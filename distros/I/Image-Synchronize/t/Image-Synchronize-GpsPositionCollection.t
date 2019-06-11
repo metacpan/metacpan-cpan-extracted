@@ -145,11 +145,13 @@ is_deeply(
   'track y positions 5'
 );
 
-is( "$gpc", <<EOD, 'stringified' );
----
-- 1970-01-12T13:46:40+00:00/13:46:50    5.00000000    6.00000000
-- 1970-01-12T13:46:47+00:00/13:47:00   17.00000000   18.00000000
-- 1970-01-12T13:47:20+00:00            25.00000000   26.00000000
-EOD
+# use Dump to construct the 'expected' outcome, because some
+# implementations of YAML produce a whitespace character after the
+# '---' and some do not.
+is( "$gpc",
+    Dump(['1970-01-12T13:46:40+00:00/13:46:50    5.00000000    6.00000000',
+          '1970-01-12T13:46:47+00:00/13:47:00   17.00000000   18.00000000',
+          '1970-01-12T13:47:20+00:00            25.00000000   26.00000000']),
+    'stringified' );
 
 done_testing;

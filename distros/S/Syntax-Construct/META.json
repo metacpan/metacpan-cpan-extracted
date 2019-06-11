@@ -1,5 +1,5 @@
 {
-   "abstract" : "Identify which non-feature constructs are used in the code.",
+   "abstract" : "Explicitly state which non-feature constructs are used in the code.",
    "author" : [
       "E. Choroba <choroba@cpan.org>"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "Syntax::Construct" : {
          "file" : "lib/Syntax/Construct.pm",
-         "version" : "1.009"
+         "version" : "1.011"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "url" : "https://github.com/choroba/syntactic-construct"
       }
    },
-   "version" : "1.009",
+   "version" : "1.011",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

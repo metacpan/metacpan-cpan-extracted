@@ -1,0 +1,45 @@
+NAME
+    Perinci::CmdLineX::CommonOptions::SelfUpgrade - Add --self-upgrade (-U)
+    common option to upgrade program to the latest version on CPAN
+
+VERSION
+    This document describes version 0.001 of
+    Perinci::CmdLineX::CommonOptions::SelfUpgrade (from Perl distribution
+    Perinci-CmdLineX-CommonOptions-SelfUpgrade), released on 2019-06-06.
+
+SYNOPSIS
+     use Perinci::CmdLine::Lite; # or ::Classic, or ::Any
+     use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
+
+     my $cmd = Perinci::CmdLine::Lite->new(...);
+     Perinci::CmdLineX::CommonOptions::SelfUpgrade->apply_to_object($cmd);
+
+     $cmd->run;
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLineX-CommonOptions-SelfUpgrade
+    >.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLineX-CommonOptions-SelfUp
+    grade>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLineX-Comm
+    onOptions-SelfUpgrade>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

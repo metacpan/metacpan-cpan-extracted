@@ -3,6 +3,9 @@
 #include "XSUB.h"
 
 #include <unbound.h>    /* unbound API */
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
 
 SV * _ub_result_to_svhv_and_free (struct ub_result* result) {
     SV *val;
@@ -102,6 +105,55 @@ _ub_ctx_set_option( struct ub_ctx *ctx, const char* opt, const char* val)
         RETVAL = ub_ctx_set_option(ctx, opt, val);
     OUTPUT:
         RETVAL
+
+void
+_ub_ctx_debuglevel( struct ub_ctx *ctx, int d )
+    CODE:
+        ub_ctx_debuglevel(ctx, d);
+
+void
+_ub_ctx_debugout( struct ub_ctx *ctx, int fd, const char *mode )
+    CODE:
+        FILE *fstream;
+
+        // Since libunbound does equality checks against stderr,
+        // let’s ensure we use that same pointer.
+        if (fd == fileno(stderr)) {
+            fstream = stderr;
+        }
+        else if (fd == fileno(stdout)) {
+            fstream = stdout;
+        }
+        else {
+
+            // Linux doesn’t care, but MacOS will segfault if you
+            // setvbuf() on an append stream opened on a non-append fd.
+            fstream = fdopen( fd, mode );
+
+            if (fstream == NULL) {
+                fprintf(stderr, "fdopen failed!!\n");
+            }
+
+            setvbuf(fstream, NULL, _IONBF, 0);
+        }
+
+        ub_ctx_debugout( ctx, fstream );
+
+const char *
+_get_fd_mode_for_fdopen(int fd)
+    CODE:
+        int flags = fcntl( fd, F_GETFL );
+
+        if ( flags == -1 ) {
+            SETERRNO( errno, 0 );
+            RETVAL = "";
+        }
+        else {
+            RETVAL = (flags & O_APPEND) ? "a" : "w";
+        }
+    OUTPUT:
+        RETVAL
+
 
 SV *
 _ub_ctx_get_option( struct ub_ctx *ctx, const char* opt)
@@ -214,7 +266,8 @@ _resolve( struct ub_ctx *ctx, SV *name, int type, int class = 1 )
             RETVAL = newSViv(retval);
         }
         else {
-            RETVAL = _ub_result_to_svhv_and_free(result);
+            SV *svhv = _ub_result_to_svhv_and_free(result);
+            RETVAL = newRV_inc(svhv);
         }
 
     OUTPUT:
@@ -227,4 +280,8 @@ BOOT:
 void
 _destroy_context( struct ub_ctx *ctx )
     CODE:
+
+        // Workaround for https://github.com/NLnetLabs/unbound/issues/39:
+        ub_ctx_debugout(ctx, stderr);
+
         ub_ctx_delete(ctx);

@@ -1,5 +1,5 @@
 package LWP::ConsoleLogger::Everywhere;
-our $VERSION = '0.000039';
+our $VERSION = '0.000040';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 0.000039
+version 0.000040
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ version 0.000039
 
 =head1 DESCRIPTION
 
-This module turns on C<LWP::ConsoleLogger::Easy> debugging for every L<LWP::UserAgent>
+This module turns on L<LWP::ConsoleLogger::Easy> debugging for every L<LWP::UserAgent>
 based user agent anywhere in your code. It doesn't matter what package or class it is in,
 or if you have access to the object itself. All you need to do is C<use> this module
 anywhere in your code and it will work.
@@ -141,7 +141,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2017 by MaxMind, Inc.
+This software is Copyright (c) 2014-2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -7,11 +7,13 @@ use File::Temp;
 use Getopt::Long::Modern qw(auto_help auto_version);
 use HTTP::Tinyish;
 use IPC::Open3;
+use Module::CoreList;
 use Pod::Usage;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 GetOptions(
+  'include-core|c' => \my $include_core,
   'from|f=s' => \my @from,
   'lib|I=s' => \my @libs,
   'notest|n' => \my $notest,
@@ -45,9 +47,9 @@ unless ($response->{success}) {
 my $from_count = @from;
 my $print_modules = "my %args; \$args{inc_override} = [splice \@ARGV, 0, $from_count] if $from_count; " . <<'EOC';
 $args{extra_libs} = [@ARGV] if @ARGV;
+print "$]\n";
 for (ExtUtils::Installed->new(skip_cwd => 1, %args)->modules) {
-  next if /\APerl\z/;
-  print $_, "\n";
+  print "$_\n" unless $_ eq 'Perl';
 }
 EOC
 
@@ -59,13 +61,22 @@ my ($list_pid, $list_out);
   $list_pid = open3 undef, $list_out, '>&STDERR', $src, '-MExtUtils::Installed', '-e', $print_modules, @from, @libs;
 }
 
+chomp(my $perl_version = readline $list_out);
+my @core_modules;
+if ($include_core) {
+  @core_modules = sort keys %{Module::CoreList::find_version($perl_version)};
+  die "Module::CoreList $Module::CoreList::VERSION is too old to retrieve core modules for Perl $perl_version\n"
+    unless @core_modules;
+}
+
 my @opts;
 push @opts, '-n' if $notest;
 push @opts, '-q' if $quiet;
 
 my $install_pid = open3 my $install_in, '>&STDOUT', '>&STDERR', $dest, $cpanm, @opts;
 
-while (my $line = readline $list_out) { print $install_in $line }
+print $install_in map { "$_\n" } @core_modules;
+while (my $module = readline $list_out) { print $install_in $module }
 close $list_out;
 close $install_in;
 
@@ -92,6 +103,7 @@ perl-migrate-modules - Migrate installed CPAN modules from one Perl to another
     perl-migrate-modules --from ~/perl5/lib/perl5 ~/perls/5.20.0
 
   Options:
+    -c, --include-core           Install core modules from source Perl
     -h, --help                   Show this message
     -f <path>, --from=<path>     Search only these path(s) for source modules
     -I <path>, --lib=<path>      Additional search path(s) for source modules
@@ -132,6 +144,12 @@ Migrate modules from an old (inactive) local::lib directory:
 
 =item *
 
+Migrate modules from the sitelib of a Perl that can no longer be executed:
+
+  $ perl-migrate-modules --from ~/.plenv/versions/5.24.0/lib/perl5/site_perl/5.24.0/ $(which perl)
+
+=item *
+
 Migrate modules to a custom local::lib location:
 
   $ env PERL_CPANM_OPT='-l /opt/project/local' perl-migrate-modules /opt/perl-5.28.0 /opt/perl-5.28.1
@@ -140,7 +158,7 @@ Migrate modules to a custom local::lib location:
 
 Update all modules installed in the current Perl:
 
-  $ perl-migrate-modules $(which perl)
+  $ perl-migrate-modules --include-core $(which perl)
 
 =back
 
@@ -148,7 +166,8 @@ Update all modules installed in the current Perl:
 
 Only modules with F<.packlist> will be migrated, this will include any module
 installed by CPAN clients, but generally not modules installed by vendor
-packages or core modules.
+packages or core modules. Core modules available from CPAN can be included via
+L<Module::CoreList> with the C<--include-core> option.
 
 Migrated modules will be installed at their latest indexed version, not the
 version that exists in the source Perl.

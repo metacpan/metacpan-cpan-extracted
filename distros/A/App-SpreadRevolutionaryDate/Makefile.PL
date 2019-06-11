@@ -39,6 +39,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "IO::Handle" => 0,
     "IO::Prompt::Hooked" => 0,
+    "LWP::Protocol::https" => 0,
     "Locale::Messages" => 0,
     "Locale::TextDomain" => 0,
     "Locale::Util" => 0,
@@ -67,7 +68,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.24",
+  "VERSION" => "0.26",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -88,6 +89,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IO::Prompt::Hooked" => 0,
+  "LWP::Protocol::https" => 0,
   "Locale::Messages" => 0,
   "Locale::TextDomain" => 0,
   "Locale::Util" => 0,

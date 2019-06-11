@@ -1,3 +1,16 @@
+0.003   2019-06-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix module Summary.
+
+
+0.002   2019-06-09 (PERLANCAR)
+
+	- [ux] image-is-{landscape,portrait}: Add option --quiet (-q) and
+	  add examples.
+
+
 0.001   2019-01-28 (PERLANCAR)
 
 	- First release.

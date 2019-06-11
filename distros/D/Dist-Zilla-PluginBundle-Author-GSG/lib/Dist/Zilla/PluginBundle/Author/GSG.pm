@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
-our $VERSION = '0.0.7'; # VERSION
+our $VERSION = '0.0.9'; # VERSION
 
 use Moose;
 with qw(
@@ -121,7 +121,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version 0.0.7
+version 0.0.9
 
 =head1 SYNOPSIS
 

@@ -12,6 +12,7 @@ t/encode.t
 t/error.t
 t/tag.t
 t/vendor.t
+t/node_list.t
 raddb/dictionary
 raddb/dictionary.ascend
 raddb/dictionary.cisco

@@ -5,7 +5,7 @@ This is Perl module B<Sub::Data::Recursive>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Sub-Data-Recursive"><img src="https://secure.travis-ci.org/bayashi/Sub-Data-Recursive.png"/></a> <a href="https://coveralls.io/r/bayashi/Sub-Data-Recursive"><img src="https://coveralls.io/repos/bayashi/Sub-Data-Recursive/badge.png?branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/Sub-Data-Recursive"><img src="https://secure.travis-ci.org/bayashi/Sub-Data-Recursive.png?_t=1559994963"/></a> <a href="https://coveralls.io/r/bayashi/Sub-Data-Recursive"><img src="https://coveralls.io/repos/bayashi/Sub-Data-Recursive/badge.png?_t=1559994963&branch=master"/></a>
 
 =end html
 

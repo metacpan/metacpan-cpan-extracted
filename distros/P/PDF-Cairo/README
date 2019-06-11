@@ -9,6 +9,10 @@ to search for the Adobe PDF core fonts or the closest equivalent. If
 not, names like Times-Roman will be replaced with the Cairo internal
 font mapping.
 
+REQUIREMENTS
+
+    libcairo >= 1.10.0 (first version with recording surfaces)
+
 INSTALLATION
 
 To install this module, run the following commands:

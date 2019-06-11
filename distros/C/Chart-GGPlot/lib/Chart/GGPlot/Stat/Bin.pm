@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use PDL::Primitive qw(which);
 use POSIX qw(floor);
@@ -41,39 +41,39 @@ classmethod _parameters () {
     ]
 }
 
-my $stat_bin_pod = layer_func_pod(<<'=cut');
+my $stat_bin_pod = layer_func_pod(<<'EOT');
 
-    stat_bin(:$mapping=undef, :$data=undef,
-             :$geom="bar", :$position="stack",
-             :$binwidth=undef, :$bins=undef,
-             :$center=undef, :$boundary=undef, :$breaks=undef,
-             :$pad=false,
-             :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
-             %rest)
+        stat_bin(:$mapping=undef, :$data=undef,
+                 :$geom="bar", :$position="stack",
+                 :$binwidth=undef, :$bins=undef,
+                 :$center=undef, :$boundary=undef, :$breaks=undef,
+                 :$pad=false,
+                 :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                 %rest)
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=item * $binwidth
+    =item * $binwidth
 
-The width of the bins.
-Can be specified as a numeric value, or a function that calculates width
-from x. The default is to use C<$bins> bins that cover the range of the
-data.
+    The width of the bins.
+    Can be specified as a numeric value, or a function that calculates width
+    from x. The default is to use C<$bins> bins that cover the range of the
+    data.
 
-=item * $bins
+    =item * $bins
 
-Number of bins. Overridden by C<$binwidth>. Defaults to 30.
+    Number of bins. Overridden by C<$binwidth>. Defaults to 30.
 
-You should always override this C<$bins> or C<$binwidth>, exploring
-multiple widths to find the best to illustrate the stories in your data.
+    You should always override this C<$bins> or C<$binwidth>, exploring
+    multiple widths to find the best to illustrate the stories in your data.
 
-=back
+    =back
 
-=cut
+EOT
 
 my $stat_bin_code = fun (
     :$mapping=undef, :$data=undef,
@@ -186,7 +186,11 @@ Chart::GGPlot::Stat::Bin - Statistic method that gets histogram of data
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Stat>
 
 =head1 AUTHOR
 

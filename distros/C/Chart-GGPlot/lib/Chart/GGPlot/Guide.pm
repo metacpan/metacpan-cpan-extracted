@@ -3,9 +3,10 @@ package Chart::GGPlot::Guide;
 # ABSTRACT: Role for guide
 
 use Chart::GGPlot::Setup;
+use Function::Parameters qw(classmethod);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use parent qw(Chart::GGPlot::Params);
 
@@ -15,11 +16,21 @@ use Chart::GGPlot::Types qw(:all);
 use Chart::GGPlot::Util qw(:all);
 
 
-method title() {
-    return $self->at('title');
+for my $attr (qw(title key reverse)) {
+    no strict 'refs';
+    *{$attr} = sub { $_[0]->at($attr); }
 }
 
-method available_aes() { undef; }
+# undef means "any"
+classmethod available_aes () { undef; }
+
+method train ($scale, $aesthetics=undef) {
+    return $self;
+}
+
+classmethod _reverse_df ($df) {
+    return $df->select_rows( [ reverse( 0 .. $df->nrow - 1 ) ] );
+}
 
 1;
 
@@ -35,7 +46,7 @@ Chart::GGPlot::Guide - Role for guide
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 ATTRIBUTES
 
@@ -44,6 +55,10 @@ version 0.0003
 A string indicating a title of the guide. If an empty string, the
 title is not show. By default (C<undef>) the name of the scale
 object or the name specified in C<labs()> is used for the title.
+
+=head2 key
+
+=head2 reverse
 
 =head1 AUTHOR
 

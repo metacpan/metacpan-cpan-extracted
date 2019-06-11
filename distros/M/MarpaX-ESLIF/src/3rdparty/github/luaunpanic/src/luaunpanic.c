@@ -201,25 +201,15 @@ static short _luaunpanic_newthread(lua_State **LNp, lua_State *L)
 short luaunpanic_newthread(lua_State **Lp, lua_State *L)
 /****************************************************************************/
 {
-  luaunpanic_userdata_t *LW;
+  luaunpanic_userdata_t *LW = (luaunpanic_userdata_t *) lua_getuserdata(L);
   lua_State *LN;
   short rc;
-
-  LW = (luaunpanic_userdata_t *) malloc(sizeof(luaunpanic_userdata_t));
-  if (LW == NULL) {
-    goto err;
-  }
-
-  LW->panicstring = LUAUNPANIC_DEFAULT_PANICSTRING;
-  LW->envpmallocl = 0;
-  LW->envpusedl   = 0;
-  LW->envp        = NULL;
 
   if (_luaunpanic_newthread(&LN, L)) {
     goto err;
   }
 
-  /* Set our userdata and panic handler - these functions never fails */
+  /* Set our userdata and panic handler - this is shared with parent */
   lua_setuserdata(LN, (void *) LW);
   lua_atpanic(LN, &luaunpanic_atpanic);
 
@@ -231,12 +221,6 @@ short luaunpanic_newthread(lua_State **Lp, lua_State *L)
   goto done;
 
  err:
-  if (LW != NULL) {
-    if (LW->envp != NULL) {
-      free(LW->envp);
-    }
-    free(LW);
-  }
   rc = 1;
 
  done:

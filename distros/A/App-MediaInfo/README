@@ -1,9 +1,10 @@
 NAME
-    App::MediaInfo - Return exit code 0 if media is portrait
+    App::MediaInfo - Utilities related to getting (metadata) information
+    from media files
 
 VERSION
-    This document describes version 0.120 of App::MediaInfo (from Perl
-    distribution App-MediaInfo), released on 2019-01-28.
+    This document describes version 0.123 of App::MediaInfo (from Perl
+    distribution App-MediaInfo), released on 2019-06-09.
 
 FUNCTIONS
   media_info
@@ -58,6 +59,11 @@ FUNCTIONS
 
         Media file/URL.
 
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -90,6 +96,11 @@ FUNCTIONS
     *   media* => *str*
 
         Media file/URL.
+
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
 
     Returns an enveloped result (an array).
 

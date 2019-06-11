@@ -1,7 +1,7 @@
 package DBIx::Class::Events;
 
 # ABSTRACT: Store Events for your DBIC Results
-# VERSION
+our $VERSION = '0.9.2'; # VERSION
 
 use v5.10;
 use strict;
@@ -125,7 +125,7 @@ DBIx::Class::Events - Store Events for your DBIC Results
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 

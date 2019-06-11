@@ -13,6 +13,7 @@ $eumm_version =~ s/_//;
 my $module = 'Apache::Tika::Async';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
 (my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -25,8 +26,8 @@ my %module = (
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
-                web => 'https://github.com/Corion/' . $distbase,
-                url => "git://github.com/Corion/$distbase.git",
+                web => "https://github.com/Corion/$distlink",
+                url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
             }
         },
@@ -40,9 +41,6 @@ my %module = (
 
     PL_FILES            => {},
     BUILD_REQUIRES => {
-        'Exporter'   => '5',    # we need the "import" facility
-        'Carp'       => '0',
-
         # Fairly long in core
         'File::Path' => 0,
         'File::Copy' => 0,
@@ -51,17 +49,18 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Exporter'         => 5, # for 'import'
+        'Exporter'           => '5',    # we need the "import" facility
+        'Filter::signatures' => 0.15,
         'Carp'           => 0,
-        'Exporter'       => 5,
         'Promises'       => 0,
         'LWP::UserAgent' => 6,
         'Moo'            => 2,
         'Try::Tiny'      => 0,
         'JSON::XS'       => 0,
     },
-    TEST_REQUIRES => { # all core anyway...
+    TEST_REQUIRES => {
         'Test::More'   => 0,
+        'Data::Dumper' => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -79,7 +78,7 @@ sub get_module_info { %module }
 if( ! caller ) {
     # I should maybe use something like Shipwright...
     regen_README($main_file);
-    #regen_EXAMPLES();
+    regen_EXAMPLES() if -d 'examples';
     WriteMakefile1(get_module_info);
 };
 
@@ -142,7 +141,11 @@ Should you wish to install this module manually, the procedure is
 INSTALL
             pod_section($_[0], 'REPOSITORY'),
             pod_section($_[0], 'SUPPORT'),
+            pod_section($_[0], 'TALKS'),
+            pod_section($_[0], 'KNOWN ISSUES'),
             pod_section($_[0], 'BUG TRACKER'),
+            pod_section($_[0], 'CONTRIBUTING'),
+            pod_section($_[0], 'SEE ALSO'),
             pod_section($_[0], 'AUTHOR'),
             pod_section($_[0], 'LICENSE' ),
             pod_section($_[0], 'COPYRIGHT' ),
@@ -161,7 +164,8 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Chrome.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Chrome)
+[![Travis Build Status](https://travis-ci.org/Corion/$distlink.svg?branch=master)](https://travis-ci.org/Corion/$distlink)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distlink?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distlink)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -175,11 +179,12 @@ sub pod_section {
 
     my @section =
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
-    pop @section if $section[-1] =~ /^=/;
-    shift @section if $remove_heading;
 
     # Trim the section
     if( @section ) {
+        pop @section if $section[-1] =~ /^=/;
+        shift @section if $remove_heading;
+
         pop @section
             while $section[-1] =~ /^\s*$/;
         shift @section
@@ -189,6 +194,20 @@ sub pod_section {
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
     return join "", @section;
 }
+
+sub regen_EXAMPLES {
+    my $perl = $^X;
+    if ($perl =~/\s/) {
+        $perl = qq{"$perl"};
+    };
+    (my $example_file = $main_file) =~ s!\.pm$!/Examples.pm!;
+    my $examples = `$perl -w examples/gen_examples_pod.pl`;
+    if ($examples) {
+        warn "(Re)Creating $example_file\n";
+        $examples =~ s/\r\n/\n/g;
+        update_file( $example_file, $examples );
+    };
+};
 
 sub update_file {
     my( $filename, $new_content ) = @_;

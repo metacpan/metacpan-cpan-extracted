@@ -1,5 +1,5 @@
 package Search::QS::Filters;
-$Search::QS::Filters::VERSION = '0.02';
+$Search::QS::Filters::VERSION = '0.04';
 use v5.14;
 use Moose;
 use Search::QS::Filter;
@@ -16,7 +16,7 @@ sub parse() {
     my $struct  = shift;
 
 
-    while (my ($k,$v) = each $struct) {
+    while (my ($k,$v) = each %$struct) {
         given($k) {
 			when (/^flt\[(.*?)\]/)   { $s->_parse_filter($1, $v) }
 		}
@@ -45,7 +45,7 @@ sub to_sql() {
     my $groups = $s->as_groups;
 
     my $and = '';
-    while (my ($k, $v) = each $groups->{and}) {
+    while (my ($k, $v) = each %{$groups->{and}}) {
         $and .= ' ( ' . join (' AND ', map($_->to_sql, @$v)) . ' ) ';
         $and .= ' OR ';
     }
@@ -53,7 +53,7 @@ sub to_sql() {
     $and = substr($and, 0, length($and)-4) if (length($and) >0);
 
     my $or = '';
-    while (my ($k, $v) = each $groups->{or}) {
+    while (my ($k, $v) = each %{$groups->{or}}) {
         $or .= ' ( ' . join (' OR ', map($_->to_sql, @$v)) . ' ) ';
         $or .= ' AND ';
     }
@@ -98,7 +98,7 @@ Search::QS::Filters - A collection of L<Search::QS::Filter>
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle PiddleFromAny);
@@ -137,7 +137,14 @@ Chart::GGPlot::Scale - The role for scale
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 DESCRIPTION
+
+This module is a Moose role for "scale".
+
+For users of Chart::GGPlot you would mostly want to look at
+L<Chart::GGPlot::Scale::Functions> instead.
 
 =head1 ATTRIBUTES
 

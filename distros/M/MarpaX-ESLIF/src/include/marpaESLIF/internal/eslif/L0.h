@@ -36,9 +36,8 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_TERMINAL_VALUES,
   L0_TERMINAL_QUOTED_STRING,
   L0_TERMINAL_REGULAR_EXPRESSION,
-  L0_TERMINAL_REGULAR_EXPRESSION_MODIFIER,
   L0_TERMINAL_CHARACTER_CLASS_REGEXP,
-  L0_TERMINAL_PCRE2_MODIFIERS,
+  L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS,
   L0_TERMINAL_STRING_MODIFIERS,
   L0_TERMINAL_RESTRICTED_ASCII_GRAPH_CHARACTERS,
   L0_TERMINAL_LUA_ACTION_NAME,
@@ -312,7 +311,7 @@ __DATA__
   /* Taken from Regexp::Common::delimited, $RE{delimited}{-delim=>q{'"}}{-cdelim=>q{'"}} */
   /* Perl stringified version is: (?:(?|(?:\')(?:[^\\\']*(?:\\.[^\\\']*)*)(?:\')|(?:\")(?:[^\\\"]*(?:\\.[^\\\"]*)*)(?:\"))) */
   { L0_TERMINAL_QUOTED_STRING, MARPAESLIF_TERMINAL_TYPE_REGEX, "su",
-    "(?:(?|(?:')(?:[^\\\\']*(?:\\\\.[^\\\\']*)*)(?:')|(?:\")(?:[^\\\\\"]*(?:\\\\.[^\\\\\"]*)*)(?:\")|(?:\\x{201C})(?:[^\\\\\\x{201D}]*(?:\\\\.[^\\\\\\x{201D}]*)*)(?:\\x{201D})))",
+    "'(?:[^\\\\']*(?:\\\\.[^\\\\']*)*)'|\"(?:[^\\\\\"]*(?:\\\\.[^\\\\\"]*)*)\"|\\x{201C}(?:[^\\\\\\x{201D}]*(?:\\\\.[^\\\\\\x{201D}]*)*)\\x{201D}",
 #ifndef MARPAESLIF_NTRACE
     "'A string'", "'"
 #else
@@ -326,17 +325,12 @@ __DATA__
   /* And it appears that is ok because a regexp starting with C comment have no sense, as well */
   /* as an empty regexp starting with // */
   { L0_TERMINAL_REGULAR_EXPRESSION, MARPAESLIF_TERMINAL_TYPE_REGEX, "su",
-    "(?:(?|(?:/(?![*/]))(?:[^\\\\/]*(?:\\\\.[^\\\\/]*)*)(?:/)))",
+    "/(?![*/])(?:[^\\\\/]*(?:\\\\.[^\\\\/]*)*)/",
 #ifndef MARPAESLIF_NTRACE
     "/a(b)c/", "/a("
 #else
     NULL, NULL
 #endif
-  },
-  /* --------------------------------------------------------------------------------------------------------------------------------- */
-  { L0_TERMINAL_REGULAR_EXPRESSION_MODIFIER, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
-    "[eijmnsxDJUuaN]",
-    NULL, NULL
   },
   /* --------------------------------------------------------------------------------------------------------------------------------- */
   /* Taken from Regexp::Common::balanced, $RE{balanced}{-parens=>'[]'} */
@@ -351,7 +345,7 @@ __DATA__
 #endif
   },
   /* --------------------------------------------------------------------------------------------------------------------------------- */
-  { L0_TERMINAL_PCRE2_MODIFIERS, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
+  { L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
     "[eijmnsxDJUuaNbcA]+",
     NULL, NULL
   },
@@ -426,13 +420,13 @@ bootstrap_grammar_rule_t bootstrap_grammar_L0_rules[] = {
   { L0_META_CHARACTER_CLASS,                  "character class 1",                            MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_CHARACTER_CLASS_REGEXP           }, -1,                        -1,      -1,             0, NULL },
   { L0_META_CHARACTER_CLASS,                  "character class 2",                            MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { L0_TERMINAL_CHARACTER_CLASS_REGEXP,
                                                                                                                                      L0_TERMINAL_SEMICOLON,
-                                                                                                                                     L0_TERMINAL_PCRE2_MODIFIERS                  }, -1,                        -1,      -1,             0, NULL },
+                                                                                                                                     L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS     }, -1,                        -1,      -1,             0, NULL },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb actions
   */
   { L0_META_REGULAR_EXPRESSION,               "regular expression 1",                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_REGULAR_EXPRESSION               }, -1,                        -1,      -1,             0, NULL },
   { L0_META_REGULAR_EXPRESSION,               "regular expression 2",                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 2, { L0_TERMINAL_REGULAR_EXPRESSION,
-                                                                                                                                     L0_TERMINAL_PCRE2_MODIFIERS                  }, -1,                        -1,      -1,             0, NULL }
+                                                                                                                                     L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS     }, -1,                        -1,      -1,             0, NULL }
 };
 
 #endif /* MARPAESLIF_INTERNAL_ESLIF_L0_H */

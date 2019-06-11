@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000010';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -321,6 +321,8 @@ Base class for DBIx::QuickDB drivers.
     1;
 
 =head1 METHODS PROVIDED HERE
+
+=over 4
 
 =item $bool = $db->autostart
 

@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
@@ -150,6 +150,7 @@ sub _fixup_helpers_usage {
 my @Perls = qw(
     blead
     dev
+    5.30
     5.28
     5.26
     5.24

@@ -278,6 +278,7 @@ mingw_modfl(long double x, long double *ip)
 #define F_ALLOW_STRINGIFY 0x00200000UL
 #define F_UNBLESSED_BOOL  0x00400000UL
 #define F_ALLOW_DUPKEYS   0x00800000UL
+#define F_REQUIRE_TYPES   0x01000000UL
 #define F_HOOK            0x80000000UL /* some hooks exist, so slow-path processing */
 
 #define F_PRETTY    F_INDENT | F_SPACE_BEFORE | F_SPACE_AFTER
@@ -742,7 +743,7 @@ typedef struct
 INLINE void
 need (pTHX_ enc_t *enc, STRLEN len)
 {
-#if PERL_VERSION > 6
+#if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION >= 1)
   DEBUG_v(Perl_deb(aTHX_ "need enc: %p %p %4ld, want: %lu\n", enc->cur, enc->end,
                    (long)(enc->end - enc->cur), (unsigned long)len));
 #endif
@@ -783,7 +784,7 @@ encode_str (pTHX_ enc_t *enc, char *str, STRLEN len, int is_utf8)
   while (str < end)
     {
       unsigned char ch = *(unsigned char *)str;
-#if PERL_VERSION > 6
+#if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION >= 1)
       DEBUG_v(Perl_deb(aTHX_ "str  enc: %p %p %4ld, want: %lu\n", enc->cur, enc->end,
                        (long)(enc->end - enc->cur), (long unsigned)len));
 #endif
@@ -1429,6 +1430,10 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
       SvREFCNT_dec(rv);
     }
   }
+  if (UNLIKELY(isref == 1 && (enc->json.flags & F_ALLOW_BIGNUM) && str && str[0] == '+')) {
+    str++;
+    len--;
+  }
   /* if ALLOW_BIGNUM and Math::Big* and NaN => according to stringify_infnan */
   if (UNLIKELY(
         (enc->json.flags & F_ALLOW_BIGNUM)
@@ -1686,6 +1691,20 @@ encode_bool (pTHX_ enc_t *enc, SV *sv)
 }
 
 static void
+sv_to_ivuv (pTHX_ SV *sv, int *is_neg, IV *iv, UV *uv)
+{
+  *iv = SvIV_nomg (sv);
+  *uv = (UV)(*iv);
+  /* SvIV and SvUV may modify SvIsUV flag */
+  *is_neg = !SvIsUV (sv);
+  if (!*is_neg)
+    {
+      *uv = SvUV_nomg (sv);
+      *iv = (IV)(*uv);
+    }
+}
+
+static void
 encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
 {
   IV type = 0;
@@ -1694,6 +1713,9 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
   int force_conversion = 0;
 
   SvGETMAGIC (sv);
+
+  if (UNLIKELY (!(SvOK (typesv)) && (enc->json.flags & F_REQUIRE_TYPES)))
+    croak ("type for '%s' was not specified", SvPV_nolen (sv));
 
   if (SvROK (sv) && !SvOBJECT (SvRV (sv)))
     {
@@ -1780,7 +1802,7 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
       bool loc_changed = FALSE;
       char *locale = NULL;
 #endif
-      NV nv = SvNOKp (sv) ? SvNVX (sv) : SvOK (sv) ? SvNV_nomg (sv) : 0;
+      NV nv = SvNOKp (sv) ? SvNVX (sv) : SvNV_nomg (sv);
       /* trust that perl will do the right thing w.r.t. JSON syntax. */
       need (aTHX_ enc, NV_DIG + 32);
       savecur = enc->cur;
@@ -1967,21 +1989,6 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
           iv = SvIVX (sv);
           uv = SvUVX (sv);
         }
-      else if (SvNOKp (sv))
-        {
-          NV nv = SvNVX (sv);
-          is_neg = (nv < 0);
-          if (is_neg)
-            {
-              iv = (IV)nv;
-              uv = (UV)iv;
-            }
-          else
-            {
-              uv = (UV)nv;
-              iv = (IV)uv;
-            }
-        }
       else if (SvPOKp (sv))
         {
           int numtype = grok_number (SvPVX (sv), SvCUR (sv), &uv);
@@ -1999,18 +2006,54 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
               else
                 iv = (IV)uv;
             }
-          else
+          else if (UNLIKELY (numtype & IS_NUMBER_INFINITY))
             {
-              is_neg = 1;
-              iv = SvIV_nomg (sv);
-              uv = (UV)iv;
+              is_neg = (numtype & IS_NUMBER_NEG);
+              if (is_neg)
+                {
+                  iv = IV_MIN;
+                  uv = (UV)iv;
+                }
+              else
+                {
+                  uv = UV_MAX;
+                  iv = (IV)uv;
+                }
+            }
+          else if (LIKELY (!(numtype & IS_NUMBER_NAN)))
+            {
+              sv_to_ivuv (aTHX_ sv, &is_neg, &iv, &uv);
             }
         }
-      else if (SvOK (sv))
+      else
         {
-          is_neg = 1;
-          iv = SvIV_nomg (sv);
-          uv = (UV)iv;
+#if PERL_VERSION < 8
+/* SvIV() and SvUV() in Perl 5.6 does not handle Inf and NaN in NV slot */
+# if defined(USE_QUADMATH) && defined(HAVE_ISINFL) && defined(HAVE_ISNANL)
+          if (SvNOKp (sv) && UNLIKELY (isinfl (SvNVX (sv))))
+# else
+          if (SvNOKp (sv) && UNLIKELY (isinf (SvNVX (sv))))
+# endif
+            {
+              if (SvNVX (sv) < 0)
+                {
+                  is_neg = 1;
+                  iv = IV_MIN;
+                  uv = (UV)iv;
+                }
+              else
+                {
+                  uv = UV_MAX;
+                  iv = (IV)uv;
+                }
+            }
+# if defined(USE_QUADMATH) && defined(HAVE_ISINFL) && defined(HAVE_ISNANL)
+          else if (!SvNOKp (sv) || LIKELY (!isnanl (SvNVX (sv))))
+# else
+          else if (!SvNOKp (sv) || LIKELY (!isnan (SvNVX (sv))))
+# endif
+#endif
+            sv_to_ivuv (aTHX_ sv, &is_neg, &iv, &uv);
         }
       if (is_neg ? iv <= 59000 && iv >= -59000
                  : uv <= 59000)
@@ -3134,11 +3177,18 @@ decode_num (pTHX_ dec_t *dec, SV *typesv)
         return newSVnv (json_atof (start));
 
       if (dec->json.flags & F_ALLOW_BIGNUM) {
+        SV *errsv;
         SV* pv = newSVpvs("require Math::BigInt && return Math::BigInt->new(\"");
         sv_catpvn(pv, start, dec->cur - start);
         sv_catpvs(pv, "\");");
         eval_sv(pv, G_SCALAR);
         SvREFCNT_dec(pv);
+        /* rethrow current error */
+        errsv = ERRSV;
+        if (SvROK (errsv))
+          croak (NULL);
+        else if (SvTRUE (errsv))
+          croak ("%" SVf, SVfARG (errsv));
         {
           dSP;
           SV *retval = SvREFCNT_inc(POPs);
@@ -3155,11 +3205,18 @@ decode_num (pTHX_ dec_t *dec, SV *typesv)
     sv_setiv_mg (typesv, JSON_TYPE_FLOAT);
 
   if (dec->json.flags & F_ALLOW_BIGNUM) {
+    SV *errsv;
     SV* pv = newSVpvs("require Math::BigFloat && return Math::BigFloat->new(\"");
     sv_catpvn(pv, start, dec->cur - start);
     sv_catpvs(pv, "\");");
     eval_sv(pv, G_SCALAR);
     SvREFCNT_dec(pv);
+    /* rethrow current error */
+    errsv = ERRSV;
+    if (SvROK (errsv))
+      croak (NULL);
+    else if (SvTRUE (errsv))
+      croak ("%" SVf, SVfARG (errsv));
     {
       dSP;
       SV *retval = SvREFCNT_inc(POPs);
@@ -4110,6 +4167,7 @@ void ascii (JSON *self, int enable = 1)
         allow_stringify = F_ALLOW_STRINGIFY
         unblessed_bool  = F_UNBLESSED_BOOL
         allow_dupkeys   = F_ALLOW_DUPKEYS
+        require_types   = F_REQUIRE_TYPES
     PPCODE:
         if (enable)
           self->flags |=  ix;
@@ -4141,6 +4199,7 @@ void get_ascii (JSON *self)
         get_allow_stringify = F_ALLOW_STRINGIFY
         get_unblessed_bool  = F_UNBLESSED_BOOL
         get_allow_dupkeys   = F_ALLOW_DUPKEYS
+        get_require_types   = F_REQUIRE_TYPES
     PPCODE:
         XPUSHs (boolSV (self->flags & ix));
 

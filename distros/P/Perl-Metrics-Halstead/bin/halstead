@@ -9,14 +9,16 @@ use Pod::Usage;
 
 my $metric = 'effort';
 my $report = 0;
+my $prec   = 2;
 my $help   = 0;
 my $man    = 0;
 
 GetOptions(
-    'metric|m=s' => \$metric,
-    'report|r'   => \$report,
-    'help|?'     => \$help,
-    'man'        => \$man,
+    'metric|m=s'    => \$metric,
+    'report|r'      => \$report,
+    'precision|p=i' => \$prec,
+    'help|?'        => \$help,
+    'man'           => \$man,
 ) or pod2usage(2);
 
 pod2usage(1) if $help || !@ARGV;
@@ -53,7 +55,7 @@ for my $file (@packages) {
     }
 
     if ( $report ) {
-        $m->report;
+        $m->report($prec);
     }
     else {
         push @scores, [ $file, $m->$metric ] if $metric && $m;
@@ -80,25 +82,24 @@ halstead
 
 =head1 VERSION
 
-version 0.0605
+version 0.0608
 
 =head1 SYNOPSIS
 
-  halstead [--options] /some/perl/file.pl [/another/Perl.pm ...]
+  halstead [--options] /some/perl/file.pl [/some/perl/Module.pm ...]
 
-=head1 NAME
+=head1 DESCRIPTION
 
-halstead - Analyze Perl code for Halstead complexity
+Analyze the Halstead complexity of Perl code.
 
 =head1 OPTIONS
 
 =head2 metric
 
-  --metric difficulty
+  --metric effort
 
-The Halstead sorted metric to use for non-report output.
-
-However, if set to the empty string (C<''>) C<--report> output is assumed.
+The Halstead sorted metric.  If not specified on the command line, a metric of
+C<effort> is used.
 
 Possible metrics:
 
@@ -115,7 +116,19 @@ Possible metrics:
 
   --report
 
-Output a Halstead report for each given file.
+Output a Halstead report for each given file instead of a single C<--metric>.
+
+=head2 precision
+
+  --prec 4
+
+Specify the decimal precision to use for report numbers.
+
+=head1 SEE ALSO
+
+L<Getopt::Long>
+
+L<Pod::Usage>
 
 =head1 AUTHOR
 

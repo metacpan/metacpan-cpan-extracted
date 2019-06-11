@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ImageInfoUtils/image_is_landscape
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-01-28'; # DATE
+our $DATE = '2019-06-09'; # DATE
 our $DIST = 'App-ImageInfoUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,13 +39,19 @@ image-is-landscape - Return exit code 0 if image is landscape
 
 =head1 VERSION
 
-This document describes version 0.001 of image-is-landscape (from Perl distribution App-ImageInfoUtils), released on 2019-01-28.
+This document describes version 0.003 of image-is-landscape (from Perl distribution App-ImageInfoUtils), released on 2019-06-09.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % image-is-landscape [options] <file>
+
+Examples:
+
+Move all landscape images to landscape/:
+
+ % for f in *.jpg;do image-is-landscape -q "$f" && mv "$f" landscape/; done
 
 =head1 DESCRIPTION
 
@@ -58,6 +64,10 @@ C<*> marks required options.
 =over
 
 =item B<--file>=I<s>*
+
+=item B<--quiet-arg>, B<--silent>, B<-q>
+
+Don't output anything on command-line, just return appropriate exit code.
 
 =back
 

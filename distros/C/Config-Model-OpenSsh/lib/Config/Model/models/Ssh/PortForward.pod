@@ -22,11 +22,18 @@ Specify if the forward is specified iwth IPv6 or IPv4. I< Optional. Type boolean
 
 =head2 bind_address - bind address to listen to
 
-Specify the address that the port will listen to. By default, only connections coming from localhost (127.0.0.1) will be forwarded.
+Specify the address that the port will listen to. By
+default, only connections coming from localhost (127.0.0.1)
+will be forwarded.
 
-By default, the local port is bound in accordance with the GatewayPorts setting. However, an explicit bind_address may be used to bind the connection to a specific address.
+By default, the local port is bound in accordance with the
+GatewayPorts setting. However, an explicit bind_address may
+be used to bind the connection to a specific address.
 
-The bind_address of 'localhost' indicates that the listening port be bound for local use only, while an empty address or '*' indicates that the port should be available from all interfaces. I< Optional. Type uniline.  > 
+The bind_address of 'localhost' indicates that the listening
+port be bound for local use only, while an empty address or
+'*' indicates that the port should be available from all
+interfaces. I< Optional. Type uniline.  > 
 
 =head2 port
 

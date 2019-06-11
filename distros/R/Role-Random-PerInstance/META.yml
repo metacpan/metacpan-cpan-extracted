@@ -1,14 +1,14 @@
 ---
-abstract: unknown
+abstract: 'A role for dealing with random values, per instance'
 author:
-  - unknown
+  - "Curtis 'Ovid' Poe <ovid@cpan.org>"
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,8 +20,9 @@ no_index:
 requires:
   List::Util: '1.4'
   Math::Round: '0.07'
+  Moose::Role: '0'
   Test::Most: '0.35'
 resources:
   repository: https://github.com/Ovid/role-random-perinstance.git
-version: '0.01'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

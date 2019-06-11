@@ -9,7 +9,7 @@ use FASTX::Reader;
 # Read two samples files if the user didnt provide any filename
 unless ($ARGV[0]) {
  say STDERR "[WARNING] No input file specified, using test data";
- push(@ARGV,"$Bin/test.fastq", "$Bin/test.fasta" )
+ push(@ARGV,"$Bin/../data/test.fastq", "$Bin/../data/test.fasta" )
 }
 
 foreach my $input_file (@ARGV) {
@@ -32,7 +32,7 @@ foreach my $input_file (@ARGV) {
 
 =head1 NAME
 
-B<Counter.pl> - A minimal implementation of the FASTX::Reader, used to count sequences in FASTA / FASTQ files
+B<Counter.pl> - Demo script using FASTX::Reader to count sequences in FASTA / FASTQ files
 
 =head1 USAGE
 

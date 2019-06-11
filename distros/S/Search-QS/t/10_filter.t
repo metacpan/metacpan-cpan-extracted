@@ -70,7 +70,7 @@ sub to_qs {
 
     my $filters = new Search::QS::Filters;
 
-    while (my ($k,$v) = each $struct) {
+    while (my ($k,$v) = each %$struct) {
         given($k) {
 			when (/^flt\[(.*?)\]/)   { $filters->push(&to_sql_flt($1, $v)) }
 		}
@@ -87,7 +87,7 @@ sub to_sql {
 
     my $filters = new Search::QS::Filters;
 
-    while (my ($k,$v) = each $struct) {
+    while (my ($k,$v) = each %$struct) {
         given($k) {
 			when (/^flt\[(.*?)\]/)   { $filters->push(&to_sql_flt($1, $v)) }
 		}

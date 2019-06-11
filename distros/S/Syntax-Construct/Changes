@@ -1,5 +1,18 @@
 Revision history for Syntax-Construct
 
+1.011   2019-06-09
+
+        - Fix link to documentation of for-qw
+
+1.010   2019-06-09
+
+        - Add @_=split
+        - Add prototype+ (thanks Chris White)
+        - Fix the version of the removal of for-qw, it was removed in
+          5.18, 5.14 was just its deprecation
+        - Improve tests: test that removed constructs don't work in
+          later versions
+
 1.009   2019-06-07
 
         - Perl 5.30 was released

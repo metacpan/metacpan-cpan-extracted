@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode;
-$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.24';
+$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.26';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Freenode.
 
 use Moose;
@@ -108,7 +108,7 @@ App::SpreadRevolutionaryDate::Target::Freenode - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.24
+version 0.26
 
 =head1 METHODS
 

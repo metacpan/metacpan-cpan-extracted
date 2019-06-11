@@ -3,8 +3,7 @@ use strict;
 use Moo 2;
 use JSON::XS qw(decode_json);
 
-use vars '$VERSION';
-$VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -140,7 +139,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2014-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

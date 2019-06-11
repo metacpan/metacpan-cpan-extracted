@@ -41,6 +41,12 @@ has condition => (
     isa => 'Str',
 );
 
+has ambiguous => (
+    is  => 'rw',
+    isa => 'Str',
+    default => 'empty',
+);
+
 has _dbi => (
     is  => 'ro',
     isa => 'Object',
@@ -77,7 +83,7 @@ sub get {
     my $column = $self->column();
     if (!$column || ref $column ne '') {
         die "column must be a singe column name when using get";
-    } 
+    }
 
     my $query = sprintf "SELECT %s FROM %s WHERE %s",
         $column, $self->table(), $self->condition();
@@ -87,45 +93,46 @@ sub get {
     my $sth = $self->_dbi()->prepare($query);
     $sth->execute( @path );
 
-    my $rows = $sth->fetchall_arrayref();
+    my $row = $sth->fetchrow_arrayref();
 
-    # hmpf
-    unless (ref $rows eq 'ARRAY') {
-       $self->log()->error('DBI did not return an arrayref');
-       die "DBI did not return an arrayref.";
-    }
+    $self->log()->trace('result is ' . Dumper $row );
 
-    $self->log()->trace('result is ' . Dumper $rows );
-
-    if (scalar @{$rows} == 0) {
+    my $result;
+    if (!$row) {
         return $self->_node_not_exists( @path );
-    } elsif (scalar @{$rows} > 1) {
+
+    } elsif (($self->ambiguous() ne 'return') && $sth->fetchrow_arrayref()) {
+
         $self->log()->error('Ambiguous (multi-valued) result');
+        if ($self->ambiguous() eq 'die') {
+            die "Ambiguous (multi-valued) result";
+        }
         return $self->_node_not_exists( @path );
+
     }
 
-    $self->log()->debug('Valid return: ' . $rows->[0]->[0]);
-    return $rows->[0]->[0];
+    $self->log()->debug('Valid return: ' . $row->[0]);
+    return $row->[0];
 
 }
 
 sub get_hash {
-    
+
     my $self = shift;
     my @path = $self->_build_path( shift );
 
     my $column = $self->column();
     if ($column && ref $column ne 'HASH') {
         die "column must be a hashref or empty when using get_hash";
-    } 
+    }
 
     my $columns = '*';
     if (ref $column eq 'HASH') {
         my @cols;
         map {
-            push @cols, sprintf( "%s as %s", $column->{$_}, $_ );      
+            push @cols, sprintf( "%s as %s", $column->{$_}, $_ );
         } keys %{$column};
-        $columns = join(",", @cols); 
+        $columns = join(",", @cols);
     }
 
     my $query = sprintf "SELECT %s FROM %s WHERE %s",
@@ -142,10 +149,18 @@ sub get_hash {
 
     if (!$row) {
         return $self->_node_not_exists( @path );
+
+    } elsif (($self->ambiguous() ne 'return') && $sth->fetchrow_hashref()) {
+
+        $self->log()->error('Ambiguous (multi-valued) result');
+        if ($self->ambiguous() eq 'die') {
+            die "Ambiguous (multi-valued) result";
+        }
+        return $self->_node_not_exists( @path );
     }
 
     $self->log()->debug('Valid return: ' . Dumper $row);
-    return $row; 
+    return $row;
 
 }
 
@@ -159,7 +174,7 @@ sub get_list {
     my $column = $self->column();
     if (!$column || ref $column ne '') {
         die "column must be a singe column name when using get_list";
-    } 
+    }
 
     my $query = sprintf "SELECT %s FROM %s WHERE %s",
         $self->column(), $self->table(), $self->condition();
@@ -256,7 +271,7 @@ Connector::Proxy::DBI
 
 =head 1 Description
 
-Use DBI to make a query to a database, supports calls to a single column only.
+Use DBI to make a query to a database.
 
 =head1 Usage
 
@@ -269,12 +284,66 @@ Use DBI to make a query to a database, supports calls to a single column only.
         table => 'mytable',
         column => 1,
         condition => 'id = ?',
+        ambiguous => 'die',
     });
+
+=head2 Parameters
+
+=over
+
+=item dbuser
+
+=item password
+
+=item table
+
+The name of the table, can also be a JOIN clause (if supported by the driver).
+
+=item column
+
+For get/get_list the name of a single column to be returned.
+
+For get_hash a hash where the keys are the target keys of the resulting
+hash and the values are the column names.
+
+=item condition
+
+The condition using a question mark as placeholder. The placeholder(s) are
+fed from the path components.
+
+=item ambigous
+
+Controls the behaviour of the connector if more than one result is found
+when a single one is expected (get/get_hash).
+
+=over
+
+=item empty (default)
+
+Return an empty result, will also die if I<die_on_undef> is set.
+
+=item return
+
+The potential ambiguity is ignored and the first row fetched is returned.
+Note that depending on the database backend the actual result returned from
+the is very likely undetermined.
+
+=item die
+
+Die with an error message.
+
+=back
+
+=back
+
+=head1 Methods
 
 =head2 get
 
-Will return the value of the requested column of the matching row. If no row or
-more than one row is found, undef is returned (dies if die_on_undef is set).
+Will return the value of the requested column of the matching row. If no row
+is found, undef is returned (dies if die_on_undef is set).
+
+If multiple rows are found, behaviour depends on the value of I<ambiguous>.
 
 =head2 get_list
 
@@ -288,7 +357,7 @@ multiple rows. Returns undef if no rows are found.
 
 =head2 get_hash
 
-Return a single row as hashref, by default all columns are returned as 
+Return a single row as hashref, by default all columns are returned as
 retrieved from the database. Pass a hashref to I<column>, where the key
 is the target key and the value is the name of the column you need.
 
@@ -297,12 +366,12 @@ index and title in your result.
 
     $con->column({ 'id' => 'id', '`index`' => 'id', 'title' => 'name' });
 
-Note: The mapping is set directly on the sql layer and as escaping 
+Note: The mapping is set directly on the sql layer and as escaping
 reserved words is not standardized, we dont do it. You can add escape
 characters yourself to the column map where required, as shown for the
 word "index" in the given example.
 
-=head2 get_keys 
+=head2 get_keys
 
 not supported
 

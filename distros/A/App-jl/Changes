@@ -1,5 +1,14 @@
 Revision history for Perl extension App::jl
 
+0.08    Tue Jun 11 14:02:20 JST 2019
+        - Add `xxxx` option
+        - Sort invoking order
+        - Improve some logics
+
+0.07    Sun Jun  9 14:10:13 JST 2019
+        - Add `xx` and `xxx` option
+        - Add `timestamp-key` option to specify unix timestamp value by hash key
+
 0.06    Sun May 12 05:01:42 JST 2019
         - Sort keys for output
         - Refactor

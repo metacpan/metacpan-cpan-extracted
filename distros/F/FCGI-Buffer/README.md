@@ -9,7 +9,7 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 
@@ -59,6 +59,7 @@ But that's simple:
             $request->Finish();
             next;
         # ...
+        }
     }
 
 To temporarily prevent the use of server-side caches, for example whilst

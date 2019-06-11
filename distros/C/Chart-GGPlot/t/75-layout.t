@@ -37,4 +37,26 @@ my $mtcars = mtcars();
     dataframe_is($data->[0], $exp, '$layout->setup()');
 }
 
+subtest _split_indices => sub {
+    is(
+        Chart::GGPlot::Layout->_split_indices( pdl( [ 0, 1, 2, 2, 1, 0 ] ) )
+          ->map( sub { $_->unpdl } ),
+        [ [ 0, 5 ], [ 1, 4 ], [ 2, 3 ] ],
+        'split_indices()'
+    );
+    is(
+        Chart::GGPlot::Layout->_split_indices( pdl( [ 1, 2, 3, 3, 2, 1 ] ) )
+          ->map( sub { $_->unpdl } ),
+        [ [], [ 0, 5 ], [ 1, 4 ], [ 2, 3 ] ],
+        'split_indices()'
+    );
+    is(
+        Chart::GGPlot::Layout->_split_indices( pdl( [ 0, 1, 2, 2, 1, 0 ] ), 2 )
+          ->map( sub { $_->unpdl } ),
+        [ [ 0, 5 ], [ 1, 2, 3, 4 ] ],
+        'split_indices()'
+    );
+};
+
+
 done_testing();

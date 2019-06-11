@@ -1,5 +1,19 @@
 package Image::Synchronize;
 
+use v5.13.2;
+
+# TODO: 20180908-wereldhavendagen: pictures taken with my smartphone
+# camera always claim to need modification but do not report which
+# modification
+
+# TODO: 20181008-5-restaurant-fanaria-oia/signal-2018-10-08-205102.jpg
+# has TimeSource=Other where I expected User, because I set the time
+# using --time.  Also, its EXIF:ModifyDate isn't set, which may be the
+# reason why the image isn't displayed in the proper order.
+
+# TODO: 2018-10-11-2-chania seems to switch between taking positions
+# from different segments in the same gpx file
+
 =head1 NAME
 
 Image::Synchronize - a module for synchronizing filesystem
@@ -27,7 +41,7 @@ Louis Strous, E<lt>imsync@quae.nl<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Louis Strous
+Copyright (C) 2018-2019 by Louis Strous
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.2 or,
@@ -77,7 +91,7 @@ use YAML::Any qw(
   LoadFile
 );
 
-our $VERSION = '1.2';
+our $VERSION = '1.4.2';
 
 my $CASE_TOLERANT;
 
@@ -515,11 +529,11 @@ sub determine_new_values_for_all_files {
   my @files_handle_by_number;
   my %files_for_image_numbers;
   my $count_modified    = 0;
-  my $count_needs_force = 0;
+  my %count_needs_force;
   foreach my $file (@files) {
     my $info = $self->{original_info}->{$file};
 
-    if ( has_embedded_timestamp($info) ) {
+    if ( $self->has_useful_timestamp($file, $info) ) {
 
       # remember which files with embedded timestamps have which image
       # number
@@ -529,7 +543,12 @@ sub determine_new_values_for_all_files {
       my $modification_type = $self->determine_new_values_for_file($file);
 
       ++$count_modified    if $modification_type == 1;
-      ++$count_needs_force if $modification_type == 2;
+
+      my $extra_info = $self->{extra_info}->{$file};
+      if (defined($extra_info)) {
+        my $f = $extra_info->get('min_force_for_change');
+        ++$count_needs_force{$f} if  $f;
+      }
     }
     elsif ( defined $info->get('image_number') ) {
 
@@ -605,7 +624,12 @@ EOD
         @targets = sort @targets;
       }
       $count_modified +=
-        $self->determine_new_values_for_file( $file, $targets[0] );
+        ($self->determine_new_values_for_file( $file, $targets[0] ) == 1);
+      my $extra_info = $self->{extra_info}->{$file};
+      if (defined($extra_info)) {
+        my $f = $extra_info->get('min_force_for_change');
+        ++$count_needs_force{$f} if  $f;
+      }
     }
     else {
       log_message(
@@ -625,16 +649,16 @@ EOD
   $self->cleanup_progressbar($progressbar);
 
   log_message("$count_modified file(s) need modification.\n");
-  log_message(
-    "$count_needs_force file(s) need more --force for modification.\n")
-    if $count_needs_force;
-
+  log_message($count_needs_force{1} . " file(s) need --force for modification.\n")
+    if $count_needs_force{1} && $self->option('force', 0) < 1;
+  log_message($count_needs_force{2} . " file(s) need --force --force for modification.\n")
+    if $count_needs_force{2} && $self->option('force', 0) < 2;
   return $self;
 }
 
 # returns 0 if the file needs no modification, 1 if the file needs
-# modification (for the current level of force), or 2 if the file
-# needs more force if it is to be modified.
+# modification (for the current level of force), or 1 + minimum needed
+# force if the file needs more force if it is to be modified.
 sub determine_new_values_for_file {
   my ( $self, $file, $target_file ) = @_;
 
@@ -670,7 +694,7 @@ sub determine_new_values_for_file {
   }
 
   # determine final camera ID.
-  if ( has_embedded_timestamp($info) ) {
+  if ( is_image_or_movie($info) ) {
     my $camera_id = $self->user_camera_id($file);
     if ( defined $camera_id ) {
       push @messages, ' Camera ID set by user (--cameraid).';
@@ -813,7 +837,7 @@ sub determine_new_values_for_file {
     }
     $extra_info->set( 'timesource_letter', $timesource_letter );
     $new_info->set( 'TimeSource', $timesource )
-      if has_embedded_timestamp($info);
+      if is_image_or_movie($info);
 
     $target_timestamp->set_to_local_timezone;
 
@@ -840,7 +864,7 @@ sub determine_new_values_for_file {
       }
     }
 
-    if ( has_embedded_timestamp($info) ) {
+    if ( is_image_or_movie($info) ) {
 
       my $position = $self->repository('user_locations')->{$file};
       if ( defined $position ) {
@@ -850,7 +874,7 @@ sub determine_new_values_for_file {
         not( $info->get('GPSDateTime') )    # none yet
         or (
           ( $info->get('TimeSource') // 'GPS' ) ne 'GPS'    # not original
-          and $self->option( 'force', 0 ) >= 2
+            or $self->option( 'force', 0 ) >= 2             # or force is at least 2
         )
         )
       {
@@ -893,13 +917,23 @@ sub determine_new_values_for_file {
         }
       }
       if ( defined $position ) {
-        $new_info->set( 'GPSLatitude',  $position->[0] );
-        $new_info->set( 'GPSLongitude', $position->[1] );
-        $new_info->set( 'GPSAltitude',  $position->[2] )
-          if defined $position->[2];
-        $new_info->set( 'GPSDateTime', $target_timestamp );
-        croak "Expected new TimeSource to have been set already\n"
-          unless defined $new_info->get('TimeSource');
+        if (@{$position}) {
+          foreach my $ix (0..$#gps_location_tags) {
+            my $v = $info->get($gps_location_tags[$ix]);
+            $new_info->set( $gps_location_tags[$ix],  $position->[$ix] )
+              if defined($position->[$ix]) and (not(defined $v) or $position->[$ix] != $v);
+          }
+          my $v = $info->get('GPSDateTime');
+          $new_info->set( 'GPSDateTime', $target_timestamp )
+            if not(defined $v) or $target_timestamp != $v;
+          croak "Expected new TimeSource to have been set already\n"
+            unless defined $new_info->get('TimeSource');
+        } else {                # remove position
+          foreach my $ix (0..$#gps_location_tags) {
+            $new_info->delete( $gps_location_tags[$ix] );
+          }
+          $new_info->delete( 'GPSDateTime' );
+        }
       }
     }
 
@@ -931,7 +965,7 @@ sub determine_new_values_for_file {
     # then we must also have a TimeSource.
   }
 
-  if ( has_embedded_timestamp($info) ) {
+  if ( is_image_or_movie($info) ) {
     $new_info->set( 'DateTimeOriginal', $new_info->get('FileModifyDate') );
     $new_info->set( 'ImsyncVersion',    $VERSION );
 
@@ -946,7 +980,7 @@ sub determine_new_values_for_file {
 
     # We want to store DateTimeOriginal with a timezone, which means
     # we must put it in the XMP group, because DateTimeOriginal in the
-    # default Exif group has not room for a timezone.
+    # default Exif group has no room for a timezone.
     {
       my $dto = $new_info->get('DateTimeOriginal');
       $new_info->set( 'XMP', 'DateTimeOriginal', $dto )
@@ -967,7 +1001,7 @@ sub determine_new_values_for_file {
   # modification if the GPS location or timestamp have changed and
   # TimeSource was not set or was equal to 'GPS'.
 
-  my $gps_tags_count;
+  my $gps_location_tags_count;
   my $min_force_for_change = 99;
   my %changes;
   foreach my $tag (
@@ -977,7 +1011,6 @@ sub determine_new_values_for_file {
     ImsyncVersion
     FileModifyDate
     GPSAltitude
-    GPSDateTime
     GPSLatitude
     GPSLongitude
     TimeSource
@@ -988,12 +1021,14 @@ sub determine_new_values_for_file {
     my $old    = $info->get($tag);
     my $change = 1;
 
+    if ( (defined($gps_location_tags{$tag}))
+         and (defined($old) or defined($new)) ) {
+      ++$gps_location_tags_count;
+      next;                     # handle these separately
+    }
+
     if ( defined $old ) {
       if ( defined $new ) {
-        if ( $gps_location_tags{$tag} ) {
-          ++$gps_tags_count;
-          next;    # handle these separately
-        }
         if ( $new ne $old ) {
           push @messages, " $tag has changed.";
         }
@@ -1002,18 +1037,10 @@ sub determine_new_values_for_file {
         }
       }
       else {       # old but not new
-        if ( $gps_location_tags{$tag} ) {
-          ++$gps_tags_count;
-          next;    # handle these separately
-        }
         push @messages, " $tag has disappeared,";
       }
     }
     elsif ( defined $new ) {    # new but not old
-      if ( $gps_location_tags{$tag} or $tag eq 'GPSDateTime' ) {
-        ++$gps_tags_count;
-        next;                   # handle these separately
-      }
       push @messages, " $tag is new.";
     }
     else {                      # neither new nor old
@@ -1042,7 +1069,13 @@ sub determine_new_values_for_file {
     }
   }
 
-  if ($gps_tags_count) {
+  if ($gps_location_tags_count) {
+    # Some cameras, for example the LG-H870, can record a GPS altitude
+    # by itself, without a GPS latitude and longitude, when the camera
+    # doesn't know its location.  We treat those cases as if the GPS
+    # altitude wasn't there, but if the file gets modified anyway and
+    # get no new GPS position then we remove the troublesome and
+    # to us useless GPS altitude.
     my $change        = 1;
     my $old_pos_count = 0;
     my @old_pos       = map {
@@ -1061,8 +1094,9 @@ sub determine_new_values_for_file {
       $v
     } @gps_location_tags;
     my $distance = geo_distance( \@old_pos, \@new_pos );
-    if ( defined $distance ) {
-      if ( $distance >= 1 ) {
+    if ( defined $distance ) {  # the GPS location was complete in old
+                                # and new
+      if ( $distance ) {
         my ( $value, $prefix ) = si_prefix($distance);
         push @messages, " GPS position has changed by $value ${prefix}m.";
         $extra_info->set( 'position_change', $distance );
@@ -1079,11 +1113,15 @@ sub determine_new_values_for_file {
       push @messages, " GPS position has disappeared,";
       $new_info->delete($_) foreach ( @gps_location_tags, 'GPSDateTime' );
     }
-    elsif ( $new_pos_count == 2 ) {
+    elsif ( $new_pos_count ) {
       push @messages, " GPS position is new.";
-    }
-    else {
-      push @messages, " GPS position was incomplete -- removing.";
+    } elsif ($old_pos_count == 0) {
+      # no old location and no new location and yet we got here.  Must
+      # be the case where the file contains a solitary GPS altitude.
+      push @messages, ' Solitary GPS altitude.';
+      $new_info->delete('GPSAltitude');
+    } else {
+      push @messages, ' GPS position is incomplete.';
       $new_info->delete($_) foreach ( @gps_location_tags, 'GPSDateTime' );
     }
     if ($change) {
@@ -1094,27 +1132,25 @@ sub determine_new_values_for_file {
       # --force level is at least 2.  Otherwise we assume that the old
       # GPS position (if any) was added by us in an earlier run; then
       # we can already modify it even if no --force is specified.
-      if ( ( $info->get('TimeSource') // 'GPS' ) eq 'GPS'
-        and defined $info->get('GPSDateTime') )
+      if ( ( $info->get('TimeSource') // 'GPS' ) eq 'GPS' )
       {
         $min_force_for_change = 2
           if $min_force_for_change > 2;
-        $changes{$_} = 2 foreach qw(GPSLongitude GPSLatitude GPSDateTime);
-        $changes{GPSAltitude} = 2
-          if $info->get('GPSAltitude')
-          or $new_info->get('GPSAltitude');
+        foreach my $tag (@gps_location_tags, 'GPSDateTime') {
+          $changes{$tag} = 2
+          if stringify($info->get($tag)) ne stringify($new_info->get($tag));
+        }
       }
       else {
         $min_force_for_change = 0
           if $min_force_for_change > 0;
-        $changes{$_} = 0 foreach qw(GPSLongitude GPSLatitude GPSDateTime);
-        $changes{GPSAltitude} = 0
-          if $info->get('GPSAltitude')
-          or $new_info->get('GPSAltitude');
+        foreach my $tag (@gps_location_tags, 'GPSDateTime') {
+          $changes{$tag} = 0
+            if stringify($info->get($tag)) ne stringify($new_info->get($tag));
+        }
       }
     }
   }
-  $extra_info->set( 'min_force_for_change', $min_force_for_change );
 
   {
     my $camera_id = $new_info->get('CameraID');
@@ -1136,6 +1172,8 @@ sub determine_new_values_for_file {
     push @messages, ' Only ImsyncVersion has changed -- suppressing.';
   }
 
+  $extra_info->set( 'min_force_for_change', $min_force_for_change );
+
   my $result = 0;
   if ( $min_force_for_change < 99 ) {    # some changes
     if ( ( $extra_info->get('explicit_change') // 0 ) > 0
@@ -1149,8 +1187,8 @@ sub determine_new_values_for_file {
     }
     else {
       push @messages, ' Modification of this file is suppressed, needs --force'
-        . ( $min_force_for_change > 1 ? " $min_force_for_change" : '' ) . '.';
-      $result = 2;
+        . ( $min_force_for_change > 1 ? ' --force' : '' ) . '.';
+      $result = $min_force_for_change + 1;
     }
   }
   else {
@@ -1160,8 +1198,8 @@ sub determine_new_values_for_file {
   # if verbose & 4 then only print if needs_modification
   # if verbose & 8 then print even if not needs_modification
   # otherwise don't print
-  my $bitflag = 12;
-  $bitflag &= ~4 unless $extra_info->get('needs_modification');
+  my $bitflag = 8;
+  $bitflag |= 4 if $extra_info->get('needs_modification');
   log_message( $bitflag, { name => $file }, join( "\n", @messages ) . "\n" );
 
   return $result;
@@ -1408,8 +1446,8 @@ sub geo_distance {
 
   # Image::Exiftool stores longitude and latitude with a resolution of
   # 0.01 seconds of arc, and altitude with a resolution of 0.01 m, so
-  # there is no point reporting a distance that is due to a difference
-  # of less than that resolution.
+  # it is not useful to report a difference that is smaller than that
+  # resolution.
 
   my @pos1_r = @{$pos1};
   @pos1_r[ 0 .. 1 ] = map { floor( $_ * 360000 + 0.5 ) } @pos1_r[ 0 .. 1 ];
@@ -1455,14 +1493,23 @@ following fixed set of tags:
 =over
 
 =item CameraID
+
 =item ImsyncVersion
+
 =item FileModifyDate
+
 =item ImageWidth
+
 =item Make
+
 =item MIMEType
+
 =item Model
+
 =item QuickTime:CreateDate
+
 =item SerialNumber
+
 =item TimeSource
 
 =back
@@ -1478,9 +1525,8 @@ C<"DateTimeOriginal">).
 
 If the ImageWidth tag is present, then the file is considered to be an
 image, and then the returned hash map also includes the effective
-camera ID (L</camera_id>), as the value for key
-C<effective_camera_id>.  The ImageWidth tag is omitted from the hash
-map.
+camera ID, as the value for key C<effective_camera_id>.  The
+ImageWidth tag is omitted from the hash map.
 
 QuickTime images/movies (recognized by there being a
 C<QuickTime:CreateDate> tag) get '|U' appended to their effective
@@ -1673,6 +1719,12 @@ sub has_embedded_timestamp {
   return 0;
 }
 
+sub has_useful_timestamp {
+  my ($self, $file, $image_info) = @_;
+  return ( has_embedded_timestamp($image_info)
+           || defined($self->repository('user_times')->{$file}) );
+}
+
 # identify @files that match the $pattern.  The match is case
 # sensitive, except on case-insensitive operating systems.
 sub identify_files {
@@ -1863,7 +1915,7 @@ EOD
       $info->set( 'supposedly_utc', 1 ) if is_supposedly_utc($info);
 
       # determine the camera ID
-      {
+      if (is_image_or_movie($info)) {
         my $camera_id = $info->get('CameraID');    # embedded camera ID
         if ( defined $camera_id ) {
 
@@ -1891,9 +1943,10 @@ EOD
           ++$fallback_to_camera_id->{$fallback_camera_id}->{$camera_id};
         }
         $info->set( 'fallback_camera_id', $fallback_camera_id );
+
+        ++$count_image_files;
       }
 
-      ++$count_image_files if has_embedded_timestamp($info);
       ++$count_gps_times   if defined $info->{GPSDateTime};
 
       $self->{original_info}->{$file} = $info;
@@ -1906,7 +1959,7 @@ EOD
 
   log_message("Found $count_gps_track_files GPS track file(s).\n")
     if $count_gps_track_files;
-  log_message("Found $count_image_files image file(s) with embedded creation timestamp.\n");
+  log_message("Found $count_image_files image file(s).\n");
   log_message("$count_gps_times file(s) have a GPS timestamp.\n");
   return $self;
 }
@@ -2147,7 +2200,10 @@ sub modify_file {
           # Image::ExifTool doesn't modify any file name byte values,
           # either.
           my @warnings = split /\n/, $warning;
-          @warnings = grep { !/FileName encoding not specified/ } @warnings;
+          @warnings = grep { !/
+                                FileName[ ]encoding[ ]not[ ]specified
+                              |Maker[ ]notes[ ]could[ ]not[ ]be[ ]parsed
+                              /x } @warnings;
           if (@warnings) {
             $warning = join( "\n", @warnings );
             log_warn(" Writing '$file' succeeded with warning: $warning\n");
@@ -2432,28 +2488,33 @@ sub process_user_locations {
   my ($self) = @_;
   my $action_cref = sub {
     my ( $rhs, $file ) = @_;
-    my @sources = identify_files( $rhs, keys %{ $self->{original_info} } );
-    if ( @sources > 1 ) {
-      log_warn("--location RHS '$rhs' matches more than one file; ignored.\n");
-      return;
-    }
-    elsif ( @sources == 0 ) {    # is it a location?
-      my ( $latitude, $longitude, $altitude ) = split /,/, $rhs;
-      $latitude  = parse_coordinate($latitude);
-      $longitude = parse_coordinate($longitude);
-      if ( defined($latitude) and defined($longitude) ) {
-        return [ $latitude, $longitude, add_maybe($altitude) ];
+    my @sources;
+    if ($rhs) {
+      @sources = identify_files( $rhs, keys %{ $self->{original_info} } );
+      if ( @sources > 1 ) {
+        log_warn("--location RHS '$rhs' matches more than one file; ignored.\n");
+        return;
       }
-    }
-    if ( @sources == 1 ) {
-      my $source_info = $self->{original_info}->{ $sources[0] };
-      if ( defined $source_info ) {
-        return [
-          $source_info->get('GPSLatitude'),
-          $source_info->get('GPSLongitude'),
-          add_maybe( $source_info->get('GPSAltitude') )
-        ];
+      elsif ( @sources == 0 ) {    # is it a location?
+        my ( $latitude, $longitude, $altitude ) = split /,/, $rhs;
+        $latitude  = parse_coordinate($latitude);
+        $longitude = parse_coordinate($longitude);
+        if ( defined($latitude) and defined($longitude) ) {
+          return [ $latitude, $longitude, add_maybe($altitude) ];
+        }
       }
+      if ( @sources == 1 ) {
+        my $source_info = $self->{original_info}->{ $sources[0] };
+        if ( defined $source_info ) {
+          return [
+                  $source_info->get('GPSLatitude'),
+                  $source_info->get('GPSLongitude'),
+                  add_maybe( $source_info->get('GPSAltitude') )
+                ];
+        }
+      }
+    } else {                    # empty rhs -- reset position
+      return [];
     }
     log_warn("Could not resolve --location RHS '$rhs'.\n");
     return;
@@ -2520,6 +2581,10 @@ sub process_user_times {
 "Cannot apply --time clock time for $file because it lacks an embedded CreateDate.\n"
         );
       }
+    }
+    elsif ( $rhs =~ /^(\d+-\d+-\d+\D\d+:\d+(?::\d+)?)$/
+            && defined($value = Image::Synchronize::Timestamp->new( $rhs )) ) {
+      # clock date/time
     }
     else {                                        # path end
       my @files = keys %{ $self->{original_info} };
@@ -2963,9 +3028,22 @@ EOD
 
     # P
     {
-      my $letter = report_letter( 'GPSLatitude', $info, $new_info );
-      if ( $letter eq '=' ) {
-        $letter = '*' if $extra_info->get('position_change');
+      my $letter;
+      if ($extra_info->get('position_change')) {
+        # position was present in old and new, and the new position is
+        # sufficiently different that the difference shows up in the
+        # EXIF tags
+        $letter = '*';
+      } else {
+        # a position wasn't present in old or new, or it was present
+        # in both and hasn't changed significantly.  The same then
+        # goes for any one of the components.
+        $letter = report_letter( 'GPSLatitude', $info, $new_info );
+        if ($letter eq '*') {
+          # the latitude is different but not by enough to show up in
+          # the EXIF tag after writing.  Mark as the same.
+          $letter = '=';
+        }
       }
       log_message($letter);
     }
@@ -3202,11 +3280,14 @@ sub resolve_files {
   }
   my @files;
   foreach my $item (@items) {
+    my @extra;
     if ( -d $item ) {
-      push @files, $rule->all($item);
+      @extra = $rule->all($item);
+      log_message("No matches for $item.\n") unless @extra;
     }
     elsif ( -f $item ) {
-      push @files, perlish_path($item);
+      my $f = file($item);
+      @extra = $rule->clone->max_depth(1)->name($f->basename)->all($f->parent);
     }
     else {
       # the item was not found as a literal name; maybe it is a file
@@ -3221,16 +3302,19 @@ sub resolve_files {
           ->name( $f->basename )
           ->directory
           ->all( $f->parent );
-      push @files, $rule->all(@subdirs) if @subdirs;
+      @extra = $rule->all(@subdirs) if @subdirs;
 
       # seek files matching the pattern
-      push @files,
+      push @extra,
         Path::Iterator::Rule->new
           ->max_depth(1)
           ->name( $f->basename )
           ->and( $rule )
           ->all( $f->parent );
+
+      log_message("No matches for $item.\n") unless @extra;
     }
+    push @files, @extra;
   }
 
   # remove duplicates, and convert to Perl-style paths
@@ -3390,6 +3474,12 @@ sub si_prefix {
   return wantarray
     ? ( $numeral, $prefix )
     : $numeral . ( $prefix ? " $prefix" : '' );
+}
+
+sub stringify {
+  my ($thing) = @_;
+  return "$thing" if defined $thing;
+  return '';
 }
 
 #  $timestamp = timestamp_for_sorting($info, $new_info);

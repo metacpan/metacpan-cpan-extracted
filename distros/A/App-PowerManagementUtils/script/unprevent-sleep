@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /PowerManagement/Any/unprevent_sleep
 # and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-05-22'; # DATE
+our $DATE = '2019-06-09'; # DATE
 our $DIST = 'App-PowerManagementUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ unprevent-sleep - Reverse the effect of prevent_sleep()
 
 =head1 VERSION
 
-This document describes version 0.001 of unprevent-sleep (from Perl distribution App-PowerManagementUtils), released on 2019-05-22.
+This document describes version 0.002 of unprevent-sleep (from Perl distribution App-PowerManagementUtils), released on 2019-06-09.
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Database::Async::ORM::Type;
 use strict;
 use warnings;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -19,6 +19,8 @@ sub basis { shift->{basis} }
 sub is_builtin { shift->{is_builtin} }
 sub values : method { (shift->{values} // [])->@* }
 sub fields { (shift->{fields} // [])->@* }
+
+sub qualified_name { ($_[0]->is_builtin ? $_[0]->name : $_[0]->schema->name . '.' . $_[0]->name) }
 
 1;
 

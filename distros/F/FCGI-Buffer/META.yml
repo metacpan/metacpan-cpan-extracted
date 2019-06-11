@@ -12,12 +12,13 @@ build_requires:
   HTTP::Response: '0'
   IPC::System::Simple: '0'
   Test::Most: '0'
+  Test::NoWarnings: '0'
   Test::TempDir::Tiny: '0.016'
   autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -49,5 +50,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI-Buffer
   repository: git://github.com/nigelhorne/FCGI-Buffer.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

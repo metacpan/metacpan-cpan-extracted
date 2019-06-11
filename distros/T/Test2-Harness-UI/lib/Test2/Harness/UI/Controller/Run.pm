@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -38,8 +38,8 @@ sub handle {
     }
     else {
         my $it = $route->{id} or die error(404 => 'No id');
-        my $query = [{run_id => $it}];
-        $run = $user->runs($query)->first or die error(404 => 'Invalid run');
+        my $schema = $self->{+CONFIG}->schema;
+        $run = $schema->resultset('Run')->search({run_id => $it})->first or die error(404 => 'Invalid Run');
     }
 
     $self->{+TITLE} = 'Run: ' . $run->project . ' - ' . $run->run_id;

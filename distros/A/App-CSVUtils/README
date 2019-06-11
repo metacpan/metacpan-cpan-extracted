@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.022 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-05-21.
+    This document describes version 0.023 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-06-06.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -23,6 +23,8 @@ DESCRIPTION
     *   csv-each-row
 
     *   csv-grep
+
+    *   csv-info
 
     *   csv-list-field-names
 
@@ -107,8 +109,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -145,8 +150,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -217,8 +225,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -255,8 +266,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   row_number => *int* (default: 2)
 
@@ -301,8 +315,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -343,8 +360,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -401,8 +421,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -472,8 +495,52 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_info
+    Usage:
+
+     csv_info(%args) -> [status, msg, payload, meta]
+
+    Show information about CSV file (number of rows, fields, etc).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -510,8 +577,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -577,8 +647,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   ignore_case => *bool*
 
@@ -661,8 +734,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -714,8 +790,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -759,8 +838,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -807,8 +889,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 
@@ -845,8 +930,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   row_spec* => *str*
 
@@ -962,8 +1050,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   ignore_case => *bool*
 
@@ -1029,8 +1120,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   reverse => *bool*
 
@@ -1149,8 +1243,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   reverse => *bool*
 
@@ -1189,8 +1286,11 @@ FUNCTIONS
 
         Whether CSV has a header row.
 
-        When you declare that CSV does not have header row ("--no-header"),
-        the fields will be named "field1", "field2", and so on.
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
 
     *   tsv => *bool*
 

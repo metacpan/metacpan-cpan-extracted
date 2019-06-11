@@ -7,6 +7,10 @@ use Apache::Tika::DocInfo;
 use Data::Dumper;
 use Promises;
 
+use Filter::signatures;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
 =head1 SYNOPSIS
 
     use Apache::Tika::Server;
@@ -29,8 +33,7 @@ use Promises;
 
 =cut
 
-use vars '$VERSION';
-$VERSION = '0.07';
+our $VERSION = '0.08';
 
 extends 'Apache::Tika::Async';
 
@@ -49,11 +52,6 @@ has port => (
     is => 'ro',
     #isa => 'Int',
     default => sub { 9998 },
-);
-
-has fh => (
-    is => 'rw',
-    #isa => 'Array',
 );
 
 has connection_class => (
@@ -77,15 +75,48 @@ sub cmdline {
     @{$self->tika_args},
 };
 
-sub launch {
-    my( $self )= @_;
+sub spawn_child_win32( $self, @cmd ) {
+    system(1, @cmd)
+}
+
+sub spawn_child_posix( $self, @cmd ) {
+    require POSIX;
+    POSIX->import("setsid");
+
+    # daemonize
+    defined(my $pid = fork())   || die "can't fork: $!";
+    if( $pid ) {    # non-zero now means I am the parent
+        return $pid;
+    };
+
+    # We are the child, close about everything, then exec
+    chdir("/")                  || die "can't chdir to /: $!";
+    (setsid() != -1)            || die "Can't start a new session: $!";
+    open(STDERR, ">&STDOUT")    || die "can't dup stdout: $!";
+    open(STDIN,  "< /dev/null") || die "can't read /dev/null: $!";
+    open(STDOUT, "> /dev/null") || die "can't write to /dev/null: $!";
+    exec @cmd;
+    exit 1;
+}
+
+sub spawn_child( $self, @cmd ) {
+    my ($pid);
+    if( $^O =~ /mswin/i ) {
+        $pid = $self->spawn_child_win32(@cmd)
+    } else {
+        $pid = $self->spawn_child_posix(@cmd)
+    };
+
+    return $pid
+}
+
+sub launch( $self ) {
     if( !$self->pid ) {
         my $cmdline= join " ", $self->cmdline; # well, for Windows...
         #warn $cmdline;
-        my $pid= open my $fh, "$cmdline |"
+        my $pid= $self->spawn_child( $self->cmdline )
             or croak "Couldn't launch [$cmdline]: $!/$^E";
         $self->pid( $pid );
-        $self->fh( $fh );
         sleep 2; # Java...
     };
 }
@@ -94,7 +125,7 @@ sub url {
     # Should return URI instead
     my( $self, $type )= @_;
     $type||= 'text';
-    
+
     my $url= {
         text => 'rmeta',
         test => 'tika', # but GET instead of PUT
@@ -104,7 +135,7 @@ sub url {
         all => 'rmeta',
         # unpack
     }->{ $type };
-    
+
     sprintf
         'http://127.0.0.1:%s/%s',
         $self->port,
@@ -136,7 +167,7 @@ sub fetch {
     my( $self, %options )= @_;
     $options{ type }||= 'text';
     my $url= $self->url( $options{ type } );
-    
+
     if(! $options{ content } and $options{ filename }) {
         # read $options{ filename }
         open my $fh, '<', $options{ filename }
@@ -145,7 +176,7 @@ sub fetch {
         local $/;
         $options{ content } = <$fh>;
     };
-    
+
     my $method;
     if( 'test' eq $options{ type } ) {
         $method= 'get';
@@ -154,9 +185,9 @@ sub fetch {
         $method= 'put';
         ;
     };
-    
+
     my $headers = $options{ headers } || {};
-    
+
     my ($code,$res) = await
         $self->ua->request( $method, $url, $options{ content }, %$headers );
     my $info;
@@ -167,13 +198,13 @@ sub fetch {
             croak "Got HTTP error code $code for '$options{ filename }'";
         };
         my $item = $res->[0];
-        
+
         # Should/could this be lazy?
         my $c = delete $item->{'X-TIKA:content'};
         # Ghetto-strip HTML we don't want:
         if( $c =~ m!<body>(.*)</body>!s or $c =~ m!<body\s*/>!) {
             $c = $1;
-            
+
             if( $item->{"Content-Type"} and $item->{"Content-Type"} =~ m!^text/plain\b!) {
                 # Also strip the enclosing <p>..</p>
                 $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
@@ -181,18 +212,18 @@ sub fetch {
         } else {
             warn "Couldn't find HTML body in response: $c";
         };
-        
+
         $info= Apache::Tika::DocInfo->new({
             content => $c,
             meta => $item,
         });
-        
+
         if( ! defined $info->{meta}->{"meta:language"} ) {
             # Yay. Two requests.
             my $lang_meta = $self->fetch(%options, type => 'language', 'Content-Type' => $item->{'Content-Type'});
             $info->{meta}->{"meta:language"} = $lang_meta->meta->{"info"};
         };
-        
+
     } else {
         # Must be '/language'
         if( $code !~ /^2..$/ ) {
@@ -225,7 +256,7 @@ __PACKAGE__->meta->make_immutable;
 =head1 REPOSITORY
 
 The public repository of this module is
-L<https://github.com/Corion/apache-tika>.
+L<https://github.com/Corion/Apache-Tika-Async>.
 
 =head1 SUPPORT
 
@@ -244,7 +275,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2014-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -138,10 +138,8 @@ lib/Pcore/Handle/DBI/Query/SQL.pm
 lib/Pcore/Handle/DBI/Query/Type.pm
 lib/Pcore/Handle/DBI/Query/VALUES.pm
 lib/Pcore/Handle/DBI/Query/WHERE.pm
-lib/Pcore/Handle/DBI/Response.pm
 lib/Pcore/Handle/DBI/STH.pm
 lib/Pcore/Handle/pgsql.pm
-lib/Pcore/Handle/pgsql/AEHandle.pm
 lib/Pcore/Handle/pgsql/DBH.pm
 lib/Pcore/Handle/sqlite.pm
 lib/Pcore/Node.pm
@@ -169,6 +167,7 @@ lib/Pcore/Util/File1/TempDir.pm
 lib/Pcore/Util/File1/TempFile.pm
 lib/Pcore/Util/HTML.pm
 lib/Pcore/Util/Hash.pm
+lib/Pcore/Util/Hash/HashArray.pm
 lib/Pcore/Util/Hash/LRU.pm
 lib/Pcore/Util/Hash/Multivalue.pm
 lib/Pcore/Util/Hash/RandKey.pm

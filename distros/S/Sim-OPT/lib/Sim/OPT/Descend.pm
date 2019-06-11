@@ -38,7 +38,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank ); # our @EXPORT = qw( );
 
-$VERSION = '0.131'; # our $VERSION = '';
+$VERSION = '0.133'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -821,6 +821,16 @@ sub descend
     my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
       $direction, $starorder, $ordmeta, $varnums_r, $countblock ) = @_;
     my %dowhat = %{ $dowhat_r };
+
+    if ( $dowhat{preprep} ne "" )
+    {
+      $sortmixed = $dowhat{preprep};
+      unless ( -e $sortmixed )
+      {
+        die;
+      }
+    }
+
     my %dirfiles = %{ $dirfiles_r };
     my @blockelts = @{ $blockelts_r }; #say $tee " IN metamodel \@blockelts : " . dump( @blockelts );
     my %carrier = %{ $carrier_r };

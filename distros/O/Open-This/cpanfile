@@ -2,6 +2,7 @@ requires "Browser::Open" => "0";
 requires "Git::Helpers" => "0.000016";
 requires "Module::Runtime" => "0";
 requires "Path::Tiny" => "0";
+requires "Pod::Usage" => "0";
 requires "Try::Tiny" => "0";
 requires "URI" => "0";
 requires "perl" => "5.006";

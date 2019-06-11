@@ -63,14 +63,14 @@
          "web" : "https://github.com/GrantStreetGroup/p5-DBIx-Class-Events"
       }
    },
-   "version" : "0.9.1",
+   "version" : "0.9.2",
    "x_contributors" : [
       "Andrew Fresh <andrew.fresh@grantstreet.com>",
       "Andrew Fresh <andrew+github@afresh1.com>",
       "Brendan Byrd <brendan.byrd@grantstreet.com>",
       "Justin Wheeler <justin.wheeler@grantstreet.com>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
+   "x_generated_by_perl" : "v5.26.3",
    "x_serialization_backend" : "JSON::XS version 4.0",
    "x_static_install" : 1
 }

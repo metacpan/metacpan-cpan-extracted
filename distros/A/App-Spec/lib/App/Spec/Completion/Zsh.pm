@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Completion::Zsh;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Moo;
 extends 'App::Spec::Completion';
@@ -13,6 +13,7 @@ sub generate_completion {
     my $spec = $self->spec;
     my $appname = $spec->name;
     my $functions = [];
+    my $appspec_version = App::Spec->VERSION;
     my $completion_outer = $self->completion_commands(
         commands => $spec->subcommands,
         options => $spec->options,
@@ -24,6 +25,8 @@ sub generate_completion {
 
 my $body = <<"EOM";
 #compdef $appname
+
+# Generated with perl module App::Spec v$appspec_version
 
 _$appname() {
     local program=$appname
@@ -265,8 +268,8 @@ sub dynamic_completion {
         $function = <<"EOM";
 $function_name() \{
     local __dynamic_completion
-    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' "\${words[@]}"`
-    __${appname}_dynamic_comp '$name' "\$__dynamic_completion"
+    __dynamic_completion=\$(PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' "\${words[@]}")
+    __${appname}_dynamic_comp '$name' \$__dynamic_completion
 \}
 EOM
     }
@@ -315,7 +318,8 @@ EOM
         $function = <<"EOM";
 $function_name() \{
     local __dynamic_completion
-    IFS=\$'\\n' set -A __dynamic_completion `$string`
+    local CURRENT_WORD="\$words\[CURRENT\]"
+    IFS=\$'\\n' set -A __dynamic_completion \$( $string )
     compadd -X "$shell_name:" \$__dynamic_completion
 \}
 EOM
@@ -396,7 +400,11 @@ sub options {
             $comp .= $indent . ";;\n";
         }
         elsif ($enum) {
-            my @list = map { qq{"$_"} } @$enum;
+            my @list = map {
+                my $item = $_;
+                $item =~ s/:/\\:/g;
+                qq{"$item"};
+            } @$enum;
             $values = ":$name:(@list)";
         }
         elsif ($type eq "file" or $type eq "dir") {

@@ -20,11 +20,11 @@ my %WriteMakefileArgs = (
     "Set::Array" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::UseAllModules" => 0,
+    "Test::UseAllModules" => "0.15",
     "Tie::IxHash" => 0,
     "URI" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Moose" => 0,
   "Set::Array" => 0,
-  "Test::UseAllModules" => 0,
+  "Test::UseAllModules" => "0.15",
   "Tie::IxHash" => 0,
   "URI" => 0
 );

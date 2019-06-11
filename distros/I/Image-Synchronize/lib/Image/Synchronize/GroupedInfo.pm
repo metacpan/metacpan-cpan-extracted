@@ -3,14 +3,43 @@ package Image::Synchronize::GroupedInfo;
 use warnings;
 use strict;
 
+use v5.10.0;
+
 use overload '""' => \&stringify;
 
 use Carp;
+
+=head1 NAME
+
+Image::Synchronize::GroupedInfo - a data collection in support of Image::Synchronize
+
+=cut
+
+=head1 METHODS
+
+=head2 new
+
+  $egi = new Image::Synchronize::GroupedInfo;
+
+Create a new instance of the class.
+
+=cut
 
 sub new {
   my ($class) = @_;
   return bless {}, $class;
 }
+
+=head2 set
+
+  $egi->set($tag, $value);
+  $egi->set($group, $tag, $value);
+
+Associated the C<$value> with the C<$tag> and (optionally) C<$group>.
+The C<$group> and C<$tag> must be scalars, but the C<$value> may be of
+any type.  Returns C<$egi>.
+
+=cut
 
 sub set {
   my $self = shift;
@@ -108,6 +137,17 @@ sub get {
   return $v;
 }
 
+=head2 delete
+
+  $egi->delete($tag);
+  $egi->delete($group, $tag);
+
+Deletes data associated with the C<$tag>.  If the C<$group> is
+specified, then deletes the tag's data for that group only.  Otherwise
+deletes the tag's data for any group.  Returns C<$egi>.
+
+=cut
+
 sub delete {
   my ($self) = shift;
   my ( $group, $tag );
@@ -129,16 +169,42 @@ sub delete {
   return $self;
 }
 
+=head2 tags
+
+  @tags = $egi->tags;
+
+Returns a list of all tags for which a value was specified.
+
+=cut
+
 sub tags {
   my ($self) = @_;
   return sort keys %{$self};
 }
+
+=head2 groups
+
+  @groups = $egi->groups($tag);
+
+Returns a list of all groups for which a value was specified for the
+C<$tag>.
+
+=cut
 
 sub groups {
   my ( $self, $tag ) = @_;
   return () unless exists $self->{$tag};
   return sort keys %{ $self->{$tag} };
 }
+
+=head2 stringify
+
+  $text = $egi->stringify;
+  $text = "$egi";
+
+Returns a text version of the contents of C<$egi>.
+
+=cut
 
 sub stringify {
   my ( $self, $prefix ) = @_;

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.04
 
 SYNOPSIS
 
@@ -24,9 +24,9 @@ DESCRIPTION
 
     into perl objects which rappresent a search.
 
-    In "filters__" there are all flt (filter) elements.
+    In "filters()" there are all flt (filter) elements.
 
-    In "options__" there are query options like limit, start and sorting.
+    In "options()" there are query options like limit, start and sorting.
 
 METHODS
 
@@ -42,12 +42,12 @@ METHODS
 
     $perl_struct is an HASHREF which represents a query string like the one
     returned by "url_params_mixed" in URI::Encode. It parses the
-    $perl_struct and fills related objects in "filters__" and "options__"
+    $perl_struct and fills related objects in "filters()" and "options()"
 
  to_qs()
 
-        Return a query string which represents current state of L<filters__> and L<options__>
-    elements
+    Return a query string which represents current state of filters() and
+    options() elements
 
 Examples
 
@@ -77,15 +77,15 @@ Examples
 
         ( (FirstName = Foo) OR (LastName = Bar) )
 
-    ?flt[c:one]=1&flt[c:one]=$and:1&flt[d:one]=2&flt[d:one]=$and:1&flt[c:two]=2&flt[c:two]=$and:2&flt[d:two]=3&flt[d:two]=$op:>&flt[d:two]=$and:2&flt[d:three]=10
+    ?flt[c:one]=1&flt[c:one]=$and:1&flt[d:one]=2&flt[d:one]=$and:1&flt[c:two]=2&flt[c:two]=$and:2&flt[d:two]=3&flt[d:two]=$op:!=&flt[d:two]=$and:2&flt[d:three]=10
 
       should be converted into
 
-        (d = 10) AND  ( (c = 1) AND (d = 2) )  OR  ( (c = 2) AND (d > 3) )
+        (d = 10) AND  ( (c = 1) AND (d = 2) )  OR  ( (c = 2) AND (d != 3) )
 
 SEE ALSO
 
-    Seach::QS::Filters, Seach::QS::Filter, Seach::QS::Options
+    Search::QS::Filters, Search::QS::Filter, Search::QS::Options
 
 AUTHOR
 

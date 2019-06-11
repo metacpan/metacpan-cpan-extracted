@@ -3,10 +3,11 @@ package PDF::Cairo::Font;
 use 5.016;
 use strict;
 use warnings;
+use Carp;
 use Cairo;
 use Font::FreeType;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -102,7 +103,7 @@ sub new {
 	my $pcref = shift;
 	my @font = split(/,/,shift);
 	my $self = {};
-	my $type;
+	my $type = '';
 	if (index($font[0], '.') == -1) {
 		@font = find_api2font(@font);
 	}
@@ -116,6 +117,10 @@ sub new {
 					last;
 				}
 			}
+		}
+		if (! -f $font[0]) {
+			carp("PDF::Cairo::Font::new: '$font[0]' not found, going generic");
+			@font = find_api2font('Times');
 		}
 	}
 	my $collection_index = 0;
@@ -151,10 +156,10 @@ sub new {
 	$self->{type} = "freetype";
 	$pcref->{_freetype} = Font::FreeType->new
 		unless ref $pcref->{_freetype};
-    my $ft_face = $pcref->{_freetype}->face(
+	my $ft_face = $pcref->{_freetype}->face(
 		$font[0],
-           load_flags => FT_LOAD_NO_HINTING,
-           index => $collection_index,
+			load_flags => FT_LOAD_NO_HINTING,
+			index => $collection_index,
 	);
 	if ($metrics_file) {
 		$ft_face->attach_file($metrics_file);
@@ -168,7 +173,7 @@ sub new {
 		freetype => $pcref->{_freetype},
 		face => $ft_face,
 	};
-    $self->{face} = Cairo::FtFontFace->create($ft_face);
+	$self->{face} = Cairo::FtFontFace->create($ft_face);
 
 	# no font file found? put *something* on the page...
 	if (! defined $self->{type}) {

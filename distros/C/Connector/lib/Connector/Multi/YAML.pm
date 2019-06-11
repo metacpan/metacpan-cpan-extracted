@@ -21,7 +21,7 @@ sub _build_config {
     if ( ! ( ( -e $file ) && ( -r $file ) ) )  {
         die 'configuration file '.$file.' not found ';
     }
-    
+
     my $yaml = YAML::LoadFile( $file );
 
     my $config = $self->makeRefs($yaml);
@@ -31,10 +31,10 @@ sub _build_config {
 }
 
 # Traverse the tree read from the YAML file and replace the "@" keys by
-# scalar references 
+# scalar references
 
 sub makeRefs {
-    
+
     my $self = shift;
     my $config = shift;
 
@@ -72,16 +72,16 @@ __DATA__
 =head1 Name
 
 Connector::Multi::YAML
- 
+
 =head1 Description
 
-This is a glue connector to create the required reference syntax for 
+This is a glue connector to create the required reference syntax for
 Connector::Multi based on a backend configuration handled by YAML.
 
 LOCATION is passed over as file to load by YAML.
 
-Internally, the constructor walks down the whole tree and translates 
-all keys starting or ending with the "@" character into references as 
+Internally, the constructor walks down the whole tree and translates
+all keys starting or ending with the "@" character into references as
 understood by Connector::Multi.
 
 =head1 CONFIGURATION
@@ -91,9 +91,9 @@ There is no special configuration besides the mandatory LOCATION property.
 =head1 Example
 
    my $backend = Connector::Multi::YAML->new({
-       LOCATION = /etc/myconfigtree/
+       LOCATION = /etc/myconfig.yaml
    })
-   
+
    my $multi = Connector::Multi->new({
        BASECONNECTOR => $backend
    })

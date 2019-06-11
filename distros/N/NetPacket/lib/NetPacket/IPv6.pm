@@ -1,7 +1,7 @@
 package NetPacket::IPv6;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble IPv6 (Internet Protocol version 6) packets.
-$NetPacket::IPv6::VERSION = '1.7.0';
+$NetPacket::IPv6::VERSION = '1.7.1';
 use strict;
 use warnings;
 
@@ -218,7 +218,7 @@ NetPacket::IPv6 - Assemble and disassemble IPv6 (Internet Protocol version 6) pa
 
 =head1 VERSION
 
-version 1.7.0
+version 1.7.1
 
 =head1 SYNOPSIS
 

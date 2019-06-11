@@ -24,7 +24,6 @@ if ($timezone->location()) {
 } else {
 	$ENV{TZ} = $timezone->area();
 }
-diag("Local timezone has been determined to be " . $timezone->timezone() );
 
 my $perl_date = 0;
 my $bsd_date = 0;

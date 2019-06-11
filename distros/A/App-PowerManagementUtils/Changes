@@ -1,3 +1,11 @@
+0.002   2019-06-09 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated PowerManagement::Any (0.005, examples for
+          sleep-is-prevented).
+
+
 0.001   2019-05-22 (PERLANCAR)
 
         - First release.

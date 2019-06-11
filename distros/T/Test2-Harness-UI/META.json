@@ -37,7 +37,7 @@
             "DBIx::Class::Schema::Loader" : "0",
             "DBIx::Class::Tree::AdjacencyList" : "0",
             "DBIx::Class::UUIDColumns" : "0",
-            "DBIx::QuickDB" : "0",
+            "DBIx::QuickDB" : "0.000008",
             "Data::GUID" : "0",
             "DateTime" : "0",
             "Email::Sender::Simple" : "0",
@@ -94,7 +94,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness-UI/"
       }
    },
-   "version" : "0.000001",
+   "version" : "0.000002",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

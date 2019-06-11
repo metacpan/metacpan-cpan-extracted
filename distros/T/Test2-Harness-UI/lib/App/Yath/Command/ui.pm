@@ -2,7 +2,7 @@ package App::Yath::Command::ui;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -69,6 +69,7 @@ sub run_command {
 
     $ENV{HARNESS_UI_DSN} = $dsn;
 
+    print "DSN: $dsn\n";
     my $config = Test2::Harness::UI::Config->new(
         dbi_dsn     => $dsn,
         dbi_user    => '',

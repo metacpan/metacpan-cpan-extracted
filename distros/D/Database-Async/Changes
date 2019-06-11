@@ -1,5 +1,10 @@
 Revision history for Database-Async
 
+0.008     2019-06-10 02:50:14+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - constraint and foreign key methods for ::ORM
+
 0.007     2019-05-05 19:18:15+08:00 Asia/Kuala_Lumpur
     New features:
 

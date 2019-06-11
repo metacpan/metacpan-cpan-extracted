@@ -7,6 +7,8 @@ README
 t/00-load.t
 t/dirs.t
 t/lists.t
+t/override.t
+t/shuffle.t
 t/warn.t
 xt/aggregate/aggregate.lst
 xt/aggregate/check_env.t

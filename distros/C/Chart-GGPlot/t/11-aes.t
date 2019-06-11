@@ -80,7 +80,7 @@ sub aes_quosure_to_hashref {
         { x => 'x', y => 'y', color => 'color' }, 'aes_all()' );
 
     ok( is_position_aes( [qw(x y)] ), 'is_position_aes()' );
-    is( aes_to_scale( [qw(colour x xmin y ymax)] ),
+    is( [ map { aes_to_scale($_) } qw(colour x xmin y ymax) ],
         [qw(color x x y y)], 'aes_to_scale()' );
 }
 

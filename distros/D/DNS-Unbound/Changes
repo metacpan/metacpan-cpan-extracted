@@ -1,5 +1,12 @@
 Revision history for Perl module DNS::Unbound
 
+0.07 - Sun, 9 June 2019
+- Add error checking for debugout().
+- Work around libunbound debugout bug (https://github.com/NLnetLabs/unbound/issues/39)
+
+0.06 - Fri, 7 June 2019
+- Add debug control support.
+
 0.05 - Fri, 7 June 2019
 - Add asynchronous query support.
 - Fix instantiation of ResolveError exception.

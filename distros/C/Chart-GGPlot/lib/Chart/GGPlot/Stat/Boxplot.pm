@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Data::Frame;
 use List::AllUtils qw(pairwise);
@@ -36,27 +36,27 @@ classmethod _parameters () {
     ]
 }
 
-my $stat_boxplot_pod = layer_func_pod(<<'=cut');
+my $stat_boxplot_pod = layer_func_pod(<<'EOT');
 
-    stat_boxplot(:$mapping=undef, :$data=undef,
-                 :$geom='boxplot', :$position='dodge2',
-                 :$coef=1.5,
-                 :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
-                 %rest)
+        stat_boxplot(:$mapping=undef, :$data=undef,
+                     :$geom='boxplot', :$position='dodge2',
+                     :$coef=1.5,
+                     :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                     %rest)
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=item * $coef
+    =item * $coef
 
-Length of the whiskers as multiple of IQR. Defaults to 1.5.
+    Length of the whiskers as multiple of IQR. Defaults to 1.5.
 
-=back
+    =back
 
-=cut
+EOT
 
 my $stat_boxplot_code = fun (
         :$mapping=undef, :$data=undef,
@@ -193,7 +193,11 @@ Chart::GGPlot::Stat::Boxplot - Statistic method that gets the statistics data fo
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Stat>
 
 =head1 AUTHOR
 

@@ -37,7 +37,7 @@ sub test_create_and_update {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 )) {
+    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )) {
         like(
             $yaml,
             qr/^ +- \Q'$v'\E$/ms,
@@ -81,6 +81,7 @@ sub test_create_and_update {
                 qw(
                     blead
                     dev
+                    5.30
                     5.28
                     5.26
                     5.24
@@ -100,7 +101,7 @@ sub test_create_and_update {
                 include        => [
                     {
                         env  => 'COVERAGE=1',
-                        perl => '5.28'
+                        perl => '5.30'
                     }
                 ],
             },
@@ -142,7 +143,7 @@ sub test_force_threaded_perls {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 )) {
+    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,
@@ -213,7 +214,7 @@ sub test_distro_has_xs {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 )) {
+    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,

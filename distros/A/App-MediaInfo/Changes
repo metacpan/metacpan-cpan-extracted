@@ -1,3 +1,26 @@
+0.123   2019-06-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak module Summary again.
+
+
+0.122   2019-06-09 (PERLANCAR)
+
+	- Add examples for media-is-{landscape,portrait}.
+
+	- [ux] Revert previous change, now uses --quiet (-q) a la grep to
+	  be silent.
+
+	- Fix module Summary.
+
+
+0.121   2019-06-09 (PERLANCAR)
+
+	- [ux] media-is-{portrait,landscape}: Show human-friendly message
+	  when run interactively.
+
+
 0.120   2019-01-28 (PERLANCAR)
 
 	- Add utilities: media-is-landscape, media-is-portrait,

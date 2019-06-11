@@ -11,7 +11,7 @@ test_requires_git();
 
 SKIP: {
     skip 'must be inside Git checkout', 1 unless is_inside_work_tree();
-    is( maybe_get_url_from_parsed_text(), undef, 'undef on undef' );
+    is( maybe_get_url_from_parsed_text(),     undef, 'undef on undef' );
     is( maybe_get_url_from_parsed_text( {} ), undef, 'undef on empty hash' );
 
     my $url = maybe_get_url_from_parsed_text(

@@ -1,10 +1,10 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Boxplot;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Boxplot
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Boxplot
 
 use Chart::GGPlot::Class qw(:pdl);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
@@ -16,7 +16,9 @@ use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb pdl_to_plotly);
 use Chart::GGPlot::Geom::Boxplot;
 use Chart::GGPlot::Geom::Point;
 
-classmethod to_basic ($data, $prestats_data, $layout, $params, $plot) {
+classmethod split_on () { [qw(color fill size)] }
+
+classmethod prepare_data ($data, $prestats_data, @rest) {
     my @join_on_columns = qw(PANEL group);
 
     my $prestats_y = $prestats_data->at('y');
@@ -40,7 +42,7 @@ classmethod to_basic ($data, $prestats_data, $layout, $params, $plot) {
     return $data;
 }
 
-classmethod to_trace ($df, $params, $plot) {
+classmethod to_traces ($df, $params, $plot) {
     load Chart::Plotly::Trace::Box;
     load Chart::Plotly::Trace::Box::Line;
     load Chart::Plotly::Trace::Box::Marker;
@@ -105,13 +107,14 @@ classmethod to_trace ($df, $params, $plot) {
         notched    => ( $params->at('notch') ? JSON::true : JSON::false ),
         notchwidth => $params->at('notchwidth'),
         hoverinfo  => ( $flip ? 'x' : 'y' ),
+        hoveron    => $class->hover_on,
 
         # plotly defaults to 'suspectedoutliers' to show outliers and
         # suspected in different styles.
         # we use 'outliers' here to align with ggplot2 behavior.
         boxpoints => 'outliers',
     );
-    return $class->_adjust_trace_for_flip($trace, $plot);
+    return [ $class->_adjust_trace_for_flip($trace, $plot) ];
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -126,11 +129,11 @@ __END__
 
 =head1 NAME
 
-Chart::GGPlot::Backend::Plotly::Geom::Boxplot - Chart::GGPlot's Plotly support for Geom::Boxplot
+Chart::GGPlot::Backend::Plotly::Geom::Boxplot - Chart::GGPlot's Plotly implementation for Geom::Boxplot
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

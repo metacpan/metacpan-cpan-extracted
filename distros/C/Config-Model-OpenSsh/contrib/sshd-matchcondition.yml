@@ -1,0 +1,39 @@
+---
+class:
+  Sshd::MatchCondition:
+    author:
+    - Dominique Dumont
+    class_description: "Conidtion to apply to identify matched items inside \na sshd_config
+      match block."
+    copyright:
+    - 2009-2011 Dominique Dumont
+    element:
+      Address:
+        description: Define the Address criteria of a conditional block. The value
+          of this field is a pattern that is tested against the address of the incoming
+          connection.
+        type: leaf
+        value_type: uniline
+      Group:
+        description: Define the Group criteria of a conditional block. The value of
+          this field is a pattern that is tested against group name.
+        type: leaf
+        value_type: uniline
+      Host:
+        description: Define the Host criteria of a conditional block. The value of
+          this field is a pattern that is tested against host name.
+        type: leaf
+        value_type: uniline
+      User:
+        description: Define the User criteria of a conditional block. The value of
+          this field is a pattern that is tested against user name.
+        type: leaf
+        value_type: uniline
+      __element_order:
+      - User
+      - Group
+      - Host
+      - Address
+    license: LGPL2
+  __class_order:
+  - Sshd::MatchCondition

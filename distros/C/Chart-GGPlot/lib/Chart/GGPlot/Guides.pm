@@ -5,9 +5,9 @@ package Chart::GGPlot::Guides;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
-use Data::Munge qw(elem);
+use List::AllUtils qw(uniq);
 use Module::Load;
 
 has _guides => (is => 'ro', default => sub { {} });
@@ -23,7 +23,8 @@ my $defined_or = sub {
 };
 
 # Train each scale in scales and generate the definition of guide.
-method build ($scales, :$labels, %rest) {
+method build ($scales, :$layers, :$labels, :$default_mapping=undef, %rest) {
+    my @gdefs;
     for my $scale ($scales->scales->flatten) {
         for my $output ( $scale->aesthetics->flatten ) {
             my $guide = $self->get_guide($output) // $scale->guide;
@@ -37,18 +38,42 @@ method build ($scales, :$labels, %rest) {
             # Check the consistency of the guide and scale.
             my $guide_available_aes = $guide->available_aes;
             if ( defined $guide_available_aes
-                and !elem( $scale->aesthetics, $guide_available_aes ) )
+                and $guide_available_aes->intersect( $scale->aesthetics )
+                ->length == 0 )
             {
                 die sprintf( "Guide %s cannot be used for %s.",
-                    $guide, $scale->aesthetics );
+                    $guide, join( ', ', @{ $scale->aesthetics } ) );
             }
 
             unless (defined $guide->title) {
-                $guide->set('title', $scale->make_title( $scale->name // $labels->at($output) ));
+                $guide->set( 'title',
+                    $scale->make_title( $scale->name // $labels->at($output) )
+                );
             }
-            $self->set($output, $guide);
+
+            $guide = $guide->train($scale, $output);
+            next unless defined $guide;
+
+            if (
+                List::AllUtils::none {
+                    my $matched =
+                      $self->_matched_aes( $_, $guide, $default_mapping );
+                    my $show_legend = $_->show_legend;
+                    ( $matched->length > 0
+                          and ( not defined $show_legend or $show_legend ) )
+                }
+                @$layers
+              )
+            {
+                next;
+            }
+
+            if (defined $guide) { 
+                push @gdefs, $guide;
+            }
         }
     }
+    return \@gdefs;
 }
 
 method set($key, $guide) { $self->_guides->{$key} = $guide; }
@@ -69,6 +94,23 @@ classmethod _validate_guide ($guide) {
     }
 }
 
+classmethod _matched_aes ($layer, $guide, $defaults) {
+    my $all = [
+        uniq(
+            @{ $layer->mapping->names },
+            @{
+                ( $layer->inherit_aes ? $defaults : $layer->stat->default_aes )
+                  ->names
+            }
+        )
+    ];
+    my $geom_aes = [ @{ $layer->geom->required_aes },
+        @{ $layer->geom->default_aes->names } ];
+    my $matched = $all->intersect($geom_aes)->intersect( $guide->key->names );
+    return $matched->setdiff(
+        [ @{ $layer->geom_params->names }, @{ $layer->aes_params->names } ] );
+}
+
 1;
 
 __END__
@@ -83,7 +125,7 @@ Chart::GGPlot::Guides - The container of guides
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 METHODS
 

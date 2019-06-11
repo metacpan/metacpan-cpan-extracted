@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::AutoSplit 0.919;
+package Text::Parser::AutoSplit 0.920;
 
 # ABSTRACT: A role that adds the ability to auto-split a line into fields
 
@@ -91,7 +91,7 @@ Text::Parser::AutoSplit - A role that adds the ability to auto-split a line into
 
 =head1 VERSION
 
-version 0.919
+version 0.920
 
 =head1 SYNOPSIS
 

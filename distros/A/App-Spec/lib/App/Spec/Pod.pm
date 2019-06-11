@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Pod;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Text::Table;
 

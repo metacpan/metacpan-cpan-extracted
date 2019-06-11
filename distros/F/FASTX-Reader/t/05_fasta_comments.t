@@ -3,7 +3,7 @@ use warnings;
 use FindBin qw($Bin);
 use Test::More;
 use_ok 'FASTX::Reader';
-my $seq = "$Bin/../scripts/comments.fasta";
+my $seq = "$Bin/../data/comments.fasta";
 
 # Check required input file
 if (! -e $seq) {

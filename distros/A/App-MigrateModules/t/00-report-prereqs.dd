@@ -20,6 +20,7 @@ do { my $x = {
                                       'Getopt::Long::Modern' => '0',
                                       'HTTP::Tinyish' => '0',
                                       'IPC::Open3' => '0',
+                                      'Module::CoreList' => '0',
                                       'Pod::Usage' => '0',
                                       'perl' => '5.006'
                                     }

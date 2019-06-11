@@ -2,8 +2,8 @@ NAME
     PowerManagement::Any - Common interface to some power management tasks
 
 VERSION
-    This document describes version 0.004 of PowerManagement::Any (from Perl
-    distribution PowerManagement-Any), released on 2019-05-28.
+    This document describes version 0.006 of PowerManagement::Any (from Perl
+    distribution PowerManagement-Any), released on 2019-06-10.
 
 NOTES
 FUNCTIONS
@@ -15,15 +15,17 @@ FUNCTIONS
     Prevent system from sleeping.
 
     Will also prevent system from hybrid sleeping, suspending, or
-    hibernating. The effect is permanent; you need to "unprevent_sleep()" to
-    reverse the effect.
+    hibernating. The effect is permanent (survives reboot); you need to
+    "unprevent_sleep()" to reverse the effect.
 
     Note that this does not prevent screen blanking or locking (screensaver
     activating); see Screensaver::Any for routines that disable screensaver.
 
-    On systems that run Systemd, this is implemented by masking the
-    sleep.target. It automatically also prevents suspend.target,
-    hybrid-sleep.target, and hibernate.target from activating.
+    On systems that run Systemd, this is implemented by masking
+    "sleep.target". It automatically also prevents "suspend.target",
+    "hybrid-sleep.target", and "hibernate.target" from activating. (Note
+    that masking "systemd-suspend.service" should also achieve the same
+    result.)
 
     Not implemented yet for other systems. Patches welcome.
 
@@ -45,15 +47,22 @@ FUNCTIONS
   sleep_is_prevented
     Usage:
 
-     sleep_is_prevented() -> [status, msg, payload, meta]
+     sleep_is_prevented(%args) -> [status, msg, payload, meta]
 
     Check if sleep has been prevented.
+
+    The CLI return exit code 0 if sleep has been prevented.
 
     See "prevent_sleep()" for more details.
 
     This function is not exported by default, but exportable.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
 
     Returns an enveloped result (an array).
 

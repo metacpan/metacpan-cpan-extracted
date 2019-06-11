@@ -33,7 +33,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.127';
+$VERSION = '0.135';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -1856,6 +1856,7 @@ sub interlinear
   if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; } #say $tee "CHECK5 \@blockelts: " . dump( @blockelts );
 
   my @mode = adjustmode( $maxloops, \@mode );
+  say "Opening $sourcefile";
   open( SOURCEFILE, "$sourcefile" ) or die;
   my @lines = <SOURCEFILE>; #say $tee "REALLY \@lines: " . dump( @lines );
   close SOURCEFILE;
@@ -2116,10 +2117,14 @@ Sim::OPT::Interlinear
 
 
   # As a Perl function:
-    interlinear( "./configfile.pl", "./sourcefile.csv", "./obtainedmetamodel.csv" );
+  re.#!/usr/bin/env perl
+  use Sim::OPT::Interlinear
+  Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.csv", "./obtainedmetamodel.csv" );
+
   # or as a script, from the command line:
-  ./Interlinear.pm . "" ./SOURCEFILE
+  perl ./Interlinear.pm . "" ./sourcefile.csv
   # (note the dot and <"">).
+
   # or, again, from the command line, for beginning with a dialogue question:
   interlinear interstart
 
@@ -2196,14 +2201,15 @@ This dataseries can be used by OPT for the optimization of one or more blocks. T
 
 The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to 10000. If a null value ("") is specified for them, no limit is assumed.
 
-To call Interlinear as a Perl function:
-use Sim::OPT::Interlinear;
-interlinear( "./configfile.pl", "./sourcefile.csv", "./obtainedmetamodel.csv" );
-"configfile.pl" is the configuration file. If that file is an empty file, Interlinear will assume the defaults.
-"./sourcefile.csv" is only information which is truly mandatory.
+To call Interlinear as a Perl function (best strategy):
+re.pl # open Perl shell
+use Sim::OPT::Interlinear; # load Interlinear
+Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.csv", "./obtainedmetamodel.csv" );
+"configfile.pl" is the configuration file. If that file is an empty file, Interlinear will assume its defaults.
+"./sourcefile.csv" is the only information which is truly mandatory: the path to the csv dataseries to be completed.
 
 To use Interlinear as a script from the command line:
-./Interlinear.pm . "./sourcefile.csv" "./configfile.pl";
+./Interlinear.pm . "./sourcefile.csv" "./configfile.pl ";
 (Note the dot within the line.) If "./sourcefile.csv" is not specified, the default file "./sourcefile.csv" will be sought.
 If "./configfile.pl" is not specified, the program goes with the defaults.
 

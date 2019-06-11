@@ -9,6 +9,9 @@ use Open::This qw(
     parse_text
 );
 use Path::Tiny qw( path );
+use Pod::Usage qw( pod2usage );
+
+pod2usage("Error: missing argument\n") unless @ARGV;
 
 my $browse;
 if ( $ARGV[0] eq '-b' ) {
@@ -58,7 +61,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000017
+version 0.000018
 
 =head1 SYNOPSIS
 

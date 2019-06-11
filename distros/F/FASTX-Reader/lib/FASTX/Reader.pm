@@ -3,8 +3,10 @@ use 5.014;
 use warnings;
 use Carp qw(confess);
 
-$FASTX::Reader::VERSION = '0.11';
+$FASTX::Reader::VERSION = '0.20';
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
+
+use constant MAGIC_GZIP => pack('C3', 0x1f, 0x8b, 0x08);
 
 
 sub new {
@@ -22,8 +24,25 @@ sub new {
 
     # Check if a filename was provided and not {{STDIN}}
     # uncoverable branch false
+
     if (defined $self->{filename} and $self->{filename} ne '{{STDIN}}') {
-      open my $fh,  '<:encoding(UTF-8)', $self->{filename} or confess "Unable to read file ", $self->{filename}, ": ", $!, "\n";
+      open my $fh, '<', $self->{filename} or confess "Unable to read file ", $self->{filename}, "\n";
+      read( $fh, my $magic, 4 );
+      close $fh;
+
+      if (substr($magic,0,3) eq MAGIC_GZIP) {
+         our $GZIP_BIN = _which('pigz', 'gzip');
+         close $fh;
+         if (! defined $GZIP_BIN) {
+           require IO::Uncompress::Gunzip;
+           $fh = IO::Uncompress::Gunzip->new($self->{filename}, MultiStream => 1);
+         } else {
+	   open  $fh, '-|', "$GZIP_BIN -dc $self->{filename}" or confess "Error opening gzip file ", $self->{filename}, ": $!\n";
+         }
+      } else {
+	 close $fh;
+      	 open $fh,  '<:encoding(UTF-8)', $self->{filename} or confess "Unable to read file ", $self->{filename}, ": ", $!, "\n";
+      }
       $object->{fh} = $fh;
     } else {
       $self->{fh} = \*STDIN;
@@ -165,7 +184,21 @@ sub getFileFormat {
   }
 }
 
-
+sub _which {
+	return undef if ($^O eq 'MSWin32');
+	my $has_which = eval { require File::Which; File::Which->import(); 1};
+	if ($has_which) {
+		foreach my $cmd (@_) {
+			return which($cmd) if (which($cmd));
+		}
+	} else {
+		foreach my $cmd (@_) {
+			`which $cmd`;
+			return $cmd if (not $?);
+		}
+	}
+	return undef;
+}
 1;
 
 __END__
@@ -180,7 +213,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, based on He
 
 =head1 VERSION
 
-version 0.11
+version 0.20
 
 =head1 SYNOPSIS
 

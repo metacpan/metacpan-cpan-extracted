@@ -1,5 +1,6 @@
 
-[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Chrome.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Chrome)
+[![Travis Build Status](https://travis-ci.org/Corion/Apache-Tika-Async.svg?branch=master)](https://travis-ci.org/Corion/Apache-Tika-Async)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Apache-Tika-Async?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Apache-Tika-Async)
 
 # NAME
 
@@ -43,7 +44,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein `corion@cpan.org`.
+Copyright 2014-2019 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

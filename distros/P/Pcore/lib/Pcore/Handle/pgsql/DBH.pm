@@ -7,25 +7,25 @@ use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_c
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Digest qw[md5_hex];
 use Pcore::Util::Data qw[from_json];
-use Pcore::Handle::pgsql::AEHandle;
 
-has handle     => ( required => 1 );    # InstanceOf ['Pcore::Handle::pgsql']
-has on_connect => ( required => 1 );    # CodeRef
-has password => ();                     # Str
+has pool => ( required => 1 );    # InstanceOf ['Pcore::Handle::pgsql']
 
-has is_pgsql => 1, init_arg => undef;
+has is_pgsql => ( 1, init_arg => undef );
+has state => ( $STATE_CONNECT, init_arg => undef );
+has id    => sub { P->uuid->v1mc_str }, init_arg => undef;
 
-has state        => $STATE_CONNECT, init_arg => undef;    # Enum [ $STATE_CONNECT, $STATE_READY, $STATE_BUSY, $STATE_DISCONNECTED ]
-has h            => ( init_arg => undef );                # InstanceOf ['Pcore::Handle::pgsql::AEHandle']
-has parameter    => ( init_arg => undef );                # HashRef
-has key_data     => ( init_arg => undef );                # HashRef
-has tx_status    => ( init_arg => undef );                # Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], current transaction status
-has wbuf         => ( init_arg => undef );                # ArrayRef, outgoing messages buffer
-has sth          => ( init_arg => undef );                # HashRef, currently executed sth
-has prepared_sth => ( init_arg => undef );                # HashRef
-has query        => ( init_arg => undef );                # ScalarRef, ref to the last query
+has _on_connect_guard => ( init_arg => undef );    # $self
+has h                 => ( init_arg => undef );    # InstanceOf['Pcore::Handle']
+has parameter         => ( init_arg => undef );    # HashRef, backen run-time parameters
+has key_data          => ( init_arg => undef );    # HashRef, backend key data, can be used to cancel request
+has tx_status         => ( init_arg => undef );    # Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], current transaction status
+has wbuf              => ( init_arg => undef );    # ArrayRef, outgoing messages buffer
+has sth               => ( init_arg => undef );    # HashRef, currently executed sth
+has prepared_sth      => ( init_arg => undef );    # HashRef, index of akready prepares sth for this dbh
+has query             => ( init_arg => undef );    # ScalarRef, ref to the last query
+has error_status      => ( init_arg => undef );    # fatal error status
 
-const our $PROTOCOL_VER => "\x00\x03\x00\x00";            # v3
+const our $PROTOCOL_VER => "\x00\x03\x00\x00";     # v3
 
 # FRONTEND
 const our $PG_MSG_BIND             => 'B';
@@ -97,137 +97,149 @@ const our $ERROR_STRING_TYPE => {
     V => 'text',
 };
 
+const our $MESSAGE_METHOD => {
+
+    # GENERAL MESSAGES
+    $PG_MSG_AUTHENTICATION        => \&_ON_AUTHENTICATION,
+    $PG_MSG_PARAMETER_STATUS      => \&_ON_PARAMETER_STATUS,
+    $PG_MSG_BACKEND_KEY_DATA      => \&_ON_BACKEND_KEY_DATA,
+    $PG_MSG_READY_FOR_QUERY       => \&_ON_READY_FOR_QUERY,
+    $PG_MSG_ERROR_RESPONSE        => \&_ON_ERROR_RESPONSE,
+    $PG_MSG_NOTICE_RESPONSE       => \&_ON_NOTICE_RESPONSE,
+    $PG_MSG_NOTIFICATION_RESPONSE => \&_ON_NOTIFICATION_RESPONSE,
+
+    # STH RELATED MESSAGES
+    $PG_MSG_PARSE_COMPLETE   => \&_ON_PARSE_COMPLETE,
+    $PG_MSG_BIND_COMPLETE    => \&_ON_BIND_COMPLETE,
+    $PG_MSG_ROW_DESCRIPTION  => \&_ON_ROW_DESCRIPTION,
+    $PG_MSG_NO_DATA          => \&_ON_NO_DATA,
+    $PG_MSG_DATA_ROW         => \&_ON_DATA_ROW,
+    $PG_MSG_PORTAL_SUSPENDED => \&_ON_PORTAL_SUSPENDED,
+    $PG_MSG_COMMAND_COMPLETE => \&_ON_COMMAND_COMPLETE,
+    $PG_MSG_CLOSE_COMPLETE   => \&_ON_CLOSE_COMPLETE,
+};
+
 sub DESTROY ( $self ) {
-    $self->{handle}->push_dbh($self) if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) && defined $self->{handle};
+    $self->{pool}->push_dbh($self) if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) && defined $self->{pool};
 
     return;
 }
 
 # https://www.postgresql.org/docs/current/static/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY
 # https://www.postgresql.org/docs/current/static/protocol-message-formats.html
-sub connect ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    my $on_connect = delete $args{on_connect};
+sub BUILD ( $self, $args ) {
+    weaken $self->{pool};
 
-    $self = bless \%args, $self;
+    $self->{_on_connect_guard} = $self;
 
-    $self->{is_pgsql} = 1;
-
-    $self->{state} = $STATE_CONNECT;
-
-    $self->{on_connect} = sub ( $dbh, $res ) {
-        undef $self;
-
-        $on_connect->(@_);
-
-        return;
-    };
-
-    my $host = $self->{handle}->host;
-    my $port = $self->{handle}->{port};
-
-    Pcore::Handle::pgsql::AEHandle->new(
-        connect => "pgsql://$host:$port",
-        on_error => sub ( $h, $fatal, $reason ) {
-            $self->_on_error( $reason, 1 );
-
-            return;
-        },
-        on_connect => sub ( $h, $host, $port, $retry ) {
-            $self->{h} = $h;
-
-            my $params = [
-                user                        => $self->{handle}->username,
-                database                    => $self->{handle}->database,
-                client_encoding             => 'UTF8',
-                bytea_output                => 'hex',
-                backslash_quote             => 'off',
-                standard_conforming_strings => 'on',
-                options                     => '--client-min-messages=warning',
-            ];
-
-            # send start message
-            push $self->{wbuf}->@*, [ $PG_MSG_STARTUP_MESSAGE, $PROTOCOL_VER . join( "\x00", $params->@* ) . "\x00\x00" ];
-
-            $self->_flush;
-
-            # start listen for messages
-            $self->_start_listen;
-
-            return;
-        }
-    );
+    $self->_connect;
 
     return;
 }
 
-sub _start_listen ($self) {
-    weaken $self;
+sub _connect ($self) {
+    Coro::async {
+        weaken $self;
 
-    $self->{h}->on_read( sub {
-        my \$rbuf = \$_[0]->{rbuf};
+        my $h = $self->{h} = P->handle( [ $self->{pool}->{uri}->connect ], timeout => undef );
 
-      REDO:
-        if ( length $rbuf > 4 ) {
-            my ( $type, $msg_len ) = unpack 'AN', $rbuf;
+        # connection error
+        return $self->_on_fatal_error if !$h;
 
-            if ( length $rbuf > $msg_len ) {
-                my $data = substr $rbuf, 0, $msg_len + 1, $EMPTY;
+        # create start message params
+        my $params = [
+            user                        => $self->{pool}->{uri}->{username},
+            database                    => $self->{pool}->{uri}->query_params->{db},
+            client_encoding             => 'UTF8',
+            bytea_output                => 'hex',
+            backslash_quote             => 'off',
+            standard_conforming_strings => 'on',
+            options                     => '--client-min-messages=warning',
+        ];
 
-                substr $data, 0, 5, $EMPTY;
+        # send start message
+        push $self->{wbuf}->@*, [ $PG_MSG_STARTUP_MESSAGE, $PROTOCOL_VER . join( "\x00", $params->@* ) . "\x00\x00" ];
 
-                # GENERAL MESSAGES
-                if    ( $type eq $PG_MSG_AUTHENTICATION )   { $self->_ON_AUTHENTICATION( \$data ) }
-                elsif ( $type eq $PG_MSG_PARAMETER_STATUS ) { $self->_ON_PARAMETER_STATUS( \$data ) }
-                elsif ( $type eq $PG_MSG_BACKEND_KEY_DATA ) { $self->_ON_BACKEND_KEY_DATA( \$data ) }
-                elsif ( $type eq $PG_MSG_READY_FOR_QUERY )  { $self->_ON_READY_FOR_QUERY( \$data ) }
-                elsif ( $type eq $PG_MSG_ERROR_RESPONSE )   { $self->_ON_ERROR_RESPONSE( \$data ) }
-                elsif ( $type eq $PG_MSG_NOTICE_RESPONSE )  { $self->_ON_NOTICE_RESPONSE( \$data ) }
+        $self->_flush;
 
-                # STH RELATED MESSAGES
-                elsif ( $type eq $PG_MSG_PARSE_COMPLETE )   { $self->_ON_PARSE_COMPLETE }
-                elsif ( $type eq $PG_MSG_BIND_COMPLETE )    { $self->_ON_BIND_COMPLETE }
-                elsif ( $type eq $PG_MSG_ROW_DESCRIPTION )  { $self->_ON_ROW_DESCRIPTION( \$data ) }
-                elsif ( $type eq $PG_MSG_NO_DATA )          { $self->_ON_NO_DATA }
-                elsif ( $type eq $PG_MSG_DATA_ROW )         { $self->_ON_DATA_ROW( \$data ) }
-                elsif ( $type eq $PG_MSG_PORTAL_SUSPENDED ) { $self->_ON_PORTAL_SUSPENDED }
-                elsif ( $type eq $PG_MSG_COMMAND_COMPLETE ) { $self->_ON_COMMAND_COMPLETE( \$data ) }
-                elsif ( $type eq $PG_MSG_CLOSE_COMPLETE )   { $self->_ON_CLOSE_COMPLETE }
+        while () {
+            return if !defined $self || $self->{state} >= $STATE_ERROR;
 
-                # UNSUPPORTED MESSAGE EXCEPTION
-                else {
-                    die qq[Unknown message "$type"];
-                }
+            my $chunk = $h->read_chunk(5);
 
-                goto REDO;
+            return if !defined $self || $self->{state} >= $STATE_ERROR;
+
+            # read error
+            return $self->_on_fatal_error if !$h;
+
+            # unpack message type and length
+            my ( $type, $msg_len ) = unpack 'AN', $chunk->$*;
+
+            my $data = $h->read_chunk( $msg_len - 4 );
+
+            return if !defined $self || $self->{state} >= $STATE_ERROR;
+
+            # read error
+            return $self->_on_fatal_error if !$h;
+
+            if ( my $method = $MESSAGE_METHOD->{$type} ) {
+                $method->( $self, $data );
+            }
+
+            # UNSUPPORTED MESSAGE EXCEPTION
+            else {
+                return $self->_on_fatal_error(qq[Unknown message "$type"]);
             }
         }
 
         return;
-    } );
+    };
 
     return;
 }
 
-sub _on_error ( $self, $reason, $fatal ) {
+sub _on_fatal_error ( $self, $reason = undef ) {
     my $state = $self->{state};
 
-    # error on connect state is always fatal
-    $fatal = 1 if $state == $STATE_CONNECT;
+    # fatal error is already processed
+    return if $state >= $STATE_ERROR;
 
-    # disconnect on fatal error
-    if ($fatal) {
-        $self->{h}->destroy if defined $self->{h};
+    $self->{state} = $state == $STATE_CONNECT ? $STATE_CONNECT_ERROR : $STATE_ERROR;
 
-        $self->{state} = $STATE_DISCONNECTED;
+    my $status = $self->{error_status} = defined $reason ? res [ 500, $reason ] : res [ $self->{h}->{status}, $self->{h}->{reason} ];
+
+    warn qq[DBI FATAL ERROR: "$status"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : $EMPTY );
+
+    $self->{h}->shutdown;
+
+    if ( $state == $STATE_CONNECT ) {
+        delete $self->{_on_connect_guard};
     }
-
-    warn qq[DBI: "$reason"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : $EMPTY );
-
-    if ( $state == $STATE_BUSY ) {
+    elsif ( $state == $STATE_BUSY ) {
         $self->{sth}->{error} = $reason;
+
+        $self->_finish_sth;
     }
-    elsif ( $state == $STATE_CONNECT ) {
-        delete( $self->{on_connect} )->( undef, res [ 500, $reason ] );
+
+    $self->{pool}->push_dbh($self);
+
+    return;
+}
+
+sub _finish_sth ($self) {
+    delete $self->{query};
+
+    my $sth = delete $self->{sth};
+
+    return if !defined $sth;
+
+    my $cb = delete $sth->{cb};
+
+    if ( $sth->{error} ) {
+        $cb->( $sth, res [ 500, $sth->{error} ] );
+    }
+    else {
+        $cb->( $sth, res 200, $sth->{tag}->%* );
     }
 
     return;
@@ -242,20 +254,26 @@ sub _ON_AUTHENTICATION ( $self, $dataref ) {
     my $auth_type = unpack 'N', substr $dataref->$*, 0, 4, $EMPTY;
 
     if ( $auth_type != $PG_MSG_AUTHENTICATION_OK ) {
+        my $password = $self->{pool}->{uri}->{password} // $EMPTY;
+
         if ( $auth_type == $PG_MSG_AUTHENTICATION_CLEARTEXT_PASSWORD ) {
-            $self->{h}->push_write( $PG_MSG_PASSWORD_MESSAGE . pack 'NZ*', 5 + length $self->{handle}->password, $self->{handle}->password );
+            push $self->{wbuf}->@*, [ $PG_MSG_PASSWORD_MESSAGE, "$password\x00" ];
+
+            $self->_flush;
         }
         elsif ( $auth_type == $PG_MSG_AUTHENTICATION_MD5_PASSWORD ) {
-            my $pwdhash = md5_hex $self->{handle}->password . $self->{handle}->username;
+            my $pwdhash = md5_hex $password . $self->{pool}->{uri}->{username};
 
             my $hash = 'md5' . md5_hex $pwdhash . $dataref->$*;
 
-            $self->{h}->push_write( $PG_MSG_PASSWORD_MESSAGE . pack 'NZ*', 5 + length $hash, $hash );
+            push $self->{wbuf}->@*, [ $PG_MSG_PASSWORD_MESSAGE, "$hash\x00" ];
+
+            $self->_flush;
         }
 
         # unsupported auth type
         else {
-            $self->_on_error( qq[Unimplemented authentication type: "$auth_type"], 1 );
+            $self->_on_fatal_error(qq[Unimplemented authentication type: "$auth_type"]);
         }
     }
 
@@ -270,12 +288,15 @@ sub _ON_PARAMETER_STATUS ( $self, $dataref ) {
     return;
 }
 
+# Identifies the message as cancellation key data.
+# The frontend must save these values if it wishes to be able to issue CancelRequest messages later.
 sub _ON_BACKEND_KEY_DATA ( $self, $dataref ) {
     ( $self->{key_data}->{pid}, $self->{key_data}->{secret} ) = unpack 'NN', $dataref->$*;
 
     return;
 }
 
+# READY FOR QUERY
 sub _ON_READY_FOR_QUERY ( $self, $dataref ) {
     $self->{tx_status} = $dataref->$*;
 
@@ -285,24 +306,16 @@ sub _ON_READY_FOR_QUERY ( $self, $dataref ) {
 
     # connected
     if ( $state == $STATE_CONNECT ) {
-        delete( $self->{on_connect} )->( $self, res 200 );
+        delete $self->{_on_connect_guard};
     }
     elsif ( $state == $STATE_BUSY ) {
-        my $sth = delete $self->{sth};
-
-        my $cb = delete $sth->{cb};
-
-        if ( $sth->{error} ) {
-            $cb->( $sth, res [ 500, $sth->{error} ] );
-        }
-        else {
-            $cb->( $sth, res 200, $sth->{tag}->%* );
-        }
+        $self->_finish_sth;
     }
 
     return;
 }
 
+# QUERY ERROR
 sub _ON_ERROR_RESPONSE ( $self, $dataref ) {
     my $error;
 
@@ -312,7 +325,14 @@ sub _ON_ERROR_RESPONSE ( $self, $dataref ) {
         $error->{ $ERROR_STRING_TYPE->{$str_type} } = $str if exists $ERROR_STRING_TYPE->{$str_type};
     }
 
-    $self->_on_error( $error->{message}, 0 );
+    if ( $self->{state} == $STATE_CONNECT ) {
+        $self->_on_fatal_error( $error->{message} );
+    }
+    else {
+        $self->{sth}->{error} = $error->{message};
+
+        warn qq[DBI: "$error->{message}"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : $EMPTY );
+    }
 
     return;
 }
@@ -331,7 +351,21 @@ sub _ON_NOTICE_RESPONSE ( $self, $dataref ) {
     return;
 }
 
-sub _ON_PARSE_COMPLETE ($self) {
+sub _ON_NOTIFICATION_RESPONSE ( $self, $dataref ) {
+    my $pid = unpack 'N', substr $dataref->$*, 0, 4, $EMPTY;
+
+    my ( $channel, $payload ) = split /\x00/sm, $dataref->$*;
+
+    my $pool = $self->{pool};
+
+    if ( my $cb = $pool->{on_notification} ) {
+        $cb->( $pool, $pid, $channel, $payload );
+    }
+
+    return;
+}
+
+sub _ON_PARSE_COMPLETE ( $self, $dataref ) {
     $self->{sth}->{is_parse_complete} = 1;
 
     # store query id in prepared sth
@@ -340,7 +374,7 @@ sub _ON_PARSE_COMPLETE ($self) {
     return;
 }
 
-sub _ON_BIND_COMPLETE ($self) {
+sub _ON_BIND_COMPLETE ( $self, $dataref ) {
     $self->{sth}->{is_bind_complete} = 1;
 
     return;
@@ -381,7 +415,7 @@ sub _ON_ROW_DESCRIPTION ( $self, $dataref ) {
     return;
 }
 
-sub _ON_NO_DATA ( $self ) {
+sub _ON_NO_DATA ( $self, $dataref ) {
     $self->{sth}->{cols} = [];
 
     # store description in prepared sth
@@ -392,6 +426,7 @@ sub _ON_NO_DATA ( $self ) {
     return;
 }
 
+# TODO decode array
 sub _ON_DATA_ROW ( $self, $dataref ) {
     my $num_of_cols = unpack 'n', substr $dataref->$*, 0, 2;
 
@@ -455,7 +490,7 @@ sub _ON_DATA_ROW ( $self, $dataref ) {
     return;
 }
 
-sub _ON_PORTAL_SUSPENDED ( $self ) {
+sub _ON_PORTAL_SUSPENDED ( $self, $dataref ) {
     $self->{sth}->{portal_suspended} = 1;
 
     return;
@@ -470,29 +505,27 @@ sub _ON_COMMAND_COMPLETE ( $self, $dataref ) {
 
     my $tag;
 
-    if ( $val[0] eq 'INSERT' ) {
-        $tag = {
-            tag  => $val[0],
-            oid  => $val[1],
-            rows => $val[2],
-        };
-    }
-    elsif ( $val[0] eq 'CREATE' ) {
-        $tag = {
-            tag  => $val[0],
-            rows => 0,
-        };
-    }
-    elsif ( $val[0] eq 'ALTER' ) {
-        $tag = {
-            tag  => $val[0],
-            rows => 0,
-        };
+    if ( looks_like_number $val[-1] ) {
+        if ( $val[0] eq 'INSERT' ) {
+            $tag = {
+                tag  => $val[0],
+                oid  => $val[1],
+                rows => $val[2],
+            };
+        }
+        else {
+            my $rows = pop @val;
+
+            $tag = {
+                tag  => join( ' ', @val ),
+                rows => $rows,
+            };
+        }
     }
     else {
         $tag = {
-            tag  => $val[0],
-            rows => $val[1],
+            tag  => join( ' ', @val ),
+            rows => 0,
         };
     }
 
@@ -506,7 +539,7 @@ sub _ON_COMMAND_COMPLETE ( $self, $dataref ) {
     return;
 }
 
-sub _ON_CLOSE_COMPLETE ( $self ) {
+sub _ON_CLOSE_COMPLETE ( $self, $dataref ) {
     return;
 }
 
@@ -525,7 +558,12 @@ sub _flush ( $self ) {
         }
     }
 
-    $self->{h}->push_write($buf) if defined $buf;
+    if ( defined $buf ) {
+        $self->{h}->write($buf);
+
+        # write error
+        return $self->_on_fatal_error if !$self->{h};
+    }
 
     return;
 }
@@ -566,7 +604,7 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
 
     # query is ArrayRef
     elsif ( is_plain_arrayref $query) {
-        ( $query, $bind ) = $self->{handle}->prepare_query($query);
+        ( $query, $bind ) = $self->{pool}->prepare_query($query);
 
         $use_extended_query = defined $bind;
     }
@@ -593,7 +631,7 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
     # extended query mode
     else {
         my $query_id  = $self->{sth}->{id} // $EMPTY;
-        my $portal_id = $EMPTY;                         # uuid_v1mc_str;
+        my $portal_id = $EMPTY;                         # uuid_v1mc_str, currently we use unnamed portals
 
         # parse query
         if ( !$self->{sth}->{is_parse_complete} ) {
@@ -692,20 +730,20 @@ sub _parse_args ( $args ) {
 
 # STH
 sub prepare ( $self, $query ) {
-    return $self->{handle}->prepare($query);
+    return $self->{pool}->prepare($query);
 }
 
-sub dbh ($self) { return $self }
+sub get_dbh ( $self, $cb = undef ) {
 
-# TODO
-sub destroy_sth ( $self, $id ) {
-    if ( exists $self->{prepared_sth}->{$id} ) {
-
-        # TODO run command and delete after command complete
-        # delete $self->{prepared_sth}->{$id};
+    # self is ready
+    if ( $self->{state} == $STATE_READY && $self->{tx_status} eq $TX_STATUS_IDLE ) {
+        return $cb ? $cb->( res(200), $self ) : ( res(200), $self );
     }
 
-    return;
+    # self is not ready
+    else {
+        return $self->{pool}->get_dbh($cb);
+    }
 }
 
 # PUBLIC DBI METHODS
@@ -994,7 +1032,7 @@ sub selectcol ( $self, $query, @args ) {
 # TRANSACTIONS
 sub begin_work ( $self, $cb = undef ) {
     my $on_finish = sub ( $sth, $res ) {
-        return $cb ? $cb->( $self, $res ) : ( $self, $res );
+        return $cb ? $cb->($res) : $res;
     };
 
     if ( defined wantarray ) {
@@ -1049,19 +1087,19 @@ sub rollback ( $self, $cb = undef ) {
 
 # QUOTE
 sub quote_id ( $self, $id ) {
-    return $self->{handle}->quote_id($id);
+    return $self->{pool}->quote_id($id);
 }
 
 sub quote ( $self, $var ) {
-    return $self->{handle}->quote($var);
+    return $self->{pool}->quote($var);
 }
 
 sub encode_array ( $self, $var ) {
-    return $self->{handle}->encode_array($var);
+    return $self->{pool}->encode_array($var);
 }
 
 sub encode_json ( $self, $var ) {
-    return $self->{handle}->encode_json($var);
+    return $self->{pool}->encode_json($var);
 }
 
 1;
@@ -1071,15 +1109,15 @@ sub encode_json ( $self, $var ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 179                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
+## |    3 | 571                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (29)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 533                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (29)                  |
+## |    3 | 661, 990             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 623, 952             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    2 | 520, 527             | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 761, 952             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 799, 990             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 800                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 838                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

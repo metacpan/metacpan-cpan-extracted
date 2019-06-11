@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -61,26 +61,28 @@ my $build = $class->new
    appli_files   => \%appli_files ,
 
   'build_requires' => {
+    'Config::Model' => '2.134',
     'Config::Model::BackendMgr' => '0',
-    'Config::Model::Tester' => '3.006',
+    'Config::Model::Tester' => '4.001',
     'Config::Model::Tester::Setup' => '0',
     'English' => '0',
     'Module::Build' => '0.34',
     'Path::Tiny' => '0',
     'Test::Differences' => '0',
     'Test::More' => '0',
+    'Test::Pod' => '1.00',
     'Test::Warn' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'
   },
   'recommends' => {
-    'Config::Model::CursesUI' => '0',
+    'App::Cme' => '0',
     'Config::Model::TkUI' => '0'
   },
   'requires' => {
     'Carp' => '0',
-    'Config::Model' => '2.128',
+    'Config::Model' => '2.134',
     'Config::Model::Backend::Any' => '0',
     'File::Copy' => '0',
     'File::HomeDir' => '0',
@@ -88,7 +90,8 @@ my $build = $class->new
     'IO::File' => '0',
     'Log::Log4perl' => '1.11',
     'Mouse' => '0',
-    'perl' => '5.010'
+    'Mouse::Role' => '0',
+    'perl' => '5.012'
   },
 
    add_to_cleanup => [qw/wr_root/] ,

@@ -1,5 +1,5 @@
 package Cpanel::JSON::XS;
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 our $XS_VERSION = $VERSION;
 # $VERSION = eval $VERSION;
 
@@ -238,13 +238,13 @@ Converts the given Perl data structure to a UTF-8 encoded, binary string
 
 This function call is functionally identical to:
 
-   $json_text = Cpanel::JSON::XS->new->utf8->encode ($perl_scalar)
+   $json_text = Cpanel::JSON::XS->new->utf8->encode ($perl_scalar, $json_type)
 
 Except being faster.
 
 For the type argument see L<Cpanel::JSON::XS::Type>.
 
-=item $perl_scalar = decode_json $json_text [, $allow_nonref ]
+=item $perl_scalar = decode_json $json_text [, $allow_nonref [, my $json_type ] ]
 
 The opposite of C<encode_json>: expects an UTF-8 (binary) string of an
 json reference and tries to parse that as an UTF-8 encoded JSON text,
@@ -252,7 +252,7 @@ returning the resulting reference. Croaks on error.
 
 This function call is functionally identical to:
 
-   $perl_scalar = Cpanel::JSON::XS->new->utf8->decode ($json_text)
+   $perl_scalar = Cpanel::JSON::XS->new->utf8->decode ($json_text, $json_type)
 
 except being faster.
 
@@ -264,6 +264,8 @@ If the new optional $allow_nonref argument is set and not false, the
 allow_nonref option will be set and the function will act is described
 as in the relaxed RFC 7159 allowing all values such as objects,
 arrays, strings, numbers, "null", "true", and "false".
+
+For the type argument see L<Cpanel::JSON::XS::Type>.
 
 =item $is_boolean = Cpanel::JSON::XS::is_bool $scalar
 
@@ -825,6 +827,18 @@ This option does not affect C<decode> in any way.
 This option is special to this module, it is not supported by other
 encoders.  So it is not recommended to use it.
 
+=item $json = $json->require_types ([$enable])
+
+=item $enable = $json->get_require_types
+
+     $json = $json->require_types([$enable])
+
+If C<$enable> is true (or missing), then C<encode> will require
+second argument with supplied JSON types. See L<Cpanel::JSON::XS::Type>.
+When second argument is not provided (or is undef), then C<encode>
+croaks. It also croaks when the type for provided structure in
+C<encode> is incomplete.
+
 =item $json = $json->allow_dupkeys ([$enable])
 
 =item $enabled = $json->get_allow_dupkeys
@@ -871,11 +885,13 @@ to do.
 
 The C<TO_JSON> method may safely call die if it wants. If C<TO_JSON>
 returns other blessed objects, those will be handled in the same
-way. C<TO_JSON> must take care of not causing an endless recursion cycle
-(== crash) in this case. The name of C<TO_JSON> was chosen because other
-methods called by the Perl core (== not by the user of the object) are
-usually in upper case letters and to avoid collisions with any C<to_json>
-function or method.
+way. C<TO_JSON> must take care of not causing an endless recursion
+cycle (== crash) in this case. The same care must be taken with
+calling encode in stringify overloads (even if this works by luck in
+older perls) or other callbacks.  The name of C<TO_JSON> was chosen
+because other methods called by the Perl core (== not by the user of
+the object) are usually in upper case letters and to avoid collisions
+with any C<to_json> function or method.
 
 If C<$enable> is false (the default), then C<encode> will not consider
 this type of conversion.
@@ -1066,7 +1082,7 @@ sprintf(%g), but without double quotes.
 strings.  No QNAN/SNAN/negative NAN support, unified to "nan". Much
 easier to detect, but may conflict with valid strings.
 
-=item $json_text = $json->encode ($perl_scalar)
+=item $json_text = $json->encode ($perl_scalar, $json_type)
 
 Converts the given Perl data structure (a simple scalar or a reference
 to a hash or array) to its JSON representation. Simple scalars will be
@@ -1075,7 +1091,9 @@ arrays become JSON arrays and references to hashes become JSON
 objects. Undefined Perl values (e.g. C<undef>) become JSON C<null>
 values. Neither C<true> nor C<false> values will be generated.
 
-=item $perl_scalar = $json->decode ($json_text)
+For the type argument see L<Cpanel::JSON::XS::Type>.
+
+=item $perl_scalar = $json->decode ($json_text, my $json_type)
 
 The opposite of C<encode>: expects a JSON text and tries to parse it,
 returning the resulting simple scalar or reference. Croaks on error.
@@ -1083,6 +1101,8 @@ returning the resulting simple scalar or reference. Croaks on error.
 JSON numbers and strings become simple Perl scalars. JSON arrays become
 Perl arrayrefs and JSON objects become Perl hashrefs. C<true> becomes
 C<1>, C<false> becomes C<0> and C<null> becomes C<undef>.
+
+For the type argument see L<Cpanel::JSON::XS::Type>.
 
 =item ($perl_scalar, $characters) = $json->decode_prefix ($json_text)
 
@@ -1440,7 +1460,10 @@ up to but not including the least significant bit.
 
 =item true, false
 
-These JSON atoms become C<Cpanel::JSON::XS::true> and
+When C<unblessed_bool> is set to true, then JSON C<true> becomes C<1> and
+JSON C<false> becomes C<0>.
+
+Otherwise these JSON atoms become C<Cpanel::JSON::XS::true> and
 C<Cpanel::JSON::XS::false>, respectively. They are C<JSON::PP::Boolean>
 objects and are overloaded to act almost exactly like the numbers C<1>
 and C<0>. You can check whether a scalar is a JSON boolean by using
@@ -1528,7 +1551,7 @@ These special values become JSON true and JSON false values,
 respectively. You can also use C<\1> and C<\0> or C<!0> and C<!1>
 directly if you want.
 
-   encode_json [Cpanel::JSON::XS::true, Cpanel::JSON::XS::true] # yields [false,true]
+   encode_json [Cpanel::JSON::XS::false, Cpanel::JSON::XS::true] # yields [false,true]
    encode_json [!1, !0]      # yields [false,true]
 
 eq/ne comparisons with true, false:
@@ -1555,7 +1578,14 @@ your own serializer method.
 
 Simple Perl scalars (any scalar that is not a reference) are the most
 difficult objects to encode: Cpanel::JSON::XS will encode undefined
-scalars or inf/nan as JSON C<null> values, scalars that have last been
+scalars or inf/nan as JSON C<null> values and other scalars to either
+number or string in non-deterministic way which may be affected or
+changed by Perl version or any other loaded Perl module.
+
+If you want to have stable and deterministic types in JSON encoder then
+use L<Cpanel::JSON::XS::Type>.
+
+Non-deterministic behavior is following: scalars that have last been
 used in a string context before encoding as JSON strings, and anything
 else as number value:
 

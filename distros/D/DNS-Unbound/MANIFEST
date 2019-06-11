@@ -8,10 +8,14 @@ README.md
 lib/DNS/Unbound.pm
 lib/DNS/Unbound.xs
 lib/DNS/Unbound/X.pm
+lib/DNS/Unbound/X/BadDebugFD.pm
 lib/DNS/Unbound/X/Base.pm
 lib/DNS/Unbound/X/ResolveError.pm
 t/async.t
 t/convenience.t
+t/debuglevel.t
+t/debugout_badfd.t
+t/debugout_bug.t
 t/destruct.t
 t/load.t
 t/option.t

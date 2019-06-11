@@ -6,7 +6,7 @@ use Chart::GGPlot::Class;
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 with qw(Chart::GGPlot::Geom);
 
@@ -16,7 +16,7 @@ my $geom_blank_pod = '';
 my $geom_blank_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = "identity", :$position = "identity",
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(
@@ -60,7 +60,7 @@ Chart::GGPlot::Geom::Blank - Class for blank geom
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

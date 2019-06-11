@@ -10,10 +10,11 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target;
-$App::SpreadRevolutionaryDate::Target::VERSION = '0.24';
+$App::SpreadRevolutionaryDate::Target::VERSION = '0.26';
 # ABSTRACT: Role providing interface for targets of L<App::SpreadRevolutionaryDate>.
 
 use MooseX::Role::Parameterized;
+use LWP::Protocol::https;
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
@@ -55,7 +56,7 @@ App::SpreadRevolutionaryDate::Target - Role providing interface for targets of L
 
 =head1 VERSION
 
-version 0.24
+version 0.26
 
 =head1 DESCRIPTION
 

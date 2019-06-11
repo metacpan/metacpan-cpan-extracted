@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+package azimuth_aero;
+$azimuth_aero::VERSION = '0.1';
+
+# ABSTRACT: CLI tool for getting lowest prices from https://azimuth.aero/
+
+
+use WWW::AzimuthAero;
+my $az = WWW::AzimuthAero->new();
+
+my $params = {
+    from => $ARGV[0],
+    to   => $ARGV[1],
+    max  => $ARGV[2]
+};
+
+if ( defined $ARGV[3] ) {
+    $params->{max} = $ARGV[3];
+    $params->{min} = $ARGV[2];
+}
+
+$az->print_flights(
+    $az->get_lowest_fares(
+        from              => $params->{from},
+        to                => $params->{to},
+        min               => $params->{min},
+        max               => $params->{max},
+        progress_bar      => 1,
+        check_neighbors   => 1,
+        find_transits     => 1,
+        print_immediately => 1
+    )
+);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+azimuth_aero - CLI tool for getting lowest prices from https://azimuth.aero/
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+    azimuth_aero ROV LED 15.06.2019             # 15.06.2019 is max date
+    azimuth_aero ROV LED 15.06.2019 20.06.2019  # 15.06.2019 is min date
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

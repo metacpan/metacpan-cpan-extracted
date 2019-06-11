@@ -1,9 +1,10 @@
 NAME
-    App::ImageInfoUtils - Get information about image files
+    App::ImageInfoUtils - Utilities related to getting (metadata)
+    information from images
 
 VERSION
-    This document describes version 0.001 of App::ImageInfoUtils (from Perl
-    distribution App-ImageInfoUtils), released on 2019-01-28.
+    This document describes version 0.003 of App::ImageInfoUtils (from Perl
+    distribution App-ImageInfoUtils), released on 2019-06-09.
 
 FUNCTIONS
   image_info
@@ -43,6 +44,11 @@ FUNCTIONS
 
     *   file* => *filename*
 
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -66,6 +72,11 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   file* => *filename*
+
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
 
     Returns an enveloped result (an array).
 

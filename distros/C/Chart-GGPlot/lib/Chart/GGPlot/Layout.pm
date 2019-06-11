@@ -5,11 +5,10 @@ package Chart::GGPlot::Layout;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Data::Frame::Types qw(DataFrame);
-use Data::Munge qw(elem);
-use List::AllUtils qw(pairwise);
+use List::AllUtils qw(pairwise reduce);
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle1D);
 use Types::Standard qw(ArrayRef InstanceOf HashRef Maybe);
@@ -224,19 +223,19 @@ classmethod scale_apply ($data, $vars, $method,
     die if ( $scale_id->nbad );
 
     my $n = $scales->length;
-    my $scale_indices = split_indices( $scale_id, $n - 1 );
+    my $scale_indices = $class->_split_indices( $scale_id, $n );
     my $scale_indices_flattened =
-      pdl( $scale_indices->map( sub { $_->flatten } ) )->qsorti;
+      ( reduce { $a->glue( 0, $b ) } @$scale_indices )->qsorti;
     return {
         $vars->map(
             fun($var)
             {
                 my $pieces = [ 0 .. $n - 1 ]->map(
                     sub {
-                       # if $method is 'train', then $scale is just trained here
+                        # if $method is 'train', $scale is just trained here
                         my $scale = $scales->at($_);
                         $scale->$method(
-                            $data->at($var)->slice( $scale_indices->at($_) ) );
+                            $data->at($var)->slice( $scale_indices->[$_] ) );
                     }
                 );
                 $pieces = $pieces->[0]->glue( 0, @$pieces[ 1 .. $#$pieces ] );
@@ -253,6 +252,14 @@ classmethod scale_apply ($data, $vars, $method,
     };
 }
 
+# Split indices of a piddle of indices into $n groups
+# Return an arrayref of piddles.
+classmethod _split_indices (Piddle1D $indices, $n=$indices->max+1) {
+    my $indices1 = $indices->copy;
+    $indices1->where($indices1 > $n - 1) .= $n - 1;
+    return [ map { which( $indices1 == $_ ) } ( 0 .. $n - 1 ) ];
+}
+
 1;
 
 __END__
@@ -267,7 +274,7 @@ Chart::GGPlot::Layout - Layout
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

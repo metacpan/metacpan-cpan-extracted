@@ -7,16 +7,17 @@ package Chart::GGPlot::Util::Scales;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Color::Brewer;
+use Color::Library;
 use Convert::Color::LCh;
 use Data::Munge qw(elem);
-use Graphics::Color::RGB;
 use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
 use Math::Round qw(nearest round);
 use Math::Interpolate;
+use Memoize;
 use PDL::Primitive qw(which);
 use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
@@ -33,6 +34,7 @@ use Types::Standard qw(ArrayRef ConsumerOf Num Optional Str Maybe);
 use Chart::GGPlot::Types qw(:all);
 use Chart::GGPlot::Util::_Base qw(:all);
 use Chart::GGPlot::Util::_Labeling qw(:all);
+use Chart::GGPlot::Util::Scales::_Viridis;
 
 use parent qw(Exporter::Tiny);
 
@@ -46,42 +48,11 @@ our @EXPORT_OK = qw(
   extended_breaks regular_minor_breaks log_breaks
   pretty pretty_breaks
   number comma percent dollar
+  rgb255_to_csshex rgb_to_csshex
+  csshex_to_rgb255
+  colorname_to_csshex
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
-
-## color
-
-#fun alpha($color, $alpha=[]) {
-#    my $color_length = $color->length;
-#    my $alpha_length = $alpha->length;
-#
-#    if ( $color_length != $alpha_length ) {
-#        if ( $color_length > 1 and $alpha_length > 1 ) {
-#            croak("Only one of colour and alpha can be vectorised");
-#        }
-#        if ( $color_length > 1 ) {
-#            $alpha = [ ( $alpha->at(0) ) x $color_length ];
-#        }
-#        elsif ( $alpha->length > 1 ) {
-#            $color = [ ( $color->at(0) ) x $alpha_length ];
-#        }
-#    }
-#
-#    my @new_color = List::AllUtils::pairwise {
-#        my ( $col, $alpha ) = ( $a, $b );
-#
-#        Graphics::Color::RGB->new(
-#            r => $col->r,
-#            g => $col->g,
-#            b => $col->b,
-#            a => ( $alpha // $col->a )
-#        );
-#    }
-#    @$color, @$alpha;
-#    return \@new_color;
-#}
-
-## range
 
 
 fun censor ( $p, $range = pdl([ 0, 1 ]), $only_finite = true ) {
@@ -180,8 +151,7 @@ fun _pal_name ( $palette, $type ) {
 #  difference in result color channel is at max just 1/256.
 fun hcl ($h, $c, $l) {
     my $c = Convert::Color::LCh->new( $l, $c, $h );
-    my ( $r, $g, $b ) = map { $_ > 1 ? 1 : $_ < 0 ? 0 : $_ } $c->rgb;
-    return Graphics::Color::RGB->new( red => $r, green => $g, blue => $b );
+    return rgb_to_csshex($c->rgb);
 }
 
 fun hue_pal (:$h=pdl([0, 360])+15, :$c=100, :$l=65, :$h_start=0, :$direction=1) {
@@ -202,7 +172,7 @@ fun hue_pal (:$h=pdl([0, 360])+15, :$c=100, :$l=65, :$h_start=0, :$direction=1) 
         my $rotate = sub { ( ( $_[0] + $h_start ) % 360 ) * $direction };
         my $hues = $rotate->( pdl( seq_n( $h_tmp->list, $n ) ) );
         return PDL::SV->new(
-            $hues->unpdl->map( sub { hcl( $_, $c, $l )->as_css_hex; } ) );
+            $hues->unpdl->map( sub { hcl( $_, $c, $l ); } ) );
     };
 }
 
@@ -218,25 +188,15 @@ fun brewer_pal ( $type, $palette = 0, $direction = 1 ) {
 
         # convert to Graphics::Color object
         @colors = map {
-            my ( $r, $g, $b ) =
-              map { $_ / 0xff; } ( $_ =~ /^rgb\((\d+),(\d+),(\d+)\)/ );
-            Graphics::Color::RGB->new( red => $r, green => $g, blue => $b );
+            my ( $r, $g, $b ) = $_ =~ /^rgb\((\d+),(\d+),(\d+)\)/;
+            rgb255_to_csshex($r, $g, $b);
         } @colors[ 0 .. $n - 1 ];
 
         if ( $direction == -1 ) {
             @colors = reverse @colors;
         }
-        return PDL::SV->new( @colors->map( sub { $_->as_css_hex } ) );
+        return PDL::SV->new( \@colors );
     };
-}
-
-sub to_color_rgb {
-    my ($x) = @_;
-    return (
-        $x =~ /^\#?[[:xdigit:]]+$/
-        ? Graphics::Color::RGB->from_hex_string($x)
-        : Graphics::Color::RGB->from_color_library($x)
-    );
 }
 
 # Color interpolation. map interval [0,1] to a set of colors
@@ -246,23 +206,22 @@ fun _color_ramp ($colors) {
     }
 
     my @hot_spots = map {
-        my $c = to_color_rgb($_);
-        [ map { my $x = $_ * 255; $x > 255 ? 255 : $x < 0 ? 0 : $x; }
-              $c->as_array ];
+        if ( $_ =~ /^\#/ ) {
+            [ csshex_to_rgb255($_) ];
+        }
+        else {
+            [ colorname_to_rgb255($_) ];
+        }
     } ( $colors->flatten );
     my @gradient =
-      map {
-        my $c = Graphics::Color::RGB->new(
-            r => $_->[0] / 255,
-            g => $_->[1] / 255,
-            b => $_->[2] / 255
-        );
-        $c->as_css_hex;
-      } multi_array_gradient( 10, @hot_spots );
+      map { rgb255_to_csshex(@$_); } multi_array_gradient( 255, @hot_spots );
 
     return fun( Piddle $p) {
-        my @mapped =
-          map { $gradient[$_] } ( $p * ( @gradient - 1 ) )->rint->flatten;
+        my @mapped = do {
+            no warnings 'numeric';
+            map { $gradient[$_] } ( $p * ( @gradient - 1 ) )->rint->flatten;
+        };
+        
         my $rslt = PDL::SV->new( \@mapped );
         $rslt = $rslt->setbadif( $p->isbad ) if $p->badflag;
         return $rslt;
@@ -309,17 +268,11 @@ fun rescale_pal ( $range = PDL->new( [ 0.1, 1 ] ) ) {
 }
 
 fun viridis_pal ($begin=0, $end=1, $direction=1, $option='viridis') {
-    use Chart::GGPlot::Util::Scales::_Viridis;
-
     return fun($n) {
         my $colors =
           Chart::GGPlot::Util::Scales::_Viridis::viridis( $n, $begin, $end,
             $direction, $option );
-        my @palette = map {
-            my ( $r, $g, $b ) = @$_;
-            my $c = Graphics::Color::RGB->new( r => $r, g => $g, b => $b );
-            $c->as_css_hex;
-        } @$colors;
+        my @palette = map { rgb_to_csshex(@$_); } @$colors;
         return PDL::SV->new( \@palette );
     };
 }
@@ -951,6 +904,33 @@ fun _accuracy ($p) {
     return 10 ** (pdl($span)->log10->floor);  
 }
 
+
+sub rgb255_to_csshex { sprintf("#%02x%02x%02x", @_); }
+
+sub rgb_to_csshex {
+    my ( $r, $g, $b ) = 
+      map { $_ * 255 } map { $_ > 1 ? 1 : $_ < 0 ? 0 : $_ } @_; 
+    rgb255_to_csshex( $r, $g, $b );
+}
+
+sub csshex_to_rgb255 {
+    my ($csshex) = @_;
+    return map { hex($_) } ( $csshex =~ /^#(..)(..)(..)/);
+}
+
+sub colorname_to_rgb255 {
+    my ($color_name) = @_;
+    my $color = Color::Library->color($color_name);
+    die "unknown color id '$color_name'" unless defined $color;
+    return $color->rgb;
+}
+
+sub colorname_to_csshex {
+    my ($color_name) = @_;
+    return rgb255_to_csshex( colorname_to_rgb255($color_name) );
+}
+memoize('colorname_to_csshex');
+
 1;
 
 __END__
@@ -965,7 +945,7 @@ Chart::GGPlot::Util::Scales - R 'scales' package functions used by Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 FUNCTIONS
 
@@ -1010,6 +990,27 @@ the range of the values in x. The values are chosen so that they are
 =head2 pretty_breaks
 
 Pretty breaks. Uses default break algorithm as implemented in C<pretty()>.
+
+=head2 rgb255_to_csshex
+
+    rgb255_to_csshex($r, $g, $b)
+
+You must make sure the arguments are beteen [0, 255] yourself.
+
+=head2 rgb_to_csshex
+
+    rgb_to_csshex($r, $g, $b)
+
+Similar as C<rgb255_to_csshex()> but the arguments should be between
+[0, 1]. This function would process arguments not within [0, 1]. 
+
+=head2 csshex_to_rgb255
+
+    csshex_to_rgb255($color_hex)
+
+=head2 colorname_to_csshex
+
+    colorname_to_csshex($color_name)
 
 =head1 AUTHOR
 

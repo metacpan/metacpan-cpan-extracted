@@ -21,13 +21,15 @@ Test2::Aggregate - Aggregate tests
         dirs => \@test_dirs
     );
 
+    done_testing();
+
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 
 =head1 DESCRIPTION
@@ -50,6 +52,7 @@ bad (e.g. redefines), depending on your requirements.
         dirs          => \@dirs,              # optional if lists defined
         lists         => \@lists,             # optional if dirs defined
         root          => '/testroot/',        # optional
+        load_modules  => \@modules,           # optional
         shuffle       => 1,                   # optional
         reverse       => 1,                   # optional
         repeat        => $no_iterations,      # optional, requires Test2::Plugin::BailOnFail for < 0
@@ -76,7 +79,12 @@ Arrayref of flat files from which each line will be pushed to C<dirs>
 
 =item * C<root> (optional)
 
-Specifies a root directory to prefix all C<dirs> with.
+Specifies a root directory to prefix all C<dirs> (and C<lists> items) with.
+
+=item * C<load_modules> (optional)
+
+Arrayref with modules to be loaded (with C<eval "use ...">) at the start of the
+test. Useful for testing modules with special namespace requirements.
 
 =item * C<override> (optional)
 
@@ -122,24 +130,24 @@ sub run_tests {
     plan skip_all => 'Skipping slow tests.'
         if $args{slow} && $ENV{SKIP_SLOW};
 
+    eval "use $_;" foreach @{$args{load_modules}};
+    local $ENV{AGGREGATE_TESTS} = 1;
+
     my $override = $args{override} ? _override($args{override}) : undef;
-
-    my @dirs = ();
-    @dirs = @{$args{dirs}} if $args{dirs};
-
-    my $root = $args{root} || '';
-    $root .= '/' unless !$root || $root =~ m#/$#;
-
+    my @dirs     = ();
+    my $root     = $args{root} || '';
     my @tests;
 
-    local $ENV{AGGREGATE_TESTS} = 1;
+    @dirs = @{$args{dirs}} if $args{dirs};
+    $root .= '/' unless !$root || $root =~ m#/$#;
 
     foreach my $file (@{$args{lists}}) {
         my $list = read_file("$root$file");
         push @dirs, split(/\r?\n/, $list);
     }
 
-    find(sub{push @tests, $root.$File::Find::name if /\.t$/}, @dirs);
+    find(sub{push @tests, $File::Find::name if /\.t$/}, map {$root.$_} @dirs)
+        if @dirs;
 
     @tests = reverse @tests if $args{reverse};
 
@@ -176,7 +184,6 @@ sub run_tests {
         _run_tests(\@tests, \%args);
     }
     warn "Test warning output:\n".join("\n", @$warnings)."\n" if @$warnings;
-    done_testing();
 }
 
 sub _run_tests {

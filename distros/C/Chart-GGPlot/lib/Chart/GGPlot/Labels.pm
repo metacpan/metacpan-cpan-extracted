@@ -5,7 +5,7 @@ package Chart::GGPlot::Labels;
 use Chart::GGPlot::Setup;
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use parent qw(Chart::GGPlot::Aes);
 
@@ -23,7 +23,7 @@ Chart::GGPlot::Labels - Axis, legend, and plot labels
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

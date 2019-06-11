@@ -2,8 +2,6 @@
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-use Graphics::Color::RGB;
-
 use Chart::GGPlot::Util qw(:scales);
 use Chart::GGPlot::Util::_Labeling qw(:all);
 
@@ -119,33 +117,6 @@ pdl_is(
     'expand_range()'
 );
 
-subtest alpha => sub {
-    skip_all "revisit this once we find we need alpha()";
-
-    is(
-        alpha("red")->map( sub { $_->as_hex_string } ),
-        [ Graphics::Color::RGB->from_color_library("red") ]
-        ->map( sub { $_->as_hex_string } ),
-        "alpha"
-    );
-    is(
-        alpha( [ "red", "blue" ] )->map( sub { $_->as_hex_string } ),
-        [
-            Graphics::Color::RGB->from_color_library("red"),
-            Graphics::Color::RGB->from_color_library("blue")
-        ]->map( sub { $_->as_hex_string } ),
-        "alpha"
-    );
-    is(
-        alpha( "red", [ 0.1, 0.2 ] )->map( sub { $_->as_hex_string } ),
-        [
-            Graphics::Color::RGB->new( r => 1, g => 0, b => 0, a => 0.1 ),
-            Graphics::Color::RGB->new( r => 1, g => 0, b => 0, a => 0.2 )
-        ]->map( sub { $_->as_hex_string } ),
-        "alpha"
-    );
-};
-
 subtest hue_pal => sub {
     no warnings 'qw';
 
@@ -170,6 +141,19 @@ subtest hue_pal => sub {
             ]
         ),
         'hue_pal()'
+    );
+};
+
+subtest gradient_n_pal => sub {
+    no warnings 'qw';
+
+    # NOTE: R's gradient_n_pal gives #777777 for 0.5, but we get #7f7f7f,
+    #  This is because R's interpolation is in the CIELab space.
+    pdl_is(
+        gradient_n_pal( PDL::SV->new( [qw(black white)] ) )
+          ->( pdl( 0, 0.5, 1 ) ),
+        PDL::SV->new( [qw(#000000 #7f7f7f #ffffff)] ),
+        "gradient_n_pal()"
     );
 };
 

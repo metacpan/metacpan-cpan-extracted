@@ -5,14 +5,14 @@ package Chart::GGPlot::Setup;
 use 5.016;
 use warnings;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use utf8;
 use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore 0.0047;
+use Alt::Data::Frame::ButMore 0.0051;
 
 use Carp;
 use Data::Dumper ();
@@ -178,7 +178,7 @@ Chart::GGPlot::Setup - Import stuffs into Chart::GGPlot classes
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SYNOPSIS
 

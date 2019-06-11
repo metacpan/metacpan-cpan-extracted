@@ -18,7 +18,7 @@ use Image::CairoSVG;
 use Module::Path 'module_path';
 use PDF::Cairo::Util;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -1020,6 +1020,8 @@ the first argument is a font reference, the PDF::API2::Lite
 compatibility version of print() will be used instead.
 
 The current position will be moved to the end of the displayed text.
+Any vertical shift will not affect the baseline of subsequent calls
+to print().
 
 =cut
 
@@ -1046,15 +1048,16 @@ sub print {
 		}elsif ($options{valign} eq "top") {
 			$dy += $height;
 		}
-		if ($options{shift}) {
-			$dy += $options{shift};
-		}
 		if ($dx or $dy) {
 			my ($x, $y) = $self->{context}->get_current_point;
 			$self->{context}->move_to($x + $dx, $y + $dy);
 		}
-		$self->{context}->set_source_rgb(@{$rgb{$self->{_fill}}->{float}});
+		$self->{context}->set_source_rgb(_color($self->{_fill}));
+		$self->rel_move(0, $options{shift})
+			if $options{shift};
 		$self->{context}->show_text($text);
+		$self->rel_move(0, -$options{shift})
+			if $options{shift};
 		# note this leaves the current point offset by the alignment
 		# which means calling print() again without moving first
 		# will match the baseline. I think this is a feature.
@@ -1227,7 +1230,8 @@ sub showimage {
 
 Create an object with recording() containing an SVG image rendered
 with L<Image::CairoSVG>, with the lower-left corner at (0,0). It can
-be rendered with place() as many times as you want.
+be rendered with place() as many times as you want. height() and
+width() methods are available to determine appropriate scaling values.
 
 Note that Image::CairoSVG only supports path operators, and ignores
 filters, fonts, and text, so many complex SVG files will not render
@@ -1466,6 +1470,17 @@ sub recording {
 	my $class = shift;
 	my %options = @_;
 	return PDF::Cairo->new(_recording => 1, %options);
+}
+
+#only really useful for recording/svg surfaces, so otherwise not documented
+#
+sub height {
+	my $self = shift;
+	return $self->{h};
+}
+sub width {
+	my $self = shift;
+	return $self->{w};
 }
 
 =back
@@ -1755,7 +1770,7 @@ sub _api2_print {
 	$self->move($x, $y);
 	my $tmp = $self->{context}->get_matrix;
 	$self->rotate($rotation);
-	$self->{context}->set_source_rgb(@{$rgb{$self->{_fill}}->{float}});
+	$self->{context}->set_source_rgb(_color($self->{_fill}));
 	$self->{context}->show_text($text);
 	$self->{context}->set_matrix($tmp);
 	$self->{_dirtypage} = 1;
@@ -2053,6 +2068,11 @@ sub _setup_page_state {
 
 =over 4
 
+=item * libcairo version must be 1.10.0 or greater to support
+recording surfaces, which this module makes extensive use of. Future
+versions will require 1.16.0 or greater to support metadata, outlines,
+hyperlinks, page labels, etc.
+
 =item * The fillcolor/strokecolor methods do not currently support the
 various %cmyk, &hsl, !hsv options for setting color values. (TODO)
 
@@ -2151,14 +2171,6 @@ sub Cairo::ImageSurface::height {
 sub Cairo::ImageSurface::width {
 	my $self = shift;
 	$self->get_width;
-}
-sub Cairo::RecordingSurface::height {
-	my $self = shift;
-	$self->{h};
-}
-sub Cairo::RecordingSurface::width {
-	my $self = shift;
-	$self->{w};
 }
 
 1; # End of PDF::Cairo

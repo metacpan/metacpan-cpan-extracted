@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000017';
+our $VERSION = '0.000018';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -300,7 +300,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000017
+version 0.000018
 
 =head1 DESCRIPTION
 

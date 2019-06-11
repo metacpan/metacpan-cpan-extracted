@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::Positional;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Chart::GGPlot::Types qw(:all);
 use Types::Standard qw(ArrayRef CodeRef Str);
@@ -20,7 +20,7 @@ method break_positions ($range=$self->get_limits()) {
 
 method axis_order () {
     my @ord = qw(primary secondary);
-    if ( List::Util::any { $self->position eq $_ } qw(right bottom) ) {
+    if ( $self->position eq 'right' or $self->position eq 'bottom' ) {
         @ord = reverse @ord;
     }
     return \@ord;
@@ -40,7 +40,7 @@ Chart::GGPlot::Scale::Positional - Role for positional scale
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 ATTRIBUTES
 

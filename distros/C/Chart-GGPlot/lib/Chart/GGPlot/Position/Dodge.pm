@@ -5,7 +5,7 @@ package Chart::GGPlot::Position::Dodge;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils qw(count_by);
 use Types::Standard qw(Enum);
@@ -70,7 +70,7 @@ Chart::GGPlot::Position::Dodge - Position for 'dodge'
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Parser for https://azimuth.aero/",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-AzimuthAero",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Data::Dumper::AutoEncode" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Exporter" : "0",
+            "Graph" : "0",
+            "JavaScript::V8" : "0",
+            "List::Util" : "0",
+            "Mojo::DOM" : "0",
+            "Mojo::UserAgent" : "0",
+            "Mojo::UserAgent::Mockable" : "0",
+            "feature" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockDateTime" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/WWW-AzumuthAero/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/WWW-AzumuthAero.git",
+         "web" : "https://github.com/pavelsr/WWW-AzumuthAero"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

@@ -5,21 +5,21 @@ use Try::Tiny;
 use Moo;
 with 'Apache::Tika::Connection';
 
-use vars '$VERSION';
-$VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub request {
     my( $self, $method, $url, $content, @headers ) = @_;
     # Should initialize
-    
+
     $method = uc $method;
-    
+
     my $content_size = length $content;
-    
+
     # 'text/plain' for the language
     my %headers= (
                   "Content-Length" => $content_size,
-                  "Accept" => 'application/json,text/plain',
+                  "Accept"         => 'application/json,text/plain',
+                  'Content-Type'   => 'application/octet-stream',
                   @headers
                  );
 
@@ -40,7 +40,7 @@ sub request {
                     $body,                        # body
                     $headers                      # headers
                 );
-                
+
                 $p->resolve( $code, $response );
             }
             catch {
@@ -57,7 +57,7 @@ sub request {
 =head1 REPOSITORY
 
 The public repository of this module is
-L<https://github.com/Corion/apache-tika>.
+L<https://github.com/Corion/Apache-Tika-Async>.
 
 =head1 SUPPORT
 
@@ -76,7 +76,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2014-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

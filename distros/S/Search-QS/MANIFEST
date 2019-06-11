@@ -2,6 +2,7 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -10,7 +11,10 @@ lib/Search/QS.pm
 lib/Search/QS/Filter.pm
 lib/Search/QS/Filters.pm
 lib/Search/QS/Options.pm
+lib/Search/QS/Options/Int.pm
+lib/Search/QS/Options/Limit.pm
 lib/Search/QS/Options/Sort.pm
+lib/Search/QS/Options/Start.pm
 t/00-load.t
 t/05_qs.t
 t/10_filter.t

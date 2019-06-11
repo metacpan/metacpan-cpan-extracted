@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Test::Fatal;
 {
-  $Test::Fatal::VERSION = '0.17';
+  $Test::Fatal::VERSION = '0.18';
 }
 # ABSTRACT: incredibly simple helpers for testing code with exceptions
 

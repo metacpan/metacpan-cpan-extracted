@@ -5,15 +5,13 @@ package Chart::GGPlot::Geom;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Types::Standard qw(ArrayRef CodeRef);
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(:all);
-
-has optional_aes => ( is => 'ro', isa => ArrayRef, default => sub { [] } );
 
 with qw(
   Chart::GGPlot::HasRequiredAes
@@ -22,6 +20,8 @@ with qw(
   Chart::GGPlot::HasParams
   Chart::GGPlot::HasCollectibleFunctions
 );
+
+classmethod optional_aes() { [] }
 
 method setup_data ($data, $params) { $data }
 
@@ -95,7 +95,14 @@ Chart::GGPlot::Geom - The geom role
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 DESCRIPTION
+
+This module is a Moose role for "geom".
+
+For users of Chart::GGPlot you would mostly want to look at
+L<Chart::GGPlot::Geom::Functions> instead.
 
 =head1 AUTHOR
 

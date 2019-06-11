@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord::Polar;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils;
 use PDL::Primitive qw(which);
@@ -37,11 +37,11 @@ with qw(
   Chart::GGPlot::HasCollectibleFunctions
 );
 
-my $coord_polar_pod = <<'=cut';
+my $coord_polar_pod = unindent(<<'EOT');
 
-    coord_ploar(:$theta='x', :$start=0, :$direction=1)
+        coord_ploar(:$theta='x', :$start=0, :$direction=1)
 
-=cut
+EOT
 
 my $coord_polar_code = fun (:$theta ='x', :$start = 0, :$direction = 1) {
     return __PACKAGE__->new(
@@ -180,7 +180,7 @@ Chart::GGPlot::Coord::Polar - The polar coordinate system
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

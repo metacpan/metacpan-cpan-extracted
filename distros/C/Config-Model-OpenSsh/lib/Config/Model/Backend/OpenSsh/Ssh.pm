@@ -1,17 +1,23 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::OpenSsh::Ssh ;
-$Config::Model::Backend::OpenSsh::Ssh::VERSION = '1.241';
+package Config::Model::Backend::OpenSsh::Ssh v2.7.9.1;
+
 use Mouse ;
 use 5.10.1;
-extends "Config::Model::Backend::OpenSsh" ;
+extends "Config::Model::Backend::Any" ;
+
+with (
+    'Config::Model::Backend::OpenSsh::Role::Reader',
+    'Config::Model::Backend::OpenSsh::Role::Writer',
+);
+
 
 use Carp ;
 use IO::File ;
@@ -128,9 +134,9 @@ sub write_forward {
     return $self->write_line($forward_elt->element_name,$line,$forward_elt->annotation) ;
 }
 
-1;
-
 no Mouse;
+
+1;
 
 # ABSTRACT: Backend for ssh configuration files
 
@@ -146,7 +152,7 @@ Config::Model::Backend::OpenSsh::Ssh - Backend for ssh configuration files
 
 =head1 VERSION
 
-version 1.241
+version v2.7.9.1
 
 =head1 SYNOPSIS
 
@@ -188,7 +194,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2008-2018 by Dominique Dumont.
+This software is Copyright (c) 2008-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -1,10 +1,10 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Line;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Line
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Line
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
 
@@ -20,11 +20,11 @@ __END__
 
 =head1 NAME
 
-Chart::GGPlot::Backend::Plotly::Geom::Line - Chart::GGPlot's Plotly support for Geom::Line
+Chart::GGPlot::Backend::Plotly::Geom::Line - Chart::GGPlot's Plotly implementation for Geom::Line
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

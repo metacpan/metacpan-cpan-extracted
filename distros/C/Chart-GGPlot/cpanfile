@@ -1,4 +1,4 @@
-requires "Alt::Data::Frame::ButMore" => "0.0047";
+requires "Alt::Data::Frame::ButMore" => "0.0051";
 requires "Autoload::AUTOCAN" => "0";
 requires "Carp" => "0";
 requires "Chart::Plotly" => "0.025";
@@ -6,6 +6,7 @@ requires "Chart::Plotly::Image::Orca" => "0";
 requires "Chart::Plotly::Plot" => "0";
 requires "Class::Method::Modifiers" => "0";
 requires "Color::Brewer" => "0";
+requires "Color::Library" => "0";
 requires "Convert::Color::LCh" => "0";
 requires "Convert::Color::RGB" => "0";
 requires "Data::Dumper" => "0";
@@ -17,7 +18,6 @@ requires "Eval::Closure" => "0";
 requires "Eval::Quosure" => "0";
 requires "Exporter::Tiny" => "0";
 requires "Function::Parameters" => "2.001003";
-requires "Graphics::Color::RGB" => "0";
 requires "Hash::Util::FieldHash" => "0";
 requires "Import::Into" => "0";
 requires "JSON" => "0";
@@ -46,6 +46,7 @@ requires "PDL::Core" => "0";
 requires "PDL::DateTime" => "0";
 requires "PDL::Lite" => "0";
 requires "PDL::Math" => "0";
+requires "PDL::MatrixOps" => "0";
 requires "PDL::Primitive" => "0";
 requires "PDL::Ufunc" => "0";
 requires "POSIX" => "0";
@@ -74,11 +75,14 @@ requires "perl" => "5.016";
 requires "strict" => "0";
 requires "utf8" => "0";
 requires "warnings" => "0";
+recommends "Math::LOESS" => "0";
+recommends "PDL::GSL::CDF" => "0.75";
+recommends "PDL::Stats::GLM" => "0.75";
 
 on 'test' => sub {
   requires "Data::Frame::Examples" => "0";
   requires "Test2::Tools::DataFrame" => "0";
-  requires "Test2::Tools::PDL" => "0.0003";
+  requires "Test2::Tools::PDL" => "0.0004";
   requires "Test2::V0" => "0";
 };
 
@@ -91,4 +95,5 @@ on 'develop' => sub {
   requires "FindBin" => "0";
   requires "Path::Tiny" => "0";
   requires "Test2::V0" => "0";
+  requires "Test::Pod" => "1.41";
 };

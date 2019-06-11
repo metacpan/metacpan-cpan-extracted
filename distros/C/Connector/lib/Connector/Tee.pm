@@ -163,7 +163,7 @@ the same request is send to nodes.conn2.test3.
 
 For the scalar I<get> call, the value given to accept is evaluated as a
 case-sensitive regex pattern using qr// internally. If you set accept to
-the string, any non-empty value is accepted.
+the empty string, any defined value is accepted.
 
 For I<get_hash>, an empty value for accept will let the empty hash pass,
 if accept is set to any true value, only non-empty hashes are accepted.

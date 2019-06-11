@@ -4,7 +4,7 @@
       "Fayland Lam <fayland@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::GitHubREADME::Badge" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHubREADME/Badge.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -72,9 +72,10 @@
          "web" : "https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_contributors" : [
       "Alex Efros <powerman@powerman.name>",
+      "Chase Whitener <cwhitener@gmail.com>",
       "Nikolay Mishin <mi@ya.ru>",
       "Paul Cochrane <paul@liekut.de>",
       "Randy Stauner <randy@magnificent-tears.com>",
@@ -83,6 +84,7 @@
       "Thorsten Klein <thorsten@kleinhq.org>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
+   "x_generated_by_perl" : "v5.25.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023",
    "x_static_install" : 1
 }

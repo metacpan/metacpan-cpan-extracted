@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-require 5.004;
+use v5.13.2;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -88,6 +88,10 @@ __END__
 
   # modify as needed, and report
   imsync --modify
+
+  # get help
+  imsync --help
+  imsync --man
 
 =head1 SUMMARY
 
@@ -204,15 +208,15 @@ Here are some other legal timestamps:
 
 The date and time must be separated by a capital C<T> or by a single
 whitespace character.  If you use the whitespace character, then
-enclose the entire option in double quotes, othertwise the whitespace
+enclose the entire option in double quotes, otherwise the whitespace
 is interpreted as a separator between different argument values.
 
 The date must include 3 numbers (year, month, day), all separated by a
 dash C<-> or all by a colon C<:>.
 
-The time must include at least one and up to three numbers (hour,
-minute, second), separated by a colon C<:>.  Omitted final components
-are assumed equal to 0.
+The time is specified on a 24-hour clock and must include at least one
+and up to three numbers (hour, minute, second), separated by a colon
+C<:>.  Omitted final components are assumed equal to 0.
 
 The time zone offset designation, if specified, must follow the
 date/time specification without any intervening other text or
@@ -330,7 +334,7 @@ the file's filesystem modification timestamp needs adjustment.
 =item
 
 an explicit time (L</--time>) or location (L</--location>) is
-specified for the image file
+specified for the image file.
 
 =item
 
@@ -354,6 +358,12 @@ I<XMP:TimeSource> tag is not present or is equal to C<GPS>.  This
 means the original GPS position that was embedded by a GPS receiver
 attached to the camera is lost.
 
+If the only thing that has changed is the version of imsync, then the
+corresponding change to I<XMP:ImsyncVersion> is suppressed.  In other
+words, if I<XMP:ImsyncVersion> is the only tag that needs a change,
+and if that tag was already in the file, then that change is
+suppressed.
+
 =head2 --help
 
   --help
@@ -373,9 +383,13 @@ somehow.
 The target may be identified by a partial file name, a timestamp, or a
 timestamp range.
 
-The location may be identified by a partial file name or a location
-specification.  If it is a partial file name then it must match only a
-single file, and then that files's location is copied to the target.
+The location may be identified by a partial file name, a location
+specification, or an empty value.  If it is a partial file name then
+it must match only a single file, and then that files's location is
+copied to the target.
+
+If it is an empty value then the existing location (if any) is slated
+for removal.
 
 The location specification consists of the latitude and longitude in
 (optionally signed) decimal degrees, and optionally the altitude in
@@ -995,12 +1009,12 @@ the file may be indicated.
 If L</--force> is not specified, then modification is indicated if the
 deduced file modification timestamp differs from the original one.
 
-Modification is then also indicated if the GPS position has changed by
-at least 1 meter, but only if the original GPS position was provided
-by the current application (as shown by the I<XMP:TimeSource> tag
-being set and unequal to C<GPS>).  We refer to such a GPS position as
-I<flexible>.  We do not want to lightly lose the GPS position embedded
-in the file by the original camera.
+Modification is then also indicated if the GPS position has changed,
+but only if the original GPS position was provided by the current
+application (as shown by the I<XMP:TimeSource> tag being set and
+unequal to C<GPS>).  We refer to such a GPS position as I<flexible>.
+We do not want to lightly lose the GPS position embedded in the file
+by the original camera.
 
 If C<--force> is specified, then modification is also indicated if any
 of I<XMP:CameraID>, I<DateTimeOriginal>, I<XMP:ImsyncVersion>, or

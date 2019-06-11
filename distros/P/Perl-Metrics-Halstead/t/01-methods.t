@@ -10,7 +10,7 @@ use_ok 'Perl::Metrics::Halstead';
 
 throws_ok {
     Perl::Metrics::Halstead->new
-} qr/Missing required arguments/, 'required file';
+} qr/Missing required arguments/, 'file required';
 
 throws_ok {
     Perl::Metrics::Halstead->new( file => 'bogus' )

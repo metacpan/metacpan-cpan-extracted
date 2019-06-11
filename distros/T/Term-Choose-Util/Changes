@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.073   2019-06-08
+        - Update menu behavior of settings_menu.
+        - Removed deprecated options 'fmt_chosen', 'remove_chosen' and 'small_on_top'.
+
 0.072   2019-05-06
         - Complete pass-through of settings.
 

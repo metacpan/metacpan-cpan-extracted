@@ -1,5 +1,8 @@
 Revision history for Calendar::Persian
 
+0.41  Mon Jun 10 17:25:00 2019
+      - Updated dependency on Date::Persian::Simple v0.22.
+
 0.40  Wed May 08 17:45:00 2019
       - Updated dependency on Calendar::Plugin::Renderer v0.15.
 

@@ -1,3 +1,20 @@
+v2.7.9.1 2019-06-10
+
+  The main visible changes of this release are:
+  * Support for OpenSsh 7.9
+  * A new version number scheme: v<major>.<OpenSsh version>.<minor>.
+
+  Under the hood, the major change of this release is the way Ssh and
+  Sshd model are updated. It used to be a manual work (which explain
+  why only OpenSsh 6.4 parameters were supported). Now the model is
+  generated from ssh_config and sshd_config manuel pages. All
+  parameters from OpenSsh 7.9 are supported and obsolete parameters
+  are silently dropped or migrated to new parameters.
+
+  Other changes:
+  * update test specifications (requires Config::Model::Tester 4.001)
+  * require Config::Model 2.134
+  
 1.241 2018-12-01
 
     * Tests require Config::Model 2.128 (gh #4)

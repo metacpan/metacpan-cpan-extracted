@@ -1,4 +1,20 @@
 Revision history for Role-Random
 
+0.04    June 10, 2019
+		- Feature 'state' was added in 5.10, so we bump up our minimum
+		  dependency.
+		- Work around Perls which don't use 64 bit integers.
+
+0.03    June 9, 2019
+        - Fix another "too modern" syntax issue in a test (fails on Perl 5.10
+          and older)
+        - Retry 20% tolerance test three times. Need a better approach to
+          that.
+
+0.02    June 9, 2019
+		- Don't use postfix deref (support older Perl's) - SREZIC
+		- Declare dependency on Moose::Role - SREZIC
+		- Fix distribution metadata - manwar
+
 0.01    June 4, 2019
-        Random number utilities in a handy role.
+        - Random number utilities in a handy role.

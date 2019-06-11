@@ -139,23 +139,6 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
-# STH
-sub prepare ( $self, $query ) {
-    my $sth = bless {
-        id    => uuid_v1mc_str,
-        query => $query,
-      },
-      'Pcore::Handle::DBI::STH';
-
-    return $sth;
-}
-
-sub destroy_sth ( $self, $id ) {
-    delete $self->{prepared_sth}->{$id};
-
-    return;
-}
-
 # SCHEMA PATCH
 sub _get_schema_patch_table_query ( $self, $table_name ) {
     return <<"SQL";
@@ -377,7 +360,9 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
     return $sth->execute(@bind);
 }
 
-sub dbh ($self) { return $self }
+sub get_dbh ( $self, $cb = undef ) {
+    return $cb ? $cb->( res(200), $self ) : ( res(200), $self );
+}
 
 # PUBLIC DBI METHODS
 sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
@@ -695,7 +680,7 @@ sub begin_work ( $self, $cb = undef ) {
         $res = res 200;
     }
 
-    return $cb ? $cb->( $self, $res ) : ( $self, $res );
+    return $cb ? $cb->($res) : $res;
 }
 
 sub commit ( $self, $cb = undef ) {
@@ -762,16 +747,16 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 160                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 143                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 383                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
+## |    3 | 368                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 466                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 451                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 351                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 334                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 673                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 658                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

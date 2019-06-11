@@ -1,6 +1,12 @@
 Revision history for Term::Form
 
 
+0.513   2019-06-08
+        - Bugfix in before_readline.
+        - Bugfix in add_char.
+        - New option 'hide_cursor'.
+        - Update hide_cursor.
+
 0.512   2019-05-06
         - Code refactoring.
 

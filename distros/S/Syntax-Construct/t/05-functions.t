@@ -9,10 +9,10 @@ use Syntax::Construct ();
 is(Syntax::Construct::introduced('//'), '5.010', 'introduced-arg');
 
 my @introduced = Syntax::Construct::introduced();
-is(@introduced, 72, 'introduced all');
+is(@introduced, 73, 'introduced all');
 
 is(Syntax::Construct::removed('auto-deref'), '5.024', 'removed-arg');
-is(Syntax::Construct::removed(), 5, 'removed all');
+is(Syntax::Construct::removed(), 6, 'removed all');
 
 my $in_old = '??';
 if ('SOMETHING_IN_OLD' eq $in_old && ! Syntax::Construct::_is_old_empty()) {

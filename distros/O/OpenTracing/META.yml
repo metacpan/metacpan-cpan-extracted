@@ -1,0 +1,68 @@
+---
+abstract: 'supporting for application process monitoring as defined by opentracing.io'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenTracing
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  OpenTracing:
+    file: lib/OpenTracing.pm
+    version: '0.002'
+  OpenTracing::Batch:
+    file: lib/OpenTracing/Batch.pm
+    version: '0.002'
+  OpenTracing::Common:
+    file: lib/OpenTracing/Common.pm
+    version: '0.002'
+  OpenTracing::Log:
+    file: lib/OpenTracing/Log.pm
+    version: '0.002'
+  OpenTracing::Process:
+    file: lib/OpenTracing/Process.pm
+    version: '0.002'
+  OpenTracing::Span:
+    file: lib/OpenTracing/Span.pm
+    version: '0.002'
+  OpenTracing::SpanProxy:
+    file: lib/OpenTracing/SpanProxy.pm
+    version: '0.002'
+  OpenTracing::Tag:
+    file: lib/OpenTracing/Tag.pm
+    version: '0.002'
+requires:
+  Math::Random::Secure: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/team-at-cpan/OpenTracing/issues
+  homepage: https://github.com/team-at-cpan/OpenTracing
+  repository: https://github.com/team-at-cpan/OpenTracing.git
+version: '0.002'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

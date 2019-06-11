@@ -1,5 +1,9 @@
 Revision history for Open-This
 
+0.000018  2019-06-10 17:02:19Z
+    - Print usage when ot is called with no arguments (GH#16) (Jos Joaqun
+      Atria)
+
 0.000017  2019-05-29 18:24:11Z
     - Parse file paths out of full GitHub URLs. (GH#15) (Olaf Alders)
 

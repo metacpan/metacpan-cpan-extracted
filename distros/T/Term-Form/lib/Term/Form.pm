@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.512';
+our $VERSION = '0.513';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -43,19 +43,18 @@ sub new {
 
 sub DESTROY {
     my ( $self ) = @_;
-    $self->__reset_term();
+    $self->__reset_term( { hide_cursor => 1 } );
 }
 
 
 sub __init_term {
     my ( $self ) = @_;
-    print SHOW_CURSOR;
     $self->{pg}->__set_mode( { mode => 'cbreak', hide_cursor => 0 } );
 }
 
 
 sub __reset_term {
-    my ( $self, $up ) = @_;
+    my ( $self, $opt, $up ) = @_;
     if ( defined $self->{pg} ) {
         $self->{pg}->__reset_mode();
     }
@@ -68,6 +67,9 @@ sub __reset_term {
         print UP x $up;
     }
     print "\r" . CLEAR_TO_END_OF_SCREEN;
+    if ( $opt->{hide_cursor} ) {
+        print SHOW_CURSOR;
+    }
 }
 
 
@@ -77,6 +79,7 @@ sub __set_defaults {
     $self->{default}          = '';
     $self->{clear_screen}     = 0;
     $self->{codepage_mapping} = 0;
+    $self->{hide_cursor}      = 1;
     $self->{info}             = '';
     $self->{prompt}           = '';
     $self->{auto_up}          = 0;
@@ -192,8 +195,10 @@ sub __before_readline {
                 $self->{i}{keys}[0] = $self->{i}{prompt};
             }
             else {
+                if ( length $self->{i}{prompt} ) { #
+                    unshift @before_lines, $self->{i}{prompt};
+                }
                 $self->{i}{keys}[0] = '';
-                unshift @before_lines, $self->{i}{prompt};
             }
         }
         $self->{i}{pre_text} = join "\n", @info, @before_lines;
@@ -290,6 +295,7 @@ sub readline {
         codepage_mapping => 0,
         default          => '',
         info             => '',
+        hide_cursor      => '[ 0 1 ]',
         no_echo          => '[ 0 1 2 ]',
         show_context     => '[ 0 1 ]',
     };
@@ -323,6 +329,9 @@ sub readline {
         print "\r" . CLEAR_TO_END_OF_SCREEN;
         $self->__before_readline( $opt, $m );
         $up_before = $self->{i}{pre_text_row_count};
+        if ( $opt->{hide_cursor} ) {
+            print HIDE_CURSOR;
+        }
         if ( length $self->{i}{pre_text} ) {
             print $self->{i}{pre_text}, "\n";
         }
@@ -334,7 +343,7 @@ sub readline {
         $self->__print_readline( $opt, $m );
         my $char = $self->{pg}->__get_key_OS();
         if ( ! defined $char ) {
-            $self->__reset_term();
+            $self->__reset_term( $opt );
             carp "EOT: $!";
             return;
         }
@@ -358,7 +367,7 @@ sub readline {
         elsif ( $char == KEY_BSPACE || $char == CONTROL_H ) { $self->__bspace( $m ) }
         elsif ( $char == VK_DELETE  || $char == CONTROL_D ) { $self->__delete( $m ) }
         elsif ( $char == CONTROL_X ) {
-            $self->__reset_term( $self->{i}{pre_text_row_count} );
+            $self->__reset_term( $opt, $self->{i}{pre_text_row_count} );
             return;
         }
         elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
@@ -368,7 +377,7 @@ sub readline {
             $char = chr $char;
             utf8::upgrade $char;
             if ( $char eq "\n" || $char eq "\r" ) { #
-                $self->__reset_term( $self->{i}{pre_text_row_count} );
+                $self->__reset_term( $opt, $self->{i}{pre_text_row_count} );
                 return join( '', map { $_->[0] } @{$m->{str}} );
             }
             else {
@@ -541,6 +550,10 @@ sub __add_char {
     $m->{p_pos}++;
     $m->{p_str_w} += $char_w;
     $m->{str_w}   += $char_w;
+    # no '<' if:
+    if ( ! $m->{diff} && $m->{p_pos} < $self->{i}{avail_w} + $self->{i}{arrow_w} ) {
+        $m->{avail_w} = $self->{i}{avail_w} + $self->{i}{arrow_w};
+    }
     while ( $m->{p_pos} < $#{$m->{p_str}} ) {
         if ( $m->{p_str_w} <= $m->{avail_w} ) {
             last;
@@ -647,7 +660,8 @@ sub __print_readline {
         print "\r" . $self->{i}{keys}[$i]; # no_echo only in readline -> in readline no separator
         return;
     }
-    my $print_str = "\r" . $self->{i}{keys}[$i] . $self->{i}{seps}[$i];
+    print "\r" . $self->{i}{keys}[$i] . $self->{i}{seps}[$i];
+    my $print_str = '';
     # left arrow:
     if ( $m->{diff} ) {
         $print_str .= $self->{i}{arrow_left};
@@ -666,6 +680,9 @@ sub __print_readline {
     my $back_to_pos = 0;
     for ( @{$m->{p_str}}[$m->{p_pos} .. $#{$m->{p_str}}] ) {
         $back_to_pos += $_->[1];
+    }
+    if ( $opt->{hide_cursor} ) {
+        print SHOW_CURSOR;
     }
     print $print_str;
     if ( $back_to_pos ) {
@@ -841,6 +858,9 @@ sub __write_first_screen {
     else {
         print "\r" . CLEAR_TO_END_OF_SCREEN;
     }
+    if ( $opt->{hide_cursor} ) {
+        print HIDE_CURSOR;
+    }
     if ( defined $self->{i}{pre_text} ) {  # empty info add newline ?
         print $self->{i}{pre_text} . "\n";
     }
@@ -861,6 +881,7 @@ sub fill_form {
         clear_screen     => '[ 0 1 ]',
         codepage_mapping => 0,
         confirm          => '',
+        hide_cursor      => '[ 0 1 ]',
         info             => '',
         prompt           => '',
         read_only        => 'ARRAY',
@@ -909,11 +930,14 @@ sub fill_form {
             $self->{i}{beep} = 0;
         }
         else {
+            if ( $opt->{hide_cursor} ) {
+                print HIDE_CURSOR;
+            }
             $self->__print_current_row( $opt, $list, $m );
         }
         my $char = $self->{pg}->__get_key_OS();
         if ( ! defined $char ) {
-            $self->__reset_term();
+            $self->__reset_term( $opt );
             carp "EOT: $!";
             return;
         }
@@ -1074,12 +1098,12 @@ sub fill_form {
                 my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
                 $up += $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
                 if ( $list->[$self->{i}{curr_row}][0] eq $opt->{back} ) {                                               # if ENTER on   {back/0}: leave and return nothing
-                    $self->__reset_term( $up );
+                    $self->__reset_term( $opt, $up );
                     return;
                 }
                 elsif ( $list->[$self->{i}{curr_row}][0] eq $opt->{confirm} ) {                                         # if ENTER on {confirm/1}: leave and return result
                     splice @$list, 0, @{$self->{i}{pre}};
-                    $self->__reset_term( $up );
+                    $self->__reset_term( $opt, $up );
                     return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
                 }
                 if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
@@ -1171,7 +1195,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.512
+Version 0.513
 
 =cut
 
@@ -1317,6 +1341,16 @@ Setting this option to C<1> enables the codepage mapping offered by L<Win32::Con
 
 default: C<0>
 
+=item
+
+hide_cursor
+
+0 - disabled
+
+1 - enabled
+
+default: C<1>
+
 =back
 
 =head2 fill_form
@@ -1426,6 +1460,16 @@ Setting this option to C<1> enables the codepage mapping offered by L<Win32::Con
 1 - keep automatic codepage mapping
 
 default: C<0>
+
+=item
+
+hide_cursor
+
+0 - disabled
+
+1 - enabled
+
+default: C<1>
 
 =back
 

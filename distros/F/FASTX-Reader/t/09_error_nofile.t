@@ -4,7 +4,7 @@ use FindBin qw($Bin);
 use Test::More;
 use Data::Dumper;
 use_ok 'FASTX::Reader';
-my $seq = "$Bin/../scripts/not_found_test.fasta";
+my $seq = "$Bin/../data/not_found_test.fasta";
 
 # Check required input file
 if (-e $seq) {
@@ -12,7 +12,8 @@ if (-e $seq) {
   exit 0;
 }
 
-my $eval = eval {
+my $eval = 0;
+$eval = eval {
  my $data = FASTX::Reader->new({ filename => "$seq" });
  print Dumper $data;
  1;

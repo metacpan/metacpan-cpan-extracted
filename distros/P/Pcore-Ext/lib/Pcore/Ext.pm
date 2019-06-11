@@ -1,8 +1,9 @@
-package Pcore::Ext v0.30.2;
+package Pcore::Ext v0.30.4;
 
 use Pcore -dist, -class;
 use Pcore::Ext::App;
 use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Util::Path::Poll qw[:POLL];
 
 has app => ( required => 1 );    # InstanceOf['Pcore::App']
 
@@ -39,8 +40,10 @@ sub create_app ( $self, $package, $cfg ) {
     return $self->{ext_app}->{$package};
 }
 
-sub rebuild_all ($self) {
-    $Pcore::Ext::App::MODULES = {};
+sub rebuild_all ( $self, $modifications ) {
+    for my $module ( $modifications->@* ) {
+        delete $Pcore::Ext::App::MODULES->{$module};
+    }
 
     while ( my ( $package, $app ) = each $self->{ext_app}->%* ) {
         print "rebuild: $package ... ";
@@ -63,25 +66,75 @@ sub clear_cache ($self) {
         P->class->unload($module);
     }
 
-    undef $Pcore::Ext::App::FRAMEWORK if !$self->{app}->{devel};
-
     undef $Pcore::Ext::App::MODULES;
+
+    undef $Pcore::Ext::App::FRAMEWORK;
 
     return;
 }
 
 sub _init_reload ($self) {
-    my $ext_ns = ref( $self->{app} ) . '::Ext' =~ s[::][/]smgr;
+    my $pcore_lib_ns       = 'Pcore/Ext/Lib';
+    my $pcore_overrides_ns = 'Pcore/Ext/Overrides';
+    my $ext_ns             = ref( $self->{app} ) . '::Ext' =~ s[::][/]smgr;
 
     for my $inc_path ( grep { !is_ref $_ } @INC ) {
 
-        # Ext reloader
+        # pcore ext lib
+        P->path("$inc_path/$pcore_lib_ns")->poll_tree(
+            abs       => 0,
+            is_dir    => 0,
+            max_depth => 0,
+            sub ( $root, $changes ) {
+                my $modifications;
+
+                for my $change ( $changes->@* ) {
+                    if ( $change->[1] == $POLL_MODIFIED || $change->[1] == $POLL_REMOVED ) {
+                        push $modifications->@*, "$pcore_lib_ns/$change->[0]";
+                    }
+                }
+
+                $self->rebuild_all($modifications) if $modifications;
+
+                return;
+            }
+        );
+
+        # pcore ext overrides
+        P->path("$inc_path/$pcore_overrides_ns")->poll_tree(
+            abs       => 0,
+            is_dir    => 0,
+            max_depth => 0,
+            sub ( $root, $changes ) {
+                my $modifications;
+
+                for my $change ( $changes->@* ) {
+                    if ( $change->[1] == $POLL_MODIFIED || $change->[1] == $POLL_REMOVED ) {
+                        push $modifications->@*, "$pcore_overrides_ns/$change->[0]";
+                    }
+                }
+
+                $self->rebuild_all($modifications) if $modifications;
+
+                return;
+            }
+        );
+
+        # ext app reloader
         P->path("$inc_path/$ext_ns")->poll_tree(
             abs       => 0,
             is_dir    => 0,
             max_depth => 0,
             sub ( $root, $changes ) {
-                $self->rebuild_all;
+                my $modifications;
+
+                for my $change ( $changes->@* ) {
+                    if ( $change->[1] == $POLL_MODIFIED || $change->[1] == $POLL_REMOVED ) {
+                        push $modifications->@*, "$ext_ns/$change->[0]";
+                    }
+                }
+
+                $self->rebuild_all($modifications) if $modifications;
 
                 return;
             }
@@ -98,7 +151,7 @@ sub _init_reload ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 48                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 51                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

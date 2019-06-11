@@ -1,6 +1,9 @@
 This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 Some APIs *can change* with the release of the first stable release (v 0.1).
 
+0.20	2019-06-10
+	* Added preliminary support to read .gz files
+
 0.11	2019-06-03
 	* Cleanup via dist.ini
 

@@ -2,21 +2,9 @@ package Pcore::Handle::DBI::STH;
 
 use Pcore -class;
 
-has id    => ( required => 1 );        # Str
-has query => ( required => 1 );        # Str
-has dbh   => ( init_arg => undef );    # ArrayRef
+has query => ( required => 1 );    # Str
 
-sub DESTROY ( $self ) {
-    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
-        for my $dbh ( $self->{dbh}->@* ) {
-            my $id = $self->{id};
-
-            $dbh->destroy_sth($id) if defined $dbh;
-        }
-    }
-
-    return;
-}
+has id => ( sub { P->uuid->v1mc_str }, init_arg => undef );    # Str
 
 1;
 __END__

@@ -1,4 +1,7 @@
 Revision history for Perl extension Sub::Data::Recursive
 
+0.02    Sat Jun  8 20:54:32 JST 2019
+        - Add `massive_invoke`
+
 0.01    Wed Jun  5 22:17:14 2013
         - original version

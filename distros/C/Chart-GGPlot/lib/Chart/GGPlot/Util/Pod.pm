@@ -4,63 +4,66 @@ package Chart::GGPlot::Util::Pod;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
+
+use List::AllUtils qw(min);
 
 use parent qw(Exporter::Tiny);
 
-our @EXPORT_OK = qw(layer_func_pod);
+our @EXPORT_OK = qw(unindent layer_func_pod);
 
-my $TMPL_COMMON_ARGS = <<'=cut';
+my $TMPL_COMMON_ARGS = unindent(<<'EOT');
 
-=item * $mapping
+    =item * $mapping
 
-Set of aesthetic mappings created by C<aes()>. If specified and
-C<$inherit_aes> is true (the default), it is combined with the default
-mapping at the top level of the plot.
-You must supply mapping if there is no plot mapping.
+    Set of aesthetic mappings created by C<aes()>. If specified and
+    C<$inherit_aes> is true (the default), it is combined with the default
+    mapping at the top level of the plot.
+    You must supply mapping if there is no plot mapping.
 
-=item * $data
+    =item * $data
 
-The data to be displayed in this layer.
-If C<undef>, the default, the data is inherited from the plot data as
-specified in the call to C<ggplot()>.
+    The data to be displayed in this layer.
+    If C<undef>, the default, the data is inherited from the plot data as
+    specified in the call to C<ggplot()>.
 
-=item * $stat
+    =item * $stat
 
-The statistical transformation to use on the data for this layer, as a
-string.
+    The statistical transformation to use on the data for this layer, as a
+    string.
 
-=item * $position
+    =item * $position
 
-Position adjustment, either as a string, or the result of a call to a
-position adjustment function.
+    Position adjustment, either as a string, or the result of a call to a
+    position adjustment function.
 
-=item * $na_rm
+    =item * $na_rm
 
-If false, the default, missing values are removed with a warning.
-If true, missing values are silently removed.
+    If false, the default, missing values are removed with a warning.
+    If true, missing values are silently removed.
 
-=item * $show_legend
+    =item * $show_legend
 
-Should this layer be included in the legends?
-'auto', the default, includes if any aesthetics are mapped.
-false never includes, and false always includes.
+    Should this layer be included in the legends?
+    C<undef>, the default, includes if any aesthetics are mapped.
+    A true scalar for never includes, and a defined false scalar for always
+    includes.
 
-=item * $inherit_aes
+    =item * $inherit_aes
 
-If false, overrides the default aesthetics, rather than combining with them.
-This is most useful for helper functions that define both data and
-aesthetics and shouldn't inherit behaviour from the default plot
-specification.
+    If false, overrides the default aesthetics, rather than combining with them.
+    This is most useful for helper functions that define both data and
+    aesthetics and shouldn't inherit behaviour from the default plot
+    specification.
 
-=item * %rest
+    =item * %rest
 
-Other arguments passed to C<Chart::GGPlot::Layer-E<gt>new()>.
-These are often aesthetics, used to set an aesthetic to a fixed value,
-like C<color =E<gt> "red", size =E<gt> 3>.
-They may also be parameters to the paired geom/stat.
+    Other arguments passed to C<Chart::GGPlot::Layer-E<gt>new()>.
+    These are often aesthetics, used to set an aesthetic to a fixed value,
+    like C<color =E<gt> "red", size =E<gt> 3>.
+    They may also be parameters to the paired geom/stat.
 
-=cut
+EOT
 
 my %templates = (
     # common args used by the geom_* and stat_* functions
@@ -71,7 +74,10 @@ sub x_pod {
     my ($tmpl_names) = @_;
 
     return sub {
-        my ($text) = @_;
+        # For why unindent is needed, see
+        # https://github.com/perl-pod/pod-simple/issues/95 for why
+        my $text = unindent(shift);
+
         for my $tmpl_name (@$tmpl_names) {
             my $tmpl_text = $templates{$tmpl_name};
             die "Invalid template name $tmpl_name" unless defined $tmpl_text;
@@ -84,6 +90,14 @@ sub x_pod {
 }
 
 *layer_func_pod = x_pod([qw(TMPL_COMMON_ARGS)]);
+
+# got from Mojo::Util
+sub unindent {
+  my $str = shift;
+  my $min = min map { m/^([ \t]*)/; length $1 || () } split "\n", $str;
+  $str =~ s/^[ \t]{0,$min}//gm if $min;
+  return $str;
+}
 
 1;
 
@@ -99,7 +113,7 @@ Chart::GGPlot::Util::Pod - Dev utilities for pod-related tasks of Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

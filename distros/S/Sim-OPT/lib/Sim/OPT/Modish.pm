@@ -1,6 +1,6 @@
 package Sim::OPT::Modish;
 #!/usr/bin/perl
-# Modish, version 0.279.
+# Modish, version 0.285.
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # The subroutine createconstrdbfile has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
 # All rights reserved, 2015-19.
@@ -2890,6 +2890,7 @@ solar source sun
                       $valstring = `cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile`;
                       say REPORT "cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile";
                       #if ( $valstring =~ /fatal/ ){ die ; };
+                      #if ( $valstring =~ /bad object count/ ) { die; };
                       my ( $x, $y, $z ) = ( $valstring =~ m/(.+)\t(.+)\t(.+)\t/ );
                       $irr = ( 179 * ( ( .265 * $x ) + ( .670 * $y ) + ( .065 * $z ) ) );
                       push ( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} }, $irr );
@@ -2911,6 +2912,7 @@ solar source sun
             }
 
 
+
             ## HERE FOLLOW THE OPERATIONS FOR THE TOTAL IRRADIANCES
 
             #if ( ( "alldiff" ~~ @calcprocedures ) or ( not ( "keepdirshdf" ~~ @calcprocedures ) ) )
@@ -2927,7 +2929,6 @@ solar source sun
                 or ( ( not( "noreflections" ~~ @calcprocedures ) and not( "composite" ~~ @calcprocedures ) and not( "radical" ~~ @calcprocedures )
                   and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) or ( "plain" ~~ @calcprocedures ) ) )
               {
-
 
                 if ( $alt <= 0 ) { $alt = 0.0001; say "IMPOSED \$alt = 0.0001;"; say REPORT "IMPOSED \$alt = 0.0001;"; } # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
@@ -2950,7 +2951,7 @@ solar source sun
                 }
                 else
                 {
-                  $thisgref= 0;
+                  $thisgref = 0;
                 }
 
                 my ( $altreturn, $lightsolar );
@@ -2982,7 +2983,7 @@ solar source sun
                   }
                   elsif ( $skycond eq "overcast" )
                   {
-                    @returns = `gensky $monthnum $day $hour -c -g $thisgobs black:ref -a $lat -o $long -m $standardmeridian`;
+                    @returns = `gensky $monthnum $day $hour -c -g $thisgref black:ref -a $lat -o $long -m $standardmeridian`;
                     say REPORT "gensky $monthnum $day $hour -c -g $thisgref -a $lat -o $long -m $standardmeridian";
                     #say REPORT "gensky " . dump( @returns );
                   }
@@ -3058,6 +3059,13 @@ solar source sun
                       {
                         $returns[$ct+3] = "3 0.1 0.1 0.1";
                       }
+                    }
+                  }
+                  elsif ( $li =~ /solar source sun/ )
+                  {
+                    if ( $returns[$ct+3] =~ /4 0.0 0.0 0.0 0/ )
+                    {
+                      $returns[$ct+3] = "4 0.1 0.1 0.1 0.1";
                     }
                   }
 
@@ -3161,6 +3169,7 @@ solar source sun
                       $valstring = `cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile`;
                       say REPORT "cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile";
                       #if ( $valstring =~ /fatal/ ) { die; };
+                      #if ( $valstring =~ /bad object count/ ) { die; };
                       my ( $x, $y, $z ) = ( $valstring =~ m/(.+)\t(.+)\t(.+)\t/ );
                       $irr = ( 179 * ( ( .265 * $x ) + ( .670 * $y ) + ( .065 * $z ) ) );
                       push ( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} }, $irr );
@@ -3280,8 +3289,8 @@ solar source sun
                     $ct++;
                   }
 
-                  @returns = `gendaylit -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian`;
-                  say REPORT "gendaylit -ang $alt $azi +s -g $groundrefl -a $lat -o $long -m $standardmeridian";
+                  @returns = `gendaylit -ang $alt $azi +s -g 0 -a $lat -o $long -m $standardmeridian`;
+                  say REPORT "gendaylit -ang $alt $azi +s -g 0 -a $lat -o $long -m $standardmeridian";
                 }
                 #say "RETURNS1: " . dump( @returns );
 
@@ -3302,8 +3311,14 @@ solar source sun
                       }
                     }
                   }
-
-                  if ( $line =~ /void brightfunc skyfunc/ )
+                  elsif ( $li =~ /solar source sun/ )
+                  {
+                    if ( $returns[$ct+3] =~ /4 0.0 0.0 0.0 0/ )
+                    {
+                      $returns[$ct+3] = "4 0.1 0.1 0.1 0.1";
+                    }
+                  }
+                  elsif ( $line =~ /void brightfunc skyfunc/ )
                   {
                     $returns[$counter+3] = "7 0 0 0 0 0 0 0\n",
                   }
@@ -3423,6 +3438,7 @@ solar source sun
 
                       $valstring = `cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab 0 -lr 0 $parpiece -h $radoctfile`;
                       say REPORT "5TO SHELL: cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab 0 -lr 0 $parpiece -h $radoctfile";
+                      #if ( $valstring =~ /bad object count/ ) { die; };
                       my ( $x, $y, $z ) = ( $valstring =~ m/(.+)\t(.+)\t(.+)\t/ );
                       $irr = ( 179 * ( ( .265 * $x ) + ( .670 * $y ) + ( .065 * $z ) ) );
                       push ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} }, $irr );

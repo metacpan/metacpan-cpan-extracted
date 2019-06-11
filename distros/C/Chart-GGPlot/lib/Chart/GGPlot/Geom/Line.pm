@@ -7,36 +7,36 @@ use namespace::autoclean;
 
 extends qw(Chart::GGPlot::Geom::Path);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util::Pod qw(layer_func_pod);
 
-my $geom_line_pod = layer_func_pod(<<'=cut');
+my $geom_line_pod = layer_func_pod(<<'EOT');
 
-    geom_line(:$mapping=undef, :$data=undef, :$stat='identity',
-              :$position='identity', :$na_rm=false, :$show_legend='auto',
-              :$inherit_aes=true, 
-              %rest)
+        geom_line(:$mapping=undef, :$data=undef, :$stat='identity',
+                  :$position='identity', :$na_rm=false, :$show_legend=undef,
+                  :$inherit_aes=true, 
+                  %rest)
 
-The "line" geom connects the observations in the order of the variable on
-the x axis.
+    The "line" geom connects the observations in the order of the variable
+    on the x axis.
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=back
+    =back
 
-=cut
+EOT
 
 my $geom_line_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'identity', :$position = 'identity',
         :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(
@@ -81,7 +81,7 @@ Chart::GGPlot::Geom::Line - Class for line geom
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

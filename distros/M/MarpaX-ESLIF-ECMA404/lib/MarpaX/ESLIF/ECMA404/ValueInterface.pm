@@ -10,7 +10,7 @@ our $FFFD = chr(0xFFFD);
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Value Interface
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -23,7 +23,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 sub new {
     my ($pkg, %options) = @_;
 
-    bless { result => undef, %options }, $pkg
+    return bless { result => undef, %options }, $pkg
 }
 
 # ----------------
@@ -31,34 +31,29 @@ sub new {
 # ----------------
 
 
-sub isWithHighRankOnly { 1 }  # When there is the rank adverb: highest ranks only ?
+sub isWithHighRankOnly { return 1 }  # When there is the rank adverb: highest ranks only ?
 
 
-sub isWithOrderByRank  { 1 }  # When there is the rank adverb: order by rank ?
+sub isWithOrderByRank  { return 1 }  # When there is the rank adverb: order by rank ?
 
 
-sub isWithAmbiguous    { 0 }  # Allow ambiguous parse ?
+sub isWithAmbiguous    { return 0 }  # Allow ambiguous parse ?
 
 
-sub isWithNull         { 0 }  # Allow null parse ?
+sub isWithNull         { return 0 }  # Allow null parse ?
 
 
-sub maxParses          { 0 }  # Maximum number of parse tree values
+sub maxParses          { return 0 }  # Maximum number of parse tree values
 
 
-sub getResult { $_[0]->{result} }
+sub getResult          { return $_[0]->{result} }
 
 
-sub setResult { $_[0]->{result} = $_[1] }
+sub setResult          { return $_[0]->{result} = $_[1] }
 
 # ----------------
 # Specific actions
 # ----------------
-
-
-sub empty_string {
-  ''
-}
 
 
 sub unicode {
@@ -100,17 +95,20 @@ sub unicode {
     }
   }
 
-  $result
+  return $result
 }
 
 
 sub members {
-    my ($self, @pairs) = @_;
+    do { shift, return { map { $_->[0] => $_->[1] } @_ } } if !$_[0]->{disallow_dupkeys};
+
+    my $self = shift;
+
     #
     # Arguments are: ($self, $pair1, $pair2, etc..., $pairn)
     #
     my %hash;
-    foreach (@pairs) {
+    foreach (@_) {
       my ($key, $value) = @{$_};
       if (exists $hash{$key}) {
         if ($self->{disallow_dupkeys}) {
@@ -128,7 +126,8 @@ sub members {
       }
       $hash{$key} = $value
     }
-    \%hash
+
+    return \%hash
 }
 
 
@@ -137,43 +136,22 @@ sub number {
   #
   # We are sure this is a float if there is the dot '.' or the exponent [eE]
   #
-  ($number =~ /[\.eE]/) ? Math::BigFloat->new($number) : Math::BigInt->new($number)
+  return ($number =~ /[\.eE]/) ? Math::BigFloat->new($number) : Math::BigInt->new($number)
 }
 
 
 sub nan {
-    Math::BigInt->bnan()
+    return Math::BigInt->bnan()
 }
 
 
 sub negative_infinity {
-    Math::BigInt->binf('-')
+    return Math::BigInt->binf('-')
 }
 
 
 sub positive_infinity {
-    Math::BigInt->binf()
-}
-
-
-sub true {
-    1
-}
-
-
-sub false {
-    0
-}
-
-
-sub pairs {
-    [ $_[1], $_[3] ]
-}
-
-
-sub elements {
-    my ($self, @elements) = @_;
-    \@elements
+    return Math::BigInt->binf()
 }
 
 
@@ -191,7 +169,7 @@ MarpaX::ESLIF::ECMA404::ValueInterface - MarpaX::ESLIF::ECMA404 Value Interface
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -241,17 +219,13 @@ Sets the current parse tree value.
 
 =head2 Specific actions
 
-=head3 empty_string
-
-Action for rule C<chars ::=>
-
 =head3 unicode
 
-Action for rule C<char ::= /(?:\\u[[:xdigit:]]{4})+/
+Action for rule C<char ::= /(?:\\u[[:xdigit:]]{4})+/>
 
 =head3 members
 
-Action for rule C<members  ::= pairs* separator => ','> hide-separator => 1
+Action for rule C<members  ::= pairs* separator => ','> hide-separator => 1>
 
 =head3 number
 
@@ -268,22 +242,6 @@ Action for rule C<number ::= '-' 'Infinity'>
 =head3 positive_infinity
 
 Action for rule C<number ::= 'Infinity'>
-
-=head3 true
-
-Action for rule C<value ::= 'true'>
-
-=head3 false
-
-Action for rule C<value ::= 'false'>
-
-=head3 pairs
-
-Action for rule C<pairs ::= string ':' value'>
-
-=head3 elements
-
-Action for rule C<elements ::= value*'>
 
 =head1 SEE ALSO
 

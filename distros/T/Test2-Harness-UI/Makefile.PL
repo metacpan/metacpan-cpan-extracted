@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "DBIx::Class::Schema::Loader" => 0,
     "DBIx::Class::Tree::AdjacencyList" => 0,
     "DBIx::Class::UUIDColumns" => 0,
-    "DBIx::QuickDB" => 0,
+    "DBIx::QuickDB" => "0.000008",
     "Data::GUID" => 0,
     "DateTime" => 0,
     "Email::Sender::Simple" => 0,
@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.000001",
+  "VERSION" => "0.000002",
   "test" => {
     "TESTS" => "t/*.t t/UI/*.t"
   }
@@ -93,7 +93,7 @@ my %FallbackPrereqs = (
   "DBIx::Class::Schema::Loader" => 0,
   "DBIx::Class::Tree::AdjacencyList" => 0,
   "DBIx::Class::UUIDColumns" => 0,
-  "DBIx::QuickDB" => 0,
+  "DBIx::QuickDB" => "0.000008",
   "Data::GUID" => 0,
   "DateTime" => 0,
   "Email::Sender::Simple" => 0,

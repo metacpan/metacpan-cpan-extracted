@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::Discrete;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use PDL::Primitive qw(which);
 use Types::Standard qw(Any ArrayRef Bool CodeRef ConsumerOf InstanceOf);
@@ -19,18 +19,10 @@ has drop            => ( is => 'ro', default => sub { true } );
 has na_translate    => ( is => 'ro' );
 has _n_breaks_cache => ( is => 'rw' );
 
-my $Palette = ( ConsumerOf ['PDL::SV'] )->plus_coercions(
-    ArrayRef [ ConsumerOf ['Graphics::Color::RGB'] ],
-    sub {
-        PDL::SV->new( $_->map( sub { $_->as_css_hex } ) );
-    }
-);
-
 has _palette_cache => (
     is      => 'rw',
-    isa     => $Palette,
+    isa     => ConsumerOf ['PDL::SV'],
     default => sub { PDL::SV->new( [] ); },
-    coerce  => 1
 );
 
 has range => (
@@ -199,7 +191,7 @@ Chart::GGPlot::Scale::Discrete - Discrete scale
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 AUTHOR
 

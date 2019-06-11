@@ -248,7 +248,8 @@ is( $et->display_utc, '2012-03-04T14:12:14Z', 'utc' );
 $et2 = Image::Synchronize::Timestamp->new('2012-03-04T20:12:14');
 
 $et->set_timezone_offset(3600);
-is( $et->display_iso, '2012-03-04T15:12:14+01:00', 'set_timezone_offset w/tz' );
+is( $et->display_iso, '2012-03-04T15:12:14+01:00',
+    'set_timezone_offset w/tz' );
 
 $et2->set_timezone_offset(3600);
 is( $et2->display_iso, '2012-03-04T20:12:14+01:00',
@@ -256,12 +257,13 @@ is( $et2->display_iso, '2012-03-04T20:12:14+01:00',
 
 my $l   = $et->local_offset_from_utc;
 my $etu = $et->time_utc;
-$et->clone_to_local_timezone;
+$et = $et->clone_to_local_timezone;
 is( $et->time_utc,        $etu, 'clone_to_local_timezone' );
 is( $et->offset_from_utc, $l,   'local timezone offset' );
 
 $et->set_timezone_offset(3603);
-is( $et->display_iso, '2012-03-04T15:12:17+01:00:03', 'timezone with seconds' );
+is( $et->display_iso, '2012-03-04T15:12:17+01:00:03',
+    'timezone with seconds' );
 
 $et->set_timezone_offset(-3603);
 is(

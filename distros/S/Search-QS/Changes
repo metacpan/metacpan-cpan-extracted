@@ -1,6 +1,22 @@
 Changelog for Search-QS
 
-0.02 2019-06-06T15:39:08
+0.04 2019-06-11T15:24:21
+ - limit and start methods in Search::QS::Options are now objects which
+   incapsulate the previous integer value
+ - Minor: Add automatically link to git repo in CPAN
+
+0.03 2019-06-10T10:10:25
+ - forget another 'each' on a scalar.
+ - forget to update Options.pm which have an 'each' applied to a scalar
+ - Minor: Add support in travis for dzilla
+ - Minor: Always travis
+ - Minor: Alway travis
+ - Minor: Removed empty section in travis file
+ - Minor: Add travis file for online tests
+ - Solved a bug which not compile in newer perl versions. Update some
+   documentation
+
+0.02 2019-06-06T15:38:52
  - Updated documentation and add more tests
  - Add a few documentation
  - Some minor changes to documentation

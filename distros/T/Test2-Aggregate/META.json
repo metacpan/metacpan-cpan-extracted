@@ -23,8 +23,7 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Test2::Tools::Basic" : "0",
-            "Test::More" : "0"
+            "Test2::Tools::Basic" : "0"
          }
       },
       "configure" : {
@@ -41,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

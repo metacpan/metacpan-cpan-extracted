@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Events;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -74,7 +74,7 @@ sub handle {
 
     $res->stream(
         env          => $req->env,
-        content_type => 'application/x-jsonl',
+        content_type => 'application/x-jsonl; charset=utf-8',
         resultset    => $rs,
     );
 

@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.1.92
+Version v3.1.93
 
 =cut
 
-our $VERSION = version->declare("v3.1.92");
+our $VERSION = version->declare("v3.1.93");
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ my $QB = '["*]';         # quote or bullet
 my $SD = '[ -]';         # space or dash
 
 my @_re = (
-	[ qr/\Q$BB/, '(?:\W*\S+\W*)' ],
+	[ qr/\Q$BB/, '(?:\W*\S\W*)' ],
 	[ qr/\Q$C/,  '(?:©|\(c\))' ],
 	[ qr/\Q$D/,  '[–-]' ],
 	[ qr/\Q$DD/, '(?: [–—-]{1,2} )' ],
@@ -131,9 +131,9 @@ $RE{adobe_glyph} = {
 	name                                => 'Adobe-Glyph',
 	'name.alt.org.fedora.web.mit.short' => 'AdobeGlyph',
 	'name.alt.org.spdx'                 => 'Adobe-Glyph',
-	'name.alt.org.tldr'                 => 'adobe-glyph-list-license',
 	caption                             => 'Adobe Glyph List License',
 	'caption.alt.org.fedora.web.mit'    => 'Adobe Glyph List Variant',
+	'caption.alt.org.tldr'              => 'Adobe Glyph List License',
 	tags                                => ['type:unversioned'],
 
 	'.default_pat' => 'license',
@@ -148,7 +148,6 @@ $RE{adobe_glyph} = {
 
 $RE{afl} = {
 	name                        => 'AFL',
-	'name.alt.org.tldr'         => 'adobe-glyph-list-license',
 	'name.alt.org.wikidata'     => 'Q337279',
 	caption                     => 'Academic Free License',
 	'caption.alt.org.wikipedia' => 'Academic Free License',
@@ -1807,7 +1806,8 @@ $RE{licensed_under} = {
 		'(?P<_licensed_under>(?:[Ll]icen[sc]ed|[Dd]istribut(?:able|ed)|permitted|provided|[Pp]ublished|[Rr]eleased?) under'
 		. '|(?:in form of source code|may be copied|placed their code|to you) under' # sloppy - may need to include granting keyword
 		. '|(?:[Tt]his|[Mm]y) (?:software|file|work) is under'                       # vague descriptor - object included
-		. '|(?:(?:according|subject) to|[Uu]nder) the (?:conditions|terms) of) ',
+		. '|Use modification and distribution are subject to'
+		. '|(?:(?:according|subject) to|as governed by|[Uu]nder) the (?:conditions|terms) of) ',
 };
 
 =item * or_at_option
@@ -2269,19 +2269,24 @@ for my $id (@_OBJECTS) {
 		or $_TYPE{$id} eq 'trait' )
 	{
 # TODO: filter duplicates (by mapping into a hash?)
-		$_ = _join_pats(
-			map      {s/^$the?/$the?/r}
-				map  {s/,//gr}
-				map  {s/(?: [Ll]icense)/\(?: \[Ll\]icense\)?/r}
-				grep { !/-\(/ }
-				grep { !/,[_~]/ }
-				map  { $RE{$id}{$_} }
-				grep { !/^name\.alt\.org\.wikidata(?:$_delim|\z)/ }
-				grep {/^(?:caption|name)(?:$_delim|\z)/}
-				keys %{ $RE{$id} }
-		);
-		next unless ($_);
-		s/ - /${DD}/g;
+		my @pat;
+		for (
+			grep { !/-\(/ }
+			grep { !/,[_~]/ }
+			map  { $RE{$id}{$_} }
+			grep { !/^name\.alt\.org\.wikidata(?:$_delim|\z)/ }
+			grep {/^(?:caption|name)(?:$_delim|\z)/}
+			keys %{ $RE{$id} }
+			)
+		{
+			s/(?: [Ll]icense)/\(?: \[Ll\]icense\)?/;
+			s/,//g;
+			s/^$the?/$the?/;
+			s/ - /${DD}/g;
+			push @pat, $_;
+		}
+		$_ = _join_pats(@pat)
+			|| next;
 		$RE{$id}{'_pat.alt.subject.grant.synth.caption'}
 			= '(?:(?:[Ll]icensed|[Rr]eleased) under|(?:according to|as governed by|under) the (?:conditions|terms) of) '
 			. $_;
@@ -2301,14 +2306,22 @@ for my $id (@_OBJECTS) {
 
 		# synthesize from seed pattern
 		my $pat = _join_pats( $RE{$id}{"_pat.alt.subject.$subject"} );
+		if ($pat) {
+			$RE{$id}{"pat.alt.subject.$subject"} = $pat;
+			next;
+		}
 
 		# synthesize from alternatives or their seeds
-		$pat ||= _join_pats(
-			map { $RE{$id}{$_} || $RE{$id}{"_$_"} }
-				map  {s/_\K//r}
-				grep {/^_?pat\.alt\.subject\.$subject$_delim/}
-				keys %{ $RE{$id} }
-		);
+		my @pat;
+		for (
+			grep {/^_?pat\.alt\.subject\.$subject$_delim/}
+			keys %{ $RE{$id} }
+			)
+		{
+			s/_\K//;
+			push @pat, $RE{$id}{$_} || $RE{$id}{"_$_"};
+		}
+		$pat ||= _join_pats(@pat);
 
 		$RE{$id}{"pat.alt.subject.$subject"} = $pat
 			if ($pat);

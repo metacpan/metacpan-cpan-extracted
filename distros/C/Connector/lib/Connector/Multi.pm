@@ -162,7 +162,8 @@ sub _route_call {
             } else {
                 # redirect
                 @prefix = ();
-                @suffix = split(/[$delim]/, $meta->{VALUE});
+                my @target = split(/[$delim]/, $meta->{VALUE});
+                unshift @suffix, @target;
                 $self->log()->debug("Plain redirect to " . join ".", @suffix);
             }
         } else {

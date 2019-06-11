@@ -1,5 +1,7 @@
 package Image::Synchronize::Logger;
 
+use v5.10.0;
+
 # I would have liked to use Log::Contextual, but I can't figure out
 # how to make it play nice with Term::ProgressBar::Simple, and how to
 # select the desired logging level based on a command-line option.

@@ -1,16 +1,20 @@
 Changelog for MarpaX-ESLIF-ECMA404
 
-0.010 2018-01-30T18:28:39
+0.011 2019-06-09T13:43:34
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Optimizations
+
+0.010 2018-01-30T18:29:03
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - use MarpaX::ESLIF 2.0.34
  - .appveyor.yml [ci skip]
  - .appveyor.yml
 
-0.009 2018-01-25T16:24:56Z
+0.009 2018-01-25T16:25:20
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - use MarpaX::ESLIF 2.0.33
 
-0.008 2018-01-19T04:36:12Z
+0.008 2018-01-19T04:36:54
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - MarpaX::ESLIF Version 2.0.32 changes some of the i_* results, basically
    yells in the input have malformed characters: the standard says nothing
@@ -19,14 +23,14 @@ Changelog for MarpaX-ESLIF-ECMA404
    corrupted input in character mode (else we would have gone to binary
    mode and handle the failures)
 
-0.007 2017-07-04T17:48:37Z
+0.007 2017-07-04T17:49:11
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Fix RecognizerInterface POD
  - elements action bug fix
  - dist.ini: t/test_transform as byte files
  - Added t/test_transform [ci skip]
 
-0.006 2017-06-01T04:06:08Z
+0.006 2017-06-01T04:08:55
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - t/test.t: forces UTF-8 in some cases just to please tests with old
    versions of perl [ci skip]
@@ -35,11 +39,11 @@ Changelog for MarpaX-ESLIF-ECMA404
  - t/test.t: renaming of a variable from want_ok to want_ko to avoid
    confusion -; [ci skip]
 
-0.005 2017-05-31T19:56:22Z
+0.005 2017-05-31T19:58:00
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - use MarpaX::ESLIF 2.0.13 [ci skip]
 
-0.004 2017-05-31T18:50:02Z
+0.004 2017-05-31T18:50:33
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - ECMA404/ValueInterface.pm: POD fix [ci skip]
  - ESLIF/ECMA404.pm: POD typo
@@ -77,11 +81,11 @@ Changelog for MarpaX-ESLIF-ECMA404
  - README.pod: Fix link for perl license
  - README.pod: =for html placement
 
-0.003 2017-05-15T04:36:24Z
+0.003 2017-05-15T04:36:41
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - dist.ini: Switch from ReadmeFromPod to ReadmeAnyFromPod
 
-0.002 2017-05-15T04:17:19Z
+0.002 2017-05-15T04:17:06
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - dist.ini: version regexp
  - dzil xtest
@@ -118,11 +122,13 @@ Changelog for MarpaX-ESLIF-ECMA404
  - Travis trial
  - Cosmetic changes [ci skip]
 
-0.001 2017-05-13T07:20:39Z
- [Jean-Damien Durand <jeandamiendurand@free.fr>]
+0.001 2017-05-13T07:20:39
+ [Jean-Damien Durand <Jean-Damien.Durand@fisglobal.com>]
  - Use MarpaX::ESLIF 2.0.9
  - json_decode is now decode_json dev+
  - dev+
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - .gitignore fix v2 [ci skip]
  - .gitignore fix [ci skip]
  - dist.ini: Fix for README.pod [ci skip]

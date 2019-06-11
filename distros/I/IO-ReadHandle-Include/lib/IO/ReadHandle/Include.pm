@@ -1,6 +1,6 @@
 package IO::ReadHandle::Include;
 
-use 5.010;
+use v5.10.0;
 use strict;
 use warnings;
 
@@ -19,11 +19,11 @@ facility
 
 =head1 VERSION
 
-Version 1.2
+Version 1.2.1
 
 =cut
 
-use version; our $VERSION = version->declare('v1.2');
+use version; our $VERSION = version->declare('v1.2.1');
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ cannot apply to any include directives that were resolved while
 processing the L</read> call that produced the text that indicates the
 need to change the transformation.
 
-In such a case, use the L</set_read_by_lines> method to indicate that
+In such a case, use the L</set_read_by_line> method to indicate that
 you want L</read> to return text that does not extend beyond the first
 input record separator -- i.e., at most one line of text.  You may
 then get fewer characters from a call to L</read> than you asked for,
@@ -624,7 +624,7 @@ into the C<$buffer> at offset C<$offset>, similar to the
 L<CORE::read|perlfunc/read> function.  Returns the number of
 characters read, or 0 when there are no more characters.
 
-If L</set_read_by_lines> is active, then the reading stops after the
+If L</set_read_by_line> is active, then the reading stops after the
 first encountered input record separator (L<$E<sol>|perlvar/"$/">),
 even if the requested number of characters has not been reached yet.
 
@@ -867,7 +867,7 @@ position, or the very end of the stream.
 
 =item
 
-L</tell> cannot be used on an B<IO::ReadHandle::Include>.
+L<tell> cannot be used on an B<IO::ReadHandle::Include>.
 
 =back
 

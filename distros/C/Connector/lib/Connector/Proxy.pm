@@ -22,7 +22,7 @@ has LOOPBACK => (
 );
 
 around BUILDARGS => sub {
-    
+
     my $orig = shift;
     my $class = shift;
 
@@ -31,18 +31,18 @@ around BUILDARGS => sub {
     if (  ref($args) eq 'HASH'
             && defined($args->{CONNECTOR})
             && defined($args->{TARGET}) ) {
-        
-            my %arg = %{$args};        
+
+            my %arg = %{$args};
             $arg{'BASECONNECTOR'} = $arg{CONNECTOR};
             delete $arg{CONNECTOR};
-                           
-            $args->{LOOPBACK} = Connector::Wrapper->new( %arg );                
+
+            $args->{LOOPBACK} = Connector::Wrapper->new( %arg );
     }
-    
+
     return $class->$orig(@_);
-    
+
 };
- 
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
@@ -62,5 +62,5 @@ This is the base class for all Connector::Proxy implementations.
 When creating the connector, all class attributes that have a corresponding config
 item are initialised with the given values.
 
-All configuration options, that are denoted on the same level as the connector 
+All configuration options, that are denoted on the same level as the connector
 definition are accessible inside the class using  C<$self->conn()->get()>.

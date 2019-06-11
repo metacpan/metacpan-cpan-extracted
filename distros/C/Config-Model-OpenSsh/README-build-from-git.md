@@ -54,3 +54,15 @@ a `TZ` environement variable. E.g run `dzil` this way:
 The list of possible timezones is provided by
 [DateTime::TimeZone::Catalog](https://metacpan.org/pod/DateTime::TimeZone::Catalog)
 documentation.
+
+## Model generation
+
+Ssh model can be regenerated from ssh man pages with the following steps:
+
+* make sure that `ssh_config` and `sshd_config` man pages are available
+* Run `perl contrib/parse-man.pl`
+* Inspect the result
+* Then build the module as shown above
+
+For more details, see this [readme file](contrib/README.org)
+

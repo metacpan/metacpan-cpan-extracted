@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Types::Standard qw(Bool);
 
@@ -73,7 +73,14 @@ Chart::GGPlot::Coord - The role for coordinates
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 DESCRIPTION
+
+This module is a Moose role for "coord".
+
+For users of Chart::GGPlot you would mostly want to look at
+L<Chart::GGPlot::Coord::Functions> instead.
 
 =head1 CLASS METHODS
 

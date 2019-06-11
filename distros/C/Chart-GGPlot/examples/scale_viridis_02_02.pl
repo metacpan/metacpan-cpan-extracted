@@ -29,7 +29,7 @@ my $p = ggplot(
     data    => $txsamp,
     mapping => aes( x => 'sales', y => 'median' )
 )->geom_point( mapping => aes( color => 'city' ) )
- ->scale_color_viridis_d( name => "City Center" );
+ ->scale_color_viridis_d( name => "City\nCenter" );
 
 if ( defined $save_as ) {
     $p->save($save_as);

@@ -30,10 +30,10 @@ optional_features: {}
 provides:
   Regexp::Pattern::License:
     file: lib/Regexp/Pattern/License.pm
-    version: v3.1.92
+    version: v3.1.93
   Regexp::Pattern::License::Parts:
     file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.1.92
+    version: v3.1.93
 requires:
   perl: '5'
   strictures: '2'
@@ -43,9 +43,9 @@ resources:
   homepage: https://metacpan.org/release/Regexp-Pattern-License
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/git/build-common/regexp-pattern-license.git
-version: v3.1.92
+version: v3.1.93
 x_help_wanted:
-  - tester
   - documenter
+  - tester
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

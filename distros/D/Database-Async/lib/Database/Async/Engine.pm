@@ -3,7 +3,7 @@ package Database::Async::Engine;
 use strict;
 use warnings;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 

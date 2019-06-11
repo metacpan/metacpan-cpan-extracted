@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2019-04-05'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-06-06'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -122,15 +122,20 @@ sub _convert_download_urls_to_filenames {
 
     my @filenames;
     for my $i (0..$#urls) {
+        my $filename;
         if ($#metanames >= $i) {
-            push @filenames, $metanames[$i];
+            $filename = $metanames[$i];
         } elsif (my $rurl = _real_url($urls[$i])) {
-            (my $filename = $rurl) =~ s!.+/!!;
+            ($filename = $rurl) =~ s!.+/!!;
             $filename = URI::Escape::uri_unescape($filename);
-            push @filenames, $filename;
         } else {
-            push @filenames, "$args{software}-$args{version}";
+            $filename = "$args{software}-$args{version}";
         }
+
+        # strip query string
+        $filename =~ s/(?=.)\?.+//;
+
+        push @filenames, $filename;
     }
     @filenames;
 }
@@ -820,7 +825,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.008 of App::instopt (from Perl distribution App-instopt), released on 2019-04-05.
+This document describes version 0.009 of App::instopt (from Perl distribution App-instopt), released on 2019-06-06.
 
 =head1 SYNOPSIS
 

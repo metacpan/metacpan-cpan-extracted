@@ -50,6 +50,15 @@ subtest match => sub {
     );
     pdl_is(
         Chart::GGPlot::Util::match(
+            pdl( [ 1, 2, 3 ] )->setbadat(2),
+            pdl( [ 3, 1, 2 ] )->setbadat(2)
+        ),
+        pdl( [ 1, 2, 0 ] )->setbadif( pdl( [ 0, 1, 1 ] ) ),
+        'match($pdl_withbad, $pdl_withbad)'
+    );
+
+    pdl_is(
+        Chart::GGPlot::Util::match(
             PDL::SV->new( [qw(foo bar baz)] ),
             PDL::SV->new( [qw(baz foo bar)] )
         ),

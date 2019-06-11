@@ -5,7 +5,7 @@ package Chart::GGPlot::Range::Discrete;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 with qw(Chart::GGPlot::Range);
 
@@ -54,7 +54,7 @@ Chart::GGPlot::Range::Discrete - Discrete range
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

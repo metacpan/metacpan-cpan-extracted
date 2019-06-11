@@ -4,6 +4,8 @@ requires "DateTime" => "0";
 requires "HTML::Restrict" => "0";
 requires "HTTP::Body" => "0";
 requires "HTTP::CookieMonster" => "0";
+requires "HTTP::Request" => "0";
+requires "HTTP::Response" => "0";
 requires "JSON::MaybeXS" => "1.003005";
 requires "LWP::UserAgent" => "0";
 requires "List::AllUtils" => "0";
@@ -34,8 +36,8 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "HTML::FormatText::WithLinks" => "0";
   requires "HTTP::CookieJar::LWP" => "0";
-  requires "HTTP::Request" => "0";
   requires "Log::Dispatch::Array" => "0";
+  requires "Module::Runtime" => "0";
   requires "Path::Tiny" => "0";
   requires "Plack::Handler::HTTP::Server::Simple" => "0.016";
   requires "Plack::Test" => "0";
@@ -45,8 +47,6 @@ on 'test' => sub {
   requires "Test::LWP::UserAgent" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
-  requires "Test::Needs" => "0";
-  requires "Test::RequiresInternet" => "0";
   requires "URI::file" => "0";
   requires "WWW::Mechanize" => "0";
   requires "perl" => "5.013010";
@@ -55,6 +55,9 @@ on 'test' => sub {
 
 on 'test' => sub {
   recommends "CPAN::Meta" => "2.120900";
+  recommends "Mojo::UserAgent" => "0";
+  recommends "Mojolicious" => "0";
+  recommends "Pithub" => "0";
 };
 
 on 'configure' => sub {
@@ -63,13 +66,25 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Code::TidyAll" => "0.71";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
+  requires "Code::TidyAll::Plugin::Test::Vars" => "0.04";
+  requires "Code::TidyAll::Plugin::UniqueLines" => "0.000003";
+  requires "Parallel::ForkManager" => "1.19";
+  requires "Perl::Critic" => "1.132";
+  requires "Perl::Tidy" => "20180220";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Pod::Wordlist" => "0";
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::Code::TidyAll" => "0.50";
   requires "Test::More" => "0.96";
+  requires "Test::Needs" => "0";
+  requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
+  requires "Test::RequiresInternet" => "0";
   requires "Test::Spelling" => "0.12";
+  requires "Test::Vars" => "0.014";
+  requires "WWW::Mechanize" => "0";
 };
 
 on 'develop' => sub {

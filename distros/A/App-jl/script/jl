@@ -51,6 +51,23 @@ This option is useful for below case:
        ]
     }
 
+=head3 xx
+
+If set C<xx> option, then JSON values are split as array by each parenthesis before recursively decoding after x option parsing.
+
+This option is useful for below case:
+
+    $ echo '{"message":"[05/09/2019 23:51:51] (warn) <server>\t{\"foo\":\"bar\"}"}' | jl -x
+    {
+       "message" : [
+          "[05/09/2019 23:51:51]",
+          "(warn)",
+          "<server>",
+          {
+             "foo" : "bar"
+          }
+       ]
+    }
 
 =head1 AUTHOR
 

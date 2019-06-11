@@ -95,6 +95,20 @@ Sets a configuration option. Returns _OBJ_.
 
 Gets a configuration option’s value.
 
+## _OBJ_->debuglevel( $LEVEL )
+
+Sets the debug level (an integer). Returns _OBJ_.
+
+As of libunbound v1.9.2, this is just a way to set the `verbosity`
+option after configuration is finalized.
+
+## _OBJ_->debugout( $FD\_OR\_FH )
+
+Accepts a file descriptor or Perl filehandle and designates that
+as the destination for libunbound diagnostic information.
+
+Returns _OBJ_.
+
 ## $str = _CLASS_->unbound\_version()
 
 Gives the libunbound version string.

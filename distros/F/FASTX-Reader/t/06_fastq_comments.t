@@ -4,7 +4,7 @@ use FindBin qw($Bin);
 use Test::More;
 
 use_ok 'FASTX::Reader';
-my $seq = "$Bin/../scripts/comments.fastq";
+my $seq = "$Bin/../data/comments.fastq";
 
 # Check required input file
 if (! -e $seq) {

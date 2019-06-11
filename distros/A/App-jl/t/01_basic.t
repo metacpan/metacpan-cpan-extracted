@@ -79,4 +79,36 @@ X: {
     note( App::jl->new('-x')->process($json_in_log) );
 }
 
+XX: {
+    my $src_json = encode_json({ foo => 'bar' });
+    my $str = 'a' x 120;
+    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] foo, bar, baz $str\r$src_json\n| });
+    note 'XX';
+    note( App::jl->new('-xx')->process($json_in_log) );
+}
+
+XXX: {
+    my $src_json = encode_json({ foo => 'bar' });
+    my $str = 'a' x 120;
+    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] (warn) <server> $str\r$src_json\n| });
+    note 'XXX';
+    note( App::jl->new('-xxx')->process($json_in_log) );
+}
+
+XXXX: {
+    my $src_json = encode_json([
+        { created    => 1560026367 },
+        { updated    => 1560026367.123 },
+        { created_at => '1560026367' },
+        { time       => '1560026367123' },
+        { unixtime   => 1560026367123 },
+        { date       => '1560026367.123' },
+        { ts         => 1560026367 },
+    ]);
+    my $str = 'a' x 120;
+    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] (warn) <server> $str\t$src_json\n| });
+    note 'XXXX';
+    note( App::jl->new('-xxxx', '--timestamp-key', 'ts')->process($json_in_log) );
+}
+
 done_testing;

@@ -14,7 +14,7 @@ my $logger = debug_ua($ua);
 
 my $wrapped_ua = HTTP::Tiny::Mech->new( mechua => $ua );
 
-my $mcpan = MetaCPAN::Client->new( ua => $wrapped_ua );
+my $mcpan  = MetaCPAN::Client->new( ua => $wrapped_ua );
 my $author = $mcpan->author('XSAWYERX');
 
 =pod

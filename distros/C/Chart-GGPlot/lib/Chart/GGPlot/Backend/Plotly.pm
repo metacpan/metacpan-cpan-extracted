@@ -5,7 +5,7 @@ package Chart::GGPlot::Backend::Plotly;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 with qw(Chart::GGPlot::Backend);
 
@@ -15,7 +15,7 @@ use Chart::Plotly::Image::Orca;
 
 use Data::Munge qw(elem);
 use JSON;
-use List::AllUtils qw(pairmap pairwise);
+use List::AllUtils qw(pairmap pairwise uniq);
 use Module::Load;
 use Types::Standard qw(HashRef Int);
 
@@ -23,13 +23,14 @@ use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(:all);
 use Chart::GGPlot::Backend::Plotly::Geom;
 use Chart::GGPlot::Backend::Plotly::Util qw(br to_rgb);
+use Chart::GGPlot::Util qw(rescale);
 
 #TODO: To test and see which value is proper.
 our $WEBGL_THRESHOLD = 2000;
 
-# TODO
-classmethod _split_on($data) {
-    return [];
+classmethod _split_on($class_geom_impl, $data) {
+    my $aes = $class_geom_impl->split_on;
+    return [ grep { $data->exists($_) } map { "${_}_raw" } @$aes ];
 }
 
 method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
@@ -64,7 +65,10 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
         Dumper( \@split_legend ) )
       if $log->is_debug;
 
-    my $split_by = [ @split_legend, @{$self->_split_on($data)} ];
+    my $split_by =
+      [ uniq( @split_legend, @{ $self->_split_on( $class_geom_impl, $data ) } )
+      ];
+
     my $split_vars = $split_by->intersect($data->names);
 
     my $hover_text_aes;     # which aes shall be displayed in hover text?
@@ -93,6 +97,13 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             } @{$hover_text_aes->keys}
         )
     );
+    # throw out positional coordinates if we're hovering on fill
+    my $hover_on = $class_geom_impl->hover_on();
+    if ($hover_on eq 'fills') {
+        @hover_aes_ordered =
+          grep { not elem( $_, [qw(x xmin xmax y ymin ymax)] ) }
+          @hover_aes_ordered;
+    }
     my @hover_labels = map { $_ => $hover_text_aes->at($_) } @hover_aes_ordered;
 
     my $panel_to_traces = fun( $d, $panel_params ) {
@@ -121,16 +132,13 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             push @splitted_sorted, $d;
         }
 
+        my $showlegend = @split_legend->intersect( $data->names )->length > 0;
         return @splitted_sorted->map(
             sub {
                 my ($d) = @_;
 
-                my $trace = $class_geom_impl->to_trace($d, $params, $plot);
-
-                # If we need a legend, set legend info.
-                my $show_legend =
-                  @split_legend->intersect( $data->names )->length;
-                if ($show_legend) {
+                my $traces = $class_geom_impl->to_traces($d, $params, $plot);
+                for my $trace (@$traces) {
                     my $legend_key = join(
                         ', ',
                         map {
@@ -143,11 +151,16 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
                             }
                         } @split_legend
                     );
-                    $trace->{showlegend} = JSON::true;
-                    $trace->{name}       = $legend_key;
+                    $trace->name($legend_key);
+
+                    # some types like heatmap may not have below methods
+                    if ( $trace->can('showlegend') ) {
+                        $trace->legendgroup($legend_key);
+                        $trace->showlegend($showlegend);
+                    }
                 }
-                return $trace;
-            } 
+                return @$traces;
+            }
         );
     };
 
@@ -159,8 +172,8 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
             my ( $panel_id, $panel_data ) = ( $a, $b );
 
             my $panel_prestats_data = $splitted_prestats_data->{$panel_id};
-            $panel_to_traces->(
-                $class_geom_impl->to_basic(
+            my $traces = $panel_to_traces->(
+                $class_geom_impl->prepare_data(
                     $panel_data, $panel_prestats_data, $layout,
                     $params,     $plot
                 ),
@@ -171,6 +184,61 @@ method layer_to_traces ($layer, $data, $prestats_data, $layout, $plot) {
     ];
 }
 
+
+# create a hidden trace only for displaying colorbar
+method _colorbar_to_trace ($guide) {
+    load Chart::Plotly::Trace::Scatter;
+    load Chart::Plotly::Trace::Scatter::Marker;
+    load Chart::Plotly::Trace::Scatter::Marker::Colorbar;
+    load Chart::Plotly::Trace::Scatter::Marker::Colorbar::Title;
+
+    # do everything on a 0-1 scale
+
+    my $rng = pdl($guide->bar->at('value')->minmax);
+    my @colorscale_color = to_rgb( $guide->bar->at('color') )->list;
+    my @colorscale_value =
+      rescale( $guide->bar->at('value'), pdl( [ 0, 1 ] ), $rng )->list;
+    my @colorscale = (
+        pairwise { [ $a, $b ] }
+        @colorscale_value, @colorscale_color
+    );
+    my $ticktext = $guide->key->at('label')->unpdl;
+    my $tickvals =
+      rescale( $guide->key->at('value'), pdl( [ 0, 1 ] ), $rng )->unpdl;
+
+    my $marker = Chart::Plotly::Trace::Scatter::Marker->new(
+        color      => [ 0, 1 ],
+        colorscale => \@colorscale,
+        colorbar   => Chart::Plotly::Trace::Scatter::Marker::Colorbar->new(
+            title =>
+              Chart::Plotly::Trace::Scatter::Marker::Colorbar::Title->new(
+                text => $guide->title,
+                side => 'top'
+              ),
+            # R's default is 1.2 "lines" for "legend.key.size".
+            # We don't support the grid unit system now (maybe in future
+            # we can develop it on Graphics::Grid::Unit), now we just
+            # leave it be for plotly to use its default.
+            #thickness => 30,
+            tickmode => 'array',
+            ticktext => $ticktext,
+            tickvals => $tickvals,
+            ticklen  => 2,
+            len      => 0.5,
+        ),
+    );
+
+    return Chart::Plotly::Trace::Scatter->new(
+        x          => [0],
+        y          => [0],
+        type       => 'scatter',
+        mode       => 'markers',
+        opacity    => 0,
+        hoverinfo  => 'none',
+        showlegend => 0,
+        marker     => $marker,
+    );
+}
 
 method _to_plotly ($plot_built) {
     my $plot   = $plot_built->plot;
@@ -325,7 +393,9 @@ method _to_plotly ($plot_built) {
                 ) ? ( showgrid => JSON::false, )
                 : (
                     gridcolor => to_rgb( $el_panel_grid->at('color') ),
-                    gridwidth => to_rgb( $el_panel_grid->at('size') ),
+
+                    # FIXME: fix this and use cex_to_px()
+                    gridwidth => $el_panel_grid->at('size'),
                 )
             ),
         };
@@ -340,6 +410,18 @@ method _to_plotly ($plot_built) {
         }
     } # for (qw(x y))
 
+    # guides
+    my $gdefs = $plot->guides->build(
+        $plot->scales,
+        labels          => $plot->labels,
+        layers          => $layers,
+        default_mapping => $plot->mapping
+    );
+
+    # if $gdefs is empty, then no legend is displayed.
+    my $global_showlegend = !!@$gdefs;
+
+    my %seen_legendgroup;
     for my $i ( 0 .. $#$layers ) {
         my $layer = $layers->[$i];
         my $data  = $plot_built->layer_data($i);
@@ -347,29 +429,46 @@ method _to_plotly ($plot_built) {
 
         $log->debug( "data at layer $i:\n" . $data->string ) if $log->is_debug;
 
-        my $panels_traces =
+        my $traces =
           $self->layer_to_traces( $layer, $data, $prestats_data,
             $layout, $plot );
-        for my $panel (@$panels_traces) {
+
+        for my $panel (@$traces) {
             for my $trace (@$panel) {
+                if ( $trace->can('showlegend') ) {
+                    if ( not $global_showlegend ) {
+                        $trace->showlegend(0);
+                    }
+                    elsif ( $seen_legendgroup{ $trace->legendgroup }++ ) {
+
+                        # for traces of same legend group, show legend for
+                        # only the first one of them.
+                        $trace->showlegend(0);
+                    }
+                }
+
                 $plotly->add_trace($trace);
             }
 
-            if ( List::AllUtils::any { $_->showlegend } @$panel ) {
+            if ( List::AllUtils::any { $_->$_call_if_can('showlegend') }
+                @$panel )
+            {
                 $plotly_layout{showlegend} = JSON::true;
 
                 # legend title
                 #
                 # TODO: See if plotly will officially support legend title
                 #  https://github.com/plotly/plotly.js/issues/276
+                my $br = br();
                 my $legend_titles =
-                  join( "\n", map { $_->title } @{ $plot->guides->guides } );
+                  join( $br, map { $_->title =~ s/\n/$br/gr; } @$gdefs );
 
                 my $annotations = $plotly_layout{annotations} //= [];
                 push @$annotations,
                   {
                     x         => 1.02,
                     y         => 1,
+                    align     => 'left',
                     xanchor   => 'left',
                     yanchor   => 'bottom',
                     text      => $legend_titles,
@@ -387,6 +486,11 @@ method _to_plotly ($plot_built) {
             }
         }
     }
+
+    # Above operations already ensures for each legend group there be only
+    #  one legend item. So there is no need to keep legendgroup gap, then
+    #  it looks better to me compared with having the default gap.
+    $plotly_layout{legend} = { tracegroupgap => 0 };
 
     $plotly_layout{hovermode} = 'closest';
     $plotly_layout{barmode} = $barmode // 'relative';
@@ -411,6 +515,18 @@ method _to_plotly ($plot_built) {
                 y1   => 1,
             }
         ];
+    }
+
+    if ( $theme->at('legend_position') eq 'none' ) {
+        $plotly_layout{showlegend} = JSON::false;
+    }
+
+    # colorbar
+    my ($colorbar) =
+      grep { $_->$_DOES('Chart::GGPlot::Guide::Colorbar') } @$gdefs;
+    if ($colorbar) {
+        my $colorbar_trace = $self->_colorbar_to_trace($colorbar);
+        $plotly->add_trace($colorbar_trace);
     }
 
     $log->debug( "plotly layout : " . Dumper( \%plotly_layout ) )
@@ -471,7 +587,7 @@ Chart::GGPlot::Backend::Plotly - Plotly backend for Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

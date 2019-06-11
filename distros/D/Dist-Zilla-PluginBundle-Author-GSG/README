@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.0.7
+    version 0.0.9
 
 SYNOPSIS
 
@@ -213,8 +213,7 @@ Setting up a new dist
 
       You should probably use a token instead of your password, which you
       can get by following GitHub's instructions
-      <https://help.github.com/en/articles/creating-a-personal-access-token
-      -for-the-command-line>.
+      <https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line>.
 
           git config --global github.user  github_login_name
           git config --global github.token token_from_instructions_above

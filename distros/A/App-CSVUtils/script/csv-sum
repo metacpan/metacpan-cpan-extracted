@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_sum
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-05-21'; # DATE
+our $DATE = '2019-06-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-sum - Output a summary row which are arithmetic sums of data rows
 
 =head1 VERSION
 
-This document describes version 0.022 of csv-sum (from Perl distribution App-CSVUtils), released on 2019-05-21.
+This document describes version 0.023 of csv-sum (from Perl distribution App-CSVUtils), released on 2019-06-06.
 
 =head1 SYNOPSIS
 
@@ -59,8 +59,11 @@ Input CSV file.
 
 =item B<--no-header>
 
-When you declare that CSV does not have header row (`--no-header`), the fields
-will be named `field1`, `field2`, and so on.
+By default (`--header`), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (`--no-header`), the first row of the CSV is
+assumed to contain the first data row. Fields will be named `field1`, `field2`,
+and so on.
 
 
 =item B<--tsv>

@@ -1,13 +1,16 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'author' => [
       'Dominique Dumont'
@@ -22,15 +25,26 @@ to specify port forwarding in a ssh configuration.',
       {
         'description' => 'Specify if the forward is specified iwth IPv6 or IPv4',
         'type' => 'leaf',
-        'value_type' => 'boolean'
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'bind_address',
       {
-        'description' => 'Specify the address that the port will listen to. By default, only connections coming from localhost (127.0.0.1) will be forwarded.
+        'description' => 'Specify the address that the port will listen to. By
+default, only connections coming from localhost (127.0.0.1)
+will be forwarded.
 
-By default, the local port is bound in accordance with the GatewayPorts setting. However, an explicit bind_address may be used to bind the connection to a specific address.
+By default, the local port is bound in accordance with the
+GatewayPorts setting. However, an explicit bind_address may
+be used to bind the connection to a specific address.
 
-The bind_address of \'localhost\' indicates that the listening port be bound for local use only, while an empty address or \'*\' indicates that the port should be available from all interfaces.',
+The bind_address of \'localhost\' indicates that the listening
+port be bound for local use only, while an empty address or
+\'*\' indicates that the port should be available from all
+interfaces.',
         'summary' => 'bind address to listen to',
         'type' => 'leaf',
         'value_type' => 'uniline'

@@ -1,5 +1,8 @@
 Revision history for LWP-ConsoleLogger
 
+0.000040  2019-06-11 01:22:03Z
+    - Add support for Mojo::UserAgent (GH#14) (Gregory Oschwald)
+
 0.000039  2018-08-01 19:40:39Z
     - (temporarily?) skip XML parsing test under newer versions of Data::Printer
 

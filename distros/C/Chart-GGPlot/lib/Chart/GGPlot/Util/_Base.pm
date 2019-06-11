@@ -4,7 +4,7 @@ package Chart::GGPlot::Util::_Base;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Data::Frame::Util qw(:all);
 use PDL::Ufunc qw(qsorti);
@@ -46,7 +46,9 @@ fun seq_n ( $from, $to, $n ) {
     return pdl( [$from] ) if ( $n == 1 );
 
     my $by = ( $to - $from ) / ( $n - 1 );
-    return seq_by( $from, $to, $by );
+    my $s = seq_by( $from, $to, $by );
+    $s->set(-1, $to);   # avoid float epsilon issues
+    return $s;
 }
 
 fun is_na ($p) { $p->isbad; }
@@ -71,6 +73,7 @@ fun is_null ($p) {
 
 fun sign ($p) { $p <=> 0; }
 
+
 fun match (Piddle $a, Piddle $b) {
     my $is_string =
       List::AllUtils::any { $_->$_DOES('PDL::SV') or $_->type eq 'byte' }
@@ -90,14 +93,11 @@ fun match (Piddle $a, Piddle $b) {
         else {
             my $sorted_idx = $b->qsorti;
             my $sorted     = $b->slice($sorted_idx);
-            my $match      = $a->vsearch_match($sorted);
-            my $rslt       = [ 0 .. $a->length - 1 ]->map(
-                sub {
-                    my $idx = $match->at($_);
-                    $idx < 0 ? -1 : $sorted_idx->at($idx);
-                }
-            );
-            return pdl($rslt)->setvaltobad(-1);
+            $sorted = $sorted->where( $sorted->isgood ) if $sorted->badflag;
+            my $match = $a->vsearch_match($sorted);
+            my $idx   = $match->slice( pdl( [ 0 .. $a->length - 1 ] ) );
+            $idx = $idx->setbadif($idx < 0) if $idx->badflag;
+            return $sorted_idx->slice($idx);
         }
     }
 }
@@ -119,7 +119,16 @@ Chart::GGPlot::Util::_Base - R 'base' package functions used by Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 FUNCTIONS
+
+=head2 match
+
+    match(Piddle $a, $Piddle $b)
+
+Returns a vector of the positions of (first) matches of its first argument
+in its second.
 
 =head1 AUTHOR
 

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MediaInfo/media_is_landscape
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-01-28'; # DATE
+our $DATE = '2019-06-09'; # DATE
 our $DIST = 'App-MediaInfo'; # DIST
-our $VERSION = '0.120'; # VERSION
+our $VERSION = '0.123'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,13 +39,19 @@ media-is-landscape - Return exit code 0 if media is landscape
 
 =head1 VERSION
 
-This document describes version 0.120 of media-is-landscape (from Perl distribution App-MediaInfo), released on 2019-01-28.
+This document describes version 0.123 of media-is-landscape (from Perl distribution App-MediaInfo), released on 2019-06-09.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % media-is-landscape [options] <media>
+
+Examples:
+
+Convert all landscape mkv videos to mp4:
+
+ % for f in *.mkv;do media-is-landscape -q "$f" && ffmpeg -i "$f" "$f.mp4"; done
 
 =head1 DESCRIPTION
 
@@ -67,6 +73,10 @@ Choose a specific backend.
 =item B<--media>=I<filename>*
 
 Media file/URL.
+
+=item B<--quiet-arg>, B<--silent>, B<-q>
+
+Don't output anything on command-line, just return appropriate exit code.
 
 =back
 

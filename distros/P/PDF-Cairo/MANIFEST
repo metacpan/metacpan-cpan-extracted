@@ -1,4 +1,8 @@
 Changes
+bin/macos2fc.pl
+data/Karla-Italic.ttf
+data/Karla-Regular.ttf
+data/icons.ttf
 data/layout1.txt
 data/layout2.txt
 data/layout3.txt
@@ -34,5 +38,8 @@ MANIFEST			This list of files
 README
 README.md
 t/00-load.t
+t/01-box.t
+t/02-cairo.t
+t/02-cairo.pdf
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

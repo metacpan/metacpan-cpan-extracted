@@ -4,7 +4,7 @@ use FindBin qw($Bin);
 use Test::More tests => 2;
 
 use_ok 'FASTX::Reader';
-my $seq = "$Bin/../scripts/test.fastq";
+my $seq = "$Bin/../data/test.fastq";
 #SKIP if seq not found
 SKIP: {
     skip "$seq not found\n", 1 if (! -e "$seq");

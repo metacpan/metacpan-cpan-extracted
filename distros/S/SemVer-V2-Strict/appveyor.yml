@@ -1,17 +1,27 @@
+environment:
+  matrix:
+    - perl_version: 5.20.3.3
+    - perl_version: 5.22.3.1
+    - perl_version: 5.24.4.1
+    - perl_version: 5.26.2.1
+    - perl_version: 5.28.2.1
+    - perl_version: 5.30.0.1
+    
 init:
-  - git config --global core.autocrlf input
+  - git config --global core.autocrlf false
 
 install:
-  - ps: Invoke-WebRequest -Uri http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.msi -OutFile strawberry-perl-5.26.0.1-64bit.msi
-  - ps: Start-Process msiexec.exe -ArgumentList @("/package", "strawberry-perl-5.26.0.1-64bit.msi", "/qn", "INSTALLDIR=C:\strawberry") -Wait
+  - ps: Invoke-WebRequest -Uri http://strawberryperl.com/download/$env:perl_version/strawberry-perl-$env:perl_version-64bit.msi -OutFile strawberry-perl.msi
+  - ps: Start-Process msiexec.exe -ArgumentList @("/package", "strawberry-perl.msi", "/qn", "INSTALLDIR=C:\strawberry") -Wait
   - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
-  - cpanm --notest --quiet Carton
-  - carton install --without develop
+  - appveyor-retry cpanm --notest --quiet Module::Build::XSUtil
+  - appveyor-retry cpanm --notest --quiet Carton
+  - appveyor-retry carton install --without develop
 
 build: off
 
 test_script:
-  - carton exec prove --norc --rc=.proverc -r t xt
+  - appveyor-retry carton exec prove --norc --rc=.proverc -r t xt
 
 cache:
   - local

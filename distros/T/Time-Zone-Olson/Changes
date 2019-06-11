@@ -1,5 +1,8 @@
 Revision history for Time-Zone-Olson
 
+0.25   Tue Jun 11 19:58:00 2019
+       Fixing Win32 encoding.  Clearing old cached timezone values after a timezone is changed.
+
 0.24   Fri Jun 07 19:58:00 2019
        Adding cygwin, dragonfly support.
 

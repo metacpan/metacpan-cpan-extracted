@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pine/p5-SemVer-V2-Strict.svg?branch=master)](https://travis-ci.org/pine/p5-SemVer-V2-Strict) [![Build Status](https://img.shields.io/appveyor/ci/pine/p5-SemVer-V2-Strict/master.svg)](https://ci.appveyor.com/project/pine/p5-SemVer-V2-Strict/branch/master) [![Coverage Status](http://codecov.io/github/pine/p5-SemVer-V2-Strict/coverage.svg?branch=master)](https://codecov.io/github/pine/p5-SemVer-V2-Strict?branch=master)
+[![Build Status](https://travis-ci.org/pine/p5-SemVer-V2-Strict.svg?branch=master)](https://travis-ci.org/pine/p5-SemVer-V2-Strict) [![Build Status](https://img.shields.io/appveyor/ci/pine/p5-SemVer-V2-Strict/master.svg?logo=appveyor)](https://ci.appveyor.com/project/pine/p5-SemVer-V2-Strict/branch/master) [![Coverage Status](http://codecov.io/github/pine/p5-SemVer-V2-Strict/coverage.svg?branch=master)](https://codecov.io/github/pine/p5-SemVer-V2-Strict?branch=master)
 # NAME
 
 SemVer::V2::Strict - Semantic version v2.0 object for Perl
@@ -88,7 +88,7 @@ Convert a `SemVer::V2::Strict` instance to string.
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2017 Pine Mizune
+Copyright (c) 2015-2019 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

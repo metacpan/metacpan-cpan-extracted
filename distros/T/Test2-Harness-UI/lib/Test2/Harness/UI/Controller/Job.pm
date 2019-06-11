@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -37,7 +37,7 @@ sub handle {
 
     $self->{+TITLE} = 'Job: ' . ($job->file || $job->name) . ' - ' . $job->job_id;
 
-    my $ct = lc($req->parameters->{'Content-Type'} || $req->parameters->{'content-type'} || 'text/html');
+    my $ct = lc($req->parameters->{'Content-Type'} || $req->parameters->{'content-type'} || 'text/html; charset=utf-8');
 
     if ($ct eq 'application/json') {
         $res->content_type($ct);

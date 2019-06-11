@@ -1,0 +1,267 @@
+# PODNAME: Config::Model::models::Dpkg
+# ABSTRACT:  Configuration class Dpkg
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Dpkg - Configuration class Dpkg
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+Model of Debian source package files (e.g debian/control, debian/copyright...)
+
+=head1 Elements
+
+=head2 my_config
+
+This element contains a set of parameters to tune the behavior of this dpkg editor. You can for instance specify e-mail replacements. These parameters are stored in ~/.dpkg-meta.yml or ~/.local/share/.dpkg-meta.yml. These parameters can be applied to all Debian packages you maintain in this unix account. I< Optional. Type node of class L<Dpkg::Meta|Config::Model::models::Dpkg::Meta> .  > 
+
+=head2 compat
+
+compat file defines the debhelper compatibility level. I< Optional. Type integer.  > 
+
+=head2 control
+
+Package control file. Specifies the most vital (and version-independent) information about the source package and about the binary packages it creates. I< Optional. Type node of class L<Dpkg::Control|Config::Model::models::Dpkg::Control> .  > 
+
+=head2 rules - package build rules
+
+debian/rules is a makefile containing all instructions required to build a debian package. I< Optional. Type string.  > 
+
+=over 4
+
+=item default value :
+
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#DH_VERBOSE = 1
+
+# see EXAMPLES in dpkg-buildflags(1) and read /usr/share/dpkg/*
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+# main packaging script based on dh7 syntax
+%:
+	dh $@
+
+=back
+
+
+
+=head2 changelog
+
+Dummy changelog entry with a dummy date.
+Don't forget to change the version
+number. Use L<dch> command to update. I< Optional. Type string.  > 
+
+Note: changelog is computed with 
+
+ $pkg_name (0.001-1) UNRELEASED; urgency=medium
+ 
+   * ...
+ 
+  -- $name <$mail>  Wed, 18 Jan 2017 18:28:23 +0100
+
+
+and with: 
+
+=over
+
+=item *
+
+C<$mail> => C<! my_config email>
+
+=item *
+
+C<$name> => C<! my_config fullname>
+
+=item *
+
+C<$pkg_name> => C<! control source Source>
+
+=back
+
+
+
+=head2 scan-copyright-patterns
+
+This parameter is used by "cme update dpkg-copyright". This command scans all source files to get copyright and license information. By default, the decision whether to scan a file or not is left to licensecheck. You can override this behavior using this parameter.
+
+See L<Dpkg::Copyright::Scanner/"electing or ignoring files to scan"> for more details. I< Optional. Type node of class L<Dpkg::Copyright::ScanPatterns|Config::Model::models::Dpkg::Copyright::ScanPatterns> .  > 
+
+=head2 fill-copyright-blanks - Provides missing copyright info for cme update
+
+This parameter is used by "cme update dpkg-copyright command".
+
+Sometimes, upstream coders are not perfect: some source files cannot be parsed correctly or some legal information is missing. A file without copyright and license information is skipped. On the other hand, a file with either copyright or license missing will be used. Unfortunately, this will prevent a correct grouping and merging of copyright entries. Instead of patching upstream source files to fill the blank, you can specify the missing information in a special file. I< Optional. Type node of class L<Dpkg::Copyright::FillBlanks|Config::Model::models::Dpkg::Copyright::FillBlanks> .  > 
+
+=head2 fix.scanned.copyright
+
+Instructions to alter or set specific copyright entries in
+"debian/fix.scanned.copyright" file. Each line of this file
+follows the syntax described in L<Config::Model::Loader>
+to modify copyright information.
+
+See L<Config::Model::Dpkg::Copyright/"Tweak copyright entries"> for more
+details. I< Optional. Type string.  > 
+
+=head2 copyright - copyright and license information
+
+copyright and license information of all files contained in this package. I< Optional. Type node of class L<Dpkg::Copyright|Config::Model::models::Dpkg::Copyright> .  > 
+
+=head2 install
+
+List the files to install into each package and the directory they should be installed to. I< Optional. Type hash of node of class L<Dpkg::Install|Config::Model::models::Dpkg::Install> .  > 
+
+=head2 not-installed
+
+List the files that are deliberately not installed in any binary package. Paths listed in this file are (only) ignored by the check done via --list-missing (or --fail-missing). However, it is not a method to exclude files from being installed. Please use --exclude for that.
+
+Please keep in mind that dh_install will not expand wildcards in this file.
+I< Optional. Type list of uniline.  > 
+
+=head2 source
+
+I< Optional. Type node of class L<Dpkg::Source|Config::Model::models::Dpkg::Source> .  > 
+
+=head2 clean - list of files to clean
+
+list of files to remove when dh_clean is run. Files names can include wild cards. For instance:
+
+ build.log
+ Makefile.in
+ */Makefile.in
+ */*/Makefile.in
+
+I< Optional. Type list of uniline.  > 
+
+=head2 bugfiles
+
+I< Optional. Type hash of node of class L<Dpkg::BugFiles|Config::Model::models::Dpkg::BugFiles> .  > 
+
+=head2 package-scripts
+
+I< Optional. Type hash of node of class L<Dpkg::PackageScripts|Config::Model::models::Dpkg::PackageScripts> .  > 
+
+=head2 patches - Debian patches applied to original sources
+
+Series of patches applied by Debian. Note that you cannot change the order of patches in the series. Use L<quilt> for this task. Comments in series file are skipped and not shown in annotation. I< Optional. Type hash of node of class L<Dpkg::Patch|Config::Model::models::Dpkg::Patch> .  > 
+
+=head2 dirs - Extra directories
+
+This file specifies any directories which we need but which are not created by the normal installation procedure (make install DESTDIR=... invoked by dh_auto_install). This generally means there is a problem with the Makefile.
+
+Files listed in an install file don't need their directories created first. 
+
+It is best to try to run the installation first and only use this if you run into trouble. There is no preceding slash on the directory names listed in the dirs file. I< Optional. Type list of uniline.  > 
+
+=head2 docs
+
+This file specifies the file names of documentation files we can have dh_installdocs(1) install into the temporary directory for us.
+
+By default, it will include all existing files in the top-level source directory that are called BUGS, README*, TODO etc. I< Optional. Type list of uniline.  > 
+
+=head2 watch
+
+watch file used by L<uscan> to monitor upstream sources. I< Optional. Type string.  > 
+
+=head2 tests
+
+Debian CI test suite specification. See L<README.package-tests.rst|https://salsa.debian.org/ci-team/autopkgtest/blob/master/doc/README.package-tests.rst> for more details. I< Optional. Type warped_node of class L<Dpkg::Tests|Config::Model::models::Dpkg::Tests> .  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Dpkg::BugFiles>
+
+=item *
+
+L<Config::Model::models::Dpkg::Control>
+
+=item *
+
+L<Config::Model::models::Dpkg::Copyright>
+
+=item *
+
+L<Config::Model::models::Dpkg::Copyright::FillBlanks>
+
+=item *
+
+L<Config::Model::models::Dpkg::Copyright::ScanPatterns>
+
+=item *
+
+L<Config::Model::models::Dpkg::Install>
+
+=item *
+
+L<Config::Model::models::Dpkg::Meta>
+
+=item *
+
+L<Config::Model::models::Dpkg::PackageScripts>
+
+=item *
+
+L<Config::Model::models::Dpkg::Patch>
+
+=item *
+
+L<Config::Model::models::Dpkg::Source>
+
+=item *
+
+L<Config::Model::models::Dpkg::Tests>
+
+=back
+
+=head1 AUTHOR
+
+=over
+
+=item Dominique Dumont
+
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item 2010-2015 Dominique Dumont
+
+
+=back
+
+=head1 LICENSE
+
+=over
+
+=item LGPL2
+
+
+=back
+
+=cut
+

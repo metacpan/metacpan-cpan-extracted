@@ -2,7 +2,7 @@ package Pcore::Handle::DBI;
 
 use Pcore -role, -const;
 use Pcore::Handle::DBI::STH;
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref is_blessed_hashref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref is_blessed_hashref is_plain_arrayref];
 
 with qw[Pcore::Handle::Base];
 
@@ -26,7 +26,15 @@ sub add_schema_patch ( $self, $id, $query ) {
 }
 
 sub upgrade_schema ( $self ) {
-    my ( $dbh, $res ) = $self->begin_work;
+    my ( $res, $dbh ) = $self->get_dbh;
+
+    # unable to get dbh
+    die $res if !$res;
+
+    $res = $dbh->begin_work;
+
+    # unable to start transaction
+    die $res if !$res;
 
     my $on_finish = sub {
         delete $self->{_schema_patch};
@@ -135,6 +143,31 @@ sub query_to_string ( $self, $query ) {
     $sql =~ s/\$(\d+)/$self->quote($bind->[$1 - 1])/smge;
 
     return $sql;
+}
+
+sub prepare ( $self, $query ) {
+    my $bind;
+
+    if ( is_plain_arrayref $query) {
+        ( $query, $bind ) = $self->prepare_query($query);
+    }
+    else {
+        # convert "?" placeholders to postgres "$1" style
+        my $i;
+
+        $query =~ s/[?]/'$' . ++$i/smge;
+    }
+
+    utf8::encode $query if utf8::is_utf8 $query;
+
+    my $sth = Pcore::Handle::DBI::STH->new( query => $query );
+
+    if (wantarray) {
+        return $sth, $bind;
+    }
+    else {
+        return $sth;
+    }
 }
 
 1;

@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 3.0.10
+version 3.0.11
 
 =head1 DESCRIPTION
 
@@ -205,6 +205,8 @@ Predefined actions are available for rules and symbols. Please refer the API doc
 
 The C<symbol-action> adverb is how a match within a sub-grammar is transfered.
 
+=item Meta actions
+
 =over
 
 =item C<::undef>
@@ -250,6 +252,36 @@ Alias for C<::copy[0]>.
 Copies the single RHS number value. This action guarantees that the nature of the RHS value is unchanged.
 
 Meaningful only for symbol actions, and is the B<default symbol action>.
+
+=item C<::true>
+
+Creates a value of type BOOL, containing a true value.
+
+Meaningful for both rule and symbol actions.
+
+=item C<::false>
+
+Creates a value of type BOOL, containing a false value.
+
+Meaningful for both rule and symbol actions.
+
+=item C<::json>
+
+Creates a value of type STRING in the UTF-8 encoding, containing a JSON string as per original JSON specification, i.e. it is using UTF-16 surrogates to describe characters above 0xFFFF.
+
+Meaningful for both rule and symbol actions.
+
+=item C<::row>
+
+Creates a value of type ROW, that contains all RHS's values.
+
+Meaningful only for rule actions.
+
+=item C<::table>
+
+Creates a value of type TABLE, that contains all RHS's values. The number of RHS must be odd.
+
+Meaningful only for rule actions.
 
 =back
 

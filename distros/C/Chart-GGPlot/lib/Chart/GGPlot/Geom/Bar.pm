@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 extends qw(Chart::GGPlot::Geom::Rect);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
@@ -20,39 +20,40 @@ has '+non_missing_aes' => ( default => sub { [qw(xmin xmax ymin ymax)] } );
 classmethod required_aes() { [qw(x y)] }
 classmethod extra_params() { [qw(na_rm width)] }
 
-my $geom_bar_pod = layer_func_pod(<<'=cut');
+my $geom_bar_pod = layer_func_pod(<<'EOT');
 
-    geom_bar(:$mapping=undef, :$data=undef, :$stat='count',
-             :$position='stack', :$width=undef,
-             :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
-             %rest)
+        geom_bar(:$mapping=undef, :$data=undef, :$stat='count',
+                 :$position='stack', :$width=undef,
+                 :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
+                 %rest)
 
-The "bar" geom makes the height bar proportional to the number of cases in each group (or if the C<weight> aesthetic is supplied, the sum of the
-C<weights>). 
-It uses C<stat_count()> by default: it counts the number of cases at each x
-position. 
+    The "bar" geom makes the height bar proportional to the number of cases
+    in each group (or if the C<weight> aesthetic is supplied, the sum of the
+    C<weights>). 
+    It uses C<stat_count()> by default: it counts the number of cases at
+    each x position. 
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=item * $width
+    =item * $width
 
-Bar width. By default, set to 90% of the resolution of the data.
+    Bar width. By default, set to 90% of the resolution of the data.
 
-=back
+    =back
 
-See also L<Chart::GGPlot::Stat::Functions/stat_count>.
+    See also L<Chart::GGPlot::Stat::Functions/stat_count>.
 
-=cut
+EOT
 
 my $geom_bar_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'count', :$position = 'stack',
         :$width = undef, :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(
@@ -71,47 +72,47 @@ my $geom_bar_code = fun (
     );
 };
 
-my $geom_histogram_pod = layer_func_pod(<<'=cut');
+my $geom_histogram_pod = layer_func_pod(<<'EOT');
 
-    geom_histogram(:$mapping=undef, :$data=undef, :$stat="bin",
-                   :$position="stack", :$binwidth=undef, :$bins=undef,
-                   :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
-                   %rest)
+        geom_histogram(:$mapping=undef, :$data=undef, :$stat="bin",
+                       :$position="stack", :$binwidth=undef, :$bins=undef,
+                       :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
+                       %rest)
 
-Visualise the distribution of a single continuous variable by dividing the 
-x axis into bins and counting the number of observations in each bin.
-This "histogram" geom displays the counts with bars.
+    Visualise the distribution of a single continuous variable by dividing
+    the x axis into bins and counting the number of observations in each
+    bin. This "histogram" geom displays the counts with bars.
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=item * $binwidth
+    =item * $binwidth
 
-The width of the bins.
-Can be specified as a numeric value, or a function that calculates width
-from x. The default is to use C<$bins> bins that cover the range of the
-data.
+    The width of the bins.
+    Can be specified as a numeric value, or a function that calculates width
+    from x. The default is to use C<$bins> bins that cover the range of the
+    data.
 
-=item * $bins
+    =item * $bins
 
-Number of bins. Overridden by C<$binwidth>. Defaults to 30.
+    Number of bins. Overridden by C<$binwidth>. Defaults to 30.
 
-You should always override this C<$bins> or C<$binwidth>, exploring
-multiple widths to find the best to illustrate the stories in your data.
+    You should always override this C<$bins> or C<$binwidth>, exploring
+    multiple widths to find the best to illustrate the stories in your data.
 
-=back
+    =back
 
-See also L<Chart::GGPlot::Stat::Functions/stat_bin>.
+    See also L<Chart::GGPlot::Stat::Functions/stat_bin>.
 
-=cut
+EOT
 
 my $geom_histogram_code = fun (
         :$data = undef, :$mapping = undef,
         :$stat = "bin", :$position = "stack",
         :$binwidth = undef, :$bins = undef,
         :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(
@@ -178,7 +179,7 @@ Chart::GGPlot::Geom::Bar - Class for bar geom
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

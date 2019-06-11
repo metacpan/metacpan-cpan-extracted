@@ -1,5 +1,8 @@
 Revision history for FCGI-Buffer
 
+0.14	Mon 10 Jun 14:18:31 EDT 2019
+	Untaint the language part of the save_to directory
+
 0.13	Sat Feb 23 20:17:41 EST 2019
 	Fix copy and paste error
 

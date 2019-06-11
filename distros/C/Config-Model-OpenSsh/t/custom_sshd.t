@@ -9,6 +9,8 @@ use Path::Tiny;
 use warnings;
 use strict;
 
+$::_use_log4perl_to_warn = 1;
+
 my ($model, $trace) = init_test();
 
 # pseudo root where config files are written by config-model
@@ -39,10 +41,9 @@ my $root = $inst -> config_root ;
 my $dump =  $root->dump_tree ();
 print "First $wr_dir1 dump:\n",$dump if $trace ;
 
-#like($dump,qr/Match:0/, "check Match section") if $testdir =~ /match/;
-
 $root -> load("Port=2222") ;
 
+my $new_dump = $root->dump_tree();
 
 $inst->write_back() ;
 ok(1,"wrote data in $wr_dir1") ;
@@ -68,9 +69,7 @@ my $root2 = $inst2 -> config_root ;
 my $dump2 = $root2 -> dump_tree ();
 print "Second $wr_dir2 dump:",$dump2 if $trace ;
 
-my @mod = split /\n/,$dump ;
-$mod[17] =~ s/221/2222/;
-is_deeply([split /\n/,$dump2],\@mod, "check if both dumps are consistent") ;
+is_deeply([split /\n/,$dump2],[split /\n/, $new_dump], "check if both dumps are consistent") ;
 
 done_testing;
 

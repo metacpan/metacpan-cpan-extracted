@@ -123,6 +123,9 @@ $schema->txn_do( sub {
         name     => "bar"
     }, 'Correct delete details';
 
+    $artist = $schema->resultset('Artist')->create( { name => 'foo' } );
+    isnt $artist->id, $artist_id, "Got a new ID for a replaced object";
+
     $schema->txn_rollback;
 } );
 

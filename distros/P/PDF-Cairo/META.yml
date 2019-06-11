@@ -4,6 +4,8 @@ author:
   - 'J Greely <jgreely@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Compare: '0'
+  File::Temp: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -25,5 +27,7 @@ requires:
   Module::Path: '0.19'
   Pango: '1.227'
   perl: '5.016'
-version: '1.03'
+resources:
+  repository: https://github.com/jgreely/PDF-Cairo.git
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

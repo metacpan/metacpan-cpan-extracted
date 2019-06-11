@@ -1,5 +1,5 @@
 package Search::QS::Filter;
-$Search::QS::Filter::VERSION = '0.02';
+$Search::QS::Filter::VERSION = '0.04';
 use v5.14;
 use Moose;
 
@@ -109,7 +109,7 @@ Search::QS::Filter - Incapsulation of a single filter element
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -128,8 +128,8 @@ search element in an SQL string. Like
 
   fullname = "Joe"
 
-it has a fied L</"name__"> "fullname", an L</"operator__"> "=" and a
-L</"value__"> "Joe".
+it has a fied L</"name()"> "fullname", an L</"operator()"> "=" and a
+L</"value()"> "Joe".
 
 =head1 METHODS
 
@@ -184,7 +184,7 @@ is traslated in
 
 =head2 orGroup()
 
-Like L</"andGroup__"> but for OR operator
+Like L</"andGroup()"> but for OR operator
 
 =head2 parse($perl_struct)
 

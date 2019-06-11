@@ -1,7 +1,7 @@
 package HTTP::Tiny::Patch::LogGer;
 
-our $DATE = '2019-04-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-06-09'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -139,7 +139,7 @@ HTTP::Tiny::Patch::LogGer - Log HTTP::Tiny with Log::ger
 
 =head1 VERSION
 
-This document describes version 0.002 of HTTP::Tiny::Patch::LogGer (from Perl distribution HTTP-Tiny-Patch-LogGer), released on 2019-04-21.
+This document describes version 0.003 of HTTP::Tiny::Patch::LogGer (from Perl distribution HTTP-Tiny-Patch-LogGer), released on 2019-06-09.
 
 =head1 SYNOPSIS
 

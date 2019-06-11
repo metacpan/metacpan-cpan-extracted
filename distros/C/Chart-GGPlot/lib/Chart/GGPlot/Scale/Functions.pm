@@ -4,7 +4,7 @@ package Chart::GGPlot::Scale::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils qw(pairgrep);
 use Module::Load;
@@ -416,7 +416,7 @@ fun _scale_viridis_c ($aes) {
 *scale_fill_viridis_c  = _scale_viridis_c('fill');
 
 
-fun scale_color_continuous ( : $type = "gradient", %rest ) {
+fun scale_color_continuous (:$type = "gradient", %rest) {
     state $switch = {
         gradient => \&scale_color_gradient,
         viridis  => \&scale_color_viridis_c,
@@ -427,7 +427,7 @@ fun scale_color_continuous ( : $type = "gradient", %rest ) {
     die("Unknown scale type");
 }
 
-fun scale_fill_continuous ( : $type = "gradient", %rest ) {
+fun scale_fill_continuous (:$type = "gradient", %rest) {
     state $switch = {
         gradient => \&scale_fill_gradient,
         viridis  => \&scale_fill_viridis_c,
@@ -751,7 +751,7 @@ Chart::GGPlot::Scale::Functions - Scale functions
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 FUNCTIONS
 

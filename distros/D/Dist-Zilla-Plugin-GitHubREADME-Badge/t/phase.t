@@ -5,7 +5,8 @@ use warnings;
 use lib 't/lib';
 use TestBadges;
 
-my $badges = qr/(\[[^\n]+\n)+/;
+my $nl = qr/(?:\r\n|\r|\n)/;
+my $badges = qr/(\[[^\r\n]+${nl})+/;
 
 subtest 'after build' => sub {
   my $test = build_dist({}, {
@@ -14,7 +15,7 @@ subtest 'after build' => sub {
   });
 
   like $test->{readme}->slurp_raw,
-    qr/$badges\n+build\n+readme\n+build/m,
+    qr/$badges${nl}+build${nl}+readme${nl}+build/m,
     'badges added after build';
 
   unlike $test->{readme}->slurp_raw, qr/release/, 'not yet released';
@@ -22,7 +23,7 @@ subtest 'after build' => sub {
   $test->{zilla}->release;
 
   like $test->{readme}->slurp_raw,
-    qr/release\n+$badges\n+build\n+readme\n+build\n+release/m,
+    qr/release${nl}+$badges${nl}+build${nl}+readme${nl}+build${nl}+release/m,
     'badges added between build and release';
 };
 
@@ -38,7 +39,7 @@ subtest 'after release' => sub {
   $test->{zilla}->release;
 
   like $test->{readme}->slurp_raw,
-    qr/$badges\n+release\n+build\n+readme\n+build\n+release/m,
+    qr/$badges${nl}+release${nl}+build${nl}+readme${nl}+build${nl}+release/m,
     'badges added after release';
 };
 

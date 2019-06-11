@@ -6,7 +6,7 @@ use Chart::GGPlot::Class;
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Chart::GGPlot::Layer;
 use Chart::GGPlot::Util::Pod qw(layer_func_pod);
@@ -15,22 +15,22 @@ with qw(
   Chart::GGPlot::Stat
 );
 
-my $stat_identity_pod = layer_func_pod(<<'=cut');
+my $stat_identity_pod = layer_func_pod(<<'EOT');
 
-    stat_identity(:$mapping=undef, :$data=undef,
-                  :$geom="point", :$position="identity",
-                  :$show_legend=undef, :$inherit_aes=true,
-                  %rest)
+        stat_identity(:$mapping=undef, :$data=undef,
+                      :$geom="point", :$position="identity",
+                      :$show_legend=undef, :$inherit_aes=true,
+                      %rest)
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=back
+    =back
 
-=cut
+EOT
 
 my $stat_identity_code = fun (
         :$mapping = undef, :$data = undef,
@@ -80,7 +80,11 @@ Chart::GGPlot::Stat::Identity - Statistic method that does identity
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Stat>
 
 =head1 AUTHOR
 

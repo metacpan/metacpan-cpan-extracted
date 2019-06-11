@@ -32,7 +32,6 @@ t/LWP/ConsoleLogger/Easy.t
 t/LWP/ConsoleLogger/Everywhere.t
 t/LWP/ConsoleLogger/post-with-json.t
 t/LWP/ConsoleLogger/post.t
-t/pithub.t
 t/pretty.t
 t/test-data/content-regex.html
 t/test-data/file-upload.html
@@ -42,5 +41,7 @@ t/unicode.t
 tidyall.ini
 xt/author/pod-coverage.t
 xt/author/pod-spell.t
+xt/author/pod-syntax.t
 xt/author/tidyall.t
+xt/pithub.t
 xt/release/cpan-changes.t

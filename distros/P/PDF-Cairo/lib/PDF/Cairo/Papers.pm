@@ -1,3 +1,7 @@
+#no code; these are just to shut up CPANTS
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDF::Cairo::Papers - a list of valid paper sizes to use in new()

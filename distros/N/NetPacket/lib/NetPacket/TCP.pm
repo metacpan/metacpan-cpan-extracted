@@ -1,7 +1,7 @@
 package NetPacket::TCP;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble TCP (Transmission Control Protocol) packets.
-$NetPacket::TCP::VERSION = '1.7.0';
+$NetPacket::TCP::VERSION = '1.7.1';
 use strict;
 use warnings;
 
@@ -282,7 +282,7 @@ NetPacket::TCP - Assemble and disassemble TCP (Transmission Control Protocol) pa
 
 =head1 VERSION
 
-version 1.7.0
+version 1.7.1
 
 =head1 SYNOPSIS
 

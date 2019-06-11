@@ -1,6 +1,13 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.24 2019-06-04T07:47:15
+0.26 2019-06-08T15:16:33
+ - Add dependency to LWP::Protocol::https
+
+0.25 2019-06-08T10:51:03Z
+ - Remove channels added by Bot::BasicBot::irc_chanjoin_state with
+   different case
+
+0.24 2019-06-04T07:47:15Z
  - Fix backward compatibility processing of --acab option
  - Fix not prompting user if --promptuser_default option is set
 

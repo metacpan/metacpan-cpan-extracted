@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Module::Path 'module_path';
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 $VERSION = eval $VERSION;
 
 =head1 NAME

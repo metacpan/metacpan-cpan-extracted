@@ -5,7 +5,7 @@ package Chart::GGPlot::Stat;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils qw(reduce pairmap);
 use Types::Standard qw(ArrayRef CodeRef Str InstanceOf Bool);
@@ -59,9 +59,7 @@ method compute_layer ( $data, $params, $layout ) {
                     return $self->compute_panel( $d, $scales, $params );
                 }
                 catch {
-                    warn
-                      sprintf( "Computation failed in '%s': $@", ref($self) );
-                    return;
+                    die sprintf( "Computation failed in '%s': $@", ref($self) );
                 }
             }
         )->flatten
@@ -84,13 +82,15 @@ method compute_panel ( $data, $scales, $params ) {
             my $new_df  = $stats->{$_};
             my $old_df  = $groups->{$_};
             my $missing = $old_df->names->setdiff($new_df->names);
-            $new_df->cbind(
-                $old_df->slice( [ 0 .. $new_df->nrow - 1 ], $missing ) );
+            for my $colname (@$missing) {
+                $new_df->set( $colname,
+                    $old_df->at($colname)->slice( pdl( [0] ) ) );
+            }
+            $new_df;
         } sort { $a <=> $b } @{ $stats->keys }
     ];
 
-    my $rslt = reduce { $a->rbind($b) } @$stats;
-    return $rslt;
+    return reduce { $a->rbind($b) } @$stats;
 }
 
 method compute_group ( $data, $scales ) { ... }
@@ -117,7 +117,14 @@ Chart::GGPlot::Stat - The stat role
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 DESCRIPTION
+
+This module is a Moose role for "stats".
+
+For users of Chart::GGPlot you would mostly want to look at
+L<Chart::GGPlot::Stat::Functions> instead.
 
 =head1 AUTHOR
 

@@ -1,5 +1,7 @@
 package Image::Synchronize::Timestamp;
 
+use v5.10.0;
+
 =head1 NAME
 
 Image::Synchronize::Timestamp - a timestamp class

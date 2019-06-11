@@ -1,0 +1,64 @@
+---
+abstract: 'wire protocol support for the opentracing.io API'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Log::Any::Adapter::TAP: '0.003002'
+  Test::CheckDeps: '0.010'
+  Test::Deep: '1.124'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  Test::Refcount: '0.07'
+  Test::Warnings: '0.024'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-OpenTracing
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Net::Async::OpenTracing:
+    file: lib/Net/Async/OpenTracing.pm
+    version: '0.001'
+requires:
+  Encode: '1.98'
+  Future: '0.39'
+  IO::Async::Notifier: '0'
+  IO::Async::Socket: '0'
+  Log::Any: '1.045'
+  Log::Any::Adapter: '1.045'
+  Math::Random::Secure: '0'
+  OpenTracing: '0.001'
+  Scalar::Util: '1.47'
+  Syntax::Keyword::Try: '0.04'
+  Time::HiRes: '0'
+  Unicode::UTF8: '0'
+  constant: '0'
+  indirect: '0'
+  parent: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/team-at-cpan/Net-Async-OpenTracing/issues
+  homepage: https://github.com/team-at-cpan/Net-Async-OpenTracing
+  repository: https://github.com/team-at-cpan/Net-Async-OpenTracing.git
+version: '0.001'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

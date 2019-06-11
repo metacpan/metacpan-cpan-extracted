@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -741,9 +741,8 @@ sub _timezones {
 }
 
 sub _win32_timezones {
-    my ($self)  = @_;
-    my $class   = ref $self;
-    my %mapping = $class->win32_mapping();
+    my ($self) = @_;
+    my %mapping = $self->win32_mapping();
     $self->{_zones} = [ keys %mapping ];
     my @sorted_zones = sort { $a cmp $b } @{ $self->{_zones} };
     return @sorted_zones;
@@ -911,7 +910,7 @@ sub timezone {
             $self->{area}     = $LAST_PAREN_MATCH{area};
             $self->{location} = $LAST_PAREN_MATCH{location};
             if ( $self->win32_registry() ) {
-                my %mapping = Time::Zone::Olson->win32_mapping();
+                my %mapping = $self->win32_mapping();
                 if ( !defined $mapping{$new} ) {
                     Carp::croak(
 "'$new' is not an time zone in the existing Win32 registry"
@@ -945,6 +944,13 @@ sub timezone {
         else {
             Carp::croak(
                 "'$new' does not have a valid format for a TZ timezone");
+        }
+        if ( ( defined $new ) && ( defined $old ) && ( $old eq $new ) ) {
+            foreach my $key (qw(_zonetab_last_modified _comments _zones)) {
+                delete $self->{$key};
+            }
+            $_tzdata_cache  = {};
+            $_zonetab_cache = {};
         }
         delete $self->{offset};
     }
@@ -1004,8 +1010,10 @@ sub _guess_olson_tz {
             'freebsd' => [
                 '/var/db/zoneinfo',    # freebsd 11
             ],
-            'gnukfreebsd' => [ '/var/db/zoneinfo', '/etc/timezone', ],
-            'linux'       => [
+            'gnukfreebsd' => [
+                '/etc/timezone',       # gnukfreebsd 10,
+            ],
+            'linux' => [
                 '/etc/timezone',           # debian jessie
                 '/etc/sysconfig/clock',    # rhel6, opensuse, empty in rhel7
             ],
@@ -1160,21 +1168,14 @@ sub _check_area_location {
     return;
 }
 
-sub _truncate_win32_regquery {
-    my ( $self, $value ) = @_;
-    $value =~
-      s/\0.*$//smx;   # Windows 7 at least has rubbish after the first null byte
-    return $value;
-}
-
 sub _guess_win32_tz {
     my ($self) = @_;
     require Win32API::Registry;
     my $current_timezone_registry_path =
       'SYSTEM\CurrentControlSet\Control\TimeZoneInformation';
-    Win32API::Registry::RegOpenKeyEx(
+    Win32API::Registry::RegOpenKeyExW(
         Win32API::Registry::HKEY_LOCAL_MACHINE(),
-        $current_timezone_registry_path,
+        $self->_win32_registry_encode($current_timezone_registry_path),
         0,
         Win32API::Registry::KEY_QUERY_VALUE(),
         my $current_timezone_registry_key
@@ -1184,15 +1185,15 @@ sub _guess_win32_tz {
           . Win32API::Registry::regLastError() );
     my $win32_timezone_name;
     if (
-        Win32API::Registry::RegQueryValueEx(
-            $current_timezone_registry_key, 'TimeZoneKeyName',
-            [],                             my $type,
-            $win32_timezone_name,           my $size,
+        Win32API::Registry::RegQueryValueExW(
+            $current_timezone_registry_key,
+            $self->_win32_registry_encode('TimeZoneKeyName'),
+            [], my $type, $win32_timezone_name, my $size,
         )
       )
     {
         $win32_timezone_name =
-          $self->_truncate_win32_regquery($win32_timezone_name);
+          $self->_win32_registry_decode($win32_timezone_name);
     }
     elsif (
         Win32API::Registry::regLastError() == _WIN32_ERROR_FILE_NOT_FOUND() )
@@ -1215,7 +1216,7 @@ sub _guess_win32_tz {
         "Failed to open LOCAL_MACHINE\\$current_timezone_registry_path:"
           . Win32API::Registry::regLastError() );
     my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
-    my %mapping                  = Time::Zone::Olson->win32_mapping();
+    my %mapping                  = $self->win32_mapping();
     foreach my $key ( sort { $a cmp $b } keys %mapping ) {
         if ( $mapping{$key} eq $win32_timezone_name ) {
             if ( $key =~ /^$timezone_full_name_regex$/smx ) {
@@ -1235,12 +1236,15 @@ sub _guess_old_win32_tz {
         $current_timezone_registry_key ) = @_;
     my $win32_timezone_name;
 
-    Win32API::Registry::RegQueryValueEx( $current_timezone_registry_key,
-        'StandardName', [], my $type, my $standard_name, [] )
+    Win32API::Registry::RegQueryValueExW(
+        $current_timezone_registry_key,
+        $self->_win32_registry_encode('StandardName'),
+        [], my $type, my $standard_name, []
+      )
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\StandardName:"
           . Win32API::Registry::regLastError() );
-    $standard_name = $self->_truncate_win32_regquery($standard_name);
+    $standard_name = $self->_win32_registry_decode($standard_name);
     my ( $description, $major, $minor, $build, $id ) = Win32::GetOSVersion();
     my $old_timezone_registry_path;
     if ( $id < 2 ) {
@@ -1251,9 +1255,9 @@ sub _guess_old_win32_tz {
         $old_timezone_registry_path =
           'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones';
     }
-    Win32API::Registry::RegOpenKeyEx(
+    Win32API::Registry::RegOpenKeyExW(
         Win32API::Registry::HKEY_LOCAL_MACHINE(),
-        $old_timezone_registry_path,
+        $self->_win32_registry_encode($old_timezone_registry_path),
         0,
         Win32API::Registry::KEY_QUERY_VALUE() |
           Win32API::Registry::KEY_ENUMERATE_SUB_KEYS(),
@@ -1266,29 +1270,37 @@ sub _guess_old_win32_tz {
     my $old_timezone_registry_index = 0;
     while ($enumerate_timezones) {
         if (
-            Win32API::Registry::RegEnumKeyEx(
+            Win32API::Registry::RegEnumKeyExW(
                 $old_timezone_registry_key, $old_timezone_registry_index,
                 my $subkey_name,
                 [], [], [], [], [],
             )
           )
         {
+            $subkey_name = $self->_win32_registry_decode($subkey_name);
             Win32API::Registry::RegOpenKeyEx(
-                $old_timezone_registry_key, $subkey_name, 0,
+                $old_timezone_registry_key,
+                $self->_win32_registry_encode($subkey_name),
+                0,
                 Win32API::Registry::KEY_QUERY_VALUE(),
                 my $old_timezone_specific_registry_key
               )
               or Carp::croak(
 "Failed to open LOCAL_MACHINE\\$old_timezone_registry_path\\$subkey_name:"
                   . Win32API::Registry::regLastError() );
-            Win32API::Registry::RegQueryValueEx(
+            Win32API::Registry::RegQueryValueExW(
                 $old_timezone_specific_registry_key,
-                'Std', [], my $type, my $local_language_timezone_name, [] )
+                $self->_win32_registry_encode('Std'),
+                [],
+                my $type,
+                my $local_language_timezone_name,
+                []
+              )
               or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$current_timezone_registry_path\\$subkey_name\\Std:"
                   . Win32API::Registry::regLastError() );
             $local_language_timezone_name =
-              $self->_truncate_win32_regquery($local_language_timezone_name);
+              $self->_win32_registry_decode($local_language_timezone_name);
             if ( $local_language_timezone_name eq $standard_name ) {
                 $win32_timezone_name = $subkey_name;
             }
@@ -2567,6 +2579,19 @@ sub _read_v2_tzfile {
     return;
 }
 
+sub _win32_registry_encode {
+    my ( $self, $string ) = @_;
+    my $encoded = Encode::encode( 'UCS-2LE', $string, 1 ) . "\0";
+    return $encoded;
+}
+
+sub _win32_registry_decode {
+    my ( $self, $string ) = @_;
+    my $decoded = Encode::decode( 'UCS-2LE', $string, 1 );
+    $decoded =~ s/\0.*$//smx;
+    return $decoded;
+}
+
 sub _read_win32_tzfile {
     my ( $self, $tz ) = @_;
     if ( $self->{_tzdata}->{$tz}->{tz_definition} ) {
@@ -2574,9 +2599,9 @@ sub _read_win32_tzfile {
     }
     my $timezone_specific_registry_path =
 "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones\\$olson_to_win32_timezones{$tz}";
-    Win32API::Registry::RegOpenKeyEx(
+    Win32API::Registry::RegOpenKeyExW(
         Win32API::Registry::HKEY_LOCAL_MACHINE(),
-        $timezone_specific_registry_path,
+        $self->_win32_registry_encode($timezone_specific_registry_path),
         0,
         Win32API::Registry::KEY_QUERY_VALUE(),
         my $timezone_specific_subkey,
@@ -2584,31 +2609,35 @@ sub _read_win32_tzfile {
       or Carp::croak(
 "Failed to open LOCAL_MACHINE\\$timezone_specific_registry_path:$EXTENDED_OS_ERROR"
       );
-    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Dlt', [],
-        [], my $daylight_name, [] )
+    Win32API::Registry::RegQueryValueExW( $timezone_specific_subkey,
+        $self->_win32_registry_encode('Dlt'),
+        [], [], my $daylight_name, [] )
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dlt:$EXTENDED_OS_ERROR"
       );
-    $daylight_name = $self->_truncate_win32_regquery($daylight_name);
-    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Std', [],
-        [], my $standard_name, [] )
+    $daylight_name = $self->_win32_registry_decode($daylight_name);
+    Win32API::Registry::RegQueryValueExW( $timezone_specific_subkey,
+        $self->_win32_registry_encode('Std'),
+        [], [], my $standard_name, [] )
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Std:$EXTENDED_OS_ERROR"
       );
-    $standard_name = $self->_truncate_win32_regquery($standard_name);
-    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'Display',
+    $standard_name = $self->_win32_registry_decode($standard_name);
+    Win32API::Registry::RegQueryValueExW( $timezone_specific_subkey,
+        $self->_win32_registry_encode('Display'),
         [], [], my $comment, [] )
       or Carp::croak(
-"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Std:$EXTENDED_OS_ERROR"
+"Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Display:$EXTENDED_OS_ERROR"
       );
-    $comment = $self->_truncate_win32_regquery($comment);
-    Win32API::Registry::RegQueryValueEx( $timezone_specific_subkey, 'TZI', [],
-        [], my $binary, [] )
+    $comment = $self->_win32_registry_decode($comment);
+    Win32API::Registry::RegQueryValueExW( $timezone_specific_subkey,
+        $self->_win32_registry_encode('TZI'),
+        [], [], my $binary, [] )
       or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\TZI:$EXTENDED_OS_ERROR"
       );
 
-    my %mapping = Time::Zone::Olson->win32_mapping();
+    my %mapping = $self->win32_mapping();
 
     $self->{_comments}->{$tz} = $comment;
 
@@ -2740,33 +2769,42 @@ sub _read_win32_transition_times {
       @_;
     my @transition_times;
     if (
-        Win32API::Registry::RegOpenKeyEx(
-            $timezone_specific_subkey, 'Dynamic DST',
-            0,                         Win32API::Registry::KEY_QUERY_VALUE(),
+        Win32API::Registry::RegOpenKeyExW(
+            $timezone_specific_subkey,
+            $self->_win32_registry_encode('Dynamic DST'),
+            0,
+            Win32API::Registry::KEY_QUERY_VALUE(),
             my $timezone_dst_subkey
         )
       )
     {
-        Win32API::Registry::RegQueryValueEx( $timezone_dst_subkey,
-            'FirstEntry', [], [], my $dword, [] )
+        Win32API::Registry::RegQueryValueExW( $timezone_dst_subkey,
+            $self->_win32_registry_encode('FirstEntry'),
+            [], [], my $dword, [] )
           or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dynamic DST\\FirstEntry:$EXTENDED_OS_ERROR"
           );
         my $first_entry = unpack 'I', $dword;
-        Win32API::Registry::RegQueryValueEx( $timezone_dst_subkey, 'LastEntry',
+        Win32API::Registry::RegQueryValueExW( $timezone_dst_subkey,
+            $self->_win32_registry_encode('LastEntry'),
             [], [], $dword, [] )
           or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dynamic DST\\LastEntry:$EXTENDED_OS_ERROR"
           );
         my $last_entry = unpack 'I', $dword;
         for my $year ( $first_entry .. $last_entry ) {
-            Win32API::Registry::RegQueryValueEx( $timezone_dst_subkey, $year,
+            Win32API::Registry::RegQueryValueExW( $timezone_dst_subkey,
+                $self->_win32_registry_encode($year),
                 [], [], my $binary, [] )
               or Carp::croak(
 "Failed to read LOCAL_MACHINE\\$timezone_specific_registry_path\\Dynamic DST\\$year:$EXTENDED_OS_ERROR"
               );
             my $tz_definition = $self->_unpack_win32_tzi_structure($binary);
         }
+        Win32API::Registry::RegCloseKey($timezone_dst_subkey)
+          or Carp::croak(
+"Failed to close LOCAL_MACHINE\\$timezone_specific_registry_path\\Dynamic DST:$EXTENDED_OS_ERROR"
+          );
     }
     elsif (
         Win32API::Registry::regLastError() == _WIN32_ERROR_FILE_NOT_FOUND() )
@@ -2781,13 +2819,14 @@ sub _read_win32_transition_times {
 }
 
 sub win32_mapping {
+    my ($self) = @_;
     my %returned_timezones;
     if ( $OSNAME eq 'MSWin32' ) {
         my $timezone_database_registry_path =
           'SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones';
-        Win32API::Registry::RegOpenKeyEx(
+        Win32API::Registry::RegOpenKeyExW(
             Win32API::Registry::HKEY_LOCAL_MACHINE(),
-            $timezone_database_registry_path,
+            $self->_win32_registry_encode($timezone_database_registry_path),
             0,
             Win32API::Registry::KEY_QUERY_VALUE() |
               Win32API::Registry::KEY_ENUMERATE_SUB_KEYS(),
@@ -2801,13 +2840,14 @@ sub win32_mapping {
         my %local_windows_timezones;
         while ($enumerate_timezones) {
             if (
-                Win32API::Registry::RegEnumKeyEx(
+                Win32API::Registry::RegEnumKeyExW(
                     $timezone_database_subkey, $timezone_index, my $buffer, [],
                     [], [], [], [],
                 )
               )
             {
-                $local_windows_timezones{$buffer} = 1;
+                $local_windows_timezones{ $self->_win32_registry_decode($buffer)
+                } = 1;
             }
             elsif ( Win32API::Registry::regLastError() ==
                 _WIN32_ERROR_NO_MORE_ITEMS() )
@@ -2866,7 +2906,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
@@ -2890,7 +2930,7 @@ Time::Zone::Olson is intended to provide a simple interface to the Olson databas
 
 Time::Zone::Olson was designed to produce the same result as a 64 bit copy of the L<date(1)|date(1)> command.
 
-Time::Zone::Olson will attempt to function even without an actual Olson database on Win32 platforms by translating information available in the Win32 registry.
+Time::Zone::Olson will attempt to function even without an actual Olson database on Windows platforms by translating information available in the Windows registry.
 
 =head1 SUBROUTINES/METHODS
 
@@ -2902,19 +2942,19 @@ Both of these parameters default to C<$ENV{TZ}> and C<$ENV{TZDIR}> respectively.
 
 =head2 areas
 
-The areas() object method will return a list of the areas (such as Asia, Australia, Africa, America, Europe) from the zone.tab file.  The areas will be sorted alphabetically.
+This method will return a list of the areas (such as Asia, Australia, Africa, America, Europe) from the zone.tab file.  The areas will be sorted alphabetically.
 
 =head2 locations
 
-The locations($area) object method will return a list of the locations (such as Melbourne, Perth, Hobart) for a specified area from the zone.tab file.  The locations will be sorted alphabetically.
+This method accepts a area (such as Asia, Australia, Africa, America, Europe) as a parameter and will return a list of matching locations (such as Melbourne, Perth, Hobart) from the zone.tab file.  The locations will be sorted alphabetically.
 
 =head2 comment
 
-The comment($timezone) object method will return the matching comment from the zone.tab file for the time zone parameter.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">.  For Win32 platforms, it will return the contents of the C<Display> registry setting.  For example, for C<"Australia/Melbourne">, it would return C<"(UTC+10) Canberra, Melbourne, Sydney">.
+This method accepts the name of time zone such as C<"Australia/Melbourne"> as a parameter and will return the matching comment from the zone.tab file.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">.  For Windows platforms, it will return the contents of the C<Display> registry setting.  For example, for C<"Australia/Melbourne">, it would return C<"(UTC+10) Canberra, Melbourne, Sydney">.
 
 =head2 directory
 
-This method can be used to get or set the root directory of the Olson database, usually located at /usr/share/zoneinfo.
+This method can be used to get or set the root directory of the Olson database, usually located at C</usr/share/zoneinfo>.
 
 =head2 timezone
 
@@ -2956,7 +2996,7 @@ This method can be used to get the list of transition times for the current time
 
 =head2 determining_path
 
-This method can be used to determine which file system path was used to determine the current operating system timezone.  If it returns undef, then the current operating system timezone was determined by other means (such as the win32 registry, or comparing the digests of /etc/localtime with timezones in L</directory>).
+This method can be used to determine which file system path was used to determine the current operating system timezone.  If it returns undef, then the current operating system timezone was determined by other means (such as the win32 registry, or comparing the digests of C</etc/localtime> with timezones in L</directory>).
 
 =head2 leap_seconds
 
@@ -2972,7 +3012,7 @@ This method will return a hash containing the mapping between Windows time zones
 
 =head2 win32_registry
 
-This method will return true if the object is using the Win32 registry for Olson tz calculations.  Otherwise it will return false.
+This method will return true if the object is using the Windows registry for Olson tz calculations.  Otherwise it will return false.
 
 =head1 DIAGNOSTICS
 
@@ -3065,7 +3105,7 @@ None reported
 
 =head1 BUGS AND LIMITATIONS
 
-On Win32 platforms, the Olson TZ database is usually unavailable.  In an attempt to provide a workable alternative, the Win32 Registry is interrogated and translated to allow Olson time zones (such as Australia/Melbourne) to be used on Win32 nodes.  Therefore, the use of Time::Zone::Olson should be cross-platform compatible, but the actual results may be different, depending on the compatibility of the Win32 Registry time zones and the Olson TZ database.
+On Windows platforms, the Olson TZ database is usually unavailable.  In an attempt to provide a workable alternative, the Windows Registry is interrogated and translated to allow Olson time zones (such as Australia/Melbourne) to be used on Windows nodes.  Therefore, the use of Time::Zone::Olson should be cross-platform compatible, but the actual results may be different, depending on the compatibility of the Windows Registry time zones and the Olson TZ database.
 
 Please report any bugs or feature requests to C<bug-time-zone-olson at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson>.  I will be notified, and then you'll
@@ -3083,6 +3123,12 @@ L<DateTime::TimeZone::Tzfile|DateTime::TimeZone::Tzfile>
 
 =item *
 L<DateTime::TimeZone::Local::Win32|DateTime::TimeZone::Local::Win32>
+
+=item *
+L<Time::Local|Time::Local>
+
+=item *
+L<Time::Local::TZ|Time::Local::TZ>
 
 =back
 

@@ -1,21 +1,18 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 use strict;
-
-use Config::Model::BackendMgr;
+use warnings;
 
 # test loading layered config à la ssh_config
 
-$model_to_test = "SystemSsh";
-
-@tests = (
+my @tests = (
     {    # t0
         name  => 'basic',
         setup => {
@@ -37,4 +34,6 @@ $model_to_test = "SystemSsh";
     }
 );
 
-1;
+return {
+    tests => \@tests,
+};

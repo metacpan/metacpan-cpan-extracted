@@ -4,7 +4,7 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -30,8 +30,9 @@
          "requires" : {
             "Getopt::Long" : "2.42",
             "JSON" : "0",
+            "POSIX" : "0",
             "Pod::Usage" : "0",
-            "Sub::Data::Recursive" : "0",
+            "Sub::Data::Recursive" : "0.02",
             "perl" : "5.008005",
             "strict" : "0",
             "warnings" : "0"
@@ -47,7 +48,7 @@
    "provides" : {
       "App::jl" : {
          "file" : "lib/App/jl.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -62,6 +63,6 @@
          "url" : "http://github.com/bayashi/App-jl"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,0 +1,12 @@
+Revision history for OpenTracing
+
+0.002     2019-06-10 06:03:51+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - removed some unnecessary debug lines
+
+0.001     2019-06-10 05:41:04+08:00 Asia/Kuala_Lumpur
+    Initial release.
+

@@ -1,23 +1,20 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 use Config::Model::BackendMgr;
+use strict;
+use warnings;
 
 # test loading layered config à la ssh_config
 
-$home_for_test =
-  $^O eq 'darwin'
-  ? '/Users/joe'
-  : '/home/joe';
-Config::Model::BackendMgr::_set_test_home($home_for_test);
-
-$model_to_test = "Ssh";
+my $home_for_test = $^O eq 'darwin' ? '/Users/joe'
+                  :                   '/home/joe';
 
 # Ssh backend excepts both system and user files
 my @setup = (
@@ -30,7 +27,7 @@ my @setup = (
     }
 );
 
-@tests = (
+my @tests = (
     {
         name => 'basic',
         @setup,
@@ -46,7 +43,7 @@ my @setup = (
             #'Host:"foo\.\*,\*\.bar"' => '',
             'Host:picosgw LocalForward:0 port' => 20022,
             'Host:picosgw LocalForward:0 host' => '10.3.244.4',
-            'Host:picosgw LocalForward:1 ipv6' => 1,
+            'Host:picosgw LocalForward:1 ipv6' => 'yes',
             'Host:picosgw LocalForward:1 port' => 22080,
             'Host:picosgw LocalForward:1 host' => '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
         ],
@@ -60,7 +57,11 @@ my @setup = (
         name => 'legacy',
         @setup,
         load_check    => 'skip',
-        log4perl_load_warnings => [ [ 'User', ( warn => qr/deprecated/) x 2, ] ],
+        log4perl_load_warnings => [ [
+            'User',
+            ( warn => qr/deprecated/) x 2,
+            warn => qr/Unknown parameter/,
+        ] ],
     },
     {
         name => 'bad-forward',
@@ -74,9 +75,12 @@ my @setup = (
        @setup,
        load_check    => 'skip',
        log4perl_load_warnings => [
-           [ 'User', ( warn => qr/Unknown check_list item/) , ]
+           [ 'User', ( warn => qr/Unexpected authentication method/) , ]
        ],
     },
 );
 
-1;
+return {
+    home_for_test => $home_for_test,
+    tests => \@tests,
+};

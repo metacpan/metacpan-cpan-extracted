@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-04-05'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-06-06'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010;
 use strict;
@@ -9,6 +9,7 @@ use warnings;
 use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
 
 use Perinci::CmdLine::Any;
+use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
 my $prefix = "/App/instopt/";
 
@@ -29,6 +30,7 @@ my $cli = Perinci::CmdLine::Any->new(
         'compare-versions'         => {url=>"${prefix}compare_versions"},
     },
 );
+Perinci::CmdLineX::CommonOptions::SelfUpgrade->apply_to_object($cli);
 $cli->run;
 
 # ABSTRACT: Download and install software
@@ -46,7 +48,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.008 of instopt (from Perl distribution App-instopt), released on 2019-04-05.
+This document describes version 0.009 of instopt (from Perl distribution App-instopt), released on 2019-06-06.
 
 =head1 SYNOPSIS
 
@@ -98,6 +100,10 @@ Then:
 
  # Cleanup download dir (remove older versions)
  % instopt cleanup-download-dir
+
+
+ # Update program to the latest from CPAN
+ % instopt --self-upgrade ; # or -U
 
 =head1 DESCRIPTION
 
@@ -319,6 +325,10 @@ Do not read environment for default options.
 =item B<--quiet>
 
 Shortcut for --log-level=error.
+
+=item B<--self-upgrade>, B<-U>
+
+Update program to latest version from CPAN.
 
 =item B<--subcommands>
 

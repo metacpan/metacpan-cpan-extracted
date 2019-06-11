@@ -75,7 +75,7 @@ sub _LOCALTIME_DAY_OF_WEEK_INDEX { return 6 }
 
 sub check_time {
 	my ($tz, $time) = @_;
-	my @time_local = Time::Zone::Olson->new()->local_time($time);
+	my @time_local = Time::Zone::Olson->new(timezone => $tz)->local_time($time);
 	my $match;
 	my $ok;
 	while ($tz =~ /M(\d+)[.](\d+)[.](\d+)(?:\/(\d+))?/smxg) {

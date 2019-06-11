@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils qw(reduce);
 use PDL::Primitive qw(which);
@@ -32,29 +32,29 @@ has '+default_aes'     => (
 
 classmethod required_aes () { [qw(x y)] }
 
-my $geom_path_pod = layer_func_pod(<<'=cut');
+my $geom_path_pod = layer_func_pod(<<'EOT');
 
-    geom_path(:$mapping=undef, :$data=undef, :$stat='identity',
-              :$position='identity', :$na_rm=false, :$show_legend='auto',
-              :$inherit_aes=true, 
-              %rest)
+        geom_path(:$mapping=undef, :$data=undef, :$stat='identity',
+                  :$position='identity', :$na_rm=false, :$show_legend=undef,
+                  :$inherit_aes=true, 
+                  %rest)
 
-The "path" geom connects the observations in the order in which they appear
-in the data.
+    The "path" geom connects the observations in the order in which they
+    appear in the data.
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=back
+    =back
 
-=cut
+EOT
 
 my $geom_path_code = fun (
         :$mapping = undef, :$data = undef,
         :$stat = 'identity', :$position = 'identity',
         :$na_rm = false,
-        :$show_legend = 'auto', :$inherit_aes = true,
+        :$show_legend = undef, :$inherit_aes = true,
         %rest )
 {
     return Chart::GGPlot::Layer->new(
@@ -155,7 +155,7 @@ Chart::GGPlot::Geom::Path - Class for path geom
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

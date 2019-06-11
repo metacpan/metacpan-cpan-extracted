@@ -39,7 +39,7 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '3.0.10'; # VERSION
+    our $VERSION = '3.0.11'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
@@ -122,7 +122,7 @@ sub DESTROY {
 }
 
 
-sub is_bool { goto \&JSON::MaybeXS::is_bool }
+*is_bool = \&JSON::MaybeXS::is_bool;
 
 
 1;
@@ -139,7 +139,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 3.0.10
+version 3.0.11
 
 =head1 SYNOPSIS
 
@@ -230,9 +230,7 @@ Defaults to C<JSON::MaybeXS::false()>.
 
 =item is_bool($value)
 
-Returns a true value if C<$value> is a boolean. You may localize C<MarpaX::ESLIF::is_bool()> function before using ESLIF to change it.
-
-Defaults to C<JSON::MaybeXS::is_bool($value)>
+Returns a true value if C<$value> is a boolean. You may localize C<MarpaX::ESLIF::is_bool()> function before using ESLIF to change it. ESLIF always requires at least that C<$value> is an object, object nature then defaults to C<JSON::MaybeXS::is_bool($value)>
 
 =back
 

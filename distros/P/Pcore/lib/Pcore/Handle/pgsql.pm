@@ -5,18 +5,21 @@ use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref is_plain_coderef];
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Hash::HashArray;
 
 with qw[Pcore::Handle::DBI];
 
 our $EXPORT = {
-    STATE     => [qw[$STATE_CONNECT $STATE_READY $STATE_BUSY $STATE_DISCONNECTED]],
+    STATE     => [qw[$STATE_CONNECT $STATE_READY $STATE_BUSY $STATE_ERROR $STATE_CONNECT_ERROR $STATE_REMOVED]],
     TX_STATUS => [qw[$TX_STATUS_IDLE $TX_STATUS_TRANS $TX_STATUS_ERROR]],
 };
 
-const our $STATE_CONNECT      => 1;
-const our $STATE_READY        => 2;
-const our $STATE_BUSY         => 3;
-const our $STATE_DISCONNECTED => 4;
+const our $STATE_CONNECT       => 1;
+const our $STATE_READY         => 2;
+const our $STATE_BUSY          => 3;
+const our $STATE_ERROR         => 4;
+const our $STATE_CONNECT_ERROR => 5;
+const our $STATE_REMOVED       => 6;
 
 const our $TX_STATUS_IDLE  => 'I';    # idle (not in a transaction block)
 const our $TX_STATUS_TRANS => 'T';    # in a transaction block
@@ -24,131 +27,100 @@ const our $TX_STATUS_ERROR => 'E';    # in a failed transaction block (queries w
 
 require Pcore::Handle::pgsql::DBH;
 
-has max_dbh  => 3;                    # PositiveInt
-has backlog  => 1_000;                # Maybe [PositiveInt]
-has host     => ( is => 'lazy' );     # Str
-has port     => 5432;                 # PositiveOrZeroInt
-has username => ( is => 'lazy' );     # Str
-has password => ( is => 'lazy' );     # Str
-has database => ( is => 'lazy' );     # Str
+has max_dbh         => 3;             # PositiveInt
+has backlog         => 1_000;         # Maybe [PositiveInt]
+has on_notification => ();            # CodeRef->( $self, $pid, $channel, $payload )
 
 has is_pgsql   => 1, init_arg => undef;
 has active_dbh => 0, init_arg => undef;
-has _dbh_pool      => ( init_arg => undef );            # ArrayRef
+has _dbh_pool => sub { Pcore::Util::Hash::HashArray->new }, init_arg => undef;
 has _get_dbh_queue => sub { [] }, init_arg => undef;    # ArrayRef
 
-sub _build_host ($self) {
-    return $self->{uri}->{path} eq '/' ? "$self->{uri}->{host}" : "$self->{uri}->{path}";
-}
-
-sub _build_username ($self) {
-    return $self->{uri}->{username};
-}
-
-sub _build_password ($self) {
-    return $self->{uri}->{password} // $EMPTY;
-}
-
-sub _build_database ($self) {
-    return $self->{uri}->query_params->{db};
-}
-
 # DBH POOL METHODS
-sub _create_dbh ($self) {
-    $self->{active_dbh}++;
+sub get_dbh ( $self, $cb = undef ) {
+    my $dbh = pop $self->{_dbh_pool}->@*;
 
-    Pcore::Handle::pgsql::DBH->connect(
-        handle     => $self,
-        on_connect => sub ( $dbh, $res ) {
-            if ( !$res ) {
-                $self->{active_dbh}--;
+    return $cb ? $cb->( res(200), $dbh ) : ( res(200), $dbh ) if defined $dbh;
 
-                # throw connection error for all pending requests
-                while ( my $cb = shift $self->{_get_dbh_queue}->@* ) {
-                    $cb->( $res, undef );
-                }
-            }
-            else {
-                $self->{on_connect}->($dbh) if $self->{on_connect};
-
-                $self->push_dbh($dbh);
-            }
-
-            return;
-        }
-    );
-
-    return;
-}
-
-sub _get_dbh ( $self, $cb ) {
-    while ( my $dbh = shift $self->{_dbh_pool}->@* ) {
-        if ( $dbh->{state} == $STATE_READY && $dbh->{tx_status} eq $TX_STATUS_IDLE ) {
-            $cb->( res(200), $dbh );
-
-            return;
-        }
-        else {
-            $self->{active_dbh}--;
-        }
-    }
-
+    # backlog is full
     if ( $self->{backlog} && $self->{_get_dbh_queue}->@* > $self->{backlog} ) {
         warn 'DBI: backlog queue is full';
 
-        $cb->( res( [ 500, 'backlog queue is full' ] ), undef );
+        my $res = res [ 500, 'backlog queue is full' ];
 
-        return;
+        return $cb ? $cb->( $res, undef ) : ( $res, undef );
     }
 
-    push $self->{_get_dbh_queue}->@*, $cb;
+    if ( defined wantarray ) {
+        my $cv = P->cv;
 
-    $self->_create_dbh if $self->{active_dbh} < $self->{max_dbh};
+        # push callback to the backlog queue
+        push $self->{_get_dbh_queue}->@*, $cv;
+
+        # create dbh if limit is not reached
+        $self->_create_dbh if $self->{active_dbh} < $self->{max_dbh};
+
+        # block thread
+        return $cb ? $cb->( $cv->recv ) : $cv->recv;
+    }
+    else {
+        # push callback to the backlog queue
+        push $self->{_get_dbh_queue}->@*, $cb if $cb;
+
+        # create dbh if limit is not reached
+        $self->_create_dbh if $self->{active_dbh} < $self->{max_dbh};
+    }
 
     return;
 }
 
 sub push_dbh ( $self, $dbh ) {
+    my $state = $dbh->{state};
+
+    # handle is already removed
+    return if $state == $STATE_REMOVED;
+
+    if ( $state >= $STATE_ERROR ) {
+        $dbh->{state} = $STATE_REMOVED;
+
+        delete $self->{_dbh_pool}->{ $dbh->{id} };
+
+        $self->{active_dbh}--;
+
+        if ( $state == $STATE_CONNECT_ERROR ) {
+            while ( my $cb = shift $self->{_get_dbh_queue}->@* ) {
+                $cb->( $dbh->{error_status} );
+            }
+        }
+    }
 
     # dbh is ready for query
-    if ( $dbh->{state} == $STATE_READY && $dbh->{tx_status} eq $TX_STATUS_IDLE ) {
+    elsif ( $state == $STATE_READY && $dbh->{tx_status} eq $TX_STATUS_IDLE ) {
         if ( my $cb = shift $self->{_get_dbh_queue}->@* ) {
             $cb->( res(200), $dbh );
         }
         else {
-            push $self->{_dbh_pool}->@*, $dbh;
+            $self->{_dbh_pool}->{ $dbh->{id} } = $dbh;
         }
 
     }
 
-    # dbh is disconnected or in transaction state
+    # dbh is not ready or in the transaction state
     else {
-        $self->{active_dbh}--;
+        $dbh->_on_fatal_error(q[DBH is not ready for query or is in the transaction state (you need to finish transaction)]);
 
-        $self->_create_dbh if $self->{_get_dbh_queue}->@* && $self->{active_dbh} < $self->{max_dbh};
+        return;
     }
 
     return;
 }
 
-# STH
-sub prepare ( $self, $query ) {
-    utf8::encode $query if utf8::is_utf8 $query;
+sub _create_dbh ($self) {
+    $self->{active_dbh}++;
 
-    # convert "?" placeholders to "$1" style
-    if ( index( $query, '?' ) != -1 ) {
-        my $i;
+    Pcore::Handle::pgsql::DBH->new( pool => $self, );
 
-        $query =~ s/[?]/'$' . ++$i/smge;
-    }
-
-    my $sth = bless {
-        id    => uuid_v1mc_str,
-        query => $query,
-      },
-      'Pcore::Handle::DBI::STH';
-
-    return $sth;
+    return;
 }
 
 # SCHEMA PATCH
@@ -264,14 +236,6 @@ sub encode_array ( $self, $var ) {
     return \( '{' . join( q[,], @buf ) . '}' );
 }
 
-sub dbh ($self) {
-    my $cv = P->cv;
-
-    $self->_get_dbh($cv);
-
-    return $cv->recv;
-}
-
 # DBI METHODS
 for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref selectcol]) {
     *$method = eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
@@ -279,7 +243,7 @@ for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref 
             my \$cb = is_plain_coderef \$args[-1] ? \$args[-1] : undef;
 
             if ( defined wantarray ) {
-                my ( \$res, \$dbh ) = \$self->dbh;
+                my ( \$res, \$dbh ) = \$self->get_dbh;
 
                 if ( !\$res ) {
                     return \$cb ? \$cb->(\$res) : \$res;
@@ -289,7 +253,7 @@ for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref 
                 }
             }
             else {
-                \$self->_get_dbh(
+                \$self->get_dbh(
                     sub ( \$res, \$dbh ) {
                         if ( !\$res ) {
                             \$cb->( \$res ) if \$cb;
@@ -308,38 +272,6 @@ for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref 
 PERL
 }
 
-# TRANSACTIONS
-sub begin_work ( $self, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? $args[-1] : undef;
-
-    if ( defined wantarray ) {
-        my ( $res, $dbh ) = $self->dbh;
-
-        if ( !$res ) {
-            return $cb ? $cb->($res) : $res;
-        }
-        else {
-            return $dbh->begin_work(@args);
-        }
-    }
-    else {
-        $self->_get_dbh(
-            sub ( $res, $dbh ) {
-                if ( !$res ) {
-                    $cb->( undef, $res ) if $cb;
-                }
-                else {
-                    $dbh->begin_work(@args);
-                }
-
-                return;
-            }
-        );
-
-        return;
-    }
-}
-
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -347,7 +279,7 @@ sub begin_work ( $self, @args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 155                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 127                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

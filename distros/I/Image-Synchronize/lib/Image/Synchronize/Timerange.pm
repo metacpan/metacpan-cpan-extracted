@@ -1,5 +1,7 @@
 package Image::Synchronize::Timerange;
 
+use v5.10.0;
+
 =head1 NAME
 
 Image::Synchronize::Timerange - a timestamp range class
@@ -556,7 +558,7 @@ sub add {
   return $result;
 }
 
-=stringify
+=head2 stringify
 
   $text = $r->stringify;
   $text = "$r";

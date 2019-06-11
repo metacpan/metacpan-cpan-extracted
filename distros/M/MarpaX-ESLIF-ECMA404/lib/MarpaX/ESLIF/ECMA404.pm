@@ -6,13 +6,13 @@ package MarpaX::ESLIF::ECMA404;
 
 # ABSTRACT: JSON Data Interchange Format following ECMA-404 specification
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 
 use Carp qw/croak/;
-use MarpaX::ESLIF 2.0.34;   # bundled libiconv
+use MarpaX::ESLIF 3.0.9;
 use MarpaX::ESLIF::ECMA404::RecognizerInterface;
 use MarpaX::ESLIF::ECMA404::ValueInterface;
 use Scalar::Util qw/looks_like_number/;
@@ -103,29 +103,27 @@ sub decode {
     # We need to use the recognizer loop to have access to the inc/dec events
     #
     my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($self->{grammar}, $recognizerInterface);
-    return unless eval {
-      $eslifRecognizer->scan() || die "scan() failed";
-      $self->_manage_events($eslifRecognizer);
-      if ($eslifRecognizer->isCanContinue) {
+    $eslifRecognizer->scan() || croak "scan() failed";
+    $self->_manage_events($eslifRecognizer);
+    if ($eslifRecognizer->isCanContinue) {
         do {
-          $eslifRecognizer->resume || die "resume() failed";
-          $self->_manage_events($eslifRecognizer)
+            $eslifRecognizer->resume || croak 'resume() failed';
+            $self->_manage_events($eslifRecognizer)
         } while ($eslifRecognizer->isCanContinue)
-      }
-      #
-      # We configured value interface to not accept ambiguity not null parse.
-      # So no need to loop on value()
-      #
-      MarpaX::ESLIF::Value->new($eslifRecognizer, $valueInterface)->value()
     }
+    #
+    # We configured value interface to not accept ambiguity not null parse.
+    # So no need to loop on value()
+    #
+    MarpaX::ESLIF::Value->new($eslifRecognizer, $valueInterface)->value() || croak 'Valuation failed'
   } else {
-    return unless eval { $self->{grammar}->parse($recognizerInterface, $valueInterface) }
+    $self->{grammar}->parse($recognizerInterface, $valueInterface) || croak 'Parse failed'
   }
 
   # ------------------------
   # Return the value
   # ------------------------
-  $valueInterface->getResult
+  return $valueInterface->getResult
 }
 
 sub _manage_events {
@@ -155,7 +153,7 @@ MarpaX::ESLIF::ECMA404 - JSON Data Interchange Format following ECMA-404 specifi
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -229,7 +227,7 @@ Dot not allow duplicate key in an object.
 
 =head2 decode($self, $input, $encoding)
 
-Parses JSON that is in C<$input> and returns a perl variable containing the corresponding structured representation, or C<undef> in case of failure. C<$encoding> is an optional parameter: JSON parser is using L<MarpaX::ESLIF> that will I<guess> about the encoding if not specified, this guess is not 100% reliable - so if you know the encoding of your data, in particular if it is not in UTF-8, you should give the information to the parser. Default is to guess.
+Parses JSON that is in C<$input> and returns a perl variable containing the corresponding structured representation (which can be C<undef>), or croaks in case of failure. C<$encoding> is an optional parameter: JSON parser is using L<MarpaX::ESLIF> that will I<guess> about the encoding if not specified, this guess is not 100% reliable - so if you know the encoding of your data, in particular if it is not in UTF-8, you should give the information to the parser. Default is to guess.
 
 =head1 SEE ALSO
 
@@ -266,74 +264,57 @@ __DATA__
 # -------------------
 # Composite separator
 # -------------------
-comma    ::= ','                                  action         => ::undef   # No-op anyway, override ::shift (default action)
+comma    ::= ','                                                                    action          => ::undef  # Never needed in any case
 
 # ----------
 # JSON value
 # ----------
-value    ::= string                                                           # ::shift (default action)
-           | number                                                           # ::shift (default action)
-           | object                                                           # ::shift (default action)
-           | array                                                            # ::shift (default action)
-           | 'true'                               action         => true      # Returns a perl true value
-           | 'false'                              action         => false     # Returns a perl false value
-           | 'null'
+value    ::= string
+           | number
+           | object
+           | array
+           | 'true'                                                                 action         => ::true
+           | 'false'                                                                action         => ::false
+           | 'null'                                                                 action         => ::undef
 
 # -----------
 # JSON object
 # -----------
-object   ::= '{' inc members '}' dec              action         => ::copy[2] # Returns members
-members  ::= pairs*                               action         => members   # Returns { @{pairs1}, ..., @{pair2} }
-                                                  separator      => comma     # ... separated by comma
-                                                  proper         => 1         # ... with no trailing separator
-                                                  hide-separator => 1         # ... and hide separator in the action
-                                                  
-pairs    ::= string ':' value                     action         => pairs     # Returns [ string, value ]
+object   ::= '{' inc members '}' dec                                                action         => ::copy[2]
+members  ::= pairs*                                                                 action         => members   # Returns { @{pairs1}, ..., @{pair2} }
+                                                                                    separator      => comma     # ... separated by comma
+                                                                                    proper         => 1         # ... with no trailing separator
+                                                                                    hide-separator => 1         # ... and hide separator in the action
+
+pairs    ::= string (-':'-) value                                                   action         => ::row     # Returns [ string, value ]
 
 # -----------
 # JSON Arrays
 # -----------
-array    ::= '[' inc elements ']' dec             action         => ::copy[2] # Returns elements
-elements ::= value*                               action => elements          # Returns [ value1, ..., valuen ]
-                                                  separator      => comma     # ... separated by comma
-                                                  proper         => 1         # ... with no trailing separator
-                                                  hide-separator => 1         # ... and hide separator in the action
-                                                  
+array    ::= '[' inc elements ']' dec                                               action         => ::copy[2] # Returns elements
+elements ::= value*                                                                 action         => ::row     # Returns [ value1, ..., valuen ]
+                                                                                    separator      => comma     # ... separated by comma
+                                                                                    proper         => 1         # ... with no trailing separator
+                                                                                    hide-separator => 1         # ... and hide separator in the action
 
-# ------------
-# JSON Numbers
-# ------------
-number ::= NUMBER            # /* bignum */       action => number            # Prepare for eventual bignum extension
-
-NUMBER   ~ _INT
-         | _INT _FRAC
-         | _INT _EXP
-         | _INT _FRAC _EXP
-_INT     ~ _DIGIT
-         | _DIGIT19 _DIGITS
-         | '-' _DIGIT
-         | '-' _DIGIT19 _DIGITS
-_DIGIT   ~ [0-9]
-_DIGIT19 ~ [1-9]
-_FRAC    ~ '.' _DIGITS
-_EXP     ~ _E _DIGITS
-_DIGITS  ~ _DIGIT+
-_E       ~ /e[+-]?/i
+# -----------
+# JSON Number
+# -----------
+number ::= /-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/ # /* bignum */    action => number            # Prepare for eventual bignum extension
 
 # -----------
 # JSON String
 # -----------
-string     ::= '"' discardOff chars '"' discardOn action => ::copy[2]               # Only chars is of interest
-discardOff ::=                                    action => ::undef                 # Nullable rule used to disable discard
-discardOn  ::=                                    action => ::undef                 # Nullable rule used to enable discard
+string     ::= '"' discardOff chars '"' discardOn                                   action => ::copy[2]               # Only chars is of interest
+discardOff ::=                                                                      action => ::undef                 # Nullable rule used to disable discard
+discardOn  ::=                                                                      action => ::undef                 # Nullable rule used to enable discard
 
-event :discard[on]  = nulled discardOn                                                           # Implementation of discard disabing using reserved ':discard[on]' keyword
-event :discard[off] = nulled discardOff                                                          # Implementation of discard enabling using reserved ':discard[off]' keyword
-
-chars   ::= filled                                                                               # ::shift (default action)
-filled  ::= char+                                 action => ::concat                # Returns join('', char1, ..., charn)
-chars   ::=                                       action => empty_string            # Prefering empty string instead of undef
-char    ::= [^"\\\x00-\x1F]                                                         # ::shift (default action) - take care PCRE2 [:cntrl:] includes DEL character
+event :discard[on]  = nulled discardOn                                              # Implementation of discard disabing using reserved ':discard[on]' keyword
+event :discard[off] = nulled discardOff                                             # Implementation of discard enabling using reserved ':discard[off]' keyword
+chars   ::= filled
+filled  ::= char+                                                                   action => ::concat
+chars   ::=                                                                         action => ::u8""
+char    ::= /[^"\\\x00-\x1F]+/                                                      # ::shift (default action) - take care PCRE2 [:cntrl:] includes DEL character
           | '\\' '"'                              action => ::copy[1]               # Returns double quote, already ok in data
           | '\\' '\\'                             action => ::copy[1]               # Returns backslash, already ok in data
           | '\\' '/'                              action => ::copy[1]               # Returns slash, already ok in data
@@ -344,15 +325,14 @@ char    ::= [^"\\\x00-\x1F]                                                     
           | '\\' 't'                              action => ::u8"\x{09}"
           | /(?:\\u[[:xdigit:]]{4})+/             action => unicode
 
-
 # -------------------------
 # Unsignificant whitespaces
 # -------------------------
 :discard ::= /[\x{9}\x{A}\x{D}\x{20}]+/
 
-# ------------------------------------------------------
-# Needed for eventual depth extension - no op by default
-# ------------------------------------------------------
+# -------------------------------------------
+# Nullable rules for eventual depth extension
+# -------------------------------------------
 inc ::=                                                        action => ::undef
 dec ::=                                                        action => ::undef
 

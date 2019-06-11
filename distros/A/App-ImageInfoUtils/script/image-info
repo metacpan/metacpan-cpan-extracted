@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ImageInfoUtils/image_info
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-01-28'; # DATE
+our $DATE = '2019-06-09'; # DATE
 our $DIST = 'App-ImageInfoUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ image-info - Get information about image files
 
 =head1 VERSION
 
-This document describes version 0.001 of image-info (from Perl distribution App-ImageInfoUtils), released on 2019-01-28.
+This document describes version 0.003 of image-info (from Perl distribution App-ImageInfoUtils), released on 2019-06-09.
 
 =head1 SYNOPSIS
 

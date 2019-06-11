@@ -5,7 +5,7 @@ package Chart::GGPlot::Layer;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils qw(pairgrep pairkeys pairmap);
 use Module::Load;
@@ -49,8 +49,7 @@ has position    => ( is => 'ro', required => 1 );
 has inherit_aes => ( is => 'ro', default  => sub { false } );
 
 
-my $ShowLegend = ( ( Enum [qw(auto never always)] ) | AesMapping );
-has show_legend => ( is => 'ro', isa => $ShowLegend, default => 'auto' );
+has show_legend => ( is => 'ro' );
 
 around BUILDARGS( $orig, $class : @rest ) {
     my %params = @rest;
@@ -320,7 +319,7 @@ Chart::GGPlot::Layer - Chart::GGPlot layer
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 
@@ -376,19 +375,21 @@ Should this layer be included in the legends?
 
 =item *
 
-C<'auto'>, includes if any aesthetics are mapped.
+C<undef>, includes if any aesthetics are mapped.
 
 =item *
 
-C<'never'>, never includes.
+A defined true scalar (non-Chart::GGPlot::Aes), never includes.
 
 =item *
 
-C<'always'>, always includes. 
+A defined false scalar (non-Chart::GGPlot::Aes), always includes. 
 
 =item *
 
-A Chart::GGPlot::Aes object, to finely select the aesthetics to display.
+A L<Chart::GGPlot::Aes> object whose values are booleans, to finely
+
+select the aesthetics to display.
 
 =back
 

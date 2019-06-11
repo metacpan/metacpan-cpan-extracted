@@ -101,8 +101,8 @@ NOTES
 
       Returns a true value if $value is a boolean. You may localize
       MarpaX::ESLIF::is_bool() function before using ESLIF to change it.
-
-      Defaults to JSON::MaybeXS::is_bool($value)
+      ESLIF always requires at least that $value is an object, object
+      nature then defaults to JSON::MaybeXS::is_bool($value)
 
  INTEGER TYPE
 

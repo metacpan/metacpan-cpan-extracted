@@ -3,7 +3,7 @@ package Database::Async::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 =head1 NAME
 
@@ -51,10 +51,11 @@ use Path::Tiny;
 use List::Util qw(sum0);
 use Scalar::Util qw(blessed);
 
-use Database::Async::ORM::Table;
-use Database::Async::ORM::Type;
-use Database::Async::ORM::Field;
 use Database::Async::ORM::Schema;
+use Database::Async::ORM::Type;
+use Database::Async::ORM::Table;
+use Database::Async::ORM::Field;
+use Database::Async::ORM::Constraint;
 use Database::Async::ORM::Extension;
 
 use Log::Any qw($log);
@@ -453,13 +454,14 @@ sub populate_table {
     my $schema = $args{schema};
     $log->tracef('Add table %s as %s', $table_name, $table_details);
     my $table = Database::Async::ORM::Table->new(
-        defined_in  => $table_details->{defined_in},
-        name        => $table_name,
-        schema      => $schema,
-        table       => $table_details->{table} // 'enum',
-        description => $table_details->{description},
-        values      => $table_details->{data},
-        parents     => $args{parents},
+        defined_in   => $table_details->{defined_in},
+        name         => $table_name,
+        schema       => $schema,
+        table        => $table_details->{table} // 'enum',
+        description  => $table_details->{description},
+        values       => $table_details->{data},
+        parents      => $args{parents},
+        primary_keys => $table_details->{primary_keys},
     );
     for my $field_details ($table_details->{fields}->@*) {
         my $type = $field_details->{type};
@@ -480,6 +482,15 @@ sub populate_table {
         );
         $log->tracef('Add field %s as %s with type %s', $field->name, $field_details, $field->type);
         push $table->{fields}->@*, $field;
+    }
+    for my $constraint_details ($table_details->{constraints}->@*) {
+        my $constraint = Database::Async::ORM::Constraint->new(
+            defined_in => $table_details->{defined_in},
+            table      => $table,
+            %{$constraint_details}{grep { exists $constraint_details->{$_} } qw(name type deferrable initially_deferred fields references)}
+        );
+        $log->tracef('Add constraint %s as %s with type %s', $constraint->name, $constraint_details, $constraint->type);
+        push $table->{constraints}->@*, $constraint;
     }
     $schema->add_table($table);
     return $table;

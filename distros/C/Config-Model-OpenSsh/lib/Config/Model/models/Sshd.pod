@@ -11,39 +11,43 @@ Config::Model::models::Sshd - Configuration class Sshd
 
 Configuration classes used by L<Config::Model>
 
-Configuration class used by L<Config::Model> to edit or 
-validate /etc/ssh/sshd_config
+This configuration class was generated from sshd_system documentation.
+by L<parse-man.pl|https://github.com/dod38fr/config-model-openssh/contrib/parse-man.pl>
 
 
 =head1 Elements
 
 =head2 AcceptEnv
 
-Specifies what environment variables sent by the client will be copied into the session's environ(7). I< Optional. Type list of uniline.  > 
-
-=head2 AddressFamily
-
-Specifies which address family should be used by sshd(8). I< Optional. Type enum. choice: 'any', 'inet', 'inet6'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-any
-
-=back
-
-
+B<AcceptEnv>Specifies what environment
+variables sent by the client will be copied into the
+session’s L<environ(7)>. See B<SendEnv> and
+B<SetEnv> in L<ssh_config(5)> for how to configure the
+client. The TERM environment variable is always accepted
+whenever the client requests a pseudo-terminal as it is
+required by the protocol. Variables are specified by name,
+which may contain the wildcard characters ’*’
+and ’?’. Multiple environment variables may be
+separated by whitespace or spread across multiple
+B<AcceptEnv> directives. Be warned that some environment
+variables could be used to bypass restricted user
+environments. For this reason, care should be taken in the
+use of this directive. The default is not to accept any
+environment variables. I< Optional. Type list of uniline.  > 
 
 =head2 AllowAgentForwarding
 
-Specifies whether L<ssh-agent(1)> forwarding is permitted.  Note that disabling agent forwarding does not improve security unless users are also denied shell access, as they can always install their own forwarders. I< Optional. Type boolean.  > 
+B<AllowAgentForwarding>Specifies whether L<ssh-agent(1)>
+forwarding is permitted. The default is B<yes>. Note
+that disabling agent forwarding does not improve security
+unless users are also denied shell access, as they can
+always install their own forwarders. I< Optional. Type boolean.  > 
 
 =over 4
 
 =item upstream_default value :
 
-1
+yes
 
 =back
 
@@ -51,52 +55,51 @@ Specifies whether L<ssh-agent(1)> forwarding is permitted.  Note that disabling 
 
 =head2 AllowGroups
 
-Login is allowed only for users whose primary group or supplementary group list matches one of the patterns. Only group names are valid; a numerical group ID is not recognized. By default, login is allowed for all groups. The allow/deny directives are processed in the following order: DenyUsers, AllowUsers, DenyGroups, and finally AllowGroups. I< Optional. Type list of uniline.  > 
+B<AllowGroups>This keyword can be followed by
+a list of group name patterns, separated by spaces. If
+specified, login is allowed only for users whose primary
+group or supplementary group list matches one of the
+patterns. Only group names are valid; a numerical group ID
+is not recognized. By default, login is allowed for all
+groups. The allow/deny directives are processed in the
+following order: B<DenyUsers>, B<AllowUsers>,
+B<DenyGroups>, and finally B<AllowGroups>.See PATTERNS in
+L<ssh_config(5)> for more information on patterns. I< Optional. Type list of uniline.  > 
 
-=head2 AllowUsers
+=head2 AllowStreamLocalForwarding
 
-List of user name patterns, separated by spaces. If specified, login is allowed only for user names that match one of the patterns. Only user names are valid; a numerical user ID is not recognized. By default, login is allowed for all users. If the pattern takes the form USER@HOST then USER and HOST are separately checked, restricting logins to particular users from particular hosts. The allow/deny directives are processed in the following order: DenyUsers, AllowUsers, DenyGroups, and finally AllowGroups. I< Optional. Type list of uniline.  > 
+B<AllowStreamLocalForwarding>Specifies whether StreamLocal
+(Unix-domain socket) forwarding is permitted. The available
+options are B<yes> (the default) or B<all> to allow
+StreamLocal forwarding, B<no> to prevent all StreamLocal
+forwarding, B<local> to allow local (from the
+perspective of L<ssh(1)>) forwarding only or B<remote> to
+allow remote forwarding only. Note that disabling
+StreamLocal forwarding does not improve security unless
+users are also denied shell access, as they can always
+install their own forwarders. I< Optional. Type enum. choice: 'yes', 'all', 'no', 'local', 'remote'.  > 
 
-=head2 AuthenticationMethods - authentication methods that must be successfully completed for a user to be granted access
+=over 4
 
-Specifies the authentication methods that must be successfully
-completed for a user to be granted access. This option must be
-followed by one or more comma-separated lists of authentication method
-names. Successful authentication requires completion of every method
-in at least one of these lists.
+=item upstream_default value :
 
-For example, an argument of "publickey,password
-publickey,keyboard-interactive" would require the user to complete
-public key authentication, followed by either password or keyboard
-interactive authentication. Only methods that are next in one or more
-lists are offered at each stage, so for this example, it would not be
-possible to attempt password or keyboard-interactive authentication
-before public key.
+yes
 
-For keyboard interactive authentication it is also possible to
-restrict authentication to a specific device by appending a colon
-followed by the device identifier "bsdauth", "pam", or "skey",
-depending on the server configuration. For example,
-"keyboard-interactive:bsdauth" would restrict keyboard interactive
-authentication to the "bsdauth" device.
+=back
 
-This option is only available for SSH protocol 2 and will yield a
-fatal error if enabled if protocol 1 is also enabled. Note that each
-authentication method listed should also be explicitly enabled in the
-configuration. The default is not to require multiple authentication;
-successful completion of a single authentication method is sufficient. I< Optional. Type uniline.  > 
 
-=head2 AuthorizedKeysCommand - program to be used to look up the user's public keys
-
-Specifies a program to be used to look up the user's public keys. The program must be owned by root and not writable by group or others. It will be invoked with a single argument of the username being authenticated, and should produce on standard output zero or more lines of authorized_keys output (see AUTHORIZED_KEYS in L<sshd(8)>). If a key supplied by AuthorizedKeysCommand does not successfully authenticate and authorize the user then public key authentication continues using the usual AuthorizedKeysFile files. By default, no AuthorizedKeysCommand is run. I< Optional. Type uniline.  > 
-
-=head2 AuthorizedKeysCommandUser -  user under whose account the AuthorizedKeysCommand is run
-
-Specifies the user under whose account the AuthorizedKeysCommand is run. It is recommended to use a dedicated user that has no other role on the host than running authorized keys commands. I< Optional. Type uniline.  > 
 
 =head2 AllowTcpForwarding
 
-Specifies whether TCP forwarding is permitted. The default is "yes".Note that disabling TCP forwarding does not improve security unless users are also denied shell access, as they can always install their own forwarders. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<AllowTcpForwarding>Specifies whether TCP
+forwarding is permitted. The available options are
+B<yes> (the default) or B<all> to allow TCP
+forwarding, B<no> to prevent all TCP forwarding,
+B<local> to allow local (from the perspective of L<ssh(1)>)
+forwarding only or B<remote> to allow remote forwarding
+only. Note that disabling TCP forwarding does not improve
+security unless users are also denied shell access, as they
+can always install their own forwarders. I< Optional. Type enum. choice: 'yes', 'all', 'no', 'local', 'remote'.  > 
 
 =over 4
 
@@ -108,96 +111,234 @@ yes
 
 
 
-=head2 AuthorizedKeysFile2
+=head2 AllowUsers
 
-Specifies the file that contains the public keys that can be used for user authentication. AuthorizedKeysFile may contain tokens of the form %T which are substituted during connection setup. B<Deprecated> I< Optional. Type list of uniline.  > 
+B<AllowUsers>This keyword can be followed by
+a list of user name patterns, separated by spaces. If
+specified, login is allowed only for user names that match
+one of the patterns. Only user names are valid; a numerical
+user ID is not recognized. By default, login is allowed for
+all users. If the pattern takes the form USER@HOST then USER
+and HOST are separately checked, restricting logins to
+particular users from particular hosts. HOST criteria may
+additionally contain addresses to match in CIDR
+address/masklen format. The allow/deny directives are
+processed in the following order: B<DenyUsers>,
+B<AllowUsers>, B<DenyGroups>, and finally
+B<AllowGroups>.See PATTERNS in
+L<ssh_config(5)> for more information on patterns. I< Optional. Type list of uniline.  > 
+
+=head2 AuthenticationMethods
+
+B<AuthenticationMethods>Specifies the authentication
+methods that must be successfully completed for a user to be
+granted access. This option must be followed by one or more
+lists of comma-separated authentication method names, or by
+the single string B<any> to indicate the default
+behaviour of accepting any single authentication method. If
+the default is overridden, then successful authentication
+requires completion of every method in at least one of these
+lists.For example,
+"publickey,password
+publickey,keyboard-interactive" would require the user
+to complete public key authentication, followed by either
+password or keyboard interactive authentication. Only
+methods that are next in one or more lists are offered at
+each stage, so for this example it would not be possible to
+attempt password or keyboard-interactive authentication
+before public key.For keyboard
+interactive authentication it is also possible to restrict
+authentication to a specific device by appending a colon
+followed by the device identifier B<bsdauth> or
+B<pam>. depending on the server configuration. For
+example, "keyboard-interactive:bsdauth" would
+restrict keyboard interactive authentication to the
+B<bsdauth> device.If the
+publickey method is listed more than once, L<sshd(8)> verifies
+that keys that have been used successfully are not reused
+for subsequent authentications. For example,
+"publickey,publickey" requires successful
+authentication using two different public keys.Note that each
+authentication method listed should also be explicitly
+enabled in the configuration.The available
+authentication methods are: "gssapi-with-mic",
+"hostbased", "keyboard-interactive",
+"none" (used for access to password-less accounts
+when B<PermitEmptyPasswords> is enabled),
+"password" and "publickey". I< Optional. Type uniline.  > 
+
+=head2 AuthorizedKeysCommand
+
+B<AuthorizedKeysCommand>Specifies a program to be used
+to look up the user’s public keys. The program must be
+owned by root, not writable by group or others and specified
+by an absolute path. Arguments to
+B<AuthorizedKeysCommand> accept the tokens described in
+the I<TOKENS> section. If no arguments are specified
+then the username of the target user is used.The program
+should produce on standard output zero or more lines of
+authorized_keys output (see I<AUTHORIZED_KEYS> in
+L<sshd(8)>). If a key supplied by B<AuthorizedKeysCommand>
+does not successfully authenticate and authorize the user
+then public key authentication continues using the usual
+B<AuthorizedKeysFile> files. By default, no
+B<AuthorizedKeysCommand> is run. I< Optional. Type uniline.  > 
+
+=head2 AuthorizedKeysCommandUser
+
+B<AuthorizedKeysCommandUser>Specifies the user under whose
+account the B<AuthorizedKeysCommand> is run. It is
+recommended to use a dedicated user that has no other role
+on the host than running authorized keys commands. If
+B<AuthorizedKeysCommand> is specified but
+B<AuthorizedKeysCommandUser> is not, then L<sshd(8)> will
+refuse to start. I< Optional. Type uniline.  > 
 
 =head2 AuthorizedKeysFile
 
-Specifies the file that contains the public keys that can be used for user authentication. The format is described in the AUTHORIZED_KEYS FILE FORMAT section of L<sshd(8)>. AuthorizedKeysFile may contain tokens of the form %T which are substituted during connection setup. The following tokens are defined: %% is replaced by a literal '%', %h is replaced by the home directory of the user being authenticated, and %u is replaced by the username of that user. After expansion, AuthorizedKeysFile is taken to be an absolute path or one relative to the user's home directory. Multiple files may be listed, separated by whitespace. The default is ".ssh/authorized_keys .ssh/authorized_keys2". I< Optional. Type list of uniline.  > 
+B<AuthorizedKeysFile>Specifies the file that
+contains the public keys used for user authentication. The
+format is described in the I<AUTHORIZED_KEYS FILE
+FORMAT> section of L<sshd(8)>. Arguments to
+B<AuthorizedKeysFile> accept the tokens described in the
+I<TOKENS> section. After expansion,
+B<AuthorizedKeysFile> is taken to be an absolute path or
+one relative to the user’s home directory. Multiple
+files may be listed, separated by whitespace. Alternately
+this option may be set to B<none> to skip checking for
+user keys in files. The default is
+".ssh/authorized_keys .ssh/authorized_keys2". I< Optional. Type list of uniline.  > 
 
 Note: AuthorizedKeysFile values are migrated from '- AuthorizedKeysFile2'
 
-=head2 AuthorizedPrincipalsFile - file that lists principal names that are accepted for certificate authentication
+=head2 AuthorizedPrincipalsCommand
 
-Specifies a file that lists principal names that are accepted for
-certificate authentication.  When using certificates signed by a key
-listed in TrustedUserCAKeys, this file lists names, one of which must
-appear in the certificate for it to be accepted for authentication.
-Names are listed one per line preceded by key options (as described in
-AUTHORIZED_KEYS FILE FORMAT in L<sshd(8)>).  Empty lines and comments
-starting with '#' are ignored.
+B<AuthorizedPrincipalsCommand>Specifies a program to be used
+to generate the list of allowed certificate principals as
+per B<AuthorizedPrincipalsFile>. The program must be
+owned by root, not writable by group or others and specified
+by an absolute path. Arguments to
+B<AuthorizedPrincipalsCommand> accept the tokens
+described in the I<TOKENS> section. If no arguments are
+specified then the username of the target user is used.The program
+should produce on standard output zero or more lines of
+B<AuthorizedPrincipalsFile> output. If either
+B<AuthorizedPrincipalsCommand> or
+B<AuthorizedPrincipalsFile> is specified, then
+certificates offered by the client for authentication must
+contain a principal that is listed. By default, no
+B<AuthorizedPrincipalsCommand> is run. I< Optional. Type uniline.  > 
 
-AuthorizedPrincipalsFile may contain tokens of the form %T which are
-substituted during connection setup. The following tokens are
-defined: %% is replaced by a literal '%', %h is replaced by the home
-directory of the user being authenticated, and %u is replaced by the
-username of that user.  After expansion, AuthorizedPrincipalsFile is
-taken to be an absolute path or one relative to the user's home
-directory.
+=head2 AuthorizedPrincipalsCommandUser
 
-The default is "none", i.e. not to use a principals file - in this
-case, the username of the user must appear in a certificate's
-principals list for it to be accepted.  Note that
-AuthorizedPrincipalsFile is only used when authentication proceeds
-using a CA listed in TrustedUserCAKeys and is not consulted for
-certification authorities trusted via ~/.ssh/authorized_keys, though
-the principals= key option offers a similar facility (see L<sshd(8)>
-for details). I< Optional. Type uniline.  > 
+B<AuthorizedPrincipalsCommandUser>Specifies the user under whose
+account the B<AuthorizedPrincipalsCommand> is run. It is
+recommended to use a dedicated user that has no other role
+on the host than running authorized principals commands. If
+B<AuthorizedPrincipalsCommand> is specified but
+B<AuthorizedPrincipalsCommandUser> is not, then L<sshd(8)>
+will refuse to start. I< Optional. Type uniline.  > 
 
-=head2 Banner
+=head2 AuthorizedPrincipalsFile
 
-In some jurisdictions, sending a warning message before authentication may be relevant for getting legal protection. The contents of the specified file are sent to the remote user before authentication is allowed. This option is only available for protocol version 2. By default, no banner is displayed. I< Optional. Type uniline.  > 
-
-=head2 ChallengeResponseAuthentication
-
-Specifies whether challenge-response authentication is allowed. All authentication styles from login.conf(5) are supported. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<AuthorizedPrincipalsFile>Specifies a file that lists
+principal names that are accepted for certificate
+authentication. When using certificates signed by a key
+listed in B<TrustedUserCAKeys>, this file lists names,
+one of which must appear in the certificate for it to be
+accepted for authentication. Names are listed one per line
+preceded by key options (as described in I<AUTHORIZED_KEYS
+FILE FORMAT> in L<sshd(8)>). Empty lines and comments
+starting with ’#’ are ignored.Arguments to
+B<AuthorizedPrincipalsFile> accept the tokens described
+in the I<TOKENS> section. After expansion,
+B<AuthorizedPrincipalsFile> is taken to be an absolute
+path or one relative to the user’s home directory. The
+default is B<none>, i.e. not to use a principals file
+– in this case, the username of the user must appear
+in a certificate’s principals list for it to be
+accepted.Note that
+B<AuthorizedPrincipalsFile> is only used when
+authentication proceeds using a CA listed in
+B<TrustedUserCAKeys> and is not consulted for
+certification authorities trusted via
+I<~/.ssh/authorized_keys>, though the B<principals=>
+key option offers a similar facility (see L<sshd(8)> for
+details). I< Optional. Type uniline.  > 
 
 =over 4
 
 =item upstream_default value :
 
-yes
+none
 
 =back
 
 
 
-=head2 ChrootDirectory - pathname of a directory to chroot to after authentication
+=head2 Banner
 
-Specifies the pathname of a directory to L<chroot(2)> to after
-authentication.  All components of the pathname must be root owned
-directories that are not writable by any other user or group.  After
-the chroot, L<sshd(8)> changes the working directory to the user's home
-directory.
+B<Banner>The contents of
+the specified file are sent to the remote user before
+authentication is allowed. If the argument is B<none>
+then no banner is displayed. By default, no banner is
+displayed. I< Optional. Type uniline.  > 
 
-The pathname may contain the following tokens that are expanded at
-runtime once the connecting user has been authenticated: %% is
-replaced by a literal '%', %h is replaced by the home directory of the
-user being authenticated, and %u is replaced by the username of that
-user.
+=head2 ChrootDirectory
 
-The ChrootDirectory must contain the necessary files and directories
-to support the user's session.  For an interactive session this
-requires at least a shell, typically L<sh(1)>, and basic /dev nodes
-such as L<null(4)>, L<zero(4)>, L<stdin(4)>, L<stdout(4)>,
-L<stderr(4)>, L<arandom(4)> and L<tty(4)> devices.  For file transfer
-sessions using "sftp", no additional configuration of the environment
-is necessary if the in-process sftp server is used, though sessions
-which use logging do require /dev/log inside the chroot directory (see
-L<sftp-server(8)> for details).
+B<ChrootDirectory>Specifies the pathname of a
+directory to L<chroot(2)> to after authentication. At session
+startup L<sshd(8)> checks that all components of the pathname
+are root-owned directories which are not writable by any
+other user or group. After the chroot, L<sshd(8)> changes the
+working directory to the user’s home directory.
+Arguments to B<ChrootDirectory> accept the tokens
+described in the I<TOKENS> section.The
+B<ChrootDirectory> must contain the necessary files and
+directories to support the user’s session. For an
+interactive session this requires at least a shell,
+typically L<sh(1)>, and basic I</dev> nodes such as
+L<null(4)>, L<zero(4)>, L<stdin(4)>, L<stdout(4)>, L<stderr(4)>, and L<tty(4)>
+devices. For file transfer sessions using SFTP no additional
+configuration of the environment is necessary if the
+in-process sftp-server is used, though sessions which use
+logging may require I</dev/log> inside the chroot
+directory on some operating systems (see L<sftp-server(8)> for
+details).For safety, it
+is very important that the directory hierarchy be prevented
+from modification by other processes on the system
+(especially those outside the jail). Misconfiguration can
+lead to unsafe environments which L<sshd(8)> cannot detect.The default is
+B<none>, indicating not to L<chroot(2)>. I< Optional. Type uniline.  > 
 
-The default is not to chroot(2). I< Optional. Type uniline.  > 
+=over 4
 
-=head2 Ciphers
+=item upstream_default value :
 
-Specifies the ciphers allowed for protocol version 2. By default, all ciphers are allowed. I< Optional. Type check_list. choice: '3des-cbc', 'aes128-cbc', 'aes192-cbc', 'aes256-cbc', 'aes128-ctr', 'aes192-ctr', 'aes256-ctr', 'arcfour128', 'arcfour256', 'arcfour', 'blowfish-cbc', 'cast128-cbc'.  > 
+none
+
+=back
+
+
 
 =head2 ClientAliveCountMax
 
-Sets the number of client alive messages which may be sent without sshd(8) receiving any messages back from the client. If this threshold is reached while client alive messages are being sent, sshd will disconnect the client, terminating the session.  It is important to note that the use of client alive messages is very different from TCPKeepAlive. The client alive messages are sent through the encrypted channel and therefore will not be spoofable. The TCP keepalive option enabled by TCPKeepAlive is spoofable. The client alive mechanism is valuable when the client or server depend on knowing when a connection has become inactive.
-
-The default value is 3. If ClientAliveInterval is set to 15, and ClientAliveCountMax is left at the default, unresponsive SSH clients will be disconnected after approximately 45 seconds. This option applies to protocol version 2 only. I< Optional. Type integer.  > 
+B<ClientAliveCountMax>Sets the number of client alive
+messages which may be sent without L<sshd(8)> receiving any
+messages back from the client. If this threshold is reached
+while client alive messages are being sent, sshd will
+disconnect the client, terminating the session. It is
+important to note that the use of client alive messages is
+very different from B<TCPKeepAlive>. The client alive
+messages are sent through the encrypted channel and
+therefore will not be spoofable. The TCP keepalive option
+enabled by B<TCPKeepAlive> is spoofable. The client
+alive mechanism is valuable when the client or server depend
+on knowing when a connection has become inactive.The default
+value is 3. If B<ClientAliveInterval> is set to 15, and
+B<ClientAliveCountMax> is left at the default,
+unresponsive SSH clients will be disconnected after
+approximately 45 seconds. I< Optional. Type integer.  > 
 
 =over 4
 
@@ -211,144 +352,12 @@ The default value is 3. If ClientAliveInterval is set to 15, and ClientAliveCoun
 
 =head2 ClientAliveInterval
 
-I< Optional. Type integer.  > 
-
-=head2 Compression
-
-Specifies whether compression is allowed, or delayed until the user has authenticated successfully. I< Optional. Type enum. choice: 'yes', 'delayed', 'no'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-delayed
-
-=back
-
-
-
-=head2 DenyGroups
-
-This keyword can be followed by a list of group name patterns, separated by spaces.  Login is disallowed for users whose primary group or supplementary group list matches one of the patterns. Only group names are valid; a numerical group ID is not recognized. By default, login is allowed for all groups.  The allow/deny directives are processed in the following order: DenyUsers, AllowUsers, DenyGroups, and finally AllowGroups. I< Optional. Type list of uniline.  > 
-
-=head2 DenyUSers
-
-This keyword can be followed by a list of user name patterns, separated by spaces.  Login is disallowed for user names that match one of the patterns. Only user names are valid; a numerical user ID is not recognized. By default, login is allowed for all users. If the pattern takes the form USER@HOST then USER and HOST are separately checked, restricting logins to particular users from particular hosts. The allow/deny directives are processed in the following order: DenyUsers, AllowUsers, DenyGroups, and finally AllowGroups. I< Optional. Type list of uniline.  > 
-
-=head2 ForceCommand
-
-Forces the execution of the command specified by ForceCommand, ignoring any command supplied by the client. The command is invoked by using the user's login shell with the -c option. This applies to shell, command, or subsystem execution. It is most useful inside a Match block. The command originally supplied by the client is available in the SSH_ORIGINAL_COMMAND environment variable. I< Optional. Type uniline.  > 
-
-=head2 GatewayPorts
-
-Specifies whether remote hosts are allowed to connect to ports forwarded for the client. By default, sshd(8) binds remote port forwardings to the loopback address. This prevents other remote hosts from connecting to forwarded ports. GatewayPorts can be used to specify that sshd should allow remote port forwardings to bind to non-loopback addresses, thus allowing other hosts to connect. I< Optional. Type enum. choice: 'yes', 'clientspecified', 'no'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-Here are some explanations on the possible values:
-
-=over
-
-=item 'clientspecified'
-
-allow the client to select the address to which the forwarding is bound
-
-=item 'no'
-
-No port forwarding
-
-
-=item 'yes'
-
-force remote port forwardings to bind to the wildcard address
-
-=back
-
-
-
-=head2 GSSAPIAuthentication
-
-Specifies whether user authentication based on GSSAPI is allowed. Note that this option applies to protocol version 2 only. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-=head2 GSSAPIKeyExchange
-
-Specifies whether key exchange based on GSSAPI is allowed. GSSAPI key exchange doesn't rely on ssh keys to verify host identity. Note that this option applies to protocol version 2 only. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-=head2 GSSAPICleanupCredentials
-
-Specifies whether to automatically destroy the user's credentials cache on logout. Note that this option applies to protocol version 2 only. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-=head2 GSSAPIStrictAcceptorCheck
-
-Determines whether to be strict about the identity of the GSSAPI acceptor a client authenticates against.This facility is provided to assist with operation on multi homed machines. Note that this option applies only to protocol version 2 GSSAPI connections, and setting it to "no" may only work with recent Kerberos GSSAPI libraries. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-Here are some explanations on the possible values:
-
-=over
-
-=item 'no'
-
-the client may authenticate against any service key stored in the machine's default store
-
-=item 'yes'
-
-the client must authenticate against the host service on the current hostname.
-
-=back
-
-
-
-=head2 GSSAPIStoreCredentialsOnRekey
-
-Controls whether the user's GSSAPI credentials should be updated following a successful connection rekeying. This option can be used to accepted renewed or updated credentials from a compatible client. I< Optional. Type boolean.  > 
+B<ClientAliveInterval>Sets a timeout interval in
+seconds after which if no data has been received from the
+client, L<sshd(8)> will send a message through the encrypted
+channel to request a response from the client. The default
+is 0, indicating that these messages will not be sent to the
+client. I< Optional. Type integer.  > 
 
 =over 4
 
@@ -360,9 +369,135 @@ Controls whether the user's GSSAPI credentials should be updated following a suc
 
 
 
+=head2 DenyGroups
+
+B<DenyGroups>This keyword can be followed by
+a list of group name patterns, separated by spaces. Login is
+disallowed for users whose primary group or supplementary
+group list matches one of the patterns. Only group names are
+valid; a numerical group ID is not recognized. By default,
+login is allowed for all groups. The allow/deny directives
+are processed in the following order: B<DenyUsers>,
+B<AllowUsers>, B<DenyGroups>, and finally
+B<AllowGroups>.See PATTERNS in
+L<ssh_config(5)> for more information on patterns. I< Optional. Type list of uniline.  > 
+
+=head2 DenyUsers
+
+B<DenyUsers>This keyword can be followed by
+a list of user name patterns, separated by spaces. Login is
+disallowed for user names that match one of the patterns.
+Only user names are valid; a numerical user ID is not
+recognized. By default, login is allowed for all users. If
+the pattern takes the form USER@HOST then USER and HOST are
+separately checked, restricting logins to particular users
+from particular hosts. HOST criteria may additionally
+contain addresses to match in CIDR address/masklen format.
+The allow/deny directives are processed in the following
+order: B<DenyUsers>, B<AllowUsers>,
+B<DenyGroups>, and finally B<AllowGroups>.See PATTERNS in
+L<ssh_config(5)> for more information on patterns. I< Optional. Type list of uniline.  > 
+
+=head2 ForceCommand
+
+B<ForceCommand>Forces the execution of the
+command specified by B<ForceCommand>, ignoring any
+command supplied by the client and I<~/.ssh/rc> if
+present. The command is invoked by using the user’s
+login shell with the -c option. This applies to shell,
+command, or subsystem execution. It is most useful inside a
+B<Match> block. The command originally supplied by the
+client is available in the SSH_ORIGINAL_COMMAND environment
+variable. Specifying a command of B<internal-sftp> will
+force the use of an in-process SFTP server that requires no
+support files when used with B<ChrootDirectory>. The
+default is B<none>. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+none
+
+=back
+
+
+
+=head2 GatewayPorts
+
+B<GatewayPorts>Specifies whether remote hosts
+are allowed to connect to ports forwarded for the client. By
+default, L<sshd(8)> binds remote port forwardings to the
+loopback address. This prevents other remote hosts from
+connecting to forwarded ports. B<GatewayPorts> can be
+used to specify that sshd should allow remote port
+forwardings to bind to non-loopback addresses, thus allowing
+other hosts to connect. The argument may be B<no> to
+force remote port forwardings to be available to the local
+host only, B<yes> to force remote port forwardings to
+bind to the wildcard address, or B<clientspecified> to
+allow the client to select the address to which the
+forwarding is bound. The default is B<no>. I< Optional. Type enum. choice: 'no', 'yes', 'clientspecified'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 GSSAPIAuthentication
+
+B<GSSAPIAuthentication>Specifies whether user
+authentication based on GSSAPI is allowed. The default is
+B<no>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 HostbasedAcceptedKeyTypes
+
+B<HostbasedAcceptedKeyTypes>Specifies the key types that
+will be accepted for hostbased authentication as a list of
+comma-separated patterns. Alternately if the specified value
+begins with a ’+’ character, then the specified
+key types will be appended to the default set instead of
+replacing them. If the specified value begins with a
+’-’ character, then the specified key types
+(including wildcards) will be removed from the default set
+instead of replacing them. The default for this option
+is:ecdsa-sha2-nistp256-cert-v01@openssh.com,
+
+ecdsa-sha2-nistp384-cert-v01@openssh.com, 
+ecdsa-sha2-nistp521-cert-v01@openssh.com, 
+ssh-ed25519-cert-v01@openssh.com, 
+
+rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256-cert-v01@openssh.com,
+
+ssh-rsa-cert-v01@openssh.com, 
+
+ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,
+
+ssh-ed25519,rsa-sha2-512,rsa-sha2-256,ssh-rsaThe list of
+available key types may also be obtained using "ssh -Q
+key". I< Optional. Type uniline.  > 
+
 =head2 HostbasedAuthentication
 
-Specifies whether rhosts or /etc/hosts.equiv authentication together with successful public key client host authentication is allowed (host-based authentication). This option is similar to RhostsRSAAuthentication and applies to protocol version 2 only. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<HostbasedAuthentication>Specifies whether rhosts or
+/etc/hosts.equiv authentication together with successful
+public key client host authentication is allowed (host-based
+authentication). The default is B<no>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -376,7 +511,14 @@ no
 
 =head2 HostbasedUsesNameFromPacketOnly
 
-Specifies whether or not the server will attempt to perform a reverse name lookup when matching the name in the ~/.shosts, ~/.rhosts, and /etc/hosts.equiv files during HostbasedAuthentication. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<HostbasedUsesNameFromPacketOnly>Specifies whether or not the
+server will attempt to perform a reverse name lookup when
+matching the name in the I<~/.shosts>, I<~/.rhosts>,
+and I</etc/hosts.equiv> files during
+B<HostbasedAuthentication>. A setting of B<yes>
+means that L<sshd(8)> uses the name supplied by the client
+rather than attempting to resolve the name from the TCP
+connection itself. The default is B<no>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -388,71 +530,31 @@ no
 
 
 
-Here are some explanations on the possible values:
+=head2 IPQoS
 
-=over
-
-=item 'no'
-
-sshd(8) attempts to resolve the name from the TCP connection itself.
-
-=item 'yes'
-
-sshd(8) uses the name supplied by the client
-
-=back
-
-
-
-=head2 HostCertificate
-
-Specifies a file containing a public host certificate. The certificate's public key must match a private host key already specified by HostKey. The default behaviour of sshd(8) is not to load any certificates. I< Optional. Type uniline.  > 
-
-=head2 HostKey
-
-Specifies a file containing a private host key used by SSH. The default is /etc/ssh/ssh_host_key for protocol version 1, and /etc/ssh/ssh_host_rsa_key and /etc/ssh/ssh_host_dsa_key for protocol version 2. Note that sshd(8) will refuse to use a file if it is group/world-accessible.  It is possible to have multiple host key files. "rsa1" keys are used for version 1 and "dsa" or "rsa" are used for version 2 of the SSH protocol. I< Optional. Type list of uniline.  > 
-
-=head2 HostKeyAgent
-
-Identifies the UNIX-domain socket used to communicate with an agent that has access to the private host keys. If "SSH_AUTH_SOCK" is specified, the location of the socket will be read from the SSH_AUTH_SOCK environment variable. I< Optional. Type uniline.  > 
-
-=head2 IgnoreRhosts
-
-Specifies that .rhosts and .shosts files will not be used in RhostsRSAAuthentication or HostbasedAuthentication. /etc/hosts.equiv and /etc/ssh/shosts.equiv are still used. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<IPQoS>Specifies the
+IPv4 type-of-service or DSCP class for the connection.
+Accepted values are B<af11>, B<af12>, B<af13>,
+B<af21>, B<af22>, B<af23>, B<af31>,
+B<af32>, B<af33>, B<af41>, B<af42>,
+B<af43>, B<cs0>, B<cs1>, B<cs2>, B<cs3>,
+B<cs4>, B<cs5>, B<cs6>, B<cs7>, B<ef>,
+B<lowdelay>, B<throughput>, B<reliability>, a
+numeric value, or B<none> to use the operating system
+default. This option may take one or two arguments,
+separated by whitespace. If one argument is specified, it is
+used as the packet class unconditionally. If two values are
+specified, the first is automatically selected for
+interactive sessions and the second for non-interactive
+sessions. The default is B<lowdelay> for interactive
+sessions and B<throughput> for non-interactive
+sessions. I< Optional. Type uniline.  > 
 
 =over 4
 
 =item upstream_default value :
 
-yes
-
-=back
-
-
-
-=head2 IgnoreUserKnownHosts
-
-Specifies whether sshd(8) should ignore the user's ~/.ssh/known_hosts during RhostsRSAAuthentication or HostbasedAuthentication. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-=head2 IPQoS - IPv4 type-of-service or DSCP class for the connection.
-
-Specifies the IPv4 type-of-service or DSCP class for the connection. Accepted values are "af11", "af12", "af13", "af21", "af22", "af23", "af31", "af32", "af33", "af41", "af42", "af43", "cs0", "cs1", "cs2", "cs3", "cs4", "cs5", "cs6", "cs7", "ef", "lowdelay", "throughput", "reliability", or a numeric value. This option may take one or two arguments, separated by whitespace. If one argument is specified, it is used as the packet class unconditionally. If two values are specified, the first is automatically selected for interactive sessions and the second for non-interactive sessions. The default is "lowdelay" for interactive sessions and "throughput" for non-interactive sessions. I< Optional. Type uniline.  > 
-
-=over 4
-
-=item upstream_default value :
-
-lowdelay throughput
+af21 cs1
 
 =back
 
@@ -460,125 +562,26 @@ lowdelay throughput
 
 =head2 KbdInteractiveAuthentication
 
-No doc found in sshd documentation. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
+B<KbdInteractiveAuthentication>Specifies whether to allow
+keyboard-interactive authentication. The argument to this
+keyword must be B<yes> or B<no>. The default is to
+use whatever value B<ChallengeResponseAuthentication> is
+set to (by default B<yes>). I< Optional. Type boolean.  > 
 
 =head2 KerberosAuthentication
 
-Specifies whether the password provided by the user for PasswordAuthentication will be validated through the Kerberos KDC. To use this option, the server needs a Kerberos servtab which allows the verification of the KDC's identity. The default is "no". I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<KerberosAuthentication>Specifies whether the password
+provided by the user for B<PasswordAuthentication> will
+be validated through the Kerberos KDC. To use this option,
+the server needs a Kerberos servtab which allows the
+verification of the KDC’s identity. The default is
+B<no>. I< Optional. Type boolean.  > 
 
 =over 4
 
 =item upstream_default value :
 
 no
-
-=back
-
-
-
-=head2 KerberosGetAFSToken
-
-If AFS is active and the user has a Kerberos 5 TGT, attempt to acquire an AFS token before accessing the user's home directory. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-=head2 KerberosOrLocalPasswd
-
-If password authentication through Kerberos fails then the password will be validated via any additional local mechanism such as /etc/passwd. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-yes
-
-=back
-
-
-
-=head2 KerberosTicketCleanup
-
-Specifies whether to automatically destroy the user's ticket cache file on logout. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-yes
-
-=back
-
-
-
-=head2 KexAlgorithms
-
-Specifies the available KEX (Key Exchange) algorithms. I< Optional. Type check_list. choice: 'ecdh-sha2-nistp256', 'ecdh-sha2-nistp384', 'ecdh-sha2-nistp521', 'diffie-hellman-group-exchange-sha256', 'diffie-hellman-group-exchange-sha1', 'diffie-hellman-group14-sha1', 'diffie-hellman-group1-sha1'.  > 
-
-=head2 KeyRegenerationInterval
-
-In protocol version 1, the ephemeral server key is automatically regenerated after this many seconds (if it has been used). The purpose of regeneration is to prevent decrypting captured sessions by later breaking into the machine and stealing the keys. The key is never stored anywhere. If the value is 0, the key is never regenerated. The default is 3600 (seconds). I< Optional. Type integer.  > 
-
-=over 4
-
-=item upstream_default value :
-
-3600
-
-=back
-
-
-
-=head2 Port
-
-Specifies the port number that sshd(8) listens on. The default is 22. Multiple options of this type are permitted. See also ListenAddress. I< Optional. Type integer.  > 
-
-=over 4
-
-=item upstream_default value :
-
-22
-
-=back
-
-
-
-=head2 ListenAddress
-
-Specifies the local addresses sshd(8) should listen on. The following forms may be used:
-
-  host|IPv4_addr|IPv6_addr
-  host|IPv4_addr:port
-  [host|IPv6_addr]:port
-
-If port is not specified, sshd will listen on the address and all prior Port options specified. The default is to listen on all local addresses.  Multiple ListenAddress options are permitted. Additionally, any Port options must precede this option for non-port qualified addresses. I< Optional. Type list of uniline.  > 
-
-=head2 LoginGraceTime
-
-The server disconnects after this time if the user has not successfully logged in. If the value is 0, there is no time limit. The default is 120 seconds. I< Optional. Type integer.  > 
-
-=over 4
-
-=item upstream_default value :
-
-120
 
 =back
 
@@ -586,7 +589,13 @@ The server disconnects after this time if the user has not successfully logged i
 
 =head2 LogLevel
 
-I< Optional. Type enum. choice: 'SILENT', 'QUIET', 'FATAL', 'ERROR', 'INFO', 'VERBOSE', 'DEBUG', 'DEBUG1', 'DEBUG2', 'DEBUG3'.  > 
+B<LogLevel>Gives the verbosity level that
+is used when logging messages from L<sshd(8)>. The possible
+values are: QUIET, FATAL, ERROR, INFO, VERBOSE, DEBUG,
+DEBUG1, DEBUG2, and DEBUG3. The default is INFO. DEBUG and
+DEBUG1 are equivalent. DEBUG2 and DEBUG3 each specify higher
+levels of debugging output. Logging with a DEBUG level
+violates the privacy of users and is not recommended. I< Optional. Type enum. choice: 'QUIET', 'FATAL', 'ERROR', 'INFO', 'VERBOSE', 'DEBUG', 'DEBUG1', 'DEBUG2', 'DEBUG3'.  > 
 
 =over 4
 
@@ -598,37 +607,12 @@ INFO
 
 
 
-Here are some explanations on the possible values:
-
-=over
-
-=item 'DEBUG'
-
-Logging with this level violates the privacy of users and is not recommended
-
-=item 'DEBUG1'
-
-Logging with this level violates the privacy of users and is not recommended
-
-=item 'DEBUG2'
-
-Logging with this level violates the privacy of users and is not recommended
-
-=item 'DEBUG3'
-
-Logging with this level violates the privacy of users and is not recommended
-
-=back
-
-
-
-=head2 MACs
-
-Specifies the available MAC (message authentication code) algorithms. The MAC algorithm is used in protocol version 2 for data integrity protection. I< Optional. Type check_list. choice: 'hmac-md5', 'hmac-md5-96', 'hmac-ripemd160', 'hmac-sha1', 'hmac-sha1-96', 'umac-64@openssh.com'.  > 
-
 =head2 MaxAuthTries
 
-Specifies the maximum number of authentication attempts permitted per connection. Once the number of failures reaches half this value, additional failures are logged. I< Optional. Type integer.  > 
+B<MaxAuthTries>Specifies the maximum number of
+authentication attempts permitted per connection. Once the
+number of failures reaches half this value, additional
+failures are logged. The default is 6. I< Optional. Type integer.  > 
 
 =over 4
 
@@ -640,25 +624,16 @@ Specifies the maximum number of authentication attempts permitted per connection
 
 
 
-=head2 MaxSessions - Specifies the maximum number of open sessions permitted per network connection
+=head2 MaxSessions
 
-I< Optional. Type integer.  > 
-
-=over 4
-
-=item upstream_default value :
-
-10
-
-=back
-
-
-
-=head2 MaxStartups
-
-Specifies the maximum number of concurrent unauthenticated connections to the SSH daemon. Additional connections will be dropped until authentication succeeds or the LoginGraceTime expires for a connection. The default is 10.
-
-Alternatively, random early drop can be enabled by specifying the three colon separated values "start:rate:full" (e.g. "10:30:60"). sshd(8) will refuse connection attempts with a probability of "rate/100" (30%) if there are currently "start" (10) unauthenticated connections. The probability increases linearly and all connection attempts are refused if the number of unauthenticated connections reaches "full" (60). I< Optional. Type uniline.  > 
+B<MaxSessions>Specifies the maximum number of
+open shell, login or subsystem (e.g. sftp) sessions
+permitted per network connection. Multiple sessions may be
+established by clients that support connection multiplexing.
+Setting B<MaxSessions> to 1 will effectively disable
+session multiplexing, whereas setting it to 0 will prevent
+all shell, login and subsystem sessions while still
+permitting forwarding. The default is 10. I< Optional. Type integer.  > 
 
 =over 4
 
@@ -672,7 +647,8 @@ Alternatively, random early drop can be enabled by specifying the three colon se
 
 =head2 PasswordAuthentication
 
-Specifies whether password authentication is allowed. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<PasswordAuthentication>Specifies whether password
+authentication is allowed. The default is B<yes>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -684,13 +660,12 @@ yes
 
 
 
-=head2 PermitBlacklistedKeys
-
-Specifies whether sshd(8) should allow keys recorded in its blacklist of known-compromised keys (see L<ssh-vulnkey(1)>). If "yes", then attempts to authenticate with compromised keys will be logged but accepted. If "no", then attempts to authenticate with compromised keys will be rejected. I< Optional. Type boolean.  > 
-
 =head2 PermitEmptyPasswords
 
-When password authentication is allowed, it specifies whether the server allows login to accounts with empty password strings.  The default is "no". I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<PermitEmptyPasswords>When password authentication is
+allowed, it specifies whether the server allows login to
+accounts with empty password strings. The default is
+B<no>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -702,52 +677,71 @@ no
 
 
 
-Here are some explanations on the possible values:
+=head2 PermitListen
 
-=over
-
-=item 'yes'
-
-So, you want your machine to be part of a botnet ? ;-)
-
-=back
-
-
+B<PermitListen>Specifies the addresses/ports
+on which a remote TCP port forwarding may listen. The listen
+specification must be one of the following forms:B<PermitListen>I<port> B<
+PermitListen> I<host>:I<port>Multiple
+permissions may be specified by separating them with
+whitespace. An argument of B<any> can be used to remove
+all restrictions and permit any listen requests. An argument
+of B<none> can be used to prohibit all listen requests.
+The host name may contain wildcards as described in the
+PATTERNS section in L<ssh_config(5)>. The wildcard
+’*’ can also be used in place of a port number
+to allow all ports. By default all port forwarding listen
+requests are permitted. Note that the B<GatewayPorts>
+option may further restrict which addresses may be listened
+on. Note also that L<ssh(1)> will request a listen host of
+“localhost” if no listen host was specifically
+requested, and this this name is treated differently to
+explicit localhost addresses of “127.0.0.1” and
+“::1”. I< Optional. Type list of uniline.  > 
 
 =head2 PermitOpen
 
-Specifies the destinations to which TCP port forwarding is permitted. The forwarding specification must be one of the following forms: "host:port" or "IPv4_addr:port" or "[IPv6_addr]:port". An argument of "any" can be used to remove all restrictions and permit any forwarding requests. By default all port forwarding requests are permitted. I< Optional. Type list of uniline.  > 
+B<PermitOpen>Specifies the destinations to
+which TCP port forwarding is permitted. The forwarding
+specification must be one of the following forms:B<PermitOpen>I<host>:I<port> B<
+PermitOpen> I<IPv4_addr>:I<port> B<
+PermitOpen> I<[IPv6_addr]>:I<port>Multiple
+forwards may be specified by separating them with
+whitespace. An argument of B<any> can be used to remove
+all restrictions and permit any forwarding requests. An
+argument of B<none> can be used to prohibit all
+forwarding requests. The wildcard ’*’ can be
+used for host or port to allow all hosts or ports,
+respectively. By default all port forwarding requests are
+permitted. I< Optional. Type list of uniline.  > 
 
 =head2 PermitRootLogin
 
-Specifies whether root can log in using ssh(1). I< Optional. Type enum. choice: 'yes', 'without-password', 'forced-commands-only', 'no'.  > 
+B<PermitRootLogin>Specifies whether root can log
+in using L<ssh(1)>. The argument must be B<yes>,
+B<prohibit-password>, B<forced-commands-only>, or
+B<no>. The default is B<prohibit-password>.If this option
+is set to B<prohibit-password> (or its deprecated alias,
+B<without-password>), password and keyboard-interactive
+authentication are disabled for root.If this option
+is set to B<forced-commands-only>, root login with
+public key authentication will be allowed, but only if the
+I<command> option has been specified (which may be
+useful for taking remote backups even if root login is
+normally not allowed). All other authentication methods are
+disabled for root.If this option
+is set to B<no>, root is not allowed to log in. I< Optional. Type enum. choice: 'yes', 'prohibit-password', 'forced-commands-only', 'no'.  > 
+
+=head2 PermitTTY
+
+B<PermitTTY>Specifies whether L<pty(4)>
+allocation is permitted. The default is B<yes>. I< Optional. Type boolean.  > 
 
 =over 4
 
 =item upstream_default value :
 
 yes
-
-=back
-
-
-
-Here are some explanations on the possible values:
-
-=over
-
-=item 'forced-commands-only'
-
-root login with public key authentication will be allowed, but only if the command option has been specified (which may be useful for taking remote backups even if root login is normally not allowed).  All other authentication methods are disabled for root.
-
-=item 'no'
-
-root is not allowed to log in
-
-
-=item 'without-password'
-
-password authentication is disabled for root
 
 =back
 
@@ -755,7 +749,14 @@ password authentication is disabled for root
 
 =head2 PermitTunnel
 
-Specifies whether tun(4) device forwarding is allowed. The argument must be "yes", "point-to-point" (layer 3), "ethernet" (layer 2), or "no".  Specifying "yes" permits both "point-to-point" and "ethernet". I< Optional. Type enum. choice: 'yes', 'point-to-point', 'ethernet', 'no'.  > 
+B<PermitTunnel>Specifies whether L<tun(4)> device
+forwarding is allowed. The argument must be B<yes>,
+B<point-to-point> (layer 3), B<ethernet> (layer 2),
+or B<no>. Specifying B<yes> permits both
+B<point-to-point> and B<ethernet>. The default is
+B<no>.Independent of
+this setting, the permissions of the selected L<tun(4)> device
+must allow access to the user. I< Optional. Type enum. choice: 'yes', 'point-to-point', 'ethernet', 'no'.  > 
 
 =over 4
 
@@ -767,49 +768,11 @@ no
 
 
 
-Here are some explanations on the possible values:
+=head2 PermitUserRC
 
-=over
-
-=item 'yes'
-
-permits both "point-to-point" and "ethernet"
-
-=back
-
-
-
-=head2 PermitUserEnvironment
-
-Specifies whether ~/.ssh/environment and environment= options in ~/.ssh/authorized_keys are processed by sshd(8). The default is "no". Enabling environment processing may enable users to bypass access restrictions in some configurations using mechanisms such as LD_PRELOAD. I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
-
-=head2 PidFile
-
-Specifies the file that contains the process ID of the SSH daemon. I< Optional. Type uniline.  > 
-
-=over 4
-
-=item upstream_default value :
-
-/var/run/sshd.pid
-
-=back
-
-
-
-=head2 PrintLastLog
-
-Specifies whether sshd(8) should print the date and time of the last user login when a user logs in interactively. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<PermitUserRC>Specifies whether any
+I<~/.ssh/rc> file is executed. The default is
+B<yes>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -821,27 +784,37 @@ yes
 
 
 
-=head2 PrintMotd
+=head2 PubkeyAcceptedKeyTypes
 
-Specifies whether sshd(8) should print /etc/motd when a user logs in interactively. (On some systems it is also printed by the shell, /etc/profile, or equivalent.) I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<PubkeyAcceptedKeyTypes>Specifies the key types that
+will be accepted for public key authentication as a list of
+comma-separated patterns. Alternately if the specified value
+begins with a ’+’ character, then the specified
+key types will be appended to the default set instead of
+replacing them. If the specified value begins with a
+’-’ character, then the specified key types
+(including wildcards) will be removed from the default set
+instead of replacing them. The default for this option
+is:ecdsa-sha2-nistp256-cert-v01@openssh.com,
 
-=over 4
+ecdsa-sha2-nistp384-cert-v01@openssh.com, 
+ecdsa-sha2-nistp521-cert-v01@openssh.com, 
+ssh-ed25519-cert-v01@openssh.com, 
 
-=item upstream_default value :
+rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256-cert-v01@openssh.com,
 
-yes
+ssh-rsa-cert-v01@openssh.com, 
 
-=back
+ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,
 
-
-
-=head2 Protocol
-
-Specifies the protocol versions sshd(8) supports.  Note that the order of the protocol list does not indicate preference, because the client selects among multiple protocol versions offered by the server. I< Optional. Type check_list. choice: '1', '2'.  > 
+ssh-ed25519,rsa-sha2-512,rsa-sha2-256,ssh-rsaThe list of
+available key types may also be obtained using "ssh -Q
+key". I< Optional. Type uniline.  > 
 
 =head2 PubkeyAuthentication
 
-Specifies whether public key authentication is allowed.  The default is "yes". Note that this option applies to protocol version 2 only. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<PubkeyAuthentication>Specifies whether public key
+authentication is allowed. The default is B<yes>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -855,42 +828,77 @@ yes
 
 =head2 RekeyLimit
 
-Specifies the maximum amount of data that may be transmitted before
-the session key is renegotiated, optionally followed a maximum amount
-of time that may pass before the session key is renegotiated.  The
-first argument is specified in bytes and may have a suffix of 'K',
-'M', or 'G' to indicate Kilobytes, Megabytes, or Gigabytes,
-respectively.  The default is between '1G' and '4G', depending on the
-cipher.  The optional second value is specified in seconds and may use
-any of the units documented in the TIME FORMATS section.  The default
-value for RekeyLimit is "default none", which means that rekeying is
-performed after the cipher's default amount of data has been sent or
-received and no time based rekeying is done.  This option applies to
-protocol version 2 only. I< Optional. Type uniline.  > 
+B<RekeyLimit>Specifies the maximum amount of
+data that may be transmitted before the session key is
+renegotiated, optionally followed a maximum amount of time
+that may pass before the session key is renegotiated. The
+first argument is specified in bytes and may have a suffix
+of ’K’, ’M’, or ’G’ to
+indicate Kilobytes, Megabytes, or Gigabytes, respectively.
+The default is between ’1G’ and
+’4G’, depending on the cipher. The optional
+second value is specified in seconds and may use any of the
+units documented in the I<TIME FORMATS> section. The
+default value for B<RekeyLimit> is B<default none>,
+which means that rekeying is performed after the
+cipher’s default amount of data has been sent or
+received and no time based rekeying is done. I< Optional. Type uniline.  > 
 
-=over 4
+=head2 RevokedKeys
 
-=item upstream_default value :
+B<RevokedKeys>Specifies revoked public keys
+file, or B<none> to not use one. Keys listed in this
+file will be refused for public key authentication. Note
+that if this file is not readable, then public key
+authentication will be refused for all users. Keys may be
+specified as a text file, listing one public key per line,
+or as an OpenSSH Key Revocation List (KRL) as generated by
+L<ssh-keygen(1)>. For more information on KRLs, see the KEY
+REVOCATION LISTS section in L<ssh-keygen(1)>. I< Optional. Type uniline.  > 
 
-default none
+=head2 RDomain
 
-=back
+B<RDomain>Specifies an explicit routing
+domain that is applied after authentication has completed.
+The user session, as well and any forwarded or listening IP
+sockets, will be bound to this L<rdomain(4)>. If the routing
+domain is set to B<%D>, then the domain in which the
+incoming connection was received will be applied. I< Optional. Type uniline.  > 
 
+=head2 SetEnv
 
+B<SetEnv>Specifies one
+or more environment variables to set in child sessions
+started by L<sshd(8)> as “NAME=VALUE”. The
+environment value may be quoted (e.g. if it contains
+whitespace characters). Environment variables set by
+B<SetEnv> override the default environment and any
+variables specified by the user via B<AcceptEnv> or
+B<PermitUserEnvironment>. I< Optional. Type uniline.  > 
 
-=head2 RevokedKeys - Revoked keys file
+=head2 StreamLocalBindMask
 
-Specifies revoked public keys.  Keys listed in this file will be
-refused for public key authentication.  Note that if this file is not
-readable, then public key authentication will be refused for all
-users.  Keys may be specified as a text file, listing one public key
-per line, or as an OpenSSH Key Revocation List (KRL) as generated by
-L<ssh-keygen(1)>.  For more information on KRLs, see the KEY REVOCATION
-LISTS section in ssh-keygen(1). I< Optional. Type uniline.  > 
+B<StreamLocalBindMask>Sets the octal file creation
+mode mask (umask) used when creating a Unix-domain socket
+file for local or remote port forwarding. This option is
+only used for port forwarding to a Unix-domain socket
+file.The default
+value is 0177, which creates a Unix-domain socket file that
+is readable and writable only by the owner. Note that not
+all operating systems honor the file mode on Unix-domain
+socket files. I< Optional. Type uniline.  > 
 
-=head2 RhostsRSAAuthentication
+=head2 StreamLocalBindUnlink
 
-Specifies whether rhosts or /etc/hosts.equiv authentication together with successful RSA host authentication is allowed.  The default is "no". This option applies to protocol version 1 only. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<StreamLocalBindUnlink>Specifies whether to remove an
+existing Unix-domain socket file for local or remote port
+forwarding before creating a new one. If the socket file
+already exists and B<StreamLocalBindUnlink> is not
+enabled, B<sshd> will be unable to forward the port to
+the Unix-domain socket file. This option is only used for
+port forwarding to a Unix-domain socket file.The argument
+must be B<yes> or B<no>. The default is
+B<no>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -902,9 +910,118 @@ no
 
 
 
+=head2 TrustedUserCAKeys
+
+B<TrustedUserCAKeys>Specifies a file containing
+public keys of certificate authorities that are trusted to
+sign user certificates for authentication, or B<none> to
+not use one. Keys are listed one per line; empty lines and
+comments starting with ’#’ are allowed. If a
+certificate is presented for authentication and has its
+signing CA key listed in this file, then it may be used for
+authentication for any user listed in the
+certificate’s principals list. Note that certificates
+that lack a list of principals will not be permitted for
+authentication using B<TrustedUserCAKeys>. For more
+details on certificates, see the CERTIFICATES section in
+L<ssh-keygen(1)>. I< Optional. Type uniline.  > 
+
+=head2 X11DisplayOffset
+
+B<X11DisplayOffset>Specifies the first display
+number available for L<sshd(8)>’s X11 forwarding. This
+prevents sshd from interfering with real X11 servers. The
+default is 10. I< Optional. Type uniline.  > 
+
+=head2 X11Forwarding
+
+B<X11Forwarding>Specifies whether X11
+forwarding is permitted. The argument must be B<yes> or
+B<no>. The default is B<no>.When X11
+forwarding is enabled, there may be additional exposure to
+the server and to client displays if the L<sshd(8)> proxy
+display is configured to listen on the wildcard address (see
+B<X11UseLocalhost>), though this is not the default.
+Additionally, the authentication spoofing and authentication
+data verification and substitution occur on the client side.
+The security risk of using X11 forwarding is that the
+client’s X11 display server may be exposed to attack
+when the SSH client requests forwarding (see the warnings
+for B<ForwardX11> in L<ssh_config(5)>). A system
+administrator may have a stance in which they want to
+protect clients that may expose themselves to attack by
+unwittingly requesting X11 forwarding, which can warrant a
+B<no> setting.Note that
+disabling X11 forwarding does not prevent users from
+forwarding X11 traffic, as users can always install their
+own forwarders. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 AuthorizedKeysFile2
+
+This parameter is now ignored by Ssh. B<Deprecated> I< Optional. Type list of uniline.  > 
+
+=head2 Protocol
+
+B<Deprecated> I< Optional. Type uniline.  > 
+
 =head2 RSAAuthentication
 
-Specifies whether pure RSA authentication is allowed. This option applies to protocol version 1 only. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<Deprecated> I< Optional. Type uniline.  > 
+
+=head2 RhostsRSAAuthentication
+
+B<Deprecated> I< Optional. Type uniline.  > 
+
+=head2 UsePrivilegeSeparation
+
+B<Deprecated> I< Optional. Type uniline.  > 
+
+=head2 KeyRegenerationInterval
+
+B<Deprecated> I< Optional. Type uniline.  > 
+
+=head2 AddressFamily
+
+B<AddressFamily>Specifies which address family
+should be used by L<sshd(8)>. Valid arguments are B<any>
+(the default), B<inet> (use IPv4 only), or B<inet6>
+(use IPv6 only). I< Optional. Type enum. choice: 'any', 'inet', 'inet6'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+any
+
+=back
+
+
+
+=head2 CASignatureAlgorithms
+
+B<CASignatureAlgorithms>Specifies which algorithms are
+allowed for signing of certificates by certificate
+authorities (CAs). The default is:ecdsa-sha2-nistp256.ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,
+
+ssh-ed25519,rsa-sha2-512,rsa-sha2-256,ssh-rsaCertificates
+signed using other algorithms will not be accepted for
+public key or host-based authentication. I< Optional. Type uniline.  > 
+
+=head2 ChallengeResponseAuthentication
+
+B<ChallengeResponseAuthentication>Specifies whether
+challenge-response authentication is allowed (e.g. via PAM).
+The default is B<yes>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -916,15 +1033,576 @@ yes
 
 
 
-=head2 ServerKeyBits
+=head2 Ciphers
 
-Defines the number of bits in the ephemeral protocol version 1 server key. The minimum value is 512, and the default is 768. I< Optional. Type integer.  > 
+B<Ciphers>Specifies the ciphers allowed.
+Multiple ciphers must be comma-separated. If the specified
+value begins with a ’+’ character, then the
+specified ciphers will be appended to the default set
+instead of replacing them. If the specified value begins
+with a ’-’ character, then the specified ciphers
+(including wildcards) will be removed from the default set
+instead of replacing them.The supported
+ciphers are:3des-cbc 
+aes128-cbc 
+aes192-cbc 
+aes256-cbc 
+aes128-ctr 
+aes192-ctr 
+aes256-ctr 
+aes128-gcm@openssh.com 
+aes256-gcm@openssh.com 
+chacha20-poly1305@openssh.comThe default
+is:chacha20-poly1305@openssh.com,
+
+aes128-ctr,aes192-ctr,aes256-ctr, 
+aes128-gcm@openssh.com,aes256-gcm@openssh.comThe list of
+available ciphers may also be obtained using "ssh -Q
+cipher". I< Optional. Type uniline.  > 
+
+=head2 Compression
+
+B<Compression>Specifies whether compression
+is enabled after the user has authenticated successfully.
+The argument must be B<yes>, B<delayed> (a legacy
+synonym for B<yes>) or B<no>. The default is
+B<yes>. I< Optional. Type enum. choice: 'yes', 'delayed', 'no'.  > 
 
 =over 4
 
 =item upstream_default value :
 
-768
+yes
+
+=back
+
+
+
+=head2 DebianBanner
+
+B<DebianBanner>Specifies whether the
+distribution-specified extra version suffix is included
+during initial protocol handshake. The default is
+B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
+
+=head2 DisableForwarding
+
+B<DisableForwarding>Disables all forwarding
+features, including X11, L<ssh-agent(1)>, TCP and StreamLocal.
+This option overrides all other forwarding-related options
+and may simplify restricted configurations. I< Optional. Type uniline.  > 
+
+=head2 ExposeAuthInfo
+
+B<ExposeAuthInfo>Writes a temporary file
+containing a list of authentication methods and public
+credentials (e.g. keys) used to authenticate the user. The
+location of the file is exposed to the user session through
+the SSH_USER_AUTH environment variable. The default is
+B<no>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 FingerprintHash
+
+B<FingerprintHash>Specifies the hash algorithm
+used when logging key fingerprints. Valid options are:
+B<md5> and B<sha256>. The default is
+B<sha256>. I< Optional. Type enum. choice: 'md5', 'sha256'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+sha256
+
+=back
+
+
+
+=head2 GSSAPIKeyExchange
+
+B<GSSAPIKeyExchange>Specifies whether key exchange
+based on GSSAPI is allowed. GSSAPI key exchange
+doesn’t rely on ssh keys to verify host identity. The
+default is B<no>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 GSSAPICleanupCredentials
+
+B<GSSAPICleanupCredentials>Specifies whether to
+automatically destroy the user’s credentials cache on
+logout. The default is B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
+
+=head2 GSSAPIStrictAcceptorCheck
+
+B<GSSAPIStrictAcceptorCheck>Determines whether to be strict
+about the identity of the GSSAPI acceptor a client
+authenticates against. If set to B<yes> then the client
+must authenticate against the host service on the current
+hostname. If set to B<no> then the client may
+authenticate against any service key stored in the
+machine’s default store. This facility is provided to
+assist with operation on multi homed machines. The default
+is B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
+
+=head2 GSSAPIStoreCredentialsOnRekey
+
+B<GSSAPIStoreCredentialsOnRekey>Controls whether the
+user’s GSSAPI credentials should be updated following
+a successful connection rekeying. This option can be used to
+accepted renewed or updated credentials from a compatible
+client. The default is B<no>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 HostCertificate
+
+B<HostCertificate>Specifies a file containing a
+public host certificate. The certificate’s public key
+must match a private host key already specified by
+B<HostKey>. The default behaviour of L<sshd(8)> is not to
+load any certificates. I< Optional. Type uniline.  > 
+
+=head2 HostKey
+
+B<HostKey>Specifies a file containing a
+private host key used by SSH. The defaults are
+I</etc/ssh/ssh_host_ecdsa_key>,
+I</etc/ssh/ssh_host_ed25519_key> and
+I</etc/ssh/ssh_host_rsa_key>.Note that
+L<sshd(8)> will refuse to use a file if it is
+group/world-accessible and that the B<HostKeyAlgorithms>
+option restricts which of the keys are actually used by
+L<sshd(8)>.It is possible
+to have multiple host key files. It is also possible to
+specify public host key files instead. In this case
+operations on the private key will be delegated to an
+L<ssh-agent(1)>. I< Optional. Type uniline.  > 
+
+=head2 HostKeyAgent
+
+B<HostKeyAgent>Identifies the UNIX-domain
+socket used to communicate with an agent that has access to
+the private host keys. If the string
+"SSH_AUTH_SOCK" is specified, the location of the
+socket will be read from the SSH_AUTH_SOCK environment
+variable. I< Optional. Type uniline.  > 
+
+=head2 HostKeyAlgorithms
+
+B<HostKeyAlgorithms>Specifies the host key
+algorithms that the server offers. The default for this
+option is:ecdsa-sha2-nistp256-cert-v01@openssh.com,
+
+ecdsa-sha2-nistp384-cert-v01@openssh.com, 
+ecdsa-sha2-nistp521-cert-v01@openssh.com, 
+ssh-ed25519-cert-v01@openssh.com, 
+
+rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256-cert-v01@openssh.com,
+
+ssh-rsa-cert-v01@openssh.com, 
+
+ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,
+
+ssh-ed25519,rsa-sha2-512,rsa-sha2-256,ssh-rsaThe list of
+available key types may also be obtained using "ssh -Q
+key". I< Optional. Type uniline.  > 
+
+=head2 IgnoreRhosts
+
+B<IgnoreRhosts>Specifies that I<.rhosts>
+and I<.shosts> files will not be used in
+B<HostbasedAuthentication>.I</etc/hosts.equiv>
+and I</etc/ssh/shosts.equiv> are still used. The default
+is B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
+
+=head2 IgnoreUserKnownHosts
+
+B<IgnoreUserKnownHosts>Specifies whether L<sshd(8)>
+should ignore the user’s I<~/.ssh/known_hosts>
+during B<HostbasedAuthentication> and use only the
+system-wide known hosts file I</etc/ssh/known_hosts>.
+The default is B<no>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 KerberosGetAFSToken
+
+B<KerberosGetAFSToken>If AFS is active and the user
+has a Kerberos 5 TGT, attempt to acquire an AFS token before
+accessing the user’s home directory. The default is
+B<no>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 KerberosOrLocalPasswd
+
+B<KerberosOrLocalPasswd>If password authentication
+through Kerberos fails then the password will be validated
+via any additional local mechanism such as
+I</etc/passwd>. The default is B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
+
+=head2 KerberosTicketCleanup
+
+B<KerberosTicketCleanup>Specifies whether to
+automatically destroy the user’s ticket cache file on
+logout. The default is B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
+
+=head2 KexAlgorithms
+
+B<KexAlgorithms>Specifies the available KEX
+(Key Exchange) algorithms. Multiple algorithms must be
+comma-separated. Alternately if the specified value begins
+with a ’+’ character, then the specified methods
+will be appended to the default set instead of replacing
+them. If the specified value begins with a ’-’
+character, then the specified methods (including wildcards)
+will be removed from the default set instead of replacing
+them. The supported algorithms are:curve25519-sha256
+
+curve25519-sha256@libssh.org 
+diffie-hellman-group1-sha1 
+diffie-hellman-group14-sha1 
+diffie-hellman-group14-sha256 
+diffie-hellman-group16-sha512 
+diffie-hellman-group18-sha512 
+diffie-hellman-group-exchange-sha1 
+diffie-hellman-group-exchange-sha256 
+ecdh-sha2-nistp256 
+ecdh-sha2-nistp384 
+ecdh-sha2-nistp521The default
+is:curve25519-sha256,curve25519-sha256@libssh.org,
+
+ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,
+
+diffie-hellman-group-exchange-sha256, 
+
+diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,
+
+
+diffie-hellman-group14-sha256,diffie-hellman-group14-sha1The list of
+available key exchange algorithms may also be obtained using
+"ssh -Q kex". I< Optional. Type uniline.  > 
+
+=head2 ListenAddress
+
+B<ListenAddress>Specifies the local addresses
+L<sshd(8)> should listen on. The following forms may be
+used:B<ListenAddress>I<hostname>|I<address> [B<rdomain>I<domain>] B<
+ListenAddress> I<hostname>:I<port>
+[B<rdomain> I<domain>] B<
+ListenAddress> I<IPv4_address>:I<port>
+[B<rdomain> I<domain>] B<
+ListenAddress> [I<hostname>|I<address> ]:I<port>
+[B<rdomain> I<domain>]The optional
+B<rdomain> qualifier requests L<sshd(8)> listen in an
+explicit routing domain. If I<port> is not specified,
+sshd will listen on the address and all B<Port> options
+specified. The default is to listen on all local addresses
+on the current default routing domain. Multiple
+B<ListenAddress> options are permitted. For more
+information on routing domains, see L<rdomain(4)>. I< Optional. Type uniline.  > 
+
+=head2 LoginGraceTime
+
+B<LoginGraceTime>The server disconnects after
+this time if the user has not successfully logged in. If the
+value is 0, there is no time limit. The default is 120
+seconds. I< Optional. Type uniline.  > 
+
+=head2 MACs
+
+B<MACs>Specifies the
+available MAC (message authentication code) algorithms. The
+MAC algorithm is used for data integrity protection.
+Multiple algorithms must be comma-separated. If the
+specified value begins with a ’+’ character,
+then the specified algorithms will be appended to the
+default set instead of replacing them. If the specified
+value begins with a ’-’ character, then the
+specified algorithms (including wildcards) will be removed
+from the default set instead of replacing them.The algorithms
+that contain "-etm" calculate the MAC after
+encryption (encrypt-then-mac). These are considered safer
+and their use recommended. The supported MACs are:hmac-md5 
+hmac-md5-96 
+hmac-sha1 
+hmac-sha1-96 
+hmac-sha2-256 
+hmac-sha2-512 
+umac-64@openssh.com 
+umac-128@openssh.com 
+hmac-md5-etm@openssh.com 
+hmac-md5-96-etm@openssh.com 
+hmac-sha1-etm@openssh.com 
+hmac-sha1-96-etm@openssh.com 
+hmac-sha2-256-etm@openssh.com 
+hmac-sha2-512-etm@openssh.com 
+umac-64-etm@openssh.com 
+umac-128-etm@openssh.comThe default
+is:umac-64-etm@openssh.com,umac-128-etm@openssh.com,
+
+
+hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,
+
+hmac-sha1-etm@openssh.com, 
+umac-64@openssh.com,umac-128@openssh.com, 
+hmac-sha2-256,hmac-sha2-512,hmac-sha1The list of
+available MAC algorithms may also be obtained using
+"ssh -Q mac". I< Optional. Type uniline.  > 
+
+=head2 Match
+
+B<Match>Introduces a
+conditional block. If all of the criteria on the
+B<Match> line are satisfied, the keywords on the
+following lines override those set in the global section of
+the config file, until either another B<Match> line or
+the end of the file. If a keyword appears in multiple
+B<Match> blocks that are satisfied, only the first
+instance of the keyword is applied.The arguments
+to B<Match> are one or more criteria-pattern pairs or
+the single token B<All> which matches all criteria. The
+available criteria are B<User>, B<Group>,
+B<Host>, B<LocalAddress>, B<LocalPort>,
+B<RDomain>, and B<Address> (with B<RDomain>
+representing the L<rdomain(4)> on which the connection was
+received.)The match
+patterns may consist of single entries or comma-separated
+lists and may use the wildcard and negation operators
+described in the I<PATTERNS> section of
+L<ssh_config(5)>.The patterns in
+an B<Address> criteria may additionally contain
+addresses to match in CIDR address/masklen format, such as
+192.0.2.0/24 or 2001:db8::/32. Note that the mask length
+provided must be consistent with the address - it is an
+error to specify a mask length that is too long for the
+address or one with bits set in this host portion of the
+address. For example, 192.0.2.0/33 and 192.0.2.0/8,
+respectively.Only a subset
+of keywords may be used on the lines following a
+B<Match> keyword. Available keywords are
+B<AcceptEnv>, B<AllowAgentForwarding>,
+B<AllowGroups>, B<AllowStreamLocalForwarding>,
+B<AllowTcpForwarding>, B<AllowUsers>,
+B<AuthenticationMethods>, B<AuthorizedKeysCommand>,
+B<AuthorizedKeysCommandUser>, B<AuthorizedKeysFile>,
+B<AuthorizedPrincipalsCommand>,
+B<AuthorizedPrincipalsCommandUser>,
+B<AuthorizedPrincipalsFile>, B<Banner>,
+B<ChrootDirectory>, B<ClientAliveCountMax>,
+B<ClientAliveInterval>, B<DenyGroups>,
+B<DenyUsers>, B<ForceCommand>, B<GatewayPorts>,
+B<GSSAPIAuthentication>,
+B<HostbasedAcceptedKeyTypes>,
+B<HostbasedAuthentication>,
+B<HostbasedUsesNameFromPacketOnly>, B<IPQoS>,
+B<KbdInteractiveAuthentication>,
+B<KerberosAuthentication>, B<LogLevel>,
+B<MaxAuthTries>, B<MaxSessions>,
+B<PasswordAuthentication>, B<PermitEmptyPasswords>,
+B<PermitListen>, B<PermitOpen>,
+B<PermitRootLogin>, B<PermitTTY>,
+B<PermitTunnel>, B<PermitUserRC>,
+B<PubkeyAcceptedKeyTypes>, B<PubkeyAuthentication>,
+B<RekeyLimit>, B<RevokedKeys>, B<RDomain>,
+B<SetEnv>, B<StreamLocalBindMask>,
+B<StreamLocalBindUnlink>, B<TrustedUserCAKeys>,
+B<X11DisplayOffset>, B<X11Forwarding> and
+B<X11UseLocalHost>. I< Optional. Type list of node of class L<Sshd::MatchBlock|Config::Model::models::Sshd::MatchBlock> .  > 
+
+=head2 MaxStartups
+
+B<MaxStartups>Specifies the maximum number of
+concurrent unauthenticated connections to the SSH daemon.
+Additional connections will be dropped until authentication
+succeeds or the B<LoginGraceTime> expires for a
+connection. The default is 10:30:100.Alternatively,
+random early drop can be enabled by specifying the three
+colon separated values start:rate:full (e.g.
+"10:30:60"). L<sshd(8)> will refuse connection
+attempts with a probability of rate/100 (30%) if there are
+currently start (10) unauthenticated connections. The
+probability increases linearly and all connection attempts
+are refused if the number of unauthenticated connections
+reaches full (60). I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+10
+
+=back
+
+
+
+=head2 PermitUserEnvironment
+
+B<PermitUserEnvironment>Specifies whether
+I<~/.ssh/environment> and B<environment=> options in
+I<~/.ssh/authorized_keys> are processed by L<sshd(8)>.
+Valid options are B<yes>, B<no> or a pattern-list
+specifying which environment variable names to accept (for
+example "LANG,LC_*"). The default is B<no>.
+Enabling environment processing may enable users to bypass
+access restrictions in some configurations using mechanisms
+such as LD_PRELOAD. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
+=head2 PidFile
+
+B<PidFile>Specifies the file that
+contains the process ID of the SSH daemon, or B<none> to
+not write one. The default is I</run/sshd.pid>. I< Optional. Type uniline.  > 
+
+=head2 Port
+
+B<Port>Specifies the
+port number that L<sshd(8)> listens on. The default is 22.
+Multiple options of this type are permitted. See also
+B<ListenAddress>. I< Optional. Type uniline.  > 
+
+=head2 PrintLastLog
+
+B<PrintLastLog>Specifies whether L<sshd(8)>
+should print the date and time of the last user login when a
+user logs in interactively. The default is B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
+
+=head2 PrintMotd
+
+B<PrintMotd>Specifies whether L<sshd(8)>
+should print I</etc/motd> when a user logs in
+interactively. (On some systems it is also printed by the
+shell, I</etc/profile>, or equivalent.) The default is
+B<yes>. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
 
 =back
 
@@ -932,8 +1610,14 @@ Defines the number of bits in the ephemeral protocol version 1 server key. The m
 
 =head2 StrictModes
 
-Specifies whether sshd(8) should check file modes and ownership of the user's files and home directory before accepting login.  This is normally desirable because novices sometimes accidentally leave their directory or files world-writable.  The default is "yes".
-I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<StrictModes>Specifies whether L<sshd(8)>
+should check file modes and ownership of the user’s
+files and home directory before accepting login. This is
+normally desirable because novices sometimes accidentally
+leave their directory or files world-writable. The default
+is B<yes>. Note that this does not apply to
+B<ChrootDirectory>, whose permissions and ownership are
+checked unconditionally. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -947,11 +1631,24 @@ yes
 
 =head2 Subsystem
 
-Configures an external subsystem (e.g. file transfer daemon). Keys of the hash should be a subsystem name and hash value a command (with optional arguments) to execute upon subsystem request. The command sftp-server(8) implements the "sftp" file transfer subsystem.  By default no subsystems are defined. Note that this option applies to protocol version 2 only. I< Optional. Type hash of uniline.  > 
+B<Subsystem>Configures an external
+subsystem (e.g. file transfer daemon). Arguments should be a
+subsystem name and a command (with optional arguments) to
+execute upon subsystem request.The command
+B<sftp-server> implements the SFTP file transfer
+subsystem.Alternately the
+name B<internal-sftp> implements an in-process SFTP
+server. This may simplify configurations using
+B<ChrootDirectory> to force a different filesystem root
+on clients.By default no
+subsystems are defined. I< Optional. Type hash of uniline.  > 
 
 =head2 SyslogFacility
 
-Gives the facility code that is used when logging messages from sshd(8). The default is AUTH. I< Optional. Type enum. choice: 'DAEMON', 'USER', 'AUTH', 'LOCAL0', 'LOCAL1', 'LOCAL2', 'LOCAL3', 'LOCAL4', 'LOCAL5', 'LOCAL6', 'LOCAL7'.  > 
+B<SyslogFacility>Gives the facility code that is
+used when logging messages from L<sshd(8)>. The possible values
+are: DAEMON, USER, AUTH, LOCAL0, LOCAL1, LOCAL2, LOCAL3,
+LOCAL4, LOCAL5, LOCAL6, LOCAL7. The default is AUTH. I< Optional. Type enum. choice: 'DAEMON', 'USER', 'AUTH', 'LOCAL0', 'LOCAL1', 'LOCAL2', 'LOCAL3', 'LOCAL4', 'LOCAL5', 'LOCAL6', 'LOCAL7'.  > 
 
 =over 4
 
@@ -963,13 +1660,23 @@ AUTH
 
 
 
-=head2 KeepAlive
-
-B<Deprecated> I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
 =head2 TCPKeepAlive
 
-Specifies whether the system should send TCP keepalive messages to the other side. If they are sent, death of the connection or crash of one of the machines will be properly noticed. However, this means that connections will die if the route is down temporarily, and some people find it annoying.  On the other hand, if TCP keepalives are not sent, sessions may hang indefinitely on the server, leaving "ghost" users and consuming server resources. This option was formerly called KeepAlive. I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<TCPKeepAlive>Specifies whether the system
+should send TCP keepalive messages to the other side. If
+they are sent, death of the connection or crash of one of
+the machines will be properly noticed. However, this means
+that connections will die if the route is down temporarily,
+and some people find it annoying. On the other hand, if TCP
+keepalives are not sent, sessions may hang indefinitely on
+the server, leaving "ghost" users and consuming
+server resources.The default is
+B<yes> (to send TCP keepalive messages), and the server
+will notice if the network goes down or the client host
+crashes. This avoids infinitely hanging sessions.To disable TCP
+keepalive messages, the value should be set to
+B<no>.This option was
+formerly called B<KeepAlive>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -980,65 +1687,16 @@ yes
 =back
 
 
-
-Here are some explanations on the possible values:
-
-=over
-
-=item 'no'
-
-disable TCP keepalive messages
-
-=item 'yes'
-
-Send TCP keepalive messages. The server will notice if the network goes down or the client host crashes. This avoids infinitely hanging sessions.
-
-=back
-
-
-
-Note: TCPKeepAlive is migrated with 'C<$keep_alive>' and with: 
-
-=over
-
-=item *
-
-C<$keep_alive> => C<- KeepAlive>
-
-=back
-
-
-
-=head2 TrustedUserCAKeys
-
-Specifies a file containing public keys of certificate authorities
-that are trusted to sign user certificates for authentication.  Keys
-are listed one per line; empty lines and comments starting with '#'
-are allowed.  If a certificate is presented for authentication and has
-its signing CA key listed in this file, then it may be used for
-authentication for any user listed in the certificate's principals
-list.  Note that certificates that lack a list of principals will not
-be permitted for authentication using TrustedUserCAKeys.  For more
-details on certificates, see the CERTIFICATES section in
-ssh-keygen(1). I< Optional. Type uniline.  > 
 
 =head2 UseDNS
 
-Specifies whether sshd(8) should look up the remote host name and check that the resolved host name for the remote IP address maps back to the very same IP address. The default is "yes" I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-yes
-
-=back
-
-
-
-=head2 UseLogin
-
-Deprecated in August 2016, removed in 2017. B<Deprecated> I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<UseDNS>Specifies
+whether L<sshd(8)> should look up the remote host name, and to
+check that the resolved host name for the remote IP address
+maps back to the very same IP address.If this option
+is set to B<no> (the default) then only addresses and
+not host names may be used in I<~/.ssh/authorized_keys>B<from> and B<sshd_config Match Host>
+directives. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -1052,31 +1710,24 @@ no
 
 =head2 UsePAM
 
-Enables the Pluggable Authentication Module interface. If set to "yes" this will enable PAM authentication using ChallengeResponseAuthentication and PasswordAuthentication in addition to PAM account and session module processing for all authentication types.
-
-Because PAM challenge-response authentication usually serves an equivalent role to password authentication, you should disable either PasswordAuthentication or ChallengeResponseAuthentication.
-
-If UsePAM is enabled, you will not be able to run sshd(8) as a non-root user.  The default is "no". I< Optional. Type enum. choice: 'no', 'yes'.  > 
+B<UsePAM>Enables the
+Pluggable Authentication Module interface. If set to
+B<yes> this will enable PAM authentication using
+B<ChallengeResponseAuthentication> and
+B<PasswordAuthentication> in addition to PAM account and
+session module processing for all authentication types.Because PAM
+challenge-response authentication usually serves an
+equivalent role to password authentication, you should
+disable either B<PasswordAuthentication> or
+B<ChallengeResponseAuthentication.>If
+B<UsePAM> is enabled, you will not be able to run
+L<sshd(8)> as a non-root user. The default is B<no>. I< Optional. Type boolean.  > 
 
 =over 4
 
 =item upstream_default value :
 
 no
-
-=back
-
-
-
-=head2 UsePrivilegeSeparation
-
-Specifies whether sshd(8) separates privileges by creating an unprivileged child process to deal with incoming network traffic.  After successful authentication, another process will be created that has the privilege of the authenticated user. The goal of privilege separation is to prevent privilege escalation by containing any corruption within the unprivileged processes. The default is "yes". I< Optional. Type enum. choice: 'no', 'yes'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-yes
 
 =back
 
@@ -1084,53 +1735,24 @@ yes
 
 =head2 VersionAddendum
 
-Optionally specifies additional text to append to the SSH protocol banner sent by the server upon connection. I< Optional. Type uniline.  > 
-
-=head2 XAuthLocation
-
-Specifies the full pathname of the xauth(1) program. I< Optional. Type uniline.  > 
-
-=over 4
-
-=item upstream_default value :
-
-/usr/bin/X11/xauth
-
-=back
-
-
-
-=head2 X11DisplayOffset
-
-Specifies the first display number available for sshd(8)'s X11 forwarding. This prevents sshd from interfering with real X11 servers. I< Optional. Type integer.  > 
-
-=over 4
-
-=item upstream_default value :
-
-10
-
-=back
-
-
-
-=head2 X11Forwarding
-
-Specifies whether X11 forwarding is permitted. Note that disabling X11 forwarding does not prevent users from forwarding X11 traffic, as users can always install their own forwarders. X11 forwarding is automatically disabled if UseLogin is enabled. I< Optional. Type enum. choice: 'yes', 'no'.  > 
-
-=over 4
-
-=item upstream_default value :
-
-no
-
-=back
-
-
+B<VersionAddendum>Optionally specifies additional
+text to append to the SSH protocol banner sent by the server
+upon connection. The default is B<none>. I< Optional. Type uniline.  > 
 
 =head2 X11UseLocalhost
 
-Specifies whether sshd(8) should bind the X11 forwarding server to the loopback address or to the wildcard address. By default, sshd binds the forwarding server to the loopback address and sets the hostname part of the DISPLAY environment variable to "localhost". This prevents remote hosts from connecting to the proxy display. However, some older X11 clients may not function with this configuration. X11UseLocalhost may be set to "no" to specify that the forwarding server should be bound to the wildcard address. I< Optional. Type enum. choice: 'yes', 'no'.  > 
+B<X11UseLocalhost>Specifies whether L<sshd(8)>
+should bind the X11 forwarding server to the loopback
+address or to the wildcard address. By default, sshd binds
+the forwarding server to the loopback address and sets the
+hostname part of the DISPLAY environment variable to
+B<localhost>. This prevents remote hosts from connecting
+to the proxy display. However, some older X11 clients may
+not function with this configuration. B<X11UseLocalhost>
+may be set to B<no> to specify that the forwarding
+server should be bound to the wildcard address. The argument
+must be B<yes> or B<no>. The default is
+B<yes>. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -1142,9 +1764,21 @@ yes
 
 
 
-=head2 Match
+=head2 XAuthLocation
 
-Specifies a match block. The criteria User, Group Host and Address can contain patterns. When all these criteria are satisfied (i.e. all patterns match the incoming connection), the parameters set in the block element will override the general settings. I< Optional. Type list of node of class L<Sshd::MatchBlock|Config::Model::models::Sshd::MatchBlock> .  > 
+B<XAuthLocation>Specifies the full pathname of
+the L<xauth(1)> program, or B<none> to not use one. The
+default is I</usr/bin/xauth>. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/usr/bin/xauth
+
+=back
+
+
 
 =head1 SEE ALSO
 
@@ -1157,24 +1791,6 @@ L<cme>
 =item *
 
 L<Config::Model::models::Sshd::MatchBlock>
-
-=back
-
-=head1 AUTHOR
-
-=over
-
-=item Dominique Dumont
-
-
-=back
-
-=head1 COPYRIGHT
-
-=over
-
-=item 2009-2011 Dominique Dumont
-
 
 =back
 

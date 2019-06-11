@@ -1,5 +1,9 @@
 Revision history for Perl extension Config-ENV
 
+0.18 2019-06-11T08:20:01Z
+	- FIX: Improve error messages (by akiym)
+	- FIX: Test for mswin32 (by akiym)
+
 0.17 2018-03-02T05:52:38Z
 	- FIX: regression on 0.16 (by kga)
 

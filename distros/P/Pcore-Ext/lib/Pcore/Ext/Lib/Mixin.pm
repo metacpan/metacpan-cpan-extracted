@@ -33,7 +33,7 @@ sub EXT_route : Extend('Ext.Mixin') {
                         this.redirectTo(this.routePath + this.defaultRoute, {replace: true});
                     }
                     else {
-                        var routeView = this.lookup(route) || view.add({
+                        routeView = this.lookup(route) || view.add({
                             xtype: this.router[route],
                             reference: route
                         });

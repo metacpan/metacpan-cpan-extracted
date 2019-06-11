@@ -1,0 +1,31 @@
+This directory contains a utility to regenerate ssh and sshd model
+using the data provided by ssh_config and sshd_config man page.
+
+The ~parse-man.pl~ program works this way:
+- ssh man page is converted to HTML with ~roff2html~
+- The list of configuration parameter and its description is extracted
+  from the HTML
+- The description is parsed to generate ssh model
+- the same steps are applied for ~sshs_config~ man page
+
+Unfortunately, extracting a model from unstructured data (like a
+parameter description) is not bullet proof so:
+- the model of some parameter is hardcoded in ~lib/ParseMan.pm~
+- extra information is hardcoded in yaml files.
+
+Here's the content of this directory:
+- ~parse-man.pl~ : the generator program
+- ~lib/ParseMan.pm~: a Perl library for ~parse-man.pl~
+- ~ssh-fixup.yaml~: extra model information for ssh model
+- ~sshd-fixup.yaml~: likewise for sshd
+- ~systemssh.yml~: skeleton model for system ssh model
+- ~fixup-element-ipqos.yml~: extra information for ~IPQoS~ parameter
+  used by both ssh and sshd models
+- ~sshd-matchblock.yml~: skeleton model for ~Sshd::MatchBlock~
+  configuration class
+- ~sshd-matchcondition.yml~: model for ~Sshd::MatchCondition~
+  configuration class
+- ~ssh-portforward.yml~: model for ~Ssh::PortForward~ configuration
+  class
+
+

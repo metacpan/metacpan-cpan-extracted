@@ -1,5 +1,5 @@
 CREATE TABLE "artist" (
-  "artistid" INTEGER PRIMARY KEY NOT NULL,
+  "artistid" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   "name" text NOT NULL,
   "last_name_change_id" INTEGER NULL,
   "previousid" INTEGER NULL,
@@ -10,7 +10,7 @@ CREATE TABLE "artist" (
 CREATE UNIQUE INDEX "artist_name" ON "artist" ("name");
 
 CREATE TABLE "artist_event" (
-    "artisteventid" INTEGER PRIMARY KEY NOT NULL,
+    "artisteventid" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "artistid" INTEGER NOT NULL,
     "event" VARCHAR(32) NOT NULL,
     "triggered_on" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -21,7 +21,7 @@ CREATE TABLE "artist_event" (
 CREATE INDEX "artist_event_idx_artist" ON "artist_event" ("artistid", "event", "triggered_on");
 
 CREATE TABLE "cd" (
-  "cdid" INTEGER PRIMARY KEY NOT NULL,
+  "cdid" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   "artistid" integer NOT NULL,
   "title" text NOT NULL,
   "year" datetime,
@@ -33,7 +33,7 @@ CREATE INDEX "cd_idx_artistid" ON "cd" ("artistid");
 CREATE UNIQUE INDEX "cd_title_artistid" ON "cd" ("title", "artistid");
 
 CREATE TABLE "cd_event" (
-    "cdeventid" INTEGER PRIMARY KEY NOT NULL,
+    "cdeventid" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "cdid" INTEGER NOT NULL,
     "event" VARCHAR(32) NOT NULL,
     "triggered_on" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -44,7 +44,7 @@ CREATE TABLE "cd_event" (
 CREATE INDEX "cd_event_idx_cd" ON "cd_event" ("cdid", "event", "triggered_on");
 
 CREATE TABLE "track" (
-  "trackid" INTEGER PRIMARY KEY NOT NULL,
+  "trackid" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   "cdid" integer NOT NULL,
   "id" varchar(16),
   "title" text NOT NULL,
@@ -56,7 +56,7 @@ CREATE INDEX "track_idx_cdid" ON "track" ("cdid");
 CREATE UNIQUE INDEX "track_title_cdid" ON "track" ("title", "cdid");
 
 CREATE TABLE "track_event" (
-    "id" INTEGER PRIMARY KEY NOT NULL,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     "trackid" INTEGER NOT NULL,
     "event" VARCHAR(32) NOT NULL,
     "triggered_on" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

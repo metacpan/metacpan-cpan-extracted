@@ -10,6 +10,8 @@ use Path::Tiny;
 use warnings;
 use strict;
 
+$::_use_log4perl_to_warn = 1;
+
 my ($model, $trace) = init_test();
 
 # pseudo root where config files are written by config-model
@@ -38,12 +40,15 @@ ok($inst,"Read $ssh_file1 and created instance") ;
 my $root = $inst -> config_root ;
 
 my $dump =  $root->dump_tree ();
-print "First $wr_dir1 dump:\n",$dump if $trace ;
+print "First $wr_dir1 dump after reading file:\n",$dump if $trace ;
 
 #like($dump,qr/Match:0/, "check Match section") if $testdir =~ /match/;
 
 $root -> load("Port=2222 HostbasedAuthentication=yes"
                   . " Subsystem:ddftp=/home/dd/bin/ddftp Match:1 Condition Host=elysee.* ") ;
+
+my $mod_dump =  $root->dump_tree ();
+print "First $wr_dir1 dump after modification:\n",$dump if $trace ;
 
 $inst->write_back() ;
 ok(1,"wrote data in $wr_dir1") ;
@@ -69,11 +74,7 @@ my $root2 = $inst2 -> config_root ;
 my $dump2 = $root2 -> dump_tree ();
 print "Second $wr_dir2 dump:\n",$dump2 if $trace ;
 
-my @mod = split /\n/,$dump ;
-unshift @mod, 'HostbasedAuthentication=yes', 'Port=2222';
-splice @mod,2,0,'Subsystem:ddftp=/home/dd/bin/ddftp';
-splice @mod,12,1,'    Group="pres.*"','    Host="elysee.*" -';
-eq_or_diff([split /\n/,$dump2],\@mod, "check if both dumps are consistent") ;
+eq_or_diff([split /\n/,$dump2], [split /\n/,$mod_dump], "check if both dumps are consistent") ;
 
 done_testing;
 

@@ -4,7 +4,7 @@ package Chart::GGPlot::Coord::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Chart::GGPlot::Util qw(collect_functions_from_package);
 
@@ -43,7 +43,7 @@ Chart::GGPlot::Coord::Functions - Functions of coordination systems
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 FUNCTIONS
 

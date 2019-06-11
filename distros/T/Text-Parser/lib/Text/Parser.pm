@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use feature ':5.14';
 
-package Text::Parser 0.919;
+package Text::Parser 0.920;
 
 # ABSTRACT: Simplifies text parsing. Easily extensible to parse any text format.
 
@@ -108,8 +108,8 @@ sub read {
 
 sub _handle_read_inp {
     my $self = shift;
-    return $self->filehandle if not @_;
-    return if not ref( $_[0] ) and not $_[0];
+    return $self->filehandle   if not @_;
+    return                     if not ref( $_[0] ) and not $_[0];
     return $self->filename(@_) if not ref( $_[0] );
     return $self->filehandle(@_);
 }
@@ -204,7 +204,7 @@ sub _get_valid_text_filename {
 # Don't touch: Override this is Text::Parser::AutoUncompress
 sub _throw_invalid_file_exception {
     my ( $self, $fname ) = ( shift, shift );
-    die invalid_filename( name => $fname ) if not -f $fname;
+    die invalid_filename( name => $fname )  if not -f $fname;
     die file_not_readable( name => $fname ) if not -r $fname;
     die file_not_plain_text( name => $fname );
 }
@@ -224,9 +224,9 @@ has filehandle => (
 
 sub filehandle {
     my $self = shift;
-    return if not @_ and not $self->_has_filehandle;
+    return                      if not @_ and not $self->_has_filehandle;
     $self->_save_filehandle(@_) if @_;
-    $self->_clear_filename if @_;
+    $self->_clear_filename      if @_;
     return $self->_get_filehandle;
 }
 
@@ -340,7 +340,7 @@ Text::Parser - Simplifies text parsing. Easily extensible to parse any text form
 
 =head1 VERSION
 
-version 0.919
+version 0.920
 
 =head1 SYNOPSIS
 

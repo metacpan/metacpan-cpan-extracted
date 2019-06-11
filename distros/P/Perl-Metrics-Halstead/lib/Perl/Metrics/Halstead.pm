@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0605';
+our $VERSION = '0.0608';
 
 use PPI::Document;
 use PPI::Dumper;
@@ -163,20 +163,23 @@ sub BUILD {
 
 
 sub report {
-    my ($self) = @_;
+    my ( $self, $precision ) = @_;
+
+    $precision ||= 3;
+
     printf "Total operators: %d + Total operands: %d = Program length: %d\n",
         $self->n_operators, $self->n_operands, $self->prog_length;
     printf "Distinct operators: %d + Distinct operands: %d = Program vocabulary: %d\n",
         $self->n_distinct_operators, $self->n_distinct_operands, $self->prog_vocab;
-    printf "Estimated program length: %.3f\n", $self->est_prog_length;
-    printf "Program volume: %.3f\n", $self->volume;
-    printf "Program difficulty: %.3f\n", $self->difficulty;
-    printf "Program level: %.3f\n", $self->level;
-    printf "Program language level: %.3f\n", $self->lang_level;
-    printf "Program intelligence content: %.3f\n", $self->intel_content;
-    printf "Program effort: %.3f\n", $self->effort;
-    printf "Time to program: %.3f\n", $self->time_to_program;
-    printf "Delivered bugs: %.3f\n", $self->delivered_bugs;
+    printf "Estimated program length: %.*f\n", $precision, $self->est_prog_length;
+    printf "Program volume: %.*f\n", $precision, $self->volume;
+    printf "Program difficulty: %.*f\n", $precision, $self->difficulty;
+    printf "Program level: %.*f\n", $precision, $self->level;
+    printf "Program language level: %.*f\n", $precision, $self->lang_level;
+    printf "Program intelligence content: %.*f\n", $precision, $self->intel_content;
+    printf "Program effort: %.*f\n", $precision, $self->effort;
+    printf "Time to program: %.*f\n", $precision, $self->time_to_program;
+    printf "Delivered bugs: %.*f\n", $precision, $self->delivered_bugs;
 }
 
 
@@ -229,7 +232,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0605
+version 0.0608
 
 =head1 SYNOPSIS
 
@@ -369,8 +372,10 @@ Process the given B<file> into the computed metrics.
 =head2 report
 
   $halstead->report;
+  $halstead->report($precision);
 
-Print the computed metrics to C<STDOUT>.
+Print the computed metrics to C<STDOUT>.  Optionally provide a number for the
+decimal precision.  Default: 3 digits
 
 =head2 dump
 

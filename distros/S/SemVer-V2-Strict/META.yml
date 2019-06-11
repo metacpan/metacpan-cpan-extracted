@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,14 +35,14 @@ no_index:
 provides:
   SemVer::V2::Strict:
     file: lib/SemVer/V2/Strict.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/pine/p5-SemVer-V2-Strict/issues
   homepage: https://github.com/pine/p5-SemVer-V2-Strict
   repository: git://github.com/pine/p5-SemVer-V2-Strict.git
-version: '0.16'
+version: '0.17'
 x_authority: cpan:PINE
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

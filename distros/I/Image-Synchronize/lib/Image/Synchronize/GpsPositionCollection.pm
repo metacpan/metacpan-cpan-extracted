@@ -3,6 +3,8 @@ package Image::Synchronize::GpsPositionCollection;
 use warnings;
 use strict;
 
+use v5.10.0;
+
 use parent 'Exporter';
 
 use Carp;

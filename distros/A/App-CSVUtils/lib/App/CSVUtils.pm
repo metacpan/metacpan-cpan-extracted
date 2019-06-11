@@ -1,7 +1,7 @@
 package App::CSVUtils;
 
-our $DATE = '2019-05-21'; # DATE
-our $VERSION = '0.022'; # VERSION
+our $DATE = '2019-06-06'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use 5.010001;
 use strict;
@@ -124,8 +124,11 @@ our %args_common = (
         default => 1,
         description => <<'_',
 
-When you declare that CSV does not have header row (`--no-header`), the fields
-will be named `field1`, `field2`, and so on.
+By default (`--header`), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (`--no-header`), the first row of the CSV is
+assumed to contain the first data row. Fields will be named `field1`, `field2`,
+and so on.
 
 _
     },
@@ -323,6 +326,7 @@ $SPEC{csvutil} = {
             schema => ['str*', in=>[
                 'add-field',
                 'list-field-names',
+                'info',
                 'delete-field',
                 'munge-field',
                 #'replace-newline', # not implemented in csvutil
@@ -372,6 +376,8 @@ sub csvutil {
 
     my $res = "";
     my $i = 0;
+    my $header_row_count = 0;
+    my $data_row_count = 0;
     my $fields;
     my %field_idxs;
 
@@ -390,8 +396,10 @@ sub csvutil {
             return unless $row0;
             return [map { "field$_" } 1..@$row0];
         } elsif ($i == 1 && !$has_header) {
+            $header_row_count++;
             return $row0;
         }
+        $data_row_count++;
         $csv->getline($fh);
     };
 
@@ -461,6 +469,7 @@ sub csvutil {
                     [map { {name=>$_, index=>$field_idxs{$_}+1} }
                          sort keys %field_idxs],
                     {'table.fields'=>['name','index']}];
+        } elsif ($action eq 'info') {
         } elsif ($action eq 'munge-field') {
             unless ($i == 1) {
                 unless ($code) {
@@ -679,6 +688,20 @@ sub csvutil {
         }
     } # while getline()
 
+    if ($action eq 'info') {
+        return [200, "OK", {
+            field_count => scalar @$fields,
+            fields      => $fields,
+
+            row_count        => $header_row_count + $data_row_count,
+            header_row_count => $header_row_count,
+            data_row_count   => $data_row_count,
+
+            #file_size  => $chars, # we use csv's getline() so how?
+            file_size   => (-s $fh),
+        }];
+    }
+
     if ($action eq 'convert-to-hash') {
         $selected_row //= [];
         my $hash = {};
@@ -839,6 +862,19 @@ $SPEC{csv_list_field_names} = {
 sub csv_list_field_names {
     my %args = @_;
     csvutil(%args, action=>'list-field-names');
+}
+
+$SPEC{csv_info} = {
+    v => 1.1,
+    summary => 'Show information about CSV file (number of rows, fields, etc)',
+    args => {
+        %args_common,
+        %arg_filename_0,
+    },
+};
+sub csv_info {
+    my %args = @_;
+    csvutil(%args, action=>'info');
 }
 
 $SPEC{csv_delete_field} = {
@@ -1939,7 +1975,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.022 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-05-21.
+This document describes version 0.023 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-06-06.
 
 =head1 DESCRIPTION
 
@@ -1962,6 +1998,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-each-row>
 
 =item * L<csv-grep>
+
+=item * L<csv-info>
 
 =item * L<csv-list-field-names>
 
@@ -2052,8 +2090,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2071,7 +2112,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_avg
@@ -2096,8 +2136,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2119,7 +2162,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_concat
@@ -2174,8 +2216,11 @@ Input CSV files.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2193,7 +2238,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_convert_to_hash
@@ -2218,8 +2262,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<row_number> => I<int> (default: 2)
 
@@ -2241,7 +2288,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_delete_field
@@ -2270,8 +2316,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2289,7 +2338,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_dump
@@ -2318,8 +2366,11 @@ Provide row in $_ as hashref instead of arrayref.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2337,7 +2388,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_each_row
@@ -2386,8 +2436,11 @@ Provide row in $_ as hashref instead of arrayref.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2405,7 +2458,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_grep
@@ -2466,8 +2518,11 @@ Provide row in $_ as hashref instead of arrayref.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2486,6 +2541,51 @@ that contains extra information.
 
 Return value:  (any)
 
+
+=head2 csv_info
+
+Usage:
+
+ csv_info(%args) -> [status, msg, payload, meta]
+
+Show information about CSV file (number of rows, fields, etc).
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
 
 
 =head2 csv_list_field_names
@@ -2510,8 +2610,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2529,7 +2632,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_lookup_fields
@@ -2582,8 +2684,11 @@ Do not output rows, just report the number of rows filled.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<ignore_case> => I<bool>
 
@@ -2613,7 +2718,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_map
@@ -2674,8 +2778,11 @@ Provide row in $_ as hashref instead of arrayref.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2693,7 +2800,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_munge_field
@@ -2732,8 +2838,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2751,7 +2860,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_replace_newline
@@ -2782,8 +2890,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2803,7 +2914,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_select_fields
@@ -2836,8 +2946,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 
@@ -2855,7 +2968,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_select_row
@@ -2880,8 +2992,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<row_spec>* => I<str>
 
@@ -2903,7 +3018,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_setop
@@ -3001,8 +3115,11 @@ Input CSV files.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<ignore_case> => I<bool>
 
@@ -3028,7 +3145,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_sort_fields
@@ -3074,8 +3190,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<reverse> => I<bool>
 
@@ -3095,7 +3214,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_sort_rows
@@ -3199,8 +3317,11 @@ Provide row in $_ as hashref instead of arrayref.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<reverse> => I<bool>
 
@@ -3220,7 +3341,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 csv_sum
@@ -3245,8 +3365,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<tsv> => I<bool>
 

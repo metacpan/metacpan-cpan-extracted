@@ -1,9 +1,53 @@
 ==================================================
-Changes from 2018-03-28 00:00:00 +0000 to present.
+Changes from 2018-06-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.9.1 at 2019-03-28 19:21:43 +0000
+version 0.9.2 at 2019-06-10 20:12:24 +0000
+------------------------------------------
+
+  Change: 2e424b3ee35e9e9b13cc0c1d6dec625d522fa8ec
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-10 15:49:37 +0000
+
+    Fix cpanfile typo 
+
+  Change: 963480535017df58af02cea2aa36daf4476f243d
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-10 15:46:27 +0000
+
+    Update files from upstream 
+
+  Change: 6ef0302087f752d6d5ad11099cb287fbf9c9a838
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-07 15:01:30 +0000
+
+    Merge pull request #1 in ~AFRESH/p5-dbix-class-events from
+    fix-test-autoincrement to master
+
+    * commit 'd8084cdf9c15243ea28d989c2dedf9f2bf6b6533':
+
+    Enable SQLite AUTOINCREMENT in tests 
+
+  Change: d8084cdf9c15243ea28d989c2dedf9f2bf6b6533
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-05 19:04:47 +0000
+
+    Enable SQLite AUTOINCREMENT in tests
+
+    and actually test that they work. This makes using the example code
+    actually do what it says. 
+
+  Change: 2363f130706c1680e1a5a2119c87d94d25ffa6e7
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-04-01 12:00:45 +0000
+
+    Fix .gitignore dist matching
+
+    We don't include the `v` in the dist name here. 
+
+------------------------------------------
+version 0.9.1 at 2019-03-28 19:05:05 +0000
 ------------------------------------------
 
   Change: fb394395fb0f20c476789f372ebe471a3e766ae5

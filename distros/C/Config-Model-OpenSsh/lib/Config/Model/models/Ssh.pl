@@ -1,51 +1,87 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
-    'author' => [
-      'Dominique Dumont <ddumon at cpan.org>'
-    ],
-    'class_description' => 'Configuration class used by L<Config::Model> to edit or 
-validate ~/.ssh/config.
-',
-    'copyright' => [
-      '2009-2013 Dominique Dumont'
-    ],
-    'element' => [
-      'EnableSSHKeysign',
+    'accept' => [
+      '.*',
       {
-        'description' => 'Setting this option to \'yes\' in the global client configuration file /etc/ssh/ssh_config enables the use of the helper program ssh-keysign(8) during HostbasedAuthentication.  See ssh-keysign(8)for more information.
-',
+        'summary' => 'boilerplate parameter that may hide a typo',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
-      },
+        'value_type' => 'uniline',
+        'warn' => 'Unknown parameter. Please make sure there\'s no typo and contact the author'
+      }
+    ],
+    'class_description' => 'This configuration class was generated from ssh_system documentation.
+by L<parse-man.pl|https://github.com/dod38fr/config-model-openssh/contrib/parse-man.pl>
+',
+    'element' => [
       'Host',
       {
         'cargo' => {
           'config_class_name' => 'Ssh::HostElement',
           'type' => 'node'
         },
-        'description' => 'The declarations make in \'parameters\' are applied only to the hosts that match one of the patterns given in pattern elements. A single \'*\' as a pattern can be used to provide global defaults for all hosts. The host is the hostname argument given on the command line (i.e. the name is not converted to a canonicalized host name before matching). Since the first obtained value for each parameter is used, more host-specific declarations should be given near the beginning of the hash (which takes order into account), and general defaults at the end.',
+        'description' => "Restricts the
+following declarations (up to the next B<Host> or
+B<Match> keyword) to be only for those hosts that match
+one of the patterns given after the keyword. If more than
+one pattern is provided, they should be separated by
+whitespace. A single \x{2019}*\x{2019} as a pattern can be
+used to provide global defaults for all hosts. The host is
+usually the I<hostname> argument given on the command
+line (see the B<CanonicalizeHostname> keyword for
+exceptions).See
+I<PATTERNS> for more information on patterns.",
         'index_type' => 'string',
-        'level' => 'important',
-        'ordered' => '1',
         'type' => 'hash'
       },
-      'IgnoreUnknown',
+      'Match',
       {
-        'description' => 'Specifies a pattern-list of unknown options to be ignored if they are encountered in configuration parsing. This may be used to suppress errors if ssh_config contains options that are unrecognised by ssh(1). It is recommended that IgnoreUnknown be listed early in the configuration file as it will not be applied to unknown options that appear before it.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'cargo' => {
+          'config_class_name' => 'Ssh::HostElement',
+          'type' => 'node'
+        },
+        'description' => "Restricts the
+following declarations (up to the next B<Host> or
+B<Match> keyword) to be used only when the conditions
+following the B<Match> keyword are satisfied. Match
+conditions are specified using one or more criteria or the
+single token B<all> which always matches. The available
+criteria keywords are: B<canonical>, B<exec>,
+B<host>, B<originalhost>, B<user>, and
+B<localuser>. The B<all> criteria must appear alone
+or immediately after B<canonical>. Other criteria may be
+combined arbitrarily. All criteria but B<all> and
+B<canonical> require an argument. Criteria may be
+negated by prepending an exclamation mark
+(\x{2019}!\x{2019}).The other
+keywords\x{2019} criteria must be single entries or
+comma-separated lists and may use the wildcard and negation
+operators described in the I<PATTERNS> section. The
+criteria for the B<host> keyword are matched against the
+target hostname, after any substitution by the
+B<Hostname> or B<CanonicalizeHostname> options. The
+B<originalhost> keyword matches against the hostname as
+it was specified on the command-line. The B<user>
+keyword matches against the target username on the remote
+host. The B<localuser> keyword matches against the name
+of the local user running L<ssh(1)> (this keyword may be useful
+in system-wide B<ssh_config> files).",
+        'index_type' => 'string',
+        'type' => 'hash'
       }
     ],
+    'generated_by' => 'parse-man.pl from ssh_system  7.9p1 doc',
     'include' => [
       'Ssh::HostElement'
     ],

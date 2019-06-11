@@ -4,7 +4,7 @@ package Chart::GGPlot::Labels::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Chart::GGPlot::Labels;
 
@@ -54,7 +54,7 @@ Chart::GGPlot::Labels::Functions - Function interface for Chart::GGPlot::Labels
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 FUNCTIONS
 

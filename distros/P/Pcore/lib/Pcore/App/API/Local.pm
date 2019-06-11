@@ -203,8 +203,14 @@ sub create_user ( $self, $user_name, $password, $enabled, $permissions ) {
         return;
     };
 
+    # get dbh
+    my ( $res, $dbh ) = $self->{dbh}->get_dbh;
+
+    # unable to get dbh
+    return $res if !$res;
+
     # start transaction
-    my ( $dbh, $res ) = $self->{dbh}->begin_work;
+    $res = $dbh->begin_work;
 
     # failed to start transaction
     return $res if !$res;
@@ -251,10 +257,16 @@ sub set_user_permissions ( $self, $user_id, $permissions ) {
     # user wasn't found
     return $user if !$user;
 
-    # begin transaction
-    my ( $dbh, $res ) = $self->{dbh}->begin_work;
+    # get dbh
+    my ( $res, $dbh ) = $self->{dbh}->get_dbh;
 
-    # error, strating transaction
+    # unable to get dbh
+    return $res if !$res;
+
+    # start transaction
+    $res = $dbh->begin_work;
+
+    # failed to start transaction
     return $res if !$res;
 
     $res = $self->_set_user_permissions( $dbh, $user->{data}->{id}, $permissions );
@@ -423,10 +435,16 @@ sub create_user_token ( $self, $user_id, $desc, $permissions ) {
         return res 500 if $permissions->@* != $user_permissions->{data}->@*;
     }
 
-    # begin transaction
-    my ( $dbh, $res ) = $self->{dbh}->begin_work;
+    # get dbh
+    my ( $res, $dbh ) = $self->{dbh}->get_dbh;
 
-    # error
+    # unable to get dbh
+    return $res if !$res;
+
+    # start transaction
+    $res = $dbh->begin_work;
+
+    # failed to start transaction
     return $res if !$res;
 
     my $on_finish = sub ($res) {

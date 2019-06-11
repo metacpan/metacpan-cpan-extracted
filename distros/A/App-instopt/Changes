@@ -1,3 +1,10 @@
+0.009   2019-06-06 (PERLANCAR)
+
+	- Add option: --self-upgrade (-U).
+
+	- [ux] download: Strip URL query string from filename.
+
+
 0.008   2019-04-05 (PERLANCAR)
 
 	- [bugfix] list_downloaded_versions(): Check VERSION/ARCH/ directory

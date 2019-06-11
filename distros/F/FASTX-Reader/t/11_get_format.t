@@ -5,7 +5,7 @@ use Test::More;
 
 use_ok 'FASTX::Reader';
 
-my $basename = "$Bin/../scripts/test.";
+my $basename = "$Bin/../data/test.";
 
 for my $format ('fasta', 'fastq') {
     my $file = $basename . $format;

@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Config::Model" : "2.134",
             "Module::Build" : "0.34"
          }
       },
@@ -24,14 +25,24 @@
             "Module::Build" : "0.34"
          }
       },
+      "develop" : {
+         "requires" : {
+            "ParseMan" : "0",
+            "Path::Tiny" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "XXX" : "0"
+         }
+      },
       "runtime" : {
          "recommends" : {
-            "Config::Model::CursesUI" : "0",
+            "App::Cme" : "0",
             "Config::Model::TkUI" : "0"
          },
          "requires" : {
             "Carp" : "0",
-            "Config::Model" : "2.128",
+            "Config::Model" : "2.134",
             "Config::Model::Backend::Any" : "0",
             "File::Copy" : "0",
             "File::HomeDir" : "0",
@@ -39,18 +50,20 @@
             "IO::File" : "0",
             "Log::Log4perl" : "1.11",
             "Mouse" : "0",
-            "perl" : "5.010"
+            "Mouse::Role" : "0",
+            "perl" : "5.012"
          }
       },
       "test" : {
          "requires" : {
             "Config::Model::BackendMgr" : "0",
-            "Config::Model::Tester" : "3.006",
+            "Config::Model::Tester" : "4.001",
             "Config::Model::Tester::Setup" : "0",
             "English" : "0",
             "Path::Tiny" : "0",
             "Test::Differences" : "0",
             "Test::More" : "0",
+            "Test::Pod" : "1.00",
             "Test::Warn" : "0"
          }
       }
@@ -68,8 +81,8 @@
          "web" : "http://github.com/dod38fr/config-model-openssh.git"
       }
    },
-   "version" : "1.241",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "version" : "v2.7.9.1",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

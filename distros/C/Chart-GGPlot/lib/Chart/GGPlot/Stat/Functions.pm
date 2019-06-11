@@ -4,7 +4,7 @@ package Chart::GGPlot::Stat::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Module::Load;
 
@@ -14,7 +14,10 @@ use parent qw(Exporter::Tiny);
 
 my @export_ggplot;
 
-our @sub_namespaces = qw(Bin Boxplot Count Identity);
+our @sub_namespaces = qw(
+  Bin Boxplot Count Identity
+  Smooth
+);
 
 for my $name (@sub_namespaces) {
     my $package = "Chart::GGPlot::Stat::$name";
@@ -42,7 +45,7 @@ Chart::GGPlot::Stat::Functions - Function interface for stats
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 
@@ -93,8 +96,9 @@ If true, missing values are silently removed.
 =item * $show_legend
 
 Should this layer be included in the legends?
-'auto', the default, includes if any aesthetics are mapped.
-false never includes, and false always includes.
+C<undef>, the default, includes if any aesthetics are mapped.
+A true scalar for never includes, and a defined false scalar for always
+includes.
 
 =item * $inherit_aes
 
@@ -169,8 +173,9 @@ If true, missing values are silently removed.
 =item * $show_legend
 
 Should this layer be included in the legends?
-'auto', the default, includes if any aesthetics are mapped.
-false never includes, and false always includes.
+C<undef>, the default, includes if any aesthetics are mapped.
+A true scalar for never includes, and a defined false scalar for always
+includes.
 
 =item * $inherit_aes
 
@@ -235,8 +240,9 @@ If true, missing values are silently removed.
 =item * $show_legend
 
 Should this layer be included in the legends?
-'auto', the default, includes if any aesthetics are mapped.
-false never includes, and false always includes.
+C<undef>, the default, includes if any aesthetics are mapped.
+A true scalar for never includes, and a defined false scalar for always
+includes.
 
 =item * $inherit_aes
 
@@ -300,8 +306,9 @@ If true, missing values are silently removed.
 =item * $show_legend
 
 Should this layer be included in the legends?
-'auto', the default, includes if any aesthetics are mapped.
-false never includes, and false always includes.
+C<undef>, the default, includes if any aesthetics are mapped.
+A true scalar for never includes, and a defined false scalar for always
+includes.
 
 =item * $inherit_aes
 
@@ -316,6 +323,150 @@ Other arguments passed to C<Chart::GGPlot::Layer-E<gt>new()>.
 These are often aesthetics, used to set an aesthetic to a fixed value,
 like C<color =E<gt> "red", size =E<gt> 3>.
 They may also be parameters to the paired geom/stat.
+
+=back
+
+=head2 stat_smooth
+
+    stat_smooth(:$maping=undef, :$data=undef,
+                :$geom='smooth', :$position='identity',
+                :$method='auto', :$se=true,
+                :$n=80, :$span=0.75, :$fullrange=false, :$level=0.95,
+                :$method_args={},
+                :$na_rm=false, :$show_legend='auto', :$inherit_aes=true,
+                %rest)
+
+Arguments:
+
+=over 4
+
+=item * $mapping
+
+Set of aesthetic mappings created by C<aes()>. If specified and
+C<$inherit_aes> is true (the default), it is combined with the default
+mapping at the top level of the plot.
+You must supply mapping if there is no plot mapping.
+
+=item * $data
+
+The data to be displayed in this layer.
+If C<undef>, the default, the data is inherited from the plot data as
+specified in the call to C<ggplot()>.
+
+=item * $stat
+
+The statistical transformation to use on the data for this layer, as a
+string.
+
+=item * $position
+
+Position adjustment, either as a string, or the result of a call to a
+position adjustment function.
+
+=item * $na_rm
+
+If false, the default, missing values are removed with a warning.
+If true, missing values are silently removed.
+
+=item * $show_legend
+
+Should this layer be included in the legends?
+C<undef>, the default, includes if any aesthetics are mapped.
+A true scalar for never includes, and a defined false scalar for always
+includes.
+
+=item * $inherit_aes
+
+If false, overrides the default aesthetics, rather than combining with them.
+This is most useful for helper functions that define both data and
+aesthetics and shouldn't inherit behaviour from the default plot
+specification.
+
+=item * %rest
+
+Other arguments passed to C<Chart::GGPlot::Layer-E<gt>new()>.
+These are often aesthetics, used to set an aesthetic to a fixed value,
+like C<color =E<gt> "red", size =E<gt> 3>.
+They may also be parameters to the paired geom/stat.
+
+=item * method
+
+Smoothing method (function) to use.
+
+The available methods are,
+
+=over 8
+
+=item * 'auto'
+
+'loess' is used for less than 1000 observations, 'glm' otherwise 
+
+=item * 'loess'
+
+Locally Weighted Regression
+
+Requires L<Math::LOESS>.
+
+Supported C<$method_args>, (see L<Math::LOESS::Model> for details)
+
+=over 12
+
+=item * $degree
+
+=item * $parametric
+
+=item * $drop_square
+
+=item * $normalize
+
+=item * $family
+
+=back
+
+=item * 'glm' : Generalized Linear Model
+
+Requires L<PDL::Stats::GLM> and L<PDL::GSL::CDF>.
+
+At this moment we can do only simple linear modeling. Still to support
+logistic and polynomial in future.
+
+Supported C<$method_args>,
+
+=over 12
+
+=item * $family
+
+=back
+
+=back
+
+=item * method_args
+
+Additional optional arguments passed on to the modeling function
+defined by C<$method>.
+
+=item * se
+
+Display confidence interval around smooth? (true by default, see
+C<$level> to control.)
+
+=item * fullrange
+
+Should the fit span the full range of the plot, or just the data?
+
+=item * level
+
+Level of confidence interval to use (0.95 by default). Effective when
+C<$se> is true.
+
+=item * span
+
+Controls the amount of smoothing for the default loess smoother.
+Larger number means more smoothing. It should be in the C<(0, 1)> range.
+
+=item * n
+
+Number of points at which to evaluate smoother.
 
 =back
 

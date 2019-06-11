@@ -147,19 +147,20 @@ sub ls ( $self ) {
                 title => 'TAG NAME',
                 width => 15,
             },
-            is_autobuild_tag => {
-                title  => "AUTOBUILD\nTAG",
-                width  => 11,
-                align  => -1,
-                format => sub ( $val, $id, $row ) {
-                    if ( !$val ) {
-                        return $BOLD . $WHITE . $ON_RED . ' no ' . $RESET;
-                    }
-                    else {
-                        return $BLACK . $ON_GREEN . q[ yes ] . $RESET;
-                    }
-                }
-            },
+
+            # is_autobuild_tag => {
+            #     title  => "AUTOBUILD\nTAG",
+            #     width  => 11,
+            #     align  => -1,
+            #     format => sub ( $val, $id, $row ) {
+            #         if ( !$val ) {
+            #             return $BOLD . $WHITE . $ON_RED . ' no ' . $RESET;
+            #         }
+            #         else {
+            #             return $BLACK . $ON_GREEN . q[ yes ] . $RESET;
+            #         }
+            #     }
+            # },
             size => {
                 title  => 'IMAGE SIZE',
                 width  => 15,

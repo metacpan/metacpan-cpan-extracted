@@ -1,8 +1,10 @@
 package LWP::ConsoleLogger::Easy;
-our $VERSION = '0.000039';
+our $VERSION = '0.000040';
 use strict;
 use warnings;
 
+use HTTP::Request;
+use HTTP::Response;
 use LWP::ConsoleLogger;
 use Module::Load::Conditional qw( can_load );
 use Sub::Exporter -setup => { exports => ['debug_ua'] };
@@ -20,7 +22,7 @@ my %VERBOSITY = (
 );
 
 sub debug_ua {
-    my $ua = shift;
+    my $ua    = shift;
     my $level = shift || 10;
 
     my %args = map { $_ => $VERBOSITY{$_} <= $level } keys %VERBOSITY;
@@ -58,6 +60,37 @@ sub add_ua_handlers {
     my $ua             = shift;
     my $console_logger = shift;
 
+    if ( $ua->isa('Test::WWW::Mechanize::Mojo') ) {
+        $ua = $ua->tester->ua;
+    }
+    if ( $ua->isa('Mojo::UserAgent') ) {
+        $ua->on(
+            'start',
+            sub {
+                my $the_ua = shift;
+                my $tx     = shift;
+
+                my $request = HTTP::Request->parse( $tx->req->to_string );
+                $console_logger->request_callback(
+                    $request,
+                    $the_ua,
+                );
+
+                $tx->on(
+                    'finish',
+                    sub {
+                        my $tx = shift;
+                        my $res
+                            = HTTP::Response->parse( $tx->res->to_string );
+                        $res->request($request);
+                        $console_logger->response_callback( $res, $the_ua );
+                    }
+                );
+            }
+        );
+        return;
+    }
+
     $ua->add_handler(
         'response_done',
         sub { $console_logger->response_callback(@_) }
@@ -80,7 +113,7 @@ LWP::ConsoleLogger::Easy - Easy LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000039
+version 0.000040
 
 =head1 SYNOPSIS
 
@@ -110,8 +143,9 @@ version 0.000039
 This module gives you the easiest possible introduction to
 L<LWP::ConsoleLogger>.  It offers one wrapper around L<LWP::ConsoleLogger>:
 C<debug_ua>.  This function allows you to get up and running quickly with just
-a couple of lines of code. It instantiates LWP logging and also returns a
-L<LWP::ConsoleLogger> object, which you may then tweak to your heart's desire.
+a couple of lines of code. It instantiates user-agent logging and also returns
+a L<LWP::ConsoleLogger> object, which you may then tweak to your heart's
+desire.
 
 If you're able to install L<HTML::FormatText::Lynx> then you'll get highly
 readable HTML to text conversions.
@@ -125,18 +159,21 @@ I'd suggest going with this to start with and then turning down the verbosity
 after that.   This method returns an L<LWP::ConsoleLogger> object, which you
 may tweak to your heart's desire.
 
-    my $ua_logger = debug_ua( $mech );
+    my $ua_logger = debug_ua( $ua );
     $ua_logger->content_pre_filter( sub {...} );
     $ua_logger->logger( Log::Dispatch->new(...) );
 
-    $mech->get(...);
+    $ua->get(...);
+
+C<$ua> may be one of several user-agents, including C<LWP::UserAgent>,
+C<Mojo::UserAgent>, and C<WWW::Mechanize>.
 
 You can provide a verbosity level of 0 or more.  (Currently 0 - 8 supported.)
 This will turn up the verbosity on your output gradually.  A verbosity of 0
 will display nothing.  8 will display all available outputs.
 
     # don't get too verbose
-    my $ua_logger = debug_ua( $mech, 4 );
+    my $ua_logger = debug_ua( $ua, 4 );
 
 =head2 add_ua_handlers
 
@@ -205,7 +242,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2017 by MaxMind, Inc.
+This software is Copyright (c) 2014-2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

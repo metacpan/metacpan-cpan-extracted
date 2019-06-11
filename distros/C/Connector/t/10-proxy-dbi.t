@@ -7,7 +7,7 @@ use English;
 use DBI;
 use Log::Log4perl qw(:easy);
 use File::Temp qw/ :POSIX /;
-  
+
 use Test::More;
 
 eval {
@@ -25,7 +25,7 @@ BEGIN {
 
 require_ok( 'Connector::Proxy::DBI' );
 
-my $dbfile = tmpnam();  
+my $dbfile = tmpnam();
 
 my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","", {AutoCommit => 1, RaiseError => 1});
 my $sth = $dbh->prepare("CREATE table test( id int, name text ); commit;");
@@ -72,6 +72,51 @@ is ($res->{id}, 1);
 is ($res->{index}, 1);
 is ($res->{title}, 'test me');
 is ($res->{name}, undef);
+
+$conn = Connector::Proxy::DBI->new(
+    {
+    LOCATION  => "dbi:SQLite:dbname=$dbfile",
+    table => 'test',
+    column => 'name',
+    condition => 'name like ?',
+});
+
+$res = $conn->get('%test%');
+ok(!$res);
+
+$conn->ambiguous('return');
+
+$res = $conn->get('%test%');
+ok($res);
+
+$conn->ambiguous('die');
+eval { $res = $conn->get('%test%');};
+ok($EVAL_ERROR);
+
+$conn = Connector::Proxy::DBI->new(
+    {
+    LOCATION  => "dbi:SQLite:dbname=$dbfile",
+    table => 'test',
+    condition => 'id = ?',
+});
+
+$res = $conn->get_hash('%test%');
+ok(!$res);
+
+$conn->ambiguous('return');
+
+$res = $conn->get_hash(1);
+is($res->{id}, 1);
+is($res->{name}, 'test me');
+
+$conn->condition('name like ?');
+
+$res = $conn->get_hash('%test%');
+ok($res->{id});
+
+$conn->ambiguous('die');
+eval { $res = $conn->get_hash('%test%');};
+ok($EVAL_ERROR);
 
 unlink($dbfile);
 

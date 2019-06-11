@@ -163,6 +163,9 @@ my %tests = (
           11 ],
         [ 'srand-return',
           'srand 42', 42 ],
+        [ 'prototype+',
+          'sub proto_plus (+) { $_[0][0] }; my @ar = qw( a b ); proto_plus(@ar)',
+          'a' ],
     ],
 
     '5.012' => [
@@ -298,7 +301,8 @@ readline default
     '5.020' => [
         [ 'utf8-locale',
     old => [
-        [ '??',     # see 04-extra.t
-        [ 'for-qw', # see 04-extra.t
+        [ '??',       # see 04-extra.t
+        [ 'for-qw',   # see 04-extra.t
+        [ '@_=split', # see 04-extra.t
 =cut
 

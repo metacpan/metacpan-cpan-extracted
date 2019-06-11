@@ -1,6 +1,22 @@
 Revision history for PDF-Cairo
 
-1.02    2019/06/02 15:15 PDT
+1.04    2019/06/08 19:00 PDT
+        bugfix: correct height/width methods for recording()/loadsvg()
+        bugfix: use correct color mapping in print()/_api2_print()
+        bugfix: fall back to generic FreeType font if file not found
+        bugfix: fix print() shift option
+        document requirement for libcairo 1.10.0 or newer
+        add detailed box tests
+        add detailed drawing tests (requires poppler to render and compare)
+        macos2fc.pl: add all activated Mac fonts to Fontconfig config
+        add library versions to basic tests for debugging CPAN test failures
+        add git repo link for CPAN
+        silence false positives in CPANTS
+
+1.03    2019/06/02 00:30 PDT
+        work around aggressive PAUSE indexing for CPAN.
+
+1.02    2019/06/01 14:44 PDT
         bugfix: showimage() needs full save/restore, not just matrix
         bugfix: print() valign typo
         bugfix: make layout ink height positive (bbox height remains negative)

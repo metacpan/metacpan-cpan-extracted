@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /PowerManagement/Any/prevent_sleep
 # and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-05-22'; # DATE
+our $DATE = '2019-06-09'; # DATE
 our $DIST = 'App-PowerManagementUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ prevent-sleep - Prevent system from sleeping
 
 =head1 VERSION
 
-This document describes version 0.001 of prevent-sleep (from Perl distribution App-PowerManagementUtils), released on 2019-05-22.
+This document describes version 0.002 of prevent-sleep (from Perl distribution App-PowerManagementUtils), released on 2019-06-09.
 
 =head1 SYNOPSIS
 
@@ -50,14 +50,16 @@ Usage:
 =head1 DESCRIPTION
 
 Will also prevent system from hybrid sleeping, suspending, or hibernating. The
-effect is permanent; you need to C<unprevent_sleep()> to reverse the effect.
+effect is permanent (survives reboot); you need to C<unprevent_sleep()> to
+reverse the effect.
 
 Note that this does not prevent screen blanking or locking (screensaver
 activating); see L<Screensaver::Any> for routines that disable screensaver.
 
-On systems that run Systemd, this is implemented by masking the sleep.target. It
-automatically also prevents suspend.target, hybrid-sleep.target, and
-hibernate.target from activating.
+On systems that run Systemd, this is implemented by masking C<sleep.target>. It
+automatically also prevents C<suspend.target>, C<hybrid-sleep.target>, and
+C<hibernate.target> from activating. (Note that masking C<systemd-suspend.service>
+should also achieve the same result.)
 
 Not implemented yet for other systems. Patches welcome.
 

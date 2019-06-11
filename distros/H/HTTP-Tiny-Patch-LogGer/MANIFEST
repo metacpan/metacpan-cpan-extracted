@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/HTTP/Tiny/Patch/LogGer.pm
+lib/Log/ger/For/HTTP/Tiny.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

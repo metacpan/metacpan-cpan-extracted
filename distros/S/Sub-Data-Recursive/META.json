@@ -4,13 +4,13 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sub-Data-Recursive",
    "prereqs" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "Sub::Data::Recursive" : {
          "file" : "lib/Sub/Data/Recursive.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -47,5 +47,6 @@
          "url" : "http://github.com/bayashi/Sub-Data-Recursive"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

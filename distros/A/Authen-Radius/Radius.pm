@@ -39,7 +39,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.29';
+$VERSION = '0.30';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0
@@ -117,70 +117,73 @@ sub new {
         $serv_port = $SERVICES{$service};
     }
 
-    ($host, $port) = split(/:/, $h{'Host'});
-    if (!$port) {
-        $port = $serv_port;
-    }
-
     $self->{'timeout'} = $h{'TimeOut'} ? $h{'TimeOut'} : 5;
     $self->{'localaddr'} = $h{'LocalAddr'};
     $self->{'secret'} = $h{'Secret'};
     $self->{'message_auth'}  = $h{'Rfc3579MessageAuth'};
-    print STDERR "Using Radius server $host:$port\n" if $debug;
-    my %io_sock_args = (
-                Type => SOCK_DGRAM,
-                Proto => 'udp',
-                Timeout => $self->{'timeout'},
-                LocalAddr => $self->{'localaddr'},
-    );
+
     if ($h{'NodeList'}) {
         # contains resolved node list in text representation
         $self->{'node_list_a'} = {};
         foreach my $node_a (@{$h{'NodeList'}}) {
             my ($n_host, $n_port) = split(/:/, $node_a);
-            if (!$n_port) {
-                $n_port = $serv_port;
-            }
+            $n_port ||= $serv_port;
             my @hostinfo = gethostbyname($n_host);
             if (!scalar(@hostinfo)) {
                 print STDERR "Can't resolve node hostname '$n_host': $! - skipping it!\n" if $debug;
                 next;
             }
-            print STDERR "Adding ".inet_ntoa($hostinfo[4]).':'.$n_port." to node list.\n" if $debug;
+
+            my $ip = inet_ntoa($hostinfo[4]);
+            print STDERR "Adding ".$ip.':'.$n_port." to node list.\n" if $debug;
             # store split address to avoid additional parsing later
-            $self->{'node_list_a'}->{inet_ntoa($hostinfo[4]).':'.$n_port} =
-                    [inet_ntoa($hostinfo[4]), $n_port];
+            $self->{'node_list_a'}->{$ip.':'.$n_port} = [$ip, $n_port];
         }
+
         if (!scalar(keys %{$self->{'node_list_a'}})) {
             return $self->set_error('ESOCKETFAIL', 'Empty node list.');
         }
-        if ($host) {
-            my @hostinfo = gethostbyname($host);
-            if (scalar(@hostinfo)) {
-                my $act_addr_a = inet_ntoa($hostinfo[4]).':'.$port;
-                if (exists($self->{'node_list_a'}->{$act_addr_a})) {
-                    $self->{'node_addr_a'} = $act_addr_a;
-                } else {
-                    print STDERR "'$host' doesn't exist in node list - ignoring it!\n" if $debug;
-                }
-            } else {
-                print STDERR "Can't resolve active node hostname '$host': $! - ignoring it!\n" if $debug;
-            }
-        }
-    } else {
+    }
+
+    if ($h{'Host'}) {
+        ($host, $port) = split(/:/, $h{'Host'});
+        $port ||= $serv_port;
+        print STDERR "Using Radius server $host:$port\n" if $debug;
+
         my @hostinfo = gethostbyname($host);
         if (!scalar(@hostinfo)) {
+            if ($self->{'node_list_a'}) {
+                print STDERR "Can't resolve hostname '$host'\n" if $debug;
+                return $self;
+            }
+
             return $self->set_error('ESOCKETFAIL', "Can't resolve hostname '".$host."'.");
         }
-        $self->{'node_addr_a'} = inet_ntoa($hostinfo[4]).':'.$port;
-    }
-    if ($host) {
-        $io_sock_args{'PeerAddr'} = $host;
-        $io_sock_args{'PeerPort'} = $port;
+
+        my $ip = inet_ntoa($hostinfo[4]);
+
+        # if Host used with NodeList - it must be from the list
+        if ($self->{'node_list_a'} && !exists($self->{'node_list_a'}->{$ip.':'.$port})) {
+            print STDERR "'$host' doesn't exist in node list - ignoring it!\n" if $debug;
+            return $self;
+        }
+
+        # set as active node
+        $self->{'node_addr_a'} = $ip.':'.$port;
+
+        my %io_sock_args = (
+            Type => SOCK_DGRAM,
+            Proto => 'udp',
+            Timeout => $self->{'timeout'},
+            LocalAddr => $self->{'localaddr'},
+            PeerAddr => $host,
+            PeerPort => $port,
+        );
         $self->{'sock'} = IO::Socket::INET->new(%io_sock_args)
             or return $self->set_error('ESOCKETFAIL', $@);
     }
-    $self;
+
+    return $self;
 }
 
 sub send_packet {

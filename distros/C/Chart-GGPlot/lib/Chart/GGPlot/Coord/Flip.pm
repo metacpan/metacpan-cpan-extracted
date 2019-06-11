@@ -5,18 +5,20 @@ package Chart::GGPlot::Coord::Flip;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 extends qw(Chart::GGPlot::Coord::Cartesian); 
 
-my $coord_flip_pod = <<'=cut';
+use Chart::GGPlot::Util::Pod qw(unindent);
 
-    coord_flip(:$xlim=undef, :$ylim=undef, :$expand=true)
+my $coord_flip_pod = unindent(<<'EOT');
 
-Flip cartesian coordinates so that horizontal becomes vertical, and
-vertical becoms horizontal.
+        coord_flip(:$xlim=undef, :$ylim=undef, :$expand=true)
 
-=cut
+    Flip cartesian coordinates so that horizontal becomes vertical, and
+    vertical becoms horizontal.
+
+EOT
 
 my $coord_flip_code = sub {
     return __PACKAGE__->new(@_);
@@ -54,7 +56,7 @@ Chart::GGPlot::Coord::Flip - Cartesian coordinates with x and y flipped
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

@@ -29,6 +29,7 @@ requires:
   Git::Helpers: '0.000016'
   Module::Runtime: '0'
   Path::Tiny: '0'
+  Pod::Usage: '0'
   Try::Tiny: '0'
   URI: '0'
   perl: '5.006'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://github.com/oalders/open-this/issues
   homepage: https://github.com/oalders/open-this
   repository: https://github.com/oalders/open-this.git
-version: '0.000017'
+version: '0.000018'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -443,7 +444,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000017
+          tag: v0.000018
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -565,6 +566,7 @@ x_Dist_Zilla:
     version: '6.012'
 x_contributors:
   - 'Boris Däppen <bdaeppen.perl@gmail.com>'
+  - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'

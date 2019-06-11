@@ -12,7 +12,7 @@ say STDERR color('bold'), "Read FASTA/FASTQ files, printing them back to the use
 say STDERR "Usage: $0 FILE1 FILE2 ... FILEn\n";
 
 # Read two samples files if the user didnt provide any filename
-push(@ARGV,"$Bin/test.fastq", "$Bin/test.fasta" )
+push(@ARGV,"$Bin/../data/test.fastq", "$Bin/../data/test.fasta" )
   unless ($ARGV[0]);
 
 foreach my $input_file (@ARGV) {
@@ -47,7 +47,7 @@ foreach my $input_file (@ARGV) {
 
 =head1 NAME
 
-B<reader.pl> - A minimal implementation of the FASTX::Reader module to show how to parse a FASTA/FASTQ files
+B<Reader.pl> - A minimal implementation of the FASTX::Reader module to show how to parse a FASTA/FASTQ files
 
 =head1 USAGE
 

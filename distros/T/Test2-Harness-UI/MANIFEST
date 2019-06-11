@@ -49,10 +49,10 @@ demo/simple-pass.jsonl.bz2
 demo/simple-pass/simple.t
 demo/subtests.jsonl.bz2
 demo/subtests/subtests.t
+demo/table.jsonl.bz2
+demo/table/table.t
 demo/tap.jsonl.bz2
 demo/tap/tap.t
-demo/test-logs/2019-04-25~07:46:16~E172786E-6768-11E9-831F-05A06AFAD454~22056.jsonl.bz2
-demo/test-logs/2019-04-25~07:50:28~7764C1F6-6769-11E9-854F-7AA26AFAD454~22685.jsonl.bz2
 demo/tiny.jsonl.bz2
 demo/tiny/tiny.t
 dist.ini

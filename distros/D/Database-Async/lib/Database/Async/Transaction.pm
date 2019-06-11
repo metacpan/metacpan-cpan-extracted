@@ -3,7 +3,7 @@ package Database::Async::Transaction;
 use strict;
 use warnings;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use parent qw(Database::Async::DB);
 

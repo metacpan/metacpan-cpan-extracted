@@ -4,7 +4,7 @@ use warnings;
 use 5.006;
 
 package LWP::ConsoleLogger;
-our $VERSION = '0.000039';
+our $VERSION = '0.000040';
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
 use DateTime qw();
 use HTML::Restrict qw();
@@ -283,7 +283,7 @@ sub _log_params {
         my @values = (
             any { $name eq $_ }
             @{ $self->params_to_redact }
-            )                    ? '[REDACTED]'
+            ) ? '[REDACTED]'
             : ref $params{$name} ? @{ $params{$name} }
             :                      $params{$name};
 
@@ -556,7 +556,7 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000039
+version 0.000040
 
 =head1 SYNOPSIS
 
@@ -898,7 +898,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2017 by MaxMind, Inc.
+This software is Copyright (c) 2014-2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

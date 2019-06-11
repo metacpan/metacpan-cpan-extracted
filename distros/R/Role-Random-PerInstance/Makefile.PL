@@ -1,14 +1,18 @@
 use strict;
 use warnings;
-require 5.006;
+require 5.010;
 use ExtUtils::MakeMaker;
 WriteMakefile(
-    'NAME'         => 'Role::Random::PerInstance',
-    'VERSION_FROM' => 'lib/Role/Random/PerInstance.pm',
-    'PREREQ_PM'    => {
-        'Test::Most'  => '0.35',
-        'Math::Round' => '0.07',
+    'NAME'          => 'Role::Random::PerInstance',
+    'AUTHOR'        => q{Curtis 'Ovid' Poe <ovid@cpan.org>},
+    'VERSION_FROM'  => 'lib/Role/Random/PerInstance.pm',
+    'ABSTRACT_FROM' => 'lib/Role/Random/PerInstance.pm',
+    'LICENSE'       => 'artistic_2',
+    'PREREQ_PM'     => {
         'List::Util'  => '1.4',
+        'Math::Round' => '0.07',
+        'Moose::Role' => 0,
+        'Test::Most'  => '0.35',
     },
     'INSTALLDIRS' => 'site',
     'EXE_FILES'   => [],

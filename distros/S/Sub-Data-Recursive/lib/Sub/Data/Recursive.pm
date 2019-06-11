@@ -2,7 +2,7 @@ package Sub::Data::Recursive;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Scalar::Util qw/refaddr/;
 
@@ -44,6 +44,52 @@ sub _apply {
         }
         else{
             push @retval, defined($arg) ? $code->($arg) : $arg;
+        }
+    }
+
+    return wantarray ? @retval : $retval[0];
+}
+
+sub massive_invoke {
+    my ($class, $code, @args) = @_;
+    _massive_apply($code, +{}, undef, undef, @args);
+}
+
+sub _massive_apply {
+    my $code     = shift;
+    my $seen     = shift;
+    my $context  = shift;
+    my $keys     = shift;
+
+    my @retval;
+    for my $arg (@_) {
+        if(my $ref = ref $arg){
+            my $refaddr = refaddr($arg);
+            my $proto;
+
+            if(defined($proto = $seen->{$refaddr})){
+                 # noop
+            }
+            elsif($ref eq 'ARRAY'){
+                $proto = $seen->{$refaddr} = [];
+                @{$proto} = _massive_apply($code, $seen, $ref, undef, @{$arg});
+            }
+            elsif($ref eq 'HASH'){
+                $proto = $seen->{$refaddr} = {};
+                %{$proto} = _massive_apply($code, $seen, $ref, [keys %{$arg}], %{$arg});
+            }
+            elsif($ref eq 'REF' or $ref eq 'SCALAR'){
+                $proto = $seen->{$refaddr} = \do{ my $scalar };
+                ${$proto} = _massive_apply($code, $seen, $ref, undef, ${$arg});
+            }
+            else{ # CODE, GLOB, IO, LVALUE etc.
+                $proto = $seen->{$refaddr} = $arg;
+            }
+
+            push @retval, $proto;
+        }
+        else{
+            push @retval, defined($arg) ? $code->($arg, $context, $keys) : $arg;
         }
     }
 
@@ -94,6 +140,12 @@ Sub::Data::Recursive is recursive invoker.
 =head2 invoke($code_ref, $hash [, $hash..])
 
 invoke subroutine recursively
+
+=head2 massive_invoke($code_ref, $hash [, $hash..])
+
+massively invoke subroutine recursively
+
+Pass args with $context and $keys (in case of `HASH`)
 
 
 =head1 REPOSITORY

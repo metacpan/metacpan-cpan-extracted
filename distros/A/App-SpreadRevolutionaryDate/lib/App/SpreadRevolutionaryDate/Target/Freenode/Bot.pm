@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode::Bot;
-$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.24';
+$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.26';
 # ABSTRACT: Subclass overloading L<Bot::BasicBot> to post a message on some Freenode channels
 
 use Moose;
@@ -82,6 +82,22 @@ sub log {
   # do nothing!
 }
 
+sub chanjoin {
+  my $self = shift;
+
+  # Remove channels added by Bot::BasicBot::irc_chanjoin_state with different case
+  my %uniq_channels;
+  foreach my $channel ($self->channels) {
+    $uniq_channels{lc($channel)} = $channel;
+  }
+
+  if (scalar(keys %uniq_channels) != scalar($self->channels)) {
+    $self->channels(values %uniq_channels);
+  }
+
+  return;
+}
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
@@ -105,7 +121,7 @@ App::SpreadRevolutionaryDate::Target::Freenode::Bot - Subclass overloading L<Bot
 
 =head1 VERSION
 
-version 0.24
+version 0.26
 
 =head1 SEE ALSO
 

@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-
-$model_to_test = "Sshd" ;
+use strict;
+use warnings;
 
 my $map = {
    'darwin' => '/etc/sshd_config',
@@ -17,7 +17,7 @@ my $map = {
 
 my $target = $map->{$^O} || $map->{default} ;
 
-@tests = (
+my @tests = (
     { 
         name => 'debian-bug-671367' ,
         setup => {
@@ -45,4 +45,6 @@ my $target = $map->{$^O} || $map->{default} ;
     }
 );
 
-1;
+return {
+    tests => \@tests,
+};

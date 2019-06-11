@@ -1,23 +1,67 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
-    'author' => [
-      'Dominique Dumont'
+    'accept' => [
+      '.*',
+      {
+        'summary' => 'boilerplate parameter that may hide a typo',
+        'type' => 'leaf',
+        'value_type' => 'uniline',
+        'warn' => 'Unknown parameter. Please make sure there\'s no typo and contact the author'
+      }
     ],
-    'class_description' => 'Configuration class that represents all parameters available 
-inside a Host directive of a ssh configuration.',
-    'copyright' => [
-      '2009-2011 Dominique Dumont'
-    ],
+    'class_description' => 'This configuration class was generated from ssh_system documentation.
+by L<parse-man.pl|https://github.com/dod38fr/config-model-openssh/contrib/parse-man.pl>
+',
     'element' => [
+      'AddKeysToAgent',
+      {
+        'choice' => [
+          'yes',
+          'confirm',
+          'ask',
+          'no'
+        ],
+        'description' => 'Specifies whether keys should
+be automatically added to a running L<ssh-agent(1)>. If this
+option is set to B<yes> and a key is loaded from a file,
+the key and its passphrase are added to the agent with the
+default lifetime, as if by L<ssh-add(1)>. If this option is set
+to B<ask>, L<ssh(1)> will require confirmation using the
+SSH_ASKPASS program before adding a key (see L<ssh-add(1)> for
+details). If this option is set to B<confirm>, each use
+of the key must be confirmed, as if the B<-c> option was
+specified to L<ssh-add(1)>. If this option is set to B<no>,
+no keys are added to the agent. The argument must be
+B<yes>, B<confirm>, B<ask>, or B<no> (the
+default).Specifies whether keys should
+be automatically added to a running L<ssh-agent(1)>. If this
+option is set to B<yes> and a key is loaded from a file,
+the key and its passphrase are added to the agent with the
+default lifetime, as if by L<ssh-add(1)>. If this option is set
+to B<ask>, L<ssh(1)> will require confirmation using the
+SSH_ASKPASS program before adding a key (see L<ssh-add(1)> for
+details). If this option is set to B<confirm>, each use
+of the key must be confirmed, as if the B<-c> option was
+specified to L<ssh-add(1)>. If this option is set to B<no>,
+no keys are added to the agent. The argument must be
+B<yes>, B<confirm>, B<ask>, or B<no> (the
+default).',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'enum'
+      },
       'AddressFamily',
       {
         'choice' => [
@@ -25,173 +69,385 @@ inside a Host directive of a ssh configuration.',
           'inet',
           'inet6'
         ],
-        'description' => 'Specifies which address family to use when connecting.',
+        'description' => 'Specifies which address family
+to use when connecting. Valid arguments are B<any> (the
+default), B<inet> (use IPv4 only), or B<inet6> (use
+IPv6 only).Specifies which address family
+to use when connecting. Valid arguments are B<any> (the
+default), B<inet> (use IPv4 only), or B<inet6> (use
+IPv6 only).',
         'type' => 'leaf',
         'upstream_default' => 'any',
         'value_type' => 'enum'
       },
       'BatchMode',
       {
-        'description' => 'If set to \'yes\', passphrase/password querying will be disabled. In addition, the ServerAliveInterval option will be set to 300 seconds by default. This option is useful in scripts and other batch jobs where no user is present to supply the password, and where it is desirable to detect a broken network swiftly. ',
+        'description' => 'If set to B<yes>,
+passphrase/password querying will be disabled. In addition,
+the B<ServerAliveInterval> option will be set to 300
+seconds by default (Debian-specific). This option is useful
+in scripts and other batch jobs where no user is present to
+supply the password, and where it is desirable to detect a
+broken network swiftly. The argument must be B<yes> or
+B<no> (the default).If set to B<yes>,
+passphrase/password querying will be disabled. In addition,
+the B<ServerAliveInterval> option will be set to 300
+seconds by default (Debian-specific). This option is useful
+in scripts and other batch jobs where no user is present to
+supply the password, and where it is desirable to detect a
+broken network swiftly. The argument must be B<yes> or
+B<no> (the default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'BindAddress',
       {
-        'description' => 'Use the specified address on the local machine as the source address of the connection. Only useful on systems with more than one address. Note that this option does not work if UsePrivilegedPort is set to \'yes\'.',
+        'description' => 'Use the specified address on
+the local machine as the source address of the connection.
+Only useful on systems with more than one address.Use the specified address on
+the local machine as the source address of the connection.
+Only useful on systems with more than one address.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'BindInterface',
+      {
+        'description' => 'Use the address of the
+specified interface on the local machine as the source
+address of the connection.Use the address of the
+specified interface on the local machine as the source
+address of the connection.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'CanonicalDomains',
+      {
+        'description' => 'When
+B<CanonicalizeHostname> is enabled, this option
+specifies the list of domain suffixes in which to search for
+the specified destination host.When
+B<CanonicalizeHostname> is enabled, this option
+specifies the list of domain suffixes in which to search for
+the specified destination host.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'CanonicalizeFallbackLocal',
+      {
+        'description' => "Specifies whether to fail with
+an error when hostname canonicalization fails. The default,
+B<yes>, will attempt to look up the unqualified hostname
+using the system resolver\x{2019}s search rules. A value of
+B<no> will cause L<ssh(1)> to fail instantly if
+B<CanonicalizeHostname> is enabled and the target
+hostname cannot be found in any of the domains specified by
+B<CanonicalDomains>.Specifies whether to fail with
+an error when hostname canonicalization fails. The default,
+B<yes>, will attempt to look up the unqualified hostname
+using the system resolver\x{2019}s search rules. A value of
+B<no> will cause L<ssh(1)> to fail instantly if
+B<CanonicalizeHostname> is enabled and the target
+hostname cannot be found in any of the domains specified by
+B<CanonicalDomains>.",
+        'type' => 'leaf',
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'CanonicalizeHostname',
+      {
+        'choice' => [
+          'no',
+          'yes',
+          'always'
+        ],
+        'description' => 'Controls whether explicit
+hostname canonicalization is performed. The default,
+B<no>, is not to perform any name rewriting and let the
+system resolver handle all hostname lookups. If set to
+B<yes> then, for connections that do not use a
+B<ProxyCommand> or B<ProxyJump>, L<ssh(1)> will attempt
+to canonicalize the hostname specified on the command line
+using the B<CanonicalDomains> suffixes and
+B<CanonicalizePermittedCNAMEs> rules. If
+B<CanonicalizeHostname> is set to B<always>, then
+canonicalization is applied to proxied connections too.If this option
+is enabled, then the configuration files are processed again
+using the new target name to pick up any new configuration
+in matching B<Host> and B<Match> stanzas.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'enum'
+      },
+      'CanonicalizeMaxDots',
+      {
+        'description' => 'Specifies the maximum number of
+dot characters in a hostname before canonicalization is
+disabled. The default, 1, allows a single dot (i.e.
+hostname.subdomain).Specifies the maximum number of
+dot characters in a hostname before canonicalization is
+disabled. The default, 1, allows a single dot (i.e.
+hostname.subdomain).',
+        'type' => 'leaf',
+        'upstream_default' => '1',
+        'value_type' => 'integer'
+      },
+      'CanonicalizePermittedCNAMEs',
+      {
+        'description' => 'Specifies rules to determine
+whether CNAMEs should be followed when canonicalizing
+hostnames. The rules consist of one or more arguments of
+I<source_domain_list>:I<target_domain_list>, where
+I<source_domain_list> is a pattern-list of domains that
+may follow CNAMEs in canonicalization, and
+I<target_domain_list> is a pattern-list of domains that
+they may resolve to.For example,
+"*.a.example.com:*.b.example.com,*.c.example.com"
+will allow hostnames matching "*.a.example.com" to
+be canonicalized to names in the "*.b.example.com"
+or "*.c.example.com" domains.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'CASignatureAlgorithms',
+      {
+        'description' => 'Specifies which algorithms are
+allowed for signing of certificates by certificate
+authorities (CAs). The default is:L<ssh(1)> will not
+accept host certificates signed using algorithms other than
+those specified.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'CertificateFile',
+      {
+        'description' => "Specifies a file from which the
+user\x{2019}s certificate is read. A corresponding private
+key must be provided separately in order to use this
+certificate either from an B<IdentityFile> directive or
+B<-i> flag to L<ssh(1)>, via L<ssh-agent(1)>, or via a
+B<PKCS11Provider>.It is possible
+to have multiple certificate files specified in
+configuration files; these certificates will be tried in
+sequence. Multiple B<CertificateFile> directives will
+add to the list of certificates used for authentication.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'ChallengeResponseAuthentication',
       {
-        'description' => 'Specifies whether to use challenge-response authentication.',
+        'description' => 'Specifies whether to use
+challenge-response authentication. The argument to this
+keyword must be B<yes> (the default) or B<no>.Specifies whether to use
+challenge-response authentication. The argument to this
+keyword must be B<yes> (the default) or B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '1',
-        'value_type' => 'boolean'
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'CheckHostIP',
       {
-        'description' => 'If enabled, ssh(1) will additionally check the host IP address in the known_hosts file. This allows ssh to detect if a host key changed due to DNS spoofing. If disbled, the check will not be executed.',
+        'description' => 'If set to B<yes> (the
+default), L<ssh(1)> will additionally check the host IP address
+in the I<known_hosts> file. This allows it to detect if
+a host key changed due to DNS spoofing and will add
+addresses of destination hosts to I<~/.ssh/known_hosts>
+in the process, regardless of the setting of
+B<StrictHostKeyChecking>. If the option is set to
+B<no>, the check will not be executed.If set to B<yes> (the
+default), L<ssh(1)> will additionally check the host IP address
+in the I<known_hosts> file. This allows it to detect if
+a host key changed due to DNS spoofing and will add
+addresses of destination hosts to I<~/.ssh/known_hosts>
+in the process, regardless of the setting of
+B<StrictHostKeyChecking>. If the option is set to
+B<no>, the check will not be executed.',
         'type' => 'leaf',
-        'upstream_default' => '1',
-        'value_type' => 'boolean'
-      },
-      'Cipher',
-      {
-        'choice' => [
-          'blowfish',
-          '3des',
-          'des'
-        ],
-        'description' => 'Specifies the cipher to use for encrypting the session in protocol version 1. "des" is only supported in the ssh(1) client for interoperability with legacy protocol 1 implementations that do not support the 3des cipher. Its use is strongly discouraged due to cryptographic weaknesses.',
-        'type' => 'leaf',
-        'upstream_default' => '3des',
-        'value_type' => 'enum'
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'Ciphers',
       {
-        'description' => "Specifies the ciphers allowed for protocol version 2 in order of
-preference.  Multiple ciphers must be comma-separated.  If the
-specified value begins with a \x{2018}+\x{2019} character, then the specified
-ciphers will be appended to the default set instead of replacing them.
-If the specified value begins with a \x{2018}-\x{2019} character, then the specified
-ciphers (including wildcards) will be removed from the default set
-instead of replacing them.
-
-The supported ciphers are:
-
-   3des-cbc
-   aes128-cbc
-   aes192-cbc
-   aes256-cbc
-   aes128-ctr
-   aes192-ctr
-   aes256-ctr
-   aes128-gcm\@openssh.com
-   aes256-gcm\@openssh.com
-   arcfour
-   arcfour128
-   arcfour256
-   blowfish-cbc
-   cast128-cbc
-   chacha20-poly1305\@openssh.com
-
-The default is:
-
-   chacha20-poly1305\@openssh.com,
-   aes128-ctr,aes192-ctr,aes256-ctr,
-   aes128-gcm\@openssh.com,aes256-gcm\@openssh.com,
-   aes128-cbc,aes192-cbc,aes256-cbc
-
-The list of available ciphers may also be obtained using
-C<ssh -Q cipher>",
+        'description' => "Specifies the ciphers allowed
+and their order of preference. Multiple ciphers must be
+comma-separated. If the specified value begins with a
+\x{2019}+\x{2019} character, then the specified ciphers will
+be appended to the default set instead of replacing them. If
+the specified value begins with a \x{2019}-\x{2019} character,
+then the specified ciphers (including wildcards) will be
+removed from the default set instead of replacing them.The list of
+available ciphers may also be obtained using \"ssh -Q
+cipher\".",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'ClearAllForwardings',
       {
-        'description' => 'Specifies that all local, remote, and dynamic port forwardings specified in the configuration files or on the command line be cleared. This option is primarily useful when used from the ssh(1) command line to clear port forwardings set in configuration files, and is automatically set by scp(1) and sftp(1).',
+        'description' => 'Specifies that all local,
+remote, and dynamic port forwardings specified in the
+configuration files or on the command line be cleared. This
+option is primarily useful when used from the L<ssh(1)> command
+line to clear port forwardings set in configuration files,
+and is automatically set by L<scp(1)> and L<sftp(1)>. The argument
+must be B<yes> or B<no> (the default).Specifies that all local,
+remote, and dynamic port forwardings specified in the
+configuration files or on the command line be cleared. This
+option is primarily useful when used from the L<ssh(1)> command
+line to clear port forwardings set in configuration files,
+and is automatically set by L<scp(1)> and L<sftp(1)>. The argument
+must be B<yes> or B<no> (the default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'Compression',
       {
-        'description' => 'Specifies whether to use compression.',
+        'description' => 'Specifies whether to use
+compression. The argument must be B<yes> or B<no>
+(the default).Specifies whether to use
+compression. The argument must be B<yes> or B<no>
+(the default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
-      },
-      'CompressionLevel',
-      {
-        'level' => 'hidden',
-        'max' => '9',
-        'min' => '1',
-        'type' => 'leaf',
-        'upstream_default' => '6',
-        'value_type' => 'integer',
-        'warp' => {
-          'follow' => {
-            'compression' => '- Compression'
-          },
-          'rules' => [
-            '$compression == 1',
-            {
-              'level' => 'normal'
-            }
-          ]
-        }
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'ConnectionAttempts',
       {
-        'description' => 'Specifies the number of tries (one per second) to make before exiting. The argument must be an integer. This may be useful in scripts if the connection sometimes fails.',
-        'min' => '1',
+        'description' => 'Specifies the number of tries
+(one per second) to make before exiting. The argument must
+be an integer. This may be useful in scripts if the
+connection sometimes fails. The default is 1.Specifies the number of tries
+(one per second) to make before exiting. The argument must
+be an integer. This may be useful in scripts if the
+connection sometimes fails. The default is 1.',
         'type' => 'leaf',
         'upstream_default' => '1',
         'value_type' => 'integer'
       },
       'ConnectTimeout',
       {
-        'description' => 'Specifies the timeout (in seconds) used when connecting to the SSH server, instead of using the default system TCP timeout. This value is used only when the target is down or really unreachable, not when it refuses the connection.
-',
+        'description' => 'Specifies the timeout (in
+seconds) used when connecting to the SSH server, instead of
+using the default system TCP timeout. This value is used
+only when the target is down or really unreachable, not when
+it refuses the connection.Specifies the timeout (in
+seconds) used when connecting to the SSH server, instead of
+using the default system TCP timeout. This value is used
+only when the target is down or really unreachable, not when
+it refuses the connection.',
         'type' => 'leaf',
         'value_type' => 'integer'
       },
       'ControlMaster',
       {
         'choice' => [
-          'no',
-          'yes',
-          'ask',
           'auto',
-          'autoask'
+          'autoask',
+          'yes',
+          'no',
+          'ask'
         ],
-        'description' => 'Enables the sharing of multiple sessions over a single network connection. When set to \'yes\', ssh(1) will listen for connections on a control socket specified using the ControlPath argument. Additional sessions can connect to this socket using the same ControlPath with ControlMaster set to \'no\' (the default). These sessions will try to reuse the master instance\'s network connection rather than initiating new ones, but will fall back to connecting normally if the control socket does not exist, or is not listening.
-
-Setting this to \'ask\' will cause ssh to listen for control connections, but require confirmation using the SSH_ASKPASS program before they are accepted (see ssh-add(1) for details). If the ControlPath cannot be opened, ssh will continue without connecting to a master instance.
-
-X11 and ssh-agent(1) forwarding is supported over these multiplexed connections, however the display and agent forwarded will be the one belonging to the master connection i.e. it is not pos sible to forward multiple displays or agents.
-
-Two additional options allow for opportunistic multiplexing: try to use a master connection but fall back to creating a new one if
- one does not already exist. These options are: \'auto\' and \'autoask\'. The latter requires confirmation like the \'ask\' option.
-',
+        'description' => "Enables the sharing of multiple
+sessions over a single network connection. When set to
+B<yes>, L<ssh(1)> will listen for connections on a control
+socket specified using the B<ControlPath> argument.
+Additional sessions can connect to this socket using the
+same B<ControlPath> with B<ControlMaster> set to
+B<no> (the default). These sessions will try to reuse
+the master instance\x{2019}s network connection rather than
+initiating new ones, but will fall back to connecting
+normally if the control socket does not exist, or is not
+listening.Two additional
+options allow for opportunistic multiplexing: try to use a
+master connection but fall back to creating a new one if one
+does not already exist. These options are: B<auto> and
+B<autoask>. The latter requires confirmation like the
+B<ask> option.",
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'enum'
       },
       'ControlPath',
       {
-        'description' => 'Specify the path to the control socket used for connection sharing as described in the ControlMaster section above or the string \'none\' to disable connection sharing.  In the path, \'%l\' will be substituted by the local host name, \'%h\' will be substituted by the target host name, \'%p\' the port, and \'%r\' by the remotelogin username. It is recommended that any ControlPath used for opportunistic connection sharing include at least %h, %p, and %r. This ensures that shared connections are uniquely identified.
-',
+        'description' => "Specify the path to the control
+socket used for connection sharing as described in the
+B<ControlMaster> section above or the string B<none>
+to disable connection sharing. Arguments to
+B<ControlPath> may use the tilde syntax to refer to a
+user\x{2019}s home directory or the tokens described in the
+I<TOKENS> section. It is recommended that any
+B<ControlPath> used for opportunistic connection sharing
+include at least %h, %p, and %r (or alternatively %C) and be
+placed in a directory that is not writable by other users.
+This ensures that shared connections are uniquely
+identified.Specify the path to the control
+socket used for connection sharing as described in the
+B<ControlMaster> section above or the string B<none>
+to disable connection sharing. Arguments to
+B<ControlPath> may use the tilde syntax to refer to a
+user\x{2019}s home directory or the tokens described in the
+I<TOKENS> section. It is recommended that any
+B<ControlPath> used for opportunistic connection sharing
+include at least %h, %p, and %r (or alternatively %C) and be
+placed in a directory that is not writable by other users.
+This ensures that shared connections are uniquely
+identified.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'ControlPersist',
       {
-        'description' => 'When used in conjunction with ControlMaster, specifies that the master connection should remain open in the background (waiting for future client connections) after the initial client connection has been closed. If set to ``no\'\', then the master connection will not be placed into the background, and will close as soon as the initial client connection is closed. If set to ``yes\'\', then the master connection will remain in the background indef- initely (until killed or closed via a mechanism such as the ssh(1) ``-O exit\'\' option). If set to a time in seconds, or a time in any of the formats documented in sshd_config(5), then the backgrounded master connection will automatically terminate after it has remained idle (with no client connections) for the specified time.',
-        'match' => '^(?i)yes|no|\\d+$',
-        'summary' => 'persists the master connection in the background',
+        'description' => 'When used in conjunction with
+B<ControlMaster>, specifies that the master connection
+should remain open in the background (waiting for future
+client connections) after the initial client connection has
+been closed. If set to B<no>, then the master connection
+will not be placed into the background, and will close as
+soon as the initial client connection is closed. If set to
+B<yes> or 0, then the master connection will remain in
+the background indefinitely (until killed or closed via a
+mechanism such as the "ssh -O exit"). If set to a
+time in seconds, or a time in any of the formats documented
+in L<sshd_config(5)>, then the backgrounded master connection
+will automatically terminate after it has remained idle
+(with no client connections) for the specified time.When used in conjunction with
+B<ControlMaster>, specifies that the master connection
+should remain open in the background (waiting for future
+client connections) after the initial client connection has
+been closed. If set to B<no>, then the master connection
+will not be placed into the background, and will close as
+soon as the initial client connection is closed. If set to
+B<yes> or 0, then the master connection will remain in
+the background indefinitely (until killed or closed via a
+mechanism such as the "ssh -O exit"). If set to a
+time in seconds, or a time in any of the formats documented
+in L<sshd_config(5)>, then the backgrounded master connection
+will automatically terminate after it has remained idle
+(with no client connections) for the specified time.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -201,95 +457,243 @@ Two additional options allow for opportunistic multiplexing: try to use a master
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Specifies that a TCP port on the local machine be forwarded over the secure channel, and the application protocol is then used to determine where to connect to from the remote machine.
-
-The argument must be [bind_address:]port. IPv6 addresses can be specified by enclosing addresses in square brackets or by using an alternative syntax: [bind_address/]port. By default, the local port is bound in accordance with the GatewayPorts setting. However, an explicit bind_address may be used to bind the connection to a specific address. The bind_address of \'localhost\' indicates that the listening port be bound for local use only, while an empty address or \'*\' indicates that the port should be available from all interfaces.
-
-Currently the SOCKS4 and SOCKS5 protocols are supported, and ssh(1) will act as a SOCKS server. Multiple forwardings may be specified, and additional forwardings can be given on the command line. Only the superuser can forward privileged ports.
-',
+        'description' => 'Specifies that a TCP port on
+the local machine be forwarded over the secure channel, and
+the application protocol is then used to determine where to
+connect to from the remote machine.Currently the
+SOCKS4 and SOCKS5 protocols are supported, and L<ssh(1)> will
+act as a SOCKS server. Multiple forwardings may be
+specified, and additional forwardings can be given on the
+command line. Only the superuser can forward privileged
+ports.',
         'type' => 'list'
+      },
+      'EnableSSHKeysign',
+      {
+        'description' => 'Setting this option to
+B<yes> in the global client configuration file
+I</etc/ssh/ssh_config> enables the use of the helper
+program L<ssh-keysign(8)> during
+B<HostbasedAuthentication>. The argument must be
+B<yes> or B<no> (the default). This option should be
+placed in the non-hostspecific section. See L<ssh-keysign(8)>
+for more information.Setting this option to
+B<yes> in the global client configuration file
+I</etc/ssh/ssh_config> enables the use of the helper
+program L<ssh-keysign(8)> during
+B<HostbasedAuthentication>. The argument must be
+B<yes> or B<no> (the default). This option should be
+placed in the non-hostspecific section. See L<ssh-keysign(8)>
+for more information.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'EscapeChar',
       {
-        'description' => 'Sets the escape character (default: \'~\'). The escape character can also be set on the command line.  The argument should be a single character, \'^\' followed by a letter, or \'none\' to disable the escape character entirely (making the connection transparent for binary data).
-',
+        'description' => "Sets the escape character
+(default: \x{2019}~\x{2019}). The escape character can also be
+set on the command line. The argument should be a single
+character, \x{2019}^\x{2019} followed by a letter, or
+B<none> to disable the escape character entirely (making
+the connection transparent for binary data).Sets the escape character
+(default: \x{2019}~\x{2019}). The escape character can also be
+set on the command line. The argument should be a single
+character, \x{2019}^\x{2019} followed by a letter, or
+B<none> to disable the escape character entirely (making
+the connection transparent for binary data).",
         'type' => 'leaf',
-        'upstream_default' => '~',
         'value_type' => 'uniline'
       },
       'ExitOnForwardFailure',
       {
-        'description' => 'Specifies whether ssh(1) should terminate the connection if it cannot set up all requested dynamic, tunnel, local, and remote port forwardings.',
+        'description' => 'Specifies whether L<ssh(1)> should
+terminate the connection if it cannot set up all requested
+dynamic, tunnel, local, and remote port forwardings, (e.g.
+if either end is unable to bind and listen on a specified
+port). Note that B<ExitOnForwardFailure> does not apply
+to connections made over port forwardings and will not, for
+example, cause L<ssh(1)> to exit if TCP connections to the
+ultimate forwarding destination fail. The argument must be
+B<yes> or B<no> (the default).Specifies whether L<ssh(1)> should
+terminate the connection if it cannot set up all requested
+dynamic, tunnel, local, and remote port forwardings, (e.g.
+if either end is unable to bind and listen on a specified
+port). Note that B<ExitOnForwardFailure> does not apply
+to connections made over port forwardings and will not, for
+example, cause L<ssh(1)> to exit if TCP connections to the
+ultimate forwarding destination fail. The argument must be
+B<yes> or B<no> (the default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'FingerprintHash',
+      {
+        'choice' => [
+          'md5',
+          'sha256'
+        ],
+        'description' => 'Specifies the hash algorithm
+used when displaying key fingerprints. Valid options are:
+B<md5> and B<sha256> (the default).Specifies the hash algorithm
+used when displaying key fingerprints. Valid options are:
+B<md5> and B<sha256> (the default).',
+        'type' => 'leaf',
+        'upstream_default' => 'sha256',
+        'value_type' => 'enum'
       },
       'ForwardAgent',
       {
-        'description' => 'Specifies whether the connection to the authentication agent (if any) will be forwarded to the remote machine. 
-
-Agent forwarding should be enabled with caution.  Users with the ability to bypass file permissions on the remote host (for the agent\'s Unix-domain socket) can access the local agent through the forwarded connection.  An attacker cannot obtain key material from the agent, however they can perform operations on the keys that enable them to authenticate using the identities loaded into the agent.
-',
+        'description' => "Specifies whether the
+connection to the authentication agent (if any) will be
+forwarded to the remote machine. The argument must be
+B<yes> or B<no> (the default).Agent
+forwarding should be enabled with caution. Users with the
+ability to bypass file permissions on the remote host (for
+the agent\x{2019}s Unix-domain socket) can access the local
+agent through the forwarded connection. An attacker cannot
+obtain key material from the agent, however they can perform
+operations on the keys that enable them to authenticate
+using the identities loaded into the agent.",
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'ForwardX11',
       {
-        'description' => 'Specifies whether X11 connections will be automatically redirected over the secure channel and DISPLAY set.
-
-X11 forwarding should be enabled with caution.  Users with the ability to bypass file permissions on the remote host (for the user\'s X11 authorization database) can access the local X11 dis play through the forwarded connection.  An attacker may then be able to perform activities such as keystroke monitoring if the ForwardX11Trusted option is also enabled.
-',
-        'level' => 'important',
+        'description' => "Specifies whether X11
+connections will be automatically redirected over the secure
+channel and DISPLAY set. The argument must be B<yes> or
+B<no> (the default).X11 forwarding
+should be enabled with caution. Users with the ability to
+bypass file permissions on the remote host (for the
+user\x{2019}s X11 authorization database) can access the
+local X11 display through the forwarded connection. An
+attacker may then be able to perform activities such as
+keystroke monitoring if the B<ForwardX11Trusted> option
+is also enabled.",
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'ForwardX11Timeout',
       {
-        'description' => 'Specify a timeout for untrusted X11 forwarding using the format described in the TIME FORMATS section of L<sshd_config(5)>. X11 connections received by L<ssh(1)> after this time will be refused. The default is to disable untrusted X11 forwarding after twenty minutes has elapsed.',
-        'summary' => 'timeout for untrusted X11 forwarding',
+        'description' => 'Specify a timeout for untrusted
+X11 forwarding using the format described in the I<TIME
+FORMATS> section of L<sshd_config(5)>. X11 connections
+received by L<ssh(1)> after this time will be refused. Setting
+B<ForwardX11Timeout> to zero will disable the timeout
+and permit X11 forwarding for the life of the connection.
+The default is to disable untrusted X11 forwarding after
+twenty minutes has elapsed.Specify a timeout for untrusted
+X11 forwarding using the format described in the I<TIME
+FORMATS> section of L<sshd_config(5)>. X11 connections
+received by L<ssh(1)> after this time will be refused. Setting
+B<ForwardX11Timeout> to zero will disable the timeout
+and permit X11 forwarding for the life of the connection.
+The default is to disable untrusted X11 forwarding after
+twenty minutes has elapsed.',
         'type' => 'leaf',
-        'value_type' => 'uniline'
+        'value_type' => 'integer'
       },
       'ForwardX11Trusted',
       {
-        'description' => 'If this option is set, remote X11 clients will have full access to the original X11 display.
-
-If this option is not set, remote X11 clients will be considered untrusted and prevented from stealing or tampering with data belonging to trusted X11 clients. Furthermore, the xauth(1) token used for the session will be set to expire after 20 minutes. Remote clients will be refused access after this time.
-
-See the X11 SECURITY extension specification for full details on the restrictions imposed on untrusted clients.
-',
+        'description' => 'If this option is set to
+B<yes>, (the Debian-specific default), remote X11
+clients will have full access to the original X11
+display.See the X11
+SECURITY extension specification for full details on the
+restrictions imposed on untrusted clients.',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'GatewayPorts',
       {
-        'description' => 'Specifies whether remote hosts are allowed to connect to local forwarded ports. By default, ssh(1) binds local port forwardings to the loopback address. This prevents other remote hosts from connecting to forwarded ports. GatewayPorts can be used to specify that ssh should bind local port forwardings to the wildcard address, thus allowing remote hosts to connect to forwarded ports. ',
+        'description' => 'Specifies whether remote hosts
+are allowed to connect to local forwarded ports. By default,
+L<ssh(1)> binds local port forwardings to the loopback address.
+This prevents other remote hosts from connecting to
+forwarded ports. B<GatewayPorts> can be used to specify
+that ssh should bind local port forwardings to the wildcard
+address, thus allowing remote hosts to connect to forwarded
+ports. The argument must be B<yes> or B<no> (the
+default).Specifies whether remote hosts
+are allowed to connect to local forwarded ports. By default,
+L<ssh(1)> binds local port forwardings to the loopback address.
+This prevents other remote hosts from connecting to
+forwarded ports. B<GatewayPorts> can be used to specify
+that ssh should bind local port forwardings to the wildcard
+address, thus allowing remote hosts to connect to forwarded
+ports. The argument must be B<yes> or B<no> (the
+default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'GlobalKnownHostsFile',
       {
-        'description' => 'Specifies a file to use for the global host key database',
+        'description' => 'Specifies one or more files to
+use for the global host key database, separated by
+whitespace. The default is I</etc/ssh/ssh_known_hosts>,
+I</etc/ssh/ssh_known_hosts2>.Specifies one or more files to
+use for the global host key database, separated by
+whitespace. The default is I</etc/ssh/ssh_known_hosts>,
+I</etc/ssh/ssh_known_hosts2>.',
         'type' => 'leaf',
         'upstream_default' => '/etc/ssh/ssh_known_hosts',
         'value_type' => 'uniline'
       },
       'GSSAPIAuthentication',
       {
-        'description' => 'Specifies whether user authentication based on GSSAPI is allowed. Note that this option applies to protocol version 2 only.',
+        'description' => 'Specifies whether user
+authentication based on GSSAPI is allowed. The default is
+B<no>.Specifies whether user
+authentication based on GSSAPI is allowed. The default is
+B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'GSSAPIKeyExchange',
       {
-        'description' => 'Specifies whether key exchange based on GSSAPI may be used. When using GSSAPI key exchange the server need not have a host key. Note that this option applies to protocol version 2 only.',
+        'description' => 'Specifies whether key exchange
+based on GSSAPI may be used. When using GSSAPI key exchange
+the server need not have a host key. The default is
+B<no>.Specifies whether key exchange
+based on GSSAPI may be used. When using GSSAPI key exchange
+the server need not have a host key. The default is
+B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '0',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -298,21 +702,37 @@ See the X11 SECURITY extension specification for full details on the restriction
       },
       'GSSAPIClientIdentity',
       {
-        'description' => 'If set, specifies the GSSAPI client identity that ssh should use when connecting to the server. The default is unset, which means that the default identity will be used.',
+        'description' => 'If set, specifies the GSSAPI
+client identity that ssh should use when connecting to the
+server. The default is unset, which means that the default
+identity will be used.If set, specifies the GSSAPI
+client identity that ssh should use when connecting to the
+server. The default is unset, which means that the default
+identity will be used.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'GSSAPIServerIdentity',
       {
-        'description' => 'If set, specifies the GSSAPI server identity that ssh should expect when connecting to the server. The default is unset, which means that the expected GSSAPI server identity will be determined from the target hostname.',
+        'description' => 'If set, specifies the GSSAPI
+server identity that ssh should expect when connecting to
+the server. The default is unset, which means that the
+expected GSSAPI server identity will be determined from the
+target hostname.If set, specifies the GSSAPI
+server identity that ssh should expect when connecting to
+the server. The default is unset, which means that the
+expected GSSAPI server identity will be determined from the
+target hostname.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'GSSAPIDelegateCredentials',
       {
-        'description' => 'Forward (delegate) credentials to the server. Note that this option applies to protocol version 2 connections using GSSAPI.',
+        'description' => 'Forward (delegate) credentials
+to the server. The default is B<no>.Forward (delegate) credentials
+to the server. The default is B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '0',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -321,9 +741,17 @@ See the X11 SECURITY extension specification for full details on the restriction
       },
       'GSSAPIRenewalForcesRekey',
       {
-        'description' => 'If set to "yes" then renewal of the client\'s GSSAPI credentials will force the rekeying of the ssh connection. With a compatible server, this can delegate the renewed credentials to a session on the server.',
+        'description' => "If set to B<yes> then
+renewal of the client\x{2019}s GSSAPI credentials will force
+the rekeying of the ssh connection. With a compatible
+server, this can delegate the renewed credentials to a
+session on the server. The default is B<no>.If set to B<yes> then
+renewal of the client\x{2019}s GSSAPI credentials will force
+the rekeying of the ssh connection. With a compatible
+server, this can delegate the renewed credentials to a
+session on the server. The default is B<no>.",
         'type' => 'leaf',
-        'upstream_default' => '0',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -332,9 +760,17 @@ See the X11 SECURITY extension specification for full details on the restriction
       },
       'GSSAPITrustDns',
       {
-        'description' => 'Set to "yes" to indicate that the DNS is trusted to securely canonicalize the name of the host being connected to. If "no", the hostname entered on the command line will be passed untouched to the GSSAPI library. This option only applies to protocol version 2 connections using GSSAPI.',
+        'description' => 'Set to B<yes> to indicate
+that the DNS is trusted to securely canonicalize the name of
+the host being connected to. If B<no>, the hostname
+entered on the command line will be passed untouched to the
+GSSAPI library. The default is B<no>.Set to B<yes> to indicate
+that the DNS is trusted to securely canonicalize the name of
+the host being connected to. If B<no>, the hostname
+entered on the command line will be passed untouched to the
+GSSAPI library. The default is B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '0',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -343,52 +779,152 @@ See the X11 SECURITY extension specification for full details on the restriction
       },
       'HashKnownHosts',
       {
-        'description' => 'Indicates that ssh(1) should hash host names and addresses when they are added to ~/.ssh/known_hosts. These hashed names may be used normally by ssh(1) and sshd(8), but they do not reveal identifying information should the file\'s contents be disclosed. Note that existing names and addresses in known hosts files will not be converted automatically, but may be manually hashed using ssh-keygen(1).
-',
+        'description' => "Indicates that L<ssh(1)> should
+hash host names and addresses when they are added to
+I<~/.ssh/known_hosts>. These hashed names may be used
+normally by L<ssh(1)> and L<sshd(8)>, but they do not reveal
+identifying information should the file\x{2019}s contents be
+disclosed. The default is B<no>. Note that existing
+names and addresses in known hosts files will not be
+converted automatically, but may be manually hashed using
+L<ssh-keygen(1)>. Use of this option may break facilities such
+as tab-completion that rely on being able to read unhashed
+host names from I<~/.ssh/known_hosts>.Indicates that L<ssh(1)> should
+hash host names and addresses when they are added to
+I<~/.ssh/known_hosts>. These hashed names may be used
+normally by L<ssh(1)> and L<sshd(8)>, but they do not reveal
+identifying information should the file\x{2019}s contents be
+disclosed. The default is B<no>. Note that existing
+names and addresses in known hosts files will not be
+converted automatically, but may be manually hashed using
+L<ssh-keygen(1)>. Use of this option may break facilities such
+as tab-completion that rely on being able to read unhashed
+host names from I<~/.ssh/known_hosts>.",
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'HostbasedAuthentication',
       {
-        'description' => 'Specifies whether to try rhosts based authentication with public key authentication. This option applies to protocol version 2 only and is similar to RhostsRSAAuthentication.
-',
+        'description' => 'Specifies whether to try rhosts
+based authentication with public key authentication. The
+argument must be B<yes> or B<no> (the default).Specifies whether to try rhosts
+based authentication with public key authentication. The
+argument must be B<yes> or B<no> (the default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'HostbasedKeyTypes',
+      {
+        'description' => "Specifies the key types that
+will be used for hostbased authentication as a
+comma-separated list of patterns. Alternately if the
+specified value begins with a \x{2019}+\x{2019} character,
+then the specified key types will be appended to the default
+set instead of replacing them. If the specified value begins
+with a \x{2019}-\x{2019} character, then the specified key
+types (including wildcards) will be removed from the default
+set instead of replacing them. The default for this option
+is:The B<-Q>
+option of L<ssh(1)> may be used to list supported key
+types.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'HostKeyAlgorithms',
       {
-        'choice' => [
-          'ssh-rsa',
-          'ssh-dss'
-        ],
-        'description' => 'Specifies the protocol version 2 host key algorithms that the client wants to use in order of preference.',
-        'ordered' => '1',
-        'type' => 'check_list',
-        'upstream_default_list' => [
-          'ssh-rsa',
-          'ssh-dss'
-        ]
+        'description' => "Specifies the host key
+algorithms that the client wants to use in order of
+preference. Alternately if the specified value begins with a
+\x{2019}+\x{2019} character, then the specified key types will
+be appended to the default set instead of replacing them. If
+the specified value begins with a \x{2019}-\x{2019} character,
+then the specified key types (including wildcards) will be
+removed from the default set instead of replacing them. The
+default for this option is:The list of
+available key types may also be obtained using \"ssh -Q
+key\".",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'HostKeyAlias',
       {
-        'description' => 'Specifies an alias that should be used instead of the real host name when looking up or saving the host key in the host key database files. This option is useful for tunneling SSH connections or for multiple servers running on a single host.',
+        'description' => 'Specifies an alias that should
+be used instead of the real host name when looking up or
+saving the host key in the host key database files and when
+validating host certificates. This option is useful for
+tunneling SSH connections or for multiple servers running on
+a single host.Specifies an alias that should
+be used instead of the real host name when looking up or
+saving the host key in the host key database files and when
+validating host certificates. This option is useful for
+tunneling SSH connections or for multiple servers running on
+a single host.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'HostName',
       {
-        'description' => 'Specifies the real host name to log into. This can be used to specify nicknames or abbreviations for hosts. The default is the name given on the command line. Numeric IP addresses are also permitted (both on the command line and in HostName specifications).',
+        'description' => 'Specifies the real host name to
+log into. This can be used to specify nicknames or
+abbreviations for hosts. Arguments to B<HostName> accept
+the tokens described in the I<TOKENS> section. Numeric
+IP addresses are also permitted (both on the command line
+and in B<HostName> specifications). The default is the
+name given on the command line.Specifies the real host name to
+log into. This can be used to specify nicknames or
+abbreviations for hosts. Arguments to B<HostName> accept
+the tokens described in the I<TOKENS> section. Numeric
+IP addresses are also permitted (both on the command line
+and in B<HostName> specifications). The default is the
+name given on the command line.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'IdentitiesOnly',
       {
-        'description' => 'Specifies that ssh(1) should only use the authentication identity files configured in the ssh_config files, even if ssh-agent(1) offers more identities. This option is intended for situations where ssh-agent offers many different identities.',
+        'description' => 'Specifies that L<ssh(1)> should
+only use the authentication identity and certificate files
+explicitly configured in the B<ssh_config> files or
+passed on the L<ssh(1)> command-line, even if L<ssh-agent(1)> or a
+B<PKCS11Provider> offers more identities. The argument
+to this keyword must be B<yes> or B<no> (the
+default). This option is intended for situations where
+ssh-agent offers many different identities.Specifies that L<ssh(1)> should
+only use the authentication identity and certificate files
+explicitly configured in the B<ssh_config> files or
+passed on the L<ssh(1)> command-line, even if L<ssh-agent(1)> or a
+B<PKCS11Provider> offers more identities. The argument
+to this keyword must be B<yes> or B<no> (the
+default). This option is intended for situations where
+ssh-agent offers many different identities.',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'IdentityAgent',
+      {
+        'description' => "Specifies the UNIX-domain
+socket used to communicate with the authentication
+agent.Arguments to
+B<IdentityAgent> may use the tilde syntax to refer to a
+user\x{2019}s home directory or the tokens described in the
+I<TOKENS> section.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'IdentityFile',
       {
@@ -402,12 +938,69 @@ See the X11 SECURITY extension specification for full details on the restriction
             }
           }
         },
-        'description' => 'Specifies a file from which the user\'s RSA or DSA authentication identity is read. The default is ~/.ssh/identity for protocol version 1, and ~/.ssh/id_rsa and ~/.ssh/id_dsa for protocol version 2. Additionally, any identities represented by the authentication agent will be used for authentication.
-
-The file name may use the tilde syntax to refer to a user\'s home directory or one of the following escape characters: \'%d\' (local user\'s home directory), \'%u\' (local user name), \'%l\' (local host  name), \'%h\' (remote host name) or \'%r\' (remote user name).
-
-It is possible to have multiple identity files specified in con figuration files; all these identities will be tried in sequence.
-',
+        'description' => "Specifies a file from which the
+user\x{2019}s DSA, ECDSA, Ed25519 or RSA authentication
+identity is read. The default is I<~/.ssh/id_dsa>,
+I<~/.ssh/id_ecdsa>, I<~/.ssh/id_ed25519> and
+I<~/.ssh/id_rsa>. Additionally, any identities
+represented by the authentication agent will be used for
+authentication unless B<IdentitiesOnly> is set. If no
+certificates have been explicitly specified by
+B<CertificateFile>, L<ssh(1)> will try to load certificate
+information from the filename obtained by appending
+I<-cert.pub> to the path of a specified
+B<IdentityFile>.B<IdentityFile>
+may be used in conjunction with B<IdentitiesOnly> to
+select which identities in an agent are offered during
+authentication. B<IdentityFile> may also be used in
+conjunction with B<CertificateFile> in order to provide
+any certificate also needed for authentication with the
+identity.",
+        'type' => 'list'
+      },
+      'IgnoreUnknown',
+      {
+        'description' => 'Specifies a pattern-list of
+unknown options to be ignored if they are encountered in
+configuration parsing. This may be used to suppress errors
+if B<ssh_config> contains options that are unrecognised
+by L<ssh(1)>. It is recommended that B<IgnoreUnknown> be
+listed early in the configuration file as it will not be
+applied to unknown options that appear before it.Specifies a pattern-list of
+unknown options to be ignored if they are encountered in
+configuration parsing. This may be used to suppress errors
+if B<ssh_config> contains options that are unrecognised
+by L<ssh(1)>. It is recommended that B<IgnoreUnknown> be
+listed early in the configuration file as it will not be
+applied to unknown options that appear before it.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'Include',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => "Include the specified
+configuration file(s). Multiple pathnames may be specified
+and each pathname may contain L<glob(7)> wildcards and, for
+user configurations, shell-like \x{2019}~\x{2019} references
+to user home directories. Files without absolute paths are
+assumed to be in I<~/.ssh> if included in a user
+configuration file or I</etc/ssh> if included from the
+system configuration file. B<Include> directive may
+appear inside a B<Match> or B<Host> block to perform
+conditional inclusion.Include the specified
+configuration file(s). Multiple pathnames may be specified
+and each pathname may contain L<glob(7)> wildcards and, for
+user configurations, shell-like \x{2019}~\x{2019} references
+to user home directories. Files without absolute paths are
+assumed to be in I<~/.ssh> if included in a user
+configuration file or I</etc/ssh> if included from the
+system configuration file. B<Include> directive may
+appear inside a B<Match> or B<Host> block to perform
+conditional inclusion.",
         'type' => 'list'
       },
       'IPQoS',
@@ -426,25 +1019,64 @@ my @v = (/(\\S+)/g);
 my @good = grep {/^(af[1-4][1-3]|cs[0-7]|ef|lowdelay|throughput|reliability|\\d+)/} @v ;
 return @good == @v ? 1 : 0;
 ',
-            'msg' => 'value must be 1 or 2 occurences of: "af11", "af12", "af13", "af21", "af22",
+            'msg' => 'Unexpected value "$_". Expected 1 or 2 occurences of: "af11", "af12", "af13", "af21", "af22",
 "af23", "af31", "af32", "af33", "af41", "af42", "af43", "cs0", "cs1",
 "cs2", "cs3", "cs4", "cs5", "cs6", "cs7", "ef", "lowdelay",
-"throughput", "reliability", or a numeric value.'
+"throughput", "reliability", or numeric value.
+'
           }
         },
-        'description' => 'Specifies the IPv4 type-of-service or DSCP class for the connection. Accepted values are "af11", "af12", "af13", "af21", "af22", "af23", "af31", "af32", "af33", "af41", "af42", "af43", "cs0", "cs1", "cs2", "cs3", "cs4", "cs5", "cs6", "cs7", "ef", "lowdelay", "throughput", "reliability", or a numeric value. This option may take one or two arguments, separated by whitespace. If one argument is specified, it is used as the packet class unconditionally. If two values are specified, the first is automatically selected for interactive sessions and the second for non-interactive sessions. The default is "lowdelay" for interactive sessions and "throughput" for non-interactive sessions.',
-        'summary' => 'IPv4 type-of-service or DSCP class for the connection.',
+        'description' => 'Specifies the
+IPv4 type-of-service or DSCP class for connections. Accepted
+values are B<af11>, B<af12>, B<af13>,
+B<af21>, B<af22>, B<af23>, B<af31>,
+B<af32>, B<af33>, B<af41>, B<af42>,
+B<af43>, B<cs0>, B<cs1>, B<cs2>, B<cs3>,
+B<cs4>, B<cs5>, B<cs6>, B<cs7>, B<ef>,
+B<lowdelay>, B<throughput>, B<reliability>, a
+numeric value, or B<none> to use the operating system
+default. This option may take one or two arguments,
+separated by whitespace. If one argument is specified, it is
+used as the packet class unconditionally. If two values are
+specified, the first is automatically selected for
+interactive sessions and the second for non-interactive
+sessions. The default is B<lowdelay> for interactive
+sessions and B<throughput> for non-interactive
+sessions.Specifies the
+IPv4 type-of-service or DSCP class for connections. Accepted
+values are B<af11>, B<af12>, B<af13>,
+B<af21>, B<af22>, B<af23>, B<af31>,
+B<af32>, B<af33>, B<af41>, B<af42>,
+B<af43>, B<cs0>, B<cs1>, B<cs2>, B<cs3>,
+B<cs4>, B<cs5>, B<cs6>, B<cs7>, B<ef>,
+B<lowdelay>, B<throughput>, B<reliability>, a
+numeric value, or B<none> to use the operating system
+default. This option may take one or two arguments,
+separated by whitespace. If one argument is specified, it is
+used as the packet class unconditionally. If two values are
+specified, the first is automatically selected for
+interactive sessions and the second for non-interactive
+sessions. The default is B<lowdelay> for interactive
+sessions and B<throughput> for non-interactive
+sessions.',
         'type' => 'leaf',
-        'upstream_default' => 'lowdelay throughput',
+        'upstream_default' => 'af21 cs1',
         'value_type' => 'uniline'
       },
       'KbdInteractiveAuthentication',
       {
-        'description' => 'Specifies whether to use keyboard-interactive authentication.
-',
+        'description' => 'Specifies whether to use
+keyboard-interactive authentication. The argument to this
+keyword must be B<yes> (the default) or B<no>.Specifies whether to use
+keyboard-interactive authentication. The argument to this
+keyword must be B<yes> (the default) or B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '1',
-        'value_type' => 'boolean'
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'KbdInteractiveDevices',
       {
@@ -452,31 +1084,49 @@ return @good == @v ? 1 : 0;
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Specifies the list of methods to use in keyboard-interactive authentication.  Multiple method names must be comma-separated. The default is to use the server specified list. The methods available vary depending on what the server supports. For an OpenSSH server, it may be zero or more of: \'bsdauth\', \'pam\', and \'skey\'.',
+        'description' => 'Specifies the list of methods
+to use in keyboard-interactive authentication. Multiple
+method names must be comma-separated. The default is to use
+the server specified list. The methods available vary
+depending on what the server supports. For an OpenSSH
+server, it may be zero or more of: B<bsdauth> and
+B<pam>.Specifies the list of methods
+to use in keyboard-interactive authentication. Multiple
+method names must be comma-separated. The default is to use
+the server specified list. The methods available vary
+depending on what the server supports. For an OpenSSH
+server, it may be zero or more of: B<bsdauth> and
+B<pam>.',
         'type' => 'list'
       },
       'KexAlgorithms',
       {
-        'choice' => [
-          'ecdh-sha2-nistp256',
-          'ecdh-sha2-nistp384',
-          'ecdh-sha2-nistp521',
-          'diffie-hellman-group-exchange-sha256',
-          'diffie-hellman-group-exchange-sha1',
-          'diffie-hellman-group14-sha1',
-          'diffie-hellman-group1-sha1'
-        ],
-        'description' => 'Specifies the available KEX (Key Exchange) algorithms.',
-        'type' => 'check_list',
-        'upstream_default_list' => [
-          'diffie-hellman-group-exchange-sha1',
-          'diffie-hellman-group-exchange-sha256',
-          'diffie-hellman-group1-sha1',
-          'diffie-hellman-group14-sha1',
-          'ecdh-sha2-nistp256',
-          'ecdh-sha2-nistp384',
-          'ecdh-sha2-nistp521'
-        ]
+        'description' => "Specifies the available KEX
+(Key Exchange) algorithms. Multiple algorithms must be
+comma-separated. Alternately if the specified value begins
+with a \x{2019}+\x{2019} character, then the specified methods
+will be appended to the default set instead of replacing
+them. If the specified value begins with a \x{2019}-\x{2019}
+character, then the specified methods (including wildcards)
+will be removed from the default set instead of replacing
+them. The default is:The list of
+available key exchange algorithms may also be obtained using
+\"ssh -Q kex\".",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'LocalCommand',
+      {
+        'description' => "Specifies a command to execute
+on the local machine after successfully connecting to the
+server. The command string extends to the end of the line,
+and is executed with the user\x{2019}s shell. Arguments to
+B<LocalCommand> accept the tokens described in the
+I<TOKENS> section.This directive
+is ignored unless B<PermitLocalCommand> has been
+enabled.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'LocalForward',
       {
@@ -484,24 +1134,28 @@ return @good == @v ? 1 : 0;
           'config_class_name' => 'Ssh::PortForward',
           'type' => 'node'
         },
-        'description' => 'Specifies that a TCP port on the local machine be forwarded over the secure channel to the specified host and port from the remote machine. The first argument must be [bind_address:]port and the second argument must be host:hostport. 
-
-IPv6 addresses can be specified by enclosing addresses in square brackets or by using an alternative syntax: [bind_address/]port and host/hostport. 
-
-Multiple forwardings may be specified, and additional forwardings can be given on the command line. Only the superuser can forward privileged ports. 
-
-By default, the local port is bound in accordance with the GatewayPorts setting. However, an explicit bind_address may be used to bind the connection to a specific address. The bind_address of "localhost" indicates that the listening port be bound for local use only, while an empty address or \'*\' indicates that the port should be available from all interfaces.
-
-Example:
-   LocalForward 20000 192.168.0.66:80
-',
-        'summary' => 'Local port forwarding',
+        'description' => "Specifies that a TCP port on
+the local machine be forwarded over the secure channel to
+the specified host and port from the remote machine. The
+first argument must be [I<bind_address>: ]I<port> and the second
+argument must be I<host>:I<hostport>. IPv6 addresses
+can be specified by enclosing addresses in square brackets.
+Multiple forwardings may be specified, and additional
+forwardings can be given on the command line. Only the
+superuser can forward privileged ports. By default, the
+local port is bound in accordance with the
+B<GatewayPorts> setting. However, an explicit
+I<bind_address> may be used to bind the connection to a
+specific address. The I<bind_address> of
+B<localhost> indicates that the listening port be bound
+for local use only, while an empty address or
+\x{2019}*\x{2019} indicates that the port should be available
+from all interfaces.",
         'type' => 'list'
       },
       'LogLevel',
       {
         'choice' => [
-          'SILENT',
           'QUIET',
           'FATAL',
           'ERROR',
@@ -512,134 +1166,263 @@ Example:
           'DEBUG2',
           'DEBUG3'
         ],
-        'description' => 'Gives the verbosity level that is used when logging messages from ssh(1).  The possible values are: SILENT, QUIET, FATAL, ERROR, INFO, VERBOSE, DEBUG, DEBUG1, DEBUG2, and DEBUG3.  The default is INFO.  DEBUG and DEBUG1 are equivalent.  DEBUG2 and DEBUG3 each specify higher levels of verbose output.',
+        'description' => 'Gives the verbosity level that
+is used when logging messages from L<ssh(1)>. The possible
+values are: QUIET, FATAL, ERROR, INFO, VERBOSE, DEBUG,
+DEBUG1, DEBUG2, and DEBUG3. The default is INFO. DEBUG and
+DEBUG1 are equivalent. DEBUG2 and DEBUG3 each specify higher
+levels of verbose output.Gives the verbosity level that
+is used when logging messages from L<ssh(1)>. The possible
+values are: QUIET, FATAL, ERROR, INFO, VERBOSE, DEBUG,
+DEBUG1, DEBUG2, and DEBUG3. The default is INFO. DEBUG and
+DEBUG1 are equivalent. DEBUG2 and DEBUG3 each specify higher
+levels of verbose output.',
         'type' => 'leaf',
         'upstream_default' => 'INFO',
         'value_type' => 'enum'
       },
       'MACs',
       {
-        'choice' => [
-          'hmac-md5',
-          'hmac-sha1',
-          'umac-64@openssh.com',
-          'hmac-ripemd160',
-          'hmac-sha1-96',
-          'hmac-md5-96'
-        ],
-        'description' => 'Specifies the MAC (message authentication code) algorithms in order of preference. The MAC algorithm is used in protocol version 2 for data integrity protection.',
-        'ordered' => '1',
-        'type' => 'check_list',
-        'upstream_default_list' => [
-          'hmac-md5',
-          'hmac-sha1',
-          'umac-64@openssh.com',
-          'hmac-ripemd160',
-          'hmac-sha1-96',
-          'hmac-md5-96'
-        ]
+        'description' => "Specifies the
+MAC (message authentication code) algorithms in order of
+preference. The MAC algorithm is used for data integrity
+protection. Multiple algorithms must be comma-separated. If
+the specified value begins with a \x{2019}+\x{2019} character,
+then the specified algorithms will be appended to the
+default set instead of replacing them. If the specified
+value begins with a \x{2019}-\x{2019} character, then the
+specified algorithms (including wildcards) will be removed
+from the default set instead of replacing them.The list of
+available MAC algorithms may also be obtained using
+\"ssh -Q mac\".",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'NoHostAuthenticationForLocalhost',
       {
-        'description' => 'This option can be used if the home directory is shared across machines. In this case localhost will refer to a different machine on each of the machines and the user will get many warn ings about changed host keys. However, this option disables host authentication for localhost. The default is to check the host key for localhost.',
+        'description' => 'Disable host authentication for
+localhost (loopback addresses). The argument to this keyword
+must be B<yes> or B<no> (the default).Disable host authentication for
+localhost (loopback addresses). The argument to this keyword
+must be B<yes> or B<no> (the default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'NumberOfPasswordPrompts',
       {
-        'description' => 'Specifies the number of password prompts before giving up.',
+        'description' => 'Specifies the number of
+password prompts before giving up. The argument to this
+keyword must be an integer. The default is 3.Specifies the number of
+password prompts before giving up. The argument to this
+keyword must be an integer. The default is 3.',
         'type' => 'leaf',
         'upstream_default' => '3',
         'value_type' => 'integer'
       },
       'PasswordAuthentication',
       {
-        'description' => 'Specifies whether to use password authentication.',
+        'description' => 'Specifies whether to use
+password authentication. The argument to this keyword must
+be B<yes> (the default) or B<no>.Specifies whether to use
+password authentication. The argument to this keyword must
+be B<yes> (the default) or B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '1',
-        'value_type' => 'boolean'
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'PermitLocalCommand',
       {
-        'description' => 'Allow local command execution via the LocalCommand option or using the !command escape sequence in ssh(1).',
+        'description' => 'Allow local command execution
+via the B<LocalCommand> option or using the
+B<!>I<command> escape sequence in L<ssh(1)>. The
+argument must be B<yes> or B<no> (the default).Allow local command execution
+via the B<LocalCommand> option or using the
+B<!>I<command> escape sequence in L<ssh(1)>. The
+argument must be B<yes> or B<no> (the default).',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
-      },
-      'LocalCommand',
-      {
-        'description' => 'Specifies a command to execute on the local machine after successfully connecting to the server. The command string extends to the end of the line, and is executed with the user\'s shell. The following escape character substitutions will be performed: \'%d\' (local user\'s home directory), \'%h\' (remote host name), \'%l\' (local host name), \'%n\' (host name as provided on the command line), \'%p\' (remote port), \'%r\' (remote user name) or \'%u\' (local user name). This directive is ignored unless PermitLocalCommand has been enabled.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'PKCS11Provider',
       {
-        'description' => 'Specifies which PKCS#11 provider to use. The argument to this keyword is the PKCS#11 shared library ssh(1) should use to communicate with a PKCS#11 token providing the user\'s private RSA key.',
+        'description' => "Specifies which PKCS#11
+provider to use. The argument to this keyword is the PKCS#11
+shared library L<ssh(1)> should use to communicate with a
+PKCS#11 token providing the user\x{2019}s private RSA
+key.Specifies which PKCS#11
+provider to use. The argument to this keyword is the PKCS#11
+shared library L<ssh(1)> should use to communicate with a
+PKCS#11 token providing the user\x{2019}s private RSA
+key.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'Port',
       {
-        'description' => 'Specifies the port number to connect on the remote host.',
+        'description' => 'Specifies the
+port number to connect on the remote host. The default is
+22.Specifies the
+port number to connect on the remote host. The default is
+22.',
         'type' => 'leaf',
-        'upstream_default' => '22',
-        'value_type' => 'integer'
+        'value_type' => 'uniline'
       },
       'PreferredAuthentications',
       {
-        'choice' => [
-          'gssapi-with-mic',
-          'hostbased',
-          'publickey',
-          'keyboard-interactive',
-          'password'
-        ],
-        'description' => 'Specifies the order in which the client should try protocol 2 authentication methods.  This allows a client to prefer one method (e.g. keyboard-interactive) over another method (e.g. password).',
-        'ordered' => '1',
-        'type' => 'check_list',
-        'upstream_default_list' => [
-          'gssapi-with-mic',
-          'hostbased',
-          'publickey',
-          'keyboard-interactive',
-          'password'
-        ]
-      },
-      'Protocol',
-      {
-        'choice' => [
-          '2',
-          '1'
-        ],
-        'description' => 'Specifies the protocol versions ssh(1) should support in order of preference.  The default is "2,1".  This means that ssh tries version 2 and falls back to version 1 if version 2 is not available.',
-        'ordered' => '1',
-        'type' => 'check_list',
-        'upstream_default_list' => [
-          '2',
-          '1'
-        ]
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline',
+          'warn_unless_match' => {
+            '^(gssapi-with-mic|hostbased|publickey|keyboard-interactive|password)$' => {
+              'msg' => 'Unexpected authentication method: \'C<$_>\'. Expected one of
+C<gssapi-with-mic>, C<hostbased>, C<publickey>,
+C<keyboard-interactive> or C<password>
+'
+            }
+          }
+        },
+        'description' => 'Specifies the order in which
+the client should try authentication methods. This allows a
+client to prefer one method (e.g.
+B<keyboard-interactive>) over another method (e.g.
+B<password>). The default is:gssapi-with-mic,hostbased,publickey,
+
+keyboard-interactive,password',
+        'type' => 'list'
       },
       'ProxyCommand',
       {
-        'description' => 'Specifies the command to use to connect to the server. The command string extends to the end of the line, and is executed with the user\'s shell. In the command string, \'%h\' will be substi tuted by the host name to connect and \'%p\' by the port.  The com mand can be basically anything, and should read from its standard input and write to its standard output. It should eventually connect an sshd(8) server running on some machine, or execute sshd -i somewhere. Host key management will be done using the HostName of the host being connected (defaulting to the name typed by the user).  Setting the command to "none" disables this option entirely. Note that CheckHostIP is not available for connects with a proxy command.
-
-This directive is useful in conjunction with nc(1) and its proxy support. For example, the following directive would connect via an HTTP proxy at 192.0.2.0:
-
-    ProxyCommand /usr/bin/nc -X connect -x 192.0.2.0:8080 %h %p',
+        'description' => "Specifies the command to use to
+connect to the server. The command string extends to the end
+of the line, and is executed using the user\x{2019}s shell
+\x{2019}exec\x{2019} directive to avoid a lingering shell
+process.ProxyCommand
+/usr/bin/nc -X connect -x 192.0.2.0:8080 %h %p",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'ProxyJump',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Specifies one or more jump
+proxies as eitherNote that this
+option will compete with the B<ProxyCommand> option -
+whichever is specified first will prevent later instances of
+the other from taking effect.',
+        'type' => 'list'
+      },
+      'ProxyUseFdpass',
+      {
+        'description' => 'Specifies that
+B<ProxyCommand> will pass a connected file descriptor
+back to L<ssh(1)> instead of continuing to execute and pass
+data. The default is B<no>.Specifies that
+B<ProxyCommand> will pass a connected file descriptor
+back to L<ssh(1)> instead of continuing to execute and pass
+data. The default is B<no>.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'PubkeyAcceptedKeyTypes',
+      {
+        'description' => "Specifies the key types that
+will be used for public key authentication as a
+comma-separated list of patterns. Alternately if the
+specified value begins with a \x{2019}+\x{2019} character,
+then the key types after it will be appended to the default
+instead of replacing it. If the specified value begins with
+a \x{2019}-\x{2019} character, then the specified key types
+(including wildcards) will be removed from the default set
+instead of replacing them. The default for this option
+is:The list of
+available key types may also be obtained using \"ssh -Q
+key\".",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'PubkeyAuthentication',
       {
-        'description' => 'Specifies whether to try public key authentication. This option applies to protocol version 2 only.',
+        'description' => 'Specifies whether to try public
+key authentication. The argument to this keyword must be
+B<yes> (the default) or B<no>.Specifies whether to try public
+key authentication. The argument to this keyword must be
+B<yes> (the default) or B<no>.',
         'type' => 'leaf',
-        'upstream_default' => '1',
-        'value_type' => 'boolean'
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'RekeyLimit',
       {
-        'description' => 'Specifies the maximum amount of data that may be transmitted before the session key is renegotiated.  The argument is the number of bytes, with an optional suffix of \'K\', \'M\', or \'G\' to indicate Kilobytes, Megabytes, or Gigabytes, respectively.  The default is between \'1G\' and \'4G\', depending on the cipher.  This option applies to protocol version 2 only.',
+        'description' => "Specifies the maximum amount of
+data that may be transmitted before the session key is
+renegotiated, optionally followed a maximum amount of time
+that may pass before the session key is renegotiated. The
+first argument is specified in bytes and may have a suffix
+of \x{2019}K\x{2019}, \x{2019}M\x{2019}, or \x{2019}G\x{2019} to
+indicate Kilobytes, Megabytes, or Gigabytes, respectively.
+The default is between \x{2019}1G\x{2019} and
+\x{2019}4G\x{2019}, depending on the cipher. The optional
+second value is specified in seconds and may use any of the
+units documented in the I<TIME FORMATS> section of
+L<sshd_config(5)>. The default value for B<RekeyLimit> is
+B<default none>, which means that rekeying is performed
+after the cipher\x{2019}s default amount of data has been
+sent or received and no time based rekeying is done.Specifies the maximum amount of
+data that may be transmitted before the session key is
+renegotiated, optionally followed a maximum amount of time
+that may pass before the session key is renegotiated. The
+first argument is specified in bytes and may have a suffix
+of \x{2019}K\x{2019}, \x{2019}M\x{2019}, or \x{2019}G\x{2019} to
+indicate Kilobytes, Megabytes, or Gigabytes, respectively.
+The default is between \x{2019}1G\x{2019} and
+\x{2019}4G\x{2019}, depending on the cipher. The optional
+second value is specified in seconds and may use any of the
+units documented in the I<TIME FORMATS> section of
+L<sshd_config(5)>. The default value for B<RekeyLimit> is
+B<default none>, which means that rekeying is performed
+after the cipher\x{2019}s default amount of data has been
+sent or received and no time based rekeying is done.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RemoteCommand',
+      {
+        'description' => "Specifies a command to execute
+on the remote machine after successfully connecting to the
+server. The command string extends to the end of the line,
+and is executed with the user\x{2019}s shell. Arguments to
+B<RemoteCommand> accept the tokens described in the
+I<TOKENS> section.Specifies a command to execute
+on the remote machine after successfully connecting to the
+server. The command string extends to the end of the line,
+and is executed with the user\x{2019}s shell. Arguments to
+B<RemoteCommand> accept the tokens described in the
+I<TOKENS> section.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -649,44 +1432,67 @@ This directive is useful in conjunction with nc(1) and its proxy support. For ex
           'config_class_name' => 'Ssh::PortForward',
           'type' => 'node'
         },
-        'description' => 'Specifies that a TCP port on the remote machine be forwarded over the secure channel to the specified host and port from the local machine. Multiple forwardings may be specified, and additional forwardings can be given on the command line. Only the superuser can forward privileged ports.
-
-If the bind_address is not specified, the default is to only bind to loopback addresses. If the bind_address is \'*\' or an empty string, then the forwarding is requested to listen on all inter faces. Specifying a remote bind_address will only succeed if the server\'s GatewayPorts option is enabled (see sshd_config(5)).',
-        'level' => 'important',
-        'summary' => 'remote port forward to local',
+        'description' => "Specifies that a TCP port on
+the remote machine be forwarded over the secure channel. The
+remote port may either be forwarded to a specified host and
+port from the local machine, or may act as a SOCKS 4/5 proxy
+that allows a remote client to connect to arbitrary
+destinations from the local machine. The first argument must
+be [If the
+I<bind_address> is not specified, the default is to only
+bind to loopback addresses. If the I<bind_address> is
+\x{2019}*\x{2019} or an empty string, then the forwarding is
+requested to listen on all interfaces. Specifying a remote
+I<bind_address> will only succeed if the server\x{2019}s
+B<GatewayPorts> option is enabled (see
+L<sshd_config(5)>).",
         'type' => 'list'
       },
       'RequestTTY',
       {
         'choice' => [
-          'yes',
           'no',
+          'yes',
           'force',
           'auto'
         ],
-        'description' => 'Specifies whether to request a pseudo-tty for the session. This option mirrors the -t and -T flags for C<ssh>.',
-        'help' => {
-          'auto' => 'request a TTY when opening a login session',
-          'force' => 'always request a TTY',
-          'no' => 'never request a TTY',
-          'yes' => 'always request a TTY when standard input is a TTY'
-        },
+        'description' => 'Specifies whether to request a
+pseudo-tty for the session. The argument may be one of:
+B<no> (never request a TTY), B<yes> (always request
+a TTY when standard input is a TTY), B<force> (always
+request a TTY) or B<auto> (request a TTY when opening a
+login session). This option mirrors the B<-t> and
+B<-T> flags for L<ssh(1)>.Specifies whether to request a
+pseudo-tty for the session. The argument may be one of:
+B<no> (never request a TTY), B<yes> (always request
+a TTY when standard input is a TTY), B<force> (always
+request a TTY) or B<auto> (request a TTY when opening a
+login session). This option mirrors the B<-t> and
+B<-T> flags for L<ssh(1)>.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
-      'RhostsRSAAuthentication',
+      'RevokedHostKeys',
       {
-        'description' => 'Specifies whether to try rhosts based authentication with RSA host authentication. This option applies to protocol version 1 only and requires ssh(1) to be setuid root.',
+        'description' => 'Specifies revoked host public
+keys. Keys listed in this file will be refused for host
+authentication. Note that if this file does not exist or is
+not readable, then host authentication will be refused for
+all hosts. Keys may be specified as a text file, listing one
+public key per line, or as an OpenSSH Key Revocation List
+(KRL) as generated by L<ssh-keygen(1)>. For more information on
+KRLs, see the KEY REVOCATION LISTS section in
+L<ssh-keygen(1)>.Specifies revoked host public
+keys. Keys listed in this file will be refused for host
+authentication. Note that if this file does not exist or is
+not readable, then host authentication will be refused for
+all hosts. Keys may be specified as a text file, listing one
+public key per line, or as an OpenSSH Key Revocation List
+(KRL) as generated by L<ssh-keygen(1)>. For more information on
+KRLs, see the KEY REVOCATION LISTS section in
+L<ssh-keygen(1)>.',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
-      },
-      'RSAAuthentication',
-      {
-        'description' => 'Specifies whether to try RSA authentication. RSA authentication will only be attempted if the identity file exists, or an authentication agent is running. Note that this option applies to protocol version 1 only.',
-        'type' => 'leaf',
-        'upstream_default' => '1',
-        'value_type' => 'boolean'
+        'value_type' => 'uniline'
       },
       'SendEnv',
       {
@@ -694,64 +1500,197 @@ If the bind_address is not specified, the default is to only bind to loopback ad
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Specifies what variables from the local environ(7) should be sent to the server. Note that environment passing is only supported for protocol 2. The server must also support it, and the server must be configured to accept these environment variables. Refer to AcceptEnv in sshd_config(5) for how to configure the server. Variables are specified by name, which may contain wildcard char acters. Multiple environment variables may be separated by whitespace or spread across multiple SendEnv directives. The default is not to send any environment variables.
-
-See PATTERNS in ssh_config(5) for more information on patterns.',
+        'description' => 'Specifies what variables from
+the local L<environ(7)> should be sent to the server. The
+server must also support it, and the server must be
+configured to accept these environment variables. Note that
+the TERM environment variable is always sent whenever a
+pseudo-terminal is requested as it is required by the
+protocol. Refer to B<AcceptEnv> in L<sshd_config(5)> for
+how to configure the server. Variables are specified by
+name, which may contain wildcard characters. Multiple
+environment variables may be separated by whitespace or
+spread across multiple B<SendEnv> directives.It is possible
+to clear previously set B<SendEnv> variable names by
+prefixing patterns with I<->. The default is not to send
+any environment variables.',
         'type' => 'list'
       },
       'ServerAliveCountMax',
       {
-        'description' => 'Sets the number of server alive messages (see below) which may be sent without ssh(1) receiving any messages back from the server. If this threshold is reached while server alive messages are being sent, ssh will disconnect from the server, terminating the session.  It is important to note that the use of server alive messages is very different from TCPKeepAlive.  The server alive messages are sent through the encrypted channel and there fore will not be spoofable. The TCP keepalive option enabled by TCPKeepAlive is spoofable. The server alive mechanism is valuable when the client or server depend on knowing when a connec tion has become inactive.
-
-The default value is 3. If, for example, ServerAliveInterval is set to 15 and ServerAliveCountMax is left at the default, if the server becomes unresponsive, ssh will disconnect after approximately 45 seconds.  This option applies to protocol version 2 only; in protocol version 1 there is no mechanism to request a response from the server to the server alive messages, so disconnection is the responsibility of the TCP stack.',
+        'description' => 'Sets the number of server alive
+messages (see below) which may be sent without L<ssh(1)>
+receiving any messages back from the server. If this
+threshold is reached while server alive messages are being
+sent, ssh will disconnect from the server, terminating the
+session. It is important to note that the use of server
+alive messages is very different from B<TCPKeepAlive>
+(below). The server alive messages are sent through the
+encrypted channel and therefore will not be spoofable. The
+TCP keepalive option enabled by B<TCPKeepAlive> is
+spoofable. The server alive mechanism is valuable when the
+client or server depend on knowing when a connection has
+become inactive.The default
+value is 3. If, for example, B<ServerAliveInterval> (see
+below) is set to 15 and B<ServerAliveCountMax> is left
+at the default, if the server becomes unresponsive, ssh will
+disconnect after approximately 45 seconds.',
         'type' => 'leaf',
         'upstream_default' => '3',
         'value_type' => 'integer'
       },
       'ServerAliveInterval',
       {
-        'description' => 'Sets a timeout interval in seconds after which if no data has been received from the server, ssh(1) will send a message through the encrypted channel to request a response from the server.  The default is 0, indicating that these messages will not be sent to the server, or 300 if the BatchMode option is set.  This option applies to protocol version 2 only.  ProtocolKeepAlives and SetupTimeOut are Debian-specific compatibility aliases for this option.',
+        'description' => 'Sets a timeout interval in
+seconds after which if no data has been received from the
+server, L<ssh(1)> will send a message through the encrypted
+channel to request a response from the server. The default
+is 0, indicating that these messages will not be sent to the
+server, or 300 if the B<BatchMode> option is set
+(Debian-specific). B<ProtocolKeepAlives> and
+B<SetupTimeOut> are Debian-specific compatibility
+aliases for this option.Sets a timeout interval in
+seconds after which if no data has been received from the
+server, L<ssh(1)> will send a message through the encrypted
+channel to request a response from the server. The default
+is 0, indicating that these messages will not be sent to the
+server, or 300 if the B<BatchMode> option is set
+(Debian-specific). B<ProtocolKeepAlives> and
+B<SetupTimeOut> are Debian-specific compatibility
+aliases for this option.',
         'type' => 'leaf',
         'upstream_default' => '0',
-        'value_type' => 'integer',
-        'warp' => {
-          'follow' => {
-            'batch_mode' => '?BatchMode'
-          },
-          'rules' => [
-            '$batch_mode eq \'1\'',
-            {
-              'upstream_default' => '300'
-            }
-          ]
-        }
+        'value_type' => 'integer'
       },
-      'SmartcardDevice',
+      'SetEnv',
       {
-        'description' => 'Specifies which smartcard device to use.  The argument to this keyword is the device ssh(1) should use to communicate with a smartcard used for storing the user\'s private RSA key.  By default, no device is specified and smartcard support is not activated.',
+        'description' => 'Directly
+specify one or more environment variables and their contents
+to be sent to the server. Similarly to B<SendEnv>, the
+server must be prepared to accept the environment
+variable.Directly
+specify one or more environment variables and their contents
+to be sent to the server. Similarly to B<SendEnv>, the
+server must be prepared to accept the environment
+variable.',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'StreamLocalBindMask',
+      {
+        'description' => 'Sets the octal file creation
+mode mask (umask) used when creating a Unix-domain socket
+file for local or remote port forwarding. This option is
+only used for port forwarding to a Unix-domain socket
+file.The default
+value is 0177, which creates a Unix-domain socket file that
+is readable and writable only by the owner. Note that not
+all operating systems honor the file mode on Unix-domain
+socket files.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StreamLocalBindUnlink',
+      {
+        'description' => 'Specifies whether to remove an
+existing Unix-domain socket file for local or remote port
+forwarding before creating a new one. If the socket file
+already exists and B<StreamLocalBindUnlink> is not
+enabled, B<ssh> will be unable to forward the port to
+the Unix-domain socket file. This option is only used for
+port forwarding to a Unix-domain socket file.The argument
+must be B<yes> or B<no> (the default).',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'StrictHostKeyChecking',
       {
         'choice' => [
           'yes',
+          'accept-new',
           'no',
+          'off',
           'ask'
         ],
-        'description' => 'If this flag is set to "yes", ssh(1) will never automatically add host keys to the ~/.ssh/known_hosts file, and refuses to connect to hosts whose host key has changed.  This provides maximum protection against trojan horse attacks, though it can be annoying when the /etc/ssh/ssh_known_hosts file is poorly maintained or when connections to new hosts are frequently made.  This option forces the user to manually add all new hosts.  If this flag is set to "no", ssh will automatically add new host keys to the user known hosts files.  If this flag is set to "ask", new host keys will be added to the user known host files only after the user has confirmed that is what they really want to do, and ssh will refuse to connect to hosts whose host key has changed.  The host keys of known hosts will be verified automatically in all cases. The argument must be "yes", "no", or "ask".  The default is "ask".',
+        'description' => "If this flag is set to
+B<yes>, L<ssh(1)> will never automatically add host keys to
+the I<~/.ssh/known_hosts> file, and refuses to connect
+to hosts whose host key has changed. This provides maximum
+protection against man-in-the-middle (MITM) attacks, though
+it can be annoying when the I</etc/ssh/ssh_known_hosts>
+file is poorly maintained or when connections to new hosts
+are frequently made. This option forces the user to manually
+add all new hosts.If this flag is
+set to \x{201c}accept-new\x{201d} then ssh will automatically
+add new host keys to the user known hosts files, but will
+not permit connections to hosts with changed host keys. If
+this flag is set to \x{201c}no\x{201d} or \x{201c}off\x{201d},
+ssh will automatically add new host keys to the user known
+hosts files and allow connections to hosts with changed
+hostkeys to proceed, subject to some restrictions. If this
+flag is set to B<ask> (the default), new host keys will
+be added to the user known host files only after the user
+has confirmed that is what they really want to do, and ssh
+will refuse to connect to hosts whose host key has changed.
+The host keys of known hosts will be verified automatically
+in all cases.",
         'type' => 'leaf',
         'upstream_default' => 'ask',
         'value_type' => 'enum'
       },
+      'SyslogFacility',
+      {
+        'choice' => [
+          'DAEMON',
+          'USER',
+          'AUTH',
+          'LOCAL0',
+          'LOCAL1',
+          'LOCAL2',
+          'LOCAL3',
+          'LOCAL4',
+          'LOCAL5',
+          'LOCAL6',
+          'LOCAL7'
+        ],
+        'description' => 'Gives the facility code that is
+used when logging messages from L<ssh(1)>. The possible values
+are: DAEMON, USER, AUTH, LOCAL0, LOCAL1, LOCAL2, LOCAL3,
+LOCAL4, LOCAL5, LOCAL6, LOCAL7. The default is USER.Gives the facility code that is
+used when logging messages from L<ssh(1)>. The possible values
+are: DAEMON, USER, AUTH, LOCAL0, LOCAL1, LOCAL2, LOCAL3,
+LOCAL4, LOCAL5, LOCAL6, LOCAL7. The default is USER.',
+        'type' => 'leaf',
+        'upstream_default' => 'USER',
+        'value_type' => 'enum'
+      },
       'TCPKeepAlive',
       {
-        'description' => 'Specifies whether the system should send TCP keepalive messages to the other side.  If they are sent, death of the connection or crash of one of the machines will be properly noticed.  This option only uses TCP keepalives (as opposed to using ssh level keepalives), so takes a long time to notice when the connection dies.  As such, you probably want the ServerAliveInterval option as well.  However, this means that connections will die if the route is down temporarily, and some people find it annoying. The default is "yes" (to send TCP keepalive messages), and the client will notice if the network goes down or the remote host dies.  This is important in scripts, and many users want it too.
-
-To disable TCP keepalive messages, the value should be set to "no".',
+        'description' => 'Specifies whether the system
+should send TCP keepalive messages to the other side. If
+they are sent, death of the connection or crash of one of
+the machines will be properly noticed. This option only uses
+TCP keepalives (as opposed to using ssh level keepalives),
+so takes a long time to notice when the connection dies. As
+such, you probably want the B<ServerAliveInterval>
+option as well. However, this means that connections will
+die if the route is down temporarily, and some people find
+it annoying.To disable TCP
+keepalive messages, the value should be set to B<no>.
+See also B<ServerAliveInterval> for protocol-level
+keepalives.',
         'type' => 'leaf',
-        'upstream_default' => '1',
-        'value_type' => 'boolean'
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'Tunnel',
       {
@@ -761,44 +1700,87 @@ To disable TCP keepalive messages, the value should be set to "no".',
           'ethernet',
           'no'
         ],
-        'description' => 'Request tun(4) device forwarding between the client and the server.  The argument must be "yes", "point-to-point" (layer 3), "ethernet" (layer 2), or "no".  Specifying "yes" requests the default tunnel mode, which is "point-to-point".  The default is "no".',
+        'description' => 'Request L<tun(4)>
+device forwarding between the client and the server. The
+argument must be B<yes>, B<point-to-point> (layer
+3), B<ethernet> (layer 2), or B<no> (the default).
+Specifying B<yes> requests the default tunnel mode,
+which is B<point-to-point>.Request L<tun(4)>
+device forwarding between the client and the server. The
+argument must be B<yes>, B<point-to-point> (layer
+3), B<ethernet> (layer 2), or B<no> (the default).
+Specifying B<yes> requests the default tunnel mode,
+which is B<point-to-point>.',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'enum'
       },
       'TunnelDevice',
       {
-        'description' => 'Specifies the tun(4) devices to open on the client (local_tun) and the server (remote_tun).
-
-             The argument must be local_tun[:remote_tun].  The devices may be specified by numerical ID or the keyword "any", which uses the next available tunnel device.  If remote_tun is not specified, it defaults to "any".  The default is "any:any".',
+        'description' => 'Specifies the L<tun(4)> devices to
+open on the client (I<local_tun>) and the server
+(I<remote_tun>).The argument
+must be I<local_tun>[:I<remote_tun>]. The devices
+may be specified by numerical ID or the keyword B<any>,
+which uses the next available tunnel device. If
+I<remote_tun> is not specified, it defaults to
+B<any>. The default is B<any:any>.',
         'type' => 'leaf',
         'upstream_default' => 'any:any',
         'value_type' => 'uniline'
       },
-      'UseBlacklistedKeys',
+      'UpdateHostKeys',
       {
-        'description' => 'Specifies whether ssh(1) should use keys recorded in its blacklist of known-compromised keys (see ssh-vulnkey(1)) for authentication.  If "yes", then attempts to use compromised keys for authentication will be logged but accepted.  It is strongly recommended that this be used only to install new authorized keys on the remote system, and even then only with the utmost care.  If "no", then attempts to use compromised keys for authentication will be prevented.  The default is "no".',
+        'choice' => [
+          'yes',
+          'no',
+          'ask'
+        ],
+        'description' => "Specifies whether L<ssh(1)> should
+accept notifications of additional hostkeys from the server
+sent after authentication has completed and add them to
+B<UserKnownHostsFile>. The argument must be B<yes>,
+B<no> (the default) or B<ask>. Enabling this option
+allows learning alternate hostkeys for a server and supports
+graceful key rotation by allowing a server to send
+replacement public keys before old ones are removed.
+Additional hostkeys are only accepted if the key used to
+authenticate the host was already trusted or explicitly
+accepted by the user. If B<UpdateHostKeys> is set to
+B<ask>, then the user is asked to confirm the
+modifications to the known_hosts file. Confirmation is
+currently incompatible with B<ControlPersist>, and will
+be disabled if it is enabled.Presently, only
+L<sshd(8)> from OpenSSH 6.8 and greater support the
+\"hostkeys\@openssh.com\" protocol extension used to
+inform the client of all the server\x{2019}s hostkeys.",
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
-      },
-      'UsePrivilegedPort',
-      {
-        'description' => 'Specifies whether to use a privileged port for outgoing connections.  The argument must be "yes" or "no".  The default is "no". If set to "yes", ssh(1) must be setuid root.  Note that this option must be set to "yes" for RhostsRSAAuthentication with older servers.',
-        'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'enum'
       },
       'User',
       {
-        'description' => 'Specifies the user to log in as.  This can be useful when a dif ferent user name is used on different machines.  This saves the trouble of having to remember to give the user name on the command line.',
-        'level' => 'important',
+        'description' => 'Specifies the
+user to log in as. This can be useful when a different user
+name is used on different machines. This saves the trouble
+of having to remember to give the user name on the command
+line.Specifies the
+user to log in as. This can be useful when a different user
+name is used on different machines. This saves the trouble
+of having to remember to give the user name on the command
+line.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'UserKnownHostsFile',
       {
-        'description' => 'Specifies a file to use for the user host key database instead of ~/.ssh/known_hosts.',
+        'description' => 'Specifies one or more files to
+use for the user host key database, separated by whitespace.
+The default is I<~/.ssh/known_hosts>,
+I<~/.ssh/known_hosts2>.Specifies one or more files to
+use for the user host key database, separated by whitespace.
+The default is I<~/.ssh/known_hosts>,
+I<~/.ssh/known_hosts2>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -806,34 +1788,52 @@ To disable TCP keepalive messages, the value should be set to "no".',
       {
         'choice' => [
           'yes',
-          'no',
-          'ask'
+          'ask',
+          'no'
         ],
-        'description' => 'Specifies whether to verify the remote key using DNS and SSHFP resource records.  If this option is set to "yes", the client will implicitly trust keys that match a secure fingerprint from DNS.  Insecure fingerprints will be handled as if this option was set to "ask".  If this option is set to "ask", information on fingerprint match will be displayed, but the user will still need to confirm new host keys according to the StrictHostKeyChecking option.  The argument must be "yes", "no", or "ask".  The default is "no".  Note that this option applies to protocol version 2 only. 
-See also VERIFYING HOST KEYS in ssh(1).',
+        'description' => 'Specifies whether to verify the
+remote key using DNS and SSHFP resource records. If this
+option is set to B<yes>, the client will implicitly
+trust keys that match a secure fingerprint from DNS.
+Insecure fingerprints will be handled as if this option was
+set to B<ask>. If this option is set to B<ask>,
+information on fingerprint match will be displayed, but the
+user will still need to confirm new host keys according to
+the B<StrictHostKeyChecking> option. The default is
+B<no>.See also
+I<VERIFYING HOST KEYS> in L<ssh(1)>.',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'enum'
       },
       'VisualHostKey',
       {
-        'description' => 'If this flag is set to "yes", an ASCII art representation of the remote host key fingerprint is printed additionally to the hex fingerprint string.  If this flag is set to "no", only the hex fingerprint string will be printed.  The default is "no".',
+        'description' => 'If this flag is set to
+B<yes>, an ASCII art representation of the remote host
+key fingerprint is printed in addition to the fingerprint
+string at login and for unknown host keys. If this flag is
+set to B<no> (the default), no fingerprint strings are
+printed at login and only the fingerprint string will be
+printed for unknown host keys.If this flag is set to
+B<yes>, an ASCII art representation of the remote host
+key fingerprint is printed in addition to the fingerprint
+string at login and for unknown host keys. If this flag is
+set to B<no> (the default), no fingerprint strings are
+printed at login and only the fingerprint string will be
+printed for unknown host keys.',
         'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'boolean'
+        'upstream_default' => 'no',
+        'value_type' => 'uniline'
       },
       'XAuthLocation',
       {
-        'description' => 'Specifies the full pathname of the xauth(1) program.  The default is /usr/bin/X11/xauth.',
+        'description' => 'Specifies the full pathname of
+the L<xauth(1)> program. The default is
+I</usr/bin/xauth>.Specifies the full pathname of
+the L<xauth(1)> program. The default is
+I</usr/bin/xauth>.',
         'type' => 'leaf',
-        'upstream_default' => '/usr/X11R6/bin/xauth',
-        'value_type' => 'uniline'
-      },
-      'UseRsh',
-      {
-        'description' => 'This parameter is now ignored by Ssh',
-        'status' => 'deprecated',
-        'type' => 'leaf',
+        'upstream_default' => '/usr/bin/xauth',
         'value_type' => 'uniline'
       },
       'FallBackToRsh',
@@ -842,8 +1842,16 @@ See also VERIFYING HOST KEYS in ssh(1).',
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'UseRsh',
+      {
+        'description' => 'This parameter is now ignored by Ssh',
+        'status' => 'deprecated',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       }
     ],
+    'generated_by' => 'parse-man.pl from ssh_system  7.9p1 doc',
     'license' => 'LGPL2',
     'name' => 'Ssh::HostElement'
   }

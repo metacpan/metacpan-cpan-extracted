@@ -16,7 +16,7 @@ use Test::More;
         ];
     };
 
-    my $ua = LWP::UserAgent->new( cookie_jar => {} );
+    my $ua             = LWP::UserAgent->new( cookie_jar => {} );
     my $console_logger = debug_ua($ua);
     $console_logger->pretty(0);
 

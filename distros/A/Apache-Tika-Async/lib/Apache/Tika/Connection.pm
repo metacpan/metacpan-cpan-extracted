@@ -2,18 +2,17 @@ package Apache::Tika::Connection;
 use strict;
 use Moo::Role;
 use JSON::XS;
-use vars qw($VERSION);
-$VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub decode_response {
     my( $self, $body ) = @_;
-    
+
     return decode_json( $body );
 }
 
 sub process_response {
     my ( $self, $params, $code, $msg, $body, $headers ) = @_;
-    
+
     my $mime_type = $headers->{"content-type"};
 
     my $is_encoded = $mime_type && $mime_type !~ m!^text/plain\b!;
@@ -40,7 +39,7 @@ sub process_response {
 =head1 REPOSITORY
 
 The public repository of this module is
-L<https://github.com/Corion/apache-tika>.
+L<https://github.com/Corion/Apache-Tika-Async>.
 
 =head1 SUPPORT
 
@@ -59,7 +58,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2014-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

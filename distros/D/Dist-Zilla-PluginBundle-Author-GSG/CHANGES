@@ -1,9 +1,100 @@
 ==================================================
-Changes from 2018-05-31 00:00:00 +0000 to present.
+Changes from 2018-06-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.0.7 at 2019-05-31 16:35:46 +0000
+version 0.0.9 at 2019-06-10 18:48:39 +0000
+------------------------------------------
+
+  Change: dc315bdb2deba1f804087c8ca200fea982266dca
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-10 14:48:05 +0000
+
+    Update version in README.md
+
+    Still need to figure out how to make that automatic. 
+
+  Change: 0bf1d598ed796d8a325ceace02b3301f8e2d7cbd
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-10 14:43:23 +0000
+
+    Merge pull request #5 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
+    fix-ignored-makefile to master
+
+    * commit 'ff4a1f8c8f8e7f43574c9369ec28574fab0d0b90':
+
+    Rename Makefile in sharedir to avoid MANIFEST.SKIP
+
+    Update README version. 
+
+  Change: ff4a1f8c8f8e7f43574c9369ec28574fab0d0b90
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-07 16:21:04 +0000
+
+    Rename Makefile in sharedir to avoid MANIFEST.SKIP
+
+    Unfortunately this *won't* update automatically so that's super
+    annoying, but not too much stuff is using it yet. 
+
+------------------------------------------
+version 0.0.8 at 2019-06-07 19:07:07 +0000
+------------------------------------------
+
+  Change: af88b64684d83eb92e16b09f2b57adf132f9c599
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-07 15:07:07 +0000
+
+    Update README version. 
+
+  Change: 575769e0db59ef20fb4ee8496e417df8fe73cc47
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-07 15:01:49 +0000
+
+    Merge pull request #4 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from auto-install-dzil
+    to master
+
+    * commit '4f1a5c53fb4c201d1cdc904fdcfd515080d7c77e':
+
+    Rename carton target
+
+    Auto carton install develop requirements as needed
+
+    use $(CARTON) everywhere instead of hardcoding
+
+    Require GitHub::Meta >= 0.46 
+
+  Change: 4f1a5c53fb4c201d1cdc904fdcfd515080d7c77e
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-05 18:39:25 +0000
+
+    Rename carton target
+
+    I think this one is clearer and makes a better target name 
+
+  Change: 54abac202e1e987e4fdc1f2a2827a49d19c6fc71
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-05 18:39:25 +0000
+
+    Auto carton install develop requirements as needed 
+
+  Change: 4a4d0e4b7c3a003b8fed38dc93de719eeac15b08
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-05 18:39:25 +0000
+
+    use $(CARTON) everywhere instead of hardcoding 
+
+  Change: 7ba963818b53321c575a53c80ff99e619eb9c89a
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-05 18:39:25 +0000
+
+    Require GitHub::Meta >= 0.46
+
+    This fixes a bug with connecting. 
+
+------------------------------------------
+version 0.0.7 at 2019-05-31 16:18:28 +0000
 ------------------------------------------
 
   Change: 8a2c6f6a6ab37d4c86c053cdc817f562f58fc1a9

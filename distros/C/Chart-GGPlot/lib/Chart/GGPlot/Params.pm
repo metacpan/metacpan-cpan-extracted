@@ -6,7 +6,7 @@ use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 use namespace::autoclean;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils qw(pairgrep pairmap);
 use Storable qw(dclone);
@@ -21,8 +21,12 @@ classmethod new (@rest) {
         _hash => %params->rename( sub { $class->transform_key( $_[0] ) } )
       },
       $class;
+
+    $self->BUILD(\%params);
     return $self;
 }
+
+sub BUILD { }
 
 sub _hash { $_[0]->{_hash} }
 
@@ -144,7 +148,7 @@ Chart::GGPlot::Params - Collection of key-value pairs used in Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 DESCRIPTION
 

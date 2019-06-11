@@ -37,7 +37,7 @@ sub _build_config {
     my $self = shift;
 
     if (! -d $self->{LOCATION}) {
-	   confess("Cannot open directory " . $self->{LOCATION} );
+       confess("Cannot open directory " . $self->{LOCATION} );
     }
 
     return 1;
@@ -55,10 +55,10 @@ sub get {
         return $self->_node_not_exists( $path );
     }
 
-	my $content = do {
-	  local $INPUT_RECORD_SEPARATOR;
-	  open my $fh, '<', $filename;
-	  <$fh>;
+    my $content = do {
+      local $INPUT_RECORD_SEPARATOR;
+      open my $fh, '<', $filename;
+      <$fh>;
     };
     return $content;
 }
@@ -179,7 +179,7 @@ Connector::Builtin::File::Path
 
 =head1 Description
 
-Highly configurable file writter/reader.
+Highly configurable file writer/reader.
 
 =head1 Parameters
 
@@ -230,7 +230,7 @@ parameter for an alternative behaviour.
 
 Fetch data from a file. See the file parameter how to control the filename.
 
-    my $data = $conn->set('filename');
+    my $data = $conn->get('filename');
 
 =head1 Example
 

@@ -1,7 +1,7 @@
 package App::MediaInfo;
 
-our $DATE = '2019-01-28'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2019-06-09'; # DATE
+our $VERSION = '0.123'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,6 +9,12 @@ use warnings;
 #use Log::Any '$log';
 
 our %SPEC;
+
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'Utilities related to getting (metadata) information from '.
+        'media files',
+};
 
 our %arg0_media_multiple = (
     media => {
@@ -45,6 +51,15 @@ our %argopt_backend = (
                 ns_prefix => "Media::Info",
             );
         },
+    },
+);
+
+our %argopt_quiet = (
+    quiet => {
+        summary => "Don't output anything on command-line, ".
+            "just return appropriate exit code",
+        schema => 'true*',
+        cmdline_aliases => {q=>{}, silent=>{}},
     },
 );
 
@@ -97,7 +112,17 @@ _
     args => {
         %arg0_media_single,
         %argopt_backend,
+        %argopt_quiet,
     },
+    examples => [
+        {
+            summary => 'Move all portrait videos to portrait/',
+            src => 'for f in *.mp4;do [[prog]] -q "$f" && mv "$f" portrait/; done',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub media_is_portrait {
     my %args = @_;
@@ -111,7 +136,12 @@ sub media_is_portrait {
     return [412, "Can't determine video width x height"] unless $width && $height;
     my $is_portrait = ($rotate == 90 || $rotate == 270 ? 1:0) ^ ($width <= $height ? 1:0) ? 1:0;
 
-    [200, "OK", $is_portrait, {'cmdline.exit_code' => $is_portrait ? 0:1, 'cmdline.result' => ''}];
+    [200, "OK", $is_portrait, {
+        'cmdline.exit_code' => $is_portrait ? 0:1,
+        'cmdline.result' => $args{quiet} ? '' :
+            "Media is ".
+            ($is_portrait ? "portrait" : "NOT portrait (landscape)"),
+    }];
 }
 
 $SPEC{media_is_landscape} = {
@@ -126,7 +156,17 @@ _
     args => {
         %arg0_media_single,
         %argopt_backend,
+        %argopt_quiet,
     },
+    examples => [
+        {
+            summary => 'Convert all landscape mkv videos to mp4',
+            src => 'for f in *.mkv;do [[prog]] -q "$f" && ffmpeg -i "$f" "$f.mp4"; done',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub media_is_landscape {
     my %args = @_;
@@ -140,7 +180,12 @@ sub media_is_landscape {
     return [412, "Can't determine video width x height"] unless $width && $height;
     my $is_landscape = ($rotate == 90 || $rotate == 270 ? 1:0) ^ ($width <= $height ? 1:0) ? 0:1;
 
-    [200, "OK", $is_landscape, {'cmdline.exit_code' => $is_landscape ? 0:1, 'cmdline.result' => ''}];
+    [200, "OK", $is_landscape, {
+        'cmdline.exit_code' => $is_landscape ? 0:1,
+        'cmdline.result' => $args{quiet} ? '' :
+            "Media is ".
+            ($is_landscape ? "landscape" : "NOT landscape (portrait)"),
+    }];
 }
 
 $SPEC{media_orientation} = {
@@ -173,7 +218,7 @@ sub media_orientation {
 }
 
 1;
-# ABSTRACT: Return exit code 0 if media is portrait
+# ABSTRACT: Utilities related to getting (metadata) information from media files
 
 __END__
 
@@ -183,11 +228,11 @@ __END__
 
 =head1 NAME
 
-App::MediaInfo - Return exit code 0 if media is portrait
+App::MediaInfo - Utilities related to getting (metadata) information from media files
 
 =head1 VERSION
 
-This document describes version 0.120 of App::MediaInfo (from Perl distribution App-MediaInfo), released on 2019-01-28.
+This document describes version 0.123 of App::MediaInfo (from Perl distribution App-MediaInfo), released on 2019-06-09.
 
 =head1 FUNCTIONS
 
@@ -228,6 +273,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 media_is_landscape
 
 Usage:
@@ -253,6 +299,10 @@ Choose a specific backend.
 
 Media file/URL.
 
+=item * B<quiet> => I<true>
+
+Don't output anything on command-line, just return appropriate exit code.
+
 =back
 
 Returns an enveloped result (an array).
@@ -265,6 +315,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 media_is_portrait
@@ -292,6 +343,10 @@ Choose a specific backend.
 
 Media file/URL.
 
+=item * B<quiet> => I<true>
+
+Don't output anything on command-line, just return appropriate exit code.
+
 =back
 
 Returns an enveloped result (an array).
@@ -304,6 +359,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 media_orientation

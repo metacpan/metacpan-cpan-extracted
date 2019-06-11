@@ -1,9 +1,7 @@
-use Test::More;
+use Test2::Tools::Basic;
 
 plan tests => 1;
 
-BEGIN {
-    use_ok( 'Test2::Aggregate' ) || print "Bail out!\n";
-}
+use ok 'Test2::Aggregate';
 
 diag( "Testing Test2::Aggregate $Test2::Aggregate::VERSION, Perl $], $^X" );

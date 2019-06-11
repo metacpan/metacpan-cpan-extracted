@@ -2,7 +2,7 @@ package Net::AMQP::RabbitMQ;
 use strict;
 use warnings;
 
-our $VERSION = '2.40001';
+our $VERSION = '2.40002';
 
 use XSLoader;
 XSLoader::load "Net::AMQP::RabbitMQ", $VERSION;
@@ -19,7 +19,7 @@ use Scalar::Util qw(blessed);
 # If neither is found #151 will remain unfixed
 my $have_fieldhash = eval {
     require Hash::FieldHash;
-    Hash::FieldHash->import('fieldhash');
+    Hash::FieldHash->import('all');
     1;
 } || eval {
     require Hash::Util;

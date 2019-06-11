@@ -2,7 +2,7 @@ package Test2::Harness::UI::CPANImporter;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use Carp qw/croak/;
 
@@ -70,8 +70,6 @@ sub run {
                 updated => \'NOW()',
                 cpan_batch => $batch,
             }) or die "Could not add permissions for $id on $project";
-
-            print "Added $id to $project_name\n";
         }
     }
     close($dfh);

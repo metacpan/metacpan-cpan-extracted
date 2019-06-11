@@ -1,0 +1,42 @@
+---
+class:
+  __order:
+    - Ssh::HostElement
+    - Ssh
+  Ssh:
+    include:
+      - Ssh::HostElement
+    include_after: Host
+    rw_config:
+      auto_create: 1
+      backend: OpenSsh::Ssh
+      config_dir: ~/.ssh
+      file: config
+      default_layer:
+        config_dir: /etc/ssh
+        file: ssh_config
+        os_config_dir:
+          darwin: /etc
+  Ssh::HostElement:
+    element:
+      __skip_order: 1
+      IdentityFile:
+        cargo:
+          warn_if_match:
+            \.pub$:
+              fix: s/\.pub$//;
+              msg: 'identity file should be the private key '
+      UseRsh: &deprecated
+        description: This parameter is now ignored by Ssh
+        status: deprecated
+        type: leaf
+        value_type: uniline
+      FallBackToRsh: *deprecated
+      PreferredAuthentications:
+        cargo:
+          warn_unless_match:
+            "^(gssapi-with-mic|hostbased|publickey|keyboard-interactive|password)$":
+              msg: |
+                Unexpected authentication method: 'C<$_>'. Expected one of
+                C<gssapi-with-mic>, C<hostbased>, C<publickey>,
+                C<keyboard-interactive> or C<password>

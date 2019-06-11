@@ -1,14 +1,16 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::OpenSsh ;
-$Config::Model::OpenSsh::VERSION = '1.241';
+package Config::Model::OpenSsh v2.7.9.1;
+use strict;
+use warnings;
+
 use Config::Model 2.111;
 
 1;
@@ -27,7 +29,7 @@ Config::Model::OpenSsh - OpenSSH config editor
 
 =head1 VERSION
 
-version 1.241
+version v2.7.9.1
 
 =head1 SYNOPSIS
 
@@ -106,7 +108,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2008-2018 by Dominique Dumont.
+This software is Copyright (c) 2008-2019 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -19,9 +19,10 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => "1.2",
     "Data::Dumper" => "2.1",
+    "File::Which" => 0,
     "FindBin" => "1.3"
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,6 +32,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => "1.2",
   "Data::Dumper" => "2.1",
+  "File::Which" => 0,
   "FindBin" => "1.3"
 );
 

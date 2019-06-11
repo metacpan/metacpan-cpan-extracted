@@ -1,7 +1,7 @@
 package PowerManagement::Any;
 
-our $DATE = '2019-05-28'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-06-10'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,6 +17,15 @@ $SPEC{':package'} = {
     v => 1.1,
     summary => 'Common interface to some power management tasks',
 };
+
+our %argopt_quiet = (
+    quiet => {
+        summary => "Don't output anything on command-line, ".
+            "just return appropriate exit code",
+        schema => 'true*',
+        cmdline_aliases => {q=>{}, silent=>{}},
+    },
+);
 
 # XXX probably should refactor this into Systemd::Util later
 sub _target_is_masked {
@@ -74,7 +83,8 @@ sub _prevent_or_unprevent_sleep_or_check {
         $is_masked = $res->[2];
         return [200, "OK", $is_masked, {
             'cmdline.exit_code' => !$is_masked,
-            'cmdline.result' => '',
+            'cmdline.result' => $args{quiet} ? '' :
+                "Sleep is ".($is_masked ? "prevented" : "NOT prevented"),
         }] if $which eq 'check';
         return [304, "sleep.target already masked"]
             if $which eq 'prevent' && $is_masked;
@@ -113,14 +123,16 @@ $SPEC{'prevent_sleep'} = {
     description => <<'_',
 
 Will also prevent system from hybrid sleeping, suspending, or hibernating. The
-effect is permanent; you need to `unprevent_sleep()` to reverse the effect.
+effect is permanent (survives reboot); you need to `unprevent_sleep()` to
+reverse the effect.
 
 Note that this does not prevent screen blanking or locking (screensaver
 activating); see <pm:Screensaver::Any> for routines that disable screensaver.
 
-On systems that run Systemd, this is implemented by masking the sleep.target. It
-automatically also prevents suspend.target, hybrid-sleep.target, and
-hibernate.target from activating.
+On systems that run Systemd, this is implemented by masking `sleep.target`. It
+automatically also prevents `suspend.target`, `hybrid-sleep.target`, and
+`hibernate.target` from activating. (Note that masking `systemd-suspend.service`
+should also achieve the same result.)
 
 Not implemented yet for other systems. Patches welcome.
 
@@ -150,10 +162,23 @@ $SPEC{'sleep_is_prevented'} = {
     summary => 'Check if sleep has been prevented',
     description => <<'_',
 
+The CLI return exit code 0 if sleep has been prevented.
+
 See `prevent_sleep()` for more details.
 
 _
-    args => {},
+    args => {
+        %argopt_quiet,
+    },
+    examples => [
+        {
+            summary => 'Run a heavy task if sleep has been prevented on this laptop',
+            src => '[[prog]] -q && some-heavy-task',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub sleep_is_prevented {
     _prevent_or_unprevent_sleep_or_check('check', @_);
@@ -174,7 +199,7 @@ PowerManagement::Any - Common interface to some power management tasks
 
 =head1 VERSION
 
-This document describes version 0.004 of PowerManagement::Any (from Perl distribution PowerManagement-Any), released on 2019-05-28.
+This document describes version 0.006 of PowerManagement::Any (from Perl distribution PowerManagement-Any), released on 2019-06-10.
 
 =head1 NOTES
 
@@ -190,14 +215,16 @@ Usage:
 Prevent system from sleeping.
 
 Will also prevent system from hybrid sleeping, suspending, or hibernating. The
-effect is permanent; you need to C<unprevent_sleep()> to reverse the effect.
+effect is permanent (survives reboot); you need to C<unprevent_sleep()> to
+reverse the effect.
 
 Note that this does not prevent screen blanking or locking (screensaver
 activating); see L<Screensaver::Any> for routines that disable screensaver.
 
-On systems that run Systemd, this is implemented by masking the sleep.target. It
-automatically also prevents suspend.target, hybrid-sleep.target, and
-hibernate.target from activating.
+On systems that run Systemd, this is implemented by masking C<sleep.target>. It
+automatically also prevents C<suspend.target>, C<hybrid-sleep.target>, and
+C<hibernate.target> from activating. (Note that masking C<systemd-suspend.service>
+should also achieve the same result.)
 
 Not implemented yet for other systems. Patches welcome.
 
@@ -222,15 +249,25 @@ Return value:  (any)
 
 Usage:
 
- sleep_is_prevented() -> [status, msg, payload, meta]
+ sleep_is_prevented(%args) -> [status, msg, payload, meta]
 
 Check if sleep has been prevented.
+
+The CLI return exit code 0 if sleep has been prevented.
 
 See C<prevent_sleep()> for more details.
 
 This function is not exported by default, but exportable.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quiet> => I<true>
+
+Don't output anything on command-line, just return appropriate exit code.
+
+=back
 
 Returns an enveloped result (an array).
 

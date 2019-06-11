@@ -59,7 +59,7 @@ use DNS::Unbound::X ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.05';
+    $VERSION = '0.07';
     XSLoader::load();
 }
 
@@ -314,6 +314,45 @@ sub get_option {
     }
 
     return $$got;
+}
+
+#----------------------------------------------------------------------
+
+=head2 I<OBJ>->debuglevel( $LEVEL )
+
+Sets the debug level (an integer). Returns I<OBJ>.
+
+As of libunbound v1.9.2, this is just a way to set the C<verbosity>
+option after configuration is finalized.
+
+=cut
+
+sub debuglevel {
+    _ub_ctx_debuglevel( $_[0]{'_ub'}, $_[1] );
+    return $_[0];
+}
+
+=head2 I<OBJ>->debugout( $FD_OR_FH )
+
+Accepts a file descriptor or Perl filehandle and designates that
+as the destination for libunbound diagnostic information.
+
+Returns I<OBJ>.
+
+=cut
+
+sub debugout {
+    my ($self, $fd_or_fh) = @_;
+
+    my $fd = ref($fd_or_fh) ? fileno($fd_or_fh) : $fd_or_fh;
+
+    my $mode = _get_fd_mode_for_fdopen($fd) or do {
+        die DNS::Unbound::X->create('BadDebugFD', $fd, $!);
+    };
+
+    _ub_ctx_debugout( $self->{'_ub'}, $fd, $mode );
+
+    return $self;
 }
 
 #----------------------------------------------------------------------

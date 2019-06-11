@@ -12,6 +12,7 @@ SYNOPSIS
         perl-migrate-modules --from ~/perl5/lib/perl5 ~/perls/5.20.0
     
       Options:
+        -c, --include-core           Install core modules from source Perl
         -h, --help                   Show this message
         -f <path>, --from=<path>     Search only these path(s) for source modules
         -I <path>, --lib=<path>      Additional search path(s) for source modules
@@ -45,19 +46,25 @@ EXAMPLES
 
         $ perl-migrate-modules --from ~/perl5-old/lib/perl5 /usr/bin/perl
 
+      * Migrate modules from the sitelib of a Perl that can no longer be
+      executed:
+
+        $ perl-migrate-modules --from ~/.plenv/versions/5.24.0/lib/perl5/site_perl/5.24.0/ $(which perl)
+
       * Migrate modules to a custom local::lib location:
 
         $ env PERL_CPANM_OPT='-l /opt/project/local' perl-migrate-modules /opt/perl-5.28.0 /opt/perl-5.28.1
 
       * Update all modules installed in the current Perl:
 
-        $ perl-migrate-modules $(which perl)
+        $ perl-migrate-modules --include-core $(which perl)
 
 CAVEATS
 
     Only modules with .packlist will be migrated, this will include any
     module installed by CPAN clients, but generally not modules installed
-    by vendor packages or core modules.
+    by vendor packages or core modules. Core modules available from CPAN
+    can be included via Module::CoreList with the --include-core option.
 
     Migrated modules will be installed at their latest indexed version, not
     the version that exists in the source Perl.

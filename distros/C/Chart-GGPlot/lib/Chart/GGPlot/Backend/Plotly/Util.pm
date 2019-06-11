@@ -4,25 +4,28 @@ package Chart::GGPlot::Backend::Plotly::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
+use Data::Frame;
 use Data::Munge qw(elem);
-use Graphics::Color::RGB;
 use List::AllUtils qw(all min max pairmap pairwise reduce);
-use Memoize;
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle);
 use Types::Standard qw(Str);
 
 use parent qw(Exporter::Tiny);
 
+use Chart::GGPlot::Util::Scales qw(
+  csshex_to_rgb255 colorname_to_csshex
+);
+
 our @EXPORT_OK = qw(
-  pt_to_px
-  cex_to_px
+  pt_to_px cex_to_px
   br
   to_rgb
   group_to_NA
   pdl_to_plotly
+  ribbon
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -44,30 +47,33 @@ fun to_rgb ($color, $alpha=pdl(1)) {
 
     my $rgb = sub {
         my ($c, $a) = @_;
+
+        return 'transparent' if $c eq 'BAD';
         unless ( $c =~ /^\#/ ) {
-             $c = _color_name_to_rgb($c);
+             $c = colorname_to_csshex($c);
         }
         return $c if $a == 1;
 
-        if ( my @rgb = ( $c =~ /^#(..)(..)(..)/ ) ) {
-            $a = max( min( $a, 1 ), 0 );
+        if ($c =~ /^#/) {
             return sprintf(
                 "rgba(%s,%s,%s,%s)",
-                ( map { hex($_) } @rgb ),
-                int( $a * 255 + 0.5 )
+                csshex_to_rgb255($c),
+                0+sprintf("%.2f", $a)   # 0+ for removing trailing zeros
             );
         }
         return $c;
     };
 
     if ( !ref($color) ) {
-        return $rgb->($color, 1);
+        return $rgb->($color, $alpha->at(0));
     }
     else {
         if ($alpha->length != $color->length and $alpha->length != 1) {
             die "alpha must be of length 1 or the same length as x";
         }
         $alpha = $alpha->setbadtoval(1);
+        $alpha->where($alpha > 1) .= 1;
+        $alpha->where($alpha < 0) .= 0;
         
         my @color = $color->flatten;
         my @rgba;
@@ -78,23 +84,9 @@ fun to_rgb ($color, $alpha=pdl(1)) {
             @rgba = pairwise { $rgb->($a, $b) } @color, @alpha;
         }
 
-        my $p = PDL::SV->new(\@rgba);
-        $p = $p->setbadif( $color->isbad ) if $color->badflag;
-        return $p;
+        return PDL::SV->new(\@rgba);
     }
 }
-
-sub _color_name_to_rgb {
-    my ($color) = @_;
-
-    try {
-        return Graphics::Color::RGB->from_color_library($color)->as_css_hex;
-    }
-    catch {
-        return $color;
-    }
-}
-memoize('_color_name_to_rgb');
 
 
 fun group_to_NA ($df, :$group_vars=['group'],
@@ -210,6 +202,37 @@ fun pdl_to_plotly ($p, $allow_collapse=false) {
     return $p->unpdl;
 }
 
+# Transform geom_smooth prediction confidence intervals into format plotly
+#  likes
+fun ribbon ($data) {
+    my $n        = $data->nrow;
+    my $tmp      = $data->sort( ['x'] );
+    my $tmp2     = $data->sort( ['x'], false );
+    my $not_used = $data->names->setdiff( [qw(x ymin ymax y)] );
+
+    # top-half of ribbon
+    my @others = map { $_ => $tmp->at($_) } @$not_used;
+    my $data1  = Data::Frame->new(
+        columns => [
+            x => $tmp->at('x'),
+            y => $tmp->at('ymax'),
+            @others,
+        ]
+    );
+
+    # bottom-half of ribbon
+    my @others2 = map { $_ => $tmp2->at($_) } @$not_used;
+    my $data2   = Data::Frame->new(
+        columns => [
+            x => $tmp2->at('x'),
+            y => $tmp2->at('ymin'),
+            @others2,
+        ]
+    );
+
+    return $data1->rbind($data2);
+}
+
 1;
 
 __END__
@@ -224,7 +247,7 @@ Chart::GGPlot::Backend::Plotly::Util - Utilities used by Chart::GGPlot::Backend:
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 FUNCTIONS
 

@@ -14,6 +14,8 @@ The module provides the following methods:
 use warnings;
 use strict;
 
+use v5.10.0;
+
 use Carp;
 use Image::Synchronize::Timestamp;
 use Scalar::Util qw(
@@ -62,8 +64,8 @@ C<$camera_id> is the ID of the camera that took the image for which an
 offset is specified.
 
 C<$time> is the time (either in seconds since the epoch, as for
-L<gmtime>, or else as an L<Image::Synchronize::Timestamp>) of the image for which
-the offset is specified.
+L<gmtime>, or else as an L<Image::Synchronize::Timestamp>) of the
+image for which the offset is specified.
 
 C<$offset> is the time offset in seconds that is valid at the
 specified C<$time>.
@@ -300,7 +302,7 @@ sub get {
   return wantarray ? ( $offset, $file ) : $offset;
 }
 
-=head2
+=head2 get_exact
 
   $offset = $co->get_exact($camera_id, $time);
 
@@ -332,8 +334,21 @@ sub get_exact {
 
   $data = $co->export_data;
 
-Returns a version of Image::Synchronize::CameraOffsets C<$co> suitable for exporting.  The
-return value is similar to
+Returns a version of Image::Synchronize::CameraOffsets C<$co> suitable
+for exporting.  The return value is similar to
+
+  {
+    'cameraid1' =>
+    {
+      '2019-06-04T14:33:12' => '+1:03:15',
+      '2019-06-05T08:11:43' => '+1:03:15'
+    },
+    'cameraid2' =>
+    {
+      '2019-01-01T00:00:00' => '+2:00',
+      '2019-06-05T08:11:43' => '+2:00'
+    },
+  }
 
 =cut
 
@@ -357,9 +372,9 @@ sub export_data {
   $co = $co->parse($data);
 
 Parses camera offsets information from text C<$data> into
-Image::Synchronize::CameraOffsets C<$co>, replacing any earlier contents of C<$co>.  The
-text is expected to be in the format that L</stringify> produces.
-Returns the object.
+Image::Synchronize::CameraOffsets C<$co>, replacing any earlier
+contents of C<$co>.  The text is expected to be in the format that
+L</stringify> produces.  Returns the object.
 
 =cut
 
@@ -410,8 +425,8 @@ sub parse {
 }
 
 # returns a version of timestamp C<$time> (acceptable to
-# L<Image::Synchronize::Timestamp>) that is ready for display.  For use by the
-# L</stringify> method.
+# L<Image::Synchronize::Timestamp>) that is ready for display.  For
+# use by the L</stringify> method.
 sub display_time {
   my ($time) = @_;
   my $t = Image::Synchronize::Timestamp->new($time);
@@ -489,6 +504,27 @@ sub relevant_part {
     }
   }
   return \%relevant;
+}
+
+=head2 stringify
+
+  $text = $co->stringify;
+
+Returns the exportable contents of Image::Synchronize::CameraOffsets
+C<$co> in YAML format.  The return value is similar to
+
+    cameraid1:
+      2019-06-04T14:33:12: +1:03:15
+      2019-06-05T08:11:43: +1:03:15
+    cameraid2:
+      2019-01-01T00:00:00: +2:00
+      2019-06-05T08:11:43: +2:00
+
+=cut
+
+sub stringify {
+  my ($self) = @_;
+  return Dump($self->export_data);
 }
 
 sub to_display {

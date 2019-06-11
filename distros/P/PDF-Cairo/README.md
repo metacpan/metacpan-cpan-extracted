@@ -4,7 +4,7 @@ Perl API for PDF generation using Cairo, FreeType, and Pango.
 
 ## Overview
 
-PDF::Cairo is loosely based on the API of PDF::API2::Lite, but uses
+[PDF::Cairo](https://metacpan.org/release/PDF-Cairo) is loosely based on the API of PDF::API2::Lite, but uses
 Cairo, Font::FreeType, and (optionally) Pango to provide better
 support for modern TrueType and OpenType fonts. Compatibility methods
 are provided to more easily convert existing scripts.

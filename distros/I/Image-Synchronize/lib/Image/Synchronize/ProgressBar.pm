@@ -1,5 +1,7 @@
 package Image::Synchronize::ProgressBar;
 
+use v5.10.0;
+
 =head1 NAME
 
 Image::Synchronize::ProgressBar - A simple progress bar that also

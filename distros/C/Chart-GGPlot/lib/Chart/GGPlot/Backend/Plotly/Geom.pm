@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom;
 
 use Chart::GGPlot::Role;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use List::AllUtils qw(pairmap);
 use Types::Standard qw(ArrayRef);
@@ -12,14 +12,20 @@ use Types::Standard qw(ArrayRef);
 use Chart::GGPlot::Backend::Plotly::Util qw(br);
 
 
-method use_webgl ($df) {
+classmethod split_on () { [] }
+
+
+classmethod hover_on () { 'points' }
+
+
+classmethod use_webgl ($df) {
     my $threshold = $Chart::GGPlot::Backend::Plotly::WEBGL_THRESHOLD;
     return 0 if ( $threshold < 0 );
     return ( $df->nrow > $threshold );
 }
 
 
-requires 'to_trace';
+requires 'to_traces';
 
 
 classmethod make_hovertext ($df, ArrayRef $hover_labels) {
@@ -34,16 +40,17 @@ classmethod make_hovertext ($df, ArrayRef $hover_labels) {
                 $var = $var->expr;
             }
             my $data = $class->_hovertext_data_for_aes( $df, $aes );
-            return ( defined $data ? ( $var => $data->as_pdlsv ) : () );
+            return ( defined $data ? ( $var => $data->as_pdlsv->unpdl ) : () );
         }
     }
     @$hover_labels;
 
-    return [ 0 .. $df->nrow - 1 ]->map(
-        sub {
-            join( br(), pairmap { "$a: " . $b->at($_) } @hover_assoc );
-        }
-    );
+    my $br = br();
+    return [
+        map {
+            join( $br, pairmap { "$a: " . $b->[$_] } @hover_assoc )
+        } ( 0 .. $df->nrow - 1 )
+    ];
 }
 
 classmethod _hovertext_data_for_aes ($df, $aes) {
@@ -54,7 +61,8 @@ classmethod _hovertext_data_for_aes ($df, $aes) {
     );
 }
 
-classmethod to_basic($data, $prestats_data, $layout, $params, $plot) {
+# for preprocessing data at an early point
+classmethod prepare_data($data, $prestats_data, $layout, $params, $plot) {
     return $data;
 }
 
@@ -87,9 +95,23 @@ Chart::GGPlot::Backend::Plotly::Geom - Role for geom-specific details with the P
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
-=head1 METHODS
+=head1 CLASS METHODS
+
+=head2 split_on
+
+    split_on()
+
+Returns an arrayref of aestheics on which continuous variables in the data
+should be splitted.
+This is necessary for some geoms, for example, polygons.
+
+=head2 hover_on
+
+    hover_on()
+
+Return value would be used for plotly trace's C<hoveron> attribute.
 
 =head2 use_webgl
 
@@ -103,9 +125,9 @@ The variable can be adjusted by like,
 
     $Chart::GGPlot::Backend::Plotly::WEBGL_THRESHOLD = 2000;
 
-=head2 to_trace
+=head2 to_traces
 
-    to_trace($df, $params, $plot)
+    to_traces($df, $params, $plot)
 
 This shall be implemented by consumers of this role.
 It should return an arrayref of Chart::Plotly::Trace::X objects.  

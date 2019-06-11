@@ -1,25 +1,25 @@
 package NetPacket::Ethernet;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble ethernet packets.
-$NetPacket::Ethernet::VERSION = '1.7.0';
+$NetPacket::Ethernet::VERSION = '1.7.1';
 use strict;
 use warnings;
 
 use parent 'NetPacket';
 
-my @eth_types = qw/ ETH_TYPE_IP        
-                    ETH_TYPE_ARP       
-                    ETH_TYPE_APPLETALK 
-                    ETH_TYPE_RARP      
-                    ETH_TYPE_SNMP      
-                    ETH_TYPE_IPv6      
-                    ETH_TYPE_PPP       
-                    ETH_TYPE_802_1Q    
-                    ETH_TYPE_IPX       
-                    ETH_TYPE_PPPOED    
+my @eth_types = qw/ ETH_TYPE_IP
+                    ETH_TYPE_ARP
+                    ETH_TYPE_APPLETALK
+                    ETH_TYPE_RARP
+                    ETH_TYPE_SNMP
+                    ETH_TYPE_IPv6
+                    ETH_TYPE_PPP
+                    ETH_TYPE_802_1Q
+                    ETH_TYPE_IPX
+                    ETH_TYPE_PPPOED
                     ETH_TYPE_PPPOES    /;
 
-our @EXPORT_OK = ( 'eth_strip', 'ETH_HLEN', @eth_types ); 
+our @EXPORT_OK = ( 'eth_strip', 'ETH_HLEN', @eth_types );
 
 our %EXPORT_TAGS = (
     ALL         => [@EXPORT_OK],
@@ -117,29 +117,18 @@ sub strip {
 
     my $eth_obj = NetPacket::Ethernet->decode($pkt);
     return $eth_obj->{data};
-}   
-
-#
-# Encode a packet - not implemented!
-#
-
-sub encode {
-    my ($self) = shift; 
-
-    (my $dest = $self->{src_mac}) =~ s/://g;
-    (my $src = $self->{dest_mac}) =~ s/://g;
-
-    my $frame = pack('H12H12n a*', $dest, $src, 0x0800, $self->{data});
-    return $frame;
 }
 
-#
-# Module initialisation
-#
+sub encode {
+    my ($self) = shift;
+
+    my @mac = map { $self->{$_} } qw/ dest_mac src_mac /;
+    s/://g for @mac;
+
+    return pack 'H12H12n a*', @mac, 0x0800, $self->{data};
+}
 
 1;
-
-# autoloaded methods go after the END token (&& pod) below
 
 =pod
 
@@ -149,7 +138,7 @@ NetPacket::Ethernet - Assemble and disassemble ethernet packets.
 
 =head1 VERSION
 
-version 1.7.0
+version 1.7.1
 
 =head1 SYNOPSIS
 
@@ -162,7 +151,7 @@ version 1.7.0
 =head1 DESCRIPTION
 
 C<NetPacket::Ethernet> provides a set of routines for assembling and
-disassembling packets using the Ethernet protocol.  
+disassembling packets using the Ethernet protocol.
 
 =head2 Methods
 
@@ -234,7 +223,7 @@ none
 =item exportable
 
 ETH_TYPE_IP ETH_TYPE_ARP ETH_TYPE_APPLETALK ETH_TYPE_SNMP
-ETH_TYPE_IPv6 ETH_TYPE_PPP 
+ETH_TYPE_IPv6 ETH_TYPE_PPP
 
 =item tags
 
@@ -245,7 +234,7 @@ The following tags group together related exportable items.
 =item C<:types>
 
 ETH_TYPE_IP ETH_TYPE_ARP ETH_TYPE_APPLETALK ETH_TYPE_SNMP
-ETH_TYPE_IPv6 ETH_TYPE_PPP 
+ETH_TYPE_IPv6 ETH_TYPE_PPP
 
 =item C<:strip>
 
@@ -292,7 +281,7 @@ to standard output.
 
 Copyright (c) 2001 Tim Potter and Stephanie Wehner.
 
-Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of 
+Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of
 the participants in the CRC for Advanced Computational Systems
 ('ACSys').
 

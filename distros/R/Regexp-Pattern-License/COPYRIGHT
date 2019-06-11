@@ -9,10 +9,9 @@ Files: Changes
  doap.ttl
  lib/Regexp/Pattern/License.pm
  lib/Regexp/Pattern/License/Parts.pm
- t/01-basic.t
  t/lib/MyTest.pm
  t/normalized.t
-Copyright: Copyright 2018 Jonas Smedegaard.
+Copyright: Copyright 2019 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: INSTALL
@@ -28,30 +27,34 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: dist.ini
-Copyright: Copyright 2017 Jonas Smedegaard.
-License: GPL-3.0
-
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/01-basic.t
+Copyright: Copyright 2018 Jonas Smedegaard.
 License: GPL-3.0
- This software is Copyright (c) 2018 by Jonas Smedegaard.
+
+Files: dist.ini
+Copyright: Copyright 2017 Jonas Smedegaard.
+License: GPL-3.0
+
+License: GPL-3.0
+ This software is Copyright (c) 2019 by Jonas Smedegaard.
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 3, June 2007
 
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

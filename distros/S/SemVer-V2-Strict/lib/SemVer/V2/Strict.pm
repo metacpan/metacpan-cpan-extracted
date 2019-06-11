@@ -2,7 +2,7 @@ package SemVer::V2::Strict;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use constant PRE_RELEASE_FORMAT    => qr/(?:-(?<pre_release>[a-zA-Z0-9.\-]+))?/;
 use constant BUILD_METADATA_FORMAT => qr/(?:\+(?<build_metadata>[a-zA-Z0-9.\-]+))?/;
@@ -219,7 +219,7 @@ Convert a C<SemVer::V2::Strict> instance to string.
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2017 Pine Mizune
+Copyright (c) 2015-2019 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

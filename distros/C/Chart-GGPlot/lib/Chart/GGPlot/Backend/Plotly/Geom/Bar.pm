@@ -1,10 +1,10 @@
 package Chart::GGPlot::Backend::Plotly::Geom::Bar;
 
-# ABSTRACT: Chart::GGPlot's Plotly support for Geom::Bar
+# ABSTRACT: Chart::GGPlot's Plotly implementation for Geom::Bar
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
@@ -12,7 +12,9 @@ use Module::Load;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(to_rgb pdl_to_plotly);
 
-classmethod to_trace ($df, $params, $plot) {
+classmethod split_on () { [qw(fill)] }
+
+classmethod to_traces ($df, $params, $plot) {
     load Chart::Plotly::Trace::Bar;
     load Chart::Plotly::Trace::Bar::Marker;
 
@@ -37,8 +39,9 @@ classmethod to_trace ($df, $params, $plot) {
         marker    => $marker,
         hovertext => pdl_to_plotly( $df->at('hovertext') ),
         hoverinfo => 'text',
+        hoveron   => $class->hover_on,
     );
-    return $class->_adjust_trace_for_flip($trace, $plot);
+    return [ $class->_adjust_trace_for_flip($trace, $plot) ];
 }
 
 around _hovertext_data_for_aes( $orig, $class : $df, $aes ) {
@@ -61,11 +64,11 @@ __END__
 
 =head1 NAME
 
-Chart::GGPlot::Backend::Plotly::Geom::Bar - Chart::GGPlot's Plotly support for Geom::Bar
+Chart::GGPlot::Backend::Plotly::Geom::Bar - Chart::GGPlot's Plotly implementation for Geom::Bar
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

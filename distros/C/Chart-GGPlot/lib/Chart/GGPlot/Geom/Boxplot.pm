@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 extends qw(Chart::GGPlot::Geom::Rect);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
@@ -42,57 +42,58 @@ classmethod extra_params () {
     ]
 }
 
-my $geom_boxplot_pod = layer_func_pod(<<'=cut');
+my $geom_boxplot_pod = layer_func_pod(<<'EOT');
 
-    geom_boxplot(:$mapping=undef, :$data=undef, 
-                 :$stat='boxplot', :$position='dodge2',
-                 :$outlier_color=undef, :$outlier_colour=undef,
-                 :$outlier_fill=undef, :$outlier_shape=undef,
-                 :$outlier_size=1.5, :$outlier_stroke=undef,
-                 :$outlier_alpha=undef,
-                 :$notch=false, :$notchwidth=0.25,
-                 :$varwidth=false, :$na_rm=false,
-                 :$show_legend='auto', :$inherit_aes=true,
-                 %rest)
+        geom_boxplot(:$mapping=undef, :$data=undef, 
+                     :$stat='boxplot', :$position='dodge2',
+                     :$outlier_color=undef, :$outlier_colour=undef,
+                     :$outlier_fill=undef, :$outlier_shape=undef,
+                     :$outlier_size=1.5, :$outlier_stroke=undef,
+                     :$outlier_alpha=undef,
+                     :$notch=false, :$notchwidth=0.25,
+                     :$varwidth=false, :$na_rm=false,
+                     :$show_legend=undef, :$inherit_aes=true,
+                     %rest)
 
-The boxplot compactly displays the distribution of a continuous variable. It
-visualises five summary statistics (the median, two hinges and two whiskers),
-and all "outlying" points individually.
+    The boxplot compactly displays the distribution of a continuous
+    variable. It visualises five summary statistics (the median, two hinges
+    and two whiskers), and all "outlying" points individually.
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=item * $outlier_color, $outlier_fill, $outlier_size, $outlier_stroke,
-$outlier_alpha
+    =item * $outlier_color, $outlier_fill, $outlier_size, $outlier_stroke,
+    $outlier_alpha
 
-Default aesthetics for outliers. Set to C<undef> to inherit from the
-aesthetics used for the box.
+    Default aesthetics for outliers. Set to C<undef> to inherit from the
+    aesthetics used for the box.
 
-Sometimes it can be useful to hide the outliers, for example when overlaying
-the raw data points on top of the boxplot. Hiding the outliers can be
-achieved by setting C<outlier_shape =E<gt> ''>.
-Importantly, this does not remove the outliers, it only hides them, so the
-range calculated for the y-axis will be the same with outliers shown and
-outliers hidden.
+    Sometimes it can be useful to hide the outliers, for example when
+    overlaying the raw data points on top of the boxplot. Hiding the
+    outliers can be achieved by setting C<outlier_shape =E<gt> ''>.
+    Importantly, this does not remove the outliers, it only hides them, so
+    the range calculated for the y-axis will be the same with outliers
+    shown and outliers hidden.
 
-=item * $notch
+    =item * $notch
 
-If false (default) make a standard box plot. If true, make a notched box
-plot. Notches are used to compare groups; if the notches of two boxes do not
-overlap, this suggests that the medians are significantly different.
+    If false (default) make a standard box plot. If true, make a notched
+    box plot. Notches are used to compare groups; if the notches of two
+    boxes do not overlap, this suggests that the medians are significantly
+    different.
 
-=item * $notchwidth
+    =item * $notchwidth
 
-For a notched box plot, width of the notch relative to the body. 
+    For a notched box plot, width of the notch relative to the body. 
 
-=back
+    =back
 
-See also L<Chart::GGPlot::Stat::Functions/stat_boxplot>.
+    See also L<Chart::GGPlot::Stat::Functions/stat_boxplot>.
 
-=cut
+EOT
 
 my $geom_boxplot_code = fun (
         :$data=undef, :$mapping=undef, 
@@ -103,7 +104,7 @@ my $geom_boxplot_code = fun (
         :$outlier_alpha=undef,
         :$notch=false, :$notchwidth=0.25,
         :$varwidth=false, :$na_rm=false,
-        :$show_legend='auto', :$inherit_aes=true,
+        :$show_legend=undef, :$inherit_aes=true,
         %rest )
 {
     if ( not Ref::Util::is_ref($position) ) {
@@ -210,7 +211,7 @@ Chart::GGPlot::Geom::Boxplot - Class for boxplot geom
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SEE ALSO
 

@@ -4,7 +4,7 @@ package Chart::GGPlot::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Data::Dumper::Concise ();
 
@@ -44,7 +44,6 @@ my @export_all = (
       call_if_coderef
       alias_color_functions
       dist_euclidean dist_polar
-      split_indices
       find_line_formula spiral_arc_length
       has_groups
       collect_functions_from_package
@@ -248,17 +247,6 @@ fun spiral_arc_length ($a, $theta1, $theta2) {
           ( $theta2 * ( $theta2**2 + 1 )->sqrt + $theta2->asinh ) );
 }
 
-# Split indices of an indices array ref into groups
-# Return an arrayref of piddles.
-fun split_indices (Piddle1D $indices, $n=$indices->max) {
-    my @rslt = map { [] } ( 1 .. $n );
-    for my $i ( 0 .. $indices->length - 1 ) {
-        my $id = min($indices->at($i), $n);
-        push @{ $rslt[$id] }, $i;
-    }
-    return [ map { pdl($_) } @rslt ];
-}
-
 
 fun resolution(Piddle1D $x, $zero=true) {
     if ($x->type < PDL::float or zero_range(range_($x, true))) {
@@ -325,7 +313,7 @@ Chart::GGPlot::Util - Utility functions
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 FUNCTIONS
 

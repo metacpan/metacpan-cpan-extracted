@@ -42,11 +42,20 @@
       },
       "test" : {
          "requires" : {
+            "File::Compare" : "0",
+            "File::Temp" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.03",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jgreely/PDF-Cairo.git",
+         "web" : "https://github.com/jgreely/PDF-Cairo"
+      }
+   },
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

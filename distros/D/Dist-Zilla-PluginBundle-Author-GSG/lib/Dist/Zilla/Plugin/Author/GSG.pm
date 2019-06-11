@@ -7,7 +7,7 @@ use Git::Wrapper qw();
 use namespace::autoclean;
 
 # ABSTRACT: Grant Street Group defaults CPAN dists
-our $VERSION = '0.0.7'; # VERSION
+our $VERSION = '0.0.9'; # VERSION
 
 before 'BUILDARGS' => sub {
     my ($class, $args) = @_;
@@ -49,7 +49,7 @@ Dist::Zilla::Plugin::Author::GSG - Grant Street Group defaults CPAN dists
 
 =head1 VERSION
 
-version 0.0.7
+version 0.0.9
 
 =head1 SYNOPSIS
 

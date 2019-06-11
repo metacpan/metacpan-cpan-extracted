@@ -6,6 +6,8 @@ use FindBin qw /$Bin/;
 use File::Spec;
 use Test::More;
 use Test::More::UTF8;
+use Test::Trap;
+
 # use Log::Any qw/$log/;
 # use Log::Log4perl qw/:easy/;
 # use Log::Any::Adapter;
@@ -17,18 +19,18 @@ use Test::More::UTF8;
 # our $defaultLog4perlConf = '
 # log4perl.rootLogger              = INFO, Screen
 # log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-# log4perl.appender.Screen.stderr  = 0
-# log4perl.appender.Screen.layout  = PatternLayout
-# log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
-# ';
-# Log::Log4perl::init(\$defaultLog4perlConf);
-# Log::Any::Adapter->set('Log4perl');
+# log4perl.appender.Screen.stderr  = 0
+# log4perl.appender.Screen.layout  = PatternLayout
+# log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
+# ';
+# Log::Log4perl::init(\$defaultLog4perlConf);
+# Log::Any::Adapter->set('Log4perl');
 
 BEGIN { require_ok('MarpaX::ESLIF::ECMA404') };
 
 my $ecma404 = MarpaX::ESLIF::ECMA404->new(
-                                          # logger => $log
-                                         );
+    # logger => $log
+    );
 isa_ok($ecma404, 'MarpaX::ESLIF::ECMA404');
 
 diag("###########################################################");
@@ -45,16 +47,7 @@ foreach (sort __PACKAGE__->section_data_names) {
     # Test data
     #
     my $input = __PACKAGE__->section_data($_);
-    if ($want_ok) {
-        # Left commented to compare with a good and working parser -;
-        # use JSON::XS ();
-        # is_deeply($ecma404->decode($$input), JSON::XS::decode_json($$input), $_);
-        ok(defined($ecma404->decode($$input)), $_);
-        #use Data::Dumper;
-        #print STDERR Dumper($ecma404->decode($$input));
-    } else {
-        ok(!defined($ecma404->decode($$input)), $_);
-    }
+    do_test($want_ok, $_, $$input);
 }
 
 #
@@ -153,11 +146,18 @@ foreach my $dir_basename (qw/test_parsing test_transform/) {
         }
         # diag("Testing $file_path, expecting " . ($want_ko ? 'failure' : 'success') . "$reason");
         if ($want_ko) {
-            ok(!defined($ecma404->decode($data, $encoding)), "ko / $basename$reason");
+            do_test(0, "ko / $basename$reason", $data, $encoding);
         } else {
-            ok(defined($ecma404->decode($data, $encoding)), "ok / $basename$reason");
+            do_test(1, "ok / $basename$reason", $data, $encoding);
         }
     }
+}
+
+sub do_test {
+    my ($want_ok, $name, $input, $encoding) = @_;
+
+    my @r = trap { $ecma404->decode($input, $encoding) };
+    ok($want_ok ? scalar(@r) : !scalar(@r), $name);
 }
 
 #

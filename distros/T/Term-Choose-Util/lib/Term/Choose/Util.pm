@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.072';
+our $VERSION = '0.073';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -73,6 +73,7 @@ sub choose_dirs {
             push @tmp, $o->{prompt};
         }
         my $lines = join( "\n", @tmp );
+        # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
@@ -211,6 +212,7 @@ sub _choose_a_path {
             push @tmp, $o->{prompt};
         }
         my $lines = join( "\n", @tmp );
+        # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx,
@@ -290,6 +292,7 @@ sub _a_file {
         }
         my $lines = join( "\n", @tmp );
         my @pre = ( undef, $o->{confirm} );
+        # Choose
         my $choice = choose(
             [ @pre, sort( @files ) ],
             { prompt => $lines, info => $o->{info}, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
@@ -318,11 +321,6 @@ sub choose_a_number {
     if ( ! defined $opt ) {
         $opt = {};
     }
-    #####
-    if ( ! defined $opt->{small_first} ) {          # 18.02.2019 # deprecated
-        $opt->{small_first} = $opt->{small_on_top};
-    }
-    #####
     my $info        = defined $opt->{info}         ? $opt->{info}         : '';
     my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : '';
     my $name        =         $opt->{name};
@@ -436,15 +434,9 @@ sub choose_a_subset {
     if ( ! defined $opt ) {
         $opt = {};
     }
-    #####
-    if ( ! defined $opt->{keep_chosen} && defined $opt->{remove_chosen} ) { # 18.02.2019 # deprecated
-        $opt->{keep_chosen} = $opt->{remove_chosen} ? 0 : 1;
-    }
-    #####
     my $info        = defined $opt->{info}            ? $opt->{info}            : '';
     my $name        =         $opt->{name};
     my $prompt      = defined $opt->{prompt}          ? $opt->{prompt}          : '';
-    my $fmt_chosen  = defined $opt->{fmt_chosen}      ? $opt->{fmt_chosen}      : 0;            # 29.01.2109 # deprecated
     my $keep_chosen = defined $opt->{keep_chosen}     ? $opt->{keep_chosen}     : 0;
     my $mark        =         $opt->{mark};
     my $index       = defined $opt->{index}           ? $opt->{index}           : 0;
@@ -470,34 +462,15 @@ sub choose_a_subset {
 
     while ( 1 ) {
         my @tmp;
-        if ( defined $opt->{sofar_begin} || defined $opt->{sofar_separator} || defined $opt->{sofar_end} ) {                  ####
-            my $sofar = $name;
-            #if ( @{$available}[@$new_idx] ) {
-            if ( @$new_idx ) {
-                $sofar .= $list_begin . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $list_end;
-            }
-            elsif ( $opt->{all_by_default} ) {
-                $sofar .= $list_begin . '*' . $list_end;
-            }
-            @tmp = ( $sofar );
-        }                                                                                                                      ####    29.01.2109
-        else {                                                                                                                 ####
-            my @info_list;                                                                                                     ####
-            if ( @$new_idx ) {                                                                                                 ####
-                @info_list = @{$available}[@$new_idx];                                                                         ####
-            }                                                                                                                  ####
-            elsif ( $opt->{all_by_default} ) {                                                                                 ####
-                @info_list = ( '*' );                                                                                          ####
-            }                                                                                                                  ####
-            if ( $fmt_chosen == 0 ) {                                                                                          ####    remove lines marked with ####
-                $name = '> ' if ! defined $name;                                                                               ####
-                push @tmp,  $name . join( $list_sep, map { defined $_ ? $_ : '' } @info_list );                                ####    remove fmt_chosen in the documentation
-            }                                                                                                                  ####
-            else {                                                                                                             ####
-                push @tmp, $name if defined $name;                                                                             ####
-                push @tmp, join( "\n", map { ( ' ' x length $prefix ) . ( defined $_ ? $_ : '' ) } @info_list ) if @info_list; ####
-            }                                                                                                                  ####
-        }                                                                                                                      ####
+        my $sofar = $name;
+        #if ( @{$available}[@$new_idx] ) {
+        if ( @$new_idx ) {
+            $sofar .= $list_begin . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $list_end;
+        }
+        elsif ( $opt->{all_by_default} ) {
+            $sofar .= $list_begin . '*' . $list_end;
+        }
+        @tmp = ( $sofar );
         if ( length $prompt ) {
             push @tmp, $prompt;
         }
@@ -570,39 +543,62 @@ sub settings_menu {
         $curr->{$key} = 0       if ! defined $curr->{$key};
         $new->{$key}  = $curr->{$key};
     }
+    my @print_keys;
+    for my $sub ( @$menu ) {
+        my ( $key, $name, $values ) = @$sub;
+        my $current = $values->[$new->{$key}];
+        push @print_keys, sprintf "%-*s [%s]", $longest, $name, $current;
+    }
+    my @pre = ( undef, $confirm );
+    $ENV{TC_RESET_AUTO_UP} = 0;
+    my $default = 0;
+    my $count = 0;
 
     while ( 1 ) {
-        my @print_keys;
-        for my $sub ( @$menu ) {
-            my ( $key, $name, $values ) = @$sub;
-            my $current = $values->[$new->{$key}];
-            push @print_keys, sprintf "%-*s [%s]", $longest, $name, $current;
-        }
-        my @pre = ( undef, $confirm );
-        my $choices = [ @pre, @print_keys ];
         # Choose
         my $idx = choose(
-            $choices,
-            { prompt => $prompt, info => $info, index => 1, layout => 3, justify => 0, mouse => $mouse,
-              clear_screen => $clear, undef => $back, hide_cursor => $hide_cursor }
+            [ @pre, @print_keys ],
+            { prompt => $prompt, info => $info, index => 1, default => $default, layout => 3, justify => 0,
+              mouse => $mouse, clear_screen => $clear, undef => $back, hide_cursor => $hide_cursor }
         );
-        return if ! defined $idx;
-        my $choice = $choices->[$idx];
-        return if ! defined $choice;
-        if ( $choice eq $confirm ) {
+        if ( ! $idx ) {
+            return;
+        }
+        elsif ( $idx == $#pre ) {
             my $change = 0;
             for my $sub ( @$menu ) {
                 my $key = $sub->[0];
-                next if $curr->{$key} == $new->{$key};
+                if ( $curr->{$key} == $new->{$key} ) {
+                    next;
+                }
                 $curr->{$key} = $new->{$key};
                 $change++;
             }
             return $change; #
         }
-        my $key    = $menu->[$idx-@pre][0];
-        my $values = $menu->[$idx-@pre][2];
-        $new->{$key}++;
-        $new->{$key} = 0 if $new->{$key} == @$values;
+        my $i = $idx - @pre;
+        my $key    = $menu->[$i][0];
+        my $values = $menu->[$i][2];
+        if ( $default == $idx ) {
+            if ( $ENV{TC_RESET_AUTO_UP} ) {
+                $count = 0;
+            }
+            elsif ( $count == @$values * 3 ) {
+                $default = 0;
+                $count = 0;
+                next;
+            }
+        }
+        else {
+            $count = 0;
+            $default = $idx;
+        }
+        ++$count;
+        ++$new->{$key};
+        if ( $new->{$key} == @$values ) {
+            $new->{$key} = 0;
+        }
+        $print_keys[$i] =~ s/\[[^\[\]]+\]\z/[$values->[$new->{$key}]]/;
     }
 }
 
@@ -686,6 +682,7 @@ sub print_hash {
         }
     }
     return join "\n", @vals if defined wantarray;
+    # Choose
     choose(
         [ @vals ],
         { prompt => $prompt, layout => 3, justify => 0, mouse => $mouse,
@@ -752,7 +749,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.072
+Version 0.073
 
 =cut
 
@@ -969,12 +966,6 @@ Default: "> ";
 
 =item
 
-small_on_top DEPRECATED
-
-Renamed to I<small_first>.
-
-=item
-
 small_first
 
 Put the small number ranges on top.
@@ -1000,17 +991,6 @@ As a first argument it is required a reference to an array which provides the av
 The optional second argument is a hash reference. The following options are available:
 
 =over
-
-=item
-
-fmt_chosen DEPRECATED
-
-The option I<fmt_chosen> is deprecated; use the options I<sofar_begin>, I<sofar_separator> and I<sofar_end> to format
-the info-output.
-
-If I<fmt_chosen> is set to C<1>, each chosen item gets its own line in the output on the screen.
-
-Values: [0],1;
 
 =item
 
@@ -1073,16 +1053,6 @@ I<prefix> expects as its value a string. This string is put in front of the elem
 The chosen elements are returned without this I<prefix>.
 
 The default value is "  " if the I<layout> is 3 else the default is the empty string ("").
-
-=item
-
-remove_chosen DEPRECATED
-
-Use I<keep_chosen> instead.
-
-If enabled, the chosen items are remove from the available choices.
-
-Values: 0,[1];
 
 =item
 

@@ -372,7 +372,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "Regexp-Pattern-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://anonscm.debian.org/git/build-common/regexp-pattern-license.git>;
@@ -605,6 +605,31 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.92.tar.gz>;
 	doap:revision        "v3.1.92"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.1.93"^^xsd:string;
+	dc:issued            "2019-06-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Fix metadata for object afl: Drop bogus tldr name. Slightly improve metadata for object adobe_glyph.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Avoid regex option /r to support Perl < 5.14.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Extend trait pattern licensed_under.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix DOS in pattern for leading bullets.";
+			doap-bugs:fixes <https://bugs.debian.org/926392>;
+			doap-changeset:thanks <http://webid.debian.net/maintainers/nthykier>, <https://github.com/manisandro>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.93.tar.gz>;
+	doap:revision        "v3.1.93"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:dr@jones.dk>, <mailto:jonass@cpan.org>;
@@ -612,6 +637,14 @@
 	foaf:nick            "JONASS";
 	foaf:page            <https://metacpan.org/author/JONASS>.
 
+<http://webid.debian.net/maintainers/nthykier>
+	foaf:mbox            <mailto:niels@thykier.net>, <mailto:nthykier@debian.org>;
+	foaf:name            "Niels Thykier".
+
 <http://www.gnu.org/licenses/gpl-3.0.txt>
 	dc:title             "GNU General Public License version 3 or newer.".
+
+<https://github.com/manisandro>
+	foaf:mbox            <mailto:manisandro@gmail.com>;
+	foaf:name            "Sandro Mani".
 

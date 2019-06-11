@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.009';
+our $VERSION = '1.011';
 
 my %introduces = ( '5.030' => [qw[
                                   unicode12.1 uniprop_wildcards qr'N
@@ -35,7 +35,7 @@ my %introduces = ( '5.030' => [qw[
                    '5.014' => [qw[
                                  ?^ /r /d /l /u /a auto-deref
                                  ^GLOBAL_PHASE \o package-block
-                                 srand-return
+                                 srand-return prototype+
                               ]],
                    '5.012' => [qw[
                                  package-version ... each-array
@@ -52,7 +52,7 @@ my %introduces = ( '5.030' => [qw[
                                  s-utf8-delimiters-hack
                               ]],
                    old => [qw[
-                                 ?? for-qw
+                                 ?? for-qw @_=split
                           ]],
                  );
 
@@ -60,10 +60,13 @@ my %removed = ( 'auto-deref'             => '5.024',
                 'lexical-$_'             => '5.024',
                 '??'                     => '5.022',
                 's-utf8-delimiters-hack' => '5.020',
-                'for-qw'                 => '5.014',
+                'for-qw'                 => '5.018',
+                '@_=split'               => '5.012',
               );
 
 my %alias = (
+    # old
+    'split-populates-@_' => '@_=split',
     # 5.010
     '\H' => '\h',
     '\V' => '\v',
@@ -230,11 +233,11 @@ sub _is_old_empty { @{ $introduces{old} } ? 0 : 1 }
 
 =head1 NAME
 
-Syntax::Construct - Identify which non-feature constructs are used in the code.
+Syntax::Construct - Explicitly state which non-feature constructs are used in the code.
 
 =head1 VERSION
 
-Version 1.009
+Version 1.011
 
 =head1 SYNOPSIS
 
@@ -555,6 +558,10 @@ See B<package block syntax> under L<perl5140delta/Syntactical Enhancements>.
 
 See B<srand() now returns the seed> under L<perl5140delta/Other Enhancements>.
 
+=head3 prototype+
+
+See L<perl5140delta/Single-term-prototype>.
+
 =head2 5.016
 
 No non-feature constructs were introduced in this version of Perl.
@@ -783,7 +790,13 @@ explicit operator has been removed>.
 
 =head3 for-qw
 
-Removed in 5.14. See L<perl5140delta/Use of qw(...) as parentheses>.
+Removed in 5.18. See L<perl5180delta/qw(...)-can-no-longer-be-used-as-parentheses>.
+
+=head3 @_=split
+
+Removed in 5.12, but documented in 5.14. See L<perl5140delta/split()-and-@_>.
+
+Alias: split-populates-@_
 
 =head2 Accepted Features
 
@@ -799,7 +812,7 @@ E. Choroba, C<< <choroba at cpan.org> >>
 
 =head2 Contributors
 
-Gabor Szabo, JJ Merelo, tynovsky
+Gabor Szabo, JJ Merelo, tynovsky, Chris White
 
 =head1 BUGS
 

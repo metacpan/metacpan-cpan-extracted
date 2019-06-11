@@ -1,7 +1,7 @@
 package App::PowerManagementUtils;
 
-our $DATE = '2019-05-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-09'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ App::PowerManagementUtils - CLI utilities related to power management
 
 =head1 VERSION
 
-This document describes version 0.001 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2019-05-22.
+This document describes version 0.002 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2019-06-09.
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use Data::Frame;
 
@@ -30,27 +30,27 @@ has '+default_aes'  => (
 
 classmethod required_aes() { ['x'] }
 
-my $stat_count_pod = layer_func_pod(<<'=cut');
+my $stat_count_pod = layer_func_pod(<<'EOT');
 
-    stat_count(:$mapping=undef, :$data=undef,
-               :$geom='bar', :$position='stack', 
-               :$width=undef,
-               :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
-               %rest)
+        stat_count(:$mapping=undef, :$data=undef,
+                   :$geom='bar', :$position='stack', 
+                   :$width=undef,
+                   :$na_rm=false, :$show_legend=undef, :$inherit_aes=true,
+                   %rest)
 
-Arguments:
+    Arguments:
 
-=over 4
+    =over 4
 
-%TMPL_COMMON_ARGS%
+    %TMPL_COMMON_ARGS%
 
-=item * $width
+    =item * $width
 
-Bar width. By default, set to 90% of the resolution of the data.
+    Bar width. By default, set to 90% of the resolution of the data.
 
-=back
+    =back
 
-=cut
+EOT
 
 my $stat_count_code = fun (
         :$mapping = undef, :$data = undef,
@@ -143,7 +143,11 @@ Chart::GGPlot::Stat::Count - Statistic method that counts number of data in bin
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
+
+=head1 SEE ALSO
+
+L<Chart::GGPlot::Stat>
 
 =head1 AUTHOR
 

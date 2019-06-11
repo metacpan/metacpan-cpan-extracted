@@ -2186,13 +2186,17 @@ static short marpaESLIFPerl_is_bool(pTHX_ SV *svp, int typei)
   AV    *avp;
   short rcb;
 
-  avp = newAV();
-  av_push(avp, (svp == &PL_sv_undef) ? newSV(0) : newSVsv(svp)); /* Ref count of stringp is transfered to av -; */
-  svp = marpaESLIFPerl_call_actionp(aTHX_ NULL /* interfacep */, "MarpaX::ESLIF::is_bool", avp, NULL /* Perl_MarpaX_ESLIF_Valuep */, 0 /* evalb */, 0 /* evalSilentb */);
-  av_undef(avp);
-
-  rcb = SvTRUE(svp);
-  MARPAESLIFPERL_REFCNT_DEC(svp);
+  /* We request that at least it has be an object - the MarpaX::ESLIF::is_bool will check object nature itself */
+  if ((typei & OBJECT) == OBJECT) {
+    avp = newAV();
+    av_push(avp, (svp == &PL_sv_undef) ? newSV(0) : newSVsv(svp)); /* Ref count of stringp is transfered to av -; */
+    svp = marpaESLIFPerl_call_actionp(aTHX_ NULL /* interfacep */, "MarpaX::ESLIF::is_bool", avp, NULL /* Perl_MarpaX_ESLIF_Valuep */, 0 /* evalb */, 0 /* evalSilentb */);
+    av_undef(avp);
+    rcb = SvTRUE(svp);
+    MARPAESLIFPERL_REFCNT_DEC(svp);
+  } else {
+    rcb = 0;
+  }
 
   return rcb;
 }

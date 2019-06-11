@@ -13,13 +13,17 @@ __DATA__
 Alders
 Alders'
 Anwar
+Atria
 Boris
 Däppen
+Joaquín
+José
 Mohammad
 Olaf
 Open
 This
 bdaeppen
+jjatria
 lib
 libs
 mohammad

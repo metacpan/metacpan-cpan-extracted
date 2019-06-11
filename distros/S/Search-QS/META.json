@@ -1,0 +1,49 @@
+{
+   "abstract" : "A converter between query string URI and search query",
+   "author" : [
+      "Emiliano Bruni <info@ebruni.it>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-QS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Set::Array" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::UseAllModules" : "0.15",
+            "Tie::IxHash" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EmilianoBruni/search-qs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EmilianoBruni/search-qs.git",
+         "web" : "https://github.com/EmilianoBruni/search-qs"
+      }
+   },
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.14.2",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

@@ -1,3 +1,13 @@
+v0.91.0 2019-06-09T13:54:39Z
+ - p doc ls autobuild column removed
+ - >begin_work method removed from the dbh pool
+ - Pcore::Handle::DBI::Response removed
+ - pgsql get_dbh combined with _get_dbh
+ - pgsql refactored
+ - pgsql notifications
+ - ext app reloader improved
+ - dbh prepare query improved
+
 v0.90.6 2019-06-06T05:29:13Z
  - old code removed
  - dbi query to string

@@ -325,4 +325,38 @@ subtest geom_boxplot_1 => sub {
     dataframe_is( $data, $data_expected, '$built->data' );
 };
 
+subtest geom_polygon_1 => sub {
+    my $datapoly = Data::Frame->new(
+        columns => [
+            id    => factor( [ map { ($_) x 4 } qw(1.1 2.1 1.2 2.2 1.3 2.3) ] ),
+            value => pdl(    [ map { ($_) x 4 } qw(3 3.1 3.1 3.2 3.15 3.5) ] ),
+            x     => pdl(
+                2,   1,   1.1, 2.2, 1,   0,   0.3, 1.1, 2.2, 1.1, 1.2, 2.5,
+                1.1, 0.3, 0.5, 1.2, 2.5, 1.2, 1.3, 2.7, 1.2, 0.5, 0.6, 1.3
+            ),
+            y => pdl(
+                -0.5, 0,   1,   0.5, 0,   0.5, 1.5, 1,
+                0.5,  1,   2.1, 1.7, 1,   1.5, 2.2, 2.1,
+                1.7,  2.1, 3.2, 2.8, 2.1, 2.2, 3.3, 3.2
+            ),
+        ]
+    );
+
+    my $p = ggplot(
+        data    => $datapoly,
+        mapping => aes( x => 'x', y => 'y' )
+    )->geom_polygon( mapping => aes( fill => 'value', group => 'id' ) );
+
+    my $built = $p->backend->build($p);
+
+    my $scales = $p->scales;
+    is( $scales->length, 3, '$plot->scales->length' );
+    my $scale_color = $scales->scales->[0];
+    isa_ok( $scale_color, ['Chart::GGPlot::Scale::Continuous'] );
+    is( $scale_color->guide, 'colorbar',
+        q{geom_polygon's color scale guide is "colorbar"} );
+    
+    pass();
+};
+
 done_testing();

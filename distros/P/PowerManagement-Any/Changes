@@ -1,3 +1,16 @@
+0.006   2019-06-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix typo in Changes.
+
+
+0.005   2019-06-09 (PERLANCAR)
+
+	- [ux] sleep-is-prevented: Now provide --quiet (-q) a la grep to be
+	  quiet, add examples.
+
+
 0.004   2019-05-28 (PERLANCAR)
 
 	- [ux] Shut up log when 'systemctl status' exits with code=3.
