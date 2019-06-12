@@ -1,3 +1,7 @@
+0.003 - June 12th 2019
+  * More testing implemented
+  * Clarify licensing a bit
+
 0.002 - June 4th 2019
   * Bindings are now mostly complete and seem to be functional.  Possible to actually use them now.
   * Tests now prove that demorgan's law is valid in this universe.

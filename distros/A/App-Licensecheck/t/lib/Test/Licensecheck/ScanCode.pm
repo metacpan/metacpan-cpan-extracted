@@ -18,7 +18,11 @@ use Test::Requires qw(
 use Path::Tiny 0.053;
 use App::Licensecheck;
 
+my $tb     = $CLASS->builder;
 my $corpus = File::BaseDir::data_dirs('tests/ScanCode');
+
+$tb->skip_all('no corpus at $ENV{XDG_DATA_DIRS} + tests/ScanCode/')
+	unless $corpus;
 
 sub licenses ($)
 {
@@ -71,9 +75,6 @@ sub expected ($$;$)
 		# TODO: Report ScanCode bug: Missing SPDX identifier
 		s/^mit-old-style-no-advert$/NTP/;
 
-		# TODO: Report SPDX bug: Missing versioning
-		s/^Aladdin$/Aladdin-8/;
-
 		# TODO: support (non-SPDX) ScanCode identifiers
 		s/^epl\b/EPL/;
 		s/^kevlin-henney/Kevlin-Henney/;
@@ -111,7 +112,6 @@ $app->deb_fmt(1);
 sub is_licensed_like_scancode ($$;$$)
 {
 	my ( $file, $licenses, $skiplist, $overrides ) = @_;
-	my $tb = $CLASS->builder;
 
 	return if (/\.yml$/);
 
@@ -158,10 +158,6 @@ sub is_licensed_like_scancode ($$;$$)
 sub are_licensed_like_scancode ($;$$)
 {
 	my ( $testpaths, $skipfile, $overrides ) = @_;
-	my $tb = $CLASS->builder;
-
-	$tb->skip_all('corpus missing from $ENV{XDG_DATA_DIRS} + tests/ScanCode/')
-		unless $corpus;
 
 	my $licenses = licenses($corpus);
 
@@ -180,7 +176,6 @@ sub are_licensed_like_scancode ($;$$)
 
 sub done_testing
 {
-	my $tb = $CLASS->builder;
 	$tb->done_testing;
 }
 

@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'pattern' => '(\\d{4})(\\d{4})',
-                  'leading_digits' => '[0237]',
-                  'format' => '$1 $2'
+                  'leading_digits' => '[0237]'
                 },
                 {
                   'pattern' => '(\\d{5})(\\d{4})',
@@ -38,14 +38,14 @@ my $formatters = [
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'toll_free' => '0800\\d{4}',
-                'fixed_line' => '[23][2-5]\\d{6}',
-                'voip' => '70\\d{6}',
-                'specialrate' => '(900\\d{6})',
-                'mobile' => '7[6-9]\\d{6}',
                 'pager' => '',
-                'geographic' => '[23][2-5]\\d{6}'
+                'toll_free' => '0800\\d{4}',
+                'mobile' => '7[6-9]\\d{6}',
+                'personal_number' => '',
+                'specialrate' => '(900\\d{6})',
+                'geographic' => '[23][2-5]\\d{6}',
+                'voip' => '70\\d{6}',
+                'fixed_line' => '[23][2-5]\\d{6}'
               };
 my %areanames = (
   2682207 => "Nhlangano\,\ Shiselweni\ district",

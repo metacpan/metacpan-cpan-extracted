@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- (this file generated automatically by Image::ExifTool::BuildTagLookup) -->
 <head>
 <title>FujiFilm Tags</title>
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
@@ -554,42 +555,61 @@ the date of manufacture)</span></span></td></tr>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x3803 = 14339'>0x3803</td>
+<td>VideoRecordingMode</td>
+<td class=c>int32u</td>
+<td><span class=s>0x0 = Normal
+  <br>0x10 = F-log
+  <br>0x20 = HLG</span></td></tr>
+<tr class=b>
+<td title='0x3804 = 14340'>0x3804</td>
+<td>PeripheralLighting</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td title='0x3806 = 14342'>0x3806</td>
+<td>VideoCompression</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Log GOP
+  <br>2 = All Intra</span></td></tr>
+<tr class=b>
 <td title='0x3820 = 14368'>0x3820</td>
 <td>FrameRate</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x3821 = 14369'>0x3821</td>
 <td>FrameWidth</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x3822 = 14370'>0x3822</td>
 <td>FrameHeight</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x4005 = 16389'>0x4005</td>
 <td>FaceElementSelected</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x4100 = 16640'>0x4100</td>
 <td>FacesDetected</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x4103 = 16643'>0x4103</td>
 <td>FacePositions</td>
 <td class=c>int16u[n]</td>
 <td><span class=s><span class=n>(left, top, right and bottom coordinates in full-sized image for each face
 detected)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x4200 = 16896'>0x4200</td>
 <td>NumFaceElements</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x4201 = 16897'>0x4201</td>
 <td>FaceElementTypes</td>
 <td class=c>int8u[n]</td>
@@ -597,33 +617,33 @@ detected)</span></span></td></tr>
   <br>1 = Face
   <br>2 = Left Eye
   <br>3 = Right Eye</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x4203 = 16899'>0x4203</td>
 <td>FaceElementPositions</td>
 <td class=c>int16u[n]</td>
 <td><span class=s><span class=n>(left, top, right and bottom coordinates in full-sized image for each face
 element)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x4282 = 17026'>0x4282</td>
 <td>FaceRecInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FujiFilm.html#FaceRecInfo'>FujiFilm FaceRecInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x8000 = 32768'>0x8000</td>
 <td>FileSource</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x8002 = 32770'>0x8002</td>
 <td>OrderNumber</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x8003 = 32771'>0x8003</td>
 <td>FrameNumber</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xb211 = 45585'>0xb211</td>
 <td>Parallax</td>
 <td class=c>rational64s</td>
@@ -665,7 +685,8 @@ element)</span></span></td></tr>
 <td><span class=s>[val &amp; 0xff]
   <br>0 = AF-M
   <br>1 = AF-S
-  <br>2 = AF-C</span></td></tr>
+  <br>2 = AF-C
+  <br>17 = AF-S (Auto)</span></td></tr>
 <tr class=b>
 <td class=r title='0 = 0x0'>0.2</td>
 <td>AFAreaMode</td>
@@ -882,81 +903,96 @@ RAF-format information.</p>
 <td class=c>no</td>
 <td><span class=s><span class=n>(including borders)</span></span></td></tr>
 <tr class=b>
+<td title='0x0110 = 272'>0x0110</td>
+<td>RawImageCropTopLeft</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(top margin first, then left margin)</span></span></td></tr>
+<tr>
+<td title='0x0111 = 273'>0x0111</td>
+<td>RawImageCroppedSize</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(including borders)</span></span></td></tr>
+<tr class=b>
+<td title='0x0115 = 277'>0x0115</td>
+<td>RawImageAspectRatio</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td title='0x0121 = 289'>0x0121</td>
 <td>RawImageSize</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0130 = 304'>0x0130</td>
 <td>FujiLayout</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0131 = 305'>0x0131</td>
 <td>XTransLayout</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x2000 = 8192'>0x2000</td>
 <td>WB_GRGBLevelsAuto</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x2100 = 8448'>0x2100</td>
 <td>WB_GRGBLevelsDaylight</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x2200 = 8704'>0x2200</td>
 <td>WB_GRGBLevelsCloudy</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x2300 = 8960'>0x2300</td>
 <td>WB_GRGBLevelsDaylightFluor</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x2301 = 8961'>0x2301</td>
 <td>WB_GRGBLevelsDayWhiteFluor</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x2302 = 8962'>0x2302</td>
 <td>WB_GRGBLevelsWhiteFluorescent</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x2310 = 8976'>0x2310</td>
 <td>WB_GRGBLevelsWarmWhiteFluor</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x2311 = 8977'>0x2311</td>
 <td>WB_GRGBLevelsLivingRoomWarmWhiteFluor</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x2400 = 9216'>0x2400</td>
 <td>WB_GRGBLevelsTungsten</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x2ff0 = 12272'>0x2ff0</td>
 <td>WB_GRGBLevels</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x9200 = 37376'>0x9200</td>
 <td>RelativeExposure</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x9650 = 38480'>0x9650</td>
 <td>RawExposureBias</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xc000 = 49152'>0xc000</td>
 <td>RAFData</td>
 <td class=c>-</td>
@@ -1117,7 +1153,7 @@ RAF-format information.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 20, 2019</i>
+<br><i>Last revised Apr 30, 2019</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

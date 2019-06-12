@@ -6,7 +6,7 @@ use warnings;
 
 use lib 't/lib';
 
-use MyTest tests => 82;
+use MyTest tests => 84;
 
 license_covered(
 	'adobe_2006',
@@ -22,11 +22,6 @@ THIS SOURCE CODE IS PROVIDED "AS IS" AND "WITH ALL FAULTS", WITHOUT ANY TECHNICA
 ALSO, THERE IS NO WARRANTY OF NON-INFRINGEMENT, TITLE OR QUIET ENJOYMENT.
 IN NO EVENT SHALL MACROMEDIA OR ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOURCE CODE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	]
 );
 
 license_covered(
@@ -43,11 +38,6 @@ Adobe shall not be liable to any party for any loss of revenue or profit or for 
 The Adobe materials are provided on an "AS IS" basis.
 Adobe specifically disclaims all express, statutory, or implied warranties relating to the Adobe materials, including but not limited to those concerning merchantability or fitness for a particular purpose or non-infringement of any third party rights regarding the Adobe materials.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	]
 );
 
 license_covered(
@@ -63,10 +53,41 @@ license_covered(
 	name  => 'Aladdin Free Public License',
 	grant => <<EOF,
 This program may also be distributed as part of Aladdin Ghostscript, under the terms of the Aladdin Free Public License (the "License").
+EOF
+	TODO => [qw(subject_license)]
+);
 
-Every copy of Aladdin Ghostscript must include a copy of the License, normally in a plain ASCII text file named PUBLIC.
-The License grants you the right to copy, modify and redistribute Aladdin Ghostscript, but only under certain conditions described in the License.
-Among other things, the License requires that the copyright notice and this notice be preserved on all copies.
+license_covered(
+	'aladdin_8',
+	name  => 'Aladdin Free Public License',
+	grant => <<EOF,
+This program may also be distributed as part of Aladdin Ghostscript, under the terms of the Aladdin Free Public License (the "License").
+EOF
+	text => <<EOF,
+Aladdin Enterprises hereby grants to anyone the permission to apply this License to their own work, as long as the entire License (including the above notices and this paragraph) is copied with no changes, additions, or deletions except for changing the first paragraph of Section 0 to include a suitable description of the work to which the license is being applied and of the person or entity that holds the copyright in the work, and, if the License is being applied to a work created in a country other than the United States, replacing the first paragraph of Section 6 with an appropriate reference to the laws of the appropriate country.
+
+0. Subject Matter
+
+This License applies to the computer program known as "Aladdin Ghostscript." The "Program", below, refers to such program.
+EOF
+);
+
+license_covered(
+	'aladdin_9',
+	name  => 'Aladdin Free Public License',
+	grant => <<EOF,
+This program may also be distributed as part of Aladdin Ghostscript, under the terms of the Aladdin Free Public License (the "License").
+EOF
+	text => <<EOF,
+Aladdin Enterprises hereby grants to anyone the permission to apply this License to their own work, as long as the entire License (including the above notices and this paragraph) is copied with no changes, additions, or deletions except for changing the first paragraph of Section 0 to include a suitable description of the work to which the license is being applied and of the person or entity that holds the copyright in the work, and, if the License is being applied to a work created in a country other than the United States, replacing the first paragraph of Section 6 with an appropriate reference to the laws of the appropriate country.
+
+This License is not an Open Source license: among other things, it places restrictions on distribution of the Program, specifically including sale of the Program.
+While Aladdin Enterprises respects and supports the philosophy of the Open Source Definition, and shares the desire of the GNU project to keep licensed software freely redistributable in both source and object form, we feel that Open Source licenses unfairly prevent developers of useful software from being compensated proportionately when others profit financially from their work.
+This License attempts to ensure that those who receive, redistribute, and contribute to the licensed Program according to the Open Source and Free Software philosophies have the right to do so, while retaining for the developer(s) of the Program the power to make those who use the Program to enhance the value of commercial products pay for the privilege of doing so.
+
+0. Subject Matter
+
+This License applies to the computer programs known as "AFPL Ghostscript", "AFPL Ghostscript PCL5e", "AFPL Ghostscript PCL5c", and "AFPL Ghostscript PXL".&nbsp; The "Program", below, refers to such program.
 EOF
 );
 
@@ -76,11 +97,7 @@ license_covered(
 	grant => <<EOF,
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -96,11 +113,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
 EOF
-	TODO => [
-		qw(
-			subject_license
-			not_grant_iri)
-	]
+	TODO => [qw(subject_license not_grant_iri)]
 );
 
 license_covered(
@@ -110,11 +123,6 @@ license_covered(
 This file and the 14 PostScript(R) AFM files it accompanies may be used, copied, and distributed for any purpose and without charge, with or without modification, provided that all copyright notices are retained; that the AFM files are not distributed without this file; that all modifications to this file or any of the AFM files are prominently noted in the modified file(s); and that this paragraph is not modified.
 Adobe Systems has no responsibility or obligation to support the use of the AFM files.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	]
 );
 
 license_covered(
@@ -124,11 +132,6 @@ license_covered(
 	text => <<EOF,
 Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	]
 );
 
 license_covered(
@@ -139,11 +142,7 @@ license_covered(
 Permission is hereby granted to use or copy this program for any purpose, provided the above notices are retained on all copies.
 Permission to modify the code and to distribute modified code is granted, provided the above notices are retained, and a notice that the code was modified is included with the above copyright notice.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -155,11 +154,7 @@ If this code is accessible from within Matlab, then typing "help colamd" or "col
 Permission to modify the code and to distribute modified code is granted, provided the above notices are retained, and a notice that the code was modified is included with the above copyright notice.
 You must also retain the Availability information below, of the original version.
 EOF
-	TODO => [
-		qw(
-			subject_iri subject_name
-			)
-	],
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -175,11 +170,6 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -197,11 +187,6 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -218,98 +203,70 @@ This product includes software developed by the <organization>.
 THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(name_name)]
 );
 
 license_covered(
 	'bsl',
 	name => 'Boost Software License',
 	iri  => 'http://www.boost.org/LICENSE_1_0.txt',
-	TODO => [
-		qw(
-			subject_license subject_name
-			)
-	],
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
 	'bsl_1',
 	name => 'Boost Software License 1.0',
 	iri  => 'http://www.boost.org/LICENSE_1_0.txt',
-	TODO => [
-		qw(
-			subject_license subject_name
-			)
-	],
+	text => <<EOF,
+Permission is hereby granted, free of charge,
+to any person or organization obtaining a copy of the software and accompanying documentation covered by this license (the "Software")
+to use, reproduce, display, distribute, execute, and transmit the Software,
+and to prepare derivative works of the Software,
+and to permit third-parties to whom the Software is furnished to do so,
+all subject to the following:
+EOF
+	TODO => [qw(text_license not_iri_name)]
 );
 
 license_covered(
 	'cc_by',
 	name => 'Creative Commons Attribution 4.0 International Public License',
-	TODO => [
-		qw(
-			subject_license subject_iri
-			)
-	],
+	TODO => [qw(subject_license subject_iri)]
 );
 
 license_covered(
 	'cc_by_nc',
 	name =>
 		'Creative Commons Attribution-NonCommercial 4.0 International Public License',
-	TODO => [
-		qw(
-			subject_license subject_iri
-			)
-	],
+	TODO => [qw(subject_license subject_iri)]
 );
 
 license_covered(
 	'cc_by_nc_nd',
 	name =>
 		'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License',
-	TODO => [
-		qw(
-			subject_license subject_iri
-			)
-	],
+	TODO => [qw(subject_license subject_iri)]
 );
 
 license_covered(
 	'cc_by_nc_sa',
 	name =>
 		'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License',
-	TODO => [
-		qw(
-			subject_license subject_iri
-			)
-	],
+	TODO => [qw(subject_license subject_iri)]
 );
 
 license_covered(
 	'cc_by_nd',
 	name =>
 		'Creative Commons Attribution-NoDerivatives 4.0 International Public License',
-	TODO => [
-		qw(
-			subject_license subject_iri
-			)
-	],
+	TODO => [qw(subject_license subject_iri)]
 );
 
 license_covered(
 	'cc_by_sa',
 	name =>
 		'Creative Commons Attribution-ShareAlike 4.0 International Public License',
-	TODO => [
-		qw(
-			subject_license subject_iri
-			)
-	],
+	TODO => [qw(subject_license subject_iri)]
 );
 
 license_covered(
@@ -319,21 +276,13 @@ license_covered(
 		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
 	grant =>
 		'To the extent possible under law, the person who associated CC0 with this work has waived all copyright and related or neighboring rights to this work',
-	TODO => [
-		qw(
-			subject_license
-			)
-	],
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
 	'cc_sp',
 	name => 'Creative Commons Sampling Plus 1.0',
-	TODO => [
-		qw(
-			subject_iri subject_license
-			)
-	],
+	TODO => [qw(subject_iri subject_license)]
 );
 
 license_covered(
@@ -343,11 +292,7 @@ license_covered(
 COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL)
 Version 1.0
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -358,11 +303,7 @@ CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL
 
 Version 2.1 du 2013-06-21
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -372,11 +313,6 @@ license_covered(
 	text => <<EOF,
 Version 1 du 21/06/2004
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -386,11 +322,7 @@ license_covered(
 	text => <<EOF,
 Version 1.1 of 10/26/2004
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -400,11 +332,7 @@ license_covered(
 	text => <<EOF,
 Version 2.0 du 2006-09-05.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(name_name mot_iri_name)]
 );
 
 license_covered(
@@ -418,11 +346,7 @@ EOF
 	text => <<EOF,
 Version 2.1 du 2013-06-21
 EOF
-	TODO => [
-		qw(grant_grant
-			subject_name
-			)
-	]
+	TODO => [qw(name_name grant_grant)]
 );
 
 license_covered(
@@ -460,11 +384,7 @@ Le Licencié s'engage expressément:
 
 Le Licencié s'engage à ne pas porter atteinte, directement ou indirectement, aux droits de propriété intellectuelle du Titulaire et/ou des Contributeurs sur le Logiciel et à prendre, le cas échéant, à l'égard de son personnel toutes les mesures nécessaires pour assurer le respect des dits droits de propriété intellectuelle du Titulaire et/ou des Contributeurs.
 EOF
-	TODO => [
-		qw(name_name
-			subject_license
-			)
-	],
+	TODO => [qw(subject_license not_iri_name)]
 );
 
 license_covered(
@@ -478,11 +398,6 @@ If you use this software in a product, an acknowledgment in the product document
 additional clause specific to Cube:
 4. Source versions may not be "relicensed" under a different license without my explicitly written permission.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -493,11 +408,6 @@ Permission to use, copy, modify, and distribute this software for any purpose wi
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -506,11 +416,6 @@ license_covered(
 	text => <<EOF,
 This program discloses material protectable under copyright laws of the United States.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	]
 );
 
 license_covered(
@@ -519,11 +424,7 @@ license_covered(
 	text => <<EOF,
 Eclipse Public License - v 1.0
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -537,11 +438,6 @@ If you use this software in a product, an acknowledgment in the product document
 4. If you change this software and redistribute parts or all of it in any form, you must make the source code of the altered version of this software available.
 5. This notice may not be removed or altered from any source distribution.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -553,11 +449,6 @@ license_covered(
 Copying and distribution of this file, with or without modification, are permitted in any medium without royalty provided the copyright notice and this notice are preserved.
 This file is offered as-is, without any warranty.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -566,11 +457,6 @@ license_covered(
 	text => <<EOF,
 This configure script is free software; the Free Software Foundation gives unlimited permission to copy, distribute and modify it.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -579,11 +465,7 @@ license_covered(
 	text => <<EOF,
 This file is free software; the Free Software Foundation gives unlimited permission to copy and/or distribute it, with or without modifications, as long as this notice is preserved.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -601,11 +483,7 @@ license_covered(
 GNU Free Documentation License
 Version 1.1, March 2000
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -615,11 +493,6 @@ license_covered(
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
 THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -631,23 +504,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 Except as contained in this notice, the name of a copyright holder shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization of the copyright holder.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
 	'json',
-	text => <<EOF,
-The Software shall be used for Good, not Evil.
-EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	text => 'The Software shall be used for Good, not Evil.',
 );
 
 license_covered(
@@ -655,11 +516,6 @@ license_covered(
 	name => 'Jython License',
 	text =>
 		'4. PSF is making Jython available to Licensee on an "AS IS" basis.',
-	TODO => [
-		qw(name name_name
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -669,11 +525,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 This software is supplied "as is" without express or implied warranty.
 But that said, if there are any problems please get in touch.
 EOF
-	TODO => [
-		qw(
-			subject_iri subject_name
-			)
-	],
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -683,11 +535,7 @@ license_covered(
 GNU LESSER GENERAL PUBLIC LICENSE
 Version 3, 29 June 2007
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -697,11 +545,7 @@ Permission is hereby granted to use or copy this program under the terms of the 
 User documentation of any code that uses this code or any modified version of this code must cite the Copyright, this License, the Availability note, and "Used by permission."
 Permission to modify the code and to distribute modified code is granted, provided the Copyright, this License, and the Availability note are retained, and a notice that the code was modified is included.
 EOF
-	TODO => [
-		qw(
-			subject_iri subject_name
-			)
-	],
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -711,11 +555,7 @@ license_covered(
 	text => <<EOF,
 as governed by the terms of the Lisp Lesser General Public License
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -728,11 +568,7 @@ license_covered(
 The Contributing Authors and Group 42, Inc. specifically permit, without fee, and encourage the use of this source code as a component to supporting the PNG file format in commercial products.
 If you use this source code in a product, acknowledgment is not required but would be appreciated.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(name_name)],
 );
 
 license_covered(
@@ -740,11 +576,6 @@ license_covered(
 	text => <<EOF,
 The above copyright notice and this permission notice shall be included in all copies of the Software, its documentation and marketing & publicity materials, and acknowledgment shall be given in the documentation, materials and software packages that this Software was used.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -753,11 +584,6 @@ license_covered(
 	text => <<EOF,
 Permission to use, copy, modify and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appears in all copies and that both that copyright notice and this permission notice appear in supporting documentation, and that the name of CMU and The Regents of the University of California not be used in advertising or publicity pertaining to distribution of the software without specific written permission.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	]
 );
 
 license_covered(
@@ -765,11 +591,6 @@ license_covered(
 	text => <<EOF,
 Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both the copyright notice and this permission notice and warranty disclaimer appear in supporting documentation, and that the name of Lucent Technologies, Bell Labs or any Lucent entity not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -782,11 +603,6 @@ In addition publicly documented acknowledgment must be given that this software 
 This includes acknowledgments in either Copyright notices, Manuals, Publicity and Marketing documents or any documentation provided with any product containing this software.
 This License does not apply to any software that links to the libraries provided by this software (statically or dynamically), but only to the software provided.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	]
 );
 
 license_covered(
@@ -796,11 +612,6 @@ license_covered(
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all copies of the Software and its documentation and acknowledgment shall be given in the documentation and software packages that this Software was used.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -811,11 +622,6 @@ license_covered(
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -824,11 +630,7 @@ license_covered(
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and/or associated documentation files (the "Materials"), to deal in the Materials without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Materials, and to permit persons to whom the Materials are furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Materials.
 EOF
-	TODO => [
-		qw(
-			subject_iri subject_name
-			)
-	],
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -836,11 +638,7 @@ license_covered(
 	text => <<EOF,
 Permission is hereby granted, without written agreement and without license or royalty fees, to use, copy, modify, and distribute this software and its documentation for any purpose, provided that the above copyright notice and the following two paragraphs appear in all copies of this software.
 EOF
-	TODO => [
-		qw(
-			subject_iri subject_name
-			)
-	],
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -850,11 +648,6 @@ Permission to use, copy, modify, distribute, and sell this software and its docu
 No representations are made about the suitability of this software for any purpose.
 It is provided "as is" without express or implied warranty.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -863,11 +656,6 @@ license_covered(
 Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both that copyright notice and this permission notice appear in supporting documentation.
 THE AUTHOR PROVIDES THIS SOFTWARE ''AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -879,11 +667,6 @@ THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE, INCLUDING ANY
 SHOULD ANY PORTION OF THE SOFTWARE PROVE DEFECTIVE, THE LICENSEE (NOT IBM OR LEXMARK) ASSUMES THE ENTIRE COST OF ALL SERVICING, REPAIR AND CORRECTION.
 IN NO EVENT SHALL IBM OR LEXMARK BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -894,11 +677,7 @@ license_covered(
 The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -923,11 +702,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 <<var;name=TMname;original=(TrademarkedName);match=.+>> makes no representations about the suitability this software for any purpose.
 It is provided "as is" without express or implied warranty.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -939,11 +713,7 @@ It is provided "as is" without express or implied warranty.
 
 M.I.T. DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL M.I.T. BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 EOF
-	TODO => [
-		qw(
-			subject_iri subject_name
-			)
-	],
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -955,11 +725,7 @@ SIL OPEN FONT LICENSE
 
 Version 1.0 - 22 November 2005
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -980,11 +746,6 @@ This package is an SSL implementation written by Eric Young (eay@cryptsoft.com).
 
 This library is free for commercial and non-commercial use as long as the following conditions are aheared to.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -993,11 +754,6 @@ license_covered(
 	text => <<EOF,
 Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and this paragraph and the following two paragraphs appear in all copies.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -1006,21 +762,13 @@ license_covered(
 	grant => <<EOF,
 This file is put in the public domain
 EOF
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
 	'python',
 	name => 'Python License',
-	TODO => [
-		qw(name name_name
-			subject_license
-			)
-	],
+	TODO => [qw(name_name subject_license)]
 );
 
 license_covered(
@@ -1028,42 +776,25 @@ license_covered(
 	name => 'Python Software Foundation License version 2',
 	text =>
 		'4. PSF is making Python available to Licensee on an "AS IS" basis.',
-	TODO => [
-		qw(name name_name
-			subject_name
-			)
-	],
 );
 
 license_covered(
 	'qpl',
 	name => 'Q Public License',
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
 	'rpsl',
 	name => 'RealNetworks Public Source License',
-	TODO => [
-		qw(
-			subject_license
-			)
-	]
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
 	'sgi_b',
 	name => 'SGI Free Software License B',
 	iri  => 'https://www.sgi.com/projects/FreeB/',
-	TODO => [
-		qw(
-			subject_license
-			not_iri_name)
-	]
+	TODO => [qw(subject_license not_iri_name)]
 );
 
 license_covered(
@@ -1075,11 +806,7 @@ No warranties of any kind are expressed or implied.
 The recipient agrees to determine applicability of information provided.  If this file has been provided on optical media by Unicode, Inc., the sole remedy for any claim will be exchange of defective media within 90 days of receipt.
 Unicode, Inc. hereby grants the right to freely use the information supplied in this file in the creation of products supporting the Unicode Standard, and to make copies of this file in any form for internal or external distribution as long as this notice remains attached.
 EOF
-	TODO => [
-		qw(
-			subject_iri subject_name
-			)
-	]
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -1088,22 +815,13 @@ license_covered(
 	text => <<EOF,
 3. Any person is hereby authorized, without fee, to view, use, reproduce, and distribute all documents and files solely for informational purposes in the creation of products supporting the Unicode Standard, subject to the Terms and Conditions herein.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
 	'wtfpl',
 	name  => 'Do What The F*ck You Want To Public License',
 	grant => 'This input method table is licensed under the WTFPL.',
-	TODO  => [
-		qw(name_name
-			subject_license
-			)
-	],
+	TODO  => [qw(name_name subject_license)]
 );
 
 license_covered(
@@ -1119,11 +837,7 @@ If you use this software in a product, an acknowledgment in the product document
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(not_iri_name)]
 );
 
 license_covered(
@@ -1139,11 +853,6 @@ Portions Copyright (c) 2002-2007 Charlie Poole or Copyright (c) 2002-2004 James 
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
 );
 
 license_covered(
@@ -1161,11 +870,7 @@ This product includes software developed by the <organization>.
 THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EOF
-	TODO => [
-		qw(
-			subject_name
-			)
-	],
+	TODO => [qw(not_iri_name)]
 );
 
 license_covered(
@@ -1173,11 +878,7 @@ license_covered(
 	name  => 'MIT License',
 	iri   => 'https://en.wikipedia.org/wiki/MIT_License',
 	grant => 'Released under the MIT license',
-	TODO  => [
-		qw(name_name
-			subject_license
-			)
-	],
+	TODO  => [qw(name_name subject_license)]
 );
 
 done_testing;

@@ -22,37 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '3',
-                  'format' => '$1 $2 $3 $4'
+                  'leading_digits' => '3'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[67]',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[67]'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
-          30(?:
-            24|
-            3[12]|
-            4[1-35-7]|
-            5[13]|
-            6[189]|
-            [78]1|
-            9[1478]
-          )\\d{4}
-        ',
+                'personal_number' => '',
+                'toll_free' => '',
                 'mobile' => '6[02356]\\d{7}',
-                'voip' => '722\\d{6}',
-                'specialrate' => '',
+                'pager' => '',
                 'fixed_line' => '
           30(?:
             24|
@@ -64,8 +53,19 @@ my $validators = {
             9[1478]
           )\\d{4}
         ',
-                'personal_number' => '',
-                'toll_free' => ''
+                'voip' => '722\\d{6}',
+                'specialrate' => '',
+                'geographic' => '
+          30(?:
+            24|
+            3[12]|
+            4[1-35-7]|
+            5[13]|
+            6[189]|
+            [78]1|
+            9[1478]
+          )\\d{4}
+        '
               };
 my %areanames = (
   224302 => "Fria",

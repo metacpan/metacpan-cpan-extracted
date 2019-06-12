@@ -1,7 +1,7 @@
 package Data::Password::zxcvbn::Match::Sequence;
 use Moo;
 with 'Data::Password::zxcvbn::Match';
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: match class for sequences of uniformly-spaced codepoints
 
 
@@ -117,7 +117,7 @@ Data::Password::zxcvbn::Match::Sequence - match class for sequences of uniformly
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 DESCRIPTION
 

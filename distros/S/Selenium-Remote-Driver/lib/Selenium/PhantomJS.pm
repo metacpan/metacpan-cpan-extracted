@@ -1,5 +1,5 @@
 package Selenium::PhantomJS;
-$Selenium::PhantomJS::VERSION = '1.31';
+$Selenium::PhantomJS::VERSION = '1.32';
 use strict;
 use warnings;
 
@@ -10,26 +10,26 @@ extends 'Selenium::Remote::Driver';
 
 
 has '+browser_name' => (
-    is => 'ro',
+    is      => 'ro',
     default => sub { 'phantomjs' }
 );
 
 
 has 'binary' => (
-    is => 'lazy',
-    coerce => \&coerce_simple_binary,
-    default => sub { 'phantomjs' },
+    is        => 'lazy',
+    coerce    => \&coerce_simple_binary,
+    default   => sub { 'phantomjs' },
     predicate => 1
 );
 
 
 has 'binary_port' => (
-    is => 'lazy',
+    is      => 'lazy',
     default => sub { 8910 }
 );
 
 has '_binary_args' => (
-    is => 'lazy',
+    is      => 'lazy',
     builder => sub {
         my ($self) = @_;
 
@@ -54,7 +54,7 @@ Selenium::PhantomJS - Use GhostDriver without a Selenium server
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

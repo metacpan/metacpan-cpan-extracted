@@ -1,14 +1,14 @@
 #!/usr/bin/env perl
-use 5.012;
+use 5.010;
 use Benchmark qw(:all);
 
 use FindBin qw($Bin);
 use lib "$Bin/../../lib/";
 use FASTX::Reader;
 
-my $s = "$Bin/../../scripts/";
+my $s = "$Bin/../../data/";
 my @files = ("$s/comments.fastq",  "$s/test2.fastq", "$s/test.fastq");
-unshift(@files, @ARGV); 
+unshift(@files, @ARGV);
 my $c = 1500;
 $c /= 100 if ($ARGV[3]);
 foreach my $file (@files) {
@@ -19,7 +19,7 @@ foreach my $file (@files) {
     		'Fq' => sub { test_fq($file); },
 	});
 
-} 
+}
 
 
 sub test_fx {

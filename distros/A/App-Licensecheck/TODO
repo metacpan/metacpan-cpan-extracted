@@ -14,6 +14,7 @@
       (see File::LibMagic).
     * --decode-auto
       enable all --decode-* options for common file extensions.
+    * Optionally (i.e. if available) consult File::Extension on failure
   * Move detection code to separate module(s).
     * Maybe extend Software::License.
   * Fail when passed unknown options
@@ -54,6 +55,11 @@
     + license-reconcile
     + https://wiki.debian.org/CopyrightReviewTools
     + https://docs.clearlydefined.io/clearly#licensed
+    + http://copyfree.org/standard/licenses
+    + https://wiki.debian.org/DFSGLicenses
+    + http://voag.linkedmodel.org/2.0/doc/2015/REFDATA_voag-licenses-v2.0.html
+    + https://github.com/hierynomus/license-gradle-plugin
+    + ruby-licensee - http://ben.balter.com/licensee/
   * Warn about licensing conflicts
     + See adequate
   * Sort Files sections to list common over exotic:
@@ -70,3 +76,12 @@
     + Map matches, and skip repeatedly scanning parts already identified
     + First scan for well-formed grants using prefix + name + postfix patterns
     + Support detection reversion, and first scan for grants then licenses - reverting embedded grants
+  * Test against challenging projects
+    + ghostpdl
+    + chromium
+    + fpc
+    + lazarus
+    + boost
+
+  * Maybe use libdata-binary-perl
+  * Maybe use Text::Locus to track (and emit in verbose/debug mode) where patterns are detected?

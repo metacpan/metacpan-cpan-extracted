@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 my %introduces = ( '5.030' => [qw[
                                   unicode12.1 uniprop_wildcards qr'N
@@ -237,7 +237,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.011
+Version 1.012
 
 =head1 SYNOPSIS
 
@@ -785,7 +785,7 @@ L<perldelta/Turkic UTF-8 locales are now seamlessly supported>
 
 =head3 ??
 
-Removed in 5.022. See L<perl5220delta#Support for ?PATTERN? without
+Removed in 5.022. See L<perl5220delta/Support for ?PATTERN? without
 explicit operator has been removed>.
 
 =head3 for-qw

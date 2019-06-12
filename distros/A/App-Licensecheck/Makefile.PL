@@ -33,7 +33,7 @@ my $meta = {
                                 "perl"                      => "5.014000",
                                 "Pod::Constants"            => 0,
                                 "Regexp::Pattern"           => 0,
-                                "Regexp::Pattern::License"  => "v3.1.92",
+                                "Regexp::Pattern::License"  => "v3.1.94",
                                 "Sort::Key::Multi"          => 1.25,
                                 "strictures"                => 2,
                                 "String::Copyright"         => 0.003,
@@ -43,10 +43,10 @@ my $meta = {
                             },
                             test => {
                               recommends => {
-                                              "File::BaseDir"     => 0,
-                                              "List::MoreUtils"   => 0,
-                                              "Software::License" => 0.103008,
-                                              "YAML::XS"          => 0,
+                                              "File::BaseDir"          => 0,
+                                              "List::MoreUtils"        => 0,
+                                              "Software::LicenseUtils" => 0.103014,
+                                              "YAML::XS"               => 0,
                                             },
                               requires   => {
                                               "File::Basename"        => 0,
@@ -59,7 +59,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.0.36" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.0.37" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -74,7 +74,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.0.36",
+  "version"            => "v3.0.37",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
   "x_help_wanted"      => ["documenter", "tester"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },

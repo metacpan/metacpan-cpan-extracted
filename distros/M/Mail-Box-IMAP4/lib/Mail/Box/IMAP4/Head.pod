@@ -287,8 +287,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.005,
-built on June 05, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.006,
+built on June 12, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

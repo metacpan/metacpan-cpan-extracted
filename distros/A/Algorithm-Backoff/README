@@ -2,8 +2,8 @@ NAME
     Algorithm::Backoff - Various backoff strategies for retry
 
 VERSION
-    This document describes version 0.004 of Algorithm::Backoff (from Perl
-    distribution Algorithm-Backoff), released on 2019-06-05.
+    This document describes version 0.006 of Algorithm::Backoff (from Perl
+    distribution Algorithm-Backoff), released on 2019-06-08.
 
 SYNOPSIS
      # 1. pick a strategy and instantiate
@@ -45,6 +45,9 @@ METHODS
         between a random number between original_delay * (1-jitter_factor)
         and original_delay * (1+jitter_factor). Jitters are usually added to
         avoid so-called "thundering herd" problem.
+
+        The jitter will be applied to delay on failure as well as on
+        success.
 
     *   max_attempts => *uint* (default: 0)
 

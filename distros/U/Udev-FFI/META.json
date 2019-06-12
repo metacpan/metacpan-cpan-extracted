@@ -58,7 +58,7 @@
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.103000"
+         "version" : "0.104000"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -71,6 +71,9 @@
       },
       "Udev::FFI::Functions" : {
          "file" : "lib/Udev/FFI/Functions.pm"
+      },
+      "Udev::FFI::Helper" : {
+         "file" : "lib/Udev/FFI/Helper.pm"
       },
       "Udev::FFI::Monitor" : {
          "file" : "lib/Udev/FFI/Monitor.pm"
@@ -87,11 +90,11 @@
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.103000",
+   "version" : "0.104000",
    "x_authority" : "cpan:ILUX",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 0
 }

@@ -5904,6 +5904,14 @@ memory_stats(dom, flags=0)
           case VIR_DOMAIN_MEMORY_STAT_DISK_CACHES:
               (void)hv_store (RETVAL, "disk_caches", 11, virt_newSVll(stats[i].val), 0);
               break;
+
+          case VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGALLOC:
+              (void)hv_store (RETVAL, "hugetlb_pgalloc", 15, virt_newSVll(stats[i].val), 0);
+              break;
+
+          case VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGFAIL:
+              (void)hv_store (RETVAL, "hugetlb_pgfail", 14, virt_newSVll(stats[i].val), 0);
+              break;
           }
       }
       Safefree(stats);
@@ -9139,6 +9147,8 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_LAST_UPDATE, MEMORY_STAT_LAST_UPDATE);
       REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_USABLE, MEMORY_STAT_USABLE);
       REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_DISK_CACHES, MEMORY_STAT_DISK_CACHES);
+      REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGALLOC, MEMORY_STAT_HUGETLB_PGALLOC);
+      REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGFAIL, MEMORY_STAT_HUGETLB_PGFAIL);
 
 
       REGISTER_CONSTANT_STR(VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_BYTES_SEC, BLOCK_IOTUNE_TOTAL_BYTES_SEC);

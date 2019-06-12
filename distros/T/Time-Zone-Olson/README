@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.25
+    Version 0.26
 
 SYNOPSIS
 
@@ -34,8 +34,8 @@ DESCRIPTION
     copy of the date(1) command.
 
     Time::Zone::Olson will attempt to function even without an actual Olson
-    database on Win32 platforms by translating information available in the
-    Win32 registry.
+    database on Windows platforms by translating information available in
+    the Windows registry.
 
 SUBROUTINES/METHODS
 
@@ -52,25 +52,26 @@ SUBROUTINES/METHODS
 
  areas
 
-    The areas() object method will return a list of the areas (such as
-    Asia, Australia, Africa, America, Europe) from the zone.tab file. The
-    areas will be sorted alphabetically.
+    This method will return a list of the areas (such as Asia, Australia,
+    Africa, America, Europe) from the zone.tab file. The areas will be
+    sorted alphabetically.
 
  locations
 
-    The locations($area) object method will return a list of the locations
-    (such as Melbourne, Perth, Hobart) for a specified area from the
-    zone.tab file. The locations will be sorted alphabetically.
+    This method accepts a area (such as Asia, Australia, Africa, America,
+    Europe) as a parameter and will return a list of matching locations
+    (such as Melbourne, Perth, Hobart) from the zone.tab file. The
+    locations will be sorted alphabetically.
 
  comment
 
-    The comment($timezone) object method will return the matching comment
-    from the zone.tab file for the time zone parameter. For example, if
-    "Australia/Melbourne" was passed as a parameter, the "comment" function
-    would return "Victoria". For Win32 platforms, it will return the
-    contents of the Display registry setting. For example, for
-    "Australia/Melbourne", it would return "(UTC+10) Canberra, Melbourne,
-    Sydney".
+    This method accepts the name of time zone such as "Australia/Melbourne"
+    as a parameter and will return the matching comment from the zone.tab
+    file. For example, if "Australia/Melbourne" was passed as a parameter,
+    the "comment" function would return "Victoria". For Windows platforms,
+    it will return the contents of the Display registry setting. For
+    example, for "Australia/Melbourne", it would return "(UTC+10) Canberra,
+    Melbourne, Sydney".
 
  directory
 
@@ -174,8 +175,8 @@ SUBROUTINES/METHODS
 
  win32_registry
 
-    This method will return true if the object is using the Win32 registry
-    for Olson tz calculations. Otherwise it will return false.
+    This method will return true if the object is using the Windows
+    registry for Olson tz calculations. Otherwise it will return false.
 
 DIAGNOSTICS
 
@@ -282,12 +283,12 @@ INCOMPATIBILITIES
 
 BUGS AND LIMITATIONS
 
-    On Win32 platforms, the Olson TZ database is usually unavailable. In an
-    attempt to provide a workable alternative, the Win32 Registry is
+    On Windows platforms, the Olson TZ database is usually unavailable. In
+    an attempt to provide a workable alternative, the Windows Registry is
     interrogated and translated to allow Olson time zones (such as
-    Australia/Melbourne) to be used on Win32 nodes. Therefore, the use of
+    Australia/Melbourne) to be used on Windows nodes. Therefore, the use of
     Time::Zone::Olson should be cross-platform compatible, but the actual
-    results may be different, depending on the compatibility of the Win32
+    results may be different, depending on the compatibility of the Windows
     Registry time zones and the Olson TZ database.
 
     Please report any bugs or feature requests to bug-time-zone-olson at
@@ -303,6 +304,10 @@ SEE ALSO
       * DateTime::TimeZone::Tzfile
 
       * DateTime::TimeZone::Local::Win32
+
+      * Time::Local
+
+      * Time::Local::TZ
 
 AUTHOR
 

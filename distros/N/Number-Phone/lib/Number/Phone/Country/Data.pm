@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20190302235311';
+    $VERSION = '2.20190611222532';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -258,7 +258,7 @@
 'CK' => ['682', '00', undef, qr/\A 00 /xms],
 'CL' => ['56', '00', undef, qr/\A (?:0|1(?:1[0-69]|2[0-57]|5[13-58]|69|7[0167]|8[018]))0 /xms],
 'CM' => ['237', '00', undef, qr/\A 00 /xms],
-'CN' => ['86', '00', '0', qr/\A 00|1(?:[12]\d|79|9[0-7])\d\d00 /xms],
+'CN' => ['86', '00', '0', qr/\A 00|1(?:[12]\d|79|9[0235-7])\d\d00 /xms],
 'CO' => ['57', '009', '0', qr/\A 00(?:4(?:[14]4|56)|[579]) /xms],
 'CR' => ['506', '00', undef, qr/\A 00 /xms],
 'CU' => ['53', '119', '0', qr/\A 119 /xms],
@@ -309,7 +309,7 @@
 'HR' => ['385', '00', '0', qr/\A 00 /xms],
 'HT' => ['509', '00', undef, qr/\A 00 /xms],
 'HU' => ['36', '00', '06', qr/\A 00 /xms],
-'ID' => ['62', '001', '0', qr/\A 0(?:0[17-9]|10(?:00|1[67])) /xms],
+'ID' => ['62', '001', '0', qr/\A 00[189] /xms],
 'IE' => ['353', '00', '0', qr/\A 00 /xms],
 'IL' => ['972', '00', '0', qr/\A 0(?:0|1[2-9]) /xms],
 'IM' => ['44', '00', '0', qr/\A 00 /xms],
@@ -543,10 +543,7 @@ $Number::Phone::Country::idd_codes{991} = 'ITPCS';
     $Number::Phone::Country::prefix_codes{BV} = ['47',  '00',   undef, qr/\A 00 /xms];
     $Number::Phone::Country::prefix_codes{GS} = ['500', '00',   undef, qr/\A 00 /xms];
     $Number::Phone::Country::prefix_codes{TF} = ['596', '00',   '0',   qr/\A 00 /xms];
+
     # 0011 from https://en.wikipedia.org/wiki/Telephone_numbers_in_the_Australian_Antarctic_Territory
     #   but note that Norfolk Island is also 672 but apparently uses 00 as per libphonenumber
-    $Number::Phone::Country::prefix_codes{AQ} = ['672', '0011', undef, undef];
-    # see https://en.wikipedia.org/wiki/Telephone_numbers_in_the_Pitcairn_Islands
-    #   it's supposed to use +64xx (NZ) but apparently they use satphones instead.
-    #   for extra fun, +872 may be obsolete
-    $Number::Phone::Country::prefix_codes{PN} = ['872', undef, undef, undef];
+    $Number::Phone::Country::prefix_codes{AQ} = ['672', '0011', undef, qr/\A 0011 /xms];

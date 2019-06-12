@@ -9,7 +9,6 @@ build_requires:
   HTML::FormatText::WithLinks: '0'
   HTTP::CookieJar::LWP: '0'
   Log::Dispatch::Array: '0'
-  Module::Runtime: '0'
   Path::Tiny: '0'
   Plack::Handler::HTTP::Server::Simple: '0.016'
   Plack::Test: '0'
@@ -54,6 +53,7 @@ requires:
   List::AllUtils: '0'
   Log::Dispatch: '2.56'
   Module::Load::Conditional: '0'
+  Module::Runtime: '0'
   Moo: '0'
   MooX::StrictConstructor: '0'
   Parse::MIME: '0'
@@ -75,7 +75,7 @@ resources:
   bugtracker: https://github.com/oalders/lwp-consolelogger/issues
   homepage: https://github.com/oalders/lwp-consolelogger
   repository: https://github.com/oalders/lwp-consolelogger.git
-version: '0.000040'
+version: '0.000041'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -479,7 +479,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000040
+          tag: v0.000041
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

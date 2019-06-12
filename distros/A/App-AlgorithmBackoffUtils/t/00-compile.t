@@ -6,16 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/AlgorithmBackoffUtils.pm'
 );
 
 my @scripts = (
+    'script/retry',
     'script/retry-constant',
     'script/retry-exponential',
-    'script/retry-fibonacci'
+    'script/retry-fibonacci',
+    'script/show-backoff-delays'
 );
 
 # no fake home requested

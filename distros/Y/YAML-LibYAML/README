@@ -114,6 +114,13 @@ USING YAML::XS WITH UNICODE
     you are having problems, use Devel::Peek on all the possible data
     points.
 
+LIBYAML
+
+    You can find out (since v.079) which libyaml version this module was
+    built with:
+
+          my $libyaml_version = YAML::XS::LibYAML::libyaml_version();
+
 SEE ALSO
 
       * YAML.pm

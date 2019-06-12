@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Backoff
   homepage: https://metacpan.org/release/Algorithm-Backoff
   repository: git://github.com/perlancar/perl-Algorithm-Backoff.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

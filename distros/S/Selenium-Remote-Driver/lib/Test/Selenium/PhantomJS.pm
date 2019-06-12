@@ -1,11 +1,11 @@
 package Test::Selenium::PhantomJS;
-$Test::Selenium::PhantomJS::VERSION = '1.31';
+$Test::Selenium::PhantomJS::VERSION = '1.32';
 use Moo;
 extends 'Selenium::PhantomJS', 'Test::Selenium::Remote::Driver';
 
 has 'webelement_class' => (
     is      => 'rw',
-    default => sub {'Test::Selenium::Remote::WebElement'},
+    default => sub { 'Test::Selenium::Remote::WebElement' },
 );
 
 1;

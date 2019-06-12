@@ -22,54 +22,68 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'leading_digits' => '125',
+                  'pattern' => '(\\d{4})(\\d{3})',
                   'format' => '$1-$2',
-                  'pattern' => '(\\d{4})(\\d{3})'
+                  'leading_digits' => '125'
                 },
                 {
-                  'format' => '$1-$2-$3',
                   'leading_digits' => '121',
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{2})'
-                },
-                {
-                  'format' => '$1-$2-$3',
-                  'leading_digits' => '[2-489]',
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1'
-                },
-                {
-                  'national_rule' => '0$1',
-                  'leading_digits' => '[57]',
-                  'format' => '$1-$2-$3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
-                },
-                {
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})',
-                  'leading_digits' => '12',
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{2})',
                   'format' => '$1-$2-$3'
                 },
                 {
-                  'leading_digits' => '159',
+                  'leading_digits' => '[2-489]',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
+                  'format' => '$1-$2-$3',
+                  'national_rule' => '0$1'
+                },
+                {
+                  'leading_digits' => '[57]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'national_rule' => '0$1',
+                  'format' => '$1-$2-$3'
+                },
+                {
+                  'format' => '$1-$2-$3',
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})',
+                  'leading_digits' => '12'
+                },
+                {
+                  'pattern' => '(\\d{4})(\\d{6})',
                   'format' => '$1-$2',
-                  'pattern' => '(\\d{4})(\\d{6})'
+                  'leading_digits' => '159'
                 },
                 {
+                  'leading_digits' => '1[7-9]',
                   'pattern' => '(\\d)(\\d{3})(\\d{3})(\\d{3})',
-                  'format' => '$1-$2-$3-$4',
-                  'leading_digits' => '1[7-9]'
+                  'format' => '$1-$2-$3-$4'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{1,2})(\\d{3})(\\d{4})',
                   'leading_digits' => '15',
+                  'pattern' => '(\\d{3})(\\d{1,2})(\\d{3})(\\d{4})',
                   'format' => '$1-$2 $3-$4'
                 }
               ];
 
 my $validators = {
+                'specialrate' => '(1700\\d{6})|(
+          1212\\d{4}|
+          1(?:
+            200|
+            9(?:
+              0[01]|
+              19
+            )
+          )\\d{6}
+        )|(1599\\d{6})',
+                'geographic' => '
+          153\\d{8,9}|
+          [2-489]\\d{7}
+        ',
                 'voip' => '
           78(?:
             33|
@@ -88,20 +102,17 @@ my $validators = {
             9[2357-9]
           )\\d{6}
         ',
-                'specialrate' => '(1700\\d{6})|(
-          1212\\d{4}|
-          1(?:
-            200|
-            9(?:
-              0[01]|
-              19
-            )
-          )\\d{6}
-        )|(1599\\d{6})',
-                'pager' => '',
-                'geographic' => '
+                'fixed_line' => '
           153\\d{8,9}|
           [2-489]\\d{7}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'toll_free' => '
+          1(?:
+            255|
+            80[019]\\d{3}
+          )\\d{3}
         ',
                 'mobile' => '
           5(?:
@@ -121,17 +132,6 @@ my $validators = {
               9[1-9]
             )
           )\\d{5}
-        ',
-                'personal_number' => '',
-                'toll_free' => '
-          1(?:
-            255|
-            80[019]\\d{3}
-          )\\d{3}
-        ',
-                'fixed_line' => '
-          153\\d{8,9}|
-          [2-489]\\d{7}
         '
               };
 my %areanames = (

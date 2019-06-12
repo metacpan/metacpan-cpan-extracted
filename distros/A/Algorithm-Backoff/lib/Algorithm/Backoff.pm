@@ -1,7 +1,7 @@
 package Algorithm::Backoff;
 
-our $DATE = '2019-06-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-06-08'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -16,6 +16,7 @@ our %attr_consider_actual_delay = (
         summary => 'Whether to consider actual delay',
         schema => ['bool*'],
         default => 0,
+        tags => ['common'],
         description => <<'_',
 
 If set to true, will take into account the actual delay (timestamp difference).
@@ -35,6 +36,7 @@ our %attr_max_actual_duration = (
         summary => 'Maximum number of seconds for all of the attempts (0 means unlimited)',
         schema => ['ufloat*'],
         default => 0,
+        tags => ['common'],
         description => <<'_',
 
 If set to a positive number, will limit the number of seconds for all of the
@@ -54,6 +56,7 @@ our %attr_max_attempts = (
         summary => 'Maximum number consecutive failures before giving up',
         schema => 'uint*',
         default => 0,
+        tags => ['common'],
         description => <<'_',
 
 0 means to retry endlessly without ever giving up. 1 means to give up after a
@@ -70,12 +73,15 @@ our %attr_jitter_factor = (
     jitter_factor => {
         summary => 'How much to add randomness',
         schema => ['float*', between=>[0, 0.5]],
+        tags => ['common'],
         description => <<'_',
 
 If you set this to a value larger than 0, the actual delay will be between a
 random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
 
 _
     },
@@ -93,7 +99,58 @@ our %attr_max_delay = (
     max_delay => {
         summary => 'Maximum delay time, in seconds',
         schema => 'ufloat*',
+         tags => ['common'],
+   },
+);
+
+our %attr_min_delay = (
+    min_delay => {
+        summary => 'Maximum delay time, in seconds',
+        schema => 'ufloat*',
+        default => 0,
+        tags => ['common'],
+   },
+);
+
+our %attr_initial_delay = (
+    initial_delay => {
+        summary => 'Initial delay for the first attempt after failure, '.
+            'in seconds',
+        schema => 'ufloat*',
+        req => 1,
     },
+);
+
+our %attr_delay_multiple_on_failure = (
+    delay_multiple_on_failure => {
+        summary => 'How much to multiple previous delay, upon failure (e.g. 1.5)',
+        schema => 'ufloat*',
+        req => 1,
+   },
+);
+
+our %attr_delay_multiple_on_success = (
+    delay_multiple_on_success => {
+        summary => 'How much to multiple previous delay, upon success (e.g. 0.5)',
+        schema => 'ufloat*',
+        req => 1,
+   },
+);
+
+our %attr_delay_increment_on_failure = (
+    delay_increment_on_failure => {
+        summary => 'How much to add to previous delay, in seconds, upon failure (e.g. 5)',
+        schema => 'float*',
+        req => 1,
+   },
+);
+
+our %attr_delay_increment_on_success = (
+    delay_increment_on_success => {
+        summary => 'How much to add to previous delay, in seconds, upon success (e.g. -5)',
+        schema => 'float*',
+        req => 1,
+   },
 );
 
 $SPEC{new} = {
@@ -134,20 +191,6 @@ sub new {
     bless \%args, $class;
 }
 
-sub _success_or_failure {
-    my ($self, $is_success, $timestamp) = @_;
-
-    $self->{_last_timestamp} //= $timestamp;
-    $timestamp >= $self->{_last_timestamp} or
-        die ref($self).": Decreasing timestamp ".
-        "($self->{_last_timestamp} -> $timestamp)";
-    my $delay = $is_success ?
-        $self->_success($timestamp) : $self->_failure($timestamp);
-    $delay = $self->{max_delay}
-        if defined $self->{max_delay} && $delay > $self->{max_delay};
-    $delay;
-}
-
 sub _consider_actual_delay {
     my ($self, $delay, $timestamp) = @_;
 
@@ -158,6 +201,43 @@ sub _consider_actual_delay {
     $new_delay;
 }
 
+sub _add_jitter {
+    my ($self, $delay) = @_;
+    return $delay unless $delay && $self->{jitter_factor};
+    my $min = $delay * (1-$self->{jitter_factor});
+    my $max = $delay * (1+$self->{jitter_factor});
+    $min + ($max-$min)*rand();
+}
+
+sub _success_or_failure {
+    my ($self, $is_success, $timestamp) = @_;
+
+    $self->{_last_timestamp} //= $timestamp;
+    $timestamp >= $self->{_last_timestamp} or
+        die ref($self).": Decreasing timestamp ".
+        "($self->{_last_timestamp} -> $timestamp)";
+
+    my $delay = $is_success ?
+        $self->_success($timestamp) : $self->_failure($timestamp);
+
+    $delay = $self->_consider_actual_delay($delay, $timestamp)
+        if $self->{consider_actual_delay};
+
+    $delay = $self->_add_jitter($delay)
+        if $self->{jitter_factor};
+
+    # keep between max(0, min_delay) and max_delay
+    $delay = $self->{max_delay}
+        if defined $self->{max_delay} && $delay > $self->{max_delay};
+    $delay = 0 if $delay < 0;
+    $delay = $self->{min_delay}
+        if defined $self->{min_delay} && $delay < $self->{min_delay};
+
+    $self->{_last_timestamp} = $timestamp;
+    $self->{_prev_delay}     = $delay;
+    $delay;
+}
+
 sub success {
     my ($self, $timestamp) = @_;
 
@@ -165,13 +245,7 @@ sub success {
 
     $self->{_attempts} = 0;
 
-    my $delay = $self->_success_or_failure(1, $timestamp);
-    $delay = $self->_consider_actual_delay($delay, $timestamp)
-        if $self->{consider_actual_delay};
-    $self->{_last_timestamp} = $timestamp;
-    return 0 if $delay < 0;
-
-    $self->_add_jitter($delay);
+    $self->_success_or_failure(1, $timestamp);
 }
 
 sub failure {
@@ -187,21 +261,7 @@ sub failure {
     return -1 if $self->{max_attempts} &&
         $self->{_attempts} >= $self->{max_attempts};
 
-    my $delay = $self->_success_or_failure(0, $timestamp);
-    $delay = $self->_consider_actual_delay($delay, $timestamp)
-        if $self->{consider_actual_delay};
-    $self->{_last_timestamp} = $timestamp;
-    return 0 if $delay < 0;
-
-    $self->_add_jitter($delay);
-}
-
-sub _add_jitter {
-    my ($self, $delay) = @_;
-    return $delay unless $delay && $self->{jitter_factor};
-    my $min = $delay * (1-$self->{jitter_factor});
-    my $max = $delay * (1+$self->{jitter_factor});
-    $min + ($max-$min)*rand();
+    $self->_success_or_failure(0, $timestamp);
 }
 
 1;
@@ -219,7 +279,7 @@ Algorithm::Backoff - Various backoff strategies for retry
 
 =head1 VERSION
 
-This document describes version 0.004 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-05.
+This document describes version 0.006 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-08.
 
 =head1 SYNOPSIS
 
@@ -268,6 +328,8 @@ If you set this to a value larger than 0, the actual delay will be between a
 random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
 
 =item * B<max_attempts> => I<uint> (default: 0)
 

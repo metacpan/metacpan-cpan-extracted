@@ -1,3 +1,8 @@
+0.002   2019-06-07 (PERLANCAR)
+
+	- Add utilities: retry, show-backoff-delays.
+
+
 0.001   2019-06-05 (PERLANCAR)
 
         - First release.

@@ -1,4 +1,7 @@
 Revision history for RT-Extension-QuickAssign
 
+1.01 2019-06-12
+ - Declare that it works with 4.4 too
+
 0.01 2014-10-30
  - Initial version

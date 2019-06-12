@@ -1,5 +1,5 @@
 package Selenium::Chrome;
-$Selenium::Chrome::VERSION = '1.31';
+$Selenium::Chrome::VERSION = '1.32';
 use strict;
 use warnings;
 
@@ -10,26 +10,26 @@ extends 'Selenium::Remote::Driver';
 
 
 has '+browser_name' => (
-    is => 'ro',
+    is      => 'ro',
     default => sub { 'chrome' }
 );
 
 
 has 'binary' => (
-    is => 'lazy',
-    coerce => \&coerce_simple_binary,
-    default => sub { 'chromedriver' },
+    is        => 'lazy',
+    coerce    => \&coerce_simple_binary,
+    default   => sub { 'chromedriver' },
     predicate => 1
 );
 
 
 has 'binary_port' => (
-    is => 'lazy',
+    is      => 'lazy',
     default => sub { 9515 }
 );
 
 has '_binary_args' => (
-    is => 'lazy',
+    is      => 'lazy',
     builder => sub {
         my ($self) = @_;
 
@@ -57,7 +57,7 @@ Selenium::Chrome - Use ChromeDriver without a Selenium server
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

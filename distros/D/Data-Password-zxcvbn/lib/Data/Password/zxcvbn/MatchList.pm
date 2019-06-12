@@ -6,7 +6,7 @@ use Data::Password::zxcvbn::TimeEstimate qw(guesses_to_score);
 use Module::Runtime qw(use_module);
 use List::AllUtils 0.14 qw(max_by);
 
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: a collection of matches for a password
 
 
@@ -323,7 +323,7 @@ Data::Password::zxcvbn::MatchList - a collection of matches for a password
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 

@@ -10,11 +10,11 @@ Pg::Explain::FromXML - Parser for explains in XML format
 
 =head1 VERSION
 
-Version 0.78
+Version 0.79
 
 =cut
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 =head1 SYNOPSIS
 

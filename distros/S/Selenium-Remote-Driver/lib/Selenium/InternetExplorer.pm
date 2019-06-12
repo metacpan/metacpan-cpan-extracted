@@ -1,5 +1,5 @@
 package Selenium::InternetExplorer;
-$Selenium::InternetExplorer::VERSION = '1.31';
+$Selenium::InternetExplorer::VERSION = '1.32';
 use strict;
 use warnings;
 
@@ -9,12 +9,12 @@ extends 'Selenium::Remote::Driver';
 
 
 has '+browser_name' => (
-    is => 'ro',
+    is      => 'ro',
     default => sub { 'internet_explorer' }
 );
 
 has '+platform' => (
-    is => 'ro',
+    is      => 'ro',
     default => sub { 'WINDOWS' }
 );
 
@@ -33,7 +33,7 @@ Selenium::InternetExplorer - A convenience package for creating a IE instance
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

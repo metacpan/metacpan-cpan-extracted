@@ -1,11 +1,11 @@
 package Test::Selenium::Firefox;
-$Test::Selenium::Firefox::VERSION = '1.31';
+$Test::Selenium::Firefox::VERSION = '1.32';
 use Moo;
 extends 'Selenium::Firefox', 'Test::Selenium::Remote::Driver';
 
 has 'webelement_class' => (
     is      => 'rw',
-    default => sub {'Test::Selenium::Remote::WebElement'},
+    default => sub { 'Test::Selenium::Remote::WebElement' },
 );
 
 1;

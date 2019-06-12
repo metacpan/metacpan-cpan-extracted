@@ -22,20 +22,20 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
-                  'intl_format' => 'NA',
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '[2-9]',
-                  'format' => '$1-$2'
+                  'format' => '$1-$2',
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'intl_format' => 'NA'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'leading_digits' => '[2-9]',
+                  'intl_format' => '$1-$2-$3',
                   'format' => '($1) $2-$3',
-                  'intl_format' => '$1-$2-$3'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
@@ -57,23 +57,31 @@ my $validators = {
             82[124]
           )\\d{4}
         ',
+                'voip' => '',
+                'geographic' => '
+          868(?:
+            2(?:
+              01|
+              1[89]|
+              [23]\\d
+            )|
+            6(?:
+              0[7-9]|
+              1[02-8]|
+              2[1-9]|
+              [3-69]\\d|
+              7[0-79]
+            )|
+            82[124]
+          )\\d{4}
+        ',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'toll_free' => '
           8(?:
             00|
             33|
             44|
             55|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
-                'personal_number' => '
-          5(?:
-            00|
-            2[12]|
-            33|
-            44|
             66|
             77|
             88
@@ -98,26 +106,18 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'pager' => '',
-                'geographic' => '
-          868(?:
-            2(?:
-              01|
-              1[89]|
-              [23]\\d
-            )|
-            6(?:
-              0[7-9]|
-              1[02-8]|
-              2[1-9]|
-              [3-69]\\d|
-              7[0-79]
-            )|
-            82[124]
-          )\\d{4}
+                'personal_number' => '
+          5(?:
+            00|
+            2[12]|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
         ',
-                'specialrate' => '(900[2-9]\\d{6})',
-                'voip' => ''
+                'pager' => ''
               };
 use Number::Phone::NANP::Data;
 sub areaname {

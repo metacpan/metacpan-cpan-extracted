@@ -19,6 +19,7 @@ __PACKAGE__->add_columns(
     encode_column => 0,
     encode_class  => 'Digest',
     encode_check_method => 'check_dummy_col',
+    encode_args => { charset => 'utf-8' },
   },
   sha1_hex => {
     data_type => 'char',
@@ -29,6 +30,7 @@ __PACKAGE__->add_columns(
     encode_args => {
       format    => 'hex',
       algorithm => 'SHA-1',
+      charset => 'utf-8',
     },
     encode_check_method => 'check_sha1_hex',
   },
@@ -40,6 +42,7 @@ __PACKAGE__->add_columns(
     encode_class  => 'Digest',
     encode_args => {
       algorithm => 'SHA-1',
+      charset => 'utf-8',
     },
     encode_check_method => 'check_sha1_b64',
   },
@@ -49,7 +52,7 @@ __PACKAGE__->add_columns(
     size      => 64,
     encode_column => 1,
     encode_class  => 'Digest',
-    encode_args => { format => 'hex',},
+    encode_args => { format => 'hex', charset => 'utf-8', },
   },
   sha256_b64 => {
     data_type => 'char',
@@ -58,6 +61,7 @@ __PACKAGE__->add_columns(
     accessor  => 'sha256b64',
     encode_column => 1,
     encode_class  => 'Digest',
+    encode_args => { charset => 'utf-8' },
   },
   sha256_b64_salted => {
     data_type => 'char',
@@ -66,7 +70,7 @@ __PACKAGE__->add_columns(
     encode_column => 1,
     encode_class  => 'Digest',
     encode_check_method => 'check_sha256_b64_salted',
-    encode_args   => {salt_length => 14}
+    encode_args   => {salt_length => 14, charset => 'utf-8', }
   },
 );
 

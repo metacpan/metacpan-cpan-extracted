@@ -1,3 +1,30 @@
+0.006   2019-06-08 (PERLANCAR)
+
+	- Add strategies: LILD, LIMD, MILD, MIMD.
+
+        - Make max_delay and min_delay a common attribute for all strategies.
+
+	- [bugfix] jittered delay shouldn't have violated min_delay and
+          max_delay.
+
+	- [refactor] Refactor to reduce code duplication.
+
+	- [doc] Show illustrations using show-backoff-delays CLI in
+	  Synopsis.
+
+	- [meta] No longer mark delay_on_success as common attribute, because we
+	  now have algorithms that have varying delays on success.
+
+
+0.005   2019-06-07 (PERLANCAR)
+
+        - No functional changes.
+
+        - [doc] Minor tweaks.
+
+        - [meta] Add tag to common attributes.
+
+
 0.004   2019-06-05 (PERLANCAR)
 
 	- Add common attribute: max_actual_duration.

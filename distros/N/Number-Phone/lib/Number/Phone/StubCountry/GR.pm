@@ -22,19 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
             21|
             7
-          ',
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
+          '
                 },
                 {
-                  'format' => '$1 $2',
                   'leading_digits' => '
             2(?:
               2|
@@ -46,12 +45,13 @@ my $formatters = [
               8[2-49]
             )
           ',
-                  'pattern' => '(\\d{4})(\\d{6})'
+                  'pattern' => '(\\d{4})(\\d{6})',
+                  'format' => '$1 $2'
                 },
                 {
-                  'leading_digits' => '[2689]',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
+                  'leading_digits' => '[2689]'
                 }
               ];
 
@@ -117,14 +117,7 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'toll_free' => '800\\d{7}',
-                'personal_number' => '70\\d{8}',
-                'mobile' => '
-          6(?:
-            8[57-9]|
-            9\\d
-          )\\d{7}
-        ',
+                'voip' => '',
                 'geographic' => '
           2(?:
             1\\d\\d|
@@ -186,7 +179,6 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'pager' => '',
                 'specialrate' => '(
           8(?:
             0[16]|
@@ -194,7 +186,15 @@ my $validators = {
             25
           )\\d{7}
         )|(90[19]\\d{7})',
-                'voip' => ''
+                'personal_number' => '70\\d{8}',
+                'toll_free' => '800\\d{7}',
+                'mobile' => '
+          6(?:
+            8[57-9]|
+            9\\d
+          )\\d{7}
+        ',
+                'pager' => ''
               };
 my %areanames = (
   3021 => "Athens\/Piraeus\/Salamina",

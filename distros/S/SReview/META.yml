@@ -21,6 +21,7 @@ no_index:
 requires:
   Mojo::JSON: '0'
   Mojo::Pg: '0'
+  Mojolicious::Plugin::OAuth2::Server: '0'
   Moose: '0'
-version: v0.4.0
+version: v0.4.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@ use warnings;
 use FindBin qw($Bin);
 use Test::More;
 use Data::Dumper;
-use_ok 'FASTX::Reader';
+use FASTX::Reader;
 my $seq = "$Bin/../data/test.fasta";
 
 # Check required input file
@@ -14,7 +14,7 @@ if (! -e $seq) {
 
 my $data = FASTX::Reader->new({ filename => "$seq" });
 
-print Dumper $data;
+
 # CHeck error status before requesting invalid sequence
 ok(! defined $data->{status} , "Object has no status (initial state)");
 ok(! defined $data->{message}, "Object stored error message (initial state)");

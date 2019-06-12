@@ -1,3 +1,8 @@
+0.79 Tue 11 Jun 2019 09:35:22 PM CEST
+ - Support aliasing scalars resolved as null or booleans (tinita)
+ - Add YAML::XS::LibYAML::libyaml_version() (tinita)
+ - Support standard !!int/!!float tags instead of dying (tinita)
+
 0.78 Sat 18 May 2019 06:35:21 PM CEST
  - Fix double free/core dump when Dump()ing binary data, see issue#91
    (tinita)

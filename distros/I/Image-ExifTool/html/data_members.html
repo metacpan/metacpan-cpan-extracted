@@ -103,6 +103,8 @@ value.</p>
 
 <tr><td>FILE_TYPE</td><td>Root file format type (JPEG, TIFF, RIFF, etc...)</td></tr>
 
+<tr><td>FileType</td><td>Actual identified file type</td></tr>
+
 <tr><td>FIRST_EXIF_POS</td><td>Position of first EXIF in file</td></tr>
 
 <tr><td>FMT_EXPR</td><td>The current advanced formatting expression when interpolating tag
@@ -126,6 +128,8 @@ value.</p>
 <tr><td>IN_RESOURCE</td><td>Flag indicates we are processing the resource fork of a Mac OS file</td></tr>
 
 <tr><td>IO_TAG_LIST</td><td>List for output of requested tags in proper case and order</td></tr>
+
+<tr><td>IsWriting</td><td>Flag set to indicate that metadata is being written to this file</td></tr>
 
 <tr><td>LIST_TAGS</td><td>Hash of tag keys by tagInfo reference for active list-type
     tags.  This hash is cleared at the start of processing for each directory.
@@ -244,6 +248,9 @@ value.</p>
 <tr><td>SAVE_NEW_VALUE</td><td>Hash of new value information which was overwritten after
     a call to SaveNewValues()</td></tr>
 
+<tr><td>SaveFormat</td><td>Hash reference to check which TIFF format types were used
+    in the file.  Valid only if the (undocumented) SaveFormat option is used.</td></tr>
+    
 <tr><td>SET_GROUP0</td><td>Value to use for family 0 group name when new tags
     are found</td></tr>
 

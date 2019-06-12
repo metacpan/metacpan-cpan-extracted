@@ -1,5 +1,5 @@
 package Test::DirectoryLayout;
-$Test::DirectoryLayout::VERSION = '0.001';
+$Test::DirectoryLayout::VERSION = '0.002';
 
 #ABSTRACT: Test directory layout for standard compliance
 
@@ -78,16 +78,44 @@ Test::DirectoryLayout - Test directory layout for standard compliance
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
     use Test::More;
-    use Test::DirectoryLayout;
+    use Test::DirectoryLayout qw(directory_layout_ok get_allowed_dirs set_allowed_dirs);
 
-    directory_layout_ok();
+    my $ok = directory_layout_ok();
+
+    my @allowed_dirs = qw(bin blib lib config doc t);
+    set_allowed_dirs(\@allowed_dirs);
+
+    my $allowed_dirs = get_allowed_dirs();
 
 =head1 DESCRIPTION
+
+This test module helps you to keep your project directory clean. It
+provides a test tool that can be used in your test suite to make sure
+only the allowed set of directories exists:
+
+    use Test::More;
+    use Test::DirectoryLayout qw(directory_layout_ok get_allowed_dirs set_allowed_dirs);
+
+    ok directory_layout_ok(), 'directory layout is ok';
+
+The predefined set of allowed directories looks like this:
+
+    my @allowed_dirs = qw(bin blib lib config doc t);
+
+You can set it using C<set_allowed_dirs>:
+
+    my @allowed_dirs = qw(bin blib lib config doc t);
+    set_allowed_dirs(\@allowed_dirs);
+
+You can get the set of currently allowed dirs by calling
+C<get_allowed_dirs>:
+
+    my $allowed_dirs = get_allowed_dirs();
 
 =head1 FUNCTIONS
 
@@ -106,21 +134,21 @@ Tests if the provided directory contains only allowed directories.
 
 If no name is provided the current directory is assumed.
 
-=over 4
-
-=item B<directory_layout_ok>
-
-=back
-
 =head1 SEE ALSO
 
 =over 4
 
-=item L<Test::Dir> for testing several attributes of a single directory.
+=item * 
 
-=item L<Test::Dirs> for comparing a directory with an existing directory.
+L<Test::Dir> for testing several attributes of a single directory.
 
-=item L<Test::Directory> for testing if creating and deleting
+=item *
+
+L<Test::Dirs> for comparing a directory with an existing directory.
+
+=item *
+
+L<Test::Directory> for testing if creating and deleting
 files and directories was performed as expected.
 
 =back
@@ -131,7 +159,7 @@ Gregor Goldbach <grg@perlservices.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gregor Goldbach.
+This software is copyright (c) 2019 by Gregor Goldbach.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

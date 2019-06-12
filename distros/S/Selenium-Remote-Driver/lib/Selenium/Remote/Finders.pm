@@ -1,5 +1,5 @@
 package Selenium::Remote::Finders;
-$Selenium::Remote::Finders::VERSION = '1.31';
+$Selenium::Remote::Finders::VERSION = '1.32';
 use strict;
 use warnings;
 
@@ -11,20 +11,20 @@ use namespace::clean;
 
 
 sub _build_find_by {
-    my ($self, $by) = @_;
+    my ( $self, $by ) = @_;
 
     return sub {
-        my ($driver, $locator) = @_;
+        my ( $driver, $locator ) = @_;
         my $strategy = $by;
 
         return try {
-            return $driver->find_element($locator, $strategy);
+            return $driver->find_element( $locator, $strategy );
         }
         catch {
             carp $_;
             return 0;
         };
-    }
+      }
 }
 
 1;
@@ -41,7 +41,7 @@ Selenium::Remote::Finders - Handle construction of generic parameter finders
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 DESCRIPTION
 

@@ -62,6 +62,7 @@ t/glob.t
 t/indent.t
 t/io-handle.t
 t/leak.t
+t/libyaml-version.t
 t/load-blessed.t
 t/load.t
 t/load_standard_tags.t

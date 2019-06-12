@@ -8,7 +8,7 @@
 
 package Mail::Server::IMAP4::Search;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Box::Search';
 

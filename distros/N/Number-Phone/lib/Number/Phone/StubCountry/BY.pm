@@ -22,23 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222638;
 
 my $formatters = [
                 {
                   'national_rule' => '8 $1',
                   'format' => '$1 $2',
-                  'leading_digits' => '800',
-                  'pattern' => '(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{3})',
+                  'leading_digits' => '800'
                 },
                 {
-                  'leading_digits' => '800',
+                  'national_rule' => '8 $1',
                   'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2,4})',
-                  'national_rule' => '8 $1'
+                  'leading_digits' => '800'
                 },
                 {
-                  'format' => '$1 $2-$3',
                   'leading_digits' => '
             1(?:
               5[169]|
@@ -59,56 +58,72 @@ my $formatters = [
               3[3-5]
             )
           ',
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})',
-                  'national_rule' => '8 0$1'
+                  'national_rule' => '8 0$1',
+                  'format' => '$1 $2-$3',
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})'
                 },
                 {
-                  'national_rule' => '8 0$1',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2-$3-$4',
                   'leading_digits' => '
             1(?:
               [56]|
               7[467]
             )|
             2[1-3]
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'national_rule' => '8 0$1',
+                  'format' => '$1 $2-$3-$4'
                 },
                 {
+                  'national_rule' => '8 0$1',
                   'format' => '$1 $2-$3-$4',
-                  'leading_digits' => '[1-4]',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
-                  'national_rule' => '8 0$1'
+                  'leading_digits' => '[1-4]'
                 },
                 {
-                  'national_rule' => '8 $1',
+                  'leading_digits' => '[89]',
                   'pattern' => '(\\d{3})(\\d{3,4})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[89]'
+                  'national_rule' => '8 $1'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(
-          (?:
-            810|
-            902
-          )\\d{7}
-        )',
                 'voip' => '249\\d{6}',
-                'mobile' => '
+                'fixed_line' => '
           (?:
-            2(?:
-              5[5-79]|
-              9[1-9]
+            1(?:
+              5(?:
+                1[1-5]|
+                [24]\\d|
+                6[2-4]|
+                9[1-7]
+              )|
+              6(?:
+                [235]\\d|
+                4[1-7]
+              )|
+              7\\d\\d
             )|
-            (?:
-              33|
-              44
-            )\\d
-          )\\d{6}
+            2(?:
+              1(?:
+                [246]\\d|
+                3[0-35-9]|
+                5[1-9]
+              )|
+              2(?:
+                [235]\\d|
+                4[0-8]
+              )|
+              3(?:
+                [26]\\d|
+                3[02-79]|
+                4[024-7]|
+                5[03-7]
+              )
+            )
+          )\\d{5}
         ',
-                'pager' => '',
                 'geographic' => '
           (?:
             1(?:
@@ -143,6 +158,12 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'specialrate' => '(
+          (?:
+            810|
+            902
+          )\\d{7}
+        )',
                 'toll_free' => '
           800\\d{3,7}|
           8(?:
@@ -150,41 +171,20 @@ my $validators = {
             20\\d
           )\\d{7}
         ',
-                'personal_number' => '',
-                'fixed_line' => '
+                'mobile' => '
           (?:
-            1(?:
-              5(?:
-                1[1-5]|
-                [24]\\d|
-                6[2-4]|
-                9[1-7]
-              )|
-              6(?:
-                [235]\\d|
-                4[1-7]
-              )|
-              7\\d\\d
-            )|
             2(?:
-              1(?:
-                [246]\\d|
-                3[0-35-9]|
-                5[1-9]
-              )|
-              2(?:
-                [235]\\d|
-                4[0-8]
-              )|
-              3(?:
-                [26]\\d|
-                3[02-79]|
-                4[024-7]|
-                5[03-7]
-              )
-            )
-          )\\d{5}
-        '
+              5[5-79]|
+              9[1-9]
+            )|
+            (?:
+              33|
+              44
+            )\\d
+          )\\d{6}
+        ',
+                'personal_number' => '',
+                'pager' => ''
               };
 my %areanames = (
   3751511 => "Vyalikaya\ Byerastavitsa\,\ Grodno\ Region",

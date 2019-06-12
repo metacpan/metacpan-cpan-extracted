@@ -22,23 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '[1-59]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
-                'voip' => '',
-                'mobile' => '9\\d{8}',
-                'pager' => '',
-                'geographic' => '
+                'fixed_line' => '
           (?:
             11(?:
               1(?:
@@ -74,7 +70,7 @@ my $validators = {
                 5[0-4]
               )|
               6(?:
-                18|
+                1[78]|
                 2[69]|
                 39|
                 4[5-7]|
@@ -159,9 +155,8 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'toll_free' => '',
-                'personal_number' => '',
-                'fixed_line' => '
+                'voip' => '',
+                'geographic' => '
           (?:
             11(?:
               1(?:
@@ -197,7 +192,7 @@ my $validators = {
                 5[0-4]
               )|
               6(?:
-                18|
+                1[78]|
                 2[69]|
                 39|
                 4[5-7]|
@@ -281,7 +276,12 @@ my $validators = {
               )
             )
           )\\d{4}
-        '
+        ',
+                'specialrate' => '',
+                'personal_number' => '',
+                'toll_free' => '',
+                'mobile' => '9\\d{8}',
+                'pager' => ''
               };
 my %areanames = (
   25111111 => "Arada\ I\,\ Addis\ Ababa",
@@ -359,7 +359,7 @@ my %areanames = (
   25111552 => "Filwha\ VI\,\ Addis\ Ababa",
   25111553 => "Filwha\ V\,\ Addis\ Ababa",
   25111554 => "Filwha\ VII\,\ Addis\ Ababa",
-  2511161 => "Bole\ I\,\ Addis\ Ababa",
+  25111618 => "Bole\ I\,\ Addis\ Ababa",
   25111626 => "Bole\ Michael\,\ Addis\ Ababa",
   25111629 => "Gerji\,\ Addis\ Ababa",
   25111645 => "Yeka\ I\,\ Addis\ Ababa",

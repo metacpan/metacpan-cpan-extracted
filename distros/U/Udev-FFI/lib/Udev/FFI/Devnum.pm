@@ -34,7 +34,7 @@ sub makedev {
 
 
 
-sub mkdev { #2017-12-19
+sub mkdev { # 2017-12-19
     warn "mkdev is deprecated, use makedev instead\n";
     return makedev(@_);
 }
@@ -67,15 +67,15 @@ This module provides major, minor and  makedev functions.
 
 =head1 FUNCTIONS
 
-=head2  major( DEVNUM )
+=head2 major( DEVNUM )
 
 Return major ID.
 
-=head2  minor( DEVNUM )
+=head2 minor( DEVNUM )
 
 Return minor ID.
 
-=head2  makedev( MAJOR, MINOR )
+=head2 makedev( MAJOR, MINOR )
 
 Return device number.
 

@@ -9,11 +9,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.78
+Version 0.79
 
 =cut
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 =head1 SYNOPSIS
 
@@ -156,6 +156,23 @@ sub parse_source {
             };
 
             next LINE;
+        }
+        elsif ( $line =~ m{ \A \s* (Planning|Execution) \s+ time: \s+ (\d+\.\d+) \s+ ms \s* \z }xmsi ) {
+            my ( $type, $time ) = ( $1, $2 );
+            next unless $top_node;
+            $top_node->planning_time( $2 )  if 'planning' eq lc( $type );
+            $top_node->execution_time( $2 ) if 'execution' eq lc( $type );
+        }
+        elsif ( $line =~ m{ \A \s* Trigger \s+ (.*) : \s+ time=(\d+\.\d+) \s+ calls=(\d+) \s* \z }xmsi ) {
+            my ( $name, $time, $calls ) = ( $1, $2, $3 );
+            next unless $top_node;
+            $top_node->add_trigger_time(
+                {
+                    'name'  => $name,
+                    'time'  => $time,
+                    'calls' => $calls,
+                }
+            );
         }
         elsif ( $line =~ m{ \A (\s*) ( \S .* \S ) \s* \z }xms ) {
             my ( $infoprefix, $info ) = ( $1, $2 );

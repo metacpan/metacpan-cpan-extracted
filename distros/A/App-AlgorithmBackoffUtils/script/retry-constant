@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/AlgorithmBackoffUtils/retry_constant
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-06-05'; # DATE
+our $DATE = '2019-06-07'; # DATE
 our $DIST = 'App-AlgorithmBackoffUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,13 @@ retry-constant - Retry a command with constant delay backoff
 
 =head1 VERSION
 
-This document describes version 0.001 of retry-constant (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-05.
+This document describes version 0.002 of retry-constant (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-07.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % retry-constant [options] <command>
+ % retry-constant [options] <command> ...
 
 =head1 OPTIONS
 
@@ -63,6 +63,39 @@ See C<--command>.
 =item B<--command>=I<s@>*
 
 Can be specified multiple times.
+
+=item B<--delay>=I<s>*
+
+Number of seconds to wait after a failure.
+
+=item B<--retry-on>=I<s>
+
+Comma-separated list of exit codes that should trigger retry.
+
+By default, all non-zero exit codes will trigger retry.
+
+
+=item B<--skip-delay>, B<-D>
+
+Do not delay at all.
+
+Useful for testing, along with --dry-run, when you just want to see how the
+retries are done (the number of retries, along with the number of seconds of
+delays) by seeing the log messages, without actually delaying.
+
+
+=item B<--success-on>=I<s>
+
+Comma-separated list of exit codes that mean success.
+
+By default, only exit code 0 means success.
+
+
+=back
+
+=head2 Common to all algorithms options
+
+=over
 
 =item B<--consider-actual-delay>
 
@@ -85,10 +118,6 @@ Default value:
 
  0
 
-=item B<--delay>=I<s>*
-
-Number of seconds to wait after a failure.
-
 =item B<--jitter-factor>=I<s>
 
 How much to add randomness.
@@ -97,6 +126,8 @@ If you set this to a value larger than 0, the actual delay will be between a
 random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
 
 
 =item B<--max-actual-duration>=I<s>
@@ -129,29 +160,6 @@ single failure (i.e. no retry attempts). 2 means to retry once after a failure.
 Note that after a success, the number of attempts is reset (as expected). So if
 max_attempts is 3, and if you fail twice then succeed, then on the next failure
 the algorithm will retry again for a maximum of 3 times.
-
-
-=item B<--retry-on>=I<s>
-
-Comma-separated list of exit codes that should trigger retry.
-
-By default, all non-zero exit codes will trigger retry.
-
-
-=item B<--skip-delay>, B<-D>
-
-Do not delay at all.
-
-Useful for testing, along with --dry-run, when you just want to see how the
-retries are done (the number of retries, along with the number of seconds of
-delays) by seeing the log messages, without actually delaying.
-
-
-=item B<--success-on>=I<s>
-
-Comma-separated list of exit codes that mean success.
-
-By default, only exit code 0 means success.
 
 
 =back

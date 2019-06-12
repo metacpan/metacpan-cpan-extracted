@@ -22,43 +22,43 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
                   'intl_format' => 'NA',
-                  'leading_digits' => '[1-9]',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{3})',
+                  'leading_digits' => '[1-9]'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '[28]',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 },
                 {
                   'leading_digits' => '[79]',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{2})(\\d{7})',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'specialrate' => '',
+                'toll_free' => '800\\d{6}',
                 'mobile' => '
           (?:
             76|
             9[5-8]
           )\\d{7}
         ',
-                'geographic' => '21[1-8]\\d{6}',
-                'pager' => '',
                 'personal_number' => '',
-                'toll_free' => '800\\d{6}',
-                'fixed_line' => '21[1-8]\\d{6}'
+                'pager' => '',
+                'voip' => '',
+                'fixed_line' => '21[1-8]\\d{6}',
+                'geographic' => '21[1-8]\\d{6}',
+                'specialrate' => ''
               };
 my %areanames = (
   260211 => "Lusaka\ Province",

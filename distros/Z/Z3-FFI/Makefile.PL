@@ -29,11 +29,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Exporter" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "Package::Stash" => 0,
+    "Test::More" => 0,
+    "lib" => 0,
+    "namespace::autoclean" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,15 +48,19 @@ my %FallbackPrereqs = (
   "Alien::Z3" => "0.001",
   "Carp" => 0,
   "Data::Dumper" => 0,
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "FFI::CheckLib" => 0,
   "FFI::Platypus" => "0.87",
   "FFI::Platypus::API" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,
+  "Package::Stash" => 0,
   "Path::Tiny" => 0,
   "Test::More" => 0,
   "constant" => 0,
+  "lib" => 0,
+  "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0
 );

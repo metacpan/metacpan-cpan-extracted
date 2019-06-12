@@ -1,0 +1,515 @@
+<?xml version="1.0" ?>
+<root>
+  <Header>
+    <system>BiosynML</system>
+    <version>1.0</version>
+    <date action="created">06.09.2018</date>
+    <date action="modified">06.09.2018</date>
+    <author>antismash</author>
+    <description>Output from antismash analysis</description>
+  </Header>
+  <domainlist>
+    <domain id="1">
+      <nodeid>1</nodeid>
+      <function>KS</function>
+      <subtype/>
+      <dstatus>active</dstatus>
+      <label>KS</label>
+      <chemistry>condensation</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">1</geneid>
+          <position>
+            <begin>0</begin>
+            <end>1308</end>
+          </position>
+        </gene>
+        <protein>
+          <name>SEQ1_KS</name>
+          <sequence>MACRLPGGIDKPLDLWDHVRAGRSSATAIPKDRFNAENFLSMDPNQKGAQAFRGAHFVKRDIKQFDHKFFGISKDTATAMDPQQKQLLEVVYECLESANISMETISKSKIGCYCAMFVSDYHDMLMQDPEYLPTFIAIGTTRTMLANRISHALDLGGPSVTIDTACSGALVALHLACQALQAGECDGAVIGASNLFLSPDYALSLTRLGAIAADGQCKTFDASANGYGRGEGTNAVYVKRLSDAIRDGDSIRAVIRGTSSNRFVCSVLIQDSDTNSFSSGATPAITEPSGRAQADTILQAYAQAGINDFSETGYFECHGTGTPVGDCIELGAVGSVFSESHKTQDALWVGSTKPNVGHSEAASGLSSLIKVVLALEKGEIPPNTNYKTPNPKIDFDGWRVRVPTAPQPWPSKSIRRASVNSLGIGGSTAHAVVEVY</sequence>
+          <position>
+            <begin>0</begin>
+            <end>436</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="2">
+      <nodeid>2</nodeid>
+      <function>AT</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>AT</label>
+      <chemistry>acyl transfer</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">1</geneid>
+          <position>
+            <begin>1713</begin>
+            <end>2214</end>
+          </position>
+        </gene>
+        <protein>
+          <name>SEQ1_AT</name>
+          <sequence>FTGQGAMWSQMGKRLLDAFPVARNSLYNLEEVLRELQSSKTPTWSLIDKLTNELSQEEIDSPALAHPLSMAVQIALTDVLSSWGVLPDGVVGHSGGETAAAYACGALTAKEAIAVAYYRGIACQNAPSGAMLATRSAPKAKELKDALEAKRCADCFAFNGPQNLTLA</sequence>
+          <position>
+            <begin>571</begin>
+            <end>738</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="3">
+      <nodeid>3</nodeid>
+      <function>DH</function>
+      <subtype>DHt</subtype>
+      <dstatus>active</dstatus>
+      <label>DH</label>
+      <chemistry>dehydration</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">1</geneid>
+          <position>
+            <begin>2598</begin>
+            <end>3132</end>
+          </position>
+        </gene>
+        <protein>
+          <name>SEQ1_DH</name>
+          <sequence>HEILGSRCRGVNPSAPTWRNKVSIEDAPWLVDHQVNGIVTFSFTTGIAMVVEAMMQVQEENKEIDWANHSFELQDFVFSNSIILPDESPIDLFLTLIPDNDNAKSEETWYDFTISSLRGDVDIRHCHGRAAVLETSKDNVALRRRTSWHHMPLKVPLKSYYKTLERVGYGYGPKFQLL</sequence>
+          <position>
+            <begin>866</begin>
+            <end>1044</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="4">
+      <nodeid>4</nodeid>
+      <function>MT</function>
+      <subtype/>
+      <dstatus>active</dstatus>
+      <label>MT</label>
+      <chemistry>methyl transfer</chemistry>
+      <substrate>intermediate,building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">1</geneid>
+          <position>
+            <begin>3957</begin>
+            <end>4500</end>
+          </position>
+        </gene>
+        <protein>
+          <name>SEQ1_MT</name>
+          <sequence>YEESIFTTSMNQKLLSVAELLAHKNPNMRILEIGAGTGGATTELLRGFSKAGGKNAYQSFTFTDISAGFFDKAKKKFAQWDRIEFKTLDVEKDIAEQGFTEKYDLVVAANVLHATADLPFAMKNIRSLLRDDGYLLVGELSEDLTSANFLWGPLTGWWLRPRSPGRSGPGLTLDEWRDELA</sequence>
+          <position>
+            <begin>1319</begin>
+            <end>1500</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="5">
+      <nodeid>5</nodeid>
+      <function>ER</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>ER</label>
+      <chemistry>enoylreduction</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">1</geneid>
+          <position>
+            <begin>5229</begin>
+            <end>6147</end>
+          </position>
+        </gene>
+        <protein>
+          <name>SEQ1_ER</name>
+          <sequence>GILESLTMAQDDAYTAIPDGHVLVEVKAVGLNERDGFIAQGSLPATSFGRECSGVVTSCGANVASFSPGDRVAVIGQGTFTTQYLAPSNCCRKIPDWLSFEDAAAIPTSFVTALYALTTPARVSTGQKILIANASSTQGVALIKIATALKLDVYAAISDATNKPLLTRLGLHSAKIFVNPTNTSRSSVSRSTTFQAYKLVLNTKSGQYADFAHLVANRGTYIEIASGETSGDEVYLAPNKNVMFASVDLADAYQEDKQDLGDLLDQVIDWVEKREIDVDTSVSVTGLDSIQSAFSSLVEGNQQKQV</sequence>
+          <position>
+            <begin>1743</begin>
+            <end>2049</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="6">
+      <nodeid>6</nodeid>
+      <function>KR</function>
+      <dstatus>active</dstatus>
+      <label>KR</label>
+      <chemistry>ketoreduction</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">1</geneid>
+          <position>
+            <begin>6219</begin>
+            <end>6732</end>
+          </position>
+        </gene>
+        <protein>
+          <name>SEQ1_KR</name>
+          <sequence>KTYIITGGLGGLGRAISVWMASYGARHIILATSSVARASESGDLLQQLSSYGCNGRVEVCDVGDPEAVERLVASIDTPVGGVIHSALKLSDITLEDFDAVFGPKVNGSLNLHNSLINQDLDFFVMLSSGCGVLGNEGQSNYAASSTFLDTFARYRQSLGLPASSVDLGFVE</sequence>
+          <position>
+            <begin>2073</begin>
+            <end>2244</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+  </domainlist>
+  <genelist>
+    <gene id="1">
+      <gene_name>seq1</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>1</begin>
+        <end>7359</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="aSProdPred" ori="auto-annotation" style="genbank">p</qualifier>
+        <qualifier name="aSProdPred" ori="auto-annotation" style="genbank">k</qualifier>
+        <qualifier name="product" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="smCOG" ori="auto-annotation" style="genbank">SMCOG1022:Beta-ketoacyl_synthase (Score: 210.5; E-value: 7.3e-64);</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Type: t1pks</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Domains detected: PP-binding (E-value: 3.6e-10, bitscore: 26.5, seeds: 164); PKS_AT (E-value: 8.4e-45, bitscore: 139.5, seeds: 1682); itr_KS (E-value: 4.9e-166, bitscore: 538.7, seeds: 96); adh_short (E-value: 5.6e-47, bitscore: 146.1, seeds: 230)</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Kind: biosynthetic</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS subtype: Type I Iterative PKS</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PKS_KS (0-436). E-value: 9.5e-157. Score: 513.8;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PKS_AT (571-738). E-value: 3.9e-43. Score: 139.5; Substrate specificity predictions: N/A (PKS signature), mmal (Minowa), pk (consensus);</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PKS_DH (866-1044). E-value: 3e-21. Score: 68.0;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: cMT (1319-1500). E-value: 4.6e-60. Score: 194.4;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PKS_ER (1743-2049). E-value: 4.8e-61. Score: 198.1;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PKS_KR (2073-2244). E-value: 1e-50. Score: 163.8; Predicted KR activity: inactive; Predicted KR stereochemistry: C2;</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MACRLPGGIDKPLDLWDHVRAGRSSATAIPKDRFNAENFLSMDPNQKGAQAFRGAHFVKRDIKQFDHKFFGISKDTATAMDPQQKQLLEVVYECLESANISMETISKSKIGCYCAMFVSDYHDMLMQDPEYLPTFIAIGTTRTMLANRISHALDLGGPSVTIDTACSGALVALHLACQALQAGECDGAVIGASNLFLSPDYALSLTRLGAIAADGQCKTFDASANGYGRGEGTNAVYVKRLSDAIRDGDSIRAVIRGTSSNRFVCSVLIQDSDTNSFSSGATPAITEPSGRAQADTILQAYAQAGINDFSETGYFECHGTGTPVGDCIELGAVGSVFSESHKTQDALWVGSTKPNVGHSEAASGLSSLIKVVLALEKGEIPPNTNYKTPNPKIDFDGWRVRVPTAPQPWPSKSIRRASVNSLGIGGSTAHAVVEVYEPPHLTNGSTNGANGVNGTHSTNGTNGVNGVNGHHEEGEKSNDPYFLLFTSGASKSSRETNEQNLLEFLKTHEECKSLTSPLVKALNARSQINIRPWKSFAVAQSVDDLIQQLETNALKVGTGPTSGDSPRVLFTFTGQGAMWSQMGKRLLDAFPVARNSLYNLEEVLRELQSSKTPTWSLIDKLTNELSQEEIDSPALAHPLSMAVQIALTDVLSSWGVLPDGVVGHSGGETAAAYACGALTAKEAIAVAYYRGIACQNAPSGAMLATRSAPKAKELKDALEAKRCADCFAFNGPQNLTLAVLYTDAVTLALTSSDRKFDLCVELGPHSLLSRPTSEIVKSLPNPPQLPFFATMLRNADSSQQLMSLAGDLVLNGKKLDLDQVNKIAGKTGRLPNHLQDNLPAYAWDYSSTPWTEPRNSQEWRFRKSPRHEILGSRCRGVNPSAPTWRNKVSIEDAPWLVDHQVNGIVTFSFTTGIAMVVEAMMQVQEENKEIDWANHSFELQDFVFSNSIILPDESPIDLFLTLIPDNDNAKSEETWYDFTISSLRGDVDIRHCHGRAAVLETSKDNVALRRRTSWHHMPLKVPLKSYYKTLERVGYGYGPKFQLLNEVRVRPSLSACSAKIDMTSTAQSPVPGQRYLLHPAMMDAALQTPALANRSGYFQEIDTLLLPSKMKRISIRMPAENTDVASCTTNTSPVGFSRIQGSVECYDSLSRPFFVVEGLQMDRATSDDNTTLPWLRLTWKPDIGDISSSDPMLSSIKIQSLPAEKKLVNLENLVKELIPLIVENGIEKGKDLAPHLLSYHSWFLDQAELHKDLLAARHKQQNGFATVQDAIMNVVANSGISQTVDASIVSQLAINMSKIFRGEVEALAVWLENDLLYRFYEESIFTTSMNQKLLSVAELLAHKNPNMRILEIGAGTGGATTELLRGFSKAGGKNAYQSFTFTDISAGFFDKAKKKFAQWDRIEFKTLDVEKDIAEQGFTEKYDLVVAANVLHATADLPFAMKNIRSLLRDDGYLLVGELSEDLTSANFLWGPLTGWWLRPRSPGRSGPGLTLDEWRDELAADFDSVSEIEAKHDKSDTDQLSSTIVMIARAKPVEYTPPKPLSEEKVHIAGVGGDLSTRDHLQKYLGTRGISASSSTLEDLASREWSGEWLILVDEAEGSFLASLQQEQLIALKSWLTKPIKCIWVTRKVYLDPQNTTGGLVTGFARTLRGENSQCQLYTLDLSSDGDITANVIYHVLERAHYSHDDPISRLDYEIAEKDGQLWTCRLVNDALLENAYGPARKMDAPSTQVVKAPHHLIMGEVGILESLTMAQDDAYTAIPDGHVLVEVKAVGLNERDGFIAQGSLPATSFGRECSGVVTSCGANVASFSPGDRVAVIGQGTFTTQYLAPSNCCRKIPDWLSFEDAAAIPTSFVTALYALTTPARVSTGQKILIANASSTQGVALIKIATALKLDVYAAISDATNKPLLTRLGLHSAKIFVNPTNTSRSSVSRSTTFQAYKLVLNTKSGQYADFAHLVANRGTYIEIASGETSGDEVYLAPNKNVMFASVDLADAYQEDKQDLGDLLDQVIDWVEKREIDVDTSVSVTGLDSIQSAFSSLVEGNQQKQVVSLTNSDDQQLIKTRPKTSRFNPHKTYIITGGLGGLGRAISVWMASYGARHIILATSSVARASESGDLLQQLSSYGCNGRVEVCDVGDPEAVERLVASIDTPVGGVIHSALKLSDITLEDFDAVFGPKVNGSLNLHNSLINQDLDFFVMLSSGCGVLGNEGQSNYAASSTFLDTFARYRQSLGLPASSVDLGFVEDVGNISERPEIQASLLSRGLRPITVRDVLRVVEGAIATGSPKNPNINDSIYDSFVQSQIVLSFGMIDKATAEYQSWAQDAKFGLLRSRAADNAALDSDADSGESAVQTAVKAFRNTLGRLGDAPEGKEAALQPFVCTALVAKLAQVLSIKVADIQPSRSAIQYGMDSLIAIEVRSWARYAFQIDLPINDLTNPYSIQDLSARVSRMIVG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+  </genelist>
+  <motiflist>
+    <motif domainID="1" geneID="1" id="1">
+      <motif_name>PKSI-KS_m3</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>468</begin>
+        <end>515</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KS_m3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.40E-05</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0001</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-KS_m3 (e-value: 1.4e-05; bit-score: 17.2)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">17.2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KS_m3</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="1" geneID="1" id="2">
+      <motif_name>PKSI-KS_m4</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>657</begin>
+        <end>695</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KS_m4</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">4.90E-04</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0002</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-KS_m4 (e-value: 0.00049; bit-score: 13.2)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">13.2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KS_m4</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="1" geneID="1" id="3">
+      <motif_name>PKSI-KS_m5</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>939</begin>
+        <end>986</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KS_m5</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.10E-03</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0003</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-KS_m5 (e-value: 0.0011; bit-score: 11.5)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">11.5</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KS_m5</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="0" geneID="1" id="4">
+      <motif_name>PKSI-AT-mM_m1</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1707</begin>
+        <end>1760</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-AT-mM_m1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.90E-03</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0004</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-AT-mM_m1 (e-value: 0.0019; bit-score: 11.1)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">11.1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-AT-mM_m1</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="2" geneID="1" id="5">
+      <motif_name>PKSI-AT-mM_m3</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1962</begin>
+        <end>2063</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-AT-mM_m3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">5.30E-09</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0005</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-AT-mM_m3 (e-value: 5.3e-09; bit-score: 28.6)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">28.6</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-AT-mM_m3</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="3" geneID="1" id="6">
+      <motif_name>PKSI-DH_m2</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>2682</begin>
+        <end>2759</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-DH_m2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.10E-03</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0006</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-DH_m2 (e-value: 0.0011; bit-score: 11.6)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">11.6</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-DH_m2</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="5" geneID="1" id="7">
+      <motif_name>PKSI-ER_m2</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>5370</begin>
+        <end>5408</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-ER_m2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.00E-03</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0007</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-ER_m2 (e-value: 0.001; bit-score: 12.0)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">12.0</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-ER_m2</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="5" geneID="1" id="8">
+      <motif_name>PKSI-ER_m4</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>5535</begin>
+        <end>5579</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-ER_m4</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">3.60E-03</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0008</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-ER_m4 (e-value: 0.0036; bit-score: 10.9)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">10.9</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-ER_m4</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="5" geneID="1" id="9">
+      <motif_name>PKSI-ER_m5</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>5604</begin>
+        <end>5666</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-ER_m5</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">6.70E-04</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0009</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-ER_m5 (e-value: 0.00067; bit-score: 12.4)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">12.4</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-ER_m5</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="0" geneID="1" id="10">
+      <motif_name>PKSI-KR_m1</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>6222</begin>
+        <end>6311</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KR_m1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">2.30E-14</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0010</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-KR_m1 (e-value: 2.3e-14; bit-score: 45.9)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">45.9</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KR_m1</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="6" geneID="1" id="11">
+      <motif_name>PKSI-KR_m4</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>6576</begin>
+        <end>6686</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">seq1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KR_m4</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">2.10E-19</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_seq1_0011</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-KR_m4 (e-value: 2.1e-19; bit-score: 62.1)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">62.1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KR_m4</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+  </motiflist>
+  <Sequencelist>
+    <source id="1">
+      <label>Protein_Input</label>
+      <Sequence>nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn</Sequence>
+    </source>
+  </Sequencelist>
+  <model id="1">
+    <title>Biosynthetic pathway1</title>
+    <confidence>Sequence-based prediction</confidence>
+    <generator>antiSMASH</generator>
+    <label>model 1</label>
+    <organism>
+      <name></name>
+      <strain> </strain>
+      <identifier source=" "> </identifier>
+      <status></status>
+    </organism>
+    <compound>
+      <name> </name>
+      <identifier source=""> </identifier>
+      <status> </status>
+      <citation type=""></citation>
+    </compound>
+    <genecluster>
+      <name>Biosynthetic genecluster</name>
+      <shortname></shortname>
+      <status></status>
+      <type>t1pks</type>
+      <identifier source=""> </identifier>
+      <citation type=""></citation>
+      <sequence source="sequencelist">1</sequence>
+      <region>
+        <begin>1</begin>
+        <end>7359</end>
+      </region>
+    </genecluster>
+    <nodelist>
+      <node id="1">
+        <class>linkage</class>
+        <context>PKS</context>
+      </node>
+      <node id="2">
+        <class>activation</class>
+        <context>PKS</context>
+      </node>
+      <node id="3">
+        <class>modification</class>
+        <context>PKS</context>
+      </node>
+      <node id="4">
+        <class>modification</class>
+        <context>Unspecified</context>
+      </node>
+      <node id="5">
+        <class>modification</class>
+        <context>PKS</context>
+      </node>
+      <node id="6">
+        <class>modification</class>
+        <context>PKS</context>
+      </node>
+    </nodelist>
+  </model>
+</root>

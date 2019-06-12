@@ -2,8 +2,10 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use Test::More;
-use_ok 'FASTX::Reader';
+use FASTX::Reader;
 my $seq = "$Bin/../data/comments.fasta";
+
+# TEST: Retrieves sequence COMMENTS from a FASTA file
 
 # Check required input file
 if (! -e $seq) {
@@ -19,7 +21,7 @@ while ($seq = $data->getRead() ) {
 	my (undef, $len) = split /=/, $comment;
 
 	die "Comment in <$seq> is malformed: expecting len=INT but <$comment> found.\n" unless ($len > 0);
-	ok( $len = length($seq->{seq}), "[FASTA COMMENT] Able to parse the comment: $len bp in header matches sequence length");
+	ok( $len = length($seq->{seq}), "[FASTA COMMENT] Comment parsed: $len bp in comment matches sequence length");
 }
 
 done_testing();

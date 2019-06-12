@@ -12,6 +12,7 @@ WriteMakefile(
 		'Mojo::JSON' => 0,
 		'Mojo::Pg' => 0,
 		'Moose' => 0,
+		'Mojolicious::Plugin::OAuth2::Server' => 0,
 	},
 	TEST_REQUIRES => {
 		'Test::More' => 0,
@@ -23,6 +24,7 @@ WriteMakefile(
 		'scripts/sreview-dispatch',
 		'scripts/sreview-skip',
 		'scripts/sreview-user',
+		'scripts/sreview-encode',
 		'scripts/notify/sreview-notify',
 		'scripts/upload/sreview-upload',
 		'scripts/transcode/sreview-transcode',

@@ -22,20 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'leading_digits' => '75[12]',
+                  'national_rule' => '0$1',
                   'format' => '$1',
                   'pattern' => '(\\d{5})',
                   'intl_format' => 'NA',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '75[12]'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{4,9})',
-                  'format' => '$1 $2',
                   'leading_digits' => '
             [2568][1-8]|
             3(?:
@@ -43,16 +40,18 @@ my $formatters = [
               [1-9]
             )|
             9
-          '
+          ',
+                  'format' => '$1 $2',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{4,9})'
                 },
                 {
-                  'intl_format' => 'NA',
                   'pattern' => '(\\d{6})',
                   'format' => '$1',
+                  'intl_format' => 'NA',
                   'leading_digits' => '11'
                 },
                 {
-                  'format' => '$1 $2',
                   'leading_digits' => '
             (?:
               [12]0|
@@ -61,31 +60,27 @@ my $formatters = [
             [368]
           ',
                   'pattern' => '(\\d{3})(\\d{3,7})',
+                  'format' => '$1 $2',
                   'national_rule' => '0$1'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{4,8})',
-                  'leading_digits' => '[12457]',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[12457]'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
+                'personal_number' => '',
                 'mobile' => '
           (?:
             4[0-8]|
             50
           )\\d{4,8}
         ',
-                'pager' => '',
-                'geographic' => '
-          (?:
-            1[3-79][1-8]|
-            [235689][1-8]\\d
-          )\\d{2,6}
-        ',
-                'voip' => '',
+                'toll_free' => '800\\d{4,6}',
                 'specialrate' => '([67]00\\d{5,6})|(
           (?:
             10|
@@ -104,14 +99,19 @@ my $validators = {
           )|
           20[2-59]\\d\\d
         )',
+                'geographic' => '
+          (?:
+            1[3-79][1-8]|
+            [235689][1-8]\\d
+          )\\d{2,6}
+        ',
                 'fixed_line' => '
           (?:
             1[3-79][1-8]|
             [235689][1-8]\\d
           )\\d{2,6}
         ',
-                'personal_number' => '',
-                'toll_free' => '800\\d{4,6}'
+                'voip' => ''
               };
 my %areanames = (
   35813 => "North\ Karelia",

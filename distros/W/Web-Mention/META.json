@@ -1,10 +1,10 @@
 {
    "abstract" : "Implementation of the IndieWeb Webmention protocol",
    "author" : [
-      "$author = $wm->author;"
+      "Jason McIntosh (jmac@jmac.org)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.17",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "mit"
    ],
@@ -42,10 +42,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "DateTime" : "0",
             "Encode" : "0",
             "HTTP::Link" : "0",
             "LWP" : "0",
+            "LWP::Protocol::https" : "0",
             "List::Util" : "0",
             "Mojo::DOM58" : "0",
             "Moose" : "0",
@@ -53,12 +55,13 @@
             "MooseX::Enumeration" : "0",
             "MooseX::Types::URI" : "0",
             "Path::Class::Dir" : "0",
+            "Readonly" : "0",
             "Scalar::Util" : "0",
             "String::Truncate" : "0",
             "Try::Tiny" : "0",
             "Types::Standard" : "0",
             "URI::Escape" : "0",
-            "Web::Microformats2" : "0.3",
+            "Web::Microformats2" : "0.5",
             "perl" : "v5.10.0"
          }
       },
@@ -75,7 +78,7 @@
    "provides" : {
       "Web::Mention" : {
          "file" : "lib/Web/Mention.pm",
-         "version" : "0.501"
+         "version" : "0.701"
       },
       "Web::Mention::Author" : {
          "file" : "lib/Web/Mention/Author.pm"
@@ -92,10 +95,11 @@
          "web" : "https://github.com/jmacdotorg/webmention-perl"
       }
    },
-   "version" : "0.501",
+   "version" : "0.701",
    "x_contributors" : [
       "Jason McIntosh <jmac@jmac.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
 }

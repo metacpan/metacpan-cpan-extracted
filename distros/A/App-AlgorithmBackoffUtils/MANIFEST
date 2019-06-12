@@ -8,9 +8,11 @@ Makefile.PL
 README
 dist.ini
 lib/App/AlgorithmBackoffUtils.pm
+script/retry
 script/retry-constant
 script/retry-exponential
 script/retry-fibonacci
+script/show-backoff-delays
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

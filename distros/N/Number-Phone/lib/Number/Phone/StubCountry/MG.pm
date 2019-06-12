@@ -22,35 +22,23 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{2})',
                   'leading_digits' => '[23]',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{2})'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
+                'mobile' => '3[2-49]\\d{7}',
                 'toll_free' => '',
                 'personal_number' => '',
-                'fixed_line' => '
-          2072[29]\\d{4}|
-          20(?:
-            2\\d|
-            4[47]|
-            5[3467]|
-            6[279]|
-            7[35]|
-            8[268]|
-            9[245]
-          )\\d{5}
-        ',
                 'specialrate' => '',
-                'voip' => '22\\d{7}',
-                'mobile' => '3[2-49]\\d{7}',
                 'geographic' => '
           2072[29]\\d{4}|
           20(?:
@@ -63,7 +51,19 @@ my $validators = {
             9[245]
           )\\d{5}
         ',
-                'pager' => ''
+                'voip' => '22\\d{7}',
+                'fixed_line' => '
+          2072[29]\\d{4}|
+          20(?:
+            2\\d|
+            4[47]|
+            5[3467]|
+            6[279]|
+            7[35]|
+            8[268]|
+            9[245]
+          )\\d{5}
+        '
               };
 my %areanames = (
   2612022 => "Antananarivo",

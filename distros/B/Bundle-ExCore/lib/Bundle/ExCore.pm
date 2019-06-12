@@ -1,8 +1,9 @@
 package Bundle::ExCore;
 
 use strict;
+use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 1;
 
@@ -23,6 +24,8 @@ Bundle::ExCore::Perl5012
 Bundle::ExCore::Perl5018
 
 Bundle::ExCore::Perl5020
+
+Bundle::ExCore::Perl5030
 
 =head1 DESCRIPTION
 
@@ -60,6 +63,8 @@ L<Bundle::ExCore::Perl5018>
 
 L<Bundle::ExCore::Perl5020>
 
+L<Bundle::ExCore::Perl5030>
+
 L<Module::CoreList>
 
 =head1 BUGS AND LIMITATIONS
@@ -73,10 +78,10 @@ Martin Becker, E<lt>mhasch@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Martin Becker.  All rights reserved.
+Copyright (c) 2015-2019 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.20.2 or,
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

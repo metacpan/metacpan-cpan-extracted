@@ -22,29 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'pattern' => '(\\d{5})(\\d{4})',
+                  'format' => '$1-$2',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             5(?:
               29|
               38
             )[89]
-          ',
-                  'format' => '$1-$2'
+          '
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '5[45]',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '5[45]'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{4})(\\d{5})',
                   'leading_digits' => '
             5(?:
               2[2-489]|
@@ -53,48 +51,28 @@ my $formatters = [
             )|
             892
           ',
-                  'format' => '$1-$2'
+                  'format' => '$1-$2',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{4})(\\d{5})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'leading_digits' => '8',
                   'format' => '$1-$2',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{7})'
                 },
                 {
-                  'format' => '$1-$2',
                   'leading_digits' => '[5-7]',
                   'pattern' => '(\\d{3})(\\d{6})',
+                  'format' => '$1-$2',
                   'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '80\\d{7}',
+                'pager' => '',
                 'personal_number' => '',
-                'fixed_line' => '
-          5(?:
-            2(?:
-              [015-79]\\d|
-              2[02-9]|
-              3[2-57]|
-              4[2-8]|
-              8[235-7]
-            )|
-            3(?:
-              [0-48]\\d|
-              [57][2-9]|
-              6[2-8]|
-              9[3-9]
-            )|
-            (?:
-              4[067]|
-              5[03]
-            )\\d
-          )\\d{5}
-        ',
-                'specialrate' => '(89\\d{7})',
-                'voip' => '5924[01]\\d{4}',
+                'toll_free' => '80\\d{7}',
                 'mobile' => '
           (?:
             6(?:
@@ -102,9 +80,9 @@ my $validators = {
               8[0-247-9]
             )|
             7(?:
-              0[067]|
+              0[06-8]|
               6[1267]|
-              7[017]
+              7[0-27]
             )
           )\\d{6}
         ',
@@ -129,7 +107,29 @@ my $validators = {
             )\\d
           )\\d{5}
         ',
-                'pager' => ''
+                'specialrate' => '(89\\d{7})',
+                'voip' => '5924[01]\\d{4}',
+                'fixed_line' => '
+          5(?:
+            2(?:
+              [015-79]\\d|
+              2[02-9]|
+              3[2-57]|
+              4[2-8]|
+              8[235-7]
+            )|
+            3(?:
+              [0-48]\\d|
+              [57][2-9]|
+              6[2-8]|
+              9[3-9]
+            )|
+            (?:
+              4[067]|
+              5[03]
+            )\\d
+          )\\d{5}
+        '
               };
 my %areanames = (
   212520 => "Casablanca",

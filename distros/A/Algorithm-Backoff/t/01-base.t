@@ -86,6 +86,26 @@ subtest "attr: jitter_factor" => sub {
 
     rand_between_ok(sub { $ar->failure(1) }, 2*(1-0.1), 2*(1+0.1));
     rand_between_ok(sub { $ar->success(1) }, 3*(1-0.1), 3*(1+0.1));
+
+    # jittered delay still doesn't violate min_delay and max_delay
+    $ar = Algorithm::Backoff::Constant->new(
+        delay => 2,
+        delay_on_success => 2,
+        min_delay => 1.8,
+        max_delay => 2.2,
+        jitter_factor => 0.5,
+    );
+    rand_between_ok(sub { $ar->failure(1) }, 1.8, 2.2);
+
+    $ar = Algorithm::Backoff::Constant->new(
+        delay => 2,
+        delay_on_success => 3,
+        min_delay => 2.8,
+        max_delay => 3.2,
+        jitter_factor => 0.5,
+    );
+
+    rand_between_ok(sub { $ar->success(1) }, 2.8, 3.2);
 };
 
 subtest "timestamp must not decrease" => sub {
@@ -105,11 +125,11 @@ sub rand_between_ok(&$$) {
     my ($block, $min, $max, $name) = @_;
     my @res;
     my %res;
-    for (1..10) {
+    for (1..30) {
         my $res = $block->();
         do {
-            ok(0, "Result #$_ is not between $min and $max");
-            last;
+            ok(0, "Result #$_ is not between $min and $max ($res)");
+            return;
         } if $res < $min || $res > $max;
         push @res, $res;
         $res{ $res+0 }++;

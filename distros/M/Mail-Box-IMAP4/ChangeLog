@@ -1,7 +1,12 @@
 
 ===== history of Mail-Box-IMAP4
 
-version 3.005:
+version 3.006: Wed 12 Jun 16:43:39 CEST 2019
+
+	Improvements:
+	- more flexible in passing settings to Mail::IMAPClient.
+
+version 3.005: Wed  5 Jun 15:56:33 CEST 2019
 
 	Fixes:
 	- ignore StartTLS on SSL connection.

@@ -22,20 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222639;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[02-8]',
-                  'format' => '$1 $2 $3 $4'
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '[02-8]'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
+                'fixed_line' => '
+          (?:
+            2(?:
+              0[023]|
+              1[02357]|
+              [23][045]|
+              4[03-5]
+            )|
+            3(?:
+              0[06]|
+              1[069]|
+              [2-4][07]|
+              5[09]|
+              6[08]
+            )
+          )\\d{5}
+        ',
                 'voip' => '',
-                'pager' => '',
+                'specialrate' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -53,33 +69,17 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'personal_number' => '',
                 'mobile' => '
           (?:
-            [07][1-9]|
-            [45]\\d|
+            0[1-9]|
+            [457]\\d|
             6[014-9]|
             8[4-9]
           )\\d{6}
         ',
                 'toll_free' => '',
-                'personal_number' => '',
-                'fixed_line' => '
-          (?:
-            2(?:
-              0[023]|
-              1[02357]|
-              [23][045]|
-              4[03-5]
-            )|
-            3(?:
-              0[06]|
-              1[069]|
-              [2-4][07]|
-              5[09]|
-              6[08]
-            )
-          )\\d{5}
-        '
+                'pager' => ''
               };
 my %areanames = (
   22520 => "Plateau\,\ Abidjan",

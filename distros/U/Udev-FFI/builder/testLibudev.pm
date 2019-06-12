@@ -12,7 +12,7 @@ sub new {
     die qq{It seems that your system doesn't provide udev library.
 Please install udev library.
 Installation failed.\n}
-        unless defined $libudev;
+        unless defined($libudev);
 
     $class->SUPER::new(%arg);
 }

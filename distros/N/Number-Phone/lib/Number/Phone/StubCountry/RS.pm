@@ -22,12 +22,10 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3,9})',
                   'leading_digits' => '
             (?:
               2[389]|
@@ -35,31 +33,30 @@ my $formatters = [
             )0|
             [7-9]
           ',
-                  'format' => '$1 $2'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{3,9})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'leading_digits' => '[1-36]',
                   'format' => '$1 $2',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{5,10})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'specialrate' => '(
-          (?:
-            78\\d|
-            90[0169]
-          )\\d{3,7}
-        )|(7[06]\\d{4,10})',
+                'toll_free' => '800\\d{3,9}',
                 'mobile' => '
           6(?:
             [0-689]|
             7\\d
           )\\d{6,7}
         ',
-                'geographic' => '
+                'personal_number' => '',
+                'pager' => '',
+                'voip' => '',
+                'fixed_line' => '
           (?:
             11[1-9]\\d|
             (?:
@@ -76,10 +73,13 @@ my $validators = {
             3[0-8]
           )[2-9]\\d{4,9}
         ',
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '800\\d{3,9}',
-                'fixed_line' => '
+                'specialrate' => '(
+          (?:
+            78\\d|
+            90[0169]
+          )\\d{3,7}
+        )|(7[06]\\d{4,10})',
+                'geographic' => '
           (?:
             11[1-9]\\d|
             (?:

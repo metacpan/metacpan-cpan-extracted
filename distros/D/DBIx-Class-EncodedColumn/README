@@ -94,11 +94,7 @@ DESCRIPTION
     omitted them by design.
 
 Options added to add_column
-    If any one of these options is present the column will be treated as a
-    digest column and all of the defaults will be applied to the rest of the
-    options.
-
-  encode_enable => 1
+  encode_column => 1
     Enable automatic encoding of column values. If this option is not set to
     true any other options will become no-ops.
 

@@ -15,7 +15,7 @@ use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.103000';
+$Udev::FFI::VERSION = '0.104000';
 
 
 
@@ -26,12 +26,12 @@ $Udev::FFI::VERSION = '0.103000';
 sub new {
     my $class = shift;
 
-    if(0 == Udev::FFI::Functions->init()) {
+    if (0 == Udev::FFI::Functions->init()) {
         return undef; # error already in $@
     }
 
     my $self = {_context => udev_new()};
-    if(!defined($self->{_context})) {
+    unless (defined($self->{_context})) {
         $@ = "Can't create udev context: $!";
         return undef;
     }
@@ -106,7 +106,7 @@ sub new_monitor {
         if $source ne 'udev' && $source ne 'kernel';
 
     my $monitor = udev_monitor_new_from_netlink($self->{_context}, $source);
-    unless(defined($monitor)) {
+    unless (defined($monitor)) {
         $@ = $! || "Can't create udev monitor from netlink";
         return undef;
     }
@@ -120,7 +120,7 @@ sub new_enumerate {
     my $self = shift;
 
     my $enumerate = udev_enumerate_new($self->{_context});
-    unless(defined($enumerate)) {
+    unless (defined($enumerate)) {
         $@ = $! || "Can't create enumerate context";
         return undef;
     }
@@ -178,7 +178,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
     if ($monitor->start()) {
         for (;;) {
             # poll devices, now insert or remove your block device
-            my $device = $monitor->poll(); #blocking read
+            my $device = $monitor->poll(); # blocking read
             my $action = $device->get_action();
     
             print 'ACTION: '.$action, "\n";
@@ -190,7 +190,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
     
         for (;;) {
             # poll devices, now insert or remove your block device
-            if (defined(my $device = $monitor->poll(0))) { #non-blocking read like can_read in IO::Select
+            if (defined(my $device = $monitor->poll(0))) { # non-blocking read like can_read in IO::Select
                 my $action = $device->get_action();
     
                 print 'ACTION: '.$action, "\n";
@@ -225,7 +225,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
     if (@a) { # we got devices
         my $device = $udev->new_device_from_syspath($a[0]);
     
-        if (defined $device) {
+        if (defined($device)) {
             print "Device: ".$device->get_sysname(), "\n";
     
             my $devnum = $device->get_devnum();
@@ -369,7 +369,7 @@ Return new L<Udev::FFI::Device> object or undef, if device does not exist.
     my $udev = Udev::FFI->new() or
         die "Can't create Udev::FFI object: $@";
     my $device = $udev->new_device_from_environment();
-    if (defined $device) {
+    if (defined($device)) {
         # $device is the device from the udev rule (backlight in this example)
         # work with $device
 
@@ -389,7 +389,7 @@ ENOENT (`udevadm` not found) or EACCES (permission denied).
     # or catch the error
     use Errno qw( :POSIX );
     my $udev_version = Udev::FFI::udev_version();
-    unless (defined $udev_version) {
+    unless (defined($udev_version)) {
         if ($!{ENOENT}) {
             # udevadm not found
         }
@@ -397,7 +397,7 @@ ENOENT (`udevadm` not found) or EACCES (permission denied).
             # permission denied
         }
     
-        die "Can't get udev library version: $@";
+        die("Can't get udev library version: $@");
     }
 
 =head1 EXAMPLES

@@ -22,12 +22,10 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
                   'leading_digits' => '
             [13-69]|
             7(?:
@@ -38,31 +36,20 @@ my $formatters = [
             )|
             8[02-9]
           ',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '[7-9]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            (?:
-              [14-69]\\d|
-              8[02-9]
-            )\\d|
-            7(?:
-              [2-57]\\d|
-              62|
-              8[0-7]|
-              9[04-9]
-            )
-          )\\d{4}
-        ',
-                'pager' => '',
+                'personal_number' => '',
+                'toll_free' => '',
                 'mobile' => '
           (?:
             (?:
@@ -77,8 +64,7 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'specialrate' => '(80\\d{6})|(9[01]\\d{6})',
-                'voip' => '',
+                'pager' => '',
                 'fixed_line' => '
           (?:
             (?:
@@ -93,8 +79,22 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'toll_free' => '',
-                'personal_number' => ''
+                'voip' => '',
+                'geographic' => '
+          (?:
+            (?:
+              [14-69]\\d|
+              8[02-9]
+            )\\d|
+            7(?:
+              [2-57]\\d|
+              62|
+              8[0-7]|
+              9[04-9]
+            )
+          )\\d{4}
+        ',
+                'specialrate' => '(80\\d{6})|(9[01]\\d{6})'
               };
 
     sub new {

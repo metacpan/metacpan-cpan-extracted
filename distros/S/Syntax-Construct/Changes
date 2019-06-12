@@ -1,5 +1,9 @@
 Revision history for Syntax-Construct
 
+1.012   2019-06-11
+
+        - Fix broken link to perl5220delta
+
 1.011   2019-06-09
 
         - Fix link to documentation of for-qw

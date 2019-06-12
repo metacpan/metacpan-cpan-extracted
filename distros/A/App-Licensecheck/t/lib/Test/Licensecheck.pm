@@ -11,6 +11,8 @@ use warnings;
 use File::Basename;
 use App::Licensecheck;
 
+my $tb = $CLASS->builder;
+
 # test corpus data
 my $app = App::Licensecheck->new;
 $app->lines(0);
@@ -19,7 +21,6 @@ $app->deb_fmt(1);
 sub license_is ($$)
 {
 	my ( $corpus, $expected ) = @_;
-	my $tb = $CLASS->builder;
 	my ( $expected_license, $expected_license_todo );
 	my $expected_copyright;
 
@@ -60,7 +61,6 @@ sub license_is ($$)
 sub license_like ($$)
 {
 	my ( $corpus, $expected ) = @_;
-	my $tb = $CLASS->builder;
 
 	# expected is either regexp, or array of regexp
 	for ( ref($expected) eq 'ARRAY' ? @{$expected} : $expected ) {
@@ -75,8 +75,6 @@ sub license_like ($$)
 
 sub done_testing ()
 {
-	my $tb = $CLASS->builder;
-
 	$tb->done_testing;
 }
 

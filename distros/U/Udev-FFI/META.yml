@@ -27,7 +27,7 @@ no_index:
 provides:
   Udev::FFI:
     file: lib/Udev/FFI.pm
-    version: '0.103000'
+    version: '0.104000'
   Udev::FFI::Device:
     file: lib/Udev/FFI/Device.pm
   Udev::FFI::Devnum:
@@ -36,6 +36,8 @@ provides:
     file: lib/Udev/FFI/Enumerate.pm
   Udev::FFI::Functions:
     file: lib/Udev/FFI/Functions.pm
+  Udev::FFI::Helper:
+    file: lib/Udev/FFI/Helper.pm
   Udev::FFI::Monitor:
     file: lib/Udev/FFI/Monitor.pm
 requires:
@@ -47,7 +49,7 @@ resources:
   bugtracker: https://github.com/Ilya33/udev-ffi/issues
   homepage: https://github.com/Ilya33/udev-ffi
   repository: git://github.com/Ilya33/udev-ffi.git
-version: '0.103000'
+version: '0.104000'
 x_authority: cpan:ILUX
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

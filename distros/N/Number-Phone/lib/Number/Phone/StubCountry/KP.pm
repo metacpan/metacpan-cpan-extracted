@@ -22,48 +22,48 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '8',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1'
-                },
-                {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'leading_digits' => '2',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
-                },
-                {
                   'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                },
+                {
+                  'leading_digits' => '2',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
+                },
+                {
                   'leading_digits' => '1',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'specialrate' => '',
-                'mobile' => '19[1-3]\\d{7}',
                 'geographic' => '
           (?:
             2\\d|
             85
           )\\d{6}
         ',
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '',
+                'specialrate' => '',
+                'voip' => '',
                 'fixed_line' => '
           (?:
             2\\d|
             85
           )\\d{6}
-        '
+        ',
+                'pager' => '',
+                'toll_free' => '',
+                'mobile' => '19[1-3]\\d{7}',
+                'personal_number' => ''
               };
 
     sub new {

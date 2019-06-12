@@ -1,6 +1,9 @@
 Revision history for Time-Zone-Olson
 
-0.25   Tue Jun 11 19:58:00 2019
+0.26   Wed Jun 12 06:29:00 2019
+       Windows XP fixes for guessing timezone.
+
+0.25   Tue Jun 11 19:53:00 2019
        Fixing Win32 encoding.  Clearing old cached timezone values after a timezone is changed.
 
 0.24   Fri Jun 07 19:58:00 2019

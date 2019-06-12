@@ -22,37 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'leading_digits' => '[235]'
                 },
                 {
-                  'leading_digits' => '[89]',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{6})'
+                  'pattern' => '(\\d{3})(\\d{6})',
+                  'leading_digits' => '[89]'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          (?:
-            222|
-            55[015]
-          )\\d{6}
-        ',
-                'geographic' => '
-          33[0-24-9]\\d[46]\\d{4}|
-          3(?:
-            33|
-            5\\d
-          )\\d[7-9]\\d{4}
-        ',
-                'pager' => '',
-                'specialrate' => '(90\\d[1-9]\\d{5})',
                 'voip' => '',
                 'fixed_line' => '
           33[0-24-9]\\d[46]\\d{4}|
@@ -61,8 +46,23 @@ my $validators = {
             5\\d
           )\\d[7-9]\\d{4}
         ',
+                'specialrate' => '(90\\d[1-9]\\d{5})',
+                'geographic' => '
+          33[0-24-9]\\d[46]\\d{4}|
+          3(?:
+            33|
+            5\\d
+          )\\d[7-9]\\d{4}
+        ',
+                'personal_number' => '',
+                'mobile' => '
+          (?:
+            222|
+            55[015]
+          )\\d{6}
+        ',
                 'toll_free' => '80\\d[1-9]\\d{5}',
-                'personal_number' => ''
+                'pager' => ''
               };
 my %areanames = (
   24033004 => "Bioko",

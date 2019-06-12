@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.0.3",
+  "VERSION" => "1.0.4",
   "test" => {
     "TESTS" => "t/*.t t/tests/data/password/*.t t/tests/data/password/zxcvbn/*.t t/tests/data/password/zxcvbn/match/*.t"
   }

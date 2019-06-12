@@ -22,27 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222638;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{5})',
                   'format' => '$1 $2',
-                  'leading_digits' => '90',
-                  'pattern' => '(\\d{2})(\\d{5})'
+                  'leading_digits' => '90'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '[2-6]'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '7',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
+                'voip' => '
+          79(?:
+            1(?:
+              [01]\\d|
+              20
+            )|
+            2[0-2]\\d
+          )\\d{3}
+        ',
                 'fixed_line' => '
           (?:
             2(?:
@@ -54,7 +63,7 @@ my $validators = {
               1[0-35-9]|
               55|
               [69]\\d|
-              7[01]
+              7[013]
             )|
             4(?:
               6[03]|
@@ -74,15 +83,6 @@ my $validators = {
               8[067]
             )
           )\\d{4}
-        ',
-                'personal_number' => '',
-                'toll_free' => '',
-                'mobile' => '
-          77200\\d{3}|
-          7(?:
-            [1-6]\\d|
-            7[014-8]
-          )\\d{5}
         ',
                 'geographic' => '
           (?:
@@ -95,7 +95,7 @@ my $validators = {
               1[0-35-9]|
               55|
               [69]\\d|
-              7[01]
+              7[013]
             )|
             4(?:
               6[03]|
@@ -116,17 +116,17 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'pager' => '',
-                'voip' => '
-          79(?:
-            1(?:
-              [01]\\d|
-              20
-            )|
-            2[0-2]\\d
-          )\\d{3}
+                'specialrate' => '(90\\d{5})',
+                'toll_free' => '',
+                'mobile' => '
+          77200\\d{3}|
+          7(?:
+            [1-6]\\d|
+            7[014-8]
+          )\\d{5}
         ',
-                'specialrate' => '(90\\d{5})'
+                'personal_number' => '',
+                'pager' => ''
               };
 my %areanames = (
   26724 => "Francistown",
@@ -142,7 +142,8 @@ my %areanames = (
   267319 => "Gaborone",
   26735 => "Gaborone",
   26736 => "Gaborone",
-  26737 => "Gaborone",
+  267370 => "Gaborone",
+  267371 => "Gaborone",
   267390 => "Gaborone",
   267391 => "Gaborone",
   267392 => "Gaborone",

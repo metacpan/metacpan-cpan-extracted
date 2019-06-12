@@ -11,6 +11,7 @@ requires "LWP::UserAgent" => "0";
 requires "List::AllUtils" => "0";
 requires "Log::Dispatch" => "2.56";
 requires "Module::Load::Conditional" => "0";
+requires "Module::Runtime" => "0";
 requires "Moo" => "0";
 requires "MooX::StrictConstructor" => "0";
 requires "Parse::MIME" => "0";
@@ -37,7 +38,6 @@ on 'test' => sub {
   requires "HTML::FormatText::WithLinks" => "0";
   requires "HTTP::CookieJar::LWP" => "0";
   requires "Log::Dispatch::Array" => "0";
-  requires "Module::Runtime" => "0";
   requires "Path::Tiny" => "0";
   requires "Plack::Handler::HTTP::Server::Simple" => "0.016";
   requires "Plack::Test" => "0";
@@ -56,7 +56,7 @@ on 'test' => sub {
 on 'test' => sub {
   recommends "CPAN::Meta" => "2.120900";
   recommends "Mojo::UserAgent" => "0";
-  recommends "Mojolicious" => "0";
+  recommends "Mojolicious" => "7.13";
   recommends "Pithub" => "0";
 };
 

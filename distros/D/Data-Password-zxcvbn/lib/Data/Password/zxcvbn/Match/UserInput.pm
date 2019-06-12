@@ -1,21 +1,48 @@
 package Data::Password::zxcvbn::Match::UserInput;
 use Moo;
 extends 'Data::Password::zxcvbn::Match::Dictionary';
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: match class for words that match other user-supplied information
 
 
-# a somewhat general word boundary: the spot between a letter and a
-# non-letter, or a digit and a non-digit; we don't care about
-# beginning or end of string, because we're going to use this only in
-# a split
-my $WORD_BOUNDARY_RE = qr{
-                             (?: (?<=\p{L})(?=\P{L}) ) |
-                             (?: (?<=\P{L})(?=\p{L}) ) |
-                             (?: (?<=\d)(?=\D) ) |
-                             (?: (?<=\D)(?=\d) )
+# a somewhat general word boundary: the spot between a letter
+# (\p{L}) and a non-letter (\P{L}), or a digit (\d) and a non-digit
+# (\D); we don't care about beginning or end of string, because we're
+# going to use this only in a split
+
+# this split on every transition:
+my $WORD_BOUNDARY_SPLIT_MORE_RE = qr{
+                                        # letter followed by non-letter
+                                        (?: (?<=\p{L})(?=\P{L}) ) |
+                                        # non-letter followed by letter
+                                        (?: (?<=\P{L})(?=\p{L}) ) |
+                                        # digit followed by non-digit
+                                        (?: (?<=\d)(?=\D) ) |
+                                        # non-digit followed by digit
+                                        (?: (?<=\D)(?=\d) )
+                                }x;
+
+# this splits on alphanumeric / non-alphanumeric transitions only
+my $WORD_BOUNDARY_SPLIT_LESS_RE = qr{
+                                        # alnum followed by non-alnum
+                                        (?: (?<=[\p{L}\d])(?=[^\p{L}\d]) ) |
+                                        # non-alnum followed by alnum
+                                        (?: (?<=[^\p{L}\d])(?=[\p{L}\d]) )
                      }x;
 
+
+sub _split_to_hash {
+    my ($class, $value, $re) = @_;
+
+    if (my @words = grep {length} split $re, $value) {
+        # all words have rank 1, they're the first thing that a
+        # cracker would try
+        return (
+            map { lc($_) => 1 } @words, ## no critic(ProhibitUselessTopic)
+        );
+    }
+    return ();
+}
 
 sub make {
     my ($class, $password, $opts) = @_;
@@ -27,13 +54,12 @@ sub make {
     my %user_dicts;
     for my $field (keys %{$user_input}) {
         my $value = $user_input->{$field};
-        if (my @words = grep {length>2} split $WORD_BOUNDARY_RE, $value) {
-            # all words have rank 1, they're the first thing that a
-            # cracker would try
-            $user_dicts{$field} = {
-                map { lc($_) => 1 } @words, ## no critic(ProhibitUselessTopic)
-            };
-        }
+        $user_dicts{$field} = {
+            $class->_split_to_hash($value,$WORD_BOUNDARY_SPLIT_MORE_RE),
+            $class->_split_to_hash($value,$WORD_BOUNDARY_SPLIT_LESS_RE),
+            # also keep the whole value
+            lc($value) => 1,
+        };
     }
 
     return $class->next::method(
@@ -78,7 +104,7 @@ Data::Password::zxcvbn::Match::UserInput - match class for words that match othe
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 DESCRIPTION
 

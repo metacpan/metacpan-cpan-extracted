@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205538;
+our $VERSION = 1.20190611222639;
 
 my $formatters = [
                 {
@@ -30,35 +30,18 @@ my $formatters = [
             [24-7]|
             8[3-9]
           ',
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{4})(\\d{4})'
+                  'pattern' => '(\\d{4})(\\d{4})',
+                  'format' => '$1 $2'
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'format' => '$1-$2-$3',
-                  'leading_digits' => '[89]',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
+                  'leading_digits' => '[89]'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '800\\d{7}',
-                'personal_number' => '',
-                'fixed_line' => '
-          210[7-9]\\d{4}|
-          2(?:
-            [024-7]\\d|
-            1[1-9]
-          )\\d{5}
-        ',
                 'specialrate' => '(90[059]\\d{7})',
-                'voip' => '
-          (?:
-            210[0-6]|
-            4\\d{3}|
-            5100
-          )\\d{4}
-        ',
-                'pager' => '',
                 'geographic' => '
           210[7-9]\\d{4}|
           2(?:
@@ -66,6 +49,22 @@ my $validators = {
             1[1-9]
           )\\d{5}
         ',
+                'voip' => '
+          (?:
+            210[0-6]|
+            4\\d{3}|
+            5100
+          )\\d{4}
+        ',
+                'fixed_line' => '
+          210[7-9]\\d{4}|
+          2(?:
+            [024-7]\\d|
+            1[1-9]
+          )\\d{5}
+        ',
+                'pager' => '',
+                'toll_free' => '800\\d{7}',
                 'mobile' => '
           6500[01]\\d{3}|
           5(?:
@@ -77,7 +76,8 @@ my $validators = {
             7[0-3]|
             8[3-9]
           )\\d{6}
-        '
+        ',
+                'personal_number' => ''
               };
 
     sub new {

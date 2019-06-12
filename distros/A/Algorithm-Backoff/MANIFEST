@@ -11,6 +11,10 @@ lib/Algorithm/Backoff.pm
 lib/Algorithm/Backoff/Constant.pm
 lib/Algorithm/Backoff/Exponential.pm
 lib/Algorithm/Backoff/Fibonacci.pm
+lib/Algorithm/Backoff/LILD.pm
+lib/Algorithm/Backoff/LIMD.pm
+lib/Algorithm/Backoff/MILD.pm
+lib/Algorithm/Backoff/MIMD.pm
 t/00-compile.t
 t/01-base.t
 t/author-critic.t
@@ -19,5 +23,9 @@ t/author-pod-syntax.t
 t/constant.t
 t/exponential.t
 t/fibonacci.t
+t/lild.t
+t/limd.t
+t/mild.t
+t/mimd.t
 t/release-rinci.t
 weaver.ini

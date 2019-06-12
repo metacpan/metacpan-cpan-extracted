@@ -1,0 +1,69 @@
+% Antismash report for [% name %] Analysis
+
+\pagebreak
+
+# Resume of the Analysis:
+
+[% IF gca -%]
+**Assembly**: [% gca %]
+
+
+**Organism**: [% org %]
+
+
+**Taxid**: [% taxid %]
+
+
+**Taxonomy**: [% taxonomy.join('; ') %]
+[% END -%]
+
+Number of gene clusters detected: [% clusters_count %] gene clusters
+
+
+Number of nrps/pks domains detected: [% domains_count %] domains
+
+
+**Details of Second metabolites gene clusters identified are presented below.**
+
+\pagebreak
+[%- i = 0 -%]
+[%- FOR cluster IN clusters %]
+[% i = i + 1 %]
+
+# Gene cluster [% i %]: [% cluster.type %]
+
+
+
+**Type**: [% cluster.type %]
+
+
+**Coordinates**: [% cluster.coords.join('-') %] 
+
+
+**Size**: [% cluster.size %] bp 
+
+
+**Domains**: [% cluster.domains %]
+
+
+[% IF cluster.cluster_svg != 0 %]
+![]([% cluster.cluster_svg %])
+[%- ELSE %]
+No Biosynthetic cluster describbed
+[%- END -%]
+
+
+**Prediction of the synthesized product:**
+
+[% IF cluster.structure != 0 %]
+[% cluster.monomers %]
+
+![]([% cluster.structure %])
+[%- ELSE %]
+No product structure predicted
+[%- END -%]
+
+\pagebreak
+
+[%- END -%]
+

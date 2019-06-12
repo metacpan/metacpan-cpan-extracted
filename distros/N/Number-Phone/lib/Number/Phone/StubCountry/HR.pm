@@ -22,54 +22,55 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
+                  'leading_digits' => '6[01]',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2,3})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '6[01]'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2,3})',
+                  'leading_digits' => '8',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '8'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2,3})'
                 },
                 {
                   'leading_digits' => '1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d)(\\d{4})(\\d{3})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
+                },
+                {
+                  'leading_digits' => '[67]',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
+                },
+                {
+                  'leading_digits' => '9',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
+                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1'
                 },
                 {
                   'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[67]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
-                },
-                {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '9',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
-                },
-                {
-                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '[2-5]'
                 },
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '8',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
+                'toll_free' => '80[01]\\d{4,6}',
                 'mobile' => '
           9(?:
             751\\d{5}|
@@ -81,24 +82,8 @@ my $validators = {
             7[0679]
           )\\d{6}
         ',
+                'personal_number' => '7[45]\\d{6}',
                 'pager' => '',
-                'geographic' => '
-          1\\d{7}|
-          (?:
-            2[0-3]|
-            3[1-5]|
-            4[02-47-9]|
-            5[1-3]
-          )\\d{6,7}
-        ',
-                'specialrate' => '(
-          6[01459]\\d{6}|
-          6[01]\\d{4,5}
-        )|(
-          62\\d{6,7}|
-          72\\d{6}
-        )',
-                'voip' => '',
                 'fixed_line' => '
           1\\d{7}|
           (?:
@@ -108,8 +93,23 @@ my $validators = {
             5[1-3]
           )\\d{6,7}
         ',
-                'toll_free' => '80[01]\\d{4,6}',
-                'personal_number' => '7[45]\\d{6}'
+                'voip' => '',
+                'specialrate' => '(
+          6[01459]\\d{6}|
+          6[01]\\d{4,5}
+        )|(
+          62\\d{6,7}|
+          72\\d{6}
+        )',
+                'geographic' => '
+          1\\d{7}|
+          (?:
+            2[0-3]|
+            3[1-5]|
+            4[02-47-9]|
+            5[1-3]
+          )\\d{6,7}
+        '
               };
 my %areanames = (
   3851 => "Zagreb",

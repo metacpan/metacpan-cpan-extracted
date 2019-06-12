@@ -1,3 +1,7 @@
+1.0.4     2019-06-12 10:03:16+01:00 Europe/London
+ - improve matching against the "user_info" dictionary: more cases are
+   caught, and generally with lower scores
+
 1.0.3     2019-05-15 16:54:46+01:00 Europe/London
  - make it easier to subclass the various components, for example to
    use custom feedback messages

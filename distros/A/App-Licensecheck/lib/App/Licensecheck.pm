@@ -10,7 +10,7 @@ use Path::Tiny;
 use Fcntl qw/:seek/;
 use Encode;
 use Regexp::Pattern;
-use Regexp::Pattern::License 3.1.92;
+use Regexp::Pattern::License 3.1.94;
 use String::Copyright 0.003 {
 	format => sub { join ' ', $_->[0] || (), $_->[1] || () }
 };
@@ -31,11 +31,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.36
+Version v3.0.37
 
 =cut
 
-our $VERSION = version->declare("v3.0.36");
+our $VERSION = version->declare("v3.0.37");
 
 =head1 SYNOPSIS
 
@@ -270,7 +270,7 @@ sub parse_lines
 			$fh = $file->openr(
 				sprintf ':encoding(%s)',
 				$self->encoding->name
-				)
+			)
 		}
 	}
 
@@ -381,7 +381,7 @@ sub licensepatterns
 			$list{name}{$key}    ||= $val->{"name.alt.org.$_"};
 			$list{caption}{$key} ||= $val->{"caption.alt.org.$_"};
 		}
-		$list{name}{$key} ||= $val->{name} || $key;
+		$list{name}{$key}    ||= $val->{name}    || $key;
 		$list{caption}{$key} ||= $val->{caption} || $val->{name} || $key;
 		for ( @{ $val->{tags} } ) {
 			/^(family|type):([a-z][a-z0-9_]*)(?::([a-z][a-z0-9_]*))?/;
@@ -484,13 +484,9 @@ sub parse_license
 	};
 
 	for my $id ( keys %{ $L{re_name} } ) {
-		my @pos;
-
 		while ( $licensetext =~ /$L{re_name}{$id}/g ) {
-			push @pos, $-[0], $+[0];
+			$match{$id}{name}{ $-[0] } = $+[0];
 		}
-		$match{$id}{name} = {@pos}
-			if (@pos);
 	}
 
 	#<<<  do not let perltidy touch this (keep long regex on one line)
@@ -550,23 +546,19 @@ sub parse_license
 	}
 
 	# multi-licensing
-	given ($licensetext) {
-		my @multilicenses;
-		# same sentence
-		if ( grep { $match{$_}{name} } @lgpl ) {
-		when ( /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{lgpl}$L{re_trait_keep}{version}?/i ) {
+	my @multilicenses;
+	# same sentence
+	if ( grep { $match{$_}{name} } @lgpl ) {
+		if ( $licensetext =~ /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{lgpl}$L{re_trait_keep}{version}?/i ) {
 			push @multilicenses, 'lgpl', $1, $2;
-			continue;
 		}
-		}
-		if ( grep { $match{$_}{name} } @gpl ) {
-		when ( /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{gpl}$L{re_trait_keep}{version}?/i ) {
-			push @multilicenses, 'gpl', $1, $2;
-			continue;
-		}
-		}
-		$gen_license->( @multilicenses ) if (@multilicenses);
 	}
+	if ( grep { $match{$_}{name} } @gpl ) {
+		if ( $licensetext =~ /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{gpl}$L{re_trait_keep}{version}?/i ) {
+			push @multilicenses, 'gpl', $1, $2;
+		}
+	}
+	$gen_license->( @multilicenses ) if (@multilicenses);
 
 	if ( grep { $match{$_}{name} } @lgpl ) {
 
@@ -679,7 +671,7 @@ sub parse_license
 	# CC
 	given ($licensetext) {
 		foreach my $id (@L_family_cc) {
-#			next unless ( $match{$id}{name} );
+			next unless ( $match{$id}{name} );
 			when ( /$L{re_name}{$id}$L{re_trait_keep}{version_numberstring} or $L{re_trait_keep}{version_numberstring}/i ) {
 				$license = "$L{caption}{$id} (v$1 or v$2) $license";
 				push @spdx_license, "$L{name}{$id}-$1 or $L{name}{$id}-$1";
@@ -873,71 +865,64 @@ sub parse_license
 		when ( /Permission is hereby granted, free of charge, to any person or organization obtaining a copy of the software and accompanying documentation covered by this license \(the Software\)/ ) {
 			$gen_license->('BSL');
 		}
-		when ( /Boost Software License$L{re_trait_keep}{version}?/i ) {
-			$gen_license->( 'BSL', $1, $2 );
-		}
 	}
 	#>>>
 
-	given ($licensetext) {
+	# singleversion
+	foreach my $id (@L_type_singleversion) {
+		next if ( $match{$id}{custom} );
 
-		# singleversion
-		foreach my $id (@L_type_singleversion) {
-			next if ( $match{$id}{custom} );
+		if ( $licensetext =~ $L{re_grant_license}{$id} ) {
+			$gen_license->($id);
+			$match{ $L{series}{$id} }{custom} = 1
+				if ( $L{series}{$id} );
+		}
+	}
 
-			when ( $L{re_grant_license}{$id} ) {
-				$gen_license->($id);
-				$match{ $L{series}{$id} }{custom} = 1
-					if ( $L{series}{$id} );
-				continue;
-			}
+	# versioned
+	foreach my $id (@L_type_versioned) {
+		next if ( $match{$id}{custom} );
+
+		# skip embedded or referenced licenses
+		if ( grep { $id eq $_ } qw(mpl python) ) {
+			next if $licensetext =~ $L{re_grant_license}{rpsl};
 		}
 
-		# versioned
-		foreach my $id (@L_type_versioned) {
-			next if ( $match{$id}{custom} );
-
-			# skip embedded or referenced licenses
-			if ( grep { $id eq $_ } qw(mpl python) ) {
-				next if $licensetext =~ $L{re_grant_license}{rpsl};
-			}
-
-			if ( $L{re_name}{$id} ) {
-				when (/$L{re_name}{$id}$L{re_trait_keep}{version}?/) {
-					$gen_license->( $id, $1, $2 );
-					$match{$id}{custom} = 1;
-					continue;
-				}
-			}
-			next if ( $match{$id}{custom} );
-			if ( $L{re_grant_license}{$id} ) {
-				when (/$L{re_grant_license}{$id}/) {
-					$gen_license->($id);
-					continue;
-				}
+		# FIXME: match grant (not name)
+		if ( $match{$id}{name} ) {
+			if ( $licensetext
+				=~ /$L{re_name}{$id}$L{re_trait_keep}{version}?/ )
+			{
+				$gen_license->( $id, $1, $2 );
+				$match{$id}{custom} = 1;
 			}
 		}
-
-		# unversioned
-		foreach my $id (@L_type_unversioned) {
-			next if ( $match{$id}{custom} );
-
-			# skip embedded or referenced licenses
-			if ( grep { $id eq $_ } qw(zlib) ) {
-				next if $licensetext =~ $L{re_grant_license}{cube};
-			}
-			if ( grep { $id eq $_ } qw(ntp) ) {
-				next if $licensetext =~ $L{re_grant_license}{ntp_disclaimer};
-				next if $licensetext =~ $L{re_grant_license}{dsdp};
-			}
-			if ( grep { $id eq $_ } qw(ntp_disclaimer) ) {
-				next if $licensetext =~ $L{re_grant_license}{mit_cmu};
-			}
-
-			when ( $L{re_grant_license}{$id} ) {
+		next if ( $match{$id}{custom} );
+		if ( $L{re_grant_license}{$id} ) {
+			if ( $licensetext =~ /$L{re_grant_license}{$id}/ ) {
 				$gen_license->($id);
-				continue;
 			}
+		}
+	}
+
+	# unversioned
+	foreach my $id (@L_type_unversioned) {
+		next if ( $match{$id}{custom} );
+
+		# skip embedded or referenced licenses
+		if ( grep { $id eq $_ } qw(zlib) ) {
+			next if $licensetext =~ $L{re_grant_license}{cube};
+		}
+		if ( grep { $id eq $_ } qw(ntp) ) {
+			next if $licensetext =~ $L{re_grant_license}{ntp_disclaimer};
+			next if $licensetext =~ $L{re_grant_license}{dsdp};
+		}
+		if ( grep { $id eq $_ } qw(ntp_disclaimer) ) {
+			next if $licensetext =~ $L{re_grant_license}{mit_cmu};
+		}
+
+		if ( $licensetext =~ $L{re_grant_license}{$id} ) {
+			$gen_license->($id);
 		}
 	}
 

@@ -8,6 +8,13 @@ use Test::Needs qw( Pithub );
 use Test::RequiresInternet ( 'api.github.com' => 443 );
 use WWW::Mechanize ();
 
+# If this is a PR then it will likely be running without a token and we'll
+# probably hit GitHub rate limiting, which fails this test.
+
+if ( exists $ENV{TRAVIS} && !exists $ENV{GITHUB_READ_TOKEN} ) {
+    plan skip_all => 'Need a GITHUB_READ_TOKEN for this test';
+}
+
 local $ENV{LWPCL_REDACT_HEADERS} = 'Authorization';
 
 foreach my $class ( 'LWP::UserAgent', 'WWW::Mechanize' ) {

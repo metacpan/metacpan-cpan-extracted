@@ -22,39 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'format' => '$1-$2',
+                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [3467]|
             9[14-9]
           '
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'leading_digits' => '[89]',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
-          (?:
-            3(?:
-              0[0-3]|
-              3[0-59]
-            )|
-            6(?:
-              [57][02468]|
-              6[024-68]|
-              8[024689]
-            )
-          )\\d{4}
-        ',
+                'toll_free' => '800\\d{7}',
                 'mobile' => '
           46[46]\\d{4}|
           (?:
@@ -62,7 +49,8 @@ my $validators = {
             9[14-9]
           )\\d{5}
         ',
-                'specialrate' => '(900\\d{7})|(4[05]0\\d{4})',
+                'personal_number' => '',
+                'pager' => '',
                 'voip' => '',
                 'fixed_line' => '
           (?:
@@ -77,8 +65,20 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'toll_free' => '800\\d{7}',
-                'personal_number' => ''
+                'geographic' => '
+          (?:
+            3(?:
+              0[0-3]|
+              3[0-59]
+            )|
+            6(?:
+              [57][02468]|
+              6[024-68]|
+              8[024689]
+            )
+          )\\d{4}
+        ',
+                'specialrate' => '(900\\d{7})|(4[05]0\\d{4})'
               };
 my %areanames = (
   960300 => "Malé\/Hulhulé\/Aarah",

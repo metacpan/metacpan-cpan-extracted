@@ -15,6 +15,7 @@ use Plack::Test::Agent ();
 use Test::FailWarnings -allow_deps => 1;
 use Test::Fatal qw( exception );
 use Test::Most;
+use Try::Tiny qw( catch try );
 use WWW::Mechanize ();
 
 my $lwp  = LWP::UserAgent->new( cookie_jar => {} );
@@ -23,10 +24,24 @@ my $mech = WWW::Mechanize->new( autocheck  => 0 );
 my @user_agents = ( $lwp, $mech );
 
 my $mojo;
-if ( require_module('Mojo::UserAgent') ) {
+try {
+    require_module('Mojo::UserAgent');
+    require_module('Mojolicious');
+
+    # Guard against the modules being split out in future
+    if ( version->parse($Mojolicious::VERSION) < 7.13 ) {
+        die "Mojo version $Mojolicious::VERSION is too low";
+    }
+
     $mojo = Mojo::UserAgent->new;
     push @user_agents, $mojo;
 }
+catch {
+    diag $_;
+SKIP: {
+        skip 'Mojolicious not installed', 1;
+    }
+};
 
 my $foo = 'file://' . path('t/test-data/foo.html')->absolute;
 

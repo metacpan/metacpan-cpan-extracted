@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+0.79    2019/06/12
+        - Added parsing of "Planning time", "Execution time", and "Trigger
+        time"
+
 0.78    2019/03/29
         - Fix parsing of json explain, when there is no trailing new line
           character.

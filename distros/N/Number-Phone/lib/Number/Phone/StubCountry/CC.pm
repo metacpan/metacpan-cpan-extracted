@@ -22,11 +22,23 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222638;
 
 my $formatters = [];
 
 my $validators = {
+                'voip' => '
+          (?:
+            14(?:
+              5(?:
+                1[0458]|
+                [23][458]
+              )|
+              71\\d
+            )|
+            550\\d\\d
+          )\\d{4}
+        ',
                 'fixed_line' => '
           8(?:
             51(?:
@@ -62,14 +74,13 @@ my $validators = {
             )
           )\\d{3}
         ',
-                'toll_free' => '
-          180(?:
-            0\\d{3}|
-            2
-          )\\d{3}
-        ',
-                'personal_number' => '',
-                'pager' => '',
+                'specialrate' => '(
+          13(?:
+            00\\d{3}|
+            45[0-4]
+          )\\d{3}|
+          13\\d{4}
+        )|(190[0-26]\\d{6})',
                 'geographic' => '
           8(?:
             51(?:
@@ -105,31 +116,25 @@ my $validators = {
             )
           )\\d{3}
         ',
+                'personal_number' => '',
                 'mobile' => '
           4(?:
             [0-3]\\d|
             4[047-9]|
             5[0-25-9]|
-            6[6-9]|
+            6[06-9]|
             7[02-9]|
             8[0-2457-9]|
             9[017-9]
           )\\d{6}
         ',
-                'specialrate' => '(
-          13(?:
-            00\\d{3}|
-            45[0-4]
-          )\\d{3}|
-          13\\d{4}
-        )|(190[0-26]\\d{6})',
-                'voip' => '
-          1471\\d{5}|
-          (?:
-            145|
-            550
-          )\\d{6}
-        '
+                'toll_free' => '
+          180(?:
+            0\\d{3}|
+            2
+          )\\d{3}
+        ',
+                'pager' => ''
               };
 my %areanames = (
   61238000 => "Bowral",

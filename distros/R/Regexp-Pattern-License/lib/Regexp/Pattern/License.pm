@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.1.93
+Version v3.1.94
 
 =cut
 
-our $VERSION = version->declare("v3.1.93");
+our $VERSION = version->declare("v3.1.94");
 
 =head1 DESCRIPTION
 
@@ -44,12 +44,12 @@ my $QB = '["*]';         # quote or bullet
 my $SD = '[ -]';         # space or dash
 
 my @_re = (
-	[ qr/\Q$BB/, '(?:\W*\S\W*)' ],
+	[ qr/\Q$BB/, '(?:\W{0,3}\S\W{0,3})' ],
 	[ qr/\Q$C/,  '(?:©|\(c\))' ],
 	[ qr/\Q$D/,  '[–-]' ],
 	[ qr/\Q$DD/, '(?: [–—-]{1,2} )' ],
-	[ qr/\Q$E/,  '(?:\s+)' ],
-	[ qr/\Q$EE/, '(?:\s+)' ],
+	[ qr/\Q$E/,  '(?:\s{1,3})' ],
+	[ qr/\Q$EE/, '(?:\s{1,3})' ],
 	[ qr/\Q$F/,  '[.]' ],
 	[ qr/\Q$HT/, '(?:(?:https?:?)?(?://)?)' ],
 	[ qr/\Q$ND/, '[\d–-]' ],
@@ -82,9 +82,12 @@ my $fsf_ullr
 	= "$fsf gives unlimited permission to copy and/or distribute it, with or without modifications, as long as this notice is preserved";
 
 # internal-only patterns
-my $_delim   = '[.(]';
-my $_prop    = '(?:[a-z][a-z0-9_]*)';
-my $_lang    = '(?:\([a-z][a-z0-9_]*\))';
+# _lang is "basic variants" regex at <https://stackoverflow.com/a/48300605>
+# without upper-case chars (as dictated by DefHash) and no capture groups
+my $_delim = '[.(]';
+my $_prop  = '(?:[a-z][a-z0-9_]*)';
+my $_lang
+	= '(?:\([a-z]{2,4}(?:_(?:[a-z]{4}|[0-9]{3}))?(?:_(?:[a-z]{2}|[0-9]{3}))?\))';
 my $_notlang = '[a-z0-9_.]';
 my $_any     = '[a-z0-9_.()]';
 
@@ -153,10 +156,6 @@ $RE{afl} = {
 	'caption.alt.org.wikipedia' => 'Academic Free License',
 	tags                        => ['type:versioned:decimal'],
 
-	'_pat.alt.subject.name' => [
-		"$the?Academic Free License(?: \\(AFL\\))?",
-		"${the}AFL\\b",
-	],
 	'pat.alt.subject.license.scope.line.scope.paragraph' =>
 		"Exclusions [Ff]rom License Grant$F${E}Neither",
 };
@@ -178,7 +177,7 @@ $RE{agpl} = {
 	'caption.alt.org.wikipedia' => 'GNU Affero General Public License',
 	tags                        => [ 'family:gpl', 'type:versioned:decimal' ],
 
-	'_pat.alt.subject.name' => [
+	'_pat.alt.subject.name.misc.extra' => [
 		"$the?$gnu?Affero $gpl(?: \\(AGPL\\))?$by_fsf?",
 		"$the?$gnu?AFFERO $gpl(?: \\(AGPL\\))?$by_fsf?",
 		"$the$gnu?AGPL",
@@ -200,13 +199,8 @@ $RE{aladdin} = {
 	caption               => 'Aladdin Free Public License',
 	tags                  => ['type:versioned:decimal'],
 
-	'pat.alt.subject.name' => "$the?Aladdin Free Public License",
 	'pat.alt.subject.grant.scope.line.scope.sentence' =>
 		'under the terms of the Aladdin Free Public License',
-	'_pat.alt.subject.license.scope.line.scope.sentence' => [
-		'hereby grants to anyone the permission to apply',
-		'This License applies to the computer programs? known as',
-	],
 };
 
 $RE{aladdin_8} = {
@@ -216,6 +210,9 @@ $RE{aladdin_8} = {
 	'name.alt.org.debian'   => 'Aladdin-8',
 	caption                 => 'Aladdin Free Public License, Version 8',
 	tags                    => ['type:singleversion:aladdin'],
+
+	'pat.alt.subject.license.scope.multisection' =>
+		"laws of the appropriate country$F${EE}0$F Subject Matter",
 };
 
 $RE{aladdin_9} = {
@@ -227,6 +224,9 @@ $RE{aladdin_9} = {
 	'iri.alt.archive.20130804020135' =>
 		'http://www.artifex.com/downloads/doc/Public.htm',
 	tags => ['type:singleversion:aladdin'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'This License is not an Open Source license: among other things',
 };
 
 =item * apache
@@ -243,6 +243,7 @@ $RE{apache} = {
 
 	'.default_pat' => 'name',
 
+# FIXME
 	'pat.alt.subject.name' => "$the?Apache(?: Software)? License",
 };
 
@@ -443,10 +444,16 @@ $RE{bsl} = {
 	name                                => 'BSL',
 	'name.alt.org.fedora.web.mit.short' => 'Thrift',
 	caption                             => 'Boost Software License',
+	'caption.alt.misc.mixedcase'        => 'boost Software License',
 	'caption.alt.org.fedora.web.mit'    => 'Thrift variant',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Boost_Software_License#License',
 	tags => ['type:versioned:decimal'],
+
+# FIXME
+	'_pat.alt.subject.name' => [
+		'Boost Software License',
+	],
 };
 
 $RE{bsl_1} = {
@@ -456,9 +463,16 @@ $RE{bsl_1} = {
 	'name.alt.org.tldr'            => 'boost-software-license-1.0-explained',
 	'name.alt.org.tldr.path.short' => 'boost',
 	caption                        => 'Boost Software License 1.0',
+	'caption.alt.misc.mixedcase'   => 'boost Software License, Version 1.0',
 	'caption.alt.org.tldr'         => 'Boost Software License 1.0 (BSL-1.0)',
+	'caption.alt.org.facebook'     => 'Thrift Software License',
 	iri                            => 'http://www.boost.org/LICENSE_1_0.txt',
-	tags                           => ['type:singleversion:bsl'],
+	'iri.alt.org.facebook.archive.20070630190325' =>
+		'http://developers.facebook.com/thrift/',
+	tags => ['type:singleversion:bsl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"this license \\(the ${Q}Software$Q\\) to use, reproduce",
 };
 
 =item * cc_by
@@ -1862,11 +1876,17 @@ $RE{'version_later_postfix'} = {
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
 		'\(?(?P<_version_later_postfix>'
 		. $RE{or_at_option}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-		. '(?: any)? (?:later|newer)(?: version)?'
+		. '(?: any)? (?:later|above|newer)(?: version)?'
 		. '|or any later at your option)\)?',
 };
 
+$RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	= ",? (?P<version_later>"
+	. "$RE{version_later_postfix}{'pat.alt.subject.trait.scope.line.scope.sentence'})";
 $RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
+	= "$F$E(?P<version_later>"
+	. "$RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'})";
+$RE{version_later}{'pat.alt.subject.trait'}
 	= "(?:$F$E|,? )(?P<version_later>"
 	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
 	. "|$RE{version_later_postfix}{'pat.alt.subject.trait.scope.line.scope.sentence'})";
@@ -1901,19 +1921,39 @@ $RE{'version_prefix'} = {
 	tags    => ['type:trait'],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		'[Vv](?:ersion |ERSION |\.? ?)',
+		"(?:$D|[,;]?(?: (?:only |either )?)?|$DD)?\\(?(?:[Vv]ersion |VERSION |[Vv]\\.? ?)?",
+	'pat.alt.subject.trait.scope.paragraph' =>
+		":?$E\\(?(?:Version |VERSION )?",
+	'pat.alt.subject.trait' =>
+		"(?:$D|[,;](?: (?:either )?)?|$DD|:?$E)?\\(?(?:[Vv]ersion |VERSION |[Vv]\\.? ?)?",
 };
 
 $RE{version_numberstring}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	= "(?:$RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'})?"
+	= $RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. $RE{version_number}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. '(?:(?: of the)? License)?';
+$RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
+	= $RE{version_prefix}{'pat.alt.subject.trait.scope.paragraph'}
+	. $RE{version_number}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. '(?:(?: of the)? License)?';
+$RE{version_numberstring}{'pat.alt.subject.trait'}
+	= $RE{version_prefix}{'pat.alt.subject.trait'}
 	. $RE{version_number}{'pat.alt.subject.trait.scope.line.scope.sentence'}
 	. '(?:(?: of the)? License)?';
 
-$RE{version}{'pat.alt.subject.trait.scope.paragraph'}
-	= "(?:$D|[,;] ?|$DD|:?$E)?\\(?(?P<_version>"
+$RE{version}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	= '(?P<_version>'
 	. $RE{version_numberstring}
 	{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. "(?:$RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'})?)\\)?";
+$RE{version}{'pat.alt.subject.trait.scope.paragraph'}
+	= '(?P<_version>'
+	. $RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
 	. "(?:$RE{version_later}{'pat.alt.subject.trait.scope.paragraph'})?)\\)?";
+$RE{version}{'pat.alt.subject.trait'}
+	= '(?P<_version>'
+	. $RE{version_numberstring}{'pat.alt.subject.trait'}
+	. "(?:$RE{version_later}{'pat.alt.subject.trait'})?)\\)?";
 
 =back
 
@@ -2264,11 +2304,10 @@ for my $id (@_OBJECTS) {
 			if ($pat);
 	}
 
-	# synthesize subject pattern grant from metadata caption
-	unless ( $RE{$id}{'_pat.alt.subject.grant.synth.caption'}
+	# synthesize subject pattern name from metadata caption
+	unless ( $RE{$id}{'_pat.alt.subject.name.synth.caption'}
 		or $_TYPE{$id} eq 'trait' )
 	{
-# TODO: filter duplicates (by mapping into a hash?)
 		my @pat;
 		for (
 			grep { !/-\(/ }
@@ -2279,17 +2318,32 @@ for my $id (@_OBJECTS) {
 			keys %{ $RE{$id} }
 			)
 		{
-			s/(?: [Ll]icense)/\(?: \[Ll\]icense\)?/;
-			s/,//g;
+			unless (/ /) {
+				s/^(?:\\b)?/\\b/;
+				s/(?:\\b)?$/\\b/;
+			}
 			s/^$the?/$the?/;
+			s/(?: [Ll]icense)/\(?: \[Ll\]icense\)?/;
+			s/,/,?/g;
 			s/ - /${DD}/g;
 			push @pat, $_;
 		}
-		$_ = _join_pats(@pat)
-			|| next;
+		push @{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} }, @pat
+			if (@pat);
+	}
+
+	# synthesize subject pattern grant from subject pattern name
+	unless ( $RE{$id}{'_pat.alt.subject.grant.synth.caption'}
+		or $_TYPE{$id} eq 'trait' )
+	{
+		# TODO: use resolved patterns (not subpatterns)
+		my $pat
+			= _join_pats(
+			@{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} } )
+			or next;
 		$RE{$id}{'_pat.alt.subject.grant.synth.caption'}
-			= '(?:(?:[Ll]icensed|[Rr]eleased) under|(?:according to|as governed by|under) the (?:conditions|terms) of) '
-			. $_;
+			= $RE{licensed_under}
+			{'pat.alt.subject.trait.scope.line.scope.sentence'} . $pat;
 	}
 
 	# synthesize subject pattern license from metadata caption

@@ -22,37 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '[2489]',
-                  'national_rule' => '0$1'
-                },
-                {
                   'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '5',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'leading_digits' => '[2489]'
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '1',
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '5'
+                },
+                {
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '1'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
-          (?:
-            22[2-47-9]|
-            42[45]|
-            82[01458]|
-            92[369]
-          )\\d{5}
-        ',
+                'pager' => '',
                 'personal_number' => '',
                 'toll_free' => '1800\\d{6}',
                 'mobile' => '5[69]\\d{7}',
@@ -64,9 +57,16 @@ my $validators = {
             92[369]
           )\\d{5}
         ',
-                'pager' => '',
+                'specialrate' => '(1700\\d{6})',
                 'voip' => '',
-                'specialrate' => '(1700\\d{6})'
+                'fixed_line' => '
+          (?:
+            22[2-47-9]|
+            42[45]|
+            82[01458]|
+            92[369]
+          )\\d{5}
+        '
               };
 
     sub new {

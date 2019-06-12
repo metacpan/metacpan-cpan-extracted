@@ -7,6 +7,7 @@ build_requires:
   Test::Builder::Module: '0'
   Test::Exception: '0'
   Test::More: '0.98'
+  Try::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
@@ -30,20 +31,20 @@ optional_features: {}
 provides:
   Regexp::Pattern::License:
     file: lib/Regexp/Pattern/License.pm
-    version: v3.1.93
+    version: v3.1.94
   Regexp::Pattern::License::Parts:
     file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.1.93
+    version: v3.1.94
 requires:
   perl: '5'
   strictures: '2'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project
-  bugtracker: https://bugs.debian.org/regexp-pattern-license
+  bugtracker: https://bugs.debian.org/libregexp-pattern-license-perl
   homepage: https://metacpan.org/release/Regexp-Pattern-License
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-  repository: https://anonscm.debian.org/git/build-common/regexp-pattern-license.git
-version: v3.1.93
+  repository: https://salsa.debian.org/build-common-team/regexp-pattern-license.git
+version: v3.1.94
 x_help_wanted:
   - documenter
   - tester

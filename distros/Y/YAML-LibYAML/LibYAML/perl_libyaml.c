@@ -434,12 +434,31 @@ load_scalar(perl_yaml_loader_t *loader)
         if (strEQ(tag, YAML_STR_TAG)) {
             style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
+        else if (strEQ(tag, YAML_INT_TAG) || strEQ(tag, YAML_FLOAT_TAG)) {
+            /* TODO check int/float */
+            scalar = newSVpvn(string, length);
+            if ( looks_like_number(scalar) ) {
+                /* numify */
+                SvIV_please(scalar);
+            }
+            else {
+                croak("%s",
+                    loader_error_msg(loader, form("Invalid content found for !!int tag: '%s'", tag))
+                );
+            }
+            if (anchor)
+                hv_store(loader->anchors, anchor, strlen(anchor), SvREFCNT_inc(scalar), 0);
+            return scalar;
+        }
         else if (
             strEQ(tag, YAML_NULL_TAG)
             &&
             (strEQ(string, "~") || strEQ(string, "null") || strEQ(string, ""))
         ) {
-            return newSV(0);
+            scalar = newSV(0);
+            if (anchor)
+                hv_store(loader->anchors, anchor, strlen(anchor), SvREFCNT_inc(scalar), 0);
+            return scalar;
         }
         else {
             char *class;
@@ -468,45 +487,47 @@ load_scalar(perl_yaml_loader_t *loader)
     }
 
     else if (style == YAML_PLAIN_SCALAR_STYLE) {
-        if (strEQ(string, "~"))
-            return newSV(0);
-        else if (strEQ(string, ""))
-            return newSV(0);
-        else if (strEQ(string, "null"))
-            return newSV(0);
+        if (strEQ(string, "~") || strEQ(string, "null") || strEQ(string, "")) {
+            scalar = newSV(0);
+            if (anchor)
+                hv_store(loader->anchors, anchor, strlen(anchor), SvREFCNT_inc(scalar), 0);
+            return scalar;
+        }
         else if (strEQ(string, "true")) {
             if (loader->load_bool_jsonpp) {
                 char *name = "JSON::PP::Boolean";
-                SV *rv = newSV(1);
-                SV* sv = sv_setref_iv(rv, name, 1);
-                return rv;
+                scalar = newSV(1);
+                scalar = sv_setref_iv(scalar, name, 1);
             }
             else if (loader->load_bool_boolean) {
                 char *name = "boolean";
-                SV *rv = newSV(1);
-                SV* sv = sv_setref_iv(rv, name, 1);
-                return rv;
+                scalar = newSV(1);
+                scalar = sv_setref_iv(scalar, name, 1);
             }
             else {
-                return &PL_sv_yes;
+                scalar = &PL_sv_yes;
             }
+            if (anchor)
+                hv_store(loader->anchors, anchor, strlen(anchor), SvREFCNT_inc(scalar), 0);
+            return scalar;
         }
         else if (strEQ(string, "false")) {
             if (loader->load_bool_jsonpp) {
                 char *name = "JSON::PP::Boolean";
-                SV *rv = newSV(1);
-                SV* sv = sv_setref_iv(rv, name, 0);
-                return rv;
+                scalar = newSV(1);
+                scalar = sv_setref_iv(scalar, name, 0);
             }
             else if (loader->load_bool_boolean) {
                 char *name = "boolean";
-                SV *rv = newSV(1);
-                SV* sv = sv_setref_iv(rv, name, 0);
-                return rv;
+                scalar = newSV(1);
+                scalar = sv_setref_iv(scalar, name, 0);
             }
             else {
-                return &PL_sv_no;
+                scalar = &PL_sv_no;
             }
+            if (anchor)
+                hv_store(loader->anchors, anchor, strlen(anchor), SvREFCNT_inc(scalar), 0);
+            return scalar;
         }
     }
 

@@ -1,0 +1,2299 @@
+<?xml version="1.0" ?>
+<root>
+  <Header>
+    <system>BiosynML</system>
+    <version>1.0</version>
+    <date action="created">02.12.2015</date>
+    <date action="modified">02.12.2015</date>
+    <author>antismash</author>
+    <description>Output from antismash analysis</description>
+  </Header>
+  <domainlist>
+    <domain id="1">
+      <nodeid>1</nodeid>
+      <function>C</function>
+      <subtype/>
+      <dstatus>active</dstatus>
+      <label>C</label>
+      <chemistry>condensation</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">8</geneid>
+          <position>
+            <begin>369</begin>
+            <end>1311</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_810_C</name>
+          <sequence>RFPLSYAQQQMYALYQMQPESTAYNITRAVRISTSAFELSKLETACRALLSKHEALRSLFVVDDITGEPRQVVMSIGQCRQPIVQVLEWTREQGEYRDDEAMAAFLTATTSVPFDLVQDIPVRFIAVASPDGSSMMSWTLVVILHHIVTDGASSVIVWNDLLAMYASPHLELSPVSGTVVNYRDYAVWQRERVESGVIEPTIAYWCRQFAGEDSPTPVLSLPFDYPTTRSPHHEGQGDVITFTASSDALTRMTTLCGAQGCSLYMGLLSVFYMLLSRLSGSSDIVIGTPTSGRDRVELEHIVGYFVNTLALRIH</sequence>
+          <position>
+            <begin>123</begin>
+            <end>437</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="2">
+      <nodeid>2</nodeid>
+      <function>A</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>A</label>
+      <chemistry>adenylation</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">8</geneid>
+          <position>
+            <begin>1908</begin>
+            <end>3141</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_810_A</name>
+          <sequence>SYQQLWDASGRVAHALHSLKRTGDGQLRVGLLTSRGFESAAAIIGALRARAVFVPLDAAFPAARLAYMVQDSAVHAIVSQRRHASIVQALLPPAGDVQVLLYEDLSAEPGDVLATLHADDMPVYILYTSGSTGKPKGVVVTHSNLLSTIQWTVRTYAVGPGSVFLQSTSTTLDGSLTQLLSPLMSGGAVVITKDGGLQDLAYIGGLLSTVSFCVFVPSYLSLLIEFLAVLPPAVRHVVVVGEAFSMELARKFYRKFESSSACLVNEYGPTEAAVTSTSFFLSRNRVLDLELDTVPIGTPIDDHYAVVLDTHKQLVPVNVPGELYVGGRGVATGYWRRPELSAAAFSHPEVEQLTGGATSKWYRTGDIVKWLPTGHLVFLGRADAQVKLNGLRVELNEVRNELMRHESVRDA</sequence>
+          <position>
+            <begin>636</begin>
+            <end>1047</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="3">
+      <nodeid>3</nodeid>
+      <function>PCP</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>PCP</label>
+      <chemistry>thioester</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">8</geneid>
+          <position>
+            <begin>3423</begin>
+            <end>3627</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_810_PCP</name>
+          <sequence>ALVEIWTQVLELEDEQVDWKTQSFVALGGDSLAAIRAISLARTRGISLAVDTFFRCHSVDEMAILASS</sequence>
+          <position>
+            <begin>1141</begin>
+            <end>1209</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="4">
+      <nodeid>4</nodeid>
+      <function>TE</function>
+      <subtype/>
+      <dstatus>active</dstatus>
+      <label>TE</label>
+      <chemistry>thioesterase</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">8</geneid>
+          <position>
+            <begin>3762</begin>
+            <end>4191</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_810_TE</name>
+          <sequence>TSTTPESVEHLADKYWAAIQRWTATLPASPIVLGGFSFGCRVAHAIARLAVRAGRALYPLTLLDGVPFYLDDGSEGVDDADEVSDFADTFCISGANMGEDETALVAQVAAQFRAHCAIEGAYRPQQREDDVRIAATLFKTDRW</sequence>
+          <position>
+            <begin>1254</begin>
+            <end>1397</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="5">
+      <nodeid>5</nodeid>
+      <function></function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label></label>
+      <chemistry></chemistry>
+      <substrate></substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">11</geneid>
+          <position>
+            <begin>39</begin>
+            <end>1101</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_813_</name>
+          <sequence>EMINFKVGQPAPDMLPLDKIRASAALKFAESDPMFLQYGHLKGYPKFRESLAGFLTKGYGHEVDPEKLFITNGVTGGLALVCSLFLKSGDLVFMEEPTYFLALSIMKDFKINVRQVPMQEDGLDVDALEKLLAKGVVPKMLYTIPTCHNPTGRTLSPAKRAKLVDLSVKYNFTIVADEVYQLLSFPHVTPPPPMFTFDKHGTVLALGSFSKILAPALRLGWIQASPKLLKPITDCGQLDSSGGINPVVQGIVHAAISSGAQQEHLEWTTKTLWQRADALMKELKARLPEGVTFEVPDGGYFVLVRLPEHMNAADLLPIAQEHKVMFLPGSSFSESMKNYLRLSFSWYDYHELEL</sequence>
+          <position>
+            <begin>13</begin>
+            <end>367</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="6">
+      <nodeid>6</nodeid>
+      <function>A</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>A</label>
+      <chemistry>adenylation</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">30</geneid>
+          <position>
+            <begin>54</begin>
+            <end>1485</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_2961_A</name>
+          <sequence>RELNRKVQNLAALLRISPSQHPKGLGLQPGATVLLVYPPGLDFIVAFLACLRAGVVAVPVYPPDPRKMKKDISMFVAVAQNSRAQVALTCGLYVHAKKIAGIKQKLTFSDQLPWPEHLKWVTTDDLVDAKGVEPKHWLTAAQSPRAEDIAFLQYTSGSTSTPKGVVLTHGNLNHNLRTISSALQAGRDTVVVSWLPQYHDMGLIGAYLGTIFNGGTGVYLSPFSFIRNPCLWIQLISKHRATHLQAPNFAYSLLARKADKLHADSSIDLSCVRHMINGAEPIQGEAMDNFYKAFSPFGLPAGVVKPTYGLAEHTVYVCGSGAQRVWVDKVTLERDGEFRVVNSGDKKVDEVKEMIGCGVPSRKDHGIDLRIVDPETQIERQEGQIGEIWISSASKAQGYYGDELKALSDEAFHAKLEGGSNAEGQTFLKTGDFGVLFNGELFICGRMKDLVIIRGRNHYPQDLEATAETHEEIRPGC</sequence>
+          <position>
+            <begin>18</begin>
+            <end>495</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="7">
+      <nodeid>7</nodeid>
+      <function>ACP</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>ACP</label>
+      <chemistry>thioester</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">30</geneid>
+          <position>
+            <begin>1941</begin>
+            <end>2112</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_2961_ACP</name>
+          <sequence>LLGELAHLLGVEKQDIDVNMPLQELGLDSMALTQLQGIITQKYKVHVDEAVLYGETT</sequence>
+          <position>
+            <begin>647</begin>
+            <end>704</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="8">
+      <nodeid>8</nodeid>
+      <function>KR</function>
+      <dstatus>active</dstatus>
+      <label>KR</label>
+      <chemistry>ketoreduction</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">41</geneid>
+          <position>
+            <begin>189</begin>
+            <end>678</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV0000002255_KR</name>
+          <sequence>VVTGATDGIGKALAVELARKGMNLVLMSRTQKRLEEVRDEIVAKYPKVQVEVLAVDFNNIDDPSERAAISKLLARLGDIGVLFNNVGVSYDFPQFFEQLPANRVDSLIKLNVTSSTVMTQLVLPGMLERKRGVVVNVSSGSGRLRVPLLAQYSATKKYVEQFT</sequence>
+          <position>
+            <begin>63</begin>
+            <end>226</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="9">
+      <nodeid>9</nodeid>
+      <function>TE</function>
+      <subtype/>
+      <dstatus>active</dstatus>
+      <label>TE</label>
+      <chemistry>thioesterase</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">50</geneid>
+          <position>
+            <begin>54</begin>
+            <end>726</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_3716_TE</name>
+          <sequence>RVLVLPFAGGSTRSLALEWGKSFRDASLKVELWGVDWKWGQDGAATSVAQLMDAITAELSGCFFDKPYAVIGHSLGALATFALVAHLEAKQFALPRHVFLSGAAAPVHAQVYGESLSDAELLKLLTEWNGTDAELLSIPEKRDPLVAQLRSDLKLHDALVKWSQQSGESRIRSSVTVYGGLSDDTASVSSLDSWKDFTAGDNVTFEVVTFPGDHFFLTNTESQA</sequence>
+          <position>
+            <begin>18</begin>
+            <end>242</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="10">
+      <nodeid>10</nodeid>
+      <function>A</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>A</label>
+      <chemistry>adenylation</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">50</geneid>
+          <position>
+            <begin>921</begin>
+            <end>2145</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_3716_A</name>
+          <sequence>TFREVDFMSERLADYLYHAGVRPNCISGIFMEHCIEFVIAYIAALKAGGAYMPLEIVYPPDLLERVMEESKPTIILTKSQFRNRLPDWQLTLNMDEGWLNTLTKQNILPMPADRTRTHPDDLAYVVMSSGTTGVPKGICCPHRGAVHSYHWRLENCPFIETDRVACHVFFVWELLRPMLGNKPLYIIPDDTIYDPIRLVEYISVHSITRILFTPSLCQLILDTCSSELLLEKLKSLRLVWLCGEVVTMELRDRFVKLFPDCELQNLYSVSECHDASAVDLAHMNEFDNSLLSKYASCGEVMPNVHAYVLDDDYKPVSIGVPGELFIGGPCIAIGYLNRPEQTAQRFLKTIVPGETVYRTGDRARYLPNGHLELIGRCDFMVKIRGYSVVLGAVESALAQHPLVSTAVV</sequence>
+          <position>
+            <begin>307</begin>
+            <end>715</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="11">
+      <nodeid>11</nodeid>
+      <function>PCP</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>PCP</label>
+      <chemistry>thioester</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">50</geneid>
+          <position>
+            <begin>2430</begin>
+            <end>2646</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_3716_PCP</name>
+          <sequence>EKSLAAIWTDLLRLENSSILNKKVNFFDVGGHSLLATRLVSSIRDTFNVHLTLADILSAPELAVIAARIDAE</sequence>
+          <position>
+            <begin>810</begin>
+            <end>882</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="12">
+      <nodeid>12</nodeid>
+      <function>Red</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>Red</label>
+      <chemistry>reductive release</chemistry>
+      <substrate>intermediate</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">50</geneid>
+          <position>
+            <begin>2814</begin>
+            <end>3567</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_3716_Red</name>
+          <sequence>VLLTGCTGFLGAHLLHALLKHTETTVYCLVRASDEEAAFARIGQTLRTYSLYKEVEDKLEDQVVPVAGDLAKPLFGLSSDTFKSLASEVDAIIHNGAEVNLVKPYAALKSTNVLGTQEVLRLAVTNGLAKTRVKPVHYISTNGVFPTSFADSVLPENADLSEIPESLENGYAQSKWVAEQLCREAAARGLPVSILRPGNMAPSSISGEWNTSDFIYLLLKGCVSLGAVPASGDVDWRFDMTPVDFAARAIV</sequence>
+          <position>
+            <begin>938</begin>
+            <end>1189</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="13">
+      <nodeid>13</nodeid>
+      <function>ACL</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>ACL</label>
+      <chemistry>acyl-CoA ligation</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">70</geneid>
+          <position>
+            <begin>201</begin>
+            <end>1614</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_9714_ACL</name>
+          <sequence>SFEDVDRAARKVAAALQRDAGVRKGDRVMLCYPPGLDFALGFWGCLYAGAVGIPVYPPYPGTLAKDLPKFNRMVADSGAKVVLTNKTYHLASKMATVKGFFSGGSKATTWPENVQWISTDALADSGAAHYDDAELGLTVDDVAFFQYSSGSTSEPKAVMISHGNLRAQLKTWESILPSDTLVSWLPSYHDMGLVGFIITPCITGGRCVSMXXXXXXXXFIKDPAMWMRTVSKYRATHVCAPNFGYALAARKTTDKEAASMDLSTLKQTICAAEPIRPESLDAFISKFEKASGFNPDTFNCGYGLAEVTLVCTGQDPLTRQLPTVLTVDKSMLETNQKVVQVSKPAKKETVMSLVGCGKAMPTFKVSIVDPNSKKLLKDMQVGEVWIQGPSVSIGYWNRPEYTEEMFGALLAGEKDSKNTFLRTGDMGFLRNGELFVTGRLKDLIIIRGRNVCPQDVEATVERAHDHIRPGC</sequence>
+          <position>
+            <begin>67</begin>
+            <end>538</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="14">
+      <nodeid>14</nodeid>
+      <function>ACP</function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label>ACP</label>
+      <chemistry>thioester</chemistry>
+      <substrate>building block</substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">70</geneid>
+          <position>
+            <begin>2106</begin>
+            <end>2265</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_9714_ACP</name>
+          <sequence>PKPAEIDPSTPWAMFGLDSVAIVGLSSELGEFLGCVVPPSAFFQYDTPEKLAN</sequence>
+          <position>
+            <begin>702</begin>
+            <end>755</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+    <domain id="15">
+      <nodeid>15</nodeid>
+      <function></function>
+      <subtype> </subtype>
+      <dstatus>active</dstatus>
+      <label></label>
+      <chemistry></chemistry>
+      <substrate></substrate>
+      <location>
+        <gene>
+          <geneid source="genelist">70</geneid>
+          <position>
+            <begin>2478</begin>
+            <end>3510</end>
+          </position>
+        </gene>
+        <protein>
+          <name>EPRPV000_9714_</name>
+          <sequence>KKTNFNTYNYLGNARDPEVLNAARKAITEYGSTMSSSPIVGQTQVNVDLEKALCSFFRAEASVLFVGGWVTNVTTIDALVGKGDLILCDALNHDSCVTGQRLSGATILPYPHNDTDALERMLSQLRTKYRRVLIVTEGVYGMDGDIPNIPEMVRIKKKFKSLLFIDEAHSFGTMGETGRGICEHFGVDTDEVDVRMGTMSKALGSIGGFVLGSRALVQYLKHCAGGFVFSVGLAPSAAAAALKSIELMTASPSRTERLHDNSRYFFDKCKEHNIPIGLHTFRGGPVVVVMIGSTIATAKASEYLAANGVNVKPIVYPAVEEGKCRLRFFISAVHTTKQLDHTIK</sequence>
+          <position>
+            <begin>826</begin>
+            <end>1170</end>
+          </position>
+        </protein>
+      </location>
+    </domain>
+  </domainlist>
+  <genelist>
+    <gene id="1">
+      <gene_name>EPrPV000_803</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2769787</begin>
+        <end>2770935</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_803</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_803</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MTTATGMFMDTVSLNDDAGAVGQVPSQSSSDGGSGASAVLDVDSLEAQFNVTKQPKTAHFQSEENNATPDQVVVVVGNGGDENSKSNSSSKSNGPESAHDVVKPRQQPVLPKLRVPPSNNDHLEERDYVDPSLFSPEVSRHAMEVAHRRAKAVAMEVKEMMELESDPAIAATTVNNGRLSPGDAVGIIGSAFVSSMMRVKHIVKRDAKEYDLLAGSSPSSKMEDLDTDGDGLQISPDASKGDGKHFRSPSLRPALKRISAYVAIPTEKPQRQKKALQWHEDVLDGDEEFFDDGEEDLDENGGSSPRETNSLVMNGHSILNYKKGGDLTPRSKKKRKKLYREELAGEEHSRWSLWLVMFITMLAVLLIVLIFLIARQHAHATKQ</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="2">
+      <gene_name>EPrPV000_804</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2771936</begin>
+        <end>2772091</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_804</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_804</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MSLVRQSLRALKAVNTPSVLRPATARFMSDKAYPTTSEDPDVVIPELHQTLE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="3">
+      <gene_name>EPrPV000_805</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2773092</begin>
+        <end>2774210</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_805</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_805</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">FGAAAGGGAKPPLFGKTTASTGFGGFGAAPASGTAATGGSSMFGGFGATAAPKPAGTGFSFGTGGTSSFGTTGAGSFGTTGTTGFGGFGATSGTPSAFGTPAAGATPSAFXXXXXXXXXXXPPAAPSTAPPPIILAAADTSVAQLNTVKYAYQDPAQSRFKFLMYNQVDPTQRHLYVRPSHISERLWNQAEQDNPDPLNCVPVPIMGSSDLLKRIQVQQEYAGKYDAFADDLRGQLKEMDKQKRATEEKLEKCRHEHVQLFHALVKVMKDIEFLQNLGKPLQRTEMELVMALKKLQTLLDSPGQYKARLNDAVSRQGAQKAAQPPPAANQLSPEDLQRVYQFLDKQRQSLEHLTNVLQDDLADIQLMKETWRR</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="4">
+      <gene_name>EPrPV000_806</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2775211</begin>
+        <end>2780250</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_806</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_806</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MVPPVRPGFGTLGKEIRVYANYYPVTLKGDDVFHYDVAIKESGTDKEPPKTLAMKVVKTLVTEICRDYPDTSVATDGWKGLFSNKGLPFNEHQFTGLRPGDEGDGDGRPARVFDALVKEVDHTVIQTMKLNDHVAGRPVLGFVKEVLGMNADPTVLDKRQSKLWCRIAKDQKLLRKCIVKKNFIKVHHGLDQILSNLSMKINMKLGGVNAIVHGLPLRVLEQRTMIIGADVNHPNSRDTMEPSIAAVVGSMDNSFARYSATFQPQGHGMEMIEGLQGMVSTLLEQFRAARDALPTQIVFFRDGVSEGQFQMALIHELTAIRDACSAFEFQPPITFVVVQKRHHTRFFPTDQRDADKSGNLKAGTVVDQGSHGGLIGTSRSSHYHVLWDEMNFTPDELQVLINSLCYTFARATRAVSIVPPVYYADLLAYRARLFVQDHGESHESTSSVTSTGSTYPVLGIHPGVSNTMFFFKKIRQRAMGSATNLPRSASDSGAAALGVTDSGPRWAVGERRAPASRRELPLTRLGAREPHPLTSIALVLTAVLTTDAQSADNSTELAPLAVSSPIAAKTELVVLQDGDVDPLGALSAGVEALSALGSDGSAAVLAVSSSTVKKRIEPVADEPLTVKQQWRAHKDRLLSKFAEHTFKIKASMLETKDLESELLVESRGEGSSRSHIDDSSDELDAMRKSRERLEELERKQQGLKTQSNSQRGDRTLELSQSEYVARVERMRTQLEAAWTRNQKVLALRIAIKCVKLLGDTTTAPQLYPCVFVLVRDVLDTFGTLVFDRIKVRASEDEHGQPLPRPLGDFFTTADVNVHATETCRNWFYKTACIRELLPRIYMEIALLRCYRFLCDGEYPQIVMRISNMIRGIGDPLVALYTWLYLGLESTELLAPTDKAAVTSSLSDYLFTFHEFRSHKLETWLSVQHMELEDYLALHSPAVEWLVKCAAHQSPRDTFDELIDQYQQFSDCSMVLKHLTEGFGAANYAQDPFPILELARTASPSQYSKSHLYSVLALQLSCSKTFLKREDEDDDDNVYSRRLAFLNNAWASVTSQPSIEQYMECAAAFMKLVVVHYAPREALILLRDVVRHLNAATSDELTPKTFNLMGTLIENVVIGAQQRYAFFRKLVPSPEFLTLLGMFKREASVGVARKVLRAFVLGSLSQSPGQGSKYDDGHGIKTRRLPVVGPEAAVAHTLLVLCCRVHDALDSLHASRVARNEASRDICAFISRLGYTTSNDESDRARDEEQDALLDLYVDCRRAFYKLESVQAALVRRVLALAMHVHHTRLSAGALHAKKAKKSRDLVKSCLAYAHITAPSVERALVKLELLVDAAKVALVTSCLPQMDSFIKAAVVLIAELDLDALLAMSTDEDEEPHNIGDSFRINSIGLTRFEYGLELLVRITCDLVSVLIYAPSLTDSDAFYFVHALRKAALERLLVVQPSAHEATMVAIAASRVRIQFALLQLLALWGQPSLPDGRIGGVDSNDVLYGGDVLFARRVREEFSTTIENIVREIETLGQIDDDDKQAPAQRMDRAIATLQAELMLDFINLAAPSLAYAEIDDASSDPLDDEAKSDVLDDGQRRRRRRARSSAVLLRKCWLFVSSKLDTAQDAGSTRSIKSEGTKESSWLEEYRENTREFVAQLATTAMAATKWQHPSSSAHVQSIEALRAVLSNRATVG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="5">
+      <gene_name>EPrPV000_807</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2781251</begin>
+        <end>2783461</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_807</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_807</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MEETWSSAMRRLVAREEAQERDKLQRRQLKLKKEASLVSGAVGVSTSAVGTPVPSEIVNGHEPVEAPEEVAPEDDGKQEDEDEEGDDDFMQKHLLSRPTGRWICLEDAQQANCVALNRRQTMFAVGERDGRVSIWDNVSLRVITRELDPTSIVVPDEKHIENDGQSGEEEDNSERRGGLSKTESHNDEDEDEDGGDANDYSTGNEDASVEDDDGHSVEEGDGSTEEDDEDADDGDHHGSDDETRSVTRSGDAPVASGNGNGGIVEPGLSVTDLRRVRNSLKVVTQVAWSCDSRWVFSGCEEKSTRKGILCVWDVEASTLVATFAFDAAINCLSVHPSDPRQVLVSSYNSVPVLLNVTTREATPLNEIPLENSMLTITIPSNSRHPALIVAARYGQSGEFIYAATTKATVAILNASTLARVNHIDLNILIQYVDICVNSSETALLITSSKGIHEFAIRRPSTQPETGARELSEVWQLSTGAVRAPWALCSFTGDEKFAVGVPVVRHRHIGENGLYTWDCATGKPQHNAGVTDGVNSLTWDTQRDAIIAVSATGALYVFEEEFTTTWPGSMYPAGFRLITDNELHDESFDVEDAVERDQERQAAQQSEQEDIDIFEGHGPVIDSDDSAAVVFPSLAPIENELLYLPAIPIAQHQRKHNQPFQGSVYHDERHFGLGQSVFEPLKVPQKPKSSRSRRKSGIVVEQVVTDPTGAAGPVPATQSGKRNTSAAGGNSSHKRRRR</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="6">
+      <gene_name>EPrPV000_808</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2784462</begin>
+        <end>2786714</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_808</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_808</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MATTAAKTGRLAQRLAYPAVRRSDLVENLHGAQVADPYRWLEDPDAPETRVFVDAQNAVTQRVFGEIPSVEATKQRLTDWFNYEKYSAPHKYGSKYFYYKNDGLQNQSVLYMQDSLTAEPEVLIDPNLLSVDGTAALSSRAFSEAKLDDGKLFFAHGISRGGSDWQTIKVLAVHDRKTLDDAIEWVKFSSIAWTHDDKGFFYSRYPAPVKVADGAHDDEDSKRGTETDSNLNHQLWYHRLHTPQSEDKLVYAFPEEPSNTVAAEISDDGKTLIVYVQDGCKNANMIHLADLSGFEDFLAGPKDETLPVKKLVNDMESAFSYLLNDDDVFYFKTNADAPRERVVRTNVAAFSGEPGPAPVWEEVIPEQPDNVVIEGVHPVAGDLLVVQLMKDVRHVLHVYNLKGEFQYELDLPSVGTVSVSSKRTESELFYHFISFLYPGSIYRVDLADSPPTATLFRQTQVKGFDPSLFEATQVFYPSKDGTKIPMFIVKRKSAPLDGNQPVYLYGYGGFNISLTPAFSVARLIFAHHYGGILALPNLRGGGEYGEQWHQDGMLFKKQNVFDDFHGAAEYLIKEKYTNSERIAIHGGSNGGLLVAACINQRPDLYRCAVGAVGVMDMLRFHKFTIGHAWRTDYGDPDVAEDFKYLLKYSPVHNVPSADSPAVAALADRGGFPSVLLTTGDHDDRVVPLHSYKLIAELQHKLGNSSAQTNPLVIRIDTKSGHGAGKPTTKIIEETSEVYAFIAWSIGAEFLV</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="7">
+      <gene_name>EPrPV000_809</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2787715</begin>
+        <end>2788518</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_809</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_809</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAFLDQRDAVHQVLITGSFGVGKTAFLSFVMWQLRLAADPPTVVLDVDGFFGRIGADGVVEVGERGRSFADDLAERSTVYLCDVSAASATGGPLCGPNVLARTIVTAAPVRKLVAEFEGCADRRTVTFHLIELVHMWGGTARAALGTQFADAKEQFVRSAAALPLGVAAQLVRDHGTATENMVDADGYSEAGHRLVHMDVDADNLFKLQSVALCSANACAIVLSTAGDGEVGKLIETLEADLKHPTDRITEPFKRQLEHEHLSKVVRA</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="8">
+      <gene_name>EPrPV000_810</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2789519</begin>
+        <end>2793868</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="aSProdPred" ori="auto-annotation" style="genbank">n</qualifier>
+        <qualifier name="aSProdPred" ori="auto-annotation" style="genbank">r</qualifier>
+        <qualifier name="aSProdPred" ori="auto-annotation" style="genbank">p</qualifier>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MVADGIRVIATDPSYHSALAVSGVECGGGGGRTEIEALLDGGHVSQVVSWLHNLIRLQASINSEHEQRQQLPAQKKRLSTLKQALLCVEAALKRQEQVLELQLAPGLSTQFSKVQHDEPRQLRRFPLSYAQQQMYALYQMQPESTAYNITRAVRISTSAFELSKLETACRALLSKHEALRSLFVVDDITGEPRQVVMSIGQCRQPIVQVLEWTREQGEYRDDEAMAAFLTATTSVPFDLVQDIPVRFIAVASPDGSSMMSWTLVVILHHIVTDGASSVIVWNDLLAMYASPHLELSPVSGTVVNYRDYAVWQRERVESGVIEPTIAYWCRQFAGEDSPTPVLSLPFDYPTTRSPHHEGQGDVITFTASSDALTRMTTLCGAQGCSLYMGLLSVFYMLLSRLSGSSDIVIGTPTSGRDRVELEHIVGYFVNTLALRIHPTEIDSFQELLATVRDVVLNGFANMEAPFHEVVRRIRAAQRRHHRGGDAEASMLDHGLYQVMFSLESGATDGDSLHEVALPHTTAKFDLMLTMRVDRDDHGRRELQGELEFPLDKFSRATAERFARYYCKLLDLVTLKPRAKLTTLSMLPLDEHHKLIHQWGAPAATVPLSSCYIDECLRAQVAKSPESLAVHFEGSSWSYQQLWDASGRVAHALHSLKRTGDGQLRVGLLTSRGFESAAAIIGALRARAVFVPLDAAFPAARLAYMVQDSAVHAIVSQRRHASIVQALLPPAGDVQVLLYEDLSAEPGDVLATLHADDMPVYILYTSGSTGKPKGVVVTHSNLLSTIQWTVRTYAVGPGSVFLQSTSTTLDGSLTQLLSPLMSGGAVVITKDGGLQDLAYIGGLLSTVSFCVFVPSYLSLLIEFLAVLPPAVRHVVVVGEAFSMELARKFYRKFESSSACLVNEYGPTEAAVTSTSFFLSRNRVLDLELDTVPIGTPIDDHYAVVLDTHKQLVPVNVPGELYVGGRGVATGYWRRPELSAAAFSHPEVEQLTGGATSKWYRTGDIVKWLPTGHLVFLGRADAQVKLNGLRVELNEVRNELMRHESVRDAEVQVLSTKRKSKGSLVAFVMSDADPDELRSYLRGHLPSHMVPHEIRIVDAWPRTPNGKLDVRVLLETATKAAPRLSTVEDEQPPVRLATRLAREALVEIWTQVLELEDEQVDWKTQSFVALGGDSLAAIRAISLARTRGISLAVDTFFRCHSVDEMAILASSTADARTLALQPLVPLNIRSCGLPTLFLVHGADGTRLPFPVVGLQATSTTPESVEHLADKYWAAIQRWTATLPASPIVLGGFSFGCRVAHAIARLAVRAGRALYPLTLLDGVPFYLDDGSEGVDDADEVSDFADTFCISGANMGEDETALVAQVAAQFRAHCAIEGAYRPQQREDDVRIAATLFKTDRWDVDVDEFKAAGADIATVEFPGSSHLSLLRPVHVDSLGVAIREQFEHWTEQPPC</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Type: nrps</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Domains detected: Condensation (E-value: 3.7e-57, bitscore: 193.1, seeds: 42); AMP-binding (E-value: 2.7e-88, bitscore: 295.7, seeds: 400); PP-binding (E-value: 6.2e-08, bitscore: 32.5, seeds: 164)</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Kind: biosynthetic</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS subtype: NRPS</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: Condensation_LCL (123-437). E-value: 3.1e-75. Score: 244.6;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: AMP-binding (636-1047). E-value: 1.1e-90. Score: 295.7; NRPS/PKS Domain: EPrPV000_810_A1; Substrate specificity predictions: phe,trp,phg,tyr,bht (NRPSPredictor2 SVM), asn (Stachelhaus code), arg (Minowa), nrp (consensus);</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PCP (1141-1209). E-value: 6.3e-11. Score: 34.0;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: Thioesterase (1254-1397). E-value: 3e-11. Score: 35.7;</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="9">
+      <gene_name>EPrPV000_811</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2794869</begin>
+        <end>2796446</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_811</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_811</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MTTMRVGRMLLALVLCVAMLFASGEGVADVAESELTFLDFTVEGLDGKQVPMTSFQQYPVILVVNVASECGYTDQNYRELQTLYEKYHDRGFMVLGFPCNQFGRQEPGSSQDIKQFVESTYHITFPIFAKVDVNGEHAHPLFKFLTQKLTGFVTNDIKWNFSKFLLVNHEPFKRYGTSTVPFEIEVDIAAALDTAKPSTRIEDMGPSSVAKKPRVVLVTGGTGLVGCALQAEVRSQDLAEDEWHFVGSKDADLRDAKQCKALFERIRPTHVIHLAALVGGLYNNLSRKVDFFRDNMAMNDAVLHCSHEFGVEKVVSCLSTCIFPDKTTYPIDESMLHDGRPHASNEGYAMAKRLIDTMNRCYADQYGCAFTSVIPTNIYGPHDNFNIDGGHVIPGLIHKCYLAKQRGEPFTIWGSGAPLRQFISSRDIARLMLWVLDSYESVEPLILSVDEQDEVSIREVALQIASAMGFEGEVVFDATKADGQFKKTASNAKLRRLVPDFAFTSLSDGLRESVAWFQANYDSARK</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="10">
+      <gene_name>EPrPV000_812</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2797447</begin>
+        <end>2801040</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_812</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_812</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAQRDGTNEPNAGGGERFAGAASTTGSKSAALGMGASGKRPLGSAASHRSAEEVRRSGLNMEKMIKKNVMVASRPGGMKKRGLAVVEYFKNRSKQQQETSGASASVAAEEADDRHAKRRKTAPSSHADGTHGEASPASAAAASTAAVPAPAVAASSVPLTGDGGQRLSGRMSLSPSHRPPSTAAAFADLLASPQRHHHGRSNPLHLVSPARGRAAAAINLSSPARPPRGSQAAVTMTSPMRAIRNGTIASPLRRPGQFLASPARPRRTTASPRKPLFQGPDDEDHSHSTIASRPIVSAANGEVSGPQRPPSAPVLESALEQIERNTASSKAGAAISKSPFQSFQSKYAVKPRQGPSVLTSPSVDSTNAQHQPGPTRTGPTIVGVASPRAEDASIAVEVPPIEAIVPKVHAKPARALFASKTVVANRSMCFSTEGVASSVDVSPDGEIVVVGFTDGSVRLYEMDSNVPSDRHGYLLGHIDEESNQGTANANLRVKITPDGRYIFVGCRTGPRLVMSINLHHYRNEKDEDDFEQFQKSFLSDTKVRGFADATSCSALTNATSQRQHSYYLMFGLGIGTLRIWQFIEGRPEPEWKYLYAVQTGGNTATTAAFLASEIGGSLTNSLTIACIGEDKNLRVWPLEYSNEKESGSAKSDEEENEDAADDNHGGIHIAKSHYDIPNTKDIVAIFGHYAYGISLVGEAYRLRIPLNGLSPGSVSRQSFDAEKFDHGGSGKSRRSKTILESVSASEDGSVLIAVSTEGVLYYTNHISTDAAVTPTLKMIGKNSSQNQQYKMPMKVYIPQPKQSSTVDKSDPSDLQSMMAVVCNPSEDDDCDEGFFNVDPTDVFAARWMVPSQGRDCWVCGVRNTCHWQAPTEQQHKTVLKNKHTRSGRPFRPGKDDSDDDDRASDRGSKKRAKTKSSSSSSRSQNDTPTEESSVRPTSTPSSDAKRPASAKARTSLGSANRSDIQAISMDRTRNATPRGRSRKAMSSNASTGEDSDGSAEHSSNSNLAAELVHYKERLSQIEIEWKRRLKGEIQMRRLWKSRETEFNKELKELLEQLYQAEQQVETLQAAQKDAEKRFSFEKLKAEQQSSVRVRYEQLCEEMGEKMALVEDQRRLLEQTTRSLLVEVDRNVSSLKNAVSLERSECIVCKDKQAVTAIVPCGHLCFCEEDGEAYRRNASGPTLTCPICQRELISLLRIY</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="11">
+      <gene_name>EPrPV000_813</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2802041</begin>
+        <end>2803939</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_813</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_813</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MGDYGQYVVPEADEMINFKVGQPAPDMLPLDKIRASAALKFAESDPMFLQYGHLKGYPKFRESLAGFLTKGYGHEVDPEKLFITNGVTGGLALVCSLFLKSGDLVFMEEPTYFLALSIMKDFKINVRQVPMQEDGLDVDALEKLLAKGVVPKMLYTIPTCHNPTGRTLSPAKRAKLVDLSVKYNFTIVADEVYQLLSFPHVTPPPPMFTFDKHGTVLALGSFSKILAPALRLGWIQASPKLLKPITDCGQLDSSGGINPVVQGIVHAAISSGAQQEHLEWTTKTLWQRADALMKELKARLPEGVTFEVPDGGYFVLVRLPEHMNAADLLPIAQEHKVMFLPGSSFSESMKNYLRLSFSWYDYHELELGARRLSDAINEYAAQLAARPAASAAGGSAAHGQGVRVAVHGAKGRLGSLIVSELAQVTDFSAGFAGAIDLRANVLPPLDTIDVIVDVTLPQGTKALIAHLLAQDKAAFKNGKYPALVVGTTGALPTEALEQYAQVAPVVLKSNFSVGVPLVAELLQAAAFKLPSDGWNVEVTETHHTKKLDAPSGTAKTLVKALASTGAPCTGVNGTIPTHSLRLGDEVGQHTVLFAGPGERIEIKHQATRREVFAIGAVRAAKEAIALPAGVHTD</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS subtype: PKS/NRPS-like protein</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: Aminotran_1_2 (13-367). E-value: 1.6e-45. Score: 147.3;</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="12">
+      <gene_name>EPrPV000_814</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2804940</begin>
+        <end>2805698</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_814</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_814</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MLELVARLERTQAELLAELLQIAEAQPSVDGERVEELKRGFEELELVAAAATPAIDAGVPSNPNPAVLTPDFYATYLLVVLLSKNLNDARFLWKRIDHATKSASEVLGAVWEIGKALWKRYEWFSPTARKCTEWGWYSDLGAAHSAMTKPWPHQLQPLVDLLRRSTRESATELLSVAYSTISFQDVMIALGFEQEDAMVQYCSVLNWEIAANEKLVKPKPLKHASRYETGLEQLDSLSQSVLHLEQNTVLKLP</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="13">
+      <gene_name>EPrPV000_815</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2806699</begin>
+        <end>2807601</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_815</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_815</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MSPPAEIVTGIKGAEEASDRMRFRPCIDIHAGEVKQIVGSTLTDGAEAPVTNFVASQSAGEFARMYKRDSLTGGHVIMLGVSEPNKQAALEALREYPGGLQIGGGINADNCQFYIENGASHVIVTSYVFRDGQIDFERLKKLKTLVGKDHLVLDLSCRKKAEDGRFYVMTDRWQTFTSTSIEYVCILPPLSSGTNVANYCRSEALLHRLADYCDEFLVHAVDVEGKRCGIQQELVELLAEWSTIPVTYAGGASSLADLEVVDRVGRGRVDLSIGSALDIFGGNIRYDDVVTWNKQHDAVAE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="14">
+      <gene_name>EPrPV000_816</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2808602</begin>
+        <end>2809354</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_816</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_816</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MSSDTTAATGDAAAEQPSALQLLRAQQNAYYIEAVQGALEAEERRKQRLAGVSTHLEAKRLEKQFARERRQDKERLEHIQEDHNLLLKAKIAEWKANGGVVAAPAVTGRTTARSTKPADDDKPPVKLTKERLDNLSKPRATATYEQGKRPSSAARGQVETSQDLAFYKALYKKHDPTRLAASSSLPALNAANLQAMSEVDLLHRQANLLTQLHGVVSLQERIIMDDQCTIRSSVSSWKSSSTGTSANNRKR</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="15">
+      <gene_name>EPrPV000_817</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>2810355</begin>
+        <end>2813024</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_817</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_817</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPAHPRVYTFVKGESQGHASMKQLLGGKGANLCEMACGGVNVPPGLTITTEVCQEFYAVGGRLPNGLMDEVREGVHLMERTVDKTFGDAANPLLVSVRSGAAVSMPGMMDTVLNLGLNDEIVAGVAARGGERFAYDCYRRLLQMFGDVVLEIPHDDFEAELSAMKMARGVTFDVELTADDLKELVEKYKTVYEKHEQRFPTDPWEQMTMGIEAVFRSWNIPRAVKYREINKITGLKGTAVNVQAMVYGNINDRSCTGVLFTRSPADGENKLYGEFLLNAQGEDVVAGIRTPQPIAELEAKMPEVYKQLDETVHKLETHFKDVQDTEFTVEDGVLFMLQTRNGKRTGPAALKIAVDLWREKLVTEAEAVMLVEPRHLDQLLHPSFADEKAYQSDVLCSGLAASPGAAVGKVVFTAADAEEWFARGEQVLLVREETSPEDVGGMHAAEGILTSRGGMTSHAAVVARGWGKPCVCGCDALMIDAASKTLRVRTAGGEVLVAEGDFLSLNGTTGEVIKGEQVLKQATVSADMAQFMTWVDAHRRMEVYTNADTPEDARDARANGAQGIGLTRTEHMFFSSAQRIAAVRRMIAAVELDSPQQQEALDELCAFQQQDFEGIFRAMDGLPVTIRLLDPPLHEFLPHEGSALDDLCVQLSTELGVSKETVEARLAGMKEANPMMGLRGCRLGIVHPGITKIQAKAIAAAAVAVAADGVAVHPHIMIPLVGTFEELELEVKLVKSVVEEIVGASEQKVNYKVGTMIEVPRGALQAGKLAEVAEFFSFGTNDLTQMTFGISRDDAQAKFLSYYVKHGILETDPFETIDTVGVGELIKLAAARGRATRPDIELGICGEHGGDPKSIEFFEAVGLRYVSCSPLRVVIARLAAAQAALKLQHA</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="16">
+      <gene_name>EPrPV000_2563</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8231148</begin>
+        <end>8232671</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2563</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2563</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MATRTRPQRKAKRTDVDYAVLSSGQQIPEYSSEDESSGDDDFGGGRKRKKRGKAAANGRKRRAAGGSQDECFICQKTSKSPFIQCDICSRLFHARCGRPFESASILGNTSCYECLQEATISSMDALPRTKLETVEDFVKLLKKAKKIVVIAGAGISVSCGIPDFRSKDGIYAMAQHMDVVLPEPECLFQIEYFREDPTPFFQIVRNAFANSPVPSPTHRFLKLLQDKKKLLRVYTQNIDGLEEAAGVNRVIPCHGSFAWSTCMRCRNRVPTSSLMSAIQAGVIPTCSVNDCRGVLKPDITFFGELLDDKVSTSITKDRLQADLLLVMGTSLKVAPVMEIPGYLPAHIPQVVINKTLLKRKKIKKKAPGQVPSEMAKSNGKTGGDDEEFDLSLLGNCDDIVRYICDQARWELDSIGDGDDDDVVEVTSKGSPARKKKMGKQVHRDVYTRVILHKSGRKKVVCFGECQCGNQLANGMEDSSAESEQEPEKIVCNRCGVCIDGDKVAHFRC</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="17">
+      <gene_name>EPrPV000_2564</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8233672</begin>
+        <end>8235321</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2564</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2564</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MDHGVMLADKASNLLAERTDSGQQISDRLLVGDHTESGAMHHIRWTFVAQSMEMKLSTFTNLTEADMAAQTEVLVTTLSHKLLFPTLKLEFGTEFYSNRLKNAGVVGQTIYRVVCGPVDARRAQVQNLELVCCPQQFDGVCLALGSEFSLTSADLFLKMSDLTTEARIWMWQWLAYGLFHATSRSSLSKLNLRDAIIGEEEVNAISSVMTSENPLSVILSRGFADRRFSLNLDMTQATWEPVLLPYGTYIHFLGEHPTYPLGSRMLRNDVQGVTACSDGETSNLVYVVLPGFGICCADRTQLEPVPQSTTQKTSVTNLTLKFNRWPDQPPAISRFFQFVGPPLTFLEIEATGSLCLAESLKWCPNLKTLIAREGVLINTAPFLQVYQSHDLRIETIECKFDNMVLLLRELSDQNTNLARRLRQLWHRYSYSGLRLDPVLTSVSEMLQANQRLEYLELVGPGFPNDGILATIEAHDGELLQVEQLPIKCRLAFVSMFGHREHSSEANQNELRSPVAASATMLPFLDLNALALVFEFAATRTQRHVSISHEW</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="18">
+      <gene_name>EPrPV000_2565</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8236322</begin>
+        <end>8238559</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2565</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2565</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MNGMADAAWSFMQPWCEPLRGLLSIQIEQGHLTMKFAGIGVHLPTLETEDTMSKLRAIRKALVLMTLLAHVDDAAWKNALVEYCDLSITDKVEVFESEEFEPRFVFTLNDQFASAHLDNSEDSDEDMWVSSVLPAFLVTAAHEDAAFAAAAARIASVGANVALSDVGIPIVVCISLEFFEDDVVLDHFRGVWNSIKELKARVGGYRFPVGSTNDAADDGILRQCSFVLSLIDADSSLCALTPGLAAVVEEMATAGDGLVFRHLAFNVTPPDYFVGNDNFNAVKITGKSLEQVLCANQPSDRSVLKAVTLQCENTDPPEIARVCSAIAQASTTKDLTVMLETEEEVPEMWMWIWERLAYALFSKHSQSSITKFTLFGAYVTTEAVDAIAAVLRADNPAHFLFGQPFFGGEPGRPLPPSGDDFGLMMLKRGAHVTLQQLHPHEPVFTVPSWSLPTDIRGIKVLNDERNQESVLALLPGYGVCKVQREQLVPAGDAKGRSGVTTLNLMVENEPEAWEGLPGLLELVGKSLTRLWIQILSSDDLLRVDGILKWCPNLQALAIRGIKVDTQSFLDVYRENHLKISELDCDFDDVAILAKELARPSSLVAQNVLCWSYSFRSEADTSESGRVEGILEMLRSNCSLQYLSLVMPREQHDASLERFERHRNEPLPVLGDRFPLINCTAFLSIFGSSSRRRGPKRAKADSTPTVEIELLGHRHVVSIIFDFAAQCLRRKVHLRHYDPPRGLMEWQ</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="19">
+      <gene_name>EPrPV000_2566</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8239560</begin>
+        <end>8239925</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2566</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2566</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MQDWRMFLTIEERQAVRSKIRDAYTSRCATYEDLLQVVRVPRFTAAILHACAIEEELLHISAPSRLDYFKSGFEFENRVKLKKDQLQGQLAALDAKRRAGGVGGVGGGQSSHSSGQASQPPA</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="20">
+      <gene_name>EPrPV000_2567</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8240926</begin>
+        <end>8241903</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2567</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2567</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MLGRICQAGHAGPRHGRRWRALTPATARRMSGASGNSRVPASVALRESVRQYDYDHYLCGLLLPIDTRPAYFAIRAMNVELATIKDSIRSNHLTGKIRVQWWRERVSALYESPGGATRETPLLLELDRAIAAHGLTRRWFERLLDARDQDLDVDQPLSLEDLERYAEQTASSLLYLTLECLGVRDGAADRAASHVGAAVGLATLLRGTAFHAMRQQVYLPEDLMLRHGVSVYDLAEATENPELGMVAAPVVADVARRAQEHVAEARALMGDVPKAARAALLPLVSMDMHLAELEAVQFNAFDPKLQQRSALRLHLQVLKHYFLGRY</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Type: terpene</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Domains detected: phytoene_synt (E-value: 6e-19, bitscore: 67.7, seeds: 8)</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Kind: biosynthetic</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="21">
+      <gene_name>EPrPV000_2568</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8242904</begin>
+        <end>8243284</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2568</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2568</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPDEMKALSGSPPDYVQVETPREASDDATNRLEATFENAENPDHAKSKQSKTTDGRLVPFLELFTYADATDKLLMALGTIGALGTGASRPAQIILFGNVINSFNPSVTMDPDEFRDDINTVSLNFTI</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="22">
+      <gene_name>EPrPV0000002038</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8244285</begin>
+        <end>8245331</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000002038</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000002038</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MEEGSRWLAWALNLAYAGGTLCAGALFLLYMFQDKLLYYPTIPGAPKLTKDNPRGYRNPGEYGIEYEDLMIPTSDGVRVHAWLMKQSDHTSRPTLVFFHGNAGNIGFRLPNAIQLYHKVGVNLVLVDYRGFGHSEGEPNEKGLKLDAEVSVIRPAVLDFVHARADIDSSKIVLFGRSLGGAVAVYLADKEPSRVAAVVLENTFLSISSMVDALMPFLSYFKAIVLRINWDSEVAIARISQPILFIAGLQDELVPHSHMRRLRSLAVSSKRAVWYPVPNGTHNDSWLRGGEKYFSELRKFLSQLDDRAGDTSTCAADGADLPQAHEGSIPTMLQQPFMGSISKTQKPHAE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="23">
+      <gene_name>EPrPV000_2569</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8246332</begin>
+        <end>8247081</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2569</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2569</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MACSCAGTVALLVLYVATVLNTVAFILPLWSTSTVVTDSLQDEVSNADFAAGIWGFCTDIEFQKNASSANESFTFDHCYFFHTSSKFDLTEIDDEFTGNFSDMSVCNGYRQAKDEGDDVLAVYSGIYAYVAGMNETTFGEFLDKSCGALGSASLSLGAISLATGVLACVFLTLGITCCKSKSVFVVSGRVLVLLSFFATLLTFVLWLPQSHMLGKGDDVTLNGSFVLSVIAAVLYLIDLGLVARHAAVSK</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="24">
+      <gene_name>EPrPV000_2570</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>8248082</begin>
+        <end>8252311</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2570</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2570</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MMKCSLAGSIGLLLLCAAIGLNTVALILPMWSATEFNESSSSSAVKEADLAAGVWGFCTDAQVRISHTSRAANGTLAFDQCFFFHTATHFEVPKFGTAESFNFNDASICSGFASAVDSSNATERHAFVSTYAELAAQSTASFDKFLSRSCGALGYSVLLFAFAAPALGVLASLALIADMTCAGQRTISITAAKYLSVAAFVSGTIAVGLWVPQQYPIEDASFGGGFVVAGISAVFYLNVLVLCARHEHVTKPRKEEPGAEIAVGAADRQRVISEQRHTLNRGHAEEASKMLVKYPIMGLSYAHGYFAICGGGGSLKSGIKNTVDIYQLSETDPSGFSKEITAETGLELASGVAFSSNGLLIAVAVNSGCWIYELDTKEKSLTLLVKFRTDFAKEESSQVGSTACFVGNSTILTGGEDGIVRVWRLSHDISAGERAEGTAPALDCSQASHDDQSDAAVLLPKIGDRSIQGDSMVTLTREFRGHTKRIRGIHVDPSHRNLVVSSSEDQSCHLWRLTEDTPLWTFSKDDALDIAFQSLPTKPAPGPRKHQFRCVQFANSGRTLYTVLTPARGDSILIKWKPSTIIQTNSEQWGWTVEGVAIAGDKPVASLCVSQDDKFICTAAVSGDMKVFLASTLQPYKKIAQEQHTFAITGMSFAPSPDKSSPFVHLISGGADKNLIRHDIPLEGGELVGGLDAVVSGTKRVISGTVALGLSAFMALLVLFILLLFIHAEAALLLDGPLEGFQPLSRHGAQDLSALRVSSTNAIATVAATVASIVVAAIIGKTSSTTTLFFWNGLLCLVSGAVTFYAALSPTLQFTWQTGNSSFDELLDYKISVILGGFAIAFLLAHSLLTTVEEDAKTSAKAPKSWAEALGVPKAEPVAKLAPWATAAAPVGVANEGEATAEHETKAPVSFEVAIQDALGRLKVTEPVNEMKKRGLVNQGNTCFQNVIMQSLLACPPFLNLLVDISGAVAPTQELLSNKASFKVWRHILAFAREFEEPTLAQLQARMRSGQGNGFDGKTPKAIKISGYFMDVLSEFQKMRGEQEDALEFLEFFLDYLHSEYEKSGLELPPSCEKQTKHTVSASAADQSQDAAGGWGDFDDGWAEVGKRGKSSVLRQNPVDATRSPINWLFKGSLRSELKHNGKKQSSITIEPFHCLHLNLELDQQDPSAVVGSGIGNPTKTYTIDEMIRKAFAVEEIEGVDASSSMRRFVSMETLPVVLTMNIKRFTYHPEHGPVKLQQFVKYPAYFEFPTQFMSSTCRAENGADLGKTGSASSTNGQGDDGFTYPPRYELFAVVSHLGKFIVGGHYTCVCRDNKDQWFRYNDEHVLSITEAAALSETAYLLFYIRTNRPPPPPPKPAPGSVNLENGTKSKSSKAKGGKTSNGNAWGHHQGGASRKIPGMTPVKKPGKKK</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="25">
+      <gene_name>EPrPV000_2956</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9377757</begin>
+        <end>9384959</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2956</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2956</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MKRGRPATRGAARRVLRRRNVVRDEDDSEGVEEKEEAVSEDEDEAGDAEEEEEEEEEETPKKLTRAQAKKQQEEEAERKRTAKRPVRRARTASKEKSEEDEEEEEEEEDDDEEEEEEEEEEEDDDDEDDEDDDEEEEADESEAERNKRSRGAKKPQLRGARAPPLKKQKRKIIETDEDEDADEDANPDVDMDAAGDDASNEDKETVETPAGKTAVVEGTEEGADSPLEEPPAIEPPTPNEAASASEADANEAASVRSEASSVAATPTASPTKRKAGIMMAMLTRHDLGGTGLSMDTIMNDAEEAEDTRSKSELGENVPDQNIREQLDNVSSEQELLSRFAAPSVLKYLLRLLRSKHYIGQKDPSASSDSMHPNRPGSSAPTGGPVAAGSPTVDFQVISLPVLVANVLVHVLKDVDNWPEDSVKVFLDDSLYSRYWVDHELSQLFVRNVKTIVHATTLSDDLDHNQPDKSGLVRQRFHEIKVGKDMRDLIVNHIRLRLSELEKEKGGAHGGGTASNAMRNVILTLTDFASYPQARVLAAENMEAWLQNPSVKGPSRELLTKIVVASGLSEDEDRRTVDLLLKMKLKSTMFQTKVEAVTQLVRTNQAYLKQALGLFIARERPNNMGKDIDNIKMVQHIFRAVRATAAGAHTQADDAFYRSPTPHLGSNASRELAHVVRELASVADVAPVLKTIVRKVLKQLTFEQVDVRTLCVGILDNDGHWDSLTGDARLLDYIGLVTGIVWMILLTRGSAVKNLQIQQSNVSSRQPPGSSSLGSGNKLGGAQPIPRRNSQPLGHGRSHHKIGGPRDGKMVSGGAGKAKQHLGKTSSNSSIGSGQSSVAGSGTPGGTAVPGNATPPPPSDSSNKSVSVAIKAKEELQQALAYVQREAIVCCRGILQHFELSGESPFEKMLYEAIVKKLLFLEIPSDVQPTEHDRTCFMSTKEGIPVHQDSLQLLCELYNSCKAIDRMEALRTLESVVFRAAEGQLQREQLWRNHEDDLKEYNQNGGVIGVEVQNSAFVAELLKLTMWNSRGEHTEHEFCHASRFWVCCSILLIVGCFNPSTVGKFLWHEVPTLRSMMQMVITGQFTFPVTSSTDPHLLGKHRSTFSDVAAVNQQLIDYEEQVAQLVQDPIAAEDPLMVFELNGIARQPPPAILEHLRTLDRKFKLGVRLRQARSPDFLTEMVSENDGMGNNAADFADSAWWIADIVCEDFETVQYLPHGCLCKLLLLALRGRNAVLPGTKGEVNQAPNEGQSTFNQSTLRSIIPRLLLKLREYLADENEKEGVASSVILYYLDCLSSTDVAVRHVASQVLHLLTSSNASSSTTDTDSTSTPLTSDIESMEDEILAYDSVLSGGQTSGSMAFGWISELVKFPCYEQVRPKIFSSLEGLFERESSVAALRSCVKALYDFGNEDSTEDTDATMDGSSSRGNKSAIEKSLMLAGAYGRLLSGREFVAKLLLQDREIFSVIVEVMWRVIDLQLVSGSQLKASSGISFSDCKVFYVADSANAIREIKLPLPVIHGAILALCSPHARSASGSSMTSSKNESFHSKLTQSLFPKATSGTTILASTGLIATKDRRLYPDHLLVKLASSSSDLYLCRTAVRAMTCEAAWGLLQLSALGEPCFGLVAQTLLDAAKANESKTTTSLVTATGCITAQDAASVVLSALTVYDLETDPASVLSQTTTERLSALEIWLRRVRDKTNDGEMAVDEDEFDRDEDDLLSEGFASVAIGEGVSRLPRPTKPFYSAEFVITVKSQPDASAAEKHPIEQSEMAYFASNYLRGVETSHSMISGEGERYHEVTDRGVIAALAQTLLSSCGADPKSSQSESWQVRMSMLHYVRLSCCTRERAIQVANAMLDVLHHHIVNLNSLDALSSVTAADVSHDVEMVLGAIADFATESISRWEKIGQPLVLDGMTLHDIVLLLKDIAVLRDASSLKGSPDTHSSLLVLMLGESLDAGTLVNVIDAVVSTVPRVTSSTGNVLQLHDQIRREMIGVLYFKNPKQVAVHLDSLYPGWKALVNVESMGVDRGSGGGSRGDDLSALSDPKLVAFVDDTLRHLKRDGSEVIDRFREVARRHPLLVLSRFPKQLMDLIGAVSLTRLYLNTTHYQNILQAMEIVRPCLRSHMQTFPLFSQFAFQLLGVIADHHATDFYPLIARVWDIFYDALDADYDLASEHIFSPSRCIVLRVIVELYAGVHADVSAFADLMAARGSQTHFCTTLESIQAARDKKLMSASQVQQIDRLLKRLTAVQIEDSSALNDLNWNEVDLVLQSISQLCTRTRQQEGPTASLLRQCGPPLTKLLTVATLTKAAMSTLCQALVALARSDPDCAQLVTQRYVACLRSLRPAVRESAVAFALDFVSLADEAQRQELLQFLFEDTSDIARTKLIAYLKSSAFRNGALALIP</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="26">
+      <gene_name>EPrPV000_2957</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9385960</begin>
+        <end>9386442</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2957</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2957</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MTAIAVAQALAPLPTALMLPQLIFGQRLEDDVERGLVLVTLILVFSMVLANAWRMRSRLPQVVNGMVALAVGTAVFHIVIVLFGAPVNHARGSDECFIAGSAIGSAFGAYLGALPIPLDWDRPWQQWPLTCVYGSLLGHTVGGMVGLIVGASRRVTDTKTE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="27">
+      <gene_name>EPrPV000_2958</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9387443</begin>
+        <end>9392263</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2958</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2958</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MNNRRLTSSLGDSVVAPSETSTMTRTRPLHEQMAVVSTAAQAAADREVFAKAAMLRQLPSVQLRKPSAWSGTVASPISSRRPATASATSHSRVHQALRRNMSEFGLNASHPRVEEPSDQRHDTSGSVAVEEDARPKQQRGMVRHRSQTVVPRQRGMTRKRLPSPLKSNQRTESGNLSIQTLIKPPNSPQQLANHADTPLVARSSSVSAEEVASVHRQRRCAKTFADMIAARISPRLISGSSNVLAPSAEEVEAGNRAVETLLSDGIVHSLLNLSVSSDAATIAHCCRALYYLSSVERARKVMVAQGVVTAIRQLSRTPATEPREDLAAMLCRLAEHPGATELLFFEGIDRTLVRLYSSSSAETRRICALAVFNLSVEASELKHFGEAFSQLLVNFTKGKPSGSGTTSGVSTAASLPAITFLLKAVYNVALFPQFHNALLGESVPRYLLQQLPVVPPPVQCWALRSLVLLCGSRLSRMQLFSQQLCKELRFALTGTDEAAQELALIVLLQLSMDEGSRIKLCNWVPAGAIVRSGQQHLSHTETLALEESPETNGSEHWRRRLHFHAHLFRNLCDSVLTHHELIEEGVVPVLLAMARIDEITLKATAISAMCSIISSSTDDVSDDIPEVIEQLLCLSMGSNLERCTFAVTALYNISCCDDSLVLLGNSASLLSTVLQLATSLSQPHLADLVSAIVYRLATAPECAPKLLQHGYLHVLIKLIHRFPTCRTFALNALFLLAQHGGAEFPHGGDEISQLVVALLSDGEDSAVGLVRKGEAVTDPVMVRSAVTLLAHLASHPTNRTVLVRHGTVFKFLKKMHRANDEEDIVLTNCAFVFYCLTATQEGSEVLVKERGIEDIIHLARAGSGSTGGDPHEALTDVHAVQELCMQSLCRLSSYFGLESRLIEQGAIEGAMVLALVKSDRMSIKALCVKLLANCLVSKPCTRSLVDNGVTWALSSLCLVPYPASYADVYPACAISLCNLSAVSAMVPKFLDAGAPRALTHLLHQAVDASTVLVTIKAIANLVANEKICQAFLNEDIERHLSRHFDARESSDETRQLAAMVLLRTTSISNDLISVDHLRNRVFRWMEQIVVIKEEELVRNCMLTVHDLTCNPAIDATELDVPHVLRIVVQVLHRHRLHLEIVTLCLSVVYNLSCEPSLLHYLVTADIMGFLRQQIPPTQPGCSRQYLDPVIDLEPPSSSGPPHKSTAMRFSCLILHNLSCSAAAPDPTHRDAVPVALVGFHAAALLRDVFCLSRNDLRETSAVALCNLAIGKVNSTKLLDDGVHKVLVAFAYSPQLQQQPDHIALLSGAYRKLGNAPGNQRRLLAAGIAKAMITLLSGPETSTVAKLNLLWTLSRLSQCGEHAQQLAEDGVLPCIVHLVEHSTMTSELQTHCFEIVSNVCTANFQDQSTSEVNVVGTLMKLSEHHHRPHHHTIDTAPNETYYARGEGQPLPLPELLTYMMKSPSSSTSFKKNLELKATYAVTARKWASNAQPTPKDPPPLLCGELPLADTGQTLPPEVKQQIASLALLPREPLVRGDAVVSTTEGGSNTPPAESGGRVNENNQQPAAALSTPKKLVRPSTASVAGPRRLTRAASGRHILATCLDEMDT</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="28">
+      <gene_name>EPrPV000_2959</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9393264</begin>
+        <end>9393908</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2959</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2959</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MLPREFPSPPQLVDLLRAHDKHRRNDYQPPGRPNANLDFAARHNSRVLAKEGSSTIRRALQGAPTSRTTRFAPASLATEERAKLRQERSASDGAHRLTHASWNSSTQLPLPPSRQLRHQILNKAYQPPAPVYVDISETNQLVDRLGKTTVSSRMKEYQQSAVSNIVNLHPGEVDDDAFDDAPCSPPDTRARDAIQTLLFYRREVEKRRQRAGASH</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="29">
+      <gene_name>EPrPV000_2960</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9394909</begin>
+        <end>9397353</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2960</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2960</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPTSVVPAQLQKTARDLQAALHSVRKRRQSGEGLAFGSFPDCDNQAQLAADDGVKDKENHSDRASCGDEEDGSDDDALALSQLSGLSDLSDDSERSVTHEDEMAKMLRLAKDFQTDIEHSSCLTEDLRSQMLQRESRLSATPSSSSLSDPVLERDRLQSRRLLDLAARAKEADLRALSWRMSFEEEAERADRAESRLNMAQEDFHSHSQLWLSMRRDMVPADSVEICQSRISLLEEHVRDMQSQVACDREQFGYEQAKWEHDKNSAHQELQEIHDVSVKLLKVLVIREKLLKKRERKASRRIEAFQHETATITARLKQVVQTLMEEGASLLLVVQQLSVHRVGNGQPLAVKPAHLRSLIKQLKRLDQSIDRLGAAAPCNVDNDSSCAESAVSDDCQAITLAAQHFLYEHEKFPVPARRSKLQAVMEALFFTHGTNLYHVSQTRARTKDDVLPLPQANLTSECVARLMAAYETHGRSFWSAVLFAYWPTYLTICVGQGVLTACTVFAPIVLQQVVLAFSSDVVDVERLTMWVLLFIVSRVFKVVVATQVSYFSNLLNMRLVAATRSLIFRKTMRKRIDHHEENLSGKDNRADTTKPEIMNLVTTDTSSTIVWAIRIADVWTLPPKIIIVTILLFRVLGVVAVLAGVAVLVATLALNVWVARKMNVAFRTLSRARDQRMSVVKELFGSIQIVKFNAWERKFAKKLGSERAQELRALRKYCYIDAVSQFVLWSSPVCVTAVSFAVYALVLGQQLTAARVFTTIALFDVIRDPLRTLPAIVQTFVQARVSIRRIQQFLDATELSRSDIVRQGTNSALVI</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="30">
+      <gene_name>EPrPV000_2961</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9398354</begin>
+        <end>9400606</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2961</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2961</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MESELLERVEKWSKEAPTRELNRKVQNLAALLRISPSQHPKGLGLQPGATVLLVYPPGLDFIVAFLACLRAGVVAVPVYPPDPRKMKKDISMFVAVAQNSRAQVALTCGLYVHAKKIAGIKQKLTFSDQLPWPEHLKWVTTDDLVDAKGVEPKHWLTAAQSPRAEDIAFLQYTSGSTSTPKGVVLTHGNLNHNLRTISSALQAGRDTVVVSWLPQYHDMGLIGAYLGTIFNGGTGVYLSPFSFIRNPCLWIQLISKHRATHLQAPNFAYSLLARKADKLHADSSIDLSCVRHMINGAEPIQGEAMDNFYKAFSPFGLPAGVVKPTYGLAEHTVYVCGSGAQRVWVDKVTLERDGEFRVVNSGDKKVDEVKEMIGCGVPSRKDHGIDLRIVDPETQIERQEGQIGEIWISSASKAQGYYGDELKALSDEAFHAKLEGGSNAEGQTFLKTGDFGVLFNGELFICGRMKDLVIIRGRNHYPQDLEATAETHEEIRPGCCAAFSYSNGAGNDGEEEQLAIIAELRDPDINNKASLCGKIRSAIAREHGVKVTLILLLPPRTIPKTTSGKISRSRCKKAMEEKQLDVLYRNEDIIGDAPDDAATEVEDAVMDRSVDAAPPAGARPNGAAVGAESKNLPSVITTETPERVYATLLGELAHLLGVEKQDIDVNMPLQELGLDSMALTQLQGIITQKYKVHVDEAVLYGETTTFAGLHAALFGRKPANGGPTSPGGHAQGTGGAGGGKKSKLLCGCIAC</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Type: other</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Domains detected: AMP-binding (E-value: 8.6e-88, bitscore: 294.1, seeds: 400); PP-binding (E-value: 1.9e-08, bitscore: 34.1, seeds: 164)</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Kind: biosynthetic</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS subtype: NRPS-like protein</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: AMP-binding (18-495). E-value: 3.3e-90. Score: 294.1; NRPS/PKS Domain: EPrPV000_2961_A1; Substrate specificity predictions: hydrophobic-aliphatic (NRPSPredictor2 SVM), orn (Stachelhaus code), glu (Minowa), nrp (consensus);</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: ACP (647-704). E-value: 1.8e-09. Score: 29.4;</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="31">
+      <gene_name>EPrPV000_2962</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9401607</begin>
+        <end>9402476</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2962</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2962</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MSAHLFGEHFLDARIIQVSETPDLTKGGDPFHFVGVKYLALNSPAKLVKPRDYVYFEYTGSLIDANGEPVVFKVVRSMPLETIEFDCVAARALRHSSTPSQPLVRAELSCLFLFRGTDGGARTEVTVQSLHCFGGKVPSWATTKMLQPFWGGVLNMGTLSAACALQRHLHHGQSKPLLTKKMNSSPRSAGHRAPACRVCFRGKRLLPSTRVCLGCDQEVCKACTLRLHFLSGEDNDTVALRFCLNCVADARAVGRCSVDTVLLQTPQHQYLSDRQVTPASRSVPSSVLMM</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="32">
+      <gene_name>EPrPV000_2963</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9403477</begin>
+        <end>9404802</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2963</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2963</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MARGANDLRARLRERHARAADAVQLGDRQAQEYFASRQFKQRRRAKPASTAAKRVTRKAPKPSAAKDEGDAQAVSNEPKRDDGEDNEEDNEEDDKLVLPPHGDVIAALQRVDGREAAYREAAKEFPRFEHAFEYQPDAVGRLTVDSQLFESWKSQLRVGNNLLISGVGSKLAVLQEFASTTLTDGFAVQLHGYLPTVSIRYLCSFINEEVLRVNDKSSRTLPHQCQEIARAMATRAAAKMPTRAVYLVVHSIDGATLRTPEIQSCLSWLASAPTIHVVASIDHINGSSMWQEADMRRFQWISLSVDTLRPYTTEIELHLVKQTKVTDASGTGVRFILQSLTPTDVGTLQEIGRQQLAATAARSKTSRSRRQAAKSVLYQTVYDACRKRLLHTSVVSMKNSIKCLEDHGLVKLLRVQSHEELEIPLPDAIITADILQLAPEKQ</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="33">
+      <gene_name>EPrPV000_2964</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9405803</begin>
+        <end>9408166</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2964</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2964</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MADLRPGPTITTSIIHSVTEPFQPQGAPTAPFSASIGSSSSVSSTSSAGAAGLGLGRGQRNSTSGFTAFQPATSGHQHQVPTFQSTTSTPQSFTAFGAGLGSGGGVASTPGSQHSIGGPSLSSTSASSTGEARGGIGWMRTGRVIRVKDTGESYRFPLDEEHLPRVRATAAQFAALKDKLERVADKYVGNAATWMENPTLSSAYRNQSWKVQVEKRNGVVYRQKTSDTRDVISRKAIVRAKLDTTLEEIEYALYSDTTEELRAYLAHCYQESFLDAAVLQVHERGTAADPLNFVGLKWLVFQSSVDSVFSCRDSLVVEMSKTYEDAKGQKVLVRVTQSVDPRELECQEKNFGFNRTGMTTVYLFRSMGPSSGKVDAAIFADMQFEGGKTTPSWLANRVISTLYHVVVNHATCADAKFLVKARLITDKAWVPNNERPACSVCFKSFNLLRSRHHCRVCAEIMCSPCTLELGIQASKLPVGMLPEQSSGCIVSVEKFCLKCINKARQERRSAIARAADYSSSVDEEGNPTVPASFAGRASEVFYQNQNDGSRGSLSDMPGFYDSLPANSNHQSQSFASVSSSSSTGSVSGAPTANSEKSAISYAGWSTKVLSAINREKPSDGSDASITSLTGSTNSLNISGTMRNRAGERRRQNSDASQTTSVSSQSERGSNSLSDLRGHNLNGTTDSITVVEEDIVDVTPLPTSFTKMEEQIAAQQALLRSMFVEGQKMMQQRQGMQPQYINQIPQQQYIADGAAVPVGPAEVVVMDETAPAQLTVPPPAAVTSIESID</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="34">
+      <gene_name>EPrPV000_2965</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9409167</begin>
+        <end>9409865</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2965</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2965</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">ERYKLLRDVLAPTYEGRDARVLEFRGWIPRNAEGWIDKKRPHLILPATFRFLQLIEAENESHRHDPDFQQLRSFSLLPLKRGFECSHFKMCTVGLHALLKRAGTRVPPLESKGGPVWSDVADEWWRKLFDIDRFETDKRTFAGEILTDGKAVSIVLRKPKIPVVEEPAMPMKGNAGMHNFGEIWGLDPGRRDLFVATSNFGETLSCSSREFYQDAKYYSSNRTTRHWMDHDPQ</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="35">
+      <gene_name>EPrPV000_2966</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9410866</begin>
+        <end>9411045</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2966</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2966</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MIWPDADERHDIACQIRTKYDFPNCVGMVDVQVISGWRRLLHSQRGYAVNAIITCDDIAR</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="36">
+      <gene_name>EPrPV000_2967</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9412046</begin>
+        <end>9412534</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_2967</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_2967</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPRSTARQRLLKRLHRENEAWMREADVRFLMSEQDGFEDDIDKLIQAAYTMVQQTRYVSQDPSYRRRSDRWKVLLYGRDYLNDTEFLGHFRVRRSAFSRLVALISADLVFQAQSRHPRRGHADLHLMILLKYLGSDGNDNTAPKFALFLGWGMGRLTCTWVAQ</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="37">
+      <gene_name>EPrPV0000001329</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9413535</begin>
+        <end>9416039</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000001329</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000001329</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MASARVSVGGAKLSDAAVLDSALAAIEGRGFAVTGSGFVSLADAAKAAGVETAAAVLSAGDRAVLAQGPPLVLLAESALAVGGARALLPLSDAVAALSCEAAHAATAAFEPEFVDASRPHRGIVTSAANLRLMLDGSKLCNVKDAPQADAAALRFIPQYHGPVRDAVLAVYKTVEAELNSAVPAKHAAGASAIHPQTLRTALASVVDGLQVLLQGSDERRRVVAGEQTGAGDVESKTGSAVELVSAVSAALELELAPSLKFFDEEDAQLKERAAERQVKAQEAAAKAAAAAAKEDEKLAAMPEAQRNKILEKRRKKLEKQKEKESTKKSAKDEVKIGLGSAAFREFLSTRSNALTPFDLRVDGAAQFVEDLLLRLGSGGARRKPKIAKGAQDFLPNQMQLREKIFNKIRMVFKRHAGVEIETPVFELKETLTGKYGEDSKLIYDLADQGGELLALRYDLTVPFARFMALHNPGNIKRFHIARVYRRDNPQMARGRFREFYQCDFDVAGTYAPMLPDAEVLSIAIEVLQQFPEVGPFKVKLSHRRLLDAILAICGVPADKFRTTCSAIDKLDKEPWENVRREMVDDKGLPEAVADRIQKYVCKVGSPRELHEELVRENLFGDNQDAQTAMSDLKLLFEYLDAMGVLPYISFDLSLARGLDYYTGLIYEFVLTSPEHNVGSIAAGGRYDNLVGMFSATGQQIPCVGVSMGIERIFSILQAHAEKTGALAVPPSQVLVASTGTAPALLLARLELCKALWTANIAAEVMQIENPKFTKQLHYALEAGIPYMVVIGEDELAQGVVKVKDMSSKEEVAVARADMVAELLRRDCRTTSMLNI</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="38">
+      <gene_name>EPrPV0000001330</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9417040</begin>
+        <end>9418116</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000001330</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000001330</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MDSKAQELCAETRSQYEQLLARRDESHERQLNALRESLRQAMDASISLSEHQRVLAATATAYRREQDDLVAAHAADVRRIEQELIVAWQRRLESSQLKASRQLDSVKSQLTALRLDSARVDMARVDLERQIESLRGEVAAVTTGESLAEARLAEACRHLASLRAQFRIAKAEQRDGRDKEQRWRDKVSACRLAMAEMKGRLETKVATLESELVHSNKALEEAREAATALQTDKSELLTRAQELQQTVAELKTREAGGEEMRAAEREQFRRELAAAQRDLERERASSATLTTRDLSTRLALQTQAQDMEKQQLRAAADELRRRAERLEGELAKARAEVEAHERRVSEVEAWEKNLVRGRR</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="39">
+      <gene_name>EPrPV0000001328</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>9419117</begin>
+        <end>9421546</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000001328</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000001328</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MSVIGVDFGNVDCVIGQAKRGGIDIILNENSNRKNPNMVCIQGKQRFIGEAAISVARMHYKNTATDIKRLIGRKFKHPEVQREIAQLAYPCVELANGDVGIVLQYNDEPVTFSCEQIVAMVLNKMQNIAAAANEGVNPAYAVLSCPGFYTDVQRRAVLNASKIAGVNCLRLLNEHTAVALAYGIYKSARNLFHESEPQYVMFIDIGHASYTVSIIAFVQGKLQVKAAAYDRFLGGRDFDMAIAKDAAAQFSAKYKTDPLANPKSRIKLLSACEKSKKNLSPYGVTATHLNIECLADDRDYSAQITLEQFEEMIAPLLARLDAPIESALKDAGIDKSQLANVEIIGGGTRVASVKRHLSEVLGLDKEAQNYGLSTTLNADESVARGCALQCAILSPMFKVKEFSITDAVHLPIRVSWDGAASAPTDAAENDEDVNMEASSDSSIVIFHRKDEYPKTKRITFRRDQSFAIDAVYDESATPYLPPDYLMSIGKFTVSGLPSLAKDAELPKIRVNVTQDINGLFSVASSQLMQEVKEEEKPAEEEAKEGAEGDAKAAEDKSEQPKKKRFRKIELQVTAEVGGLTTSDVAAATEQELKMAQQDRVIEETFNKRNELESFVYEMRNHVSDRLANFITSSEKATLEEKLLEAEDWLYTDEGFDSTKSVYQTKLDDLRKLSNPVEFRLTESTERSVAQAELQSVLEEYKRMVNSGDDKYSHWTEEEKAKLRQSCIDAETWLFDGLAKQNDLQPTDAPALTSAAIRTRVVGVRAVALPIVTKPKPLPKVEVPAAEEAKETASPDADAEKDGEAEKMDLD</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="40">
+      <gene_name>EPrPV000_3708</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11581820</begin>
+        <end>11582851</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3708</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3708</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MATSVPSSHLPVFFFHGLTGNPGEAVNLERVLTANGRALVALSFCPSESSVLALRKQIPMAIAQIREVVASDERFQNGYVFIGHSQGGMMARAVVEEMDDHQVHTLISMAGAQNGVFYGPQPEDAAPMQGLLSLSGFSMQPFPTAIFDFGTYQDESDSTSLRGKVQRAFAQLGLDQPELHEQFSFINLGWFPARETWLASNPFLPMINNVNKCEPGDVQALEDKERRKRNFLKLKAAHFFASPGDGIAAPWQNSVFGRYSEVDSLDEIVTKFESLKMLDMRETEEYQGDTFGLKTLEERGALFIHVVPDVPHCGWITDGPLADDPAKTCEFQDVFDKYILPALP</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="41">
+      <gene_name>EPrPV0000002255</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11583852</begin>
+        <end>11584835</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000002255</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000002255</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MADAVLAAVQPLLQEVAGFPLYVQVLVGVAALWAARWALCLAGLFFKFFLRPAKRVQQFGAWGVVTGATDGIGKALAVELARKGMNLVLMSRTQKRLEEVRDEIVAKYPKVQVEVLAVDFNNIDDPSERAAISKLLARLGDIGVLFNNVGVSYDFPQFFEQLPANRVDSLIKLNVTSSTVMTQLVLPGMLERKRGVVVNVSSGSGRLRVPLLAQYSATKKYVEQFTLCLADETRAKGVHVQCHVPMFVTTKLAKIRHPTFFVPSPAVYARASVAFLGRDTLVSPYWPHALQIWIYENVPQWLASKFAMMSHLSLRKRALKKLAAKKTE</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS subtype: PKS/NRPS-like protein</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PKS_KR (63-226). E-value: 6.1e-10. Score: 30.9; Predicted KR activity: inactive; Predicted KR stereochemistry: C2;</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="42">
+      <gene_name>EPrPV000_3709</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11585836</begin>
+        <end>11586429</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3709</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3709</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MGAVAKNHWGFVHRRRFYRWVYATLTLFAYFAVVASFYDFRGKNGDGDKDQSMLQWLYVFYPTPIAFAWFVVYFGQFFCCVRIKRLRKARNYKYNLLLASFAAAFLYSAALNIALSMTFNHGPALRSAMIMAACQFGLTCIEVFDERKTRKERHRRKRMLREQQCVEDTASEQPLSTPKSNAPSPQTLVISQPPGGLL</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="43">
+      <gene_name>EPrPV000_3710</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11587430</begin>
+        <end>11588080</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3710</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3710</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MGHRRSFAKMLTVSEGYWGFVHQKRFYRWAYATLTFFAIFAVVVAFFDIGKGTTYSTSYVAGQYTAGELNENERLLQWIYVFYPTPIAFAWFVVYFGKFFCCVRIKRLRKARNYKYNLLLASLVIAVFYAGVVKGVLHMDLYSGPKLRSAIIIAICELGLVSIEVFDERKTRKERHRRKRLLREQQDAEAGMYPQKTSEPAPDLQVAPVPQAHGGML</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="44">
+      <gene_name>EPrPV000_3711</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11589081</begin>
+        <end>11589914</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3711</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3711</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAGPTSFAPIINQAVNVVSQTGEYHILVIIADGQVTRSVDIPPHAVSRNEKETIDAITYASNFPLSIIMVGVGDGPWESMIYFDNYLVHRRFDNFQFVEYHKIASRFPTPQMRETQFALQALMEIPDQYRVIKEMGYLGRGPGQLRSDMPRVEIFPSPLPPSPPAYHHSFNQYEESRPSQTNTPSAPTYSSSTVETSTVQGIPVAQAYQASATLNRQGSVAEAELARMQEELLCAICEDQRKNLVFQCGHETCERCGEFLDHCPICRQPIQVRIKRYG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="45">
+      <gene_name>EPrPV000_3712</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11590915</begin>
+        <end>11591958</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3712</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3712</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAARRSSSDSYQDENRDESNTPTDGCAGGVAAMSLSFIINDMDAAVRAARIDDDAKPSEDEDDRSSTCSSTHTVRTSTSAAAATAPLSNTSSTGSTTGSALDMSALLNTVCAKPDCYRTVRGPSGTFCKYHKQSRFCRAAGCPKSAKTGGFCISHGGGKRCSFPECSKSAKQGGLCISHGGGKRCSEAGCTKSALVGGFCSAHGGGRKCKTPDCTKTALLGGLCIAHGGGKRCQMQGCSRSAVGGTLCVSHGGGKRCQAPGCSKGAVRNGVCIRHGAKRDAGASPTTTHSAERPRQNTQTHTGLEAAGSREPNDIDDTQRCSPSPTEATPASAHAAYTTNYRPHHSIK</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="46">
+      <gene_name>EPrPV000_3713</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11592959</begin>
+        <end>11593570</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3713</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3713</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MALGPGELHTHVASRVELALGRALPQMEVRFKGVSVSAQIAVAADDSKAELPTIANELKKKFGRIGAKKHVATKRILQNVSGVFKPGTITLVLGQPGSGKSALMKLLSGRFPVGKNVTVDGEMMYNGTPQSEIRKRLPQFVSYVTQRDKHFPTLTVQETLEFAHLCCGGELSKRAESHFTYGSPEDIKAALDAARALFKHYPDV</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="47">
+      <gene_name>EPrPV000_3714</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11594571</begin>
+        <end>11595857</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3714</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3714</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">SRSAQIVYDPAPAPANKKRRGKKPVPADHPDNNPSVDESMDGPPPPLAVVVGASTSTSAFDKLNTLKLLLDCGHLTADEYQERKTQIINDMTGTSTERSKPAPRPFLPQPIMKTVVPHPPPDFGRIRAERADKLSFDVDTLEWKSAAARVKIDLVPFATGQLRNAYYLQFSIRHAEPTSYLSDVEMQAVCAHYAALYNEHEPPLKVYYARSWLLKLRDRADLVCSVEEFLPGAYVKYSNNNGYVGRETSTTEERERNTPQAFSHFSFVASDYRLMIVDIQGVDDSYTDPQIHTADGRGFGAGNLGTFGMEKFLESHRCNEVCRWLALRSINEQYKPGGTAAPAYRMPFGGAIKKSTNRITEERNTFSTSVTVSQAFGGPDAVAIRAGSGSHDEDAASSSMSLASDAPTCATGGSSALLYFQQQLAAKQQ</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="48">
+      <gene_name>EPrPV000_3715</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11596858</begin>
+        <end>11597979</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3715</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3715</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MEGGDGMTSAILSEAVGHALAQQDAKLAFEMLLLNEQARHREDAGRALQDENALLKARLAAQTQEQSDMYQYLHAKLDAQVAASAALEAELSAARREREQLEEAHAAAAGEQLEQRAEEKAELEADRAALRLTVETQRAEFDEAARELERRALVERERAKQELLARMAQTKEALVARTEGQLSAATRRAMMESEHAVDELAFQSREADKLLARVADMERELRALRVANGVLEANERVLARKTRVYQRIVQKLRRAGDRRALAALLPAEDAALREKRFALAQQDEVLQFLLGALSREELRKEAAAEAAQSAQQQPQQQQQRTALPAAAETTTTMAGLARLFPLQAPLDELAPGEARALLRFLVDKLRRYQQKVAV</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="49">
+      <gene_name>EPrPV0000001845</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11598980</begin>
+        <end>11600407</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000001845</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000001845</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MIADGEATNESTRPAKREINSVFKTRLYPSTVQREKLDQMFATHRAVYNKMVALSRDDFATRLYPREPEHKNEKLTKKQFLRKYRPISQNHSMHKYFRDKKKLRRHMEVDSEVRGSAFIDFKRATTSSLALFFALIRDGKPTSYPELKFKSKFARSNSIEISCSRITSVRGGKAVRFYPRFFNFGKADGIEVREALPPLEHSVRLQRLREGDYYIIIPRHKDFKQTKQSMQTARVCAIDPGVRNFATIYDPSGLTFSLNGTYTVLKKRFDAIDSMNSMLSVMNNECKVKHQSKVRTRNKAKMAKSGFCQETEPKGCNAKDRDDIDSKSNYPSKSTAHRVRYRLRRCIRYTNRRVTRMVQDMHQKLSCWLASNYDQVLLPHFRTSEMVRKFEKKATANGKPDTSPDDSPPAGTGCKGRKRKIYSSTARAMLAQAHCRFKTLLRYKLSRAGGQLIDCTEEYTSKTCSNCGGVKAVTGL</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="50">
+      <gene_name>EPrPV000_3716</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11601408</begin>
+        <end>11605349</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3716</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3716</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAAQVTATCFQSDEFAPLRVLVLPFAGGSTRSLALEWGKSFRDASLKVELWGVDWKWGQDGAATSVAQLMDAITAELSGCFFDKPYAVIGHSLGALATFALVAHLEAKQFALPRHVFLSGAAAPVHAQVYGESLSDAELLKLLTEWNGTDAELLSIPEKRDPLVAQLRSDLKLHDALVKWSQQSGESRIRSSVTVYGGLSDDTASVSSLDSWKDFTAGDNVTFEVVTFPGDHFFLTNTESQAAFTSSFVGKLQLVITQAALETTALIEKWNSKTAPYPSDLCLHDMFYEAVKRSPDAVAVYYEGKTLTFREVDFMSERLADYLYHAGVRPNCISGIFMEHCIEFVIAYIAALKAGGAYMPLEIVYPPDLLERVMEESKPTIILTKSQFRNRLPDWQLTLNMDEGWLNTLTKQNILPMPADRTRTHPDDLAYVVMSSGTTGVPKGICCPHRGAVHSYHWRLENCPFIETDRVACHVFFVWELLRPMLGNKPLYIIPDDTIYDPIRLVEYISVHSITRILFTPSLCQLILDTCSSELLLEKLKSLRLVWLCGEVVTMELRDRFVKLFPDCELQNLYSVSECHDASAVDLAHMNEFDNSLLSKYASCGEVMPNVHAYVLDDDYKPVSIGVPGELFIGGPCIAIGYLNRPEQTAQRFLKTIVPGETVYRTGDRARYLPNGHLELIGRCDFMVKIRGYSVVLGAVESALAQHPLVSTAVVLTEGDEGQDKKLVAYIVPDNWEHVPSASRLREFLKEKLPHYAIPSVFVELDALPINSASGKLDRKRMPTIEEAKKLRNASVDLTIDATQALDTETEKSLAAIWTDLLRLENSSILNKKVNFFDVGGHSLLATRLVSSIRDTFNVHLTLADILSAPELAVIAARIDAEAAGPGTDNAATQQLKEAAKIVFSLEAHLDPSIYPAATRKSGYSRFRVEMVGRPPRSVLLTGCTGFLGAHLLHALLKHTETTVYCLVRASDEEAAFARIGQTLRTYSLYKEVEDKLEDQVVPVAGDLAKPLFGLSSDTFKSLASEVDAIIHNGAEVNLVKPYAALKSTNVLGTQEVLRLAVTNGLAKTRVKPVHYISTNGVFPTSFADSVLPENADLSEIPESLENGYAQSKWVAEQLCREAAARGLPVSILRPGNMAPSSISGEWNTSDFIYLLLKGCVSLGAVPASGDVDWRFDMTPVDFAARAIVQFAVVHPKDALGLTLHIQNSALPVSSNEFLASFRSAVAATTKGQLEELSYAEWKARLATAANEEASASETSEVQKLAAGIDAFEVYLQSDKVFDSRVATALLKQAGVTCPAVDSSLLQTYVAKWN</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Type: other</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Domains detected: AMP-binding (E-value: 1.4e-88, bitscore: 296.7, seeds: 400); PP-binding (E-value: 4.5e-09, bitscore: 36.1, seeds: 164); NAD_binding_4 (E-value: 8.6e-70, bitscore: 234.1, seeds: 102)</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Kind: biosynthetic</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS subtype: NRPS-like protein</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: Thioesterase (18-242). E-value: 1.3e-20. Score: 66.3;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: AMP-binding (307-715). E-value: 5.2e-91. Score: 296.7; NRPS/PKS Domain: EPrPV000_3716_A1; Substrate specificity predictions: ala (NRPSPredictor2 SVM), ala (Stachelhaus code), glu (Minowa), ala (consensus);</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: PCP (810-882). E-value: 7e-19. Score: 59.4;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: TD (938-1189). E-value: 9.2e-81. Score: 262.2;</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="51">
+      <gene_name>EPrPV000_3717</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11606350</begin>
+        <end>11609559</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3717</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3717</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAEAEQAGGYSDEDFGSGDEFEQESFEGDEIRAAEQQIPAAILQPGSGVGVMSAEMNGGARVPARIDGRWSDRDGTEDYAGDSEFEDDDQNGAIVGDRVDASVAVLSAPTEQLSPALRPLDQSNFESASAADALVVADETNSAVVSNSGPSVSDDTLSIKPIGGRSPAVLGQKYLPTQRSFSVPAVPGVPADAAAPSQRSASVPTVPIASIRGCGGVSDGEICVRSKATRAPLPILDETMQQRPEDEESESDQDDESSGGDDPETNCAATARFRSLSLQHREKQRIMIPLRKAKSYVNRNRLPRVCEVGVGEHVEQSQDTGECSVNEDSKHATNESTLQALACSPPNCVRPTDTPGGDTNCRDVGIADTGKLGDGNPVAGTSGEFETASATVSSSQDDDYDSRFDDDEQSNSMTDDSKNDQHTDTDVATMRSEHNDVDALIRENALGESNPVKTADCYGDGDFNDGNDPADIDDADRYMTNDDDFDDHDEYVTPNDGATSNLTQHDICSATDGTGYDDEFDVEDFVDNRRETEGLLLVAQSLISAQSGGGVDRASRTNNVCSDIAEMNAHVSDNPASPSVHEAGESTAEAANSGYDSADDSFNDENASGDDDNTDRYASDDGGMDNSGDVDNNNEEHELSAAPRQTNEMAQECASDAIVAGGAVTASCSMKVAAEPNSLAQSIPVELDGNNAVVRDAAGQQNDSKPAAREQSAKLANKSDGKASETRAERRPSPRKVLKPAPPPARPIASTKAKATARHDSEAPSSPEHSTPAPRVRKLHISDSSAKPTKPLRSPNSSVAKSVGTERQNRVVANLSVASSEITGETPSTLEVASSPKQTRSPKKPQRPAPSPSKQQEAPETDEYPKLPRKDRVPKQKVGQKRIAAEAKREHLKPVRGPVNLRFNIAKADKTKRDWLFLNMFRHGDDVSKYESFVPRTALPEASKAPTSTRPHSARTLSNAYQTPAFGGRRLVKPDDQAIVARERNWVALTPRDSAIPTYDSILDKHCSTVTSPAVQRQIYQTRCRDLTPQVAFVLEKRVEKFCKEAHSVSGEARTPYRTHKFPSPPKQAG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="52">
+      <gene_name>EPrPV000_3718</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11610560</begin>
+        <end>11612356</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3718</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3718</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MDQRNPYGLPQGRGGLPNGMDPSRQPPQQGFAPQHYMNDMLFDPLSMPMSSGMYHPQAQHPQAHRGMGGAGGSMSMLHQQSLVPDDDPRFMDDIIDVLGGPVGVGMGEQPQHLGQMPNHGVPQRQQPAPTPLQQQMNQNRMQGRPQQPQGMGGPPPSSMQMNHMNGVGMNIAPPTAVPQQPQPVGVTGLAGLAGPLTAPTTNNRRQSPATSGASALVPSNGGAFGKASTSTAITTANSNAGSSDDEGGMGDDDVNKKKERRRQQVRYASRRRRKKQKDEESFLRDRIEELKEQIRIIGGDLTEQCSQMAGMSEQALTEAYEKQMLTVQTLRKDNNKLKEQLLQHENFARMIQYGLNALPSDCRDVDRKKITNVPMWFSDQMNPLKGPTLVVDLNLCHEAVRQAYNELKGFGPSVNSKTNVCYAMGWKTELWATGTCLSFRAVRTIGDKNIREVANASWDIITSPDKCKRIYPDVKQFRILQKVTDDIVVLHRVSSVASDLSDREFISVAFRLRDGDNYYVGTKSIAVQTECAENCIRGEECQGWMFTGTADETAQWKAHFLGYYDVKGEKDDKVLNQLANEAMFGMLRWESEAMHPLSV</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="53">
+      <gene_name>EPrPV000_3719</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11613357</begin>
+        <end>11615897</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3719</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3719</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MADAQPASASNKLNRELLRWIQSLDLAYSIKNVKRDFANGFLVAEVLSRYYDKDVSMHSYDNGIGLKVKKDNWEQLLKLFGRLPDLEPLASRSDVDAIIHCQNGAAVAFLSKLYQCLTKRTIQLPAPTPASSSTAAATIARAPSAADEIPPYAKPTGSAIIRDKMRDPQIAETQDESQINRRVRDIHSQHEEALQVQRVDAGAERYPALRSASKATVLRGATKPVRNDEASPVLMTQHIVKEVQIKAIGDKGIEKLRATREAKENEALGLTSGIGASFDTRGGGAIGSGGGGAGAAGSSPELMQRRKPMDLLNEVVGTSLASMGAISRLQLRGGKDRFESFLDSAYEGQPFDEHEAVQVMGELVDDDGVLAFAFLDFPRELWKCAGLLWPFMAEFDDEHAYFTSTVELLTKLGEQCVARDPTAAALLMTDYLLPKLSTGLRRSATKRAPLLRVVYAFVPDAALAHIQTIKRLREALADDLQLFIHLLSILLCMERELDDALVDLYHYYCCIGLETTCDKLRAACLSMLTPLMAYDTTFVLDLLPRLTQLSSRHAWWEVKTQLMIVASAFLHLAPSQPADDDAGRDFTDQIELCLTIVEREFHPASSLNVRRVGLANLAKNLGMYQELVPLYVDVLFSLPPPVRHIMLEPSTSTSDERGIPPAADDARELPIRGASGARYQLLALPSQWDSVAIAKQVFYERKNDKVADFEALLVLQRCFEQLAVDTVDDSTVRMLFDQMKSYVISGLLDADSCGATSQILRSVLATSAAAATDVLGSDDMLDVLQQLVSRNVEDLRQQTAVRLLQDAYNLGPEQAAAVQQLVSHMRAASDATLFKVSLFSIALDVGM</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="54">
+      <gene_name>EPrPV000_3720</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11616898</begin>
+        <end>11622192</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3720</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3720</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAKLLDGKACSQEIEAELAAATYIRLKKKASERVGIAAQVFELPTASTLDDLSALLAKLNADTQVHGVLLQLPLPEHLAAHEETLLESIAPTKDVDGLHSHHYARLADRPSDESKELHLEPCTPAGCLELLKRNGFEVAGKHAVVVGRGKLVGKPLSQLLLSADATVTTCHSRTANLQAHVGQADVLFVGVGKPELIKGDWIRDGAVVVDVGINYVDDASTKRGYKILGDVDWLIASTCPSQLEPFSRDPVVVAMALTQEDIDLASIALCQPLTAILNFSLFQYLFSVFAPRRREPRVRLLLLVAFLGFVSLVPFAYPDHELVRNLNDISEASSVLTFTLQIVILTKSVNKKMRLASIARLGRLAEILVALGLAMLLFNAASIIAPTAIGMDVVEILDLVVEYFALGFIVAFRFFFLSLARGWSHLWRHQKLEMVFYALLLTHAVPFHVLEHATGLEWNHIQALWLRITIALALSSTIRARLAILSSLVSRSNHTTGPASQRDKKRSVDSVGPNADHVVSPAHSRLSSKGNGSMLTSSRSRLRLGSGRVRVEASSAARTGSRNLSRGVFRLGHTLSSRRQMGVVPHAGDPQDSTSLPTLRRASSQTMKRRSPNSRFGIPATNASPSSLPPLAIASVPSPRRAPLAQLQDEELATLQTQFADRVRAQKQFCDASQLLQLVKTASSTVSDAHDTEGDGLNEASDVFAQTKQAIRSLEPKCQHTAQFLSTLVSHIEELVQLKLHKEIDKAAAHPQVNNRTNNHTLLSPSVDNREDNEAEDDSSSDSDSNNSEKESGREESPDREENQGSPCRKQPDAWNKYPHPSPPTTKFRTTLRCRKFPPTRVPDDEHIAVTTTYTPFGHRASGVNAGELRLTESTDADENRGKEWTVVLFPRTKPSLNHTEIDAFIQWAERKLEDARVGSSNEDDQAGQFQEQMKLRELLCYELTRLVFDKCPTTARFLHGLFVELTEIVAQTMHAAERDARIMSQHQKNAQLELQRLQARRTAMEGSLYALQDTMRRRQQHLLTERERIIRQRKKLNLLLAADQILIRHVIAVLQHGVESAEEILTAKGEGDGRTSTIDALTSLAPPTTVSPPYTALDELYEIVGSKFATLPEVLQAKRNYDKQQLDHLQAAQDDIVADDSLGQRKVIVLDTKDIVLASEEFKSALPRLTRLLTTKCPDSSVGWAAEELWDQALFIPSPEDVQDLDRDVQRLCAQVETVVLKQRRQRAIADDRVNVDTQTDITTCGPPNFRGRARANGLMSLQLLKQNMASDTHSISPAPSLRRSAPTTTTLSTTIGASGRPIKAKIQIPRLALLQETNLELFERFLPEALRLLVRSIPVDYEPRQLSLVVVHGLISYVFNEMWSLIQQENLQNSGHGRRAVGMASTAHPLLISVRSIHEYLYRIYLEHFQTSSFAVSRLLDLLISASRLDTQSCKVLLFCRLLGLPGTDPLPEGSFWFLIKSIHVLQRACTSSGNYFLLDANGINEFVPQASAWDAMNQLFHNATKDIHKRLRMRLAGLASVYGAVWIPAYNVIDLIIEEWTVGQVVLRTALEDKMFIRNPEVSTDHQDGIVSYTEFLSVFERLNLRTSRLEVTQMYHQLLTSAKQKPPVTKSGSASDGLKHSEAIDVDRFNEQWVSIILRAINQSQHQQIATFNGQYTHRKPSSTDGSSGNGAGTAVHFGPPPEAQANATQKLSYRFLKATWEQTKPDFIHWLDLQFHDIGLQVRLVQHMDSICSNHETNVLHAWRNFQQLIQIAAVENPDE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="55">
+      <gene_name>EPrPV000_3721</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11623193</begin>
+        <end>11623993</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_3721</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_3721</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MSDDTEESDDVRVLELVGQVACLPIMILLNFSLFQFLVSVFARRRQELRIRALLFVAVLGFVVLLPFAYPDEEFVHTLLDISDSCSSLTFVLQIVVLARDINKKMHLTTIARLGHIAELLVVAGVALLVGKSVGLVIPEAAGMDVLEEIEHPLQYVTLVFVVIFRFYFLATARGWSAIWNNQKLELVFYALLATHMVPFVVLESVTELEWHPIQALWLRITIALSLSSTIRARLANRASNAIGKNTAAKQQTTASHNYDASSPQCNN</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="56">
+      <gene_name>EPrPV0000001846</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>11624994</begin>
+        <end>11627423</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000001846</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000001846</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MLEDKKRKPSRDFPAHAQVPLGKVPNGLHHNGRHRVALNGSLPPAVPPMNDPFHILNGDADDAGVPTLYSSLSLPLPPRSGSMMSVDSVASVLSVDDNFRMAAAGDQEEELFDTGSSTSSLPKNERPAQPANEREYFEKLWAENFERSEAKTNNTSSSYLPVGADGRLNRIKGFSFARDAVSHKMYAVFRLEIECIVSEKQWTIYRRFHDFKQLAHQLKNESMRVPTVPTRTLMRSLDTNFLRKRQLELDRWLREVLMLISLENCKSESDKYAECCGNRAQHASCRLIRHFLTHKANEPPAFENVDMNASSSFSASGGSGGRPTLYSISETKSTGMEAEGALATTASQHQIDMLSSSLDQSDMMGTSMEDGDGGAPIYGGERRSVILQDVDDDEEMTSSGRNGWSGSGKVSLKQFDVLRMIGKGSFGKVLLVRKKNTSQLFAVKILSKPILVRKQQVEHTRTERRVLASITHPFVVCLHYAFQTKDKLYFVLDYCPGGDLFFHLSRCGCFPEAMVKFYAAEIVLALIHLHEQGIVYRDLKPENIMLDVDGHVKLADFGLAKEGITSELNGTYTMCGTPEYLPPEILNRAGHGTAVDWWNLGMVVYEMLTGRPPWYTQDRHELFNRLREAELEFPDGLSAEAMDLIQGLLTRDPAKRLGAIDAREITYHPFFGEIDWNLLYLRQVEPLYRPCQYTDPIDAANFEEEFTKLPLAQIDSAGLSVPASELERQANVAAVGGNGVAMDNGDHVAGGAAGQAYPGAMAGSAGSGGSSTRNSTLRNLSYTFAGFTYDGTSSPSIARSNSFDGALPTH</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="57">
+      <gene_name>EPrPV000_7298</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>21650615</begin>
+        <end>21652936</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_7298</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_7298</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPLSDNDGSPSPLRMPLSDSELFPDDMVDKKIVHTKTTSTSAAPPNTAGCSPTTPSMSTFSTTSSVSVTLTSIIRAISSRSSLSRLGTWDVATIAIVLVSGAPVQWLELLETTRYIESVPWPPVVADLHDDCHRNAYSSHALGPSSRSMRGSRVVEPNPRAWLSRTSSRTQRTIAPDTRGRNTATAPSLPSAHAWPGPPSFLLLLTDHSACVVVYASKGNWRTLTSFATDPSTSRVVVQRSSWVSINATPSAVTTSSAVAKHAPRTPRCLSSATIASTHASPRRDHRTESRVAIATAVLSSRRGAAPDVAARGFRAVRTRGQRPGVRRGVAKRCDGLAATLATARVTETREDCFDASPARRQATEARAARSFRGRASSCGWAGGGGGAALAEASSQQEFSRGKMHSLSESLFVPHCEFFTGLTPWLPRRSIAQHSARDPCVSATVASYPHFQSSTKISSRSDKTVIIMRVAIAGAGSFAKYFVDELPRAGHEVVLLTRMHKPFFDGKHGLVDQRVTDYKDVEQLTQQLNDCDALVSTVADMTQSSVDVHLALIEACKRSVQCKKFIPAEFYGTPEDKPDLSLYAFNLPVRDALCAQQELEWTVVYMGWVAEYLLPAVNRHHPDFGLFPLNYETKTLAIPGTGNEKFAVTSVRDFAAAIAALLTSTTKWRPFTYVQGEETTWREVREALRSVAGLSDDQLSVSFESVADLQAQLERNESPEAVMLAEFKLYGPSGALQFDQSKVQRDRDEFFKEVRFRSVKELLEAVQENPTVVV</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="58">
+      <gene_name>EPrPV000_7299</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>21653937</begin>
+        <end>21655055</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_7299</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_7299</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MMPLPRQRRRRRQPTRNSTRDRETTELRALRLLVDELATHRSSLLAFPSRAPSLMSPPAHRSVWRRLAERQAAARESAQRENRALLRQVQRRADWIERLWRLLLETRSDDLVEETRVYCRLSRDLAIVAELKQRGVRGACFATALDVVTAEGVALIDTHEDRWTTTRDVEGSVAKLVSVRQLPFDAYTTTQALWSVLTVVAGKTVDQARRVPMEEMAPLPCYDLAYLERSSSVCAMKYATAKREDSVRRLDYHAVVQTIDRDDGPNAWLEYAFLWQSSCRSATTGGQGTDSMYLVVSSNSSHCTGAPLTSTIAIVATSHVPSRDKLLLDEMARMMEVSVTLTLDVVENVLMDGVVGEQPAVLGGAADVDVVLV</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="59">
+      <gene_name>EPrPV000_7300</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>21656056</begin>
+        <end>21656853</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_7300</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_7300</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MLSSKTLLKLLVVAAALSSHAVDATAEGNPAQIIQATQSVTPCPTQDKTTVPDYDDSNDSNDDSTDDSSDYHSGTVYGGVSGGVSGGVSGGATGGAKGGVSGGIYGGASGGVSGGVSGGASGGVSGGIKGGVSGGASGGVSGGVKGGASGGVGGSIYGGASGGVSGNASGGVSGAAKGGLGGGISINVGGVSVGVSGGVSGGTKGGASGGVSGGVSVSVGGGASGGVKDGVSGGAKGGVSGGIYGGLGGGVSGGVSGGVSGGAKGG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="60">
+      <gene_name>EPrPV000_7301</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>21657854</begin>
+        <end>21658426</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_7301</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_7301</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MLARSIKPAANAAAATAAAKRSVHATRAAPFLLRGLEDVRAAGRELSSADGALTSRRYLVRGDDCGFSVQHEVLKKGSPVRLQFANHVYAVLVTRGAGTAQLLEAPGHVDEGEVKQIQEGSLFALSAAEVLELSAESDELEFTRLPSGVFPAVDQDGVSHESFDHKSARRLFEVPSSLKGGGATMKDDPLF</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Type: ectoine</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Domains detected: ectoine_synt (E-value: 7.2e-09, bitscore: 35.8, seeds: 10)</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Kind: biosynthetic</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="61">
+      <gene_name>EPrPV000_7302</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>21659427</begin>
+        <end>21660851</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_7302</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_7302</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MGNGVSSGMEIFAEGELEAEMQRLGGSGDSSVKKLLGKGYRDVVQLIIRPKRAEYSLQALGPSTLRLAELKPSGSNKELNPAATNEDDEFRIVRRRDFDVLNDRKLRVVCSHWQLYEDADSAAPLATPCLVYLHSNIGSRVDALNMRDLALRRGFSVLALDFCGSGLSDGVYVTMGWNEARDLNAVLQELENDPTVTEFAIYAHSMGTFPAVVNVAARSLVADKKLLAKMETLPHELRAANANVLAKPIKALVFDGGYATMAQVNEGLLRAMQEEGFPVPKSVMKLAMAAIQKSAKKRAEVDLDLLRPIDFVGACSIPALFIAGENDRYVLPQQSEELVSKYPGPASLLRVKGEHYTPRDPAVYAQAVDFFRPVVRERAAQVELDVNKIADRVVAIVQVEEVDVLGRRDLRVAASVLVYKVVLLTLAPLELVSPASSLLSPSSTSAADVTLPRDEVVTGATRQAVDATLDPLLAR</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="62">
+      <gene_name>EPrPV000_7303</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>21661852</begin>
+        <end>21663399</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_7303</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_7303</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">VDGAGHDARPVSDADAAQVEELCLARLRRWTERFGAHDWKHERVCQKWKENQQRXXXXXTQEEAAAESAAAPGEDEGKRSPSKAVREAFSNLTSAAEVWWMCSGAADKKAAADESYAQLVARRQYLSKSAVMDIEKDLPRTFPVDLSQSQDLGASAGLTAASGVWENDRARRRNKSISELRRVLQAYSVRNPAIGYCQSMNFLAAVLLHQMEEEEAFWVLVAIVEELTPQYHTRSMSGSRADQRVFSDLVQQKLPALYHHMQRLGVDFEPFTLKWFLCLFLNTLPFEPVMRIWDVFFCEGSHVLLRVGLALLKLNQPRILACDDAFDVYELFKLSHDMLQSVTAPYRSGLLNRDECVCDTLLRLAMDKSFVGPIPPDWLHELRVYYRNEIETELGEADARRLEHRSQRASSGSSVASTACRVAPVTTSSRGSVTSAALVDEGDKSDDAGETSSSGSGTDRERQEYDFVDEYTGRDSEISPSKHIHFLDLYDSDDAIGYFIDVKFDLSSSLAHYRSA</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="63">
+      <gene_name>EPrPV000_9707</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>27990697</begin>
+        <end>27990942</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9707</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9707</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAANNDNAAHTVKGEDHHAFTRGVVTPTRPRSQLAKLQNFEVSYSTCVAIFALVLVGISLVPLKEYYLGSYVTEPFDEVRDE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="64">
+      <gene_name>EPrPV000_9708</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>27991943</begin>
+        <end>27994150</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9708</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9708</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MSEVYLRHFNDELVVRKIMKNVQEGFMSLELPEFTNTVATAIVERYSKGISLAGVIALLPSSFDAEHVALVDVLGISTLLSYYLDTQQLTMGVNVNNEAAIVAEVTHATATYFTPDFLVNTVGMHYVSTTHLAVFWECAIRHTTMDKTITVADVDGAAIKQCGSDLAGILPLFVVNLLFLFQSDERDYSTLDNTTTYTLGRRRESDTDYVPLTLPETFAGSALLSTDGSAWSTANTDATSKATTPYGYLYTADCKSVVTQALLQTGRNVQKYQAYMGDGLGNCAFRDSQETDLQTLCRLFMTADEVLFQDLSGNAISIPTCASLISAGANATVQALEQASLRQIEWFMIDTTMLTRRIRIQDNTSRQIRTFLLILNLIGASHYALEYIFILKSVWIFVSNSVLQPAAELRSRLGSADAFKYDTTPVVRLGILELLQCDPADGALEHPVTMVLMYLGAVGALSNIFSLGCSAELSTSGDGIVIYCTPSIPVNSLNLVFTTLSSSYWVIRVTLQTRSLAMRLDHVVRDNFARFWLTNAAAVLVIHFTCKGGADLLFQNVELHSDPHIYAILGGLAVAFTISAGFLLVHIAATDSSRLRRMIQQRSTRSLWRASRARATSDRAFVAKWSTAGLDSVLHHCASPQIARQLQVSSLPEQTDWKQGSRSGEPIKDGRPNPIRIHEFVAVHCAGGAHAHLQSVKWYLEPNGRGGVTTVEPMSMKARIFCLDESAPNHTADKKG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="65">
+      <gene_name>EPrPV000_9709</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>27995151</begin>
+        <end>27995672</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9709</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9709</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MEPLDGDTAGDCSPSTTAPANQEIPLPPPSRNTRLLSRESLLQLANRQISYRACIVIFLFLASIAVLTPFKEYYLGNYITDPFDEVRDEVVAKKLNQLGVVTSGIHYFDTFDRKLLPLIDLNTKSALSRTAATTLSLTDFLVRANLRRADLLANLPDELLTQPVNPMVDEPHPG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="66">
+      <gene_name>EPrPV000_9710</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>27996673</begin>
+        <end>27998580</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9710</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9710</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MRASSLHETVGAATVDRECPHVAVLRQKPSPRLPFGQVQLQPTRRRPRRELRGHRNRQIAHTRGPRDLNLHHAAATEHGAPELHHPVGSGSFNSVVEVDVHHLRDPLSIVAGCDSELSLWRDSTRVTQNLSVFHYAAIASRRIWRGLDSVRVRASAMNAFLLRGLGFLAAAYDVSVMAVVDAVLHEEFVFTVAALSSAEFASSGRDVVLAAGLAGAVVGQLGLGMLGDVVGRRGPMIATSALLVLGAALSAAAYASGTRHLLVFLAIARAITGLGVGGAAWVASAFLGNLLVQALAMDVPGENDRGGXXXXLLLALGTVPAAVVGYYRITASAETAAFKSARDKGLVDHSHGTTSILCRHGARLSFIARYYALPLIGCAGAWFVWGVLSTAPTLLARHALVVLRIVAEEDEPPLQLWTAVNACMALLALPGYAVATAAGGRVGRRRLQLQGFALLSVLFVVLASLWDEIKGEPPAFVVLVALVLFFGNCGPNATTFALPTEMFPPAIGCTCFGVAAAAGHVGMAAGHFLVPSGAVDDVPIACFTFAALAVLGAVLTWFCCFDCDLSFEERDEQFERRLLDDDHGRHLASRGTRAALMITGDERRTLPPELPSRIERIRHRVGGATVYEAWRTPNAT</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="67">
+      <gene_name>EPrPV000_9711</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>27999581</begin>
+        <end>28001875</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9711</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9711</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MMQLWCAVLGSGRVMQVEVAWTARVRDLAVAVASQLAPRPSPSWLELYLAKRQPGRWLLAQNRDVRTLAIYGRCSDSLVELLTEDARIDGAAMLGECFAAADMDKVSQTEIHVLVVVNGIGDRLVGRQSLSVESKPRWKWEPERMPVYSLDEERLFFVGREAAVSHLIQMHSSNFDRAVNGSARAWAIPLADNVSGMGKTEFATTYIQKCREIWTGTELPNGFARTLCACRTIRIVFAEGDLLTDSLDEVVVKKLVWKLKRMFLEPPEILVDPPGDSVDLLTALTAEVGPLFLVLDEIGAAFQGDARMSELERRDAFIAFCQTTMLRWLPLPSVFFLLVGHASFLSLINNQVCLIDCRVCRLELPLLRADEIKQILQRTPVEDVATSATVAMALGMNDAQTMVASEQLCRATCGHPKSVVRALNRCHSIPQLMSYASSEVVQWSALYDTVTTHRVDARRLVEVVTGEQSVAIDLTGVTEDGSTTWATRATTCWFQWSGSTSQARLFASPFRVEFLMTFVLSLDELMRAVDKLPVTPAARLEWLVLKRFQELFRSPTRPRSALPMVFGVCPTFGDYPDVAFSARTQPMPMIADPIRDRQSLQAIDYEWTACGVSKLSLKSRPHSWPCDVLVTTLPNGVVLTVGIVIHNHRTSVSILETEIVAFDGVFGSCWSSLSVERRNVLLVFATNMDEELKQLTNANPSTVLRVPSACTHVDEAVLINWSTPLLRAQFFGLKASAAKDVLERTVDTAKREKAFVLQQAQSTGN</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="68">
+      <gene_name>EPrPV000_9712</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28002876</begin>
+        <end>28006244</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9712</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9712</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPTATNVPSEVAAAGSSSKKTTGSSSSDSSSSGSLSAVGSTDGSSATAGTVTTPGDGSDGSDGSDAGESASASGSDSTTKTPTSTTKTPTNAEYDHGHTDQHDGHADQYDQNADGHHQDTDYDHGHTDHGLVRDGRHAPAADGGSGRGRRSDHDQLDGLDHDRAVLVQLDQHDDQHDDHDGSVXXXXASSSGSSEGSWSSSASASSWSSSSTSSSATSTTTTVEFSCDATFYGAWAKMGLTCGDSALDVDAAAAQTQCLIYSGTADGTGVTDLKTCLSVCRFPGCANGTWDYAADDGINSDIYADLDLLSLLTYAGESAAVSGAVSQPFSNLTMTAETECDYTSDSSFSACQCDNYVYSSTSSSSTAGTSGTASNSYTVPEDKGLEDSDHWADGTTKTTVDKAGIATSTIXXXXAATVSVVAGGVMSVASGVVGGTXXXXAASVGITMAAVDLCQFSIMINQMNVDARPRFLEKMGKKMAPAGFQFLPFGKVSSSDNSTDGSGSSSSSASTSGSGTRRRLGSSSTSASGSSSSGSGSSSSTSVQGMEKYAALIGVQADKLFYLTVAGIGCLIGALFACYGLFMLAAYSFVSDFPAFSKKWFDKAIGVLMMILILSEYVIGATAMYQICYCIDNDSIDVSFGLAIIALLVMAFGTILFGVLVIRNNEEELRDLGTKDHFDKKFHARFGPLYDEYSFEGRFFFAPKLMLALLCGMTTGMVWIQGLWQIIVLIGFHIAFLFYLEMKQPYPTAFVQKTSSFVIIIKISALFLSFFLLSSATSFNEDIPDDLREGVGFAIVGLQVLVLVALMIRQMYIFYRTWKLKRDGASADDDKAGTTVVTANNRDGNTDPFFSLGEPQYGHANQQQQQQQYGQANQQQQQQYGQPGRENSVAILGDDARGQYASGGDQFEQQQQAQYQYQPGKLRGLQPPTGRRTASVVVHDGPGGYRSNEVAAPTAGLAQRARGWRAPIEGNHTNAFSRLAVSTVRSSTSFAALAFSPKNCARSSGVDQLISTASSTCVQALGTRSTVDGFAFVSCLSSSSMLVANTSSTLRRSTLNELQQEPKTPSNATISVSSMETLVRWLWITIPTVRTTPLGRVVTRTSHGHECGRDLRLSFETPQAVHS</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="69">
+      <gene_name>EPrPV000_9713</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28007245</begin>
+        <end>28008966</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9713</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9713</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MKLLNWHKLANEAALKAAIIKTNKVKREDAHFSSALGAEDREERAQRAQQIIEEEQLRPLQVNSDFFRDFEAKGQRDDAKLEDDVQRHIQHLKRLKDTMATKEDAQRRRRQYRDKVQDLHRNTKPTPQPRDLTARKSSNQEDEHLNRYQRIADAQNGGRANAEVVGSLDKLMELEKRIRHLEDAGLGADALDEEQEAMDADADRGSTTTAGIRFAKRRSSAGPHEPSRTVYAVQSGNGRASKMRSKDARPKSFPQPTANKKRGLSTGNRPETFLTSLPDSKQRQLRRMTERERRQFLKAEKAAETKQKALKQDVVIEGWMDKKRQAATQRKAANSHVRGGNNAGGGAVSMAGSSAGSTAQRGATTTRKATLPPPPRVRAPAVGAASGKRISNPHMQKFDDIKKGFDRRKEVVQRAPTTTNAARAGSLQASSTSRRGPNAGASQPPPAGASRMPRQSSSLAMQQPQARRGDAKSSAPARSTAPSGLVTPVAPGAKSSGSSRPTTKLPSISRNDLKSSAPVGGGRSGKDAGLRSSSGGGGLTLPRIVGQAPRVAPVPSPPPANRPSGPQFSRLHKR</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="70">
+      <gene_name>EPrPV000_9714</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28009967</begin>
+        <end>28014931</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9714</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9714</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MAVEADADAETPKRHKSAASNAPKAANANPEAEPVVDELKRKAAQSKWRHKIVYTFLDDRGRELVNYSFEDVDRAARKVAAALQRDAGVRKGDRVMLCYPPGLDFALGFWGCLYAGAVGIPVYPPYPGTLAKDLPKFNRMVADSGAKVVLTNKTYHLASKMATVKGFFSGGSKATTWPENVQWISTDALADSGAAHYDDAELGLTVDDVAFFQYSSGSTSEPKAVMISHGNLRAQLKTWESILPSDTLVSWLPSYHDMGLVGFIITPCITGGRCVSMXXXXXXXXFIKDPAMWMRTVSKYRATHVCAPNFGYALAARKTTDKEAASMDLSTLKQTICAAEPIRPESLDAFISKFEKASGFNPDTFNCGYGLAEVTLVCTGQDPLTRQLPTVLTVDKSMLETNQKVVQVSKPAKKETVMSLVGCGKAMPTFKVSIVDPNSKKLLKDMQVGEVWIQGPSVSIGYWNRPEYTEEMFGALLAGEKDSKNTFLRTGDMGFLRNGELFVTGRLKDLIIIRGRNVCPQDVEATVERAHDHIRPGCCAAFSIEKNQEEALVVVAEVKNGSSQDVLKEVCGEIIKCVLSEHQLRCEAIVLLPQRAIPKTTSGKIQRSASKAKFITSTLPKAVYEYKSAAGVDQPRPSAAKPSPKQPVAQPSEEGDANVQKTPEDVKTPAEILTWLLERVALEVQTASASGESSSSESAVETPKPAEIDPSTPWAMFGLDSVAIVGLSSELGEFLGCVVPPSAFFQYDTPEKLANAPGLATGELVTEEEAVNGGAAPLASSIEEIDSSCYDIANFPEVQNLFGQMKEFESAGLTVPFLETLTPEMRKKTNFNTYNYLGNARDPEVLNAARKAITEYGSTMSSSPIVGQTQVNVDLEKALCSFFRAEASVLFVGGWVTNVTTIDALVGKGDLILCDALNHDSCVTGQRLSGATILPYPHNDTDALERMLSQLRTKYRRVLIVTEGVYGMDGDIPNIPEMVRIKKKFKSLLFIDEAHSFGTMGETGRGICEHFGVDTDEVDVRMGTMSKALGSIGGFVLGSRALVQYLKHCAGGFVFSVGLAPSAAAAALKSIELMTASPSRTERLHDNSRYFFDKCKEHNIPIGLHTFRGGPVVVVMIGSTIATAKASEYLAANGVNVKPIVYPAVEEGKCRLRFFISAVHTTKQLDHTIKLLDTYIKSSVALEQTTTKVTTVKKVKKAQEVGSGSSEATVVVATTTTTTTTTTSTSTTNVGASAACVSRYLRSLARISSWISSIVLPLVSGTYLTVKTKAAQSASANGANTNSPSTACMVGKTRPMRNEQIQLTIVATDMAVGRGLAGNISATMSHGMGPRPISKNHTKHMTPPTLATLANGSSLSRPTHDAREDHPRSRVEQQRTAARRVHEHERDHGREHVDGRDERGADERVLQPDVLEEGARVEHDGVDAAELLRELQHDADDERQADRPVEQHLPDTHVARLVVARRAYGVDLLVHVVRAAQAAQDVGGLLRPVLRQQPARRLGQQRRQRDLQHAGHDREAEEHAPARVRQPVARVTEAEGEQVGHQDARHHRELVRRAERAAQVGRRQLAEVERHDDANRARGEAHEEAADDECVHVDREGHDAAGRDEQARRDEQCLLAAEHVGHAAGRERPEGAAHREDGHAHGPLDVRVAREDDVL</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Type: other</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Domains detected: AMP-binding (E-value: 1.3e-85, bitscore: 286.9, seeds: 400); PP-binding (E-value: 1.3e-08, bitscore: 34.6, seeds: 164)</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">Kind: biosynthetic</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS subtype: PKS/NRPS-like protein</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: CAL_domain (67-538). E-value: 5.1e-97. Score: 316.6; Substrate specificity predictions: Acetyl-CoA (Minowa);</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: ACP (702-755). E-value: 1.3e-09. Score: 29.8;</qualifier>
+        <qualifier name="sec_met" ori="auto-annotation" style="genbank">NRPS/PKS Domain: Aminotran_1_2 (826-1170). E-value: 1.6e-54. Score: 176.9;</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="71">
+      <gene_name>EPrPV000_9715</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28015932</begin>
+        <end>28017596</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9715</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9715</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MDQPRIQHSQSDLALGTPGSWADLKAAEGLKKRSNTAQNLQFYVEEQKRLYQELPFSVLPGMRRQSFQRERSYSNLRSRSSWGSFSNLVKYGEDQPLLGSEDEFPEPGYTFPLLLSSIVALMSAFQFGYNTGVTGGISPDIIFPGHTDIQWAVCVSIFAVGGPFGSLTAGRMANMLGRKKALLITSCLFIAAGGIMAFSVNMYALIVGRFLVGFASGTVSVVVPLYLGELAPPNLRGALGTAYQLAMVTGILVADLLAFGFGDASDGLAHPGWRMLFGFTVVPGVLQIALSALLTESPRWLLAQNRPKEAADILRRLRGSNDVYEEIDAICSASDNESGDMGIWEVLLDRSIRLPLIVGVVLQLAQQFSGINAVMFYASSFFQNVGLQNPLVGATLVSTVNVLATVVALVLMDTAGRRPLLLYSAAGMIFSCVVLTVGLLKLLPFASVASVGGVMCFVWFFEIGLGPIPWLIVAEMFPAKPRPTAMSVATMVNWICSFLIGLVFPTMQAVLGEFVFAPFALALCAAFVFTVKYVPETKGKTIDEIQDDMRAKDRK</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="72">
+      <gene_name>EPrPV000_9716</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28018597</begin>
+        <end>28018959</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9716</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9716</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MADLQGQVNTFLASGKGGQISWGFLMGVCSGFALKKVSKVGAIALGGLFVLLQCASYSGYIDVNYQKLQRDMTDYLDLNRDGVLDTKDLDSLYKSVMKVLEFSLPAGSGYAAGFLVGFRAG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="73">
+      <gene_name>EPrPV000_9717</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28019960</begin>
+        <end>28021072</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9717</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9717</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPSVGQISRVDRLLEIQQRLQASIRKKLLQGMVGGRREGYLGVEDALFQLDSAGDGYLPEQLFVDKFLAGLKRPLSEPEMDFLLAQLKSRGRLSDNQGIDYEQLGIVFGLDGDDSASEWEVDSVTVGSGMDGVPSPTRRSQLGSEFLAAEKRLTAFLHAPWQPSSNAQTDPSETPRSVFTGAERFLELAEEVDRAKTGLMHEKCRISVLGFCVCSLGLWMADTFEDQMTGFGQLLSQCGVDIPDHLMQSILSRFPRVEGHSVSYSAFLLRYGQNPEQSRERRELKQLVGKLVEQIKMPISEWVSQLRQCFDKYDKSLTPSIRGALVQPEFLRLLTRHCEATNVPVSHIAPISRTLARLSDDKMIRHHEFFG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="74">
+      <gene_name>EPrPV000_9718</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28022073</begin>
+        <end>28022648</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9718</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9718</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">ICRVLTDVSKADATAYLLPGETVQFALQAGKEEFAFTNQALLTLRGESSTTTRKIVTRYDYKSHIIAHVQFETAGLVDRDCELKFVVGDKHFSIDVAKGDESEVRVIYKVLELVSRKQKEHERTWEFGRLALDASSKALRLSENSNQSLTKQSDETLEWLEALYVRTHPRCYREVIIAAFQTVRTDLKTQDG</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="75">
+      <gene_name>EPrPV0000001641</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28023649</begin>
+        <end>28024080</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000001641</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000001641</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MTLAELTYLEGTAHDFIVLLVMRTCSDSTEETRARGLFGLLVLDKFPIAHTKQGVPCALVKLTRLERVKIQSLYVSLLYILTCYLAVIYMLKEIYVAQVITKQFVIEFRSQEIHRQLAVCLANITMKLSTELKLVESSALMAMP</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="76">
+      <gene_name>EPrPV0000001640</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28025081</begin>
+        <end>28025455</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV0000001640</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV0000001640</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MLPAPTARLRTDDVLFLSNGEPAEGSPWDLDEVEKAPAATTVSTKQGASPGWILWPLLVGNDRTLLQQAGRGVVDTAADAAVRHGMDAGSIQDKYHARIGYEAAHRVEGQQAHVALALHILGDHL</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="77">
+      <gene_name>EPrPV000_9719</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28026456</begin>
+        <end>28027343</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9719</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9719</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MATLDQELDELVEVSGDVQKVTLFEFHKHLARLNYAAVERLAKDLSSGIMLTDHRRVNCLTCAESKQTKIAMSKKNTGDNSPIDRIGGVICSDLKGSMDTKVRLNNRHMINFVHYKSNYCRVFLARTKDAAAKQFEHFLVFFDRRFNCRIHVLCTDSGGGEDTRKKNFAQRAQQGTNVGIGEETKGCRVYLPKDNVVVTTQHVRSIETLNKEQNEQVQRLYPKDGEDESENKAPEQGGVSEDAPTTTGGKTSRSPAHGRANKKSKKKKKSWARKQHVTRSIGRQAAANADESAQWE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="78">
+      <gene_name>EPrPV000_9720</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28028344</begin>
+        <end>28031016</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9720</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9720</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MPARKVNDDEAAGGMHPPPSTASSASSYVGAGELGESSLLDQLHDLHRRLAAVRQDSQRFNSAARNVGPIPMANETNKIIVCSVRRCVRMLKTNQDDSWQYVPSDTGFKSAVDYLGAGNKVAWISWPGAVVDESSQDGVRRKLESEYGCQPVFLSSEMLDLFHNQFCNVILWPLFHSLPQRSDSRLLENFSEKYDAYCAANQKFLEAVSEIYKEGDLVLVCDYHLMTLPGLLRRRFPDITCGFYFHCPFPSSEFFQMLPSREELLHGVLGADLVVFNHFDYIRHFLNVCTRMLGLESSPSRVEYNGRLISLGICPMGIDPGKYEITPQVETQIEMLKQQQQNGMKIIVGVQKLDFCKGIPEMLEAMEYLLQHYPEYRGHVVLYAVVRDAGRTTSFQYKMLNRHINQLVGRVNGKFGTAEYCPIRYLKRSIEHDQLVALYNLADVAIISSIKEGINLQAMEFIAAQKKNGHGVLVYSEFAGCASSFQGALLVNPMHTEQVAASIDTALRMSTTTKQLRHQQLSRYVNTYTSTLWAQRIMSALNEAAATAQEYNRLDKLDTASLLGYYERSRRRLFLLDYDGTLVNYQSMPELAAPSAAVLSCLEELANDPHNAVYVISGRNKTRLQEWFGHLPHIGLAAEHGYWFRPAAKHAVSKPAEWEPSLQDVHGVSRSSPGNVKGVVGDSNPLSPSNASKSNDTTDNVGENMIASPHGLPWQCMFSDVELDWQDEVESILEHFTERTPGSLLDIKDCSYTWHFLDADPVFGLKQAKDLQLHFDQMLRDRPVGVVMCQIKKYVTIRPWRVNKGRAVSRILEYESESAYFTSLDFDFILAVGDERTDEDMFDVVQGSNCYTCTVGMKVSRAQNYLEDPDEVLRVLTACTSLISSDSHPAL</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+    <gene id="79">
+      <gene_name>EPrPV000_9721</gene_name>
+      <sequence source="sequencelist">1</sequence>
+      <gene_location>
+        <begin>28032017</begin>
+        <end>28036072</end>
+      </gene_location>
+      <gene_qualifiers>
+        <qualifier name="product" ori="auto-annotation" style="genbank">EPrPV000_9721</qualifier>
+        <qualifier name="locus_tag" ori="auto-annotation" style="genbank">EPrPV000_9721</qualifier>
+        <qualifier name="translation" ori="auto-annotation" style="genbank">MEFLVPLHAPDLELPKADRYHVHTVHSFDDISFDELGDRISDLENHVLASDMGLELLQEGCLDMTYSLVKYQRPVLMLLFGVPRKLPVLTEPIRMRIVEMLAAFVSNTTDGILAARLGSDREESVTCRSAFKASVYFLITALSSISQILQQAEKDILKKGKKSQTSAINRINWSKVVEAAIQKLTRSVSPVTFGLWNMNLPEEVGILCFGILYLVEFAVLYSKVVFQLLENASLCRGKSLKPKLYHLLAMSLQKVPSIHISVVASLIDLIYTHEHLSIPIADLIELLYGKYENTVFAADLISEIGKISSRDGSKDVAGTRNIATFLSTLSSLTPSLIVSNLSFVLALLDSESYQLRNSAVTCITQILLWNFRQNGGQALHPAGDETSASIKKRDADSDDDAESLDSDRAGVDEDNDRSEQVEEASSVRTFSRSTRDQLLSVLEDRIHDVNSFARGHVLKMWTTLCEEGALPIHMLKNVTLMAVGRLQDKAAVVRRHSIHLLTLLLESNPFMGNLERDFYVKKRSELVEEMKKKQVEVIAGAEKEMNEGMDELNLSGSAGVPEASSSLEEQAAELEKELQTTQRVVRFYTDAIEFIEEFELRALPLMGQLLGSKSVSDVLESIQFFEKAYRFHLGAAQTGIKKILPLTWRGDVSIQEQLSNTFVALFIRIDEEDDERRSPQAVAENLVKFLDECTVAEYTCLERIFGELHKNKKIPRAVVAALWDFVDETAYPVSVLSNTMLLLSMIASIDDSMLFTNDRLNQILTNGFGDVACKADPKYRAFGSACRLMKCIQLTPKSEGGSRGSTQQRVQRANLDATEQIILRLQRFLALDFLSESGIEADCLHSTWFDTVQQTIDAIFAICERPEEVCGDVIKHLSLRLFESATADVSRVELAHFFFVLGHSVARVAIHVEMLATKMKKLRANHQHRPRKAAAKPDDASNGAADDVTAMEDELGVAAEVEAEEDTYVNNIIQKEIACRNLLGVYSPLILRVLVGKVDEFTGDELLIECAVVALSKFMAVSDEFCEKHLQLLFTILQESPLPSVRGNLIIALGDLSFRFPNLIEPWTAHLYNRLRDVNLDVRKNTIVVLSHLILNDMIKVKAQISEIAISLVDENEAIRNMAKLFFNELSKKGNNPIYNMLPDAIGQLSVSDLVSNQDFQSITRFLVQFLNKEKQVESIVDKLCQRFPASTKVQQQRDLAFCLSRLPHTEKSLKYLYQNRKLFSDALHDNVVADNFTALISKARRGSPAVSATTELKETIDKLDKFVTGKKEGQEEDETGDGDVRDRPSPQAKNPPKRRGKRGRPPKAKAAPTPKREQRNPSRRQAAAAAKSKARRAVQLSDESGSSDGEE</qualifier>
+      </gene_qualifiers>
+      <operon>1</operon>
+    </gene>
+  </genelist>
+  <motiflist>
+    <motif domainID="1" geneID="8" id="1">
+      <motif_name>C2_LCL_024-062</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>432</begin>
+        <end>551</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C2_LCL_024-062</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">2.00E-06</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0001</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: C2_LCL_024-062 (e-value: 2e-06; bit-score: 20.2)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">20.2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C2_LCL_024-062</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="1" geneID="8" id="2">
+      <motif_name>C3_LCL_132-143</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>798</begin>
+        <end>863</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C3_LCL_132-143</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">6.80E-07</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0002</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: C3_LCL_132-143 (e-value: 6.8e-07; bit-score: 21.9)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">21.9</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C3_LCL_132-143</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="1" geneID="8" id="3">
+      <motif_name>C4_LCL_164-176</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>912</begin>
+        <end>944</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C4_LCL_164-176</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">5.00E-05</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0003</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: C4_LCL_164-176 (e-value: 5e-05; bit-score: 15.9)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">15.9</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C4_LCL_164-176</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="1" geneID="8" id="4">
+      <motif_name>C5_LCL_267-296</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1215</begin>
+        <end>1304</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C5_LCL_267-296</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">3.90E-16</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0004</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: C5_LCL_267-296 (e-value: 3.9e-16; bit-score: 51.4)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">51.4</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C5_LCL_267-296</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="0" geneID="8" id="5">
+      <motif_name>C67_LCL_14fromHMM</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1353</begin>
+        <end>1502</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C67_LCL_14fromHMM</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.10E-02</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0005</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: C67_LCL_14fromHMM (e-value: 0.011; bit-score: 8.1)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">8.1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">C67_LCL_14fromHMM</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="2" geneID="8" id="6">
+      <motif_name>NRPS-A_a3</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>2277</begin>
+        <end>2333</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">4.90E-10</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0006</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a3 (e-value: 4.9e-10; bit-score: 31.3)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">31.3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="2" geneID="8" id="7">
+      <motif_name>NRPS-A_a6</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>2853</begin>
+        <end>2942</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.40E-14</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0007</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a6 (e-value: 1.4e-14; bit-score: 46.2)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">46.2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="2" geneID="8" id="8">
+      <motif_name>NRPS-A_a8</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>3039</begin>
+        <end>3101</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">2.80E-08</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0008</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a8 (e-value: 2.8e-08; bit-score: 26.1)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">26.1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="4" geneID="8" id="9">
+      <motif_name>NRPS-te1</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>3840</begin>
+        <end>3908</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_810</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-te1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.20E-06</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_810_0009</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-te1 (e-value: 1.2e-06; bit-score: 21.0)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">21.0</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-te1</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="6" geneID="30" id="10">
+      <motif_name>NRPS-A_a3</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>501</begin>
+        <end>560</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_2961</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">4.80E-08</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_2961_0001</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a3 (e-value: 4.8e-08; bit-score: 25.3)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">25.3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="6" geneID="30" id="11">
+      <motif_name>NRPS-A_a6</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1200</begin>
+        <end>1391</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_2961</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.20E-04</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_2961_0002</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a6 (e-value: 0.0001204; bit-score: 16.5)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">16.5</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="6" geneID="30" id="12">
+      <motif_name>NRPS-A_a8</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1383</begin>
+        <end>1445</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_2961</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">3.50E-05</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_2961_0003</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a8 (e-value: 3.5e-05; bit-score: 16.5)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">16.5</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="0" geneID="41" id="13">
+      <motif_name>PKSI-KR_m1</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>189</begin>
+        <end>917</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV0000002255</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KR_m1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">4.18E-04</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV0000002255_0001</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: PKSI-KR_m1 (e-value: 0.000418; bit-score: 15.2)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">15.2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">PKSI-KR_m1</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="9" geneID="50" id="14">
+      <motif_name>NRPS-te1</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>249</begin>
+        <end>314</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_3716</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-te1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.30E-03</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_3716_0001</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-te1 (e-value: 0.0013; bit-score: 11.4)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">11.4</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-te1</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="10" geneID="50" id="15">
+      <motif_name>NRPS-A_a2</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1047</begin>
+        <end>1082</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_3716</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a2</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">2.70E-03</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_3716_0002</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a2 (e-value: 0.0027; bit-score: 11.3)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">11.3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a2</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="10" geneID="50" id="16">
+      <motif_name>NRPS-A_a3</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1287</begin>
+        <end>1346</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_3716</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">4.30E-06</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_3716_0003</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a3 (e-value: 4.3e-06; bit-score: 19.3)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">19.3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="10" geneID="50" id="17">
+      <motif_name>NRPS-A_a6</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1872</begin>
+        <end>1958</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_3716</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.10E-15</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_3716_0004</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a6 (e-value: 1.1e-15; bit-score: 49.7)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">49.7</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="10" geneID="50" id="18">
+      <motif_name>NRPS-A_a8</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>2040</begin>
+        <end>2102</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_3716</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">4.50E-05</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_3716_0005</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a8 (e-value: 4.5e-05; bit-score: 16.1)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">16.1</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="13" geneID="70" id="19">
+      <motif_name>NRPS-A_a3</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>627</begin>
+        <end>686</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_9714</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">7.30E-06</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_9714_0001</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a3 (e-value: 7.3e-06; bit-score: 18.7)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">18.7</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a3</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="13" geneID="70" id="20">
+      <motif_name>NRPS-A_a6</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1341</begin>
+        <end>1418</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_9714</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">2.00E-09</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_9714_0002</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a6 (e-value: 2e-09; bit-score: 29.7)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">29.7</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a6</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+    <motif domainID="13" geneID="70" id="21">
+      <motif_name>NRPS-A_a8</motif_name>
+      <motif_type>BiosynML motif</motif_type>
+      <sequence source="sequencelist">1</sequence>
+      <motif_location>
+        <begin>1509</begin>
+        <end>1571</end>
+      </motif_location>
+      <motif_qualifiers>
+        <qualifier name="note" ori="auto-annotation" style="genbank">hmmscan</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">EPrPV000_9714</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">abmotifs</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">1.50E-04</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">nrpspksmotif_EPrPV000_9714_0003</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS/PKS Motif: NRPS-A_a8 (e-value: 0.00015; bit-score: 14.5)</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">14.5</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">pksnrpsmotif</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">XXXXXXXXXXXXXXXXXXXXX</qualifier>
+        <qualifier name="note" ori="auto-annotation" style="genbank">NRPS-A_a8</qualifier>
+        <qualifier name="NCBI Feature Key" ori="auto-annotation" style="genbank">CDS_motif</qualifier>
+      </motif_qualifiers>
+    </motif>
+  </motiflist>
+  <Sequencelist>
+    <source id="1">
+      <label>Protein_Input</label>
+      <Sequence>n</Sequence>
+    </source>
+  </Sequencelist>
+  <model id="1">
+    <title>Biosynthetic pathway1</title>
+    <confidence>Sequence-based prediction</confidence>
+    <generator>antiSMASH</generator>
+    <label>model 1</label>
+    <organism>
+      <name></name>
+      <strain> </strain>
+      <identifier source=" "> </identifier>
+      <status></status>
+    </organism>
+    <compound>
+      <name> </name>
+      <identifier source=""> </identifier>
+      <status> </status>
+      <citation type=""></citation>
+    </compound>
+    <genecluster>
+      <name>Biosynthetic genecluster</name>
+      <shortname></shortname>
+      <status></status>
+      <type>nrps</type>
+      <identifier source=""> </identifier>
+      <citation type=""></citation>
+      <sequence source="sequencelist">1</sequence>
+      <region>
+        <begin>2769518</begin>
+        <end>2813868</end>
+      </region>
+    </genecluster>
+    <nodelist>
+      <node id="1">
+        <class>linkage</class>
+        <context>NRPS</context>
+      </node>
+      <node id="2">
+        <class>activation</class>
+        <context>NRPS</context>
+      </node>
+      <node id="3">
+        <class>carrier</class>
+        <context>NRPS</context>
+      </node>
+      <node id="4">
+        <class>termination</class>
+        <context>Unspecified</context>
+      </node>
+      <node id="5">
+        <class></class>
+        <context></context>
+      </node>
+    </nodelist>
+  </model>
+  <model id="2">
+    <title>Biosynthetic pathway2</title>
+    <confidence>Sequence-based prediction</confidence>
+    <generator>antiSMASH</generator>
+    <label>model 2</label>
+    <organism>
+      <name></name>
+      <strain> </strain>
+      <identifier source=" "> </identifier>
+      <status></status>
+    </organism>
+    <compound>
+      <name> </name>
+      <identifier source=""> </identifier>
+      <status> </status>
+      <citation type=""></citation>
+    </compound>
+    <genecluster>
+      <name>Biosynthetic genecluster</name>
+      <shortname></shortname>
+      <status></status>
+      <type>terpene</type>
+      <identifier source=""> </identifier>
+      <citation type=""></citation>
+      <sequence source="sequencelist">1</sequence>
+      <region>
+        <begin>8230925</begin>
+        <end>8251903</end>
+      </region>
+    </genecluster>
+    <nodelist/>
+  </model>
+  <model id="3">
+    <title>Biosynthetic pathway3</title>
+    <confidence>Sequence-based prediction</confidence>
+    <generator>antiSMASH</generator>
+    <label>model 3</label>
+    <organism>
+      <name></name>
+      <strain> </strain>
+      <identifier source=" "> </identifier>
+      <status></status>
+    </organism>
+    <compound>
+      <name> </name>
+      <identifier source=""> </identifier>
+      <status> </status>
+      <citation type=""></citation>
+    </compound>
+    <genecluster>
+      <name>Biosynthetic genecluster</name>
+      <shortname></shortname>
+      <status></status>
+      <type>other</type>
+      <identifier source=""> </identifier>
+      <citation type=""></citation>
+      <sequence source="sequencelist">1</sequence>
+      <region>
+        <begin>9378353</begin>
+        <end>9420606</end>
+      </region>
+    </genecluster>
+    <nodelist>
+      <node id="6">
+        <class>activation</class>
+        <context>NRPS</context>
+      </node>
+      <node id="7">
+        <class>carrier</class>
+        <context>PKS</context>
+      </node>
+    </nodelist>
+  </model>
+  <model id="4">
+    <title>Biosynthetic pathway4</title>
+    <confidence>Sequence-based prediction</confidence>
+    <generator>antiSMASH</generator>
+    <label>model 4</label>
+    <organism>
+      <name></name>
+      <strain> </strain>
+      <identifier source=" "> </identifier>
+      <status></status>
+    </organism>
+    <compound>
+      <name> </name>
+      <identifier source=""> </identifier>
+      <status> </status>
+      <citation type=""></citation>
+    </compound>
+    <genecluster>
+      <name>Biosynthetic genecluster</name>
+      <shortname></shortname>
+      <status></status>
+      <type>other</type>
+      <identifier source=""> </identifier>
+      <citation type=""></citation>
+      <sequence source="sequencelist">1</sequence>
+      <region>
+        <begin>11581407</begin>
+        <end>11625349</end>
+      </region>
+    </genecluster>
+    <nodelist>
+      <node id="8">
+        <class>modification</class>
+        <context>PKS</context>
+      </node>
+      <node id="9">
+        <class>termination</class>
+        <context>Unspecified</context>
+      </node>
+      <node id="10">
+        <class>activation</class>
+        <context>NRPS</context>
+      </node>
+      <node id="11">
+        <class>carrier</class>
+        <context>NRPS</context>
+      </node>
+      <node id="12">
+        <class>termination</class>
+        <context>PKS,NRPS</context>
+      </node>
+    </nodelist>
+  </model>
+  <model id="5">
+    <title>Biosynthetic pathway5</title>
+    <confidence>Sequence-based prediction</confidence>
+    <generator>antiSMASH</generator>
+    <label>model 5</label>
+    <organism>
+      <name></name>
+      <strain> </strain>
+      <identifier source=" "> </identifier>
+      <status></status>
+    </organism>
+    <compound>
+      <name> </name>
+      <identifier source=""> </identifier>
+      <status> </status>
+      <citation type=""></citation>
+    </compound>
+    <genecluster>
+      <name>Biosynthetic genecluster</name>
+      <shortname></shortname>
+      <status></status>
+      <type>ectoine</type>
+      <identifier source=""> </identifier>
+      <citation type=""></citation>
+      <sequence source="sequencelist">1</sequence>
+      <region>
+        <begin>21652853</begin>
+        <end>21663426</end>
+      </region>
+    </genecluster>
+    <nodelist/>
+  </model>
+  <model id="6">
+    <title>Biosynthetic pathway6</title>
+    <confidence>Sequence-based prediction</confidence>
+    <generator>antiSMASH</generator>
+    <label>model 6</label>
+    <organism>
+      <name></name>
+      <strain> </strain>
+      <identifier source=" "> </identifier>
+      <status></status>
+    </organism>
+    <compound>
+      <name> </name>
+      <identifier source=""> </identifier>
+      <status> </status>
+      <citation type=""></citation>
+    </compound>
+    <genecluster>
+      <name>Biosynthetic genecluster</name>
+      <shortname></shortname>
+      <status></status>
+      <type>other</type>
+      <identifier source=""> </identifier>
+      <citation type=""></citation>
+      <sequence source="sequencelist">1</sequence>
+      <region>
+        <begin>27989966</begin>
+        <end>28034931</end>
+      </region>
+    </genecluster>
+    <nodelist>
+      <node id="13">
+        <class>activation</class>
+        <context>PKS</context>
+      </node>
+      <node id="14">
+        <class>carrier</class>
+        <context>PKS</context>
+      </node>
+      <node id="15">
+        <class></class>
+        <context></context>
+      </node>
+    </nodelist>
+  </model>
+</root>

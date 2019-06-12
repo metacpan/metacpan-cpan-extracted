@@ -22,44 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222639;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'leading_digits' => '88',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
+                  'format' => '$1 $2',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{5})',
-                  'leading_digits' => '[1-6]',
-                  'format' => '$1 $2'
+                  'leading_digits' => '[1-6]'
                 },
                 {
                   'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '1',
-                  'format' => '$1 $2 $3'
+                  'leading_digits' => '1'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'leading_digits' => '[89]',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'toll_free' => '',
-                'fixed_line' => '
-          12\\d{7}|
-          [1-6]\\d{6}
-        ',
-                'voip' => '',
-                'specialrate' => '',
                 'mobile' => '
           88\\d{5}|
           (?:
@@ -67,11 +59,19 @@ my $validators = {
             9[017-9]
           )\\d{7}
         ',
+                'toll_free' => '',
+                'personal_number' => '',
+                'pager' => '',
+                'voip' => '',
+                'fixed_line' => '
+          12\\d{7}|
+          [1-6]\\d{6}
+        ',
                 'geographic' => '
           12\\d{7}|
           [1-6]\\d{6}
         ',
-                'pager' => ''
+                'specialrate' => ''
               };
 my %areanames = (
   2431 => "Kinshasa",

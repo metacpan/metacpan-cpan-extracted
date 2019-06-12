@@ -1,6 +1,21 @@
 This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 Some APIs *can change* with the release of the first stable release (v 0.1).
 
+0.32	2019-06-12
+	* Ships a script to count FASTA/FASTQ sequences called 'fqc' (see)
+	* Reader object new property 'compressed' (1 if reading .gz files, 0 otherwise)
+	* POD documentation Updated
+
+0.31	2019-06-12
+	* POD documentation Updated
+
+0.30	2019-06-11
+	* Improved getFastqRead() error handling
+	* Improved unit tests, in particular for getFastqRead() method
+	* Added 'bad.fastq': malformed FASTQ file
+	* Shipping FastqReader.pl demo script to see how getFastqRead() works
+	* NOTE: This release focuses on getFastqRead(FASTQ), that is 12% faster than the generic getRead(FASTX)
+
 0.20	2019-06-10
 	* Added preliminary support to read .gz files
 
@@ -16,7 +31,7 @@ Some APIs *can change* with the release of the first stable release (v 0.1).
 0.09	2019-05-16
 	* Removed test/ directory
 
-0.08	2019-05-16	
+0.08	2019-05-16
 	* Dist::Zilla configuration updated
 	* Renamed experimental files
 

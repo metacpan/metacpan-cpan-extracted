@@ -22,24 +22,73 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'intl_format' => 'NA',
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '[2-9]',
-                  'format' => '$1-$2'
+                  'format' => '$1-$2',
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'intl_format' => 'NA'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'leading_digits' => '[2-9]',
+                  'intl_format' => '$1-$2-$3',
                   'format' => '($1) $2-$3',
-                  'intl_format' => '$1-$2-$3'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'specialrate' => '(900[2-9]\\d{6})',
+                'geographic' => '
+          758(?:
+            4(?:
+              30|
+              5\\d|
+              6[2-9]|
+              8[0-2]
+            )|
+            57[0-2]|
+            638
+          )\\d{4}
+        ',
+                'fixed_line' => '
+          758(?:
+            4(?:
+              30|
+              5\\d|
+              6[2-9]|
+              8[0-2]
+            )|
+            57[0-2]|
+            638
+          )\\d{4}
+        ',
+                'voip' => '',
+                'pager' => '',
+                'personal_number' => '
+          5(?:
+            00|
+            2[12]|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
+                'toll_free' => '
+          8(?:
+            00|
+            33|
+            44|
+            55|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
                 'mobile' => '
           758(?:
             28[4-7]|
@@ -59,55 +108,6 @@ my $validators = {
               3[01]
             )
           )\\d{4}
-        ',
-                'pager' => '',
-                'geographic' => '
-          758(?:
-            4(?:
-              30|
-              5\\d|
-              6[2-9]|
-              8[0-2]
-            )|
-            57[0-2]|
-            638
-          )\\d{4}
-        ',
-                'specialrate' => '(900[2-9]\\d{6})',
-                'voip' => '',
-                'fixed_line' => '
-          758(?:
-            4(?:
-              30|
-              5\\d|
-              6[2-9]|
-              8[0-2]
-            )|
-            57[0-2]|
-            638
-          )\\d{4}
-        ',
-                'toll_free' => '
-          8(?:
-            00|
-            33|
-            44|
-            55|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
-                'personal_number' => '
-          5(?:
-            00|
-            2[12]|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
         '
               };
 use Number::Phone::NANP::Data;

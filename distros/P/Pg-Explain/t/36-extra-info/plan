@@ -1,0 +1,11 @@
+Delete on df_scenario  (cost=0.00..1.52 rows=1 width=6) (actual time=0.036..0.036 rows=0 loops=1)
+  ->  Seq Scan on df_scenario  (cost=0.00..1.52 rows=1 width=6) (actual time=0.014..0.018 rows=1 loops=1)
+        Filter: ((df_scenario_uid)::text = 'f0c383d9-f672-4eb9-917a-db9a802f9e06'::text)
+        Rows Removed by Filter: 38
+Planning time: 0.057 ms
+Trigger for constraint fk_df_usage_2_df_scenario: time=51330.296 calls=1
+Trigger for constraint fk_df_usage_archive_2_df_scenario: time=17606.506 calls=1
+Trigger for constraint fk_df_scenario_2_df_scenario_audit: time=0.387 calls=1
+Trigger for constraint fk_df_scenario_usage_filter_2_df_scenario: time=0.207 calls=1
+Trigger for constraint fk_df_rightsholder_discrepancy_2_df_scenario: time=0.164 calls=1
+Execution time: 68937.619 ms

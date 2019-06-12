@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.93
+    Version v3.1.94
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns

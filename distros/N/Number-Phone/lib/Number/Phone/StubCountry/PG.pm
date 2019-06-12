@@ -22,41 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
             18|
             [2-69]|
             85
-          ',
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})'
+          '
                 },
                 {
-                  'leading_digits' => '[78]',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{4})(\\d{4})'
+                  'pattern' => '(\\d{4})(\\d{4})',
+                  'leading_digits' => '[78]'
                 }
               ];
 
 my $validators = {
-                'voip' => '
-          2(?:
-            0[0-47]|
-            7[568]
-          )\\d{4}
-        ',
-                'specialrate' => '',
-                'mobile' => '
-          775\\d{5}|
-          (?:
-            7[0-689]|
-            81
-          )\\d{6}
-        ',
-                'pager' => '',
                 'geographic' => '
           (?:
             64[1-9]|
@@ -71,8 +56,7 @@ my $validators = {
             9[78]
           )\\d{5}
         ',
-                'personal_number' => '',
-                'toll_free' => '180\\d{4}',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             64[1-9]|
@@ -86,6 +70,22 @@ my $validators = {
             77[0-24]|
             9[78]
           )\\d{5}
+        ',
+                'voip' => '
+          2(?:
+            0[0-47]|
+            7[568]
+          )\\d{4}
+        ',
+                'pager' => '',
+                'personal_number' => '',
+                'toll_free' => '180\\d{4}',
+                'mobile' => '
+          775\\d{5}|
+          (?:
+            7[0-689]|
+            81
+          )\\d{6}
         '
               };
 my %areanames = (

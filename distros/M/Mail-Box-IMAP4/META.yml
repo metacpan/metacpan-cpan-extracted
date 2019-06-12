@@ -44,5 +44,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Box-IMAP4.git
-version: '3.005'
+version: '3.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

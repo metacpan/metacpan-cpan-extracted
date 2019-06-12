@@ -22,18 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[2-9]'
                 }
               ];
 
 my $validators = {
+                'voip' => '78[1-49]\\d{5}',
                 'fixed_line' => '
           (?:
             20[2-8]|
@@ -51,14 +52,12 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'personal_number' => '',
-                'toll_free' => '
-          80(?:
-            [0-2578]|
-            9\\d
+                'specialrate' => '(
+          9(?:
+            4[1568]|
+            5[178]
           )\\d{5}
-        ',
-                'pager' => '',
+        )|(77[1-9]\\d{5})',
                 'geographic' => '
           (?:
             20[2-8]|
@@ -76,6 +75,12 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'toll_free' => '
+          80(?:
+            [0-2578]|
+            9\\d
+          )\\d{5}
+        ',
                 'mobile' => '
           6(?:
             00|
@@ -84,13 +89,8 @@ my $validators = {
             [7-9]\\d
           )\\d{5}
         ',
-                'voip' => '78[1-49]\\d{5}',
-                'specialrate' => '(
-          9(?:
-            4[1568]|
-            5[178]
-          )\\d{5}
-        )|(77[1-9]\\d{5})'
+                'personal_number' => '',
+                'pager' => ''
               };
 my %areanames = (
   3822 => "Danilovgad\/Kolasin\/Podgorica",

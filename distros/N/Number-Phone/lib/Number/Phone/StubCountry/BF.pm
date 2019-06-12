@@ -22,26 +22,39 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222638;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[25-7]',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[25-7]'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
                 'voip' => '',
-                'mobile' => '
-          (?:
-            5[124-8]|
-            [67]\\d
-          )\\d{6}
+                'fixed_line' => '
+          2(?:
+            0(?:
+              49|
+              5[23]|
+              6[56]|
+              9[016-9]
+            )|
+            4(?:
+              4[569]|
+              5[4-6]|
+              6[56]|
+              7[0179]
+            )|
+            5(?:
+              [34]\\d|
+              50|
+              6[5-7]
+            )
+          )\\d{4}
         ',
-                'pager' => '',
                 'geographic' => '
           2(?:
             0(?:
@@ -63,29 +76,16 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'toll_free' => '',
+                'specialrate' => '',
                 'personal_number' => '',
-                'fixed_line' => '
-          2(?:
-            0(?:
-              49|
-              5[23]|
-              6[56]|
-              9[016-9]
-            )|
-            4(?:
-              4[569]|
-              5[4-6]|
-              6[56]|
-              7[0179]
-            )|
-            5(?:
-              [34]\\d|
-              50|
-              6[5-7]
-            )
-          )\\d{4}
-        '
+                'toll_free' => '',
+                'mobile' => '
+          (?:
+            5[124-8]|
+            [67]\\d
+          )\\d{6}
+        ',
+                'pager' => ''
               };
 my %areanames = (
   226204 => "Kaya",

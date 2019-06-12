@@ -12,11 +12,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.78
+Version 0.79
 
 =cut
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,30 @@ ArrayRef of strings, each contains textual information (leading and tailing spac
 
 This is not always filled, as it depends heavily on node type and PostgreSQL version.
 
+=head2 planning_time
+
+Planning time, in milliseconds, only valid for top node, taken from "Planning time: ..." below textual explain.
+
+=head2 execution_time
+
+Execution time, in milliseconds, only valid for top node, taken from "Execution time: ..." below textual explain.
+
+=head2 trigger_times
+
+Array with information about trigger calls. Each element contains:
+
+=over
+
+=item * name
+
+=item * time
+
+=item * calls
+
+=back
+
+This information is extracted from "Trigger ..." lines below textual explain.
+
 =head2 sub_nodes
 
 ArrayRef of Pg::Explain::Node objects, which represent sub nodes.
@@ -165,6 +189,9 @@ sub estimated_row_width    { my $self = shift; $self->{ 'estimated_row_width' } 
 sub estimated_startup_cost { my $self = shift; $self->{ 'estimated_startup_cost' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_startup_cost' }; }
 sub estimated_total_cost   { my $self = shift; $self->{ 'estimated_total_cost' }   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_total_cost' }; }
 sub extra_info             { my $self = shift; $self->{ 'extra_info' }             = $_[ 0 ] if 0 < scalar @_; return $self->{ 'extra_info' }; }
+sub planning_time          { my $self = shift; $self->{ 'planning_time' }          = $_[ 0 ] if 0 < scalar @_; return $self->{ 'planning_time' }; }
+sub execution_time         { my $self = shift; $self->{ 'execution_time' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'execution_time' }; }
+sub trigger_times          { my $self = shift; $self->{ 'trigger_times' }          = $_[ 0 ] if 0 < scalar @_; return $self->{ 'trigger_times' }; }
 sub force_loops            { my $self = shift; $self->{ 'force_loops' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'force_loops' }; }
 sub initplans              { my $self = shift; $self->{ 'initplans' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'initplans' }; }
 sub never_executed         { my $self = shift; $self->{ 'never_executed' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'never_executed' }; }
@@ -269,6 +296,25 @@ sub add_extra_info {
     }
     else {
         $self->extra_info( [ @_ ] );
+    }
+    return;
+}
+
+=head2 add_trigger_time
+
+Adds new information about trigger time.
+
+It will be available at $node->trigger_times (returns arrayref)
+
+=cut
+
+sub add_trigger_time {
+    my $self = shift;
+    if ( $self->trigger_times ) {
+        push @{ $self->trigger_times }, @_;
+    }
+    else {
+        $self->trigger_times( [ @_ ] );
     }
     return;
 }
@@ -438,6 +484,9 @@ sub get_struct {
     $reply->{ 'type' }                   = $self->type                       if defined $self->type;
     $reply->{ 'scan_on' }                = clone( $self->scan_on )           if defined $self->scan_on;
     $reply->{ 'extra_info' }             = clone( $self->extra_info )        if defined $self->extra_info;
+    $reply->{ 'planning_time' }          = clone( $self->planning_time )     if defined $self->planning_time;
+    $reply->{ 'execution_time' }         = clone( $self->execution_time )    if defined $self->execution_time;
+    $reply->{ 'trigger_times' }          = clone( $self->trigger_times )     if defined $self->trigger_times;
 
     $reply->{ 'is_analyzed' } = $self->is_analyzed;
 
@@ -634,6 +683,17 @@ sub as_text {
             $textual .= $prefix_on_spaces . "SubPlan\n";
             $textual .= $ip->as_text( $prefix_on_spaces . "  " );
         }
+    }
+    if ( $self->planning_time ) {
+        $textual .= $prefix_on_spaces . "Planning time: " . $self->planning_time . " ms\n";
+    }
+    if ( $self->trigger_times ) {
+        for my $t ( @{ $self->trigger_times } ) {
+            $textual .= $prefix_on_spaces . sprintf( "Trigger %s: time=%.3f calls=%d\n", $t->{ 'name' }, $t->{ 'time' }, $t->{ 'calls' } );
+        }
+    }
+    if ( $self->execution_time ) {
+        $textual .= $prefix_on_spaces . "Execution time: " . $self->execution_time . " ms\n";
     }
     return $textual;
 }

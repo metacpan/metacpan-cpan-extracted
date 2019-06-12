@@ -3,14 +3,10 @@ use Test::More;
 use strict;
 use warnings;
 
+use lib '.';
+use t::lib::helpers;
+
 use_ok("Z3::FFI");
-
-# Use Z3 to prove demorgan's law.
-
-sub check_type {
-    my ($input, $type, $message) = @_;
-    is(ref($input), "Z3::FFI::Types::".$type, $message);
-}
 
 my $config = Z3::FFI::mk_config();
 check_type($config, "Z3_config", "Config comes back as correct type");

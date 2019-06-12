@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222639;
 
 my $formatters = [
                 {
@@ -30,30 +30,33 @@ my $formatters = [
             8[047]|
             90
           ',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             [2-79]|
             81
-          ',
-                  'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+          '
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4 $5',
-                  'leading_digits' => '8',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
+                  'leading_digits' => '8'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '878\\d{6}',
                 'toll_free' => '800\\d{6}',
+                'mobile' => '7[35-9]\\d{7}',
+                'personal_number' => '878\\d{6}',
+                'pager' => '74[0248]\\d{6}',
+                'voip' => '',
                 'fixed_line' => '
           (?:
             2[12467]|
@@ -64,10 +67,7 @@ my $validators = {
             [7-9]1
           )\\d{7}
         ',
-                'voip' => '',
                 'specialrate' => '(84[0248]\\d{6})|(90[016]\\d{6})|(5[18]\\d{7})',
-                'mobile' => '7[35-9]\\d{7}',
-                'pager' => '74[0248]\\d{6}',
                 'geographic' => '
           (?:
             2[12467]|

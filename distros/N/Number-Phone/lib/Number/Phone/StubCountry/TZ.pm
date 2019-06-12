@@ -22,48 +22,48 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[89]',
                   'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{4})',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[89]'
                 },
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[24]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '[24]'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[67]',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '[67]'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '2[2-8]\\d{7}',
-                'personal_number' => '',
-                'toll_free' => '80[08]\\d{6}',
                 'mobile' => '
           (?:
             6[2-9]|
             7[13-9]
           )\\d{7}
         ',
+                'toll_free' => '80[08]\\d{6}',
+                'personal_number' => '',
                 'pager' => '',
-                'geographic' => '2[2-8]\\d{7}',
                 'voip' => '41\\d{7}',
+                'fixed_line' => '2[2-8]\\d{7}',
                 'specialrate' => '(
           8(?:
             40|
             6[01]
           )\\d{6}
-        )|(90\\d{7})'
+        )|(90\\d{7})',
+                'geographic' => '2[2-8]\\d{7}'
               };
 my %areanames = (
   25522 => "Dar\-Es\-Salaam",

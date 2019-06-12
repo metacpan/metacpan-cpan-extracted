@@ -22,29 +22,38 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '70',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '70'
+                },
+                {
+                  'leading_digits' => '32',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
                   'leading_digits' => '[57]',
-                  'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4'
                 },
                 {
+                  'leading_digits' => '[348]',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[348]',
                   'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
+                'personal_number' => '',
+                'toll_free' => '800\\d{6}',
                 'mobile' => '
           (?:
             5(?:
@@ -57,6 +66,7 @@ my $validators = {
             790
           )\\d{6}
         ',
+                'specialrate' => '',
                 'geographic' => '
           (?:
             3(?:
@@ -74,9 +84,6 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'pager' => '',
-                'voip' => '706\\d{6}',
-                'specialrate' => '',
                 'fixed_line' => '
           (?:
             3(?:
@@ -94,8 +101,7 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'personal_number' => '',
-                'toll_free' => '800\\d{6}'
+                'voip' => '706\\d{6}'
               };
 
     sub new {

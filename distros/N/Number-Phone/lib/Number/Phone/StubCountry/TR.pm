@@ -22,24 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '444',
-                  'pattern' => '(\\d{3})(\\d)(\\d{3})',
-                  'intl_format' => 'NA'
+                  'intl_format' => 'NA',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d)(\\d{3})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             512|
             8[0589]|
             90
-          ',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+          '
                 },
                 {
                   'leading_digits' => '
@@ -48,44 +48,22 @@ my $formatters = [
               6161
             )
           ',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})(\\d{2})',
-                  'national_rule' => '0$1'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
-                  'national_rule' => '(0$1)',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})(\\d{2})',
                   'leading_digits' => '
             [24][1-8]|
             3[1-9]
           ',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})(\\d{2})',
+                  'national_rule' => '(0$1)',
                   'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
-                'pager' => '512\\d{7}',
-                'geographic' => '
-          (?:
-            2(?:
-              [13][26]|
-              [28][2468]|
-              [45][268]|
-              [67][246]
-            )|
-            3(?:
-              [13][28]|
-              [24-6][2468]|
-              [78][02468]|
-              92
-            )|
-            4(?:
-              [16][246]|
-              [23578][2468]|
-              4[26]
-            )
-          )\\d{7}
-        ',
                 'mobile' => '
           56161\\d{5}|
           5(?:
@@ -97,18 +75,14 @@ my $validators = {
             9[46]
           )\\d{7}
         ',
-                'voip' => '',
-                'specialrate' => '(
-          (?:
-            8[89]8|
-            900
-          )\\d{7}
-        )|(
-          (?:
-            444|
-            850\\d{3}
+                'toll_free' => '800\\d{7}',
+                'personal_number' => '
+          592(?:
+            21[12]|
+            461
           )\\d{4}
-        )',
+        ',
+                'pager' => '512\\d{7}',
                 'fixed_line' => '
           (?:
             2(?:
@@ -130,13 +104,39 @@ my $validators = {
             )
           )\\d{7}
         ',
-                'personal_number' => '
-          592(?:
-            21[12]|
-            461
-          )\\d{4}
+                'voip' => '',
+                'geographic' => '
+          (?:
+            2(?:
+              [13][26]|
+              [28][2468]|
+              [45][268]|
+              [67][246]
+            )|
+            3(?:
+              [13][28]|
+              [24-6][2468]|
+              [78][02468]|
+              92
+            )|
+            4(?:
+              [16][246]|
+              [23578][2468]|
+              4[26]
+            )
+          )\\d{7}
         ',
-                'toll_free' => '800\\d{7}'
+                'specialrate' => '(
+          (?:
+            8[89]8|
+            900
+          )\\d{7}
+        )|(
+          (?:
+            444|
+            850\\d{3}
+          )\\d{4}
+        )'
               };
 my %areanames = (
   90212 => "Istanbul\ \(Europe\)",
@@ -193,6 +193,7 @@ my %areanames = (
   90384 => "Nevsehir",
   90386 => "Kirsehir",
   90388 => "Nigde",
+  9039 => "Northern\ Cyprus",
   90412 => "Diyarbakir",
   90414 => "Sanliurfa",
   90416 => "Adiyaman",

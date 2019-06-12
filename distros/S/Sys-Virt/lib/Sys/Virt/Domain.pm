@@ -3986,6 +3986,14 @@ Time of last stats refresh from guest
 
 Disk cache size
 
+=item Sys::Virt::Domain::MEMORY_STAT_HUGETLB_PGALLOC
+
+The amount of successful huge page allocations
+
+=item Sys::Virt::Domain::MEMORY_STAT_HUGETLB_PGFAIL
+
+The amount of failed huge page allocations
+
 =back
 
 =head2 DOMAIN LIST CONSTANTS

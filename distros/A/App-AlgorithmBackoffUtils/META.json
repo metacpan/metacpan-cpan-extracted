@@ -36,6 +36,7 @@
             "Algorithm::Backoff::Constant" : "0",
             "Algorithm::Backoff::Exponential" : "0",
             "Algorithm::Backoff::Fibonacci" : "0",
+            "Data::Sah::Coerce::perl::array::str_comma_sep" : "0.007",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::float" : "0",
@@ -76,12 +77,17 @@
          "web" : "https://github.com/perlancar/perl-App-AlgorithmBackoffUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript retry",
+            "version" : "0.421"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript retry-constant",
@@ -95,6 +101,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript retry-fibonacci",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript show-backoff-delays",
             "version" : "0.421"
          },
          {

@@ -8,7 +8,7 @@
 
 package Mail::Transport::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Transport::Receive';
 
@@ -16,7 +16,7 @@ use strict;
 use warnings;
 
 use Digest::HMAC_MD5;   # only availability check for CRAM_MD5
-use Mail::IMAPClient;
+use Mail::IMAPClient  ();
 use List::Util        qw/first/;
 
 
@@ -43,14 +43,20 @@ sub init($)
 
     unless(ref $imap)
     {   # Create the IMAP transporter
-        my @opts = (Starttls => $args->{starttls});
+        my %opts;
+		$opts{ucfirst lc} = delete $args->{$_}
+			for grep /^[A-Z]/, keys %$args;
 
-        if(my $ssl = $args->{ssl})
-        {    $ssl = [ %$ssl ] if ref $ssl eq 'HASH';
-             push @opts, Ssl => $ssl;
-        }
+		# backwards compatibility
+		$opts{Starttls}      ||= $args->{starttls};
+		my $ssl = $opts{Ssl} ||= $args->{ssl};
 
-        $imap = $self->createImapClient($imap, @opts)
+		$opts{Ssl} = [ %$ssl ] if ref $ssl eq 'HASH';
+
+use Data::Dumper;
+warn "CREATE IMAP ", Dumper \%opts;
+warn Dumper $args;
+        $imap = $self->createImapClient($imap, %opts)
              or return undef;
     }
  

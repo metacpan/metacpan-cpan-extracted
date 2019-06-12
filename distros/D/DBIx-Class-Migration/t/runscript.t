@@ -41,4 +41,19 @@ SUGAR: {
   $code->($migration->schema, [1,2]);
 }
 
+SUGAR2: {
+  my $code = migrate {
+    $runs->(shift)
+  };
+  $code->($migration->schema, [1,2]);
+}
+
+# second go so that %INC now contains RunScript with all traits to trigger bug
+SUGAR3: {
+  my $code = migrate {
+    $runs->(shift)
+  };
+  $code->($migration->schema, [1,2]);
+}
+
 done_testing;

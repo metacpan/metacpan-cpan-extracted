@@ -1,5 +1,31 @@
 Revision history for Web::Mention
 
+0.701 2019-06-12T03:28:04Z
+
+    - Improved handling for replies that encode their referent URLs as
+    complete microformats (e.g. `h-cite`), rather than as simple
+    property strings. This allows for proper handling of reply-context
+    (https://indieweb.org/reply-context).
+
+0.7 2018-10-06T21:09:00Z
+
+    - Improved handling of source documents containing multiple URL
+    microformats. This fixes a bug where mentions of a specific type
+    (e.g. likes) would incorrectly have the generic "mention" type set.
+
+    - Cleaner response to asking for the content of content-free
+    webmentions.
+    
+0.6 2018-09-08T20:36:53Z
+
+    - Adding support for RSVP webmention types.
+    
+    - Improving post type discovery, according to a W3C-published
+    algorithm
+    (https://www.w3.org/TR/post-type-discovery/#response-algorithm).
+    This fixes a bug that would mis-type webmentions in source documents
+    containing a mix of marked-up link types.
+
 0.501 2018-05-29T13:32:33Z
 
     - Documentation cleanup.
@@ -20,7 +46,8 @@ Revision history for Web::Mention
 
 0.4 2018-05-10T04:34:13Z
 
-    - Adding support for webmention sending. (Passes all create / update / delete tests on http://webmention.rocks, as of May 9, 2018.)
+    - Adding support for webmention sending. (Passes all create / update
+    / delete tests on http://webmention.rocks, as of May 9, 2018.)
     
     - Tidier construction of author objects.
     

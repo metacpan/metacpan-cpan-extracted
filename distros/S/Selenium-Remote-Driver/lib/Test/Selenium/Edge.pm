@@ -1,11 +1,11 @@
 package Test::Selenium::Edge;
-$Test::Selenium::Edge::VERSION = '1.31';
+$Test::Selenium::Edge::VERSION = '1.32';
 use Moo;
 extends 'Selenium::Edge', 'Test::Selenium::Remote::Driver';
 
 has 'webelement_class' => (
     is      => 'rw',
-    default => sub {'Test::Selenium::Remote::WebElement'},
+    default => sub { 'Test::Selenium::Remote::WebElement' },
 );
 
 1;

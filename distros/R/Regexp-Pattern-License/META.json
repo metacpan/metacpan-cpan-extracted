@@ -44,24 +44,25 @@
             "Regexp::Pattern" : "0",
             "Test::Builder::Module" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Try::Tiny" : "0"
          }
       }
    },
    "provides" : {
       "Regexp::Pattern::License" : {
          "file" : "lib/Regexp/Pattern/License.pm",
-         "version" : "v3.1.93"
+         "version" : "v3.1.94"
       },
       "Regexp::Pattern::License::Parts" : {
          "file" : "lib/Regexp/Pattern/License/Parts.pm",
-         "version" : "v3.1.93"
+         "version" : "v3.1.94"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bugs.debian.org/regexp-pattern-license"
+         "web" : "https://bugs.debian.org/libregexp-pattern-license-perl"
       },
       "homepage" : "https://metacpan.org/release/Regexp-Pattern-License",
       "license" : [
@@ -69,11 +70,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "web" : "https://anonscm.debian.org/git/build-common/regexp-pattern-license.git"
+         "web" : "https://salsa.debian.org/build-common-team/regexp-pattern-license.git"
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project"
    },
-   "version" : "v3.1.93",
+   "version" : "v3.1.94",
    "x_help_wanted" : [
       "documenter",
       "tester"

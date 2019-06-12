@@ -8,7 +8,7 @@ cpanfile
 examples/block_devices_monitor.pl
 examples/device_get_parent.pl
 examples/device_scalar_n_list.pl
-examples/disable_touchpad_when_usbmouse.pl
+examples/disable_touchpad_when_mouse.pl
 examples/enumerate_scalar_n_list.pl
 examples/find_by_vid_pid.pl
 examples/major_minor_devnum.pl
@@ -18,11 +18,12 @@ lib/Udev/FFI/Device.pm
 lib/Udev/FFI/Devnum.pm
 lib/Udev/FFI/Enumerate.pm
 lib/Udev/FFI/Functions.pm
+lib/Udev/FFI/Helper.pm
 lib/Udev/FFI/Monitor.pm
 minil.toml
 t/00_diag.t
 t/01_use.t
-t/basic.t
+t/02_basic.t
 t/udev_ffi_new.t
 META.yml
 MANIFEST

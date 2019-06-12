@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
@@ -32,27 +32,27 @@ my $formatters = [
                   'leading_digits' => '8'
                 },
                 {
-                  'national_rule' => '0$1',
                   'leading_digits' => '4',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[39]',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4'
                 },
                 {
                   'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4 $5',
-                  'leading_digits' => '6',
-                  'pattern' => '(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '6'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'specialrate' => '',
+                'pager' => '',
+                'toll_free' => '90\\d{6}',
                 'mobile' => '
           4(?:
             4\\d|
@@ -63,21 +63,21 @@ my $validators = {
             6\\d
           )\\d{7}
         ',
+                'personal_number' => '',
+                'specialrate' => '',
                 'geographic' => '
           (?:
             870|
             9[2-47-9]\\d
           )\\d{5}
         ',
-                'pager' => '',
-                'personal_number' => '',
-                'toll_free' => '90\\d{6}',
                 'fixed_line' => '
           (?:
             870|
             9[2-47-9]\\d
           )\\d{5}
-        '
+        ',
+                'voip' => ''
               };
 
     sub new {

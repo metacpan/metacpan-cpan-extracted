@@ -1,11 +1,11 @@
 package Test::Selenium::InternetExplorer;
-$Test::Selenium::InternetExplorer::VERSION = '1.31';
+$Test::Selenium::InternetExplorer::VERSION = '1.32';
 use Moo;
 extends 'Selenium::InternetExplorer', 'Test::Selenium::Remote::Driver';
 
 has 'webelement_class' => (
     is      => 'rw',
-    default => sub {'Test::Selenium::Remote::WebElement'},
+    default => sub { 'Test::Selenium::Remote::WebElement' },
 );
 
 1;

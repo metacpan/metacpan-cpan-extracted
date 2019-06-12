@@ -4,8 +4,39 @@ Regexp-Pattern-License
 Created:      2016-11-23
 Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Home page:    <https://metacpan.org/pod/Regexp::Pattern::License>
-Bug tracker:  <https://bugs.debian.org/regexp-pattern-license>
+Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v3.1.94	2019-06-12
+
+ [ Bug Fixes ]
+ - Fix DOAP bug-database and repository URLs.
+   Slaven Rezić++
+ - Fix declare test-requirement on Try::Tiny.
+   Slaven Rezić++
+
+ [ Test Suite ]
+ - Extend testsuite: Cover objects aladdin_8 aladdin_9.
+
+ [ Other ]
+ - Extend object bsl_1: Add subject pattern license. Improve metadata.
+ - Extend trait patterns version version_later version_numberstring
+   version_prefix: Cover scopes line sentence. Limit scope paragraph.
+ - Fix objects aladdin aladdin_8 aladdin_9: Add subject pattern license for
+   singleversion licenses and drop for versioned license.
+ - Fix relax trait pattern version_later_postfix: Detect "any above".
+ - Fix relax trait pattern version_prefix: Tolerate leading only/either.
+ - Improve synthesized subject pattern grant: Use trait pattern
+   licensed_under (not simpler copy).
+ - Limit length of subpatterns BB (bullets) E (end of sentence) EE (end of
+   paragraph) and lang, both for slight speedup and to limit risk of issues
+   like Debian bug#926392.
+ - Relax synthesized name pattern to make commas optional (not strip them).
+ - Relax trait pattern version_prefix: Include optional non-text prefix
+   (not only in pattern version).
+ - Relax trait pattern version_prefix: Make whole pattern optional (not its
+   use in version_numberstring).
+ - Synthesize subject pattern name.
 
 v3.1.93	2019-06-08
 

@@ -1,12 +1,12 @@
 package FASTX::Reader;
-use 5.014;
+use 5.012;
 use warnings;
 use Carp qw(confess);
 
-$FASTX::Reader::VERSION = '0.20';
+$FASTX::Reader::VERSION = '0.32';
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
 
-use constant MAGIC_GZIP => pack('C3', 0x1f, 0x8b, 0x08);
+use constant GZIP_SIGNATURE => pack('C3', 0x1f, 0x8b, 0x08);
 
 
 sub new {
@@ -21,26 +21,29 @@ sub new {
 
     # Initialize auxiliary array for getRead
     $object->{aux} = [undef];
+    $object->{compressed} = 0;
 
     # Check if a filename was provided and not {{STDIN}}
     # uncoverable branch false
 
     if (defined $self->{filename} and $self->{filename} ne '{{STDIN}}') {
       open my $fh, '<', $self->{filename} or confess "Unable to read file ", $self->{filename}, "\n";
-      read( $fh, my $magic, 4 );
+      read( $fh, my $magic_byte, 4 );
       close $fh;
 
-      if (substr($magic,0,3) eq MAGIC_GZIP) {
+      # See: __BioX::Seq::Stream__ for GZIP (and other) compressed file reader
+      if (substr($magic_byte,0,3) eq GZIP_SIGNATURE) {
+         $object->{compressed} = 1;
          our $GZIP_BIN = _which('pigz', 'gzip');
          close $fh;
          if (! defined $GZIP_BIN) {
            require IO::Uncompress::Gunzip;
            $fh = IO::Uncompress::Gunzip->new($self->{filename}, MultiStream => 1);
          } else {
-	   open  $fh, '-|', "$GZIP_BIN -dc $self->{filename}" or confess "Error opening gzip file ", $self->{filename}, ": $!\n";
+	         open  $fh, '-|', "$GZIP_BIN -dc $self->{filename}" or confess "Error opening gzip file ", $self->{filename}, ": $!\n";
          }
       } else {
-	 close $fh;
+	       close $fh;
       	 open $fh,  '<:encoding(UTF-8)', $self->{filename} or confess "Unable to read file ", $self->{filename}, ": ", $!, "\n";
       }
       $object->{fh} = $fh;
@@ -73,7 +76,7 @@ sub getRead {
           return;
       }
   }
-  my ($name, $comm) = /^.(\S+)(?:\s+)(\S+)/ ? ($1, $2) : 
+  my ($name, $comm) = /^.(\S+)(?:\s+)(\S+)/ ? ($1, $2) :
 	                    /^.(\S+)/ ? ($1, '') : ('', '');
   #my $comm = /^.\S+\s+(.*)/? $1 : ''; # retain "comment"
   my $seq = '';
@@ -123,6 +126,7 @@ sub getFastqRead {
   my $seq    = readline($self->{fh});
   my $check  = readline($self->{fh});
   my $qual   = readline($self->{fh});
+  $self->{status} = 1;
 
   # Check 4 lines were found (FASTQ)
   return undef unless (defined $qual);
@@ -148,9 +152,9 @@ sub getFastqRead {
     }
   } else {
     # Return error (not a FASTQ)
-    $self->{message} = "Unknown format: expecting FASTQ (wrong header)";
+    $self->{message} = "Unknown format: expecting FASTQ but @ header not found";
 
-    if (substr($seq, 0,1 ) eq '>' ) {
+    if (substr($header, 0,1 ) eq '>' ) {
       # HINT: is FASTA?
       $self->{message} .= " (might be FASTA instead)";
     }
@@ -213,7 +217,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, based on He
 
 =head1 VERSION
 
-version 0.20
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -226,9 +230,13 @@ version 0.20
     print $seq->{name}, "\t", $seq->{seq}, "\t", $seq->{qual}, "\n";
   }
 
-=head2 BUILD TEST
+=head1 BUILD TEST
 
 =for html <a href="https://travis-ci.org/telatin/FASTQ-Parser"><img src="https://travis-ci.org/telatin/FASTQ-Parser.svg?branch=master"></a>
+
+Each GitHub release of the module is tested by L<Travis-CI|https://travis-ci.org/telatin/FASTQ-Parser/builds> using multiple Perl versions (5.14 to 5.28).
+
+In addition to this, every CPAN release is tested by the L<CPAN testers grid|http://matrix.cpantesters.org/?dist=FASTX-Reader>.
 
 =head1 METHODS
 
@@ -272,6 +280,16 @@ quality if the file is FASTQ
 
 If the file is FASTQ, this method returns the same read object as I<getRead()> but with a faster parser.
 Attributes of the returned object are I<name>, I<comment>, I<seq>, I<qual> (as for I<getRead()>).
+It will alter the C<status> attribute of the reader object if the FASTQ format looks terribly wrong.
+
+  use FASTX::Reader;
+  my $filepath = '/path/to/assembly.fastq';
+  my $fasta_reader = FASTX::Reader->new({ filename => "$filepath" });
+
+  while (my $seq = $fasta_reader->getFastqRead() ) {
+    die "Error parsing $filepath: " . $fasta_reader->{message} if ($fasta_reader->{status} != 1);
+    print $seq->{name}, "\t", $seq->{seq}, "\t", $seq->{qual}, "\n";
+  }
 
 =head2 getFileFormat(filename)
 
@@ -283,20 +301,22 @@ This subroutine returns 'fasta', 'fastq' or <undef> for a given filepath (this i
 
 =item B<Heng Li's readfq()>
 
-This mnodule is a wrapper around the I<readfq()> subroutine originally written by Heng Li, that I adapted
-to retain I<sequence comments>.
-
-See: L<readfq repository|https://github.com/telatin/readfq>
-
-=back
-
-=head1 CONTRIBUTORS
-
-=over 4
+This module is a has been inspired by the I<readfq()> subroutine originally written by Heng Li, that I updated
+to retain I<sequence comments>. See: L<readfq repository|https://github.com/telatin/readfq>
 
 =item B<Fabrizio Levorin>
 
-has substantially contributed to the development of this module, and is a collaborator in the GitHub repository
+has contributed to the prototyping of this module
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<BioX::Seq::Stream>
+
+The module I would have used if it was available when I started working on this. The .gz reader implementation comes from this module.
 
 =back
 

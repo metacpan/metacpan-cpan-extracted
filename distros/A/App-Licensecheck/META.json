@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Licensecheck",
    "no_index" : {
@@ -44,7 +44,7 @@
             "Path::Tiny" : "0.062",
             "Pod::Constants" : "0",
             "Regexp::Pattern" : "0",
-            "Regexp::Pattern::License" : "v3.1.92",
+            "Regexp::Pattern::License" : "v3.1.94",
             "Sort::Key::Multi" : "1.25",
             "String::Copyright" : "0.003",
             "String::Escape" : "0",
@@ -60,7 +60,7 @@
          "recommends" : {
             "File::BaseDir" : "0",
             "List::MoreUtils" : "0",
-            "Software::License" : "0.103008",
+            "Software::LicenseUtils" : "0.103014",
             "YAML::XS" : "0"
          },
          "requires" : {
@@ -76,7 +76,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.0.36"
+         "version" : "v3.0.37"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.0.36",
+   "version" : "v3.0.37",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],
@@ -107,5 +107,5 @@
          "file" : "bin/licensecheck"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

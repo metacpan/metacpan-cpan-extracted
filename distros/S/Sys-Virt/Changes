@@ -1,5 +1,10 @@
 Revision history for perl module Sys::Virt
 
+5.4.0 2019-06-12
+
+ - Add VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGALLOC and
+   VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGFAIL constants
+
 5.2.0 2019-04-03
 
  - Add VIR_DOMAIN_SNAPSHOT_LIST_TOPOLOGICAL constant

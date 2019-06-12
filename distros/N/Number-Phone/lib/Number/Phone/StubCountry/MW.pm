@@ -22,39 +22,37 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '1[2-9]',
-                  'pattern' => '(\\d)(\\d{3})(\\d{3})'
+                  'leading_digits' => '1[2-9]'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'leading_digits' => '2'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '3'
                 },
                 {
                   'national_rule' => '0$1',
-                  'leading_digits' => '2',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
-                },
-                {
-                  'national_rule' => '0$1',
-                  'leading_digits' => '3',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
-                },
-                {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[17-9]',
-                  'national_rule' => '0$1'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[17-9]'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '',
-                'personal_number' => '',
-                'fixed_line' => '
+                'geographic' => '
           (?:
             1[2-9]|
             21\\d\\d
@@ -62,13 +60,15 @@ my $validators = {
         ',
                 'specialrate' => '',
                 'voip' => '31\\d{7}',
-                'geographic' => '
+                'fixed_line' => '
           (?:
             1[2-9]|
             21\\d\\d
           )\\d{5}
         ',
                 'pager' => '',
+                'personal_number' => '',
+                'toll_free' => '',
                 'mobile' => '
           111\\d{6}|
           (?:

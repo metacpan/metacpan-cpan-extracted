@@ -3,7 +3,7 @@ package Z3::FFI;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Data::Dumper;
 use FFI::Platypus;
@@ -1047,6 +1047,22 @@ You likely don't want to use this library directly, but instead wait for the hig
 API that already exists.
 
 For some good examples of how to actually use this library, see the t/ directory in the distrobution.
+
+=head1 LICENSE
+
+The bindings themselves are distributed under the Artistic 2.0 license.  However the tests and related 
+helper library are based heavily on a translation of the z3 C API examples, which are distrubed by Microsoft
+under the MIT license.  As such the code under t/ is distributed under the MIT license also.
+
+    Copyright 2019 Ryan Voots
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+I will also state that I am not entirely sure if it should be me or Microsoft on the above notice for the files under t/, as they are rewritten to work with the Z3::FFI bindings in a new language with additional checks and functionality rather than the original C code.
 
 =head1 TODO
 

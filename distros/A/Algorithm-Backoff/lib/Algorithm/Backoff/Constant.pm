@@ -1,7 +1,7 @@
 package Algorithm::Backoff::Constant;
 
-our $DATE = '2019-06-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-06-08'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -20,6 +20,8 @@ $SPEC{new} = {
         %Algorithm::Backoff::attr_max_attempts,
         %Algorithm::Backoff::attr_jitter_factor,
         %Algorithm::Backoff::attr_delay_on_success,
+        %Algorithm::Backoff::attr_min_delay,
+        %Algorithm::Backoff::attr_max_delay,
         delay => {
             summary => 'Number of seconds to wait after a failure',
             schema => 'ufloat*',
@@ -57,7 +59,7 @@ Algorithm::Backoff::Constant - Backoff using a constant delay
 
 =head1 VERSION
 
-This document describes version 0.004 of Algorithm::Backoff::Constant (from Perl distribution Algorithm-Backoff), released on 2019-06-05.
+This document describes version 0.006 of Algorithm::Backoff::Constant (from Perl distribution Algorithm-Backoff), released on 2019-06-08.
 
 =head1 SYNOPSIS
 
@@ -81,6 +83,20 @@ This document describes version 0.004 of Algorithm::Backoff::Constant (from Perl
  my $secs = $ab->failure(1554652553); # => 2
  my $secs = $ab->success();           # => 0
  my $secs = $ab->failure();           # => 2
+
+Illustration using CLI L<show-backoff-delays> (5 failures followed by 3
+successes):
+
+ % show-backoff-delays -a Constant --delay 2 \
+     0 0 0 0 0   1 1 1
+ 2
+ 2
+ 2
+ 2
+ 2
+ 0
+ 0
+ 0
 
 =head1 DESCRIPTION
 
@@ -133,6 +149,8 @@ random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
 
+The jitter will be applied to delay on failure as well as on success.
+
 =item * B<max_actual_duration> => I<ufloat> (default: 0)
 
 Maximum number of seconds for all of the attempts (0 means unlimited).
@@ -154,6 +172,14 @@ single failure (i.e. no retry attempts). 2 means to retry once after a failure.
 Note that after a success, the number of attempts is reset (as expected). So if
 max_attempts is 3, and if you fail twice then succeed, then on the next failure
 the algorithm will retry again for a maximum of 3 times.
+
+=item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
 
 =back
 

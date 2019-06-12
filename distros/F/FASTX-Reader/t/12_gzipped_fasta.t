@@ -3,7 +3,7 @@ use warnings;
 use FindBin qw($Bin);
 use Test::More;
 
-use_ok 'FASTX::Reader';
+use FASTX::Reader;
 my $seq = "$Bin/../data/compressed.fasta.gz";
 
 # Check required input file

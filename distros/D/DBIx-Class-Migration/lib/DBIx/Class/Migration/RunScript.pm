@@ -108,16 +108,19 @@ sub default_plugins {
 sub used_plugins {
   my $path = 'DBIx/Class/Migration/RunScript/Trait/';
   my $match = "$path(.+).pm";
+  my $traits_path = $INC{'MooX/Traits/Util.pm'};
   return map { m[$match]x }
-    grep { m[$path]x } keys %INC;
+    grep { $INC{$_} ne $traits_path and m[$path]x } keys %INC;
 }
 
 sub builder(&) {
   my ($runs, @plugins) = reverse shift->();
-  my (@traits, %args);
+  my (@traits, %args, %seen);
   foreach my $plugins (@plugins) {
     if(ref $plugins) {
       %args = (%args, %$plugins);
+    } elsif ($seen{$plugins}++) {
+      # skip!
     } else {
       push @traits, $plugins;
     }

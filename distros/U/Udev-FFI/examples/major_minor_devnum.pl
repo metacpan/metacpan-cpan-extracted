@@ -3,9 +3,6 @@
 use strict;
 use warnings;
 
-use FindBin; # only for this example - load local Udev::FFI module
-use lib "$FindBin::Bin/../lib"; # only for this example - load local Udev::FFI module
-
 use Udev::FFI;
 use Udev::FFI::Devnum qw(:all); #import major, minor and makedev
 

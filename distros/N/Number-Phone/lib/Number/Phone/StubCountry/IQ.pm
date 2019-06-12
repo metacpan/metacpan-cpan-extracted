@@ -22,44 +22,31 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '1'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '[2-6]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
-                  'leading_digits' => '7',
-                  'format' => '$1 $2 $3'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '7'
                 }
               ];
 
 my $validators = {
-                'mobile' => '7[3-9]\\d{8}',
-                'pager' => '',
-                'geographic' => '
-          1\\d{7}|
-          (?:
-            2[13-5]|
-            3[02367]|
-            4[023]|
-            5[03]|
-            6[026]
-          )\\d{6,7}
-        ',
                 'voip' => '',
-                'specialrate' => '',
                 'fixed_line' => '
           1\\d{7}|
           (?:
@@ -70,8 +57,21 @@ my $validators = {
             6[026]
           )\\d{6,7}
         ',
+                'geographic' => '
+          1\\d{7}|
+          (?:
+            2[13-5]|
+            3[02367]|
+            4[023]|
+            5[03]|
+            6[026]
+          )\\d{6,7}
+        ',
+                'specialrate' => '',
                 'personal_number' => '',
-                'toll_free' => ''
+                'toll_free' => '',
+                'mobile' => '7[3-9]\\d{8}',
+                'pager' => ''
               };
 
     sub new {

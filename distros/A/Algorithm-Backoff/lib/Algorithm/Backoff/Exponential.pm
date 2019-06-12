@@ -1,7 +1,7 @@
 package Algorithm::Backoff::Exponential;
 
-our $DATE = '2019-06-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-06-08'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -20,13 +20,9 @@ $SPEC{new} = {
         %Algorithm::Backoff::attr_max_attempts,
         %Algorithm::Backoff::attr_jitter_factor,
         %Algorithm::Backoff::attr_delay_on_success,
+        %Algorithm::Backoff::attr_min_delay,
         %Algorithm::Backoff::attr_max_delay,
-        initial_delay => {
-            summary => 'Initial delay for the first attempt after failure, '.
-                'in seconds',
-            schema => 'ufloat*',
-            req => 1,
-        },
+        %Algorithm::Backoff::attr_initial_delay,
         exponent_base => {
             schema => 'ufloat*',
             default => 2,
@@ -64,7 +60,7 @@ Algorithm::Backoff::Exponential - Backoff exponentially
 
 =head1 VERSION
 
-This document describes version 0.004 of Algorithm::Backoff::Exponential (from Perl distribution Algorithm-Backoff), released on 2019-06-05.
+This document describes version 0.006 of Algorithm::Backoff::Exponential (from Perl distribution Algorithm-Backoff), released on 2019-06-08.
 
 =head1 SYNOPSIS
 
@@ -97,6 +93,25 @@ This document describes version 0.004 of Algorithm::Backoff::Exponential (from P
  $secs = $ab->failure();   # => 100 ( min(5 * 2^5, 100) )
  $secs = $ab->success();   # => 0 (= delay_on_success)
 
+Illustration using CLI L<show-backoff-delays> (10 failures followed by 3
+successes):
+
+ % show-backoff-delays -a Exponential --initial-delay 1 --max-delay 200 \
+     0 0 0 0 0   0 0 0 0 0   1 1 1
+ 1
+ 2
+ 4
+ 8
+ 16
+ 32
+ 64
+ 128
+ 200
+ 200
+ 0
+ 0
+ 0
+
 =head1 DESCRIPTION
 
 This backoff algorithm calculates the next delay as:
@@ -104,14 +119,15 @@ This backoff algorithm calculates the next delay as:
  initial_delay * exponent_base ** (attempts-1)
 
 Only the C<initial_delay> is required. C<exponent_base> is 2 by default (binary
-expoential). For the first failure attempt (C<attempts> = 1) the delay equals
+exponential). For the first failure attempt (C<attempts> = 1) the delay equals
 the initial delay. Then it is doubled, quadrupled, and so on (using the default
 exponent base of 2).
 
 There are limits on the number of attempts (`max_attempts`) and total duration
 (`max_actual_duration`).
 
-It is recommended to add a jitter factor, e.g. 0.25 to add some randomness.
+It is recommended to add a jitter factor, e.g. 0.25 to add some randomness to
+avoid "thundering herd problem".
 
 =head1 METHODS
 
@@ -159,6 +175,8 @@ random number between original_delay * (1-jitter_factor) and original_delay *
 (1+jitter_factor). Jitters are usually added to avoid so-called "thundering
 herd" problem.
 
+The jitter will be applied to delay on failure as well as on success.
+
 =item * B<max_actual_duration> => I<ufloat> (default: 0)
 
 Maximum number of seconds for all of the attempts (0 means unlimited).
@@ -182,6 +200,10 @@ max_attempts is 3, and if you fail twice then succeed, then on the next failure
 the algorithm will retry again for a maximum of 3 times.
 
 =item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
 
 Maximum delay time, in seconds.
 

@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "List::AllUtils" => 0,
     "Log::Dispatch" => "2.56",
     "Module::Load::Conditional" => 0,
+    "Module::Runtime" => 0,
     "Moo" => 0,
     "MooX::StrictConstructor" => 0,
     "Parse::MIME" => 0,
@@ -54,7 +55,6 @@ my %WriteMakefileArgs = (
     "HTML::FormatText::WithLinks" => 0,
     "HTTP::CookieJar::LWP" => 0,
     "Log::Dispatch::Array" => 0,
-    "Module::Runtime" => 0,
     "Path::Tiny" => 0,
     "Plack::Handler::HTTP::Server::Simple" => "0.016",
     "Plack::Test" => 0,
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "WWW::Mechanize" => 0,
     "version" => 0
   },
-  "VERSION" => "0.000040",
+  "VERSION" => "0.000041",
   "test" => {
     "TESTS" => "t/*.t t/LWP/*.t t/LWP/ConsoleLogger/*.t"
   }

@@ -7,6 +7,26 @@ Home page:    <https://metacpan.org/pod/App::Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.37	2019-06-12
+
+ [ Documentation ]
+ - Update TODOs.
+
+ [ Test Suite ]
+ - Adapt author testsuite for improved detection (and few minor egressions)
+   since Regexp::Pattern::License v3.1.94.
+ - Adapt testsuite to use recent Software::LicenseUtils (not slightly older
+   Software::License).
+ - Fix handle missing ScanCode corpus..
+ - Load Test::Builder only once per module..
+ - Update testsuite: OSI license Artistic-1.0 really is Artistic-1.0-Perl.
+
+ [ Other ]
+ - Reuse previous name match.
+ - Simplify conditionals: Replace given-when-continue with if.
+ - Skip scan for CC grant unless name already detected.
+ - Use more recent Regexp::Pattern::License.
+
 v3.0.36	2018-04-05
 
  - Limit to compile only trait patterns actually used.

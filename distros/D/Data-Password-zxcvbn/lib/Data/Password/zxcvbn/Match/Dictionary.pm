@@ -4,7 +4,7 @@ with 'Data::Password::zxcvbn::Match';
 use Data::Password::zxcvbn::Combinatorics qw(nCk enumerate_substitution_maps);
 use Data::Password::zxcvbn::RankedDictionaries;
 use List::AllUtils qw(min);
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: match class for words in passwords
 
 
@@ -344,7 +344,7 @@ Data::Password::zxcvbn::Match::Dictionary - match class for words in passwords
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 DESCRIPTION
 

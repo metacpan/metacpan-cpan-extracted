@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -1278,7 +1278,7 @@ sub _guess_old_win32_tz {
           )
         {
             $subkey_name = $self->_win32_registry_decode($subkey_name);
-            Win32API::Registry::RegOpenKeyEx(
+            Win32API::Registry::RegOpenKeyExW(
                 $old_timezone_registry_key,
                 $self->_win32_registry_encode($subkey_name),
                 0,
@@ -2906,7 +2906,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

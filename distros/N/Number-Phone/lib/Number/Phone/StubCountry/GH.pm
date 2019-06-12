@@ -22,35 +22,33 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
                   'intl_format' => 'NA',
                   'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
             [237]|
             80
-          ',
-                  'format' => '$1 $2'
+          '
                 },
                 {
                   'leading_digits' => '8',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{5})',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{5})'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'leading_digits' => '[235]',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '800\\d{5}',
-                'personal_number' => '',
                 'fixed_line' => '
           3(?:
             [167]2[0-6]|
@@ -72,7 +70,6 @@ my $validators = {
             [1-9]7
           )\\d{6}
         ',
-                'specialrate' => '',
                 'voip' => '',
                 'geographic' => '
           3(?:
@@ -95,14 +92,17 @@ my $validators = {
             [1-9]7
           )\\d{6}
         ',
-                'pager' => '',
+                'specialrate' => '',
+                'personal_number' => '',
+                'toll_free' => '800\\d{5}',
                 'mobile' => '
           56[01]\\d{6}|
           (?:
             2[0346-8]|
             5[0457]
           )\\d{7}
-        '
+        ',
+                'pager' => ''
               };
 my %areanames = (
   233302 => "Accra",

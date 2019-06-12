@@ -15,11 +15,14 @@ use Carp qw(carp croak);
 use Mojo::DOM58;
 use URI::Escape;
 use Encode qw(decode_utf8);
+use Readonly;
 
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.501';
+our $VERSION = '0.701';
+
+Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
 has 'source' => (
     isa => Uri,
@@ -83,6 +86,12 @@ has 'time_received' => (
     default => sub{ DateTime->now },
 );
 
+has 'rsvp_type' => (
+    isa => 'Maybe[Str]',
+    is => 'ro',
+    lazy_build => 1,
+);
+
 has 'author' => (
     isa => 'Maybe[Web::Mention::Author]',
     is => 'ro',
@@ -91,9 +100,9 @@ has 'author' => (
 );
 
 has 'type' => (
-    isa => Enum[qw(reply like repost quotation mention)],
+    isa => Enum[qw(rsvp reply like repost quotation mention)],
     traits => ['Enumeration'],
-    handles => [qw(is_reply is_like is_repost is_quotation is_mention)],
+    handles => [qw(is_rsvp is_reply is_like is_repost is_quotation is_mention)],
     is => 'ro',
     lazy_build => 1,
 );
@@ -292,16 +301,25 @@ sub _build_type {
     my $item = $self->source_mf2_document->get_first( 'h-entry' );
     return 'mention' unless $item;
 
-    if ( $item->get_property( 'in-reply-to' ) ) {
-        return 'reply';
+    # This order comes from the W3C Post Type Detection algorithm:
+    # https://www.w3.org/TR/post-type-discovery/#response-algorithm
+    # ...except adding 'quotation' as a final allowed type, before
+    # defaulting to 'mention'.
+
+    if ( $self->rsvp_type
+         && $self->_check_url_property( $item, 'in-reply-to' ) ) {
+        return 'rsvp';
     }
-    elsif ( $item->get_property( 'like-of' ) ) {
-        return 'like';
-    }
-    elsif ( $item->get_property( 'repost-of' )) {
+    elsif ( $self->_check_url_property( $item, 'repost-of' )) {
         return 'repost';
     }
-    elsif ( $item->get_property( 'quotation-of' )) {
+    elsif ( $self->_check_url_property( $item, 'like-of' ) ) {
+        return 'like';
+    }
+    elsif ( $self->_check_url_property( $item, 'in-reply-to' ) ) {
+        return 'reply';
+    }
+    elsif ( $self->_check_url_property( $item, 'quotation-of' )) {
         return 'quotation';
     }
     else {
@@ -359,9 +377,47 @@ sub _build_content {
     return $self->_truncate_content( $item->value );
 }
 
+sub _build_rsvp_type {
+    my $self = shift;
+
+    my $rsvp_type;
+    if ( my $item = $self->source_mf2_document->get_first( 'h-entry' ) ) {
+        if ( my $rsvp_property = $item->get_property( 'rsvp' ) ) {
+            if ( grep { $_ eq lc $rsvp_property } @VALID_RSVP_TYPES ) {
+                $rsvp_type = $rsvp_property;
+            }
+        }
+    }
+
+    return $rsvp_type;
+}
+
+sub _check_url_property {
+    my $self = shift;
+    my ( $item, $property ) = @_;
+
+    my $urls_ref = $item->get_properties( $property );
+    my $found = 0;
+
+    for my $url ( @$urls_ref ) {
+        if ( blessed($url) && $url->isa('Web::Microformats2::Item') ) {
+            $url = $url->value;
+        }
+        if ( $url eq $self->target ) {
+            $found = 1;
+            last;
+        }
+    }
+
+    return $found;
+}
+
 sub _truncate_content {
     my $self = shift;
     my ( $content ) = @_;
+    unless ( defined $content ) {
+        $content = q{};
+    }
 
     return elide(
         $content,
@@ -579,7 +635,10 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 =head1 DESCRIPTION
 
 This class implements the Webmention protocol, as defined by the W3C and
-the IndieWeb community. (See: L<https://indieweb.org/Webmention>)
+the IndieWeb community. (See L<This article by Chris
+Aldrich|https://alistapart.com/article/webmentions-enabling-better-
+communication-on-the-internet> for an excellent high-level summary of
+Webmention and its applications.)
 
 An object of this class represents a single webmention, with target and
 source URLs. It can verify itself, determining whether or not the
@@ -757,6 +816,35 @@ itself.
 
 Returns undef if this webmention instance hasn't tried to send itself.
 
+=head3 rsvp_type
+
+ my $rsvp = $wm->rsvp_type;
+
+If this webmention is of type C<rsvp> (see L<"type">, below), then this method returns the
+type of RSVP represented. It will be one of:
+
+=over
+
+=item *
+
+yes
+
+=item *
+
+no
+
+=item *
+
+maybe
+
+=item *
+
+interested
+
+=back
+
+Otherwise, returns undef.
+
 =head3 send
 
  my $bool = $wm->send;
@@ -841,7 +929,15 @@ repost
 
 quotation
 
+=item *
+
+rsvp
+
 =back
+
+This list is based on the W3C Post Type Discovery document
+(L<https://www.w3.org/TR/post-type-discovery/#response-algorithm>), and
+adds a "quotation" type.
 
 =head1 SERIALIZATION
 
@@ -859,8 +955,9 @@ method|"FROM_JSON">.
 
 =head1 NOTES AND BUGS
 
-This software is B<alpha>; its author is still determining how it wants
-to work, and its interface might change dramatically.
+This software is B<beta>; its interface continues to develop and remains
+subject to change, but not without some effort at supporting its current
+API.
 
 This library does not, at this time, support L<the proposed "Vouch"
 anti-spam extension for Webmention|https://indieweb.org/Vouch>.

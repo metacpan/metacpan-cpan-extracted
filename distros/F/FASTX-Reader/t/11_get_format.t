@@ -3,9 +3,11 @@ use warnings;
 use FindBin qw($Bin);
 use Test::More;
 
-use_ok 'FASTX::Reader';
+use FASTX::Reader;
 
 my $basename = "$Bin/../data/test.";
+
+# Check that format returned equals the extension
 
 for my $format ('fasta', 'fastq') {
     my $file = $basename . $format;
@@ -16,12 +18,16 @@ for my $format ('fasta', 'fastq') {
       next;
     }
     my $detected_format = FASTX::Reader->getFileFormat("$file");
-    ok($format eq $detected_format, "Format detection ok for $format"); 
+    ok($format eq $detected_format, "Format detection ok for $format");
 
 
 }
-
+# Unknown formats are returned as 'undef': try with this perl script
 my $detected_format = FASTX::Reader->getFileFormat("$0");
-ok(! defined $detected_format, "Format detection ok: undef for non sequence file"); 
+ok(! defined $detected_format, "Format detection ok: undef for non sequence file");
+
+# bad.fastq is a fastq file with errors -> undef
+my $bad_fastq = FASTX::Reader->getFileFormat("$Bin/../data/bad.fastq");
+ok(! defined $detected_format, "Format detection ok: undef for bad FASTQ file");
 
 done_testing();

@@ -22,13 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222638;
 
 my $formatters = [];
 
 my $validators = {
-                'toll_free' => '',
-                'personal_number' => '',
+                'specialrate' => '',
+                'geographic' => '
+          (?:
+            318[023]|
+            41(?:
+              6[023]|
+              70
+            )|
+            7(?:
+              1[578]|
+              50
+            )\\d
+          )\\d{3}
+        ',
+                'voip' => '',
                 'fixed_line' => '
           (?:
             318[023]|
@@ -42,8 +55,7 @@ my $validators = {
             )\\d
           )\\d{3}
         ',
-                'specialrate' => '',
-                'voip' => '',
+                'pager' => '',
                 'mobile' => '
           (?:
             31(?:
@@ -59,20 +71,8 @@ my $validators = {
             )\\d
           )\\d{3}
         ',
-                'pager' => '',
-                'geographic' => '
-          (?:
-            318[023]|
-            41(?:
-              6[023]|
-              70
-            )|
-            7(?:
-              1[578]|
-              50
-            )\\d
-          )\\d{3}
-        '
+                'toll_free' => '',
+                'personal_number' => ''
               };
 my %areanames = (
   599318 => "St\.\ Eustatius",

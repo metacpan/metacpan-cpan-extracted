@@ -14,9 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-AlgorithmBackoffUtils",
   "EXE_FILES" => [
+    "script/retry",
     "script/retry-constant",
     "script/retry-exponential",
-    "script/retry-fibonacci"
+    "script/retry-fibonacci",
+    "script/show-backoff-delays"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -25,6 +27,7 @@ my %WriteMakefileArgs = (
     "Algorithm::Backoff::Constant" => 0,
     "Algorithm::Backoff::Exponential" => 0,
     "Algorithm::Backoff::Fibonacci" => 0,
+    "Data::Sah::Coerce::perl::array::str_comma_sep" => "0.007",
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::float" => 0,
@@ -48,7 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +62,7 @@ my %FallbackPrereqs = (
   "Algorithm::Backoff::Constant" => 0,
   "Algorithm::Backoff::Exponential" => 0,
   "Algorithm::Backoff::Fibonacci" => 0,
+  "Data::Sah::Coerce::perl::array::str_comma_sep" => "0.007",
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::float" => 0,

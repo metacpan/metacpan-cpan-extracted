@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Udev::FFI::Functions qw(:all);
+use Udev::FFI::Helper;
 
 
 
@@ -160,17 +161,7 @@ sub scan_subsystems {
 
 
 sub get_list_entries {
-    my $list_entry = udev_enumerate_get_list_entry($_[0]->{_enumerate});
-
-    if (wantarray) { # TODO deprecated
-        return get_entries($list_entry);
-    }
-
-    if (defined($list_entry)) {
-        return get_entries($list_entry);
-    }
-
-    return undef;
+    return Udev::FFI::Helper::get_entries_all( udev_enumerate_get_list_entry( $_[0]->{_enumerate} ) );
 }
 
 
@@ -198,13 +189,13 @@ Udev::FFI::Enumerate
     use Udev::FFI;
     
     my $udev = Udev::FFI->new() or
-        die "Can't create Udev::FFI object: $@";
+        die("Can't create Udev::FFI object: $@");
     
     my $enumerate = $udev->new_enumerate() or
-        die "Can't create enumerate context: $@";
+        die("Can't create enumerate context: $@");
     
     $enumerate->add_match_subsystem('usb');
-    $enumerate->add_match_sysattr('idVendor'); #devices with VID
+    $enumerate->add_match_sysattr('idVendor'); # devices with VID
     
     $enumerate->scan_devices();
     

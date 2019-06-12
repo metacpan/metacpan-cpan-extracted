@@ -6,13 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Algorithm/Backoff.pm',
     'Algorithm/Backoff/Constant.pm',
     'Algorithm/Backoff/Exponential.pm',
-    'Algorithm/Backoff/Fibonacci.pm'
+    'Algorithm/Backoff/Fibonacci.pm',
+    'Algorithm/Backoff/LILD.pm',
+    'Algorithm/Backoff/LIMD.pm',
+    'Algorithm/Backoff/MILD.pm',
+    'Algorithm/Backoff/MIMD.pm'
 );
 
 

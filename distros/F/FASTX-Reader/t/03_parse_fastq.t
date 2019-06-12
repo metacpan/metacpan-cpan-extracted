@@ -3,8 +3,10 @@ use warnings;
 use FindBin qw($Bin);
 use Test::More;
 
-use_ok 'FASTX::Reader';
+use FASTX::Reader;
 my $seq = "$Bin/../data/test.fastq";
+
+# TEST: Retrieves sequences from a test FASTQ file
 
 # Check required input file
 if (! -e $seq) {

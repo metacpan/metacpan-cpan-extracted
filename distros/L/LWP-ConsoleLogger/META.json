@@ -71,6 +71,7 @@
             "List::AllUtils" : "0",
             "Log::Dispatch" : "2.56",
             "Module::Load::Conditional" : "0",
+            "Module::Runtime" : "0",
             "Moo" : "0",
             "MooX::StrictConstructor" : "0",
             "Parse::MIME" : "0",
@@ -94,7 +95,7 @@
          "recommends" : {
             "CPAN::Meta" : "2.120900",
             "Mojo::UserAgent" : "0",
-            "Mojolicious" : "0",
+            "Mojolicious" : "7.13",
             "Pithub" : "0"
          },
          "requires" : {
@@ -104,7 +105,6 @@
             "HTML::FormatText::WithLinks" : "0",
             "HTTP::CookieJar::LWP" : "0",
             "Log::Dispatch::Array" : "0",
-            "Module::Runtime" : "0",
             "Path::Tiny" : "0",
             "Plack::Handler::HTTP::Server::Simple" : "0.016",
             "Plack::Test" : "0",
@@ -133,7 +133,7 @@
          "web" : "https://github.com/oalders/lwp-consolelogger"
       }
    },
-   "version" : "0.000040",
+   "version" : "0.000041",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -653,7 +653,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000040",
+                  "tag" : "v0.000041",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

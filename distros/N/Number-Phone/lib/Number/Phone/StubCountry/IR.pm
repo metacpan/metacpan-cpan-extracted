@@ -22,18 +22,16 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205539;
+our $VERSION = 1.20190611222640;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'pattern' => '(\\d{4,5})',
-                  'leading_digits' => '96',
-                  'format' => '$1'
+                  'format' => '$1',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '96'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{4,5})',
-                  'format' => '$1 $2',
                   'leading_digits' => '
             (?:
               1[137]|
@@ -46,24 +44,25 @@ my $formatters = [
               8[13467]
             )[12689]
           ',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{2})(\\d{4,5})'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '9',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'national_rule' => '0$1',
+                  'leading_digits' => '[1-8]',
                   'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[1-8]'
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
                 'geographic' => '
           944111\\d{4}|
           94(?:
@@ -97,38 +96,6 @@ my $validators = {
               )?
             )?
           )
-        ',
-                'mobile' => '
-          9(?:
-            (?:
-              0(?:
-                [1-35]\\d|
-                44
-              )|
-              (?:
-                [13]\\d|
-                2[0-2]
-              )\\d
-            )\\d|
-            9(?:
-              (?:
-                [0-2]\\d|
-                44
-              )\\d|
-              510|
-              8(?:
-                1\\d|
-                88
-              )|
-              9(?:
-                0[013]|
-                1[0134]|
-                21|
-                77|
-                9[6-9]
-              )
-            )
-          )\\d{5}
         ',
                 'specialrate' => '(
           96(?:
@@ -185,8 +152,41 @@ my $validators = {
             )?
           )
         ',
+                'pager' => '',
+                'personal_number' => '',
                 'toll_free' => '',
-                'personal_number' => ''
+                'mobile' => '
+          9(?:
+            (?:
+              0(?:
+                [1-35]\\d|
+                44
+              )|
+              (?:
+                [13]\\d|
+                2[0-2]
+              )\\d
+            )\\d|
+            9(?:
+              (?:
+                [0-2]\\d|
+                44
+              )\\d|
+              510|
+              8(?:
+                1\\d|
+                88
+              )|
+              9(?:
+                0[013]|
+                1[0134]|
+                21|
+                77|
+                9[6-9]
+              )
+            )
+          )\\d{5}
+        '
               };
 my %areanames = (
   9811 => "Mazandaran",

@@ -589,9 +589,10 @@ interpreter for batch processing of XML files.
 
 =head1 XSH COMMANDS
 
-See L<XSH2 manual page|XSH2> or
-L<http://xsh.sourceforge.net/documentation.html> for a complete
-XSH language reference.
+See L<XSH2 manual
+page|https://metacpan.org/pod/distribution/XML-XSH2/XSH2.pod> or
+L<http://xsh.sourceforge.net/documentation.html> for a complete XSH
+language reference.
 
 For a quick help, type C<xsh help> (just C<help> on xsh prompt).
 

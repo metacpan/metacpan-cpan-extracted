@@ -8,7 +8,7 @@ use Sub::Name;
 
 __PACKAGE__->mk_classdata( '_column_encoders' );
 
-our $VERSION = '0.00015';
+our $VERSION = '0.00016';
 $VERSION = eval $VERSION;
 
 sub register_column {
@@ -16,7 +16,7 @@ sub register_column {
   my ($column, $info) = @_;
   $self->next::method(@_);
 
-  return unless exists $info->{encode_column} && $info->{encode_column} == 1;
+  return unless exists $info->{encode_column} && $info->{encode_column};
   $self->throw_exception("'encode_class' is a required argument.")
     unless exists $info->{encode_class} && defined $info->{encode_class};
   my $class = $info->{encode_class};
@@ -172,10 +172,7 @@ found these options to be non-essential and omitted them by design.
 
 =head1 Options added to add_column
 
-If any one of these options is present the column will be treated as a digest
-column and all of the defaults will be applied to the rest of the options.
-
-=head2 encode_enable => 1
+=head2 encode_column => 1
 
 Enable automatic encoding of column values. If this option is not set to true
 any other options will become no-ops.

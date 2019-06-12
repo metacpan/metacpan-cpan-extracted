@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
-use 5.012;
-use autodie;
+use 5.010;
 use Carp qw(confess);
 use FindBin qw($Bin);
 use lib "$Bin/../lib/";
@@ -9,7 +8,17 @@ use FASTX::Reader;
 # Read two samples files if the user didnt provide any filename
 unless ($ARGV[0]) {
  say STDERR "[WARNING] No input file specified, using test data";
- push(@ARGV,"$Bin/../data/test.fastq", "$Bin/../data/test.fasta" )
+ push(@ARGV,"$Bin/../data/test.fastq", "$Bin/../data/test.fasta" );
+ say STDERR<<END;
+ Counter.pl - Script using FASTX::Reader to count sequences in FASTA/FASTQ files
+ -------------------------------------------------------------------------------
+ USAGE
+
+   Counter.pl FILE1 FILE2 ... FILE{n}
+
+ If no arguments are supplied, it will parse two test files contained in the script directory
+ -------------------------------------------------------------------------------
+END
 }
 
 foreach my $input_file (@ARGV) {
@@ -29,30 +38,3 @@ foreach my $input_file (@ARGV) {
     }
   }
 }
-
-=head1 NAME
-
-B<Counter.pl> - Demo script using FASTX::Reader to count sequences in FASTA / FASTQ files
-
-=head1 USAGE
-
-  Counter.pl FILE1 FILE2 ... FILE{n}
-
-If no arguments are supplied, it will parse two test files contained in the script directory
-
-=head1 WEBSITES
-
-=over 4
-
-=item L<https://github.com/telatin/FASTQ-Parser>
-
-
-The B<GitHub> repository for this module
-
-=item L<https://metacpan.org/pod/FASTX::Reader>
-
-The B<MetaCPAN> page for this module
-
-=back
-
-=cut

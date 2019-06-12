@@ -13,7 +13,7 @@ use Number::Phone::Country qw(noexport);
 use Number::Phone::StubCountry;
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '3.5000';
+our $VERSION = '3.5001';
 
 my $NOSTUBS = 0;
 sub import {
@@ -634,6 +634,10 @@ is used to try to load the right module.
 The constructor returns undef if it can not figure out what country
 you're talking about, or an object based on Google's libphonenumber
 data if there's no complete country-specific module available.
+
+It is generally assumed that numbers are complete and unambiguous - ie you
+can't pass just the local part to the constructor if the number has an area
+code. Any subclass's constructor which contravenes this should document it.
 
 =back
 

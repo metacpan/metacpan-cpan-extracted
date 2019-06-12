@@ -34,6 +34,7 @@
          "requires" : {
             "Mojo::JSON" : "0",
             "Mojo::Pg" : "0",
+            "Mojolicious::Plugin::OAuth2::Server" : "0",
             "Moose" : "0"
          }
       },
@@ -44,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.0",
+   "version" : "v0.4.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

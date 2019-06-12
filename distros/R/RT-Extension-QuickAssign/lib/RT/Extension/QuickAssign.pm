@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::QuickAssign;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ performance impact for some installations.
 
 =head1 RT VERSION
 
-Works with RT 4.0 and 4.2
+Works with RT 4.0, 4.2 and 4.4
 
 =head1 INSTALLATION
 
@@ -70,7 +70,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions, LLC
+This software is Copyright (c) 2014-2019 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

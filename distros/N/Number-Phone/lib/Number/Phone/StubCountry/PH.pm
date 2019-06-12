@@ -22,23 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2',
                   'leading_digits' => '2',
                   'pattern' => '(\\d)(\\d{5})',
-                  'national_rule' => '(0$1)'
+                  'national_rule' => '(0$1)',
+                  'format' => '$1 $2'
                 },
                 {
-                  'national_rule' => '(0$1)',
                   'pattern' => '(\\d)(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3',
+                  'national_rule' => '(0$1)',
                   'leading_digits' => '2'
                 },
                 {
-                  'format' => '$1 $2',
                   'leading_digits' => '
             3(?:
               230|
@@ -73,9 +72,13 @@ my $formatters = [
             )
           ',
                   'pattern' => '(\\d{4})(\\d{4,6})',
-                  'national_rule' => '(0$1)'
+                  'national_rule' => '(0$1)',
+                  'format' => '$1 $2'
                 },
                 {
+                  'national_rule' => '(0$1)',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{5})(\\d{4})',
                   'leading_digits' => '
             3469|
             4(?:
@@ -86,43 +89,57 @@ my $formatters = [
               )
             )|
             8834
-          ',
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{5})(\\d{4})',
-                  'national_rule' => '(0$1)'
+          '
                 },
                 {
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '(0$1)',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [3-7]|
             8[2-8]
-          ',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '(0$1)'
+          '
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '[89]',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
-                },
-                {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '1',
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{4})'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{1,2})(\\d{3})(\\d{4})',
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '1'
+                },
+                {
                   'leading_digits' => '1',
+                  'pattern' => '(\\d{4})(\\d{1,2})(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
-                'voip' => '',
+                'personal_number' => '',
+                'mobile' => '
+          (?:
+            81[37]|
+            9(?:
+              0[5-9]|
+              1[024-9]|
+              2[0-35-9]|
+              [35]\\d|
+              4[235-9]|
+              6[0-25-8]|
+              7[1-9]|
+              8[19]|
+              9[4-9]
+            )
+          )\\d{7}
+        ',
+                'toll_free' => '1800\\d{7,9}',
                 'pager' => '',
-                'geographic' => '
+                'voip' => '',
+                'fixed_line' => '
           2\\d{5}(?:
             \\d{2}
           )?|
@@ -140,26 +157,8 @@ my $validators = {
             8[2-7]
           )\\d{7}
         ',
-                'mobile' => '
-          (?:
-            81[37]|
-            9(?:
-              0[5-9]|
-              1[024-9]|
-              2[0-35-9]|
-              3[02-9]|
-              4[235-9]|
-              5[056]|
-              6[5-7]|
-              7[3-79]|
-              89|
-              9[4-9]
-            )
-          )\\d{7}
-        ',
-                'toll_free' => '1800\\d{7,9}',
-                'personal_number' => '',
-                'fixed_line' => '
+                'specialrate' => '',
+                'geographic' => '
           2\\d{5}(?:
             \\d{2}
           )?|

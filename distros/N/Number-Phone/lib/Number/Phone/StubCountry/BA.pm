@@ -22,41 +22,67 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205537;
+our $VERSION = 1.20190611222638;
 
 my $formatters = [
                 {
-                  'format' => '$1-$2',
-                  'leading_digits' => '[2-9]',
+                  'intl_format' => 'NA',
                   'pattern' => '(\\d{3})(\\d{3})',
-                  'intl_format' => 'NA'
+                  'format' => '$1-$2',
+                  'leading_digits' => '[2-9]'
                 },
                 {
                   'leading_digits' => '
             6[1-356]|
             [7-9]
           ',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 },
                 {
+                  'format' => '$1 $2-$3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'leading_digits' => '[3-5]',
-                  'format' => '$1 $2-$3'
+                  'leading_digits' => '[3-5]'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '6',
+                  'format' => '$1 $2 $3 $4',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'toll_free' => '8[08]\\d{6}',
+                'geographic' => '
+          (?:
+            3(?:
+              [05-79][2-9]|
+              1[4579]|
+              [23][24-9]|
+              4[2-4689]|
+              8[2457-9]
+            )|
+            49[2-579]|
+            5(?:
+              0[2-49]|
+              [13][2-9]|
+              [268][2-4679]|
+              4[4689]|
+              5[2-79]|
+              7[2-69]|
+              9[2-4689]
+            )
+          )\\d{5}
+        ',
+                'specialrate' => '(8[12]\\d{6})|(9[0246]\\d{6})|(
+          70(?:
+            3[0146]|
+            [56]0
+          )\\d{4}
+        )',
+                'voip' => '',
                 'fixed_line' => '
           (?:
             3(?:
@@ -78,13 +104,9 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'voip' => '',
-                'specialrate' => '(8[12]\\d{6})|(9[0246]\\d{6})|(
-          70(?:
-            3[0146]|
-            [56]0
-          )\\d{4}
-        )',
+                'pager' => '',
+                'personal_number' => '',
+                'toll_free' => '8[08]\\d{6}',
                 'mobile' => '
           6(?:
             0(?:
@@ -94,28 +116,6 @@ my $validators = {
             [1-356]\\d|
             44[0-6]|
             71[137]
-          )\\d{5}
-        ',
-                'pager' => '',
-                'geographic' => '
-          (?:
-            3(?:
-              [05-79][2-9]|
-              1[4579]|
-              [23][24-9]|
-              4[2-4689]|
-              8[2457-9]
-            )|
-            49[2-579]|
-            5(?:
-              0[2-49]|
-              [13][2-9]|
-              [268][2-4679]|
-              4[4689]|
-              5[2-79]|
-              7[2-69]|
-              9[2-4689]
-            )
           )\\d{5}
         '
               };

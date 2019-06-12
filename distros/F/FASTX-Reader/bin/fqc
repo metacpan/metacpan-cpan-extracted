@@ -1,0 +1,296 @@
+#!/usr/bin/env perl
+# ABSTRACT: A FASTA/FASTQ sequence counter
+# PODNAME: fqc
+
+use 5.012;
+use Pod::Usage;
+use Term::ANSIColor;
+use Getopt::Long;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use File::Basename;
+use FASTX::Reader;
+use Data::Dumper;
+use JSON::PP;
+
+die "ERROR: FASTX::Reader required version is >= 0.3\n" if ($FASTX::Reader::VERSION < 0.3);
+
+my %output;
+my $sort_function;
+my $counter = 0;
+
+my $opt_separator ="\t";
+my $opt_sortby = 'order';
+my ($opt_abs, $opt_basename, $opt_thousand, $opt_csv, $opt_json, $opt_rev, $opt_screen, $opt_tsv, $opt_help, $opt_pretty_json);
+my $sort_direction = 'desc';
+my $_opt = GetOptions(
+  'a|abspath'    => \$opt_abs,
+  'b|basename'   => \$opt_basename,
+  'c|csv'        => \$opt_csv,
+  'd|thousandsep'=> \$opt_thousand,
+  's|sortby=s'   => \$opt_sortby,
+  'j|json'       => \$opt_json,
+  'p|pretty'     => \$opt_pretty_json,
+  'r|reverse'    => \$opt_rev,
+  'tab'          => \$opt_screen,
+  't|tsv'        => \$opt_tsv,
+  'h|help'       => \$opt_help,
+);
+
+
+init();
+
+
+
+
+
+
+
+
+foreach my $input_file (@ARGV) {
+  $counter++;
+  my $print_name = $input_file;
+  my $abs_path   = File::Spec->rel2abs($input_file);
+  if (! -e "$input_file") {
+    print STDERR color('red'), "[WARNING] ", color('reset'), "File <$input_file> not found. Skipping.\n";
+  }
+  if ($opt_abs) {
+    $print_name = $abs_path;
+  } elsif ($opt_basename) {
+    $print_name = basename($input_file);
+  }
+  $output{$abs_path}{name} = $print_name;
+  $output{$abs_path}{order} = $counter;
+  my  $seq_reader = FASTX::Reader->new({filename => "$input_file"});
+
+  if ($input_file=~/(\.fastq|\.fq)/) {
+    # parse FASTQ
+    while (my $seq = $seq_reader->getFastqRead()) {
+      next;
+    }
+    $output{$abs_path}{count} = $seq_reader->{counter};
+    $output{$abs_path}{parser} = 'FASTQ';
+    if ($seq_reader->{status} == 0) {
+      $output{$abs_path}{count} = 'n/a';
+    }
+  } else {
+    # generic FASTX parser
+    while (my $seq = $seq_reader->getRead()) {
+      next;
+    }
+    $output{$abs_path}{parser} = 'FASTX';
+    $output{$abs_path}{count} = $seq_reader->{counter};
+  }
+
+  $output{$abs_path}{compressed}  = $seq_reader->{compressed};
+  $output{$abs_path}{print_count} = $output{$abs_path}{count};
+  $output{$abs_path}{print_count} =~ s/(\d{1,3}?)(?=(\d{3})+$)/$1,/g if ($opt_thousand);
+}
+
+
+# PRINT OUTPUT
+
+if ($opt_json) {
+  print encode_json(\%output);
+} elsif ($opt_pretty_json) {
+  my $json = JSON::PP->new->ascii->pretty->allow_nonref;
+
+  print $json->encode( \%output );
+
+} elsif ($opt_csv or $opt_tsv) {
+  foreach my $r (sort $sort_function  keys %output  ) {
+    print join("$opt_separator",
+      $output{$r}->{order},
+      $output{$r}->{name},
+      $output{$r}->{print_count},
+      $output{$r}->{compressed},
+      $output{$r}->{parser},
+    ), "\n";
+  }
+} elsif ($opt_screen) {
+  my $t = Text::ASCIITable->new();
+  $t->setCols('#','Name','Seqs', 'Gz','Parser');
+  foreach my $r (sort $sort_function  keys %output  ) {
+
+    $t->addRow(
+      $output{$r}->{order},
+      $output{$r}->{name},
+      $output{$r}->{print_count},
+      $output{$r}->{compressed},
+      $output{$r}->{parser},
+      );
+  }
+  print $t;
+
+} else {
+  # Default: only name and counts
+  foreach my $r (sort $sort_function  keys %output  ) {
+    print join("$opt_separator", $output{$r}->{name}, $output{$r}->{print_count}), "\n";
+  }
+}
+
+sub init {
+
+  pod2usage({-exitval => 0, -verbose => 2}) if $opt_help;
+
+  my $count_options = 0;
+  $count_options++ if (defined $opt_screen);
+  $count_options++ if (defined $opt_json);
+  $count_options++ if (defined $opt_tsv);
+  $count_options++ if (defined $opt_csv);
+  $count_options++ if (defined $opt_pretty_json);
+
+  die "FATAL ERROR:\n",
+  "Just select one (or none) output format: either --csv, --tsv, --screen  or --json (none for default)\n" if ($count_options>1);
+  if ($opt_screen) {
+    eval {
+      require Text::ASCIITable;
+      Text::ASCIITable->import();
+    };
+    if ($@) {
+      print STDERR " WARNING: Text::ASCIITable not found, rolling back to default output\n";
+      $opt_screen = undef;
+    }
+  }
+
+  $opt_separator = "," if ($opt_csv);
+
+  # SORT BY
+
+  our %sorters = (
+     num_asc         => sub { $output{$b}{$opt_sortby} <=> $output{$a}{$opt_sortby} },
+     num_desc        => sub { $output{$a}{$opt_sortby} <=> $output{$b}{$opt_sortby} },
+     string_asc      => sub { $a cmp $b },
+     string_desc     => sub { $b cmp $a },
+  );
+
+  my %valid_sort = (
+    'name'  => 'string_',
+    'order' => 'num_',
+    'count' => 'num_',
+  );
+
+
+  $sort_direction = 'asc' if ($opt_rev);
+
+  if (not defined $valid_sort{$opt_sortby}) {
+    die " Fatal error: Sort by '$opt_sortby' not supported. Valid options are: ", join(', ', keys %valid_sort), "\n";
+  } else {
+    my $sort_function_name = $valid_sort{$opt_sortby} . $sort_direction;
+    $sort_function = $sorters{$sort_function_name};
+  }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fqc - A FASTA/FASTQ sequence counter
+
+=head1 VERSION
+
+version 0.32
+
+=head1 SYNOPSIS
+
+  fqc [options] [FILE1 FILE2 FILE3...]
+
+=head1 DESCRIPTION
+
+This program parses a list of FASTA/FASTQ files printing the number of sequences
+found in each file. Reads both uncompressed and GZipped files.
+Default output is the filename, tab, sequence count. Can be changed with options.
+
+The table "key" is the absolute path of each input file, but the printed name can be
+changed with options.
+
+=head1 PARAMETERS
+
+=head2 FILE NAME
+
+=over 12
+
+=item I<-a, --abspath>
+
+Print the absolute path of the filename (the absolute path is always the table key,
+but if relative paths are supplied, they will be printed).
+
+=item I<-b, --basename>
+
+Print the filename without the path.
+
+=item I<-d, --thousandsep>
+
+Print reads number with a "," used as thousand separator
+
+=back
+
+=head2 OUTPUT FORMAT
+
+Default output format is the filename and reads counts, tab separated. Options formatting
+either filename (C<-a>, C<-b>) and reads counts (C<-d>) will still work.
+
+=over 12
+
+=item I<-t, --tsv> and I<-c, --csv>
+
+Print a tabular output either tab separated (with C<-t>) or comma separated (with C<-c>).
+
+=item I<-j, --json>
+
+Print full output in JSON format.
+
+=item I<-p,  --pretty>
+
+Same as JSON but in "pretty" format.
+
+=item I<--tab>
+
+Print an ASCII-art table like:
+  .---------------------------------------------------.
+  | # | Name                     | Seqs | Gz | Parser |
+  +---+--------------------------+------+----+--------+
+  | 1 | data/comments.fasta      |    3 |  0 | FASTX  |
+  | 2 | data/comments.fastq      |    3 |  0 | FASTQ  |
+  | 3 | data/compressed.fasta.gz |    3 |  1 | FASTX  |
+  | 4 | data/compressed.fastq.gz |    3 |  1 | FASTQ  |
+  '---+--------------------------+------+----+--------'
+
+This feature requires L<Term::ASCIITable>.
+
+=back
+
+=head2 SORTING
+
+=over 12
+
+=item I<-s, --sortby>
+
+Sort by field: 'order' (default, that is the order of the input files as supplied by the user),
+'count' (number of sequences), 'name' (filename).
+By default will be descending for numeric fields, ascending for 'path'.
+See C<-r, --reverse>.
+
+=item I<-r, --reverse>
+
+Reverse the sorting order.
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -3,9 +3,13 @@ abstract: 'Low level FFI interfaces to the Z3 solver/prover'
 author:
   - 'Ryan Voots <simcop2387@simcop2387.info>'
 build_requires:
+  Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Package::Stash: '0'
   Test::More: '0'
+  lib: '0'
+  namespace::autoclean: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -26,10 +30,10 @@ no_index:
 provides:
   Z3::FFI:
     file: lib/Z3/FFI.pm
-    version: '0.002'
+    version: '0.003'
   Z3::FFI::ArrayType:
     file: lib/Z3/FFI/ArrayType.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Alien::Z3: '0.001'
   Carp: '0'
@@ -45,7 +49,7 @@ requires:
 resources:
   bugtracker: https://github.com/simcop2387/Z3-FFI/issues
   repository: git://github.com/simcop2387/Z3-FFI.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -184,7 +188,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.002
+          tag: v0.003
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

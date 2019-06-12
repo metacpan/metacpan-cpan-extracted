@@ -7,7 +7,7 @@ use Carp qw/croak/;
 use FFI::Platypus;
 
 # ABSTRACT - Z3 Opaque array type creator
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use constant _pointer_size => FFI::Platypus->new->sizeof('opaque');
 use constant _numeric_type => _pointer_size == 8 ? "Q" : "L";

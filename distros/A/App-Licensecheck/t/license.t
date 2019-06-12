@@ -29,7 +29,7 @@ license_is(
 	],
 	'BSD-3-clause'
 );
-license_is( 't/devscripts/boost.h', 'BSL' );
+license_is( 't/devscripts/boost.h', 'BSL-1.0' );
 license_is( 't/devscripts/epl.h',   'EPL-1.0' );
 
 # Lisp Lesser General Public License (BTS #806424)

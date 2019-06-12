@@ -17,6 +17,18 @@ Mail::Transport::IMAP4 - proxy to Mail::IMAPClient
  my $message = $imap->receive($id);
  $imap->send($message);
 
+ my Mail::Box::Manager $mgr = Mail::Box::Manager->new;
+ $mgr->open(
+     # Generic folder options
+     folder => 'imaps://...',
+     access => 'rw',
+     extract => 'ALWAYS',
+
+     # Mail::IMAPClient options start with [A-Z]
+     IgnoreSizeErrors => 1,
+     Ssl => 1,
+ );
+
 =head1 DESCRIPTION
 
 The IMAP4 protocol is quite complicated: it is feature rich and allows
@@ -58,6 +70,16 @@ may get shared.  This is sharing is hidden for the user.
 When an C<imap_client> is specified, then the options C<hostname>,
 C<port>, C<username>, and C<password> are extracted from it.
 
+All %options which start with a capital are passed as initiation
+to Mail::IMAPClient.  See that manual about the huge pile of
+parameters.  When talking to Microsoft Exchange, you probabaly need the
+C<IgnoreSizeErros>.  Probably, you need C<Ssl> or C<StartTLS> as well.
+As feature, you may also pass a HASH to Ssl, where C<Mail::IMAPClient>
+only accepts an ARRAY.
+
+For backwards compatibility, C<ssl> is an alternative for C<Ssl>,
+and C<starttls> for C<StartTLS>.
+
  -Option      --Defined in     --Default
   authenticate                   'AUTO'
   domain                         <server_name>
@@ -70,8 +92,6 @@ C<port>, C<username>, and C<password> are extracted from it.
   port          Mail::Transport  143
   proxy         Mail::Transport  undef
   retry         Mail::Transport  <false>
-  ssl                            undef
-  starttls                       false
   timeout       Mail::Transport  120
   trace         Mail::Reporter   'WARNINGS'
   username      Mail::Transport  undef
@@ -115,14 +135,6 @@ defined by L<Mail::IMAPClient|Mail::IMAPClient>.
 =item proxy => PATH
 
 =item retry => NUMBER|undef
-
-=item ssl => \%ssl_options|\@ssl_options
-
-You need to pass at least an empty HASH or ARRAY to enable SSL.
-
-=item starttls => BOOLEAN
-
-Run connection setup with StartTLS into an SSL connection.
 
 =item timeout => SECONDS
 
@@ -456,8 +468,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.005,
-built on June 05, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.006,
+built on June 12, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

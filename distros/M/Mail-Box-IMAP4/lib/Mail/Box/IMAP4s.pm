@@ -8,7 +8,7 @@
 
 package Mail::Box::IMAP4s;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Box::IMAP4';
 

@@ -1,2 +1,6 @@
+0.40      2019-06-11 17:50:25 EDT
+  - Follow Task::Kensho 0.40
+  - Add missing dependency on Task::Kensho itself
+
 0.39      2018-04-09 15:43:09 EDT
   - First release

@@ -3,6 +3,7 @@ package DBIx::Class::EncodedColumn::Digest;
 use strict;
 use warnings;
 use Digest;
+use Encode qw( str2bytes );
 
 our $VERSION = '0.00001';
 
@@ -33,6 +34,8 @@ sub make_encode_sub {
   my $alg  = $args->{algorithm}   ||= 'SHA-256';
   my $slen = $args->{salt_length} ||= 0;
 
+  my $encode = $args->{charset};
+
  die("Valid Digest formats are 'binary', 'hex' or 'base64'. You used '$for'.")
    unless $for =~ /^(?:hex|base64|binary)$/;
   defined(my $object = eval{ Digest->new($alg) }) ||
@@ -45,6 +48,7 @@ sub make_encode_sub {
 
   my $encoder = sub {
     my ($plain_text, $salt) = @_;
+    $plain_text = str2bytes($encode, $plain_text,  Encode::FB_PERLQQ | Encode::LEAVE_SRC) if $encode;
     $salt ||= join('', map { $salt_pool[int(rand(65))] } 1 .. $slen);
     $object->reset()->add($plain_text.$salt);
     my $digest = $object->$format_method;
@@ -63,10 +67,12 @@ sub make_check_sub {
   #this is the digest length
   my $len = $digest_lengths{$args->{algorithm}}{$args->{format}};
   die("Unable to find digest length") unless defined $len;
+  my $encode = $args->{charset} || '';
 
   #fast fast fast
   return eval qq^ sub {
     my \$col_v = \$_[0]->get_column('${col}');
+    \$col_v = str2bytes('${encode}', \$col_v, Encode::FB_PERLQQ | Encode::LEAVE_SRC) if '${encode}';
     my \$salt   = substr(\$col_v, ${len});
     \$_[0]->_column_encoders->{${col}}->(\$_[1], \$salt) eq \$col_v;
   } ^ || die($@);
@@ -89,7 +95,12 @@ DBIx::Class::EncodedColumn::Digest - Digest backend
       size        => 40 + 10,
       encode_column => 1,
       encode_class  => 'Digest',
-      encode_args   => {algorithm => 'SHA-1', format => 'hex', salt_length => 10},
+      encode_args   => {
+          algorithm   => 'SHA-1',
+          format      => 'hex',
+          salt_length => 10,
+          charset     => 'utf-8',
+      },
       encode_check_method => 'check_password',
   }
 
@@ -130,6 +141,13 @@ and will be appended to the end of the digest. Please make sure that you
 remember to make sure that to expand the size of your db column to have enough
 space to store both the digest AND the salt. Please see list below for common
 digest lengths.
+
+=head2 charset
+
+If the string is not restricted to ASCII, then you will need to
+specify a character set encoding.
+
+See L<Encode> for a list of encodings.
 
 =head1 METHODS
 

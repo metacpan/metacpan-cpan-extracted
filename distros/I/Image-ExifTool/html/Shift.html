@@ -4,7 +4,7 @@
 <head>
 <title>ExifTool Date/Time Shift Module</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:_networkd@osx357.sd.apple.com" />
+<link rev="made" href="mailto:root@osx217.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -61,6 +61,10 @@
 <p>2) [optional] Direction of shift (-1 or +1), or 0 or undef to use the sign from the shift string.</p>
 
 <p>3) [optional] Reference to time-shift hash -- filled in by first call to <b>ShiftTime</b>, and used in subsequent calls to shift date/time values by the same relative amount (see <a href="#TRICKY">&quot;TRICKY&quot;</a> section below).</p>
+
+<p>or</p>
+
+<p>0) Shift string (and $_ contains the input date/time string).</p>
 
 </dd>
 <dt id="Return-value">Return value:</dt>

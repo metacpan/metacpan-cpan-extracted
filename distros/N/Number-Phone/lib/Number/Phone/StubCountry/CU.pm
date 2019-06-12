@@ -22,35 +22,38 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205538;
+our $VERSION = 1.20190611222639;
 
 my $formatters = [
                 {
+                  'leading_digits' => '
+            2[1-4]|
+            [34]
+          ',
                   'pattern' => '(\\d{2})(\\d{4,6})',
-                  'format' => '$1 $2',
-                  'leading_digits' => '[2-4]',
-                  'national_rule' => '(0$1)'
+                  'national_rule' => '(0$1)',
+                  'format' => '$1 $2'
                 },
                 {
                   'leading_digits' => '7',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d)(\\d{6,7})',
-                  'national_rule' => '(0$1)'
+                  'national_rule' => '(0$1)',
+                  'format' => '$1 $2'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{7})',
                   'format' => '$1 $2',
-                  'leading_digits' => '5',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{7})',
+                  'leading_digits' => '5'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
+                'specialrate' => '',
                 'geographic' => '
           (?:
             3[23]|
-            4[78]
+            48
           )\\d{4,6}|
           (?:
             31|
@@ -58,17 +61,15 @@ my $validators = {
           )\\d{6}|
           (?:
             2[1-4]|
-            4[125]|
+            4[1257]|
             7\\d
           )\\d{5,6}
         ',
-                'mobile' => '5\\d{7}',
-                'specialrate' => '',
                 'voip' => '',
                 'fixed_line' => '
           (?:
             3[23]|
-            4[78]
+            48
           )\\d{4,6}|
           (?:
             31|
@@ -76,12 +77,14 @@ my $validators = {
           )\\d{6}|
           (?:
             2[1-4]|
-            4[125]|
+            4[1257]|
             7\\d
           )\\d{5,6}
         ',
+                'pager' => '',
+                'personal_number' => '',
                 'toll_free' => '',
-                'personal_number' => ''
+                'mobile' => '5\\d{7}'
               };
 my %areanames = (
   5321 => "Guantánamo\ Province",
@@ -96,7 +99,7 @@ my %areanames = (
   5343 => "Cienfuegos\ Province",
   5345 => "Matanzas\ Province",
   5346 => "Isle\ of\ Youth",
-  5347 => "Havana\ Province",
+  5347 => "Mayabeque\ and\ Artemisa",
   5348 => "Pinar\ del\ Río\ Province",
   537 => "Havana\ City",
 );

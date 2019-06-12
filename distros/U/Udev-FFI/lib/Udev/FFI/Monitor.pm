@@ -35,7 +35,7 @@ sub get_udev {
 
 sub set_receive_buffer_size {
     # self, bytes
-    if(0 == udev_monitor_set_receive_buffer_size($_[0]->{_monitor}, $_[1])) {
+    if (0 == udev_monitor_set_receive_buffer_size($_[0]->{_monitor}, $_[1])) {
         return 1;
     }
 
@@ -45,13 +45,13 @@ sub set_receive_buffer_size {
 
 
 sub filter_by_subsystem_devtype {
-    if(1 == $_[0]->{_is_started}) {
+    if (1 == $_[0]->{_is_started}) {
         $! = EPERM;
         return 0;
     }
 
     # self, subsystem, devtype
-    if(0 == ($! = udev_monitor_filter_add_match_subsystem_devtype($_[0]->{_monitor}, $_[1], $_[2]))) {
+    if (0 == ($! = udev_monitor_filter_add_match_subsystem_devtype($_[0]->{_monitor}, $_[1], $_[2]))) {
         return 1;
     }
 
@@ -62,13 +62,13 @@ sub filter_by_subsystem_devtype {
 
 
 sub filter_by_tag {
-    if(1 == $_[0]->{_is_started}) {
+    if (1 == $_[0]->{_is_started}) {
         $! = EPERM;
         return 0;
     }
 
     # self, tag
-    if(0 == ($! = udev_monitor_filter_add_match_tag($_[0]->{_monitor}, $_[1]))) {
+    if (0 == ($! = udev_monitor_filter_add_match_tag($_[0]->{_monitor}, $_[1]))) {
         return 1;
     }
 
@@ -79,7 +79,7 @@ sub filter_by_tag {
 
 
 sub filter_update {
-    if(0 == ($! = udev_monitor_filter_update($_[0]->{_monitor}))) {
+    if (0 == ($! = udev_monitor_filter_update($_[0]->{_monitor}))) {
         return 1;
     }
 
@@ -90,7 +90,7 @@ sub filter_update {
 
 
 sub filter_remove {
-    if(0 != udev_monitor_filter_remove($_[0]->{_monitor})) {
+    if (0 != udev_monitor_filter_remove($_[0]->{_monitor})) {
         return 1;
     }
 
@@ -106,7 +106,7 @@ sub start {
     return 1
         if $self->{_is_started};
 
-    if(0 != ($! = udev_monitor_enable_receiving( $self->{_monitor} ))) {
+    if (0 != ($! = udev_monitor_enable_receiving( $self->{_monitor} ))) {
         $! = -$!;
         return 0;
     }
@@ -114,7 +114,7 @@ sub start {
     my $fd = udev_monitor_get_fd($self->{_monitor});
 
     my $fdh;
-    if(!open($fdh, "<&=", $fd)) {
+    unless (open($fdh, "<&=", $fd)) {
         return 0;
     }
 
@@ -134,7 +134,7 @@ sub poll {
      croak('udev monitor is not running')
         unless $self->{_is_started};
 
-    if($self->{_select}->can_read($timeout)) {
+    if ($self->{_select}->can_read($timeout)) {
         my $device = udev_monitor_receive_device( $self->{_monitor} );
 
         return Udev::FFI::Device->new( $device );
@@ -174,16 +174,16 @@ Udev::FFI::Monitor
     use Udev::FFI;
     
     my $udev = Udev::FFI->new() or
-        die "Can't create Udev::FFI object: $@";
+        die("Can't create Udev::FFI object: $@");
     
     my $monitor = $udev->new_monitor() or
-        die "Can't create udev monitor: $@.\n";
+        die ("Can't create udev monitor: $@");
     
     $monitor->filter_by_subsystem_devtype('usb');
     
     $monitor->start();
     
-    for(;;) {
+    for (;;) {
         my $device = $monitor->poll(); # blocking read
     
         print 'ACTION: '.$device->get_action()."\n";

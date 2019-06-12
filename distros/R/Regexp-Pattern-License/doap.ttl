@@ -361,8 +361,8 @@
 	doap-deps:runtime-requirement [ doap-deps:on "strictures 2"^^doap-deps:CpanId ], [ doap-deps:on "perl 5"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Regexp::Pattern 0"^^doap-deps:CpanId ], [
 		doap-deps:on "Test::Builder::Module 0"^^doap-deps:CpanId;
-	], [ doap-deps:on "Test::Exception 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.98"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Regexp-Pattern-License>, <https://bugs.debian.org/regexp-pattern-license>;
+	], [ doap-deps:on "Test::Exception 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.98"^^doap-deps:CpanId ], [ doap-deps:on "Try::Tiny 0"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Regexp-Pattern-License>, <https://bugs.debian.org/libregexp-pattern-license-perl>;
 	doap:category        [ rdfs:label "Sourcecode" ], [ rdfs:label "Licensing" ];
 	doap:created         "2016-11-23"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/jonass>;
@@ -372,10 +372,10 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "Regexp-Pattern-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-94>;
 	doap:repository      [
 		a doap:GitRepository;
-		doap:browse <https://anonscm.debian.org/git/build-common/regexp-pattern-license.git>;
+		doap:browse <https://salsa.debian.org/build-common-team/regexp-pattern-license.git>;
 	];
 	doap:shortdesc       "regular expressions for legal licenses".
 
@@ -630,12 +630,86 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.93.tar.gz>;
 	doap:revision        "v3.1.93"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-94>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.1.94"^^xsd:string;
+	dc:issued            "2019-06-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Limit length of subpatterns BB (bullets) E (end of sentence) EE (end of paragraph) and lang, both for slight speedup and to limit risk of issues like Debian bug#926392.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve synthesized subject pattern grant: Use trait pattern licensed_under (not simpler copy).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Synthesize subject pattern name.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix objects aladdin aladdin_8 aladdin_9: Add subject pattern license for singleversion licenses and drop for versioned license.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Extend testsuite: Cover objects aladdin_8 aladdin_9.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Extend object bsl_1: Add subject pattern license. Improve metadata.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Relax synthesized name pattern to make commas optional (not strip them).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Relax trait pattern version_prefix: Make whole pattern optional (not its use in version_numberstring).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Extend trait patterns version version_later version_numberstring version_prefix: Cover scopes line sentence. Limit scope paragraph.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Relax trait pattern version_prefix: Include optional non-text prefix (not only in pattern version).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix relax trait pattern version_later_postfix: Detect \"any above\".";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix relax trait pattern version_prefix: Tolerate leading only/either.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix DOAP bug-database and repository URLs.";
+			doap-bugs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/129784>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix declare test-requirement on Try::Tiny.";
+			doap-bugs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/129785>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.94.tar.gz>;
+	doap:revision        "v3.1.94"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:dr@jones.dk>, <mailto:jonass@cpan.org>;
 	foaf:name            "Jonas Smedegaard";
 	foaf:nick            "JONASS";
 	foaf:page            <https://metacpan.org/author/JONASS>.
+
+<http://purl.org/NET/cpan-uri/person/srezic>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:srezic@cpan.org>;
+	foaf:name            "Slaven Rezić";
+	foaf:nick            "SREZIC";
+	foaf:page            <https://metacpan.org/author/SREZIC>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/129784>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "129784"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=129784>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/129785>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "129785"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=129785>.
 
 <http://webid.debian.net/maintainers/nthykier>
 	foaf:mbox            <mailto:niels@thykier.net>, <mailto:nthykier@debian.org>;

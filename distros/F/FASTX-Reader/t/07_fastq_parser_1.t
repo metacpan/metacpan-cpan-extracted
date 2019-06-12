@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 use Test::More;
-
-use_ok 'FASTX::Reader';
+use Data::Dumper;
+use FASTX::Reader;
 my $seq = "$Bin/../data/test.fastq";
 
 # Check required input file
@@ -15,7 +15,10 @@ if (! -e $seq) {
 my $data = FASTX::Reader->new({ filename => "$seq" });
 
 while (my $read = $data->getFastqRead() ) {
-	ok( length($read->{qual}) eq length($read->{seq}), "[FASTQ ALT PARSER] Ok: got sequence and quality");	
+	ok( length($read->{qual}) eq length($read->{seq}), "[FASTQ/ALT_PARSER] got sequence and quality for " . $read->{name});
+
+  ok( $data->{status} == 1 , "[FASTQ ALT PARSER] Valid format detected (reader_status=1)");
 }
+
 
 done_testing();

@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190303205540;
+our $VERSION = 1.20190611222641;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '2[12]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'leading_digits' => '2[12]'
                 },
                 {
                   'leading_digits' => '[236-9]',
@@ -38,13 +38,7 @@ my $formatters = [
               ];
 
 my $validators = {
-                'mobile' => '
-          9(?:
-            [1-36]\\d\\d|
-            480
-          )\\d{5}
-        ',
-                'geographic' => '
+                'fixed_line' => '
           2(?:
             [12]\\d|
             [35][1-689]|
@@ -55,7 +49,6 @@ my $validators = {
             9[1256]
           )\\d{6}
         ',
-                'pager' => '',
                 'voip' => '30\\d{7}',
                 'specialrate' => '(
           80(?:
@@ -80,7 +73,7 @@ my $validators = {
             8[17]
           )\\d{5}
         )',
-                'fixed_line' => '
+                'geographic' => '
           2(?:
             [12]\\d|
             [35][1-689]|
@@ -91,8 +84,15 @@ my $validators = {
             9[1256]
           )\\d{6}
         ',
+                'toll_free' => '80[02]\\d{6}',
+                'mobile' => '
+          9(?:
+            [1-36]\\d\\d|
+            480
+          )\\d{5}
+        ',
                 'personal_number' => '884[0-4689]\\d{5}',
-                'toll_free' => '80[02]\\d{6}'
+                'pager' => ''
               };
 my %areanames = (
   35121 => "Lisbon",
