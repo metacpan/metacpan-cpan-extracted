@@ -4298,6 +4298,22 @@ PPCODE:
     MARPAESLIFPERL_CROAKF("marpaESLIFRecognizer_hook_discardb failure, %s", strerror(errno));
   }
 
+=for comment
+  /* ----------------------------------------------------------------------- */
+  /* MarpaX::ESLIF::Recognizer::hookDiscardSwitch                            */
+  /* ----------------------------------------------------------------------- */
+=cut
+
+void
+hookDiscardSwitch(Perl_MarpaX_ESLIF_Recognizer)
+  MarpaX_ESLIF_Recognizer Perl_MarpaX_ESLIF_Recognizer;
+PREINIT:
+  static const char *funcs = "MarpaX::ESLIF::Recognizer::hookDiscardSwitch";
+PPCODE:
+  if (!  marpaESLIFRecognizer_hook_discard_switchb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp)) {
+    MARPAESLIFPERL_CROAKF("marpaESLIFRecognizer_hook_discard_switchb failure, %s", strerror(errno));
+  }
+
 MODULE = MarpaX::ESLIF            PACKAGE = MarpaX::ESLIF::Value
 
 PROTOTYPES: ENABLE

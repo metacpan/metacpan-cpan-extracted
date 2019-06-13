@@ -1,0 +1,42 @@
+{
+   "abstract" : "Downloads and parses Mozilla intermediate certificates",
+   "author" : [
+      "Richard Newsham <richard@simperl.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mozilla-IntermediateCerts",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "Text::CSV" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://gitlab.com/rnewsham/mozilla-intermediatecerts.git",
+         "web" : "https://gitlab.com/rnewsham/mozilla-intermediatecerts"
+      }
+   },
+   "version" : "v0.0002",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+}
+

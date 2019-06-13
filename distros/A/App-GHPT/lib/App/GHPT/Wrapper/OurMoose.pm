@@ -4,7 +4,7 @@ package App::GHPT::Wrapper::OurMoose;
 
 use App::GHPT::Wrapper::Ourperl;
 
-our $VERSION = '1.000010';
+our $VERSION = '1.000011';
 
 use Import::Into;
 use Moose ();
@@ -32,7 +32,7 @@ sub import ( $class, @ ) {
 
 sub import_extras ( $, $for_class, $level ) {
     MooseX::SemiAffordanceAccessor->import( { into => $for_class } );
-    MooseX::StrictConstructor->import( { into => $for_class } );
+    MooseX::StrictConstructor->import(      { into => $for_class } );
 
     # note that we need to use a level here rather than a classname
     # so that importing autodie works

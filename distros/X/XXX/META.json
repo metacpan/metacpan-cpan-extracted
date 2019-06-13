@@ -54,7 +54,7 @@
          "web" : "https://github.com/ingydotnet/xxx-pm"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

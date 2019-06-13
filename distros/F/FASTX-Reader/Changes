@@ -1,6 +1,15 @@
 This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 Some APIs *can change* with the release of the first stable release (v 0.1).
 
+0.50	2019-06-13
+	* Added a control in new() that will stop parsing the file if it's binary (and not .gz)
+	* Added a new control in getFastqRead() to report truncated FASTQ files
+	* 'fqc': file without reads will print n/a instead of 0
+
+0.40	2019-06-13
+	* 'fqc': added '--verbose' feature, renamed tabular output switch to '-x/--screen' for consistency with Proch::N50
+	* 'fqc': improved  handling of non existing files, improved documentation
+
 0.32	2019-06-12
 	* Ships a script to count FASTA/FASTQ sequences called 'fqc' (see)
 	* Reader object new property 'compressed' (1 if reading .gz files, 0 otherwise)

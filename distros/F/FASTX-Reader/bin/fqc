@@ -19,41 +19,38 @@ my %output;
 my $sort_function;
 my $counter = 0;
 
+my $opt_invalid = 'n/a';
 my $opt_separator ="\t";
 my $opt_sortby = 'order';
-my ($opt_abs, $opt_basename, $opt_thousand, $opt_csv, $opt_json, $opt_rev, $opt_screen, $opt_tsv, $opt_help, $opt_pretty_json);
+my ($opt_abs, $opt_basename, $opt_thousand, $opt_fastx, $opt_csv, $opt_json, $opt_rev, $opt_screen, $opt_tsv, $opt_help, $opt_pretty_json, $opt_verbose);
 my $sort_direction = 'desc';
 my $_opt = GetOptions(
   'a|abspath'    => \$opt_abs,
   'b|basename'   => \$opt_basename,
   'c|csv'        => \$opt_csv,
   'd|thousandsep'=> \$opt_thousand,
-  's|sortby=s'   => \$opt_sortby,
+  'f|fastx'      => \$opt_fastx,
+  'h|help'       => \$opt_help,
   'j|json'       => \$opt_json,
   'p|pretty'     => \$opt_pretty_json,
   'r|reverse'    => \$opt_rev,
-  'tab'          => \$opt_screen,
+  's|sortby=s'   => \$opt_sortby,
   't|tsv'        => \$opt_tsv,
-  'h|help'       => \$opt_help,
+  'v|verbose'    => \$opt_verbose,
+  'x|screen'     => \$opt_screen,
+
 );
 
 
 init();
 
 
-
-
-
-
-
-
 foreach my $input_file (@ARGV) {
+  print STDERR " - Reading $input_file... " if ($opt_verbose);
   $counter++;
   my $print_name = $input_file;
   my $abs_path   = File::Spec->rel2abs($input_file);
-  if (! -e "$input_file") {
-    print STDERR color('red'), "[WARNING] ", color('reset'), "File <$input_file> not found. Skipping.\n";
-  }
+
   if ($opt_abs) {
     $print_name = $abs_path;
   } elsif ($opt_basename) {
@@ -61,9 +58,20 @@ foreach my $input_file (@ARGV) {
   }
   $output{$abs_path}{name} = $print_name;
   $output{$abs_path}{order} = $counter;
+
+  if (! -e "$input_file") {
+    
+    $output{$abs_path}{count} = $opt_invalid;
+    $output{$abs_path}{print_count} = $opt_invalid;
+    $output{$abs_path}{parser} = "NONE";
+    $output{$abs_path}{compressed} = "$opt_invalid";
+    print STDERR "NOT FOUND\r" if ($opt_verbose);
+    print STDERR color('red'), "[WARNING] ", color('reset'), "File <$input_file> not found. Skipping.\n";
+    next;
+  }
   my  $seq_reader = FASTX::Reader->new({filename => "$input_file"});
 
-  if ($input_file=~/(\.fastq|\.fq)/) {
+  if ($input_file=~/(\.fastq|\.fq)/ and not defined $opt_fastx) {
     # parse FASTQ
     while (my $seq = $seq_reader->getFastqRead()) {
       next;
@@ -71,8 +79,9 @@ foreach my $input_file (@ARGV) {
     $output{$abs_path}{count} = $seq_reader->{counter};
     $output{$abs_path}{parser} = 'FASTQ';
     if ($seq_reader->{status} == 0) {
-      $output{$abs_path}{count} = 'n/a';
-    }
+      $output{$abs_path}{count} = "$opt_invalid";
+      $output{$abs_path}{print_count} = "$opt_invalid";
+    }  
   } else {
     # generic FASTX parser
     while (my $seq = $seq_reader->getRead()) {
@@ -81,20 +90,23 @@ foreach my $input_file (@ARGV) {
     $output{$abs_path}{parser} = 'FASTX';
     $output{$abs_path}{count} = $seq_reader->{counter};
   }
-
+  $output{$abs_path}{count} = $opt_invalid unless (defined $output{$abs_path}{count});
   $output{$abs_path}{compressed}  = $seq_reader->{compressed};
   $output{$abs_path}{print_count} = $output{$abs_path}{count};
   $output{$abs_path}{print_count} =~ s/(\d{1,3}?)(?=(\d{3})+$)/$1,/g if ($opt_thousand);
+  print STDERR $output{$abs_path}{print_count}, "     \r" if ($opt_verbose);
 }
 
+print STDERR "\n" if ($opt_verbose);
 
 # PRINT OUTPUT
 
 if ($opt_json) {
+  print STDERR "Printing output in JSON format:\n" if ($opt_verbose);
   print encode_json(\%output);
 } elsif ($opt_pretty_json) {
+  print STDERR "Printing output in JSON (PRETTY_PRINT) format:\n" if ($opt_verbose);
   my $json = JSON::PP->new->ascii->pretty->allow_nonref;
-
   print $json->encode( \%output );
 
 } elsif ($opt_csv or $opt_tsv) {
@@ -108,6 +120,7 @@ if ($opt_json) {
     ), "\n";
   }
 } elsif ($opt_screen) {
+  print STDERR "Printing output in ASCII tabular format:\n" if ($opt_verbose);
   my $t = Text::ASCIITable->new();
   $t->setCols('#','Name','Seqs', 'Gz','Parser');
   foreach my $r (sort $sort_function  keys %output  ) {
@@ -124,6 +137,7 @@ if ($opt_json) {
 
 } else {
   # Default: only name and counts
+  print STDERR "Printing output in default format:\n" if ($opt_verbose);
   foreach my $r (sort $sort_function  keys %output  ) {
     print join("$opt_separator", $output{$r}->{name}, $output{$r}->{print_count}), "\n";
   }
@@ -133,6 +147,17 @@ sub init {
 
   pod2usage({-exitval => 0, -verbose => 2}) if $opt_help;
 
+  if (! defined $ARGV[0]) {
+    print STDERR<<END;
+    fqc - FASTA/FASTQ counter $FASTX::Reader::VERSION
+    ---------------------------------------------------------------
+    USAGE:
+    fqc [options] FILE1 FILE2 ... FILEn
+
+    fqc --help for full manual
+
+END
+  }
   my $count_options = 0;
   $count_options++ if (defined $opt_screen);
   $count_options++ if (defined $opt_json);
@@ -141,14 +166,14 @@ sub init {
   $count_options++ if (defined $opt_pretty_json);
 
   die "FATAL ERROR:\n",
-  "Just select one (or none) output format: either --csv, --tsv, --screen  or --json (none for default)\n" if ($count_options>1);
+  "Just select one (or none) output format: either --csv, --tsv, --screen  or --json (none for default).\n" if ($count_options>1);
   if ($opt_screen) {
     eval {
       require Text::ASCIITable;
       Text::ASCIITable->import();
     };
     if ($@) {
-      print STDERR " WARNING: Text::ASCIITable not found, rolling back to default output\n";
+      print STDERR " WARNING: Text::ASCIITable not found, rolling back to default output.\n";
       $opt_screen = undef;
     }
   }
@@ -160,8 +185,8 @@ sub init {
   our %sorters = (
      num_asc         => sub { $output{$b}{$opt_sortby} <=> $output{$a}{$opt_sortby} },
      num_desc        => sub { $output{$a}{$opt_sortby} <=> $output{$b}{$opt_sortby} },
-     string_asc      => sub { $a cmp $b },
-     string_desc     => sub { $b cmp $a },
+     string_desc     => sub { $a cmp $b },
+     string_asc      => sub { $b cmp $a },
   );
 
   my %valid_sort = (
@@ -193,7 +218,7 @@ fqc - A FASTA/FASTQ sequence counter
 
 =head1 VERSION
 
-version 0.32
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -212,7 +237,7 @@ changed with options.
 
 =head2 FILE NAME
 
-=over 12
+=over 4
 
 =item I<-a, --abspath>
 
@@ -234,7 +259,7 @@ Print reads number with a "," used as thousand separator
 Default output format is the filename and reads counts, tab separated. Options formatting
 either filename (C<-a>, C<-b>) and reads counts (C<-d>) will still work.
 
-=over 12
+=over 4
 
 =item I<-t, --tsv> and I<-c, --csv>
 
@@ -248,9 +273,11 @@ Print full output in JSON format.
 
 Same as JSON but in "pretty" format.
 
-=item I<--tab>
+=item I<-x, --screen>
 
+This feature requires L<Term::ASCIITable>.
 Print an ASCII-art table like:
+
   .---------------------------------------------------.
   | # | Name                     | Seqs | Gz | Parser |
   +---+--------------------------+------+----+--------+
@@ -260,13 +287,11 @@ Print an ASCII-art table like:
   | 4 | data/compressed.fastq.gz |    3 |  1 | FASTQ  |
   '---+--------------------------+------+----+--------'
 
-This feature requires L<Term::ASCIITable>.
-
 =back
 
 =head2 SORTING
 
-=over 12
+=over 4
 
 =item I<-s, --sortby>
 
@@ -278,6 +303,24 @@ See C<-r, --reverse>.
 =item I<-r, --reverse>
 
 Reverse the sorting order.
+
+=back
+
+=head2 OTHER
+
+=over 4
+
+=item I<-f, --fastx>
+
+Force FASTX reader also for files ending by .fastq or .fq (by default would use getFastqRead() )
+
+=item I<-v, --verbose>
+
+Increase verbosity
+
+=item I<-h, --help>
+
+Display this help page
 
 =back
 

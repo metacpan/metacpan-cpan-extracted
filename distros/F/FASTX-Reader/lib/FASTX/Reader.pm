@@ -1,9 +1,9 @@
 package FASTX::Reader;
-use 5.012;
+use 5.014;
 use warnings;
 use Carp qw(confess);
 
-$FASTX::Reader::VERSION = '0.32';
+$FASTX::Reader::VERSION = '0.50';
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
 
 use constant GZIP_SIGNATURE => pack('C3', 0x1f, 0x8b, 0x08);
@@ -42,9 +42,15 @@ sub new {
          } else {
 	         open  $fh, '-|', "$GZIP_BIN -dc $self->{filename}" or confess "Error opening gzip file ", $self->{filename}, ": $!\n";
          }
+      } elsif (-B $self->{filename}) {
+          # BINARY FILE NOT SUPPORTED?
+          close $fh;
+          $self->{fh}      = undef;
+          $self->{status}  = 1;
+          $self->{message} = 'Binary file not supported';
       } else {
 	       close $fh;
-      	 open $fh,  '<:encoding(UTF-8)', $self->{filename} or confess "Unable to read file ", $self->{filename}, ": ", $!, "\n";
+      	 open $fh,  '<:encoding(utf8)', $self->{filename} or confess "Unable to read file ", $self->{filename}, ": ", $!, "\n";
       }
       $object->{fh} = $fh;
     } else {
@@ -54,10 +60,15 @@ sub new {
     return $object;
 }
 
+
+
 sub getRead {
   my $self   = shift;
   #my ($fh, $aux) = @_;
   my $fh = $self->{fh};
+
+  return undef if (defined $self->{status} and $self->{status} == 0);
+
   my $aux = $self->{aux};
   my $return;
   @$aux = [undef, 0] if (!(@$aux));	# remove deprecated 'defined'
@@ -122,14 +133,26 @@ sub getRead {
 sub getFastqRead {
   my $self   = shift;
   my $seq_object = undef;
+
+  return undef if (defined $self->{status} and $self->{status} == 0);
+ 
+  $self->{status} = 1;
   my $header = readline($self->{fh});
   my $seq    = readline($self->{fh});
   my $check  = readline($self->{fh});
   my $qual   = readline($self->{fh});
-  $self->{status} = 1;
+  
 
   # Check 4 lines were found (FASTQ)
-  return undef unless (defined $qual);
+
+  unless (defined $qual) {
+    if (defined $header) {
+      $self->{message} = "Unknown format: FASTQ truncated at " . $header . "?";
+      $self->{status} = 0;   
+    }
+    return undef;
+  }
+
   # Fast format control: header and separator
   if ( (substr($header, 0, 1) eq '@') and (substr($check, 0, 1) eq '+') ) {
     chomp($header);
@@ -169,7 +192,8 @@ sub getFileFormat {
   my ($filename) = shift;
   return 0 if (not defined $filename);
   return $filename if (not -e "$filename");
-  open my $f, '<:encoding(UTF-8)', "$filename" || confess "Unable to read $filename\n$!\n";
+
+  open my $f, '<:encoding(utf8)', "$filename" || confess "Unable to read $filename\n$!\n";
   my $first = readline($f);
   if (substr($first, 0,1) eq '>') {
     #should be FASTA
@@ -217,7 +241,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, based on He
 
 =head1 VERSION
 
-version 0.32
+version 0.50
 
 =head1 SYNOPSIS
 

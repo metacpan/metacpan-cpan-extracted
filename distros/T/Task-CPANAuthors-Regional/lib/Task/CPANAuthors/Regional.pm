@@ -1,21 +1,21 @@
 package Task::CPANAuthors::Regional;
-$Task::CPANAuthors::Regional::VERSION = '1.001';
+$Task::CPANAuthors::Regional::VERSION = '1.002';
 use strict;
 use warnings;
 
 'BOOK';
 
+__END__
 
-
-=pod
+=encoding utf8
 
 =head1 NAME
 
-Task::CPANAuthors::Regional
+Task::CPANAuthors::Regional - All regional Acme::CPANAuthors modules at once
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -29,12 +29,6 @@ version 1.001
 
 This tasks installs all L<Acme::CPANAuthors> modules that list CPAN authors
 by nationality, language, country or region.
-
-=encoding utf8
-
-=head1 NAME
-
-Task::CPANAuthors::Regional - All regional Acme::CPANAuthors modules at once
 
 =head1 CONTENT
 
@@ -82,6 +76,8 @@ L<Acme::CPANAuthors::Japanese> - We are Japanese CPAN authors
 
 L<Acme::CPANAuthors::Korean> - We are Korean CPAN Authors! (우리는 CPAN Author 다!)
 
+L<Acme::CPANAuthors::Malaysian> - We are Malaysian CPAN authors (Kami para penulis CPAN Malaysia)
+
 L<Acme::CPANAuthors::Norwegian> - We are Norwegian CPAN authors
 
 L<Acme::CPANAuthors::Polish> - Jesteśmy autorami-Polakami modułów na CPAN
@@ -120,26 +116,11 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2014-2019 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Philippe Bruhat (BooK) <book@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by Philippe Bruhat (BooK).
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-
-
-__END__
-

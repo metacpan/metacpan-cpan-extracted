@@ -148,7 +148,7 @@ OUROBOROS_STATIC HV* ouroboros_gv_hv(pTHX_ GV*);
 OUROBOROS_STATIC CV* ouroboros_gv_cv(pTHX_ CV*);
 OUROBOROS_STATIC HV* ouroboros_sv_stash(pTHX_ SV*);
 OUROBOROS_STATIC void ouroboros_sv_stash_set(pTHX_ SV*, HV*);
-OUROBOROS_STATIC void ouroboros_cv_stash(pTHX_ CV*);
+OUROBOROS_STATIC HV* ouroboros_cv_stash(pTHX_ CV*);
 OUROBOROS_STATIC const char* ouroboros_hv_name(pTHX_ HV*);
 OUROBOROS_STATIC STRLEN ouroboros_hv_name_len(pTHX_ HV*);
 OUROBOROS_STATIC unsigned char ouroboros_hv_name_utf8(pTHX_ HV*);

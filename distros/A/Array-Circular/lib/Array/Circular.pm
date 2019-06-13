@@ -111,8 +111,11 @@ sub current_and_previous {
 sub peek {
     my ($self, $count) = @_;
     return $self->current if $count == 0;
-    my $val = $self->next($count);
-    $self->prev($count);
+    my $meth = $count > 0 ? 'next': 'prev';
+    my $undo = $count > 0 ? 'prev': 'next';
+    $count = abs $count;
+    my $val = $self->$meth($count);
+    $self->$undo($count);
     return $val;
 }
 

@@ -4,13 +4,13 @@
       "Jean Forget <JFORGET@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DateTime-Calendar-FrenchRevolutionary",
    "no_index" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "DateTime::Calendar::FrenchRevolutionary" : {
          "file" : "lib/DateTime/Calendar/FrenchRevolutionary.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -66,5 +66,6 @@
          "web" : "https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary"
       }
    },
-   "version" : "0.14"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

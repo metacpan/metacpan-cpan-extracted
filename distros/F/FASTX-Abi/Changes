@@ -1,10 +1,21 @@
 This is the changelog for FASTX::Abi. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 
+0.07	2019-06-14
+	* Fixed a bug in fixed_quality for heterozigous sequences
+	* Updated 'ab2fq.pl' to accept fixed quality
+	* Added unit test
+
+0.06	2019-06-13
+	* get_fastq() now accepts a second parameter: fixed quality for each nucleotide
+	* get_fastq() now replaces spaces in the sequence name with a "_"
+	* Shipping a simple 'ab2fq.pl' conversion program
+	* Moved author tests to xt/release
+	* Minor POD and code comments updates
 
 0.05	2019-05-17
 	* Extended existing unit tests; New unit test on trimming behaviour
 	* FIXED: Property 'discard' was previously not covered
-
+  
 0.04	2019-05-16
 	* Added unit tests on "keep_abi"
 	* Update README.md

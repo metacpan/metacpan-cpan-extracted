@@ -6,10 +6,18 @@ use Bio::Trace::ABIF;
 use Data::Dumper;
 use File::Basename;
 
-$FASTX::Abi::VERSION = '0.05';
+$FASTX::Abi::VERSION = '0.08';
+
 #ABSTRACT: Read Sanger trace file (chromatograms) in FASTQ format. For traces called with I<hetero> option, the ambiguities will be split into two sequences to allow usage from NGS tools that usually do not understand IUPAC ambiguities.
 
-our @valid_new_attributes = ('filename', 'trim_ends', 'wnd', 'min_qual', 'bad_bases', 'keep_abi');
+our @valid_new_attributes = (
+  'filename',   # *REQUIRED* input trace filepath 
+  'trim_ends',  # bool (default: 1) trim low quality ends
+  'wnd',        # int (default: 16) sliding window for quality trim
+  'min_qual',   # int (default: 22) threshold for low quality calls
+  'bad_bases',  # int (default: 2)  maximum number of low quality bases per window
+  'keep_abi',   # bool (default: 0) import the Bio::Trace::ABIF object in FASTX::Abi (otherwise deleted after import)
+);
 our @valid_obj_attributes = (
   'diff',             # number of ambiguous bases
   'diff_array',       # array of ambiguous bases position
@@ -118,24 +126,38 @@ sub new {
 
 
 sub get_fastq {
-  my ($self, $name) = @_;
+  my ($self, $name, $quality_value) = @_;
 
   if (not defined $name) {
     $name = $self->{sequence_name};
+  } elsif ($name=~/\s+/) {
+    $name =~s/\s+/_/g;
+  }
+
+  my $quality = $self->{quality};
+  if (defined $quality_value) {
+    if ($quality_value =~/^\d+$/ and $quality_value >= 10) {
+      my $q = chr(($quality_value <= 93 ? $quality_value : 93) + 33);
+      $quality = $q x length($quality);
+    } elsif (length($quality_value) == 1) {
+      $quality = $quality_value x length($quality);
+    } else {
+      confess("Supplied quality is neither a valid integer or a single char: <$quality_value>\n");
+    }
   }
 
   my $output = '';
   if ( $self->{iso_seq} ) {
     $output .= '@' . $name . "\n" .
                 $self->{seq1} . "\n+\n" .
-                $self->{quality} . "\n";
+                $quality . "\n";
   } else {
     $output .= '@' . $name . "_1\n" .
                 $self->{seq1} . "\n+\n" .
-                $self->{quality} . "\n";
+                $quality . "\n";
     $output .= '@' . $name . "_2\n" .
                 $self->{seq2} . "\n+\n" .
-                $self->{quality} . "\n";
+                $quality . "\n";
   }
   return $output;
 }
@@ -262,21 +284,22 @@ FASTX::Abi - Read Sanger trace file (chromatograms) in FASTQ format. For traces 
 
 =head1 VERSION
 
-version 0.05
+version 0.08
 
 =head1 SYNOPSIS
 
   use FASTX::Abi;
-  my $filepath = '/path/to/trace.ab1';
-
-  my $trace_fastq = FASTX::Abi->new({ filename => "$filepath" });
+  my $trace_fastq = FASTX::Abi->new({ filename => '/path/to/trace.ab1' });
 
   # Print chromatogram as FASTQ (will print two sequences if there are ambiguities)
   print $trace_fastq->get_fastq();
 
-=head1 TEST
+=head1 BUILD STATUS
 
-=for html <a href="https://travis-ci.org/telatin/FASTX-Abi"><img src="https://travis-ci.org/telatin/FASTX-Abi.svg?branch=master"></a>
+=for html <p><a href="https://travis-ci.org/telatin/FASTX-Abi" title="Test report"><img alt="TravisCI tests badge" src="https://travis-ci.org/telatin/FASTX-Abi.svg?branch=master"></a></p>
+
+The source from GitHub is tested using Travis-CI for continuous integration. Please, check the CPAN grid test for a better estimate of 
+build success using CPAN version of interest. 
 
 =head1 HETERO CALLING (IUPAC AMBIGUITIES)
 
@@ -342,11 +365,21 @@ Maximum number of bad bases per window
 
 =back
 
-=head2 B<get_fastq($sequence_name)>
+=head2 B<get_fastq($sequence_name, $fixed_quality)>
 
 Return a string with the FASTQ formatted sequence (if no ambiguities) or two
 sequences (if at least one ambiguity is found).
-If no I<$sequence_name> is provided, the header will be made from the AB1 filename.
+
+If no C<$sequence_name> is provided, the header will be made from the AB1 filename. If C<$sequence_name> is defined and contains spaces,
+they will converted to underscores.
+
+The C<$fixed_quality> is a user provided fixed quality value for each base printed. Can be an integer (10 < x < 40), or a single char.
+In the first case it will be encoded as quality score (values above 93 will all be rendered as C<~>), in the second case the character 
+will be used as quality score. If not supplied the original
+quality of the chromatogram will be used (that B<will be very low in SNPs positions>). 
+
+  # Use 40 as quality for each base of the trace:
+  $trace->get_fastq(undef, 40);
 
 =head2 get_trace_info()
 

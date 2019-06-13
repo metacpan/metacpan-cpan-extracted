@@ -1,7 +1,9 @@
-package MToken::Server; # $Id: Server.pm 43 2017-07-31 13:04:58Z minus $
+package MToken::Server; # $Id: Server.pm 70 2019-06-09 18:25:29Z minus $
 use strict;
 use warnings FATAL => 'all';
 use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -9,7 +11,7 @@ MToken::Server - mod_perl2 server for storing backups of MToken devices
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -92,11 +94,11 @@ This function provides removing the backup file from directory
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
 
 =head1 DEPENDENCIES
 
-L<LWP>, C<mod_perl2>, L<CTK>, C<openssl>, C<gnupg>
+L<LWP>, C<mod_perl2>, L<CTK>
 
 =head1 TO DO
 
@@ -108,34 +110,27 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-C<perl>, L<CTK>, L<mod_perl2>
+L<CTK>, L<mod_perl2>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = "1.00";
+$VERSION = "1.01";
 
 use Encode;
 use Encode::Locale;
@@ -154,17 +149,34 @@ use APR::Const -compile => qw/ :common /;
 use APR::Table ();
 
 use CGI -compile => qw/ :all /;
-use JSON;
+use CTK::Serializer;
 use File::Spec;
 use File::Find;
 use File::Basename;
 
-use MToken::Util;
+use MToken::Util qw/filesize md5sum sha1sum/;
 
 use constant {
-        PREFIX => "MToken",
-        LOCATION => "/mtoken",
-        DATE_FORMAT => "%D %H:%M:%S %Z",
+        PREFIX              => "MToken",
+        LOCATION            => "/mtoken",
+        DATE_FORMAT         => "%D %H:%M:%S %Z",
+        CONTENT_TYPE        => "application/json; charset=utf-8",
+        SERIALIZE_FORMAT    => 'json',
+        SR_ATTRS            => {
+            json => [
+                { # For serialize
+                    utf8 => 0,
+                    pretty => 1,
+                    allow_nonref => 1,
+                    allow_blessed => 1,
+                },
+                { # For deserialize
+                    utf8 => 0,
+                    allow_nonref => 1,
+                    allow_blessed => 1,
+                },
+            ],
+        },
         OBJECTS_REQUIRED => [qw/
                 index_post
             /],
@@ -195,7 +207,7 @@ sub handler {
     Apache2::RequestUtil->request($r);
     $r->handler('modperl');
     my $q = new CGI if $r->method ne 'PUT';
-    $r->content_type('application/json; charset=utf-8');
+    $r->content_type(CONTENT_TYPE);
     my $uri = $r->uri || ""; $uri =~ s/\/+$//;
     my $location = $r->location || LOCATION; $location =~ s/\/+$//;
     my $blank = {
@@ -203,12 +215,14 @@ sub handler {
             error   => [],
             request_object => scalar($q ? $q->param("object") : ''),
             data    => {
-                    started => $r->request_time,
-                    startedfmt => decode(locale => Apache2::Util::ht_time($r->pool, $r->request_time, DATE_FORMAT, 0)),
-                    method => $r->method,
-                    location => $location,
-                    uri => $uri,
-                    qs  => $r->args || "",
+                    started     => $r->request_time,
+                    startedfmt  => decode(locale => Apache2::Util::ht_time(
+                            $r->pool, $r->request_time, DATE_FORMAT, 0
+                        )),
+                    method      => $r->method,
+                    location    => $location,
+                    uri         => $uri,
+                    qs          => $r->args || "",
                 },
         };
     my %json = %$blank;
@@ -491,11 +505,32 @@ sub file_delete {
 sub _output {
     my $r = shift;
     my $json = shift;
+    my $notes = $r->notes;
     my $tm = time();
     $json->{data}{finished} = $tm;
     $json->{data}{finishedfmt} = decode(locale => Apache2::Util::ht_time($r->pool, $tm, DATE_FORMAT, 0));
 
-    my $output = to_json($json, { utf8  => 0, pretty => 1, });
+    # Serializer
+    my $sr = new CTK::Serializer(SERIALIZE_FORMAT, attrs => SR_ATTRS);
+    unless ($sr->status) {
+        my $errmsg = sprintf("Can't create json serializer: %s", $sr->error);
+        _error($errmsg);
+        $ENV{REDIRECT_ERROR_NOTES} = $errmsg;
+        $r->subprocess_env(REDIRECT_ERROR_NOTES => $errmsg);
+        $notes->set('error-notes' => $errmsg);
+        return Apache2::Const::SERVER_ERROR;
+    }
+
+    my $output = $sr->serialize($json);
+    unless ($sr->status) {
+        my $errmsg = sprintf("Can't serialize structure: %s", $sr->error);
+        _error($errmsg);
+        $ENV{REDIRECT_ERROR_NOTES} = $errmsg;
+        $r->subprocess_env(REDIRECT_ERROR_NOTES => $errmsg);
+        $notes->set('error-notes' => $errmsg);
+        return Apache2::Const::SERVER_ERROR;
+    }
+
     $r->headers_out->set('Accept-Ranges', 'none');
     $r->set_content_length(length(Encode::encode_utf8($output)) || 0);
     return Apache2::Const::OK if uc($r->method) eq "HEAD";
@@ -521,7 +556,7 @@ sub _debug {
     $r->log->debug(sprintf("%s> %s", PREFIX, $msg)); # ---> Request ok :=)"
     return 1;
 }
-sub _error {
+sub _error { # Log error
     my $msg = shift;
     return 0 unless defined $msg;
     my $r = Apache2::RequestUtil->request();

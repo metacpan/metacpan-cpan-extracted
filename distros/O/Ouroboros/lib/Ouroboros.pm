@@ -157,7 +157,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT = qw();
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 require XSLoader;
 XSLoader::load('Ouroboros', $VERSION);
@@ -858,7 +858,7 @@ Perl macro: C<SvSTASH_set>
 
 =item ouroboros_cv_stash_ptr
 
-    OUROBOROS_STATIC void ouroboros_cv_stash(pTHX_ CV*);
+    OUROBOROS_STATIC HV* ouroboros_cv_stash(pTHX_ CV*);
 
 Perl macro: C<CvSTASH>
 

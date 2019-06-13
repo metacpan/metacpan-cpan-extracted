@@ -1,12 +1,12 @@
 package WordList::HTTP::UserAgentString::PERLANCAR;
 
-our $DATE = '2019-04-04'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("longest_word_len",113,"avg_word_len",89.25,"num_words_contains_whitespace",4,"num_words_contains_nonword_chars",4,"num_words_contains_unicode",0,"num_words",4,"shortest_word_len",68); # STATS
+our %STATS = ("longest_word_len",113,"avg_word_len",89.25,"num_words",4,"num_words_contains_nonword_chars",4,"shortest_word_len",68,"num_words_contains_whitespace",4,"num_words_contains_unicode",0); # STATS
 
 1;
 # ABSTRACT: A selection of some HTTP User-Agent strings
@@ -21,7 +21,7 @@ WordList::HTTP::UserAgentString::PERLANCAR - A selection of some HTTP User-Agent
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::HTTP::UserAgentString::PERLANCAR (from Perl distribution WordList-HTTP-UserAgentString-PERLANCAR), released on 2019-04-04.
+This document describes version 0.002 of WordList::HTTP::UserAgentString::PERLANCAR (from Perl distribution WordList-HTTP-UserAgentString-PERLANCAR), released on 2019-06-11.
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 __DATA__
-Mozilla/5.0 (Windows NT 6.1; WOW64; rv:66.0) Gecko/20100101 Firefox/66.0
+Mozilla/5.0 (Windows NT 6.1; WOW64; rv:67.0) Gecko/20100101 Firefox/67.0
 Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36
 Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36
-Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0
+Mozilla/5.0 (X11; Linux x86_64; rv:67.0) Gecko/20100101 Firefox/67.0

@@ -1,5 +1,8 @@
-package MToken::Const; # $Id: Const.pm 43 2017-07-31 13:04:58Z minus $
+package MToken::Const; # $Id: Const.pm 72 2019-06-11 07:28:00Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ MToken::Const - Interface for MToken Constants
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -23,11 +26,7 @@ Returns name of the project
 
 =head1 HISTORY
 
-See C<CHANGES> file
-
-=head1 DEPENDENCIES
-
-L<CTKlib|http://search.cpan.org/~abalama/CTKlib/>
+See C<Changes> file
 
 =head1 TO DO
 
@@ -39,29 +38,22 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-L<CTKlib|http://search.cpan.org/~abalama/CTKlib/>
+L<MToken>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
@@ -70,15 +62,23 @@ use constant {
         PROJECT             => 'mtoken',
         PROJECTNAME         => 'mtoken',
         PREFIX              => 'mtoken',
+        HOSTNAME            => 'localhost',
+        DEFAULT_URL         => 'http://localhost',
         MSWIN               => $^O =~ /mswin/i ? 1 : 0,
         DIR_KEYS            => 'keys',
         DIR_CERTS           => 'certs',
         DIR_ETC             => 'etc',
         DIR_BACKUP          => 'backup',
         DIR_RESTORE         => 'restore',
-        DIR_TMP             => '.tmp',
+        DIR_TMP             => $^O =~ /mswin/i ? 'tmp' : '.tmp',
+        GLOBAL_CONF_FILE    => 'mtoken.conf',
+        LOCAL_CONF_FILE     => '.mtoken',
+		PWCACHE_FILE        => '.pwcache',
+
         PUBLIC_GPG_KEY      => 'public.key',
         PRIVATE_GPG_KEY     => 'private.key',
+        MY_PUBLIC_KEY       => 'mypublic.key',
+        MY_PRIVATE_KEY      => 'myprivate.key',
         GPGCONFFILE         => 'gpg.conf',
         GPGBIN              => 'gpg',
         OPENSSLBIN          => 'openssl',
@@ -101,16 +101,17 @@ use constant {
 
 use base qw/Exporter/;
 
-use Carp; # carp - warn; croak - die;
-
 use vars qw/$VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # Named groups of exports
 %EXPORT_TAGS = (
     'GENERAL' => [qw/
         PROJECT PROJECTNAME PREFIX
+        HOSTNAME DEFAULT_URL
         DIR_KEYS DIR_CERTS DIR_ETC DIR_BACKUP DIR_RESTORE DIR_TMP
+        GLOBAL_CONF_FILE LOCAL_CONF_FILE PWCACHE_FILE
+        MY_PUBLIC_KEY MY_PRIVATE_KEY
         GPGCONFFILE PUBLIC_GPG_KEY PRIVATE_GPG_KEY
         MSWIN
         OPENSSLBIN GPGBIN

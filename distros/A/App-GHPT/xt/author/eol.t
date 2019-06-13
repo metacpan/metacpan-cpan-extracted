@@ -25,6 +25,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/lib/App/GHPT/Wrapper/OurTest/Class/Moose.pm',
+    't/lib/Helper/MockPTAPI.pm',
     't/lib/Helper/QuestionNamespace1/Question.pm',
     't/lib/Helper/QuestionNamespace2/Question.pm',
     't/lib/TestFor/App/GHPT/WorkSubmitter.pm',

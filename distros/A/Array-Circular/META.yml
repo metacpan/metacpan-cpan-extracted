@@ -2,7 +2,9 @@
 abstract: 'Provide an array data structure that can go around in circles'
 author:
   - 'Kieren Diment <zarquon@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,5 +17,5 @@ name: Array-Circular
 resources:
   bugtracker: https://github.com/singingfish/p5-array-circular/issues
   repository: git://github.com/singingfish/p5-array-circular.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.70'

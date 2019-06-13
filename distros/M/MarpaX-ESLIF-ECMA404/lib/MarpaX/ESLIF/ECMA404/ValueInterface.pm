@@ -10,7 +10,7 @@ our $FFFD = chr(0xFFFD);
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Value Interface
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -169,7 +169,7 @@ MarpaX::ESLIF::ECMA404::ValueInterface - MarpaX::ESLIF::ECMA404 Value Interface
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

@@ -52,10 +52,9 @@ subtest 'test reset' => sub {
 for ( 1 .. $a->size * 2) {
     subtest "test peek and size for starting index $_" => sub {
         for (0 .. $a->size *2 ) {
-            $DB::single=1;
             my $expected = $a->peek($_);
             my $idx = ($_ + $a->index) % $a->size;
-            diag "Peek index is $idx";
+            # diag "Peek index is $idx";
             my $got = $a->[$idx];
             is $got, $expected, "peeking $_: $expected and $got are the same";
         }

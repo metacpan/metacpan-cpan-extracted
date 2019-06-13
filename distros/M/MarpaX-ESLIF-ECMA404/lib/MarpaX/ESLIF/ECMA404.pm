@@ -6,13 +6,13 @@ package MarpaX::ESLIF::ECMA404;
 
 # ABSTRACT: JSON Data Interchange Format following ECMA-404 specification
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 
 use Carp qw/croak/;
-use MarpaX::ESLIF 3.0.9;
+use MarpaX::ESLIF 3.0.12;
 use MarpaX::ESLIF::ECMA404::RecognizerInterface;
 use MarpaX::ESLIF::ECMA404::ValueInterface;
 use Scalar::Util qw/looks_like_number/;
@@ -153,7 +153,7 @@ MarpaX::ESLIF::ECMA404 - JSON Data Interchange Format following ECMA-404 specifi
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,7 @@ value    ::= string
 # -----------
 # JSON object
 # -----------
-object   ::= '{' inc members '}' dec                                                action         => ::copy[2]
+object   ::= '{' members '}'                                                        action         => ::copy[2]
 members  ::= pairs*                                                                 action         => members   # Returns { @{pairs1}, ..., @{pair2} }
                                                                                     separator      => comma     # ... separated by comma
                                                                                     proper         => 1         # ... with no trailing separator
@@ -291,7 +291,7 @@ pairs    ::= string (-':'-) value                                               
 # -----------
 # JSON Arrays
 # -----------
-array    ::= '[' inc elements ']' dec                                               action         => ::copy[2] # Returns elements
+array    ::= '[' elements ']'                                                       action         => ::copy[2] # Returns elements
 elements ::= value*                                                                 action         => ::row     # Returns [ value1, ..., valuen ]
                                                                                     separator      => comma     # ... separated by comma
                                                                                     proper         => 1         # ... with no trailing separator
@@ -305,12 +305,10 @@ number ::= /-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/ # /* bignum */
 # -----------
 # JSON String
 # -----------
-string     ::= '"' discardOff chars '"' discardOn                                   action => ::copy[2]               # Only chars is of interest
-discardOff ::=                                                                      action => ::undef                 # Nullable rule used to disable discard
-discardOn  ::=                                                                      action => ::undef                 # Nullable rule used to enable discard
+string ::= '"' chars '"'                                                            action => ::copy[2]         # Only chars is of interest
 
-event :discard[on]  = nulled discardOn                                              # Implementation of discard disabing using reserved ':discard[on]' keyword
-event :discard[off] = nulled discardOff                                             # Implementation of discard enabling using reserved ':discard[off]' keyword
+:terminal ::= '"' pause => after event => :discard[switch]
+
 chars   ::= filled
 filled  ::= char+                                                                   action => ::concat
 chars   ::=                                                                         action => ::u8""
@@ -329,12 +327,6 @@ char    ::= /[^"\\\x00-\x1F]+/                                                  
 # Unsignificant whitespaces
 # -------------------------
 :discard ::= /[\x{9}\x{A}\x{D}\x{20}]+/
-
-# -------------------------------------------
-# Nullable rules for eventual depth extension
-# -------------------------------------------
-inc ::=                                                        action => ::undef
-dec ::=                                                        action => ::undef
 
                    #######################################################
                    # >>>>>>>>>>>>>>>>>> JSON Extensions <<<<<<<<<<<<<<<<<<
@@ -358,8 +350,10 @@ dec ::=                                                        action => ::undef
 # --------------------------
 # Max depth extension
 # --------------------------
-# /* max_depth */event inc[] = nulled inc                                                        # Increment depth
-# /* max_depth */event dec[] = nulled dec                                                        # Decrement depth
+# /* max_depth */:terminal ::= '[' pause => after event => inc[]
+# /* max_depth */:terminal ::= ']' pause => after event => dec[]
+# /* max_depth */:terminal ::= '{' pause => after event => inc[]
+# /* max_depth */:terminal ::= '}' pause => after event => dec[]
 
 # ----------------
 # Number extension

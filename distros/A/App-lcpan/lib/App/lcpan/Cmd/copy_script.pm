@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::copy_script;
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '1.032'; # VERSION
+our $DATE = '2019-06-07'; # DATE
+our $VERSION = '1.033'; # VERSION
 
 use 5.010;
 use strict;
@@ -109,7 +109,7 @@ App::lcpan::Cmd::copy_script - Copy a script's latest release file to current di
 
 =head1 VERSION
 
-This document describes version 1.032 of App::lcpan::Cmd::copy_script (from Perl distribution App-lcpan), released on 2019-01-09.
+This document describes version 1.033 of App::lcpan::Cmd::copy_script (from Perl distribution App-lcpan), released on 2019-06-07.
 
 =head1 FUNCTIONS
 

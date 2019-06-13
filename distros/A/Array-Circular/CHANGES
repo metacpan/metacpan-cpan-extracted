@@ -1,3 +1,6 @@
+0.006 13/6/2019
+  Add Test::More and Test::Exception as dependencies.
+  Handle negative numbers properly in peek function.
 0.005 6/06/2019
   improvements to peek method and tests.
 0.004 9/05/2019

@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "MarpaX::ESLIF::ECMA404",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "MarpaX::ESLIF" => "3.0.9",
+    "MarpaX::ESLIF" => "3.0.12",
     "Math::BigFloat" => 0,
     "Math::BigInt" => 0,
     "Scalar::Util" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More::UTF8" => 0,
     "Test::Trap" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "MarpaX::ESLIF" => "3.0.9",
+  "MarpaX::ESLIF" => "3.0.12",
   "Math::BigFloat" => 0,
   "Math::BigInt" => 0,
   "Scalar::Util" => 0,

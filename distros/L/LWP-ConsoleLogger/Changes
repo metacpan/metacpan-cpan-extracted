@@ -1,5 +1,8 @@
 Revision history for LWP-ConsoleLogger
 
+0.000042  2019-06-12 15:15:52Z
+    -  Don't rely on Mojo to be installed in tests (GH#18) (Olaf Alders)
+
 0.000041  2019-06-12 12:31:03Z
     - Bump minimum Mojo version required for tests (GH#17) (Olaf Alders)
     - Add support for Mojo::UserAgent to LWP::ConsoleLogger::Everywhere ((GH#16) simbabque)

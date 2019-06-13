@@ -4,7 +4,7 @@ use App::GHPT::Wrapper::Ourperl;
 
 use v5.20;
 
-our $VERSION = '1.000010';
+our $VERSION = '1.000011';
 
 1;
 
@@ -22,7 +22,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 =head1 VERSION
 
-version 1.000010
+version 1.000011
 
 =head1 SYNOPSIS
 
@@ -204,7 +204,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Florian Ragwitz Greg Oschwald Kevin Phair Mark Fowler Patrick Cronin
+=for stopwords Florian Ragwitz Greg Oschwald Kevin Phair Mark Fowler Narsimham Chelluri Patrick Cronin
 
 =over 4
 
@@ -226,13 +226,17 @@ Mark Fowler <mfowler@maxmind.com>
 
 =item *
 
+Narsimham Chelluri <nchelluri@maxmind.com>
+
+=item *
+
 Patrick Cronin <pcronin@maxmind.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

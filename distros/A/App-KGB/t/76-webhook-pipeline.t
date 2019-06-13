@@ -34,7 +34,7 @@ my $dir = tempdir(
     CLEANUP => $tmp_cleanup,
     DIR     => File::Spec->tmpdir
 );
-diag "Temp directory $dir will pe kept" unless $tmp_cleanup;
+diag "Temp directory $dir will be kept" unless $tmp_cleanup;
 
 my $test_bot = TestBot->start;
 

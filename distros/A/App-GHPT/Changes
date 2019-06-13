@@ -1,3 +1,10 @@
+1.000011 2019-06-12
+
+- Fix handling of project names. This used to be munged in a way that didn't
+  make any sense. Now we simply look for project names exactly as they're
+  passed on the command line. Fixed by Narsimham Chelluri. GH #25.
+
+
 1.000010 2018-01-04
 
 - Require the latest WebService::PivotalTracker, which is needed to include

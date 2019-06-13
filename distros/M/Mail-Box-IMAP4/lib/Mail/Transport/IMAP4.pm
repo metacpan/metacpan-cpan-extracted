@@ -8,7 +8,7 @@
 
 package Mail::Transport::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Transport::Receive';
 
@@ -53,9 +53,6 @@ sub init($)
 
 		$opts{Ssl} = [ %$ssl ] if ref $ssl eq 'HASH';
 
-use Data::Dumper;
-warn "CREATE IMAP ", Dumper \%opts;
-warn Dumper $args;
         $imap = $self->createImapClient($imap, %opts)
              or return undef;
     }

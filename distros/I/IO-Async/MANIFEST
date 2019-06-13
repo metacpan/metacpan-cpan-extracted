@@ -7,6 +7,7 @@ examples/readwrite-futures.pl
 examples/tail-logfile.pl
 examples/tcp-proxy.pl
 examples/whoami-server.pl
+lib/Future/IO/Impl/IOAsync.pm
 lib/IO/Async.pm
 lib/IO/Async/Channel.pm
 lib/IO/Async/Debug.pm
@@ -95,6 +96,7 @@ t/35loop-openprocess.t
 t/36loop-runchild.t
 t/37loop-child-root.t
 t/38loop-thread.t
+t/39loop-runproccess.t
 t/40channel.t
 t/41routine.t
 t/42function.t
@@ -107,6 +109,7 @@ t/61protocol-stream.t
 t/62protocol-linestream.t
 t/63handle-connect.t
 t/64handle-bind.t
+t/70future-io.t
 t/99pod.t
 t/StupidLoop.pm
 t/TimeAbout.pm

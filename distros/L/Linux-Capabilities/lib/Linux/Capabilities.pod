@@ -1,0 +1,312 @@
+=head1 NAME
+
+Linux::Capabilities - a class to manage capabilies in linux written in C.
+
+=head1 DESCRIPTION
+
+Linux::Capabilities contains a number of very fast useful functions, written in C.
+
+=head1 SYNOPSIS
+
+    use Linux::Capabilities;
+                       
+    my $caps_self = Linux::Capabilities->new;# Creating capabilities list for self proccess
+    my $caps_other = Linux::Capabilities->new(5432);# Creating capabilities list for proccess with pid 5432
+    my $caps_by_text = Linux::Capabilities->new("all=epi cap_chown-p");# Creating capabilities list from text as in system call cap_from_text
+    my $caps_empty = Linux::Capabilities->empty;# Creating empty capabilities set
+
+    print $caps_self->get_text;
+    my $all_caps = $caps_self0->get_all;# Hash with capabilities
+    my $cap_chown = $caps_self->get_value(CAP_CHOWN);
+    my $cap_kill_effective = $caps_self->get_value(CAP_KILL, CAP_EFFECTIVE);
+
+    $cap_self->raise;
+    $cap_self->raise(CAP_CHOWN);
+    $cap_self->raise([CAP_CHOWN, CAP_KILL]);
+    $cap_self->raise(CAP_CHOWN, CAP_EFFECTIVE);
+    $cap_self->raise(CAP_CHOWN, [CAP_EFFECTIVE, CAP_PERMITTED]);
+    $cap_self->raise([CAP_CHOWN, CAP_KILL], [CAP_EFFECTIVE, CAP_PERMITTED]);
+
+    $cap_self->drop;
+    $cap_self->drop(CAP_CHOWN);
+    $cap_self->drop([CAP_CHOWN, CAP_KILL]);
+    $cap_self->drop(CAP_CHOWN, CAP_EFFECTIVE);
+    $cap_self->drop(CAP_CHOWN, [CAP_EFFECTIVE, CAP_PERMITTED]);
+    $cap_self->drop([CAP_CHOWN, CAP_KILL], [CAP_EFFECTIVE, CAP_PERMITTED]);
+
+    $cap_self->submit;
+
+=head1 PERL FUNCTIONS
+
+Supposed usage: creating capabilities set with new, getting needed info with get_all, get_value, get_value_flag and is_supported, editing it with raise/drop, and then applying it with submit. 
+
+=head4 is_supported
+
+    $caps->is_supported(12);
+    Linux::Capabilities::is_supported(12);
+
+is_supported will return 1 if capability that you passed there is supported on your system and 0 otherwise.
+
+=head4 new
+
+    my $cap = Linux::Capability->new;
+
+returns object that is working with capability set
+
+=over
+
+=item new
+
+Object is created with capability set from current proccess.
+
+=item new(5432)
+
+Object is created with capability set from procces with pid that you pass to new.
+
+=item new("cap_chown=e")
+
+Object is created with capability set made from input string, as in system call cap_from_text in Linux.
+
+=back
+
+=head4 empty
+
+Object is created with clear capability set.
+
+=head4 get_text
+
+Returns text made from capability set, same as system call cap_to_text in Linux.
+
+    my $cap_text = Linux::Capabilities->new("cap_chown=p");
+
+$cap_text will be set to "cap_chown=p"
+
+=head4 get_all
+
+Returns capability set as hash reference:
+
+    my $caps = Linux::Capabilities->new("cap_chown=ep cap_kill=i");
+    my $cap_all = $caps->get_all;
+
+$cap_all will be set to:
+
+    {
+        cap_chown => {
+            effective => 1,
+            permitted => 1,
+            inheritable => 0
+        },
+        cap_kill => {
+            effective => 0,
+            permitted => 0,
+            inheritable => 1
+        }
+    }
+
+=head4 get_value
+
+Returns capability falgs as hash reference:
+
+    my $caps = Linux::Capabilities->new("cap_chown=ep cap_kill=i");
+    my $cap_chown = $cap_all->get_value(CAP_CHOWN);
+
+$cap_chown will be set to:
+
+    {
+        effective => 1,
+        permitted => 1,
+        inheritable => 0,
+    }
+
+=head4 get_value_flag
+
+Returns value of a flag in capability(i.e. flag effective in CAP_CHOWN);
+
+    my $caps = Linux::Capabilities->new("cap_chown=ep cap_kill=i");
+    my $cap_chown_eff = $cap_all->get_value_flag(CAP_CHOWN, CAP_EFFECTIVE);
+
+$cap_chown_eff will be set to 1
+
+=head4 raise
+
+raise is used to make flags state CAP_SET in your current capabilities set.
+
+=over
+
+=item raise
+
+    $caps->raise;
+
+this will raise all flags in all capabilities
+
+=item raise($values)
+
+    $caps->raise(CAP_CHOWN);
+    $caps->raise([CAP_CHOWN, CAP_KILL]);
+
+this will raise all flags in capability that you passed as an argument. Argument can be either single number(or constant from capabilities constants) or array of values.
+
+=item raise($values, $flags)
+
+    $caps->raise(CAP_CHOWN, CAP_EFFECTIVE);
+    $caps->raise([CAP_CHOWN, CAP_KILL], CAP_EFFECTIVE);
+    $caps->raise(CAP_CHOWN, [CAP_EFFECTIVE, CAP_PERMITTED]);
+    $caps->raise([CAP_CHOWN, CAP_KILL], [CAP_EFFECTIVE, CAP_PERMITTED]);
+
+this will raise a specific flag in capability that you passed as first argument, flag can be either single number(or constant from flag constants) or array of flags;
+
+=back
+
+=head4 drop
+
+drop is used to make flags state CAP_CLEAR in your current capabilities set.
+
+=over
+
+=item drop
+
+    $caps->drop;
+
+this will drop all flags in all capabilities
+
+=item drop($values)
+
+    $caps->drop(CAP_CHOWN);
+    $caps->drop([CAP_CHOWN, CAP_KILL]);
+
+this will drop all flags in capability that you passed as an argument. Argument can be either single number(or constant from capabilities constants) or array of values.
+
+=item drop($values, $flags)
+
+    $caps->drop(CAP_CHOWN, CAP_EFFECTIVE);
+    $caps->drop([CAP_CHOWN, CAP_KILL], CAP_EFFECTIVE);
+    $caps->drop(CAP_CHOWN, [CAP_EFFECTIVE, CAP_PERMITTED]);
+    $caps->drop([CAP_CHOWN, CAP_KILL], [CAP_EFFECTIVE, CAP_PERMITTED]);
+
+this will drop a specific flag in capability that you passed as first argument, flag can be either single number(or constant from flag constants) or array of flags;
+
+=back
+
+=head4 submit
+
+to apply all changes that you made, you have to execute submit. The changes will be applied to the proccess that is calling this command. 
+
+=head1 CONSTANTS
+
+to understand for what are this constants are used use see linux man capabilities and man libcap
+
+=head4 flag values
+
+when getting capabilities set by get_all, every flag can be either CAP_SET(1) or CAP_CLEAR(1)
+
+=over
+
+=item CAP_SET
+
+=item CAP_CLEAR
+
+=back
+
+=head4 flags
+
+=over
+
+=item CAP_EFFECTIVE
+
+=item CAP_PERMITTED
+
+=item CAP_INHERITABLE
+
+=back
+
+=head4 capabilities
+
+=over
+
+=item CAP_CHOWN
+
+=item CAP_DAC_OVERRIDE
+
+=item CAP_DAC_READ_SEARCH
+
+=item CAP_FOWNER
+
+=item CAP_FSETID
+
+=item CAP_KILL
+
+=item CAP_SETGID
+
+=item CAP_SETUID
+
+=item CAP_SETPCAP
+
+=item CAP_LINUX_IMMUTABLE
+
+=item CAP_NET_BIND_SERVICE
+
+=item CAP_NET_BROADCAST
+
+=item CAP_NET_ADMIN
+
+=item CAP_NET_RAW
+
+=item CAP_IPC_LOCK
+
+=item CAP_IPC_OWNER
+
+=item CAP_SYS_MODULE
+
+=item CAP_SYS_RAWIO
+
+=item CAP_SYS_CHROOT
+
+=item CAP_SYS_PTRACE
+
+=item CAP_SYS_PACCT
+
+=item CAP_SYS_ADMIN
+
+=item CAP_SYS_BOOT
+
+=item CAP_SYS_NICE
+
+=item CAP_SYS_RESOURCE
+
+=item CAP_SYS_TIME
+
+=item CAP_SYS_TTY_CONFIG
+
+=item CAP_MKNOD
+
+=item CAP_LEASE
+
+=item CAP_AUDIT_WRITE
+
+=item CAP_AUDIT_CONTROL
+
+=item CAP_SETFCAP
+
+=item CAP_MAC_OVERRIDE
+
+=item CAP_MAC_ADMIN
+
+=item CAP_SYSLOG
+
+=item CAP_WAKE_ALARM
+
+=item CAP_BLOCK_SUSPEND
+
+=item CAP_AUDIT_READ
+
+=back
+
+=head1 AUTHOR
+
+Nichiporenko Vasily <v.nichiporenko@crazypanda.ru>, Crazy Panda
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -1,5 +1,15 @@
 Revision history for Syntax-Keyword-Try
 
+0.10    2019-06-13
+        [CHANGES]
+         * Added experimental value-semantic expression form (RT121267)
+         * Document that the module works nicely with Future::AsyncAwait
+         * Ignore import symbols `catch` and `finally`
+
+        [BUGFIXES]
+         * Fixed spelling mistakes in documentation (patch from debian)
+           (RT124140)
+
 0.09    2017-11-08 14:33:19
         [BUGFIXES]
          * Make module loading thread-safe on perls 5.16 and above. (RT123547)

@@ -1,3 +1,12 @@
+1.033   2019-06-07 (PERLANCAR)
+
+        - Add --self-upgrade (-U).
+
+	- [doc] Update current CPAN mini size estimation.
+
+	- [doc] Mention CPAN::SQLite & CPAN::Mini in See Also.
+
+
 1.032   2019-01-09 (PERLANCAR)
 
 	- Add subcommand: extract-dist.

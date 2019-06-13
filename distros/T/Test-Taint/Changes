@@ -1,5 +1,11 @@
 Revision history for Perl extension Test::Taint
 
+1.08    Wed Jun 12 15:01:48 CDT 2019
+        [FIXES]
+        Fixed intermittent failures in the test suite.  Thanks, Petr
+        Pisar. (RT #119897)
+
+
 1.06    Fri Oct 19 11:30:31 CDT 2012
         [ENHANCEMENTS]
         tainted() now localizes $SIG{__DIE__} before performing the

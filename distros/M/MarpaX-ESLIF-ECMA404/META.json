@@ -58,7 +58,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "MarpaX::ESLIF" : "v3.0.9",
+            "MarpaX::ESLIF" : "v3.0.12",
             "Math::BigFloat" : "0",
             "Math::BigInt" : "0",
             "Scalar::Util" : "0",
@@ -89,7 +89,7 @@
    "provides" : {
       "MarpaX::ESLIF::ECMA404" : {
          "file" : "lib/MarpaX/ESLIF/ECMA404.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -105,7 +105,7 @@
          "web" : "https://github.com/jddurand/marpax-eslif-ecma404"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_authority" : "cpan:JDDPAUSE",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"

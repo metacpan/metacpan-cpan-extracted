@@ -251,7 +251,7 @@ fn	HV*	ouroboros_sv_stash	SV*
 #: SvSTASH_set
 fn	void	ouroboros_sv_stash_set	SV*	HV*
 #: CvSTASH
-fn	void	ouroboros_cv_stash	CV*
+fn	HV*	ouroboros_cv_stash	CV*
 #: HvNAME
 fn	const char*	ouroboros_hv_name	HV*
 #: HvNAMELEN

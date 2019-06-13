@@ -2,7 +2,7 @@ package Net::AMQP::RabbitMQ;
 use strict;
 use warnings;
 
-our $VERSION = '2.40002';
+our $VERSION = '2.40003';
 
 use XSLoader;
 XSLoader::load "Net::AMQP::RabbitMQ", $VERSION;
@@ -654,6 +654,14 @@ Whether the openssl library should be initialized (defaults to true).
 =item MQSSLVHOST
 
 Vhost to use when in SSL mode (defaults to vhost for for L<https://www.cloudamqp.com>).
+
+=item MQADMINPROTOCOL
+
+Protocol to use for accessing the admin. Defaults to https
+
+=item MQADMINPORT
+
+Port to use for accessing the admin interface. Defaults to 443
 
 =back
 

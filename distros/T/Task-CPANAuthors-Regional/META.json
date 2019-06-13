@@ -1,0 +1,92 @@
+{
+   "abstract" : "All regional Acme::CPANAuthors modules at once",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-CPANAuthors-Regional",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0",
+            "Acme::CPANAuthors::Australian" : "0",
+            "Acme::CPANAuthors::Austrian" : "0",
+            "Acme::CPANAuthors::Belarusian" : "0",
+            "Acme::CPANAuthors::Brazilian" : "0",
+            "Acme::CPANAuthors::British" : "0",
+            "Acme::CPANAuthors::Canadian" : "0",
+            "Acme::CPANAuthors::Catalonian" : "0",
+            "Acme::CPANAuthors::Chinese" : "0",
+            "Acme::CPANAuthors::Czech" : "0",
+            "Acme::CPANAuthors::Danish" : "0",
+            "Acme::CPANAuthors::Dutch" : "0",
+            "Acme::CPANAuthors::EU" : "2014051201",
+            "Acme::CPANAuthors::European" : "2014051201",
+            "Acme::CPANAuthors::French" : "0",
+            "Acme::CPANAuthors::German" : "0",
+            "Acme::CPANAuthors::Icelandic" : "0",
+            "Acme::CPANAuthors::India" : "0",
+            "Acme::CPANAuthors::Indonesian" : "0",
+            "Acme::CPANAuthors::Israeli" : "0",
+            "Acme::CPANAuthors::Japanese" : "0",
+            "Acme::CPANAuthors::Korean" : "0",
+            "Acme::CPANAuthors::Malaysian" : "0",
+            "Acme::CPANAuthors::Norwegian" : "0",
+            "Acme::CPANAuthors::Polish" : "0",
+            "Acme::CPANAuthors::Portuguese" : "0",
+            "Acme::CPANAuthors::Russian" : "0",
+            "Acme::CPANAuthors::Spanish" : "0",
+            "Acme::CPANAuthors::Swedish" : "0",
+            "Acme::CPANAuthors::Taiwanese" : "0",
+            "Acme::CPANAuthors::Turkish" : "0",
+            "Acme::CPANAuthors::Ukrainian" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-task-cpanauthors-regional@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-CPANAuthors-Regional"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/Task-CPANAuthors-Regional.git",
+         "web" : "http://github.com/book/Task-CPANAuthors-Regional"
+      }
+   },
+   "version" : "1.002",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

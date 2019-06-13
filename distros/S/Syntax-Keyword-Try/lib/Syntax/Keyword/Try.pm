@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
 package Syntax::Keyword::Try;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 
@@ -95,13 +95,13 @@ still propagate exceptions up to callers as normal.
       STATEMENTS...
    }
 
-A C<catch> statement provides a block of code to the preceeding C<try>
+A C<catch> statement provides a block of code to the preceding C<try>
 statement that will be invoked in the case that the main block of code throws
 an exception. The C<catch> block can inspect the raised exception by looking
 in C<$@> in the usual way.
 
 Presence of this C<catch> statement causes any exception thrown by the
-preceeding C<try> block to be non-fatal to the surrounding code. If the
+preceding C<try> block to be non-fatal to the surrounding code. If the
 C<catch> block wishes to optionally handle some exceptions but not others, it
 can re-raise it (or another exception) by calling C<die> in the usual manner.
 
@@ -121,10 +121,10 @@ block are raised to the caller in the usual way.
       STATEMENTS...
    }
 
-A C<finally> statement provides a block of code to the preceeding C<try>
+A C<finally> statement provides a block of code to the preceding C<try>
 statement (or C<try/catch> pair) which is executed afterwards, both in the
 case of a normal execution or a thrown exception. This code block may be used
-to provide whatever clean-up operations might be required by preceeding code.
+to provide whatever clean-up operations might be required by preceding code.
 
 Because it is executed during a stack cleanup operation, a C<finally {}> block
 may not cause the containing function to return, or to alter the return value
@@ -135,33 +135,51 @@ from disturbing the value of C<$@>. If the C<finally {}> block code throws an
 exception, this will be printed as a warning and discarded, leaving C<$@>
 containing the original exception, if one existed.
 
-=cut
+=head1 VALUE SEMANTICS
 
-=head1 TODO
+=over 4
 
-=over 2
+B<Warning:> the feature described in this section is experimental. This
+experiment may be stablised in a later version, or may be altered or removed
+without further notice. It is present here for testing and evaluation
+purposes.
 
-=item *
-
-Value semantics. It would be nice if a C<do {}>-wrapped C<try> set could yield
-a value, in the way other similar constructs can. For example
-
- my $x = do {
-    try { attempt(); "success" }
-    catch { "failure" }
- };
-
-A workaround for this current lack is to wrap the C<try{} catch{}> pair in an
-anonymous function which is then immediately executed:
-
- my $x = sub {
-    try { attempt(); return "success" }
-    catch { return "failure" }
- }->();
-
-See also L<https://rt.cpan.org/Ticket/Display.html?id=121267>.
+Additionally, on I<perl> versions 5.18 and later, it will produce a warning
+in the C<experimental> category.
 
 =back
+
+The syntax provided by this module may be used as a value-yielding expression.
+Because this syntax is new, experimental, and somewhat surprising, it must be
+specifically requested by name C<try_value>:
+
+   use Syntax::Feature::Try qw( try try_value );
+
+   my $result = try do { ... } catch { ... };
+
+Also, on Perl versions 5.24 and later:
+
+   my $result = try do { ... } finally { ... };
+
+   my $result = try do { ... } catch { ... } finally { ... };
+
+Specifically, note that the expression must be spelled as C<try do { ... }> so
+that the syntax is distinct from that used by control-flow statements. The
+interposed C<do> keyword reminds the reader, and instructs the syntax parser,
+that this will be an expression, not a statement. It is not necessary to
+similarly notate the C<catch> or C<finally> blocks.
+
+In this case, the syntax behaves syntactically like an expression, and may
+appear anywhere a normal expression is allowed. It follows similar semantics
+to the purely control-flow case; if the code in the C<try> block does not
+throw an exception, then the expression as a whole yields whatever value the
+C<try> expression did. If it fails, then the C<catch> block is executed and
+the expression yields its resulting value instead. A C<finally> block, if
+present, will be evaluated for side-effects before the rest of the expression
+returns.
+
+Remember that, as in the control-flow case, the C<return> keyword will cause
+the entire containing function to return, not just the C<try> block.
 
 =cut
 
@@ -234,14 +252,17 @@ modules make no statement either way.
 =head2 Value Semantics
 
 Like L<Try> and L<Syntax::Feature::Try>, the syntax provided by this module
-only works as a syntax-level statement and not an expression; you cannot
-assign from the result of a C<try> block. Additionally, final-expression value
-semantics do not work, so it cannot be contained by a C<do> block to yield
-this value. See above for a workaround involving an anonymous sub however.
+only works as a syntax-level statement and not an expression when the
+experimental C<try_value> feature described above has not been enabled. You
+cannot assign from the result of a C<try> block. Additionally,
+final-expression value semantics do not work, so it cannot be contained by a
+C<do> block to yield this value.
 
 In comparison, the behaviour implemented by L<Try::Tiny> can be used as a
 valued expression, such as assigned to a variable or returned to the caller of
-its containing function.
+its containing function. Such ability is provided by this module if the
+experimental C<try_value> feature is enabled, though it must be spelled
+differently as C<try do { ... }>.
 
 =head2 C<try> without C<catch>
 
@@ -290,9 +311,36 @@ sub import_into
 
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Keyword::Try/try"}++ if delete $syms{try};
+   $^H{"Syntax::Keyword::Try/try_value"}++ if delete $syms{try_value};
+
+   # Ignore requests for these, as they come automatically with `try`
+   delete @syms{qw( catch finally )};
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
+
+=head1 WITH OTHER MODULES
+
+=head2 Future::AsyncAwait
+
+As of C<Future::AsyncAwait> version 0.10 and L<Syntax::Keyword::Try> version
+0.07, cross-module integration tests assert that basic C<try/catch> blocks
+inside an C<async sub> work correctly, including those that attempt to
+C<return> from inside C<try>.
+
+   use Future::AsyncAwait;
+   use Syntax::Keyword::Try;
+
+   async sub attempt
+   {
+      try {
+         await func();
+         return "success";
+      }
+      catch {
+         return "failed";
+      }
+   }
 
 =head1 KNOWN BUGS
 
@@ -319,6 +367,19 @@ additional code (such as dynamically-discovered plugins), and has to run on
 early on in startup, before it spins out any additional threads.
 
 (See also L<https://rt.cpan.org/Public/Bug/Display.html?id=123547>)
+
+=head2 $@ is not local'ised by C<try do> before perl 5.24
+
+On F<perl> versions 5.24 and above, or when using only control-flow statement
+syntax, C<$@> is always correctly C<local>ised.
+
+However, when using the experimental value-yielding expression version
+C<try do {...}> on perl versions 5.22 or older, the C<local>isation of C<$@>
+does not correctly apply around the expression. After such an expression, the
+value of C<$@> will leak out if a failure happened and the C<catch> block was
+invoked, overwriting any previous value that was visible there.
+
+(See also L<https://rt.cpan.org/Public/Bug/Display.html?id=124366>)
 
 =head1 ACKNOWLEDGEMENTS
 

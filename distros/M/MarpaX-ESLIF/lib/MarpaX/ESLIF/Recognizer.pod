@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 3.0.11
+version 3.0.12
 
 =head1 SYNOPSIS
 
@@ -259,6 +259,10 @@ Returns an array containing at indices 0 and 1 the values of C<$eslifRecognizer-
 =head2 $eslifRecognizer->hookDiscard($discardOnOff)
 
 Hook the recognizer to enable or disable the use of C<:discard> if it exists. Default mode is on. This is a I<permanent> setting.
+
+=head2 $eslifRecognizer->hookDiscardSwitch()
+
+Hook the recognizer to switch the use of C<:discard> if it exists. This is a I<permanent> setting.
 
 =head1 SEE ALSO
 

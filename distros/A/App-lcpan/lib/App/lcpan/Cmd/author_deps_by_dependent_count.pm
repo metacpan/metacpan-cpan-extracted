@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::author_deps_by_dependent_count;
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '1.032'; # VERSION
+our $DATE = '2019-06-07'; # DATE
+our $VERSION = '1.033'; # VERSION
 
 use 5.010;
 use strict;
@@ -73,7 +73,7 @@ App::lcpan::Cmd::author_deps_by_dependent_count - List all dependencies of dists
 
 =head1 VERSION
 
-This document describes version 1.032 of App::lcpan::Cmd::author_deps_by_dependent_count (from Perl distribution App-lcpan), released on 2019-01-09.
+This document describes version 1.033 of App::lcpan::Cmd::author_deps_by_dependent_count (from Perl distribution App-lcpan), released on 2019-06-07.
 
 =head1 FUNCTIONS
 
@@ -125,7 +125,7 @@ using the C<index_name>.
 
 =item * B<module_authors_arent> => I<array[str]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 

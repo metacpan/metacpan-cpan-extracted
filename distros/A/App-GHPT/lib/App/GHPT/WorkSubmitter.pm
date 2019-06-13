@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000010';
+our $VERSION = '1.000011';
 
 use App::GHPT::Types qw( ArrayRef Bool PositiveInt Str );
 use App::GHPT::WorkSubmitter::AskPullRequestQuestions;
@@ -108,8 +108,7 @@ sub _build_project_ids ($self) {
     my $want = $self->project;
     if ($want) {
         for my $project ( $self->_pt_api->projects->@* ) {
-            my $munged_name = $project->name =~ s/ /-/gr;
-            return [ $project->id ] if $munged_name =~ /$want/i;
+            return [ $project->id ] if $project->name =~ /\Q$want/i;
         }
         die 'Could not find a project id for project named ' . $self->project;
     }
@@ -186,7 +185,7 @@ sub _choose_pt_story ($self) {
     return unless $stories->@*;
 
     my %stories_lookup = map { $_->name => $_ } $stories->@*;
-    my $chosen_story = choose( [ sort keys %stories_lookup ] );
+    my $chosen_story   = choose( [ sort keys %stories_lookup ] );
     return unless $chosen_story;
 
     return $stories_lookup{$chosen_story};
@@ -224,6 +223,7 @@ sub _text_for_story ( $self, $story ) {
         ? 'Reviewer: ' . $story->requested_by->name
         : ()
         ),
+        ;
 }
 
 sub _create_pull_request ( $self, $text ) {

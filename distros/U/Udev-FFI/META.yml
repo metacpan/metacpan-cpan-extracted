@@ -27,7 +27,7 @@ no_index:
 provides:
   Udev::FFI:
     file: lib/Udev/FFI.pm
-    version: '0.104000'
+    version: '0.104002'
   Udev::FFI::Device:
     file: lib/Udev/FFI/Device.pm
   Udev::FFI::Devnum:
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/Ilya33/udev-ffi/issues
   homepage: https://github.com/Ilya33/udev-ffi
   repository: git://github.com/Ilya33/udev-ffi.git
-version: '0.104000'
+version: '0.104002'
 x_authority: cpan:ILUX
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

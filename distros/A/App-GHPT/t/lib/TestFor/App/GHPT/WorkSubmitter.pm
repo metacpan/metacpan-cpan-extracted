@@ -3,9 +3,29 @@ package TestFor::App::GHPT::WorkSubmitter;
 use App::GHPT::Wrapper::OurTest::Class::Moose;
 
 use Hash::Objectify qw( objectify );
+use Helper::MockPTAPI        ();
 use App::GHPT::WorkSubmitter ();
 use Test::Differences;
 use Test::Output qw( stdout_is stdout_like );
+
+sub test_build_project_ids ( $self, @ ) {
+    my $pt_api = Helper::MockPTAPI->new(
+        token => '5d41402abc4b2a76b9719d911017c592' );
+
+    eq_or_diff(
+        App::GHPT::WorkSubmitter->new(
+            _pt_api => $pt_api, project => 'Team Uhura'
+        )->_project_ids,
+        [456],
+        q{selecting a single project works}
+    );
+
+    eq_or_diff(
+        App::GHPT::WorkSubmitter->new( _pt_api => $pt_api )->_project_ids,
+        [ 123, 456, 789, 303 ],
+        q{not selecting any project works}
+    );
+}
 
 sub test_chore_filter ( $self, @ ) {
     my $feature = objectify { story_type => 'feature' };

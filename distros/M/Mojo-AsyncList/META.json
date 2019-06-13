@@ -47,11 +47,11 @@
       "homepage" : "https://github.com/jhthorsen/mojo-asynclist",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/jhthorsen/mojo-asynclist",
+         "url" : "https://github.com/jhthorsen/mojo-asynclist.git",
          "web" : "https://github.com/jhthorsen/mojo-asynclist"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

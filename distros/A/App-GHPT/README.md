@@ -4,7 +4,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 # VERSION
 
-version 1.000010
+version 1.000011
 
 # SYNOPSIS
 
@@ -152,11 +152,12 @@ Bugs may be submitted through [https://github.com/maxmind/App-GHPT/issues](https
 - Greg Oschwald <goschwald@maxmind.com>
 - Kevin Phair <phair.kevin@gmail.com>
 - Mark Fowler <mfowler@maxmind.com>
+- Narsimham Chelluri <nchelluri@maxmind.com>
 - Patrick Cronin <pcronin@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -6,6 +6,7 @@ use ISO::639_1;
 is(get_iso639_1('en')->{nativeName}, 'English',              'en native name, without localisation');
 is(get_iso639_1('fr')->{nativeName}, 'Français',             'fr native name, without localisation');
 is(get_iso639_1('ab')->{nativeName}, 'аҧсуа бызшәа, аҧсшәа', 'ab native name, without localisation');
+is(get_iso639_1('English'),          undef,                  'Badly formatted code should return undef');
 
 is(get_iso639_1('en-us')->{nativeName}, 'English (US)',  'en-us native name, with localisation');
 is(get_iso639_1('fr_BE')->{nativeName}, 'Français (BE)', 'fr_BE native name, with localisation');

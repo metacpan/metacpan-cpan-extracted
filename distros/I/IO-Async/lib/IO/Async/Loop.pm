@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -758,7 +758,7 @@ invoked, in no particular order.
 The returned C<$id> value can be used to identify the signal handler in case
 it needs to be removed by the C<detach_signal> method. Note that this value
 may be an object reference, so if it is stored, it should be released after it
-cancelled, so the object itself can be freed.
+is cancelled, so the object itself can be freed.
 
 =over 8
 
@@ -1175,13 +1175,18 @@ sub open_child
    return $self->open_process( %params )->pid;
 }
 
-=head2 run_child
+=head2 run_process
 
-   $pid = $loop->run_child( %params )
+   @results = $loop->run_process( %params )->get
 
-This creates a new child process to run the given code block or command,
-capturing its STDOUT and STDERR streams. When the process exits, a
-continuation is invoked being passed the exitcode, and content of the streams.
+   ( $exitcode, $stdout ) = $loop->run_process( ... )->get  # by default
+
+I<Since version 0.73.>
+
+Creates a new child process to run the given code block or command, optionally
+capturing its STDOUT and STDERR streams. By default the returned future will
+yield the exit code and content of the STDOUT stream, but the C<capture>
+argument can be used to alter what is requested and returned.
 
 =over 8
 
@@ -1192,6 +1197,114 @@ continuation is invoked being passed the exitcode, and content of the streams.
 The command or code to run in the child process (as per the C<spawn_child>
 method)
 
+=item stdin => STRING
+
+Optional. String to pass in to the child process's STDIN stream.
+
+=item setup => ARRAY
+
+Optional reference to an array to pass to the underlying C<spawn> method.
+
+=item capture => ARRAY
+
+Optional reference to an array giving a list of names of values which should
+be returned by resolving future. Values will be returned in the same order as
+in the list. Valid choices are: C<exitcode>, C<stdout>, C<stderr>.
+
+=back
+
+This method is intended mainly as an IO::Async-compatible replacement for the
+perl C<readpipe> function (`backticks`), allowing it to replace
+
+   my $output = `command here`;
+
+with
+
+   my ( $exitcode, $output ) = $loop->run_process(
+      command => "command here", 
+   )->get;
+
+Z<>
+
+   my ( $exitcode, $stdout ) = $loop->run_process(
+      command => "/bin/ps",
+   )->get;
+
+   my $status = ( $exitcode >> 8 );
+   print "ps exited with status $status\n";
+
+=cut
+
+sub _run_process
+{
+   my $self = shift;
+   my %params = @_;
+
+   $params{on_finish} and croak "Unrecognised parameter on_finish";
+
+   my $capture = delete $params{capture} // [qw(exitcode stdout)];
+   ref $capture eq "ARRAY" or croak "Expected 'capture' to be an array reference";
+
+   my %subparams;
+   my %results;
+
+   if( my $child_stdin = delete $params{stdin} ) {
+      ref $child_stdin and croak "Expected 'stdin' not to be a reference";
+      $subparams{stdin} = { from => $child_stdin };
+   }
+
+   $subparams{code}    = delete $params{code};
+   $subparams{command} = delete $params{command};
+   $subparams{setup}   = delete $params{setup};
+
+   foreach my $name ( @$capture ) {
+      grep { $_ eq $name } qw( exitcode stdout stderr ) or croak "Unexpected capture $name";
+
+      $subparams{stdout} = { into => \$results{stdout} } if $name eq "stdout";
+      $subparams{stderr} = { into => \$results{stderr} } if $name eq "stderr";
+   }
+
+   croak "Unrecognised parameters " . join( ", ", keys %params ) if keys %params;
+
+   my $future = $self->new_future;
+
+   require IO::Async::Process;
+   my $process = IO::Async::Process->new(
+      %subparams,
+      on_finish => sub {
+         ( undef, $results{exitcode} ) = @_;
+
+         $future->done( @results{ @$capture } );
+      },
+   );
+
+   $self->add( $process );
+
+   return ( $future, $process );
+}
+
+sub run_process
+{
+   my $self = shift;
+   return ( $self->_run_process( @_ ) )[0];
+}
+
+=head2 run_child
+
+   $pid = $loop->run_child( %params )
+
+A back-compatibility wrapper for L</run_process>, returning the PID and taking
+an C<on_finish> continuation instead of returning a Future.
+
+This creates a new child process to run the given code block or command,
+capturing its STDOUT and STDERR streams. When the process exits, a
+continuation is invoked being passed the exitcode, and content of the streams.
+
+Takes the following named arguments in addition to those taken by
+C<run_process>:
+
+=over 8
+
 =item on_finish => CODE
 
 A continuation to be called when the child process exits and closed its STDOUT
@@ -1201,42 +1314,10 @@ and STDERR streams. It will be invoked in the following way:
 
 The second argument is passed the plain perl C<$?> value.
 
-=item stdin => STRING
-
-Optional. String to pass in to the child process's STDIN stream.
-
-=item setup => ARRAY
-
-Optional reference to an array to pass to the underlying C<spawn> method.
-
 =back
 
-This method is intended mainly as an IO::Async-compatible replacement for the
-perl C<readpipe> function (`backticks`), allowing it to replace
-
-  my $output = `command here`;
-
-with
-
- $loop->run_child(
-    command => "command here", 
-    on_finish => sub {
-       my ( undef, $exitcode, $output ) = @_;
-       ...
-    }
- );
-
-Z<>
-
-   $loop->run_child(
-      command => "/bin/ps",
-
-      on_finish => sub {
-         my ( $pid, $exitcode, $stdout, $stderr ) = @_;
-         my $status = ( $exitcode >> 8 );
-         print "ps [PID $pid] exited with status $status\n";
-      },
-   );
+This method should not be used in new code; intead use L</run_process>
+directly.
 
 =cut
 
@@ -1248,37 +1329,18 @@ sub run_child
    my $on_finish = delete $params{on_finish};
    ref $on_finish or croak "Expected 'on_finish' to be a reference";
 
-   my $stdout;
-   my $stderr;
-
-   my %subparams;
-
-   if( my $child_stdin = delete $params{stdin} ) {
-      ref $child_stdin and croak "Expected 'stdin' not to be a reference";
-      $subparams{stdin} = { from => $child_stdin };
-   }
-
-   $subparams{code}    = delete $params{code};
-   $subparams{command} = delete $params{command};
-   $subparams{setup}   = delete $params{setup};
-
-   croak "Unrecognised parameters " . join( ", ", keys %params ) if keys %params;
-
-   require IO::Async::Process;
-   my $process = IO::Async::Process->new(
-      %subparams,
-      stdout => { into => \$stdout },
-      stderr => { into => \$stderr },
-
-      on_finish => sub {
-         my ( $process, $exitcode ) = @_;
-         $on_finish->( $process->pid, $exitcode, $stdout, $stderr );
-      },
+   my ( $f, $process ) = $self->_run_process(
+      %params,
+      capture => [qw( exitcode stdout stderr )],
    );
+   my $pid = $process->pid;
 
-   $self->add( $process );
+   $f->on_done( sub {
+      undef $f; # capture cycle
+      $on_finish->( $pid, @_ );
+   });
 
-   return $process->pid;
+   return $pid;
 }
 
 =head2 resolver
@@ -2105,6 +2167,10 @@ sub fork
             $SIG{$_} = "DEFAULT" if ref $SIG{$_} eq "CODE";
          }
       }
+
+      # If the child process wants to use an IO::Async::Loop it needs to make
+      # a new one, so this value is never useful
+      undef our $ONE_TRUE_LOOP;
 
       my $exitvalue = eval { $code->() };
 

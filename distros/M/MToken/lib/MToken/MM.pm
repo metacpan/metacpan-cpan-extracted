@@ -1,5 +1,8 @@
-package MToken::MM; # $Id: MM.pm 44 2017-07-31 14:44:24Z minus $
+package MToken::MM; # $Id: MM.pm 71 2019-06-09 19:07:03Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ MToken::MM - MakeMaker helper's functions
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -39,7 +42,7 @@ Start processing
 
 =item B<macro>
 
-	my $macro = $mm->macro();
+    my $macro = $mm->macro();
 
 Returns macroses hash: { NAME => "VALUE", ... }
 
@@ -53,7 +56,7 @@ Each function returns the corresponding Makefile section
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
 
 =head1 DEPENDENCIES
 
@@ -69,50 +72,42 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-C<perl>, L<CTK>
+L<CTK>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use MToken::Const qw/ :GENERAL :CRYPT /;
 use MToken::Config;
 use Sys::Hostname;
-use CTK::Util;
-use MToken::Util;
+use CTK::Util qw/which/;
+use File::Spec;
 
 use vars qw/ $VERSION /;
-$VERSION = "1.00";
+$VERSION = "1.01";
 
 use constant {
-    HOSTNAME => 'localhost',
     PHONY => [qw/
-            all show init config reconfig
+            all show init config flushconfig reconfig
             check test
             add delete del update up
             backup restore
             tar untar
-            encrypt decrypt
+            gengpgkey encrypt decrypt
             store fetch list ls info backupdelete backupupdate
             serverconfig
             cleanup
@@ -159,225 +154,249 @@ sub macro {
         DIR_CERTS       => DIR_CERTS,
         DIR_ETC         => DIR_ETC,
         DIR_TMP			=> DIR_TMP,
-        PUBLIC_GPG_KEY	=> catfile(DIR_CERTS, PUBLIC_GPG_KEY),
-        PRIVATE_GPG_KEY => catfile(DIR_CERTS, PRIVATE_GPG_KEY),
+        MY_PUBLIC_KEY   => MY_PUBLIC_KEY,
+        MY_PRIVATE_KEY  => MY_PRIVATE_KEY,
+        PUBLIC_GPG_KEY	=> File::Spec->catfile(DIR_KEYS, PUBLIC_GPG_KEY),
+        PRIVATE_GPG_KEY => File::Spec->catfile(DIR_KEYS, PRIVATE_GPG_KEY),
         HOSTNAME        => $self->{host},
-        CONFIGURED      => catfile(DIR_ETC, sprintf(".%s", $self->{host})),
-        CONFFILE        => catfile(DIR_ETC, MToken::Config::GLOBAL_CONF_FILE()),
-        GPGCONFFILE     => catfile(DIR_ETC, GPGCONFFILE),
+        CONFIGURED      => File::Spec->catfile(DIR_ETC, sprintf(".%s", $self->{host})),
+        CONFFILE        => File::Spec->catfile(DIR_ETC, GLOBAL_CONF_FILE()),
+        GPGCONFFILE     => File::Spec->catfile(DIR_ETC, GPGCONFFILE),
         KEYSUFFIX       => KEYSUFFIX,
-        GPGBIN			=> which($config->get('gpgbin') || GPGBIN) || GPGBIN,
+        GPGBIN			=> which($config->get("gpgbin") || GPGBIN) || GPGBIN,
         OPENSSLBIN      => which($config->get("opensslbin") || OPENSSLBIN) || OPENSSLBIN,
-        GPGFLAGS        => '--options .$(DFSEP)$(GPGCONFFILE) --homedir .$(DFSEP)$(DIR_TMP)',
+        GPGFLAGS        => '--options $(GPGCONFFILE) --homedir $(DIR_TMP)',
     }
 }
 
 sub sec_all {<<'EOS'
 all :: Makefile.PL init
-	$(NOECHO) $(PERLMTOKEN) -e show
+[CMD]$(NOECHO) $(ECHO) Device $(PROJECT) on $(HOSTNAME)
+[CMD]$(NOECHO) $(ECHO) "OpenSSL info:"
+[CMD]$(OPENSSLBIN) version
+[CMD]$(NOECHO) $(ECHO) "GPG info:"
+[CMD]$(GPGBIN) $(GPGFLAGS) --version
 EOS
 }
 sub sec_show {<<'EOS'
 show :: Makefile.PL init
-	$(NOECHO) $(PERLMTOKEN) -e show
+[CMD]$(NOECHO) $(PERLMTOKEN) -e show
 EOS
 }
 sub sec_init {<<'EOS'
-init : $(CONFIGURED) $(DIR_KEYS)$(DFSEP)$(PROJECT)$(KEYSUFFIX)
-	$(NOECHO) $(NOOP)
+init : $(CONFIGURED) $(DIR_TMP)$(DFSEP).exists $(DIR_KEYS)$(DFSEP)$(PROJECT)$(KEYSUFFIX)
+[CMD]$(NOECHO) $(NOOP)
+
+$(DIR_TMP)$(DFSEP).exists :
+[CMD]$(NOECHO) $(MKPATH) $(DIR_TMP)
+[CMD]$(NOECHO) $(CHMOD) 700 $(DIR_TMP)
+[CMD]$(NOECHO) $(TOUCH) $(DIR_TMP)$(DFSEP).exists
 
 $(DIR_KEYS)$(DFSEP)$(PROJECT)$(KEYSUFFIX) :
-	$(NOECHO) $(ECHO) "Initializing..."
-	$(PERLMTOKEN) -e genkey -- $(DIR_KEYS)$(DFSEP)$(PROJECT)$(KEYSUFFIX)
-	$(PERLRUN) "-MExtUtils::Manifest=mkmanifest" -e mkmanifest
-	$(NOECHO) $(ECHO) "Done."
+[CMD]$(NOECHO) $(ECHO) "Initializing..."
+[CMD]$(PERLMTOKEN) -e genkey -- $(DIR_KEYS)$(DFSEP)$(PROJECT)$(KEYSUFFIX)
+[CMD]$(PERLRUN) "-MExtUtils::Manifest=mkmanifest" -e mkmanifest
 EOS
 }
 sub sec_config {<<'EOS'
-config : reconfig $(CONFIGURED)
-	$(NOECHO) $(NOOP)
+config : $(CONFIGURED)
+[CMD]$(NOECHO) $(ECHO) "Project has been successfully configured"
+[CMD]$(NOECHO) $(ECHO) "For reconfiguration You can run the follow command:"
+[CMD]$(NOECHO) $(ECHO) "  make reconfig"
+
+reconfig : flushconfig $(CONFIGURED)
+[CMD]$(NOECHO) $(ECHO) "Project has been successfully reconfigured"
+
+flushconfig :
+[CMD]-$(RM_F) $(CONFIGURED)
+[CMD]$(NOECHO) $(ECHO) "Configuration marker was flushed"
 
 $(CONFIGURED) : $(DIR_ETC)$(DFSEP)mtoken.conf
-	$(NOECHO) $(ECHO) "Configuration..."
-	$(CONFIGURE) $(PROJECT) $(CONFIGURED)
-	$(NOECHO) $(TOUCH) $(CONFIGURED)
-	$(NOECHO) $(ECHO) "Done."
-
-reconfig :
-	-$(RM_F) $(CONFIGURED)
-	$(NOECHO) $(ECHO) "Please run the follow command:"
-	$(NOECHO) $(ECHO) "    make config"
+[CMD]$(NOECHO) $(ECHO) "Configuration..."
+[CMD]$(CONFIGURE) $(PROJECT) $(CONFIGURED)
+[CMD]$(NOECHO) $(TOUCH) $(CONFIGURED)
 EOS
 }
 sub sec_backup {<<'EOS'
 backup : check tar encrypt store
-	$(NOECHO) $(NOOP)
+[CMD]$(NOECHO) $(NOOP)
 EOS
 }
 sub sec_restore {<<'EOS'
 restore : fetch decrypt untar
-	$(NOECHO) $(NOOP)
+[CMD]$(NOECHO) $(NOOP)
 EOS
 }
 sub sec_tar {<<'EOS'
 tar : $(DISTVNAME).tar$(SUFFIX)
-	$(NOECHO) $(NOOP)
+[CMD]$(NOECHO) $(NOOP)
 
 $(DISTVNAME).tar$(SUFFIX) : distdir
-	$(NOECHO) $(ECHO) "Compressing..."
-	$(PREOP)
-	$(TO_UNIX)
-	$(TAR) $(TARFLAGS) $(DISTVNAME).tar $(DISTVNAME)
-	$(RM_RF) $(DISTVNAME)
-	$(COMPRESS) $(DISTVNAME).tar
-	$(NOECHO) $(ECHO) "Created $(DISTVNAME).tar$(SUFFIX) file"
-	$(POSTOP)
+[CMD]$(NOECHO) $(ECHO) "Compressing..."
+[CMD]$(PREOP)
+[CMD]$(TO_UNIX)
+[CMD]$(TAR) $(TARFLAGS) $(DISTVNAME).tar $(DISTVNAME)
+[CMD]$(RM_RF) $(DISTVNAME)
+[CMD]$(COMPRESS) $(DISTVNAME).tar
+[CMD]$(NOECHO) $(ECHO) "Created $(DISTVNAME).tar$(SUFFIX) file"
+[CMD]$(POSTOP)
 
 distdir :
-	$(NOECHO) $(ECHO) "Snapshot creating..."
-	$(RM_RF) $(DISTVNAME)
-	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" -e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
-	$(NOECHO) $(ECHO) "Created $(DISTVNAME) directory"
+[CMD]$(NOECHO) $(ECHO) "Snapshot creating..."
+[CMD]$(RM_RF) $(DISTVNAME)
+[CMD]$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" -e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
+[CMD]$(NOECHO) $(ECHO) "Created $(DISTVNAME) directory"
 EOS
 }
 sub sec_untar {<<'EOS'
 untar :
-	$(NOECHO) $(ECHO) "Decompressing..."
-	- $(COMPRESS) -d $(DIR_RESTORE)$(DFSEP)*$(SUFFIX)
-	$(PERLMTOKEN) -e untar -- $(DIR_RESTORE)$(DFSEP)*.tar $(DIR_RESTORE)
+[CMD]$(NOECHO) $(ECHO) "Extracting..."
+[CMD]- $(COMPRESS) -d $(DIR_RESTORE)$(DFSEP)*$(SUFFIX)
+[CMD]$(PERLMTOKEN) -e untar -- $(DIR_RESTORE)$(DFSEP)*.tar $(DIR_RESTORE)
+EOS
+}
+sub sec_gengpgkey {<<'EOS'
+gengpgkey : $(DIR_TMP)$(DFSEP).exists $(DIR_KEYS)$(DFSEP)$(MY_PUBLIC_KEY) $(DIR_KEYS)$(DFSEP)$(MY_PRIVATE_KEY)
+[CMD]$(NOECHO) $(NOOP)
+
+$(DIR_TMP)$(DFSEP)pubring.kbx :
+[CMD]$(GPGBIN) $(GPGFLAGS) --full-gen-key
+[CMD]$(GPGBIN) $(GPGFLAGS) -k | $(PERLMTOKEN) -e gpgrecipient -- $(GPGCONFFILE)
+[CMD]$(NOECHO) $(TOUCH) $(DIR_TMP)$(DFSEP)pubring.kbx
+
+$(DIR_KEYS)$(DFSEP)$(MY_PUBLIC_KEY) : $(DIR_TMP)$(DFSEP)pubring.kbx
+[CMD]$(GPGBIN) $(GPGFLAGS) --export -a -o $(DIR_KEYS)$(DFSEP)$(MY_PUBLIC_KEY)
+
+$(DIR_KEYS)$(DFSEP)$(MY_PRIVATE_KEY) : $(DIR_TMP)$(DFSEP)pubring.kbx
+[CMD]$(GPGBIN) $(GPGFLAGS) --export-secret-keys -a -o $(DIR_KEYS)$(DFSEP)$(MY_PRIVATE_KEY)
 EOS
 }
 sub sec_encrypt {<<'EOS'
 encrypt : $(DISTVNAME).asc
-	$(NOECHO) $(NOOP)
+[CMD]$(NOECHO) $(NOOP)
 
 $(DISTVNAME).asc : $(DISTVNAME).tar$(SUFFIX) $(PUBLIC_GPG_KEY)
-	$(NOECHO) $(ECHO) "Encrypting..."
-	$(NOECHO) $(MKPATH) $(DIR_TMP)
-	$(NOECHO) $(CHMOD) 700 $(DIR_TMP)
-	$(GPGBIN) $(GPGFLAGS) --import $(PUBLIC_GPG_KEY)
-	$(GPGBIN) $(GPGFLAGS) --list-keys | $(PERLMTOKEN) -e gpgrecipient -- $(GPGCONFFILE)
-	$(GPGBIN) $(GPGFLAGS) --always-trust -o $(DISTVNAME).asc -a -e $(DISTVNAME).tar$(SUFFIX)
-	$(RM_F) $(DISTVNAME).tar$(SUFFIX)
-	- $(RM_RF) $(DIR_TMP)
-	$(NOECHO) $(ECHO) "Created $(DISTVNAME).asc file"
+[CMD]$(NOECHO) $(ECHO) "Encrypting..."
+[CMD]$(PERLMTOKEN) -e encrypt -- $(DISTVNAME).tar$(SUFFIX) $(DISTVNAME).asc
+[CMD]$(RM_F) $(DISTVNAME).tar$(SUFFIX)
+[CMD]$(NOECHO) $(ECHO) "Created $(DISTVNAME).asc file"
 
 $(PUBLIC_GPG_KEY) :
-	$(NOECHO) $(ECHO) "Getting GPG public key file"
-	$(PERLMTOKEN) -e cpgpgkey -- $(PUBLIC_GPG_KEY)
+[CMD]$(NOECHO) $(ECHO) "Getting GPG public key file"
+[CMD]$(PERLMTOKEN) -e cpgpgkey -- $(PUBLIC_GPG_KEY)
 EOS
 }
 sub sec_decrypt {<<'EOS'
 decrypt : $(PRIVATE_GPG_KEY)
-	$(NOECHO) $(ECHO) "Decrypting..."
-	$(NOECHO) $(MKPATH) $(DIR_TMP)
-	$(NOECHO) $(CHMOD) 700 $(DIR_TMP)
-	$(GPGBIN) $(GPGFLAGS) --import $(PRIVATE_GPG_KEY)
-	$(GPGBIN) $(GPGFLAGS) --list-secret-keys | $(PERLMTOKEN) -e gpgrecipient -- $(GPGCONFFILE)
-	$(PERLMTOKEN) -e gpgfileprepare -- $(DIR_RESTORE)$(DFSEP)* .tar$(SUFFIX).gpg
-	$(GPGBIN) $(GPGFLAGS) --decrypt-files $(DIR_RESTORE)$(DFSEP)*.gpg
-	- $(RM_RF) $(DIR_RESTORE)$(DFSEP)*.gpg
-	- $(RM_RF) $(DIR_TMP)
+[CMD]$(NOECHO) $(ECHO) "Decrypting..."
+[CMD]$(PERLMTOKEN) -e decrypt -- $(DIR_RESTORE)$(DFSEP)* .tar$(SUFFIX)
+[CMD]- $(RM_RF) $(DIR_RESTORE)$(DFSEP)*.gpg
 
 $(PRIVATE_GPG_KEY) :
-	$(NOECHO) $(ECHO) "Getting GPG private key file"
-	$(PERLMTOKEN) -e cpgpgkey -- $(PRIVATE_GPG_KEY)
+[CMD]$(NOECHO) $(ECHO) "Getting GPG private key file"
+[CMD]$(PERLMTOKEN) -e cpgpgkey -- $(PRIVATE_GPG_KEY)
 EOS
 }
 sub sec_store {<<'EOS'
-store : $(DIR_BACKUP)$(DFSEP)$(BACKUP)
-	$(NOECHO) $(ECHO) "Storing created backup to remote server..."
-	$(PERLMTOKEN) -e store -- $(DIR_BACKUP)$(DFSEP)$(BACKUP)
+store : init $(DIR_BACKUP)$(DFSEP)$(BACKUP)
+[CMD]$(NOECHO) $(ECHO) "Uploading created backup to remote server..."
+[CMD]$(PERLMTOKEN) -e store -- $(DIR_BACKUP)$(DFSEP)$(BACKUP)
+[CMD]$(NOECHO) $(ECHO) "Uploaded $(DIR_BACKUP)$(DFSEP)$(BACKUP) file"
 
 $(DIR_BACKUP)$(DFSEP)$(BACKUP) : $(DISTVNAME).asc
-	$(NOECHO) $(ECHO) "Preparing file to backup..."
-	$(NOECHO) $(MKPATH) $(DIR_BACKUP)
-	$(MV) $(DISTVNAME).asc $(DIR_BACKUP)$(DFSEP)$(BACKUP)
-	$(NOECHO) $(ECHO) "Created $(DIR_BACKUP)$(DFSEP)$(BACKUP) file"
+[CMD]$(NOECHO) $(ECHO) "Preparing file to backup..."
+[CMD]$(NOECHO) $(MKPATH) $(DIR_BACKUP)
+[CMD]$(MV) $(DISTVNAME).asc $(DIR_BACKUP)$(DFSEP)$(BACKUP)
+[CMD]$(NOECHO) $(ECHO) "Created $(DIR_BACKUP)$(DFSEP)$(BACKUP) file"
 EOS
 }
 sub sec_fetch {<<'EOS'
-fetch : $(DIR_RESTORE)$(DFSEP).exists list
-	$(NOECHO) $(ECHO) "Fetching backups from remote server..."
-	$(PERLMTOKEN) -e fetch -- $(DIR_RESTORE)
+fetch : init $(DIR_RESTORE)$(DFSEP).exists list
+[CMD]$(NOECHO) $(ECHO) "Downloading backup files from remote server..."
+[CMD]$(PERLMTOKEN) -e fetch -- $(DIR_RESTORE)
+[CMD]$(NOECHO) $(ECHO) "Downloaded backup files to $(DIR_RESTORE)"
 
 $(DIR_RESTORE)$(DFSEP).exists :
-	$(NOECHO) $(MKPATH) $(DIR_RESTORE)
-	$(NOECHO) $(TOUCH) $(DIR_RESTORE)$(DFSEP).exists
+[CMD]$(NOECHO) $(MKPATH) $(DIR_RESTORE)
+[CMD]$(NOECHO) $(TOUCH) $(DIR_RESTORE)$(DFSEP).exists
 EOS
 }
 sub sec_list {<<'EOS'
-list :
-	$(PERLMTOKEN) -e list
+list : init
+[CMD]$(PERLMTOKEN) -e list
 
 ls : list
-	$(NOECHO) $(NOOP)
+[CMD]$(NOECHO) $(NOOP)
 EOS
 }
 sub sec_info {<<'EOS'
-info :
-	$(PERLMTOKEN) -e info -- $(DATE_SFX)
+info : init
+[CMD]$(PERLMTOKEN) -e info -- $(DATE_SFX)
 EOS
 }
 sub sec_backupdelete {<<'EOS'
-backupdelete :
-	$(NOECHO) $(ECHO) "Deleting backup on remote server..."
-	$(PERLMTOKEN) -e backupdelete -- $(BACKUP)
+backupdelete : init
+[CMD]$(NOECHO) $(ECHO) "Deleting backup on remote server..."
+[CMD]$(PERLMTOKEN) -e backupdelete -- $(BACKUP)
 EOS
 }
 sub sec_backupupdate {<<'EOS'
-backupupdate : $(DIR_BACKUP)$(DFSEP)$(BACKUP)
-	$(NOECHO) $(ECHO) "Updating backup on remote server..."
-	$(PERLMTOKEN) -e backupupdate -- $(DIR_BACKUP)$(DFSEP)$(BACKUP)
+backupupdate : init $(DIR_BACKUP)$(DFSEP)$(BACKUP)
+[CMD]$(NOECHO) $(ECHO) "Updating backup on remote server..."
+[CMD]$(PERLMTOKEN) -e backupupdate -- $(DIR_BACKUP)$(DFSEP)$(BACKUP)
+[CMD]$(NOECHO) $(ECHO) "Updated $(DIR_BACKUP)$(DFSEP)$(BACKUP) file"
 EOS
 }
 sub sec_cleanup {<<'EOS'
 clean purge ::
-	- $(TEST_F) MANIFEST.SKIP.bak && $(MV) MANIFEST.SKIP.bak MANIFEST.SKIP
-	- $(RM_F) \
-		MYMETA.json \
-		MYMETA.yml
-	- $(RM_RF) \
-		*.bak *.tmp build \
-		$(DISTVNAME) $(DIR_BACKUP) $(DIR_RESTORE)
-	$(NOECHO) $(RM_F) $(FIRST_MAKEFILE)
+[CMD]- $(TEST_F) MANIFEST.SKIP.bak && $(MV) MANIFEST.SKIP.bak MANIFEST.SKIP
+[CMD]- $(RM_F) \
+  MYMETA.json \
+  MYMETA.yml
+[CMD]- $(RM_RF) \
+  *.bak *.tmp build $(DIR_TMP) \
+  $(DISTVNAME) $(DIR_BACKUP) $(DIR_RESTORE)
+[CMD]$(NOECHO) $(RM_F) $(FIRST_MAKEFILE)
 EOS
 }
 sub sec_serverconfig {<<'EOS'
 serverconfig : $(CONFIGURED)
-	$(NOECHO) $(PERLMTOKEN) -e serverconfig
+[CMD]$(NOECHO) $(PERLMTOKEN) -e serverconfig
 EOS
 
 }
 sub sec_check {<<'EOS'
-check :
-	$(NOECHO) $(ECHO) "Checking your device..."
-	$(NOECHO) $(PERLMTOKEN) -e check -- $(DATE_FMT)
-	$(NOECHO) $(ECHO) "Checking remote server..."
-	$(NOECHO) $(PERLMTOKEN) -e list
-	$(NOECHO) $(ECHO) "Checking the actual backup file..."
-	$(NOECHO) $(PERLMTOKEN) -e info -- $(DATE_SFX)
+check : init
+[CMD]$(NOECHO) $(ECHO) "Checking your device..."
+[CMD]$(NOECHO) $(PERLMTOKEN) -e check -- $(DATE_FMT)
+[CMD]$(NOECHO) $(ECHO) "Checking remote server..."
+[CMD]$(NOECHO) $(PERLMTOKEN) -e list
+[CMD]$(NOECHO) $(ECHO) "Checking the actual backup file..."
+[CMD]$(NOECHO) $(PERLMTOKEN) -e info -- $(DATE_SFX)
+
 test : check
-	$(NOECHO) $(NOOP)
+[CMD]$(NOECHO) $(NOOP)
 EOS
 }
 sub sec_add {<<'EOS'
 add :
-	$(NOECHO) $(ECHO) "Add file(s) on device..."
-	$(NOECHO) $(PERLMTOKEN) -e add -- $(DATE_FMT)
+[CMD]$(NOECHO) $(ECHO) "Add file(s) on device..."
+[CMD]$(NOECHO) $(PERLMTOKEN) -e add -- $(DATE_FMT)
 EOS
 }
 sub sec_update {<<'EOS'
 update :
-	$(NOECHO) $(ECHO) "Update files on device..."
-	$(NOECHO) $(PERLMTOKEN) -e update -- $(DATE_FMT)
+[CMD]$(NOECHO) $(ECHO) "Update files on device..."
+[CMD]$(NOECHO) $(PERLMTOKEN) -e update -- $(DATE_FMT)
+
 up : update
 EOS
 }
 sub sec_delete {<<'EOS'
 delete :
-	$(NOECHO) $(ECHO) "Remove file from device..."
-	$(NOECHO) $(PERLMTOKEN) -e del
+[CMD]$(NOECHO) $(ECHO) "Remove file from device..."
+[CMD]$(NOECHO) $(PERLMTOKEN) -e del
+
 del : delete
 EOS
 }
@@ -393,15 +412,17 @@ Usage:
 Commands:
     init -- initialization and configuration your device
     config -- configuration your device
-    reconfig -- unset configuration flag. Remove $(CONFIGURED) file
-    usage, help -- show this information
-    show (default) -- show files on the your device
+    reconfig -- reconfiguration your device
+    gengpgkey -- generate GPG private/public keys pair
+    show -- show files on the your device
     check -- checking files in your device
     clean -- clean the device
     serverconfig -- show configuration file for Apache2 web server
     add -- add file(s) to device (manifest file edit)
     update, up -- update files on device (manifest file edit)
     delete, del -- remove file(s) from device
+    usage, help -- show this information
+    (default) -- show statistic information
 
 Backup commands:
     backup -- backup your device (check, tar, encrypt, store)
@@ -418,16 +439,16 @@ Backup commands:
     backupdelete -- delete backup file from remote server
 
 EOS
-	my $out = "usage :\n";
-	foreach my $s (split(/\n/, $usage)) {
-		$out .= sprintf('[CMD]$(NOECHO) $(ECHO) "%s"', $s);
-		$out .= "\n";
-	}
-	return $out;
+    my $out = "usage :\n";
+    foreach my $s (split(/\n/, $usage)) {
+        $out .= sprintf('[CMD]$(NOECHO) $(ECHO) "%s"', $s);
+        $out .= "\n";
+    }
+    return $out;
 }
 sub sec_help {<<'EOS'
 help : usage
-	$(NOECHO) $(NOOP)
+[CMD]$(NOECHO) $(NOOP)
 EOS
 }
 

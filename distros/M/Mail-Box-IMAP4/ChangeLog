@@ -1,6 +1,11 @@
 
 ===== history of Mail-Box-IMAP4
 
+version 3.007: Thu 13 Jun 16:54:08 CEST 2019
+
+	Fixes:
+	- remove debug statements.
+
 version 3.006: Wed 12 Jun 16:43:39 CEST 2019
 
 	Improvements:

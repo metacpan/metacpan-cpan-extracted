@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 # Perl DateTime extension for converting to/from the French Revolutionary calendar
-# Copyright (c) 2003, 2004, 2010, 2011, 2012, 2014, 2016 Jean Forget. All rights reserved.
+# Copyright (c) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget. All rights reserved.
 #
 # See the license in the embedded documentation below.
 #
@@ -13,7 +13,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 use Params::Validate qw(validate SCALAR BOOLEAN OBJECT);
 use Roman;
@@ -1334,7 +1334,7 @@ A literal `%' character.
 
 =back
 
-=head1 REMARKS
+=head1 PROBLEMS AND KNOWN BUGS
 
 =head2 Time Zones
 
@@ -1359,12 +1359,35 @@ Calendar module written in Ruby.
 Some feast names are not translated, other's translations are doubtful
 (they are flagged with a question mark).  Remarks are welcome.
 
+=head2 Feasts
+
+The various  sources for  the feasts  are somewhat  contradictory. The
+most obvious  example if  the 4th  additional day,  which is  "Jour de
+l'opinion" (day of opinion) in some  documents and "Jour de la raison"
+(day of reason) in others.
+
+In addition, the sources have several slight differences between them.
+All of  them obviously include some  typos. [Annexe] is chosen  as the
+reference since it is the  definitive legislative text that officially
+defines names of days in  the French revolutionary calendar. This text
+introduces  amendments  to  the  original calendar  set  up  by  Fabre
+d'Églantine in [Fabre], and gives  in annex the amended calendar. When
+there is  a difference between  the amended calendar and  [Fabre] with
+amendments  (yes it  can happen!),  [Fabre] version  prevails. Obvious
+typos  in  [Annexe] (yes  it  can  happen!)  are preserved,  with  the
+exception  of accented  letters  because they  are  fuzzy rendered  in
+original prints, or  cannot be printed at all at  that time on letters
+in uppercase.
+
+The bracket  references refer  to entries in  the "SEE  ALSO" section,
+"Internet" subsection below.
+
 =head1 SUPPORT
 
 Support for this module is provided via the datetime@perl.org email
-list. See L<http://lists.perl.org/> for more details.
+list. See L<https://lists.perl.org/> for more details.
 
-Please enter bug reports at L<http://rt.cpan.org/>
+Please enter bug reports at L<https://rt.cpan.org/>
 
 =head1 AUTHOR
 
@@ -1377,13 +1400,45 @@ Date::Convert::French_Rev module.
 The development of this module is hosted by I<Les Mongueurs de Perl>,
 L<http://www.mongueurs.net/>.
 
+=head2 THANKS
+
+Many thanks to those who sent me a RT ticket or a pull request:
+
+=over 4
+
+=item * The late Iain Truskett,
+
+=item * Philippe Bruhat (BooK)
+
+=item * Slaven Rezić
+
+=item * and especially Gérald Sédrati-Dinet (GIBUS at cpan dot org),
+for his thorough documentation research.
+
+=back
+
+Also,  many thanks  to all  the  persons who  gave me  advices on  the
+DateTime mailing list. I will not mention them, because I might forget
+some of them.
+
 =head1 SEE ALSO
 
-=head2 Software
+=head2 Perl Software
 
-date(1), strftime(3), perl(1), DateTime(3), DateTime::Calendar::Pataphysical(3), Date::Convert::French_Rev
+date(1), strftime(3), perl(1)
 
-calendar/cal-french.el in emacs-21.2 or later or xemacs 21.1.8
+L<DateTime>
+
+L<DateTime::Calendar::Pataphysical>
+
+L<Date::Convert::French_Rev> or L<https://github.com/jforget/Date-Convert-French_Rev>
+
+L<Date::Converter>
+
+=head2 Other Software
+
+F<calendar/cal-french.el>  in emacs-21.2  or later  or xemacs  21.1.8,
+forked in L<https://github.com/jforget/emacs-lisp-cal-french>
 
 =head2 Books
 
@@ -1401,35 +1456,87 @@ Histoire de l'heure en France, Jacques Gapaillard, publ. Vuibert -- ADAPT
 
 =head2 Internet
 
-L<http://datetime.perl.org/>
+L<https://github.com/houseabsolute/DateTime.pm/wiki>
 
 L<http://www.faqs.org/faqs/calendars/faq/part3/>
 
-L<http://zapatopi.net/metrictime.html>
+L<https://zapatopi.net/metrictime/>
 
 L<http://datetime.mongueurs.net/>
 
-L<http://www.kokogiak.com/frc/default.asp> (the link still exists, but
-it seems  to no  longer include stuff  about the  French Revolutionary
-calendar.)
+L<https://www.allhotelscalifornia.com/kokogiakcom/frc/default.asp>
 
 L<https://github.com/jhbadger/FrenchRevCal-ruby>
 
-L<http://en.wikipedia.org/wiki/French_Republican_Calendar>
+L<https://en.wikipedia.org/wiki/French_Republican_Calendar>
+
+L<https://fr.wikipedia.org/wiki/Calendrier_républicain>
+
+L<https://archive.org/details/decretdelaconven00fran_40>
+
+"Décret  du  4 frimaire,  an  II  (24  novembre  1793) sur  l'ère,  le
+commencement et l'organisation de l'année et sur les noms des jours et
+des mois"
+
+L<https://archive.org/details/decretdelaconven00fran_41>
+
+Same text, with a slightly different typography.
+
+L<https://purl.stanford.edu/dx068ky1531>
+
+"Archives parlementaires  de 1789 à  1860: recueil complet  des débats
+législatifs & politiques  des Chambres françaises", J.  Madival and E.
+Laurent, et. al.,  eds, Librairie administrative de  P. Dupont, Paris,
+1912.
+
+Starting with  page 6,  this document  includes the  same text  as the
+previous links, with  a much improved typography.  Especially, all the
+"long s"  letters have been replaced  by short s. Also  interesting is
+the text  following the  decree, page 21  and following:  "Annuaire ou
+calendrier pour la seconde année de la République française, annexe du
+décret  du  4  frimaire,  an  II (24  novembre  1793)  sur  l'ère,  le
+commencement et l'organisation de l'année et sur les noms des jours et
+des mois". In the remarks above, it is refered as [Annexe].
+
+L<https://gallica.bnf.fr/ark:/12148/bpt6k48746z>
+
+[Fabre] "Rapport fait à la Convention nationale dans la séance du 3 du
+second mois de la seconde année  de la République française, au nom de
+la   Commission    chargée   de   la   confection    du   calendrier",
+Philippe-François-Nazaire  Fabre  d'Églantine,  Imprimerie  nationale,
+Paris, 1793
+
+L<https://gallica.bnf.fr/ark:/12148/bpt6k49016b>
+
+[Annuaire] "Annuaire  du cultivateur,  pour la  troisième année  de la
+République  : présenté  le  30 pluviôse  de l'an  II  à la  Convention
+nationale, qui en  a décrété l'impression et l'envoi,  pour servir aux
+écoles  de la  République",  Gilbert Romme,  Imprimerie nationale  des
+lois, Paris, 1794-1795
+
+L<https://gallica.bnf.fr/ark:/12148/bpt6k43978x>
+
+"Calendrier militaire,  ou tableau  sommaire des  victoires remportées
+par les  Armées de  la République française,  depuis sa  fondation (22
+septembre 1792),  jusqu'au 9  floréal an  7, époque  de la  rupture du
+Congrès de Rastadt et de la reprise des hostilités" Moutardier, Paris,
+An  VIII de  la République  française.  The source  of the  C<on_date>
+method.
 
 =head1 LICENSE STUFF
 
-Copyright (c)  2003, 2004,  2010, 2012, 2014,  2016 Jean  Forget.  All
-rights reserved.  This program is  free software. You  can distribute,
-modify,  and otherwise  mangle DateTime::Calendar::FrenchRevolutionary
-under the same terms as perl 5.16.3.
+Copyright (c)  2003, 2004, 2010,  2012, 2014, 2016, 2019  Jean Forget.
+All  rights  reserved.   This  program  is  free   software.  You  can
+distribute,    adapt,    modify,     and    otherwise    mangle    the
+DateTime::Calendar::FrenchRevolutionary module under the same terms as
+perl 5.16.3.
 
 This program is  distributed under the same terms  as Perl 5.16.3: GNU
 Public License version 1 or later and Perl Artistic License
 
 You can find the text of the licenses in the F<LICENSE> file or at
-L<http://www.perlfoundation.org/artistic_license_1_0> and
-L<http://www.gnu.org/licenses/gpl-1.0.html>.
+L<https://dev.perl.org/licenses/artistic.html>
+and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -1444,7 +1551,7 @@ MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
 You  should have received  a copy  of the  GNU General  Public License
-along with this program; if not, see <http://www.gnu.org/licenses/> or
-write to the Free Software Foundation, Inc., L<http://fsf.org>.
+along with  this program; if not,  see <https://www.gnu.org/licenses/>
+or write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

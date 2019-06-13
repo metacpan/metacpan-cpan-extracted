@@ -3,7 +3,7 @@ use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
+my %parms = (
     NAME                => 'Test::Taint',
     VERSION_FROM        => 'Taint.pm',
     ABSTRACT            => "Checks for taintedness of variables",
@@ -19,6 +19,16 @@ WriteMakefile(
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Test-Taint-*' },
 );
+
+if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
+    $parms{META_MERGE} = {
+        resources => {
+            repository  => 'https://github.com/petdance/test-taint',
+        }
+    };
+}
+
+WriteMakefile( %parms );
 
 sub MY::postamble {
     return <<'MAKE';

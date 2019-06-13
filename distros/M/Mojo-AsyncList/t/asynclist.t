@@ -33,4 +33,11 @@ is $item,   int @items, 'item';
 is $result, int @items, 'result';
 is_deeply \@res, [map { ["got:$_", "foo"] } @items], 'res';
 
+# Check that concurrent can be higher than int(@items)
+my @got;
+@items = qw(supergirl);
+Mojo::AsyncList->new(sub { push @got, $_[1]; pop->($_[1]); })->concurrent(10)
+  ->process(\@items)->wait;
+is_deeply \@got, \@items, 'item event got items';
+
 done_testing;

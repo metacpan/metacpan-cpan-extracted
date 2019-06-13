@@ -59,7 +59,7 @@ use DNS::Unbound::X ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.07';
+    $VERSION = '0.08';
     XSLoader::load();
 }
 
@@ -155,8 +155,9 @@ B<NOTE:> Members of C<data> are in their DNS-native RDATA encodings.
 neither does DNS::Unbound.)
 To decode some common record types, see L</CONVENIENCE FUNCTIONS> below.
 
-Also B<NOTE:> libunbound’s facilities for timing out a synchronous query
-are rather lackluster. If that’s relevant for you, you probably want
+Also B<NOTE:> libunbound doesn’t seem to offer effective controls for
+timing out a synchronous query.
+If timeouts are relevant for you, you probably want
 to use C<resolve_async()> instead.
 
 =cut

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.012;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/fqc"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.012",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "FASTX::Reader",
   "PREREQ_PM" => {
     "Carp" => "1.2",
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "File::Which" => 0,
     "FindBin" => "1.3"
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.50",
   "test" => {
     "TESTS" => "t/*.t"
   }

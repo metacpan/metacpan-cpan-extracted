@@ -31,7 +31,7 @@ ISO::639\_1 exports the following methods:
 ## get\_iso639\_1
 
     Usage    : get_iso639_1('zu')
-    Returns  : a hashref providing the informations described below.
+    Returns  : a hashref providing the informations described below. May return undef if no language is found.
               {
                   "639-1"      => "zu",          # ISO 639-1 code
                   "639-2"      => "zul",         # ISO 639-2 code
@@ -62,12 +62,12 @@ You can find documentation for this module with the perldoc command.
 
 Bugs and feature requests will be tracked on:
 
-    https://framagit.org/luc/iso-639_1/issues
+    https://framagit.org/fiat-tux/perl-modules/iso-639_1/issues
 
 The latest source code can be browsed and fetched at:
 
-    https://framagit.org/luc/iso-639_1
-    git clone https://framagit.org/luc/iso-639_1.git
+    https://framagit.org/fiat-tux/perl-modules/iso-639_1
+    git clone https://framagit.org/fiat-tux/perl-modules/iso-639_1.git
 
 Source code mirror:
 

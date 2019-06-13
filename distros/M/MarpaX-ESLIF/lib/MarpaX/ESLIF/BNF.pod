@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 3.0.11
+version 3.0.12
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ Internally this correspond to this set of options in PCRE2:
   A                 PCRE2_ANCHORED
   ----------------------------------------------------------------
 
-=item Lexemes
+=item Lexemes and Terminals
 
 Lexemes are meta-symbols that does appear as the LHS symbol anywhere within the current grammar. Therefore they behave like terminals, except that their definition is not in the current grammar. By default such meta-symbol is looked up at the next level. For example:
 
@@ -140,6 +140,10 @@ Lexemes are meta-symbols that does appear as the LHS symbol anywhere within the 
   something   ~ [\d]
 
 say that symbol C<something> at grammar level C<0> is a reference to C<something> at grammar level C<1>.
+
+In contrast a terminal is an explicit quoted string, character class or regular expression, e.g.:
+
+  the_rhs_is_a_terminal ::= '"'
 
 Lexemes can be references:
 
@@ -173,7 +177,7 @@ The unsigned integer is interpreted as an explicit grammar level.
 
 =item Discard
 
-Everytime expected terminals cannot be match, MarpaX::ESLIF will try to match the special rule C<:discard>. The C<:discard> rule also have precedence if it matches longer than the longest acceptable lexeme. and can not be ambiguous (else discard silently fail).
+Everytime expected terminals cannot be match, MarpaX::ESLIF will try to match the special rule C<:discard>. The C<:discard> rule also have precedence if it matches longer than the longest acceptable lexeme or terminal. and can not be ambiguous (else discard silently fail).
 
 =back
 
@@ -316,9 +320,13 @@ Hook that is disabling C<:discard> rule for the current recognizer. Equivalent t
 
 Hook that is enabling C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discardb(0)>. Not propagated. Take care, this is a permanent setting.
 
+=item C<:discard[switch]>
+
+Hook that is switching C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discard_switchb()>. Not propagated. Take care, this is a permanent setting.
+
 =back
 
-Please note that the C<:discard[on]> and C<:discard[off]> events will I<always> happen if specified in the grammar, at any level of parsing, regardless if you use the grammar's C<parse()> method (that is never propagating any event to the end user) or not. This is because these are internal events, not visible by the end user, and categorized as parsing hooks, not as a facility in the user-space.
+Please note that the C<:discard[on]>, C<:discard[off]> and C<:discard[switch]> events will I<always> happen if specified in the grammar with an true initial state and if associated to lexemes or terminals. No callback to the end user will happen. This is because these are internal events, categorized as parsing hooks.
 
 =item * Event initializers
 
@@ -326,7 +334,7 @@ By default, events are on, this is equivalent to appending C<=on> after the even
 
 =back
 
-Lexemes are different than non-lexeme symbols because they are treated in the grammar are I<terminals>, others are not.
+Lexemes are different than non-lexeme symbols because they are treated in the grammar as I<terminals>, others are not.
 
 =over
 
@@ -335,21 +343,28 @@ Lexemes are different than non-lexeme symbols because they are treated in the gr
 Meta symbols that are lexemes can have pause events, C<before> mean that the scanning recognized them, C<after> mean they have been consumed, e.g.:
 
   :lexeme ::= symbolname1 pause => before event => ^symbolname1
-  :lexeme ::= symbolname2 pause => after  event =>  symbolname2$2
+  :lexeme ::= symbolname2 pause => after  event =>  symbolname2$
 
 It is not allowed to set a lexeme event on a symbol that is not a lexeme.
 
+=item Terminal events
+
+Explicit terminals can have pause events, C<before> mean that the scanning recognized them, C<after> mean they have been consumed, e.g.:
+
+  :terminal ::= '"' pause => before event => ^beforeDquote
+  :terminal ::= "'" pause => after  event =>  afterSquote$
+
+Only an explicit terminal can be set using the :terminal keyword.
+
 =item Non-lexeme events
 
-Completion, predicted or nulled events are supported, targetting a symbol name.
+Completion, predicted or nulled events are supported, targetting a symbol name. These are I<grammar> events.
 
 For example:
 
   event a     = completed  symbolname
   event b=off = nulled     symbolname
   event c=on  = predicted ^symbolname
-
-It is not allowed to a a non-lexeme event on a symbol that is a lexeme.
 
 =back
 
@@ -536,13 +551,13 @@ Nulling symbols can rank high low, the default is low.
 
 =item Priority specification
 
-Lexemes can be prioritized, using a signed integer:
+Lexemes and terminals can be prioritized, using a signed integer:
 
   priority => 15
 
 =item Pause specification
 
-Scanner can be paused before a lexeme is recognized, or just after it has been completed:
+Scanner can be paused before a lexeme or a terminal is recognized, or just after it has been completed:
 
   pause => before
   pause => after
@@ -698,6 +713,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | ':symbol'
                                    | ':discard[on]'
                                    | ':discard[off]'
+                                   | ':discard[switch]'
   <lhs>                          ::= <symbol name>
   <rhs>                          ::= <rhs alternative>+
   <rhs alternative>              ::= <single symbol>
@@ -711,7 +727,8 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <rhs primary>                  ::= <single symbol>
                                    | <symbol name> '@' <grammar reference>
   <single symbol>                ::= <symbol>
-                                   | <character class>
+                                   | <terminal>
+  <terminal>                     ::= <character class>
                                    | <regular expression>
                                    | <quoted string>
   <symbol>                       ::= <symbol name>
@@ -770,7 +787,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <word character>                 ~ /[\w]/
   <one or more word characters>    ~ <word character>+ proper => 1
   <zero or more word characters>   ~ <word character>* proper => 1
-  <restricted ascii graph name>    ~ /[!#$%&*+.\/;?\[\\\]^_`~A-Za-z0-9][!#$%&*+.\/;?\[\\\]^_`~A-Za-z0-9]*/
+  <restricted ascii graph name>    ~ /[!#$%&*+.\/;?\[\\\]^_`~A-Za-z0-9]+/
   <lua action name>                ~ /::lua->[a-zA-Z_][a-zA-Z0-9_]*/
   <bare name>                      ~ <word character>+ proper => 1
   <standard name>                  ~ /[a-zA-Z]/ <zero or more word characters>
@@ -785,6 +802,8 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | /(?:(?|(?:\/(?![*\/]))(?:[^\\\/]*(?:\\.[^\\\/]*)*)(?:\/)))/su /[eijmnsxDJUuaNbcA]+/
 
 =head1 NOTES
+
+=over
 
 The embedded lua language always have the following globals when executing its actions:
 
@@ -805,6 +824,12 @@ Lua object representing current marpaESLIFRecognizer instance.
 =item marpaESLIFValue
 
 Lua object representing current marpaESLIFValue instance.
+
+=back
+
+=over
+
+Grammar events have a cost, and when possible lexeme or terminal events should be prefered.
 
 =back
 

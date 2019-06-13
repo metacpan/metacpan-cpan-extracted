@@ -22,8 +22,8 @@ requires:
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-asynclist/issues
   homepage: https://github.com/jhthorsen/mojo-asynclist
-  repository: https://github.com/jhthorsen/mojo-asynclist
-version: '0.01'
+  repository: https://github.com/jhthorsen/mojo-asynclist.git
+version: '0.02'
 x_contributors:
   - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

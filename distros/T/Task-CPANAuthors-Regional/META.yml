@@ -2,11 +2,14 @@
 abstract: 'All regional Acme::CPANAuthors modules at once'
 author:
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,6 +38,7 @@ requires:
   Acme::CPANAuthors::Israeli: '0'
   Acme::CPANAuthors::Japanese: '0'
   Acme::CPANAuthors::Korean: '0'
+  Acme::CPANAuthors::Malaysian: '0'
   Acme::CPANAuthors::Norwegian: '0'
   Acme::CPANAuthors::Polish: '0'
   Acme::CPANAuthors::Portuguese: '0'
@@ -49,4 +53,5 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-CPANAuthors-Regional
   repository: http://github.com/book/Task-CPANAuthors-Regional.git
-version: '1.001'
+version: '1.002'
+x_serialization_backend: 'YAML::Tiny version 1.70'

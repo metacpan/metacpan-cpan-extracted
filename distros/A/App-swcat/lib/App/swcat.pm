@@ -1,7 +1,7 @@
 package App::swcat;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-06-07'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -584,7 +584,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.012 of App::swcat (from Perl distribution App-swcat), released on 2019-06-03.
+This document describes version 0.013 of App::swcat (from Perl distribution App-swcat), released on 2019-06-07.
 
 =head1 SYNOPSIS
 
@@ -635,6 +635,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 available_versions
 
 Usage:
@@ -671,6 +672,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 download_url
@@ -715,6 +717,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 latest_version
 
 Usage:
@@ -757,6 +760,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list
 
 Usage:
@@ -793,6 +797,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_cpan
@@ -835,6 +840,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_installed
 
 Usage:
@@ -871,6 +877,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 release_note

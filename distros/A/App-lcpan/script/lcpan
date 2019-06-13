@@ -1,15 +1,16 @@
 #!perl
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '1.032'; # VERSION
+our $DATE = '2019-06-07'; # DATE
+our $VERSION = '1.033'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
 
-use PERLANCAR::Module::List;
 use Perinci::CmdLine::Any;
+use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
+use PERLANCAR::Module::List;
 
 my $prefix = '/App/lcpan/';
 my $mods = do {
@@ -46,6 +47,7 @@ my $cli = Perinci::CmdLine::Any->new(
     subcommands => $subcommands,
 );
 $cli->common_opts->{naked_res}{default} = 1;
+Perinci::CmdLineX::CommonOptions::SelfUpgrade->apply_to_object($cli);
 $cli->run;
 
 # ABSTRACT: Manage your local CPAN mirror
@@ -63,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.032 of lcpan (from Perl distribution App-lcpan), released on 2019-01-09.
+This document describes version 1.033 of lcpan (from Perl distribution App-lcpan), released on 2019-06-07.
 
 =head1 SYNOPSIS
 
@@ -80,7 +82,7 @@ Then run:
 
 A mini CPAN mirror will be downloaded/updated in your C<~/cpan> directory. This
 will take a while, e.g. a couple of hours, depending on your Internet connection
-speed (as of 2018-09-08 the size of a mini CPAN mirror is ~10GB). Subsequent
+speed (as of 2019-05-20 the size of a mini CPAN mirror is ~7GB). Subsequent
 updates will of course take significantly shorter time.
 
 After download, a SQLite database will also be created/updated at
@@ -885,6 +887,10 @@ off.
 
 Shortcut for --log-level=error.
 
+=item B<--self-upgrade>, B<-U>
+
+Update program to latest version from CPAN.
+
 =item B<--subcommands>
 
 List available subcommands.
@@ -996,7 +1002,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -1032,11 +1038,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--author-arg>=I<s>*
+
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
-
-=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1080,7 +1086,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -1457,7 +1463,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -1531,7 +1537,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -2347,7 +2353,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.24.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2503,7 +2509,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.24.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3366,7 +3372,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author)
+ author (see --author-arg)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --no-include-core)

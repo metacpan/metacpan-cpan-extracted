@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::ChangedFiles;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000010';
+our $VERSION = '1.000011';
 
 use List::Util 1.44 qw( any uniq );
 use App::GHPT::Types qw( ArrayRef HashRef Str );
@@ -75,7 +75,7 @@ App::GHPT::WorkSubmitter::ChangedFiles - Contains all the files that were modifi
 
 =head1 VERSION
 
-version 1.000010
+version 1.000011
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

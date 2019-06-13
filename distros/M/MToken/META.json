@@ -1,12 +1,12 @@
 {
    "abstract" : "Tokens processing system (Security)",
    "author" : [
-      "Sergey Lepenkov (Serz Minus) <abalama@cpan.org>"
+      "Serz Minus (Sergey Lepenkov) <abalama@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "open_source"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,39 +32,29 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Data::Dumper" : "0"
-         },
          "requires" : {
             "Archive::Extract" : "0.8",
             "CGI" : "4.32",
-            "CTK" : "1.18",
-            "Class::C3::Adopt::NEXT" : "0.14",
-            "Config::General" : "2.63",
+            "CTK" : "2",
             "Digest::MD5" : "2.54",
             "Digest::SHA1" : "2.13",
             "File::HomeDir" : "1",
             "File::Spec" : "3.62",
             "HTTP::Message" : "6.11",
-            "JSON" : "2.94",
             "LWP" : "5.8",
-            "List::MoreUtils" : "0.416",
-            "MRO::Compat" : "0.13",
-            "Try::Tiny" : "0.28",
+            "LWP::Protocol::https" : "6",
+            "Try::Tiny" : "0.2",
             "URI" : "1.6",
-            "perl" : "5.012001"
+            "perl" : "5.016001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://www.serzik.com",
+      "homepage" : "https://www.serzik.com",
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
-      ],
-      "repository" : {
-         "url" : "http://svn.serzik.com/MToken/trunk/"
-      }
+         "https://dev.perl.org/licenses"
+      ]
    },
-   "version" : "1.00"
+   "version" : "1.01"
 }

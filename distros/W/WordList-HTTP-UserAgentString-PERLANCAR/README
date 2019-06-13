@@ -3,9 +3,9 @@ NAME
     User-Agent strings
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     WordList::HTTP::UserAgentString::PERLANCAR (from Perl distribution
-    WordList-HTTP-UserAgentString-PERLANCAR), released on 2019-04-04.
+    WordList-HTTP-UserAgentString-PERLANCAR), released on 2019-06-11.
 
 SYNOPSIS
      use WordList::HTTP::UserAgentString::PERLANCAR;

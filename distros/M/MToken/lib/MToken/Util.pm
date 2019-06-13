@@ -1,5 +1,8 @@
-package MToken::Util; # $Id: Util.pm 51 2017-08-02 03:44:49Z minus $
+package MToken::Util; # $Id: Util.pm 69 2019-06-09 16:17:44Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ MToken::Util - Exported utility functions
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -31,17 +34,11 @@ Clening the specified ServerName value
 
 Clening the specified FileName value
 
-=item B<which>
+=item B<explain>
 
-    my $ls = which( "ls" );
+    print explain( $object );
 
-Get full path to specified command. Based on File::Which
-
-=item B<where>
-
-    my @ls = which( "ls" );
-
-Get all full paths to specified command. Based on File::Which
+Returns Data::Dumper dump
 
 =item B<md5sum>
 
@@ -61,15 +58,54 @@ See L<Digest::SHA1>
 
 Returns file size
 
+=item B<hide_pasword>
+
+    print hide_pasword('http://user:password@example.com'); # 'http://user:*****@example.com'
+
+Returns specified URL but without password
+
+=item B<blue>, B<cyan>, B<green>, B<red>, B<yellow>
+
+    print cyan("Format %s", "text");
+
+Returns colored string
+
+=item B<nope>, B<skip>, B<wow>, B<yep>
+
+    my $status = nope("Format %s", "text");
+
+Prints status message and returns status.
+
+For nope returns - 0; for skip, wow, yep - 1
+
+=item B<parse_credentials>
+
+    my ($user, $password) = parse_credentials( 'http://user:password@example.com' );
+    my ($user, $password) = parse_credentials( new URI('http://user:password@example.com') );
+
+Returns credentials pair by URL or URI object
+
+=item B<tcd_load>
+
+    if (my $text = tcd_load("/my/file.tcd")) {
+        print $text; # Blah-Blah-Blah
+    } else {
+        or die("Oops");
+    }
+
+Load text data from TCD04 file
+
+=item B<tcd_save>
+
+    tcd_save("/my/file.tcd", "Blah-Blah-Blah") or die("Oops");
+
+Save text data to TCD04 file
+
 =back
 
 =head1 HISTORY
 
-See C<CHANGES> file
-
-=head1 DEPENDENCIES
-
-L<CTK>, C<openssl>, C<gnupg>
+See C<Changes> file
 
 =head1 TO DO
 
@@ -81,90 +117,51 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-C<perl>, L<CTK>, L<File::Which>
+L<Digest::MD5>, L<Digest::SHA1>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use vars qw/ $VERSION @EXPORT @EXPORT_OK /;
-$VERSION = "1.00";
+use vars qw/ $VERSION @EXPORT_OK @EXPORT /;
+$VERSION = "1.01";
 
-use CTK::Util qw/:ALL/;
-use List::MoreUtils qw/uniq/;
+use Carp;
+use CTK::Util qw/bload bsave/;
+use CTK::Crypt::TCD04;
+use URI;
+use URI::Escape qw/uri_unescape/;
 use Digest::MD5;
 use Digest::SHA1;
+use Data::Dumper; #$Data::Dumper::Deparse = 1;
+use Term::ANSIColor qw/colored/;
 
 use base qw/Exporter/;
 @EXPORT = qw(
-        which where
+        yep nope skip wow
+        blue green red yellow cyan
+    );
+@EXPORT_OK = (qw(
         cleanServerName cleanFileName
         filesize md5sum sha1sum
-    );
-@EXPORT_OK = @EXPORT;
+        parse_credentials hide_pasword
+		tcd_save tcd_load
+        explain
+    ), @EXPORT);
 
-sub which {
-    # Based on File::Which
-    my $cs = shift;
-    my $wh = shift;
-    return undef unless defined $cs;
-    return undef if $cs eq '';
-    my @aliases = ($cs);
-    if (isostype('Windows')) {
-        my @pext = (qw/.com .exe .bat/);
-        if ($ENV{PATHEXT}) {
-            push @pext, split /\s*\;\s*/, lc($ENV{PATHEXT});
-        }
-        push @aliases, $cs.$_ for (uniq(@pext));
-    }
-    my @path = path();
-    unshift @path, curdir;
-
-    my @arr = ();
-    foreach my $p ( @path ) {
-        foreach my $f ( @aliases ) {
-            my $file = catfile($p, $f);
-            next if -d $file;
-            if (isostype('Windows')) {
-                if (-e $file) {
-                    my $nospcsf = ($file =~ /\s/) ? sprintf("\"%s\"", $file) : $file;
-                    if ($wh) {push @arr, $nospcsf} else {return $nospcsf}
-                }
-            } elsif (isostype('Unix')) {
-                if (-e $file and -x _) {
-                    if ($wh) {push @arr, $file} else {return $file}
-                }
-            } else {
-                if (-e $file) {
-                    if ($wh) {push @arr, $file} else {return $file}
-                }
-            }
-        }
-    }
-    return @arr if $wh;
-    return undef;
-}
-sub where { which(shift,1) }
 sub cleanServerName {
     my $sn = shift // 'localhost';
     $sn =~ s/[^a-z0-9_\-.]//ig;
@@ -209,5 +206,71 @@ sub filesize {
     $filesize = (stat $f)[7] if -e $f;
     return $filesize;
 }
+sub parse_credentials {
+    my $url = shift || return ();
+    my $uri = (ref($url) eq 'URI') ? $url : URI->new($url);
+    my $info = $uri->userinfo() // "";
+    my $user = $info;
+    my $pass = $info;
+    $user =~ s/:.*//;
+    $pass =~ s/^[^:]*://;
+    return (uri_unescape($user // ''), uri_unescape($pass // ''));
+}
+sub hide_pasword {
+    my $url = shift || return "";
+	my $full = shift || 0;
+	my $uri = new URI($url);
+	my ($u,$p) = parse_credentials($uri);
+	return $url unless defined($p) && length($p);
+	$uri->userinfo($full ? undef : sprintf("%s:*****", $u));
+    return $uri->canonical->as_string;
+}
+sub tcd_save {
+	my $fn = shift;
+	my $text = shift // '';
+	carp("No file specified") unless $fn;
+	return unless length $text;
+	bsave($fn, CTK::Crypt::TCD04->new()->encrypt($text))
+		or carp("Can't save file \"$fn\"");
+	return 1;
+}
+sub tcd_load {
+	my $fn = shift;
+	carp("No file specified") unless $fn;
+	return unless -f $fn and -r _ and -s _;
+	return CTK::Crypt::TCD04->new()->decrypt(bload($fn) // '');
+}
+sub explain {
+    my $dumper = new Data::Dumper( [shift] );
+    $dumper->Indent(1)->Terse(1);
+    $dumper->Sortkeys(1) if $dumper->can("Sortkeys");
+    return $dumper->Dump;
+}
+
+################
+# Colored says
+################
+sub yep {
+    print(green('[  OK  ]'), ' ', sprintf(shift, @_), "\n");
+    return 1;
+}
+sub nope {
+    print(red('[ FAIL ]'), ' ', sprintf(shift, @_), "\n");
+    return 0;
+}
+sub skip {
+    print(yellow('[ SKIP ]'), ' ', sprintf(shift, @_), "\n");
+    return 1;
+}
+sub wow {
+    print(blue('[ INFO ]'), ' ', sprintf(shift, @_), "\n");
+    return 1;
+}
+# Colored helper functions
+sub green {  colored(['bright_green'],  sprintf(shift, @_)) }
+sub red {    colored(['bright_red'],    sprintf(shift, @_)) }
+sub yellow { colored(['bright_yellow'], sprintf(shift, @_)) }
+sub cyan {   colored(['bright_cyan'],   sprintf(shift, @_)) }
+sub blue {   colored(['bright_blue'],   sprintf(shift, @_)) }
 
 1;

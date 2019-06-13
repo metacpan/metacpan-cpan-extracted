@@ -2533,8 +2533,12 @@ sub gitlab_webhook_pipeline {
         if @{ $opts->{pipeline_only_status} }
         and not grep { $_ eq $status } @{ $opts->{pipeline_only_status} };
 
-    $status = colorize( $status => $status )
-        if $status =~ /^(?:success|failure)$/;
+    if ( $status eq 'success' ) {
+        $status = colorize( $status => $status );
+    }
+    elsif ( $status eq 'failed' ) {
+        $status = colorize( failure => $status );
+    }
 
     my $log;
     if ( my $duration = $body->{object_attributes}{duration} ) {

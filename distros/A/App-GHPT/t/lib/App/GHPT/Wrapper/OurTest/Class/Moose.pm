@@ -19,7 +19,7 @@ sub import {
     Test::Class::Moose->import::into($caller_level);
 
     MooseX::SemiAffordanceAccessor->import( { into => $for_class } );
-    MooseX::StrictConstructor->import( { into => $for_class } );
+    MooseX::StrictConstructor->import(      { into => $for_class } );
 
     App::GHPT::Wrapper::Ourperl->import::into($caller_level);
     namespace::autoclean->import::into($caller_level);

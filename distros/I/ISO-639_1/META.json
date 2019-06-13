@@ -4,7 +4,7 @@
       "Luc Didry <luc@didry.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.0",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -56,16 +56,16 @@
    "provides" : {
       "ISO::639_1" : {
          "file" : "lib/ISO/639_1.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://framagit.org/luc/iso-639_1.git"
+         "url" : "git://framagit.org/fiat-tux/perl-modules/iso-639_1.git"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

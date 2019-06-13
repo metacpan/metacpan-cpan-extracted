@@ -1,8 +1,8 @@
-DateTime::Calendar::FrenchRevolutionary version 0.14
+DateTime::Calendar::FrenchRevolutionary version 0.15
 ====================================================
 
 DateTime::Calendar::FrenchRevolutionary is copyright (c) 2003,
-2004, 2010, 2011, 2012, 2014, 2016 Jean Forget
+2004, 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget
 
 
 This is  a companion module  to DateTime.pm. It implements  the French
@@ -18,12 +18,19 @@ with
 
   git clone https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary.git
 
-then the preferred way, which requires Module::Build, is:
+then the preferred way is either:
 
    perl Build.PL
    ./Build
    ./Build test
    ./Build install
+
+or
+
+   perl Makefile.PL
+   make
+   make test
+   make install
 
 Note to the users of old filesystems.
 

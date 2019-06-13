@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.032 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2019-01-09.
+    This document describes version 1.033 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2019-06-07.
 
 SYNOPSIS
     See lcpan script.
@@ -166,7 +166,7 @@ FUNCTIONS
 
     *   modules* => *array[perl::modname]*
 
-    *   perl_version => *str* (default: "v5.26.1")
+    *   perl_version => *str* (default: "v5.24.0")
 
         Set base Perl version for determining core modules.
 
@@ -345,7 +345,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.1")
+    *   perl_version => *str* (default: "v5.24.0")
 
         Set base Perl version for determining core modules.
 
@@ -498,7 +498,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.1")
+    *   perl_version => *str* (default: "v5.24.0")
 
         Set base Perl version for determining core modules.
 
@@ -895,6 +895,11 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    CPAN::SQLite
+
+    CPAN::Mini
 
 AUTHOR
     perlancar <perlancar@cpan.org>

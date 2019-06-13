@@ -16,6 +16,9 @@ t/11loop.t
 t/12return.t
 t/13die-in-finally.t
 t/14try-localises.t
+t/20try-do.t
+t/21try-do-finally.t
 t/80await+try.t
 t/90rt123547.t
+t/90rt125971.t
 t/99pod.t

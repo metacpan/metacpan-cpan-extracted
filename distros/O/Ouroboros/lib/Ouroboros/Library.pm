@@ -2,7 +2,7 @@ package Ouroboros::Library;
 
 use File::ShareDir qw/dist_file/;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use strict;
 use warnings;

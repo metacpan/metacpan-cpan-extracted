@@ -21,6 +21,7 @@
 #define G1_RULE_STATEMENT_17                     "G1_rule_statement_17"
 #define G1_RULE_STATEMENT_18                     "G1_rule_statement_18"
 #define G1_RULE_STATEMENT_19                     "G1_rule_statement_19"
+#define G1_RULE_STATEMENT_20                     "G1_rule_statement_20"
 #define G1_RULE_START_RULE                       "G1_rule_start_rule"
 #define G1_RULE_DESC_RULE                        "G1_rule_desc_rule"
 #define G1_RULE_EMPTY_RULE                       "G1_rule_empty_rule"
@@ -31,6 +32,7 @@
 #define G1_RULE_DISCARD_RULE                     "G1_rule_discard_rule"
 #define G1_RULE_DEFAULT_RULE                     "G1_rule_default_rule"
 #define G1_RULE_LEXEME_RULE                      "G1_rule_lexeme_rule"
+#define G1_RULE_TERMINAL_RULE                    "G1_rule_terminal_rule"
 #define G1_RULE_COMPLETION_EVENT_DECLARATION_1   "G1_rule_completion_event_declaration_1"
 #define G1_RULE_COMPLETION_EVENT_DECLARATION_2   "G1_rule_completion_event_declaration_2"
 #define G1_RULE_NULLED_EVENT_DECLARATION_1       "G1_rule_nulled_event_declaration_1"
@@ -104,6 +106,7 @@
 #define G1_RULE_EVENT_NAME_2                     "G1_rule_event_name_2"
 #define G1_RULE_EVENT_NAME_3                     "G1_rule_event_name_3"
 #define G1_RULE_EVENT_NAME_4                     "G1_rule_event_name_4"
+#define G1_RULE_EVENT_NAME_5                     "G1_rule_event_name_4"
 #define G1_RULE_LHS                              "G1_rule_lhs"
 #define G1_RULE_RHS                              "G1_rule_rhs"
 #define G1_RULE_RHS_ALTERNATIVE_1                "G1_rule_rhs_alternative_1"
@@ -118,8 +121,9 @@
 #define G1_RULE_RHS_PRIMARY_2                    "G1_rule_rhs_primary_2"
 #define G1_RULE_SINGLE_SYMBOL_1                  "G1_rule_single_symbol_1"
 #define G1_RULE_SINGLE_SYMBOL_2                  "G1_rule_single_symbol_2"
-#define G1_RULE_SINGLE_SYMBOL_3                  "G1_rule_single_symbol_3"
-#define G1_RULE_SINGLE_SYMBOL_4                  "G1_rule_single_symbol_4"
+#define G1_RULE_TERMINAL_1                       "G1_rule_terminal_1"
+#define G1_RULE_TERMINAL_2                       "G1_rule_terminal_2"
+#define G1_RULE_TERMINAL_3                       "G1_rule_terminal_3"
 #define G1_RULE_SYMBOL                           "G1_rule_symbol"
 #define G1_RULE_SYMBOL_NAME_1                    "G1_rule_symbol_name_1"
 #define G1_RULE_SYMBOL_NAME_2                    "G1_rule_symbol_name_2"
@@ -164,8 +168,8 @@
 #define G1_RULE_STRING_LITERAL_INSIDE_3          "G1_rule_string_literal_inside_3"
 #define G1_RULE_STRING_LITERAL_INSIDE_4          "G1_rule_string_literal_inside_4"
 #define G1_RULE_STRING_LITERAL_INSIDE_5          "G1_rule_string_literal_inside_5"
-#define G1_RULE_DISCARD_OFF                      "G1_rule_discard_off"
 #define G1_RULE_DISCARD_ON                       "G1_rule_discard_on"
+#define G1_RULE_DISCARD_OFF                      "G1_rule_discard_off"
 #define G1_RULE_LUASCRIPT_STATEMENT              "G1_rule_luascript_statement"
 #define G1_RULE_LUASCRIPT_SOURCE                 "G1_rule_luascript_source"
 
@@ -189,6 +193,7 @@
 #define G1_ACTION_STATEMENT_17                     "::undef"
 #define G1_ACTION_STATEMENT_18                     "::undef"
 #define G1_ACTION_STATEMENT_19                     "::undef"
+#define G1_ACTION_STATEMENT_20                     "::undef"
 #define G1_ACTION_START_RULE                       "G1_action_start_rule"                       /* done */
 #define G1_ACTION_DESC_RULE                        "G1_action_desc_rule"                        /* done */
 #define G1_ACTION_EMPTY_RULE                       "G1_action_empty_rule"                       /* done */
@@ -199,6 +204,7 @@
 #define G1_ACTION_DISCARD_RULE                     "G1_action_discard_rule"                     /* done */
 #define G1_ACTION_DEFAULT_RULE                     "G1_action_default_rule"                     /* done */
 #define G1_ACTION_LEXEME_RULE                      "G1_action_lexeme_rule"                      /* done */
+#define G1_ACTION_TERMINAL_RULE                    "G1_action_terminal_rule"                    /* done */
 #define G1_ACTION_COMPLETION_EVENT_DECLARATION_1   "G1_action_completion_event_declaration_1"   /* done */
 #define G1_ACTION_COMPLETION_EVENT_DECLARATION_2   "G1_action_completion_event_declaration_2"   /* done */
 #define G1_ACTION_NULLED_EVENT_DECLARATION_1       "G1_action_nulled_event_declaration_1"       /* done */
@@ -271,6 +277,7 @@
 #define G1_ACTION_EVENT_NAME_2                     "::ascii" /* <event name> ::= ':symbol' */
 #define G1_ACTION_EVENT_NAME_3                     "::ascii" /* <event name> ::= ':discard[on]' */
 #define G1_ACTION_EVENT_NAME_4                     "::ascii" /* <event name> ::= ':discard[off]' */
+#define G1_ACTION_EVENT_NAME_5                     "::ascii" /* <event name> ::= ':discard[switch]' */
 #define G1_ACTION_LHS                              "::shift" /* lhs ::= <symbol name> */
 #define G1_ACTION_RHS                              "G1_action_rhs"                              /* done */
 #define G1_ACTION_RHS_ALTERNATIVE_1                "G1_action_rhs_alternative_1"                /* done */
@@ -284,9 +291,10 @@
 #define G1_ACTION_RHS_PRIMARY_1                    "G1_action_rhs_primary_1"                    /* done */
 #define G1_ACTION_RHS_PRIMARY_2                    "G1_action_rhs_primary_2"                    /* done */
 #define G1_ACTION_SINGLE_SYMBOL_1                  "G1_action_single_symbol_1"                  /* done */
-#define G1_ACTION_SINGLE_SYMBOL_2                  "G1_action_single_symbol_2"                  /* done */
-#define G1_ACTION_SINGLE_SYMBOL_3                  "G1_action_single_symbol_3"                  /* done */
-#define G1_ACTION_SINGLE_SYMBOL_4                  "G1_action_single_symbol_4"                  /* done */
+#define G1_ACTION_SINGLE_SYMBOL_2                  "::shift"                                    /* done */
+#define G1_ACTION_TERMINAL_1                       "G1_action_terminal_1"                       /* done */
+#define G1_ACTION_TERMINAL_2                       "G1_action_terminal_2"                       /* done */
+#define G1_ACTION_TERMINAL_3                       "G1_action_terminal_3"                       /* done */
 #define G1_ACTION_SYMBOL                           "::shift" /* symbol ::= <symbol name> */
 #define G1_ACTION_SYMBOL_NAME_1                    "G1_action_symbol_name_1" /* <symbol name> ::= <bare name> */
 #define G1_ACTION_SYMBOL_NAME_2                    "G1_action_symbol_name_2" /* <symbol name> ::= <bracketed name> */ /* done */
@@ -328,8 +336,8 @@
 #define G1_ACTION_STRING_LITERAL_INSIDE_3          "G1_action_string_literal_inside_3"          /* done */
 #define G1_ACTION_STRING_LITERAL_INSIDE_4          "G1_action_string_literal_inside_4"          /* done */
 #define G1_ACTION_STRING_LITERAL_INSIDE_5          "G1_action_string_literal_inside_5"          /* done */
-#define G1_ACTION_DISCARD_OFF                      "::undef"
 #define G1_ACTION_DISCARD_ON                       "::undef"
+#define G1_ACTION_DISCARD_OFF                      "::undef"
 #define G1_ACTION_LUASCRIPT_STATEMENT              "G1_action_luascript_statement"
 #define G1_ACTION_LUASCRIPT_SOURCE                 "::concat"
 

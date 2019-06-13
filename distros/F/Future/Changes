@@ -1,5 +1,9 @@
 Revision history for Future
 
+0.41    2019-06-13
+        [CHANGES]
+         * Added Future::Exception->throw
+
 0.40    2019-05-03
         [CHANGES]
          * Added Future::Exception (RT129373)

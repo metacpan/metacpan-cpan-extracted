@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 our @EXPORT = qw(get_iso639_1);
 
@@ -1512,14 +1512,15 @@ sub get_iso639_1 {
         return \%result;
     }
 
-    $input =~ m/(?<code>[^_-]+)[_-](?<localization>[^_-]+)/;
-    my ($code, $localization) = ($+{code}, uc($+{localization}));
+    if ($input =~ m/(?<code>[^_-]+)[_-](?<localization>[^_-]+)/) {
+        my ($code, $localization) = ($+{code}, uc($+{localization}));
 
-    if (defined($code) && defined $codes{$code}) {
-        my %result = %{$codes{$code}};
-        $result{nativeName} .= ' ('.uc($localization).')';
-        $result{name}       .= ' ('.$localization.')';
-        return \%result;
+        if (defined($code) && defined $codes{$code}) {
+            my %result = %{$codes{$code}};
+            $result{nativeName} .= ' ('.uc($localization).')';
+            $result{name}       .= ' ('.$localization.')';
+            return \%result;
+        }
     }
     return undef;
 }
@@ -1562,7 +1563,7 @@ ISO::639_1 exports the following methods:
 =head2 get_iso639_1
 
   Usage    : get_iso639_1('zu')
-  Returns  : a hashref providing the informations described below.
+  Returns  : a hashref providing the informations described below. May return undef if no language is found.
             {
                 "639-1"      => "zu",          # ISO 639-1 code
                 "639-2"      => "zul",         # ISO 639-2 code
@@ -1593,12 +1594,12 @@ You can find documentation for this module with the perldoc command.
 
 Bugs and feature requests will be tracked on:
 
-    https://framagit.org/luc/iso-639_1/issues
+    https://framagit.org/fiat-tux/perl-modules/iso-639_1/issues
 
 The latest source code can be browsed and fetched at:
 
-    https://framagit.org/luc/iso-639_1
-    git clone https://framagit.org/luc/iso-639_1.git
+    https://framagit.org/fiat-tux/perl-modules/iso-639_1
+    git clone https://framagit.org/fiat-tux/perl-modules/iso-639_1.git
 
 Source code mirror:
 

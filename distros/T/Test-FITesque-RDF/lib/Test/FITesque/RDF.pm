@@ -5,7 +5,7 @@ use warnings;
 package Test::FITesque::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use Moo;
 use Attean::RDF;
@@ -19,7 +19,7 @@ use Carp qw(croak);
 use Data::Dumper;
 use HTTP::Request;
 use HTTP::Response;
-
+use LWP::UserAgent;
 
 has source => (
 					is      => 'ro',
@@ -118,6 +118,18 @@ sub transform_rdf {
 					 $req->method($req_data->object->value);
 				  } elsif ($req_data->predicate->equals($ns->http->requestURI)) {
 					 $req->uri($req_data->object->as_string);
+				  } elsif ($req_data->predicate->equals($ns->http->content)) {
+					 if ($req_data->object->is_literal) {
+						$req->content($req_data->object->value); # TODO: might need encoding
+					 } elsif ($req_data->object->is_iri) {
+						my $ua = LWP::UserAgent->new;
+						my $content_response = $ua->get($req_data->object);
+						if ($content_response->is_success) {
+						  $req->content($content_response->decoded_content); # TODO: might need encoding
+						} else {
+						  croak "Could not retrieve content from " . $req_data->object->as_string . " . Got " . $content_response->status_line;
+						}
+					 }
 				  } elsif (defined($local_header)) {
 					 $req->push_header(_find_header($local_header, $req_data));
 				  }

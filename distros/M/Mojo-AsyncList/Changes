@@ -1,4 +1,7 @@
 Revision history for perl distribution Mojo-AsyncList
 
+0.02 2019-06-13T09:44:07+0200
+ - Fix bug when concurrent is higher than number of @items
+
 0.01 2019-06-04T15:50:27+0200
  - Started on Mojo::AsyncList

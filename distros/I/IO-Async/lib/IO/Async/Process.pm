@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 use Carp;
 
@@ -71,7 +71,8 @@ Also accessible via the L<IO::Async::Loop/open_process> method:
     },
 
     on_finish => sub {
-       my ( $pid, $exitcode ) = @_;
+       my $process = shift;
+       my ( $exitcode ) = @_;
        my $status = ( $exitcode >> 8 );
        ...
     },
@@ -115,7 +116,8 @@ field will be an empty string. It will however always be defined. This can be
 used to distinguish the two cases:
 
  on_exception => sub {
-    my ( $self, $exception, $errno, $exitcode ) = @_;
+    my $self = shift;
+    my ( $exception, $errno, $exitcode ) = @_;
 
     if( length $exception ) {
        print STDERR "The process died with the exception $exception " .
@@ -804,7 +806,9 @@ data written by the process can be captured.
     command => [ "writing-program", "arguments" ],
     stdout => { into => \$stdout },
     on_finish => sub {
-       print "The process has finished, and wrote:\n";
+       my $process = shift;
+       my ( $exitcode ) = @_;
+       print "Process has exited with code $exitcode, and wrote:\n";
        print $stdout;
     }
  );

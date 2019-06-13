@@ -14,7 +14,7 @@ App::GHPT::WorkSubmitter::Question::ExampleFileNameCheck - An example supplement
 
 =head1 VERSION
 
-version 1.000010
+version 1.000011
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

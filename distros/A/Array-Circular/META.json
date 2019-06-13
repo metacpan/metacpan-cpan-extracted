@@ -26,6 +26,12 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -39,7 +45,7 @@
          "web" : "https://github.com/singingfish/p5-array-circular"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

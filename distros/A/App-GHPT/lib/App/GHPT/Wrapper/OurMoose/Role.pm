@@ -2,7 +2,7 @@ package App::GHPT::Wrapper::OurMoose::Role;
 
 use App::GHPT::Wrapper::Ourperl;
 
-our $VERSION = '1.000010';
+our $VERSION = '1.000011';
 
 use Import::Into;
 use Moose::Exporter;
@@ -18,7 +18,7 @@ my ($import) = Moose::Exporter->setup_import_methods(
 sub import {
     my $for_role = caller();
 
-    $import->( undef, { into => $for_role } );
+    $import->( undef,                       { into => $for_role } );
     MooseX::SemiAffordanceAccessor->import( { into => $for_role } );
 
     my $caller_level = 1;

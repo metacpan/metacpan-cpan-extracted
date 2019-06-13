@@ -61,8 +61,9 @@ excluding `len`, `answer_packet`, and `answer_len`.
 neither does DNS::Unbound.)
 To decode some common record types, see ["CONVENIENCE FUNCTIONS"](#convenience-functions) below.
 
-Also **NOTE:** libunbound’s facilities for timing out a synchronous query
-are rather lackluster. If that’s relevant for you, you probably want
+Also **NOTE:** libunbound doesn’t seem to offer effective controls for
+timing out a synchronous query.
+If timeouts are relevant for you, you probably want
 to use `resolve_async()` instead.
 
 ## $query = _OBJ_->resolve\_async( $NAME, $TYPE \[, $CLASS \] );

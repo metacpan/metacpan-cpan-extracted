@@ -66,12 +66,14 @@ is(scalar @{$params->{'http-requests'}}, 2, 'There are two requests');
 foreach my $req (@{$params->{'http-requests'}}) {
   object_ok($req, 'Checking request object',
 				isa => ['HTTP::Request'],
-				can => [qw(method uri headers)]
+				can => [qw(method uri headers content)]
 			  );
 }
 
 is(${$params->{'http-requests'}}[0]->method, 'PUT', 'First method is PUT');
 is(${$params->{'http-requests'}}[1]->method, 'GET', 'Second method is GET');
+
+like(${$params->{'http-requests'}}[0]->content, qr/dahut/, 'First request has content');
 
 
 is(scalar @{$params->{'http-responses'}}, 2, 'There are two responses');
@@ -85,6 +87,8 @@ foreach my $res (@{$params->{'http-responses'}}) {
 
 is(${$params->{'http-responses'}}[0]->code, '201', 'First code is 201');
 is(${$params->{'http-responses'}}[1]->content_type, 'text/turtle', 'Second ctype is turtle');
+
+# TODO: Test retrieving content from URI
 
 done_testing;
 

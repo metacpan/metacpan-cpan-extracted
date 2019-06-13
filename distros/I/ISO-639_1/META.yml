@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.0, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +26,12 @@ no_index:
 provides:
   ISO::639_1:
     file: lib/ISO/639_1.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Module::Build::Tiny: '0'
   perl: '5.008001'
 resources:
-  repository: https://framagit.org/luc/iso-639_1.git
-version: '0.02'
+  repository: git://framagit.org/fiat-tux/perl-modules/iso-639_1.git
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,3 +1,10 @@
+1.55 (2019-06-13)
+  [ gregor herrmann ]
+  * fix typo in test diag()
+
+  [ Damyan Ivanov ]
+  * fix coloring of failed pipelines (Closes: #930450)
+
 1.54 (2019-01-03)
   [ Damyan Ivanov ]
   * comment out the test client config example of message-template

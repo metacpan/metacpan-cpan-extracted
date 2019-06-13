@@ -1,3 +1,5 @@
+0.14    2019-06-13
+        - Fix definition of CvSTASH.
 0.13	2017-06-02
 	- Only expose documented SV constants.
 	- Add GV constants.

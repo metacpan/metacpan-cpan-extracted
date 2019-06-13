@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+# ABSTRACT: Remove tags by content from ABI traces
+# PODNAME: strip_tags
 use 5.018;
 use warnings;
 use Data::Dumper;
@@ -7,7 +9,6 @@ use Term::ANSIColor;
 my ($file, $REMOVE_TAG) = @ARGV;
 
 # STRIP TAGS FROM AB1 FILE IF CONTENT MATCHES $REMOVE_TAG
-# ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ
 
 die "Missing argument <AB1File>\n" unless (-e "$file");
 die "Missing argument TAG (usage: FileABI TagContentToStrip)\n" unless (defined $REMOVE_TAG);

@@ -2,7 +2,7 @@ package Ouroboros::Spec;
 use strict;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 # spec {
 our %SPEC = (
@@ -1465,14 +1465,14 @@ our %SPEC = (
       "type" => "void"
     },
     {
-      "c_decl" => "OUROBOROS_STATIC void ouroboros_cv_stash(pTHX_ CV*);",
+      "c_decl" => "OUROBOROS_STATIC HV* ouroboros_cv_stash(pTHX_ CV*);",
       "name" => "ouroboros_cv_stash",
       "params" => [
         "CV*"
       ],
       "ptr_name" => "ouroboros_cv_stash_ptr",
       "tags" => {},
-      "type" => "void"
+      "type" => "HV*"
     },
     {
       "c_decl" => "OUROBOROS_STATIC const char* ouroboros_hv_name(pTHX_ HV*);",

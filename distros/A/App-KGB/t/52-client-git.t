@@ -31,7 +31,7 @@ binmode $builder->todo_output,    ":utf8";
 
 my $tmp_cleanup = not $ENV{TEST_KEEP_TMP};
 my $dir = tempdir( 'kgb-XXXXXXX', CLEANUP => $tmp_cleanup, DIR => File::Spec->tmpdir );
-diag "Temp directory $dir will pe kept" unless $tmp_cleanup;
+diag "Temp directory $dir will be kept" unless $tmp_cleanup;
 
 my $test_bot = TestBot->start;
 

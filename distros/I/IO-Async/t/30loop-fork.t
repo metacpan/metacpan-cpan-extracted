@@ -78,4 +78,21 @@ SKIP: {
    is( ($exitcode >> 8), 22,    'WEXITSTATUS($exitcode) after child SIGINT with keep_signals' );
 }
 
+{
+   my $exitcode;
+
+   $loop->fork(
+      code => sub {
+         my $innerloop = IO::Async::Loop->new;
+         return 0 if $innerloop != $loop; # success
+         return 1;
+      },
+      on_exit => sub { ( undef, $exitcode ) = @_ },
+   );
+
+   wait_for { defined $exitcode };
+
+   ok( $exitcode == 0, 'IO::Async::Loop->new inside forked process code gets new loop instance' );
+}
+
 done_testing;

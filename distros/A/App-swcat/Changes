@@ -1,4 +1,11 @@
+0.013   2019-06-07 (PERLANCAR)
+
+	- Add --self-upgrade (-U).
+
+
 0.012   2019-06-03 (PERLANCAR)
+
+	- No functional changes.
 
 	- Downgrade MetaCPAN::Client & App::lcpan::Call from requires ->
 	  suggests.

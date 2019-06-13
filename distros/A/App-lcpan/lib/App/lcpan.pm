@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '1.032'; # VERSION
+our $DATE = '2019-06-07'; # DATE
+our $VERSION = '1.033'; # VERSION
 
 use 5.010001;
 use strict;
@@ -4053,7 +4053,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.032 of App::lcpan (from Perl distribution App-lcpan), released on 2019-01-09.
+This document describes version 1.033 of App::lcpan (from Perl distribution App-lcpan), released on 2019-06-07.
 
 =head1 SYNOPSIS
 
@@ -4140,6 +4140,7 @@ Return value:  (any)
 
 By default will return an array of CPAN ID's. If you set C<detail> to true, will
 return array of records.
+
 
 
 =head2 deps
@@ -4231,7 +4232,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4262,6 +4263,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 dists
@@ -4370,6 +4372,7 @@ By default will return an array of distribution names. If you set C<detail> to
 true, will return array of records.
 
 
+
 =head2 modules
 
 Usage:
@@ -4427,7 +4430,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4464,6 +4467,7 @@ Return value:  (any)
 
 By default will return an array of package names. If you set C<detail> to true,
 will return array of records.
+
 
 
 =head2 namespaces
@@ -4536,6 +4540,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 packages
 
 Usage:
@@ -4593,7 +4598,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4630,6 +4635,7 @@ Return value:  (any)
 
 By default will return an array of package names. If you set C<detail> to true,
 will return array of records.
+
 
 
 =head2 rdeps
@@ -4704,6 +4710,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 releases
@@ -4795,6 +4802,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 reset
 
 Usage:
@@ -4845,6 +4853,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 stats
 
 Usage:
@@ -4893,6 +4902,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 update
@@ -5024,6 +5034,12 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<CPAN::SQLite>
+
+L<CPAN::Mini>
 
 =head1 AUTHOR
 

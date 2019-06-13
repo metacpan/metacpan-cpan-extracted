@@ -16,14 +16,21 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Array::Circular",
   "PREREQ_PM" => {},
-  "VERSION" => "0.005",
+  "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Test::Exception" => 0,
+  "Test::More" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

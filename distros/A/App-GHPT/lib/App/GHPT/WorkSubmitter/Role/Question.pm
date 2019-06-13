@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::Role::Question;
 
 use App::GHPT::Wrapper::OurMoose::Role;
 
-our $VERSION = '1.000010';
+our $VERSION = '1.000011';
 
 use Term::CallEditor qw( solicit );
 use Term::Choose qw( choose );
@@ -52,7 +52,7 @@ sub _trim ($text) {
 ## use critic
 
 sub format_qa_markdown ( $self, $question, $answer ) {
-    return <<"ENDOFMARKDOWN"
+    return <<"ENDOFMARKDOWN";
 ### Question ###
 @{[ _trim( $question )]}
 
@@ -77,7 +77,7 @@ App::GHPT::WorkSubmitter::Role::Question - Role for writing interactive question
 
 =head1 VERSION
 
-version 1.000010
+version 1.000011
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -22,7 +22,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-HTTP-UserAgentString-PERLANCAR
   homepage: https://metacpan.org/release/WordList-HTTP-UserAgentString-PERLANCAR
   repository: git://github.com/perlancar/perl-WordList-HTTP-UserAgentString-PERLANCAR.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -102,7 +102,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.594'
+      version: '0.596'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -167,9 +167,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/OurDist'
       version: '0.02'
     -
-      class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
-      name: '@Author::PERLANCAR/PERLANCAR::OurPkgVersion'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::PERLANCAR/OurPkgVersion'
+      version: '0.15'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:

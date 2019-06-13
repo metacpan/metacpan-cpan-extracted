@@ -9,12 +9,12 @@ Test::Taint - Tools to test taintedness
 
 =head1 VERSION
 
-Version 1.06
+Version 1.08
 
 =cut
 
 use vars qw( $VERSION );
-$VERSION = "1.06";
+$VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -281,7 +281,7 @@ References can be tainted like any other scalar, but it doesn't make
 sense to, so they will B<not> be tainted by this function.
 
 Some C<tie>d and magical variables may fail to be tainted by this routine,
-try as it may.)
+try as it may.
 
 =cut
 
@@ -357,7 +357,7 @@ Written by Andy Lester, C<< <andy@petdance.com> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2004, Andy Lester, All Rights Reserved.
+Copyright 2004-2019, Andy Lester.
 
 You may use, modify, and distribute this package under the
 same terms as Perl itself.

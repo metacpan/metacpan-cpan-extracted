@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
  */
 #include "EXTERN.h"
 #include "perl.h"
@@ -48,44 +48,18 @@ typedef I32 array_ix_t;
 #endif /* <5.19.4 */
 
 static OP *pp_entertrycatch(pTHX);
+static OP *pp_catch(pTHX);
 
 /*
- * A modified version of pp_return for returning from inside a try block.
- * To do this, we unwind the context stack to just past the CXt_EVAL and then
- * chain to the regular OP_RETURN func
+ * A variant of dounwind() which preserves the topmost scalar or list value on
+ * the stack in non-void context
  */
-static OP *pp_returnintry(pTHX)
+#define dounwind_keeping_stack(cxix)  MY_dounwind_keeping_stack(aTHX_ cxix)
+static void MY_dounwind_keeping_stack(pTHX_ I32 cxix)
 {
-  I32 cxix;
   I32 gimme;
   SV *retval;
 
-  for (cxix = cxstack_ix; cxix; cxix--) {
-    if(CxTYPE(&cxstack[cxix]) == CXt_SUB)
-      break;
-
-    if(CxTYPE(&cxstack[cxix]) == CXt_EVAL && CxTRYBLOCK(&cxstack[cxix])) {
-      /* If this CXt_EVAL frame came from our own ENTERTRYCATCH, then the
-       * retop should point at an OP_OR and its first grand-child will be our
-       * custom modified ENTERTRY. We can skip over it and continue in this
-       * case.
-       */
-      OP *retop = cxstack[cxix].blk_eval.retop;
-      OP *leave, *enter;
-      if(retop->op_type == OP_OR &&
-         (leave = cLOGOPx(retop)->op_first) && leave->op_type == OP_LEAVETRY &&
-         (enter = cLOGOPx(leave)->op_first) && enter->op_type == OP_ENTERTRY &&
-         enter->op_ppaddr == &pp_entertrycatch) {
-        continue;
-      }
-      /* We have to stop at any other kind of CXt_EVAL */
-      break;
-    }
-  }
-  if(!cxix)
-    croak("Unable to find an CXt_SUB to pop back to");
-
-  /* Before we unwind the stack we must preserve the value(s) being returned */
   /* chunks of this code inspired by
    *   ZEFRAM/Scope-Escape-0.005/lib/Scope/Escape.xs
    */
@@ -144,6 +118,43 @@ static OP *pp_returnintry(pTHX)
       break;
     }
   }
+}
+
+/*
+ * A modified version of pp_return for returning from inside a try block.
+ * To do this, we unwind the context stack to just past the CXt_EVAL and then
+ * chain to the regular OP_RETURN func
+ */
+static OP *pp_returnintry(pTHX)
+{
+  I32 cxix;
+
+  for (cxix = cxstack_ix; cxix; cxix--) {
+    if(CxTYPE(&cxstack[cxix]) == CXt_SUB)
+      break;
+
+    if(CxTYPE(&cxstack[cxix]) == CXt_EVAL && CxTRYBLOCK(&cxstack[cxix])) {
+      /* If this CXt_EVAL frame came from our own ENTERTRYCATCH, then the
+       * retop should point at an OP_CUSTOM and its first grand-child will be
+       * our custom modified ENTERTRY. We can skip over it and continue in
+       * this case.
+       */
+      OP *retop = cxstack[cxix].blk_eval.retop;
+      OP *leave, *enter;
+      if(retop->op_type == OP_CUSTOM && retop->op_ppaddr == &pp_catch &&
+         (leave = cLOGOPx(retop)->op_first) && leave->op_type == OP_LEAVETRY &&
+         (enter = cLOGOPx(leave)->op_first) && enter->op_type == OP_ENTERTRY &&
+         enter->op_ppaddr == &pp_entertrycatch) {
+        continue;
+      }
+      /* We have to stop at any other kind of CXt_EVAL */
+      break;
+    }
+  }
+  if(!cxix)
+    croak("Unable to find an CXt_SUB to pop back to");
+
+  dounwind_keeping_stack(cxix);
 
   return PL_ppaddr[OP_RETURN](aTHX);
 }
@@ -329,18 +340,38 @@ static void MY_walk_optree_try_in_eval(pTHX_ OP **op_ptr, OP *root)
   }
 }
 
-/* We call this op entertrycatch to distinguish it from core perl's entertry.
- * It doesn't actually implement the catch behaviour
- */
 static OP *pp_entertrycatch(pTHX)
 {
+  /* Localise the errgv */
+  save_scalar(PL_errgv);
+
   return PL_ppaddr[OP_ENTERTRY](aTHX);
+}
+
+static XOP xop_catch;
+
+static OP *pp_catch(pTHX)
+{
+  /* If an error didn't happen, then ERRSV will be both not true and not a
+   * reference. If it's a reference, then an error definitely happened
+   */
+  if(SvROK(ERRSV) || SvTRUE(ERRSV))
+    return cLOGOP->op_other;
+  else
+    return cLOGOP->op_next;
+}
+
+/* A variant of OP_LEAVE which keeps the values on the stack */
+static OP *pp_leave_keeping_stack(pTHX)
+{
+  dounwind_keeping_stack(cxstack_ix - 1);
+  return cUNOP->op_next;
 }
 
 #define newENTERTRYCATCHOP(try, catch)  MY_newENTERTRYCATCHOP(aTHX_ try, catch)
 static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
 {
-  OP *enter;
+  OP *enter, *ret;
 
   /* Walk the block for OP_RETURN ops, so we can apply a hack to them to
    * make
@@ -349,21 +380,21 @@ static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
    */
   walk_optree_try_in_eval(&try, try);
 
-  enter = newUNOP(OP_ENTERTRY, 0,
-    op_append_elem(OP_LINESEQ,
-      try,
-      newSVOP(OP_CONST, 0, &PL_sv_yes)
-    )
-  );
+  enter = newUNOP(OP_ENTERTRY, 0, try);
   /* despite calling newUNOP(OP_ENTERTRY,...) the returned root node is the
    * OP_LEAVETRY, whose first child is the ENTERTRY we wanted
    */
   ((UNOP *)enter)->op_first->op_ppaddr = &pp_entertrycatch;
 
-  return newLOGOP(OP_OR, 0,
+  ret = newLOGOP(OP_CUSTOM, 0,
     enter,
     newLISTOP(OP_SCOPE, 0, catch, NULL)
   );
+  /* the returned op is actually an UNOP that's either NULL or NOT; the real
+   * logop is the op_next of it
+   */
+  cUNOPx(ret)->op_first->op_ppaddr = &pp_catch;
+  return ret;
 }
 
 static int try_keyword(pTHX_ OP **op)
@@ -371,11 +402,24 @@ static int try_keyword(pTHX_ OP **op)
   OP *try = NULL, *catch = NULL;
   CV *finally = NULL;
   OP *ret = NULL;
+  bool is_value = FALSE;
+  HV *hints = GvHV(PL_hintgv);
 
   lex_read_space(0);
 
+  if(hints && hv_fetchs(hints, "Syntax::Keyword::Try/try_value", 0) &&
+     lex_consume("do")) {
+    lex_read_space(0);
+    is_value = TRUE;
+
+#ifdef WARN_EXPERIMENTAL
+    Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+      "'try do' syntax is experimental and may be changed or removed without notice");
+#endif
+  }
+
   if(lex_peek_unichar(0) != '{')
-    croak("Expected try be followed by '{'");
+    croak("Expected try to be followed by '{'");
 
   try = parse_scoped_block(0);
   lex_read_space(0);
@@ -389,6 +433,11 @@ static int try_keyword(pTHX_ OP **op)
   if(lex_consume("finally")) {
     I32 floor_ix, save_ix;
     OP *body;
+
+#if !PERL_VERSION_GE(5,24,0)
+    if(is_value)
+      croak("try do {} finally {} is not supported on this version of perl");
+#endif
 
     lex_read_space(0);
 
@@ -412,15 +461,8 @@ static int try_keyword(pTHX_ OP **op)
 
   ret = try;
 
-  /* If there's a catch block, make
-   *   $RET = eval { $TRY; 1 } or do { $CATCH }
-   */
-
   if(catch) {
     ret = newENTERTRYCATCHOP(try, catch);
-
-    /* localise $@ beforehand */
-    ret = op_prepend_elem(OP_LINESEQ, newLOCALISEOP(PL_errgv), ret);
   }
 
   /* If there's a finally, make
@@ -430,16 +472,14 @@ static int try_keyword(pTHX_ OP **op)
      ret = op_prepend_elem(OP_LINESEQ, newPUSHFINALLYOP(finally), ret);
   }
 
-  /* If there's either catch or finally, block-wrap the result
-   */
-  if(catch || finally) {
-    ret = newLISTOP(OP_LEAVE, 0,
-      op_prepend_elem(OP_LINESEQ, newOP(OP_ENTER, 0), ret),
-      NULL);
-  }
+  ret = newLISTOP(OP_LEAVE, 0,
+    op_prepend_elem(OP_LINESEQ, newOP(OP_ENTER, 0), ret),
+    NULL);
+  if(is_value)
+    ret->op_ppaddr = &pp_leave_keeping_stack;
 
   *op = ret;
-  return KEYWORD_PLUGIN_STMT;
+  return is_value ? KEYWORD_PLUGIN_EXPR : KEYWORD_PLUGIN_STMT;
 }
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
@@ -473,6 +513,12 @@ BOOT:
   if(!next_keyword_plugin) {
     next_keyword_plugin = PL_keyword_plugin;
     PL_keyword_plugin = &my_keyword_plugin;
+
+    XopENTRY_set(&xop_catch, xop_name, "catch");
+    XopENTRY_set(&xop_catch, xop_desc,
+      "optionally invoke the catch block if required");
+    XopENTRY_set(&xop_catch, xop_class, OA_LOGOP);
+    Perl_custom_op_register(aTHX_ &pp_catch, &xop_catch);
 
     XopENTRY_set(&xop_pushfinally, xop_name, "pushfinally");
     XopENTRY_set(&xop_pushfinally, xop_desc,

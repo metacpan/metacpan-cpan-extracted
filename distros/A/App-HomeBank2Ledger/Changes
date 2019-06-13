@@ -1,0 +1,12 @@
+Revision history for App-HomeBank2Ledger.
+
+0.003     2019-06-13 02:55:59-06:00 MST7MDT
+  * Fix bug that makes the --version and --help flags broken
+
+0.002     2019-06-12 23:39:32-06:00 MST7MDT
+  * Rename dist
+  * Provide better README in dist
+
+0.001     2019-06-12 22:54:58-06:00 MST7MDT
+  * Initial early development release
+

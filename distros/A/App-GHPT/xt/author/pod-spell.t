@@ -16,6 +16,7 @@ App
 AskPullRequestQuestions
 ChangedFiles
 ChangedFilesFactory
+Chelluri
 Cronin
 Dave
 Eilam
@@ -35,6 +36,7 @@ Mark
 MaxMind
 MaxMind's
 Meta
+Narsimham
 OAuth
 Oschwald
 Oschwald's
@@ -66,6 +68,7 @@ iff
 lib
 mark
 mfowler
+nchelluri
 pcronin
 phair
 rafl

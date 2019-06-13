@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-06-07'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 use 5.010;
 use strict;
@@ -9,6 +9,7 @@ use warnings;
 use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
 
 use Perinci::CmdLine::Any;
+use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
 my $prefix = "/App/swcat/";
 
@@ -26,6 +27,7 @@ my $cli = Perinci::CmdLine::Any->new(
         'archive-info' => {url=>"${prefix}archive_info"},
     },
 );
+Perinci::CmdLineX::CommonOptions::SelfUpgrade->apply_to_object($cli);
 $cli->run;
 
 # ABSTRACT: Software catalog
@@ -43,7 +45,7 @@ swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.012 of swcat (from Perl distribution App-swcat), released on 2019-06-03.
+This document describes version 0.013 of swcat (from Perl distribution App-swcat), released on 2019-06-07.
 
 =head1 SYNOPSIS
 
@@ -212,6 +214,10 @@ Do not read environment for default options.
 =item B<--quiet>
 
 Shortcut for --log-level=error.
+
+=item B<--self-upgrade>, B<-U>
+
+Update program to latest version from CPAN.
 
 =item B<--subcommands>
 

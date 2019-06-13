@@ -1,5 +1,10 @@
 Revision history for Perl extension DateTime::Calendar::FrenchRevolutionary.
 
+0.15  Quintidi 25 Prairial CCXXVII, jour de la tanche,  219th anniversary of the Marengo victory and of Kléber's assassination (or Thusday, 2019-06-13)
+        - fix a few typos in the feasts names (thank you Gérald)
+	- add a few entries in the "SEE ALSO" chapter (thank you Gérald)
+        - tidying up the documentation, for example replacing http:// by https:// whenever possible
+
 0.14  Primidi 11 Frimaire CCXXV, jour de la cire, 212th anniversary of Napoleon's crowning, 211th anniversary of the Battle of Austerlitz (or Thursday 2016-12-01)
         - fix a few typos
         - Makefile.PL no longer uses Module::Build

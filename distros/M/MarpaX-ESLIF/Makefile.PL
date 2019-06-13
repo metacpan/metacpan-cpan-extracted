@@ -541,7 +541,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.11",
+  "VERSION" => "3.0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }

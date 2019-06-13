@@ -1,0 +1,61 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::Plugin::ConsistentVersionTest' => '0',
+                                      'Dist::Zilla::PluginBundle::Author::CCM' => '0',
+                                      'Dist::Zilla::PluginBundle::Filter' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Software::License::MIT' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::ConsistentVersion' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::No404s' => '0',
+                                      'Test::Portability::Files' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Exporter' => '0',
+                                      'Getopt::Long' => '2.38',
+                                      'Module::Load' => '0',
+                                      'Module::Pluggable' => '0',
+                                      'Pod::Usage' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Time::Piece' => '0',
+                                      'XML::Entities' => '0',
+                                      'XML::Parser::Lite' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

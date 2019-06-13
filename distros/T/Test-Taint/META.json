@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "unknown"
    ],
@@ -22,26 +22,31 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Scalar::Util" : 0,
-            "Test::Builder" : 0,
-            "Test::More" : 0,
-            "Tie::Array" : 0,
-            "Tie::Hash" : 0,
-            "Tie::Scalar" : 0,
-            "overload" : 0
+            "Scalar::Util" : "0",
+            "Test::Builder" : "0",
+            "Test::More" : "0",
+            "Tie::Array" : "0",
+            "Tie::Hash" : "0",
+            "Tie::Scalar" : "0",
+            "overload" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.06"
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/petdance/test-taint"
+      }
+   },
+   "version" : "1.08"
 }

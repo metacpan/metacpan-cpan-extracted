@@ -8,7 +8,7 @@
 
 package Mail::Server::IMAP4::Fetch;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 
 use strict;

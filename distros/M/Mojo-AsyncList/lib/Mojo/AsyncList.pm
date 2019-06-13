@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::IOLoop;
 use Time::HiRes ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has concurrent => 0;
 has ioloop     => sub { Mojo::IOLoop->singleton };
@@ -46,8 +46,9 @@ sub process {
   };
 
   $self->ioloop->next_tick(sub {
-    $self->emit(item => $items->[$item_pos++], $gather_cb->())
-      for 1 .. ($self->concurrent || @$items);
+    my $n = $self->concurrent;
+    $n = @$items if !$n or $n > @$items;
+    $self->emit(item => $items->[$item_pos++], $gather_cb->()) for 1 .. $n;
   });
 
   return $self;

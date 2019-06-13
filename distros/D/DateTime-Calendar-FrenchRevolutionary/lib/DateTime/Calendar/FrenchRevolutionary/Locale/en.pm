@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 # Perl DateTime extension for providing English strings for the French Revolutionary calendar
-# Copyright (c) 2003, 2004, 2010, 2011, 2014, 2016 Jean Forget. All rights reserved.
+# Copyright (c) 2003, 2004, 2010, 2011, 2014, 2016, 2019 Jean Forget. All rights reserved.
 #
 # See the license in the embedded documentation below.
 #
@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION = '0.14'; # same as parent module DT::C::FR
+$VERSION = '0.15'; # same as parent module DT::C::FR
 
 my @months_short  = qw (Vin Fog Fro Sno Rai Win Bud Flo Mea Rea Hea Fru S-C);
 
@@ -55,7 +55,7 @@ my %time_formats = (
 # wants to initialize a flat array with the concatenation of lists.
 # I am a (at least mildly) experienced programmer who wants to use qw() and yet insert
 # comments in some places.
-# This array is mainly based on http://www.kokogiak.com/frc/default.asp
+# This array is mainly based on L<https://www.allhotelscalifornia.com/kokogiakcom/frc/default.asp>
 # Used with permission from Alan Taylor
 # Checked with Jonathan Badger's FrenchRevCal-ruby and Wikipedia
 my @feast = (
@@ -1472,7 +1472,7 @@ their victorious advances until Gosselies.
 24 Prairial III Army of Sambre and Meuse. Capture of Luxembourg.
 
 0925
-25 Prairial VIII Battle of Marengo, Italy. The same day, general Kleber assassinated in Cairo.
+25 Prairial VIII Battle of Marengo, Italy. The same day, general Kleber is assassinated in Cairo.
 
 0926
 26 Prairial II United Armies of Moselle, Ardennes and North. Near
@@ -2202,7 +2202,7 @@ in any French History book or any encyclopedia.
 =head1 SUPPORT
 
 Support for this module is provided via the datetime@perl.org email
-list. See http://lists.perl.org/ for more details.
+list. See L<https://lists.perl.org/> for more details.
 
 =head1 AUTHOR
 
@@ -2223,27 +2223,26 @@ Calendrier Militaire, anonymous
 
 L<http://datetime.perl.org/>
 
-L<http://www.kokogiak.com/frc/default.asp> (the link still exists, but
-it seems  to no  longer include stuff  about the  French Revolutionary
-calendar.)
+L<https://www.allhotelscalifornia.com/kokogiakcom/frc/default.asp>
 
 L<https://github.com/jhbadger/FrenchRevCal-ruby>
 
-L<http://en.wikipedia.org/wiki/French_Republican_Calendar>
+L<https://en.wikipedia.org/wiki/French_Republican_Calendar>
 
 =head1 LICENSE STUFF
 
-Copyright (c)  2003, 2004,  2010, 2012, 2014,  2016 Jean  Forget.  All
-rights reserved.  This program is  free software. You  can distribute,
-modify,  and otherwise  mangle DateTime::Calendar::FrenchRevolutionary
-under the same terms as perl 5.16.3.
+Copyright (c)  2003, 2004, 2010,  2012, 2014, 2016, 2019  Jean Forget.
+All  rights  reserved.   This  program  is  free   software.  You  can
+distribute,      adapt,     modify,      and     otherwise      mangle
+DateTime::Calendar::FrenchRevolutionary under  the same terms  as perl
+5.16.3.
 
 This program is  distributed under the same terms  as Perl 5.16.3: GNU
 Public License version 1 or later and Perl Artistic License
 
 You can find the text of the licenses in the F<LICENSE> file or at
-L<http://www.perlfoundation.org/artistic_license_1_0> and
-L<http://www.gnu.org/licenses/gpl-1.0.html>.
+L<https://dev.perl.org/licenses/artistic.html> and
+L<https://www.gnu.org/licenses/old-licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -2258,7 +2257,7 @@ MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
 You  should have received  a copy  of the  GNU General  Public License
-along with this program; if not, see <http://www.gnu.org/licenses/> or
-write to the Free Software Foundation, Inc., L<http://fsf.org>.
+along with this program; if not, see <https://www.gnu.org/licenses/> or
+write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

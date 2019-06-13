@@ -50,4 +50,16 @@ use Future;
       '->failure from Future->call on rethrown failure' );
 }
 
+# Future::Exception->throw
+{
+   my $e = exception { Future::Exception->throw( "message\n", category => qw( g h ) ) };
+
+   is( $e->message,  "message\n", '$e->message from F::E->throw' );
+   is( $e->category, "category",  '$e->category from F::E->throw' );
+   is_deeply( [ $e->details ], [qw( g h )], '$e->details from F::E->throw' );
+
+   $e = exception { Future::Exception->throw( "short", category => ) };
+   like( $e->message, qr/^short at \S+ line \d+\.$/, 'F::E->throw appends file/line' );
+}
+
 done_testing;

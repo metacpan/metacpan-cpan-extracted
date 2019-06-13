@@ -1,5 +1,12 @@
 Revision history for Perl extension ISO::639_1
 
+0.03 2019-06-13T11:35:23Z
+
+0.03 2019-06-13T11:31:10Z
+
+    - Update repository URLs
+    - Update pod: "may return undef"
+
 0.02 2018-06-01T13:44:59Z
 
     - Fix pod

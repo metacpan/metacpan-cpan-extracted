@@ -28,7 +28,6 @@ try {
     require_module('Mojo::UserAgent');
     require_module('Mojolicious');
 
-    # Guard against the modules being split out in future
     if ( version->parse($Mojolicious::VERSION) < 7.13 ) {
         die "Mojo version $Mojolicious::VERSION is too low";
     }

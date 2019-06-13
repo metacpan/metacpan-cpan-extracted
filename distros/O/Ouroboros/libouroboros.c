@@ -589,9 +589,9 @@ void ouroboros_sv_stash_set(pTHX_ SV* sv, HV* a)
         SvSTASH_set(sv, a);
 }
 
-void ouroboros_cv_stash(pTHX_ CV* a)
+HV* ouroboros_cv_stash(pTHX_ CV* a)
 {
-        CvSTASH(a);
+        return CvSTASH(a);
 }
 
 const char* ouroboros_hv_name(pTHX_ HV* a)

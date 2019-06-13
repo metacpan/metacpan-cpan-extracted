@@ -295,9 +295,9 @@ the latter, all standard imap flags which do not appear in the list will
 be ignored: their value may either by set or cleared.  See L<getFlags()|Mail::Transport::IMAP4/"Protocol [internals]">
 
 Unknown flags in C<@flags> are stripped from their backslash and
-
-lower-cased.  For instance, '\SomeWeirdFlag' will become `someweirdflag
-=> 1'.  It will be set to '1' for C<SET>, and '0' in case of C<CLEAR>.
+lower-cased.  For instance, '\SomeWeirdFlag' will become
+`someweirdflag =E<gt> 1'.  It will be set to '1' for C<SET>, and '0'
+in case of C<CLEAR>.
 
 example: translating IMAP4 flags into MailBox flags
 
@@ -468,8 +468,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.006,
-built on June 12, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.007,
+built on June 13, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

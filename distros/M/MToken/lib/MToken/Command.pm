@@ -1,6 +1,9 @@
-package MToken::Command; # $Id: Command.pm 44 2017-07-31 14:44:24Z minus $
+package MToken::Command; # $Id: Command.pm 70 2019-06-09 18:25:29Z minus $
 use strict;
 use feature qw/say/;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -8,7 +11,7 @@ MToken::Command - utilities to replace common UNIX commands in Makefiles etc.
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -55,11 +58,23 @@ Configure the Device
 
 Copy public or private key file to Device
 
+=head2 decrypt
+
+    perl -MMToken::Command -e decrypt -- *.asc .tar.gz
+
+GPG decrypt files
+
 =head2 del
 
     perl -MMToken::Command -e del
 
 Remove file from Device
+
+=head2 encrypt
+
+    perl -MMToken::Command -e encrypt -- file.tar.gz file.asc
+
+GPG encrypt file
 
 =head2 fetch
 
@@ -72,12 +87,6 @@ Download backup file from remote server
     perl -MMToken::Command -e genkey -- keys/myfooproject.key
 
 Generate main key file for Device
-
-=head2 gpgfileprepare
-
-    perl -MMToken::Command -e gpgfileprepare -- restore/* .tar.gz.gpg
-
-Rename file downloaded file
 
 =head2 gpgrecipient
 
@@ -129,52 +138,49 @@ Update backup file on server
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/ $VERSION @EXPORT /;
-$VERSION = "1.00";
+$VERSION = "1.01";
 
 use base qw/Exporter/;
 @EXPORT = qw/
         config genkey store fetch list info backupdelete backupupdate
-        cpgpgkey gpgrecipient gpgfileprepare untar
+        gpgrecipient cpgpgkey untar
         serverconfig
         show check add update del
+        encrypt decrypt
     /;
 
-use CTK qw/ :NONE /;
-use CTK::Util;
+use Carp;
+use CTK;
+use CTK::Util qw/ :ALL /;
 use CTK::TFVals qw/ :ALL /;
+use CTK::Crypt::GPG;
 use MToken::Const qw/ :GENERAL :CRYPT /;
 use MToken::Util;
 use MToken::Config;
 use MToken::Client;
 use Digest::MD5 qw/md5_hex/;
 use File::Basename qw/basename/;
+use File::Spec;
 use File::Copy qw/cp mv/;
 use URI;
 use Archive::Extract;
@@ -186,7 +192,6 @@ use ExtUtils::Manifest qw/
     /;
 
 use constant {
-    DEBUG   => 0,
     VERBOSE => 0,
     RESERVED_NAMES => [qw/
             MANIFEST MANIFEST.SKIP
@@ -203,17 +208,18 @@ sub genkey {
     my $rndf = shift @ARGV || '';
     my $config = new MToken::Config;
     unless ($rndf) {
-        $rndf = catfile(DIR_KEYS, sprintf("%s%s",$config->get("project") || PROJECT,KEYSUFFIX));
+        $rndf = File::Spec->catfile(DIR_KEYS, sprintf("%s%s",$config->get("project") || PROJECT,KEYSUFFIX));
     }
     if (-e $rndf) {
-        say(sprintf("Skipped. File \"%s\" already exists", $rndf));
+        skip("File \"%s\" already exists", $rndf);
         return 1;
     }
     my $size = int(rand(KEYMAXSIZE - KEYMINSIZE))+KEYMINSIZE;
 
     my $opensslbin = $config->get("opensslbin");
     unless ($opensslbin) {
-        croak("Can't find OpenSSL program. Please configure first this device");
+        say STDERR red("Can't find OpenSSL program. Please configure first this device");
+        exit(1);
     }
 
     my $err = "";
@@ -221,12 +227,13 @@ sub genkey {
     my $cmd = [$opensslbin, "rand", "-out", $rndf, $size];
     say(join(" ", @$cmd));
     my $out = execute( $cmd, undef, \$err );
-    carp $err if $err;
-    say $out if $out;
+    say STDERR red($err) if $err;
+    say cyan($out) if $out;
 
     # Check
     unless (-e $rndf) {
-        croak(sprintf("FATAL ERROR: File \"%s\" not created"), $rndf);
+        say STDERR red(sprintf("File \"%s\" not created", $rndf));
+        exit(1);
     }
 
     return 1;
@@ -235,8 +242,8 @@ sub config {
     my $prj = shift @ARGV || PROJECT;
     my $cgd = shift @ARGV;
     if ($cgd && -e $cgd) {
-        say(sprintf("File already exists: %s", $cgd));
-        say("Skipped. Device already configured. Run \"make reconfig\" for forced configuration");
+        skip("Device already configured. Run \"make reconfig\" for forced configuration");
+        say(yellow("File already exists: %s", $cgd));
         return 1;
     }
     say "Start configuration device: $prj";
@@ -244,25 +251,29 @@ sub config {
     #my $config = new MToken::Config( name => 'foo' );
     my $config = new MToken::Config;
     my %before = $config->getall;
-    #say(Data::Dumper::Dumper($config));
+    #say(MToken::Util::explain($config));
 
     # Internal use only
-    my $c = new CTK;
+    my $c = new CTK(plugins => [qw/cli/]);
 
     # Check openssl
     my $opensslbin = $c->cli_prompt('OpenSSL program:', which($config->get("opensslbin") || OPENSSLBIN) || $config->get("opensslbin") || OPENSSLBIN);
     unless ($opensslbin) {
-        croak("FATAL ERROR: Program openssl not found. Please install it and try again later");
+        say STDERR red("Program openssl not found. Please install it and try again later");
+        exit(1);
     } else {
         my $cmd = [$opensslbin, "version"];
         say(join(" ", @$cmd));
         my $err = "";
         my $out = execute( $cmd, undef, \$err );
-        carp $err if $err;
-        unless ($out && $out =~ /^OpenSSL\s+[1-9]\.[0-9]/m) {
-            croak("FATAL ERROR: Program openssl not found. Please install it and try again later") unless $out;
-            say $out;
-            carp("OpenSSL Version is not correctly. May be some problems");
+        say STDERR red($err) if $err;
+        unless ($out) {
+            say STDERR red("Program openssl not found. Please install it and try again later");
+            exit(1);
+        }
+        unless ($out =~ /^OpenSSL\s+[1-9]\.[0-9]/m) {
+            say STDERR yellow("OpenSSL Version is not correctly. May be some problems");
+            say cyan($out);
         }
     }
     $config->set(opensslbin => $opensslbin);
@@ -270,80 +281,64 @@ sub config {
     # Check GnuPG
     my $gpgbin = $c->cli_prompt('GnuPG (gpg) program:', which($config->get("gpgbin") || GPGBIN) || $config->get("gpgbin") || GPGBIN);
     unless ($gpgbin) {
-        croak("FATAL ERROR: Program GnuPG (gpg) not found. Please install it and try again later");
+        say STDERR red("Program GnuPG (gpg) not found. Please install it and try again later");
+        exit(1);
     } else {
         my $cmd = [$gpgbin, "--version"];
         say(join(" ", @$cmd));
         my $err = "";
         my $out = execute( $cmd, undef, \$err );
-        carp $err if $err;
-        unless ($out && $out =~ /^gpg\s+\(GnuPG\)\s+[2-9]\.[0-9]/m) {
-            croak("FATAL ERROR: Program GnuPG (gpg) not found. Please install it and try again later") unless $out;
-            say $out;
-            carp("GnuPG Version is not correctly. May be some problems");
+        say STDERR red($err) if $err;
+        unless ($out) {
+            say STDERR red("FATAL ERROR: Program GnuPG (gpg) not found. Please install it and try again later");
+            exit(1);
+        }
+        unless ($out =~ /^gpg\s+\(GnuPG\)\s+[2-9]\.[0-9]/m) {
+            say STDERR yellow("GnuPG Version is not correctly. May be some problems");
+            say cyan($out);
         }
     }
     $config->set(gpgbin => $gpgbin);
 
-    # Server data
-    while ( 1 ) {
-        say "";
-        # Server Host Name (server_host)
-        my $server_host = cleanServerName( $c->cli_prompt('Server Host Name:', $config->get("server_host") || "my.domain.com") );
-        $config->set(server_host => $server_host);
+    # Server URL (server_url)
+    say "";
+    my $default_url = _get_default_url($prj);
+    my $server_url = $c->cli_prompt('Server URL:', MToken::Util::hide_pasword($config->get("server_url") || $default_url, 1));
+    my $uri = new URI( $server_url );
 
-        # Server Port Number (server_port)
-        my $server_port = $c->cli_prompt('Server Port Number:', $config->get("server_port") || 443);
-        say("Invalid Port Number") && exit(1) unless is_int16($server_port);
-        $config->set(server_port => $server_port);
-
-        # Server scheme (server_scheme)
-        my $ssdefault = 'http';
-        $ssdefault = 'https' if is_int16($server_port) && $server_port == 443;
-        my $server_scheme = $c->cli_prompt('Server Scheme:', $config->get("server_scheme") || $ssdefault);
-        $config->set(server_scheme => $server_scheme);
-
-        # Server path (server_path)
-        my $server_path = $c->cli_prompt('Server Path:', $config->get("server_path") || "/".PROJECT);
-        $config->set(server_path => $server_path);
-
-        # Server dir (server_dir)
-        my $server_dir = $c->cli_prompt('Server Directory:', $config->get("server_dir") || catfile($c->webdir, $server_host, PROJECT));
-        $config->set(server_dir => $server_dir);
-
-        # Show URL:
-        my $uri = new URI( "http://localhost" );
-        $uri->scheme($server_scheme);
-        $uri->host($server_host);
-        $uri->port($server_port) if ($server_port != 80 and $server_port != 443);
-        $uri->path($server_path);
-        my $url = $uri->as_string;
-        say(sprintf("\nResultant Server URL: %s", $url));
-        last if $c->cli_prompt('It is alright?:','yes') =~ /^\s*y/i;
-    }
+    # Server user & password
     if ($c->cli_prompt('Ask the credentials interactively (Recommended, t. It\'s safer)?:','yes') =~ /^\s*y/i) {
-        $config->set(server_ask_credentials => 1);
-        $config->set(server_user => $config->get("server_user"));
-        $config->set(server_password => $config->get("server_password"));
+        $uri->userinfo(undef);
     } else {
-        # Server user & password
-        $config->set(server_ask_credentials => 0);
-        my $server_user = $c->cli_prompt('Server user:', $config->get("server_user") || "anonymous");
-        $config->set(server_user => $server_user);
-        system("stty -echo") unless MSWIN;
-        my $server_password = $c->cli_prompt('Server password:');
-        $config->set(server_password => $server_password);
-        system("stty echo") unless MSWIN;
-        print STDERR "\n";  # because we disabled echo
+        my ($server_user, $server_password) = MToken::Util::parse_credentials($uri);
+        unless ($server_user) { # User
+            $server_user = $c->cli_prompt('Server user:', "anonymous") // "";
+            $server_user =~ s/%/%25/g;
+            $server_user =~ s/:/%3A/g;
+        }
+        unless ($server_password) { # Password
+            system("stty -echo") unless MSWIN;
+            $server_password = $c->cli_prompt('Server password:') // "";
+            $server_password =~ s/%/%25/g;
+            system("stty echo") unless MSWIN;
+            print STDERR "\n";  # because we disabled echo
+        }
+        $uri->userinfo(sprintf("%s:%s", $server_user, $server_password));
     }
+
+    # Result
+    my $url = $uri->canonical->as_string;
+    say(cyan("Full server URL: %s", MToken::Util::hide_pasword($url)));
+    unless ($c->cli_prompt('It is alright?:','yes') =~ /^\s*y/i) {
+        nope("Aborted");
+        exit(1);
+    }
+    $config->set(server_url => $url);
 
     # Hash Diff
     my %after = $config->getall;
     #say(Data::Dumper::Dumper({ before => {%before}, after => {%after} }));
-    if (_hashmd5(%before) eq _hashmd5(%after)) {
-        say "Nothing changed. Skipped";
-        return 1;
-    }
+    return skip("Nothing changed") if _hashmd5(%before) eq _hashmd5(%after);
 
     say "Current configuration:";
 eval <<'FORMATTING';
@@ -360,7 +355,12 @@ $kf,$vf
 .
     foreach my $k (sort {$a cmp $b} keys %after) {
         $kf = $k;
-        $vf = variant_stf((defined($after{$k}) ? $after{$k} : ''), 52);
+		my $tv = defined($after{$k}) ? $after{$k} : '';
+		if ($k =~ /(^ur[il])|(ur[il]$)/i) {
+			$vf = variant_stf(MToken::Util::hide_pasword($tv), 52);
+		} else {
+			$vf = variant_stf($tv, 52);
+		}
         write;
     }
     say "";
@@ -368,82 +368,60 @@ FORMATTING
 
     if ($c->cli_prompt('Are you sure you want to save all changes to local configuration file?:','yes') =~ /^\s*y/i) {
         if ($config->save) {
-            say(sprintf("File \"%s\" successfully saved", $config->get("local_conf_file")));
+            yep("File \"%s\" successfully saved", $config->get("local_conf_file"));
         } else {
-            croak(sprintf("Can't save file \"%s\"", $config->get("local_conf_file")));
+            nope("Can't save file \"%s\"", $config->get("local_conf_file"));
+            exit(1);
         }
     } else {
-        say("Aborted. File not saved");
+        skip("Aborted. File not saved");
     }
 
     1;
 }
-sub store { # Upload files
+sub store {
+    # Upload files
     _expand_wildcards();
     my @files = @ARGV;
     croak("Agrguments missing") unless @files;
     my $config = new MToken::Config;
-    #say(Data::Dumper::Dumper($config));
 
-    # Set URI & URL
-    my $uri = _mk_uri($config);
-    my $url = $uri->as_string;
+    # Client
     my $client = new MToken::Client(
-            uri => $uri,
-            debug => DEBUG, # Show headers
+            url     => $config->get("server_url"),
             verbose => VERBOSE, # Show data pool
-
-            #user => "test",
-            #password => "test",
-            #realm => "MToken restricted zone",
         );
-    #my $status = $client->check();
-    say( STDERR $client->error) && exit(1) unless $client->check();
-    #say($client->error) && return 0 unless $client->status;
 
-    # MAYBE: AAA
-    #  - Дедлаем запрос check. Если возвращается - требуется авторизаия - запрашиваем
-    #  - Запрашиваем авторизацию интерактивно!!
-    #  - Переустанавливаем credentials
-    #    $client->credentials($login, $password);
-    #
-    #if (!$status && $client->code && $client->code == 401) {
-    #    $client->credentials("test", "test", "MToken restricted zone");
-    #    say($client->error) && return 0 unless $client->check();
-    #}
-
-    #say(Dumper({ code => $client->code}));
-
-    #say(sprintf("Response content length: %d bytes", $client->res->content_length));
-
-    #say(Dumper($client));
-    #say(Dumper({ url => $client->{url}, redirect => $client->{redirect}}));
-
-    #say(Dumper(\%json));
-    #say(Dumper(MToken::Client::_check_response(\%json)));
+    $client->check() or do {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
+    };
 
     # Send file
     my $retstat = 1;
     foreach my $file (@files) {
         my $filename = basename($file);
-        print(sprintf("Sending file %s --> %s... ", $filename, $url));
+        printf("Sending file %s to %s...\n", $filename, $client->{uri}->host_port);
         if (-f $file) {
-            if ($client->upload($file)) {
-                say "OK";
-            } else {
-                say "NOT OK";
-                say STDERR $client->error;
+            unless ($client->upload($file)) {
+                nope($client->transaction);
+                say STDERR red($client->error);
+                say STDERR $client->trace;
                 $retstat = 0;
+                next;
             }
+            yep($client->transaction);
         } else { # Skipped
-            say "SKIPPED. It is not file";
-            $retstat = 0;
+            skip("It is not file")
         }
     }
     exit(1) unless $retstat;
     return $retstat;
 }
-sub fetch { # Downlod files
+sub fetch {
+    # Downlod files
     _expand_wildcards();
     my @files = @ARGV;
     my $dir = shift @files;
@@ -451,27 +429,34 @@ sub fetch { # Downlod files
     croak("Directory incorrect") unless (-d $dir or -l $dir);
 
     # Internal use only
-    my $c = new CTK;
+    my $c = new CTK(plugins => [qw/cli/]);
     my $f = '';
     unless (@files) {
         # Try input FileName
-        $f = cleanFileName( $c->cli_prompt('Please type filename for fetching from server or (last, all):', "last"));
+        $f = MToken::Util::cleanFileName(
+            $c->cli_prompt('Please type filename for fetching from server or (last, all):', "last")
+        );
     }
-    croak("Agrguments missing") unless $f or @files;
+    unless ($f or @files) {
+        nope("Incorrect filename for fetching");
+        exit(1);
+    }
 
     my $config = new MToken::Config;
     my $distname = $config->get("distname");
 
     # Set URI & URL
-    my $uri = _mk_uri($config);
-    my $url = $uri->as_string;
     my $client = new MToken::Client(
-            uri     => $uri,
-            debug   => DEBUG, # Show headers
+            url     => $config->get("server_url"),
             verbose => VERBOSE, # Show data pool
         );
-    #my $status = $client->check();
-    say( STDERR $client->error) && exit(1) unless $client->check();
+
+    $client->check() or do {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
+    };
 
     my @list; # File list from server
     if ($f && $f eq 'all') { # All files
@@ -492,62 +477,63 @@ sub fetch { # Downlod files
     foreach my $l (@list) {
         my $filename = $l->{filename};
         unless ($filename) {
-            say STDERR "Filename incorrect";
+            nope("Filename incorrect");
             next;
         }
-        my $file = catfile($dir, $filename);
-        print(sprintf("Fetching file %s <-- %s... ", $filename, $url));
+        my $file = File::Spec->catfile($dir, $filename);
+        printf("Downloading file %s from %s...\n", $filename, $client->{uri}->host_port);
         if (my $msg = $client->download($file)) {
             my $in_md5 = $l->{md5};
             if ($in_md5) {
-                my $out_md5 = md5sum($file) || '';
+                my $out_md5 = MToken::Util::md5sum($file) || '';
                 unless ($in_md5 eq $out_md5) {
-                    say "NOT OK";
-                    say STDERR sprintf("File md5sum mismatch: Expected: %s; Got: %s", $in_md5, $out_md5);
+                    nope("File md5sum mismatch: Expected: %s; Got: %s", $in_md5, $out_md5);
                     $retstat = 0;
                 }
             }
             my $in_sha1 = $l->{sha1};
             if ($in_sha1) {
-                my $out_sha1 = sha1sum($file);
+                my $out_sha1 = MToken::Util::sha1sum($file);
                 unless ($in_sha1 eq $out_sha1) {
-                    say "NOT OK";
-                    say STDERR sprintf("File sha1sum mismatch: Expected: %s; Got: %s", $in_sha1, $out_sha1);
+                    nope("File sha1sum mismatch: Expected: %s; Got: %s", $in_sha1, $out_sha1);
                     $retstat = 0;
                 }
             }
             if ($retstat) {
-                say "OK";
-                say $msg;
+                yep($msg);
             }
         } else {
-            say "NOT OK";
-            say STDERR $client->error;
+            nope($client->transaction);
+            say STDERR red($client->error);
+            say STDERR $client->trace;
             $retstat = 0;
         }
     }
     exit(1) unless $retstat;
     return $retstat;
-
-    return 1;
 }
 sub list {
     my $config = new MToken::Config;
     my $distname = $config->get("distname");
     my $client = new MToken::Client(
-            uri     => _mk_uri($config),
-            debug   => DEBUG, # Show headers
+            url     => $config->get("server_url"),
             verbose => VERBOSE, # Show data pool
         );
-    say( STDERR $client->error) && exit(1) unless $client->check();
+    $client->check() or do {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
+    };
 
     my @list = sort { ($b->{date_sfx} || 0) <=> ($a->{date_sfx} || 0) } ($client->list($distname));
-    say( STDERR $client->error) && exit(1) unless $client->status();
-
-    unless (@list) {
-        say "No files found";
-        return 1;
+    unless ($client->status) {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
     }
+    return skip("No files found") unless scalar(@list);
 
 eval <<'FORMATTING';
     my @arr;
@@ -588,23 +574,26 @@ sub info {
     my @in = @ARGV;
     my $fnorid = shift @in;
     croak("Agrguments missing") unless $fnorid;
-
     my $config = new MToken::Config;
-    my $distname = $config->get("distname");
     my $client = new MToken::Client(
-            uri     => _mk_uri($config),
-            debug   => DEBUG, # Show headers
+            url     => $config->get("server_url"),
             verbose => VERBOSE, # Show data pool
         );
-    say( STDERR $client->error) && exit(1) unless $client->check();
+    $client->check() or do {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
+    };
 
     my %info = $client->info($fnorid);
-    say( STDERR $client->error) && exit(1) unless $client->status();
-
-    unless (%info) {
-        say "File not found";
-        return 1;
+    unless ($client->status) {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
     }
+    return skip("File not found") unless %info;
 
 eval <<'FORMATTING';
     my ($kf,$vf);
@@ -637,28 +626,32 @@ sub backupdelete {
     croak("Agrguments missing") unless @files;
     my $config = new MToken::Config;
 
-    # Set URI & URL
-    my $uri = _mk_uri($config);
-    my $url = $uri->as_string;
+    # Client
     my $client = new MToken::Client(
-            uri     => $uri,
-            debug   => DEBUG, # Show headers
+            url     => $config->get("server_url"),
             verbose => VERBOSE, # Show data pool
         );
-    say( STDERR $client->error) && exit(1) unless $client->check();
+
+    $client->check() or do {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
+    };
 
     # Delete files
     my $retstat = 1;
     foreach my $file (@files) {
         my $filename = basename($file);
-        print(sprintf("Deleting backup file %s --> %s... ", $filename, $url));
-        if ($client->remove($file)) {
-            say "OK";
-        } else {
-            say "NOT OK";
-            say STDERR $client->error;
+        printf("Deleting backup file %s from %s...\n", $filename, $client->{uri}->host_port);
+        unless ($client->remove($file)) {
+            nope($client->transaction);
+            say STDERR red($client->error);
+            say STDERR $client->trace;
             $retstat = 0;
+            next;
         }
+        yep($client->transaction);
     }
     exit(1) unless $retstat;
     return $retstat;
@@ -669,101 +662,96 @@ sub backupupdate {
     croak("Agrguments missing") unless @files;
     my $config = new MToken::Config;
 
-    # Set URI & URL
-    my $uri = _mk_uri($config);
-    my $url = $uri->as_string;
+    # Client
     my $client = new MToken::Client(
-            uri     => $uri,
-            debug   => 0, #DEBUG, # Show headers
-            verbose => 0, #VERBOSE, # Show data pool
+            url     => $config->get("server_url"),
+            verbose => 0, # VERBOSE, # --disabled! binary data!
         );
-    say( STDERR $client->error) && exit(1) unless $client->check();
+
+    $client->check() or do {
+        nope($client->transaction);
+        say STDERR red($client->error);
+        say STDERR $client->trace;
+        exit(1);
+    };
 
     # Updating files
     my $retstat = 1;
     foreach my $file (@files) {
         my $filename = basename($file);
-        print(sprintf("Update backup file %s --> %s... ", $filename, $url));
+        printf("Update backup file %s on %s...\n", $filename, $client->{uri}->host_port);
         if (-f $file) {
-            if ($client->update($file)) {
-                say "OK";
-            } else {
-                say "NOT OK";
-                say STDERR $client->error;
+            unless ($client->update($file)) {
+                nope($client->transaction);
+                say STDERR red($client->error);
+                say STDERR $client->trace;
                 $retstat = 0;
+                next;
             }
+            yep($client->transaction);
         } else { # Skipped
-            say "SKIPPED. It is not file";
-            $retstat = 0;
+            skip("It is not file")
         }
     }
     exit(1) unless $retstat;
-
     return $retstat;
-}
-sub cpgpgkey {
-    # Copy GPG public and private key files from user directory to standard token-directory (certs)
-    my @in = @ARGV;
-    my $dst = shift @in;
-    croak("Destination file is not specified") unless $dst;
-    say("Skipped. Destination file $dst already exists") && return 1 if -e $dst;
-
-    # Internal use only
-    my $c = new CTK;
-    my $src = $c->cli_prompt('Please type full path to file:');
-    croak("Path to file incorrect") unless $src;
-    croak("File is not exists. Try again") unless -e $src and -f $src and -r $src;
-
-    unless (cp($src, $dst)) {
-        croak("Can't copy file: $!");
-        exit 1;
-    }
-
-    say(sprintf("File successfully copied: %s --> %s", $src, $dst));
-    return 1;
 }
 sub gpgrecipient {
     # Get recipient from stdin and replace default-recipient in file
-    my @in = @ARGV;
-    my $fn = shift @in;
+    my $fn = shift(@ARGV);
     croak("Destination file is not specified") unless $fn;
 
-    my $config = new MToken::Config;
-
     # Get recipient from STDIN
-    my $pool = scalar(do{local $/ = undef; <STDIN>});
-    my $recipient = $1 if $pool =~ /\<(.+?\@.+?)\>/s;
-    say( STDERR sprintf("Can't get recipient from input pool:\n%s", $pool)) && exit(1) unless $recipient;
-    say sprintf("Found recipient: %s", $recipient);
+    my $pool = scalar(do{local $/ = undef; <STDIN>}) // "";
+    #say(blue($pool));
+
+    # Cut a recipient
+    my $recipient = $1 if $pool =~ /^\s+\b([0-9A-F]+)\b/m;
+    $recipient //= "";
+    unless($recipient) {
+        nope("Can't get recipient from input pool");
+        say cyan($pool);
+        exit(1);
+    }
 
     # Get data from file and replacing
     my $data = fload($fn);
-    $data =~ s/\n{2,}//s if $data =~ s/^\s*default-recipient.+$//gm;
+    $data =~ s/^\s*default-recipient.+$//gm;
     $data .= sprintf("\ndefault-recipient %s\n", $recipient);
+    $data =~ s/\n{2,}/\n/sg;
 
     # Save file
     unless (fsave($fn, $data)) {
-        croak("Can't save file $fn") unless $fn;
+        nope("Can't save file %s", $fn);
+        exit(1);
     }
-
-    return 1;
+    return yep("Found recipient: %s", $recipient);
 }
-sub gpgfileprepare {
-    _expand_wildcards();
-    my @files = @ARGV;
-    my $suffix = pop @files;
-    croak("Suffix incorrect") unless $suffix;
-    croak("No files. Missing arguments") unless @files;
+sub cpgpgkey {
+    # Copy GPG public and private key files from user directory to standard token-directory (certs)
+    my $dst = shift @ARGV;
+    croak("Destination file is not specified") unless $dst;
+    return skip("Destination file $dst already exists") if -e $dst;
 
-    foreach my $file (@files) {
-        next unless -f $file;
-        unless (mv($file, $file.$suffix)) {
-            say( STDERR "Can't move file: $!");
-            next;
-        }
-        say "File $file --> $file.$suffix";
+    # Internal use only
+    my $c = new CTK(plugins => [qw/cli/]);
+	my $dflt = File::Spec->catfile(DIR_KEYS, $dst =~ /priv/ ? MY_PRIVATE_KEY : MY_PUBLIC_KEY);
+    my $src = $c->cli_prompt('Please type full path to file:', $dflt);
+
+    unless ($src) {
+        nope("Incorrect path to key file");
+        exit(1);
     }
-    return 1;
+    unless (-f $src and -r _) {
+        nope("File is not exists. Try again");
+        exit(1);
+    }
+    unless (cp($src, $dst)) {
+        nope("Can't copy file: %s", $!);
+        exit 1;
+    }
+
+    return yep("File has been successfully copied to %s", $dst);
 }
 sub untar {
     _expand_wildcards();
@@ -772,23 +760,26 @@ sub untar {
     croak("Directory incorrect") unless $directory;
     croak("No files. Missing arguments") unless @files;
 
+    my $retstat = 1;
     foreach my $file (@files) {
         next unless -f $file;
         my $dir = $1 if $file =~ /\.(\d{8})\./;
         unless ($dir) {
-            say( STDERR "Skip file $file");
+            skip("Incorrect file %s", $file);
             next;
         }
         my $ae = Archive::Extract->new( archive => $file );
-        unless ($ae->extract( to => catdir($directory,$dir) )) {
-            say( STDERR "Error extract files from $file: ".$ae->error);
+        unless ($ae->extract( to => File::Spec->catdir($directory, $dir) )) {
+            nope("Error extract files from $file");
+            say STDERR red($ae->error);
+            $retstat = 0;
             next;
         }
-
         unlink($file);
-        say "Untar file $file --> $dir";
+        yep("Untar file %s to %s", $file, $dir);
     }
-    return 1;
+    exit(1) unless $retstat;
+    return $retstat;
 }
 sub serverconfig {
     my $config = new MToken::Config;
@@ -819,9 +810,9 @@ $pool = <<'EOP';
 </VirtualHost>
 
 # Please also create follow file:
-    [SERVER_DIR]\\.htpasswd:
+#   [SERVER_DIR]\\.htpasswd:
 # And add string:
-    [SERVER_SS]
+#   [SERVER_SS]
 EOP
     } else {
 $pool = <<'EOP';
@@ -848,23 +839,23 @@ $pool = <<'EOP';
 </VirtualHost>
 
 # Please also create follow file:
-    [SERVER_DIR]/.htpasswd:
+#   [SERVER_DIR]/.htpasswd:
 # And add string:
-    [SERVER_SS]
+#   [SERVER_SS]
 EOP
     }
+    my $uri = _mk_uri($config->get("server_url"));
+    my ($suser, $spass) = MToken::Util::parse_credentials($uri);
+    my $ss = sprintf("%s:%s", $suser, $spass);
 
     my $htpasswd = which('htpasswd');
-    my $suser = $config->get("server_user") || 'test';
-    my $spass = $config->get("server_password") || 'test';
-    my $ss = sprintf("%s:%s", $suser, $spass);
     if ($htpasswd) {
         my $err = "";
         my $cmd = [$htpasswd, "-nb", $suser, $spass];
         my $out = execute( $cmd, undef, \$err );
         if ($err) {
-            say STDERR sprintf("Error running: ".join(" ", @$cmd));
-            carp $err;
+            say STDERR join(" ", @$cmd);
+            say STDERR red($err)
         }
         if ($out) {
             chomp $out;
@@ -873,10 +864,10 @@ EOP
     }
 
     print dformat($pool, {
-        SERVER_HOST => $config->get("server_host"),
-        SERVER_PORT => $config->get("server_port"),
-        SERVER_PATH => $config->get("server_path"),
-        SERVER_DIR  => $config->get("server_dir"),
+        SERVER_HOST => $uri->host,
+        SERVER_PORT => $uri->port || ($uri->secure ? 443 : 80),
+        SERVER_PATH => $uri->path || "/",
+        SERVER_DIR  => File::Spec->catfile(webdir(), $uri->host),
         SERVER_SS   => $ss,
     });
 }
@@ -891,14 +882,13 @@ sub show {
         say "Current device structure (without system files):";
         _show_list($manifest);
     } else {
-        say "No files in manifest. Please initialize your device correctly";
-        return 0;
+        return nope("No files in manifest. Please initialize your device correctly");
     }
     return 1;
 }
 sub check {
     # less /usr/share/perl/5.22.2/ExtUtils/Manifest.pm
-    my $date_fmt = shift(@ARGV) || CTK::dtf("%YYYY/%MM/%DD", time());
+    my $date_fmt = shift(@ARGV) || dtf("%YYYY/%MM/%DD", time());
     my $status = _check_date($date_fmt);
 
     # Missing files
@@ -920,7 +910,7 @@ sub check {
         say "Manifest:";
         _show_list($manifest);
     } else {
-        say "No files in manifest. Please initialize your device correctly";
+        say STDERR red("No files in manifest. Please initialize your device correctly");
         $status = 0;
     }
 
@@ -930,33 +920,30 @@ sub check {
         my $date = $1 if $comment =~ /(\d{4}\/\d{2}\/\d{2})/; $date ||= $date_fmt;
         my $md5  = $1 if $comment =~ /([a-f0-9]{32})/i;
         next unless $md5;
-        my $realf = catfile(split(/\//, $k));
+        my $realf = File::Spec->catfile(split(/\//, $k));
         next unless -f $realf and -r _;
-        my $got = md5sum($realf) || '';
+        my $got = MToken::Util::md5sum($realf) || '';
         next if lc($md5) eq lc($got);
 
         $status = 0;
-        say(sprintf("MD5 Conflict for file: %s", $k));
-        say(sprintf("  Got      : %s", $got)); # Got : 745cb2db6dbc5ec03dade96ccbc51628 (получил)
-        say(sprintf("  Expected : %s", $md5)); # Expected : 745cb2db6dbc5ec03dade96ccbc51629 (ожидал)
-        say("");
+        say STDERR red("MD5 Conflict for file: %s", $k);
+        say STDERR red("  Got      : %s", $got); # Got : 745cb2db6dbc5ec03dade96ccbc51628 (получил)
+        say STDERR red("  Expected : %s", $md5); # Expected : 745cb2db6dbc5ec03dade96ccbc51629 (ожидал)
+        print STDERR "\n";
     }
 
     exit(1) unless $status;
     return 1;
 }
 sub add {
-    my $date_fmt = shift(@ARGV) || CTK::dtf("%YYYY/%MM/%DD", time());
-    my $status = _check_date($date_fmt);
+    my $date_fmt = shift(@ARGV) || dtf("%YYYY/%MM/%DD", time());
+    _check_date($date_fmt);
 
     # Internal use only
-    my $c = new CTK;
+    my $c = new CTK(plugins => [qw/cli/]);
 
     my $n = _show_extra();
-    unless ($n) {
-        say "Nothing to add. Please first copy physical file for adding";
-        return 0;
-    }
+    return skip("Nothing to add. Please first copy physical file for adding") unless $n;
 
     # Добавление единственного файла, _add(1)
     return _add(1, $date_fmt) if $n == 1; # 1
@@ -968,25 +955,18 @@ sub add {
         # Добавление всех файлов, _addall
         return _addall($date_fmt);
     } elsif ($sel && $sel =~ /cancel/i) { # Cancel
-        say "Aborted";
-        return 0;
+        return skip("Aborted");
     } else { # Other
-        say "Incorrect answer. Try again";
-        return 0;
+        return nope("Incorrect answer. Try again");
     }
-
-    return $status;
 }
 sub update {
     my $date_fmt = shift(@ARGV) || CTK::dtf("%YYYY/%MM/%DD", time());
-    my $status = _check_date($date_fmt);
+    _check_date($date_fmt);
 
     # Manifest
     my $manifest = maniread(); # Текущий манифест файл => коментарий
-    unless (keys %$manifest) {
-        say "No files in manifest. Please initialize your device correctly";
-        $status = 0;
-    }
+    return skip("No files in manifest. Please initialize your device correctly") unless keys %$manifest;
 
     # Checking MD5 conflicts
     my $rnames = RESERVED_NAMES;
@@ -997,37 +977,36 @@ sub update {
         my $date = $1 if $comment =~ /(\d{4}\/\d{2}\/\d{2})/; $date ||= "";
         my $md5  = $1 if $comment =~ /([a-f0-9]{32})/i; $md5 ||= "";
 
-        my $realf = catfile(split(/\//, $k));
+        my $realf = File::Spec->catfile(split(/\//, $k));
         unless (-f $realf and -r _) {
             $updates{$k} = ''; # DELETE
-            say(sprintf("Missing file %s", $k));
+            skip("Missing file %s", $k);
             next;
         }
 
         # Check date and md5
-        my $got_md5 = md5sum($realf) || '';
+        my $got_md5 = MToken::Util::md5sum($realf) || '';
         next if $date && lc($md5) eq lc($got_md5);
 
         $updates{$k} = sprintf("\%s\t%s", $got_md5, $date_fmt);
-        say(sprintf("Changed file %s", $k));
+        yep("Updated metadata for %s", $k);
     }
     if (%updates) {
         if (ExtUtils::Manifest::maniupdate(\%updates)) {
-            say("Device successfully updated");
+            yep("Device successfully updated");
         } else {
-            say("Can't update device");
+            nope("Can't update device");
         }
     } else {
-        say("Device no need to update");
+        skip("Device no need to update");
     }
     say("");
 
-    exit(1) unless $status;
     return 1;
 }
 sub del {
-    my $c = new CTK;
-    my $status = 1;
+    # Internal use only
+    my $c = new CTK(plugins => [qw/cli/]);
 
     # Manifest (without system files)
     # my $found    = manifind(); # Список вообще всех файлов
@@ -1041,9 +1020,7 @@ sub del {
         say "Manifest (without system files):";
         _show_list($manifest);
     } else {
-        say "No files in manifest. Add files first";
-        $status = 0;
-        return $status;
+        return skip("No files in manifest. Add files first");
     }
 
     my $n = scalar(@files);
@@ -1051,67 +1028,127 @@ sub del {
     if ($sel && is_int($sel) && ($sel > 0) && ($sel <= $n)) { # NNN
         # Удаление конкретного файла
         my $file = $files[$sel - 1];
-        my $realf = catfile(split(/\//, $file));
+        my $realf = File::Spec->catfile(split(/\//, $file));
         unless ($file) {
-            say "File not specified or incorrect";
+            nope("File not specified or incorrect");
             exit(1);
         }
-        say(sprintf("File for deleting: %s", $file));
+        unless ($c->cli_prompt(sprintf("Are you sure you want to remove \"%s\" file?:", $file),'no') =~ /^\s*y/i) {
+            return skip("Aborted");
+        }
+        say(sprintf("Deleting %s...", $file));
         unless (-f $realf && -w _) {
-            say "File not exists or locked for writing";
+            nope("File not exists or locked for writing");
             exit(1);
-        }
-        unless ($c->cli_prompt('Are you sure you want to remove this file?:','no') =~ /^\s*y/i) {
-            say "Aborted";
-            return 0;
         }
         unless (unlink($realf)) {
-            say "Can't remove file: $!";
+            nope("Can't remove file: $!");
             exit(1);
         }
         if (ExtUtils::Manifest::maniupdate({$file, ''})) {
-            say("Device successfully updated");
+            yep("Device successfully updated");
         } else {
-            say("Can't update device");
-            $status = 0;
+            nope("Can't update device");
+            exit(1);
         }
     } elsif ($sel && $sel =~ /all/i) { # All
-        unless ($c->cli_prompt('Are you sure you want to remove all file?:','no') =~ /^\s*y/i) {
-            say "Aborted";
-            return 0;
+        unless ($c->cli_prompt('Are you sure you want to remove all device files?:','no') =~ /^\s*y/i) {
+            return skip("Aborted");
         }
         my %dels;
         foreach my $file (@files) {
-            my $realf = catfile(split(/\//, $file));
-            say(sprintf("File for deleting: %s", $file));
+            my $realf = File::Spec->catfile(split(/\//, $file));
+            say(sprintf("Deleting %s...", $file));
             unless (-f $realf && -w _) {
-                say "File not exists or locked for writing";
-                $status = 0;
+                nope("File not exists or locked for writing");
                 next;
             }
             unless (unlink($realf)) {
-                say "Can't remove file: $!";
-                $status = 0;
+                nope("Can't remove file: $!");
                 next;
             }
             $dels{$file} = "";
         }
         if (ExtUtils::Manifest::maniupdate({%dels})) {
-            say("Device successfully updated");
+            yep("Device successfully updated");
         } else {
-            say("Can't update device");
-            $status = 0;
+            nope("Can't update device");
+            exit(1);
         }
     } elsif ($sel && $sel =~ /cancel/i) { # Cancel
-        say "Aborted";
-        return 0;
+        return skip("Aborted");
     } else { # Other
-        say "Incorrect answer. Try again";
-        return 0;
+        return nope("Incorrect answer. Try again");
     }
 
-    exit(1) unless $status;
     return 1;
+}
+sub encrypt {
+    my $src = shift @ARGV;
+    my $dst = shift @ARGV;
+    croak("Incorrect source file") unless $src && (-f $src) && (-r $src);
+    croak("Destination file is not specified") unless $dst;
+
+    my $gpg = new CTK::Crypt::GPG(
+        -publickey => File::Spec->catfile(DIR_KEYS, PUBLIC_GPG_KEY),
+    );
+    unless ($gpg) {
+        nope("Can't create CTK::Crypt::GPG object");
+        exit(1);
+    }
+
+    $gpg->encrypt(
+        -infile => $src,
+        -outfile=> $dst,
+        -armor  => "yes",
+    ) or do {
+        nope("GPG encrypt error");
+        say(red($gpg->error)) if $gpg->error;
+        exit(1);
+    };
+    return yep("Encrypted")
+}
+sub decrypt {
+    _expand_wildcards();
+    my @files = @ARGV;
+    my $suffix = pop @files;
+    croak("Suffix incorrect") unless $suffix;
+    croak("No files. Missing arguments") unless @files;
+
+    my $gpg = new CTK::Crypt::GPG(
+        -privatekey => File::Spec->catfile(DIR_KEYS, PRIVATE_GPG_KEY),
+    );
+    unless ($gpg) {
+        nope("Can't create CTK::Crypt::GPG object");
+        exit(1);
+    }
+
+    my $retstat = 1;
+    foreach my $file (@files) {
+        next unless -f $file;
+        next if $file =~ /^\./;
+        next if $file =~ /tar\.\w+$/;
+        my $src = sprintf("%s%s.gpg", $file, $suffix);
+        my $dst = sprintf("%s%s", $file, $suffix);
+        if (mv($file, $src)) {
+            $gpg->decrypt(
+                -infile => $src,
+                -outfile=> $dst,
+            ) or do {
+                nope("GPG decrypt error");
+                say(red($gpg->error)) if $gpg->error;
+                $retstat = 0;
+                next;
+            };
+            yep("Decripted %s", $dst);
+        } else {
+            nope("Can't move file %s to %s: %s", $file, $src, $!);
+        }
+    }
+
+    #say(MToken::Util::explain($gpg));
+    exit(1) unless $retstat;
+    return $retstat;
 }
 
 #####################
@@ -1128,18 +1165,19 @@ sub _hashmd5 {
     return "" unless $s;
     return md5_hex($s);
 }
-sub _mk_uri { # URI constructor
-    my $config = shift;
-    my $uri = new URI( "http://localhost" );
-    my $server_host = $config->get("server_host") || "localhost";
-    my $server_port = $config->get("server_port") || 443;
-    my $server_path = $config->get("server_path") || $config->get("project") || PROJECT;
-    my $server_scheme = $config->get("server_scheme") || ($server_port == 443 ? 'https' : 'http');
-    $uri->scheme($server_scheme);
-    $uri->host($server_host);
-    $uri->port($server_port) if ($server_port != 80 and $server_port != 443);
-    $uri->path($server_path);
+sub _mk_uri {
+    # URI constructor
+    my $url = shift || DEFAULT_URL; # $config->get("server_url")
+    my $uri = new URI( $url );
     return $uri;
+}
+sub _get_default_url {
+    my $project = shift || PROJECT;
+    my $uri = new URI( DEFAULT_URL );
+    $uri->scheme('https');
+    $uri->host(HOSTNAME);
+    $uri->path($project);
+    return $uri->canonical->as_string;
 }
 sub _show_list {
 my $struct = shift;
@@ -1176,7 +1214,7 @@ foreach my $k (sort { lc $a cmp lc $b } keys %$struct) {
     my $comment = $struct->{$k} || '';
     my $datef = $1 if $comment =~ /(\d{4}\/\d{2}\/\d{2})/; $datef ||= "";
     push @arr, $datef; # Date
-    my $realf = catfile(split(/\//, $k));
+    my $realf = File::Spec->catfile(split(/\//, $k));
     my $fs = (-f $realf and -r _) ? (-s _) : 0; # File size
     $total += ($fs || 0);
     push @arr, correct_number($fs || 0);
@@ -1194,9 +1232,9 @@ sub _check_date {
     croak("Incorrect date format") unless $date_fmt && $date_fmt =~ /^\d{4}\/\d{2}\/\d{2}$/;
 
     # Date conflict
-    my $cur_fmt = CTK::dtf("%YYYY/%MM/%DD", time());
+    my $cur_fmt = dtf("%YYYY/%MM/%DD", time());
     unless ($date_fmt eq $cur_fmt) {
-        say ("Makefile too old. Please run first follows commands:\n\tmake clean\n\tperl Makefile.PL\n");
+        say STDERR red("Makefile too old. Please run first follows commands:\n\tmake clean\n\tperl Makefile.PL\n");
         exit(1);
     }
     return 1;
@@ -1219,14 +1257,11 @@ sub _add {
     my $d = shift || '';
 
     # Internal use only
-    my $c = new CTK;
+    my $c = new CTK(plugins => [qw/cli/]);
 
     # Extraneous files
     my @extra = filecheck(); # Отсутствующие файла в манифесте но есть на диске
-    unless (@extra) {
-        say "No files for add";
-        return 0;
-    }
+    return skip("No files for add") unless @extra;
 
     my $sel = "";
     my $i = 0;
@@ -1234,50 +1269,38 @@ sub _add {
         $i++;
         $sel = $_ if $i == $n;
     }
-    unless ($sel) {
-        say "File not selected";
-        return 0;
-    }
-    say "Selected file for adding:";
-    say(sprintf("  File : %s", $sel));
-    my $realf = catfile(split(/\//, $sel));
+    return skip("File not selected") unless $sel;
+
+    say(cyan("Selected file for adding:"));
+    say(cyan("  File : %s", $sel));
+    my $realf = File::Spec->catfile(split(/\//, $sel));
     my $fs = (-f $realf and -r _) ? (-s _) : 0; # File size
-    say(sprintf("  Size : %s bytes", correct_number($fs || 0)));
-    say(sprintf("  Date : %s", $d));
-    my $md5 = md5sum($realf);
-    say(sprintf("  MD5  : %s", $md5));
-    my $sha1 = sha1sum($realf);
-    say(sprintf("  SHA1 : %s", $sha1));
-    unless ($c->cli_prompt('Are you sure you want to add this file?:','no') =~ /^\s*y/i) {
-        say "Aborted";
-        return 0;
-    }
+    say(cyan("  Size : %s bytes", correct_number($fs || 0)));
+    say(cyan("  Date : %s", $d));
+    my $md5 = MToken::Util::md5sum($realf);
+    say(cyan("  MD5  : %s", $md5));
+    my $sha1 = MToken::Util::sha1sum($realf);
+    say(cyan("  SHA1 : %s", $sha1));
+    return skip("Aborted") unless $c->cli_prompt('Are you sure you want to add this file?:','no') =~ /^\s*y/i;
 
     my $comment = sprintf("\%s\t%s", $md5, $d);
-    unless (maniadd({$sel, $comment})) {
-        say "Can't add file";
-        return 0;
-    }
-    say "Done";
-    return 1;
+    return nope("Can't add file") unless maniadd({$sel, $comment});
+    return yep("Done");
 }
 sub _addall {
     my $d = shift || '';
 
     # Extraneous files
     my @extra = filecheck(); # Отсутствующие файла в манифесте но есть на диске
-    unless (@extra) {
-        say "No files for add";
-        return 0;
-    }
+    return skip("No files for add") unless @extra;
 
     foreach my $f (@extra) {
-        my $realf = catfile(split(/\//, $f));
-        my $comment = sprintf("\%s\t%s", md5sum($realf), $d);
+        my $realf = File::Spec->catfile(split(/\//, $f));
+        my $comment = sprintf("\%s\t%s", MToken::Util::md5sum($realf), $d);
         if (maniadd({$f, $comment})) {
-            say(sprintf("File %s successfully added", $f));
+            yep("File %s successfully added", $f);
         } else {
-            say(sprintf("Can't add file %s", $f));
+            nope("Can't add file %s", $f);
         }
     }
     return 1;

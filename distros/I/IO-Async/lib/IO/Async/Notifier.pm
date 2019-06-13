@@ -8,7 +8,7 @@ package IO::Async::Notifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -357,6 +357,24 @@ sub adopt_future
    }));
 
    return $f;
+}
+
+=head2 adopted_futures
+
+   @f = $notifier->adopted_futures
+
+I<Since version 0.73.>
+
+Returns a list of all the adopted and still-pending futures, in no particular
+order.
+
+=cut
+
+sub adopted_futures
+{
+   my $self = shift;
+
+   return values %{ $self->{IO_Async_Notifier__futures} };
 }
 
 =head1 CHILD NOTIFIERS

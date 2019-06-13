@@ -611,8 +611,8 @@ to copy one of these.  Copying will proceed for all other sub-folders.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.006,
-built on June 12, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.007,
+built on June 13, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

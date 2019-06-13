@@ -133,7 +133,7 @@
          "web" : "https://github.com/oalders/lwp-consolelogger"
       }
    },
-   "version" : "0.000041",
+   "version" : "0.000042",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -653,7 +653,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000041",
+                  "tag" : "v0.000042",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

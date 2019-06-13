@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Sergey Lepenkov (Serz Minus), <abalama@cpan.org>
+# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 00-trailingspace.t 43 2017-07-31 13:04:58Z minus $
+# $Id: 00-trailingspace.t 54 2019-06-03 16:37:49Z minus $
 #
 # For Notapad++: [ \t]+\r\n -> \r\n
 #
@@ -23,7 +23,7 @@ plan tests => 1;
 
 my $finder = Test::TrailingSpace->new({
        root => '.',
-       filename_regex => qr/(?:\.(?:t|pm|pl|cgi|xs|c|h|pod|PL|conf)|README|CHANGES|TODO|LICENSE|mdscore)\z/,
+       filename_regex => qr/(?:\.(?:t|pm|pl|cgi|xs|c|h|pod|PL|conf)|README|CHANGES|TODO|LICENSE)\z/,
    });
 
 # TEST

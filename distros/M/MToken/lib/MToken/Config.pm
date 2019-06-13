@@ -1,5 +1,8 @@
-package MToken::Config; # $Id: Config.pm 43 2017-07-31 13:04:58Z minus $
+package MToken::Config; # $Id: Config.pm 57 2019-06-06 13:46:47Z minus $
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,7 +10,7 @@ MToken::Config - MToken global and local configuration
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -71,49 +74,40 @@ Save current configuration to local_file and returns status of the operation
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use CTK::Util qw/ :BASE /;
+use Carp;
 use File::HomeDir;
 use Config::General;
 use Try::Tiny;
 use Cwd;
+use File::Spec;
 use MToken::Const qw/ :GENERAL :MATH /;
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use constant {
-    GLOBAL_CONF_FILE    => 'mtoken.conf',
-    LOCAL_CONF_FILE     => '.mtoken',
     ALLOWED_KEYS        => [qw/
             name distname project
-            server_host server_port server_path server_scheme server_dir
-            server_ask_credentials server_user server_password
+            server_url
             gpgbin opensslbin
         /],
 };
@@ -128,7 +122,7 @@ sub new {
 
     # global_file
     unless (defined $global_file) {
-        $global_file = catfile(cwd(), DIR_ETC, GLOBAL_CONF_FILE);
+        $global_file = File::Spec->catfile(cwd(), DIR_ETC, GLOBAL_CONF_FILE);
     }
 
     # local_file
@@ -139,14 +133,14 @@ sub new {
         my $lcf = $locex
             ? sprintf("%s_%s", LOCAL_CONF_FILE, $project)
             : LOCAL_CONF_FILE;
-        $local_file = catfile(home(), $lcf);
+        $local_file = File::Spec->catfile(home(), $lcf);
     }
 
     unless ($locex) {
         my %tmp = _loadconfig($global_file);
         my $project = $tmp{project};
         croak("Can't get PROJECT param from $global_file file. Please reinitialize this project") unless $project;
-        $local_file = catfile(home(), sprintf("%s_%s", LOCAL_CONF_FILE, $project));
+        $local_file = File::Spec->catfile(home(), sprintf("%s_%s", LOCAL_CONF_FILE, $project));
     }
 
     my %cfg = (

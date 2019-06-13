@@ -1,5 +1,14 @@
 Revision history for IO-Async
 
+0.73    2019-06-12 16:49:28
+        [CHANGES]
+         * Provide an IO::Async implementation of Future::IO
+         * Added $loop->run_process (RT129225)
+         * Clear $ONE_TRUE_LOOP in $loop->fork so that child processes can do
+           IO::Async::Loop->new successfully
+         * Added $notifier->adopted_futures accessor (RT127818)
+         * Various docs fixes
+
 0.72    2018-04-02 19:34:27
         [CHANGES]
          * Expanded docs on Stream's on_read sub return values

@@ -7,11 +7,8 @@ use Test::More tests => 6;
 
 use Test::Taint;
 
-my @keys = keys %ENV;
-my $key = shift @keys;
-
 taint_checking_ok();
-ok( tainted($ENV{$key}), "\$ENV{$key} is tainted" );
+ok( tainted($^X), '$^X is tainted' );
 
 my $foo = 43;
 ok( !tainted($foo), '43 is not tainted' );
@@ -21,7 +18,7 @@ RESET_SIG_DIE: {
 
     local $SIG{__DIE__} = sub { $counter++ };
 
-    ok( tainted($ENV{$key}), "\$ENV{$key} is tainted" );
+    ok( tainted($^X), '$^X is tainted' );
     is($counter, 0, 'counter was not incremented (our die did not fire)');
 
     eval { die 'validly' };

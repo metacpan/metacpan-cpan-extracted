@@ -8,7 +8,7 @@ package Future::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 NAME
 
@@ -87,6 +87,32 @@ sub details  { my $self = shift; @{$self}[2..$#$self] }
 =head1 METHODS
 
 =cut
+
+=head2 throw
+
+   Future::Exception->throw( $message, $category, @details )
+
+I<Since version 0.41.>
+
+Constructs a new exception object and throws it using C<die()>. This method
+will not return, as it raises the exception directly.
+
+If C<$message> does not end in a linefeed then the calling file and line
+number are appended to it, in the same way C<die()> does.
+
+=cut
+
+sub throw
+{
+   my $class = shift;
+   my ( $message, $category, @details ) = @_;
+   $message =~ m/\n$/ or
+      $message .= sprintf " at %s line %d.\n", ( caller )[1,2];
+   die $class->new( $message, $category, @details );
+}
+
+# TODO: consider a 'croak' method that uses Carp::shortmess to find a suitable
+# file/linenumber
 
 =head2 as_future
 

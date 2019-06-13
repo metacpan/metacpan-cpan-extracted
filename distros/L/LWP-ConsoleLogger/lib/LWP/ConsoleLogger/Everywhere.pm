@@ -1,12 +1,14 @@
 package LWP::ConsoleLogger::Everywhere;
-our $VERSION = '0.000041';
 use strict;
 use warnings;
 
-use LWP::ConsoleLogger::Easy qw( debug_ua );
-use LWP::UserAgent;
+our $VERSION = '0.000042';
+
 use Class::Method::Modifiers ();
+use LWP::ConsoleLogger::Easy qw( debug_ua );
+use LWP::UserAgent ();
 use Module::Runtime qw( require_module );
+use Try::Tiny qw( try );
 
 no warnings 'once';
 
@@ -26,7 +28,8 @@ Class::Method::Modifiers::install_modifier(
     }
 );
 
-if ( require_module('Mojo::UserAgent') ) {
+try {
+    require_module('Mojo::UserAgent');
     Class::Method::Modifiers::install_modifier(
         'Mojo::UserAgent',
         'around',
@@ -40,7 +43,7 @@ if ( require_module('Mojo::UserAgent') ) {
             return $ua;
         }
     );
-}
+};
 
 sub loggers {
     return $loggers;
@@ -69,7 +72,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 0.000041
+version 0.000042
 
 =head1 SYNOPSIS
 
