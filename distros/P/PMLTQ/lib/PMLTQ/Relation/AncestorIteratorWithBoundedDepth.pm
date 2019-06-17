@@ -1,6 +1,6 @@
 package PMLTQ::Relation::AncestorIteratorWithBoundedDepth;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::AncestorIteratorWithBoundedDepth::VERSION = '3.0.1';
+$PMLTQ::Relation::AncestorIteratorWithBoundedDepth::VERSION = '3.0.2';
 # ABSTRACT: Iterates over ancestor nodes to given bound
 
 use 5.006;
@@ -87,7 +87,7 @@ PMLTQ::Relation::AncestorIteratorWithBoundedDepth - Iterates over ancestor nodes
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

@@ -1,6 +1,6 @@
 package PMLTQ::Relation::DepthFirstRangeIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::DepthFirstRangeIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::DepthFirstRangeIterator::VERSION = '3.0.2';
 # ABSTRACT: Iterates tree using depth first search in given boundaries
 
 
@@ -141,7 +141,7 @@ PMLTQ::Relation::DepthFirstRangeIterator - Iterates tree using depth first searc
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 SYNOPSIS
 

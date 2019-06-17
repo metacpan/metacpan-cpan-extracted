@@ -58,7 +58,7 @@
          "web" : "https://github.com/andrewjmaguire/Net-AS2"
       }
    },
-   "version" : "1.0101",
+   "version" : "1.0110",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

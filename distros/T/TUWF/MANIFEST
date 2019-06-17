@@ -17,11 +17,16 @@ lib/TUWF/Request.pm
 lib/TUWF/Request.pod
 lib/TUWF/Response.pm
 lib/TUWF/Response.pod
+lib/TUWF/Validate.pm
+lib/TUWF/Validate.pod
+lib/TUWF/Validate/Interop.pm
 lib/TUWF/XML.pm
 lib/TUWF/XML.pod
 Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
-README
+README.md
+t/interop.t
 t/kv_validate.t
+t/validate.t

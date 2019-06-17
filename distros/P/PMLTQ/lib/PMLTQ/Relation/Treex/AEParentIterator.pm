@@ -1,6 +1,6 @@
 package PMLTQ::Relation::Treex::AEParentIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::Treex::AEParentIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::Treex::AEParentIterator::VERSION = '3.0.2';
 # ABSTRACT: Effective parent relation iterator on a-nodes for Treex treebanks
 
 use strict;
@@ -55,7 +55,7 @@ PMLTQ::Relation::Treex::AEParentIterator - Effective parent relation iterator on
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

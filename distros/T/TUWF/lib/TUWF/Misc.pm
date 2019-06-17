@@ -9,10 +9,10 @@ use Carp 'croak';
 use Exporter 'import';
 use Encode 'encode_utf8';
 use Scalar::Util 'looks_like_number';
+use TUWF::Validate;
 
 
-our $VERSION = '1.2';
-our @EXPORT = ('formValidate', 'mail');
+our $VERSION = '1.3';
 our @EXPORT_OK = ('uri_escape', 'kv_validate');
 
 
@@ -32,13 +32,6 @@ sub _template_validate_num {
   return 1;
 }
 
-my $re_fqdn      = qr/(?:[a-zA-Z0-9][\w-]*\.)+[a-zA-Z][a-zA-Z0-9-]{1,25}\.?/;
-my $re_ip4_digit = qr/(?:0|[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/;
-my $re_ip4       = qr/($re_ip4_digit\.){3}$re_ip4_digit/;
-# This monstrosity is based on http://stackoverflow.com/questions/53497/regular-expression-that-matches-valid-ipv6-addresses
-# Doesn't allow IPv4-mapped-IPv6 addresses or other fancy stuff.
-my $re_ip6       = qr/(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)/;
-my $re_domain    = qr/(?:$re_fqdn|$re_ip4|\[$re_ip6\])/;
 
 my %default_templates = (
   # JSON number format, regex from http://stackoverflow.com/questions/13340717/json-numbers-regular-expression
@@ -46,8 +39,8 @@ my %default_templates = (
   int    => { func => \&_template_validate_num, regex => qr/^-?(?:0|[1-9]\d*)$/, inherit => ['min','max'] },
   uint   => { func => \&_template_validate_num, regex => qr/^(?:0|[1-9]\d*)$/, inherit => ['min','max'] },
   ascii  => { regex => qr/^[\x20-\x7E]*$/ },
-  email  => { regex => qr/^[-\+\.#\$=\w]+\@$re_domain$/, maxlength => 254 },
-  weburl => { regex => qr/^https?:\/\/$re_domain(?::[1-9][0-9]{0,5})?\/[^\s<>"]*$/, maxlength => 65536 }, # the maxlength is a bit arbitrary, but better than unlimited
+  email  => { regex => $TUWF::Validate::re_email, maxlength => 254 },
+  weburl => { regex => $TUWF::Validate::re_weburl, maxlength => 65536 }, # the maxlength is a bit arbitrary, but better than unlimited
 );
 
 
@@ -154,7 +147,7 @@ sub _validate { # value, \%templates, \%rules
 
 
 
-sub formValidate {
+sub TUWF::Object::formValidate {
   my($self, @fields) = @_;
   return kv_validate(
     { post   => sub { $self->reqPosts(shift)  },
@@ -170,7 +163,7 @@ sub formValidate {
 
 # A simple mail function, body and headers as arguments. Usage:
 #  $self->mail('body', header1 => 'value of header 1', ..);
-sub mail {
+sub TUWF::Object::mail {
   my $self = shift;
   my $body = shift;
   my %hs = @_;
@@ -188,7 +181,9 @@ sub mail {
   }
   $mail .= sprintf "\n%s", $body;
 
-  if(open(my $mailer, '|-:utf8', "$self->{_TUWF}{mail_sendmail} -t -f '$hs{From}'")) {
+  if($self->{_TUWF}{mail_sendmail} eq 'log') {
+    $self->log("tuwf->mail(): The following mail would have been sent:\n$mail");
+  } elsif(open(my $mailer, '|-:utf8', "$self->{_TUWF}{mail_sendmail} -t -f '$hs{From}'")) {
     print $mailer $mail;
     croak "Error running sendmail ($!)"
       if !close($mailer);
@@ -197,5 +192,43 @@ sub mail {
   }
 }
 
+
+sub TUWF::Object::compile {
+  TUWF::Validate::compile($_[0]{_TUWF}{custom_validations}, $_[1]);
+}
+
+
+sub _compile {
+  ref $_[0] eq 'TUWF::Validate' ? $_[0] : $TUWF::OBJ->compile($_[0]);
+}
+
+
+sub TUWF::Object::validate {
+  my $self = shift;
+  my $what = shift;
+
+  return _compile($_[0])->validate($self->reqJSON) if $what eq 'json';
+
+  # 'param' is special, and not really encouraged. Create a new hash based on
+  # reqParam() and cache the result.
+  $self->{_TUWF}{Req}{PARAM} ||= {
+    map { my @v = $self->reqParams($_); +($_, @v > 1 ? \@v : $v[0]) } $self->reqParams()
+  } if $what eq 'param';
+
+  my $source =
+    $what eq 'get'   ? $self->{_TUWF}{Req}{GET} :
+    $what eq 'post'  ? $self->{_TUWF}{Req}{POST} :
+    $what eq 'param' ? $self->{_TUWF}{Req}{PARAM}
+                     : croak "Invalid source type '$what'";
+
+  # Multi-value, schema hash or object
+  return _compile($_[0])->validate($source) if @_ == 1;
+
+  # Single value
+  return _compile($_[1])->validate($source->{$_[0]}) if @_ == 2;
+
+  # Multi-value, separate params
+  _compile({ type => 'hash', keys => { @_ } })->validate($source);
+}
 
 1;

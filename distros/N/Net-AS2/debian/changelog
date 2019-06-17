@@ -1,3 +1,9 @@
+libnet-as2-perl (1.0110-1) stable; urgency=low
+
+  * Message-Id and Original-Message-ID
+     - RFC4130 requires Message-Id and Original-Message-ID delimited
+       by angle brackets in header
+
 libnet-as2-perl (1.0101-1) stable; urgency=low
 
   * Message-Id

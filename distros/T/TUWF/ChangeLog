@@ -1,3 +1,11 @@
+1.3 - 2019-06-17
+	- Add TUWF::Validate module for generic data structure validation
+	- Add tuwf->compile() and tuwf->validate() interfaces for input validation
+	- Add 'custom_validations' setting
+	- Add setting to write emails to the log file instead of mailing them
+	- Add (undocumented) TUWF::Validate::Interop module for JSON coercion, HTML5 validation patterns and Elm code generation.
+	- Fix logging of JSON request body on error
+
 1.2 - 2018-02-18
 	- Add tuwf() exported function as alias to $self or $TUWF::OBJ
 	- Add TUWF::get/put/post/etc() as better alternative to TUWF::register()
@@ -53,5 +61,5 @@
 	- Lowered minimum Perl version to 5.8.0
 
 0.1 - 2011-02-07
-	Initial version
+	- Initial version
 

@@ -2,8 +2,9 @@ package Test::APIcast;
 use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
+use Fcntl qw(:flock SEEK_END);
 
-our $VERSION = "0.22";
+our $VERSION = "0.24";
 
 BEGIN {
     $ENV{TEST_NGINX_BINARY} ||= 'openresty';
@@ -38,21 +39,33 @@ our @EXPORT = qw( get_random_port );
 
 our @PORTS = ();
 
+open(my $prove_filename_lock, ">", "/tmp/prove_lock");
+
+sub lock {
+    flock($prove_filename_lock, LOCK_EX) or bail_out "cannot get prove lock.";
+    # and, in case someone appended while we were waiting...
+    seek($prove_filename_lock, 0, SEEK_END) or bail_out "cannot get prove lock.";
+}
+
+sub unlock {
+    flock($prove_filename_lock, LOCK_UN) or bail_out "Cannot release prove lock";
+}
+
 sub get_random_port {
     my $tries = 1000;
     my $ServerPort;
-
+    lock();
     for (my $i = 0; $i < $tries; $i++) {
         my $port = int(rand 60000) + 1025;
 
         my $sock = IO::Socket::INET->new(
-            LocalAddr => $Test::Nginx::Util::ServerAddr,
             LocalPort => $port,
             Proto => 'tcp',
-            Timeout => 0.1,
         );
 
         if (defined $sock) {
+            $sock->shutdown(0);
+            $sock->close();
             push @PORTS, $sock;
             $ServerPort = $port;
             last;
@@ -62,6 +75,7 @@ sub get_random_port {
             warn "Try again, port $port is already in use: $@\n";
         }
     }
+    unlock();
 
     if (!defined $ServerPort) {
         bail_out "Cannot find an available listening port number after $tries attempts.\n";

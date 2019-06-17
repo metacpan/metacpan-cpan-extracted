@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000012';
 
 use App::GHPT::Types qw( ArrayRef Bool PositiveInt Str );
 use App::GHPT::WorkSubmitter::AskPullRequestQuestions;
@@ -17,11 +17,21 @@ use WebService::PivotalTracker 0.10;
 
 with 'MooseX::Getopt::Dashes';
 
+has create_story => (
+    is  => 'ro',
+    isa => Bool,
+    documentation =>
+        'If true, will create a new story instead of finding an existing one.',
+);
+
 has project => (
     is  => 'ro',
     isa => Str,
     documentation =>
         'The name of the PT project to search. This will be matched against the names of all the projects you have access to. By default, all projects will be searched.',
+    default => sub {
+        $ENV{APP_GHPT_PROJECT} // q{};
+    },
 );
 
 has base => (
@@ -37,6 +47,22 @@ has dry_run => (
     isa           => Bool,
     default       => 0,
     documentation => 'Dry run, just print out the PR we would have created',
+);
+
+has requester => (
+    is      => 'ro',
+    isa     => Str,
+    default => q{},
+    documentation =>
+        q{When creating a story, this will be the requester. You can provide a substring of the person's name (case insensitive) and it will find them.},
+);
+
+has story_name => (
+    is      => 'ro',
+    isa     => Str,
+    default => q{},
+    documentation =>
+        'When creating a story, this is the name (title) to set.',
 );
 
 has _question_namespaces => (
@@ -106,14 +132,36 @@ has _project_ids => (
 
 sub _build_project_ids ($self) {
     my $want = $self->project;
-    if ($want) {
-        for my $project ( $self->_pt_api->projects->@* ) {
-            return [ $project->id ] if $project->name =~ /\Q$want/i;
-        }
-        die 'Could not find a project id for project named ' . $self->project;
-    }
+    return [
+        map      { $_->id }
+            grep { $want ? ( $_->name =~ /\Q$want/i ) : 1 }
+            $self->_pt_api->projects->@*
+    ];
+}
 
-    return [ map { $_->id } $self->_pt_api->projects->@* ];
+sub _find_project ($self) {
+    my $want     = $self->project;
+    my @projects = grep { $want ? ( $_->name =~ /\Q$want/i ) : 1 }
+        $self->_pt_api->projects->@*;
+
+    return $projects[0] if @projects == 1;
+
+    my %project_by_name = map { $_->name => $_ } @projects;
+    my $name            = $self->_choose( [ sort keys %project_by_name ] );
+    return $project_by_name{$name};
+}
+
+sub _find_requester ( $self, $project ) {
+    my $want        = $self->requester;
+    my @memberships = grep { $want ? ( $_->person->name =~ /\Q$want/i ) : 1 }
+        $project->memberships->@*;
+
+    return $memberships[0]->person if @memberships == 1;
+
+    my %membership_by_person_name
+        = map { $_->person->name => $_ } @memberships;
+    my $name = $self->_choose( [ sort keys %membership_by_person_name ] );
+    return $membership_by_person_name{$name}->person;
 }
 
 before print_usage_text => sub {
@@ -128,7 +176,10 @@ sub run ($self) {
             "hub does not appear to be set up. Please run 'hub browse' to set it up.\n";
     }
 
-    my $chosen_story = $self->_choose_pt_story;
+    my ( $requester, $chosen_story ) = $self->_choose_pt_story;
+    unless ($requester) {
+        die "No requester found!\n";
+    }
     unless ($chosen_story) {
         die "No started stories found!\n";
     }
@@ -136,7 +187,7 @@ sub run ($self) {
     my $pull_request_url = $self->_create_pull_request(
         $self->_append_question_answers(
             $self->_confirm_story(
-                $self->_text_for_story($chosen_story),
+                $self->_text_for_story( $chosen_story, $requester ),
             ),
         ),
     );
@@ -167,7 +218,42 @@ sub _pt_token ($self) {
 }
 ## use critic
 
+sub _choose {
+    my $self = shift;
+    return choose(@_)
+        || exit 1;    # user hit q or ctrl-d to quit
+}
+
 sub _choose_pt_story ($self) {
+    if ( $self->create_story ) {
+        my $project   = $self->_find_project;
+        my $requester = $self->_find_requester($project);
+        my $name      = $self->_get_story_name;
+
+        if ( $self->dry_run ) {
+            say "Would create story $name in "
+                . $project->name
+                . ' with requester '
+                . $requester->name
+                . ' but this is a dry-run.';
+            exit;
+        }
+
+        return (
+            $requester->name,
+            $self->_pt_api->create_story(
+                current_state => 'started',
+
+                # This is primarily intended for small changes/stories, so 0 points.
+                estimate        => 0,
+                name            => $name,
+                owner_ids       => [ $self->_pt_api->me->id ],
+                project_id      => $project->id,
+                requested_by_id => $requester->id,
+            )
+        );
+    }
+
     my $stories = [
         map {
             $self->_pt_api->project_stories_where(
@@ -182,13 +268,32 @@ sub _choose_pt_story ($self) {
 
     $stories = $self->_filter_chores_and_maybe_warn_user($stories);
 
-    return unless $stories->@*;
+    return undef unless $stories->@*;
 
     my %stories_lookup = map { $_->name => $_ } $stories->@*;
-    my $chosen_story   = choose( [ sort keys %stories_lookup ] );
-    return unless $chosen_story;
+    my $chosen_story   = $self->_choose( [ sort keys %stories_lookup ] );
 
-    return $stories_lookup{$chosen_story};
+    return (
+        $stories_lookup{$chosen_story}->requested_by->name,
+        $stories_lookup{$chosen_story}
+    );
+}
+
+sub _get_story_name ($self) {
+    my $story_name = $self->story_name;
+    if ( !$story_name ) {
+        say q{Please enter the new story's name:};
+        $story_name = $self->_read_line;
+    }
+    return $story_name;
+}
+
+sub _read_line ($) {
+    while (1) {
+        my $l = readline( \*STDIN );
+        $l =~ s/^\s+|\s+$//g;
+        return $l if $l;
+    }
 }
 
 sub _filter_chores_and_maybe_warn_user ( $self, $stories ) {
@@ -206,21 +311,20 @@ sub _filter_chores_and_maybe_warn_user ( $self, $stories ) {
 }
 
 sub _confirm_story ( $self, $text ) {
-    my $result = choose( [ 'Accept', 'Edit' ], { prompt => $text } )
-        or exit 1;    # user hit q or ctrl-d to quit
+    my $result = $self->_choose( [ 'Accept', 'Edit' ], { prompt => $text } );
     return $text if $result eq 'Accept';
     my $fh = solicit($text);
     return do { local $/ = undef; <$fh> };
 }
 
-sub _text_for_story ( $self, $story ) {
+sub _text_for_story ( $self, $story, $reviewer ) {
     join "\n\n",
         $story->name,
         $story->url,
         ( $story->description ? $story->description : () ),
         (
         $self->_include_requester_name_in_pr
-        ? 'Reviewer: ' . $story->requested_by->name
+        ? 'Reviewer: ' . $reviewer
         : ()
         ),
         ;

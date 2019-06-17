@@ -1,6 +1,6 @@
 package PMLTQ::Relation::Treex::TEChildIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::Treex::TEChildIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::Treex::TEChildIterator::VERSION = '3.0.2';
 # ABSTRACT: Effective child relation iterator on t-nodes for Treex treebanks
 
 use strict;
@@ -39,7 +39,7 @@ PMLTQ::Relation::Treex::TEChildIterator - Effective child relation iterator on t
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

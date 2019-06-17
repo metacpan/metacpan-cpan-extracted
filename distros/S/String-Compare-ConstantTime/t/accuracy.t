@@ -8,7 +8,7 @@ use String::Compare::ConstantTime qw/equals/;
 use utf8;
 use Encode;
 
-use Test::More tests => 21;
+use Test::More tests => 26;
 
 
 ok(equals("asdf", "asdf"));
@@ -42,3 +42,14 @@ ok( utf8::is_utf8($string_utf8_on), "utf8 flag on");
 my $string_utf8_off = Encode::encode("utf8", $string_utf8_on);
 ok( !utf8::is_utf8($string_utf8_off), "utf8 flag off");
 ok(equals($string_utf8_on, $string_utf8_off));
+
+my $latin1_e_acute = "\xe9";
+ok( !utf8::is_utf8($latin1_e_acute), "latin-1 e-acute has utf8 flag off");
+my $utf8_e_acute = "é";
+ok( utf8::is_utf8($utf8_e_acute), "UTF-8 e-acute has utf8 flag on");
+ok(!equals($latin1_e_acute, $utf8_e_acute), "latin-1 vs UTF-8 not equal to us");
+ok($latin1_e_acute eq $utf8_e_acute, "but perl thinks they are");
+
+utf8::encode($utf8_e_acute);
+utf8::encode($latin1_e_acute);
+ok(equals($latin1_e_acute, $utf8_e_acute), "after encoding, they are equal to us");

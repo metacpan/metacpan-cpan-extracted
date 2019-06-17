@@ -14,6 +14,7 @@ data/comments.fasta
 data/comments.fastq
 data/compressed.fasta.gz
 data/compressed.fastq.gz
+data/more_comments.fa
 data/old_sanger.fastq
 data/test.fasta
 data/test.fastq

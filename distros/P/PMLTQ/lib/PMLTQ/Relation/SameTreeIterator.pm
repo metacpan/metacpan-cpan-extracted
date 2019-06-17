@@ -1,6 +1,6 @@
 package PMLTQ::Relation::SameTreeIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::SameTreeIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::SameTreeIterator::VERSION = '3.0.2';
 # ABSTRACT: Evaluates condition on nodes of current tree
 
 use 5.006;
@@ -37,7 +37,7 @@ PMLTQ::Relation::SameTreeIterator - Evaluates condition on nodes of current tree
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

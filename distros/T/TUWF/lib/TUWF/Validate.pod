@@ -1,0 +1,575 @@
+=head1 NAME
+
+TUWF::Validate - Data and form validation and normalization
+
+=head1 DESCRIPTION
+
+This module provides an easy and simple interface for data validation. It can
+handle most types of data structures (scalars, hashes, arrays and nested data
+structures), and has some conveniences for validating form-like data.
+
+This module requires no additional modules from CPAN, and can be used
+stand-alone, outside of the L<TUWF> ecosystem.  For integration with L<TUWF>,
+see the C<compile()> and C<validate()> methods in L<TUWF::Misc>.
+
+Note that this module will not solve B<all> your input validation problems. It
+can validate the format and the structure of the data, but it does not support
+validations that depend on other input values. For example, it is not possible
+to specify that the contents of a I<password> field must be equivalent to that
+of a I<confirm_password> field, but you can specify that both fields need to be
+filled out. Recursive data structures are not supported. There is also no
+built-in support for validating hashes with dynamic keys or arrays where not
+all elements conform to the same schema. These could technically still be
+validated with custom validations, but it won't be as convenient.
+
+This module is designed to validate any kind of program input after it has been
+parsed into a Perl data structure. It should not be used to validate function
+parameters within Perl code. In fact, the correct answer to "how do I validate
+function parameters?" is "don't, document your assumptions instead".
+
+=head1 API
+
+=head2 Validation
+
+L<TUWF::Validate> provides two functions: C<compile()> and C<validate()>, these
+functions can be called with the full package name, but are also exported on
+request.
+
+  use TUWF::Validate;
+  state $validator = TUWF::Validate::compile($validations, $schema);
+  my $result = $validator->validate($input);
+
+  # Equivalent:
+  use TUWF::Validate qw/compile/;
+  state $validator = compile $validations, $schema;
+  my $result = $validator->validate($input);
+
+C<validate()> can also be used as a function with three arguments, so you can
+skip the compilation step:
+
+  use TUWF::Validate qw/validate/;
+  my $result = validate $validations, $schema, $input;
+
+  # Is equivalent to:
+  use TUWF::Validate qr/compile/;
+  my $result = compile($validations, $schema)->validate($input);
+
+But if you are going to use the same schema to validate multiple inputs, it may
+be faster to call C<compile()> only once and reuse the compiled C<$validator>
+object.
+
+In the above examples, C<$schema> is the schema that describes the data to be
+validated (see L</SCHEMA DEFINITION> below), C<$validations> is a hashref
+containing L<custom validations|/Custom validations> that C<$schema> can refer
+to, C<$input> is the data to be validated, and the C<$result> object is
+L<described below|/Result object>.
+
+Both C<compile()> and C<validate()> may throw an error if the C<$validations>
+or C<$schema> are invalid. Errors in the C<$input> should never cause an error
+to be thrown, these are always reported in the C<$result> object.
+
+This module takes great care that C<$input> is not being modified in place,
+even if data normalization is being performed. The normalized data can be read
+from the C<$result> object.
+
+=head2 Result object
+
+The C<$result> object returned by C<validate()> overloads boolean context, so
+you can check if the validation succeeded with a simple if statement:
+
+  my $result = TUWF::Validate::validate(..);
+  if($result) {
+    # Success!
+    my $data = $result->data;
+  } else {
+    # Input failed to validate...
+    my $error = $result->err;
+  }
+
+In addition, the result object implements the following methods:
+
+=over
+
+=item data()
+
+Returns the validated and normalized data. This method will throw an error if
+validation failed, so if you're lazy and don't want to bother too much with
+proper error reporting, you can safely I<validate-and-die> in a single step:
+
+  my $validated_data = validate(..)->data;
+
+(Note regarding reference semantics: The returned data will usually be a
+(possibly modified) copy of C<$input>, but may in some cases still have nested
+references to data in C<$input> - so if you are working with nested hashrefs,
+arrayrefs or other objects and are going to make modifications to the values
+embedded within them, these changes may or may not also affect the values in
+the original C<$input>. Make a deep copy of the data if you're concerned about
+this).
+
+=item unsafe_data()
+
+Same as C<data()>, but does not throw an error if validation failed. Instead,
+it returns the partially validated/normalized data. Can be used to throw the
+data back at the user in a "Here, this is what I made of it, but I still don't
+like it so please fix it!" fashion.
+
+=item err()
+
+Returns I<undef> if validation succeeded, an error object otherwise.
+
+An error object is a hashref containing at least one key: I<validation>, which
+indicates the name of the that validation failed. Additional keys with more
+detailed information may be present, depending on the validation. These are
+documented in L</SCHEMA DEFINITION> below.
+
+=back
+
+
+=head1 SCHEMA DEFINITION
+
+A schema is a hashref, each key is the name of a built-in option or of a
+validation to be performed. None of the options or validations are required,
+but some built-ins have default values. This means that the empty schema C<{}>
+is actually equivalent to:
+
+  { type         => 'scalar',
+    rmwhitespace => 1,
+    required     => 1
+  }
+
+=head2 Built-in options
+
+=over
+
+=item type => $type
+
+Specify the required type of the input, this can be I<scalar>, I<array>,
+I<hash> or I<any>. If no type is specified or implied by other validations, the
+default type is I<scalar>.
+
+Upon failure, the error object will look something like:
+
+  { validation => 'type',
+    expected   => 'hash',
+    got        => 'scalar'
+  }
+
+=item required => 0/1
+
+Whether this input is required to have a value. Specifically, this means
+C<exists($x) && defined($x) && $x ne ''>. If the input is empty and this option
+is disabled, the I<default> option is returned when it is set, otherwise the
+input is simply returned as-is.
+
+As a corollary: Other validations will never get to validate undef or an empty
+string, these values are either rejected or substituted with a default.
+
+Note that this option is checked after I<rmwhitespace> and before any other
+validation. So a string containing only whitespace is considered an empty
+string, and will fail the I<required> test.
+
+Default: true.
+
+=item default => $val
+
+The value to return if I<required> is false and the input is empty or undef.
+
+=item rmwhitespace => 0/1
+
+By default, any whitespace around scalar-type input is removed before testing
+any other validations. Setting I<rmwhitespace> to a false value will disable
+this behavior.
+
+=item keys => $hashref
+
+For C<< type => 'hash' >>, this option specifies which keys are permitted, and
+how to validate the values. Each key in C<$hashref> corresponds to a key with
+the same name in the input. Each value is a schema definition by which the
+value in the input will be validated. The schema definition may be a bare
+hashref or a validator returned by C<compile()>. If a value with
+C<< required => 0 >> is not present in the input hash, it will be created in
+the output with the default value (or undef).
+
+For example, the following schema specifies that the input must be a hash with
+three keys:
+
+  { type => 'hash',
+    keys => {
+      username => { maxlength => 16 },
+      password => { minlength => 8 },
+      email    => { required => 0, email => 1 }
+    }
+  }
+
+If validation on one or more keys fail, the error object that is returned looks
+like:
+
+  { validation => 'keys',
+    errors => [
+      # List of error objects, each with an additional 'key' field.
+      { key => 'username', validation => 'required' }
+      # In this case, the username was required but either absent or empty.
+    ]
+  }
+
+=item unknown => $option
+
+For C<< type => 'hash' >>, this option specifies what to do with keys in the
+input data that have not been defined in the I<keys> option. Possible values
+are I<remove> to remove unknown keys from the output data (this is the
+default), I<reject> to return an error if there are unknown keys in the input,
+or I<pass> to pass through any unknown keys to the output data. Note that the
+values for passed-through keys will not be validated against any schema!
+
+In the case of I<reject>, the error object will look like:
+
+  { validation => 'unknown',
+    # List of unknown keys present in the input
+    keys       => ['unknown1', .. ],
+    # List of known keys (which may or may not be present
+    # in the input - that is checked at a later stage)
+    expected   => ['known1', .. ]
+  }
+
+=item values => $schema
+
+For C<< type => 'array' >>, this defines the schema that applies to all items
+in the array.  The schema definition may be a bare hashref or a validator
+returned by C<compile()>.
+
+Failure is reported in a similar fashion to I<keys>:
+
+  { validation => 'values',
+    errors => [
+      { index => 1, validation => 'required' }
+    ]
+  }
+
+=item scalar => 0/1
+
+For C<< type => 'array' >>, this option will also permit the input to be a
+scalar. In this case, the input is interpreted and returned as an array with
+only one element. This option exists to make it easy to validate multi-value
+form inputs. For example, suppose that we wanted to parse a query string where
+an option may be present multiple times with different values, like in
+C<a=1&b=2&a=3>, and suppose that we have a query string parser that, given such
+a string, would parse that into the following hash:
+
+  { a => [1, 3], b => 1 }
+
+But if C<a> is only specified once, it would parse into a scalar instead of an
+array. With the I<scalar> option, we can permit C<a> to be a scalar and force
+it into a single-element array. The following schema definition will validate
+the above hash:
+
+  { type => 'hash',
+    keys => {
+      a => { type => 'array', scalar => 1 },
+      b => { }
+    }
+  }
+
+=item sort => $option
+
+For C<< type => 'array' >>, sort the array after validating its elements.
+C<$option> determines how the array is sorted, possible values are I<str> for
+string comparison, I<num> for numeric comparison, or a subroutine reference for
+custom comparison function. The subroutine must be similar to the one given to
+Perl's C<sort()> function, except it should compare C<$_[0]> and C<$_[1]>
+instead of C<$a> and C<$b>.
+
+=item unique => $option
+
+For C<< type => 'array' >>, require elements to be unique. That is, don't allow
+duplicate elements. There are several ways to specify what uniqueness means in
+this context:
+
+If C<$option> is a subroutine reference, then the subroutine is given an
+element as first argument, and it should return a string that is used to check
+for uniqueness. For example, if array elements are hashes, and you want to
+check for uniqueness of a hash key named I<id>, you can specify this as
+C<< unique => sub { $_[0]{id} } >>.
+
+Otherwise, if C<$option> is true and the I<sort> option is set, then the
+comparison function used for sorting is also used as uniqueness check. Two
+elements are the same if the comparison function returns C<0>.
+
+If C<$option> is true and I<sort> is not set, then the elements will be
+interpreted as strings, similar to setting C<< unique => sub { $_[0] } >>.
+
+All of that may sound complicated, but it's quite easy to use. Here's a few
+examples:
+
+  # This describes an array of hashes with keys 'id' and 'name'.
+  { type => 'array',
+    values => {
+      type => 'hash',
+      keys => {
+        id   => { uint => 1 },
+        name => {}
+      }
+    },
+    # Sort the array on 'id'
+    sort => sub { $_[0]{id} <=> $_[1]{id} },
+    # And require that 'id' fields are unique
+    unique => 1
+  }
+
+  # Contrived example: An array of strings, and we want
+  # each string to start with a different character.
+  { type => 'array',
+    values => { minlength => 1 },
+    unique => sub { substr $_[0], 0, 1 }
+  }
+
+On failure, this validation returns the following error object. This output
+assumes the first schema from the previous example.
+
+  { validation => 'unique',
+    # Index and value of element a
+    index_a => 1,
+    value_a => { id => 3, name => 'whatever' }
+    # Index and value of duplicate element b
+    index_b => 4,
+    value_b => { id => 3, name => 'something else' },
+    # If string-based uniqueness was used, this is included as well:
+    # key => '..'
+  }
+
+
+=item func => $sub
+
+Run the input through a subroutine to perform additional validation or
+normalization. The subroutine is only called after all other validations have
+been checked. The subroutine is called with the input as its only argument.
+Normalization of the input can be done by assigning to the first argument or
+modifying its value in-place.
+
+On success, the subroutine should return a true value. On failure, it should
+return either a false value or a hashref. The hashref will have the
+I<validation> key set to I<func>, and this will be returned as error object.
+
+(Note that, when I<func> is used inside a custom validation, the returned error
+object will have its I<validation> field set to the name of the custom
+validation. This makes custom validations to behave as first-class validations
+in terms of error reporting).
+
+
+=back
+
+=head2 Standard validations
+
+Standard validations are provided by the module. It is possible to override,
+re-implement and supplement these with custom validations. Internally, these
+are, in fact, implemented as custom validations.
+
+=over
+
+=item regex => $re
+
+Implies C<< type => 'scalar' >>. Validate the input against a regular
+expression.
+
+=item enum => $options
+
+Implies C<< type => 'scalar' >>. Validate the input against a list of known
+values. C<$options> can be either a scalar (in which case that is the only
+permitted input), an array (listing all possible inputs) or a hash (where the
+hash keys are considered to be the list of permitted inputs).
+
+=item minlength => $num
+
+Minimum length of the input. The I<length> is the string C<length()> if the
+input is a scalar, the number of elements if the input is an array, or the
+number of keys if the input is a hash.
+
+=item maxlength => $num
+
+Maximum length of the input.
+
+=item length => $option
+
+If C<$option> is a number, then this specifies the exact length of the input.
+If C<$option> is an array, then this is a shorthand for
+C<[$minlength,$maxlength]>.
+
+=item anybool => 1
+
+Accept any value of any type as input, and normalize it to either a C<0> or a
+C<1> according to Perl's idea of truth.
+
+=item jsonbool => 1
+
+Require the input to be a boolean type returned by a JSON parser. Supported
+types are L<JSON::PP>, L<JSON::XS>, L<Types::Serialiser>, L<Cpanel::JSON::XS>
+and L<boolean>.
+
+=item num => 1
+
+Implies C<< type => 'scalar' >>. Require the input to be a number formatted
+using the format permitted by JSON. Note that this is slightly more restrictive
+from Perl's number formatting, in that 'NaN', 'Inf' and thousand separators are
+not permitted.
+
+=item int => 1
+
+Implies C<< type => 'scalar' >>. Require the input to be an (arbitrarily large)
+integer.
+
+=item uint => 1
+
+Implies C<< type => 'scalar' >>. Require the input to be an (arbitrarily large)
+positive integer.
+
+=item min => $num
+
+Implies C<< num => 1 >>. Require the input to be larger than or equal to
+C<$num>.
+
+=item max => $num
+
+Implies C<< num => 1 >>. Require the input to be smaller than or equal to
+C<$num>.
+
+=item range => [$min,$max]
+
+Equivalent to C<< min => $min, max => $max >>.
+
+=item ascii => 1
+
+Implies C<< type => 'scalar' >>. Require the input to wholly consist of
+printable ASCII characters.
+
+=item ipv4 => 1
+
+Implies C<< type => 'scalar' >>. Require the input to be an IPv4 address.
+
+=item ipv6 => 1
+
+Implies C<< type => 'scalar' >>. Require the input to be an IPv6 address. Note
+that the IP address is not normalized, and fancy features such as
+IPv4-manned-IPv6 addresses are not permitted.
+
+=item ip => 1
+
+Require either C<< ipv4 => 1 >> or C<< ipv6 => 1 >>.
+
+=item email => 1
+
+Implies C<< type => 'scalar' >>. Validate the email address against a
+monstrosity of a regular expression. This email validation is designed to catch
+obviously invalid addresses and addresses that, while compliant with some RFCs,
+will not be accepted by most actual SMTP implementations.
+
+Email validation is quite a minefield, see L<Data::Validate::Email> for an
+alternative solution.
+
+=item weburl => 1
+
+Implies C<< type => 'scalar' >>. Requires the input to be a C<http://> or
+C<https://> url.
+
+=back
+
+
+=head2 Custom validations
+
+Custom validations can be passed to C<compile()> and C<validate()> as the
+C<$validations> hashref argument.  A custom validation is, in simple terms,
+either a schema or a subroutine that returns a schema.  The custom validation
+can then be referenced from other schemas.
+
+Here's a simple example that defines and uses a custom validation named
+I<stringbool>, which accepts either the string I<true> or I<false>.
+
+  my $validations = {
+    stringbool => { enum => ['true', 'false'] }
+  };
+  my $schema = { stringbool => 1 };
+  my $result = validate $validations, $schema, 'true';
+  # $result->data() eq 'true'
+
+A custom validation can also be defined as a subroutine, in which case it can
+accept options. Here is an example of a I<prefix> custom validation, which
+requires that the string starts with the given prefix. The subroutine returns a
+schema that contains the I<func> built-in option to do the actual validation.
+
+  my $validations = {
+    prefix => sub {
+      my $prefix = shift;
+      return {
+        func => sub { $_[0] =~ /^\Q$prefix/ }
+      }
+    }
+  };
+  my $schema = { prefix => 'Hello, ' };
+  my $result = validate $validations, $schema, 'Hello, World!';
+
+=head3 Custom validations and built-in options
+
+Custom validations can also set built-in options, but the semantics differ a
+little depending on the option. First, be aware that many of the built-in
+options apply to the whole schema and not just to the custom validation.  For
+example, if the top-level schema sets C<< rmwhitespace => 0 >>, then all of the
+validations used in that schema may get input with whitespace around it.
+
+All validations used in a schema need to agree upon a single I<type> option.
+If a custom validation does not specify a I<type> option (and no type is
+implied by another validation such as I<enum> or I<regex>), then the validation
+should work with every type. It is an error to define a schema that mixes
+validations of different types. For example, the following will throw an error:
+
+  compile {}, {
+    # top-level schema says we expect a hash
+    type => 'hash',
+    # but the 'int' validation implies that the type is a scalar
+    int => 1
+  };
+
+The I<keys>, I<values> and C<func> built-in options will be validated
+separately for each custom validation. So if you have multiple custom
+validations that set the I<values> option, then the array elements must
+validate all the listed schemas. The same applies to I<keys>: If the same key
+is listed in multiple custom validations, then the key must conform to all
+schemas. With respect to the I<unknown> option, a key that is mentioned in any
+of the I<keys> options is considered "known".
+
+All other built-in options follow inheritance semantics: These options can be
+set in a custom validation, and they will be inherited by the top-level schema.
+If the same option is set in multiple validations, only the first one (in
+alphabetic order by the name of the validation) will be inherited. The
+top-level schema can always override options set by custom validations.
+
+
+=head1 SEE ALSO
+
+L<TUWF>.
+
+TUWF::Validate has drawn inspiration from L<Brannigan>. Brannigan is very
+similar, but slightly more complex and more buggy (and, unfortunately,
+unmaintained). TUWF::Validate has more detailed error types and more powerful
+I<custom validations>, but lacks grouping, inheritance and wildcard hash keys.
+
+L<Sah> and L<Data::Sah> provide a more advanced interface for data validation.
+I have found Sah schemas to not be terribly convenient for form validation.  I
+haven't done any benchmarks, but I suspect that Sah is a bit faster than
+TUWF::Validate, at the cost of higher memory usage and a large dependency tree.
+
+L<JSON::Schema> is similar to Sah: It features more advanced data structure
+validation, but the schema is not terribly convenient for form validation, and
+the module has more dependencies than I'd prefer.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2019 Yoran Heling.
+
+This module is part of the TUWF framework and is free software available under
+the liberal MIT license. See the COPYING file in the TUWF distribution for the
+details.
+
+
+=head1 AUTHOR
+
+Yoran Heling <projects@yorhel.nl>
+
+=cut

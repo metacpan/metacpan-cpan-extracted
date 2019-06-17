@@ -54,6 +54,6 @@ package Net::AS2::FAQ;
 
 use strict;
 use warnings;
-our $VERSION = '1.0101'; # VERSION
+our $VERSION = '1.0110'; # VERSION
 
 1;

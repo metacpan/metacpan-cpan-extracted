@@ -1,8 +1,19 @@
 Revision history for Text-Parser
 
+0.925     2019-06-17 07:49:04-07:00 America/Los_Angeles
+  - Changed the primary usage model from inheritance-based to regular use in main.
+  - A new class for text parsing rules created Text::Parser::Rule (#17).
+  - Import functions from String::Util, Scalar::Util, String::Util::Match, String::Util::Range, and String::Index.
+    These can be accessed inside the ExAWK string rules directly (#44)
+  - Added new methods to Text::Parser called add_rule to create rules (#37), and clear_rules to delete rules (#40)
+  - Added new methods to Text::Parser called BEGIN_rule and END_rule (#47). The current line is not accessible in this rule.
+  - Added new method join_range available when auto_split => 1 (#38)
+  - Rules support range shortcuts like ${3+}, @{2+}, and \@{3+} (#39), (#45)
+  - Added ability to create parse-time variables accessible across rules such as ~var (#48)
+
 0.920     2019-06-09 19:48:42-07:00 America/Los_Angeles
-  - Bug in new version of Dist::Zilla::Plugin::Test::MinimumVersion causes bug. Work-around provided (#35).
-    See bug#8 on https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion/issues
+  - Bug in new version of Dist::Zilla::Plugin::Test::MinimumVersion causes bug. Work-around provided (#35). See
+    Issue #8 on https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion/issues
 
 0.919     2019-04-21 23:53:30-07:00 America/Los_Angeles
   - Change auto_split and multiline_type into read-write attributes: multiline_type can be changed back to undef (Issues #32, #31, #26)

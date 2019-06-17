@@ -6,6 +6,7 @@ package MyTestParser;
 use Test::More;    # last test to print
 use Test::Exception;
 use Moose;
+use English;
 extends 'Text::Parser';
 
 sub save_record {
@@ -23,12 +24,19 @@ sub save_record {
             [ reverse( $self->fields ) ],
             'Reverse order of fields'
         );
+        my $rev_str = join ' ', ( reverse( $self->fields ) );
+        is( $self->join_range( -1, 0, ' ' ),
+            $rev_str, 'String in reverse order' );
     }
     'Does not die on searching backwards';
     is_deeply(
         [ $self->field_range ],
         [ $self->fields ],
         'If all arguments are skipped ; passes'
+    );
+    is( $self->join_range,
+        join( $LIST_SEPARATOR, $self->field_range ),
+        'Join all the elements'
     );
     my $nf = $self->NF;
     my (@last) = $self->field_range(-2) if $self->NF >= 2;

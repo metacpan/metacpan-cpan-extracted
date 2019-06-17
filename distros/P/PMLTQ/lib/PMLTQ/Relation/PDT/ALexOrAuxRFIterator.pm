@@ -1,6 +1,6 @@
 package PMLTQ::Relation::PDT::ALexOrAuxRFIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::PDT::ALexOrAuxRFIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::PDT::ALexOrAuxRFIterator::VERSION = '3.0.2';
 # ABSTRACT: a/lex.rf or a/aux.rf relation iterator for PDT like treebanks
 
 use strict;
@@ -57,7 +57,7 @@ PMLTQ::Relation::PDT::ALexOrAuxRFIterator - a/lex.rf or a/aux.rf relation iterat
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

@@ -40,11 +40,15 @@ foreach my $input_file (@ARGV) {
     my $counter = 0;
     while (my $seq = $seq_reader->getRead()) {
       $counter++;
+      my $print_seq = $seq->{seq};
+      if (length($print_seq) > 80) {
+         $print_seq = substr($seq->{seq}, 0, 35). '...' . substr($seq->{seq}, -35);
+      }
       # Print FASTA or FASTQ accordingly (check 'qual' defined)
       if (defined $seq->{qual}) {
-        print '@', $seq->{name}, ' ', $seq->{comment}, "\n", $seq->{seq}, "\n+\n", $seq->{qual}, "\n";
+        print '@', color('bold'), $seq->{name},color('reset'), ' ', color('cyan'), $seq->{comment}, color('reset'), "\n", $print_seq, "\n+\n", $seq->{qual}, "\n";
       } else {
-        print ">", $seq->{name}, ' ', $seq->{comment}, "\n", $seq->{seq}, "\n";
+        print ">", color('bold'), $seq->{name},color('reset'), ' ', color('cyan'), $seq->{comment}, color('reset'), "\n", $print_seq, "\n";
       }
     }
     my $color = 'cyan';

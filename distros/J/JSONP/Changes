@@ -1,5 +1,10 @@
 Revision history for Perl extension JSONP.
 
+1.93
+	- add automatic temporary directory management
+	- add tempdir method
+	- add ctwd method
+
 1.92
 	- prevent warnings when reftype is null
 	- save session only when request is POST or PUT

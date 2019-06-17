@@ -1,6 +1,6 @@
 package PMLTQ::Relation::PDT::TEChildIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::PDT::TEChildIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::PDT::TEChildIterator::VERSION = '3.0.2';
 # ABSTRACT: Effective child relation iterator on t-nodes for PDT like treebanks
 
 use strict;
@@ -39,7 +39,7 @@ PMLTQ::Relation::PDT::TEChildIterator - Effective child relation iterator on t-n
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

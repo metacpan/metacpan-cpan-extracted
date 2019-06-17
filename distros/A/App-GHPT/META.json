@@ -113,55 +113,55 @@
    "provides" : {
       "App::GHPT" : {
          "file" : "lib/App/GHPT.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::Types" : {
          "file" : "lib/App/GHPT/Types.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::WorkSubmitter" : {
          "file" : "lib/App/GHPT/WorkSubmitter.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::WorkSubmitter::AskPullRequestQuestions" : {
          "file" : "lib/App/GHPT/WorkSubmitter/AskPullRequestQuestions.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::WorkSubmitter::ChangedFiles" : {
          "file" : "lib/App/GHPT/WorkSubmitter/ChangedFiles.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::WorkSubmitter::ChangedFilesFactory" : {
          "file" : "lib/App/GHPT/WorkSubmitter/ChangedFilesFactory.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::WorkSubmitter::Role::FileInspector" : {
          "file" : "lib/App/GHPT/WorkSubmitter/Role/FileInspector.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::WorkSubmitter::Role::Question" : {
          "file" : "lib/App/GHPT/WorkSubmitter/Role/Question.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::Wrapper::OurMoose" : {
          "file" : "lib/App/GHPT/Wrapper/OurMoose.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::Wrapper::OurMoose::Role" : {
          "file" : "lib/App/GHPT/Wrapper/OurMoose/Role.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::Wrapper::OurMooseX::Role::Parameterized" : {
          "file" : "lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::Wrapper::OurMooseX::Role::Parameterized::Meta::Trait::Parameterizable::Strict" : {
          "file" : "lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized/Meta/Trait/Parameterizable/Strict.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       },
       "App::GHPT::Wrapper::Ourperl" : {
          "file" : "lib/App/GHPT/Wrapper/Ourperl.pm",
-         "version" : "1.000011"
+         "version" : "1.000012"
       }
    },
    "release_status" : "stable",
@@ -176,10 +176,10 @@
          "web" : "https://github.com/maxmind/App-GHPT"
       }
    },
-   "version" : 1.000011,
+   "version" : 1.000012,
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -596,7 +596,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -835,7 +835,7 @@
             "class" : "Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -846,7 +846,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -883,7 +883,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -911,7 +911,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -928,12 +928,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.000011",
+                  "tag" : "v1.000012",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -953,7 +953,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -993,7 +993,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1013,7 +1013,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -1093,7 +1093,7 @@
       "Narsimham Chelluri <nchelluri@maxmind.com>",
       "Patrick Cronin <pcronin@maxmind.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

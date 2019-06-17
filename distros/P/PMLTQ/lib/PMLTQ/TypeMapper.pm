@@ -1,6 +1,6 @@
 package PMLTQ::TypeMapper;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::TypeMapper::VERSION = '3.0.1';
+$PMLTQ::TypeMapper::VERSION = '3.0.2';
 # ABSTRACT: Helper methods for PML::Schema, relations and PML::Node types
 
 use 5.006;
@@ -257,7 +257,7 @@ sub get_relation_target_type {
     return $type if $type;
   }
   if (!$category or $category eq 'implementation') {
-    return PMLTQ::Relation->target_type($node_type, $relation);
+    return PMLTQ::Relation->target_type($self->get_schema_name_for($node_type),$node_type, $relation);
   }
   return;
 }
@@ -276,7 +276,7 @@ PMLTQ::TypeMapper - Helper methods for PML::Schema, relations and PML::Node type
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

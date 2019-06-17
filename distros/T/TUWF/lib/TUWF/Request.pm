@@ -7,7 +7,7 @@ use Encode 'decode_utf8', 'encode_utf8';
 use Exporter 'import';
 use Carp 'croak';
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 our @EXPORT = qw|
   reqInit reqGets reqGet reqPosts reqPost reqParams reqParam reqJSON
   reqUploadMIMEs reqUploadMIME reqUploadRaws reqUploadRaw reqSaveUpload
@@ -68,6 +68,12 @@ sub _check_control {
 }
 
 
+sub _store {
+  return push @{$_[0]}, $_[1] if ref $_[0];
+  $_[0] = defined $_[0] ? [$_[0], $_[1]] : $_[1];
+}
+
+
 sub _parse_urlencoded {
   my %dat;
   my $d = shift;
@@ -84,7 +90,7 @@ sub _parse_urlencoded {
       s/%u([0-9a-fA-F]{4})/chr hex($1)/eg;
       _check_control($_);
     }
-    push @{$dat{$key}}, $val;
+    _store $dat{$key}, $val;
   }
   return \%dat;
 }
@@ -142,11 +148,11 @@ sub _parse_multipart {
     # regular form element. The standards do not require the filename to be
     # present, but I am not aware of any browser that does not send it.
     if($filename) {
-      push @{$nfo->{POST}{$name}}, _check_control decode_utf8 $filename, 1;
-      push @{$nfo->{MIMES}{$name}}, _check_control decode_utf8 $mime, 1;
-      push @{$nfo->{FILES}{$name}}, $value; # not decoded, can be binary
+      _store $nfo->{POST}{$name}, _check_control decode_utf8 $filename, 1;
+      _store $nfo->{MIMES}{$name}, _check_control decode_utf8 $mime, 1;
+      _store $nfo->{FILES}{$name}, $value; # not decoded, can be binary
     } else {
-      push @{$nfo->{POST}{$name}}, _check_control decode_utf8 $value, 1;
+      _store $nfo->{POST}{$name}, _check_control decode_utf8 $value, 1;
     }
   }
 }
@@ -179,14 +185,15 @@ sub _tablegets {
   my($k, $s, $n) = @_;
   my $lst = $s->{_TUWF}{Req}{$k};
   return keys %$lst if @_ == 2;
-  return $lst->{$n} ? @{$lst->{$n}} : ();
+  my $v = $lst->{$n};
+  ref $v ? @$v : defined $v ? ($v) : ();
 }
 
 
 sub _tableget {
   my($k, $s, $n) = @_;
   my $v = $s->{_TUWF}{Req}{$k}{$n};
-  return $v ? $v->[0] : undef;
+  ref $v ? $v->[0] : $v;
 }
 
 
@@ -209,9 +216,11 @@ sub reqParams {
     my %keys = map +($_,1), keys(%{$nfo->{GET}}), keys(%{$nfo->{POST}});
     return keys %keys;
   }
+  my $p = $nfo->{POST}{$n};
+  my $g = $nfo->{GET}{$n};
   return (
-    $nfo->{POST}{$n} ? @{$nfo->{POST}{$n}} : (),
-    $nfo->{GET}{$n}  ? @{$nfo->{GET}{$n}}  : (),
+    ref $p ? @$p : defined $p ? ($p) : (),
+    ref $g ? @$g : defined $g ? ($g) : (),
   );
 }
 
@@ -220,10 +229,8 @@ sub reqParams {
 sub reqParam {
   my($s, $n) = @_;
   my $nfo = $s->{_TUWF}{Req};
-  return [
-    $nfo->{POST}{$n} ? @{$nfo->{POST}{$n}} : (),
-    $nfo->{GET}{$n}  ? @{$nfo->{GET}{$n}}  : (),
-  ]->[0];
+  my $v = $nfo->{POST}{$n} || $nfo->{GET}{$n};
+  ref $v ? $v->[0] : $v;
 }
 
 

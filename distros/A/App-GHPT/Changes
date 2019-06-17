@@ -1,3 +1,7 @@
+1.000012 2019-06-17
+
+- Add feature to create simple stories. Written by Narsimham Chelluri.
+
 1.000011 2019-06-12
 
 - Fix handling of project names. This used to be munged in a way that didn't

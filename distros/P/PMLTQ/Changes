@@ -1,5 +1,14 @@
 Revision history for PMLTQ
 
+3.0.2
+ - Released: 2019-06-17 05:37:41 UTC
+
+ [BUG FIXES]
+ - fix user defined relations in PMLTQ::TypeMapper
+
+ [STATISTICS]
+ - code churn: 6 files changed, 29 insertions(+), 21 deletions(-)
+
 3.0.1
  - Released: 2019-01-29 06:23:15 UTC
 

@@ -10,7 +10,7 @@ use Exporter 'import';
 use Carp 'carp', 'croak';
 
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 our(@EXPORT_OK, %EXPORT_TAGS, $OBJ);
 
 # List::Util provides a uniq() since 1.45, but for some reason my Perl comes

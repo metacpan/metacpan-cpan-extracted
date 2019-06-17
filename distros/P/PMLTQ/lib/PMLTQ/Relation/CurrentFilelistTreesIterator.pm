@@ -1,6 +1,6 @@
 package PMLTQ::Relation::CurrentFilelistTreesIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::CurrentFilelistTreesIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::CurrentFilelistTreesIterator::VERSION = '3.0.2';
 # ABSTRACT: Iterates over trees in files of given file list (calling TredMacro::NextFile())
 
 use 5.006;
@@ -60,7 +60,7 @@ PMLTQ::Relation::CurrentFilelistTreesIterator - Iterates over trees in files of 
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

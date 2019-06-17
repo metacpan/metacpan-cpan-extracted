@@ -1,6 +1,6 @@
 package PMLTQ::Relation;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::VERSION = '3.0.1';
+$PMLTQ::Relation::VERSION = '3.0.2';
 # ABSTRACT: Base class for all Relations standard or user defined
 
 use 5.006;
@@ -107,7 +107,7 @@ PMLTQ::Relation - Base class for all Relations standard or user defined
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

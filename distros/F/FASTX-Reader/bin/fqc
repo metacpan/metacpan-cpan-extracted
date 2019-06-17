@@ -44,7 +44,6 @@ my $_opt = GetOptions(
 
 init();
 
-
 foreach my $input_file (@ARGV) {
   print STDERR " - Reading $input_file... " if ($opt_verbose);
   $counter++;
@@ -218,7 +217,7 @@ fqc - A FASTA/FASTQ sequence counter
 
 =head1 VERSION
 
-version 0.50
+version 0.60
 
 =head1 SYNOPSIS
 

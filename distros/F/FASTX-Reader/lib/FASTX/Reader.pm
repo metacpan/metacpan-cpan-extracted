@@ -3,7 +3,7 @@ use 5.014;
 use warnings;
 use Carp qw(confess);
 
-$FASTX::Reader::VERSION = '0.50';
+$FASTX::Reader::VERSION = '0.60';
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
 
 use constant GZIP_SIGNATURE => pack('C3', 0x1f, 0x8b, 0x08);
@@ -87,9 +87,12 @@ sub getRead {
           return;
       }
   }
-  my ($name, $comm) = /^.(\S+)(?:\s+)(\S+)/ ? ($1, $2) :
-	                    /^.(\S+)/ ? ($1, '') : ('', '');
+
   #my $comm = /^.\S+\s+(.*)/? $1 : ''; # retain "comment"
+  # Comments can have more spaces:    xx
+  my ($name, $comm) = /^.(\S+)(?:\s+)(.+)/ ? ($1, $2) :
+	                    /^.(\S+)/ ? ($1, '') : ('', '');
+  
   my $seq = '';
   my $c;
   $aux->[0] = undef;
@@ -241,7 +244,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, based on He
 
 =head1 VERSION
 
-version 0.50
+version 0.60
 
 =head1 SYNOPSIS
 

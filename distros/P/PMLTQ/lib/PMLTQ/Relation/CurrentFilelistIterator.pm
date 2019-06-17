@@ -1,6 +1,6 @@
 package PMLTQ::Relation::CurrentFilelistIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::CurrentFilelistIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::CurrentFilelistIterator::VERSION = '3.0.2';
 # ABSTRACT: Iterates over files of given file list (calling TredMacro::NextFile())
 
 use 5.006;
@@ -50,7 +50,7 @@ PMLTQ::Relation::CurrentFilelistIterator - Iterates over files of given file lis
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

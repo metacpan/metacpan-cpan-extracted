@@ -1,6 +1,6 @@
 package PMLTQ::Relation::SiblingIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::SiblingIterator::VERSION = '3.0.1';
+$PMLTQ::Relation::SiblingIterator::VERSION = '3.0.2';
 # ABSTRACT: Iterates over siblings given node
 
 use 5.006;
@@ -59,7 +59,7 @@ PMLTQ::Relation::SiblingIterator - Iterates over siblings given node
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

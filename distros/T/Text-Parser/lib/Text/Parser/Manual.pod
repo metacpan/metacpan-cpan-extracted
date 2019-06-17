@@ -1,0 +1,143 @@
+
+# PODNAME: Text::Parser::Manual
+
+# ABSTRACT: A manual for the Text::Parser class
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Text::Parser::Manual - A manual for the Text::Parser class
+
+=head1 VERSION
+
+version 0.925
+
+=head1 MOTIVATION
+
+Text parsing is perhaps the single most common thing that almost every Perl program does. Yet we don't have a lean, flexible, text parsing utility. Ideally, the developer should only have to specify the "grammar" of the text file she intends to parse. Everything else, like C<open>ing a file handle, C<close>ing the file handle, tracking line-count, joining continued lines into one, reporting any errors in line continuation, trimming white space, splitting each line into fields, etc., should be automatic.
+
+Unfortunately however, most file parsing code looks like this:
+
+    open FH, "<$fname";
+    my $line_count = 0;
+    while (<FH>) {
+        $line_count++;
+        chomp;
+        $_ = trim $_;  ## From String::Util
+        my (@fields) = split /\s+/;
+        # do something for each line ...
+    }
+    close FH;
+
+Note that a developer may have to repeat all of the above if she has to read another file with different content or format. And if the target text format allows line-wrapping with a continuation character, it isn't easy to implement it well with the above C<while> loop. Furthermore, the part that is not shown in the above code C<# do something for each line ...> can actually be quite complex with several cascading if-else blocks.
+
+    if ($fields[0] eq 'NAME:') {
+        # something
+    } elsif ($fields[0] eq 'ADDRESS:') {
+        # something else
+    } elsif ($fields[0] eq 'EMAIL:') {
+    .
+    .
+    .
+    } else {
+        # finally!
+    }
+
+There are several problems with this sort of code. For starters, it is:
+
+=over 4
+
+=item *
+
+Hard to refactor and simplify into small functions (See I<"Clean Code"> by Robert C. Martin).
+
+=item *
+
+Cannot be easily modified and re-used for another very similar text format.
+
+=item *
+
+Complex conditions are harder to write and often result in nested conditions.
+
+=item *
+
+Documenting code in the while loop can get rather hairy.
+
+=back
+
+=head1 VISION
+
+What if:
+
+=over 4
+
+=item *
+
+a utility took care of all the "mundane" boilerplate like C<open>, C<close> etc.?
+
+=item *
+
+parsing line-wrapped files were as simple as writing a small function that joins lines to unwrap?
+
+=item *
+
+data extraction could be done with a set of self-explanatory rules that don't need to be documented?
+
+=item *
+
+the resulting code "reads like well-written prose"?
+
+=item *
+
+developers could easily extend a text parser written by another developer?
+
+=back
+
+L<Text::Parser> can help you accomplish all of these and more!
+
+The programmer needs to specify a set of parsing rules which look quite like AWK. And the rest is all taken care of. So now, a programmer need only focus on the grammar of the file they intend to parse.
+
+=head1 CHAPTERS
+
+This manual is divided into chapters:
+
+=over 4
+
+=item *
+
+L<Text::Parser::Manual::ComparingWithNativePerl> - this chapter should explain why one should consider using L<Text::Parser> instead of native Perl.
+
+=item *
+
+L<Text::Parser::Manual::ExtendedAWKSyntax> - this chapter outlines the syntax for the rules
+
+=back
+
+You can L<start here|Text::Parser::Manual::ExtendedAWKSyntax>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://github.com/balajirama/Text-Parser/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Balaji Ramasubramanian <balajiram@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018-2019 by Balaji Ramasubramanian.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

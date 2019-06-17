@@ -3,7 +3,7 @@ package String::Compare::ConstantTime;
 use strict;
 use warnings;
 
-our $VERSION = '0.320';
+our $VERSION = '0.321';
 
 require XSLoader;
 XSLoader::load('String::Compare::ConstantTime', $VERSION);
@@ -53,6 +53,7 @@ This module provides one function, C<equals> (not exported by default).
 
 You should pass this function two strings of the same length. Just like perl's C<eq>, it will return true if they are string-wise identical and false otherwise. However, comparing any two differing strings of the same length will take a fixed amount of time. If the lengths of the strings are different, C<equals> will return false right away.
 
+B<NOTE>: This does byte-wise comparison of the underlying string storage, meaning that comparing strings with non-ASCII data with different states of the internal UTF-8 flag is not reliable.  You should always encode your data to bytes before comparing.
 
 
 =head1 TIMING SIDE-CHANNEL

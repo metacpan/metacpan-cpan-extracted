@@ -1,0 +1,6 @@
+State: California
+County: Santa Clara, 1304, San Jose, 2/18/1850
+County: Alameda, 821, Oakland, 3/25/1853
+County: San Mateo, 774, Redwood City, 4/19/1856
+
+State: Arkansas

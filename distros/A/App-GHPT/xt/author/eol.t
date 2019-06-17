@@ -28,6 +28,7 @@ my @files = (
     't/lib/Helper/MockPTAPI.pm',
     't/lib/Helper/QuestionNamespace1/Question.pm',
     't/lib/Helper/QuestionNamespace2/Question.pm',
+    't/lib/Helper/WorkSubmitter.pm',
     't/lib/TestFor/App/GHPT/WorkSubmitter.pm',
     't/lib/TestFor/App/GHPT/WorkSubmitter/AskPullRequestQuestions.pm',
     't/lib/TestFor/App/GHPT/WorkSubmitter/ChangedFiles.pm',

@@ -1,0 +1,336 @@
+
+# PODNAME: Text::Parser::Manual::ComparingWithNativePerl
+
+# ABSTRACT: A comparison of text parsing with native Perl and Text::Parser
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Text::Parser::Manual::ComparingWithNativePerl - A comparison of text parsing with native Perl and Text::Parser
+
+=head1 VERSION
+
+version 0.925
+
+=head1 LIMITATIONS OF THE PERL ONE-LINER
+
+When people compare Perl against AWK, the usual answer is this:
+
+    $ > perl -lane 'print;' file.txt
+
+But the problem is that it isn't useful for anything more than just oneliners. Secondly, this cannot be used in a complex program. And even if you could write some one-liner code, you cannot follow good programming practices line C<use strict>.
+
+So I will show that the Perl one-liner is surely not a useful solution for serious programs.
+
+=head1 A SIMPLE EXAMPLE
+
+To understand how L<Text::Parser> compares to the native Perl way of doing things, let's take a simple example and see how we would write code. Let's say we have a simple text file (F<info.txt>) with lines of information like this:
+
+    NAME: Brian
+    EMAIL: brian@webhost.net
+    ADDRESS: 401 Burnswick Ave, Cool City, UT 12345
+    NAME: Darin Cruz
+    ADDRESS: 209 Random St, Forest City, CA 92710
+    EMAIL: darin123@yahoo.co.uk
+    NAME: Elizabeth Andrews
+    ADDRESS: 0 Muutama Lane, Inaccessible Forest area, AK 88170
+    NAME: Audrey C. Miller
+    ADDRESS: 9 New St, Smart City, PA 12933
+    EMAIL: aud@audrey.io
+
+You have to write code that would parse this to create a data structure with all names and corresponding email addresses.
+
+    { name => "Brian", email => "brian@webhost.net", address => "401 Burnswick Ave, Cool City, UT 12345"}, 
+    .
+    .
+    .
+
+=head2 Perl one-liner
+
+Could we do this using a Perl one-liner?
+
+    perl -lane 'BEGIN {
+        @data = ();\
+        }\
+        if($F[0] eq "NAME:") {\
+            push @data, {name => $F[1]};\
+        } elsif($F[0] eq "EMAIL:") {\
+            $d = pop @data; $d->{email} = $F[1];\
+        } elsif($F[0] eq "ADDRESS:") {\
+            $d = pop @data;\
+            shift @F; \
+            $d->{address} = join ' ', @F;\
+        }' info.txt
+
+So much for a one-liner! But you can't do anything else with this, can you?
+
+=head2 Native Perl script
+
+Here's an implementation in native Perl scipt:
+
+    open IN, "<info.txt";
+    my @data = ();
+    while(<IN>) {
+        chomp;
+        my (@field) = split /\s+/;
+        if ($field[0] eq 'NAME:') {
+            shift @field;
+            push @data, { name => join(' ', @field) };
+        } elsif($field[0] eq 'EMAIL:') {
+            $data[-1]->{email} = $field[1];
+        }
+    }
+    close IN;
+
+=head2 With Text::Parser
+
+Here's how you'd write the same thing with L<Text::Parser>.
+
+    use Text::Parser;
+
+    my $parser = Text::Parser->new();
+    $parser->add_rule( if => '$1 eq "NAME:"', do => 'return { name => ${2+} }' );
+    $parser->add_rule( if => '$1 eq "EMAIL:"',
+        do => 'my $rec = $this->pop_record; $rec->{email} = $2; return $rec' );
+    $parser->read('info.txt');
+
+=head2 Quick observations
+
+The programmer has to still specify how to extract data, but:
+
+=over 4
+
+=item *
+
+she can focus on the content rather than the mechanics of file handling
+
+=item *
+
+another programmer can instantly understand what is going on
+
+=item *
+
+the results can be used in a more complex program - not just a one-liner
+
+=item *
+
+parsing files has never been this intuiive, especially with shortcuts like C<${2+}>
+
+=back
+
+Besides, did you notice the bug in the C<while> loop of the native Perl script above? Hint: What happens if we C<split> a string with leading and trailing spaces?
+
+=head1 ANOTHER SIMPLE EXAMPLE
+
+Take another simple example. Here we have new stuff in F<info.txt>:
+
+    State: California
+    County: Santa Clara, 1304, San Jose, 2/18/1850
+    County: Alameda, 821, Oakland, 3/25/1853
+    County: San Mateo, 774, Redwood City, 4/19/1856
+    .
+    .
+    .
+
+    State: Arkansas
+    .
+    .
+    .
+
+Let's say you have to parse this and form a data structure like this:
+
+    [
+        {
+            state           => 'California', 
+            'Santa Clara'   => {area => 1304, county_seat => 'San Jose', date_inc => '2/18/1850'}, 
+            'Alameda'       => {area => 821, county_seat => 'Oakland', date_inc => '3/25/1853'}, 
+            'San Mateo'     => {area => 774, county_seat => 'Redwood City', date_inc => '4/19/1856'}, 
+        }, 
+        {
+            state           => 'Arkansas', 
+            ...
+        }
+    ]
+
+=head2 Perl one-liner
+
+It is clear that the one-liner is no longer really a one-liner. And you cannot C<use strict>. But go ahead and give it a try if you want.
+
+=head2 Native Perl code
+
+    use String::Util 'trim';
+
+    open IN, "<info.txt";
+    my @data = ();
+    while(<IN>) {
+        chomp;
+        $_ = trim($_);
+        my (@field) = split /[:,]\s+/;
+        if ($field[0] eq 'State') {
+            push @data, { state => $field[1] };
+        } elsif($field[0] eq 'County') {
+            my $data = pop @data;
+            $data->{$field[1]} => {area => $field[2], county_seat => $field[3], date_inc => $field[4]};
+            push @data, $data;
+        }
+    }
+    close IN;
+
+=head2 With Text::Parser
+
+    use Text::Parser;
+
+    my $parser = Text::Parser->new(auto_split => 1, FS => qr/[:,]\s+/);
+    $parser->add_rule(if => '$1 eq "State"', do => 'return {state => $2}');
+    $parser->add_rule(if => '$1 eq "County"',
+        do => 'my $data = $this->pop_record;
+        $data->{$2} = { area => $3, county_seat => $4, date_inc => $5, };
+        return $data;'
+    );
+    $parser->read('info.txt');
+
+=head1 SOMETHING MORE FUN
+
+Let's take something more fun. A selection of students from Riverdale High and Hogwarts took part in a quiz. This is a record of their scores.
+
+    School = Riverdale High
+    Grade = 1
+    Student number, Name
+    0, Phoebe
+    1, Rachel
+    
+    Student number, Score
+    0, 3
+    1, 7
+    
+    Grade = 2
+    Student number, Name
+    0, Angela
+    1, Tristan
+    2, Aurora
+    
+    Student number, Score
+    0, 6
+    1, 3
+    2, 9
+    
+    School = Hogwarts
+    Grade = 1
+    Student number, Name
+    0, Ginny
+    1, Luna
+    
+    Student number, Score
+    0, 8
+    1, 7
+    
+    Grade = 2
+    Student number, Name
+    0, Harry
+    1, Hermione
+    
+    Student number, Score
+    0, 5
+    1, 10
+    
+    Grade = 3
+    Student number, Name
+    0, Fred
+    1, George
+    
+    Student number, Score
+    0, 0
+    1, 0 
+
+You want to parse this into a data structure like this:
+
+    # Entries data-structure hierarchy is:
+    #   school/grade/student number/Name
+    #   school/grade/student number/Score
+    {
+        "Riverdale High" => {
+            "1" => {
+                0 => {Name => "Phoebe", Score => 3}, 
+                1 => {Name => "Rachel", Score => 7}
+            }, 
+            "2" => {
+                0 => {Name => "Angela", Score => 6}, 
+                1 => {Name => "Tristan", Score => 3}, 
+                2 => {Name => "Aurora", Score => 9}, 
+            }, 
+        }, 
+    }, 
+    {
+        "Hogwarts" => {
+            "1" => {
+                0 => {Name => "Ginny", Score => 8}, 
+                1 => {Name => "Luna", Score => 7}, 
+            }, 
+            "2" => {
+                0 => {Name => "Harry", Score => 5}, 
+                1 => {Name => "Hermione", Score => 10}, 
+            }, 
+            "3" => {
+                0 => {Name => "Fred", Score => 0}, 
+                1 => {Name => "George", Score => 0 }, 
+            },
+        }, 
+    }
+
+=head2 Native Perl
+
+Do I have to really do this? Why don't I let you try this yourself.
+
+=head2 With Text::Parser
+
+    use Text::Parser;
+
+    my $parser = Text::Parser->new(FS => qr/\s+\=\s+|,\s+/);
+    $parser->add_rule(if => '$1 eq "School"',
+        do => '~school = $2; return {$2 => {}};');
+    $parser->add_rule(if => '$1 eq "Grade"',
+        do => 'my $p = $this->pop_record;
+        $p->{~school}{$2} = {};
+        ~grade = $2;
+        return $p;');
+    $parser->add_rule(if => '$1 eq "Student number"',
+        do => '~info = $2;', dont_record => 1);
+    $parser->add_rule(
+        do => 'my $p = $this->pop_record;
+        $p->{~school}{~grade}{$1}{~info} = $2;
+        return $p;'
+    );
+    $parser->read('info.txt');
+
+That's it!
+
+By now, you should have concluded that it is pointless trying to write native Perl to parse text input.
+
+L<Table of contents|Text::Parser::Manual> | L<Next|Text::Parser::Manual::ExtendedAWKSyntax>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://github.com/balajirama/Text-Parser/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Balaji Ramasubramanian <balajiram@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018-2019 by Balaji Ramasubramanian.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

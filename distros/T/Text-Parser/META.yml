@@ -25,18 +25,23 @@ name: Text-Parser
 provides:
   Text::Parser:
     file: lib/Text/Parser.pm
-    version: '0.920'
+    version: '0.925'
   Text::Parser::AutoSplit:
     file: lib/Text/Parser/AutoSplit.pm
-    version: '0.920'
+    version: '0.925'
   Text::Parser::Errors:
     file: lib/Text/Parser/Errors.pm
-    version: '0.920'
+    version: '0.925'
   Text::Parser::Multiline:
     file: lib/Text/Parser/Multiline.pm
-    version: '0.920'
+    version: '0.925'
+  Text::Parser::Rule:
+    file: lib/Text/Parser/Rule.pm
+    version: '0.925'
 requires:
+  English: '0'
   FileHandle: '0'
+  List::Util: '0'
   Moose: '0'
   Moose::Role: '0'
   Moose::Util: '0'
@@ -44,7 +49,10 @@ requires:
   MooseX::CoverableModifiers: '0'
   MooseX::StrictConstructor: '0'
   Scalar::Util: '0'
+  String::Index: '0'
   String::Util: '0'
+  String::Util::Match: '0'
+  String::Util::Range: '0'
   Throwable::SugarFactory: '0'
   Try::Tiny: '0'
   feature: '0'
@@ -56,7 +64,7 @@ resources:
   bugtracker: http://github.com/balajirama/Text-Parser/issues
   homepage: https://github.com/balajirama/Text-Parser
   repository: https://github.com/balajirama/Text-Parser.git
-version: '0.920'
+version: '0.925'
 x_contributors:
   - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

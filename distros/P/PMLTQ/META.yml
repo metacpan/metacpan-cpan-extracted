@@ -27,157 +27,157 @@ no_index:
 provides:
   PMLTQ:
     file: lib/PMLTQ.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::BtredEvaluator:
     file: lib/PMLTQ/BtredEvaluator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Common:
     file: lib/PMLTQ/Common.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Grammar:
     file: lib/PMLTQ/Grammar.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Loader:
     file: lib/PMLTQ/Loader.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::NG2PMLTQ:
     file: lib/PMLTQ/NG2PMLTQ.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::ParserError:
     file: lib/PMLTQ/ParserError.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Planner:
     file: lib/PMLTQ/Planner.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation:
     file: lib/PMLTQ/Relation.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::AncestorIterator:
     file: lib/PMLTQ/Relation/AncestorIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::AncestorIteratorWithBoundedDepth:
     file: lib/PMLTQ/Relation/AncestorIteratorWithBoundedDepth.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::ChildnodeIterator:
     file: lib/PMLTQ/Relation/ChildnodeIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::CurrentFileIterator:
     file: lib/PMLTQ/Relation/CurrentFileIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::CurrentFilelistIterator:
     file: lib/PMLTQ/Relation/CurrentFilelistIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::CurrentFilelistTreesIterator:
     file: lib/PMLTQ/Relation/CurrentFilelistTreesIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::CurrentTreeIterator:
     file: lib/PMLTQ/Relation/CurrentTreeIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::DepthFirstFollowsIterator:
     file: lib/PMLTQ/Relation/DepthFirstFollowsIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::DepthFirstPrecedesIterator:
     file: lib/PMLTQ/Relation/DepthFirstPrecedesIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::DepthFirstRangeIterator:
     file: lib/PMLTQ/Relation/DepthFirstRangeIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::DescendantIterator:
     file: lib/PMLTQ/Relation/DescendantIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::DescendantIteratorWithBoundedDepth:
     file: lib/PMLTQ/Relation/DescendantIteratorWithBoundedDepth.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::FSFileIterator:
     file: lib/PMLTQ/Relation/FSFileIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Iterator:
     file: lib/PMLTQ/Relation/Iterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::MemberIterator:
     file: lib/PMLTQ/Relation/MemberIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::OptionalIterator:
     file: lib/PMLTQ/Relation/OptionalIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::OrderIterator:
     file: lib/PMLTQ/Relation/OrderIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::PDT:
     file: lib/PMLTQ/Relation/PDT.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::PDT::AEChildIterator:
     file: lib/PMLTQ/Relation/PDT/AEChildIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::PDT::AEParentIterator:
     file: lib/PMLTQ/Relation/PDT/AEParentIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::PDT::ALexOrAuxRFIterator:
     file: lib/PMLTQ/Relation/PDT/ALexOrAuxRFIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::PDT::TEChildIterator:
     file: lib/PMLTQ/Relation/PDT/TEChildIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::PDT::TEParentIterator:
     file: lib/PMLTQ/Relation/PDT/TEParentIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::PMLREFIterator:
     file: lib/PMLTQ/Relation/PMLREFIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::ParentIterator:
     file: lib/PMLTQ/Relation/ParentIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::SameTreeIterator:
     file: lib/PMLTQ/Relation/SameTreeIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::SiblingIterator:
     file: lib/PMLTQ/Relation/SiblingIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::SiblingIteratorWithDistance:
     file: lib/PMLTQ/Relation/SiblingIteratorWithDistance.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::SimpleListIterator:
     file: lib/PMLTQ/Relation/SimpleListIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::TransitiveIterator:
     file: lib/PMLTQ/Relation/TransitiveIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::TreeIterator:
     file: lib/PMLTQ/Relation/TreeIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Treex:
     file: lib/PMLTQ/Relation/Treex.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Treex::AEChildCIterator:
     file: lib/PMLTQ/Relation/Treex/AEChildCIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Treex::AEChildIterator:
     file: lib/PMLTQ/Relation/Treex/AEChildIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Treex::AEParentCIterator:
     file: lib/PMLTQ/Relation/Treex/AEParentCIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Treex::AEParentIterator:
     file: lib/PMLTQ/Relation/Treex/AEParentIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Treex::TEChildIterator:
     file: lib/PMLTQ/Relation/Treex/TEChildIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::Treex::TEParentIterator:
     file: lib/PMLTQ/Relation/Treex/TEParentIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::TreexFileIterator:
     file: lib/PMLTQ/Relation/TreexFileIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::Relation::TreexFilelistIterator:
     file: lib/PMLTQ/Relation/TreexFilelistIterator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::SQLEvaluator:
     file: lib/PMLTQ/SQLEvaluator.pm
-    version: v3.0.1
+    version: v3.0.2
   PMLTQ::TypeMapper:
     file: lib/PMLTQ/TypeMapper.pm
-    version: v3.0.1
+    version: v3.0.2
 recommends:
   DBD::Pg: v2.19.3
   Net::HTTPServer: v1.1.1
@@ -203,7 +203,7 @@ resources:
   bugtracker: https://github.com/ufal/perl-pmltq/issues
   homepage: http://ufal.mff.cuni.cz/pmltq/
   repository: https://github.com/ufal/perl-pmltq.git
-version: 3.0.1
+version: 3.0.2
 x_authority: cpan:MATY
 x_authority_from_module: PMLTQ
 x_permissions_from_module: PMLTQ

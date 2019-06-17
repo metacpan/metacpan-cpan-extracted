@@ -1,0 +1,11 @@
+NAME: Brian
+EMAIL: brian@webhost.net
+ADDRESS: 401 Burnswick Ave, Cool City, UT 12345
+NAME: Darin Cruz
+ADDRESS: 209 Random St, Forest City, CA 92710
+EMAIL: darin123@yahoo.co.uk
+NAME: Elizabeth Andrews
+ADDRESS: 0 Muutama Lane, Inaccessible Forest area, AK 88170
+NAME: Audrey C. Miller
+ADDRESS: 9 New St, Smart City, PA 12933
+EMAIL: aud@audrey.io

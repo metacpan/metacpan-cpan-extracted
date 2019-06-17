@@ -1,6 +1,6 @@
 package PMLTQ;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::VERSION = '3.0.1';
+$PMLTQ::VERSION = '3.0.2';
 # ABSTRACT: Query engine and query language for trees in PML format
 
 
@@ -40,7 +40,7 @@ PMLTQ - Query engine and query language for trees in PML format
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =for html <a href="https://travis-ci.org/ufal/perl-pmltq"><img src="https://travis-ci.org/ufal/perl-pmltq.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/ufal/perl-pmltq?branch=master"><img src="https://coveralls.io/repos/ufal/perl-pmltq/badge.svg?branch=master&amp;service=github" alt="Coverage Status"></a>

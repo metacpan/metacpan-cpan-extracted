@@ -56688,3 +56688,12 @@ J/JO/JOHNMERTZ/VoIPms-0.01.tar.gz
 J/JM/JMAC/Web-Mention-0.702.tar.gz
 S/SH/SHLOMIF/WWW-Form-1.20.tar.gz
 G/GR/GRANTM/XML-SAX-1.02.tar.gz
+M/MA/MAXMIND/App-GHPT-1.000012.tar.gz
+P/PR/PROCH/FASTX-Reader-0.60.tar.gz
+A/AC/ACANFORA/JSONP-1.93.tar.gz
+A/AJ/AJM/Net-AS2-1.0110.tar.gz
+M/MA/MATY/PMLTQ-3.0.2.tar.gz
+F/FR/FRACTAL/String-Compare-ConstantTime-0.321.tar.gz
+M/MC/MCICHRA/Test-APIcast-0.24.tar.gz
+B/BA/BALAJIRAM/Text-Parser-0.925.tar.gz
+Y/YO/YORHEL/TUWF-1.3.tar.gz

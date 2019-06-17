@@ -14,7 +14,7 @@ App::GHPT::WorkSubmitter::Question::ExampleFileNameCheck - An example supplement
 
 =head1 VERSION
 
-version 1.000011
+version 1.000012
 
 =head1 SYNOPSIS
 

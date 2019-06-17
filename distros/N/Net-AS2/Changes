@@ -1,5 +1,11 @@
 Revision history for perl module Net::AS2
 
+1.0110 2019-06-17
+
+ [Message-Id and Original-Message-ID]
+ - RFC4130 requires Message-Id and Original-Message-ID delimited
+   by angle brackets in header
+
 1.0101 2019-03-11
 
  [Message-Id]

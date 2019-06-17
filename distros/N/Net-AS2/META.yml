@@ -29,5 +29,5 @@ requires:
 resources:
   homepage: https://github.com/andrewjmaguire/Net-AS2
   repository: https://github.com/andrewjmaguire/Net-AS2.git
-version: '1.0101'
+version: '1.0110'
 x_serialization_backend: 'YAML::Tiny version 1.70'

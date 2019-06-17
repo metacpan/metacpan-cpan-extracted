@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 
 # Store the object in a global variable for some functions that don't get it
@@ -38,6 +38,7 @@ our $OBJ = bless {
       sprintf "[%s] %s -> %s\n", scalar localtime(), $uri, $msg;
     },
     validate_templates => {},
+    custom_validations => {},
     # No particular selection of MIME types
     mime_types => {qw{
       7z     application/x-7z-compressed
@@ -486,7 +487,10 @@ sub _handle_error {
     "HTTP Request Headers:\n".
     join('', map sprintf("  %s: %s\n", $_, $self->reqHeader($_)), $self->reqHeader).
     "POST dump:\n".
-    join('', map sprintf("  %s: %s\n", $_, join "\n    ", $self->reqPosts($_)), $self->reqPosts).
+    ($self->reqJSON()
+      ? JSON::XS->new->pretty->encode($self->reqJSON())
+      : join('', map sprintf("  %s: %s\n", $_, join "\n    ", $self->reqPosts($_)), $self->reqPosts)
+    ).
     "Error:\n  $err\n"
   ) if ref $err ne 'TUWF::Exception';
 }

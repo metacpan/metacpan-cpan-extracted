@@ -1,6 +1,10 @@
 This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 Some APIs *can change* with the release of the first stable release (v 0.1).
 
+0.60	2019-06-17
+	* FIXED: Comment retainment: comments were truncated 
+	* File::Which only recommended (might be removed as requirement in the future)
+
 0.50	2019-06-13
 	* Added a control in new() that will stop parsing the file if it's binary (and not .gz)
 	* Added a new control in getFastqRead() to report truncated FASTQ files

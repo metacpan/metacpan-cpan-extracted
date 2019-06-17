@@ -1,3 +1,7 @@
+0.321  2019-06-17
+  * Remove unnecessary sv_len_utf8 calls (thanks David Golden)
+  * Test and document mixed UTF-8 flag comparison (thanks David Golden)
+
 0.320  2018-04-22
   * Added Travis and Appveyor testing (thanks Paul Cochrane)
   * Use warnings pragmas (thanks Paul Cochrane)

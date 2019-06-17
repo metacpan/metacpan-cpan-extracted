@@ -2,7 +2,7 @@ package Net::AS2::MDN;
 
 use strict;
 use warnings;
-our $VERSION = '1.0101'; # VERSION
+our $VERSION = '1.0110'; # VERSION
 
 =head1 NAME
 
@@ -270,7 +270,7 @@ sub _parse_mdn
     }
 
     if (my $id = $disposition{'original-message-id'}) {
-        if ($id =~ /<?($Email::Address::addr_spec)>?/) {
+        if ($id =~ /^\s*<($Email::Address::addr_spec)>\s*$/) {
             $self->{original_message_id} = $1;
         }
         else {
@@ -492,7 +492,7 @@ sub as_mime
         sprintf("Original-Recipient: rfc822; %s", $quoted_recipient),
         sprintf("Final-Recipient: rfc822; %s", $quoted_recipient),
         ( $self->{original_message_id} ?
-            sprintf("Original-Message-ID: %s", $self->{original_message_id} ) :
+            sprintf("Original-Message-ID: <%s>", $self->{original_message_id} ) :
             ()),
         sprintf("Disposition: automatic-action/MDN-sent-automatically; %s",
             $self->{warning} ? 'processed/warning: ' . $self->{status_text} :

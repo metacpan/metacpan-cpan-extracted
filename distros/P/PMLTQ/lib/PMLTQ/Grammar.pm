@@ -1,6 +1,6 @@
 package PMLTQ::Grammar;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Grammar::VERSION = '3.0.1';
+$PMLTQ::Grammar::VERSION = '3.0.2';
 # ABSTRACT: Provides L<Parse::RecDescent> grammar for parsing PML-TQ queries
 
 use 5.006;
@@ -23,7 +23,7 @@ PMLTQ::Grammar - Provides L<Parse::RecDescent> grammar for parsing PML-TQ querie
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

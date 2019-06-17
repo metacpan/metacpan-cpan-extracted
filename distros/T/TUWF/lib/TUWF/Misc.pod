@@ -28,6 +28,101 @@ Shorthand for calling C<kv_validate()> with the following sources:
 The L<validate_templates|TUWF/validate_templates> configuration setting is
 passed as the I<templates> option.
 
+=head2 compile($schema)
+
+I<Experimental.> Short-hand for calling
+L<TUWF::Validate::compile|TUWF::Validate/compile> with the
+L<custom_validations|TUWF/custom_validations> option. For example:
+
+  TUWF::set('custom_validations')->{username} = { length => [ 3, 32 ] };
+
+  my $val = tuwf->compile({ username => 1 })->validate('this is a username')->data;
+
+=head2 validate(what, @args)
+
+I<Experimental replacement for formValidate().> Validate and return request
+data using L<TUWF::Validate>. The first argument must be the source of the data
+to validate, the following sources are supported:
+
+  Argument  Source
+    post     reqPosts()
+    get      reqGets()
+    param    reqParams()
+    json     reqJSON()
+
+This method takes several different forms for the further arguments (the
+examples below will perhaps make this more clear):
+
+=over
+
+=item Single value (C<< tuwf->validate($source, $param_name, $schema)> >>)
+
+In this form, only a single value is validated and returned.
+
+=item Hash value (C<< tuwf->validate($source, $schema) >>)
+
+In this form, the source is converted into a hash table and then validated. The
+C<$schema> then validates the entire hash.
+
+=item Multiple values (C<< tuwf->validate($source, $param1, $schema1, $param2, $schema2, ..) >>)
+
+This form uses the syntax of the I<Single value> form to validate multiple
+values. It is a convenient short-hand for the I<Hash value> form.
+
+=back
+
+The C<$schema> argument in the above description can be either a bare or
+compiled schema. A bare schema will be compiled with the
+L<custom_validations|TUWF/custom_validations> setting.
+
+The C<json> source only supports the I<Hash value> form. Using the C<param>
+source is discouraged, as it is slower than using the C<get> or C<post> source
+directly. And in almost all cases you only need to accept the data from either
+the query string or the POST data, not both.
+
+If a get/post/param parameter has multiple values, it is represented in the
+source data as an array. To handle parameters that may occur any number of
+times, use a C<< {type => 'array', scalar => 1} >> schema.
+
+Some examples:
+
+  # JSON, with custom error handling
+  my $validation_result = tuwf->validate(json => {
+    type => 'hash',
+    keys => {
+      username => { length => [ 3, 32 ] },
+      password => { },
+    }
+  });
+  if($validation_result) {
+    my $data = $validation_result->data;
+    check_login($data->{username}, $data->{password});
+  } else {
+    show_error();
+  }
+
+  # Single value
+  my $page_number = tuwf->validate(get => page => { uint => 1, max => 1000 })->data;
+
+  # Same, with a pre-compiled scheme (this is faster)
+  state $c = tuwf->compile({ uint => 1, max => 1000 });
+  my $page_number = tuwf->validate(get => page => $c)->data;
+
+  # Multiple values
+  my $data = tuwf->validate(post =>
+    username => { length => [ 3, 32 ] },
+    password => { },
+  )->data;
+
+  # Same, using the "Hash value" form
+  my $data = tuwf->validate(post => {
+    type => 'hash',
+    keys => {
+      username => { length => [ 3, 32 ] },
+      password => { },
+    }
+  })->data;
+
 =head2 mail(body, header => value, ..)
 
 Very simple email sending function. The C<Content-Type> header defaults to
@@ -280,7 +375,7 @@ L<TUWF>, L<URI::Escape>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2018 Yoran Heling.
+Copyright (c) 2008-2019 Yoran Heling.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the

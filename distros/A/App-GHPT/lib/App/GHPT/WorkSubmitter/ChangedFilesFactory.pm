@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::ChangedFilesFactory;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000012';
 
 use IPC::Run3 qw( run3 );
 use App::GHPT::Types qw( ArrayRef HashRef Str );
@@ -170,7 +170,7 @@ App::GHPT::WorkSubmitter::ChangedFilesFactory - Work out what files have changed
 
 =head1 VERSION
 
-version 1.000011
+version 1.000012
 
 =head1 SYNOPSIS
 

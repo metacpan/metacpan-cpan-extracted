@@ -6,13 +6,16 @@ use strict;
 use warnings;
 use utf8;
 use Time::HiRes qw(gettimeofday);
+use File::Temp qw();
+use File::Path;
+use Cwd qw();
 use Scalar::Util qw(reftype);
 use CGI qw();
 use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.92';
+our $VERSION = '1.93';
 
 =encoding utf8
 
@@ -136,7 +139,7 @@ or even (deference ref):
 	$$jsonp{first}{second} = 'hello!';
 	print $$jsonp{first}{second};
 
-you can insert hashes at any level of structure  and they will become callable with the built-in convenience shortcut:
+you can insert hashes at any level of structure and they will become callable with the built-in convenience shortcut:
 
 	my $obj = {a => 1, b => 2};
 	$jsonp->first->second = $obj;
@@ -144,7 +147,7 @@ you can insert hashes at any level of structure  and they will become callable w
 	$jsonp->first->second->b = 3;
 	print $jsonp->first->second->b; # will print 3
 
-you can insert also array at any level of structure  and the nodes (hashrefs) within resulting structure will become callable with the built-in convenience shortcut. You will need to call C<-E<gt>[index]> in order to access them, though:
+you can insert also array at any level of structure and the nodes (hashrefs) within resulting structure will become callable with the built-in convenience shortcut. You will need to call C<-E<gt>[index]> in order to access them, though:
 
 	my $ary = [{a => 1}, 2];
 	$jsonp->first->second = $ary;
@@ -177,18 +180,18 @@ IMPORTANT NOTE 2: remember that all the method names of the module cannot be use
 
 IMPORTANT NOTE 3: deserialized booleans from JSON are turned into referenes to scalars by JSON module, to say JSON I<true> will turn into a Perl I<\1> and JSON I<false> will turn into a Perl I<\0>. JSONP module detects boolen context so when you try to evaluate one of these values in a boolean context it correctly returns the actual boolean value hold by the leaf instead of the reference (that would always evaluate to I<true> even for I<\0>), to say will dereference I<\0> and I<\1> in order to return I<0> and I<1> respectively.
 
-        $j->graft('testbool', q|{"true": true, "false":false}|);
-        say $j->testbool->true;
-        say $j->testbool->false;
-        say !! $j->testbool->true;
-        say !! $j->testbool->false;
+	$j->graft('testbool', q|{"true": true, "false":false}|);
+	say $j->testbool->true;
+	say $j->testbool->false;
+	say !! $j->testbool->true;
+	say !! $j->testbool->false;
 
 NOTE: in order to get a "pretty print" via serialize method you will need to either call I<debug> or I<pretty> methods before serialize, use I<pretty> if you want to serialize a deeper branch than the root one:
 
 	my $j = JSONP->new->debug;
-        $j->firstnode->a = 5;
-        $j->firstnode->b = 9;
-        $j->secondnode->thirdnode->a = 7;
+	$j->firstnode->a = 5;
+	$j->firstnode->b = 9;
+	$j->secondnode->thirdnode->a = 7;
 	my $pretty = $j->serialize; # will get a pretty print
 	my $deepser = $j->firstnode->serialize; # won't get a pretty print, because deeper than root
 	my $prettydeeper = $j->firstnode->pretty->serialize; # will get a pretty print, because we called I<pretty> first
@@ -275,13 +278,19 @@ sub run
 	$self->{_html} = 0;
 	$self->{_mod_perl} = defined $ENV{MOD_PERL};
 	$self->{_jsonp_version} = $VERSION;
+	# File::Temp will remove the tempdir and its content on after request end
+	$self->{_tempdir} = File::Temp->newdir;
+	my $curdir = Cwd::cwd;
+	# Taint mode
+	$curdir = $curdir =~ m{(/.*)} ? $1 : '';
+	$self->{_curdir} = $curdir;
 	#$ENV{PATH} = '' if $self->{_taint_mode} = ${^TAINT};
 	die "you have to provide an AAA function" unless $self->{_aaa_sub};
 	my $r = CGI->new;
 	# this will enable us to give back the unblessed reference
 	my %params = $r->Vars;
 	my $contype = $r->content_type // '';
-	my $method  = $r->request_method;
+	my $method = $r->request_method;
 	$self->{_request_method} = $method;
 	if($contype =~ m{application/json} && scalar keys %params == 1){
 		my $payload;
@@ -401,7 +410,7 @@ sub run
 		$self->{_mimetype} = $callback ? 'application/javascript' : 'application/json';
 		$header->{'-type'} = $self->{_mimetype};
 		print $r->header($header);
-		print "$callback(" if  $callback;
+		print "$callback(" if $callback;
 		print $self->serialize;
 		print ')' if $callback;
 	} else {
@@ -421,10 +430,13 @@ sub run
 		}
 	}
 
+	# exit any eventual temp directory before it is removed by File::Temp
+	chdir $self->{_curdir};
+
 	if($self->{_mod_perl}){
 		my $rh = $r->r;
 		# suppress default Apache response
-		$rh->custom_response($self->{_status_code}, '');
+		$rh->custom_response($self->{_status_code} || 200, '');
 		$rh->rflush;
 	}
 
@@ -852,6 +864,61 @@ sub serialize
 	} || $@;
 }
 
+=head3 tempdir
+
+returns a temporary directory whose content will be removed at the request end.
+if you pass a relative path, it will be created under the random tmp directory.
+if creation fails, a boolean false will be retured (void string).
+
+	my $path = $j->tempdir; # will return something like /tmp/systemd-private-af123/tmp/nRmseALe8H
+	my $path = $j->tempdir('DIRNAME'); # will return something like /tmp/systemd-private-af123/tmp/nRmseALe8H/DIRNAME
+
+=cut
+
+sub tempdir
+{
+	my ($self, $path) = @_;
+	return $self->{_tempdir}->dirname unless $path;
+	return $self->_makePath($path);
+}
+
+=head3 ctwd
+
+changes current working directory to a random temporary directory whose content will be removed at the request end.
+if you pass a path, it will be appended to the temporary directory before cwd'ing on it, bool outcome will be returned.
+if creation fails, a boolean false will be returned (void string).
+
+	my $cwdOK = $j->ctwd;
+
+=cut
+
+sub ctwd
+{
+	my ($self, $path) = @_;
+	return chdir $self->{_tempdir} unless $path;
+	$path = $self->_makePath($path);
+	return $path ? chdir $path : '';
+}
+
+sub _makePath
+{
+	my ($self, $path) = @_;
+	my $mkdirerr;
+	$path = "$$self{_tempdir}/$path";
+	File::Path::make_path($path, {error => \$mkdirerr});
+	if(@$mkdirerr){
+		for my $direrr (@$mkdirerr){
+			my ($curdir, $curmessage) = %$direrr;
+			say STDERR "error while attempting to create $curdir: $curmessage";
+		}
+
+		# if creation fails set $path to a "false" string
+		$path = '';
+	}
+
+	$path;
+}
+
 sub _bless_tree
 {
 	my ($self, $node) = @_;
@@ -881,7 +948,7 @@ sub TO_JSON
 		if($self->{_is_root_element}){
 			$skip++ if $_ =~ /_sub$/;
 			$skip++ if $_ eq 'session' && $nodebug;
-			$skip++ if $_ eq 'params'  && $nodebug;
+			$skip++ if $_ eq 'params' && $nodebug;
 		}
 		$skip++ if $_ =~ /^_/ && $nodebug;
 		next if $skip;
@@ -895,7 +962,7 @@ sub DESTROY{}
 
 sub AUTOLOAD : lvalue
 {
-	my $classname =  ref $_[0];
+	my $classname = ref $_[0];
 	my $validname = q{(?:[^[:cntrl:][:space:][:punct:][:digit:]][^':[:cntrl:]]{0,1023}|\d{1,1024})};
 	our $AUTOLOAD =~ /^${classname}::($validname)$/;
 	my $key = $1;

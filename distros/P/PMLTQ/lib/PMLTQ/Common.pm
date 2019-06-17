@@ -1,6 +1,6 @@
 package PMLTQ::Common;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Common::VERSION = '3.0.1';
+$PMLTQ::Common::VERSION = '3.0.2';
 # ABSTRACT: Helper functions mainly for PML manipulations
 
 use 5.006;
@@ -294,7 +294,7 @@ sub GetRelativeQueryNodeType {
   my $name = $rel ? $rel->name : 'child';
   #  $name .= ':'.$rel->value->{label} if $name eq 'user-defined';
   my $reltype = ($name eq 'user-defined' ?
-		 $type_mapper->get_relation_target_type($type,$rel->value->{label},0,$rel->value->{category})
+		 $type_mapper->get_relation_target_type($type,$rel->value->{label},$rel->value->{category})
 		 : ($type{$type.':'.$name} || $type{':'.$name})) || return;
   my @decls;
   my ($schema,$schema_name);
@@ -1195,7 +1195,7 @@ PMLTQ::Common - Helper functions mainly for PML manipulations
 
 =head1 VERSION
 
-version 3.0.1
+version 3.0.2
 
 =head1 AUTHORS
 

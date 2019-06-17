@@ -3,7 +3,7 @@ package Net::AS2::Message;
 use strict;
 use warnings;
 
-our $VERSION = '1.0101'; # VERSION
+our $VERSION = '1.0110'; # VERSION
 
 =head1 NAME
 

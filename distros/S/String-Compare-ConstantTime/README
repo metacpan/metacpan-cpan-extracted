@@ -31,6 +31,11 @@ DESCRIPTION
     same length will take a fixed amount of time. If the lengths of the
     strings are different, "equals" will return false right away.
 
+    NOTE: This does byte-wise comparison of the underlying string storage,
+    meaning that comparing strings with non-ASCII data with different states
+    of the internal UTF-8 flag is not reliable. You should always encode
+    your data to bytes before comparing.
+
 TIMING SIDE-CHANNEL
     Some programs take different amounts of time to run depending on the
     input values provided to them. Untrusted parties can sometimes learn

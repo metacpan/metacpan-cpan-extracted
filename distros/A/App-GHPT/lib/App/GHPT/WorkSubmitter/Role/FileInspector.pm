@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::Role::FileInspector;
 
 use App::GHPT::Wrapper::OurMoose::Role;
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000012';
 
 use IPC::Run3 qw( run3 );
 
@@ -42,7 +42,7 @@ App::GHPT::WorkSubmitter::Role::FileInspector - Role for examining the committed
 
 =head1 VERSION
 
-version 1.000011
+version 1.000012
 
 =head1 SUPPORT
 

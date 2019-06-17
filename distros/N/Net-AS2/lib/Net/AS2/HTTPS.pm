@@ -2,7 +2,7 @@ package Net::AS2::HTTPS;
 
 use strict;
 use warnings;
-our $VERSION = '1.0101'; # VERSION
+our $VERSION = '1.0110'; # VERSION
 
 use parent 'Net::AS2::HTTP';
 

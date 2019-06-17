@@ -1,5 +1,5 @@
 This archive contains the distribution FASTX-Reader,
-version 0.50:
+version 0.60:
 
   A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
 
