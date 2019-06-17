@@ -4,7 +4,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 # VERSION
 
-version 0.000018
+version 0.000019
 
 # DESCRIPTION
 
@@ -44,6 +44,12 @@ https://github.com/oalders/open-this:
 
     ot -b Open::This line 50
     # https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L50
+
+# SUPPORTED EDITORS
+
+This code has been well tested with `vim`.  It should also work with `nvim`,
+`emacs`, `pico`, `nano` and `kate`.  Patches for other editors are very
+welcome.
 
 # FUNCTIONS
 

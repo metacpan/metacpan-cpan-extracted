@@ -10,6 +10,72 @@ sure you change the first line.
 
 =cut
 
+=head1 NAME
+
+OpenTracing::Span - represents an operation or parent operation
+
+=head1 DESCRIPTION
+
+The reference definition for a span is a good starting point for understanding these:
+
+L<https://opentracing.io/docs/overview/spans/>
+
+=head2 trace_id
+
+The trace ID for this span. Multiple spans are grouped under a single trace.
+
+=head2 id
+
+The span ID. This should be unique.
+
+=head2 parent_id
+
+Parent span ID. 0 if there isn't one.
+
+=head2 flags
+
+Any flags relating to this span.
+
+=head2 start_time
+
+Exact time this span started, in microseconds.
+
+=head2 duration
+
+Total duration of this span, including any nested spans.
+
+=head2 operation_name
+
+The operation that this span represents.
+
+=head2 tags
+
+The tags relating to this span.
+
+=head2 batch
+
+The L<OpenTracing::Batch> instance that this span belongs to.
+
+=head2 tag_list
+
+A list of tags as L<OpenTracing::Tag> instances.
+
+=head2 logs
+
+The arrayref of log entries for this span, as L<OpenTracing::Log> instances.
+
+=head2 log_list
+
+A list of log entries for this span, as L<OpenTracing::Log> instances.
+
+=head2 log
+
+Records a single log message.
+
+=head2 finish
+
+Mark this span as finished (populating the L</duration> field).
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -19,4 +85,12 @@ sure you change the first line.
 L<new|OpenTracing::Common/new>
 
 =back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
 

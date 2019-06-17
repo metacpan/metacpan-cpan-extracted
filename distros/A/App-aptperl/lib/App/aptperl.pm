@@ -14,7 +14,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use base qw/Exporter/;
 
-our $VERSION     = version->new('0.0.3');
+our $VERSION     = version->new('0.0.4');
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -28,7 +28,7 @@ App::aptperl - Installs perl dependencies from apt (if possible) otherwise uses 
 
 =head1 VERSION
 
-This documentation refers to apt-perl version 0.0.3
+This documentation refers to apt-perl version 0.0.4
 
 =head1 SYNOPSIS
 

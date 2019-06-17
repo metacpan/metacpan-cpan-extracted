@@ -52,8 +52,8 @@ Future->wait_all(
                 my $count = await $redis->incr($key);
                 ++$incr_count;
                 $count == 1
-                ? $redis->expire($key => 5)
-                : Future->done
+                ? await $redis->expire($key => 5)
+                : ()
             }, foreach => [1..100000], concurrent => 10)->on_fail(sub { warn "failed for $key - @_" })
         } keys %conn
     )

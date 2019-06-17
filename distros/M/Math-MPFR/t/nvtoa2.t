@@ -14,8 +14,7 @@ use Test::More;
 # Every third mantissa will be negative.
 # Assign that random string to an NV ($nv) and check that nvtoa($nv) == $nv
 # If the equivalence does not hold, issue a message, register a FAIL, and quit.
-#
-# Then, remove all leading and trailing zeroes from the mantissa and check that
+# Else, then remove all leading and trailing zeroes from the mantissa and check that
 # the number of mantissa digits in the output string is no greater than the number of
 # mantissa digits in the input string.
 #
@@ -41,10 +40,13 @@ use Test::More;
 #    if perl's nvtype is "double", then $Config{d_strtod} needs to be defined
 #    or if perl's nvtype is "long double", then $Config{d_strtold} needs to be defined.
 # All perl's whose nvtype is __float128 assign correctly and $reliable is set to true for
-# them, irrespective of the value of $].
+# them, irrespective of the value of $] (the perl version).
 #
 # All perls that don't fit any of the above categories are deemed unreliable, and
 # $reliable is set to false.
+#
+# If $reliable is true, we simply assign the values using perl - otherwise we assign them
+# using Math::MPFR's atonv() function, which is also deemed reliable.
 
 if(MPFR_VERSION_MAJOR < 3 || (MPFR_VERSION_MAJOR() == 3  && MPFR_VERSION_PATCHLEVEL < 6)) {
   plan skip_all => "nvtoa.t utilizes Math::MPFR functionality that requires mpfr-3.1.6\n";
@@ -56,7 +58,7 @@ my $todo = 0;
 
 # Some systems provide sqrtl() but not powl() for their -Duselongdouble builds
 unless(sqrt(2.0) == 2 ** 0.5) {
-  warn "\nPoorly configured system\n";
+  warn "\nPoorly designed system\n";
   $todo = 1;
 }
 

@@ -10,6 +10,8 @@ t/001main.t
 t/010main-unzip.t
 t/111const-deflate.t
 t/999pod.t
+t/meta-json.t 
+t/meta-yaml.t
 t/compress/CompTestUtils.pm
 t/Test/Builder.pm
 t/Test/More.pm

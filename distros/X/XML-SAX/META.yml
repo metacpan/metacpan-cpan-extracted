@@ -21,5 +21,7 @@ requires:
   File::Temp: '0'
   XML::NamespaceSupport: '0.03'
   XML::SAX::Base: '1.05'
-version: '1.00'
+resources:
+  repository: https://github.com/grantm/xml-sax
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

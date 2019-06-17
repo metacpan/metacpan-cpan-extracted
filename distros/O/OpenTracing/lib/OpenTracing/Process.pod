@@ -10,6 +10,29 @@ sure you change the first line.
 
 =cut
 
+=head1 NAME
+
+OpenTracing::Process - information about a single process
+
+=head1 DESCRIPTION
+
+Each batch of spans is linked to a process. This can either be a Unix-style process or a more abstract "service"
+concept.
+
+=head1 METHODS
+
+=head2 name
+
+The process name. Freeform text string.
+
+=head2 tags
+
+Arrayref of tags relating to the process.
+
+=head2 tag_list
+
+List of tags for this process.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -19,4 +42,12 @@ sure you change the first line.
 L<new|OpenTracing::Common/new>
 
 =back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
 

@@ -50,7 +50,7 @@ sub _load_module ( $self, $module ) {
         my $prefix = $package =~ s[::][/]smgr;
 
         # remove all package symbols
-        P->class->unload($package) if $INC{$module};
+        P->class->unload($package);
 
         my $package_ref_attrs;
 
@@ -80,10 +80,11 @@ sub _load_module ( $self, $module ) {
         *{"$package\::class"} = {};
         *{"$package\::type"}  = {};
 
-        eval { require $module };
+        # load module
+        do P->class->find($module);
 
         # package compilation error
-        die $@ if $@;
+        die qq[Unable to load module "$module": $@] if $@;
 
         my $stash = Package::Stash::XS->new($package);
 
@@ -534,11 +535,9 @@ sub _prepare_js ( $self, $js ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 76, 77               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 83                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 184                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 183                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 452                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 453                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -15,9 +15,12 @@ name: Mozilla-IntermediateCerts
 requires:
   LWP::UserAgent: '0'
   Moo: '0'
+  Test::HTTP::LocalServer: '0'
+  Test::Spec: '0'
   Text::CSV: '0'
+  namespace::clean: '0'
 resources:
   repository: git://gitlab.com/rnewsham/mozilla-intermediatecerts.git
-version: v0.0002
+version: v0.0003
 x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

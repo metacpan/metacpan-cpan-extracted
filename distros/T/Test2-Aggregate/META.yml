@@ -22,5 +22,7 @@ requires:
   File::Slurp: '0'
   Test2::V0: '0'
   perl: '5.006'
-version: '0.03'
+resources:
+  repository: git://github.com/SpareRoom/Test2-Aggregate.git
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

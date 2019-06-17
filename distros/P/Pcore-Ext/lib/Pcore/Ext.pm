@@ -1,4 +1,4 @@
-package Pcore::Ext v0.30.4;
+package Pcore::Ext v0.31.7;
 
 use Pcore -dist, -class;
 use Pcore::Ext::App;
@@ -51,7 +51,7 @@ sub rebuild_all ( $self, $modifications ) {
         eval { $app->build };
 
         if ($@) {
-            say $@;
+            $@->sendlog;
         }
         else {
             say 'done';

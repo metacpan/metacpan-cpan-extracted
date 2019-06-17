@@ -9,7 +9,7 @@ __END__
 
 =head1 NAME
 
-jl - JSON in JSON log viewer
+jl - Show JSON Log Nicely
 
 =head1 SYNOPSIS
 
@@ -26,17 +26,9 @@ The B<jl> command allows you to recursively decode JSON in JSON string
 
 =head2 OPTIONS
 
-=head3 depth
-
-The number of recursive depth. (default: 10)
-
-=head3 no-pretty
-
-If set C<no-pretty> option, then output JSON is not prettify. (default: false, Do prettify)
-
 =head3 x
 
-If set C<x> option, then JSON values are split as array by [\t\n\r] before recursively decoding.
+If you set C<x> option, then JSON values and parsed elements are split as array by [\t\n\r] before/after recursive JSON decoding.
 
 This option is useful for below case:
 
@@ -51,23 +43,103 @@ This option is useful for below case:
        ]
     }
 
+TAB delimited string has been arraynized. It's easy to treat by c<jq>.
+
 =head3 xx
 
-If set C<xx> option, then JSON values are split as array by each parenthesis before recursively decoding after x option parsing.
+If you set C<xx> option, then the elements are split as array by comma after recursive JSON decoding.
 
 This option is useful for below case:
 
-    $ echo '{"message":"[05/09/2019 23:51:51] (warn) <server>\t{\"foo\":\"bar\"}"}' | jl -x
+    $ echo '{"message":"[05/09/2019 23:51:51] foo, bar, baz \n{\"foo\":\"bar\"}\n"}' | jl -xx
     {
        "message" : [
-          "[05/09/2019 23:51:51]",
-          "(warn)",
-          "<server>",
+          [
+             "[05/09/2019 23:51:51] foo",
+             "bar",
+             "baz "
+          ],
           {
              "foo" : "bar"
           }
        ]
     }
+
+
+=head3 xxx
+
+If you set C<xxx> option, then the elements are split as array without delimiter by each parenthesis and brackets (exclude braces {}) after recursive JSON decoding.
+
+This option is useful for below case:
+
+    $ echo '{"message":"[05/09/2019 23:51:51](warn)<server> \n{\"foo\":\"bar\"}\n"}' | jl -xxx
+    {
+       "message" : [
+          [
+             "[05/09/2019 23:51:51]",
+             "(warn)",
+             "<server>",
+             " "
+          ],
+          {
+             "foo" : "bar"
+          }
+       ]
+    }
+
+=head3 xxxx
+
+If you set C<xxxx> option, then the elements such like a unix timestamp are converted as local date time after recursive JSON decoding.
+
+This option is useful for below case:
+
+    $ echo '{"message":"[05/09/2019 23:51:51](warn)<server> \n{\"time\":1560026367123}"}' | jl -xxxx
+    {
+       "message" : [
+          [
+             "[05/09/2019 23:51:51]",
+             "(warn)",
+             "<server>",
+             " "
+          ],
+          {
+             "time" : "2019-06-09 05:39:27.123"
+          }
+       ]
+    }
+
+B<NOTE> that if you set C<xxxx> option, then it means that C<x>, C<xx> and C<xxx> are enabled as well. C<xxx> is going to be enabled C<x> and C<xx> as well. So C<xx> is including C<x>.
+
+=head3 timestamp-key
+
+You can set custom timestamp-key to convert unix timestamp to date time.
+
+    $ echo '{"message":"{\"ts\":1560026367123}"}' | jl --timestamp-key ts
+    {
+       "message" : {
+          "ts" : "2019-06-09 05:39:27.123"
+       }
+    }
+
+Supports unixtime C<1560026367>, msec C<1560026367123> and C<1560026367.123>
+
+=head3 gmtime
+
+If you set C<gmtime> flag, then unix timestamp converts date time as GMT instead of localtime.
+
+
+=head3 depth
+
+The number of recursive depth. (default: 10)
+
+=head3 no-pretty
+
+If set C<no-pretty> option, then output JSON is not prettify. (default: false, Do prettify)
+
+=head3 yaml
+
+If set C<yaml> option, show output string as YAML instead.
+
 
 =head1 AUTHOR
 

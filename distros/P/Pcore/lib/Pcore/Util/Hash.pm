@@ -46,10 +46,10 @@ sub multivalue {
     return Pcore::Util::Hash::Multivalue->new(@_);
 }
 
-sub randkey {
-    require Pcore::Util::Hash::RandKey;
+sub hasharray {
+    require Pcore::Util::Hash::HashArray;
 
-    return Pcore::Util::Hash::RandKey->new;
+    return Pcore::Util::Hash::HashArray->new;
 }
 
 sub limited ($max_size) {

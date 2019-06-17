@@ -18,9 +18,12 @@ my $builder = Module::Build->new(
         'YAML::Syck'             => 0,
         'version'                => 0,
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'App-apt-perl-*' ],
     create_license     => 1,

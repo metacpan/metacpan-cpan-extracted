@@ -96,32 +96,32 @@ ltc/pk/asn1/der/utctime/der_decode_utctime.o ltc/pk/asn1/der/utctime/der_encode_
 ltc/pk/asn1/der/utctime/der_length_utctime.o ltc/pk/asn1/der/utf8/der_decode_utf8_string.o \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.o ltc/pk/asn1/der/utf8/der_length_utf8_string.o \
 ltc/pk/asn1/oid/pk_get_oid.o ltc/pk/asn1/oid/pk_oid_cmp.o ltc/pk/asn1/oid/pk_oid_str.o \
-ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.o ltc/pk/asn1/x509/x509_decode_subject_public_key_info.o \
-ltc/pk/asn1/x509/x509_encode_subject_public_key_info.o ltc/pk/dh/dh.o ltc/pk/dh/dh_check_pubkey.o \
-ltc/pk/dh/dh_export.o ltc/pk/dh/dh_export_key.o ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o \
-ltc/pk/dh/dh_import.o ltc/pk/dh/dh_set.o ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o \
-ltc/pk/dsa/dsa_decrypt_key.o ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o \
-ltc/pk/dsa/dsa_free.o ltc/pk/dsa/dsa_generate_key.o ltc/pk/dsa/dsa_generate_pqg.o \
-ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_set.o ltc/pk/dsa/dsa_set_pqg_dsaparam.o \
-ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o ltc/pk/dsa/dsa_verify_hash.o \
-ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o ltc/pk/ecc/ecc_ansi_x963_import.o \
-ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.o \
-ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_find_curve.o ltc/pk/ecc/ecc_free.o \
-ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o \
-ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o \
-ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_set_curve.o \
-ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o \
-ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o \
-ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o \
-ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o \
-ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o \
-ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
-ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o \
-ltc/pk/pkcs1/pkcs_1_oaep_decode.o ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o \
-ltc/pk/pkcs1/pkcs_1_pss_decode.o ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o \
-ltc/pk/pkcs1/pkcs_1_v1_5_encode.o ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o \
-ltc/pk/rsa/rsa_export.o ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o ltc/pk/rsa/rsa_get_size.o \
-ltc/pk/rsa/rsa_import.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_x509.o \
+ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.o ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.o \
+ltc/pk/asn1/x509/x509_decode_subject_public_key_info.o ltc/pk/asn1/x509/x509_encode_subject_public_key_info.o \
+ltc/pk/dh/dh.o ltc/pk/dh/dh_check_pubkey.o ltc/pk/dh/dh_export.o ltc/pk/dh/dh_export_key.o \
+ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o ltc/pk/dh/dh_import.o ltc/pk/dh/dh_set.o \
+ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o ltc/pk/dsa/dsa_decrypt_key.o \
+ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o ltc/pk/dsa/dsa_free.o ltc/pk/dsa/dsa_generate_key.o \
+ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_set.o \
+ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
+ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o \
+ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o \
+ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_find_curve.o \
+ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o \
+ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o \
+ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o \
+ltc/pk/ecc/ecc_set_curve.o ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o \
+ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o \
+ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o \
+ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o \
+ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o \
+ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o \
+ltc/pk/ecc/ltc_ecc_projective_dbl_point.o ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/pkcs1/pkcs_1_i2osp.o \
+ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o ltc/pk/pkcs1/pkcs_1_oaep_encode.o \
+ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_1_pss_decode.o ltc/pk/pkcs1/pkcs_1_pss_encode.o \
+ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o ltc/pk/rsa/rsa_decrypt_key.o \
+ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o \
+ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_x509.o \
 ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_set.o ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o \
 ltc/pk/rsa/rsa_verify_hash.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
@@ -142,18 +142,19 @@ ltm/bn_mp_copy.o ltm/bn_mp_count_bits.o ltm/bn_mp_div.o ltm/bn_mp_div_2.o ltm/bn
 ltm/bn_mp_div_3.o ltm/bn_mp_div_d.o ltm/bn_mp_dr_is_modulus.o ltm/bn_mp_dr_reduce.o \
 ltm/bn_mp_dr_setup.o ltm/bn_mp_exch.o ltm/bn_mp_export.o ltm/bn_mp_exptmod.o ltm/bn_mp_exptmod_fast.o \
 ltm/bn_mp_expt_d.o ltm/bn_mp_expt_d_ex.o ltm/bn_mp_exteuclid.o ltm/bn_mp_fread.o \
-ltm/bn_mp_fwrite.o ltm/bn_mp_gcd.o ltm/bn_mp_get_int.o ltm/bn_mp_get_long.o ltm/bn_mp_grow.o \
-ltm/bn_mp_import.o ltm/bn_mp_init.o ltm/bn_mp_init_copy.o ltm/bn_mp_init_multi.o \
+ltm/bn_mp_fwrite.o ltm/bn_mp_gcd.o ltm/bn_mp_get_bit.o ltm/bn_mp_get_int.o ltm/bn_mp_get_long.o \
+ltm/bn_mp_grow.o ltm/bn_mp_import.o ltm/bn_mp_init.o ltm/bn_mp_init_copy.o ltm/bn_mp_init_multi.o \
 ltm/bn_mp_init_set.o ltm/bn_mp_init_set_int.o ltm/bn_mp_init_size.o ltm/bn_mp_invmod.o \
 ltm/bn_mp_invmod_slow.o ltm/bn_mp_is_square.o ltm/bn_mp_jacobi.o ltm/bn_mp_karatsuba_mul.o \
-ltm/bn_mp_karatsuba_sqr.o ltm/bn_mp_lcm.o ltm/bn_mp_lshd.o ltm/bn_mp_mod.o ltm/bn_mp_mod_2d.o \
-ltm/bn_mp_mod_d.o ltm/bn_mp_montgomery_calc_normalization.o ltm/bn_mp_montgomery_reduce.o \
-ltm/bn_mp_montgomery_setup.o ltm/bn_mp_mul.o ltm/bn_mp_mulmod.o ltm/bn_mp_mul_2.o \
-ltm/bn_mp_mul_2d.o ltm/bn_mp_mul_d.o ltm/bn_mp_neg.o ltm/bn_mp_n_root.o ltm/bn_mp_n_root_ex.o \
-ltm/bn_mp_or.o ltm/bn_mp_prime_fermat.o ltm/bn_mp_prime_is_divisible.o ltm/bn_mp_prime_is_prime.o \
-ltm/bn_mp_prime_miller_rabin.o ltm/bn_mp_prime_next_prime.o ltm/bn_mp_prime_rabin_miller_trials.o \
-ltm/bn_mp_prime_random_ex.o ltm/bn_mp_radix_size.o ltm/bn_mp_radix_smap.o ltm/bn_mp_rand.o \
-ltm/bn_mp_read_radix.o ltm/bn_mp_read_signed_bin.o ltm/bn_mp_read_unsigned_bin.o \
+ltm/bn_mp_karatsuba_sqr.o ltm/bn_mp_kronecker.o ltm/bn_mp_lcm.o ltm/bn_mp_lshd.o \
+ltm/bn_mp_mod.o ltm/bn_mp_mod_2d.o ltm/bn_mp_mod_d.o ltm/bn_mp_montgomery_calc_normalization.o \
+ltm/bn_mp_montgomery_reduce.o ltm/bn_mp_montgomery_setup.o ltm/bn_mp_mul.o ltm/bn_mp_mulmod.o \
+ltm/bn_mp_mul_2.o ltm/bn_mp_mul_2d.o ltm/bn_mp_mul_d.o ltm/bn_mp_neg.o ltm/bn_mp_n_root.o \
+ltm/bn_mp_n_root_ex.o ltm/bn_mp_or.o ltm/bn_mp_prime_fermat.o ltm/bn_mp_prime_frobenius_underwood.o \
+ltm/bn_mp_prime_is_divisible.o ltm/bn_mp_prime_is_prime.o ltm/bn_mp_prime_miller_rabin.o \
+ltm/bn_mp_prime_next_prime.o ltm/bn_mp_prime_rabin_miller_trials.o ltm/bn_mp_prime_random_ex.o \
+ltm/bn_mp_prime_strong_lucas_selfridge.o ltm/bn_mp_radix_size.o ltm/bn_mp_radix_smap.o \
+ltm/bn_mp_rand.o ltm/bn_mp_read_radix.o ltm/bn_mp_read_signed_bin.o ltm/bn_mp_read_unsigned_bin.o \
 ltm/bn_mp_reduce.o ltm/bn_mp_reduce_2k.o ltm/bn_mp_reduce_2k_l.o ltm/bn_mp_reduce_2k_setup.o \
 ltm/bn_mp_reduce_2k_setup_l.o ltm/bn_mp_reduce_is_2k.o ltm/bn_mp_reduce_is_2k_l.o \
 ltm/bn_mp_reduce_setup.o ltm/bn_mp_rshd.o ltm/bn_mp_set.o ltm/bn_mp_set_int.o ltm/bn_mp_set_long.o \

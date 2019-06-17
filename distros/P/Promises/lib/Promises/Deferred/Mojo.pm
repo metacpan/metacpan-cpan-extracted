@@ -1,7 +1,7 @@
 package Promises::Deferred::Mojo;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: An implementation of Promises in Perl
-$Promises::Deferred::Mojo::VERSION = '1.00';
+$Promises::Deferred::Mojo::VERSION = '1.01';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ Promises::Deferred::Mojo - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 

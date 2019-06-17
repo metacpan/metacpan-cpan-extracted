@@ -7,7 +7,7 @@ with qw[Pcore::App::API::Local];
 
 sub _db_add_schema_patch ( $self, $dbh ) {
     $dbh->add_schema_patch(
-        1 => <<"SQL"
+        1, 'auth', <<"SQL"
             CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
             -- ROLE
@@ -22,7 +22,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
                 "name" TEXT NOT NULL UNIQUE,
                 "hash" BYTEA NOT NULL,
                 "enabled" BOOLEAN NOT NULL DEFAULT FALSE,
-                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())
+                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
             );
 
             -- USER PERMISSION
@@ -41,7 +41,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
                 "user_id" UUID NOT NULL REFERENCES "api_user" ("id") ON DELETE CASCADE,
                 "hash" BYTEA NOT NULL,
                 "desc" TEXT,
-                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())
+                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
             );
 
             -- USER TOKEN PERMISSION

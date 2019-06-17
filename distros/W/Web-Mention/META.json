@@ -67,6 +67,7 @@
       },
       "test" : {
          "requires" : {
+            "JSON" : "0",
             "Path::Class::Dir" : "0",
             "Test::Exception" : "0",
             "Test::LWP::UserAgent" : "0",
@@ -78,7 +79,7 @@
    "provides" : {
       "Web::Mention" : {
          "file" : "lib/Web/Mention.pm",
-         "version" : "0.701"
+         "version" : "0.702"
       },
       "Web::Mention::Author" : {
          "file" : "lib/Web/Mention/Author.pm"
@@ -95,7 +96,7 @@
          "web" : "https://github.com/jmacdotorg/webmention-perl"
       }
    },
-   "version" : "0.701",
+   "version" : "0.702",
    "x_contributors" : [
       "Jason McIntosh <jmac@jmac.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

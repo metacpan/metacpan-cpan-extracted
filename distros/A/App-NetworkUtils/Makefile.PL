@@ -15,10 +15,14 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-NetworkUtils",
   "EXE_FILES" => [
     "script/networking-is-on",
+    "script/turn-networking-off",
+    "script/turn-networking-on",
     "script/turn-off-networking",
     "script/turn-off-wireless",
     "script/turn-on-networking",
-    "script/turn-on-wireless"
+    "script/turn-on-wireless",
+    "script/turn-wireless-off",
+    "script/turn-wireless-on"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -27,7 +31,7 @@ my %WriteMakefileArgs = (
     "Exporter::Rinci" => 0,
     "File::Which" => 0,
     "IPC::System::Options" => "0.331",
-    "Log::ger" => "0.023",
+    "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
@@ -40,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +58,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "IPC::System::Options" => "0.331",
-  "Log::ger" => "0.023",
+  "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",

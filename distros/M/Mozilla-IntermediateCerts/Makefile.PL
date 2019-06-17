@@ -18,9 +18,12 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "LWP::UserAgent" => 0,
     "Moo" => 0,
-    "Text::CSV" => 0
+    "Test::HTTP::LocalServer" => 0,
+    "Test::Spec" => 0,
+    "Text::CSV" => 0,
+    "namespace::clean" => 0
   },
-  "VERSION" => "v0.0002",
+  "VERSION" => "v0.0003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,7 +33,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "Moo" => 0,
-  "Text::CSV" => 0
+  "Test::HTTP::LocalServer" => 0,
+  "Test::Spec" => 0,
+  "Text::CSV" => 0,
+  "namespace::clean" => 0
 );
 
 

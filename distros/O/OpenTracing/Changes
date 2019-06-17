@@ -1,5 +1,17 @@
 Revision history for OpenTracing
 
+0.003     2019-06-16 21:56:03+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - extended the random IDs to 63-bit (was 62-bit, the protocol defines as 128-bit but the overhead of
+    generating these is a bit too high for comfort)
+
+    Documentation:
+
+    - added basic class information
+
 0.002     2019-06-10 06:03:51+08:00 Asia/Kuala_Lumpur
     No new features.
 

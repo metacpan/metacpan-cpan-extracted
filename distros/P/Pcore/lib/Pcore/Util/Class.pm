@@ -3,6 +3,7 @@ package Pcore::Util::Class;
 use Pcore;
 use Sub::Util qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 use Package::Stash::XS qw[];
+use Pcore::Util::Scalar qw[is_ref];
 
 sub load ( $module, @ ) {
     my %args = (

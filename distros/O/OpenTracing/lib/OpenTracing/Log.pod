@@ -10,6 +10,28 @@ sure you change the first line.
 
 =cut
 
+=head1 NAME
+
+OpenTracing::Log - represents a single log message
+
+=head1 DESCRIPTION
+
+Each instance represents one log message.
+
+=head1 METHODS
+
+=head2 timestamp
+
+When this message was logged.
+
+=head2 tags
+
+Arrayref of tags relating to the log entry.
+
+=head2 tag_list
+
+List of tags relating to the log entry.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -19,4 +41,12 @@ sure you change the first line.
 L<new|OpenTracing::Common/new>
 
 =back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
 

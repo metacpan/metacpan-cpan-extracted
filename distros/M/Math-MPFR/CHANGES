@@ -1,3 +1,8 @@
+4.12
+ - Fix bug in nvtoa() that had values with negative single digit significands &&
+   exponents less than -4 appearing as "-x.e-EXP" instead of "-xe-EXP"
+ - Add doubletoa() function. (Uses grisu3 algorithm.)
+
 4.11
  - Optimizations to nvtoa()
 

@@ -18,16 +18,16 @@ meta-spec:
 name: App-BluetoothUtils
 requires:
   Bluetooth::Any: '0'
-  Log::ger: '0.023'
+  Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.811'
+  Perinci::CmdLine::Base: '1.816'
   Perinci::CmdLine::Classic: '1.770'
   perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BluetoothUtils
   homepage: https://metacpan.org/release/App-BluetoothUtils
   repository: git://github.com/perlancar/perl-App-BluetoothUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -35,6 +35,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript turn-off-bluetooth'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript turn-bluetooth-off'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript turn-bluetooth-on'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -119,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.596'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -184,9 +192,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/OurDist'
       version: '0.02'
     -
-      class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
-      name: '@Author::PERLANCAR/PERLANCAR::OurPkgVersion'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::PERLANCAR/OurPkgVersion'
+      version: '0.15'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -350,7 +358,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

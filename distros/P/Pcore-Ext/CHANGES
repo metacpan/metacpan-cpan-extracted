@@ -1,3 +1,33 @@
+v0.31.7 2019-06-16T21:18:35Z
+ - warn on rebuild app error
+
+v0.31.6 2019-06-14T08:28:30Z
+ - version string alignd right
+
+v0.31.5 2019-06-14T08:25:31Z
+ - theme init fixed
+
+v0.31.4 2019-06-14T08:14:39Z
+ - theme init fixed
+
+v0.31.3 2019-06-14T07:01:28Z
+ - theme init fixed
+
+v0.31.2 2019-06-14T05:42:22Z
+ - menu version updated
+
+v0.31.1 2019-06-14T05:27:16Z
+ - typo
+
+v0.31.0 2019-06-14T05:17:04Z
+ - overrides added
+ - reload module via do
+ - l10n updated
+ - theme selector
+ - dark mode sync
+ - ext server verion in menu
+ - sync locale name
+
 v0.30.4 2019-06-09T15:20:36Z
  - js errors fixed
 

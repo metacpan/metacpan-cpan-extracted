@@ -10,7 +10,7 @@ use Pcore::Util::UUID qw[uuid_v4 looks_like_uuid];
 with qw[Pcore::App::API];
 
 has dbh         => ( init_arg => undef );    # InstanceOf ['Pcore::Handle::DBI']
-has _hash_cache => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Hash::RandKey']
+has _hash_cache => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Hash::LRU']
 has _hash_cache_size => 10_000;              # PositiveInt;
 
 sub init ( $self ) {

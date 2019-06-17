@@ -6,6 +6,7 @@ requires 'warnings';
 requires 'JSON';
 requires 'Sub::Data::Recursive', '0.02';
 requires 'POSIX';
+requires 'YAML::Syck';
 requires 'Getopt::Long', '2.42';
 requires 'Pod::Usage';
 

@@ -15,6 +15,8 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-BluetoothUtils",
   "EXE_FILES" => [
     "script/bluetooth-is-on",
+    "script/turn-bluetooth-off",
+    "script/turn-bluetooth-on",
     "script/turn-off-bluetooth",
     "script/turn-on-bluetooth"
   ],
@@ -23,9 +25,9 @@ my %WriteMakefileArgs = (
   "NAME" => "App::BluetoothUtils",
   "PREREQ_PM" => {
     "Bluetooth::Any" => 0,
-    "Log::ger" => "0.023",
+    "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.811",
+    "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770"
   },
   "TEST_REQUIRES" => {
@@ -34,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,9 +48,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.023",
+  "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.811",
+  "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",
   "Test::More" => 0
 );

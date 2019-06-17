@@ -1,48 +1,11 @@
-0.054   2018-03-23 (PERLANCAR)
+0.100   2019-06-08 (PERLANCAR)
 
-	- Consult WordList::Namespace.
+        - No functional changes.
 
-
-0.053   2018-03-19 (PERLANCAR)
-
-	- Allow WordList to be custom sorted when $SORT is true (WordList
-	  0.2.0).
-
-	- [doc] Remove mention of DZP:WordListC.
+        - Edit Changes & renumber version.
 
 
-0.052   2018-02-20 (PERLANCAR)
+0.054   2019-02-14 (PERLANCAR)
 
-	- No functional changes.
-
-	- [doc] Tweaks/fixes, mention DZP:WordListC.
-
-
-0.051   2017-12-25 (PERLANCAR)
-
-	- Check duplicate & sortedness.
-
-
-0.050   2017-12-24 (PERLANCAR)
-
-	- [Bugfix] Show length of words in graphemes instead of codepoints.
-
-
-0.04    2016-01-13 (PERLANCAR)
-
-	- [Bugfix] Fix num_words_contains_nonword_chars statistics.
-
-
-0.03    2016-01-13 (PERLANCAR)
-
-	- Fix 'unicode' detection.
-
-
-0.02    2016-01-13 (PERLANCAR)
-
-	- Add avg_word_len to statistics.
-
-
-0.01    2016-01-13 (PERLANCAR)
-
-        - First release.
+        - First release (UPDATE: forgot to reset copy-pasted version number, as
+          well as edit Changes).

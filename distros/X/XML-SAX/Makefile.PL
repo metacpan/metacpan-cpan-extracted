@@ -5,12 +5,22 @@ use File::Spec ();
 
 WriteMakefile(
     'NAME'	=> 'XML::SAX',
-    'VERSION_FROM' => 'SAX.pm', # finds $VERSION
+    'VERSION_FROM' => 'lib/XML/SAX.pm', # finds $VERSION
     'PREREQ_PM' => { 
         'File::Temp' => 0,
         'XML::SAX::Base' => 1.05,
         'XML::NamespaceSupport' => 0.03,
     },    
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'git@github.com:grantm/XML-SAX.git',
+                web  => 'https://github.com/grantm/xml-sax',
+            },
+        },
+    },
 );
 
 sub MY::install {

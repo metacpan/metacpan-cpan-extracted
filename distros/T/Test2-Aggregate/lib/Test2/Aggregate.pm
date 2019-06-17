@@ -25,11 +25,11 @@ Test2::Aggregate - Aggregate tests
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 DESCRIPTION
@@ -79,7 +79,8 @@ Arrayref of flat files from which each line will be pushed to C<dirs>
 
 =item * C<root> (optional)
 
-Specifies a root directory to prefix all C<dirs> (and C<lists> items) with.
+If defined, must be a valid root directory that will prefix all C<dirs> and
+C<lists> items.
 
 =item * C<load_modules> (optional)
 
@@ -120,6 +121,7 @@ time per test (average if multiple iterations are specified), starting with the
 slowest test and passing percentage gets written. On negative C<repeat> the
 stats of each successful run will be written separately instead of the averages.
 The name of the file is C<caller_script-YYYYMMDD_HHmmss.txt>.
+If C<-> is passed instead of a path, then STDOUT will be used instead.
 
 =back
 
@@ -141,13 +143,19 @@ sub run_tests {
     @dirs = @{$args{dirs}} if $args{dirs};
     $root .= '/' unless !$root || $root =~ m#/$#;
 
-    foreach my $file (@{$args{lists}}) {
-        my $list = read_file("$root$file");
-        push @dirs, split(/\r?\n/, $list);
-    }
+    if ($root && ! -e $root) {
+        warn "Root '$root' does not exist, no tests are loaded."
+    } else {
+        foreach my $file (@{$args{lists}}) {
+            push @dirs, split(/\r?\n/, read_file("$root$file"));
+        }
 
-    find(sub{push @tests, $File::Find::name if /\.t$/}, map {$root.$_} @dirs)
-        if @dirs;
+        find(
+            sub {push @tests, $File::Find::name if /\.t$/},
+            grep {-e} map {$root . $_} @dirs
+        )
+            if @dirs;
+    }
 
     @tests = reverse @tests if $args{reverse};
 
@@ -233,8 +241,13 @@ sub _print_stats {
         }
     }
 
-    my $file = $args->{stats_output}."/".$args->{caller}."-"._timestamp().".txt";
-    open(my $fh, '>', $file) or die "Can't open > $file: $!";
+    my $fh;
+    if ($args->{stats_output} =~ /^-$/) {
+        $fh = *STDOUT
+    } else {
+        my $file = $args->{stats_output}."/".$args->{caller}."-"._timestamp().".txt";
+        open($fh, '>', $file) or die "Can't open > $file: $!";
+    }
 
     print $fh "TIME PASS% TEST\n";
     my $total = 0;
@@ -244,7 +257,7 @@ sub _print_stats {
             $stats->{time}->{$test}, $stats->{pass_perc}->{$test};
     }
     printf $fh "TOTAL TIME: %.1f sec\n", $total;
-    close $fh;
+    close $fh unless $args->{stats_output} =~ /^-$/;
 }
 
 sub _timestamp {

@@ -5,7 +5,7 @@ HTML::Lint::Pluggable - plugin system for HTML::Lint
 
 # VERSION
 
-This document describes HTML::Lint::Pluggable version 0.08.
+This document describes HTML::Lint::Pluggable version 0.10.
 
 # SYNOPSIS
 
@@ -106,6 +106,7 @@ to cpan-RT.
 # SEE ALSO
 
 [HTML::Lint](https://metacpan.org/pod/HTML::Lint)
+[HTML::Tidy5](https://metacpan.org/pod/HTML::Tidy5)
 
 # AUTHOR
 

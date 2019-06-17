@@ -14,7 +14,7 @@ use Mozilla::IntermediateCerts::Cert;
 
 # ABSTRACT: Downloads and parses Mozilla intermediate certificates
 
-our $VERSION = 'v0.0002';
+our $VERSION = 'v0.0003';
 
 =head1 NAME
  

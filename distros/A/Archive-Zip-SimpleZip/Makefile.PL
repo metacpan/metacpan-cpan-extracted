@@ -32,11 +32,33 @@ WriteMakefile(
     ),
 
 
-    META_MERGE => {
-        no_index => {
-            directory => [ 't', 'private' ],
-        },
-    },    
+     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }  
+        ? ( META_MERGE  => {
+    
+                "meta-spec" => { version => 2 },
+
+                no_index => {
+                    directory => [ 't', 'private' ],
+                },
+
+                resources   => {
+                
+                    bugtracker  => {
+                        web     => 'https://github.com/pmqs/Archive-Zip-SimpleZip/issues'
+                    },
+
+                    homepage    => 'https://github.com/pmqs/Archive-Zip-SimpleZip',
+
+                    repository  => {
+                        type    => 'git',
+                        url     => 'git://github.com/pmqs/Archive-Zip-SimpleZip.git',
+                        web     => 'https://github.com/pmqs/Archive-Zip-SimpleZip',
+                    },        
+                },
+              } 
+            ) 
+        : ()
+    ),
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),    

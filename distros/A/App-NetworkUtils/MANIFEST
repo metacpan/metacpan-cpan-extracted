@@ -9,10 +9,14 @@ README
 dist.ini
 lib/App/NetworkUtils.pm
 script/networking-is-on
+script/turn-networking-off
+script/turn-networking-on
 script/turn-off-networking
 script/turn-off-wireless
 script/turn-on-networking
 script/turn-on-wireless
+script/turn-wireless-off
+script/turn-wireless-on
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

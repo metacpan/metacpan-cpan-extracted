@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.87"
+            "Rinci" : "v1.1.90"
          }
       },
       "runtime" : {
@@ -36,7 +36,7 @@
             "Exporter::Rinci" : "0",
             "File::Which" : "0",
             "IPC::System::Options" : "0.331",
-            "Log::ger" : "0.023",
+            "Log::ger" : "0.027",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Base" : "1.816",
             "Perinci::CmdLine::Classic" : "1.770",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-App-NetworUtils"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -75,6 +75,16 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript networking-is-on",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript turn-networking-off",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript turn-networking-on",
             "version" : "0.421"
          },
          {
@@ -95,6 +105,16 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript turn-on-wireless",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript turn-wireless-off",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript turn-wireless-on",
             "version" : "0.421"
          },
          {
@@ -191,7 +211,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.594"
+            "version" : "0.596"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -275,9 +295,9 @@
             "version" : "0.02"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion",
-            "name" : "@Author::PERLANCAR/PERLANCAR::OurPkgVersion",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@Author::PERLANCAR/OurPkgVersion",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",

@@ -127,9 +127,10 @@ sub _create_dbh ($self) {
 sub _get_schema_patch_table_query ( $self, $table_name ) {
     return <<"SQL";
         CREATE TABLE IF NOT EXISTS "$table_name" (
-            "id" INT NOT NULL,
-            "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            PRIMARY KEY ("id")
+            "module" TEXT NOT NULL,
+            "id" INT4 NOT NULL,
+            "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY ("module", "id")
         )
 SQL
 }
@@ -173,9 +174,9 @@ sub quote ( $self, $var ) {
             # encode and quote
             $var = $self->encode_json( $var->[1] );
 
-            $var =~ s/'/''/smg;
+            $var->$* =~ s/'/''/smg;
 
-            return "'$var'";
+            return q['] . $var->$* . q['];
         }
         else {
             die 'Unsupported SQL type';
@@ -213,7 +214,7 @@ sub quote ( $self, $var ) {
 sub encode_json ( $self, $var ) {
 
     # encode
-    return to_json $var;
+    return \to_json $var;
 }
 
 sub encode_array ( $self, $var ) {

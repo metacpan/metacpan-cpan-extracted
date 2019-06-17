@@ -46,6 +46,10 @@ static const unsigned char CBOR_NULL_U8  = CBOR_NULL;
 static const unsigned char CBOR_FALSE_U8 = CBOR_FALSE;
 static const unsigned char CBOR_TRUE_U8  = CBOR_TRUE;
 
+static const unsigned char CBOR_INF_SHORT[3] = { 0xf9, 0x7c, 0x00 };
+static const unsigned char CBOR_NAN_SHORT[3] = { 0xf9, 0x7e, 0x00 };
+static const unsigned char CBOR_NEGINF_SHORT[3] = { 0xf9, 0xfc, 0x00 };
+
 enum CBOR_TYPE {
     CBOR_TYPE_UINT,
     CBOR_TYPE_NEGINT,
@@ -59,6 +63,9 @@ enum CBOR_TYPE {
 
 static HV *boolean_stash;
 static HV *tagged_stash;
+
+static const char* UV_TO_STR_TMPL = sizeof(UV) == 8 ? "%llu" : "%lu";
+static const char* IV_TO_STR_TMPL = sizeof(UV) == 8 ? "%lld" : "%ld";
 
 //----------------------------------------------------------------------
 // Definitions
@@ -118,25 +125,13 @@ SV *_decode( pTHX_ decode_ctx* decstate );
 
 //----------------------------------------------------------------------
 
-#if IS_64_BIT
-UV _uv_to_str(unsigned long long num, char *numstr, const char strlen) {
-    return my_snprintf( numstr, strlen, "%llu", num );
+UV _uv_to_str(UV num, char *numstr, const char strlen) {
+    return my_snprintf( numstr, strlen, UV_TO_STR_TMPL, num );
 }
-#else
-UV _uv_to_str(unsigned long num, char *numstr, const char strlen) {
-    return my_snprintf( numstr, strlen, "%lu", num );
-}
-#endif
 
-#if IS_64_BIT
-UV _iv_to_str(long long num, char *numstr, const char strlen) {
-    return my_snprintf( numstr, strlen, "%lld", num );
+UV _iv_to_str(IV num, char *numstr, const char strlen) {
+    return my_snprintf( numstr, strlen, IV_TO_STR_TMPL, num );
 }
-#else
-UV _iv_to_str(long num, char *numstr, const char strlen) {
-    return my_snprintf( numstr, strlen, "%ld", num );
-}
-#endif
 
 #define _croak croak
 
@@ -273,26 +268,26 @@ static inline void _COPY_INTO_ENCODE( encode_ctx *encode_state, const unsigned c
 // while on little-endian systems it’s a bswap.
 
 static inline void _u16_to_buffer( UV num, uint8_t *buffer ) {
-    buffer[0] = num >> 8;
-    buffer[1] = num;
+    *(buffer++) = num >> 8;
+    *(buffer++) = num;
 }
 
 static inline void _u32_to_buffer( UV num, unsigned char *buffer ) {
-    buffer[0] = num >> 24;
-    buffer[1] = num >> 16;
-    buffer[2] = num >> 8;
-    buffer[3] = num;
+    *(buffer++) = num >> 24;
+    *(buffer++) = num >> 16;
+    *(buffer++) = num >> 8;
+    *(buffer++) = num;
 }
 
 static inline void _u64_to_buffer( UV num, unsigned char *buffer ) {
-    buffer[0] = num >> 56;
-    buffer[1] = num >> 48;
-    buffer[2] = num >> 40;
-    buffer[3] = num >> 32;
-    buffer[4] = num >> 24;
-    buffer[5] = num >> 16;
-    buffer[6] = num >> 8;
-    buffer[7] = num;
+    *(buffer++) = num >> 56;
+    *(buffer++) = num >> 48;
+    *(buffer++) = num >> 40;
+    *(buffer++) = num >> 32;
+    *(buffer++) = num >> 24;
+    *(buffer++) = num >> 16;
+    *(buffer++) = num >> 8;
+    *(buffer++) = num;
 }
 
 // Basically ntohll(), but it accepts a pointer.
@@ -300,29 +295,31 @@ static inline UV _buffer_u64_to_uv( unsigned char *buffer ) {
     UV num = 0;
 
 #if IS_64_BIT
-    num |= buffer[0];
-    num = num << 8;
+    num |= *(buffer++);
+    num <<= 8;
 
-    num |= buffer[1];
-    num = num << 8;
+    num |= *(buffer++);
+    num <<= 8;
 
-    num |= buffer[2];
-    num = num << 8;
+    num |= *(buffer++);
+    num <<= 8;
 
-    num |= buffer[3];
-    num = num << 8;
+    num |= *(buffer++);
+    num <<= 8;
+#else
+    buffer += 4;
 #endif
 
-    num |= buffer[4];
-    num = num << 8;
+    num |= *(buffer++);
+    num <<= 8;
 
-    num |= buffer[5];
-    num = num << 8;
+    num |= *(buffer++);
+    num <<= 8;
 
-    num |= buffer[6];
-    num = num << 8;
+    num |= *(buffer++);
+    num <<= 8;
 
-    num |= buffer[7];
+    num |= *(buffer++);
 
     return num;
 }
@@ -405,28 +402,43 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
             }
         }
         else if (SvNOK(value)) {
+            NV val_nv = SvNVX(value);
 
-            // Typecast to a double to accommodate long-double perls.
-            double val = (double) SvNVX(value);
+            if (Perl_isnan(val_nv)) {
+                _COPY_INTO_ENCODE(encode_state, CBOR_NAN_SHORT, 3);
+            }
+            else if (Perl_isinf(val_nv)) {
+                if (val_nv > 0) {
+                    _COPY_INTO_ENCODE(encode_state, CBOR_INF_SHORT, 3);
+                }
+                else {
+                    _COPY_INTO_ENCODE(encode_state, CBOR_NEGINF_SHORT, 3);
+                }
+            }
+            else {
 
-            char *valptr = (char *) &val;
+                // Typecast to a double to accommodate long-double perls.
+                double val = (double) val_nv;
+
+                char *valptr = (char *) &val;
 
 #if IS_LITTLE_ENDIAN
-            encode_state->scratch[0] = CBOR_DOUBLE;
-            encode_state->scratch[1] = valptr[7];
-            encode_state->scratch[2] = valptr[6];
-            encode_state->scratch[3] = valptr[5];
-            encode_state->scratch[4] = valptr[4];
-            encode_state->scratch[5] = valptr[3];
-            encode_state->scratch[6] = valptr[2];
-            encode_state->scratch[7] = valptr[1];
-            encode_state->scratch[8] = valptr[0];
+                encode_state->scratch[0] = CBOR_DOUBLE;
+                encode_state->scratch[1] = valptr[7];
+                encode_state->scratch[2] = valptr[6];
+                encode_state->scratch[3] = valptr[5];
+                encode_state->scratch[4] = valptr[4];
+                encode_state->scratch[5] = valptr[3];
+                encode_state->scratch[6] = valptr[2];
+                encode_state->scratch[7] = valptr[1];
+                encode_state->scratch[8] = valptr[0];
 
-            _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 9);
+                _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 9);
 #else
-            char bytes[9] = { CBOR_DOUBLE, valptr[0], valptr[1], valptr[2], valptr[3], valptr[4], valptr[5], valptr[6], valptr[7] };
-            _COPY_INTO_ENCODE(encode_state, bytes, 9);
+                char bytes[9] = { CBOR_DOUBLE, valptr[0], valptr[1], valptr[2], valptr[3], valptr[4], valptr[5], valptr[6], valptr[7] };
+                _COPY_INTO_ENCODE(encode_state, bytes, 9);
 #endif
+            }
         }
         else if (!SvOK(value)) {
             _COPY_INTO_ENCODE(encode_state, &CBOR_NULL_U8, 1);
@@ -686,8 +698,9 @@ struct numbuf {
 UV _decode_uint( pTHX_ decode_ctx* decstate ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
-    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE)
+    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
         _croak_invalid_control( aTHX_ decstate );
+    }
 
     return _parse_for_uint_len2( aTHX_ decstate );
 }
@@ -695,14 +708,15 @@ UV _decode_uint( pTHX_ decode_ctx* decstate ) {
 IV _decode_negint( pTHX_ decode_ctx* decstate ) {
     union control_byte *control = (union control_byte *) decstate->curbyte;
 
-    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE)
+    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
         _croak_invalid_control( aTHX_ decstate );
+    }
 
     UV positive = _parse_for_uint_len2( aTHX_ decstate );
 
 #if IS_64_BIT
     if (positive >= 0x8000000000000000U) {
-        _croak_cannot_decode_negative( aTHX_ 1 + positive, decstate->curbyte - decstate->start - 8 );
+        _croak_cannot_decode_negative( aTHX_ positive, decstate->curbyte - decstate->start - 8 );
     }
 #else
     if (positive >= 0x80000000U) {
@@ -715,7 +729,7 @@ IV _decode_negint( pTHX_ decode_ctx* decstate ) {
             offset -= 8;
         }
 
-        _croak_cannot_decode_negative( aTHX_ 1 + positive, offset );
+        _croak_cannot_decode_negative( aTHX_ positive, offset );
     }
 #endif
 
@@ -864,11 +878,8 @@ double decode_half_float(uint8_t *halfp) {
     return half & 0x8000 ? -val : val;
 }
 
-static inline float _decode_float_to_le( decode_ctx* decstate, uint8_t *ptr ) {
-    decstate->scratch.bytes[0] = ptr[3];
-    decstate->scratch.bytes[1] = ptr[2];
-    decstate->scratch.bytes[2] = ptr[1];
-    decstate->scratch.bytes[3] = ptr[0];
+static inline float _decode_float_to_host( pTHX_ decode_ctx* decstate, uint8_t *ptr ) {
+    *((uint32_t *) decstate->scratch.bytes) = ntohl( *((uint32_t *) ptr) );
 
     return decstate->scratch.as_float;
 }
@@ -978,7 +989,7 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
                     float decoded_flt;
 
 #if IS_LITTLE_ENDIAN
-                    decoded_flt = _decode_float_to_le( decstate, (uint8_t *) (1 + decstate->curbyte ) );
+                    decoded_flt = _decode_float_to_host( aTHX_ decstate, (uint8_t *) (1 + decstate->curbyte ) );
 #else
                     decoded_flt = *( (float *) (1 + decstate->curbyte) );
 #endif

@@ -403,7 +403,7 @@ _radix_to_bin(char *in, int radix)
         mp_int mpi;
 
         if (in == NULL) XSRETURN_UNDEF;
-        if (mp_init(&mpi) != CRYPT_OK) XSRETURN_UNDEF;
+        if (mp_init(&mpi) != MP_OKAY) XSRETURN_UNDEF;
         if (strlen(in) == 0) {
           RETVAL = newSVpvn("", 0);
         }
@@ -417,7 +417,10 @@ _radix_to_bin(char *in, int radix)
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, len);
             out_data = (unsigned char *)SvPVX(RETVAL);
-            mp_to_unsigned_bin(&mpi, out_data);
+            if (mp_to_unsigned_bin(&mpi, out_data) != MP_OKAY) {
+              SvREFCNT_dec(RETVAL);
+              RETVAL = newSVpvn(NULL, 0); /* undef */
+            }
           }
         }
         else {
@@ -437,30 +440,39 @@ _bin_to_radix(SV *in, int radix)
         char *out_data;
         mp_int mpi, tmp;
         mp_digit d;
+        mp_err merr;
         int digits = 0;
 
         if (!SvPOK(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, len);
-        mp_init_multi(&mpi, &tmp, NULL);
+        if (mp_init_multi(&mpi, &tmp, NULL) != MP_OKAY) XSRETURN_UNDEF;
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           if (mp_read_unsigned_bin(&mpi, in_data, (unsigned long)len) == CRYPT_OK) {
-            mp_copy(&mpi, &tmp);
-            while (mp_iszero(&tmp) == MP_NO) {
-              mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
+            merr = mp_copy(&mpi, &tmp);
+            while (merr == MP_OKAY && mp_iszero(&tmp) == MP_NO) {
+              merr = mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
               digits++;
             }
-            if (digits == 0) {
+            if (merr != MP_OKAY) {
+              RETVAL = newSVpvn(NULL, 0); /* undef */
+            }
+            else if (digits == 0) {
               RETVAL = newSVpvn("", 0);
             }
             else {
               RETVAL = NEWSV(0, digits + 2); /* +2 for sign and NUL byte */
               SvPOK_only(RETVAL);
               out_data = SvPVX(RETVAL);
-              mp_toradix(&mpi, out_data, radix);
-              SvCUR_set(RETVAL, strlen(out_data));
+              if (mp_toradix(&mpi, out_data, radix) == MP_OKAY) {
+                SvCUR_set(RETVAL, strlen(out_data));
+              }
+              else {
+                SvREFCNT_dec(RETVAL);
+                RETVAL = newSVpvn(NULL, 0); /* undef */
+              }
             }
           }
           else {

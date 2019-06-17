@@ -17,7 +17,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
         },
 
         # MATERIAL THEME
-        theme => {
+        defautTheme => {
             accent   => 'grey',
             base     => 'blue-grey',
             darkMode => \0
@@ -60,7 +60,13 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
             }
 
             // set material theme
-            me.setTheme(me.theme, true);
+            me._applyTheme(me._getCurrentTheme());
+
+            this.getViewModel().bind('{session.theme.darkMode}', function (newVal, oldVal, eOpt) {
+                if (newVal == null) return;
+
+                this.setTheme({ darkMode: newVal });
+            }, this);
 
             Ext.util.History.hashbang = true;
 
@@ -96,12 +102,8 @@ JS
             me.doSignin(null, null, function(res) {
                 if (res.isSuccess()) {
 
-                    // store session
-                    var session = me.checkSession(res.data.session);
-                    me.getViewModel().set('session', session);
-
-                    // store app settings
-                    me.getViewModel().set('settings', res.data.settings);
+                    // get session
+                    var session = me.checkSession(res.data);
 
                     me.setLocale(session.locale, function () {
                         Ext.route.Router.resume();
@@ -143,34 +145,50 @@ JS
                 return this.permissions[role] ? 1 : 0;
             };
 
-            if (!session.locale) session.locale = localStorage.locale || session.default_locale;
+            if (!Ext.isObject(session.locales)) session.locales = {};
 
-            session.theme = this.theme;
+            var locale = session.locale || localStorage.locale || session.default_locale;
+
+            if (!session.locales[locale]) locale = session.default_locale;
+
+            session.locale = locale;
+            session.localeName = session.locales[locale];
+
+            session.theme = this._getCurrentTheme();
+
+            // update viewModel
+            var viewModel = this.getViewModel();
+            viewModel.set('session', session);
 
             return session;
 JS
 
         # MATERIAL THEME
-        setTheme => func [ 'newTheme', 'isDefaultTheme' ], <<"JS",
-            if (Ext.theme.Material) {
-                Ext.manifest.material = Ext.manifest.material || {};
-                Ext.manifest.material.toolbar = Ext.manifest.material.toolbar || {};
-                Ext.manifest.material.toolbar.dynamic = true;
+        setTheme => func ['theme'], <<"JS",
+            if (!Ext.theme.Material) return;
 
-                var userTheme = localStorage.theme ? JSON.parse(localStorage.theme) : {},
-                    currentTheme = this.theme;
+            theme = Ext.apply(this._getCurrentTheme(), theme);
 
-                if (isDefaultTheme) {
-                    this.theme = Ext.apply(newTheme, userTheme, currentTheme);
-                }
-                else {
-                    localStorage.theme = JSON.stringify(newTheme);
+            localStorage.theme = JSON.stringify(theme);
 
-                    this.theme = Ext.apply(currentTheme, newTheme, userTheme);
-                }
+            var session = this.getViewModel().get('session');
+            if (session) session.theme = theme;
 
-                Ext.theme.Material.setColors(this.theme);
-            }
+            this._applyTheme(theme);
+JS
+
+        _getCurrentTheme => func <<'JS',
+            return Ext.apply({}, localStorage.theme ? JSON.parse(localStorage.theme) : {}, this.defaultTheme);
+JS
+
+        _applyTheme => func ['theme'], <<'JS',
+            if (!Ext.theme.Material) return;
+
+            Ext.manifest.material = Ext.manifest.material || {};
+            Ext.manifest.material.toolbar = Ext.manifest.material.toolbar || {};
+            Ext.manifest.material.toolbar.dynamic = true;
+
+            Ext.theme.Material.setColors(theme);
 JS
 
         # MASK
@@ -217,13 +235,19 @@ JS
 
         # LOCALE
         onSetLocale => func ['locale'], <<"JS",
+
             // already using required locale
             if (Ext.L10N.getCurrentLocale() == locale) return;
 
-            // store user locale in profile, if user is authenticated
-            if (this.getViewModel().get('session').is_authenticated) this.doSetLocale(locale);
+            var me = this,
+                viewModel = me.getViewModel(),
+                session = viewModel.get('session');
 
-            var me = this;
+            // locale is not allowed
+            if (!session.locales[locale]) return;
+
+            // store user locale in profile, if user is authenticated
+            if (session.is_authenticated) this.doSetLocale(locale);
 
             me.setLocale(locale, function () {
                 me.redirectTo(Ext.util.History.getToken(), {force: true});
@@ -231,11 +255,25 @@ JS
 JS
 
         setLocale => func [ 'locale', 'cb' ], <<'JS',
+
+            // already using required locale
             if (locale == Ext.L10N.getCurrentLocale()) {
                 cb();
             }
             else {
-                var me = this;
+                var me = this,
+                    viewModel = me.getViewModel(),
+                    session = viewModel.get('session');
+
+                // locale is not allowed
+                if (!session.locales[locale]) {
+                    cb();
+
+                    return;
+                }
+
+                // update localeName
+                session.localeName = session.locales[locale];
 
                 // store locale in local storage
                 localStorage.locale = locale;
@@ -285,12 +323,8 @@ JS
 
                 if (res.isSuccess()) {
 
-                    // store app settings
-                    me.getViewModel().set('settings', res.data.settings);
-
-                    // store session
-                    var session = me.checkSession(res.data.session);
-                    me.getViewModel().set('session', session);
+                    // get session
+                    var session = me.checkSession(res.data);
 
                     // not authenticated
                     if (!session.is_authenticated) {

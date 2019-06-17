@@ -13,7 +13,7 @@ else {
 }
 
 if(!$@) {
-  if($Math::NV::VERSION eq '2.01') {print "ok 2\n"}
+  if($Math::NV::VERSION eq '2.02') {print "ok 2\n"}
   else {
     warn "Wrong version of Math::NV - we have $Math::NV::VERSION\n";
     print "not ok 2\n";
@@ -22,7 +22,7 @@ if(!$@) {
 else {print "ok 2\n"}
 
 if(!$@) {
-  if($Math::MPFR::VERSION >= '4.03') {
+  if($Math::MPFR::VERSION >= '4.07') {
     warn "\nUsing MATH::MPFR-$Math::MPFR::VERSION\n";
     print "ok 3\n";
   }

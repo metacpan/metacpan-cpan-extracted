@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Calendar-Dates
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Calendar-Dates
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Calendar-Dates.git
-version: '0.054'
+version: '0.100'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -106,7 +106,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.594'
+      version: '0.596'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -171,9 +171,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/OurDist'
       version: '0.02'
     -
-      class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
-      name: '@Author::PERLANCAR/PERLANCAR::OurPkgVersion'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::PERLANCAR/OurPkgVersion'
+      version: '0.15'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:

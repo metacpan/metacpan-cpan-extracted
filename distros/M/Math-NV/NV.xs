@@ -32,16 +32,6 @@ typedef __float128 float128;
 #  define Newx(v,n,t) New(0,v,n,t)
 #endif
 
-#ifdef NV_IS_FLOAT128
-typedef float128 ARGTYPE;
-#endif
-#ifdef NV_IS_LONG_DOUBLE
-typedef long double ARGTYPE;
-#endif
-#ifdef NV_IS_DOUBLE
-typedef double ARGTYPE;
-#endif
-
 SV * _itsa(pTHX_ SV * a) {
      if(SvUOK(a)) return newSVuv(1);
      if(SvIOK(a)) return newSVuv(2);
@@ -104,7 +94,7 @@ unsigned long mant_dig(void) {
 #endif
 }
 
-int Isnan_ld (ARGTYPE d) {
+int Isnan_ld (NV d) {
   if(d == d) return 0;
   return 1;
 }
@@ -117,8 +107,8 @@ int Isnan_ld (ARGTYPE d) {
 void _ld2binary (pTHX_ SV * ld) {
 
   dXSARGS;
-  ARGTYPE d = (ARGTYPE)SvNV(ld);
-  ARGTYPE e;
+  NV d = (NV)SvNV(ld);
+  NV e;
   int exp = 1;
   unsigned long int prec = 0;
   int returns = 0;
@@ -132,7 +122,7 @@ void _ld2binary (pTHX_ SV * ld) {
       XSRETURN(3);
   }
 
-  if (d < (ARGTYPE) 0.0 || (d == (ARGTYPE) 0.0 && (1.0 / (double) d < 0.0))) {
+  if (d < (NV) 0.0 || (d == (NV) 0.0 && (1.0 / (double) d < 0.0))) {
       XPUSHs(sv_2mortal(newSVpv("-", 0)));
       returns++;
       d = -d;
@@ -149,7 +139,7 @@ void _ld2binary (pTHX_ SV * ld) {
       XSRETURN(returns);
   }
 
-  if (d == (ARGTYPE) 0.0) {
+  if (d == (NV) 0.0) {
       XPUSHs(sv_2mortal(newSVpv("0.0", 0)));
       XPUSHs(sv_2mortal(newSViv(exp)));
       XPUSHs(sv_2mortal(newSViv(prec)));
@@ -158,9 +148,9 @@ void _ld2binary (pTHX_ SV * ld) {
   }
 
   /* now d > 0 */
-  e = (ARGTYPE) 1.0;
+  e = (NV) 1.0;
   while (e > d) {
-      e = e * (ARGTYPE) 0.5;
+      e = e * (NV) 0.5;
       exp --;
   }
 
@@ -174,18 +164,18 @@ void _ld2binary (pTHX_ SV * ld) {
   XPUSHs(sv_2mortal(newSVpv("0.", 0)));
   returns ++;
 
-  while (d > (ARGTYPE) 0.0) {
+  while (d > (NV) 0.0) {
       prec++;
       if(d >= e) {
         XPUSHs(sv_2mortal(newSVpv("1", 0)));
         returns ++;
-        d = (ARGTYPE) ((ARGTYPE) d - (ARGTYPE) e);
+        d = (NV) ((NV) d - (NV) e);
       }
       else {
         XPUSHs(sv_2mortal(newSVpv("0", 0)));
         returns ++;
       }
-      e *= (ARGTYPE) 0.5;
+      e *= (NV) 0.5;
   }
 
   XPUSHs(sv_2mortal(newSViv(exp)));
@@ -197,8 +187,8 @@ void _ld2binary (pTHX_ SV * ld) {
 void _ld_str2binary (pTHX_ char * ld) {
 
   dXSARGS;
-  ARGTYPE d;
-  ARGTYPE e;
+  NV d;
+  NV e;
   int exp = 1;
   unsigned long int prec = 0;
   int returns = 0;
@@ -222,7 +212,7 @@ void _ld_str2binary (pTHX_ char * ld) {
       XSRETURN(3);
   }
 
-  if (d < (ARGTYPE) 0.0 || (d == (ARGTYPE) 0.0 && (1.0 / (double) d < 0.0))) {
+  if (d < (NV) 0.0 || (d == (NV) 0.0 && (1.0 / (double) d < 0.0))) {
       XPUSHs(sv_2mortal(newSVpv("-", 0)));
       returns++;
       d = -d;
@@ -239,7 +229,7 @@ void _ld_str2binary (pTHX_ char * ld) {
       XSRETURN(returns);
   }
 
-  if (d == (ARGTYPE) 0.0) {
+  if (d == (NV) 0.0) {
       XPUSHs(sv_2mortal(newSVpv("0.0", 0)));
       XPUSHs(sv_2mortal(newSViv(exp)));
       XPUSHs(sv_2mortal(newSViv(prec)));
@@ -248,9 +238,9 @@ void _ld_str2binary (pTHX_ char * ld) {
   }
 
   /* now d > 0 */
-  e = (ARGTYPE) 1.0;
+  e = (NV) 1.0;
   while (e > d) {
-      e = e * (ARGTYPE) 0.5;
+      e = e * (NV) 0.5;
       exp --;
   }
 
@@ -264,18 +254,18 @@ void _ld_str2binary (pTHX_ char * ld) {
   XPUSHs(sv_2mortal(newSVpv("0.", 0)));
   returns ++;
 
-  while (d > (ARGTYPE) 0.0) {
+  while (d > (NV) 0.0) {
       prec++;
       if(d >= e) {
         XPUSHs(sv_2mortal(newSVpv("1", 0)));
         returns ++;
-        d = (ARGTYPE) ((ARGTYPE) d - (ARGTYPE) e);
+        d = (NV) ((NV) d - (NV) e);
       }
       else {
         XPUSHs(sv_2mortal(newSVpv("0", 0)));
         returns ++;
       }
-      e *= (ARGTYPE) 0.5;
+      e *= (NV) 0.5;
   }
 
   XPUSHs(sv_2mortal(newSViv(exp)));
@@ -288,8 +278,8 @@ SV * _bin2val(pTHX_  SV * precision, SV * exponent, SV * bin) {
   IV i, prec;
   prec = SvIV(precision);
 
-  ARGTYPE d = (ARGTYPE)0.0;
-  ARGTYPE exp  = (ARGTYPE)SvNV(exponent);
+  NV d = (NV)0.0;
+  NV exp  = (NV)SvNV(exponent);
   for(i = 0; i < prec; i++) {
     if(SvIV(*(av_fetch((AV*)SvRV(bin), i, 0))))
 #ifdef NV_IS_FLOAT128
@@ -301,7 +291,7 @@ SV * _bin2val(pTHX_  SV * precision, SV * exponent, SV * bin) {
 #ifdef NV_IS_DOUBLE
      d += pow(2.0, exp);
 #endif
-    exp -= (ARGTYPE)1.0;
+    exp -= (NV)1.0;
   }
 
   return newSVnv(d);
@@ -332,7 +322,7 @@ SV * _bug_1175557635e10(pTHX) {
 }
 
 void Cprintf(pTHX_ char * fmt, SV * nv) {
-  printf(fmt, (ARGTYPE)SvNV(nv));
+  printf(fmt, (NV)SvNV(nv));
 }
 
 void Csprintf(pTHX_ char * fmt, SV * nv, int size) {
@@ -344,7 +334,7 @@ void Csprintf(pTHX_ char * fmt, SV * nv, int size) {
 #ifdef NV_IS_FLOAT128
    quadmath_snprintf(out, size, fmt, (__float128)SvNV(nv));
 #else
-   sprintf(out, fmt, (ARGTYPE)SvNV(nv));
+   sprintf(out, fmt, (NV)SvNV(nv));
 #endif
 
    ST(0) = sv_2mortal(newSVpv(out, 0));
@@ -363,11 +353,14 @@ int _looks_like_number(pTHX_ SV * x) {
 }
 
 SV * _set_C (pTHX_ char * str) {
-#ifdef Perl_strtod
- return newSVnv(Perl_strtod(str, NULL));
-#else
- warn("'Perl_strtod' not defined");
- return &PL_sv_undef;
+#ifdef NV_IS_FLOAT128
+ return newSVnv(strtoflt128(str, NULL));
+#endif
+#ifdef NV_IS_LONG_DOUBLE
+ return newSVnv(strtold(str, NULL));
+#endif
+#ifdef NV_IS_DOUBLE
+ return newSVnv(strtod(str, NULL));
 #endif
 }
 
@@ -418,6 +411,10 @@ OUTPUT:  RETVAL
 unsigned long
 mant_dig ()
 
+
+int
+Isnan_ld (d)
+	NV	d
 
 void
 _ld2binary (ld)

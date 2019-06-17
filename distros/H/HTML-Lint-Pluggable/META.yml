@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.6, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +26,20 @@ no_index:
 provides:
   HTML::Lint::Pluggable:
     file: lib/HTML/Lint/Pluggable.pm
-    version: '0.08'
+    version: '0.10'
   HTML::Lint::Pluggable::HTML5:
     file: lib/HTML/Lint/Pluggable/HTML5.pm
-    version: '0.08'
+    version: '0.10'
+  HTML::Lint::Pluggable::Microdata:
+    file: lib/HTML/Lint/Pluggable/Microdata.pm
+  HTML::Lint::Pluggable::RDFa:
+    file: lib/HTML/Lint/Pluggable/RDFa.pm
   HTML::Lint::Pluggable::TinyEntitesEscapeRule:
     file: lib/HTML/Lint/Pluggable/TinyEntitesEscapeRule.pm
-    version: '0.08'
+    version: '0.10'
   HTML::Lint::Pluggable::WhiteList:
     file: lib/HTML/Lint/Pluggable/WhiteList.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   HTML::Entities: '0'
   HTML::Lint: '0'
@@ -48,10 +52,12 @@ resources:
   bugtracker: https://github.com/karupanerura/p5-HTML-Lint-Pluggable/issues
   homepage: https://github.com/karupanerura/p5-HTML-Lint-Pluggable
   repository: git://github.com/karupanerura/p5-HTML-Lint-Pluggable.git
-version: '0.08'
+version: '0.10'
 x_authority: cpan:KARUPA
 x_contributors:
-  - 'Klaus S. Madsen <ksm@jobindex.dk>'
   - 'Doug Bell <preaction@users.noreply.github.com>'
+  - 'Klaus S. Madsen <ksm@jobindex.dk>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'shibayu36 <shibayu36@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

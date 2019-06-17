@@ -2,7 +2,7 @@ package Pcore::Handle::DBI;
 
 use Pcore -role, -const;
 use Pcore::Handle::DBI::STH;
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref is_blessed_hashref is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref is_blessed_hashref is_plain_arrayref is_plain_hashref];
 
 with qw[Pcore::Handle::Base];
 
@@ -12,14 +12,34 @@ has on_connect    => ();                       # Maybe [CodeRef]
 has _schema_patch => ( init_arg => undef );    # HashRef
 
 const our $SCHEMA_PATCH_TABLE_NAME => '__schema_patch';
+const our $DEFAULT_MODULE          => 'main';
 
 # SCHEMA PATCH
-sub add_schema_patch ( $self, $id, $query ) {
-    die qq[Schema patch id "$id" already exists] if exists $self->{_schema_patch}->{$id};
+sub add_schema_patch ( $self, $id, $module, $query = undef ) {
+    if ( !defined $query ) {
+        $query = $module;
 
-    $self->{_schema_patch}->{$id} = {
-        id    => $id,
-        query => $query,
+        $module = $DEFAULT_MODULE;
+    }
+
+    die qq[Schema patch id "$id" for module "$module" is already exists] if exists $self->{_schema_patch}->{$module}->{$id};
+
+    if ( is_plain_hashref $query) {
+        if ( $self->{is_sqlite} && exists $query->{sqlite} ) {
+            $query = $query->{sqlite};
+        }
+        elsif ( $self->{is_pgsql} && exists $query->{pgsql} ) {
+            $query = $query->{pgsql};
+        }
+        else {
+            die qq[Schema patch id "$id" for module "$module" has no SQL statement for current database];
+        }
+    }
+
+    $self->{_schema_patch}->{$module}->{$id} = {
+        module => $module,
+        id     => $id,
+        query  => $query,
     };
 
     return;
@@ -52,17 +72,19 @@ sub upgrade_schema ( $self ) {
     # create patch table
     ( $res = $dbh->do( $self->_get_schema_patch_table_query($SCHEMA_PATCH_TABLE_NAME) ) ) || return $on_finish->();
 
-    for my $id ( sort keys $self->{_schema_patch}->%* ) {
-        ( $res = $dbh->selectrow( qq[SELECT "id" FROM "$SCHEMA_PATCH_TABLE_NAME" WHERE "id" = \$1], [$id] ) ) || return $on_finish->();
+    for my $module ( sort keys $self->{_schema_patch}->%* ) {
+        for my $id ( sort keys $self->{_schema_patch}->{$module}->%* ) {
+            ( $res = $dbh->selectrow( qq[SELECT "id" FROM "$SCHEMA_PATCH_TABLE_NAME" WHERE "module" = \$1 AND "id" = \$2], [ $module, $id ] ) ) or return $on_finish->();
 
-        # patch is already exists
-        next if $res->{data};
+            # patch is already applied
+            next if $res->{data};
 
-        # apply patch
-        ( $res = $dbh->do( $self->{_schema_patch}->{$id}->{query} ) ) || return $on_finish->();
+            # apply patch
+            ( $res = $dbh->do( $self->{_schema_patch}->{$module}->{$id}->{query} ) ) or return $on_finish->();
 
-        # register patch
-        ( $res = $dbh->do( qq[INSERT INTO "$SCHEMA_PATCH_TABLE_NAME" ("id") VALUES (\$1)], [$id] ) ) || return $on_finish->();
+            # register patch
+            ( $res = $dbh->do( qq[INSERT INTO "$SCHEMA_PATCH_TABLE_NAME" ("module", "id") VALUES (\$1, \$2)], [ $module, $id ] ) ) or return $on_finish->();
+        }
     }
 
     return $on_finish->();
@@ -137,12 +159,16 @@ sub prepare_query ( $self, $query ) {
     return join( $SPACE, @sql ), @bind ? \@bind : undef;
 }
 
-sub query_to_string ( $self, $query ) {
-    my ( $sql, $bind ) = $self->prepare_query($query);
+sub query_to_string ( $self, $query, $bind = undef ) {
+    if ( is_plain_arrayref $query) {
+        ( $query, my $bind1 ) = $self->prepare_query($query);
 
-    $sql =~ s/\$(\d+)/$self->quote($bind->[$1 - 1])/smge;
+        $bind //= $bind1;
+    }
 
-    return $sql;
+    $query =~ s/\$(\d+)/$self->quote($bind->[$1 - 1])/smge;
+
+    return $query;
 }
 
 sub prepare ( $self, $query ) {

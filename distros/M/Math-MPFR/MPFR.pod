@@ -1703,7 +1703,29 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     NOTE: ORIGINALLY TOOK 2 ARGUMENTS - NOW TAKES ONLY 1, as of
           Math-MPFR-4.07.
 
-   $str = nvtoa($nv);
+   $str = doubletoa($nv [, $x]); # Available only when
+                                 # $Config{nvsize} == 8.
+                                 # Else use nvtoa().
+    Sets $str to the value of the double $nv.
+    $str will appear in standard decimal format such that the
+    condition ($str == $nv) is true.
+    The grisu3 algorithm used by this function, whilst very quick,
+    will fail for about 0.5% of values. When this happens doubletoa
+    will (by default) fall back to using nvtoa() - which is slower,
+    but reliable.
+    Alternatively, providing a second argument to doubletoa (any
+    scalar will do) will ensure that sprintf("%.16e", $nv) is
+    returned. This will be an accurate return, and it will be
+    quicker than the nvtoa() fallback, but it often provides more
+    digits than are necessary.
+    Whenever doubletoa reverts to a fallback routine,
+    $Math::MPFR::doubletoa_fallback (which is initially set to 0)
+    will be incremented. This feature can be disabled by providing
+    the FB=0 argument to the 'perl Makefile.PL' step of the
+    Math::MPFR build.
+
+   $str = nvtoa($nv); # Available irrespective of $Config{nvsize}
+                      # and $Config{nvtype}
     Sets $str to the value of $nv.
     $str will appear in standard decimal format, containing the
     *minimum* number of digits such that the condition ($str == $nv)
@@ -1718,14 +1740,15 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
             When it matters, assign with atonv() - which requires
             mpfr-3.1.6.
     NOTE 2: Be wary of values assigned by perl to double-double NVs.
-            Such assignments may be incorrect by up to a few ULPS,
+            Such assignments may be incorrect by up to a few ULPs,
             irrespective of the perl version.
             When it matters, assign with atonv() - which requires
             mpfr-3.1.6.
-            With these NVs, nvtoa() currently requires mpfr-4.0.0.
+            With double-double NVs, nvtoa() currently requires
+            mpfr-4.0.0.
 
    $MPFR_version = Rmpfr_get_version();
-    Returns the version of the MPFR library (eg 2.1.0) being used by
+    Returns the version of the MPFR library (eg 4.0.2) being used by
     Math::MPFR.
 
    $GMP_version = Math::MPFR::gmp_v();

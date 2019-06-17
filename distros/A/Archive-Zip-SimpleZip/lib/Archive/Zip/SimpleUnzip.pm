@@ -19,7 +19,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleUnzipError);
 
-$VERSION = '0.01';
+$VERSION = '0.024';
 $SimpleUnzipError = '';
 
 @ISA    = qw(IO::Uncompress::Unzip Exporter);
@@ -28,14 +28,33 @@ $SimpleUnzipError = '';
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
+our %PARAMS = (
+                'filesonly' => [IO::Compress::Base::Common::Parse_boolean, 0],
+              );
+
+sub _ckParams
+{
+    my $got = IO::Compress::Base::Parameters::new();
+
+    $got->parse(\%PARAMS, @_)
+        or _myDie("Parameter Error: " . $got->getError())  ;
+
+    return $got;
+}
 
 sub _setError
-{  
+{
     $SimpleUnzipError = $_[2] ;
     $_[0]->{Error} = $_[2]
         if defined  $_[0] ;
-    
+
     return $_[1];
+}
+
+sub _myDie
+{
+    $SimpleUnzipError = $_[0];
+    Carp::croak $_[0];
 }
 
 sub _illegalFilename
@@ -47,17 +66,17 @@ sub is64BitPerl
 {
     use Config;
     # possibly use presence of pack/unpack "Q" for int size test?
-    $Config{lseeksize} >= 8 and $Config{uvsize} >= 8; 
+    $Config{lseeksize} >= 8 and $Config{uvsize} >= 8;
 }
 
 sub new
 {
     my $class = shift ;
-    
-    return _setError(undef, undef, "Missing Filename") 
+
+    return _setError(undef, undef, "Missing Filename")
         unless @_ ;
 
-    my $inValue = shift ;  
+    my $inValue = shift ;
     my $fh;
 
     if (!defined $inValue)
@@ -67,16 +86,16 @@ sub new
 
     my $isSTDOUT = ($inValue eq '-') ;
     my $inType = IO::Compress::Base::Common::whatIsOutput($inValue);
-    
+
     if ($inType eq 'filename')
     {
         if (-e $inValue && ( ! -f _ || ! -r _))
         {
             return _illegalFilename
         }
-        
-        $fh = new IO::File "<$inValue"    
-            or return _setError(undef, undef, "cannot open file '$inValue': $!");         
+
+        $fh = new IO::File "<$inValue"
+            or return _setError(undef, undef, "cannot open file '$inValue': $!");
     }
     elsif( $inType eq 'buffer' || $inType eq 'handle')
     {
@@ -84,24 +103,28 @@ sub new
     }
     else
     {
-        return _illegalFilename        
+        return _illegalFilename
     }
 
     my %obj ;
+
+    my $got = _ckParams(@_);
+    my $filesOnly = $got->getValue('filesonly');
+
     my $inner = IO::Compress::Base::Common::createSelfTiedObject($class, \$SimpleUnzipError);
-   
+
     *$inner->{Pause} = 1;
-    $inner->_create(undef, 0, $fh, @_)
+    $inner->_create(undef, 0, $fh)
         or return undef;
-    
-    my ($CD, $Members, $comment) = $inner->scanCentralDirectory();
+
+    my ($CD, $Members, $comment) = $inner->scanCentralDirectory($filesOnly);
     $obj{CD} = $CD;
     $obj{Members} = $Members ;
     $obj{Comment} = $comment;
     $obj{Cursor} = 0;
     $obj{Inner} = $inner;
-    $obj{Open} = 1 ; 
-       
+    $obj{Open} = 1 ;
+
     bless \%obj, $class;
 }
 
@@ -122,8 +145,8 @@ sub _readLocalHeader
 {
     my $self = shift;
     my $member = shift;
-    
-    my $inner = $self->{Inner};   
+
+    my $inner = $self->{Inner};
     my $status = $inner->smartSeek($member->{LocalHeaderOffset}, 0, SEEK_SET);
 
     #*$inner->{InputLength} = undef;
@@ -142,7 +165,7 @@ sub _readLocalHeader
 #    *$inner->{UnCompSize}->reset();
 #    *$inner->{CompSize}->reset();
     *$inner->{Info}{TrailerLength} = 0;
-        
+
     # disable streaming if present & set sizes from central dir
     # TODO - this will only allow a single file to be read at a time.
     #        police it or fix it.
@@ -157,7 +180,7 @@ sub _readLocalHeader
 sub comment
 {
     my $self = shift;
-    
+
     return $self->{Comment} ;
 }
 
@@ -167,13 +190,13 @@ sub _mkMember
     my $member = shift;
 
     $self->_readLocalHeader($member);
-    
-    my %member ; 
+
+    my %member ;
     $member{Inner}  = $self->{Inner};
-    $member{Member} = $member;
+    $member{Info} = $member;
     #Scalar::Util::weaken $member{Inner}; # for 5.8
- 
-      
+
+
     return bless \%member, 'Archive::Zip::SimpleUnzip::Member';
 }
 
@@ -181,13 +204,13 @@ sub member
 {
     my $self = shift;
     my $name = shift;
-    
-    return _setError(undef, undef, "Member '$name' not in zip") 
+
+    return _setError(undef, undef, "Member '$name' not in zip")
         if ! defined $name ;
-            
+
     my $member = $self->{Members}{$name};
 
-    return _setError(undef, undef, "Member '$name' not in zip") 
+    return _setError(undef, undef, "Member '$name' not in zip")
         if ! defined $member ;
 
     return $self->_mkMember($member) ;
@@ -197,31 +220,54 @@ sub open
 {
     my $self = shift;
     my $name = shift;
-    
+
     my $member = $self->{Members}{$name};
-    
+
     # TODO - get to return unef
     die "Member '$name' not in zip file\n"
         if ! defined $member ;
- 
+
      $self->_readLocalHeader($member);
-    
+
 #    return $self->{Inner};
     my $z = IO::Compress::Base::Common::createSelfTiedObject("Archive::Zip::SimpleUnzip::Handle", \$SimpleUnzipError) ;
-     
+
     *$z->{Open} = 1 ;
     *$z->{SZ} = $self->{Inner};
     Scalar::Util::weaken *$z->{SZ}; # for 5.8
 
-    $z;    
+    $z;
 }
 
-sub extract # to file/buffer
+sub extract # to file - return actual path or pass/fail?
 {
     my $self = shift;
     my $name = shift;
-    my $out = shift;
-    
+    my $out  = shift;
+
+    my $member = $self->member($name)
+        or return undef ;
+
+    return $member->extract($out // $name);
+}
+
+sub getCanonicalPath
+{
+    my $self = shift;
+    my $name = shift;
+
+    return _canonicalPath($name);
+}
+
+
+
+sub _isDirectory
+{
+    my $self = shift;
+    my $name = shift ;
+
+    return substr($name, -1, 1) eq '/' &&
+        $self->{Info}{UncompressedLength} == 0  ;
 }
 
 sub content
@@ -232,7 +278,7 @@ sub content
     return undef
         if ! exists $self->{Members}{$name};
 
-    $self->{Inner}->read(my $data, $self->{Member}{UncompressedLength});
+    $self->{Inner}->read(my $data, $self->{Info}{UncompressedLength});
 
     return $data;
 }
@@ -241,7 +287,7 @@ sub exists
 {
     my $self = shift;
     my $name = shift;
-    
+
    return exists $self->{Members}{$name};
 }
 
@@ -254,15 +300,15 @@ sub names
 sub next
 {
     my $self = shift;
-    return undef if $self->{Cursor} >= @{ $self->{CD} } ;   
+    return undef if $self->{Cursor} >= @{ $self->{CD} } ;
     return $self->_mkMember($self->{CD}[ $self->{Cursor} ++]) ;
 }
 
 # sub rewind
 # {
-#     my $self = shift;    
+#     my $self = shift;
 
-#     $self->{Cursor} = 0;    
+#     $self->{Cursor} = 0;
 # }
 
 # sub unzip
@@ -273,13 +319,7 @@ sub next
 
 sub getExtraParams
 {
-   
-    return (
-            # Zip header fields
-            'name'    => [IO::Compress::Base::Common::Parse_any,       undef],
-
-#            'stream'  => [IO::Compress::Base::Common::Parse_boolean,   1],
-        );    
+    return ();
 }
 
 sub ckParams
@@ -290,8 +330,6 @@ sub ckParams
     # unzip always needs crc32
     $got->setValue('crc32' => 1);
 
-    *$self->{UnzipData}{Name} = $got->getValue('name');
-
     return 1;
 }
 
@@ -299,7 +337,7 @@ sub mkUncomp
 {
     my $self = shift ;
     my $got = shift ;
-    
+
     my $magic = $self->ckMagic()
         or return 0;
 
@@ -314,12 +352,37 @@ sub chkTrailer
 }
 
 
+sub seekOrDie
+{
+    # temp method to die if bad seek
+    # TODO - revisist
+    my $self   = shift ;
+    my $offset = shift ;
+    my $truncate = shift;
+    my $position = shift || SEEK_SET;
+    my $message = shift || "Error Seeking in CentralDirectory" ;
+
+    my $got =  $self->smartSeek($offset, $truncate, $position);
+
+    return $got ;
+}
+
+sub readOrDie
+{
+    # temp method to die if bad read
+    # TODO - revisist
+    my $self = shift;
+
+    $self->smartReadExact(@_)
+        or die "Error reading";
+}
+
 sub scanCentralDirectory
 {
 #    print "scanCentralDirectory\n";
-    
-    my $self = shift;
 
+    my $self = shift;
+    my $filesOnly = shift ; # *$self->{FilesOnly};
     my $here = $self->smartTell();
 
     # Use cases
@@ -333,15 +396,15 @@ sub scanCentralDirectory
     return ()
         if ! defined $offset;
 
-    return ([], {}, $zipcomment)    
+    return ([], {}, $zipcomment)
         if $entries == 0;
 
-    $self->smartSeek($offset, 0, SEEK_SET) ;
+    $self->seekOrDie($offset, 0, SEEK_SET) ;
 
     # Now walk the Central Directory Records
     my $index = 0;
     my $buffer ;
-    while ($self->smartReadExact(\$buffer, 46) && 
+    while ($self->smartReadExact(\$buffer, 46) &&
            unpack("V", $buffer) == ZIP_CENTRAL_HDR_SIG) {
 
         my $crc32              = unpack("V", substr($buffer, 16, 4));
@@ -361,7 +424,7 @@ sub scanCentralDirectory
                 or return $self->TruncatedTrailer("filename");
 #            print "Filename [$filename]\n";
         }
-    
+
         if ($extra_length)
         {
             $self->smartReadExact(\$extraField, $extra_length)
@@ -380,15 +443,18 @@ sub scanCentralDirectory
                 {
                     $compressedLength = U64::Value_VV64  substr($zip64Extended, 0, 8, "");
                     # $compressedLength = unpack "Q<", substr($zip64Extended, 0, 8, "");
-                } 
+                }
                 if ($locHeaderOffset == 0xFFFFFFFF)
                 {
                     $locHeaderOffset = U64::Value_VV64  substr($zip64Extended, 0, 8, "");
                     # $locHeaderOffset = unpack "Q<", substr($zip64Extended, 0, 8, "");
-                }                         
-            }                     
+                }
+            }
         }
-    
+
+        next
+            if $filesOnly && substr($filename, -1, 1) eq '/' && $uncompressedLength == 0;
+
         if ($comment_length)
         {
             $self->smartReadExact(\$comment, $comment_length)
@@ -400,7 +466,7 @@ sub scanCentralDirectory
                     'Comment'            => $comment,
                     'LocalHeaderOffset'  => $locHeaderOffset,
                     'CompressedLength'   => $compressedLength ,
-                    'UncompressedLength' => $uncompressedLength ,                    
+                    'UncompressedLength' => $uncompressedLength ,
                     'CRC32'              => $crc32 ,
                     #'Time'               => _dosToUnixTime($lastModTime),
                     #'Stream'             => $streamingMode,
@@ -410,11 +476,11 @@ sub scanCentralDirectory
                     );
         push @CD, \%data;
         $Members{$filename} = \%data ;
-        
+
         ++ $index;
     }
 
-    $self->smartSeek($here, 0, SEEK_SET) ;
+    $self->seekOrDie($here, 0, SEEK_SET) ;
 
     return (\@CD, \%Members, $zipcomment) ;
 }
@@ -426,43 +492,41 @@ sub offsetFromZip64
     my $self = shift ;
     my $here = shift;
 
-    $self->smartSeek($here - 20, 0, SEEK_SET) 
-        or die "xx $!" ;
+    $self->seekOrDie($here - 20, 0, SEEK_SET) ;
 
     my $buffer;
     my $got = 0;
-    $self->smartReadExact(\$buffer, 20)  
-        or die "xxx $here $got $!" ;
+    $self->readOrDie(\$buffer, 20) ;
+        # or die "xxx $here $got $!" ;
 
     if ( unpack("V", $buffer) == ZIP64_END_CENTRAL_LOC_HDR_SIG ) {
         my $cd64 = U64::Value_VV64 substr($buffer,  8, 8);
         # my $cd64 = unpack "Q<", substr($buffer,  8, 8);
-       
-        $self->smartSeek($cd64, 0, SEEK_SET) ;
 
-        $self->smartReadExact(\$buffer, 4) 
-            or die "xxx" ;
+        $self->seekOrDie($cd64, 0, SEEK_SET) ;
+
+        $self->readOrDie(\$buffer, 4) ;
 
         if ( unpack("V", $buffer) == ZIP64_END_CENTRAL_REC_HDR_SIG ) {
 
-            $self->smartReadExact(\$buffer, 8)
-                or die "xxx" ;
+            $self->readOrDie(\$buffer, 8);
+                # or die "xxx" ;
             my $size  = U64::Value_VV64($buffer);
             # my $size  = unpack "Q<", $buffer;
 
-            $self->smartReadExact(\$buffer, $size)
-                or die "xxx" ;
+            $self->readOrDie(\$buffer, $size);
+                # or die "xxx" ;
 
             my $cd64 =  U64::Value_VV64 substr($buffer,  36, 8);
             # my $cd64 = unpack "Q<", substr($buffer,  36, 8);
 
             return $cd64 ;
         }
-        
-        die "zzz";
+
+        die "zzz1";
     }
 
-    die "zzz";
+    die "zzz2";
 }
 
 use constant Pack_ZIP_END_CENTRAL_HDR_SIG => pack("V", ZIP_END_CENTRAL_HDR_SIG);
@@ -475,23 +539,22 @@ sub findCentralDirectoryOffset
     # know exactly where the end of central directory record
     # should be.
 
-    $self->smartSeek(-22, 0, SEEK_END) ;
+    $self->seekOrDie(-22, 0, SEEK_END) ;
     my $here = $self->smartTell();
 
     my $buffer;
-    $self->smartReadExact(\$buffer, 22) 
-        or die "xxx" ;
+    $self->readOrDie(\$buffer, 22) ;
 
-    my $zip64 = 0;                             
+    my $zip64 = 0;
     my $centralDirOffset ;
     my $comment = '';
     my $entries = 0;
     if ( unpack("V", $buffer) == ZIP_END_CENTRAL_HDR_SIG ) {
         $entries          = unpack("v", substr($buffer, 8,  2));
-        $centralDirOffset = unpack("V", substr($buffer, 16,  4));        
+        $centralDirOffset = unpack("V", substr($buffer, 16,  4));
     }
     else {
-        $self->smartSeek(0, 0, SEEK_END) ;
+        $self->seekOrDie(0, 0, SEEK_END) ;
 
         my $fileLen = $self->smartTell();
         my $want = 0 ;
@@ -503,16 +566,14 @@ sub findCentralDirectoryOffset
                 $seekTo = 0;
                 $want = $fileLen ;
             }
-            
-            $self->smartSeek($seekTo, 0, SEEK_SET) 
-                or die "xxx $!" ;
+
+            $self->seekOrDie($seekTo, 0, SEEK_SET) ;
             my $got;
-            $self->smartReadExact(\$buffer, $want)
-                or die "xxx " ;
+            $self->readOrDie(\$buffer, $want) ;
             my $pos = rindex( $buffer, Pack_ZIP_END_CENTRAL_HDR_SIG);
 
             if ($pos >= 0) {
-                
+
                 #$here = $self->smartTell();
                 $here = $seekTo + $pos ;
                 $entries            = unpack("v", substr($buffer, $pos + 8,  2));
@@ -520,7 +581,7 @@ sub findCentralDirectoryOffset
                 my $comment_length  = unpack("v", substr($buffer, $pos + 20, 2));
                 $comment = substr($buffer, $pos + 22, $comment_length)
                     if $comment_length ;
-                
+
                 last ;
             }
 
@@ -532,7 +593,7 @@ sub findCentralDirectoryOffset
     $centralDirOffset = $self->offsetFromZip64($here)
         if $entries and U64::full32 $centralDirOffset ;
 
-#    print "findCentralDirectoryOffset $centralDirOffset [$comment]\n"; 
+#    print "findCentralDirectoryOffset $centralDirOffset [$comment]\n";
     return ($entries, $centralDirOffset, $comment) ;
 }
 
@@ -551,18 +612,37 @@ sub STORABLE_thaw
 
 {
     package Archive::Zip::SimpleUnzip::Member;
-    
+
+    use IO::File ;
+
     sub name
     {
         my $self = shift;
-#        $self->_stdPreq() or return 0 ; 
+#        $self->_stdPreq() or return 0 ;
 
-        #return $self->{Member}[0];        
-        return $self->{Member}{Name};
+        return $self->{Info}{Name};
     }
-       
+
+    sub isDirectory
+    {
+        my $self = shift;
+#        $self->_stdPreq() or return 0 ;
+
+        return substr($self->{Info}{Name}, -1, 1) eq '/' &&
+                $self->{Info}{UncompressedLength} == 0  ;
+    }
+
+    sub isFile
+    {
+        my $self = shift;
+#        $self->_stdPreq() or return 0 ;
+
+        # TODO - test for symlink
+        return ! $self->isDirectory() ;
+    }
+
 # TODO
-#       
+#
 #    isZip64
 #    isDir
 #    isSymLink
@@ -578,106 +658,188 @@ sub STORABLE_thaw
 #    isStored
 #    compressionName
 #
-#   extractToFile
-    
+
     sub compressedSize
     {
         my $self = shift;
-#        $self->_stdPreq() or return 0 ; 
+#        $self->_stdPreq() or return 0 ;
 
-        return $self->{Member}{CompressedLength};
+        return $self->{Info}{CompressedLength};
     }
 
     sub uncompressedSize
     {
         my $self = shift;
-#        $self->_stdPreq() or return 0 ; 
+#        $self->_stdPreq() or return 0 ;
 
-        return $self->{Member}{UncompressedLength};
+        return $self->{Info}{UncompressedLength};
     }
 
     sub content
     {
         my $self = shift;
         my $data ;
-        
-        # $self->{Inner}->read($data, $self->{UncompressedLength});
-        $self->{Inner}->read($data, $self->{Member}{UncompressedLength});
 
-        return $data;        
-    }   
-    
+        # $self->{Inner}->read($data, $self->{UncompressedLength});
+        $self->{Inner}->read($data, $self->{Info}{UncompressedLength});
+
+        return $data;
+    }
+
     sub open
     {
         my $self = shift;
-        
+
 #        return  return $self->{Inner} ;
-                
+
 #        my $handle = Symbol::gensym();
 #        tie *$handle, "Archive::Zip::SimpleUnzip::Handle", $self->{SZ}{UnZip};
 #        return $handle;
-        
+
         my $z = IO::Compress::Base::Common::createSelfTiedObject("Archive::Zip::SimpleUnzip::Handle", \$SimpleUnzipError) ;
-         
+
         *$z->{Open} = 1 ;
         *$z->{SZ} = $self->{Inner};
         Scalar::Util::weaken *$z->{SZ}; # for 5.8
-    
+
         $z;
     }
-    
+
     sub close
     {
         my $self = shift;
         return 1;
-    }  
-    
+    }
+
     sub comment
     {
         my $self = shift;
+
+        return $self->{Info}{Comment};
+    }
+
+    sub _canonicalPath
+    {
+        my $name = shift ;
+
+        # Not an absolute path
+        $name =~ s#^/+## ;
+
+        # Remove trailing slash
+        $name =~ s#/+$## ;
+
+        $name =~ s#/+#/#g ;
+
+        # Drop any ".." and "." paths
+        # Us of ".." is unsafe
+        my @paths = split '/', $name ;
+        my @have =  grep { ! m#^\.(\.)?$# } @paths ;
+
+        return @have ;
+
+        $name = join '/', grep { ! m#^\.(\.)?$# } @paths ;
+
+        # use Perl::OSType;
+        # my $type = Perl::OSType::os_type();
+        # if ( $type eq 'Unix' )
+        # {
+        # }
+        # # TODO Win32
+    }
+
+    sub canonicalName
+    {
+        my $self = shift;
+
+        return join '/', _canonicalPath($self->{Info}{Name});
+    }
+
+    sub extract # to file 
+    {
+        my $self = shift;
+        my $out  = shift;
+
+        my @path = _canonicalPath($out // $self->{Info}{Name}) ;
+        my $filename = join '/', @path ;
+        pop @path
+            if ! $self->isDirectory();
         
-        return $self->{Member}{Comment};
+        my @dir  ;
+
+        while (@path)
+        {
+            push @dir, shift @path;
+            my $dir = join '/', @dir;
+            mkdir $dir
+                or return _setError("Cannot create path '$dir': $!");
+        }
+
+        # TODO - symlink
+
+        if ($self->isFile())
+        {
+            my $handle = $self->open();
+            my $fh = new IO::File ">$filename"
+                or return _setError("Cannot open file '$filename': $!");
+            $fh->binmode();
+
+            my $data;
+            print $fh $data 
+                while $handle->read($data);
+            $handle->close();
+            $fh->close();
+        }
+
+        # TODO - set timestamps etc...
+
+        return 1 ;
+    } 
+
+    sub _setError
+    {
+        $Archive::Zip::SimpleUnzip::SimpleUnzipError = $_[0] ;
+        return 0;
     }       
 }
 
 
 {
     package Archive::Zip::SimpleUnzip::Handle ;
-          
+
     sub TIEHANDLE
     {
         return $_[0] if ref($_[0]);
         die "OOPS\n" ;
     }
-      
+
     sub UNTIE
     {
         my $self = shift ;
     }
-    
+
     sub DESTROY
     {
 #        print "DESTROY H";
         my $self = shift ;
         local ($., $@, $!, $^E, $?);
         $self->close() ;
-    
-        # TODO - memory leak with 5.8.0 - this isn't called until 
+
+        # TODO - memory leak with 5.8.0 - this isn't called until
         #        global destruction
         #
         %{ *$self } = () ;
         undef $self ;
     }
-           
-   
+
+
     sub close
     {
         my $self = shift ;
         return 1 if ! *$self->{Open};
-        
+
         *$self->{Open} = 0 ;
-        
-#        untie *$self 
+
+#        untie *$self
 #            if $] >= 5.008 ;
 
         if (defined *$self->{SZ})
@@ -688,84 +850,84 @@ sub STORABLE_thaw
 
         1;
     }
-    
+
     sub read
-    {       
+    {
         # TODO - remember to fix the return value to match real read & not the broken one in IO::Uncompress
         my $self = shift;
         $self->_stdPreq() or return 0 ;
-            
+
 #        warn "READ [$self]\n";
 #        warn "READ [*$self->{SZ}]\n";
-        
+
 #        $_[0] = *$self->{SZ}{Unzip};
-#        my $status = goto &IO::Uncompress::Base::read; 
+#        my $status = goto &IO::Uncompress::Base::read;
 #        $_[0] = \$_[0] unless ref $_[0];
         my $status = *$self->{SZ}->read(@_);
         $status = undef if $status < 0 ;
         return $status;
     }
-    
+
     sub readline
     {
         my $self = shift;
-        $self->_stdPreq() or return 0 ;  
-        *$self->{SZ}->getline(@_);      
+        $self->_stdPreq() or return 0 ;
+        *$self->{SZ}->getline(@_);
     }
-      
+
     sub tell
     {
         my $self = shift;
         $self->_stdPreq() or return 0 ;
-        
+
         *$self->{SZ}->tell(@_);
     }
-    
+
     sub eof
     {
         my $self = shift;
         $self->_stdPreq() or return 0 ;
-        
+
         *$self->{SZ}->eof;
     }
 
     sub _stdPreq
     {
         my $self = shift;
-        
+
         # TODO - fix me
         return 1;
-                                           
-        return _setError("Zip file closed") 
-            if ! defined defined *$self->{SZ} || ! *$self->{Inner}{Open} ; 
-            
-                            
-        return _setError("member filehandle closed") 
+
+        return _setError("Zip file closed")
+            if ! defined defined *$self->{SZ} || ! *$self->{Inner}{Open} ;
+
+
+        return _setError("member filehandle closed")
             if  ! *$self->{Open} ; #|| ! defined *$self->{SZ}{Raw};
-            
-        return 0 
-            if *$self->{SZ}{Error} ; 
-                          
-         return 1;    
+
+        return 0
+            if *$self->{SZ}{Error} ;
+
+         return 1;
     }
-    
+
     sub _setError
-    {  
+    {
         $Archive::Zip::SimpleUnzip::SimpleUnzipError = $_[0] ;
         return 0;
-    }        
-       
+    }
+
     sub binmode { 1 }
-    
+
 #    sub clearerr { $Archive::Zip::SimpleUnzip::SimpleUnzipError = '' }
 
     *BINMODE  = \&binmode;
-#    *SEEK     = \&seek; 
+#    *SEEK     = \&seek;
     *READ     = \&read;
     *sysread  = \&read;
     *TELL     = \&tell;
-    *READLINE = \&readline;    
-    *EOF      = \&eof;    
+    *READLINE = \&readline;
+    *EOF      = \&eof;
     *FILENO   = \&fileno;
     *CLOSE    = \&close;
 }
@@ -792,16 +954,21 @@ Archive::Zip::SimpleUnzip - Read Zip Archives
     # Get the names of all the members in a zip archive
     my @names = $z->names();
 
-    # test member existence
+    # Test member existence
     if ($z->exists("abc.txt"))
     {
      ...
     }
-    
-    # read the zip comment
+
+    # Extract member to filesystem
+    $z->extract("member") ;
+    $z->extract("member", "outfile") ;
+
+
+    # Read the zip comment
     my $comment = $zip->comment();
 
-    # open a member by name
+    # Select a member by name
     my $member = $z->member("abc.txt");
     my $name = $member->name();
     my $content = $member->content();
@@ -811,14 +978,17 @@ Archive::Zip::SimpleUnzip - Read Zip Archives
     while (my $member = $z->next)
     {
         print $member->name() . "\n" ;
+
+        $member->extract();
+        $member->extract("outfile");
     }
 
     # Archive::Zip::SimpleUnzip::Member
 
-    # open a filehandle to read from a zip member
+    # Open a filehandle to read from a zip member
     $fh = $member->open("mydata1.txt");
 
-    # read blocks of data
+    # Read blocks of data
     read($fh, $buffer, 1234) ;
 
     # or a line at a time
@@ -830,17 +1000,20 @@ Archive::Zip::SimpleUnzip - Read Zip Archives
 
 =head1 DESCRIPTION
 
-Archive::Zip::SimpleUnzip is a module that allows reading of Zip archives. 
-For writing Zip archives, there is a companion module, 
+Archive::Zip::SimpleUnzip is a module that allows reading of Zip archives.
+
+For writing Zip archives, there is a companion module,
 called L<Archive::Zip::SimpleZip>, that can create Zip archives.
 
-B<NOTE> This is alpha quality code, so the interface may change.
+B<NOTE> This is late alpha quality code, so the interface may change.
 
 =head2 Features
 
 =over 5
 
 =item * Read zip archive from a file, a filehandle or from an in-memory buffer.
+
+Note that the code assume that the zip archive is being read from a seekable file/filhandle/buffer.
 
 =item * Perl Filehandle interface for reading a zip member.
 
@@ -859,8 +1032,8 @@ B<NOTE> This is alpha quality code, so the interface may change.
 The constructor takes one mandatory parameter along with zero or more
 optional parameters.
 
-The mandatory parameter controls where the zip archive is read from.  
-This can be any one of the following
+The mandatory parameter controls where the zip archive is read from.
+This can be any one of the following:
 
 =over 5
 
@@ -887,7 +1060,17 @@ when calling the constructor.
 
 =head2 Options
 
-None yet.
+=over 5
+
+=item -FilesOnly => 1|0
+
+When true, ignore members in the zip archive that are directories.
+
+Enabling this option will change the behaviour of the C<names>, C<next> and C<exists> methods.
+
+Default is false.
+
+=back
 
 =head2 Methods
 
@@ -895,8 +1078,14 @@ None yet.
 
 =item $buffer = $z->content($member)
 
-Returns the payload data for $member. 
+Returns the uncompressed data stored in $member.
 Returns C<undef> if the member does not exist.
+
+=item $buffer = $z->extract($member [, $outfile])
+
+Uncompresses the data stored in $member and writes it to the filesystem.
+By default the filename used is the member name. 
+If the optional parameter $outfile is specified, the payload is written to that file instead.
 
 
 =item $string = $z->comment()
@@ -917,11 +1106,11 @@ In array context returns a list of the names of the members in the Zip archive.
 
 =item $z->next()
 
-Returns the next member from the zip archive as a 
+Returns the next member from the zip archive as a
 Archive::Zip::SimpleUnzip::Member object.
 See L</Archive::Zip::SimpleUnzip::Member>
 
-Standard usage is 
+Standard usage is
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
 
@@ -933,20 +1122,24 @@ Standard usage is
 
     while (my $member = $z->next())
     {
-        my $name = $member->name();       
+        my $name = $member->name();
         my $fh = $member->open();
         while (<$fh>)
         {
-            my $offset = 
+            my $offset =
             print "$name, line $.\n" if /$match/;
         }
     }
+
+=item $z->close()
+
+Closes the zip archive.
 
 =back
 
 =head1 Archive::Zip::SimpleUnzip::Member
 
-The C<next> method returns a member object of 
+The C<next> method from C<Archive::Zip::SimpleUnzip> returns a member object of
 type C<Archive::Zip::SimpleUnzip::Member>
 that has the following methods.
 
@@ -964,9 +1157,26 @@ Returns the member comment.
 
 Returns the uncompressed content.
 
+=item $buffer = $z->extract()
+=item $buffer = $z->extract($outfile])
+
+Uncompresses the data stored in the current member and writes to the filesystem.
+By default the filename used is the member name. 
+If the optional parameter $outfile is specified, the payload is written to that file instead.
+
 =item $fh = $m->open()
 
 Returns a filehandle that can be used to read the uncompressed content.
+
+=item $bool = $m->isDirectory()
+
+Returns true is the member is a directory.
+Otherwise returns false.
+
+=item $bool = $m->isFile()
+
+Returns true is the member is standard file.
+Otherwise returns false.
 
 =back
 
@@ -974,8 +1184,8 @@ Returns a filehandle that can be used to read the uncompressed content.
 
 =head2 Print the contents of a Zip member
 
-The code below shoes how this module is used to 
-read the contents of the member 
+The code below shows how this module is used to
+read the contents of the member
 "abc.txt" from the zip archive  "my1.zip".
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
@@ -1005,41 +1215,71 @@ read the contents of the member
     print "Zip file '$zipfile' has $members entries\n";
 
     while (my $member = $z->next())
-    {    
+    {
         print "$member->name()\n";
     }
 
 =head2 Filehandle interface
 
-Here is a simple grep, that walks through a zip file and 
-prints matching strings.
+Here is a simple grep, that walks through a zip file and
+prints matching strings present in the compressed payload.
+The C<FilesOnly> option has been included in the call to the
+constructor to automaticaly skip members that just contain directories.
 
     use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
 
     my $match = "hello";
     my $zipfile = "my.zip";
 
-    my $z = new Archive::Zip::SimpleUnzip $zipfile
+    my $z = new Archive::Zip::SimpleUnzip $zipfile, FilesOnly => 1
         or die "Cannot open zip file: $SimpleUnzipError\n" ;
 
     while (my $member = $z->next())
     {
-        my $name = $member->name();       
+        my $name = $member->name();
         my $fh = $member->open();
         while (<$fh>)
         {
-            my $offset = 
+            my $offset =
             print "$name, line $.\n" if /$match/;
         }
     }
 
+=head2 rezip
+
+Another example that uses the filehandle interface. This time the code uses C<Archive::Zip::SimpleUnzip>
+to get a filehandle for each member of a zip archive which it passes to  C<Archive::Zip::SimpleZip> to recompress.
+
+
+    use Archive::Zip::SimpleUnzip qw($SimpleUnzipError) ;
+    use Archive::Zip::SimpleZip qw($SimpleZipError Z_BEST_COMPRESSION) ;
+
+    my $input  = shift ;
+    my $output = shift ;
+
+    my $unzip = new Archive::Zip::SimpleUnzip $input
+                    or die "Cannot open '$input': $SimpleUnzipError";
+
+    my $zip = new Archive::Zip::SimpleZip $output, Level => Z_BEST_COMPRESSION
+            or die "Cannot create zip file '$output': $SimpleZipError";
+
+    while (my $member = $unzip->next())
+    {
+        my $name = $member->name();
+        warn "Processing member $name\n"  ;
+
+        my $fh = $member->open();
+
+        $zip->addFileHandle($fh, Name => $name)
+                or die "Cannot addFileHandle file '$file': $SimpleZipError\n" ;
+    }
 
 
 =head1 Zip File Interoperability
 
-The intention is to be interoperable with zip archives created by other 
-programs, like pkzip or WinZip, but the majority of testing carried out 
-used the L<Info-Zip zip/unzip|http://www.info-zip.org/> programs 
+The intention is to be interoperable with zip archives created by other
+programs, like pkzip or WinZip, but the majority of testing carried out
+used the L<Info-Zip zip/unzip|http://www.info-zip.org/> programs
 running on Linux.
 
 This doesn't necessarily mean that there is no interoperability with other
@@ -1048,7 +1288,7 @@ them. Please report any issues you find.
 
 =head2 Compression Methods Supported
 
-The following compression methods are supported 
+The following compression methods are supported
 
 =over 5
 
@@ -1072,13 +1312,13 @@ Only if the C<IO-Compress-Lzma> module is available.
 
 =head2 Zip64 Support
 
-This modules supports Zip64, so it can read archves larger than 4Gig 
+This modules supports Zip64, so it can read archves larger than 4Gig
 and/or have greater than 64K members.
 
 
 =head2 Limitations
 
-The following features are no currently supported.
+The following features are not currently supported.
 
 =over 4
 
@@ -1098,7 +1338,7 @@ L<Archive::Zip::SimpleZip>, L<Archive::Zip>, L<IO::Compress::Zip>,  L<IO::Uncomp
 
 =head1 AUTHOR
 
-This module was written by Paul Marquess, F<pmqs@cpan.org>. 
+This module was written by Paul Marquess, F<pmqs@cpan.org>.
 
 =head1 MODIFICATION HISTORY
 
@@ -1106,7 +1346,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Paul Marquess. All rights reserved.
+Copyright (c) 2018-2019 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

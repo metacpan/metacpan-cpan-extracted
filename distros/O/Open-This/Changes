@@ -1,5 +1,9 @@
 Revision history for Open-This
 
+0.000019  2019-06-14 13:49:45Z
+    - Add support for Kate editor (GH#17) (Jos Joaqun Atria)
+    - Document supported editors
+
 0.000018  2019-06-10 17:02:19Z
     - Print usage when ot is called with no arguments (GH#16) (Jos Joaqun
       Atria)

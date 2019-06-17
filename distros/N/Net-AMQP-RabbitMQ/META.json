@@ -56,7 +56,7 @@
          "web" : "https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq"
       }
    },
-   "version" : "2.40003",
+   "version" : "2.40004",
    "x_contributors" : [
       "jesus - Theo Schlossnagle <jesus@omniti.com>",
       "markellis - Mark Ellis <markellis@cpan.org>",

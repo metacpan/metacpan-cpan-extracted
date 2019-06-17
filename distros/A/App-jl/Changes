@@ -1,5 +1,17 @@
 Revision history for Perl extension App::jl
 
+0.10    Sat Jun 15 22:52:15 JST 2019
+        - Support YAML for output
+        - improve doc
+        - refactor
+
+0.09    Sat Jun 15 00:47:35 JST 2019
+        - Convert unixtime if 'timestamp-key' is set without 'xxxx' option
+        - Add 'gmtime' option to treat unixtime for GMT
+        - Trim trailing chars
+        - Improve doc
+        - Tiny refactor
+
 0.08    Tue Jun 11 14:02:20 JST 2019
         - Add `xxxx` option
         - Sort invoking order

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -122,47 +122,53 @@ sub editor_args_from_parsed_text {
     my $parsed = shift;
     return unless $parsed;
 
+    my @args;
+
+    # kate --line 11 --column 2 filename
+    if ( $ENV{EDITOR} eq 'kate' ) {
+        push @args, '--line', $parsed->{line_number}
+            if $parsed->{line_number};
+
+        push @args, '--column', $parsed->{column_number}
+            if $parsed->{column_number};
+    }
+
     # See https://vi.stackexchange.com/questions/18499/can-i-open-a-file-at-an-arbitrary-line-and-column-via-the-command-line
     # nvim +'call cursor(11,2)' filename
     # vi   +'call cursor(11,2)' filename
     # vim  +'call cursor(11,2)' filename
-    if ( exists $parsed->{column_number} ) {
+    elsif ( exists $parsed->{column_number} ) {
         if (   $ENV{EDITOR} eq 'nvim'
             || $ENV{EDITOR} eq 'vi'
             || $ENV{EDITOR} eq 'vim' ) {
-            return (
-                sprintf(
-                    q{+call cursor(%i,%i)},
-                    $parsed->{line_number},
-                    $parsed->{column_number},
-                ),
-                $parsed->{file_name}
+            @args = sprintf(
+                q{+call cursor(%i,%i)},
+                $parsed->{line_number},
+                $parsed->{column_number},
             );
         }
 
         # nano +11,2 filename
         if ( $ENV{EDITOR} eq 'nano' ) {
-            return (
-                sprintf(
-                    q{+%i,%i},
-                    $parsed->{line_number},
-                    $parsed->{column_number},
-                ),
-                $parsed->{file_name}
+            @args = sprintf(
+                q{+%i,%i},
+                $parsed->{line_number},
+                $parsed->{column_number},
             );
         }
     }
 
-    # emacs +11 filename
-    # nano  +11 filename
-    # nvim  +11 filename
-    # pico  +11 filename
-    # vi    +11 filename
-    # vim   +11 filename
-    return (
-        ( $parsed->{line_number} ? '+' . $parsed->{line_number} : () ),
-        $parsed->{file_name}
-    );
+    else {
+        # emacs +11 filename
+        # nano  +11 filename
+        # nvim  +11 filename
+        # pico  +11 filename
+        # vi    +11 filename
+        # vim   +11 filename
+        push @args, '+' . $parsed->{line_number} if $parsed->{line_number};
+    }
+
+    return ( @args, $parsed->{file_name} );
 }
 
 sub _maybe_extract_line_number {
@@ -300,7 +306,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000018
+version 0.000019
 
 =head1 DESCRIPTION
 
@@ -340,6 +346,12 @@ https://github.com/oalders/open-this:
 
     ot -b Open::This line 50
     # https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L50
+
+=head1 SUPPORTED EDITORS
+
+This code has been well tested with C<vim>.  It should also work with C<nvim>,
+C<emacs>, C<pico>, C<nano> and C<kate>.  Patches for other editors are very
+welcome.
 
 =head1 FUNCTIONS
 

@@ -298,6 +298,19 @@ if($^O =~ /MSWin32/i && $] < 5.022) {
   $defines .= " -D_WIN32_BIZARRE_INFNAN";
 }
 
+if($Config{nvsize} == 8) {
+  my $fallback_notify = 1;
+  for(@ARGV) {
+    $fallback_notify = 0 if $_ eq "FB=0";
+  }
+
+  if($fallback_notify) {
+    $defines .= " -DFALLBACK_NOTIFY";
+    print "\ndoubletoa() fallback notification ENABLED (default)\n\n";
+  }
+  else { print "\ndoubletoa() fallback notification DISABLED\n\n" }
+}
+
 # NOTE: The '-lquadmath' link we provide below
 #       to 'LIBS' is generally not needed.
 #       It is, however, currently needed on at

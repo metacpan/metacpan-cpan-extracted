@@ -27,7 +27,7 @@ requires:
 resources:
   bugtracker: https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq/issues
   repository: git://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq.git
-version: '2.40003'
+version: '2.40004'
 x_contributors:
   - 'jesus - Theo Schlossnagle <jesus@omniti.com>'
   - 'markellis - Mark Ellis <markellis@cpan.org>'

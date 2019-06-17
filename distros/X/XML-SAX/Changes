@@ -1,5 +1,11 @@
 Revision history for Perl extension XML::SAX.
 
+1.02  14 Jun 2019  Grant McLean
+    - Spelling fixes (patch from Ville Skyttä)
+    - Add repo location to metadata (patches from Ville Skyttä & Martin McGrath)
+    - Reorganise module files under lib/XML
+    - Regenerate MANIFEST using 'make manifest' to include missing test files
+
 1.00  15 Feb 2018  Grant McLean
     - Add makefile dependency to fix order of build steps RT#62289 (patch from
       Ed J)

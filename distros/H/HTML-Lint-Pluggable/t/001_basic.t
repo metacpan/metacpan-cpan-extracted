@@ -22,6 +22,12 @@ my $passing_html5 = q{
 <input type="number" min="2" max="42">
 <iframe allowfullscreen></iframe>
 <button type="submit" formaction="/save">Save</button>
+<video controls>
+  <source src="myVideo.mp4" type="video/mp4">
+  <source src="myVideo.webm" type="video/webm">
+  <p>Your browser doesn't support HTML5 video. Here is
+     a <a href="myVideo.mp4">link to the video</a> instead.</p>
+</video>
 </body>
 </html>
 };

@@ -9,7 +9,7 @@ use CondTestMore tests => 2;
 use WWW::Form;
 
 {
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -24,13 +24,13 @@ use WWW::Form;
             type => "textarea",
         },
     );
-    
-    my %fields_values = 
+
+    my %fields_values =
     (
         'first_name' => "Josephine",
         'comments' => "</textarea><h1>You have been Exploited! (& more)</h1>",
     );
-    
+
     my $form = WWW::Form->new(
         \%fields_data,
         \%fields_values,
@@ -51,7 +51,7 @@ EOF
 }
 
 {
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -72,14 +72,14 @@ EOF
             type => "hidden",
         },
     );
-    
-    my %fields_values = 
+
+    my %fields_values =
     (
         'first_name' => "Josephine",
         'comments' => "</textarea><h1>You have been Exploited! (& more)</h1>",
         'myhide' => "JohnSmith",
     );
-    
+
     my $form = WWW::Form->new(
         \%fields_data,
         \%fields_values,

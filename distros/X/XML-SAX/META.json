@@ -39,6 +39,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.00",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/grantm/xml-sax"
+      }
+   },
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

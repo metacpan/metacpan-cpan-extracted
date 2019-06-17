@@ -2,7 +2,7 @@ package HTML::Lint::Pluggable;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use parent qw/ HTML::Lint /;
 
@@ -61,7 +61,7 @@ HTML::Lint::Pluggable - plugin system for HTML::Lint
 
 =head1 VERSION
 
-This document describes HTML::Lint::Pluggable version 0.08.
+This document describes HTML::Lint::Pluggable version 0.10.
 
 =head1 SYNOPSIS
 
@@ -163,6 +163,7 @@ to cpan-RT.
 =head1 SEE ALSO
 
 L<HTML::Lint>
+L<HTML::Tidy5>
 
 =head1 AUTHOR
 

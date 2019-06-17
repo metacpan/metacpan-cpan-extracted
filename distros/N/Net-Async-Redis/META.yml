@@ -24,22 +24,23 @@ meta-spec:
 name: Net-Async-Redis
 requires:
   Class::Method::Modifiers: '0'
-  Future: '0.37'
+  Future: '0.40'
+  Future::AsyncAwait: '0.27'
   IO::Async: '0'
   List::Util: '1.29'
   Log::Any: '1.050'
   Math::Random::Secure: '0'
+  OpenTracing: '0.003'
   Ryu::Async: '0.006'
   Syntax::Keyword::Try: '0.08'
   URI: '0'
   URI::redis: '0'
   curry: '0'
-  namespace::clean: '0'
   parent: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: http://search.cpan.org/perldoc?Net-Async-Redis
   repository: git://github.com/team-at-cpan/Net-Async-Redis.git
-version: '1.014'
+version: '2.000'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

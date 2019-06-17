@@ -11,51 +11,51 @@ sub EXT_swipe_tab : Extend('Ext.plugin.Abstract') : Type('plugin') {
         },
 
         init => func ['cmp'], <<'JS',
-                this.updateCmp(cmp);
+            this.updateCmp(cmp);
 JS
 
         updateCmp => func [ 'newCmp', 'oldCmp' ], <<'JS',
-                if (newCmp) {
-                    this.setCmp(newCmp);
+            if (newCmp) {
+                this.setCmp(newCmp);
 
-                    newCmp.element.on('swipe', this.onSwipe, this);
-                }
+                newCmp.element.on('swipe', this.onSwipe, this);
+            }
 
-                if (oldCmp) {
-                    oldCmp.element.un('swipe', this.onSwipe);
-                }
+            if (oldCmp) {
+                oldCmp.element.un('swipe', this.onSwipe);
+            }
 JS
 
         onSwipe => func ['e'], <<'JS',
-                if (this.getAllowDirections().indexOf(e.direction) < 0) {
-                    return;
-                }
+            if (this.getAllowDirections().indexOf(e.direction) < 0) {
+                return;
+            }
 
-                var cmp           = this.getCmp(),
-                    allowOverflow = this.getAllowOverflow(),
-                    direction     = e.direction,
-                    activeItem    = cmp.getActiveItem(),
-                    innerItems    = cmp.getInnerItems(),
-                    numIdx        = innerItems.length - 1,
-                    idx           = Ext.Array.indexOf(innerItems, activeItem),
-                    newIdx        = idx + (direction === 'left' ? 1 : -1),
-                    newItem;
+            var cmp           = this.getCmp(),
+                allowOverflow = this.getAllowOverflow(),
+                direction     = e.direction,
+                activeItem    = cmp.getActiveItem(),
+                innerItems    = cmp.getInnerItems(),
+                numIdx        = innerItems.length - 1,
+                idx           = Ext.Array.indexOf(innerItems, activeItem),
+                newIdx        = idx + (direction === 'left' ? 1 : -1),
+                newItem;
 
-                if (newIdx < 0) {
-                    if (allowOverflow) {
-                        newItem = innerItems[numIdx];
-                    }
-                } else if (newIdx > numIdx) {
-                    if (allowOverflow) {
-                        newItem = innerItems[0];
-                    }
-                } else {
-                    newItem = innerItems[newIdx];
+            if (newIdx < 0) {
+                if (allowOverflow) {
+                    newItem = innerItems[numIdx];
                 }
+            } else if (newIdx > numIdx) {
+                if (allowOverflow) {
+                    newItem = innerItems[0];
+                }
+            } else {
+                newItem = innerItems[newIdx];
+            }
 
-                if (newItem) {
-                    cmp.setActiveItem(newItem);
-                }
+            if (newItem) {
+                cmp.setActiveItem(newItem);
+            }
 JS
     };
 }

@@ -10,6 +10,25 @@ sure you change the first line.
 
 =cut
 
+=head1 NAME
+
+OpenTracing::Tag - wrapper object for tags
+
+=head1 DESCRIPTION
+
+Most of the time, tags are represented as simple key/value entries in a hashref.
+
+Some tags have specific semantic meaning, so this class acts as a base for supporting
+future operations on specific tags.
+
+=head2 key
+
+The tag key, a plain string.
+
+=head2 value
+
+The tag value, as a plain string.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -19,4 +38,12 @@ sure you change the first line.
 L<new|OpenTracing::Common/new>
 
 =back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
 

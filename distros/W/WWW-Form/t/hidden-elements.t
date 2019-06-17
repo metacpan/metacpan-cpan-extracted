@@ -43,7 +43,7 @@ use WWW::Form;
         \%fields_values,
         [ qw(id first_name comment) ],
     );
- 
+
     # TEST
     is ($form->getFieldHTMLRow('id'), <<"EOF", "Expecting a display:none default row HTML");
 <tr style="display:none">

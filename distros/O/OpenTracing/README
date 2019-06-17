@@ -10,6 +10,20 @@ DESCRIPTION
     or more OpenTracing::Span instances to it. Those instances can have
     zero or more OpenTracing::Log entries.
 
+    See the following classes for more information:
+
+      * OpenTracing::Tag
+
+      * OpenTracing::Log
+
+      * OpenTracing::Span
+
+      * OpenTracing::SpanProxy
+
+      * OpenTracing::Process
+
+      * OpenTracing::Batch
+
 SEE ALSO
 
  Tools and specifications

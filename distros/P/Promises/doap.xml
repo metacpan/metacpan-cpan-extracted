@@ -46,6 +46,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Erik Huelsmann</foaf:name>
+      <foaf:mbox rdf:resource="mailto:ehuels@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Florian Ragwitz</foaf:name>
       <foaf:mbox rdf:resource="mailto:rafl@debian.org" />
     </foaf:Person>
@@ -236,6 +242,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.99</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-29</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.00</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-05-15</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

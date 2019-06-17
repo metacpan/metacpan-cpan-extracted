@@ -64,87 +64,87 @@
    "provides" : {
       "App::Spec" : {
          "file" : "lib/App/Spec.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Argument" : {
          "file" : "lib/App/Spec/Argument.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Completion" : {
          "file" : "lib/App/Spec/Completion.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Completion::Bash" : {
          "file" : "lib/App/Spec/Completion/Bash.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Completion::Zsh" : {
          "file" : "lib/App/Spec/Completion/Zsh.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Option" : {
          "file" : "lib/App/Spec/Option.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Parameter" : {
          "file" : "lib/App/Spec/Parameter.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Plugin::Format" : {
          "file" : "lib/App/Spec/Plugin/Format.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Plugin::Help" : {
          "file" : "lib/App/Spec/Plugin/Help.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Plugin::Meta" : {
          "file" : "lib/App/Spec/Plugin/Meta.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Pod" : {
          "file" : "lib/App/Spec/Pod.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Role::Command" : {
          "file" : "lib/App/Spec/Role/Command.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Role::Plugin" : {
          "file" : "lib/App/Spec/Role/Plugin.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Role::Plugin::GlobalOptions" : {
          "file" : "lib/App/Spec/Role/Plugin/GlobalOptions.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Role::Plugin::Subcommand" : {
          "file" : "lib/App/Spec/Role/Plugin/Subcommand.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Run" : {
          "file" : "lib/App/Spec/Run.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Run::Cmd" : {
          "file" : "lib/App/Spec/Run/Cmd.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Run::Output" : {
          "file" : "lib/App/Spec/Run/Output.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Run::Response" : {
          "file" : "lib/App/Spec/Run/Response.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Run::Validator" : {
          "file" : "lib/App/Spec/Run/Validator.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "App::Spec::Subcommand" : {
          "file" : "lib/App/Spec/Subcommand.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -158,7 +158,7 @@
          "web" : "https://github.com/perlpunk/App-Spec-p5"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

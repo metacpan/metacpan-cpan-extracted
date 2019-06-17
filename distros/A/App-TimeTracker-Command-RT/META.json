@@ -1,0 +1,60 @@
+{
+   "abstract" : "App::TimeTracker RT plugin",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-TimeTracker-Command-RT",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::TimeTracker::Utils" : "0",
+            "Moose::Role" : "0",
+            "RT::Client::REST" : "0",
+            "RT::Client::REST::Ticket" : "0",
+            "Try::Tiny" : "0",
+            "Unicode::Normalize" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://timetracker.plix.at",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/App-TimeTracker-RT.git",
+         "web" : "https://github.com/domm/App-TimeTracker-RT"
+      }
+   },
+   "version" : "3.000",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

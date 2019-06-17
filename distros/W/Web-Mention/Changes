@@ -1,5 +1,15 @@
 Revision history for Web::Mention
 
+0.702 2019-06-13T21:13:55Z
+
+    - Adding a 'title' read-only attribute.
+
+    - Fixing a bug that accidentally deleted structure from the
+    source MF2 document representation in certain circumstances.
+
+    - Fixing a bug where reverifying an already-verified webmention
+    would not update its type.
+
 0.701 2019-06-12T03:28:04Z
 
     - Improved handling for replies that encode their referent URLs as

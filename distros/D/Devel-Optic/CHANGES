@@ -1,9 +1,242 @@
 ==================================================
-Changes from 2018-04-12 00:00:00 +0000 to present.
+Changes from 2018-06-16 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.005 at 2019-04-12 21:26:24 +0000
+version 0.010 at 2019-06-16 19:05:55 +0000
+------------------------------------------
+
+  Change: 013fd433ce6a9f154e1e6945bdc9bbd033ff48fb
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-16 21:00:02 +0000
+
+    tests: add tests for nested resolution 
+
+  Change: 21e6bf3d41ae229f72347f2504a715a769fa0d7b
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-16 18:56:31 +0000
+
+    cpants: META provides 
+
+  Change: 80d4c9febfc32a2c90135c766c6928a5107b9215
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-16 18:53:34 +0000
+
+    cpants: strict/warnings 
+
+  Change: 03d1de2e49d1e7abf926eb0e34546f72f198e904
+  Author: Mohammad S Anwar <Mohammad.Anwar@yahoo.com>
+  Date : 2019-06-16 18:52:59 +0000
+
+    Auto generate META.json using plugin [MetaJSON]. (#3) 
+
+------------------------------------------
+version 0.009 at 2019-06-15 21:31:00 +0000
+------------------------------------------
+
+  Change: 4df57a7e1649d21508f6c681f8d4d15ca4b0e844
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-15 23:31:00 +0000
+
+    @CARP_NOT tweak
+
+    So callers of Devel::Optic get errors thrown on the line where the
+    probe is defined, not inside of Devel::Optic. 
+
+------------------------------------------
+version 0.008 at 2019-06-15 21:09:58 +0000
+------------------------------------------
+
+  Change: e7da290494874cb012983eb691088c12e0a05050
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-15 23:09:58 +0000
+
+    fit_to_view: support coderefs
+
+    This commit introduces a dependency on Sub::Info in order to provide
+    some details on coderefs: name, package, file, and lines. 
+
+  Change: 0aa1eb9d5b3225cb6f039d8cf120bfc9bf23f896
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-15 23:01:16 +0000
+
+    fit_to_view: support regexps/scalarrefs
+
+    Also clean up truncation messages. 
+
+  Change: 00b2f2a5089b71f352e08fb46124fc5b61948c26
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-15 22:25:01 +0000
+
+    fit_to_view: fix sample count > data structure size
+
+    Summaries of hashes were not respecting the number of keys in the
+    hash, so if you had a sample key count of 10, and a hash like { a =>
+    1 }, Devel::Optic was going to misbehave.
+
+    Rename ref_key_sample_count -> sample_count along the way. 
+
+------------------------------------------
+version 0.007 at 2019-06-15 17:08:14 +0000
+------------------------------------------
+
+  Change: fb3c9d54da759058c92e64efe5be84fff87735fd
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-15 19:08:14 +0000
+
+    Syntax change to accommodate Perl < 5.18
+
+    Thank you, CPAN testers! 
+
+------------------------------------------
+version 0.006 at 2019-06-15 13:02:06 +0000
+------------------------------------------
+
+  Change: 7816a4894a020596e52157c05c39db0b94cdf2bf
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-15 15:02:06 +0000
+
+    tests: escape braces in regex 
+
+  Change: 021031425483141c5540ab1e8c252aef709b1dbc
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-15 14:56:10 +0000
+
+    README: stray word 
+
+  Change: 099ccc4e920bd912cd4817c892816330a7743268
+  Author: Ben Tyler <benjamin.tyler@gmail.com>
+  Date : 2019-06-15 14:52:18 +0000
+
+    Perlish parser (#2)
+
+    * Prototype: Perl-ish syntax for accessing vars in scope
+
+    This is potentially a really terrible idea, but it was fun to work on
+    the parser. Basically: JSON::Pointer syntax is probably a little too
+    simple -- Sawyer had good feedback on not just guessing whether
+    something is a hash or array access. So he wrote a nice, compact
+    lexer and parser to support quoted strings and spit out tokens with
+    types.
+
+    This commit takes that general idea, and goes a little nuts: the
+    parser now produces an AST describing a Perl-like syntax for
+    dereferencing and accessing Perl data structures. It supports simple
+    cases, like '$my_cool_hashref', but also fancy ones, like
+    '$my_cool_hashref->{$some_arrayref->[-1]->{nested_hashkey}->{$some_sc
+    alar}}';
+
+    It does not use Perl 'eval'; indeed, it violates normal Perl syntax
+    rules in several ways. For example, indexing into a data structure
+    _always_ uses '->', even if it isn't a ref, e.g.
+    '%my_cool_hash->{foo}'. As a result, this might be uncanny valley
+    territory.
+
+    TODO: tests, the interpreter, reviewing whether this is remotely a
+    reasonable thing to do.
+
+    * parser: export 'lex', 'parse', and ':constants'
+
+    ':constants' will be used for testing, as well as interpreting the op
+    tree
+
+    * parser: these syntax names are never used
+
+    * lexer: die on empty or obviously bogus spec
+
+    Everything will always need to start with a Perl symbol name.
+
+    * parser: split hash/array parsing into subs
+
+    I think this makes it a bit easier to follow the flow.
+
+    * parser: be stricter about symbol names
+
+    Catch some obvious typos that will never be valid symbol names (like
+    '$fo o').
+
+    * parser: better error messages for Perl syntax
+
+    This is probably a signal that this langauge should conform more
+    closely to real Perl syntax, but I'm not ready to invest in doing
+    that just yet.
+
+    * lexer/parser: require strings to be quoted
+
+    This allows the parser to be more informative about bad input.
+    Legitmate use of single quotes in hash key literals can be managed
+    via backslash escapes.
+
+    * parser: flesh out test cases
+
+    Along the way the lexer was changed to return a list instead of an
+    arrayref. This has better symmetry with the input format for 'parse',
+    which is a list of tokens.
+
+    * parser: tests for invalid parses
+
+    * parser: make it an object
+
+    This makes it easier to introduce a 'parser' argument to Devel::Optic
+    which is any object which ->can("parse").
+
+    * parser: cosmetic reorganization
+
+    * interpreter: naive recursive interpreter
+
+    This commit introduces a basic recursive interpreter for the AST spat
+    out by the parser. With this, the basic functionality of Devel::Optic
+    is back in place, now with a much higher power language for data
+    access.
+
+    Ideally I'd like to change this and the parser to be non-recursive to
+    reduce the number of sub calls -- the interpeter code, at least,
+    might be running inside very hot parts of a system -- but I couldn't
+    quite picture how to do this with explicit stacks, and I wanted to
+    get something functioning to start with. Make it work, make it right,
+    make it fast, yada yada yada.
+
+    TODO: adapt tests, adapt main functions to use this, more human
+    readable error messages, performance measurements and optimizations.
+
+    The error messages are going to be quite a challenge -- the simple
+    (and non-nested) JSON::Pointer syntax made it easy to tell users
+    exactly where we were when things went pear shaped, so we could give
+    very useful feedback to guide iteration. That's a bit trickier with
+    recursive tree traversal.
+
+    * tests: move 'parser' earlier than 'full_picture'
+
+    full_picture uses the parser in order to work, so it should come
+    later in the sequence.
+
+    * sweeping code reorganization
+
+    stuff interpreter/parser inside a 'lens' (maybe the name wasn't so
+    bad?), which is self-contained as to what language it expects and how
+    it gets data out of Perl
+
+    update docs to reflect new syntax
+
+    some tests are commented out because introducing a full-blown mini
+    language for apertures has a lot of benefits, but simplicity of
+    contextful error reporting is not among them.
+
+    * die -> croak
+
+    many errors are caller errors
+
+    * 'aperture' -> 'query'
+
+    KISS terminology
+
+    * high quality error reporting
+
+    This commit restores the errors reported by the Perlish lens to more
+    or less the level of quality I had in the first, naive query syntax. 
+
+------------------------------------------
+version 0.005 at 2019-04-12 21:25:35 +0000
 ------------------------------------------
 
   Change: 15cb5cfbbb180d8371adb7f59f0eec9bb99ebc9c

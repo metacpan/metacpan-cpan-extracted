@@ -3,7 +3,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use Carp qw/croak/;
 
@@ -36,7 +36,7 @@ HTML::Lint::Pluggable::WhiteList - to ignore certain errors that have been speci
 
 =head1 VERSION
 
-This document describes HTML::Lint::Pluggable::WhiteList version 0.08.
+This document describes HTML::Lint::Pluggable::WhiteList version 0.10.
 
 =head1 SYNOPSIS
 

@@ -24,8 +24,8 @@ SKIP: {
     };
     $trap->did_return(" ... returned");
     $trap->quiet(" ... quietly");
-    is( $result->{object}->{name},
-        'opsview', "Pulled opview host configuration" );
+    like( $result->{object}->{name},
+        qr/^\w+/, "Pulled opview host configuration" );
     note( "result from import: ", pp($result) );
 
     # create a new host

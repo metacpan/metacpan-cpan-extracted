@@ -19,7 +19,7 @@ require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleZipError);
 
 $SimpleZipError= '';
-$VERSION = "0.022";
+$VERSION = "0.024";
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( $SimpleZipError ) ;
@@ -337,6 +337,34 @@ sub add
         }
     }
     
+    my ($mode, $uid, $gid, $size, $atime, $mtime, $ctime) ;
+
+    if ( $got->parsed('storelinks') )
+    {
+        ($mode, $uid, $gid, $size, $atime, $mtime, $ctime) 
+                = (lstat($filename))[2, 4, 5, 7, 8, 9, 10] ;
+    }
+    else
+    {
+        ($mode, $uid, $gid, $size, $atime, $mtime, $ctime) 
+                = (stat($filename))[2, 4, 5,7, 8, 9, 10] ;
+    }
+
+    $got->setValue(time => $mtime);
+
+    if (! $got->getValue('minimal')) {
+
+        $got->setValue(extime => [$atime, $mtime, $ctime]) ;
+
+        use Perl::OSType;
+        my $type = Perl::OSType::os_type();
+        if ( $type eq 'Unix' ) 
+        {
+            $got->setValue(exunixn => [$uid, $gid]) ;
+        }
+        # TODO add Windows 
+    }
+
     $self->_newStream($filename, $got);
     
     if($isLink)
@@ -422,6 +450,23 @@ sub addFileHandle
     
     return 1;   
 }
+
+# sub createDirectory
+# {
+#     my $self = shift ;
+#     my $directory = shift;
+
+#     # TODO - file attributes
+
+#     $self->_stdPreq or return 0 ;
+
+#     my $got = _ckParams($options, 0, @_);
+#     $got->setValue(name => IO::Compress::Zip::canonicalName($filename, 1));
+
+#     $self->_newStream(undef, $got);
+        
+#     return 1;   
+# }
 
 sub openMember
 {
@@ -1510,8 +1555,8 @@ relative path.
 
     $z->close();
 
-If you I<do> want to include relative paths, pass the <$File::Find::name>
-variable to the C<Name> option, as shown below.
+If you I<do> want to include relative paths, pass the C<$File::Find::name>
+variable with the C<Name> option, as shown below.
 
     find( sub 
           { 
@@ -1708,7 +1753,7 @@ have to set the C<Stream> option when you call the constructor.
     $z->add("file1.txt");
     $z->close(); 
 
-See L</What is a Streamed Zip file> for a discussion on the C<Stream>
+See L</What is a Streamed Zip file?> for a discussion on the C<Stream>
 option.
 
 =head2 Can I write a Zip Archive directly to a socket?
@@ -1747,7 +1792,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2012-2018 Paul Marquess. All rights reserved.
+Copyright (c) 2012-2019 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

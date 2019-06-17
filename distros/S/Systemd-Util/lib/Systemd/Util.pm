@@ -1,7 +1,7 @@
 package Systemd::Util;
 
-our $DATE = '2019-05-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-17'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,18 +27,18 @@ Will return payload of 1 if systemd is running, 0 if not running, `undef` if
 cannot determine for sure. The result metadata `func.note` will give more
 details. The following heuristics are currently used:
 
-1. Check if /sbin/init exists, if it does not the return 0.
+1. Check if `/sbin/init` exists, if it does not the return 0.
 
-2. Check if /sbin/init is a symlink to something with /systemd/ in its name. If
-yes, then we return 1. We use <pm:Cwd>'s `realpath()` instead of `readlink()`
+2. Check if `/sbin/init` is a symlink to something with "systemd" in its name.
+If yes, then we return 1. We use <pm:Cwd>'s `realpath()` instead of `readlink()`
 here, to handle multiple redirection.
 
-3. Check if /lib/systemd/systemd exists. Return 0 otherwise.
+3. Check if `/lib/systemd/systemd` exists. Return 0 otherwise.
 
-4. Check if /sbin/init is a hardlink to /lib/systemd/systemd by comparing its
-inode. Return 1 if it is.
+4. Check if `/sbin/init` is a hardlink to `/lib/systemd/systemd` by comparing
+its inode. Return 1 if it is.
 
-3. Return undef otherwise, since we detect that /lib/systemd/systemd exists
+3. Return undef otherwise, since we detect that `/lib/systemd/systemd` exists
 (systemd is installed) but we cannot be sure if it is running or not.
 
 When used as a CLI, this routine will exit 0 if systemd is running, 1 if systemd
@@ -129,7 +129,7 @@ Systemd::Util - Some utility routines related to Systemd
 
 =head1 VERSION
 
-This document describes version 0.001 of Systemd::Util (from Perl distribution Systemd-Util), released on 2019-05-22.
+This document describes version 0.002 of Systemd::Util (from Perl distribution Systemd-Util), released on 2019-06-17.
 
 =head1 FUNCTIONS
 
@@ -148,18 +148,18 @@ details. The following heuristics are currently used:
 
 =over
 
-=item 1. Check if /sbin/init exists, if it does not the return 0.
+=item 1. Check if C</sbin/init> exists, if it does not the return 0.
 
-=item 2. Check if /sbin/init is a symlink to something with /systemd/ in its name. If
-yes, then we return 1. We use L<Cwd>'s C<realpath()> instead of C<readlink()>
+=item 2. Check if C</sbin/init> is a symlink to something with "systemd" in its name.
+If yes, then we return 1. We use L<Cwd>'s C<realpath()> instead of C<readlink()>
 here, to handle multiple redirection.
 
-=item 3. Check if /lib/systemd/systemd exists. Return 0 otherwise.
+=item 3. Check if C</lib/systemd/systemd> exists. Return 0 otherwise.
 
-=item 4. Check if /sbin/init is a hardlink to /lib/systemd/systemd by comparing its
-inode. Return 1 if it is.
+=item 4. Check if C</sbin/init> is a hardlink to C</lib/systemd/systemd> by comparing
+its inode. Return 1 if it is.
 
-=item 5. Return undef otherwise, since we detect that /lib/systemd/systemd exists
+=item 5. Return undef otherwise, since we detect that C</lib/systemd/systemd> exists
 (systemd is installed) but we cannot be sure if it is running or not.
 
 =back

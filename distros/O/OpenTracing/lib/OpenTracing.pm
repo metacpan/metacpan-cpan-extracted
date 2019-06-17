@@ -1,9 +1,10 @@
 package OpenTracing;
-# ABSTRACT: supporting for application process monitoring as defined by opentracing.io
+# ABSTRACT: supporting for application process monitoring, as defined by opentracing.io
+
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =encoding utf8
 
@@ -18,6 +19,24 @@ This is an early implementation, so the API may be subject to change.
 In general, you'll want to create an L<OpenTracing::Batch>, then add one
 or more L<OpenTracing::Span> instances to it. Those instances can have zero
 or more L<OpenTracing::Log> entries.
+
+See the following classes for more information:
+
+=over 4
+
+=item * L<OpenTracing::Tag>
+
+=item * L<OpenTracing::Log>
+
+=item * L<OpenTracing::Span>
+
+=item * L<OpenTracing::SpanProxy>
+
+=item * L<OpenTracing::Process>
+
+=item * L<OpenTracing::Batch>
+
+=back
 
 =cut
 

@@ -1,5 +1,7 @@
 package Astro::UTDF;
 
+use 5.006002;
+
 use strict;
 use warnings;
 
@@ -17,7 +19,7 @@ use constant SPEED_OF_LIGHT => 299792.458;	# Km/sec, per U.S. NIST
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 sub new {
     my $class = shift;
@@ -983,7 +985,7 @@ frequency band to a number from 0 to 15; this number comes from the low
 4 bits of the argument.
 
 The frequency band is found in the high nybble of the
-L</frequency_code_and_transmission_type>, and the encoding is documented
+L</frequency_band_and_transmission_type>, and the encoding is documented
 there.
 
 =head2 frequency_band_and_transmission_type
@@ -1614,7 +1616,7 @@ transmission type to a number from 0 to 15; this number comes from the low
 4 bits of the argument.
 
 The transmission type is found in the low nybble of the
-L</frequency_code_and_transmission_type>, and the encoding is documented
+L</frequency_band_and_transmission_type>, and the encoding is documented
 there.
 
 =head2 transmit_antenna_padid
@@ -1772,7 +1774,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2018 Thomas R. Wyant, III
+Copyright (C) 2010-2019 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

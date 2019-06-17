@@ -2,7 +2,7 @@ package Crypt::Stream::Rabbit;
 
 use strict;
 use warnings;
-our $VERSION = '0.063';
+our $VERSION = '0.064';
 
 use CryptX;
 

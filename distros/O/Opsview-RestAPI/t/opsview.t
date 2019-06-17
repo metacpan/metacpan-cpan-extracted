@@ -230,6 +230,66 @@ TODO: {
 
     #my $stack = cmp_deeply($amended, remove_refs_from_data($output));
     #eq_deeply($amended, remove_refs_from_data($output)) || deep_diag($stack);
+
+    # fetch the first host - should be the master server
+    my $host_1 = trap {
+        $rest->get(
+            api => 'config/host/1',
+        );
+    };
+    $trap->did_return("Fetched config for host ID 1");
+    $trap->quiet("no error on fetch of host ID one");
+
+    $host_1 = remove_refs_from_data( $host_1 );
+
+    # now try to do a single param search on the name
+    my $host_1_by_name = trap {
+        $rest->get(
+            api => 'config/host',
+            params => {
+                's.name' => $host_1->{object}->{name},
+            },
+        );
+    };
+    $trap->did_return("Fetched config for host ID 1 by single param name search");
+    $trap->quiet("no error on fetch of host ID by name singe");
+
+    $host_1_by_name = remove_refs_from_data( $host_1_by_name );
+
+    is_deeply(
+        $host_1->{object},
+        $host_1_by_name->{list}->[0],
+        "Search by ID and search by name match"
+    );
+
+    # now try an array of params when searching on the name.  Multiple
+    # params should do an OR so the result should be no different
+    my $host_1_by_name_multi = trap {
+        $rest->get(
+            api => 'config/host',
+            params => {
+                's.name' => [
+                    $host_1->{object}->{name},
+                    $host_1->{object}->{name},
+                    $host_1->{object}->{name},
+                    $host_1->{object}->{name},
+                ],
+            },
+        );
+    };
+    $trap->did_return("Fetched config for host ID 1 by multiple param name search");
+    $trap->quiet("no error on fetch of host ID by name multi");
+
+    $host_1_by_name_multi = remove_refs_from_data( $host_1_by_name_multi );
+
+    is_deeply(
+        $host_1->{object},
+        $host_1_by_name_multi->{list}->[0],
+        "Search by ID and search by name match"
+    );
+
+    #diag(pp($host_1));
+    #diag(pp($host_1_by_name));
 }
 
 sub remove_refs_from_data {

@@ -1,3 +1,10 @@
+0.003   2019-06-08 (PERLANCAR)
+
+        - Add utilities: retry-{lild,limd,mild,mimd}.
+
+        - Update to Algoritm-Backoff 0.006.
+
+
 0.002   2019-06-07 (PERLANCAR)
 
 	- Add utilities: retry, show-backoff-delays.

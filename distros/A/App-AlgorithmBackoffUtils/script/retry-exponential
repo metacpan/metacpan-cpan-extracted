@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/AlgorithmBackoffUtils/retry_exponential
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-06-07'; # DATE
+our $DATE = '2019-06-08'; # DATE
 our $DIST = 'App-AlgorithmBackoffUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,13 @@ retry-exponential - Retry a command with exponential backoff
 
 =head1 VERSION
 
-This document describes version 0.002 of retry-exponential (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-07.
+This document describes version 0.003 of retry-exponential (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % retry-exponential [options] <command> ...
+ % retry-exponential [options] <command>
 
 =head1 OPTIONS
 
@@ -63,6 +63,14 @@ See C<--command>.
 =item B<--command>=I<s@>*
 
 Can be specified multiple times.
+
+=item B<--delay-on-success>=I<s>
+
+Number of seconds to wait after a success.
+
+Default value:
+
+ 0
 
 =item B<--exponent-base>=I<s>
 
@@ -116,14 +124,6 @@ seconds larger than the previous timestamp), failure() will return 2 seconds.
 And if you waited 4 seconds or more, failure() will return 0.
 
 
-=item B<--delay-on-success>=I<s>
-
-Number of seconds to wait after a success.
-
-Default value:
-
- 0
-
 =item B<--jitter-factor>=I<s>
 
 How much to add randomness.
@@ -171,6 +171,14 @@ the algorithm will retry again for a maximum of 3 times.
 =item B<--max-delay>=I<s>
 
 Maximum delay time, in seconds.
+
+=item B<--min-delay>=I<s>
+
+Maximum delay time, in seconds.
+
+Default value:
+
+ 0
 
 =back
 

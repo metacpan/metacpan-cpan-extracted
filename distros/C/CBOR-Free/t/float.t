@@ -52,6 +52,28 @@ for my $i ( @nums ) {
     }
 }
 
+my $inf = unpack("f>", "\x7f\x80\x00\x00");
+my $nan = unpack("f>", "\x7f\xc0\x00\x00");
+my $neginf = unpack("f>", "\xff\x80\x00\x00");
+
+is(
+    sprintf('%v.02x', CBOR::Free::encode($inf)),
+    'f9.7c.00',
+    'Inf encodes to half-precision as expected',
+);
+
+is(
+    sprintf('%v.02x', CBOR::Free::encode($neginf)),
+    'f9.fc.00',
+    '-Inf encodes to half-precision as expected',
+);
+
+is(
+    sprintf('%v.02x', CBOR::Free::encode($nan)),
+    'f9.7e.00',
+    'NaN encodes to half-precision as expected',
+);
+
 sub _cmpbin {
     my ($got, $expect, $label) = @_;
 

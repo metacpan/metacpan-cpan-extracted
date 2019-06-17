@@ -102,13 +102,14 @@ ltc/pk/asn1/der/utctime/der_decode_utctime.obj ltc/pk/asn1/der/utctime/der_encod
 ltc/pk/asn1/der/utctime/der_length_utctime.obj ltc/pk/asn1/der/utf8/der_decode_utf8_string.obj \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_length_utf8_string.obj \
 ltc/pk/asn1/oid/pk_get_oid.obj ltc/pk/asn1/oid/pk_oid_cmp.obj ltc/pk/asn1/oid/pk_oid_str.obj \
-ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj \
-ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj \
-ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj \
-ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_set.obj ltc/pk/dh/dh_set_pg_dhparam.obj ltc/pk/dh/dh_shared_secret.obj \
-ltc/pk/dsa/dsa_decrypt_key.obj ltc/pk/dsa/dsa_encrypt_key.obj ltc/pk/dsa/dsa_export.obj \
-ltc/pk/dsa/dsa_free.obj ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_generate_pqg.obj \
-ltc/pk/dsa/dsa_import.obj ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
+ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.obj \
+ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj \
+ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj \
+ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_set.obj \
+ltc/pk/dh/dh_set_pg_dhparam.obj ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj \
+ltc/pk/dsa/dsa_encrypt_key.obj ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_free.obj \
+ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj \
+ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
 ltc/pk/dsa/dsa_shared_secret.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_verify_hash.obj \
 ltc/pk/dsa/dsa_verify_key.obj ltc/pk/ecc/ecc.obj ltc/pk/ecc/ecc_ansi_x963_export.obj \
 ltc/pk/ecc/ecc_ansi_x963_import.obj ltc/pk/ecc/ecc_decrypt_key.obj ltc/pk/ecc/ecc_encrypt_key.obj \
@@ -150,27 +151,27 @@ ltm/bn_mp_div.obj ltm/bn_mp_div_2.obj ltm/bn_mp_div_2d.obj ltm/bn_mp_div_3.obj l
 ltm/bn_mp_dr_is_modulus.obj ltm/bn_mp_dr_reduce.obj ltm/bn_mp_dr_setup.obj ltm/bn_mp_exch.obj \
 ltm/bn_mp_export.obj ltm/bn_mp_exptmod.obj ltm/bn_mp_exptmod_fast.obj ltm/bn_mp_expt_d.obj \
 ltm/bn_mp_expt_d_ex.obj ltm/bn_mp_exteuclid.obj ltm/bn_mp_fread.obj ltm/bn_mp_fwrite.obj \
-ltm/bn_mp_gcd.obj ltm/bn_mp_get_int.obj ltm/bn_mp_get_long.obj ltm/bn_mp_grow.obj \
-ltm/bn_mp_import.obj ltm/bn_mp_init.obj ltm/bn_mp_init_copy.obj ltm/bn_mp_init_multi.obj \
-ltm/bn_mp_init_set.obj ltm/bn_mp_init_set_int.obj ltm/bn_mp_init_size.obj ltm/bn_mp_invmod.obj \
-ltm/bn_mp_invmod_slow.obj ltm/bn_mp_is_square.obj ltm/bn_mp_jacobi.obj ltm/bn_mp_karatsuba_mul.obj \
-ltm/bn_mp_karatsuba_sqr.obj ltm/bn_mp_lcm.obj ltm/bn_mp_lshd.obj ltm/bn_mp_mod.obj \
-ltm/bn_mp_mod_2d.obj ltm/bn_mp_mod_d.obj ltm/bn_mp_montgomery_calc_normalization.obj \
+ltm/bn_mp_gcd.obj ltm/bn_mp_get_bit.obj ltm/bn_mp_get_int.obj ltm/bn_mp_get_long.obj \
+ltm/bn_mp_grow.obj ltm/bn_mp_import.obj ltm/bn_mp_init.obj ltm/bn_mp_init_copy.obj \
+ltm/bn_mp_init_multi.obj ltm/bn_mp_init_set.obj ltm/bn_mp_init_set_int.obj ltm/bn_mp_init_size.obj \
+ltm/bn_mp_invmod.obj ltm/bn_mp_invmod_slow.obj ltm/bn_mp_is_square.obj ltm/bn_mp_jacobi.obj \
+ltm/bn_mp_karatsuba_mul.obj ltm/bn_mp_karatsuba_sqr.obj ltm/bn_mp_kronecker.obj ltm/bn_mp_lcm.obj \
+ltm/bn_mp_lshd.obj ltm/bn_mp_mod.obj ltm/bn_mp_mod_2d.obj ltm/bn_mp_mod_d.obj ltm/bn_mp_montgomery_calc_normalization.obj \
 ltm/bn_mp_montgomery_reduce.obj ltm/bn_mp_montgomery_setup.obj ltm/bn_mp_mul.obj \
 ltm/bn_mp_mulmod.obj ltm/bn_mp_mul_2.obj ltm/bn_mp_mul_2d.obj ltm/bn_mp_mul_d.obj \
 ltm/bn_mp_neg.obj ltm/bn_mp_n_root.obj ltm/bn_mp_n_root_ex.obj ltm/bn_mp_or.obj ltm/bn_mp_prime_fermat.obj \
-ltm/bn_mp_prime_is_divisible.obj ltm/bn_mp_prime_is_prime.obj ltm/bn_mp_prime_miller_rabin.obj \
-ltm/bn_mp_prime_next_prime.obj ltm/bn_mp_prime_rabin_miller_trials.obj ltm/bn_mp_prime_random_ex.obj \
-ltm/bn_mp_radix_size.obj ltm/bn_mp_radix_smap.obj ltm/bn_mp_rand.obj ltm/bn_mp_read_radix.obj \
-ltm/bn_mp_read_signed_bin.obj ltm/bn_mp_read_unsigned_bin.obj ltm/bn_mp_reduce.obj \
-ltm/bn_mp_reduce_2k.obj ltm/bn_mp_reduce_2k_l.obj ltm/bn_mp_reduce_2k_setup.obj ltm/bn_mp_reduce_2k_setup_l.obj \
-ltm/bn_mp_reduce_is_2k.obj ltm/bn_mp_reduce_is_2k_l.obj ltm/bn_mp_reduce_setup.obj \
-ltm/bn_mp_rshd.obj ltm/bn_mp_set.obj ltm/bn_mp_set_int.obj ltm/bn_mp_set_long.obj \
-ltm/bn_mp_shrink.obj ltm/bn_mp_signed_bin_size.obj ltm/bn_mp_sqr.obj ltm/bn_mp_sqrmod.obj \
-ltm/bn_mp_sqrt.obj ltm/bn_mp_sqrtmod_prime.obj ltm/bn_mp_sub.obj ltm/bn_mp_submod.obj \
-ltm/bn_mp_sub_d.obj ltm/bn_mp_tc_and.obj ltm/bn_mp_tc_div_2d.obj ltm/bn_mp_tc_or.obj \
-ltm/bn_mp_tc_xor.obj ltm/bn_mp_toom_mul.obj ltm/bn_mp_toom_sqr.obj ltm/bn_mp_toradix.obj \
-ltm/bn_mp_toradix_n.obj ltm/bn_mp_to_signed_bin.obj ltm/bn_mp_to_signed_bin_n.obj \
+ltm/bn_mp_prime_frobenius_underwood.obj ltm/bn_mp_prime_is_divisible.obj ltm/bn_mp_prime_is_prime.obj \
+ltm/bn_mp_prime_miller_rabin.obj ltm/bn_mp_prime_next_prime.obj ltm/bn_mp_prime_rabin_miller_trials.obj \
+ltm/bn_mp_prime_random_ex.obj ltm/bn_mp_prime_strong_lucas_selfridge.obj ltm/bn_mp_radix_size.obj \
+ltm/bn_mp_radix_smap.obj ltm/bn_mp_rand.obj ltm/bn_mp_read_radix.obj ltm/bn_mp_read_signed_bin.obj \
+ltm/bn_mp_read_unsigned_bin.obj ltm/bn_mp_reduce.obj ltm/bn_mp_reduce_2k.obj ltm/bn_mp_reduce_2k_l.obj \
+ltm/bn_mp_reduce_2k_setup.obj ltm/bn_mp_reduce_2k_setup_l.obj ltm/bn_mp_reduce_is_2k.obj \
+ltm/bn_mp_reduce_is_2k_l.obj ltm/bn_mp_reduce_setup.obj ltm/bn_mp_rshd.obj ltm/bn_mp_set.obj \
+ltm/bn_mp_set_int.obj ltm/bn_mp_set_long.obj ltm/bn_mp_shrink.obj ltm/bn_mp_signed_bin_size.obj \
+ltm/bn_mp_sqr.obj ltm/bn_mp_sqrmod.obj ltm/bn_mp_sqrt.obj ltm/bn_mp_sqrtmod_prime.obj \
+ltm/bn_mp_sub.obj ltm/bn_mp_submod.obj ltm/bn_mp_sub_d.obj ltm/bn_mp_tc_and.obj ltm/bn_mp_tc_div_2d.obj \
+ltm/bn_mp_tc_or.obj ltm/bn_mp_tc_xor.obj ltm/bn_mp_toom_mul.obj ltm/bn_mp_toom_sqr.obj \
+ltm/bn_mp_toradix.obj ltm/bn_mp_toradix_n.obj ltm/bn_mp_to_signed_bin.obj ltm/bn_mp_to_signed_bin_n.obj \
 ltm/bn_mp_to_unsigned_bin.obj ltm/bn_mp_to_unsigned_bin_n.obj ltm/bn_mp_unsigned_bin_size.obj \
 ltm/bn_mp_xor.obj ltm/bn_mp_zero.obj ltm/bn_prime_tab.obj ltm/bn_reverse.obj ltm/bn_s_mp_add.obj \
 ltm/bn_s_mp_exptmod.obj ltm/bn_s_mp_mul_digs.obj ltm/bn_s_mp_mul_high_digs.obj ltm/bn_s_mp_sqr.obj \

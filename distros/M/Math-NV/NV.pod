@@ -35,6 +35,16 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
      Else returns false - which implies that either perl or C is buggy
      in its assignment of that value. (Or they could both be buggy.)
 
+   $ternary = is_inexact($str); # requires mpfr-3.1.6
+     If $ternary is 0, then the value specified by $str is exactly
+     representable by an NV.
+     If $ternary is less than 0, then the value specified by $str
+     is not exactly representable by an NV, and the nearest NV (ties
+     to even) is less than the value that the string specifies.
+     If $ternary is greater than 0, then the value specified by $str
+     is not exactly representable by an NV, and the nearest NV (ties
+     to even) is greater than the value that the string specifies.
+
    $bool = is_eq_mpfr($str);
 
      Returns true if the value perl assigns from the string $str is
@@ -60,13 +70,10 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
     $Math::NV::no_warn to 1.
 
    $nv = set_C($str);
-    Uses Perl_strtod to assign the value specified by $str to the NV
-    $nv. Expect this value to be the same as that returned by nv().
-    If perl was built without Perl_strtod, a warning to this effect is
-    emitted, and undef is returned.
-    Note that Perl_strtod wraps the standard C library's strtod() or
-    strtold() or strtoflt128() - depending upon which of those three
-    is correct for your perl's floating point type.
+    Uses the standard C library's strtod() or strtold() or strtoflt128(),
+    depending upon which of those three is correct for perl's floating
+    point type.
+    Expect the returned value to be the same as that returned by nv().
 
    $nv = set_mpfr($str);
     Uses Math::MPFR to assign the value specified by $str to the NV $nv.
@@ -203,7 +210,7 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
 
    This program is free software; you may redistribute it and/or modify
    it under the same terms as Perl itself.
-   Copyright 2013-16, 2018 Sisyphus
+   Copyright 2013-16, 2018-19 Sisyphus
 
 
 =head1 AUTHOR

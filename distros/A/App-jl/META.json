@@ -1,5 +1,5 @@
 {
-   "abstract" : "Recursive JSON decoder",
+   "abstract" : "Show JSON Log Nicely",
    "author" : [
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
@@ -33,6 +33,7 @@
             "POSIX" : "0",
             "Pod::Usage" : "0",
             "Sub::Data::Recursive" : "0.02",
+            "YAML::Syck" : "0",
             "perl" : "5.008005",
             "strict" : "0",
             "warnings" : "0"
@@ -48,7 +49,7 @@
    "provides" : {
       "App::jl" : {
          "file" : "lib/App/jl.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -63,6 +64,6 @@
          "url" : "http://github.com/bayashi/App-jl"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -3,9 +3,9 @@ NAME
     Calendar::Dates::* distribution
 
 VERSION
-    This document describes version 0.054 of
+    This document describes version 0.100 of
     Dist::Zilla::Plugin::Calendar::Dates (from Perl distribution
-    Dist-Zilla-Plugin-Calendar-Dates), released on 2019-02-14.
+    Dist-Zilla-Plugin-Calendar-Dates), released on 2019-06-08.
 
 SYNOPSIS
     In dist.ini:

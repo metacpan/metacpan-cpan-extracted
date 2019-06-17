@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Pcore-Ext\n"
 "Report-Msgid-Bugs-To: zdm <zdm@softvisio.net>\n"
-"POT-Creation-Date: 2019-06-05 06:06+0300\n"
+"POT-Creation-Date: 2019-06-13 17:03+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: zdm <zdm@softvisio.net>\n"
 "Language-Team: \n"
@@ -131,15 +131,15 @@ msgstr "Ошибка соединения с сервером приложени
 msgid "Try again."
 msgstr "Попробовать еще раз."
 
-#: lib/Pcore/Ext/Lib/Menu.pm:150
+#: lib/Pcore/Ext/Lib/Menu.pm:148
 msgid "Profile"
 msgstr "Профиль"
 
-#: lib/Pcore/Ext/Lib/Menu.pm:154
+#: lib/Pcore/Ext/Lib/Menu.pm:152
 msgid "Sign out"
 msgstr "Выйти"
 
-#: lib/Pcore/Ext/Lib/Menu.pm:169
+#: lib/Pcore/Ext/Lib/Menu.pm:167
 msgid "DARK MODE"
 msgstr "ТЕМНЫЙ РЕЖИМ"
 
@@ -320,21 +320,29 @@ msgstr "Пя"
 msgid "Sat"
 msgstr "Сб"
 
-#: lib/Pcore/Ext/Overrides/modern.pm:6
+#: lib/Pcore/Ext/Overrides/modern.pm:7
 msgid "Sort Ascending"
 msgstr "Сортировать по возрастанию"
 
-#: lib/Pcore/Ext/Overrides/modern.pm:10
+#: lib/Pcore/Ext/Overrides/modern.pm:11
 msgid "Sort Descending"
 msgstr "Сортировать по убыванию"
 
-#: lib/Pcore/Ext/Overrides/modern.pm:16
+#: lib/Pcore/Ext/Overrides/modern.pm:17
 msgid "Collapse panel"
 msgstr "Свернуть панель"
 
-#: lib/Pcore/Ext/Overrides/modern.pm:17
+#: lib/Pcore/Ext/Overrides/modern.pm:18
 msgid "Expand panel"
 msgstr "Развернуть панель"
+
+#: lib/Pcore/Ext/Overrides/modern.pm:26
+msgid "LOAD MORE ..."
+msgstr "ЗАГРУЗИТЬ БОЛЬШЕ ЗАПИСЕЙ ..."
+
+#: lib/Pcore/Ext/Overrides/modern.pm:27
+msgid "NO MORE RECORDS"
+msgstr "ВСЕ ЗАГРУЖЕНО"
 
 #~ msgid "User name"
 #~ msgstr "Имя пользователя"

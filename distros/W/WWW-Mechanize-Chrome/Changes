@@ -1,5 +1,5 @@
     * Tested against Google Chrome 67.0.3396.99  Built on OSX, thanks Travis CI
-    * Tested against Chrome/67.0.3396.99 / Win64, thanks AppVeyor
+    * Tested against Chrome/75.0.3770.90 / Win64, thanks AppVeyor
     * Tested against Chrome Chrome/59.0.3071.115
     * Tested against Chromium HeadlessChrome/60.0.3110.0
     * Tested against Chromium HeadlessChrome/61.0.3141.0
@@ -11,15 +11,35 @@
     * Tested against Chromium HeadlessChrome/67.0.3396.99
     * Tested against Chromium HeadlessChrome/68.0.3440.84
     * Tested against Chromium HeadlessChrome/69.0.3497.100
-    * Tested against Chromium HeadlessChrome/70.0.3538.77
     * Tested against Chromium HeadlessChrome/70.0.3538.102
     * Tested against Chromium HeadlessChrome/71.0.3578.98
-    * Tested against Chrome   HeadlessChrome/72.0.3623.0
+    * Tested against Chrome   HeadlessChrome/72.0.3626.96
     * Tested against Chromium HeadlessChrome/73.0.3683.103
     * Tested against Chromium HeadlessChrome/74.0.3729.131
-    * Tested against Chromium HeadlessChrome/75.0.3768.3
+    * Tested against Chromium HeadlessChrome/75.0.3770.90
     * Tested against Chromium HeadlessChrome/76.0.3798.0
+    * Tested against Chromium HeadlessChrome/77.0.3826.0
 
+0.34 2019-06-15
+    * Add ->remove_listener to $mech to explicitly remove event listeners.
+      The usual way is RAII-style, letting your event listener simply go out of
+      scope. This is for times where you can't let your event listener go out
+      of scope.
+    * Be more defensive to avoid (unweak) circular references. This should clean
+      out more memory leaks whenever a callback is set or a Future is returned
+      from W:M:C.
+    * Fix (partial code for) saving a page. I don't know how this test ever
+      passed. This adresses RT #129821.
+
+0.33 2019-05-29
+    * Actually call waitpid to make sure our Chrome processes go away properly
+      and to not accumulate zombies. Sent by Felipe Sologuren. This fixes
+      RT #129805, thanks!
+    * Fix memory leak caused by non-weakening of references in ->add_listener
+        Diagnosed and reported by Felipe Sologuren. This fixes RT #129808,
+        thanks!
+    * Add ->event accessor to Chrome::DevToolsProtocol::EventListener, suggested
+      by Felipe Sologuren, thanks!
 
 0.32 2019-05-29
     * ->update_html now stringifies its argument. This allows to pass in objects

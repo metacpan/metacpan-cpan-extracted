@@ -2,14 +2,18 @@ NAME
     App::NetworkUtils - Command-line utilities related to networking
 
 VERSION
-    This document describes version 0.003 of App::NetworkUtils (from Perl
-    distribution App-NetworkUtils), released on 2019-01-08.
+    This document describes version 0.004 of App::NetworkUtils (from Perl
+    distribution App-NetworkUtils), released on 2019-06-15.
 
 DESCRIPTION
     This distribution includes the following command-line utilities related
     to networking:
 
     *   networking-is-on
+
+    *   turn-networking-off
+
+    *   turn-networking-on
 
     *   turn-off-networking
 
@@ -18,6 +22,10 @@ DESCRIPTION
     *   turn-on-networking
 
     *   turn-on-wireless
+
+    *   turn-wireless-off
+
+    *   turn-wireless-on
 
 FUNCTIONS
   networking_is_on

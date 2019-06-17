@@ -3,10 +3,9 @@ use strict;
 use warnings;
 use JSON qw//;
 use Sub::Data::Recursive;
-use POSIX qw/strftime/;
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 my $MAX_DEPTH = 10;
 
@@ -24,16 +23,24 @@ my $MAYBE_UNIXTIME = join '|', (
 
 my $UNIXTIMESTAMP_KEY = '';
 
+my $GMTIME;
+
+my $INVOKER = 'Sub::Data::Recursive';
+
 sub new {
     my $class = shift;
     my @argv  = @_;
 
     my $opt = $class->_parse_opt(@argv);
 
-    bless {
+    my $self = bless {
         _opt  => $opt,
         _json => JSON->new->utf8->pretty(!$opt->{no_pretty})->canonical(1),
     }, $class;
+
+    $self->_lazyload_modules;
+
+    return $self;
 }
 
 sub opt {
@@ -46,11 +53,26 @@ sub run {
     my ($self) = @_;
 
     while (my $orig_line = <STDIN>) {
-        if ($orig_line !~ m!^[\[\{]!) {
+        if ($orig_line !~ m!^\s*[\[\{]!) {
             print $orig_line;
             next;
         }
         print $self->process($orig_line);
+    }
+}
+
+sub _lazyload_modules {
+    my ($self) = @_;
+
+    if ($self->opt('xxxx') || $self->opt('timestamp_key')) {
+        require 'POSIX.pm'; ## no critic
+        POSIX->import;
+    }
+
+    if ($self->opt('yaml')) {
+        require 'YAML/Syck.pm'; ## no critic
+        YAML::Syck->import;
+        $YAML::Syck::Headless = $YAML::Syck::SortKeys = 1;
     }
 }
 
@@ -64,14 +86,60 @@ sub process {
         return $line;
     }
     else {
-        Sub::Data::Recursive->invoke(\&_split_lf => $decoded) if $self->opt('x');
-        $self->{_depth} = $self->opt('depth');
-        $self->_recursive_decode_json($decoded);
-        Sub::Data::Recursive->invoke(\&_split_comma => $decoded) if $self->opt('xx');
-        Sub::Data::Recursive->invoke(\&_split_label => $decoded) if $self->opt('xxx');
-        Sub::Data::Recursive->massive_invoke(\&_convert_timestamp => $decoded) if $self->opt('xxxx');
+        $self->_recursive_process($decoded);
+        return $self->_output($decoded);
+
+    }
+}
+
+sub _output {
+    my ($self, $decoded) = @_;
+
+    if ($self->opt('yaml')) {
+        return YAML::Syck::Dump($decoded);
+    }
+    else {
         return $self->{_json}->encode($decoded);
     }
+}
+
+sub _recursive_process {
+    my ($self, $decoded) = @_;
+
+    $self->_recursive_pre_process($decoded);
+
+    $self->{_depth} = $self->opt('depth');
+    $self->_recursive_decode_json($decoded);
+
+    $self->_recursive_post_process($decoded);
+}
+
+sub _recursive_pre_process {
+    my ($self, $decoded) = @_;
+
+    $INVOKER->invoke(\&_split_lf => $decoded) if $self->opt('x');
+}
+
+sub _recursive_post_process {
+    my ($self, $decoded) = @_;
+
+    if ($self->opt('x')) {
+        $INVOKER->invoke(\&_split_lf => $decoded);
+    }
+
+    if ($self->opt('xx')) {
+        $INVOKER->invoke(\&_split_comma => $decoded);
+    }
+
+    if ($self->opt('xxx')) {
+        $INVOKER->invoke(\&_split_label => $decoded);
+    }
+
+    if ($self->opt('xxxx') || $self->opt('timestamp_key')) {
+        $INVOKER->massive_invoke(\&_convert_timestamp => $decoded);
+    }
+
+    $INVOKER->invoke(\&_trim => $decoded);
 }
 
 sub _split_lf {
@@ -89,7 +157,7 @@ sub _split_comma {
 
     chomp $line;
 
-    return $line if length $line < 128 || $line !~ m!, ! || $line =~ m!\\!;
+    return $line if $line !~ m!, ! || $line =~ m!\\!;
 
     my @elements = split /,\s+/, $line;
 
@@ -101,7 +169,7 @@ sub _split_label {
 
     chomp $line;
 
-    return $line if length $line < 128 || $line =~ m!\\!;
+    return $line if $line =~ m!\\!;
 
     $line =~ s!([])>])\s+([[(<])!$1$2!g;
     $line =~ s!((\[[^])>]+\]|\([^])>]+\)|<[^])>]+>))!$1\n!g; # '\n' already replaced by --x option
@@ -123,11 +191,31 @@ sub _convert_timestamp {
             || ($LAST_VALUE =~ m!(?:$MAYBE_UNIXTIME)!i && $line =~ m!(\d+(\.\d+)?)!)
     ) {
         if (my $date = _ts2date($1, $2)) {
-            $_[0] = "$date = $line";
+            $_[0] = $date;
         }
     }
 
     $LAST_VALUE = $line;
+}
+
+sub _trim {
+    my $line = $_[0];
+
+    my $trim = 0;
+
+    if ($line =~ m!^[\s\t\r\n]+!) {
+        $line =~ s!^[\s\t\r\n]+!!;
+        $trim = 1;
+    }
+
+    if ($line =~ m![\s\t\r\n]+$!) {
+        $line =~ s![\s\t\r\n]+$!!;
+        $trim = 1;
+    }
+
+    if ($trim) {
+        $_[0] = $line;
+    }
 }
 
 sub _ts2date {
@@ -141,7 +229,8 @@ sub _ts2date {
             $msec = ".$msec";
             $unix_timestamp = int($unix_timestamp / 1000);
         }
-        return strftime('%Y-%m-%d %H:%M:%S', localtime($unix_timestamp)) . $msec;
+        my @t = $GMTIME ? gmtime($unix_timestamp) : localtime($unix_timestamp);
+        return POSIX::strftime('%Y-%m-%d %H:%M:%S', @t) . $msec;
     }
 }
 
@@ -178,6 +267,8 @@ sub _parse_opt {
         'xxx'       => \$opt->{xxx},
         'xxxx'      => \$opt->{xxxx},
         'timestamp-key=s' => \$opt->{timestamp_key},
+        'gmtime'    => \$opt->{gmtime},
+        'yaml|yml'  => \$opt->{yaml},
         'h|help'    => sub {
             $class->_show_usage(1);
         },
@@ -194,6 +285,8 @@ sub _parse_opt {
     $opt->{x}   ||= $opt->{xx};
 
     $UNIXTIMESTAMP_KEY = $opt->{timestamp_key};
+
+    $GMTIME = $opt->{gmtime};
 
     return $opt;
 }
@@ -213,19 +306,21 @@ __END__
 
 =head1 NAME
 
-App::jl - Recursive JSON decoder
+App::jl - Show JSON Log Nicely
 
 
 =head1 SYNOPSIS
 
+See L<jl> for CLI to view logs.
+
     use App::jl;
+    
+    App::jl->new(@ARGV)->run;
 
 
 =head1 DESCRIPTION
 
-App::jl is recursive JSON decoder. This module can decode JSON in JSON.
-
-See L<jl> for CLI to view logs.
+App::jl is recursive JSON in JSON decoder. It makes JSON log nice.
 
 
 =head1 METHODS
@@ -251,7 +346,7 @@ The parser of the line
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1560229824"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1560229824&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1560606718"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1560606718&branch=master"/></a>
 
 =end html
 

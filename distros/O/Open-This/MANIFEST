@@ -22,6 +22,7 @@ t/Open/This.t
 t/bin/date
 t/git.t
 t/github.t
+t/kate.t
 t/lib/Foo/Bar.pm
 t/nano.t
 t/other-lib/Foo/Baz.pm

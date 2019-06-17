@@ -1,6 +1,6 @@
 package main;
 
-use 5.010;
+use 5.006002;
 
 use strict;
 use warnings;

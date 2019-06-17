@@ -1,0 +1,327 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/AlgorithmBackoffUtils/retry_limd
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
+
+our $DATE = '2019-06-08'; # DATE
+our $DIST = 'App-AlgorithmBackoffUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/AlgorithmBackoffUtils/retry_limd",
+    program_name => "retry-limd",
+    log => 1,
+    log_level => "info",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Retry a command with LIMD (linear increase, multiplicative decrease) backoff
+# PODNAME: retry-limd
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+retry-limd - Retry a command with LIMD (linear increase, multiplicative decrease) backoff
+
+=head1 VERSION
+
+This document describes version 0.003 of retry-limd (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-08.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % retry-limd [options] <command>
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--command-json>=I<s>
+
+See C<--command>.
+
+=item B<--command>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--delay-increment-on-failure>=I<s>*
+
+How much to add to previous delay, in seconds, upon failure (e.g. 5).
+
+=item B<--delay-multiple-on-success>=I<s>*
+
+How much to multiple previous delay, upon success (e.g. 0.5).
+
+=item B<--initial-delay>=I<s>*
+
+Initial delay for the first attempt after failure, in seconds.
+
+=item B<--retry-on>=I<s>
+
+Comma-separated list of exit codes that should trigger retry.
+
+By default, all non-zero exit codes will trigger retry.
+
+
+=item B<--skip-delay>, B<-D>
+
+Do not delay at all.
+
+Useful for testing, along with --dry-run, when you just want to see how the
+retries are done (the number of retries, along with the number of seconds of
+delays) by seeing the log messages, without actually delaying.
+
+
+=item B<--success-on>=I<s>
+
+Comma-separated list of exit codes that mean success.
+
+By default, only exit code 0 means success.
+
+
+=back
+
+=head2 Common to all algorithms options
+
+=over
+
+=item B<--consider-actual-delay>
+
+Whether to consider actual delay.
+
+If set to true, will take into account the actual delay (timestamp difference).
+For example, when using the Constant strategy of delay=2, you log failure()
+again right after the previous failure() (i.e. specify the same timestamp).
+failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
+seconds before calling failure() again (i.e. specify the timestamp that is 2
+seconds larger than the previous timestamp), failure() will return 2 seconds.
+And if you waited 4 seconds or more, failure() will return 0.
+
+
+=item B<--jitter-factor>=I<s>
+
+How much to add randomness.
+
+If you set this to a value larger than 0, the actual delay will be between a
+random number between original_delay * (1-jitter_factor) and original_delay *
+(1+jitter_factor). Jitters are usually added to avoid so-called "thundering
+herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
+
+
+=item B<--max-actual-duration>=I<s>
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+Default value:
+
+ 0
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
+
+
+=item B<--max-attempts>=I<s>
+
+Maximum number consecutive failures before giving up.
+
+Default value:
+
+ 0
+
+0 means to retry endlessly without ever giving up. 1 means to give up after a
+single failure (i.e. no retry attempts). 2 means to retry once after a failure.
+Note that after a success, the number of attempts is reset (as expected). So if
+max_attempts is 3, and if you fail twice then succeed, then on the next failure
+the algorithm will retry again for a maximum of 3 times.
+
+
+=item B<--max-delay>=I<s>
+
+Maximum delay time, in seconds.
+
+=item B<--min-delay>=I<s>
+
+Maximum delay time, in seconds.
+
+Default value:
+
+ 0
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--dry-run>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C retry-limd retry-limd
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete retry-limd 'p/*/`retry-limd`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-AlgorithmBackoffUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-AlgorithmBackoffUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-AlgorithmBackoffUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Algorithm::Backoff::LIMD>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

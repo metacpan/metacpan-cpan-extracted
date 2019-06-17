@@ -1,9 +1,10 @@
 package WWW::FieldValidator;
 
+use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "1.06";
+our $VERSION = "1.19";
 
 # The following constants represent the validator types that can be used to
 # validate the specified user input.
@@ -170,9 +171,9 @@ types are supported (Note these are constants, the $validatorType param needs
 to be one of the following values):
 
   # Input must conform to /^[\w\-\.\+]+@(\w+)(\.([\w\-]+))+$/
-  WWW::FieldValidator::WELL_FORMED_EMAIL 
+  WWW::FieldValidator::WELL_FORMED_EMAIL
   # Input must be >= a specified string length
-  WWW::FieldValidator::MIN_STR_LENGTH 
+  WWW::FieldValidator::MIN_STR_LENGTH
   # Input must be <= a specified string length
   WWW::FieldValidator::MAX_STR_LENGTH
   # Input must match a user defined regex

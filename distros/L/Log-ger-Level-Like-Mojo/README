@@ -1,0 +1,35 @@
+NAME
+    Log::ger::Level::Like::Mojo - Define logging levels like Mojo::Log
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     # load before 'use Log::ger' in any package/target
+     use Log::ger::Level::Like::Mojo;
+
+DESCRIPTION
+    This module changes the Log::ger levels to:
+
+        fatal     => 10,
+        error     => 20,
+        warn      => 30,
+        info      => 40,
+        debug     => 50,
+
+    which is just like the default except for the absence of "trace".
+
+SEE ALSO
+    Log::Any
+
+    Mojo::Log
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

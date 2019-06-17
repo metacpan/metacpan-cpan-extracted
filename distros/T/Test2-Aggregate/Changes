@@ -1,7 +1,12 @@
 Revision history for Test2-Aggregate
 
+0.04    2019-06-14
+        Don't warn on non-existent paths, warn on invalid root.
+        STDOUT option for stats_output.
+        Fix tests for @INC not containing '.'.
+
 0.03    2019-06-10
-        File::Find fix for Perl <= 5.22, pass tests for @INC not containing '.'.
+        File::Find fix for Perl <= 5.22.
 
 0.02    2019-06-10
         Fix root option, add load_modules, no implicit done_testing().

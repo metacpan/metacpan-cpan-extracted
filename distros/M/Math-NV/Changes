@@ -1,7 +1,12 @@
 Revision history for Perl module Math::NV
+ 2.02
+    - Remove "Perl_strtod" from NV.xs.
+    - Remove references to Perl_strtod from NV.pod.
+    - Add is_inexact (new function).
+
  2.01
     - Require version 4.07 of Math::MPFR as Math-MPFR-4.07 altered the way
-      that atonv() is called. The atonv function is use only in
+      that atonv() is called. The atonv function is used only in
       t/08subnormal_mpfr.t and t/09subnormal_mpfr_alt.t
     - Fix bug in test 7 of t/08subnormal_mpfr.t and t/09subnormal_mpfr_alt.t
       Bug exposed by:

@@ -1,7 +1,7 @@
 package App::AlgorithmBackoffUtils;
 
-our $DATE = '2019-06-07'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-06-08'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -11,9 +11,13 @@ use Log::ger;
 use Algorithm::Backoff::Constant ();
 use Algorithm::Backoff::Exponential ();
 use Algorithm::Backoff::Fibonacci ();
+use Algorithm::Backoff::LILD ();
+use Algorithm::Backoff::LIMD ();
+use Algorithm::Backoff::MILD ();
+use Algorithm::Backoff::MIMD ();
 use Time::HiRes qw(time sleep);
 
-my @algos = qw(Constant Exponential Fibonacci);
+my @algos = qw(Constant Exponential Fibonacci LILD LIMD MILD MIMD);
 our %SPEC;
 
 our %arg_algorithm = (
@@ -29,7 +33,7 @@ our %args_algo_attrs;
 for my $algo (@algos) {
     my $args = ${"Algorithm::Backoff::$algo\::SPEC"}{new}{args};
     for my $arg (keys %$args) {
-        my $argspec = { %{$args->{$arg}} };
+        my $argspec = $args_algo_attrs{$arg} // { %{$args->{$arg}} };
         $argspec->{req} = 0;
         delete $argspec->{pos};
         if ($argspec->{tags} &&
@@ -223,6 +227,78 @@ sub retry_fibonacci {
     _retry("Fibonacci", {@_});
 }
 
+$SPEC{retry_lild} = {
+    v => 1.1,
+    summary => 'Retry a command with LILD (linear increase, linear decrease) backoff',
+    args => {
+        %args_retry_common,
+        %{ $Algorithm::Backoff::LILD::SPEC{new}{args} },
+    },
+    features => {
+        dry_run => 1,
+    },
+    links => [
+        {url => 'pm:Algorithm::Backoff::LILD'},
+    ],
+};
+sub retry_lild {
+    _retry("LILD", {@_});
+}
+
+$SPEC{retry_limd} = {
+    v => 1.1,
+    summary => 'Retry a command with LIMD (linear increase, multiplicative decrease) backoff',
+    args => {
+        %args_retry_common,
+        %{ $Algorithm::Backoff::LIMD::SPEC{new}{args} },
+    },
+    features => {
+        dry_run => 1,
+    },
+    links => [
+        {url => 'pm:Algorithm::Backoff::LIMD'},
+    ],
+};
+sub retry_limd {
+    _retry("LIMD", {@_});
+}
+
+$SPEC{retry_mild} = {
+    v => 1.1,
+    summary => 'Retry a command with MILD (multiplicative increase, linear decrease) backoff',
+    args => {
+        %args_retry_common,
+        %{ $Algorithm::Backoff::MILD::SPEC{new}{args} },
+    },
+    features => {
+        dry_run => 1,
+    },
+    links => [
+        {url => 'pm:Algorithm::Backoff::MILD'},
+    ],
+};
+sub retry_mild {
+    _retry("MILD", {@_});
+}
+
+$SPEC{retry_mimd} = {
+    v => 1.1,
+    summary => 'Retry a command with MIMD (multiplicative increase, multiplicative decrease) backoff',
+    args => {
+        %args_retry_common,
+        %{ $Algorithm::Backoff::MIMD::SPEC{new}{args} },
+    },
+    features => {
+        dry_run => 1,
+    },
+    links => [
+        {url => 'pm:Algorithm::Backoff::MIMD'},
+    ],
+};
+sub retry_mimd {
+    _retry("MIMD", {@_});
+}
+
 $SPEC{show_backoff_delays} = {
     v => 1.1,
     summary => 'Show backoff delays',
@@ -270,10 +346,17 @@ sub show_backoff_delays {
 
     my %algo_attrs;
     for my $arg (keys %args_algo_attrs) {
+        my $argspec = $args_algo_attrs{$arg};
+        next unless grep {
+            $_ eq 'category:common-to-all-algorithms' ||
+            $_ eq lc("category:$algo-algorithm")
+        } @{ $argspec->{tags} };
         if (exists $args{$arg}) {
             $algo_attrs{$arg} = $args{$arg};
         }
     }
+    #use DD; dd \%args_algo_attrs;
+    #use DD; dd \%algo_attrs;
     my $ab = "Algorithm::Backoff::$algo"->new(%algo_attrs);
 
     my @delays;
@@ -315,7 +398,7 @@ App::AlgorithmBackoffUtils - Utilities related to Algorithm::Backoff
 
 =head1 VERSION
 
-This document describes version 0.002 of App::AlgorithmBackoffUtils (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-07.
+This document describes version 0.003 of App::AlgorithmBackoffUtils (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-08.
 
 =head1 DESCRIPTION
 
@@ -330,6 +413,14 @@ This distributions provides the following command-line utilities:
 =item * L<retry-exponential>
 
 =item * L<retry-fibonacci>
+
+=item * L<retry-lild>
+
+=item * L<retry-limd>
+
+=item * L<retry-mild>
+
+=item * L<retry-mimd>
 
 =item * L<show-backoff-delays>
 
@@ -376,6 +467,22 @@ And if you waited 4 seconds or more, failure() will return 0.
 =item * B<delay> => I<ufloat>
 
 Number of seconds to wait after a failure.
+
+=item * B<delay_increment_on_failure> => I<float>
+
+How much to add to previous delay, in seconds, upon failure (e.g. 5).
+
+=item * B<delay_increment_on_success> => I<float>
+
+How much to add to previous delay, in seconds, upon success (e.g. -5).
+
+=item * B<delay_multiple_on_failure> => I<ufloat>
+
+How much to multiple previous delay, upon failure (e.g. 1.5).
+
+=item * B<delay_multiple_on_success> => I<ufloat>
+
+How much to multiple previous delay, upon success (e.g. 0.5).
 
 =item * B<delay_on_success> => I<ufloat> (default: 0)
 
@@ -429,6 +536,10 @@ max_attempts is 3, and if you fail twice then succeed, then on the next failure
 the algorithm will retry again for a maximum of 3 times.
 
 =item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
 
 Maximum delay time, in seconds.
 
@@ -548,6 +659,14 @@ single failure (i.e. no retry attempts). 2 means to retry once after a failure.
 Note that after a success, the number of attempts is reset (as expected). So if
 max_attempts is 3, and if you fail twice then succeed, then on the next failure
 the algorithm will retry again for a maximum of 3 times.
+
+=item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
 
 =item * B<retry_on> => I<str>
 
@@ -669,6 +788,10 @@ max_attempts is 3, and if you fail twice then succeed, then on the next failure
 the algorithm will retry again for a maximum of 3 times.
 
 =item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
 
 Maximum delay time, in seconds.
 
@@ -797,6 +920,526 @@ the algorithm will retry again for a maximum of 3 times.
 
 Maximum delay time, in seconds.
 
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
+
+=item * B<retry_on> => I<str>
+
+Comma-separated list of exit codes that should trigger retry.
+
+By default, all non-zero exit codes will trigger retry.
+
+=item * B<skip_delay> => I<true>
+
+Do not delay at all.
+
+Useful for testing, along with --dry-run, when you just want to see how the
+retries are done (the number of retries, along with the number of seconds of
+delays) by seeing the log messages, without actually delaying.
+
+=item * B<success_on> => I<str>
+
+Comma-separated list of exit codes that mean success.
+
+By default, only exit code 0 means success.
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 retry_lild
+
+Usage:
+
+ retry_lild(%args) -> [status, msg, payload, meta]
+
+Retry a command with LILD (linear increase, linear decrease) backoff.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<command>* => I<array[str]>
+
+=item * B<consider_actual_delay> => I<bool> (default: 0)
+
+Whether to consider actual delay.
+
+If set to true, will take into account the actual delay (timestamp difference).
+For example, when using the Constant strategy of delay=2, you log failure()
+again right after the previous failure() (i.e. specify the same timestamp).
+failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
+seconds before calling failure() again (i.e. specify the timestamp that is 2
+seconds larger than the previous timestamp), failure() will return 2 seconds.
+And if you waited 4 seconds or more, failure() will return 0.
+
+=item * B<delay_increment_on_failure>* => I<float>
+
+How much to add to previous delay, in seconds, upon failure (e.g. 5).
+
+=item * B<delay_increment_on_success>* => I<float>
+
+How much to add to previous delay, in seconds, upon success (e.g. -5).
+
+=item * B<initial_delay>* => I<ufloat>
+
+Initial delay for the first attempt after failure, in seconds.
+
+=item * B<jitter_factor> => I<float>
+
+How much to add randomness.
+
+If you set this to a value larger than 0, the actual delay will be between a
+random number between original_delay * (1-jitter_factor) and original_delay *
+(1+jitter_factor). Jitters are usually added to avoid so-called "thundering
+herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
+
+=item * B<max_actual_duration> => I<ufloat> (default: 0)
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
+
+=item * B<max_attempts> => I<uint> (default: 0)
+
+Maximum number consecutive failures before giving up.
+
+0 means to retry endlessly without ever giving up. 1 means to give up after a
+single failure (i.e. no retry attempts). 2 means to retry once after a failure.
+Note that after a success, the number of attempts is reset (as expected). So if
+max_attempts is 3, and if you fail twice then succeed, then on the next failure
+the algorithm will retry again for a maximum of 3 times.
+
+=item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
+
+=item * B<retry_on> => I<str>
+
+Comma-separated list of exit codes that should trigger retry.
+
+By default, all non-zero exit codes will trigger retry.
+
+=item * B<skip_delay> => I<true>
+
+Do not delay at all.
+
+Useful for testing, along with --dry-run, when you just want to see how the
+retries are done (the number of retries, along with the number of seconds of
+delays) by seeing the log messages, without actually delaying.
+
+=item * B<success_on> => I<str>
+
+Comma-separated list of exit codes that mean success.
+
+By default, only exit code 0 means success.
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 retry_limd
+
+Usage:
+
+ retry_limd(%args) -> [status, msg, payload, meta]
+
+Retry a command with LIMD (linear increase, multiplicative decrease) backoff.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<command>* => I<array[str]>
+
+=item * B<consider_actual_delay> => I<bool> (default: 0)
+
+Whether to consider actual delay.
+
+If set to true, will take into account the actual delay (timestamp difference).
+For example, when using the Constant strategy of delay=2, you log failure()
+again right after the previous failure() (i.e. specify the same timestamp).
+failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
+seconds before calling failure() again (i.e. specify the timestamp that is 2
+seconds larger than the previous timestamp), failure() will return 2 seconds.
+And if you waited 4 seconds or more, failure() will return 0.
+
+=item * B<delay_increment_on_failure>* => I<float>
+
+How much to add to previous delay, in seconds, upon failure (e.g. 5).
+
+=item * B<delay_multiple_on_success>* => I<ufloat>
+
+How much to multiple previous delay, upon success (e.g. 0.5).
+
+=item * B<initial_delay>* => I<ufloat>
+
+Initial delay for the first attempt after failure, in seconds.
+
+=item * B<jitter_factor> => I<float>
+
+How much to add randomness.
+
+If you set this to a value larger than 0, the actual delay will be between a
+random number between original_delay * (1-jitter_factor) and original_delay *
+(1+jitter_factor). Jitters are usually added to avoid so-called "thundering
+herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
+
+=item * B<max_actual_duration> => I<ufloat> (default: 0)
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
+
+=item * B<max_attempts> => I<uint> (default: 0)
+
+Maximum number consecutive failures before giving up.
+
+0 means to retry endlessly without ever giving up. 1 means to give up after a
+single failure (i.e. no retry attempts). 2 means to retry once after a failure.
+Note that after a success, the number of attempts is reset (as expected). So if
+max_attempts is 3, and if you fail twice then succeed, then on the next failure
+the algorithm will retry again for a maximum of 3 times.
+
+=item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
+
+=item * B<retry_on> => I<str>
+
+Comma-separated list of exit codes that should trigger retry.
+
+By default, all non-zero exit codes will trigger retry.
+
+=item * B<skip_delay> => I<true>
+
+Do not delay at all.
+
+Useful for testing, along with --dry-run, when you just want to see how the
+retries are done (the number of retries, along with the number of seconds of
+delays) by seeing the log messages, without actually delaying.
+
+=item * B<success_on> => I<str>
+
+Comma-separated list of exit codes that mean success.
+
+By default, only exit code 0 means success.
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 retry_mild
+
+Usage:
+
+ retry_mild(%args) -> [status, msg, payload, meta]
+
+Retry a command with MILD (multiplicative increase, linear decrease) backoff.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<command>* => I<array[str]>
+
+=item * B<consider_actual_delay> => I<bool> (default: 0)
+
+Whether to consider actual delay.
+
+If set to true, will take into account the actual delay (timestamp difference).
+For example, when using the Constant strategy of delay=2, you log failure()
+again right after the previous failure() (i.e. specify the same timestamp).
+failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
+seconds before calling failure() again (i.e. specify the timestamp that is 2
+seconds larger than the previous timestamp), failure() will return 2 seconds.
+And if you waited 4 seconds or more, failure() will return 0.
+
+=item * B<delay_increment_on_success>* => I<float>
+
+How much to add to previous delay, in seconds, upon success (e.g. -5).
+
+=item * B<delay_multiple_on_failure>* => I<ufloat>
+
+How much to multiple previous delay, upon failure (e.g. 1.5).
+
+=item * B<initial_delay>* => I<ufloat>
+
+Initial delay for the first attempt after failure, in seconds.
+
+=item * B<jitter_factor> => I<float>
+
+How much to add randomness.
+
+If you set this to a value larger than 0, the actual delay will be between a
+random number between original_delay * (1-jitter_factor) and original_delay *
+(1+jitter_factor). Jitters are usually added to avoid so-called "thundering
+herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
+
+=item * B<max_actual_duration> => I<ufloat> (default: 0)
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
+
+=item * B<max_attempts> => I<uint> (default: 0)
+
+Maximum number consecutive failures before giving up.
+
+0 means to retry endlessly without ever giving up. 1 means to give up after a
+single failure (i.e. no retry attempts). 2 means to retry once after a failure.
+Note that after a success, the number of attempts is reset (as expected). So if
+max_attempts is 3, and if you fail twice then succeed, then on the next failure
+the algorithm will retry again for a maximum of 3 times.
+
+=item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
+
+=item * B<retry_on> => I<str>
+
+Comma-separated list of exit codes that should trigger retry.
+
+By default, all non-zero exit codes will trigger retry.
+
+=item * B<skip_delay> => I<true>
+
+Do not delay at all.
+
+Useful for testing, along with --dry-run, when you just want to see how the
+retries are done (the number of retries, along with the number of seconds of
+delays) by seeing the log messages, without actually delaying.
+
+=item * B<success_on> => I<str>
+
+Comma-separated list of exit codes that mean success.
+
+By default, only exit code 0 means success.
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 retry_mimd
+
+Usage:
+
+ retry_mimd(%args) -> [status, msg, payload, meta]
+
+Retry a command with MIMD (multiplicative increase, multiplicative decrease) backoff.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<command>* => I<array[str]>
+
+=item * B<consider_actual_delay> => I<bool> (default: 0)
+
+Whether to consider actual delay.
+
+If set to true, will take into account the actual delay (timestamp difference).
+For example, when using the Constant strategy of delay=2, you log failure()
+again right after the previous failure() (i.e. specify the same timestamp).
+failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
+seconds before calling failure() again (i.e. specify the timestamp that is 2
+seconds larger than the previous timestamp), failure() will return 2 seconds.
+And if you waited 4 seconds or more, failure() will return 0.
+
+=item * B<delay_multiple_on_failure>* => I<ufloat>
+
+How much to multiple previous delay, upon failure (e.g. 1.5).
+
+=item * B<delay_multiple_on_success>* => I<ufloat>
+
+How much to multiple previous delay, upon success (e.g. 0.5).
+
+=item * B<initial_delay>* => I<ufloat>
+
+Initial delay for the first attempt after failure, in seconds.
+
+=item * B<jitter_factor> => I<float>
+
+How much to add randomness.
+
+If you set this to a value larger than 0, the actual delay will be between a
+random number between original_delay * (1-jitter_factor) and original_delay *
+(1+jitter_factor). Jitters are usually added to avoid so-called "thundering
+herd" problem.
+
+The jitter will be applied to delay on failure as well as on success.
+
+=item * B<max_actual_duration> => I<ufloat> (default: 0)
+
+Maximum number of seconds for all of the attempts (0 means unlimited).
+
+If set to a positive number, will limit the number of seconds for all of the
+attempts. This setting is used to limit the amount of time you are willing to
+spend on a task. For example, when using the Exponential strategy of
+initial_delay=3 and max_attempts=10, the delays will be 3, 6, 12, 24, ... If
+failures are logged according to the suggested delays, and max_actual_duration
+is set to 21 seconds, then the third failure() will return -1 instead of 24
+because 3+6+12 >= 21, even though max_attempts has not been exceeded.
+
+=item * B<max_attempts> => I<uint> (default: 0)
+
+Maximum number consecutive failures before giving up.
+
+0 means to retry endlessly without ever giving up. 1 means to give up after a
+single failure (i.e. no retry attempts). 2 means to retry once after a failure.
+Note that after a success, the number of attempts is reset (as expected). So if
+max_attempts is 3, and if you fail twice then succeed, then on the next failure
+the algorithm will retry again for a maximum of 3 times.
+
+=item * B<max_delay> => I<ufloat>
+
+Maximum delay time, in seconds.
+
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
+
 =item * B<retry_on> => I<str>
 
 Comma-separated list of exit codes that should trigger retry.
@@ -879,6 +1522,22 @@ And if you waited 4 seconds or more, failure() will return 0.
 
 Number of seconds to wait after a failure.
 
+=item * B<delay_increment_on_failure> => I<float>
+
+How much to add to previous delay, in seconds, upon failure (e.g. 5).
+
+=item * B<delay_increment_on_success> => I<float>
+
+How much to add to previous delay, in seconds, upon success (e.g. -5).
+
+=item * B<delay_multiple_on_failure> => I<ufloat>
+
+How much to multiple previous delay, upon failure (e.g. 1.5).
+
+=item * B<delay_multiple_on_success> => I<ufloat>
+
+How much to multiple previous delay, upon success (e.g. 0.5).
+
 =item * B<delay_on_success> => I<ufloat> (default: 0)
 
 Number of seconds to wait after a success.
@@ -951,6 +1610,10 @@ the algorithm will retry again for a maximum of 3 times.
 
 Maximum delay time, in seconds.
 
+=item * B<min_delay> => I<ufloat> (default: 0)
+
+Maximum delay time, in seconds.
+
 =back
 
 Special arguments:
@@ -993,11 +1656,19 @@ feature.
 =head1 SEE ALSO
 
 
-L<Algorithm::Backoff::Fibonacci>.
+L<Algorithm::Backoff::Exponential>.
+
+L<Algorithm::Backoff::LIMD>.
 
 L<Algorithm::Backoff::Constant>.
 
-L<Algorithm::Backoff::Exponential>.
+L<Algorithm::Backoff::LILD>.
+
+L<Algorithm::Backoff::Fibonacci>.
+
+L<Algorithm::Backoff::MILD>.
+
+L<Algorithm::Backoff::MIMD>.
 
 L<Algorithm::Backoff>
 

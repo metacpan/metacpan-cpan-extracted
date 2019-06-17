@@ -1,5 +1,14 @@
 Revision history for App-apt-perl
 
+0.0.4   2019-06-15
+        Updating for release of version 0.0.4
+        Adding newer perl version (Ivan Wills)
+        Adding newer perl version (Ivan Wills)
+        Fixning config dependencies (Ivan Wills)
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
 0.0.3   2015-08-05
         Updating for release of version 0.0.3
         Removed creation of makefile (Ivan Wills)

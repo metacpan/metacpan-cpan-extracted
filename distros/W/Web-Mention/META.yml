@@ -3,6 +3,7 @@ abstract: 'Implementation of the IndieWeb Webmention protocol'
 author:
   - 'Jason McIntosh (jmac@jmac.org)'
 build_requires:
+  JSON: '0'
   Path::Class::Dir: '0'
   Test::Exception: '0'
   Test::LWP::UserAgent: '0'
@@ -30,7 +31,7 @@ no_index:
 provides:
   Web::Mention:
     file: lib/Web/Mention.pm
-    version: '0.701'
+    version: '0.702'
   Web::Mention::Author:
     file: lib/Web/Mention/Author.pm
 requires:
@@ -59,7 +60,7 @@ resources:
   bugtracker: https://github.com/jmacdotorg/webmention-perl/issues
   homepage: https://github.com/jmacdotorg/webmention-perl
   repository: git://github.com/jmacdotorg/webmention-perl.git
-version: '0.701'
+version: '0.702'
 x_contributors:
   - 'Jason McIntosh <jmac@jmac.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

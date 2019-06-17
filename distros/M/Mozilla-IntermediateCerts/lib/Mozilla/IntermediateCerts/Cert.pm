@@ -10,7 +10,7 @@ use namespace::clean;
 
 # ABSTRACT: Wrapper for handling Mozilla Intermediate certificate
 
-our $VERSION = 'v0.0002';
+our $VERSION = 'v0.0003';
 
 =head1 NAME
  

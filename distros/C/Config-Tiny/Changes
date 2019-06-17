@@ -1,17 +1,32 @@
 ﻿Revision history for Perl extension Config-Tiny:
 
-2.23  Wed Oct 14 09:11:00 2015
+2.24  2019-06-11T15:30:00
+	- Delete from caveats in documentation where it used to say:
+		'Config::Tiny will only recognize the first time an option is set in a config file.'
+		'Any further attempts to set the same option later in the config file are ignored.'
+		In reality the code uses the 2nd and subsequent values to overwrite earlier values.
+	- Make this topic a new FAQ.
+	- Add corresponding test t/06.repeat.key.t.
+	- Update POD to clarify trailing comment options.
+	- Add corresponding test t/07.trailing.comment.t.
+	- Romanize Gregory Kidrenko's name so Config::IniFiles does not get 'Wide char in print'.
+	- Move xt/pod.t to xt/author/pod.t.
+ 	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Move require 5.008001 from Tiny.pm into Makefile.PL.
+
+2.23  2015-10-14T09:11:00
 	- Add the utf8 BOM to this file. Let's hope the CPAN toolchain can cope. If it can't, another
 		version of the code will have to be released.
 	- Fix read() and write() so they work on files called '0' (zero). See RT#107754.
-		Many thanx to Григорий Кудренко for the report and patch.
+		Many thanx to Gregory Kidrenko for the report and patch.
 	- Add t/05.zero.t and t/0 to test the new code.
 	- Reformat the source slightly.
 
-2.22  Tue Feb 17 08:32:00 2015
+2.22  2015-02-17T08:32:00
 	- Fix licence info in Makefile.PL to say Perl.
 
-2.21  Mon Feb 16 08:59:00 2015
+2.21  2015-02-16T08:59:00
 	- Patch Makefile.PL to refer to the current repo, which is on github, and not the original one,
 		which is on Adam's web site. See RT#102125.
 	- Remove Build.PL because Karen Etheridge tells me Module::Build is no longer in core.
@@ -20,31 +35,31 @@
 	- Edit line lengths in the docs the same way.
 	- Expand the See Also section of the docs.
 
-2.20  Sun Nov 24 10:52:00 2013
+2.20  2013-11-24T10:52:00
 	- Relax pre-req version requirements
 
-2.19  Sun Sep 15 09:16:00 2013
+2.19  2013-09-15T09:16:00
 	- Change VERSION => $VERSION in Makefile.PL to VERSION_FROM => 'lib/Config/Tiny.pm'.
 		Reported by Jean-Louis Morel. See RT#88670.
 
-2.18  Sat Sep 14 10:03:00 2013
+2.18  2013-09-14T10:03:00
 	- Remove obsolete and wrong version # from Makefile.PL.
 		Reported by Jean-Louis Morel. See RT#88658.
 	- Implement Kevin Ryde's suggestion to test if read() will return undef.
 		If so, set an error message and (still) return undef.
 
-2.17  Fri Sep 13 12:41:00 2013
+2.17  2013-09-13T12:41:00
 	- Remove the file tests -efr during calls to read(). The open() tests for any error.
 		Also, the -f test was reporting /dev/null as a directory, not a file.
 		Thanx to Kevin Ryde for pushing me to implement this. See RT#36974.
 	- Clean up some error messages slightly.
 
-2.16  Fri Sep  6 11:54:00 2013
+2.16  2013-09-06T11:54:00
 	- Replace Path::Tiny with File::Spec, because the former's list of dependencies is so long :-(.
 		Changed files: t/02.main.t, t/04.utf8.t, Build.PL and Makefile.PL.
 		See: RT#88435 (for Tree::DAG_Node) for an explanation.
 
-2.15  Sun Aug  4 14:59:00 2013
+2.15  2013-08-04T14:59:00
 	- Clean up the shambolic dates in this file.
 	- Add a note under Caveats about setting options more that once. Only the first case is
 		respected. Thanx to Kimmel K. See RT#69795.

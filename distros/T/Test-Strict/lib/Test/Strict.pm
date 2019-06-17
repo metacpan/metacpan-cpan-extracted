@@ -6,7 +6,7 @@ Test::Strict - Check syntax, presence of use strict; and test coverage
 
 =head1 VERSION
 
-Version 0.49
+Version 0.52
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ use File::Find;
 use Config;
 
 our $COVER;
-our $VERSION = '0.49';
+our $VERSION = '0.52';
 our $PERL    = $^X || 'perl';
 our $COVERAGE_THRESHOLD = 50; # 50%
 our $UNTAINT_PATTERN    = qr|^(.*)$|;
@@ -130,7 +130,7 @@ sub _all_files {
         #return if ($File::Find::dir =~ m![\\/]?blib[\\/]libdoc$!); # Filter out pod doc in dist
         #return if ($File::Find::dir =~ m![\\/]?blib[\\/]man\d$!); # Filter out pod doc in dist
         if (-d $File::Find::name &&
-            ($_ eq 'CVS' || $_ eq '.svn' || # Filter out cvs or subversion dirs
+            ($_ eq 'CVS' || $_ eq '.svn' || $_ eq '.git' || # Filter out cvs or git or subversion dirs
              $File::Find::name =~ m!(?:^|[\\/])blib[\\/]libdoc$! || # Filter out pod doc in dist
              $File::Find::name =~ m!(?:^|[\\/])blib[\\/]man\d$!) # Filter out pod doc in dist
             ) {
@@ -236,9 +236,12 @@ sub _strict_ok {
     my ($in) = @_;
     my $strict_module_rx = _module_rx( modules_enabling_strict() );
     local $_;
+    my $pod;
     while (<$in>) {
         next if (/^\s*#/); # Skip comments
-        next if (/^\s*=.+/ .. /^\s*=(cut|back|end)/); # Skip pod
+        $pod = 0, next if /^=(cut|back|end)/;
+        $pod = 1, next if /^=\S+/;
+        next if $pod; # skip pod
         last if (/^\s*(__END__|__DATA__)/); # End of code
         return 1 if $_ =~ $strict_module_rx;
         if (/\buse\s+(5\.\d+)/ and $1 >= 5.012) {
@@ -293,6 +296,7 @@ our @MODULES_ENABLING_STRICT = qw(
     strictures
     Test::Most
     Test::Roo
+    Test::Roo::Role
 );
 
 sub modules_enabling_strict { return @MODULES_ENABLING_STRICT }
@@ -339,6 +343,7 @@ our @MODULES_ENABLING_WARNINGS = qw(
     strictures
     Test::Most
     Test::Roo
+    Test::Roo::Role
 );
 
 sub modules_enabling_warnings { return @MODULES_ENABLING_WARNINGS }

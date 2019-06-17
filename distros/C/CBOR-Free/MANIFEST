@@ -8,6 +8,7 @@ Makefile.PL
 README.md
 lib/CBOR/Free.pm
 lib/CBOR/Free.xs
+lib/CBOR/Free/AddOne.pm
 lib/CBOR/Free/Tagged.pm
 lib/CBOR/Free/X.pm
 lib/CBOR/Free/X/Base.pm
@@ -21,6 +22,7 @@ lib/CBOR/Free/X/Recursion.pm
 lib/CBOR/Free/X/Unrecognized.pm
 ppport.h
 t/32bit.t
+t/add_one.t
 t/against_cbor_xs.t
 t/array.t
 t/boolean.t
@@ -38,5 +40,6 @@ t/string.t
 t/tag.t
 t/uint.t
 t/undef.t
+t_manual/upstream_test_vectors.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

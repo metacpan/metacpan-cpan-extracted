@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "JSON::Pointer meets PadWalker",
+  "ABSTRACT" => "Production safe data inspector",
   "AUTHOR" => "Ben Tyler <btyler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -20,14 +20,15 @@ my %WriteMakefileArgs = (
     "Devel::Size" => "0.82",
     "PadWalker" => "2.3",
     "Ref::Util" => "0.204",
-    "Scalar::Util" => 0
+    "Scalar::Util" => 0,
+    "Sub::Info" => "0.002"
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000100"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.010",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/lens-perlish/*.t"
   }
 );
 
@@ -37,6 +38,7 @@ my %FallbackPrereqs = (
   "PadWalker" => "2.3",
   "Ref::Util" => "0.204",
   "Scalar::Util" => 0,
+  "Sub::Info" => "0.002",
   "Test2::V0" => "0.000100"
 );
 

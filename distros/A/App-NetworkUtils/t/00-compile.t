@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/NetworkUtils.pm'
@@ -14,10 +14,14 @@ my @module_files = (
 
 my @scripts = (
     'script/networking-is-on',
+    'script/turn-networking-off',
+    'script/turn-networking-on',
     'script/turn-off-networking',
     'script/turn-off-wireless',
     'script/turn-on-networking',
-    'script/turn-on-wireless'
+    'script/turn-on-wireless',
+    'script/turn-wireless-off',
+    'script/turn-wireless-on'
 );
 
 # no fake home requested

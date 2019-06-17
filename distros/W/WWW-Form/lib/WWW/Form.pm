@@ -3,7 +3,7 @@ package WWW::Form;
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 use Data::Dumper;
 use CGI;
@@ -37,7 +37,7 @@ sub new {
 
     bless($self, $class);
 
-    # Set up a fields hash ref for the fields, so we will not need 
+    # Set up a fields hash ref for the fields, so we will not need
     # autovivificatiopn later
     $self->{fields} = {};
 
@@ -331,7 +331,7 @@ sub _setFields {
 
     foreach my $fieldName (keys %{$fieldsData}) {
         $self->_setField(
-            'name' => $fieldName, 
+            'name' => $fieldName,
             'params' => $fieldsData->{$fieldName},
             'value' => $fieldValues->{$fieldName}
         );
@@ -341,16 +341,16 @@ sub _setFields {
 sub _getFieldInitParams
 {
     my $self = shift;
-    
+
     my %args = (@_);
-    
+
     my $fieldName = $args{name};
     my $params = $args{params};
     my $user_given_field_value = $args{value};
 
     # This is the output parameters that we eventually place under
     # $out_params->. It is declared it so it can later be filled
-    # in by a different function other 
+    # in by a different function other
     my $out_params = {};
 
     # Use the supplied field value if one is given. Generally the supplied
@@ -473,7 +473,7 @@ sub _setField
     my %args = (@_);
 
     my $params = $self->_getFieldInitParams(%args);
-    
+
     $self->{fields}{$args{name}} = $params;
 
     return $self;
@@ -564,11 +564,11 @@ sub getFieldInputTdHTML
 sub renderFieldHTMLRow
 {
     my $self = shift;
-    my (%args) = (@_);    
+    my (%args) = (@_);
     my $fieldName = $args{'fieldName'};
     my $attributesString = $args{'attributesString'};
     my $tr_attr_string = $args{'trAttrString'};
-    return 
+    return
         "<tr${tr_attr_string}>" . $self->getFieldLabelTdHTML($fieldName) .
         $self->getFieldLabel($fieldName) . "</td>" .
         $self->getFieldInputTdHTML($fieldName) . $self->getFieldFormInputHTML(
@@ -590,7 +590,7 @@ sub renderHintHTMLRow
     my $tr_attributes = $self->_getTrAttributes($fieldName);
 
     my $form_args = $func_args{'form_args'};
-    
+
     my $hint = $self->getFieldHint($fieldName);
 
     if (defined($hint)) {
@@ -620,7 +620,7 @@ sub _getTrAttributes
 {
     my $self = shift;
     my $fieldName = shift;
-    
+
     my %tr_attributes = ();
 
     my $field = $self->getField($fieldName);
@@ -673,7 +673,7 @@ sub getFieldHTMLRow {
     my $html = "";
 
     my $tr_attr_string = $self->_getTrAttrString($fieldName);
-    
+
     foreach my $error (@feedback) {
         $html .= "<tr${tr_attr_string}><td colspan='2'>"
             . "<span style='color: #ff3300'>$error</span>"
@@ -686,7 +686,7 @@ sub getFieldHTMLRow {
         'trAttrString' => $tr_attr_string,
         );
 
-    $html .= 
+    $html .=
         $self->renderHintHTMLRow(
             $fieldName,
             'form_args' => $form_args,
@@ -825,8 +825,8 @@ sub getHiddenFieldsHTML
 {
     my $self = shift;
 
-    return 
-        join("", 
+    return
+        join("",
             (map { $self->_getInputHTML($_, "") . "\n" }
             grep { $self->_getFieldType($_) eq "hidden" }
             (@{$self->getFieldsOrder()}))
@@ -1086,7 +1086,7 @@ WWW::Form
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -1683,7 +1683,7 @@ Returns the opening tag of the <td> element that belongs to the control.
 
 =head2 renderFieldHTMLRow
 
-    $html .= 
+    $html .=
         $self->renderFieldHTMLRow(
             'fieldName' => "name",
             'attributesString' => " class=\"hello\"",
@@ -1697,7 +1697,7 @@ This function renders the field HTML row and returns the HTML.
     $html .= $self->renderHintHTMLRow('name');
 
     or
-    
+
     $html .= $self->renderHintHTMLRow(
         'name',
         form_args => {
@@ -1705,9 +1705,9 @@ This function renders the field HTML row and returns the HTML.
                 class => 'FormBlueBackground'
             }
         }
-    );    
+    );
 
-This function renders the hint HTML row of the specified field and returns the 
+This function renders the hint HTML row of the specified field and returns the
 HTML.
 
 =head2 getFieldHTMLRow
@@ -2017,7 +2017,7 @@ Adds new methods for dealing with hidden form inputs.
 
 November 18, 2006 - WWW::Form 1.17
 
-Adds support for select boxes with 'multiple' attribute set.  Note that this 
+Adds support for select boxes with 'multiple' attribute set.  Note that this
 needs to be tested in a mod_perl environment.
 
 Fixed CondTestMore to adapt it to the new Test::More.

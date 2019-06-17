@@ -4,11 +4,11 @@ author:
   - 'Ivan Wills <ivan.wills@gmail.com>'
 build_requires:
   Test::More: '0.88'
-  Test::Warnings: '0'
+  Test::Warnings: '0.026'
 configure_requires:
-  Module::Build: '0.42'
+  Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: App-aptperl
 provides:
   App::aptperl:
     file: lib/App/aptperl.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
   CHI: '0'
   File::chdir: '0'
@@ -32,4 +32,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::aptperl
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-apt-perl.git
-version: v0.0.3
+version: v0.0.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

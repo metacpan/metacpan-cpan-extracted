@@ -18,17 +18,18 @@ my %WriteMakefileArgs = (
   "NAME" => "Net::Async::Redis",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
-    "Future" => "0.37",
+    "Future" => "0.40",
+    "Future::AsyncAwait" => "0.27",
     "IO::Async" => 0,
     "List::Util" => "1.29",
     "Log::Any" => "1.050",
     "Math::Random::Secure" => 0,
+    "OpenTracing" => "0.003",
     "Ryu::Async" => "0.006",
     "Syntax::Keyword::Try" => "0.08",
     "URI" => 0,
     "URI::redis" => 0,
     "curry" => 0,
-    "namespace::clean" => 0,
     "parent" => 0
   },
   "TEST_REQUIRES" => {
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Variable::Disposition" => "0.004"
   },
-  "VERSION" => "1.014",
+  "VERSION" => "2.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,13 +54,15 @@ my %FallbackPrereqs = (
   "Class::Method::Modifiers" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Future" => "0.37",
+  "Future" => "0.40",
+  "Future::AsyncAwait" => "0.27",
   "IO::Async" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.29",
   "Log::Any" => "1.050",
   "Math::Random::Secure" => 0,
+  "OpenTracing" => "0.003",
   "Ryu::Async" => "0.006",
   "Syntax::Keyword::Try" => "0.08",
   "Test::CheckDeps" => "0.010",
@@ -70,7 +73,6 @@ my %FallbackPrereqs = (
   "URI::redis" => 0,
   "Variable::Disposition" => "0.004",
   "curry" => 0,
-  "namespace::clean" => 0,
   "parent" => 0
 );
 

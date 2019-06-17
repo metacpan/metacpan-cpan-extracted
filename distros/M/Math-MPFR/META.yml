@@ -19,5 +19,5 @@ no_index:
     - inc
 resources:
   repository: https://github.com/sisyphus/math-mpfr.git
-version: '4.11'
+version: '4.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 package Promises::Deferred::IO::Async;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: IO::Async implementation of Promises
-$Promises::Deferred::IO::Async::VERSION = '1.00';
+$Promises::Deferred::IO::Async::VERSION = '1.01';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ Promises::Deferred::IO::Async - IO::Async implementation of Promises
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 

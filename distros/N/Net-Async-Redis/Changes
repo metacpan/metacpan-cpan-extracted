@@ -1,5 +1,10 @@
 Revision history for Net-Async-Redis
 
+2.000     2019-06-16 22:44:26+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - now requires Future::AsyncAwait
+
 1.014     2019-02-04 02:05:21+08:00 Asia/Kuala_Lumpur
     New features:
 

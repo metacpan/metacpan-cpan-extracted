@@ -21,6 +21,6 @@ requires:
 resources:
   homepage: https://github.com/bingos/devel-patchperl
   repository: https://github.com/bingos/devel-patchperl.git
-version: '1.62'
+version: '1.64'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

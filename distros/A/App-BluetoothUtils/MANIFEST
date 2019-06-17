@@ -9,6 +9,8 @@ README
 dist.ini
 lib/App/BluetoothUtils.pm
 script/bluetooth-is-on
+script/turn-bluetooth-off
+script/turn-bluetooth-on
 script/turn-off-bluetooth
 script/turn-on-bluetooth
 t/00-compile.t

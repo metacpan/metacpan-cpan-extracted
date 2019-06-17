@@ -4,25 +4,25 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-aptperl",
    "prereqs" : {
       "build" : {
          "requires" : {
             "Test::More" : "0.88",
-            "Test::Warnings" : "0"
+            "Test::Warnings" : "0.026"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.38"
          }
       },
       "runtime" : {
@@ -42,7 +42,7 @@
    "provides" : {
       "App::aptperl" : {
          "file" : "lib/App/aptperl.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -57,5 +57,6 @@
          "url" : "git://github.com/ivanwills/App-apt-perl.git"
       }
    },
-   "version" : "v0.0.3"
+   "version" : "v0.0.4",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

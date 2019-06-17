@@ -1,10 +1,27 @@
 CHANGES
 -------
 
+  0.024 16 June 2019
+
+        * Respin release
+
+  0.023 16 June 2019
+  
+      * SimpleZip.pm
+        Populate extended attributes for file times & unix uid/gid
+
+      * SimpleUnzip.pm
+        * Added FilesOnly option
+        * Added extract method
+
+      * Added source to github
+
+      * Added .travis & .appveyor files
+
   0.022 10 April 2018
 
       *  t/010main-unzip.t 
-        Fixed failure on Windows
+         Fixed failure on Windows
 
   0.021 8 April 2018
 

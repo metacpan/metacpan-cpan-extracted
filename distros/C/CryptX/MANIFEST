@@ -457,6 +457,7 @@ src/ltc/pk/asn1/oid/pk_get_oid.c
 src/ltc/pk/asn1/oid/pk_oid_cmp.c
 src/ltc/pk/asn1/oid/pk_oid_str.c
 src/ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.c
+src/ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.c
 src/ltc/pk/asn1/x509/x509_decode_subject_public_key_info.c
 src/ltc/pk/asn1/x509/x509_encode_subject_public_key_info.c
 src/ltc/pk/dh/dh.c
@@ -616,6 +617,7 @@ src/ltm/bn_mp_exteuclid.c
 src/ltm/bn_mp_fread.c
 src/ltm/bn_mp_fwrite.c
 src/ltm/bn_mp_gcd.c
+src/ltm/bn_mp_get_bit.c
 src/ltm/bn_mp_get_int.c
 src/ltm/bn_mp_get_long.c
 src/ltm/bn_mp_grow.c
@@ -632,6 +634,7 @@ src/ltm/bn_mp_is_square.c
 src/ltm/bn_mp_jacobi.c
 src/ltm/bn_mp_karatsuba_mul.c
 src/ltm/bn_mp_karatsuba_sqr.c
+src/ltm/bn_mp_kronecker.c
 src/ltm/bn_mp_lcm.c
 src/ltm/bn_mp_lshd.c
 src/ltm/bn_mp_mod.c
@@ -650,12 +653,14 @@ src/ltm/bn_mp_n_root_ex.c
 src/ltm/bn_mp_neg.c
 src/ltm/bn_mp_or.c
 src/ltm/bn_mp_prime_fermat.c
+src/ltm/bn_mp_prime_frobenius_underwood.c
 src/ltm/bn_mp_prime_is_divisible.c
 src/ltm/bn_mp_prime_is_prime.c
 src/ltm/bn_mp_prime_miller_rabin.c
 src/ltm/bn_mp_prime_next_prime.c
 src/ltm/bn_mp_prime_rabin_miller_trials.c
 src/ltm/bn_mp_prime_random_ex.c
+src/ltm/bn_mp_prime_strong_lucas_selfridge.c
 src/ltm/bn_mp_radix_size.c
 src/ltm/bn_mp_radix_smap.c
 src/ltm/bn_mp_rand.c

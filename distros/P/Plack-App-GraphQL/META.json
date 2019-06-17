@@ -1,0 +1,56 @@
+{
+   "abstract" : "Serve GraphQL from Plack / PSGI",
+   "author" : [
+      "John Napiorkowski <jjn1056@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-App-GraphQL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GraphQL" : "0.33",
+            "JSON::MaybeXS" : "1.004000",
+            "Plack" : "1.0047",
+            "Safe::Isa" : "1.000010",
+            "Template::Tiny" : "1.12"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "JSON::MaybeXS" : "1.004000",
+            "Plack::Test" : "0",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Plack-App-GraphQL/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/Plack-App-GraphQL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/Plack-App-GraphQL.git",
+         "web" : "https://github.com/jjn1056/Plack-App-GraphQL"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

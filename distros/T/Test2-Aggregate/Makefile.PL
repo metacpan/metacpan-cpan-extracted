@@ -20,6 +20,16 @@ my %WriteMakefileArgs = (
         'File::Slurp' => '0',
         'Test2::V0'   => '0'
     },
+    META_MERGE        => {
+      "meta-spec" => { version => 2 },
+      resources => {
+        repository => {
+            type => 'git',
+            url => 'git://github.com/SpareRoom/Test2-Aggregate.git',
+            web => 'https://github.com/SpareRoom/Test2-Aggregate',
+        },
+      },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Test2-Aggregate-*' },
 );

@@ -1,0 +1,250 @@
+# ABSTRACT: A collection of Perl idioms or short pieces of Perl code
+# PODNAME: perlsnippets
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+perlsnippets - A collection of Perl idioms or short pieces of Perl code
+
+=head1 VERSION
+
+This document describes version 0.004 of perlsnippets (from Perl distribution perlsnippets), released on 2019-06-06.
+
+=head1 DESCRIPTION
+
+This distribution catalogs (in its POD pages) various idioms or short pieces of
+code that a Perl programmer usually uses. You can also copy-paste them to your
+code.
+
+The pieces of code are often too small to refactor into modules, or sometimes
+they have been refactored as modules but you still want to "inline" them to
+avoid adding a dependency. The pieces of code are often Perl idioms (patterns of
+code that are specific to Perl programming), but not always.
+
+Keywords: idiom, snippet, pattern
+
+=head1 ARY (Arrays)
+
+=head1 ARY/PICK (Arrays / Picking Array Elements)
+
+=head2 ARY/PICK/1 (Check whether a value exists in an array, without any module)
+
+ my $foo_exists = grep { $_ eq 'foo' } @ary;
+
+Another alternative is using smartmatch:
+
+ my $foo_exists = 'foo' ~~ @ary;
+
+but smartmatch is now in experimental status and might be removed in the future.
+Plus the above is not exactly equivalent to the snippet and might be "too smart"
+for your needs (read L<perlop> for more details).
+
+Another alternative is using L<List::Util>'s C<first>:
+
+ my $foo_exists = first { $_ eq 'foo' } @ary;
+
+The benefit of the above alternative is that it short-circuits (finishes after
+it finds the first match) while C<grep> evaluates the whole array even though it
+already finds a match (although the speed difference might not matter except for
+big arrays). But this alternative requires a module (albeit a core one). And
+beware of traps like:
+
+ my $foo_exists = first { $_ == 0 } @ary; # wil return false even though array contains 0
+
+=head2 ARY/PICK/2 (Check whether a value exists in an array, without any module, with short-circuiting)
+
+ my $foo_exists; $_ eq 'foo' ? ($foo_exists++, last) : 0 for @ary;
+ my $foo_exists = do { my $res; $_ eq 'foo' ? ($res++, last) : 0 for @ary; $res };
+
+Since C<grep> is not short-circuiting, to short-circuit we need to employ a loop
+(e.g. C<for> + C<last>, C<while>). This snippet offers a few styled variations.
+Some require multiple statements (declare variable + set it) while other offer
+single statement but requires a C<do {}> block and double declaration. All are
+ugly enough that you might as well use C<first()> for clarity.
+
+=head2 ARY/PICK/3 (Pick a random element from array)
+
+ my $elem = $ary[rand @ary];
+
+If you need to random-pick multiple elements from an array, you can use
+C<samples> from L<List::MoreUtils>. If you cannot use a module for some reason,
+you can copy-paste the implementation from L<List::MoreUtils::PP>.
+
+=head1 ARY/SORT (Arrays / Sorting Arrays)
+
+=head2 ARY/SORT/1 (Schwartzian transform)
+
+ my @sorted = map  { $_->[0] }
+              sort { $a->[1] <=> $b->[1] }
+              map  { [$_, gen_key_for($_)] }
+              @ary;
+
+This is the infamous Schwartzian transform named after Randal Schwartz who
+popularized it during the early days of Perl 5 in 1994. Basically, it's a
+one-statement way to sort an array using a key. Examples of functions to
+generate a key: C<length($_)> (to sort by string length), C<lc($_)> (to do
+case-insensitive sorting).
+
+Related documentation: L<https://en.wikipedia.org/wiki/Schwartzian_transform>
+
+=head1 HASH (Hashes)
+
+=head1 IO (I/O)
+
+=head1 IO/FILE (I/O / File I/O)
+
+=head2 IO/FILE/1 (Slurp a file content into a string)
+
+ my $content = do { local $/; <$fh> };
+
+The above snippet slurps the whole file (which has been opened with filehandle
+C<$fh>) into memory (scalar variable). The C<do {}> block localizes the effect
+of C<$/>. If you start from a filename and want to open it first:
+
+=head2 IO/FILE/2 (Slurp a file content into a string)
+
+ my $content = do { local $/; open my $fh, "<", $filename; <$fh> };
+
+=head2 IO/FILE/3 (Slurp a file content into array of strings)
+
+ my @lines = do { local $/; open my $fh, "<", $filename; <$fh> };
+
+Like the previous snippet but you get the content as an array of lines. Each
+line still has their terminating newlines.
+
+=head2 IO/FILE/4 (Slurp a file content into array of strings)
+
+ chomp(my @lines = do { local $/; open my $fh, "<", $filename; <$fh> });
+
+Like the previous snippet, but the lines no longer contain newlines because they
+are C<chomp()>-ed.
+
+Related modules: L<File::Slurper>.
+
+Related documentation: C<$/> in L<perlvar>.
+
+=head1 MOD (Modules)
+
+=head2 MOD/LOAD/1 (Require a module by name from variable)
+
+ { (my $mod_pm = "$mod.pm") =~ s!::!/!g; require $mod_pm }
+
+You have a module name in C<$mod> (e.g. C<"Foo::Bar">) and want to
+load/C<require> it. You cannot just use C<require $mod> because require expects
+its non-bareware argument to be in the form of C<"Foo/Bar.pm">. So the above
+snippet converts C<$mod> to that form.
+
+This is safer than C<eval "use $mod"> or C<eval "require $mod"> which work but
+necessitates you to check that $mod does not contain arbitrary and dangerous
+code.
+
+Related modules: L<Module::Load>
+
+Related documentation: C<require> in L<perlfunc>.
+
+=head2 MOD/LOAD/2 (Require a module and importing from it)
+
+ require Foo::Bar; Foo::Bar->import("baz", "qux");
+
+The above snippet loads C<Foo::Bar> module and imports things from the module.
+It is the run-time equivalent of C<< use Foo::Bar "baz", "qux"; >>. C<< require
+Foo::Bar; >> itself is the run-time equivalent of C<< use Foo::Bar (); >>, i.e.
+loading a module without importing anything from it.
+
+=head1 PROC (Process Management)
+
+=head1 PROC/CHLD (Process / Child Process)
+
+Some bit-fiddling and logic is needed to extract exit code from C<$?>
+(C<$CHILD_ERROR>). L<Process::Status> makes things easier by presenting you with
+an object that you can query, but if you just want an exit code:
+
+=head2 PROC/CHLD/1 (Extract information from $?)
+
+ my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
+
+This snippet extracts all the information contained in C<$?>: exit code (which
+can be -1 to mean there is no child process being created due to an execution
+error, e.g. C<system "non-existent-command">), what signal the child process
+dies from, and whether the child process dumps core.
+
+=head2 PROC/CHLD/2 (Extract exit code from $?)
+
+ my $exit_code = $? < 0 ? $? : $? >> 8.
+
+This snippets just extracts the exit code of child process (which can be -1 to
+mean that there is no child process being created due to an execution error,
+e.g. C<system "non-existent-command">).
+
+Related modules: L<Process::Status>, L<Proc::ChildError>.
+
+Related documentation: C<$?> in L<perlvar>.
+
+=head1 OBJ (Objects)
+
+=head1 REF (References)
+
+=head1 SUB (Subroutines)
+
+=head1 SUB/ARG (Subroutines / Subroutine Arguments)
+
+=head2 SUB/ARG/1 (Assign hash arguments)
+
+ my %args = @_;
+
+=head2 SUB/ARG/2 (Assign hash arguments in method)
+
+ my ($self, %args) = @_;
+
+=head2 SUB/ARG/3 (Assign hash arguments in method, shift $self)
+
+ my ($self, %args) = (shift, @_);
+
+This variant shifts C<$self> from C<@_> first, so you can do this later:
+
+ $self->yet_other_method(...);
+ $self->SUPER::method(@_);
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/perlsnippets>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-perlsnippets>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=perlsnippets>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Common Perl idioms (2004)|https://www.perlmonks.org/?node_id=376948>
+
+The Idioms subchapter in the Modern Perl book. L<http://modernperlbooks.com/>
+
+Perl Cookbook, 2nd edition. L<http://shop.oreilly.com/product/9780596003135.do>
+
+L<perlsecret>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

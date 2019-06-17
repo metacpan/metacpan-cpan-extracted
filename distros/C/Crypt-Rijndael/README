@@ -2,7 +2,7 @@ NAME
     Crypt::Rijndael - Crypt::CBC compliant Rijndael encryption module
 
 VERSION
-    Version 1.13
+    Version 1.14
 
 SYNOPSIS
      use Crypt::Rijndael;

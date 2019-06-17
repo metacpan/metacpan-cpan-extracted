@@ -170,7 +170,6 @@ lib/Pcore/Util/Hash.pm
 lib/Pcore/Util/Hash/HashArray.pm
 lib/Pcore/Util/Hash/LRU.pm
 lib/Pcore/Util/Hash/Multivalue.pm
-lib/Pcore/Util/Hash/RandKey.pm
 lib/Pcore/Util/Host.pm
 lib/Pcore/Util/IDN.pm
 lib/Pcore/Util/List.pm

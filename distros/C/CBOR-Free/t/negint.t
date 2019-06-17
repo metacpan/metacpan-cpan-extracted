@@ -54,7 +54,7 @@ if ( (0xffffffff << 1) < 0xffffffff ) {
 }
 
 SKIP: {
-    skip 'No 64-bit support!', 2 if !eval { pack 'q' };
+    skip 'No 64-bit support!' if !eval { pack 'q' };
 
     for my $i ( -0xffffffff, -0xffffffff - 1 ) {
         my $cbor = CBOR::Free::encode($i);

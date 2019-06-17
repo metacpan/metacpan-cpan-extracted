@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Opsview::RestAPI::Exception;
-$Opsview::RestAPI::Exception::VERSION = '1.190220';
+$Opsview::RestAPI::Exception::VERSION = '1.191660';
 # ABSTRACT: Opsview::RestAPI Exception object
 
 
@@ -72,7 +72,7 @@ Opsview::RestAPI::Exception - Opsview::RestAPI Exception object
 
 =head1 VERSION
 
-version 1.190220
+version 1.191660
 
 =head1 SYNOPSIS
 

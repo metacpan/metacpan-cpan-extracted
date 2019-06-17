@@ -5,14 +5,14 @@ This is Perl module B<App::jl>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1560229824"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1560229824&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1560606718"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1560606718&branch=master"/></a>
 
 =end html
 
 
 =head1 SYNOPSIS
 
-The B<jl> command allows you to recursively decode JSON in JSON string
+The B<jl> command allows you to show JSON log nicely. Especially, recursively decoded JSON in JSON string
 
     $ echo '{"foo":"{\"bar\":\"{\\\"baz\\\":123}\"}"}' | jl
     {
@@ -23,8 +23,36 @@ The B<jl> command allows you to recursively decode JSON in JSON string
        }
     }
 
+A complecated log can be converted to nice JSON structure to treat a tool like C<jq> .
+
+    echo '{"service":"Foo-Service","pod":"bar-baz-12345","message":"{\"log\":\"[PID:12345]<info>\\nThis is log message. foo, bar, baz, qux, long message is going to be splitted nicely to treat JSON by jq without any special function\",\"timestamp\":1560526739}"}' | jl -xxxx
+    {
+       "message" : {
+          "log" : [
+             [
+                "[PID:12345]",
+                "<info>"
+             ],
+             [
+                "This is log message. foo",
+                "bar",
+                "baz",
+                "qux",
+                "long message is going to be splitted nicely to treat JSON by jq without any special function"
+             ]
+          ],
+          "timestamp" : "2019-06-15 00:38:59"
+       },
+       "pod" : "bar-baz-12345",
+       "service" : "Foo-Service"
+    }
+
+Make JSON logs more readable.
+
 
 =head1 INSTALLATION
+
+There are several ways to install,
 
 1) The easiest way to install B<App::jl> is
 

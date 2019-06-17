@@ -25,5 +25,6 @@ on 'test' => sub {
     requires "Test::LWP::UserAgent";
     requires "Test::Warn";
 
+    requires "JSON";
     requires "Path::Class::Dir";
 };

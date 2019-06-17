@@ -9,6 +9,7 @@ use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arra
 use Pcore::Util::UUID qw[uuid_v1mc_str uuid_v4_str];
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Text qw[encode_utf8];
+use Time::HiRes qw[];
 
 # NOTE http://habrahabr.ru/post/149635/
 # для вставки данных в цикле надо использовать h->begin_work ... h->commit
@@ -131,6 +132,7 @@ sub BUILD ( $self, $args ) {
     $dbh->sqlite_create_function( 'uuid_generate_v1mc', 0, sub { return uuid_v1mc_str } );
     $dbh->sqlite_create_function( 'uuid_generate_v4',   0, sub { return uuid_v4_str } );
     $dbh->sqlite_create_function( 'gen_random_uuid',    0, sub { return uuid_v4_str } );
+    $dbh->sqlite_create_function( 'time_hires',         0, sub { return Time::HiRes::time() } );
 
     $self->{on_connect}->($self) if $self->{on_connect};
 
@@ -143,8 +145,10 @@ sub BUILD ( $self, $args ) {
 sub _get_schema_patch_table_query ( $self, $table_name ) {
     return <<"SQL";
         CREATE TABLE IF NOT EXISTS "$table_name" (
-            "id" INTEGER PRIMARY KEY NOT NULL,
-            "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            "module" TEXT NOT NULL,
+            "id" INTEGER NOT NULL,
+            "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY ("module", "id")
         )
 SQL
 }
@@ -747,16 +751,16 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 143                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 145                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 368                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
+## |    3 | 372                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 451                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 455                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 334                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 338                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 658                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 662                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

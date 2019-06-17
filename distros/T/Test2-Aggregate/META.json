@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test2::Tools::Basic" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,9 +36,21 @@
             "Test2::V0" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Tools::Basic" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/SpareRoom/Test2-Aggregate.git",
+         "web" : "https://github.com/SpareRoom/Test2-Aggregate"
+      }
+   },
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

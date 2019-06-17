@@ -225,7 +225,7 @@ sub decompress ( $self ) {
 
 sub compress ( $self ) {
     state $dbh = do {
-        my $_dbh = P->handle("sqlite:$ENV->{PCORE_USER_DIR}/perl-compress.sqlite");
+        my $_dbh = P->handle("sqlite:$ENV->{PCORE_USER_BUILD_DIR}/perl-compress.sqlite");
 
         $_dbh->add_schema_patch(
             1 => <<'SQL'

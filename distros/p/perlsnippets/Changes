@@ -1,0 +1,25 @@
+0.004   2019-06-06 (PERLANCAR)
+
+	- Add some snippets on picking elements from array, assigning hash
+          arguments.
+
+	- Add keywords in Description.
+
+	- Mention Perl Cookbook.
+
+
+0.003   2019-06-04 (PERLANCAR)
+
+	- Rename dist from Perl::Snippets -> perlsnippets.
+
+        - Reorganize headings.
+
+
+0.002   2019-05-29 (PERLANCAR)
+
+	- Mention perlsecret.
+
+
+0.001   2019-05-28 (PERLANCAR)
+
+        - First release.

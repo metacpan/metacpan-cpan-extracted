@@ -20,13 +20,21 @@ SKIP: {
     my $starttime = strftime( '%Y-%m-%d %H:%M:%S', localtime() );
     my $endtime = strftime( '%Y-%m-%d %H:%M:%S', localtime( time() + 3600 ) );
 
+    my $host_id_1 = trap {
+        $ora_test->rest->get(
+            api => 'config/host/1',
+        );
+    };
+    $trap->did_return("got host ID 1");
+    $trap->quiet("with no errors");
+
     # Add downtime just using parameters
     my $result = trap {
         $ora_test->rest->post(
             api    => 'downtime',
             params => {
-                'svc.hostname'    => 'opsview',
-                'svc.servicename' => 'Opsview Agent',
+                'svc.hostname'    => $host_id_1->{object}->{name},
+                'svc.servicename' => $host_id_1->{object}->{servicechecks}->[0]->{name},
                 starttime         => $starttime,
                 endtime           => $endtime,
                 comment => 'Downtime added by Opsview::RestAPI test: '
@@ -45,8 +53,8 @@ SKIP: {
         $ora_test->rest->post(
             api    => 'downtime',
             params => {
-                'svc.hostname'    => 'opsview',
-                'svc.servicename' => 'Opsview Agent',
+                'svc.hostname'    => $host_id_1->{object}->{name},
+                'svc.servicename' => $host_id_1->{object}->{servicechecks}->[0]->{name},
             },
             data => {
                 starttime => $starttime,

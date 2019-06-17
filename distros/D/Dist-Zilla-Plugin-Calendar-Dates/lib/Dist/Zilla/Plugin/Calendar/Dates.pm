@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Calendar::Dates;
 
-our $DATE = '2019-02-14'; # DATE
-our $VERSION = '0.054'; # VERSION
+our $DATE = '2019-06-08'; # DATE
+our $VERSION = '0.100'; # VERSION
 
 use 5.010001;
 use strict;
@@ -110,7 +110,7 @@ Dist::Zilla::Plugin::Calendar::Dates - Plugin to use when building Calendar::Dat
 
 =head1 VERSION
 
-This document describes version 0.054 of Dist::Zilla::Plugin::Calendar::Dates (from Perl distribution Dist-Zilla-Plugin-Calendar-Dates), released on 2019-02-14.
+This document describes version 0.100 of Dist::Zilla::Plugin::Calendar::Dates (from Perl distribution Dist-Zilla-Plugin-Calendar-Dates), released on 2019-06-08.
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ sub make_obj
 # Test Suite #1: a simple one.
 {
     my $form = make_obj();
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -38,9 +38,9 @@ sub make_obj
             type => "textarea",
         },
     );
-    
+
     $form->_setFields(\%fields_data, {});
-    
+
     # TEST
     is($form->{fields}{first_name}{label}, "First Name", "simple-fn-label");
     # TEST
@@ -52,13 +52,13 @@ sub make_obj
     # TEST
     is($form->{fields}{comments}{defaultValue}, "Enter your comments here.", "simple-comments-dv");
     # TEST
-    is($form->{fields}{comments}{type}, "textarea", "simple-comments-type");   
+    is($form->{fields}{comments}{type}, "textarea", "simple-comments-type");
 }
 
 # Test Suite #2: an invalid value being entered
 {
     my $form = make_obj();
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -74,9 +74,9 @@ sub make_obj
             type => "textarea",
         },
     );
-    
+
     $form->_setFields(\%fields_data, {});
-    
+
     # TEST
     is($form->{fields}{first_name}{label}, "First Name", "non-existent-fn-label");
     # TEST
@@ -88,15 +88,15 @@ sub make_obj
     # TEST
     is($form->{fields}{comments}{defaultValue}, "Enter your comments here.", "non-existent-comments-dv");
     # TEST
-    is($form->{fields}{comments}{type}, "textarea", "non-existent-comments-type");   
-    # TEST 
+    is($form->{fields}{comments}{type}, "textarea", "non-existent-comments-type");
+    # TEST
     ok( (!exists($form->{fields}{first_name}{fooportuklok})), "non-existent-non-existent");
 }
 
 # Test Suite #3: hint
 {
     my $form = make_obj();
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -112,9 +112,9 @@ sub make_obj
             type => "textarea",
         },
     );
-    
+
     $form->_setFields(\%fields_data, {});
-    
+
     # TEST
     is($form->{fields}{first_name}{label}, "First Name", "hint-fn-label");
     # TEST
@@ -126,8 +126,8 @@ sub make_obj
     # TEST
     is($form->{fields}{comments}{defaultValue}, "Enter your comments here.", "hint-comments-dv");
     # TEST
-    is($form->{fields}{comments}{type}, "textarea", "hint-comments-type");   
-    # TEST 
+    is($form->{fields}{comments}{type}, "textarea", "hint-comments-type");
+    # TEST
     is($form->{fields}{first_name}{hint}, "Type your first name here", "hint-fn-hint");
     # TEST
     ok((! exists($form->{fields}{comments}{hint})), "hint-comments-hint");
@@ -139,7 +139,7 @@ sub make_obj
 
     $form->{fields} = {};
 
-    my @params = 
+    my @params =
     (
         'name' => 'first_name',
         'params' =>
@@ -167,11 +167,11 @@ sub make_obj
     # Final test - make sure that $self->{fields} is unharmed.
     # _getFieldInitParams() is a functional (as in Functional Programming)
     # routine
-    
+
     # TEST
     ok ((scalar(keys(%{$form->{fields}})) == 0), "_getFieldInitParams() does not touches the \$self->{fields} hash");
 
-    $form->_setField(        
+    $form->_setField(
         @params,
     );
 

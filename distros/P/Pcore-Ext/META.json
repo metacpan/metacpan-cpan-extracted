@@ -48,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-ext/overview"
       }
    },
-   "version" : "v0.30.4",
+   "version" : "v0.31.7",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

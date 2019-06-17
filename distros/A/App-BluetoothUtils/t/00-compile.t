@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BluetoothUtils.pm'
@@ -14,6 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/bluetooth-is-on',
+    'script/turn-bluetooth-off',
+    'script/turn-bluetooth-on',
     'script/turn-off-bluetooth',
     'script/turn-on-bluetooth'
 );

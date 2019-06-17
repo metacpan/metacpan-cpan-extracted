@@ -8,11 +8,14 @@ author/requires.cpanm
 cpanfile
 lib/HTML/Lint/Pluggable.pm
 lib/HTML/Lint/Pluggable/HTML5.pm
+lib/HTML/Lint/Pluggable/Microdata.pm
+lib/HTML/Lint/Pluggable/RDFa.pm
 lib/HTML/Lint/Pluggable/TinyEntitesEscapeRule.pm
 lib/HTML/Lint/Pluggable/WhiteList.pm
 minil.toml
 t/000_load.t
 t/001_basic.t
+t/001_rdfa.t
 xt/perlcritic.t
 xt/pod.t
 xt/podcoverage.t

@@ -15,9 +15,85 @@ sub EXT_no_selection : Extend('Ext.Panel') {
             this.callParent(arguments);
 
             if (!this.getHtml()) {
-                this.setHtml('<div style="text-align:center;color:gray;"><i class="$FAR_TIMES_CIRCLE" style="font-size:7em;"></i><br/><br/><div class="x-label-text-el" style="font-size:2em;">' + this.getText() + '</div></div>');
+                this.setHtml('<div style="text-align:center;color:grey;"><i class="$FAR_TIMES_CIRCLE" style="font-size:7em;"></i><br/><br/><div class="x-label-text-el" style="font-size:2em;">' + this.getText() + '</div></div>');
             }
 JS
+    };
+}
+
+# THEME
+sub EXT_theme_controller : Extend('Ext.app.ViewController') {
+    return {
+        themes => P->cfg->read( $ENV->{share}->get('data/ext/material-themes.json') ),
+
+        init => func ['view'],
+        <<"JS",
+            this.callParent(arguments);
+
+            var columnsPanel = this.lookup('columns'),
+                columns = [],
+                currentCol;
+
+                for (var i = 1; i <= view.getColumns(); i++) {
+                    columns.push(columnsPanel.add({}));
+                }
+
+                for ( var name in this.themes ) {
+                    currentCol = columns.shift();
+                    columns.push(currentCol);
+
+                    currentCol.add({
+                        text: name
+                    });
+                }
+JS
+
+        setTheme => func [ 'button', 'e' ], <<"JS",
+            Ext.fireEvent('setTheme', this.themes[button.getText()]);
+JS
+    };
+}
+
+sub EXT_theme : Extend('Ext.Panel') {
+    return {
+        controller => $type{'theme_controller'},
+
+        config => {
+            columns => 3,    # number of columns to distribute themes buttons
+        },
+
+        layout => 'vbox',
+
+        items => [
+            {   reference => 'columns',
+
+                layout => {
+                    type  => 'hbox',
+                    align => 'start',
+                    pack  => 'start',
+                },
+
+                defaults => {
+                    layout => {
+                        type  => 'vbox',
+                        align => 'start',
+                        pack  => 'start',
+                    },
+
+                    width => 300,
+
+                    defaults => {
+                        xtype   => 'button',
+                        iconCls => $FAS_PALETTE,
+                        handler => 'setTheme',
+                    },
+                },
+            },
+            {   xtype    => 'togglefield',
+                boxLabel => l10n('DARK MODE'),
+                bind     => '{session.theme.darkMode}',
+            },
+        ],
     };
 }
 

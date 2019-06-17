@@ -1,0 +1,76 @@
+{
+   "abstract" : "Production safe data inspector",
+   "author" : [
+      "Ben Tyler <btyler@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-Optic",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Size" : "0.82",
+            "PadWalker" : "2.3",
+            "Ref::Util" : "0.204",
+            "Scalar::Util" : "0",
+            "Sub::Info" : "0.002",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000100"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Optic" : {
+         "file" : "lib/Devel/Optic.pm",
+         "version" : "0.010"
+      },
+      "Devel::Optic::Lens::Perlish" : {
+         "file" : "lib/Devel/Optic/Lens/Perlish.pm",
+         "version" : "0.010"
+      },
+      "Devel::Optic::Lens::Perlish::Constants" : {
+         "file" : "lib/Devel/Optic/Lens/Perlish/Constants.pm",
+         "version" : "0.010"
+      },
+      "Devel::Optic::Lens::Perlish::Interpreter" : {
+         "file" : "lib/Devel/Optic/Lens/Perlish/Interpreter.pm",
+         "version" : "0.010"
+      },
+      "Devel::Optic::Lens::Perlish::Parser" : {
+         "file" : "lib/Devel/Optic/Lens/Perlish/Parser.pm",
+         "version" : "0.010"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kanatohodets/Devel-Optic/issues"
+      },
+      "homepage" : "https://github.com/kanatohodets/Devel-Optic",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kanatohodets/Devel-Optic.git",
+         "web" : "https://github.com/kanatohodets/Devel-Optic"
+      }
+   },
+   "version" : "0.010",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+}
+

@@ -61,7 +61,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000018
+version 0.000019
 
 =head1 SYNOPSIS
 
@@ -132,6 +132,12 @@ Or
 
 Probably you want to export this variable in your C<~/.bashrc> file (or some
 other appropriate place in your dot files.
+
+=head1 SUPPORTED EDITORS
+
+This code has been well tested with C<vim>.  It should also work with C<nvim>,
+C<emacs>, C<pico>, C<nano> and C<kate>.  Patches for other editors are very
+welcome.
 
 =head1 AUTHOR
 

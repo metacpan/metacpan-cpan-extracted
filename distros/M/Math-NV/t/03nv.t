@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Math::NV qw(:all);
+use Config;
 
 print "1..5\n";
 
@@ -40,17 +41,11 @@ else {
   print "not ok 4\n";
 }
 
-if($strtod) {
-  $nv = nv('-1125e-3');
-  if($nv == set_C('-1125e-3')) {print "ok 5\n"}
-  else {
-    warn "\n$nv != ", set_C('-1125e-3'), "\n";
-    print "not ok 5\n";
-  }
-}
+$nv = nv('-1125e-3');
+if($nv == set_C('-1125e-3')) {print "ok 5\n"}
 else {
-  warn "\n Skipping test 5 - Perl_strtod is not defined\n";
-  print "ok 5\n";
+  warn "\n$nv != ", set_C('-1125e-3'), "\n";
+  print "not ok 5\n";
 }
 
 $Math::NV::no_warn = 0; # re-enable warning

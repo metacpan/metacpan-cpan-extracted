@@ -1,3 +1,9 @@
+0.004   2019-06-15 (PERLANCAR)
+
+	- [ux] Add CLI aliases: turn-{wireless,networking}-{off,on} ->
+	  turn-{off,on}-{networking,wireless}.
+
+
 0.003   2019-01-08 (PERLANCAR)
 
 	- No functional changes.

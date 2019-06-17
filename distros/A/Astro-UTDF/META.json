@@ -4,7 +4,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "Astro::UTDF" : {
          "file" : "lib/Astro/UTDF.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-UTDF"
       }
    },
-   "version" : "0.007",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.008",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

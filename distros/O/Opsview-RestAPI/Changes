@@ -1,5 +1,9 @@
 Revision history for Opsview-RestAPI
 
+1.191660  2019-06-15 12:42:38+01:00 Europe/London
+- Allow arrays within params
+- Fixe tests for use with Opsview Monitor v6.x
+
 1.190220  2019-01-22 11:35:52+00:00 Europe/London
 - Add in $rest->opsview_version call
 - Improve exception object for showing error details

@@ -10,7 +10,7 @@ use WWW::Form;
 
 # Test Suite #1: a simple one.
 {
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -26,12 +26,12 @@ use WWW::Form;
         },
     );
 
-    my %fields_values = 
+    my %fields_values =
     (
         'first_name' => "Shlomi",
         'comments' => "I'm too lame to put anything here",
     );
-    
+
     my $form = WWW::Form->new(\%fields_data, \%fields_values);
 
     my $first_name = $form->getField("first_name");

@@ -19,15 +19,16 @@ has share         => ( init_arg => undef );                        # InstanceOf 
 has user_cfg_path => ( is       => 'lazy', init_arg => undef );
 has user_cfg      => ( is       => 'lazy', init_arg => undef );    # $HOME/.pcore/pcore.yaml config
 
-has PCORE_SHARE_DIR => ();
-has USER_DIR        => ();                                         # OS user profile dir
-has PCORE_USER_DIR  => ();                                         # USER_DIR/.pcore, pcore profile dir
-has INLINE_DIR      => ();
-has START_DIR       => ();
-has SCRIPT_DIR      => ();
-has SCRIPT_NAME     => ();
-has TEMP_DIR        => ();                                         # OS temp dir
-has DATA_DIR        => ();
+has PCORE_SHARE_DIR      => ();
+has USER_DIR             => ();                                    # OS user profile dir
+has PCORE_USER_DIR       => ();                                    # USER_DIR/.pcore, pcore profile dir
+has PCORE_USER_BUILD_DIR => ();                                    # USER_DIR/.pcore/.build, pcore build dir
+has INLINE_DIR           => ();
+has START_DIR            => ();
+has SCRIPT_DIR           => ();
+has SCRIPT_NAME          => ();
+has TEMP_DIR             => ();                                    # OS temp dir
+has DATA_DIR             => ();
 
 has SCANDEPS  => ();
 has DAEMONIZE => ();
@@ -173,9 +174,11 @@ sub BUILD ( $self, $args ) {
     $self->{PCORE_USER_DIR} = "$self->{USER_DIR}/.pcore";
     mkdir $self->{PCORE_USER_DIR} || die qq[Error creating user dir "$self->{PCORE_USER_DIR}"] if !-d $self->{PCORE_USER_DIR};
 
+    $self->{PCORE_USER_BUILD_DIR} = "$self->{PCORE_USER_DIR}/.build";
+    mkdir $self->{PCORE_USER_BUILD_DIR} || die qq[Error creating user dir "$self->{PCORE_USER_BUILD_DIR}"] if !-d $self->{PCORE_USER_BUILD_DIR};
+
     if ( !$self->{is_par} ) {
-        $self->{INLINE_DIR} = "$self->{PCORE_USER_DIR}/inline/$Config{version}-$Config{archname}";
-        mkdir "$self->{PCORE_USER_DIR}/inline" || die qq[Error creating ""$self->{PCORE_USER_DIR}/inline""] if !-d "$self->{PCORE_USER_DIR}/inline";
+        $self->{INLINE_DIR} = "$self->{PCORE_USER_BUILD_DIR}/$Config{version}-$Config{archname}";
         mkdir $self->{INLINE_DIR} || die qq[Error creating "$self->{INLINE_DIR}"] if !-d $self->{INLINE_DIR};
     }
 
@@ -205,9 +208,10 @@ sub BUILD ( $self, $args ) {
 }
 
 sub BUILD1 ($self) {
-    $self->{USER_DIR}       = P->path( $self->{USER_DIR} )->{path};
-    $self->{PCORE_USER_DIR} = P->path( $self->{PCORE_USER_DIR} )->{path};
-    $self->{INLINE_DIR}     = P->path( $self->{INLINE_DIR} )->{path} if $self->{INLINE_DIR};
+    $self->{USER_DIR}             = P->path( $self->{USER_DIR} )->{path};
+    $self->{PCORE_USER_DIR}       = P->path( $self->{PCORE_USER_DIR} )->{path};
+    $self->{PCORE_USER_BUILD_DIR} = P->path( $self->{PCORE_USER_BUILD_DIR} )->{path};
+    $self->{INLINE_DIR}           = P->path( $self->{INLINE_DIR} )->{path} if $self->{INLINE_DIR};
 
     # init share
     $self->{share} = Pcore::Core::Env::Share->new;
@@ -421,14 +425,14 @@ END {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 207                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
-## |      | 331                  | * Subroutine "END" with high complexity score (23)                                                             |
+## |      | 210                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
+## |      | 335                  | * Subroutine "END" with high complexity score (23)                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 342                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 346                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 382                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 386                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 409                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |    2 | 413                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

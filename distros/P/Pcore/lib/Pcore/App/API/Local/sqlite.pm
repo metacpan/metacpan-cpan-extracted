@@ -7,7 +7,7 @@ with qw[Pcore::App::API::Local];
 
 sub _db_add_schema_patch ( $self, $dbh ) {
     $dbh->add_schema_patch(
-        1 => <<"SQL"
+        1, 'auth', <<"SQL"
 
             -- ROLE
             CREATE TABLE IF NOT EXISTS "api_role" (
@@ -21,7 +21,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
                 "name" TEXT NOT NULL UNIQUE,
                 "hash" BLOB NOT NULL,
                 "enabled" INTEGER NOT NULL DEFAULT 0,
-                "created" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'now') AS INT))
+                "created" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'NOW') AS INT))
             );
 
             -- USER PERMISSION
@@ -40,7 +40,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
                 "user_id" BLOB NOT NULL REFERENCES "api_user" ("id") ON DELETE CASCADE,
                 "hash" BLOB NOT NULL,
                 "desc" TEXT,
-                "created" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'now') AS INT))
+                "created" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'NOW') AS INT))
             );
 
             -- USER TOKEN PERMISSION

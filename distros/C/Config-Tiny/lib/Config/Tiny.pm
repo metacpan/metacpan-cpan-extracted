@@ -6,10 +6,10 @@ use strict;
 
 # Warning: There is another version line, in t/02.main.t.
 
-our $VERSION = '2.23';
+our $VERSION = '2.24';
 
 BEGIN {
-	require 5.008001;
+	require 5.008001; # For the utf8 stuff.
 	$Config::Tiny::errstr  = '';
 }
 
@@ -247,7 +247,7 @@ Lines starting with C<'#'> or C<';'> are considered comments and ignored,
 as are blank lines.
 
 When writing back to the config file, all comments, custom whitespace,
-and the ordering of your config file elements is discarded. If you need
+and the ordering of your config file elements are discarded. If you need
 to keep the human elements of a config when writing back, upgrade to
 something better, this module is not for you.
 
@@ -310,15 +310,49 @@ Generates the file content for the object and returns it as a string.
 
 =head1 FAQ
 
+=head2 What happens if a key is repeated?
+
+The last value is retained, overwriting any previous values.
+
+See t/06.repeat.key.t.
+
 =head2 Why can't I put comments at the ends of lines?
 
-Because a line like:
+=over 4
+
+=item o The # char is only introduces a comment when it's at the start of a line.
+
+So a line like:
 
 	key=value # A comment
 
-Sets key to 'value # A comment' :-(.
+Sets key to 'value # A comment', which, presumably, you did not intend.
 
 This conforms to the syntax discussed in L</CONFIGURATION FILE SYNTAX>.
+
+=item o Comments matching /\s\;\s.+$//g; are ignored.
+
+This means you can't preserve the suffix using:
+
+	key = Prefix ; Suffix
+
+Result: key is now 'Prefix'.
+
+But you can do this:
+
+	key = Prefix;Suffix
+
+Result: key is now 'Prefix;Suffix'.
+
+Or this:
+
+	key = Prefix; Suffix
+
+Result: key is now 'Prefix; Suffix'.
+
+=back
+
+See t/07.trailing.comment.t.
 
 =head2 Why can't I omit the '=' signs?
 
@@ -366,8 +400,6 @@ Yes. See t/05.zero.t (test code) and t/0 (test data).
 
 =head1 CAVEATS
 
-=head2 Unsupported Section Headers
-
 Some edge cases in section headers are not supported, and additionally may not
 be detected when writing the config file.
 
@@ -375,11 +407,9 @@ Specifically, section headers with leading whitespace, trailing whitespace,
 or newlines anywhere in the section header, will not be written correctly
 to the file and may cause file corruption.
 
-=head2 Setting an option more than once
+=head1 Repository
 
-C<Config::Tiny> will only recognize the first time an option is set in a
-config file. Any further attempts to set the same option later in the config
-file are ignored.
+L<https://github.com/ronsavage/Config-Tiny.git>
 
 =head1 SUPPORT
 

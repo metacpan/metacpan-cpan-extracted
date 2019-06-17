@@ -2,6 +2,7 @@ MANIFEST
 Makefile.PL
 MPFR.pm
 MPFR.pod
+grisu3.h
 math_mpfr_include.h
 MPFR.xs
 README
@@ -38,6 +39,7 @@ t/decimal128_conv.t
 t/div_by_zero.t
 t/DoubleDouble.t
 t/DoubleDouble2.t
+t/doubletoa.t
 t/exceptions.t
 t/flags.t
 t/float128_conv.t

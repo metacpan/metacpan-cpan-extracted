@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Run::Response;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use App::Spec::Run::Output;
 use Scalar::Util qw/ blessed /;

@@ -1,0 +1,10 @@
+SUPPORTED ATTRIBUTES
+====================
+  uid		UID of process
+  pid		process ID
+  ppid		parent process ID
+  fname		file name
+  start		start time (seconds since the epoch)
+  sid		SID of process
+  user_name	user name of process
+  domain_name	domain name of process

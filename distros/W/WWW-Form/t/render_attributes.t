@@ -15,10 +15,10 @@ my $www_form = WWW::Form->new({});
 ok($www_form, "Initialization");
 
 {
-    my %attributes = 
+    my %attributes =
         (
-            'first' => "Hello", 
-            "second" => "Good", 
+            'first' => "Hello",
+            "second" => "Good",
             "third" => "yoohoo",
         );
     my $expected = q{ first="Hello" second="Good" third="yoohoo"};
@@ -28,9 +28,9 @@ ok($www_form, "Initialization");
 }
 
 {
-    my %attributes = 
+    my %attributes =
         (
-            'first' => "D&D", 
+            'first' => "D&D",
         );
     my $expected = q{ first="D&amp;D"};
     my $real = $www_form->_render_attributes(\%attributes);
@@ -39,7 +39,7 @@ ok($www_form, "Initialization");
 }
 
 {
-    my %attributes = 
+    my %attributes =
         (
             'style' => "font : \"Helvetica\"",
         );
@@ -50,7 +50,7 @@ ok($www_form, "Initialization");
 }
 
 {
-    my %attributes = 
+    my %attributes =
         (
             'name' => "<jonathan>",
         );

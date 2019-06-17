@@ -1,5 +1,6 @@
 package WWW::FieldValidator;
 
+use 5.014;
 use strict;
 use warnings;
 
@@ -135,7 +136,7 @@ sub _validateMaxStrLength {
 # Checks to see if input matches the specified pattern.
 sub _validateRegex {
     my $self  = shift;
-    my $input = shift || '';
+    my $input = shift // '';
 
     return ($input =~ /$self->{regex}/);
 }
@@ -154,7 +155,7 @@ WWW::FieldValidator
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -182,9 +183,9 @@ types are supported (Note these are constants, the $validatorType param needs
 to be one of the following values):
 
   # Input must conform to /^[\w\-\.\+]+@(\w+)(\.([\w\-]+))+$/
-  WWW::FieldValidator::WELL_FORMED_EMAIL 
+  WWW::FieldValidator::WELL_FORMED_EMAIL
   # Input must be >= a specified string length
-  WWW::FieldValidator::MIN_STR_LENGTH 
+  WWW::FieldValidator::MIN_STR_LENGTH
   # Input must be <= a specified string length
   WWW::FieldValidator::MAX_STR_LENGTH
   # Input must match a user defined regex

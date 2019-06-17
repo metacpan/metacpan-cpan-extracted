@@ -9,7 +9,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::NV::VERSION = '2.01';
+$Math::NV::VERSION = '2.02';
 
 DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
 
@@ -17,13 +17,13 @@ DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
 @Math::NV::EXPORT_OK = qw(
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
-    set_C set_mpfr
+    set_C set_mpfr is_inexact
     );
 
 %Math::NV::EXPORT_TAGS = (all => [qw(
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
-    set_C set_mpfr
+    set_C set_mpfr is_inexact
     )]);
 
 if($Math::MPFR::VERSION < 4.07) {
@@ -361,6 +361,32 @@ sub set_mpfr {
 
   return Rmpfr_get_NV($val, MPFR_RNDN);
 
+}
+
+sub is_inexact {
+
+  die "is_inexact() requires at least mpfr-3.1.6"
+    if $Math::NV::mpfr_strtofr_bug;
+
+  unless($Math::NV::no_warn & 1) {
+    my $itsa = $_[0];
+    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
+    warn "Argument given to is_inexact() is $_itsa{$itsa}, not a string - possibly not what you want"
+    if $itsa != 4;
+  }
+
+  my $bits = mant_dig();
+  $bits = 2098 if $bits == 106;
+
+  my $val = Rmpfr_init2($bits);
+
+  my $inex = Rmpfr_strtofr($val, $_[0], 0, 0);
+  my $nv = atonv($_[0]);
+
+  my $cmp = Rmpfr_cmp_NV($val, $nv) * -1;
+
+  return $inex if !$cmp;
+  return $cmp;
 }
 
 sub set_C {

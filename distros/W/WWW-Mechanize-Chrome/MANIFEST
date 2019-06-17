@@ -35,6 +35,7 @@ README.mkdn
 t/00-load.t
 t/01-chrome-devtools-protocol.t
 t/02-chrome-devtools-tab.t
+t/03-listener-leak-test.t
 t/47-mech-simplest.t
 t/49-launch.t
 t/49-mech-get-file-lc-ct.html
@@ -101,6 +102,7 @@ t/75-classnames.t
 t/76-infinite-scroll.html
 t/76-scroll.t
 t/77-reload-fragment.t
+t/78-memleak.t
 t/helper.pm
 t/mixi_jp_index.html
 t/sophos_co_jp_index.html

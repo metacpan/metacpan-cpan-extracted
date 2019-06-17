@@ -1,0 +1,22 @@
+requires "App::TimeTracker::Utils" => "0";
+requires "Digest::SHA" => "0";
+requires "Encode" => "0";
+requires "LWP::UserAgent" => "0";
+requires "Moose::Role" => "0";
+requires "URI::Escape" => "0";
+requires "perl" => "5.010";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.28";
+};
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+  requires "lib" => "0";
+};
+
+on 'configure' => sub {
+  requires "Module::Build" => "0.28";
+};

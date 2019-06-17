@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.62';
+$Devel::PatchPerl::VERSION = '1.64';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -7790,6 +7790,7 @@ sub _patch_utils_h2ph {
   my $perlver = shift;
   my $num = _norm_ver( $perlver );
   return unless $num < 5.021010;
+  return if    $num == 5.020003;
   if ( $num < 5.006001 ) {
     return _patch(<<'UH2PH560');
 --- utils/h2ph.PL
@@ -9072,6 +9073,7 @@ sub _patch_lib_h2ph {
   my $perlver = shift;
   my $num = _norm_ver( $perlver );
   return unless $num < 5.021010;
+  return if    $num == 5.020003;
   if ( $num >= 5.013005 ) {
     _patch(<<'LH2PH1');
 --- lib/h2ph.t
@@ -9133,7 +9135,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.62
+version 1.64
 
 =head1 SYNOPSIS
 

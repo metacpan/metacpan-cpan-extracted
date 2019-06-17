@@ -22,7 +22,7 @@ use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 
-our $VERSION = '0.32';
+our $VERSION = '0.34';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -788,6 +788,7 @@ sub _connect( $self, %options ) {
         if( $self->{ kill_pid } and my $pid = delete $self->{ pid }) {
             local $SIG{CHLD} = 'IGNORE';
             kill 'SIGKILL' => $pid;
+            waitpid $pid, 0;
         };
         croak $err;
     }
@@ -1025,6 +1026,18 @@ To see the browser console live from your Perl script, use the following:
         @{ $_[0]->{params}->{args} };
   });
 
+If you want to explicitly remove the listener, either set it to C<undef>:
+
+  undef $console;
+
+Alternatively, call
+
+  $console->unregister;
+
+or call
+
+  $mech->remove_listener( $console );
+
 =cut
 
 sub add_listener( $self, $event, $callback ) {
@@ -1033,6 +1046,10 @@ sub add_listener( $self, $event, $callback ) {
             . "Please store the result somewhere";
     };
     return $self->driver->add_listener( $event, $callback )
+}
+
+sub remove_listener( $self, $listener ) {
+    $listener->unregister
 }
 
 =head2 C<< $mech->on_request_intercepted( $cb ) >>
@@ -1060,7 +1077,7 @@ sub on_request_intercepted( $self, $cb ) {
         $self->{ on_request_intercept_listener } =
         $self->add_listener('Network.requestIntercepted', sub( $ev ) {
             if( $s->{ on_request_intercepted }) {
-                $self->log('debug', sprintf 'Request intercepted %s: %s',
+                $s->log('debug', sprintf 'Request intercepted %s: %s',
                                     $ev->{params}->{interceptionId},
                                     $ev->{params}->{request}->{url});
                 $s->{ on_request_intercepted }->( $s, $ev->{params} );
@@ -1120,7 +1137,7 @@ sub on_dialog( $self, $cb ) {
         $self->{ on_dialog_listener } =
         $self->add_listener('Page.javascriptDialogOpening', sub( $ev ) {
             if( $s->{ on_dialog }) {
-                $self->log('debug', sprintf 'Javascript %s: %s', $ev->{params}->{type}, $ev->{params}->{message});
+                $s->log('debug', sprintf 'Javascript %s: %s', $ev->{params}->{type}, $ev->{params}->{message});
                 $s->{ on_dialog }->( $s, $ev->{params} );
             };
         });
@@ -1394,6 +1411,7 @@ sub DESTROY {
     if( $pid ) {
         local $SIG{CHLD} = 'IGNORE';
         kill 'SIGKILL' => $pid;
+        waitpid $pid, 0;
     };
     %{ $_[0] }= (); # clean out all other held references
 }
@@ -3195,6 +3213,9 @@ sub _performSearch( $self, %args ) {
             #    );
             #}
             )->then( sub( $response ) {
+                # This should already happen through the DESTROY callback
+                # but we'll be explicit here
+                $setChildNodes->unregister;
                 undef $setChildNodes;
                 my %nodes = map {
                     $_->{nodeId} => $_
@@ -3257,13 +3278,13 @@ sub _fetchNode( $self, $nodeId, $attributes = undef ) {
                 @{ $attributes },
             },
             nodeName => $nodeName,
-            driver => $self->driver,
+            driver => $s->driver,
             mech => $s,
-            _generation => $self->_generation,
+            _generation => $s->_generation,
         };
         Future->done( WWW::Mechanize::Chrome::Node->new( $node ));
     })->catch(sub {
-        warn "Node has gone away in the meantime, could not resolve";
+        warn "Node $nodeId has gone away in the meantime, could not resolve";
         Future->done( WWW::Mechanize::Chrome::Node->new( {} ) );
     });
 }
@@ -4566,10 +4587,12 @@ sub fetchResources_future( $self, %options ) {
     my $names = $options{ names };
     my $save = $options{ save };
 
+    my $s = $self;
+    weaken $s;
+
     $self->getResourceTree_future
     ->then( sub( $tree ) {
         my @requested;
-
         # Also fetch the frame itself?!
         # Or better reuse ->content?!
         # $tree->{frame}
@@ -4578,7 +4601,7 @@ sub fetchResources_future( $self, %options ) {
         # This should become a separate method
         # Also something like get_page_resources, that returns the linear
         # list of resources for all frames etc.
-        for my $res (@{ $tree->{resources}}) {
+        for my $res ($tree->{frame}, @{ $tree->{resources}}) {
             # Also include childFrames and subresources here, recursively
 
             if( $names->{ $res->{url} } ) {
@@ -4588,7 +4611,8 @@ sub fetchResources_future( $self, %options ) {
 
             # we will only scrape HTTP resources
             next if $res->{url} !~ /^https?:/i;
-            my $target = $self->filenameFromUrl( $res->{url}, $extensions{ $res->{mimeType} });
+            warn $res->{url};
+            my $target = $s->filenameFromUrl( $res->{url}, $extensions{ $res->{mimeType} });
             my %filenames = reverse %$names;
 
             my $duplicates;
@@ -4601,24 +4625,24 @@ sub fetchResources_future( $self, %options ) {
         };
 
         # retrieve and save the resource content for each resource
-        for my $res (@{ $tree->{resources}}) {
+        for my $res ($tree->{frame}, @{ $tree->{resources}}) {
             next if $seen->{ $res->{url} };
 
             # we will only scrape HTTP resources
             next if $res->{url} !~ /^https?:/i;
-            my $fetch = $self->getResourceContent_future( $res );
+            my $fetch = $s->getResourceContent_future( $res );
             if( $save ) {
-                #warn "Will save $res->{url}";
+                warn "Will save $res->{url}";
                 $fetch = $fetch->then( $save );
             };
             push @requested, $fetch;
         };
-        Future->wait_all( @requested )->catch(sub {
+        return Future->wait_all( @requested )->catch(sub {
             warn $@;
         });
     })->catch(sub {
-            warn $@;
-        });
+        warn $@;
+    });
 }
 
 =head2 C<< $mech->saveResources_future >>
@@ -4647,6 +4671,8 @@ sub saveResources_future( $self, %options ) {
     my %names = (
         $self->uri => $target_file,
     );
+    my $s = $self;
+    weaken $s;
     $self->fetchResources_future( save => sub( $resource ) {
 
         # For mime/html targets without a name, use the title?!
@@ -4656,7 +4682,7 @@ sub saveResources_future( $self, %options ) {
         $names{ $resource->{url} } ||= File::Spec->catfile( $target_dir, $names{ $resource->{url} });
         my $target = $names{ $resource->{url} }
             or die "Don't have a filename for URL '$resource->{url}' ?!";
-        $self->log( 'debug', "Saving '$resource->{url}' to '$target'" );
+        $s->log( 'debug', "Saving '$resource->{url}' to '$target'" );
         open my $fh, '>', $target
             or croak "Couldn't save url '$resource->{url}' to $target: $!";
         binmode $fh;
@@ -4667,7 +4693,7 @@ sub saveResources_future( $self, %options ) {
     }, names => \%names, seen => \my %seen )->then( sub( @resources ) {
         Future->done( %names );
     })->catch(sub {
-            warn $@;
+        warn $@;
     });
 }
 
@@ -5005,18 +5031,20 @@ sub _handleScreencastFrame( $self, $frame ) {
     # Meh, this one doesn't get a response I guess. So, not ->send_message, just
     # send a JSON packet to acknowledge the frame
     my $ack;
+    my $s = $self;
+    weaken $s;
     $ack = $self->driver->send_message(
         'Page.screencastFrameAck',
         sessionId => 0+$frame->{params}->{sessionId} )->then(sub {
-            $self->log('trace', 'Screencast frame acknowledged');
+            $s->log('trace', 'Screencast frame acknowledged');
             $frame->{params}->{data} = decode_base64( $frame->{params}->{data} );
-            $self->{ screenFrameCallback }->( $self, $frame->{params} );
+            $s->{ screenFrameCallback }->( $s, $frame->{params} );
             # forget ourselves
             undef $ack;
     });
 }
 
-sub setScreenFrameCallback( $self, $callback, %options ) {
+sub setScreenFrameCallback( $self, $callback=undef, %options ) {
     $self->{ screenFrameCallback } = $callback;
 
     $options{ format } ||= 'png';
@@ -5031,7 +5059,7 @@ sub setScreenFrameCallback( $self, $callback, %options ) {
         };
         $self->{ screenCastFrameListener } =
             $self->add_listener('Page.screencastFrame', $self->{ screenFrameCallbackCollector });
-        $action = $self->driver->send_message(
+        $action = $s->driver->send_message(
             'Page.startScreencast',
             format => $options{ format },
             everyNthFrame => 0+$options{ everyNthFrame }
@@ -5041,7 +5069,7 @@ sub setScreenFrameCallback( $self, $callback, %options ) {
             # well, actually, we should only reset this after we're sure that
             # the last frame has been processed. Maybe we should send ourselves
             # a fake event for that, or maybe Chrome tells us
-            delete $self->{ screenCastFrameListener };
+            delete $s->{ screenCastFrameListener };
             Future->done(1);
         });
     }

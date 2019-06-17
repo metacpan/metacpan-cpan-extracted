@@ -3,7 +3,7 @@ package Net::Async::Redis::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '1.014'; # VERSION
+our $VERSION = '2.000'; # VERSION
 
 =head1 NAME
 
@@ -15,6 +15,7 @@ Used internally by L<Net::Async::Redis> and L<Net::Async::Redis::Server>.
 
 =cut
 
+use Scalar::Util qw(blessed reftype looks_like_number);
 use Log::Any qw($log);
 
 my $CRLF = "\x0D\x0A";
@@ -32,8 +33,6 @@ see L</encode_from_client> instead.
 =cut
 
 sub encode {
-    use Scalar::Util qw(blessed reftype);
-    use namespace::clean qw(blessed reftype);
     my ($self, $data) = @_;
     die 'blessed data is not ok' if blessed $data;
     if(my $type = reftype $data) {
@@ -82,9 +81,6 @@ Likely to call L</item> or L</item_error> zero or more times.
 =cut
 
 sub decode {
-    use Scalar::Util qw(looks_like_number);
-    use namespace::clean qw(looks_like_number);
-
     my ($self, $bytes) = @_;
 
     my $len = $self->{parsing_bulk};
@@ -148,4 +144,14 @@ sub item_error {
 }
 
 1;
+
+__END__
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth and others 2015-2019. Licensed under the same terms as Perl itself.
 

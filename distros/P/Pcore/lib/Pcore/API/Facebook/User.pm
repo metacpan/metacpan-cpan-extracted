@@ -1,28 +1,27 @@
 package Pcore::API::Facebook::User;
 
 use Pcore -role, -const;
+use Pcore::Util::Scalar qw[is_plain_coderef];
 
-const our $VER => 3.3;
+const our $API_VER => 3.3;
 
-sub me ( $self, $cb = undef ) {
-    return $self->_req( 'GET', "me", undef, undef, $cb );
+sub me ( $self, @args ) {
+    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+
+    my %args = @args;
+
+    return $self->_req( 'GET', 'me', \%args, undef, $cb );
 }
 
-sub debug_token ( $self, $cb = undef ) {
-    return $self->_req( 'GET', "v$VER/debug_token", { input_token => $self->{token} }, undef, $cb );
+sub debug_token ( $self, @args ) {
+    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+
+    my %args = @args;
+
+    return $self->_req( 'GET', "v$API_VER/debug_token", { input_token => $self->{token} }, undef, $cb );
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 8                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

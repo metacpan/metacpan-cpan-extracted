@@ -12,7 +12,7 @@ Promises::Cookbook::SynopsisBreakdown - A breakdown of the SYNOPSIS section of P
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 

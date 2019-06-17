@@ -4,7 +4,7 @@
       "Kenta Sato <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.6",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -62,19 +62,25 @@
    "provides" : {
       "HTML::Lint::Pluggable" : {
          "file" : "lib/HTML/Lint/Pluggable.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "HTML::Lint::Pluggable::HTML5" : {
          "file" : "lib/HTML/Lint/Pluggable/HTML5.pm",
-         "version" : "0.08"
+         "version" : "0.10"
+      },
+      "HTML::Lint::Pluggable::Microdata" : {
+         "file" : "lib/HTML/Lint/Pluggable/Microdata.pm"
+      },
+      "HTML::Lint::Pluggable::RDFa" : {
+         "file" : "lib/HTML/Lint/Pluggable/RDFa.pm"
       },
       "HTML::Lint::Pluggable::TinyEntitesEscapeRule" : {
          "file" : "lib/HTML/Lint/Pluggable/TinyEntitesEscapeRule.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "HTML::Lint::Pluggable::WhiteList" : {
          "file" : "lib/HTML/Lint/Pluggable/WhiteList.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -88,12 +94,14 @@
          "web" : "https://github.com/karupanerura/p5-HTML-Lint-Pluggable"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_authority" : "cpan:KARUPA",
    "x_contributors" : [
-      "Klaus S. Madsen <ksm@jobindex.dk>",
       "Doug Bell <preaction@users.noreply.github.com>",
+      "Klaus S. Madsen <ksm@jobindex.dk>",
+      "Robert Rothenberg <rrwo@cpan.org>",
       "shibayu36 <shibayu36@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

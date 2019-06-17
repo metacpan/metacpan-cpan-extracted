@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/NetworkUtils/turn_on_networking
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-01-08'; # DATE
+our $DATE = '2019-06-15'; # DATE
 our $DIST = 'App-NetworkUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ turn-on-networking - Turn on networking
 
 =head1 VERSION
 
-This document describes version 0.003 of turn-on-networking (from Perl distribution App-NetworkUtils), released on 2019-01-08.
+This document describes version 0.004 of turn-on-networking (from Perl distribution App-NetworkUtils), released on 2019-06-15.
 
 =head1 SYNOPSIS
 

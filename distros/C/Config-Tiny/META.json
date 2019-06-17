@@ -4,7 +4,7 @@
       "Adam Kennedy <adamk@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -35,9 +35,14 @@
             "File::Spec" : "3.3",
             "File::Temp" : "0.22",
             "UNIVERSAL" : "0",
-            "perl" : "v5.8.1",
             "strict" : "0",
             "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::Pod" : "1.51"
          }
       }
    },
@@ -52,6 +57,6 @@
          "web" : "https://github.com/ronsavage/Config-Tiny"
       }
    },
-   "version" : "2.23"
+   "version" : "2.24",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }
-

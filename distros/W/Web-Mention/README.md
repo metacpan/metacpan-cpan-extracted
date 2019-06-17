@@ -199,9 +199,8 @@ this returns undef.
 
     $content = $wm->content;
 
-Returns a string representing this object's best determination of the
-_display-ready_ representation of this webmention's content, based on a
-number of factors.
+Returns a string containing this object's best determination of this
+webmention's _display-ready_ content, based on a number of factors.
 
 If the source document uses Microformats2 metadata and contains an
 `h-entry` MF2 item, then returned content may come from a variety of
@@ -334,6 +333,30 @@ If this webmention has been verified, then this will return a
 [DateTime](https://metacpan.org/pod/DateTime) object corresponding to the time of verification.
 (Otherwise, returns undef.)
 
+### title
+
+    my $title = $wm->title;
+
+Returns a string containing this object's best determination of the
+_display-ready_ title of this webmention's source document,
+considered separately from its content. (You can get its more complete
+content via the ["content"](#content) method.
+
+If the source document uses Microformats2 metadata and contains an
+`h-entry` MF2 item, _and_ that item has a `name` property, then this
+method will return the text content of that name property.
+
+If not, then it will return the content of the source document's
+&lt;title> element, with any further HTML stripped away.
+
+In any case, the string will get truncated if it's too long. See
+["max\_content\_length"](#max_content_length) and ["content\_truncation\_marker"](#content_truncation_marker).
+
+Note that in some circumstances, the title and content methods might
+return identical values. (If, for example, the source document defines
+an entry with an explicit name property and no summary or content
+properties.)
+
 ### type
 
     $type = $wm->type;
@@ -392,7 +415,7 @@ Jason McIntosh (jmac@jmac.org)
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jason McIntosh.
+This software is Copyright (c) 2018-2019 by Jason McIntosh.
 
 This is free software, licensed under:
 

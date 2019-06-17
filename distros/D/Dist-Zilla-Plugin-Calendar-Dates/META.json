@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Dist-Zilla-Plugin-Calendar-Dates"
       }
    },
-   "version" : "0.054",
+   "version" : "0.100",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -156,7 +156,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.594"
+            "version" : "0.596"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -240,9 +240,9 @@
             "version" : "0.02"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion",
-            "name" : "@Author::PERLANCAR/PERLANCAR::OurPkgVersion",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@Author::PERLANCAR/OurPkgVersion",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",

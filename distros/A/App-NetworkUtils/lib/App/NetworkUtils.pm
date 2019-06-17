@@ -1,7 +1,7 @@
 package App::NetworkUtils;
 
-our $DATE = '2019-01-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-15'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -180,7 +180,7 @@ App::NetworkUtils - Command-line utilities related to networking
 
 =head1 VERSION
 
-This document describes version 0.003 of App::NetworkUtils (from Perl distribution App-NetworkUtils), released on 2019-01-08.
+This document describes version 0.004 of App::NetworkUtils (from Perl distribution App-NetworkUtils), released on 2019-06-15.
 
 =head1 DESCRIPTION
 
@@ -191,6 +191,10 @@ networking:
 
 =item * L<networking-is-on>
 
+=item * L<turn-networking-off>
+
+=item * L<turn-networking-on>
+
 =item * L<turn-off-networking>
 
 =item * L<turn-off-wireless>
@@ -198,6 +202,10 @@ networking:
 =item * L<turn-on-networking>
 
 =item * L<turn-on-wireless>
+
+=item * L<turn-wireless-off>
+
+=item * L<turn-wireless-on>
 
 =back
 
@@ -231,6 +239,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 turn_off_networking
 
 Usage:
@@ -256,6 +265,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 turn_off_wireless
@@ -285,6 +295,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 turn_on_networking
 
 Usage:
@@ -310,6 +321,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 turn_on_wireless

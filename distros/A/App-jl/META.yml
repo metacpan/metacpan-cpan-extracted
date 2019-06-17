@@ -1,5 +1,5 @@
 ---
-abstract: 'Recursive JSON decoder'
+abstract: 'Show JSON Log Nicely'
 author:
   - 'Dai Okabayashi <bayashi@cpan.org>'
 build_requires:
@@ -20,13 +20,14 @@ name: App-jl
 provides:
   App::jl:
     file: lib/App/jl.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   Getopt::Long: '2.42'
   JSON: '0'
   POSIX: '0'
   Pod::Usage: '0'
   Sub::Data::Recursive: '0.02'
+  YAML::Syck: '0'
   perl: '5.008005'
   strict: '0'
   warnings: '0'
@@ -34,5 +35,5 @@ resources:
   bugtracker: http://github.com/bayashi/App-jl/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/App-jl
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

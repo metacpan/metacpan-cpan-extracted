@@ -10,6 +10,50 @@ sure you change the first line.
 
 =cut
 
+=head1 NAME
+
+OpenTracing::Batch - represents a group of zero or more spans
+
+=head1 DESCRIPTION
+
+A batch of spans is used for submitting results to an opentracing endpoint.
+
+Once you've created a batch, take a look at L</new_span> and the L<OpenTracing::SpanProxy>
+class.
+
+=head1 METHODS
+
+=head2 process
+
+Returns the L<OpenTracing::Process> that this batch applies to. Each batch is
+submitted from a single process.
+
+=head2 spans
+
+Returns an arrayref of L<OpenTracing::Span> instances.
+
+=head2 span_list
+
+Returns a list of L<OpenTracing::Span> instances.
+
+=head2 add_span
+
+Adds a new L<OpenTracing::Span> instance to this batch.
+
+=head2 new_span
+
+Creates a new L<OpenTracing::Span>, adds it to this batch, and returns an
+L<OpenTracing::SpanProxy> instance (which will automatically mark the end
+of the span when it's destroyed).
+
+This is most likely to be the method you'll want for working with spans
+in user code.
+
+=head2 DESTROY
+
+Triggers callbacks when the batch is discarded. Normally used by the transport
+mechanism to ensure that the batch is sent over to the tracing endpoint.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -19,4 +63,12 @@ sure you change the first line.
 L<new|OpenTracing::Common/new>
 
 =back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
 

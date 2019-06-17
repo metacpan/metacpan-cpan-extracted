@@ -10,7 +10,7 @@ use WWW::Form;
 
 # Test that _getTextAreaHTML escapes its HTML.
 {
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -25,13 +25,13 @@ use WWW::Form;
             type => "textarea",
         },
     );
-    
-    my %fields_values = 
+
+    my %fields_values =
     (
         'first_name' => "Josephine",
         'comments' => "</textarea><h1>You have been Exploited! (& more)</h1>",
     );
-    
+
     my $form = WWW::Form->new(
         \%fields_data,
         \%fields_values,
@@ -40,7 +40,7 @@ use WWW::Form;
     my $retrieved_text = $form->_getTextAreaHTML("comments", "");
 
     # TEST
-    is ($retrieved_text, 
+    is ($retrieved_text,
         q{<textarea name='comments'>&lt;/textarea&gt;&lt;h1&gt;You have been Exploited! (&amp; more)&lt;/h1&gt;</textarea>},
         "Textarea HTML Escape"
        );
@@ -54,7 +54,7 @@ use WWW::Form;
 }
 
 {
-    my %fields_data = 
+    my %fields_data =
     (
         'first_name' =>
         {
@@ -76,14 +76,14 @@ use WWW::Form;
             type => "textarea",
         },
     );
-    
-    my %fields_values = 
+
+    my %fields_values =
     (
         'is_female' => 0,
         'first_name' => "\"Ben&Shlomi\" <bas\@hello.com>",
         'comments' => "</textarea><h1>You have been Exploited! (& more)</h1>",
     );
-    
+
     my $form = WWW::Form->new(
         \%fields_data,
         \%fields_values,
@@ -98,14 +98,14 @@ use WWW::Form;
         );
 
     $retrieved_text = $form->_getCheckBoxHTML("is_female", "");
-    
+
     # TEST
     is ($retrieved_text,
         q{<input type='checkbox' name='is_female' id='is_female' value="Yes." />},
         "Checkbox Unset Value"
     );
 
-    %fields_values = 
+    %fields_values =
     (
         'is_female' => 1,
         'first_name' => "\"Ben&Shlomi\" <bas\@hello.com>",

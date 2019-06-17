@@ -22,7 +22,7 @@ no_index:
 provides:
   Test::Strict:
     file: lib/Test/Strict.pm
-    version: '0.49'
+    version: '0.52'
 requires:
   File::Find: '0.01'
   File::Spec: '0.01'
@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: http://github.com/manwar/Test-Strict
   repository: http://github.com/manwar/Test-Strict.git
-version: '0.49'
+version: '0.52'
 x_contributors:
   - 'Gabor Szabo <szabgab@cpan.org>'
   - 'Peter Vereshagin <veresc@cpan.org>'

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.031';
+our $VERSION = '1.032';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -91,7 +91,7 @@ our $VERSION = '1.031';
 #pod =for html
 #pod <img alt="screenshot of yancy editor showing custom element"
 #pod     src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-custom-element.png?raw=true"
-#pod     style="width: 600px; max-width: 100%;" />
+#pod     style="width: 600px; max-width: 100%;" width="600" />
 #pod
 #pod =head2 yancy.editor.route
 #pod
@@ -566,7 +566,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.031
+version 1.032
 
 =head1 SYNOPSIS
 
@@ -656,7 +656,7 @@ available for custom applications.
 
 =for html <img alt="screenshot of yancy editor showing custom element"
     src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-custom-element.png?raw=true"
-    style="width: 600px; max-width: 100%;" />
+    style="width: 600px; max-width: 100%;" width="600" />
 
 =head2 yancy.editor.route
 

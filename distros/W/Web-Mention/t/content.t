@@ -20,6 +20,7 @@ my $target = "http://example.com/webmention-target";
 
     my $content = $wm->content;
     is( $content, 'This page mentions the target URL!', );
+    is( $wm->title, 'This page mentions the target URL!' );
 }
 
 {
@@ -31,6 +32,7 @@ my $target = "http://example.com/webmention-target";
     like( $content, qr/🤠 Howdy, I’m/ );
     unlike( $content, qr/Antwerp/ );
 
+    is( $wm->title, 'This page uses MF2 to explicitly define some content.');
 }
 
 {
@@ -89,6 +91,8 @@ my $target = "http://example.com/webmention-target";
     my $content = $wm->content;
     like( $content, qr/At least I declare a name/ );
     unlike( $content, qr/Antwerp/ );
+
+    is( $wm->title, 'At least I declare a name.');
 }
 
 {

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/AlgorithmBackoffUtils/retry
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-06-07'; # DATE
+our $DATE = '2019-06-08'; # DATE
 our $DIST = 'App-AlgorithmBackoffUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,13 @@ retry - Retry a command with custom backoff algorithm
 
 =head1 VERSION
 
-This document describes version 0.002 of retry (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-07.
+This document describes version 0.003 of retry (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % retry [options] <command> ...
+ % retry [options] <command>
 
 =head1 OPTIONS
 
@@ -62,7 +62,7 @@ Backoff algorithm.
 
 Valid values:
 
- ["Constant","Exponential","Fibonacci"]
+ ["Constant","Exponential","Fibonacci","LILD","LIMD","MILD","MIMD"]
 
 =item B<--command-json>=I<s>
 
@@ -114,14 +114,6 @@ seconds larger than the previous timestamp), failure() will return 2 seconds.
 And if you waited 4 seconds or more, failure() will return 0.
 
 
-=item B<--delay-on-success>=I<s>
-
-Number of seconds to wait after a success.
-
-Default value:
-
- 0
-
 =item B<--jitter-factor>=I<s>
 
 How much to add randomness.
@@ -170,11 +162,27 @@ the algorithm will retry again for a maximum of 3 times.
 
 Maximum delay time, in seconds.
 
+=item B<--min-delay>=I<s>
+
+Maximum delay time, in seconds.
+
+Default value:
+
+ 0
+
 =back
 
 =head2 Constant algorithm options
 
 =over
+
+=item B<--delay-on-success>=I<s>
+
+Number of seconds to wait after a success.
+
+Default value:
+
+ 0
 
 =item B<--delay>=I<s>
 
@@ -185,6 +193,14 @@ Number of seconds to wait after a failure.
 =head2 Exponential algorithm options
 
 =over
+
+=item B<--delay-on-success>=I<s>
+
+Number of seconds to wait after a success.
+
+Default value:
+
+ 0
 
 =item B<--exponent-base>=I<s>
 
@@ -202,6 +218,14 @@ Initial delay for the first attempt after failure, in seconds.
 
 =over
 
+=item B<--delay-on-success>=I<s>
+
+Number of seconds to wait after a success.
+
+Default value:
+
+ 0
+
 =item B<--initial-delay1>=I<s>
 
 Initial delay for the first attempt after failure, in seconds.
@@ -209,6 +233,42 @@ Initial delay for the first attempt after failure, in seconds.
 =item B<--initial-delay2>=I<s>
 
 Initial delay for the second attempt after failure, in seconds.
+
+=back
+
+=head2 Lild algorithm options
+
+=over
+
+=item B<--delay-increment-on-failure>=I<s>
+
+How much to add to previous delay, in seconds, upon failure (e.g. 5).
+
+=item B<--delay-increment-on-success>=I<s>
+
+How much to add to previous delay, in seconds, upon success (e.g. -5).
+
+=item B<--initial-delay>=I<s>
+
+Initial delay for the first attempt after failure, in seconds.
+
+=back
+
+=head2 Limd algorithm options
+
+=over
+
+=item B<--delay-increment-on-failure>=I<s>
+
+How much to add to previous delay, in seconds, upon failure (e.g. 5).
+
+=item B<--delay-multiple-on-success>=I<s>
+
+How much to multiple previous delay, upon success (e.g. 0.5).
+
+=item B<--initial-delay>=I<s>
+
+Initial delay for the first attempt after failure, in seconds.
 
 =back
 
@@ -235,6 +295,42 @@ Shortcut for --log-level=trace.
 =item B<--verbose>
 
 Shortcut for --log-level=info.
+
+=back
+
+=head2 Mild algorithm options
+
+=over
+
+=item B<--delay-increment-on-success>=I<s>
+
+How much to add to previous delay, in seconds, upon success (e.g. -5).
+
+=item B<--delay-multiple-on-failure>=I<s>
+
+How much to multiple previous delay, upon failure (e.g. 1.5).
+
+=item B<--initial-delay>=I<s>
+
+Initial delay for the first attempt after failure, in seconds.
+
+=back
+
+=head2 Mimd algorithm options
+
+=over
+
+=item B<--delay-multiple-on-failure>=I<s>
+
+How much to multiple previous delay, upon failure (e.g. 1.5).
+
+=item B<--delay-multiple-on-success>=I<s>
+
+How much to multiple previous delay, upon success (e.g. 0.5).
+
+=item B<--initial-delay>=I<s>
+
+Initial delay for the first attempt after failure, in seconds.
 
 =back
 

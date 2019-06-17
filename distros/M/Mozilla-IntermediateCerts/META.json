@@ -23,7 +23,10 @@
          "requires" : {
             "LWP::UserAgent" : "0",
             "Moo" : "0",
-            "Text::CSV" : "0"
+            "Test::HTTP::LocalServer" : "0",
+            "Test::Spec" : "0",
+            "Text::CSV" : "0",
+            "namespace::clean" : "0"
          }
       }
    },
@@ -35,7 +38,7 @@
          "web" : "https://gitlab.com/rnewsham/mozilla-intermediatecerts"
       }
    },
-   "version" : "v0.0002",
+   "version" : "v0.0003",
    "x_generated_by_perl" : "v5.28.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }

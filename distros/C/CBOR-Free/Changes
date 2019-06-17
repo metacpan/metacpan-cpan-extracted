@@ -1,5 +1,14 @@
 Revision history for Perl module CBOR::Free
 
+0.10 14 Jun 2019
+- Fix test & number stringification on 32-bit Perls (broken in 0.09).
+
+0.09 14 Jun 2019
+- Further optimizations.
+- Test fixes (obscure MSWin32?)
+- Always encode Inf, -Inf, and NaN to half-precision.
+- Fix off-by-one in error message when trying to decode -(~0).
+
 0.08 10 May 2019
 - Further decoding speed-ups.
 
