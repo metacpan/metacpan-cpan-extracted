@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 my %introduces = ( '5.030' => [qw[
                                   unicode12.1 uniprop_wildcards qr'N
@@ -157,6 +157,15 @@ sub _hook {
           warn "Unknown rand implementation at ", _position(1), ".\n"
               unless 'Perl_drand48' eq $Config::Config{randfunc};
       },
+      'turkic-casing' => sub {
+          eval {
+              use locale;
+              require POSIX;
+              POSIX::setlocale(POSIX::LC_ALL(), 'tr_TR.UTF-8');
+              lc 'I' ne 'i'
+          } or die 'Turkic locale casing not working at '
+              . _position(1) . "\.\n";
+      },
     }
 }
 
@@ -237,7 +246,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.012
+Version 1.013
 
 =head1 SYNOPSIS
 
@@ -776,7 +785,10 @@ Alias: named-char-in-single-quoted-regex
 
 =head3 turkic-casing
 
-L<perldelta/Turkic UTF-8 locales are now seamlessly supported>
+See L<perldelta/Turkic UTF-8 locales are now seamlessly supported>.
+B<Beware:> the actual behaviour depends on the operating system's
+locale support. E.g. FreeBSD, DragonFly, and Solaris are known not to
+support it.
 
 =for completeness
 =head2 old

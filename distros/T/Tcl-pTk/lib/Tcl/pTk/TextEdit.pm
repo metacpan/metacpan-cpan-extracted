@@ -11,7 +11,7 @@
 
 package Tcl::pTk::TextEdit;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use Tcl::pTk qw (Ev);
 use AutoLoader;

@@ -1,5 +1,5 @@
 package WWW::AzimuthAero::Utils;
-$WWW::AzimuthAero::Utils::VERSION = '0.1';
+$WWW::AzimuthAero::Utils::VERSION = '0.2';
 
 # ABSTRACT: functions that can be used outside WWW::AzimuthAero::* packages
 
@@ -27,6 +27,7 @@ our @EXPORT_OK = qw(
   sort_dates
   extract_js_glob_var
   iata_pairwise
+  fix_html_string
 );
 
 # TO-DO: to_dt and from_dt methods
@@ -96,14 +97,22 @@ sub get_dates_from_dows {
     return sort_dates(@res);
 }
 
+# This method used for filtering dates when no available_to property
+
 sub get_dates_from_range {
     my (%params) = @_;
 
     # confess "min date is not defined" unless defined $params{min};
-    confess "max date is not defined" unless defined $params{max};
+    # confess "max date is not defined" unless defined $params{max};
 
-    my $dt_max = DateTime::Format::Strptime->new( pattern => '%d.%m.%Y' )
-      ->parse_datetime( $params{max} );
+    my $dt_max =
+      ( defined $params{max} )
+      ? ( DateTime::Format::Strptime->new( pattern => '%d.%m.%Y' )
+          ->parse_datetime( $params{max} ) )
+      : ( DateTime->now->truncate( to => 'day' )->add( months => 2 ) );
+
+    # my $dt_max = DateTime::Format::Strptime->new( pattern => '%d.%m.%Y' )
+    #->parse_datetime( $params{max} );
 
     # DateTime->now->truncate include max_day
     my $dt_min =
@@ -172,6 +181,20 @@ sub extract_js_glob_var {
 }
 
 
+sub fix_html_string {
+    my ($html_str) = @_;
+    my $str = $html_str;
+    $str =~ s/[\r\n\t]//g;
+    $str =~ s/^\s+//;
+    $str =~ s/\s+$//;
+
+    # hack for deleting &nbsp; at flight_num
+    $str =~ s/([A-Z1-9]).(\d{3})/$1 $2/;
+
+    return $str;
+}
+
+
 sub iata_pairwise {
     my ($AoA) = @_;
     my @res;
@@ -195,7 +218,7 @@ WWW::AzimuthAero::Utils - functions that can be used outside WWW::AzimuthAero::*
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 DESCRIPTION
 
@@ -236,6 +259,10 @@ Filter dates by max and min dates
 =head1 extract_js_glob_var
 
 Extract global variable value from JavaScript code
+
+=head1 fix_html_string
+
+remove newline symbols, leading and trailing whitespaces
 
 =head1 pairwise
 

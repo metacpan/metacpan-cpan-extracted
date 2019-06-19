@@ -38,7 +38,7 @@ my %tests = (
           q("\N{ORIYA DIGIT FOUR}" =~ m'\N{ORIYA DIGIT FOUR}'), 1 ],
         [ 'turkic-casing',
           'use locale; use POSIX "locale_h";'
-          . skippable('setlocale(LC_ALL, "tr_TR.UTF-8")',
+          . skippable('(setlocale(LC_ALL, "tr_TR.UTF-8") eq "tr_TR.UTF-8")',
                       '": testing locale not available"',
                       'lc "I" eq "\N{LATIN SMALL LETTER DOTLESS I}"'),
           1 ],
@@ -249,40 +249,38 @@ for my $version (keys %tests) {
     my $vf = sprintf '%.3f', $version;
     my @triples = @{ $tests{$version} };
     my $can = eval { require ( 0 + $version) };
-    $count += 2 * @triples;
+    $count += @triples;
     for my $triple (@triples) {
-        my $removed = Syntax::Construct::removed($triple->[0]);
-        my $value = eval "use Syntax::Construct qw($triple->[0]);$triple->[1]";
-        my $err = $@;
+        my $removed_version = Syntax::Construct::removed($triple->[0]);
+        my $was_removed = $removed_version && $removed_version <= $];
+        my $loaded = eval { Syntax::Construct->import($triple->[0]); 1 };
+        my $load_error = $@;
+        my $value = eval $triple->[1];
+        my $run_error = $@;
         if ($can) {
-            if ($err) {
-                ok($removed, 'removed in version');
-                like($err, qr/\Q$triple->[0] removed in $removed/);
-
+            if ($was_removed) {
+                is($loaded, undef, "$triple->[0] not loaded");
+                like($load_error,
+                     qr/\Q$triple->[0] removed in $removed_version/,
+                     "$triple->[0] removed message");
+                ok($run_error, "$triple->[0] doens't run");
+                $count += 2;
             } else {
-                is($err, q(), "no error $triple->[0]");
-                if (! defined $value || 'SKIPPED' ne $value) {
+                if ('SKIPPED' ne $value) {
                     is($value, $triple->[2], $triple->[0]);
                 }
-                if ($removed) {
-                    cmp_ok($removed, '>', $],
-                           $triple->[0]
-                               . ' not removed in the current version');
-                    ++$count;
-                }
             }
-
         } else {
-            like($err,
-                 qr/^Unsupported construct \Q$triple->[0]\E at \(eval [0-9]+\) line 1 \(Perl $vf needed\)\n/,
-                 $triple->[0]);
-            my $value = eval "$triple->[1]";
+            like($load_error,
+                 qr/^Unsupported construct \Q$triple->[0]\E at .*?02-constructs\.t line [0-9]+ \(Perl $vf needed\)\n/,
+                 "$triple->[0] not supported");
             if (($value || "") ne 'SKIPPED'
                 && ($triple->[3] || "") ne MAY_WORK_IN_OLDER
             ) {
                 isnt($value, $triple->[2], "not $triple->[0]");
+                ++$count;
             } else {
-                --$count unless 'SKIPPED' eq $value;
+                ++$count if $value eq 'SKIPPED';
             }
         }
     }

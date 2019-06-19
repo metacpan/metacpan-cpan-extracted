@@ -2,8 +2,8 @@ NAME
     Algorithm::Backoff - Various backoff strategies for retry
 
 VERSION
-    This document describes version 0.006 of Algorithm::Backoff (from Perl
-    distribution Algorithm-Backoff), released on 2019-06-08.
+    This document describes version 0.007 of Algorithm::Backoff (from Perl
+    distribution Algorithm-Backoff), released on 2019-06-18.
 
 SYNOPSIS
      # 1. pick a strategy and instantiate
@@ -97,6 +97,11 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Action::Retry - Somehow I didn't find this module before writing
+    Algorithm::Backoff. Otherwise I would probably not created
+    Algorithm::Backoff. But Algorithm::Backoff offers an alternative
+    interface, a lighter footprint (no Moo), and a couple more strategies.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

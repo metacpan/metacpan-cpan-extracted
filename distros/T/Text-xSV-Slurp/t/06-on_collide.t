@@ -143,7 +143,7 @@ my $got = eval { xsv_slurp( string => "a,b\n1,1\n1,1\n", shape => 'hoh', key => 
 
 my $err = $@;
 
-like( $err, qr/\AError: key collision in HoH construction \(key-value path was: { 'a' => '1' }\)/, 'die collide' );
+like( $err, qr/\AError: key collision in HoH construction \(key-value path was: \{ 'a' => '1' \}\)/, 'die collide' );
 
 ok( ! $got, 'die collide - return' );
 
@@ -163,7 +163,7 @@ is_deeply($got, { 1 => { b => 1 } }, 'die collide - no collision return');
    
    my $got = xsv_slurp( string => "a,b\n1,1\n1,1\n", shape => 'hoh', key => 'a', on_collide => 'warn' );
    
-   like( $warning, qr/\AWarning: key collision in HoH construction \(key-value path was: { 'a' => '1' }\)/, 'warn collide' );
+   like( $warning, qr/\AWarning: key collision in HoH construction \(key-value path was: \{ 'a' => '1' \}\)/, 'warn collide' );
    
    is_deeply($got, { 1 => { b => 1 } }, 'warn collide - return');
    

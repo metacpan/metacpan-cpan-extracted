@@ -48,3 +48,9 @@
 1.018
   -- Fixed pas through argument issue with queue_request
     Now accepts array ref correctly
+1.019
+  -- Now disables keepalive by default
+1.020
+  -- Now disables persistent by default
+1.021 
+  -- Now uses default timeout of AnyEvent::HTTP

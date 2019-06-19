@@ -1923,7 +1923,10 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   /* Save the identity of the currently-compiling sub so that 
    * await_keyword_plugin() can check
    */
-  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newRV((SV *)PL_compcv));
+  PL_hints |= HINT_LOCALIZE_HH;
+  SAVEHINTS();
+
+  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
 
   I32 save_ix = block_start(TRUE);
 
@@ -1970,9 +1973,8 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
 
 static int await_keyword_plugin(pTHX_ OP **op_ptr)
 {
-  SV **asynccvrefp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
-  if(!asynccvrefp || !*asynccvrefp ||
-     SvRV(*asynccvrefp) != (SV *)PL_compcv)
+  SV **asynccvp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
+  if(!asynccvp || SvUV(*asynccvp) != PTR2UV(PL_compcv))
     croak(CvEVAL(PL_compcv) ?
       "await is not allowed inside string eval" :
       "Cannot 'await' outside of an 'async sub'");

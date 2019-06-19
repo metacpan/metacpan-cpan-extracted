@@ -3,16 +3,17 @@
 use warnings;
 use strict;
 use Test;
-plan tests => 1;
 
 use Tcl::pTk;
 
 my $destroyed;
 
 unless( Tcl::pTk::WIDGET_CLEANUP ){
-        skip("Widget Cleanup not enabled", 1);
-        exit;
+    print "1..0 # Skipped: Widget Cleanup not enabled\n";
+    exit;
 }
+
+plan tests => 1;
 
 $| = 1; # Pipes Hot
 my $top = MainWindow->new;

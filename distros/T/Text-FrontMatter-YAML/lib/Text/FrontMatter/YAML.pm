@@ -7,6 +7,7 @@ use 5.10.1;
 
 use Data::Dumper;
 use Carp;
+use Encode;
 use YAML::Tiny qw/Load/;
 
 =head1 NAME
@@ -14,7 +15,7 @@ use YAML::Tiny qw/Load/;
 Text::FrontMatter::YAML - read the "YAML front matter" format
 
 =cut
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 
 =head1 SYNOPSIS
@@ -109,6 +110,12 @@ Creating an object with C<frontmatter_hashref> and C<data_text> works
 in reverse, except that there's no way to specify an empty (as opposed
 to non-existent) YAML front matter section.
 
+=head2 Encoding
+
+Text::FrontMatter::YAML operates on Perl character strings. Decode your
+data from its original encoding before passing it in; re-encode it
+after getting it back. See L<Encode>.
+
 =head1 METHODS
 
 Except for new(), none of these methods take parameters.
@@ -200,6 +207,7 @@ sub _init_from_fh {
             # subsequent lines
             if ($line =~ $yaml_marker_re) {
                 # found closing marker, so slurp the rest of the data
+                no warnings 'uninitialized'; # there might be no more data
                 local $/;
                 $self->{'data'} = '' . <$fh>; # '' so we always define data here
                 last LINE;
@@ -214,11 +222,17 @@ sub _init_from_string {
     my $self   = shift;
     my $string = shift;
 
-    open my $fh, '<:encoding(UTF-8)', \$string
+    # store whole document for later retrieval
+    $self->{'document'} = $string;
+
+    # re-encode string as utf8 bytes so that open() can re-decode it to
+    # make the filehandle from it (see "Strings with code points over
+    # 0xFF may not be mapped into in-memory file handles" in perldiag).
+    my $byte_string = encode("UTF-8", $string, Encode::FB_CROAK);
+    open my $fh, '<:encoding(UTF-8)', \$byte_string
       or die "internal error: cannot open filehandle on string, $!";
 
     $self->_init_from_fh($fh);
-    $self->{'document'} = $string;
 
     close $fh;
 }
@@ -382,7 +396,7 @@ Aaron Hall, C<vitahall@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2014 Aaron Hall.
+Copyright 2013-2019 Aaron Hall.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.10.1.

@@ -41,7 +41,7 @@ use vars qw/@ISA @EXPORT_OK %EXPORT_TAGS $VERSION $REVISION $OUT
 	  /;
 
 BEGIN {
-  $VERSION='2.2.0'; # VERSION TEMPLATE
+  $VERSION='2.2.3'; # VERSION TEMPLATE
   $REVISION=q($Revision: 2.49 $);
   @ISA=qw(Exporter);
   @PARAM_VARS=qw/$ENCODING
@@ -5697,7 +5697,7 @@ sub stream_process {
   $opts->{'input-file'} = _tilde_expand($opts->{'input-file'}) if exists($opts->{'input-file'});
   $opts->{'output-file'} = _tilde_expand($opts->{'output-file'}) if exists($opts->{'output-file'});
   my $output = $opts->{'output-string'} || $opts->{'output-pipe'} ||
-               $opts->{'output-file'} || '-';
+               $opts->{'output-file'} || undef;
   my $input = $opts->{'input-string'} || $opts->{'input-pipe'} ||
               $opts->{'input-file'} || '-';
 
@@ -5753,7 +5753,7 @@ sub stream_process {
       if (exists $opts->{'input-pipe'}) {
         open my $F,"$input|";
         $F || die "Cannot open pipe to $input: $!\n";
-        $parser->parse_fh($F);
+        $parser->parse_file($F);
         close $F;
       } elsif (exists $opts->{'input-string'}) {
         $parser->parse_string($input);

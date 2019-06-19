@@ -1,0 +1,103 @@
+NAME
+    Retry::Backoff - Retry a piece of code, with backoff strategies
+
+VERSION
+    This document describes version 0.001 of Retry::Backoff (from Perl
+    distribution Retry-Backoff), released on 2019-06-18.
+
+SYNOPSIS
+     use Retry::Backoff 'retry';
+
+     # by default, will use Algorithm::Backoff::Exponential with these parameters:
+     # - initial_delay =   1 (1 second)
+     # - max_delay     = 300 (5 minutes)
+     # - max_attempts  =  10
+     retry { ... };
+
+     # pick backoff strategy (see corresponding Algorithm::Backoff::* for
+     # list of parameters)
+     retry { ... } strategy=>'Constant', delay=>1, max_attempts=>10;
+
+     #
+
+DESCRIPTION
+    This module provides "retry" to retry a piece of code if it dies.
+    Several backoff (delay between retries) strategies are available from
+    "Algorithm::Backoff":: modules.
+
+FUNCTIONS
+  retry
+    Usage:
+
+     retry { attempt-code... } %args;
+
+    Retry the attempt-code if it dies. Known arguments:
+
+    *   strategy
+
+        String. Default is "Exponential" (with "initial_delay"=1,
+        "max_delay"=300, and "max_attempts"=10).
+
+    *   on_success
+
+        Coderef. Will be called if attempt-code is deemed as successful.
+
+    *   on_failure
+
+        Coderef. Will be called if attempt-code is deemed to have failed.
+
+    *   retry_if
+
+        Coderef. If not specified, attempt-code is deemed to have failed if
+        it dies. If this is specified, then the coderef will be called and
+        if it returns true then the attempt-code is deemed to have failed.
+
+        Coderef will be passed:
+
+         \%h
+
+        containing these keys:
+
+         error
+         action_retry
+         attempt_result
+         attempt_parameters
+
+    *   non_blocking
+
+        Boolean.
+
+    The rest of the arguments will be passed to the backoff strategy module
+    ("Algorithm::Backoff::*").
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Retry-Backoff>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Retry-Backoff>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Retry-Backoff>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Code is based on Action::Retry.
+
+    Other similar modules: Sub::Retry, Retry.
+
+    Backoff strategies are from Algorithm::Backoff::* modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

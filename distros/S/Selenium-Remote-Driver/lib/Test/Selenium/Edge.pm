@@ -1,5 +1,5 @@
 package Test::Selenium::Edge;
-$Test::Selenium::Edge::VERSION = '1.32';
+$Test::Selenium::Edge::VERSION = '1.33';
 use Moo;
 extends 'Selenium::Edge', 'Test::Selenium::Remote::Driver';
 

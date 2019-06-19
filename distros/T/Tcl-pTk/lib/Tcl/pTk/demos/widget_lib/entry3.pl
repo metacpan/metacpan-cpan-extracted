@@ -77,7 +77,8 @@ sub entry3 {
     # Click to focus goes to the first editable character...
     $e3->bind('<FocusIn>' => [sub {
 	my $e = shift;
-        print "Event Detail = $eventDetail\n";
+	my $eventDetail = shift;
+	# print "Event Detail = $eventDetail\n";
 	if ($eventDetail ne "NotifyAncestor") {
 	    $e->icursor(3);
 	    $e->afterIdle(sub {$e->selectionClear});

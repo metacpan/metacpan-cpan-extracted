@@ -334,7 +334,7 @@ sub BackTrace{
         die $message."\n";
 }
         
-# Simplfied IsWidget method. This was originaly in Tk.xs in the pTk distribution
+# Simplified IsWidget method. This was originally in Tk.xs in the pTk distribution
 #   we just do a simple isa call
 sub IsWidget{
         my $cw = shift;

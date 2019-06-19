@@ -1,9 +1,5 @@
 Build.PL
 Changes
-MANIFEST			This list of files
-META.json
-META.yml
-README
 lib/Pg/Explain.pm
 lib/Pg/Explain/From.pm
 lib/Pg/Explain/FromJSON.pm
@@ -12,6 +8,10 @@ lib/Pg/Explain/FromXML.pm
 lib/Pg/Explain/FromYAML.pm
 lib/Pg/Explain/Node.pm
 lib/Pg/Explain/StringAnonymizer.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00-load.t
 t/01-pod.t
 t/02-pod-coverage.t
@@ -131,6 +131,12 @@ t/34-parallel-index-only-scan.t
 t/35-sort-mode-and-buffers-from-json.t
 t/36-extra-info.t
 t/36-extra-info/plan
+t/37-plan-without-costs.t
+t/37-plan-without-costs/1.expect
+t/37-plan-without-costs/1.plan
+t/37-plan-without-costs/2.expect
+t/37-plan-without-costs/2.plan
+t/38-worktable.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

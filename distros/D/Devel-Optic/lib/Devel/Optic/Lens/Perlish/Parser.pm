@@ -1,6 +1,10 @@
 package Devel::Optic::Lens::Perlish::Parser;
+$Devel::Optic::Lens::Perlish::Parser::VERSION = '0.011';
+# ABSTRACT: Lexer/parser for Perlish lens
+
 use strict;
 use warnings;
+
 use Exporter qw(import);
 our @EXPORT_OK = qw(parse lex);
 
@@ -248,11 +252,11 @@ __END__
 
 =head1 NAME
 
-Devel::Optic::Lens::Perlish::Parser
+Devel::Optic::Lens::Perlish::Parser - Lexer/parser for Perlish lens
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 AUTHOR
 

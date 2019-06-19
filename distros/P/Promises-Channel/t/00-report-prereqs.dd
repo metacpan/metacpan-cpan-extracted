@@ -12,7 +12,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Moo' => '0',
-                                      'Promises' => '0'
+                                      'Promises' => '0.96'
                                     }
                     },
        'test' => {

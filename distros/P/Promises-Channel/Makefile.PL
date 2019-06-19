@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Promises::Channel",
   "PREREQ_PM" => {
     "Moo" => 0,
-    "Promises" => 0
+    "Promises" => "0.96"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Moo" => 0,
-  "Promises" => 0,
+  "Promises" => "0.96",
   "Test2::V0" => 0,
   "Test::LeakTrace" => 0,
   "Test::More" => 0,

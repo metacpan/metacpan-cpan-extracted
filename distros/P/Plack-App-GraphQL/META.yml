@@ -22,10 +22,11 @@ requires:
   Plack: '1.0047'
   Safe::Isa: '1.000010'
   Template::Tiny: '1.12'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/jjn1056/Plack-App-GraphQL/issues
   homepage: https://github.com/jjn1056/Plack-App-GraphQL
   repository: https://github.com/jjn1056/Plack-App-GraphQL.git
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

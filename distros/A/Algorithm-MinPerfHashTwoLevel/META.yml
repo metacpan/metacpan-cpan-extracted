@@ -22,5 +22,5 @@ requires: {}
 resources:
   bugtracker: https://github.com/demerphq/Algorithm-MinPerfHashTwoLevel/issues
   repository: git://github.com/demerphq/Algorithm-MinPerfHashTwoLevel.git
-version: '0.15'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

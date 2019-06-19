@@ -1,5 +1,11 @@
 Revision history for Pg-Explain
 
+0.80    2019/06/18
+        - Allow parsing of plans with COSTS disabled.
+        per gripe from Marc
+        - Properly parse WorkTable Scans
+        per gripe from Ivan Vergiliev
+
 0.79    2019/06/12
         - Added parsing of "Planning time", "Execution time", and "Trigger
         time"

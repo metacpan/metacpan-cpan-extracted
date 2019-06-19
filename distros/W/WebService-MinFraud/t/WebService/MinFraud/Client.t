@@ -57,7 +57,7 @@ for my $service ( 'factors', 'insights', 'score' ) {
                 _run_request(
                     $service,
                     { response_content => '{1}' },
-                    )
+                )
             };
 
             isa_ok(
@@ -299,7 +299,7 @@ sub _test_ws_error {
 
 sub _run_request {
     my $service = shift;
-    my $args = shift || {};
+    my $args    = shift || {};
 
     my $request
         = $args->{requests} || { device => { ip_address => '1.1.1.1' } };

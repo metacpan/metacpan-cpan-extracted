@@ -11,7 +11,7 @@ use File::HomeBank;
 use Getopt::Long 2.38 qw(GetOptionsFromArray);
 use Pod::Usage;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my %ACCOUNT_TYPES = (   # map HomeBank account types to Ledger accounts
     bank        => 'Assets:Bank',
@@ -93,6 +93,9 @@ sub convert_homebank_to_ledger {
     my $homebank = shift;
     my $opts     = shift || {};
 
+    my $default_account_income   = 'Income:Unknown';
+    my $default_account_expenses = 'Expenses:Unknown';
+
     my $ledger = App::HomeBank2Ledger::Ledger->new;
 
     my $transactions    = $homebank->sorted_transactions;
@@ -119,13 +122,17 @@ sub convert_homebank_to_ledger {
             $item->{excluded} = 1 if $item->{ledger_name} =~ /$re/;
         }
     }
+    while (my ($re, $replacement) = each %{$opts->{rename_accounts}}) {
+        $default_account_income   =~ s/$re/$replacement/;
+        $default_account_expenses =~ s/$re/$replacement/;
+    }
 
     my $has_initial_balance = grep { $_->{initial} && !$_->{excluded} } @$accounts;
 
     if ($opts->{accounts}) {
         my @accounts = map { $_->{ledger_name} } grep { !$_->{excluded} } @$accounts, @$categories;
 
-        push @accounts, $opts->{default_account};
+        push @accounts, $default_account_income, $default_account_expenses;
         push @accounts, $OPENING_BALANCES_ACCOUNT if $has_initial_balance;
 
         $ledger->add_accounts(@accounts);
@@ -256,10 +263,12 @@ sub convert_homebank_to_ledger {
             my @categories  = split(/\|\|/, $transaction->{split_category} || '');
 
             for (my $i = 0; $amounts[$i]; ++$i) {
-                my $amount        = -$amounts[$i];
-                my $category      = $homebank->find_category_by_key($categories[$i]);
-                my $memo          = $memos[$i] || '';
-                my $other_account = $category ? $category->{ledger_name} : $opts->{default_account};
+                my $amount          = -$amounts[$i];
+                my $category        = $homebank->find_category_by_key($categories[$i]);
+                my $memo            = $memos[$i] || '';
+                my $other_account   = $category   ? $category->{ledger_name}
+                                    : $amount < 0 ? $default_account_income
+                                    :               $default_account_expenses;
 
                 push @postings, {
                     account     => $other_account,
@@ -273,12 +282,16 @@ sub convert_homebank_to_ledger {
             }
         }
         else {  # with or without category
-            my $category      = $homebank->find_category_by_key($transaction->{category});
-            my $other_account = $category ? $category->{ledger_name} : $opts->{default_account};
+            my $amount          = -$transaction->{amount};
+            my $category        = $homebank->find_category_by_key($transaction->{category});
+            my $other_account   = $category   ? $category->{ledger_name}
+                                : $amount < 0 ? $default_account_income
+                                :               $default_account_expenses;
+
             push @postings, {
                 account     => $other_account,
                 commodity   => $commodities{$account->{currency}},
-                amount      => -$transaction->{amount},
+                amount      => $amount,
                 payee       => $payee->{name},
                 memo        => $memo,
                 status      => $status,
@@ -335,7 +348,6 @@ sub parse_args {
         tags                => 1,
         commodities         => 1,
         opening_date        => '',
-        default_account     => 'Expenses:No Category',
         rename_accounts     => {},
         exclude_accounts    => [],
     );
@@ -353,7 +365,6 @@ sub parse_args {
         'tags!'                 => \$opts{tags},
         'commodities!'          => \$opts{commodities},
         'opening-date=s'        => \$opts{opening_date},
-        'default-account=s'     => \$opts{default_account},
         'rename-account|r=s'    => \%{$opts{rename_accounts}},
         'exclude-account|x=s'   => \@{$opts{exclude_accounts}},
     ) or pod2usage(-exitval => 1, -verbose => 99, -sections => [qw(SYNOPSIS OPTIONS)]);
@@ -382,7 +393,7 @@ App::HomeBank2Ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Promises::Channel;
 # ABSTRACT: a coordination channel implemented with Promises
-$Promises::Channel::VERSION = '0.02';
+$Promises::Channel::VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -22,22 +22,34 @@ has limit =>
   predicate => 'has_limit';
 
 
-has is_shutdown =>
+has shutdown_signal =>
   is      => 'ro',
-  default => 0;
+  default => sub { deferred },
+  handles => { is_shutdown => 'is_done' };
 
+#-------------------------------------------------------------------------------
+# Stores pending insertions as a list of tuples in the form of [item, promise].
+# When the inbox is full, this is where callers of put() wait until there is
+# room for their item to be inserted.
+#-------------------------------------------------------------------------------
 has backlog =>
   is      => 'ro',
   default => sub { [] };
 
+#-------------------------------------------------------------------------------
+# Stores inserted items ready for delivery.
+#-------------------------------------------------------------------------------
 has inbox =>
   is      => 'ro',
   default => sub { [] };
 
+#-------------------------------------------------------------------------------
+# Stores a list of promises handed out by get, representing callers that are
+# waiting for items in the queue.
+#-------------------------------------------------------------------------------
 has outbox =>
   is      => 'ro',
   default => sub { [] };
-
 
 
 sub size {
@@ -64,41 +76,51 @@ sub put {
   my ($self, $item) = @_;
   my $soon = deferred;
 
-  my $promise = $soon->promise->then(sub {
+  my $promise = $soon->then(sub {
     $self->drain;
     return $self;
   });
 
   push @{ $self->backlog }, [$item, $soon];
   $self->pump;
-  $soon->promise;
+  return $promise;
 }
 
 
 sub get {
   my $self = shift;
   my $soon = deferred;
-  push @{ $self->outbox }, $soon;
 
-  my $promise = $soon->promise->then(sub {
+  my $promise = $soon->then(sub {
     my ($self, $item) = @_;
     $self->pump;
     return ($self, $item);
   });
 
+  push @{ $self->outbox }, $soon;
   $self->drain;
-
   return $promise;
 }
 
 
 sub shutdown {
   my $self = shift;
-  $self->{is_shutdown} = 1;
+  $self->shutdown_signal->resolve
+    unless $self->is_shutdown;
   $self->drain;
   $self->pump;
 }
 
+
+sub on_shutdown {
+  my $self = shift;
+  return $self->shutdown_signal->promise;
+}
+
+
+#-------------------------------------------------------------------------------
+# Clears out waiting backlog of insertions until the queue is full.
+#-------------------------------------------------------------------------------
 sub pump {
   my $self = shift;
 
@@ -109,6 +131,11 @@ sub pump {
   }
 }
 
+#-------------------------------------------------------------------------------
+# Drains the queue (inbox) and resolves waiting watchers' promises (outbox) to
+# the next item in the queue until empty. If shutdown has been called, any
+# further watchers are resolved to undef.
+#-------------------------------------------------------------------------------
 sub drain {
   my $self = shift;
 
@@ -119,8 +146,7 @@ sub drain {
   }
 
   if ($self->is_shutdown) {
-    while (@{ $self->outbox }) {
-      my $soon = shift @{ $self->outbox };
+    while (my $soon = shift @{ $self->outbox }) {
       $soon->resolve($self, undef);
     }
   }
@@ -128,6 +154,10 @@ sub drain {
   return;
 }
 
+#-------------------------------------------------------------------------------
+# Automatically shuts down the channel when the instance goes out of scope or
+# is destroyed.
+#-------------------------------------------------------------------------------
 sub DEMOLISH {
   my $self = shift;
   $self->shutdown;
@@ -137,6 +167,7 @@ sub DEMOLISH {
 
 sub channel { Promises::Channel->new(@_) }
 sub chan    { Promises::Channel->new(@_) }
+
 
 1;
 
@@ -152,7 +183,7 @@ Promises::Channel - a coordination channel implemented with Promises
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -178,6 +209,9 @@ version 0.02
     $channel->shutdown;
   });
 
+  my $depleted = 0;
+  $channel->on_shutdown
+    ->then(sub { $depleted = 1 });
 
   sub reader {
     my ($channel, $line) = @_;
@@ -251,6 +285,12 @@ is empty, after which any remaining deferrals will be resolved with C<undef>.
 When the channel goes out of scope, it will be shutdown and drained
 automatically.
 
+=head2 on_shutdown
+
+Returns a promise which will be resolved after the channel has been shut down
+and drained. As the channel is shut down when demolished, this promise will
+be resolved when the channel goes out of scope as well.
+
 =head1 EXPORTS
 
 Nothing is exported by default.
@@ -264,6 +304,17 @@ Sugar for calling the default constructor. The following lines are equivalent.
   my $ch = chan;
   my $ch = channel;
   my $ch = Promises::Channel->new;
+
+=head1 CONTRIBUTORS
+
+The following people have contributed to this module by supplying new features,
+bug reports, or feature requests.
+
+=over
+
+=item Erik Huelsmann (EHUELS)
+
+=back
 
 =head1 AUTHOR
 

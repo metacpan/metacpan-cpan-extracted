@@ -7,8 +7,6 @@ use Tcl::pTk;
 
 use Test;
 
-plan test => 1;
-
 
 my $TOP = MainWindow->new;
 
@@ -18,10 +16,11 @@ my $version = $TOP->tclVersion;
 
 # Skip if Tcl/pTk version is < 8.5
 if( $version < 8.5 ){
-        skip("Tile widgets only works for Tcl >= 8.5", 1);
-        exit;
+    print "1..0 # Skipped: Tile widgets only works for Tcl >= 8.5\n";
+    exit;
 }
 
+plan test => 1;
 
 my $msg = $TOP->ttkLabel( -text => 
         "Ttk is the new Tk themed widget set. One of the widgets it includes is a tree widget, which can be configured to display multiple columns of informational data without displaying the tree itself. This is a simple way to build a listbox that has multiple columns. Clicking on the heading for a column will sort the data by that column. You can also change the width of the columns by dragging the boundary between them.",

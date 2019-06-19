@@ -1,3 +1,12 @@
+1.009001 2019-06-18
+
+- Added the following new values to the /payment/processor validation:
+  - datacash
+  - gocardless
+  - paylike
+  - smartdebit
+  - synapsefi
+
 1.009000 2018-09-10
 
 - Added the following new values to the /payment/processor validation:

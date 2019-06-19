@@ -38,6 +38,8 @@ WriteMakefile(
     },
     PREREQ_PM => {
         Config => 0,
+        POSIX  => 0,
+        locale => 0,
     },
     macro => { TARFLAGS => '--format=ustar -cvf' },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

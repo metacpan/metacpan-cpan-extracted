@@ -1,3 +1,6 @@
+0.4.0 2019-06-18
+  - support TLS for ldap
+
 0.3.8 2018-07-02
   - return 407 to force proxy auth
   

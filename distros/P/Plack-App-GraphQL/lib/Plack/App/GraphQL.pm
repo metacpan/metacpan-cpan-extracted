@@ -8,7 +8,7 @@ use Moo;
 
 extends 'Plack::Component';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has convert => (
   is => 'ro',
@@ -38,7 +38,7 @@ has schema => (
   builder => '_build_schema',
   coerce => sub {
     my $schema_proto = shift;
-    return (ref($schema_proto) =~m/GraphQL::Schema/) ?
+    return (  ref($schema_proto) =~m/GraphQL::Schema/) ?
       $schema_proto :
       coerce_schema($schema_proto);
   }
@@ -91,7 +91,7 @@ has promise_code => (
   is => 'ro',
   required => 0,
   lazy => 1,
-);
+); # TODO waiting on GraphQL
 
 has endpoint => (
   is => 'ro',
@@ -267,10 +267,11 @@ sub prepare_results {
   my ($self, $req) = @_;
   my $data = $self->prepare_body($req);
   my $context = $self->prepare_context($req, $data);
+  my $root_value = $self->prepare_root_value($context);
   my $results = $self->execute(
     $self->schema,
     $data,
-    $self->root_value,
+    $root_value,
     $context,
     $self->resolver,
     $self->promise_code,
@@ -304,6 +305,11 @@ sub build_context {
   );
 }
 
+sub prepare_root_value {
+  my ($self, $context) = @_;
+  return my $root_value = $context->req->env->{'plack.graphql.root_value'} ||= $self->root_value;
+}
+
 sub execute {
   my ($self, $schema, $data, $root_value, $context, $resolver, $promise_code) = @_;
   return my $results = GraphQL::Execution::execute(
@@ -323,6 +329,18 @@ sub execute {
 =head1 NAME
  
 Plack::App::GraphQL - Serve GraphQL from Plack / PSGI
+
+=begin markdown
+
+
+https://travis-ci.org/jjn1056/Plack-App-GraphQL
+
+# PROJECT STATUS
+
+[![Build Status](https://travis-ci.org/jjn1056/Plack-App-GraphQL.svg?branch=master)](https://travis-ci.org/jjn1056/Plack-App-GraphQL)
+[![CPAN version](https://badge.fury.io/pl/Plack-App-GraphQL.svg)](https://metacpan.org/pod/Plack-App-GraphQL) 
+
+=end markdown
  
 =head1 SYNOPSIS
  
@@ -391,6 +409,12 @@ graphql SDL document that we can build a schema object from.  Makes for easy dem
 An object, hashref or coderef that field resolvers can use to look up requests.  Generally
 the method or hash keys will match the query or mutation keys.  See the examples for
 more.
+
+You can override this at runtime (with for example a bit of middleware) by using the
+'plack.graphql.root_value' key in the PSGI $env.  This may or my not be considered a
+good practice :)  Some examples suggest always using the $context for stuff like this
+while other examples seem to think its a good idea.  I choose to rather enable this
+ability and let you decide what is right for your application.
 
 =head2 resolver
 

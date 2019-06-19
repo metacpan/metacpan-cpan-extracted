@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.2;
+our $VERSION = 6.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -43,6 +43,21 @@ The Net::Clacks system implements a fast client/server based interprocess messag
 handling a high number of clients, you can run multiple servers in a master/slave configuration.
 A slave can also run itself as master for it's own slaves, so a tree-like setup is possible. This
 is implemented by using Interclacks mode via OVERHEAD mode setting.
+
+=head1 VERSION 6 UPGRADE NOTES
+
+Version 6 (and higher) of L<Net::Clacks::Server> imlements a smarter interclacks sync. Make
+sure to upgrade all nodes on your local clacks network at the same time! While the protocol itself
+is mostly backward compatible, interclacks sync will fail otherwise.
+
+Version 6 also includes a smarter shutdown sequence for L<Net::Clacks::Client> and the ability to 
+persistantly store the clackscache data in a file in L<Net::Clacks::Server>. The file format has also
+changed somewhat from previous beta versions of this feature due to the implementation of smarter 
+sync. If you have used persistance before, you might (or might not) have to reset/remove the persistance
+file.
+
+This change to "smarter" syncing has increased stability of some of my systems using "Net::Clacks", but
+has been in use for only a limited time. You should test with your own software before upgrading.
 
 =head1 PROTOCOL
 

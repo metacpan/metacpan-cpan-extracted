@@ -12,7 +12,7 @@ use Time::Piece;
 use XML::Entities;
 use XML::Parser::Lite;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(parse_string parse_file);
 
@@ -487,7 +487,7 @@ File::HomeBank - Parse HomeBank files
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

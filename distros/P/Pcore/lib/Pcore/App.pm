@@ -34,7 +34,7 @@ sub BUILD ( $self, $args ) {
     } );
 
     # create CDN object
-    $self->{cdn} = Pcore::CDN->new( $self->{cfg}->{cdn} ) if $self->{cfg}->{cdn};
+    $self->{cdn} = Pcore::CDN->new( $self->{app_cfg}->{cdn} ) if $self->{app_cfg}->{cdn};
 
     # create API object
     $self->{api} = Pcore::App::API->new($self);

@@ -3,7 +3,7 @@
 
 package Tcl::pTk::Tie::Watch;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 =head1 NAME
 

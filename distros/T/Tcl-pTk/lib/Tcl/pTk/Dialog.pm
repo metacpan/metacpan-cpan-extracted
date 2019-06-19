@@ -10,7 +10,7 @@ package Tcl::pTk::Dialog;
 
 # Documentation after __END__
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use Carp;
 use strict;
@@ -66,6 +66,4 @@ sub Populate
 1;
 
 __END__
-
-=cut
 

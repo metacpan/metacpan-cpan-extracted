@@ -1,8 +1,12 @@
 package Devel::Optic::Lens::Perlish::Interpreter;
+$Devel::Optic::Lens::Perlish::Interpreter::VERSION = '0.011';
+# ABSTRACT: Basic recursive interpreter for Perlish lens
+
 use strict;
 use warnings;
+
 use Exporter qw(import);
-our @EXPORT_OK = qw(run _ast_to_code);
+our @EXPORT_OK = qw(run);
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Devel::Optic::Lens::Perlish Devel::Optic);
@@ -255,11 +259,11 @@ __END__
 
 =head1 NAME
 
-Devel::Optic::Lens::Perlish::Interpreter
+Devel::Optic::Lens::Perlish::Interpreter - Basic recursive interpreter for Perlish lens
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 AUTHOR
 

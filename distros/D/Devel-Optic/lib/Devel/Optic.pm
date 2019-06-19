@@ -1,7 +1,9 @@
+package Devel::Optic;
+$Devel::Optic::VERSION = '0.011';
+# ABSTRACT: Production safe data inspector
+
 use strict;
 use warnings;
-package Devel::Optic;
-# ABSTRACT: Production safe data inspector
 
 use Carp qw(croak);
 use Scalar::Util qw(looks_like_number);
@@ -188,7 +190,7 @@ Devel::Optic - Production safe data inspector
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

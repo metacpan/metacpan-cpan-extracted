@@ -18,6 +18,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+Anwar
 BacklogInterval
 BatchDir
 BatchDiskSpace
@@ -38,6 +39,7 @@ MaxConnsTotal
 MaxFailedRatio
 MaxPendingRequests
 MaxRecoveryBatches
+Mohammad
 POE
 StatsHandler
 StatsInterval
@@ -46,3 +48,4 @@ brad
 elasticsearch
 file
 lib
+mohammad

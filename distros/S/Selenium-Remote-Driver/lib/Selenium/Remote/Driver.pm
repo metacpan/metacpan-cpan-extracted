@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.32';
+$Selenium::Remote::Driver::VERSION = '1.33';
 use strict;
 use warnings;
 
@@ -534,6 +534,14 @@ sub _request_new_session {
         }
     }
 
+    #Fix broken out of the box chrome because they hate the maintainers of their interfaces
+    if ( $self->isa('Selenium::Chrome') ) {
+        if ( exists $args->{desiredCapabilities} ) {
+            $args->{desiredCapabilities}{chromeOptions}{args} //= [];
+            push(@{$args->{desiredCapabilities}{chromeOptions}{args}}, qw{no-sandbox disable-dev-shm-usage});
+        }
+    }
+
     # Get actual status
     $self->remote_conn->check_status();
 
@@ -547,6 +555,10 @@ sub _request_new_session {
     };
     my $rc = $self->remote_conn;
     my $resp = $rc->request( $resource_new_session, $args, );
+
+    if ( $resp->{cmd_status} && $resp->{cmd_status} eq 'NOT OK' ) {
+        croak "Could not obtain new session: ". $resp->{cmd_return}{message};
+    }
 
     if ( ( defined $resp->{'sessionId'} ) && $resp->{'sessionId'} ne '' ) {
         $self->session_id( $resp->{'sessionId'} );
@@ -1875,7 +1887,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 
@@ -3705,7 +3717,7 @@ Aditya Ivaturi <ivaturi@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Allen Lew A.MacLeay Andy Jack Bas Bloemsaat Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Doug Bell Eric Johnson Gabor Szabo Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Max O'Cull Michael Prokop Peter Mottram (SysPete) Phil Kania Mitchell Prateek Goyal Richard Sailer Robert Utter rouzier Tetsuya Tatsumi Tod Hagan Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal Yves Lavoie
+=for stopwords Allen Lew A.MacLeay Andy Jack Bas Bloemsaat Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Doug Bell Eric Johnson Gabor Szabo George S. Baugh Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Max O'Cull Michael Prokop Peter Mottram (SysPete) Phil Kania Mitchell Prateek Goyal Richard Sailer Robert Utter rouzier Tetsuya Tatsumi Tod Hagan Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal Yves Lavoie
 
 =over 4
 
@@ -3764,6 +3776,10 @@ Eric Johnson <eric.git@iijo.org>
 =item *
 
 Gabor Szabo <gabor@szabgab.com>
+
+=item *
+
+George S. Baugh <george.b@cpanel.net>
 
 =item *
 

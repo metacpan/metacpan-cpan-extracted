@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.2;
+our $VERSION = 6.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -69,7 +69,7 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English qw(-no_match_vars);\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 5.2;\n";
+            print $ofh "our \$VERSION = 6.0;\n";
             print $ofh "use Fatal qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "#---AUTOPRAGMAEND---\n";

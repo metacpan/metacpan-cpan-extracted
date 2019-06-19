@@ -1,5 +1,5 @@
 package Data::Verifier::Results;
-$Data::Verifier::Results::VERSION = '0.62';
+$Data::Verifier::Results::VERSION = '0.63';
 use Moose;
 use MooseX::Storage;
 
@@ -193,7 +193,7 @@ Data::Verifier::Results - Results of a Data::Verifier verify
 
 =head1 VERSION
 
-version 0.62
+version 0.63
 
 =head1 SYNOPSIS
 
@@ -353,7 +353,7 @@ Cory G Watson <gphat@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Cold Hard Code, LLC.
+This software is copyright (c) 2019 by Cold Hard Code, LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

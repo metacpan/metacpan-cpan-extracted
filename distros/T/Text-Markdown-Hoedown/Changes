@@ -1,5 +1,13 @@
 Revision history for Perl extension Text-Markdown-Hoedown
 
+1.03 2019-06-19T04:19:18Z
+
+    commit f84d864c06bee5c5cf9057378fad75f8cf9dd89d
+    Author: Ian P Bradley <ian.bradley@studiocrabapple.com>
+    Date:   Fri Mar 29 18:26:55 2019 -0700
+
+        Add missing (accidentally removed?) hoedown 3 html_options constant HOEDOWN_HTML_ESCAPE
+
 1.02 2017-08-12T03:04:42Z
 
     - updaete to hoedown3(Taeril)

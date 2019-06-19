@@ -11,7 +11,6 @@ use Tcl::pTk::Pane;
 #use Tk::Pane;
 
 use Test;
-plan tests => 1;
 
 $| = 1; # Pipes Hot
 my $top = MainWindow->new;
@@ -20,10 +19,11 @@ my $top = MainWindow->new;
 my $retVal = $top->interp->pkg_require('BWidget');
 
 unless( $retVal){
-        skip("BWidget Tcl package not available", 1);
-        exit;
+    print "1..0 # Skipped: BWidget Tcl package not available\n";
+    exit;
 }
 
+plan tests => 1;
 
 my $sff = $top->Scrolled('Pane',  -scrollbars => 'soe',
     -sticky => 'we',

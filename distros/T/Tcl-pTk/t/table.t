@@ -17,9 +17,8 @@ my $mw = MainWindow->new;
 my $retVal = $mw->interp->pkg_require('Tktable');
 
 unless( $retVal){
-	plan test => 1;
-        skip("Tktable Tcl package not available", 1);
-        exit;
+    print "1..0 # Skipped: Tktable Tcl package not available\n";
+    exit;
 }
 
 plan test => 2;
@@ -32,7 +31,7 @@ sub Pressed
  my ($t,$i,$j) = @_;
  my $l = $t->Label(-text => "Pressed $i,$j",-relief => 'sunken');
  my $old = $t->put($i,$j,$l);
- $old->delete if ($old);
+ $old->destroy if ($old);
 }
 
 my $i;

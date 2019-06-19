@@ -36,7 +36,7 @@
             "MaxMind::DB::Reader" : "0.050000",
             "Parallel::ForkManager" : "1.19",
             "Perl::Critic" : "1.126",
-            "Perl::Tidy" : "20160302",
+            "Perl::Tidy" : "20190601",
             "Pod::Wordlist" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta::JSON" : "0.16",
@@ -96,7 +96,7 @@
    "provides" : {
       "MaxMind::DB::Reader::XS" : {
          "file" : "lib/MaxMind/DB/Reader/XS.pm",
-         "version" : "1.000007"
+         "version" : "1.000008"
       }
    },
    "release_status" : "stable",
@@ -111,10 +111,10 @@
          "web" : "https://github.com/maxmind/MaxMind-DB-Reader-XS"
       }
    },
-   "version" : 1.000007,
+   "version" : 1.000008,
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -162,7 +162,7 @@
                }
             },
             "name" : "@MAXMIND/Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -730,8 +730,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@MAXMIND/InstallGuide",
-            "version" : "1.200012"
+            "version" : "1.200013"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
@@ -837,14 +843,14 @@
                }
             },
             "name" : "@MAXMIND/Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%v%n%n%c"
+                  "commit_msg" : "v%V%n%n%c"
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -869,7 +875,7 @@
                }
             },
             "name" : "@MAXMIND/Commit generated files",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -878,9 +884,9 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.000007",
-                  "tag_format" : "v%v",
-                  "tag_message" : "v%v"
+                  "tag" : "v1.000008",
+                  "tag_format" : "v%V",
+                  "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
                   "git_version" : "2.17.1",
@@ -891,7 +897,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -908,7 +914,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -951,7 +957,7 @@
                }
             },
             "name" : "@MAXMIND/Commit version bump",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -968,7 +974,7 @@
                }
             },
             "name" : "@MAXMIND/Push version bump",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "inc::MyModuleBuild",
@@ -990,6 +996,17 @@
             },
             "name" : "DevelopRequires",
             "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Deprecated",
+            "config" : {
+               "Dist::Zilla::Plugin::Deprecated" : {
+                  "all" : 1,
+                  "modules" : []
+               }
+            },
+            "name" : "Deprecated",
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -1065,7 +1082,8 @@
       "Mark Fowler <mark@twoshortplanks.com>",
       "Olaf Alders <oalders@maxmind.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

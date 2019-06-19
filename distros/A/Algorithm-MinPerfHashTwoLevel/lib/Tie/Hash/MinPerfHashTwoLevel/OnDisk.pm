@@ -1,7 +1,7 @@
 package Tie::Hash::MinPerfHashTwoLevel::OnDisk;
 use strict;
 use warnings;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our $DEFAULT_VARIANT = 5;
 
 # this also installs the XS routines we use into our namespace.
@@ -364,9 +364,8 @@ The list of supported variants is as follows:
 
     5 - Xor, siphash, with inthash, 8 byte alignment, one checksum.
 
-Variants 0 through 3 were available in v0.14, variant 4 was never released.
-Prior to variant 5 the hash function was stadtx hash, but in variant 5 we
-switched to SipHash 1-3.
+In version 0.15 we switched hash functions to use SipHash(1-3), which
+unfortunately made supporting variants prior to 5 impossible.
 
 =back
 

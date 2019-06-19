@@ -5,11 +5,11 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
-     use alinfile;
+     use alienfile;
      
      plugin 'Decode::SourceForge';
 
@@ -20,8 +20,8 @@ DESCRIPTION
     challenges it presents is that projects hosted by SourceForge add the
     unnecessary suffix /download to links of tarballs, which confuses the
     way Alien::Base computes the filename based on URLs. This plugin solves
-    this problem by rewriting the filenames returned by the
-    Alien::Build::Plugin::Decode::HTML plugin.
+    this problem by rewriting the filenames returned by the configured
+    decode plugin.
 
 SEE ALSO
 
@@ -35,7 +35,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Alexandr Ciornii (CHORNY)
 
 COPYRIGHT AND LICENSE
 

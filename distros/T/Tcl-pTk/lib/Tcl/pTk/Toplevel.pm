@@ -1,6 +1,6 @@
 package Tcl::pTk::Toplevel;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 # Simple Toplevel package.
 #  Split-out from the Tcl::pTk::Widget package for compatibility with

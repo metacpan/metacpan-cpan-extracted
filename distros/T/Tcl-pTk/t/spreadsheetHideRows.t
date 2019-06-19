@@ -15,7 +15,6 @@ use Tcl::pTk;
 
 use Tcl::pTk::TableMatrix::SpreadsheetHideRows;
 use Test;
-plan tests => 1;
 
 my $top = MainWindow->new;
 
@@ -23,9 +22,11 @@ my $top = MainWindow->new;
 my $retVal = $top->interp->pkg_require('Tktable');
 
 unless( $retVal){
-        skip("Tktable Tcl package not available", 1);
-        exit;
+    print "1..0 # Skipped: Tktable Tcl package not available\n";
+    exit;
 }
+
+plan tests => 1;
 
 my $arrayVar = {};
 

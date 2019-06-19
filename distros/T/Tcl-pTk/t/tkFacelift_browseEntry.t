@@ -25,18 +25,16 @@ my $top = MainWindow->new();
 # This will skip if Tile widgets not available
 my $tclVersion = $top->tclVersion;
 unless( $tclVersion > 8.4 ){
-        plan tests => 1;
-        skip("Tile Tests on Tcl version < 8.5", 1);
-        exit;
+    print "1..0 # Skipped: Tile Tests on Tcl version < 8.5\n";
+    exit;
 }
  
 # This will skip if Tix not present
 my $retVal = $top->interp->pkg_require('Tix');
 
 unless( $retVal){
-	plan tests => 1;
-        skip("Tix Tcl package not available", 1);
-        exit;
+    print "1..0 # Skipped: Tix Tcl package not available\n";
+    exit;
 }
 
 plan tests => 3;
@@ -60,7 +58,7 @@ ok(@choice2, 4, "get returns list context");
 #  facelift has replaced Tk::BrowseEntry with a Tcl::pTk::ttkBrowseEntry
 $be->set('two');
 my $choice = $be->choiceget();
-ok($choice, 'two', "ttkBrowseEntry subsitution check");
+ok($choice, 'two', "ttkBrowseEntry substitution check");
 
 $top->after(1000,sub{$top->destroy});
 

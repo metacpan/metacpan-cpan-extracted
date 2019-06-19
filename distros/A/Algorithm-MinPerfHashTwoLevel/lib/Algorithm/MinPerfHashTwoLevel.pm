@@ -1,7 +1,7 @@
 package Algorithm::MinPerfHashTwoLevel;
 use strict;
 use warnings;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our $DEFAULT_VARIANT = 5;
 
 use Exporter qw(import);
@@ -199,7 +199,7 @@ the appropriate mask values.
 
 In this implementation only one 64 bit hash value is computed, but the high
 and low 32 bits are used as if there were two hash values. The hash function
-used is stadtxhash. (The full 64 bit hash is called h0, the high 32 bits are
+used is SipHash 1-3. The full 64 bit hash is called h0, the high 32 bits are
 called h1, and the low 32 bits are called h2.)
 
 Computing the hash and mask is done in C (via XS).

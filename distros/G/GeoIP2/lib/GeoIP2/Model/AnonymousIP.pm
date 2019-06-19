@@ -3,7 +3,7 @@ package GeoIP2::Model::AnonymousIP;
 use strict;
 use warnings;
 
-our $VERSION = '2.006001';
+our $VERSION = '2.006002';
 
 use Moo;
 
@@ -41,7 +41,7 @@ GeoIP2::Model::AnonymousIP - Model class for the GeoIP2 Anonymous IP database
 
 =head1 VERSION
 
-version 2.006001
+version 2.006002
 
 =head1 SYNOPSIS
 
@@ -74,11 +74,15 @@ Returns true if the IP address belongs to any sort of anonymous network.
 
 =head2 $anon->is_anonymous_vpn()
 
-Returns true if the IP address belongs to an anonymous VPN system.
+Returns true if the IP address is registered to an anonymous VPN provider.
+If a VPN provider does not register subnets under names associated with them,
+we will likely only flag their IP ranges using the C<is_hosting_provider>
+attribute.
 
 =head2 $anon->is_hosting_provider()
 
-Returns true if the IP address belongs to a hosting provider.
+Returns true if the IP address belongs to a hosting or VPN provider
+(see description of C<is_anonymous_vpn> attribute).
 
 =head2 $anon->is_public_proxy()
 
@@ -120,7 +124,7 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2013 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-All of these but the City file are JSON dumps of the databases
+All of these but the City and Enterprise files are JSON dumps of the databases
 created by the GeoIP2 build integration tests
 (TestFor::MM::Integration::GeoIP2::Build).
 
@@ -6,5 +6,10 @@ Additional data was added to match our legacy test databases.
 
 The City file is of unknown origin.
 
-The Precision files is the normal GeoIP2 files with an additional marker
-(128.101.101.101) to differentiate the two.
+The Enterprise file was a single example IP address, modified slightly to
+include all fields. It now has more than that.
+
+The Precision file was the normal Enterprise file with an additional marker
+(128.101.101.101) to differentiate the two. It now contains additional
+additions and changes as it is the database used in many MaxMind
+integration tests.

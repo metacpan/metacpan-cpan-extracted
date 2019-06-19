@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use IO::Handle; 
 
@@ -800,7 +800,7 @@ sub bind {
                 set catchVal [catch {$tclsubName} retVal]
                 #puts \"catchVal = \$catchVal retval = \$retVal\"
                 if {\$catchVal != 0} {
-                        if { \$retVal != \"_TK_BREAK_\\n\" } { # BREAK returns are not errors
+                        if { \$retVal ne \"_TK_BREAK_\\n\" } { # BREAK returns are not errors
                                 return -code error \$retVal
                         } else {
                                 break
@@ -1757,9 +1757,8 @@ sub Scrolled
  # If there aren't any, then add them
  my $mouseWheel = $cw->bind(ref($w), '<MouseWheel>'); # Check for class binding
  $mouseWheel = 1 if( $w->isa('Tcl::pTk::Text')); # Text is a special case, it has already has mousewheel binding
- if( !$mouseWheel ){
- 	$cw->MouseWheelBind($w) unless $mouseWheel;
-
+ unless ($mouseWheel) {
+ 	$cw->MouseWheelBind($w);
  }
  #else{
  #	print "wheelbinding alread exists for $w\n";
@@ -2182,7 +2181,7 @@ sub _FE_helper{
    # Windows version of checking if io handle is readable
    if( $^O eq 'MSWin32'){
    
-           # See how big the hande is, if non-zero, read it
+           # See how big the handle is, if non-zero, read it
            $size = -s $handle;
            #print "size = $size\n";
    }
@@ -2225,7 +2224,7 @@ sub _FE_helper{
 }
 
 #######
-# Inteface to the tk_setPalette command
+# Interface to the tk_setPalette command
 sub setPalette{
         my $self = shift;
         my @args = @_;
@@ -2233,7 +2232,7 @@ sub setPalette{
         return $self->call('tk_setPalette', @args);
 }  
 
-# Inteface to the tk_bisque command
+# Interface to the tk_bisque command
 sub bisque{
         my $self = shift;
         my @args = @_;
@@ -2352,7 +2351,7 @@ sub SelectionHandle{
 
     }
     
-    # Callback not defined, must be reseting the selection handler
+    # Callback not defined, must be resetting the selection handler
     return $widget->interp->call('selection', 'handle', @_, $widget, $callback );
     
     
@@ -2365,7 +2364,7 @@ sub SelectionGet{
 }
 
 
-# Scrolling and mousewhile bind methods copied from Tk::Widget
+# Scrolling and mousewheel bind methods copied from Tk::Widget
 sub XscrollBind
 {
  my ($mw,$class) = @_;
@@ -2439,7 +2438,7 @@ sub MouseWheelBind
    # Support for mousewheels on Linux/Unix commonly comes through mapping
    # the wheel to the extended buttons.  If you have a mousewheel, find
    # Linux configuration info at:
-   #   http://www.inria.fr/koala/colas/mouse-wheel-scroll/
+   #   http://linuxreviews.org/howtos/xfree/mouse/
    $mw->bind($class, '<4>',
 		 sub { $_[0]->yview('scroll', -3, 'units')
 			   unless $Tk::strictMotif;

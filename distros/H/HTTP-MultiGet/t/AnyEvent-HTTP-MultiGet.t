@@ -12,7 +12,7 @@ use_ok($class);
 
 my $string;
 my $logger=LoggerToString($class,$string);
-my $self=$class->new(logger=>$logger);
+my $self=$class->new(logger=>$logger,request_opts=>{timeout=>10,persistent=>0,cookie_jar=>{},keepalive=>0});
 isa_ok($self,$class);
 
 SKIP: { skip 'env valirable RUN_HTTP_TESTS not set', 56 unless $ENV{RUN_HTTP_TESTS};

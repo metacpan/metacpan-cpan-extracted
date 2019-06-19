@@ -1,6 +1,6 @@
 package Tcl::pTk;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use strict;
 use Tcl;
@@ -1374,37 +1374,40 @@ sub ALL_EVENTS{ Tcl::ALL_EVENTS()};
 
 # Wrappers for the Tk color functions (for compatibility with perl/tk)
 sub NORMAL_BG{
-        if($^O eq 'cygwin' || $^O eq 'MSWin32' ){
+        my $ws = $tkinterp->Eval('tk windowingsystem');
+        if( $ws eq 'win32' ){
                 return 'systembuttonface';
         }
-        elsif( $^O eq 'darwin' ){ # MacOS
+        elsif( $ws eq 'aqua' ){ # MacOS
                 return 'systemWindowBody';
         }
-        else{ # Must be unix
+        else{ # Must be x11
                 return '#d9d9d9';
         }
 }
 
 sub ACTIVE_BG{
-        if($^O eq 'cygwin' || $^O eq 'MSWin32' ){
+        my $ws = $tkinterp->Eval('tk windowingsystem');
+        if( $ws eq 'win32' ){
                 return 'systembuttonface';
         }
-        elsif( $^O eq 'darwin' ){ # MacOS
+        elsif( $ws eq 'aqua' ){ # MacOS
                 return 'systemButtonFacePressed';
         }
-        else{ # Must be unix
+        else{ # Must be x11
                 return '#ececec';
         }
 }
 
 sub SELECT_BG{
-        if($^O eq 'cygwin' || $^O eq 'MSWin32' ){
+        my $ws = $tkinterp->Eval('tk windowingsystem');
+        if( $ws eq 'win32' ){
                 return 'SystemHighlight';
         }
-        elsif( $^O eq 'darwin' ){ # MacOS
+        elsif( $ws eq 'aqua' ){ # MacOS
                 return 'systemHighlightSecondary';
         }
-        else{ # Must be unix
+        else{ # Must be x11
                 return '#c3c3c3';
         }
 }

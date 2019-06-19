@@ -23,7 +23,7 @@ my %subsList = ( qw/
         
         /);
 
-# ISAs for the subsituted widget. If not listed here, then they will be sub-classes
+# ISAs for the substituted widget. If not listed here, then they will be sub-classes
 #   of Widget.
 my %subISA = ( qw/
         Frame   Frame
@@ -69,7 +69,7 @@ foreach my $oldWidgetName( keys %subsList ){
 
 exit();
 
-# Sub to output the subsitution code ####
+# Sub to output the substitution code ####
 sub translateWidget{
         my $top            = shift;
         my $oldWidgetName  = shift;
@@ -175,7 +175,7 @@ sub Populate {
     
     
     # Setup options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = (
 __IGNOREOPTIONS__
     );

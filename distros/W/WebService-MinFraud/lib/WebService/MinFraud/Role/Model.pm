@@ -3,7 +3,7 @@ package WebService::MinFraud::Role::Model;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '1.009000';
+our $VERSION = '1.009001';
 
 use Sub::Quote qw( quote_sub );
 use Types::Standard qw( HashRef );
@@ -100,7 +100,7 @@ WebService::MinFraud::Role::Model - A role for storing there original response i
 
 =head1 VERSION
 
-version 1.009000
+version 1.009001
 
 =head1 SUPPORT
 
@@ -112,7 +112,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

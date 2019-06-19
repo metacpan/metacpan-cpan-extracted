@@ -1,5 +1,10 @@
 Revision history for Syntax-Construct
 
+1.013   2019-06-18
+
+        - Rework tests
+        - Turkig casing only works if the underlying OS supports it
+
 1.012   2019-06-11
 
         - Fix broken link to perl5220delta

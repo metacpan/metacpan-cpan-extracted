@@ -1,6 +1,6 @@
 package Map::Tube::Route;
 
-$Map::Tube::Route::VERSION   = '3.62';
+$Map::Tube::Route::VERSION   = '3.63';
 $Map::Tube::Route::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Route - Class to represent the route in the map.
 
 =head1 VERSION
 
-Version 3.62
+Version 3.63
 
 =cut
 
@@ -26,6 +26,19 @@ use overload q{""} => 'as_string', fallback => 1;
 has [ qw(from to) ] => (is => 'ro', isa => Node,  required => 1);
 has nodes => (is => 'ro', isa => Nodes, required => 1);
 with 'Map::Tube::Plugin::Formatter';
+
+=head1 SYNOPSIS
+
+    use strict; use warnings;
+    use Map::Tube::London;
+
+    my $map   = Map::Tube::London->new;
+    my $route = $map->get_shortest_route('Baker Street', 'Euston Square');
+
+    print "Route Starts:",    $route->from,      "\n";
+    print "Route Ends:",      $route->to,        "\n";
+    print "Route:",           $route,            "\n";
+    print "Route Preferred:", $route->preferred, "\n";
 
 =head1 DESCRIPTION
 

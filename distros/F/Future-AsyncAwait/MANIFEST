@@ -45,4 +45,5 @@ t/43failure.t
 t/80await+try.t
 t/81memory-growth.t
 t/90rt128176.t
+t/90rt129836.t
 t/99pod.t

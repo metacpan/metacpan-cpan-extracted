@@ -9,7 +9,7 @@ use App::HomeBank2Ledger::Util qw(commify rtrim);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -257,7 +257,7 @@ App::HomeBank2Ledger::Formatter::Beancount - Beancount formatter
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

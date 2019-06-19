@@ -4,7 +4,7 @@ package POE::Component::ElasticSearch::Indexer;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use Const::Fast;
 use Digest::SHA1 qw(sha1_hex);
@@ -56,6 +56,8 @@ sub spawn {
         StatsInterval      => 60,
         BacklogInterval    => 60,
         CleanupInterval    => 60,
+        PoolConnections    => 1,
+        KeepAliveTimeout   => 2,
         MaxConnsPerServer  => 3,
         MaxPendingRequests => 5,
         MaxRecoveryBatches => 10,
@@ -114,19 +116,26 @@ sub spawn {
     # Connection Pooling
     my $num_servers  = scalar( @{ $CONFIG{Servers} } );
     $CONFIG{MaxConnsTotal} ||= $num_servers * $CONFIG{MaxConnsPerServer};
-    my $pool = POE::Component::Client::Keepalive->new(
-        keep_alive   => 60,
+    my $pool = $CONFIG{PoolConnections} ? POE::Component::Client::Keepalive->new(
+        keep_alive   => $CONFIG{KeepAliveTimeout},
         max_open     => $CONFIG{MaxConnsTotal},
         max_per_host => $CONFIG{MaxConnsPerServer},
         timeout      => $CONFIG{Timeout},
-    );
+    ) : undef;
+
+    my $http_timeout = $pool ? $CONFIG{Timeout} * $CONFIG{MaxConnsPerServer} : $CONFIG{Timeout};
     POE::Component::Client::HTTP->spawn(
-        Alias             => 'http',
-        ConnectionManager => $pool,
-        Timeout           => $CONFIG{Timeout} * 2,   # Allow two-inflight requests per slot
+        Alias   => 'http',
+        Timeout => $http_timeout,
+        # Are we using Connection Pooling?
+        $pool ? (ConnectionManager => $pool)  : (),
     );
-    DEBUG(sprintf "Spawned an HTTP Pool for %d servers: %d max connections, %d max per host.",
-        $num_servers, @CONFIG{qw(MaxConnsTotal MaxConnsPerServer)}
+    DEBUG(sprintf "Spawned an HTTP %s for %d servers, %s.",
+        $CONFIG{PoolConnections} ? 'pool' : 'session',
+        $num_servers,
+        $CONFIG{PoolConnections} ?
+            sprintf("%d max connections, %d max per host", @CONFIG{qw(MaxConnsTotal MaxConnsPerServer)})
+            : 'pooling disabled',
     );
     return $session;
 }
@@ -642,7 +651,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -653,7 +662,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
     my $es_session = POE::Component::ElasticSearch::Indexer->spawn(
         Alias            => 'es',                    # Default
         Servers          => [qw(localhost)],         # Default
-        Timeout          => 1,                       # Default
+        Timeout          => 5,                       # Default
         FlushInterval    => 30,                      # Default
         FlushSize        => 1_000,                   # Default
         LoggingConfig    => undef,                   # Default
@@ -690,7 +699,25 @@ B<es>.
 A list of Elasticsearch hosts for connections.  Maybe in the form of
 C<hostname> or C<hostname:port>.
 
+=item B<PoolConnections>
+
+Boolean, default true.  Enable connection pooling with
+L<POE::Component::Client::Keepalive>.  This is desirable in most cases, but can
+result in timeouts piling up.  You may wish to disable this if you notice that
+indexing takes a while to recover after timeout events.
+
+=item B<KeepAliveTimeout>
+
+Requires C<PoolConnections>.
+
+Set the keep_alive timeout in seconds for the creation of a
+L<POE::Component::Client::Keepalive> connection pool.
+
+Defaults to B<2>.
+
 =item B<MaxConnsPerServer>
+
+Requires C<PoolConnections>.
 
 Maximum number of simultaneous connections to an Elasticsearch node.  Used in
 the creation of a L<POE::Component::Client::Keepalive> connection pool.
@@ -699,12 +726,16 @@ Defaults to B<3>.
 
 =item B<MaxConnsTotal>
 
+Requires C<PoolConnections>.
+
 Maximum number of simultaneous connections to all servers.  Used in
 the creation of a L<POE::Component::Client::Keepalive> connection pool.
 
 Defaults to B<MaxConnsPerServer * number of Servers>.
 
 =item B<MaxPendingRequests>
+
+Requires C<PoolConnections>.
 
 Maximum number of requests backlogged in the connection pool.  Defaults to B<5>.
 
@@ -939,6 +970,12 @@ This software is Copyright (c) 2018 by Brad Lhotsky.
 This is free software, licensed under:
 
   The (three-clause) BSD License
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mohammad S Anwar
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

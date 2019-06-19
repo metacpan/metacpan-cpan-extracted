@@ -1,6 +1,6 @@
 package Map::Tube::Line;
 
-$Map::Tube::Line::VERSION   = '3.62';
+$Map::Tube::Line::VERSION   = '3.63';
 $Map::Tube::Line::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Line - Class to represent the line in the map.
 
 =head1 VERSION
 
-Version 3.62
+Version 3.63
 
 =cut
 
@@ -45,6 +45,11 @@ It provides simple interface to the C<line> of the map.
     my $node = Map::Tube::Node->new({ id => 1, name => 'N1', link  => '2,3', line => [$line] });
 
     $line->add_station($node);
+
+    print "Line Id:",       $line->id,       "\n";
+    print "Line Name:",     $line->name,     "\n";
+    print "Line Color:",    $line->color,    "\n";
+    print "Line Stations:", $line->stations, "\n";
 
 =head1 CONSTRUCTOR
 

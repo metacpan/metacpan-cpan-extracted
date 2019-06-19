@@ -20,14 +20,14 @@ plugin 'Probe::CommandLine' => (
 share {
 
   requires 'Path::Tiny';
-  plugin 'Fetch::HTTPTiny' => 'http://www.nasm.us/pub/nasm/releasebuilds';
-  plugin 'Decode::HTML' => ();
+  plugin 'Fetch::HTTPTiny' => 'https://www.nasm.us/pub/nasm/releasebuilds';
+  plugin 'Decode::Mojo' => ();
   plugin 'Prefer::SortVersions' => ();
 
   download sub {
     my($build) = @_;
     
-    my $res = $build->decode($build->fetch('http://www.nasm.us/pub/nasm/releasebuilds'));
+    my $res = $build->decode($build->fetch('https://www.nasm.us/pub/nasm/releasebuilds'));
 
     $res->{list} = [grep { $_->{filename} =~ /^[0-9\.]+$/ } @{ $res->{list} }];
     

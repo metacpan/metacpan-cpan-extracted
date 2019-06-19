@@ -1,5 +1,10 @@
 Revision history for Future-AsyncAwait
 
+0.28    2019-06-17 17:06:18
+        [BUGFIXES]
+         * Fix localisation of hints hash at compiletime so nested `async sub`
+           works correctly (RT129836)
+
 0.27    2019-06-04 20:48:42
         [CHANGES]
          * Detect certain forbidden constructs at compile-time; await inside:

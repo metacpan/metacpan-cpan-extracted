@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Config;
 
 eval q{ require Test::More };
@@ -12,8 +12,9 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::Plugin
+  Alien::Build::Plugin::Decode::Mojo
   ExtUtils::MakeMaker
-  HTML::LinkExtor
+  Mojo::DOM58
   Test2::V0
   Test::Alien::Build
   URI

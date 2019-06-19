@@ -244,6 +244,7 @@ WITH OTHER MODULES
     inside an async sub work correctly, including those that attempt to
     return from inside try.
 
+       use Future::AsyncAwait;
        use Syntax::Keyword::Try;
     
        async sub attempt

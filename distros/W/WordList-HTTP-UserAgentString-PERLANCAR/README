@@ -3,9 +3,9 @@ NAME
     User-Agent strings
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     WordList::HTTP::UserAgentString::PERLANCAR (from Perl distribution
-    WordList-HTTP-UserAgentString-PERLANCAR), released on 2019-06-11.
+    WordList-HTTP-UserAgentString-PERLANCAR), released on 2019-06-17.
 
 SYNOPSIS
      use WordList::HTTP::UserAgentString::PERLANCAR;
@@ -30,17 +30,17 @@ DESCRIPTION
     Windows).
 
 STATISTICS
-     +----------------------------------+-------+
-     | key                              | value |
-     +----------------------------------+-------+
-     | avg_word_len                     | 89.25 |
-     | longest_word_len                 | 113   |
-     | num_words                        | 4     |
-     | num_words_contains_nonword_chars | 4     |
-     | num_words_contains_unicode       | 0     |
-     | num_words_contains_whitespace    | 4     |
-     | shortest_word_len                | 68    |
-     +----------------------------------+-------+
+     +----------------------------------+------------------+
+     | key                              | value            |
+     +----------------------------------+------------------+
+     | avg_word_len                     | 95.6666666666667 |
+     | longest_word_len                 | 113              |
+     | num_words                        | 6                |
+     | num_words_contains_nonword_chars | 6                |
+     | num_words_contains_unicode       | 0                |
+     | num_words_contains_whitespace    | 6                |
+     | shortest_word_len                | 68               |
+     +----------------------------------+------------------+
 
     The statistics is available in the %STATS package variable.
 

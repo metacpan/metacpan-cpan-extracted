@@ -1,5 +1,5 @@
 #!perl
-# PODNAME: files-to-elasticsearch.pl
+# PODNAME: file-to-elasticsearch.pl
 # ABSTRACT: A simple utility to tail a file and index each line as a document in ElasticSearch
 use strict;
 use warnings;
@@ -273,7 +273,27 @@ sub got_new_line {
                     }
                 }
                 elsif( $extract->{by} eq 'regex' ) {
-                    # TODO: Regex Decoder
+                    # Skip unless it's valid
+                    next unless $extract->{regex} and $extract->{regex_parts};
+
+                    if( my @parts = ($from =~ /$extract->{regex}/) ) {
+                        # Name parts
+                        my $keys = $extract->{regex_parts};
+                        for( my $i = 0; $i < @parts; $i++ ) {
+                            next unless $keys->[$i] and length $keys->[$i] and $parts[$i];
+                            next if lc $keys->[$i] eq 'null' or lc $keys->[$i] eq 'undef';
+                            if( my $into = $extract->{into} ) {
+                                # Make sure we have a hash reference
+                                $doc ||=  {};
+                                $doc->{$into} = {} unless is_hashref($doc->{$into});
+                                $doc->{$into}{$keys->[$i]} = $parts[$i];
+                            }
+                            else {
+                                $doc ||=  {};
+                                $doc->{$keys->[$i]} = $parts[$i];
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -348,11 +368,11 @@ __END__
 
 =head1 NAME
 
-files-to-elasticsearch.pl - A simple utility to tail a file and index each line as a document in ElasticSearch
+file-to-elasticsearch.pl - A simple utility to tail a file and index each line as a document in ElasticSearch
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -471,7 +491,7 @@ will be loaded if available.
 
 =item B<index>
 
-A C<strfime> compatible string to use as the index to put documents created
+A C<strftime> compatible string to use as the index to put documents created
 from this file.  If not specified, the defaults from the ElasticSearch section
 will be used, and failing that, the default as specified in
 L<POE::Component::ElasticSearch::Index>.
@@ -487,6 +507,67 @@ Extraction of fields from the document by one of the supported methods.
 =over 4
 
 =item by
+
+Can be 'split' or 'regex'.
+
+B<split> supports:
+
+=over 4
+
+=item split_on
+
+Regex or string to split the string on.
+
+=item split_parts
+
+Name for each part of the split, C<undef> positions in the split string will be discarded.
+
+=back
+
+B<regex> supports:
+
+=over 4
+
+=item regex
+
+The regex to use to extract, using capture groups to designate:
+
+=item regex_parts
+
+Name for reach captured group, C<undef> positions in the list will be discarded.
+
+=back
+
+=item from
+
+Name of the field to apply the extraction to.
+
+=item when
+
+Limits applying the extraction to values matching the regex.
+
+=item into
+
+Top level namespace for the collected keys to wind up inside of, ie:
+
+    extract:
+      - by: split
+        from: name
+        when: '^pack'
+        into: 'pack'
+        split_on: '/'
+        split_parts: [ null, "name", "report"  ]
+
+Will look at the field B<name> and when it matches C<^pack> it will split the
+name on C</> and index the second element to C<name> and the third to C<report>, so:
+
+    name: pack/os/cpu_info
+
+Becomes:
+
+    pack:
+      name: os
+      report: cpu_info
 
 =back
 

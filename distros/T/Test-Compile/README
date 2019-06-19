@@ -8,6 +8,8 @@ DEPENDENCIES
     Requires perl v5.6.2, plus
     * UNIVERSAL::require
     * version
+    * parent
+    * Exporter
 
 INSTALLATION
     Standard process for building & installing modules:

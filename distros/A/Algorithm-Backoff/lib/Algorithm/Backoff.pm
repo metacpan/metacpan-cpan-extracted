@@ -1,7 +1,7 @@
 package Algorithm::Backoff;
 
-our $DATE = '2019-06-08'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-06-18'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -279,7 +279,7 @@ Algorithm::Backoff - Various backoff strategies for retry
 
 =head1 VERSION
 
-This document describes version 0.006 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-08.
+This document describes version 0.007 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-18.
 
 =head1 SYNOPSIS
 
@@ -384,6 +384,11 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<Action::Retry> - Somehow I didn't find this module before writing
+Algorithm::Backoff. Otherwise I would probably not created Algorithm::Backoff.
+But Algorithm::Backoff offers an alternative interface, a lighter footprint (no
+Moo), and a couple more strategies.
 
 =head1 AUTHOR
 

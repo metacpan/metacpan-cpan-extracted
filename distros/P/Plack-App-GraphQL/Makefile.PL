@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Plack-App-GraphQL",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Plack::App::GraphQL",
   "PREREQ_PM" => {
     "GraphQL" => "0.33",
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

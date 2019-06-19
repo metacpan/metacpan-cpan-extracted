@@ -2,7 +2,7 @@ package WidgetDemo;
 
 use 5.005_03;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use Tcl::pTk;
 use Carp;

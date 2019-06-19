@@ -200,6 +200,5 @@ struct mph_bucket {
 struct mph_obj {
     size_t bytes;
     struct mph_header *header;
-    int fd;
 };
 

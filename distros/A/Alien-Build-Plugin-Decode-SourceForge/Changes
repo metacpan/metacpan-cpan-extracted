@@ -1,4 +1,9 @@
 Revision history for Alien-Build-Plugin-Decode-SourceForge
 
+0.02      2019-06-18 10:11:38 -0400
+  - Switch to Decode::Mojo as a test prereq instead of Decode::HTML
+    (this is in preperation for making the latter the default in
+     the next version of Alien::Build)
+
 0.01      2017-07-14 15:16:26 -0400
   - initial version

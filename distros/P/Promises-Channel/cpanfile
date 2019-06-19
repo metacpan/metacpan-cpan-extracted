@@ -1,5 +1,5 @@
 requires 'Moo' => '0';
-requires 'Promises' => '0';
+requires 'Promises' => '0.96';
 
 on test => sub {
   requires 'Test2::V0' => '0';

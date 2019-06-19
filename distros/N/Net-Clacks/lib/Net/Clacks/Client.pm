@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.2;
+our $VERSION = 6.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -824,6 +824,50 @@ sub clientlist {
     return @keys;
 }
 
+sub flush {
+    my ($self, $flushid) = @_;
+
+    if(!defined($flushid) || $flushid eq '') {
+        $flushid = 'AUTO' . int(rand(1_000_000)) . int(rand(1_000_000));
+    }
+
+    if($self->{needreconnect}) {
+        $self->reconnect;
+    }
+
+    $self->{outbuffer} .= "FLUSH $flushid\r\n";
+
+    # Make sure we send everything
+    while(1) {
+        $self->doNetwork();
+        if($self->{needreconnect}) {
+            # Nothing we can do, really...
+            return;
+        }
+        last if(!length($self->{outbuffer}));
+    }
+
+    # Now, wait for the answer
+    my $answerline;
+    while(1) {
+        $self->doNetwork(0.5);
+        if($self->{needreconnect}) {
+            # Nothing we can do, really...
+            return;
+        }
+        for(my $i = 0; $i < scalar @{$self->{inlines}}; $i++) {
+            if($self->{inlines}->[$i] =~ /^FLUSHED\ $flushid/) {
+                # Remove the answer from in in-queue directly (out of sequence), because we don't need in in the getNext function
+                $answerline = splice @{$self->{inlines}}, $i, 1;
+                last;
+            }
+        }
+        last if(defined($answerline));
+    }
+
+    return;
+}
+
 
 sub autohandle_messages {
     my ($self) = @_;
@@ -871,14 +915,16 @@ sub DESTROY {
     my ($self) = @_;
 
     # Notify server we are leaving and make sure we send everything in our outgoing buffer
+    $self->flush();
     $self->{outbuffer} .= "QUIT\r\n";
     my $endtime = time + 1; # Wait a maximum of one second to send
     while(1) {
         last if(time > $endtime);
         $self->doNetwork();
         last if(!length($self->{outbuffer}));
-        usleep(1000);
+        sleep(0.05);
     }
+    sleep(0.5); # Wait another half second for the OS to flush the socket
 
     delete $self->{socket};
 
@@ -960,6 +1006,11 @@ tell everyone interested immediately that it has changed.
 =head2 DESTROY
 
 Automatically closes the connection.
+
+=head1 IMPORTANT NOTE
+
+Please make sure and read the documentations for L<Net::Clacks> as it contains important information
+pertaining to upgrades and general changes!
 
 =head1 AUTHOR
 

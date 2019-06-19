@@ -20,9 +20,8 @@ $top = MainWindow->new;
 # This will skip if Tix not present
 my $retVal = $top->interp->pkg_require('Tix');
 unless( $retVal){
-	plan tests => 1;
-        skip("Tix Tcl package not available", 1);
-        exit;
+    print "1..0 # Skipped: Tix Tcl package not available\n";
+    exit;
 }
 
 plan test => 2;

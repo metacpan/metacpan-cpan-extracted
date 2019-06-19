@@ -73,7 +73,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Store-MongoDB"
       }
    },
-   "version" : "0.0802",
+   "version" : "0.0803",
    "x_contributors" : [
       "Johann Rolschewski <jorol@cpan.org>",
       "Nicolas Franck <nicolas.franck@ugent.be>",

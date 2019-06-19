@@ -46,11 +46,11 @@ could contain these values. This is why you need to find the last occurrence
 of this sequence.
 
 The maximum allowable size for the metadata section, including the marker that
-starts the metadata, is 128kb.
+starts the metadata, is 128KiB.
 
 The metadata is stored as a map data structure. This structure is described
 later in the spec. Changing a key's data type or removing a key would
-consistute a major version change for this spec.
+constitute a major version change for this spec.
 
 Except where otherwise specified, each key listed is required for the database
 to be considered valid.
@@ -159,7 +159,7 @@ relevant to the given netblock.
 Each node in the search tree consists of two records, each of which is a
 pointer. The record size varies by database, but inside a single database node
 records are always the same size. A record may be anywhere from 24 to 128 bits
-long, dependending on the number of nodes in the tree. These pointers are
+long, depending on the number of nodes in the tree. These pointers are
 stored in big-endian format (most significant byte first).
 
 Here are some examples of how the records are laid out in a node for 24, 28,
@@ -175,7 +175,8 @@ and 32 bit records. Larger record sizes follow this same pattern.
     | <------------- node --------------->|
     | 23 .. 0 | 27..24 | 27..24 | 23 .. 0 |
 
-Note, the last 4 bits of each pointer are combined into the middle byte.
+Note 4 bits of each pointer are combined into the middle byte. For both
+records, they are prepended and end up in the most significant position.
 
 #### 32 bits (large database), one node is 8 bytes
 
@@ -206,26 +207,31 @@ have any data for the IP address, and the search ends here.
 
 If the record value is *greater* than the number of nodes in the search tree,
 then it is an actual pointer value pointing into the data section. The value
-of the pointer is calculated from the start of the data section, *not* from
-the start of the file.
+of the pointer is relative to the start of the data section, *not* the
+start of the file.
 
 In order to determine where in the data section we should start looking, we use
 the following formula:
 
     $data_section_offset = ( $record_value - $node_count ) - 16
 
-The `16` is the size of the data section separator (see below for details).
+The 16 is the size of the data section separator. We subtract it because we
+want to permit pointing to the first byte of the data section. Recall that
+the record value cannot equal the node count as that means there is no
+data. Instead, we choose to start values that go to the data section at
+`$node_count + 16`. (This has the side effect that record values
+`$node_count + 1` through `$node_count + 15` inclusive are not valid).
 
-The reason that we subtract the `$node_count` is best demonstrated by an example.
+This is best demonstrated by an example:
 
 Let's assume we have a 24-bit tree with 1,000 nodes. Each node contains 48
 bits, or 6 bytes. The size of the tree is 6,000 bytes.
 
-When a record in the tree contains a number that is < 1,000, this is a *node
-number*, and we look up that node. If a record contains a value >= 1,016, we
-know that it is a data section value. We subtract the node count (1,000) and
-then subtract 16 for the data section separator, giving us the number 0, the
-first byte of the data section.
+When a record in the tree contains a number that is less than 1,000, this
+is a *node number*, and we look up that node. If a record contains a value
+greater than or equal to 1,016, we know that it is a data section value. We
+subtract the node count (1,000) and then subtract 16 for the data section
+separator, giving us the number 0, the first byte of the data section.
 
 If a record contained the value 6,000, this formula would give us an offset of
 4,984 into the data section.
@@ -233,9 +239,14 @@ If a record contained the value 6,000, this formula would give us an offset of
 In order to determine where in the file this offset really points to, we also
 need to know where the data section starts. This can be calculated by
 determining the size of the search tree in bytes and then adding an additional
-16 bytes for the data section separator.
+16 bytes for the data section separator:
 
-So the final formula to determine the offset in the file is:
+    $offset_in_file = $data_section_offset
+                      + $search_tree_size_in_bytes
+                      + 16
+
+Since we subtract and then add 16, the final formula to determine the
+offset in the file can be simplified to:
 
     $offset_in_file = ( $record_value - $node_count )
                       + $search_tree_size_in_bytes
@@ -271,7 +282,7 @@ section. This separator exists in order to make it possible for a verification
 tool to distinguish between the two sections.
 
 This separator is not considered part of the data section itself. In other
-words, the data section starts at `$size\_of\_search_tree + 16" bytes in the
+words, the data section starts at `$size_of_search_tree + 16` bytes in the
 file.
 
 ## Output Data Section
@@ -368,7 +379,7 @@ data. For example, instead of repeating the string "United States" over and
 over in the database, we store it in the cache container and use pointers
 *into* this container instead.
 
-Nothing in the database will ever contain a pointer to the this field
+Nothing in the database will ever contain a pointer to this field
 itself. Instead, various fields will point into the container.
 
 The primary reason for making this a separate data type versus simply inlining
@@ -413,16 +424,16 @@ contain a number from 1 to 7, the actual type for the field.
 We've tried to assign the most commonly used types as numbers 1-7 as an
 optimization.
 
-With an extended type, the type number in the second byte is the number minus
-7. In other words, an array (type 11) will be stored with a 0 for the type in
-the first byte and a 4 in the second.
+With an extended type, the type number in the second byte is the number
+minus 7. In other words, an array (type 11) will be stored with a 0 for the
+type in the first byte and a 4 in the second.
 
 Here is an example of how the control byte may combine with the next byte to
 tell us the type:
 
     001XXXXX          pointer
     010XXXXX          UTF-8 string
-    010XXXXX          unsigned 32-bit int (ASCII)
+    110XXXXX          unsigned 32-bit int (ASCII)
     000XXXXX 00000011 unsigned 128-bit int (binary)
     000XXXXX 00000100 array
     000XXXXX 00000110 end marker
@@ -502,7 +513,7 @@ and payload.
 Pointers use the last five bits in the control byte to calculate the pointer
 value.
 
-To calculate the pointer value, we start by subdiving the five bits into two
+To calculate the pointer value, we start by subdividing the five bits into two
 groups. The first two bits indicate the size, and the next three bits are part
 of the value, so we end up with a control byte breaking down like this:
 001SSVVV.
@@ -539,6 +550,7 @@ data section size for the database is limited to 4GB.
 * [Perl](https://github.com/maxmind/MaxMind-DB-Reader-perl)
 * [PHP](https://github.com/maxmind/MaxMind-DB-Reader-php)
 * [Python](https://github.com/maxmind/MaxMind-DB-Reader-python)
+* [Ruby](https://github.com/maxmind/MaxMind-DB-Reader-ruby)
 
 ## Authors
 

@@ -7,7 +7,7 @@ use XML::XSH2::Functions qw();
 use vars qw($VERSION);
 use strict;
 
-  $VERSION='2.2.0'; # VERSION TEMPLATE
+  $VERSION='2.2.3'; # VERSION TEMPLATE
 
 our @PATH_HASH;
 our $O=qr/:[[:alnum:]]|--[-_[:alnum:]]+/; # option

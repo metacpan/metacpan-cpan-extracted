@@ -6,7 +6,7 @@
 # Modified from the Perl/Tk version for inclusion into Tcl::pTk
 package Tcl::pTk::DialogBox;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use strict;
 use Carp;

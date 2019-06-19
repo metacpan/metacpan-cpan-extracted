@@ -1,5 +1,5 @@
 package WWW::AzimuthAero;
-$WWW::AzimuthAero::VERSION = '0.1';
+$WWW::AzimuthAero::VERSION = '0.2';
 
 # ABSTRACT: Parser for https://azimuth.aero/
 
@@ -9,23 +9,29 @@ use warnings;
 use utf8;
 use feature 'say';
 use Carp;
+use List::Util qw/min/;
 
 use Mojo::DOM;
 use Mojo::UserAgent;
 
 use WWW::AzimuthAero::Utils qw(:all);
 use WWW::AzimuthAero::RouteMap;
+use WWW::AzimuthAero::Flight;
 
 use Data::Dumper;
 use Data::Dumper::AutoEncode;
 
 
 sub new {
-    my ( $self, $ua ) = @_;
-    $ua = Mojo::UserAgent->new() unless defined $ua;
+    my ( $self, %params ) = @_;
+    $params{ua_obj} = Mojo::UserAgent->new() unless defined $params{ua_obj};
+    $params{ua_str} =
+'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36'
+      unless defined $params{ua_str};
+    $params{ua_obj}->transactor->name( $params{ua_str} );
 
     # get cookies, otheerwise will be 403 error
-    my $req = $ua->get('https://booking.azimuth.aero/');
+    my $req = $params{ua_obj}->get('https://booking.azimuth.aero/');
 
     # get route map
     my $route_map = $req->res->dom->find('script')
@@ -33,7 +39,7 @@ sub new {
     $route_map = extract_js_glob_var( $route_map, 'data.routes' );
 
     bless {
-        ua        => $ua,
+        ua        => $params{ua_obj},
         route_map => WWW::AzimuthAero::RouteMap->new($route_map)
     }, $self;
 }
@@ -67,18 +73,46 @@ sub get_schedule_dates {
             # $interval->{min}
             # $interval->{max}
             # $interval->{days}
-            push @dates, get_dates_from_dows(%$interval);
+            push @dates,
+              get_dates_from_dows(%$interval);    # to-do : check max_date
         }
+
+        # to-do: push from now only
+
         return sort_dates(@dates);
     }
     else {
         carp "No schedule available between "
           . $params{from} . " and "
           . $params{to}
-          . ", url : $url"
+          . ", url : $url, most likely is transit route"
           if $params{v};
-        return get_dates_from_range( min => $params{min}, max => $params{max} );
+
+        return get_dates_from_range( min => $params{min}, max => $params{max} )
+          ;    # to-do : check max_date
     }
+}
+
+
+sub find_no_schedule {
+    my ( $self, %params ) = @_;
+
+    my $iata_map = $self->route_map->route_map_iata;
+
+    my %res = ();
+    my $i;
+    while ( my ( $from, $cities ) = each(%$iata_map) ) {
+        for my $to (@$cities) {
+            my $url =
+              'https://azimuth.aero/ru/flights?from=' . $from . '&to=' . $to;
+            my $res = $self->{ua}->get($url)->res->json;
+            say $i;
+            $res{$from} = $to if ( ref( $res->{available_to} ) ne 'ARRAY' );
+            $i++;
+        }
+    }
+
+    return %res;
 }
 
 
@@ -104,67 +138,6 @@ sub print_flights {
     return $str;
 }
 
-sub _get_fares {
-    my ( $self, $dom ) = @_;
-    my $fares          = {};
-    my @possible_fares = qw/legkiy vygodnyy optimalnyy svobodnyy/;
-
-    for my $class (@possible_fares) {
-        my $tdom =
-          $dom->at( 'div.td_fare.' . $class . ' span.sf-price__value.rub' );
-        if ($tdom) {
-            my $f = $tdom->text;
-            $f =~ s/\D+//g;
-            $fares->{$class} = $f;
-
-            # $fares->{lowest} = $f if ( $f < $fares->{lowest} );
-        }
-    }
-
-    $fares->{lowest} = 99999;
-    for my $fare ( values %$fares ) {
-        $fares->{lowest} = $fare if ( $fare < $fares->{lowest} );
-    }
-
-    return $fares;
-}
-
-# leave only digits and :
-sub _fix_time {
-    my ( $self, $time ) = @_;
-    $time =~ s/(?![\d:]).//g;
-    $time =~ s/[\r\n\t]//g;
-    return $time;
-}
-
-sub _get_flight_data {
-    my ( $self, $dom ) = @_;
-
-    # div.ts-flight_summary
-    my %stops_data;
-    if ( my $stops = $dom->at('div.ts-flight__duration div.ts-flight__stops') )
-    {
-        if ( $stops->text =~ /пересадк/ ) {
-            $stops_data{has_stops} = 1;
-            $stops_data{flight_duration} =
-              $dom->at('div.ts-flight__duration div.ts-flight__dur')->text;
-            $stops_data{flight_duration} =~ s/[\r\n\t]//g;
-            $stops_data{flight_duration} =~ s/^\s+//;
-            $stops_data{flight_duration} =~ s/\s+$//;
-        }
-    }
-
-    return {
-        arrival => $self->_fix_time(
-            $dom->at('div.ts-flight__arrival div.ts-flight__time')->text
-        ),
-        departure => $self->_fix_time(
-            $dom->at('div.ts-flight__deparure div.ts-flight__time')->text
-        ),
-        %stops_data
-    };
-}
-
 
 sub get {
     my ( $self, %params ) = @_;
@@ -188,13 +161,54 @@ sub get {
 
         for my $flight_dom ( $target_dom->find('div.sf-flight-block')->each ) {
 
-            my $fhash = {
-                flight => $self->_get_flight_data($flight_dom),
-                fares  => $self->_get_fares($flight_dom),
-                %params
-            };
+            my $flight = WWW::AzimuthAero::Flight->new(
+                from => $params{from},
+                to   => $params{to},
+                date => $params{date}
+            );
 
-            push @res, $fhash;
+            my $stops_css =
+              $flight_dom->at('div.ts-flight__duration div.ts-flight__stops');
+
+            if ($stops_css) {
+                if ( $stops_css->text =~ /пересадк/ ) {
+                    $flight->has_stops(1);
+
+                    $flight->duration(
+                        fix_html_string $flight_dom->at(
+                            'div.ts-flight__duration div.ts-flight__dur')->text
+                    );
+                }
+            }
+
+            $flight->arrival(
+                fix_html_string $flight_dom->at(
+                    'div.ts-flight__arrival div.ts-flight__time')->text );
+
+            $flight->departure(
+                fix_html_string $flight_dom->at(
+                    'div.ts-flight__deparure div.ts-flight__time')->text
+            );
+
+            $flight->flight_num(
+                fix_html_string $flight_dom->at('div.ts-flight__num')->text );
+
+            my @possible_fares = qw/legkiy vygodnyy optimalnyy svobodnyy/;
+
+            my $fares = {};
+            for my $class (@possible_fares) {
+                my $tdom = $flight_dom->at(
+                    'div.td_fare.' . $class . ' span.sf-price__value.rub' );
+                if ($tdom) {
+                    my $f = $tdom->text;
+                    $f =~ s/\D+//g;    # remove all non-digits
+                    $fares->{$class} = $f;
+                }
+            }
+
+            $fares->{lowest} = min values %$fares;
+            $flight->fares($fares);
+            push @res, $flight;
 
         }
 
@@ -341,7 +355,7 @@ WWW::AzimuthAero - Parser for https://azimuth.aero/
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 SYNOPSIS
 
@@ -383,24 +397,33 @@ How to generate DOM samples for unit tests after git clone:
 
 See L<WWW::AzimuthAero::Mock> and L<Mojo::UserAgent::Mockable> for more details
 
+API urls that modules uses:
+
+https://booking.azimuth.aero/ (for fetching route map and initialize session)
+
+https://azimuth.aero/ru/flights?from=ROV&to=LED (for fetching schedule)
+
+https://booking.azimuth.aero/!/ROV/LED/19.06.2019/1-0-0/ (for fetching prices)
+
 =head1 TO-DO
 
-implement find_transits
++ implement find_transits
 
-Checking more than 1 transfer
++ Checking more than 1 transfer
 
-L<WWW::AzimuthAero/get_fares_schedule> get requests debug stat
++ debug output of L<WWW::AzimuthAero/get_fares_schedule> and others
 
 =head1 new
 
     use WWW::AzimuthAero;
     my $az = Azimuth->new();
+    # or my $az = Azimuth->new(ua_str => 'yandex-travel');
 
 =head1 route_map  
 
 Return L<WWW::AzimuthAero::RouteMap> object
 
-    perl -Ilib -MWWW::AzimuthAero -MData::Dumper::AutoEncode -e 'my $x = WWW::AzimuthAero->new->route_map->raw; warn eDumper $x;'
+    perl -Ilib -MWWW::AzimuthAero -MData::Dumper::AutoEncode -e 'my $x = WWW::AzimuthAero->new->route_map; warn eDumper $x;'
 
 =head1 get_schedule_dates
 
@@ -416,7 +439,12 @@ Return list of available dates in '%d.%m.%Y' format
 
 Method is useful for minimize amount of API requests
 
-If no available_to property set (like at https://azimuth.aero/ru/flights?from=ROV&to=PKV ) will return all dates in range
+If no available_to property set (like at https://azimuth.aero/ru/flights?from=ROV&to=PKV ) 
+will check for 2 months forward and return all dates in range
+
+=head1 find_no_schedule
+
+Return hash with routes with no available schedule, presumably all transit routes.
 
 =head1 print_flights
 
@@ -431,46 +459,9 @@ Cities are specified as IATA codes.
 
     $az->get( from => 'ROV', to => 'LED', date => '04.06.2019' );
 
-Return ARRAYref with flights data of hash with error like 
+Return ARRAYref with L<WWW::AzimuthAero::Flight> objects or hash with error like 
 
     { 'error' => 'No flights found' }
-
-Example output 
-
-    [
-        {
-            'date' => '16.06.2019',
-            'fares' => { 'lowest' => '5620', 'svobodnyy' => '5620' },
-            'to' => 'KLF',
-            'from' => 'ROV',
-            'flight' => { 'arrival' => '11:35', 'departure' => '10:00' }
-        },from is not defined
-        ...
-    ];
-
-Example of output if flight has transfers :
-
-[
-      {
-        'date' => '12.06.2019',
-        'fares' => {
-                     'lowest' => '6930',
-                     'optimalnyy' => '8430',
-                     'svobodnyy' => '16360',
-                     'vygodnyy' => '6930'
-                   },
-        'to' => 'PKV',
-        'flight' => {
-                      'flight_duration' => '5ч 35м',
-                      'has_stops' => 1,
-                      'departure' => '07:45',
-                      'arrival' => '13:20'
-                    },
-        'from' => 'ROV'
-      }
-    ];
-
-( flight property will have has_stops option )
 
 =head1 get_fares_schedule
 

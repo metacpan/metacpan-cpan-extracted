@@ -111,183 +111,183 @@
    "provides" : {
       "WebService::MinFraud" : {
          "file" : "lib/WebService/MinFraud.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Client" : {
          "file" : "lib/WebService/MinFraud/Client.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::CCToken" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/CCToken.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::CustomInputs" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/CustomInputs.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::DateTime::RFC3339" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/DateTime/RFC3339.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::Enum" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/Enum.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::Hex32" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/Hex32.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::Hostname" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/Hostname.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::IPAddress" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/IPAddress.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Data::Rx::Type::WebURI" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/WebURI.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Error::Generic" : {
          "file" : "lib/WebService/MinFraud/Error/Generic.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Error::HTTP" : {
          "file" : "lib/WebService/MinFraud/Error/HTTP.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Error::WebService" : {
          "file" : "lib/WebService/MinFraud/Error/WebService.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Model::Chargeback" : {
          "file" : "lib/WebService/MinFraud/Model/Chargeback.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Model::Factors" : {
          "file" : "lib/WebService/MinFraud/Model/Factors.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Model::Insights" : {
          "file" : "lib/WebService/MinFraud/Model/Insights.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Model::Score" : {
          "file" : "lib/WebService/MinFraud/Model/Score.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::BillingAddress" : {
          "file" : "lib/WebService/MinFraud/Record/BillingAddress.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Country" : {
          "file" : "lib/WebService/MinFraud/Record/Country.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::CreditCard" : {
          "file" : "lib/WebService/MinFraud/Record/CreditCard.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Device" : {
          "file" : "lib/WebService/MinFraud/Record/Device.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Disposition" : {
          "file" : "lib/WebService/MinFraud/Record/Disposition.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Email" : {
          "file" : "lib/WebService/MinFraud/Record/Email.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::IPAddress" : {
          "file" : "lib/WebService/MinFraud/Record/IPAddress.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Issuer" : {
          "file" : "lib/WebService/MinFraud/Record/Issuer.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Location" : {
          "file" : "lib/WebService/MinFraud/Record/Location.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::ScoreIPAddress" : {
          "file" : "lib/WebService/MinFraud/Record/ScoreIPAddress.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::ShippingAddress" : {
          "file" : "lib/WebService/MinFraud/Record/ShippingAddress.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Subscores" : {
          "file" : "lib/WebService/MinFraud/Record/Subscores.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Record::Warning" : {
          "file" : "lib/WebService/MinFraud/Record/Warning.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Role::Data::Rx::Type" : {
          "file" : "lib/WebService/MinFraud/Role/Data/Rx/Type.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Role::Error::HTTP" : {
          "file" : "lib/WebService/MinFraud/Role/Error/HTTP.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Role::HasCommonAttributes" : {
          "file" : "lib/WebService/MinFraud/Role/HasCommonAttributes.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Role::HasLocales" : {
          "file" : "lib/WebService/MinFraud/Role/HasLocales.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Role::Model" : {
          "file" : "lib/WebService/MinFraud/Role/Model.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Role::Record::Address" : {
          "file" : "lib/WebService/MinFraud/Role/Record/Address.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Role::Record::HasRisk" : {
          "file" : "lib/WebService/MinFraud/Role/Record/HasRisk.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Types" : {
          "file" : "lib/WebService/MinFraud/Types.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Validator" : {
          "file" : "lib/WebService/MinFraud/Validator.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Validator::Base" : {
          "file" : "lib/WebService/MinFraud/Validator/Base.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Validator::Chargeback" : {
          "file" : "lib/WebService/MinFraud/Validator/Chargeback.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Validator::Factors" : {
          "file" : "lib/WebService/MinFraud/Validator/Factors.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Validator::FraudService" : {
          "file" : "lib/WebService/MinFraud/Validator/FraudService.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Validator::Insights" : {
          "file" : "lib/WebService/MinFraud/Validator/Insights.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       },
       "WebService::MinFraud::Validator::Score" : {
          "file" : "lib/WebService/MinFraud/Validator/Score.pm",
-         "version" : "1.009000"
+         "version" : "1.009001"
       }
    },
    "release_status" : "stable",
@@ -302,10 +302,10 @@
          "web" : "https://github.com/maxmind/minfraud-api-perl"
       }
    },
-   "version" : "1.009000",
+   "version" : 1.009001,
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026001"
+         "version" : "5.028002"
       },
       "plugins" : [
          {
@@ -342,7 +342,7 @@
                }
             },
             "name" : "@MAXMIND/Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -407,7 +407,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "@MAXMIND/GitHub::Meta",
-            "version" : "0.46"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",
@@ -417,7 +417,7 @@
                }
             },
             "name" : "@MAXMIND/GitHub::Update",
-            "version" : "0.46"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -802,7 +802,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -979,8 +979,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@MAXMIND/InstallGuide",
-            "version" : "1.200011"
+            "version" : "1.200013"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
@@ -1081,14 +1087,14 @@
                }
             },
             "name" : "@MAXMIND/Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%v%n%n%c"
+                  "commit_msg" : "v%V%n%n%c"
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -1113,7 +1119,7 @@
                }
             },
             "name" : "@MAXMIND/Commit generated files",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -1122,9 +1128,9 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.009000",
-                  "tag_format" : "v%v",
-                  "tag_message" : "v%v"
+                  "tag" : "v1.009001",
+                  "tag_format" : "v%V",
+                  "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
                   "git_version" : "2.17.1",
@@ -1135,7 +1141,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1152,7 +1158,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -1195,7 +1201,7 @@
                }
             },
             "name" : "@MAXMIND/Commit version bump",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1212,7 +1218,18 @@
                }
             },
             "name" : "@MAXMIND/Push version bump",
-            "version" : "2.045"
+            "version" : "2.046"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Deprecated",
+            "config" : {
+               "Dist::Zilla::Plugin::Deprecated" : {
+                  "all" : 1,
+                  "modules" : []
+               }
+            },
+            "name" : "Deprecated",
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -1292,7 +1309,8 @@
       "Ruben Navarro <rnavarro@maxmind.com>",
       "William Storey <wstorey@maxmind.com>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

@@ -3,7 +3,7 @@ package GeoIP2::Database::Reader;
 use strict;
 use warnings;
 
-our $VERSION = '2.006001';
+our $VERSION = '2.006002';
 
 use Moo;
 
@@ -202,7 +202,7 @@ GeoIP2::Database::Reader - Perl API for GeoIP2 databases
 
 =head1 VERSION
 
-version 2.006001
+version 2.006002
 
 =head1 SYNOPSIS
 
@@ -211,7 +211,7 @@ version 2.006001
   use GeoIP2::Database::Reader;
 
   my $reader = GeoIP2::Database::Reader->new(
-      file    => '/path/to/database',
+      file    => '/path/to/database',  # e.g. /home/maxmind/db/GeoIP2-Country.mmdb
       locales => [ 'en', 'de', ]
   );
 
@@ -257,7 +257,8 @@ This method creates a new object. It accepts the following arguments:
 
 =item * file
 
-This is the path to the GeoIP2 database file which you'd like to query.
+This is the path to the GeoIP2 database which you'd like to query. The path
+should include the filename.
 
 =item * locales
 
@@ -414,7 +415,7 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2013 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,11 @@
+0.04 2019-06-18
+-bugfix: set version of Promises in cpanfile to minimum supported feature set used by this module
+
+0.03 2019-06-17
+-new feature: on_shutdown() returns a promise which is resolved when the channel is shut down (ehuels)
+
 0.02 2019-06-06
--bugfix: 'get()' followed by 'put()' lacks 'drain()' ==> blocks the channel (thanks to ehuelsmann for identifying and fixing)
+-bugfix: 'get()' followed by 'put()' lacks 'drain()' ==> blocks the channel (thanks to ehuels for identifying and fixing)
 
 0.01 2018-12-19
 -Initial release

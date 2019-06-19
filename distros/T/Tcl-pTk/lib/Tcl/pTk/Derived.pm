@@ -3,7 +3,7 @@
 
 package Tcl::pTk::Derived;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use Carp;
 
@@ -332,7 +332,7 @@ sub ConfigDefault
  #
  # $specs->{'-cursor'} = ['SELF',undef,undef,undef] unless (exists $specs->{'-cursor'});
 
- # Now some hacks that cause colours to propogate down a composite widget
+ # Now some hacks that cause colours to propagate down a composite widget
  # tree - really needs more thought, other options adding such as active
  # colours too and maybe fonts
 
@@ -343,15 +343,14 @@ sub ConfigDefault
   Tcl::pTk::catch { $cw->Tcl::pTk::Widget::cget('-background') };
    my (@bg) = $@ ? ('PASSIVE') : ('SELF');
    push(@bg,'CHILDREN') if $child;
-   my $NORMAL_BG = $^O eq 'MSWin32' ? "SystemButtonFace" : '#d9d9d9'; # normal background for different platforms
-   $specs->{'-background'} = [\@bg,'background','Background',$NORMAL_BG];
+   $specs->{'-background'} = [\@bg,'background','Background',undef];
   }
  unless (exists($specs->{'-foreground'}))
   {
    Tcl::pTk::catch { $cw->Tcl::pTk::Widget::cget('-foreground') };
    my (@fg) = $@ ? ('PASSIVE') : ('SELF');
    push(@fg,'CHILDREN') if $child;
-   $specs->{'-foreground'} = [\@fg,'foreground','Foreground','BLACK'];
+   $specs->{'-foreground'} = [\@fg,'foreground','Foreground',undef];
   }
  $cw->ConfigAlias(-fg => '-foreground', -bg => '-background');
 

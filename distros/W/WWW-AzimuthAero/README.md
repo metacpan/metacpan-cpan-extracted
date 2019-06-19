@@ -4,7 +4,7 @@ WWW::AzimuthAero - Parser for https://azimuth.aero/
 
 # VERSION
 
-version 0.1
+version 0.2
 
 # SYNOPSIS
 
@@ -46,24 +46,33 @@ How to generate DOM samples for unit tests after git clone:
 
 See [WWW::AzimuthAero::Mock](https://metacpan.org/pod/WWW::AzimuthAero::Mock) and [Mojo::UserAgent::Mockable](https://metacpan.org/pod/Mojo::UserAgent::Mockable) for more details
 
+API urls that modules uses:
+
+https://booking.azimuth.aero/ (for fetching route map and initialize session)
+
+https://azimuth.aero/ru/flights?from=ROV&to=LED (for fetching schedule)
+
+https://booking.azimuth.aero/!/ROV/LED/19.06.2019/1-0-0/ (for fetching prices)
+
 # TO-DO
 
-implement find\_transits
+\+ implement find\_transits
 
-Checking more than 1 transfer
+\+ Checking more than 1 transfer
 
-["get\_fares\_schedule" in WWW::AzimuthAero](https://metacpan.org/pod/WWW::AzimuthAero#get_fares_schedule) get requests debug stat
+\+ debug output of ["get\_fares\_schedule" in WWW::AzimuthAero](https://metacpan.org/pod/WWW::AzimuthAero#get_fares_schedule) and others
 
 # new
 
     use WWW::AzimuthAero;
     my $az = Azimuth->new();
+    # or my $az = Azimuth->new(ua_str => 'yandex-travel');
 
 # route\_map  
 
 Return [WWW::AzimuthAero::RouteMap](https://metacpan.org/pod/WWW::AzimuthAero::RouteMap) object
 
-    perl -Ilib -MWWW::AzimuthAero -MData::Dumper::AutoEncode -e 'my $x = WWW::AzimuthAero->new->route_map->raw; warn eDumper $x;'
+    perl -Ilib -MWWW::AzimuthAero -MData::Dumper::AutoEncode -e 'my $x = WWW::AzimuthAero->new->route_map; warn eDumper $x;'
 
 # get\_schedule\_dates
 
@@ -79,7 +88,12 @@ Return list of available dates in '%d.%m.%Y' format
 
 Method is useful for minimize amount of API requests
 
-If no available\_to property set (like at https://azimuth.aero/ru/flights?from=ROV&to=PKV ) will return all dates in range
+If no available\_to property set (like at https://azimuth.aero/ru/flights?from=ROV&to=PKV ) 
+will check for 2 months forward and return all dates in range
+
+# find\_no\_schedule
+
+Return hash with routes with no available schedule, presumably all transit routes.
 
 # print\_flights
 
@@ -94,46 +108,9 @@ Cities are specified as IATA codes.
 
     $az->get( from => 'ROV', to => 'LED', date => '04.06.2019' );
 
-Return ARRAYref with flights data of hash with error like 
+Return ARRAYref with [WWW::AzimuthAero::Flight](https://metacpan.org/pod/WWW::AzimuthAero::Flight) objects or hash with error like 
 
     { 'error' => 'No flights found' }
-
-Example output 
-
-    [
-        {
-            'date' => '16.06.2019',
-            'fares' => { 'lowest' => '5620', 'svobodnyy' => '5620' },
-            'to' => 'KLF',
-            'from' => 'ROV',
-            'flight' => { 'arrival' => '11:35', 'departure' => '10:00' }
-        },from is not defined
-        ...
-    ];
-
-Example of output if flight has transfers :
-
-\[
-      {
-        'date' => '12.06.2019',
-        'fares' => {
-                     'lowest' => '6930',
-                     'optimalnyy' => '8430',
-                     'svobodnyy' => '16360',
-                     'vygodnyy' => '6930'
-                   },
-        'to' => 'PKV',
-        'flight' => {
-                      'flight\_duration' => '5ч 35м',
-                      'has\_stops' => 1,
-                      'departure' => '07:45',
-                      'arrival' => '13:20'
-                    },
-        'from' => 'ROV'
-      }
-    \];
-
-( flight property will have has\_stops option )
 
 # get\_fares\_schedule
 

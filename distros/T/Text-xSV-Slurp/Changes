@@ -1,5 +1,9 @@
 Revision history for Text-xSV-Slurp
 
+0.23    Mon Jun 17 2019
+        - escape literal '{' in test regex
+        - add explicit close of file handle 
+
 0.22    Sun Jan 29 2009
         - use $csv->getline() to parse headers
         - added error checking to all $csv->getline() calls

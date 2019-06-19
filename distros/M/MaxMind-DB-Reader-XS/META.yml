@@ -33,7 +33,7 @@ name: MaxMind-DB-Reader-XS
 provides:
   MaxMind::DB::Reader::XS:
     file: lib/MaxMind/DB/Reader/XS.pm
-    version: '1.000007'
+    version: '1.000008'
 requires:
   Math::Int128: '0'
   Math::Int64: '0'
@@ -50,10 +50,10 @@ resources:
   bugtracker: https://github.com/maxmind/MaxMind-DB-Reader-XS/issues
   homepage: http://metacpan.org/release/MaxMind-DB-Reader-XS
   repository: git://github.com/maxmind/MaxMind-DB-Reader-XS.git
-version: '1.000007'
+version: '1.000008'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -92,7 +92,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@MAXMIND/Git::GatherDir'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@MAXMIND/ManifestSkip'
@@ -534,8 +534,12 @@ x_Dist_Zilla:
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@MAXMIND/InstallGuide'
-      version: '1.200012'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@MAXMIND/CPANFile'
@@ -616,13 +620,13 @@ x_Dist_Zilla:
           git_version: 2.17.1
           repo_root: .
       name: '@MAXMIND/Git::Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Build.PL
@@ -641,7 +645,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit generated files'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -649,16 +653,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000007
-          tag_format: v%v
-          tag_message: v%v
+          tag: v1.000008
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.17.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Git::Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -670,7 +674,7 @@ x_Dist_Zilla:
           git_version: 2.17.1
           repo_root: .
       name: '@MAXMIND/Git::Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -701,7 +705,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -713,7 +717,7 @@ x_Dist_Zilla:
           git_version: 2.17.1
           repo_root: .
       name: '@MAXMIND/Push version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: inc::MyModuleBuild
       config:
@@ -729,6 +733,14 @@ x_Dist_Zilla:
           type: requires
       name: DevelopRequires
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Deprecated
+      config:
+        Dist::Zilla::Plugin::Deprecated:
+          all: 1
+          modules: []
+      name: Deprecated
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -787,5 +799,6 @@ x_contributors:
   - 'Hidenori Sugiyama <madogiwa@gmail.com>'
   - 'Mark Fowler <mark@twoshortplanks.com>'
   - 'Olaf Alders <oalders@maxmind.com>'
-x_generated_by_perl: v5.26.2
+x_deprecated: 1
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

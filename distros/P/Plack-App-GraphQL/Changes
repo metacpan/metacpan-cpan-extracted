@@ -1,0 +1,9 @@
+# This file documents the revision history for Perl extension Plack-App-GraphQL
+
+0.002 - 17 June 2019
+  - Some updates to project metadata (travisCI, Changes, README)
+  - Allow you to override the default root_value during request by setting
+    'plack.graphql.root_value' in the PSGI $env
+
+0.001 - 16 June 2019
+  - First Release 

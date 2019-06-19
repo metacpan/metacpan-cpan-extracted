@@ -1,4 +1,5 @@
 requires "Carp" => "0";
+requires "Class::Tiny" => "0";
 requires "Data::Dumper" => "0";
 requires "Data::Dumper::AutoEncode" => "0";
 requires "DateTime" => "0";
@@ -11,6 +12,7 @@ requires "Mojo::DOM" => "0";
 requires "Mojo::UserAgent" => "0";
 requires "Mojo::UserAgent::Mockable" => "0";
 requires "feature" => "0";
+requires "parent" => "0";
 requires "strict" => "0";
 requires "utf8" => "0";
 requires "warnings" => "0";

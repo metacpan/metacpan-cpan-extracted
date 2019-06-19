@@ -1,7 +1,7 @@
 package WWW::AzimuthAero::RouteMap;
-$WWW::AzimuthAero::RouteMap::VERSION = '0.1';
+$WWW::AzimuthAero::RouteMap::VERSION = '0.2';
 
-# ABSTRACT: additional subroutines for unit testing
+# ABSTRACT: Route map representation
 
 
 use utf8;   # important cause of L<WWW::AzimuthAero::RouteMap/neighbor_airports>
@@ -49,6 +49,7 @@ sub get_iata_by_azo {
     my ( $self, $azo_code ) = @_;
     return $self->raw->{$azo_code}{IATA};
 }
+
 
 sub route_map_iata {
     my ($self) = @_;
@@ -143,11 +144,11 @@ __END__
 
 =head1 NAME
 
-WWW::AzimuthAero::RouteMap - additional subroutines for unit testing
+WWW::AzimuthAero::RouteMap - Route map representation
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 SYNOPSIS
 
@@ -184,6 +185,20 @@ Examples:
 
     $rm->get('IATA', 'NAME', 'Ростов-на-Дону')
     $rm->get('IATA', 'AZO', 'РОВ')
+
+=head1 route_map_iata
+
+Return hash with IATA route map
+
+    perl -Ilib -MWWW::AzimuthAero -MData::Dumper -e 'my $x = WWW::AzimuthAero->new->route_map->route_map_iata; warn Dumper $x;'
+
+Amount of cities
+
+    my $x = WWW::AzimuthAero->new->route_map->route_map_iata; print scalar values %$x;
+
+Amount of all routes
+
+    perl -Ilib -MWWW::AzimuthAero -e 'my $x = WWW::AzimuthAero->new->route_map->route_map_iata; my $i = 0; $i+= scalar @$_ for values %$x; print $i;'
 
 =head1 neighbor_airports
 

@@ -3,7 +3,7 @@ package GeoIP2::Record::City;
 use strict;
 use warnings;
 
-our $VERSION = '2.006001';
+our $VERSION = '2.006002';
 
 use Moo;
 
@@ -41,7 +41,7 @@ GeoIP2::Record::City - Contains data for the city record associated with an IP a
 
 =head1 VERSION
 
-version 2.006001
+version 2.006002
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,7 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2013 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

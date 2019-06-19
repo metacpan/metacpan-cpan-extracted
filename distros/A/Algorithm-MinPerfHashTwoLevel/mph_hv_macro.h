@@ -51,6 +51,7 @@
   #endif
 #endif
 
+#ifndef ROTL32
 /* Find best way to ROTL32/ROTL64 */
 #if defined(_MSC_VER)
   #include <stdlib.h>  /* Microsoft put _rotl declaration in here */
@@ -64,6 +65,7 @@
   #define ROTR32(x,r)  (((U32)(x) << (32 - (r))) | ((U32)(x) >> (r)))
   #define ROTL64(x,r)  ( ( (U64)(x) << (r) ) | ( (U64)(x) >> ( 64 - (r) ) ) )
   #define ROTR64(x,r)  ( ( (U64)(x) << ( 64 - (r) ) ) | ( (U64)(x) >> (r) ) )
+#endif
 #endif
 
 

@@ -7,7 +7,7 @@ my $build = alienfile_ok q{
   
   share {
   
-    plugin 'Decode::HTML';
+    plugin 'Decode::Mojo';
     plugin 'Decode::SourceForge';
   
   };

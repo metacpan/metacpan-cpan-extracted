@@ -53,6 +53,8 @@ lib/LINE/Bot/API/Response/NumberOfSentMessages.pm
 lib/LINE/Bot/API/Response/Profile.pm
 lib/LINE/Bot/API/Response/RichMenu.pm
 lib/LINE/Bot/API/Response/RichMenuList.pm
+lib/LINE/Bot/API/Response/TargetLimit.pm
+lib/LINE/Bot/API/Response/TotalUsage.pm
 t/00_compile.t
 t/00_send_message_response.t
 t/01_send_text.t
@@ -66,6 +68,9 @@ t/08_send_template.t
 t/11_send_multiple.t
 t/12_get_number_of_send_messages.t
 t/12_multicast.t
+t/13_broadcast.t
+t/14_get_number_of_messages_sent_this_month.t
+t/15_get_target_limit_for_additional_messages.t
 t/21_get_profile.t
 t/41_event.t
 t/42_create_events_by_api.t

@@ -35,8 +35,12 @@ no_leaks_ok {
     ->then(sub { is $put_count, 10, '10 items added' })
     ->catch(sub { ok 0, "put failed with: @_" });
 
+  my $shutdown = 0;
+  $ch->on_shutdown
+      ->then(sub { $shutdown = 1; });
   $ch->shutdown;
   ok $ch->is_shutdown, 'is_shutdown true after shutdown';
+  ok $shutdown, 'on_shutdown promise has been resolved after shutdown';
 
   $ch->get->then(
     sub {

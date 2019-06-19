@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.009000",
+  "VERSION" => "1.009001",
   "test" => {
     "TESTS" => "t/*.t t/WebService/MinFraud/*.t t/WebService/MinFraud/Model/*.t t/WebService/MinFraud/Record/*.t"
   }

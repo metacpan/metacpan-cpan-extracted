@@ -1,7 +1,7 @@
 package LINE::Bot::API;
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use URI;
 
@@ -15,6 +15,8 @@ use LINE::Bot::API::Response::Profile;
 use LINE::Bot::API::Response::IssueLinkToken;
 use LINE::Bot::API::Response::RichMenu;
 use LINE::Bot::API::Response::RichMenuList;
+use LINE::Bot::API::Response::TargetLimit;
+use LINE::Bot::API::Response::TotalUsage;
 
 sub new {
     my($class, %args) = @_;
@@ -78,6 +80,18 @@ sub multicast {
     LINE::Bot::API::Response::Common->new(%{ $res });
 }
 
+sub broadcast {
+    my($self, $messages) = @_;
+
+    my $res = $self->request(
+        post => 'message/broadcast',
+        +{
+            messages => $messages,
+        }
+    );
+    LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
 sub get_message_content {
     my($self, $message_id, %options) = @_;
     my $res = $self->request(
@@ -105,6 +119,18 @@ sub leave_group {
     LINE::Bot::API::Response::Common->new(%{ $res });
 }
 
+sub get_target_limit_for_additional_messages {
+    my($self, $date) = @_;
+    my $res = $self->request(get => "message/quota");
+    LINE::Bot::API::Response::TargetLimit->new(%{ $res });
+}
+
+sub get_number_of_messages_sent_this_month {
+    my($self, $date) = @_;
+    my $res = $self->request(get => "message/quota/consumption");
+    LINE::Bot::API::Response::TotalUsage->new(%{ $res });
+}
+
 sub get_number_of_sent_reply_messages {
     my($self, $date) = @_;
     my $res = $self->request(get => "message/delivery/reply?date=${date}");
@@ -120,6 +146,12 @@ sub get_number_of_sent_push_messages {
 sub get_number_of_sent_multicast_messages {
     my($self, $date) = @_;
     my $res = $self->request(get => "message/delivery/multicast?date=${date}", +{});
+    LINE::Bot::API::Response::NumberOfSentMessages->new(%{ $res });
+}
+
+sub get_number_of_send_broadcast_messages {
+    my($self, $date) = @_;
+    my $res = $self->request(get => "message/delivery/broadcast?date=${date}", +{});
     LINE::Bot::API::Response::NumberOfSentMessages->new(%{ $res });
 }
 
@@ -330,6 +362,16 @@ See the documentation for the C<parse_events_from_json($json)> method.
 
 See also the LINE Developers API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#send-multicast-messages>
 
+=head2 broadcast([ $message, ... ])
+
+Sends push messages to multiple users at any time.
+
+    my $messages = LINE::Bot::API::Builder::SendMessage->new;
+    $messages->add_text( text => 'Example push text' );
+    $bot->broadcast($messages->build);
+
+See also the LINE Developers API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#send-broadcast-message>
+
 =head2 validate_signature($json, $signature)
 
     my $req = Plack::Request->new( ... );
@@ -403,6 +445,18 @@ You can also see the online API reference documentation.
 
 See also the LINE Developers API reference of this method: L<https://developers.line.biz/en/reference/messaging-api/#get-content>
 
+=head2 get_target_limit_for_additional_messages
+
+Gets the target limit for additional messages in the current month.
+
+See also the LINE Developers API reference of this method:  L<https://developers.line.biz/en/reference/messaging-api/#get-quota>
+
+=head2 get_number_of_messages_sent_this_month
+
+Gets the number of messages sent in the current month.
+
+See also the LINE Developers API reference of this method:  L<https://developers.line.biz/en/reference/messaging-api/#get-consumption>
+
 =head2 get_profile($user_id)
 
 Get user profile information.
@@ -448,6 +502,23 @@ Date the messages were sent
 Gets the number of messages sent with the C<< /bot/message/multicast >> endpoint.
 
 The number of messages retrieved by this operation does not include the number of messages sent from LINE@ Manager.
+
+=over 4
+
+=item date
+
+Date the messages were sent
+
+    Format: yyyyMMdd (Example: 20191231)
+    Timezone: UTC+9
+
+=back
+
+=head2 C<< get_number_of_send_broadcast_messages($date) >>
+
+Gets the number of messages sent with the C<< /bot/message/broadcast >> endpoint.
+
+The number of messages retrieved by this operation does not include the number of messages sent from LINE Official Account Manager.
 
 =over 4
 
@@ -627,8 +698,7 @@ Build a sticker type object.
 
 =head3 Imagemap type
 
-Build an imagemap type object.
-You can use a helper module for the imagemap type.
+To build a message of imagemap type, you may use a helper module.
 
     my $imagemap = LINE::Bot::API::Builder::ImagemapMessage->new(
         base_url    => 'https://example.com/bot/images/rm001',
@@ -652,6 +722,27 @@ You can use a helper module for the imagemap type.
     my $messages = LINE::Bot::API::Builder::SendMessage->new(
     )->add_imagemap($imagemap->build);
     $bot->reply_message($reply_token, $messages->build);
+
+An Imagemap message can contain a video area inside. Here is an example of one withe upper half being a video overlay:
+
+    my $imagemap_message = LINE::Bot::API::Builder::ImagemapMessage->new(
+        base_url    => 'https://example.com/bot/images/rm001',
+        alt_text    => 'this is an imagemap',
+        base_width  => 1040,
+        base_height => 1040,
+        video => {
+            originalContentUrl => "https://example.com/video.mp4",
+            previewImageUrl => "https://example.com/video_preview.jpg",
+            area => {
+                x => 0,
+                y => 0,
+                width => 1040,
+                height => 585
+            }
+        }
+    )->build;
+
+For more detail about Imagemap message, see: L<https://developers.line.biz/en/reference/messaging-api/#imagemap-message>
 
 =head3 Template type
 

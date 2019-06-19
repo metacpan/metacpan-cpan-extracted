@@ -35,6 +35,8 @@
       "runtime" : {
          "requires" : {
             "Config" : "0",
+            "POSIX" : "0",
+            "locale" : "0",
             "perl" : "5.006"
          }
       }
@@ -42,7 +44,7 @@
    "provides" : {
       "Syntax::Construct" : {
          "file" : "lib/Syntax/Construct.pm",
-         "version" : "1.012"
+         "version" : "1.013"
       }
    },
    "release_status" : "stable",
@@ -51,6 +53,6 @@
          "url" : "https://github.com/choroba/syntactic-construct"
       }
    },
-   "version" : "1.012",
+   "version" : "1.013",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

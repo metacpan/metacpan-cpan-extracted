@@ -1,57 +1,16 @@
-Revision history for Perl extension Algorithm::MinPerfHashTwoLevel.
+Revision history for Perl extension Algorithm::MinPerfHashTwoLevel
+and Tie::Hash::MinPerfHashTwoLevel::OnDisk.
+
+0.16  Jun 17, 2019
+    OnDisk: Close the file after creating the mmap(), the kernal will take a refcount
+    on the file internally. This avoids running out of file descriptors when
+    mapping many files. Thanks to Luciano Rocha for noticing this.
+    Doc tweaks and cleanup changes given that 0.15 was a non backwards compatible
+    release.
+
 0.15  Jun 06, 2019
     Use a better hash function, Siphash (1-3 variant), and take the opportunity
     to ditch the old variants. The latest and only supported variant is version 5.
 
     WARNING: This version is NOT capable of reading old files, use version 0.14
     to do that or regenerate from source using this version.
-
-0.14  May 22, 2019
-    Sigh. Yet another rerelease of the v0.11 changes, missed an upstream commit.
-    There is no version 0.13, that is an unlucky number.
-
-0.12  May 22, 2019
-    Fixup MANIFEST. Otherwise identical to 0.11
-
-0.11  May 21, 2019
-    Switch to a deterministic seed construction, and avoid use of rand()
-    when construction fails. Switch to a full file checksum, and from 16
-    byte alignment to 8 byte alignment. Test improvements.
-
-0.10  May 14, 2019
-    Rework in XS for speed. Add a new variant 2, which has a more robust
-    construction method which has a much higher chance of finding a solution
-    for a given seed.
-
-0.09  Fri Apr 26, 2019
-    Some performance optimisations.
-    Fixups so we work correctly on Perl 5.8.9
-
-0.08  Thurs Apr 25, 2019
-    Better build refusal logic.
-
-0.07  Weds Apr 24, 2019
-    Refuse to build on Win32, and refuse to build without 64-bit integer
-    support and little endian integers.
-
-0.06  Weds Apr 24, 2019
-    Fix building for FreeBSD. - Thanks to Slaven Slaven Rezić for the
-    various reports which lead to v0.06 and v0.05.
-
-0.05  Weds Apr 24, 2019
-    Fix building under threaded perls.
-
-0.04  Tue Apr 23 20:14:18 CEST 2019
-    Fixup builds for 5.28.x where there is already a stadtx_hash.h
-    included in the build process via perl headers.
-    Fixup documentation of fetch algorithm.
-
-0.03  Sat Mar 30 15:43:44 2019
-    rename "version" to variant in all use cases
-    add support for variant 1 as well as variant 0,
-    variant 1 is faster to produce.
-
-0.01  Sat Mar 30 15:43:44 2019
-	- original version; created by h2xs 1.23 with options
-		-A -n Algorithm::MinPerfHashTwoLevel
-

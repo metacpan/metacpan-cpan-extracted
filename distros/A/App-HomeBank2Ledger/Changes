@@ -1,7 +1,16 @@
 Revision history for App-HomeBank2Ledger.
 
+0.004     2019-06-17 23:28:10-06:00 MST7MDT
+  * Remove --default-account option. Instead the default account(s) can be
+    customized using the --rename-account option, like this:
+
+        --rename-account='^Expenses:Unknown$=Foo'
+        --rename-account='^Income:Unknown$=Foo'
+
+  * Remove single use of "yada yada" for perls <5.12.
+
 0.003     2019-06-13 02:55:59-06:00 MST7MDT
-  * Fix bug that makes the --version and --help flags broken
+  * Fix bug that makes the --version and --help flags broken.
 
 0.002     2019-06-12 23:39:32-06:00 MST7MDT
   * Rename dist

@@ -1,6 +1,6 @@
 package Map::Tube::Node;
 
-$Map::Tube::Node::VERSION   = '3.62';
+$Map::Tube::Node::VERSION   = '3.63';
 $Map::Tube::Node::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Node - Class to represent the station in the map.
 
 =head1 VERSION
 
-Version 3.62
+Version 3.63
 
 =cut
 
@@ -48,7 +48,12 @@ It provides simple interface to the C<node> of the map.
     my $line = Map::Tube::Line->new({ id => 1, name => 'L1', color => 'red'                  });
     my $node = Map::Tube::Node->new({ id => 1, name => 'N1', link  => '2,3', line => [$line] });
 
-    print "Node: $node\n";
+    print "Station:",       $node,        "\n";
+    print "Station Id:",    $node->id,    "\n";
+    print "Station Name:",  $node->name,  "\n";
+    print "Station Link:",  $node->link,  "\n";
+    print "Station Line:",  $node->line,  "\n";
+    print "Station Links:", $node->links, "\n";
 
 =head1 CONSTRUCTOR
 

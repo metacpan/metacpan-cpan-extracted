@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Carp;
 
@@ -260,11 +260,12 @@ the C<async sub> is currently waiting on. See L</TODO>.
 
 =head2 Syntax::Keyword::Try
 
-As of C<Future::AsyncAwait> version 0.10 and L<Syntax::Keyword::Try> version
+As of L<Future::AsyncAwait> version 0.10 and L<Syntax::Keyword::Try> version
 0.07, cross-module integration tests assert that basic C<try/catch> blocks
 inside an C<async sub> work correctly, including those that attempt to
 C<return> from inside C<try>.
 
+   use Future::AsyncAwait;
    use Syntax::Keyword::Try;
 
    async sub attempt

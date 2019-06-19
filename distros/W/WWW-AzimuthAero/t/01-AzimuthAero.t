@@ -27,25 +27,24 @@ subtest 'get' => sub {
         unrecognized => 'exception'
     );
 
-    $az = WWW::AzimuthAero->new($ua_mock);
+    $az = WWW::AzimuthAero->new( ua_obj => $ua_mock );
 
     is_deeply(
         $az->get( %{ WWW::AzimuthAero::Mock->mock_data->{get} } ),
         [
-            {
-                'date'   => '23.06.2019',
-                'flight' => {
-                    'departure' => '07:45',
-                    'arrival'   => '09:45'
-                },
-                'to'    => 'MOW',
-                'fares' => {
+            WWW::AzimuthAero::Flight->new(
+                'date'      => '23.06.2019',
+                'departure' => '07:45',
+                'arrival'   => '09:45',
+                'to'        => 'MOW',
+                'fares'     => {
                     'lowest'     => 5980,
                     'svobodnyy'  => 10980,
                     'optimalnyy' => 5980
                 },
-                'from' => 'ROV'
-            }
+                'from'       => 'ROV',
+                'flight_num' => 'A4 201'
+            )
         ]
     );
 

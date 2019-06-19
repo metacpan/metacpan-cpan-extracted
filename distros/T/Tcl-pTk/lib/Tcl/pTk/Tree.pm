@@ -7,7 +7,7 @@ package Tcl::pTk::Tree;
 #
 # Converted to Tcl::pTk  John Cerney
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use Tcl::pTk ();
 use Tcl::pTk::Derived;
@@ -230,5 +230,3 @@ __END__
 #               (c) 1994-1995 Sun Microsystems, Inc.
 #  The license terms of the Tcl/Tk distrobution are in the file
 #  license.tcl.
-
-=cut

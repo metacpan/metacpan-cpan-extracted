@@ -1,3 +1,10 @@
+Release 2.2.2: 19/06/18
+Bug fix: stream output went to ./- instead of STDOUT since
+XML::SAX::Writer 0.57.
+
+Release 2.2.1: 19/06/18
+Bug fix: the --input-pipe option of the stream command didn't work.
+
 Release 2.2.0: 19/06/11
 Fix documentation link. Also, bump the minor version so we don't have
 to care about lexicographic ordering in 2.1.X and 2.1.XX.

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Basic Solid Tests",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Solid-Test-Basic",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FindBin" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::Deep" : "0",
+            "Test::FITesque::RDF" : "0",
+            "Test::More" : "0.96",
+            "Test::RDF" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Web::Solid::Test::Basic" : {
+         "file" : "lib/Web/Solid/Test/Basic.pm",
+         "version" : "0.001"
+      },
+      "Web::Solid::Test::HTTPLists" : {
+         "file" : "lib/Web/Solid/Test/HTTPLists.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-web-solid-test-basic/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Web-Solid-Test-Basic",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-web-solid-test-basic.git",
+         "web" : "https://github.com/kjetilk/p5-web-solid-test-basic"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

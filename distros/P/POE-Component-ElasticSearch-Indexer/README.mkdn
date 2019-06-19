@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.010
+version 0.011
 
 # SYNOPSIS
 
@@ -15,7 +15,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
     my $es_session = POE::Component::ElasticSearch::Indexer->spawn(
         Alias            => 'es',                    # Default
         Servers          => [qw(localhost)],         # Default
-        Timeout          => 1,                       # Default
+        Timeout          => 5,                       # Default
         FlushInterval    => 30,                      # Default
         FlushSize        => 1_000,                   # Default
         LoggingConfig    => undef,                   # Default
@@ -50,7 +50,25 @@ following parameters.
     A list of Elasticsearch hosts for connections.  Maybe in the form of
     `hostname` or `hostname:port`.
 
+- **PoolConnections**
+
+    Boolean, default true.  Enable connection pooling with
+    [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive).  This is desirable in most cases, but can
+    result in timeouts piling up.  You may wish to disable this if you notice that
+    indexing takes a while to recover after timeout events.
+
+- **KeepAliveTimeout**
+
+    Requires `PoolConnections`.
+
+    Set the keep\_alive timeout in seconds for the creation of a
+    [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
+
+    Defaults to **2**.
+
 - **MaxConnsPerServer**
+
+    Requires `PoolConnections`.
 
     Maximum number of simultaneous connections to an Elasticsearch node.  Used in
     the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
@@ -59,12 +77,16 @@ following parameters.
 
 - **MaxConnsTotal**
 
+    Requires `PoolConnections`.
+
     Maximum number of simultaneous connections to all servers.  Used in
     the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
 
     Defaults to **MaxConnsPerServer \* number of Servers**.
 
 - **MaxPendingRequests**
+
+    Requires `PoolConnections`.
 
     Maximum number of requests backlogged in the connection pool.  Defaults to **5**.
 
@@ -269,6 +291,10 @@ This software is Copyright (c) 2018 by Brad Lhotsky.
 This is free software, licensed under:
 
     The (three-clause) BSD License
+
+# CONTRIBUTOR
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # SUPPORT
 

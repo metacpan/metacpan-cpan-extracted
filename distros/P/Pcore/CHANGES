@@ -1,3 +1,8 @@
+v0.94.0 2019-06-19T03:29:16Z
+ - internal cdn config
+ - md5_stream added
+ - stream sha1 added
+
 v0.93.0 2019-06-17T02:36:10Z
  - hash randkey replaced with hasharray
  - DBI schema module added

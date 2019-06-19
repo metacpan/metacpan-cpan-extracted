@@ -19,28 +19,28 @@ name: Pg-Explain
 provides:
   Pg::Explain:
     file: lib/Pg/Explain.pm
-    version: '0.79'
+    version: '0.80'
   Pg::Explain::From:
     file: lib/Pg/Explain/From.pm
-    version: '0.79'
+    version: '0.80'
   Pg::Explain::FromJSON:
     file: lib/Pg/Explain/FromJSON.pm
-    version: '0.79'
+    version: '0.80'
   Pg::Explain::FromText:
     file: lib/Pg/Explain/FromText.pm
-    version: '0.79'
+    version: '0.80'
   Pg::Explain::FromXML:
     file: lib/Pg/Explain/FromXML.pm
-    version: '0.79'
+    version: '0.80'
   Pg::Explain::FromYAML:
     file: lib/Pg/Explain/FromYAML.pm
-    version: '0.79'
+    version: '0.80'
   Pg::Explain::Node:
     file: lib/Pg/Explain/Node.pm
-    version: '0.79'
+    version: '0.80'
   Pg::Explain::StringAnonymizer:
     file: lib/Pg/Explain/StringAnonymizer.pm
-    version: '0.79'
+    version: '0.80'
 requires:
   Clone: '0'
   Digest::SHA: '0'
@@ -51,5 +51,5 @@ requires:
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.79'
+version: '0.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

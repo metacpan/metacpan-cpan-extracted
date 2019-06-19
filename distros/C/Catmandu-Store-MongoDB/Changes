@@ -1,5 +1,8 @@
 Revision history for Catmandu-Store-MongoDB
 
+0.0803  2019-06-18 09:54:21 CEST
+  - support json encoded sort specification
+
 0.0802  2019-02-08 16:16:42 CET
   - transaction method is now list/scalar context aware
 

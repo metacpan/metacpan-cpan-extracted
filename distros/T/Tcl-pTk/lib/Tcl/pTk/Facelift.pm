@@ -5,7 +5,7 @@ use Tcl::pTk::ttkTixNoteBook;
 
 package Tcl::pTk::Facelift;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 =head1 NAME
 
@@ -27,10 +27,10 @@ Tcl::pTk::Facelift -  Update the look of older Tk scripts using the new tile wid
 
 =head1 DESCRIPTION
 
-I<Tcl::pTk::Facelift> is an experimental module that gives existing tcl/tk scripts an updated look by subsituting
+I<Tcl::pTk::Facelift> is an experimental module that gives existing tcl/tk scripts an updated look by substituting
 some the widgets (button, entry, label, etc) with their new "Tile" widget equivalents.
         
-Note that this replacement/subsitution is not complete. The new "Tile" widgets aren't 100% compatible with the
+Note that this replacement/substitution is not complete. The new "Tile" widgets aren't 100% compatible with the
 older widgets. To take full advantage of the new Tcl/Tk "Tile" widgets, 
 you should re-code your application to specifically take advantage of them.
 
@@ -62,7 +62,7 @@ equivalent option in the new "Tile" widget, the option is ignored.
         
 For example, most appearance-related options that are present in the old widgets don't exist in the new "Tile" widgets,
 because Tile-widgets appearances are controlled using "Themes". So the -bg (background color) option that exists for an old "button" widget
-doesn't exist in the new "ttkButton" widget. For better compatibility with existing scripts, the Tile-subsitution
+doesn't exist in the new "ttkButton" widget. For better compatibility with existing scripts, the Tile-substitution
 widgets (e.g. the Button, Entry, etc widgets) created in this package will have
 a appearance options (e.g. -bg, -fg, etc) option, but they will be ignored. 
 
@@ -109,7 +109,7 @@ sub Populate {
     
     
     # Setup options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = (
      -activebackground,
      -activeforeground,
@@ -188,7 +188,7 @@ sub Populate {
     
     
     # Setup options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = (
      -activebackground,
      -activeforeground,
@@ -271,7 +271,7 @@ sub Populate {
     
     
     # Setup options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = (
      -bd,
      -bg,
@@ -343,7 +343,7 @@ sub Populate {
     
     
     # Setup options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = (
      -background,
      -bd,
@@ -419,7 +419,7 @@ sub Populate {
     
     
     # Setup options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = (
      -activebackground,
      -activeforeground,
@@ -498,7 +498,7 @@ sub Populate {
     
     
     # Setup options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = (
      -activebackground,
      -activeforeground,

@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 # shortcuts
 #  os and distros
@@ -90,6 +90,13 @@ sub mapping {
      [cpanmod => 'Alien::LibJIT',
       [like_debian,
        [package => [qw(autoconf libtool flex bison texinfo)]]], # but no success building it
+     ],
+
+     [cpanmod => 'Alien::libtickit',
+      [like_debian,
+       [before_ubuntu_bionic,
+	[package => []]],
+       [package => 'libtickit-dev']],
      ],
 
      [cpanmod => 'Alien::LibUSBx',
@@ -1301,7 +1308,10 @@ sub mapping {
       [os_freebsd,
        [package => 'libwnck']],
       [like_debian,
-       [package => 'libwnck-dev']]],
+       [package => 'libwnck-dev']],
+      [like_fedora,
+       [package => 'libwnck-devel']],
+     ],
 
      [cpanmod => ['Gnome2::VFS', 'VFS::Gnome'],
       [os_freebsd,
@@ -2238,6 +2248,15 @@ sub mapping {
 	[package => 'apache2-prefork-dev']],
        [package => 'apache2-dev']]],
 
+     [cpanmod => 'MPV::Simple',
+      [os_freebsd,
+       [package => 'mpv']],
+      [like_debian,
+       [before_ubuntu_trusty,
+	[package => []]],
+       [package => 'libmpv-dev']],
+     ],
+
      [cpanmod => 'MusicBrainz::DiscID',
       [os_freebsd,
        [package => 'libdiscid']],
@@ -2515,6 +2534,15 @@ sub mapping {
       [like_debian,
        [package => ['g++', 'libcurl3']]]],
 
+     [cpanmod => 'Ogg::LibOgg',
+      [os_freebsd,
+       [package => 'libogg']],
+      [like_debian,
+       [package => 'libogg-dev']],
+      [like_fedora,
+       [package => 'libogg-devel']],
+     ],
+
      [cpanmod => ['Ogg::Vorbis', 'Ogg::Vorbis::Decoder'],
       [os_freebsd,
        [package => 'libvorbis']],
@@ -2676,6 +2704,8 @@ sub mapping {
        [package => ['poppler', 'poppler-glib']]],
       [like_debian,
        [package => ['libpoppler-dev', 'libpoppler-glib-dev']]],
+      [like_fedora,
+       [package => 'poppler-glib-devel']], # but available version too low on CentOS6
       [os_darwin,
        [package => 'poppler']],
      ],

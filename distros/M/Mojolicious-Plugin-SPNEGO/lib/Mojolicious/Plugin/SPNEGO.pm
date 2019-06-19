@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.3.8';
+our $VERSION = '0.4.0';
 
 my %cCache;
 
@@ -40,6 +40,12 @@ sub register {
                         onerror=> sub { my $msg = shift; $c->app->log->error($msg->error);return $msg},
                         timeout=>$timeout
                     );
+                    if ($cfg->{start_tls}){
+                        my $msg = $ldap->start_tls($cfg->{start_tls});
+                        if ($msg->is_error()){
+                            $c->app->log->error($msg->error);
+                        }
+                    }
                     # Read/Write timeouts via setsockopt
                     my $socket = $ldap->socket(sasl_layer=>0);
                     IO::Socket::Timeout->enable_timeouts_on($socket);
@@ -104,6 +110,10 @@ Mojolicious::Plugin::SPNEGO - Provide NTLM authentication by forwarding requests
     my $c = shift;
     if (not $c->session('user')){
         $c->ntlm_auth({
+            ad_server => "ldap://my.server",
+            start_tls => {
+                verify => 'none',
+            },
             auth_success_cb => sub {
                 my $c = shift;
                 my $user = shift;
@@ -113,7 +123,7 @@ Mojolicious::Plugin::SPNEGO - Provide NTLM authentication by forwarding requests
                 my $groups = $ldap->get_ad_groups($user->{samaccountname});
                 $c->session('groups',[ sort keys %$groups]);
                 return 1; # 1 is you are happy with the outcome
-            }
+            } 
         }) or return;
     }
  } => 'index';
@@ -163,7 +173,7 @@ in the C<ad_server> argument.
 
 If a C<auth_success_cb> is specified it will be executed once the ntlm dialog
 has completed successfully. Depending on the return value of the
-callback the entire process will be considered successfull or not.
+callback the entire process will be considered successful or not.
 
 To use NTLM for authenticating a web proxy, you have to enable the C<web_proxy_mode>
 to use the appropriate Authentication and Authorization headers.
@@ -174,6 +184,12 @@ to save authentication success in a cookie.
 Note that windows will only do automatic NTLM SSO with hosts in the local zone
 so you may have to add your webserver to this group of machines in the
 Internet Settings dialog.
+
+You can secure your connection to AD by setting the C<start_tls> option and
+providing an appropriate configuration hash.
+See L<https://metacpan.org/pod/Net::LDAP#start_tls> for inspiration.
+Note that your AD Server also must be configured appropriately
+L< https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/8e73932f-70cf-46d6-88b1-8d9f86235e81>.
 
 =head1 DEBUGGING
 
@@ -199,7 +215,8 @@ Use the following steps to run the demo:
 Now connect with your webbrowser to the webserver runing on port 3000. If you
 login from a Windows host and the url you are connecting resides in the local
 zone, you will see (or rather not see) seemless authentication taking place.
-Finally a webpage will be displayed showing a list of groups you are a member of.
+Finally a webpage will be displayed showing a list of groups you are a
+member of.
 
 The demo script stores your authentication in a cookie in your brower, so once
 you are authenticated, you will have to restart the browser or remove the cookie

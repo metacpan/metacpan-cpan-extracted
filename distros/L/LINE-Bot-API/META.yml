@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/line/line-bot-sdk-perl/issues
   homepage: https://github.com/line/line-bot-sdk-perl
   repository: https://github.com/line/line-bot-sdk-perl.git
-version: '1.08'
+version: '1.09'
 x_contributors:
   - '7kashin <4nji.7ka6ra@gmail.com>'
   - 'Hirofumi Kataoka <hirofumi.kataoka@gmail.com>'

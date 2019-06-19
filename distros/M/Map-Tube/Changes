@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+3.63  2019-06-18T18:00:00+00:00
+      - Added SYNOPSIS section the Map::Tube::Route.
+      - Added more codes to SYNOPSIS section of Map::Tube::Node and Map::Tube::Line.
+
 3.62  2019-05-11T12:03:45+00:00
       - Refactored Map::Tube::Plugin::Formatter and plugged into object directly.
 

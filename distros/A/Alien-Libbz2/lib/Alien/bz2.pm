@@ -5,7 +5,7 @@ use warnings;
 use Alien::Libbz2;
 
 # ABSTRACT: Build and make available bz2
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.24'; # VERSION
 
 
 sub new
@@ -65,7 +65,7 @@ Alien::bz2 - Build and make available bz2
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Selenium::Remote::WebElement;
-$Selenium::Remote::WebElement::VERSION = '1.32';
+$Selenium::Remote::WebElement::VERSION = '1.33';
 # ABSTRACT: Representation of an HTML Element used by Selenium Remote Driver
 
 use strict;
@@ -395,7 +395,7 @@ Selenium::Remote::WebElement - Representation of an HTML Element used by Seleniu
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 DESCRIPTION
 

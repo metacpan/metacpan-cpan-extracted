@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.2;
+our $VERSION = 6.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -256,8 +256,8 @@ This implements the memcached-like client for the CLACKS interprocess messaging 
 
 =head1 IMPORTANT NOTE
 
-Please refer to the included protocol.txt file for information
-about the CLACKS protocol.
+Please make sure and read the documentations for L<Net::Clacks> as it contains important information
+pertaining to upgrades and general changes!
 
 =head1 AUTHOR
 

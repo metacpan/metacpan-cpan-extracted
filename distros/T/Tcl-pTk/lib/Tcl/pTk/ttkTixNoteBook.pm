@@ -1,6 +1,6 @@
 package Tcl::pTk::ttkTixNoteBook;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 =head1 NAME 
 
@@ -213,7 +213,7 @@ sub Populate {
     $cw->SUPER::Populate($args);
     
     # Setup label options that will be ignored  (setup to just be passive), because they don't
-    #  exists in the subsituted tile widget
+    #  exists in the substituted tile widget
     my @ignoreOptions = ( qw/ 
     -dynamicgeometry -backpagecolor -disabledforeground -focuscolor -font -inactivebackground -tabpadx -tabpady
     /);

@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.62';
+$Map::Tube::VERSION   = '3.63';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.62
+Version 3.63
 
 =cut
 
@@ -148,8 +148,8 @@ sub BUILD {
     use strict; use warnings;
     use Map::Tube::London;
 
-    my $tube = Map::Tube::London->new;
-    print $tube->get_shortest_route('Baker Street', 'Euston Square'), "\n";
+    my $map = Map::Tube::London->new;
+    print $map->get_shortest_route('Baker Street', 'Euston Square'), "\n";
 
 You should expect the result like below:
 
@@ -160,8 +160,8 @@ You should expect the result like below:
     use strict; use warnings;
     use Map::Tube::London;
 
-    my $tube = Map::Tube::London->new;
-    print $tube->get_shortest_route('Baker Street', 'Euston Square')->preferred, "\n";
+    my $map = Map::Tube::London->new;
+    print $map->get_shortest_route('Baker Street', 'Euston Square')->preferred, "\n";
 
 You should now expect the result like below:
 

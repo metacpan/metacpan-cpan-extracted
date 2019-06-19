@@ -374,8 +374,8 @@
    },
    {
       "::16.0.0.0/104" : {
-         "$" : "Hewlett-Packard Company",
          "autonomous_system_number" : 71,
+         "autonomous_system_organization" : "Hewlett-Packard Company",
          "isp" : "Hewlett-Packard Company",
          "organization" : "Hewlett-Packard Company"
       }
@@ -400,6 +400,14 @@
          "autonomous_system_organization" : "Akamai Technologies, Inc.",
          "isp" : "Akamai Technologies",
          "organization" : "Akamai Technologies"
+      }
+   },
+   {
+      "::23.32.32.1/128" : {
+         "autonomous_system_number" : 262589,
+         "autonomous_system_organization" : "INTERNEXA Brasil Operadora de Telecomunicações S.A",
+         "isp" : "INTERNEXA Brasil Operadora de Telecomunicações S.A",
+         "organization" : "INTERNEXA Brasil Operadora de Telecomunicações S.A"
       }
    },
    {

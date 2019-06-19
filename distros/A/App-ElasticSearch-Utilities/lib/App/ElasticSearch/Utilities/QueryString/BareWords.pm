@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::BareWords;
 use strict;
 use warnings;
 
-our $VERSION = '6.7'; # VERSION
+our $VERSION = '6.8'; # VERSION
 
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
@@ -41,7 +41,7 @@ App::ElasticSearch::Utilities::QueryString::BareWords - Mostly fixing case and t
 
 =head1 VERSION
 
-version 6.7
+version 6.8
 
 =head1 SYNOPSIS
 

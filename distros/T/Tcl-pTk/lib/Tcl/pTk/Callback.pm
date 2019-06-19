@@ -1,6 +1,6 @@
 package Tcl::pTk::Callback;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 
 use strict;
@@ -73,7 +73,7 @@ The EvMapping will be:
 Flag = 1 to NOT include the widget/event-source as the first arg passed to a binding
 
 This is most always equal to 0, because bindings always include the source widget as the first arg.
-However, some widgets that provide their own '%' subsitution (like tktable a.k.a. TableMatrix) do not
+However, some widgets that provide their own '%' substitution (like tktable a.k.a. TableMatrix) do not
 pass the widget as the first arg.
  
 =back

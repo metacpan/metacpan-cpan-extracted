@@ -1,0 +1,15 @@
+{
+    'actual_loops' => '1',
+    'actual_rows' => '427',
+    'actual_time_first' => '0.014',
+    'actual_time_last' => '0.131',
+    'estimated_rows' => '427',
+    'estimated_row_width' => '371',
+    'estimated_startup_cost' => '0',
+    'estimated_total_cost' => '17.27',
+    'is_analyzed' => 1,
+    'type' => 'Seq Scan',
+    'scan_on' => {
+        'table_name' => 'pg_class'
+    }
+}

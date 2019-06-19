@@ -1,5 +1,75 @@
-@  changeset:   49:75c14a5ac7cb
+@  changeset:   63:f8f7ac6344ea
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Tue Jun 18 20:31:50 2019 +0200
+|  summary:     Update documentation
+|
+o  changeset:   62:efc16af17dda
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Tue Jun 18 20:08:55 2019 +0200
+|  summary:     CLean up cmdline output
+|
+o  changeset:   61:185441faf746
+|  user:        Rene Schickbauer <cavac@dsky>
+|  date:        Tue Jun 18 20:03:32 2019 +0200
+|  summary:     Use existing interclacks forwarding for much of KEYSYNC handling
+|
+o  changeset:   60:d031dc2e46dd
+|  user:        Rene Schickbauer <cavac@dsky>
+|  date:        Tue Jun 18 19:58:23 2019 +0200
+|  summary:     Sync bugfixes
+|
+o  changeset:   59:f6ed8571791a
+|  user:        Rene Schickbauer <cavac@dsky>
+|  date:        Tue Jun 18 19:35:48 2019 +0200
+|  summary:     Fix more sync stuff
+|
+o  changeset:   58:f2ef812e8cde
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Tue Jun 18 19:20:28 2019 +0200
+|  summary:     BF
+|
+o  changeset:   57:98a519e6e6f8
+|  user:        Rene Schickbauer <cavac@dsky>
+|  date:        Tue Jun 18 19:16:21 2019 +0200
+|  summary:     Smarter sending of keys known in interclacks client to server
+|
+o  changeset:   56:ac568fa45a4c
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Tue Jun 18 19:00:33 2019 +0200
+|  summary:     Fix some sync bugs
+|
+o  changeset:   55:1be45188781b
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Tue Jun 18 18:41:16 2019 +0200
+|  summary:     BF
+|
+o  changeset:   54:fd831fb2a99e
+|  user:        Rene Schickbauer <cavac@dsky>
+|  date:        Tue Jun 18 18:36:38 2019 +0200
+|  summary:     BF
+|
+o  changeset:   53:44418014974c
+|  user:        Rene Schickbauer <cavac@rosetta>
+|  date:        Tue Jun 18 18:10:01 2019 +0200
+|  summary:     Try a more intelligent interclacks sync mode using local timestamps
+|
+o  changeset:   52:245b71908c79
+|  user:        Rene Schickbauer <cavac@pitop>
+|  date:        Wed Jun 12 10:27:54 2019 +0200
+|  summary:     Implement the FLUSH command
+|
+o  changeset:   51:73f25852dee1
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Wed May 08 02:04:50 2019 +0200
+|  summary:     Clackscache can now (optionally) persist over restarts
+|
+o  changeset:   50:af6b657a6a31
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Wed Feb 06 21:41:42 2019 +0100
+|  summary:     Update "Changes" file
+|
+o  changeset:   49:75c14a5ac7cb
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Wed Feb 06 21:40:40 2019 +0100
 |  summary:     Better remembrance code

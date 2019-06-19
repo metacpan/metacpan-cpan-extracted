@@ -1,3 +1,10 @@
+0.007   2019-06-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Action::Retry.
+
+
 0.006   2019-06-08 (PERLANCAR)
 
 	- Add strategies: LILD, LIMD, MILD, MIMD.

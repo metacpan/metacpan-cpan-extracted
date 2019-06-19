@@ -4,7 +4,7 @@
       "Cory G Watson <gphat@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,28 @@
          }
       }
    },
+   "provides" : {
+      "Data::Verifier" : {
+         "file" : "lib/Data/Verifier.pm",
+         "version" : "0.63"
+      },
+      "Data::Verifier::Field" : {
+         "file" : "lib/Data/Verifier/Field.pm",
+         "version" : "0.63"
+      },
+      "Data::Verifier::Filters" : {
+         "file" : "lib/Data/Verifier/Filters.pm",
+         "version" : "0.63"
+      },
+      "Data::Verifier::Nested" : {
+         "file" : "lib/Data/Verifier/Nested.pm",
+         "version" : "0.63"
+      },
+      "Data::Verifier::Results" : {
+         "file" : "lib/Data/Verifier/Results.pm",
+         "version" : "0.63"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -67,7 +89,8 @@
          "web" : "https://github.com/Manwar/data-verifier"
       }
    },
-   "version" : "0.62",
+   "version" : "0.63",
+   "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

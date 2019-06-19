@@ -1,10 +1,12 @@
 package Geo::GoogleEarth::AutoTour;
 # ABSTRACT: Generate Google Earth Camera Tours from Tracks and Paths
 
-use 5.006_001;
+use 5.012;
 use strict;
 use warnings;
+
 use base 'Exporter';
+
 use Carp 'croak';
 use IO::Uncompress::Unzip qw( unzip $UnzipError );
 use IO::Compress::Zip qw(zip $ZipError);
@@ -12,7 +14,7 @@ use XML::LibXML;
 use Date::Parse 'str2time';
 use Math::Trig 1.23 qw( deg2rad rad2deg great_circle_distance great_circle_bearing );
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 our @EXPORT_OK = qw( tour kmz_to_xml xml_to_kmz load_kml read_path gather_points build_tour );
 
@@ -270,7 +272,7 @@ Geo::GoogleEarth::AutoTour - Generate Google Earth Camera Tours from Tracks and 
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Geo-GoogleEarth-AutoTour.svg)](https://travis-ci.org/gryphonshafer/Geo-GoogleEarth-AutoTour)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Geo-GoogleEarth-AutoTour/badge.png)](https://coveralls.io/r/gryphonshafer/Geo-GoogleEarth-AutoTour)
@@ -533,7 +535,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

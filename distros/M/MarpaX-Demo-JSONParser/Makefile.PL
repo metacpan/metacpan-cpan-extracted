@@ -24,10 +24,11 @@ my(%params) =
 		COMPRESS => 'gzip',
 		SUFFIX   => 'gz'
 	},
-	DISTNAME  => 'MarpaX-Demo-JSONParser',
-	NAME      => 'MarpaX::Demo::JSONParser',
-	PL_FILES  => {},
-	PREREQ_PM =>
+	DISTNAME			=> 'MarpaX-Demo-JSONParser',
+	MIN_PERL_VERSION	=> 5.014000,
+	NAME				=> 'MarpaX::Demo::JSONParser',
+	PL_FILES			=> {},
+	PREREQ_PM			=>
 	{
 		'File::Basename'	=> 2.82,
 		'File::Slurper'		=> 0.009,
@@ -35,7 +36,6 @@ my(%params) =
 		'MarpaX::Simple'	=> 0.06,
 		'Moo'				=> 2.003000,
 		'Path::Tiny'		=> 0.098,
-		'Perl'				=> 5.014000,
 		'strict'			=> 0,
 		'Try::Tiny'			=> 0.27,
 		'Types::Standard'	=> 1.000005,
@@ -43,7 +43,7 @@ my(%params) =
 	},
 	TEST_REQUIRES =>
 	{
-		'Test::More'	=> 1.001014,
+		'Test::More'	=> 1.001002,
 		'Test::Pod'		=> 1.48,
 	},
 	VERSION_FROM => 'lib/MarpaX/Demo/JSONParser.pm',

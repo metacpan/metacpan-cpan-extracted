@@ -7,9 +7,12 @@ Makefile.PL
 README.md
 bin/azimuth_aero
 cpanfile
+crawler.pl
 dist.ini
 lib/WWW/AzimuthAero.pm
+lib/WWW/AzimuthAero/Flight.pm
 lib/WWW/AzimuthAero/Mock.pm
+lib/WWW/AzimuthAero/PriceCrawler.pm
 lib/WWW/AzimuthAero/RouteMap.pm
 lib/WWW/AzimuthAero/Utils.pm
 t/01-AzimuthAero.t

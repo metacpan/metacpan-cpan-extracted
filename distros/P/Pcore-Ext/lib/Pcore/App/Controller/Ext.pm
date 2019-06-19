@@ -51,6 +51,14 @@ around run => sub ( $orig, $self, $req ) {
     return;
 };
 
+sub get_resources ($self) {
+    my $cdn = $self->{app}->{cdn};
+
+    return [
+        # $cdn->get_resources('jssha')->@*,
+    ];
+}
+
 sub _return_index ( $self, $req ) {
     my $app = $self->_get_app;
 
@@ -58,6 +66,8 @@ sub _return_index ( $self, $req ) {
         push my $resources->@*, $app->get_resources( $self->{app}->{devel} )->@*;
 
         my $cdn = $self->{app}->{cdn};
+
+        push $resources->@*, $self->get_resources->@*;
 
         # overrides
         # push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('overrides.js') );
@@ -92,7 +102,7 @@ sub _return_index ( $self, $req ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 64                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 74                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

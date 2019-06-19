@@ -17,6 +17,7 @@ meta-spec:
 name: WWW-AzimuthAero
 requires:
   Carp: '0'
+  Class::Tiny: '0'
   Data::Dumper: '0'
   Data::Dumper::AutoEncode: '0'
   DateTime: '0'
@@ -29,11 +30,13 @@ requires:
   Mojo::UserAgent: '0'
   Mojo::UserAgent::Mockable: '0'
   feature: '0'
+  parent: '0'
   strict: '0'
   utf8: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/pavelsr/WWW-AzumuthAero/issues
+  homepage: https://metacpan.org/pod/WWW::AzimuthAero
   repository: git://github.com/pavelsr/WWW-AzumuthAero.git
-version: '0.1'
+version: '0.2'
 x_serialization_backend: 'YAML::Tiny version 1.70'

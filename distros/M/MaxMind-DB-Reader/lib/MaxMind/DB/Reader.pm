@@ -3,7 +3,7 @@ package MaxMind::DB::Reader;
 use strict;
 use warnings;
 
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 use 5.010000;
 
@@ -43,7 +43,7 @@ MaxMind::DB::Reader - Read MaxMind DB files and look up IP addresses
 
 =head1 VERSION
 
-version 1.000013
+version 1.000014
 
 =head1 SYNOPSIS
 
@@ -151,6 +151,9 @@ major number, YYY is the minor number, and ZZZ is the patch number.
 
 =head1 SUPPORT
 
+This module is deprecated and will only receive fixes for major bugs and
+security vulnerabilities. New features and functionality will not be added.
+
 Please report all issues with this code using the GitHub issue tracker at
 L<https://github.com/maxmind/MaxMind-DB-Reader-perl/issues>.
 
@@ -172,13 +175,17 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Greg Oschwald Mateu X Hunter Ran Eilam William Stevenson
+=for stopwords Greg Oschwald Mark Fowler Mateu X Hunter Ran Eilam William Stevenson Will Storey
 
 =over 4
 
 =item *
 
 Greg Oschwald <goschwald@maxmind.com>
+
+=item *
+
+Mark Fowler <mark@twoshortplanks.com>
 
 =item *
 
@@ -192,11 +199,15 @@ Ran Eilam <reilam@maxmind.com>
 
 William Stevenson <skyblue@skybluecircles.com>
 
+=item *
+
+Will Storey <wstorey@maxmind.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MaxMind, Inc.
+This software is Copyright (c) 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

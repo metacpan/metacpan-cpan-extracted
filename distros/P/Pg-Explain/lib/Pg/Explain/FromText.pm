@@ -9,11 +9,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.79
+Version 0.80
 
 =cut
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 =head1 SYNOPSIS
 
@@ -53,6 +53,17 @@ sub parse_source {
 
     my @lines = split /\r?\n/, $source;
 
+    my $costs_re   = qr{ \( cost=(?<estimated_startup_cost>\d+\.\d+)\.\.(?<estimated_total_cost>\d+\.\d+) \s+ rows=(?<estimated_rows>\d+) \s+ width=(?<estimated_row_width>\d+) \) }xms;
+    my $analyze_re = qr{ \(
+                            (?:
+                                actual \s time=(?<actual_time_first>\d+\.\d+)\.\.(?<actual_time_last>\d+\.\d+) \s rows=(?<actual_rows>\d+) \s loops=(?<actual_loops>\d+)
+                                |
+                                actual \s rows=(?<actual_rows>\d+) \s loops=(?<actual_loops>\d+)
+                                |
+                                (?<never_executed> never \s+ executed )
+                            )
+                        \) }xms;
+
     LINE:
     for my $line ( @lines ) {
 
@@ -65,19 +76,13 @@ sub parse_source {
                 (?<prefix>\s* -> \s* | \s* )
                 (?<type>\S.*?)
                 \s+
-                \( cost=(?<estimated_startup_cost>\d+\.\d+)\.\.(?<estimated_total_cost>\d+\.\d+) \s+ rows=(?<estimated_rows>\d+) \s+ width=(?<estimated_row_width>\d+) \)
                 (?:
-                    \s+
-                    \(
-                        (?:
-                            actual \s time=(?<actual_time_first>\d+\.\d+)\.\.(?<actual_time_last>\d+\.\d+) \s rows=(?<actual_rows>\d+) \s loops=(?<actual_loops>\d+)
-                            |
-                            actual \s rows=(?<actual_rows>\d+) \s loops=(?<actual_loops>\d+)
-                            |
-                            (?<never_executed> never \s+ executed )
-                        )
-                    \)
-                )?
+                    $costs_re \s+ $analyze_re
+                    |
+                    $costs_re
+                    |
+                    $analyze_re
+                )
                 \s*
                 \z
             }xms

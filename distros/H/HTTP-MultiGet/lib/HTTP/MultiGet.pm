@@ -84,7 +84,7 @@ BEGIN {
 with 'Log::LogMethods';
 with 'Data::Result::Moo';
 }
-our $VERSION='1.018';
+our $VERSION='1.021';
 
 sub BUILD {
   my ($self)=@_;
@@ -204,7 +204,7 @@ has running=>(
 has request_opts=>(
   is=>'rw',
   requires=>1,
-  default=>sub { {cookie_jar=>{},persistent=>0,timeout=>10} },
+  default=>sub { {cookie_jar=>{},persistent=>0} },
 );
 
 has stack=>( is=>'ro');
@@ -572,6 +572,9 @@ sub create_request {
     $req=$obj;
     my $code=$self->que_function($req,$id);
     $opt->{cb}=$code;
+  }
+  foreach my $key (qw(keepalive persistent)) {
+    $opt->{params}->{$key}=0 unless exists $opt->{params}->{$key};
   }
   my $request=$self->SENDER_CLASS->new(
     $req,

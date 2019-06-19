@@ -18,7 +18,7 @@ my $TOP = MainWindow->new();
     my $e2 = $TOP->Entry(@relief)->pack(@pl);
     my $e3 = $TOP->Entry(@relief)->pack(@pl);
 
-    $e2->insert('end', 'This entry contains a long value, much too long to fit in the window at one time, so long in fact that you\'ll have to scan or scroll to see the end.');
+    $e2->insert('end', "This entry contains a long value, much too long to fit in the window at one time, so long in fact that you'll have to scan or scroll to see the end.");
 
     my $selectPresent = $e2->selectionPresent;
     ok($selectPresent, 0, "camelCase call check");

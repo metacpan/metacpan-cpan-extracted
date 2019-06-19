@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -ex
+
+if echo $CIP_ENV | grep -q system; then
+  cip sudo apt-get update
+  cip sudo apt-get install -y nasm
+else
+  echo use internet nasm
+fi

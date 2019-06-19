@@ -9,13 +9,12 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   Test::Most: '0'
-  blib: '1.01'
-  perl: '5.010'
+  perl: '5.012'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: '5.012'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,11 +29,13 @@ requires:
   Math::Trig: '1.23'
   XML::LibXML: '0'
   base: '0'
-  perl: '5.010'
+  perl: '5.012'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour/issues
   homepage: https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour
   repository: https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour.git
-version: '1.05'
+version: '1.06'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

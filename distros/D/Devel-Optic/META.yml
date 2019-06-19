@@ -16,19 +16,19 @@ name: Devel-Optic
 provides:
   Devel::Optic:
     file: lib/Devel/Optic.pm
-    version: '0.010'
+    version: '0.011'
   Devel::Optic::Lens::Perlish:
     file: lib/Devel/Optic/Lens/Perlish.pm
-    version: '0.010'
+    version: '0.011'
   Devel::Optic::Lens::Perlish::Constants:
     file: lib/Devel/Optic/Lens/Perlish/Constants.pm
-    version: '0.010'
+    version: '0.011'
   Devel::Optic::Lens::Perlish::Interpreter:
     file: lib/Devel/Optic/Lens/Perlish/Interpreter.pm
-    version: '0.010'
+    version: '0.011'
   Devel::Optic::Lens::Perlish::Parser:
     file: lib/Devel/Optic/Lens/Perlish/Parser.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Devel::Size: '0.82'
   PadWalker: '2.3'
@@ -40,6 +40,6 @@ resources:
   bugtracker: https://github.com/kanatohodets/Devel-Optic/issues
   homepage: https://github.com/kanatohodets/Devel-Optic
   repository: https://github.com/kanatohodets/Devel-Optic.git
-version: '0.010'
+version: '0.011'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

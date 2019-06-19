@@ -1,6 +1,6 @@
 package Tcl::pTk::Canvas;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 # Simple Canvas package.
 #  This is here just so widgets can subclass from a canvas before actually creating a canvas
@@ -24,7 +24,7 @@ sub index{
 }
 
 #### Wrappers for the canvas item create methods ###############
-# These directly call invoke for speed. It these methods weren't present,
+# These directly call invoke for speed. If these methods weren't present,
 #  the normal tcl/tk mapping process would be used, which is more general case, but slow
 ## Note: This means that -updatecommand won't work properly if supplied at creation
 #        If this is really needed, it can be set later with an itemConfigure call.

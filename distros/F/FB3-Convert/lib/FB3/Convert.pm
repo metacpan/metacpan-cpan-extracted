@@ -25,7 +25,7 @@ use Image::Magick;
 use File::ShareDir qw/dist_dir/;
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 
 =head1 NAME
 
@@ -187,6 +187,7 @@ my %AllowElementsMain = (
   },
   'root_fb3_container' => {
     'allow_elements_inside' => {
+      'br' => undef,
       'underline'=>undef,
       'b'=>undef,
       'strong'=>undef,

@@ -6,7 +6,7 @@ use strict;
 use vars qw(@EXPORT_OK @EXPORT @ISA $VERSION);
 
 BEGIN {
-  $VERSION='2.2.0'; # VERSION TEMPLATE
+  $VERSION='2.2.3'; # VERSION TEMPLATE
   @ISA       = qw(Exporter);
   @EXPORT = qw(&xsh);
   @EXPORT_OK = @XML::XSH2::Functions::EXPORT_OK;
@@ -74,9 +74,10 @@ Initialize the XSH language parser and interpreter.
 
 Execute commands in XSH language.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Petr Pajas, pajas@matfyz.cz
+E. Choroba, choroba@matfyz.cz
 
 =head1 SEE ALSO
 

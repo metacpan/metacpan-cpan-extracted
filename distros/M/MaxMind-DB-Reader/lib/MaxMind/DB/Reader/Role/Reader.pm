@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie;
 
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 use Data::Validate::IP 0.25 qw( is_ip );
 use MaxMind::DB::Types qw( Str );
@@ -51,7 +51,7 @@ around _build_metadata => sub {
 
     my $metadata = $self->$orig(@_);
 
-    $metadata->debug_dump();
+    $metadata->debug_dump;
 
     return $metadata;
 };

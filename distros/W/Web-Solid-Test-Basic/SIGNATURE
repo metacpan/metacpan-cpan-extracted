@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 815037b9cd8deb0281a24031b3f5cac43b40755a COPYRIGHT
+SHA1 e3e0e39296ce1cb035cb7c372a53ac507bbbda5f CREDITS
+SHA1 0083e0580e9891d230e438fb04303875ec8b4fac Changes
+SHA1 e0204b14f4412f59a1c9829032368254d25ae9b8 Dockerfile
+SHA1 c827b1594c89da834f093c5737e770229a2e7ab8 INSTALL
+SHA1 31b362b768abdb2e21227f74a760b338c6450ac6 LICENSE
+SHA1 b4243a01da20fd070e98bd2252a86edd31d81fab MANIFEST
+SHA1 ba600d585fb1da718ab85cdfc38a3982d5cd6c64 META.json
+SHA1 237d283ff4b849c888572b502a66d97cd0991f96 META.yml
+SHA1 b67232b86f815776e14c71b39428debab8a659f6 Makefile.PL
+SHA1 1cc283283bea431c8636545301255c08a00fb47a README
+SHA1 20ad38e3e2c63dd0b19745b09697a5b9d66351e3 README.md
+SHA1 e0fb9689ae5b37944cbda9c5cd3bfd0eeff193c0 dist.ini
+SHA1 e99d3e0f5a69d21ad972174097559fcace8eeb2e doap.ttl
+SHA1 1a0b3e89328395abfba7f3e2c9d6af8ce47ad4c7 lib/Web/Solid/Test/Basic.pm
+SHA1 fd0ac84da31ac0d496d433d8ccc021056a1e45e8 lib/Web/Solid/Test/HTTPLists.pm
+SHA1 1a6e2b8a9ed74e80f99fa884c9dfb4e7c21357f5 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAl0JiGYACgkQf77o3zqe
+SqUTNw//YoxkEdbOuF2vRF3OIfF5VmmHbUjv97vGpksDsLAc6YY+opxcQ8h1if30
+YQ/ZNXjXdgaM++9fcS94eX1iPV4n2URvmhnCotX4Dqp/ce0tQbaGY+NuawdnbxaV
+HZxkyGKD9n9O+T3b2sQfFuDqg469p4b223Yv3MZSGucIw2xzdononXv9Syz3ppKC
+swACCHCUhmYuTQWzsbC2UX9qSy0yyfpB3ilbq1CoWjoN8S0ob95b2Wi30AmPZ7lb
+R4WztpOT+j5O7m3TojjAs8ggynGkXPxIoqm7t8wtmtRcVhkOO5D9tjD9WJFk5pkw
+fogL9/QoFni5YexhBompMtnibN56q1OPbg97uDLtpzdr8QnCpCFyKJ4+A19zMJvF
+cqXnO300ppGu+dC4IRq5ZEcNpBYlIL+xMuaetdRM026ADOJGVBI61w74ohFyrEPo
+oKRVhTFkUoj9ElKNeO5rztbBvslfNTSbdCJ0YTGOqNpQmDgQ3zqu5BIu0PL08Iv7
+C67wyCZtA/RSOF+aMrGFQtYAbRqNweCNJXC67odeA+xe4ke6qt5r63E+oXDjImoj
+wpAiuzr0CorwOW37OFqshgSBdo1i4qcDwfwv17HFSnK4qehMGM5Wjge+b7UwujDb
+ZLnamoQJBU96A5ecSWGvi1eg6+MUATSBuL/WpXjrUaB2q+fMzhc=
+=FXzZ
+-----END PGP SIGNATURE-----

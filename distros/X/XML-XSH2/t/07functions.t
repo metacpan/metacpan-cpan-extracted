@@ -307,6 +307,10 @@ foreach //node() {
 $c = 0 ;
 stream :N :s '<r><a/><b/><a/><c/></r>' select a { $c = $c + 1 } ;
 assert2 $c 2 ;
+
+$c = 0 ;
+stream :N :p 'perl -e"print q(<r><n/><n/></r>)"' select n { $c = $c + 1 } ;
+assert2 $c 2 ;
 EOF
 
   plan tests => 4+@xsh_test;

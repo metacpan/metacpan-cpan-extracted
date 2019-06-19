@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use URI;
 
 # ABSTRACT: Alien::Build plugin to handle SourceForge links
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub init
@@ -69,11 +69,11 @@ Alien::Build::Plugin::Decode::SourceForge - Alien::Build plugin to handle Source
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
- use alinfile;
+ use alienfile;
  
  plugin 'Decode::SourceForge';
 
@@ -83,8 +83,7 @@ SourceForge is a website that offers software developers a centralized online lo
 manage their Open Source projects.  One of the challenges it presents is that projects
 hosted by SourceForge add the unnecessary suffix C</download> to links of tarballs, which
 confuses the way L<Alien::Base> computes the filename based on URLs.  This plugin solves
-this problem by rewriting the filenames returned by the L<Alien::Build::Plugin::Decode::HTML>
-plugin.
+this problem by rewriting the filenames returned by the configured decode plugin.
 
 =head1 SEE ALSO
 
@@ -102,7 +101,11 @@ plugin.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Alexandr Ciornii (CHORNY)
 
 =head1 COPYRIGHT AND LICENSE
 

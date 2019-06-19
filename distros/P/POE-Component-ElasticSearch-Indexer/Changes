@@ -1,9 +1,56 @@
 ==================================================
-Changes from 2016-11-16 00:00:00 +0000 to present.
+Changes from 2017-06-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.010 at 2018-11-16 19:39:31 +0000
+version 0.011 at 2019-06-19 03:49:37 +0000
+------------------------------------------
+
+  Change: b9a2a6b0a2e382991d3521acc1ae940663cfe42f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-22 21:31:11 +0000
+
+    Prepping a new release
+
+    * Handle connection pool exhaustion that can happen after a cluster
+
+    unhappiness * Docs updated and the file-to-elasticsearch.pl improved to do
+    what the
+
+    docs say 
+
+  Change: b97bfcd7ac53a1fe02e644828df750d7893c8877
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 21:31:16 +0000
+
+    Documentation fixes 
+
+  Change: 6043df9f57b0b75e93a9d17eecccba7c06c02ab2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 21:07:34 +0000
+
+    Fix podname on file-to-elasticsearch.pl 
+
+  Change: 8467211b8a6e732712ad949fb862541b2c0f860c
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2018-11-17 03:54:39 +0000
+
+    Auto generate META.yml using plugin [MetaYAML]. 
+
+  Change: 7cf2892c9e6735c01e28c3934bb462da1ef6b60d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-16 11:45:37 +0000
+
+    Fix discrepancy in the synopsis from the actual behavior of Timeout 
+
+  Change: 1a599ad2c237488ce81c5cfc5fff81fd971894bf
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-16 11:40:08 +0000
+
+    Updated documentation for 0.010 
+
+------------------------------------------
+version 0.010 at 2018-11-16 19:39:51 +0000
 ------------------------------------------
 
   Change: 9e8c423eb30bf62d10ad4d49abea743b2aefa94e

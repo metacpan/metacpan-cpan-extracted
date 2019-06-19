@@ -1,5 +1,10 @@
 Revision history for Geo::GoogleEarth::AutoTour
 
+1.06      2019-06-18 15:25:34-07:00 America/Los_Angeles
+        - Reduce rounding precision to allow for ld/non-ld passing
+        - Adding Perl versions to test; annual general update for 2019
+        - Adding Perl versions to test; annual general update for 2018
+
 1.05      2016-11-29 13:32:33-08:00 America/Los_Angeles
         - Set Math::Trig dependency to require >= 1.23
         - Fixed rounding code in test to add back a bit more precision

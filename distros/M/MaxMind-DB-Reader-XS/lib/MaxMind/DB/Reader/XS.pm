@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000007';
+our $VERSION = '1.000008';
 
 use 5.010000;
 
@@ -116,7 +116,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 =head1 VERSION
 
-version 1.000007
+version 1.000008
 
 =head1 SYNOPSIS
 
@@ -169,6 +169,9 @@ The PPA is now configured, and you may install (or upgrade) the libmaxminddb
 library via the usual apt commands.
 
 =head1 SUPPORT
+
+This module is deprecated and will only receive fixes for major bugs and
+security vulnerabilities. New features and functionality will not be added.
 
 Please report all issues with this code using the GitHub issue tracker at
 L<https://github.com/maxmind/MaxMind-DB-Reader-XS/issues>.
@@ -231,7 +234,7 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2018 by MaxMind, Inc.
+This software is Copyright (c) 2013 - 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

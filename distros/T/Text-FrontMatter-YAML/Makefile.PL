@@ -13,11 +13,13 @@ my %MakefileOptions = (
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
-        'YAML::Tiny'    => 0,
         'Carp'          => 0,
+        'Encode'        => 0,
+        'YAML::Tiny'    => 0,
     },
     BUILD_REQUIRES => {
-        'Test::More' => '0.88',
+        'Test::More'    => '0.88',
+        'Encode'        => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

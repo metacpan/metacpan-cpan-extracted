@@ -1,5 +1,11 @@
 Revision history for Alien-nasm
 
+0.22      2019-06-18 16:52:48 -0400
+  - use https instead of http
+
+0.21      2019-06-18 11:26:10 -0400
+  - Use Decode::Mojo instead of Decode::HTML
+
 0.20      2018-01-31 10:31:01 -0500
   - implicit modification of PATH is now removed
     (was deprecated in 0.11)

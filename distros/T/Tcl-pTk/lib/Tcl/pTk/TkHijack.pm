@@ -3,7 +3,7 @@ use Tcl::pTk ( qw/ MainLoop DoOneEvent tkinit update Ev Exists /); # Don't impor
 
 package Tcl::pTk::TkHijack;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 =head1 NAME
 

@@ -1,3 +1,7 @@
+1.000008 2019-06-18
+
+- Add deprecation notice
+
 1.000007 2018-12-15
 
 - Explicitly depend on Math::Int64 and Math::Int128. Reported by

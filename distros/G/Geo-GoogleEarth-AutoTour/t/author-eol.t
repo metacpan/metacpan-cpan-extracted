@@ -1,15 +1,15 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -21,11 +21,11 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
+    't/author-portability.t',
+    't/author-synopsis.t',
     't/basic_functionality.t',
     't/edge_cases.t',
-    't/release-kwalitee.t',
-    't/release-portability.t',
-    't/release-synopsis.t'
+    't/release-kwalitee.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

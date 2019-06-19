@@ -25,11 +25,11 @@ Text::xSV::Slurp - Convert xSV data to common data shapes.
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 SYNOPSIS
 
@@ -563,6 +563,9 @@ sub xsv_slurp
    
    ## run the data conversion
    my $data     = $shaper->( $handle, $csv, \%o );
+
+   ## cleanup
+   close $handle;
    
    return $data;
    }

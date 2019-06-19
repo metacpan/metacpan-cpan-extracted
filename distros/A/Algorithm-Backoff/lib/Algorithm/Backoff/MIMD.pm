@@ -1,7 +1,7 @@
 package Algorithm::Backoff::MIMD;
 
-our $DATE = '2019-06-08'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-06-18'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use warnings;
@@ -70,7 +70,7 @@ Algorithm::Backoff::MIMD - Multiplicative Increment, Multiplicative Decrement (M
 
 =head1 VERSION
 
-This document describes version 0.006 of Algorithm::Backoff::MIMD (from Perl distribution Algorithm-Backoff), released on 2019-06-08.
+This document describes version 0.007 of Algorithm::Backoff::MIMD (from Perl distribution Algorithm-Backoff), released on 2019-06-18.
 
 =head1 SYNOPSIS
 

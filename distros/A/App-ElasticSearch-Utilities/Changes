@@ -1,9 +1,27 @@
 ==================================================
-Changes from 2017-05-30 00:00:00 +0000 to present.
+Changes from 2017-06-19 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.7 at 2019-05-30 05:02:27 +0000
+version 6.8 at 2019-06-19 00:22:48 +0000
+----------------------------------------
+
+  Change: 691d833f341d0104b770c34b588d016ce65539a1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-18 16:41:33 +0000
+
+    Docs for 6.8 release 
+
+  Change: 9e49a7ea375770a013a0a3c0eccf46bc545e6125
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-18 16:25:37 +0000
+
+    Added histogram support to --with
+
+    Allows for the ability to use the histogram aggregation appropriately. 
+
+----------------------------------------
+version 6.7 at 2019-05-30 05:01:39 +0000
 ----------------------------------------
 
   Change: b223877862510dac87c842505b5e4624503fffc7
@@ -725,5 +743,5 @@ version 5.4 at 2017-10-13 19:36:20 +0000
     es-alias-manager.pl: relax index name checker to allow _ 
 
 =================================================
-Plus 60 releases after 2017-05-30 00:00:00 +0000.
+Plus 60 releases after 2017-06-19 00:00:00 +0000.
 =================================================

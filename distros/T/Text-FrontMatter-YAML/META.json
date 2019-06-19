@@ -4,7 +4,7 @@
       "Aaron Hall <ahall@vitaphone.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Encode" : "0",
             "Test::More" : "0.88"
          }
       },
@@ -33,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Encode" : "0",
             "YAML::Tiny" : "0",
             "perl" : "5.010001"
          }
@@ -50,5 +52,5 @@
          "web" : "https://github.com/vitahall/Text-FrontMatter-YAML"
       }
    },
-   "version" : "0.07"
+   "version" : "0.09"
 }

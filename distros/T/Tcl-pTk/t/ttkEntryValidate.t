@@ -6,8 +6,6 @@ use Test;
 use Tcl::pTk;
 #use Tk;
 
-plan tests => 3;
-
 my $textVar = "Initial Value";
 
 $| = 1;
@@ -20,11 +18,11 @@ my $version = $TOP->tclVersion;
 
 # Skip if Tcl/pTk version is < 8.5
 if( $version < 8.5 ){
-        skip("Tile widgets only works for Tcl >= 8.5", 1);
-        skip("Tile widgets only works for Tcl >= 8.5", 1);
-        skip("Tile widgets only works for Tcl >= 8.5", 1);
-        exit;
+    print "1..0 # Skipped: Tile widgets only works for Tcl >= 8.5\n";
+    exit;
 }
+
+plan tests => 3;
 
 # Parameters passed to the -validatecommand
 my ($proposed, $changes, $current, $index, $type) ;

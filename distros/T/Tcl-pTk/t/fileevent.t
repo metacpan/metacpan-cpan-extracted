@@ -17,8 +17,7 @@ if ($^O =~ m/darwin|dragonfly|freebsd|netbsd|openbsd/) {
         $theplan{'todo'} = [1, 2];
 }
 if ($Tcl::pTk::_FE_unavailable) {
-        print "1..0 # Skipped: fileevent is unavailable, reason:\n"
-            . "# $Tcl::pTk::_FE_unavailable\n";
+        print "1..0 # Skipped: fileevent is unavailable, reason: $Tcl::pTk::_FE_unavailable\n";
         exit;
 }
 plan %theplan;

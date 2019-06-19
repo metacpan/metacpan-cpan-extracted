@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0802';
+our $VERSION = '0.0803';
 
 use Catmandu::Util qw(:is);
 use Catmandu::Store::MongoDB::Searcher;
@@ -300,6 +300,14 @@ sub normalize_query {
     return $query if ref $query;
     return {} if !$query;
     decode_json($query);
+}
+
+# assume a sort option is a JSON encoded MongoDB sort specification
+sub normalize_sort {
+    my ($self, $sort) = @_;
+    return $sort if ref $sort;
+    return {} if !$sort;
+    decode_json($sort);
 }
 
 sub drop {

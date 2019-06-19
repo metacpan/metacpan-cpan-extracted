@@ -31,5 +31,5 @@ requires:
   XML::LibXSLT: '1.60'
   XML::SAX::Writer: '0.44'
   XML::XUpdate::LibXML: v0.6.0
-version: v2.2.0
+version: v2.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,12 +4,12 @@ author:
   - 'Ron Savage (ron@savage.net.au)'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '1.001014'
+  Test::More: '1.001002'
   Test::Pod: '1.48'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,13 +26,13 @@ requires:
   MarpaX::Simple: '0.06'
   Moo: '2.003'
   Path::Tiny: '0.098'
-  Perl: '5.014'
   Try::Tiny: '0.27'
   Types::Standard: '1.000005'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/MarpaX-Demo-JSONParser.git
-version: '1.07'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

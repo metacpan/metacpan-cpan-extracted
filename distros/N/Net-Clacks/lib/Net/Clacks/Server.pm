@@ -7,13 +7,13 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.2;
+our $VERSION = 6.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
 
 use XML::Simple;
-use Time::HiRes qw(sleep usleep);
+use Time::HiRes qw(sleep usleep time);
 use Sys::Hostname;
 use Errno;
 use IO::Socket::IP;
@@ -21,6 +21,7 @@ use IO::Select;
 use IO::Socket::SSL;
 use YAML::Syck;
 use MIME::Base64;
+#use Data::Dumper;
 
 # For turning off SSL session cache
 use Readonly;
@@ -152,6 +153,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     my %clients;
 
     my %clackscache;
+    my %clackscachetime;
     my $shutdowntime;
     my $selector = IO::Select->new();
     my $interclackslock = 0;
@@ -164,17 +166,39 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     if($self->{persistance} && -f $self->{config}->{persistancefile}) {
         if(open(my $ifh, '<', $self->{config}->{persistancefile})) {
             my $line = <$ifh>;
+            my $timestampline = <$ifh>;
             close $ifh;
             chomp $line;
             $line = decode_base64($line);
             $line = Load($line);
             %clackscache = %{$line};
+
+            # Mark all data as current
+            my $now = time;
+            foreach my $key (keys %clackscache) {
+                $clackscachetime{$key} = $now;
+            }
+            
+            # Do we have timestamp data? (need to check for upgrade compatibility
+            if(defined($timestampline) && length($timestampline) > 5) {
+                chomp $timestampline;
+                $timestampline = decode_base64($timestampline);
+                $timestampline = Load($timestampline);
+                my %clackstemp = %{$timestampline};
+                foreach my $key (keys %clackscache) {
+                    if(defined($clackstemp{$key})) {
+                        $clackscachetime{$key} = $clackstemp{$key};
+                    }
+                }
+            }
+
         }
     }
 
     while($keepRunning) {
         my $workCount = 0;
         my $savecache = 0;
+        my $lastsavecache = 0;
 
         # Check for shutdown time
         if($shutdowntime && $shutdowntime < time) {
@@ -455,6 +479,16 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                             if($value) {
                                 print "Interclacks sync lock ON.\n";
                                 $interclackslock = 1;
+                                
+                                # Send server our keys to the server
+                                foreach my $ckey (sort keys %clackscache) {
+                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
+                                }
+                                foreach my $ckey (sort keys %clackscachetime) {
+                                    next if(defined($clackscache{$ckey}));
+                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
+                                }
+
                             } else {
                                 print "Interclacks sync lock OFF.\n";
                                 $interclackslock = 0;
@@ -502,9 +536,13 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                                                                "OVERHEAD L 1\r\n";                                            # ...and lock client for sync
 
                                 # Make sure our new interclacks client has an *exact* copy of our buffer
-                                $clients{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
+                                #$clients{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
                                 foreach my $ckey (sort keys %clackscache) {
-                                    $clients{$cid}->{outbuffer} .= "STORE $ckey=" . $clackscache{$ckey} . "\r\n";
+                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
+                                }
+                                foreach my $ckey (sort keys %clackscachetime) {
+                                    next if(defined($clackscache{$ckey}));
+                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
                                 }
                                 $clients{$cid}->{outbuffer} .= "OVERHEAD L 0\r\n"; # unlock client after sync
                                 $clients{$cid}->{outbuffer} .= "PING\r\n";
@@ -603,8 +641,35 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                             value => $2,
                         );
                         push @outbox, \%tmp;
+                    } elsif($clients{$cid}->{buffer} =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
+                        print $clients{$cid}->{buffer}, "\n";
+                        my ($ctimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4);
+
+                        if(!defined($clackscachetime{$ckey})) {
+                            $clackscachetime{$ckey} = 0;
+                        }
+                        if($cmode eq "U") { # "Update"
+                            if($ctimestamp > $clackscachetime{$ckey}) {
+                                $clackscache{$ckey} = $cval;
+                                $clackscachetime{$ckey} = $ctimestamp;
+                            }
+                        } else { # REMOVE request from server
+                            if($ctimestamp > $clackscachetime{$ckey}) {
+                                delete $clackscache{$ckey};
+                                $clackscachetime{$ckey} = $ctimestamp;
+                            } else { # check if we have a value that happened after deletion at the server end
+                                if(!defined($clackscache{$ckey})) {
+                                    delete $clackscache{$ckey};
+                                    $clackscachetime{$ckey} = $ctimestamp;
+                                }
+                            }
+                        }
+
+                        $savecache = 1;
+                        $sendinterclacks = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^STORE\ (.+?)\=(.*)/) {
                         $clackscache{$1} = $2;
+                        $clackscachetime{$1} = time;
                         $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^RETRIEVE\ (.+)/) {
                         #$clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
@@ -619,6 +684,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         my $ckey = $1;
                         if(defined($clackscache{$ckey})) {
                             delete $clackscache{$ckey};
+                            $clackscachetime{$ckey} = time;
                         }
                         $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^INCREMENT\ (.+)/) {
@@ -633,6 +699,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         } else {
                             $clackscache{$ckey} = $cval;
                         }
+                        $clackscachetime{$ckey} = time;
                         $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^DECREMENT\ (.+)/) {
                         my $ckey = $1;
@@ -646,6 +713,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         } else {
                             $clackscache{$ckey} = 0 - $cval;
                         }
+                        $clackscachetime{$ckey} = time;
                         $savecache = 1;
                     } elsif($clients{$cid}->{buffer} =~ /^KEYLIST/) {
                         $clients{$cid}->{outbuffer} .= "KEYLISTSTART\r\n";
@@ -656,6 +724,8 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         $sendinterclacks = 0;
                     } elsif($clients{$cid}->{buffer} =~ /^CLEARCACHE/) {
                         %clackscache = ();
+                        %clackscachetime = ();
+                        $savecache = 1;
 
                     # local managment commands
                     } elsif($clients{$cid}->{buffer} =~ /^CLIENTLIST/) {
@@ -683,6 +753,10 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                             push @toremove, $lmccid;
                         }
                         $sendinterclacks = 0;
+                    } elsif($clients{$cid}->{buffer} =~ /^FLUSH\ (.+)/) {
+                        my $retid = $1;
+                        $clients{$cid}->{outbuffer} .= "FLUSHED $retid\r\n";
+                        $sendinterclacks = 0;
                     } else {
                         print STDERR "ERROR Unknown_command ", $clients{$cid}->{buffer}, "\r\n";
                         $sendinterclacks = 0;
@@ -707,6 +781,16 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
         }
 
+        # clean up very old "deleted" entries
+        my $stillvalidtime = time - (7 * 24 * 60 * 60); # 1 week
+        foreach my $key (keys %clackscachetime) {
+            next if($clackscachetime{$key} > $stillvalidtime);
+            next if(defined($clackscache{$key})); # Still has data
+            delete $clackscachetime{$key};
+            $savecache = 1;
+        }
+
+
         while((my $line = shift @outbox)) {
             $workCount++;
             foreach my $cid (keys %clients) {
@@ -724,6 +808,10 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         $clients{$cid}->{outbuffer} .= "NOTIFY ". $line->{name} . "\r\n";
                     } elsif($line->{type} eq 'SET') {
                         $clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
+                    } elsif($line->{type} eq 'STORE' && $clients{$cid}->{interclacks}) {
+                        $clients{$cid}->{outbuffer} .= "STORE ". $line->{name} . "=" . $line->{value} . "\r\n";
+                    } elsif($line->{type} eq 'REMOVE' && $clients{$cid}->{interclacks}) {
+                        $clients{$cid}->{outbuffer} .= "REMOVE ". $line->{name} . "\r\n";
                     }
                 }
             }
@@ -771,13 +859,18 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             }
         }
 
-        if($savecache) {
+        if($savecache && time > ($lastsavecache + 10)) { # only every 10 seconds
             $savecache = 0;
+            $lastsavecache = time;
             if($self->{persistance}) {
                 my $line = Dump(\%clackscache);
                 $line = encode_base64($line, '');
+                my $timestampline = Dump(\%clackscachetime);
+                $timestampline = encode_base64($timestampline, '');
+
                 if(open(my $ofh, '>', $self->{config}->{persistancefile})) {
                     print $ofh $line, "\n";
+                    print $ofh $timestampline, "\n";
                     close $ofh;
                 }
             }
@@ -843,8 +936,8 @@ Create a new instance.
 
 =head1 IMPORTANT NOTE
 
-Please refer to the included protocol.txt file for information
-about the CLACKS protocol.
+Please make sure and read the documentations for L<Net::Clacks> as it contains important information
+pertaining to upgrades and general changes!
 
 =head1 AUTHOR
 

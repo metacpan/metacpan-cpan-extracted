@@ -3,6 +3,7 @@
 BEGIN {
     require strict;
     require warnings;
+    require parent;
     require Test::Builder;
     require File::Spec;
     require UNIVERSAL::require;

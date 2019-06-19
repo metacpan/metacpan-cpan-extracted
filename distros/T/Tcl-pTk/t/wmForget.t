@@ -16,9 +16,8 @@ my $version = $TOP->tclVersion;
 
 # Skip if Tcl/pTk version is < 8.5
 if( $version < 8.5 ){
-        plan test => 1;
-        skip("Wm manage only works for Tcl >= 8.5", 1);
-        exit;
+    print "1..0 # Skipped: Wm manage only works for Tcl >= 8.5\n";
+    exit;
 }
 # Additionally skip for Tk Aqua pre-8.5.15
 # (`wm manage` and `wm forget` are unimplemented)
@@ -26,9 +25,8 @@ elsif (
   ($TOP->windowingsystem eq 'aqua')
   and ($TOP->interp->Eval('package vcompare $tk_patchLevel 8.5.15') == -1)
 ) {
-        plan test => 1;
-        skip("Wm manage/forget unimplemented for Tk Aqua < 8.5.15", 1);
-        exit;
+    print "1..0 # Skipped: Wm manage/forget unimplemented for Tk Aqua < 8.5.15\n";
+    exit;
 }
 
 plan test => 3;

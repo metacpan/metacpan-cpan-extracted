@@ -3,11 +3,12 @@ abstract: 'read the "YAML front matter" format'
 author:
   - 'Aaron Hall <ahall@vitaphone.net>'
 build_requires:
+  Encode: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +20,10 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Encode: '0'
   YAML::Tiny: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Bug/Report.html?Queue=Text-FrontMatter-YAML
   repository: https://github.com/vitahall/Text-FrontMatter-YAML.git
-version: '0.07'
+version: '0.09'

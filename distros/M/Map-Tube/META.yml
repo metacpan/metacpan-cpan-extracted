@@ -22,28 +22,28 @@ no_index:
 provides:
   Map::Tube:
     file: lib/Map/Tube.pm
-    version: '3.62'
+    version: '3.63'
   Map::Tube::Line:
     file: lib/Map/Tube/Line.pm
-    version: '3.62'
+    version: '3.63'
   Map::Tube::Node:
     file: lib/Map/Tube/Node.pm
-    version: '3.62'
+    version: '3.63'
   Map::Tube::Pluggable:
     file: lib/Map/Tube/Pluggable.pm
-    version: '3.62'
+    version: '3.63'
   Map::Tube::Route:
     file: lib/Map/Tube/Route.pm
-    version: '3.62'
+    version: '3.63'
   Map::Tube::Table:
     file: lib/Map/Tube/Table.pm
-    version: '3.62'
+    version: '3.63'
   Map::Tube::Types:
     file: lib/Map/Tube/Types.pm
-    version: '3.62'
+    version: '3.63'
   Map::Tube::Utils:
     file: lib/Map/Tube/Utils.pm
-    version: '3.62'
+    version: '3.63'
 requires:
   File::Basename: '2.6'
   File::ShareDir: '1.114'
@@ -65,5 +65,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube.git
-version: '3.62'
+version: '3.63'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

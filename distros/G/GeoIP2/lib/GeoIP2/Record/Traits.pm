@@ -3,7 +3,7 @@ package GeoIP2::Record::Traits;
 use strict;
 use warnings;
 
-our $VERSION = '2.006001';
+our $VERSION = '2.006002';
 
 use Moo;
 
@@ -88,7 +88,7 @@ GeoIP2::Record::Traits - Contains data for the traits record associated with an 
 
 =head1 VERSION
 
-version 2.006001
+version 2.006002
 
 =head1 SYNOPSIS
 
@@ -177,15 +177,20 @@ This attribute is returned by all end points.
 
 =head2 $traits_rec->is_anonymous_vpn()
 
-This returns a true value if the IP address belongs to an anonymous VPN
-system and a false value otherwise.
+This returns a true value if the IP address is registered to an anonymous VPN
+provider and a false value otherwise.
+
+If a VPN provider does not register subnets under names associated with them,
+we will likely only flag their IP ranges using the C<is_hosting_provider>
+attribute.
 
 This attribute is only available from the Insights web service.
 
 =head2 $traits_rec->is_hosting_provider()
 
-This returns a true value if the IP address belongs to a hosting provider and
-a false value otherwise.
+This returns a true value if the IP address belongs to a hosting or VPN
+provider and a false value otherwise (see description of C<is_anonymous_vpn>
+attribute).
 
 This attribute is only available from the Insights web service.
 
@@ -302,7 +307,7 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2013 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

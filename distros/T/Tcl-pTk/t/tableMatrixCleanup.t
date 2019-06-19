@@ -20,9 +20,8 @@ my $top = MainWindow->new;
 my $retVal = $top->interp->pkg_require('Tktable');
 
 unless( $retVal){
-	plan test => 1;
-        skip("Tktable Tcl package not available", 1);
-        exit;
+    print "1..0 # Skipped: Tktable Tcl package not available\n";
+    exit;
 }
 
 plan test => 2;

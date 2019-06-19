@@ -1,5 +1,8 @@
 Revision history for Alien-Libbz2
 
+0.24      2019-06-18 11:11:54 -0400
+  - Update download URL
+
 0.23      2018-06-06 12:03:00 -0400
   - Require Alien::Build 1.25 and friends for bugfixes
 

@@ -22,6 +22,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Class::Tiny" : "0",
             "Data::Dumper" : "0",
             "Data::Dumper::AutoEncode" : "0",
             "DateTime" : "0",
@@ -34,6 +35,7 @@
             "Mojo::UserAgent" : "0",
             "Mojo::UserAgent::Mockable" : "0",
             "feature" : "0",
+            "parent" : "0",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -52,13 +54,14 @@
       "bugtracker" : {
          "web" : "https://github.com/pavelsr/WWW-AzumuthAero/issues"
       },
+      "homepage" : "https://metacpan.org/pod/WWW::AzimuthAero",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/pavelsr/WWW-AzumuthAero.git",
          "web" : "https://github.com/pavelsr/WWW-AzumuthAero"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

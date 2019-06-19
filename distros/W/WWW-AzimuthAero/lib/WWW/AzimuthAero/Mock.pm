@@ -1,5 +1,5 @@
 package WWW::AzimuthAero::Mock;
-$WWW::AzimuthAero::Mock::VERSION = '0.1';
+$WWW::AzimuthAero::Mock::VERSION = '0.2';
 
 # ABSTRACT: additional subroutines for unit testing
 
@@ -62,7 +62,7 @@ WWW::AzimuthAero::Mock - additional subroutines for unit testing
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 SYNOPSIS
 

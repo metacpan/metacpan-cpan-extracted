@@ -3,6 +3,7 @@ package WebService::MinFraud::Validator::FraudService;
 use Moo;
 use namespace::autoclean;
 
+use Data::Rx;
 use WebService::MinFraud::Data::Rx::Type::CCToken;
 use WebService::MinFraud::Data::Rx::Type::CustomInputs;
 use WebService::MinFraud::Data::Rx::Type::DateTime::RFC3339;
@@ -12,7 +13,7 @@ use WebService::MinFraud::Data::Rx::Type::Hostname;
 use WebService::MinFraud::Data::Rx::Type::IPAddress;
 use WebService::MinFraud::Data::Rx::Type::WebURI;
 
-our $VERSION = '1.009000';
+our $VERSION = '1.009001';
 
 extends 'WebService::MinFraud::Validator::Base';
 
@@ -201,6 +202,7 @@ sub _build_request_schema_definition {
                                 'cybersource',
                                 'dalenys',
                                 'dalpay',
+                                'datacash',
                                 'dibs',
                                 'digital_river',
                                 'ebs',
@@ -213,6 +215,7 @@ sub _build_request_schema_definition {
                                 'exact',
                                 'first_data',
                                 'global_payments',
+                                'gocardless',
                                 'heartland',
                                 'hipay',
                                 'ingenico',
@@ -237,6 +240,7 @@ sub _build_request_schema_definition {
                                 'payeezy',
                                 'payfast',
                                 'paygate',
+                                'paylike',
                                 'payment_express',
                                 'paymentwall',
                                 'payone',
@@ -265,9 +269,11 @@ sub _build_request_schema_definition {
                                 'simplify_commerce',
                                 'skrill',
                                 'smartcoin',
+                                'smartdebit',
                                 'solidtrust_pay',
                                 'sps_decidir',
                                 'stripe',
+                                'synapsefi',
                                 'telerecargas',
                                 'towah',
                                 'transact_pro',
@@ -356,7 +362,7 @@ WebService::MinFraud::Validator::FraudService - Parent Validation for the minFra
 
 =head1 VERSION
 
-version 1.009000
+version 1.009001
 
 =head1 SUPPORT
 
@@ -368,7 +374,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

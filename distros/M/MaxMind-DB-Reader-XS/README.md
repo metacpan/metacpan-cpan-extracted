@@ -4,7 +4,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 # VERSION
 
-version 1.000007
+version 1.000008
 
 # SYNOPSIS
 
@@ -54,6 +54,9 @@ library via the usual apt commands.
 
 # SUPPORT
 
+This module is deprecated and will only receive fixes for major bugs and
+security vulnerabilities. New features and functionality will not be added.
+
 Please report all issues with this code using the GitHub issue tracker at
 [https://github.com/maxmind/MaxMind-DB-Reader-XS/issues](https://github.com/maxmind/MaxMind-DB-Reader-XS/issues).
 
@@ -77,7 +80,7 @@ Bugs may be submitted through [https://github.com/maxmind/MaxMind-DB-Reader-XS/i
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2018 by MaxMind, Inc.
+This software is Copyright (c) 2013 - 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

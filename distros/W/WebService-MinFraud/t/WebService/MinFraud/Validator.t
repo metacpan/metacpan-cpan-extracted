@@ -243,7 +243,7 @@ subtest 'cc_token' => sub {
 };
 
 subtest 'Domain validation' => sub {
-    my %base = ( device => { ip_address => '24.24.24.24' } );
+    my %base              = ( device => { ip_address => '24.24.24.24' } );
     my $good_email_domain = {
         %base,
         email => { domain => 'zed.com' },
@@ -521,7 +521,7 @@ subtest 'custom inputs' => sub {
                         device        => { ip_address => '24.24.24.24' },
                         custom_inputs => $bad_inputs->[1],
                     },
-                    )
+                )
             },
             qr/Found invalid/,
             "$bad_inputs->[0] is invalid"

@@ -1,5 +1,13 @@
 Revision history for Text-FrontMatter-YAML
 
+0.09	2019-06-17
+  - Bump copyright date, call it 0.09. If this works it'll become 1.0.
+
+0.08	2017-01-27 (never-uploaded)
+  - String input is now expected to be already decoded from its original
+    encoding.
+  - Squelch warning with empty data section on newer Perls
+
 0.07	2014-05-27
   - Perl 5.10.1 is now required.
   - RT#95548: fix 20-basic-init-from-sections.t to deal with the

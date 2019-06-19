@@ -9,24 +9,9 @@ ftp://ftp.info-zip.org/pub/infozip/
 
 1 Installing from a Unix-like distro
 ------------------------------------
-shell>gunzip MarpaX-Demo-JSONParser-1.03.tgz
-shell>tar mxvf MarpaX-Demo-JSONParser-1.03.tar
-
-On Unix-like systems, assuming you have installed Module::Build V 0.25+:
-
-shell>perl Build.PL
-shell>./Build
-shell>./Build test
-shell>./Build install
-
-On MS Windows-like systems, assuming you have installed Module::Build V 0.25+:
-
-shell>perl Build.PL
-shell>perl Build
-shell>perl Build test
-shell>perl Build install
-
-Alternately, without Module::Build, you do this:
+shell> gunzip MarpaX-Demo-JSONParser-1.03.tgz
+shell> tar xvf MarpaX-Demo-JSONParser-1.03.tar
+shell> cd MarpaX-Demo-JSONParser-1.03
 
 Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
 

@@ -32,8 +32,7 @@ share {
   plugin 'Build::MSYS' => () unless $compiler_type eq 'microsoft';
 
   plugin 'Download' => (
-    url     => 'http://www.bzip.org/downloads.html',
-    version => qr/^bzip2-([0-9\.]+)tar.gz$/,
+    url     => 'https://sourceforge.net/projects/bzip2/files/latest/download',
   );
   plugin Extract => 'tar.gz';
   

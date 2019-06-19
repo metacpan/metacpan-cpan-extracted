@@ -26,6 +26,7 @@ lib/Pcore/Ext/Lib/Menu.pm
 lib/Pcore/Ext/Lib/Mixin.pm
 lib/Pcore/Ext/Lib/PDF.pm
 lib/Pcore/Ext/Lib/Plugin.pm
+lib/Pcore/Ext/Lib/Upload.pm
 lib/Pcore/Ext/Lib/Util.pm
 lib/Pcore/Ext/Lib/Viewport.pm
 lib/Pcore/Ext/Overrides/core.pm

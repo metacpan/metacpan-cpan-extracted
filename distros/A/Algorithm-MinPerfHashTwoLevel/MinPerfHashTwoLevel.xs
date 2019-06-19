@@ -148,6 +148,7 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj, SV *error, U32 flags) {
         return MPH_MOUNT_ERROR_TOO_SMALL;
     }
     ptr = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED | MPH_MAP_POPULATE, fd, 0);
+    close(fd); /* kernel holds its own refcount on the file, we do not need to keep it open */
     if (ptr == MAP_FAILED) {
         if (error)
             sv_setpvf(error,"failed to create mapping to file '%s'", file);
@@ -156,7 +157,6 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj, SV *error, U32 flags) {
 
     obj->bytes= st.st_size;
     obj->header= head= (struct mph_header*)ptr;
-    obj->fd= fd;
     if (head->magic_num != MAGIC_DECIMAL) {
         if (head->magic_num == MAGIC_BIG_ENDIAN_DECIMAL) {
             if (error)
@@ -215,7 +215,6 @@ mph_mmap(pTHX_ char *file, struct mph_obj *obj, SV *error, U32 flags) {
 void
 mph_munmap(struct mph_obj *obj) {
     munmap(obj->header,obj->bytes);
-    close(obj->fd);
 }
 
 STRLEN

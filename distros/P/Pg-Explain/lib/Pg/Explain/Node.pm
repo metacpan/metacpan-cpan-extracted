@@ -12,11 +12,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.79
+Version 0.80
 
 =cut
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 =head1 SYNOPSIS
 
@@ -230,14 +230,14 @@ sub new {
     else {
         %args = @_;
     }
+    croak( 'type has to be passed to constructor of explain node' ) unless defined $args{ 'type' };
+
+    # Backfill costs if they are not given from plan
+    for my $key ( qw( estimated_rows estimated_row_width estimated_startup_cost estimated_total_cost ) ) {
+        $args{ $key } = 0 unless defined $args{ $key };
+    }
 
     @{ $self }{ keys %args } = values %args;
-
-    croak( 'estimated_rows has to be passed to constructor of explain node' )         unless defined $self->estimated_rows;
-    croak( 'estimated_row_width has to be passed to constructor of explain node' )    unless defined $self->estimated_row_width;
-    croak( 'estimated_startup_cost has to be passed to constructor of explain node' ) unless defined $self->estimated_startup_cost;
-    croak( 'estimated_total_cost has to be passed to constructor of explain node' )   unless defined $self->estimated_total_cost;
-    croak( 'type has to be passed to constructor of explain node' )                   unless defined $self->type;
 
     if ( $self->type =~ m{ \A ( (?: Parallel \s+ )? (?: Seq \s Scan | Bitmap \s+ Heap \s+ Scan | Foreign \s+ Scan | Update | Insert | Delete ) ) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms ) {
         $self->type( $1 );
@@ -262,6 +262,11 @@ sub new {
         $self->type( $1 );
         $self->scan_on( { 'cte_name' => $2, } );
         $self->scan_on->{ 'cte_alias' } = $3 if defined $3;
+    }
+    elsif ( $self->type =~ m{ \A ( WorkTable \s Scan ) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms ) {
+        $self->type( $1 );
+        $self->scan_on( { 'worktable_name' => $2, } );
+        $self->scan_on->{ 'worktable_alias' } = $3 if defined $3;
     }
     elsif ( $self->type =~ m{ \A ( Function \s Scan ) \s on \s (\S+) (?: \s+ (\S+) )? \z }xms ) {
         $self->type( $1 );

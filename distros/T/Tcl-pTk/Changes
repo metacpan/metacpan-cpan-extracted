@@ -1,5 +1,29 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.00:  2019-06-19
+
+ * Fix POD errors (`=cut` outside POD block) reported by CPANTS
+   (contribution from Mohammad S Anwar)
+ * Improve compliance with `use warnings` and `use strict`
+   - Fix errors/warnings in entry3 widget demo
+ * Add missing Tile availability check to tileLabelFont.t (RT #128813)
+ * photo.t: proceed with remaining test cases after errors (RT #128803)
+ * Prevent `unknown color name` errors (e.g. when using `x11` rather than
+   `aqua` on macOS) by checking the windowingsystem rather than `$^O`
+ * Attempt to fix RT #125049, #129505: in order for menu entries to be legible
+   when using the dark menu bar or dark mode on recent macOS versions, do not
+   set hardcoded default colors on derived widgets. This change also makes
+   UI appearance of other derived widgets more consistent with the defaults
+   chosen by Aqua for non-derived widgets, especially when using Tk 8.6.10
+   or later with dark mode enabled.
+ * Test reports (e.g. from CPAN testers) were displaying some tests as "ok"
+   but were actually completely skipped (using `skip()` or `ok()`).
+   These tests are now shown as skipped along with the reason it was skipped
+   (by instead using `print "1..0 # Skipped: $reason\n"`).
+ * Fileevent tests: ensure reason fileevent is unavailable appears
+   in test report (reason can't be printed on separate line)
+ * Various spelling fixes
+
 Release 0.96:  2019-03-03
 
  * For consistency, use the exact platform name strings when checking `$^O`,

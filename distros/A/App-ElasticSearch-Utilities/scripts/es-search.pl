@@ -233,6 +233,7 @@ if( exists $OPT{top} ) {
             # Process Args from Right to Left
             my $pcts  = $attrs[-1] =~ /^\d{1,2}(?:\.\d+)?(?:,\d{1,2}(?:\.\d+)?)*$/ ? pop @attrs : '25,50,75,90,95,99';
             my $size  = $pcts =~ /^\d+$/ ? $pcts : 3;
+            my $hi    = @attrs == 3 ? $attrs[-1] : '0.1';
             my $field = exists $FIELDS{$attrs[-1]} ? pop @attrs : undef;
             my $type  = @attrs ? pop @attrs : 'terms';
             # Skip invalid elements
@@ -249,6 +250,7 @@ if( exists $OPT{top} ) {
                     field => $field,
                     $type =~ /terms/ ? (size  => $size) : (),
                     $type eq 'percentiles' ? ( percents => [split /,/, $pcts] ) : (),
+                    $type eq 'histogram'   ? ( interval => $hi ) :  (),
                 }
             };
         }
@@ -701,7 +703,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 6.7
+version 6.8
 
 =head1 SYNOPSIS
 
@@ -946,6 +948,7 @@ Other examples:
     --with extended_stats:out_bytes
     --with percentiles:out_bytes
     --with percentiles:out_bytes:50,95,99
+    --with histogram:out_bytes:1024
 
 =item B<bg-filter>
 

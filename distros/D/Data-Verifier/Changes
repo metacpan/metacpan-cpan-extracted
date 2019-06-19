@@ -1,6 +1,9 @@
 Revision history for Data::Verifier
 
-Next
+0.63  Jun 17 2019
+      - Handle "meta_yml_has_provides" issue raised by CPANTS.
+
+0.62  Mar 02 2018
       * Doc cleanup, thanks @ronsavage.
         https://github.com/gphat/data-verifier/issues/8
       * Tidied up Changes file.

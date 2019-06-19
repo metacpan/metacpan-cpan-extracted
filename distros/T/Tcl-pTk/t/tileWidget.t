@@ -7,8 +7,6 @@ use Tcl::pTk;
 
 use Test;
 
-plan test => 1;
-
 
 my $TOP = MainWindow->new;
 
@@ -17,10 +15,11 @@ my $version = $TOP->tclVersion;
 
 # Skip if Tcl/pTk version is < 8.5
 if( $version < 8.5 ){
-        skip("Tile widgets only works for Tcl >= 8.5", 1);
-        exit;
+    print "1..0 # Skipped: Tile widgets only works for Tcl >= 8.5\n";
+    exit;
 }
 
+plan test => 1;
 
 my $msg = $TOP->ttkLabel( -text => 
         "Ttk is the new Tk themed widget set. This is a Ttk themed label, and below are three groups of Ttk widgets in Ttk labelframes. The first group are all buttons that set the current application theme when pressed. The second group contains three sets of checkbuttons, with a separator widget between the sets. Note that the Enabled button controls whether all the other themed widgets in this toplevel are in the disabled state. The third group has a collection of linked radiobuttons.",

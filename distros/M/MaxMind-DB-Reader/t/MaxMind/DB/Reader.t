@@ -78,17 +78,17 @@ SKIP:
             integer     => $ipnum,
             mask_length => $depth,
             ip_version  => 6,
-            )->as_string();
+        )->as_string();
     };
 
     $reader->iterate_search_tree( $data_cb, $node_cb );
 
     my %node_tests = (
-        0   => [ 1,   242 ],
-        80  => [ 81,  197 ],
-        96  => [ 97,  242 ],
-        103 => [ 242, 104 ],
-        241 => [ 96,  242 ],
+        0   => [ 1,   436 ],
+        80  => [ 81,  324 ],
+        96  => [ 97,  148 ],
+        103 => [ 445, 104 ],
+        241 => [ 445, 242 ],
     );
 
     for my $node ( sort keys %node_tests ) {
@@ -154,7 +154,7 @@ SKIP:
             MaxMind::DB::Reader->new(
                 file => file(
                     'maxmind-db/test-data/MaxMind-DB-test-mixed-24.mmdb')
-                )
+            )
         },
         undef,
         'Using a file object does not cause a type error'
@@ -228,7 +228,7 @@ sub _test_ipv4_lookups {
         [ '1.1.1.17' => '1.1.1.16' ],
         [ '1.1.1.31' => '1.1.1.16' ],
         [ '1.1.1.32' => '1.1.1.32' ],
-        ) {
+    ) {
 
         my ( $ip, $expect ) = @{$pair};
 
@@ -297,7 +297,7 @@ sub _test_ipv6_lookups {
         [ '::2:0:52' => '::2:0:50' ],
         [ '::2:0:57' => '::2:0:50' ],
         [ '::2:0:59' => '::2:0:58' ],
-        ) {
+    ) {
 
         my ( $ip, $expect ) = @{$pair};
         is_deeply(

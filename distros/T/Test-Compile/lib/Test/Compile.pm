@@ -3,7 +3,8 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v1.3.0");
+use version; our $VERSION = qv("v2.0_0");
+use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;
 
@@ -22,7 +23,7 @@ Test::Compile - Check whether Perl files compile correctly.
     $test->done_testing();
 
     # The procedural way (deprecated)
-    use Test::Compile;
+    use Test::Compile qw( all_pm_files_ok );
     all_pm_files_ok();
 
 =head1 DESCRIPTION
@@ -47,21 +48,18 @@ in a module distribution:
 
 =cut
 
-sub import {
-    my $self   = shift;
-    my $caller = caller;
-    for my $func (
-        qw(
-        pm_file_ok pl_file_ok all_pm_files all_pl_files all_pm_files_ok
-        all_pl_files_ok
-        )
-      ) {
-        no strict 'refs';
-        *{ $caller . "::" . $func } = \&$func;
-    }
-    $Test->exported_to($caller);
-    $Test->plan(@_);
-}
+our @EXPORT_OK = qw(
+    pm_file_ok
+    pl_file_ok
+
+    all_files_ok
+    all_pm_files_ok
+    all_pl_files_ok
+
+    all_pm_files
+    all_pl_files
+);
+our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
 
 =head1 METHODS
 
@@ -148,11 +146,6 @@ like C<Test::Simple>'s C<ok()>.
 
 Defines how many tests you plan to run.
 
-=item C<exported_to($caller)>
-
-Tells C<Test::Builder> what package you exported your functions to.  I am
-not sure why you would want to do that, or whether it would do you any good.
-
 =item C<diag(@msgs)>
 
 Prints out the given C<@msgs>. Like print, arguments are simply appended
@@ -210,7 +203,9 @@ in a module distribution:
     eval "use Test::Compile";
     Test::More->builder->BAIL_OUT(
         "Test::Compile required for testing compilation") if $@;
-    all_pm_files_ok();
+    my $test = Test::Compile->new();
+    $test->all_pm_files_ok();
+    $test->done_testing();
 
 =cut
 
@@ -248,7 +243,9 @@ in a module distribution:
     eval "use Test::Compile";
     plan skip_all => "Test::Compile required for testing compilation"
       if $@;
-    all_pl_files_ok();
+    my $test = Test::Compile->new();
+    $test->all_pl_files_ok();
+    $test->done_testing();
 
 =cut
 
@@ -351,11 +348,24 @@ Skips any files in C<CVS> or C<.svn> directories.
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
 
-=back
 =cut
 
 sub all_pl_files {
     return $Test->all_pl_files(@_);
+}
+
+=item C<all_files_ok(@dirs)>
+
+Checks all the perl files it can find for compilation errors.
+
+If C<@dirs> is defined then it is taken as an array of directories to
+be searched for perl files, otherwise it searches some default locations
+- see L</all_pm_files()> and L</all_pl_files()>.
+
+=back
+=cut
+sub all_files_ok {
+    return $Test->all_files_ok(@_);
 }
 
 sub _verbose {

@@ -8,7 +8,6 @@ use strict;
 use Tcl::pTk::TkHijack;
 
 use Test;
-plan tests => 1;
 
 use Tk;
 
@@ -21,9 +20,11 @@ my $top = new MainWindow;
 my $retVal = $top->interp->pkg_require('Tktable');
 
 unless( $retVal){
-        skip("Tktable Tcl package not available", 1);
-        exit;
+    print "1..0 # Skipped: Tktable Tcl package not available\n";
+    exit;
 }
+
+plan tests => 1;
 
 my $arrayVar = {};
 

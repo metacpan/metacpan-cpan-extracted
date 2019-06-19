@@ -3,7 +3,7 @@ abstract: 'Alien::Build plugin to handle SourceForge links'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  HTML::LinkExtor: '0'
+  Mojo::DOM58: '0'
   Test2::V0: '0.000060'
   Test::Alien::Build: '0'
   URI::Escape: '0'
@@ -12,15 +12,16 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-Build-Plugin-Decode-SourceForge
 requires:
-  Alien::Build: '0.62'
+  Alien::Build: '1.74'
   Alien::Build::Plugin: '0'
+  Alien::Build::Plugin::Decode::Mojo: '1.74'
   URI: '0'
   perl: '5.008001'
 resources:
@@ -28,5 +29,10 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Build-Plugin-Decode-SourceForge/issues
   homepage: https://metacpan.org/pod/Alien::Build::Plugin::Decode::SourceForge
   repository: git://github.com/plicease/Alien-Build-Plugin-Decode-SourceForge.git
-version: '0.01'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.02'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Alexandr Ciornii (CHORNY)'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

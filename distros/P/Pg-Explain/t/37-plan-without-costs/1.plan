@@ -1,0 +1,1 @@
+Seq Scan on pg_class (actual time=0.014..0.141 rows=427 loops=1)

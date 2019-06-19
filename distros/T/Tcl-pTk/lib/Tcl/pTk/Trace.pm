@@ -1,6 +1,6 @@
 package Tcl::pTk::Trace;
 
-our ($VERSION) = ('0.96');
+our ($VERSION) = ('1.00');
 
 use Carp;
 use Tcl::pTk::Tie::Watch;
@@ -173,7 +173,7 @@ sub Tcl::pTk::Widget::traceVariable {
 
     # Need to add our internal callback to user's callback arg list
     # so we can call ours first, followed by the user's callback and
-    # any user arguments. Trace callbacks are activated as requied.
+    # any user arguments. Trace callbacks are activated as required.
 
     my $trace = $TRACE{$vref};
     if ( not defined $trace ) {
