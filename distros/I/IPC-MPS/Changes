@@ -1,5 +1,8 @@
 Revision history for Perl extension IPC::MPS.
 
+0.20  1019-06-20
+    - SOCK_NONBLOCK for socketpair
+
 0.19  1016-08-08
 	- vpid2pid
 

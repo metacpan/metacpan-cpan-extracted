@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Barpolar::Stream;
 use Chart::Plotly::Trace::Barpolar::Transform;
 use Chart::Plotly::Trace::Barpolar::Unselected;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: The data visualized by the radial span of the bars is set in `r`
 
@@ -304,7 +304,7 @@ Chart::Plotly::Trace::Barpolar - The data visualized by the radial span of the b
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use AnyEvent;
 use Scalar::Util qw/weaken/;
@@ -224,13 +224,15 @@ sub _wait_with_status {## blocking
 1;
 __END__
 
+=for stopwords cb
+
 =head1 NAME
 
 AnyEvent::ForkManager - A simple parallel processing fork manager with AnyEvent
 
 =head1 VERSION
 
-This document describes AnyEvent::ForkManager version 0.06.
+This document describes AnyEvent::ForkManager version 0.07.
 
 =head1 SYNOPSIS
 

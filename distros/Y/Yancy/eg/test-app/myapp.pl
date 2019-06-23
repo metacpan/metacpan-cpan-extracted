@@ -12,7 +12,9 @@ app->defaults( layout => 'default' );
 app->routes->get( '/people' )->to(
     'yancy#list',
     schema => 'people',
-    template => 'list_people',
+    table => {
+        show_filter => 1,
+    },
 )->name( 'people.list' );
 app->routes->get( '/people/:id' )->to(
     'yancy#get',
@@ -40,13 +42,6 @@ __DATA__
 </main>
 </div>
 </div>
-
-@@ list_people.html.ep
-<ul>
-% for my $person ( @$items ) {
-    <li><%= link_to $person->{name}, 'people.get', $person %></li>
-% }
-</ul>
 
 @@ view_people.html.ep
 <h1><%= $item->{name} %></h1>

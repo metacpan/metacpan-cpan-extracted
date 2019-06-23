@@ -1,10 +1,12 @@
 #!perl -w
 use strict;
-use Test::More;
-use Test::SharedFork;
+use Test::More 0.98;
+use Test::SharedFork 0.31;
+use Test::SharedObject;
 
 use AnyEvent;
 use AnyEvent::ForkManager;
+use Time::HiRes;
 
 my $MAX_WORKERS = 2;
 my $JOB_COUNT   = $MAX_WORKERS * 3;
@@ -15,7 +17,7 @@ my $TEST_COUNT  =
     ($JOB_COUNT > $MAX_WORKERS ? (($JOB_COUNT - $MAX_WORKERS) * 2) : 0) + # on_enqueue
     ($JOB_COUNT > $MAX_WORKERS ? (($JOB_COUNT - $MAX_WORKERS) * 2) : 0) + # on_dequeue
     ($JOB_COUNT > $MAX_WORKERS ? (($JOB_COUNT - $MAX_WORKERS) * 2) : 0) + # on_working_max
-    3;# wait_all_children
+    4;# wait_all_children
 plan tests => $TEST_COUNT;
 
 my $pm = AnyEvent::ForkManager->new(
@@ -63,7 +65,8 @@ my $pm = AnyEvent::ForkManager->new(
     }
 );
 
-my $cv = AnyEvent->condvar;
+
+my $ready = Test::SharedObject->new(0);
 
 my @all_data = (1 .. $JOB_COUNT);
 my $started_all_process = 0;
@@ -71,9 +74,10 @@ foreach my $exit_code (@all_data) {
     $pm->start(
         cb => sub {
             my($pm, $exit_code) = @_;
-            local $SIG{INT} = sub { $started_all_process = 1; };
             isnt $$, $pm->manager_pid, 'called by child';
-            until ($started_all_process) {}; # wait
+
+            Time::HiRes::usleep(100) until $ready->get();
+
             note "exit_code: $exit_code";
             $pm->finish($exit_code);
             fail 'finish failed';
@@ -81,9 +85,12 @@ foreach my $exit_code (@all_data) {
         args => [$exit_code]
     );
 }
-$started_all_process = 1;
-$pm->signal_all_children('INT');
+$ready->set(1);
 
+my $cv = AnyEvent->condvar;
+
+my $callback_called;
+$callback_called++;
 $pm->wait_all_children(
     cb => sub {
         my($pm) = @_;
@@ -97,3 +104,4 @@ $pm->wait_all_children(
 );
 
 $cv->recv;
+is $callback_called, 1, 'wait_all_children callback is called at once';

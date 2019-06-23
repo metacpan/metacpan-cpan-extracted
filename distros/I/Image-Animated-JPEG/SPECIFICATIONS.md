@@ -327,7 +327,7 @@ Clipland GmbH, [clipland.com](http://www.clipland.com/)
 
 ## Copyright and License
 
-This software specification is Copyright 2013-2017 Clipland GmbH. All rights
+This software specification is Copyright 2013-2019 Clipland GmbH. All rights
 reserved.
 
 Clipland GmbH licenses this specification to the public under the GNU Free

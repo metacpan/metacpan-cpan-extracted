@@ -1,9 +1,34 @@
 ==================================================
-Changes from 2018-06-17 00:00:00 +0000 to present.
+Changes from 2018-06-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.011 at 2019-06-17 19:37:45 +0000
+version 0.012 at 2019-06-19 17:32:22 +0000
+------------------------------------------
+
+  Change: f03d4e1d02911665fb8eb4a3cd55de0ac8073370
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-06-19 19:27:35 +0000
+
+    Remove Devel::Size.
+
+    Some profiling indicated that it was by far the most expensive part
+    of Devel::Optic. With it enabled, throughput on a "hello world"
+    Mojolicious app dropped to about 50% of normal. Without it, overhead
+    was small enough to be nearly unmeasureable.
+
+    This has the downside that Devel::Optic now _always_ summarizes.
+
+    A better conceptual approach would be to write a custom serializer:
+    start traversing the data structure and adding to the serialized
+    representation. When that representation becomes too big, stop and
+    send it. That would get maximum information for minimum size.
+    However, the current strategy (always do a basic one-level summary)
+    is much simpler to implement, so we'll start with this and await some
+    feedback. 
+
+------------------------------------------
+version 0.011 at 2019-06-17 19:33:52 +0000
 ------------------------------------------
 
   Change: 085ba28938539c460f28543329d78d57b2fad0f3

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Parameters;
 use Quiq::AnsiColor;
@@ -412,11 +412,39 @@ sub editPage {
 
     # Seite speichern
 
-    return $self->send('POST','edit',
+    my $res = $self->send('POST','edit',
         token => $token,
         $arg =~ /^\d+$/? (pageid => $arg): (title => $arg),
         text => $text,
     );
+
+    # CAPTCHA behandeln. Wir behandeln den CAPTCH-Type "simple" automatisch.
+
+    if (my $h = $res->{'edit'}->{'captcha'}) {
+        my $captchaType = $h->{'type'};
+        if ($captchaType eq 'simple') {
+            my $captchaId = $h->{'id'};
+            my $captchaQuestion = $h->{'question'};
+
+            # Request mit gelöstem CAPTCHA wiederholen
+
+            $res = $self->send('POST','edit',
+                captchaid => $captchaId,
+                captchaword => eval "$captchaQuestion",
+                token => $token,
+                $arg =~ /^\d+$/? (pageid => $arg): (title => $arg),
+                text => $text,
+            );
+        }
+        else {
+            $self->throw(
+                'MEDIAWIKI-00099: Unknown CAPTCHA type',
+                CaptchaType => $captchaType,
+            );
+        }
+    }
+
+    return $res;
 }
 
 # -----------------------------------------------------------------------------
@@ -943,7 +971,7 @@ Option -force ist gesetzt
 
 =item Aufruf wird mit Fehlermeldung zurückgewiesen
 
-Die Datei ist eine Seite soll gespeichert werden, wobei ein
+Die Datei ist eine Seite und soll gespeichert werden, wobei ein
 Unterschied zwischen Cache- und Wiki-Datei festgestellt wird.
 Das bedeutet, im Wiki wurde die Datei seit dem letzten Speichern
 geändert. Der Aufruf ist nur durch Setzen der Option -force möglich,
@@ -1189,6 +1217,7 @@ sub send {
     if (!$res->is_success) {
         $self->throw(
             'MEDIAWIKI-00099: HTTP request failed',
+            Request => $res->request->as_string,
             StatusLine => $res->status_line,
             Response => $res->content,
         );
@@ -1214,6 +1243,7 @@ sub send {
     if ($res->header('MediaWiki-API-Error')) {
         $self->throw(
             'MEDIAWIKI-00099: API error',
+            Request => $res->request->as_string,
             Code => $json->{'error'}->{'code'},
             Info => $json->{'error'}->{'info'},
         );
@@ -1357,7 +1387,7 @@ sub log {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

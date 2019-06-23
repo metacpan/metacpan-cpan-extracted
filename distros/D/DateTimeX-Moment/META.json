@@ -4,9 +4,9 @@
       "karupanerura <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
-      "artistic_2"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -49,6 +49,7 @@
          "requires" : {
             "Class::Accessor::Lite" : "0",
             "Class::Inspector" : "0",
+            "DateTime::Duration" : "0",
             "DateTime::Locale" : "0",
             "DateTime::TimeZone" : "0",
             "List::Util" : "0",
@@ -68,7 +69,7 @@
    "provides" : {
       "DateTimeX::Moment" : {
          "file" : "lib/DateTimeX/Moment.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "DateTimeX::Moment::Duration" : {
          "file" : "lib/DateTimeX/Moment/Duration.pm"
@@ -85,10 +86,11 @@
          "web" : "https://github.com/karupanerura/DateTimeX-Moment"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:KARUPA",
    "x_contributors" : [
       "chansen <chansen@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 4.03",
+   "x_static_install" : 1
 }

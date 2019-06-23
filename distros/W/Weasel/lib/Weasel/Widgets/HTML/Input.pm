@@ -70,15 +70,17 @@ sub clear {
 =item value([$value])
 
 Gets the 'value' attribute; if C<$value> is provided, it is used to set the
-attribute value.
+value.
 
 =cut
 
 sub value {
     my ($self, $value) = @_;
 
-    $self->session->set_attribute($self, 'value', $value)
-        if defined $value;
+    if (defined $value) {
+        $self->clear;
+        $self->send_keys($value);
+    }
 
     return $self->session->get_attribute($self, 'value');
 }
@@ -91,8 +93,8 @@ Erik Huelsmann
 
 =head1 CONTRIBUTORS
 
-Erik Huelsmann
-Yves Lavoie
+ Erik Huelsmann
+ Yves Lavoie
 
 =head1 MAINTAINERS
 

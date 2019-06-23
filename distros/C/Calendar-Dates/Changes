@@ -1,3 +1,12 @@
+0.2.1   2019-06-19 (PERLANCAR)
+
+        - Add STATUS section.
+
+        - get_entries(): Define parameter 'all'.
+
+        - Define the meaning of entry's tags: 'low-priority' and 'anniversary'.
+
+
 0.2.0   2019-05-25 (PERLANCAR)
 
 	[SPEC CHANGES]

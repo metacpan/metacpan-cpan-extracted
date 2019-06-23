@@ -1,6 +1,7 @@
 requires 'Class::Accessor::Lite';
 requires 'Class::Inspector';
 requires 'DateTime::Locale';
+requires 'DateTime::Duration';
 requires 'DateTime::TimeZone';
 requires 'List::Util';
 requires 'Scalar::Util';

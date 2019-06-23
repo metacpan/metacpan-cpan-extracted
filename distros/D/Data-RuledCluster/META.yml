@@ -3,12 +3,13 @@ abstract: 'clustering data resolver'
 author:
   - 'Atsushi Kobayashi <nekokak@gmail.com>'
 build_requires:
+  DBD::SQLite: '0'
   DBI: '0'
   Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.5, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +28,7 @@ no_index:
 provides:
   Data::RuledCluster:
     file: lib/Data/RuledCluster.pm
-    version: '0.06'
+    version: '0.07'
   Data::RuledCluster::Strategy:
     file: lib/Data/RuledCluster/Strategy.pm
   Data::RuledCluster::Strategy::Formatted:
@@ -45,11 +46,12 @@ resources:
   bugtracker: https://github.com/nekokak/p5-Data-RuledCluster/issues
   homepage: https://github.com/nekokak/p5-Data-RuledCluster
   repository: git://github.com/nekokak/p5-Data-RuledCluster.git
-version: '0.06'
+version: '0.07'
 x_contributors:
-  - 'punytan <punytan@gmail.com>'
-  - 'xaicron <xaicron@gmail.com>'
   - 'Hiroyoshi HOUCHI <info@hixi-hyi.com>'
   - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
   - 'karupanerura <karupa@cpan.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'punytan <punytan@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

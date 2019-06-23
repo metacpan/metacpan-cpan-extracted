@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.032';
+our $VERSION = '1.033';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -124,6 +124,25 @@ our $VERSION = '1.032';
 #pod properties. See L<Yancy::Help::Config/Generated Forms> for details on
 #pod how Yancy translates JSON schema into forms.
 #pod
+#pod =head2 yancy->form->input_for
+#pod
+#pod     my $html = $c->yancy->form->input_for( $schema, $property, %args );
+#pod     %= $c->yancy->form->input_for( $schema, $property, %args );
+#pod
+#pod Create a form input for the given schema's property. This creates just
+#pod the input field, nothing else. To add a label, see C<field_for>.
+#pod
+#pod =head2 yancy->form->filter_for
+#pod
+#pod     my $html = $c->yancy->form->filter_for( $schema, $property, %args );
+#pod     %= $c->yancy->form->filter_for( $schema, $property, %args );
+#pod
+#pod Create a form input suitable as a filter for the given schema's
+#pod property. A filter input is never a required field, and always allows
+#pod some kind of "blank" value. The filter automatically captures a value
+#pod from the query parameter of the same name as the C<$property>. This
+#pod creates just the input field, nothing else.
+#pod
 #pod =head2 yancy->form->field_for
 #pod
 #pod     my $html = $c->yancy->form->field_for( $schema, $name );
@@ -171,7 +190,7 @@ use Yancy::Util qw( currym );
 sub register {
     my ( $self, $app, $conf ) = @_;
     my $prefix = $conf->{prefix} || 'form';
-    for my $method ( qw( form_for field_for input ) ) {
+    for my $method ( qw( form_for field_for input_for filter_for input ) ) {
         $app->helper( "yancy.$prefix.$method" => currym( $self, $method ) );
     }
 }
@@ -188,7 +207,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 
@@ -311,6 +330,25 @@ form.
 Most of these properties are the same as the JSON schema field
 properties. See L<Yancy::Help::Config/Generated Forms> for details on
 how Yancy translates JSON schema into forms.
+
+=head2 yancy->form->input_for
+
+    my $html = $c->yancy->form->input_for( $schema, $property, %args );
+    %= $c->yancy->form->input_for( $schema, $property, %args );
+
+Create a form input for the given schema's property. This creates just
+the input field, nothing else. To add a label, see C<field_for>.
+
+=head2 yancy->form->filter_for
+
+    my $html = $c->yancy->form->filter_for( $schema, $property, %args );
+    %= $c->yancy->form->filter_for( $schema, $property, %args );
+
+Create a form input suitable as a filter for the given schema's
+property. A filter input is never a required field, and always allows
+some kind of "blank" value. The filter automatically captures a value
+from the query parameter of the same name as the C<$property>. This
+creates just the input field, nothing else.
 
 =head2 yancy->form->field_for
 

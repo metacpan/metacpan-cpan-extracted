@@ -1,11 +1,8 @@
 package Net::Google::WebmasterTools::Response;
 {
-  $Net::Google::WebmasterTools::Response::VERSION = '0.01';
+  $Net::Google::WebmasterTools::Response::VERSION = '0.03';
 }
 use strict;
-# use Data::Dumper;
-# use Mojo::Log;
-# my $log = Mojo::Log->new;
 
 # ABSTRACT: Google Webmaster Tools API response
 
@@ -89,7 +86,6 @@ sub dimensions {
 
 sub totals {
     my ($self, $metric) = @_;
-    # $log->info(Dumper(@_));
     return $self->_totals->{$metric};
 }
 
@@ -174,7 +170,7 @@ Net::Google::WebmasterTools::Response - Google Webmaster Tools API response
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -207,7 +203,7 @@ Net::Google::WebmasterTools::Response - Google Webmaster Tools API response
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 CONSTRUCTOR
 

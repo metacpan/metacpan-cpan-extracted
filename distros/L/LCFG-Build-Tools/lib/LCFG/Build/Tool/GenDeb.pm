@@ -2,21 +2,22 @@ package LCFG::Build::Tool::GenDeb;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: GenDeb.pm.in 35296 2019-01-10 10:47:26Z squinney@INF.ED.AC.UK $
+# $Id: GenDeb.pm.in 36519 2019-06-21 09:27:03Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/CheckMacros.pm.in,v $
-# $Revision: 35296 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Tool/GenDeb.pm.in $
-# $Date: 2019-01-10 10:47:26 +0000 (Thu, 10 Jan 2019) $
+# $Revision: 36519 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/lib/LCFG/Build/Tool/GenDeb.pm.in $
+# $Date: 2019-06-21 10:27:03 +0100 (Fri, 21 Jun 2019) $
 
 use v5.10;
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use File::Copy::Recursive ();
 use File::Spec ();
 use File::Find::Rule ();
 use LCFG::Build::Utils;
 use Template v2.14;
+use Try::Tiny;
 
 use Moose;
 
@@ -76,7 +77,7 @@ sub execute {
     }
 
     # Find any extra doc files which should be included in the package
-    my @docs = ($vcs->logname);
+    my @docs;
 
     for my $doc (qw/README TODO/) {
         my $docfile = File::Spec->catfile( $dir, $doc );
@@ -98,7 +99,46 @@ sub execute {
     # Does this look like a component?
 
     my $comp_file = File::Spec->catfile( $dir, $spec->name . '.cin' );
-    my $is_component = -f $comp_file;
+    my $is_component = -f $comp_file ? 1 : 0;
+
+    my $comp_type = 'shell';
+    if ( $is_component ) {
+        try {
+            my $fh = IO::File->new( $comp_file, 'r' )
+                or die "Cannot open $comp_file: $!\n";
+            my $first_line = $fh->getline
+                or die "Failed to read $comp_file: $!\n";
+            if ( $first_line =~ m{^\#\!.*perl}i ) {
+                $comp_type = 'perl';
+            }
+        } catch {
+            warn $_;
+        };
+    }
+
+    # Is there a nagios helper module?
+
+    my $nagios_file = File::Spec->catfile( $dir, 'nagios',
+                                           $spec->name . '.pm' );
+
+    # Need to try both forms of the filename
+
+    my $has_nagios = -f $nagios_file  ? 1 : 0;
+    if ( !$has_nagios ) {
+        $nagios_file .= '.cin';
+        $has_nagios = -f $nagios_file ? 1 : 0;
+    }
+
+    # Does there appear to be a Perl library?
+
+    my $libdir = File::Spec->catdir( $dir, 'lib' );
+    my $looks_like_perl_lib = 0;
+    if ( -d $libdir ) {
+        my @files = File::Find::Rule->file()->name(qr/\.pm(\.cin)?$/)->in($libdir);
+        if ( scalar @files > 0 ) {
+            $looks_like_perl_lib = 1;
+        }
+    }
 
     # Process all the templates
 
@@ -112,27 +152,35 @@ sub execute {
         spec => $spec,
         vcs  => $vcs,
         docs => \@docs,
-        is_component => $is_component,
+        is_component        => $is_component,
+        comp_type           => $comp_type,
+        looks_like_perl_lib => $looks_like_perl_lib,
+        has_nagios          => $has_nagios,
     };
-
-    my %comp_only   = map { $_ => 1 } qw/preinst prerm postinst postrm service/;
-    my %prefix_name = map { $_ => 1 } qw/service/;
 
     for my $key (sort keys %templates) {
 
         # Only need these files for components
-        if ( $comp_only{$key} && !$is_component ) {
+        if ( $key =~ m/^COMP/ && !$is_component ) {
+            next;
+        }
+
+        if ( $key =~ m/^COMP-nagios/ && ( !$is_component || !$has_nagios ) ) {
             next;
         }
 
         my $tmpl = $templates{$key};
 
-        my $target;
-        if ( $prefix_name{$key} ) {
-            $target = join '.', $spec->deb_name, $key;
-        } else {
-            $target = $key;
-        }
+        my $target = $key;
+
+        # Need to translate 'COMP' separately as otherwise it could
+        # potentially resolve to the wrong thing.
+
+        my $deb_name = $spec->deb_name;
+        $target =~ s/\bCOMP\b/$deb_name/g;
+
+        $target =~ s/\b((?:LCFG|DEB)_[A-Z]+)\b/
+                     LCFG::Build::Utils::translate_macro($spec,$1)/gxe;
 
         $self->log("Creating debian/$target metadata file");
 
@@ -179,7 +227,7 @@ __END__
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::Tool::GenDeb version 0.9.20
+This documentation refers to LCFG::Build::Tool::GenDeb version 0.9.30
 
 =head1 SYNOPSIS
 

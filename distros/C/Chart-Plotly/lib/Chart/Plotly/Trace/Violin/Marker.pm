@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Violin::Marker::Line;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace violin.
 
@@ -81,7 +81,7 @@ Chart::Plotly::Trace::Violin::Marker - This attribute is one of the possible opt
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use base qw(Exporter);
-our @EXPORT_OK = qw(iso_date get_mtime month_name);
+our @EXPORT_OK = qw(iso_date get_date get_mtime month_name);
 
 use POSIX qw(strftime);
 
@@ -68,6 +68,41 @@ Turn numeric months into English names.
   sub month_name {
     my ($number) = @_;
     return $months[$number];
+  }
+}
+
+=item get_date('key', 'other_key', ...)
+
+Return current date values for the given key. Valid keys are sec, min, hour,
+mday (day of month), mon, year, wday (day of week), yday (day of year), and
+isdst (is daylight savings).
+
+Remember that year is given in years after 1900.
+
+=cut
+
+# Below replaces:
+# my ($sec, $min, $hour, $mday, $mon,
+#     $year, $wday, $yday, $isdst) = localtime(time);
+{
+  my %name_map = (
+    sec   => 0,  min   => 1, hour => 2, mday => 3,
+    mon   => 4,  year  => 5, wday => 6, yday => 5,
+    isdst => 6,
+  );
+
+  sub get_date {
+    my (@names) = @_;
+    my (@indices) = @name_map{@names};
+    my (@values) = (localtime time)[@indices];
+
+    if (wantarray()) {
+        # my ($foo, $bar) = get_date('foo', 'bar');
+        return @values;
+    } else {
+        # this is probably useless unless you're getting just one value
+        return join '', @values;
+    }
   }
 }
 

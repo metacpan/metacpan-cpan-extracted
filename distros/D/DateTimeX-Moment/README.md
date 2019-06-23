@@ -132,4 +132,4 @@ This is free software, licensed under:
 
 # AUTHOR
 
-karupanerura &lt;karupa@cpan.org>
+karupanerura <karupa@cpan.org>

@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Waterfall::Textfont;
 use Chart::Plotly::Trace::Waterfall::Totals;
 use Chart::Plotly::Trace::Waterfall::Transform;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: Draws waterfall trace which is useful graph to displays the contribution of various elements (either positive or negative) in a bar chart. The data visualized by the span of the bars is set in `y` if `orientation` is set th *v* (the default) and the labels are set in `x`. By setting `orientation` to *h*, the roles are interchanged.
 
@@ -392,7 +392,7 @@ Chart::Plotly::Trace::Waterfall - Draws waterfall trace which is useful graph to
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

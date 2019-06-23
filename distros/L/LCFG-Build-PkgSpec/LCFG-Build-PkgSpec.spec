@@ -1,10 +1,10 @@
 Name:           perl-LCFG-Build-PkgSpec
-Version:        0.2.6
+Version:        0.2.7
 Release:        1
 Summary:        Object-oriented interface to LCFG build metadata
 License:        GPLv2
 Group:          Development/Libraries
-Source0:        LCFG-Build-PkgSpec-0.2.6.tar.gz
+Source0:        LCFG-Build-PkgSpec-0.2.7.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl >= 1:5.6.1
@@ -66,8 +66,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
-* Fri Jan 18 2019 SVN: new release
-- Release: 0.2.6
+* Fri Mar 22 2019 SVN: new release
+- Release: 0.2.7
+
+* Fri Mar 22 2019 15:28  squinney@INF.ED.AC.UK
+- debian/control: Need to build-depend on libmodule-build-perl
+
+* Thu Mar 21 2019 16:36  squinney@INF.ED.AC.UK
+- README: Added notes about what packages are required on Debian
+
+* Fri Jan 18 2019 10:45  squinney@INF.ED.AC.UK
+- Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release: 0.2.6
 
 * Fri Jan 18 2019 10:45  squinney@INF.ED.AC.UK
 - lcfg.yml, t/02_pkgspec_basic.t: updated tests for change to tarname

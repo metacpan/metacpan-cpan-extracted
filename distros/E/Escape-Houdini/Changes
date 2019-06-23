@@ -1,5 +1,12 @@
 Revision history for Escape-Houdini
 
+0.3.1 2019-06-22
+  [ DOCUMENTATION ]
+    - Small improvements.
+
+  [ STATISTICS ]
+    - code churn: 9 files changed, 244 insertions(+), 69 deletions(-)
+
 0.3.0 2017-03-27
   [ ENHANCEMENTS ]
     - Update houdini lib to latest version.

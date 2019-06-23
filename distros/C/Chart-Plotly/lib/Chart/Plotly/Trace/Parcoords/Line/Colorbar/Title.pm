@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Parcoords::Line::Colorbar::Title::Font;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace parcoords.
 
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Parcoords::Line::Colorbar::Title - This attribute is one o
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

@@ -18,7 +18,7 @@ name: LCFG-Build-PkgSpec
 provides:
   LCFG::Build::PkgSpec:
     file: lib/LCFG/Build/PkgSpec.pm
-    version: v0.2.6
+    version: v0.2.7
 requires:
   Data::Structure::Util: '0.12'
   DateTime: '0'
@@ -33,4 +33,4 @@ resources:
     web: https://bugs.lcfg.org/
   homepage: http://www.lcfg.org/doc/buildtools/
   license: https://opensource.org/licenses/GPL-2.0
-version: v0.2.6
+version: v0.2.7

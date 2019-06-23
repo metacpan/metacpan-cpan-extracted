@@ -1,0 +1,114 @@
+
+# ABSTRACT: CSVJF (CSV with JSON Fields) file format specification
+#PODNAME: CSVJF
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+CSVJF - CSVJF (CSV with JSON Fields) file format specification
+
+=head1 SPECIFICATION VERSION
+
+0.1
+
+=head1 VERSION
+
+This document describes version 0.1.1 of CSVJF (from Perl distribution CSVJF), released on 2019-06-19.
+
+=head1 STATUS
+
+Draft series (0.x), might still change. Will be stable in 1.0.
+
+=head1 ABSTRACT
+
+CSVJF (short for "CSV with JSON field") is an extension to the CSV format to
+allow fields that contain JSON string, arrays, or hashes (objects).
+
+=head1 NOTATION
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
+
+=head1 RATIONALE
+
+CSV is a convenient format to generate or write manually. However, it does not
+allow fields to be a data structure.
+
+CSVJF extends the CSV specification as follows:
+
+A CSV file is zero or more lines, separated by newlines. Each line represent a
+row of fields.
+
+The first line may be a header line.
+
+Each line is a comma-separated list of fields.
+
+A field is either an unquoted string, a JSON-encoded string, a JSON-encoded
+array, or a JSON-encoded hash (object).
+
+An unquoted string must not contain the record separator character (newline) or
+field separator character (comma). If the field wants to contain these
+characters it must be written as a JSON-encoded string. It also must not start
+with opening square bracket ("[") or opening curly brace ("{") because those
+characters are used for JSON array and hash, respectively.
+
+A JSON-encoded string is string enclosed in double quotes ("). Escaping follows
+JSON rules.
+
+A JSON-encoded array is string enclosed in square brackets ("[" and "]").
+
+A JSON-encoded hash is string enclosed in curly braces ("{" and "}").
+
+Some examples of CSVJF rows:
+
+ one,two,three
+
+ "field one with spaces","field two with
+ newline and com,ma,s",field 3,["field5","array"],{"field6":"hash"}
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/CSVJF>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-CSVJF>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=CSVJF>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+CSVJ file format, L<https://csvj.org/>. This file format attempts to standardize
+the CSV format with JSON rules. It's basically JSON array with the "[" and "]"
+square brackets removed (implied), with additional restriction of elements
+cannot be array/object. Thus, every string field must be quoted except when a
+field is a number, boolean C<true>/C<false> literal, or C<null>.
+
+IOD format specification, L<IOD>, which also employs the use of encoding
+prefixes C<">, C<[> and C<{> to embed JSON string, array, and hash,
+respectively.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -5,7 +5,7 @@ use Moo::Role;
 use Types::Standard qw(Str Defined Int);
 use namespace::autoclean;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 requires qw(
@@ -53,7 +53,7 @@ eris::role::context - Role for implementing a log context
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 ATTRIBUTES
 

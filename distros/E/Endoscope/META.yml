@@ -1,0 +1,30 @@
+---
+abstract: 'Dig into the guts of a live Perl program'
+author:
+  - 'Ben Tyler <btyler@cpan.org>'
+build_requires:
+  Test2::V0: '0.000100'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Endoscope
+provides:
+  Endoscope:
+    file: lib/Endoscope.pm
+    version: '0.001'
+requires:
+  Devel::Optic: '0.012'
+  Devel::Probe: '0.000005'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/kanatohodets/Endoscope/issues
+  homepage: https://github.com/kanatohodets/Endoscope
+  repository: https://github.com/kanatohodets/Endoscope.git
+version: '0.001'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

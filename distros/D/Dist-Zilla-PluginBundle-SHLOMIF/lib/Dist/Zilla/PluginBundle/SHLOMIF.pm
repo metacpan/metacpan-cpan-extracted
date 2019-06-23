@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::SHLOMIF;
-$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000008';
+$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000009';
 use 5.014;
 
 use Moose;
@@ -208,7 +208,6 @@ has _plugins => (
                 PkgVersion
                 PodCoverageTests
                 PodSyntaxTests
-                PodVersion
                 Test::Compile
                 Test::CPAN::Changes
                 Test::EOL
@@ -298,7 +297,7 @@ Dist::Zilla::PluginBundle::SHLOMIF - Dist::Zilla plugins for me
 
 =head1 VERSION
 
-version 0.000008
+version 0.000009
 
 =head1 SYNOPSIS
 
@@ -377,7 +376,7 @@ Dist::Zilla::PluginBundle::SHLOMIF - dzil plugins for SHLOMIF (Shlomi Fish)
 
 =head1 VERSION
 
-version 0.000008
+version 0.000009
 
 =head1 SEE ALSO
 
@@ -395,7 +394,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Jesse Luehrs.
+This software is Copyright (c) 2019 by Jesse Luehrs.
 
 This is free software, licensed under:
 

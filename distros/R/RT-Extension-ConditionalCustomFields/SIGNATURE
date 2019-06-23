@@ -14,7 +14,7 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 39af7523a006ffed77153c7fa2383f19e874cecc Changes
+SHA1 0a15e8944d71088ba85fccf09451a6a7a89598ea Changes
 SHA1 0a3224be32be8a39834f4c2d84648064fadeb559 LICENSE
 SHA1 63c9000efb23555cd93dfc4c898c533718d01d7f MANIFEST
 SHA1 d4c6c19e13fffcd93948d62e825dfbdca496d5df META.yml
@@ -28,7 +28,7 @@ SHA1 4795d3f454640e7aec535c50b51331967ef620a9 html/Callbacks/RT-Extension-Condit
 SHA1 9af5cf974ce21ed238f791cd4051e6b82c7e221f html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/EditCustomFields/AfterCustomFieldValue
 SHA1 edcc5f6bce159cdf6857aa8a88eac6ef8961f102 html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/ShowCustomFields/AfterCustomFieldValue
 SHA1 b2375c42b6426fa83145f5c876564f071433a51a html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/ShowRecord/AfterValue
-SHA1 ac8637e6b4bee3c80bc69a7d57e0c72380d27337 html/Elements/EditConditionalCustomFields
+SHA1 33635ca25c8a129607f1855648aff9a0952d69b6 html/Elements/EditConditionalCustomFields
 SHA1 f857ff4a80d68083c74c14b08910a0daf9fb5045 html/Elements/SelectConditionalCustomField
 SHA1 1666024885b80af36ef70f0de60351dd17c1335a html/Elements/SelectConditionalRelation
 SHA1 bdbfcdeb7b36d3e0719537996237e937d1991060 html/Elements/ShowConditionalCustomFields
@@ -49,7 +49,7 @@ SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
 SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
 SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
 SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
-SHA1 3b308c0399f7b40740d8a0265e522c9d9a378f96 lib/RT/Extension/ConditionalCustomFields.pm
+SHA1 a6d65345cdb2f1c33bae86031f9fbb6be8568311 lib/RT/Extension/ConditionalCustomFields.pm
 SHA1 6894f760fbd9d05fde394fa09bc3864c519f426a lib/RT/Extension/ConditionalCustomFields/Test.pm.in
 SHA1 4ae19b19eb25633ecfe53fa2e3b642cfe02dc26d patches/4.2-add-callbacksto-extend-customfields-capabilities.patch
 SHA1 8e0a55c5b346eb46fa59bf84d5343cec1e296753 patches/4.4.1-add-callbacks-to-extend-customfields-capabilities.patch
@@ -127,7 +127,7 @@ SHA1 a66e6bd1795ac347134d9191646a1991d06eb202 xt/user_dynamic_modify_selectbox.t
 SHA1 8356aa70604070fbc3a8cde2941379bee0240ea7 xt/user_summary_select_is_multiple_condition.t
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCXGLjJwAKCRDz3XhnulP5
-Pz4zAKDFOOIBtINEzdyCJWeGngjIvYTd1wCgoV7pjEfNtHqRys+0QHKMgT0RjA4=
-=Wfwa
+iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCXQzxRQAKCRDz3XhnulP5
+PxAtAJ4yvpzhETE6TfWHo8RZTW83e2IQwACeJanux1nJalAkOqS/W5AvyJqr9oU=
+=FeOx
 -----END PGP SIGNATURE-----

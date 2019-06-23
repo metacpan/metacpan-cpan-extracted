@@ -1,4 +1,4 @@
-# AWS::KinesisAnalytics::ApplicationOutput generated from spec 2.25.0
+# AWS::KinesisAnalytics::ApplicationOutput generated from spec 3.2.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::KinesisAnalytics::ApplicationOutput {
     [  ]
   }
   sub supported_regions {
-    [ 'eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

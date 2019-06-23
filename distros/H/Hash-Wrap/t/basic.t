@@ -2,7 +2,7 @@
 
 use Test2::V0;
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw( blessed refaddr );
 
 use Hash::Wrap;
 
@@ -10,7 +10,11 @@ subtest 'default' => sub {
 
     my %hash = ( a => 1, b => 2 );
 
-    my $obj = wrap_hash \%hash;
+    my $hash = \%hash;
+
+    my $obj = wrap_hash $hash;
+
+    is( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
 
     is( $obj->a, 1, 'retrieve value' );
     is( $obj->b, 2, 'retrieve another value' );
@@ -38,6 +42,16 @@ subtest 'default' => sub {
 
 };
 
+subtest 'no hash' => sub {
+
+    my $hash = wrap_hash;
+
+    $hash->{a} = 1;
+
+    is( $hash->a, 1, "set" );
+};
+
+
 use Hash::Wrap ( {
     -as   => 'return_copied',
     -copy => 1,
@@ -47,8 +61,11 @@ use Hash::Wrap ( {
 subtest 'copied' => sub {
 
     my %hash = ( a => 1, b => 2, c => [9] );
+    my $hash = \%hash;
 
-    my $obj = return_copied \%hash;
+    my $obj = return_copied $hash;
+
+    isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
 
     is( $obj->a, 1, 'retrieve value' );
     is( $obj->b, 2, 'retrieve another value' );
@@ -77,9 +94,11 @@ use Hash::Wrap ({
 subtest 'cloned' => sub {
 
     my %hash = ( a => 1, b => 2, c => [9] );
+    my $hash = \%hash;
 
-    my $obj = return_cloned \%hash;
+    my $obj = return_cloned $hash;
 
+    isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
     is( $obj->a, 1, 'retrieve value' );
     is( $obj->b, 2, 'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );

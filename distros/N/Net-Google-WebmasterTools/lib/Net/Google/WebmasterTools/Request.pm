@@ -1,17 +1,21 @@
 package Net::Google::WebmasterTools::Request;
 {
-  $Net::Google::WebmasterTools::Request::VERSION = '0.01';
+    $Net::Google::WebmasterTools::Request::VERSION = '0.03';
 }
 use strict;
 
 # ABSTRACT: Google Webmaster Tools API request
 
-use Class::XSAccessor
-    accessors => [ qw(
+use Class::XSAccessor accessors => [
+    qw(
         site_url
-        report_name 
+        report_name
         method
+        dimension
         dimensions
+        dimension_filter_groups
+        operator
+        expression
         sort
         filters
         segment
@@ -19,18 +23,24 @@ use Class::XSAccessor
         fields
         pretty_print
         user_ip quota_user
-    ) ],
+        )
+    ],
     constructor => 'new';
 
 my @param_map = (
-    dimensions      => 'dimensions',
-    search_type      => 'searchType',
-    start_date       => 'startDate',
-    end_date       => 'endDate',
-    row_limit       => 'rowLimit',
-    pretty_print => 'prettyPrint',
-    user_ip      => 'userIp',
-    quota_user   => 'quotaUser',
+    dimensions              => 'dimensions',
+    dimension_filter_groups => 'dimensionFilterGroups',
+    filters                 => 'filters',
+    dimension               => 'dimension',
+    operator                => 'operator',
+    expression              => 'expression',
+    search_type             => 'searchType',
+    start_date              => 'startDate',
+    end_date                => 'endDate',
+    row_limit               => 'rowLimit',
+    pretty_print            => 'prettyPrint',
+    user_ip                 => 'userIp',
+    quota_user              => 'quotaUser',
 );
 
 sub _params {
@@ -44,9 +54,9 @@ sub _params {
 
     my %params;
 
-    for (my $i=0; $i<@param_map; $i+=2) {
+    for ( my $i = 0; $i < @param_map; $i += 2 ) {
         my $from = $param_map[$i];
-        my $to   = $param_map[$i+1];
+        my $to   = $param_map[ $i + 1 ];
 
         my $value = $self->{$from};
         $params{$to} = $value if defined($value);
@@ -57,11 +67,7 @@ sub _params {
 
 1;
 
-__END__
-
 =pod
-
-=encoding UTF-8
 
 =head1 NAME
 
@@ -69,7 +75,7 @@ Net::Google::WebmasterTools::Request - Google Webmaster Tools API request
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -89,14 +95,6 @@ version 0.01
 =head1 DESCRIPTION
 
 Request class for L<Net::Google::WebmasterTools> web service.
-
-=head1 NAME
-
-Net::Google::WebmasterTools::Request - Google Webmaster Tools API request
-
-=head1 VERSION
-
-version 0.01
 
 =head1 CONSTRUCTOR
 
@@ -161,15 +159,8 @@ This software is copyright (c) 2012 by Nick Wellnhofer.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-=head1 AUTHOR
-
-Rob Hammond <contact@rjh.am>, Nick Wellnhofer <wellnhofer@aevum.de>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by Nick Wellnhofer.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
+
+__END__
+
+

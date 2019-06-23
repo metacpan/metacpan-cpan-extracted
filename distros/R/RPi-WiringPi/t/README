@@ -27,6 +27,12 @@ SDA -> SDA
 10 -> 11 (MOSI)
 26 -> 10 (CS)
 
+# MCP4XXXX Digital Potentiometer
+
+13 -> 1 (CS)
+11 -> 2 (SCLK)
+10 -> 3 (MOSI)
+
 # MCP4922 DAC
 
 12 -> 3 (CS)

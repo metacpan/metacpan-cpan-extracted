@@ -1,10 +1,10 @@
 package Net::Google::WebmasterTools;
 {
-  $Net::Google::WebmasterTools::VERSION = '0.01';
+    $Net::Google::WebmasterTools::VERSION = '0.03';
 }
 use strict;
 
-# ABSTRACT: Simple interface to the Google WebmasterTools Core Reporting API
+# ABSTRACT: Simple interface to the Google Search Console Core Reporting API
 
 use JSON;
 use LWP::UserAgent;
@@ -12,15 +12,11 @@ use Net::Google::WebmasterTools::Request;
 use Net::Google::WebmasterTools::Response;
 use Net::Google::WebmasterTools::Row;
 use URI;
-use Data::Dumper;
-use Mojo::Log;
-
-my $log = Mojo::Log->new;
 
 sub new {
     my $package = shift;
 
-    my $self = bless({}, $package);
+    my $self = bless( {}, $package );
 
     return $self;
 }
@@ -31,18 +27,17 @@ sub auth_params {
     my $auth_params = $self->{auth_params} || [];
 
     if (@_) {
-        $self->{auth_params} = [ @_ ];
+        $self->{auth_params} = [@_];
     }
 
     return @$auth_params;
 }
 
 sub token {
-    my ($self, $token) = @_;
+    my ( $self, $token ) = @_;
 
-    $self->{auth_params} = [
-        Authorization => "$token->{token_type} $token->{access_token}",
-    ];
+    $self->{auth_params}
+        = [ Authorization => "$token->{token_type} $token->{access_token}", ];
 }
 
 sub user_agent {
@@ -50,10 +45,10 @@ sub user_agent {
 
     my $ua = $self->{user_agent};
 
-    if (@_ > 1) {
+    if ( @_ > 1 ) {
         $self->{user_agent} = $_[1];
     }
-    elsif (!defined($ua)) {
+    elsif ( !defined($ua) ) {
         $ua = LWP::UserAgent->new();
         $self->{user_agent} = $ua;
     }
@@ -68,52 +63,53 @@ sub new_request {
 }
 
 sub _uri {
-    my ($self, $req, $start_index, $row_limit) = @_;
+    my ( $self, $req, $row_limit ) = @_;
 
-    my $uri = URI->new('https://www.googleapis.com/webmasters/v3/sites/' . $req->site_url . '/' . $req->report_name . '/' . $req->method);
-    if (($req->report_name =~ m{^(?:sitemaps|urlCrawlErrorsSamples)$}) && ($req->method eq 'list')) {
-        $uri = URI->new('https://www.googleapis.com/webmasters/v3/sites/' . $req->site_url . '/' . $req->report_name);
-    } elsif (($req->report_name eq 'sites') && ($req->method eq 'list')) {
+    my $uri
+        = URI->new( 'https://www.googleapis.com/webmasters/v3/sites/'
+            . $req->site_url . '/'
+            . $req->report_name . '/'
+            . $req->method );
+    if (   ( $req->report_name =~ m{^(?:sitemaps|urlCrawlErrorsSamples)$} )
+        && ( $req->method eq 'list' ) )
+    {
+        $uri
+            = URI->new( 'https://www.googleapis.com/webmasters/v3/sites/'
+                . $req->site_url . '/'
+                . $req->report_name );
+    }
+    elsif ( ( $req->report_name eq 'sites' ) && ( $req->method eq 'list' ) ) {
         $uri = URI->new('https://www.googleapis.com/webmasters/v3/sites');
     }
-    print "$uri\n";
-    my @params;
-    push(@params, 'start-index' => $start_index) if defined($start_index);
-    push(@params, 'max-results' => $row_limit) if defined($row_limit);
-
-    $uri->query_form(
-        $req->_params,
-        @params,
-    );
-
     return $uri;
 }
 
 sub uri {
-    my ($self, $req) = @_;
+    my ( $self, $req ) = @_;
 
-    return $self->_uri($req, $req->start_index, $req->row_limit);
+    return $self->_uri( $req, $req->start_index, $req->row_limit );
 }
 
 sub _retrieve_http {
-    my ($self, $req, $start_index, $row_limit) = @_;
+    my ( $self, $req, $start_index, $row_limit ) = @_;
 
-    my $uri         = $self->_uri($req, $start_index, $row_limit);
-    
-    my $params = $req;
+    my $uri = $self->_uri( $req, $start_index, $row_limit );
+
+    my $params      = $req;
     my @auth_params = $self->auth_params;
-    
+
     my %params = $req->_params;
-    my $json = to_json(\%params);
+    my $json   = to_json( \%params );
 
     my $http_req = HTTP::Request->new( 'POST', $uri->as_string );
-    $http_req->header( @auth_params );
+    $http_req->header(@auth_params);
     $http_req->header( 'Content-Type' => 'application/json' );
-    $http_req->content( $json );
+    $http_req->content($json);
 
-    if (($req->report_name eq 'sitemaps') && ($req->method eq 'list')) {
+    if ( ( $req->report_name eq 'sitemaps' ) && ( $req->method eq 'list' ) ) {
         $http_req = HTTP::Request->new( 'GET', $uri->as_string );
-    } elsif (($req->report_name eq 'sites') && ($req->method eq 'list')) {
+    }
+    elsif ( ( $req->report_name eq 'sites' ) && ( $req->method eq 'list' ) ) {
         $http_req = HTTP::Request->new( 'GET', $uri->as_string );
     }
 
@@ -121,25 +117,25 @@ sub _retrieve_http {
 }
 
 sub retrieve_http {
-    my ($self, $req) = @_;
+    my ( $self, $req ) = @_;
 
-    return $self->_retrieve_http($req, $req->start_index, $req->row_limit);
+    return $self->_retrieve_http( $req, $req->start_index, $req->row_limit );
 }
 
 sub _retrieve {
-    my ($self, $req, $start_index, $row_limit) = @_;
+    my ( $self, $req, $start_index, $row_limit ) = @_;
 
-    my $http_res = $self->_retrieve_http($req, $start_index, $row_limit);
-    my $res = Net::Google::WebmasterTools::Response->new;
-    $res->code($http_res->code);
-    $res->message($http_res->message);
+    my $http_res = $self->_retrieve_http( $req, $start_index, $row_limit );
+    my $res      = Net::Google::WebmasterTools::Response->new;
+    $res->code( $http_res->code );
+    $res->message( $http_res->message );
 
-    if (!$http_res->is_success) {
-        $res->content($http_res->decoded_content);
+    if ( !$http_res->is_success ) {
+        $res->content( $http_res->decoded_content );
         return $res;
     }
 
-    my $json = from_json($http_res->decoded_content);
+    my $json = from_json( $http_res->decoded_content );
     $res->_parse_json($json);
 
     $res->start_index($start_index);
@@ -149,49 +145,9 @@ sub _retrieve {
 }
 
 sub retrieve {
-    my ($self, $req) = @_;
+    my ( $self, $req ) = @_;
 
-    return $self->_retrieve($req, $req->start_index, $req->row_limit);
-}
-
-sub retrieve_paged {
-    my ($self, $req) = @_;
-
-    my $start_index = $req->start_index;
-    $start_index = 1 if !defined($start_index);
-    my $remaining_items = $req->row_limit;
-    my $max_items_per_page = 10_000;
-    my $res;
-
-    while (!defined($remaining_items) || $remaining_items > 0) {
-        my $row_limit =
-            defined($remaining_items) &&
-            $remaining_items < $max_items_per_page ?
-                $remaining_items : $max_items_per_page;
-
-        my $page = $self->_retrieve($req, $start_index, $row_limit);
-        return $page if !$page->is_success;
-
-        if (!defined($res)) {
-            $res = $page;
-        }
-        else {
-            push(@{ $res->rows }, @{ $page->rows });
-        }
-
-        my $num_items = @{ $page->rows };
-        last if $num_items < $row_limit;
-
-        $remaining_items -= $num_items if defined($remaining_items);
-        $start_index     += $num_items;
-    }
-
-    my $total_items = @{ $res->rows };
-    $res->items_per_page($total_items);
-    # The total result count of the first page isn't always accurate
-    $res->total_results($total_items);
-
-    return $res;
+    return $self->_retrieve( $req, $req->start_index, $req->row_limit );
 }
 
 1;
@@ -204,11 +160,11 @@ __END__
 
 =head1 NAME
 
-Net::Google::WebmasterTools - Simple interface to the Google WebmasterTools Core Reporting API
+Net::Google::WebmasterTools - Simple interface to the Google Webmaster Tools (Search Console) Core Reporting API
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -235,14 +191,14 @@ version 0.01
 
     # Build request
     my $req = $wmt->new_request(
-        site_url         => "$site_url",
+        site_url     => "$site_url",
         report_name  => "searchAnalytics",
-        method     => "query",
-        dimensions     => ['country','device'],
-        search_type => 'web',
-        start_date  => "2015-08-01",
-        end_date    => "2015-08-31",
-        row_limit => 1000,
+        method       => "query",
+        dimensions   => ['country','device'],
+        search_type  => 'web',
+        start_date   => "2019-05-01",
+        end_date     => "2019-05-31",
+        row_limit    => 1000,
     );
 
     # Send request
@@ -251,21 +207,14 @@ version 0.01
 
     # Print results
 
-    print
-        "Results: 1 - ", $res->items_per_page,
-        " of ", $res->total_results, "\n\n";
-
-    for my $row (@{ $res->rows }) {
+    for my $row (@{ $res->{'rows'} }) {
         print
-            $row->get_source,  ": ",
-            $row->get_visits,  " visits, ",
-            $row->get_bounces, " bounces\n";
+            "Query: ", $row->{'keys'}->[0], "\n",
+            Position: ", $row->{'position'},  " | ",
+            Impressions: ", $row->{'impressions'},  " | ",
+            Clicks: ", $row->{'clicks'},  " | ",
+            CTR: ", $row->{'ctr'},  "\n---\n";
     }
-
-    print
-        "\nTotal: ",
-        $res->totals("visits"),  " visits, ",
-        $res->totals("bounces"), " bounces\n";
 
 =head1 DESCRIPTION
 
@@ -284,7 +233,7 @@ Net::Google::WebmasterTools - Simple interface to the Google Webmaster Tools (Se
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 GETTING STARTED
 

@@ -13,6 +13,10 @@ t/error.t
 t/tag.t
 t/vendor.t
 t/node_list.t
+t/local_dictionary.t
+t/check_pwd.t
+t/no_dictionary.t
+t/acct_reply.t
 raddb/dictionary
 raddb/dictionary.ascend
 raddb/dictionary.cisco

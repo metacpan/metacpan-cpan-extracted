@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Histogram2d::Transform;
 use Chart::Plotly::Trace::Histogram2d::Xbins;
 use Chart::Plotly::Trace::Histogram2d::Ybins;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` and `y` (where `x` and `y` represent marginal distributions, binning is set in `xbins` and `ybins` in this case) or `z` (where `z` represent the 2D distribution and binning set, binning is set by `x` and `y` in this case). The resulting distribution is visualized as a heatmap.
 
@@ -378,7 +378,7 @@ Chart::Plotly::Trace::Histogram2d - The sample data from which statistics are co
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

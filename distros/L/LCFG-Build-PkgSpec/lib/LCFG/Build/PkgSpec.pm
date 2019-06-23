@@ -5,10 +5,10 @@ use warnings;
 # $Id: PkgSpec.pm.in 35434 2019-01-18 10:43:38Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-PkgSpec/lib/LCFG/Build/PkgSpec.pm.in,v $
 # $Revision: 35434 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_6/lib/LCFG/Build/PkgSpec.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_7/lib/LCFG/Build/PkgSpec.pm.in $
 # $Date: 2019-01-18 10:43:38 +0000 (Fri, 18 Jan 2019) $
 
-our $VERSION = '0.2.6';
+our $VERSION = '0.2.7';
 
 use v5.10;
 
@@ -555,7 +555,7 @@ LCFG::Build::PkgSpec - Object-oriented interface to LCFG build metadata
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::PkgSpec version 0.2.6
+This documentation refers to LCFG::Build::PkgSpec version 0.2.7
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,10 @@
+0.150   2019-06-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update dep: Perinci::CmdLine::Lite=1.820.
+
+
 0.14    2017-07-22 (PERLANCAR)
 
         - [optimize] Reduce startup overhad by avoiding use of strict/warnings

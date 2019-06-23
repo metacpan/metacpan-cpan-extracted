@@ -14,36 +14,36 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 3dcdd9a79495b0c69bfea0a216399b7acd046412 CONTRIBUTORS
-SHA1 0ef8ef827012e0cadf84cc05338baa1df1c4ca53 Changes
+SHA1 bca03c3eb3add03ad1d4b1901220ab0623c25639 CONTRIBUTORS
+SHA1 82ceda18458545c75c7aa638a21bee4c171ee47f Changes
 SHA1 2ff8bb17436915f897b6e58d3ce2a28ee657035d INSTALL
 SHA1 40c10f40f9556b2f66a220d0e4909e7e715facf3 LICENSE
 SHA1 405a45ad39e65c0a5c39106e31b058b02037b471 MANIFEST
-SHA1 6ea6b34d91d8da4f354e9f05e8ce0ab8322e2660 META.json
-SHA1 6c3c968d12ed4c97d2bece8f818cda8390621aab META.yml
-SHA1 50a01c02eb6ad85b4c3b8c8ea6d5a41d19a50f94 Makefile.PL
+SHA1 d71b9b09a137cb923ff559eba1109cbe8769ac03 META.json
+SHA1 30363948eda4f8ad7fa122e541c44fc6e05ad767 META.yml
+SHA1 94fc30b766c219338a890c064afec1bd868b571d Makefile.PL
 SHA1 4bc38d34a6eeb51674f06e9d764d30d8f64c4e2d README.md
-SHA1 f681c0f4b1f53c4f8ada94db52a72d296e35b219 README.mkdn
+SHA1 f74fbc58b2f440dd8d41876f25e1e100d832926b README.mkdn
 SHA1 2d3898dac9016b489580c12678f4fa593a0e02bc cpanfile
-SHA1 163868b2337a8a09c5a914e80d46b4586a5c5cb6 doap.xml
+SHA1 93adffe3374d5a486563ccbbc850b2690e22f244 doap.xml
 SHA1 d05a4ade3faf1c75190c4415b67eba101d8d9f67 example/chaining-example.pl
 SHA1 49c446c6fbbaa13d3642dbed57c3fe32fe6f14f1 example/example.pl
 SHA1 3f822b32b37db136a3b2ed8ddbc24c6b7e976a18 example/mojo-promises.pl
-SHA1 b560a424e746c5fb6b1979f35b1a1950a7e84636 lib/Promises.pm
-SHA1 c8b8bab4889deeecf712242b4e1ba3010c9ee0d6 lib/Promises/Cookbook/ChainingAndPipelining.pod
-SHA1 9af2827cd45a3fdfe27dec3fc6895de03243f022 lib/Promises/Cookbook/GentleIntro.pod
-SHA1 a99a57d8866a5df993902a12a6dbd0a350e1542a lib/Promises/Cookbook/Recursion.pod
-SHA1 9ed862daa1d0f31e552e4511857c6d10a9fbeae9 lib/Promises/Cookbook/ScalaFuturesComparison.pod
-SHA1 88fa94cf5230dc7814084bd76454eb9750a1f198 lib/Promises/Cookbook/SynopsisBreakdown.pod
-SHA1 74aeae5a9ab05cbd3b43265e37677df974efd0e1 lib/Promises/Cookbook/TIMTOWTDI.pod
-SHA1 ce81bd639ae96c89d0d33c13cc2feca7d13d2b15 lib/Promises/Deferred.pm
-SHA1 4a9be0566a991298f129deeac30cf65787001830 lib/Promises/Deferred/AE.pm
-SHA1 f6c71867c1254fc9c3636a8dcfd065f80959e9d6 lib/Promises/Deferred/AnyEvent.pm
-SHA1 dbfce1bbb630843d154106f3c3c743631938899c lib/Promises/Deferred/EV.pm
-SHA1 17dcbb66d149e4fa88546da19ecebe83ad6ed790 lib/Promises/Deferred/IO/Async.pm
-SHA1 5aa4fa63200727372eefa18447b15d3fdd63ef4a lib/Promises/Deferred/Mojo.pm
-SHA1 23ee5aaa971ddc56f44807ff3d47fe10f77a3449 lib/Promises/Promise.pm
-SHA1 92f1f4aec40d5e3639b238cd6f464fffeae4a082 lib/Promises/Sub.pm
+SHA1 e2c2ae3ee3b34c8125b59ae9a1202890ce95677d lib/Promises.pm
+SHA1 c082c666eecd23c3167279b9d7bff7b0a35c84af lib/Promises/Cookbook/ChainingAndPipelining.pod
+SHA1 81d065c2734415d24819f97312da2f8b9d45ec81 lib/Promises/Cookbook/GentleIntro.pod
+SHA1 de59ad84f9695a52bd605ae4df7fe9caa3a61e1b lib/Promises/Cookbook/Recursion.pod
+SHA1 c5800f3eed512275170960187595b89b05cab273 lib/Promises/Cookbook/ScalaFuturesComparison.pod
+SHA1 3e63354c8206ae4feac06aec0da8978f1d2cb6c4 lib/Promises/Cookbook/SynopsisBreakdown.pod
+SHA1 67ab57364b9b77d10e1f4b23288031e3bf317c49 lib/Promises/Cookbook/TIMTOWTDI.pod
+SHA1 15070350382159b7890c30362739e9ce77c90c19 lib/Promises/Deferred.pm
+SHA1 2bd896a57e5983f707f45a07f3d02b935287137f lib/Promises/Deferred/AE.pm
+SHA1 fe8929f56394dfaa2a511fe2849d3f290a686aa9 lib/Promises/Deferred/AnyEvent.pm
+SHA1 730c34963b5c33bfdb2ed1625bb7d633028d69db lib/Promises/Deferred/EV.pm
+SHA1 1cd22cf0577fbfb3382e26e3810d26612fc012e8 lib/Promises/Deferred/IO/Async.pm
+SHA1 10e701080ce1e65b7621eb35b9ca69403d958b43 lib/Promises/Deferred/Mojo.pm
+SHA1 71831db490de810394eac6fc7defa52becf3262c lib/Promises/Promise.pm
+SHA1 a03c6b05a270dc158001eb878660f9e20ad888c4 lib/Promises/Sub.pm
 SHA1 3b3789073e4a5dc8542c7682b3ee9a77d0c530af t/00-compile.t
 SHA1 96dca84840db78375995ed51772d65f36eebd9c4 t/00-report-prereqs.dd
 SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
@@ -92,7 +92,7 @@ SHA1 5eca6aa3c8d2b892014c0ac432a5fc30f4f53bda t/warnings.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAl0E/YsACgkQ34Hwf+GwC4xkZACeKeRenL+crQUjcVL3+DJRJVy3
-3aoAnRBUpS06pvHan9rQxDSm9+Vcqta3
-=ccNE
+iEYEARECAAYFAl0OUAIACgkQ34Hwf+GwC4yjfgCfYYszpCeVnA+9ILfMVEUP3/yq
+j4EAn0SM8jQJHAH54OOuTppD7E4GjR+s
+=FatV
 -----END PGP SIGNATURE-----

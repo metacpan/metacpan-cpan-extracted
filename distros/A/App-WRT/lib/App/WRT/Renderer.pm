@@ -41,7 +41,7 @@ mangling of things on the filesystem.
 
 sub new {
   my $class = shift;
-  my ($wrt, $logger) = @_;
+  my ($wrt, $logger, $io) = @_;
 
   ref($logger) eq 'CODE' or
     croak("Error: Renderer expects an anonymous function for logging");
@@ -49,9 +49,7 @@ sub new {
   my %params = (
     wrt    => $wrt,
     logger => $logger,
-
-    # Overwrite this for testing purposes:
-    io => App::WRT::FileIO->new(),
+    io     => $io,
   );
 
   my $self = \%params;

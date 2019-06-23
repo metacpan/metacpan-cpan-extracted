@@ -156,7 +156,7 @@ sub main_start {
                 }
             }
             else {
-                printf STDERR "StatsHandler did not receive a hashref.\n";
+                print STDERR "StatsHandler did not receive a hashref.\n";
             }
         },
         StdoutHandler => sub {
@@ -218,7 +218,7 @@ eris-eris-client.pl - Simple wrapper to spawn workers for handling syslog stream
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

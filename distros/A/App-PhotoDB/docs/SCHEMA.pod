@@ -1,6 +1,6 @@
 =head1 PhotoDB schema documentation
 
-This documentation is generated automatically from the database schema itself with the C<./dump-schema.pl> script, using table and column comments embedded in the database
+This documentation is generated automatically from the database schema itself with the C<travis/dump-schema.pl> script, using table and column comments embedded in the database
 
 =head2 ACCESSORY
 
@@ -154,8 +154,6 @@ Table to catalog camera models - both cameras with fixed lenses and cameras with
     | battery_qty         | int(11)      | Quantity of batteries needed                                                 |
     | battery_type        | int(11)      | Denotes type of battery needed                                               |
     | notes               | text         | Freeform text field for extra notes                                          |
-    | min_shutter         | varchar(10)  | Fastest available shutter speed, expressed like 1/400                        |
-    | max_shutter         | varchar(10)  | Slowest available shutter speed, expressed like 30 (no ")                    |
     | bulb                | tinyint(1)   | Whether the camera supports bulb (B) exposure                                |
     | time                | tinyint(1)   | Whether the camera supports time (T) exposure                                |
     | min_iso             | int(11)      | Minimum ISO the camera will accept for metering                              |
@@ -664,6 +662,17 @@ Table to catalog negatives (which includes positives/slide too). Negatives are c
     | copy_of          | int(11)      | Negative ID of negative from which this negative is reproduced/duplicated/rephotographed |
     +------------------+--------------+------------------------------------------------------------------------------------------+
 
+=head2 NEGATIVEFORMAT_COMPAT
+
+Table to record compatibility between film formats and negative sizes
+
+    +------------------+-------------+-------------------------+
+    | COLUMN_NAME      | COLUMN_TYPE | COLUMN_COMMENT          |
+    +------------------+-------------+-------------------------+
+    | format_id        | int(11)     | ID of the film format   |
+    | negative_size_id | int(11)     | ID of the negative size |
+    +------------------+-------------+-------------------------+
+
 =head2 NEGATIVE_SIZE
 
 Table to catalog different negative sizes available. Negtives sizes are distinct from film formats.
@@ -804,6 +813,30 @@ Table to record all the images that have been scanned digitally
     | height      | int(11)      | Height of the scanned image in pixels |
     +-------------+--------------+---------------------------------------+
 
+=head2 SERIES
+
+Table to list all series of cameras and lenses
+
+    +-------------+-------------+---------------------------------------------+
+    | COLUMN_NAME | COLUMN_TYPE | COLUMN_COMMENT                              |
+    +-------------+-------------+---------------------------------------------+
+    | series_id   | int(11)     | Unique ID of this series                    |
+    | name        | varchar(45) | Name of this collection, e.g. Canon FD SLRs |
+    +-------------+-------------+---------------------------------------------+
+
+=head2 SERIES_MEMBER
+
+Table to record which cameras and lenses belong to which series
+
+    +------------------+-------------+-------------------------------------------------------------------+
+    | COLUMN_NAME      | COLUMN_TYPE | COLUMN_COMMENT                                                    |
+    +------------------+-------------+-------------------------------------------------------------------+
+    | series_member_id | int(11)     | Unique ID of this series membership                               |
+    | series_id        | int(11)     | ID of the series to which this camera model or lens model belongs |
+    | cameramodel_id   | int(11)     | ID of the camera model                                            |
+    | lensmodel_id     | int(11)     | ID of the lens model                                              |
+    +------------------+-------------+-------------------------------------------------------------------+
+
 =head2 SHUTTER_SPEED
 
 Table to list all possible shutter speeds
@@ -819,12 +852,13 @@ Table to list all possible shutter speeds
 
 Table to associate cameras with shutter speeds
 
-    +----------------+-------------+------------------------------------+
-    | COLUMN_NAME    | COLUMN_TYPE | COLUMN_COMMENT                     |
-    +----------------+-------------+------------------------------------+
-    | cameramodel_id | int(11)     | ID of the camera model             |
-    | shutter_speed  | varchar(10) | Shutter speed that this camera has |
-    +----------------+-------------+------------------------------------+
+    +----------------+-------------+-----------------------------------------------------------------------------------------+
+    | COLUMN_NAME    | COLUMN_TYPE | COLUMN_COMMENT                                                                          |
+    +----------------+-------------+-----------------------------------------------------------------------------------------+
+    | cameramodel_id | int(11)     | ID of the camera model                                                                  |
+    | shutter_speed  | varchar(10) | Shutter speed that this camera has                                                      |
+    | bulb           | int(1)      | Whether this is a manual "bulb" shutter speed that can only be accessed in B or T modes |
+    +----------------+-------------+-----------------------------------------------------------------------------------------+
 
 =head2 SHUTTER_TYPE
 
@@ -887,11 +921,9 @@ Table to catalogue negatives that should be printed
 
 =head2 schema_migrations
 
-Table to record schema migrations
-
-    +--------------+--------------+-------------------------------+
-    | COLUMN_NAME  | COLUMN_TYPE  | COLUMN_COMMENT                |
-    +--------------+--------------+-------------------------------+
-    | name         | varchar(255) | Filename of applied migration |
-    | date_applied | datetime     | Date migration was applied    |
-    +--------------+--------------+-------------------------------+
+    +--------------+--------------+----------------+
+    | COLUMN_NAME  | COLUMN_TYPE  | COLUMN_COMMENT |
+    +--------------+--------------+----------------+
+    | name         | varchar(255) |                |
+    | date_applied | datetime     |                |
+    +--------------+--------------+----------------+

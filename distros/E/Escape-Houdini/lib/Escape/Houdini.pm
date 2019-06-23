@@ -1,16 +1,16 @@
 package Escape::Houdini;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Perl API to Houdini, a zero-dependency C web escaping library
-$Escape::Houdini::VERSION = '0.3.0';
+$Escape::Houdini::VERSION = '0.3.1';
 use strict;
 use warnings;
 
 use parent qw/ DynaLoader Exporter /;
 
 our %EXPORT_TAGS = (
-    all => [ qw/ escape_html unescape_html escape_xml 
+    all => [ qw/ escape_html unescape_html escape_xml
         escape_uri escape_url escape_href
-        unescape_uri unescape_url 
+        unescape_uri unescape_url
         escape_js unescape_js
         / ],
     html => [ qw/ escape_html unescape_html /],
@@ -37,7 +37,7 @@ Escape::Houdini - Perl API to Houdini, a zero-dependency C web escaping library
 
 =head1 VERSION
 
-version 0.3.0
+version 0.3.1
 
 =head1 SYNOPSIS
 
@@ -49,9 +49,9 @@ version 0.3.0
 =head1 DESCRIPTION
 
 I<Escape::Houdini> is a wrapper around the zero-depedency, minimalistic
-web escaping C library Houdini.
+web escaping C library L<Houdini|https://github.com/vmg/houdini>.
 
-This version of I<Escape::Houdini> has been built against 
+This version of I<Escape::Houdini> has been built against
 the commit
 L<https://github.com/vmg/houdini/commit/3e2a78a2399bf3f58253c435278df6daf0e41740>
 of Houdini.
@@ -60,51 +60,50 @@ of Houdini.
 
 =head2 escape_html( $text )
 
-See L<https://github.com/vmg/houdini>
+    escape_html( '<body class="foo">' ); # => '&lt;body class=&quot;foo&quot;&gt;'
 
 =head2 unescape_html( $text )
 
-See L<https://github.com/vmg/houdini>
+    unescape_html( "&lt;body&gt;" ); # => '<body>'
 
 =head2 escape_xml( $text )
 
-See L<https://github.com/vmg/houdini>
+    escape_xml( "<foo>" ); # => '&lt;foo&gt;'
 
 =head2 escape_uri( $text )
 
-See L<https://github.com/vmg/houdini>
-
 =head2 unescape_uri( $text )
-
-See L<https://github.com/vmg/houdini>
 
 =head2 escape_url( $text )
 
-See L<https://github.com/vmg/houdini>
+    escape_url("http://foo.com/meh"); # => 'http%3A%2F%2Ffoo.com%2Fmeh'
 
 =head2 unescape_url( $text )
 
-See L<https://github.com/vmg/houdini>
+    unescape_url('http%3A%2F%2Ffoo.com%2Fmeh'); # => "http://foo.com/meh"
 
 =head2 escape_href( $text )
 
-See L<https://github.com/vmg/houdini>
-
 =head2 escape_js( $text )
 
-See L<https://github.com/vmg/houdini>
+    escape_js( "foo\nbar" ); # => 'foo\nbar'
 
 =head2 unescape_js( $text )
 
-See L<https://github.com/vmg/houdini>
+    escape_js( 'foo\nbar' ); # => "foo\nbar"
 
 =head1 EXPORTS
 
-I<Escape::Houdini> doesn't export any function by default. Functions can be  
-exported individually, or via the tags I<:html> (for I<escape_html> and
-I<unescape_html>), I<:uri> (for I<escape_uri> and I<unescape_uri>),
-I<:url> (for I<escape_url> and I<unescape_url>), I<:js> (for I<escape_js>
-and I<unescape_js>) and I<:all> (for... well, all of them).
+I<Escape::Houdini> doesn't export any function by default. Functions can be
+exported individually, or via the following tags:
+
+    | tag   | exported functions         |
+    |-------|----------------------------|
+    | :all  | all o' them                |
+    | :html | escape_html, unescape_html |
+    | :uri  | escape_uri, unescape_uri   |
+    | :url  | escape_url, unescape_url   |
+    | :js   | escape_js, unescape_js     |
 
 =head1 SEE ALSO
 
@@ -116,7 +115,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2019, 2017, 2014, 2013 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

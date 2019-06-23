@@ -1,5 +1,10 @@
 Revision history for Perl extension Radius.
 
+0.31 Fri Jun 21 16:10:42 2019
+    - Fixed check_pwd() method when dictionaries are not loaded and attribute ID is used instead of Name
+      (reported by Christopher Florio).
+      Issue added in 0.28 version.
+
 0.30 Mon Jun 10 17:21:42 2019
     - Fixed warning when NodeList parameter used without Host
 

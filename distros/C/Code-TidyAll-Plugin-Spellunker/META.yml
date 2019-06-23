@@ -1,0 +1,45 @@
+---
+abstract: 'Code::TydyAll plugin for Spellunker'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::Base: '0'
+  Test::MockObject: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-Spellunker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Code::TidyAll::Plugin::Spellunker:
+    file: lib/Code/TidyAll/Plugin/Spellunker.pm
+    version: '0.01'
+  Code::TidyAll::Plugin::Spellunker::Pod:
+    file: lib/Code/TidyAll/Plugin/Spellunker/Pod.pm
+requires:
+  Code::TidyAll: '0'
+  Moo: '0'
+  Spellunker: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/Code-TidyAll-Plugin-Spellunker/issues
+  homepage: https://github.com/karupanerura/Code-TidyAll-Plugin-Spellunker
+  repository: git://github.com/karupanerura/Code-TidyAll-Plugin-Spellunker.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

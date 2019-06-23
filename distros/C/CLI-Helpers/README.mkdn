@@ -4,7 +4,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 # VERSION
 
-version 1.3
+version 1.4
 
 # SYNOPSIS
 
@@ -72,12 +72,12 @@ Colors would be automatically enabled based on the user's ~/.gitconfig
 
 # OVERVIEW
 
-This module provides a libray of useful functions for constructing simple command
+This module provides a library of useful functions for constructing simple command
 line interfaces.  It is able to extract information from the environment and your
 ~/.gitconfig to display data in a reasonable manner.
 
 Using this module adds argument parsing using [Getopt::Long](https://metacpan.org/pod/Getopt::Long) to your script.  It
-enables passthrough, so you can still use your own argument parsing routines or
+enables pass-through, so you can still use your own argument parsing routines or
 Getopt::Long in your script.
 
 # FUNCTIONS
@@ -104,7 +104,7 @@ messages to be output.
 ## verbose( \\%opts, @messages )
 
 Exported.  Takes an optional hash reference of formatting options.  Automatically
-overrides the **level** paramter to 1 if it's not set.
+overrides the **level** parameter to 1 if it's not set.
 
 ## debug( \\%opts, @messages )
 
@@ -132,7 +132,7 @@ Returns 1 for 'yes' and 0 for 'no'
 
 Exported.  Provides a prompt to the user for input.  If validate is passed, it should be a hash reference
 containing keys of error messages and values which are subroutines to validate the input available as $\_.
-If a validator fails, it's error message will be displayed, and the user will be reprompted.
+If a validator fails, it's error message will be displayed, and the user will be re-prompted.
 
 Valid options are:
 
@@ -166,7 +166,7 @@ Exported.  Synonym for text\_input("Password: ", noecho => 1);  Also requires th
 
 ## prompt("Prompt", options )
 
-Exported.  Wrapper function with rudimentary mimickery of IO::Prompt(er).
+Exported.  Wrapper function with rudimentary mimicry of IO::Prompt(er).
 Uses:
 
     # Mapping back to confirm();
@@ -203,7 +203,7 @@ This module uses [Sub::Exporter](https://metacpan.org/pod/Sub::Exporter) for fle
     text_input ( "Question", validate => { "error message" => sub { length $_[0] } } )
     confirm    ( "Question" )
 
-    prompt()    Wrapper which mimicks IO::Prompt a bit
+    prompt()    Wrapper which mimics IO::Prompt a bit
     pwprompt()  Wrapper to get sensitive data
 
 # ARGS
@@ -211,6 +211,7 @@ This module uses [Sub::Exporter](https://metacpan.org/pod/Sub::Exporter) for fle
 From CLI::Helpers:
 
     --data-file         Path to a file to write lines tagged with 'data => 1'
+    --tags              A comma separated list of tags to display
     --color             Boolean, enable/disable color, default use git settings
     --verbose           Incremental, increase verbosity (Alias is -v)
     --debug             Show developer output
@@ -220,11 +221,54 @@ From CLI::Helpers:
     --syslog-facility   Default "local0"
     --syslog-tag        The program name, default is the script name
     --syslog-debug      Enable debug messages to syslog if in use, default false
+    --nopaste           Use App::Nopaste to paste output to configured paste service
+    --nopaste-service   Named App::Nopaste service to target, defaults to Shadowcat
+
+# NOPASTE
+
+This is optional and will only work if you have [App::Nopaste](https://metacpan.org/pod/App::Nopaste) installed.  If
+you just specify `--nopaste`, any output that would be displayed to the screen
+is submitted to the [App::Nopaste::Service::Shadowcat](https://metacpan.org/pod/App::Nopaste::Service::Shadowcat) paste bin.  This
+paste service is pretty simple, but works reliably.
+
+During the `END` block, the output is submitted and the URL of the paste is
+returned to the user.
 
 # OUTPUT OPTIONS
 
 Every output function takes an optional HASH reference containing options for
 that output.  The hash may contain the following options:
+
+- **tag**
+
+    Add a keyword to tag output with.  The user may then specify `--tags
+    keyword1,keyword2` to only view output at the appropriate level.  This option
+    will affect `data-file` and `syslog` output.  The output filter requires both
+    the presence of the `tag` in the output options **and** the user to specify
+    `--tags` on the command line.
+
+    Consider a script, `status.pl`:
+
+        output("System Status: Normal")
+        output({tag=>'foo'}, "Component Foo: OK");
+        output({tag=>'bar'}, "Component Bar: OK");
+
+    If an operator runs:
+
+        $ status.pl
+        System Status: Normal
+        Component Foo: OK
+        Component Bar: OK
+
+        $ status.pl --tags bar
+        System Status: Normal
+        Component Bar: OK
+
+        $ status.pl --tags foo
+        System Status: Normal
+        Component Foo: OK
+
+    This could be helpful for selecting one or more pertinent tags to display.
 
 - **sticky**
 
@@ -233,7 +277,7 @@ that output.  The hash may contain the following options:
 
 - **color**
 
-    String. Using Term::ANSIColor for output, use the color designated, ie:
+    String. Using Term::ANSIColor for output, use the color designated, i.e.:
 
         red,blue,green,yellow,cyan,magenta,white,black, etc..
 
@@ -254,7 +298,7 @@ that output.  The hash may contain the following options:
 
 - **IMPORTANT**
 
-    Bool. Even if --quiet is specified, output this message.  Use sparringly, and yes,
+    Bool. Even if --quiet is specified, output this message.  Use sparingly, and yes,
     it is case sensitive.  You need to yell at it for it to yell at your users.
 
 - **stderr**
@@ -273,7 +317,7 @@ that output.  The hash may contain the following options:
 
 - **kv**
 
-    Bool.  The array of messsages is actually a key/value pair, this implements special coloring and
+    Bool.  The array of messages is actually a key/value pair, this implements special coloring and
     expects the number of messages to be even.
 
         output(qw(a 1 b 2));
@@ -301,7 +345,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Brad Lhotsky.
+This software is Copyright (c) 2019 by Brad Lhotsky.
 
 This is free software, licensed under:
 
@@ -324,7 +368,7 @@ in addition to those websites please use your favorite search engine to discover
 
     A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-    [http://metacpan.org/release/CLI-Helpers](http://metacpan.org/release/CLI-Helpers)
+    [https://metacpan.org/release/CLI-Helpers](https://metacpan.org/release/CLI-Helpers)
 
 - RT: CPAN's Bug Tracker
 

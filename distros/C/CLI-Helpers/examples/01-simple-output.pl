@@ -1,4 +1,6 @@
-#!/usr/bin/env perl
+#!perl
+use strict;
+use warnings;
 use CLI::Helpers qw(:output);
 
 output({color=>'green'}, "[normal] Hello, World!");

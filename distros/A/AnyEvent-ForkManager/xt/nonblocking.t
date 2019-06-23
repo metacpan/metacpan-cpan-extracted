@@ -2,6 +2,7 @@
 use strict;
 use Test::More;
 use Test::SharedFork;
+use Test::SharedObject;
 
 use AnyEvent;
 use AnyEvent::ForkManager;
@@ -17,7 +18,7 @@ my $TEST_COUNT  =
     ($JOB_COUNT > $MAX_WORKERS ? (($JOB_COUNT - $MAX_WORKERS) * 2) : 0) + # on_enqueue
     ($JOB_COUNT > $MAX_WORKERS ? (($JOB_COUNT - $MAX_WORKERS) * 2) : 0) + # on_dequeue
     ($JOB_COUNT > $MAX_WORKERS ? (($JOB_COUNT - $MAX_WORKERS) * 2) : 0) + # on_working_max
-    4;# wait_all_children
+    5;# wait_all_children
 plan tests => $TEST_COUNT;
 
 my $pm = AnyEvent::ForkManager->new(
@@ -67,6 +68,8 @@ my $pm = AnyEvent::ForkManager->new(
 
 my $cv = AnyEvent->condvar;
 
+my $ready = Test::SharedObject->new(0);
+
 my @all_data = (1 .. $JOB_COUNT);
 my $started_all_process = 0;
 foreach my $exit_code (@all_data) {
@@ -77,8 +80,9 @@ foreach my $exit_code (@all_data) {
             my($pm, $exit_code) = @_;
             Time::HiRes::sleep(0.5);
             isnt $$, $pm->manager_pid, 'called by child';
-            local $SIG{USR1} = sub { $started_all_process = 1; };
-            until ($started_all_process) {}; # wait
+
+            Time::HiRes::usleep(100) until $ready->get();
+
             $pm->finish($exit_code);
             fail 'finish failed';
         },
@@ -87,9 +91,9 @@ foreach my $exit_code (@all_data) {
     my $end_time = Time::HiRes::gettimeofday;
     cmp_ok $end_time - $start_time, '<', 0.3, 'non-blocking';
 }
-$started_all_process = 1;
-$pm->signal_all_children('USR1');
+$ready->set(1);
 
+my $callback_called;
 my $start_time = Time::HiRes::gettimeofday;
 $pm->wait_all_children(
     cb => sub {
@@ -99,6 +103,7 @@ $pm->wait_all_children(
         is $pm->num_workers, 0, 'finished all child process';
         is $pm->num_queues,  0, 'empty all child process queue';
         note 'end   wait_all_children callback';
+        $callback_called++;
         $cv->send;
     },
 );
@@ -106,3 +111,4 @@ my $end_time = Time::HiRes::gettimeofday;
 cmp_ok $end_time - $start_time, '<', 0.1, 'non-blocking';
 
 $cv->recv;
+is $callback_called, 1, 'wait_all_children callback is called at once';

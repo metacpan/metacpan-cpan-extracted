@@ -4,7 +4,7 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 use Net::Prometheus;
 use IPC::ShareLite;
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.2.2';
 
 has prometheus => sub { Net::Prometheus->new(disable_process_collector => 1) };
 has route => sub {undef};
@@ -152,8 +152,8 @@ sub _start {
 
   Mojo::IOLoop->next_tick(
     sub {
-      $self->prometheus->register(
-        Net::Prometheus::ProcessCollector->new(labels => [worker => $$]));
+      my $pc = Net::Prometheus::ProcessCollector->new(labels => [worker => $$]);
+      $self->prometheus->register($pc) if $pc;
       $self->_guard->_store({$$ => $self->prometheus->render});
     }
   );

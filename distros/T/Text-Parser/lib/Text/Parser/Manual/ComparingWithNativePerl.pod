@@ -15,7 +15,7 @@ Text::Parser::Manual::ComparingWithNativePerl - A comparison of text parsing wit
 
 =head1 VERSION
 
-version 0.925
+version 0.926
 
 =head1 LIMITATIONS OF THE PERL ONE-LINER
 
@@ -23,9 +23,9 @@ When people compare Perl against AWK, the usual answer is this:
 
     $ > perl -lane 'print;' file.txt
 
-But the problem is that it isn't useful for anything more than just oneliners. Secondly, this cannot be used in a complex program. And even if you could write some one-liner code, you cannot follow good programming practices line C<use strict>.
+But the problem is that it isn't useful for anything more than just oneliners. Secondly, this cannot be used in a complex program. And even if you could write some one-liner code, you cannot follow good programming practices like C<use strict>.
 
-So I will show that the Perl one-liner is surely not a useful solution for serious programs.
+The Perl one-liner is surely not a useful solution for serious programs. But if you're not convinced, we'll go through some examples here.
 
 =head1 A SIMPLE EXAMPLE
 
@@ -58,7 +58,8 @@ Could we do this using a Perl one-liner?
         @data = ();\
         }\
         if($F[0] eq "NAME:") {\
-            push @data, {name => $F[1]};\
+            shift @F;\
+            push @data, {name => join(' ', @F)};\
         } elsif($F[0] eq "EMAIL:") {\
             $d = pop @data; $d->{email} = $F[1];\
         } elsif($F[0] eq "ADDRESS:") {\
@@ -83,6 +84,9 @@ Here's an implementation in native Perl scipt:
             push @data, { name => join(' ', @field) };
         } elsif($field[0] eq 'EMAIL:') {
             $data[-1]->{email} = $field[1];
+        } elsif($field[0] eq 'ADDRESS:') {
+            shift @field;
+            $data[-1]->{email} = join ' ', @field;
         }
     }
     close IN;
@@ -97,6 +101,8 @@ Here's how you'd write the same thing with L<Text::Parser>.
     $parser->add_rule( if => '$1 eq "NAME:"', do => 'return { name => ${2+} }' );
     $parser->add_rule( if => '$1 eq "EMAIL:"',
         do => 'my $rec = $this->pop_record; $rec->{email} = $2; return $rec' );
+    $parser->add_rule( if => '$1 eq "ADDRESS:"',
+        do => 'my $rec = $this->pop_record; $rec->{email} = ${2+}; return $rec' );
     $parser->read('info.txt');
 
 =head2 Quick observations
@@ -282,6 +288,8 @@ You want to parse this into a data structure like this:
         }, 
     }
 
+This problem comes from L<a source|https://stackoverflow.com/questions/47982949/how-to-parse-complex-text-files-using-python/47984221> where the solution was implemented in Python using a PEG parser.
+
 =head2 Native Perl
 
 Do I have to really do this? Why don't I let you try this yourself.
@@ -309,7 +317,7 @@ Do I have to really do this? Why don't I let you try this yourself.
 
 That's it!
 
-By now, you should have concluded that it is pointless trying to write native Perl to parse text input.
+By now, you I<should> have concluded that the L<Text::Parser> way is much better. If not, you must know a better solution and perhaps you should make a Perl module (or feel free to contact me and contribute if you like this project).
 
 L<Table of contents|Text::Parser::Manual> | L<Next|Text::Parser::Manual::ExtendedAWKSyntax>
 

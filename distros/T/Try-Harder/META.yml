@@ -1,0 +1,20 @@
+---
+abstract: 'Try hard to get the functionality of Syntax::Keyword::Try'
+author:
+  - 'Steve Scaffidi <sscaffidi@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Try-Harder
+resources:
+  bugtracker: https://github.com/hercynium/Acme-Try-Harder/issues
+  repository: git://github.com/hercynium/Acme-Try-Harder.git
+version: '0.002'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

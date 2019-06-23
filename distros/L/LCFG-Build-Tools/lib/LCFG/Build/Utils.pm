@@ -5,10 +5,10 @@ use warnings;
 # $Id: Utils.pm.in 35408 2019-01-17 16:05:10Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Utils.pm.in,v $
 # $Revision: 35408 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Utils.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/lib/LCFG/Build/Utils.pm.in $
 # $Date: 2019-01-17 16:05:10 +0000 (Thu, 17 Jan 2019) $
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use v5.10;
 
@@ -408,7 +408,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Utils version 0.9.20
+    This documentation refers to LCFG::Build::Utils version 0.9.30
 
 =head1 SYNOPSIS
 

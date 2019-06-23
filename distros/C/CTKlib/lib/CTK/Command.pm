@@ -1,4 +1,4 @@
-package CTK::Command; # $Id: Command.pm 266 2019-05-18 07:59:05Z minus $
+package CTK::Command; # $Id: Command.pm 267 2019-05-21 08:23:33Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Command - Utilities to extend common UNIX commands
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw($VERSION @EXPORT);
-$VERSION = 1.02;
+$VERSION = 1.03;
 
 use base qw /Exporter/;
 @EXPORT = qw(
@@ -211,6 +211,7 @@ sub crlf {
     _expand_wildcards();
     find({ wanted => sub {
         return if -d;
+        return if -z _;
         return unless -w _;
         return unless -r _;
         return unless -T _;

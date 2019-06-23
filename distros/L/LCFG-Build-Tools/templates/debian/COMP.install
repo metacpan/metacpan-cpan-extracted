@@ -1,0 +1,8 @@
+usr/share/lcfg/components/
+usr/share/lcfg/conf/
+usr/share/lcfg/defaults/client/
+[% IF looks_like_perl_lib -%]
+usr/share/perl5/LCFG/Component
+[% END -%]
+var/lib/lcfg/conf/
+

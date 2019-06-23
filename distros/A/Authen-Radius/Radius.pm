@@ -39,7 +39,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.30';
+$VERSION = '0.31';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0
@@ -188,6 +188,9 @@ sub new {
 
 sub send_packet {
     my ($self, $type, $retransmit) = @_;
+
+    $self->{attributes} //= '';
+
     my $data;
     my $length = 20 + length($self->{attributes});
 
@@ -558,7 +561,7 @@ sub _decode_value {
 sub get_attributes {
     my $self = shift;
     my ( $vendor, $vendor_id, $name, $id, $length, $value, $type, $rawvalue, $tag, @a );
-    my ($attrs) = $self->{attributes};
+    my $attrs = $self->{attributes} // '';
 
     $self->set_error;
 
@@ -602,12 +605,13 @@ sub vendorID ($) {
     my ($attr) = @_;
     if (defined $attr->{'Vendor'}) {
         return ($dict_vendor_name{ $attr->{'Vendor'} }{'id'} // int($attr->{'Vendor'}));
-    } else {
+    } elsif (exists $dict_name{$attr->{'Name'}} ) {
         # look up vendor by attribute name
         my $vendor_name = $dict_name{$attr->{'Name'}}{'vendor'} or return NO_VENDOR;
         my $vendor_id = $dict_vendor_name{$vendor_name}{'id'} or return NO_VENDOR;
         return $vendor_id;
     }
+    return NO_VENDOR;
 }
 
 sub _encode_enum {
@@ -851,7 +855,7 @@ sub _encode_value {
 
 sub add_attributes {
     my ($self, @attr) = @_;
-    my ($a, $vendor, $id, $type, $value);
+    my ($a, $vendor, $id, $type, $value, $need_tag);
     my @a = ();
     $self->set_error;
 
@@ -866,7 +870,11 @@ sub add_attributes {
             $attr_name = $1;
         }
 
-        die 'unknown attr name '.$attr_name if (! exists $dict_name{$attr_name});
+        if (! exists $dict_name{$attr_name}) {
+            # no dictionaries loaded, $attr_name must be attribute ID
+            push @a, $attr;
+            next;
+        }
 
         $id = $dict_name{$attr_name}{id} // int($attr_name);
         $vendor = vendorID($attr);
@@ -896,10 +904,21 @@ sub add_attributes {
     }
 
     for $a (@a) {
-        $id = $dict_name{ $a->{Name} }{id} // int($a->{Name});
-        $type = $a->{Type} // $dict_name{ $a->{Name} }{type};
-        $vendor = vendorID($a);
-        my $need_tag = (defined $a->{Tag}) || $dict_name{ $a->{Name} }{has_tag};
+        if (exists $dict_name{ $a->{Name} }) {
+            my $def = $dict_name{ $a->{Name} };
+            $id = $def->{id};
+            # allow to override Type (why?)
+            $type = $a->{Type} // $def->{type};
+            $need_tag = $a->{Tag} // $def->{has_tag};
+        }
+        else {
+            # ID must be a value for Name
+            $id = int($a->{Name});
+            $type = $a->{Type};
+            $need_tag = $a->{Tag};
+        }
+
+        # we do not support 0 value for Tag
         if ($need_tag) {
             $a->{Tag} //= 0;
             if ($a->{Tag} < 1 || $a->{Tag} > 31) {
@@ -908,12 +927,15 @@ sub add_attributes {
             }
         }
 
+        $vendor = vendorID($a);
         if ($vendor eq WIMAX_VENDOR) {
-            # WiMAX uses non-standard VSAs - include the continuation byte
+            #TODO WiMAX uses non-standard VSAs - include the continuation byte
         }
 
         unless (defined($value = $self->_encode_value($vendor, $id, $type, $a->{Name}, $a->{Value}, $a->{Tag}))) {
-            print STDERR "Unable to encode attribute $a->{Name} ($id, $type, $vendor) with value '$a->{Value}'\n" if $debug;
+            printf STDERR "Unable to encode attribute %s (%s, %s, %s) with value '%s'\n",
+                $a->{Name}, $id // '?', $type // '?', $vendor, $a->{Value}
+            if $debug;
             next;
         }
 
@@ -1341,7 +1363,9 @@ was loaded). Values for C<TYPE> can be 'C<string>', 'C<integer>', 'C<ipaddr>',
 'C<ipv6addr>', 'C<ipv6prefix>', 'C<ifid>' or 'C<avpair>'. The C<VENDOR> may be
 Vendor's name from the dictionary or their integer id. For tagged attributes
 (RFC2868) tag can be specified in C<Name> using 'Name:Tag' format, or by
-using C<Tag> pair. TAG value is expected to be an integer.
+using C<Tag> pair. TAG value is expected to be an integer, within [1:31] range
+(zero value isn't supported).
+
 
 =item get_attributes
 

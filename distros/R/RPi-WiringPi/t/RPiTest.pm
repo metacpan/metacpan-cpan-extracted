@@ -6,24 +6,52 @@ use strict;
 use Exporter;
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = qw(check_pin_status);
+our @EXPORT_OK = qw(check_pin_status oled_available oled_unavailable);
 
 use Test::More;
 use WiringPi::API qw(:perl);
 
+my $oled_lock = '/tmp/oled_unavailable.rpi-wiringpi';
+
+sub oled_available {
+    my ($available) = @_;
+
+    if ($available) {
+        if (-e $oled_lock) {
+            unlink $oled_lock or die $!;
+        }
+    }
+
+    return -e $oled_lock ? 0 : 1;
+}
+sub oled_unavailable {
+    open my $wfh, '>', $oled_lock or die $!;
+    close $wfh;
+
+    return -e $oled_lock ? 1 : 0;
+}
 sub check_pin_status {
-#    ok 1==1;
-#    return;
+
     setup_gpio();
 
-    # removed pins 4, 5, 6, 17, 22, 27 because of LCD
+    # pins 4, 5, 6, 17, 22, 27 removed because of LCD
 
-    my @gpio_pins = qw(
-        2 3 14 15 18 23 24 10 9 25 11 8 7 0 1 13 19 16 20 21
-    );
+    my $oled_locked = -e '/tmp/oled_in_use';
 
-    my $conf;
+    note "I2C locked due to external OLED software running; skipping pins 2 and 3";
 
+    my @gpio_pins;
+
+    if ($oled_locked) {
+        @gpio_pins = qw(
+            14 15 18 23 24 10 9 25 11 8 7 0 1 13 19 16 20 21
+        );
+    }
+    else {
+        @gpio_pins = qw(
+            2 3 14 15 18 23 24 10 9 25 11 8 7 0 1 13 19 16 20 21
+        );
+    }
     my $config = default_pin_config();
 
     for (@gpio_pins){
@@ -72,8 +100,8 @@ sub default_pin_config {
                 'state' => 0
               },
       '13' => {
-                'state' => 0,
-                'alt' => 0
+                'state' => 0, # state: HIGH:   due to the dpot test (t/50)
+                'alt' => 0    # mode:  OUTPUT: due to the dpot test (t/50)
               },
       '1' => {
                'state' => 1,

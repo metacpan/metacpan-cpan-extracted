@@ -1,7 +1,6 @@
 use Test2::V0;
 
 use Devel::Optic;
-use Devel::Size qw(total_size);
 
 subtest 'initialization' => sub {
     for my $bogus_uplevel ('blorg', 0, -3) {
@@ -13,83 +12,81 @@ subtest 'initialization' => sub {
     }
 };
 
-subtest 'avoid summarizing empty structures by default' => sub {
+subtest 'summarize empty structures' => sub {
     my $o = Devel::Optic->new();
     my $undef = undef;
-    is($o->fit_to_view($undef), $undef, 'undef');
+    is($o->fit_to_view($undef), "(undef)", 'undef');
     my $string = "";
-    is($o->fit_to_view($string), $string, 'empty string');
+    is($o->fit_to_view($string), '"" (len 0)', 'empty string');
     my $num = 0;
-    is($o->fit_to_view($num), $num, 'empty number');
+    is($o->fit_to_view($num), "$num (len 1)", 'empty number');
     my $empty_arrayref = [];
-    is($o->fit_to_view($empty_arrayref), $empty_arrayref, 'empty arrayref');
+    is($o->fit_to_view($empty_arrayref), "ARRAY: [] (len 0)", 'empty arrayref');
     my $empty_hashref = {};
-    is($o->fit_to_view($empty_hashref), $empty_hashref, 'empty hashref');
+    is($o->fit_to_view($empty_hashref), "HASH: {} (0 keys)", 'empty hashref');
 };
 
-subtest 'avoid summarizing small structures by default' => sub {
+subtest 'summarize small structures' => sub {
     my $o = Devel::Optic->new();
     my $string = "blorg";
-    is($o->fit_to_view($string), $string, 'simple small string');
-    my $num = 12234567;
-    is($o->fit_to_view($num), $num, 'simple small number');
-    my $arrayref = [qw(a b c d e f g)];
-    is($o->fit_to_view($arrayref), $arrayref, 'small arrayref');
+    is($o->fit_to_view($string), "$string (len 5)", 'simple small string');
+    my $num = 1223;
+    is($o->fit_to_view($num), "$num (len 4)", 'simple small number');
+    my $arrayref = [qw(a b c d)];
+    is($o->fit_to_view($arrayref), "ARRAY: [a, b, c, d] (len 4)", 'small arrayref');
     my $hashref = {a => 1, b => 2, c => 3};
-    is($o->fit_to_view($hashref), $hashref, 'small hashref');
+    like($o->fit_to_view($hashref), qr|HASH: \{\w => \d, \w => \d, \w => \d\} \(3 keys\)|, 'small hashref');
 };
 
-subtest 'summarize subjectively big structures by default' => sub {
+subtest 'summarize subjectively big structures' => sub {
     my $o = Devel::Optic->new();
-    my $string = "a" x Devel::Optic::DEFAULT_MAX_SIZE_BYTES;
+    my $string = "a" x 500;
     my $scalar_limit = Devel::Optic::DEFAULT_SCALAR_TRUNCATION_SIZE;
     like(
         $o->fit_to_view($string),
-        qr|a* \(truncated to len $scalar_limit; len \d+ / \d+ bytes in full\)$|,
+        qr|a* \(truncated to len $scalar_limit; len \d+\)$|,
         'long string gets truncated message'
     );
 
-    my $ref_limit = Devel::Optic::DEFAULT_MAX_SIZE_BYTES;
     my $arrayref_with_simple_scalar_members = [('a') x 100];
     my $arrayref_simple_len = scalar @$arrayref_with_simple_scalar_members;
     like(
         $o->fit_to_view($arrayref_with_simple_scalar_members),
-        qr|ARRAY: \[a, a, a, a \.\.\.\] \(len $arrayref_simple_len / \d+ bytes\)$|,
+        qr|ARRAY: \[a, a, a, a \.\.\.\] \(len $arrayref_simple_len\)$|,
         'big arrayref with simple string scalar members gets summarized',
-        { total_size => total_size($arrayref_with_simple_scalar_members), len => $arrayref_simple_len, limit => $ref_limit }
+        { len => $arrayref_simple_len }
     );
 
     my $arrayref_with_ref_members = [(['a'], { a => 1 }) x 100];
     my $arrayref_ref_len = scalar @$arrayref_with_ref_members;
     like(
         $o->fit_to_view($arrayref_with_ref_members),
-        qr|ARRAY: \[ARRAY, HASH, ARRAY, HASH \.\.\.\] \(len $arrayref_ref_len / \d+ bytes\)$|,
+        qr|ARRAY: \[ARRAY, HASH, ARRAY, HASH \.\.\.\] \(len $arrayref_ref_len\)$|,
         'big arrayref with mixed ref members gets summarized',
-        { total_size => total_size($arrayref_with_ref_members), len => $arrayref_ref_len, limit => $ref_limit }
+        { len => $arrayref_ref_len }
     );
 
     my $hashref_with_simple_scalar_values = { map { $_ => 'a' } (1 .. 100) };
     my $hashref_simple_values_keys = scalar keys %$hashref_with_simple_scalar_values;
     like(
         $o->fit_to_view($hashref_with_simple_scalar_values),
-        qr|HASH: \{\d+ => a, \d+ => a, \d+ => a, \d+ => a \.\.\.\} \($hashref_simple_values_keys keys / \d+ bytes\)$|,
+        qr|HASH: \{\d+ => a, \d+ => a, \d+ => a, \d+ => a \.\.\.\} \($hashref_simple_values_keys keys\)$|,
         'big hashref with simple string scalar values gets summarized',
-        { total_size => total_size($hashref_with_simple_scalar_values), key_count => $hashref_simple_values_keys, limit => $ref_limit }
+        { key_count => $hashref_simple_values_keys }
     );
 
     my $hashref_with_ref_values = { map { $_ => ['a'] } (1 .. 100) };
     my $hashref_ref_values_keys = scalar keys %$hashref_with_ref_values;
     like(
         $o->fit_to_view($hashref_with_ref_values),
-        qr|HASH: \{\d+ => ARRAY, \d+ => ARRAY, \d+ => ARRAY, \d+ => ARRAY \.\.\.\} \($hashref_ref_values_keys keys / \d+ bytes\)$|,
+        qr|HASH: \{\d+ => ARRAY, \d+ => ARRAY, \d+ => ARRAY, \d+ => ARRAY \.\.\.\} \($hashref_ref_values_keys keys\)$|,
         'big hashref with ref values gets summarized',
-        { total_size => total_size($hashref_with_ref_values), key_count => $hashref_ref_values_keys, limit => $ref_limit }
+        { key_count => $hashref_ref_values_keys }
     );
 };
 
 subtest 'check configurable limits' => sub {
     my $o = Devel::Optic->new(
-        max_size => 1, # always summarize
         scalar_truncation_size => 1,
         scalar_sample_size => 1,
         sample_count => 1,
@@ -97,56 +94,55 @@ subtest 'check configurable limits' => sub {
 
     like(
         $o->fit_to_view("abc"),
-        qr|a\.\.\. \(truncated to len 1; len \d+ / \d+ bytes in full\)$|,
+        qr|a\.\.\. \(truncated to len 1; len \d+\)$|,
         'string gets truncated message'
     );
 
     like(
         $o->fit_to_view(['a']),
-        qr|ARRAY: \[a\] \(len 1 / \d+ bytes\)$|,
+        qr|ARRAY: \[a\] \(len 1\)$|,
         'arrayref with simple string scalar members gets summarized'
     );
 
     like(
         $o->fit_to_view(['abc']),
-        qr|ARRAY: \[a\.\.\.\] \(len 1 / \d+ bytes\)$|,
+        qr|ARRAY: \[a\.\.\.\] \(len 1\)$|,
         'arrayref summary truncates long string scalar members'
     );
 
     like(
         $o->fit_to_view([qw(a b c d)]),
-        qr|ARRAY: \[a \.\.\.\] \(len 4 / \d+ bytes\)$|,
+        qr|ARRAY: \[a \.\.\.\] \(len 4\)$|,
         'arrayref summary shows sample_count members'
     );
 
     like(
         $o->fit_to_view({a => 'b'}),
-        qr|HASH: \{a => b\} \(1 keys / \d+ bytes\)$|,
+        qr|HASH: \{a => b\} \(1 keys\)$|,
         'hashref with simple string scalar values gets summarized'
     );
 
     like(
         $o->fit_to_view({a => 'bcdefg'}),
-        qr|HASH: \{a => b\.\.\.\} \(1 keys / \d+ bytes\)$|,
+        qr|HASH: \{a => b\.\.\.\} \(1 keys\)$|,
         'hashref summary truncates long string scalar value'
     );
 
     like(
         $o->fit_to_view({abcd => 'bcdefg'}),
-        qr|HASH: \{a\.\.\. => b\.\.\.\} \(1 keys / \d+ bytes\)$|,
+        qr|HASH: \{a\.\.\. => b\.\.\.\} \(1 keys\)$|,
         'hashref summary truncates long key and long value'
     );
 
     like(
         $o->fit_to_view({a => 1, b => 2, c => 3}),
-        qr|HASH: \{\w => \d \.\.\.\} \(3 keys / \d+ bytes\)$|,
+        qr|HASH: \{\w => \d \.\.\.\} \(3 keys\)$|,
         'hashref summary shows sample_count pairs'
     );
 };
 
 subtest 'sample count respects data structure size' => sub {
     my $o = Devel::Optic->new(
-        max_size => 1, # always summarize
         scalar_truncation_size => 1,
         scalar_sample_size => 1,
         sample_count => 10,
@@ -154,37 +150,35 @@ subtest 'sample count respects data structure size' => sub {
 
     like(
         $o->fit_to_view(['a']),
-        qr|ARRAY: \[a\] \(len 1 / \d+ bytes\)$|,
+        qr|ARRAY: \[a\] \(len 1\)$|,
         'arrayref with just one member shows only one sample'
     );
 
     like(
         $o->fit_to_view({a => 'b'}),
-        qr|HASH: \{a => b\} \(1 keys / \d+ bytes\)$|,
+        qr|HASH: \{a => b\} \(1 keys\)$|,
         'hashref with one key shows only one sample'
     );
 };
 
 subtest 'weird ref types' => sub {
-    my $o = Devel::Optic->new(
-        max_size => 1, # always summarize
-    );
+    my $o = Devel::Optic->new();
 
     like(
         $o->fit_to_view(\'a'),
-        qr|SCALAR a \(len \d+ / \d+ bytes\)|,
+        qr|SCALAR a \(len \d+\)|,
         'scalarref summary'
     );
 
     like(
         $o->fit_to_view(qr/foo/),
-        qr|Regexp .+ \(len \d+ / \d+ bytes\)|,
+        qr|Regexp .+ \(len \d+\)|,
         'regexp summary'
     );
 
     like(
         $o->fit_to_view(\*STDERR),
-        qr|GLOB: \d+ bytes$|,
+        qr|GLOB: \(no sample\)|,
         'globref no summary'
     );
 

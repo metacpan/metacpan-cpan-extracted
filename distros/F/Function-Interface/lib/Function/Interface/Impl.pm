@@ -3,11 +3,16 @@ package Function::Interface::Impl;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
-use Class::Load qw(load_class try_load_class is_class_loaded);
+use Class::Load qw(try_load_class is_class_loaded);
 use Scalar::Util qw(blessed);
 use Import::Into;
+use B::Hooks::EndOfScope;
+
+use Function::Interface;
+use Function::Parameters;
+use Function::Return;
 
 sub import {
     my $class = shift;
@@ -20,16 +25,21 @@ sub import {
 
     Function::Parameters->import::into($pkg);
     Function::Return->import::into($pkg);
+
+    on_scope_end {
+        _check_impl();
+    }
 }
 
 our @CHECK_LIST;
 my %IMPL_CHECKED;
-CHECK {
-    for (@CHECK_LIST) {
-        assert_valid(@$_{qw/package interface_package filename line/});
+sub _check_impl {
+    while (my $data = shift @CHECK_LIST) {
+        my ($package, $interface_package, @fl) = @$data{qw/package interface_package filename line/};
+        assert_valid($package, $interface_package, @fl);
 
         # for Function::Interface::Types#ImplOf
-        $IMPL_CHECKED{$_->{package}}{$_->{interface_package}} = !!1;
+        $IMPL_CHECKED{$package}{$interface_package} = !!1;
     }
 }
 
@@ -87,32 +97,16 @@ sub _error {
 
 sub info_interface {
     my $interface_package = shift;
-    load_class('Function::Interface');
     Function::Interface::info($interface_package)
 }
 
 sub info_params {
     my $code = shift;
-    load_class('Function::Parameters');
     Function::Parameters::info($code)
 }
 
-
-# XXX:
-# Need to call C<CHECK> code blocks in the following order:
-# 1. Function::Return#CHECK (to get return info)
-# 2. Function::Interface::Impl#CHECK (to check implements)
-#
-# C<CHECK> code blocks are LIFO order.
-# So, it is necessary to load in the following order:
-# 1. Function::Interface::Impl
-# 2. Function::Return
-#
-# Because of this,
-# Function::Interface::Impl doesn't use Function::Return, but loads dat run time.
 sub info_return {
     my $code = shift;
-    load_class('Function::Return');
     Function::Return::info($code)
 }
 

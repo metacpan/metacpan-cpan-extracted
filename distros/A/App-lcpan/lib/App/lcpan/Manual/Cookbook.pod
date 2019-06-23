@@ -18,7 +18,7 @@ App::lcpan::Manual::Cookbook - lcpan recipes/tips
 
 =head1 VERSION
 
-This document describes version 1.033 of App::lcpan::Manual::Cookbook (from Perl distribution App-lcpan), released on 2019-06-07.
+This document describes version 1.034 of App::lcpan::Manual::Cookbook (from Perl distribution App-lcpan), released on 2019-06-19.
 
 =head1 RECIPES
 

@@ -56,6 +56,7 @@ do { my $x = {
                                    'Test::Differences' => '0',
                                    'Test::More' => '0',
                                    'Test::Requires::Git' => '0',
+                                   'Test::Warnings' => '0',
                                    'perl' => '5.006'
                                  }
                  }

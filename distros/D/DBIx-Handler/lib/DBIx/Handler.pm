@@ -1,7 +1,7 @@
 package DBIx::Handler;
 use strict;
 use warnings;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use DBI 1.605;
 use DBIx::TransactionManager 1.09;
@@ -11,7 +11,11 @@ our $TxnTraceLevel = 0;
 
 sub _noop {}
 
-*connect = \&new;
+{
+    no warnings qw/once/;
+    *connect = \&new;
+}
+
 sub new {
     my $class = shift;
 
@@ -26,7 +30,8 @@ sub new {
         on_connect_do    => $opts->{on_connect_do}    || undef,
         on_disconnect_do => $opts->{on_disconnect_do} || undef,
         no_ping          => $opts->{no_ping}          || 0,
-        dbi_class        => $opts->{dbi_class}        || "DBI",
+        dbi_class        => $opts->{dbi_class}        || 'DBI',
+        prepare_method   => $opts->{prepare_method}   || 'prepare',
     }, $class;
 }
 
@@ -143,6 +148,12 @@ sub no_ping {
     $self->{no_ping};
 }
 
+sub prepare_method {
+    my ($self, $prepare_method) = @_;
+    $self->{prepare_method} = $prepare_method if $prepare_method;
+    $self->{prepare_method};
+}
+
 sub query {
     my ($self, $sql, @args) = @_;
 
@@ -158,7 +169,8 @@ sub query {
 
     my $sth;
     eval {
-        $sth = $self->dbh->prepare($sql);
+        my $prepare_method = $self->{prepare_method};
+        $sth = $self->dbh->$prepare_method($sql);
         $sth->execute(@{$bind || []});
     };
     if (my $error = $@) {
@@ -291,7 +303,7 @@ DBIx::Handler - fork-safe and easy transaction handling DBI handler
 =head1 SYNOPSIS
 
   use DBIx::Handler;
-  my $handler = DBIx::Handler->new($dsn, $user, $pass, $opts);
+  my $handler = DBIx::Handler->new($dsn, $user, $pass, $dbi_opts, $opts);
   my $dbh = $handler->dbh;
   $dbh->do(...);
 
@@ -305,7 +317,7 @@ DBIx::Handler provide scope base transaction, fork safe dbh handling, simple.
 
 =over 4
 
-=item my $handler = DBIx::Handler->new($dsn, $user, $pass, $opts);
+=item my $handler = DBIx::Handler->new($dsn, $user, $pass, $dbi_opts, $opts);
 
 get database handling instance.
 
@@ -336,6 +348,17 @@ Ignore to inject the SQL comment when trace_ignore_if's return value is true.
 
 By default, ping before each executing query.
 If it affect performance then you can set to true for ping stopping.
+
+=item dbi_class : ClassName
+
+By default, this module uses generally L<DBI> class.
+For example, if you want to use another custom class compatibility with DBI, you can use it with this option.
+
+
+=item prepare_method : Str
+
+By default, this module uses generally L<prepare> method.
+For example, if you want to use C<prepare_cached> method or other custom method compatibility with C<prepare> method, you can use it with this option.
 
 =back
 

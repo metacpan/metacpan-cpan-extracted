@@ -1,4 +1,15 @@
 Revision history for Perl module Net::Google::WebmasterTools
 
+0.03  2019-06-19
+        - Fix bugs introduced in v0.02
+        - Don't URL encode site URL (failed on testing)
+        - Fix some more example code in POD
+
+0.02  2019-06-19
+        - Fix bugs with dependencies (Data::Dumper, Mojo::Log) not in Makefile.PL
+        - URL encode site URL
+        - Fix some example code in POD
+        - Fix bug with query filters not working as expected
+
 0.01  2015-08-10
         - Initial test version

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,10 +26,10 @@ no_index:
 provides:
   Time::Strptime:
     file: lib/Time/Strptime.pm
-    version: '1.03'
+    version: '1.04'
   Time::Strptime::Format:
     file: lib/Time/Strptime/Format.pm
-    version: '1.03'
+    version: '1.04'
   Time::Strptime::TimeZone:
     file: lib/Time/Strptime/TimeZone.pm
 requires:
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/karupanerura/Time-Strptime/issues
   homepage: https://github.com/karupanerura/Time-Strptime
   repository: git://github.com/karupanerura/Time-Strptime.git
-version: '1.03'
+version: '1.04'
 x_authority: cpan:KARUPA
 x_contributors:
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'

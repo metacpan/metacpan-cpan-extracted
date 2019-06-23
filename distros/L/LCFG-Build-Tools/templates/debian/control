@@ -12,9 +12,34 @@ Vcs-Browser: [% vcs_url.replace( 'svn\.lcfg\.org/svn/', 'svn.lcfg.org/viewvc/' )
 
 Package: [% spec.deb_name %]
 Architecture: all
-Depends: ${misc:Depends}, ${perl:Depends}[% IF is_component %],
+Depends: ${misc:Depends}[% IF NOT is_component OR comp_type == 'perl' %], ${perl:Depends}[% END %][% IF is_component %],
     lcfg-om,
     lcfg-ngeneric[% END %]
-Description: [% spec.abstract %]
+Description: [% spec.abstract.replace('^((?i)(?:A|An|The)\s+)','') %]
 [% wrap(spec.abstract, 72, ' ', ' ') %]
 
+Package: [% spec.deb_name %]-doc
+Architecture: all
+Depends: ${misc:Depends}
+Description: Documentation for [% spec.deb_name %]
+ Additional documentation for the LCFG [% spec.name %] component.
+
+[% IF is_component -%]
+Package: [% spec.deb_name %]-defaults
+Architecture: all
+Depends: ${misc:Depends}
+Description: Server schemas for [% spec.deb_name %]
+ LCFG server schema files for the LCFG [% spec.name %] component.
+
+[% IF has_nagios -%]
+Package: [% spec.deb_name %]-nagios
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, lcfg-nagios-base
+Description: nagios translator for [% spec.deb_name %]
+ The nagios translator module for the LCFG [% spec.name %]
+ component. This may be used by the LCFG nagios component to translate
+ the LCFG profile into an appropriate nagios configuration for the
+ service.
+
+[% END -%]
+[% END -%]

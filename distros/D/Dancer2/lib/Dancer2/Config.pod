@@ -13,7 +13,7 @@ Dancer2::Config - Configure Dancer2 to suit your needs
 
 =head1 VERSION
 
-version 0.207000
+version 0.208000
 
 =head1 DESCRIPTION
 
@@ -369,11 +369,6 @@ Default: B<layouts>.
 
 =head2 Logging, debugging and error handling
 
-=head3 strict_config (boolean, default: false)
-
-If true, C<config> will return an object instead of a hash reference. See
-L<Dancer2::Config::Object> for more information.
-
 =head3 startup_info (boolean)
 
 If set to true, prints a banner at the server start with information such as
@@ -681,7 +676,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Alexis Sukrieh.
+This software is copyright (c) 2019 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

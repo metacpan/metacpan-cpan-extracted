@@ -4,9 +4,12 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use Import::Into;
 
 BEGIN {
     use_ok 'Text::Parser';
+    String::Index->import::into( 'Text::Parser::Rule',
+        qw(cindex ncindex crindex ncrindex) );
     use_ok 'Text::Parser::Rule';
 }
 
@@ -23,6 +26,9 @@ lives_ok {
         'Everything read in'
     );
     $parser->clear_rules;
+    ok( not( $parser->_has_begin_rule ),
+        'Does not have a begin rule anymore'
+    );
     $parser->read('t/names.txt');
     is( scalar( $parser->get_records ), 9, 'Back to original' );
     $parser->add_rule(

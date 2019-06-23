@@ -1,4 +1,4 @@
-# AWS::AppMesh::VirtualNode generated from spec 2.30.0
+# AWS::AppMesh::VirtualNode generated from spec 3.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualNode',
@@ -171,7 +171,7 @@ package Cfn::Resource::Properties::AWS::AppMesh::VirtualNode::ServiceDiscoveryVa
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has DNS => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualNode::DnsServiceDiscovery', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DNS => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualNode::DnsServiceDiscovery', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualNode::Logging',

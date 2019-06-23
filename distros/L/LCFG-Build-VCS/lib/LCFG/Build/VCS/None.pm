@@ -5,10 +5,10 @@ use warnings;
 # $Id: None.pm.in 35424 2019-01-18 10:01:16Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-VCS/lib/LCFG/Build/VCS/None.pm.in,v $
 # $Revision: 35424 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_3_8/lib/LCFG/Build/VCS/None.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_3_9/lib/LCFG/Build/VCS/None.pm.in $
 # $Date: 2019-01-18 10:01:16 +0000 (Fri, 18 Jan 2019) $
 
-our $VERSION = '0.3.8';
+our $VERSION = '0.3.9';
 
 use v5.10;
 
@@ -182,7 +182,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::VCS::None version 0.3.8
+    This documentation refers to LCFG::Build::VCS::None version 0.3.9
 
 =head1 SYNOPSIS
 

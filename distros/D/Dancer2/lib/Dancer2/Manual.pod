@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.207000
+version 0.208000
 
 =head1 DESCRIPTION
 
@@ -2532,6 +2532,26 @@ name.
         # will result in two headers "x-my-header" in the response
     }
 
+=head2 prepare_app
+
+You can introduce code you want to run when your app is loaded, similar to the
+C<prepare_app> in L<Plack::Middleware>.
+
+    prepare_app {
+        my $app = shift;
+
+        ... # do your thing
+    };
+
+You should not close over the App instance, since you receive it as a first
+argument. If you close over it, you B<will> have a memory leak.
+
+    my $app = app();
+
+    prepare_app {
+        do_something_with_app($app); # MEMORY LEAK
+    };
+
 =head2 hook
 
 Adds a hook at some position. For example :
@@ -3292,7 +3312,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Alexis Sukrieh.
+This software is copyright (c) 2019 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

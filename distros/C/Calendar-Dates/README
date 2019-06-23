@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.2.0 of Calendar::Dates (from Perl
-    distribution Calendar-Dates), released on 2019-05-25.
+    This document describes version 0.2.1 of Calendar::Dates (from Perl
+    distribution Calendar-Dates), released on 2019-06-19.
 
 DESCRIPTION
     The "Calendar::Dates::*" namespace is reserved for modules that provide
@@ -59,6 +59,9 @@ DESCRIPTION
          Calendar::Dates::Sports::WTA::2019
          Calendar::Dates::ID::Jakarta::Sports::Marathon
 
+STATUS
+    Draft series (0.x), expect to be stable in 1.0.
+
 METHODS
   get_min_year
     Usage:
@@ -86,14 +89,24 @@ METHODS
     Return entries for a particular year (or month, or day). Method must die
     if year (or month, or day) is not supported.
 
+    Parameters. The optional %params can be specified for more complex
+    querying/filtering. Each calendar might support different parameters.
+    Currently known common/standardized parameters:
+
+    *   all
+
+        Boolean. If set to true, will include all entries that are normally
+        not included, e.g. low-priority entries (entries with tag
+        "low-priority").
+
     Result. Result is arrayref of entries, where each entry is a DefHash.
     The following keys are recognized, an asterisk ("*") signifies required
     key (see DefHash for more details on each key):
 
     *   date*
 
-        String. Either ISO8601 date in the format "YYYY-MM-DD" or
-        "YYYY-MM-DD"T"HH:MM" or date interval in the format of
+        String. Either ISO8601 date in the form of "YYYY-MM-DD" or
+        "YYYY-MM-DD"T"HH:MM", or date interval in the form of
         "YYYY-MM-DD"T"HH:MM/HH:MM".
 
         Examples:
@@ -135,7 +148,10 @@ METHODS
     *   tags
 
         From DefHash specification. Some recommended/known tags: tentative,
-        holiday, religious.
+        holiday, religious, low-priority (entry with this tag by default
+        should not be returned by "get_entries" unless it specifies a true
+        "all" option), anniversary (entry with this tag will repeat yearly
+        and will be included in every (later) year).
 
     *   url
 
@@ -165,7 +181,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/repos/perl-Calendar-Dates>.
+    <https://github.com/perlancar/perl-Calendar-Dates>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

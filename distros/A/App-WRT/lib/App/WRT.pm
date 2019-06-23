@@ -1,6 +1,22 @@
 package App::WRT;
 
-use version; our $VERSION = version->declare("v6.2.4");
+# From semver.org:
+#
+#   Given a version number MAJOR.MINOR.PATCH, increment the:
+#
+#       MAJOR version when you make incompatible API changes,
+#       MINOR version when you add functionality in a backwards-compatible
+#             manner, and
+#       PATCH version when you make backwards-compatible bug fixes.
+#
+#   Additional labels for pre-release and build metadata are available as
+#   extensions to the MAJOR.MINOR.PATCH format.
+#
+# Honestly I have always found it just about impossible to follow semver
+# without overthinking a bunch of hair-splitting decisions and categories,
+# but whatever.  I'll try to follow it, roughly.
+
+use version; our $VERSION = version->declare("v6.3.0");
 
 use strict;
 use warnings;
@@ -23,7 +39,7 @@ use App::WRT::FileIO;
 use App::WRT::HTML   qw(:all);
 use App::WRT::Image  qw(image_size);
 use App::WRT::Markup qw(line_parse image_markup eval_perl);
-use App::WRT::Util   qw(dir_list get_date file_get_contents);
+use App::WRT::Util   qw(dir_list file_get_contents);
 
 =pod
 

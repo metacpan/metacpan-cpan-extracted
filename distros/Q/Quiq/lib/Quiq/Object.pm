@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Scalar::Util ();
 use Hash::Util ();
+use Quiq::Parameters;
 use Quiq::Stacktrace;
 
 # -----------------------------------------------------------------------------
@@ -26,7 +27,7 @@ Quiq::Object - Basisklasse für alle Klassen der Klassenbibliothek
 
 =head1 METHODS
 
-=head2 Instantiierung
+=head2 Blessen
 
 =head3 bless() - Blesse Objekt auf Klasse
 
@@ -74,7 +75,7 @@ sub bless {
 
 # -----------------------------------------------------------------------------
 
-=head3 rebless() - Blesse Objekt auf eine andere Klasse um
+=head3 rebless() - Blesse Objekt auf eine andere Klasse
 
 =head4 Synopsis
 
@@ -100,6 +101,178 @@ sub rebless {
     my ($self,$class) = @_;
     $class->bless($self);
     return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Parameterübergabe
+
+=head3 parameters() - Argumente und Optionen eines Methodenaufrufs
+
+=head4 Synopsis
+
+    [1] $this->parameters(\@param,@optRef);
+    [2] $this->parameters($sloppy,\@param,@optRef);
+    [3] $argA = $this->parameters($minArgs,$maxArgs,\@param,@optRef);
+    [4] $argA = $this->parameters($sloppy,$minArgs,$maxArgs,\@param,@optRef);
+
+=head4 Arguments
+
+=over 4
+
+=item $sloppy
+
+Wirf keine Exception, wenn unerwartete Parameter (also Optionen und
+Argumente) in @param enthalten sind. Diese Parameter werden aus @param
+nicht entfernt, bleiben also für eine weitere Verarbeitung stehen.
+
+=item $minArgs
+
+Mindestanzahl an Argumenten.
+
+=item $maxArgs
+
+Maximale Anzahl an Argumenten.
+
+=item @params
+
+Liste der Parameter, typischerweise @_.
+
+=item @optRef
+
+Liste der erwarteten Optionen zusammen mit Referenzen auf die
+zugehörigen Optionsvariablen.
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $argA
+
+Referenz auf Array mit mindestens $minArgs und höchstens
+$maxArgs Argumenten.
+
+=back
+
+=head4 Description
+
+Liefere die Argumente und Optionen eines Methodenaufrufs. Die Methode
+kann eine Klassen- oder Objektmethode sein. Das Argument @params ist
+typischerweise @_. Parameters() behandelt den Fall sehr effizient,
+dass @params leer ist, denn dann kehrt parameters() sofort zurück.
+
+[1] Wenn die Methode eine feste Anzahl an Argumenten besitzt und diese
+von ihr selbst behandelt werden, ist die Nutzung am effizientesten.
+Denn die Argumente müssen von parameters() dann nicht kopiert werden und
+wenn der Methodenaufruf ohne Optionen erfolgt, kehrt parameters(),
+wie bereits gesagt, sofort zurück. Beispiel:
+
+    sub myMethod {
+        my ($this,$arg1,$arg2,$arg3) = splice @_,0,3;
+    
+        # Optionen
+    
+        my $opt1 = 1;
+        my $opt2 = 2;
+    
+        $this->parameters(\@_,
+            opt1 => \$opt1,
+            opt2 => \$opt2,
+        );
+    
+        # ...
+    }
+
+[2] Wie [1], nur dass keine Exception geworfen wird, wenn unbekannte
+Parameter übergeben werden. Diese bleiben in @_ stehen. Dies ist nützlich,
+wenn die Methode zusätzliche Parameter empfängt und diese unbesehen
+an eine andere Methode weiterleitet. Der Aufruf von parameters() ändert
+sich zu:
+
+    $this->parameters(1,\@_,
+        opt1 => \$opt1,
+        opt2 => \$opt2,
+    );
+
+[3], [4] Wie [1] bzw. [2], nur dass parameters() zusätzlich die
+Argumente der Methode behandelt. Dies ist nützlich, wenn die
+Methode eine I<variable> Anzahl an Argumenten hat. Diese werden
+von parameters() aus der Parameterliste "herausgefischt" und eine
+Referenz auf diese Liste zurückgegeben. Beispiel:
+
+    sub myMethod {
+        my $this = shift;
+    
+        # Optionen und Argumente
+    
+        my $opt1 = 1;
+        my $opt2 = 2;
+    
+        $argA = $this->parameters(0,\@_,
+            opt1 => \$opt1,
+            opt2 => \$opt2,
+        );
+        my ($arg1,$arg2,$arg3,$arg4) = @$argA;
+    
+        # ...
+    }
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub parameters {
+    my $this = shift;
+    # @_: s.o.
+
+    # Die verschiedenen Aufrufvarianten behandeln
+
+    my ($sloppy,$minArgs,$maxArgs);
+    if (ref $_[0]) {
+        $sloppy = $minArgs = $maxArgs = 0;
+    }
+    elsif (ref $_[1]) {
+        $sloppy = shift;
+        $minArgs = $maxArgs = 0;
+    }
+    elsif (ref $_[2]) {
+        $sloppy = 0;
+        ($minArgs,$maxArgs) = splice @_,0,2;
+    }
+    else {
+        ($sloppy,$minArgs,$maxArgs) = splice @_,0,3;
+    }
+
+    # Parameterliste bestimmen
+
+    my $paramA = shift;
+    if (!@$paramA) {
+        # Wenn die Parameterliste leer ist, kehren wir sofort mit einer
+        # leeren Argumentliste zurück. Die Optionsvariblen behalten
+        # einfach ihren Wert.
+        return [];
+    }
+
+    # Parameterliste verarbeiten
+
+    my $argA = Quiq::Parameters->extract(1,0,undef,$paramA,$maxArgs,@_);
+    if (@$argA < $minArgs) {
+        $this->throw(
+            'PARAM-00099: Missing arguments',
+            MinArgs => $minArgs,
+            Arguments => "@$argA",
+        );
+    }
+    elsif (@$paramA && !$sloppy) {
+        $this->throw(
+            'PARAM-00099: Unexpected parameter(s)',
+            Parameters => "@$paramA",
+        );
+    }
+
+    return $argA;
 }
 
 # -----------------------------------------------------------------------------
@@ -414,7 +587,7 @@ sub this {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

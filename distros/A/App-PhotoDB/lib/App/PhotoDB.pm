@@ -196,6 +196,13 @@ All of the above "special" accessories can be added to the database with C<acces
 Types of general accessory with no special properties could include cases or straps. General accessories can be associated with cameras or lenses, or neither.
 Add new general accessories with C<accessory add> and add new categories of general accessories with C<accessory category>.
 
+=head3 Series
+
+A series is a group of camera models and/or lens models. An example of a series could be Canon T-series, and it could contain camera models such as the Canon
+T80 and Canon T90. Series are designed to provide visibility of camera and lens models that exist, and could be added to the collection. It is possible to
+create custom series and they can be used for any purpose to help you keep track of your collection. A camera or lens model can belong to more than one series
+and a series can contain a mixture of camera and lens models.
+
 =head1 Installing PhotoDB
 
 =head2 Install database backend
@@ -299,7 +306,7 @@ use App::PhotoDB::handlers;
 use App::PhotoDB::commands;
 
 # Authoritative distro version
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub main {
 	my $args = shift;
@@ -338,9 +345,8 @@ sub main {
 			}
 
 			# Execute chosen handler
-			if (&prompt({prompt=>"$handlers{$command}{$subcommand}{'desc'}. Continue?", type=>'boolean', default=>'yes'})) {
-				$handlers{$command}{$subcommand}{'handler'}->({db=>$db});
-			}
+			print "$handlers{$command}{$subcommand}{'desc'}\n";
+			$handlers{$command}{$subcommand}{'handler'}->({db=>$db});
 		} else {
 			# Print list of commands if unknown input is entered
 			if ($rv ne '') {

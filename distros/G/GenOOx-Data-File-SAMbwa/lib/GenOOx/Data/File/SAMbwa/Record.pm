@@ -37,7 +37,7 @@ GenOOx::Data::File::SAMbwa::Record - Represents a record of a SAM format file ge
 # Let the code begin...
 
 package GenOOx::Data::File::SAMbwa::Record;
-$GenOOx::Data::File::SAMbwa::Record::VERSION = '0.0.4';
+$GenOOx::Data::File::SAMbwa::Record::VERSION = '0.0.5';
 
 #######################################################################
 #######################   Load External modules   #####################
@@ -58,7 +58,7 @@ extends 'GenOO::Data::File::SAM::Record';
 sub number_of_best_hits {
 	my ($self) = @_;
 	
-	return $self->tag('X0:i');
+	return $self->tag('X0:i') || 0;
 }
 
 sub number_of_suboptimal_hits {

@@ -1,0 +1,26 @@
+---
+abstract: 'Retrieve hardware system information from a Raspberry Pi'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPi-SysInfo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.01'
+resources:
+  bugtracker: https://github.com/stevieb9/rpi-sysinfo/issues
+  repository: https://github.com/stevieb9/rpi-sysinfo.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

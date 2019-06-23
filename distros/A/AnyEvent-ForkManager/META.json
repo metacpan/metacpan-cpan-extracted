@@ -4,7 +4,7 @@
       "Kenta Sato <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.1",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -53,14 +53,15 @@
       "test" : {
          "requires" : {
             "Test::More" : "0.98",
-            "Test::SharedFork" : "0.31"
+            "Test::SharedFork" : "0.31",
+            "Test::SharedObject" : "0"
          }
       }
    },
    "provides" : {
       "AnyEvent::ForkManager" : {
          "file" : "lib/AnyEvent/ForkManager.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -74,10 +75,12 @@
          "web" : "https://github.com/karupanerura/p5-AnyEvent-ForkManager"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
+   "x_authority" : "cpan:KARUPA",
    "x_contributors" : [
-      "かるぱねるら <karupanerura@karupas-mbp.local>",
       "E. Choroba <choroba@matfyz.cz>",
       "karupanerura <karupanerura@users.noreply.github.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.03",
+   "x_static_install" : 1
 }

@@ -1,4 +1,6 @@
-#!/usr/bin/env perl
+#!perl
+use strict;
+use warnings;
 use CLI::Helpers qw(:all);
 
 output({color=>'yellow',sticky=>1}, "This is duct tape.");

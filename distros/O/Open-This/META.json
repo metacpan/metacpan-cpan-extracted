@@ -78,6 +78,7 @@
             "Test::Differences" : "0",
             "Test::More" : "0",
             "Test::Requires::Git" : "0",
+            "Test::Warnings" : "0",
             "perl" : "5.006"
          }
       }
@@ -94,7 +95,7 @@
          "web" : "https://github.com/oalders/open-this"
       }
    },
-   "version" : "0.000019",
+   "version" : "0.000020",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -616,7 +617,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000019",
+                  "tag" : "v0.000020",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -782,6 +783,7 @@
    "x_contributors" : [
       "Boris D\u00e4ppen <bdaeppen.perl@gmail.com>",
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>",
+      "Manni Heumann <github@lxxi.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Olaf Alders <olaf.alders@gmail.com>",
       "Olaf Alders <olaf@wundersolutions.com>"

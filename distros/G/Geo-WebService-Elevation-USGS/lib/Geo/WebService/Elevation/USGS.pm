@@ -65,7 +65,7 @@ months, but that fell in the cracks, and when I revisited it I thought
 the change in the default value of the C<'compatible'> attribute (to
 false, see below) was disruptive enough that I would make it a release
 by itself. The current plan is to delay making the deprecated methods
-fatal the C<compatible> attribute becomes fatal.
+fatal until the C<compatible> attribute becomes fatal.
 
 In the meantime you can suppress the warnings with
 
@@ -127,7 +127,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 use constant BEST_DATA_SET => -1;
 use constant USGS_URL => 'http://ned.usgs.gov/epqs/pqs.php';
@@ -765,9 +765,11 @@ __END__
 
 =head2 Attributes
 
-=head3 carp (boolean)
+=head3 carp
 
-This boolean attribute determines whether the data acquisition methods carp on
+Boolean
+
+This Boolean attribute determines whether the data acquisition methods carp on
 encountering an error. If false, they silently return undef. Note,
 though, that the L<croak|/croak> attribute trumps this one.
 
@@ -780,9 +782,11 @@ version 0.005_01.
 
 The default is 0 (i.e. false).
 
-=head3 compatible (boolean)
+=head3 compatible
 
-This boolean attribute determines whether this object attempts to make
+Boolean
+
+This Boolean attribute determines whether this object attempts to make
 returned data consistent with the old GIS server.
 
 The default was C<1> (i.e. true) when it was introduced in version
@@ -791,34 +795,40 @@ plan, it is C<0> (i.e. false). Like the other deprecated attributes any
 use of it will eventually become fatal. See the L<NOTICE|/NOTICE> above
 for details.
 
-=head3 croak (boolean)
+=head3 croak
 
-This attribute determines whether the data acquisition methods croak on
-encountering an error. If false, they return undef on an error.
+Boolean
+
+This Boolean attribute determines whether the data acquisition methods
+croak on encountering an error. If false, they return undef on an error.
 
 If L<retry|/retry> is set to a number greater than 0, the data
 acquisition method will not croak until all retries are exhausted.
 
 The default is 1 (i.e. true).
 
-=head3 default_ns (string)
+=head3 default_ns
 
-This attribute is deprecated. See the L<NOTICE|/NOtICE> above for the
+String
+
+This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
 deprecation schedule.
 
 This attribute records the XML namespace used by the SOAP query. This
 must agree with the targetNamespace value given in the USGS' WSDL found
 at
-L<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_service.asmx?WSDL>.
+C<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_service.asmx?WSDL>.
 
 This attribute should not ordinarily need to be modified, but the
 desperate user may be able to use it to get him- or herself going again
 if the USGS changes the WSDL and this module has not been modified to
 track the change.
 
-The default is 'http://gisdata.usgs.gov/XMLWebServices2/'.
+The default is C<'http://gisdata.usgs.gov/XMLWebServices2/'>.
 
-=head3 error (string)
+=head3 error
+
+String
 
 This attribute records the error returned by the last query operation,
 or undef if no error occurred. This attribute can be set by the user,
@@ -826,7 +836,9 @@ but will be reset by any query operation.
 
 The default (before any queries have occurred) is undef.
 
-=head3 places (integer)
+=head3 places
+
+Integer
 
 If this attribute is set to a non-negative integer, elevation results
 will be rounded to this number of decimal places by running them through
@@ -834,16 +846,18 @@ sprintf "%.${places}f".
 
 The default is undef.
 
-=head3 proxy (string)
+=head3 proxy
 
-This attribute is deprecated. See the L<NOTICE|/NOtICE> above for the
+String
+
+This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
 deprecation schedule.
 
 This attribute specifies the actual url to which the SOAP query is
 posted. It must agree with the soap:address location value given for
 wsdl:port name "Elevation_ServiceSoap" given in the USGS' WSDL found
 at
-L<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_service.asmx?WSDL>.
+C<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_service.asmx?WSDL>.
 
 This attribute should not ordinarily need to be modified, but the
 desperate user may be able to use it to get him- or herself going again
@@ -853,7 +867,9 @@ track the change.
 The default is
 C<'http://gisdata.usgs.gov/XMLWebServices2/Elevation_Service.asmx'>.
 
-=head3 retry (unsigned integer)
+=head3 retry
+
+Unsigned integer
 
 This attribute specifies the number of retries to be done by
 C<getAllElevations()> and C<getElevation()> when an error is
@@ -865,7 +881,9 @@ also subject to the L</throttle> setting if any.
 
 The default is 0, i.e. no retries.
 
-=head3 retry_hook (code reference)
+=head3 retry_hook
+
+Code reference
 
 This attribute specifies a piece of code to be called before retrying.
 The code will be called before a retry takes place, and will be passed
@@ -892,12 +910,12 @@ The default is the null subroutine, i.e. C<sub {}>.
 
 =head3 source
 
-This attribute is deprecated. See the L</NOTICE> above for the
+This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
 deprecation schedule.
 
 This attribute specifies the ID of the source layer to be queried by
 the elevation() method. Valid layer IDs are documented at
-L<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_Service_Methods.php>.
+C<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_Service_Methods.php>.
 
 A legal value is a scalar, or an ARRAY, CODE, HASH, or Regexp reference.
 Please see the elevation() method's documentation for how these are
@@ -906,7 +924,9 @@ used.
 The default is '-1', which requests a response from the 'best' data
 source for the given point.
 
-=head3 throttle (non-negative number, or undef)
+=head3 throttle
+
+Non-negative number, or undef
 
  Geo::WebService::Elevation::USGS->set( throttle => 5 );
 
@@ -920,34 +940,42 @@ This functionality, and its implementation, are experimental, and may be
 changed or retracted without notice. Heck, I may even go back to
 C<$TARGET>, though I don't think so.
 
-=head3 timeout (integer, or undef)
+=head3 timeout
+
+Integer, or undef
 
 This attribute specifies the timeout for the SOAP query in seconds.
 
 The default is 30.
 
-=head3 trace (boolean)
+=head3 trace
 
-If true, this attribute requests that network requests and responses be
-dumped to standard error.  This should only be used for troubleshooting,
-and the author makes no representation about and has no control over
-what output you get if you set this true.
+Boolean
 
-The default is undef (i.e. false).
+If true, this Boolean attribute requests that network requests and
+responses be dumped to standard error.  This should only be used for
+troubleshooting, and the author makes no representation about and has no
+control over what output you get if you set this true.
 
-=head3 units (string)
+The default is C<undef> (i.e. false).
+
+=head3 units
+
+String
 
 This attribute specifies the desired units for the resultant elevations.
 Valid values are C<'Feet'> and C<'Meters'>. In practice these are not
 case-sensitive, and any value other than case-insensitive C<'Meters'>
 will be taken as C<'Feet'>.
 
-The default is 'FEET', but this will become C<'Feet'> when the
+The default is C<'FEET'>, but this will become C<'Feet'> when the
 compatibility code goes away.
 
-=head3 use_all_limit (integer)
+=head3 use_all_limit
 
-This attribute is deprecated. See the L<NOTICE|/NOtICE> above for the
+Integer
+
+This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
 deprecation schedule.
 
 This attribute is used to optimize the behavior of the elevation()

@@ -195,6 +195,7 @@ Finds input tags of type radio
 Criteria:
  * 'id'
  * 'name'
+ * 'value'
 
 =cut
 
@@ -202,7 +203,7 @@ sub radio_expander {
     my %args = @_;
 
     my @clauses;
-    for my $clause (qw/ id name /) {
+    for my $clause (qw/ id name value /) {
         push @clauses, "\@$clause='$args{$clause}'"
             if defined $args{$clause};
     }

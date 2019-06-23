@@ -7,7 +7,7 @@ build:
   gencmake: 0
   remove_input_after_translate: 1
   translate_before_pack: 1
-date: 18/01/19 10:45:46
+date: 22/03/19 15:28:23
 license: GPLv2
 name: LCFG-Build-PkgSpec
 orgident: org.lcfg
@@ -21,4 +21,4 @@ translate:
 vcs: 
   genchangelog: 1
   logname: Changes
-version: 0.2.6
+version: 0.2.7

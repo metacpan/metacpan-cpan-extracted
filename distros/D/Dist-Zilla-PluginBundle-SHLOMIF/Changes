@@ -1,6 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-SHLOMIF
 
-0.000008    2017-12--20
+0.000009    2019-06-21
+        - Remove PodVersion to avoid duplicate VERSION.
+
+0.000008    2017-12-20
         - Remove some broken deps: Authority and Test::Kwalitee::Extra
 
 0.000007    2017-04-05

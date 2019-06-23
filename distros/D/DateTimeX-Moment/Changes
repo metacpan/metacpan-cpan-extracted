@@ -1,5 +1,16 @@
 Revision history for Perl extension DateTimeX-Moment
 
+0.06 2019-06-21T21:41:01Z
+
+    - 19c8238 add dependency for DateTime::Duration (fix #3)
+    - 1a6b3b2 Align/Group accessors and avoid shifting the stack (chansen)
+    - e28422d Group methods in a somewhat logical order (chansen)
+    - 85a5436 Removed unused routine _mod_and_keep_sign (chansen)
+    - 6ea316a Fixed ->delta_days (chansen)
+    - f9eb6fb Fixed ->delta_md (chansen)
+    - 8ded533 Fixed ->subtract_datetime_absolute (chansen)
+    - eab6307 Optimize ->set (chansen)
+
 0.05 2016-04-13T03:39:17Z
 
     - more increase compatibility with DateTime (thanks chansen)

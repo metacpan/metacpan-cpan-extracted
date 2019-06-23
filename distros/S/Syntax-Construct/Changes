@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.014   2019-06-20
+        - Correctly skip tests of turking casing
+
 1.013   2019-06-18
 
         - Rework tests

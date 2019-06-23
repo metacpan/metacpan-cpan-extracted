@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "URI" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +33,8 @@ my %FallbackPrereqs = (
   "Class::XSAccessor" => "1.05",
   "JSON" => 0,
   "LWP::UserAgent" => 0,
-  "URI" => 0
+  "URI" => 0,
+  "URI::Encode" => 0
 );
 
 

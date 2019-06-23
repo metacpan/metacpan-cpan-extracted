@@ -1,5 +1,10 @@
 Revision history for Pod-Weaver-PluginBundle-SHLOMIF
 
+0.001002        2019-06-21
+
+    - Try to fix empty NAME section.
+        - Thanks to haarg.
+
 0.001001        2018-09-17
 
     - Hopefully fix tests on CPAN testers / cpan.

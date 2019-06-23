@@ -1,6 +1,12 @@
 Revision history for Hash-Wrap
 
-0.08      2018-03-12 11:08:19-04:00 America/New_York
+0.09      2019-06-20 16:57:19-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * wrap_hash may now be called with no arguments, in which
+      case it autogenerates a hash for you.
+
 
 0.08      2018-02-27 10:57:06-05:00 America/New_York
 

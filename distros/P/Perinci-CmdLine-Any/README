@@ -3,8 +3,8 @@ NAME
     or ::Classic)
 
 VERSION
-    This document describes version 0.14 of Perinci::CmdLine::Any (from Perl
-    distribution Perinci-CmdLine-Any), released on 2017-07-22.
+    This document describes version 0.150 of Perinci::CmdLine::Any (from
+    Perl distribution Perinci-CmdLine-Any), released on 2019-06-20.
 
 SYNOPSIS
     In your command-line script (this will pick ::Lite first):
@@ -66,7 +66,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

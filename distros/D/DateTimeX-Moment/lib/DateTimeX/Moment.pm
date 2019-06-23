@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Time::Moment 0.38;
 use DateTimeX::Moment::Duration;
@@ -273,57 +273,125 @@ sub _adjust_to_current_offset {
 
 sub clone { bless { %{$_[0]} }, ref $_[0] }
 
-sub year { shift->{_moment}->year }
-sub year_0 { shift->{_moment}->year - 1 }
-sub month_0 { shift->{_moment}->month - 1 }
-sub month { shift->{_moment}->month }
-sub day_of_week { shift->{_moment}->day_of_week }
-sub day_of_week_0 { shift->{_moment}->day_of_week - 1 }
-sub day_of_month { shift->{_moment}->day_of_month }
-sub day_of_month_0 { shift->{_moment}->day_of_month - 1 }
-sub day_of_quarter { shift->{_moment}->day_of_quarter }
-sub day_of_quarter_0 { shift->{_moment}->day_of_quarter - 1 }
-sub day_of_year { shift->{_moment}->day_of_year }
-sub day_of_year_0 { shift->{_moment}->day_of_year - 1 }
-sub quarter { shift->{_moment}->quarter }
-sub quarter_0 { shift->{_moment}->quarter - 1 }
-sub weekday_of_month { int((shift->{_moment}->day_of_month + 6) / 7) }
-sub hour { shift->{_moment}->hour }
-sub hour_1 { shift->{_moment}->hour || 24 }
-sub hour_12 { shift->hour_12_0 || 12 }
-sub hour_12_0 { shift->{_moment}->hour % 12 }
-sub minute { shift->{_moment}->minute }
-sub second { shift->{_moment}->second }
-
-sub fractional_second {
-    my $moment = shift->{_moment};
-    return $moment->second + $moment->nanosecond / 1_000_000_000;
-}
-
-sub nanosecond { shift->{_moment}->nanosecond }
-sub millisecond { shift->{_moment}->millisecond }
-sub microsecond { shift->{_moment}->microsecond }
-
-sub is_leap_year { shift->{_moment}->is_leap_year + 0 }
-sub leap_seconds { 0 } ## XXX: time moment doesn't have a leap seconds. So always leap seconds are zero.
-
-sub week_number { shift->{_moment}->week }
-sub week_year { shift->{_moment}->strftime('%G') + 0 }
+# Date / Calendar
+sub year                 { $_[0]->{_moment}->year                             }
+sub year_0               { $_[0]->{_moment}->year - 1                         }
+sub month_0              { $_[0]->{_moment}->month - 1                        }
+sub month                { $_[0]->{_moment}->month                            }
+sub day_of_week          { $_[0]->{_moment}->day_of_week                      }
+sub day_of_week_0        { $_[0]->{_moment}->day_of_week - 1                  }
+sub day_of_month         { $_[0]->{_moment}->day_of_month                     }
+sub day_of_month_0       { $_[0]->{_moment}->day_of_month - 1                 }
+sub day_of_quarter       { $_[0]->{_moment}->day_of_quarter                   }
+sub day_of_quarter_0     { $_[0]->{_moment}->day_of_quarter - 1               }
+sub day_of_year          { $_[0]->{_moment}->day_of_year                      }
+sub day_of_year_0        { $_[0]->{_moment}->day_of_year - 1                  }
+sub quarter              { $_[0]->{_moment}->quarter                          }
+sub quarter_0            { $_[0]->{_moment}->quarter - 1                      }
+sub weekday_of_month     { int(($_[0]->{_moment}->day_of_month + 6) / 7)      }
+sub week_number          { $_[0]->{_moment}->week                             }
+sub week_year            { $_[0]->{_moment}->strftime('%G') + 0               }
 
 sub week {
     return ($_[0]->week_year, $_[0]->week_number);
 }
-
-# ISO says that the first week of a year is the first week containing
-# a Thursday. Extending that says that the first week of the month is
-# the first week containing a Thursday. ICU agrees.
 sub week_of_month {
     my $moment = shift->{_moment};
     my $thu    = $moment->day_of_month + 4 - $moment->day_of_week;
     return int(($thu + 6) / 7);
 }
 
-sub offset { shift->{_moment}->offset * 60 }
+sub is_leap_year         { $_[0]->{_moment}->is_leap_year + 0                 }
+
+# Time of Day
+sub hour                 { $_[0]->{_moment}->hour                             }
+sub hour_1               { $_[0]->{_moment}->hour || 24                       }
+sub hour_12              { $_[0]->hour_12_0 || 12                             }
+sub hour_12_0            { $_[0]->{_moment}->hour % 12                        }
+sub minute               { $_[0]->{_moment}->minute                           }
+sub second               { $_[0]->{_moment}->second                           }
+sub nanosecond           { $_[0]->{_moment}->nanosecond                       }
+sub millisecond          { $_[0]->{_moment}->millisecond                      }
+sub microsecond          { $_[0]->{_moment}->microsecond                      }
+
+sub fractional_second {
+    my $moment = $_[0]->{_moment};
+    return $moment->second + $moment->nanosecond / 1_000_000_000;
+}
+
+sub leap_seconds         { 0                                                  }
+sub is_finite            { 1                                                  }
+sub is_infinite          { 0                                                  }
+
+# Absolute values
+sub epoch                { $_[0]->{_moment}->epoch                            }
+
+sub hires_epoch {
+    my $moment = $_[0]->{_moment};
+    return $moment->epoch + $moment->nanosecond / 1_000_000_000;
+}
+
+sub mjd                  { $_[0]->{_moment}->mjd                              }
+sub jd                   { $_[0]->{_moment}->jd                               }
+sub rd                   { $_[0]->{_moment}->rd                               }
+sub utc_rd_values        { $_[0]->{_moment}->utc_rd_values                    }
+sub local_rd_values      { $_[0]->{_moment}->local_rd_values                  }
+sub utc_rd_as_seconds    { $_[0]->{_moment}->utc_rd_as_seconds                }
+sub local_rd_as_seconds  { $_[0]->{_moment}->local_rd_as_seconds              }
+
+# Time zone
+sub offset               { $_[0]->{_moment}->offset * 60                      }
+sub is_dst               { $_[0]->{time_zone}->is_dst_for_datetime($_[0])     }
+sub time_zone_long_name  { $_[0]->{time_zone}->name                           }
+sub time_zone_short_name { $_[0]->{time_zone}->short_name_for_datetime($_[0]) }
+
+sub utc_year             { $_[0]->{_moment}->utc_year                         }
+
+# Locale
+sub ce_year              { $_[0]->{_moment}->year                             }
+sub era_name             { $_[0]->{locale}->era_wide->[1]                     }
+sub era_abbr             { $_[0]->{locale}->era_abbreviated->[1]              }
+sub christian_era        { 'AD'                                               }
+sub secular_era          { 'CE'                                               }
+
+sub year_with_era {
+    $_[0]->ce_year . $_[0]->era_abbr;
+}
+
+sub year_with_christian_era {
+    $_[0]->ce_year . $_[0]->christian_era;
+}
+
+sub year_with_secular_era {
+    $_[0]->ce_year . $_[0]->secular_era;
+}
+
+sub month_name {
+    $_[0]->{locale}->month_format_wide->[ $_[0]->month_0 ];
+}
+sub month_abbr {
+    $_[0]->{locale}->month_format_abbreviated->[ $_[0]->month_0 ];
+}
+sub day_name {
+    $_[0]->{locale}->day_format_wide->[ $_[0]->day_of_week_0];
+}
+sub day_abbr {
+    $_[0]->{locale}->day_format_abbreviated->[ $_[0]->day_of_week_0 ];
+}
+sub am_or_pm {
+    $_[0]->{locale}->am_pm_abbreviated->[ $_[0]->{_moment}->hour < 12 ? 0 : 1 ];
+}
+sub quarter_name {
+    $_[0]->{locale}->quarter_format_wide->[ $_[0]->quarter_0 ];
+}
+sub quarter_abbr {
+    $_[0]->{locale}->quarter_format_abbreviated->[ $_[0]->quarter_0 ];
+}
+
+sub local_day_of_week {
+    my $moment = $_[0]->{_moment};
+    return 1 + ($moment->day_of_week - $_[0]->{locale}->first_day_of_week) % 7;
+}
 
 sub _escape_pct {
     (my $string = $_[0]) =~ s/%/%%/g; $string;
@@ -359,56 +427,6 @@ sub hms {
 
 sub iso8601 {
     return $_[0]->{_moment}->strftime('%Y-%m-%dT%H:%M:%S');
-}
-
-# NOTE: no nanoseconds, no leap seconds
-sub utc_rd_values   { $_[0]->{_moment}->utc_rd_values }
-sub local_rd_values { $_[0]->{_moment}->local_rd_values }
-sub utc_rd_as_seconds   { $_[0]->{_moment}->utc_rd_as_seconds }
-sub local_rd_as_seconds { $_[0]->{_moment}->local_rd_as_seconds }
-sub utc_year { shift->{_moment}->utc_year }
-
-## NOTE: Time::Moment supports date in anno Domini omly.
-sub ce_year { shift->{_moment}->year }
-sub era_name { $_[0]->{locale}->era_wide->[1] }
-sub era_abbr { $_[0]->{locale}->era_abbreviated->[1] }
-sub christian_era { 'AD' }
-sub secular_era   { 'CE' }
-sub year_with_era           { ( abs $_[0]->ce_year ) . $_[0]->era_abbr }
-sub year_with_christian_era { ( abs $_[0]->ce_year ) . $_[0]->christian_era }
-sub year_with_secular_era   { ( abs $_[0]->ce_year ) . $_[0]->secular_era }
-
-sub month_name { $_[0]->{locale}->month_format_wide->[ $_[0]->month_0() ] }
-sub month_abbr { $_[0]->{locale}->month_format_abbreviated->[ $_[0]->month_0() ] }
-sub day_name   { $_[0]->{locale}->day_format_wide->[ $_[0]->day_of_week_0() ] }
-sub day_abbr   { $_[0]->{locale}->day_format_abbreviated->[ $_[0]->day_of_week_0() ] }
-sub am_or_pm   { $_[0]->{locale}->am_pm_abbreviated->[ $_[0]->{_moment}->hour < 12 ? 0 : 1 ] }
-sub quarter_name { $_[0]->{locale}->quarter_format_wide->[ $_[0]->quarter_0() ] }
-sub quarter_abbr { $_[0]->{locale}->quarter_format_abbreviated->[ $_[0]->quarter_0() ] }
-
-sub local_day_of_week {
-    my $self = shift;
-    return 1 + ($self->{_moment}->day_of_week - $self->{locale}->first_day_of_week) % 7;
-}
-
-sub mjd { $_[0]->{_moment}->mjd }
-sub jd { $_[0]->{_moment}->jd }
-sub rd { $_[0]->{_moment}->rd }
-
-sub epoch { shift->{_moment}->epoch }
-
-sub hires_epoch {
-    my $moment = shift->{_moment};
-    return $moment->epoch + $moment->nanosecond / 1_000_000_000;
-}
-
-sub is_finite   { 1 }
-sub is_infinite { 0 }
-
-sub _mod_and_keep_sign {
-    my ($lhs, $rhs) = @_;
-    my $sign = $lhs < 0 ? -1 : 1;
-    return $sign * ($lhs % $rhs);
 }
 
 sub subtract_datetime {
@@ -482,20 +500,18 @@ sub subtract_datetime_absolute {
     my ($lhs, $rhs) = @_;
     my $class = ref $lhs;
 
-    # normalize
-    $rhs = $class->from_object(object => $rhs) unless $rhs->isa($class);
-    $rhs = $rhs->clone->set_time_zone($lhs->time_zone) unless $lhs->time_zone eq $rhs->time_zone;
+    $rhs = $class->from_object(object => $rhs)
+      unless $rhs->isa($class);
 
-    my ($lhs_moment, $rhs_moment) = map { $_->{_moment} } ($lhs, $rhs);
-    my $sign = $lhs_moment < $rhs_moment ? -1 : 1;
-    ($lhs_moment, $rhs_moment) = ($rhs_moment, $lhs_moment) if $sign == -1;
+    my ($lhs_moment, $rhs_moment) = ($lhs->{_moment}, $rhs->{_moment});
 
     my $seconds     = $rhs_moment->delta_seconds($lhs_moment);
-    my $nanoseconds = $rhs_moment->delta_nanoseconds($lhs_moment) % 1_000_000_000;
+    my $nanoseconds = $rhs_moment->plus_seconds($seconds)
+                                 ->delta_nanoseconds($lhs_moment);
 
     return DateTimeX::Moment::Duration->new(
-        seconds     => $sign * $seconds,
-        nanoseconds => $sign * $nanoseconds,
+        seconds     => $seconds,
+        nanoseconds => $nanoseconds,
     );
 }
 
@@ -605,18 +621,25 @@ sub set {
     my %args = (@_ == 1 && ref $_[0] eq 'HASH') ? %{$_[0]} : @_;
 
     my $moment = $self->{_moment};
-
-    my %params = (offset => $moment->offset);
-    for my $unit (qw/year month day hour minute second nanosecond/) {
-        my $key = $unit eq 'day' ? 'day_of_month' : $unit;
-        $params{$unit} = exists $args{$unit} ? delete $args{$unit} : $moment->$key();
+    my %params = (
+        year       => $moment->year,
+        month      => $moment->month,
+        day        => $moment->day_of_month,
+        hour       => $moment->hour,
+        minute     => $moment->minute,
+        second     => $moment->second,
+        nanosecond => $moment->nanosecond,
+    );
+    for my $component (keys %args) {
+        next unless exists $params{$component};
+        $params{$component} = delete $args{$component};
     }
     if (%args) {
         my $msg = 'Invalid args: '.join ',', keys %args;
         Carp::croak $msg;
     }
 
-    my $result = Time::Moment->new(%params);
+    my $result = Time::Moment->new(%params, offset => $moment->offset);
     if (!$moment->is_equal($result)) {
         $self->{_moment} = _moment_resolve_local($result, $self->{time_zone});
     }
@@ -630,6 +653,39 @@ sub set_hour       { $_[0]->set(hour       => $_[1]) }
 sub set_minute     { $_[0]->set(minute     => $_[1]) }
 sub set_second     { $_[0]->set(second     => $_[1]) }
 sub set_nanosecond { $_[0]->set(nanosecond => $_[1]) }
+
+sub set_time_zone {
+    my ($self, $time_zone) = @_;
+    Carp::croak 'required time_zone' if @_ != 2;
+
+    $time_zone = $self->_inflate_time_zone($time_zone);
+    return $self if $time_zone == $self->{time_zone};
+    return $self if $time_zone->name eq $self->{time_zone}->name;
+
+    $self->{_moment} = do {
+        if ($self->{time_zone}->is_floating) {
+            _moment_resolve_local($self->{_moment}, $time_zone)
+        }
+        else {
+            _moment_resolve_instant($self->{_moment}, $time_zone);
+        }
+    };
+    $self->{time_zone} = $time_zone;
+    return $self;
+}
+
+sub set_locale {
+    my ($self, $locale) = @_;
+    Carp::croak 'required locale' if @_ != 2;
+    $self->{locale} = $self->_inflate_locale($locale);
+    return $self;
+}
+
+sub set_formatter {
+    my ($self, $formatter) = @_;
+    $self->{formatter} = $self->_inflate_formatter($formatter);
+    return $self;
+}
 
 sub add      { shift->_calc_date(plus  => @_) }
 sub subtract { shift->_calc_date(minus => @_) }
@@ -684,8 +740,42 @@ sub _calc_date {
 }
 
 sub delta_md {
-    my ($lhs, $rhs) = reverse sort { $a <=> $b } @_;
-    return $lhs->clone->truncate(to => 'day')->subtract_datetime($rhs->clone->truncate(to => 'day'));
+    my ($lhs, $rhs) = @_;
+    my $class = ref $lhs;
+
+    $rhs = $class->from_object(object => $rhs)
+      unless $rhs->isa($class);
+
+    my ($lhs_moment, $rhs_moment) = ($lhs->{_moment}, $rhs->{_moment});
+
+    if ($lhs_moment->rd < $rhs_moment->rd) {
+        ($lhs_moment, $rhs_moment) = ($rhs_moment, $lhs_moment);
+    }
+
+    my $months = $rhs_moment->delta_months($lhs_moment);
+    my $days   = $lhs_moment->day_of_month - $rhs_moment->day_of_month;
+
+    if ($days < 0) {
+        $days   += $rhs_moment->length_of_month;
+        $months -= $lhs_moment->day_of_month > $rhs_moment->day_of_month;
+    }
+
+    return DateTimeX::Moment::Duration->new(
+        months => $months,
+        days   => $days,
+    );
+}
+
+sub delta_days {
+    my ($lhs, $rhs) = @_;
+    my $class = ref $lhs;
+
+    $rhs = $class->from_object(object => $rhs)
+      unless $rhs->isa($class);
+
+    return DateTimeX::Moment::Duration->new(
+        days => abs($lhs->{_moment}->delta_days($rhs->{_moment}))
+    );
 }
 
 sub delta_ms {
@@ -702,7 +792,7 @@ sub delta_ms {
 sub delta_years        { shift->_delta(years        => @_) }
 sub delta_months       { shift->_delta(months       => @_) }
 sub delta_weeks        { shift->_delta(weeks        => @_) }
-sub delta_days         { shift->_delta(days         => @_) }
+#sub delta_days         { shift->_delta(days         => @_) }
 sub delta_hours        { shift->_delta(hours        => @_) }
 sub delta_minutes      { shift->_delta(minutes      => @_) }
 sub delta_seconds      { shift->_delta(seconds      => @_) }
@@ -781,31 +871,6 @@ sub format_cldr {
     )->format_cldr(@_);
 }
 
-sub set_time_zone {
-    my ($self, $time_zone) = @_;
-    Carp::croak 'required time_zone' if @_ != 2;
-
-    $time_zone = $self->_inflate_time_zone($time_zone);
-    return $self if $time_zone == $self->{time_zone};
-    return $self if $time_zone->name eq $self->{time_zone}->name;
-
-    $self->{_moment} = do {
-        if ($self->{time_zone}->is_floating) {
-            _moment_resolve_local($self->{_moment}, $time_zone)
-        }
-        else {
-            _moment_resolve_instant($self->{_moment}, $time_zone);
-        }
-    };
-    $self->{time_zone} = $time_zone;
-    return $self;
-}
-
-sub is_dst { $_[0]->{time_zone}->is_dst_for_datetime($_[0]) }
-
-sub time_zone_long_name  { $_[0]->{time_zone}->name }
-sub time_zone_short_name { $_[0]->{time_zone}->short_name_for_datetime($_[0]) }
-
 sub truncate :method {
     my $self = shift;
     my %args = (@_ == 1 && ref $_[0] eq 'HASH') ? %{$_[0]} : @_;
@@ -879,19 +944,6 @@ sub add_duration {
     }
 
     return $self->add($duration->deltas);
-}
-
-sub set_locale {
-    my ($self, $locale) = @_;
-    Carp::croak 'required locale' if @_ != 2;
-    $self->{locale} = $self->_inflate_locale($locale);
-    return $self;
-}
-
-sub set_formatter {
-    my ($self, $formatter) = @_;
-    $self->{formatter} = $self->_inflate_formatter($formatter);
-    return $self;
 }
 
 # internal utilities

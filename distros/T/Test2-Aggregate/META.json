@@ -51,6 +51,6 @@
          "web" : "https://github.com/SpareRoom/Test2-Aggregate"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

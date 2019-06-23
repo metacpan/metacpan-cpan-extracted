@@ -25,6 +25,7 @@ t/02_function_interface_info/function/param.t
 t/02_function_interface_info/function/return_param.t
 t/02_function_interface_info/info.t
 t/03_function_interface_impl/assert_valid.t
+t/03_function_interface_impl/case_duplicate.t
 t/03_function_interface_impl/check_params.t
 t/03_function_interface_impl/check_return.t
 t/03_function_interface_impl/error.t

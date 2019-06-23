@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use feature ':5.14';
 
-package Text::Parser 0.925;
+package Text::Parser 0.926;
 
 # ABSTRACT: Simplifies text parsing. Easily extensible to parse any text format.
 
@@ -188,6 +188,7 @@ sub read {
     $self->_run_begin_end_block('_begin_rule');
     $self->__read_and_close_filehandle;
     $self->_run_begin_end_block('_end_rule');
+    $self->_ExAWK_symbol_table( {} );
 }
 
 sub _handle_read_inp {
@@ -211,7 +212,6 @@ sub _run_begin_end_block {
     return if not $self->$pred();
     my $rule = $self->$func();
     $rule->run( $self, 0 );
-    $self->_ExAWK_symbol_table( {} ) if $func eq '_end_rule';
 }
 
 sub __read_and_close_filehandle {
@@ -450,7 +450,7 @@ Text::Parser - Simplifies text parsing. Easily extensible to parse any text form
 
 =head1 VERSION
 
-version 0.925
+version 0.926
 
 =head1 SYNOPSIS
 
@@ -460,21 +460,21 @@ version 0.925
     $parser->read(shift);
     print $parser->get_records, "\n";
 
-The above code reads the first command-line argument as a string, and assuming it is the name of a text file, it will print the content of the file to C<STDOUT>. If the string is not the name of a text file it will throw an exception and exit.
+The above code prints the content of the file (named in the first argument) to C<STDOUT>.
 
     my $parser = Text::Parser->new();
     $parser->add_rule(do => 'print');
     $parser->read(shift);
 
-You can do a lot of complex things. For examples see the L<manual|Text::Parser::Manual>.
+This example also dones the same as the earlier one. For more complex examples see the L<manual|Text::Parser::Manual>.
 
 =head1 OVERVIEW
 
-The L<need|Text::Parser::Manual/MOTIVATION> for this class stems from the fact that text parsing is the most common thing that programmers do, and yet there is no lean, simple way to do it efficiently. Most programmers still use boilerplate code with a C<while> loop.
+The L<need|Text::Parser::Manual/MOTIVATION> for this class stems from the fact that text parsing is the most common thing that programmers do, and yet there is no lean, simple way to do it efficiently. Most programmers still write boilerplate code with a C<while> loop.
 
-Instead C<Text::Parser> allows programmers to parse text with terse, self-explanatory L<rules|Text::Parser::Manual::ExtendedAWKSyntax>, whose structure is very similar to AWK, but extends beyond the capability of AWK. Incidentally, AWK is the inspiration for Perl itself! And one would have expected Perl to extend the capabilities of AWK. Yet, command-line C<perl -lane> or even C<perl -lan script.pl> are L<very limited|Text::Parser::Manual::ComparingWithNativePerl> in what they can do. Programmers cannot use them for serious programs.
+Instead C<Text::Parser> allows programmers to parse text with terse, self-explanatory L<rules|Text::Parser::Manual::ExtendedAWKSyntax>, whose structure is very similar to L<AWK|https://books.google.com/books/about/The_AWK_Programming_Language.html?id=53ueQgAACAAJ>, but extends beyond the capability of AWK. Incidentally, AWK is L<one of the ancestors of Perl|http://history.perl.org/PerlTimeline.html>! One would have expected Perl to extend the capabilities of AWK, although that's not really the case. Command-line C<perl -lane> or even C<perl -lan script.pl> are L<very limited|Text::Parser::Manual::ComparingWithNativePerl> in what they can do. Programmers cannot use them for serious projects. And parsing text files in regular Perl involves writing the same C<while> loop again. L<This website|https://perl-begin.org/uses/text-parsing/> summarizes the options available in Perl so far.
 
-With C<Text::Parser>, a developer can focus on specifying a grammar and then simply C<read> the file. The C<L<read|/read>> method automatically runs each rule collecting records from the text input into an array internally. And finally C<L<get_records|/get_records>> can retrieve the records. Thus the programmer now has the power of Perl to create complex data structures, along with the elegance of AWK to parse text files.
+With C<Text::Parser>, a developer can focus on specifying a grammar and then simply C<read> the file. The C<L<read|/read>> method automatically runs each rule collecting records from the text input into an array internally. And finally C<L<get_records|/get_records>> can retrieve the records. Thus the programmer now has the power of Perl to create complex data structures, along with the elegance of AWK to parse text files. The L<manuals|Text::Parser::Manual> illustrate this with L<examples|Text::Parser::Manual::ComparingWithNativePerl>.
 
 =head1 CONSTRUCTOR
 
@@ -514,7 +514,7 @@ Read-write attribute. The values this can take are shown under the C<L<new|/new>
 
 =head2 FS
 
-Read-write attribute that can be used to specify the field separator along with C<auto_split> attribute. It must be a regular expression reference enclosed in the C<qr> function, like C<qr/\s+|[,]/> which will split across either spaces or commas. The default value for this argument is C<qr/\s+/>.
+Read-write attribute that can be used to specify the field separator to be used by the C<auto_split> feature. It must be a regular expression reference enclosed in the C<qr> function, like C<qr/\s+|[,]/> which will split across either spaces or commas. The default value for this argument is C<qr/\s+/>.
 
 The name for this attribute comes from the built-in C<FS> variable in the popular L<GNU Awk program|https://www.gnu.org/software/gawk/gawk.html>.
 
@@ -570,7 +570,7 @@ Takes no arguments, returns nothing. Clears the rules that were added to the obj
 
     $parser->clear_rules;
 
-This is useful to be able to re-use the parser after a C<read> call, to parse another text with another set of rules.
+This is useful to be able to re-use the parser after a C<read> call, to parse another text with another set of rules. The C<clear_rules> method does clear even the rules set up by C<L<BEGIN_rule|/BEGIN_rule>> and C<L<END_rule|/END_rule>>.
 
 =head2 BEGIN_rule
 
@@ -850,7 +850,7 @@ L<Text::Parser::Manual> - Read this manual
 
 =item *
 
-L<FileHandle> - if you want to C<read> from file handles directly
+L<The AWK Programming Language|https://books.google.com/books/about/The_AWK_Programming_Language.html?id=53ueQgAACAAJ> - by B<A>ho, B<W>einberg, and B<K>ernighan.
 
 =item *
 

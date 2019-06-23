@@ -1,11 +1,12 @@
 package Chart::Plotly::Plot;
 
 use Moose;
+use JSON qw();
 use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 use Chart::Plotly;
 
@@ -23,30 +24,56 @@ has traces => ( traits  => ['Array'],
 has layout => ( is  => 'rw',
                 isa => 'HashRef' );
 
+has config => ( is  => 'rw',
+                isa => 'HashRef' );
+
 sub html {
     my $self                         = shift;
     my %params                       = @_;
     my $chart_id                     = $params{'div_id'} // create_uuid_as_string(UUID_TIME);
     my $load_plotly_using_script_tag = $params{'load_plotly_using_script_tag'} // 1;
     my $layout                       = $self->layout;
+    my $config                       = $self->config;
+    if ( defined $config ) {
+        $config = Chart::Plotly::_process_data($config);
+        if ( !defined $layout ) {
+            $layout = {};
+        }
+    }
     if ( defined $layout ) {
         $layout = Chart::Plotly::_process_data($layout);
     }
     return
       Chart::Plotly::_render_cell( Chart::Plotly::_process_data( $self->traces() ),
-                                   $chart_id, $layout,
+                                   $chart_id, $layout, $config,
                                    { load_plotly_using_script_tag => $load_plotly_using_script_tag } );
 }
 
 sub TO_JSON {
     my $self   = shift;
     my $layout = $self->layout;
+    my $config = $self->config;
     my $json   = '{ "data": ' . Chart::Plotly::_process_data( $self->traces() );
     if ( defined $layout ) {
         $layout = Chart::Plotly::_process_data($layout);
         $json .= ', "layout": ' . $layout;
     }
+    if ( defined $config ) {
+        $config = Chart::Plotly::_process_data($config);
+        $json .= ', "config": ' . $config;
+    }
     return $json . " }";
+}
+
+sub from_json {
+    my $class = shift;
+    my $json  = shift;
+    my %data  = %{ JSON::from_json($json) };
+    return
+      $class->new( ( defined $data{"data"}   ? ( traces => $data{"data"} )   : () ),
+                   ( defined $data{"layout"} ? ( layout => $data{"layout"} ) : () ),
+                   ( defined $data{"config"} ? ( config => $data{"config"} ) : () )
+      );
 }
 
 1;
@@ -63,7 +90,7 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -94,6 +121,10 @@ Chart::Plotly::Plot - Set of traces with their options and data
 
 =head1 METHODS
 
+=head2 config
+
+Configuration options for the plot. See L<https://plot.ly/javascript/configuration-options/>
+
 =head2 html
 
 Returns the html corresponding to the plot
@@ -103,6 +134,8 @@ Returns the html corresponding to the plot
 =head2 TO_JSON
 
 Returns the json corresponding to the plot
+
+=head2 from_json
 
 =head1 AUTHOR
 

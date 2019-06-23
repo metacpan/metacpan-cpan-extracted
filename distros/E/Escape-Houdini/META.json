@@ -4,13 +4,13 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Escape-Houdini",
    "prereqs" : {
@@ -57,7 +57,7 @@
    "provides" : {
       "Escape::Houdini" : {
          "file" : "lib/Escape/Houdini.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.3.1"
       }
    },
    "release_status" : "stable",
@@ -72,13 +72,18 @@
          "web" : "https://github.com/yanick/Escape-Houdini"
       }
    },
-   "version" : "0.3.0",
+   "version" : "0.3.1",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
    "x_contributors" : [
       "Mike Doherty <doherty@cs.dal.ca>"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

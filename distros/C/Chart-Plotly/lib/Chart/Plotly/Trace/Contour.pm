@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Contour::Line;
 use Chart::Plotly::Trace::Contour::Stream;
 use Chart::Plotly::Trace::Contour::Transform;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: The data from which contour lines are computed is set in `z`. Data in `z` must be a {2D array} of numbers. Say that `z` has N rows and M columns, then by default, these N rows correspond to N y coordinates (set in `y` or auto-generated) and the M columns correspond to M x coordinates (set in `x` or auto-generated). By setting `transpose` to *true*, the above behavior is flipped.
 
@@ -401,7 +401,7 @@ Chart::Plotly::Trace::Contour - The data from which contour lines are computed i
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

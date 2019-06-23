@@ -23,7 +23,7 @@ tracker - run App::TimeTracker
 
 =head1 VERSION
 
-version 2.028
+version 3.000
 
 =head1 SYNOPSIS
 
@@ -46,6 +46,26 @@ different sets of plugins for different jobs or projects.
 B<Tip:> Use C<tracker plugins> to list all installed plugins. Read more
 about each plugin in C<App::TimeTracker::Command::PLUGIN-NAME>.
 
+=head2 Note about (missing) Plugins
+
+Up to version 2.028 a lot of plugins where included in the main distribution C<App-TimeTracker>. To make installation easier and faster, all non-core command plugins have been moved into distinct, standalone distribution.
+
+The following plugins are affected:
+
+=over
+
+=item * App::TimeTracker::Git (which also includes SyncViaGit)
+
+=item * App::TimeTracker::RT
+
+=item * App::TimeTracker::TellRemote (which was called Post2IRC earlier)
+
+=item * App::TimeTracker::Overtime has been removed, while the idea is nice, the API and implementation are not good enough.
+
+=item * App::TimeTracker::TextNotify has been removed.
+
+=back
+
 =head1 INSTALLATION
 
 L<App::TimeTracker> is a L<Perl|http://perl.org> application, and thus requires
@@ -60,8 +80,6 @@ available:
 
 =head3 cpanminus
 
-The new and shiny CPAN client!
-
   ~$ cpanm App::TimeTracker
   --> Working on App::TimeTracker
   Fetching http://search.cpan.org/CPAN/authors/id/D/DO/DOMM/App-TimeTracker-2.009.tar.gz ... OK
@@ -74,12 +92,6 @@ If you don't have C<cpanminus> installed yet, L<install it right
 now|http://search.cpan.org/dist/App-cpanminus/lib/App/cpanminus.pm#INSTALLATION>:
 
   ~$ curl -L http://cpanmin.us | perl - --sudo App::cpanminus
-
-=head3 CPANPLUS
-
-CPANPLUS comes preinstalled with recent Perls (5.10 and newer).
-
-  cpanp i App::TimeTracker
 
 =head3 CPAN.pm
 
@@ -96,6 +108,17 @@ CPAN module install dance:
   ~/perl/App-TimeTracker$ ./Build
   ~/perl/App-TimeTracker$ ./Build test
   ~/perl/App-TimeTracker$ ./Build install  # might require sudo
+
+=head1 SETUP
+
+The first time you run C<tracker>, it will create the directory
+C<~/.TimeTracker> and generate an empty C<tracker.json> core config
+file there.
+
+In the root directory of the project you want to track time for, do
+C<tracker init>. This will set up this directory for time-tracking.
+See below for more information on the config files and the mergin of
+config files.
 
 =head1 CONFIGURATION
 
@@ -231,7 +254,7 @@ To see how long you worked, use C<tracker report>:
 =head2 Advanced Usage with git, RT and IRC
 
 By using some plugins we can make C<tracker> a much more powerful tool.
-Let's use the C<git>, C<RT> and C<Post2IRC> plugins for maximum laziness.
+Let's use the C<git>, C<RT> and C<TellRemote> plugins for maximum laziness.
 
 The first step is to add a setting to the tracker config file in your
 project directory. Or you could add those settings to a config file in a
@@ -242,9 +265,9 @@ parent directory, see L<Configuration|/CONFIGURATION> for more information about
     "plugins" : [
       "Git",
       "RT",
-      "Post2IRC",
+      "TellRemote",
     ],
-    "post2irc" : {
+    "tell_remote" : {
       "secret" : "bai0uKiw",
       "host" : "http://devbox.vpn.somewhere.com/"
     },
@@ -379,7 +402,7 @@ Thomas Klausner <domm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2018 by Thomas Klausner.
+This software is copyright (c) 2011 - 2019 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,22 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3632  2019-06-22
+        - added the digital potentiometer (MCP4xxxx) to the test platform (in
+          this case, we're using the single pot MCP41010). (Closes #87)
+        - correct markup error in FAQ (closes #100)
+        - added BMP180 to the test platform (closes #85)
+        - OLED displays are now available
+        - reorganized all test files so that when unit testing with
+          Test::BrewBuild, the LCD will retain the test results for the majority
+          of the test run
+        - added new testing env var "RPI_RELEASE_TESTING", so that we can
+          install other CPAN distributions without breaking things due to
+          "RELEASE_TESTING" always being set
+        - fully integrated the new RPi::SysInfo distribution as a parent to
+          RPi::Core
+        - updated stepper motor FAQ with new GPIO expander functionality
+          (closes #102)
+
 2.3631  2019-02-25
         - no functional changes -- all changes are documentation
         - added section on the automated testing section of FAQ that on modern

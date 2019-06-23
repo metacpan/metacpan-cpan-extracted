@@ -5,7 +5,7 @@ DBIx::Handler - fork-safe and easy transaction handling DBI handler
 # SYNOPSIS
 
     use DBIx::Handler;
-    my $handler = DBIx::Handler->new($dsn, $user, $pass, $opts);
+    my $handler = DBIx::Handler->new($dsn, $user, $pass, $dbi_opts, $opts);
     my $dbh = $handler->dbh;
     $dbh->do(...);
 
@@ -17,7 +17,7 @@ DBIx::Handler provide scope base transaction, fork safe dbh handling, simple.
 
 # METHODS
 
-- my $handler = DBIx::Handler->new($dsn, $user, $pass, $opts);
+- my $handler = DBIx::Handler->new($dsn, $user, $pass, $dbi\_opts, $opts);
 
     get database handling instance.
 
@@ -45,6 +45,16 @@ DBIx::Handler provide scope base transaction, fork safe dbh handling, simple.
 
         By default, ping before each executing query.
         If it affect performance then you can set to true for ping stopping.
+
+    - dbi\_class : ClassName
+
+        By default, this module uses generally [DBI](https://metacpan.org/pod/DBI) class.
+        For example, if you want to use another custom class compatibility with DBI, you can use it with this option.
+
+    - prepare\_method : Str
+
+        By default, this module uses generally [prepare](https://metacpan.org/pod/prepare) method.
+        For example, if you want to use `prepare_cached` method or other custom method compatibility with `prepare` method, you can use it with this option.
 
 - my $handler = DBIx::Handler->connect($dsn, $user, $pass, $opts);
 

@@ -122,7 +122,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') {
                             }, function(res) {
 
                                 // request error
-                                if (!res) {
+                                if (!res.isSuccess()) {
                                     me.onRequestError(res);
 
                                     return;

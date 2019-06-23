@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 # -----------------------------------------------------------------------------
 
@@ -40,18 +40,15 @@ L<Quiq::Hash>
     $c->addArgument('/tmp/test.pdf');
     
     my $cmd = $c->command;
-    
     __END__
-    
-    iconv -f utf-8 -t latin1 | enscript --no-header --landscape
-      --font=Courier8 2>/dev/null | ps2pdf - /tmp/test.pdf
+    iconv -f utf-8 -t latin1 | enscript --no-header --landscape --font=Courier8 2>/dev/null | ps2pdf - /tmp/test.pdf
 
 =head1 DESCRIPTION
 
 Die Klasse stellt Methoden zur Verfügung, um eine
-Unix-Kommandozeile zu konstruieren. Die Klasse ist vor allem
-hilfreich, wenn die einzelnen Bestandteile der Kommandozeile nicht
-statisch sind, sondern variieren können.
+Unix-Kommandozeile zu konstruieren. Die Klasse ist hilfreich, wenn
+einzelne Bestandteile der Kommandozeile nicht statisch sind,
+sondern variieren können.
 
 =head1 METHODS
 
@@ -539,7 +536,7 @@ sub value {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

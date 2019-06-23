@@ -337,3 +337,7 @@ Revision history for Perl extension Proc::ProcessTable.
 0.56 2019-02-07
   * Testing support for mswin32
   * minor fix for FreeBSD
+0.59 2019-06-20
+  * works again on AIX
+  * fixed mswin32 stuff, hope it works now
+  * reogranized code and started to use newest version ExtUtils::MakeMaker

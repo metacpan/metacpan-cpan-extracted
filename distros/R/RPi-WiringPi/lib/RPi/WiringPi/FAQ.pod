@@ -27,6 +27,7 @@ L<RPi::Const> module.
     EDGE_FALLING -  a state when a pin goes from HIGH to LOW
     EDGE_RISING  -  a state when a pin goes from LOW to HIGH
     EDGE_BOTH    -  both of the above states
+    OLED         -  Organic Light Emitting Diode
     DPOT         -  digital potentiometer
     ADC          -  analog to digital converter (in)
     DAC          -  digital to analog converter (out)
@@ -222,7 +223,130 @@ identification within your scripts.
     $pi->label('pi-test-01');
     print $pi->label . "\n"; # pi-test-01
 
-=head1 PIN 
+=head2 System Information
+
+We inherit all functionality from the L<RPi::SysInfo> distribution, which
+provides the following functionality:
+
+=head3 CPU usage percent
+
+    my $cpu_percent = $pi->cpu_percent;
+    say "CPU utilization: $cpu_percent%";
+
+Example output:
+
+    CPU utilization: 3.80%
+
+=head3 Memory usage percent
+
+    my $mem_percent = $pi->mem_percent;
+    say "RAM utilization: $mem_percent%";
+
+Example output:
+
+    RAM utilization: 71.01%
+
+=head3 CPU core temperature
+
+    my $tC = $pi->core_temp;
+    my $tF = $pi->core_temp('f');
+
+    say "Core CPU temperature: $tC C : $tF F";
+
+Example output:
+
+    Core CPU temperature: 46.7 C : 116.06 F
+
+=head3 GPIO information
+
+Note: if you do not supply an array reference with pin numbers, by default,
+we'll return the information for *all* GPIO pins.
+
+    my $pin_21_info = $pi->gpio_info([21]);
+
+    my $multi_pin_info = $pi->gpio_info([2, 4, 6]);
+
+    say "Pin 21 info:";
+    say "$pin_21_info\n";
+
+    say "Multi-pin info:";
+    say $multi_pin_info;
+
+Example output:
+
+    Pin 21 info:
+    GPIO 21: level=0 fsel=0 func=INPUT
+
+    Multi-pin info:
+    GPIO 2: level=1 fsel=4 alt=0 func=SDA1
+    GPIO 4: level=0 fsel=1 func=OUTPUT
+    GPIO 6: level=0 fsel=1 func=OUTPUT
+
+=head3 Boot configuration settings
+
+    say $pi->raspi_config;
+
+Example output (significantly snipped for brevity):
+
+    arm_freq=1200
+    audio_pwm_mode=514
+    config_hdmi_boost=5
+    core_freq=250
+    desired_osc_freq=0x36ee80
+    ...
+    dtparam=i2c_arm=on
+    dtparam=spi=on
+    dtparam=audio=on
+    enable_uart=1
+    dtparam=i2c_arm_baudrate=10000
+    dtoverlay=pi3-disable-bt-overlay
+    dtoverlay=spi-bcm2835
+
+=head3 Network configuration information
+
+    say $pi->network_info;
+
+This method simply returns the information from the C<ifconfig> system call.
+
+=head3 File system information
+
+    say $pi->file_system;
+
+Example output:
+
+    Filesystem     1K-blocks    Used Available Use% Mounted on
+    /dev/root       61289372 3375520  55373576   6% /
+    devtmpfs          470116       0    470116   0% /dev
+    tmpfs             474724       0    474724   0% /dev/shm
+    tmpfs             474724   24140    450584   6% /run
+    tmpfs               5120       4      5116   1% /run/lock
+    tmpfs             474724       0    474724   0% /sys/fs/cgroup
+    /dev/mmcblk0p1     43234   22035     21199  51% /boot
+    tmpfs              94944       0     94944   0% /run/user/1000
+
+    Filename                                Type            Size    Used    Priority
+    /var/swap                               file            102396  0       -2
+
+=head3 Pi board and OS details
+
+    say $pi->pi_details;
+
+    Raspberry Pi 3 Model B Rev 1.2
+
+    PRETTY_NAME="Raspbian GNU/Linux 9 (stretch)"
+    NAME="Raspbian GNU/Linux"
+    VERSION_ID="9"
+    VERSION="9 (stretch)"
+
+    Linux pi-test 4.14.98-v7+ #1200 SMP Tue Feb 12 20:27:48 GMT 2019 armv7l GNU/Linux
+
+    Hardware        : BCM2835
+    Revision        : a22082
+    Serial          : 000000005d916dc3
+    Throttled flag  : throttled=0x50000
+    Camera          : supported=0 detected=0
+
+=head1 PIN
 
 =head2 Creating and using a GPIO pin object
 
@@ -771,6 +895,26 @@ usage instructions.
 
     my $meridien = $rtc->am_pm;
 
+=head1 OLED DISPLAY
+
+We provide access to OLED displays. Currently, only the C<128x64> size is
+available, and is brought in by the L<RPi::OLED::SSD1306::128_64> distribution.
+Please see its documentation for full usage information.
+
+=head2 Usage
+
+    my $oled = $pi->oled('128x64');
+
+    $oled->string("hello, world!");
+    $oled->display;
+
+    $oled->clear;
+
+    $oled->rect(0, 0, 10, 10); # X, Y, width, height
+    $oled->display;
+
+    $oled->clear;
+
 =head1 GPIO EXPANDERS
 
 We provide access to the C<MCP23017> GPIO expander chip via the
@@ -844,6 +988,18 @@ This method provides access to the L<RPi::StepperMotor> library to drive a
     $sm->cw(180);   # clockwise, 180 degrees
     $sm->ccw(240);  # counter-clockwise, 240 degrees
 
+You can also use the stepper motor with a GPIO expander IC, and use those pins
+instead of the GPIO on the Pi:
+
+    my $expander = $pi->expander;
+
+    my $sm = $pi->stepper_motor(
+        epander => $expander,
+        pins => [0, 1, 2, 3]    # first four GPIO expander pins
+    );
+
+    $sm->cw(180);
+
 =head1 CORE/UTIL LIBRARY
 
 =head2 Overview
@@ -880,6 +1036,16 @@ There are a couple of test files that require root privileges, but we handle
 this internally by re-running the file with C<sudo> enabled. This allows all
 tests but these couple to be run as a standard user.
 
+=head3 Author Testing
+
+To run the author tests (manifest, POD etc), set:
+
+    RPI_RELEASE_TESTING=1
+
+We use this instead of C<RELEASE_TESTING>, because that typically caused
+all sorts of grief when installing prerequisites from the CPAN. Other
+people's distribution's author tests often fail due to having it set.
+
 =head3 Arduino/I2C
 
 For testing the L<RPi::I2C> module, we have a dedicated Arduino sketch in the
@@ -913,6 +1079,14 @@ C</boot/config.txt> file (this disabled Bluetooth on the Serial interface):
 
     dtoverlay=pi3-disable-bt-overlay
 
+=head3 BMP Barometric Pressure Sensor Testing
+
+To test the temperature and barometric pressure from the BMPx80 sensors:
+
+    export RPI_BMP=1
+
+These tests skip by default.
+
 =head3 HCSR04 Ultrasonic Testing
 
 For this test, please see the documentation for L<RPi::HCSR04>, and check the
@@ -922,6 +1096,20 @@ test files for the pins that are needed. After confirmed and connected, set
 
 These tests only occur in automated mode when building on a Perl that doesn't
 have prerequisites installed.
+
+=head3 OLED Display Testing
+
+These tests use the L<RPi::OLED::SSD1306::128_64> distribution with a 128x64
+pixel I2C OLED display. To have these tests execute, set:
+
+    export RPI_OLED=1
+
+There's a functional script that will display aspects of the system (time, date,
+temperature and barometric pressure sensor) on an available OLED. While the OLED
+tests are running, the script automatically disables itself. To operate this
+functionality:
+
+    perl examples/oled_display_date_time_temp.pl &
 
 =head3 LCD Testing
 
@@ -962,6 +1150,16 @@ need to be set:
 
 =head3 Digital Potentiometer Testing
 
+Set the following environment variable:
+
+    export RPI_DIGIPOT=1
+
+We also need the ADS1115 connected and enabled:
+
+    export RPI_ADC=1
+
+=head3 Digital to Analog Converter Testing
+
 To test the functionality of the L<RPi::DAC::MCP4922>, set the following
 environment variable:
 
@@ -973,7 +1171,7 @@ L<Test::BrewBuild> has some special features specifically to facilitate the
 automatic testing of this distribution while on a Raspberry Pi, with provisions
 that allow you to display the last test run results on an LCD if desired.
 
-WARNING: Note that seemingly from perlbrew 0.86, the output of its <c>exec</c>
+WARNING: Note that seemingly from perlbrew 0.86, the output of its C<exec>
 command doesn't display the perl version if only a single instance of perl is
 installed. Simply ensure you've got more than one Perl instance installed.
 
@@ -1038,18 +1236,22 @@ environment variables for the full test platform. For LCD, the last two digits
 column unit, leave those last two digits off.
 
     PI_BOARD=1
+    RPI_RELEASE_TESTING=1
     RPI_ARDUINO=1
     RPI_ADC=1
+    RPI_BMP=1
     RPI_MCP3008=1
+    RPI_DIGIPOT=1
     RPI_MCP4922=1
     RPI_SHIFTREG=1
     RPI_LCD=1
+    RPI_OLED=1
     RPI_SERIAL=1
-    RPI_HCSR04=1
+    RPI_HCSR04=0
     BB_RPI_LCD=5,6,4,17,27,22,4,20
     RPI_RTC=1
     RPI_MCP23017=1
-    RELEASE_TESTING=1
+    RELEASE_TESTING=0
 
 =head1 DEVELOPMENT
 
@@ -1071,7 +1273,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017,2018 by Steve Bertrand
+Copyright (C) 2016-2019 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

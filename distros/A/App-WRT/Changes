@@ -1,5 +1,12 @@
 Revision history for App::WRT
 
+v6.3.0 2019-06-22
+
+  - move get_date() from App::WRT::Util to App::WRT::Date
+  - make App::WRT::FileIO and ::Util less redundant
+  - add App::WRT::Mock::FileIO for faking writes in tests
+  - make bin/wrt-render-all testable, add t/bin-wrt-render-all.t
+
 v6.2.4 2019-05-28
 
   - Replace README.pod with a concise README.md

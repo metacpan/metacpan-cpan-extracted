@@ -4,6 +4,7 @@ requires 'autobox';
 requires 'autobox::Core';
 requires 'true';
 requires 'Carp';
+requires 'parent';
 requires 'Sort::Maker';
 requires 'List::MoreUtils';
 
@@ -13,4 +14,3 @@ on 'test' => sub {
     requires 'Test::Exception';
     requires 'Moo';
 };
-

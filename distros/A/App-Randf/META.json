@@ -4,26 +4,25 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Randf",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build::Pluggable::CPANfile" : "0.04"
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40",
-            "Module::Build::Pluggable" : "0",
-            "Module::Build::Pluggable::CPANfile" : "0.04"
+            "Module::Build" : "0.42",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "runtime" : {
@@ -35,18 +34,12 @@
             "strict" : "0",
             "warnings" : "0"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Capture::Tiny" : "0",
-            "Test::More" : "0.88"
-         }
       }
    },
    "provides" : {
       "App::Randf" : {
          "file" : "lib/App/Randf.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -65,5 +58,6 @@
          "web" : "http://webchat.freenode.net/?channels=%23bayadev"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Pod-Weaver-PluginBundle-SHLOMIF",
-  "dist_version" => "0.001001",
+  "dist_version" => "0.001002",
   "license" => "apache",
   "module_name" => "Pod::Weaver::PluginBundle::SHLOMIF",
   "recursive_test_files" => 1,

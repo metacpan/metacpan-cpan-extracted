@@ -1,0 +1,4 @@
+name = "AnyEvent-ForkManager"
+badges = ["travis"]
+authority="cpan:KARUPA"
+module_maker="ModuleBuildTiny"

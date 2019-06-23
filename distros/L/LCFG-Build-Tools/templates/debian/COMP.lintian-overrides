@@ -1,0 +1,3 @@
+# LCFG components are usually associated with lcfg-multi-user.target
+
+systemd-service-file-refers-to-unusual-wantedby-target lib/systemd/system/[% spec.fullname %].service lcfg-multi-user.target

@@ -7,7 +7,7 @@ use File::Which qw( which );
 use File::Spec;
 use Env qw( @PATH );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -40,41 +40,41 @@ Perl:
 
 =head1 DESCRIPTION
 
-This module provides native Rust types for L<FFI::Platypus> in order to 
-reduce cognitive load and concentrate on Rust and forget about C types.  
-This document also documents issues and caveats that I have discovered 
+This module provides native Rust types for L<FFI::Platypus> in order to
+reduce cognitive load and concentrate on Rust and forget about C types.
+This document also documents issues and caveats that I have discovered
 in my attempts to work with Rust and FFI.
 
-This module is somewhat experimental.  It is also available for adoption 
-for anyone either sufficiently knowledgable about Rust or eager enough 
-to learn enough about Rust.  If you are interested, please send me a 
+This module is somewhat experimental.  It is also available for adoption
+for anyone either sufficiently knowledgeable about Rust or eager enough
+to learn enough about Rust.  If you are interested, please send me a
 pull request or two on the project's GitHub.
 
-Note that in addition to using pre-compiled Rust libraries, you can 
-bundle Rust code with your Perl distribution using 
+Note that in addition to using pre-compiled Rust libraries, you can
+bundle Rust code with your Perl distribution using
 L<Module::Build::FFI::Rust>.
 
 =head1 CAVEATS
 
-In doing my testing I have been using the pre-release 1.0.0 Alpha 
-version of Rust.  Rust is a very fast moving target!  I have rarely 
-found examples on the internet that still work by the time I get around 
-to trying them.  Fast times.  Hopefully when it becomes stable things 
+In doing my testing I have been using the pre-release 1.0.0 Alpha
+version of Rust.  Rust is a very fast moving target!  I have rarely
+found examples on the internet that still work by the time I get around
+to trying them.  Fast times.  Hopefully when it becomes stable things
 will change.
 
 =head2 name mangling
 
-Rust names are "mangled" to handle features such as modules and the fact 
-that some characters in Rust names are illegal machine code symbol 
-names. For now that means that you have to tell Rust not to mangle the 
-names of functions that you are going to call from Perl.  You can 
-accomplish that lke this:
+Rust names are "mangled" to handle features such as modules and the fact
+that some characters in Rust names are illegal machine code symbol
+names. For now that means that you have to tell Rust not to mangle the
+names of functions that you are going to call from Perl.  You can
+accomplish that like this:
 
  #[no_mangle]
  pub extern "C" fn foo() {
  }
 
-You do not need to add this decoration to functions that you do not 
+You do not need to add this decoration to functions that you do not
 directly call from Perl.  For example:
 
  fn bar() {
@@ -84,11 +84,6 @@ directly call from Perl.  For example:
  pub extern "C" fn foo() {
    bar();
  }
-
-In the future we may add support for name mangling so that you can use 
-the Rust names, as we attempt to do for L<C++|FFI::Platypus::Lang::CPP>. 
-In fact we may be able to use the same technique, as it appears that 
-Rust uses the same mangling format.
 
 =head1 METHODS
 
@@ -100,8 +95,8 @@ Platypus are documented here.
 
  my $hashref = FFI::Platypus::Lang::Rust->native_type_map;
 
-This returns a hash reference containing the native aliases for the Rust 
-programming languages.  That is the keys are native Rust types and the 
+This returns a hash reference containing the native aliases for the Rust
+programming languages.  That is the keys are native Rust types and the
 values are libffi native types.
 
 =cut
@@ -122,12 +117,8 @@ sub native_type_map
     binary64 => 'double',   #  "    "  "     "    "  "
     f32      => 'float',
     f64      => 'double',
-    usize    => do { FFI::Platypus->type_meta('size_t')->{ffi_type} },
-    isize    => do {
-      my $ffi_type = FFI::Platypus->type_meta('size_t')->{ffi_type};
-      $ffi_type =~ s{^u}{s};
-      $ffi_type;
-    },
+    usize    => FFI::Platypus->type_meta('size_t')->{ffi_type},
+    isize    => FFI::Platypus->type_meta('ssize_t')->{ffi_type},
   },
 }
 

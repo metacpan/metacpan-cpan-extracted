@@ -12,7 +12,7 @@ with qw(
     eris::role::pluggable
 );
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 sub _build_namespace { 'eris::log::decoder' }
@@ -72,7 +72,7 @@ eris::log::decoders - Discovery and access for decoders
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

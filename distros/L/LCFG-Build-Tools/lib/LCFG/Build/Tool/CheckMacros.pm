@@ -2,13 +2,13 @@ package LCFG::Build::Tool::CheckMacros;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: CheckMacros.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: CheckMacros.pm.in 35684 2019-02-28 10:04:54Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/CheckMacros.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Tool/CheckMacros.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35684 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/lib/LCFG/Build/Tool/CheckMacros.pm.in $
+# $Date: 2019-02-28 10:04:54 +0000 (Thu, 28 Feb 2019) $
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use File::Spec ();
 use File::Temp ();
@@ -50,6 +50,7 @@ my %basic = map { $_ => 'basic' } qw(
     LCFG_FULLNAME
     LCFG_VERSION
     LCFG_VERSION
+    LCFG_PERL_VERSION
     LCFG_RELEASE
     LCFG_SCHEMA
     LCFG_VENDOR
@@ -303,7 +304,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::CheckMacros version 0.9.20
+    This documentation refers to LCFG::Build::Tool::CheckMacros version 0.9.30
 
 =head1 SYNOPSIS
 

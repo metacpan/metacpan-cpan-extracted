@@ -4,7 +4,7 @@ use warnings;
 use Config::CmdRC '.randfrc';
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub run {
     my $self = shift;
@@ -81,7 +81,7 @@ execute randf
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-Randf"><img src="https://secure.travis-ci.org/bayashi/App-Randf.png?_t=1440937201"/></a> <a href="https://coveralls.io/r/bayashi/App-Randf"><img src="https://coveralls.io/repos/bayashi/App-Randf/badge.png?_t=1440937201&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/App-Randf"><img src="https://secure.travis-ci.org/bayashi/App-Randf.png?_t=1561223563"/></a> <a href="https://coveralls.io/r/bayashi/App-Randf"><img src="https://coveralls.io/repos/bayashi/App-Randf/badge.png?_t=1561223563&branch=master"/></a>
 
 =end html
 

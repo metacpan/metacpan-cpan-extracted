@@ -3,9 +3,9 @@ NAME
     arguments (@ARGV)
 
 VERSION
-    This document describes version 0.841 of Perinci::Sub::GetArgs::Argv
+    This document describes version 0.842 of Perinci::Sub::GetArgs::Argv
     (from Perl distribution Perinci-Sub-GetArgs-Argv), released on
-    2019-04-15.
+    2019-06-20.
 
 SYNOPSIS
      use Perinci::Sub::GetArgs::Argv;

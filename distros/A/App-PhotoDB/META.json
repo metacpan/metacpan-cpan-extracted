@@ -53,9 +53,11 @@
       },
       "test" : {
          "requires" : {
+            "DB::SQL::Migrations" : "0",
             "Test::Compile" : "0",
             "Test::Expect" : "0",
             "Test::More" : "0.47",
+            "Test::Output" : "0",
             "Test::Perl::Critic" : "0"
          }
       }
@@ -63,7 +65,7 @@
    "provides" : {
       "App::PhotoDB" : {
          "file" : "lib/App/PhotoDB.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PhotoDB::commands" : {
          "file" : "lib/App/PhotoDB/commands.pm"
@@ -81,6 +83,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

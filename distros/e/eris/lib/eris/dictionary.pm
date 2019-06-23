@@ -8,7 +8,7 @@ with qw(
 use Types::Standard qw(HashRef);
 use namespace::autoclean;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 
@@ -29,7 +29,7 @@ sub _build_fields {
     foreach my $p ( @{ $self->plugins } ) {
         foreach my $f ( @{ $p->fields } ) {
             if( exists $complete{$f} ) {
-                warn sprintf "Duplicated field '%s' in dictionaies, %s authoratitive, %s conflicting.",
+                warn sprintf "Duplicated field '%s' in dictionaries, %s authoratitive, %s conflicting.",
                     $f,
                     $complete{$f},
                     $p->name;
@@ -72,7 +72,7 @@ eris::dictionary - Field dictionary loader
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

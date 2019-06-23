@@ -2,8 +2,8 @@ NAME
     App::depak - Pack your dependencies onto your script file
 
 VERSION
-    This document describes version 0.580 of App::depak (from Perl
-    distribution App-depak), released on 2018-09-10.
+    This document describes version 0.581 of App::depak (from Perl
+    distribution App-depak), released on 2019-06-20.
 
 SYNOPSIS
     See depak.
@@ -12,7 +12,7 @@ FUNCTIONS
   depak
     Usage:
 
-     depak(%args) -> [status, msg, result, meta]
+     depak(%args) -> [status, msg, payload, meta]
 
     Pack your dependencies onto your script file.
 
@@ -272,7 +272,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -296,7 +296,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

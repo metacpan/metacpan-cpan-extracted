@@ -1,0 +1,16 @@
+[Unit]
+Description=[% spec.abstract %]
+After=lcfg-multi-user-stable.target
+Documentation=man:[% spec.fullname %](8)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/om [% spec.name %] start
+ExecReload=/usr/bin/om [% spec.name %] reload
+ExecStop=/usr/bin/om [% spec.name %] stop
+RemainAfterExit=yes
+StandardOutput=journal+console
+StandardError=inherit
+
+[Install]
+WantedBy=lcfg-multi-user.target

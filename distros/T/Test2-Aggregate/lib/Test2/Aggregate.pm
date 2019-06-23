@@ -7,7 +7,7 @@ use File::Find;
 use File::Path;
 use File::Slurp;
 
-use Test2::V0;
+use Test2::V0 'subtest';
 
 =head1 NAME
 
@@ -25,11 +25,11 @@ Test2::Aggregate - Aggregate tests
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 DESCRIPTION
@@ -53,13 +53,13 @@ bad (e.g. redefines), depending on your requirements.
         lists         => \@lists,             # optional if dirs defined
         root          => '/testroot/',        # optional
         load_modules  => \@modules,           # optional
-        shuffle       => 1,                   # optional
-        reverse       => 1,                   # optional
-        repeat        => $no_iterations,      # optional, requires Test2::Plugin::BailOnFail for < 0
-        slow          => 1,                   # optional
+        shuffle       => 0,                   # optional
+        reverse       => 0,                   # optional
+        repeat        => 1,                   # optional, requires Test2::Plugin::BailOnFail for < 0
+        slow          => 0,                   # optional
         override      => \%override,          # optional, requires Sub::Override
         stats_output  => $stats_output_path,  # optional, requires Time::HiRes
-        test_warnings => 1                    # optional
+        test_warnings => 0                    # optional
     );
 
 Runs the aggregate tests. Hash parameter specifies:
@@ -80,7 +80,8 @@ Arrayref of flat files from which each line will be pushed to C<dirs>
 =item * C<root> (optional)
 
 If defined, must be a valid root directory that will prefix all C<dirs> and
-C<lists> items.
+C<lists> items. You may want to set it to C<'./'> if you want dirs relative
+to the current directory and the dot is not in your C<@INC>.
 
 =item * C<load_modules> (optional)
 
@@ -93,16 +94,17 @@ Pass C<Sub::Override> key/values as a hashref.
 
 =item * C<repeat> (optional)
 
-Number of times to repeat the test(s). If C<repeat> is negative, the test will
-repeat until it fails (or produces a warning when C<test_warnings> is also set).
+Number of times to repeat the test(s) (default is 1 for a single run). If
+C<repeat> is negative, the tests will repeat until they fail (or produce a
+warning if C<test_warnings> is also set).
 
 =item * C<shuffle> (optional)
 
-Random order of tests.
+Random order of tests if set to true.
 
 =item * C<reverse> (optional)
 
-Reverse order of tests.
+Reverse order of tests if set to true.
 
 =item * C<slow> (optional)
 
@@ -110,8 +112,8 @@ When true, tests will be skipped if the environment variable C<SKIP_SLOW> is set
 
 =item * C<test_warnings> (optional)
 
-Tests for warnings over all the tests. It will print an array of warnings,
-however if you want to see the warnings the moment they are generated
+Tests for warnings over all the tests if set to true. It will print an array of
+warnings, however if you want to see the warnings the moment they are generated
 (for debugging etc), then leave it disabled.
 
 =item * C<stats_output_path> (optional)
@@ -122,6 +124,8 @@ slowest test and passing percentage gets written. On negative C<repeat> the
 stats of each successful run will be written separately instead of the averages.
 The name of the file is C<caller_script-YYYYMMDD_HHmmss.txt>.
 If C<-> is passed instead of a path, then STDOUT will be used instead.
+The timing stats are useful because the test harness doesn not normally measure
+type by subtest.
 
 =back
 
@@ -129,7 +133,7 @@ If C<-> is passed instead of a path, then STDOUT will be used instead.
 
 sub run_tests {
     my %args = @_;
-    plan skip_all => 'Skipping slow tests.'
+    Test2::V0::plan skip_all => 'Skipping slow tests.'
         if $args{slow} && $ENV{SKIP_SLOW};
 
     eval "use $_;" foreach @{$args{load_modules}};
@@ -176,14 +180,14 @@ sub run_tests {
             $iter++;
             print "Test suite iteration $iter\n";
             if ($args{test_warnings}) {
-                $warnings = warnings{_run_tests(\@tests, \%args)};
+                $warnings = Test2::V0::warnings{_run_tests(\@tests, \%args)};
             } else {
                 _run_tests(\@tests, \%args);
             }
         }
     } elsif ($args{test_warnings}) {
-        $warnings = warnings { _run_tests(\@tests, \%args) };
-        is(
+        $warnings = Test2::V0::warnings { _run_tests(\@tests, \%args) };
+        Test2::V0::is(
             @$warnings,
             0,
             'No warnings in the aggregate tests.'
@@ -206,7 +210,7 @@ sub _run_tests {
     for (1 .. $repeat) {
         my $iter = $repeat > 1 ? "Iter: $_/$repeat - " : '';
         foreach my $test (@$tests) {
-            my $start = Time::HiRes::time() if $args->{stats_output};
+            my $start  = Time::HiRes::time() if $args->{stats_output};
             my $result = subtest $iter. "Running test $test" => sub {
                 do $test;
             };
@@ -268,15 +272,10 @@ sub _timestamp {
 =head1 USAGE NOTES
 
 Not all tests can be modified to run under the aggregator, it is not intended
-for tests that require an isolated environment. So, for those that do not,
-sometimes very simple changes might needed like giving unique names to subs (or
-not warning for redefines, or replacing things that complain such as
-C<Test::More>), restoring the environment at the end of the test etc.
-
-Speaking about C<Test::More>, by replacing C<Test2:V0> with C<Test::More> in the
-source of this module would generally work fine (except for the option
-C<repeat < 0>) and not complain on C<Test::More>-based suites, but perhaps you'd
-be better off starting to move to Test2.
+for tests that require an isolated environment. So, for those that do not and
+can potentially run under the aggregator, sometimes very simple changes might be
+needed like giving unique names to subs (or not warning for redefines), replacing
+things that complain, restoring the environment at the end of the test etc.
 
 The environment variable C<AGGREGATE_TESTS> will be set while the tests are
 running. Example usage is a module that can only be loaded once, so you load it

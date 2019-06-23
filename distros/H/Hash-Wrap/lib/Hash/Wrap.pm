@@ -9,7 +9,7 @@ use warnings;
 
 use Scalar::Util qw[ blessed reftype ];
 use Digest::MD5;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -45,7 +45,7 @@ sub _find_symbol {
 # this is called only if the method doesn't exist.
 sub _generate_accessor {
 
-    my ( $hash_class, $object, $class, $key ) = @_;
+    my ( $hash_class, $class, $key ) = @_;
 
     my %dict = (
         key   => $key,
@@ -75,7 +75,7 @@ sub _autoload {
         qq[Can't locate object method "$key" via package @{[ ref $object]}] )
       unless $REGISTRY{$hash_class}{validate}->( $object, $key );
 
-    _generate_accessor( $hash_class, $object, $class, $key );
+    _generate_accessor( $hash_class, $class, $key );
 }
 
 
@@ -343,9 +343,10 @@ sub _build_constructor {
 
     no warnings 'redefine';
 
-    sub <<NAME>> ($) {
+    sub <<NAME>> (;$) {
       my $class = <<CLASS>>
-      my $hash = shift;
+      my $hash = shift // {};
+
       if ( 'HASH' ne Scalar::Util::reftype($hash) ) {
          require Carp;
          Carp::croak( "argument to <<PACKAGE>>::<<NAME>> must be a hashref" )
@@ -454,7 +455,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -538,7 +539,8 @@ returns the hash:
 
 The wrapper class has no constructor method, so the only way to create
 an object is via the C<wrap_hash> subroutine. (See L</WRAPPER CLASSES>
-for more about wrapper classes)
+for more about wrapper classes)  If C<wrap_hash> is called without
+arguments, it will create a hash for you.
 
 =head2 Advanced Usage
 
@@ -976,20 +978,54 @@ is done globally, so all objects are affected.
 
 =back
 
-=head1 BUGS
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap> or by email
-to L<bug-Hash-Wrap@rt.cpan.org|mailto:bug-Hash-Wrap@rt.cpan.org>.
+=head1 SUPPORT
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+=head2 Websites
 
-=head1 SOURCE
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
 
-The development version is on github at L<https://github.com/djerius/hash-wrap>
-and may be cloned from L<git://github.com/djerius/hash-wrap.git>
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/Hash-Wrap>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap>
+
+=back
+
+=head2 Email
+
+You can email the author of this module at C<DJERIUS at cpan.org> asking for help with any problems you have.
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-hash-wrap at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Hash-Wrap>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://gitlab.com/djerius/hash-wrap>
+
+  https://gitlab.com/djerius/hash-wrap.git
 
 =head1 AUTHOR
 
@@ -1092,7 +1128,8 @@ __END__
 #pod
 #pod The wrapper class has no constructor method, so the only way to create
 #pod an object is via the C<wrap_hash> subroutine. (See L</WRAPPER CLASSES>
-#pod for more about wrapper classes)
+#pod for more about wrapper classes)  If C<wrap_hash> is called without
+#pod arguments, it will create a hash for you.
 #pod
 #pod =head2 Advanced Usage
 #pod

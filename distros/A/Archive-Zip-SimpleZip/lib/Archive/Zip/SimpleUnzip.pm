@@ -19,7 +19,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleUnzipError);
 
-$VERSION = '0.024';
+$VERSION = '0.025';
 $SimpleUnzipError = '';
 
 @ISA    = qw(IO::Uncompress::Unzip Exporter);
@@ -248,7 +248,7 @@ sub extract # to file - return actual path or pass/fail?
     my $member = $self->member($name)
         or return undef ;
 
-    return $member->extract($out // $name);
+    return $member->extract(defined $out ? $out : $name);
 }
 
 sub getCanonicalPath
@@ -759,7 +759,7 @@ sub STORABLE_thaw
         my $self = shift;
         my $out  = shift;
 
-        my @path = _canonicalPath($out // $self->{Info}{Name}) ;
+        my @path = _canonicalPath(defined $out ? $out : $self->{Info}{Name}) ;
         my $filename = join '/', @path ;
         pop @path
             if ! $self->isDirectory();
@@ -781,7 +781,7 @@ sub STORABLE_thaw
             my $handle = $self->open();
             my $fh = new IO::File ">$filename"
                 or return _setError("Cannot open file '$filename': $!");
-            $fh->binmode();
+            #$fh->binmode(); # not available in 5.8.0
 
             my $data;
             print $fh $data 

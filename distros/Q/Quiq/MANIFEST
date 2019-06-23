@@ -44,6 +44,7 @@ lib/Quiq/DirHandle.pm
 lib/Quiq/Duration.pm
 lib/Quiq/Epoch.pm
 lib/Quiq/ExampleCode.pm
+lib/Quiq/Excel/Writer.pm
 lib/Quiq/FFmpeg.pm
 lib/Quiq/File/Audio.pm
 lib/Quiq/File/Image.pm
@@ -212,6 +213,7 @@ t/bin/Quiq/DirHandle.t
 t/bin/Quiq/Duration.t
 t/bin/Quiq/Epoch.t
 t/bin/Quiq/ExampleCode.t
+t/bin/Quiq/Excel/Writer.t
 t/bin/Quiq/FFmpeg.t
 t/bin/Quiq/File/Audio.t
 t/bin/Quiq/File/Image.t

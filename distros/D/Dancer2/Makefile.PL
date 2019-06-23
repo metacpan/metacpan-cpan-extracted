@@ -92,7 +92,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.92"
   },
-  "VERSION" => "0.207000",
+  "VERSION" => "0.208000",
   "test" => {
     "TESTS" => "t/*.t t/classes/Dancer2-Core-Factory/*.t t/classes/Dancer2-Core-Hook/*.t t/classes/Dancer2-Core-Request/*.t t/classes/Dancer2-Core-Response-Delayed/*.t t/classes/Dancer2-Core-Response/*.t t/classes/Dancer2-Core-Role-Engine/*.t t/classes/Dancer2-Core-Role-Handler/*.t t/classes/Dancer2-Core-Role-HasLocation/*.t t/classes/Dancer2-Core-Role-Serializer/*.t t/classes/Dancer2-Core-Role-StandardResponses/*.t t/classes/Dancer2-Core-Route/*.t t/classes/Dancer2-Core-Runner/*.t t/classes/Dancer2-Core/*.t t/classes/Dancer2/*.t t/dsl/*.t t/examples/*.t t/issues/*.t t/issues/gh-1013/*.t t/issues/gh-1046/*.t t/issues/gh-1216/*.t t/issues/gh-1226/*.t t/issues/gh-1230/*.t t/issues/gh-639/fails/*.t t/issues/gh-639/succeeds/*.t t/issues/gh-650/*.t t/issues/gh-975/*.t t/issues/memleak/*.t t/plugin2/*.t t/roles/*.t t/route-pod-coverage/*.t t/scope_problems/*.t t/template_tiny/*.t"
   }

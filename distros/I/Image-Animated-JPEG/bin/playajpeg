@@ -394,7 +394,7 @@ sub OnTimer {
 		delete($self->{resize});
 	}
 
-	my $dc = Wx::PaintDC->new($self->{panel});
+	my $dc = Wx::ClientDC->new($self->{panel}); # no PaintDC, we're accessing the client area outside the OnPaint event here
 
 	$dc->SetUserScale($self->{scale},$self->{scale});
 

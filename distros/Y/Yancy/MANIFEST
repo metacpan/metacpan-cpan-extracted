@@ -61,6 +61,7 @@ lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/register.ht
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/unauthorized.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/unauthorized.json.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/index.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/table.html.ep
 lib/Yancy.pm
 lib/Yancy/Backend.pod
 lib/Yancy/Backend/Dbic.pm

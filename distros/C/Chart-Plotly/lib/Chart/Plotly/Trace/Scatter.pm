@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Scatter::Textfont;
 use Chart::Plotly::Trace::Scatter::Transform;
 use Chart::Plotly::Trace::Scatter::Unselected;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: The scatter trace type encompasses line charts, scatter charts, text charts, and bubble charts. The data visualized as scatter point or lines is set in `x` and `y`. Text (appearing either on the chart or on hover only) is via `text`. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to numerical arrays.
 
@@ -427,7 +427,7 @@ Chart::Plotly::Trace::Scatter - The scatter trace type encompasses line charts, 
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

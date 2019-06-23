@@ -1,0 +1,8 @@
+Parameters: 
+  InstanceType: 
+    Type: 'AWS::SSM::Parameter::Value<String>'
+Resources: 
+  Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      InstanceType: !Ref InstanceType

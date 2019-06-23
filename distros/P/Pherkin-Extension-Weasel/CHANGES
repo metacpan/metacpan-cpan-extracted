@@ -1,3 +1,13 @@
+** 0.07 / 2019-06-21
+   - Change minimum Perl version to static declaration in dist.ini
+   - Resolve undefined variable warnings with logging enabled
+   - Add support for Test::BDD::Cucumber 0.57+
+     (improved post-step extension hook)
+   - Screenshot generation improvements:
+     - no screenshots without logging
+     - prevent screenshots from various features overwriting each other
+     - add styling in html log for screenshots
+
 ** 0.06 / 2019-02-22
    - Actually write the HTML log when steps/scenarios/features
      complete

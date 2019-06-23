@@ -20,6 +20,7 @@ WriteMakefile(
       $ENV{SKIP_FOR_CORE}
         ? ()
 	    : (PREREQ_PM   => { 'IO::Compress::Base' => 2.081,
+                             'Perl::OSType'      => 0,
                           }
 	      )
     ),

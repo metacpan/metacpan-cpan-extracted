@@ -1,4 +1,4 @@
-# AWS::DLM::LifecyclePolicy generated from spec 2.25.0
+# AWS::DLM::LifecyclePolicy generated from spec 3.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy',
@@ -109,6 +109,28 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::ScheduleValue {
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RetainRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::RetainRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TagsToAdd => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VariableTags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::Parameters',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::Parameters',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::ParametersValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::ParametersValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ExcludeBootVolume => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::PolicyDetails',
@@ -129,6 +151,8 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::PolicyDetailsValue
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has Parameters => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::Parameters', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has PolicyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ResourceTypes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Schedules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DLM::LifecyclePolicy::Schedule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TargetTags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

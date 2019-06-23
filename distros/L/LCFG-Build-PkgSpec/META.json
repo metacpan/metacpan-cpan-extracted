@@ -42,7 +42,7 @@
    "provides" : {
       "LCFG::Build::PkgSpec" : {
          "file" : "lib/LCFG/Build/PkgSpec.pm",
-         "version" : "v0.2.6"
+         "version" : "v0.2.7"
       }
    },
    "release_status" : "stable",
@@ -55,5 +55,5 @@
          "https://opensource.org/licenses/GPL-2.0"
       ]
    },
-   "version" : "v0.2.6"
+   "version" : "v0.2.7"
 }

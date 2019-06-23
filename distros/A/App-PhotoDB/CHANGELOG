@@ -1,5 +1,21 @@
 Revision history for Perl module App::PhotoDB
 
+0.07 2019-06-21
+
+ * Create concept of a series of camera or lens models (#118, #313, #299)
+ * Use series info to display a basic wish list (#246)
+ * Make assigning shutter speeds to cameras much easier (#302)
+ * Improve the way bulb shutter speeds are handled (#311)
+ * Drop confirmation step when launching a handler to speed up usage (#303)
+ * Add cameramodel info and lensmodel info handlers (#304)
+ * Include serial number when referring to cameras or lenses (#297)
+ * Add reports to show duplicate cameras and lenses (#314)
+ * Link film formats to negative sizes (#310)
+ * Make camera info much faster (#329)
+ * Improvements to CI tests (#320)
+ * Automatically generate schema docs in CI (#334)
+ * Bug fixes left over from abstrating camera model (#309, #322)
+
 0.06 2019-06-04
 
  * Abstract camera and lens models out from ownership (#182, #283, #286, #292)

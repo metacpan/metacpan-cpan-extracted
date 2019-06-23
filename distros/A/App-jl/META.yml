@@ -20,7 +20,7 @@ name: App-jl
 provides:
   App::jl:
     file: lib/App/jl.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Getopt::Long: '2.42'
   JSON: '0'
@@ -35,5 +35,5 @@ resources:
   bugtracker: http://github.com/bayashi/App-jl/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/App-jl
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

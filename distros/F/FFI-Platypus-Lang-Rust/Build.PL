@@ -30,13 +30,13 @@ my $builder = My::ModuleBuild->new(
   configure_requires => {
     'Module::Build' => 0.38,
     'File::Which' => 0,
-    'Module::Build::FFI' => '0.18',
+    'Module::Build::FFI' => '0.49',
     'File::chdir'   => 0,
   },
   build_requires => {
     'Module::Build' => 0.38,
     'File::Which' => 0,
-    'Module::Build::FFI' => '0.18',
+    'Module::Build::FFI' => '0.49',
     'File::chdir'   => 0,
   },
   test_requires => {
@@ -47,7 +47,7 @@ my $builder = My::ModuleBuild->new(
   },
   requires => {
     'perl',         => '5.008001',
-    'FFI::Platypus' => '0.18',
+    'FFI::Platypus' => '0.88',
     'File::Which'   => 0,
   },
   meta_merge => {
@@ -60,6 +60,7 @@ my $builder = My::ModuleBuild->new(
       directory => [ 'examples' ],
     },
   },
+  ffi_libtest_dir => [ 't/ffi' ],
 );
 
 $builder->add_to_cleanup(
@@ -68,10 +69,11 @@ $builder->add_to_cleanup(
   'examples/*.dll',
   'examples/*.bundle',
   'examples/*.dylib',
-  'libtest/*.so',
-  'libtest/*.dll',
-  'libtest/*.bundle',
-  'libtest/*.dylib',
+  't/ffi/*.so',
+  't/ffi/*.dll',
+  't/ffi/*.bundle',
+  't/ffi/*.dylib',
+  't/ffi/Cargo.lock',
   'FFI-Platypus-Lang-Rust-*',
 );
 

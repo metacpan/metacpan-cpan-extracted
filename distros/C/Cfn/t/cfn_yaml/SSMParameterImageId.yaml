@@ -1,0 +1,8 @@
+Parameters: 
+  ImageId: 
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+Resources: 
+  Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Ref ImageId

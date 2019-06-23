@@ -1,4 +1,4 @@
-package MToken; # $Id: MToken.pm 70 2019-06-09 18:25:29Z minus $
+package MToken; # $Id: MToken.pm 75 2019-06-19 15:23:53Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ MToken - Tokens processing system (Security)
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = "1.01";
+$VERSION = "1.02";
 
 use feature qw/say/;
 use Carp;

@@ -1,5 +1,11 @@
 Revision history for Pod-Weaver-PluginBundle-SHLOMIF
 
+0.001001        2018-09-17
+
+    - Hopefully fix tests on CPAN testers / cpan.
+        - See http://www.cpantesters.org/cpan/report/bfb6c3f6-a256-11e8-b159-f834aed9e2bc
+        among others.
+
 0.001000        2018-08-17
 
     - Forked from https://metacpan.org/release/Dist-Zilla-PluginBundle-DAGOLDEN

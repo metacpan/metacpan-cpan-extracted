@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Carpet::Aaxis::Tickfont;
 use Chart::Plotly::Trace::Carpet::Aaxis::Tickformatstop;
 use Chart::Plotly::Trace::Carpet::Aaxis::Title;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace carpet.
 
@@ -329,7 +329,7 @@ Chart::Plotly::Trace::Carpet::Aaxis - This attribute is one of the possible opti
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

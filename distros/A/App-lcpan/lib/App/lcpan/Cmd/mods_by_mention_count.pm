@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mods_by_mention_count;
 
-our $DATE = '2019-06-07'; # DATE
-our $VERSION = '1.033'; # VERSION
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '1.034'; # VERSION
 
 use 5.010;
 use strict;
@@ -105,7 +105,7 @@ App::lcpan::Cmd::mods_by_mention_count - List modules ranked by number of mentio
 
 =head1 VERSION
 
-This document describes version 1.033 of App::lcpan::Cmd::mods_by_mention_count (from Perl distribution App-lcpan), released on 2019-06-07.
+This document describes version 1.034 of App::lcpan::Cmd::mods_by_mention_count (from Perl distribution App-lcpan), released on 2019-06-19.
 
 =head1 FUNCTIONS
 

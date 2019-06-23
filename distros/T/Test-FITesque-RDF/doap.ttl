@@ -30,7 +30,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "Test-FITesque-RDF";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-test-fitesque-rdf>;
@@ -102,6 +102,15 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.007.tar.gz>;
 	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-008>
+	a                    doap:Version;
+	rdfs:label           "Fix bug in HTTP param selection";
+	dc:identifier        "Test-FITesque-RDF-0.008"^^xsd:string;
+	dc:issued            "2019-06-20"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;

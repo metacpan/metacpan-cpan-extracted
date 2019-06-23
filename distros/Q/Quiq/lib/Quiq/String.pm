@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Encode::Guess ();
 use Encode ();
@@ -26,6 +26,54 @@ Quiq::String - Operationen auf Zeichenketten
 L<Quiq::Object>
 
 =head1 METHODS
+
+=head2 Eigenschaften
+
+=head3 maxLineLength() - Länge der längsten Zeile
+
+=head4 Synopsis
+
+    $len = $class->maxLineLength($text);
+
+=head4 Arguments
+
+=over 4
+
+=item $text
+
+Ein String, typischerweise mehrzeilig.
+
+=back
+
+=head4 Returns
+
+Länge der längsten Zeile (Integer)
+
+=head4 Description
+
+Ermittele die Länge der längsten Zeile und liefere diese zurück. Newline
+wird nicht mitgezählt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub maxLineLength {
+    my ($class,$text) = @_;
+
+    my $maxLen = 0;
+    for (split /\n/,$text) {
+        chomp;
+        my $l = length;
+        if ($l > $maxLen) {
+            $maxLen = $l;
+        }
+    }
+
+    return $maxLen;
+}
+
+# -----------------------------------------------------------------------------
 
 =head2 Encoding
 
@@ -735,7 +783,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

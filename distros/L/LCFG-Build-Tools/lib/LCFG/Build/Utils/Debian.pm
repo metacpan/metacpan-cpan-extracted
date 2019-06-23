@@ -5,10 +5,10 @@ use warnings;
 # $Id: Debian.pm.in 35444 2019-01-18 11:42:09Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/Pack.pm.in,v $
 # $Revision: 35444 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Utils/Debian.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/lib/LCFG/Build/Utils/Debian.pm.in $
 # $Date: 2019-01-18 11:42:09 +0000 (Fri, 18 Jan 2019) $
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use v5.10;
 

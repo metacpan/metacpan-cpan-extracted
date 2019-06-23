@@ -19,11 +19,11 @@ lib/Weasel/WidgetHandlers.pm
 lib/Weasel/Widgets/HTML.pm
 lib/Weasel/Widgets/HTML/Button.pm
 lib/Weasel/Widgets/HTML/Input.pm
+lib/Weasel/Widgets/HTML/Radio.pm
 lib/Weasel/Widgets/HTML/Select.pm
 lib/Weasel/Widgets/HTML/Selectable.pm
 t/00-load.t
 t/01-logging.t
-t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 xt/perlcriticrc

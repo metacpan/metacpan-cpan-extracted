@@ -1,5 +1,13 @@
 Revision history for RPi-StepperMotor
 
+2.3605  2019-06-19
+        - added new examples (multi-motor and fork)
+        - added new name() feature so each motor object can have its own name
+          (closes #1)
+        - added ability to use an MCP23017 GPIO Expander to drive the motor
+        - added blurb about how to identify clockwise operation from counter
+          clockwise (closes #2)
+
 2.3604  2018-03-14
         - Pi day!
         - added Fritzing breadboard layout/docs directory

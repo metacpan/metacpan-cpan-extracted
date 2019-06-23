@@ -1,3 +1,6 @@
+0.113		2019-06-21	T. R. Wyant
+    Fix more broken POD links.
+
 0.112		2019-04-18	T. R. Wyant
     Fixed broken link in the pod. Thanks to Mohammad S Anwar for
     finding this.

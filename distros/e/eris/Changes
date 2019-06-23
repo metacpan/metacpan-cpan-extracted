@@ -1,9 +1,70 @@
 ==================================================
-Changes from 2016-09-10 00:00:00 +0000 to present.
+Changes from 2017-06-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2018-09-10 17:17:05 +0000
+version 0.008 at 2019-06-20 04:41:06 +0000
+------------------------------------------
+
+  Change: e7f412e96ee3200c846a633bf0a004491b327993
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-20 06:40:35 +0000
+
+    Fix the data types of a few elements 
+
+  Change: 966698d60a7eebb562777530975cc8c816186314
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-20 06:34:32 +0000
+
+    Don't track log files in git 
+
+  Change: 67f1ed5cb9f21dc7cab7188e0d3b2db92ab03301
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-19 06:50:40 +0000
+
+    Fix message field in the syslog dictionary 
+
+  Change: c8c1462d45cdac2c9034e848e37e81e9e42b0473
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-19 06:46:49 +0000
+
+    Parse::Syslog::Line fixed postfix style tag parsing 
+
+  Change: abcc4c9e30f6222baea651cc2e889d4ee690289c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-19 06:42:15 +0000
+
+    Adding capacity to specify meta-data with fields
+
+    This data will be used to construct an ElasticSearch mapping for the
+    indices. 
+
+  Change: 4c5b61f91baaa5621b393f214a01ce8461f93530
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-19 05:42:45 +0000
+
+    Packaging fixes to make a Docker thing possible 
+
+  Change: a567725859f3f2413540f21bd1fc675fe0dc770e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-19 05:42:45 +0000
+
+    Version release preparation 
+
+  Change: c6615f11d9e8205e9bf5a1ff8a10221c2e2feda3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-20 17:16:23 +0000
+
+    Fix missing POE parameter offsets 
+
+  Change: e265aa5dd1f4c82f7d64efb8c5bd74e0341a039b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-11 09:29:44 +0000
+
+    Fix typo in error message 
+
+------------------------------------------
+version 0.007 at 2018-09-10 17:16:35 +0000
 ------------------------------------------
 
   Change: 51913f0aa78af31273482c567517fa9b1bbcd69f
@@ -411,294 +472,6 @@ version 0.004 at 2017-11-16 17:43:11 +0000
     Fixed up older contexts to take advantage of better logic. Added help
     option to the eris-context script 
 
-------------------------------------------
-version 0.003 at 2017-03-01 06:24:50 +0000
-------------------------------------------
-
-  Change: acee6050a6cae7fee3db0b8f962404302c6a8c1a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-03-01 07:24:50 +0000
-
-    Add ability to swap index basenames and types via contexts.
-
-    This patch allows a context to set a different index base name or type.
-    This will be sent along to the cluster in the bulk api end point. 
-
-  Change: 63c8d264be2e86678ecbecf1262cfa53c7afde6f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-02-02 20:54:29 +0000
-
-    Update location of GeoIP2 mmdb, rename 'desc' to 'name' for clarity. 
-
-  Change: 2579cad2f0a63c7a6ba4578b6844769085d822ef
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-02-02 09:26:43 +0000
-
-    eris::log->add_tags() created to allow contexts to tag messages, total_time
-    added to allow easy searching. 
-
-  Change: 1307cf25da94f1b47ce7afac0f548a78f0a9de7d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-02-02 08:40:51 +0000
-
-    Added suricata/snort log decoding to the library. 
-
-  Change: e18c8d66f30ec0cf1bbbdfe708ffa87a58757fb6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-12-16 07:47:54 +0000
-
-    Bump release in the docs. 
-
-------------------------------------------
-version 0.002 at 2016-12-16 06:45:24 +0000
-------------------------------------------
-
-  Change: 503862bb34803e756ed43f25d4b887a7fcc9d039
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-12-16 07:45:24 +0000
-
-    Fix race condition in the scheduling that was preventing bulk writes from
-    occurring. 
-
-  Change: 05590cf74a82b9d5ae36af97e7a676c9cea7c60c
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-12-16 07:01:14 +0000
-
-    Postfix Context: Make sure the K/V pairs extract before trying to use them
-    in the log context 
-
-  Change: d4fb6699edf3ad40b36411413bcf4ec6547a8ee3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-29 01:36:59 +0000
-
-    Update ignore list. 
-
-  Change: 47ab113720483941f3e2c617e00617a1fe98a8d8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-28 20:39:17 +0000
-
-    Cron support on FreeBSD, Invalid user tracking on sshd. 
-
-  Change: be5ead9c3f26270d43d3313370678a6e1dc9532b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-26 03:19:14 +0000
-
-    CROND and postfix parsers added, dictionary fixes. 
-
-  Change: 936fd1c3ae01e64843c5ff1b615c8fcfea171a9f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-23 21:38:10 +0000
-
-    Conversion to Moo and Type::Tiny
-
-    I'm not utilizing the full Moosey stack, so I converted to Moo. If I need
-    to use Moose for something later, the Type::Tiny conversion will make that
-    trivial.
-
-    Restructured the contexts, decoders, and dictionaries to use the
-    eris::role::plugin to remove duplicate code. 
-
----------------------------------------------
-version 0.001_01 at 2016-11-20 04:14:44 +0000
----------------------------------------------
-
-  Change: 4101a001d306c9780e0f9884c126472fc0c5268a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-20 05:14:44 +0000
-
-    Ignore the dzil distribution builds. 
-
-  Change: 30f6b501ec302af320b1b65744421ed465c98807
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-20 05:11:19 +0000
-
-    Added rudimentary README to the dist. 
-
-  Change: 9169cc3302c39d40b86aadaf46cd443225283e58
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-20 05:10:35 +0000
-
-    Append newlines to the STDERR log messages. 
-
-  Change: 7f4526adf6caea02a9535d97a094fd065bf387b1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-20 05:00:21 +0000
-
-    Automatically manage index templates
-
-    This patch adds a simple template checking in to the worker startup. 
-
-  Change: a07d8b9fdfe20e4af22803a25f48315a0f051b99
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-20 03:38:55 +0000
-
-    Prerelease alpha
-
-    The eris-eris-client.pl can work with a POE::Component::Server::eris server
-    to connect and stream the logs to an ElasticSearch cluster. Stats are
-    bubbled up from the workers to the server, and documents land in the index! 
-
-  Change: b4f4bc012cf0d2cb71376fce5aacf60a1a0fd5f0
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-19 19:09:58 +0000
-
-    Output basic stats for testing purposes. 
-
-  Change: b4ceb83d54897b2ca949a2b13f1106ddf05958fc
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-19 19:06:06 +0000
-
-    Allow worker pools to be a configurable size. 
-
-  Change: a7f8a9663379711fa7b2813335e700ac982c6760
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-19 18:59:56 +0000
-
-    Added eris-eris-client.pl
-
-    Uses POE::Component::Client::eris to connect to a local syslog server as
-    it's source. 
-
-  Change: ef7b6799ce619d9f490c0fc329144e30b17c9b14
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-19 18:24:43 +0000
-
-    Prerelease Candidate 1
-
-    dzil configs updated to reflect my standard dzil layout. Renaming the
-    scripts in the bin directory to have clearer, more appropriate names and
-    avoid collisions. Restructure the timing data so it can be easily indexed
-    in ElasticSearch. Convert the config file to an optional parameter so the
-    utilities run cleanly from the the dist. 
-
-  Change: b0554bc33417834348579abedecb7ea202a63722
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-11-19 17:29:36 +0000
-
-    Remove static license file. 
-
-  Change: 725576bc10475a79cf33017a197c0a56c60b5fcb
-  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
-  Date : 2016-09-21 22:28:38 +0000
-
-    Delete postfix.pm
-
-    This was just a placeholder, removing to remove confusion. 
-
-  Change: ce5b8590f3e645374af835df96a86b437d9898f7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Catch errors and remove the input streams from the system. Bubble stats up
-    to the main process for handling. 
-
-  Change: ecf1e1deb89f853e8cb92d355b14975da6b785e4
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Getting close to a releasable package. 
-
-  Change: 3190609932c28ae1a828a9519000b5e2443adafa
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    more stuff 
-
-  Change: bd85f8eff29ff4969875268e738816e6f3fa7c91
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Allow context/complete objects to be duplicated as in the case of the GeoIP
-    context. 
-
-  Change: acb23a094a573a1d22b8697a4b6d571e135dbc07
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    GeoIP Context Established 
-
-  Change: 815920085af300f40e6406620e759587eb5604e3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Pass plugin configs down to the context objects 
-
-  Change: b6d6c0831413c34a51b856db09923586980fd767
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Add timing information to contextualize script. 
-
-  Change: 0cf3b9ba37b8e59faaedae37a73b2aa7939cd4ce
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Added sudo and yum log parsers. 
-
-  Change: 58c41cc831df9eea401fdf2b35473f054670e08b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Added sudoers parsing and dictionary entries for src/dst usernames. 
-
-  Change: 4788e0dacf903066deb68f018e3fe90d5a0c1eb2
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    pause. 
-
-  Change: 70f28672cc14b2fcdafb2e57ca344e0ba85a66d8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Added an empty postfix context and fixed output from the library functions. 
-
-  Change: c08994a3cffeda013ede875892358418c0952ee7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Adding timing element to log object. 
-
-  Change: 25c4a3f9d29775cba801c82d71ecc4dc1521efaa
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Added basic context establishment Added dictionary lookups for fields Fixes
-    to the decoders to behave 
-
-  Change: 338bea1dad1d28ef2e7d66ec3d242beff1e9d2f7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Simplify the contexts by providing a SubType to coerce things into the
-    eris::log::context->target() code ref. It will return true if the context
-    matches the field / target pair, or false otherwise. 
-
-  Change: 89279c0b767432a17b1b0dd5a9c53f43eb62d41b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Typos, syntax, and logic fix ups. Included a demo script to use to test the
-    whole eris:* name space. Decoders and object creation are working. 
-
-  Change: dac379507a39fc7e6f4e530913da04a6a0916f82
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    Ignore the main config file. 
-
-  Change: c307f13774d6829af2e51ce221f07e28db49d7b6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-09-21 22:20:22 +0000
-
-    initial revision 
-
-  Change: 8a3d2b7f64ba059fcb3cd2cd12f12bad620c61b7
-  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
-  Date : 2016-09-21 22:19:43 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 3 releases after 2017-06-20 00:00:00 +0000.
+================================================

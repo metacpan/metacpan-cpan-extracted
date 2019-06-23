@@ -34,6 +34,20 @@ To use this module you will need the following:
         Moose >= 0.98
         YAML::Syck >= 0.98
 
+On Debian/Ubuntu machines you can install these packages like this:
+
+apt install libmodule-build-perl libdatetime-perl libdata-structure-util-perl libemail-address-perl libemail-valid-perl libmoose-perl libyaml-syck-perl
+
+To run the tests you will also need:
+
+        Test::More
+        Test::Differences
+        Test::Exception
+
+On Debian/Ubuntu machines you can install these packages like this:
+
+apt install libtest-exception-perl libtest-differences-perl
+
 ==== INSTALLATION ====
 
 Make sure you have the dependencies installed first! (see DEPENDENCIES above)

@@ -36,8 +36,8 @@ SKIP: {
 
     my ($pstmp) = grep {/^$pid\s+/} map { chomp; s/^\s*//; $_ } `ps xo pid,vsz,rss`;
     my ($ps_pid, $ps_vsize, $ps_rss) = split /\s+/, $pstmp;
-    my $ps_vsize *= 1024;
-    my $ps_rss   *= 1024;
+    $ps_vsize *= 1024;
+    $ps_rss   *= 1024;
 
     my $t = Proc::ProcessTable->new;
     my ($p) = grep { $_->{pid} == $pid } @{ $t->table };

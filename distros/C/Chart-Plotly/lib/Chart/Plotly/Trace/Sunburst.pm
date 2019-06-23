@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Sunburst::Stream;
 use Chart::Plotly::Trace::Sunburst::Textfont;
 use Chart::Plotly::Trace::Sunburst::Transform;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: Visualize hierarchal data spanning outward radially from root to leaves. The sunburst sectors are determined by the entries in *labels* or *ids* and in *parents*.
 
@@ -268,7 +268,7 @@ Chart::Plotly::Trace::Sunburst - Visualize hierarchal data spanning outward radi
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

@@ -8,6 +8,7 @@ use Encode;
 use File::Copy;
 use File::Path qw(make_path);
 use Data::Dumper;
+use App::WRT::Util;
 
 =pod
 
@@ -56,21 +57,8 @@ Calls $sort_order, which can be one of:
 =cut
 
 sub dir_list {
-  my ($self, $dir, $sort_order, $pattern) = @_;
-
-  $pattern    ||= qr/^[0-9]{1,2}$/;
-  $sort_order ||= 'high_to_low';
-
-  opendir my $list_dir, $dir
-    or die "Couldn't open $dir: $!";
-
-  my @files = sort $sort_order
-              grep { m/$pattern/ }
-              readdir $list_dir;
-
-  closedir $list_dir;
-
-  return @files;
+  my $self = shift;
+  return App::WRT::Util::dir_list(@_);
 }
 
 # Various named sorts for dir_list:
@@ -89,11 +77,8 @@ L<https://secure.php.net/manual/en/function.file-put-contents.php>
 =cut
 
 sub file_put_contents {
-  my ($self, $file, $contents) = @_;
-  open(my $fh, '>', $file)
-    or die "Unable to open $file for writing: $!";
-  print $fh $contents;
-  close $fh;
+  my $self = shift;
+  App::WRT::Util::file_put_contents(@_);
 }
 
 
@@ -106,24 +91,8 @@ L<https://secure.php.net/manual/en/function.file-get-contents.php>
 =cut
 
 sub file_get_contents {
-  my ($self, $file) = @_;
-
-  open my $fh, '<', $file
-    or croak "Couldn't open $file: $!\n";
-
-  my $contents;
-  {
-    # line separator:
-    local $/ = undef;
-    $contents = <$fh>;
-  }
-
-  close $fh or croak "Couldn't close $file: $!";
-
-  # TODO: _May_ want to assume here that any file is UTF-8 text.
-  # http://perldoc.perl.org/perlunitut.html
-  # return decode('UTF-8', $contents);
-  return $contents;
+  my $self = shift;
+  return App::WRT::Util::file_get_contents(@_);
 }
 
 

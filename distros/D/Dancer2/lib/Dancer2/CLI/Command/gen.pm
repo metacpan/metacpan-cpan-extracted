@@ -1,6 +1,6 @@
 # ABSTRACT: create new Dancer2 application
 package Dancer2::CLI::Command::gen;
-$Dancer2::CLI::Command::gen::VERSION = '0.207000';
+$Dancer2::CLI::Command::gen::VERSION = '0.208000';
 use strict;
 use warnings;
 
@@ -182,7 +182,7 @@ sub _copy_templates {
 
         {
             local $/;
-            open(my $fh, '<', $from) or die "unable to open file `$from' for reading: $!";
+            open(my $fh, '<:raw', $from) or die "unable to open file `$from' for reading: $!";
             $content = <$fh>;
             close $fh;
         }
@@ -191,7 +191,7 @@ sub _copy_templates {
             $content = _process_template($content, $vars);
         }
 
-        open(my $fh, '>', $to) or die "unable to open file `$to' for writing: $!";
+        open(my $fh, '>:raw', $to) or die "unable to open file `$to' for writing: $!";
         print $fh $content;
         close $fh;
 
@@ -307,7 +307,7 @@ Dancer2::CLI::Command::gen - create new Dancer2 application
 
 =head1 VERSION
 
-version 0.207000
+version 0.208000
 
 =head1 AUTHOR
 
@@ -315,7 +315,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Alexis Sukrieh.
+This software is copyright (c) 2019 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

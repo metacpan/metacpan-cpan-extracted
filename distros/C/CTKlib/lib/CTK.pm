@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 262 2019-05-17 15:22:41Z minus $
+package CTK; # $Id: CTK.pm 270 2019-06-19 18:56:25Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK - Command-line ToolKit library (CTKlib)
 
 =head1 VERSION
 
-Version 2.00
+Version 2.01
 
 =head1 NOTE
 
@@ -236,7 +236,7 @@ Returns error string if occurred any errors while creating the object
 
     $ctk->error("error text");
 
-Sets new error message and returns it. Also prints message on STDERR if is set verbose mode
+Sets new error message and returns it. Also prints message on STDERR if is set debug mode
 and sends message to log if log mode is enabled
 
 =head2 exedir
@@ -331,6 +331,10 @@ See L</verbosemode>
 
 Returns boolean status of creating and using the object
 
+    my $status = $ctk->status( 1 );
+
+Sets new status and just returns it
+
 =head2 tempfile
 
     my $tempfile = $ctk->tempfile;
@@ -353,9 +357,13 @@ Returns test flag. 1 - on, 0 - off
 
 =head2 tms
 
-    print $ctk->tms;
+    print $ctk->tms; # +0.0080 sec
 
-Returns timestamp. For example: +0.0080 sec
+Returns formatted timestamp
+
+    print $ctk->tms(1); # 0.008000
+
+Returns NOT formatted timestamp
 
 =head2 verbosemode
 
@@ -502,7 +510,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/ $VERSION %PLUGIN_ALIAS_MAP %EXPORT_TAGS @EXPORT_OK /;
-$VERSION = '2.00';
+$VERSION = '2.01';
 
 use base qw/Exporter/;
 
@@ -570,7 +578,7 @@ sub new {
         origin      => {%args},
         created     => time(),
         hitime      => gettimeofday() * 1,
-        revision    => q/$Revision: 262 $/,
+        revision    => q/$Revision: 270 $/,
         options     => $options,
         plugins     => {},
 
@@ -669,7 +677,13 @@ sub debug {
     }
     return 1;
 }
-sub tms { sprintf("%+.*f sec",4, gettimeofday()-(shift->{hitime})) }
+sub tms {
+    my $self = shift;
+    my $no_format = shift;
+    my $v = gettimeofday()*1 - $self->{hitime}*1;
+    return $v if $no_format;
+    return sprintf("%+.*f sec", 4, $v);
+}
 sub error {
     my $self = shift;
     my @err = @_;
@@ -678,7 +692,7 @@ sub error {
         my $ident = $self->{ident} // "";
         if (length($self->{error})) {
             $self->log_error("%s", $self->{error}) if $self->logmode && $self->can("log_error"); # To log
-            if ($self->verbosemode) { # To STDERR
+            if ($self->debugmode) { # To STDERR
                 unshift(@err, sprintf("%s ", $ident)) if length($ident);
                 printf STDERR "%s\n", join("", @err);
             }
@@ -688,6 +702,8 @@ sub error {
 }
 sub status {
     my $self = shift;
+    my $s = shift;
+    $self->{status} = $s if defined $s;
     return $self->{status} ? 1 : 0;
 }
 

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace parcoords.
 
@@ -83,11 +83,9 @@ has tickformat => (
       "Sets the tick label formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-format/blob/master/README.md#locale_format",
 );
 
-has ticktext => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
-    documentation =>
-      "Sets the text displayed at the ticks position via `tickvals`. Only has an effect if `tickmode` is set to *array*. Used with `tickvals`.",
+has ticktext => ( is            => "rw",
+                  isa           => "ArrayRef|PDL",
+                  documentation => "Sets the text displayed at the ticks position via `tickvals`.",
 );
 
 has ticktextsrc => ( is            => "rw",
@@ -95,11 +93,9 @@ has ticktextsrc => ( is            => "rw",
                      documentation => "Sets the source reference on plot.ly for  ticktext .",
 );
 
-has tickvals => (
-    is  => "rw",
-    isa => "ArrayRef|PDL",
-    documentation =>
-      "Sets the values at which ticks on this axis appear. Only has an effect if `tickmode` is set to *array*. Used with `ticktext`.",
+has tickvals => ( is            => "rw",
+                  isa           => "ArrayRef|PDL",
+                  documentation => "Sets the values at which ticks on this axis appear.",
 );
 
 has tickvalssrc => ( is            => "rw",
@@ -140,7 +136,7 @@ Chart::Plotly::Trace::Parcoords::Dimension - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -235,7 +231,7 @@ Sets the tick label formatting rule using d3 formatting mini-language which is s
 
 =item * ticktext
 
-Sets the text displayed at the ticks position via `tickvals`. Only has an effect if `tickmode` is set to *array*. Used with `tickvals`.
+Sets the text displayed at the ticks position via `tickvals`.
 
 =item * ticktextsrc
 
@@ -243,7 +239,7 @@ Sets the source reference on plot.ly for  ticktext .
 
 =item * tickvals
 
-Sets the values at which ticks on this axis appear. Only has an effect if `tickmode` is set to *array*. Used with `ticktext`.
+Sets the values at which ticks on this axis appear.
 
 =item * tickvalssrc
 

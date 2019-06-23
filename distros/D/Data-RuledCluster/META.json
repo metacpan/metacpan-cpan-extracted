@@ -4,7 +4,7 @@
       "Atsushi Kobayashi <nekokak@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.5",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -50,6 +50,7 @@
       },
       "test" : {
          "requires" : {
+            "DBD::SQLite" : "0",
             "DBI" : "0",
             "Test::More" : "0"
          }
@@ -58,7 +59,7 @@
    "provides" : {
       "Data::RuledCluster" : {
          "file" : "lib/Data/RuledCluster.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Data::RuledCluster::Strategy" : {
          "file" : "lib/Data/RuledCluster/Strategy.pm"
@@ -84,13 +85,14 @@
          "web" : "https://github.com/nekokak/p5-Data-RuledCluster"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
-      "punytan <punytan@gmail.com>",
-      "xaicron <xaicron@gmail.com>",
       "Hiroyoshi HOUCHI <info@hixi-hyi.com>",
       "Hiroyoshi Houchi <git@hixi-hyi.com>",
-      "karupanerura <karupa@cpan.org>"
+      "karupanerura <karupa@cpan.org>",
+      "punytan <punytan@gmail.com>",
+      "xaicron <xaicron@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 4.03",
+   "x_static_install" : 1
 }

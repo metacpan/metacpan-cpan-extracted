@@ -101,7 +101,7 @@ Clipland GmbH, [clipland.com](http://www.clipland.com/)
 
 ## COPYRIGHT & LICENSE
 
-Copyright 2013-2018 Clipland GmbH. All rights reserved.
+Copyright 2013-2019 Clipland GmbH. All rights reserved.
 
 This library is free software, dual-licensed under [GPLv3](http://www.gnu.org/licenses/gpl)
 and [Perl Artistic 2](http://opensource.org/licenses/Artistic-2.0).

@@ -1,4 +1,4 @@
-# $Id: Changes 54 2019-06-03 16:37:49Z minus $
+# $Id: Changes 75 2019-06-19 15:23:53Z minus $
 # Version/Revision history.
 
 1.00 Fri Jun 23 08:46:53 MSK 2017
@@ -7,3 +7,5 @@
 1.01 Mon  3 Jun 18:22:26 MSK 2019
     * CTKlib v2.00 adapted
 
+1.02 Wed Jun 19 18:20:56 MSK 2019
+    * Bug fixed: removed test URL

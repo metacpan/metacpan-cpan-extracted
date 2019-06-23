@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(spawn receive msg snd quit wt snd_wt listener open_node vpid2pid);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 use Event;
@@ -461,7 +461,7 @@ sub w_event_cb {
 	my ($event) = @_;
 	my $fh = $event->w->fd;
 
-	$DEBUG > 1 and print "Write event from $self_vpid: \n";
+	$DEBUG > 1 and print "Write event from $self_vpid.\n";
 	$fh2fh{$fh} or return;
 
 			my $buf = $w_bufs{$fh};

@@ -1,4 +1,4 @@
-# AWS::ECR::Repository generated from spec 2.25.0
+# AWS::ECR::Repository generated from spec 3.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ECR::Repository',
@@ -50,6 +50,7 @@ package Cfn::Resource::Properties::AWS::ECR::Repository {
   has LifecyclePolicy => (isa => 'Cfn::Resource::Properties::AWS::ECR::Repository::LifecyclePolicy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RepositoryName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has RepositoryPolicyText => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

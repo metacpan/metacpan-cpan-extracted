@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.207000';
+$Dancer2::Core::App::VERSION = '0.208000';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -482,6 +482,12 @@ has destroyed_session => (
     clearer   => 'clear_destroyed_session',
 );
 
+has 'prep_apps' => (
+    'is'      => 'ro',
+    'isa'     => ArrayRef,
+    'default' => sub { [] },
+);
+
 sub find_plugin {
     my ( $self, $name ) = @_;
     my $plugin = List::Util::first { ref($_) eq $name } @{ $self->plugins };
@@ -600,18 +606,6 @@ has routes => (
             del     => [],
             options => [],
         };
-    },
-);
-
-has 'calling_class' => (
-    'is'      => 'ro',
-    'isa'     => Str,
-    'default' => sub {
-        my $class = ( caller(2) )[0] ||
-                    ( caller(1) )[0] ||
-                    ( caller(0) )[0];
-
-        return $class;
     },
 );
 
@@ -1134,10 +1128,9 @@ sub finish {
             $self->postponed_hooks
         );
 
-    $self->calling_class->can('prepare_app')
-      and warn "WARNING: You have a subroutine in your "
-      . "app called 'prepare_app'. In the future "
-      . "this will automatically be called by Dancer2.";
+    foreach my $prep_cb ( @{ $self->prep_apps } ) {
+        $prep_cb->($self);
+    }
 }
 
 sub init_route_handlers {
@@ -1676,7 +1669,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.207000
+version 0.208000
 
 =head1 DESCRIPTION
 
@@ -1886,7 +1879,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Alexis Sukrieh.
+This software is copyright (c) 2019 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

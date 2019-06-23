@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Cfn",
   "LICENSE" => "apache",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Cfn",
   "PREREQ_PM" => {
     "JSON" => 0,
@@ -21,7 +22,8 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Moose" => 0,
     "MooseX::SlurpyConstructor" => 0,
-    "MooseX::StrictConstructor" => 0
+    "MooseX::StrictConstructor" => 0,
+    "YAML::PP" => "0.015"
   },
   "TEST_REQUIRES" => {
     "Data::Printer" => 0,
@@ -32,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +54,8 @@ my %FallbackPrereqs = (
   "MooseX::StrictConstructor" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "Test::Pod" => 0
+  "Test::Pod" => 0,
+  "YAML::PP" => "0.015"
 );
 
 

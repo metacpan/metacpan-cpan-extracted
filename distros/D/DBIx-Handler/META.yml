@@ -10,7 +10,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   DBIx::Handler:
     file: lib/DBIx/Handler.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   DBI: '1.605'
   DBIx::TransactionManager: '1.09'
@@ -37,15 +37,16 @@ resources:
   bugtracker: https://github.com/nekokak/p5-DBIx-Handler/issues
   homepage: https://github.com/nekokak/p5-DBIx-Handler
   repository: git://github.com/nekokak/p5-DBIx-Handler.git
-version: '0.14'
+version: '0.15'
 x_authority: cpan:XAICRON
 x_contributors:
-  - 'Keiji, Yoshimi <walf443@gmail.com>'
-  - 'Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>'
-  - 'tokuhirom <tokuhirom@gmail.com>'
   - 'Atsushi Kobayashi <nekokak@gmail.com>'
-  - 'soh335 <sugarbabe335@gmail.com>'
-  - 'xaicron <xaicron@gmail.com>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>'
   - 'karupanerura <karupa@cpan.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'soh335 <sugarbabe335@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

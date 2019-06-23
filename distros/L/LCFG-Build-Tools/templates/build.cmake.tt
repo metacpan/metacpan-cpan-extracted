@@ -17,7 +17,10 @@ MACRO(lcfg_add_comp_script compname)
     SET(comppath "${CMAKE_SOURCE_DIR}/${compname}")
   endif()
 
-  install(PROGRAMS ${comppath} DESTINATION ${LCFGCOMP})
+  # This is marked as optional as 'virtual' components do not have any
+  # code, just a schema
+
+  install(PROGRAMS ${comppath} DESTINATION ${LCFGCOMP} OPTIONAL)
 
 ENDMACRO(lcfg_add_comp_script)
 
@@ -59,9 +62,23 @@ FIND_PROGRAM(PODSTRIP podselect)
 
 MACRO(pod_strip in out)
 
-  IF(PODSTRIP)
+  if(PODSTRIP)
+
+    # Calling podselect like this will happily generate empty files when
+    # the input does not contain any POD. Attempt to read a single byte
+    # to see if the output file has any contents. Remove if the file is
+    # empty.
+
     EXECUTE_PROCESS(COMMAND ${PODSTRIP} ${in} OUTPUT_FILE ${out})
-  ENDIF(PODSTRIP)
+
+    if(EXISTS ${out})
+      file(STRINGS ${out} tmpstring LIMIT_INPUT 1)
+      if ( NOT tmpstring )
+        file(REMOVE ${out})
+      endif()
+    endif()
+
+  endif(PODSTRIP)
 
 ENDMACRO(pod_strip)
 
@@ -146,7 +163,9 @@ MACRO(lcfg_add_perl_module file modpath)
   SET(podfile "${CMAKE_BINARY_DIR}/${modname}.pod")
 
   pod_strip(${file} ${podfile})
-  lcfg_add_pod(${podfile} ${modname} ${PERL_LIBSECT})
+  if(EXISTS ${podfile})
+    lcfg_add_pod(${podfile} ${modname} ${PERL_LIBSECT})
+  endif()
 
   GET_FILENAME_COMPONENT(dirname ${modpath} PATH)
 

@@ -220,7 +220,7 @@ sub test_number_of_best_hits {
 	is $test->get_testable_object(1)->number_of_best_hits, 1, "... and returns the correct value";
 	is $test->get_testable_object(2)->number_of_best_hits, 1, "... and returns the correct value";
 	is $test->get_testable_object(3)->number_of_best_hits, 1, "... and returns the correct value";
-	is $test->get_testable_object(4)->number_of_best_hits, undef, "... and returns the correct value";
+	is $test->get_testable_object(4)->number_of_best_hits, 0, "... and returns the correct value";
 }
 
 sub test_number_of_suboptimal_hits {

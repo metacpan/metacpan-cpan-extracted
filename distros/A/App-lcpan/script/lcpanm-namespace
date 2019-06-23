@@ -1,0 +1,144 @@
+#!perl
+
+# NO_PERINCI_CMDLINE_SCRIPT
+# FRAGMENT id=shcompgen-hint command=_cpanm-namespace
+
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '1.034'; # VERSION
+
+use strict;
+use warnings;
+
+use App::lcpan;
+use Perinci::CmdLine::Util::Config;
+
+my $res = Perinci::CmdLine::Util::Config::read_config(
+    program_name => "lcpan",
+);
+die "Can't read lcpan config files: $res->[0] - $res->[1]\n"
+    unless $res->[0] == 200;
+my $config = $res->[2];
+
+my %args;
+$res = Perinci::CmdLine::Util::Config::get_args_from_config(
+    config => $config,
+    args   => \%args,
+    subcommand_name => 'update-index',
+    meta   => $App::lcpan::SPEC{update},
+);
+die "Can't set lcpan function argument from config: $res->[0] - $res->[1]\n"
+    unless $res->[0] == 200;
+App::lcpan::_set_args_default(\%args);
+my $dbh = App::lcpan::_connect_db('ro', $args{cpan}, $args{index_name}, $args{use_bootstrap});
+
+my @new_argv;
+my %seen_dists; # key = distname, val = modname
+{
+    my %modnames;
+    for my $arg (@ARGV) {
+        unless ($arg =~ /\A[A-Za-z0-9_]+(::[A-Za-z0-9_]+)*\z/) {
+            push @new_argv, $arg;
+            next;
+        }
+        $modnames{$arg} = undef;
+    }
+    my $where = join(" AND ",map {"module.name='$_' OR module.name LIKE '$_\::%'"} sort keys %modnames);
+    last unless length $where;
+    my $sth = $dbh->prepare("
+SELECT
+  module.name module,
+  dist.name dist
+FROM module
+LEFT JOIN file ON module.file_id=file.id
+LEFT JOIN dist ON file.id=dist.file_id
+WHERE $where
+");
+    $sth->execute;
+    while (my @row = $sth->fetchrow_array) {
+        next if $seen_dists{ $row[1] };
+        push @new_argv, $row[0];
+        $seen_dists{ $row[1] } = $row[0];
+    }
+}
+
+{
+    local $ENV{PERL5OPT} = $ENV{LCPANM_PERL5OPT}
+        if defined $ENV{LCPANM_PERL5OPT};
+
+    my @cmd = ("cpanm");
+    push @cmd, "--mirror", $args{cpan}, "--mirror-only" if $args{cpan}; # should be defined
+    push @cmd, @new_argv;
+
+    print "lcpanm: exec: ".join(" ", @cmd), "\n" if $ENV{DEBUG};
+    exec @cmd;
+}
+
+# ABSTRACT: cpanm wrapper (set mirror to local CPAN by default, install all modules from a namespace)
+# PODNAME: lcpanm-namespace
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lcpanm-namespace - cpanm wrapper (set mirror to local CPAN by default, install all modules from a namespace)
+
+=head1 VERSION
+
+This document describes version 1.034 of lcpanm-namespace (from Perl distribution App-lcpan), released on 2019-06-19.
+
+=head1 SYNOPSIS
+
+Use like you would use L<cpanm-namespace>:
+
+ % lcpanm-namespace -n Calendar::Dates ...
+
+=head1 DESCRIPTION
+
+C<lcpanm-namespace> is just like L<cpanm-namespace>, but also adds C<--mirror
+$cpan> and C<--mirror-only>, where I<$cpan> is path to the local CPAN mirror
+read from F<lcpan.conf>.
+
+=head1 ENVIRONMENT
+
+=head2 LCPANM_PERL5OPT
+
+If set, will set C<PERL5OPT> to this value when executing L<cpanm>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-lcpan>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-lcpan>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<cpanm-namespace>, L<cpanm>
+
+L<App::lcpan> and L<lcpan>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

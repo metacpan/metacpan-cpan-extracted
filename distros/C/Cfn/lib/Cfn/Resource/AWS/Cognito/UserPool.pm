@@ -1,4 +1,4 @@
-# AWS::Cognito::UserPool generated from spec 2.32.0
+# AWS::Cognito::UserPool generated from spec 3.2.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool',
@@ -65,6 +65,7 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPool::PasswordPolicyValue {
   has RequireNumbers => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RequireSymbols => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RequireUppercase => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TemporaryPasswordValidityDays => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::NumberAttributeConstraints',

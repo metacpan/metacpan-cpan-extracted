@@ -1,5 +1,9 @@
 Revision history for Open-This
 
+0.000020  2019-06-21 14:45:12Z
+    - Support the pseudo-paths that git diff and friends will display (GH#23) (mannih)
+    - Parse Ansible error messages (GH#20) (Olaf Alders)
+
 0.000019  2019-06-14 13:49:45Z
     - Add support for Kate editor (GH#17) (Jos Joaqun Atria)
     - Document supported editors

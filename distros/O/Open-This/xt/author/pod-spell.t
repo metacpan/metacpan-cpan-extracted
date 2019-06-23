@@ -16,13 +16,16 @@ Anwar
 Atria
 Boris
 Däppen
+Heumann
 Joaquín
 José
+Manni
 Mohammad
 Olaf
 Open
 This
 bdaeppen
+github
 jjatria
 lib
 libs

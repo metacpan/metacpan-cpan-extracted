@@ -4,8 +4,9 @@ use base qw/Quiq::Hash/;
 use strict;
 use warnings;
 use v5.10.0;
+use utf8;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
@@ -218,12 +219,16 @@ Ausgabe der CASCM-Kommandos (String)
 
 =head4 Description
 
-Öffne die Repository-Datei $repoFile im Editor. Nach dem Verlassen
-des Editors wird geprüft, ob die Datei (eine Kopie im lokalen Verzeichnis)
-verändert wurde. Falls ja, wird die Repository-Datei ausgecheckt und
-die gänderte lokale Datei unter einer neuen Versionsnummer eingecheckt.
-Das Package $package wird auf die unterste Stufe bewegt und wieder
-zurück bewegt, falls nötig.
+Checke die Repository-Datei $repoFile aus und öffne sie im Editor.
+Nach dem Verlassen des Editors wird geprüft, ob die Datei (eine Kopie
+im lokalen Verzeichnis) verändert wurde. Der Benutzer wird gefragt,
+ob er seine Änderungen ins Repository übertragen möchte oder nicht.
+Anschließend wird die Repository-Datei wieder eingecheckt. Dies
+geschieht, gleichgültig, ob sie geändert wurde oder nicht. CASCM
+vergibt nur dann eine neue Versionsnummer, wenn die Datei sich
+geändert hat. Das Package $package wird vorher auf die unterste Stufe
+bewegt, falls es sich dort nicht bereits befindet, und hinterher
+wieder zurück bewegt.
 
 =cut
 
@@ -248,6 +253,8 @@ sub edit {
             Package => $package,
         );
     }
+    # Wir bewegen das Package auf die unterste Stufe ("Entwicklung")
+    $self->movePackage($self->states->[0],$package);
 
     # Lokale Kopie der Datei erstellen
 
@@ -287,6 +294,9 @@ sub edit {
     my $backupFile = "$localFile.bak";
     $p->copy($localFile,$backupFile);
 
+    # Checke Datei aus
+    $output .= $self->checkout($package,$repoFile);
+
     my $editor = $ENV{'EDITOR'} || 'vi';
     Quiq::Shell->exec("$editor $localFile");
     if ($p->compare($localFile,$backupFile)) {
@@ -296,10 +306,11 @@ sub edit {
             -default => 'y',
         );
         if ($answ eq 'y') {
-            $self->movePackage($self->states->[0],$package);
-            my ($repoDir) = $p->split($repoFile);
-            $output = $self->putFiles($package,$repoDir,$localFile);
-            $self->movePackage($state,$package);
+            my $workspace = $self->workspace;
+            $p->copy($localFile,"$workspace/$repoFile",
+                -overwrite => 1,
+                -preserve => 1,
+            );
         }
     }
     elsif (!$p->compare($localFile,$origFile)) {
@@ -308,6 +319,13 @@ sub edit {
         $p->delete($origFile);
         $p->delete($localFile);
     }
+
+    # Checke Datei ein. Wenn sie nicht geändert wurde (kein Copy oben),
+    # wird keine neue Version erzeugt.
+    $output .= $self->checkin($package,$repoFile);
+
+    # Package zurückbewegen, falls wir es holen mussten
+    $self->movePackage($state,$package);
 
     # Die Backup-Datei löschen wir immer
     $p->delete($backupFile);
@@ -349,7 +367,7 @@ sub view {
     my ($self,$repoFile,$package) = @_;
 
     my $file = $self->repoFileToFile($repoFile);
-    Quiq::Shell->exec("vi -R $file");
+    Quiq::Shell->exec("emacs $file --eval '(setq buffer-read-only t)'");
 
     return;
 }
@@ -777,6 +795,8 @@ sub deleteVersion {
 =item $namePattern
 
 Name des Item (File oder Directory), SQL-Wildcards sind erlaubt.
+Der Name ist nicht verankert, wird intern also als '%$namePattern%'
+abgesetzt.
 
 =back
 
@@ -825,7 +845,7 @@ sub findItem {
                 ON rep.repositobjid = itm.repositobjid
         WHERE
             env.environmentname = '$projectContext'
-            AND itm.itemname LIKE '$namePattern'
+            AND itm.itemname LIKE '%$namePattern%'
         START WITH
             itm.itemname = '$viewPath'
             AND itm.repositobjid = rep.repositobjid
@@ -1192,7 +1212,7 @@ sub showPackage {
     my $viewPath = $self->viewPath;
 
     my $tab = $self->runSql("
-        SELECT
+        SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
             itm.itemobjid AS id
             , SYS_CONNECT_BY_PATH(itm.itemname,'/') AS item_path
             , itm.itemtype AS item_type
@@ -1206,8 +1226,8 @@ sub showPackage {
                 ON pkg.packageobjid = ver.packageobjid
             JOIN harenvironment env
                 ON env.envobjid = pkg.envobjid
-            JOIN harstate sta
-                ON sta.stateobjid = pkg.stateobjid
+            /* JOIN harstate sta
+                ON sta.stateobjid = pkg.stateobjid */
             JOIN haritems par
                 ON par.itemobjid = itm.parentobjid
             JOIN harrepository rep
@@ -1925,7 +1945,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

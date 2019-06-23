@@ -5,10 +5,10 @@ use warnings;
 # $Id: OSXPkg.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Utils/MacOSX.pm.in,v $
 # $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Utils/OSXPkg.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/lib/LCFG/Build/Utils/OSXPkg.pm.in $
 # $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use File::Copy ();
 use File::Spec ();
@@ -116,7 +116,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Utils::OSXPkg version 0.9.20
+    This documentation refers to LCFG::Build::Utils::OSXPkg version 0.9.30
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,7 @@ Text::Parser::Manual - A manual for the Text::Parser class
 
 =head1 VERSION
 
-version 0.925
+version 0.926
 
 =head1 MOTIVATION
 
@@ -110,15 +110,15 @@ This manual is divided into chapters:
 
 =item *
 
-L<Text::Parser::Manual::ComparingWithNativePerl> - this chapter should explain why one should consider using L<Text::Parser> instead of native Perl.
+L<Comparing with native Perl|Text::Parser::Manual::ComparingWithNativePerl> - this chapter should explain why one should consider using L<Text::Parser> instead of native Perl.
 
 =item *
 
-L<Text::Parser::Manual::ExtendedAWKSyntax> - this chapter outlines the syntax for the rules
+L<The Extended AWK Syntax|Text::Parser::Manual::ExtendedAWKSyntax> - this chapter outlines the syntax for the rules
 
 =back
 
-You can L<start here|Text::Parser::Manual::ExtendedAWKSyntax>.
+You can L<jump here|Text::Parser::Manual::ExtendedAWKSyntax> for a quickstart.
 
 =head1 BUGS
 

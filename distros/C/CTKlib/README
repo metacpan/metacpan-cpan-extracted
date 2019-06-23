@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 2.00
+    Version 2.01
 
 NOTE
 
@@ -229,7 +229,7 @@ DESCRIPTION
         $ctk->error("error text");
 
     Sets new error message and returns it. Also prints message on STDERR if
-    is set verbose mode and sends message to log if log mode is enabled
+    is set debug mode and sends message to log if log mode is enabled
 
  exedir
 
@@ -324,6 +324,10 @@ DESCRIPTION
 
     Returns boolean status of creating and using the object
 
+        my $status = $ctk->status( 1 );
+
+    Sets new status and just returns it
+
  tempfile
 
         my $tempfile = $ctk->tempfile;
@@ -346,9 +350,13 @@ DESCRIPTION
 
  tms
 
-        print $ctk->tms;
+        print $ctk->tms; # +0.0080 sec
 
-    Returns timestamp. For example: +0.0080 sec
+    Returns formatted timestamp
+
+        print $ctk->tms(1); # 0.008000
+
+    Returns NOT formatted timestamp
 
  verbosemode
 

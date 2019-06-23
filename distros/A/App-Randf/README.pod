@@ -5,7 +5,7 @@ This is Perl module B<App::Randf>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-Randf"><img src="https://secure.travis-ci.org/bayashi/App-Randf.png?_t=1440937201"/></a> <a href="https://coveralls.io/r/bayashi/App-Randf"><img src="https://coveralls.io/repos/bayashi/App-Randf/badge.png?_t=1440937201&branch=master"/></a> <a href="http://cpants.cpanauthors.org/dist/App-Randf"><img src="http://cpa
+<a href="http://travis-ci.org/bayashi/App-Randf"><img src="https://secure.travis-ci.org/bayashi/App-Randf.png?_t=1561223563"/></a> <a href="https://coveralls.io/r/bayashi/App-Randf"><img src="https://coveralls.io/repos/bayashi/App-Randf/badge.png?_t=1561223563&branch=master"/></a> <a href="http://cpants.cpanauthors.org/dist/App-Randf"><img src="http://cpa
 nts.cpanauthors.org/dist/App-Randf.png"/></a>
 
 =end html

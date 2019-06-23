@@ -16,6 +16,15 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_maxLineLength : Test(1) {
+    my $self = shift;
+
+    my $len = Quiq::String->maxLineLength("Dies\nist\nein\nBeispieltext\n!\n");
+    $self->is($len,12);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_indent : Test(5) {
     my $self = shift;
 

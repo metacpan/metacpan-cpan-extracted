@@ -10,7 +10,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 my %SUSPICIOUS = ();
@@ -151,7 +151,7 @@ eris::log::context::attacks::url - Inspects URL's for common attack patterns
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,82 @@
+{
+   "abstract" : "Code::TydyAll plugin for Spellunker",
+   "author" : [
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Code-TidyAll-Plugin-Spellunker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Moo" : "0",
+            "Spellunker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Code::TidyAll::Plugin::Spellunker" : {
+         "file" : "lib/Code/TidyAll/Plugin/Spellunker.pm",
+         "version" : "0.01"
+      },
+      "Code::TidyAll::Plugin::Spellunker::Pod" : {
+         "file" : "lib/Code/TidyAll/Plugin/Spellunker/Pod.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/Code-TidyAll-Plugin-Spellunker/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/Code-TidyAll-Plugin-Spellunker",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/Code-TidyAll-Plugin-Spellunker.git",
+         "web" : "https://github.com/karupanerura/Code-TidyAll-Plugin-Spellunker"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.03",
+   "x_static_install" : 1
+}

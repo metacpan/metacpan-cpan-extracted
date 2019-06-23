@@ -1,5 +1,8 @@
 Revision history for Perl extension Function-Interface
 
+0.06 2019-06-19T15:28:30Z
+    - use B::Hooks::EndOfScope instead of CHECK phase #11
+
 0.05 2019-03-20T23:29:16Z
     - fixed pod. thanks @manwar! #10
 

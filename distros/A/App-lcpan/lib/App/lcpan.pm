@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-06-07'; # DATE
-our $VERSION = '1.033'; # VERSION
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '1.034'; # VERSION
 
 use 5.010001;
 use strict;
@@ -4053,7 +4053,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.033 of App::lcpan (from Perl distribution App-lcpan), released on 2019-06-07.
+This document describes version 1.034 of App::lcpan (from Perl distribution App-lcpan), released on 2019-06-19.
 
 =head1 SYNOPSIS
 
@@ -4232,7 +4232,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 
@@ -4430,7 +4430,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 
@@ -4598,7 +4598,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 

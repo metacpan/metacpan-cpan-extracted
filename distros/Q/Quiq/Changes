@@ -1,3 +1,52 @@
+1.147 2019-06-22
+================
+[Makefile.PL]
+* Excel::Writer::XLSX zu den Prerequisites hinzugefügt
+
+1.146 2019-06-22
+================
+[Quiq::Cascm]
+* edit(): Checkout und Checkin korrigiert
+* view(): Emacs auf Readonly-Buffer umgestellt
+* findItem(): Suche ohne Verankerung
+* showPackage(): Redundante Einträge beseitigt
+
+[Quiq::Database::ResultSet]
+* Kosmetik
+
+[Quiq::Excel::Writer]
+* Klasse hinzugefügt
+
+[Quiq::MediaWiki::Client]
+* editPage(): Behandlung von CAPTCHAs hinzugefügt
+
+[Quiq::Object]
+* parameters(): hinzugefügt
+
+[Quiq::Parameters]
+* extract(): Schnelle Rückkehr bei leerer Parameterliste
+
+[Quiq::Path]
+* nextFile(): hinzugefügt
+
+[Quiq::Program]
+* parameters(): Sloppy-Modus hinzugefügt
+
+[Quiq::Shell]
+* exec(): -outputTo hinzugefügt - Umleitung der gesamten Ausgabe 
+
+[Quiq::String]
+* maxLineLength(): hinzugefügt
+
+[Quiq::Table]
+* Kolumnennamen optional
+
+[Quiq::TableRow]
+* Kolumnennamen optional
+
+[Quiq::Xml::LibXml]
+* Methode lookup() hinzugefügt
+
 1.145 2019-06-04
 ================
 [Quiq::Epoch]

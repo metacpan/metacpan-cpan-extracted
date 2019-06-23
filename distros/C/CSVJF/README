@@ -1,0 +1,30 @@
+NAME
+    CSVJF - CSVJF (CSV with JSON Fields) file format specification
+
+VERSION
+    This document describes version 0.1.1 of CSVJF (from Perl distribution
+    CSVJF), released on 2019-06-19.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CSVJF>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-CSVJF>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CSVJF>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

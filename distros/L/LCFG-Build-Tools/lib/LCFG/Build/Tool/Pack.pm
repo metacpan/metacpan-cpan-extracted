@@ -5,10 +5,10 @@ use warnings;
 # $Id: Pack.pm.in 35307 2019-01-10 15:31:12Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/Pack.pm.in,v $
 # $Revision: 35307 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Tool/Pack.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/lib/LCFG/Build/Tool/Pack.pm.in $
 # $Date: 2019-01-10 15:31:12 +0000 (Thu, 10 Jan 2019) $
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use File::Path ();
 use File::Spec ();
@@ -133,7 +133,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::Pack version 0.9.20
+    This documentation refers to LCFG::Build::Tool::Pack version 0.9.30
 
 =head1 SYNOPSIS
 

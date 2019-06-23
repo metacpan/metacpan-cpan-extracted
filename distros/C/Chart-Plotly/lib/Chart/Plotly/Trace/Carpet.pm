@@ -12,7 +12,7 @@ use Chart::Plotly::Trace::Carpet::Font;
 use Chart::Plotly::Trace::Carpet::Hoverlabel;
 use Chart::Plotly::Trace::Carpet::Stream;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: The data describing carpet axis layout is set in `y` and (optionally) also `x`. If only `y` is present, `x` the plot is interpreted as a cheater plot and is filled in using the `y` values. `x` and `y` may either be 2D arrays matching with each dimension matching that of `a` and `b`, or they may be 1D arrays with total length equal to that of `a` and `b`.
 
@@ -255,7 +255,7 @@ Chart::Plotly::Trace::Carpet - The data describing carpet axis layout is set in 
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

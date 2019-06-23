@@ -5,7 +5,7 @@ use warnings;
 # $Id: lcfg-pkgcfg.in 35341 2019-01-15 16:19:12Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-PkgSpec/bin/lcfg-pkgcfg.in,v $
 # $Revision: 35341 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_6/bin/lcfg-pkgcfg.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_7/bin/lcfg-pkgcfg.in $
 # $Date: 2019-01-15 16:19:12 +0000 (Tue, 15 Jan 2019) $
 
 use LCFG::Build::PkgSpec;
@@ -13,7 +13,7 @@ use File::Spec ();
 use Getopt::Long ();
 use Pod::Usage ();
 
-our $VERSION = '0.2.6';
+our $VERSION = '0.2.7';
 
 use v5.10;
 
@@ -120,7 +120,7 @@ lcfg-pkgcfg - A tool for querying LCFG build metadata files
 
 =head1 VERSION
 
-This documentation refers to lcfg-reltool version 0.2.6
+This documentation refers to lcfg-reltool version 0.2.7
 
 =head1 USAGE
 

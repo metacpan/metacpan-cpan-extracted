@@ -17,11 +17,11 @@ Device::Yeelight - Controller for Yeelight smart devices
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -54,6 +54,7 @@ sub new {
     my $data  = {
         address => '239.255.255.250',
         port    => 1982,
+        timeout => 3,
         devices => [],
     };
     return bless( $data, $class );
@@ -90,18 +91,18 @@ MAN: "ssdp:discover"\r
 ST: wifi_bulb\r
 EOQ
     $socket->mcast_send( $query, "$self->{address}:$self->{port}" ) or croak $!;
+    $socket->close;
 
     my @ready;
-    while ( @ready = $sel->can_read ) {
+    while ( @ready = $sel->can_read( $self->{timeout} ) ) {
+        break unless @ready;
         foreach my $fh (@ready) {
             my $data;
             $fh->recv( $data, 4096 );
             $self->parse_response($data) if $data =~ m#^HTTP/1\.1 200 OK\r\n#;
-            $sel->remove($fh);
-            $fh->close;
         }
     }
-    $socket->close;
+    $listen->close;
     return $self->{devices};
 }
 

@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.06
+0.07
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 use File::Share ':all';
@@ -96,9 +96,9 @@ sub _weasel_log_hook {
 sub _flush_log {
     my $self = shift;
     my $log = $self->_log;
-    return if ! $log;
+    return if ! $log || ! $log->{feature};
 
-    my $f = md5_hex($log->{feature}->{title}) . '.html';
+    my $f = md5_hex($log->{feature}->{filename}) . '.html';
     $log->{template}->process(
         $self->feature_template,
         { %{$log} }, # using the $log object directly destroys it...
@@ -112,6 +112,9 @@ sub _flush_log {
 sub _initialize_logging {
     my ($self) = @_;
 
+    if ($self->screenshots_dir && !$self->logging_dir) {
+        die "Unable to generate screenshots when logging is disabled";
+    }
     if ($self->logging_dir) { # the user wants logging...
         die 'Logging directory: ' . $self->logging_dir . ' does not exist'
             if ! -d $self->logging_dir;
@@ -180,6 +183,7 @@ sub pre_feature {
         my $feature_log = {
             scenarios => [],
             title => $feature->name,
+            filename => $feature->document->filename,
             satisfaction => join("\n",
                                  map { $_->content }
                                  @{$feature->satisfaction})
@@ -198,8 +202,8 @@ sub post_feature {
 
     my $log = $self->_log;
     if ($log) {
-        $log->{feature} = undef;
         $self->_flush_log;
+        $log->{feature} = undef;
     }
 }
 
@@ -237,8 +241,8 @@ sub post_scenario {
 
     my $log = $self->_log;
     if ($log) {
-        $log->{scenario} = undef;
         $self->_flush_log;
+        $log->{scenario} = undef;
     }
 
     $stash->{ext_wsl}->stop
@@ -261,7 +265,7 @@ sub pre_step {
 }
 
 sub post_step {
-    my ($self, $step, $context, $result) = @_;
+    my ($self, $step, $context, $fail, $result) = @_;
 
     return if ! defined $context->stash->{scenario}->{ext_wsl};
     $self->_save_screenshot("step", "post");
@@ -354,7 +358,7 @@ sub _save_screenshot {
     return if ! $self->screenshots_dir;
     return if ! $self->screenshot_event_on("$phase-$event");
 
-    my $img_name = "$event-$phase-" . ($img_num++) . '.png';
+    my $img_name = md5_hex($self->_log->{feature}->{filename}) . "-$event-$phase-" . ($img_num++) . '.png';
     if (open my $fh, ">", $self->screenshots_dir . '/' . $img_name) {
         $self->_weasel->session->screenshot($fh);
         close $fh

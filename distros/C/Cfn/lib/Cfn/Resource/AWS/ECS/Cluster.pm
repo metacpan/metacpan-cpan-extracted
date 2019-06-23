@@ -1,4 +1,4 @@
-# AWS::ECS::Cluster generated from spec 2.25.0
+# AWS::ECS::Cluster generated from spec 3.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ECS::Cluster',
@@ -26,6 +26,7 @@ package Cfn::Resource::Properties::AWS::ECS::Cluster {
   extends 'Cfn::Resource::Properties';
   
   has ClusterName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

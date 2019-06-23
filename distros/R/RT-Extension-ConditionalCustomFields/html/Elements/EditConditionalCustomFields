@@ -13,9 +13,9 @@
 <script type="text/javascript">
 jQuery(function() {
     var condition_selector = get_selector('<% $condition_name |n%>', '<% $condition_cf->Type |n%>', '<% $condition_cf->RenderType |n%>');
-    var alternative_selector = condition_selector.replace(/[-:]/g, '_') + '_chosen';
+    var alternative_selector = '#' + '<% $condition_name |n%>'.replace(/[\W]/g, '_') + '_chosen';
     jQuery(condition_selector).change(function() {
-        var cf_id = <% "$cf_id" |h,n,j%>;
+        var cf_id = '<% $cf_id |h,n%>';
         cf_id = cf_id.replace(/:/g,'\\:');
         var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
         var condition_selector_vals = get_cf_current_form_values(condition_selector, '<% $condition_cf->Type |n%>', '<% $condition_cf->RenderType |n%>', <% $condition_cf->SingleValue ? 'true' : 'false' %>);
@@ -47,7 +47,7 @@ jQuery(function() {
     });
 
     jQuery(condition_selector).on('hide', function() {
-        var cf_id = <% "$cf_id" |h,n,j%>;
+        var cf_id = '<% $cf_id |h,n%>';
         cf_id = cf_id.replace(/:/g,'\\:');
         if (jQuery('#'+cf_id).length) {
             jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
@@ -60,7 +60,7 @@ jQuery(function() {
     });
 
     jQuery(condition_selector).on('show', function() {
-        var cf_id = <% "$cf_id" |h,n,j%>;
+        var cf_id = '<% $cf_id |h,n%>';
         cf_id = cf_id.replace(/:/g,'\\:');
         var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
         var condition_selector_vals = get_cf_current_form_values(condition_selector, '<% $condition_cf->Type |n%>', '<% $condition_cf->RenderType |n%>');

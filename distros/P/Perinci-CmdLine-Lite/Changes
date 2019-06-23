@@ -1,3 +1,10 @@
+1.820   2019-06-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update dep: Perinci::Sub::GetArgs::Argv=0.842.
+
+
 1.819   2019-06-02 (PERLANCAR)
 
 	- Introduce cmdline.resut.interactive and

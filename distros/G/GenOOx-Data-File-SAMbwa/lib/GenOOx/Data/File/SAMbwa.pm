@@ -49,7 +49,7 @@ The GenOO framework SAM parser avoids code that is unique to specific programs a
 # Let the code begin...
 
 package GenOOx::Data::File::SAMbwa;
-$GenOOx::Data::File::SAMbwa::VERSION = '0.0.4';
+$GenOOx::Data::File::SAMbwa::VERSION = '0.0.5';
 
 #######################################################################
 #######################   Load External modules   #####################

@@ -7,10 +7,10 @@ use v5.10;
 # $Id: VCS.pm.in 35396 2019-01-17 12:01:51Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-VCS/lib/LCFG/Build/VCS.pm.in,v $
 # $Revision: 35396 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_3_8/lib/LCFG/Build/VCS.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_3_9/lib/LCFG/Build/VCS.pm.in $
 # $Date: 2019-01-17 12:01:51 +0000 (Thu, 17 Jan 2019) $
 
-our $VERSION = '0.3.8';
+our $VERSION = '0.3.9';
 
 use DateTime ();
 use File::Copy ();
@@ -422,7 +422,7 @@ __END__
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::VCS version 0.3.8
+This documentation refers to LCFG::Build::VCS version 0.3.9
 
 =head1 SYNOPSIS
 

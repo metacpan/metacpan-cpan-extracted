@@ -11,7 +11,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 sub _build_priority { 1000 }
@@ -49,8 +49,8 @@ sub _build_geo_lookup {
     } or do {
         my $err = $@;
         warn sprintf "Failed loading GeoIP Database '%s' with error: %s",
-            $self->geo_db,
-            $err;
+            ( $self->geo_db || 'unspecified' ),
+            ( $err || 'unknown error');
     };
     return $g;
 }
@@ -129,7 +129,7 @@ eris::log::context::GeoIP - Apply MaxMind GeoIP Data to events
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

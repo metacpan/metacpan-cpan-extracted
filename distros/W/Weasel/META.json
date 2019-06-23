@@ -60,7 +60,7 @@
          "web" : "https://github.com/perl-weasel/weasel"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

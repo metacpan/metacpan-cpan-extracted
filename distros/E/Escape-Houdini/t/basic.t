@@ -1,20 +1,24 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16; 
+use Test::More tests => 10;
 use Test::Exception;
 
 use Escape::Houdini qw/ :all /;
 
-is escape_html( "<body>" ) => '&lt;body&gt;';
-throws_ok { escape_html( [ 1..4]  ) } qr/\Qescape_html() argument not a string/;
-is escape_html( 6 ) => 6;
-is escape_html( '<div class="❤">foo</div>' ) => '&lt;div class=&quot;❤&quot;&gt;foo&lt;&#47;div&gt;';
+subtest 'escape_html' => sub {
+    is escape_html( "<body>" ) => '&lt;body&gt;';
+    throws_ok { escape_html( [ 1..4]  ) } qr/\Qescape_html() argument not a string/;
+    is escape_html( 6 ) => 6;
+    is escape_html( '<div class="❤">foo</div>' ) => '&lt;div class=&quot;❤&quot;&gt;foo&lt;&#47;div&gt;';
+};
 
-is unescape_html( "&lt;body&gt;" ) => '<body>';
-dies_ok { unescape_html( [ 1..4]  ) };
-is unescape_html( 6 ) => 6;
-is unescape_html( '&lt;div class=&quot;❤&quot;&gt;foo&lt;&#47;div&gt;' ) => '<div class="❤">foo</div>';
+subtest 'unescape_html' => sub {
+    is unescape_html( "&lt;body&gt;" ) => '<body>';
+    dies_ok { unescape_html( [ 1..4]  ) };
+    is unescape_html( 6 ) => 6;
+    is unescape_html( '&lt;div class=&quot;❤&quot;&gt;foo&lt;&#47;div&gt;' ) => '<div class="❤">foo</div>';
+};
 
 is escape_xml( "<foo>" ) => '&lt;foo&gt;';
 

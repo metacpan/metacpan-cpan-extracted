@@ -20,4 +20,4 @@ no_index:
 requires: {}
 resources:
   repository: https://github.com/yuki-kimoto/SPVM.git
-version: '0.0437'
+version: '0.0438'

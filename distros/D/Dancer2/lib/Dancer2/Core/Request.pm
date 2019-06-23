@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '0.207000';
+$Dancer2::Core::Request::VERSION = '0.208000';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -566,11 +566,6 @@ sub _shallow_clone {
     # in $self, then merge any overridden values
     my $env = { %{ $self->env }, %{ $options || {} } };
 
-    # request body fh has been read till end
-    # delete CONTENT_LENGTH in new request (no need to parse body again)
-    # and merge existing params
-    delete $env->{CONTENT_LENGTH};
-
     my $new_request = __PACKAGE__->new(
         env         => $env,
         body_params => {},
@@ -591,7 +586,6 @@ sub _shallow_clone {
     $new_request->{_params}       = $new_params;
     $new_request->{_body_params}  = $self->{_body_params};
     $new_request->{_route_params} = $self->{_route_params};
-    $new_request->{body}          = $self->body;
     $new_request->{headers}       = $self->headers;
 
     # Copy remaining settings
@@ -629,7 +623,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 0.207000
+version 0.208000
 
 =head1 SYNOPSIS
 
@@ -1146,7 +1140,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Alexis Sukrieh.
+This software is copyright (c) 2019 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

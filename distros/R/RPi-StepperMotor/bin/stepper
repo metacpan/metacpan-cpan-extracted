@@ -7,7 +7,7 @@ use RPi::StepperMotor;
 
 for ($ARGV[0], $ARGV[1]){
     if (! $_){
-        print "\nUsage:   stepper <cw|ccw> degrees [speed]\n\n";
+        print "\nUsage: stepper <cw|ccw> degrees [speed]\n\n";
         print "Example: stepper cw 180 [full]\n\n";
         exit;
     }

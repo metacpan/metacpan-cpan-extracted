@@ -22,7 +22,7 @@ name: Pod-Weaver-PluginBundle-SHLOMIF
 provides:
   Pod::Weaver::PluginBundle::SHLOMIF:
     file: lib/Pod/Weaver/PluginBundle/SHLOMIF.pm
-    version: '0.001001'
+    version: '0.001002'
 requires:
   Pod::Elemental::PerlMunger: '0.200001'
   Pod::Elemental::Transformer::List: '0.102000'
@@ -37,10 +37,10 @@ resources:
   bugtracker: https://github.com/shlomif/pod-weaver-pluginbundle-shlomif/issues
   homepage: http://metacpan.org/release/Pod-Weaver-PluginBundle-SHLOMIF
   repository: git://github.com/shlomif/pod-weaver-pluginbundle-shlomif.git
-version: '0.001001'
+version: '0.001002'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -359,5 +359,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

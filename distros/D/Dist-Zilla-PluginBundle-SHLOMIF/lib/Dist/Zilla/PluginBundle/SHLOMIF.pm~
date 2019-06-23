@@ -273,7 +273,6 @@ has _plugins => (
             ),
             ($self->awesome ? $self->awesome : 'MakeMaker'),
             qw(
-                Authority
                 CheckChangesHasContent
                 ConfirmRelease
                 Manifest

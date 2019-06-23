@@ -1,6 +1,13 @@
 Revision history for Test2-Aggregate
 
+0.05    2019-06-21
+        Avoid Test::More redefine warnings.
+        Defaults shown in POD method description.
+
 0.04    2019-06-14
+        Don't warn on non-existent paths, warn on invalid root.
+        STDOUT option for stats_output.
+        Fix tests for @INC not containing '.'.
         Don't warn on non-existent paths, warn on invalid root.
         STDOUT option for stats_output.
         Fix tests for @INC not containing '.'.

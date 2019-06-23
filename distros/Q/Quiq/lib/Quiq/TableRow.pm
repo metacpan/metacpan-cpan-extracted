@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Scalar::Util ();
 
@@ -69,7 +69,7 @@ Instantiiere ein Zeilen-Objekt für Tabelle $tab mit den Zeilendaten @arr.
 sub new {
     my ($class,$tab,$valueA) = @_;
 
-    if (@$valueA != @{$tab->{'columnA'}}) {
+    if (@$valueA != $tab->{'width'}) {
         $class->throw(
             'TABLE-00099: Unexpected array length',
             TableWidth => scalar @{$tab->{'columnA'}},
@@ -150,7 +150,7 @@ sub values {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ name = Dist-Zilla-PluginBundle-SHLOMIF
 author = Shlomi Fish <shlomif@cpan.org>
 license = MIT
 copyright_holder = Jesse Luehrs
-version = 0.000007
+version = 0.000008
 
 [@Filter]
 -bundle = @SHLOMIF

@@ -20,7 +20,13 @@ my ($opt,$usage) = describe_options(
     [ 'config|c=s', "eris config file", {
         callbacks => { exists => sub { -f shift } }
     }],
+    [],
+    ['help', 'Display this help', { shortcircuit => 1 }],
 );
+if( $opt->help ) {
+    print $usage->text;
+    exit 0;
+}
 
 #------------------------------------------------------------------------#
 # Main
@@ -56,7 +62,7 @@ eris-field-lookup.pl - Utility for testing the logging contextualizer
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

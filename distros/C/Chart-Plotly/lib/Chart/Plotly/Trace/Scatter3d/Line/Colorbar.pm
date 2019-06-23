@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scatter3d::Line::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Scatter3d::Line::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Scatter3d::Line::Colorbar::Title;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter3d.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Scatter3d::Line::Colorbar - This attribute is one of the p
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

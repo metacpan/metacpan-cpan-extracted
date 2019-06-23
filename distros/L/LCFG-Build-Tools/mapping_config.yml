@@ -36,3 +36,8 @@ CPACK_PACKAGE_CONTACT: author
 CPACK_PACKAGE_VERSION_MAJOR: get_major
 CPACK_PACKAGE_VERSION_MINOR: get_minor
 CPACK_PACKAGE_VERSION_PATCH: get_micro
+DEB_DSCNAME: deb_dscname
+DEB_NAME: deb_name
+DEB_SRCTARNAME: deb_srctarname
+DEB_TARNAME: deb_tarname
+DEB_VERSION: deb_version

@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.032';
+our $VERSION = '1.033';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -18,6 +18,9 @@ our $VERSION = '1.032';
 #pod         say 'Matched!';
 #pod     }
 #pod
+#pod     use Yancy::Util qw( fill_brackets );
+#pod     my $value = fill_brackets( $template, $item );
+#pod
 #pod =head1 DESCRIPTION
 #pod
 #pod This module contains utility functions for Yancy.
@@ -35,9 +38,10 @@ use Mojo::Loader qw( load_class );
 use Scalar::Util qw( blessed );
 use Mojo::JSON::Pointer;
 use Mojo::JSON qw( to_json );
+use Mojo::Util qw( xml_escape );
 use Carp qw( carp );
 
-our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp );
+our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp fill_brackets );
 
 #pod =sub load_backend
 #pod
@@ -247,6 +251,33 @@ sub match {
     return $passes == keys %test;
 }
 
+#pod =sub fill_brackets
+#pod
+#pod     my $string = fill_brackets( $template, $item );
+#pod
+#pod This routine will fill in the given template string with the values from
+#pod the given C<$item> hashref. The template contains field names within curly braces.
+#pod Values in the C<$item> hashref will be escaped with L<Mojo::Util/xml_escape>.
+#pod
+#pod     my $item = {
+#pod         name => 'Doug Bell',
+#pod         email => 'doug@example.com',
+#pod         quote => 'I <3 Perl',
+#pod     };
+#pod
+#pod     # Doug Bell <doug@example.com>
+#pod     fill_brackets( '{name} <{email}>', $item );
+#pod
+#pod     # I &lt;3 Perl
+#pod     fill_brackets( '{quote}', $item );
+#pod
+#pod =cut
+
+sub fill_brackets {
+    my ( $template, $item ) = @_;
+    return scalar $template =~ s/(?<!\\)\{\s*([^\s\}]+)\s*\}/xml_escape $item->{$1}/reg;
+}
+
 #pod =sub derp
 #pod
 #pod     derp "This feature is deprecated in file '%s'", $file;
@@ -287,7 +318,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 
@@ -304,6 +335,9 @@ version 1.032
     if ( match( $where, $item ) ) {
         say 'Matched!';
     }
+
+    use Yancy::Util qw( fill_brackets );
+    my $value = fill_brackets( $template, $item );
 
 =head1 DESCRIPTION
 
@@ -389,6 +423,26 @@ Test if the given C<$item> matches the given L<SQL::Abstract> C<$where>
 data structure. See L<SQL::Abstract/WHERE CLAUSES> for the full syntax.
 
 Not all of SQL::Abstract's syntax is supported yet, so patches are welcome.
+
+=head2 fill_brackets
+
+    my $string = fill_brackets( $template, $item );
+
+This routine will fill in the given template string with the values from
+the given C<$item> hashref. The template contains field names within curly braces.
+Values in the C<$item> hashref will be escaped with L<Mojo::Util/xml_escape>.
+
+    my $item = {
+        name => 'Doug Bell',
+        email => 'doug@example.com',
+        quote => 'I <3 Perl',
+    };
+
+    # Doug Bell <doug@example.com>
+    fill_brackets( '{name} <{email}>', $item );
+
+    # I &lt;3 Perl
+    fill_brackets( '{quote}', $item );
 
 =head2 derp
 

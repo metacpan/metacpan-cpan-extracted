@@ -90,6 +90,33 @@ Add a new category of general accessory to the database
 		'search'        => { 'handler' => \&accessory_search,   'desc' => 'Search for an accessory' },
 	};
 
+=head2 series
+
+=head3 series add
+
+Add a new series of camera or lens models
+
+=head3 series info
+
+View information about a series of camera or lens models
+
+=head3 series list
+
+Summarise series of camera or lens models
+
+=head3 series need
+
+View list of models needed to complete series
+
+=cut
+
+	$handlers{series} = {
+		'add'  => { 'handler' => \&series_add,  'desc' => 'Add a new series of camera or lens models' },
+		'info' => { 'handler' => \&series_info, 'desc' => 'View information about a series of camera or lens models' },
+		'list' => { 'handler' => \&series_list, 'desc' => 'Summarise series of camera or lens models' },
+		'need' => { 'handler' => \&series_need, 'desc' => 'View list of models needed to complete series' },
+	};
+
 =head2 archive
 
 =head3 archive add
@@ -228,9 +255,17 @@ Add accessory compatibility info to a camera model
 
 Add available exposure program info to a camera model
 
+=head3 cameramodel info
+
+View information about a camera model
+
 =head3 cameramodel meteringmode
 
 Add available metering mode info to a camera model
+
+=head3 cameramodel series
+
+Add a camera model to a series
 
 =head3 cameramodel shutterspeeds
 
@@ -242,7 +277,9 @@ Add available shutter speed info to a camera model
 		'accessory'       => { 'handler' => \&cameramodel_accessory,       'desc' => 'Add accessory compatibility info to a camera model' },
 		'add'             => { 'handler' => \&cameramodel_add,             'desc' => 'Add a new camera model to PhotoDB' },
 		'exposureprogram' => { 'handler' => \&cameramodel_exposureprogram, 'desc' => 'Add available exposure program info to a camera model' },
+		'info'            => { 'handler' => \&cameramodel_info,            'desc' => 'View information about a camera model' },
 		'meteringmode'    => { 'handler' => \&cameramodel_meteringmode,    'desc' => 'Add available metering mode info to a camera model' },
+		'series'          => { 'handler' => \&cameramodel_series,          'desc' => 'Add a camera model to a series' },
 		'shutterspeeds'   => { 'handler' => \&cameramodel_shutterspeeds,   'desc' => 'Add available shutter speed info to a camera model' },
 	};
 
@@ -456,11 +493,21 @@ Add a new lens model to PhotoDB
 
 Add accessory compatibility info to a lens model
 
+=head3 lensmodel info
+
+View information about a lens model
+
+=head3 lensmodel series
+
+Add a lens model to a series
+
 =cut
 
         $handlers{lensmodel} = {
                 'accessory' => { 'handler' => \&lensmodel_accessory, 'desc' => 'Add accessory compatibility info to a lens model' },
                 'add'       => { 'handler' => \&lensmodel_add,       'desc' => 'Add a new lens model to PhotoDB' },
+                'info'      => { 'handler' => \&lensmodel_info,      'desc' => 'View information about a lens model' },
+                'series'    => { 'handler' => \&lensmodel_series,    'desc' => 'Add a lens model to a series' },
         };
 
 =head2 lens

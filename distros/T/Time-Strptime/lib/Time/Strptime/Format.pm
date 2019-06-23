@@ -15,7 +15,7 @@ use Time::Strptime::TimeZone;
 
 use constant DEBUG => exists $ENV{PERL_TIME_STRPTIME_DEBUG} && $ENV{PERL_TIME_STRPTIME_DEBUG};
 
-our $VERSION = 1.03;
+our $VERSION = 1.04;
 
 our %DEFAULT_HANDLER = (
     A   => [SKIP          => sub {

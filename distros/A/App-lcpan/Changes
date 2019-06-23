@@ -1,3 +1,8 @@
+1.034   2019-06-19 (PERLANCAR)
+
+	- Add script: lcpanm-namespace.
+
+
 1.033   2019-06-07 (PERLANCAR)
 
         - Add --self-upgrade (-U).

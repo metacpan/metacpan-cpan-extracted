@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Encode ();
 
@@ -29,6 +29,36 @@ um zusätzliche Funktionalität.
 =head1 METHODS
 
 =head2 Erweiterung XML::LibXML::Document
+
+=head3 lookup() - Finde Knoten
+
+=head4 Synopsis
+
+    $node = $doc->lookup($xpath);
+
+=head4 Returns
+
+Knoten
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+*XML::LibXML::Document::lookup = sub {
+    my ($self,$xpath) = @_;
+
+    my @nodes = $self->findnodes($xpath);
+    if (!@nodes) {
+        $self->throw;
+    }
+    if (@nodes > 1) {
+        $self->throw;
+    }
+
+    return $nodes[0];
+};
+
+# -----------------------------------------------------------------------------
 
 =head3 toFormattedString() - Formatiertes XML
 
@@ -111,7 +141,7 @@ $nod->removeChildNodes().
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

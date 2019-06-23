@@ -897,6 +897,8 @@ t/00-load.t
 t/20-orca.t
 t/30-color_type_constraint.t
 t/40-meta_attribute_translation.t
+t/50-config_support.t
+t/60-serialize_json.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

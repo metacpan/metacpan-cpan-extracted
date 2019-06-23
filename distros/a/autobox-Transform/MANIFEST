@@ -16,11 +16,14 @@ t/hash-filter_each.t
 t/hash-map_each.t
 t/hash-map_each_to_array.t
 t/hash-map_each_value.t
+t/hash-reject_each.t
 t/key_value.t
 t/lib/Literature.pm
 t/map_by.t
 t/order.t
 t/order_by.t
+t/reject.t
+t/reject_by.t
 t/to_x.t
 t/uniq_by.t
 META.yml

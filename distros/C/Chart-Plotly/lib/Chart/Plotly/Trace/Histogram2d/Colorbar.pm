@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Histogram2d::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Histogram2d::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Histogram2d::Colorbar::Title;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram2d.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Histogram2d::Colorbar - This attribute is one of the possi
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

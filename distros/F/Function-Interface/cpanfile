@@ -1,6 +1,6 @@
 requires 'perl', '5.014004';
 requires 'Function::Parameters', '2.000003';
-requires 'Function::Return', '0.05';
+requires 'Function::Return', '0.07';
 requires 'PPR';
 requires 'Keyword::Simple', '0.04';
 requires 'Carp';

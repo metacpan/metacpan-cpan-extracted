@@ -1,4 +1,11 @@
-0.05 
+0.06 2019-06-19
+  - Implements the resources in CloudFormation spec 3.4.0 (published as of 2019-06-19)
+  - YAML CloudFormation support. Added from_yaml and as_yaml methods to Cfn.
+  - Declare minimum Perl version of 5.16, due to heavy usage of package { } syntax
+  - Add parameter types for SSM
+    https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html#parameters-section-ssm-examples
+
+0.05 2019-05-15
   - Implements the resources in CloudFormation spec 3.0.0 (published as of 2019-05-15)
   - AWS::Serverless::API resource up to date (not in the spec)
 

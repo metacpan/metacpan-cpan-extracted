@@ -23,4 +23,4 @@ requires:
   Modern::Perl: '0'
   Moose: '0'
   namespace::autoclean: '0'
-version: 0.0.4
+version: 0.0.5

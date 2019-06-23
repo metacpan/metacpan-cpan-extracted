@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Class::Moose::Runner" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.0.4",
+  "VERSION" => "0.0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }

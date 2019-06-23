@@ -144,3 +144,8 @@
        + tz_diff
        + trim
     + Added CTK::Daemon
+
+2.01 Wed Jun 19 18:25:46 MSK 2019
+    * CTK::Command::crlf: Bug fixed - added -z condition
+    * Status method has been extended: now You can use this method as setter
+    * The methods tms and error has been modified

@@ -1,10 +1,15 @@
 Revision history for Image::Animated::JPEG
 
+0.03	2019-06-19
+	- fix DC drawing
+	- actually mention that ajpeg2gif is included
+
 0.02	2018-03-02
 	- ajpegtran: provide integers only to jpegtran
 	- ajpegtran: fix handling of filenames with special chars
 	- playajpeg: fix drawing on newer Wx
 	- js: experimental JavaScript implementation / lib
+	- ajpeg2gif: convert ajpegs to gifs with mogrify+gifsicle
 
 0.01	2016-11-02
 	- left alpha stage, feature lock

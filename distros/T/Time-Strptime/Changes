@@ -1,5 +1,9 @@
 Revision history for Perl extension Time-Strptime
 
+1.04 2019-06-21T22:08:22Z
+
+    - document for difference with POSIX::strptime (#13)
+
 1.03 2018-07-03T15:12:15Z
 
     - fixed tests on no DateTime.pm enviroments

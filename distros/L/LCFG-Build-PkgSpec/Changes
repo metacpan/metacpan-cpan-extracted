@@ -1,6 +1,19 @@
-2019-01-18  SVN: new release
+2019-03-22  SVN: new release
 
-	* Release: 0.2.6
+	* Release: 0.2.7
+
+2019-03-22 15:28  squinney@INF.ED.AC.UK
+
+	* debian/control: Need to build-depend on libmodule-build-perl
+
+2019-03-21 16:36  squinney@INF.ED.AC.UK
+
+	* README: Added notes about what packages are required on Debian
+
+2019-01-18 10:45  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release:
+	  0.2.6
 
 2019-01-18 10:45  squinney@INF.ED.AC.UK
 

@@ -1,9 +1,46 @@
 ==================================================
-Changes from 2015-07-23 00:00:00 +0000 to present.
+Changes from 2017-06-22 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.3 at 2017-07-22 04:21:38 +0000
+version 1.4 at 2019-06-22 04:20:26 +0000
+----------------------------------------
+
+  Change: c5891e80dab8a6426fa7c2a2f599e33857be0e0b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-21 21:16:30 +0000
+
+    Release Version 1.4 Ready
+
+    * Adding --tags to support selective output using tagged messages * Add
+    optional App::Nopaste support to the module
+
+    * If App::Nopaste is installed and --nopaste is specified paste to
+    Shadowcat * Convert from IPC::Run3 to Capture::Tiny * Documentation and
+    testing updates 
+
+  Change: 423e3c5dadb8d00151cf9038715b8e5b86f3acc0
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-12 21:27:46 +0000
+
+    POD and test fixups
+
+    POD spelling and tests fix-up. 
+
+  Change: d06aaad52cc48dbf611654ec67dbab66b7e8639f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-12 21:18:03 +0000
+
+    Add spelling checks 
+
+  Change: 51122cb1672978d31f0993311f98a1284aaafd2a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-13 06:17:05 +0000
+
+    More fixes for dist.ini 
+
+----------------------------------------
+version 1.3 at 2017-07-22 04:20:36 +0000
 ----------------------------------------
 
   Change: 410b1ab053cbe0a14fdb505686e994868009c069
@@ -21,124 +58,6 @@ version 1.3 at 2017-07-22 04:21:38 +0000
     Added Perl Critic to the test suite. Replaced 'ref' calls with their
     Ref::Util counterparts. 
 
-----------------------------------------
-version 1.2 at 2016-08-18 23:14:58 +0000
-----------------------------------------
-
-  Change: f90b8876a61dbcf75c1c1d24027a6be1e9fc5cb1
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 16:14:58 +0000
-
-    README regenerated for 1.2 release. 
-
-  Change: bfea9ce99b57357554df8e1b9a4b80f0115beb8f
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 16:12:28 +0000
-
-    Upgrade the release tooling preferences. 
-
-  Change: 9de85d543c779d9c1e51be12e692226bfa440664
-  Author: Kevin M. Goess <kgoess@craigslist.org>
-  Date : 2016-08-18 15:36:01 +0000
-
-    allow add'l validation for pwprompt 
-
-----------------------------------------
-version 1.1 at 2016-08-18 01:12:44 +0000
-----------------------------------------
-
-  Change: e57b793d88a77339feaf62124b19f915d12c0629
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-17 18:12:44 +0000
-
-    Release 1.1 - Echoing Sysloggian Bane
-
-    Added a noecho option to text_input which disables terminal echo and
-    refrains from Term::ReadLine magic.
-
-    Added pwprompt() to prompt a user for a password. Modified prompt() to
-    detect /passw(or)?d/i in a prompt and switch automatically to pwprompt.
-
-    Added a 'no_syslog' option to output to replace '_skip_syslog' which was a
-    hidden feature. This allows a user to ensure certain messages never go to
-    syslog.
-
-    Updated documentation to reflect the current state of affairs. 
-
-  Change: d6a0815fbf61eb5326458ac75839f25ecc826969
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 22:56:33 +0000
-
-    Dist::Zilla and Pod::Weaver configs updated. 
-
-  Change: 9257aed38de09b194dd3327c2e3c31107449689e
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2016-02-20 15:41:03 +0000
-
-    - Fix broken link in the README.mkdn file. 
-
-----------------------------------------
-version 1.0 at 2016-02-19 20:40:09 +0000
-----------------------------------------
-
-  Change: 51aad9acc121aaff07c30ab7a722e00208463017
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-19 20:40:09 +0000
-
-    Version 1.0 release 
-
-  Change: 798a83da59d66409f518f29bb8ca5160df7a1dfb
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-19 20:29:37 +0000
-
-    Version 1.0 time. 
-
-  Change: 8a2bd515c056a2d997f061488558d17c1d678a68
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-19 12:27:27 +0000
-
-    Fix warnings around undefined values in certain instances. 
-
-----------------------------------------
-version 0.9 at 2016-02-02 22:32:24 +0000
-----------------------------------------
-
-  Change: d1d157aaf8af474943b830cb523f4aa091bc8c6a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-02 22:32:24 +0000
-
-    Version 0.9 release bump 
-
-  Change: eb98a12979d4e3e2c48a79965fbaa95540e3837e
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-02 14:28:24 +0000
-
-    Fix minimum verion of Term::ANSIColor and the authordeps in dist.ini. 
-
-  Change: 9b6e5543264e18f5266173923487b4f1940fbea4
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 23:11:20 +0000
-
-    Fixing more authordeps. 
-
-  Change: 2903baadfebbb42f787335f26a0675c4176c4d89
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 23:07:03 +0000
-
-    Authordeps updated. 
-
-  Change: 8b2702bffb208b41ed89b365486a34e0edba403b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 22:59:42 +0000
-
-    Adding TravisCI to the project. 
-
-  Change: 8cc582b7c30fc004ff60f12703542c0a7bc55f25
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 22:56:49 +0000
-
-    Updates to dist.ini for better Prereqs and current tests. 
-
-================================================
-Plus 8 releases after 2015-07-23 00:00:00 +0000.
-================================================
+=================================================
+Plus 12 releases after 2017-06-22 00:00:00 +0000.
+=================================================

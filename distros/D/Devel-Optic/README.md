@@ -5,13 +5,13 @@ Devel::Optic - Production safe variable inspector
 # SYNOPSIS
 
     use Devel::Optic;
-    my $optic = Devel::Optic->new(max_size => 100);
+    my $optic = Devel::Optic->new();
     my $foo = { bar => ['baz', 'blorg', { clang => 'pop' }] };
 
-    # 'pop'
+    # 'pop (len 3)'
     $optic->inspect(q|$foo->{'bar'}->[-1]->{'clang'}|);
 
-    # 'HASH: { bar => ARRAY ...} (1 total keys / 738 bytes). Exceeds viewing size (100 bytes)"
+    # 'HASH: { bar => ARRAY ...} (1 total keys)"
     $optic->inspect('$foo');
 
 # DESCRIPTION
@@ -45,26 +45,6 @@ a structured logging pipeline.
 
     Which Perl scope to view. Default: 1 (scope that `Devel::Optic` is called from)
 
-- `max_size`
-
-    Max size, in bytes, of a data structure that can be viewed without
-    summarization. This is a little hairy across different architectures, so this
-    is best expressed in terms of Perl data structures if specified. The goal is to
-    avoid spitting out subjectively 'big' Perl data structures to a debugger or
-    log. If you're tuning this value, keep in mind that CODE refs are _enormous_
-    (~33kb on `x86_64`), so basically any data structure with CODE refs inside
-    will be summarized.
-
-    Default: Platform dependent. The value is calculated by
-
-        Devel::Size::total_size([ map { { a => [1, 2, 3, qw(foo bar baz)] } } 1 .. 5 ])
-
-    ... which is ~3kb on `x86_64`, and ~160 bytes JSON encoded. This is an
-    estimate on my part for the size of data structure that makes sense to export
-    in raw format when viewed. To my entirely personal taste, larger data
-    structures than this are too big to reasonably export to logs in their
-    entirety.
-
 - `scalar_truncation_size`
 
     Size, in `substr` length terms, that scalar values are truncated to for
@@ -94,7 +74,7 @@ found at that path.
 
     my $some_variable = ['a', 'b', { foo => 'bar' }, [ 'blorg' ] ];
 
-    my $tiny = Devel::Optic->new(max_size => 1); # small to force summarization
+    my $tiny = Devel::Optic->new();
     # "ARRAY: [ 'a', 'b', HASH, ARRAY ]"
     $tiny->fit_to_view($some_variable);
 

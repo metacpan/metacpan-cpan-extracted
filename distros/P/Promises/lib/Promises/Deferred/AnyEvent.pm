@@ -1,7 +1,7 @@
 package Promises::Deferred::AnyEvent;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: An implementation of Promises in Perl
-$Promises::Deferred::AnyEvent::VERSION = '1.01';
+$Promises::Deferred::AnyEvent::VERSION = '1.02';
 use strict;
 use warnings;
 
@@ -79,7 +79,7 @@ Promises::Deferred::AnyEvent - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

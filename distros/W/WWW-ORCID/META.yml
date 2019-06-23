@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/LibreCat/WWW-ORCID/issues
   homepage: https://github.com/LibreCat/WWW-ORCID
   repository: https://github.com/LibreCat/WWW-ORCID.git
-version: '0.0401'
+version: '0.0402'
 x_contributors:
   - 'jjatria <jjatria@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
@@ -49,4 +49,6 @@ x_contributors:
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 0

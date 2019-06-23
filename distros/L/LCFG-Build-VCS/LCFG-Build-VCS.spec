@@ -1,10 +1,10 @@
 Name:           perl-LCFG-Build-VCS
-Version:        0.3.8
+Version:        0.3.9
 Release:        1
 Summary:        LCFG version control infrastructure
 License:        GPLv2
 Group:          Development/Libraries
-Source0:        LCFG-Build-VCS-0.3.8.tar.gz
+Source0:        LCFG-Build-VCS-0.3.9.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl >= 5.10.0
@@ -65,8 +65,14 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_mandir}/man3/*
 
 %changelog
-* Fri Jan 18 2019 SVN: new release
-- Release: 0.3.8
+* Fri Mar 22 2019 SVN: new release
+- Release: 0.3.9
+
+* Fri Mar 22 2019 15:55  squinney@INF.ED.AC.UK
+- debian/control: Need to build-depend on libmodule-build-perl
+
+* Fri Jan 18 2019 10:23  squinney@INF.ED.AC.UK
+- Changes, debian/changelog, lcfg.yml: LCFG-Build-VCS release: 0.3.8
 
 * Fri Jan 18 2019 10:22  squinney@INF.ED.AC.UK
 - Makefile.PL: Updated build script

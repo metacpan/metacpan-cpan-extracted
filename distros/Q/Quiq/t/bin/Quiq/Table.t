@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use v5.10.0;
 
+use Quiq::Unindent;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {
@@ -14,6 +16,62 @@ sub test_loadClass : Init(1) {
 }
 
 # -----------------------------------------------------------------------------
+
+# Ohne Kolumnennamen
+
+sub test_unitTest_noColumns : Test(3) {
+    my $self = shift;
+
+    my @rows = (
+        [1,  'A',    76.253],
+        [12, 'AB',    1.7  ],
+        [123,'ABC',9999    ],
+    );
+
+    # new()
+
+    my $tab = Quiq::Table->new(3,\@rows);
+    $self->is(ref($tab),'Quiq::Table');
+
+    my @values = $tab->values(1);
+    $self->isDeeply(\@values,['A','AB','ABC']);
+
+    my $str = $tab->asText;
+    my $expected = Quiq::Unindent->string(q~
+        |   1 | A   |   76.253 |
+        |  12 | AB  |    1.700 |
+        | 123 | ABC | 9999.000 |
+    ~);
+    $self->is($str,$expected);
+}
+
+# Mit Kolumnennamen
+
+sub test_unitTest_columns : Test(3) {
+    my $self = shift;
+
+    my @rows = (
+        [1,  'A',    76.253],
+        [12, 'AB',    1.7  ],
+        [123,'ABC',9999    ],
+    );
+
+    # new()
+
+    my $tab = Quiq::Table->new(['a','b','c'],\@rows);
+    $self->is(ref($tab),'Quiq::Table');
+
+    my @values = $tab->values('b');
+    $self->isDeeply(\@values,['A','AB','ABC']);
+
+    my $str = $tab->asText;
+    my $expected = Quiq::Unindent->string(q~
+        |   1 | A   |   76.253 |
+        |  12 | AB  |    1.700 |
+        | 123 | ABC | 9999.000 |
+    ~);
+    $self->is($str,$expected);
+}
 
 sub test_unitTest : Test(23) {
     my $self = shift;
@@ -31,15 +89,15 @@ sub test_unitTest : Test(23) {
     my $columnA = $tab->columns;
     $self->isDeeply($columnA,[qw/a b c d/]);
 
-    # index()
+    # pos()
 
-    my $i = $tab->index('a');
+    my $i = $tab->pos('a');
     $self->is($i,0);
 
-    $i = $tab->index('d');
+    $i = $tab->pos('d');
     $self->is($i,3);
 
-    eval {$tab->index('z')};
+    eval {$tab->pos('z')};
     $self->ok($@);
 
     # count()

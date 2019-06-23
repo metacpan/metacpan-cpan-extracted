@@ -1,5 +1,5 @@
 package Devel::Optic::Lens::Perlish::Interpreter;
-$Devel::Optic::Lens::Perlish::Interpreter::VERSION = '0.011';
+$Devel::Optic::Lens::Perlish::Interpreter::VERSION = '0.012';
 # ABSTRACT: Basic recursive interpreter for Perlish lens
 
 use strict;
@@ -263,7 +263,7 @@ Devel::Optic::Lens::Perlish::Interpreter - Basic recursive interpreter for Perli
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 AUTHOR
 

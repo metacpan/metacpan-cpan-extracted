@@ -35,4 +35,4 @@ requires:
 resources:
   homepage: https://www.serzik.com
   license: https://dev.perl.org/licenses
-version: '1.01'
+version: '1.02'

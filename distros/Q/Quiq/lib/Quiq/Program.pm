@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Perl;
 use Encode ();
@@ -480,11 +480,19 @@ sub encode {
 
 =head4 Synopsis
 
-    ($argA,$opt) = $prg->parameters($minArgs,$maxArgs,@optVal);
+    [1] ($argA,$opt) = $prg->parameters($sloppy,$minArgs,$maxArgs,@optVal);
+    [2] $opt = $prg->parameters($sloppy,0,0,@optVal);
+    [3] $argA = $prg->parameters($sloppy,$minArgs,$maxArgs,@optVal);
 
 =head4 Arguments
 
 =over 4
+
+=item $sloppy
+
+Wirf keine Exception, wenn unerwartete Parameter (also Optionen und
+Arumente) in @ARGV enthalten sind. Diese Parameter bleiben in @ARGV
+stehen.
 
 =item $minArgs
 
@@ -517,16 +525,22 @@ $maxArgs Argumenten.
 
 =head4 Description
 
-Liefere die Argumente und Optionen des Programmaufs. Sind weniger als
-$minArgs oder mehr als $maxArgs Argumente übergeben oder nicht deklarierte
-Optionen übergeben worden, wird eine Exception geworfen.
+Liefere die Argumente und Optionen des Programmaufs. Werden weniger als
+$minArgs oder mehr als $maxArgs Argumente oder nicht deklarierte
+Optionen übergeben, wird eine Exception geworfen. Ist $sloppy gesetzt,
+wird im Falle überzähliger Parameter I<keine> Exception geworfen.
+Die überzähligen Parameter bleiben in @ARGV erhalten.
+
+Im Skalarkontext wird nur $opt geliefert, wenn keine Argumente erwartet
+werden ($minArgs und $maxArgs sind 0), andernfalls $argA. Letzteres
+ist nützlich, wenn C<-help> die einzige Option ist.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub parameters {
-    my ($self,$minArgs,$maxArgs) = splice @_,0,3;
+    my ($self,$sloppy,$minArgs,$maxArgs) = splice @_,0,4;
 
     my ($argA,$opt) = Quiq::Parameters->extract(0,0,
         $self->encoding,\@ARGV,$maxArgs,@_);
@@ -536,11 +550,11 @@ sub parameters {
     elsif (@$argA < $minArgs) {
         $self->help(11,'ERROR: Missing arguments');
     }
-    elsif (@ARGV) {
+    elsif (@ARGV && !$sloppy) {
         $self->help(12,"ERROR: Unexpected parameter(s): @ARGV");
     }
 
-    return ($argA,$opt);
+    return wantarray? ($argA,$opt): $maxArgs == 0? $opt: $argA;
 }
 
 # -----------------------------------------------------------------------------
@@ -944,7 +958,7 @@ sub new {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

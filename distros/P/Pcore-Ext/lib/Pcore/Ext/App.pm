@@ -365,7 +365,7 @@ JS
     $js = $self->_prepare_js($js);
 
     # CDN deploy
-    $self->{cdn}->upload( "/app/$self->{id}/app.js", $js );
+    $self->{cdn}->upload( "/app/$self->{id}/app.js", \$js );
 
     return;
 }
@@ -467,7 +467,7 @@ sub _build_overrides ($self) {
     $build = $self->_prepare_js($build);
 
     # CDN deploy
-    $self->{cdn}->upload( '/app/overrides.js', $build );
+    $self->{cdn}->upload( '/app/overrides.js', \$build );
 
     return;
 }
@@ -501,7 +501,7 @@ sub _build_locales ( $self ) {
 JS
 
         # CDN deploy
-        $self->{cdn}->upload( "/app/$self->{id}/locale/$locale.js", $self->_prepare_js($js) );
+        $self->{cdn}->upload( "/app/$self->{id}/locale/$locale.js", \$self->_prepare_js($js) );
     }
 
     return;

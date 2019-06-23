@@ -1,7 +1,7 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '0.207000';
+$Dancer2::Core::DSL::VERSION = '0.208000';
 use Moo;
 use Carp;
 use Module::Runtime 'require_module';
@@ -90,6 +90,9 @@ sub dsl_keywords {
         path                 => { is_global => 1 },
         post                 => { is_global => 1 },
         prefix               => { is_global => 1 },
+        prepare_app          => {
+            is_global => 1, prototype => '&',
+        },
         psgi_app             => { is_global => 1 },
         push_header          => { is_global => 0 },
         push_response_header => { is_global => 0 },
@@ -214,6 +217,8 @@ sub options { shift->_normalize_route( [qw/options /], @_ ) }
 sub patch   { shift->_normalize_route( [qw/patch   /], @_ ) }
 sub post    { shift->_normalize_route( [qw/post    /], @_ ) }
 sub put     { shift->_normalize_route( [qw/put     /], @_ ) }
+
+sub prepare_app { push @{ shift->app->prep_apps }, @_ }
 
 sub any {
     my $self = shift;
@@ -514,7 +519,7 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 0.207000
+version 0.208000
 
 =head1 FUNCTIONS
 
@@ -545,7 +550,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Alexis Sukrieh.
+This software is copyright (c) 2019 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

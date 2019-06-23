@@ -61,7 +61,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000019
+version 0.000020
 
 =head1 SYNOPSIS
 
@@ -104,6 +104,15 @@ version 0.000019
     # open a file locally, using a GitHub link.  You must be at the top level
     # of this repository on a local checkout.
     ot https://github.com/oalders/git-helpers/blob/master/lib/Git/Helpers.pm#L50
+
+    # open a file that was mentioned in the output of diff or
+    # git diff or git log -p, etc:
+    # (this will open foo/bar if it exists)
+    ot a/foo/bar
+
+    # open "/foo/bar.txt" as it appears in an Ansible error message
+    # (Note the quotes around the arg)
+    ot "The error appears to be in '/foo/bar.txt': line 14, column 16, but may be"
 
 =head1 DESCRIPTION
 

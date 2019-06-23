@@ -1,5 +1,10 @@
 Revision history for Text-Parser
 
+0.926     2019-06-21 11:48:08-07:00 America/Los_Angeles
+  - Removed unnecessary module dependencies. Users can always use Import::Into when they need to add new functions (Issue #52)
+  - Bug with shared variables not being removed after read call fixed (Issue #49)
+  - Minor updates to documentation
+
 0.925     2019-06-17 07:49:04-07:00 America/Los_Angeles
   - Changed the primary usage model from inheritance-based to regular use in main.
   - A new class for text parsing rules created Text::Parser::Rule (#17).

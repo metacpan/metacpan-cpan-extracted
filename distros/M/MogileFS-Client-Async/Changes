@@ -1,3 +1,7 @@
+0.031
+  - Switch to Dist::Zilla.
+  - Attempt to fix tests.
+
 0.030
   - Fix fallback store_file behaviour.
 

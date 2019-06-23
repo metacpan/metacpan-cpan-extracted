@@ -7,7 +7,7 @@ use Types::Standard qw(ArrayRef HashRef InstanceOf Str);
 use namespace::autoclean;
 use Module::Pluggable::Object;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 has namespace => (
@@ -124,7 +124,7 @@ eris::role::pluggable - Implements the plumbing for an object to support plugins
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

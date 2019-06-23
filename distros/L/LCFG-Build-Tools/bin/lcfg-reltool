@@ -5,10 +5,10 @@ use warnings;
 # $Id: lcfg-reltool.in 35358 2019-01-15 16:54:36Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/bin/lcfg-reltool.in,v $
 # $Revision: 35358 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/bin/lcfg-reltool.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/bin/lcfg-reltool.in $
 # $Date: 2019-01-15 16:54:36 +0000 (Tue, 15 Jan 2019) $
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use LCFG::Build::Tools;
 
@@ -22,7 +22,7 @@ lcfg-reltool - LCFG source release control tool
 
 =head1 VERSION
 
-This documentation refers to lcfg-reltool version 0.9.20
+This documentation refers to lcfg-reltool version 0.9.30
 
 =head1 SYNOPSIS
 

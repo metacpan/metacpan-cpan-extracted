@@ -1,0 +1,36 @@
+0.09  2019-06-21
+    - URI must be without utf8 flag
+    - rename to URI::Pure
+    - POD
+    - CPAN
+
+0.08  2018-06-30
+    - casefold
+
+0.07  2018-06-30
+    - Net::IDN::Punycode
+    - escape_char used
+
+0.06  2018-06-18
+    - IRI
+
+0.05  2018-06-10
+    - IDN
+
+0.04  2018-06-01
+    - normalize only if need
+    - tests
+    - many fixes
+
+0.03  2018-03-30
+    - normalize
+    - tests
+    - fix abs
+    - bench for abs
+    - rm authority
+
+0.02  2018-03-29
+    - abs
+
+0.01  2018-03-24
+    - first

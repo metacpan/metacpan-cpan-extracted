@@ -12,13 +12,18 @@
 ** DONE grep_by - value
 ** [#A] group (group_count)
 *** group_array
-** sort
+** DONE sort
 ** find(sub), like grep
 ** find_by($method, $args, $value), like grep_by but first
 ** contains value
 ** compact - without undefined
 ** compactTrue - without false
-** without - grep -v value
+** DONE reject - grep -v value
+*** DONE reject
+*** DONE reject_by
+*** DONE reject_each
+*** DONE reject_each_defined
+*** release
 ** DONE grep --> filter
 *** DONE so I can write "grep" instead of autobox::Core
 *** DONE deprecate grep, but keep the alias

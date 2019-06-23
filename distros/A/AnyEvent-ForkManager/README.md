@@ -1,10 +1,11 @@
+[![Build Status](https://travis-ci.org/karupanerura/p5-AnyEvent-ForkManager.svg?branch=master)](https://travis-ci.org/karupanerura/p5-AnyEvent-ForkManager)
 # NAME
 
 AnyEvent::ForkManager - A simple parallel processing fork manager with AnyEvent
 
 # VERSION
 
-This document describes AnyEvent::ForkManager version 0.06.
+This document describes AnyEvent::ForkManager version 0.07.
 
 # SYNOPSIS
 

@@ -1,3 +1,7 @@
+  - Update to plotly.js 1.48.3
+  - Add method Chart::Plotly::Plot->from_json to deserialize from json dumps
+  - Now using Plotly.react instead of Plotly.plot
+  - Add support for config options
 0.026 2019-06-03 22:00:00+0000 
   - Update to plotly.js 1.48.1
   - Add new trace types: funnel, funnelarea

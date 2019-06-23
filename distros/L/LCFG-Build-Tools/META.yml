@@ -18,52 +18,52 @@ name: 'LCFG-Build-Tools'
 provides:
   LCFG::Build::Tool:
     file: lib/LCFG/Build/Tool.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::CheckMacros:
     file: lib/LCFG/Build/Tool/CheckMacros.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::DevOSXPkg:
     file: lib/LCFG/Build/Tool/DevOSXPkg.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::DevPack:
     file: lib/LCFG/Build/Tool/DevPack.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::DevRPM:
     file: lib/LCFG/Build/Tool/DevRPM.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::MajorVersion:
     file: lib/LCFG/Build/Tool/MajorVersion.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::MicroVersion:
     file: lib/LCFG/Build/Tool/MicroVersion.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::MinorVersion:
     file: lib/LCFG/Build/Tool/MinorVersion.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::OSXPkg:
     file: lib/LCFG/Build/Tool/OSXPkg.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::Pack:
     file: lib/LCFG/Build/Tool/Pack.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::RPM:
     file: lib/LCFG/Build/Tool/RPM.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tool::SRPM:
     file: lib/LCFG/Build/Tool/SRPM.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Tools:
     file: lib/LCFG/Build/Tools.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Utils:
     file: lib/LCFG/Build/Utils.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Utils::OSXPkg:
     file: lib/LCFG/Build/Utils/OSXPkg.pm
-    version: v0.9.20
+    version: v0.9.30
   LCFG::Build::Utils::RPM:
     file: lib/LCFG/Build/Utils/RPM.pm
-    version: v0.9.20
+    version: v0.9.30
 requires:
   Archive::Tar: 0
   DateTime: 0
@@ -86,4 +86,4 @@ resources:
     web: https://bugs.lcfg.org/
   homepage: http://www.lcfg.org/doc/buildtools/
   license: https://opensource.org/licenses/GPL-2.0
-version: v0.9.20
+version: v0.9.30

@@ -8,7 +8,7 @@ use Carp qw(croak);
 use RPi::Const qw(:all);
 use WiringPi::API qw(:perl);
 
-our $VERSION = '2.3604';
+our $VERSION = '2.3605';
 
 use constant FULL => 2;
 use constant HALF => 1;
@@ -38,6 +38,8 @@ sub new {
 
     setup_gpio();
 
+    $self->_expander($args{expander});
+
     $self->_pins($args{pins});
 
     my $delay = $args{delay} // 0.01;
@@ -45,6 +47,8 @@ sub new {
 
     my $speed = $args{speed} // 'half';
     $self->speed($speed);
+
+    $self->name($args{name});
 
     return $self;
 }
@@ -59,15 +63,22 @@ sub ccw {
 sub cleanup {
     my ($self) = @_;
 
-    for (@{ $self->_pins }){
-        write_pin($_, LOW);
-        pin_mode($_, INPUT);
+    if (! $self->_expander) {
+        for (@{$self->_pins}) {
+            write_pin($_, LOW);
+            pin_mode($_, INPUT);
+        }
     }
 }
 sub delay {
     my ($self, $delay) = @_;
     $self->{delay} = $delay if defined $delay;
     return $self->{delay};
+}
+sub name {
+    my ($self, $name) = @_;
+    $self->{name} = $name if defined $name;
+    return $self->{name};
 }
 sub speed {
     my ($self, $speed) = @_;
@@ -95,10 +106,14 @@ sub _engage_motor {
     for (1..$self->_turns($degrees)) {
         for my $gpio_pin (NUM_PINS) {
             if (STEPPER_SEQUENCE->[$step_counter][$gpio_pin]) {
-                write_pin($pins->[$gpio_pin], HIGH);
+                $self->_expander
+                    ? $self->_expander()->write($pins->[$gpio_pin], HIGH)
+                    : write_pin($pins->[$gpio_pin], HIGH);
             }
             else {
-                write_pin($pins->[$gpio_pin], LOW);
+                $self->_expander
+                    ? $self->_expander()->write($pins->[$gpio_pin], LOW)
+                    : write_pin($pins->[$gpio_pin], LOW);
             }
         }
 
@@ -120,6 +135,15 @@ sub _engage_motor {
         $self->_wait;
     }
 }
+sub _expander {
+    my ($self, $exp) = @_;
+
+    if (defined $exp){
+        $self->{expander} = $exp;
+    }
+
+    return $self->{expander};
+}
 sub _phases {
     return $_[0]->speed eq 'full' ? FULL : HALF;
 }
@@ -132,10 +156,19 @@ sub _pins {
                   "elements\n";
         }
 
-        for (@$pins){
-            pin_mode($_, OUTPUT);
-            write_pin($_, LOW);
+        if ($self->_expander){
+            for (@$pins){
+                $self->_expander()->mode($_, MCP23017_OUTPUT);
+                $self->_expander()->write($_, LOW);
+            }
         }
+        else {
+            for (@$pins){
+                pin_mode($_, OUTPUT);
+                write_pin($_, LOW);
+            }
+        }
+
         $self->{pins} = $pins;
     }
 
@@ -172,9 +205,11 @@ RPi::StepperMotor - Control a typical stepper motor with the Raspberry Pi
     use RPi::StepperMotor;
 
     my $sm = RPi::StepperMotor->new(
-        pins => [12, 16, 20, 21],
+        pins  => [12, 16, 20, 21],
         speed => 'half',            # optional, default
         delay => 0.01               # optional, default
+        name  => 'tilt'             # optional, default undef
+        expander => $expander_obj   # optional, default undef
     );
 
     $sm->cw(180);  # turn motor 180 degrees clockwise
@@ -183,15 +218,14 @@ RPi::StepperMotor - Control a typical stepper motor with the Raspberry Pi
     $sm->speed('full'); # skip every second step, turning the motor twice as fast
     $sm->delay(0.5);    # set the delay to a half-second in between steps
 
+    $sm->name('new name');
+
     $sm->cleanup; # reset pins back to INPUT
 
 =head1 DESCRIPTION
 
-Control a 28BYJ-48 stepper motor through a ULN2003 driver chip.
-
-This is the only setup I've tested. If I come across any more in the future, I
-will update this distribution and allow a user to selectively pick which setup
-they would like to use.
+Control a 28BYJ-48 stepper motor through a ULN2003 driver chip, with the option
+to run it from an MCP23017 GPIO Expander.
 
 =head1 METHODS
 
@@ -219,9 +253,18 @@ Optional, Float or Int: By default, between each step, we delay by C<0.01>
 seconds. Send in a float or integer for the number of seconds to delay each step
 by. The smaller this number, the faster the motor will turn.
 
+    expander => Object
+
+Optional, L<RPi::GPIOExpander::MCP23017> object instance. Send one of these
+objects in, and we'll run the stepper motor from that instead. The pins
+parameter still needs to be sent in, but will be in the limit C<0-15>, the four
+pins attached from the expander to the motor, in the order of C<IN1> through
+C<IN4>.
+
 =head2 cw($degrees)
 
 Turns the motor in a clockwise direction by a specified number of degrees.
+Clockwise is defined when the shaft of the motor is facing you/upwards.
 
 Parameters:
 
@@ -233,7 +276,8 @@ direction.
 =head2 ccw($degrees)
 
 Turns the motor in a counter-clockwise direction by a specified number of
-degrees.
+degrees. Counter-clockwise is defined when the shaft of the motor is facing
+you/upwards.
 
 Parameters:
 
@@ -264,6 +308,19 @@ between each step of the motor.
 Returns:
 
 The currently set delay time.
+
+=head2 name($name)
+
+When you have more than one servo in an application, it may be useful to give
+each motor its own name for printing purposes.
+
+Parameters:
+
+    $name
+
+Optional, String. The name you want to give the servo.
+
+Return: The name if one has been set, otherwise C<undef>.
 
 =head2 speed($speed)
 

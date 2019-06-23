@@ -15,7 +15,7 @@ name: Data-Table-Text
 provides:
   Data::Table::Text:
     file: lib/Data/Table/Text.pm
-    version: '20190601'
+    version: '20190621'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -36,5 +36,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190601'
+version: '20190621'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

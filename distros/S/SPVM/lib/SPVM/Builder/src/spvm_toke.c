@@ -101,10 +101,16 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   // Expect variable expansion state
   int32_t state_var_expansion = compiler->state_var_expansion;
   compiler->state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_DEFAULT;
-  
+
   while(1) {
     // Get current character
     char ch = *compiler->bufptr;
+    
+    // "aaa $foo bar" is interupted "aaa $foo " . "bar"
+    if (compiler->bufptr == compiler->next_double_quote_start_bufptr) {
+      compiler->next_double_quote_start_bufptr = NULL;
+      state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_SECOND_CONCAT;
+    }
     
     // Variable expansion state
     if (state_var_expansion == SPVM_TOKE_C_STATE_VAR_EXPANSION_FIRST_CONCAT) {
@@ -121,6 +127,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
     switch (ch) {
       case '\0': {
         compiler->cur_file = NULL;
+        free(compiler->cur_src);
         compiler->cur_src = NULL;
         compiler->bufptr = NULL;
         compiler->befbufptr = NULL;
@@ -228,13 +235,41 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 return 0;
               }
               fseek(fh, 0, SEEK_SET);
-              char* cur_src = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, file_size + 1);
+              char* cur_src = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(file_size + 1);
               if ((int32_t)fread(cur_src, 1, file_size, fh) < file_size) {
                 SPVM_COMPILER_error(compiler, "Can't read file %s at %s line %d\n", cur_file, op_use->file, op_use->line);
                 return 0;
               }
               fclose(fh);
               cur_src[file_size] = '\0';
+
+              // Convert \r\n to \n
+              char* cur_src_nl = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(file_size + 1);
+              int32_t nl_merge_count = 0;
+              int32_t cur_src_pos = 0;
+              int32_t cur_src_nl_pos = 0;
+              while (cur_src_pos < file_size) {
+                int32_t ch = cur_src[cur_src_pos];
+                int32_t ch_next = cur_src[cur_src_pos + 1];
+                
+                if (ch == '\r' && ch_next == '\n') {
+                  cur_src_nl[cur_src_pos - nl_merge_count] = '\n';
+                  nl_merge_count++;
+                  cur_src_pos += 2;
+                }
+                else if (ch == '\r') {
+                  cur_src_nl[cur_src_pos - nl_merge_count] = '\n';
+                  cur_src_pos++;
+                }
+                else {
+                  cur_src_nl[cur_src_pos - nl_merge_count] = ch;
+                  cur_src_pos++;
+                }
+                cur_src_nl_pos++;
+              }
+              cur_src_nl[cur_src_nl_pos] = '\0';
+              free(cur_src);
+              cur_src = cur_src_nl;
               
               compiler->cur_src = cur_src;
               compiler->bufptr = cur_src;
@@ -261,22 +296,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '\f':
         compiler->bufptr++;
         continue;
-      case '\r':
-        compiler->bufptr++;
-        if (*compiler->bufptr == '\n') {
-          compiler->bufptr++;
-          compiler->cur_line++;
-        }
-        else {
-          compiler->cur_line++;
-        }
-        
-        compiler->line_start_ptr = compiler->bufptr;
-        continue;
       case '\n':
         compiler->bufptr++;
         compiler->cur_line++;
-        
         compiler->line_start_ptr = compiler->bufptr;
         continue;
       // Cancat
@@ -503,7 +525,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '#':
         compiler->bufptr++;
         while(1) {
-          if (*compiler->bufptr == '\r' || *compiler->bufptr == '\n' || *compiler->bufptr == '\0') {
+          if (*compiler->bufptr == '\n' || *compiler->bufptr == '\0') {
             break;
           }
           else {
@@ -515,7 +537,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       
       case '=':
         // POD
-        if (compiler->bufptr == compiler->cur_src || *(compiler->bufptr - 1) == '\n' || *(compiler->bufptr - 1) == '\r') {
+        if (compiler->bufptr == compiler->cur_src || *(compiler->bufptr - 1) == '\n') {
           while (1) {
             compiler->bufptr++;
             if (*compiler->bufptr == '\n') {
@@ -535,7 +557,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->bufptr += 4;
               
               while (1) {
-                if (*compiler->bufptr == '\r' || *compiler->bufptr == '\n' || *compiler->bufptr == '\0') {
+                if (*compiler->bufptr == '\n' || *compiler->bufptr == '\0') {
                   break;
                 }
                 compiler->bufptr++;
@@ -782,10 +804,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       }
       case '"': {
         if (state_var_expansion == SPVM_TOKE_C_STATE_VAR_EXPANSION_DOUBLE_QUOTE) {
-          // $var-> is invalid
-          if (*compiler->bufptr == '-' && *(compiler->bufptr + 1) == '>') {
-            SPVM_COMPILER_error(compiler, "Don't support variable expansion of array access or field access at %s line %d\n", compiler->cur_file, compiler->cur_line);
-          }
+          // Nothing
         }
         else {
           compiler->bufptr++;
@@ -807,15 +826,98 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         }
         else {
           int32_t finish = 0;
+          
           while(1) {
             // End of string literal
-            if (*compiler->bufptr == '"' && *(compiler->bufptr - 1) != '\\') {
+            if (*compiler->bufptr == '"') {
               finish = 1;
             }
             // Variable expansion
-            else if (*compiler->bufptr == '$' && *(compiler->bufptr - 1) != '\\') {
-              finish = 1;
-              next_state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_FIRST_CONCAT;
+            else if (*compiler->bufptr == '$') {
+              if (*(compiler->bufptr + 1) == '"') {
+                // Last $ is allow
+              }
+              else {
+                finish = 1;
+                next_state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_FIRST_CONCAT;
+                
+                // Pending next string literal start
+                char* next_double_quote_start_bufptr = compiler->bufptr + 1;
+
+                int32_t var_is_ref = 0;
+                if (*next_double_quote_start_bufptr == '$') {
+                  next_double_quote_start_bufptr++;
+                  var_is_ref = 1;
+                }
+                
+                int32_t var_have_brace = 0;
+                if (*next_double_quote_start_bufptr == '{') {
+                  next_double_quote_start_bufptr++;
+                  var_have_brace = 1;
+                }
+                
+                if (*next_double_quote_start_bufptr == '@') {
+                  next_double_quote_start_bufptr++;
+                  if (var_have_brace) {
+                    if (*next_double_quote_start_bufptr == '}') {
+                      next_double_quote_start_bufptr++;
+                    }
+                  }
+                }
+                else {
+                
+                  // Pend variable
+                  while (1) {
+                    if (isalnum(*next_double_quote_start_bufptr) || *next_double_quote_start_bufptr == '_') {
+                      next_double_quote_start_bufptr++;
+                    }
+                    else if (*next_double_quote_start_bufptr == ':' && *(next_double_quote_start_bufptr + 1) == ':') {
+                      next_double_quote_start_bufptr += 2;
+                    }
+                    else if (*next_double_quote_start_bufptr == '}') {
+                      if (var_have_brace) {
+                        next_double_quote_start_bufptr++;
+                        break;
+                      }
+                    }
+                    else {
+                      break;
+                    }
+                  }
+                  
+                  // Pend Field access or array access(only support field access or constant array accsess)
+                  if (!var_have_brace && !var_is_ref) {
+                    int32_t is_access = 0;
+                    if (*next_double_quote_start_bufptr == '-' && *(next_double_quote_start_bufptr + 1) == '>') {
+                      is_access = 1;
+                      next_double_quote_start_bufptr += 2;
+                    }
+                    if (is_access) {
+                      while (1) {
+                        if (isalnum(*next_double_quote_start_bufptr) || *next_double_quote_start_bufptr == '_' ||  *next_double_quote_start_bufptr == '{' || *next_double_quote_start_bufptr == '[' || *next_double_quote_start_bufptr == ' ') {
+                          next_double_quote_start_bufptr++;
+                        }
+                        else if (*next_double_quote_start_bufptr == '}' || *next_double_quote_start_bufptr == ']') {
+                          if ((*(next_double_quote_start_bufptr + 1) == '-' && *(next_double_quote_start_bufptr + 2) == '>')) {
+                            next_double_quote_start_bufptr += 2;
+                          }
+                          else if (*(next_double_quote_start_bufptr + 1) == '{' || *(next_double_quote_start_bufptr + 1) == '[') {
+                            next_double_quote_start_bufptr++;
+                          }
+                          else {
+                            next_double_quote_start_bufptr++;
+                            break;
+                          }
+                        }
+                        else {
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+                compiler->next_double_quote_start_bufptr = next_double_quote_start_bufptr;
+              }
             }
             // End of source file
             else if (*compiler->bufptr == '\0') {
@@ -825,12 +927,27 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               break;
             }
             else {
-              compiler->bufptr++;
+              // Escape is always 2 characters
+              if (*compiler->bufptr == '\\') {
+                compiler->bufptr += 2;
+              }
+              else {
+                if (*compiler->bufptr == '\n') {
+                  compiler->bufptr++;
+                  compiler->cur_line++;
+                  compiler->line_start_ptr = compiler->bufptr;
+                }
+                else {
+                  compiler->bufptr++;
+                }
+              }
             }
           }
           if (*compiler->bufptr == '\0') {
             SPVM_COMPILER_error(compiler, "Can't find string terminator '\"' anywhere before EOF at %s line %d\n", compiler->cur_file, compiler->cur_line);
-            continue;
+            SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, "", 0, compiler->cur_file, compiler->cur_line);
+            yylvalp->opval = op_constant;
+            return CONSTANT;
           }
           
           int32_t str_tmp_len = (int32_t)(compiler->bufptr - cur_token_ptr) * 4;
@@ -895,6 +1012,48 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 else if (*char_ptr == '$') {
                   str[str_length] = '$';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 's') {
+                  str[str_length] = '\\';
+                  str_length++;
+                  str[str_length] = 's';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 'S') {
+                  str[str_length] = '\\';
+                  str_length++;
+                  str[str_length] = 'S';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 'd') {
+                  str[str_length] = '\\';
+                  str_length++;
+                  str[str_length] = 'd';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 'D') {
+                  str[str_length] = '\\';
+                  str_length++;
+                  str[str_length] = 'D';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 'w') {
+                  str[str_length] = '\\';
+                  str_length++;
+                  str[str_length] = 'w';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 'W') {
+                  str[str_length] = '\\';
+                  str_length++;
+                  str[str_length] = 'W';
                   str_length++;
                   char_ptr++;
                 }
@@ -980,7 +1139,29 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   }
                 }
                 else {
-                  SPVM_COMPILER_error(compiler, "Invalid escape character in string literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                  int32_t is_pword = 0;
+                  if (*char_ptr >= 'a' && *char_ptr <= 'z') {
+                    is_pword = 1;
+                  }
+                  else if (*char_ptr >= 'A' && *char_ptr <= 'Z') {
+                    is_pword = 1;
+                  }
+                  else if (*char_ptr >= '0' && *char_ptr <= '9') {
+                    is_pword = 1;
+                  }
+                  else if (*char_ptr == '_') {
+                    is_pword = 1;
+                  }
+                  if (is_pword) {
+                    SPVM_COMPILER_error(compiler, "Invalid escape character in string literal %c at %s line %d\n", *char_ptr, compiler->cur_file, compiler->cur_line);
+                  }
+                  else {
+                    str[str_length] = '\\';
+                    str_length++;
+                    str[str_length] = *char_ptr;
+                    str_length++;
+                    char_ptr++;
+                  }
                 }
               }
               else {
@@ -1025,6 +1206,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             yylvalp->opval = op_exception_var;
             return EXCEPTION_VAR;
           }
+          // Exception variable with {}
+          else if (*(compiler->bufptr + 1) == '{' && *(compiler->bufptr + 2) == '@' && *(compiler->bufptr + 3) == '}') {
+            compiler->bufptr += 4;
+            SPVM_OP* op_exception_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_EXCEPTION_VAR, compiler->cur_file, compiler->cur_line);
+            yylvalp->opval = op_exception_var;
+            return EXCEPTION_VAR;
+          }
           // Lexical variable or Package variable
           else {
             compiler->bufptr++;
@@ -1044,7 +1232,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               isalnum(*compiler->bufptr)
               || (*compiler->bufptr) == '_'
               || (*compiler->bufptr == ':' && *(compiler->bufptr + 1) == ':')
-              || (*compiler->bufptr) == '@'
             )
             {
               if (*compiler->bufptr == ':') {
@@ -1081,11 +1268,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, var_name, compiler->cur_file, compiler->cur_line);
 
             yylvalp->opval = op_name;
-            
-            // Variable expansion next state is double quote
-            if (state_var_expansion == SPVM_TOKE_C_STATE_VAR_EXPANSION_VAR) {
-              compiler->state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_SECOND_CONCAT;
-            }
             
             // Package variable
             return VAR_NAME;

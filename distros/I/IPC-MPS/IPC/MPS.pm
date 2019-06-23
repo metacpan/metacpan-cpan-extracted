@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(spawn receive msg snd quit wt snd_wt listener open_node vpid2pid);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 use IO::Select;
@@ -484,8 +484,8 @@ IPC::MPS - Message Passing Style of Inter-process communication
 =head1 SYNOPSIS
 
  use IPC::MPS;
- 
- my $vpid = spawn { 
+
+ my $vpid = spawn {
  	receive {
  		msg ping => sub {
  			my ($from, $i) = @_;
@@ -494,9 +494,9 @@ IPC::MPS - Message Passing Style of Inter-process communication
  		};
  	};
  };
- 
+
  snd($vpid, "ping", 1);
- receive { 
+ receive {
  	msg pong => sub {
  		my ($from, $i) = @_;
  		print "Pong $i from $from\n";
@@ -517,9 +517,9 @@ Moto: inter-process communication without blocking.
 =head2 Concurrency programming
 
 The peculiarity of the system is that the messaging between child processes is handled by the parents.
-That is why we recommend using the parental processes just to coordinate the working process and to store data. 
+That is why we recommend using the parental processes just to coordinate the working process and to store data.
 
-The messages are handled by the UNIX sockets. 
+The messages are handled by the UNIX sockets.
 
  $vpid = spawn {
     ...
@@ -535,12 +535,12 @@ The messages are handled by the UNIX sockets.
   };
 
 
-Child processes are created not when spawn is called, they are created later when receive is called, just before send-receive cycle is called. It is necessary so that all vpid are defined by fork call. vpid is an address of the link to the socket from main process to the child one. 
+Child processes are created not when spawn is called, they are created later when receive is called, just before send-receive cycle is called. It is necessary so that all vpid are defined by fork call. vpid is an address of the link to the socket from main process to the child one.
 
 Other spawn may be created inside spawn.
 If spawn is created inside receive, receive also must be called to start child processes. New receive will add its information to the old one and pass the control to the old receive messaging cycle.
 
-The message sending.  
+The message sending.
 
  snd($vpid, "msg name", @args);
 
@@ -550,7 +550,7 @@ If the parental process is over, the child process ends too.
 
 To detect spawn closing message SPAWN_CLOSED handler should be defined:
 
- msg SPAWN_CLOSED => sub { 
+ msg SPAWN_CLOSED => sub {
  	my ($vpid) = @_;
  	...
  };
@@ -568,7 +568,7 @@ Sometimes you may need to get additional information from other processes and on
 
  snd("vpid_1", "msg_1", @args_1);
  snd("vpid_2", "msg_2", @args_2);
- 
+
  my $r = wt("vpid_1", "msg_1");
  ...
  my @r = wt("vpid_2", "msg_2");
@@ -627,7 +627,7 @@ You may set youself pack and unpack functions, instead of freeze and thaw functi
 
 To detect connection closing message NODE_CLOSED handler should be defined:
 
- msg NODE_CLOSED => sub { 
+ msg NODE_CLOSED => sub {
  	my ($vpid, $connected) = @_;
 	if ($connected) {
  		print "Node closed.\n";
@@ -644,14 +644,14 @@ This statement is true for both the client and the server.
 =head2 Ping Pong
 
  use IPC::MPS;
- 
+
  my $ping_pong = 3;
- 
+
  my ($vpid1, $vpid2);
- 
+
  $vpid1 = spawn {
  	snd($vpid2, "ping", 1);
- 	receive { 
+ 	receive {
  		msg pong => sub {
  			my ($from, $i) = @_;
  			print "Pong $i from $from\n";
@@ -663,8 +663,8 @@ This statement is true for both the client and the server.
  		};
  	};
  };
- 
- $vpid2 = spawn { 
+
+ $vpid2 = spawn {
  	receive {
  		msg ping => sub {
  			my ($from, $i) = @_;
@@ -673,7 +673,7 @@ This statement is true for both the client and the server.
  		};
  	};
  };
- 
+
  receive {
  	msg exit => sub {
  		print "EXIT\n";
@@ -684,9 +684,9 @@ This statement is true for both the client and the server.
 =head2 Triplex circular Ping Pong
 
  use IPC::MPS;
- 
+
  my $ping_pong = 5;
- 
+
  sub ping_pong($) {
  	my $vpid = shift;
  	sub {
@@ -707,24 +707,24 @@ This statement is true for both the client and the server.
  		};
  	};
  }
- 
- 
+
+
  my ($vpid1, $vpid2, $vpid3);
- 
+
  $vpid1 = spawn {
  	snd($vpid2, "ping", 1, $$);
  	receive { ping_pong($vpid2)->() };
  };
- 
- $vpid2 = spawn { 
+
+ $vpid2 = spawn {
  	receive { ping_pong($vpid3)->() };
  };
- 
- $vpid3 = spawn { 
+
+ $vpid3 = spawn {
  	receive { ping_pong($vpid1)->() };
  };
- 
- 
+
+
  receive {
  	msg exit => sub {
  		print "EXIT\n";
@@ -735,43 +735,43 @@ This statement is true for both the client and the server.
 =head2 Tree
 
  use IPC::MPS;
- 
+
  my $vpid1 = spawn {
- 
+
  	my $vpid2 = spawn {
- 		receive { 
+ 		receive {
  		 	msg hello2 => sub {
  		 		print "Hello 2\n";
  		 	};
  		};
  	};
- 
+
  	receive {
  		msg hello1 => sub {
  			print "Hello 1\n";
  			snd($vpid2, "hello2");
- 
+
  			my $vpid3 = spawn {
- 				receive { 
+ 				receive {
  					msg hello3 => sub {
  						print "Hello 3\n";
  					};
  				};
  			};
- 
+
  			snd($vpid3, "hello3");
  			receive {};
  		};
  	};
  };
- 
+
  spawn {
  	sleep 1;
  	print "SLEEP\n";
  	snd(0, "exit");
  	receive {};
  };
- 
+
  snd($vpid1, "hello1");
  receive {
  	msg exit => sub {
@@ -785,30 +785,30 @@ This statement is true for both the client and the server.
 Waiting for a response to a specific message.
 
  use IPC::MPS;
- 
+
  my $vpid = spawn {
- 	receive { 
+ 	receive {
  		msg foo => sub {
  			my ($from, $text) = @_;
  			print "foo: $text\n";
- 
+
  			snd(0, "too", 1);
  			print "too -> baz\n";
- 
+
  			my $rv = wt(0, "baz");
  			print "baz: $rv\n";
- 
+
  			my @rv = snd_wt(0, "sugar", $rv);
  			print "sugar: $rv[0]\n";
- 
+
  			exit;
  		};
  	};
  };
- 
- 
+
+
  snd($vpid, "foo", "Hello, wait");
- 
+
  receive {
  	msg too => sub {
  		my ($from, $i) = @_;
@@ -845,13 +845,13 @@ L<IPC::MPS::EV> based on L<EV>.
 
 =head1 Compatibility with Event, EV, AnyEvent based modules
 
-IPC::MPS::Event and IPC::MPS::EV allows usage of side modules based on Event, EV modules accordingly (directly or thru AnyEvent). 
+IPC::MPS::Event and IPC::MPS::EV allows usage of side modules based on Event, EV modules accordingly (directly or thru AnyEvent).
 
 =head2 Timer
 
  use IPC::MPS::Event;
  use Event;
- 
+
  my $vpid = spawn {
  	receive {
  		msg ping => sub {
@@ -863,9 +863,9 @@ IPC::MPS::Event and IPC::MPS::EV allows usage of side modules based on Event, EV
  		};
  	};
  };
- 
+
  snd($vpid, "ping", "hello");
- 
+
  receive {
  	msg pong => sub {
  		my ($from, $hello) = @_;
@@ -879,21 +879,21 @@ IPC::MPS::Event and IPC::MPS::EV allows usage of side modules based on Event, EV
 
  use IPC::MPS::Event;
  use AnyEvent::HTTP;
- 
+
  my $vpid = spawn {
  	receive {
  		msg req => sub {
  			my ($from, $url) = @_;
- 			http_get $url, sub { 
+ 			http_get $url, sub {
  				print ${$_[1]}{URL}, "\t", ${$_[1]}{Status}, "; $$\n";
  				snd($from, "res", $url, ${$_[1]}{Status});
  			};
  		};
  	};
  };
- 
+
  snd($vpid, "req", "http://localhost/");
- 
+
  receive {
  	msg res => sub {
  		my ($from, $url, $status) = @_;

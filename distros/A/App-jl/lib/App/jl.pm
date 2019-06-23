@@ -5,7 +5,7 @@ use JSON qw//;
 use Sub::Data::Recursive;
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my $MAX_DEPTH = 10;
 
@@ -72,7 +72,7 @@ sub _lazyload_modules {
     if ($self->opt('yaml')) {
         require 'YAML/Syck.pm'; ## no critic
         YAML::Syck->import;
-        $YAML::Syck::Headless = $YAML::Syck::SortKeys = 1;
+        $YAML::Syck::SortKeys = 1;
     }
 }
 
@@ -346,7 +346,7 @@ The parser of the line
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1560606718"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1560606718&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1561133163"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1561133163&branch=master"/></a>
 
 =end html
 

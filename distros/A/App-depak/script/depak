@@ -2,8 +2,8 @@
 
 # FRAGMENT id=shcompgen-hint command=depak
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.580'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.581'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,7 +31,7 @@ depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.580 of depak (from Perl distribution App-depak), released on 2018-09-10.
+This document describes version 0.581 of depak (from Perl distribution App-depak), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -265,6 +265,10 @@ available.
 
 Can be specified multiple times.
 
+=item B<--include-core>
+
+Do not exclude core modules.
+
 =item B<--include-dir-json>=I<dirname>
 
 Include extra modules under directories (JSON-encoded).
@@ -333,10 +337,6 @@ is available.
 
 
 Can be specified multiple times.
-
-=item B<--no-exclude-core>
-
-Do not exclude core modules.
 
 =item B<--perl-version>=I<s>, B<-V>
 
@@ -694,7 +694,7 @@ List of available configuration parameters:
  allow_xs (see --allow-xs)
  args (see --arg)
  debug_keep_tempdir (see --debug-keep-tempdir)
- exclude_core (see --no-exclude-core)
+ exclude_core (see --include-core)
  exclude_dist (see --exclude-dist)
  exclude_list (see --exclude-list)
  exclude_module (see --exclude-module)
@@ -797,7 +797,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 02-client.t 57 2019-06-06 13:46:47Z minus $
+# $Id: 02-client.t 75 2019-06-19 15:23:53Z minus $
 #
 #########################################################################
 use Test::More;
@@ -20,7 +20,7 @@ plan skip_all => "Currently a developer-only test" unless (-d DIR_ETC);
 
 # Create client
 my $client = new MToken::Client(
-        url         => "http://minus:asahi1\@mtoken.suffit.org/mtoken", # FIXIT: Delete this site!!
+        url         => "http://localhost/mtoken",
         timeout     => 10, # default: 180
         verbose     => 1, # Show req/res data
     );

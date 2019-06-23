@@ -1,4 +1,12 @@
-Revision history for DefHash
+1.0.12  2019-06-18 (PERLANCAR)
+
+        - No spec changes.
+
+        - Add a Synopsis.
+
+        - Split Sah schemas to Sah-Schemas-DefHash so that schema tweaks don't
+          require releasing a new spec release.
+
 
 1.0.11  2015-09-03 (PERLANCAR)
 

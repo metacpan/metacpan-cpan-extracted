@@ -14,4 +14,4 @@ say "+ Discovered device $_->{id} ($_->{model})"
   foreach ( @{ $yeelight->search } );
 say
 "\nDevice $_->{id} ($_->{name}) supports following methods\n\t@{$_->{support}}"
-  foreach ( @{ $yeelight->search } );
+  foreach ( @{ $yeelight->{devices} } );

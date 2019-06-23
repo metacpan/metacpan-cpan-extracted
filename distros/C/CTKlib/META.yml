@@ -60,4 +60,4 @@ resources:
   homepage: http://www.serzik.com
   license: https://dev.perl.org/licenses
   repository: http://svn.serzik.com/CTKlib/trunk
-version: '2.00'
+version: '2.01'

@@ -5,7 +5,7 @@ use warnings;
 package Test::FITesque::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 use Moo;
 use Attean::RDF;
@@ -100,9 +100,9 @@ sub transform_rdf {
 		my $params_iter = $model->get_quads($test->value('paramid')); # Get the parameters for each test
 		my $params;
 		while (my $param = $params_iter->next) {
-		  # First, see if there is are HTTP request-responses that can be constructed
-		  my $req_head = $model->objects(undef, iri($ns->test->requests->as_string))->next;
-		  my $res_head = $model->objects(undef, iri($ns->test->responses->as_string))->next;
+		  # First, see if there are HTTP request-responses that can be constructed
+		  my $req_head = $model->objects($param->subject, iri($ns->test->requests->as_string))->next;
+		  my $res_head = $model->objects($param->subject, iri($ns->test->responses->as_string))->next;
 		  my @requests;
 		  my @responses;
 

@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -485,7 +485,7 @@ sub duplicate {
 
 =head4 Synopsis
 
-    $changed = $this->edit($file);
+    $changed = $this->edit($file,@opt);
 
 =head4 Arguments
 
@@ -691,6 +691,72 @@ sub newlineStr {
     $fh->close;
 
     return $nl;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 nextFile() - Generiere nächsten Dateinamen
+
+=head4 Synopsis
+
+    $file = $this->nextFile($name,$n,$ext);
+
+=head4 Arguments
+
+=over 4
+
+=item $name
+
+Grundname der Datei einschließlich Pfad.
+
+=item $n
+
+Anzahl der Stellen der laufenden Nummer.
+
+=item $ext
+
+Extension der Datei.
+
+=back
+
+=head4 Description
+
+Ermittele und liefere den nächsten Namen einer Datei. Der Dateiname
+hat den Aufbau
+
+    NAME-NNNN.EXT
+
+Die laufende Nummer NNNN (deren Breite durch den zweiten Parameter
+festgelegt) wird anhand der vorhandenen Dateien im Dateisystem
+ermittelt und um 1 erhöht.
+
+=head4 Example
+
+Es liegt noch keine Datei vor:
+
+    $file = Quiq::Path->nextFile('myfile',3,'log');
+    =>
+    myfile-001.log
+
+Die Datei mit der höchsten Nummer ist myfile-031.log:
+
+    $file = Quiq::Path->nextFile('myfile',3,'log');
+    =>
+    myfile-032.log
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub nextFile {
+    my ($this,$name,$n,$ext) = @_;
+
+    my @files = sort $this->glob("$name-*.$ext");
+    my $file = $files[-1] // sprintf '%s-%0*d.%s',$name,$n,0,$ext;
+    my ($i) = $file =~ /^\Q$name\E-(\d+).\Q$ext\E/;
+    $file = sprintf "%s-%0*d.%s",$name,$n,++$i,$ext;
+
+    return $file;
 }
 
 # -----------------------------------------------------------------------------
@@ -2612,7 +2678,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

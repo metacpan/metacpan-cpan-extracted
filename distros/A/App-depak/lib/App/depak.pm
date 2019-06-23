@@ -1,7 +1,7 @@
 package App::depak;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.580'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.581'; # VERSION
 
 use 5.010001;
 use strict;
@@ -75,7 +75,7 @@ sub _build_lib {
         for my $prereq (@{ $self->{include_prereq} }) {
             my @mods = ($prereq);
             # find prereq's dependencies
-            my $res = call_lcpan_script(argv=>["deps", "--no-include-core", "-R", "--perl-version", $self->{perl_version}->numify, $prereq]);
+            my $res = call_lcpan_script(argv=>["deps", "--exclude-core", "-R", "--perl-version", $self->{perl_version}->numify, $prereq]);
             die "Can't lcpan deps: $res->[0] - $res->[1]" unless $res->[0] == 200;
             for my $entry (@{ $res->[2] }) {
                 $entry->{module} =~ s/^\s+//;
@@ -161,7 +161,7 @@ sub _build_lib {
                 for my $prereq (@{ $self->{exclude_prereq} }) {
                     my @mods = ($prereq);
                     # find prereq's dependencies
-                    my $res = call_lcpan_script(argv=>["deps", "--no-include-core", "-R", "--perl-version", $self->{perl_version}->numify, $prereq]);
+                    my $res = call_lcpan_script(argv=>["deps", "--exclude-core", "-R", "--perl-version", $self->{perl_version}->numify, $prereq]);
                     die "Can't lcpan deps: $res->[0] - $res->[1]" unless $res->[0] == 200;
                     for my $entry (@{ $res->[2] }) {
                         $entry->{module} =~ s/^\s+//;
@@ -907,7 +907,7 @@ App::depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.580 of App::depak (from Perl distribution App-depak), released on 2018-09-10.
+This document describes version 0.581 of App::depak (from Perl distribution App-depak), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -922,7 +922,7 @@ See L<depak>.
 
 Usage:
 
- depak(%args) -> [status, msg, result, meta]
+ depak(%args) -> [status, msg, payload, meta]
 
 Pack your dependencies onto your script file.
 
@@ -1175,7 +1175,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1203,7 +1203,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

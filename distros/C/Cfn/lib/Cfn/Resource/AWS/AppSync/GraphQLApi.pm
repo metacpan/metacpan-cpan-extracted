@@ -1,4 +1,4 @@
-# AWS::AppSync::GraphQLApi generated from spec 2.25.0
+# AWS::AppSync::GraphQLApi generated from spec 3.2.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi',
@@ -19,30 +19,6 @@ package Cfn::Resource::AWS::AppSync::GraphQLApi {
 }
 
 
-
-subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfig',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfig',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfigValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfigValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has AppIdClientRegex => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has AwsRegion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has DefaultAction => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has UserPoolId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
 
 subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfig',
      as 'Cfn::Value';
@@ -68,6 +44,73 @@ package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfig
   has Issuer => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConfigValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConfigValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AppIdClientRegex => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AwsRegion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UserPoolId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfigValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfigValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AppIdClientRegex => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AwsRegion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DefaultAction => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UserPoolId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::Tags',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::Tags',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::TagsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::TagsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+}
+
 subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::LogConfig',
      as 'Cfn::Value';
 
@@ -90,15 +133,60 @@ package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::LogConfigValue {
   has FieldLogLevel => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviders',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviders',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvidersValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvidersValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvider',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvider',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviderValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviderValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AuthenticationType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OpenIDConnectConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UserPoolConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has AdditionalAuthenticationProviders => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviders', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AuthenticationType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LogConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::LogConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OpenIDConnectConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::Tags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has UserPoolConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

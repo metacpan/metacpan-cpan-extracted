@@ -1,4 +1,5 @@
 Build.PL
+CONTRIBUTING.md
 lib/Data/Edit/Xml.pm
 MANIFEST			This list of files
 test.pl

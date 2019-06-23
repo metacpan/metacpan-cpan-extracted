@@ -141,231 +141,231 @@
    "provides" : {
       "Dancer2" : {
          "file" : "lib/Dancer2.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::CLI" : {
          "file" : "lib/Dancer2/CLI.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::CLI::Command::gen" : {
          "file" : "lib/Dancer2/CLI/Command/gen.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::CLI::Command::version" : {
          "file" : "lib/Dancer2/CLI/Command/version.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core" : {
          "file" : "lib/Dancer2/Core.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::App" : {
          "file" : "lib/Dancer2/Core/App.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Cookie" : {
          "file" : "lib/Dancer2/Core/Cookie.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::DSL" : {
          "file" : "lib/Dancer2/Core/DSL.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Dispatcher" : {
          "file" : "lib/Dancer2/Core/Dispatcher.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Error" : {
          "file" : "lib/Dancer2/Core/Error.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Factory" : {
          "file" : "lib/Dancer2/Core/Factory.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::HTTP" : {
          "file" : "lib/Dancer2/Core/HTTP.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Hook" : {
          "file" : "lib/Dancer2/Core/Hook.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::MIME" : {
          "file" : "lib/Dancer2/Core/MIME.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Request" : {
          "file" : "lib/Dancer2/Core/Request.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Request::Upload" : {
          "file" : "lib/Dancer2/Core/Request/Upload.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Response" : {
          "file" : "lib/Dancer2/Core/Response.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Response::Delayed" : {
          "file" : "lib/Dancer2/Core/Response/Delayed.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::ConfigReader" : {
          "file" : "lib/Dancer2/Core/Role/ConfigReader.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::DSL" : {
          "file" : "lib/Dancer2/Core/Role/DSL.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::Engine" : {
          "file" : "lib/Dancer2/Core/Role/Engine.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::Handler" : {
          "file" : "lib/Dancer2/Core/Role/Handler.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::HasLocation" : {
          "file" : "lib/Dancer2/Core/Role/HasLocation.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::Hookable" : {
          "file" : "lib/Dancer2/Core/Role/Hookable.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::Logger" : {
          "file" : "lib/Dancer2/Core/Role/Logger.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::Serializer" : {
          "file" : "lib/Dancer2/Core/Role/Serializer.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::SessionFactory" : {
          "file" : "lib/Dancer2/Core/Role/SessionFactory.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::SessionFactory::File" : {
          "file" : "lib/Dancer2/Core/Role/SessionFactory/File.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::StandardResponses" : {
          "file" : "lib/Dancer2/Core/Role/StandardResponses.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Role::Template" : {
          "file" : "lib/Dancer2/Core/Role/Template.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Route" : {
          "file" : "lib/Dancer2/Core/Route.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Runner" : {
          "file" : "lib/Dancer2/Core/Runner.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Session" : {
          "file" : "lib/Dancer2/Core/Session.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Time" : {
          "file" : "lib/Dancer2/Core/Time.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Core::Types" : {
          "file" : "lib/Dancer2/Core/Types.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::FileUtils" : {
          "file" : "lib/Dancer2/FileUtils.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Handler::AutoPage" : {
          "file" : "lib/Dancer2/Handler/AutoPage.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Handler::File" : {
          "file" : "lib/Dancer2/Handler/File.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Logger::Capture" : {
          "file" : "lib/Dancer2/Logger/Capture.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Logger::Capture::Trap" : {
          "file" : "lib/Dancer2/Logger/Capture/Trap.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Logger::Console" : {
          "file" : "lib/Dancer2/Logger/Console.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Logger::Diag" : {
          "file" : "lib/Dancer2/Logger/Diag.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Logger::File" : {
          "file" : "lib/Dancer2/Logger/File.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Logger::Note" : {
          "file" : "lib/Dancer2/Logger/Note.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Logger::Null" : {
          "file" : "lib/Dancer2/Logger/Null.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Plugin" : {
          "file" : "lib/Dancer2/Plugin.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Serializer::Dumper" : {
          "file" : "lib/Dancer2/Serializer/Dumper.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Serializer::JSON" : {
          "file" : "lib/Dancer2/Serializer/JSON.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Serializer::Mutable" : {
          "file" : "lib/Dancer2/Serializer/Mutable.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Serializer::YAML" : {
          "file" : "lib/Dancer2/Serializer/YAML.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Session::Simple" : {
          "file" : "lib/Dancer2/Session/Simple.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Session::YAML" : {
          "file" : "lib/Dancer2/Session/YAML.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Template::Implementation::ForkedTiny" : {
          "file" : "lib/Dancer2/Template/Implementation/ForkedTiny.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Template::Simple" : {
          "file" : "lib/Dancer2/Template/Simple.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Template::TemplateToolkit" : {
          "file" : "lib/Dancer2/Template/TemplateToolkit.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Template::Tiny" : {
          "file" : "lib/Dancer2/Template/Tiny.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       },
       "Dancer2::Test" : {
          "file" : "lib/Dancer2/Test.pm",
-         "version" : "0.207000"
+         "version" : "0.208000"
       }
    },
    "release_status" : "stable",
@@ -382,8 +382,8 @@
       "x_IRC" : "irc://irc.perl.org/#dancer",
       "x_WebIRC" : "https://chat.mibbit.com/#dancer@irc.perl.org"
    },
-   "version" : "0.207000",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "version" : "0.208000",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

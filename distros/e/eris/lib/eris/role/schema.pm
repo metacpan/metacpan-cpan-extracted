@@ -12,7 +12,7 @@ with qw(
     eris::role::plugin
 );
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 
@@ -169,7 +169,7 @@ eris::role::schema - Role for implementing a schema
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  SubnetID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet to deploy EC2 instance into
+  SecurityGroupIDs:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: List of Security Groups to add to EC2 instance
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: >-
+      Name of an existing EC2 KeyPair to enable SSH access to the instance
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+Mappings:
+  AWSRegionToAMI:
+    us-east-1:
+      AMIID: ami-0b33d91d
+    us-east-2:
+      AMIID: ami-c55673a0
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance                     
+    Properties:
+      ImageId:
+        !FindInMap                                 # This is an example of the short form YAML FindInMap function
+          - AWSRegionToAMI                         # It accepts three parameters each denoted by a hyphen (-)
+          - !Ref AWS::Region
+          - AMIID
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroupIds: !Ref SecurityGroupIDs
+      SubnetId: !Ref SubnetID
+      UserData:
+        Fn::Base64:                                # YAML makes userdata much cleaner
+          !Sub |
+              #!/bin/bash -ex
+              yum install -y httpd;
+              echo "<html>I love YAML CloudFormation!!</html>" > /var/www/html/index.html;
+              cd /var/www/html;
+              chmod 755 index.html;
+              service httpd start;
+              chkconfig httpd on;
+      Tags:                                      # Tags are an example of a sequence of mappings in YAML,
+        -                                        # each key/value pair is separated by a hyphen
+          Key: Name
+          Value: CloudFormation Test - YAML      
+        -
+          Key: Environment
+          Value: Development

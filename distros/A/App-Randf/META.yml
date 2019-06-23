@@ -3,15 +3,12 @@ abstract: 'random filter for STDIN'
 author:
   - 'Dai Okabayashi <bayashi@cpan.org>'
 build_requires:
-  Capture::Tiny: '0'
-  Module::Build::Pluggable::CPANfile: '0.04'
-  Test::More: '0.88'
+  Module::Build::Pluggable::CPANfile: '0.05'
 configure_requires:
-  Module::Build: '0.40'
-  Module::Build::Pluggable: '0'
-  Module::Build::Pluggable::CPANfile: '0.04'
+  Module::Build: '0.42'
+  Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +17,7 @@ name: App-Randf
 provides:
   App::Randf:
     file: lib/App/Randf.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Config::CmdRC: '0.07'
   Getopt::Long: '2.42'
@@ -35,4 +32,5 @@ resources:
   bugtracker: http://github.com/bayashi/App-Randf/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/App-Randf
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

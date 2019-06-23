@@ -4,7 +4,7 @@
       "Atsushi Kobayashi <nekokak _at_ gmail _dot_ com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "DBIx::Handler" : {
          "file" : "lib/DBIx/Handler.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -73,17 +73,18 @@
          "web" : "https://github.com/nekokak/p5-DBIx-Handler"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_authority" : "cpan:XAICRON",
    "x_contributors" : [
-      "Keiji, Yoshimi <walf443@gmail.com>",
-      "Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>",
-      "tokuhirom <tokuhirom@gmail.com>",
       "Atsushi Kobayashi <nekokak@gmail.com>",
-      "soh335 <sugarbabe335@gmail.com>",
-      "xaicron <xaicron@gmail.com>",
+      "Keiji, Yoshimi <walf443@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "karupanerura <karupa@cpan.org>"
+      "Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>",
+      "karupanerura <karupa@cpan.org>",
+      "soh335 <sugarbabe335@gmail.com>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "xaicron <xaicron@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 4.03",
+   "x_static_install" : 1
 }

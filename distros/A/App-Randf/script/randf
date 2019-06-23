@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use App::Randf;
 
+$| = 1;
+
 App::Randf->run(@ARGV);
 
 __END__

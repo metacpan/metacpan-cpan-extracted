@@ -1,5 +1,5 @@
 package Devel::Optic;
-$Devel::Optic::VERSION = '0.011';
+$Devel::Optic::VERSION = '0.012';
 # ABSTRACT: Production safe data inspector
 
 use strict;
@@ -10,19 +10,12 @@ use Scalar::Util qw(looks_like_number);
 use Ref::Util qw(is_ref is_arrayref is_hashref is_scalarref is_coderef is_regexpref);
 
 use Sub::Info qw(sub_info);
-use Devel::Size qw(total_size);
+
 use PadWalker qw(peek_my);
 
 use Devel::Optic::Lens::Perlish;
 
 use constant {
-    EXEMPLAR => [ map { { a => [1, 2, 3, qw(foo bar baz)] } } 1 .. 5 ],
-};
-
-use constant {
-    # ~3kb on x86_64, and ~160 bytes JSON encoded
-    DEFAULT_MAX_SIZE_BYTES => total_size(EXEMPLAR),
-
     DEFAULT_SCALAR_TRUNCATION_SIZE => 256,
     DEFAULT_SCALAR_SAMPLE_SIZE => 64,
     DEFAULT_SAMPLE_COUNT => 4,
@@ -39,19 +32,13 @@ sub new {
     my $self = {
         uplevel => $uplevel,
 
-        # data structures larger than this value (bytes) will be compressed into a sample
-        max_size => $params{max_size} // DEFAULT_MAX_SIZE_BYTES,
-
-        # if our over-size entity is a scalar, how much of the scalar should we export.
-        # assumption is that this is a "simple" data structure and trimming it much
-        # more aggressively probably won't hurt understanding that much.
+        # substr size for scalar subjects
         scalar_truncation_size => $params{scalar_truncation_size} // DEFAULT_SCALAR_TRUNCATION_SIZE,
 
         # when building a sample, how much of each scalar child to substr
         scalar_sample_size => $params{scalar_sample_size} // DEFAULT_SCALAR_SAMPLE_SIZE,
 
-        # how many keys or indicies to display in a sample from an over-size
-        # hashref/arrayref
+        # how many keys or indicies to display in a sample from a hashref/arrayref
         sample_count => $params{sample_count} // DEFAULT_SAMPLE_COUNT,
 
         lens => $params{lens} // Devel::Optic::Lens::Perlish->new,
@@ -70,23 +57,20 @@ sub inspect {
 sub fit_to_view {
     my ($self, $subject) = @_;
 
-    my $max_size = $self->{max_size};
-    # The sizing is a bit hand-wavy: please ping me if you have a cool idea in
-    # this area. I was hesitant to serialize the data structure just to
-    # find the size (seems like a lot of work if it is huge), but maybe that's
-    # the way to go. total_size also does work proportional to the depth of the
-    # data structure, but it's likely much lighter than serialization.
-    my $size = total_size($subject);
-    if ($size < $max_size) {
-        return $subject;
-    }
-
     my $ref = ref $subject;
     my $reasonably_summarized_with_substr = !is_ref($subject) || is_regexpref($subject) || is_scalarref($subject);
 
     # now we're in too-big territory, so we need to come up with a way to get
     # some useful data to the user without showing the whole structure
     if ($reasonably_summarized_with_substr) {
+        if (!defined $subject) {
+            return "(undef)";
+        }
+
+        if ($subject eq "") {
+            return '"" (len 0)';
+        }
+
         $subject = $$subject if is_scalarref($subject);
         my $scalar_truncation_size = $self->{scalar_truncation_size};
         my $len = length $subject;
@@ -99,25 +83,25 @@ sub fit_to_view {
 
         if ($len <= $scalar_truncation_size) {
             return sprintf(
-                "%s%s (len %d / %d bytes)",
+                "%s%s (len %d)",
                 $ref ? "$ref " : "",
                 $subject,
-                $len, $size,
+                $len,
             );
         }
 
         return sprintf(
-            "%s%s (truncated to len %d; len %d / %d bytes in full)",
+            "%s%s (truncated to len %d; len %d)",
             $ref ? "$ref " : "",
             substr($subject, 0, $scalar_truncation_size) . "...",
             $scalar_truncation_size,
-            $len, $size
+            $len,
         );
     }
 
     my $sample_count = $self->{sample_count};
     my $scalar_sample_size = $self->{scalar_sample_size};
-    my $sample_text = "$size bytes";
+    my $sample_text = "(no sample)";
     if (is_hashref($subject)) {
         my @sample;
         my @keys = keys %$subject;
@@ -137,10 +121,10 @@ sub fit_to_view {
             $key_chunk .= '...' if length($key_chunk) < length($key);
             push @sample, sprintf("%s => %s", $key_chunk, $val_chunk);
         }
-        $sample_text = sprintf("{%s%s} (%d keys / %d bytes)",
+        $sample_text = sprintf("{%s%s} (%d keys)",
             join(', ', @sample),
             $key_count > $sample_count ? ' ...' : '',
-            $key_count, $size
+            $key_count,
         );
     } elsif (is_arrayref($subject)) {
         my @sample;
@@ -157,10 +141,10 @@ sub fit_to_view {
             }
             push @sample, $val_chunk;
         }
-        $sample_text = sprintf("[%s%s] (len %d / %d bytes)",
+        $sample_text = sprintf("[%s%s] (len %d)",
             join(', ', @sample),
             $total_len > $sample_count ? ' ...' : '',
-            $total_len, $size
+            $total_len,
         );
     } elsif (is_coderef($subject)) {
         my $info = sub_info($subject);
@@ -190,18 +174,18 @@ Devel::Optic - Production safe data inspector
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
   use Devel::Optic;
-  my $optic = Devel::Optic->new(max_size => 100);
+  my $optic = Devel::Optic->new();
   my $foo = { bar => ['baz', 'blorg', { clang => 'pop' }] };
 
-  # 'pop'
+  # 'pop (len 3)'
   $optic->inspect(q|$foo->{'bar'}->[-1]->{'clang'}|);
 
-  # 'HASH: { bar => ARRAY ...} (1 total keys / 738 bytes). Exceeds viewing size (100 bytes)"
+  # 'HASH: { bar => ARRAY ...} (1 total keys)"
   $optic->inspect('$foo');
 
 =head1 DESCRIPTION
@@ -241,26 +225,6 @@ C<%options> may be empty, or contain any of the following keys:
 
 Which Perl scope to view. Default: 1 (scope that C<Devel::Optic> is called from)
 
-=item C<max_size>
-
-Max size, in bytes, of a data structure that can be viewed without
-summarization. This is a little hairy across different architectures, so this
-is best expressed in terms of Perl data structures if specified. The goal is to
-avoid spitting out subjectively 'big' Perl data structures to a debugger or
-log. If you're tuning this value, keep in mind that CODE refs are I<enormous>
-(~33kb on C<x86_64>), so basically any data structure with CODE refs inside
-will be summarized.
-
-Default: Platform dependent. The value is calculated by
-
-    Devel::Size::total_size([ map { { a => [1, 2, 3, qw(foo bar baz)] } } 1 .. 5 ])
-
-... which is ~3kb on C<x86_64>, and ~160 bytes JSON encoded. This is an
-estimate on my part for the size of data structure that makes sense to export
-in raw format when viewed. To my entirely personal taste, larger data
-structures than this are too big to reasonably export to logs in their
-entirety.
-
 =item C<scalar_truncation_size>
 
 Size, in C<substr> length terms, that scalar values are truncated to for
@@ -292,7 +256,7 @@ found at that path.
 
     my $some_variable = ['a', 'b', { foo => 'bar' }, [ 'blorg' ] ];
 
-    my $tiny = Devel::Optic->new(max_size => 1); # small to force summarization
+    my $tiny = Devel::Optic->new();
     # "ARRAY: [ 'a', 'b', HASH, ARRAY ]"
     $tiny->fit_to_view($some_variable);
 

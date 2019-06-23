@@ -3,7 +3,7 @@ package YAML::LibYAML::API;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_ANY_SCALAR_STYLE YAML_PLAIN_SCALAR_STYLE
@@ -176,7 +176,9 @@ of nodes. There's no wrapper for these functions yet.
 This is just one of the first releases. The function names will eventually be
 changed.
 
-C<libyaml-dev> has to be installed. It might be included in a future release.
+The sources of C<libyaml-dev> are included in this distribution. You can
+build this module with the system libyaml instead, if you remove the libyaml
+sources and call C<Makefile.PL> with C<WITH_SYSTEM_LIBYAML=1>.
 
 =head1 SEE ALSO
 

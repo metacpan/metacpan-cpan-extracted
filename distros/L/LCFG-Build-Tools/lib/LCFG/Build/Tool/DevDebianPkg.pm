@@ -5,10 +5,10 @@ use warnings;
 # $Id: DevDebianPkg.pm.in 35384 2019-01-16 16:25:00Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/RPM.pm.in,v $
 # $Revision: 35384 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Tool/DevDebianPkg.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_30/lib/LCFG/Build/Tool/DevDebianPkg.pm.in $
 # $Date: 2019-01-16 16:25:00 +0000 (Wed, 16 Jan 2019) $
 
-our $VERSION = '0.9.20';
+our $VERSION = '0.9.30';
 
 use v5.10;
 
@@ -97,7 +97,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::DevDebianPkg version 0.9.20
+    This documentation refers to LCFG::Build::Tool::DevDebianPkg version 0.9.30
 
 =head1 SYNOPSIS
 

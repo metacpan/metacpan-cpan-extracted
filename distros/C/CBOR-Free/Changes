@@ -1,5 +1,11 @@
 Revision history for Perl module CBOR::Free
 
+0.11 20 Jun 2019
+- BREAKING CHANGE: $CBOR::Free::true and $CBOR::Free::false no longer exist.
+- Lighten memory usage significantly by deferring load of Types::Serialiser
+  until it’s needed.
+- Tweak documentation a bit for accuracy.
+
 0.10 14 Jun 2019
 - Fix test & number stringification on 32-bit Perls (broken in 0.09).
 

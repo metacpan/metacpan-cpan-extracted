@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Option;
 use Quiq::Ipc;
@@ -361,7 +361,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

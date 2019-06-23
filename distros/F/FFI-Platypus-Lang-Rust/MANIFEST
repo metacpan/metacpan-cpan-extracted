@@ -12,8 +12,6 @@ inc/run/readme.pl
 INSTALL
 lib/FFI/Platypus/Lang/Rust.pm
 lib/Module/Build/FFI/Rust.pm
-libtest/Cargo.toml
-libtest/src/lib.rs
 LICENSE
 maint/releaseprep
 MANIFEST			This list of files
@@ -23,8 +21,8 @@ README
 SUPPORT
 t/00_diag.t
 t/00_diag.txt
-t/01_use.t
 t/02_types.t
 t/example.t
-t/ffi_platypus_attach.t
-t/lang.t
+t/ffi/Cargo.toml
+t/ffi/src/lib.rs
+t/ffi_platypus_lang_rust.t

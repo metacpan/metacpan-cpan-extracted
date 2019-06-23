@@ -25,7 +25,7 @@ plan tests => 1;
 
 my $finder = Test::TrailingSpace->new({
        root => '.',
-       filename_regex => qr/(?:\.(?:t|pm|pl|cgi|xs|c|h|pod|PL|conf)|CHANGES|TODO)\z/,
+       filename_regex => qr/(?:\.(?:t|pm|pl|cgi|xs|c|h|pod|PL|conf)|Changes|TODO)\z/,
        abs_path_prune_re => qr(\Asrc),
    });
 

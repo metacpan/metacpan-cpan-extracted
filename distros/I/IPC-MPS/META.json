@@ -4,13 +4,13 @@
       "Nick Kostyria <kni@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IPC-MPS",
    "no_index" : {
@@ -35,6 +35,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

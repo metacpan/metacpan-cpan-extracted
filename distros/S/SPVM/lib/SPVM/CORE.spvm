@@ -1,7 +1,14 @@
 package SPVM::CORE {
   
-  # Don't use any modules
-
+  # SPVM::CORE is core function of SPVM
+  # Don't use any ohter modules in SPVM::CORE except for default loaded modules.
+  # Don't use any system calls except for standard I/O and standard error.
+  
+  native sub strtoi : int ($string : string, $digit : int);
+  native sub strtol : long ($string : string, $digit : int);
+  native sub strtof : float ($string : string);
+  native sub strtod : double ($string : string);
+  
   sub chomp : string ($string : string) {
     unless ($string) {
       return undef;
@@ -23,7 +30,43 @@ package SPVM::CORE {
     
     return $new_string;
   }
+
+  native sub isdigit : int ($char : int);
   
+  sub ispspace : int ($char : int) {
+    my $ispspace = 0;
+    switch ($char) {
+      case ' ':
+      case '\r':
+      case '\n':
+      case '\t':
+      case '\f':
+      {
+        $ispspace = 1;
+        break;
+      }
+    }
+    return $ispspace;
+  }
+
+  sub ispword : int ($char : int) {
+    my $ispword = 0;
+    
+    if ($char >= 'a' && $char <= 'z') {
+      $ispword = 1;
+    }
+    elsif ($char >= 'A' && $char <= 'Z') {
+      $ispword = 1;
+    }
+    elsif ($char == '_') {
+      $ispword = 1;
+    }
+    elsif ($char >= '0' && $char <= '9') {
+      $ispword = 1;
+    }
+    return $ispword;
+  }
+
   native sub rand : int ($seed_ref : int&);
   
   precompile sub lc : string($str : string) {

@@ -21,7 +21,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Devel::Size" : "0.82",
             "PadWalker" : "2.3",
             "Ref::Util" : "0.204",
             "Scalar::Util" : "0",
@@ -38,23 +37,23 @@
    "provides" : {
       "Devel::Optic" : {
          "file" : "lib/Devel/Optic.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Devel::Optic::Lens::Perlish" : {
          "file" : "lib/Devel/Optic/Lens/Perlish.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Devel::Optic::Lens::Perlish::Constants" : {
          "file" : "lib/Devel/Optic/Lens/Perlish/Constants.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Devel::Optic::Lens::Perlish::Interpreter" : {
          "file" : "lib/Devel/Optic/Lens/Perlish/Interpreter.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Devel::Optic::Lens::Perlish::Parser" : {
          "file" : "lib/Devel/Optic/Lens/Perlish/Parser.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -69,7 +68,7 @@
          "web" : "https://github.com/kanatohodets/Devel-Optic"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }

@@ -15,13 +15,14 @@ use RPi::DigiPot::MCP4XXXX;
 use RPi::HCSR04;
 use RPi::I2C;
 use RPi::LCD;
+use RPi::OLED::SSD1306::128_64;
 use RPi::Pin;
 use RPi::RTC::DS3231;
 use RPi::Serial;
 use RPi::SPI;
 use RPi::StepperMotor;
 
-our $VERSION = '2.3631';
+our $VERSION = '2.3632';
 
 my $fatal_exit = 1;
 
@@ -155,6 +156,27 @@ sub lcd {
     $lcd->init(%args);
     return $lcd;
 }
+sub oled {
+    my ($self, $model, $i2c_addr, $display_splash_page) = @_;
+
+    $model //= '128x64';
+    $i2c_addr //= 0x3C;
+
+    my %models = (
+        '128x64'  => 1,
+        '128x32'  => 1,
+        '96x16'   => 1,
+    );
+
+    if (! exists $models{$model}){
+        die "oled() requires one of the following models sent in: " .
+              "128x64, 128x32 or 96x16\n";
+    }
+
+    if ($model eq '128x64'){
+        return RPi::OLED::SSD1306::128_64->new($i2c_addr, $display_splash_page);
+    }
+}
 sub pin {
     my ($self, $pin_num) = @_;
 
@@ -263,6 +285,17 @@ Please see the L<FAQ|RPi::WiringPi::FAQ> for full usage details.
 
     my $pi = RPi::WiringPi->new;
 
+    # For the below handful of system methods, see RPi::SysInfo
+
+    my $mem_percent = $pi->mem_percent;
+    my $cpu_percent = $pi->cpu_percent;
+    my $cpu_temp    = $pi->core_temp;
+    my $gpio_info   = $pi->gpio_info;
+    my $raspi_conf  = $pi->raspi_config;
+    my $net_info    = $pi->network_info;
+    my $file_system = $pi->file_system;
+    my $hw_details  = $pi->pi_details;
+
     # pin
 
     my $pin = $pi->pin(5);
@@ -306,10 +339,7 @@ L<pinout.xyz|https://pinout.xyz/pinout/wiringpi>. You can also run the C<pinmap>
 command that was installed by this module, or C<wiringPi>'s C<gpio readall>
 command.
 
-=head1 METHODS
-
-See L<RPi::WiringPi::Core> for utility/helper/hardware-specific methods that are
-imported into an C<RPi::WiringPi> object.
+=head1 BASE METHODS
 
 =head2 new([%args])
 
@@ -456,6 +486,27 @@ LCD displays connected to your Raspberry Pi.
 
 Please see the linked documentation for information regarding the parameters
 required.
+
+=head2 oled([$model], [$i2c_addr])
+
+Returns a specific C<RPi::OLED::SSD1306> OLED display object, allowing you to
+display text, characters and shapes to the screen.
+
+Currently, only the C<128x64> size model is offered, see the
+L<RPi::OLED::SSD1306::128_64> documentation for full usage details.
+
+Parameters:
+
+    $model
+
+Optional, String: The screen size of the OLED you've got. Valid options are
+C<128x64>, C<128x32> and C<96x16>. Currently, only the C<128x64> option is
+valid, and it's the default if not sent in.
+
+    $i2c_addr
+
+Optional, Integer: The I2C address of your display. Defaults to C<0x3C> if not
+sent in.
 
 =head2 pin($pin_num)
 
@@ -618,6 +669,141 @@ Optional, Float or Int: By default, between each step, we delay by C<0.01>
 seconds. Send in a float or integer for the number of seconds to delay each step
 by. The smaller this number, the faster the motor will turn.
 
+=head2 CORE PI SYSTEM METHODS
+
+Core methods are inherited in and documented in L<RPi::WiringPi::Core>. See
+that documentation for full details of each one. I've included a basic
+description of them here.
+
+=head3 gpio_layout
+
+Returns the GPIO layout, which in essence is the Pi board revision number.
+
+=head3 io_led
+
+Turn the disk IO (green) LED on or off.
+
+=head3 pwr_led
+
+Turn the power (red) LED on or off.
+
+=head3 identify
+
+Toggles the power led off and disk IO led on which allows external physical
+identification of the Pi you're running on.
+
+=head3 label
+
+Sets an internal label/name to your L<RPi::WiringPi> Pi object.
+
+=head3 pin_scheme
+
+Returns the current pin mapping scheme in use within the object.
+
+=head3 pin_map
+
+Returns a hash reference mapping of the physical pin numbers to a pin scheme's
+pin numbers.
+
+=head3 pin_to_gpio
+
+Converts a pin number from any non-GPIO (BCM) scheme to GPIO (BCM) scheme.
+
+=head3 wpi_to_gpio
+
+Converts a wiringPi pin number to GPIO pin number.
+
+=head3 phys_to_gpio
+
+Converts a physical pin number to the GPIO pin number.
+
+=head3 pwm_range
+
+Set/get the PWM range.
+
+=head3 pwm_mode
+
+Set/get the PWM mode.
+
+=head3 pwm_clock
+
+Set/get the PWM clock.
+
+=head3 export_pin
+
+Exports a pin if running under the C<setup_sys()> initialization scheme.
+
+=head3 unexport_pin
+
+Un-exports a pin if running under the C<setup_sys()> initialization scheme.
+
+=head3 registered_pins
+
+Returns an array reference of all pin numbers currently registered in the
+system. Used primarily for cleanup functionality.
+
+=head3 register_pin
+
+Registers a pin with the system for error checking, and proper resetting in the
+cleanup routines.
+
+=head3 unregister_pin
+
+Removes an already registered pin.
+
+=head3 cleanup
+
+Cleans up the entire system, resetting all pins and devices back to the state
+we found them in when we initialized the system.
+
+=head2 ADDITIONAL PI SYSTEM METHODS
+
+We also include in the Pi object several hardware-type methods brought in from
+L<RPi::SysInfo>. They are loaded through L<RPi::WiringPi::Core> via
+inheritance. See the L<RPi::SysInfo> documentation for full method details.
+
+    my $mem_percent = $pi->mem_percent;
+    my $cpu_percent = $pi->cpu_percent;
+    my $cpu_temp    = $pi->core_temp;
+    my $gpio_info   = $pi->gpio_info;
+    my $raspi_conf  = $pi->raspi_config;
+    my $net_info    = $pi->network_info;
+    my $file_system = $pi->file_system;
+    my $hw_details  = $pi->pi_details;
+
+=head3 cpu_percent
+
+Returns the current CPU usage.
+
+=head3 mem_percent
+
+Returns the current memory usage.
+
+=head3 core_temp
+
+Returns the current temperature of the CPU core.
+
+=head3 gpio_info
+
+Returns the current status and configuration of one, many or all of the GPIO
+pins.
+
+=head3 raspi_config
+
+Returns a list of all configured parameters in the C</boot/config.txt> file.
+
+=head3 network_info
+
+Returns the network configuration of the Pi.
+
+=head3 file_system
+
+Returns current disk and mount information.
+
+=head3 pi_details
+
+Returns various information on both the hardware and OS aspects of the Pi.
+
 =head1 RUNNING TESTS
 
 Please see L<RUNNING TESTS|RPi::WiringPi::FAQ/RUNNING TESTS> in the
@@ -634,7 +820,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017,2018 by Steve Bertrand
+Copyright (C) 2016-2019 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

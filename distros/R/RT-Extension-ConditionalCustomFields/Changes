@@ -1,6 +1,9 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
-1.00 2019-02-12
+1.02 2019-06-21
+ - Replace non alphabetic chars by underscores in alternative_selector for chosen select CFs
+
+1.01 2019-02-12
  - Add tests with condition on empty value
  - Add BoolanCustomField as eligible condition CF
  - Update number of unitary tests

@@ -1,3 +1,14 @@
+** 0.23 / 2019-06-21
+   - Mark multiple methods DEPRECATED (up for removal on 1.0 or
+     in 2 years -- whichever comes first)
+   - Factor radio buttons into a separate widget: the value
+     depends on the selected element in the group; not on the
+     button itself
+   - Add option to find radio buttons by their VALUE attribute's value
+   - Don't call 'set_attribute' on INPUT widgets (instead, send keys)
+   - Add 'value'/'values' distinction to SELECT widgets (multi-value support)
+   - Add 'set_attribute' complement of 'get_attribute'
+
 ** 0.22 / 2019-02-28
    - Correctly update $VERSION strings (incorrectly updated on 0.21)
 

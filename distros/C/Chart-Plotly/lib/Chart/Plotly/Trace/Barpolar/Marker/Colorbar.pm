@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Barpolar::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Barpolar::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Barpolar::Marker::Colorbar::Title;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace barpolar.
 
@@ -282,7 +282,7 @@ Chart::Plotly::Trace::Barpolar::Marker::Colorbar - This attribute is one of the 
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,95 @@
+#!perl
+
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+# FRAGMENT id=shcompgen-hint command=_cpanm-namespace
+
+use strict;
+use warnings;
+
+use App::lcpan::Call;
+
+my @new_argv;
+my %seen_dists; # key=distname, val=modulename
+for my $arg (@ARGV) {
+    unless ($arg =~ /\A[A-Za-z0-9_]+(::[A-Za-z0-9_]+)*\z/) {
+        push @new_argv, $arg;
+        next;
+    }
+    my $res = App::lcpan::Call::call_lcpan_script(
+        argv => ["mods", "--namespace", $arg, "-l"],
+    );
+    unless ($res->[0] == 200) {
+        die "cpanm-namespace: Can't list modules with namespace '$arg': ".
+            "$res->[0] - $res->[1]\n";
+    }
+    my @mods;
+    for my $rec (@{$res->[2]}) {
+        next if $seen_dists{ $rec->{dist} };
+        push @mods, $rec->{module};
+        $seen_dists{ $rec->{dist} } = $rec->{module};
+    }
+    push @new_argv, @mods;
+}
+
+print join(" ", "cpanm", @new_argv), "\n" if $ENV{DEBUG};
+system {"cpanm"} "cpanm", @new_argv;
+
+# ABSTRACT: Install all modules from certain namespace from CPAN
+# PODNAME: cpanm-namespace
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpanm-namespace - Install all modules from certain namespace from CPAN
+
+=head1 VERSION
+
+This document describes version 0.001 of cpanm-namespace (from Perl distribution App-cpanm-namespace), released on 2019-06-19.
+
+=head1 DESCRIPTION
+
+L<cpanm-namespace> is a simplistic wrapper over L<cpanm>. This command:
+
+ % cpanm-namespace -n Calendar::Dates
+
+will cause B<cpanm-namespace> to search for modules under the namespace
+C<Calendar::Dates> (currently using L<lcpan>) and install them all using
+L<cpanm>.
+
+That's about it.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cpanm-namespace>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cpanm-namespace>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanm-namespace>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

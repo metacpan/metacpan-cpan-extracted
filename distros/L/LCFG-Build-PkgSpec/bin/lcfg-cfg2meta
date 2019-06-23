@@ -5,10 +5,10 @@ use warnings;
 # $Id: lcfg-cfg2meta.in 3445 2009-03-11 13:25:36Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-PkgSpec/bin/lcfg-cfg2meta.in,v $
 # $Revision: 3445 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_6/bin/lcfg-cfg2meta.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_7/bin/lcfg-cfg2meta.in $
 # $Date: 2009-03-11 13:25:36 +0000 (Wed, 11 Mar 2009) $
 
-our $VERSION = '0.2.6';
+our $VERSION = '0.2.7';
 
 use File::Basename       ();
 use File::Spec           ();
@@ -58,7 +58,7 @@ lcfg-cfg2meta - Tool to convert LCFG config.mk into new metadata file
 
 =head1 VERSION
 
-This documentation refers to lcfg-cfg2meta version 0.2.6
+This documentation refers to lcfg-cfg2meta version 0.2.7
 
 =head1 SYNOPSIS
 

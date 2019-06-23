@@ -23,7 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "20190523",
+            "Data::Table::Text" : "20190620",
             "Storable" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
@@ -35,7 +35,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "20190527"
+         "version" : "20190621"
       },
       "ditaSyntaxDiagramFromDocBookCmdSynopsis" : {
          "file" : "lib/Data/Edit/Xml.pm"
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20190527",
+   "version" : "20190621",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

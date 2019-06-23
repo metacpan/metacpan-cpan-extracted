@@ -3,7 +3,7 @@ package WWW::ORCID::Transport::LWP;
 use strict;
 use warnings;
 
-our $VERSION = 0.0401;
+our $VERSION = 0.0402;
 
 use LWP::UserAgent ();
 use Moo;

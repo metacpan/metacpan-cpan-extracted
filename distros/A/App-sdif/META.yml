@@ -40,7 +40,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: v4.10.9
+    version: v4.11.1
   App::sdif::Divert:
     file: lib/App/sdif/Divert.pm
   App::sdif::LabelStack:
@@ -62,7 +62,7 @@ provides:
 requires:
   Getopt::EX: v1.14.0
   List::Util: '1.45'
-  Text::ANSI::Fold: '0.02'
+  Text::ANSI::Fold: '0.06'
   Text::VisualWidth::PP: '0.05'
   Unicode::EastAsianWidth::Detect: '0'
   perl: '5.014'
@@ -70,7 +70,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: git://github.com/kaz-utashiro/sdif-tools.git
-version: 4.10.9
+version: 4.11.1
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

@@ -1,3 +1,7 @@
+4.003     2019-06-21 18:06:07 EDT
+  - Ignore missing workers for jobs in the minion_foreground named queue to
+    make debugging very slow jobs easier.
+
 4.002     2018-10-03 13:58:15 EDT
   - Optimize repair query (yrjustice, #15, #16)
 

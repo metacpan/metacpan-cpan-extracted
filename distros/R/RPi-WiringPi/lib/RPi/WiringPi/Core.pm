@@ -4,10 +4,11 @@ use strict;
 use warnings;
 
 use parent 'WiringPi::API';
+use parent 'RPi::SysInfo';
 use JSON;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3631';
+our $VERSION = '2.3632';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;
@@ -245,6 +246,10 @@ necessarily fit anywhere else. It is a base class, and is not designed to be
 used independently.
 
 =head1 METHODS
+
+Besides the methods listed below, we also make available through inheritance
+all methods provided by L<RPi::SysInfo>. Please see that documentation for
+usage details.
 
 =head2 gpio_layout()
 
@@ -513,7 +518,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017,2018 by Steve Bertrand
+Copyright (C) 2016-2019 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

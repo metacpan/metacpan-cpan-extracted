@@ -403,7 +403,9 @@ while (<DIFF>) {
 	    @new = read_line(*DIFF, $n);
 	    $readfile and read_line(*NEW, $n);
 	}
-	map { s/^[<>]\s?/ / } @old, @new;
+	map {
+	    s/^([<>])\s?/{'<' => '-', '>' => '+'}->{$1}/e
+	} @old, @new;
 	flush_buffer([], \@old, \@new);
     }
     #

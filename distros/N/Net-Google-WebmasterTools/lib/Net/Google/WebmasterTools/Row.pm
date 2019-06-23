@@ -1,6 +1,6 @@
 package Net::Google::WebmasterTools::Row;
 {
-  $Net::Google::WebmasterTools::Row::VERSION = '0.01';
+  $Net::Google::WebmasterTools::Row::VERSION = '0.03';
 }
 use strict;
 
@@ -80,7 +80,7 @@ Net::Google::WebmasterTools::Row - Base class for Google WebmasterTools API resu
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -92,7 +92,7 @@ Net::Google::WebmasterTools::Row - Base class for Google Webmaster Tools API res
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 CONSTRUCTOR
 

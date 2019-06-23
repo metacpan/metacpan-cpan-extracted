@@ -1,7 +1,7 @@
 ---
 abstract: 'Autobox methods to transform Arrays and Hashes'
 author:
-  - 'Johan Lindstrom, C<< <johanl [AT] cpan.org> >>'
+  - '- Johan Lindstrom, All Rights Reserved.'
 build_requires:
   Moo: '0'
   Test::Differences: '0'
@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,22 +29,26 @@ no_index:
 provides:
   autobox::Transform:
     file: lib/autobox/Transform.pm
-    version: '1.031'
+    version: '1.034'
 requires:
   Carp: '0'
   List::MoreUtils: '0'
   Sort::Maker: '0'
   autobox: '0'
   autobox::Core: '0'
+  parent: '0'
   perl: '5.010'
   'true': '0'
 resources:
   bugtracker: https://github.com/jplindstrom/p5-autobox-Transform/issues
   homepage: https://github.com/jplindstrom/p5-autobox-Transform
   repository: git://github.com/jplindstrom/p5-autobox-Transform.git
-version: '1.031'
+version: '1.034'
 x_authority: cpan:JOHANL
 x_contributors:
   - 'Johan Lindstrom <johan.lindstrom@broadbean.com>'
   - 'Johan Lindstrom <jpl@nospam>'
+  - 'Johan Lindstrom <jplindstrom@users.noreply.github.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

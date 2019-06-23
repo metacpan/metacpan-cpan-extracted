@@ -5,12 +5,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Hash;
 use Quiq::Properties;
 use Quiq::TableRow;
-use Quiq::Parameters;
 use Quiq::AnsiColor;
 
 # -----------------------------------------------------------------------------
@@ -27,70 +26,73 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
+Mit Kolumnennamen:
+
     use Quiq::Table;
     
-    # Objekt
-    $tab = Quiq::Table->new(['a','b','c','d']);
+    # Daten
     
-    # Kolumnen
+    @rows = (
+        [1,  'A',  76.253],
+        [12, 'AB', 1.7   ],
+        [123,'ABC',9999  ],
+    );
     
-    $width = $tab->width;
-    # 4
+    # Objekt instantiieren
+    $tab = Quiq::Table->new(['a','b','c'],\@rows);
     
-    @columns = $tab->columns;
-    # ('a','b','c','d')
+    # Werte der Kolumne b
     
-    $columnA = $tab->columns;
-    # ['a','b','c','d']
+    @values = $tab->values('b');
+    say "@values";
+    ==>
+    A AB ABC
     
-    $i = $tab->index('c');
-    # 2
+    # Ausgabe als Text-Tabelle
     
-    $i = $tab->index('z');
-    # Exception
+    print $tab->asText;
+    ==>
+    |   1 | A   |   76.253 |
+    |  12 | AB  |    1.700 |
+    | 123 | ABC | 9999.000 |
+
+Ohne Kolumnennamen:
+
+    use Quiq::Table;
     
-    # Zeilen
+    # Daten
     
-    @rows = $tab->rows;
-    # ()
+    @rows = (
+        [1,  'A',  76.253],
+        [12, 'AB', 1.7   ],
+        [123,'ABC',9999  ],
+    );
     
-    $rowA = $tab->rows;
-    # []
+    # Objekt instantiieren
+    $tab = Quiq::Table->new(3,\@rows);
     
-    $count = $tab->count;
-    # 0
+    # Werte der Kolumne 1 (0-basierte Zählung)
     
-    $tab->push([1,2,3,4]);
-    $tab->push([5,6,7,8]);
-    $tab->push([1,9,10,11]);
-    $count = $tab->count;
-    # 3
+    @values = $tab->values(1);
+    say "@values";
+    ==>
+    A AB ABC
     
-    # Über alle Zeilen und Kolumnen iterieren
+    # Ausgabe als Text-Tabelle
     
-    for my $row ($tab->rows) {
-        for my $value ($row->values) {
-            # ...
-        }
-    }
-    
-    # Werte
-    
-    @values = $tab->values('a');
-    # (1,5,1)
-    
-    $valueA = $tab->values('a');
-    # [1,5,1]
-    
-    @values = $tab->values('a',-distinct=>1);
-    # (1,5)
+    print $tab->asText;
+    ==>
+    |   1 | A   |   76.253 |
+    |  12 | AB  |    1.700 |
+    | 123 | ABC | 9999.000 |
 
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert eine Tabelle, also eine Liste
-von gleichförmigen Zeilen. Die Namen der Kolumnen werden dem Konstruktor
-der Klasse übergeben. Sie bezeichnen die Komponenten der Zeilen. Die
-Zeilen sind Objekte der Klasse Quiq::TableRow.
+von Arrays identischer Größe. Die Kolumnen können über ihre Position
+oder ihren Namen (sofern definiert) angesprochen werden.
+Die Klasse kann die Daten in verschiedenen Formaten tabellarisch
+ausgegeben.
 
 =head1 EXAMPLE
 
@@ -104,15 +106,26 @@ Siehe quiq-ls
 
 =head4 Synopsis
 
+    $tab = $class->new($width);
+    $tab = $class->new($width,\@rows);
     $tab = $class->new(\@columns);
+    $tab = $class->new(\@columns,\@rows);
 
 =head4 Arguments
 
 =over 4
 
+=item $width
+
+Anzahl der Kolumnen (Integer).
+
 =item @columns
 
-Liste der Kolumnennamen (Strings).
+Liste von Kolumnennamen (Array of Strings).
+
+=item @rows
+
+Liste von Zeilen (Array of Arrays).
 
 =back
 
@@ -122,27 +135,44 @@ Referenz auf Tabellen-Objekt
 
 =head4 Description
 
-Instantiiere ein Tabellen-Objekt mit den Kolumnennamen @columns und
-liefere eine Referenz auf das Objekt zurück. Die Kolumnennamen werden
-nicht kopiert, die Referenz wird im Objekt gespeichert. Die
-Liste der Zeilen ist zunächst leer.
+Instantiiere ein Tabellen-Objekt und liefere eine Referenz auf dieses
+Objekt zurück.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub new {
-    my $class = shift;
-    my $columnA = shift;
-    my $rowA = shift // [];
+    my ($class,$arg,$rowA) = @_;
 
-    my $i = 0;
+    # Objekt instantiieren
+
     my $self = $class->SUPER::new(
-        columnA => $columnA,
-        columnH => Quiq::Hash->new({map {$_ => $i++} @$columnA}),
-        propertyH => undef,
+        columnA => [],
+        columnH => {},
+        propertyA => undef,
         rowA => [],
+        width => 0,
     );
+
+    # Kolumnen
+
+    if (ref $arg) {
+        # \@columns
+
+        my $i = 0;
+        $self->set(
+            width => scalar @$arg,
+            columnA => $arg,
+            columnH => Quiq::Hash->new({map {$_ => $i++} @$arg}),
+        );
+    }
+    else {
+        # $width
+        $self->set(width=>$arg);
+    }
+
+    # Zeilen
 
     for my $row (@$rowA) {
         $self->push($row);
@@ -178,6 +208,11 @@ sub columns {
     my $self = shift;
 
     my $columnA = $self->{'columnA'};
+    if (!@$columnA) {
+        $self->throw(
+            'TABLE-00099: No column names defined',
+        );
+    }
     return wantarray? @$columnA: $columnA;
 }
 
@@ -208,11 +243,12 @@ sub count {
 
 # -----------------------------------------------------------------------------
 
-=head3 index() - Index einer Kolumne
+=head3 pos() - Position einer Kolumne
 
 =head4 Synopsis
 
-    $i = $tab->index($column);
+    $pos = $tab->pos($column);
+    $pos = $tab->pos($pos);
 
 =head4 Arguments
 
@@ -222,6 +258,10 @@ sub count {
 
 Kolumnenname (String).
 
+=item $pos
+
+Kolumnenposition (Integer).
+
 =back
 
 =head4 Returns
@@ -230,16 +270,29 @@ Integer
 
 =head4 Description
 
-Liefere den Index der Kolumne $column. Der Index einer Kolumne ist ihre
-Position innerhalb des Kolumnen-Arrays.
+Liefere die Position der Kolumne $column in den Zeilen-Arrays.
+Die Position ist 0-basiert. Ist das Argument eine Zahl (Position),
+liefere diese unverändert zurück.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub index {
-    my ($self,$column) = @_;
-    return $self->{'columnH'}->{$column};
+sub pos {
+    my ($self,$arg) = @_;
+
+    if ($arg =~ /^[0-9]+$/) {
+        return $arg;
+    }
+
+    my $columnH = $self->{'columnH'};
+    if (!%$columnH) {
+        $self->throw(
+            'TABLE-00099: No column names defined',
+        );
+    }
+
+    return $columnH->{$arg};
 }
 
 # -----------------------------------------------------------------------------
@@ -248,6 +301,7 @@ sub index {
 
 =head4 Synopsis
 
+    $prp = $tab->properties($pos);
     $prp = $tab->properties($column);
 
 =head4 Arguments
@@ -277,15 +331,16 @@ Tabelle mit push() erweitert, wird der Cache automatisch gelöscht.
 # -----------------------------------------------------------------------------
 
 sub properties {
-    my ($self,$column) = @_;
+    my ($self,$arg) = @_;
 
-    my $prp = $self->{'propertyH'}->{$column};
+    my $pos = $self->pos($arg);
+    my $prp = $self->{'propertyA'}->[$pos];
     if (!$prp) {
         $prp = Quiq::Properties->new;
-        for my $val ($self->values($column,-distinct=>1)) {
+        for my $val ($self->values($pos,-distinct=>1)) {
             $prp->analyze($val);
         }
-        $self->{'propertyH'}->{$column} = $prp;
+        $self->{'propertyA'}->[$pos] = $prp;
     }
 
     return $prp;
@@ -326,7 +381,7 @@ sub push {
 
     my $row = Quiq::TableRow->new($self,$valueA);
     $self->SUPER::push('rowA',$row);
-    $self->{'propertyH'} &&= undef; # Kolumneneigenschaften löschen
+    $self->{'propertyA'} = undef; # Kolumneneigenschaften löschen
 
     return;
 }
@@ -365,6 +420,7 @@ sub rows {
 
 =head4 Synopsis
 
+    @values | $valueA = $tab->values($pos,@opt);
     @values | $valueA = $tab->values($column,@opt);
 
 =head4 Arguments
@@ -402,24 +458,23 @@ auch Option C<-distinct>.
 # -----------------------------------------------------------------------------
 
 sub values {
-    my $self = shift;
-    my $column = shift;
+    my ($self,$arg) = splice @_,0,2;
     # @_: @opt
 
     # Optionen
 
     my $distinct = 0;
 
-    Quiq::Parameters->extractToVariables(\@_,0,0,
+    $self->parameters(\@_,
         -distinct => \$distinct,
     );
 
-    # Erstelle Werteliste
+    # Operation ausführen
 
     my (@arr,%seen);
-    my $i = $self->index($column);
+    my $pos = $self->pos($arg);
     for my $row (@{$self->{'rowA'}}) {
-        my $val = $row->[1][$i];
+        my $val = $row->[1][$pos];
         if ($distinct && $seen{$val//''}++) {
             next;
         }
@@ -450,8 +505,7 @@ Liefere die Anzahl der Kolumnen der Tabelle.
 # -----------------------------------------------------------------------------
 
 sub width {
-    my $self = shift;
-    return scalar @{$self->{'columnA'}};
+    return shift->{'width'};
 }
 
 # -----------------------------------------------------------------------------
@@ -474,7 +528,7 @@ Callback-Funktion, die für jede Zelle gerufen wird und eine Termnal-Farbe
 für die jeweilige Zelle liefert. Die Funktion hat die Struktur:
 
     sub {
-        my ($tab,$row,$column,$val) = @_;
+        my ($tab,$row,$pos,$val) = @_;
         ...
         return $color;
     }
@@ -499,15 +553,12 @@ sub asText {
 
     my $colorizeS = undef;
 
-    Quiq::Parameters->extractToVariables(\@_,0,0,
+    $self->parameters(\@_,
         -colorize => \$colorizeS,
     );
 
-    # Kolumnennamen
-    my $columnA = $self->columns;
-
     # Kolumneneigenschaften
-    my @properties = map {$self->properties($_)} $self->columns;
+    my @properties = map {$self->properties($_)} 0 .. $self->width-1;
 
     # Terminal-Farben
     my $a = Quiq::AnsiColor->new;
@@ -521,7 +572,7 @@ sub asText {
         for (my $i = 0; $i < @$valueA; $i++) {
             my $val = sprintf $properties[$i]->format('text',$valueA->[$i]);
             if ($colorizeS) {
-                if (my $color = $colorizeS->($self,$row,$columnA->[$i],$val)) {
+                if (my $color = $colorizeS->($self,$row,$i,$val)) {
                     $val = $a->str($color,$val);
                 }
             }
@@ -537,7 +588,7 @@ sub asText {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

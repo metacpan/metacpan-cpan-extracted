@@ -1,7 +1,7 @@
 package Calendar::Dates;
 
-our $DATE = '2019-05-25'; # DATE
-our $VERSION = '0.2.0'; # VERSION
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '0.2.1'; # VERSION
 
 1;
 # ABSTRACT: Modules that contain calendar dates
@@ -22,7 +22,7 @@ Calendar::Dates - Modules that contain calendar dates
 
 =head1 VERSION
 
-This document describes version 0.2.0 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-05-25.
+This document describes version 0.2.1 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-06-19.
 
 =head1 DESCRIPTION
 
@@ -77,6 +77,10 @@ Examples:
 
 =back
 
+=head1 STATUS
+
+Draft series (0.x), expect to be stable in 1.0.
+
 =head1 METHODS
 
 =head2 get_min_year
@@ -108,6 +112,19 @@ Usage:
 Return entries for a particular year (or month, or day). Method must die if year
 (or month, or day) is not supported.
 
+B<Parameters.> The optional C<%params> can be specified for more complex
+querying/filtering. Each calendar might support different parameters. Currently
+known common/standardized parameters:
+
+=over
+
+=item * all
+
+Boolean. If set to true, will include all entries that are normally not
+included, e.g. low-priority entries (entries with tag C<low-priority>).
+
+=back
+
 B<Result.> Result is arrayref of entries, where each entry is a L<DefHash>. The
 following keys are recognized, an asterisk (C<*>) signifies required key (see
 L<DefHash> for more details on each key):
@@ -116,8 +133,8 @@ L<DefHash> for more details on each key):
 
 =item * date*
 
-String. Either ISO8601 date in the format C<< YYYY-MM-DD >> or C<<
-YYYY-MM-DD"T"HH:MM >> or date interval in the format of C<<
+String. Either ISO8601 date in the form of C<< YYYY-MM-DD >> or C<<
+YYYY-MM-DD"T"HH:MM >>, or date interval in the form of C<<
 YYYY-MM-DD"T"HH:MM/HH:MM >>.
 
 Examples:
@@ -157,8 +174,11 @@ English version is recommended. To specify description in other language, use
 
 =item * tags
 
-From DefHash specification. Some recommended/known tags: tentative, holiday,
-religious.
+From DefHash specification. Some recommended/known tags: B<tentative>,
+B<holiday>, B<religious>, B<low-priority> (entry with this tag by default should
+not be returned by L</get_entries> unless it specifies a true C<all> option),
+B<anniversary> (entry with this tag will repeat yearly and will be included in
+every (later) year).
 
 =item * url
 
@@ -189,7 +209,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Calendar-D
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/repos/perl-Calendar-Dates>.
+Source repository is at L<https://github.com/perlancar/perl-Calendar-Dates>.
 
 =head1 BUGS
 

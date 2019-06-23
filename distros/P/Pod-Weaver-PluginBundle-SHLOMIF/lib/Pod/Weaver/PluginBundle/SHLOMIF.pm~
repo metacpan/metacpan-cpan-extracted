@@ -66,11 +66,11 @@ sub mvp_bundle_config {
             _exp('Support'),
             {
                 all_modules => 1,
-                perldoc            => 0,
+                perldoc     => 0,
             }
         ],
         [ '@SHLOMIF/Authors',      _exp('Authors'),      {} ],
-        [ '@SHLOMIF/Bugs',         _exp('Bugs'),      {} ],
+        [ '@SHLOMIF/Bugs',         _exp('Bugs'),         {} ],
         [ '@SHLOMIF/Contributors', _exp('Contributors'), {} ],
         [ '@SHLOMIF/Legal',        _exp('Legal'),        {} ],
         [ '@SHLOMIF/List', _exp('-Transformer'), { 'transformer' => 'List' } ],

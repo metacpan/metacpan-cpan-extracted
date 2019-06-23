@@ -5,18 +5,13 @@ use warnings;
 
 use lib 'lib';
 
-use Test::Simple tests => 2;
-use App::WRT::Util qw(get_date);
+use Test::More tests => 2;
 
-my $year = get_date('year') + 1900;
+require_ok('App::WRT::Util');
 
 ok(
-  ($year =~ /^[0-9]+$/) && ($year > 1900),
-  'sure looks like a year'
+  App::WRT::Util::file_get_contents('example/files/include_me') =~ 'content',
+  'got contents of include_me'
 );
-
-my (@values) = get_date('wday', 'yday', 'mon');
-my $length = @values;
-ok($length == 3, 'got multiple values');
 
 1;

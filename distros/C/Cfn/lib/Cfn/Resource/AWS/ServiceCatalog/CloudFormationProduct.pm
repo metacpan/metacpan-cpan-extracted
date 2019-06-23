@@ -1,4 +1,4 @@
-# AWS::ServiceCatalog::CloudFormationProduct generated from spec 2.25.0
+# AWS::ServiceCatalog::CloudFormationProduct generated from spec 3.2.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ServiceCatalog::CloudFormationProduct',
@@ -61,6 +61,7 @@ package Cfn::Resource::Properties::AWS::ServiceCatalog::CloudFormationProduct::P
   extends 'Cfn::Value::TypedValue';
   
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DisableTemplateValidation => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Info => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

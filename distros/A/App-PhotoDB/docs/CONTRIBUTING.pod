@@ -51,8 +51,7 @@ Then PhotoDB can upgrade its own database schema to match the application versio
 running `photodb db upgrade`. This system of migrations means it is easy for users
 to keep their schema up to date.
 
-Then use the included Perl script C<dump-schema.pl> to export the dump files in the
-right format. You'll need the following CPAN modules on your system:
+The CI pipeline in Travis will automatically export the dump files and generate the schema documentation.
 
 =over
 

@@ -4,7 +4,7 @@ Data::RuledCluster - clustering data resolver
 
 # VERSION
 
-This document describes Data::RuledCluster version 0.06.
+This document describes Data::RuledCluster version 0.07.
 
 # SYNOPSIS
 

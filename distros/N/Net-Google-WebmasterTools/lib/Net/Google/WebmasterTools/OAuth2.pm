@@ -1,6 +1,6 @@
 package Net::Google::WebmasterTools::OAuth2;
 {
-  $Net::Google::WebmasterTools::OAuth2::VERSION = '0.01';
+  $Net::Google::WebmasterTools::OAuth2::VERSION = '0.03';
 }
 use strict;
 
@@ -108,7 +108,7 @@ Net::Google::WebmasterTools::OAuth2 - OAuth2 for Google Webmaster Tools API
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ Net::Google::WebmasterTools::OAuth2 - OAuth2 for Google WebmasterTools API
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 CONSTRUCTOR
 

@@ -1,6 +1,211 @@
-2019-02-18  SVN: new release
+2019-06-21  SVN: new release
 
-	* Release: 0.9.20
+	* Release: 0.9.30
+
+2019-06-21 09:28  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/debian/COMP-nagios.install,
+	  templates/debian/COMP-nagios.manpages: list of default files for
+	  nagios sub-package
+
+2019-06-21 09:28  squinney@INF.ED.AC.UK
+
+	* templates/debian/control: don't depend on perl if not a perl
+	  component
+
+2019-06-21 09:27  squinney@INF.ED.AC.UK
+
+	* templates/debian/COMP.manpages: Only include manpages from
+	  section 8 by default
+
+2019-06-21 09:27  squinney@INF.ED.AC.UK
+
+	* templates/debian/COMP.install: only include perl modules for
+	  components by default
+
+2019-06-21 09:27  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Need Try::Tiny
+
+2019-06-21 08:50  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/GenDeb.pm.in: fixed logic for
+	  nagios module check
+
+2019-06-21 08:48  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in,
+	  templates/debian/COMP-nagios.install, templates/debian/control:
+	  Added support for nagios sub-package for components
+
+2019-06-20 09:54  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.29
+
+2019-06-20 09:54  squinney@INF.ED.AC.UK
+
+	* debian/docs, debian/rules, lcfg.yml: Fixed installation of
+	  changelog
+
+2019-06-20 09:52  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.28
+
+2019-06-19 19:17  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Handle changelog with
+	  dh_installchangelogs rather than dh_install
+
+2019-06-19 19:17  squinney@INF.ED.AC.UK
+
+	* templates/debian/rules: Ensure upstream changelog is always
+	  installed correctly
+
+2019-04-17 08:29  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.27
+
+2019-04-16 09:06  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Removed debug message I didn't intend to
+	  include
+
+2019-04-16 09:04  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Handle case of distribution release
+	  version not having a minor part (e.g. Centos), closes:
+	  https://bugs.lcfg.org/show_bug.cgi?id=1129
+
+2019-03-22 16:03  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.26
+
+2019-03-22 16:03  squinney@INF.ED.AC.UK
+
+	* debian/control, lcfg.yml: Need to build-depend on
+	  libmodule-build-perl
+
+2019-03-21 17:16  squinney@INF.ED.AC.UK
+
+	* debian/control: Added missing dependency on
+	  libmoosex-app-cmd-perl
+
+2019-03-14 15:58  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.25
+
+2019-03-14 15:16  squinney@INF.ED.AC.UK
+
+	* templates/debian/COMP.lintian-overrides: Added lintian override
+	  to explain that the systemd service for a component is typically
+	  associated with lcfg-multi-user.target
+
+2019-03-14 15:15  squinney@INF.ED.AC.UK
+
+	* templates/debian/COMP.service: Added StandardOutput setting to
+	  send output to console, very useful for boot time to see progress
+
+2019-03-14 10:10  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.24
+
+2019-03-14 10:09  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Improved comment about COMP
+	  template handling
+
+2019-03-14 10:05  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/GenDeb.pm.in,
+	  templates/debian/COMP-doc.install,
+	  templates/debian/DEB_NAME-doc.install, templates/debian/control:
+	  Create doc sub-package by default for all projects, not just
+	  components
+
+2019-03-14 10:04  squinney@INF.ED.AC.UK
+
+	* templates/debian/COMP.install: Added support for perl-based
+	  components which ship with modules
+
+2019-03-14 10:03  squinney@INF.ED.AC.UK
+
+	* mapping_config.yml: Map macros for the deb_* methods
+
+2019-03-13 11:07  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Added test to see if the
+	  component looks like it has a perl library
+
+2019-03-13 11:00  squinney@INF.ED.AC.UK
+
+	* templates/debian/rules: Improved comments on optional sections
+
+2019-03-13 11:00  squinney@INF.ED.AC.UK
+
+	* templates/debian/control: Improved generated descriptions to make
+	  lintian happier
+
+2019-03-13 07:45  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/GenDeb.pm.in,
+	  templates/debian/COMP-defaults.install,
+	  templates/debian/COMP-doc.install, templates/debian/COMP.install,
+	  templates/debian/COMP.manpages, templates/debian/COMP.postinst,
+	  templates/debian/COMP.postrm, templates/debian/COMP.prerm,
+	  templates/debian/COMP.service, templates/debian/control,
+	  templates/debian/postinst, templates/debian/postrm,
+	  templates/debian/prerm, templates/debian/service: Reworked the
+	  way the debian package templates work for components. Now results
+	  in 3 packages - main, docs and defaults
+
+2019-03-06 14:15  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.23
+
+2019-03-06 14:15  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: marked component script as optional as
+	  'virtual' components do not have any code, just a schema
+
+2019-02-28 18:46  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.22
+
+2019-02-28 18:45  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Properly fixed pod_strip so that the
+	  code is only run when the podselect tool is available
+
+2019-02-28 16:50  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.21
+
+2019-02-28 16:50  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Altered the behaviour of pod_strip so
+	  that it removes empty output files generated with podselect when
+	  the input file does not contain any POD. Also modified
+	  lcfg_add_perl_module to not attempt to install pod/man files if
+	  pod_strip did not create a file
+
+2019-02-28 10:04  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/CheckMacros.pm.in: Included LCFG_PERL_VERSION
+	  in list of standard macros
+
+2019-02-18 09:35  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.20
 
 2019-02-18 09:34  squinney@INF.ED.AC.UK
 

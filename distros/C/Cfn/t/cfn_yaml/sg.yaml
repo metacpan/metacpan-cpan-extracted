@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Conditions:
+  Cond1: !Or [!Equals [sg-mysggroup, !Ref ASecurityGroup], !Condition SomeOtherCondition]
+Resources:
+  ClientSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Ref 'AWS::StackName'
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}

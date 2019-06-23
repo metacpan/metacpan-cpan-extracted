@@ -1,3 +1,9 @@
+0.581   2019-06-20 (PERLANCAR)
+
+	- Update lcpan command (--no-include-core becomes --exclude-core
+	  due to Getopt::Long::Negate::EN).
+
+
 0.580   2018-09-10 (PERLANCAR)
 
         - No functional changes.

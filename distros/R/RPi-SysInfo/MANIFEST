@@ -1,0 +1,21 @@
+Changes
+lib/RPi/SysInfo.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+SysInfo.xs
+t/00-load.t
+t/05-cpu_percent.t
+t/10-mem_percent.t
+t/15-core_temp.t
+t/20-gpio_info.t
+t/25-raspi_config.t
+t/30-network_info.t
+t/35-file_system.t
+t/40-pi_details.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

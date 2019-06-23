@@ -10,6 +10,7 @@ use File::Spec;
 use Pherkin::Extension::Weasel;
 use Test::BDD::Cucumber::Executor;
 use Test::BDD::Cucumber::Harness;
+use Test::BDD::Cucumber::Model::Document;
 use Test::BDD::Cucumber::Model::Feature;
 use Test::BDD::Cucumber::Model::Line;
 use Test::BDD::Cucumber::Model::Scenario;
@@ -97,6 +98,9 @@ ok($ext->_log->{template}, q{logger template processor correctly created});
 
 my $f = Test::BDD::Cucumber::Model::Feature->new(
     name => 'feature1',
+    document => Test::BDD::Cucumber::Model::Document->new(
+        filename => 'feature1',
+        ),
     satisfaction => [
         Test::BDD::Cucumber::Model::Line->new(
             raw_content => 'satisfaction1'),
@@ -140,7 +144,7 @@ $ext->pre_scenario($s, $feature_stash, $scenario_stash);
 $content = _flush_and_read_log();
 
 
-like($content, qr!<img src="scenario-pre-\d+\.png"!,
+like($content, qr!<img src="[a-z0-9]+-scenario-pre-\d+\.png"!,
      q{Pre-scenario screenshot correctly added});
 
 
@@ -169,7 +173,7 @@ $ext->pre_step($f, $context);
 $content = _flush_and_read_log();
 
 
-like($content, qr!<img src="step-pre-\d+\.png"!,
+like($content, qr!<img src="[a-z0-9]+-step-pre-\d+\.png"!,
      q{Pre-step screenshot correctly added});
 like($content, qr!<td>Given step 1</td>!,
      q{Step 1 correctly included in log output});

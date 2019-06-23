@@ -12,7 +12,7 @@ use Geo::WebService::Elevation::USGS;
 use Pod::Usage;
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 BEGIN {
     eval {

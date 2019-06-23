@@ -24,5 +24,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/jwbargsten/perl-proc-processtable
-version: '0.58'
+version: '0.59'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

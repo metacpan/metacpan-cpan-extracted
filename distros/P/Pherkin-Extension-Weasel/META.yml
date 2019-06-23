@@ -21,12 +21,12 @@ requires:
   Module::Runtime: '0'
   Moose: '0'
   Template: '0'
-  Test::BDD::Cucumber: '0.50'
+  Test::BDD::Cucumber: '0.57'
   Weasel: '0'
   Weasel::Session: '0.08'
-  perl: '5.008'
+  perl: v5.10.1
 resources:
   bugtracker: https://github.com/ehuelsmann/pherkin-extension-weasel/issues
   repository: https://github.com/ehuelsmann/pherkin-extension-weasel.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'YAML::Tiny version 1.70'

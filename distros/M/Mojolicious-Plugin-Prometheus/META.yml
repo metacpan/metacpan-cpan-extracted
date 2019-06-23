@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojolicious::Plugin::Prometheus:
     file: lib/Mojolicious/Plugin/Prometheus.pm
-    version: v1.2.1
+    version: v1.2.2
 requires:
   IPC::ShareLite: '0'
   Mojolicious: '0'
@@ -38,10 +38,13 @@ resources:
   bugtracker: https://github.com/tyldum/mojolicious-plugin-prometheus/issues
   homepage: https://github.com/tyldum/mojolicious-plugin-prometheus
   repository: git://github.com/tyldum/mojolicious-plugin-prometheus.git
-version: 1.2.1
+version: 1.2.2
 x_authority: cpan:TYLDUM
 x_contributors:
   - 'Christopher Rasch-Olsen Raa <christopher@stix.no>'
+  - 'Marcus Ramberg <marcus.ramberg@gmail.com>'
   - 'Roland Lammel <rl@neotel.at>'
   - 'Vidar Tyldum <vidar@tyldum.com>'
   - 'lammel <lammel@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

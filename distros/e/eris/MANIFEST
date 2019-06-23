@@ -3,6 +3,7 @@ Changes
 LICENSE
 MANIFEST
 META.json
+META.yml
 Makefile.PL
 README.mkdn
 bin/eris-context.pl
@@ -10,6 +11,7 @@ bin/eris-eris-client.pl
 bin/eris-es-indexer.pl
 bin/eris-field-lookup.pl
 bin/eris-stdin-listener.pl
+cpanfile
 dist.ini
 example.log
 lib/eris.pm

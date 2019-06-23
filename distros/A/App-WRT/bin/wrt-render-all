@@ -43,35 +43,51 @@ no  warnings 'uninitialized';
 use Getopt::Long;
 use Pod::Usage;
 use App::WRT;
+use App::WRT::FileIO;
 use App::WRT::Renderer;
 
-use App::WRT::Util qw(file_put_contents);
-
-# Handle options, including help generated from the POD above.  See:
-# - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
-# - https://metacpan.org/pod/Pod::Usage
-# - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
-my $config_file = 'wrt.json';
-GetOptions(
-  'config=s' => \$config_file,
-  help       => sub { pod2usage(0) },
-) or pod2usage(2);
-
-unless (-e $config_file) {
-  die "No wrt config file found.  Tried: $config_file";
+# If invoked directly from the command-line, caller() will return undef.
+# Execute main() with a callback to print output directly, a FileIO object,
+# and a copy of our real @ARGV:
+if (not caller()) {
+  my $output = sub { say @_; };
+  my $io = App::WRT::FileIO->new();
+  main($output, $io, @ARGV);
+  exit(0);
 }
 
-my $wrt = App::WRT::new_from_file($config_file);
+# main() takes an output callback, a FileIO object or equivalent, and an @ARGV
+# to pass in to GetOptionsFromArray().  This allows relatively simple
+# integration tests to be written.  See also: t/bin-wrt-render-all.t
+sub main {
+  my ($output, $io, @local_argv) = @_;
 
-# This expects a callback to handle logging output and a callback to handle
-# file writing:
+  # Handle options, including help generated from the POD above.  See:
+  # - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
+  # - https://metacpan.org/pod/Pod::Usage
+  # - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
+  my $config_file = 'wrt.json';
+  GetOptions(
+    'config=s' => \$config_file,
+    help       => sub { pod2usage(0) },
+  ) or pod2usage(2);
 
-my $renderer = App::WRT::Renderer->new(
-  $wrt,
-  sub { say $_[0]; },
-  sub { file_put_contents($_[0], $_[1]); },
-);
+  unless (-e $config_file) {
+    die "No wrt config file found.  Tried: $config_file";
+  }
 
-$renderer->render();
+  my $wrt = App::WRT::new_from_file($config_file);
 
-exit(0);
+  # This expects a callback to handle logging output and a callback to handle
+  # file writing:
+
+  my $renderer = App::WRT::Renderer->new(
+    $wrt,
+    $output,
+    $io
+  );
+
+  $renderer->render();
+}
+
+1;

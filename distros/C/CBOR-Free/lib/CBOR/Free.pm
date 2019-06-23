@@ -3,8 +3,6 @@ package CBOR::Free;
 use strict;
 use warnings;
 
-use Types::Serialiser;
-
 use CBOR::Free::X;
 use CBOR::Free::Tagged;
 
@@ -13,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.10';
+    $VERSION = '0.11';
     XSLoader::load();
 }
 
@@ -50,7 +48,7 @@ please always check the changelog before upgrading.
 =head2 $cbor = encode( $DATA, %OPTS )
 
 Encodes a data structure or non-reference scalar to CBOR.
-The encoder recognizes and encodes integers, floats, binary and UTF-8
+The encoder recognizes and encodes integers, floats, byte and character
 strings, array and hash references, L<CBOR::Free::Tagged> instances,
 L<Types::Serialiser> booleans, and undef (encoded as null).
 
@@ -70,7 +68,7 @@ Notes on mapping Perl to CBOR:
 =over
 
 =item * The internal state of a defined Perl scalar (e.g., whether it’s an
-integer, float, binary string, or UTF-8 string) determines its CBOR
+integer, float, byte string, or character string) determines its CBOR
 encoding.
 
 =item * L<Types::Serialiser> booleans are encoded as CBOR booleans.
@@ -93,10 +91,10 @@ Notes on mapping CBOR to Perl:
 
 =over
 
-=item * CBOR UTF-8 strings become Perl UTF-8 strings. CBOR binary strings
-become Perl binary strings. (This may become configurable later.)
+=item * CBOR text strings become Perl character strings. CBOR binary strings
+become Perl byte strings. (This may become configurable later.)
 
-Note that invalid UTF-8 in a CBOR UTF-8 string is considered
+Note that invalid UTF-8 in a CBOR text string is considered
 invalid input and will thus prompt a thrown exception.
 
 =item * The only map keys that C<decode()> accepts are integers and strings.
@@ -117,9 +115,9 @@ C<encode()> receives.)
 
 =head1 BOOLEANS
 
-C<CBOR::Free::true()>, C<CBOR::Free::false()>,
-C<$CBOR::Free::true>, and C<$CBOR::Free::false> are defined as
-convenience aliases for the equivalent L<Types::Serialiser> values.
+C<CBOR::Free::true()> and C<CBOR::Free::false()> are defined as
+convenience aliases for the equivalent L<Types::Serialiser> functions.
+(Note that there are no equivalent scalar aliases.)
 
 =head1 FRACTIONAL (FLOATING-POINT) NUMBERS
 
@@ -162,6 +160,11 @@ CBOR::Free is pretty snappy. I find that it keeps pace with or
 surpasses L<CBOR::XS>, L<Cpanel::JSON::XS>, L<JSON::XS>, L<Sereal>,
 and L<Data::MessagePack>.
 
+It’s also quite light. Its only “heavy” dependency is
+L<Types::Serialiser>, which is only loaded when you actually need it.
+This keeps memory usage low for when, e.g., you’re using CBOR for
+IPC between Perl processes and have no need for true booleans.
+
 =head1 AUTHOR
 
 L<Gasper Software Consulting|http://gaspersoftware.com> (FELIPE)
@@ -171,6 +174,8 @@ L<Gasper Software Consulting|http://gaspersoftware.com> (FELIPE)
 This code is licensed under the same license as Perl itself.
 
 =head1 SEE ALSO
+
+L<CBOR::PP> is a pure-Perl CBOR library.
 
 L<CBOR::XS> is an older CBOR module on CPAN. It’s got more bells and
 whistles, so check it out if CBOR::Free lacks a feature you’d like.
@@ -184,9 +189,17 @@ applications.
 
 #----------------------------------------------------------------------
 
-our ($true, $false);
-*true = *Types::Serialiser::true;
-*false = *Types::Serialiser::false;
+sub true {
+    require Types::Serialiser;
+    *true = *Types::Serialiser::true;
+    goto &true;
+}
+
+sub false {
+    require Types::Serialiser;
+    *false = *Types::Serialiser::false;
+    goto &false;
+}
 
 sub tag {
     return CBOR::Free::Tagged->new(@_);

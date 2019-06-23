@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -45,8 +45,8 @@ L<Quiq::Object>
 
 =item $varMode (0 oder 1)
 
-Der erste Parameter entscheidet, ob die Optionswerte an ein
-Optionsobjekt (0) oder an Variablen (1) zugewiesen werden.
+Legt fest, ob die Optionswerte an ein Optionsobjekt (0) oder an
+Variablen (1) zugewiesen werden.
 
 =item $properties (0 oder 1)
 
@@ -157,18 +157,21 @@ sub extract {
 
     my @args;
 
+    # Wir können sofort mit einer leeren Argumentliste zurückkehren,
+    # wenn die Parameterliste leer ist und wir im VarMode sind.
+
+    if (!@$paramA && $varMode) {
+        return \@args;
+    }
+
     # Hash mit allen angegebenen Optionen aufbauen. Wert ist entweder
     # eine Variablen-Referenz (VarMode) oder der Defaultwert der Option.
-    # Wir können uns die Initialisierung des Options-Hash ersparen,
-    # wenn wir im VarMode sind und die Parameterliste leer ist.
 
     my %opt;
-    if (!$varMode || @$paramA) {
-        while (@_) {
-            my $key = shift;
-            $key =~ s/^-+//; # führende Bindestriche entfernen
-            $opt{$key} = shift;
-        }
+    while (@_) {
+        my $key = shift;
+        $key =~ s/^-+//; # führende Bindestriche entfernen
+        $opt{$key} = shift;
     }
 
     # Parameterliste verarbeiten
@@ -594,7 +597,7 @@ sub extractToObject {
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::Rule 0.925;
+package Text::Parser::Rule 0.926;
 
 # ABSTRACT: Makes it possible to write AWK-style parsing rules for Text::Parser
 
@@ -9,12 +9,6 @@ use Moose;
 use Text::Parser::Errors;
 use Scalar::Util 'blessed', 'looks_like_number';
 use String::Util ':all';
-use String::Util::Match 'match_array_or_regex';
-use String::Util::Range 'convert_sequence_to_range';
-use String::Index qw(cindex ncindex crindex ncrindex);
-use List::Util qw(max maxstr min minstr product sum0
-    uniq pairs unpairs pairkeys
-    pairvalues pairfirst pairgrep pairmap);
 
 
 has condition => (
@@ -81,11 +75,16 @@ sub _replace_range_shortcut {
 }
 
 sub _replace_exawk_vars {
-    my (@varnames) = uniq( $_ =~ /[~]([a-z_][a-z0-9_]+)/ig );
+    my (@varnames) = _uniq( $_ =~ /[~]([a-z_][a-z0-9_]+)/ig );
     foreach my $var (@varnames) {
         my $v = '~' . $var;
         s/$v/\$__->{$var}/g;
     }
+}
+
+sub _uniq {
+    my (%elem) = map { $_ => 1 } @_;
+    return ( keys %elem );
 }
 
 has _cond_sub_str => (
@@ -326,7 +325,7 @@ Text::Parser::Rule - Makes it possible to write AWK-style parsing rules for Text
 
 =head1 VERSION
 
-version 0.925
+version 0.926
 
 =head1 SYNOPSIS
 

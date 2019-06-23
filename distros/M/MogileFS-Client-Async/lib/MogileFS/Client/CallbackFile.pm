@@ -24,7 +24,7 @@ MogileFS::Client::CallbackFile
 
 =head1 SYNOPSIS
 
-    my $mogfs = MogileFS::Client::Callback->new( ... )
+    my $mogfs = MogileFS::Client::CallbackFile->new( ... )
 
     open(my $read_fh, "<", "...") or die ...
     my $eventual_length = -s $read_fh;

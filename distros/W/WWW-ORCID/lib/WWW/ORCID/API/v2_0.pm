@@ -3,7 +3,7 @@ package WWW::ORCID::API::v2_0;
 use strict;
 use warnings;
 
-our $VERSION = 0.0401;
+our $VERSION = 0.0402;
 
 use Moo;
 use namespace::clean;
@@ -195,6 +195,7 @@ Get details about the current client.
 =head2 C<search>
 
     my $hits = $client->search(q => "johnson");
+
 =head2 C<activities>
 
     my $rec = $client->activities(token => $token, orcid => $orcid);

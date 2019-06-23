@@ -23,6 +23,8 @@ lives_ok {
         'Lines parsed is 9'
     );
     is_deeply( [ $parser->get_records ], [ 0 .. 8 ], 'All the records' );
+    $parser->clear_rules;
+    ok( not( $parser->_has_end_rule ), 'Does not have end rule anymore' );
 }
 'No compilation errors';
 

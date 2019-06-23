@@ -83,7 +83,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.87",
+   "version" : "0.88",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -99,8 +99,8 @@
       "Petr Pisar (ppisar)",
       "Mohammad S Anwar (MANWAR)"
    ],
-   "x_generated_by_perl" : "v5.29.9",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0
 }
 

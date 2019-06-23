@@ -6,6 +6,7 @@ use warnings;
 use Open::This qw( to_editor_args );
 use Test::Differences qw( eq_or_diff );
 use Test::More;
+use Test::Warnings;
 
 local $ENV{EDITOR} = 'kate';
 

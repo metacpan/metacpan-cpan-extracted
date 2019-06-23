@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Devel::Optic",
   "PREREQ_PM" => {
-    "Devel::Size" => "0.82",
     "PadWalker" => "2.3",
     "Ref::Util" => "0.204",
     "Scalar::Util" => 0,
@@ -26,7 +25,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000100"
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t t/lens-perlish/*.t"
   }
@@ -34,7 +33,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Devel::Size" => "0.82",
   "PadWalker" => "2.3",
   "Ref::Util" => "0.204",
   "Scalar::Util" => 0,

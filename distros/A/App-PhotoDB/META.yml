@@ -3,10 +3,12 @@ abstract: 'App to manage a collection of film cameras & lenses'
 author:
   - 'Jonathan Gazeley <me@jonathangazeley.com>'
 build_requires:
+  DB::SQL::Migrations: '0'
   Pod::Select: '0'
   Test::Compile: '0'
   Test::Expect: '0'
   Test::More: '0.47'
+  Test::Output: '0'
   Test::Perl::Critic: '0'
 configure_requires:
   Module::Build: '0'
@@ -21,7 +23,7 @@ name: App-PhotoDB
 provides:
   App::PhotoDB:
     file: lib/App/PhotoDB.pm
-    version: '0.06'
+    version: '0.07'
   App::PhotoDB::commands:
     file: lib/App/PhotoDB/commands.pm
   App::PhotoDB::funcs:
@@ -52,5 +54,5 @@ requires:
   warnings: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

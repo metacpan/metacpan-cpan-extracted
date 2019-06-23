@@ -18,7 +18,7 @@ use Chart::Plotly::Trace::Bar::Textfont;
 use Chart::Plotly::Trace::Bar::Transform;
 use Chart::Plotly::Trace::Bar::Unselected;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 # ABSTRACT: The data visualized by the span of the bars is set in `y` if `orientation` is set th *v* (the default) and the labels are set in `x`. By setting `orientation` to *h*, the roles are interchanged.
 
@@ -426,7 +426,7 @@ Chart::Plotly::Trace::Bar - The data visualized by the span of the bars is set i
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

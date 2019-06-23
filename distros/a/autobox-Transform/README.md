@@ -30,6 +30,9 @@ particular when the values are hashrefs or objects.
     $book_genres->filter("scifi");
     $book_genres->filter({ fantasy => 1, scifi => 1 }); # hash key exists
 
+    # reject: the inverse of filter
+    $book_genres->reject("fantasy");
+
     # order (like a more succinct sort)
     $book_genres->order;
     $book_genres->order("desc");
@@ -80,6 +83,9 @@ particular when the values are hashrefs or objects.
 
     # grep_by is an alias for filter_by
     $books->grep_by("is_sold_out");
+
+    # reject_by: the inverse of filter_by
+    $books->reject_by("is_sold_out");
 
     $books->uniq_by("id");
 
@@ -157,6 +163,11 @@ particular when the values are hashrefs or objects.
     # Genres with more than five books
     $genre_count->filter_each(sub { $_ > 5 });
 
+    # filter out each pair
+    # Genres with no more than five books
+    $genre_count->reject_each(sub { $_ > 5 });
+
+
     # Return reference, even in list context, e.g. in a parameter list
     %genre_count->to_ref;
 
@@ -177,14 +188,15 @@ particular when the values are hashrefs or objects.
         ->map_by("name")->uniq->join(", ");
 
     my $total_order_amount = $order->books
+        ->reject_by("is_sold_out")
         ->filter_by([ covered_by_vouchers => $vouchers ], sub { ! $_ })
         ->map_by([ price_with_tax => $tax_pct ])
         ->sum;
 
 # DESCRIPTION
 
-High level autobox methods you can call on arrays, arrayrefs, hashes
-and hashrefs.
+`autobox::Transform` provides high level autobox methods you can call
+on arrays, arrayrefs, hashes and hashrefs.
 
 ## Transforming lists of objects vs list of hashrefs
 
@@ -248,8 +260,12 @@ whatever you use to avoid upgrading modules to incompatible versions.
 
 There are several methods that filter items,
 e.g. `@array->filter` (duh), `@array->filter_by`, and
-`%hash->filter_each`. These methods take a $predicate argument to
-determine which items to retain or filter out.
+`%hash->filter_each`. These methods take a `$predicate` argument
+to determine which items to retain or filter out.
+
+The `reject` family of methods do the opposite, and _filter out_
+items that match the predicate, i.e. the opposite of the filter
+methods.
 
 If $predicate is an _unblessed scalar_, it is compared to each value
 with `string eq`.
@@ -258,7 +274,7 @@ with `string eq`.
 
 If $predicate is a _regex_, it is compared to each value with `=~`.
 
-    $books->filter_by("author", qr/Corey/);
+    $books->reject_by("author", qr/Corey/);
 
 If $predicate is a _hashref_, values in @array are retained if the
 $predicate hash key `exists` (the hash values are irrelevant).
@@ -274,8 +290,8 @@ $predicate hash key `exists` (the hash values are irrelevant).
 If $predicate is a _subref_, the subref is called for each value to
 check whether this item should remain in the list.
 
-The $predicate subref should return a true value to remain. $\_ is set
-to the current $value.
+The $predicate subref should return a true value to remain. `$_` is
+set to the current $value.
 
     $authors->filter_by(publisher => sub { $_->name =~ /Orbit/ });
 
@@ -286,7 +302,8 @@ autobox::Transform's `order`/`order_by`.
 
 ### Sorting with sort
 
-- provide a sub that returns the comparison outcome of two values: $a and $b
+- provide a sub that returns the comparison outcome of two values: `$a`
+and `$b`
 - in case of a tie, provide another comparison of $a and $b
 
     # If the name is the same, compare age (oldest first)
@@ -296,7 +313,7 @@ autobox::Transform's `order`/`order_by`.
         int( $b->{age} / 10 ) <=> int( $a->{age} / 10 ) # second comparison
     } @users
 
-(note the opposite order of $a and $b for the age comparison,
+(note the opposite order of `$a` and `$b` for the age comparison,
 something that's often difficult to discern at a glance)
 
 ### Sorting with order, order\_by
@@ -342,7 +359,7 @@ provide them in an arrayref in any order.
 - A subref - default is: `sub { $_ }`
     - The return value is used in the comparison
 - A regex, e.g. `qr/id: (\d+)/`
-    - The value of join("", @captured\_groups) are used in the comparison (@captured\_groups are $1, $2, $3 etc.)
+    - The value of `join("", @captured_groups)` are used in the comparison (`@captured_groups` are `$1`, `$2`, `$3` etc.)
 
 ### Examples of a single comparison
 
@@ -419,7 +436,7 @@ list in list context and an arrayref in scalar context, just like
 
 When in doubt, assume they work like `map` and `grep` (i.e. return a
 list), and convert the return value to references where you might have
-an unobvious list context. E.g.
+an non-obvious list context. E.g.
 
 ### Incorrect
 
@@ -449,16 +466,16 @@ an unobvious list context. E.g.
 
 ## @array->filter($predicate = \*is\_true\_subref\*) : @array | @$array
 
-Similar to Perl's `grep`, return an @array with values for which
+Similar to Perl's `grep`, return an `@array` with values for which
 $predicate yields a true value.
 
 $predicate can be a subref, string, undef, regex, or hashref. See
 ["Filter predicates"](#filter-predicates).
 
-The default (no $predicate) is a subref which retains true values in
-the @array.
+The default (no `$predicate`) is a subref which retains true values
+in the @array.
 
-Examples:
+### Examples
 
     my @apples     = $fruit->filter("apple");
     my @any_apple  = $fruit->filter( qr/apple/i );
@@ -472,14 +489,33 @@ Examples:
 method. `filter` also supports the other predicate types, like
 string, regex, etc.
 
+## @array->reject($predicate = \*is\_false\_subref\*) : @array | @$array
+
+Similar to the Unix command `grep -v`, return an @array with values
+for which `$predicate` yields a _false_ value.
+
+$predicate can be a subref, string, undef, regex, or hashref. See
+["Filter predicates"](#filter-predicates).
+
+The default (no $predicate) is a subref which _filters out_ true
+values in the `@array`.
+
+Examples:
+
+    my @apples     = $fruit->reject("apple");
+    my @any_apple  = $fruit->reject( qr/apple/i );
+    my @publishers = $authors->reject(
+        sub { $_->publisher->name =~ /Orbit/ },
+    );
+
 ## @array->order(@comparisons = ("str")) : @array | @$array
 
-Return @array ordered according to the @comparisons. The default
+Return `@array` ordered according to the `@comparisons`. The default
 comparison is the same as the default sort, e.g. a normal string
-comparison of the @array values.
+comparison of the `@array` values.
 
-If the first item in @comparison ends in a tie, the next one is used,
-etc.
+If the first item in `@comparison` ends in a tie, the next one is
+used, etc.
 
 Each _comparison_ consists of a single _option_ or an _arrayref of
 options_, e.g. `str`/`num`, `asc`/`desc`, or a subref/regex. See
@@ -499,9 +535,9 @@ Examples:
 
 ## @array->group($value\_subref = item) : %key\_value | %$key\_value
 
-Group the @array items into a hashref with the items as keys.
+Group the `@array` items into a hashref with the items as keys.
 
-The default $value\_subref puts each item in the list as the hash
+The default `$value_subref` puts each item in the list as the hash
 value. If the key is repeated, the value is overwritten with the last
 object.
 
@@ -518,7 +554,7 @@ Example:
 ### The $value\_subref
 
 For simple cases of just grouping a single key to a single value, the
-$value\_subref is straightforward to use.
+`$value_subref` is straightforward to use.
 
 The hash key is the array item. The hash value is whatever is returned
 from
@@ -585,13 +621,13 @@ on. Example:
     # ->books returns an arrayref of Book objects with a ->title
     $authors->map_by("books")->flat->map_by("title")
 
-Note: This is different from autobox::Core's ->flatten, which reurns a
-list rather than an array and therefore can't be used in this
-way.
+Note: This is different from [autobox::Core](https://metacpan.org/pod/autobox::Core)'s `->flatten`,
+which reurns a list rather than an array and therefore can't be used
+in this way.
 
 ## @array->to\_ref() : $arrayref
 
-Return the reference to the @array, regardless of context.
+Return the reference to the `@array`, regardless of context.
 
 Useful for ensuring the last array method return a reference while in
 scalar context. Typically:
@@ -600,32 +636,32 @@ scalar context. Typically:
         books => $author->map_by("books")->to_ref,
     );
 
-map\_by is called in list context, so without ->to\_ref it would have
-return an array, not an arrayref.
+map\_by is called in list context, so without `->to_ref` it would
+have return an array, not an arrayref.
 
 ## @array->to\_array() : @array
 
-Return the @array, regardless of context. This is mostly useful if
+Return the `@array`, regardless of context. This is mostly useful if
 called on a ArrayRef at the end of a chain of method calls.
 
 ## @array->to\_hash() : %hash | %$hash
 
-Return the item pairs in the @array as the key-value pairs of a %hash
-(context sensitive).
+Return the item pairs in the `@array` as the key-value pairs of a
+`%hash` (context sensitive).
 
-Useful if you need to continue calling %hash methods on it.
+Useful if you need to continue calling `%hash` methods on it.
 
-Die if there aren't an even number of items in @array.
+Die if there aren't an even number of items in `@array`.
 
 # METHODS ON ARRAYS CONTAINING OBJECTS/HASHES
 
 ## @array->map\_by($accessor) : @array | @$array
 
-$accessor is either a string, or an arrayref where the first item is a
-string.
+`$accessor` is either a string, or an arrayref where the first item
+is a string.
 
-Call the $accessor on each object in @array, or get the hash key value
-on each hashref in @array. Like:
+Call the `$accessor` on each object in `@array`, or get the hash key
+value on each hashref in `@array`. Like:
 
     map { $_->$accessor() } @array
     # or
@@ -640,10 +676,10 @@ Or get the hash key value. Example:
 
     my @review_scores = $reviews->map_by("score");
 
-Alternatively for when @array contains objects, the $accessor can be
-an arrayref. The first item is the method name, and the rest of the
+Alternatively for when `@array` contains objects, the $accessor can
+be an arrayref. The first item is the method name, and the rest of the
 items are passed as args in the method call. This obviously won't work
-when the @array contains hashrefs.
+when the `@array` contains hashrefs.
 
 Examples:
 
@@ -652,17 +688,17 @@ Examples:
 
 ## @array->filter\_by($accessor, $predicate = \*is\_true\_subref\*) : @array | @$array
 
-$accessor is either a string, or an arrayref where the first item is a
-string.
+`$accessor` is either a string, or an arrayref where the first item
+is a string.
 
-Call the $accessor on each object in the list, or get the hash key
+Call the `$accessor` on each object in the list, or get the hash key
 value on each hashref in the list.
 
 Example:
 
     my @prolific_authors = $authors->filter_by("is_prolific");
 
-Alternatively the $accessor is an arrayref. The first item is the
+Alternatively the `$accessor` is an arrayref. The first item is the
 accessor name, and the rest of the items are passed as args the method
 call. This only works when working with objects, not with hashrefs.
 
@@ -670,12 +706,12 @@ Example:
 
     my @books_to_charge_for = $books->filter_by([ price_with_tax => $tax_pct ]);
 
-Use the $predicate to determine whether the value should remain.
-$predicate can be a subref, string, undef, regex, or hashref. See
+Use the `$predicate` to determine whether the value should remain.
+`$predicate` can be a subref, string, undef, regex, or hashref. See
 ["Filter predicates"](#filter-predicates).
 
-The default (no $predicate) is a subref which retains true values in
-the result @array.
+The default (no `$predicate`) is a subref which retains true values
+in the result `@array`.
 
 Examples:
 
@@ -700,12 +736,24 @@ might be easier and more readable to simply use
 `grep_by` is an alias for `filter_by`. Unlike `grep` vs `filter`,
 this one works exaclty the same way.
 
+## @array->reject\_by($accessor, $predicate = \*is\_false\_subref\*) : @array | @$array
+
+`reject_by` is the same as [`filter_by`](https://metacpan.org/pod/filter_by), except it _filters out_
+items that matches the $predicate.
+
+Example:
+
+    my @unproductive_authors = $authors->reject_by("is_prolific");
+
+The default (no $predicate) is a subref which _filters out_ true
+values in the result `@array`.
+
 ## @array->uniq\_by($accessor) : @array | @$array
 
-$accessor is either a string, or an arrayref where the first item is a
-string.
+`$accessor` is either a string, or an arrayref where the first item
+is a string.
 
-Call the $accessor on each object in the list, or get the hash key
+Call the $`accessor` on each object in the list, or get the hash key
 value on each hashref in the list. Return list of items wich have a
 unique set of return values. The order is preserved. On duplicates,
 keep the first occurrence.
@@ -715,7 +763,7 @@ Examples:
     # You have gathered multiple Author objects with duplicate ids
     my @authors = $authors->uniq_by("author_id");
 
-Alternatively the $accessor is an arrayref. The first item is the
+Alternatively the `$accessor` is an arrayref. The first item is the
 accessor name, and the rest of the items are passed as args the method
 call. This only works when working with objects, not with hashrefs.
 
@@ -727,7 +775,8 @@ Examples:
 
 ## @array->order\_by(@accessor\_comparison\_pairs) : @array | @$array
 
-Return @array ordered according to the @accessor\_comparison\_pairs.
+Return `@array` ordered according to the
+`@accessor_comparison_pairs`.
 
 The comparison value comes from an initial
 `@array-`map\_by($accessor)> for each accessor-comparison pair. It is
@@ -772,14 +821,14 @@ a pair.
 
 ## @array->group\_by($accessor, $value\_subref = object) : %key\_value | %$key\_value
 
-$accessor is either a string, or an arrayref where the first item is a
-string.
+`$accessor` is either a string, or an arrayref where the first item
+is a string.
 
 Call `->$accessor` on each object in the array, or get the hash
 key for each hashref in the array (just like `->map_by`) and
 group the values as keys in a hashref.
 
-The default $value\_subref puts each object in the list as the hash
+The default `$value_subref` puts each object in the list as the hash
 value. If the key is repeated, the value is overwritten with the last
 object.
 
@@ -796,7 +845,7 @@ Example:
 ### The $value\_subref
 
 For simple cases of just grouping a single key to a single value, the
-$value\_subref is straightforward to use.
+`$value_subref` is straightforward to use.
 
 The hash key is whatever is returned from `$object->$accessor`.
 
@@ -815,15 +864,15 @@ object:
     my $book_id__author = $books->group_by("id", sub { $_->author });
     # keys: book id; values: author
 
-If you want to create an aggregate value the $value\_subref can be a
+If you want to create an aggregate value the `$value_subref` can be a
 bit tricky to use, so the most common thing would probably be to use
 one of the more specific group\_by-methods (see below). It should be
 capable enough to achieve what you need though.
 
 ## @array->group\_by\_count($accessor) : %key\_count | %$key\_count
 
-$accessor is either a string, or an arrayref where the first item is a
-string.
+`$accessor` is either a string, or an arrayref where the first item
+is a string.
 
 Just like `group_by`, but the hash values are the the number of
 instances each $accessor value occurs in the list.
@@ -841,8 +890,8 @@ counted for the "Sci-fi" key.
 
 ## @array->group\_by\_array($accessor) : %key\_objects | %$key\_objects
 
-$accessor is either a string, or an arrayref where the first item is a
-string.
+`$accessor` is either a string, or an arrayref where the first item
+is a string.
 
 Just like `group_by`, but the hash values are arrayrefs containing
 the objects which has each $accessor value.
@@ -863,15 +912,15 @@ are collected under the Sci-fi key.
 ## %hash->map\_each($key\_value\_subref) : %new\_hash | %$new\_hash
 
 Map each key-value pair in the hash using the
-$key\_value\_subref. Similar to how to how map transforms a list into
+`$key_value_subref`. Similar to how to how map transforms a list into
 another list, map\_each transforms a hash into another hash.
 
 `$key_value_subref->($key, $value)` is called for each pair (with
 $\_ set to the value).
 
 The subref should return an even-numbered list with zero or more
-key-value pairs which will make up the %new\_hash. Typically two items
-are returned in the list (the key and the value).
+key-value pairs which will make up the `%new_hash`. Typically two
+items are returned in the list (the key and the value).
 
 ### Example
 
@@ -880,14 +929,14 @@ are returned in the list (the key and the value).
 
 ## %hash->map\_each\_value($value\_subref) : %new\_hash | %$new\_hash
 
-Map each value in the hash using the $value\_subref, but keep the keys
-the same.
+Map each value in the hash using the `$value_subref`, but keep the
+keys the same.
 
-`$value_subref->($key, $value)` is called for each pair (with $\_
-set to the value).
+`$value_subref->($key, $value)` is called for each pair (with
+`$_` set to the value).
 
 The subref should return a single value for each key which will make
-up the %new\_hash (with the same keys but with new mapped values).
+up the `%new_hash` (with the same keys but with new mapped values).
 
 ### Example
 
@@ -897,13 +946,13 @@ up the %new\_hash (with the same keys but with new mapped values).
 ## %hash->map\_each\_to\_array($item\_subref) : @new\_array | @$new\_array
 
 Map each key-value pair in the hash into a list using the
-$item\_subref.
+`$item_subref`.
 
-`$item_subref->($key, $value)` is called for each pair (with $\_
-set to the value) in key order.
+`$item_subref->($key, $value)` is called for each pair (with
+`$_` set to the value) in key order.
 
 The subref should return zero or more list items which will make up
-the @new\_array. Typically one item is returned.
+the `@new_array`. Typically one item is returned.
 
 ### Example
 
@@ -912,35 +961,44 @@ the @new\_array. Typically one item is returned.
 
 ## %hash->filter\_each($predicate = \*is\_true\_subref\*) : @hash | @$hash
 
-Return a %hash with values for which $predicate yields a true value.
+Return a `%hash` with values for which `$predicate` yields a true
+value.
 
-$predicate can be a subref, string, undef, regex, or hashref. See
+`$predicate` can be a subref, string, undef, regex, or hashref. See
 ["Filter predicates"](#filter-predicates).
 
 The default (no $predicate) is a subref which retains true values in
-the @array.
+the `%hash`.
 
-Examples:
-
-    my @apples     = $fruit->filter("apple");
-    my @any_apple  = $fruit->filter( qr/apple/i );
-    my @publishers = $authors->filter(
-        sub { $_->publisher->name =~ /Orbit/ },
-    );
-
-If the $predicate is a subref, `$predicate->($key,
-$value)` is called for each pair (with $\_ set to the value).
+If the $predicate is a subref, `$predicate->($key, $value)` is
+called for each pair (with `$_` set to the value).
 
 The subref should return a true value to retain the key-value pair in
-the result %hash.
+the result `%hash`.
 
-### Example
+### Examples
+
+    { a => 1, b => 2 }->filter_each(sub { $_ == 2 });
+    # Returns { b => 2 }
 
     $book_author->filter_each(sub { $_->name =~ /Corey/ });
 
+## %hash->reject\_each($predicate = \*is\_false\_subref\*) : @hash | @$hash
+
+`reject_each` is the same as [`filter_each`](https://metacpan.org/pod/filter_each), except it _filters out_
+items that matches the $predicate.
+
+Examples:
+
+    { a => 1, b => 2 }->reject_each(sub { $_ == 2 });
+    # Returns { a => 1 }
+
+The default (no $predicate) is a subref which _filters out_ true
+values in the `%hash`.
+
 ## %hash->to\_ref() : $hashref
 
-Return the reference to the %hash, regardless of context.
+Return the reference to the `%hash`, regardless of context.
 
 Useful for ensuring the last hash method return a reference while in
 scalar context. Typically:
@@ -951,15 +1009,15 @@ scalar context. Typically:
 
 ## %hash->to\_hash() : %hash
 
-Return the %hash, regardless of context. This is mostly useful if
+Return the `%hash`, regardless of context. This is mostly useful if
 called on a HashRef at the end of a chain of method calls.
 
 ## %hash->to\_array() : @array | @$array
 
-Return the key-value pairs of the %hash as an @array, ordered by the
-keys.
+Return the key-value pairs of the `%hash` as an `@array`, ordered by
+the keys.
 
-Useful if you need to continue calling @array methods on it.
+Useful if you need to continue calling `@array` methods on it.
 
 # AUTOBOX AND VANILLA PERL
 
@@ -980,16 +1038,16 @@ methods for mapping, filtering and sorting common cases which are easier
 to read and write.
 
 Since they are at a slightly higher semantic level, once you know them
-they also provide a more specific meaning than just "map" or "grep".
+they also provide a more specific meaning than just `map` or `grep`.
 
-(Compare the difference between seeing a "map" and seeing a "foreach"
-loop. Just seeing the word "map" hints at what type of thing is going
-on here: transforming a list into another list).
+(Compare the difference between seeing a `map` and seeing a
+`foreach` loop. Just seeing the word `map` hints at what type of
+thing is going on here: transforming a list into another list).
 
-The methods of autobox::Transform are not suitable for all
-cases, but when used appropriately they will lead to much more clear,
+The methods of `autobox::Transform` are not suitable for all cases,
+but when used appropriately they will lead to much more clear,
 succinct and direct code, especially in conjunction with
-autobox::Core.
+`autobox::Core`.
 
 ## Code Comparison
 

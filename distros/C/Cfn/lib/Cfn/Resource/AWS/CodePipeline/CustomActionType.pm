@@ -1,4 +1,4 @@
-# AWS::CodePipeline::CustomActionType generated from spec 2.25.0
+# AWS::CodePipeline::CustomActionType generated from spec 3.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CodePipeline::CustomActionType',
@@ -126,7 +126,7 @@ package Cfn::Resource::Properties::AWS::CodePipeline::CustomActionType {
   has OutputArtifactDetails => (isa => 'Cfn::Resource::Properties::AWS::CodePipeline::CustomActionType::ArtifactDetails', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Provider => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Settings => (isa => 'Cfn::Resource::Properties::AWS::CodePipeline::CustomActionType::Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;

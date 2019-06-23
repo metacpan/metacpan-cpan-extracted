@@ -1,5 +1,5 @@
 package Devel::Optic::Lens::Perlish;
-$Devel::Optic::Lens::Perlish::VERSION = '0.011';
+$Devel::Optic::Lens::Perlish::VERSION = '0.012';
 # ABSTRACT: Perl-ish syntax for querying data structures
 
 use strict;
@@ -35,7 +35,7 @@ Devel::Optic::Lens::Perlish - Perl-ish syntax for querying data structures
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 AUTHOR
 

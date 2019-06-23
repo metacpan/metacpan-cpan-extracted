@@ -40,9 +40,9 @@ register_widget_handler(
     __PACKAGE__, 'HTML',
     tag_name => 'input',
     attributes => {
-        type => $_,
-    })
-    for (qw/ radio checkbox /);
+        type => 'checkbox',
+    });
+
 
 register_widget_handler(
     __PACKAGE__, 'HTML',
@@ -61,29 +61,35 @@ sets the selected status.
 =cut
 
 sub selected {
-    my ($self, $value) = @_;
+    my ($self, $new_value) = @_;
 
-    $self->session->set_attribute($self, 'selected', $value)
-        if defined $value;
-
+    if (defined $new_value) {
+        my $selected = $self->session->get_attribute($self, 'selected');
+        if (! $new_value && $selected) {
+            $self->click; # unselect
+        }
+        elsif ($new_value && ! $selected) {
+            $self->click; # select
+        }
+    }
     return $self->session->get_attribute($self, 'selected');
 }
 
-=item get_attribute($name)
+=item value([$new_value])
 
-Returns the value of the attribute; when the element is I<not> selected,
+Returns the value of the 'value' attribute; when the element is I<not> selected,
 the 'value' attribute is overruled to return C<false> (an empty string).
 
 =cut
 
-sub get_attribute {
-    my ($self, $name) = @_;
+sub value {
+    my ($self, $new_value) = @_;
 
-    if ($name eq 'value' && ! $self->selected) {
+    if (! $self->selected($new_value)) {
         return ''; # false/ not selected
     }
     else {
-        return $self->SUPER::get_attribute($name);
+        return $self->get_attribute('value');
     }
 }
 

@@ -2,22 +2,25 @@ package eris::dictionary::cee;
 # ABSTRACT: Contains fields in the Common Event Expression syntax
 
 use Moo;
+use JSON::MaybeXS;
 use namespace::autoclean;
 with qw(
     eris::role::dictionary::hash
 );
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 my $_hash=undef;
 sub hash {
+    my $self = shift;
     return $_hash if defined $_hash;
     my %data;
     while(<DATA>) {
         chomp;
-        my ($k,$desc) = split /\s+/, $_, 2;
-        $data{lc $k} = $desc;
+        my ($field,$def) = $self->expand_line($_);
+        next unless $field;
+        $data{$field} = $def;
     }
     $_hash = \%data;
 }
@@ -33,7 +36,7 @@ eris::dictionary::cee - Contains fields in the Common Event Expression syntax
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -70,34 +73,34 @@ dev_links Device Node Links
 dev_node Device Node
 driver System Kernel Driver Name
 dst Destination Hostname
-dst_ip Destination IP Address
+{ "name": "dst_ip", "type": "ip", "description": "Destination IP Address" }
 dst_mac Destination MAC Address
-dst_port Destination Port Nummber
+{ "name": "dst_port", "type": "integer", "description": "Destination Port Nummber" }
 dst_prefix_len Destination IP Address Prefix Length
 exe Binary process exe path
 file File Name
-in_bytes Inbound (Ingress) Bytes
-in_pkts  Inbound (Ingress) Packet Count
-out_bytes Outbound (Egress) Bytes
-out_pkts  Outbound (Egress) Packet Count
-p_ip Producer IP address
+{ "name": "in_bytes", "type": "double", "description": "Inbound (Ingress) Bytes" }
+{ "name": "in_pkts", "type": "double", "description": "Inbound (Ingress) Packet Count" }
+{ "name": "out_bytes", "type": "double", "description": "Outbound (Egress) Bytes" }
+{ "name": "out_pkts", "type": "double", "description": "Outbound (Egress) Packet Count" }
+{ "name": "p_ip", "type": "ip", "description": "Producer IP address" }
 p_mac Producer MAC address
 proc Process Name
-proc_egid Process Effective Group ID
-proc_euid Process Effectice User ID
-proc_gid Process Group ID
-proc_uid Process User ID
-proc_id Process ID
+{ "name": "proc_egid", "type": "integer", "description": "Process Effective Group ID" }
+{ "name": "proc_euid", "type": "integer", "description": "Process Effectice User ID" }
+{ "name": "proc_gid", "type": "integer", "description": "Process Group ID" }
+{ "name": "proc_uid", "type": "integer", "description": "Process User ID" }
+{ "name": "proc_id", "type": "integer", "description": "Process ID" }
 prod Product Name
 proto_app Network Application Protocol Name
-rcv_time Event Record Receive Time
+{ "name": "rcv_time", "type": "date", "description": "Event Record Receive Time" }
 rec_id Event Record ID
-rec_time Event Record Time
+{ "name": "rec_time", "type": "date", "description": "Event Record Time" }
 sess User Session ID
 src Source Hostname
-src_ip Source IP Address
+{ "name": "src_ip", "type": "ip", "description": "Source IP Address" }
 src_mac Source MAC Address
-src_port Source Port Nummber
+{ "name": "src_port", "type": "integer", "description": " Source Port Nummber" }
 src_prefix_len Source IP Address Prefix Length
 subsystem System Kernel Subsystem
 action Primary action taken
@@ -107,7 +110,7 @@ id Event ID
 object Type of object
 p_app  Producing application
 p_proc Producing process
-p_proc_id Producing Process ID
+{ "name": "p_proc_id", "type": "integer", "description": "Producing Process ID" }
 p_sys Producing system
 pri Priority of the Event
 schema Schema covered by event
@@ -116,4 +119,4 @@ service Service involved
 status Result of the action
 subject type of object initiated
 tags Freeform tags for the event
-time Time of the event
+{ "name": "time", "type": "date", "description": "Time of the event" }

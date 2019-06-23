@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Randf
 
+0.03    Sun Jun 23 02:12:52 JST 2019
+        - no buffered
+
 0.02    Wed Sep  9 09:29:07 JST 2015
         - support rcfile(.randfrc)
 

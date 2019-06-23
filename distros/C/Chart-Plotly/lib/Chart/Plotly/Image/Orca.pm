@@ -12,7 +12,7 @@ use Path::Tiny;
 use File::ShareDir qw(dist_file);
 use utf8;
 
-our $VERSION = '0.026';    # VERSION
+our $VERSION = '0.027';    # VERSION
 
 my $ORCA_COMMAND = 'orca';
 
@@ -133,7 +133,7 @@ Chart::Plotly::Image::Orca - Export static images of Plotly charts using orca
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

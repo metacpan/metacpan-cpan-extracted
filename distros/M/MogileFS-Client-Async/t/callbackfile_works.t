@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use MogileFS::Client::CallbackFile;
+use MogileFS::Admin;
 use Digest::SHA1;
 use Digest::MD5;
 use File::Temp qw/ tempfile /;
@@ -18,13 +19,18 @@ sub sha1 {
 
 my $exp_sha = sha1($0);
 
+my @hosts = qw/ 127.0.0.1:7001 /;
+
+my $moga = MogileFS::Admin->new(hosts => [@hosts]);
+my $doms = eval { $moga->get_domains };
+
+unless ($doms) {
+    plan skip_all => "No mogilefsd";
+}
+
 my $mogc = MogileFS::Client::CallbackFile->new(
     domain => "state51",
-    hosts => [qw/
-        tracker0.cissme.com:7001
-        tracker1.cissme.com:7001
-        tracker2.cissme.com:7001
-    /],
+    hosts => [@hosts],
 );
 ok $mogc, 'Have client';
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-07'; # DATE
-our $VERSION = '1.033'; # VERSION
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '1.034'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.033 of lcpan (from Perl distribution App-lcpan), released on 2019-06-07.
+This document describes version 1.034 of lcpan (from Perl distribution App-lcpan), released on 2019-06-19.
 
 =head1 SYNOPSIS
 
@@ -921,6 +921,14 @@ See C<--phase>.
 
 =item B<--author>=I<s>*
 
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
 =item B<--flatten>
 
 Instead of showing tree-like information, flatten it.
@@ -988,21 +996,13 @@ Only list depended modules published by specified author(s) (JSON-encoded).
 
 See C<--module-author>.
 
-=item B<--no-include-core>
-
-Exclude core modules.
-
-=item B<--no-include-noncore>
-
-Exclude non-core modules.
-
 =item B<--perl-version>=I<s>, B<-V>
 
 Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -1056,6 +1056,14 @@ See C<--author-isnt>.
 
 See C<--author>.
 
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
 =item B<--module-author-isnt>=I<s@>
 
 Can be specified multiple times.
@@ -1072,21 +1080,13 @@ See C<--module-author-isnt>.
 
 See C<--module-author>.
 
-=item B<--no-include-core>
-
-Exclude core modules.
-
-=item B<--no-include-noncore>
-
-Exclude non-core modules.
-
 =item B<--perl-version>=I<s>, B<-V>
 
 Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -1398,6 +1398,14 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
 =item B<--flatten>
 
 Instead of showing tree-like information, flatten it.
@@ -1449,21 +1457,13 @@ Can be specified multiple times.
 
 See C<--module>.
 
-=item B<--no-include-core>
-
-Exclude core modules.
-
-=item B<--no-include-noncore>
-
-Exclude non-core modules.
-
 =item B<--perl-version>=I<s>, B<-V>
 
 Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -1515,6 +1515,14 @@ See C<--author-isnt>.
 
 See C<--author>.
 
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
 =item B<--module>=I<s@>*
 
 Can be specified multiple times.
@@ -1523,21 +1531,13 @@ Can be specified multiple times.
 
 See C<--module>.
 
-=item B<--no-include-core>
-
-Exclude core modules.
-
-=item B<--no-include-noncore>
-
-Exclude non-core modules.
-
 =item B<--perl-version>=I<s>, B<-V>
 
 Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -2321,6 +2321,14 @@ Filter by author.
 
 Filter by distribution.
 
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
 =item B<--latest>
 
 =item B<--namespace>=I<s@>, B<-N>
@@ -2335,14 +2343,6 @@ Select modules belonging to certain namespace(s) (JSON-encoded).
 
 See C<--namespace>.
 
-=item B<--no-include-core>
-
-Exclude core modules.
-
-=item B<--no-include-noncore>
-
-Exclude non-core modules.
-
 =item B<--or>
 
 When there are more than one query, perform OR instead of AND logic.
@@ -2353,7 +2353,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.28.2"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2477,6 +2477,14 @@ Filter by author.
 
 Filter by distribution.
 
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
 =item B<--latest>
 
 =item B<--namespace>=I<s@>, B<-N>
@@ -2491,14 +2499,6 @@ Select modules belonging to certain namespace(s) (JSON-encoded).
 
 See C<--namespace>.
 
-=item B<--no-include-core>
-
-Exclude core modules.
-
-=item B<--no-include-noncore>
-
-Exclude non-core modules.
-
 =item B<--or>
 
 When there are more than one query, perform OR instead of AND logic.
@@ -2509,7 +2509,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.28.2"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3360,8 +3360,8 @@ List of available configuration parameters:
 
  author (see --author)
  flatten (see --flatten)
- include_core (see --no-include-core)
- include_noncore (see --no-include-noncore)
+ include_core (see --exclude-core)
+ include_noncore (see --exclude-noncore)
  level (see --level)
  module_authors (see --module-author)
  module_authors_arent (see --module-author-isnt)
@@ -3375,8 +3375,8 @@ List of available configuration parameters:
  author (see --author-arg)
  authors (see --author)
  authors_arent (see --author-isnt)
- include_core (see --no-include-core)
- include_noncore (see --no-include-noncore)
+ include_core (see --exclude-core)
+ include_noncore (see --exclude-noncore)
  module_authors (see --module-author)
  module_authors_arent (see --module-author-isnt)
  perl_version (see --perl-version)
@@ -3486,8 +3486,8 @@ List of available configuration parameters:
 =head2 Configuration for subcommand deps
 
  flatten (see --flatten)
- include_core (see --no-include-core)
- include_noncore (see --no-include-noncore)
+ include_core (see --exclude-core)
+ include_noncore (see --exclude-noncore)
  level (see --level)
  modules (see --module)
  perl_version (see --perl-version)
@@ -3499,8 +3499,8 @@ List of available configuration parameters:
 
  authors (see --author)
  authors_arent (see --author-isnt)
- include_core (see --no-include-core)
- include_noncore (see --no-include-noncore)
+ include_core (see --exclude-core)
+ include_noncore (see --exclude-noncore)
  modules (see --module)
  perl_version (see --perl-version)
  phase (see --phase)
@@ -3666,8 +3666,8 @@ List of available configuration parameters:
  author (see --author)
  detail (see --detail)
  dist (see --dist)
- include_core (see --no-include-core)
- include_noncore (see --no-include-noncore)
+ include_core (see --exclude-core)
+ include_noncore (see --exclude-noncore)
  latest (see --latest)
  namespaces (see --namespace)
  or (see --or)
@@ -3698,8 +3698,8 @@ List of available configuration parameters:
  author (see --author)
  detail (see --detail)
  dist (see --dist)
- include_core (see --no-include-core)
- include_noncore (see --no-include-noncore)
+ include_core (see --exclude-core)
+ include_noncore (see --exclude-noncore)
  latest (see --latest)
  namespaces (see --namespace)
  or (see --or)

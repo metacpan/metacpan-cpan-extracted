@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+0.06 2019-06-20T12:53:16Z
+
+    - Ignore trailing formfeed and carriage return.
+
 0.05 2018-12-07T00:54:35Z
 
     - Update "chops" funciton to accept array reference.

@@ -331,6 +331,8 @@ sub get_text {
 
 =item set_attribute($element_id, $attribute_name, $value)
 
+DEPRECATED
+
 Changes the value of the attribute named by C<$attribute_name> to C<$value>
 for the element identified by C<$element_id>.
 
@@ -349,6 +351,10 @@ sub set_attribute {
 
 =item get_selected($element_id)
 
+DEPRECATED
+
+Please use C<$self->get_attribute('selected')> instead.
+
 =cut
 
 sub get_selected {
@@ -362,6 +368,10 @@ sub get_selected {
 }
 
 =item set_selected($element_id, $value)
+
+DEPRECATED
+
+Please use C<$self->set_attribute('selected', $value)> instead.
 
 =cut
 
@@ -622,8 +632,8 @@ Erik Huelsmann
 
 =head1 CONTRIBUTORS
 
-Erik Huelsmann
-Yves Lavoie
+ Erik Huelsmann
+ Yves Lavoie
 
 =head1 MAINTAINERS
 

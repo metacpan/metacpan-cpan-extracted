@@ -1,5 +1,23 @@
 # Revision history for Perl module autobox::Transform
 
+1.034 2019-06-19T20:22:58Z
+
+  * Documentation improvements to go with new "reject", "reject_by",
+    "reject_each" methods
+
+
+1.033 2019-06-19T20:15:20Z
+
+  * Doc fixes
+
+
+1.032 2019-06-19T19:22:20Z
+
+  * New @array method: ->reject,      the opposite of Array->filter
+  * New @array method: ->reject_by,   the opposite of Array->filter_by
+  * New @array method: ->reject_each, the opposite of Array->filter_each
+
+
 1.031 2017-11-09T00:48:09Z
 
   * Improved POD documentation

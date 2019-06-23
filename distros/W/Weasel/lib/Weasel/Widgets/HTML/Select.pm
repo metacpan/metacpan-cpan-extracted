@@ -5,7 +5,7 @@ Weasel::Widgets::HTML::Select - Wrapper of SELECT tag
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 
@@ -25,6 +25,7 @@ package Weasel::Widgets::HTML::Select;
 use strict;
 use warnings;
 
+use List::Util qw/first/;
 use Moose;
 use Weasel::Element;
 use Weasel::WidgetHandlers qw/ register_widget_handler /;
@@ -55,6 +56,9 @@ sub _option_popup {
     return $self;
 }
 
+=item find_option
+
+=cut
 
 sub find_option {
     my ($self, $text) = @_;
@@ -63,6 +67,16 @@ sub find_option {
     return $popup->find('*option', text => $text);
 }
 
+=item find_options
+
+=cut
+
+sub find_options {
+    my ($self) = @_;
+    my $popup = $self->_option_popup;
+
+    return $popup->find_all('*option');
+}
 
 =item select_option
 
@@ -74,6 +88,34 @@ sub select_option {
     return $self->find_option($text)->click;
 }
 
+=item value([ $new_value ])
+
+=cut
+
+sub value {
+    my ($self, $new_value) = @_;
+
+    if ($new_value) {
+        $self->select_option($new_value);
+    }
+    my $option = first { $_->selected } $self->find_options;
+    return $option ? $option->get_attribute('value') : undef;
+}
+
+=item values([@new_values])
+
+=cut
+
+sub values {
+    my ($self, @new_values) = @_;
+
+    if (@new_values) {
+        $self->select_option($_)
+            for @new_values;
+    }
+    my @options = grep { $_->selected } $self->find_options;
+    return map { $_->get_attribute('value') } @options;
+}
 
 =back
 
@@ -107,7 +149,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016  Erik Huelsmann
+ (C) 2016-2019  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

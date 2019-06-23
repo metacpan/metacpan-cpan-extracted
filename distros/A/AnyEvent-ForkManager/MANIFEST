@@ -9,6 +9,7 @@ example/blocking.pl
 example/nonblocking-with-signal-exit.pl
 example/nonblocking.pl
 lib/AnyEvent/ForkManager.pm
+minil.toml
 t/000_load.t
 t/001_basic.t
 t/002_blocking.t

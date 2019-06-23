@@ -4,9 +4,10 @@ Cfn - An object model for CloudFormation documents
 
 # DESCRIPTION
 
-This module helps parse, manipulate and validate CloudFormation documents. It creates
-an object model of a CloudFormation template so you can work with the document as 
-a set of objects. See [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html) for
+This module helps parse, manipulate, validate and generate CloudFormation documents in JSON
+and YAML formats (see stability section for more information on YAML). It creates an object 
+model of a CloudFormation template so you can work with the document as a set of objects. 
+See [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html) for
 more information.
 
 It provides full blown objects for all know CloudFormation resources. See 
@@ -46,7 +47,11 @@ This method converts a hashref that represents a CloudFormation document into a 
 
 ### from\_json
 
-This method creates a Cfn object from a JSON string that containes a CloudFormation document
+This method creates a Cfn object from a JSON string that contains a CloudFormation document in JSON format
+
+### from\_yaml
+
+This method creates a Cfn object from a YAML string that contains a CloudFormation document in YAML format
 
 ## Attributes
 
@@ -61,6 +66,13 @@ You can specify your own JSON serializer to control how JSON is generated:
     my $cfn = Cfn->new(json => JSON->new->canonical->pretty);
     ...
     print $cfn->as_json;
+
+### yaml
+
+Holds a configured `YAML::PP` parser for use when serializing and deserializing to and from YAML.
+Methods `load_string` and `dump_string` are called when needed from convert the object model
+to a YAML document, and to convert a YAML document to a datastructure that can later be coerced
+into the object model.
 
 ### cfn\_options
 
@@ -166,7 +178,11 @@ called with the `$cfn` instance as the first parameter to their subroutine
 
 ### as\_json
 
-Returns a JSON representation of `as_hashref`. Just a shortcut
+Returns a JSON representation of the current instance
+
+### as\_yaml
+
+Returns a YAML representation of the current instance
 
 ### path\_to($path)
 
@@ -595,6 +611,12 @@ Holds a HashRef with the export definition of the object
 
 Returns a HashRef representation of the output that is convertible to JSON
 
+# STABILITY
+
+YAML support is recent, and due to the still evolving YAML::PP module, may break 
+(altough the tests are there to detect that). This distribution will try to keep up 
+as hard as it can with latest YAML::PP developments.
+
 # SEE ALSO
 
 [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html)
@@ -611,6 +633,10 @@ This module kind of resembles troposphere (python): [https://github.com/cloudtoo
 
 Thanks to Sergi Pruneda, Miquel Ruiz, Luis Alberto Gimenez, Eleatzar Colomer, Oriol Soriano, 
 Roi Vazquez for years of work on this module.
+
+TINITA for helping make the YAML support possible. First for the YAML::PP module, which is the only
+Perl module to support sufficiently modern YAML features, and also for helping me in the use of
+YAML::PP.
 
 # BUGS and SOURCE
 

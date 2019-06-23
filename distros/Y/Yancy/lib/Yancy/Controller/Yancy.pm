@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.032';
+our $VERSION = '1.033';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -96,6 +96,61 @@ our $VERSION = '1.032';
 #pod
 #pod =back
 #pod
+#pod =head1 TEMPLATES
+#pod
+#pod =head2 yancy/table
+#pod
+#pod The default C<list> template. Uses the following additional stash values
+#pod for configuration:
+#pod
+#pod =over
+#pod
+#pod =item properties
+#pod
+#pod An array reference of columns to display in the table. The same as
+#pod C<x-list-columns> in the schema configuration. Defaults to
+#pod C<x-list-columns> in the schema configuration or all of the schema's
+#pod columns in C<x-order> order. See L<Yancy::Help::Config/Extended
+#pod Collection Configuration> for more information.
+#pod
+#pod =item table
+#pod
+#pod     get '/events' => (
+#pod         controller => 'yancy',
+#pod         action => 'list',
+#pod         table => {
+#pod             thead => 0, # Disable column headers
+#pod             class => 'table table-responsive', # Add a class
+#pod         },
+#pod     );
+#pod
+#pod Attributes for the table tag. A hash reference of the following keys:
+#pod
+#pod =over
+#pod
+#pod =item thead
+#pod
+#pod Whether or not to display the table head section, which contains the
+#pod column headings.  Defaults to true (C<1>). Set to false (C<0>) to
+#pod disable C<< <thead> >>.
+#pod
+#pod =item show_filter
+#pod
+#pod Show filter input boxes for each column in the header. Pressing C<Enter>
+#pod will filter the table.
+#pod
+#pod =item id
+#pod
+#pod The ID of the table element.
+#pod
+#pod =item class
+#pod
+#pod The class(s) of the table element.
+#pod
+#pod =back
+#pod
+#pod =back
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<Yancy>
@@ -126,7 +181,7 @@ use Yancy::Util qw( derp );
 #pod =item template
 #pod
 #pod The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
-#pod for how template names are resolved.
+#pod for how template names are resolved. Defaults to C<yancy/table>.
 #pod
 #pod =item limit
 #pod
@@ -255,6 +310,9 @@ sub list {
             $c->stash( json => { %$items, offset => $offset } );
         },
         html => sub {
+            if ( !$c->stash( 'template' ) ) {
+                $c->stash( template => 'yancy/table' );
+            }
             $c->stash(
                 %$items,
                 total_pages => int( $items->{total} / $limit ) + 1,
@@ -734,7 +792,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 
@@ -801,7 +859,7 @@ The schema to use. Required.
 =item template
 
 The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
-for how template names are resolved.
+for how template names are resolved. Defaults to C<yancy/table>.
 
 =item limit
 
@@ -1137,6 +1195,61 @@ logging at C<debug> level by running in C<development> mode (the
 default), or setting the C<MOJO_LOG_LEVEL> environment variable to
 C<debug>. See L<MODE in the Mojolicious
 tutorial|Mojolicious::Guides::Tutorial/Mode> for more information.
+
+=back
+
+=head1 TEMPLATES
+
+=head2 yancy/table
+
+The default C<list> template. Uses the following additional stash values
+for configuration:
+
+=over
+
+=item properties
+
+An array reference of columns to display in the table. The same as
+C<x-list-columns> in the schema configuration. Defaults to
+C<x-list-columns> in the schema configuration or all of the schema's
+columns in C<x-order> order. See L<Yancy::Help::Config/Extended
+Collection Configuration> for more information.
+
+=item table
+
+    get '/events' => (
+        controller => 'yancy',
+        action => 'list',
+        table => {
+            thead => 0, # Disable column headers
+            class => 'table table-responsive', # Add a class
+        },
+    );
+
+Attributes for the table tag. A hash reference of the following keys:
+
+=over
+
+=item thead
+
+Whether or not to display the table head section, which contains the
+column headings.  Defaults to true (C<1>). Set to false (C<0>) to
+disable C<< <thead> >>.
+
+=item show_filter
+
+Show filter input boxes for each column in the header. Pressing C<Enter>
+will filter the table.
+
+=item id
+
+The ID of the table element.
+
+=item class
+
+The class(s) of the table element.
+
+=back
 
 =back
 

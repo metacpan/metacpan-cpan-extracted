@@ -19,7 +19,7 @@ my @tests = (
             "\xff\xff",
             CBOR::Free::tag( 12, 12 ),
             CBOR::Free::tag( 12, [12] ),
-            $CBOR::Free::true,
+            CBOR::Free::true(),
         ],
         join(
             q<>,

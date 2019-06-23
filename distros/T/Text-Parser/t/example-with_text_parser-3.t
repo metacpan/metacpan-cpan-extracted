@@ -33,6 +33,8 @@ lives_ok {
         return $p;'
     );
     $parser->read('t/example-compare_native_perl-3.txt');
+    my $root = $parser->_ExAWK_symbol_table;
+    is( scalar( keys %{$root} ),        0, 'No more shared variables' );
     is( scalar( $parser->get_records ), 2, 'Two records' );
     is_deeply(
         [ $parser->get_records ],

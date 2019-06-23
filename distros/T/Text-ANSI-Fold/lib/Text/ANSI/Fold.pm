@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -110,6 +110,7 @@ sub fold {
 	    last;
 	}
 	if (s/\A([\f\r]+)//) {
+	    last if length == 0;
 	    $folded .= $1;
 	    $room = $width;
 	    next;

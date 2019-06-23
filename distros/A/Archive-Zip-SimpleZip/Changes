@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  0.025 19 June 2019
+
+        * Don't use // for older perls
+        
+        * Add Perl::OSType as a prerequisite module
+
   0.024 16 June 2019
 
         * Respin release

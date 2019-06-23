@@ -83,7 +83,7 @@ sub main_start {
 }
 
 sub main_stats {
-    my ($kernel,$heap) = @_;
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
 
     my $stats = exists $heap->{stats} ? delete $heap->{stats} : {};
 
@@ -132,7 +132,7 @@ eris-stdin-listener.pl - Simple wrapper to spawn workers for handling syslog str
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

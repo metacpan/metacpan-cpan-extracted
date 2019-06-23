@@ -1,39 +1,38 @@
 ---
-abstract: ~
-author: ~
+abstract: 'A non-blocking MogileFS client'
+author:
+  - 'Dave Lambley <dlambley@cpan.org>'
+  - 'Tomas Doran <bobtfish@cpan.org>'
 build_requires:
-  Data::Dumper: 0
-  Digest::MD5: 0
-  Digest::SHA1: 0
-  ExtUtils::MakeMaker: 6.42
-  File::Temp: 0
-  Test::Exception: 0.31
-  Test::More: 0.88
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Digest::SHA1: '0'
+  File::Temp: '0'
+  MogileFS::Admin: '0'
+  Test::Exception: '0.31'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.92'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: MogileFS::Client::Async
+  version: '1.4'
 name: MogileFS-Client-Async
-no_index:
-  directory:
-    - inc
-    - t
 requires:
-  AnyEvent: 0
-  AnyEvent::HTTP: 0
-  File::Slurp: 0
-  IO::AIO: 3.25
-  IO::Socket::INET: 0
-  LWP::Simple: 0
-  Linux::PipeMagic: 0.03
-  MogileFS::Client: 0
-  Try::Tiny: 0
-  namespace::clean: 0
+  AnyEvent: '0'
+  AnyEvent::HTTP: '0'
+  File::Slurp: '0'
+  IO::AIO: '3.25'
+  IO::Socket::INET: '0'
+  LWP::Simple: '0'
+  Linux::PipeMagic: '0.03'
+  MogileFS::Client: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
 resources:
-  repository: git://github.com/davel/MogileFS-Client-Async.git
-version: 0.030
+  homepage: https://github.com/davel/MogileFS-Client-Async
+  repository: https://github.com/davel/MogileFS-Client-Async.git
+version: '0.031'
+x_serialization_backend: 'YAML::Tiny version 1.70'

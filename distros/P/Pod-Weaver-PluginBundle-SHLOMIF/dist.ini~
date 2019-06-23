@@ -2,7 +2,7 @@ name = Pod-Weaver-PluginBundle-SHLOMIF
 author = Shlomi Fish <shlomif@cpan.org>
 license = Apache_2_0
 copyright_holder  = David Golden
-version = 0.001000
+version = 0.001001
 
 [@SHLOMIF]
 dist = Pod-Weaver-PluginBundle-SHLOMIF

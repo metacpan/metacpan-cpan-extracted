@@ -66,6 +66,7 @@ my $opt_unknown = 1;
 my $opt_command = 1;
 my $opt_mark = 1;
 my $opt_graph = 1;
+my $opt_visible_cr = 1;
 
 my $opt_c;
 my $opt_u;
@@ -118,6 +119,7 @@ my @optargs = (
     "unknown!" => \$opt_unknown,
     "mark!" => \$opt_mark,
     "graph!" => \$opt_graph,
+    "visible-cr|vcr!" => \$opt_visible_cr,
 
     "i|ignore-case" => \$opt_i,
     "b|ignore-space-change" => \$opt_b,
@@ -252,7 +254,9 @@ my $w_pattern = do {
 	    \p{Cyrillic}+ |
 	    \p{Arabic}+   |
 	    \p{Thai}+     |
-	    [_\d\p{Latin}]+ |
+	    \d+ |
+	    \p{Punct}+ |
+	    \p{Latin}+ |
 	    [\ \t\r\f]*\n | \s+ | (.)\g{-1}*
 	}x;
     }
@@ -566,6 +570,10 @@ sub compare {
 	$$new =~ s/^($nmark_re)/push(@nmark, $1), ""/mge;
     }
 
+    if ($opt_visible_cr) {
+	s/\r/\x{240D}/g for $$old, $$new;
+    }
+
     ($$old, $$new) = context($$old, $$new);
 
     $$old =~ s/^/shift @omark/mge if @omark;
@@ -845,6 +853,7 @@ Options:
 	--[no]unknown	    print unknown line      (default true)
 	--[no]mark	    print mark or not       (default true)
 	--[no]graph	    read git --graph output (default true)
+	--[no]visible-cr    visible carriage return (default true)
 	--[no]mecab	    use mecab tokenizer     (default false)
 
 
@@ -1072,6 +1081,10 @@ These options are prepared for watchdiff(1) command.
 =item B<-->[B<no>]B<graph>
 
 Process B<git> B<--graph> option.
+
+=item B<-->[B<no>]B<visible-cr>
+
+Convert carriage-return to visible code.
 
 =item B<-->[B<no>]B<mecab>
 

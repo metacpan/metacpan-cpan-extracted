@@ -120,12 +120,34 @@ Note: Some browsers apply default values to attributes which are not
   the existence of attributes in the original page and this function
   returning C<undef>.
 
+Note: Those users familiar with Selenium might be looking for a method
+  called C<is_selected> or C<set_selected>. Weasel doesn't have that
+  short-hand. Please use C<get_attribute>/C<set_attribute> with an
+  attribute name of C<selected> instead.
+
 =cut
 
 sub get_attribute {
     my ($self, $attribute) = @_;
 
     return $self->session->get_attribute($self, $attribute);
+}
+
+=item set_attribute($attribute, $value)
+
+Sets the value of the element's attribute named in C<$attribute>.
+
+Note: Those users familiar with Selenium might be looking for a method
+  called C<is_selected> or C<set_selected>. Weasel doesn't have that
+  short-hand. Please use C<get_attribute>/C<set_attribute> with an
+  attribute name of C<selected> instead.
+
+=cut
+
+sub set_attribute {
+    my ($self, $attribute, $value) = @_;
+
+    return $self->session->set_attribute($self, $attribute, $value);
 }
 
 =item get_text()

@@ -1,3 +1,9 @@
+Revision history for Perl module YAML::LibYAML::API
+
+0.006 2019-06-20 20:11:54+02:00
+
+    - Include libyaml sources
+
 0.005 2019-05-25 20:10:47+02:00
 
     - Add option 'indent' to emitter

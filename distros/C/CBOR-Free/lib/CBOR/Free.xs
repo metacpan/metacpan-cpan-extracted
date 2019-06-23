@@ -31,6 +31,7 @@
 #define CBOR_LENGTH_HUGE        0x1b
 #define CBOR_LENGTH_INDEFINITE  0x1f
 
+#define LOAD_BOOLEAN_CLASS   "Types::Serialiser"
 #define BOOLEAN_CLASS   "Types::Serialiser::Boolean"
 #define TAGGED_CLASS    "CBOR::Free::Tagged"
 
@@ -40,6 +41,8 @@
 
 #define IS_LITTLE_ENDIAN (BYTEORDER == 0x1234 || BYTEORDER == 0x12345678)
 #define IS_64_BIT        (BYTEORDER > 0x10000)
+
+#define _croak croak
 
 static const unsigned char NUL = 0;
 static const unsigned char CBOR_NULL_U8  = CBOR_NULL;
@@ -61,8 +64,8 @@ enum CBOR_TYPE {
     CBOR_TYPE_OTHER,
 };
 
-static HV *boolean_stash;
-static HV *tagged_stash;
+static HV *boolean_stash = NULL;
+static HV *tagged_stash = NULL;
 
 static const char* UV_TO_STR_TMPL = sizeof(UV) == 8 ? "%llu" : "%lu";
 static const char* IV_TO_STR_TMPL = sizeof(UV) == 8 ? "%lld" : "%ld";
@@ -125,6 +128,50 @@ SV *_decode( pTHX_ decode_ctx* decstate );
 
 //----------------------------------------------------------------------
 
+STATIC HV *_get_boolean_stash() {
+    if (!boolean_stash) {
+        dTHX;
+
+        boolean_stash = gv_stashpv(BOOLEAN_CLASS, 0);
+
+        if (!boolean_stash) {
+            SV *modname = newSVpvs(LOAD_BOOLEAN_CLASS);
+            load_module(PERL_LOADMOD_NOIMPORT, modname, NULL);
+
+            boolean_stash = gv_stashpv(BOOLEAN_CLASS, 0);
+
+            if (!boolean_stash) {
+                _croak("Loaded Types::Serialiser but didn’t find stash!");
+            }
+        }
+    }
+
+    return boolean_stash;
+}
+
+static SV *stored_false = NULL;
+static SV *stored_true = NULL;
+
+SV *_get_false() {
+    if (!stored_false) {
+        dTHX;
+        _get_boolean_stash();
+        stored_false = get_sv("Types::Serialiser::false", 0);
+    }
+
+    return stored_false;
+}
+
+SV *_get_true() {
+    if (!stored_true) {
+        dTHX;
+        _get_boolean_stash();
+        stored_true = get_sv("Types::Serialiser::true", 0);
+    }
+
+    return stored_true;
+}
+
 UV _uv_to_str(UV num, char *numstr, const char strlen) {
     return my_snprintf( numstr, strlen, UV_TO_STR_TMPL, num );
 }
@@ -132,8 +179,6 @@ UV _uv_to_str(UV num, char *numstr, const char strlen) {
 UV _iv_to_str(IV num, char *numstr, const char strlen) {
     return my_snprintf( numstr, strlen, IV_TO_STR_TMPL, num );
 }
-
-#define _croak croak
 
 void _die( pTHX_ I32 flags, char **argv ) {
     call_argv( "CBOR::Free::_die", G_EVAL | flags, argv );
@@ -472,16 +517,9 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
         }
     }
     else if (sv_isobject(value)) {
-        HV *stash = SvSTASH ( SvRV(value) );
+        HV *stash = SvSTASH( SvRV(value) );
 
-        if (boolean_stash == stash) {
-            _COPY_INTO_ENCODE(
-                encode_state,
-                SvTRUE(SvRV(value)) ? &CBOR_TRUE_U8 : &CBOR_FALSE_U8,
-                1
-            );
-        }
-        else if (tagged_stash == stash) {
+        if (tagged_stash == stash) {
             AV *array = (AV *)SvRV(value);
             SV **tag = av_fetch(array, 0, 0);
             IV tagnum = SvIV(*tag);
@@ -489,8 +527,15 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
             _init_length_buffer( aTHX_ tagnum, CBOR_TYPE_TAG, encode_state );
             _encode( aTHX_ *(av_fetch(array, 1, 0)), encode_state );
         }
+        else if (_get_boolean_stash() == stash) {
+            _COPY_INTO_ENCODE(
+                encode_state,
+                SvTRUE(SvRV(value)) ? &CBOR_TRUE_U8 : &CBOR_FALSE_U8,
+                1
+            );
+        }
 
-        // TODO: Support TO_JSON() method?
+        // TODO: Support TO_JSON() or TO_CBOR() method?
 
         else _croak_unrecognized(aTHX_ value);
     }
@@ -960,12 +1005,12 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
         case CBOR_TYPE_OTHER:
             switch (control->u8) {
                 case CBOR_FALSE:
-                    ret = newSVsv( get_sv("CBOR::Free::false", 0) );
+                    ret = newSVsv( _get_false() );
                     ++decstate->curbyte;
                     break;
 
                 case CBOR_TRUE:
-                    ret = newSVsv( get_sv("CBOR::Free::true", 0) );
+                    ret = newSVsv( _get_true() );
                     ++decstate->curbyte;
                     break;
 
@@ -1038,7 +1083,6 @@ BOOT:
     HV *stash = gv_stashpv("CBOR::Free", FALSE);
     newCONSTSUB(stash, "_MAX_RECURSION", newSVuv( MAX_ENCODE_RECURSE ));
 
-    boolean_stash = gv_stashpv(BOOLEAN_CLASS, 1);
     tagged_stash = gv_stashpv(TAGGED_CLASS, 1);
 
 SV *

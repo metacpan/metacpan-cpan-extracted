@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -35,8 +35,16 @@ sub parse_text {
     $parsed{column_number} = $col if $col;
     $parsed{sub_name}      = _maybe_extract_subroutine_name( \$text );
 
-    # Is this is an actual file.
-    $parsed{file_name} = $text if -e path($text);
+    _maybe_filter_text( \$text );
+
+    # Is this an actual file.
+    if ( -e path($text) ) {
+        $parsed{file_name} = $text;
+    }
+    elsif ( my $file_name = _maybe_git_diff_path($text) ) {
+        $parsed{file_name} = $file_name;
+    }
+
     if ( !exists $parsed{file_name} ) {
         if ( my $bin = _which($text) ) {
             $parsed{file_name} = $bin;
@@ -174,6 +182,11 @@ sub editor_args_from_parsed_text {
 sub _maybe_extract_line_number {
     my $text = shift;    # scalar ref
 
+    # Ansible: ": line 14, column 16,"
+    if ( $$text =~ s{ line (\d+).*, column (\d+).*}{} ) {
+        return $1, $2;
+    }
+
     # Find a line number
     #  lib/Foo/Bar.pm line 222.
 
@@ -200,10 +213,21 @@ sub _maybe_extract_line_number {
 
     # git-grep contextual match
     # lib/Open/This.pm-17-
-    if ( $$text =~ s{(\w)-(\d+)\-{0,1}}{$1} ) {
+    if ( $$text =~ s{(\w)-(\d+)\-{0,1}\z}{$1} ) {
         return $2;
     }
+
     return undef;
+}
+
+sub _maybe_filter_text {
+    my $text = shift;
+
+    # Ansible: The error appears to be in '/path/to/file':
+    if ( $$text =~ m{'(.*)'} ) {
+        my $maybe_file = $1;
+        $$text = $maybe_file if -e $maybe_file;
+    }
 }
 
 sub _maybe_extract_subroutine_name {
@@ -270,6 +294,18 @@ sub _maybe_find_local_file {
     return undef;
 }
 
+sub _maybe_git_diff_path {
+    my $file_name = shift;
+
+    if ( $file_name =~ m|^[ab]/(.+)$| ) {
+        if ( -e path($1) ) {
+            return $1;
+        }
+    }
+
+    return undef;
+}
+
 # search for binaries in path
 
 sub _which {
@@ -306,7 +342,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000019
+version 0.000020
 
 =head1 DESCRIPTION
 

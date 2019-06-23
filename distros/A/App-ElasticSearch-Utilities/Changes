@@ -1,9 +1,26 @@
 ==================================================
-Changes from 2017-06-19 00:00:00 +0000 to present.
+Changes from 2017-06-20 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.8 at 2019-06-19 00:22:48 +0000
+version 6.9 at 2019-06-20 04:21:23 +0000
+----------------------------------------
+
+  Change: 3e0c7429bcb83f9ae1613025ddd524d26229d258
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-19 20:29:27 +0000
+
+    Fix --with argument parsing, add --no-implications
+
+    * Handle the third parameter of the --with gracefully * Statistical facets
+    will be impacted by the presence or absence of a
+
+    field in a document, so imply an _exists_:<field> for any field
+
+    statistically aggregated. 
+
+----------------------------------------
+version 6.8 at 2019-06-18 23:41:33 +0000
 ----------------------------------------
 
   Change: 691d833f341d0104b770c34b588d016ce65539a1
@@ -743,5 +760,5 @@ version 5.4 at 2017-10-13 19:36:20 +0000
     es-alias-manager.pl: relax index name checker to allow _ 
 
 =================================================
-Plus 60 releases after 2017-06-19 00:00:00 +0000.
+Plus 60 releases after 2017-06-20 00:00:00 +0000.
 =================================================

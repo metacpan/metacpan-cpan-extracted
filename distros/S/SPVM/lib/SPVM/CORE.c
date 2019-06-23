@@ -8,8 +8,114 @@
 #include <float.h>
 #include <complex.h>
 #include <memory.h>
+#include <ctype.h>
+#include <errno.h>
 
 static const char* MFILE = "SPVM/CORE.c";
+
+int32_t SPNATIVE__SPVM__CORE__strtoi(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_string = stack[0].oval;
+  if (!obj_string) {
+    SPVM_DIE("String must be defined", MFILE, __LINE__);
+  }
+  const char* string = (const char*)env->belems(env, obj_string);
+  
+  int32_t digit = stack[1].ival;
+  
+  if (!(digit == 2 || digit == 8 || digit == 10 || digit == 16)) {
+    SPVM_DIE("Digit must be 2, 8, 10, 16", MFILE, __LINE__);
+  }
+  
+  char *end;
+  errno = 0;
+  long int num = strtol(string, &end, digit);
+  if (*end != '\0') {
+    SPVM_DIE("Invalid number format", MFILE, __LINE__);
+  }
+  else if (errno == ERANGE || num < INT32_MIN || num > INT32_MAX) {
+    SPVM_DIE("Out of range", MFILE, __LINE__);
+  }
+  
+  stack[0].ival = (int32_t)num;
+
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__CORE__strtol(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_string = stack[0].oval;
+  if (!obj_string) {
+    SPVM_DIE("String must be defined", MFILE, __LINE__);
+  }
+  const char* string = (const char*)env->belems(env, obj_string);
+  
+  int32_t digit = stack[1].ival;
+
+  if (!(digit == 2 || digit == 8 || digit == 10 || digit == 16)) {
+    SPVM_DIE("Digit must be 2, 8, 10, 16", MFILE, __LINE__);
+  }
+  
+  char *end;
+  errno = 0;
+  long long int num = strtoll(string, &end, digit);
+  if (*end != '\0') {
+    SPVM_DIE("Invalid number format", MFILE, __LINE__);
+  }
+  else if (errno == ERANGE || num < INT64_MIN || num > INT64_MAX) {
+    SPVM_DIE("Out of range", MFILE, __LINE__);
+  }
+  
+  stack[0].lval = (int64_t)num;
+
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__CORE__strtof(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_string = stack[0].oval;
+  if (!obj_string) {
+    SPVM_DIE("String must be defined", MFILE, __LINE__);
+  }
+  const char* string = (const char*)env->belems(env, obj_string);
+  
+  char *end;
+  errno = 0;
+  float num = strtof(string, &end);
+  if (*end != '\0') {
+    SPVM_DIE("Invalid number format", MFILE, __LINE__);
+  }
+  else if (errno == ERANGE) {
+    SPVM_DIE("[ERANGE]Out of range", MFILE, __LINE__);
+  }
+  
+  stack[0].fval = num;
+
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__CORE__strtod(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_string = stack[0].oval;
+  if (!obj_string) {
+    SPVM_DIE("String must be defined", MFILE, __LINE__);
+  }
+  const char* string = (const char*)env->belems(env, obj_string);
+  
+  char *end;
+  errno = 0;
+  double num = strtod(string, &end);
+  if (*end != '\0') {
+    SPVM_DIE("Invalid number format", MFILE, __LINE__);
+  }
+  else if (errno == ERANGE) {
+    SPVM_DIE("[ERANGE]Out of range", MFILE, __LINE__);
+  }
+  
+  stack[0].dval = num;
+
+  return SPVM_SUCCESS;
+}
 
 // https://github.com/lattera/glibc/blob/master/stdlib/rand_r.c
 static int
@@ -37,6 +143,18 @@ SPVM_rand_r (unsigned int *seed)
   return result;
 }
 
+
+int32_t SPNATIVE__SPVM__CORE__isdigit(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t ch = stack[0].ival;
+  
+  int32_t is_valid = isdigit(ch);
+  
+  stack[0].ival = is_valid;
+
+  return SPVM_SUCCESS;
+}
+
 int32_t SPNATIVE__SPVM__CORE__rand(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   uint32_t* next_ptr = (uint32_t*)stack[0].iref;
@@ -49,12 +167,16 @@ int32_t SPNATIVE__SPVM__CORE__rand(SPVM_ENV* env, SPVM_VALUE* stack) {
 int32_t SPNATIVE__SPVM__CORE__memcpyb(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_dist_str = stack[0].oval;
-  if (!obj_dist_str) { SPVM_DIE("Dist string must be defined", MFILE, __LINE__); }
+  if (!obj_dist_str) {
+    SPVM_DIE("Dist string must be defined", MFILE, __LINE__);
+  }
   
   int32_t dist_offset = stack[1].ival;
   
   void* obj_src_str = stack[2].oval;
-  if (!obj_src_str) { SPVM_DIE("Source string must be defined", MFILE, __LINE__); }
+  if (!obj_src_str) {
+    SPVM_DIE("Source string must be defined", MFILE, __LINE__);
+  }
   
   int32_t src_offset = stack[3].ival;
   

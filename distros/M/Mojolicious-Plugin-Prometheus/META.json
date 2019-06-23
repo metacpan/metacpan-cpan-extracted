@@ -4,7 +4,7 @@
       "Vidar Tyldum"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.14",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "artistic_2"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "Mojolicious::Plugin::Prometheus" : {
          "file" : "lib/Mojolicious/Plugin/Prometheus.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.2"
       }
    },
    "release_status" : "stable",
@@ -75,12 +75,15 @@
          "web" : "https://github.com/tyldum/mojolicious-plugin-prometheus"
       }
    },
-   "version" : "1.2.1",
+   "version" : "1.2.2",
    "x_authority" : "cpan:TYLDUM",
    "x_contributors" : [
       "Christopher Rasch-Olsen Raa <christopher@stix.no>",
+      "Marcus Ramberg <marcus.ramberg@gmail.com>",
       "Roland Lammel <rl@neotel.at>",
       "Vidar Tyldum <vidar@tyldum.com>",
       "lammel <lammel@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
 }

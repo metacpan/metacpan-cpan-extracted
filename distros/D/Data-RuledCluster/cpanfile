@@ -9,5 +9,6 @@ on configure => sub {
 
 on test => sub {
     requires 'DBI';
+    requires 'DBD::SQLite';
     requires 'Test::More';
 };

@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Cfn;
+use YAML::PP;
+use YAML::PP::Schema::Cfn;
+
+my $yp = YAML::PP->new(
+  schema => [ 'Cfn' ],
+);
+
+my $cfn = Cfn->new;
+$cfn->addResource('R1', 'AWS::IAM::User', { Path => { Ref => 'AWS::StackName' }, Groups => [ 'Group1', 'Group2' ] });
+$cfn->addResource('R2', 'AWS::IAM::User', { Path => { Ref => 'R1' } });
+$cfn->addResource('R3', 'AWS::IAM::User', { Path => { 'Fn::GetAtt' => [ 'R1', 'Arn' ] } });
+$cfn->addResource('S1', 'AWS::CloudFormation::Stack', {
+  TemplateURL => { 'Fn::Join' => [ ':', [ 'http', '//example.com' ] ] },
+  Parameters => { X => 1, Y => 2 }
+});
+
+use Data::Dumper;
+#print Dumper($cfn);
+
+my $yaml = $yp->dump_string($cfn);
+
+print $yaml;

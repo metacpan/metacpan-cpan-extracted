@@ -34,7 +34,6 @@ sub mvp_bundle_config {
         [ '@SHLOMIF/SingleEncoding', _exp('-SingleEncoding'), {} ],
         [ '@SHLOMIF/WikiDoc',        _exp('-WikiDoc'),        {} ],
         [ '@SHLOMIF/CorePrep',       _exp('@CorePrep'),       {} ],
-        [ '@SHLOMIF/Name',           _exp('Name'),            {} ],
         [ '@SHLOMIF/Version',        _exp('Version'),         {} ],
 
         [ '@SHLOMIF/Prelude',     _exp('Region'),  { region_name => 'prelude' } ],
@@ -96,7 +95,7 @@ Pod::Weaver::PluginBundle::SHLOMIF - SHLOMIF's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 DESCRIPTION
 
@@ -150,7 +149,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by David Golden.
+This software is Copyright (c) 2019 by David Golden.
 
 This is free software, licensed under:
 

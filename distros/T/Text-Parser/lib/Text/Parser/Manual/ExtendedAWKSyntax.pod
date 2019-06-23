@@ -15,7 +15,7 @@ Text::Parser::Manual::ExtendedAWKSyntax - A manual for ExAWK (extended AWK) synt
 
 =head1 VERSION
 
-version 0.925
+version 0.926
 
 =head1 THE EXTENDED AWK LANGUAGE
 
@@ -170,7 +170,9 @@ All shared variables created during the parsing of a text input exist only for t
 
 =head3 Suite of string and array utility functions
 
-Perl anyway has more built-in functions that are very useful and better than their AWK counterparts. But in addition, L<CPAN|http://www.cpan.org> has a lot of great modules with utility functions. ExAWK gives the programmer access to a number of these functions:
+Perl anyway has more built-in functions that are very useful and better than their AWK counterparts. But in addition, L<CPAN|http://www.cpan.org> has a lot of great modules with utility functions. ExAWK gives the programmer adds a few good utility functions, but also makes it very easy to add any other functions:
+
+=head4 Utility functions added
 
 =over 4
 
@@ -182,23 +184,22 @@ L<Scalar::Util> : C<blessed>, C<looks_like_number>
 
 L<String::Util> : All functions here
 
-=item *
-
-L<String::Util::Match> : C<match_array_or_regex>
-
-=item *
-
-L<String::Util::Range> : C<convert_sequence_to_range>
-
-=item *
-
-L<String::Index> : C<cindex>, C<ncindex>, C<crindex>, C<ncrindex>
-
-=item *
-
-L<List::Util> : The following functions - C<max maxstr min minstr product sum0 uniq pairs unpairs pairkeys pairvalues pairfirst pairgrep pairmap>
-
 =back
+
+I have kept this list small to minimize C<Text::Parser> dependencies. The user can import whatever functions they want from the package of their choice.
+
+=head4 How to add other utility functions
+
+Suppose you know of a very useful package (fictitiously named) C<Useful::Package>. And let's say it has functions C<foo> and C<bar> that are very useful and operate on strings. And you wish to use these in your rules. Then do the following in your code:
+
+    use Import::Into;
+    Useful::Package->import::into('Text::Parser::Rule', qw(foo bar));
+    use Text::Parser;
+
+    my $parser = Text::Parser->new();
+    $parser->add_rule(if => 'bar($1)', do => 'return foo($2);');
+
+This means that the power of any new package on CPAN can be harnessed very easily.
 
 =head1 COMPLEX CONDITIONAL TREES
 

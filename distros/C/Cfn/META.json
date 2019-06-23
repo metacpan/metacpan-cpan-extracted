@@ -37,7 +37,9 @@
             "Module::Runtime" : "0",
             "Moose" : "0",
             "MooseX::SlurpyConstructor" : "0",
-            "MooseX::StrictConstructor" : "0"
+            "MooseX::StrictConstructor" : "0",
+            "YAML::PP" : "0.015",
+            "perl" : "5.016000"
          }
       },
       "test" : {
@@ -63,7 +65,7 @@
          "web" : "https://github.com/pplu/cfn-perl"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }

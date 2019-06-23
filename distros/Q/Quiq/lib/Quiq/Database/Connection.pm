@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.145';
+our $VERSION = '1.147';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -4817,7 +4817,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.145
+1.147
 
 =head1 AUTHOR
 
