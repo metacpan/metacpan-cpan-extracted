@@ -1,0 +1,11 @@
+0.03
+    Added support for RFC-7239 (HTTP Forwarded header)
+    Brought all development configs up to date
+
+0.02
+    Renamed plugin to TrustedProxy
+    Added a series of unit tests
+    Added configurable HTTP header check values
+
+0.01
+    First release.

@@ -108,8 +108,6 @@ This option is useful for below case:
        ]
     }
 
-B<NOTE> that if you set C<xxxx> option, then it means that C<x>, C<xx> and C<xxx> are enabled as well. C<xxx> is going to be enabled C<x> and C<xx> as well. So C<xx> is including C<x>.
-
 =head3 timestamp-key
 
 You can set custom timestamp-key to convert unix timestamp to date time.
@@ -123,10 +121,23 @@ You can set custom timestamp-key to convert unix timestamp to date time.
 
 Supports unixtime C<1560026367>, msec C<1560026367123> and C<1560026367.123>
 
+=head3 xxxxx
+
+If you set C<xxxxx> option, then forcely convert integer value which is over 946684800 (2000-01-01T00:00:00Z).
+
+B<NOTE> that if you set C<xxxx> option, then it means that C<x>, C<xx> and C<xxx> are enabled as well. C<xxx> is going to be enabled C<x> and C<xx> as well. So C<xx> is including C<x>.
+
 =head3 gmtime
 
 If you set C<gmtime> flag, then unix timestamp converts date time as GMT instead of localtime.
 
+=head3 grep REGEXP
+
+If set C<grep> option with regexp, filtering JSON which is matched regexp.
+
+=head3 ignore REGEXP
+
+If set C<ignore> option with regexp, filtering JSON which is unmatched regexp.
 
 =head3 depth
 
@@ -139,6 +150,14 @@ If set C<no-pretty> option, then output JSON is not prettify. (default: false, D
 =head3 yaml
 
 If set C<yaml> option, show output string as YAML instead.
+
+=head3 unbuffered
+
+If set C<unbuffered> option, flush the output after each line is printed.
+
+=head3 stderr
+
+If set C<stderr> option, output line to STDERR instead.
 
 
 =head1 AUTHOR

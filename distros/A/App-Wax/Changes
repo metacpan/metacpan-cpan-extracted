@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Wax.
 
+2.3.1 - 2019-06-23
+
+    - sanity-check corrupt (empty) index files
+
 2.3.0 - 2018-09-27
 
     - improve tarball detection

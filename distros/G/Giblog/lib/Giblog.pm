@@ -10,7 +10,7 @@ use Carp 'confess';
 use Pod::Usage 'pod2usage';
 use List::Util 'min';
 
-our $VERSION = '0.76';
+our $VERSION = '0.91';
 
 sub new {
   my $class = shift;
@@ -90,17 +90,39 @@ sub config { shift->{config} }
 
 =head1 NAME
 
-Giblog - Blog builder for git generation
+Giblog - Web site and Blog builders you can manage with Git
+
+B<Giblog is in beta test before 1.0 release. Note that features is changed without warnings.>
+
+=begin html
+
+<p>
+  <b>Website</b>
+</p>
+<p>
+  <a href="https://new-website-example.giblog.net/"><img src="https://github.com/yuki-kimoto/giblog/raw/master/images/giblog-website.png"></a>
+</p>
+<p>
+  <a href="https://new-website-example.giblog.net/">Website Example</a>
+</p>
+<p>
+  <b>Blog</b>
+</p>
+<p>
+  <a href="https://new-blog-example.giblog.net/"><img src="https://github.com/yuki-kimoto/giblog/raw/master/images/giblog-blog.png"></a>
+</p>
+<p>
+  <a href="https://new-blog-example.giblog.net/">Blog Example</a>
+</p>
+
+=end html
 
 =head1 DESCRIPTION
 
-Giblog is B<Blog builder> written by Perl language.
-
-You can create B<your onw website and blog> easily.
-
-All created files is static HTML, so you can manage them using git.
-
-Giblog is in beta test before 1.0 release. Note that features is changed without warnings.
+Giblog is B<Website and Blog builder> written by Perl.
+You can create B<your website and blog> easily.
+All created files is B<static files>, so you can manage them using B<git>.
+You can B<customize your website by Perl>.
 
 =head1 SYNOPSYS
   
@@ -122,7 +144,7 @@ Giblog is in beta test before 1.0 release. Note that features is changed without
   # Build web site
   giblog build
   
-  # Serve web site(need Mojolicious)
+  # Check web site in local environment(need Mojolicious)
   morbo serve.pl
 
   # Add new entry with home directory
@@ -137,35 +159,33 @@ Giblog have the following features.
 
 =over 4
 
-=item * Build both website and blog.
+=item * Build Website and Blog.
 
-=item * Linux, Mac OS, Windows Support. (In Windows, recommend installation of msys2)
+=item * Git mangement. All created files is Static. you can manage files by git.
 
-=item * Default CSS for smart phone site
+=item * Linux, macOS, Windows Support. (In Windows, recommend installation of msys2)
 
-=item * Content is wrapped by top section, bottom section, header, footer, HTML head, and side var.
+=item * Provide default CSS for Smart phone site.
 
-=item * Add p tag automatically. Escape E<lt>, E<gt> automatically in pre tag
+=item * Header, Hooter and Side bar support
 
-=item * Set title tag automatically from text of first h1-h6 tag.
+=item * You can customize Top and Bottom section of content.
 
-=item * Set meta description tag automatically from text of first p tag.
+=item * You can customize HTML head.
 
-=item * You can use above all features or choice some of them, and can add more advanced features.
+=item * Automatical Line break. p tag is automatically added.
 
-=item * In advanced features, you can customize list of entries page, use markdown syntax, and add twitter card, etc.
+=item * Escape E<lt>, E<gt> automatically in pre tag
 
-=imte * Check web site using morbo command of Mojolicious. Contents changes is detected and build automatically.
+=item * Title tag is automatically added from first h1-h6 tag.
 
-=item * Build 645 pages by 0.78 seconds in my starndard linux environment.
+=item * Description meta tag is automatically added from first p tag.
 
-=item * Use JavaScript. Display the ad
+=item * You can customize your web site by Perl.
 
-=item * You can manage files by git easily, and deploy them to rental server.
+=item * You can serve your web site in local environment. Contents changes is detected and build automatically(need L<Mojolicious>).
 
-=item * If you use Github Pages, you can create https web site for free.
-
-=item * Giblog is used to build Perl Zemi web site.
+=item * Fast. Build 645 pages by 0.78 seconds in starndard linux environment.
 
 =back
 
@@ -173,55 +193,48 @@ Giblog have the following features.
 
 =head2 Create web site
 
-You can create web site from 3 prototype.
+B<1. Create Empty website>
 
-B<1. Empty website>
-
-"new" command create empty website. "mysite" is a exapmle name of your web site.
+"new" command create empty website. "mysite" is a name of your web site.
 
   giblog new mysite
 
-If you want to create empty site, choice this prototype.
+If you want to create empty site, choice this command.
+Templates and CSS is empty and provide minimal site building process.
 
-Templates and CSS is empty and provide minimal build process.
+B<2. Create Website>
 
-B<2. Website>
-
-"new_website" command create empty website. 
+"new_website" command create simple website.  "mysite" is a name of your web site.
 
   giblog new_website mysite
 
-If you want to create simple website, choice this prototype.
+If you want to create simple website, choice this command.
+Top page "templates/index.html" is created.
+List page "templates/list.html" is created, which is prepare to create blog entry pages easily for feature.
 
-Template of top page "templates/index.html" is created. CSS is designed to match smart phone site and provide basic build process.
+CSS is responsive design and supports smart phone and provide basic site building process.
 
-B<3. Blog>
+B<3. Create Blog>
 
-"new_blog" command create empty website. 
+"new_blog" command create empty website.  "mysite" is a name of your web site.
 
   giblog new_blog mysite
 
 If you want to create blog, choice this prototype.
+Top page "templates/index.html" is created, which show 7 days entries.
+List page "templates/list.html" is created, which show all entries links.
 
-Have page "templates/index.html" which show 7 days entry.
+CSS is responsive design and supports smart phone and provide basic blog building process.
 
-Have page "templates/list.html" which show all page links.
+=head2 Add blog entry page
 
-CSS is designed to match smart phone site and provide basic build process.
-
-=head2 Add entry page
-
-"add" command add blog entry page.
-  
-  giblog add
-
-You need to change directory to "mysite" before run "add" command.
+You need to change directory to "mysite" before run "add" command if you are in other directory.
 
   cd mysite
 
-If you use "--home" option, you don't need to change directory
-
-  giblog add --home /home/kimoto/mysite
+"add" command add entry page.
+  
+  giblog add
 
 Created file name is, for example,
 
@@ -229,26 +242,109 @@ Created file name is, for example,
 
 This file name contains current date and time.
 
+To write new entry, You open it, write h2 head and content.
+
+  <h2>How to use Giblog</h2>
+
+  How to use Giblog. This is ...
+
+Other parts wrapping content like Header and footer is automatically added in building process.
+
+=head2 Add content page
+
+If you want to create content page, put file into "templates" directory.
+
+  templates/access.html
+  templates/profile.html
+
+Then open these file, write h2 head and content.
+
+  <h2>How to use Giblog</h2>
+
+  How to use Giblog. This is ...
+
+Other parts wrapping content like Header and footer is automatically added in building process.
+
+You can put file into sub directory.
+
+  templates/profile/more.html
+
+Note that "templates/static" and "templates/common" is special directories.
+Don't push content page files into these directories.
+
+  # Special directories you don't put content page files into
+  templates/static
+  templates/common
+
+=head2 Add static page
+
+If you want to add static files like css, images, JavaScript, You put these file into "templates/static" directory.
+
+Files in "templates/static" directory is only copied to public files by build process.
+
+  templates/static/js/jquery.js
+  templates/static/images/logo.png
+  templates/static/css/more.css
+
+=head2 Customize header or footer, side bar, top of content, bottom of content
+
+You can customize header, footer, side bar, top of content, bottom of content.
+  
+  ------------------------
+  Header
+  ------------------------
+  Top of content   |
+  -----------------|
+                   |Side
+  Content          |bar
+                   |
+  -----------------|
+  Bottom of content|
+  ------------------------
+  Footer
+  ------------------------
+
+If you want to edit these section, you edit these files.
+
+  templates/common/header.html     Header
+  templates/common/top.html        Top of content
+  templates/common/side.html       Side bar
+  templates/common/bottom.html     Bottom of content
+  templates/common/footer.html     Footer
+
+=head2 Customize HTML header
+
+You can customize HTML header.
+
+  <html>
+    <head>
+      <!-- HTML header -->
+    </head>
+    <body>
+    
+    </body>
+  </html>
+
+If you want to edit HTML header, you edit the following file.
+
+  templates/common/meta.html
+
 =head2 Build web site
+
+You need to change directory to "mysite" before run "build" command if you are in other directory.
+
+  cd mysite
 
 "build" command build web site.
 
   giblog build
 
-You need to change directory to "mysite" before run "build" command.
-
-  cd mysite
-
-If you use "--home" option, you don't need to change directory.
-
-  giblog build --home /home/kimoto/mysite
-
 What is build process?
 
-Build process is writen in "run" method of "lib/Giblog/Command/build.pm".
+build process is writen in "lib/Giblog/Command/build.pm".
 
-Main part of build process is combination of L<Giblog::API>.
-  
+"build" command only execute "run" method in "Giblog::Command::build.pm" .
+
   # "lib/Giblog/Command/build.pm" in web site created by "new_blog" command
   package Giblog::Command::build;
 
@@ -287,6 +383,15 @@ Main part of build process is combination of L<Giblog::API>.
       # Parse title
       $api->parse_title_from_first_h_tag($data);
 
+      # Edit title
+      my $site_title = $config->{site_title};
+      if ($data->{file} eq 'index.html') {
+        $data->{title} = $site_title;
+      }
+      else {
+        $data->{title} = "$data->{title} - $site_title";
+      }
+
       # Add page link
       $api->add_page_link_to_first_h_tag($data, {root => 'index.html'});
 
@@ -319,15 +424,13 @@ Main part of build process is combination of L<Giblog::API>.
     $self->create_list;
   }
 
-"run" method read all template files in "templates" directory, and edit them, and wrtie output to file in "public" directory.
+You can customize build process if you need.
 
-You can edit this build process by yourself if you need.
-
-If you need to understand APIs in run method, see L<Giblog::API>.
+If you need to know Giblog API, see L<Giblog::API>.
 
 =head2 Serve web site
 
-If you have L<Mojolicious>, you can build and serve web site.
+If you have L<Mojolicious>, you can serve web site in local environment.
 
    morbo serve.pl
 
@@ -336,14 +439,12 @@ You see the following message.
    Server available at http://127.0.0.1:3000
    Server start
 
-If files in "templates" directory is updated, web site is build and this server is reloaded automatically.
+If files in "templates" directory is changed, Web site is automatically rebuild.
 
 =head1 METHODS
 
 These methods is internally methods.
-
-Don't need to know these methods except for Giblog developer.
-
+Normally, you don't need to know these methods.
 See L<Giblog::API> to manipulate HTML contents.
 
 =head2 new
@@ -386,7 +487,7 @@ Yuki Kimoto, C<< <kimoto.yuki at gmail.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Yuki Kimoto.
+Copyright 2018-2019 Yuki Kimoto.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

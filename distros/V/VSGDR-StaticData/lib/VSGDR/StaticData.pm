@@ -6,12 +6,13 @@ use warnings;
 use 5.010;
 
 use List::Util qw(max);
+use List::MoreUtils qw(any);
 use POSIX qw(strftime);
 use Carp;
 use DBI;
 use Data::Dumper;
 use English;
-if ($OSNAME eq 'MSWin32') {require Win32} 
+if ($OSNAME eq 'MSWin32') {require Win32}
 
 ##TODO 1. Fix multi-column primary/unique keys.
 ##TODO 2. Check that non-key identity columns are handled correctly when they occur in the final position in the table.
@@ -22,11 +23,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 
 sub databaseName {
@@ -74,8 +75,8 @@ sub dependencySQL {
 return <<"EOF" ;
 select  distinct
         tc2.TABLE_CATALOG               as to_CATALOG
-,       tc2.TABLE_SCHEMA                as to_SCHEMA 
-,       tc2.TABLE_NAME                  as to_NAME   
+,       tc2.TABLE_SCHEMA                as to_SCHEMA
+,       tc2.TABLE_NAME                  as to_NAME
 ,       tc1.TABLE_CATALOG               as from_CATALOG
 ,       tc1.TABLE_SCHEMA                as from_SCHEMA
 ,       tc1.TABLE_NAME                  as from_NAME
@@ -98,9 +99,9 @@ EOF
 sub generateScript {
 
     my ${LargeDataSetThreshhold}        = 30 ;
-    
+
     local $_                            = undef;
-            
+
     my $dbh                             = shift ;
     my $schema                          = shift ;
     my $table                           = shift ;
@@ -111,18 +112,18 @@ sub generateScript {
 
     $schema = substr $schema, 1, -1     if $schema =~ m/\A \[ .+ \] \Z /msix;
     $table  = substr $table,  1, -1     if $table  =~ m/\A \[ .+ \] \Z /msix;
-    my $combinedName                    = "${schema}.${table}"; 
-    my $quotedCombinedName              = "[${schema}].[${table}]"; 
-    my $tableVarName                    = "LocalTable_${table}"; 
+    my $combinedName                    = "${schema}.${table}";
+    my $quotedCombinedName              = "[${schema}].[${table}]";
+    my $tableVarName                    = "LocalTable_${table}";
 
-    my $quotedSchema                    = "[${schema}]"; 
-    my $quotedTable                     = "[${table}]"; 
-       
+    my $quotedSchema                    = "[${schema}]";
+    my $quotedTable                     = "[${table}]";
+
     my $database                        = databaseName($dbh);
 
     no warnings;
     my $userName                        = $OSNAME eq 'MSWin32' ? eval('Win32::LoginName') : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
-    use warnings;                      
+    use warnings;
 
     my $date                            = strftime "%d/%m/%Y", localtime;
 
@@ -131,7 +132,7 @@ sub generateScript {
     if ($hasId) {
         $idCol                  = idCols($dbh,$schema,$table) ;
     }
-#warn Dumper $idCol ;    
+#warn Dumper $idCol ;
     my $set_IDENTITY_INSERT_ON  = "";
     my $set_IDENTITY_INSERT_OFF = "";
     $set_IDENTITY_INSERT_ON     = "set IDENTITY_INSERT ${quotedCombinedName} ON"  if $hasId;
@@ -139,11 +140,11 @@ sub generateScript {
 
 
     my $ra_columns              = columns($dbh,$schema,$table);
-#warn Dumper $quotedSchema,$quotedTable   ; 
+#warn Dumper $quotedSchema,$quotedTable   ;
     my $ra_pkcolumns            = pkcolumns($dbh,$quotedSchema,$quotedTable);
 
     croak "${quotedCombinedName} doesn't appear to be a valid table"          unless scalar @{$ra_columns};
-    
+
 #warn Dumper $ra_columns ;
 #exit ;
 
@@ -156,7 +157,7 @@ sub generateScript {
 #exit;
 
     my $primaryKeyCheckClause   = "";
-    my $pk_column               = undef ; #$ra_pkcolumns->[0][0];    
+    my $pk_column               = undef ; #$ra_pkcolumns->[0][0];
     #my @nonKeyColumns = grep { $_->[0][0] ne $pk_column } @{$ra_columns};
 
     my @nonKeyColumns           = () ;
@@ -170,11 +171,11 @@ sub generateScript {
     foreach my $l (@{$ra_columns}) {
         do { local $" = "";   $flatcolumnlist           .= "[$l->[0]]" ; $flatcolumnlist .= ", "} ;
         do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
-    }    
+    }
     $flatcolumnlist             =~ s{ ,\s? \z }{}msx;
     $flatvariablelist           =~ s{ ,\s? \z }{}msx;
 
-    
+
 #warn Dumper @{$ra_pkcolumns} ;
 
     my $reportingPKCols                 = "" ;
@@ -189,20 +190,20 @@ sub generateScript {
         }
         #my @pk_ColumnsCheck     = map { "( $_->[0]\t\t\t = \@$_->[0] or ( $_->[0]\t\t\t is null and \@$_->[0] is null ) ) " } @{$ra_columns} ;
         $primaryKeyCheckClause  = "where\t" . do { local $" = "\n\t\t\t\tand\t\t"; "@pk_ColumnsCheck" };
-        
+
         $recordExistenceCheckSQL = <<"EOF";
 if exists
                 (
                 select $flatvariablelist
-                except        
-                select  ${flatcolumnlist} 
+                except
+                select  ${flatcolumnlist}
                 from    ${quotedCombinedName}
                 )
 EOF
 
     }
     elsif ( scalar @{$ra_pkcolumns} != 1 ) {
-        
+
         my @pk_ColumnsCheck = () ;
 
         foreach my $l (@{$ra_pkcolumns}) {
@@ -217,7 +218,7 @@ EOF
 #        my @pk_ColumnsCheck     = map { "$_->[0]\t\t\t = \@$_->[0]" } @{$ra_columns} ;
         }
         $primaryKeyCheckClause  = "where\t" . do { local $" = "\n\t\t\t\tand\t\t"; "@pk_ColumnsCheck" }  ;
-        
+
         foreach my $col (@{$ra_columns}) {
 #warn Dumper @{$ra_columns};
 #warn Dumper $col;
@@ -233,21 +234,21 @@ if not exists
 EOF
     }
     else {
-        $reportingPKCols        = $ra_pkcolumns->[0][0];     
-        $pk_column              = $ra_pkcolumns->[0][0];        
+        $reportingPKCols        = $ra_pkcolumns->[0][0];
+        $pk_column              = $ra_pkcolumns->[0][0];
         $primaryKeyCheckClause  = "where   ${pk_column}        = \@${pk_column}";
         @nonKeyColumns = grep { $_->[0] ne $pk_column } @{$ra_columns};
-        
+
         $recordExistenceCheckSQL = <<"EOF";
 if not exists
                 (
-                select  ${flatcolumnlist} 
+                select  ${flatcolumnlist}
                 from    ${quotedCombinedName}
                 ${primaryKeyCheckClause}
-                )               
+                )
 EOF
-    } 
-    
+    }
+
 
     my $variabledeclaration     = "declare\t" ;
     my $tabledeclaration        = "(\t\tStaticDataPopulationId\t\tint\tnot null identity(1,1)\n\t,\t\t" ;
@@ -267,7 +268,7 @@ EOF
         my $varlen  = length($l->[0]) ;
         my $colpadding = $widest_column_name_padding - (int(($varlen)/4));
         my $varpadding = $widest_column_name_padding - (int(($varlen+1)/4));
-#warn Dumper     $l->[0];        
+#warn Dumper     $l->[0];
 #warn Dumper     $varlen;
 #warn Dumper     $padding;
 #warn Dumper $variabledeclaration;
@@ -278,16 +279,16 @@ EOF
         do { local $" = "\t"; $tabledeclaration         .= "[@{$l}[0]]". "\t"x$colpadding . "[$$l[1]]" ."@{$l}[2,3,4,5]" ; $tabledeclaration .= "\n\t,\t\t"} ;
 #        do { local $" = "";   $selectstatement          .= "@"."$l->[0]\t\t= $l->[0]" ; $selectstatement .= "\n\t\t,\t\t"} ;
         do { local $" = "";   $selectstatement          .= "@"."$l->[0]" . "\t"x$varpadding ."= [$l->[0]]" ; $selectstatement .= "\n\t\t,\t\t"} ;
-        do { local $" = "";   $insertclause             .= "[$l->[0]]" ; $insertclause .= ", "} ;    
-        do { local $" = "";   $valuesclause             .= "[$l->[0]]" ; $valuesclause .= ", "} ;    
+        do { local $" = "";   $insertclause             .= "[$l->[0]]" ; $insertclause .= ", "} ;
+        do { local $" = "";   $valuesclause             .= "[$l->[0]]" ; $valuesclause .= ", "} ;
 #        do { local $" = "";   $flatcolumnlist           .= "[$l->[0]]" ; $flatcolumnlist .= ", "} ;
         do { local $" = "";   $flatExtractColumnList    .= $l->[1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i  ? "convert(varchar(30),[$l->[0]],120)" :  "[$l->[0]]" ; $flatExtractColumnList .= ", "} ;
 #        do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
 
         do { local $" = "";   $printStatement           .= "'  $$l[0]: ' " ; } ;
-        my $printFragment                               = $$l[1] !~ m{ (?: char ) }ixms 
+        my $printFragment                               = $$l[1] !~ m{ (?: char ) }ixms
                                                                   ? "cast( \@$$l[0] as varchar(128))"
-                                                                  : "\@$$l[0]" ; 
+                                                                  : "\@$$l[0]" ;
 
         $printFragment   = " + case when ${printFragment} is null then 'NULL' else '''' + ${printFragment} + '''' end + " ;                                                                  ;
         $printStatement .= $printFragment ;
@@ -295,7 +296,7 @@ EOF
     foreach my $l (@nonKeyColumns) {
         # create update statement for each non-identity column.
         if ( ! $hasId || ( $l->[0] ne $idCol ) ) {
-#warn Dumper $l;            
+#warn Dumper $l;
             do { local $" = "";   $updateColumns            .= "$l->[0]\t\t= "."@"."$l->[0]" ; $updateColumns .= "\n\t\t\t\t\t,\t"} ;
         }
         elsif($hasId)  {
@@ -303,7 +304,7 @@ EOF
         }
     }
 
-    
+
     # trim off erroneous trailing cruft - better to resign array interpolations above .
     $variabledeclaration      =~ s{ \n\t,\t\t \z }{}msx;
     $tabledeclaration         =~ s{ \n\t,\t\t \z }{}msx;
@@ -329,7 +330,7 @@ EOF
 #    my $ra_data = getCurrentTableData($dbh,$combinedName,$pk_column,$flatcolumnlist);
 #    my $ra_data = getCurrentTableData($dbh,$quotedCombinedName    ,$pk_column,$flatcolumnlist);
     my $ra_data = getCurrentTableData($dbh,$quotedCombinedName    ,$pk_column,$flatExtractColumnList);
-    
+
     my @valuesTable     ;
     my $valuesClause    = "values\n\t\t\t";
 
@@ -337,28 +338,28 @@ EOF
     foreach my $ra_row (@{$ra_data}){
     #    warn Dumper $ra_row;
         my @outVals = undef ;
-#warn Dumper @{$ra_row} ;        
+#warn Dumper @{$ra_row} ;
 #exit;
         for ( my $i = 0; $i < scalar @{$ra_row}; $i++ ) {
-#warn Dumper $ra_row->[$i] ;    
+#warn Dumper $ra_row->[$i] ;
 #warn Dumper $IsColumnNumeric[$i] ;
 #            $ra_row->[$i] = ( defined $ra_row->[$i] ) ? $ra_row->[$i] : "null" ;
-            
+
             if ( ( $IsColumnNumeric[$i] == 1 ) and ( not ( defined ($ra_row->[$i]) ) ) ) {
-                $outVals[$i] = 'null' ;  
+                $outVals[$i] = 'null' ;
             }
             if ( ( $IsColumnNumeric[$i] == 0 ) and ( not ( defined ($ra_row->[$i]) ) ) ) {
-                $outVals[$i] = 'null' ;  
+                $outVals[$i] = 'null' ;
             }
             if ( ( $IsColumnNumeric[$i] == 1 ) and (     ( defined ($ra_row->[$i]) ) ) ) {
-                $outVals[$i] = $ra_row->[$i]  ;  
+                $outVals[$i] = $ra_row->[$i]  ;
             }
             if ( ( $IsColumnNumeric[$i] == 0 ) and (     ( defined ($ra_row->[$i]) ) ) ) {
                 if (${$ra_columns}[$i][1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i) {
                     $outVals[$i] = "convert(". ${$ra_columns}[$i][1] ."," . $dbh->quote($ra_row->[$i]) . ",120)"   ;
                 }
                 else {
-                    $outVals[$i] = $dbh->quote($ra_row->[$i])  ;  
+                    $outVals[$i] = $dbh->quote($ra_row->[$i])  ;
                 }
             }
         }
@@ -371,13 +372,13 @@ EOF
 
     my @maxWidth;
     my $maxCol;
-    
+
     if ( scalar @valuesTable ) {
         my @tmp = @{$valuesTable[0]};
         $maxCol = scalar @tmp -1 ;
         for ( my $i = 0; $i <= $maxCol; $i++ ) {
             push @maxWidth, 0;
-        }     
+        }
         for ( my $i = 0; $i < scalar @valuesTable; $i++ ) {
             my @tmp = @{$valuesTable[$i]};
             for ( my $i = 0; $i <= $maxCol; $i++ ) {
@@ -387,9 +388,9 @@ EOF
             }
         }
     }
-    
+
     #warn Dumper @maxWidth ;
-    
+
     for ( my $i = 0; $i < scalar @valuesTable; $i++ ) {
         my @tmp = @{$valuesTable[$i]};
         my $line = "";
@@ -405,19 +406,19 @@ EOF
     }
 
     $valuesClause        =~ s{ \n\t\t,\t \z }{}msx;
-    
+
 
     my $noopPrintStatement      = "'Nothing to update. Values are unchanged.'";
     my $printNoOpStatement      = "print ${noopPrintStatement}" ;
     if ( ${pk_column} ) {
-        $noopPrintStatement     = "'Nothing to update. ${combinedName}: Values are unchanged for Primary/Unique Key: '";    
-        $printNoOpStatement     = "print ${noopPrintStatement} + cast(\@${reportingPKCols} as varchar(1000)) "        
+        $noopPrintStatement     = "'Nothing to update. ${combinedName}: Values are unchanged for Primary/Unique Key: '";
+        $printNoOpStatement     = "print ${noopPrintStatement} + cast(\@${reportingPKCols} as varchar(1000)) "
     }
-    
+
     my $elsePrintSection        = <<"EOF";
 else  begin
                 ${printNoOpStatement}
-            end 
+            end
 EOF
 
     if ( scalar @{$ra_data} > ${LargeDataSetThreshhold}  ){
@@ -427,14 +428,14 @@ EOF
     }
 
     my ${elseBlock} = "";
-    
-    if ( scalar @nonKeyColumns ) {    
+
+    if ( scalar @nonKeyColumns ) {
         ${elseBlock} = <<"EOF";
-        
+
         -- if the static data doesn''t match what is already there then update it.
         -- 'except' handily handles null as equal.  Saves some extensive twisted logic.
         else begin
-            if exists 
+            if exists
                 (
                 select  ${flatcolumnlist}
                 from    $quotedCombinedName
@@ -451,14 +452,14 @@ EOF
                 end
                 set \@ChangedCount += 1 ;
             end
-        ${elsePrintSection}        
+        ${elsePrintSection}
         end
 EOF
-    } 
-    
-    
+    }
+
+
     my $tmp_sv = substr(${table},0,20) ;
-    my $savePointName = "sc_${tmp_sv}_SP";    
+    my $savePointName = "sc_${tmp_sv}_SP";
 
     my ${printChangedTotalsSection} = "" ;
 #warn Dumper @nonKeyColumns ;
@@ -476,18 +477,18 @@ return <<"EOF";
  * Author  :    ${userName}
  * Date    :    ${date}
  * Purpose :    Static data deployment script for ${combinedName}
- *              
+ *
  *
  * Version History
  * ---------------
  * 1.0.0    ${date} ${userName}
  * Created.
- ***************************************************************************************/  
+ ***************************************************************************************/
 
-set nocount on 
+set nocount on
 
-declare  \@DeployCmd                varchar(20)     
-        ,\@DeploySwitch             bit             
+declare  \@DeployCmd                varchar(20)
+        ,\@DeploySwitch             bit
 
 set     \@DeployCmd                 = '\$(StaticDataDeploy)'
 set     \@DeploySwitch              = 0
@@ -508,8 +509,8 @@ else
 begin try
 
     -- Declarations
-    declare \@ct                       int          
-    ,       \@i                        int  
+    declare \@ct                       int
+    ,       \@i                        int
     ,       \@InsertedCount            int = 0
     ,       \@ChangedCount             int = 0
 
@@ -523,22 +524,22 @@ begin try
 
     declare \@${tableVarName} table
     ${tabledeclaration}
-    
-    ; with src as 
+
+    ; with src as
     (
-    select * 
+    select *
     from    ( ${valuesClause}
-            ) AS vtable 
+            ) AS vtable
     ( $flatcolumnlist)
     )
     insert  into
-            \@${tableVarName} 
+            \@${tableVarName}
     (       ${flatcolumnlist}
     )
     select  ${flatcolumnlist}
     from    src
 
-    ${variabledeclaration}        
+    ${variabledeclaration}
 
 
 
@@ -580,7 +581,7 @@ begin catch
 
     -- if xact_state() = -1 then the transaction isn't recorded in \@\@trancount so check both
     if \@\@trancount > 0 or xact_state() = -1 begin
-        if xact_state() = -1 
+        if xact_state() = -1
             rollback; -- we can't do anything else
         -- Rollback any locally begun transaction to savepoint.  Don't fail the whole deployment if it's transactional.
         -- If our transaction is the only one, then just rollback.
@@ -602,7 +603,7 @@ begin catch
 
     print 'Deployment of ${combinedName} static data failed.  This script was rolled back.';
     print error_message();
-    
+
     ${set_IDENTITY_INSERT_OFF};
 
 
@@ -618,7 +619,7 @@ EOF
 sub generateTestDataScript {
 
     local $_                            = undef;
-            
+
     my $dbh                             = shift ;
     my $schema                          = shift ;
     my $table                           = shift ;
@@ -631,24 +632,24 @@ sub generateTestDataScript {
     croak "bad arg table"               unless defined $table;
     croak "bad arg sql"                 unless defined $sql;
     croak "bad arg minimal form"        unless defined $use_MinimalForm;
-    croak "bad arg minimal form"        unless defined $use_IgnoreNulls;
+    croak "bad arg ignore nulls"        unless defined $use_IgnoreNulls;
 
     $schema = substr $schema, 1, -1     if $schema =~ m/\A \[ .+ \] \Z /msix;
     $table  = substr $table,  1, -1     if $table  =~ m/\A \[ .+ \] \Z /msix;
-    my $combinedName                    = "${schema}.${table}"; 
-    my $quotedCombinedName              = "[${schema}].[${table}]"; 
+    my $combinedName                    = "${schema}.${table}";
+    my $quotedCombinedName              = "[${schema}].[${table}]";
 
-    my $quotedSchema                    = "[${schema}]"; 
-    my $quotedTable                     = "[${table}]"; 
-       
+    my $quotedSchema                    = "[${schema}]";
+    my $quotedTable                     = "[${table}]";
+
     my $database                        = databaseName($dbh);
 
     my $hasId                           = has_idCols($dbh,$schema,$table) ;
     my $idCol                           = undef ;
-    if ($hasId) {       
+    if ($hasId) {
         $idCol                          = idCols($dbh,$schema,$table) ;
     }
-#warn Dumper $idCol ;    
+#warn Dumper $idCol ;
     my $set_IDENTITY_INSERT_ON  = "";
     my $set_IDENTITY_INSERT_OFF = "";
     $set_IDENTITY_INSERT_ON     = "set IDENTITY_INSERT ${quotedCombinedName} ON"  if $hasId;
@@ -656,8 +657,9 @@ sub generateTestDataScript {
 
 
     my $ra_columns              = columns($dbh,$schema,$table);
+
     croak "${quotedCombinedName} doesn't appear to be a valid table"          unless scalar @{$ra_columns};
-    
+
 
     my @IsColumnNumeric         = map { $_->[1] =~ m{uniqueidentifier|char|text|date}i ? 0 : 1 ;  } @{$ra_columns} ;
     my @nonKeyColumns           = () ;
@@ -668,7 +670,7 @@ sub generateTestDataScript {
     my $flatvariablelist        = "" ;
     foreach my $l (@{$ra_columns}) {
         do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
-    }    
+    }
     $flatvariablelist           =~ s{ ,\s? \z }{}msx;
 
     foreach my $l (@{$ra_columns}) {
@@ -689,20 +691,27 @@ sub generateTestDataScript {
 
     $flatExtractColumnList    =~ s{ ,\s? \z }{}msx;
 
-    my $ra_metadata = describeTestDataForTable($dbh,$sql);
+#warn Dumper $flatExtractColumnList;
+#warn Dumper $ra_columns;
+
+    my $ra_metadata = describeTestDataForTable($dbh,$sql,$ra_columns);
     my @cols = map { $$_[0] } @$ra_metadata ;
 
-    my $ra_data     = getTestDataForTable($dbh,$quotedCombinedName,$flatExtractColumnList,$sql);
+    my $ra_data     = getTestDataForTable($dbh,$quotedCombinedName,\@cols,$sql);
 
+#warn Dumper $$ra_data[0];    
+#warn Dumper @cols;
+#warn Dumper @$ra_metadata;
+   
     my @useColumnValues   = ();
-    
+
     #look over data and try to find the slices which are empty
     if ($use_IgnoreNulls) {
         @useColumnValues   = map { 0 } @$ra_metadata ;
         foreach my $ra_row (@{$ra_data}){
             for ( my $i = 0; $i < scalar @{$ra_row}; $i++ ) {
                 if ( ( defined ($ra_row->[$i]) ) ) {
-                    $useColumnValues[$i] = 1 ;  
+                    $useColumnValues[$i] = 1 ;
                 }
             }
         }
@@ -710,9 +719,9 @@ sub generateTestDataScript {
     else {
         @useColumnValues   = map { 1 } @$ra_metadata ;
     }
-    
+
     my $colList = "" ;#do { local $" = "," ; "@cols" } ;
-    
+
     my $i =0;
     foreach my $c (@cols)
     {
@@ -728,8 +737,8 @@ sub generateTestDataScript {
     }
 
 #warn Dumper $colList;
-
-    #need to overlay tables with columns apart from those which are 'hidden'    
+#exit;
+    #need to overlay tables with columns apart from those which are 'hidden'
     my @valuesTable     ;
     my $valuesClause    = "values\n\t\t\t";
 
@@ -739,17 +748,17 @@ sub generateTestDataScript {
         for ( my $i = 0; $i < scalar @{$ra_row}; $i++ ) {
             if ($useColumnValues[$i]) {
             if ( not ( defined ($ra_row->[$i]) ) ) {
-                $outVals[$i] = 'null' ;  
+                $outVals[$i] = 'null' ;
             }
             else {
                 if (${$ra_metadata}[$i][1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i) {
                     $outVals[$i] = "convert(". ${$ra_columns}[$i][1] ."," . $dbh->quote($ra_row->[$i]) . ",120)"   ;
                 }
                 elsif ( ${$ra_metadata}[$i][1] =~ m{(?:uniqueidentifier|char|text|date)}i)  {
-                    $outVals[$i] = $dbh->quote($ra_row->[$i])  ;  
+                    $outVals[$i] = $dbh->quote($ra_row->[$i])  ;
                 }
                 else {
-                    $outVals[$i] = $ra_row->[$i] ;  
+                    $outVals[$i] = $ra_row->[$i] ;
                 }
             }
             }
@@ -761,13 +770,13 @@ sub generateTestDataScript {
 
     my @maxWidth;
     my $maxCol;
-    
+
     if ( scalar @valuesTable ) {
         my @tmp = @{$valuesTable[0]};
         $maxCol = scalar @tmp -1 ;
         for ( my $i = 0; $i <= $maxCol; $i++ ) {
             push @maxWidth, 0;
-        }     
+        }
         for ( my $i = 0; $i < scalar @valuesTable; $i++ ) {
             my @tmp = @{$valuesTable[$i]};
             for ( my $i = 0; $i <= $maxCol; $i++ ) {
@@ -779,15 +788,15 @@ sub generateTestDataScript {
             }
         }
     }
-    
+
     #warn Dumper @maxWidth ;
-    
+
     for ( my $i = 0; $i < scalar @valuesTable; $i++ ) {
         my @tmp             = @{$valuesTable[$i]};
         my $line            = "";
         for ( my $j = 0; $j <= $maxCol; $j++ ) {
             if ($useColumnValues[$j]) {
-            
+
             my $val         = $tmp[$j];
             my $valWidth    = length($val);
             my $PadLength   = $maxWidth[$j]-$valWidth;
@@ -800,16 +809,16 @@ sub generateTestDataScript {
     }
 
     $valuesClause           =~ s{ \n\t\t,\t \z }{}msx;
-    
+
     if ( ! $use_MinimalForm) {
 return <<"EOF";
 
     ${set_IDENTITY_INSERT_ON}
-    ; with src as 
+    ; with src as
     (
-    select  * 
+    select  *
     from    ( ${valuesClause}
-            ) AS vtable 
+            ) AS vtable
     ( ${colList})
     )
     insert  into
@@ -827,53 +836,64 @@ EOF
 return <<"EOF";
 ${valuesClause}
 EOF
-        
+
     }
 }
 
 sub describeTestDataForTable {
 
     local $_ = undef ;
-    
-    my $dbh          = shift or croak 'no dbh' ;
-    my $sql          = shift or croak 'no sql' ;
+
+    my $dbh             = shift or croak 'no dbh' ;
+    my $sql             = shift or croak 'no sql' ;
+    my $ra_validColumns = shift or croak 'no valid columns' ;
 
     ( my $quoted_sql    = $sql ) =~ s{'}{''}g;
-    
+
     my $metadata_sql    = "exec sp_describe_first_result_set N'${quoted_sql}'" ;
 
     my $sth2            = $dbh->prepare($metadata_sql);
     my $rs              = $sth2->execute();
     my $res             = $sth2->fetchall_arrayref() ;
 
-    my @ret_res         = map { [($$_[2],$$_[5],$$_[3],$$_[1])] } @$res;
+#warn Dumper  @$ra_validColumns  ;
+#warn Dumper @$res  ;
+
+    my @filteredRes     = grep { my $col = $_; if ( any { $$_[0] eq $$col[2] } @$ra_validColumns) { $col } } @$res;
+#warn Dumper @filteredRes  ;
+#exit;
+    my @ret_res         = map { [($$_[2],$$_[5],$$_[3],$$_[1])] } @filteredRes;
+
+#warn Dumper @ret_res  ;
 
     return \@ret_res ;
-    
+
 }
 
 sub getTestDataForTable {
 
     local $_ = undef ;
-    
+
     my $dbh          = shift or croak 'no dbh' ;
     my $combinedName = shift or croak 'no table' ;
     my $cols         = shift or croak 'no cols list' ;
     my $sql          = shift or croak 'no sql' ;
+#warn Dumper "COLS = ", $cols;
+#my @cols = map {$_ => 1 } @$cols;
 #warn Dumper getCurrentTableDataSQL($combinedName,$pkCol,$cols);
 
     my $sth2 = $dbh->prepare($sql);
     my $rs   = $sth2->execute();
-    my $res  = $sth2->fetchall_arrayref() ;
+    my $res  = $sth2->fetchall_arrayref($cols) ;
 
     return $res ;
-    
+
 }
 
 sub getCurrentTableData {
 
     local $_ = undef ;
-    
+
     my $dbh          = shift or croak 'no dbh' ;
     my $combinedName = shift or croak 'no table' ;
     my $pkCol        = shift ; #or croak 'no primary key' ;
@@ -892,18 +912,18 @@ sub getCurrentTableData {
 sub getCurrentTableDataSQL {
 
     local $_ = undef ;
-    
+
     my $combinedName = shift or croak 'no table' ;
     my $pkCol        = shift ; #or croak 'no primary key' ;
     my $cols         = shift ; #or croak 'no primary key' ;
-    
-    my $orderBy      = "" ; 
-    
+
+    my $orderBy      = "" ;
+
     if ( ! $pkCol ) {
-        $orderBy = "" ;     
+        $orderBy = "" ;
     }
     else {
-        $orderBy = "order   by        $pkCol" ; 
+        $orderBy = "order   by        $pkCol" ;
     }
 
 return <<"EOF" ;
@@ -919,7 +939,7 @@ EOF
 sub idCols {
 
     local $_ = undef ;
-    
+
     my $dbh    = shift or croak 'no dbh' ;
     my $schema = shift or croak 'no schema' ;
     my $table  = shift or croak 'no table' ;
@@ -951,7 +971,7 @@ EOF
 sub has_idCols {
 
     local $_ = undef ;
-    
+
     my $dbh     = shift or croak 'no dbh' ;
     my $schema  = shift or croak 'no schema' ;
     my $table   = shift or croak 'no table' ;
@@ -986,7 +1006,7 @@ EOF
 sub pkcolumns {
 
     local $_    = undef ;
-    
+
     my $dbh         = shift or croak 'no dbh' ;
     my $qtd_schema  = shift or croak 'no schema' ;
     my $qtd_table   = shift or croak 'no table' ;
@@ -996,7 +1016,7 @@ sub pkcolumns {
 
        $schema  =~ s/\A\[(.*)\]\z/$1/;
        $table   =~ s/\A\[(.*)\]\z/$1/;
-    
+
     my $sth2    = $dbh->prepare( pkcolumnsSQL());
     my $rs      = $sth2->execute($schema,$table,$schema,$table);
     my $res     = $sth2->fetchall_arrayref() ;
@@ -1019,21 +1039,21 @@ where   tc.CONSTRAINT_TYPE          in( 'PRIMARY KEY','UNIQUE' )
 and     tc.TABLE_SCHEMA             = ?
 and     tc.TABLE_NAME               = ?
 )
-select  COLUMN_NAME 
+select  COLUMN_NAME
 from    INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
 join    INFORMATION_SCHEMA.KEY_COLUMN_USAGE  kcu
 on      tc.TABLE_CATALOG            = kcu.TABLE_CATALOG
 and     tc.TABLE_SCHEMA             = kcu.TABLE_SCHEMA
 and     tc.TABLE_NAME               = kcu.TABLE_NAME
 and     tc.CONSTRAINT_NAME          = kcu.CONSTRAINT_NAME
-join    ranking rk 
+join    ranking rk
 on      tc.CONSTRAINT_SCHEMA        = rk.CONSTRAINT_SCHEMA
 and     tc.CONSTRAINT_NAME          = rk.CONSTRAINT_NAME
 where   tc.CONSTRAINT_TYPE          in( 'PRIMARY KEY','UNIQUE' )
 and     tc.TABLE_SCHEMA             = ?
 and     tc.TABLE_NAME               = ?
 and     rn = 1
-order   by      
+order   by
         ORDINAL_POSITION
 
 EOF
@@ -1062,19 +1082,19 @@ sub columns {
 sub columnsSQL {
 
 return <<"EOF" ;
-select  Column_name 
+select  Column_name
 ,       data_type
-,       case when character_maximum_length is not null then '('+ case when character_maximum_length = -1 then 'max' else cast(character_maximum_length as varchar(10)) end+')' else '' end 
+,       case when character_maximum_length is not null then '('+ case when character_maximum_length = -1 then 'max' else cast(character_maximum_length as varchar(10)) end+')' else '' end
         as datasize
 ,       isnull(case	when lower(Data_type) = 'float'
-				then '('+cast(Numeric_precision as varchar(10))+')' 
-				when lower(Data_type) not like '%int%' and lower(Data_type) not like '%money%' and Numeric_precision is not null 
-				then '('+cast(Numeric_precision as varchar(10))+','+cast(Numeric_scale as varchar(10))+')' 
-				else '' 
-				end 
+				then '('+cast(Numeric_precision as varchar(10))+')'
+				when lower(Data_type) not like '%int%' and lower(Data_type) not like '%money%' and Numeric_precision is not null
+				then '('+cast(Numeric_precision as varchar(10))+','+cast(Numeric_scale as varchar(10))+')'
+				else ''
+				end
 				,'')
                 as dataprecision
-,       case when DATABASEPROPERTYEX(db_name(), 'Collation') != collation_name then 'collate ' + collation_name else '' end 
+,       case when DATABASEPROPERTYEX(db_name(), 'Collation') != collation_name then 'collate ' + collation_name else '' end
         as collation
 ,       case when LOWER(IS_NULLABLE) = 'no' then 'not null' else 'null' end
         as datanullabity

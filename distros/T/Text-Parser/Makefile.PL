@@ -26,9 +26,11 @@ my %WriteMakefileArgs = (
     "English" => 0,
     "FileHandle" => 0,
     "Moose" => 0,
+    "Moose::Exporter" => 0,
     "Moose::Role" => 0,
     "Moose::Util" => 0,
     "Moose::Util::TypeConstraints" => 0,
+    "MooseX::ClassAttribute" => 0,
     "MooseX::CoverableModifiers" => 0,
     "MooseX::StrictConstructor" => 0,
     "Scalar::Util" => 0,
@@ -41,7 +43,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Benchmark" => 0,
     "Exception::Class" => 0,
+    "FindBin" => 0,
     "Import::Into" => 0,
     "String::Index" => 0,
     "Test::Exception" => 0,
@@ -50,9 +54,11 @@ my %WriteMakefileArgs = (
     "Test::Output" => 0,
     "Text::CSV" => 0,
     "constant" => 0,
-    "parent" => 0
+    "lib" => 0,
+    "parent" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "0.926",
+  "VERSION" => "0.927",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,16 +66,20 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Benchmark" => 0,
   "Devel::Cover::Report::Codecov" => 0,
   "Dist::Zilla::Plugin::Test::TidyAll" => 0,
   "English" => 0,
   "Exception::Class" => 0,
   "FileHandle" => 0,
+  "FindBin" => 0,
   "Import::Into" => 0,
   "Moose" => 0,
+  "Moose::Exporter" => 0,
   "Moose::Role" => 0,
   "Moose::Util" => 0,
   "Moose::Util::TypeConstraints" => 0,
+  "MooseX::ClassAttribute" => 0,
   "MooseX::CoverableModifiers" => 0,
   "MooseX::StrictConstructor" => 0,
   "Pod::Elemental::Transformer::List" => 0,
@@ -86,9 +96,11 @@ my %FallbackPrereqs = (
   "Try::Tiny" => 0,
   "constant" => 0,
   "feature" => 0,
+  "lib" => 0,
   "namespace::autoclean" => 0,
   "parent" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

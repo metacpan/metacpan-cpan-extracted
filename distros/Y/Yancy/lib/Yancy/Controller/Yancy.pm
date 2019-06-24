@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.033';
+our $VERSION = '1.034';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -194,8 +194,11 @@ use Yancy::Util qw( derp );
 #pod
 #pod =item filter
 #pod
-#pod A hash reference of field/value pairs to filter the contents of the
-#pod list. This overrides any query filters and so can be used to enforce
+#pod A hash reference of field/value pairs to filter the contents of the list
+#pod or a subref that generates this hash reference. The subref will be passed
+#pod the current controller object (C<$c>).
+#pod
+#pod This overrides any query filters and so can be used to enforce
 #pod authorization / security.
 #pod
 #pod =back
@@ -297,7 +300,7 @@ sub list {
     my $filter = {
         %param_filter,
         # Stash filter always overrides param filter, for security
-        %{ $c->stash( 'filter' ) || {} },
+        %{ $c->_resolve_filter },
     };
 
     #; use Data::Dumper;
@@ -780,6 +783,15 @@ sub _is_type {
         : $type eq $is_type;
 }
 
+sub _resolve_filter {
+    my ( $c ) = @_;
+    my $filter = $c->stash( 'filter' );
+    if ( ref $filter eq 'CODE' ) {
+        return $filter->( $c );
+    }
+    return $filter // {};
+}
+
 1;
 
 __END__
@@ -792,7 +804,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
@@ -872,8 +884,11 @@ be used to calculate the C<offset> parameter to L<Yancy::Backend/list>.
 
 =item filter
 
-A hash reference of field/value pairs to filter the contents of the
-list. This overrides any query filters and so can be used to enforce
+A hash reference of field/value pairs to filter the contents of the list
+or a subref that generates this hash reference. The subref will be passed
+the current controller object (C<$c>).
+
+This overrides any query filters and so can be used to enforce
 authorization / security.
 
 =back

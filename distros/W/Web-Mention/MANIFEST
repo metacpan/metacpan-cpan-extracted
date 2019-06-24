@@ -17,11 +17,13 @@ t/authorship_test_cases/h-entry_with_u-author.html
 t/authorship_test_cases/h-feed_with_p-author_h-card.html
 t/authorship_test_cases/h-feed_with_u-author.html
 t/content.t
+t/mf2_metadata.t
 t/rsvp.t
 t/sending.t
 t/serialization.t
 t/sources/content_property.html
 t/sources/escaped.html
+t/sources/explicit_metadata.html
 t/sources/explicit_name.html
 t/sources/invalid.html
 t/sources/long_content_and_long_summary.html

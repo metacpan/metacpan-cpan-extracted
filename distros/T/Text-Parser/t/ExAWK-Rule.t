@@ -110,7 +110,7 @@ lives_ok {
     $rule->dont_record(1);
     $rule->run($parser2);
     is_deeply( [ $parser2->get_records ], [], 'No records' );
-    $rule->run($parser);
+    $rule->run( $parser, 1 );
     is_deeply( [ $parser->get_records ], [], 'No records this time' );
     my $rule2 = Text::Parser::Rule->new( do => '' );
     $rule2->run($parser);

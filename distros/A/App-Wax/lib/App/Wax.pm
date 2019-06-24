@@ -18,7 +18,7 @@ use URI::Split qw(uri_split);
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v3.1.0');
+use version; our $VERSION = version->declare('v3.1.1');
 
 # defaults
 use constant {
@@ -385,7 +385,9 @@ method resolve_keep ($_url) {
     my $index_file = File::Spec->catfile($directory, sprintf(INDEX, $id));
     my ($error, $extension);
 
-    if (-e $index_file) {
+    # -s: if /tmp is full, the index file may get written as an empty file, so
+    # make sure it's non-empty
+    if (-s $index_file) {
         $self->debug('index (%d): %s (exists)', $url_index, $index_file);
 
         try {

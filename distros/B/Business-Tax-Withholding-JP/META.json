@@ -56,7 +56,7 @@
    "provides" : {
       "Business::Tax::Withholding::JP" : {
          "file" : "lib/Business/Tax/Withholding/JP.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/worthmine/Business-Tax-Withholding-JP"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:WORTHMINE",
    "x_serialization_backend" : "JSON::PP version 4.00",
    "x_static_install" : 1

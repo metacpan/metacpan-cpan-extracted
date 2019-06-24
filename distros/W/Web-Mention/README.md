@@ -248,7 +248,7 @@ the document on this first attempt, this method returns 0.
 
 If the document fetched from the source URL seems to point at yet
 another URL as its original source, then this returns that URL. If not,
-this has the same return value as `source()`.
+this has the same return value as ["source"](#source).
 
 (It makes this determination based on the possible presence a `u-url`
 property in an `h-entry` found within the source document.)
@@ -319,15 +319,29 @@ returns undef.
 
 Returns the webmention's target URL, as a [URI](https://metacpan.org/pod/URI) object.
 
+### time\_published
+
+    $published_dt = $wm->time_published;
+
+If the document fetched from the source URL explicitly declares a
+publication time via microformats, then this will return an appropriate
+[DateTime](https://metacpan.org/pod/DateTime) object.
+
+If not (or if the declared time seems to be invalid), then this will
+instead have the same return value as ["time\_received"](#time_received).
+
+(It makes this determination based on the possible presence a `dt-published`
+property in an `h-entry` found within the source document.)
+
 ### time\_received
 
-    $dt = $wm->time_received;
+    $received_dt = $wm->time_received;
 
 A [DateTime](https://metacpan.org/pod/DateTime) object corresponding to this object's creation time.
 
 ### time\_verified
 
-    $dt = $wm->time_verified;
+    $verified_dt = $wm->time_verified;
 
 If this webmention has been verified, then this will return a
 [DateTime](https://metacpan.org/pod/DateTime) object corresponding to the time of verification.

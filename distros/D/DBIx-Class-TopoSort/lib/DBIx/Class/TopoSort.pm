@@ -6,7 +6,7 @@ use 5.008_004;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.050100';
+our $VERSION = '0.060000';
 
 use Graph;
 
@@ -80,6 +80,7 @@ sub toposort_graph {
         push @{ $table_sources{$table_name} }, $name;
     }
 
+    my %addl_deps = %{ $opts{add_dependencies} // {} };
     foreach my $name ( @source_names ) {
         my $source = $schema->source($name);
         $g->add_vertex($name);
@@ -95,6 +96,23 @@ sub toposort_graph {
                 }
             }
         }
+
+        if (exists $addl_deps{$name}) {
+            my @parents = (reftype($addl_deps{$name}) // '') eq 'ARRAY'
+                ? @{ delete $addl_deps{$name} }
+                : (delete $addl_deps{$name});
+
+            foreach my $parent (@parents) {
+                die "Unknown parent '$parent' found in add_dependencies"
+                    unless grep { $_ eq $parent } @source_names;
+                $g->add_edge($parent, $name);
+            }
+        }
+    }
+
+    if (keys %addl_deps) {
+        my $children = join("', '", (sort keys(%addl_deps)));
+        die "Unknown children '$children' found in add_dependencies";
     }
 
     if ($opts{detect_cycle}) {
@@ -207,6 +225,33 @@ names.
   skip => {
       Artist => [ qw/ first_album / ],
   },
+
+=item add_dependencies
+
+This is the opposite of skip. Instead of removing connections between sources,
+this adds them. Unlike skip, you don't specify the relationship. Instead, you
+just specify that the child depends on the parent.
+
+  add_dependencies => {
+      Album => 'Artist',
+  },
+
+If you want to add multiple dependencies from one child, you can provide an
+array of new parents as so:
+
+  add_dependencies => {
+      Album => [ 'Artist', 'Studio' ],
+  },
+
+Adding dependencies for multiple tables looks like this:
+
+  add_dependencies => {
+      Album => 'Artist',
+      Artist => 'Producer',
+  },
+
+The child and parent sources must exist or errors will be thrown. Adding a
+dependency that already exists is a no-op.
 
 =item detect_cycle
 

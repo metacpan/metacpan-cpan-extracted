@@ -16,11 +16,12 @@ use Mojo::DOM58;
 use URI::Escape;
 use Encode qw(decode_utf8);
 use Readonly;
+use DateTime::Format::ISO8601;
 
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.702';
+our $VERSION = '0.703';
 
 Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
@@ -84,6 +85,12 @@ has 'time_received' => (
     isa => 'DateTime',
     is => 'ro',
     default => sub{ DateTime->now },
+);
+
+has 'time_published' => (
+    isa => 'DateTime',
+    is => 'rw',
+    lazy_build => 1,
 );
 
 has 'rsvp_type' => (
@@ -450,6 +457,24 @@ sub _build_original_source {
     }
 
     return $self->source;
+}
+
+sub _build_time_published {
+    my $self = shift;
+
+    if ( $self->source_mf2_document ) {
+        if ( my $item = $self->source_mf2_document->get_first( 'h-entry' ) ) {
+            if ( my $time = $item->get_property( 'published' ) ) {
+                my $dt;
+                try {
+                    $dt = DateTime::Format::ISO8601->parse_datetime( $time );
+                };
+                return $dt if $dt;
+            }
+        }
+    }
+
+    return $self->time_received;
 }
 
 sub _build_endpoint {
@@ -841,7 +866,7 @@ the document on this first attempt, this method returns 0.
 
 If the document fetched from the source URL seems to point at yet
 another URL as its original source, then this returns that URL. If not,
-this has the same return value as C<source()>.
+this has the same return value as L<"source">.
 
 (It makes this determination based on the possible presence a C<u-url>
 property in an C<h-entry> found within the source document.)
@@ -927,15 +952,29 @@ returns undef.
 
 Returns the webmention's target URL, as a L<URI> object.
 
+=head3 time_published
+
+ $published_dt = $wm->time_published;
+
+If the document fetched from the source URL explicitly declares a
+publication time via microformats, then this will return an appropriate
+L<DateTime> object.
+
+If not (or if the declared time seems to be invalid), then this will
+instead have the same return value as L<"time_received">.
+
+(It makes this determination based on the possible presence a C<dt-published>
+property in an C<h-entry> found within the source document.)
+
 =head3 time_received
 
- $dt = $wm->time_received;
+ $received_dt = $wm->time_received;
 
 A L<DateTime> object corresponding to this object's creation time.
 
 =head3 time_verified
 
- $dt = $wm->time_verified;
+ $verified_dt = $wm->time_verified;
 
 If this webmention has been verified, then this will return a
 L<DateTime> object corresponding to the time of verification.

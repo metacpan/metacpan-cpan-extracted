@@ -1,6 +1,8 @@
 Build.PL
+CONTRIBUTING.md
+englishWords/listOfEnglishWords.pl
+englishWords/listOfEnglishWordsNormalized.txt
 lib/Dita/GB/Standard.pm
-lib/Dita/GB/Standard.pm.backup
 MANIFEST			This list of files
 test.pl
 META.yml

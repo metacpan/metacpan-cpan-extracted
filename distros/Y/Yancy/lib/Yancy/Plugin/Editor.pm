@@ -1,42 +1,82 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.033';
+our $VERSION = '1.034';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
+#pod     # The default editor at /yancy
 #pod     plugin Yancy => {
 #pod         backend => 'sqlite://myapp.db',
 #pod         read_schema => 1,
 #pod         editor => {
-#pod             # XXX
+#pod             require_user => { can_edit => 1 },
 #pod         },
 #pod     };
 #pod
+#pod     # Enable another editor for blog users
+#pod     app->plugin->yancy( Editor => {
+#pod         moniker => 'blog_editor',
+#pod         backend => app->yancy->backend,
+#pod         schema => { blog_posts => app->yancy->schema( 'blog_posts' ) },
+#pod         route => app->routes->any( '/blog/editor' ),
+#pod         require_user => { can_blog => 1 },
+#pod     } );
+#pod
 #pod =head1 DESCRIPTION
 #pod
-#pod XXX
+#pod This plugin contains the Yancy editor application which allows editing
+#pod the data in a L<Yancy::Backend>.
 #pod
 #pod =head1 CONFIGURATION
 #pod
 #pod This plugin has the following configuration options.
 #pod
-#pod XXX schema openapi default_controller backend moniker
+#pod =head2 backend
 #pod
-#pod =over
+#pod The backend to use for this editor. Defaults to the default backend
+#pod configured in the L<main Yancy plugin|Mojolicious::Plugin::Yancy>.
 #pod
-#pod =item route
+#pod =head2 schema
 #pod
-#pod A base route to add Yancy to. This allows you to customize the URL
-#pod and add authentication or authorization. Defaults to allowing access
-#pod to the Yancy web application under C</yancy>, and the REST API under
+#pod The schema to use to build the editor application. This may not
+#pod necessarily be the full and exact schema supported by the backend: You
+#pod can remove certain fields from this editor instance to protect them, for
+#pod example.
+#pod
+#pod If not given, will use L<Yancy::Backend/read_schema> to read the schema
+#pod from the backend.
+#pod
+#pod =head2 openapi
+#pod
+#pod Instead of L</schema>, you can pass a full OpenAPI spec to this editor.
+#pod See L<Yancy::Help::Config> for more details on how to build the OpenAPI
+#pod spec.
+#pod
+#pod =head2 default_controller
+#pod
+#pod The default controller for API routes. Defaults to
+#pod L<Yancy::Controller::Yancy>. Building a custom controller can allow for
+#pod customizing how the editor works and what content it displays to which
+#pod users.
+#pod
+#pod =head2 moniker
+#pod
+#pod The name of this editor instance. Used to build helper names and route
+#pod names.  Defaults to C<editor>. Other plugins may rely on there being
+#pod a default editor named C<editor>. Additional instances should have
+#pod different monikers.
+#pod
+#pod =head2 route
+#pod
+#pod A base route to add the editor to. This allows you to customize the URL
+#pod and add authentication or authorization. Defaults to allowing access to
+#pod the Yancy web application under C</yancy>, and the REST API under
 #pod C</yancy/api>.
 #pod
-#pod =item return_to
+#pod =head2 return_to
 #pod
 #pod The URL to use for the "Back to Application" link. Defaults to C</>.
-#pod
-#pod =back
 #pod
 #pod =head1 HELPERS
 #pod
@@ -127,6 +167,8 @@ has moniker => 'editor';
 has route =>;
 has includes => sub { [] };
 has menu_items => sub { +{} };
+has backend =>;
+has schema =>;
 
 sub _helper_name {
     my ( $self, $name ) = @_;
@@ -136,6 +178,9 @@ sub _helper_name {
 sub register {
     my ( $self, $app, $config ) = @_;
 
+    $self->backend( $config->{backend} );
+    $self->schema( $config->{schema} );
+
     for my $key ( grep exists $config->{ $_ }, qw( moniker ) ) {
         $self->$key( $config->{ $key } );
     }
@@ -144,6 +189,7 @@ sub register {
         derp 'api_controller configuration is deprecated. Use editor.default_controller instead';
     }
 
+    # XXX: Throw an error if there is already a route here
     my $route = $config->{route} // $app->routes->any( '/yancy' );
     $route->to( return_to => $config->{return_to} // '/' );
 
@@ -192,7 +238,7 @@ sub register {
     $self->_openapi_spec_add_mojo( $spec, $config );
 
     my $openapi = $app->plugin( OpenAPI => {
-        route => $route->any( '/api' )->name( 'yancy.api' ),
+        route => $route->any( '/api' )->to( backend => $self->backend )->name( 'yancy.api' ),
         spec => $spec,
         default_response_name => '_Error',
     } );
@@ -566,43 +612,83 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
+    # The default editor at /yancy
     plugin Yancy => {
         backend => 'sqlite://myapp.db',
         read_schema => 1,
         editor => {
-            # XXX
+            require_user => { can_edit => 1 },
         },
     };
 
+    # Enable another editor for blog users
+    app->plugin->yancy( Editor => {
+        moniker => 'blog_editor',
+        backend => app->yancy->backend,
+        schema => { blog_posts => app->yancy->schema( 'blog_posts' ) },
+        route => app->routes->any( '/blog/editor' ),
+        require_user => { can_blog => 1 },
+    } );
+
 =head1 DESCRIPTION
 
-XXX
+This plugin contains the Yancy editor application which allows editing
+the data in a L<Yancy::Backend>.
 
 =head1 CONFIGURATION
 
 This plugin has the following configuration options.
 
-XXX schema openapi default_controller backend moniker
+=head2 backend
 
-=over
+The backend to use for this editor. Defaults to the default backend
+configured in the L<main Yancy plugin|Mojolicious::Plugin::Yancy>.
 
-=item route
+=head2 schema
 
-A base route to add Yancy to. This allows you to customize the URL
-and add authentication or authorization. Defaults to allowing access
-to the Yancy web application under C</yancy>, and the REST API under
+The schema to use to build the editor application. This may not
+necessarily be the full and exact schema supported by the backend: You
+can remove certain fields from this editor instance to protect them, for
+example.
+
+If not given, will use L<Yancy::Backend/read_schema> to read the schema
+from the backend.
+
+=head2 openapi
+
+Instead of L</schema>, you can pass a full OpenAPI spec to this editor.
+See L<Yancy::Help::Config> for more details on how to build the OpenAPI
+spec.
+
+=head2 default_controller
+
+The default controller for API routes. Defaults to
+L<Yancy::Controller::Yancy>. Building a custom controller can allow for
+customizing how the editor works and what content it displays to which
+users.
+
+=head2 moniker
+
+The name of this editor instance. Used to build helper names and route
+names.  Defaults to C<editor>. Other plugins may rely on there being
+a default editor named C<editor>. Additional instances should have
+different monikers.
+
+=head2 route
+
+A base route to add the editor to. This allows you to customize the URL
+and add authentication or authorization. Defaults to allowing access to
+the Yancy web application under C</yancy>, and the REST API under
 C</yancy/api>.
 
-=item return_to
+=head2 return_to
 
 The URL to use for the "Back to Application" link. Defaults to C</>.
-
-=back
 
 =head1 HELPERS
 

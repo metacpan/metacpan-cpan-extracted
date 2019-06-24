@@ -1,5 +1,8 @@
 See also the git repository.
 
+1.24    2019-06-23
+        Add fill_4way and fill_8way methods.
+
 0.73    2018-10-07
         Break interface of crop (it was broken for negative bounds).
         flip_four now has more features. More examples in the docs.

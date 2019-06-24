@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use constant { border => 1000000 };
 
@@ -38,7 +38,7 @@ no Moose;
 
 sub net {
     my $self = shift;
-    return $self->price();
+    return $self->price(@_);
 }
 
 sub subtotal {

@@ -1,4 +1,4 @@
-package Text::Parser::Errors 0.926;
+package Text::Parser::Errors 0.927;
 use strict;
 use warnings;
 
@@ -146,7 +146,7 @@ Text::Parser::Errors - Exceptions for Text::Parser
 
 =head1 VERSION
 
-version 0.926
+version 0.927
 
 =head1 DESCRIPTION
 

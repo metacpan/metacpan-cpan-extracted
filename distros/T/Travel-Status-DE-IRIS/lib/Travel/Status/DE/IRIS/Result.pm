@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -30,6 +30,7 @@ my %translation = (
 	11 => 'Unwetter',
 	12 => 'Warten auf Fahrgäste aus einem Schiff',
 	13 => 'Pass- und Zollkontrolle',
+	14 => 'Technische Störung am Bahnhof',
 	15 => 'Beeinträchtigung durch Vandalismus',
 	16 => 'Entschärfung einer Fliegerbombe',
 	17 => 'Beschädigung einer Brücke',
@@ -280,7 +281,7 @@ sub set_ar {
 	}
 
 	if ( $attrib{route_pre} ) {
-		$self->{route_pre} = [ split( qr{[|]}, $attrib{route_pre} // q{} ) ];
+		$self->{route_pre}   = [ split( qr{[|]}, $attrib{route_pre} // q{} ) ];
 		$self->{route_start} = $self->{route_pre}[0];
 	}
 	else {
@@ -342,7 +343,7 @@ sub set_dp {
 
 	if ( $attrib{route_post} ) {
 		$self->{route_post} = [ split( qr{[|]}, $attrib{route_post} // q{} ) ];
-		$self->{route_end} = $self->{route_post}[-1];
+		$self->{route_end}  = $self->{route_post}[-1];
 	}
 	else {
 		$self->{route_post} = $self->{sched_route_post};
@@ -643,7 +644,7 @@ sub info {
 	my ($self) = @_;
 
 	my @messages = sort keys %{ $self->{messages} };
-	my @ids = uniq( map { $self->{messages}{$_}->[2] } @messages );
+	my @ids      = uniq( map { $self->{messages}{$_}->[2] } @messages );
 
 	my @info = map { $self->translate_msg($_) } @ids;
 
@@ -812,7 +813,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

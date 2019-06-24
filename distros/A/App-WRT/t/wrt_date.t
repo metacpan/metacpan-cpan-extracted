@@ -14,9 +14,10 @@ ok(
 );
 
 my $iso_date = App::WRT::Date::iso_date(0);
+diag($iso_date);
 ok(
-  $iso_date eq '1969-12-31T17:00:00Z',
-  'ISO date for epoch'
+  $iso_date =~ m/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/,
+  'ISO-ish date for epoch'
 );
 
 ok(

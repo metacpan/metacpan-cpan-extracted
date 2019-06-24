@@ -1,6 +1,9 @@
 Revision history for Perl extension Test-Compile
 
-v2.0_0    2019-06-18 (DEV RELEASE)
+v2.0.1    2019-06-18              (Evan Giles <egiles@cpan.org>)
+    - Export most of the old functions (CPAN-RT 129888)
+
+v2.0_0    2019-06-18
     Łukasz Hejnak <lehack@lehack.pl>
     - Replaced import() with Exporter usage.
     - Added all_files_ok to the procedural mode.

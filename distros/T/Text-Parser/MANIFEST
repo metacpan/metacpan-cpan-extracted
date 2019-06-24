@@ -19,6 +19,7 @@ lib/Text/Parser/Manual/ComparingWithNativePerl.pod
 lib/Text/Parser/Manual/ExtendedAWKSyntax.pod
 lib/Text/Parser/Multiline.pm
 lib/Text/Parser/Rule.pm
+lib/Text/Parser/RuleSpec.pm
 t/ExAWK-Rule-1.t
 t/ExAWK-Rule-line_counter.t
 t/ExAWK-Rule-util_subs.t
@@ -48,6 +49,7 @@ t/auto_trim.t
 t/bad-basic-joiner.t
 t/bad-continued.txt
 t/bad-spice.sp
+t/benchmark.pl
 t/continued.txt
 t/data.txt
 t/dirty-data.csv
@@ -73,6 +75,7 @@ t/join-backslash.t
 t/lines-whitespace.txt
 t/mult-basic.t
 t/names.txt
+t/profile.pl
 t/range_shortcut.t
 t/release-cpan-changes.t
 t/release-distmeta.t

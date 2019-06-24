@@ -6,7 +6,7 @@
 # Modified from the Perl/Tk version for inclusion into Tcl::pTk
 package Tcl::pTk::DialogBox;
 
-our ($VERSION) = ('1.00');
+our ($VERSION) = ('1.01');
 
 use strict;
 use Carp;
@@ -69,7 +69,7 @@ sub Populate {
 	}
     }
     $cw->ConfigSpecs(-command    => ['CALLBACK', undef, undef, undef ],
-                     -foreground => ['DESCENDANTS', 'foreground','Foreground', 'black'],
+                     -foreground => ['DESCENDANTS', 'foreground','Foreground',  undef],
                      -background => ['DESCENDANTS', 'background','Background',  undef],
 		     -focus	 => ['PASSIVE', undef, undef, undef],
 		     -showcommand => ['CALLBACK', undef, undef, undef],

@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '2.02';
+$VERSION = '2.10';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -335,7 +335,11 @@ sub getIPv6Record {
 		if ($mode == ALL) {
 			return (-1, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
 		} else {
-			return NO_IP;
+			if ($mode == ISPROXY) {
+				return -1;
+			} else {
+				return NO_IP;
+			}
 		}
 	}
 
@@ -373,7 +377,7 @@ sub getIPv6Record {
 		return NOT_SUPPORTED;
 	}
 
-	my $realipno = $ipnum;
+	my $realipno = Math::BigInt->new($ipnum);
 	my $handle = $obj->{"filehandle"};
 	my $baseaddr = $obj->{"ipv6databaseaddr"};
 	my $dbcount = $obj->{"ipv6databasecount"};
@@ -405,10 +409,9 @@ sub getIPv6Record {
 	my $ipto = 0;
 	my $ipno = 0;
 
-	if ($realipno == MAX_IPV6_RANGE) {
-		$ipno = $realipno - 1;
-	} else {
-		$ipno = $realipno;
+	$ipno = $realipno;
+	if ($realipno->beq("340282366920938463463374607431768211455")) {
+		$ipno = $ipno->bsub(1);
 	}
 
 	while ($low <= $high) {
@@ -539,7 +542,11 @@ sub getIPv6Record {
 	if ($mode == ALL) {
 		return (-1, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
 	} else {
-		return UNKNOWN;
+		if ($mode == ISPROXY) {
+			return -1;
+		} else {
+			return UNKNOWN;
+		}		
 	}
 }
 
@@ -553,7 +560,11 @@ sub getIPv4Record {
 		if ($mode == ALL) {
 			return (-1, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
 		} else {
-			return NO_IP;
+			if ($mode == ISPROXY) {
+				return -1;
+			} else {
+				return NO_IP;
+			}
 		}
 	}
 	
@@ -745,7 +756,11 @@ sub getIPv4Record {
 	if ($mode == ALL) {
 		return (-1, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
 	} else {
-		return UNKNOWN;
+		if ($mode == ISPROXY) {
+			return -1;
+		} else {
+			return UNKNOWN;
+		}
 	}
 }
 
@@ -841,6 +856,23 @@ sub validateIP {
 			if (($ipnum >= 281470681743360) && ($ipnum <= 281474976710655)) {
 				$ipv = 4;
 				$ipnum = $ipnum - 281470681743360;
+			}
+			#reformat 6to4 address to ipv4 address 2002:: to 2002:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
+			if (($ipnum >= 42545680458834377588178886921629466624) && ($ipnum <= 42550872755692912415807417417958686719)) {
+				$ipv = 4;
+				#bitshift right 80 bits
+				$ipnum->brsft(80);
+				#bitwise modulus to get the last 32 bit
+				$ipnum->bmod(4294967296); 
+			}
+			#reformat Teredo address to ipv4 address 2001:0000:: to 2001:0000:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:
+			if (($ipnum >= 42540488161975842760550356425300246528) && ($ipnum <= 42540488241204005274814694018844196863)) {
+				$ipv = 4;
+				$ipnum = Math::BigInt->new($ipnum);
+				#bitwise not to invert binary
+				$ipnum->bnot();
+				#bitwise modulus to get the last 32 bit
+				$ipnum->bmod(4294967296); 
 			}
 		} else {
 			#not IPv4 and IPv6
@@ -1115,7 +1147,7 @@ L<IP2Proxy Product|https://www.ip2location.com/database/ip2proxy>
 
 =head1 VERSION
 
-2.02
+2.10
 
 =head1 AUTHOR
 

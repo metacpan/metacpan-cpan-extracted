@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::Multiline 0.926;
+package Text::Parser::Multiline 0.927;
 
 # ABSTRACT: Adds multi-line support to the Text::Parser object.
 
@@ -127,7 +127,7 @@ Text::Parser::Multiline - Adds multi-line support to the Text::Parser object.
 
 =head1 VERSION
 
-version 0.926
+version 0.927
 
 =head1 SYNOPSIS
 

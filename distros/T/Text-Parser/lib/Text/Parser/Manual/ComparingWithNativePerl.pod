@@ -15,7 +15,7 @@ Text::Parser::Manual::ComparingWithNativePerl - A comparison of text parsing wit
 
 =head1 VERSION
 
-version 0.926
+version 0.927
 
 =head1 LIMITATIONS OF THE PERL ONE-LINER
 

@@ -14,7 +14,7 @@ Alien::Build::Plugin::Probe - Probe Alien::Build plugins
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 SYNOPSIS
 

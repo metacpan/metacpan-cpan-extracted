@@ -1,0 +1,256 @@
+Name
+    YAML::Safe - Safe Perl YAML Serialization using XS and libyaml
+
+Synopsis
+        use YAML::Safe qw(LoadFile DumpFile);
+
+        my $yaml  = Dump [ 1..4 ];
+        my $array = Load $yaml;
+
+        $yaml  = DumpFile ("my.yml", [ 1..4 ]);
+        $array = LoadFile "my.yml";
+        open my $fh, "my.yml";
+        $yaml  = DumpFile ($fh, [ 1..4 ]);
+        $array = LoadFile $fh;
+        open *FH, "my.yml";
+        $yaml  = DumpFile (*FH, [ 1..4 ]);
+        $array = LoadFile *FH;
+
+        my $obj = YAML::Safe->new;
+        $yaml  = $obj->DumpFile ("my.yml", [ 1..4 ]);
+        $array = $obj->LoadFile("my.yml");
+
+        $yaml = YAML::Safe->new->nonstrict->encoding("any");
+        $yaml->SafeClass("DateTime");
+        $array = $yaml->SafeLoadFile("META.yml");
+
+        $yaml = YAML::Safe->new->canonical;
+        $yaml->SafeClass("DateTime");
+        $array = $yaml->SafeDumpFile("META.yml");
+
+Description
+    This module is a refactoring of YAML::XS, the old Perl XS binding to
+    "libyaml" which offers Perl somewhat acceptable YAML support to date.
+    YAML::XS never produced code which could be read from YAML, and thus was
+    unsuitable to be used as YAML replacement for core and CPAN. It also
+    required reading and setting options from global variables.
+
+    Kirill Siminov's "libyaml" is a YAML library implementation. The C
+    library is written precisely to the YAML 1.1 specification, and offers
+    YAML 1.2 support. It was originally bound to Python and was later bound
+    to Ruby. "libsyck" is written a bit more elegant, has less bugs, is not
+    as strict as libyaml, but misses some YAML features. It can only do YAML
+    1.0.
+
+    This module exports the functions "Dump" and "Load", and do work as
+    functions exactly like YAML::XS and "YAML.pm"'s corresponding functions.
+    It is however preferred to use the new OO-interface to store all options
+    in the new created object. YAML::Safe does not support the old globals
+    anymore.
+
+    There are also new Safe variants of Load and Dump methods, and options
+    as setter methods. With the Safe methods you can enforce loading YAML
+    1.0 files only, all unsafe tags are removed. By default all blessed data
+    is unsafe.
+
+    If you set the option "noindentmap", "YAML::Safe" will behave like with
+    version < 0.70, which creates yml files which cannot be read by
+    "YAML.pm"
+
+    However the loader is stricter than "YAML", "YAML::Syck" and
+    "CPAN::Meta::YAML" i.e. "YAML::Tiny" as used in core. Set the option
+    "nonstrict" to allow certain reader errors to pass the "CPAN::Meta"
+    validation testsuite.
+
+FUNCTIONS
+    Load
+    LoadFile
+    Dump
+    DumpFile
+    libyaml_version
+
+METHODS
+    new "classname", option => value, ...
+        Create a YAML loader or dumper object with some options.
+
+    SafeClass "classname", ...
+        Register a string or list of strings to the list of allowed classes
+        to the "Safe{Load,Dump}" methods. Without any SafeClass added, no
+        custom "!" classes are allow in the YAML. Regexp are not supported.
+
+    SafeLoad
+    SafeLoadFile
+        Restrict the loader to the registered safe classes only or tags
+        starting with "perl/".
+
+    SafeDump
+    SafeDumpFile
+        Restrict the dumper to the registered safe classes only or tags
+        starting with "perl/".
+
+    And all the loader and dumper options as getter and setter methods. See
+    below.
+
+Configuration
+  Options for Loader and Dumper
+    via getter and setter methods.
+
+    "enablecode" =item "get_enablecode"
+        If enabled turns on handling of code blocks for the loader and
+        dumper. It sets both the "loadcode" and "dumpcode" option.
+
+    "disableblessed" =item "get_disableblessed"
+        Default 0
+
+        If set, i.e. blessed is disabled, all blessed data for the Loader
+        and Dumper is unblessed. This is similar to the Safe methods without
+        any SafeClass set.
+
+    "encoding" =item "get_encoding"
+        Default "utf8"
+
+        Set to "any", "utf8", "utf16le" or "utf16be".
+
+    "boolean" =item "get_boolean"
+        Set to "JSON::PP" or "boolean" to enable or 0 to disable. Encodes
+        true and false to the respective classes. It will try to load
+        JSON::PP or boolean and die if it can't be loaded.
+
+        With that it's possible to add new "real" booleans to a data
+        structure:
+
+              my $o = YAML::Safe->new->boolean("JSON::PP"); # or "boolean"
+              my $data = $o->Load("booltrue: true");
+              $data->{boolfalse} = JSON::PP::false;
+              my $yaml = Dump($data);
+              # boolfalse: false
+              # booltrue: true
+
+        Please note that JSON::PP::Boolean and boolean.pm behave a bit
+        differently. Ideally you should only use them in boolean context.
+        Setting a boolean() class is only possible on a perl since v5.8.9.
+        It will die on older perls.
+
+        If not set, booleans are loaded as special perl variables
+        "PL_sv_yes" and "PL_sv_no", which have the disadvantage that they
+        are readonly, and you can't add those to an existing data structure
+        with pure perl.
+
+        If you simply need to load "perl booleans" that are true or false in
+        boolean context, you will be fine with the default setting.
+
+    "safemode" =item "get_safemode"
+        Default 0
+
+        If enabled by using the the Safe methods restrict the blessing only
+        for the set of registered classes or tags starting with "perl/".
+
+  Loader Options
+    via getter and setter methods.
+
+    "nonstrict" =item "get_nonstrict"
+        If enabled permits certain reader errors to loosely match other YAML
+        module semantics. In detail: Allow "control characters are not
+        allowed" with while parsing a quoted scalar found unknown escape
+        character. Note that any error is stored and returned, just not
+        immediately. This is needed for cpan distroprefs.
+
+        However the reader error "invalid trailing UTF-8 octet" and all
+        other utf8 strictness violations are still fatal.
+
+        And if the structure of the YAML document cannot be parsed, i.e. a
+        required value consists only of invalid control characters, the
+        loader returns an error, unlike with non-strict YAML modules.
+
+    "loadcode" =item "get_loadcode"
+        Turns on deparsing and evaling of code blocks in the loader.
+
+  Dumper Options
+    via globals variables or as optional getter and setter methods.
+
+    "dumpcode" =item "get_dumpcode"
+        If enabled supports Dump of CV code blocks via
+        "YAML::Safe::coderef2text()".
+
+    "quotenum" =item "get_quotenum"
+        Default: enabled.
+
+        If enabled strings that look like numbers but have not been numified
+        will be quoted when dumping. This ensures leading that things like
+        leading zeros and other formatting are preserved.
+
+    "noindentmap" =item "get_noindentmap"
+        If enabled fallback to the old "YAML::Safe" behavior to omit the
+        indentation of map keys, which arguably violates the YAML spec, is
+        different to all other YAML libraries and causes "YAML.pm" to fail.
+
+        Disabled
+
+             authors:
+               - this author
+
+        Enabled
+
+             authors:
+             - this author
+
+    "indent" =item "get_indent"
+        Default 2. Valid values are from 1 - 10.
+
+    "wrapwidth" =item "get_wrapwidth"
+        Default 80
+
+        Control text wrapping.
+
+    "canonical" =item "get_canonical"
+        Default: disabled.
+
+        Enable to sort map keys.
+
+    "unicode" =item "get_unicode"
+        Default 1
+
+        Set to undef or 0 to disallow unescaped non-ASCII characters. e.g.
+        "YAML::Safe-"new->unicode(0)>
+
+    "linebreak" =item "get_linebreak"
+        Default ln
+
+        Set to "any", "cr", "ln" or "crln".
+
+    "openended" =item "get_openended"
+        Default 0
+
+        If enabled embed the yaml into "...", if an explicit document end is
+        required.
+
+Using YAML::Safe with Unicode
+    Handling unicode properly in Perl can be a pain. YAML::Safe only deals
+    with streams of utf8 octets. Just remember this:
+
+        $perl = Load($utf8_octets);
+        $utf8_octets = Dump($perl);
+
+    There are many, many places where things can go wrong with unicode. If
+    you are having problems, use Devel::Peek on all the possible data
+    points.
+
+See Also
+    YAML.pm
+    YAML::XS
+    YAML::Syck
+    YAML::Tiny
+    CPAN::Meta::YAML
+
+Author
+    Reini Urban <rurban@cpan.org>, based on YAML::XS by Ingy döt Net
+    <ingy@cpan.org>
+
+Copyright and License
+    Copyright 2007-2016. Ingy döt Net. Copyright 2015-2019. Reini Urban.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

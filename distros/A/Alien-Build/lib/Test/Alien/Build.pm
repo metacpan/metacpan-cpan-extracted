@@ -28,7 +28,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '1.74'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 
 my $build;
@@ -616,7 +616,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 SYNOPSIS
 

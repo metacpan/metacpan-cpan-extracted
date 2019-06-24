@@ -15,7 +15,7 @@ Text::Parser::Manual::ExtendedAWKSyntax - A manual for ExAWK (extended AWK) synt
 
 =head1 VERSION
 
-version 0.926
+version 0.927
 
 =head1 THE EXTENDED AWK LANGUAGE
 

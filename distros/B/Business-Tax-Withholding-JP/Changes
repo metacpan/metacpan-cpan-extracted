@@ -1,5 +1,8 @@
 Revision history for Perl extension Business-Tax-Withholding-JP
 
+0.05 2019-06-24T02:58:23Z
+    - fixed the bug of net()
+
 0.04 2019-04-03T02:50:56Z
 
     - added subtotal() method and tests

@@ -1,5 +1,12 @@
 Revision history for Perl extension App::jl
 
+0.12    Sun Jun 23 14:42:37 JST 2019
+        - Add `grep` and `ignore` options
+        - Add `stderr` option
+        - Add `xxxxx` option to convert unix timestamp forcely
+        - Add `unbuffered` option
+        - Refactor
+
 0.11    Sat Jun 22 01:06:15 JST 2019
         - Add head line for YAML output
 

@@ -3,7 +3,7 @@ abstract: 'webify your CLI'
 author:
   - 'chocolateboy <chocolate@cpan.org>'
 build_requires:
-  Test::Differences: '0.64'
+  Test::Differences: '0.67'
   Test::TinyMocker: '0.03'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -20,20 +20,20 @@ no_index:
     - inc
 requires:
   Digest::SHA: '0'
-  File::BaseDir: '0.07'
+  File::BaseDir: '0.08'
   File::Slurper: '0.012'
   IPC::System::Simple: '1.25'
-  LWP: '6.31'
+  LWP: '6.39'
   MIME::Types: '2.17'
   Method::Signatures::Simple: '1.07'
-  Mouse: v2.5.2
+  Mouse: v2.5.6
   Parallel::parallel_map: '0.02'
   Try::Tiny: '0.30'
-  URI: '1.73'
+  URI: '1.76'
   perl: '5.008008'
   version: '0.77'
 resources:
   bugtracker: https://github.com/chocolateboy/App-Wax/issues
   repository: https://github.com/chocolateboy/App-Wax
-version: v2.3.0
+version: v2.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Dita::GB::Standard;
-our $VERSION = "20190531";
+our $VERSION = 20190622;
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -59,13 +59,13 @@ sub hexAsWords($)                                                               
 
 sub gbStandardFileName($$%)                                                     #E Return the L<GBStandard> file name given the content and extension of a proposed file.
  {my ($content, $extension, %options) = @_;                                     # Content, extension, various ingenious options designed by Micaela
-  defined($content) or
-    confess "Content must be defined";
-  defined($extension) && $extension =~ m(\A\S{2,}\Z)s or
+  defined($content) or confess "Content must be defined";
+  $content   =~ s(\s*xtr[cf]="[^"]*") ()gs;                                     # Suppress xtrc|f attributes as we use them to hold file names and line numbers during a conversion but they are not germane to the final result and thus prevent files from being collapsed.
+  $extension && ($extension =~ m(\A\S{2,}\Z)s) or
     confess "Extension must be non blank and at least two characters long";
   my $name   = nameFromStringRestrictedToTitle($content, %options);             # Human readable component ideally taken from the title tag
-  my $md5    = fileMd5Sum($content);                                            # Md5 sum
-  fpe($name.q(_).(useWords ? hexAsWords($md5) : $md5), $extension)              # Add extension
+  my $md5    = $options{md5} // fileMd5Sum($content);                           # Md5 sum either as supplied or computed
+  fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5), $extension)             # Add extension
  }
 
 sub gbStandardCompanionFileName($)                                              #E Return the name of the L<Companion File> given a file whose name complies with the L<GBStandard>.
@@ -78,18 +78,18 @@ sub gbStandardCompanionFileContent($)                                           
   readFile(gbStandardCompanionFileName($file))                                  # L<GBStandard> companion file name content
  }
 
-sub gbStandardCreateFile($$$;$)                                                 #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>
- {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, contents of the companion file.
+sub gbStandardCreateFile($$$%)                                                  #E Create a file in the specified B<$Folder> whose name is the L<GBStandard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>
+ {my ($Folder, $content, $extension, %options) = @_;                            # Target folder or a file in that folder, content of the file, file extension, options.
   my $folder = fp $Folder;                                                      # Normalized folder name
-  my $file   = gbStandardFileName($content, $extension);                        # Entirely satisfactory
+  my $file   = gbStandardFileName($content, $extension, %options);              # Entirely satisfactory
 
   my $out    = fpf($folder, $file);                                             # Output file
   overWriteFile($out, $content);                                                # Write file content
 
-  if (defined $companionContent)                                                # Write a companion file if some content for it has been supplied
+  if (my $content = $options{companionContent})                                 # Write a companion file if some content for it has been supplied
    {my $comp = gbStandardCompanionFileName($out);                               # Companion file name
     if (!-e $comp)                                                              # Do not overwrite existing companion file
-     {writeFile($comp, $companionContent);                                      # Write companion file
+     {writeFile($comp, $content);                                               # Write companion file
      }
     else
      {confess "Companion file already exists:\n$comp\n";
@@ -98,21 +98,22 @@ sub gbStandardCreateFile($$$;$)                                                 
   $out
  }
 
-sub gbStandardRename($)                                                         #E Check whether a file needs to be renamed to match the L<GBStandard>. Return the correct name for the file or  B<undef> if the name is already correct.
- {my ($file)   = @_;                                                            # File to check
+sub gbStandardRename($%)                                                        #E Check whether a file needs to be renamed to match the L<GBStandard>. Return the correct name for the file or  B<undef> if the name is already correct.
+ {my ($file, %options) = @_;                                                    # File to check, options
   my $content  = readFile($file);                                               # Content of proposed file
   my $ext      = fe($file);                                                     # Extension of proposed file
-  my $proposed = gbStandardFileName($content, $ext);                            # Proposed name according to the L<GBStandard>
+  my $proposed = gbStandardFileName($content, $ext, %options);                  # Proposed name according to the L<GBStandard>
   my $base     = fne($file);                                                    # The name of the current file minus the path
   return undef if $base eq $proposed;                                           # Success - the names match
   $proposed                                                                     # Fail - the name should be this
  }
 
-sub gbStandardCopyFile($;$)                                                     #E Copy a file to the specified B<$target> folder renaming it to the L<GBStandard>.  If no B<$Target> folder is specified then rename the file in its current folder so that it does comply with the L<GBStandard>.
- {my ($source, $target) = @_;                                                   # Source file, target folder or a file in the target folder
+sub gbStandardCopyFile($%)                                                      #E Copy a file to the specified B<$target> folder renaming it to the L<GBStandard>.  If no B<$Target> folder is specified then rename the file in its current folder so that it does comply with the L<GBStandard>.
+ {my ($source, %options) = @_;                                                  # Source file, options
   -e $source && !-d $source or                                                  # Check that the source file exists and is a file
     confess "Source file to normalize does not exist:\n$source";
-  my $correctName = gbStandardRename($source);                                  # Get the correct name for the file
+  my $target = $options{target};                                                # The target folder (or a file in it) to which to copy this file
+  my $correctName = gbStandardRename($source, %options);                        # Get the correct name for the file
 
   if ($target and $target ne fp($source))                                       # New target folder specified
    {my $t = fpf($target, $correctName//$source);                                # Target of copy
@@ -145,14 +146,12 @@ sub gbStandardDelete($)                                                         
 
 sub gbBinaryStandardFileName($$)                                                #E Return the L<GBStandard> file name given the content and extension of a proposed file.
  {my ($content, $extension) = @_;                                               # Content, extension
-  defined($content) or
-    confess "Content must be defined";
-  defined($extension) && $extension =~ m(\A\S{2,}\Z)s or
+  defined($content) or confess "Content must be defined";
+  $extension && ($extension =~ m(\A\S{2,}\Z)s) or
     confess "Extension must be non blank and at least two characters long";
-# my $name   = nameFromStringRestrictedToTitle($content);                       # Human readable component ideally taken from the title tag
   my $name   = lc $extension;                                                   # Human readable component was taken from the file content but this produced long garbled names as there was no useful ascii content at the start of most image files.  Substituted the extension lower case instead to separate the images out in directory listings.
   my $md5    = fileMd5Sum($content);                                            # Md5 sum
-  fpe($name.q(_).(useWords ? hexAsWords($md5) : $md5), $extension)              # Add extension
+  fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5), $extension)             # Add extension
  }
 
 sub gbBinaryStandardCompanionFileName($)                                        #E Return the name of the companion file given a file whose name complies with the L<GBStandard>.
@@ -830,7 +829,7 @@ as a universal standard.
 The Gearhart-Brenan Dita Topic Naming Standard.
 
 
-Version "20190530".
+Version 20190622.
 
 
 The following sections describe the methods in each functional area of this
@@ -854,7 +853,7 @@ Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name g
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     if (useWords)
      {ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(<<END, q(dita)) eq q(c_abc_Plume_VApoR_CaPER_eqUAl_qUAIL_saInT_mEdia_Irony.dita);
   <concept>
@@ -865,14 +864,14 @@ B<Example:>
      }
     else
      {ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(<<END, q(dita)) eq q(c_abc_8551cffdb92932637d952e04447783c8.dita);
-  <concept>
+  <concept xtrf="A">
     <title>abc 𝝰𝝱𝝲</title>
     <conbody/>
   </concept>
   END
      }
    }
-
+  
 
 This method can be imported via:
 
@@ -889,8 +888,8 @@ Return the name of the L<Companion File> given a file whose name complies with t
 B<Example:>
 
 
-  ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);
-
+  ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);                             
+  
 
 This method can be imported via:
 
@@ -907,190 +906,191 @@ Return the content of the L<Companion File> given a file whose name complies wit
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                              
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
+  
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($c) eq $S;
-
+  
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-
+  
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-
+  
     ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($F) eq $S;                                  # Check companion file content
-
+  
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-
+  
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
   use Dita::GB::Standard qw(gbStandardCompanionFileContent)
 
 
-=head2 gbStandardCreateFile($$$$)
+=head2 gbStandardCreateFile($$$%)
 
 Create a file in the specified B<$Folder> whose name is the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> name for the specified B<$content> and return the file name,  A L<Companion File> can, optionally, be  created with the specified B<$companionContent>
 
-     Parameter          Description
-  1  $Folder            Target folder or a file in that folder
-  2  $content           Content of the file
-  3  $extension         File extension
-  4  $companionContent  Contents of the companion file.
+     Parameter   Description
+  1  $Folder     Target folder or a file in that folder
+  2  $content    Content of the file
+  3  $extension  File extension
+  4  %options    Options.
 
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                           
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
-    my $f = 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗿𝗲𝗮𝘁𝗲𝗙𝗶𝗹𝗲($d, $s, q(xml), $S);                             # Create file
+  
+    my $f = 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗿𝗲𝗮𝘁𝗲𝗙𝗶𝗹𝗲($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-
-    my $F = gbStandardCopyFile($f, $D);                                           # Copy file
+  
+    my $F = gbStandardCopyFile($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-
+  
     ok !gbStandardRename($F);                                                     # No rename required to standardize file name
-
+  
     gbStandardDelete($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
   use Dita::GB::Standard qw(gbStandardCreateFile)
 
 
-=head2 gbStandardRename($)
+=head2 gbStandardRename($%)
 
 Check whether a file needs to be renamed to match the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>. Return the correct name for the file or  B<undef> if the name is already correct.
 
      Parameter  Description
   1  $file      File to check
+  2  %options   Options
 
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                           
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
-    my $f = gbStandardCreateFile($d, $s, q(xml), $S);                             # Create file
+  
+    my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-
-    my $F = gbStandardCopyFile($f, $D);                                           # Copy file
+  
+    my $F = gbStandardCopyFile($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-
+  
     ok !𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗥𝗲𝗻𝗮𝗺𝗲($F);                                                     # No rename required to standardize file name
-
+  
     gbStandardDelete($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
   use Dita::GB::Standard qw(gbStandardRename)
 
 
-=head2 gbStandardCopyFile($$)
+=head2 gbStandardCopyFile($%)
 
 Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.  If no B<$Target> folder is specified then rename the file in its current folder so that it does comply with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>.
 
      Parameter  Description
   1  $source    Source file
-  2  $target    Target folder or a file in the target folder
+  2  %options   Options
 
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                           
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
-    my $f = gbStandardCreateFile($d, $s, q(xml), $S);                             # Create file
+  
+    my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-
-    my $F = 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗽𝘆𝗙𝗶𝗹𝗲($f, $D);                                           # Copy file
+  
+    my $F = 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗽𝘆𝗙𝗶𝗹𝗲($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-
+  
     ok !gbStandardRename($F);                                                     # No rename required to standardize file name
-
+  
     gbStandardDelete($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
@@ -1107,38 +1107,38 @@ Delete a file and its companion file if there is one.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                           
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
-    my $f = gbStandardCreateFile($d, $s, q(xml), $S);                             # Create file
+  
+    my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-
-    my $F = gbStandardCopyFile($f, $D);                                           # Copy file
+  
+    my $F = gbStandardCopyFile($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-
+  
     ok !gbStandardRename($F);                                                     # No rename required to standardize file name
-
+  
     𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗗𝗲𝗹𝗲𝘁𝗲($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
@@ -1160,7 +1160,7 @@ Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name g
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     if (useWords)
      {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(png)) eq q(png_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.png);
      }
@@ -1168,7 +1168,7 @@ B<Example:>
      {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(png)) eq q(png_2786f1147a331ec6ebf60c1ba636a458.png);
      }
    }
-
+  
 
 This method can be imported via:
 
@@ -1185,8 +1185,8 @@ Return the name of the companion file given a file whose name complies with the 
 B<Example:>
 
 
-  ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);
-
+  ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);                       
+  
 
 This method can be imported via:
 
@@ -1203,42 +1203,42 @@ Return the content of the L<Companion File> given a file whose name complies wit
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                              
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
+  
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-
+  
     ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($f) eq $S;                            # Check companion file content
-
+  
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($C) eq $S;
-
+  
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-
+  
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-
+  
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
@@ -1258,42 +1258,42 @@ Create a file in the specified B<$Folder> whose name is the L<GB Standard|http:/
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                              
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
+  
     my $f = 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗿𝗲𝗮𝘁𝗲𝗙𝗶𝗹𝗲($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-
+  
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-
+  
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-
+  
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-
+  
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-
+  
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
@@ -1310,42 +1310,42 @@ Check whether a file needs to be renamed to match the L<GB Standard|http://metac
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                              
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
+  
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-
+  
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-
+  
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-
+  
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-
+  
     ok !𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗥𝗲𝗻𝗮𝗺𝗲($F);                                               # No rename required to standardize file name
-
+  
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
@@ -1363,42 +1363,42 @@ Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                              
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
+  
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-
+  
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-
+  
     my $F = 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗽𝘆𝗙𝗶𝗹𝗲($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-
+  
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-
+  
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-
+  
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
@@ -1415,42 +1415,42 @@ Delete a file and its L<Companion File> if there is one.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                              
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-
+  
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-
+  
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-
+  
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-
+  
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-
+  
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-
+  
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-
+  
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-
+  
     𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗗𝗲𝗹𝗲𝘁𝗲($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-
+  
     clearFolder($_, 10) for $d, $D;
    }
-
+  
 
 This method can be imported via:
 
@@ -1578,11 +1578,13 @@ use warnings FATAL=>qw(all);
 use strict;
 use Data::Table::Text qw(:all);
 
-if ($^O =~ m(linux)i)
+makeDieConfess;
+
+if ($^O =~ m(bsd|linux)i)
  {plan tests => 48;
  }
 else
- {plan skip_all => 'Only Linux is supported';
+ {plan skip_all => 'Not supported';
  }
 
 Test::More->builder->output("/dev/null")                                        # Show only errors during testing
@@ -1623,7 +1625,7 @@ END
    }
   else
    {ok gbStandardFileName(<<END, q(dita)) eq q(c_abc_8551cffdb92932637d952e04447783c8.dita);
-<concept>
+<concept xtrf="A">
   <title>abc 𝝰𝝱𝝲</title>
   <conbody/>
 </concept>
@@ -1640,7 +1642,7 @@ if (1) {                                                                        
   my $D = q(out2/);
   clearFolder($_, 10) for $d, $D;
 
-  my $f = gbStandardCreateFile($d, $s, q(xml), $S);                             # Create file
+  my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
   ok -e $f;
   ok readFile($f) eq $s;
 
@@ -1648,7 +1650,7 @@ if (1) {                                                                        
   ok -e $c;
   ok readFile($c) eq $S;
 
-  my $F = gbStandardCopyFile($f, $D);                                           # Copy file
+  my $F = gbStandardCopyFile($f, target=>$D);                                   # Copy file
   ok -e $F;
   ok readFile($F) eq $s;
 

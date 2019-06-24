@@ -28,6 +28,7 @@ WriteMakefile(
         'Getopt::Euclid'        => 0,
         'Graph'                 => 0.90,
         'List::Util'            => 1.00,
+        'List::MoreUtils'       => 0,
         'POSIX'                 => 0,
         'autodie'               => 0,
         'indirect'              => 0,

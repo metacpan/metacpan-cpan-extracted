@@ -2,7 +2,7 @@
 
 package Tcl::pTk::HList;
 
-our ($VERSION) = ('1.00');
+our ($VERSION) = ('1.01');
 
 @Tcl::pTk::HList::ISA = (Tcl::pTk::Widget);
 

@@ -14,7 +14,7 @@ my $META_MERGE = {
 };
 
 my $TEST_REQUIRES = {
-    'Test::Differences' => '0.64',
+    'Test::Differences' => '0.67',
 
     # the latest version (0.05) is not available:
     # https://github.com/sukria/Test-TinyMocker/issues/8
@@ -29,16 +29,16 @@ WriteMakefile(
     VERSION_FROM   => 'bin/wax',
     PREREQ_PM      => {
         'Digest::SHA'                => '0',
-        'File::BaseDir'              => '0.07',
+        'File::BaseDir'              => '0.08',
         'File::Slurper'              => '0.012',
         'IPC::System::Simple'        => '1.25',
-        'LWP'                        => '6.31',
+        'LWP'                        => '6.39',
         'Method::Signatures::Simple' => '1.07',
         'MIME::Types'                => '2.17',
-        'Mouse'                      => 'v2.5.2',
+        'Mouse'                      => 'v2.5.6',
         'Parallel::parallel_map'     => '0.02',
         'Try::Tiny'                  => '0.30',
-        'URI'                        => '1.73',
+        'URI'                        => '1.76',
         'version'                    => '0.77',
     },
     ($EUMM_VERSION >= 6.5503 ? (BUILD_REQUIRES => $TEST_REQUIRES) : ()),

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.033';
+our $VERSION = '1.034';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -87,8 +87,10 @@ our $VERSION = '1.033';
 #pod
 #pod     my $be = $c->yancy->backend;
 #pod
-#pod Get the currently-configured Yancy backend object. See L<Yancy::Backend>
-#pod for the methods you can call on a backend object and their purpose.
+#pod Get the Yancy backend object. By default, gets the backend configured
+#pod while loading the Yancy plugin. Requests can override the backend by
+#pod setting the C<backend> stash value. See L<Yancy::Backend> for the
+#pod methods you can call on a backend object and their purpose.
 #pod
 #pod =head2 yancy.plugin
 #pod
@@ -586,7 +588,13 @@ sub register {
     # Load the backend and schema
     $config = { %$config };
     $app->helper( 'yancy.backend' => sub {
-        state $backend = load_backend( $config->{backend}, $config->{schema} || $config->{openapi}{definitions} );
+        my ( $c ) = @_;
+        state $default_backend = load_backend( $config->{backend}, $config->{schema} || $config->{openapi}{definitions} );
+        if ( my $backend = $c->stash( 'backend' ) ) {
+            $c->app->log->debug( 'Using override backend from stash: ' . ref $backend );
+            return $backend;
+        }
+        return $default_backend;
     } );
     if ( $config->{schema} || $config->{read_schema} ) {
         $config->{schema} = $config->{schema} ? dclone( $config->{schema} ) : {};
@@ -958,7 +966,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
@@ -1045,8 +1053,10 @@ C<schema> configuration as needed.
 
     my $be = $c->yancy->backend;
 
-Get the currently-configured Yancy backend object. See L<Yancy::Backend>
-for the methods you can call on a backend object and their purpose.
+Get the Yancy backend object. By default, gets the backend configured
+while loading the Yancy plugin. Requests can override the backend by
+setting the C<backend> stash value. See L<Yancy::Backend> for the
+methods you can call on a backend object and their purpose.
 
 =head2 yancy.plugin
 

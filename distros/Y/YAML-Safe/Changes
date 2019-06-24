@@ -1,0 +1,490 @@
+---
+version: 0.80
+date:    Sun 23 Jun 2019 02:25:17 PM CEST
+changes:
+- First release as YAML::Safe
+- Added Safe methods
+- Fixed ax/markstack after Dump
+- Added tests: t/boolean-cpaneljsonxs.t t/boolean-jsonmaybexs.t
+  t/boolean-jsonxs.t t/options.t t/safeclass.t t/cpan.t
+- Added Test::Base and Spiffy to inc
+- Added more boolean tests and supported packages, witch run-time
+  version check. You can preload a JSON package and use it when it's
+  JSON::PP::Boolean compatible (most are).
+- options are lowercase, methods uppercase.
+- enablecode is a combination for loadcode + dumpcode
+- Warn on unsafe violations, which remove the tag/class, but with code
+  disable unsafe code at all.
+- Rename append_output to yaml_sv_write_handler
+- Dump and Load can woprk as functions or methods. Safe methods
+  can only be methods, because they need to keep the state of safe classes.
+- Fix many compiler warnings, e.g. WRITE_BREAK
+- yaml_string_extend: guard against integer overflow
+- Use our patched libyaml-2.2.3
+---
+version: 0.79_01
+date:    Mon 17 Jun 2019 10:14:30 AM CEST
+changes:
+- Merge with cperl fixes (rurban) to be usable for CPAN and in core.
+---
+version: 0.79
+date:    Tue 11 Jun 2019 09:35:22 PM CEST
+changes:
+- Support aliasing scalars resolved as null or booleans (tinita)
+- Add YAML::XS::LibYAML::libyaml_version() (tinita)
+- Support standard !!int/!!float tags instead of dying (tinita)
+---
+version: 0.78
+date:    Sat 18 May 2019 06:35:21 PM CEST
+changes:
+- Fix double free/core dump when Dump()ing binary data, see issue#91 (tinita)
+- Update config.h from libyaml (tinita)
+---
+version: 0.77
+date:    Mon 15 Apr 2019 10:55:13 PM CEST
+changes:
+- "Update libyaml to version 0.2.2. Most important change for users is that
+  plain urls in flow style can be parsed now. Example: `[ http://yaml.org ]`.
+  (tinita)"
+---
+version: 0.76
+date:    Sun Dec 30 20:10:16 CET 2018
+changes:
+- Add $Indent - number of spaces when dumping. PR#89 @zdm++
+- Fix typo in docs. PR#87 @mr-mixas++
+- Fix links in docs. @manwar++
+---
+version: 0.75
+date:    Sat Nov  3 14:17:28 CET 2018
+changes:
+- Implement $LoadCode (tinita)
+---
+version: 0.74
+date:    Fri Aug 31 18:06:17 PDT 2018
+changes:
+- Fix tests on older perls
+- Support back to perl.5.8.1
+---
+version: 0.72
+date:    Sun Jul  8 17:03:08 CEST 2018
+changes:
+- Update to libyaml 0.2.1 (tinita) It's forbidden now to escape single quotes
+  inside double quotes
+- When disabling $LoadBlessed, return scalars not refs (tinita)
+- Save anchors also for blessed scalars (tinita)
+---
+version: 0.70
+date:    Sat Jun  9 21:53:05 CEST 2018
+changes:
+- Fix format specifier/argument mismatch PR#79 @a3f++
+- 'Travis CI: Test on Perl 5.26 PR#80 @a3f++'
+- Fix a C90-compatibility issue PR#81 @stphnlyd++
+---
+version: 0.69
+date:    Tue Dec 26 18:37:25 CET 2017
+changes:
+- Security fix Add $LoadBlessed option to turn on/off loading objects
+  PR#73 PR#74 TINITA++
+---
+version: 0.68
+date:    Mon Dec 18 20:01:05 CET 2017
+changes:
+- Fix regex roundtrip (fixes issue#69) PR#70 (TINITA++)
+- Fix loading of many regexes (fixes issue#64) PR#71 (TINITA++)
+---
+version: 0.67
+date:    Wed Nov 15 18:59:33 CET 2017
+changes:
+- Support standard tags !!str, !!map and !!seq instead of dying.
+  PR#67 (TINITA++)
+- Support JSON::PP::Boolean and boolean.pm via $YAML::XS::Boolean.
+  PR#66 (TINITA++) Thanks also to Björn Höhrmann for SvPV_nolen()
+---
+version: 0.66
+date:    Thu Aug 17 20:06:06 CEST 2017
+changes:
+- Apply PR#55 (@vti++)
+- Dump() was modifying original data, adding a PV to numbers
+- Added a test for this (TINITA++)
+---
+version: 0.65
+date:    Thu 18 May 23:09:38 CEST 2017
+changes:
+- Prevent warning about unused variables (see issue#59)
+- Clarify documentation about exported functions
+---
+version: 0.64
+date:    Fri  7 Apr 20:32:01 CEST 2017
+changes:
+- use lib FindBin::Bin in tests, preparing for perl 5.26 where '.'
+  gets removed from @INC. Fixes issue#54 TINITA++
+- Use the latest libyaml sources.
+- Lazy load B::Deparse for faster startup time.
+  Applied PR/53 by @perlpunk++
+  (submitted by @carnil++ from a Debian issue as GitHub issue#52)
+---
+version: 0.63
+date:    Fri Jul  8 14:40:35 UTC 2016
+changes:
+- Apply PR/48 by @perlpunk++
+- Fixes memory leaks
+---
+version: 0.62
+date:    Mon Feb 22 15:46:06 UTC 2016
+changes:
+- Apply PR/42 @perlpunk++ (fix for detecting filehandles)
+---
+version: 0.61
+date:    Sat Feb 20 18:04:19 UTC 2016
+changes:
+- Apply PR/37 @perlpunk++ (includes PR/36 @lameventanas++)
+---
+version: 0.60
+date:    Tue Feb  9 14:36:09 EST 2016
+changes:
+- Apply PR/33. @andygrundman++. Solaris fixes.
+---
+version: 0.59
+date:    Mon Jan 26 15:04:10 PST 2015
+changes:
+- PR/23 Better scalar dump heuristics
+- More closely match YAML.pm
+- Thanks Matthias Bethke
+---
+version: 0.58
+date:    Tue Jan 20 21:01:49 PST 2015
+changes:
+- Add a VERSION statement to YAML::LibYAML (issue#8)
+---
+version: 0.57
+date:    Thu Jan 15 23:05:15 EST 2015
+changes:
+- Applied fix for PR/21. nawglan++
+---
+version: 0.56
+date:    Thu Jan 15 22:21:47 EST 2015
+changes:
+- Update copyright year
+- Use Swim cpan-tail block functions in doc
+---
+version: 0.55
+date:    Mon Dec 22 17:26:27 PST 2014
+changes:
+- Get YAML::XS using latest libyaml
+---
+version: 0.54
+date:    Sat Nov 29 11:47:10 PST 2014
+changes:
+- Reverted an old patch with 0.53. Unreverted.
+---
+version: 0.53
+date:    Fri Nov 28 09:20:08 PST 2014
+changes:
+- Fix for https://bitbucket.org/xi/libyaml/issue/10/wrapped-strings-cause-assert-failure
+---
+version: 0.52
+date:    Fri Aug 22 21:03:19 PDT 2014
+changes:
+- Fix e1 test failure on 5.21.4
+---
+version: 0.51
+date:    Sat Aug 16 14:28:45 PDT 2014
+changes:
+- Remove =travis section
+---
+version: 0.50
+date:    Sat Aug 16 12:57:04 PDT 2014
+changes:
+- Meta 0.0.2
+---
+version: 0.49
+date:    Sat Aug 16 04:23:17 PDT 2014
+changes:
+- Eliminate spurious trailing whitespace
+---
+version: 0.48
+date:    Fri Aug 15 21:07:12 PDT 2014
+changes:
+- Add t/000-compile-modules.t
+---
+version: 0.47
+date:    Sat Aug  9 00:29:29 PDT 2014
+changes:
+- Fix swim errors
+---
+version: 0.46
+date:    Tue Aug  5 10:32:41 PDT 2014
+changes:
+- Add badges to doc
+- Fix ReadMe
+---
+version: 0.45
+date:    Mon Aug  4 01:23:10 PDT 2014
+changes:
+- Fix Meta and add Contributing.
+---
+version: 0.44
+date:    Sun Jul 13 15:19:41 PDT 2014
+changes:
+- Doc fix. GitHub-Issue-#6. Thanks to Debian Perl Group for finding this.
+---
+version: 0.43
+date:    Sat Jul 12 10:04:07 PDT 2014
+changes:
+- Test::Base tests needed 'inc' in @INC
+---
+version: 0.42
+date:    Fri Jul 11 14:45:58 PDT 2014
+changes:
+- Switch to Zilla::Dist
+- No longer dep on Test::Base, Spiffy, and Filter::Util::Call
+- Remove test/changes.t
+---
+version: 0.41
+date:    Wed Mar 13 10:34:55 PDT 2013
+changes:
+- Removed another C++ // style comment. jdb++
+---
+version: 0.40
+date:    Tue Mar 12 11:05:34 PDT 2013
+changes:
+- Removed C++ // style comments, for better portability. jdb++
+---
+version: 0.39
+date:    Mon Feb 11 18:08:04 PST 2013
+changes:
+- Using the latest libyaml codebase
+- https://github.com/yaml/libyaml/tree/perl-yaml-xs
+- Changes have been made to start moving libyaml to 1.2
+---
+version: 0.38
+date:    Tue Jan  3 22:56:01 PST 2012
+changes:
+- Apply SPROUT++ deparse test patch. Thanks!
+---
+version: 0.37
+date:    Thu Sep 29 20:09:20 CEST 2011
+changes:
+- Fix the bug that accidentally released YAML-XS instead of YAML-LibYAML.
+- Released from Wendy++ and Liz++'s Guest Bedroom.
+---
+version: 0.36
+date:    Sun Sep 25 22:08:53 CEST 2011
+changes:
+- Switch to Module::Package
+- Fix LoadFile on empty file failure.
+- Released from Wendy++ and Liz++'s Basement Server Room.
+---
+version: 0.35
+date:    Mon Apr  4 00:33:09 CST 2011
+changes:
+- Apply bdfoy patch from rt-46172
+- Update ppport.h to fix rt-64749 & rt-62054
+- Add ANDK's regexp.t patch from rt-62266
+---
+version: 0.34
+date:    Wed Apr 14 17:57:10 PDT 2010
+changes:
+- These changes from chansen++
+- Handle misbehaved tied hashes
+- Handle 'get' magic
+- Added support for tied arrays and hashes
+- Don't turn on the UTF-8 flag for strings containing US-ASCII (0x00-0x7F)
+---
+version: 0.33
+date:    Wed Apr 14 17:57:10 PDT 2010
+changes:
+- Applied Gisle Aas' patch from https://rt.cpan.org/Ticket/Display.html?id=43115
+---
+version: 0.32
+date:    Mon Jan 12 11:23:55 IST 2009
+changes:
+- newSVpvs is not portable, change to newSVpvn
+- update ppport.h options
+---
+version: 0.31
+date:    Mon Jan 12 11:23:55 IST 2009
+changes:
+- Fix the leak test so it doesn't load an unused, undeclared dependency
+  (Test::LongString)
+---
+version: 0.30
+date:    Sun Jan 11 12:53:55 IST 2009
+changes:
+- Plug a leak in Load
+- More efficient intermediate structure allocation
+---
+version: 0.29
+date:    Tue Nov 11 22:57:07 PST 2008
+changes:
+- Check SvNIOK when dumping and format if quotes when it's a string that looks
+  like a number
+- Parse plain scalars as numbers when they look like numbers
+- Load nulls as newSV(0) instead of &PL_sv_undef to avoid "Modification of
+  non-creatable hash value attempted" errors
+---
+version: 0.28
+date:    Mon Jun 23 15:23:24 PDT 2008
+changes:
+- Apply UTF8 patch supplied by KLEINJ in rt.cpan#36734
+---
+version: 0.27
+date:    Fri Jun  6 22:05:29 PDT 2008
+changes:
+- Apply patches from Gisle Aas and Jan Dubois of ActiveState.
+---
+version: 0.26
+date:    Mon Jun 25 00:14:19 PDT 2007
+changes:
+- Refactor to consistent pointer & declaration syntax
+- Start commenting the C code.
+- Make YAML::XS work on Win32 by adding -DYAML_DECLARE_EXPORT. (Tested on
+  StrawberryPerl)
+---
+version: 0.25
+date:    Sun Jun 24 17:39:13 PDT 2007
+changes:
+- Squelch most -pedantic C warnings. Thanks audreyt.
+- Allow anchored and aliased scalars (and regexps) to be Loaded
+---
+version: 0.24
+date:    Sun Jun 24 10:29:03 PDT 2007
+changes:
+- Turn on unicode dumping support.
+- Make anchor numbers Dump in order.
+---
+version: 0.23
+date:    Fri Jun 22 17:56:50 PDT 2007
+changes:
+- Added full regexp Dump and Load support. Borrowed code from YAML::Syck.
+  Discovered/reported bugs in the same.
+---
+version: 0.22
+date:    Fri Jun 22 00:38:14 PDT 2007
+changes:
+- Support !foo private tags for Loading scalar refs - for David Garamond
+---
+version: 0.21
+date:    Thu Jun 21 15:08:03 PDT 2007
+changes:
+- Add Loadfile and Dumpfile functions
+- Support !foo private tags for Load - for David Garamond
+- Support Dump/Load of strings with nulls
+---
+version: 0.20
+date:    Mon Jun 18 16:29:33 PDT 2007
+changes:
+- Better parse error messaging
+---
+version: 0.19
+date:    Mon Jun 18 00:54:40 PDT 2007
+changes:
+- Fixed memory bugs. Reported_by avar
+---
+version: 0.18
+date:    Sun Jun 17 18:33:41 PDT 2007
+changes:
+- Renamed to shorter YAML::XS
+- Load and Dump blessed scalar refs
+- Report Load errors
+- Allow !!hash and !!array
+---
+version: 0.17
+date:    Wed Jun  6 19:48:52 PDT 2007
+changes:
+- Support code and glob dumping
+- Much refactoring.
+---
+version: 0.16
+date:    Thu May 31 13:46:50 PDT 2007
+changes:
+- Using a newer version of libyaml (0.1.1 cut of trunk).
+- Can dump scalars that need quoting without getting a !
+---
+version: 0.15
+date:    Wed May 30 20:16:22 PDT 2007
+changes:
+- Use 'Perl_form' to generate tags. Don't use memory allocating.
+- Can correctly load a scalar ref to itself.
+---
+version: 0.14
+date:    Wed May 30 02:31:39 PDT 2007
+changes:
+- Plain empty strings should load as undef
+---
+version: 0.12
+date:    Wed May 30 01:08:52 PDT 2007
+changes:
+- Add support for dumping code refs and blessed code refs
+---
+version: 0.11
+date:    Tue May 29 17:25:18 PDT 2007
+changes:
+- Fixed false YAML::Tiny dependency
+- Support blessed hashes and arrays
+---
+version: 0.10
+date:    Mon May 28 03:17:29 PDT 2007
+changes:
+- Integrated with YAML::Tests test suite.
+---
+version: 0.09
+date:    Mon May 28 00:38:19 PDT 2007
+changes:
+- Dump and Load scalar refs
+- Handle alias scalar refs
+---
+version: 0.08
+date:    Wed May 23 19:34:35 PDT 2007
+changes:
+- Make sure dumped empty strings have quotes
+- Add boolean roundtrip support
+- Add full anchor/alias support
+---
+version: 0.07
+date:    Wed May 23 00:04:42 PDT 2007
+changes:
+- TonyC showed me how to use '...' in my XS prototype to say zero or
+  more args.
+---
+version: 0.06
+date:    Tue May 22 23:37:40 PDT 2007
+changes:
+- Support dumping zero objects, and loading empty or comment only
+  streams to produce zero objects.
+---
+version: 0.05
+date:    Mon May 21 00:14:40 PDT 2007
+changes:
+- TonyC pointed out the error in my ways for using newSVpvf for
+  strings.
+---
+version: 0.04
+date:    Sat May 19 20:04:04 PDT 2007
+changes:
+- Added a typedef 'dumper' like 'loader'. Makes internals nicer and more
+  exposable.
+- Support dumping undef as ~ and "~" as '~', and loading them correctly.
+---
+version: 0.03
+date:    Mon May 14 23:27:17 PDT 2007
+changes:
+- Fixed Dump call stack bugs reported by vhold. Made Dump work
+  like Load.
+- Made this very 'Changes' file loadable, and have a test to prove it.
+- As a result Load now handles a multiple document stream correctly.
+- Added a 'loader' typedef to the C code. This is kinda like a self object for
+  the Loader and maybe I'll expose this to the Perl API at some point.
+- Made Dump and Load not be proxy subs from YAML::LibYAML to
+  YAML::LibYAML::XS. This removes one level of Perl sub calling which
+  should improve benchmarks.
+---
+version: 0.02
+date:    Mon May 14 23:27:17 PDT 2007
+changes:
+- Implement initial Dump function. Now supports basic Dump and Load.
+---
+version: 0.01
+date:    Fri May 11 14:08:54 PDT 2007
+changes:
+- First Version. Very alpha. Not for production!

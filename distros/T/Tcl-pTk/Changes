@@ -1,5 +1,14 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.01:  2019-06-23
+
+ * More adjustments for macOS Aqua dark mode (Tk 8.6.10 or later)
+   - DialogBox: do not set default foreground color
+     (would cause text and icon to be difficult to see)
+   - Balloon: set default foreground to 'black' for improved legibility
+     (black text on yellow background, rather than white text on
+     yellow background)
+
 Release 1.00:  2019-06-19
 
  * Fix POD errors (`=cut` outside POD block) reported by CPANTS

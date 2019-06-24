@@ -5,7 +5,7 @@ use JSON qw//;
 use Sub::Data::Recursive;
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $MAX_DEPTH = 10;
 
@@ -52,13 +52,37 @@ sub opt {
 sub run {
     my ($self) = @_;
 
+    local $| = !!$self->opt('unbuffered');
+
+    my $out = !!$self->opt('stderr') ? *STDERR : *STDOUT;
+
     while (my $orig_line = <STDIN>) {
-        if ($orig_line !~ m!^\s*[\[\{]!) {
-            print $orig_line;
-            next;
+        if (my $line = $self->_run_line($orig_line)) {
+            print $out $line;
         }
-        print $self->process($orig_line);
     }
+}
+
+sub _run_line {
+    my ($self, $orig_line) = @_;
+
+    if ($orig_line !~ m!^\s*[\[\{]!) {
+        return $orig_line;
+    }
+
+    if (my $regexp = $self->opt('grep')) {
+        if ($orig_line !~ m!$regexp!) {
+            return;
+        }
+    }
+
+    if (my $regexp = $self->opt('ignore')) {
+        if ($orig_line =~ m!$regexp!) {
+            return;
+        }
+    }
+
+    return $self->process($orig_line);
 }
 
 sub _lazyload_modules {
@@ -136,7 +160,12 @@ sub _recursive_post_process {
     }
 
     if ($self->opt('xxxx') || $self->opt('timestamp_key')) {
-        $INVOKER->massive_invoke(\&_convert_timestamp => $decoded);
+        if ($self->opt('xxxxx')) {
+            $INVOKER->massive_invoke(\&_forcely_convert_timestamp => $decoded);
+        }
+        else {
+            $INVOKER->massive_invoke(\&_convert_timestamp => $decoded);
+        }
     }
 
     $INVOKER->invoke(\&_trim => $decoded);
@@ -198,6 +227,16 @@ sub _convert_timestamp {
     $LAST_VALUE = $line;
 }
 
+sub _forcely_convert_timestamp {
+    my $line    = $_[0];
+
+    if ($line =~ m!(\d+(\.\d+)?)!) {
+        if (my $date = _ts2date($1, $2)) {
+            $_[0] = $date;
+        }
+    }
+}
+
 sub _trim {
     my $line = $_[0];
 
@@ -223,7 +262,7 @@ sub _ts2date {
     my $msec           = shift || '';
 
     # 946684800 = 2000-01-01T00:00:00Z
-    if ($unix_timestamp > 946684800) {
+    if ($unix_timestamp >= 946684800) {
         if ($unix_timestamp > 2**31 -1) {
             ($msec) = ($unix_timestamp =~ m!(\d\d\d)$!);
             $msec = ".$msec";
@@ -266,9 +305,14 @@ sub _parse_opt {
         'xx'        => \$opt->{xx},
         'xxx'       => \$opt->{xxx},
         'xxxx'      => \$opt->{xxxx},
+        'xxxxx'     => \$opt->{xxxxx},
         'timestamp-key=s' => \$opt->{timestamp_key},
         'gmtime'    => \$opt->{gmtime},
+        'g|grep=s'  => \$opt->{grep},
+        'ignore=s'  => \$opt->{ignore},
         'yaml|yml'  => \$opt->{yaml},
+        'unbuffered' => \$opt->{unbuffered},
+        'stderr'    => \$opt->{stderr},
         'h|help'    => sub {
             $class->_show_usage(1);
         },
@@ -280,9 +324,10 @@ sub _parse_opt {
 
     $opt->{depth} ||= $MAX_DEPTH;
 
-    $opt->{xxx} ||= $opt->{xxxx};
-    $opt->{xx}  ||= $opt->{xxx};
-    $opt->{x}   ||= $opt->{xx};
+    $opt->{xxxx} ||= $opt->{xxxxx};
+    $opt->{xxx}  ||= $opt->{xxxx};
+    $opt->{xx}   ||= $opt->{xxx};
+    $opt->{x}    ||= $opt->{xx};
 
     $UNIXTIMESTAMP_KEY = $opt->{timestamp_key};
 
@@ -346,7 +391,7 @@ The parser of the line
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1561133163"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1561133163&branch=master"/></a>
+<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1561268694"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1561268694&branch=master"/></a>
 
 =end html
 

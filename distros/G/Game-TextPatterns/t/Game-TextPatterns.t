@@ -134,6 +134,28 @@ EOF
         [ "....", "....", "....", "...#" ] );
 }
 
+# fill_4way
+{
+    my $field = Game::TextPatterns->new( pattern => <<'EOF' );
+#.#
+...
+#.#
+EOF
+    eq_or_diff( $field->fill_4way( [ 1, 1 ], 'x' )->pattern,
+        [ '#x#', 'xxx', '#x#' ] );
+}
+
+# fill_8way
+{
+    my $field = Game::TextPatterns->new( pattern => <<'EOF' );
+.#.
+#.#
+.#.
+EOF
+    eq_or_diff( $field->fill_8way( [ 1, 1 ], 'x' )->pattern,
+        [ 'x#x', '#x#', 'x#x' ] );
+}
+
 # flip_cols, flip_rows, flip_both
 {
     # this heredoc form is probably not good if there are trailing
@@ -303,4 +325,4 @@ EOF
 #$v->mask( '.', $i );
 #diag "\n", $v->string;
 
-done_testing 58
+done_testing 60

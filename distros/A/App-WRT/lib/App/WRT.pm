@@ -16,7 +16,7 @@ package App::WRT;
 # without overthinking a bunch of hair-splitting decisions and categories,
 # but whatever.  I'll try to follow it, roughly.
 
-use version; our $VERSION = version->declare("v6.3.0");
+use version; our $VERSION = version->declare("v6.3.1");
 
 use strict;
 use warnings;

@@ -1,3 +1,7 @@
+Travel::Status::DE::DBWagenreihung 0.02 - Sun Jun 23 2019
+
+    * Add from_json option to constructor
+
 Travel::Status::DE::DBWagenreihung 0.01 - Fri May 31 2019
 
     * Initial release. wagen order and wagon type information for a specific

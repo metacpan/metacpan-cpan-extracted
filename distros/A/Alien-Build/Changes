@@ -1,5 +1,12 @@
 Revision history for Alien-Build
 
+1.76      2019-06-23 11:01:08 -0400
+  - Production release identical to 1.75_01
+
+1.75_01   2019-06-07 15:06:30 -0400
+  - Download::Negotiate defaults to Deocde::Mojo instead of Decode::HTML for
+    share installs that require parsing an HTML index (gh#127, gh#115).
+
 1.74      2019-05-22 08:43:10 -0400
   - Check if share directory exists before clean_install
     (gh#114, gh#126 zmughal++ for the report)

@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Module::Load ();
 
 # ABSTRACT: Plugin to extract links from HTML using Mojo::DOM or Mojo::DOM58
-our $VERSION = '1.74'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 
 sub _load ($)
@@ -95,7 +95,7 @@ Alien::Build::Plugin::Decode::Mojo - Plugin to extract links from HTML using Moj
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 SYNOPSIS
 
@@ -125,9 +125,9 @@ This plugin decodes an HTML file listing into a list of candidates for your Pref
 It works just like L<Alien::Build::Plugin::Decode::HTML> except it uses either L<Mojo::DOM>
 or L<Mojo::DOM58> to do its job.
 
-This plugin is much lighter than The C<Decode::HTML> plugin, and doesn't require XS.  The
-intent is if this plugin proves its self reliable that it will eventually be preferred by
-the download negotiator.
+This plugin is much lighter than The C<Decode::HTML> plugin, and doesn't require XS.  It
+is the default decode plugin used by L<Alien::Build::Plugin::Download::Negotiate> if it
+detects that you need to parse an HTML index.
 
 =head1 AUTHOR
 

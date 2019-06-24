@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use feature ':5.14';
 
-package Text::Parser 0.926;
+package Text::Parser 0.927;
 
 # ABSTRACT: Simplifies text parsing. Easily extensible to parse any text format.
 
@@ -46,20 +46,13 @@ has auto_split => (
     isa     => 'Bool',
     lazy    => 1,
     default => 0,
+    trigger => \&__newval_auto_split,
 );
 
-around auto_split => sub {
-    my ( $orig, $self ) = ( shift, shift );
-    __newval_auto_split( $orig, $self, @_ );
-    return $orig->($self);
-};
-
 sub __newval_auto_split {
-    my ( $orig, $self, $newval ) = ( shift, shift, shift );
-    return if not defined $newval;
-    $self->_clear_all_fields if not $newval and $orig->($self);
-    $orig->( $self, $newval );
+    my ( $self, $newval, $oldval ) = ( shift, shift, shift );
     ensure_all_roles $self, 'Text::Parser::AutoSplit' if $newval;
+    $self->_clear_all_fields if not $newval and $oldval;
 }
 
 
@@ -211,7 +204,7 @@ sub _run_begin_end_block {
     my $pred = '_has' . $func;
     return if not $self->$pred();
     my $rule = $self->$func();
-    $rule->run( $self, 0 );
+    $rule->_run( $self, 0 );
 }
 
 sub __read_and_close_filehandle {
@@ -241,7 +234,8 @@ sub __parse_line {
     my ( $self, $line ) = ( shift, shift );
     $self->_next_line_parsed();
     $line = $self->_def_line_manip($line);
-    $self->__try_to_parse($line);
+    $self->_set_this_line($line);
+    $self->save_record($line);
     return not $self->has_aborted;
 }
 
@@ -257,13 +251,6 @@ sub _trim_line {
     return trim($line)  if $self->auto_trim eq 'b';
     return ltrim($line) if $self->auto_trim eq 'l';
     return rtrim($line);
-}
-
-sub __try_to_parse {
-    my ( $self, $line ) = @_;
-    $self->_set_this_line($line);
-    try { $self->save_record($line); }
-    catch { die $_; };
 }
 
 
@@ -355,8 +342,8 @@ sub save_record {
 sub _run_through_rules {
     my $self = shift;
     foreach my $rule ( $self->_get_rules ) {
-        next if not $rule->test($self);
-        $rule->run($self);
+        next if not $rule->_test($self);
+        $rule->_run( $self, 0 );
         last if not $rule->continue_to_next;
     }
 }
@@ -450,7 +437,7 @@ Text::Parser - Simplifies text parsing. Easily extensible to parse any text form
 
 =head1 VERSION
 
-version 0.926
+version 0.927
 
 =head1 SYNOPSIS
 

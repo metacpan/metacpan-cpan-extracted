@@ -1,5 +1,10 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+2.10  Mon June 24 16:00:00 2019
+      Added 6to4 addressing support
+      Added Teredo addressing support
+      Minor fix on isProxy value if IP address is UNKNOWN
+
 2.02  Mon Apr 08 16:00:00 2019
       Minor fix on POD
 

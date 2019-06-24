@@ -12,7 +12,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.73';
+our $VERSION = '1.24';
 
 with 'MooX::Rebuild';    # for ->rebuild (which differs from ->clone)
 
@@ -201,6 +201,62 @@ sub draw_in {
     }
     return $self;
 }
+
+sub _adj_4way {
+    my ( $p, $max_col, $max_row ) = @_;
+    my @adj;
+    push @adj, [ $p->[0] - 1, $p->[1] ] unless $p->[0] == 0;
+    push @adj, [ $p->[0] + 1, $p->[1] ] unless $p->[0] == $max_col;
+    push @adj, [ $p->[0], $p->[1] - 1 ] unless $p->[1] == 0;
+    push @adj, [ $p->[0], $p->[1] + 1 ] unless $p->[1] == $max_row;
+    return @adj;
+}
+
+sub _adj_8way {
+    my ( $p, $max_col, $max_row ) = @_;
+    my @adj;
+    push @adj, [ $p->[0] - 1, $p->[1] ] unless $p->[0] == 0;
+    push @adj, [ $p->[0] + 1, $p->[1] ] unless $p->[0] == $max_col;
+    push @adj, [ $p->[0], $p->[1] - 1 ] unless $p->[1] == 0;
+    push @adj, [ $p->[0], $p->[1] + 1 ] unless $p->[1] == $max_row;
+    push @adj, [ $p->[0] - 1, $p->[1] - 1 ] unless $p->[0] == 0 or $p->[1] == 0;
+    push @adj, [ $p->[0] - 1, $p->[1] + 1 ]
+      unless $p->[0] == 0
+      or $p->[1] == $max_row;
+    push @adj, [ $p->[0] + 1, $p->[1] - 1 ]
+      unless $p->[0] == $max_col
+      or $p->[1] == 0;
+    push @adj, [ $p->[0] + 1, $p->[1] + 1 ]
+      unless $p->[0] == $max_col
+      or $p->[1] == $max_row;
+    return @adj;
+}
+
+sub _fill {
+    my ( $self, $p, $char, $adjfn ) = @_;
+    my $ref     = $self->as_array;
+    my $max_col = $ref->[0]->$#*;
+    my $max_row = $ref->$#*;
+    if (   $p->[0] < 0
+        or $p->[0] > $max_col
+        or $p->[1] < 0
+        or $p->[1] > $max_row ) {
+        croak "point @$p out of bounds";
+    }
+    my @queue   = $p;
+    my $replace = $ref->[ $p->[1] ][ $p->[0] ];
+    while ( my $p = pop @queue ) {
+        if ( $ref->[ $p->[1] ][ $p->[0] ] eq $replace ) {
+            $ref->[ $p->[1] ][ $p->[0] ] = $char;
+            push @queue, $adjfn->( $p, $max_col, $max_row );
+        }
+    }
+    $self->from_array($ref);
+    return $self;
+}
+
+sub fill_4way { push @_, \&_adj_4way; return &_fill }
+sub fill_8way { push @_, \&_adj_8way; return &_fill }
 
 # "mirrors are abominable" (Jorge L. Borges. "Tlön, Uqbar, Orbis Tertuis")
 # so the term flip is here used instead
@@ -655,6 +711,18 @@ differs from other methods that accept a I<fill> argument).
 
 See also the more complicated B<overlay>.
 
+=item B<fill_4way> I<point> I<char>
+
+Replaces the character found at I<point> with I<char> and repeats this
+fill for all similar characters found by 4-way motion from the
+starting I<point>.
+
+=item B<fill_8way> I<point> I<char>
+
+Replaces the character found at I<point> with I<char> and repeats this
+fill for all similar characters found by 8-way motion from the
+starting I<point>.
+
 =item B<flip_both>
 
 Flips the B<pattern> by columns and by rows. Similar to a rotate by
@@ -831,6 +899,8 @@ a conversion such that particular colors become particular ASCII symbols
 (or combinations of symbols, with Unicode or control sequences to set
 colors or such).
 
+L<Game::PlatformsOfPeril> has some levels built with this module.
+
 And then there is also the
 L<https://github.com/thrig/ministry-of-silly-vaults/>
 
@@ -840,7 +910,7 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Jeremy Mates
+Copyright (C) 2018,2019 by Jeremy Mates
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '1.74'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 
 has '+url' => undef;
@@ -62,32 +62,32 @@ sub _pick
   {
     if($self->bootstrap_ssl && ! _has_ssl)
     {
-      return (['Fetch::CurlCommand','Fetch::Wget'], 'Decode::HTML');
+      return (['Fetch::CurlCommand','Fetch::Wget'], 'Decode::Mojo');
     }
     elsif(_has_ssl)
     {
-      return ('Fetch::HTTPTiny', 'Decode::HTML');
+      return ('Fetch::HTTPTiny', 'Decode::Mojo');
     }
     elsif(do { require Alien::Build::Plugin::Fetch::CurlCommand; Alien::Build::Plugin::Fetch::CurlCommand->protocol_ok('https') })
     {
-      return ('Fetch::CurlCommand', 'Decode::HTML');
+      return ('Fetch::CurlCommand', 'Decode::Mojo');
     }
     else
     {
-      return ('Fetch::HTTPTiny', 'Decode::HTML');
+      return ('Fetch::HTTPTiny', 'Decode::Mojo');
     }
   }
   elsif($self->scheme eq 'http')
   {
-    return ('Fetch::HTTPTiny', 'Decode::HTML');
+    return ('Fetch::HTTPTiny', 'Decode::Mojo');
   }
   elsif($self->scheme eq 'ftp')
   {
     if($ENV{ftp_proxy} || $ENV{all_proxy})
     {
       return $self->scheme =~ /^ftps?/
-        ? ('Fetch::LWP', 'Decode::DirListing', 'Decode::HTML')
-        : ('Fetch::LWP', 'Decode::HTML');
+        ? ('Fetch::LWP', 'Decode::DirListing', 'Decode::Mojo')
+        : ('Fetch::LWP', 'Decode::Mojo');
     }
     else
     {
@@ -181,7 +181,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 SYNOPSIS
 

@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.74'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 
 our @aliens;
@@ -635,7 +635,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 SYNOPSIS
 
@@ -877,6 +877,8 @@ The module name detected during the XS parsing phase will
 be passed in to the subtest.  This is helpful when you are
 using a generated module name.
 
+If you need to test XS C++ interfaces, see L<Test::Alien::CPP>.
+
 =head2 ffi_ok
 
  ffi_ok;
@@ -953,6 +955,8 @@ either the given string or regular expression.
 =item L<Test::Alien::CanPlatypus>
 
 =item L<Test::Alien::Synthetic>
+
+=item L<Test::Alien::CPP>
 
 =back
 

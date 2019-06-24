@@ -1,5 +1,5 @@
 ---
-abstract: 'Blog builder for git generation'
+abstract: 'Web site and Blog builders you can manage with Git'
 author:
   - 'Yuki Kimoto <kimoto.yuki@gmail.com>'
 build_requires:
@@ -21,4 +21,4 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/yuki-kimoto/giblog.git
-version: '0.76'
+version: '0.91'

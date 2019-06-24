@@ -4,7 +4,7 @@
 #
 # This is a patched version of Balloon 3.037 - it adds support
 # for different orientations of the balloon widget, depending
-# on wether there's enough space for it. The little arrow now
+# on whether there's enough space for it. The little arrow now
 # should always point directly to the client.
 # Added by Gerhard Petrowitsch (gerhard.petrowitsch@philips.com)
 #
@@ -16,7 +16,7 @@
 #  Modified for use in Tcl::pTk
 package Tcl::pTk::Balloon;
 
-our ($VERSION) = ('1.00');
+our ($VERSION) = ('1.01');
 
 use Tcl::pTk;
 use Carp;
@@ -109,7 +109,7 @@ sub Populate {
 		    -cancelcommand => ['CALLBACK', 'cancelCommand', 'CancelCommand', undef],
 		    -motioncommand => ['CALLBACK', 'motionCommand', 'MotionCommand', undef],
 		    -background => ['DESCENDANTS', 'background', 'Background', '#C0C080'],
-                    -foreground => ['DESCENDANTS', 'foreground', 'Foreground', undef],
+		    -foreground => ['DESCENDANTS', 'foreground', 'Foreground', 'black'],
 		    -font => [$ml, 'font', 'Font', '-*-helvetica-medium-r-normal--*-120-*-*-*-*-*-*'],
 		    -borderwidth => ['SELF', 'borderWidth', 'BorderWidth', 1],
                     -numscreens=>['PASSIVE', 'numScreens','NumScreens',1],

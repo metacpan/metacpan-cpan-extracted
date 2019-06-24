@@ -1,5 +1,9 @@
 Revision history for DBIx::Class::TopoSort (ordered by revision number).
 
+0.060000 Jun 23 2019 09:30:00 PDT
+    - Add support for the following options to toposort_graph:
+        - add_dependencies
+
 0.050100 Oct 05 2018 19:30:00 PDT
     - Add support for the following options to toposort_graph:
         - die_on_cycle

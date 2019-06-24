@@ -1,7 +1,7 @@
 package Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
-our $DATE = '2019-06-06'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -76,7 +76,7 @@ sub action_self_upgrade {
     }
     $version_on_cpan = $apires->{version};
     unless (defined $version_on_cpan) {
-        return [412, "Cannot upgrade: Module $package's latest version on CPAN is undefined"];
+        return [412, "Cannot upgrade: Module $package\'s latest version on CPAN is undefined"];
     }
 
     if (defined $local_version &&
@@ -112,7 +112,7 @@ Perinci::CmdLineX::CommonOptions::SelfUpgrade - Add --self-upgrade (-U) common o
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::CmdLineX::CommonOptions::SelfUpgrade (from Perl distribution Perinci-CmdLineX-CommonOptions-SelfUpgrade), released on 2019-06-06.
+This document describes version 0.002 of Perinci::CmdLineX::CommonOptions::SelfUpgrade (from Perl distribution Perinci-CmdLineX-CommonOptions-SelfUpgrade), released on 2019-06-19.
 
 =head1 SYNOPSIS
 

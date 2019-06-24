@@ -6,6 +6,15 @@ use JSON qw/encode_json/;
 
 use App::jl;
 
+sub jl_test {
+    my ($name, $src_json, $opt) = @_;
+
+    note $name;
+    note(
+        App::jl->new($opt ? @{$opt} : ())->process($src_json)
+    );
+}
+
 my $JSON = encode_json({
     foo => encode_json({
         bar => encode_json({
@@ -18,34 +27,48 @@ my $JSON = encode_json({
 
 note $JSON;
 
-BASIC: {
-    note 'BASIC';
-    note( App::jl->new->process($JSON) );
+jl_test('BASIC', $JSON);
+
+jl_test('NOT_JSON', 'aikoの詩。');
+
+jl_test('SORT_KEYS', encode_json({ z => 1, b => 1, a => 1 }));
+
+jl_test('JA', encode_json({ aiko => '詩' }));
+
+jl_test('NO_PRETTY', $JSON, ['--no-pretty']);
+
+jl_test('DEPTH', $JSON, ['--depth', '1']);
+
+{
+    my $src_json = encode_json({ foo => 'bar' });
+    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51]\t[warn]\t$src_json\n| });
+    jl_test('X', $json_in_log, ['-x']);
 }
 
-NOT_JSON: {
-    note 'NOT_JSON';
-    note( App::jl->new->process('aikoの詩。') );
+{
+    my $src_json = encode_json({ foo => 'bar' });
+    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] foo, bar, baz \n$src_json\n| });
+    jl_test('XX', $json_in_log, ['-xx']);
 }
 
-SORT_KEYS: {
-    note 'SORT_KEYS';
-    note( App::jl->new->process(encode_json({ z => 1, b => 1, a => 1 })) );
+{
+    my $src_json = encode_json({ foo => 'bar' });
+    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51](warn)<server> \n$src_json\n| });
+    jl_test('XXX', $json_in_log, ['-xxx']);
 }
 
-JA: {
-    note 'JA';
-    note( App::jl->new->process(encode_json({ aiko => '詩' })) );
-}
-
-NO_PRETTY: {
-    note 'NO_PRETTY';
-    note( App::jl->new('--no-pretty')->process($JSON) );
-}
-
-DEPTH: {
-    note 'DEPTH';
-    note( App::jl->new('--depth', '1')->process($JSON) );
+{
+    my $src_json = encode_json([
+        { created    => 1560026367 },
+        { updated    => 1560026367.123 },
+        { created_at => '1560026367' },
+        { time       => '1560026367123' },
+        { unixtime   => 1560026367123 },
+        { date       => '1560026367.123' },
+        { ts         => 1560026367 },
+    ]);
+    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] (warn) <server>\n$src_json\n| });
+    jl_test('XXXX', $json_in_log, ['-xxxx', '--timestamp-key', 'ts']);
 }
 
 STDIN: {
@@ -57,6 +80,18 @@ STDIN: {
     close $IN;
     note 'STDIN';
     note $stdout;
+}
+
+STDERR: {
+    open my $IN, '<', \$JSON;
+    local *STDIN = *$IN;
+    my ($stdout, $stderr) = capture {
+        App::jl->new('--stderr')->run;
+    };
+    close $IN;
+    note 'STDERR';
+    is $stdout, '';
+    ok $stderr;
 }
 
 STDIN_WITH_NOT_JSON: {
@@ -72,56 +107,37 @@ STDIN_WITH_NOT_JSON: {
     is $stdout, $str;
 }
 
-X: {
-    my $src_json = encode_json({ foo => 'bar' });
-    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51]\t[warn]\t$src_json\n| });
-    note 'X ' . $json_in_log;
-    note( App::jl->new('-x')->process($json_in_log) );
+GREP: {
+    open my $IN, '<', \$JSON;
+    local *STDIN = *$IN;
+    my ($stdout, $stderr) = capture {
+        App::jl->new('--grep', 'baz')->run;
+    };
+    close $IN;
+    note 'GREP';
+    ok $stdout;
 }
 
-XX: {
-    my $src_json = encode_json({ foo => 'bar' });
-    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] foo, bar, baz \n$src_json\n| });
-    note 'XX ' . $json_in_log;
-    note( App::jl->new('-xx')->process($json_in_log) );
+IGNORE: {
+    open my $IN, '<', \$JSON;
+    local *STDIN = *$IN;
+    my ($stdout, $stderr) = capture {
+        App::jl->new('--ignore', 'baz')->run;
+    };
+    close $IN;
+    note 'IGNORE';
+    ok !$stdout;
 }
 
-XXX: {
-    my $src_json = encode_json({ foo => 'bar' });
-    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51](warn)<server> \n$src_json\n| });
-    note 'XXX ' . $json_in_log;
-    note( App::jl->new('-xxx')->process($json_in_log) );
-}
-
-XXXX: {
-    my $src_json = encode_json([
-        { created    => 1560026367 },
-        { updated    => 1560026367.123 },
-        { created_at => '1560026367' },
-        { time       => '1560026367123' },
-        { unixtime   => 1560026367123 },
-        { date       => '1560026367.123' },
-        { ts         => 1560026367 },
-    ]);
-    my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] (warn) <server>\n$src_json\n| });
-    note 'XXXX ' . $json_in_log;
-    note( App::jl->new('-xxxx', '--timestamp-key', 'ts')->process($json_in_log) );
-}
-
-GMTIME: {
+{
     my $src_json = encode_json([
         { created => 1560026367 },
     ]);
     my $json_in_log = encode_json({ message => qq|[info]\n$src_json\n| });
-    note 'GMTIME ' . $json_in_log;
-    note( App::jl->new('-xxxx', '--gmtime')->process($json_in_log) );
+    jl_test('GMTIME', $json_in_log, ['-xxxx', '--gmtime']);
 }
 
-TRIM: {
-    my $json_in_log = encode_json({ message => qq|  info\tfoo\tbar\tbaz  | });
-    note 'GMTIME ' . $json_in_log;
-    note( App::jl->new('-x')->process($json_in_log) );
-}
+jl_test('TRIM', encode_json({ message => qq|  info\tfoo\tbar\tbaz  | }), ['-x']);
 
 {
     my $json = encode_json({
@@ -132,13 +148,17 @@ TRIM: {
         }),
         pod     => 'bar-baz-12345',
     });
-    note $json;
-    note( App::jl->new('-xxxx')->process($json) );
+    jl_test('LONG', $json, ['-xxxx']);
 }
 
-YAML: {
-    note 'YAML';
-    note( App::jl->new('--yaml')->process($JSON) );
+jl_test('YAML', $JSON, ['-yaml']);
+
+{
+    my $src_json = encode_json([
+        { created => 946684800 },
+    ]);
+    my $json_in_log = encode_json({ message => qq|[info]\n$src_json\n| });
+    jl_test('XXXXX', $json_in_log, ['-xxxxx']);
 }
 
 done_testing;

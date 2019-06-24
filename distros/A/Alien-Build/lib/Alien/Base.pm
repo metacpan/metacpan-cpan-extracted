@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.74'; # VERSION
+our $VERSION = '1.76'; # VERSION
 
 
 sub import {
@@ -604,7 +604,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.0_0");
+use version; our $VERSION = qv("v2.0.1");
 use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;
@@ -48,6 +48,16 @@ in a module distribution:
 
 =cut
 
+our @EXPORT = qw(
+    pm_file_ok
+    pl_file_ok
+
+    all_pm_files_ok
+    all_pl_files_ok
+
+    all_pm_files
+    all_pl_files
+);
 our @EXPORT_OK = qw(
     pm_file_ok
     pl_file_ok
@@ -83,7 +93,7 @@ Checks all the perl files it can find for compilation errors.
 
 If C<@dirs> is defined then it is taken as an array of directories to
 be searched for perl files, otherwise it searches some default locations
-- see L</all_pm_files()> and L</all_pl_files()>.
+- see L</all_pm_files(@dirs)> and L</all_pl_files(@dirs)>.
 
 =item C<all_pm_files(@dirs)>
 
@@ -360,7 +370,7 @@ Checks all the perl files it can find for compilation errors.
 
 If C<@dirs> is defined then it is taken as an array of directories to
 be searched for perl files, otherwise it searches some default locations
-- see L</all_pm_files()> and L</all_pl_files()>.
+- see L</all_pm_files(@dirs)> and L</all_pl_files(@dirs)>.
 
 =back
 =cut

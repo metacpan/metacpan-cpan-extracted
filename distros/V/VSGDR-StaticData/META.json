@@ -39,6 +39,7 @@
             "English" : "0",
             "Getopt::Euclid" : "0",
             "Graph" : "0.9",
+            "List::MoreUtils" : "0",
             "List::Util" : "1",
             "POSIX" : "0",
             "Test::More" : "0",
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.46",
+   "version" : "0.47",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

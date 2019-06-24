@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::Rule 0.926;
+package Text::Parser::Rule 0.927;
 
 # ABSTRACT: Makes it possible to write AWK-style parsing rules for Text::Parser
 
@@ -21,10 +21,33 @@ has condition => (
 
 sub _set_condition {
     my $self = shift;
+    $self->_has_blank_condition(0);
     $self->_set_highest_nf;
     $self->_cond_sub_str( _gen_sub_str( $self->condition ) );
     $self->_cond_sub(
         _set_cond_sub( $self->condition, $self->_cond_sub_str ) );
+}
+
+has _has_blank_condition => (
+    is      => 'rw',
+    isa     => 'Bool',
+    lazy    => 1,
+    default => 1,
+);
+
+sub _set_highest_nf {
+    my $self = shift;
+    my $nf   = _get_min_req_fields( $self->_gen_joined_str );
+    $self->_set_min_nf($nf);
+}
+
+sub _gen_joined_str {
+    my $self = shift;
+    my (@strs) = ();
+    push @strs, $self->condition            if $self->_has_condition;
+    push @strs, $self->action               if $self->_has_action;
+    push @strs, $self->_join_preconds('; ') if not $self->_no_preconds;
+    my $str = join '; ', @strs;
 }
 
 sub _get_min_req_fields {
@@ -126,21 +149,6 @@ has min_nf => (
     handles  => { _set_min_nf => 'set', }
 );
 
-sub _set_highest_nf {
-    my $self = shift;
-    my $nf   = _get_min_req_fields( $self->_gen_joined_str );
-    $self->_set_min_nf($nf);
-}
-
-sub _gen_joined_str {
-    my $self = shift;
-    my (@strs) = ();
-    push @strs, $self->condition            if $self->_has_condition;
-    push @strs, $self->action               if $self->_has_action;
-    push @strs, $self->_join_preconds('; ') if not $self->_no_preconds;
-    my $str = join '; ', @strs;
-}
-
 
 has action => (
     is        => 'rw',
@@ -199,7 +207,13 @@ sub BUILD {
     die illegal_rule_no_if_no_act
         if not $self->_has_condition and not $self->_has_action;
     $self->action('return $0;') if not $self->_has_action;
-    $self->condition(1)         if not $self->_has_condition;
+    $self->_constr_condition if not $self->_has_condition;
+}
+
+sub _constr_condition {
+    my $self = shift;
+    $self->condition(1);
+    $self->_has_blank_condition(1);
 }
 
 
@@ -259,9 +273,8 @@ sub test {
     my $self = shift;
     return 0 if not _check_parser_arg(@_);
     my $parser = shift;
-    return 0 if not $parser->auto_split or $parser->NF < $self->min_nf;
-    return 0 if not $self->_test_preconditions($parser);
-    return $self->_test_cond_sub($parser);
+    return 0 if not $parser->auto_split;
+    return $self->_test($parser);
 }
 
 sub _check_parser_arg {
@@ -269,6 +282,15 @@ sub _check_parser_arg {
     my $parser = shift;
     return 0 if not defined blessed($parser);
     $parser->isa('Text::Parser');
+}
+
+sub _test {
+    my ( $self, $parser ) = ( shift, shift );
+    return 0 if $parser->NF < $self->min_nf;
+    return 0
+        if not( $self->_no_preconds or $self->_test_preconditions($parser) );
+    return 1 if $self->_has_blank_condition;
+    return $self->_test_cond_sub($parser);
 }
 
 sub _test_preconditions {
@@ -292,11 +314,17 @@ sub _test_cond_sub {
 sub run {
     my $self = shift;
     die rule_run_improperly if not _check_parser_arg(@_);
-    return if nocontent( $self->action ) or not $_[0]->auto_split;
-    push @_, 1 if @_ == 1;
-    my (@res) = $self->_call_act_sub(@_);
+    return if not $_[0]->auto_split;
+    push @_, 1 if @_ < 2;
+    $self->_run(@_);
+}
+
+sub _run {
+    my ( $self, $parser ) = ( shift, shift );
+    return if nocontent( $self->action );
+    my (@res) = $self->_call_act_sub( $parser, @_ );
     return if $self->dont_record;
-    $_[0]->push_records(@res);
+    $parser->push_records(@res);
 }
 
 sub _call_act_sub {
@@ -325,7 +353,7 @@ Text::Parser::Rule - Makes it possible to write AWK-style parsing rules for Text
 
 =head1 VERSION
 
-version 0.926
+version 0.927
 
 =head1 SYNOPSIS
 

@@ -31,9 +31,15 @@ sub run {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
-Giblog::Command::add - add command
+Giblog::Command::add - new blog entry adding command
+
+=head1 DESCRIPTION
+
+L<Giblog::Command::add> is new blog entry adding command.
 
 =head1 METHODS
 
@@ -42,6 +48,10 @@ implements the following new ones.
 
 =head2 run
 
-  $command->run(@argv);
+  $command->run;
 
-Execute add command.
+Create a new blog entry page file in "templates/blog" directory.
+
+The file contains date and time.
+
+  templates/blog/20190416153053.html

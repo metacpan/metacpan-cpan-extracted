@@ -17,7 +17,7 @@ package Ball;
 # Gurusamy Sarathy (gsar@engin.umich.edu)
 # Tidied up by SOL.
 
-our ($VERSION) = ('1.00');
+our ($VERSION) = ('1.01');
 
 use Tcl::pTk::Canvas;
 #use Tk::Widget;

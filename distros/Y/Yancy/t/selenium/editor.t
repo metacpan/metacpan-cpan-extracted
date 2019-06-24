@@ -128,6 +128,8 @@ my %data = (
         { # Test XML escaping in x-list-columns templates
             title => 'I <b><3</b> Perl',
             slug => '/perl/heart',
+            markdown => '# I Heart Perl',
+            html => '<h1>I Heart Perl</h1>',
         },
     ],
 );
@@ -156,9 +158,9 @@ $t->navigate_ok("/yancy")
     ->set_window_size( [ 800, 600 ] )
     ->screenshot_directory( $Bin )
     ->status_is(200)
-    ->wait_for( '#sidebar-schema-list' )
+    ->wait_for( '#sidebar-schema-list li:nth-child(2) a' )
     ->click_ok( '#sidebar-schema-list li:nth-child(2) a' )
-    ->wait_for( 'table' )
+    ->wait_for( 'table[data-schema=people]' )
     ->main::capture( 'after-people-clicked' )
     ->click_ok( '#add-item-btn' )
     ->main::capture( 'after-new-item-clicked' )
@@ -174,7 +176,7 @@ $t->navigate_ok("/yancy")
 
 subtest 'x-list-columns template' => sub {
     $t->click_ok( '#sidebar-schema-list li:nth-child(1) a', 'click blog schema' )
-      ->wait_for( 'table' )
+      ->wait_for( 'table[data-schema=blog]' )
       ->live_text_like(
         'tbody tr:nth-child(1) td:nth-child(2)', qr{^\s*I <b><3</b> Perl\s*\(/perl/heart\)\s*$},
         'unsafe characters in value are escaped'

@@ -42,7 +42,7 @@
    "provides" : {
       "App::WRT" : {
          "file" : "lib/App/WRT.pm",
-         "version" : "v6.3.0"
+         "version" : "v6.3.1"
       },
       "App::WRT::Date" : {
          "file" : "lib/App/WRT/Date.pm"
@@ -75,6 +75,6 @@
          "http://opensource.org/licenses/gpl-license.php"
       ]
    },
-   "version" : "v6.3.0",
+   "version" : "v6.3.1",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

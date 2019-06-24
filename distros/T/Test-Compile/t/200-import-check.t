@@ -8,20 +8,22 @@ Test::Compile::_verbose(0);
 plan skip_all => "Test::Exception required for checking exceptions"
     unless eval "use Test::Exception; 1";
 
-my @METHODS = qw(
+my @EXPORTED = qw(
     pm_file_ok
     pl_file_ok
 
-    all_files_ok
     all_pm_files_ok
     all_pl_files_ok
 
     all_pm_files
     all_pl_files
 );
+my @NOTEXPORTED = qw(
+    all_files_ok
+);
 
 # try to use the methods, despite not exporting them
-for my $m (@METHODS) {
+for my $m (@NOTEXPORTED) {
     is(__PACKAGE__->can($m), undef, "$m not auto-imported");
 } 
 
@@ -35,5 +37,5 @@ lives_ok ( sub {
 # finally use the "all" tag to import all methods and check if it worked
 diag 'Use :all import tag and check if methods got imported correctly';
 Test::Compile->import(':all');
-can_ok(__PACKAGE__, @METHODS);
+can_ok(__PACKAGE__, @EXPORTED,@NOTEXPORTED);
 done_testing();

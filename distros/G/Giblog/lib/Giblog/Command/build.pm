@@ -13,9 +13,15 @@ sub run {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
-Giblog::Command::build - build command
+Giblog::Command::build - Website building command
+
+=head1 DESCRIPTION
+
+L<Giblog::Command::build> is website building command.
 
 =head1 METHODS
 
@@ -24,6 +30,8 @@ implements the following new ones.
 
 =head2 run
 
-  $command->run(@argv);
+  $command->run;
 
-Execute build command.
+Build website.
+
+This method is planed to be overridden in subclass.

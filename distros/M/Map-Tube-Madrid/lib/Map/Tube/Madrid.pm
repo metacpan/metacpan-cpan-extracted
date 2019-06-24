@@ -1,6 +1,6 @@
 package Map::Tube::Madrid;
 
-$Map::Tube::Madrid::VERSION   = '0.36';
+$Map::Tube::Madrid::VERSION   = '0.37';
 $Map::Tube::Madrid::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Madrid - Interface to the Madrid Metro Map.
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 

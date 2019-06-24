@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '1.033';
+our $VERSION = '1.034';
 # ABSTRACT: A controller to show a user only their content
 
 #pod =head1 SYNOPSIS
@@ -138,7 +138,7 @@ sub list {
     my ( $c ) = @_;
     my $user_id = $c->stash( 'user_id' ) || die "User ID not defined in stash";
     $c->stash( filter => {
-        %{ $c->stash( 'filter' ) || {} },
+        %{ $c->_resolve_filter },
         $c->stash( 'user_id_field' ) // 'user_id' => $user_id,
     } );
     return $c->SUPER::list;
@@ -329,7 +329,7 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 

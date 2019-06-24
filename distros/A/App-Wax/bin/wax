@@ -7,7 +7,7 @@ use App::Wax;
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v2.3.0');
+use version; our $VERSION = version->declare('v2.3.1');
 
 exit App::Wax->new({ app_version => $VERSION })->run(\@ARGV);
 
@@ -188,7 +188,7 @@ etc.
 
 =head1 VERSION
 
-2.3.0
+2.3.1
 
 =head1 SEE ALSO
 
@@ -210,7 +210,7 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2010-2018 by chocolateboy.
+Copyright (c) 2010-2019 by chocolateboy.
 
 This is free software; you can redistribute it and/or modify it under the
 terms of the L<Artistic License 2.0|http://www.opensource.org/licenses/artistic-license-2.0.php>.
