@@ -33,16 +33,16 @@ subtest 'get' => sub {
         $az->get( %{ WWW::AzimuthAero::Mock->mock_data->{get} } ),
         [
             WWW::AzimuthAero::Flight->new(
-                'date'      => '23.06.2019',
-                'departure' => '07:45',
-                'arrival'   => '09:45',
-                'to'        => 'MOW',
-                'fares'     => {
+                'flight_date'    => '23.06.2019',
+                'departure_time' => '07:45',
+                'arrival_time'   => '09:45',
+                'fares'          => {
                     'lowest'     => 5980,
                     'svobodnyy'  => 10980,
                     'optimalnyy' => 5980
                 },
-                'from'       => 'ROV',
+                'from_city'  => 'ROV',
+                'to_city'    => 'MOW',
                 'flight_num' => 'A4 201'
             )
         ]

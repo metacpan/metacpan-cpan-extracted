@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '1.034'; # VERSION
+our $DATE = '2019-06-26'; # DATE
+our $VERSION = '1.035'; # VERSION
 
 use 5.010001;
 use strict;
@@ -2264,8 +2264,9 @@ sub _complete_mod {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of module name first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2317,8 +2318,9 @@ sub _complete_mod_or_dist {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of module/distro name first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2387,8 +2389,9 @@ sub _complete_mod_or_dist_or_script {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of module/distro/script name first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2467,8 +2470,9 @@ sub _complete_ns {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of namespace first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2514,8 +2518,9 @@ sub _complete_script {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of script name first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2555,8 +2560,9 @@ sub _complete_dist {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of distro name first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2602,8 +2608,9 @@ sub _complete_cpanid {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of PAUSE ID first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2643,8 +2650,9 @@ sub _complete_rel {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of release name first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -2684,8 +2692,9 @@ sub _complete_content_package_or_script {
 
     my $word = $args{word} // '';
 
-    # because it might be very slow, don't complete empty word
-    return [] unless length $word;
+    # completing from an empty word is very slow
+    return {message=>"Please enter a few characters of content/package/script name first", static=>1}
+        unless length $word;
 
     # only run under pericmd
     my $cmdline = $args{cmdline} or return undef;
@@ -4053,7 +4062,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.034 of App::lcpan (from Perl distribution App-lcpan), released on 2019-06-19.
+This document describes version 1.035 of App::lcpan (from Perl distribution App-lcpan), released on 2019-06-26.
 
 =head1 SYNOPSIS
 
@@ -4232,7 +4241,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4430,7 +4439,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4598,7 +4607,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 

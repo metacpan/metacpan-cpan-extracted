@@ -15,7 +15,8 @@ use warnings;
 use LaTeXML::Global;
 use LaTeXML::Common::Object;
 use Time::HiRes;
-use Term::ANSIColor;
+use Term::ANSIColor 2.01 qw(colored colorstrip);
+
 use base qw(Exporter);
 our @EXPORT = (
   # Error Reporting
@@ -74,8 +75,8 @@ sub Fatal {
 
   # This seemingly should be "local", but that doesn't seem to help with timeout/alarm/term?
   # It should be safe so long as the caller has bound it and rebinds it if necessary.
-  $SIG{__DIE__} = 'DEFAULT';    # Avoid recursion while preparing the message.
-  my $state = $STATE;
+  local $SIG{__DIE__} = 'DEFAULT';    # Avoid recursion while preparing the message.
+  my $state     = $STATE;
   my $verbosity = $state && $state->lookupValue('VERBOSITY') || 0;
 
   if (!$inhandler) {
@@ -110,7 +111,7 @@ sub checkRecursiveError {
 # Should be fatal if strict is set, else warn.
 sub Error {
   my ($category, $object, $where, $message, @details) = @_;
-  my $state = $STATE;
+  my $state     = $STATE;
   my $verbosity = $state && $state->lookupValue('VERBOSITY') || 0;
   if ($state && $state->lookupValue('STRICT')) {
     Fatal($category, $object, $where, $message, @details); }
@@ -128,7 +129,7 @@ sub Error {
 # Warning message; results may be OK, but somewhat unlikely
 sub Warn {
   my ($category, $object, $where, $message, @details) = @_;
-  my $state = $STATE;
+  my $state     = $STATE;
   my $verbosity = $state && $state->lookupValue('VERBOSITY') || 0;
   $state && $state->noteStatus('warning');
   print STDERR generateMessage(colorizeString("Warning:" . $category . ":" . ToString($object), 'warning'),
@@ -140,7 +141,7 @@ sub Warn {
 # but the message may give clues about subsequent warnings or errors
 sub Info {
   my ($category, $object, $where, $message, @details) = @_;
-  my $state = $STATE;
+  my $state     = $STATE;
   my $verbosity = $state && $state->lookupValue('VERBOSITY') || 0;
   $state && $state->noteStatus('info');
   print STDERR generateMessage(colorizeString("Info:" . $category . ":" . ToString($object), 'info'),
@@ -202,7 +203,8 @@ my $at_re         = qr/(at .*)/;                                                
 
 sub perl_die_handler {
   my (@line) = @_;
-  if ($LaTeXML::IGNORE_ERRORS) {    # Just get out now, if we're ignoring errors within an eval.
+  if ($LaTeXML::IGNORE_ERRORS    # Just get out now, if we're ignoring errors within an eval.
+    || (colorstrip($line[0]) =~ /^\s*Fatal:/)) {    # Or, we've already been through here.
     local $SIG{__DIE__} = undef;
     die @line; }
   # We try to find a meaningful name for where the error occurred;
@@ -256,21 +258,21 @@ sub perl_interrupt_handler {
   my (@line) = @_;
   $LaTeXML::IGNORE_ERRORS = 0;    # NOT ignored
   $LaTeXML::UNSAFE_FATAL  = 1;
-  Fatal('interrupt', 'interrupted', undef, "LaTeXML was interrupted", @_);
+  Fatal('interrupt', 'interrupted', undef, "LaTeXML was interrupted", @line);
   return; }
 
 sub perl_timeout_handler {
   my (@line) = @_;
   $LaTeXML::IGNORE_ERRORS = 0;    # NOT ignored
   $LaTeXML::UNSAFE_FATAL  = 1;
-  Fatal('timeout', 'timedout', undef, "Conversion timed out", @_);
+  Fatal('timeout', 'timedout', undef, "Conversion timed out", @line);
   return; }
 
 sub perl_terminate_handler {
   my (@line) = @_;
   $LaTeXML::IGNORE_ERRORS = 0;    # NOT ignored
   $LaTeXML::UNSAFE_FATAL  = 1;
-  Fatal('terminate', 'terminated', undef, "Conversion was terminated", @_);
+  Fatal('terminate', 'terminated', undef, "Conversion was terminated", @line);
   return; }
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Internals
@@ -342,7 +344,7 @@ sub generateMessage {
       push(@lines, "In " . trim(Stringify($$top[0])) . ' ' . Stringify($$top[1]));
       push(@objects, ['...']) if @objects && defined $nstack;
       push(@lines, join('', (map { ' <= ' . trim(Stringify($$_[0])) } @objects))) if @objects;
-    } }
+  } }
 
   # finally, join the result into a block of lines, indenting all but the 1st line.
   return "\n" . join("\n\t", @lines) . "\n"; }
@@ -364,7 +366,7 @@ sub MergeStatus {
       $$status{$type} += $$external_status{$type};
     }
   }
-}
+  return; }
 
 # returns the locator of an object, or undef
 sub Locator {
@@ -470,7 +472,7 @@ sub format_arg {
   elsif (ref $arg)         { $arg = Stringify($arg); }    # Allow overloaded stringify!
   elsif ($arg =~ /^-?[\d.]+\z/) { }                       # Leave numbers alone.
   else {                                                  # Otherwise, string, so quote
-    $arg =~ s/'/\\'/g;                                    # Slashify '
+    $arg =~ s/'/\\'/g;                                        # Slashify '
     $arg =~ s/([[:cntrl:]])/ "\\".chr(ord($1)+ord('A'))/ge;
     $arg = "'$arg'" }
   return trim($arg); }

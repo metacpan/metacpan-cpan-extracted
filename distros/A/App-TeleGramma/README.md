@@ -4,41 +4,51 @@ App::TeleGramma - A modular Telegram Bot
 
 # VERSION
 
-version 0.13
+version 0.14
 
 # SYNOPSIS
 
 Install App::TeleGramma and its dependencies
 
-    $ cpanm App::TeleGramma
+```
+$ cpanm App::TeleGramma
+```
 
 The first time run, a basic configuration file is automatically created for you.
 
-    $ telegramma
-    Your new config has been created in /Users/username/.telegramma/telegramma.ini
+```perl
+$ telegramma
+Your new config has been created in /Users/username/.telegramma/telegramma.ini
 
-    Please edit it now and update the Telegram Bot token, then
-    re-run bin/telegramma.
+Please edit it now and update the Telegram Bot token, then
+re-run bin/telegramma.
 
-    The configuration will have an entry for each plugin currently available on
-    your system, but disabled.
+The configuration will have an entry for each plugin currently available on
+your system, but disabled.
+```
 
 Edit the config file, adding (at least) the Telegram Bot API key. You can get
 an API key from the @botfather bot on Telegram.
 
 Now you can run, first in foreground mode for testing purposes:
 
-    $ telegramma --nodaemon
+```
+$ telegramma --nodaemon
+```
 
 When it's all good, you'll want to run it as a daemon:
 
-    $ telegramma
+```
+$ telegramma
+```
 
 You can monitor the status of the running process, and shut it down.
 
-    $ telegramma --status
+```
+$ telegramma --status
 
-    $ telegramma --shutdown
+$ telegramma --shutdown
+```
 
 # DESCRIPTION
 
@@ -65,11 +75,11 @@ Justin Hawkins `justin@eatmorecode.com`
 
 # AUTHOR
 
-Justin Hawkins <justin@eatmorecode.com>
+Justin Hawkins <justin@hawkins.id.au>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Justin Hawkins <justin@eatmorecode.com>.
+This software is copyright (c) 2019 by Justin Hawkins <justin@eatmorecode.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

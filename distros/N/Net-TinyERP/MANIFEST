@@ -1,6 +1,7 @@
 Changes
 lib/Net/TinyERP.pm
 lib/Net/TinyERP/NotaFiscal.pm
+lib/Net/TinyERP/NotaFiscalServicos.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

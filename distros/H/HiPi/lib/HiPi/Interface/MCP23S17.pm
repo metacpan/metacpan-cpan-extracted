@@ -17,7 +17,7 @@ use HiPi qw( :rpi :spi :mcp23S17 );
 use HiPi::Device::SPI;
 use Carp;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 # compatibility
 

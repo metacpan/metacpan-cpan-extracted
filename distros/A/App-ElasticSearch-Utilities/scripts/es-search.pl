@@ -45,7 +45,7 @@ GetOptions(\%OPT, qw(
     prefix=s@
     pretty
     show=s@
-    size|n=i
+    size|n|limit=i
     sort=s
     tail
     timestamp=s
@@ -712,7 +712,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 6.9
+version 7.0
 
 =head1 SYNOPSIS
 
@@ -734,7 +734,7 @@ Options:
     --prefix            Takes "field:string" and enables the Lucene prefix query for that field
     --exists            Field which must be present in the document
     --missing           Field which must not be present in the document
-    --size              Result size, default is 20
+    --size              Result size, default is 20, aliased to -n and --limit
     --all               Don't consider result size, just give me *everything*
     --asc               Sort by ascending timestamp
     --desc              Sort by descending timestamp (Default)
@@ -773,6 +773,7 @@ See also the "CONNECTION ARGUMENTS" and "INDEX SELECTION ARGUMENTS" sections fro
 From CLI::Helpers:
 
     --data-file         Path to a file to write lines tagged with 'data => 1'
+    --tags              A comma separated list of tags to display
     --color             Boolean, enable/disable color, default use git settings
     --verbose           Incremental, increase verbosity (Alias is -v)
     --debug             Show developer output
@@ -782,6 +783,9 @@ From CLI::Helpers:
     --syslog-facility   Default "local0"
     --syslog-tag        The program name, default is the script name
     --syslog-debug      Enable debug messages to syslog if in use, default false
+    --nopaste           Use App::Nopaste to paste output to configured paste service
+    --nopaste-public    Defaults to false, specify to use public paste services
+    --nopaste-service   Comma-separated App::Nopaste service, defaults to Shadowcat
 
 =head1 DESCRIPTION
 

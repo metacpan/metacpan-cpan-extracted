@@ -1,0 +1,78 @@
+{
+   "abstract" : "KYTProf prolifer for AWS::CLIWrapper",
+   "author" : [
+      "papix <mail@papix.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-KYTProf-Profiler-AWS-CLIWrapper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AWS::CLIWrapper" : "0",
+            "Devel::KYTProf" : "0.9991",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::Guard" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::KYTProf::Profiler::AWS::CLIWrapper" : {
+         "file" : "lib/Devel/KYTProf/Profiler/AWS/CLIWrapper.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/papix/Devel-KYTProf-Profiler-AWS-CLIWrapper/issues"
+      },
+      "homepage" : "https://github.com/papix/Devel-KYTProf-Profiler-AWS-CLIWrapper",
+      "repository" : {
+         "url" : "git://github.com/papix/Devel-KYTProf-Profiler-AWS-CLIWrapper.git",
+         "web" : "https://github.com/papix/Devel-KYTProf-Profiler-AWS-CLIWrapper"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:PAPIX",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

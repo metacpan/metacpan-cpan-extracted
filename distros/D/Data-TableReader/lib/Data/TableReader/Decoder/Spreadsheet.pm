@@ -1,5 +1,4 @@
 package Data::TableReader::Decoder::Spreadsheet;
-$Data::TableReader::Decoder::Spreadsheet::VERSION = '0.010';
 use Moo 2;
 use Carp 'croak';
 use IO::Handle;
@@ -7,6 +6,7 @@ use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Base class for implementing spreadsheet decoders
+our $VERSION = '0.011'; # VERSION
 
 
 has workbook => ( is => 'lazy' );
@@ -146,7 +146,7 @@ Data::TableReader::Decoder::Spreadsheet - Base class for implementing spreadshee
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -160,7 +160,7 @@ See attributes from parent class: L<Data::TableReader::Decoder>.
 =head2 workbook
 
 This is an instance of L<Spreadsheet::ParseExcel>, L<Spreadsheet::ParseXLSX>,
-or L<Spreadsheet::XLSX> (which all happen have the same API).  Subclasses can
+or L<Spreadsheet::XLSX> (which all happen to have the same API).  Subclasses can
 lazy-build this from the C<file_handle>.
 
 =head2 sheet

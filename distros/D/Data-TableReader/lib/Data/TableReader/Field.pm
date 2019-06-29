@@ -1,8 +1,9 @@
 package Data::TableReader::Field;
-$Data::TableReader::Field::VERSION = '0.010';
 use Moo 2;
+use Carp ();
 
 # ABSTRACT: Field specification for Data::TableReader
+our $VERSION = '0.011'; # VERSION
 
 
 has name     => ( is => 'ro', required => 1 );
@@ -34,6 +35,22 @@ sub _build_header_regex {
 	return qr/^[\W_]*$pattern[\W_]*$/im;
 }
 
+has trim_coderef => ( is => 'lazy' );
+
+sub _default_trim_coderef {
+	$_ =~ s/\s+$//;
+	$_ =~ s/^\s+//;
+}
+
+sub _build_trim_coderef {
+	my $t= shift->trim;
+	return undef unless $t;
+	return \&_default_trim_coderef if !ref $t;
+	return $t if ref $t eq 'CODE';
+	return sub { s/$t//g; } if ref $t eq 'Regexp';
+	Carp::croak("Can't convert ".ref($t)." to a coderef");
+}
+
 1;
 
 __END__
@@ -48,7 +65,7 @@ Data::TableReader::Field - Field specification for Data::TableReader
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -99,13 +116,27 @@ from the table; it just requires a column to exist.
 
 =head2 trim
 
-Whether or not to remove prefix/suffix whitespace from each value of the field.
-Default is B<true>.
+  # remove leading/trailing whitespace
+  trim => 1
+  
+  # remove leading/trailing whitespace but also remove "N/A" and "NULL"
+  trim => qr( ^ \s* N/A \s* $ | ^ \s* NULL \s* $ | ^ \s+ | \s+ $ )xi
+  
+  # custom search/replace in a coderef
+  trim => sub { s/[\0-\1F\7F]+/ /g; s/^\s+//; s/\s+$//; };
+
+If set to a non-reference, this is treated as a boolean of whether to remove leading and
+trailing whitespace.  If set to a coderef, the coderef will be called for each value with
+C<$_> set to the current value; it should modify C<$_> as appropriate (return value is ignored).
+It can also be set to a regular expression of all the patterns to remove, as per
+C<< s/$regexp//g >>.
+
+Default is B<1>, which is equivalent to a regular expression of C<< qr/(^\s+)|(\s+$)/ >>.
 
 =head2 blank
 
-The value to extract when the spreadsheet cell is empty.  (where "empty" depends on the value
-of C<trim>).  Default is C<undef>.  Another common value would be C<"">.
+The value to extract when the spreadsheet cell is an empty string or undef.  (after any
+processing done by L</trim>)  Default is C<undef>.  Another common value would be C<"">.
 
 =head2 type
 
@@ -167,7 +198,8 @@ starting from the header C<'Scores'> until a column of any other header.
 
 =head2 follows_list
 
-Convenience accessor for C<< @{ ->follows } >>.
+Convenience accessor for C<< @{ ->follows } >>, useful because C<follows> might only be a
+scalar.
 
 =head2 header_regex
 

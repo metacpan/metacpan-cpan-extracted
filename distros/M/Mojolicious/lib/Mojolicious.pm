@@ -43,7 +43,7 @@ has moniker  => sub { Mojo::Util::decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
 has routes   => sub { Mojolicious::Routes->new };
-has secrets  => sub {
+has secrets => sub {
   my $self = shift;
 
   # Warn developers about insecure default
@@ -59,7 +59,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.17';
+our $VERSION  = '8.18';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -868,6 +868,12 @@ Current members of the core team in alphabetical order:
 
 =over 2
 
+CandyAngel, C<candyangel@mojolicious.org>
+
+Christopher Rasch-Olsen Raa, C<christopher@mojolicious.org>
+
+Dan Book, C<grinnz@mojolicious.org>
+
 Jan Henning Thorsen, C<batman@mojolicious.org>
 
 Joel Berger, C<jberger@mojolicious.org>
@@ -966,15 +972,13 @@ chromatic
 
 Curt Tilmes
 
-Dan Book
-
 Daniel Kimsey
 
 Daniel Mantovani
 
 Danijel Tasov
 
-Dagfinn Ilmari Mannsaker
+Dagfinn Ilmari Mannsåker
 
 Danny Thomas
 

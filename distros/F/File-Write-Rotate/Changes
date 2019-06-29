@@ -1,4 +1,7 @@
-Revision history for File-Write-Rotate
+0.320   2019-06-27 (PERLANCAR)
+
+	- Add a no-op flush().
+
 
 0.31    2016-10-07 (PERLANCAR)
 

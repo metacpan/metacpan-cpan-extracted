@@ -1,0 +1,5 @@
+Perltidy version is 20181119
+
+79: 'arrival_time' => '21:45' 'departure_time' => '19:45',
+                      ------- ^                           
+found String where operator expected (previous token underlined)

@@ -3,7 +3,7 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.75';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -87,6 +87,11 @@ sub moz_accessibility_checks {
     return $self->{moz_accessibility_checks};
 }
 
+sub moz_build_id {
+    my ($self) = @_;
+    return $self->{moz_build_id};
+}
+
 sub proxy {
     my ($self) = @_;
     return $self->{proxy};
@@ -101,7 +106,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.71
+Version 0.75
 
 =head1 SYNOPSIS
 
@@ -199,6 +204,10 @@ returns the operation system version. For example '4.14.11-300.fc27.x86_64', '17
 =head2 moz_profile
 
 returns the directory that contains the browsers profile
+
+=head2 moz_build_id
+
+returns the L<Firefox BuildId|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/buildID>
 
 =head2 moz_webdriver_click
 

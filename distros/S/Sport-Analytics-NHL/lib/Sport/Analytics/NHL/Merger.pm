@@ -10,10 +10,10 @@ use Storable qw(dclone);
 
 use List::MoreUtils qw(firstval uniq);
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:basic :ids);
 use Sport::Analytics::NHL::Errors;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Tools qw(:db);
+use Sport::Analytics::NHL::Util qw(:debug);
 
 =head1 NAME
 
@@ -132,6 +132,15 @@ Merges two rosters of a team, from the master boxscore and from the extra report
  Arguments: * the boxscore roster
             * the report roster
  Returns: void, sets the roster.
+
+=item C<merge_shifts>
+
+Merges the shift information of the game from the TV/TH reports.
+
+ Arguments: the boxscore report
+            the shifts report (TV or TH)
+
+ Returns: void, sets the shifts.
 
 =item C<merge_teams>
 
@@ -380,9 +389,12 @@ sub resolve_report_on_ice ($$) {
 	my $bs    = shift;
 
 	return if $event->{sources}{GS} && $event->{period} == 5 && $event->{stage} == $REGULAR;
+	my $en = 1;
+	my $ne = 1;
 	for my $t (0,1) {
 		for my $on_ice (@{$event->{on_ice}[$t]}) {
 			next unless $on_ice =~ /^\d{1,2}$/;
+#			dumper $on_ice, $event;
 			my $new_on_ice =
 				$PLAYER_RESOLVE_CACHE->{$bs->{teams}[$t]{name}}{$on_ice} ||
 				check_player_names(
@@ -395,10 +407,22 @@ sub resolve_report_on_ice ($$) {
 					$on_ice += 8400000;
 					next;
 				}
+				else {
+					$on_ice = $UNKNOWN_PLAYER_ID;
+				}
 			}
-			$on_ice = ${$new_on_ice}->{_id};
+			else {
+				$on_ice = ${$new_on_ice}->{_id};
+				#				dumper $new_on_ice;
+				unless ($event->{penaltyshot}) {
+					$en = 0 if $t == 1-$event->{t} && ${$new_on_ice}->{position} eq 'G';
+					$ne = 0 if $t ==  $event->{t}  && ${$new_on_ice}->{position} eq 'G';
+				}
+			}
 		}
 	}
+	$event->{en} = 1 if $en;
+	$event->{ne} = 1 if $ne;
 }
 
 sub resolve_report_roster ($$$) {
@@ -452,6 +476,11 @@ sub check_player_names ($$$) {
 		my $player = ${$player_ref};
 		my ($last_name) = ($player->{name} =~ /\b(\S+)$/);
 		$last_name = $REVERSE_NAME_TYPOS{$last_name} if $REVERSE_NAME_TYPOS{$last_name};
+#		print "DESC $description LN $last_name NM $number\n";
+#		if ($number == 4) {
+#			dumper $cache;
+#			exit;
+#		}
 		if ($description =~ /\b$last_name\b/i) {
 			debug "Matched $description with $last_name";
 			$cache->{$number} = $player_ref;
@@ -482,6 +511,8 @@ sub resolve_report_event_fields ($$) {
 			}
 		}
 		else {
+#			dumper $team, $field, $event->{$field}, $event->{$team},
+			#				$PLAYER_RESOLVE_CACHE->{$event->{$team}};
 			my $matched_player =
 				$PLAYER_RESOLVE_CACHE->{$event->{$team}}{$event->{$field}}
 				|| check_player_names(
@@ -489,7 +520,14 @@ sub resolve_report_event_fields ($$) {
 					$PLAYER_RESOLVE_CACHE->{$event->{$team}},
 					$event->{$field},
 				) || $PLAYER_RESOLVE_CACHE->{$event->{$team2}}{$event->{$field}};
+			my $ef = $event->{$field};
+#			dumper $matched_player;
 			$event->{$field} = ${$matched_player}->{_id};
+			if ($event->{type} eq 'BLOCK' && ! $event->{player2}) {
+				dumper $event, $event->{$team}, $field, $team, $matched_player, $ef;
+				dumper $PLAYER_RESOLVE_CACHE->{$event->{$team}};
+				die;
+			}
 		}
 	}
 }
@@ -517,21 +555,38 @@ sub merge_me ($$;$$) {
 
 	my $bs_event = shift;
 	my $rp_event = shift;
+
 	my $fields   = shift || [ grep {
 		$_    ne 'name'
 		&& $_ ne 'decision'
 		&& defined $rp_event->{$_}
-		&& (! defined $bs_event->{$_} || $bs_event->{$_} eq 'XX' || $bs_event->{$_} =~ /^unk$/i)
+		&& (! defined $bs_event->{$_} || $bs_event->{$_} eq 'XX' || $bs_event->{$_} eq 'N/A' || $bs_event->{$_} =~ /^unk$/i)
 		&& $rp_event->{$_} ne 'XX' && $rp_event->{$_} !~ /^Unk/i
 	} keys %{$rp_event}];
-	push(@{$fields}, 'stopreason') if $rp_event->{stopreason};
+	push(@{$fields}, 'stopreasons') if $rp_event->{stopreasons};
+#	dumper $rp_event->{number} if defined $rp_event->{number};
+#	dumper $fields if $rp_event->{number} && $rp_event->{number} == 35;
 	for (@{$fields}) {
-		when ('stopreason') {
-			$bs_event->{$_} = [ uniq (@{$bs_event->{stopreason}}, @{$rp_event->{stopreason}}) ];
+		when ('stopreasons') {
+			$bs_event->{$_} = [
+				uniq (@{$bs_event->{stopreasons}}, @{$rp_event->{stopreasons}})
+			];
+		}
+		when ('servedby') {
+			$bs_event->{$_} ||= $rp_event->{$_};
 		}
 		when ('position') {
-			$bs_event->{$_} = $rp_event->{$_}
-				if (!$bs_event->{$_} || $bs_event->{$_} eq 'N/A');
+#			dumper $bs_event->{$_}, $rp_event->{$_}, $bs_event->{name}, $rp_event->{name}, [caller];
+			$bs_event->{toi_converted} = 1;
+			if ((!$bs_event->{$_} || $bs_event->{$_} eq 'N/A')) {
+				$bs_event->{_from_na} = 1;
+				$bs_event->{$_} = $rp_event->{$_};
+				$bs_event->{number} = $rp_event->{number}
+					if defined $rp_event->{number};
+				$bs_event->{name} = $rp_event->{name}
+					if defined $rp_event->{number};
+			}
+#			dumper $bs_event;
 		}
 		when ('on_ice') {
 			$bs_event->{$_} = $rp_event->{$_}
@@ -541,10 +596,12 @@ sub merge_me ($$;$$) {
 			$bs_event->{$_} = $rp_event->{$_}
 				if ($bs_event->{$_} !~ /\S/ || $bs_event->{$_} eq 'XX');
 		}
+		
 		default {
 			$bs_event->{$_} = $rp_event->{$_};
 		}
 	}
+#	dumper $bs_event if $rp_event->{number} && $rp_event->{number} == 54;
 	if (defined $bs_event->{position}) {
 		for my $field (keys %{$rp_event}) {
 			if (! defined $bs_event->{$field}
@@ -554,8 +611,12 @@ sub merge_me ($$;$$) {
 			}
 		}
 	}
+#	if ($bs_event->{number} && $bs_event->{number} == 35) {
+#		dumper $bs_event;
+#		exit;
+#	}
+	
 }
-
 
 sub merge_roster ($$;$) {
 
@@ -566,12 +627,52 @@ sub merge_roster ($$;$) {
 		next if $rp_player->{error};
 		next unless $rp_player->{timeOnIce} || defined $rp_player->{start};
 		next if $rp_player->{_id} && $rp_player->{_id} == $EMPTY_NET_ID;
-		merge_me(
-			${$PLAYER_RESOLVE_CACHE->{$bs_team->{name}}{$rp_player->{number}}},
-			$rp_player, 0
-		) if $rp_player->{number};
+		if ($rp_player->{number}) {
+			if (
+				! $PLAYER_RESOLVE_CACHE->{$bs_team->{name}}{$rp_player->{number}}
+			) {
+				my $found = 0;
+				for my $bs_player (@{$bs_team->{roster}}) {
+#					print "$bs_player->{number} == $rp_player->{number} $rp_player->{name}\n";
+					next unless $bs_player->{number};
+					if ($bs_player->{number} == $rp_player->{number}) {
+						delete $bs_player->{broken};
+						$PLAYER_RESOLVE_CACHE->{$bs_team->{name}}{$rp_player->{number}} = \$bs_player;
+						$bs_team->{scratches} = [ grep {
+							$_ != $bs_player->{_id};
+						} @{$bs_team->{scratches}} ];
+						$found = 1;
+						last;
+					}
+				}
+				my $bs_player = check_player_names(
+					$rp_player->{name},
+					$PLAYER_RESOLVE_CACHE->{$bs_team->{name}},
+					$rp_player->{number}
+				) unless $found;
+				
+#				dumper $PLAYER_RESOLVE_CACHE->{$bs_team->{name}};
+#				$PLAYER_RESOLVE_CACHE->{$bs_team->{name}}{$rp_player->{number}} = \$bs_team->{roster}[-1];
+			}
+			#			dumper $rp_player->{number}, $rp_player->{name}, $rp_player->{position};
+#			${$PLAYER_RESOLVE_CACHE->{$bs_team->{name}}{$rp_player->{number}}} ||= {};
+			merge_me(
+				${$PLAYER_RESOLVE_CACHE->{$bs_team->{name}}{$rp_player->{number}}},
+				$rp_player, 0
+			);
+			
+#			if ($rp_player->{number} == 35) {
+#				dumper $rp_player;
+				#				dumper $PLAYER_RESOLVE_CACHE->{$bs_team->{name}};
+#				dumper $bs_team->{roster};
+#				exit;
+#			}
+		}
 	}
+#	$bs_team->{roster} = [ grep { $_->{position} ne 'N/A' } @{$bs_team->{roster}}];
+#	exit;
 }
+
 
 sub merge_teams ($$) {
 
@@ -673,6 +774,38 @@ sub merge_events ($$) {
 	}
 }
 
+sub merge_shifts ($$) {
+
+	my $boxscore = shift;
+	my $report   = shift;
+
+	for my $shift (@{$report->{shifts}}) {
+		if ($BROKEN_SHIFTS{$boxscore->{_id}}->{$shift->{team}}{$shift->{player}}) {
+			$shift->{invalid} = 1;
+			next;
+		}
+		$shift->{number} = $shift->{player};
+		my $t = $boxscore->{teams}[0]{name} eq $shift->{team} ? 0 : 1;
+		my $player = find_player($shift, $boxscore->{teams}[$t]);
+		if (! $player) {
+			$player = find_player($shift, $boxscore->{teams}[1-$t]);
+			if (! $player) {
+				die "Unresolved shift: " . Dumper $shift;
+			}
+			else {
+				$shift->{team} = $boxscore->{teams}[1-$t]{name};
+			}
+		}
+		$shift->{game_id}  = $boxscore->{_id};
+		$shift->{season}   = $boxscore->{season};
+		$shift->{stage}    = $boxscore->{stage};
+		$shift->{player}   = delete $shift->{_id};
+		$shift->{position} = $player->{position};
+	}
+	$boxscore->{shifts} ||= [];
+	push(@{$boxscore->{shifts}}, grep { ! $_->{invalid} } @{$report->{shifts}});
+}
+
 sub merge_report ($$) {
 
 	my $boxscore = shift;
@@ -698,6 +831,10 @@ sub merge_report ($$) {
 		when ([qw(GS PL)])    {
 			@{$boxscore->{events}} ?
 				merge_events($boxscore, $report) : 	copy_events($boxscore, $report);
+			continue;
+		}
+		when (/^T/) {
+			merge_shifts($boxscore, $report);
 			continue;
 		}
 	}

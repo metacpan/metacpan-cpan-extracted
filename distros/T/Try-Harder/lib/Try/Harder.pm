@@ -45,7 +45,6 @@ sub import {
 
 use if $USE_PP, "Filter::Simple";
 use if $USE_PP, "Text::Balanced" => qw( extract_codeblock );
-use if $USE_PP, "Try::Tiny" => ();
 
 setup_filter() if $USE_PP;
 
@@ -229,6 +228,10 @@ __END__
 =head1 NAME
  
 C<Try::Harder> - Yet another pure-perl C<try/catch/finally> module
+
+=head1 VERSION
+
+version 0.005
  
 =head1 SYNOPSIS
  
@@ -279,5 +282,9 @@ See the post-filtered code by running this:
 
 This module tries very hard to not change the line-count of your code, so the
 generated code is *very* dense.
+
+=head1 LICENSE
+
+This is free software; you may redistribute it and/or modify it under the same terms as the Perl 5 programming language itself.
 
 =cut

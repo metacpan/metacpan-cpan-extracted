@@ -21,5 +21,5 @@ requires:
 resources:
   bugtracker: https://github.com/perl-weasel/weasel-driver-selenium2/issues
   repository: https://github.com/perl-weasel/weasel-driver-selenium2.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'YAML::Tiny version 1.70'

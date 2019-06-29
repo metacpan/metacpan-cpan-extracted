@@ -269,6 +269,7 @@ SKIP: {
       if not IO::Async::OS->HAVE_POSIX_FORK;
 
    my ( $pipe_rd, $pipe_wr ) = IO::Async::OS->pipepair;
+   $pipe_rd->blocking( 0 );
 
    my $routine;
    {

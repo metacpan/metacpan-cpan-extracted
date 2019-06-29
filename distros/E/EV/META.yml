@@ -8,7 +8,7 @@ configure_requires:
   Canary::Stability: '0'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,5 +20,4 @@ no_index:
     - inc
 requires:
   common::sense: '0'
-version: 4.25
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: 4.27

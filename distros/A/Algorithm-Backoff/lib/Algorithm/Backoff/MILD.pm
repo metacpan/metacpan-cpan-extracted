@@ -1,7 +1,7 @@
 package Algorithm::Backoff::MILD;
 
-our $DATE = '2019-06-18'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
@@ -70,7 +70,7 @@ Algorithm::Backoff::MILD - Multiplicative Increment, Linear Decrement (MILD) bac
 
 =head1 VERSION
 
-This document describes version 0.007 of Algorithm::Backoff::MILD (from Perl distribution Algorithm-Backoff), released on 2019-06-18.
+This document describes version 0.008 of Algorithm::Backoff::MILD (from Perl distribution Algorithm-Backoff), released on 2019-06-20.
 
 =head1 SYNOPSIS
 

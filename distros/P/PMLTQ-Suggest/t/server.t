@@ -23,17 +23,21 @@ like($pid, '/^-?\d+$/', "PML-TQ suggest server is running. pid=$pid");
 
 select(undef,undef,undef,0.2); # wait a sec
 my @message_tests = (
-      [["GET / HTTP/1.1",""], '/Not found/', '[GET] Not found'],
-      [["POST / HTTP/1.1","Content-Length: 0",""], '/Not found/', '[POST] Not found'],
-      [["HEAD / HTTP/1.1",""], '/Not found/', '[HEAD] Not found'],
-      [["PUT / HTTP/1.1","Content-Length: 0",""], '/Not found/', '[PUT] Not found'],
-      [["DELETE / HTTP/1.1",""], '/Not found/', '[DELETE] Not found'],
-      [["PATCH / HTTP/1.1","Content-Length: 0",""], '/Not found/', '[PATCH] Not found'],
-      [["OPTIONS / HTTP/1.1","Content-Length: 0",""], '/Not found/', '[OPTIONS] Not found'],
+      [["GET / HTTP/1.1",""], '/\b404\b/', '[GET] Not found'],
+      [["POST / HTTP/1.1","Content-Length: 0",""], '/\b404\b/', '[POST] Not found'],
+      [["HEAD / HTTP/1.1",""], '/\b404\b/', '[HEAD] Not found'],
+      [["PUT / HTTP/1.1","Content-Length: 0",""], '/\b404\b/', '[PUT] Not found'],
+      [["DELETE / HTTP/1.1",""], '/\b404\b/', '[DELETE] Not found'],
+      [["PATCH / HTTP/1.1","Content-Length: 0",""], '/\b404\b/', '[PATCH] Not found'],
+      ## OPTIONS is not supported by HTTP::Server::Simple::CGI <v0.51 and HTTP::Server::Simple::CGI does not provide version info
+      ##[["OPTIONS / HTTP/1.1","Content-Length: 0",""], '/\b404\b/', '[OPTIONS] Not found'],
+      
+      [["POST /?p=".File::Spec->rel2abs( dirname(__FILE__))."/treebanks/pdt_test/data/cmpr9410_001.t.gz#t-cmpr9410-001-p2s1w2 HTTP/1.1",""], '/\b404\b/', '[POST] Not found -> used invalid method'],
+      [["DELETE /?p=".File::Spec->rel2abs( dirname(__FILE__))."/treebanks/pdt_test/data/cmpr9410_001.t.gz#t-cmpr9410-001-p2s1w2 HTTP/1.1",""], '/\b404\b/', '[DELETE] Not found -> used invalid method'],
 
-      [["GET /?p=treebanks/pdt_test/cmpr9410_001.t.gz HTTP/1.1",""], '/Not found/', '[GET] Not found - path has been permitted'],
-      [["GET /?p=".File::Spec->rel2abs( dirname(__FILE__))."/treebanks/pdt_test/data/cmpr9410_001.t.gz HTTP/1.1",""], '/Not found/', '[GET] Not found - path does not contain address'],
-      [["GET /?p=".File::Spec->rel2abs( dirname(__FILE__))."/FILE#ID HTTP/1.1",""], '/No such file or directory/', '[GET] nonexisting file'],
+      [["GET /?p=treebanks/pdt_test/cmpr9410_001.t.gz HTTP/1.1",""], '/\b404\b/', '[GET] Not found - path has been permitted'],
+      [["GET /?p=".File::Spec->rel2abs( dirname(__FILE__))."/treebanks/pdt_test/data/cmpr9410_001.t.gz HTTP/1.1",""], '/\b404\b/', '[GET] Not found - path does not contain address'],
+      [["GET /?p=".File::Spec->rel2abs( dirname(__FILE__))."/FILE#ID HTTP/1.1",""], '/\b500\b/', '[GET] nonexisting file'],
       [["GET /?p=".File::Spec->rel2abs( dirname(__FILE__))."/treebanks/pdt_test/data/cmpr9410_001.t.gz#ID HTTP/1.1",""], '/Empty query!/', '[GET] nonexisting ID'],
       [["GET /?p=".File::Spec->rel2abs( dirname(__FILE__))."/treebanks/noschema_test/noschema.pml#ID HTTP/1.1",""], '/no suitable backend/', '[GET] no schema'],
 
@@ -107,6 +111,7 @@ sub fetch {
             die "sysread: $!" unless defined($l);
             last if ($l == 0);
         }
+print STDERR "$response\n\n";
         $response =~ s/\015\012/\n/g; 
         (close SOCK) || die "close(): $!";
         alarm 0;

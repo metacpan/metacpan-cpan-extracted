@@ -1,6 +1,9 @@
+#!/usr/bin/env perl
 use 5.006;
+
 use strict;
-use warnings FATAL => 'all';
+use warnings;
+
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -8,7 +11,7 @@ WriteMakefile(
     AUTHOR           => q{Adrian Crisan <adrian.crisan88@gmail.com>},
     VERSION_FROM     => 'lib/Mojolicious/Plugin/Events.pm',
     ABSTRACT_FROM    => 'lib/Mojolicious/Plugin/Events.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'MIT',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {
@@ -20,9 +23,23 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
+        'Mojolicious' => 0,
+    },
+    META_MERGE   => {
+        no_index       => {directory => ['t']},
+        resources => {
+            bugtracker => {
+                web => 'https://github.com/crlcu/Mojolicious-Plugin-Events/issues'
+            },
+            license    => ['https://opensource.org/licenses/MIT'],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/crlcu/Mojolicious-Plugin-Events.git',
+                web  => 'https://github.com/crlcu/Mojolicious-Plugin-Events',
+            },
+        },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Mojolicious-Plugin-Events-*' },
+    test      => {TESTS => 't/*.t'},
 );

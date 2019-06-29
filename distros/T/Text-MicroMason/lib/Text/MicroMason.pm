@@ -1,5 +1,5 @@
 package Text::MicroMason;
-$VERSION = '2.22';
+$VERSION = '2.23';
 
 # The #line directive requires Perl 5.6 to work correctly the way we use
 # it in Base.
@@ -557,6 +557,13 @@ MicroMason can't read from %s: %s
 One of the compile_file or execute_file functions was called but we were
 unable to read the requested file, because the file path is incorrect or
 we have insufficient privileges to read that file.
+
+=item * 
+
+[Reference / Object]
+
+If the code inside the template throws a reference or object while calling
+die(), MicroMason will re-throw the reference to the calling code.
 
 =back
 

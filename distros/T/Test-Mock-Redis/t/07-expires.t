@@ -1,10 +1,10 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 use lib 't/tlib';
 use Test::More;
-use Test::Mock::Redis;
+use Test::Mock::Redis ();
 
 =pod
 x   SETEX

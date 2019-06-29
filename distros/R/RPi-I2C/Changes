@@ -1,5 +1,9 @@
 Revision history for RPi-I2C
 
+2.3608  2019-06-27
+        - No functional changes
+        - Add return values to all methods (closes #9)
+
 2.3607 2018-10-02
         - update croak() error in XS read_block() to ask user if I2C speed too
           high if a fatal error occurs (closes #8)

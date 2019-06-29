@@ -4,31 +4,32 @@ author:
   - 'Evan Giles <egiles@cpan.org>'
 build_requires: {}
 configure_requires:
-  Module::Build: 0.38
-  version: 0
+  Module::Build: '0.38'
+  version: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Xssh
 provides:
   App::Xssh:
     file: lib/App/Xssh.pm
-    version: v1.0.0
+    version: v1.1.0
   App::Xssh::Config:
     file: lib/App/Xssh/Config.pm
-    version: v1.0.0
+    version: v1.1.0
 requires:
-  Config::General: 2.4
-  Getopt::Long: 2.37
-  Moose: 1.09
-  Pod::Usage: 1.35
-  UNIVERSAL::require: 0
-  X11::Terminal: 0.2
+  Config::General: '2.4'
+  Getopt::Long: '2.37'
+  Moose: '1.09'
+  Pod::Usage: '1.35'
+  UNIVERSAL::require: '0'
+  X11::Terminal: '0.2'
   perl: v5.6.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/egiles/app-xssh
-version: v1.0.0
+version: v1.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,19 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
+#
+# This file is part of GNU Stow.
+#
+# GNU Stow is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GNU Stow is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see https://www.gnu.org/licenses/.
 
 #
 # Testing cleanup_invalid_links()
@@ -13,7 +28,7 @@ use English qw(-no_match_vars);
 use testutil;
 
 init_test_dirs();
-cd("$OUT_DIR/target");
+cd("$TEST_DIR/target");
 
 my $stow;
 
@@ -24,7 +39,7 @@ my $stow;
 # 
 
 
-make_dir('../stow/pkg1/bin1');
+make_path('../stow/pkg1/bin1');
 make_file('../stow/pkg1/bin1/file1');
 make_link('bin1', '../stow/pkg1/bin1');
 
@@ -38,8 +53,8 @@ is(
 #
 # cleanup a bad link in a simple tree
 # 
-make_dir('bin2');
-make_dir('../stow/pkg2/bin2');
+make_path('bin2');
+make_path('../stow/pkg2/bin2');
 make_file('../stow/pkg2/bin2/file2a');
 make_link('bin2/file2a', '../../stow/pkg2/bin2/file2a');
 make_invalid_link('bin2/file2b', '../../stow/pkg2/bin2/file2b');
@@ -54,8 +69,8 @@ is($stow->link_task_action('bin2/file2b'), 'remove', 'removal task for bad link'
 # dont cleanup a bad link not owned by stow
 # 
 
-make_dir('bin3');
-make_dir('../stow/pkg3/bin3');
+make_path('bin3');
+make_path('../stow/pkg3/bin3');
 make_file('../stow/pkg3/bin3/file3a');
 make_link('bin3/file3a', '../../stow/pkg3/bin3/file3a');
 make_invalid_link('bin3/file3b', '../../empty');

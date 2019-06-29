@@ -14,8 +14,7 @@ if (exists $ENV{COUNT}) {
 my $cwd = Cwd::cwd();
 system { $^X } $^X, 'Makefile.PL' and die "Failed to $^X Makefile.PL for $ENV{FIREFOX_BINARY}";
 system { 'cover' } 'cover', '-delete' and die "Failed to 'cover' for $ENV{FIREFOX_BINARY}";
-system { 'make' } 'make' and die "Failed to 'make'";
-system { $^X } $^X, '-MDevel::Cover', '-Iblib/lib', '-Iblib/arch', 't/01-marionette.t' and die "Failed to 'make'";
+system { $^X } $^X, '-MDevel::Cover', '-Ilib', 't/01-marionette.t' and die "Failed to 'make'";
 my $path = File::Spec->catdir(File::HomeDir::my_home(), 'den');
 my $handle = DirHandle->new($path) or die "Failed to find firefox den at $path";
 my @entries;
@@ -29,11 +28,11 @@ while(my $entry = $handle->read()) {
 foreach my $entry (sort { $a cmp $b } @entries) {
 	$ENV{FIREFOX_BINARY} = File::Spec->catfile($path, $entry, 'firefox');
 	if (-e $ENV{FIREFOX_BINARY}) {
-		system { $^X } $^X, '-MDevel::Cover', '-Iblib/lib', '-Iblib/arch', 't/01-marionette.t' and die "Failed to 'make'";
-		my $bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X -MDevel::Cover -Iblib/lib -Iblib/arch t/01-marionette.t";
+		system { $^X } $^X, '-MDevel::Cover', '-Ilib', 't/01-marionette.t' and die "Failed to 'make'";
+		my $bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X -MDevel::Cover -Ilib t/01-marionette.t";
 		warn "Remote Execution of '$bash_command'";
 		system { 'ssh' } 'ssh', 'localhost', $bash_command and die "Failed to remote cover for $ENV{FIREFOX_BINARY}"; 
-		$bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_VISIBLE=1 FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X -MDevel::Cover -Iblib/lib -Iblib/arch t/01-marionette.t";
+		$bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_VISIBLE=1 FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X -MDevel::Cover -Ilib t/01-marionette.t";
 		warn "Remote Execution of '$bash_command'";
 		system { 'ssh' } 'ssh', 'localhost', $bash_command and die "Failed to remote cover for $ENV{FIREFOX_BINARY}"; 
 	}

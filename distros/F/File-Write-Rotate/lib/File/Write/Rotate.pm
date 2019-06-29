@@ -1,7 +1,9 @@
+## no critic: InputOutput::ProhibitOneArgSelect
+
 package File::Write::Rotate;
 
-our $DATE = '2016-10-07'; # DATE
-our $VERSION = '0.31'; # VERSION
+our $DATE = '2019-06-27'; # DATE
+our $VERSION = '0.320'; # VERSION
 
 use 5.010001;
 use strict;
@@ -169,7 +171,7 @@ sub _get_files {
 
     my @files;
     while (my $e = readdir($dh)) {
-        my $cs = $1 if $e =~ s/(\.gz)\z//; # compress suffix
+        my $cs; $cs = $1 if $e =~ s/(\.gz)\z//; # compress suffix
         next unless $e =~ /\A\Q$self->{prefix}\E
                            (?:\. (?<period>\d{4}(?:-\d\d(?:-\d\d)?)?) )?
                            \Q$self->{suffix}\E
@@ -267,8 +269,13 @@ sub _open {
     my ($fp, $period) = $self->_file_path;
     open $self->{_fh}, ">>", $fp or die "Can't open '$fp': $!";
     if (defined $self->{binmode}) {
-        binmode $self->{_fh}, $self->{binmode}
-          or die "Can't set PerlIO layer on '$fp': $!";
+        if ($self->{binmode} eq "1") {
+            binmode $self->{_fh};
+        } else {
+            binmode $self->{_fh}, $self->{binmode}
+                or die "Can't set PerlIO layer on '$fp' ".
+                    "to '$self->{binmode}': $!";
+        }
     }
     my $oldfh = select $self->{_fh};
     $| = 1;
@@ -396,6 +403,9 @@ sub write {
     }
 }
 
+sub flush {
+}
+
 sub compress {
     my ($self) = shift;
 
@@ -465,7 +475,7 @@ File::Write::Rotate - Write to files that archive/rotate themselves
 
 =head1 VERSION
 
-This document describes version 0.31 of File::Write::Rotate (from Perl distribution File-Write-Rotate), released on 2016-10-07.
+This document describes version 0.320 of File::Write::Rotate (from Perl distribution File-Write-Rotate), released on 2019-06-27.
 
 =head1 SYNOPSIS
 
@@ -578,8 +588,16 @@ Since this is called indirectly by write(), locking is also already done.
 
 =head2 binmode => str
 
-Will call C<binmode()> (see L<perlfunc>) on the opened file handle. With this
-option you can set binary mode (e.g. on Windows) or set PerlIO layer(s).
+If set to "1", will cause the file handle to be set:
+
+ binmode $fh;
+
+which might be necessary on some OS, e.g. Windows when writing binary data.
+Otherwise, other defined values will cause the file handle to be set:
+
+ binmode $fh, $value
+
+which can be used to set PerlIO layer(s).
 
 =head1 METHODS
 
@@ -708,6 +726,10 @@ histories and delete the older ones.
 
 Does not append newline so you'll have to do it yourself.
 
+=head2 $fwr->flush
+
+A no-op, just so the object behaves more like a filehandle object.
+
 =head2 $fwr->compress
 
 Compress old rotated files and remove the uncompressed originals. Currently uses
@@ -813,7 +835,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

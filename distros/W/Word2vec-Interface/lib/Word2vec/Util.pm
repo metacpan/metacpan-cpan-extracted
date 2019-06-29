@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    02/06/2017                                                             #
-#    Revised: 05/24/2017                                                             #
+#    Revised: 06/25/2019                                                             #
 #    UMLS Similarity Word2Vec Package Utility Module                                 #
 #                                                                                    #
 ######################################################################################
@@ -27,7 +27,7 @@ use Cwd;
 
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.021';
 
 
 ######################################################################################
@@ -103,6 +103,47 @@ sub DESTROY
 #    Module Functions
 ######################################################################################
 
+sub CleanText
+{
+    my ( $self, $str ) = @_;
+
+    $self->WriteLog( "CleanText - Error: String Parameter Is Not Defined" )      if !defined( $str );
+    $self->WriteLog( "CleanText - Error: String Parameter Equals Empty String" ) if ( $str eq "" );
+    return undef if !defined( $str ) or ( $str eq "" );
+
+    $str = lc( $str );                          # Convert all characters to lowercase
+    $str =~ s/\s+/ /g;                          # Remove duplicate white spaces between words
+    $str =~ s/'s//g;                            # Remove "'s" characters (Apostrophe 's')
+    $str =~ s/-/ /g;                            # Replace all hyphen characters to spaces
+    $str =~ tr/a-z\_\015\012/ /cs;              # Remove all characters except 'a' to 'z', compound terms joined by "_" character and newline character
+    $str =~ s/\b\_\b|\b\_\B|\B\_\b/ /g;         # Remove "_" character(s) surrounded by white space and "_" not surrounded by word characters
+
+    # Convert String Line Ending Suitable To The Target
+    my $lineEnding = "";
+    my $os = $self->GetOSType();
+
+    $lineEnding = "\015\012" if ( $os eq "MSWin32" );
+    $lineEnding = "\012"     if ( $os eq "linux" );
+    $lineEnding = "\015"     if ( $os eq "MacOS" );
+
+    $str =~ s/(\015\012|\012|\015)/$lineEnding/g;
+
+    return $str;
+}
+
+sub RemoveNewLineEndingsFromString
+{
+    my ( $self, $str ) = @_;
+
+    # Check(s)
+    $self->WriteLog( "RemoveNewLineEndingsFromString - Error: String Parameter Not Defined" ) if !defined( $str );
+
+    # Remove All Known Line Endings
+    $str =~ s/\015|\012//g;
+
+    return $str;
+}
+
 sub IsFileOrDirectory
 {
     my ( $self, $path ) = @_;
@@ -118,37 +159,27 @@ sub IsFileOrDirectory
 sub IsWordOrCUITerm
 {
     my ( $self, $term ) = @_;
-    
+
     # Check(s)
     $self->WriteLog( "IsFileWordOrCUIFile - Error: String Term Not Defined" ) if !defined( $term );
     return undef if !defined( $term );
-    
-    $self->WriteLog( "IsFileWordOrCUIFile - Error: String Term Eq Empty String" ) if ( $term eq "" );
+
+    $self->WriteLog( "IsFileWordOrCUIFile - Error: String Term Is Empty String" ) if ( $term eq "" );
     return undef if ( $term eq "" );
-    
+
     # Perform Check
     $term = lc( $term );
-    my @terms = split( 'c', $term );
-    
-    # Return Word Term If There Are Not Two Elements After Splitting
-    return "word" if( @terms != 2 );
-    
-    # If $term Is CUI, Then First Element Should Be Empty String
-    return "word" if ( $terms[0] ne "" );
-    
-    # Remove Numbers From Second Element
-    $terms[1] =~ s/[0-9]//g;
-    
+
     # If $term Is CUI, Then After Removing All Number From Second Element An Empty String Is All That Is Left
-    return "word" if ( $terms[1] ne "" );
-    
-    return "cui";
+    return "cui" if ( $term =~ m/\bc[0-9]+\b/ );
+
+    return "word";
 }
 
 sub GetFilesInDirectory
 {
     my ( $self, $directoryPath, $fileTagStr ) = @_;
-    
+
     # Check(s)
     $self->WriteLog( "GetFilesInDirectory - Error: Directory Path Not Defined" ) if !defined( $directoryPath );
     $self->WriteLog( "GetFilesInDirectory - Error: File Tag String Not Defined" ) if !defined( $fileTagStr );
@@ -159,17 +190,17 @@ sub GetFilesInDirectory
     return undef if defined( $directoryPath ) && $directoryPath eq "";
     return undef if defined( $fileTagStr ) && $fileTagStr eq "";
     return undef if !( -e "$directoryPath" );
-    
-    
+
+
     # Open Directory
     my $result = 0;
     my $listOfFilesStr = "";
-    
+
     opendir( my $directoryHandle, "$directoryPath" ) or $result = -1;
     $self->WriteLog( "GetFilesInDirectory - Directory Opened Successfully" ) if $result == 0;
     $self->WriteLog( "GetFilesInDirectory - Error: Directory Could Not Be Opened" ) if $result == -1;
     return undef if $result == -1;
-    
+
     for my $file ( readdir( $directoryHandle ) )
     {
         $listOfFilesStr .= "$file " if ( index( $file, "$fileTagStr" ) != -1 );
@@ -177,9 +208,9 @@ sub GetFilesInDirectory
 
     closedir( $directoryHandle );
     undef( $directoryHandle );
-    
+
     $self->WriteLog( "GetFilesInDirectory - Found Files: $listOfFilesStr" ) if $listOfFilesStr ne "";
-    
+
     return $listOfFilesStr;
 }
 
@@ -346,9 +377,9 @@ Output:
 Example:
 
  use Word2vec::Util;
- 
+
  my $util = Word2vec::Util->new();
- 
+
  undef( $util );
 
 =head3 DESTROY
@@ -370,6 +401,70 @@ Example:
  See above example for "new" function.
 
  Note: Destroy function is also automatically called during global destruction when exiting the program.
+
+=head3 CleanText
+
+Description:
+
+ Normalizes text based on the following.
+  - Text converted to lowercase
+  - More than one white space is replaced with a single white space
+  - Apostrophe "s" ('s) characters are removed
+  - Hyphen character is replaced with a single white space
+  - All special characters removed outside of lowercase 'a-z' and compoundified terms retained, joined by '_' (underscore).
+  - Line-feed/carriage return (LF-CR) endings are cleaned and converted to OS specific LF-CR endings
+
+Input:
+
+ $string -> String of text to normalize
+
+Output:
+
+ $string -> Cleaned/Normalized text.
+
+Example:
+
+ use Word2vec::Util;
+
+ my $util = Word2vec::Util->new();
+ my $text = "123485clean-text!!@&^#*@";
+
+ print( "Original Text: \"$text\"\n" );
+
+ $text = $util->CleanText( $text );
+
+ print( "Cleaned Text: \"$text\"\n" );
+
+ undef( $util );
+
+=head3 RemoveNewLineEndingsFromString
+
+Description:
+
+ Removes new line endings from string. Supports MSWin32, linux and MacOS line endings.
+
+Input:
+
+ $string -> String with line-feed/carriage return ending to remove.
+
+Output:
+
+ $string -> String without line-feed/carriage return ending.
+
+Example:
+
+ use Word2vec::Util;
+
+ my $util = Word2vec::Util->new();
+ my $text = "this is sample text\n";
+
+ print( "Original Text: \"$text\"\n" );
+
+ $text = $util->RemoveNewLineEndingsFromString( $text );
+
+ print( "Cleaned Text: \"$text\"\n" );
+
+ undef( $util );
 
 =head3 IsFileOrDirectory
 
@@ -423,9 +518,9 @@ Example:
 
  print( "Passed String Argument Term Type: \"$result\"\n" ) if defined( $result );
  print( "Cannot Determine String Argument Term Type\n" )    if !defined( $result );
- 
+
  my $result = $util->IsWordOrCUITerm( "C08132016" );
- 
+
  print( "Passed String Argument Term Type: \"$result\"\n" ) if defined( $result );
  print( "Cannot Determine String Argument Term Type\n" )    if !defined( $result );
 

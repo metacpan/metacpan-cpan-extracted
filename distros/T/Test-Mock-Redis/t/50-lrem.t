@@ -1,11 +1,10 @@
-#!perl
+#!/usr/bin/env perl
 
 use warnings;
 use strict;
 use lib 't/tlib';
 use Test::More;
-use Test::Fatal;
-use Test::Mock::Redis;
+use Test::Mock::Redis ();
 
 ok(my $r = Test::Mock::Redis->new, 'pretended to connect to our test redis-server');
 my @redi = ($r);

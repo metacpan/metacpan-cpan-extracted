@@ -3,11 +3,11 @@ package Test::Mock::Redis;
 use warnings;
 use strict;
 
-use Carp;
+use Carp 'confess';
 use Config;
 use Scalar::Util qw/blessed/;
 use Class::Method::Modifiers;
-use Package::Stash;
+use Package::Stash ();
 use Try::Tiny;
 use namespace::clean;   # important: clean all subs imported above this line
 
@@ -17,11 +17,11 @@ Test::Mock::Redis - use in place of Redis for unit testing
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 
@@ -165,39 +165,46 @@ sub shutdown {
 
 sub set {
     my ( $self, $key, $value, @args ) = @_;
-    my $expires = 0;
+
+    my ( $expires, $expire_cmd, $cond_cmd );
     while (my $option = shift @args) {
-        $option = lc $option;
-        # Only set if key exists
-        if ($option eq 'xx') {
-            return unless $self->exists($key);
+      $option = lc $option;
 
-        # Only set if key doesn't exist
-        } elsif ($option eq 'nx') {
-            return if $self->exists($key);
+      if ($option eq 'nx' || $option eq 'xx') { # the same condition can be repeated but mix isn't allowed
+        confess '[set] ERR syntax error'
+          if defined $cond_cmd && $cond_cmd ne $option;
 
-        # Set expire time (in seconds)
-        } elsif ($option eq 'ex') {
-            my $new_expires = shift @args;
-            if ($new_expires > $expires) {
-                $expires = $new_expires;
-            }
+        $cond_cmd = $option;
+      } elsif ($option eq 'ex' || $option eq 'px') { # same units can be repeated but mix isn't allowed
+        confess '[set] ERR syntax error'
+          if defined $expire_cmd && $expire_cmd ne $option;
 
-        # Set expire time (in milliseconds)
-        } elsif ($option eq 'px') {
-            my $new_expires = shift @args;
-            $new_expires /= 1000; # To seconds
-            if ($new_expires > $expires) {
-                $expires = $new_expires;
-            }
-        } else {
-            confess '[error] ERR syntax error';
-        }
+        $expire_cmd = $option;
+
+        $expires = shift @args; # do we need a validation here?
+
+        $expires /= 1000        # milliseconds to seconds
+          if $expire_cmd eq 'px';
+      } else {
+        confess '[set] ERR syntax error';
+      }
     }
+
+    if ( defined $cond_cmd ) {
+      # Only set if key exists
+      return
+        if $cond_cmd eq 'xx'
+        && ! $self->exists($key);
+
+      # Only set if key doesn't exist
+      return
+        if $cond_cmd eq 'nx'
+        && $self->exists($key);
+    }
+
     $self->_stash->{$key} = "$value";
-    if ($expires) {
-        $self->expire($key, $expires);
-    }
+    $self->expire($key, $expires)
+      if defined $expires;
 
     return 'OK';
 }
@@ -254,7 +261,7 @@ sub persist {
 sub ttl {
     my ( $self, $key, $ttl ) = @_;
 
-    return -1 unless exists $self->_stash->{$key};
+    return -2 unless exists $self->_stash->{$key};
 
     my $slot = $self->_stash;
     my $tied = tied(%$slot);
@@ -436,23 +443,32 @@ sub dbsize {
 }
 
 sub rpush {
-    my ( $self, $key, $value ) = @_;
+    my ( $self, $key, @values ) = @_;
 
-    $self->_make_list($key);
+    confess "[rpush] ERR wrong number of arguments for 'rpush' command"
+        unless @values;
 
-    push @{ $self->_stash->{$key} }, "$value";
-    return scalar @{ $self->_stash->{$key} };
-}
-
-sub lpush {
-    my ( $self, $key, $value ) = @_;
-
-    confess "[lpush] ERR Operation against a key holding the wrong kind of value"
+    confess "[rpush] WRONGTYPE Operation against a key holding the wrong kind of value"
         unless !$self->exists($key) or $self->_is_list($key);
 
     $self->_make_list($key);
 
-    unshift @{ $self->_stash->{$key} }, "$value";
+    push @{ $self->_stash->{$key} }, map "$_", @values;
+    return scalar @{ $self->_stash->{$key} };
+}
+
+sub lpush {
+    my ( $self, $key, @values ) = @_;
+
+    confess "[lpush] ERR wrong number of arguments for 'lpush' command"
+        unless @values;
+
+    confess "[lpush] WRONGTYPE Operation against a key holding the wrong kind of value"
+        unless !$self->exists($key) or $self->_is_list($key);
+
+    $self->_make_list($key);
+
+    unshift @{ $self->_stash->{$key} }, map "$_", reverse @values;
     return scalar @{ $self->_stash->{$key} };
 }
 
@@ -495,9 +511,14 @@ sub llen {
 sub lrange {
     my ( $self, $key, $start, $end ) = @_;
 
-    my $array = $self->_stash->{$key};
-    ($start,$end) = _normalize_range(scalar(@$array),$start,$end);
-    return @{ $array }[$start..$end];
+    my @result;
+
+    if ( my $array = $self->_stash->{$key} ) {
+      ($start,$end) = _normalize_range(scalar(@$array),$start,$end);
+      @result = @{ $array }[$start..$end];
+    }
+
+    return wantarray ? @result : \ @result;
 }
 
 sub ltrim {
@@ -635,7 +656,7 @@ sub spop {
 sub smove {
     my ( $self, $source, $dest, $value ) = @_;
 
-    confess "[smove] ERR Operation against a key holding the wrong kind of value"
+    confess "[smove] WRONGTYPE Operation against a key holding the wrong kind of value"
         if ( $self->exists($source) and not $self->_is_set($source) )
         or ( $self->exists($dest)   and not $self->_is_set($dest)   );
 
@@ -724,7 +745,7 @@ sub sdiffstore {
 sub hset {
     my ( $self, $key, $hkey, $value ) = @_;
 
-    confess '[hset] ERR Operation against a key holding the wrong kind of value'
+    confess '[hset] WRONGTYPE Operation against a key holding the wrong kind of value'
          if $self->exists($key) and !$self->_is_hash($key);
 
 
@@ -779,10 +800,10 @@ sub hmget {
 sub hexists {
     my ( $self, $key, $hkey ) = @_;
 
-    confess '[hexists] ERR Operation against a key holding the wrong kind of value'
+    confess '[hexists] WRONGTYPE Operation against a key holding the wrong kind of value'
          if $self->exists($key) and !$self->_is_hash($key);
 
-    return exists $self->_stash->{$key}->{$hkey} ? 1 : 0;
+    return $self->exists($key) && exists $self->_stash->{$key}->{$hkey} ? 1 : 0;
 }
 
 sub hdel {
@@ -805,8 +826,8 @@ sub hincrby {
          if $self->exists($key) and !$self->_is_hash($key);
 
     confess "[hincrby] ERR hash value is not an integer"
-         if $self->hexists($key, $hkey)                   # it exists
-             and $self->hget($key, $hkey) !~ /^-?\d+$|^$/ # and it doesn't look like an integer (and it isn't empty)
+         if $self->hexists($key, $hkey)                # it exists
+             and $self->hget($key, $hkey) !~ /^-?\d+$/ # and it doesn't look like an integer (and it isn't empty)
     ;
 
     $self->_make_hash($key) unless $self->_is_hash($key);
@@ -827,7 +848,7 @@ sub hlen {
 sub hkeys {
     my ( $self, $key ) = @_;
 
-    confess '[hkeys] ERR Operation against a key holding the wrong kind of value'
+    confess '[hkeys] WRONGTYPE Operation against a key holding the wrong kind of value'
          if $self->exists($key) and !$self->_is_hash($key);
 
     return () unless $self->exists($key);
@@ -838,7 +859,7 @@ sub hkeys {
 sub hvals {
     my ( $self, $key ) = @_;
 
-    confess '[hvals] ERR Operation against a key holding the wrong kind of value'
+    confess '[hvals] WRONGTYPE Operation against a key holding the wrong kind of value'
          if $self->exists($key) and !$self->_is_hash($key);
 
     return values %{ $self->_stash->{$key} };
@@ -847,7 +868,7 @@ sub hvals {
 sub hgetall {
     my ( $self, $key ) = @_;
 
-    confess "[hgetall] ERR Operation against a key holding the wrong kind of value"
+    confess "[hgetall] WRONGTYPE Operation against a key holding the wrong kind of value"
          if $self->exists($key) and !$self->_is_hash($key);
 
     return $self->exists( $key )
@@ -973,22 +994,22 @@ sub info {
         used_memory_peak => '1055728',
         used_memory_peak_human => '1.01M',
         used_memory_rss => '1699840',
-        map { 'db'.$_ => sprintf('keys=%d,expires=%d',
+        map { 'db'.$_ => sprintf('keys=%d,expires=%d,avg_ttl=%d',
                              scalar keys %{ $self->_stash($_) },
-                             $self->_expires_count_for_db($_),
+                             $self->_expires_count_and_avg_ttl_for_db($_),
                          )
             } grep { scalar keys %{ $self->_stash($_) } > 0 }
                 (0..15)
     };
 }
 
-sub _expires_count_for_db {
+sub _expires_count_and_avg_ttl_for_db {
     my ( $self, $db_index ) = @_;
 
     my $slot = $self->_stash($db_index);
     my $tied = tied(%$slot);
 
-    $tied->expire_count;
+    $tied->expire_count_and_avg_ttl;
 }
 
 sub zadd {
@@ -1229,6 +1250,8 @@ The following people have contributed to I<Test::Mock::Redis>:
 
 =item * Thomas Bloor
 
+=item * Valery Kalesnik
+
 =item * Yaakov Shaul
 
 =back
@@ -1342,7 +1365,7 @@ my @want_list = qw(mget keys lrange smembers sinter sunion sdiff hmget hkeys hva
 my %want_list = map { $_ => 1 } @want_list;
 
 sub exec {
-    my ( $self ) = @_;
+    my ( $self, $cb ) = @_;
 
     # we are going to commit all the changes we saved up;
     # replay them now and return all their output
@@ -1353,6 +1376,27 @@ sub exec {
     delete $self->{_multi_commands};
 
     # replay all the queries that were queued up
+    # exec has special behaviour when run in a pipeline:
+    # the $reply argument to the pipeline callback is an array ref whose elements are themselves [$reply, $error] pairs.
+    if ( $cb && 'CODE' eq ref $cb ) {
+      my @reply = map {
+        my ( $method, @args ) = @$_;
+        try {
+          my @result = $self->$method( @args );
+          [ $want_list{ $method } ? \ @result : $result[ 0 ],
+            undef,
+          ];
+        } catch {
+          s/^\[\w+\] //;
+          [ undef, $_ ];
+        };
+      } @commands;
+
+      $cb->( \ @reply, undef );
+
+      return 1;
+    }
+
     # the returned result is a nested array of the results of all the commands
     my @exceptions;
     my @results = map {
@@ -1447,6 +1491,7 @@ my %no_pipeline_wrap_methods = (
     psubscribe => 1,
     punsubscribe => 1,
     wait_all_responses => 1,
+    exec => 1, # doc: 'exec has special behaviour when run in a pipeline'.  covered in the method
 );
 
 my @pipeline_wrapped_methods =
@@ -1476,7 +1521,7 @@ foreach my $method (@pipeline_wrapped_methods)
         # and "Pipeline management" in the Redis docs
         # To make this work, we just need to special-case exec, to collect all the
         # results and errors in tuples and send that to the $cb
-        die 'cannot combine pipelining with MULTI' if $self->{_multi_commands};
+        # die 'cannot combine pipelining with MULTI' if $self->{_multi_commands};
 
         # We could also implement this with a queue, not bothering to process
         # the commands until wait_all_responses is called - but then we need to
@@ -1570,11 +1615,26 @@ sub expire {
     $expires->{$self}->{$key} = $time;
 }
 
-sub expire_count {
+sub expire_count_and_avg_ttl {
     my ( $self ) = @_;
 
-    # really, we should probably only count keys that haven't expired
-    scalar keys %{ $expires->{$self} };
+    my $now = time();
+    my $count = 0;
+    my $ttl = 0; # looks like actual redis uses more complicated calculations here.  let's do something simple to start with
+    for my $key ( keys %{ $expires->{$self} } ) {
+      if ( $now >= $expires->{$self}->{$key} ) {
+        delete $self->{$key};
+        delete $expires->{$self}->{$key};
+      } else {
+        ++ $count;
+        $ttl += $expires->{$self}->{$key} - $now;
+      }
+    }
+
+    $ttl = int( $ttl / $count * 1_000 )
+      if $count;
+
+    ( $count, $ttl );
 }
 
 sub persist {

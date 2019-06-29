@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CalendarDatesUtils/list_calendar_dates
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-05-28'; # DATE
+our $DATE = '2019-06-28'; # DATE
 our $DIST = 'App-CalendarDatesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ list-calendar-dates - List dates from one or more Calendar::Dates::* modules
 
 =head1 VERSION
 
-This document describes version 0.005 of list-calendar-dates (from Perl distribution App-CalendarDatesUtils), released on 2019-05-28.
+This document describes version 0.009 of list-calendar-dates (from Perl distribution App-CalendarDatesUtils), released on 2019-06-28.
 
 =head1 SYNOPSIS
 
@@ -54,35 +54,19 @@ C<*> marks required options.
 
 =over
 
-=item B<--all-modules>
+=item B<--action>=I<s>
 
-Use all installed Calendar::Dates::* modules.
+Default value:
 
-=item B<--all-years>
-
-List dates from all available years instead of a single year.
-
-=item B<--day>=I<s>
+ "list-dates"
 
 Valid values:
 
- [1,31]
+ ["list-dates","list-modules"]
 
 =item B<--detail>, B<-l>
 
-=item B<--modules-json>=I<s>, B<-m>
-
-See C<--modules>.
-
-=item B<--modules>=I<s@>
-
-Can be specified multiple times.
-
-=item B<--month>=I<s>
-
-Valid values:
-
- [1,12]
+Whether to show detailed record for each date.
 
 =item B<--param>=I<s>%
 
@@ -96,17 +80,95 @@ Specify parameters (JSON-encoded).
 
 See C<--param>.
 
+=item B<-L>
+
+List all Calendar::Dates modules (eqv to --action=list-modules).
+
+See C<--action>.
+
+=back
+
+=head2 Entry filtering options
+
+=over
+
+=item B<--all-entries>, B<-A>
+
+Return all entries (include low-priority ones).
+
+By default, low-priority entries (entries tagged `low-priority`) are not
+included. This option will include those entries.
+
+When combined with --all-years, this option will also cause all very early years
+and all years far into the future to be included also.
+
+
+=item B<--all-years>
+
+List dates from all available years instead of a single year.
+
+Note that by default, following common usage pattern, dates with years that are
+too old (< 10 years ago) or that are too far into the future (> 10 years from
+now) are not included, unless you combine this option with --all-entries (-A).
+
+
+=item B<--day>=I<s>, B<-D>
+
+=item B<--exclude-tag>=I<s@>, B<-T>
+
+Can be specified multiple times.
+
+=item B<--exclude-tags-json>=I<s>
+
+See C<--exclude-tag>.
+
+=item B<--include-tag>=I<s@>, B<-t>
+
+Can be specified multiple times.
+
+=item B<--include-tags-json>=I<s>
+
+See C<--include-tag>.
+
+=item B<--max-year>=I<s>
+
+=item B<--min-year>=I<s>
+
+=item B<--month>=I<s>, B<-M>
+
 =item B<--past>
 
-Filter entries that are less than (at least) today's date.
+Only show entries that are less than (at least) today's date.
 
-=item B<--year>=I<s>
+=item B<--year>=I<s>, B<-Y>
 
 Specify year of dates to list.
 
 The default is to list dates in the current year. You can specify all_years
 instead to list dates from all available years.
 
+
+=back
+
+=head2 Module selection options
+
+=over
+
+=item B<--all-modules>, B<-a>
+
+Use all installed Calendar::Dates::* modules.
+
+=item B<--modules-json>=I<s>, B<-m>
+
+Name(s) of Calendar::Dates::* module (without the prefix) (JSON-encoded).
+
+See C<--modules>.
+
+=item B<--modules>=I<s@>
+
+Name(s) of Calendar::Dates::* module (without the prefix).
+
+Can be specified multiple times.
 
 =back
 

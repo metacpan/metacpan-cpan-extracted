@@ -38,7 +38,7 @@
    "provides" : {
       "Text::Util::Chinese" : {
          "file" : "lib/Text/Util/Chinese.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -49,7 +49,7 @@
          "web" : "https://github.com/gugod/Text-Util-Chinese"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : "1"
 }

@@ -4,7 +4,7 @@ Bread::Board - A solderless way to wire up your application components
 
 # VERSION
 
-version 0.36
+version 0.37
 
 # SYNOPSIS
 
@@ -19,7 +19,6 @@ my $c = container 'MyApp' => as {
         class        => 'FileLogger',
         lifecycle    => 'Singleton',
         dependencies => [ 'log_file_name' ],
-        ]
     );
 
     container 'Database' => as {
@@ -563,7 +562,7 @@ feature.
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,9 +3,9 @@ NAME
     Universitas Terbuka (postgraduate programs, program pascasarjana)
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Calendar::Dates::Academic::ID::UT::PPs (from Perl distribution
-    Calendar-Dates-Academic-ID-UT-PPs), released on 2019-02-15.
+    Calendar-Dates-Academic-ID-UT-PPs), released on 2019-06-20.
 
 SYNOPSIS
   Using from Perl
@@ -169,8 +169,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com///github.com/perlancar/perl-Calendar-Dates-Academic-
-    ID-UT-PPs>.
+    <https://github.com/perlancar/perl-Calendar-Dates-Academic-ID-UT-PPs>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

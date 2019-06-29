@@ -32,26 +32,78 @@ $raven:122:And his eyes have all the seeming of a demon's that is dreaming,
 $raven:124:And my soul from out that shadow that lies floating on the floor
 HERE
 
-my $perl = caret_X();
-my @lhs_args = ( $perl, '-Mblib', build_ack_invocation( '--sort-files', '-g', '[vz]', 't/text' ) );
-my @rhs_args = ( $perl, '-Mblib', build_ack_invocation( '-x', '-i', 'that' ) );
+subtest 'Basics' => sub {
+    plan tests => 2;
 
-if ( $ENV{'ACK_TEST_STANDALONE'} ) {
-    @lhs_args = grep { $_ ne '-Mblib' } @lhs_args;
-    @rhs_args = grep { $_ ne '-Mblib' } @rhs_args;
-}
+    my $perl = caret_X();
+    my @lhs_args = ( $perl, '-Mblib', build_ack_invocation( '--sort-files', '-g', '[vz]', 't/text' ) );
+    my @rhs_args = ( $perl, '-Mblib', build_ack_invocation( '-x', '-i', 'that' ) );
 
-my ($stdout, $stderr);
+    if ( $ENV{'ACK_TEST_STANDALONE'} ) {
+        @lhs_args = grep { $_ ne '-Mblib' } @lhs_args;
+        @rhs_args = grep { $_ ne '-Mblib' } @rhs_args;
+    }
 
-if ( is_windows() ) {
-    ($stdout, $stderr) = run_cmd("@lhs_args | @rhs_args");
-}
-else {
-    ($stdout, $stderr) = run_piped( \@lhs_args, \@rhs_args );
-}
+    my ($stdout, $stderr);
 
-sets_match( $stdout, \@expected, __FILE__ );
-is_empty_array( $stderr );
+    if ( is_windows() ) {
+        ($stdout, $stderr) = run_cmd("@lhs_args | @rhs_args");
+    }
+    else {
+        ($stdout, $stderr) = run_piped( \@lhs_args, \@rhs_args );
+    }
+
+    sets_match( $stdout, \@expected, __FILE__ );
+    is_empty_array( $stderr );
+};
+
+
+# GH #175: -s doesn't work with -x
+# We have to show that -s supresses errors on missing and unreadable files,
+# while still giving results on files that are there.
+subtest 'GH #175' => sub {
+    plan tests => 5;
+
+    my @search_files;
+    my @expected_errors;
+    my $unreadable_file;    # Can't be localized or else it will be cleaned up.
+
+    my $nonexistent_filename = '/tmp/non-existent-file' . $$ . '.txt';
+    push( @search_files, $nonexistent_filename );
+    push( @expected_errors, qr/\Q$nonexistent_filename: No such file/ );
+
+    if ( !is_windows() ) {
+        $unreadable_file = create_tempfile();
+        my $unreadable_filename = $unreadable_file->filename;
+        my (undef, $result) = make_unreadable( $unreadable_filename );
+        die $result if $result;
+
+        push( @search_files, $unreadable_filename );
+        push( @expected_errors, qr/\Q$unreadable_filename: Permission denied/ );
+    }
+
+    my $ok_file = create_tempfile( 'My Pal Foot-Foot', 'Foo Fighters', 'I pity the fool', 'Not a match' );
+    push( @search_files, $ok_file );
+
+    my $input_file = create_tempfile( @search_files );
+
+    # Without -s, we get an error about the missing file.
+    my ($stdout,$stderr) = pipe_into_ack_with_stderr( $input_file->filename, '-x', '-i', 'foo' );
+    is( scalar @{$stdout}, 3, 'Got three matches' );
+
+    my $n = 0;
+    for my $error ( @{$stderr} ) {
+        ++$n;
+        my $expected = shift @expected_errors;
+        like( $error, $expected, "Error #$n matches" );
+    }
+    pass( 'One freebie pass for Windows' ) if is_windows();
+
+    # With -s, there is no warning.
+    ($stdout,$stderr) = pipe_into_ack_with_stderr( $input_file->filename, '-x', '-i', '-s', 'foo' );
+    is( scalar @{$stdout}, 3, 'Still got three matches' );
+    is_empty_array( $stderr, 'No errors' );
+};
 
 done_testing();
 exit 0;

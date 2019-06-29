@@ -1,4 +1,19 @@
-#!/usr/local/bin/perl 
+#!/usr/bin/perl
+#
+# This file is part of GNU Stow.
+#
+# GNU Stow is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GNU Stow is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see https://www.gnu.org/licenses/.
 
 #
 # Test processing of CLI options.
@@ -7,7 +22,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 use testutil;
 
@@ -17,15 +32,15 @@ init_test_dirs();
 
 local @ARGV = (
     '-v',
-    "-d $OUT_DIR/stow",
-    "-t $OUT_DIR/target",
+    '-d', "$TEST_DIR/stow",
+    '-t', "$TEST_DIR/target",
     'dummy'
 );
 
 my ($options, $pkgs_to_delete, $pkgs_to_stow) = process_options();
 
 is($options->{verbose}, 1, 'verbose option');
-is($options->{dir}, "$OUT_DIR/stow", 'stow dir option');
+is($options->{dir}, "$TEST_DIR/stow", 'stow dir option');
 
 my $stow = new_Stow(%$options);
 
@@ -82,5 +97,16 @@ local @ARGV = (
 ($options, $pkgs_to_delete, $pkgs_to_stow) = process_options();
 is_deeply($options->{ignore}, [ qr(~\z), qr(\.#.*\z) ] => 'ignore temp files');
 
+#
+# Check that expansion not applied.
+#
+local @ARGV = (
+    "--target=$TEST_DIR/".'$HOME',
+    'dummy'
+);
+make_path("$TEST_DIR/".'$HOME');
+($options, $pkgs_to_delete, $pkgs_to_stow) = process_options();
+is($options->{target}, "$TEST_DIR/".'$HOME', 'no expansion');
+remove_dir("$TEST_DIR/".'$HOME');
 
 # vim:ft=perl

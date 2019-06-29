@@ -18,7 +18,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( address devicename backend ) );
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 our %_r_addr_map;
 

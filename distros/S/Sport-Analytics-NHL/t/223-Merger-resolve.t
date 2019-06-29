@@ -9,8 +9,10 @@ use Test::More tests => 10;
 
 use Sport::Analytics::NHL;
 use Sport::Analytics::NHL::Merger;
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Tools qw(:db);
 use Sport::Analytics::NHL::Test;
+
+use Data::Dumper;
 
 my $report = Sport::Analytics::NHL::retrieve_compiled_report(
 	{}, 201120010, 'BS', 't/data/2011/0002/0010'

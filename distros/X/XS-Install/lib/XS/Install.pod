@@ -85,11 +85,7 @@ see L<XS::Install::Payload>
 
 =head4 write_makefile(%params)
 
-Same as WriteMakefile(makemaker_args(%params))
-
-=head4 makemaker_args(%params)
-
-Processes %params, does all the neccessary job and returns final parameters for passing to MakeMaker's WriteMakefile.
+Writes makefile
 
 =head4 not_available($msg)
 
@@ -198,7 +194,7 @@ L<Catch2|https://github.com/catchorg/Catch2> C++ module, then, please, familiari
 module, which already provides all needed glue. To let C++ test work, there will be need:
 
 	# t/some-file.t
-	XS::Loader::load_tests();
+	XS::Loader::load_noboot('MyTest');
 	Test::Catch::run('[tag]');
 
 	# t/some-file.cc

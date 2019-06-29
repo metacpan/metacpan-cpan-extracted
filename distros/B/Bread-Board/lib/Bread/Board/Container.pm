@@ -1,7 +1,7 @@
 package Bread::Board::Container;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: A container for services and other containers
-$Bread::Board::Container::VERSION = '0.36';
+$Bread::Board::Container::VERSION = '0.37';
 use Moose;
 use Moose::Util::TypeConstraints 'find_type_constraint';
 use MooseX::Params::Validate 0.14;
@@ -196,7 +196,7 @@ Bread::Board::Container - A container for services and other containers
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -356,8 +356,7 @@ map.
   $containers->add_type_mapping_for( $type_name, $service );
 
 Adds a mapping from a L<Moose type|Moose::Util::TypeConstraints> to a
-service: whenever we try to L<< resolve|/resolve ( ?service =>
-$service_name, ?type => $type, ?parameters => { ... } ) >> that type,
+service: whenever we try to L</resolve> that type,
 we'll use that service to instantiate it.
 
 =head2 C<get_type_mapping_for>
@@ -387,7 +386,7 @@ sub-type mapped, you get a random one. This is probably a bad idea.
 
 Returns true if we have a service defined to instantiate the given
 type name, but see the note on
-L<get_type_mapping_for|/get_type_mapping_for ( $type_name )> about
+L</get_type_mapping_for> about
 subtype mapping.
 
 =head2 C<resolve>
@@ -404,7 +403,7 @@ given parameters.
   my $object = $container->resolve(type=>$type,parameters=>\%p);
 
 When given a type name, this method will use
-L<get_type_mapping_for|/get_type_mapping_for ( $type_name )> to get
+L</get_type_mapping_for> to get
 the service, then call L<< C<get>|Bread::Board::Service/get >> on it,
 optionally passing the given parameters. If the instance is not of the
 expected type, the method will die.
@@ -424,7 +423,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

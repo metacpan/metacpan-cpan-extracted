@@ -1,5 +1,21 @@
 Revision history for Term::Caca
 
+3.1.0 2019-06-27
+  [ BUG FIXES ]
+    - Remove stale example/cave.pl file using old exports (GH#6, José
+      Joaquín Atria)
+    - Ask for latest Platypus::FFI version. (GH#5)
+    - Remove unused dependency on FFI::TinyCC. (GH#9, José Joaquín Atria)
+
+  [ DOCUMENTATION ]
+    - Document missing constants and tags. (GH#7, José Joaquín Atria)
+
+  [ ENHANCEMENTS ]
+    - Move distribution to Moo. (GH#8, José Joaquín Atria)
+
+  [ STATISTICS ]
+    - code churn: 21 files changed, 169 insertions(+), 259 deletions(-)
+
 3.0.1 2019-03-18
   [ MISC ]
     - remove dependency to Test::Approx [GH#4]

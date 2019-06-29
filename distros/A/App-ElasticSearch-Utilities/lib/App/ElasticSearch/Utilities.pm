@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '6.9'; # VERSION
+our $VERSION = '7.0'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -654,14 +654,16 @@ sub es_index_fields {
 
     return unless defined $result;
 
-    # Handle Version incompatibilities
-    my $ref = exists $result->{$index}{mappings} ? $result->{$index}{mappings} : $result->{$index};
-
-    # Loop through the mappings, skipping _default_
-    my @mappings = grep { $_ ne '_default_' } keys %{ $ref };
     my %fields;
-    foreach my $mapping (@mappings) {
-        _find_fields(\%fields,$ref->{$mapping});
+    foreach my $idx ( sort keys %{ $result } ) {
+        # Handle Version incompatibilities
+        my $ref = exists $result->{$idx}{mappings} ? $result->{$idx}{mappings} : $result->{$idx};
+
+        # Loop through the mappings, skipping _default_
+        my @mappings = grep { $_ ne '_default_' } keys %{ $ref };
+        foreach my $mapping (@mappings) {
+            _find_fields(\%fields,$ref->{$mapping});
+        }
     }
     # Return the results
     return \%fields;
@@ -678,7 +680,6 @@ sub es_index_fields {
 
         my %i = (
             type   => $type,
-            subkey => $f,
         );
 
         # Store the full path
@@ -872,7 +873,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 6.9
+version 7.0
 
 =head1 SYNOPSIS
 

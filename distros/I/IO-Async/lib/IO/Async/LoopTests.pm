@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::LoopTests;
 
@@ -27,7 +27,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;

@@ -8,7 +8,7 @@ package IO::Async::Loop;
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -1211,6 +1211,20 @@ Optional reference to an array giving a list of names of values which should
 be returned by resolving future. Values will be returned in the same order as
 in the list. Valid choices are: C<exitcode>, C<stdout>, C<stderr>.
 
+=item cancel_signal => STRING
+
+Optional. Name (or number) of the signal to send to the process if the
+returned future is cancelled. Defaults to C<TERM>. Use empty string or zero
+disable sending a signal on cancellation.
+
+=item fail_on_nonzero => BOOL
+
+Optional. If true, the returned future will fail if the process exits with a
+nonzero status. The failure will contain a message, the C<process> category
+name, and the capture values that were requested.
+
+   Future->fail( $message, process => @captures )
+
 =back
 
 This method is intended mainly as an IO::Async-compatible replacement for the
@@ -1264,6 +1278,10 @@ sub _run_process
       $subparams{stderr} = { into => \$results{stderr} } if $name eq "stderr";
    }
 
+   my $cancel_signal = delete $params{cancel_signal} // "TERM";
+
+   my $fail_on_nonzero = delete $params{fail_on_nonzero};
+
    croak "Unrecognised parameters " . join( ", ", keys %params ) if keys %params;
 
    my $future = $self->new_future;
@@ -1274,9 +1292,20 @@ sub _run_process
       on_finish => sub {
          ( undef, $results{exitcode} ) = @_;
 
-         $future->done( @results{ @$capture } );
+         if( $fail_on_nonzero and $results{exitcode} > 0 ) {
+            $future->fail( "Process failed with exit code $results{exitcode}\n",
+               process => @results{ @$capture }
+            );
+         }
+         else {
+            $future->done( @results{ @$capture } );
+         }
       },
    );
+
+   $future->on_cancel(sub {
+      $process->kill( $cancel_signal );
+   }) if $cancel_signal;
 
    $self->add( $process );
 
@@ -2011,6 +2040,8 @@ sub _listen_addrs
          next;
       }
 
+      $sock->blocking( 0 );
+
       if( $reuseaddr ) {
          unless( $sock->sockopt( SO_REUSEADDR, 1 ) ) {
             $sockopterr = $!;
@@ -2248,6 +2279,7 @@ sub create_thread
    unless( $self->{thread_join_pipe} ) {
       ( my $rd, $self->{thread_join_pipe} ) = IO::Async::OS->pipepair or
          croak "Cannot pipepair - $!";
+      $rd->blocking( 0 );
       $self->{thread_join_pipe}->autoflush(1);
 
       $self->watch_io(

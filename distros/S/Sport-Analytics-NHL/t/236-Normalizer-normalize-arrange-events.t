@@ -62,7 +62,7 @@ is_deeply(
 $period = [ grep { $_->{game_id} } @{$period} ];
 for my $game_id (201120010,193020010) {
 	my @merged = Sport::Analytics::NHL::merge(
-		{}, {data_dir => 't/data/'}, $game_id
+		{}, {reports_dir => 't/data/'}, $game_id
 	);
 	my $boxscore = retrieve $merged[0];
 

@@ -1,4 +1,19 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
+#
+# This file is part of GNU Stow.
+#
+# GNU Stow is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GNU Stow is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see https://www.gnu.org/licenses/.
 
 #
 # Testing ignore lists.
@@ -14,7 +29,7 @@ use testutil;
 use Stow::Util qw(join_paths);
 
 init_test_dirs();
-cd("$OUT_DIR/target");
+cd("$TEST_DIR/target");
 
 my $stow = new_Stow();
 
@@ -40,7 +55,7 @@ sub test_local_ignore_list_always_ignored_at_top_level {
         $Stow::LOCAL_IGNORE_FILE             => 1,
         "subdir/" . $Stow::LOCAL_IGNORE_FILE => 0,
     );
-}    
+}
 
 sub test_built_in_list {
     my ($stow_path, $package, $context, $expect_ignores) = @_;
@@ -108,7 +123,7 @@ EOF
 sub setup_package_local_list {
     my ($stow_path, $package, $list) = @_;
     my $package_path = join_paths($stow_path, $package);
-    make_dir($package_path);
+    make_path($package_path);
     my $local_ignore = join_paths($package_path, $Stow::LOCAL_IGNORE_FILE);
     make_file($local_ignore, $list);
     $stow->invalidate_memoized_regexp($local_ignore);
@@ -263,7 +278,7 @@ sub test_ignore_via_stow {
     my ($stow_path) = @_;
 
     my $package = 'pkg1';
-    make_dir("$stow_path/$package/foo/bar");
+    make_path("$stow_path/$package/foo/bar");
     make_file("$stow_path/$package/foo/bar/baz");
 
     setup_package_local_list($stow_path, $package, 'foo');
@@ -271,7 +286,7 @@ sub test_ignore_via_stow {
     is($stow->get_tasks(),     0, 'top dir ignored');
     is($stow->get_conflicts(), 0, 'top dir ignored, no conflicts');
 
-    make_dir("foo");
+    make_path("foo");
     for my $ignore ('bar', 'foo/bar', '/foo/bar', '^/foo/bar', '^/fo.+ar') {
         setup_package_local_list($stow_path, $package, $ignore);
         $stow->plan_stow($package);

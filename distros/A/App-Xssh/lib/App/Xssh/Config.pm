@@ -6,7 +6,7 @@ use warnings;
 use Moose;
 use Config::General;
 
-use version; our $VERSION = qv("v1.0.0");
+use version; our $VERSION = qv("v1.1.0");
 
 =head1 NAME
 
@@ -174,7 +174,7 @@ sub write{
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010-2013 Evan Giles.
+Copyright 2010-2019 Evan Giles.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

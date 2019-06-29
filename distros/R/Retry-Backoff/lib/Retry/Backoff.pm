@@ -1,7 +1,7 @@
 package Retry::Backoff;
 
-our $DATE = '2019-06-18'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -129,7 +129,7 @@ Retry::Backoff - Retry a piece of code, with backoff strategies
 
 =head1 VERSION
 
-This document describes version 0.001 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2019-06-18.
+This document describes version 0.002 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -141,11 +141,16 @@ This document describes version 0.001 of Retry::Backoff (from Perl distribution 
  # - max_attempts  =  10
  retry { ... };
 
- # pick backoff strategy (see corresponding Algorithm::Backoff::* for
- # list of parameters)
+ # select backoff strategy (see corresponding Algorithm::Backoff::* for list of
+ # parameters)
  retry { ... } strategy=>'Constant', delay=>1, max_attempts=>10;
 
- #
+ # other available 'retry' arguments
+ retry { ... }
+     on_success   => sub { my $h = shift; ... },
+     on_failure   => sub { my $h = shift; ... },
+     retry_if     => sub { my $h = shift; ... },
+     non_blocking => 0;
 
 =head1 DESCRIPTION
 
@@ -163,7 +168,7 @@ Usage:
 
  retry { attempt-code... } %args;
 
-Retry the attempt-code if it dies. Known arguments:
+Run attempt-code, retry if it dies. Known arguments:
 
 =over
 
@@ -182,9 +187,10 @@ Coderef. Will be called if attempt-code is deemed to have failed.
 
 =item * retry_if
 
-Coderef. If not specified, attempt-code is deemed to have failed if it dies. If
-this is specified, then the coderef will be called and if it returns true then
-the attempt-code is deemed to have failed.
+Coderef. If this argument is not specified, attempt-code is deemed to have
+failed if it dies. If this argument is specified, then the coderef will
+determine whether the attempt-code is deemed to have failed (retry_if code
+returns true) or succeeded (retry_if code returns false).
 
 Coderef will be passed:
 
@@ -199,7 +205,25 @@ containing these keys:
 
 =item * non_blocking
 
-Boolean.
+Boolean. If set to true, instead of delaying after a failure (or a success,
+depending on your backoff parameters), C<retry> will immediately return. Then
+when called again it will immediately return (instead of retrying the
+attempt-code) until the required amount of delay has passed. To use this
+feature, you actually need to use the underlying OO code instead of the C<retry>
+function:
+
+ my $retry = Retry::Backoff->new(
+     attempt_code => sub { ... },
+     non_blocking => 1,
+     ....
+ );
+ while (1) {
+     # if the action failed, it doesn't sleep next time it's called, it won't do
+     # anything until it's time to retry
+     $action->run;
+
+     # do something else while time goes on
+ }
 
 =back
 

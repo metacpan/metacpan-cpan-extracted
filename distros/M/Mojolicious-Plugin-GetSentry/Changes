@@ -18,3 +18,6 @@ Revision history for Mojolicious-Plugin-GetSentry
 
 1.1.7   2018-12-04
         Require module bugfix
+
+1.1.8   2019-06-26
+        Update makefile

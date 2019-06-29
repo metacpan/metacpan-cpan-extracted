@@ -9,7 +9,6 @@ use Test::More tests => 7;
 
 use Sport::Analytics::NHL;
 use Sport::Analytics::NHL::Merger;
-use Sport::Analytics::NHL::Tools;
 
 my $report = Sport::Analytics::NHL::retrieve_compiled_report(
 	{}, 201120010, 'BS', 't/data/2011/0002/0010'

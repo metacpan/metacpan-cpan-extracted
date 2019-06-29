@@ -1,9 +1,34 @@
 ==================================================
-Changes from 2017-06-20 00:00:00 +0000 to present.
+Changes from 2017-06-27 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.9 at 2019-06-20 04:21:23 +0000
+version 7.0 at 2019-06-27 03:42:04 +0000
+----------------------------------------
+
+  Change: e5dd9b3aac45bdb0f8caeddb012adbd319f18746
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-26 20:41:36 +0000
+
+    Release 7.0 documentation 
+
+  Change: 4e160f42e8d678df4986da43c12399451a1aebcb
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-26 20:29:40 +0000
+
+    Fixes for better handling of fields
+
+    * `es_index_fields()` can now handle aliases or wildcards gracefully *
+    `es-search.pl` add --limit as an alias for --size 
+
+  Change: fd91aaa84e608b0a25cce79df238d4a8d0351057
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-19 21:43:12 +0000
+
+    Documentation updated for v6.9 
+
+----------------------------------------
+version 6.9 at 2019-06-20 03:29:27 +0000
 ----------------------------------------
 
   Change: 3e0c7429bcb83f9ae1613025ddd524d26229d258
@@ -760,5 +785,5 @@ version 5.4 at 2017-10-13 19:36:20 +0000
     es-alias-manager.pl: relax index name checker to allow _ 
 
 =================================================
-Plus 60 releases after 2017-06-20 00:00:00 +0000.
+Plus 60 releases after 2017-06-27 00:00:00 +0000.
 =================================================

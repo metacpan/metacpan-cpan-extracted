@@ -1,5 +1,5 @@
 package Dir::Manifest;
-$Dir::Manifest::VERSION = '0.0.5';
+$Dir::Manifest::VERSION = '0.2.0';
 use strict;
 use warnings;
 
@@ -74,11 +74,18 @@ sub get_obj
         { key => $key, fh => $self->_dh->child($key) } );
 }
 
+sub fh
+{
+    my ( $self, $key ) = @_;
+
+    return $self->get_obj($key)->fh;
+}
+
 sub text
 {
     my ( $self, $key, $opts ) = @_;
 
-    return Dir::Manifest::Slurp::slurp( $self->get_obj($key)->fh, $opts );
+    return Dir::Manifest::Slurp::slurp( $self->fh($key), $opts );
 }
 
 sub texts_dictionary
@@ -104,9 +111,11 @@ Dir::Manifest
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 SYNOPSIS
+
+    use Dir::Manifest ();
 
     my $obj = Dir::Manifest->new(
         {
@@ -138,7 +147,7 @@ Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of ke
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 METHODS
 
@@ -158,6 +167,13 @@ Returns a sorted array reference containing the available keys as strings.
 
 Returns the L<Dir::Manifest::Key> object associated with the string $key.
 Throws an error if $key was not given in the manifest.
+
+=head2 $self->fh($key)
+
+Returns the L<Path::Tiny> objects for the key, which is usable as a path
+in string context. Equivalent to C<<< $self->get_obj($key)->fh() >>>.
+
+(Added in version 0.2.0. ).
 
 =head2 my $contents = $self->text("$key", {%OPTS})
 

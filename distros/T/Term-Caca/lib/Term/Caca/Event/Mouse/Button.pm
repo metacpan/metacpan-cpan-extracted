@@ -1,10 +1,7 @@
 package Term::Caca::Event::Mouse::Button;
 our $AUTHORITY = 'cpan:YANICK';
-$Term::Caca::Event::Mouse::Button::VERSION = '3.0.1';
-use strict;
-use warnings;
-
-use Moose;
+$Term::Caca::Event::Mouse::Button::VERSION = '3.1.0';
+use Moo;
 extends 'Term::Caca::Event';
 
 has index =>
@@ -32,7 +29,7 @@ Term::Caca::Event::Mouse::Button
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 AUTHORS
 

@@ -1,12 +1,12 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2017-01-13'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $DATE = '2019-06-26'; # DATE
+our $VERSION = '0.471'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -304,9 +304,11 @@ sub complete_cli_arg {
         $res->{min_vals} //= $res->{type} ? 1 : 0;
         $res->{max_vals} //= $res->{type} || $res->{opttype} ? 1:0;
         for my $o0 (@{ $res->{opts} }) {
-            my @o = $res->{is_neg} && length($o0) > 1 ?
-                ($o0, "no$o0", "no-$o0") : ($o0);
-            for my $o (@o) {
+            my @ary = $res->{is_neg} && length($o0) > 1 ?
+                ([$o0, 0], ["no$o0",1], ["no-$o0",1]) : ([$o0,0]);
+            for my $elem (@ary) {
+                my $o = $elem->[0];
+                my $is_neg = $elem->[1];
                 my $k = length($o)==1 ||
                     (!$bundling && $res->{dash_prefix} eq '-') ?
                         "-$o" : "--$o";
@@ -314,11 +316,82 @@ sub complete_cli_arg {
                     name => $k,
                     ospec => $ospec, # key to getopt specification
                     parsed => $res,
+                    is_neg => $is_neg,
                 };
             }
         }
     }
     my @optnames = sort keys %opts;
+
+    my $code_get_summary = sub {
+        # currently we only extract summaries from Rinci metadata and
+        # Perinci::CmdLine object
+        return unless $extras;
+        my $ggls_res = $extras->{ggls_res};
+        return unless $ggls_res;
+        my $cmdline = $extras->{cmdline};
+        return unless $cmdline;
+        my $r = $extras->{r};
+        return unless $r;
+
+        my $optname = shift;
+        my $ospec  = $opts{$optname}{ospec};
+        return unless $ospec; # shouldn't happen
+        my $specmeta = $ggls_res->[3]{'func.specmeta'};
+        my $ospecmeta = $specmeta->{$ospec};
+
+        if ($ospecmeta->{is_alias}) {
+            my $real_ospecmeta = $specmeta->{ $ospecmeta->{alias_for} };
+            my $real_opt = $real_ospecmeta->{parsed}{opts}[0];
+            $real_opt = length($real_opt) == 1 ? "-$real_opt" : "--$real_opt";
+            return "Alias for $real_opt";
+        }
+
+        if (defined(my $coptname = $ospecmeta->{common_opt})) {
+            # it's a common Perinci::CmdLine option
+            my $coptspec = $cmdline->{common_opts}{$coptname};
+            #use DD; dd $coptspec;
+            return unless $coptspec;
+
+            my $summ;
+            # XXX translate
+            if ($opts{$optname}{is_neg}) {
+                $summ = $coptspec->{"summary.alt.bool.not"};
+                return $summ if defined $summ;
+                my $pos_opt = $ospecmeta->{pos_opts}[0];
+                $pos_opt = length($pos_opt) == 1 ? "-$pos_opt" : "--$pos_opt";
+                return "The opposite of $pos_opt";
+            } else {
+                $summ = $coptspec->{"summary.alt.bool.yes"};
+                return $summ if defined $summ;
+                $summ = $coptspec->{"summary"};
+                return $summ if defined $summ;
+            }
+        } else {
+            # it's option from function argument
+            my $arg = $ospecmeta->{arg};
+            my $argspec = $extras->{r}{meta}{args}{$arg};
+            #use DD; dd $argspec;
+
+            my $summ;
+            # XXX translate
+            #use DD; dd {optname=>$optname, ospecmeta=>$ospecmeta};
+            if ($ospecmeta->{is_neg}) {
+                $summ = $argspec->{"summary.alt.bool.not"};
+                return $summ if defined $summ;
+                my $pos_opt = $ospecmeta->{pos_opts}[0];
+                $pos_opt = length($pos_opt) == 1 ? "-$pos_opt" : "--$pos_opt";
+                return "The opposite of $pos_opt";
+            } else {
+                $summ = $argspec->{"summary.alt.bool.yes"};
+                return $summ if defined $summ;
+                $summ = $argspec->{"summary"};
+                return $summ if defined $summ;
+            }
+        }
+
+        return;
+    };
 
     my %seen_opts;
 
@@ -537,11 +610,13 @@ sub complete_cli_arg {
         #say "D:completing option names";
         my $opt = $exp->{optname};
         my @o;
-        for (@optnames) {
+        my @osumms;
+        my $o_has_summaries;
+        for my $optname (@optnames) {
             my $repeatable = 0;
-            next if $exp->{short_only} && /\A--/;
-            if ($seen_opts{$_}) {
-                my $opthash = $opts{$_};
+            next if $exp->{short_only} && $optname =~ /\A--/;
+            if ($seen_opts{$optname}) {
+                my $opthash = $opts{$optname};
                 my $ospecval = $gospec->{$opthash->{ospec}};
                 my $parsed = $opthash->{parsed};
                 if (ref($ospecval) eq 'ARRAY') {
@@ -552,22 +627,32 @@ sub complete_cli_arg {
             }
             # skip options that have been specified and not repeatable
             #use DD; dd {'$_'=>$_, seen=>$seen_opts{$_}, repeatable=>$repeatable, opt=>$opt};
-            next if $seen_opts{$_} && !$repeatable && (
+            next if $seen_opts{$optname} && !$repeatable && (
                 # long option has been specified
-                (!$opt || $opt ne $_) ||
+                (!$opt || $opt ne $optname) ||
                      # short option (in a bundle) has been specified
                     (defined($exp->{prefix}) &&
                          index($exp->{prefix}, substr($opt, 1, 1)) >= 0));
             if (defined $exp->{prefix}) {
-                my $o = $_; $o =~ s/\A-//;
+                my $o = $optname; $o =~ s/\A-//;
                 push @o, "$exp->{prefix}$o";
             } else {
-                push @o, $_;
+                push @o, $optname;
+            }
+            my $summ = $code_get_summary->($optname) // '';
+            if (length $summ) {
+                $o_has_summaries = 1;
+                push @osumms, $summ;
+            } else {
+                push @osumms, '';
             }
         }
         #use DD; dd \@o;
+        #use DD; dd \@osumms;
         my $compres = Complete::Util::complete_array_elem(
-            array => \@o, word => $word);
+            array => \@o, word => $word,
+            (summaries => \@osumms) x !!$o_has_summaries,
+        );
         #$log->tracef('[comp][compgl] adding result from option names, '.
         #                 'matching options=%s', $compres);
         push @answers, $compres;
@@ -582,7 +667,7 @@ sub complete_cli_arg {
         last unless exists($exp->{optval});
         #say "D:completing option value";
         my $opt = $exp->{optval};
-        my $opthash = $opts{$opt} if $opt;
+        my $opthash; $opthash = $opts{$opt} if $opt;
         my %compargs = (
             %$extras,
             type=>'optval', words=>\@words, cword=>$args{cword},
@@ -620,7 +705,7 @@ sub complete_cli_arg {
         );
         #$log->tracef('[comp][compgl] invoking \'completion\' routine '.
         #                 'to complete argument');
-        my $compres = $comp->(%compargs) if $comp;
+        my $compres; $compres = $comp->(%compargs) if $comp;
         if (!defined $compres) {
             $compres = _default_completion(%compargs);
             #$log->tracef('[comp][compgl] adding result from default '.
@@ -652,7 +737,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.46 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2017-01-13.
+This document describes version 0.471 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2019-06-26.
 
 =head1 SYNOPSIS
 
@@ -663,7 +748,11 @@ See L<Getopt::Long::Complete> for an easy way to use this module.
 =head1 FUNCTIONS
 
 
-=head2 complete_cli_arg(%args) -> hash|array
+=head2 complete_cli_arg
+
+Usage:
+
+ complete_cli_arg(%args) -> hash|array
 
 Complete command-line argument using Getopt::Long specification.
 
@@ -804,7 +893,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 
@@ -834,7 +923,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

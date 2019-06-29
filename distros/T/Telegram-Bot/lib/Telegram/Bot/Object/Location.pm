@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Location;
-$Telegram::Bot::Object::Location::VERSION = '0.010';
+$Telegram::Bot::Object::Location::VERSION = '0.012';
 # ABSTRACT: The base class for Telegram message 'Location' type.
 
 use Mojo::Base 'Telegram::Bot::Object::Base';
@@ -26,7 +26,7 @@ Telegram::Bot::Object::Location - The base class for Telegram message 'Location'
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 AUTHOR
 

@@ -3,5 +3,3 @@ MANIFEST
 Makefile.PL
 README.pod
 lib/Mojolicious/Plugin/Validate/Tiny.pm
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

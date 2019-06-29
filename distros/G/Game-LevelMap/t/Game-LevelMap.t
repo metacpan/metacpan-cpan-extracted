@@ -23,8 +23,11 @@ $lm = Game::LevelMap->new( from_string => $s );
 eq_or_diff( $lm->level, $dots3x3 );
 
 # uneven column lengths are not permitted
-dies_ok { Game::LevelMap->new( level => [ [qw(. .)], [qw(.)] ] ) };
+dies_ok { Game::LevelMap->new( level       => [ [qw(. .)], [qw(.)] ] ) };
 dies_ok { Game::LevelMap->new( from_string => "..$/." ) };
+
+# better coverage purity
+dies_ok { Game::LevelMap->new( from_string => $s, level => $dots3x3 ) };
 
 # some complications around testing output that goes to a terminal
 my ( $buf, $want );
@@ -42,7 +45,7 @@ sub capture (&) {
 }
 
 $want = "\e[1;1H...\e[2;1H...\e[3;1H...";
-ok( capture { $lm->to_terminal } eq $want ) or buf2hex;
+ok( capture { $lm->to_terminal( 1, 1 ) } eq $want ) or buf2hex;
 
 $want = "\e[2;5H...\e[3;5H...\e[4;5H...";
 ok( capture { $lm->to_terminal( 5, 2 ) } eq $want ) or buf2hex;
@@ -108,8 +111,14 @@ ok( capture {
       eq $want
 ) or buf2hex;
 
-# display point must not lie outside level map
-dies_ok { $lm->to_panel( @offs, @size, 999, 0 ) };
-dies_ok { $lm->to_panel( @offs, @size, 0,   -5 ) };
+$want = "\e[2;6Ha\e[3;7Hj";
+ok( capture { $lm->update_terminal( 5, 2, [ 1, 0 ], [ 2, 1 ] ) } eq $want )
+  or buf2hex;
 
-done_testing 17
+# display point must not lie outside level map
+for my $i ( -5, 999 ) {
+    dies_ok { $lm->to_panel( @offs, @size, $i, 0 ) };
+    dies_ok { $lm->to_panel( @offs, @size, 0,  $i ) };
+}
+
+done_testing 21

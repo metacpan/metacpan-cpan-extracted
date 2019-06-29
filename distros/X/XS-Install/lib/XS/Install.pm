@@ -2,20 +2,20 @@ package XS::Install;
 use strict;
 use warnings;
 use Config;
-use Cwd 'abs_path';
+use Cwd qw/getcwd abs_path/;
 use Exporter 'import';
 use ExtUtils::MakeMaker;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.1.4';
+our $VERSION = '1.2.1';
 my $THIS_MODULE = 'XS::Install';
 
-our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
+our @EXPORT_OK = qw/write_makefile not_available/;
 our @EXPORT;
 
 if ($0 =~ /Makefile.PL$/) {
-    @EXPORT = qw/write_makefile makemaker_args not_available/;
+    @EXPORT = qw/write_makefile not_available/;
     _require_makemaker();
 }
 
@@ -28,34 +28,51 @@ my $win32    = $^O eq 'MSWin32';
 
 sub write_makefile {
     _require_makemaker();
-    WriteMakefile(makemaker_args(@_));
+    
+    my ($main_params, $test_params) = makemaker_args(@_);
+    
+    MY::init_methods();
+    WriteMakefile(%$main_params);
+    
+    if ($test_params) {
+        MY::init_methods();
+        WriteMakefile(%$test_params);
+    }
 }
 
 sub makemaker_args {
-    my %params = @_;
+    my $params = ref($_[0]) eq 'HASH' ? $_[0] : {@_};
     _sync();
-    die "You must define a NAME param" unless $params{NAME};
+    die "You must define a NAME param" unless $params->{NAME};
     
-    pre_process(\%params);
-    process_FROM(\%params);
-    process_REQUIRES(\%params);    
-    process_BIN_DEPS(\%params);
-    process_PARSE_XS(\%params);
-    process_module_binary(\%params);
-    process_PM(\%params);
-    process_PAYLOAD(\%params);
-    process_CLIB(\%params);
-    process_BIN_SHARE(\%params);
-    attach_BIN_DEPENDENT(\%params);
-    warn_BIN_DEPENDENT(\%params);
-    process_CPLUS(\%params);
-    process_CCFLAGS(\%params);
-    $params{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params{OPTIMIZE});
-    process_LD(\%params);
-    process_test(\%params);
-    post_process(\%params);
-
-    return %params;
+    pre_process($params);
+    process_FROM($params);
+    process_REQUIRES($params);    
+    process_BIN_DEPS($params);
+    process_PARSE_XS($params);
+    process_module_binary($params);
+    process_PM($params);
+    process_PAYLOAD($params);
+    process_CLIB($params);
+    process_BIN_SHARE($params);
+    attach_BIN_DEPENDENT($params);
+    warn_BIN_DEPENDENT($params);
+    process_CPLUS($params);
+    process_CCFLAGS($params);
+    $params->{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params->{OPTIMIZE});
+    process_LD($params);
+    
+    my $test_mm_args;
+    if ($params->{_XSTEST}) {
+        process_test_makefile($params);
+    } else {
+        $test_mm_args = process_test($params);
+    }
+    
+    post_process($params);
+    
+    return ($params, $test_mm_args) if wantarray();
+    return $params;
 }
 
 sub pre_process {
@@ -100,15 +117,16 @@ sub process_FROM {
     my $module = $params->{NAME} or die "You must define a NAME param";
     
     if (my $file = delete $params->{ALL_FROM}) {
-        $params->{VERSION_FROM}  = $file;
-        $params->{ABSTRACT_FROM} = $file;
+        $params->{VERSION_FROM}  = $file unless $params->{VERSION};
+        $params->{ABSTRACT_FROM} = $file unless $params->{ABSTRACT};
     }
     
     my $pm = 'lib/'._pkg_file($module);
     my $pod = 'lib/'._pkg_slash($module).'.pod';
     
-    $params->{VERSION_FROM}  ||= $pm;
-    $params->{ABSTRACT_FROM} ||= (-f $pod) ? $pod : $pm;
+    $params->{VERSION_FROM}  ||= $pm unless $params->{VERSION};
+    $params->{ABSTRACT_FROM} ||= (-f $pod) ? $pod : $pm unless $params->{ABSTRACT};
+    
 }
 
 sub process_REQUIRES {
@@ -196,7 +214,7 @@ sub _apply_BIN_DEPS {
         next unless -f $lib_path;
         push @$shared_list, abs_path($lib_path);
         last;
-    }    
+    }
     
     my $info = XS::Install::Payload::binary_module_info($module)
         or die "[XS::Install] this module wants '$module' as a binary dependence, however '$module' doesn't provide any binary interface\n";
@@ -261,29 +279,17 @@ sub process_PARSE_XS { # inject ParseXS plugins into xsubpp
 sub process_module_binary {
     my $params = shift;
 
-    $params->{XS}  ||= [_scan_files($xs_mask)];
-    $params->{H}   ||= [_scan_files($h_mask)];
-    $params->{C}   ||= [_scan_files($c_mask)];
-    $params->{XSI} ||= [_scan_files($xsi_mask)];
+    $params->{XS}  ||= $params->{_XSTEST} ? [] : [_scan_files($xs_mask)];
+    $params->{H}   ||= $params->{_XSTEST} ? [] : [_scan_files($h_mask)];
+    $params->{C}   ||= $params->{_XSTEST} ? [] : [_scan_files($c_mask)];
+    $params->{XSI} ||= $params->{_XSTEST} ? [] : [_scan_files($xsi_mask)];
     
     process_binary($params);
     
-    if (has_xs($params)) {
-        # make XS files rebuild if Makefile or XSI file changes
-        push @{$params->{postamble}}, '$(XS_FILES):: $(FIRST_MAKEFILE) '.join(' ', @{$params->{XSI}}).'; $(TOUCH) $(XS_FILES)'."\n";
-    }
-
-    if ($params->{CPLUS}) {
-        _string_merge($params->{XSOPT}, '-C++ -csuffix .cc');
-        
-        push @{$params->{postamble}}, ".xs.cc:\n".
-            "\t".'$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc'."\n".
-            "\t".'$(MV) $*.xsc $*.cc';
-    }
+    _string_merge($params->{XSOPT}, '-C++') if $params->{CPLUS};
     
     $params->{clean}{FILES} .= ' $(O_FILES)';
     
-    _string_merge($params->{MODULE_INFO}{ALL_C_STR}, '$(C_FILES)');
     push @{$params->{MODULE_INFO}{ALL_C}}, @{$params->{C}};
 }
 
@@ -296,13 +302,21 @@ sub process_binary {
         canonize_array_files($params->{XS});
         $params->{XS} = { map {$_ => undef} @{$params->{XS}} };
     }
+
     foreach my $xsfile (keys %{$params->{XS}}, map { _scan_files($xs_mask, $_) } @{$params->{SRC}}) {
         next if $params->{XS}{$xsfile};
         my $cfile = $xsfile;
-        $cfile =~ s/\.xs$/.$cext/ or next;
+        $cfile =~ s/\.xs$/.xs.$cext/ or next;
         $params->{XS}{$xsfile} = $cfile;
+
+        my $suffix = $cfile;
+        $suffix =~ s/^[^.]+//;
+
+        push @{$params->{postamble}}, "$cfile : $xsfile \$(FIRST_MAKEFILE)\n".
+            "\t\$(XSUBPPRUN) \$(XSPROTOARG) \$(XSUBPPARGS) -csuffix $suffix \$(XSUBPP_EXTRA_ARGS) $xsfile > ${xsfile}c\n".
+            "\t\$(MV) ${xsfile}c $cfile";
     }
-    
+
     canonize_array_files($params->{XSI});
     push @{$params->{XSI}}, _scan_files($xsi_mask, $_) for @{$params->{SRC}};
     _uniq_list($params->{XSI});
@@ -355,6 +369,7 @@ sub process_BIN_SHARE {
     my $params = shift;
     my $bin_share = delete $params->{BIN_SHARE} or return;
     return unless %$bin_share;
+    return if $params->{_XSTEST};
     
     my $typemaps = delete($bin_share->{TYPEMAPS}) || {};
     _process_map($typemaps, $map_mask);
@@ -465,82 +480,59 @@ sub process_LD {
 sub process_test {
     my $params = shift;
     my $tp = $params->{test} or return;
+    return unless $tp->{SRC} or $tp->{XS};
     
-    $tp->{CPLUS} //= $params->{CPLUS};
-    process_binary($tp);
-    return unless has_binary($tp);
-    
-    $params->{XS}{$_} = $tp->{XS}{$_} for keys %{$tp->{XS}};
-    
-    my $ccflags = $params->{CCFLAGS};
-    _string_merge($ccflags, $tp->{CCFLAGS});
-    
-    my $optimize = merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE});
-    
-    $params->{clean}{FILES} .= ' $(TEST_OBJECT)';
-    
-    push @{$params->{postamble}}, "# --- XS::Install tests compilation section";
+    canonize_array_split($tp->{$_}) for qw/TYPEMAPS BIN_DEPS/;
 
-    my $cccmd = (bless {C => ['1.c']}, 'MM')->const_cccmd;
-    $cccmd =~ s/CCCMD/TEST_CCCMD/;
-    $cccmd =~ s/CCFLAGS/TEST_CCFLAGS/g;
-    $cccmd =~ s/OPTIMIZE/TEST_OPTIMIZE/g;
+    my $array_merge = sub {
+        my $a1 = shift || [];
+        my $a2 = shift || [];
+        return [@$a1, @$a2];
+    };
     
-    if (my $inc = $tp->{INC}) {
-        push @{$params->{postamble}}, "TEST_INC = $inc";
-        $cccmd =~ s/(\$\(INC\))/\$(TEST_INC) $1/g;
-        _string_merge($params->{MODULE_INFO}{SELF_INC}, '$(TEST_INC)');
-    }
+    my %args = (
+        NAME      => $tp->{NAME} || 'MyTest',
+        VERSION   => $tp->{VERSION} || '0.0.0',
+        ABSTRACT  => "test module",
+        SRC       => $tp->{SRC},
+        XS        => $tp->{XS},
+        BIN_DEPS  => $array_merge->([keys %{$params->{MODULE_INFO}{BIN_DEPS}||{}}], $tp->{BIN_DEPS}),
+        TYPEMAPS  => $array_merge->($params->{TYPEMAPS}, $tp->{TYPEMAPS}),
+        CPLUS     => $tp->{CPLUS} // $params->{CPLUS},
+        CC        => $tp->{CC} || $params->{CC},
+        LD        => $tp->{LD} || $params->{LD},
+        LDFROM    => '$(OBJECT) '.module_so($params),
+        INC       => string_merge($params->{MODULE_INFO}{SELF_INC}, $tp->{INC}),
+        CCFLAGS   => string_merge($params->{CCFLAGS}, $tp->{CCFLAGS}),
+        DEFINE    => string_merge($params->{DEFINE}, $tp->{DEFINE}),
+        XSOPT     => string_merge($params->{XSOPT}, $tp->{XSOPT}),
+        LIBS      => $params->{LIBS},
+        MAKEFILE  => 'Makefile.test',
+        OPTIMIZE  => merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE}),
+        PARSE_XS  => $tp->{PARSE_XS} || $params->{PARSE_XS},
+        XS        => {},
+        NO_MYMETA => 1,
+        _XSTEST   => 1,
+    );
     
-    $cccmd .= ' $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
+    my $cmd = '@$(MAKE) --no-print-directory -f Makefile.test';
     
     push @{$params->{postamble}},
-        "TEST_CCFLAGS = $ccflags",
-        "TEST_OPTIMIZE = $optimize", 
-        $cccmd,
+        '# --- XS::Install tests compilation section',
+        "ctest_object : ; $cmd object",
+        "ctest_ld : ctest_object \$(INST_DYNAMIC); $cmd",
+        'subdirs-test_dynamic :: ctest_object ctest_ld',
+        'ctest :: ctest_object ctest_ld',
+        "clean :: ; $cmd veryclean",
     ;
     
-    foreach my $c_file (@{$tp->{C}}) {
-        my $o_file = c2obj_file($c_file);
-        push @{$params->{postamble}},
-            "$o_file : $c_file\n".
-            "\t".'$(TEST_CCCMD) '."$c_file\n"
-        ;
-    }
-    
-    my $dlpath = 'blib/ctest.$(DLEXT)';
-    my $objdep = $params->{H_DEPS} ? '' : ' $(H_FILES) $(TEST_H_FILES)';
-    push @{$params->{postamble}},
-        'TEST_OBJECT = '.join(' ', @{$tp->{OBJECT}}),
-        'TEST_H_FILES = '.join(' ', @{$tp->{H}}),
-        'TEST_C_FILES = '.join(' ', @{$tp->{C}}),
-        '$(TEST_OBJECT) : $(FIRST_MAKEFILE)'.$objdep,
-    ;
-    
-    push @{$params->{postamble}},
-        'TEST_XS_FILES = '.join(' ', keys %{$tp->{XS}}),
-        '$(TEST_XS_FILES) :: $(FIRST_MAKEFILE) '.join(' ', @{$tp->{XSI}}).'; $(TOUCH) $(TEST_XS_FILES)',
-    if has_xs($tp);
-    
-    my $perl_archive  = $win32 ? '"$(PERL_ARCHIVE)" ' : '';
-    my $ld_pre_extra  = $win32 ? '-Wl,--export-all-symbols ' : '';
-    my $ld_post_extra = $win32 ? ' -Wl,--enable-auto-image-base' : '';
-        
-    push @{$params->{postamble}},
-        "TEST_INST_DYNAMIC = $dlpath",
-        'TEST_LDFROM = $(TEST_OBJECT) '.($params->{MODULE_INFO}{SHARED_LIBS_LINKING}||''),
-        '$(TEST_INST_DYNAMIC) : $(TEST_OBJECT) $(INST_DYNAMIC)'."\n".
-            "\t".'$(RM_F) $@'."\n".
-            "\t".'$(LD) '.$ld_pre_extra.'-o $@ $(LDDLFLAGS) $(TEST_LDFROM) $(INST_DYNAMIC) $(OTHERLDFLAGS) '.$perl_archive.'$(INST_DYNAMIC_FIX)'.$ld_post_extra."\n".
-            "\t".'$(CHMOD) $(PERM_RWX) $@',
-        'subdirs-test_dynamic :: $(TEST_INST_DYNAMIC)',
-        'ctest :: subdirs-test_dynamic',
-    ;
-    
-    _string_merge($params->{MODULE_INFO}{ALL_C_STR}, '$(TEST_C_FILES)');
-    push @{$params->{MODULE_INFO}{ALL_C}}, @{$tp->{C}};
-    
-    delete @$tp{qw/SRC C H XS XSI OBJECT CPLUS CCFLAGS OPTIMIZE/};
+    my $mm_args = makemaker_args(%args);
+    return has_binary($mm_args) ? $mm_args : undef;
+}
+
+sub process_test_makefile {
+    my $params = shift;
+    push @{$params->{postamble}}, 'object : $(OBJECT)';
 }
 
 sub post_process {
@@ -549,9 +541,9 @@ sub post_process {
     my $mi = $params->{MODULE_INFO};
     
     if (@{$mi->{ALL_C}} and $params->{H_DEPS}) {
-        my $cmd = "\$(PERL) -M${THIS_MODULE}::Util -e '${THIS_MODULE}::Util::cmd_check_header_dependencies()' \$(OBJ_EXT) $mi->{SELF_INC} $mi->{ALL_C_STR}";
+        my $cmd = "\$(PERL) -M${THIS_MODULE}::Util -e '${THIS_MODULE}::Util::cmd_check_dependencies()' \$(OBJ_EXT) $mi->{SELF_INC} \$(C_FILES) -xs \$(XS_FILES)";
         # for GNU make
-        push @$postamble, "CHECK_HEADER_DEPS := \$(shell $cmd)";
+        push @$postamble, "CHECK_DEPS := \$(shell $cmd)";
         # for BSD make
         push @$postamble, ".BEGIN : \n".
             "\t$cmd";
@@ -560,7 +552,7 @@ sub post_process {
     }
     
     delete @$params{qw/C H OBJECT XS CCFLAGS LDFROM OPTIMIZE XSOPT/} unless has_binary($params);
-    delete @$params{qw/CPLUS PARSE_XS SRC XSI MODULE_INFO H_DEPS/};
+    delete @$params{qw/CPLUS PARSE_XS SRC XSI MODULE_INFO H_DEPS _XSTEST/};
     
     # convert array to hash for postamble
     $params->{postamble} = {};
@@ -634,6 +626,12 @@ sub _install {
 }
 
 sub _instroot { return has_binary($_[0]) ? '$(INST_ARCHLIB)' : '$(INST_LIB)' }
+
+sub module_so {
+    my $params = shift;
+    return undef unless has_binary($params);
+    return _instroot($params).'/auto/'._pkg_slash($params->{NAME}).'/'._pkg_last($params->{NAME}).'.'.$Config{dlext};
+}
 
 sub _sync {
     no strict 'refs';
@@ -711,6 +709,13 @@ sub _string_merge {
     $_[0] .= $_[0] ? " $_[1]" : $_[1];
 }
 
+sub string_merge {
+    my $s = shift;
+    $s //= '';
+    $s .= ($_ // '') for @_;
+    return $s;
+}
+
 sub c2obj_file {
     my $file = shift;
     $file =~ s/\.[^.]+$//;
@@ -719,69 +724,68 @@ sub c2obj_file {
 
 {
     package
-        MYSOURCE;
-        
-    sub postamble {
-        my $self = shift;
-        my %args = @_;
-
-        my @list;        
-        my $i = 1;
-        while (1) {
-            last unless exists $args{$i};
-            push @list, $args{$i};
-            ++$i;
-        }
-        
-        return join("\n\n", @list);
-    }
-}
-
-{
-    package
         MY;
     use Config;
 
-    if ($win32) {
-        my $gcc_compliant = $Config{cc} =~ /\b(gcc|clang)\b/i ? 1 : 0;
+    my $gcc_compliant = $Config{cc} =~ /\b(gcc|clang)\b/i ? 1 : 0;
         
-        *dynamic_lib = sub {
-            my ($self, %attribs) = @_;
-            my $code = $self->SUPER::dynamic_lib(%attribs);
-            
-            unless ($gcc_compliant) {
-                warn(
-                    "$THIS_MODULE: to maintain UNIX-like shared library behaviour on windows (export all symbols by default), we need gcc-compliant linker. ".
-                    "$THIS_MODULE-dependant modules should only be installed on perls with MinGW shell (like strawberry perl), or at least having gcc compiler. ".
-                    "I will continue, but this module's binary dependencies may not work."
-                );
-                return $code;
-            }
-            return $code unless $code;
+    sub init_methods {
+        no warnings 'redefine';
+        
+        *postamble = sub {
+            my $self = shift;
+            my %args = @_;
     
-            # remove .def-related from code, remove double DLL build, remove dll.exp from params, add export all symbols param.
-            my $DLLTOOL = $Config{dlltool} || 'dlltool';
-            my (@out, $last_ld);
-            map { $last_ld = $_ if /\$\(LD\)\s/ } split /\n/, $code;
-            foreach my $line (split /\n/, $code) {
-                next if $line =~ /$DLLTOOL/; # drop dlltool calls (we dont need .def file)
-                if ($line =~ /\$\(LD\)\s/) {
-                    next if $line ne $last_ld;
-                    $line =~ s/\$\(LD\)\s/\$(LD) -Wl,--export-all-symbols /;
-                    $line =~ s/\bdll\.exp\b//;
-                }
-                $line =~ s/\$\(EXPORT_LIST\)//g; # remove <PACKAGE>.def from target dependency
-                push @out, $line;
+            my @list;        
+            my $i = 1;
+            while (1) {
+                last unless exists $args{$i};
+                push @list, $args{$i};
+                ++$i;
             }
             
-            $code = join("\n", @out);
-            return $code;
+            return join("\n\n", @list);
         };
         
-        *dlsyms = sub {
-            my ($self, %attribs) = @_;
-            return '' if $gcc_compliant; # our dynamic_lib target doesn't need any .def files with gcc
-            return $self->SUPER::dlsyms(%attribs);
+        if ($win32) {
+            *dynamic_lib = sub {
+                my ($self, %attribs) = @_;
+                my $code = $self->SUPER::dynamic_lib(%attribs);
+                
+                unless ($gcc_compliant) {
+                    warn(
+                        "$THIS_MODULE: to maintain UNIX-like shared library behaviour on windows (export all symbols by default), we need gcc-compliant linker. ".
+                        "$THIS_MODULE-dependant modules should only be installed on perls with MinGW shell (like strawberry perl), or at least having gcc compiler. ".
+                        "I will continue, but this module's binary dependencies may not work."
+                    );
+                    return $code;
+                }
+                return $code unless $code;
+        
+                # remove .def-related from code, remove double DLL build, remove dll.exp from params, add export all symbols param.
+                my $DLLTOOL = $Config{dlltool} || 'dlltool';
+                my (@out, $last_ld);
+                map { $last_ld = $_ if /\$\(LD\)\s/ } split /\n/, $code;
+                foreach my $line (split /\n/, $code) {
+                    next if $line =~ /$DLLTOOL/; # drop dlltool calls (we dont need .def file)
+                    if ($line =~ /\$\(LD\)\s/) {
+                        next if $line ne $last_ld;
+                        $line =~ s/\$\(LD\)\s/\$(LD) -Wl,--export-all-symbols /;
+                        $line =~ s/\bdll\.exp\b//;
+                    }
+                    $line =~ s/\$\(EXPORT_LIST\)//g; # remove <PACKAGE>.def from target dependency
+                    push @out, $line;
+                }
+                
+                $code = join("\n", @out);
+                return $code;
+            };
+            
+            *dlsyms = sub {
+                my ($self, %attribs) = @_;
+                return '' if $gcc_compliant; # our dynamic_lib target doesn't need any .def files with gcc
+                return $self->SUPER::dlsyms(%attribs);
+            };
         };
     }
 }
@@ -840,6 +844,12 @@ sub _pkg_slash {
     my $pkg = shift;
     $pkg =~ s#::#/#g;
     return $pkg;
+}
+
+sub _pkg_last {
+    my $pkg = shift;
+    return unless $pkg =~ /([^:]+)$/;
+    return $1;
 }
 
 sub _pkg_file { return _pkg_slash(shift).'.pm'  }

@@ -62,6 +62,6 @@
          "web" : "https://github.com/brucemiller/LaTeXML"
       }
    },
-   "version" : "0.8.3",
+   "version" : "0.8.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

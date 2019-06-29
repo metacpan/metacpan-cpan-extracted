@@ -34,7 +34,7 @@
          "requires" : {
             "JSON::PP" : "0",
             "XSLoader" : "0",
-            "perl" : "5.018"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -42,6 +42,7 @@
             "Data::Dumper" : "0",
             "JSON::PP" : "0",
             "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Output" : "0",
@@ -57,6 +58,6 @@
          "web" : "https://github.com/gonzus/JavaScript-Duktape-XS"
       }
    },
-   "version" : "0.000076",
+   "version" : "0.000077",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

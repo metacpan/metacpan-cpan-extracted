@@ -1,5 +1,8 @@
 Revision history for FFI-CheckLib
 
+0.25      2019-06-25 12:27:58 -0400
+  - Add support for Alien::Base with alien option (gh#18)
+
 0.24      2019-04-27 09:14:34 -0400
   - Add try_linker_script option (gh#13, gh#15)
 

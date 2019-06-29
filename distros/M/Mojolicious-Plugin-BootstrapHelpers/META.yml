@@ -29,10 +29,10 @@ no_index:
 provides:
   Mojolicious::Plugin::BootstrapHelpers:
     file: lib/Mojolicious/Plugin/BootstrapHelpers.pm
-    version: '0.0205'
+    version: '0.0206'
   Mojolicious::Plugin::BootstrapHelpers::Helpers:
     file: lib/Mojolicious/Plugin/BootstrapHelpers/Helpers.pm
-    version: '0.0205'
+    version: '0.0206'
 requires:
   List::Util: '1.44'
   Mojolicious: '5.0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-mojolicious-plugin-bootstraphelpers/issues
   homepage: https://metacpan.org/release/Mojolicious-Plugin-BootstrapHelpers
   repository: https://github.com/Csson/p5-mojolicious-plugin-bootstraphelpers.git
-version: '0.0205'
+version: '0.0206'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -440,7 +440,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.0205'
+          tag: '0.0206'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:

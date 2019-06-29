@@ -491,7 +491,7 @@ sub add_link {
 				target="_blank">$value</a> ~
  	    }
           }
-		return qq~ <a href="http://search.cpan.org/perldoc?$value" 
+		return qq~ <a href="https://metacpan.org/pod/$value" 
 		title="Click here to see $value on CPAN [Opens in a new window]" target="_blank">$value</a> ~;
 	}
 	elsif ($type eq "config") {

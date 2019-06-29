@@ -1,9 +1,12 @@
 Revision history for String-Validator-Password
 
+2.01  June 27, 2019
+      Added test of using a coderef in a custom message.
+      Fixed error in punctuation denial.
 2.00	April 4, 2018
 	Release 2.0
-1.96    March 30, 2018 
-        Found some bugs testing, cover helped find an 
+1.96    March 30, 2018
+        Found some bugs testing, cover helped find an
         unused branch.
 1.95    March 28, 2018
         enabled support of language and message customization

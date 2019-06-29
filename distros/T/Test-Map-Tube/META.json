@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Data::Compare" : "1.25",
-            "Map::Tube" : "3.62",
+            "Map::Tube" : "3.63",
             "Test::Builder" : "1.001014",
             "perl" : "5.006"
          }
@@ -42,7 +42,7 @@
    "provides" : {
       "Test::Map::Tube" : {
          "file" : "lib/Test/Map/Tube.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/manwar/Test-Map-Tube"
       }
    },
-   "version" : "0.54",
+   "version" : "0.55",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

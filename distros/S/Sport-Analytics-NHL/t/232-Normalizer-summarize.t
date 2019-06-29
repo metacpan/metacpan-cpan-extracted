@@ -5,13 +5,13 @@ use strict;
 use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
-use Test::More tests => 1235;
+use Test::More tests => 1095;
 
 use Sport::Analytics::NHL;
 use Sport::Analytics::NHL::Normalizer;
 use Storable;
 
-my @merged = Sport::Analytics::NHL::merge({}, {data_dir => 't/data/'}, 201120010);
+my @merged = Sport::Analytics::NHL::merge({}, {reports_dir => 't/data/'}, 201120010);
 my $boxscore = retrieve $merged[0];
 my $event_summary = summarize $boxscore;
 for my $t (0,1) {

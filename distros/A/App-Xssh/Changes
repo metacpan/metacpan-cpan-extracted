@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Xssh
 
+v1.1.0 2019-06-26 (Evan Giles <EGILES@cpan.org>)
+  - Update to use Test::Compile's OO testing
+  - Update copyright
+
 v1.0.0 2013-XX-XX (Evan Giles <EGILES@cpan.org>)
   - Use Sematic Versioning
   - Update copyright for 2013

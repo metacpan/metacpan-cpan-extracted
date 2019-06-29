@@ -4,7 +4,7 @@ List::Lazy - Generate lists lazily
 
 # VERSION
 
-version 0.3.1
+version 0.3.2
 
 # SYNOPSIS
 
@@ -90,11 +90,15 @@ Creates a lazy list.
 
 ### arguments
 
-> The state will be passed to the generator as `$_`. If it is modified by the generator,
-> its new value will be saved for the next invocation.
->
-> > A coderef that generates one or more next items for the list. If it returns an empty list,
-> > the stream will be considered to be exhausted.
+- state
+
+    The state will be passed to the generator as `$_`. If it is modified by the generator,
+    its new value will be saved for the next invocation.
+
+- generator
+
+    A coderef that generates one or more next items for the list. If it returns an empty list,
+    the stream will be considered to be exhausted.
 
 ## is\_done
 
@@ -245,23 +249,7 @@ Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/y
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017, 2016 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 81:
-
-    &#x3d;over should be: '=over' or '=over positive\_number'
-
-- Around line 86:
-
-    &#x3d;over should be: '=over' or '=over positive\_number'
-
-- Around line 93:
-
-    You forgot a '=back' before '=head2'

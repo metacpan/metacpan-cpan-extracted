@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Contact;
-$Telegram::Bot::Object::Contact::VERSION = '0.010';
+$Telegram::Bot::Object::Contact::VERSION = '0.012';
 # ABSTRACT: The base class for Telegram 'Contact' objects.
 
 use Mojo::Base 'Telegram::Bot::Object::Base';
@@ -28,7 +28,7 @@ Telegram::Bot::Object::Contact - The base class for Telegram 'Contact' objects.
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 AUTHOR
 

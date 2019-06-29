@@ -18,21 +18,14 @@ use IO::Socket;
 use HTTP::Request;
 use HTTP::Response;
 use IO::Lambda qw(:all);
-use IO::Lambda::Socket qw(:all);
-
+use IO::Lambda::HTTP::Server;
 
 my $port = 8080;
-my $conn_timeout = 10;
-
-my $server = IO::Socket::INET-> new(
-	Listen    => 5,
-	LocalPort => $port,
-	Blocking  => 0,
-	ReuseAddr => 1,
-);
-die $! unless $server;
-
 $port = $ARGV[0] if $ARGV[0] && $ARGV[0] =~ /^\d+$/;
+
+my ($serv,$error) = http_server { handle( @_ ) } "localhost:$port", timeout => 5;
+die "Cannot create webserver: $error\n" unless $serv;
+
 print <<BANNER;
 Listening on port $port. Specify another port as an argument, if needed.
 Now, start your browser and go to this URL:
@@ -41,52 +34,7 @@ Now, start your browser and go to this URL:
 
 BANNER
 
-my $serv = lambda {
-	context $server;
-	accept {
-		# incoming connection
-		my $conn = shift;
-		again;
-
-		unless ( ref($conn)) {
-			warn "accept() error:$conn\n" unless ref($conn);
-			return;
-		}
-		$conn-> blocking(0);
-
-		# try to read request - GET only
-		my $buf     = '';
-		my $session = {};
-		context readbuf, $conn, \$buf, qr/^(.*?)\r\n\r\n/s, $conn_timeout;
-
-	tail {
-		my ( $match, $error) = @_;
-		unless ( defined($match)) {
-			warn "session error: $error\n";
-			return close($conn);
-		}
-
-		# handle request
-		substr( $buf, 0, length($match)) = '';
-		my $req = HTTP::Request-> parse( $match);
-		unless ( $req) {
-			print $conn "bad request\r\n";
-			return close($conn);
-		}
-	
-		if ( lc($req-> protocol) ne 'http/1.1') {
-			print $conn "404 HTTP/1.1 only\r\n";
-			return close($conn);
-		}
-
-		again;
-
-		# send response
-		my $resp = handle( $req, $session)-> as_string;
-		context writebuf, $conn, \$resp, length($resp), 0, $conn_timeout;
-		&tail();
-	}}
-};
+my $conn_timeout = 10;
 
 sub fail { HTTP::Response-> new( "HTTP/1.1 $_[0]", $_[1] ) }
 
@@ -105,6 +53,8 @@ sub handle
 		$session-> {counter}--;
 	} elsif ( $req-> uri eq '/rst') {
 		$session-> {counter} = 0;
+	} elsif ( $req-> uri eq '/stp') {
+		$serv->shutdown;
 	} else {
 		fail( 404, "Not found");
 	}
@@ -116,6 +66,7 @@ sub handle
 <a href="/inc">++</a><br>
 <a href="/dec">--</a><br>
 <a href="/rst">=0</a><br>
+<a href="/stp">exit</a><br>
 </body></html>
 
 CONTENT

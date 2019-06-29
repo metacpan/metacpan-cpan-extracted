@@ -1,12 +1,27 @@
+dnl This file is part of GNU Stow.
+dnl
+dnl GNU Stow is free software: you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl GNU Stow is distributed in the hope that it will be useful, but
+dnl WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+dnl General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program. If not, see https://www.gnu.org/licenses/.
+
 dnl Process this file with Autoconf to produce configure dnl
 
-AC_INIT([stow], [2.2.2], [bug-stow@gnu.org])
+AC_INIT([stow], [2.3.0], [bug-stow@gnu.org])
 AC_PREREQ([2.61])
 AC_CONFIG_AUX_DIR([automake])
 # Unfortunately we have to disable warnings for overrides, because we
 # need to override the built-in `check' rule and also the TEXI2DVI
 # variable.
-AM_INIT_AUTOMAKE([-Wall -Werror -Wno-override dist-bzip2])
+AM_INIT_AUTOMAKE([-Wall -Werror -Wno-override dist-bzip2 foreign])
 AC_PROG_INSTALL
 
 dnl Check for perl on our system.
@@ -84,9 +99,12 @@ EOF
 !
 ! Please (re-)read INSTALL, then install the missing modules
 ! and try again.
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 EOF
+    if test -n "$STRICT_TESTS"; then
+      exit 1
+    fi
   fi
 ]])
 AC_SUBST([PMDIR])

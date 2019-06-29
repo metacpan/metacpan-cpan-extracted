@@ -71,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-App-CalendarDatesUtils"
       }
    },
-   "version" : "0.005",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

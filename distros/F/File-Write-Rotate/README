@@ -1,7 +1,13 @@
-SYNOPSIS
+NAME
+    File::Write::Rotate - Write to files that archive/rotate themselves
 
+VERSION
+    This document describes version 0.320 of File::Write::Rotate (from Perl
+    distribution File-Write-Rotate), released on 2019-06-27.
+
+SYNOPSIS
      use File::Write::Rotate;
-    
+
      my $fwr = File::Write::Rotate->new(
          dir          => '/var/log',    # required
          prefix       => 'myapp',       # required
@@ -10,7 +16,7 @@ SYNOPSIS
          histories    => 12,            # default is 10
          #buffer_size => 100,           # default is none
      );
-    
+
      # write, will write to /var/log/myapp.log, automatically rotate old log files
      # to myapp.log.1 when myapp.log reaches 25MB. will keep old log files up to
      # myapp.log.12.
@@ -21,26 +27,23 @@ SYNOPSIS
 
      $fwr->compress;
 
-    This is usually done in a separate process, because it potentially
-    takes a long time if the files to compress are large; we are rotating
+    This is usually done in a separate process, because it potentially takes
+    a long time if the files to compress are large; we are rotating
     automatically in write() so doing automatic compression too would
     annoyingly block writer for a potentially long time.
 
 DESCRIPTION
-
     This module can be used to write to file, usually for logging, that can
     rotate itself. File will be opened in append mode. By default, locking
-    will be done to avoid conflict when there are multiple writers.
-    Rotation can be done by size (after a certain size is reached), by time
+    will be done to avoid conflict when there are multiple writers. Rotation
+    can be done by size (after a certain size is reached), by time
     (daily/monthly/yearly), or both.
 
-    I first wrote this module for logging script STDERR output to files
-    (see Tie::Handle::FileWriteRotate).
+    I first wrote this module for logging script STDERR output to files (see
+    Tie::Handle::FileWriteRotate).
 
 ATTRIBUTES
-
- buffer_size => int
-
+  buffer_size => int
     Get or set buffer size. If set to a value larger than 0, then when a
     write() failed, instead of dying, the message will be stored in an
     internal buffer first (a regular Perl array). When the number of items
@@ -50,31 +53,27 @@ ATTRIBUTES
     Can be used for example when a program runs as superuser/root then
     temporarily drops privilege to a normal user. During this period,
     logging can fail because the program cannot lock the lock file or write
-    to the logging directory. Before dropping privilege, the program can
-    set buffer_size to some larger-than-zero value to hold the messages
-    emitted during dropping privilege. The next write() as the
-    superuser/root will succeed and flush the buffer to disk (provided
-    there is no other error condition, of course).
+    to the logging directory. Before dropping privilege, the program can set
+    buffer_size to some larger-than-zero value to hold the messages emitted
+    during dropping privilege. The next write() as the superuser/root will
+    succeed and flush the buffer to disk (provided there is no other error
+    condition, of course).
 
- path => str (ro)
-
+  path => str (ro)
     Current file's path.
 
- handle => (ro)
-
+  handle => (ro)
     Current file handle. You should not use this directly, but use write()
     instead. This attribute is provided for special circumstances (e.g. in
     hooks, see example in the hook section).
 
- hook_before_write => code
-
+  hook_before_write => code
     Will be called by write() before actually writing to filehandle (but
     after locking is done). Code will be passed ($self, \@msgs, $fh) where
     @msgs is an array of strings to be written (the contents of buffer, if
     any, plus arguments passed to write()) and $fh is the filehandle.
 
- hook_before_rotate => code
-
+  hook_before_rotate => code
     Will be called by the rotating routine before actually doing rotating.
     Code will be passed ($self).
 
@@ -88,15 +87,13 @@ ATTRIBUTES
     Since this hook is indirectly called by write(), locking is already
     done.
 
- hook_after_rotate => code
-
+  hook_after_rotate => code
     Will be called by the rotating routine after the rotating process. Code
     will be passed ($self, \@renamed, \@deleted) where @renamed is array of
-    new filenames that have been renamed, @deleted is array of new
-    filenames that have been deleted.
+    new filenames that have been renamed, @deleted is array of new filenames
+    that have been deleted.
 
- hook_after_create => code
-
+  hook_after_create => code
     Will be called by after a new file is created. Code will be passed
     ($self).
 
@@ -110,217 +107,244 @@ ATTRIBUTES
     Since this is called indirectly by write(), locking is also already
     done.
 
- binmode => str
+  binmode => str
+    If set to "1", will cause the file handle to be set:
 
-    Will call binmode() (see perlfunc) on the opened file handle. With this
-    option you can set binary mode (e.g. on Windows) or set PerlIO
-    layer(s).
+     binmode $fh;
+
+    which might be necessary on some OS, e.g. Windows when writing binary
+    data. Otherwise, other defined values will cause the file handle to be
+    set:
+
+     binmode $fh, $value
+
+    which can be used to set PerlIO layer(s).
 
 METHODS
-
- $obj = File::Write::Rotate->new(%args)
-
+  $obj = File::Write::Rotate->new(%args)
     Create new object. Known arguments:
 
-      * dir => STR (required)
+    *   dir => STR (required)
 
-      Directory to put the files in.
+        Directory to put the files in.
 
-      * prefix => STR (required)
+    *   prefix => STR (required)
 
-      Name of files. The files will be named like the following:
+        Name of files. The files will be named like the following:
 
-       <prefix><period><suffix><rotate_suffix>
+         <prefix><period><suffix><rotate_suffix>
 
-      <period> will only be given if the period argument is set. If period
-      is set to yearly, <period> will be YYYY (4-digit year). If period is
-      monthly, <period> will be YYYY-MM (4-digit year and 2-digit month).
-      If period is daily, <period> will be YYYY-MM-DD (4-digit year,
-      2-digit month, and 2-digit day).
+        "<period>" will only be given if the "period" argument is set. If
+        "period" is set to "yearly", "<period>" will be "YYYY" (4-digit
+        year). If "period" is "monthly", "<period>" will be "YYYY-MM"
+        (4-digit year and 2-digit month). If "period" is "daily", "<period>"
+        will be "YYYY-MM-DD" (4-digit year, 2-digit month, and 2-digit day).
 
-      <rotate_suffix> is either empty string for current file; or .1, .2
-      and so on for rotated files. .1 is the most recent rotated file, .2
-      is the next most recent, and so on.
+        "<rotate_suffix>" is either empty string for current file; or .1, .2
+        and so on for rotated files. .1 is the most recent rotated file, .2
+        is the next most recent, and so on.
 
-      An example, with prefix set to myapp:
+        An example, with "prefix" set to "myapp":
 
-       myapp         # current file
-       myapp.1       # most recently rotated
-       myapp.2       # the next most recently rotated
+         myapp         # current file
+         myapp.1       # most recently rotated
+         myapp.2       # the next most recently rotated
 
-      With prefix set to myapp, period set to monthly, suffix set to .log:
+        With "prefix" set to "myapp", "period" set to "monthly", "suffix"
+        set to ".log":
 
-       myapp.2012-12.log     # file name for december 2012
-       myapp.2013-01.log     # file name for january 2013
+         myapp.2012-12.log     # file name for december 2012
+         myapp.2013-01.log     # file name for january 2013
 
-      Like previous, but additionally with size also set (which will also
-      rotate each period file if it exceeds specified size):
+        Like previous, but additionally with "size" also set (which will
+        also rotate each period file if it exceeds specified size):
 
-       myapp.2012-12.log     # file(s) for december 2012
-       myapp.2012-12.log.1
-       myapp.2012-12.log.2
-       myapp.2013-01.log     # file(s) for january 2013
+         myapp.2012-12.log     # file(s) for december 2012
+         myapp.2012-12.log.1
+         myapp.2012-12.log.2
+         myapp.2013-01.log     # file(s) for january 2013
 
-      All times will use local time, so you probably want to set TZ
-      environment variable or equivalent methods to set time zone.
+        All times will use local time, so you probably want to set "TZ"
+        environment variable or equivalent methods to set time zone.
 
-      * suffix => STR (default: '')
+    *   suffix => STR (default: '')
 
-      Suffix to give to file names, usually file extension like .log. See
-      prefix for more details.
+        Suffix to give to file names, usually file extension like ".log".
+        See "prefix" for more details.
 
-      If you use a yearly period, setting suffix is advised to avoid
-      ambiguity with rotate suffix (for example, is myapp.2012 the current
-      file for year 2012 or file with 2012 rotate suffix?)
+        If you use a yearly period, setting suffix is advised to avoid
+        ambiguity with rotate suffix (for example, is "myapp.2012" the
+        current file for year 2012 or file with 2012 rotate suffix?)
 
-      * size => INT (default: 10*1024*1024)
+    *   size => INT (default: 10*1024*1024)
 
-      Maximum file size, in bytes, before rotation is triggered. The
-      default is 10MB (10*1024*1024) if period is not set. If period is
-      set, no default for size is provided, which means files will not be
-      rotated for size (only for period).
+        Maximum file size, in bytes, before rotation is triggered. The
+        default is 10MB (10*1024*1024) *if* "period" is not set. If "period"
+        is set, no default for "size" is provided, which means files will
+        not be rotated for size (only for period).
 
-      * period => STR
+    *   period => STR
 
-      Can be set to either daily, monthly, or yearly. If set, will
-      automatically rotate after period change. See prefix for more
-      details.
+        Can be set to either "daily", "monthly", or "yearly". If set, will
+        automatically rotate after period change. See "prefix" for more
+        details.
 
-      * histories => INT (default: 10)
+    *   histories => INT (default: 10)
 
-      Number of rotated files to keep. After the number of files exceeds
-      this, the oldest one will be deleted. 0 means not to keep any
-      history, 1 means to only keep .1 file, and so on.
+        Number of rotated files to keep. After the number of files exceeds
+        this, the oldest one will be deleted. 0 means not to keep any
+        history, 1 means to only keep .1 file, and so on.
 
-      * buffer_size => INT (default: 0)
+    *   buffer_size => INT (default: 0)
 
-      Set initial value of buffer. See the buffer_size attribute for more
-      information.
+        Set initial value of buffer. See the "buffer_size" attribute for
+        more information.
 
-      * lock_mode => STR (default: 'write')
+    *   lock_mode => STR (default: 'write')
 
-      Can be set to either none, write, or exclusive. none disables locking
-      and increases write performance, but should only be used when there
-      is only one writer. write acquires and holds the lock for each write.
-      exclusive acquires the lock at object creation and holds it until the
-      the object is destroyed.
+        Can be set to either "none", "write", or "exclusive". "none"
+        disables locking and increases write performance, but should only be
+        used when there is only one writer. "write" acquires and holds the
+        lock for each write. "exclusive" acquires the lock at object
+        creation and holds it until the the object is destroyed.
 
-      Lock file is named <prefix>.lck. Will wait for up to 1 minute to
-      acquire lock, will die if failed to acquire lock.
+        Lock file is named "<prefix>"".lck". Will wait for up to 1 minute to
+        acquire lock, will die if failed to acquire lock.
 
-      * hook_before_write => CODE
+    *   hook_before_write => CODE
 
-      * hook_before_rotate => CODE
+    *   hook_before_rotate => CODE
 
-      * hook_after_rotate => CODE
+    *   hook_after_rotate => CODE
 
-      * hook_after_create => CODE
+    *   hook_after_create => CODE
 
-      See "ATTRIBUTES".
+        See "ATTRIBUTES".
 
-      * buffer_size => int
+    *   buffer_size => int
 
-      * rotate_probability => float (between 0 < x < 1)
+    *   rotate_probability => float (between 0 < x < 1)
 
-      If set, instruct to only check for rotation under a certain
-      probability, for example if value is set to 0.1 then will only check
-      for rotation 10% of the time.
+        If set, instruct to only check for rotation under a certain
+        probability, for example if value is set to 0.1 then will only check
+        for rotation 10% of the time.
 
- lock_file_path => STR
-
+  lock_file_path => STR
     Returns a string representing the complete pathname to the lock file,
-    based on dir and prefix attributes.
+    based on "dir" and "prefix" attributes.
 
- $fwr->write(@args)
-
+  $fwr->write(@args)
     Write to file. Will automatically rotate file if period changes or file
     size exceeds specified limit. When rotating, will only keep a specified
     number of histories and delete the older ones.
 
     Does not append newline so you'll have to do it yourself.
 
- $fwr->compress
+  $fwr->flush
+    A no-op, just so the object behaves more like a filehandle object.
 
+  $fwr->compress
     Compress old rotated files and remove the uncompressed originals.
-    Currently uses IO::Compress::Gzip to do the compression. Extension
-    given to compressed file is .gz.
+    Currently uses IO::Compress::Gzip to do the compression. Extension given
+    to compressed file is ".gz".
 
-    Will not lock writers, but will create <prefix>-compress.pid PID file
-    to prevent multiple compression processes running and to signal the
+    Will not lock writers, but will create "<prefix>""-compress.pid" PID
+    file to prevent multiple compression processes running and to signal the
     writers to postpone rotation.
 
-    After compression is finished, will remove the PID file, so rotation
-    can be done again on the next write() if necessary.
+    After compression is finished, will remove the PID file, so rotation can
+    be done again on the next "write()" if necessary.
 
 FAQ
-
- Why use autorotating file?
-
+  Why use autorotating file?
     Mainly convenience and low maintenance. You no longer need a separate
-    rotator process like the Unix logrotate utility (which when
-    accidentally disabled or misconfigured will cause your logs to stop
-    being rotated and grow indefinitely).
+    rotator process like the Unix logrotate utility (which when accidentally
+    disabled or misconfigured will cause your logs to stop being rotated and
+    grow indefinitely).
 
- What is the downside of using FWR (and LDFR)?
-
-    Mainly (significant) performance overhead. At (almost) every write(),
+  What is the downside of using FWR (and LDFR)?
+    Mainly (significant) performance overhead. At (almost) every "write()",
     FWR needs to check file sizes and/or dates for rotation. Under default
-    configuration (where lock_mode is write), it also performs locking on
-    each write() to make it safe to use with multiple processes. Below is a
-    casual benchmark to give a sense of the overhead, tested on my Core
+    configuration (where "lock_mode" is "write"), it also performs locking
+    on each "write()" to make it safe to use with multiple processes. Below
+    is a casual benchmark to give a sense of the overhead, tested on my Core
     i5-2400 3.1GHz desktop:
 
     Writing lines in the size of ~ 200 bytes, raw writing to disk (SSD) has
     the speed of around 3.4mil/s, while using FWR it goes down to around
-    ~13k/s. Using lock_mode none or exclusive, the speed is ~52k/s.
+    ~13k/s. Using "lock_mode" "none" or "exclusive", the speed is ~52k/s.
 
     However, this is not something you'll notice or need to worry about
     unless you're writing near that speed.
 
-    If you need more speed, you can try setting rotate_probability which
-    will cause FWR to only check for rotation probabilistically, e.g. if
-    you set this to 0.1 then checks will only be done in about 1 of 10
-    writes. This can significantly reduce the overhead and increase write
-    speed several times (e.g. 5-8 times), but understand that this will
-    make the writes "overflow" a bit, e.g. file sizes will exceed for a bit
-    if you do size-based rotation. More suitable if you only do size-based
-    rotation since it is usually okay to exceed sizes for a bit.
+    If you need more speed, you can try setting "rotate_probability" which
+    will cause FWR to only check for rotation probabilistically, e.g. if you
+    set this to 0.1 then checks will only be done in about 1 of 10 writes.
+    This can significantly reduce the overhead and increase write speed
+    several times (e.g. 5-8 times), but understand that this will make the
+    writes "overflow" a bit, e.g. file sizes will exceed for a bit if you do
+    size-based rotation. More suitable if you only do size-based rotation
+    since it is usually okay to exceed sizes for a bit.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Write-Rotate>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Write-Rotate>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Write-Rotate>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Log::Dispatch::FileRotate, which inspires this module. Differences
     between File::Write::Rotate (FWR) and Log::Dispatch::FileRotate (LDFR)
     are as follows:
 
-      * FWR is not part of the Log::Dispatch family.
+    *   FWR is not part of the Log::Dispatch family.
 
-      This makes FWR more general to use.
+        This makes FWR more general to use.
 
-      For using together with Log::Dispatch/Log4perl, I have also written
-      Log::Dispatch::FileWriteRotate which is a direct (although not a
-      perfect drop-in) replacement for Log::Dispatch::FileRotate.
+        For using together with Log::Dispatch/Log4perl, I have also written
+        Log::Dispatch::FileWriteRotate which is a direct (although not a
+        perfect drop-in) replacement for Log::Dispatch::FileRotate.
 
-      * Secondly, FWR does not use Date::Manip.
+    *   Secondly, FWR does not use Date::Manip.
 
-      Date::Manip is relatively large (loading Date::Manip 6.37 equals to
-      loading 34 files and ~ 22k lines; while FWR itself is only < 1k
-      lines!)
+        Date::Manip is relatively large (loading Date::Manip 6.37 equals to
+        loading 34 files and ~ 22k lines; while FWR itself is only < 1k
+        lines!)
 
-      As a consequence of this, FWR does not support DatePattern; instead,
-      FWR replaces it with a simple daily/monthly/yearly period.
+        As a consequence of this, FWR does not support DatePattern; instead,
+        FWR replaces it with a simple daily/monthly/yearly period.
 
-      * And lastly, FWR supports compressing and rotating compressed old
-      files.
+    *   And lastly, FWR supports compressing and rotating compressed old
+        files.
 
-      Using separate processes like the Unix logrotate utility means having
-      to deal with yet another race condition. FWR takes care of that for
-      you (see the compress() method). You also have the option to do file
-      compression in the same script/process if you want, which is
-      convenient.
+        Using separate processes like the Unix logrotate utility means
+        having to deal with yet another race condition. FWR takes care of
+        that for you (see the compress() method). You also have the option
+        to do file compression in the same script/process if you want, which
+        is convenient.
 
-    There is no significant overhead difference between FWR and LDFR (FWR
-    is slightly faster than LDFR on my testing).
+    There is no significant overhead difference between FWR and LDFR (FWR is
+    slightly faster than LDFR on my testing).
 
     Tie::Handle::FileWriteRotate and Log::Dispatch::FileWriteRotate, which
     use this module.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

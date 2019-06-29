@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use base 'Module::Build';
 
-use Try::Tiny;
 use ExtUtils::PkgConfig;
 
 sub new {

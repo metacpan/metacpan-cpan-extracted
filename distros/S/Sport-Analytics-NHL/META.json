@@ -26,6 +26,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "BSON::OID" : "v1.8.1",
             "File::Touch" : "0",
             "MongoDB" : "v1.6.0"
          },
@@ -33,9 +34,11 @@
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Date::Calc" : "6.4",
+            "Date::Format" : "2.24",
             "Date::Parse" : "2.27",
             "Encode" : "2.49",
             "File::Basename" : "0",
+            "File::Copy" : "0",
             "File::Find" : "0",
             "File::Path" : "0",
             "Getopt::Long" : "0",
@@ -44,12 +47,14 @@
             "LWP::Protocol::https" : "5.837",
             "LWP::Simple" : "5.837",
             "List::MoreUtils" : "0.22",
+            "List::Util" : "1",
             "Module::Pluggable" : "5.2",
             "POSIX" : "0",
             "Storable" : "0",
             "Text::Unidecode" : "1.30",
             "Tie::IxHash" : "1.23",
             "Time::HiRes" : "1.9721",
+            "Time::Local" : "1.25",
             "Try::Tiny" : "0.27",
             "boolean" : "v0.28.4",
             "experimental" : "0.016",
@@ -60,7 +65,7 @@
    "provides" : {
       "Sport::Analytics::NHL" : {
          "file" : "lib/Sport/Analytics/NHL.pm",
-         "version" : "1.40"
+         "version" : "1.51"
       },
       "Sport::Analytics::NHL::Config" : {
          "file" : "lib/Sport/Analytics/NHL/Config.pm"
@@ -71,6 +76,9 @@
       "Sport::Analytics::NHL::Errors" : {
          "file" : "lib/Sport/Analytics/NHL/Errors.pm"
       },
+      "Sport::Analytics::NHL::Generator" : {
+         "file" : "lib/Sport/Analytics/NHL/Generator.pm"
+      },
       "Sport::Analytics::NHL::LocalConfig" : {
          "file" : "lib/Sport/Analytics/NHL/LocalConfig.pm"
       },
@@ -79,6 +87,9 @@
       },
       "Sport::Analytics::NHL::Normalizer" : {
          "file" : "lib/Sport/Analytics/NHL/Normalizer.pm"
+      },
+      "Sport::Analytics::NHL::PenaltyAnalyzer" : {
+         "file" : "lib/Sport/Analytics/NHL/PenaltyAnalyzer.pm"
       },
       "Sport::Analytics::NHL::Populator" : {
          "file" : "lib/Sport/Analytics/NHL/Populator.pm"
@@ -107,6 +118,15 @@
       "Sport::Analytics::NHL::Report::RO" : {
          "file" : "lib/Sport/Analytics/NHL/Report/RO.pm"
       },
+      "Sport::Analytics::NHL::Report::TH" : {
+         "file" : "lib/Sport/Analytics/NHL/Report/TH.pm"
+      },
+      "Sport::Analytics::NHL::Report::TI" : {
+         "file" : "lib/Sport/Analytics/NHL/Report/TI.pm"
+      },
+      "Sport::Analytics::NHL::Report::TV" : {
+         "file" : "lib/Sport/Analytics/NHL/Report/TV.pm"
+      },
       "Sport::Analytics::NHL::Scraper" : {
          "file" : "lib/Sport/Analytics/NHL/Scraper.pm"
       },
@@ -121,9 +141,12 @@
       },
       "Sport::Analytics::NHL::Util" : {
          "file" : "lib/Sport/Analytics/NHL/Util.pm"
+      },
+      "Sport::Analytics::NHL::Vars" : {
+         "file" : "lib/Sport/Analytics/NHL/Vars.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "1.40",
+   "version" : "1.51",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

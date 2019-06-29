@@ -212,6 +212,7 @@ background-repeat: $bg_repeat;
 background-attachment: $bg_attribute;  
 color: $ft_color;
 }
+#perlinfo table { margin: 0 auto; }
 #perlinfo td, th, h1, h2 {font-family: $ft_family;}
 #perlinfo pre {margin: 0px; font-family: monospace;}
 #perlinfo a:link {color: $lk_color; text-decoration: $lk_decoration; background-color: $lk_bgcolor;}

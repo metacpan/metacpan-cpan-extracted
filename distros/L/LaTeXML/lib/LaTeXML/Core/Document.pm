@@ -44,9 +44,9 @@ sub new {
   my $doc = XML::LibXML::Document->new("1.0", "UTF-8");
   # We'll set the DocType when the 1st Element gets added.
   return bless { document => $doc, node => $doc, model => $model,
-    idstore => {}, labelstore => {},
+    idstore    => {}, labelstore => {},
     node_fonts => {}, node_boxes => {}, node_properties => {},
-    pending => [], progress => 0 }, $class; }
+    pending    => [], progress   => 0 }, $class; }
 
 #**********************************************************************
 # Basic Accessors
@@ -96,7 +96,7 @@ sub getElement {
 # Get the child elements of the given $node
 sub getChildElements {
   my ($self, $node) = @_;
-  return grep { $_->nodeType == XML_ELEMENT_NODE } $node->childNodes; }
+  return (!$node ? () : grep { $_->nodeType == XML_ELEMENT_NODE } $node->childNodes); }
 
 # Get the last element node (if any) in $node
 sub getLastChildElement {
@@ -120,10 +120,10 @@ sub getFirstChildElement {
 # get the second element node (if any) in $node
 sub getSecondChildElement {
   my ($self, $node) = @_;
-  my $first_child = $self->getFirstChildElement($node);
+  my $first_child  = $self->getFirstChildElement($node);
   my $second_child = $first_child && $first_child->nextSibling;
   while ($second_child && $second_child->nodeType != XML_ELEMENT_NODE) {
-      $second_child = $second_child->nextSibling; }
+    $second_child = $second_child->nextSibling; }
   return $second_child; }
 
 # Find the nodes according to the given $xpath expression,
@@ -144,7 +144,7 @@ sub findnode {
 # NOTE: Should Deprecate! (use model)
 sub getNodeQName {
   my ($self, $node) = @_;
-  return $$self{model}->getNodeQName($node); }
+  return $node && $$self{model}->getNodeQName($node); }
 
 #**********************************************************************
 # Extensions of Model.
@@ -271,7 +271,7 @@ sub getTagActionList {
     (($v = $$taghash{$when1}) ? @$v : ()),
     (($v = $$nshash{$when1})  ? @$v : ()),
     (($v = $$allhash{$when1}) ? @$v : ()),
-    ); }
+  ); }
 
 #**********************************************************************
 # This is a diagnostic tool that MIGHT help locate XML::LibXML bugs;
@@ -364,11 +364,11 @@ sub finalize {
 
 sub finalize_rec {
   my ($self, $node) = @_;
-  my $model               = $$self{model};
-  my $qname               = $model->getNodeQName($node);
+  my $model = $$self{model};
+  my $qname = $model->getNodeQName($node);
   # _standalone_font is typically for metadata that gets extracted out of context
-  my $declared_font       = ($node->getAttribute('_standalone_font')
-			     ? LaTeXML::Common::Font->textDefault : $LaTeXML::FONT);
+  my $declared_font = ($node->getAttribute('_standalone_font')
+    ? LaTeXML::Common::Font->textDefault : $LaTeXML::FONT);
   my $desired_font        = $LaTeXML::FONT;
   my %pending_declaration = ();
   if (my $comment = $node->getAttribute('_pre_comment')) {
@@ -382,12 +382,19 @@ sub finalize_rec {
     if (($node->hasChildNodes || $node->getAttribute('_force_font'))
       && scalar(keys %pending_declaration)) {
       foreach my $attr (keys %pending_declaration) {
+        # Add (or combine, for @class) the attributes to the current node.
         if ($model->canHaveAttribute($qname, $attr)) {
-          $self->setAttribute($node, $attr => $pending_declaration{$attr}{value});
+          my $value = $pending_declaration{$attr}{value};
+          if ($attr eq 'class') {    # Generalize?
+            if (my $ovalue = $node->getAttribute('class')) {
+              $value .= ' ' . $ovalue; } }
+          $self->setAttribute($node, $attr => $value);
+
           # Merge to set the font currently in effect
           $declared_font = $declared_font->merge(%{ $pending_declaration{$attr}{properties} });
           delete $pending_declaration{$attr}; } }
-    } }
+  } }
+
   local $LaTeXML::FONT = $declared_font;
   foreach my $child ($node->childNodes) {
     my $type = $child->nodeType;
@@ -404,19 +411,26 @@ sub finalize_rec {
     }
     # On the other hand, if the font declaration has NOT been effected,
     # We'll need to put an extra wrapper around the text!
+    # This is usually ltx:text, but Font information can override this (eg. for \emph)
     elsif ($type == XML_TEXT_NODE) {
       # Remove any pending declarations that can't be on $FONT_ELEMENT_NAME
+      my $elementname = $pending_declaration{element}{value} || $FONT_ELEMENT_NAME;
       foreach my $key (keys %pending_declaration) {
-        delete $pending_declaration{$key} unless $self->canHaveAttribute($FONT_ELEMENT_NAME, $key); }
-      if ($self->canContain($qname, $FONT_ELEMENT_NAME)
+        delete $pending_declaration{$key} unless $self->canHaveAttribute($elementname, $key); }
+      if ($self->canContain($qname, $elementname)
         && scalar(keys %pending_declaration)) {
         # Too late to do wrapNodes?
-        my $text = $self->wrapNodes($FONT_ELEMENT_NAME, $child);
+        my $text = $self->wrapNodes($elementname, $child);
+        # Add (or combine) attributes
         foreach my $attr (keys %pending_declaration) {
-          $self->setAttribute($text, $attr => $pending_declaration{$attr}{value}); }
+          my $value = $pending_declaration{$attr}{value};
+          if ($attr eq 'class') {    # Generalize?
+            if (my $ovalue = $text->getAttribute('class')) {
+              $value .= ' ' . $ovalue; } }
+          $self->setAttribute($text, $attr => $value); }
         $self->finalize_rec($text);    # Now have to clean up the new node!
       }
-    } }
+  } }
 
   # Attributes that begin with (the semi-legal) "_" are for Bookkeeping.
   # Remove them now.
@@ -457,7 +471,7 @@ sub serialize_aux {
     my $tag      = $model->getNodeDocumentQName($node);
     my @children = $node->childNodes;
     # since we're pretty-printing, we _could_ wrap attributes to nominal line length!
-    my @anodes = $node->attributes;
+    my @anodes  = $node->attributes;
     my %nsnodes = map { $model->getNodeDocumentQName($_) => serialize_attr($_->nodeValue) }
       grep { $_->nodeType == XML_NAMESPACE_DECL } @anodes;
     my %atnodes = map { $model->getNodeDocumentQName($_) => serialize_attr($_->nodeValue) }
@@ -663,7 +677,7 @@ sub insertPI {
   my @keys = ((map { ($attrib{$_} ? ($_) : ()) } qw(class package options)),
     (grep { $_ !~ /^(?:class|package|options)$/ } sort keys %attrib));
   my $data = join(' ', map { $_ . "=\"" . ToString($attrib{$_}) . "\"" } @keys);
-  my $pi = $$self{document}->createProcessingInstruction($op, $data);
+  my $pi   = $$self{document}->createProcessingInstruction($op, $data);
   $self->closeText_internal;    # Close any open text node
   if ($$self{node}->nodeType == XML_DOCUMENT_NODE) {
     push(@{ $$self{pending} }, $pi); }
@@ -697,6 +711,11 @@ sub openText {
   print STDERR "Insert text \"$text\" /" . Stringify($font) . " at " . Stringify($node) . "\n"
     if $LaTeXML::Core::Document::DEBUG;
 
+  # Get the desired font attributes, particularly the desired element
+  # (usually ltx:text, but let Font override, eg for \emph)
+  my $declared_font       = $self->getNodeFont($node);
+  my %pending_declaration = $font->relativeTo($declared_font);
+  my $elementname         = $pending_declaration{element}{value} || $FONT_ELEMENT_NAME;
   if (($t != XML_DOCUMENT_NODE)    # If not at document begin
     && !(($t == XML_TEXT_NODE) &&    # And not appending text in same font.
       ($font->distance($self->getNodeFont($node->parentNode)) == 0))) {
@@ -706,16 +725,14 @@ sub openText {
     my $n = $node;
     while ($n->nodeType != XML_DOCUMENT_NODE) {
       my $d = $font->distance($self->getNodeFont($n));
-     #print STDERR "Font Compare: ".Stringify($n)." w/font=".Stringify($self->getNodeFont($n))." ==>$d\n";
-
       if ($d < $bestdiff) {
         $bestdiff = $d;
         $closeto  = $n;
         last if ($d == 0); }
-      last if ($$self{model}->getNodeQName($n) ne $FONT_ELEMENT_NAME) || $n->getAttribute('_noautoclose');
+      last if ($$self{model}->getNodeQName($n) ne $elementname) || $n->getAttribute('_noautoclose');
       $n = $n->parentNode; }
     $self->closeToNode($closeto) if $closeto ne $node;    # Move to best starting point for this text.
-    $self->openElement($FONT_ELEMENT_NAME, font => $font, _fontswitch => 1) if $bestdiff > 0; # Open if needed.
+    $self->openElement($elementname, font => $font, _fontswitch => 1) if $bestdiff > 0; # Open if needed.
   }
   # Finally, insert the darned text.
   my $tnode = $self->openText_internal($text);
@@ -938,15 +955,8 @@ sub getInsertionCandidates {
   my $isCapture = $first && ($first->localname || '') eq '_Capture_';
   push(@nodes, $first) if $first && $first->getType != XML_DOCUMENT_NODE && !$isCapture;
   # Collect previous siblings, if node is a text node.
-  if ($node->getType == XML_TEXT_NODE) {
-    my $n = $node;
-    while ($n) {
-      if (($n->localname || '') eq '_Capture_') {
-        push(@nodes, element_nodes($n)); }
-      else {
-        push(@nodes, $n); }
-      $n = $n->previousSibling; }
-    $node = $node->parentNode; }
+  # OR if it is a effectively a text node (ltx:para/ltx:p/text)!!!
+  my $do_sibs = $node->getType == XML_TEXT_NODE;
   # Now collect (element) node & ancestors
   while ($node && ($node->nodeType != XML_DOCUMENT_NODE)) {
     my $n = $node;
@@ -954,7 +964,14 @@ sub getInsertionCandidates {
       push(@nodes, element_nodes($node)); }
     else {
       push(@nodes, $node); }
-    $node = $node->parentNode; }
+    if ($do_sibs && ($n = $node->previousSibling)) {
+      $node = $n;
+    }
+    else {
+      $node = $node->parentNode;
+      my $t = $node->localname || '';
+      $do_sibs = 0 unless ($t eq 'p') || ($t eq 'para');
+  } }
   push(@nodes, $first) if $isCapture;
   return @nodes; }
 
@@ -1012,7 +1029,7 @@ sub floatToAttribute {
 sub floatToLabel {
   my ($self) = @_;
   my $key = 'labels';
-  my @ancestors = grep { $_->nodeType == XML_ELEMENT_NODE } getInsertionCandidates($$self{node});
+  my @ancestors  = grep { $_->nodeType == XML_ELEMENT_NODE } getInsertionCandidates($$self{node});
   my @candidates = @ancestors;
   # Should we only accept a node that already has an id, or should we create an id?
   while (@candidates
@@ -1078,7 +1095,7 @@ sub applyMathLigatures {
       foreach my $ligature (@ligatures) {
         if ($self->applyMathLigature($node, $ligature)) {
           @ligatures = grep { $_ ne $ligature } @ligatures;
-          $matched = 1;
+          $matched   = 1;
           last; } }
       return unless $matched; } }
   return; }
@@ -1452,8 +1469,10 @@ sub mergeNodeFontRec {
 
 sub getNodeFont {
   my ($self, $node) = @_;
-  my $t = $node->nodeType;
-  return (($t == XML_ELEMENT_NODE) && $$self{node_fonts}{ $node->getAttribute('_font') })
+  my $t;
+  while ($node && (($t = $node->nodeType) != XML_ELEMENT_NODE)) {
+    $node = $node->parentNode; }
+  return ($node && ($t == XML_ELEMENT_NODE) && $$self{node_fonts}{ $node->getAttribute('_font') })
     || LaTeXML::Common::Font->textDefault(); }
 
 sub getNodeLanguage {
@@ -1524,7 +1543,7 @@ sub openElementAt {
   my ($ns, $tag) = $$self{model}->decodeQName($qname);
   my $newnode;
   my $font = $attributes{_font} || $attributes{font};
-  my $box = $attributes{_box};
+  my $box  = $attributes{_box};
   $box = $$self{node_boxes}{$box} if $box && !ref $box;    # may already be the string key
          # If this will be the document root node, things are slightly more involved.
   if ($point->nodeType == XML_DOCUMENT_NODE) {    # First node! (?)
@@ -1538,7 +1557,7 @@ sub openElementAt {
   # If there is a default namespace (no prefix), that will also be declared, and applied here.
   # However, if there is ALSO a prefix associated with that namespace, we have to declare it FIRST
   # due to the (apparently) buggy way that XML::LibXML works with namespaces in setAttributeNS.
-      my $prefix = $$self{model}->getDocumentNamespacePrefix($ns);
+      my $prefix    = $$self{model}->getDocumentNamespacePrefix($ns);
       my $attprefix = $$self{model}->getDocumentNamespacePrefix($ns, 1, 1);
       if (!$prefix && $attprefix) {
         $newnode->setNamespace($ns, $attprefix, 0); }
@@ -1707,7 +1726,7 @@ sub renameNode {
   my $model = $$self{model};
   my ($ns, $tag) = $model->decodeQName($newname);
   my $parent = $node->parentNode;
-  my $new = $self->openElement_internal($parent, $ns, $tag);
+  my $new    = $self->openElement_internal($parent, $ns, $tag);
   my $id;
   # Move to the position AFTER $node
   $parent->insertAfter($new, $node);
@@ -1764,7 +1783,7 @@ sub appendTree {
     elsif ((ref $child) =~ /^XML::LibXML::/) {
       my $type = $child->nodeType;
       if ($type == XML_ELEMENT_NODE) {
-        my $tag = $self->getNodeQName($child);
+        my $tag        = $self->getNodeQName($child);
         my %attributes = map { $_->nodeType == XML_ATTRIBUTE_NODE ? ($_->nodeName => $_->getValue) : () }
           $child->attributes;
         # DANGER: REMOVE the xml:id attribute from $child!!!!

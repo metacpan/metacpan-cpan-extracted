@@ -76,9 +76,14 @@
 ^autom4te\.cache/.+$
 ^config\.(log|status)$
 ^doc/\.dirstamp$
+^doc/manual-single-old-texi2html\.html
+^doc/manual-single-texi2html-wrapper\.html
 ^doc/manual-split/
 ^doc/stamp-vti$
 ^doc/HOWTO-RELEASE$
 
 # Avoid test files
 tmp-testing-trees
+.travis.yml
+^docker/
+^[a-zA-Z]*-docker.sh

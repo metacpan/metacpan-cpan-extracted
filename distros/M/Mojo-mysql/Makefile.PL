@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'DBD::mysql' => '4.042',
+  'DBI' => '1.627',
   'Mojolicious' => '8.03',
   'SQL::Abstract' => '1.86'
 }

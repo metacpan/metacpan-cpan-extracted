@@ -3,9 +3,9 @@ NAME
     interface from consumer's $CALENDAR
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.004 of
     Calendar::DatesRoles::DataUser::CalendarVar (from Perl distribution
-    Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-05-25.
+    Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-06-20.
 
 DESCRIPTION
     This role provides Calendar::Dates interface to consumer that has
@@ -16,10 +16,76 @@ DESCRIPTION
     Required keys include: "date". "year", "month", "day" keys required by
     Calendar::Dates will be taken from "date" to let you be DRY.
 
+    Aside from ISO8601 date in the form of "YYYY-MM-DD" or
+    "YYYY-MM-DD"T"HH:MM", or date interval in the form of
+    "YYYY-MM-DD"T"HH:MM/HH:MM", the "date" can also be a date-without-year
+    in the form of "--MM-DD" or "MM-DD", or repeating date interval in the
+    form of "<R/YYYY-MM-DD/P1Y">. These are to let you specify anniversaries
+
+    Example anniversary without starting year:
+
+     {
+         summary => "Christmas day",
+         date => "12-25", # or "--12-25"
+     }
+
+    (When returned from "get_entries", the date will be converted to
+    "YYYY-MM-DD" format.)
+
+    Example anniversary with starting year:
+
+     {
+         summary => "Larry Wall's birthday",
+         date => "R/1954-09-27/P1Y",
+     }
+
+    (When returned from "get_entries", the date will be converted to
+    "YYYY-MM-DD" format. Summary will become e.g. for 2019 "Larry Wall's
+    birthday (65th anniversary)".)
+
+  Anniversaries
+    To mark an entry as an anniversary without starting year, you can set
+    date to "MM-DD" or "--MM-DD" as previously explained.
+
+    To mark an entry as an anniversary with starting year, you can either:
+    1) set date to "R/YYYY-MM-DD/P1Y"; or 2) include "anniversary" tag.
+
 METHODS
   get_min_year
+    Only years from non-anniversary dates are accounted for when determining
+    min_year and max_year. But if there are no non-anniversary dates in the
+    calendar, then the years from anniversaries will also be used.
+
   get_max_year
+    Only years from non-anniversary dates are accounted for when determining
+    min_year and max_year. But if there are no non-anniversary dates in the
+    calendar, then the years from anniversaries will also be used.
+
   get_entries
+    Usage:
+
+     $entries = $caldate->get_entries([ \%params , ] $year [ , $month [ , $day ] ]);
+
+    Only entries from matching year will be used, unless for anniversary
+    entries.
+
+    By default, low-priority entries will not be included unless the
+    parameter "all" is set to true.
+
+    Recognized parameters.
+
+    *   all
+
+        Boolean. Specified in Calendar::Dates.
+
+    *   include_tags
+
+        Array. Specified in Calendar::Dates.
+
+    *   exclude_tags
+
+        Array. Specified in Calendar::Dates.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Calendar-DatesRoles-DataUser-CalendarVar>.
@@ -40,7 +106,9 @@ BUGS
 SEE ALSO
     Calendar::Dates
 
-    Calendar::DatesRoles::FromData
+    Calendar::DatesRoles::DataProvider::CalendarVar::FromDATA::Simple
+
+    Calendar::DatesRoles::DataProvider::CalendarVar::FromDATA::CSVJF
 
 AUTHOR
     perlancar <perlancar@cpan.org>

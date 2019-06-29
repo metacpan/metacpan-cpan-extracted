@@ -1,4 +1,4 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -67,8 +67,10 @@ foreach my $r (@redi){
 
     ok(grep { $_ eq $rand } qw/foo bar baz/, 'random returned one of our keys');
 
-    like exception { $r->rename('foo', 'foo') }, qr/^\Q[rename] ERR source and destination objects are the same\E/,
-        'rename with identical source and dest returns false';
+    # commenting this out as 'Before Redis 3.2.0, an error is returned if source and destination names are the same'
+    # modern versions don't return an error
+    # like exception { $r->rename('foo', 'foo') }, qr/^\Q[rename] ERR source and destination objects are the same\E/,
+    #     'rename with identical source and dest returns false';
 
     like exception { $r->rename('quizlebub', 'foo') }, qr/^\Q[rename] ERR no such key\E/,
          "rename with source that doesn't exist returns false";
@@ -91,7 +93,7 @@ foreach my $r (@redi){
     is( $r->get('newfoo2'), 'foobar', 'renamenx worked');
 
     is($r->ttl('newfoo2'), -1, 'ttl for key with no timeout is -1');
-    is($r->ttl('quizlebub'), -1, "ttl for key that doesn't exist is -1");
+    is($r->ttl('quizlebub'), -2, "ttl for key that doesn't exist is -2");
 
     $r->expire('newfoo2', 3);
     ok($r->ttl('newfoo2') >= 2, 'ttl for newfoo2 is at least 2');

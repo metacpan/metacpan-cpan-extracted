@@ -4,7 +4,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 # VERSION
 
-version 1.3.1
+version 1.3.2
 
 # SYNOPSIS
 
@@ -347,7 +347,7 @@ The [Parse::RecDescent](https://metacpan.org/pod/Parse::RecDescent) grammar used
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

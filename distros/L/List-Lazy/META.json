@@ -4,7 +4,7 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,7 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Warn" : "0",
+            "blib" : "1.01",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -56,7 +57,7 @@
    "provides" : {
       "List::Lazy" : {
          "file" : "lib/List/Lazy.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.2"
       }
    },
    "release_status" : "stable",
@@ -71,14 +72,18 @@
          "web" : "https://github.com/yanick/List-Lazy"
       }
    },
-   "version" : "0.3.1",
+   "version" : "0.3.2",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Yanick Champoux <yanick@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

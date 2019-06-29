@@ -1,7 +1,7 @@
 package Bread::Board::Dumper;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Pretty printer for visualizing the layout of your Bread::Board
-$Bread::Board::Dumper::VERSION = '0.36';
+$Bread::Board::Dumper::VERSION = '0.37';
 use Moose;
 
 sub dump {
@@ -72,7 +72,7 @@ Bread::Board::Dumper - Pretty printer for visualizing the layout of your Bread::
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

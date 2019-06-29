@@ -7,6 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   JSON::PP: '0'
   Path::Tiny: '0'
+  Scalar::Util: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::Output: '0'
@@ -28,8 +29,8 @@ no_index:
 requires:
   JSON::PP: '0'
   XSLoader: '0'
-  perl: '5.018'
+  perl: '5.014'
 resources:
   repository: https://github.com/gonzus/JavaScript-Duktape-XS
-version: '0.000076'
+version: '0.000077'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

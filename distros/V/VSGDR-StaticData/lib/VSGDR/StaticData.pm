@@ -23,11 +23,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 
 sub databaseName {
@@ -699,6 +699,7 @@ sub generateTestDataScript {
 
     my $ra_data     = getTestDataForTable($dbh,$quotedCombinedName,\@cols,$sql);
 
+#warn Dumper $ra_data;    
 #warn Dumper $$ra_data[0];    
 #warn Dumper @cols;
 #warn Dumper @$ra_metadata;
@@ -878,15 +879,32 @@ sub getTestDataForTable {
     my $combinedName = shift or croak 'no table' ;
     my $cols         = shift or croak 'no cols list' ;
     my $sql          = shift or croak 'no sql' ;
-#warn Dumper "COLS = ", $cols;
-#my @cols = map {$_ => 1 } @$cols;
-#warn Dumper getCurrentTableDataSQL($combinedName,$pkCol,$cols);
 
+#warn Dumper "SQL  = ", $sql;    
+#warn Dumper "COLS = ", $cols;
+my %cols = map {$_ => 1 } @$cols;
+#warn Dumper getCurrentTableDataSQL($combinedName,$pkCol,$cols);
+#warn Dumper %cols;
     my $sth2 = $dbh->prepare($sql);
     my $rs   = $sth2->execute();
-    my $res  = $sth2->fetchall_arrayref($cols) ;
+#    my $res  = $sth2->fetchall_arrayref() ;
+    my $res  = $sth2->fetchall_arrayref(\%cols) ;
 
-    return $res ;
+#warn Dumper $res;
+my @res2 = ();
+my $li=0;
+foreach my $row (@$res) {
+    
+#warn Dumper $row;
+    my $ci = 0;
+    foreach my $c (@$cols) {
+       $res2[$li][$ci] = $$row{$c};
+       $ci++;
+    }
+    $li++;
+    }
+#warn Dumper \@res2;
+    return \@res2 ;
 
 }
 

@@ -102,7 +102,7 @@ es-apply-settings.pl - Run to apply a JSON list of settings to indexes matching 
 
 =head1 VERSION
 
-version 6.9
+version 7.0
 
 =head1 SYNOPSIS
 
@@ -138,6 +138,7 @@ See also the "CONNECTION ARGUMENTS" and "INDEX SELECTION ARGUMENTS" sections fro
 From CLI::Helpers:
 
     --data-file         Path to a file to write lines tagged with 'data => 1'
+    --tags              A comma separated list of tags to display
     --color             Boolean, enable/disable color, default use git settings
     --verbose           Incremental, increase verbosity (Alias is -v)
     --debug             Show developer output
@@ -147,6 +148,9 @@ From CLI::Helpers:
     --syslog-facility   Default "local0"
     --syslog-tag        The program name, default is the script name
     --syslog-debug      Enable debug messages to syslog if in use, default false
+    --nopaste           Use App::Nopaste to paste output to configured paste service
+    --nopaste-public    Defaults to false, specify to use public paste services
+    --nopaste-service   Comma-separated App::Nopaste service, defaults to Shadowcat
 
 =head1 DESCRIPTION
 

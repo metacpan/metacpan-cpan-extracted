@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2016 IP2Location.com
+# Copyright (C) 2005-2019 IP2Location.com
 # All Rights Reserved
 #
 # This library is free software: you can redistribute it and/or
@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '8.04';
+$VERSION = '8.10';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -587,11 +587,16 @@ sub get_ipv6_record {
 	my $ipto = 0;
 	my $ipno = 0;
 
-	if ($realipno == MAX_IPV6_RANGE) {
-		$ipno = $realipno - 1;
-	} else {
-		$ipno = $realipno;
+	$ipno = $realipno;
+	if ($realipno == "340282366920938463463374607431768211455") {
+		$ipno = $ipno->bsub(1);
 	}
+
+	#if ($realipno == MAX_IPV6_RANGE) {
+	#	$ipno = $realipno - 1;
+	#} else {
+	#	$ipno = $realipno;
+	#}
 
 	while ($low <= $high) {
 		$mid = int(($low + $high)/2);
@@ -1115,8 +1120,8 @@ sub validate_ip {
 		$ipnum = $obj->ip2no($ip);
 	} else {
 		#expand ipv6 address
-		$ip = $obj->expand_ipv6_address($ip);
 		if ($obj->ip_is_ipv6($ip)) {
+			$ip = $obj->expand_ipv6_address($ip);
 			#ipv6 address
 			$ipv = 6;
 			$ipnum = $obj->hex2int($ip);
@@ -1126,6 +1131,26 @@ sub validate_ip {
 				$ipv = 4;
 				$ipnum = $ipnum - 281470681743360;
 			}
+
+			#reformat 6to4 address to ipv4 address 2002:: to 2002:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
+			if (($ipnum >= 42545680458834377588178886921629466624) && ($ipnum <= 42550872755692912415807417417958686719)) {
+				$ipv = 4;
+				#bitshift right 80 bits
+				$ipnum->brsft(80);
+				#bitwise modulus to get the last 32 bit
+				$ipnum->bmod(4294967296); 
+			}
+
+			#reformat Teredo address to ipv4 address 2001:0000:: to 2001:0000:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:
+			if (($ipnum >= 42540488161975842760550356425300246528) && ($ipnum <= 42540488241204005274814694018844196863)) {
+				$ipv = 4;
+				$ipnum = Math::BigInt->new($ipnum);
+				#bitwise not to invert binary
+				$ipnum->bnot();
+				#bitwise modulus to get the last 32 bit
+				$ipnum->bmod(4294967296); 
+			}
+
 		} else {
 			#not IPv4 and IPv6
 		}
@@ -1210,7 +1235,12 @@ sub name2ip {
     $ip_address = $host;
   } else {
   	# TO_DO: Can we return IPv6 address too?
-    $ip_address = join('.', unpack('C4',(gethostbyname($host))[4]));
+  	my @hostname = gethostbyname($host);
+  	if ($#hostname < 4) {
+  		$ip_address = $host;
+  	} else {
+  		$ip_address = join('.', unpack('C4', $hostname[4]));
+  	}
   }
   return $ip_address;
 }
@@ -1228,7 +1258,7 @@ sub ip_is_ipv4 {
 sub ip_is_ipv6 {
 	my $obj = shift(@_);
 	my $ip = shift(@_);
-	if (($ip =~ m/^$IPv6_re$/) || ($ip =~ m/^$IPv4_re$/)) {
+	if (($ip =~ m/^$IPv6_re$/) || ($ip =~ m/^$IPv4_re$/) || ($ip =~ m/^\:\:$/)) {
 		return 1;
 	} else {
 		return 0;
@@ -1249,7 +1279,7 @@ Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP cod
 
 	my $dbversion = $obj->get_database_version();
 	my $moduleversion = $obj->get_module_version();
-	my $countryshort = $obj->get_country_short("20.11.187.239");
+	my $countryshort = $obj->get_country_short("2001:1000:0000:0000:0000:0000:0000:0000");
 	my $countrylong = $obj->get_country_long("20.11.187.239");
 	my $region = $obj->get_region("20.11.187.239");
 	my $city = $obj->get_city("20.11.187.239");
@@ -1276,7 +1306,7 @@ Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP cod
 
 =head1 DESCRIPTION
 
-This Perl module provides fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation and usage type from IP address using IP2Location database. This module uses a file based .BIN database available at http://www.ip2location.com upon subscription. This database contains IP blocks as keys and other information as values. It supports IP address in IPv4 or IPv6.
+This Perl module provides fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation and usage type from IP address using IP2Location database. This module uses a file based BIN database available at L<IP2Location Product Page|https://www.ip2location.com/database/ip2location> upon subscription. You can visit L<Libraries|https://www.ip2location.com/development-libraries> to download BIN sample files. This database consists of IP address as keys and other information as values. It supports all IP addresses in IPv4 and IPv6.
 
 This module can be used in many types of project such as:
 
@@ -1292,13 +1322,13 @@ This module can be used in many types of project such as:
 
 The complete IPv4 and IPv6 database are available at:
 
-L<IP2Location Product Page|http://www.ip2location.com/>
+L<IP2Location Product Page|https://www.ip2location.com/database/ip2location>
 
 The database will be updated in monthly basis for greater accuracy.
 
 Free IP2Location LITE database is also available at:
 
-L<IP2Location LITE Page|http://lite.ip2location.com/>
+L<IP2Location LITE Page|https://lite.ip2location.com/>
 
 =head1 CLASS METHODS
 
@@ -1320,7 +1350,7 @@ Returns the ISO 3166 country code of IP address or domain name. Returns "-" for 
 
 =item $countrylong = $obj->get_country_long( $ip );
 
-Returns the full country name of IP address or domain name.  Returns "-" for unassigned or private IP address.
+Returns the full country name of IP address or domain name. Returns "-" for unassigned or private IP address.
 
 =item $region = $obj->get_region( $ip );
 
@@ -1410,15 +1440,15 @@ Returns the version number of Perl module.
 
 =head1 SEE ALSO
 
-L<IP2Location Product Page|http://www.ip2location.com/>
+L<IP2Location Product Page|https://www.ip2location.com>
 
 =head1 VERSION
 
-8.04
+8.10
 
 =head1 AUTHOR
 
-Copyright (c) 2017 IP2Location.com
+Copyright (c) 2019 IP2Location.com
 
 All rights reserved. This package is free software; It is licensed under the GPL.
 

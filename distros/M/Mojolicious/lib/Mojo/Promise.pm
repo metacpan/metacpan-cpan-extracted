@@ -2,6 +2,7 @@ package Mojo::Promise;
 use Mojo::Base -base;
 
 use Mojo::IOLoop;
+use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
@@ -53,7 +54,7 @@ sub map {
   for my $item (@items) {
     my $p = $proto->clone;
     push @trigger, $p;
-    push @wait, $p->then(sub { local $_ = $item; $_->$cb });
+    push @wait,    $p->then(sub { local $_ = $item; $_->$cb });
   }
 
   my @all = map {
@@ -67,6 +68,13 @@ sub map {
 }
 
 sub new {
+
+  # DEPRECATED!
+  if (@_ > 2 or ref($_[1]) eq 'HASH') {
+    deprecated 'Mojo::Promise::new with attributes is DEPRECATED';
+    return shift->SUPER::new(@_);
+  }
+
   my $self = shift->SUPER::new;
   shift->(sub { $self->resolve(@_) }, sub { $self->reject(@_) }) if @_;
   return $self;

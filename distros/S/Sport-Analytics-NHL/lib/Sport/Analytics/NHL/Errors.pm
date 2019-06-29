@@ -3,7 +3,7 @@ package Sport::Analytics::NHL::Errors;
 use strict;
 use warnings FATAL => 'all';
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:ids);
 
 use parent 'Exporter';
 
@@ -11,12 +11,12 @@ our @EXPORT = qw(
 	%BROKEN_FILES %BROKEN_HEADERS
 	%BROKEN_COACHES %BROKEN_PLAYERS %BROKEN_EVENTS
 	%BROKEN_ROSTERS %BROKEN_PLAYER_IDS
-	%BROKEN_TIMES %BROKEN_COORDS
+	%BROKEN_TIMES %BROKEN_COORDS %BROKEN_CHALLENGES %BROKEN_PENALTIES
 	%NAME_TYPOS %NAME_VARIATIONS %REVERSE_NAME_TYPOS
 	%SPECIAL_EVENTS %FORCED_PUSH
-	%MISSING_EVENTS %MISSING_COACHES %MISSING_PLAYERS
-	%MISSING_PLAYER_INFO
-
+	%MISSING_EVENTS %MISSING_COACHES %MISSING_PLAYERS %MISSING_PS_GOALIES
+	%MISSING_PLAYER_INFO %BROKEN_SHIFTS
+	%MANUAL_FIX %BROKEN_ON_ICE_COUNT %SAME_SO_TWICE
 	$INCOMPLETE $REPLICA $NO_EVENTS $UNSYNCHED $BROKEN
 );
 
@@ -48,6 +48,7 @@ our %NAME_VARIATIONS = (
 	'WILLIAM BOWLER' => 'B. BOWLER',
 	'BOBBY HOLIK'    => 'R. HOLIK',
 	'RANDY MCKAY'    => 'H. MCKAY',
+	'MATT CARLE'     => 'MATTHEW CARLE',
 );
 
 our %BROKEN_COACHES = (
@@ -59,54 +60,142 @@ our %BROKEN_COACHES = (
 	'BAXTER/CHARRON'       => 'DOUG RISEBROUGH',
 	'CHARRON/BAXTER'       => 'GUY CHARRON',
 	'CHARON,BAXTER,HISLOP' => 'GUY CHARRON',
+	'EDDIE OATMAN'         => 'JEREMY COLLITON',
 );
-
-our %BROKEN_PLAYER_IDS = (8445204 => 8445202);
 
 our %BROKEN_PLAYERS = (
 	BS => {
 		192730312 => { 8448095 => { number => 16, }	},
+		194330121 => { 8449068 => { assists => 1,} },
+		195620210 => {
+			8450108 => { shots => 26, saves => 22, goals => 4, },
+			8450152 => { shots => 22, saves => 18, goals => 4, },
+		},
+		195820138 => {
+			8450065 => { shots => 39, saves => 32, goals => 7, },
+		},
+		196030111 => {
+			8449988 => { saves => 21, goals => 6, },
+			8450066 => { saves => 25, goals => 2, },
+		},
+		196030121 => {
+			8450111 => { shots => 36, saves => 33, goals => 3, },
+			8450020 => { shots => 39, saves => 37, goals => 2, },
+		},
+		196030112 => {
+			8449988 => { saves => 25, goals => 3, },
+			8450066 => { saves => 19, goals => 4, },
+		},
+		196030113 => {
+			8450066 => { saves => 42, goals => 2, },
+		},
+		196030125 => {
+			8450111 => { shots => 30, saves => 28, goals => 2, },
+			8449835 => { shots => 30, saves => 27, goals => 3, },
+		},
+		196130113 => {
+			8449988 => { shots => 30, saves => 29, goals => 1, },
+			8450066 => { shots => 30, saves => 26, goals => 4, },
+		},
+		196130124 => {
+			8450152 => { shots => 27, saves => 25, goals => 2, },
+			8449835 => { shots => 33, saves => 30, goals => 3, },
+		},
+		196930141 => {
+			8451528 => { saves => 34, goals => 2, },
+		},
+		197520669 => { 8452574 => { penaltyMinutes => 2 }},
+		197720583 => { 8446057 => { penaltyMinutes => 2 }},
 		196820129 => { 8449481 => { penaltyMinutes => 2,}},
 		197820329 => { 8446940 => { penaltyMinutes => 16,}},
 		198020400 => { 8448411 => { penaltyMinutes => 21,}},
+		198420013 => { 8451987 => { penaltyMinutes => 2, }},
 		198720798 => { 8449535 => { assists => 1, } },
 		199120753 => { 8448781 => { penaltyMinutes => 7 }},
 		199320074 => { 8455408 => { penaltyMinutes => 4 }},
+		199320499 => { 8459363 => { penaltyMinutes => 2 }},
 		199320640 => { 8455984 => { penaltyMinutes => 6 }},
+		199520048 => { 8458526 => { penaltyMinutes => 2 }},
+		199620473 => { 8449545 => { penaltyMinutes => 2 }},
+		199620546 => { 8449751 => { penaltyMinutes => 2 }},
 		200320009 => {
+			8470201 => { number => 22, position => 'L', },
 			8467349 => { number => 8,  position => 'D', goals => 1, },
 			8468789 => { number => 29, position => 'C', },
 			8464960 => { number => 21, position => 'C', },
+			8467427 => { number => 37, position => 'L', },
 		},
-		200320013 => {
-			8467333 => { number => 9, position => 'R', },
-		},
+		200320013 => { 8467333 => { number => 9, position => 'R' },},
 		200320019 => {
 			8466147 => { number => 17, position => 'C',},
 		},
-		200320104 => {
-			8467333 => { goals => 1, },
+		200320021 => { 8467333 => { number => 9, position => 'R' },},
+		200320027 => { 8458562 => { number => 29, position => 'G', decision => 'W' }, },
+		200320048 => {
+			8469656 => { number => 17, position => 'C',},
+			8467332 => { number => 5, position => 'D',},
+			8470201 => { number => 22, position => 'L', },
 		},
+		200320059 => {
+			8464968 => { number => 10, position => 'L'},
+		},
+		200320065 => { 8468639 => { position => 'D' }},
+#		200320072 => { 8468252 => { } }.
+		200320104 => { 8467333 => { goals => 1, },	},
 		200320132 => {
 			8452578 => { number => 19, position => 'C', goals => 1},
 		},
 		200320248 => {
 			8468003 => {goals => 1,},
 		},
+		200320331 => { 8467333 => { goals => 1 },},
+		200320362 => { 8465059 => { goals => 1 },},
 		200320459 => {
 			8468083 => { goals => 1, assists => 2, number => 40 },
 		},
+		200320489 => {
+			8467372 => { goals => 1, },
+		},
+		200320976 => {
+			8467899 => {goals => 1, assists => 1 },
+		},
+		200321074 => { 8467386 => { goals => 1 },},
+		200321181 => { 8464960 => { goals => 1 },},
+		200320801 => { 8457785 => { goals => 1, }, },
+		200320864 => { 8462078 => { goals => 1, assists => 1}, },
+		200520009 => { 8471187 => { goals => 1, }},
+		200520030 => { 8466147 => { goals => 1, }},
+		200520935 => {
+			8467913 => {
+				_notest => 1,
+			},
+		},
+		200520949 => { 8467323 => { goals => 1, }},
+		200521052 => { 8459455 => { goals => 1, assists => 1 }},
+		200620046 => { 8466266 => { goals => 1, }},
+		200620382 => {
+			8470640 => { assists => 1, },
+			8470794 => { goals => 1, }
+		},
+		200620688 => {
+			8469477 => { goals => 1, },
+		},
+		200720076 => { 8462044 => { decision => 'L'} },
+		200530152 => { 8468515 => { goals => 1, position => 'C' }},
 		200820502 => { 8470201 => { penaltyMinutes => 2, }},
 		201520995 => { 8470602 => { penaltyMinutes => 6, }},
+#		200621119 => { 8469479 => { position => 'G', number => 30 }},
 	},
 );
 
+our %SAME_SO_TWICE = (
+	200720811 => 1,
+);
 our %FORCED_PUSH = (
 	PL => {
 		200820009 => { 82  => 1, 83 => 1, },
 		201020989 => { 346 => 1 },
 		201120094 => { 198 => 1 },
-		201320083 => { 351 => 1 },
 		201420921 => { 354 => 1 },
 		201520057 => { 150 => 1, 158 => 1, 197 => 1 },
 		201520064 => { 316 => 1 },
@@ -124,61 +213,42 @@ our %FORCED_PUSH = (
 		201720176 => { 303 => 1, 304 => 1, 305 => 1, 306 => 1},
 	},
 );
-
-our %BROKEN_ROSTERS = (
-	198720509 => [ [], [ { 'No.' => 0, number => 30 } ], ],
-	199020353 => [ [], [ { 'No.' => 0, number => 30 } ], ],
-	199020696 => [ [], [ { 'No.' => 0, number => 35 } ], ],
-	199120656 => [ [], [ { 'No.' => 16, penaltyMinutes => 4 }, ], ],
-	199120753 => [ [ { 'No.' => 26, penaltyMinutes => 7 }, ], [], ],
-	199120809 => [ [ { 'No.' => 5, penaltyMinutes => 2 }, ], [], ],
-	199120839 => [ [ { 'No.' => 11, penaltyMinutes => 12 }, ], [], ],
-	199120877 => [ [ { 'No.' => 27, penaltyMinutes => 18 }, ], [], ],
-	199220449 => [ [ { 'No.' => 29, penaltyMinutes => 18 }, ], [], ],
-	199220585 => [ [], [ { 'No.' => 39, penaltyMinutes => 17 }, ], ],
-	199320044 => [ [ { 'No.' => 26, penaltyMinutes => 4 }, ], [], ],
-	199320074 => [ [ { 'No.' => 27, penaltyMinutes => 4 }, ], [], ],
-	199320404 => [ [ { 'No.' => 29, penaltyMinutes => 19 }, ], [], ],
-	199320499 => [ [], [ { 'No.' => 32, penaltyMinutes => 2 }, ], ],
-	199320640 => [ [], [ { 'No.' => 12, penaltyMinutes => 6 }, ], ],
-	199520048 => [ [ { 'No.' => 12, penaltyMinutes => 2, }, ], [], ],
-	199520790 => [ [ { 'No.' => 12, penaltyMinutes => 6, }, ], [], ],
-	199530123 => [ [], [ { 'No.' => 23, penaltyMinutes => 14, }, ], ],
-	199620473 => [ [ { 'No.' => 27, penaltyMinutes => 2, }, ], [], ],
-	199620546 => [ [ { 'No.' => 17, penaltyMinutes => 2, }, ], [], ],
-	199620548 => [ [ { 'No.' => 33, penaltyMinutes => 23 }, ], [], ],
-	199620927 => [ [
-		{ 'No.' => 20, penaltyMinutes => 2, },
-		{ 'No.' => 77, penaltyMinutes => 2, },
-	], [], ],
-	199630222 => [ [], [ { 'No.' => 18, penaltyMinutes => 2, }, ], ],
-	199720830 => [ [], [ { 'No.' => 35, 'EV' => '10 - 12' }, ], ],
-	199720876 => [ [], [ { 'No.' => 27, 'EV' => '11 - 14' }, ], ],
-	199720997 => [ [ { 'No.' => 31, 'SH' => '3 - 3' }, ], [], ],
-	199820004 => [ [], [ { 'No.' => 34, 'EV' => '26 - 28' }, ], ],
-	199820061 => [ [], [ { 'No.' => 35, 'EV' => '19 - 20' }, ], ],
-	200320027 => [ [], [ { 'No.' => 29, 'name' => 'JAMIE MCLENNAN' }, ], ],
-	200520312 => [ [ { 'No.' => 7, error => 1 } ], [] ],
-);
-
 our %BROKEN_EVENTS = (
 	BS => {
 		195520195 => { 18 => { time => '10:06' },},
+		197820401 => { 4 => { en => 1 }, },
+		199920239 => { 22 => { en => 1 }, },
 		198320770 => {
 			20 => { time => '1:29' },
 			21 => { time => '1:29' },
 		},
 		198520010 => { 16 => { time =>  '7:48' }, },
 		198520611 => { 32 => { time => '10:09' }, },
+		198720025 => {  0 => { player2 => 8447303 } },
 		198820689 => {  5 => { player2 => 8446637 }, 6 => { player2 => 8446637 }, },
 		198920567 => { 26 => { player1 => 8450167 }},
+		199920756 => {  9 => { time => '5:34' }, },
+		200320898 => { 13 => { time => '2:15' }, },
+		200520067 => { 40 => { description => 'ANDY SUTTON ATTEMPT TO INJURE AGAINST JASON ALLISON', secondaryType => 'ATTEMPT TO INJURE'}},
+		200520692 => { 40 => { description => 'SHELDON SOURAY ATTEMPT TO INJURE AGAINST DARREN MCCARTY', secondaryType => 'ATTEMPT TO INJURE'}},
+		200520999 => { 30 => { description => 'CHRIS SIMON ATTEMPT TO INJURE AGAINST DARCY HORDICHUK', secondaryType => 'ATTEMPT TO INJURE'}},
+		200621099 => { 16 => { description => 'CHRIS SIMON ATTEMPT TO INJURE AGAINST DARCY HORDICHUK', secondaryType => 'ATTEMPT TO INJURE'}},
 		201021015 => { 345 => {en => 1}},
 		201321046 => { 302 => -1 },
+		201520416 => { 131 => { description => 'Offside' }},
+		201520476 => { 291 => { en => 1 }},
+		201521100 => { 58 => { description => 'OFFSIDE', } },
+		201620665 => { 62 => { description => 'REFEREE OR LINESMAN,HOME TIMEOUT', } },
+		201620693 => { 357 => {	description => 'REFEREE OR LINESMAN,HOME TIMEOUT', } },
+		201630411 => { 47 => { description => 'OFFSIDE',}, },
 		201621152 => { 9 => { assist2 => 8475209, assists => [8474141,8475209] }},
-		201621165 => { 43 => { player1 => 8465009, assists => [ 8478443, 8476374]}}
-	},
-	BH => {
-
+		201621165 => { 43 => { player1 => 8465009, assists => [ 8478443, 8476374]}},
+		201720432 => { 304 => { description => '',}, },
+		201720608 => { 125 => {	description => 'OFFSIDE', }, },
+		201720929 => { 250 => {	description => 'OFFSIDE', }, },
+		201720948 => { 330 => {	description => 'REFEREE OR LINESMAN,VISITOR TIMEOUT', }, },
+		201820151 => { 338 => { player1  => 8471707 } },
+		201821133 => { 56 => { team1 => 'TBL' } },
 	},
 	PL => {
 		200220255 => { 122 => { player2 => 29 } },
@@ -186,6 +256,7 @@ our %BROKEN_EVENTS = (
 			81 => { player1 => 54 },
 			146 => { on_ice2 => [1, 54,21, 18, 11, 4, ] }
 		},
+		200320898 => { 110 => { time => '2:15' }, },
 		200321115 => { 10 =>  { player2 => 38 } },
         200520084 => { 54  => { player1 => 35 } },
 		200520307 => { 176 => { player1 => 20 } },
@@ -207,6 +278,7 @@ our %BROKEN_EVENTS = (
 		200520946 => { 211 => { player1 => 35 } },
         200521044 => { 313 => { player1 => 19, }, },
         200521114 => {   2 => 0 },
+		200620061 => { 311 => { period => 3, }, 312 => {period => 3 }},
 		200620433 => { 132 => { player1 => 31 } },
         200620597 => {  76 => 0, },
         200620637 => { 123 => 0, 217 => 0 },
@@ -242,7 +314,7 @@ our %BROKEN_EVENTS = (
         200820749 => { 207 => { winning_team => 'TBL', } },
         200820774 => { 92  => 0, 93 => {player1 => 17, }},
 		200820868 => { 299 => { length => 2, penalty => 'Instigator', description => 'EDM #18 MOREAU Instigator(2 min) Drawn By: DAL #29 OTT'}, },
-		200820900 => { 284 => { on_ice => [] }},
+		200820900 => { 284 => { on_ice => [[],[]] }},
         200820987 => { 284 => 0, },
         200821191 => { 289 => { player1 => 20, team1 => 'NSH', player2 => 2, team2 => 'CHI' } },
 		200921066 => {
@@ -261,6 +333,9 @@ our %BROKEN_EVENTS = (
 			description => 'FLA #21 BARCH Game misconduct(10 min)',
 		} },
 		201220341 => { 301 => 0, },
+		201220018 => { 164 => {
+			description => 'VAN #9 KASSIAN BLOCKED BY EDM #15 SCHULTZ, Wrist, Def. Zone', team1 => 'EDM', team2 => 'VAN',
+		} },
 		201320971 => {   1 => {
 			id => 1, period => 1,
 			time => '0:00',
@@ -292,9 +367,44 @@ our %BROKEN_EVENTS = (
 		201621229 => {
 			178 => { on_ice => [[15,21,73,6,53,32], [50,10,2,53,1]]},
 		},
+		201820009 => {
+			231 => { servedby => 12 },
+		},
+		201820151 => {
+			332 => { player1 => 18 },
+		},
+		201820296 => {
+			123 => { on_ice => [[27,90,22,13,3,1], [90,13,17,42,77,30]]},
+		},
+		201821133 => { 58 => { team1 => 'TBL' } },
+
 	},
-	GS => {
-	}
+);
+
+our %MISSING_PLAYER_INFO = (
+	8452484 => {
+		height => q{5' 11"},
+		weight => 175,
+	},
+	8462118 => {
+		number => 10,
+	},
+	8452019 => {
+		number => 18,
+	},
+	8459424 => {
+		number => 44,
+	},
+	8470615 => {
+		city => q{Quebec City},
+	},
+);
+
+our %MISSING_PS_GOALIES = (
+	200920081 => [ 8475094, 8470320 ],
+	200920583 => [ 8468254, 8460705 ],
+	201321202 => [ 8473434, 8474636 ],
+	201620785 => [ 8475660, 8471219 ],
 );
 
 our %BROKEN_TIMES = (
@@ -303,6 +413,250 @@ our %BROKEN_TIMES = (
 
 our %BROKEN_COORDS = (
 
+);
+
+our %BROKEN_PENALTIES = (
+#	2005206450108 => {
+#		time => '00:24', ts => 1224,
+#	},
+);
+our %BROKEN_CHALLENGES = (
+	2017209570302 => {
+		team => 'NHL', coach_name => 'NHL', type => 'i', result => 1,
+		source => 'CHL', winner => 'EDM', loser => 'LAK', ignore_stop => 1,
+	},
+	2018200850336 => {
+		team => 'NHL', coach_name => 'NHL', type => 'i', result => 0,
+		source => 'STOP', winner => 'BUF', loser => 'VGK',
+	},
+	2015210190291 => {
+		team => 'NHL', coach_name => 'NHL', type => 'i', result => 0,
+		source => 'STOP', winner => 'DET', loser => 'NYR',
+	},
+	2015210160299 => {
+		team => 'NHL', coach_name => 'NHL', type => 'i', result => 0,
+		source => 'STOP', winner => 'CHI', loser => 'DAL',
+	},
+	2015210070307 => {
+		team => 'NHL', coach_name => 'NHL', type => 'i', result => 0,
+		source => 'STOP', winner => 'CAR', loser => 'BOS',
+	},
+	2015205350262 => {
+		team => 'BUF', coach_name => 'DAN BYLSMA', type => 'i', result => 0,
+		source => 'CHL', winner => 'WSH', loser => 'BUF', ignore_stop => 1,
+	},
+	2017211900271 => {
+		team => 'TBL', coach_name => 'JON COOPER', type => 'i', result => 0,
+		source => 'STOP', winner => 'BOS', loser => 'TBL',
+	},
+	2017208360170 => {
+		team => 'CGY', coach_name => 'GLEN GULUTZAN', type => 'i', result => 0,
+		source => 'CHL', winner => 'NYR', loser => 'CGY', ignore_stop => 1,
+	},
+	2017201890230 => {
+		team => 'TBL', coach_name => 'JON COOPER', type => 'i', result => 0,
+		source => 'CHL', winner => 'NYR', loser => 'TBL', ignore_stop => 1,
+	},
+	2017201230277 => {
+		team => 'TOR', coach_name => 'MIKE BABCOCK', type => 'i', result => 0,
+		source => 'CHL', winner => 'LAK', loser => 'TOR', ignore_stop => 1,
+	},
+	2017200600114 => {
+		team => 'COL', coach_name => 'JARED BEDNAR', type => 'i', result => 0,
+		source => 'STOP', winner => 'ANA', loser => 'COL',
+	},
+	2016210320070 => {
+		team => 'SJS', coach_name => 'PETER DEBOER', type => 'i', result => 0,
+		source => 'CHL', winner => 'BUF', loser => 'SJS',
+	},
+	2016209780128 => {
+		team => 'CAR', coach_name => 'BILL PETERS', type => 'i', result => 0,
+		source => 'STOP', winner => 'COL', loser => 'CAR',
+	},
+	2016208930139 => {
+		team => 'BOS', coach_name => 'BRUCE CASSIDY', type => 'i', result => 0,
+		source => 'STOP', winner => 'ANA', loser => 'BOS',
+	},
+	2016207730057 => {
+		team => 'WPG', coach_name => 'PAUL MAURICE', type => 'i', result => 0,
+		source => 'STOP', winner => 'COL', loser => 'WPG',
+	},
+	2015210500012 => {
+		team => 'WPG', coach_name => 'PAUL MAURICE', type => 'i', result => 0,
+		source => 'STOP', winner => 'CGY', loser => 'WPG',
+	},
+	2015210350172 => {
+		team => 'STL', coach_name => 'KEN HITCHCOCK', type => 'i', result => 0,
+		source => 'STOP', winner => 'CGY', loser => 'STL',
+	},
+	2015208820256 => {
+		team => 'EDM', coach_name => 'TODD MCLELLAN', type => 'i', result => 0,
+		source => 'STOP', winner => 'COL', loser => 'EDM',
+	},
+	2015203720197 => {
+		team => 'TBL', coach_name => 'JON COOPER', type => 'i', result => 0,
+		source => 'STOP', winner => 'ANA', loser => 'TBL',
+	},
+	2015203540004 => {
+		team => 'FLA', coach_name => 'GERARD GALLANT', type => 'i', result => 0,
+		source => 'STOP', winner => 'DET', loser => 'FLA',
+	},
+	2015201750084 => {
+		team => 'MTL', coach_name => 'MICHEL THERRIEN', type => 'i', result => 9,
+		source => 'STOP', winner => 'OTT', loser => 'MTL',
+	},
+	2015201630254 => {
+		team => 'CGY', coach_name => 'BOB HARTLEY', type => 'i', result => 0,
+		source => 'STOP', winner => 'EDM', loser => 'CGY',
+	},
+	2015201460188 => {
+		team => 'TOR', coach_name => 'MIKE BABCOCK', type => 'i', result => 0,
+		source => 'STOP', winner => 'NYR', loser => 'TOR',
+	},
+	2015200490219 => {
+		team => 'ARI', coach_name => 'DAVE TIPPETT', type => 'i', result => 0,
+		source => 'STOP', winner => 'ANA', loser => 'ARI',
+	},
+	2015200180152 => {
+		team => 'BOS', coach_name => 'CLAUDE JULIEN', type => 'i', result => 0,
+		source => 'STOP', winner => 'MTL', loser => 'BOS',
+	},
+	2017209700056 => {
+		team => 'NJD', coach_name => 'JOHN HYNES', type => 'i', result => 0,
+		source => 'CHL', winner => 'PIT', loser => 'NJD',
+	},
+	2017205810111 => {
+		team => 'MIN', coach_name => 'BRUCE BOUDREAU', type => 'i', result => 1,
+		source => 'CHL', winner => 'MIN', loser => 'NSH',
+	},
+	2016210080010 => {
+		team => 'NJD', coach_name => 'JOHN HYNES', type => 'o', result => 0,
+		source => 'CHL', winner => 'ARI', loser => 'NJD',
+	},
+	2015205870239 => {
+		team => 'VAN', coach_name => 'WILLIE DESJARDINS', type => 'o', result => 1,
+		source => 'CHL', winner => 'VAN', loser => 'ARI',
+	},
+	2015204600156 => {
+		team => 'VAN', coach_name => 'WILLIE DESJARDINS', type => 'o', result => 0,
+		source => 'CHL', winner => 'MIN', loser => 'VAN',
+	},
+	2015205189999 => {
+		team => 'CBJ', coach_name => 'JOHN TORTORELLA', type => 'o', result => 0,
+		source => 'CHL', winner => 'TBL', loser => 'CBJ', ts => 1613, t => 1,
+	},
+	2015204030041 => {
+		team => 'PIT', coach_name => 'MIKE SULLIVAN', type => 'o', result => 1,
+		source => 'STOP', winner => 'PIT', loser => 'ANA',
+	},
+	2015201180025 => {
+		team => 'MIN', coach_name => 'MIKE YEO', type => 'o', result => 0,
+		source => 'STOP', winner => 'WPG', loser => 'MIN',
+	},
+	2015206730339 => {
+		team   => 'NHL', coach_name => 'NHL', type => 'o', result => 1,
+		source => 'CHL', winner => 'NYR', loser => 'WSH', ts => 3545
+	},
+	2016204380148 => 0,
+	2016200680065 => 0,
+);
+
+our %BROKEN_ON_ICE_COUNT = (
+	1999200430025 => 5151, # 0 ps
+	1999202030010 => 5141,
+	1999202640020 => 5141, # 1 ps
+	1999203020003 => 5151, # 1 ps
+	1999203500015 => 5151, # 1 ps
+	1999205530026 => 5151, # 0 ps
+	1999205720021 => 5141,
+	1999205790003 => 5151, # 1 ps
+	1999205870022 => 5151, # 1 ps
+	1999205920026 => 5151, # 1 ps
+	1999206340012 => 5151, # 1 ps
+	2000202490017 => 3151,
+	2000204390010 => 4151,
+	2000207070031 => 4151,
+	2000209770018 => 4141,
+	2000210580023 => 5131,
+	2001201190026 => 4151,
+	2001202120026 => 4151,
+	2001206490021 => 4151,
+	2001207200017 => 5131,
+	2001209520037 => 4151,
+	2002202980106 => 5131,
+	2002204380161 => 4151,
+	2002207010143 => 4141,
+	2002212210120 => 5141,
+	2003200660145 => 4151,
+	2003200730133 => 5151,
+	2003203170200 => 3151,
+	2003206080071 => 5151,
+	2003209730123 => 5131,
+	2005200250170 => 5151,
+	2005200290266 => 3151,
+	2005205930091 => 5141,
+	2005206180118 => 5131,
+	2005206450116 => 5141,
+	2005208410100 => 4151,
+	2005208480072 => 4151,
+	2005209240121 => 5141,
+	2005210840086 => 3151,
+	2005211810098 => 5151,
+	2006201500036 => 4151,
+	2006202970214 => 5141,
+	2006206270025 => 5151,
+	2006207940313 => 3151,
+	2006208190182 => 5141,
+	2006303140144 => 5131,
+	2007200240089 => 5151,
+	2007200920284 => 5131,
+	2007201810192 => 4141, # strange
+	2007210880075 => 3141, # strange
+	2007207420158 => 3151,
+	2007207780111 => 5141,
+	2007209690292 => 5151,
+	2007209770132 => 5141,
+	2008200640220 => 4141, #
+	2008203010286 => 5151,
+	2008203570228 => 5151,
+	2008204300331 => 5151,
+	2008208220193 => 3141,
+	2008208580256 => 5141,
+	2008208810268 => 5151, # clarkson penalty timing
+	2009201110037 => 4151,
+	2009203150076 => 5141,
+	2009212060253 => 4141,
+	2010200150075 => 5151,
+	2010201210293 => 5151,
+	2010203290047 => 3151,
+	2010203550281 => 5151,
+	2011201610154 => 5151,
+	2011201870306 => 5151,
+	2011201930112 => 5141,
+	2012201720366 => 4141,
+	2012206160272 => 5150,
+	2013200330275 => 5151,
+	2013202500273 => 6051,
+	2013202790185 => 4141,
+	2013206020299 => 5141,
+	2013208960196 => 5151,
+	2013210260126 => 3151,
+	2013211190119 => 5151,
+	2013301750181 => 5151,
+	2013303150305 => 5141,
+	2014203310323 => 5141,
+	2014205450305 => 5141,
+	2015206250044 => 5151,
+	2015207430252 => 5141,
+	2015208290238 => 5131,
+	2015208990183 => 5141,
+	2015211780282 => 5151,
+	2016201390301 => 5151,
+	2016203420313 => 5151,
+	2016211690127 => 5151,
+	2018201690267 => 5141,
+	2018206330221 => 5151,
+	2018210740203 => 5151,
 );
 
 our $INCOMPLETE = -1;
@@ -342,8 +696,6 @@ our %BROKEN_FILES = (
 	192530314 => { BS => $UNSYNCHED},
 	195220105 => { BS => $NO_EVENTS },
 	195320012 => { BS => $NO_EVENTS },
-	195620210 => { BS => $UNSYNCHED},
-	195820138 => { BS => $UNSYNCHED},
 	196320003 => { BS => $NO_EVENTS },
 	196720356 => { BS => $NO_EVENTS },
 	197320520 => { BS => $NO_EVENTS },
@@ -443,7 +795,7 @@ our %BROKEN_FILES = (
 	200720262 => { BS => $NO_EVENTS, },
 	200720470 => { GS => $INCOMPLETE, },
 	200720483 => { GS => $INCOMPLETE, },
-	200721178 => { ES => $INCOMPLETE, GS => $INCOMPLETE, PL => $BROKEN, RO => $INCOMPLETE },
+	200721178 => { ES => $INCOMPLETE, GS => $INCOMPLETE, PL => $BROKEN, RO => $INCOMPLETE, TV => $INCOMPLETE, TH => $INCOMPLETE },
 	200820259 => { ES => $INCOMPLETE, GS => $INCOMPLETE, PL => $BROKEN, RO => $INCOMPLETE },
 	200820409 => { ES => $INCOMPLETE, GS => $INCOMPLETE, PL => $BROKEN, RO => $INCOMPLETE },
 	200821077 => { ES => $INCOMPLETE, GS => $INCOMPLETE, PL => $BROKEN, RO => $INCOMPLETE },
@@ -460,17 +812,19 @@ our %BROKEN_FILES = (
 	201120259 => { ES => $INCOMPLETE, GS => $INCOMPLETE },
 	201320338 => { BS => $NO_EVENTS },
 	201320971 => { GS => $BROKEN },
-	201520079 => {BH => $INCOMPLETE},
-	201520120 => {BH => $INCOMPLETE},
-	201520168 => {BH => $INCOMPLETE},
-	201520214 => {BH => $INCOMPLETE},
-	201520307 => {BH => $INCOMPLETE},
+#	201520079 => {BH => $INCOMPLETE},
+#	201520120 => {BH => $INCOMPLETE},
+#	201520168 => {BH => $INCOMPLETE},
+#	201520214 => {BH => $INCOMPLETE},
+#	201520307 => {BH => $INCOMPLETE},
 	201520476 => { BS => $NO_EVENTS },
 	201720639 => { BS => $NO_EVENTS },
+	201830312 => { TV => $INCOMPLETE, TH => $INCOMPLETE },
 );
 
 our %MANUAL_FIX = (
 	200120123 => { GS => 'Remove "2" throughout the file' },
+	200120059 => { ES => 'Remove invalid html tags' },
 	200520094 => {
 		GS => 'Insert missing period for 15:35 penalty',
 		PL => 'Edited string with 00:28 penalty',
@@ -1477,23 +1831,48 @@ our %MISSING_PLAYERS = (
 	],
 );
 
-our %MISSING_PLAYER_INFO = (
-        8452484 => {
-                height => q{5' 11"},
-                weight => 175,
-        },
-        8462118 => {
-                number => 10,
-        },
-        8452019 => {
-                number => 18,
-        },
-        8459424 => {
-                number => 44,
-        },
-        8470615 => {
-                city => q{Quebec City},
-        },
+our %BROKEN_ROSTERS = (
+	198720509 => [ [], [ { 'No.' => 0, number => 30 } ], ],
+	199020353 => [ [], [ { 'No.' => 0, number => 30 } ], ],
+	199020696 => [ [], [ { 'No.' => 0, number => 35 } ], ],
+	199120656 => [ [], [ { 'No.' => 16, penaltyMinutes => 4 }, ], ],
+	199120753 => [ [ { 'No.' => 26, penaltyMinutes => 7 }, ], [], ],
+	199120809 => [ [ { 'No.' => 5, penaltyMinutes => 2 }, ], [], ],
+	199120839 => [ [ { 'No.' => 11, penaltyMinutes => 12 }, ], [], ],
+	199120877 => [ [ { 'No.' => 27, penaltyMinutes => 18 }, ], [], ],
+	199220449 => [ [ { 'No.' => 29, penaltyMinutes => 18 }, ], [], ],
+	199220585 => [ [], [ { 'No.' => 39, penaltyMinutes => 17 }, ], ],
+	199320044 => [ [ { 'No.' => 26, penaltyMinutes => 4 }, ], [], ],
+	199320074 => [ [ { 'No.' => 27, penaltyMinutes => 4 }, ], [], ],
+	199320404 => [ [ { 'No.' => 29, penaltyMinutes => 19 }, ], [], ],
+	199320499 => [ [], [ { 'No.' => 32, penaltyMinutes => 2 }, ], ],
+	199320640 => [ [], [ { 'No.' => 12, penaltyMinutes => 6 }, ], ],
+	199520048 => [ [ { 'No.' => 12, penaltyMinutes => 2, }, ], [], ],
+	199520790 => [ [ { 'No.' => 12, penaltyMinutes => 6, }, ], [], ],
+	199530123 => [ [], [ { 'No.' => 23, penaltyMinutes => 14, }, ], ],
+	199620473 => [ [ { 'No.' => 27, penaltyMinutes => 2, }, ], [], ],
+	199620546 => [ [ { 'No.' => 17, penaltyMinutes => 2, }, ], [], ],
+	199620548 => [ [ { 'No.' => 33, penaltyMinutes => 23 }, ], [], ],
+	199620927 => [ [
+		{ 'No.' => 20, penaltyMinutes => 2, },
+		{ 'No.' => 77, penaltyMinutes => 2, },
+	], [], ],
+	199630222 => [ [], [ { 'No.' => 18, penaltyMinutes => 2, }, ], ],
+	199720830 => [ [], [ { 'No.' => 35, 'EV' => '10 - 12' }, ], ],
+	199720876 => [ [], [ { 'No.' => 27, 'EV' => '11 - 14' }, ], ],
+	199720997 => [ [ { 'No.' => 31, 'SH' => '3 - 3' }, ], [], ],
+	199820004 => [ [], [ { 'No.' => 34, 'EV' => '26 - 28' }, ], ],
+	199820061 => [ [], [ { 'No.' => 35, 'EV' => '19 - 20' }, ], ],
+	200320027 => [ [], [ { 'No.' => 29, 'name' => 'JAMIE MCLENNAN' }, ], ],
+	200520312 => [ [ { 'No.' => 7, error => 1 } ], [] ],
+);
+
+our %BROKEN_PLAYER_IDS = (8445204 => 8445202);
+
+our %BROKEN_SHIFTS = (
+	200820160 => { MIN => {  8 => 1 } },
+	200920439 => { MTL => { 36 => 1 } },
+	201520508 => { ANA => {  5 => 1 } },
 );
 
 =head1 NAME

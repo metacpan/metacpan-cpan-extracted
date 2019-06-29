@@ -1,7 +1,7 @@
 package Calendar::Dates;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '0.2.1'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.2.2'; # VERSION
 
 1;
 # ABSTRACT: Modules that contain calendar dates
@@ -22,7 +22,7 @@ Calendar::Dates - Modules that contain calendar dates
 
 =head1 VERSION
 
-This document describes version 0.2.1 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-06-19.
+This document describes version 0.2.2 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-06-20.
 
 =head1 DESCRIPTION
 
@@ -122,6 +122,16 @@ known common/standardized parameters:
 
 Boolean. If set to true, will include all entries that are normally not
 included, e.g. low-priority entries (entries with tag C<low-priority>).
+
+=item * include_tags
+
+Array. If set, then only entries which contain all tags mentioned in this
+parameter should be included.
+
+=item * exclude_tags
+
+Array. If set, then entries which contain any of the tags mentioned in this
+parameter should NOT be included.
 
 =back
 

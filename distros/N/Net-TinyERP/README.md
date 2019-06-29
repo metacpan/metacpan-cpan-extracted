@@ -15,7 +15,7 @@ If you need any help or want to translate it to your language, please
 send us some pull requests! :)*
 
 
-No momento, apenas a API de notas fiscais foi implementada. Se quiser
+No momento, apenas a API de notas fiscais (NF-e e NFS-e) foi implementada. Se quiser
 acessar [outra parte da API](https://tiny.com.br/info/api-desenvolvedores)
 como produtos, vendedores e crm, envie-nos um Pull Request :)
 
@@ -56,7 +56,7 @@ libs de SSL estão instaladas e que a rede permite esse tipo de acesso.
 
 ### API
 
-No momento apenas a API de manipulação de Notas Fiscais está disponível.
+No momento apenas a API de manipulação de Notas Fiscais está disponível, NF-e e NFS-e.
 
 Para mais informações, [consulte a documentação completa](https://metacpan.org/pod/Net::TinyERP).
 

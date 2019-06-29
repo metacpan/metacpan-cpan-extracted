@@ -5,10 +5,10 @@ use strict;
 use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
-use Test::More tests => 28;
+use Test::More tests => 38;
 
 use Sport::Analytics::NHL::Report;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Util qw(:file);
 
 my $report;
 my $game_path = 't/data/2011/0002/0010';

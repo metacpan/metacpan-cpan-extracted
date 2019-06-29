@@ -3,7 +3,7 @@ package RPi::I2C;
 use strict;
 use warnings;
 
-our $VERSION = '2.3607';
+our $VERSION = '2.3608';
 our @ISA = qw(IO::Handle);
  
 use Carp;
@@ -228,6 +228,8 @@ Parameters:
 Optional, Integer: The device's register to read from. eg: C<0x01>. Defaults to
 C<0x0>.
 
+Return: C<-1> on error, whatever the device returns on success.
+
 =head2 read_bytes($num_bytes, [$reg])
 
 Allows you to read a specific number of bytes from a register and get the bytes
@@ -248,6 +250,8 @@ C<0x0>.
 Return, Array: An array where each element is a byte of data. The length of this
 array is dictated by the C<$num_bytes> parameter.
 
+Returns C<-1> on error.
+
 =head2 read_word([$reg])
 
 Same as C<read_byte()>, but reads two bytes (16-bit word) instead.
@@ -267,7 +271,7 @@ Mandatory, Integer: The number of bytes you want to read.
 Optional, Integer: The register to start reading the block of bytes from. It
 defaults to C<0x00> if you don't send it in.
 
-Returns an array containing each byte read per element.
+Returns an array containing each byte read per element, and C<-1> on error.
 
 =head2 write($data)
 
@@ -278,6 +282,8 @@ Parameters:
     $data
 
 Mandatory, 8-bit unsigned integer: The byte to send to the device.
+
+Return: C<0> on success, C<-1> on failure.
 
 =head2 write_byte($data, [$reg])
 
@@ -295,9 +301,13 @@ Mandatory, 8-bit unsigned integer: The byte to send to the device.
 Optional, Integer: The device's register to write to. eg: C<0x01>. Defaults
 to C<0x0>.
 
+Return: C<0> on success, C<-1> on failure.
+
 =head2 write_word($data, [$reg])
 
 Same as C<write_byte()>, but writes two bytes (16-bit word) instead.
+
+Return: C<0> on success, C<-1> on failure.
 
 =head2 write_block($values, [$reg])
 
@@ -316,6 +326,8 @@ byte to be written to the device.
 Optional, Integer: The register to start writing the block of bytes to. It is
 prudent to be sure you have enough contiguous byte blocks available, or things
 can be overwritten. Defaults to C<0x00> if you don't send it in.
+
+Return: C<0> on success, C<-1> on failure.
 
 =head2 process($value, [$reg])
 
@@ -388,7 +400,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017,2018 by Steve Bertrand
+Copyright (C) 2017-2019 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

@@ -49,7 +49,7 @@ use HiPi::Interface::MicroDotPHAT::Font qw( :font );
 use Try::Tiny;
 use Carp;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 __PACKAGE__->create_ro_accessors( qw( _hat_width _hat_height ) );
 

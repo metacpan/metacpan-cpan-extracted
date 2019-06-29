@@ -367,9 +367,10 @@ sub default_constructor {
     sub END {
         $out //= '';
         select $orig_stdout;
-        
+
         $out =~ s/^MODE\s*:.+//mg;
-        
+        $out =~ s/XS_EUPXS\(XS_[a-zA-Z0-9_]+\);.*\n/\n/mg;
+
         XS::Install::ParseXS::call(\@post_callbacks, \$out);
         print $out;
     }

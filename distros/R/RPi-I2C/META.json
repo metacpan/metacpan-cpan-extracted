@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -47,6 +47,6 @@
          "web" : "https://github.com/stevieb9/rpi-i2c"
       }
    },
-   "version" : "2.3607",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "2.3608",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

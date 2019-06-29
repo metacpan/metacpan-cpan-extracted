@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -183,7 +183,7 @@ Date::Easy::Date - easy date class
 
 =head1 VERSION
 
-This document describes version 0.06 of Date::Easy::Date.
+This document describes version 0.08 of Date::Easy::Date.
 
 =head1 SYNOPSIS
 
@@ -376,7 +376,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Buddy Burden.
+This software is Copyright (c) 2019 by Buddy Burden.
 
 This is free software, licensed under:
 

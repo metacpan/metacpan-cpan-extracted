@@ -13,13 +13,12 @@ use JSON;
 use Try::Tiny;
 use Text::Unidecode;
 
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Util qw(:format :utils :times);
+use Sport::Analytics::NHL::Tools qw(:db);
+use Sport::Analytics::NHL::Config qw(:basic :ids);
 use Sport::Analytics::NHL::Errors;
 
-use base qw(Sport::Analytics::NHL::Report Exporter);
+use parent qw(Sport::Analytics::NHL::Report Exporter);
 
 =head1 NAME
 
@@ -240,7 +239,7 @@ sub normalize_bio ($) {
 					$self->{$field} = substr($self->{$field}, 0, 1)
 				}
 				when ('birthdate') {
-					$self->{$field} = str2time($self->{$field});
+					$self->{$field} = str3time($self->{$field});
 				}
 				when (['draftteam', 'team']) {
 					$self->{$field} = resolve_team($self->{$field});

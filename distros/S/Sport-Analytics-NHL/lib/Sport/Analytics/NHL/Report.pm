@@ -13,9 +13,9 @@ use List::MoreUtils qw(firstval);
 use Module::Pluggable require => 1, search_path => ['Sport::Analytics::NHL::Report'];
 use Time::Local;
 
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Util qw(:debug :file :times :utils);
+use Sport::Analytics::NHL::Tools qw(:db);
+use Sport::Analytics::NHL::Config qw(:basic :ids :seasons);
 use Sport::Analytics::NHL::Errors;
 
 =head1 NAME
@@ -189,6 +189,8 @@ our %REPORT_TYPES = (
 	GS => 'html',
 	BH => 'html',
 	ES => 'html',
+	TV => 'html',
+	TH => 'html',
 );
 
 our @HEADER_STATUS_METHODS = (
@@ -489,10 +491,15 @@ sub get_header ($) {
 	$self->{head}  = [];
 	$self->{teams} = [];
 	while(my $base_element = $self->get_sub_tree(0, [$i])) {
+		my $extra_div = 0;
+		if ($base_element->tag eq 'div' && $base_element->attr('class') eq 'pageBreakAfter') {
+			$base_element = $self->get_sub_tree(0, [0], $base_element);
+			$extra_div = 1;
+		}
 		last unless ref $base_element;
 		if ($base_element->tag eq 'table') {
 			push(@{$self->{head}}, $i);
-			push(@{$self->{head}},  0) if $base_element->{_content}[0]->tag eq 'tbody';
+			push(@{$self->{head}},  0) if $base_element->{_content}[0]->tag eq 'tbody' || $extra_div;
 			last;
 		}
 		$i++;
@@ -506,6 +513,9 @@ sub read_header ($) {
 	$self->get_header();
 
 	my $main_table = $self->get_sub_tree(0, [@{$self->{head}}]);
+#	print Dumper $self->{head};
+#	print $main_table->dump;
+
 	my $gameinfo_table;
 	my $offset = 0;
 	if ($main_table->attr('class')) {

@@ -19,13 +19,14 @@ no_index:
     - inc
 requires:
   DBD::mysql: '4.042'
+  DBI: '1.627'
   Mojolicious: '8.03'
   SQL::Abstract: '1.86'
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-mysql/issues
   homepage: https://github.com/jhthorsen/mojo-mysql
   repository: https://github.com/jhthorsen/mojo-mysql.git
-version: '1.15'
+version: '1.16'
 x_contributors:
   - 'Curt Hochwender <hochwender@centurytel.net>'
   - 'Dan Book <dbook@cpan.org>'

@@ -7,9 +7,9 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Tools qw(:all);
 
-plan tests => 1;
-for my $var (qw($DB)) {
-	ok(scalar(grep { $_ eq $var } @Sport::Analytics::NHL::Tools::EXPORT), "$var exported");
+plan tests => @Sport::Analytics::NHL::Tools::EXPORT_OK+0;
+for my $sub (@Sport::Analytics::NHL::Tools::EXPORT_OK) {
+	ok(defined &$sub, "sub $sub defined");
 }

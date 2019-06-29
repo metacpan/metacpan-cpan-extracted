@@ -1,19 +1,25 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::Function;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use base qw( IO::Async::Notifier );
 use IO::Async::Timer::Countdown;
 
 use Carp;
+
+use List::Util qw( first );
+
+use Struct::Dumb qw( readonly_struct );
+
+readonly_struct Pending => [qw( priority f )];
 
 =head1 NAME
 
@@ -329,6 +335,15 @@ The C<%params> hash takes the following keys:
 
 A reference to the array of arguments to pass to the code.
 
+=item priority => NUM
+
+Optional. Defines the sorting order when no workers are available and calls
+must be queued for later. A default of zero will apply if not provided.
+
+Higher values cause the call to be considered more important, and will be
+placed earlier in the queue than calls with a smaller value. Calls of equal
+priority are still handled in FIFO order.
+
 =back
 
 If the function body returns normally the list of results are provided as the
@@ -440,7 +455,20 @@ sub call
    }
    else {
       $self->debug_printf( "QUEUE" );
-      push @{ $self->{pending_queue} }, my $wait_f = $self->loop->new_future;
+      my $queue = $self->{pending_queue};
+
+      my $next = Pending(
+         my $priority = $params{priority} || 0,
+         my $wait_f = $self->loop->new_future,
+      );
+
+      if( $priority ) {
+         my $idx = first { $queue->[$_]->priority < $priority } 0 .. $#$queue;
+         splice @$queue, $idx // $#$queue+1, 0, ( $next );
+      }
+      else {
+         push @$queue, $next;
+      }
 
       $future = $wait_f->then( sub {
          my ( $self, $worker ) = @_;
@@ -576,10 +604,12 @@ sub _dispatch_pending
    while( my $next = shift @{ $self->{pending_queue} } ) {
       my $worker = $self->_get_worker or return;
 
-      next if $next->is_cancelled;
+      my $f = $next->f;
+
+      next if $f->is_cancelled;
 
       $self->debug_printf( "UNQUEUE" );
-      $next->done( $self, $worker );
+      $f->done( $self, $worker );
       return;
    }
 

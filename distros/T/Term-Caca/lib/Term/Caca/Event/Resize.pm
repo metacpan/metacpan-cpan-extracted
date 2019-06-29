@@ -1,15 +1,12 @@
 package Term::Caca::Event::Resize;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: event triggered when the display is resized
-$Term::Caca::Event::Resize::VERSION = '3.0.1';
-use strict;
-use warnings;
+$Term::Caca::Event::Resize::VERSION = '3.1.0';
+
+use Moo;
+extends 'Term::Caca::Event';
 
 use Term::Caca;
-
-
-use Moose;
-extends 'Term::Caca::Event';
 
 has width => 
     is => 'ro',
@@ -47,7 +44,7 @@ Term::Caca::Event::Resize - event triggered when the display is resized
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 ATTRIBUTES 
 

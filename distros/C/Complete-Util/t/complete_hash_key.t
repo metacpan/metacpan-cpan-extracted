@@ -24,6 +24,17 @@ test_complete(
     hash      => {a=>1, aa=>1, ab=>1, b=>1, A=>1},
     result    => [qw()],
 );
+test_complete(
+    name      => 'arg:summaries',
+    word      => 'a',
+    hash      => {a=>1, aa=>1, ab=>1, b=>1, A=>1},
+    summaries => {a=>2, aa=>3, ab=>4, b=>5, A=>6},
+    result    => [
+        {word=>'a' , summary=>2},
+        {word=>'aa', summary=>3},
+        {word=>'ab', summary=>4},
+    ],
+);
 
 done_testing();
 
@@ -32,8 +43,9 @@ sub test_complete {
     #$log->tracef("args=%s", \%args);
 
     my $name = $args{name} // $args{word};
-    my $res = [sort @{complete_hash_key(
-        word=>$args{word}, hash=>$args{hash},
-        )}];
+    my $res = complete_hash_key(
+        word=>$args{word}, hash=>$args{hash}, summaries=>$args{summaries},
+    );
+    #diag explain $res;
     is_deeply($res, $args{result}, "$name (result)") or explain($res);
 }

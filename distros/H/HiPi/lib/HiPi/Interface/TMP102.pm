@@ -17,7 +17,7 @@ use HiPi qw( :i2c :rpi :tmp102 );
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 __PACKAGE__->create_accessors( qw( backend config_bytes ) );
 

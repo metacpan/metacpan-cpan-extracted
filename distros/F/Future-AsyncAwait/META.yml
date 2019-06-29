@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::CBuilder: '0'
   Test::More: '0.88'
+  Test::Refcount: '0.09'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -17,12 +18,12 @@ name: Future-AsyncAwait
 provides:
   Future::AsyncAwait:
     file: lib/Future/AsyncAwait.pm
-    version: '0.28'
+    version: '0.29'
 requires:
   Future: '0'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

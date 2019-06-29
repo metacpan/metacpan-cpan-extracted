@@ -9,10 +9,10 @@ use parent 'Sport::Analytics::NHL::Report';
 
 use utf8;
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:basic :ids);
 use Sport::Analytics::NHL::Errors;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Util qw(:utils :times :debug);
+use Sport::Analytics::NHL::Tools qw(:parser);
 
 use Data::Dumper;
 
@@ -222,7 +222,12 @@ sub parse_scoring_event ($$;$) {
 		$event->{on_ice}[0] = [ $self->get_sub_tree(0, [7,0,0], $row) || $self->get_sub_tree(0, [8,0], $row) ];
 		$event->{on_ice}[1] = [ $self->get_sub_tree(0, [8,0,0], $row) || $self->get_sub_tree(0, [9,0], $row) ];
 	}
+	if ($event->{penaltyshot} && (ref $event->{on_ice}[0][0] || ref $event->{on_ice}[1][0])) {
+		$event->{on_ice}[0] = [];
+		$event->{on_ice}[1] = [];
+	}
 	return undef if ref $event->{on_ice}[0][0];
+#	print Dumper $event->{team1};
 	$event->{shot_type} = 'Unknown';
 	$event->{location} = 'Unk';
 	$event->{distance} = 999;
@@ -467,7 +472,8 @@ sub parse_misc_summary ($$$) {
 
 	my $goalies_header = $self->get_sub_tree(0, [0,0], $misc_summary);
 	my $g_span = $goalies_header->attr('colspan') || $goalies_header->attr('colSpan');
-
+#	dumper $g_span;
+#	print $goalies_header->dump; 
 	my $g = 2;
 	$self->{goalies} = [];
 	while (my $goalies_row = $self->get_sub_tree(0, [$g], $misc_summary)) {
@@ -483,6 +489,8 @@ sub parse_misc_summary ($$$) {
 			$g_span == 8 ?
 				() : (so_stats      => $self->get_sub_tree(0, [$g_span-1,0,0], $goalies_row)),
 		};
+		delete $goalie->{so_stats}
+			unless $goalie->{so_stats} && $goalie->{so_stats} =~ /\d/;
 		unless ($goalie->{name} && $goalie->{name} =~ /[a-z]/i) {
 			$g++;
 			next;
@@ -561,7 +569,7 @@ sub parse_goaltender_summary ($$$) {
 	}
 }
 
-sub parse ($$) {
+sub parse ($) {
 
 	my $self = shift;
 
@@ -589,11 +597,17 @@ sub parse ($$) {
 		$self->parse_misc_summary($misc_summary) :
 		$self->parse_new_misc_summary($misc_summary);
 	unless ($self->{old}) {
-		my $goaltender_summary = $self->get_sub_tree(0, [2,14,0,0]);
+		my $goaltender_summary = $self->get_sub_tree(0, [2,15,0,0]);
+		#		exit;
+		$goaltender_summary = $self->get_sub_tree(0, [2,14,0,0])
+			unless ref $goaltender_summary;
+		$goaltender_summary = $self->get_sub_tree(0, [1,15,0,0])
+			unless ref $goaltender_summary;
+#		print $goaltender_summary->dump;
 		if (ref $goaltender_summary) {
 			$self->parse_goaltender_summary($goaltender_summary);
 		}
-		else {
+		if (! $self->{goalies} || ! @{$self->{goalies}}) {
 			$self->{_gs_no_g} = 1;
 		}
 	}
@@ -751,8 +765,8 @@ sub normalize_old ($$) {
 			else {
 				delete $event->{assist1};
 			}
-			if ($SPECIAL_EVENTS{$self->{_id}} && !$event->{on_ice}[0][0] ||
-					$event->{on_ice}[0][0] =~ /Data/) {
+			if ($SPECIAL_EVENTS{$self->{_id}} && (!$event->{on_ice}[0][0] ||
+					$event->{on_ice}[0][0] =~ /Data/)) {
 				$event->{on_ice} = [[($UNKNOWN_PLAYER_ID)x6],[($UNKNOWN_PLAYER_ID)x6]];
 			}
 			else {
@@ -847,11 +861,13 @@ sub normalize ($) {
 
 	my $self = shift;
 
+	my $game_id = $self->{_id};
 	$self->{old} ?
 		$self->normalize_old($self) :
 		$self->normalize_new($self);
 	@{$self->{events}} = grep { $_->{type} ne 'PENL' } @{$self->{events}}
-		unless $ENV{GS_KEEP_PENL};
+		unless $ENV{GS_KEEP_PENL} ||
+		$BROKEN_FILES{$game_id}->{BS} && $BROKEN_FILES{$game_id}->{BS} == $NO_EVENTS;
 	for my $event (@{$self->{events}}) {
 		if (my $evx = $BROKEN_EVENTS{GS}->{$self->{_id}}->{$event->{id}}) {
 			for my $key (keys %{$evx}) {

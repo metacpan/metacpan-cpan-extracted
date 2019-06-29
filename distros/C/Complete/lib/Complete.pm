@@ -1,7 +1,7 @@
 package Complete;
 
-our $DATE = '2018-09-26'; # DATE
-our $VERSION = '0.200'; # VERSION
+our $DATE = '2019-06-26'; # DATE
+our $VERSION = '0.201'; # VERSION
 
 1;
 # ABSTRACT: Convention for Complete::* modules family
@@ -18,7 +18,7 @@ Complete - Convention for Complete::* modules family
 
 =head1 VERSION
 
-This document describes version 0.200 of Complete (from Perl distribution Complete), released on 2018-09-26.
+This document describes version 0.201 of Complete (from Perl distribution Complete), released on 2019-06-26.
 
 =head1 DESCRIPTION
 
@@ -106,10 +106,16 @@ formatters/tools. It is a hashref which can contain the following keys:
 
 =over
 
+=item * message => string
+
+Experimental. Instead of returning completion entries, a completion answer can
+also opt to request showing a message (i.e. error message, or informational
+message) to the user.
+
 =item * words => array
 
-This key is required. Its value is an array of completion entries. A completion
-entry can be a string or a hashref. Example:
+Its value is an array of completion entries. A completion entry can be a string
+or a hashref. Example:
 
  ['apple', 'apricot'] # array of strings
 
@@ -200,7 +206,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

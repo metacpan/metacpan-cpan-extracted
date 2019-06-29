@@ -9,7 +9,7 @@ use Test::More;
 
 plan tests => 14;
 
-use Sport::Analytics::NHL::LocalConfig;
+#use Sport::Analytics::NHL::Vars;
 use Sport::Analytics::NHL;
 
 my @args = (201020102, 20161110, 2010020140, 2010020103, 201136201, 20120202);

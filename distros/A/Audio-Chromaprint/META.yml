@@ -10,7 +10,8 @@ build_requires:
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
+  FFI::CheckLib: '0.25'
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
@@ -20,16 +21,16 @@ name: Audio-Chromaprint
 provides:
   Audio::Chromaprint:
     file: lib/Audio/Chromaprint.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
-  FFI::CheckLib: '0'
+  FFI::CheckLib: '0.25'
   FFI::Platypus: '0.88'
   Moose: '0'
 resources:
   bugtracker: https://github.com/xsawyerx/audio-chromaprint/issues
   repository: git://github.com/xsawyerx/audio-chromaprint.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -246,7 +247,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.001
+          tag: v0.002
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -356,6 +357,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::DynamicPrereqs
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
+      name: DynamicPrereqs
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

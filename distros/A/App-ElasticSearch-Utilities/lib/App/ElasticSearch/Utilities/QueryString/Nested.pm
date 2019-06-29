@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Nested;
 use strict;
 use warnings;
 
-our $VERSION = '6.9'; # VERSION
+our $VERSION = '7.0'; # VERSION
 
 use App::ElasticSearch::Utilities::QueryString;
 use CLI::Helpers qw(:output);
@@ -65,7 +65,7 @@ App::ElasticSearch::Utilities::QueryString::Nested - Implement the proposed Elas
 
 =head1 VERSION
 
-version 6.9
+version 7.0
 
 =head1 SYNOPSIS
 

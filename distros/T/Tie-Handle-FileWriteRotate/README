@@ -1,5 +1,13 @@
-SYNOPSIS
+NAME
+    Tie::Handle::FileWriteRotate - Filehandle tie to write to autorotated
+    file with File::Write::Rotate
 
+VERSION
+    This document describes version 0.040 of Tie::Handle::FileWriteRotate
+    (from Perl distribution Tie-Handle-FileWriteRotate), released on
+    2019-06-27.
+
+SYNOPSIS
      use Tie::Handle::FileWriteRotate;
      tie *FH, 'Tie::Handle::FileWriteRotate',
          dir=>'/some/dir', prefix=>'myapp', size=>25*1024*1024, histories=>5;
@@ -7,24 +15,15 @@ SYNOPSIS
      print FH "Logging another line\n";
 
 DESCRIPTION
-
     This module ties a filehandle to File::Write::Rotate object.
 
     I first wrote this module to tie STDERR, so that warnings/errors are
     logged to file instead of terminal (with autorotation, for good
     behavior).
 
-METHODS
-
- TIEHANDLE classname, LIST
-
-    Tie this package to file handle. LIST will be passed to
-    File::Write::Rotate's constructor.
-
 TIPS
-
-    To log warnings/errors to terminal as well as autorotated file, you can
-    do something like this instead:
+    To log warnings/errors to terminal *as well as* autorotated file, you
+    can do something like this instead:
 
      my $fwr = File::Write::Rotate->new(...);
      $SIG{__WARN__} = sub {
@@ -36,7 +35,36 @@ TIPS
          die $_[0];
      };
 
-SEE ALSO
+METHODS
+  TIEHANDLE classname, LIST
+    Tie this package to file handle. "LIST" will be passed to
+    File::Write::Rotate's constructor.
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tie-Handle-FileWriteRotate>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tie-Handle-FileWriteRotate>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Handle-FileWriteR
+    otate>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     File::Write::Rotate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2012 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

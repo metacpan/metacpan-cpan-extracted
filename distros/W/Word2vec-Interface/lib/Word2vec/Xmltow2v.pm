@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 12/08/2017                                                             #
+#    Revised: 06/25/2019                                                             #
 #    UMLS Similarity - Medline XML-To-Word2Vec Input Format Conversion Module        #
 #                                                                                    #
 ######################################################################################
@@ -30,39 +30,48 @@ package Word2vec::Xmltow2v;
 use strict;
 use warnings;
 
+
 # Standard Package(s)
 use utf8;
-use threads;
-use threads::shared;
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
 # CPAN Package(s)
 use Cwd;
 use File::Type;
+use Sys::CpuAffinity;
 use Text::Unidecode;
 use XML::Twig;
-use Sys::CpuAffinity;
 
 # Word2Vec Utility Package(s)
 use Word2vec::Bst;
 
+# Checking For "threads" and "threads::shared" Module(s)
+my $threads_module_installed        = 0;
+my $threads_shared_module_installed = 0;
+
+eval{ require threads; };
+if( !( $@ ) ) { $threads_module_installed        = 1; }
+
+eval{ require threads::shared; };
+if( !( $@ ) ) { $threads_shared_module_installed = 1; }
+
 
 use vars qw($VERSION);
 
-$VERSION = '0.022';
+$VERSION = '0.025';
 
 
 # Global Variables
-my $debugLock         :shared;
-my $writeLock         :shared;
-my $queueLock         :shared;
-my $appendLock        :shared;
-my @xmlJobQueue       :shared;
-my $totalJobCount     :shared;
-my $finishedJobCount  :shared;
-my $preCompWordCount  :shared;
-my $postCompWordCount :shared;
-my $compoundWordCount :shared;
+my $debugLock         :shared if ( $threads_shared_module_installed == 1 );
+my $writeLock         :shared if ( $threads_shared_module_installed == 1 );
+my $queueLock         :shared if ( $threads_shared_module_installed == 1 );
+my $appendLock        :shared if ( $threads_shared_module_installed == 1 );
+my @xmlJobQueue       :shared if ( $threads_shared_module_installed == 1 );
+my $totalJobCount     :shared if ( $threads_shared_module_installed == 1 );
+my $finishedJobCount  :shared if ( $threads_shared_module_installed == 1 );
+my $preCompWordCount  :shared if ( $threads_shared_module_installed == 1 );
+my $postCompWordCount :shared if ( $threads_shared_module_installed == 1 );
+my $compoundWordCount :shared if ( $threads_shared_module_installed == 1 );
 
 
 ######################################################################################
@@ -128,7 +137,6 @@ sub new
     $self->{ _quickParse }                  = 0 if !defined ( $self->{ _quickParse } );
     $self->{ _compoundifyText }             = 0 if !defined ( $self->{ _compoundifyText } );
     $self->{ _storeAsSentencePerLine }      = 0 if !defined ( $self->{ _storeAsSentencePerLine } );
-    $self->{ _numOfThreads }                = Sys::CpuAffinity::getNumCpus() if !defined ( $self->{ _numOfThreads } );
     $self->{ _workingDir }                  = Cwd::getcwd() if !defined ( $self->{ _workingDir } );
     $self->{ _savePath }                    = Cwd::getcwd() if !defined ( $self->{ _savePath } );
     $self->{ _beginDate }                   = "00/00/0000" if !defined ( $self->{ _beginDate } );
@@ -145,6 +153,17 @@ sub new
     $self->{ _compoundWordBST }             = Word2vec::Bst->new() if !defined ( $self->{ _compoundWordBST } );
     $self->{ _maxCompoundWordLength }       = 20 if !defined ( $self->{ _maxCompoundWordLength } );
     $self->{ _overwriteExistingFile }       = 0 if !defined ( $self->{ _overwriteExistingFile } );
+    
+    # Multi-Threaded Algo
+    if( !defined ( $self->{ _numOfThreads } ) and $threads_module_installed == 1 )
+    {
+        $self->{ _numOfThreads }            = Sys::CpuAffinity::getNumCpus();
+    }
+    # Single Threaded Algo (Perl Not Built To Support Threads Backup Algo)
+    elsif( $threads_module_installed == 0 )
+    {
+        $self->{ _numOfThreads }            = 1;
+    }
     
     # Initialize Thread Safe Counting Variables
     @xmlJobQueue       = ();
@@ -282,23 +301,43 @@ sub ConvertMedlineXMLToW2V
         undef $dirHandle;
         
         # Set Total Job Count
-        $totalJobCount = @xmlJobQueue;
+        $totalJobCount = scalar @xmlJobQueue;
         
         $self->WriteLog( "ConvertMedlineXMLToW2V - Parsing $totalJobCount File(s)" );
         $self->WriteLog( "ConvertMedlineXMLToW2V - Starting Worker Thread(s) / Compiling Text Corpus" );
         
-        # Start Thread(s)
-        for( my $i = 0; $i < $self->GetNumOfThreads(); $i++ )
+        # Multi-Threaded Directory Parsing
+        if( $threads_module_installed == 1 )
         {
-            my $thread = threads->create( "_ThreadedConvert", $self, $dir );
+            # Start Thread(s)
+            for( my $i = 0; $i < $self->GetNumOfThreads(); $i++ )
+            {
+                my $thread = threads->create( "_ThreadedConvert", $self, $dir );
+            }
+
+            # Join All Running Threads Prior To Termination
+            my @threadAry = threads->list();
+    
+            for my $thread ( @threadAry )
+            {
+                $thread->join() if ( $thread->is_running() || $thread->is_joinable() );
+            }
         }
-
-        # Join All Running Threads Prior To Termination
-        my @threadAry = threads->list();
-
-        for my $thread ( @threadAry )
+        # Single Threaded Directory Parsing (Perl Not Build To Support Threads)
+        else
         {
-            $thread->join() if ( $thread->is_running() || $thread->is_joinable() );
+            for my $file ( @xmlJobQueue )
+            {
+                $self->SetXMLStringToParse( $self->_ReadXMLDataFromFile( "$dir/$file" ) );
+                next if ( $self->GetXMLStringToParse() ) eq "(null)";
+        
+                $self->WriteLog( "ConvertMedlineXMLToW2V - Parsing XML File: $file" );
+                $self->_ParseXMLString( $self->GetXMLStringToParse() );
+                $self->_SaveTextCorpusToFile( $self->GetSavePath() );
+                $self->ClearTextCorpusStr();
+                
+                $finishedJobCount++;
+            }
         }
 
         print( "Parsed $finishedJobCount of $totalJobCount Files\n" ) if ( $self->GetDebugLog() == 0 );
@@ -334,8 +373,8 @@ sub _ThreadedConvert
     my $keepWorking = 1;
     my $tid = threads->tid();
 
-    $self->WriteLog( "_ThreadedConvert - Warning: Requested Thread $tid Not Needed/Threads Exceed Work Load - Terminating Thread" ) if ( @xmlJobQueue == 0 );
-    return 1 if ( @xmlJobQueue == 0 );
+    $self->WriteLog( "_ThreadedConvert - Warning: Requested Thread $tid Not Needed/Threads Exceed Work Load - Terminating Thread" ) if ( scalar @xmlJobQueue == 0 );
+    return 1 if ( scalar @xmlJobQueue == 0 );
 
     $self->WriteLog( "_ThreadedConvert - Starting Thread: $tid" );
     $self->WriteLog( "_ThreadedConvert - Thread $tid Parsing File(s) In Job Queue" );
@@ -1338,13 +1377,18 @@ sub IsFileOrDirectory
 sub RemoveSpecialCharactersFromString
 {
     my ( $self, $str ) = @_;
+    
+    $self->WriteLog( "RemoveSpecialCharactersFromString - Error: String Parameter Is Not Defined" )      if !defined( $str );
+    $self->WriteLog( "RemoveSpecialCharactersFromString - Error: String Parameter Equals Empty String" ) if ( $str eq "" );
+    return undef if !defined( $str ) or ( $str eq "" );
+    
     $str = lc( $str );                                                 # Convert all characters to lowercase
     $str =~ s/ +/ /g;                                                  # Remove duplicate white spaces between words
     $str =~ s/'s//g;                                                   # Remove "'s" characters (Apostrophe 's')
     $str =~ s/-/ /g;                                                   # Replace all hyphen characters to spaces
     $str =~ s/\./\n/g if ( $self->GetStoreAsSentencePerLine() == 1 );  # Convert Period To New Line Character
-    $str =~ tr/a-z\015\012/ /cs;                                       # Remove all characters except 'a' to 'z' and new-line characters
-    #$str =~ s/[\$#@~!&*()\[\];.,:?^\-'`\\\/]+//g;                     # Does not include numeric characters
+    $str =~ tr/a-z\_\015\012/ /cs;                                     # Remove all characters except 'a' to 'z', compound terms joined by "_" character and newline character
+    $str =~ s/\b\_\b|\b\_\B|\B\_\b/ /g;                                # Remove "_" character(s) surrounded by white space and "_" not surrounded by word characters
     
     # Convert String Line Ending Suitable To The Target 
     my $lineEnding = "";
@@ -1355,12 +1399,15 @@ sub RemoveSpecialCharactersFromString
     $lineEnding = "\015"     if ( $os eq "MacOS" );
     
     $str =~ s/(\015\012|\012|\015)/$lineEnding/g;
+    ####
     
     # Removes Spaces At Left Side Of String
     $str =~ s/^\s+//                if ( $self->GetStoreAsSentencePerLine() == 1 );
     
     # Removes Spaces At Both Ends Of String And More Than Once Space In-Between Ends
     $str =~ s/^\s+|\s(?=\s)|\s+$//g if ( $self->GetStoreAsSentencePerLine() == 0 );
+    
+    $self->WriteLog( "RemoveSpecialCharactersFromString - Complete" );
     
     return $str;
 }
@@ -1547,7 +1594,8 @@ sub GetStoreAsSentencePerLine
 sub GetNumOfThreads
 {
     my ( $self ) = @_;
-    $self->{ _numOfThreads } = Sys::CpuAffinity::getNumCpus() if !defined ( $self->{ _numOfThreads } );
+    $self->{ _numOfThreads } = Sys::CpuAffinity::getNumCpus() if !defined ( $self->{ _numOfThreads } ) and $threads_module_installed == 1;
+    $self->{ _numOfThreads } = 1                              if !defined ( $self->{ _numOfThreads } ) and $threads_module_installed == 0;
     return $self->{ _numOfThreads };
 }
 
@@ -2675,7 +2723,13 @@ Example:
 
 Description:
 
- Removes special characters from string parameter, removes extra spaces and converts text to lowercase.
+ Normalizes text input based on settings below.
+   - All Text Conveted To Lowercase
+   - Duplicate White Spaces Removed
+   - "'s" (Apostrophe 's') Characters Removed
+   - Hyphen "-" Replaced With Whitespace
+   - All Characters Outside Of "a-z" and NewLine Characters Are Removed
+   - Lastly, Whitespace Before And After Text Is Removed
 
  Note: This method is called when parsing and compiling Medline title/abstract data.
 

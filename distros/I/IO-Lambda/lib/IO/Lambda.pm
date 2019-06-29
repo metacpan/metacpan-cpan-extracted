@@ -1,7 +1,7 @@
 # $Id: Lambda.pm,v 1.191 2012/01/13 06:41:28 dk Exp $
 package IO::Lambda;
 
-use Carp qw(croak);
+use Carp qw(croak confess);
 use strict;
 use warnings;
 use Exporter;
@@ -12,11 +12,11 @@ use vars qw(
 	$LOOP %EVENTS @LOOPS
 	$VERSION @ISA
 	@EXPORT_OK %EXPORT_TAGS	@EXPORT_CONSTANTS @EXPORT_LAMBDA @EXPORT_STREAM
-	@EXPORT_DEV @EXPORT_MISC @EXPORT_FUNC
+	@EXPORT_DEV @EXPORT_FRAME @EXPORT_MISC @EXPORT_FUNC
 	$THIS @CONTEXT $METHOD $CALLBACK $AGAIN $SIGTHROW
 	$DEBUG_IO $DEBUG_LAMBDA $DEBUG_CALLER %DEBUG
 );
-$VERSION     = '1.28';
+$VERSION     = '1.29';
 @ISA         = qw(Exporter);
 @EXPORT_CONSTANTS = qw(
 	IO_READ IO_WRITE IO_EXCEPTION 
@@ -34,14 +34,14 @@ $VERSION     = '1.28';
 	seq par mapcar filter fold curry 
 );
 @EXPORT_MISC    = qw(
-	set_frame get_frame swap_frame sigthrow
+	delete_frame set_frame get_frame swap_frame sigthrow
 );
 @EXPORT_DEV    = qw(
 	_subname _o _t
 );
 @EXPORT_OK   = (
 	@EXPORT_LAMBDA, @EXPORT_CONSTANTS, @EXPORT_STREAM, 
-	@EXPORT_DEV, @EXPORT_MISC, @EXPORT_FUNC
+	@EXPORT_DEV, @EXPORT_MISC, @EXPORT_FUNC,
 );
 %EXPORT_TAGS = (
 	func      => \@EXPORT_FUNC, 
@@ -159,8 +159,8 @@ sub watch_io
 {
 	my ( $self, $flags, $handle, $deadline, $callback, $cancel) = @_;
 
-	croak "can't register events on a stopped lambda" if $self-> {stopped};
-	croak "bad io flags" if 0 == ($flags & (IO_READ|IO_WRITE|IO_EXCEPTION));
+	confess "can't register events on a stopped lambda" if $self-> {stopped};
+	confess "bad io flags" if 0 == ($flags & (IO_READ|IO_WRITE|IO_EXCEPTION));
 
 	$deadline += time if defined($deadline) and $deadline < 1_000_000_000;
 	
@@ -187,8 +187,8 @@ sub watch_timer
 {
 	my ( $self, $deadline, $callback, $cancel) = @_;
 
-	croak "can't register events on a stopped lambda" if $self-> {stopped};
-	croak "$self: time is undefined" unless defined $deadline;
+	confess "can't register events on a stopped lambda" if $self-> {stopped};
+	confess "$self: time is undefined" unless defined $deadline;
 	
 	$deadline += time if $deadline < 1_000_000_000;
 	my $rec = [
@@ -213,10 +213,10 @@ sub watch_lambda
 	my ( $self, $lambda, $callback, $cancel) = @_;
 	@_ = (); # perl bug http://rt.perl.org/rt3//Public/Bug/Display.html?id=70974
 
-	croak "can't register events on a stopped lambda" if $self-> {stopped};
-	croak "bad lambda" unless $lambda and $lambda->isa('IO::Lambda');
+	confess "can't register events on a stopped lambda" if $self-> {stopped};
+	confess "bad lambda" unless $lambda and $lambda->isa('IO::Lambda');
 
-	croak "won't watch myself" if $self == $lambda;
+	confess "won't watch myself" if $self == $lambda;
 	# XXX check cycling
 	
 	$lambda-> reset if $lambda-> is_stopped;
@@ -336,7 +336,7 @@ sub intercept
 
 sub super
 {
-	croak "super() call outside overridden condition" unless $_[0]-> {super};
+	confess "super() call outside overridden condition" unless $_[0]-> {super};
 	my $data = $_[0]-> {super};
 	if ( defined $data-> [1]) {
 		# override() super
@@ -460,9 +460,10 @@ sub cancel_all_events
 	my $self = shift;
 
 	$self-> {stopped} = 1;
+	delete $self->{frames};
 
 	return unless @{$self-> {in}};
-	
+
 	for ( grep { $_-> [WATCH_CANCEL] } reverse @{$self-> {in}}) {
 		my $wc = $_-> [WATCH_CANCEL];
 		$_-> [WATCH_CANCEL] = undef;
@@ -514,7 +515,7 @@ sub start
 {
 	my $self = shift;
 
-	croak "can't start active lambda, call reset() first" if $self-> is_active;
+	confess "can't start active lambda, call reset() first" if $self-> is_active;
 
 	warn _d( $self, 'started') if $DEBUG_LAMBDA;
 	@{$self->{last}} = $self-> {start}-> ($self, @{$self->{last}})
@@ -535,7 +536,7 @@ sub call
 {
 	my $self = shift;
 
-	croak "can't call active lambda" if $self-> is_active;
+	confess "can't call active lambda" if $self-> is_active;
 
 	@{$self-> {last}} = @_;
 	$self;
@@ -620,7 +621,9 @@ sub wait
 		$self-> call(@_);
 		$self-> start;
 	}
+	my @frame = get_frame();
 	yield while not $self-> {stopped};
+	set_frame(@frame);
 	return $self-> peek;
 }
 
@@ -631,12 +634,14 @@ sub wait_for_all
 	return unless @objects;
 	$_-> start for grep { $_-> is_passive } @objects;
 	my @ret;
+	my @frame = get_frame();
 	while ( 1) {
 		push @ret, map { $_-> peek } grep { $_-> {stopped} } @objects;
 		@objects = grep { not $_-> {stopped} } @objects;
 		last unless @objects;
 		yield;
 	}
+	set_frame(@frame);
 	return @ret;
 }
 
@@ -646,15 +651,22 @@ sub wait_for_any
 	my @objects = @_;
 	return unless @objects;
 	$_-> start for grep { $_-> is_passive } @objects;
+	my @frame = get_frame();
 	while ( 1) {
 		my @n = grep { $_-> {stopped} } @objects;
 		return @n if @n;
 		yield;
 	}
+	set_frame(@frame);
+	return;
 }
 
 # run the event loop until no lambdas are left in the blocking state
-sub run { do {} while yield }
+sub run {
+	my @frame = get_frame();
+	do {} while yield 
+	set_frame(@frame);
+}
 
 #
 # Part II - Procedural interface to the lambda-style programming
@@ -701,21 +713,26 @@ sub _subname
 # re-enter the latest (or other) frame
 sub again
 {
-	( $METHOD, $CALLBACK) = @_ if 2 == @_;
+	if ( @_ ) {
+		my $name = shift;
+		Carp::carp("no such frame:$name") unless exists $THIS->{frames}->{$name};
+		($METHOD, $CALLBACK, @CONTEXT) = @{ $THIS->{frames}->{$name} };
+		@CONTEXT = @_ if @_;
+	}
 	local $AGAIN = 1;
-	defined($METHOD) ? 
-		$METHOD-> ($CALLBACK) : 
-		croak "again() outside of a restartable call" 
+	defined($METHOD) ?
+		$METHOD-> ($CALLBACK) :
+		confess "again() outside of a restartable call" 
 }
 
 # define context
 sub this        { @_ ? ($THIS, @CONTEXT)    = @_ : $THIS }
 sub context     { @_ ? (@CONTEXT)           = @_ : @CONTEXT }
-sub restartable { @_ ? ($METHOD, $CALLBACK) = @_ : ( $METHOD, $CALLBACK) }
 sub set_frame   { ( $THIS, $METHOD, $CALLBACK, @CONTEXT) = @_ }
 sub get_frame   { ( $THIS, $METHOD, $CALLBACK, @CONTEXT) }
 sub swap_frame  { my @f = get_frame; set_frame(@_); @f }
 sub clear       { set_frame(); undef $AGAIN; }
+sub delete_frame { delete $THIS->{frames}->{$_[0]} }
 
 END { ( $THIS, $METHOD, $CALLBACK, @CONTEXT) = (); }
 
@@ -725,13 +742,20 @@ sub state($)
 	@_ ? $this-> {state} = $_[0] : return $this-> {state};
 }
 
+sub restartable
+{
+	my $name = @_ ? $_[0] : join(':', caller);
+	$THIS->{frames}->{$name} = [ $METHOD, $CALLBACK, @CONTEXT ];
+	return $name;
+}
+
 # exceptions and backtracing
 sub catch(&$)
 {
 	my ( $cb, $event) = @_;
 	my $who = (caller(1))[3];
 	my @ctx = @CONTEXT;
-	croak "catch callback already defined" if $event-> [WATCH_CANCEL];
+	confess "catch callback already defined" if $event-> [WATCH_CANCEL];
 	$event->[WATCH_CANCEL] = $cb ? sub {
 		local *__ANON__ = "$who\:\:catch" if $DEBUG_CALLER;
 		$THIS     = shift;
@@ -753,7 +777,7 @@ sub catch(&$)
 sub call_again
 {
 	my $self = shift;
-	croak "called outside catch()" unless $self-> {cancelled_event};
+	confess "called outside catch()" unless $self-> {cancelled_event};
 	my $cb = $self-> {cancelled_event}->[WATCH_CALLBACK];
 	$cb->($self, @_) if $cb;
 }
@@ -1296,7 +1320,7 @@ sub getline
 	my $reader = shift;
 	lambda {
 		my ( $fh, $buf, $deadline) = @_;
-		croak "getline() needs a buffer! ( f.ex getline,\$fh,\\(my \$buf='') )"
+		confess "getline() needs a buffer! ( f.ex getline,\$fh,\\(my \$buf='') )"
 			unless ref($buf);
 		context readbuf($reader), $fh, $buf, qr/^[^\n]*\n/, $deadline;
 	tail {
@@ -1356,7 +1380,7 @@ sub bind
 	my $self = shift;
 
 	# create new condition
-	croak "can't register events on a stopped lambda" if $self-> {stopped};
+	confess "can't register events on a stopped lambda" if $self-> {stopped};
 
 	my $rec = [ $self, @_ ];
 	push @{$self-> {in}}, $rec;
@@ -1380,6 +1404,7 @@ sub resolve
 	unless ( @$in) {
 		warn _d( $self, 'stopped') if $DEBUG_LAMBDA;
 		$self-> {stopped} = 1;
+		delete $self->{frames};
 	}
 }
 
@@ -1541,9 +1566,6 @@ where the functional style mixes with I/O. If, on the contrary, you are
 intimidated by the module's ambitions, you can skip to L<Simple use> for a more
 gentle introduction. Those, who are interested how the module is different from
 the other I/O frameworks, please continue reading.
-
-Warning: API in version 1.01 has slightly changed. See L<IO::Lambda::Compat>
-for dealing with program written usign the older API.
 
 =head2 Simple use
 
@@ -2034,33 +2056,6 @@ Executes either when all objects in C<@lambdas> are finished, or C<$deadline>
 expires. Returns lambdas that were successfully executed during the allotted
 time.
 
-=item again(@frame = ())
-
-Restarts the current state with the current context. All the conditions above,
-excluding C<lambda>, are restartable with C<again> call (see C<start> for
-restarting a C<lambda>). The code
-
-   context $obj1;
-   tail {
-       return if $null++;
-       context $obj2;
-       again;
-   };
-
-is thus equivalent to
-
-   context $obj1;
-   tail {
-       context $obj2;
-       &tail();
-   };
-
-C<again> passes the current context to the condition.
-
-If C<@frame> is provided, then it is treated as result of previous C<restartable> call.
-It contains data sufficient to restarting another call, instead of the current.
-See C<restartable> for details.
-
 =item context @ctx
 
 If called with no parameters, returns the current context, otherwise
@@ -2083,42 +2078,6 @@ instead of
     my $q = lambda { ... };
     $q-> wait;
 
-=item restartable(@frame)
-
-If called without parameters, returns the current callback frame, that
-can be later used in C<again>. Otherwise, replaces the internal frame
-variables, that doesn't affect anything immediately, but will be used by C<again>
-that is called without parameters.
-
-This property is only used when the condition inside which C<restartable> was
-fetched, is restartable. Since it is not a requirement for a user-defined
-condition to be restartable, this property is not universally useful.
-
-Example:
-
-    context lambda { 1 };
-    tail {
-        return if 3 == shift;
-    	my @frame = restartable;
-        context lambda { 2 };
-	tail {
-	   context lambda { 3 };
-	   again( @frame);
-	}
-    }
-
-The outermost tail callback will be called twice: first time in the normal course of events,
-and second time as a result of the C<again> call. C<restartable> and C<again> thus provide
-a kind of restartable continuations.
-
-Important: C<restartable> is a somewhat dangerous procedure, because it can
-create situations where C<@frame> holds a reference to a callback, and the
-callback holds a reference to C<@frame>. This setup creates a circular
-reference, that perl guaranteedly wouldn't resolve, thus resulting in memory
-leaks.  To avoid this effect, C<@frame> that holds result of C<restartable>
-should be cleaned explicitly when C<again(@frame)> is not called, and execution
-leaves the callback. (Thanks to Ben Tilly for bringing up the issue).
-
 =item condition $lambda, $callback, $method, $name
 
 Helper function for creating conditions, either from lambdas 
@@ -2130,6 +2089,80 @@ Example: convert existing C<getline> constructor into a condition:
    ...
    context $fh, $buf, $deadline;
    gl { ... }
+
+
+=back
+
+=head2 Frames
+
+These are functions to jump to previous callback frames to
+a previously saved context.
+ 
+=over
+
+=item again([$frame, [@context]])
+
+Restarts the frame with the context.  If C<$frame> is given, jumps to the frame
+previously returned by a C<restartable> call, resetting the context to its
+previous state too.  If C<@context> is given, it is used instead.
+
+All the conditions above, excluding C<lambda>, are restartable with C<again>
+call (see C<start> for restarting a C<lambda>). The code
+
+   context $obj1;
+   tail {
+       return if $null++;
+       context $obj2;
+       again;
+   };
+
+is thus equivalent to
+
+   context $obj1;
+   tail {
+       context $obj2;
+       &tail();
+   };
+
+C<again> passes the current context to the condition.
+
+If C<$frame> is provided, then it is treated as result of previous C<restartable> call.
+It contains data sufficient to restarting another call, instead of the current.
+See L<Frames> for details.
+
+=item restartable([$name])
+
+Save a frame. C<restartable> can generate unique C<$name> itself if not given.
+All frames are deleted when a lambda is stopped.
+
+Example:
+
+    my $counter = 0;
+    context lambda { $counter += 1 };
+    tail {
+        return if 12 == shift;
+    	my $frame = restartable;
+        context lambda { $counter += 10 };
+	tail {
+    	   again($frame);
+	}
+    }
+
+C<restartable> records the current content on the lambda, and C<again> switches it back
+so that C<again> call goes to the first C<tail> instead of the second. 
+
+=item delete_frame($frame)
+
+Deletes existing saved frame. Can be used to clean up eventual circular references
+(see below).
+
+=item get_frame, set_frame(@frame), swap_frame(@frame)
+
+A lower level frame accessors that save and restore all contexts.  Do not use
+directly because it can easily used to inadvertedly create circular references,
+where C<@frame> points to a callback while the callback via the closure
+mechanisms holds a reference to the C<@frame> variable (Thanks to Ben Tilly for
+bringing up the issue).
 
 =back
 

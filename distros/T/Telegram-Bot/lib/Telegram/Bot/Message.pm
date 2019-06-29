@@ -1,5 +1,5 @@
 package Telegram::Bot::Message;
-$Telegram::Bot::Message::VERSION = '0.010';
+$Telegram::Bot::Message::VERSION = '0.012';
 # ABSTRACT: The base class for Telegram messages incoming to the bot
 
 use Mojo::Base -base;
@@ -118,7 +118,7 @@ Telegram::Bot::Message - The base class for Telegram messages incoming to the bo
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 AUTHOR
 

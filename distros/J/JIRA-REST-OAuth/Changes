@@ -1,13 +1,17 @@
 Revision history for JIRA-REST-OAuth
 
-1.02    2019-06-05 - Adam. R. Schobelock <schobes@gmail.com>
+1.03    2019-06-25 - Adam R. Schobelock <schobes@gmail.com>
+        BUGFIX: Headers not being a HASHREF <Kat Wenger>
+        BUGFIX: next_issue() not working due to _build_path handling
+
+1.02    2019-06-05 - Adam R. Schobelock <schobes@gmail.com>
         Moved README to README.md
         Added Travis CI support.
         Updated documentation regarding where to report bugs.
 
-1.01    2019-06-04 - Adam. R. Schobelock <schobes@gmail.com>
+1.01    2019-06-04 - Adam R. Schobelock <schobes@gmail.com>
         BUGFIX: Forgot to include use base qw(JIRA::REST).
 
-1.00    2019-06-04 - Adam. R. Schobelock <schobes@gmail.com>
+1.00    2019-06-04 - Adam R. Schobelock <schobes@gmail.com>
         First version, released on an unsuspecting world.
 

@@ -22,7 +22,7 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 
 our $system_path = [];
@@ -129,7 +129,7 @@ sub find_lib
   my $recursive = $args{_r} || $args{recursive} || 0;
 
   # make arguments be lists.
-  foreach my $arg (qw( lib libpath symbol verify ))
+  foreach my $arg (qw( lib libpath symbol verify alien ))
   {
     next if ref $args{$arg} eq 'ARRAY';
     if(defined $args{$arg})
@@ -160,23 +160,51 @@ sub find_lib
 
   delete $missing{'*'};
 
+  foreach my $alien (@{ $args{alien} })
+  {
+    unless(eval { $alien->can('dynamic_libs') })
+    {
+      if($alien =~ /^([A-Za-z_][A-Za-z_0-9]*)(::[A-Za-z_][A-Za-z_0-9]*)*$/)
+      {
+        require Module::Load;
+        Module::Load::load($alien);
+        unless(eval { $alien->can('dynamic_libs') })
+        {
+          croak "Alien $alien doesn't provide a dynamic_libs method";
+        }
+      }
+      else
+      {
+        croak "Doesn't appear to be a valid Alien name $alien";
+      }
+    }
+    push @path, [$alien->dynamic_libs];
+  }
+
   foreach my $path (@path)
   {
-    next unless -d $path;
-    my $dh;
-    opendir $dh, $path;
+    next if ref $path ne 'ARRAY' && ! -d $path;
+
     my @maybe =
       # make determinist based on names and versions
       sort { _cmp($a,$b) }
       # Filter out the items that do not match the name that we are looking for
       # Filter out any broken symbolic links
       grep { ($any || $missing{$_->[0]} ) && (-e $_->[1]) }
-      # get [ name, full_path ] mapping,
-      # each entry is a 2 element list ref
-      map { _matches($_,$path) }
-      # read all files from the directory
-      readdir $dh;
-    closedir $dh;
+      ref $path eq 'ARRAY'
+        ? do {
+          map {
+            my($v, $d, $f) = File::Spec->splitpath($_);
+            _matches($f, File::Spec->catpath($v,$d));
+          } @$path;
+        }
+        : do {
+          my $dh;
+          opendir $dh, $path;
+          # get [ name, full_path ] mapping,
+          # each entry is a 2 element list ref
+          map { _matches($_,$path) } readdir $dh;
+        };
 
     if($try_ld_on_text && $args{try_linker_script})
     {
@@ -225,7 +253,6 @@ sub find_lib
         while(-l $found)
         {
           require File::Basename;
-          require File::Spec;
           my $dir = File::Basename::dirname($found);
           $found = File::Spec->rel2abs( readlink($found), $dir );
         }
@@ -375,7 +402,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -493,8 +520,17 @@ On select platforms, this options will use the linker command (C<ld>)
 to attempt to resolve the real C<.so> for non-binary files.  Since there
 is extra overhead this is off by default.
 
-An example is libyaml on RedHat based Linux distributions.  On Debian
+An example is libyaml on Red Hat based Linux distributions.  On Debian
 these are handled with symlinks and no trickery is required.
+
+=item alien
+
+[version 0.25]
+
+If no libraries can be found, try the given aliens instead.  The Alien
+classes specified must provide the L<Alien::Base> interface for dynamic
+libraries, which is to say they should provide a method called
+C<dynamic_libs> that returns a list of dynamic libraries.
 
 =back
 
@@ -615,6 +651,8 @@ Dan Book (grinnz, DBOOK)
 Ilya Pavlov (Ilya, ILUX)
 
 Shawn Laffan (SLAFFAN)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

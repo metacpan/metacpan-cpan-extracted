@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Carp;
 
@@ -137,17 +137,22 @@ be turned into an immediate-failed C<Future> rather than making the call
 itself propagate the exception, which is usually what you wanted when dealing
 with futures.
 
-=head1 BETA-VERSION WARNING
+=head1 STABILITY WARNING
 
-This module is still relatively new. While it seems stable enough for
-small-scale development and experimental testing, don't expect to be able to
-use this module reliably in production yet. It doesn't memory leak in most
-simple cases, but I don't have a great amount of confidence that there aren't
-still some corner-cases left which do.
+This module is still relatively new and under active development. While it now
+seems relatively stable enough for most use-cases, there may still be a number
+of memory leaks left in it, especially if still-pending futures are abandoned.
 
-That said, using it just in places like unit-tests and short-term scripts it
+While it seems stable enough for small-scale development and experimental
+testing, take care when using this module in production, as some growth in
+memory over time may be observed. Careful use of monitoring and periodic
+restarts of long-running processes may be a wise precaution.
+
+That said, using this module in places like unit-tests and short-term scripts
 does appear to be quite stable, so do try experimenting with it in this sort
 of situation, and let me know what does and doesn't work. 
+
+=head1 SUPPORTED USES
 
 Most cases involving awaiting on still-pending futures should work fine:
 

@@ -8,36 +8,36 @@ use Module::Build 0.28;
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.3601"
+    "Module::Build" => "0.28"
   },
   "configure_requires" => {
-    "Module::Build" => "0.3601"
+    "Module::Build" => "0.28"
   },
   "dist_abstract" => "Catmandu modules for working with BibTeX data",
   "dist_author" => [
     "Nicolas Steenlant C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-BibTeX",
-  "dist_version" => "0.11",
+  "dist_version" => "0.12",
   "license" => "perl",
   "module_name" => "Catmandu::BibTeX",
   "recursive_test_files" => 1,
   "requires" => {
-    "BibTeX::Parser" => 0,
-    "Catmandu" => 0,
+    "BibTeX::Parser" => "1.02",
+    "Catmandu" => "1.2002",
     "Clone" => 0,
     "Moo" => 0,
     "perl" => "v5.10.1"
   },
   "test_requires" => {
-    "Test::More" => "0.88"
+    "Test2::V0" => "0.000122"
   }
 );
 
 
 my %fallback_build_requires = (
-  "Module::Build" => "0.3601",
-  "Test::More" => "0.88"
+  "Module::Build" => "0.28",
+  "Test2::V0" => "0.000122"
 );
 
 

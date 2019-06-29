@@ -153,6 +153,10 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
     } else if (sv_isa(value, PL_JSON_BOOLEAN_CLASS)) {
         int val = SvTRUE(value);
         duk_push_boolean(ctx, val);
+    } else if (SvPOK(value)) {
+        STRLEN vlen = 0;
+        const char* vstr = SvPV_const(value, vlen);
+        duk_push_lstring(ctx, vstr, vlen);
     } else if (SvIOK(value)) {
         long val = SvIV(value);
         if (ref && (val == 0 || val == 1)) {
@@ -163,10 +167,6 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
     } else if (SvNOK(value)) {
         double val = SvNV(value);
         duk_push_number(ctx, (duk_double_t) val);
-    } else if (SvPOK(value)) {
-        STRLEN vlen = 0;
-        const char* vstr = SvPV_const(value, vlen);
-        duk_push_lstring(ctx, vstr, vlen);
     } else if (SvROK(value)) {
         SV* ref = SvRV(value);
         int type = SvTYPE(ref);
@@ -193,7 +193,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
                     SvREFCNT_inc(uptr);
                 }
 
-                array_top = av_top_index(values);
+                array_top = av_len(values);
                 for (j = 0; j <= array_top; ++j) { /* yes, [0, array_top] */
                     SV** elem = av_fetch(values, j, 0);
                     if (!elem || !*elem) {
@@ -271,7 +271,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
                 croak("Could not associate C dispatcher and Perl callback\n");
             }
         } else {
-            croak("Don't know how to deal with an undetermined Perl reference\n");
+            croak("Don't know how to deal with an undetermined Perl reference (type: %d)\n", type);
             ret = 0;
         }
     } else {

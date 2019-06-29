@@ -48,7 +48,7 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "FileHandle" : "0",
-            "IPC::Run" : "0",
+            "IPC::Open3" : "1.03",
             "JSON" : "0",
             "MIME::Base64" : "0",
             "POSIX" : "0",
@@ -62,6 +62,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.71",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.75",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

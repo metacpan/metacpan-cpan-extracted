@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.0.1");
+use version; our $VERSION = qv("v2.1.0");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -58,14 +58,47 @@ be searched for perl files, otherwise it searches some default locations
 sub all_files_ok {
     my ($self, @dirs) = @_;
 
+    $self->all_pm_files_ok(@dirs);
+    $self->all_pl_files_ok(@dirs);
+}
+
+
+=item C<all_pm_files_ok(@dirs)>
+
+Checks all the perl module files it can find for compilation errors.
+
+If C<@dirs> is defined then it is taken as an array of directories to
+be searched for perl files, otherwise it searches some default locations
+- see L</all_pm_files(@dirs)>.
+
+=cut
+sub all_pm_files_ok {
+    my ($self, @dirs) = @_;
+
+    my $test = $self->{test};
+
+    for my $file ( $self->all_pm_files(@dirs) ) {
+        my $ok = $self->pm_file_compiles($file);
+        $test->ok($ok, "$file compiles");
+    }
+}
+
+
+=item C<all_pl_files_ok(@dirs)>
+
+Checks all the perl program files it can find for compilation errors.
+
+If C<@dirs> is defined then it is taken as an array of directories to
+be searched for perl files, otherwise it searches some default locations
+- see L</all_pl_files(@dirs)>.
+
+=cut
+sub all_pl_files_ok {
+    my ($self, @dirs) = @_;
+
     my $test = $self->{test};
 
     for my $file ( $self->all_pl_files(@dirs) ) {
-        my $ok = $self->pl_file_compiles($file);
-        $test->ok($ok, "$file compiles");
-    }
-
-    for my $file ( $self->all_pm_files(@dirs) ) {
         my $ok = $self->pm_file_compiles($file);
         $test->ok($ok, "$file compiles");
     }
@@ -96,7 +129,7 @@ Returns a list of all the perl module files - that is any files ending in F<.pm>
 in C<@dirs> and in directories below. If C<@dirs> is undefined, it
 searches F<blib> if F<blib> exists, or else F<lib>.
 
-Skips any files in C<CVS> or C<.svn> directories.
+Skips any files in C<CVS>,  C<.svn>, or C<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
@@ -124,7 +157,7 @@ either have a F<.pl> extension, or have no extension and have a perl shebang lin
 If C<@dirs> is undefined, it searches F<script> if F<script> exists, or else
 F<bin> if F<bin> exists.
 
-Skips any files in C<CVS> or C<.svn> directories.
+Skips any files in C<CVS>,  C<.svn>, or C<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
@@ -310,11 +343,16 @@ sub _run_subprocess {
     exit ($rv ? 0 : 1);
 }
 
+# Works it's way through the input array (files and/or directories), recursively
+# finding files
 sub _find_files {
-    my ($self, @queue) = @_;
+    my ($self, @searchlist) = @_;
 
-    for my $file (@queue) {
-        if (defined($file) && -d $file) {
+    my @output;
+    for my $file (@searchlist) {
+        if (defined($file) && -f $file) {
+            push @output, $file;
+        } elsif (defined($file) && -d $file) {
             local *DH;
             opendir DH, $file or next;
             my @newfiles = readdir DH;
@@ -324,14 +362,14 @@ sub _find_files {
             for my $newfile (@newfiles) {
                 my $filename = File::Spec->catfile($file, $newfile);
                 if (-f $filename) {
-                    push @queue, $filename;
+                    push @output, $filename;
                 } else {
-                    push @queue, File::Spec->catdir($file, $newfile);
+                    push @searchlist, File::Spec->catdir($file, $newfile);
                 }
             }
         }
     }
-    return @queue;
+    return @output;
 }
 
 sub _pm_starting_points {
@@ -375,7 +413,7 @@ Evan Giles, C<< <egiles@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2015 by the authors.
+Copyright 2007-2019 by the authors.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

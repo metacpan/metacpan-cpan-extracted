@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi.pm
 # Description  : Pepi module for Raspberry Pi
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2019 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -19,7 +19,7 @@ use constant hipi_export_constants();
 use Scalar::Util qw( weaken isweak refaddr );
 use Carp;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
@@ -57,16 +57,25 @@ sub unregister_exit_method {
 
 sub _call_registered_and_exit {
     my $interrupt = shift;
+    my $tid = 0;
+    if( $HiPi::Threads::threads ) {
+        $tid = threads->tid();
+        HiPi::Threads->signal_handler( $interrupt ) unless( $tid ); # only call in main thread
+    }
+    
     for my $key ( keys %$registered_exits ) {
         my $method = $registered_exits->{$key}->[1];
         if( isweak( $registered_exits->{$key}->[0] ) && $registered_exits->{$key}->[0]->can($method) ) {
             $registered_exits->{$key}->[0]->$method();
         }
     }
-    if($interrupt_verbose) {
-        Carp::confess(qq(\nInterrupt SIG$interrupt));
-    } else {
-        die qq(\nInterrupt SIG$interrupt);
+    unless( $tid ) {
+        # only in main thread
+        if($interrupt_verbose) {
+            Carp::confess(qq(\nInterrupt SIG$interrupt));
+        } else {
+            die qq(\nInterrupt SIG$interrupt);
+        }
     }
 }
 

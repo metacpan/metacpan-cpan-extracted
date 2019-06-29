@@ -50,7 +50,7 @@ Text::QuickTemplate.
 
 =head1 DISTRIBUTION STATUS
 
-This is version 2.22 of Text::MicroMason. 
+This is version 2.23 of Text::MicroMason.
 
 If you encounter any problems, please inform the current maintainer and
 I'll endeavor to patch them promptly.

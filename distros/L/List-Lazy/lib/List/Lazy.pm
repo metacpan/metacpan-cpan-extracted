@@ -1,7 +1,7 @@
 package List::Lazy;
 our $AUTHORITY = 'cpan:YANICK'; 
 # ABSTRACT: Generate lists lazily
-$List::Lazy::VERSION = '0.3.1';
+$List::Lazy::VERSION = '0.3.2';
 
 
 
@@ -242,7 +242,7 @@ List::Lazy - Generate lists lazily
 
 =head1 VERSION
 
-version 0.3.1
+version 0.3.2
 
 =head1 SYNOPSIS
 
@@ -312,12 +312,14 @@ Creates a lazy list.
 
 =head3 arguments
 
-=over state
+=over 4
+
+=item state
 
 The state will be passed to the generator as C<$_>. If it is modified by the generator,
 its new value will be saved for the next invocation.
 
-=over generator
+=item generator
 
 A coderef that generates one or more next items for the list. If it returns an empty list,
 the stream will be considered to be exhausted.
@@ -441,7 +443,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017, 2016 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

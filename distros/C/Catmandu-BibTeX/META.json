@@ -26,12 +26,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "develop" : {
@@ -42,8 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "BibTeX::Parser" : "0",
-            "Catmandu" : "0",
+            "BibTeX::Parser" : "1.02",
+            "Catmandu" : "1.2002",
             "Clone" : "0",
             "Moo" : "0",
             "perl" : "v5.10.1"
@@ -51,7 +51,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0.000122"
          }
       }
    },
@@ -67,15 +67,15 @@
          "web" : "https://github.com/LibreCat/Catmandu-BibTeX"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_contributors" : [
       "Christian Pietsch <christian.pietsch@uni-bielefeld.de>",
       "Jakob Voss <voss@gbv.de>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 0
 }
 

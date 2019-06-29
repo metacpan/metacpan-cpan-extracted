@@ -1,5 +1,12 @@
 Revision history for List-Lazy
 
+0.3.2 2019-06-28
+ [DOCUMENTATION]
+ - Fixed pod error as reported by CPANTS. (GH#5, Mohammad S Anwar)
+
+ [STATISTICS]
+ - code churn: 8 files changed, 105 insertions(+), 8 deletions(-)
+
 0.3.1 2018-04-05
  [BUG FIXES]
  - Make module compatible with perl 5.27.7+. [GH#3]

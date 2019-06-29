@@ -1,10 +1,12 @@
 package Data::TableReader::Decoder::CSV;
-$Data::TableReader::Decoder::CSV::VERSION = '0.010';
 use Moo 2;
 use Try::Tiny;
 use Carp;
 use IO::Handle;
 extends 'Data::TableReader::Decoder';
+
+# ABSTRACT: Access rows of a comma-delimited text file
+our $VERSION = '0.011'; # VERSION
 
 our @csv_probe_modules= ( ['Text::CSV_XS' => 1.06], ['Text::CSV' => 1.91] );
 our $default_csv_module;
@@ -12,8 +14,6 @@ sub default_csv_module {
 	$default_csv_module ||=
 		Data::TableReader::Decoder::_first_sufficient_module('CSV parser', \@csv_probe_modules);
 }
-
-# ABSTRACT: Access rows of a comma-delimited text file
 
 
 has _parser_args => ( is => 'ro', init_arg => 'parser' );
@@ -198,7 +198,7 @@ Data::TableReader::Decoder::CSV - Access rows of a comma-delimited text file
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 

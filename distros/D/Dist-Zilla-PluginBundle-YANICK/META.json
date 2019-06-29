@@ -4,13 +4,13 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-PluginBundle-YANICK",
    "prereqs" : {
@@ -97,11 +97,11 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::YANICK" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/YANICK.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.30.0"
       },
       "Dist::Zilla::PluginBundle::YANICK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/YANICK.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.30.0"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/yanick/Dist-Zilla-PluginBundle-YANICK"
       }
    },
-   "version" : "0.29.0",
+   "version" : "0.30.0",
    "x_author_pledge" : {
       "version" : 1
    },
@@ -128,6 +128,7 @@
       "Damien Krotkine <dams@zarb.org>",
       "Karen Etheridge <ether@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

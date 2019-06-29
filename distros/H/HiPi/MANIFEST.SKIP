@@ -1,4 +1,5 @@
-
+lib/HiPi/Threads.pm
+lib/HiPi/Threads/
 devscripts/
 examples/runexample
 ^bak

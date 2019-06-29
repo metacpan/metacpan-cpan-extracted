@@ -1,3 +1,6 @@
+0.000013    2019-06-28
+            * Prefer string value for dualvars.
+
 0.000012    2019-04-05
             * Fix broken compilation on linux.
 

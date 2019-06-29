@@ -146,11 +146,11 @@
    "provides" : {
       "Mojolicious::Plugin::BootstrapHelpers" : {
          "file" : "lib/Mojolicious/Plugin/BootstrapHelpers.pm",
-         "version" : "0.0205"
+         "version" : "0.0206"
       },
       "Mojolicious::Plugin::BootstrapHelpers::Helpers" : {
          "file" : "lib/Mojolicious/Plugin/BootstrapHelpers/Helpers.pm",
-         "version" : "0.0205"
+         "version" : "0.0206"
       }
    },
    "release_status" : "stable",
@@ -165,7 +165,7 @@
          "web" : "https://github.com/Csson/p5-mojolicious-plugin-bootstraphelpers"
       }
    },
-   "version" : "0.0205",
+   "version" : "0.0206",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -675,7 +675,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0205",
+                  "tag" : "0.0206",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },

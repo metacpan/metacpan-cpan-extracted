@@ -1,7 +1,7 @@
 package Mojo::Calendar;
 use Mojo::Base 'DateTime';
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use DateTime::Format::Flexible;
 
@@ -24,8 +24,8 @@ sub new {
     $args->{ locale } ||= 'en_gb';
     $args->{ time_zone } ||= 'Europe/London';
 
-    if ($args->{ from }) {
-        $datetime = DateTime::Format::Flexible->parse_datetime($args->{ from })
+    if (my $from = delete($args->{ from })) {
+        $datetime = DateTime::Format::Flexible->parse_datetime($from);
     }
 
     if (!$datetime) {

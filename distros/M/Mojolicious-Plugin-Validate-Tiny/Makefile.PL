@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+use 5.006;
 
 use strict;
 use warnings;
@@ -6,22 +7,38 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME         => 'Mojolicious::Plugin::Validate::Tiny',
-    VERSION_FROM => 'lib/Mojolicious/Plugin/Validate/Tiny.pm',
-    AUTHOR       => 'Adrian Crisan <adrian.crisan88@gmail.com>',
-    MIN_PERL_VERSION => 5.010,
-    PREREQ_PM    => {
-        'Mojolicious'    => 6.00,
+    NAME             => 'Mojolicious::Plugin::Validate::Tiny',
+    AUTHOR           => q{Adrian Crisan <adrian.crisan88@gmail.com>},
+    VERSION_FROM     => 'lib/Mojolicious/Plugin/Validate/Tiny.pm',
+    ABSTRACT_FROM    => 'lib/Mojolicious/Plugin/Validate/Tiny.pm',
+    LICENSE          => 'MIT',
+    PL_FILES         => {},
+    MIN_PERL_VERSION => 5.006,
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
+    },
+    BUILD_REQUIRES => {
+        'Test::More' => 0,
+    },
+    PREREQ_PM => {
+        'Mojolicious'    => 0,
         'Validate::Tiny' => 0.984
     },
     META_MERGE   => {
+        no_index       => {directory => ['t']},
         resources => {
-            repository  =>  'https://github.com/crlcu/Mojolicious-Plugin-Validate-Tiny',
+            bugtracker => {
+                web => 'https://github.com/crlcu/Mojolicious-Plugin-Validate-Tiny/issues'
+            },
+            license    => ['https://opensource.org/licenses/MIT'],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/crlcu/Mojolicious-Plugin-Validate-Tiny.git',
+                web  => 'https://github.com/crlcu/Mojolicious-Plugin-Validate-Tiny',
+            },
         },
     },
-    PREREQ_PRINT => 1,
-    test => { TESTS => 't/*.t' },
-    dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Mojolicious-Plugin-Validate-Tiny-*' },
-
+    test => {TESTS => 't/*.t'},
 );

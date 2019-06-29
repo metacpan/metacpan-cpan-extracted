@@ -1,0 +1,53 @@
+{
+   "abstract" : "Try hard to get the functionality of Syntax::Keyword::Try",
+   "author" : [
+      "Steve Scaffidi <sscaffidi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Try-Harder",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Simple" : "0",
+            "Import::Into" : "0",
+            "Module::Load::Conditional" : "0",
+            "Text::Balanced" : "0",
+            "if" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Try::Harder" : {
+         "file" : "lib/Try/Harder.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hercynium/Acme-Try-Harder/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hercynium/Acme-Try-Harder.git",
+         "web" : "https://github.com/hercynium/Acme-Try-Harder"
+      }
+   },
+   "version" : "0.005",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+}
+

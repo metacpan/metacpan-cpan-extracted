@@ -19,6 +19,7 @@ use LaTeXML::Common::Error;
 use LaTeXML::Core::Token;
 use LaTeXML::Core::Tokens;
 use LaTeXML::Util::Pathname;
+use Encode qw(decode);
 use base qw(LaTeXML::Common::Object);
 
 # Factory method;
@@ -35,7 +36,7 @@ sub create {
     $options{shortsource} = "$name.$ext";
     return $class->new($options{content}, %options); }
   elsif ($source =~ s/^literal://) {    # we've supplied literal data
-    $options{source} = ''; # the source does not have a corresponding file name
+    $options{source} = '';              # the source does not have a corresponding file name
     return $class->new($source, %options); }
   elsif (!defined $source) {
     return $class->new('', %options); }
@@ -48,7 +49,7 @@ sub create {
 
 sub new {
   my ($class, $string, %options) = @_;
-  $string               = q{}                unless defined $string;
+  $string = q{} unless defined $string;
   #$options{source}      = "Anonymous String" unless defined $options{source};
   #$options{shortsource} = "String"           unless defined $options{shortsource};
   my $self = bless { source => $options{source},
@@ -62,6 +63,16 @@ sub new {
 
 sub openString {
   my ($self, $string) = @_;
+  #  if (0){
+  if (defined $string) {
+    if (utf8::is_utf8($string)) { }    # If already utf7
+    elsif (my $encoding = $STATE->lookupValue('PERL_INPUT_ENCODING')) {
+     # Note that if chars in the input cannot be decoded, they are replaced by \x{FFFD}
+     # I _think_ that for TeX's behaviour we actually should turn such un-decodeable chars in to space(?).
+      $string = decode($encoding, $string, Encode::FB_DEFAULT);
+      if ($string =~ s/\x{FFFD}/ /g) {    # Just remove the replacement chars, and warn (or Info?)
+        Info('misdefined', $encoding, $self, "input isn't valid under encoding $encoding"); } } }
+
   $$self{string} = $string;
   $$self{buffer} = [(defined $string ? splitLines($string) : ())];
   return; }
@@ -135,16 +146,16 @@ sub getNextChar {
   if ($$self{colno} < $$self{nchars}) {
     my $ch = $$self{chars}[$$self{colno}++];
     my $cc = $$STATE{catcode}{$ch}[0] // CC_OTHER;    # $STATE->lookupCatcode($ch); OPEN CODED!
-    if (($cc == CC_SUPER)    # Possible convert ^^x
+    if (($cc == CC_SUPER)                             # Possible convert ^^x
       && ($$self{colno} + 1 < $$self{nchars}) && ($ch eq $$self{chars}[$$self{colno}])) {
       my ($c1, $c2);
-      if (($$self{colno} + 2 < $$self{nchars})    # ^^ followed by TWO LOWERCASE Hex digits???
+      if (($$self{colno} + 2 < $$self{nchars})        # ^^ followed by TWO LOWERCASE Hex digits???
         && (($c1 = $$self{chars}[$$self{colno} + 1]) =~ /^[0-9a-f]$/)
         && (($c2 = $$self{chars}[$$self{colno} + 2]) =~ /^[0-9a-f]$/)) {
         $ch = chr(hex($c1 . $c2));
         splice(@{ $$self{chars} }, $$self{colno} - 1, 4, $ch);
         $$self{nchars} -= 3; }
-      else {                                      # OR ^^ followed by a SINGLE Control char type code???
+      else {    # OR ^^ followed by a SINGLE Control char type code???
         my $c  = $$self{chars}[$$self{colno} + 1];
         my $cn = ord($c);
         $ch = chr($cn + ($cn > 64 ? -64 : 64));
@@ -162,19 +173,15 @@ sub stringify {
 #**********************************************************************
 sub getLocator {
   my ($self) = @_;
-  my ($l, $c, $lstart, $cstart) = ($$self{lineno}, $$self{colno});
-  #Deyan: Upgrade message to XPointer style
-  my $nc = $$self{nchars} - 1;    #There is always a weird (end of line?) char that gets counted
-  if ((defined $c) && ($c >= $nc)) {
-    $lstart = $l;
-    $cstart = $c - $nc; }
+  my ($toLine, $toCol, $fromLine, $fromCol) = ($$self{lineno}, $$self{colno});
+  my $maxCol = ($$self{nchars} ? $$self{nchars} - 1 : 0);    #There is always a trailing EOL char
+  if ((defined $toCol) && ($toCol >= $maxCol)) {
+    $fromLine = $toLine;
+    $fromCol  = 0; }
   else {
-    #Very rough and dirty approximation, not to be relied on.
-    #One would need to keep all line lengths to properly establish the start and end
-    # or just remember the initial char of the token's position
-    $lstart = $l - 1;
-    $cstart = $nc - $c; }
-  return LaTeXML::Common::Locator->new($$self{source}, $lstart, $cstart, $l, $c); }
+    $fromLine = $toLine;
+    $fromCol  = $toCol; }
+  return LaTeXML::Common::Locator->new($$self{source}, $fromLine, $fromCol, $toLine, $toCol); }
 
 sub getSource {
   my ($self) = @_;
@@ -336,7 +343,7 @@ sub readRawLine {
     $line = $self->getNextLine;
     if (!defined $line) {
       $$self{at_eof} = 1;
-      $$self{chars} = []; $$self{nchars} = 0; $$self{colno} = 0; }
+      $$self{chars}  = []; $$self{nchars} = 0; $$self{colno} = 0; }
     else {
       $$self{lineno}++;
       $$self{chars}  = splitChars($line);

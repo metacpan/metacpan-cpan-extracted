@@ -24,9 +24,9 @@ use HiPi::Device::SPI;
 use HiPi::GPIO;
 use Carp;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
-__PACKAGE__->create_accessors( qw( reset_pin gpio scanwait scaniter _allow_write_st debug ) );
+__PACKAGE__->create_accessors( qw( reset_pin gpio scanwait scaniter _allow_write_st _allow_write_block0 debug ) );
 
 sub new {
     my ($class, %userparams) = @_;
@@ -156,7 +156,7 @@ sub init {
 	$self->write_register(MFRC522_REG_ModWidthReg, 0x26);
     
     $self->write_register(MFRC522_REG_TModeReg, 0x80);			#// TAuto=1; timer starts automatically at the end of the transmission in all communication modes at all speeds
-	$self->write_register(MFRC522_REG_TPrescalerReg, 0xA9);		#// TPreScaler = TModeReg[3..0]:TPrescalerReg, ie 0x0A9 = 169 => f_timer=40kHz, ie a timer period of 25μs.
+	$self->write_register(MFRC522_REG_TPrescalerReg, 0xA9);		#// TPreScaler = TModeReg[3..0]:TPrescalerReg, ie 0x0A9 = 169 => f_timer=40kHz, ie a timer period of 25?s.
 	$self->write_register(MFRC522_REG_TReloadRegH, 0x03);		#// Reload timer with 0x3E8 = 1000, ie 25ms before timeout.
 	$self->write_register(MFRC522_REG_TReloadRegL, 0xE8);
 	
@@ -398,7 +398,7 @@ sub pcd_communicate_with_picc {
 	
 	#// Wait for the command to complete.
 	#// In PCD_Init() we set the TAuto flag in TModeReg. This means the timer automatically starts when the PCD stops transmitting.
-	#// Each iteration of the do-while-loop takes 17.86μs.
+	#// Each iteration of the do-while-loop takes 17.86?s.
 	#// TODO check/modify for other architectures than Arduino Uno 16bit
     	
     my $i;
@@ -501,7 +501,7 @@ sub pcd_calculate_crc {
 	$self->write_register(MFRC522_REG_FIFODataReg, @$dataref);	    #// Write data to the FIFO
 	$self->write_register(MFRC522_REG_CommandReg, MFRC522_CALCCRC);	#// Start the calculation
 	
-	#// Wait for the CRC calculation to complete. Each iteration of the while-loop takes 17.73μs.
+	#// Wait for the CRC calculation to complete. Each iteration of the while-loop takes 17.73?s.
 	#// TODO check/modify for other architectures than Arduino Uno 16bit
 
 	#// Wait for the CRC calculation to complete. Each iteration of the while-loop takes 17.73us.
@@ -534,8 +534,7 @@ sub picc_is_new_tag_present  {
     
     my $result = ( $status == MFRC522_STATUS_OK || $status == MFRC522_STATUS_COLLISION );
     return $result;
-    
-} # // End PICC_IsNewtagPresent()
+}
 
 sub picc_request_active {
     my($self) = @_;
@@ -559,9 +558,6 @@ sub picc_request_idl_or_wup {
     my $validbits = 7;									#// For REQA and WUPA we need the short frame format - transmit only 7 bits of the last (and only) byte. TxLastBits = BitFramingReg[2..0]
     my($status, $data);
     ( $status, $data, $validbits ) = $self->pcd_transceive_data( $command , $validbits, $getlen );
-    
-    #my $rand = int(rand(4000));
-    #print 'STATUS : ' . $self->get_status_code_name( $status ) . qq(  $rand\n);
 	
     if ($status != MFRC522_STATUS_OK) {
 		return ( $status, undef, undef );
@@ -1522,13 +1518,21 @@ sub get_sector_trailer_blocks {
     return $sts;
 }
 
+sub write_uid_block {
+    my( $self, $uid, $data, $key ) = @_;
+    my $block = 0;
+    $self->_allow_write_block0(1);
+    return $self->write_block_data( $block, $uid, $data, $key );
+}
+
 sub write_block_data {
     my( $self, $block, $uid, $data, $key ) = @_;
     $key = $self->get_default_key unless(defined($key));
     
-    unless( $uid && ref($uid) eq 'HASH' && defined( $uid->{'sak'})
-            && $data && ref($data) eq 'ARRAY' ) {
-        carp 'bad uid or data';
+    unless( $uid && ref($uid) eq 'HASH' && defined( $uid->{'sak'} )
+            && $data && ref($data) eq 'ARRAY'
+            && defined( $block ) ) {
+        carp 'bad uid or data or block';
         return MFRC522_STATUS_BAD_PARAM;
     }
     
@@ -1542,13 +1546,16 @@ sub write_block_data {
         if( !$block || $block !~ /^[0-9]+$/ ) {
             return MFRC522_STATUS_BLOCK_NOT_ALLOWED;
         }
-        # set flag off
-        $self->_allow_write_st(0);
+        
     } else {
-        if( !$block || $block !~ /^[0-9]+$/ || $self->picc_block_is_sector_trailer($block) ) {
+        if( ( !$block && !$self->_allow_write_block0 ) || $block !~ /^[0-9]+$/ || $self->picc_block_is_sector_trailer($block) ) {
             return MFRC522_STATUS_BLOCK_NOT_ALLOWED
         }
     }
+    
+    # set flags off
+    $self->_allow_write_st(0);
+    $self->_allow_write_block0(0);
     
     # fix up $data
     my @fixeddata = ();
@@ -1651,7 +1658,7 @@ sub mifare_set_uid {
 	#// Stop encrypted traffic so we can send raw bytes
 	$self->pcd_stop_crypto1();
 	
-	#// Activate UID backdoor
+	#// Try to Activate UID backdoor
     unless( $self->mifare_open_uid_backdoor ) {
         return 0;
     }

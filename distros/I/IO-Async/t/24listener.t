@@ -36,6 +36,7 @@ $listensock = IO::Socket::INET->new(
    LocalAddr => "localhost",
    Type      => SOCK_STREAM,
    Listen    => 1,
+   Blocking  => 0,
 ) or die "Cannot socket() - $!";
 
 

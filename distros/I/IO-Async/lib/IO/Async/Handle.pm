@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2006-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2006-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::Handle;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use Carp;
 
@@ -637,6 +637,8 @@ sub socket
    my ( $family, $socktype, $protocol ) = IO::Async::OS->extract_addrinfo( $ai );
 
    my $sock = IO::Async::OS->socket( $family, $socktype, $protocol );
+   $sock->blocking( 0 );
+
    $self->set_handle( $sock );
 }
 

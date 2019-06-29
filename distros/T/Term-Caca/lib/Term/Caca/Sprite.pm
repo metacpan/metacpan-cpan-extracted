@@ -1,7 +1,7 @@
 package Term::Caca::Sprite;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: an OO-interface to caca_sprite
-$Term::Caca::Sprite::VERSION = '3.0.1';
+$Term::Caca::Sprite::VERSION = '3.1.0';
 use strict;
 use warnings;
 use Term::Caca;
@@ -61,7 +61,7 @@ Term::Caca::Sprite - an OO-interface to caca_sprite
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 SYNOPSIS
 

@@ -14,51 +14,52 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 64fe94e366bd1dae2eab0766b8cba130759d65b1 CONTRIBUTORS
-SHA1 4d0dd6605460c4615409245285015772255ffa25 Changes
+SHA1 7882559bbba283ac45290013abccc5c496e39e60 CODE_OF_CONDUCT.md
+SHA1 99687ee97adb7366b090052a9ad0ec2f53546f6b CONTRIBUTORS
+SHA1 ed276811111f0a6ec170857d511ea7fb2ff6ffe2 Changes
 SHA1 126b3991e8ebf99ecd0bd3934ee1a7765611ed6d INSTALL
-SHA1 54e5a5e8625ea4175d48187a32afda6d1b654d1c LICENSE
-SHA1 8539c01b497268ee75bba745daa9b9c06acfc9c3 MANIFEST
-SHA1 695602abb33ff412fd94e8bb13b87f7ad9414ede META.json
-SHA1 6cdf44af8b567333c01e3678d628055860fad954 META.yml
-SHA1 da8a2a0166b67c56bb24fb6a2cfa14eef850e66a Makefile.PL
-SHA1 035f7991890257b142c6066e449fee21a1904744 README.mkdn
+SHA1 cceccfa33c74ada8305d1c8d5384a4bc4d4ee483 LICENSE
+SHA1 17d3099d2bd43cba9143195b8da689c46073c125 MANIFEST
+SHA1 2e3e81c3faf2ba3066b58b1233092e6baaf0197a META.json
+SHA1 5085e94699661b72d9dd1bc6d510c2629804b91c META.yml
+SHA1 5453be8c45db127bdc43709105ff68379b9eb3d5 Makefile.PL
+SHA1 1fcf7f9a0ad31db6d5e069d065fd9e6263c308bf README.mkdn
 SHA1 cb0124cd9c5e96cfc6427e232abc73bc9d7515de cpanfile
-SHA1 cfd713944b89fad2fa494338b7c8f77de7f9f1fa doap.xml
-SHA1 1fdd4372924d47afb7e7e1b4526ed7e9ebfbf9be lib/Bread/Board.pm
-SHA1 3b1299d9e01c2026490e5244adbdccb1d642da07 lib/Bread/Board/BlockInjection.pm
-SHA1 9297271a79ff83b2b1799b09416cd34b5592cf95 lib/Bread/Board/ConstructorInjection.pm
-SHA1 5ccd4fdf4596f7db0819904e3fe4ed1eccad9352 lib/Bread/Board/Container.pm
-SHA1 6c1312814884017d52fb55bf8319f4e31ccbf6cf lib/Bread/Board/Container/FromParameterized.pm
-SHA1 2d548758d99f7eb1dc37351171242ee02dccb47c lib/Bread/Board/Container/Parameterized.pm
-SHA1 0d8ff73563ee5edac191462749cdc277c6b38b5e lib/Bread/Board/Dependency.pm
-SHA1 b0570e6552d3c3966c838b39025b95d8feda3978 lib/Bread/Board/Dumper.pm
-SHA1 f865fcd7ee60839bcdcb15edad6aa8a71e581463 lib/Bread/Board/LifeCycle.pm
-SHA1 63aaae9c362512bf94bd24647c7a920956ca271d lib/Bread/Board/LifeCycle/Singleton.pm
-SHA1 e3d38c4dfa174313d94b46fa1316703517a84fe9 lib/Bread/Board/LifeCycle/Singleton/WithParameters.pm
-SHA1 d2b8e2152599c8cef67e47e091514995d1177190 lib/Bread/Board/Literal.pm
-SHA1 5fcd379b6d97997de1043a3212527f985f42d2e1 lib/Bread/Board/Manual.pod
-SHA1 b59fdd62baf96e96154ce5277eb5fd67f59ef51f lib/Bread/Board/Manual/Concepts.pod
-SHA1 ec97fe3c28d9876328c027673616f628ea9661b8 lib/Bread/Board/Manual/Concepts/Advanced.pod
-SHA1 e2953bf2862cd2e2a524a3b3e3793d9230c2aed7 lib/Bread/Board/Manual/Concepts/Typemap.pod
-SHA1 3c363eee055872ed8bcaa591657c7c90bcb8c860 lib/Bread/Board/Manual/Example.pod
-SHA1 cf4a95cd3414842777ad8dcbe19e7ce6c4c49212 lib/Bread/Board/Manual/Example/FormSensible.pod
-SHA1 499baaa52dba58ba6a4869d59b76f80c01366adb lib/Bread/Board/Manual/Example/LogDispatch.pod
-SHA1 db1e0f52983deb7c2695422a7d4ff460dc04125c lib/Bread/Board/Service.pm
-SHA1 fe1922905ee365aefab2e26fa79d4da90e90ad8c lib/Bread/Board/Service/Alias.pm
-SHA1 36467a282839eab3aa590f55fd91147468040277 lib/Bread/Board/Service/Deferred.pm
-SHA1 523e1f03c379b794891d5845158fc97b7aae5100 lib/Bread/Board/Service/Deferred/Thunk.pm
-SHA1 7aa1b411bd4b4dd74e5f799cab32f81f67906857 lib/Bread/Board/Service/Inferred.pm
-SHA1 fad96b321e951996346cc58c21d607ac82db1130 lib/Bread/Board/Service/WithClass.pm
-SHA1 cd432cc086bb4479974b7ca25fabe6f2db609c82 lib/Bread/Board/Service/WithConstructor.pm
-SHA1 80d6f57d4df065661e410496732ca6bf1706763c lib/Bread/Board/Service/WithDependencies.pm
-SHA1 3d7d7a1548bf40827ca23da42bcb0e8c7e2aeff5 lib/Bread/Board/Service/WithParameters.pm
-SHA1 a784dd34b133721f265dbd1befa29bccca9fe727 lib/Bread/Board/SetterInjection.pm
-SHA1 0a577abe86caecbaa1425a9b44b6f9e4e151d7d3 lib/Bread/Board/Traversable.pm
-SHA1 d6f4ff0945fcb34a46f08144116ed76ec1610001 lib/Bread/Board/Types.pm
+SHA1 ccc3175c2c919f000c6ab4c174a2a623014b76a2 doap.xml
+SHA1 d7e5a2edec446269d8e09c575c149ce8c9fa6c24 lib/Bread/Board.pm
+SHA1 8d6b6ee8000a1707bd9f430cd8f6f93a891185fa lib/Bread/Board/BlockInjection.pm
+SHA1 d2d1ed462a601a892f143d44f172646f0000e805 lib/Bread/Board/ConstructorInjection.pm
+SHA1 2be2832213c4956106bfbc599a52350ddde18a33 lib/Bread/Board/Container.pm
+SHA1 8dc8ee7ccb3c250cd6fbde35fa6720a620659f56 lib/Bread/Board/Container/FromParameterized.pm
+SHA1 c2fc38529343707355e641b60aca094dd2544bfc lib/Bread/Board/Container/Parameterized.pm
+SHA1 50e433b00b8e2bca002ad1e16216cb90d9317939 lib/Bread/Board/Dependency.pm
+SHA1 429d1412e7ae713a841d0e3248b283d195919b7c lib/Bread/Board/Dumper.pm
+SHA1 5b8c410134cf72705c90787dba8cd3bfee9ac36a lib/Bread/Board/LifeCycle.pm
+SHA1 eed1ebca34995c75223f71d89ace5ee37dec50f0 lib/Bread/Board/LifeCycle/Singleton.pm
+SHA1 6b0a4f0fd9ca41bc9ed7d6053bc1c94b3256cf3d lib/Bread/Board/LifeCycle/Singleton/WithParameters.pm
+SHA1 00fa93c74ffb4e0b09bce5d4cc196d37dba1108a lib/Bread/Board/Literal.pm
+SHA1 7561bff4d35f0c3a36f8cdfe20dbe1a1429cc8b3 lib/Bread/Board/Manual.pod
+SHA1 71e1a068cd006a707f7f8bd3123ad14ff8b75fc3 lib/Bread/Board/Manual/Concepts.pod
+SHA1 e1a7961a5a1860804277e93e64743bd83c8c2750 lib/Bread/Board/Manual/Concepts/Advanced.pod
+SHA1 6114183100e93f08620919c55ab2d5dadb894fc2 lib/Bread/Board/Manual/Concepts/Typemap.pod
+SHA1 f79f6970f559f6741cf303ada482d4ceed65bf09 lib/Bread/Board/Manual/Example.pod
+SHA1 3f2bce510493eed686a98b928e757cada8f77720 lib/Bread/Board/Manual/Example/FormSensible.pod
+SHA1 2986b9851dd4fabe055081edb29a2e347349f158 lib/Bread/Board/Manual/Example/LogDispatch.pod
+SHA1 bdb4578d5b0b4a486e4d4ebbac927163abd31cff lib/Bread/Board/Service.pm
+SHA1 05f69a659e2cb819221552cde6549be8965056db lib/Bread/Board/Service/Alias.pm
+SHA1 dc911ccd9275f58b47fee91aea96061364a8f0db lib/Bread/Board/Service/Deferred.pm
+SHA1 214743784a92cb588e6c408f4f6b5921e8144c93 lib/Bread/Board/Service/Deferred/Thunk.pm
+SHA1 43db87459d883b692cf901353c8b86c1d7d724da lib/Bread/Board/Service/Inferred.pm
+SHA1 508ab0189038a423b8fa580ed1210e30b59c5c24 lib/Bread/Board/Service/WithClass.pm
+SHA1 aefde131dfb098c565b777ce8d6236c00a3026db lib/Bread/Board/Service/WithConstructor.pm
+SHA1 edd7fb410d7db7953d5e34f39b25614884756227 lib/Bread/Board/Service/WithDependencies.pm
+SHA1 0496d1c01f25ba7460b4d1006fbc792783f9f4be lib/Bread/Board/Service/WithParameters.pm
+SHA1 3af51c47a03553526a051ae968865cb0d97dc2ea lib/Bread/Board/SetterInjection.pm
+SHA1 30cd7701e98fae1418bd78cb9adc6ed18f6e0370 lib/Bread/Board/Traversable.pm
+SHA1 89bd20d909643af48d4716a66e7f4dde8a32d024 lib/Bread/Board/Types.pm
 SHA1 750ff38befd1bf8d67708c96c68e76555a56aeaa t/00-compile.t
-SHA1 a6768699030ed8c68d1867c778cb34ed4a12412b t/00-report-prereqs.dd
-SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 b827b18eeb9c867b27ec709379b2f4e6a72d8fd2 t/00-report-prereqs.dd
+SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
 SHA1 751103232b9b8d9eb5918981341b70790fa729bb t/001_constructor_injection.t
 SHA1 1e980d97aa4bdba035ab3c83fa9b7feeae51b0b5 t/002_setter_injection.t
 SHA1 7868c26adf3b85f959a8104f774793e4fb351a36 t/003_block_injection.t
@@ -131,7 +132,7 @@ SHA1 dd10457eebda57a6f9aa89ee9a3d1e67a7298cfc t/lib/my_app.bb
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlnJkUoACgkQ34Hwf+GwC4zK9wCePV5P3w15SajOui4nbWr9QDYs
-6XgAn1KV0Uih8eGNq3ZdT/u7Gh3BofYO
-=wv57
+iEYEARECAAYFAl0WoJoACgkQ34Hwf+GwC4z8swCgoQ9+QVlGBHsn+Zd6hS4ILBjJ
+uvgAn0pkCex4yuD9a/tW7xIm+6LBkDXW
+=k9Kt
 -----END PGP SIGNATURE-----

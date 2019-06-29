@@ -61,15 +61,15 @@
    "provides" : {
       "Dir::Manifest" : {
          "file" : "lib/Dir/Manifest.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.2.0"
       },
       "Dir::Manifest::Key" : {
          "file" : "lib/Dir/Manifest/Key.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.2.0"
       },
       "Dir::Manifest::Slurp" : {
          "file" : "lib/Dir/Manifest/Slurp.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/shlomif/Dir-Manifest"
       }
    },
-   "version" : "0.0.5",
+   "version" : "0.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -472,6 +472,16 @@
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
             "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeMarkdownFromPod",
+            "config" : {
+               "Dist::Zilla::Role::FileWatcher" : {
+                  "version" : "0.006"
+               }
+            },
+            "name" : "ReadmeMarkdownFromPod",
+            "version" : "0.141140"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::TidyAll",

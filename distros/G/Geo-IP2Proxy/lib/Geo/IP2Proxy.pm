@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '2.10';
+$VERSION = '2.11';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -410,7 +410,7 @@ sub getIPv6Record {
 	my $ipno = 0;
 
 	$ipno = $realipno;
-	if ($realipno->beq("340282366920938463463374607431768211455")) {
+	if ($realipno == "340282366920938463463374607431768211455") {
 		$ipno = $ipno->bsub(1);
 	}
 
@@ -1004,7 +1004,7 @@ This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP
 	my $packageversion = $obj->getPackageVersion();
 	my $dbversion = $obj->getDatabaseVersion();
 	my $moduleversion = $obj->getModuleVersion();
-	my $countryshort = $obj->getCountryShort("1.2.3.4");
+	my $countryshort = $obj->getCountryShort("2001:0000:0000:0000:0000:0000:0000:0000");
 	my $countrylong = $obj->getCountryLong("1.2.3.4");
 	my $region = $obj->getRegion("1.2.3.4");
 	my $city = $obj->getCity("1.2.3.4");
@@ -1147,7 +1147,7 @@ L<IP2Proxy Product|https://www.ip2location.com/database/ip2proxy>
 
 =head1 VERSION
 
-2.10
+2.11
 
 =head1 AUTHOR
 

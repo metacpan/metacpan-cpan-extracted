@@ -2,8 +2,9 @@ package Net::TinyERP;
 use strict;
 use warnings;
 use Net::TinyERP::NotaFiscal;
+use Net::TinyERP::NotaFiscalServicos;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 sub new {
     my ($class, @params) = @_;
@@ -22,6 +23,14 @@ sub nota_fiscal {
         $self->{_nf_obj} = Net::TinyERP::NotaFiscal->new($self);
     }
     return $self->{_nf_obj};
+}
+
+sub nota_servicos {
+    my ($self) = @_;
+    if (!exists $self->{_nfs_obj}) {
+        $self->{_nfs_obj} = Net::TinyERP::NotaFiscalServicos->new($self);
+    }
+    return $self->{_nfs_obj};
 }
 
 1;
@@ -111,9 +120,15 @@ Retorna o objeto para manipulação de Notas Fiscais Eletrônicas (NFe).
 Para mais informações, consulte a documentação da classe
 L<Net::TinyERP::NotaFiscal>.
 
+=head2 nota_servicos()
+
+Retorna o objeto para manipulação de Notas Fiscais de Serviço Eletrônicas
+(NFSe). Para mais informações, consulte a documentação da classe
+L<Net::TinyERP::NotaFiscalServicos>.
+
 =head1 COPYRIGHT e LICENÇA
 
-Copyright (c) 2016 - Breno G. de Oliveira C<< garu at cpan.org >>.
+Copyright (c) 2016-2019 - Breno G. de Oliveira C<< garu at cpan.org >>.
 Todos os direitos reservados.
 
 Este módulo é software livre; você pode redistribuí-lo e/ou modificá-lo sob os mesmos
@@ -125,4 +140,3 @@ PORQUE ESTE SOFTWARE É LICENCIADO LIVRE DE QUALQUER CUSTO, NÃO HÁ GARANTIA AL
 PARA ELE EM TODA A EXTENSÃO PERMITIDA PELA LEI. ESTE SOFTWARE É OFERECIDO "COMO ESTÁ"
 SEM QUALQUER GARANTIA DE QUALQUER TIPO, EXPRESSA OU IMPLÍCITA. TODO O RISCO RELACIONADO
 À QUALIDADE, DESEMPENHO E COMPORTAMENTO DESTE SOFTWARE É DE QUEM O UTILIZAR.
-

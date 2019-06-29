@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 367;
+use Test::More tests => 368;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -18,7 +18,11 @@ my $at_least_one_success;
 my $test_time_limit = 90;
 
 sub out_of_time {
-	diag("Testing has been running for " . (time - $^T) . " seconds");
+	my ($package, $file, $line) = caller 1;
+	if (!defined $line) {
+		($package, $file, $line) = caller;
+	}
+	diag("Testing has been running for " . (time - $^T) . " seconds at $file line $line");
 	if (time - $^T > $test_time_limit) {
 		return 1;
 	} else {
@@ -191,11 +195,14 @@ if ($ENV{FIREFOX_BINARY}) {
 elsif ( $^O eq 'darwin' ) {
     $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
 } elsif ($^O eq 'cygwin') {
-	if (-e "$ENV{PROGRAMFILES} (x86)") {
-		$binary = "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
-	} else {
-		$binary = "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
-	}
+            my $windows_x86_firefox_path = "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
+            my $windows_firefox_path = "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
+            if ( -e $windows_x86_firefox_path ) {
+		$binary = $windows_x86_firefox_path;
+            }
+            elsif ( -e $windows_firefox_path ) {
+		$binary = $windows_firefox_path;
+            }
 }
 my $version_string = `"$binary" -version`;
 diag("Version is $version_string");
@@ -330,6 +337,7 @@ SKIP: {
 	diag("Operating System is " . ($capabilities->platform_name() || 'Unknown') . q[ ] . ($capabilities->platform_version() || 'Unknown'));
 	diag("Profile Directory is " . $capabilities->moz_profile());
 	diag("Mozilla PID is " . ($capabilities->moz_process_id() || 'Unknown'));
+	diag("Firefox BuildID is " . ($capabilities->moz_build_id() || 'Unknown'));
 	diag("Addons are " . ($firefox->addons() ? 'working' : 'disabled'));
 	if ($firefox->xvfb()) {
 		diag("Internal xvfb PID is " . $firefox->xvfb());
@@ -596,7 +604,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 242);
+		skip($skip_message, 243);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -1257,7 +1265,7 @@ SKIP: {
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
 	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
 	if (out_of_time()) {
-		skip("Running out of time.  Trying to shutdown tests as fast as possible", 32);
+		skip("Running out of time.  Trying to shutdown tests as fast as possible", 33);
 	}
 	ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
@@ -1344,6 +1352,13 @@ SKIP: {
 			skip("\$capabilities->moz_process_id is not supported for " . $capabilities->browser_version(), 1);
 		}
 		ok($capabilities->moz_process_id() =~ /^\d+$/, "\$capabilities->moz_process_id() is an integer:" . $capabilities->moz_process_id());
+	}
+	SKIP: {
+		if (!grep /^moz_build_id$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_build_id is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_build_id is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_build_id() =~ /^\d{14}$/, "\$capabilities->moz_build_id() is an date/timestamp:" . $capabilities->moz_build_id());
 	}
 	ok($capabilities->browser_name() =~ /^\w+$/, "\$capabilities->browser_name() is a string:" . $capabilities->browser_name());
 	ok($capabilities->rotatable() =~ /^(1|0)$/, "\$capabilities->rotatable() is a boolean:" . $capabilities->rotatable());

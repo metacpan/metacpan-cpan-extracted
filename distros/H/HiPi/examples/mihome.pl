@@ -17,7 +17,7 @@ use Time::HiRes qw( usleep );
 use HiPi::RF::OpenThings::Message;
 use HiPi::RF::OpenThings;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 my $handler = HiPi::Energenie::ENER314_RT->new( led_on => 0 );
 

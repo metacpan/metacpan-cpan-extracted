@@ -99,6 +99,55 @@ testing_loop( $loop );
       '$f->get from command with all captures' );
 }
 
+# run_process cancel_signal
+{
+   my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
+   $wr->autoflush;
+
+   my $f = $loop->run_process(
+      setup => [
+         $wr => "keep",
+      ],
+      code => sub {
+         $SIG{TERM} = sub {
+            $wr->syswrite( "B" );
+         };
+         $wr->syswrite( "A" );
+         sleep 5;
+      },
+      cancel_signal => "TERM"
+   );
+
+   # Wait for startup notification "A"
+   my $buf;
+   wait_for_stream { length $buf } $rd => $buf;
+
+   $f->cancel;
+
+   # Wait for signal
+   wait_for_stream { length $buf > 1 } $rd => $buf;
+
+   is( $buf, "AB", 'Process received cancel signal' );
+}
+
+# run_process fail_on_nonzero
+{
+   my $f = $loop->run_process(
+      code    => sub { return 3 },
+      capture => [qw( exitcode )],
+      fail_on_nonzero => 1,
+   );
+
+   wait_for_future $f;
+
+   ok( $f->is_failed, '$f->failed with fail_on_nonzero' ) and do {
+      # ignore message
+      my ( undef, $category, @captures ) = $f->failure;
+      is( $category, "process", '$f->failure category' );
+      is_deeply( \@captures, [ 3<<8 ], '$f->failure details' );
+   };
+}
+
 # Testing error handling
 ok( exception { $loop->run_process(
          command => [ $^X, "-e", 1 ],

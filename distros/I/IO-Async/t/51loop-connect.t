@@ -9,7 +9,7 @@ use Test::More;
 use Test::Identity;
 
 use IO::Socket::INET;
-use POSIX qw( ENOENT );
+use POSIX qw( ENOENT ENETDOWN );
 use Socket qw( AF_UNIX inet_ntoa );
 
 use IO::Async::Loop;
@@ -262,7 +262,7 @@ SKIP: {
    wait_for { $error };
 
    is( $failop, "connect", '$failop is connect' );
-   is( $failerr+0, ENOENT, '$failerr is ENOENT' );
+   like( $failerr+0, qr/^(${\ENOENT}|${\ENETDOWN})$/, '$failerr is ENOENT' );
 }
 
 SKIP: {
@@ -278,11 +278,11 @@ SKIP: {
    );
 
    is( $failop, "connect", '$failop is connect' );
-   is( $failerr+0, ENOENT, '$failerr is ENOENT' );
+   like( $failerr+0, qr/^(${\ENOENT}|${\ENETDOWN})$/, '$failerr is ENOENT' );
 
    ok( $future->is_failed, '$future failed' );
    is( ( $future->failure )[2], "connect", '$future fail op is connect' );
-   is( ( $future->failure )[3]+0, ENOENT, '$future fail err is ENOENT' );
+   like( ( $future->failure )[3]+0, qr/^(${\ENOENT}|${\ENETDOWN})$/, '$future fail err is ENOENT' );
 }
 
 # UNIX sockets always connect(2) synchronously, meaning if they fail, the error

@@ -1,4 +1,5 @@
 use Test::More;
+use Test::Exception;
 use Mojo::JSON qw/encode_json/;
 
 my $msg = {
@@ -50,5 +51,7 @@ is ($msg1->photo->[1]->file_size, 18236);
 is ($msg1->photo->[2]->file_size, 20746);
 is ($msg1->photo->[2]->file_id, 'AgADAwAD07MxG9Kt1QExdrEfe9DPEKj66yoABJF1xS56AdcVBEIBAAEC');
 
+my $bad_photo = Telegram::Bot::Object::PhotoSize->new(image => "notfound.png");
+throws_ok ( sub { $bad_photo->as_hashref }, qr/no such file 'notfound.png'/, 'local image not found' );
 
 done_testing();

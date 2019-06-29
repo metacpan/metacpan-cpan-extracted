@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::author_scripts;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '1.034'; # VERSION
+our $DATE = '2019-06-26'; # DATE
+our $VERSION = '1.035'; # VERSION
 
 use 5.010;
 use strict;
@@ -43,7 +43,7 @@ App::lcpan::Cmd::author_scripts - List scripts of an author
 
 =head1 VERSION
 
-This document describes version 1.034 of App::lcpan::Cmd::author_scripts (from Perl distribution App-lcpan), released on 2019-06-19.
+This document describes version 1.035 of App::lcpan::Cmd::author_scripts (from Perl distribution App-lcpan), released on 2019-06-26.
 
 =head1 FUNCTIONS
 

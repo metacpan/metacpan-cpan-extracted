@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+2.11  Tue June 25 16:00:00 2019
+      Minor fix on Math::BigInt->beq()
+
 2.10  Mon June 24 16:00:00 2019
       Added 6to4 addressing support
       Added Teredo addressing support

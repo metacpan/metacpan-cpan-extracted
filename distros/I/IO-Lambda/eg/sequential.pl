@@ -10,7 +10,7 @@
 use lib qw(./lib);
 use HTTP::Request;
 use IO::Lambda qw(:lambda);
-use IO::Lambda::HTTP qw(http_request);
+use IO::Lambda::HTTP::Client qw(http_request);
 use LWP::ConnCache;
 
 my $cache = LWP::ConnCache-> new;
@@ -46,7 +46,7 @@ $style = 'implicit';
 if ( $style eq 'object') {
 	# object API, all references and bindings are explicit
 	while ( @chain) {
-		my $lambda = IO::Lambda::HTTP-> new( shift(@chain), conn_cache => $cache);
+		my $lambda = IO::Lambda::HTTP::Client-> new( shift(@chain), conn_cache => $cache);
 		$lambda-> wait;
 		report( $lambda-> peek);
 	}

@@ -211,6 +211,20 @@ subtest "arg:replace_map" => sub {
     }
 };
 
+subtest "arg:summaries" => sub {
+    test_complete(
+        word      => 'a',
+        array     => [qw(an apple a day keeps the doctor away)],
+        summaries => [qw(S1 S2    S3 S4 S5    S6  S7     S8)],
+        result    => [
+            {word=>"a"    , summary=>"S3"},
+            {word=>"an"   , summary=>"S1"},
+            {word=>"apple", summary=>"S2"},
+            {word=>"away" , summary=>"S8"},
+        ],
+    );
+};
+
 DONE_TESTING:
 done_testing();
 
@@ -221,6 +235,7 @@ sub test_complete {
     my $res = complete_array_elem(
         word=>$args{word}, array=>$args{array}, exclude=>$args{exclude},
         replace_map=>$args{replace_map},
+        summaries=>$args{summaries},
     );
     is_deeply($res, $args{result}, "$name (result)")
         or diag explain($res);

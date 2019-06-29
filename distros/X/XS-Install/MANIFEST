@@ -1,7 +1,7 @@
 Changes
 lib/XS/Install.pm
 lib/XS/Install.pod
-lib/XS/Install/HeaderDeps.pm
+lib/XS/Install/Deps.pm
 lib/XS/Install/ParseXS.pm
 lib/XS/Install/Payload.pm
 lib/XS/Install/Payload.pod

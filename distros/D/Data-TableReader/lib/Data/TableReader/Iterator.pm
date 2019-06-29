@@ -1,5 +1,4 @@
 package Data::TableReader::Iterator;
-$Data::TableReader::Iterator::VERSION = '0.010';
 use strict;
 use warnings;
 use Try::Tiny;
@@ -7,6 +6,7 @@ use Carp;
 use Scalar::Util 'refaddr';
 
 # ABSTRACT: Base class for iterators (blessed coderefs)
+our $VERSION = '0.011'; # VERSION
 
 
 our %_iterator_fields;
@@ -56,7 +56,7 @@ Data::TableReader::Iterator - Base class for iterators (blessed coderefs)
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

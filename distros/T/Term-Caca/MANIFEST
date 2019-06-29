@@ -13,7 +13,6 @@ SIGNATURE
 TODO
 cpanfile
 doap.xml
-example/cave.pl
 examples/cave.pl
 examples/events.pl
 examples/maze.pl

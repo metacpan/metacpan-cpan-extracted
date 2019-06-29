@@ -21,7 +21,7 @@ doc/stow.info
 doc/stow.texi
 doc/texinfo.tex
 doc/version.texi
-INSTALL
+INSTALL.md
 lib/Stow.pm
 lib/Stow.pm.in
 lib/Stow/Util.pm
@@ -31,11 +31,13 @@ Makefile.in
 MANIFEST			This list of files
 MANIFEST.SKIP
 NEWS
-README
+README.md
 t/chkstow.t
 t/cleanup_invalid_links.t
+t/cli.t
 t/cli_options.t
 t/defer.t
+t/dotfiles.t
 t/examples.t
 t/find_stowed_path.t
 t/foldable.t
@@ -43,9 +45,11 @@ t/ignore.t
 t/join_paths.t
 t/parent.t
 t/stow.t
+t/rc_options.t
 t/testutil.pm
 t/unstow.t
 t/unstow_orig.t
+tools/get-version
 THANKS
 TODO
 META.yml

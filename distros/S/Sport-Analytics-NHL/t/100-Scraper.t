@@ -9,7 +9,7 @@ use Test::More;
 
 use Sport::Analytics::NHL::Scraper;
 
-plan tests => 15;
+plan tests => 17;
 
 ok(defined $Sport::Analytics::NHL::Scraper::SCHEDULE_JSON,     'schedule json template defined');
 ok(defined $Sport::Analytics::NHL::Scraper::SCHEDULE_JSON_API, 'schedule json api template defined');

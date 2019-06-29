@@ -32,6 +32,14 @@ sub startup {
     }
   );
 
+  # Returns current request host
+  $r->get(
+    '/host' => sub {
+      my $c = shift;
+      $c->render(text => $c->req->url->base->host);
+    }
+  );
+
   # Returns all header names
   $r->get(
     '/headers' => sub {
@@ -48,6 +56,7 @@ sub startup {
         ua_ip    => $c->tx->remote_address,
         proxy_ip => $c->tx->remote_proxy_address,
         scheme   => $c->req->is_secure ? 'https' : 'http',
+        host     => $c->req->url->base->host,
         headers  => $c->req->headers->names,
       });
     }

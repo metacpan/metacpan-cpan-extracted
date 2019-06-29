@@ -4,8 +4,8 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    05/09/2016                                                             #
-#    Revised: 03/06/2018                                                             #
-#    UMLS Similarity Word2Phrase Executable Interface Module                         #
+#    Revised: 06/25/2019                                                             #
+#    UMLS Similarity Spearman's Rank Correlation Module                              #
 #                                                                                    #
 ######################################################################################
 #                                                                                    #
@@ -27,7 +27,7 @@ use warnings;
 
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.021';
 
 
 ######################################################################################
@@ -534,21 +534,8 @@ sub _IsCUI
     $self->WriteLog( "_IsCUI - No Term Defined" ) if !defined( $term );
 
     $term = lc( $term );
-    my @terms = split( 'c', $term );
-
-    # Return False If There Are Not Two Elements After Splitting
-    return 0 if( @terms != 2 );
-
-    # If $term Is CUI, Then First Element Should Be Empty String
-    return 0 if ( $terms[0] ne "" );
-
-    # Remove Numbers From Second Element
-    $terms[1] =~ s/[0-9]//g;
-
-    # If $term Is CUI, Then After Removing All Number From Second Element An Empty String Is All That Is Left
-    return 0 if ( $terms[1] ne "" );
-
-    return 1;
+    return 1 if ( $term =~ m/\bc[0-9]+\b/ );
+    return 0;
 }
 
 sub _ResetVariables

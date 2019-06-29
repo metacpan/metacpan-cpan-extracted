@@ -10,11 +10,7 @@ use Test::More;
 use JSON;
 use Storable;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Config;
 use Sport::Analytics::NHL::Test;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
 use Sport::Analytics::NHL;
 
 use t::lib::Util;
@@ -34,7 +30,7 @@ is($storable, 't/tmp/data/2011/0002/0010/merged.storable', 'return path correct'
 ok(-f $storable, 'file exists');
 my $boxscore = retrieve $storable;
 test_merged_boxscore($boxscore);
-is($TEST_COUNTER->{Curr_Test}, 5017, 'team and roster all tested');
+is($TEST_COUNTER->{Curr_Test}, 5012, 'team and roster all tested');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
 $storable = ($nhl->merge({}, 193020010))[0];
 
@@ -42,7 +38,7 @@ is($storable, 't/tmp/data/1930/0002/0010/merged.storable', 'return path correct'
 ok(-f $storable, 'file exists');
 $boxscore = retrieve $storable;
 test_merged_boxscore($boxscore);
-is($TEST_COUNTER->{Curr_Test}, 5472, 'team and roster all tested');
+is($TEST_COUNTER->{Curr_Test}, 5467, 'team and roster all tested');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
 
 END {

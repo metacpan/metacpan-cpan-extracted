@@ -1,14 +1,7 @@
-use strict;
-use warnings;
-use Clone qw(clone);
-use Test::More;
+use Test2::V0;
 
-my $pkg;
-BEGIN {
-  $pkg = 'Catmandu::Exporter::BibTeX';
-  use_ok($pkg);
-}
-require_ok($pkg);
+use Clone qw(clone);
+use Catmandu::Exporter::BibTeX;
 
 # don't touch this! Exporter adds newline at the end.
 my $bibtex = <<TEX;
@@ -35,9 +28,9 @@ my $data = {
 my $data2 = clone($data);
 
 my $bibtex_out;
-my $exporter = $pkg->new(file => \$bibtex_out);
+my $exporter = Catmandu::Exporter::BibTeX->new(file => \$bibtex_out);
 
-isa_ok($exporter, $pkg);
+isa_ok($exporter, "Catmandu::Exporter::BibTeX");
 
 can_ok($exporter, 'add');
 
@@ -47,6 +40,6 @@ $exporter->add($data);
 
 is($bibtex, $bibtex_out, "compare output");
 
-is_deeply($data, $data2, "exporter is idempotent");
+is($data, $data2, "exporter is idempotent");
 
 done_testing;

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 # VERSION
 
-version 0.29.0
+version 0.30.0
 
 # DESCRIPTION
 
@@ -51,6 +51,8 @@ time_zone = America/Montreal
 
 [Git::GatherDir]
 exclude_filename = cpanfile
+exclude_filename = AUTHOR_PLEDGE
+exclude_filename = CODE_OF_CONDUCT.md
 
 [CopyFilesFromBuild]
 copy = cpanfile
@@ -114,6 +116,8 @@ verbose = 0
 [CopyrightYearFromGit]
 
 [GitHubREADME::Badge]
+
+[MinimumPerlFast]
 ```
 
 ## ARGUMENTS
@@ -129,7 +133,7 @@ Passed to [Dist::Zilla::Plugin::Authority](https://metacpan.org/pod/Dist::Zilla:
 ### fake\_release
 
 If given a true value, uses [Dist::Zilla::Plugin::FakeRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::FakeRelease)
-instead of 
+instead of
 [Dist::Zilla::Plugin::Git::Push](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Push),
 [Dist::Zilla::Plugin::UploadToCPAN](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN),
 [Dist::Zilla::Plugin::InstallRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::InstallRelease) and
@@ -137,7 +141,7 @@ instead of
 
 Can also be triggered via the _FAKE_ environment variable.
 
-### builder 
+### builder
 
 `ModuleBuild` or `MakeMaker`. Defaults to `MakeMaker`.
 
@@ -179,14 +183,14 @@ Defaults to `github`.
 ### travis\_perl\_versions
 
 ```
-travis_perl_versions = 14,16,18,20,22,24,26
+travis_perl_versions = 22,24,26,28,30
 ```
 
 Comma-separated list of perl versions (without the leading '5') that
 travis should test. Ranges can be given (`14..16`), for which the
 odd numbers will be skipped. So `14..26` will result in `14,16,18,...`.
 
-Defaults to `14..26`.
+Defaults to `22..30`.
 
 # AUTHOR
 
@@ -194,7 +198,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

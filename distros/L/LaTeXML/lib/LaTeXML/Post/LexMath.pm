@@ -4,7 +4,7 @@
 # \=========================================================ooo==U==ooo=/ #
 
 # ================================================================================
-# Trivial Math PostProcessor which supplies the lexemes string 
+# Trivial Math PostProcessor which supplies the lexemes string
 #   (if deposited in the lexemes attribute of the XMath)
 # currently required to --preload=llamapun.sty to achieve that
 # ================================================================================
@@ -24,7 +24,7 @@ our $lxMimeType = 'application/x-llamapun';
 
 sub convertNode {
   my ($self, $doc, $xmath, $style) = @_;
-  my $math = $xmath->parentNode;
+  my $math    = $xmath->parentNode;
   my $lexemes = $math && isElementNode($math) && $math->getAttribute('lexemes');
   return { processor => $self, encoding => $lxMimeType, mimetype => $lxMimeType,
     string => $lexemes }; }

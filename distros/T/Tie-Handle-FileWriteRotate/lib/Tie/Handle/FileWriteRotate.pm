@@ -1,12 +1,13 @@
 package Tie::Handle::FileWriteRotate;
 
+our $DATE = '2019-06-27'; # DATE
+our $VERSION = '0.040'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
 
 use File::Write::Rotate;
-
-our $VERSION = '0.03'; # VERSION
 
 sub TIEHANDLE {
     my ($class, %args) = @_;
@@ -19,6 +20,9 @@ sub TIEHANDLE {
 sub PRINT {
     my $self = shift;
     $self->{fwr}->write(@_);
+}
+
+sub CLOSE {
 }
 
 1;
@@ -36,7 +40,7 @@ Tie::Handle::FileWriteRotate - Filehandle tie to write to autorotated file with 
 
 =head1 VERSION
 
-This document describes version 0.03 of Tie::Handle::FileWriteRotate (from Perl distribution Tie-Handle-FileWriteRotate), released on 2017-07-04.
+This document describes version 0.040 of Tie::Handle::FileWriteRotate (from Perl distribution Tie-Handle-FileWriteRotate), released on 2019-06-27.
 
 =head1 SYNOPSIS
 
@@ -81,7 +85,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Tie-Handle
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Tie-Handle-FileWriteRotate>.
+Source repository is at L<https://github.com/perlancar/perl-Tie-Handle-FileWriteRotate>.
 
 =head1 BUGS
 
@@ -101,7 +105,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

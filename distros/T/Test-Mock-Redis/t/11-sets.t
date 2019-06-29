@@ -1,4 +1,4 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -148,11 +148,11 @@ foreach my $r (@redi){
     $r->set('justakey', 'foobar');
 
     like exception { $r->smove('justakey', 'set', 'foo') },
-        qr/^\Q[smove] ERR Operation against a key holding the wrong kind of value\E/,
+        qr/^\Q[smove] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
          "smove dies when source isn't a set";
 
     like exception { $r->smove('set', 'justakey', 'foo') },
-        qr/^\Q[smove] ERR Operation against a key holding the wrong kind of value\E/,
+        qr/^\Q[smove] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
          "smove dies when dest isn't a set";
 
     is $r->smove('otherset', 'newset', 'foo'), 1, "smove returns true when destination doesn't exist";

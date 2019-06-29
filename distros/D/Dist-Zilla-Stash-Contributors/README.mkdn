@@ -4,22 +4,24 @@ Dist::Zilla::Stash::Contributors - Stash containing list of contributors
 
 # VERSION
 
-version 0.1.0
+version 0.1.1
 
 # SYNOPSIS
 
-    my $contrib_stash = $self->zilla->stash_named('%Contributors');
+```perl
+my $contrib_stash = $self->zilla->stash_named('%Contributors');
 
-    unless ( $contrib_stash ) {
-        $contrib_stash = Dist::Zilla::Stash::Contributors->new;
-        $self->_register_stash('%Contributors', $contrib_stash );
-    }
+unless ( $contrib_stash ) {
+    $contrib_stash = Dist::Zilla::Stash::Contributors->new;
+    $self->_register_stash('%Contributors', $contrib_stash );
+}
+```
 
 $contrib\_stash->add\_contributors( 'Yanick Champoux <yanick@cpan.org>' );
 
 # DESCRIPTION
 
-If you are a [Dist::Zilla](http://search.cpan.org/perldoc?Dist::Zilla) user, avert your eyes and read no more: this
+If you are a [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) user, avert your eyes and read no more: this
 module is not for general consumption but for authors of plugins dealing 
 with contributors harvesting or processing.
 
@@ -28,34 +30,38 @@ stash that is meant to carry the contributors' information between plugins.
 Plugins that gather contributors can populate the list with code looking like
 this:
 
-    sub before_build {
-        my $self = shift;
+```perl
+sub before_build {
+    my $self = shift;
 
-        ...; # gather @collaborators, somehow
+    ...; # gather @collaborators, somehow
 
-        my $contrib_stash = $self->zilla->stash_named('%Contributors');
-        unless ( $contrib_stash ) {
-            $contrib_stash = Dist::Zilla::Stash::Contributors->new;
-            $self->_register_stash('%Contributors', $contrib_stash );
-        }
-
-        $contrib_stash->add_contributors( @contributors );
+    my $contrib_stash = $self->zilla->stash_named('%Contributors');
+    unless ( $contrib_stash ) {
+        $contrib_stash = Dist::Zilla::Stash::Contributors->new;
+        $self->_register_stash('%Contributors', $contrib_stash );
     }
+
+    $contrib_stash->add_contributors( @contributors );
+}
+```
 
 and plugin that use them:
 
-        # of course, make sure this is run *after* the gatherers did their job
-    sub before_build {
-        my $self = shift;
+```perl
+    # of course, make sure this is run *after* the gatherers did their job
+sub before_build {
+    my $self = shift;
 
-        my $contrib_stash = $self->zilla->stash_named('%Contributors')
-            or return;
+    my $contrib_stash = $self->zilla->stash_named('%Contributors')
+        or return;
 
-        my @contributors = $contrib_stash->all_contributors;
-    }
+    my @contributors = $contrib_stash->all_contributors;
+}
+```
 
 And that's pretty much all you need to know beside that, internally, each contributor is represented by 
-a [Dist::Zilla::Stash::Contributors::Contributor](http://search.cpan.org/perldoc?Dist::Zilla::Stash::Contributors::Contributor) object.
+a [Dist::Zilla::Stash::Contributors::Contributor](https://metacpan.org/pod/Dist::Zilla::Stash::Contributors::Contributor) object.
 
 # METHODS
 
@@ -72,7 +78,7 @@ Returns the number of contributors.
 
 Adds the `@contributors` to the stash. Duplicates are filtered out. 
 
-Contributors can be [Dist::Zilla::Stash::Contributors::Contributor](http://search.cpan.org/perldoc?Dist::Zilla::Stash::Contributors::Contributor) objects
+Contributors can be [Dist::Zilla::Stash::Contributors::Contributor](https://metacpan.org/pod/Dist::Zilla::Stash::Contributors::Contributor) objects
 or strings of the format 'Full Name <email@address.org>'.
 
 # AUTHOR
@@ -81,7 +87,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2019, 2013 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

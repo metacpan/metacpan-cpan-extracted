@@ -1,11 +1,11 @@
-#!perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 use Test::More;
-use Test::Fatal;
+use Test::Fatal 'exception';
 use Test::Deep;
-use Test::Mock::Redis;
+use Test::Mock::Redis ();
 
 #
 # first demonstrate failure

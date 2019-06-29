@@ -16,6 +16,10 @@ pod_spelling_system:
     - Laffan
     - SLAFFAN
     - libyaml
+    - Petr
+    - Pisar
+    - ppisar
+
 
 pod_coverage:
   skip: 0

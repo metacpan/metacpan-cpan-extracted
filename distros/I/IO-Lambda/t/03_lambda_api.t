@@ -1,5 +1,4 @@
 #! /usr/bin/perl
-# $Id: 03_lambda_api.t,v 1.17 2009/07/02 11:30:31 dk Exp $
 
 use strict;
 use warnings;
@@ -58,11 +57,10 @@ this lambda {
     context lambda { 1 };
     tail {
         return 3 if 3 == shift;
-    	my @frame = restartable;
+    	my $frame = restartable;
         context lambda { 2 };
 	tail {
-	   context lambda { 3 };
-	   again( @frame);
+	   again($frame, lambda { 3 });
 	}
     }
 };

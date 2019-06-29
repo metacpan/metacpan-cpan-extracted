@@ -19,7 +19,6 @@ no_index:
     - inc
 requires:
   Cwd: '3.00'
-  Errno: '0'
   File::Basename: '1.00015'
   File::Next: '1.16'
   File::Spec: '3.00'
@@ -43,4 +42,4 @@ resources:
   homepage: https://beyondgrep.com/
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/beyondgrep/ack3.git
-version: v3.0.0
+version: v3.0.1

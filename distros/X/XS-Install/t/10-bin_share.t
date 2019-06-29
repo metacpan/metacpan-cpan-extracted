@@ -7,9 +7,9 @@ use XS::Install;
 sub tune (@);
 chdir 't/testmod' or die $!;
 
-my %args;
+my $args;
 
-%args = tune XS::Install::makemaker_args(NAME => 'TestMod', BIN_SHARE => {
+$args = tune XS::Install::makemaker_args(NAME => 'TestMod', BIN_SHARE => {
     TYPEMAPS => {'typemap.map' => '', 'src2' => '/', 'src/smap.map' => 'extra/map.map' },
     INC      => '/usr/local/libevent/include',
     INCLUDE  => {'src' => '/', 'src2' => '/'},
@@ -18,7 +18,7 @@ my %args;
     CCFLAGS  => '-O2',
     XSOPT    => '-nah',
 });
-cmp_deeply($args{PM}, {
+cmp_deeply($args->{PM}, {
     'typemap.map'  => '/$(FULLEXT).x/tm/typemap.map',
     'src2/s2.map'  => '/$(FULLEXT).x/tm/s2.map',
     'src/smap.map' => '/$(FULLEXT).x/tm/extra/map.map',
@@ -48,11 +48,11 @@ cmp_deeply($info, {
 done_testing();
 
 sub tune (@) {
-    my %args = @_;
-    for (values %{$args{PM}||{}}) {
+    my $args = shift;
+    for (values %{$args->{PM}||{}}) {
         s/\$\(INST_ARCHLIB\)//;
         s/\$\(INST_LIB\)//;
     }
-    delete @{$args{PM}}{'lib/TestMod.pm', 'lib/TestMod/Pack.pm'};
-    return %args;
+    delete @{$args->{PM}}{'lib/TestMod.pm', 'lib/TestMod/Pack.pm'};
+    return $args;
 }

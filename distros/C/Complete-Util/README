@@ -2,8 +2,8 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.600 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2017-12-08.
+    This document describes version 0.601 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2019-06-25.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
@@ -139,6 +139,8 @@ FUNCTIONS
         way, "umount" will be regarded the same as "unmount" and when user
         types "um" it can be completed unambiguously into "unmount".
 
+    *   summaries => *array[str]*
+
     *   word* => *str* (default: "")
 
         Word to complete.
@@ -207,6 +209,8 @@ FUNCTIONS
 
     *   sep => *str* (default: ",")
 
+    *   summaries => *array[str]*
+
     *   uniq => *bool*
 
         Whether list should contain unique elements.
@@ -248,6 +252,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   hash* => *hash*
+
+    *   summaries => *hash*
 
     *   word* => *str* (default: "")
 
@@ -387,7 +393,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

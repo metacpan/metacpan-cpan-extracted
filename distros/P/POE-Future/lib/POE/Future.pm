@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package POE::Future;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp;
 
@@ -23,12 +23,12 @@ C<POE::Future> - use L<Future> with L<POE>
 
 =head1 SYNOPSIS
 
- use POE::Future;
+   use POE::Future;
 
- my $future = POE::Future->new_delay( 10 )
-    ->then_done( "Hello, world!" );
+   my $future = POE::Future->new_delay( 10 )
+      ->then_done( "Hello, world!" );
 
- say $future->get;
+   say $future->get;
 
 =head1 DESCRIPTION
 
@@ -46,14 +46,18 @@ For a full description on how to use Futures, see the L<Future> documentation.
 
 =cut
 
-=head2 $f = POE::Future->new
+=head2 new
+
+   $f = POE::Future->new
 
 Returns a new leaf future instance, which will allow waiting for its result to
 be made available, using the C<await> method.
 
 =cut
 
-=head2 $f = POE::Future->new_delay( $after )
+=head2 new_delay
+
+   $f = POE::Future->new_delay( $after )
 
 Returns a new leaf future instance which will become ready (with an empty
 result) after the specified delay time.
@@ -81,7 +85,9 @@ sub new_delay
    return $self;
 }
 
-=head2 $f = POE::Future->new_alarm( $at )
+=head2 new_alarm
+
+   $f = POE::Future->new_alarm( $at )
 
 Returns a new leaf future instance which will become ready (with an empty
 result) at the specified alarm time.
@@ -111,11 +117,11 @@ sub new_alarm
 
 =pod
 
-To create a delay or alarm timer that will fail instead of succeed, us the
+To create a delay or alarm timer that will fail instead of succeed, use the
 C<then_fail> method:
 
- my $f = POE::Future->new_delay( 20 )
-    ->then_fail( "Timeout" );
+   my $f = POE::Future->new_delay( 20 )
+      ->then_fail( "Timeout" );
 
 =cut
 

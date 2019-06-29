@@ -11,15 +11,15 @@ if ($ENV{HOCKEYDB_NONET}) {
 	plan skip_all => 'No network connection requested';
 	exit;
 }
-plan tests => 50;
+plan tests => 64;
 
 use t::lib::Util;
 
 test_env();
 $ENV{HOCKEYDB_DATA_DIR} = 't/tmp/data';
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Scraper;
+use Sport::Analytics::NHL::Config qw(:seasons);
+use Sport::Analytics::NHL::Tools qw(:path);
+use Sport::Analytics::NHL::Scraper qw(crawl_game);
 my @games = (
 	{ season => 2011, stage => 2, season_id => 10 },
 	{ season => 2001, stage => 2, season_id => 10 },

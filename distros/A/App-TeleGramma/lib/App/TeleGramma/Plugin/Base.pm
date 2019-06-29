@@ -1,5 +1,5 @@
 package App::TeleGramma::Plugin::Base;
-$App::TeleGramma::Plugin::Base::VERSION = '0.13';
+$App::TeleGramma::Plugin::Base::VERSION = '0.14';
 # ABSTRACT: Base class for TeleGramma plugins
 
 use Mojo::Base -base;
@@ -118,7 +118,7 @@ App::TeleGramma::Plugin::Base - Base class for TeleGramma plugins
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 METHODS
 
@@ -169,11 +169,11 @@ Returns an L<App::TeleGramma::Store> object for you to persist your plugin data.
 
 =head1 AUTHOR
 
-Justin Hawkins <justin@eatmorecode.com>
+Justin Hawkins <justin@hawkins.id.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Justin Hawkins <justin@eatmorecode.com>.
+This software is copyright (c) 2019 by Justin Hawkins <justin@eatmorecode.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings FATAL => 'all';
+use v5.10.1;
+
+use Sport::Analytics::NHL::Vars qw(:local_config);
+use Sport::Analytics::NHL::LocalConfig;
+
+use Data::Dumper;
+
+my $error = '';
+for my $var (@local_config_variables) {
+	$error .= "Missing definition for $var\n" unless defined $LOCAL_CONFIG{$var};
+}
+print $error;
+exit ($error ? 1 : 0);
+
+

@@ -1,5 +1,5 @@
 package String::Validator::Password;
-$String::Validator::Password::VERSION = '2.00';
+$String::Validator::Password::VERSION = '2.01';
 # ABSTRACT: String::Validator Password Checking Module.
 
 use 5.008;
@@ -87,16 +87,9 @@ sub Check{
 				$self->{messages}{password_minoftype}->(
 					$self->{ $required }, $type ) ) }
 		if ( $self->{ $denied }  ) {
-			if ( $self->{ $num } )
+			if ( $self->{ $num } >= $self->{ $denied } )
 				{ $self->IncreaseErr(
 					$self->{messages}{password_typeprohibit}->($type) ) } }
-		# elsif ( $self->{ $denied } > 1 ) {
-		# 	if ( $self->{ $denied } <= $self->{ $num } ) {
-		# 		$self->IncreaseErr(
-		# 			$self->{messages}{password_typelimit}->(
-		# 				$type, $self->{ $denied } ) )
-		# 	}
-		# }
 	} #foreach ( lc num uc punct ).
 return $self->{ error } ;
 }
@@ -116,7 +109,7 @@ String::Validator::Password - String::Validator Password Checking Module.
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 
@@ -245,7 +238,7 @@ John Karr <brainbuz@brainbuz.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018 by John Karr.
+This software is Copyright (c) 2014-2019 by John Karr.
 
 This is free software, licensed under:
 

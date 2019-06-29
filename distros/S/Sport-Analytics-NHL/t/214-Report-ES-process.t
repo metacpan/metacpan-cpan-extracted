@@ -6,12 +6,10 @@ use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
 use Test::More tests => 3;
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($IS_AUTHOR);
 
 $ENV{HOCKEYDB_DEBUG} = $IS_AUTHOR;
 use Sport::Analytics::NHL::Report::ES;
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::Util;
 use Sport::Analytics::NHL::Test;
 
 my $report;

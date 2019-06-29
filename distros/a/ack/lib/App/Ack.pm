@@ -11,16 +11,12 @@ App::Ack
 
 A container for functions for the ack program.
 
-=head1 VERSION
-
-Version 2.999_08
-
 =cut
 
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = v3.0.0;
+    $VERSION = v3.0.1;
     $COPYRIGHT = 'Copyright 2005-2019 Andy Lester.';
 }
 our $STANDALONE = 0;

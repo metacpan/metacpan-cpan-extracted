@@ -76,6 +76,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Graham Knop</foaf:name>
+      <foaf:mbox rdf:resource="mailto:haarg@haarg.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Jason Galea</foaf:name>
       <foaf:mbox rdf:resource="mailto:jason@lecstor.com" />
     </foaf:Person>
@@ -139,6 +145,12 @@
     <foaf:Person>
       <foaf:name>Tomas Doran</foaf:name>
       <foaf:mbox rdf:resource="mailto:bobtfish@bobtfish.net" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
     </foaf:Person>
   </helper>
   <helper>
@@ -370,6 +382,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.35</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-07-31</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.36</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-15</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

@@ -8,7 +8,7 @@ package IO::Async::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use base qw( IO::Async::Handle );
 
@@ -420,6 +420,11 @@ sub configure
    if( $self->loop and $self->read_handle ) {
       $self->can_event( "on_read" ) or
          croak 'Expected either an on_read callback or to be able to ->on_read';
+   }
+
+   if( $self->{autoflush} and my $write_handle = $self->write_handle ) {
+      carp "An IO::Async::Stream with autoflush needs an O_NONBLOCK write handle"
+         if $write_handle->blocking;
    }
 }
 

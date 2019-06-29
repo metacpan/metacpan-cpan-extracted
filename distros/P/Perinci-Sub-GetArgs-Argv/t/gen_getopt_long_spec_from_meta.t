@@ -24,6 +24,8 @@ my $meta = {
         ary1       => {schema=>'array', element_meta=>{v=>1.1, args=>{a=>{schema=>'str'}}}},
         with_foo   => {schema=>'bool'}, # demo negation form with-foo -> without-foo
         buf1       => {schema=>'buf'},
+        flag1      => {schema=>['bool', is_true=>1]}, # test is_true=1
+        flag2      => {schema=>['bool', is_true=>0]}, # test is_true=0 / is=0
 
         # demo conversion of plural -> singular option name
         strings    => {schema=>['array', of=>'str'], 'x.name.is_plural'=> 1},
@@ -107,6 +109,9 @@ my $expected_res = [
         'without-foo' => 'CODE',
         'buf1=s' => 'CODE',
         'buf1-base64=s' => 'CODE',
+        'flag1' => 'CODE',
+        'noflag2' => 'CODE',
+        'no-flag2' => 'CODE',
 
         'string=s@' => 'CODE',
         'strings-json=s' => 'CODE',
@@ -148,6 +153,9 @@ my $expected_res = [
             'without-foo' => {arg=>'with_foo', fqarg=>'with_foo', parsed=>'PARSED', is_neg=>1, pos_opts=>['with-foo']},
             'buf1=s' => {arg=>'buf1', fqarg=>'buf1', parsed=>'PARSED'},
             'buf1-base64=s' => {arg=>'buf1', fqarg=>'buf1', parsed=>'PARSED', is_base64=>1},
+            'flag1' => {arg=>'flag1', fqarg=>'flag1', parsed=>'PARSED',},
+            'noflag2' => {arg=>'flag2', fqarg=>'flag2', parsed=>'PARSED', is_neg=>1, pos_opts=>['flag2']},
+            'no-flag2' => {arg=>'flag2', fqarg=>'flag2', parsed=>'PARSED', is_neg=>1, pos_opts=>['flag2']},
 
             'string=s@' => {arg=>'strings', fqarg=>'strings', parsed=>'PARSED'},
             'strings-json=s' => {arg=>'strings', fqarg=>'strings', parsed=>'PARSED', is_json=>1},
@@ -170,6 +178,7 @@ my $expected_res = [
             '--bool1',
             '--buf1',
             '--buf1-base64',
+            '--flag1',
             '--float1',
             '--format',
             '--format-options',
@@ -182,8 +191,10 @@ my $expected_res = [
             '--incl-mice',
             '--int1',
             '--no-bool1',
+            '--no-flag2',
             '--no-verbose',
             '--nobool1',
+            '--noflag2',
             '--noverbose',
             '--set-zero',
             '--some-data-json',
@@ -225,6 +236,7 @@ my $expected_res = [
             '--bool1',
             '--buf1',
             '--buf1-base64',
+            '--flag1',
             '--float1',
             '--hash1',
             '--hash1-a',
@@ -234,7 +246,9 @@ my $expected_res = [
             '--incl-mice',
             '--int1',
             '--no-bool1',
+            '--no-flag2',
             '--nobool1',
+            '--noflag2',
             '--set-zero',
             '--some-data-json',
             '--some-data-yaml',
@@ -294,6 +308,13 @@ my $expected_res = [
             'buf1' => [
                 '--buf1',
                 '--buf1-base64',
+            ],
+            'flag1' => [
+                '--flag1',
+            ],
+            'flag2' => [
+                '--no-flag2',
+                '--noflag2',
             ],
 
             'strings' => [

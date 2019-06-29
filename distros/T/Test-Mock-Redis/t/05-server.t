@@ -1,4 +1,4 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -111,7 +111,7 @@ foreach my $r (@redi){
     like($info->{run_id},qr/^[0-9a-f]{40}/, 'run_id is 40 random hex chars');
 
     for(0..14){
-        is($info->{"db$_"}, 'keys=1,expires=0', "db$_ info is correct");
+        is($info->{"db$_"}, 'keys=1,expires=0,avg_ttl=0', "db$_ info is correct");
     }
     # db15 was left with nothing in it, since it was the last one flushed
     is($info->{"db15"}, undef, 'info returns no data about databases with no keys');
@@ -119,7 +119,8 @@ foreach my $r (@redi){
     $r->setex("volitile-key-$_", 15, 'some value') for (1..5);
 
 
-    is($r->info->{'db0'}, 'keys=6,expires=5', 'db0 info now has six keys and five expire');
+    like $r->info->{'db0'}, qr/^keys=6,expires=5,avg_ttl=\d+$/,
+      'db0 info now has six keys and five expires';
 
     ok($r->quit, 'quit returns true');
     ok(!$r->quit, 'quit returns false the second time');

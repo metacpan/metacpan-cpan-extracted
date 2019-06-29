@@ -1,14 +1,15 @@
 ---
-abstract: 'manage the installation of multiple software packages'
+abstract: 'manage farms of symbolic links'
 author:
   - unknown
 build_requires:
+  IO::Scalar: '0'
   Test::More: '0'
   Test::Output: '0'
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,17 +18,19 @@ name: Stow
 provides:
   Stow:
     file: lib/Stow.pm
-    version: v2.2.2
+    version: v2.3.0
   Stow::Util:
     file: lib/Stow/Util.pm
-    version: v2.2.2
+    version: v2.3.0
 requires:
   Carp: '0'
+  Clone: '0'
+  Hash::Merge: '0'
   IO::File: '0'
   perl: '5.006'
 resources:
   homepage: https://savannah.gnu.org/projects/stow
   license: http://www.gnu.org/licenses/gpl-2.0.html
   repository: git://git.savannah.gnu.org/stow.git
-version: v2.2.2
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: v2.3.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

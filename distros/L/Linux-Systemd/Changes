@@ -1,5 +1,8 @@
 Changelog for Linux-Systemd
 
+1.191790 2019-06-28T16:27:06Z
+ - [really closes #3] don't use Try::Tiny
+
 1.172840 2017-10-11T01:38:08Z
  - [closes #3] don't be lazy by using Try::Tiny during configure stage
  - Fix some POD

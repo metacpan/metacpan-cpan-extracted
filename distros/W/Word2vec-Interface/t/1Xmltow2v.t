@@ -24,7 +24,7 @@ ok( $xmltow2v->GetDate() ne "" );
 ok( $xmltow2v->GetTime() ne "" );
 ok( defined( $xmltow2v->GetFileType( "samples/compoundword.txt" ) ) );
 ok( $xmltow2v->GetMaxCompoundWordLength() == 20 );
-ok( $xmltow2v->GetNumOfThreads() == Sys::CpuAffinity::getNumCpus() );
+ok( $xmltow2v->GetNumOfThreads() >= 1 );
 ok( $xmltow2v->GetOverwriteExistingFile() == 0 );
 ok( $xmltow2v->GetParsedCount() == 0 );
 ok( $xmltow2v->GetQuickParse() == 0 );

@@ -1,6 +1,11 @@
 Revision history for POE-Future
 
-0.30    2014/08/22 23:33:46
+0.04    2019-06-26 18:19:45
+        [CHANGES]
+         * Provide Future::IO::Impl::POE
+         * General module/distribution refresh
+
+0.03    2014/08/22 23:33:46
         [BUGFIXES]
          * Remember to declare dependency on POE. Oops.
 

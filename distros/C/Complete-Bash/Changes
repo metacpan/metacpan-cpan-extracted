@@ -1,3 +1,31 @@
+0.324   2019-06-28 (PERLANCAR)
+
+	- [ux] Tweak summary display to make it look nicer (use vertical
+	  bar | instead of space).
+
+
+0.323   2019-06-27 (PERLANCAR)
+
+	- [ux] By default don't limit entries+summaries to a single-column
+	  display, but observe COMPLETE_BASH_MAX_COLUMNS.
+
+	- Add option to show summaries right-aligned, like in fish. This is
+          controlled via COMPLETE_BASH_SUMMARY_ALIGN (and also
+          COMPLETE_BASH_SUMMARY_LINE_EVERY).
+
+
+0.322   2019-06-26 (PERLANCAR)
+
+	- Support showing message (Complete 0.201).
+
+
+0.321   2019-06-25 (PERLANCAR)
+
+	- format_completion() now by default shows item summaries if
+	  available (can be turned off by setting 'show_summaries' option
+	  or COMPLETE_BASH_SHOW_SUMMARIES to 0).
+
+
 0.320   2018-10-10 (PERLANCAR)
 
 	- Observe COMPLETE_BASH_TRACE to produce more log statements for

@@ -7,7 +7,7 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB);
 use Sport::Analytics::NHL::DB;
 
 if ($ENV{HOCKEYDB_NODB} || ! $MONGO_DB) {

@@ -1,5 +1,11 @@
 Revision history for Game-LevelMap
 
-0.01    2019-06-24
-        First version, released on an unanimous world.
+0.02    2019-06-26
+        Break interface on to_terminal to make it match the shape of the
+        new update_terminal. Better eg/panel-viewer. More tests.
 
+0.01    2019-06-24
+        First version, released on an unanimous[1] world.
+
+-- 
+[1] Borges, "Las ruinas circulares"

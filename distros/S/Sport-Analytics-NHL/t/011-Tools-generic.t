@@ -9,8 +9,8 @@ use Test::More;
 
 plan tests => 16;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Tools qw(:generic);
+use Sport::Analytics::NHL::Vars  qw($REPORTS_DIR);
 
 is_deeply(
 	Sport::Analytics::NHL::Tools::parse_nhl_game_id(2010020102),
@@ -26,10 +26,12 @@ is_deeply(
 is(Sport::Analytics::NHL::Tools::get_season_from_date(20100202), 2009, 'season correct');
 is(Sport::Analytics::NHL::Tools::get_season_from_date(20100902), 2010, 'season correct');
 
-is(Sport::Analytics::NHL::Tools::get_schedule_json_file(2010),
-	'/misc/nhl/2010/schedule.json', 'season correct'
+is(
+	Sport::Analytics::NHL::Tools::get_schedule_json_file(2010),
+	"$REPORTS_DIR/2010/schedule.json", 'season correct'
 );
-is(Sport::Analytics::NHL::Tools::get_schedule_json_file(2010, '/tmp'),
+is(
+	Sport::Analytics::NHL::Tools::get_schedule_json_file(2010, '/tmp'),
 	'/tmp/2010/schedule.json', 'season correct'
 );
 is_deeply(

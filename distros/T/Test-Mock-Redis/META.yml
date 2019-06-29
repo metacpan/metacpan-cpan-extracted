@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Test::Mock::Redis:
     file: lib/Test/Mock/Redis.pm
-    version: '0.21'
+    version: '0.22'
   Test::Mock::Redis::Hash:
     file: lib/Test/Mock/Redis.pm
   Test::Mock::Redis::List:
@@ -47,5 +47,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Mock-Redis
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jlavallee/Test-Mock-Redis/
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

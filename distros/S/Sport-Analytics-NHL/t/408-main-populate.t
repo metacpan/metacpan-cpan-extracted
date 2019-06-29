@@ -5,12 +5,12 @@ use strict;
 use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
-use Test::More; 
+use Test::More;
 
 use JSON;
 use Storable;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB);
 use Sport::Analytics::NHL::Config;
 use Sport::Analytics::NHL::Test;
 use Sport::Analytics::NHL::Util;
@@ -41,11 +41,11 @@ for my $db_game_id (@db_game_ids) {
 	for (@{$game->{events}}) {
 		like($_, qr/^$db_game_id/, 'event converted to ids');
 	}
-	isa_ok($game->{location}, 'MongoDB::OID', 'location converted to OID')
+	isa_ok($game->{location}, 'BSON::OID', 'location converted to OID')
 		if $db_game_id == 201120010;
 	for my $t (0,1) {
 		my $team = $game->{teams}[$t];
-		isa_ok($team->{coach}, 'MongoDB::OID', 'coach converted to OID');
+		isa_ok($team->{coach}, 'BSON::OID', 'coach converted to OID');
 		for my $player (@{$team->{roster}}) {
 			my $player_db = $players_c->find_one({_id => $player->{_id}+0});
 			is(scalar(grep {$_ == $game->{_id}} @{$player_db->{games}}), 1, 'player game registered');

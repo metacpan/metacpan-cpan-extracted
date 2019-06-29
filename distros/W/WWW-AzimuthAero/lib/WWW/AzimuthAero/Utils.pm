@@ -1,5 +1,5 @@
 package WWW::AzimuthAero::Utils;
-$WWW::AzimuthAero::Utils::VERSION = '0.2';
+$WWW::AzimuthAero::Utils::VERSION = '0.31';
 
 # ABSTRACT: functions that can be used outside WWW::AzimuthAero::* packages
 
@@ -97,6 +97,7 @@ sub get_dates_from_dows {
     return sort_dates(@res);
 }
 
+
 # This method used for filtering dates when no available_to property
 
 sub get_dates_from_range {
@@ -140,6 +141,7 @@ sub sort_dates {
 
     return map { $_->dmy('.') }
       sort { DateTime->compare( $a, $b ) }
+      grep { DateTime->compare( $_, DateTime->now ) >= 0 }
       map {
         DateTime::Format::Strptime->new( pattern => $pattern )
           ->parse_datetime($_)
@@ -152,8 +154,12 @@ sub filter_dates {
     my $pattern = '%d.%m.%Y';
 
     confess "max date is not defined" unless defined $params{max};
+
     $params{max} = DateTime::Format::Strptime->new( pattern => $pattern )
       ->parse_datetime( $params{max} );
+
+    carp "max date in past" if ( $params{max} < DateTime->now() );
+
     $params{min} =
       ( defined $params{min} )
       ? ( DateTime::Format::Strptime->new( pattern => $pattern )
@@ -218,13 +224,15 @@ WWW::AzimuthAero::Utils - functions that can be used outside WWW::AzimuthAero::*
 
 =head1 VERSION
 
-version 0.2
+version 0.31
 
 =head1 DESCRIPTION
 
     Some useful date manipulation and filtering functions
 
-=head1 get_next_dow_date
+=head1 FUNCTIONS
+
+=head2 get_next_dow_date
 
 Get next dow-date following by specified date
 
@@ -233,7 +241,7 @@ By default all input and output dates in '%d.%m.%Y' format, but you can easily s
     get_next_dow_date( '7.06.2019', 7 )->dmy('.');  # '9.06.2019'
     get_next_dow_date( '7.06.2019', 3 )->dmy('.');  # '12.06.2019'
 
-=head1 get_dates_from_dows
+=head2 get_dates_from_dows
 
 Get particular dates, based on min_date, max_date and days_of_week
 
@@ -245,26 +253,26 @@ Return sorted array
 
 TO-DO: carefully check for max day without min day (result may not include it)
 
-=head1 filter_dates
+=head2 get_dates_from_range
 
-    Sort dates ascending
+=head2 sort_dates
 
-=head1 filter_dates
+=head2 filter_dates
 
 Filter dates by max and min dates
 
     filter_dates( \@dates, max => '15.06.2019' );
     filter_dates( \@dates, max => '15.06.2019', min => '07.06.2019' );
 
-=head1 extract_js_glob_var
+=head2 extract_js_glob_var
 
 Extract global variable value from JavaScript code
 
-=head1 fix_html_string
+=head2 fix_html_string
 
 remove newline symbols, leading and trailing whitespaces
 
-=head1 pairwise
+=head2 pairwise
 
 Transform
 

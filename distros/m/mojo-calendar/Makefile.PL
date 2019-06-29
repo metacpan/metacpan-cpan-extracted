@@ -1,6 +1,9 @@
+#!/usr/bin/env perl
 use 5.006;
+
 use strict;
-use warnings FATAL => 'all';
+use warnings;
+
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -8,7 +11,7 @@ WriteMakefile(
     AUTHOR           => q{Adrian Crisan <adrian.crisan88@gmail.com>},
     VERSION_FROM     => 'lib/Mojo/Calendar.pm',
     ABSTRACT_FROM    => 'lib/Mojo/Calendar.pm',
-    LICENSE          => 'artistic_2',
+    LICENSE          => 'MIT',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {
@@ -24,10 +27,20 @@ WriteMakefile(
         'DateTime::Format::Flexible' => 0,
     },
     META_MERGE   => {
+        no_index       => {directory => ['t']},
         resources => {
-            repository  =>  'https://github.com/crlcu/mojo-calendar',
+            bugtracker => {
+                web => 'https://github.com/crlcu/mojo-calendar/issues'
+            },
+            license    => ['https://opensource.org/licenses/MIT'],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/crlcu/mojo-calendar.git',
+                web  => 'https://github.com/crlcu/mojo-calendar',
+            },
         },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Mojo-Calendar-*' },
+    test      => {TESTS => 't/*.t'},
 );

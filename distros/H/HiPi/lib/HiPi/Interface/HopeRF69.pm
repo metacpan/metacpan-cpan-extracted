@@ -19,7 +19,7 @@ use HiPi qw( :rpi :spi :hrf69 );
 __PACKAGE__->create_accessors( qw( devicename reset_gpio update_default_on_reset
                                    fsk_config ook_config ook_repeat) );
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 # Hope recommended updated reset defaults
 my $reset_defaults = [

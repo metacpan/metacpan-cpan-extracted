@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi/RaspberryPi.pm
 # Description  : Information about host Raspberry Pi
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2019 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -14,13 +14,14 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
 my $israspberry = 0;
 my $israspberry2 = 0;
 my $israspberry3 = 0;
+my $israspberry4 = 0;
 my $hasdevicetree = 0;
 my $homedir = '/tmp';
 
@@ -56,6 +57,8 @@ my %_revinfostash = (
         '0' => 256,
         '1' => 512,
         '2' => 1024,
+        '3' => 2048,
+        '4' => 4096,
     },
     manufacturer => {
         '0' => 'Sony UK',
@@ -70,25 +73,28 @@ my %_revinfostash = (
         '0' => 'BCM2835',
         '1' => 'BCM2836',
         '2' => 'BCM2837',
+        '3' => 'BCM2711',
     },
     
     type => {
-        '0'  => 'Raspberry Pi Model A',
-        '1'  => 'Raspberry Pi Model B',
-        '2'  => 'Raspberry Pi Model A Plus',
-        '3'  => 'Raspberry Pi Model B Plus',
-        '4'  => 'Raspberry Pi 2 Model B',
-        '5'  => 'Raspberry Pi Alpha',
-        '6'  => 'Raspberry Pi Compute Module 1',
-        '7'  => 'Raspberry Pi Unknown Model 07',
-        '8'  => 'Raspberry Pi 3 Model B',
-        '9'  => 'Raspberry Pi Zero',
-        '10' => 'Raspberry Pi Compute Module 3',
-        '11' => 'UNKNOWN Rasberry Pi Model 11',
-        '12' => 'Raspberry Pi Zero W',
-        '13' => 'Raspberry Pi 3 Model B Plus',
-        '14' => 'Raspberry Pi 3 Model A Plus',
-        '15' => 'UNKNOWN Rasberry Pi Model 15',
+        '0'  => 'Raspberry Pi Model A',                 # 00
+        '1'  => 'Raspberry Pi Model B',                 # 01
+        '2'  => 'Raspberry Pi Model A Plus',            # 02
+        '3'  => 'Raspberry Pi Model B Plus',            # 03
+        '4'  => 'Raspberry Pi 2 Model B',               # 04
+        '5'  => 'Raspberry Pi Alpha',                   # 05
+        '6'  => 'Raspberry Pi Compute Module 1',        # 06
+        '7'  => 'Raspberry Pi Unknown Model 07',        # 07
+        '8'  => 'Raspberry Pi 3 Model B',               # 08
+        '9'  => 'Raspberry Pi Zero',                    # 09
+        '10' => 'Raspberry Pi Compute Module 3',        # 0A
+        '11' => 'UNKNOWN Rasberry Pi Model 11',         # 0B
+        '12' => 'Raspberry Pi Zero W',                  # 0C
+        '13' => 'Raspberry Pi 3 Model B Plus',          # 0D
+        '14' => 'Raspberry Pi 3 Model A Plus',          # 0E
+        '15' => 'UNKNOWN Rasberry Pi Model 15',         # 0F
+        '16' => 'Raspberry Pi Compute Module 3 Plus',   # 10
+        '17' => 'Raspberry Pi 4 Model B',               # 11
     },
     board_type => {
         '0'  => $btype2,
@@ -107,6 +113,8 @@ my %_revinfostash = (
         '13' => $btype3,
         '14' => $btype3,
         '15' => $btype3,
+        '16' => $btype4,
+        '17' => $btype3,
     },
     release => {
         '0'  => 'Q1 2013',
@@ -125,6 +133,9 @@ my %_revinfostash = (
         '13' => 'Q1 2018',
         '14' => 'Q4 2018',
         '15' => 'unknown',
+        '16' => 'Q1 2019',
+        '17' => 'Q2 2019',
+        
     },
 );
 
@@ -145,6 +156,8 @@ sub is_raspberry { return $israspberry; }
 sub is_raspberry_2 { return $israspberry2; }
 
 sub is_raspberry_3 { return $israspberry3; }
+
+sub is_raspberry_4 { return $israspberry4; }
 
 sub has_device_tree { return $hasdevicetree; }
 
@@ -219,7 +232,7 @@ sub _configure {
     my $rev = ($_cpuinfostash{Revision}) ?  lc( $_cpuinfostash{Revision} ) : $defaultkey;
     $rev =~ s/^\s+//;
     $rev =~ s/\s+$//;
-    
+        
     $israspberry = $_cpuinfostash{Hardware} && $_cpuinfostash{Hardware} =~ /^BCM2708|BCM2709|BCM2710|BCM2835$/;
         
     if ( $rev =~ /(beta|unknown|unknownex)$/) {
@@ -259,7 +272,8 @@ sub _configure {
             $binfo->{revisionnumber} = $schemerev;
             
             $israspberry2 = ( $schemetype == 4 ) ? 1 : 0;
-            $israspberry3 = ( $schemetype == 8 || $schemetype == 10 || $schemetype == 13 ) ? 1 : 0;
+            $israspberry3 = ( $schemetype == 8 || $schemetype == 10 || $schemetype == 13 || $schemetype == 14 || $schemetype == 16 ) ? 1 : 0;
+            $israspberry4 = ( $schemetype == 17 ) ? 1 : 0;
             
             $_config = { %$binfo };
         } else {
@@ -308,7 +322,7 @@ sub dump_board_info {
     $dump .= qq(Raspberry Pi Board Info\n);
     $dump .= qq(--------------------------------------------------\n);
     $dump .= qq(Model Name       : $_config->{model_name}\n);
-    #$dump .= qq(Released         : $_config->{release}\n);
+    $dump .= qq(Released         : $_config->{release}\n);
     $dump .= qq(Manufacturer     : $_config->{manufacturer}\n);
     $dump .= qq(Memory           : $_config->{memory}\n);
     $dump .= qq(Processor        : $_config->{processor}\n);
@@ -325,6 +339,7 @@ sub dump_board_info {
     $dump .= q(Is Raspberry     : ) . (($israspberry) ? 'Yes' : 'No' ) . qq(\n);
     $dump .= q(Is Raspberry 2   : ) . (($israspberry2) ? 'Yes' : 'No' ) . qq(\n);
     $dump .= q(Is Raspberry 3   : ) . (($israspberry3) ? 'Yes' : 'No' ) . qq(\n);
+    $dump .= q(Is Raspberry 4   : ) . (($israspberry4) ? 'Yes' : 'No' ) . qq(\n);
     
     return $dump;
 }

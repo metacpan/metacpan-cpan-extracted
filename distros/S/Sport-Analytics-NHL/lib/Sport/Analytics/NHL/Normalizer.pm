@@ -13,12 +13,13 @@ use Date::Parse;
 use File::Basename;
 use List::MoreUtils qw(uniq part);
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:ids :vocabularies :basic);
 use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Util qw(:debug :times);
+use Sport::Analytics::NHL::Errors;
 use Sport::Analytics::NHL::Report;
 use Sport::Analytics::NHL::Test;
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Tools qw(:parser :db);
 use Sport::Analytics::NHL::Scraper;
 
 =head1 NAME
@@ -242,14 +243,21 @@ Arguments:
 
 Returns: void. The event summary is modified.
 
+=item C<add_playoff_info>
+
+Adds information specific to playoff series to the game: the round, the series number and the game number in the series.
+
+ Arguments: the boxscore
+
+ Returns: void. The boxscore is modified.
+
 =back
 
 =cut
 
-use Data::Dumper;
-use base 'Exporter';
+use parent 'Exporter';
 
-our @EXPORT = qw(summarize normalize_boxscore);
+our @EXPORT = qw(%EVENT_PRECEDENCE set_roster_positions summarize normalize_boxscore);
 
 our $PLAYER_IDS = {};
 
@@ -263,8 +271,8 @@ our %EVENT_PRECEDENCE = (
 	MISS  => 9,
 	GOAL  => 10,
 	PENL  => 11,
-	STOP  => 12,
-	CHL   => 13,
+	CHL   => 12,
+	STOP  => 13,
 	FAC   => 14,
 	PEND  => 98,
 	GEND  => 99,
@@ -280,10 +288,32 @@ our %EVENT_TYPE_TO_STAT = (
 	FAC   => 'faceOffWins',
 );
 
-$Data::Dumper::Trailingcomma = 1;
-$Data::Dumper::Deepcopy      = 1;
-$Data::Dumper::Sortkeys      = 1;
-$Data::Dumper::Deparse       = 1;
+=over 2
+
+=item C<set_roster_positions>
+
+Prepares a hash with positions of each player id in the boxscore for future caching and resolving purposes.
+
+Arguments: the boxscore
+Returns: the positions hash.
+
+=back
+
+=cut
+
+sub set_roster_positions ($) {
+
+	my $boxscore = shift;
+	my $positions = {};
+
+	for my $t (0,1) {
+		my $team = $boxscore->{teams}[$t];
+		for my $player (@{$team->{roster}}) {
+			$positions->{$player->{_id}} = $player->{position};
+		}
+	}
+	$positions;
+}
 
 sub summarize_goal ($$$$;$) {
 
@@ -299,7 +329,9 @@ sub summarize_goal ($$$$;$) {
 		push(@{$event_summary->{stats}}, 'assists');
 	}
 	$event_summary->{$boxscore->{teams}[$event->{t}]{name}}{score}++;
-	if ($event->{player1}) {
+	$positions->{$event->{player1}} ||= 'S';
+	if ($event->{player1} && ! $SPECIAL_EVENTS{$boxscore->{_id}}) {
+#		dumper $positions, $event;
 		if ($positions->{$event->{player1}} eq 'G') {
 			$event_summary->{$event->{player1}}{g_goals}++;
 			$event_summary->{$event->{player1}}{g_shots}++;
@@ -313,7 +345,7 @@ sub summarize_goal ($$$$;$) {
 	}
 	if ($event->{player2}) {
 		$event_summary->{$event->{player2}}{shots}++;
-		$event_summary->{$event->{player2}}{goalsAgainst}++ if $event->{ts};
+		$event_summary->{$event->{player2}}{goalsAgainst}++ if $event->{ts} && ! $event->{en};
 		push(@{$event_summary->{stats}}, 'goalsAgainst', 'shots');
 	}
 	delete $event_summary->{stats} if $no_stats;
@@ -406,16 +438,22 @@ sub normalize_result ($) {
 		$game->{result} = [ 1, 1 ];
 	}
 	elsif ($game->{teams}[0]{score} > $game->{teams}[1]{score}) {
-		$game->{result} = [ 2, $game->{ot} && $game->{season} >= 1999 ? 1 : 0 ],
+		$game->{result} = [ 2, $game->{ot} && $game->{season} >= 1999 ? 1 : 0 ];
+		$game->{winner} = $game->{teams}[0]{name};
+		$game->{loser}  = $game->{teams}[1]{name};
 	}
 	else {
-		$game->{result} = [ $game->{ot} && $game->{season} >= 1999 ? 1 : 0, 2 ],
+		$game->{result} = [ $game->{ot} && $game->{season} >= 1999 ? 1 : 0, 2 ];
+		$game->{winner} = $game->{teams}[1]{name};
+		$game->{loser}  = $game->{teams}[0]{name};
 	}
 }
 
 sub normalize_header ($) {
 
 	my $game = shift;
+
+	debug "Normalizing header";
 	$game->{date} = strftime("%Y%m%d", localtime($game->{start_ts}));
 	if ($game->{location}) {
 		$game->{location} =~ s/^\s+//;
@@ -477,7 +515,15 @@ sub normalize_players ($) {
 				delete $player->{$_};
 			}
 		}
-		delete @{$player}{'Saves - Shots', qw(void EV SH PP TOITOT p1 p2 p3)};
+		for my $p (1..15) {
+			my $_p = "p$p";
+			if (defined $player->{$_p}) {
+				$player->{$_p} =~ /(\d+)\-(\d+)/;
+				$player->{"SHOT$p"} = [ $1, $2 ];
+				delete $player->{$_p};
+			}
+		}
+		delete @{$player}{'Saves - Shots', qw(void EV SH PP TOITOT pt)};
 		for (keys %{$player}) {
 			when ('faceOffPercentage') {
 				$player->{$_} = $player->{faceoffTaken}
@@ -750,7 +796,23 @@ sub sort_events ($) {
 	my $gp     = $boxscore->{periods};
 
 	my $sorted_events = [];
-	my @events_by_period = part {
+	my @so_events = part {
+		($_->{period} == 5 && $boxscore->{stage} == $REGULAR) ? 1 : 0;
+	} @{$events};
+	$so_events[0] ||= [];
+	my $so_cache = {};
+	my $so_count = 0;
+	for my $so_event (@{$so_events[1]}) {
+		if ($so_event->{player1} && $so_event->{type} ne 'PENL') {
+			$so_count++;
+			if ($so_cache->{$so_event->{player1}} && ! $SAME_SO_TWICE{$boxscore->{_id}} && $so_count <= 36) {
+				dumper $so_event;
+				die "$so_count Same player shoots twice!";
+			}
+			$so_cache->{$so_event->{player1}} = 1;
+		}
+	}
+	my @events_by_period = (( part {
 		my $x = $_->{period}
 	} sort {
 		$a->{period} <=> $b->{period}
@@ -758,13 +820,19 @@ sub sort_events ($) {
 		|| $EVENT_PRECEDENCE{$a->{type}} <=> $EVENT_PRECEDENCE{$b->{type}}
 		|| $a->{type} cmp $b->{type}
 		|| $b->{t}   <=> $a->{t}
-	} @{$events};
+	} @{$so_events[0]}), @{$so_events[1]} ? [@{$so_events[1]}] : ());
+	splice(@events_by_period, 4, 0, []) if @{$so_events[1]} && @events_by_period == 5;
 	my $ot_end =
 		$boxscore->{result}[0] != $boxscore->{result}[1]
 		&& ! $boxscore->{so};
-	pop @{$events_by_period[-1]} while @events_by_period && $events_by_period[-1]->[-1]{type} eq 'GEND';
+	$events_by_period[-1] =
+		[ grep { $_->{type} ne 'GEND' } @{$events_by_period[-1]} ]
+		if @events_by_period;
 	my $periods = $#events_by_period > 3 ? $#events_by_period : 3;
 	$periods = scalar @{$gp} if $periods < scalar @{$gp};
+#		dumper $gp, scalar(@events_by_period), $periods;
+	#dumper \@events_by_period;
+#	exit;
 	for my $p (1..$periods) {
 		my $period = $events_by_period[$p] || [];
 		insert_pstr($period, $p, $events_by_period[$p]->[0] || $boxscore)
@@ -787,6 +855,8 @@ sub sort_events ($) {
 		dclone $sorted_events->[-1]
 	);
 	$sorted_events->[-1]{type} = 'GEND';
+##	dumper $sorted_events;
+#	exit;
 	$boxscore->{events} = $sorted_events;
 }
 
@@ -801,6 +871,17 @@ sub assign_event_ids ($) {
 	}
 }
 
+sub add_playoff_info ($) {
+
+	my $boxscore = shift;
+
+	return unless $boxscore->{stage} eq $PLAYOFF;
+	my $game = $boxscore->{_id};
+	$boxscore->{round}   = substr($game, 6, 1);
+	$boxscore->{pairing} = substr($game, 7, 1);
+	$boxscore->{number}  = substr($game, 8, 1);
+}
+
 sub normalize_boxscore ($;$) {
 
 	my $boxscore = shift;
@@ -810,12 +891,13 @@ sub normalize_boxscore ($;$) {
 		my $event_summary = summarize($boxscore);
 		test_consistency($boxscore, $event_summary);
 	}
-
 	normalize_header($boxscore);
 	normalize_teams($boxscore);
 	normalize_events($boxscore);
 	sort_events($boxscore);
 	assign_event_ids($boxscore->{events});
+	add_playoff_info($boxscore) if $boxscore->{stage} == $PLAYOFF;
+	$boxscore->{length} = $boxscore->{events}[-1]{ts};
 	undef $EVENT;
 	return $PLAYER_IDS;
 }

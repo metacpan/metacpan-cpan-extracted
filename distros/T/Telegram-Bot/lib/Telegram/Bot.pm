@@ -1,5 +1,8 @@
 package Telegram::Bot;
-$Telegram::Bot::VERSION = '0.010';
+$Telegram::Bot::VERSION = '0.012';
+use strict;
+use warnings;
+
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -17,7 +20,7 @@ Telegram::Bot - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 

@@ -33,6 +33,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
                                    'Test::Warn' => '0',
+                                   'blib' => '1.01',
                                    'strict' => '0',
                                    'warnings' => '0'
                                  }

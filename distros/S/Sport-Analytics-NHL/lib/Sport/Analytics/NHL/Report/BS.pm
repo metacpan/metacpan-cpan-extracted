@@ -16,10 +16,10 @@ use Text::Unidecode;
 
 use parent 'Sport::Analytics::NHL::Report';
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:ids);
 use Sport::Analytics::NHL::Errors;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Tools qw(:basic :db :parser);
+use Sport::Analytics::NHL::Util qw(:debug :utils :times);
 
 use Data::Dumper;
 
@@ -208,10 +208,11 @@ our %PLAYER_ID_MAP = (
 	Goalie    => 'player2',
 );
 
-sub new ($$) {
+sub new ($$;$) {
 
-	my $class = shift;
-	my $json  = shift;
+	my $class        = shift;
+	my $json         = shift;
+	my $ignore_state = shift || 0;
 
 	my $code = JSON->new();
 	$code->utf8(1);
@@ -219,7 +220,7 @@ sub new ($$) {
 	return undef unless $json;
 	try { $self = {json => $code->decode(decode "UTF-8", $json)} }
 		catch { $self = {json => $code->decode($json)} };
-	return undef unless
+	return undef unless	$ignore_state ||
 		$self->{json}{gameData}{status}{abstractGameState}
 		&& $self->{json}{gameData}{status}{abstractGameState} eq 'Final';
 	bless $self, $class;
@@ -227,10 +228,10 @@ sub new ($$) {
 	$self;
 }
 
-sub set_id_data ($$) {
+sub set_id_data ($;$) {
 
-	my $self = shift;
-	my $id_data = shift;
+	my $self    = shift;
+	my $id_data = shift || $self->{json}{gamePk};
 
 	my $season_info    = parse_nhl_game_id($id_data);
 	$self->{season}    = $season_info->{season};
@@ -380,12 +381,11 @@ sub set_teams ($$) {
 			@{$team->{roster}},
 			@{$MISSING_PLAYERS{$self->{_id}}->[$t]}
 		) if ($MISSING_PLAYERS{$self->{_id}}
-			&& @{$MISSING_PLAYERS{$self->{_id}}->[$t]});
+			  && @{$MISSING_PLAYERS{$self->{_id}}->[$t]});
 		$self->force_decision($team) unless $team->{_decision};
 		push(@{$self->{teams}}, $team);
 		$t++;
 	}
-
 }
 
 sub set_stars ($$) {
@@ -451,7 +451,7 @@ sub assign_specific_penalty_data ($$) {
 		$event->{servedby} = $event->{player1} if $event->{player1};
 		$event->{player1}  = $BENCH_PLAYER_ID;
 	}
-	if ($event->{penalty} =~ /too many/i || $event->{description} =~ /^\s+against/i) {
+	if ($event->{penalty} =~ /too many/i || $event->{description} =~ /late on ice/i || $event->{description} =~ /^\s+against/i) {
 		$event->{servedby} ||= $event->{player1} if $event->{player1};
 		$event->{player1}  = $BENCH_PLAYER_ID;
 		$event->{pim_correction} += 2;

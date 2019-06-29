@@ -1,4 +1,9 @@
-Version 0.009 - 2019-01-02
+Version 0.011 - 2019-06-27
+ - Allow per-field 'trim' value to be a regex or coderef
+ - Change dist version-munger to Dist::Zilla::Plugin::OurPkgVersion
+ - Exclude ::Decoder::HTML files from getting shipped with main dist
+
+Version 0.010 - 2019-01-02
  - Fix several bugs related to multi-line headers
  - Also allow 'input' to be a Spreadsheet::ParseExcel::Workbook
  - Auto-detection support for ::Decoder::HTML companion module

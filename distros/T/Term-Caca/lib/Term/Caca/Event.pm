@@ -1,19 +1,16 @@
 package Term::Caca::Event;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: base class for Term::Caca events
-$Term::Caca::Event::VERSION = '3.0.1';
+$Term::Caca::Event::VERSION = '3.1.0';
 
-use strict;
-use warnings;
+use Moo;
 
 use FFI::Platypus::Memory;
-
-use Moose;
 
 has event => (
     is => 'ro',
     required => 1,
-    predicate => 'has_event',
+    predicate => 1,
 );
 
 has type => (
@@ -44,7 +41,7 @@ Term::Caca::Event - base class for Term::Caca events
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 DESCRIPTION
 

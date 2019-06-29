@@ -1,4 +1,12 @@
+0.843   2019-06-26 (PERLANCAR)
+
+	- Always-false bool (e.g. 'false' or [bool=>{is_true=>0}] or
+	  [bool=>{is=>0}]) now gets --no-foo, --no-foo only.
+
+
 0.842   2019-06-20 (PERLANCAR)
+
+        - No functional changes.
 
 	- Update dep: Getopt::Long::Negate::EN=0.060.
 

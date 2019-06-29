@@ -1,3 +1,23 @@
+0.471   2019-06-26 (PERLANCAR)
+
+	- Remove argument 'summaries' to complete_cli_arg(). For now, use
+	  Perinci::CmdLine-related information only.
+
+	  Instead of the naive 'summaries' hash (with optspec as key), which
+	  does not suffice at all, complete_cli_arg() for now only uses
+	  information which is Perinci::CmdLine-specific (in 'extras' ->
+	  'cmdline', 'r', 'ggls_res').
+
+	  Basically, complete_cli_arg() wants to know whether it is a "negative
+	  option" and picks an appropriate summary from the DefHash/Rinci, and
+	  so on.
+
+
+0.470   2019-06-25 (PERLANCAR)
+
+	- Add argument 'summaries' to complete_cli_arg().
+
+
 0.46    2017-01-13 (PERLANCAR)
 
 	- No functional changes.

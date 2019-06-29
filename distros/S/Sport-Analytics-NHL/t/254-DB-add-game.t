@@ -11,12 +11,12 @@ use Storable;
 
 use JSON;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB $IS_AUTHOR);
 use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Scraper;
-use Sport::Analytics::NHL::Report::Player;
+#use Sport::Analytics::NHL::Tools;
+#use Sport::Analytics::NHL::Util;
+#use Sport::Analytics::NHL::Scraper;
+#use Sport::Analytics::NHL::Report::Player;
 use Sport::Analytics::NHL;
 
 use t::lib::Util;
@@ -62,12 +62,12 @@ for (201120010, 193020010) {
 	for my $t (0,1) {
 		my $team = $game->{teams}[$t];
 		my $coach = $coaches_c->find_one({_id => $team->{coach}});
-			isa_ok($team->{coach}, 'MongoDB::OID', 'coach registered');
+			isa_ok($team->{coach}, 'BSON::OID', 'coach registered');
 		if ($coach->{name} ne 'UNKNOWN COACH') {
 			is(scalar(grep {$_ == $game->{_id}} @{$coach->{games}}), 1, 'coach game registered');
 		}
 	}
-	isa_ok($game->{location}, 'MongoDB::OID', 'location registered')
+	isa_ok($game->{location}, 'BSON::OID', 'location registered')
 		if $boxscore->{location};
 }
 

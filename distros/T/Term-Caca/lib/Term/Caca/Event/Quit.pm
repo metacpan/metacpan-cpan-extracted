@@ -1,11 +1,8 @@
 package Term::Caca::Event::Quit;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: event triggered when the display is quit
-$Term::Caca::Event::Quit::VERSION = '3.0.1';
-use strict;
-use warnings;
-
-use Moose;
+$Term::Caca::Event::Quit::VERSION = '3.1.0';
+use Moo;
 extends 'Term::Caca::Event';
 
 1;
@@ -22,7 +19,7 @@ Term::Caca::Event::Quit - event triggered when the display is quit
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 AUTHORS
 

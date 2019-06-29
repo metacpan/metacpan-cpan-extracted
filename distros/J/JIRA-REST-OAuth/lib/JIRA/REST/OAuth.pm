@@ -16,7 +16,7 @@ use HTTP::Headers();
 use URI();
 use CGI();
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub new
 {
@@ -70,6 +70,8 @@ sub _generate_oauth_request
 {
     my ($self, $method, $path, $query, $content, $headers) = @_;
 
+    $path = $self->_build_path($path, $query);
+
     # handle headers
     if ($method =~ /^(?:PUT|POST)$/) {
         my $h;
@@ -83,7 +85,7 @@ sub _generate_oauth_request
             $h = HTTP::Headers->new();
         }
 
-        unless (defined $h->content_type) {
+        unless (length $h->content_type) {
             $h->content_type('application/json;charset=UTF-8');
         }
         unless (defined $h->header('Accept')) {
@@ -135,7 +137,7 @@ sub _generate_oauth_request
 
     my @rv = ($path, $query);
     if ($method =~ /^(?:POST|PUT)$/) {
-        @rv = ($path, $query, $content, $headers);
+        @rv = ($path, $query, $content, { $headers->flatten() });
     }
 
     return @rv;
@@ -175,7 +177,7 @@ JIRA::REST::OAuth - Sub Class JIRA::REST providing OAuth 1.0 support.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 

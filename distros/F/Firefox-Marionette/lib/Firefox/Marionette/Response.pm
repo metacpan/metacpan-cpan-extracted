@@ -7,7 +7,7 @@ use Firefox::Marionette::Exception::NoSuchAlert();
 use Firefox::Marionette::Exception::StaleElement();
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '0.71';
+our $VERSION = '0.75';
 
 sub _TYPE_INDEX            { return 0 }
 sub _MESSAGE_ID_INDEX      { return 1 }
@@ -111,7 +111,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.71
+Version 0.75
 
 =head1 SYNOPSIS
 

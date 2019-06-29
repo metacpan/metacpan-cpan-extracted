@@ -121,7 +121,7 @@ package EV;
 use common::sense;
 
 BEGIN {
-   our $VERSION = 4.25;
+   our $VERSION = 4.27;
    use XSLoader;
    local $^W = 0; # avoid spurious warning
    XSLoader::load "EV", $VERSION;
@@ -250,7 +250,7 @@ usually faster then calling EV::time.
 
 Establishes the current time by querying the kernel, updating the time
 returned by C<EV::now> in the progress. This is a costly operation and
-is usually done automatically within C<EV::loop>.
+is usually done automatically within C<EV::run>.
 
 This function is rarely useful, but when some event callback runs for a
 very long time without entering the event loop, updating libev's idea of
@@ -315,9 +315,9 @@ The $flags argument can be one of the following:
 =item $loop->break ([$how])
 
 When called with no arguments or an argument of EV::BREAK_ONE, makes the
-innermost call to EV::loop return.
+innermost call to EV::run return.
 
-When called with an argument of EV::BREAK_ALL, all calls to EV::loop will
+When called with an argument of EV::BREAK_ALL, all calls to EV::run will
 return as fast as possible.
 
 When called with an argument of EV::BREAK_CANCEL, any pending break will
@@ -509,21 +509,21 @@ watcher isn't pending it does nothing and returns C<0>.
 
 =item $previous_state = $w->keepalive ($bool)
 
-Normally, C<EV::loop> will return when there are no active watchers
+Normally, C<EV::run> will return when there are no active watchers
 (which is a "deadlock" because no progress can be made anymore). This is
 convenient because it allows you to start your watchers (and your jobs),
-call C<EV::loop> once and when it returns you know that all your jobs are
+call C<EV::run> once and when it returns you know that all your jobs are
 finished (or they forgot to register some watchers for their task :).
 
 Sometimes, however, this gets in your way, for example when the module
-that calls C<EV::loop> (usually the main program) is not the same module
+that calls C<EV::run> (usually the main program) is not the same module
 as a long-living watcher (for example a DNS client module written by
 somebody else even). Then you might want any outstanding requests to be
-handled, but you would not want to keep C<EV::loop> from returning just
+handled, but you would not want to keep C<EV::run> from returning just
 because you happen to have this long-running UDP port watcher.
 
 In this case you can clear the keepalive status, which means that even
-though your watcher is active, it won't keep C<EV::loop> from returning.
+though your watcher is active, it won't keep C<EV::run> from returning.
 
 The initial value for keepalive is true (enabled), and you can change it
 any time.

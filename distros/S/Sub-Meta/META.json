@@ -1,0 +1,92 @@
+{
+   "abstract" : "handle subroutine meta information",
+   "author" : [
+      "kfly8 <kfly@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-Meta",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Identify" : "0.14",
+            "Sub::Util" : "1.50",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sub::Meta" : {
+         "file" : "lib/Sub/Meta.pm",
+         "version" : "0.01"
+      },
+      "Sub::Meta::Param" : {
+         "file" : "lib/Sub/Meta/Param.pm",
+         "version" : "0.01"
+      },
+      "Sub::Meta::Parameters" : {
+         "file" : "lib/Sub/Meta/Parameters.pm",
+         "version" : "0.01"
+      },
+      "Sub::Meta::Returns" : {
+         "file" : "lib/Sub/Meta/Returns.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/p5-Sub-Meta/issues"
+      },
+      "homepage" : "https://github.com/kfly8/p5-Sub-Meta",
+      "repository" : {
+         "url" : "git://github.com/kfly8/p5-Sub-Meta.git",
+         "web" : "https://github.com/kfly8/p5-Sub-Meta"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KFLY",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

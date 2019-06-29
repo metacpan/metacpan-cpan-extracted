@@ -1,3 +1,18 @@
+1.822   2019-06-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereqs Complete::Bash=0.322 and
+	  Perinci::Sub::Complete=0.935.
+
+
+1.821   2019-06-25 (PERLANCAR)
+
+	- [ux] Show summaries when completing subcommands (via
+	  Complete::Util 0.601) and option names (via
+	  Perinci::Sub::Complete 0.934).
+
+
 1.820   2019-06-20 (PERLANCAR)
 
 	- No functional changes.

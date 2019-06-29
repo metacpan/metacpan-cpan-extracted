@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Refcount 0.09 import => [qw( is_refcount refcount )];
 
 use Future;
 
@@ -11,6 +12,8 @@ use Future::AsyncAwait;
 
 my $orig_cxstack_ix = Future::AsyncAwait::__cxstack_ix;
 my $file = quotemeta __FILE__;
+
+my $errgv_ref = \*@;
 
 async sub identity
 {
@@ -76,6 +79,22 @@ async sub func
 
    undef $fret;
    pass( "abandoned foreach loop does not crash" );
+}
+
+# abandoned local $@
+{
+   my $errsv_refcount = refcount(\$@);
+   my $errgv_refcount = refcount($errgv_ref);
+
+   my $f1 = Future->new;
+   my $fret = (async sub { local $@; await $f1 })->();
+
+   undef $fret;
+   undef $f1;
+   pass( "abandoned local \$@ does not crash" );
+
+   is_refcount( \$@, $errsv_refcount, '$@ refcount preserved' );
+   is_refcount( $errgv_ref, $errgv_refcount, '*@ refcount preserved' );
 }
 
 is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,

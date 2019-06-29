@@ -1,0 +1,21 @@
+0.003   2019-06-19 (PERLANCAR)
+
+        - Rename module/dist from
+          Calendar::DatesRoles::DataPreparer::CalendarVar::{FromData,FromDATA::Simple}
+          to make it clearer about "DATA" section, and to allow other format in
+          DATA section.
+
+        - Mention
+          Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::CSVJF.
+
+
+0.002   2019-02-15 (PERLANCAR)
+
+	- Set entries' default_lang if default_lang directive is specified.
+
+	- [Bugfix] Fix logic bug.
+
+
+0.001    2019-02-15 (PERLANCAR)
+
+         - First release.

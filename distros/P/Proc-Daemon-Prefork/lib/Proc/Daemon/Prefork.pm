@@ -1,7 +1,7 @@
 package Proc::Daemon::Prefork;
 
-our $DATE = '2014-12-11'; # DATE
-our $VERSION = '0.70'; # VERSION
+our $DATE = '2019-06-27'; # DATE
+our $VERSION = '0.710'; # VERSION
 
 use 5.010001;
 use strict;
@@ -98,22 +98,26 @@ sub open_logs {
         open my($fhe), ">>", $self->{error_log_path}
             or die "Cannot open error log file $self->{error_log_path}: $!\n";
         $self->{_error_log} = $fhe;
+    } elsif ($self->{error_log_handle}) {
+        $self->{_error_log} = $self->{error_log_handle};
     }
 
     if ($self->{access_log_path}) {
         open my($fha), ">>", $self->{access_log_path}
             or die "Cannot open access log file $self->{access_log_path}: $!\n";
         $self->{_access_log} = $fha;
+    } elsif ($self->{access_log_handle}) {
+        $self->{_access_log} = $self->{access_log_handle};
     }
 }
 
 sub close_logs {
     my ($self) = @_;
     if ($self->{_access_log}) {
-        close $self->{_access_log};
+        $self->{_access_log}->close;
     }
     if ($self->{_error_log}) {
-        close $self->{_error_log};
+        $self->{_error_log}->close;
     }
 }
 
@@ -126,7 +130,12 @@ sub daemonize {
 
     chdir '/'                  or die "Can't chdir to /: $!\n";
     open STDIN, '/dev/null'    or die "Can't read /dev/null: $!\n";
-    open STDOUT, '>&ERROR_LOG' or die "Can't dup ERROR_LOG: $!\n";
+    open STDOUT, '>&ERROR_LOG' or do {
+        # ERROR_LOG is not a file descriptor but e.g. a tied filehandle. we want
+        # to allow this so we provide an alternative.
+        *STDOUT = \*ERROR_LOG;
+        #die "Can't dup ERROR_LOG: $!\n";
+    };
     defined(my $pid = fork)    or die "Can't fork: $!\n";
     exit if $pid;
 
@@ -136,7 +145,12 @@ sub daemonize {
     }
 
     setsid                     or die "Can't start a new session: $!\n";
-    open STDERR, '>&STDOUT'    or die "Can't dup stdout: $!\n";
+    open STDERR, '>&STDOUT'    or do {
+        # not a file descriptor but e.g. a tied filehandle. we want to allow
+        # this so we provide an alternative.
+        *STDERR = \*STDOUT;
+        # die "Can't dup stdout: $!\n";
+    };
     $self->{daemonized}++;
     $self->write_pidfile;
     $self->{parent_pid} = $$;
@@ -629,7 +643,7 @@ Proc::Daemon::Prefork - Create preforking, autoreloading daemon
 
 =head1 VERSION
 
-This document describes version 0.70 of Proc::Daemon::Prefork (from Perl distribution Proc-Daemon-Prefork), released on 2014-12-11.
+This document describes version 0.710 of Proc::Daemon::Prefork (from Perl distribution Proc-Daemon-Prefork), released on 2019-06-27.
 
 =for Pod::Coverage .*
 
@@ -645,9 +659,23 @@ Arguments:
 
 If true, bails out if not running as root.
 
-=item * error_log_path (required if daemonize=1)
+=item * error_log_path => STR (required if daemonize=1)
+
+Or, alternatively, specify C<error_log_handle> instead.
+
+=item * error_log_handle => OBJ
+
+An alternative to specifying C<error_log_path>, to allow logging to a
+filehandle-like object, e.g. tied filehandle, instead of to a regular file.
 
 =item * access_log_path => STR (required if daemonize=1)
+
+Or, alternatively, specify C<access_log_handle> instead.
+
+=item * access_log_handle => OBJ
+
+An alternative to specifying C<access_log_path>, to allow logging to a
+filehandle-like object, e.g. tied filehandle, instead of to a regular file.
 
 =item * pid_path => STR (required if daemonize=1)
 
@@ -743,7 +771,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,14 +1,15 @@
 package Text::Util::Chinese;
 use strict;
 use warnings;
+use utf8;
 
 use Exporter 5.57 'import';
 use Unicode::UCD qw(charscript);
 
-our $VERSION = '0.05';
-our @EXPORT_OK = qw(phrase_iterator extract_presuf extract_words tokenize_by_script);
+our $VERSION = '0.06';
+our @EXPORT_OK = qw(sentence_iterator phrase_iterator extract_presuf extract_words tokenize_by_script);
 
-use List::Util qw(uniq);
+use List::Util qw(uniq pairmap);
 
 sub grep_iterator {
     my ($iter, $cb) = @_;
@@ -33,6 +34,24 @@ sub phrase_iterator {
         }
         return shift @phrases;
     }
+}
+
+sub sentence_iterator {
+    my ($input_iter, $opts) = @_;
+    my @sentences;
+    return sub {
+        while(! @sentences && defined(my $text = $input_iter->())) {
+            @sentences = grep { !/\A\s+\z/ } ($text =~
+                          m/(
+                               (?:
+                                   [^\p{General_Category: Open_Punctuation}\p{General_Category: Close_Punctuation}]+?
+                               | .*? \p{General_Category: Open_Punctuation} .*? \p{General_Category: Close_Punctuation} .*?
+                               )
+                               (?: \z | [\n\?\!。？！]+ )
+                           )/gx);
+        }
+        return shift @sentences;
+    }    
 }
 
 sub extract_presuf {
@@ -248,6 +267,11 @@ C<threshold> should be an Int, C<lengths> should be an ArrayRef[Int] and
 that constraints the lengths of prefixes and suffixes to be extracted.
 
 The default value for C<threshold> is 9, while the default value for C<lengths> is C<[2,3]>
+
+=item sentences_iterator( $input_iter ) #=> CodeRef
+
+This subroutine split input into sentences. It takes an text iterator,
+and returns another one.
 
 =item phrase_iterator( $input_iter ) #=> CodeRef
 

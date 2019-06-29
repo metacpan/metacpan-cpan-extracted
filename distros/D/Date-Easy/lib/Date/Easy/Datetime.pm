@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -272,17 +272,7 @@ sub split
 
 # FORMATTERS
 
-sub strftime
-{
-	my ($self, $format) = @_;
-	return $self->{impl}->strftime unless defined $format;
-
-	# Handle the %s format specifier ourselves because otherwise our users may get a nasty shock.
-	# See https://github.com/rjbs/Time-Piece/issues/24 for full details.
-	$format =~ s/(?<!%)%s/$self->epoch/eg;
-	return $self->{impl}->strftime($format);
-}
-
+sub strftime	{ shift->{impl}->strftime(@_) }
 sub iso8601		{ shift->{impl}->datetime }
 *iso = \&iso8601;
 
@@ -394,7 +384,7 @@ Date::Easy::Datetime - easy datetime class
 
 =head1 VERSION
 
-This document describes version 0.06 of Date::Easy::Datetime.
+This document describes version 0.08 of Date::Easy::Datetime.
 
 =head1 SYNOPSIS
 
@@ -820,7 +810,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Buddy Burden.
+This software is Copyright (c) 2019 by Buddy Burden.
 
 This is free software, licensed under:
 

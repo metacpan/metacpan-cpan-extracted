@@ -12,10 +12,10 @@ use experimental qw(smartmatch);
 
 use Storable qw(dclone);
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:basic :ids);
 use Sport::Analytics::NHL::Errors;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Tools qw(:parser :db);
+use Sport::Analytics::NHL::Util qw(:utils);
 
 use Data::Dumper;
 
@@ -267,6 +267,9 @@ sub parse_penalty_old ($$) {
 		$event->{length}   = $2;
 		$event->{servedby} = $UNKNOWN_PLAYER_ID;
 	}
+	if (! $event->{servedby} && $event->{description} =~ /Served By\s+(\d+)/) {
+		$event->{servedby} = $1;
+	}
 	$event->{misconduct} = 1 if $event->{description} =~ /(misconduct|unsportsmanlike)/i;
 }
 
@@ -425,7 +428,10 @@ sub parse_description ($$) {
 
 	$event->{description} =~ tr/ / /;
 	my $evx = $BROKEN_EVENTS{PL}->{$self->{_id}};
-		$event->{description} = $evx->{$event->{id}}{description} if defined $evx->{$event->{id}} && $evx->{$event->{id}}{description};
+	if (defined $evx->{$event->{id}} && $evx->{$event->{id}}{description}) {
+		$event->{old_description} = $event->{description};
+		$event->{description} = $evx->{$event->{id}}{description};
+	}
 
 	return $self->parse_penalty($event) if $event->{type} eq 'PENL';
 
@@ -533,10 +539,11 @@ sub parse_on_ice ($$) {
 			my $num = scalar @{$on_ice_table->{_content}};
 			$event->{on_ice} ||= [];
 			$event->{on_ice}[$team-1] = [];
+			$event->{_description} = $event->{description};
 			for (my $i = 0; $i < $num; $i+=2) {
 				my $on_ice_font = $self->get_sub_tree(0, [$i,0,0,0,0], $on_ice_table);
 				my $name = $on_ice_font->attr('title') || '';
-				$event->{description} .= " $name";
+				$event->{_description} .= " $name";
 				my $on_ice_cell = $self->get_sub_tree(0, [$i,0,0,0,0,0], $on_ice_table);
 				next unless defined $on_ice_cell;
 				$on_ice_cell =
@@ -674,7 +681,7 @@ sub fix_old_event_type ($$) {
 	my $event = shift;
 
 	if ($event->{type} eq 'Penalty Shot') {
-		$event->{strength} = 'EV';
+		$event->{strength} ||= 'EV';
 		$event->{penaltyshot} = 1;
 	}
 	$event->{type} = $OLD_EVENT_TYPES{$event->{type}};

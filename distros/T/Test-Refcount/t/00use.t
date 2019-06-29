@@ -1,5 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use Test::More tests => 1;
+use strict;
+use warnings;
+
+use Test::More;
 
 use_ok( "Test::Refcount" );
+
+done_testing;

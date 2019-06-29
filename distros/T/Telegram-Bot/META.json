@@ -1,0 +1,44 @@
+{
+   "abstract" : "A base class to make your very own Telegram bot",
+   "author" : [
+      "Justin Hawkins <justin@eatmorecode.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Telegram-Bot",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::SSL" : "2.037",
+            "Log::Any" : "1.032",
+            "Mojolicious" : "8.00",
+            "Test::Exception" : "0.43"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EatMoreCode/Telegram-Bot",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EatMoreCode/Telegram-Bot.git",
+         "web" : "https://github.com/EatMoreCode/Telegram-Bot"
+      }
+   },
+   "version" : "0.012",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+}
+

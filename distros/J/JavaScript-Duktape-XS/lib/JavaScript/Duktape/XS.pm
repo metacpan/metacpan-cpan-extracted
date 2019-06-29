@@ -6,7 +6,7 @@ use parent 'Exporter';
 use JSON::PP;  # required to properly handle booleans
 use XSLoader;
 
-our $VERSION = '0.000076';
+our $VERSION = '0.000077';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -25,7 +25,7 @@ engine
 
 =head1 VERSION
 
-Version 0.000076
+Version 0.000077
 
 =head1 SYNOPSIS
 

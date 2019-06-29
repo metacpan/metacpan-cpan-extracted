@@ -1,2 +1,8 @@
-0.01  Thu, 09 Dec 2010 16:04:21 +0100
+Revision history for DBIx-Class-InflateColumn-Authen-Passphrase
+
+0.02      2019-06-29 02:21:50Z
+  * add DBD::SQLite to test requirements (RT#90065)
+  * remove unused SQL::Translator from test requirements
+
+0.01      2010-12-09 15:04:21Z
   * Initial release.

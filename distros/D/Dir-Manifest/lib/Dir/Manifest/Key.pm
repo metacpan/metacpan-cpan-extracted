@@ -1,5 +1,5 @@
 package Dir::Manifest::Key;
-$Dir::Manifest::Key::VERSION = '0.0.5';
+$Dir::Manifest::Key::VERSION = '0.2.0';
 use strict;
 use warnings;
 use 5.014;
@@ -25,7 +25,7 @@ Dir::Manifest::Key
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Dir::Manifest::Key - a Dir::Manifest key.
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 METHODS
 

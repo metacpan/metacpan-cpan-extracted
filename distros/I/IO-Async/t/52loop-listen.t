@@ -35,6 +35,7 @@ testing_loop( $loop );
       Type      => SOCK_STREAM,
       Listen    => 1,
    ) or die "Cannot socket() - $!";
+   $listensock->blocking( 0 );
 
    my $newclient;
 

@@ -1,43 +1,63 @@
-0.933   2019-04-15 (PERLANCAR)
+0.936   2019-06-28  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Try out new release note style in Changes.
+
+
+0.935   2019-06-26  Released-By: PERLANCAR
+
+	- Update to Complete::Getopt::Long 0.471, no longer uses
+	  Perinci::Sub::To::CLIDocData.
+
+
+0.934   2019-06-25  Released-By: PERLANCAR
+
+	- Pass summaries (from Perinci::Sub::To::CLIDocData's
+	  gen_cli_doc_data_from_meta() to
+	  Complete::Getopt::Long::complete_cli_arg().
+
+
+0.933   2019-04-15  Released-By: PERLANCAR
 
 	- Update to Rinci 1.1.88 (slurpy).
 
 	- [logging] Log gen_completion() arguments.
 
 
-0.932   2018-12-07 (PERLANCAR)
+0.932   2018-12-07  Released-By: PERLANCAR
 
 	- Complete from argument examples.
 
 
-0.931   2018-06-01 (PERLANCAR)
+0.931   2018-06-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add more helpful log statements for debugging.
 
 
-0.930   2018-06-01 (PERLANCAR)
+0.930   2018-06-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - Add a couple of log statements to aid debugging.
 
 
-0.92    2017-07-10 (PERLANCAR)
+0.92    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.91    2017-01-15 (PERLANCAR)
+0.91    2017-01-15  Released-By: PERLANCAR
 
 	- Handle x.completion being coderef or scalar, in addition to
 	  arrayref (Perinci::Sub::XCompletion 0.07).
 
 
-0.90    2016-12-11 (PERLANCAR)
+0.90    2016-12-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -45,34 +65,34 @@
 	  of Sah::Schema::rinci::function_meta to 1.1.82).
 
 
-0.89    2016-12-10 (PERLANCAR)
+0.89    2016-12-10  Released-By: PERLANCAR
 
 	- Handle completion of hash option (--arg k1=v1 --arg k2=v2 ...). Grok
           'index_completion' argument spec property.
 
 
-0.88    2016-10-29 (PERLANCAR)
+0.88    2016-10-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Depend on Sah::SchemaR::* instead of Sah::Schema::* [RT#118535].
 
 
-0.87    2016-10-28 (PERLANCAR)
+0.87    2016-10-28  Released-By: PERLANCAR
 
 	- Provide 'parsed_opts' to handler in
 	  'completion'/'element_completion' properties for more
 	  information.
 
 
-0.86    2016-08-03 (PERLANCAR)
+0.86    2016-08-03  Released-By: PERLANCAR
 
 	- Replace code to check for installed module from using
 	  Module::Path::More to using Module::Installed::Tiny (works with
 	  fatpacked/datapacked scripts).
 
 
-0.85    2016-07-22 (PERLANCAR)
+0.85    2016-07-22  Released-By: PERLANCAR
 
         - complete_from_schema(): look up Sah::SchemaR::* modules when schema's
           type is not a known built-in type.
@@ -81,7 +101,7 @@
           arg spec.
 
 
-0.84    2015-12-30 (PERLANCAR)
+0.84    2015-12-30  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -90,7 +110,7 @@
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.83    2015-12-05 (PERLANCAR)
+0.83    2015-12-05  Released-By: PERLANCAR
 
 	- Adjust to Complete::Common 0.21.
 
@@ -99,13 +119,13 @@
 	  via Complete::Common.
 
 
-0.82    2015-09-09 (PERLANCAR)
+0.82    2015-09-09  Released-By: PERLANCAR
 
 	- [dist] Use Complete::Setting instead of Complete, the settings
 	  have been split to a separate module in 0.13.
 
 
-0.81    2015-09-03 (PERLANCAR)
+0.81    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -114,7 +134,7 @@
 	  requirement.
 
 
-0.80    2015-08-11 (PERLANCAR)
+0.80    2015-08-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -122,60 +142,60 @@
 	  of startup time.
 
 
-0.79    2015-04-27 (PERLANCAR)
+0.79    2015-04-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - Adjust tests to Complete::Getopt::Long 0.32 [CT].
 
 
-0.78    2015-04-09 (PERLANCAR)
+0.78    2015-04-09  Released-By: PERLANCAR
 
 	- Replace Log::Any with Log::Any::IfLOG.
 
 
-0.77    2015-04-02 (PERLANCAR)
+0.77    2015-04-02  Released-By: PERLANCAR
 
 	- Observe x.completion & x.element_completion attributes in
 	  argument specification (experimental).
 
 
-0.76    2015-03-30 (PERLANCAR)
+0.76    2015-03-30  Released-By: PERLANCAR
 
 	- complete_from_schema(): Handle 'any' type by combining answers
 	  from all of its alternate types.
 
 
-0.75    2015-03-09 (PERLANCAR)
+0.75    2015-03-09  Released-By: PERLANCAR
 
 	- Adjust to Complete::Getopt::Long 0.30 (escmode renamed to
 	  esc_mode).
 
 
-0.74    2015-03-03 (PERLANCAR)
+0.74    2015-03-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] Forgot to 'use Complete', d'oh.
 
 
-0.73    2015-03-03 (PERLANCAR)
+0.73    2015-03-03  Released-By: PERLANCAR
 
 	- Observe $Complete::OPT_CI as default for 'ci' options.
 
 
-0.72    2015-03-01 (PERLANCAR)
+0.72    2015-03-01  Released-By: PERLANCAR
 
 	- Use completion routine from Perinci::Sub::ArgEntity::* modules.
 
 
-0.71    2015-01-09 (PERLANCAR)
+0.71    2015-01-09  Released-By: PERLANCAR
 
 	- Add option: func_arg_starts_at which is a workaround for
 	  Perinci::CmdLine.
 
 
-0.70    2014-12-27 (PERLANCAR)
+0.70    2014-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -183,12 +203,12 @@
 	  peri-test-comp).
 
 
-0.69    2014-12-20 (PERLANCAR)
+0.69    2014-12-20  Released-By: PERLANCAR
 
 	- [Bugfix] 'args' arg for completion routine was not set correctly.
 
 
-0.68    2014-12-20 (PERLANCAR)
+0.68    2014-12-20  Released-By: PERLANCAR
 
         [INCOMPATIBLE CHANGES]
 
@@ -198,49 +218,49 @@
           is put into a single key in %args as 'extras'.
 
 
-0.67    2014-12-11 (PERLANCAR)
+0.67    2014-12-11  Released-By: PERLANCAR
 
 	- [Bugfix] static should be 0 when word length is not zero.
 
 
-0.66    2014-12-09 (PERLANCAR)
+0.66    2014-12-09  Released-By: PERLANCAR
 
 	- Return 'static' key in completion answer (see Complete 0.05 for
 	  more details).
 
 
-0.65    2014-11-30 (PERLANCAR)
+0.65    2014-11-30  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - Forgot to adjust some tests [CT], [RT#100605].
 
 
-0.64    2014-11-28 (PERLANCAR)
+0.64    2014-11-28  Released-By: PERLANCAR
 
 	- Adjust to Complete 0.04 (in hash form, words are now put in
 	  'words' instead of 'completion').
 
 
-0.63     2014-09-03 (PERLANCAR)
+0.63     2014-09-03  Released-By: PERLANCAR
 
          - Use ignore_converted_code option to keep tab completion working when
            there is coderef cmdline_aliases property.
 
 
-0.62     2014-08-06 (SHARYANTO)
+0.62     2014-08-06  Released-By: SHARYANTO
 
          - [Bugfix] When producing 'args' by calling get_args_from_argv(),
            forgot to set strict => 0.
 
 
-0.61     2014-08-06 (SHARYANTO)
+0.61     2014-08-06  Released-By: SHARYANTO
 
          - Provide 'words', 'cword', 'args' in 'extras' passed to completion
            routines.
 
 
-0.60     2014-07-27 (SHARYANTO)
+0.60     2014-07-27  Released-By: SHARYANTO
 
          - Now uses Complete::Getopt::Long instead of implementing completion
            logic ourselves. The code is now much shorter and completion is now
@@ -269,14 +289,14 @@
            need to parse cmdline yourself.
 
 
-0.59     2014-07-25 (SHARYANTO)
+0.59     2014-07-25  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Adjust to Complete::Bash 0.09.
 
 
-0.58     2014-07-24 (SHARYANTO)
+0.58     2014-07-24  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -285,21 +305,21 @@
          - Use Data::Sah::Normalize instead of Data::Sah, to reduce deps.
 
 
-0.57     2014-07-19 (SHARYANTO)
+0.57     2014-07-19  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Adjust to Complete::Bash 0.06.
 
 
-0.56     2014-07-18 (SHARYANTO)
+0.56     2014-07-18  Released-By: SHARYANTO
 
          - [Bugfix] Excluded the option we're trying to complete ('cmd --help^'
            or 'cmd -h^' didn't work because we excluded that option from the
            list!).
 
 
-0.55     2014-07-18 (SHARYANTO)
+0.55     2014-07-18  Released-By: SHARYANTO
 
          - Adjust to Perinci::Sub::GetArgs::Argv 0.44, which makes it more
            convenient for us to do completion (get_args_from_argv() returns the
@@ -315,14 +335,14 @@
            handlers.
 
 
-0.54     2014-07-18 (SHARYANTO)
+0.54     2014-07-18  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Adjust to Complete::Bash 0.04.
 
 
-0.53     2014-07-02 (SHARYANTO)
+0.53     2014-07-02  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -330,14 +350,14 @@
            consistency (all completion routine now uses /^complete_/).
 
 
-0.52     2014-07-02 (SHARYANTO)
+0.52     2014-07-02  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Adjust to Complete::Util 0.12.
 
 
-0.51     2014-07-01 (SHARYANTO)
+0.51     2014-07-01  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -345,21 +365,21 @@
            schema to have a schema of [].
 
 
-0.50     2014-06-29 (SHARYANTO)
+0.50     2014-06-29  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Re-upload.
 
 
-0.49     2014-06-29 (SHARYANTO)
+0.49     2014-06-29  Released-By: SHARYANTO
 
          - shell_complete_args() allows completion routines to return hash
            (completion reply + metadata) instead of just array (completion
            reply) (Rinci 1.1.52).
 
 
-0.48     2014-06-27 (SHARYANTO)
+0.48     2014-06-27  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -371,20 +391,20 @@
            escape the dollar sign.
 
 
-0.47     2014-06-26 (SHARYANTO)
+0.47     2014-06-26  Released-By: SHARYANTO
 
          - No functional changes.
 
          - [Bug fix] Remove perl undef warning when arg doesn't have schema.
 
 
-0.46     2014-06-25 (SHARYANTO)
+0.46     2014-06-25  Released-By: SHARYANTO
 
          - [Bug fix] Forgot to remove complete_array() in
            complete_arg_{val,elem}().
 
 
-0.45     2014-06-25 (SHARYANTO)
+0.45     2014-06-25  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -393,14 +413,14 @@
            or spelling correction.
 
 
-0.44     2014-06-25 (SHARYANTO)
+0.44     2014-06-25  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Use Complete::Util which replaces SHARYANTO::Complete::Util.
 
 
-0.43     2014-06-19 (SHARYANTO)
+0.43     2014-06-19  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -408,7 +428,7 @@
            float.
 
 
-0.42     2014-06-19 (SHARYANTO)
+0.42     2014-06-19  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -421,7 +441,7 @@
            int.
 
 
-0.41     2014-06-19 (SHARYANTO)
+0.41     2014-06-19  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -429,18 +449,18 @@
            completed as element).
 
 
-0.40     2014-06-19 (SHARYANTO)
+0.40     2014-06-19  Released-By: SHARYANTO
 
          - Third attempt, only riap_server_url is needed, riap_uri is optional
            because the former can contain the latter.
 
 
-0.39     2014-06-18 (SHARYANTO)
+0.39     2014-06-18  Released-By: SHARYANTO
 
          - Second attempt, we also need riap_server_url.
 
 
-0.38     2014-06-18 (SHARYANTO)
+0.38     2014-06-18  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -450,14 +470,14 @@
            into string (currently no tests yet).
 
 
-0.37     2014-06-18 (SHARYANTO)
+0.37     2014-06-18  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Don't die if arg spec's completion is not a coderef, decline instead.
 
 
-0.36     2013-11-14 (SHARYANTO)
+0.36     2013-11-14  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -474,7 +494,7 @@
            --file F1 --file F2 etc).
 
 
-0.35     2013-11-08 (SHARYANTO)
+0.35     2013-11-08  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -482,7 +502,7 @@
            Perinci::Sub::Wrapper version.
 
 
-0.34     2013-11-05 (SHARYANTO)
+0.34     2013-11-05  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -502,7 +522,7 @@
          - A few bug fixes.
 
 
-0.33     2013-11-04 (SHARYANTO)
+0.33     2013-11-04  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -515,7 +535,7 @@
            list, just like the other completion routines.
 
 
-0.32     2013-11-04 (SHARYANTO)
+0.32     2013-11-04  Released-By: SHARYANTO
 
          [REFACTORING]
 
@@ -529,12 +549,12 @@
          - Rename some functions.
 
 
-0.31     2013-09-08 (SHARYANTO)
+0.31     2013-09-08  Released-By: SHARYANTO
 
          - No functional changes. Remove references to Perinci::Access::InProcess.
 
 
-0.30     2013-08-10 (SHARYANTO)
+0.30     2013-08-10  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -542,7 +562,7 @@
            bash (currently undocumented).
 
 
-0.30     2013-08-10 (SHARYANTO)
+0.30     2013-08-10  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -550,21 +570,21 @@
            bash (currently undocumented).
 
 
-0.29     2012-06-22 (SHARYANTO)
+0.29     2012-06-22  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Support --dry-run for function which has dry_run feature
 
 
-0.28     2012-03-22 (SHARYANTO)
+0.28     2012-03-22  Released-By: SHARYANTO
 
          - Support with.dot function arguments
 
          - Normalize --foo_bar into --foo-bar
 
 
-0.27     2012-03-16 (SHARYANTO)
+0.27     2012-03-16  Released-By: SHARYANTO
 
          [FIXES]
 
@@ -579,14 +599,14 @@
            bash to insert space after the "/".
 
 
-0.26     2012-03-07 (SHARYANTO)
+0.26     2012-03-07  Released-By: SHARYANTO
 
          - No functional changes. Deal with test failure reports from CT (change
            'replace $HOME with ~' test in t/_line_to_argv.t into a warning, as I
            don't know the workaround yet).
 
 
-0.25     2012-03-04 (SHARYANTO)
+0.25     2012-03-04  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -594,7 +614,7 @@
            (symlink traversal is still different though).
 
 
-0.24     2012-03-04 (SHARYANTO)
+0.24     2012-03-04  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -604,81 +624,81 @@
            include dotfiles. Otherwise it treats word as wildcard and glob() it.
 
 
-0.23     2012-03-03 (SHARYANTO)
+0.23     2012-03-03  Released-By: SHARYANTO
 
          - No functional changes. Change implementation of _line_to_argv() from
            calling Perl binary and dumping @ARGV, to using bash's own "$@". On
            my Atom N570 netbook, this shaves time from about 0.1s to 0.03s.
 
 
-0.22     2012-02-28 (SHARYANTO)
+0.22     2012-02-28  Released-By: SHARYANTO
 
          - No functional changes. Fix to avoid numerous CT failure reports
            (calling perl binary using $^X instead of the hardcoded "perl"). I
            haven't quoted $^X, hope that won't cause much trouble though.
 
 
-0.21     2012-02-28 (SHARYANTO)
+0.21     2012-02-28  Released-By: SHARYANTO
 
          - Handle argument name completion of one-letter args and cmdline_aliases.
 
 
-0.20     2012-02-27 (SHARYANTO)
+0.20     2012-02-27  Released-By: SHARYANTO
 
          - No functional changes. Make _line_to_argv() report errors (lots of
            failure reports from CPAN Testers with apparently undef result from
            _line_to_argv()).
 
 
-0.19     2012-02-23 (SHARYANTO)
+0.19     2012-02-23  Released-By: SHARYANTO
 
          - Rename distribution from Sub-Spec-BashComplete to Perinci-BashComplete.
            Follow Rinci v1.1 specification.
 
 
-0.18     2011-11-23 (SHARYANTO)
+0.18     2011-11-23  Released-By: SHARYANTO
 
          - No functional changes. _parse_schema() moved from Data::Sah::Util to
            normalize_schema() in Data::Sah.
 
 
-0.17     2011-10-31 (SHARYANTO)
+0.17     2011-10-31  Released-By: SHARYANTO
 
          - No functional changes. _parse_schema() is moved from Sub::Spec::Utils
            to Data::Sah::Util.
 
 
-0.16     2011-08-25 (SHARYANTO)
+0.16     2011-08-25  Released-By: SHARYANTO
 
          - No functional changes. Adjust to Sub::Spec 0.15.
 
 
-0.15     2011-07-26 (SHARYANTO)
+0.15     2011-07-26  Released-By: SHARYANTO
 
          - No functional changes. Adjust to use the new Sub::Spec::GetArgs::Argv.
 
 
-0.14     2011-05-31 (SHARYANTO)
+0.14     2011-05-31  Released-By: SHARYANTO
 
          - No functional changes. Skip tests on systems which don't have bash.
 
 
-0.13     2011-02-23 (SHARYANTO)
+0.13     2011-02-23  Released-By: SHARYANTO
 
          - Add missing dependency: Log::Any [CT].
 
 
-0.12     2011-02-23 (SHARYANTO)
+0.12     2011-02-23  Released-By: SHARYANTO
 
          - Add missing dependency: Sub::Spec::CmdLine [CT].
 
 
-0.11     2011-02-22 (SHARYANTO)
+0.11     2011-02-22  Released-By: SHARYANTO
 
          - Use Sub::Spec::Utils.
 
 
-0.10     2011-02-19 (SHARYANTO)
+0.10     2011-02-19  Released-By: SHARYANTO
 
          - Incompatible change: arg_complete & custom_completer now expected to
            return arrayref instead of list.
@@ -686,7 +706,7 @@
          - More fixes for remaining_words for custom_completer.
 
 
-0.09     2011-02-18 (SHARYANTO)
+0.09     2011-02-18  Released-By: SHARYANTO
 
          - Handle backspaced whitespace.
 
@@ -696,46 +716,46 @@
          - Fix cword & remaining_words for custom_completer.
 
 
-0.08     2011-02-18 (SHARYANTO)
+0.08     2011-02-18  Released-By: SHARYANTO
 
          - Backslash-escape output.
 
          - Spec: cmdline_aliases renamed to arg_aliases.
 
 
-0.07     2011-02-17 (SHARYANTO)
+0.07     2011-02-17  Released-By: SHARYANTO
 
          - bash_complete_spec_arg(): Also add --nofoo completion for bool
            cmdline_aliases.
 
 
-0.06     2011-02-17 (SHARYANTO)
+0.06     2011-02-17  Released-By: SHARYANTO
 
          - bash_complete_spec_arg(): Add 'custom_completer' option, parse
            'cmdline_aliases' in arg spec.
 
 
-0.05     2011-02-17 (SHARYANTO)
+0.05     2011-02-17  Released-By: SHARYANTO
 
          - Fix cword counting.
 
 
-0.04     2011-02-16 (SHARYANTO)
+0.04     2011-02-16  Released-By: SHARYANTO
 
          - Small fix on detecting arg name/value.
 
 
-0.03     2011-02-16 (SHARYANTO)
+0.03     2011-02-16  Released-By: SHARYANTO
 
          - Complete arg name instead of value if user type '-' (indicates he/she
            wants arg name).
 
 
-0.02     2011-02-16 (SHARYANTO)
+0.02     2011-02-16  Released-By: SHARYANTO
 
          - Fix dependency version (requires Sub::Spec::CmdLine 0.10+).
 
 
-0.01     2011-02-16 (SHARYANTO)
+0.01     2011-02-16  Released-By: SHARYANTO
 
          - First release.

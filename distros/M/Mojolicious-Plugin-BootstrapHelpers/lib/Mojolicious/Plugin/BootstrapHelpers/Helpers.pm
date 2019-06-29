@@ -5,7 +5,7 @@ package Mojolicious::Plugin::BootstrapHelpers::Helpers;
 
 # ABSTRACT: Supporting module
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0205';
+our $VERSION = '0.0206';
 
 use List::Util qw/uniq/;
 use Mojo::ByteStream;
@@ -19,7 +19,7 @@ sub bootstraps_bootstraps {
     my $c = shift;
     my $arg = shift;
 
-    my $bs_version = '3.4.0';
+    my $bs_version = '3.4.1';
 
     my $css   = qq{<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/$bs_version/css/bootstrap.min.css">};
     my $theme = qq{<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/$bs_version/css/bootstrap-theme.min.css">};
@@ -966,7 +966,7 @@ Mojolicious::Plugin::BootstrapHelpers::Helpers - Supporting module
 
 =head1 VERSION
 
-Version 0.0205, released 2019-12-31.
+Version 0.0206, released 2019-06-24.
 
 =head1 SOURCE
 

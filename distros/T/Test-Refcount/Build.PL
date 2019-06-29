@@ -13,15 +13,19 @@ my $build = Module::Build->new(
    recommends => {
       'Devel::MAT' => '0.04',
    },
-   build_requires => {
-      'Test::Builder::Tester' => 0,
-      'Test::More' => 0,
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   test_requires => {
+      'Test::Builder::Tester' => 0,
+      'Test::More' => '0.88', # done_testing
+   },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
+   extra_manify_args => {
+      utf8 => 1, # We have UTF-8 manpages
+   },
 );
 
 $build->create_build_script;

@@ -10,11 +10,8 @@ use Storable;
 
 use JSON;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB $IS_AUTHOR);
 use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Scraper;
 use Sport::Analytics::NHL::Report::Player;
 use Sport::Analytics::NHL;
 
@@ -31,7 +28,6 @@ my $db = Sport::Analytics::NHL::DB->new();
 $ENV{HOCKEYDB_DEBUG} = $IS_AUTHOR;
 my $coaches_c = $db->get_collection('coaches');
 my $hdb = Sport::Analytics::NHL->new();
-use Data::Dumper;
 for (201120010, 193020010) {
 	my @normalized = $hdb->normalize({data_dir => 't/data/'}, $_);
 	my $boxscore = retrieve $normalized[0];
@@ -41,7 +37,7 @@ for (201120010, 193020010) {
 		my $coach_db = Sport::Analytics::NHL::DB::add_new_coach(
 			$coaches_c, $boxscore, $team
 		);
-		isa_ok($coach_db->{_id}, 'MongoDB::OID');
+		isa_ok($coach_db->{_id}, 'BSON::OID');
 		is($coach_db->{name}, $team->{coach}, 'coach name ok');
 		is($coach_db->{team}, $team->{name},  'coach team ok')
 			unless $coach_db->{name} eq 'UNKNOWN COACH';
@@ -63,7 +59,7 @@ for (201120010, 193020010) {
 			my $coach_db = $coaches_c->find_one({
 				_id => $boxscore->{teams}[$t]{coach},
 			});
-			isa_ok($coach_db->{_id}, 'MongoDB::OID');
+			isa_ok($coach_db->{_id}, 'BSON::OID');
 			is($coach_db->{team}, $team->{name},  'coach team ok');
 			is($coach_db->{start}, $boxscore->{start_ts}, 'coach start ok');
 			is($coach_db->{end},   $boxscore->{start_ts}, 'coach end ok');

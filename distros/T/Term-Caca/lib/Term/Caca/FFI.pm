@@ -1,14 +1,13 @@
 package Term::Caca::FFI;
 our $AUTHORITY = 'cpan:YANICK';
-# ABSTRACT: ffi bindings to libcaca 
-$Term::Caca::FFI::VERSION = '3.0.1';
+# ABSTRACT: ffi bindings to libcaca
+$Term::Caca::FFI::VERSION = '3.1.0';
 
 use 5.20.0;
 
 use Alien::caca;
 
-use FFI::Platypus;
-use FFI::TinyCC;
+use FFI::Platypus 0.88;
 
 use Exporter::Shiny qw/
     UINT_SIZE
@@ -59,7 +58,7 @@ my $ffi = FFI::Platypus->new;
 $ffi->lib(Alien::caca->dynamic_libs);
 
 $ffi->load_custom_type('::StringArray' => 'string_array');
- 
+
 $ffi->attach( 'caca_get_event' => ['opaque','int','opaque','int'] => 'void' );
 $ffi->attach( 'caca_get_display_driver_list' => [] => 'string_array' );
 $ffi->attach( 'caca_create_display_with_driver' => [ 'opaque', 'string' ] => 'opaque' );
@@ -127,13 +126,13 @@ __END__
 
 =head1 NAME
 
-Term::Caca::FFI - ffi bindings to libcaca 
+Term::Caca::FFI - ffi bindings to libcaca
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 Internal bindings to the libcaca functions. Nothing
 interesting to see here for users.

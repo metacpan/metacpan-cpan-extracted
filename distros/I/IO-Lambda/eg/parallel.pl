@@ -9,7 +9,7 @@
 use lib qw(./lib);
 use HTTP::Request;
 use IO::Lambda qw(:lambda);
-use IO::Lambda::HTTP qw(http_request);
+use IO::Lambda::HTTP::Client qw(http_request);
 use LWP::ConnCache;
 
 my $a = HTTP::Request-> new(
@@ -49,7 +49,7 @@ if ( $style eq 'object') {
 	}
 	my $master = IO::Lambda-> new;
 	for ( @chain) {
-		my $lambda = IO::Lambda::HTTP-> new( $_ );
+		my $lambda = IO::Lambda::HTTP::Client-> new( $_ );
 		$master-> watch_lambda( $lambda, \&handle);
 	}
 	run IO::Lambda;
@@ -75,7 +75,7 @@ if ( $style eq 'object') {
 	# 
 	# also, use 'tail'
 	this lambda {
-		context map { IO::Lambda::HTTP-> new( $_, async_dns => 1 ) } @chain;
+		context map { IO::Lambda::HTTP::Client-> new( $_, async_dns => 1 ) } @chain;
 		tails { report $_ for @_ };
 	};
 	this-> wait;

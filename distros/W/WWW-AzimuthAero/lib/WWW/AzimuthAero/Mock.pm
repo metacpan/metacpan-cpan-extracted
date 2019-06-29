@@ -1,5 +1,5 @@
 package WWW::AzimuthAero::Mock;
-$WWW::AzimuthAero::Mock::VERSION = '0.2';
+$WWW::AzimuthAero::Mock::VERSION = '0.31';
 
 # ABSTRACT: additional subroutines for unit testing
 
@@ -25,6 +25,7 @@ sub mock_data {
 sub filename {
     return 't/ua_mock.json';
 }
+
 
 sub generate {
     my $self      = shift;
@@ -62,7 +63,7 @@ WWW::AzimuthAero::Mock - additional subroutines for unit testing
 
 =head1 VERSION
 
-version 0.2
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -72,9 +73,13 @@ version 0.2
 
     Some helpers to generate mocks
 
-=head1 mock_data
+=head2 mock_data
 
 Return data that is used for mock at unit tests
+
+=head2 generate
+
+Generate json mock data
 
 =head1 AUTHOR
 

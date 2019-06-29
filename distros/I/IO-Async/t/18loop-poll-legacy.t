@@ -80,6 +80,7 @@ is_deeply( [ $poll->handles ], [], '$poll->handles empty after unwatch_io write_
 # Removal is clean (tests for workaround to bug in IO::Poll version 0.05)
 
 my ( $P1, $P2 ) = IO::Async::OS->pipepair or die "Cannot pipepair - $!";
+$_->blocking( 0 ) for $P1, $P2;
 
 # Just to make the loop non-empty
 $loop->watch_io( handle => $P2, on_read_ready => sub {} );

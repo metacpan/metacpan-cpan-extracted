@@ -59,7 +59,7 @@ $r-> protocol('HTTP/1.1');
 $r-> headers-> header( Host => $r-> uri-> host);
 
 # this example doesn't deal with Connection: Keep-Alive for the simplicity of it
-# see IO::Lambda::HTTP for implementation that does
+# see IO::Lambda::HTTP::Client for implementation that does
 $r-> headers-> header( Connection => 'close'); 
 
 this http_redirect_request( $r);

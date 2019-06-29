@@ -22,7 +22,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Dates
   homepage: https://metacpan.org/release/Calendar-Dates
   repository: git://github.com/perlancar/perl-Calendar-Dates.git
-version: 0.2.1
+version: 0.2.2
 x_Dist_Zilla:
   perl:
     version: '5.028002'

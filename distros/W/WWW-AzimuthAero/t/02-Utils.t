@@ -23,53 +23,84 @@ subtest 'get_next_dow_date_dmy' => sub {
 
 subtest 'get_dates_from_dows' => sub {
 
-    is_deeply(
-        [
-            get_dates_from_dows(
-                min  => '2019-06-10',
-                max  => '2019-06-16',
-                days => '25'
-            )
-        ],
-        [ '11.06.2019', '14.06.2019' ],
-        'one week'
-    );
+    # Check when today < min < max
+    on '2019-01-01 00:00:01' => sub {
+        is_deeply(
+            [
+                get_dates_from_dows(
+                    min  => '2019-06-10',
+                    max  => '2019-06-16',
+                    days => '25'
+                )
+            ],
+            [ '11.06.2019', '14.06.2019' ],
+            'one week'
+        );
 
-    is_deeply(
-        [
-            get_dates_from_dows(
-                min  => '2019-06-10',
-                max  => '2019-06-23',
-                days => '25'
-            )
-        ],
-        [ '11.06.2019', '14.06.2019', '18.06.2019', '21.06.2019' ],
-        'two weeks'
-    );
+        is_deeply(
+            [
+                get_dates_from_dows(
+                    min  => '2019-06-10',
+                    max  => '2019-06-23',
+                    days => '25'
+                )
+            ],
+            [ '11.06.2019', '14.06.2019', '18.06.2019', '21.06.2019' ],
+            'two weeks'
+        );
 
-    is_deeply(
-        [
-            get_dates_from_dows(
-                min  => '2019-06-24',
-                max  => '2019-07-07',
-                days => '25'
-            )
-        ],
-        [ '25.06.2019', '28.06.2019', '02.07.2019', '05.07.2019' ],
-        'dates range are in diff month'
-    );
+        is_deeply(
+            [
+                get_dates_from_dows(
+                    min  => '2019-06-24',
+                    max  => '2019-07-07',
+                    days => '25'
+                )
+            ],
+            [ '25.06.2019', '28.06.2019', '02.07.2019', '05.07.2019' ],
+            'dates range are in diff month'
+        );
 
-    is_deeply(
-        [
-            get_dates_from_dows(
-                min  => '2019-12-23',
-                max  => '2020-01-05',
-                days => '25'
-            )
-        ],
-        [ '24.12.2019', '27.12.2019', '31.12.2019', '03.01.2020' ],
-        'dates range are in diff year'
-    );
+        is_deeply(
+            [
+                get_dates_from_dows(
+                    min  => '2019-12-23',
+                    max  => '2020-01-05',
+                    days => '25'
+                )
+            ],
+            [ '24.12.2019', '27.12.2019', '31.12.2019', '03.01.2020' ],
+            'dates range are in diff year'
+        );
+    };
+
+    # Check when min < today < max
+    on '2019-12-30 00:00:01' => sub {
+        is_deeply(
+            [
+                get_dates_from_dows(
+                    min  => '2019-12-23',
+                    max  => '2020-01-05',
+                    days => '25'
+                )
+            ],
+            [ '31.12.2019', '03.01.2020' ],
+            'dates range are in diff year when min < today < max'
+        );
+    };
+
+    on '2019-05-01 03:04:05' => sub {
+        is_deeply(
+            [
+                get_dates_from_dows(
+                    max  => '2019-04-27',
+                    days => '25'
+                )
+            ],
+            [],
+'return an empty array if min_date is not specified and max date < today'
+        );
+    };
 
 };
 

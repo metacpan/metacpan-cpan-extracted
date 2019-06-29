@@ -2,8 +2,8 @@ NAME
     App::CalendarDatesUtils - Utilities related to Calendar::Dates
 
 VERSION
-    This document describes version 0.005 of App::CalendarDatesUtils (from
-    Perl distribution App-CalendarDatesUtils), released on 2019-05-28.
+    This document describes version 0.009 of App::CalendarDatesUtils (from
+    Perl distribution App-CalendarDatesUtils), released on 2019-06-28.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -24,6 +24,18 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   action => *str* (default: "list-dates")
+
+    *   all_entries => *true*
+
+        Return all entries (include low-priority ones).
+
+        By default, low-priority entries (entries tagged "low-priority") are
+        not included. This option will include those entries.
+
+        When combined with --all-years, this option will also cause all very
+        early years and all years far into the future to be included also.
+
     *   all_modules => *true*
 
         Use all installed Calendar::Dates::* modules.
@@ -32,11 +44,28 @@ FUNCTIONS
 
         List dates from all available years instead of a single year.
 
+        Note that by default, following common usage pattern, dates with
+        years that are too old (< 10 years ago) or that are too far into the
+        future (> 10 years from now) are not included, unless you combine
+        this option with --all-entries (-A).
+
     *   day => *int*
 
     *   detail => *bool*
 
+        Whether to show detailed record for each date.
+
+    *   exclude_tags => *array[str]*
+
+    *   include_tags => *array[str]*
+
+    *   max_year => *int*
+
+    *   min_year => *int*
+
     *   modules => *array[perl::modname]*
+
+        Name(s) of Calendar::Dates::* module (without the prefix).
 
     *   month => *int*
 
@@ -46,7 +75,7 @@ FUNCTIONS
 
     *   past => *bool*
 
-        Filter entries that are less than (at least) today's date.
+        Only show entries that are less than (at least) today's date.
 
     *   year => *int*
 

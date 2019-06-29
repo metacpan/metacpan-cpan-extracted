@@ -5,7 +5,7 @@
 
 package Template::Mustache::Parser;
 our $AUTHORITY = 'cpan:YANICK';
-$Template::Mustache::Parser::VERSION = '1.3.1';
+$Template::Mustache::Parser::VERSION = '1.3.2';
 
 use Parse::RecDescent;
 { my $ERRORS;
@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 package Parse::RecDescent::Template::Mustache::Parser;
 our $AUTHORITY = 'cpan:YANICK';
-$Parse::RecDescent::Template::Mustache::Parser::VERSION = '1.3.1';
+$Parse::RecDescent::Template::Mustache::Parser::VERSION = '1.3.2';
 
 use strict;
 use vars qw($skip $AUTOLOAD  );
@@ -7214,7 +7214,7 @@ Template::Mustache::Parser
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 AUTHORS
 
@@ -7236,7 +7236,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

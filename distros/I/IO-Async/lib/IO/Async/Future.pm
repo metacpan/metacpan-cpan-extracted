@@ -8,7 +8,7 @@ package IO::Async::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use base qw( Future );
 Future->VERSION( '0.05' ); # to respect subclassing

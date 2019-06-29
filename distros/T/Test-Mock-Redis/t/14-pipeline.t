@@ -1,11 +1,12 @@
+#!/usr/bin/env perl
 use strict;
 use warnings FATAL => 'all';
 
 use Test::More 0.88;
 use Test::Deep;
-use Test::Fatal;
+use Test::Fatal 'exception';
 use Test::Deep::UnorderedPairs;
-use Test::Mock::Redis;
+use Test::Mock::Redis ();
 
 use lib 't/tlib';
 
@@ -71,7 +72,7 @@ foreach my $redis (@redi)
         $redis->hset(
             'pipeline_key_2', 'bar', '9',
             # weird, when pipelining, the real redis doesn't always include the command name?
-            sub { cmp_deeply(\@_, [ undef, re(qr/^(\[hset\] )?ERR Operation against a key holding the wrong kind of value/) ], 'hset callback') },
+            sub { cmp_deeply(\@_, [ undef, re(qr/^(\[hset\] )?WRONGTYPE Operation against a key holding the wrong kind of value/) ], 'hset callback') },
         ),
         '1',
         'hset operation sent',

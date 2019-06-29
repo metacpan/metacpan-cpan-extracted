@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '1.820'; # VERSION
+our $DATE = '2019-06-26'; # DATE
+our $VERSION = '1.822'; # VERSION
 
 use 5.010001;
 use strict;
@@ -671,9 +671,14 @@ sub do_completion {
                     $subcommand_name_from ne '--cmd' &&
                          $type eq 'arg' && $args{argpos}==0) {
                 require Complete::Util;
+                my $subcommands    = $self->list_subcommands;
+                my @subc_names     = keys %$subcommands;
+                my @subc_summaries = map { $subcommands->{$_}{summary} }
+                    @subc_names;
                 return Complete::Util::complete_array_elem(
-                    array => [keys %{ $self->list_subcommands }],
-                    word  => $words->[$cword]);
+                    array     => \@subc_names,
+                    summaries => \@subc_summaries,
+                    word      => $words->[$cword]);
             }
 
             # otherwise let periscomp do its thing
@@ -1734,7 +1739,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.820 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-06-20.
+This document describes version 1.822 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-06-26.
 
 =head1 DESCRIPTION
 

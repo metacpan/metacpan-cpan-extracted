@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Weasel driver wrapping Selenium::Remote::Driver
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ use namespace::autoclean;
 
 use MIME::Base64;
 use Selenium::Remote::Driver;
-use Time::HiRes;
+use Time::HiRes qw/ time sleep /;
 use Weasel::DriverRole;
 use Carp;
 use English qw(-no_match_vars);
@@ -64,7 +64,7 @@ use English qw(-no_match_vars);
 use Moose;
 with 'Weasel::DriverRole';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 =head1 ATTRIBUTES
@@ -224,12 +224,17 @@ sub wait_for {
     # Do NOT use Selenium::Waiter, it eats all exceptions!
     my $end = time() + $args{retry_timeout};
     my $rv;
-    do {
+    while (1) {
         $rv = $callback->();
         return $rv if $rv;
 
-        sleep $args{poll_delay};
-    } while (time() <= $end);
+        if (time() <= $end) {
+            sleep $args{poll_delay};
+        }
+        else {
+            croak 'wait_for deadline expired; consider increasing the deadline';
+        }
+    }
 
     return;
 }

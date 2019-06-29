@@ -1,5 +1,74 @@
 NAME
     word2vec CHANGES
+  
+  version 0.039
+  	(06/25/2019)
+			- Util.pm - CleanText() - Updated tr///cs, removed "|" character.
+			- Xml2w2v.pm - Modified module to check for "threads" and "threads::shared" module on runtime. (Fix Perl Not Built To Support Threads Issue)
+		  	           - new() - Updated to support Perl installations not built to support threads / Updated For Single Threaded Use
+		    	         - ConvertMedlineXMLToW2V() - Updated to support Perl installations not built to support threads / Updated For Single Threaded Use
+		     	         - GetNumOfThreads() - Updated to support Perl installations not built to support threads / Updated For Single Threaded Use
+		      	       - RemoveSpecialCharactersFromString() - Updated tr///cs, removed "|" character.
+			- Spearmans.pm - _IsCUI() - Bug Fix: Added word boundary around regex. Catches "C012345678b" as not CUI now.
+			- Util.pm - IsWordOrCUITerm() - Bug Fix: Added word boundary around regex. Catches "C012345678b" as not CUI now.
+			- Interface.pm - CLCompileTextCorpus() - Updated to support Perl installaions not built to support threads / Update For Single Threaded Use
+ 			               - CLFindSimilarTerms() - Updated to support Perl installaions not built to support threads / Update For Single Threaded Use
+			- 1Xmltow2v.t - Updated to support the above changes.
+
+		(06/21/2019)
+			- Lesk.pm - CalculateAllScores() - Return hash of zero values if no overlapping phrases/feature exist between strings.
+
+		(06/18/2019)
+			- Xmltow2v.pm - RemoveSpecialCharactersFromString() - Updated function to support compoundified terms
+			                                                    - Added debug statements
+			- Lesk.pm - Added Module
+			          - GetPhraseOverlap() - Added function to locate overlapping terms between two strings
+		  	        - GetMatchingFeatures() - Added function to locate matching features (terms) between two strings
+		    	      - CalculateCosineScore() - Added function
+		      	    - CalculateFScore() - Added function
+		        	  - CalculateLeskScore() - Added function
+		          	- CalculateAllScore() - Added function
+			- Util.pm - CleanText() - Added function (Normalizes text similar to Word2vec::Xmltow2v::RemoveSpecialCharactersFromString)
+			          - RemoveNewLineEndingsFromString() - Added function (Removes new line endings from string)
+		  	        - IsWordOrCUITerm() - Updated to use much simpler/cleaner code.
+		    	      - Updated POD documentation for new functions
+			- Spearmans.pm - _IsCUI() - Updated to use much simpler/cleaner code.
+			- Word2vec.pm - IsWordOrCUIVectorData() - Updated to use much simpler/cleaner code.
+			- Interface.pm - new() - Added Word2vec::Lesk module object variable
+		  	             - CleanText() - Added function link to Word2vec::Util::CleanText()
+		    	           - RemoveNewLineEndingsFromString() - Added function link to Word2vec::Util::RemoveNewLineEndingsFromString()
+		      	         - IsWordOrCUITerm() - Added function link to Word2vec::Util::IsWordOrCUITerm()
+		        	       - GetLeskHandler() - Added function returning Word2vec::Lesk module object
+		          	     - GetMatchingFeaturesBetweenStrings() - Added function link to Word2vec::Lesk::GetMatchingFeatures()
+		            	   - GetPhraseOverlapBetweenStrings() - Added function link to Word2vec::Lesk::GetPhraseOverlap()
+		              	 - CalculateLeskScore() - Added function link to Word2vec::Lesk::CalculateLeskScore()
+			               - CalculateLeskCosineScore() - Added function link to Word2vec::Lesk::CalculateCosineScore()
+			               - CalculateLeskFScore() - Added function link to Word2vec::Lesk::CalculateFScore()
+			               - CalculateAllLeskScores() - Added function link to Word2vec::Lesk::CalculateAllScores()
+			               - CLCleanText() - Updated to use Word2vec::Interface::CleanText() function instead of Word2vec::Xmltow2v::RemoveSpecialCharactersFromString()
+			               - Updated POD documentation for new functions
+			               - Fixed some TYPOs in the POD documentation
+			- Word2vec-Interface.pl - CleanText() - Updated comment to support above change.
+
+		(05/31/2019)
+			- Word2vec-Interface.pl - Added "--cleantext" command / Cleans text within an input file and writes to output file, line-by-line.
+			                        - CleanText() - Added function
+			                        - Added Documentation
+			- Interface.pm - CLCleanText() - Added function / Cleans text within an input file and writes to output file, line-by-line.
+			               - WSDParseFile() - Set open file using "encoding(utf8)" encoding.
+			               - Added Documentation
+			- Xmltow2v.pm - RemoveSpecialCharactersFromString() - Updated documentation.
+
+		(03/28/2019)
+			- Spearmans.pm - Typo Fix
+
+		(12/21/2018)
+			- Word2vec-Interface.pl - "--findsimilarterms" command documentation update.
+
+		(09/21/2018)
+			- Interface.pm - CLComputeCosineSimilarity() - Bug Fix: Set passed word parameters to lowercase before passing to word2vec module.
+			               - CLComputeMultiWordCosineSimilarity() - Bug Fix: Set passed word parameters to lowercase before passing to word2vec module.
+			               - CLComputeAvgOfWordsCosineSimilarity() - Bug Fix: Set passed word parameters to lowercase before passing to word2vec module.
 
   version 0.038
 	  (03/15/2018)

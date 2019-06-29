@@ -22,7 +22,7 @@ use JSON;
 use Try::Tiny;
 use HiPi::RF::OpenThings::Message;
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 __PACKAGE__->create_accessors( qw( config result mode display options pretty user console_display_message) );
 

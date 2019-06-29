@@ -9,12 +9,13 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   Test::Warn: '0'
+  blib: '1.01'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +24,7 @@ name: List-Lazy
 provides:
   List::Lazy:
     file: lib/List/Lazy.pm
-    version: v0.3.1
+    version: v0.3.2
 requires:
   Carp: '0'
   Clone: '0'
@@ -37,10 +38,13 @@ resources:
   bugtracker: https://github.com/yanick/List-Lazy/issues
   homepage: https://github.com/yanick/List-Lazy
   repository: https://github.com/yanick/List-Lazy.git
-version: 0.3.1
+version: 0.3.2
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.02
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Yanick Champoux <yanick@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.69'

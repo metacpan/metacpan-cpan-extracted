@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Video;
-$Telegram::Bot::Object::Video::VERSION = '0.010';
+$Telegram::Bot::Object::Video::VERSION = '0.012';
 # ABSTRACT: The base class for Telegram 'Video' object.
 
 use Mojo::Base 'Telegram::Bot::Object::Base';
@@ -33,7 +33,7 @@ Telegram::Bot::Object::Video - The base class for Telegram 'Video' object.
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 AUTHOR
 

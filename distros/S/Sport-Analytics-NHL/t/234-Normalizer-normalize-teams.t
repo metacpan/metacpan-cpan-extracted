@@ -11,7 +11,7 @@ use Sport::Analytics::NHL;
 use Sport::Analytics::NHL::Normalizer;
 use Storable;
 
-my @merged = Sport::Analytics::NHL::merge({}, {data_dir => 't/data/'}, 201120010);
+my @merged = Sport::Analytics::NHL::merge({}, {reports_dir => 't/data/'}, 201120010);
 my $boxscore = retrieve $merged[0];
 use Data::Dumper;
 my $round = 0;

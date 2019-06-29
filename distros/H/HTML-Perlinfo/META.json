@@ -4,7 +4,7 @@
       "Michael Accardo <accardo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,10 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "CGI" : "0"
+            "CGI::Deurl" : "0",
+            "HTML::Entities" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.69"
+   "version" : "1.71",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

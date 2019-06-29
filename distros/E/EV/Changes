@@ -3,6 +3,19 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and have more
 documentation in the libev Changes file.
 
+4.27 Thu Jun 27 09:39:58 CEST 2019
+	- (libev) completely rewritten linuxaio backend, maybe
+          usable as a general-use backend.
+	- (libev) use more aggressive assertions to catch
+          more usage errors.
+	- allow users to re-enable assert() in case it is disabled
+          by perl (which is typically the case).
+
+4.26 Mon Jun 24 23:39:40 CEST 2019
+	- (libev) included experimental linux aio backend.
+        - allow the linux aio backend to be used by default
+          only when explicitly configured during Makefile.PL time.
+
 4.25 Fri Dec 21 08:04:26 CET 2018
 	- (libev) updated to libev 4.25, minor fixes and enhancements.
 	- document the requirement to "use EV" when using EV::MakeMaker.
@@ -12,7 +25,6 @@ documentation in the libev Changes file.
           by design, winning the "broken by design 2016 award" - well done.
         - correct EV::periodic example 24h after midnight -> one day after
           midnight (reported by Felix Ostmann).
-        - added stability canary support.
 
 4.22 Sun Dec 20 02:34:39 CET 2015
         - (libev) when epoll detects unremovable fds in the fd set, rebuild

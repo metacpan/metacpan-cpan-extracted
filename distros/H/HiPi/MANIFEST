@@ -6,6 +6,7 @@ examples/mfrc522/dump_tag_blocks.pl
 examples/mfrc522/dump_tag_info.pl
 examples/mfrc522/module_info.pl
 examples/mfrc522/read_write.pl
+examples/mfrc522/write_uid_block.pl
 examples/microdotphat/advanced_scrolling.pl
 examples/microdotphat/clock.pl
 examples/microdotphat/fading_text.pl

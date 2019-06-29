@@ -1,7 +1,7 @@
 package Bread::Board::Service::Deferred;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Helper for holding a service that is not quite constructed yet
-$Bread::Board::Service::Deferred::VERSION = '0.36';
+$Bread::Board::Service::Deferred::VERSION = '0.37';
 use Moose ();
 
 use overload
@@ -95,7 +95,7 @@ Bread::Board::Service::Deferred - Helper for holding a service that is not quite
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

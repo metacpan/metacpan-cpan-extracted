@@ -43,4 +43,33 @@ subtest header_regex => sub {
 	}
 };
 
+subtest trim => sub {
+	my @tests= ({
+		name => 'true', trim => 1,
+		input    => [ 'x', ' x', 'x ', '  x  ', '  ' ],
+		expected => [ 'x', 'x',  'x',  'x', '' ],
+	},{
+		name => 'regex', trim => qr/^\s*N\/A\s*$|^\s*NULL\s*$|^\s+|\s+$/i,
+		input => [ 'x', ' x', 'x ', ' x ', 'N/A', ' N/A ', ' Null ' ],
+		expected => [ 'x', 'x', 'x', 'x', '', '', '' ],
+	},{
+		name => 'coderef', trim => sub { s/\s+/_/g; },
+		input => [ 'x x', '  x' ],
+		expected => [ 'x_x', '_x' ],
+	});
+	plan tests => scalar @tests;
+	for my $t (@tests) {
+		subtest "name=$t->{name}" => sub {
+			plan tests => 1 + @{$t->{input}};
+			my $field= new_ok( 'Data::TableReader::Field',
+				[ name => $t->{name}, trim => $t->{trim} ], 'field' );
+			for (0.. $#{$t->{input}}) {
+				my ($in, $expected)= ( $t->{input}[$_], $t->{expected}[$_] );
+				$field->trim_coderef->() for my $out= $in;
+				is( $out, $expected, $in );
+			}
+		};
+	}
+};
+
 done_testing;

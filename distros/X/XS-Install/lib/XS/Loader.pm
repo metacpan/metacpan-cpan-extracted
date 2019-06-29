@@ -6,11 +6,12 @@ use XS::Install::Payload;
 
 sub load {
     shift if $_[0] && $_[0] eq __PACKAGE__;
-    my ($module, $version, $flags) = @_;
+    my ($module, $version, $flags, $noboot) = @_;
     
     $module  ||= caller(0);
     $version ||= XS::Install::Payload::loaded_module_version($module);
     $flags   //= 0x01;
+    $noboot    = 1 if $module eq 'MyTest';
     
     if ($flags) {
         no strict 'refs';
@@ -40,7 +41,11 @@ EOF
         }
     }}
     
-    DynaLoader::bootstrap_inherit($module, $version);
+    my $ok = eval {
+        DynaLoader::bootstrap_inherit($module, $version);
+        1;        
+    };
+    DynaLoader::croak($@) if !$ok and !($noboot and $@ and $@ =~ /Can't find 'boot_/i);
     
     if ($flags) {
         no strict 'refs';
@@ -48,30 +53,9 @@ EOF
         delete $stash->{dl_load_flags};
     }
 }
-*bootstrap = *load;
 
-sub load_tests {
-    my ($module) = @_;
-    require Config;
-    my $fname = 'ctest.'.$Config::Config{dlext};
-    
-    my $file;
-    foreach my $dir (@INC) {
-        next unless $dir =~ m#(.*\bblib[/\\:]+)arch\b#;
-        $file = $1.$fname;
-        last;
-    }
-    $file ||= 'blib/'.$fname;
-    $module ||= '';
-    my $libref = DynaLoader::dl_load_file($file, 0x01) or die "Can't load '$file' for module $module: ".DynaLoader::dl_error();
-    
-    return unless $module;
-    my $bootname = "boot_$module";
-    $bootname =~ s/\W/_/g;
-    
-    my $boot_symbol_ref = DynaLoader::dl_find_symbol($libref, $bootname) or die "Can't find '$bootname' symbol in $file\n";
-    my $xs = DynaLoader::dl_install_xsub("${module}::bootstrap", $boot_symbol_ref, $file);
-    $xs->($module);
-}
+sub load_noboot { load($_[0], $_[1], $_[2], 1) }
+
+*bootstrap = *load;
 
 1;

@@ -1,5 +1,12 @@
 Revision history for Perl extension Geo::IP2Location.
 
+8.10  Wed Jun 26 12:00:00 2019
+      Sixteenth release under the Geo::IP2Location
+      Added 6to4 addressing support
+      Added Teredo addressing support
+      Minor fixes in IPv6 handling
+      Update description in POD
+
 8.04  Sat Jul 08 12:00:00 2017
       Fifteenth release under the Geo::IP2Location
       Fixed bug in POD

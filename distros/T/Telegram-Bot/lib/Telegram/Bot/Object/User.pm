@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::User;
-$Telegram::Bot::Object::User::VERSION = '0.010';
+$Telegram::Bot::Object::User::VERSION = '0.012';
 # ABSTRACT: The base class for Telegram message 'User' type.
 
 use Mojo::Base 'Telegram::Bot::Object::Base';
@@ -31,7 +31,7 @@ Telegram::Bot::Object::User - The base class for Telegram message 'User' type.
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 AUTHOR
 

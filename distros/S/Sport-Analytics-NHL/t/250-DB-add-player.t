@@ -9,10 +9,9 @@ use Test::More;
 
 use JSON;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB);
 use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Util qw(:file);
 use Sport::Analytics::NHL::Report::Player;
 
 use t::lib::Util;

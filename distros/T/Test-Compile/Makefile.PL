@@ -3,16 +3,16 @@ require 5.006002;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'NAME' => 'Test::Compile',
   'INSTALLDIRS' => 'site',
-  'PREREQ_PM' => {
-                   'UNIVERSAL::require' => 0,
-                   'version' => 0,
-                   'Exporter' => '5.68',
-                   'parent' => '0.225'
-                 },
   'EXE_FILES' => [],
-  'PL_FILES' => {},
+  'PREREQ_PM' => {
+                   'parent' => '0.225',
+                   'UNIVERSAL::require' => 0,
+                   'Exporter' => '5.68',
+                   'version' => 0
+                 },
   'VERSION_FROM' => 'lib/Test/Compile.pm',
-  'NAME' => 'Test::Compile'
+  'PL_FILES' => {}
 )
 ;

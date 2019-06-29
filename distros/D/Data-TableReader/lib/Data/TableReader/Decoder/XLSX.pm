@@ -1,5 +1,4 @@
 package Data::TableReader::Decoder::XLSX;
-$Data::TableReader::Decoder::XLSX::VERSION = '0.010';
 use Moo 2;
 use Carp;
 use Try::Tiny;
@@ -13,6 +12,7 @@ sub default_xlsx_module {
 }
 
 # ABSTRACT: Access sheets/rows of a modern Microsoft Excel workbook
+our $VERSION = '0.011'; # VERSION
 
 
 sub _build_workbook {
@@ -49,7 +49,7 @@ Data::TableReader::Decoder::XLSX - Access sheets/rows of a modern Microsoft Exce
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 

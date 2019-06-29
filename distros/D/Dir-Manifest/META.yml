@@ -20,13 +20,13 @@ name: Dir-Manifest
 provides:
   Dir::Manifest:
     file: lib/Dir/Manifest.pm
-    version: v0.0.5
+    version: v0.2.0
   Dir::Manifest::Key:
     file: lib/Dir/Manifest/Key.pm
-    version: v0.0.5
+    version: v0.2.0
   Dir::Manifest::Slurp:
     file: lib/Dir/Manifest/Slurp.pm
-    version: v0.0.5
+    version: v0.2.0
 requires:
   Exporter: '0'
   Moo: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/shlomif/dir-manifest/issues
   homepage: http://metacpan.org/release/Dir-Manifest
   repository: https://github.com/shlomif/Dir-Manifest.git
-version: 0.0.5
+version: 0.2.0
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -342,6 +342,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: ReadmeMarkdownFromPod
+      version: '0.141140'
     -
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: Test::TidyAll

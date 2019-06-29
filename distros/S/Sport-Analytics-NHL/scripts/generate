@@ -1,0 +1,23 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use Sport::Analytics::NHL::Usage;
+use Sport::Analytics::NHL::Generator;
+
+my @accepts_opts = qw(
+	:database data-dir sql :generator :season
+);
+
+my @accepts_args = (
+	{
+		name => 'GAME_IDS',
+		description => 'MHS 9-digit IDs for games to generate from explicitly',
+	}
+);
+
+my $what_it_does = 'Generates the extra data from the NHL reports.';
+my $opts = gopts($what_it_does, \@accepts_opts, \@accepts_args);
+
+generate($opts, @ARGV);

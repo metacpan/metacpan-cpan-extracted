@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.71';
+our $VERSION = '0.75';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -101,9 +101,14 @@ sub existing {
                 $path = File::Spec->catfile( $profile_ini_directory,
                     $config->{$key}->{Path}, 'prefs.js' );
             }
-            else {
+            elsif ( $config->{$key}->{Path} ) {
                 $path =
                   File::Spec->catfile( $config->{$key}->{Path}, 'prefs.js' );
+            }
+            else {
+                $path =
+                  File::Spec->catfile( $profile_ini_directory,
+                    $config->{$key}->{Default}, 'prefs.js' );
             }
         }
     }
@@ -136,6 +141,11 @@ sub new {
       )
       or Firefox::Marionette::Exception->throw(
         "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+    my $dirname = $profile->{_download_directory}->dirname();
+    if ( $OSNAME eq 'cygwin' ) {
+        $dirname =
+          Firefox::Marionette->execute( 'cygpath', '-s', '-w', $dirname );
+    }
     $profile->set_value( 'browser.shell.checkDefaultBrowser',     'false', 0 );
     $profile->set_value( 'browser.reader.detectedFirstArticle',   'true',  0 );
     $profile->set_value( 'dom.disable_open_click_delay',          0,       0 );
@@ -152,16 +162,12 @@ sub new {
     $profile->set_value( 'xpinstall.signatures.require', 'false', 0 );
     $profile->set_value( 'toolkit.telemetry.reportingpolicy.firstRun',
         'false', 0 );
-    $profile->set_value( 'browser.download.useDownloadDir', 'true', 0 );
-    $profile->set_value( 'browser.download.downloadDir',
-        $profile->{_download_directory}->dirname(), 1 );
-    $profile->set_value( 'browser.download.dir',
-        $profile->{_download_directory}->dirname(), 1 );
-    $profile->set_value( 'browser.download.lastDir',
-        $profile->{_download_directory}->dirname(), 1 );
-    $profile->set_value( 'browser.download.defaultFolder',
-        $profile->{_download_directory}->dirname(), 1 );
-    $profile->set_value( 'browser.download.folderList', 2, 0 )
+    $profile->set_value( 'browser.download.useDownloadDir', 'true',   0 );
+    $profile->set_value( 'browser.download.downloadDir',    $dirname, 1 );
+    $profile->set_value( 'browser.download.dir',            $dirname, 1 );
+    $profile->set_value( 'browser.download.lastDir',        $dirname, 1 );
+    $profile->set_value( 'browser.download.defaultFolder',  $dirname, 1 );
+    $profile->set_value( 'browser.download.folderList',     2,        0 )
       ;    # the last folder specified for a download
     $profile->set_value( 'marionette.port', _ANY_PORT() );
     return $profile;
@@ -272,7 +278,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.71
+Version 0.75
 
 =head1 SYNOPSIS
 

@@ -2,11 +2,9 @@ use strict;
 use warnings;
 use Test::More 0.89;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use lib 't/lib';
 
 use TestSchema;
-use SQL::Translator;
 use Authen::Passphrase::SaltedDigest;
 use Authen::Passphrase::BlowfishCrypt;
 

@@ -1,13 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-
-my $pkg;
-BEGIN {
-  $pkg = 'Catmandu::Importer::BibTeX';
-  use_ok($pkg);
-}
-require_ok($pkg);
+use Test2::V0;
+use Catmandu::Importer::BibTeX;
 
 my $data = [
   {
@@ -49,12 +41,12 @@ my $bibtex = <<TEX;
 }
 TEX
 
-my $importer = $pkg->new(file => \$bibtex);
+my $importer = Catmandu::Importer::BibTeX->new(file => \$bibtex);
 
 can_ok ($importer, 'each');
 
-isa_ok $importer, $pkg;
+isa_ok $importer, "Catmandu::Importer::BibTeX";
 
-is_deeply $importer->to_array, $data;
+is $importer->to_array, $data;
 
 done_testing;

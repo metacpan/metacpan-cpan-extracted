@@ -159,6 +159,7 @@ $loop->remove( $stream );
 undef $stream;
 
 ( $S1, $S2 ) = IO::Async::OS->socketpair or die "Cannot socketpair - $!";
+$_->blocking( 0 ) for $S1, $S2;
 
 $stream = IO::Async::Stream->new(
    handle => $S1,

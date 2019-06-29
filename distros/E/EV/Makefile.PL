@@ -9,7 +9,7 @@ sub have_inc($) {
 
 my $DEFINE;
 
-unless (-e "libev/ev_epoll.c") {
+unless (-e "libev/ev_linuxaio.c") {
    print <<EOF;
 
 ***
@@ -145,6 +145,48 @@ print <<EOF;
 *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 
 
+Linux 4.18 introduced another event polling interface, this time using
+the Linux AIO API. While this API is far superior to epoll and almost
+rivals kqueue, it also suffers from the same issues as kqueue typically
+does: only a subset of file types are supported (as of 4.19, I have seen
+eventfd, pipes, sockets files and some devices, but no ttys). It also
+is subject arbitrary system-wide limits imposed on it. Therefore, this
+backend is not used by default, even when it is compiled in, and you have
+to request it explicitly, e.g. with LIBEV_FLAGS=64. If unsure, accept the
+default.
+
+EOF
+
+my $can_linuxaio = have_inc "linux/aio_abi.h";
+$can_linuxaio = $ENV{EV_LINUXAIO} if exists $ENV{EV_LINUXAIO};
+$can_linuxaio = 0 + (prompt ("Enable linux aio backend (y/n)?", $can_linuxaio ? "y" : "n") =~ /[yY]/);
+$DEFINE .= " -DEV_USE_LINUXAIO=$can_linuxaio";
+
+if ($can_linuxaio) {
+print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+
+The previously mentioned Linux AIO backend is experimental and will not
+be used unless requested explicitly. You can, howeer, choose to make ti a
+recommended basckend, which means it will be chosen if available even when
+not explicitly asked for, in preference to epoll on GNU/Linux. This option
+is likely temporary. When unsure, accept the default.
+
+EOF
+
+my $recommend_linuxaio = 0;
+$recommend_linuxaio = $ENV{EV_RECOMMEND_LINUXAIO} if exists $ENV{EV_RECOMMEND_LINUXAIO};
+$recommend_linuxaio = 0 + (prompt ("Treat linux aio as a recommended backend (y/n)?", $recommend_linuxaio ? "y" : "n") =~ /[yY]/);
+$DEFINE .= " -DEV_RECOMMEND_LINUXAIO=$recommend_linuxaio";
+}
+
+print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+
 Similarly to the epoll backend above, EV can take advantage of kqueue on
 many BSD systems. Support for kqueue will be detected at runtime, with a
 safe fallback to other methods when it cannot be used.
@@ -251,6 +293,28 @@ EOF
 my $can_signalfd = have_inc "sys/signalfd.h";
 $can_signalfd = $ENV{EV_SIGNALFD} if exists $ENV{EV_SIGNALFD};
 $DEFINE .= " -DEV_USE_SIGNALFD=" . (0 + (prompt ("Enable linux signalfd support (y/n)?", $can_signalfd ? "y" : "n") =~ /[yY]/));
+
+print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+
+Libev contains numerous internal assert() invocations to check for
+consistency and user errors. These are normally enabled, but most
+perl builds disable this error reporting mechanism by default. You
+can re-enable these asserts here. Enabling them might help you catch
+programming bugs earlier, but might cause a small slowdown. Also, failures
+will be reported by aboritng your program, instead of throwing a perl
+exception.
+
+If unsure, enable this if you only use this perl installation for
+development, and leave it off for use in production environments.
+
+EOF
+
+my $enable_assertions = 0;
+$enable_assertions = 0 + (prompt ("Make sure assertions are enabled? (y/n)?", $enable_assertions ? "y" : "n") =~ /[yY]/);
+$DEFINE .= " -DEV_ENABLE_ASERTIONS=1" if $enable_assertions;
 
 print <<EOF;
 

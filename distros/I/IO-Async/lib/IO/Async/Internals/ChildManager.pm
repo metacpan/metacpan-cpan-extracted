@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::Internals::ChildManager;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 # Not a notifier
 
@@ -120,6 +120,7 @@ sub spawn_child
       local $^F = -1;
 
       ( $readpipe, $writepipe ) = IO::Async::OS->pipepair or croak "Cannot pipe() - $!";
+      $readpipe->blocking( 0 );
    }
 
    if( defined $command ) {

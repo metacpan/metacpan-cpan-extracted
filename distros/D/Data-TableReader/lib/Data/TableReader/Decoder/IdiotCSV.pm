@@ -1,5 +1,4 @@
 package Data::TableReader::Decoder::IdiotCSV;
-$Data::TableReader::Decoder::IdiotCSV::VERSION = '0.010';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -8,6 +7,7 @@ use Log::Any '$log';
 extends 'Data::TableReader::Decoder::CSV';
 
 # ABSTRACT: Access rows of a badly formatted comma-delimited text file
+our $VERSION = '0.011'; # VERSION
 
 
 sub _build_parser {
@@ -36,7 +36,7 @@ Data::TableReader::Decoder::IdiotCSV - Access rows of a badly formatted comma-de
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 

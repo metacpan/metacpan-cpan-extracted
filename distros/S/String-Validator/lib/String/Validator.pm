@@ -1,5 +1,5 @@
 package String::Validator;
-$String::Validator::VERSION = '2.01';
+$String::Validator::VERSION = '2.02';
 use 5.008;
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ String::Validator - A Collection of Routines for validating and transforming str
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 Description
 
@@ -111,6 +111,8 @@ As of Version 2.0 the ->new Method to takes two optional parameters: language an
          	somevalidator_sandworm => 'Shai-Halud'});
 
 See String::Validator::Language for a list of available languages.
+
+There are a few examples of this in the tests. The coderef form example test is in password because that module has messages that use a coderef.
 
 =head1 Making Validator Better
 

@@ -94,6 +94,11 @@ EXPORTED SUBROUTINES
       The default value for threshold is 9, while the default value for
       lengths is [2,3]
 
+    sentences_iterator( $input_iter ) #=> CodeRef
+
+      This subroutine split input into sentences. It takes an text
+      iterator, and returns another one.
+
     phrase_iterator( $input_iter ) #=> CodeRef
 
       This subroutine split input into smallelr phrases. It takes an text

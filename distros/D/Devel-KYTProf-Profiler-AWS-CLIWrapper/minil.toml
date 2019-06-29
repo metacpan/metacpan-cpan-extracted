@@ -1,0 +1,7 @@
+name = "Devel-KYTProf-Profiler-AWS-CLIWrapper"
+badges = ["travis-ci.org"]
+authority="cpan:PAPIX"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

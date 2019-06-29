@@ -1,7 +1,7 @@
 package Template::Mustache::Token::Verbatim;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Object representing a Verbatim block
-$Template::Mustache::Token::Verbatim::VERSION = '1.3.1';
+$Template::Mustache::Token::Verbatim::VERSION = '1.3.2';
 use Moo;
 
 use MooseX::MungeHas { has_ro => [ 'is_ro' ], has_rw => [ 'is_rw' ] };
@@ -41,7 +41,7 @@ Template::Mustache::Token::Verbatim - Object representing a Verbatim block
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 AUTHORS
 
@@ -63,7 +63,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

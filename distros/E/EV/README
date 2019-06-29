@@ -197,7 +197,7 @@ BASIC INTERFACE
     $loop->now_update
         Establishes the current time by querying the kernel, updating the
         time returned by "EV::now" in the progress. This is a costly
-        operation and is usually done automatically within "EV::loop".
+        operation and is usually done automatically within "EV::run".
 
         This function is rarely useful, but when some event callback runs
         for a very long time without entering the event loop, updating
@@ -253,9 +253,9 @@ BASIC INTERFACE
     EV::break [$how]
     $loop->break ([$how])
         When called with no arguments or an argument of EV::BREAK_ONE, makes
-        the innermost call to EV::loop return.
+        the innermost call to EV::run return.
 
-        When called with an argument of EV::BREAK_ALL, all calls to EV::loop
+        When called with an argument of EV::BREAK_ALL, all calls to EV::run
         will return as fast as possible.
 
         When called with an argument of EV::BREAK_CANCEL, any pending break
@@ -416,23 +416,23 @@ WATCHER OBJECTS
         the watcher isn't pending it does nothing and returns 0.
 
     $previous_state = $w->keepalive ($bool)
-        Normally, "EV::loop" will return when there are no active watchers
+        Normally, "EV::run" will return when there are no active watchers
         (which is a "deadlock" because no progress can be made anymore).
         This is convenient because it allows you to start your watchers (and
-        your jobs), call "EV::loop" once and when it returns you know that
+        your jobs), call "EV::run" once and when it returns you know that
         all your jobs are finished (or they forgot to register some watchers
         for their task :).
 
         Sometimes, however, this gets in your way, for example when the
-        module that calls "EV::loop" (usually the main program) is not the
+        module that calls "EV::run" (usually the main program) is not the
         same module as a long-living watcher (for example a DNS client
         module written by somebody else even). Then you might want any
         outstanding requests to be handled, but you would not want to keep
-        "EV::loop" from returning just because you happen to have this
+        "EV::run" from returning just because you happen to have this
         long-running UDP port watcher.
 
         In this case you can clear the keepalive status, which means that
-        even though your watcher is active, it won't keep "EV::loop" from
+        even though your watcher is active, it won't keep "EV::run" from
         returning.
 
         The initial value for keepalive is true (enabled), and you can

@@ -1,0 +1,6 @@
+Revision history for RPi-EEPROM-AT24C32
+
+0.01    2019-06-28
+        - initial version released
+        - ability to write/read single bytes
+

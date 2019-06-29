@@ -1,5 +1,41 @@
 Revision history for PMLTQ-Suggest
 
+1.0.4
+ - Released: 2019-06-27 11:43:24 UTC
+
+ [BUG FIXES]
+ - fix missing semicolon, add script/pmltq-suggest-server to compilation
+   tests
+
+1.0.3
+ - Released: 2019-06-27 11:10:32 UTC
+
+ [BUG FIXES]
+ - add missing Getopt::Long dependency
+
+1.0.2
+ - Released: 2019-06-27 09:14:46 UTC
+
+ [BUG FIXES]
+ - fix installation bug -> decreasing HTTP::Server::Simple::CGI version to
+   0
+ - fix tests when locale is not english
+
+1.0.1
+ - Released: 2019-06-26 18:20:23 UTC
+
+ [BUG FIXES]
+ - increase minimal HTTP::Server::Simple::CGI version in order to fix tests
+
+1.0.0
+ - Released: 2019-06-26 08:52:54 UTC
+
+ [API CHANGES]
+ - allow multiple resource paths: ---resource_path path1 path2
+
+ [BUG FIXES]
+ - fix missing PMLTQ::Base dependency
+
 0.0.3
  - Released: 2018-12-07 09:47:07 UTC
 

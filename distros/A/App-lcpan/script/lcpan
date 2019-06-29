@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '1.034'; # VERSION
+our $DATE = '2019-06-26'; # DATE
+our $VERSION = '1.035'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.034 of lcpan (from Perl distribution App-lcpan), released on 2019-06-19.
+This document describes version 1.035 of lcpan (from Perl distribution App-lcpan), released on 2019-06-26.
 
 =head1 SYNOPSIS
 
@@ -1002,7 +1002,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.28.2"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1038,11 +1038,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
-=item B<--author-arg>=I<s>*
-
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
+
+=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1086,7 +1086,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.28.2"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1463,7 +1463,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.28.2"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1537,7 +1537,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.28.2"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -2353,7 +2353,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.28.2"
+ "v5.26.1"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2509,7 +2509,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.28.2"
+ "v5.26.1"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3372,7 +3372,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author-arg)
+ author (see --author)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)

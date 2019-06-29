@@ -11,12 +11,8 @@ use Storable;
 
 use JSON;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($IS_AUTHOR $MONGO_DB);
 use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Scraper;
-use Sport::Analytics::NHL::Report::Player;
 use Sport::Analytics::NHL;
 
 use t::lib::Util;
@@ -35,7 +31,7 @@ my $location = $db->create_location({
 	name => 'Aba baa  baa ',
 	capacity => 15000,
 });
-isa_ok($location->{_id}, 'MongoDB::OID', '_id created');
+isa_ok($location->{_id}, 'BSON::OID', '_id created');
 is($location->{capacity}, 15000, 'capacity installed');
 is($location->{name}, 'ABA BAA BAA', 'name normalized');
 
@@ -61,7 +57,7 @@ my $entry = $db->get_catalog_entry('test', {just => 'ref'});
 is_deeply($entry, { just => 'ref'}, 'ref detected');
 
 $entry = $db->get_catalog_entry('test', 'JAJA');
-isa_ok($entry->{_id}, 'MongoDB::OID', 'new entry created');
+isa_ok($entry->{_id}, 'BSON::OID', 'new entry created');
 is($entry->{name}, 'JAJA', 'name preserved');
 my $new_entry = $db->get_catalog_entry('test', 'JAJA');
 is_deeply($new_entry, $entry, 'no new entry inserted');
@@ -95,7 +91,7 @@ for (201120010, 193020010) {
 			when ('STOP') {
 				ok(@{$event->{stopreasons}}, 'some stopreasons');
 				for my $stopreason (@{$event->{stopreasons}}) {
-					isa_ok($stopreason, 'MongoDB::OID', 'stopreason an OID');
+					isa_ok($stopreason, 'BSON::OID', 'stopreason an OID');
 				}
 			}
 		}
@@ -109,14 +105,14 @@ for (201120010, 193020010) {
 		push(@collections, $event_c);
 		my $_event = $events_c->find_one({event_id => $event_id});
 		my $event_db = $event_c->find_one({_id => $event_id});
-		isa_ok($_event->{_id}, 'MongoDB::OID', '_event has an OID');
+		isa_ok($_event->{_id}, 'BSON::OID', '_event has an OID');
 		is($_event->{event_id}, $event_db->{_id}, 'id referenced');
 		is($_event->{game_id}, $boxscore->{_id}, 'game id referenced');
 		is($event_db->{game_id}, $boxscore->{_id}, 'game id referenced');
 		is($_event->{type}, $event->{type}, 'type preserved');
 		for my $field (qw(location shot_type miss penalty strength zone)) {
 			if (exists $event->{$field}) {
-				isa_ok($event_db->{$field}, 'MongoDB::OID', 'event field has a catalog OID');
+				isa_ok($event_db->{$field}, 'BSON::OID', 'event field has a catalog OID');
 			}
 		}
 	}

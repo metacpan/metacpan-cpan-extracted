@@ -7,6 +7,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+README.mkdn
 dist.ini
 lib/Dir/Manifest.pm
 lib/Dir/Manifest/Key.pm

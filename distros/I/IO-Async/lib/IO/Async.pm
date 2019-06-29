@@ -12,7 +12,7 @@ use warnings;
 # It is provided simply to keep CPAN happy:
 #   cpan -i IO::Async
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 =head1 NAME
 

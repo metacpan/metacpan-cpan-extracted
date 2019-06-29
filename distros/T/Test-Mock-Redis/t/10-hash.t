@@ -1,4 +1,4 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -38,6 +38,10 @@ if( $ENV{RELEASE_TESTING} ){
 foreach my $r (@redi){
     diag("testing $r") if $ENV{RELEASE_TESTING};
 
+    ok ! $r->hexists('hash', 'foo'), "hexists on an empty hash returns false";
+
+    ok ! $r->hexists('hash', 'foo'), "hexists on the same empty hash returns false proving there was no autovivification";
+
     is $r->hget('hash', 'foo'), undef, "hget for a hash that doesn't exist is undef";
 
     is_deeply([sort $r->hkeys('hash')], [], "hkeys returned no keys for a hash that doesn't exist");
@@ -65,13 +69,13 @@ foreach my $r (@redi){
     is $r->get('hash'), 'blarg', "even though it squashed it";
 
     like exception { $r->hset('hash', 'foo', 'foobar') },
-        qr/^\Q[hset] ERR Operation against a key holding the wrong kind of value\E/,
+        qr/^\Q[hset] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
         "hset throws error when we overwrite a string with a hash";
 
     ok ! $r->hexists('blarg', 'blorf'), "hexists on a hash that doesn't exist returns false";
 
     like exception { $r->hexists('hash', 'blarg') },
-        qr/^\Q[hexists] ERR Operation against a key holding the wrong kind of value\E/,
+        qr/^\Q[hexists] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
         "hexists on a field that's not a hash throws error";
 
     $r->del('hash');
@@ -95,7 +99,7 @@ foreach my $r (@redi){
     $r->set('not a hash', 'foo bar');
 
     like exception { $r->hkeys('not a hash') },
-         qr/^\Q[hkeys] ERR Operation against a key holding the wrong kind of value\E/,
+         qr/^\Q[hkeys] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
          "hkeys on key that isn't a hash throws error";
 
     # OK seems inconsistient
@@ -107,7 +111,7 @@ foreach my $r (@redi){
     is_deeply { $r->hgetall("I don't exist") }, { }, "hgetall on non-existent key is empty";
 
     like exception { $r->hgetall('not a hash') },
-         qr/^\Q[hgetall] ERR Operation against a key holding the wrong kind of value\E/,
+         qr/^\Q[hgetall] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
          "hgetall on key that isn't a hash throws error";
 
 
@@ -119,7 +123,7 @@ foreach my $r (@redi){
     $r->set('not a hash', 'foo bar');
 
     like exception { $r->hvals('not a hash') },
-         qr/^\Q[hvals] ERR Operation against a key holding the wrong kind of value\E/,
+         qr/^\Q[hvals] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
          "hvals on key that isn't a hash throws error";
 
 
@@ -147,7 +151,9 @@ foreach my $r (@redi){
 
     is $r->hset('hash', 'emptystr', ''), 1, "can set hash value to empty string";
 
-    is $r->hincrby('hash', 'emptystr', 1), 1, "incrby 1 on the empty string returns 1";
+    like exception { $r->hincrby('hash', 'emptystr', 1) },
+        qr/^\Q[hincrby] ERR hash value is not an integer\E/,
+         "hincrby dies when an empty string is incremented";
 }
 
 

@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -43,6 +43,11 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.28",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/dk/IO-Lambda"
+      }
+   },
+   "version" : "1.29",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

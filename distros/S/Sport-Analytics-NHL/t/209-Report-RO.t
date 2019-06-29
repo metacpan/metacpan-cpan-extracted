@@ -8,8 +8,6 @@ use experimental qw(smartmatch);
 use Test::More tests => 3;
 
 use Sport::Analytics::NHL::Report::RO;
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::Util;
 my $report;
 $report = Sport::Analytics::NHL::Report::RO->new({
 	file => 't/data/2011/0002/0010/RO.html',

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use Carp;
 
@@ -442,6 +442,7 @@ sub _prepare_fds
 
       if( $via == FD_VIA_PIPEREAD ) {
          my ( $myfd, $childfd ) = IO::Async::OS->pipepair or croak "Unable to pipe() - $!";
+         $myfd->blocking( 0 );
 
          $handle->configure( read_handle => $myfd );
 
@@ -450,6 +451,7 @@ sub _prepare_fds
       }
       elsif( $via == FD_VIA_PIPEWRITE ) {
          my ( $childfd, $myfd ) = IO::Async::OS->pipepair or croak "Unable to pipe() - $!";
+         $myfd->blocking( 0 );
          $write_only++;
 
          $handle->configure( write_handle => $myfd );
@@ -463,6 +465,7 @@ sub _prepare_fds
          # can ->close them properly
          my ( $myread, $childwrite ) = IO::Async::OS->pipepair or croak "Unable to pipe() - $!";
          my ( $childread, $mywrite ) = IO::Async::OS->pipepair or croak "Unable to pipe() - $!";
+         $_->blocking( 0 ) for $myread, $mywrite;
 
          $handle->configure( read_handle => $myread, write_handle => $mywrite );
 
@@ -472,6 +475,7 @@ sub _prepare_fds
       }
       elsif( $via == FD_VIA_SOCKETPAIR ) {
          my ( $myfd, $childfd ) = IO::Async::OS->socketpair( $opts->{family}, $opts->{socktype} ) or croak "Unable to socketpair() - $!";
+         $myfd->blocking( 0 );
 
          $opts->{prefork}->( $myfd, $childfd ) if $opts->{prefork};
 

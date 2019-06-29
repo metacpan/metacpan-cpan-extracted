@@ -7,9 +7,9 @@ use experimental qw(smartmatch);
 
 use parent 'Sport::Analytics::NHL::Report';
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:basic :ids);
 use Sport::Analytics::NHL::Errors;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Util qw(:utils);
 
 use Storable qw(dclone);
 use Data::Dumper;
@@ -68,6 +68,13 @@ Parse a team's table in the old HTML.
 
  Arguments: HTML element with the team table
  Returns: the team hashref.
+
+=item C<parse_goaltender_summary>
+
+Parse the seldom-happening goaltending summary in the ES report.
+
+ Arguments: the HTML element with the summary
+ Returns: void, the object is updated.
 
 =back
 
@@ -250,6 +257,47 @@ sub parse_new_team_summary ($$) {
 	@rosters;
 }
 
+sub parse_goaltender_summary ($$$) {
+
+	my $self               = shift;
+	my $goaltender_summary = shift;
+
+	$self->{goalies} = [];
+	my $g = 2;
+	my $t = 0;
+	while (my $goalies_row = $self->get_sub_tree(0, [$g], $goaltender_summary)) {
+		last unless $goalies_row && ref $goalies_row;
+		my $number = $self->get_sub_tree(0, [0,0], $goalies_row);
+		if ($number =~ /^\d+$/) {
+			$t = 1 if $t;
+			my $goalie = {
+				number        => $number,
+				team          => $t,
+				position      => 'G',
+				name_decision => $self->get_sub_tree(0, [2,0], $goalies_row),
+				ev            => $self->get_sub_tree(0, [3,0], $goalies_row),
+				pp            => $self->get_sub_tree(0, [4,0], $goalies_row),
+				sh            => $self->get_sub_tree(0, [5,0], $goalies_row),
+				toitot        => $self->get_sub_tree(0, [6,0], $goalies_row),
+			};
+			my $s = 1;
+			while (my $shots_period = $self->get_sub_tree(0, [$s+6,0], $goalies_row)) {
+				$goalie->{"SHOT$s"} = $shots_period;
+				$self->{last_period} = $s;
+				$s++;
+			};
+			$self->{last_period}--;
+			$s--;
+			$goalie->{"SHOT"} = delete $goalie->{"SHOT$s"};
+			push(@{$self->{goalies}}, $goalie);
+		}
+		else {
+			$t++;
+		}
+		$g++;
+	}
+}
+
 sub parse ($$) {
 
 	my $self = shift;
@@ -262,6 +310,11 @@ sub parse ($$) {
 		$self->{teams}[1]{roster} = $self->parse_old_team_summary($home_summary);
 	}
 	else {
+		my $gs_probe = $self->get_sub_tree(0, [$body_size/2,3,0,0]);
+		if ($gs_probe eq 'GOALTENDER SUMMARY') {
+			my $goaltender_summary = $self->get_sub_tree(0, [$body_size/2,4,0,0]);
+			$self->parse_goaltender_summary($goaltender_summary);
+		}
 		my $summary = $self->get_sub_tree(0, [$body_size/2,7]);
 		my @rosters = $self->parse_new_team_summary($summary);
 		$self->{teams}[0]{roster} = dclone $rosters[0];
@@ -295,6 +348,7 @@ sub normalize ($$) {
 			}
 			$player->{name} = "$2 $1" if $player->{name} =~ /^(\S.*\S)\,\s+(\S.*)$/;
 			$player->{start} = 2;
+			$player->{shots} ||= 0;
 			$player->{status} = 'X';
 			for my $field (qw(G A PIM)) {
 				$player->{$field} ||= 0E0;
@@ -312,6 +366,35 @@ sub normalize ($$) {
 				$player->{timeOnIce} = $player->{evenTimeOnIce} + $player->{powerPlayTimeOnIce} + $player->{shortHandedTimeOnIce} if defined $player->{evenTimeOnIce};
 			}
 		}
+	}
+	for my $goalie (@{$self->{goalies}}) {
+		for my $field (keys %{$goalie}) {
+			if ($field eq 'name_decision') {
+				if ($goalie->{$field} =~ /^(\S+.*)\,\s+(\S+.*\S+)\s+\((W|L|OT)\)/) {
+					$goalie->{name} = "$2 $1";
+					$goalie->{wl} = $3;
+				}
+				else {
+					$goalie->{$field} =~ /^(\S+.*)\,\s+(\S+.*\S+)/;
+					$goalie->{name} = "$2 $1";
+					$goalie->{wl} = '';
+				}
+			}
+			elsif ($field eq 'team') {
+				$goalie->{$field} = $self->{teams}[$goalie->{$field}]{name};
+			}
+			elsif ($goalie->{$field} =~ /(\d+)\:(\d+)/) {
+				$goalie->{uc $field} = $goalie->{$field};
+				$goalie->{$field} = $1*60 + $2;
+			}
+			elsif ($goalie->{$field} =~ /(\d+)\-(\d+)/) {
+				$goalie->{$field} = [$1, $2];
+			}
+			if ($goalie->{$field} eq ' ' || ord($goalie->{$field}) == 160) {
+				$goalie->{$field} = $field =~ /SHOT/ ? [0,0] : 0;
+			}
+		}
+		delete $goalie->{name_decision};
 	}
 }
 

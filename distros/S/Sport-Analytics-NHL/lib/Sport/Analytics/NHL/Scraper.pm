@@ -6,17 +6,21 @@ use strict;
 use experimental qw(smartmatch);
 use parent 'Exporter';
 
+use File::Copy;
+use File::Basename;
 use Time::HiRes qw(time usleep);
 use POSIX qw(strftime);
 
 use JSON;
 use LWP::Simple;
+use HTML::TableExtract;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Vars qw(:scrape);
+use Sport::Analytics::NHL::Config qw(:seasons $UNDRAFTED_PICK);
+use Sport::Analytics::NHL::Util qw(:debug :file);
+use Sport::Analytics::NHL::Tools qw(:schedule :basic :path resolve_team);
 use Sport::Analytics::NHL::Report::BS;
+use Sport::Analytics::NHL::Errors;
 
 =head1 NAME
 
@@ -110,19 +114,34 @@ Crawls the data for an NHL player given his NHL id. First, the API call is made,
 
  Returns: the path to the saved file
 
+=item C<crawl_rotoworld_injuries>
+
+Crawls the RotoWorld.com injuries page to detect the injuries.
+
+ Arguments: none
+
+ Returns: a list of hashes, each one a player name,
+           the injury status and the injury type.
+
+=item C<crawl_injured_players>
+
+Currently only contains a call to crawl_rotoworld_injuries (q.v.)
+
 =back
 
 =cut
 
-our $SCHEDULE_JSON     = 'http://live.nhle.com/GameData/SeasonSchedule-%s%s.json';
-our $SCHEDULE_JSON_API = 'https://statsapi.web.nhl.com/api/v1/schedule?startDate=%s&endDate=%s';
-our $HTML_REPORT_URL   = 'http://www.nhl.com/scores/htmlreports/%d%d/%s%02d%04d.HTM';
-our $PLAYER_URL        = 'https://statsapi.web.nhl.com/api/v1/people/%d?expand=person.stats&stats=yearByYear,yearByYearPlayoffs&expand=stats.team&site=en_nhl';
-our $SUPP_PLAYER_URL   = "https://www.nhl.com/player/%d";
-#our $ROTOWORLD_URL     = 'http://www.rotoworld.com/teams/injuries/nhl/all/';
-#our %ROTO_CENSUS = (
-#        'CHRIS TANEV' => 'CHRISTOPHER TANEV',
-#);
+our $SCHEDULE_JSON        = 'http://live.nhle.com/GameData/SeasonSchedule-%s%s.json';
+our $SCHEDULE_JSON_API    = 'https://statsapi.web.nhl.com/api/v1/schedule?startDate=%s&endDate=%s';
+our $HTML_REPORT_URL      = 'http://www.nhl.com/scores/htmlreports/%d%d/%s%02d%04d.HTM';
+our $PLAYER_URL           = 'https://statsapi.web.nhl.com/api/v1/people/%d?expand=person.stats&stats=yearByYear,yearByYearPlayoffs&expand=stats.team&site=en_nhl';
+our $SUPP_PLAYER_URL      = "https://www.nhl.com/player/%d";
+our $ROTOWORLD_URL        = 'https://www.rotoworld.com/api/injury?sort=-start_date&filter[player.team]=%d&filter[player.status.active]=1&filter[active]=1&include=injury_type,player,player.status,player.position';
+our $ROTOWORLD_TEAM_URL = 'https://www.rotoworld.com/api/team/hockey/%s';
+
+our %ROTO_CENSUS = (
+	'CHRIS TANEV' => 'CHRISTOPHER TANEV',
+);
 our @GAME_FILES = (
 	{
 		name      => 'BS',
@@ -131,8 +150,23 @@ our @GAME_FILES = (
 		validate  => sub {
 			my $json = shift;
 			my $bs = Sport::Analytics::NHL::Report::BS->new($json);
-			return scalar @{$bs->{json}{liveData}{plays}{allPlays}};
-			1;
+			$bs->set_id_data();
+			return 1 if $BROKEN_FILES{$bs->{_id}}->{BS};
+			return 0 unless $bs;
+			return 1 if	scalar @{$bs->{json}{liveData}{plays}{allPlays}};
+			# remove later
+			my $alt = make_game_path(
+				$bs->{season}, $bs->{stage}, $bs->{season_id}, '/misc/nhl',
+			);
+			my $alt_file = "$alt/BS.json";
+			return 0 unless -f $alt_file;
+			my $alt_json = read_file($alt_file);
+			my $alt_bs = Sport::Analytics::NHL::Report::BS->new($alt_json);
+			return unless $alt_bs;
+			copy $alt_file, make_game_path(
+				$bs->{season}, $bs->{stage}, $bs->{season_id}
+			) . '/BS.json';
+			return scalar @{$alt_bs->{json}{liveData}{plays}{allPlays}};
 		},
 	},
 	{
@@ -145,12 +179,17 @@ our @GAME_FILES = (
 	{ name => 'GS' },
 	{ name => 'PL' },
 	{ name => 'RO' },
+	{ name => 'TH' },
+	{ name => 'TV' },
 );
 
-our @EXPORT = qw(
-	crawl_schedule crawl_game crawl_player
+our @EXPORT_OK = qw(
+	crawl_schedule crawl_game crawl_player crawl_injured_players
 );
 
+our %EXPORT_TAGS = (
+	all => [@EXPORT_OK],
+);
 our $DEFAULT_RETRIES = 3;
 
 sub scrape ($) {
@@ -172,6 +211,7 @@ sub scrape ($) {
 			verbose "$opts->{url} failed validation, retrying";
 			$content = undef;
 		}
+		usleep 200000 unless $content;
 	}
 	debug sprintf("Retrieved in %.3f seconds", time - $now) if $content;
 	$content;
@@ -195,14 +235,16 @@ sub crawl_schedule ($) {
 			$schedule_json = scrape({ url => $schedule_json_url });
 			if (! $schedule_json) {
 				my ($start_date, $stop_date) = get_start_stop_date($season);
-				$schedule_json_url = sprintf($SCHEDULE_JSON_API, $start_date, $stop_date);
+				$schedule_json_url = sprintf(
+					$SCHEDULE_JSON_API, $start_date, $stop_date
+				);
 				$schedule_json = scrape({ url => $schedule_json_url });
 				if (! $schedule_json) {
 					verbose "Couldn't download from $schedule_json_url, skipping...";
 					next;
 				}
 			}
-			write_file($schedule_json, $schedule_json_file);
+			write_file($schedule_json, $schedule_json_file) if $schedule_json;
 			if (! -f $schedule_json_file) {
 				print "ERROR: could not find a JSON schedule file, skipping...";
 				next;
@@ -258,7 +300,7 @@ sub crawl_game ($;$) {
 		my $file = "$path/$doc->{name}.$doc->{extension}";
 		if (-f $file && ! $opts->{force}) {
 			print STDERR "[NOTICE] File $file already exists, not crawling\n";
-			$contents->{$doc->{name}} = read_file($file);
+			$contents->{$doc->{name}}{content} = read_file($file);
 			next;
 		}
 		my $url     = sprintf($doc->{pattern}, @args);
@@ -285,13 +327,13 @@ sub crawl_player ($;$$$) {
 	$opts->{playerfile_expiration} ||= $DEFAULT_PLAYERFILE_EXPIRATION;
 	my $sfx = 'json';
 	my $file = sprintf("%s/players/%d.%s", $opts->{data_dir}, $id, $sfx);
-
 	if (-f $file && -M $file < $opts->{playerfile_expiration} && ! $opts->{force}) {
 		debug "File exists and is recent, skipping";
 		return $file;
 	}
-
-	my $content = scrape({ url => sprintf($PLAYER_URL, $id) });
+	$opts->{url} = sprintf($PLAYER_URL, $id);
+	$opts->{retries} = 6;
+	my $content = scrape($opts);
 	if (! $content) {
 		print STDERR "ID $id missing or network unavailable\n";
 		if (-f $file) {
@@ -310,7 +352,7 @@ sub crawl_player ($;$$$) {
 	}
 	else {
 		my $supp_url = sprintf($SUPP_PLAYER_URL, $id);
-		$content = scrape({url => $supp_url});
+		$content = scrape({url => $supp_url, retries => $opts->{retries}});
 		if ($content =~ /Draft:.*(\d{4}) (\S{3}), (\d+)\S\S rd, .* pk \((\d+)\D+ overall\)/) {
 			$json->{draftyear} = $1+0;
 			$json->{draftteam} = $2;
@@ -325,6 +367,73 @@ sub crawl_player ($;$$$) {
 	}
 	write_file(encode_json($json), $file);
 	$file;
+}
+
+sub crawl_rotoworld_injuries (;$) {
+
+	my $opts = shift || {};
+	my $injuries = [];
+	$ENV{HOCKEYDB_DEBUG} = 1;
+	for (my $i = 331; $i <= 481; $i += 5) {
+		my $roto_file = sprintf(
+			"%s/%s/roto/%d/%d-roto.html",
+			$REPORTS_DIR,
+			$CURRENT_SEASON,
+			$i,
+			strftime("%Y%m%d", localtime(time)),
+		);
+		my $roto_team;
+		if (-f $roto_file && -M $roto_file < $ROTOFILE_EXPIRATION && !$opts->{force}) {
+			$roto_team = read_file($roto_file);
+		}
+		else {
+			my $_url = sprintf($ROTOWORLD_URL, $i);
+			$roto_team = scrape({ url => $_url });
+			write_file($roto_team, $roto_file);
+		}
+		my $code = JSON->new();
+		$code->utf8(1);
+		my $roto_js = $code->decode($roto_team);
+		next unless @{$roto_js->{data}};
+		my %included = ();
+		for my $include (@{$roto_js->{included}}) {
+			$included{$include->{attributes}{uuid}} = $include;
+		}
+		for my $data (@{$roto_js->{data}}) {
+			my $injury = {};
+			$injury->{injury_status} =
+				uc($data->{attributes}{return_estimate} || 'UNKNOWN');
+			my $injury_type   = $data->{relationships}{injury_type}{data}{id};
+			$injury->{injury_type}   =
+				uc($included{$injury_type}->{attributes}{name} || 'UNKNOWN');
+			my $injury_player = $data->{relationships}{player}{data}{id};
+			$injury->{player_name}   = uc $included{$injury_player}->{attributes}{name};
+			#dumper \%included;
+			my $roto_team_file = dirname($roto_file) . '/team';
+			if (-f $roto_team_file) {
+				$injury->{team} = read_file($roto_team_file);
+				chomp $injury->{team};
+			}
+			else {
+				my $injury_team = $included{$injury_player}->{relationships}{team}{data}{id};
+				if (!$included{$injury_team}) {
+					my $url = sprintf($ROTOWORLD_TEAM_URL, $injury_team);
+					my $team_js = scrape({ url => $url });
+					my $team = $code->decode($team_js);
+					$included{$injury_team} = resolve_team($team->{data}{attributes}{name});
+					write_file($included{$injury_team}, $roto_team_file);
+				}
+				$injury->{team} = $included{$injury_team};
+			}
+			push(@{$injuries}, $injury);
+		}
+	}
+	$injuries;
+}
+
+sub crawl_injured_players () {
+
+	goto &crawl_rotoworld_injuries;
 }
 
 1;

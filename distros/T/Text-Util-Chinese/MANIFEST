@@ -14,4 +14,5 @@ t/extract-presuf.t
 t/extract-words.t
 t/grep_iterator.t
 t/phrase_iterator.t
+t/sentence_iterator.t
 t/tokenize_by_script.t

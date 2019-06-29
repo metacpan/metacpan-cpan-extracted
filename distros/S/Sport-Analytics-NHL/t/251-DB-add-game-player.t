@@ -10,11 +10,12 @@ use Storable;
 
 use JSON;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars
+	qw($MONGO_DB $IS_AUTHOR $DEFAULT_PLAYERFILE_EXPIRATION);
 use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Scraper;
+use Sport::Analytics::NHL::Util qw(:debug :times);
+use Sport::Analytics::NHL::Scraper qw(crawl_player);
+use Sport::Analytics::NHL::Populator qw(create_player_id_hash);
 use Sport::Analytics::NHL::Report::Player;
 use Sport::Analytics::NHL;
 
@@ -26,7 +27,7 @@ if ($ENV{HOCKEYDB_NODB} || ! $MONGO_DB) {
 }
 plan qw(no_plan);
 test_env();
-
+$DEFAULT_PLAYERFILE_EXPIRATION = 0;
 my $db = Sport::Analytics::NHL::DB->new();
 $ENV{HOCKEYDB_DEBUG} = $IS_AUTHOR;
 my $hdb = Sport::Analytics::NHL->new();
@@ -57,6 +58,7 @@ for (201120010, 193020010) {
 		Sport::Analytics::NHL::DB::set_player_statuses($player, $player_game, $boxscore, $team);
 		Sport::Analytics::NHL::DB::set_player_teams($player, $boxscore, $team);
 		Sport::Analytics::NHL::DB::set_injury_history($player, $boxscore, 'OK');
+		delete $player_db->{updated};
 		is_deeply($player_db, $player, 'player inserted');
 	}
 }

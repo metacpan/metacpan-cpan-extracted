@@ -28,12 +28,12 @@ use FindBin;
 
 our $OLD_LIBXML = grep { /OLD_LIBXML/ } @ARGV;
 our $NOMKTEXLSR = grep { /NOMKTEXLSR/ } @ARGV;
-our $TEXMF;
+our $KPSE_TOOLCHAIN = "";
+our ($KPSEV, $TEXMF);
 my ($texmfspec) = grep { /^TEXMF/ } @ARGV;
 if ($texmfspec && $texmfspec =~ /^TEXMF\s*=(.*)$/) {
   $TEXMF = $1;
-  @ARGV = grep { $_ ne $texmfspec } @ARGV;    # Remove so MakeMaker doesn't fret.
-}
+  @ARGV  = grep { $_ ne $texmfspec } @ARGV; }    # Remove so MakeMaker doesn't fret.
 our @EXCLUSIONS     = ();
 our $MORE_MACROS    = {};
 our $MORE_MAKERULES = '';
@@ -44,10 +44,10 @@ install_TeXStyles();
 extra_Tests();
 
 WriteMakefile(NAME => 'LaTeXML',
-  AUTHOR             => 'Bruce Miller <bruce.miller@nist.gov>',
-  ABSTRACT           => "transforms TeX and LaTeX into XML/HTML/MathML",
-  VERSION_FROM       => 'lib/LaTeXML.pm',
-  MIN_PERL_VERSION   => 5.010001,
+  AUTHOR           => 'Bruce Miller <bruce.miller@nist.gov>',
+  ABSTRACT         => "transforms TeX and LaTeX into XML/HTML/MathML",
+  VERSION_FROM     => 'lib/LaTeXML.pm',
+  MIN_PERL_VERSION => 5.010001,
   # A very restricted set of licenses are allowed here. No Creative Commons, eg.!
   # The tag open_source should be an Open Source Initiative approved license;
   # public domain is sorta included. See http://opensource.org/faq#public-domain
@@ -64,11 +64,11 @@ WriteMakefile(NAME => 'LaTeXML',
     'IO::String'        => 0,
     'JSON::XS'          => 0,
     'LWP'               => 0,
-    'MIME::Base64'      => 0,   # Core
+    'MIME::Base64'      => 0,      # Core
     'Parse::RecDescent' => 0,
-    'Pod::Parser'       => 0,   # for Pod::Find
+    'Pod::Parser'       => 0,      # for Pod::Find
     'Text::Unidecode'   => 0,
-    'Test::More'        => 0,   # part of Test::Simple
+    'Test::More'        => 0,      # part of Test::Simple
     'Time::HiRes'       => 0,
     'URI'               => 0,
     'version'           => 0,
@@ -86,13 +86,13 @@ WriteMakefile(NAME => 'LaTeXML',
   macro => $MORE_MACROS,
   # link to  github location to newer MakeMaker
   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
-   'meta-spec' => { version => 2 },
-   resources => {
-     repository => {
-       type => 'git',
-       url => 'https://github.com/brucemiller/LaTeXML.git',
-       web => 'https://github.com/brucemiller/LaTeXML'}}})
-    : () ),
+        'meta-spec' => { version => 2 },
+        resources   => {
+          repository => {
+            type => 'git',
+            url  => 'https://github.com/brucemiller/LaTeXML.git',
+            web  => 'https://github.com/brucemiller/LaTeXML' } } })
+    : ()),
 );
 
 print STDERR ('=' x 55), "\n",
@@ -101,21 +101,6 @@ print STDERR ('=' x 55), "\n",
   "| To install:\n",
   "|    ln -s ../../tools/pre-commit .git/hooks\n",
   ('=' x 55), "\n" unless -x '.git/hooks/pre-commit';
-#**********************************************************************
-# Overriding ExtUtils::MM methods
-#**********************************************************************
-# Exclude the sources used to generate others from the build (See below).
-sub MY::libscan {
-  my ($self, $path) = @_;
-  if (($path =~ /~$/) || grep { $path eq $_ } @EXCLUSIONS) {
-    return ""; }
-  return $self->MY::SUPER::libscan($path); }
-
-# Append any additional Makefile rules added by the following.
-sub MY::postamble {
-  my ($self, @rules) = @_;
-  return $self->MY::SUPER::postamble(@rules) . $MORE_MAKERULES; }
-
 #**********************************************************************
 # Special Cases
 #**********************************************************************
@@ -135,7 +120,8 @@ sub record_revision {
   ## This command is appropriate for svn
   ##  $$MORE_MACROS{REVISION} = '$(shell svnversion $(REVISION_BASE))';
   ## This command is appropriate for git (I think)
-  if ((-d '.git') && (system("git --version") == 0) ) {    # If a git checkout & can run git?
+  if ((-d '.git') && (system("git --version") == 0)) {    # If a git checkout & can run git?
+    print STDERR "\n";                                    # space out messages
     $$MORE_MACROS{REVISION} = '$(shell git log --max-count=1 --abbrev-commit --pretty="%h")'; }
   # Extract the previously recorded revision from the revision file (awkward)
   $$MORE_MACROS{OLD_REVISION}
@@ -167,7 +153,7 @@ RecordRevision
 #======================================================================
 # We'll compile the RecDescent grammar during make; don't need to install grammar.
 sub compile_MathGrammar {
-  push(@EXCLUSIONS, 'blib/lib/LaTeXML/MathGrammar');
+  push(@EXCLUSIONS, 'README.pod', 'blib/lib/LaTeXML/MathGrammar');
   $MORE_MAKERULES .= <<'MakeGrammar';
 
 # Precompile the (Recursive Descent) MathGrammar
@@ -215,8 +201,10 @@ MakeGrammar
 #    embedded spaces.
 sub install_TeXStyles {
   if (!$TEXMF) {
-    if (system("kpsewhich --expand-var='\$TEXMFLOCAL'") == 0) {    # can run kpsewhich?
-      $TEXMF = `kpsewhich --expand-var='\$TEXMFLOCAL'`;
+    if ($ENV{"APPVEYOR"}) {    # assume miktex admin on windows CI
+      $KPSE_TOOLCHAIN = "--miktex-admin"; }
+    if (system("kpsewhich --version $KPSE_TOOLCHAIN") == 0) {    # can run kpsewhich?
+      $TEXMF = `kpsewhich --expand-var='\$TEXMFLOCAL' $KPSE_TOOLCHAIN`;
       # Strip the quotes (they appear in windows, when spaces in pathnames(?))
       # These quotes inhibit pasting pathnames togheter,
       # but we DO need to wrap quotes around all completed paths!!
@@ -248,8 +236,8 @@ uninstall ::
 
 InstallTeXStyles
 
-  if(! $NOMKTEXLSR){
-  $MORE_MAKERULES .= <<'InstallTeXStyles';
+  if (!$NOMKTEXLSR) {
+    $MORE_MAKERULES .= <<'InstallTeXStyles';
 pure_install ::
 	$(NOECHO) ($(PERLRUN) -e "exit(1) if -w shift;" -- "$(INSTALLTEXMFBASEDIR)" || mktexlsr) \
 	||   echo "No write permission for $(INSTALLTEXMFBASEDIR), skipping mktexlsr"
@@ -259,7 +247,7 @@ uninstall ::
 	||   echo "No write permission for $(INSTALLTEXMFBASEDIR), skipping mktexlsr"
 
 InstallTeXStyles
-}
+  }
   return; }
 
 #======================================================================
@@ -277,4 +265,21 @@ extratest ::
 ExtraTests
   return; }
 
+#**********************************************************************
+# Overriding ExtUtils::MM methods
+#**********************************************************************
+package MY;
+# Exclude the sources used to generate others from the build (See below).
+sub libscan {
+  my ($self, $path) = @_;
+  if (($path =~ /~$/) || grep { $path eq $_ } @EXCLUSIONS) {
+    return ""; }
+  return $self->MY::SUPER::libscan($path); }
+
+# Append any additional Makefile rules added by the following.
+sub postamble {
+  my ($self, @rules) = @_;
+  return $self->MY::SUPER::postamble(@rules) . $MORE_MAKERULES; }
+
+1;
 #======================================================================

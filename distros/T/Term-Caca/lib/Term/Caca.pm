@@ -1,11 +1,10 @@
 package Term::Caca;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: perl interface for libcaca (Colour AsCii Art library)
-$Term::Caca::VERSION = '3.0.1';
+$Term::Caca::VERSION = '3.1.0';
 use 5.20.0;
-use strict;
-use warnings;
-no warnings qw/ uninitialized /;
+
+use Moo;
 
 use Carp;
 use List::MoreUtils qw/ uniq /;
@@ -23,9 +22,6 @@ use Term::Caca::Event::Mouse::Button::Release;
 use Term::Caca::Event::Resize;
 use Term::Caca::Event::Quit;
 
-use Moose;
-
-use MooseX::Attribute::Chained;
 
 use MooseX::MungeHas { 
     has_ro => [ 'is_ro' ], 
@@ -61,20 +57,23 @@ has_ro display =>
 has_ro canvas => sub($self) { caca_get_canvas($self->display) };
 
 has_rw title => (
-    traits => [ 'Chained' ],
     trigger => sub($self,$title) {
         caca_set_display_title($self->display, $title);
     }
 );
 
 has_rw refresh_delay => (
-    traits => [ 'Chained' ],
     trigger => sub($self,$seconds) {
         caca_set_display_time($self->display,int( $seconds * 1_000_000 ));
     }
 );
 
-sub refresh ($self) { 
+around [qw( title refresh_delay )] => sub ($orig, $self, @rest) {
+    $self->$orig(@rest);
+    return $self;
+};
+
+sub refresh ($self) {
     caca_refresh_display($self->display);
     return $self 
 }
@@ -300,7 +299,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 SYNOPSIS
 

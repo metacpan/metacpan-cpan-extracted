@@ -9,9 +9,9 @@ use Test::More;
 
 use JSON qw(decode_json);
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB);
+use Sport::Analytics::NHL::Tools qw(:schedule);
+use Sport::Analytics::NHL::Util qw(:file);
 use Sport::Analytics::NHL::Test;
 use Sport::Analytics::NHL::DB;
 
@@ -22,7 +22,7 @@ if ($ENV{HOCKEYDB_NODB} || ! $MONGO_DB) {
 	plan skip_all => 'Mongo not defined';
 	exit;
 }
-plan tests => 2;
+plan tests => 3;
 
 my @dates = (19310303, 20161103, 20180109);
 my $db = Sport::Analytics::NHL::DB->new();
@@ -49,5 +49,7 @@ for my $game (@games) {
 	test_game_date($game->{date}, 'game date YYYYMMDD');
 }
 
-$db->{dbh}->get_collection('schedule')->drop();
+@games = get_games_from_schedule(201620003, 201620004);
+is(scalar(@games), 2, 'two games retrieved');
+$db->get_collection('schedule')->drop();
 summarize_tests();

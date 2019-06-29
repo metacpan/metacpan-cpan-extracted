@@ -174,12 +174,13 @@ sub rendered {
   my ($self, $status) = @_;
 
   # Make sure we have a status
-  my $res = $self->res;
-  $res->code($status || 200) if $status || !$res->code;
+  $self->res->code($status) if $status;
 
   # Finish transaction
   my $stash = $self->stash;
   if (!$stash->{'mojo.finished'} && ++$stash->{'mojo.finished'}) {
+    my $res = $self->res;
+    $res->code(200) if !$status && !$res->code;
 
     # Disable auto rendering and stop timer
     my $app = $self->render_later->app;
@@ -810,7 +811,7 @@ You can also use the helper L<Mojolicious::Plugin::DefaultHelpers/"url_with">
 to inherit query parameters from the current request.
 
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
-  $c->url_with->query([page => 2]);
+  $c->url_with->query({page => 2});
 
 =head2 write
 

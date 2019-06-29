@@ -1,5 +1,4 @@
 package Data::TableReader;
-$Data::TableReader::VERSION = '0.010';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -9,6 +8,7 @@ use Data::TableReader::Field;
 use Data::TableReader::Iterator;
 
 # ABSTRACT: Extract records from "dirty" tabular data sources
+our $VERSION = '0.011'; # VERSION
 
 
 has input               => ( is => 'rw', required => 1 );
@@ -495,7 +495,7 @@ sub iterator {
 	my @row_slice; # one column index per field, and possibly more for array_val_map
 	my @arrayvals; # list of source index and destination index for building array values
 	my @field_names; # ordered list of field names where row slice should be assigned
-	my @trim_idx;  # list of array indicies which should be whitespace-trimmed.
+	my %trimmer;   # list of trim functions and the array indicies they should be applied to
 	my @blank_val; # blank value per each fetched column
 	my @type_check;# list of 
 	my $class;     # optional object class for the resulting rows
@@ -523,7 +523,10 @@ sub iterator {
 	for (0 .. $#row_slice) {
 		if (!ref $row_slice[$_]) {
 			my $field= $col_map->[$row_slice[$_]];
-			push @trim_idx, $_ if $field->trim;
+			if (my $t= $field->trim_coderef) {
+				$trimmer{$t} ||= [ $t, [] ];
+				push @{ $trimmer{$t}[1] }, $_;
+			}
 			push @blank_val, $field->blank;
 			push @type_check, $self->_make_validation_callback($field, $_)
 				if $field->type;
@@ -538,13 +541,17 @@ sub iterator {
 			push @arrayvals, [ $_, $from, scalar @$src ];
 			for ($from .. $#row_slice) {
 				my $field= $col_map->[$row_slice[$_]];
-				push @trim_idx, $_ if $field->trim;
+				if (my $t= $field->trim_coderef) {
+					$trimmer{$t} ||= [ $t, [] ];
+					push @{ $trimmer{$t}[1] }, $_;
+				}
 				push @blank_val, $field->blank;
 				push @type_check, $self->_make_validation_callback($field, $_)
 					if $field->type;
 			}
 		}
 	}
+	my @trim= values %trimmer;
 	@arrayvals= reverse @arrayvals;
 	my ($n_blank, $first_blank, $eof);
 	my $sub= sub {
@@ -553,9 +560,8 @@ sub iterator {
 		my $row= !$eof && $data_iter->(\@row_slice)
 			or ++$eof && return undef;
 		# Apply 'trim' to any column whose field requested it
-		for (grep { defined } @{$row}[@trim_idx]) {
-			$_ =~ s/\s+$//;
-			$_ =~ s/^\s+//;
+		for my $t (@trim) {
+			$t->[0]->() for grep defined, @{$row}[@{$t->[1]}];
 		}
 		# Apply 'blank value' to every column which is zero length
 		$n_blank= 0;
@@ -689,7 +695,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -712,11 +718,11 @@ but there's plenty of options to choose from...
     
     # We want these fields to exist in the file (identified by headers)
     fields => [
-      { name => 'address', header => qw/street|address/i },
+      { name => 'address', header => qr/street|address/i },
       'city',
       'state',
       # can validate with Type::Tiny classes
-      { name => 'zip', header => qw/zip\b|postal/i, type => US_Zipcode },
+      { name => 'zip', header => qr/zip\b|postal/i, type => US_Zipcode },
     ],
     
     # Our data provider is horrible; just ignore any nonsense we encounter
@@ -733,13 +739,13 @@ but there's plenty of options to choose from...
 
 =head1 DESCRIPTION
 
-This module is designed to be a useful for anyone who needs to take "loose"
-or "dirty" tabular data sources (such as Excel, CSV, TSV, or HTML) which may
-have been edited by non-technical humans and extract the data into sanitized
-records, while also verifying that the data file contains roughly the schema
-you were expecting.  It is primarily intended for making automated imports
-of data from non-automated or unstable sources, and providing human-readable
-feedback about the validity of the data file.
+This module is designed to take "loose" or "dirty" tabular data sources
+(such as Excel, CSV, TSV, or HTML) which may have been edited by non-technical
+humans and extract the data into sanitized records, while also verifying that
+the data file contains roughly the schema you were expecting.  It is primarily
+intended for making automated imports of data from non-automated or unstable
+sources, and providing human-readable feedback about the validity of the data
+file.
 
 =head1 ATTRIBUTES
 
@@ -774,9 +780,13 @@ Examples:
 
 =head2 fields
 
-An arrayref of L<Data::TableReader::Field> objects (or hashrefs to
-construct them with) which this module should search for within the tables
-(worksheets etc.) of L</input>.
+An arrayref of L<Data::TableReader::Field> objects which this module should
+search for within the tables (worksheets etc.) of L</input>.
+
+If an element of this array is a hashref or string, it will be coerced to an
+instance of L<Data::TableReader::Field>, with plain strings becoming the
+C<name> attribute.  See L<Data::TableReader::Field/header> for how names are
+automatically converted to the header-matching regex.
 
 =head2 record_class
 

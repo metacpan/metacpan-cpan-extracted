@@ -23,5 +23,5 @@ requires:
   ExtUtils::MakeMaker: '7.12'
   ExtUtils::ParseXS: '3.24'
   perl: '5.010000'
-version: v1.1.4
+version: v1.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

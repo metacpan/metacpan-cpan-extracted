@@ -1,15 +1,11 @@
 package Term::Caca::Event::Mouse::Motion;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: event triggered by mouse movements.
-$Term::Caca::Event::Mouse::Motion::VERSION = '3.0.1';
-use strict;
-use warnings;
-
-use Term::Caca;
-
-use Moose;
+$Term::Caca::Event::Mouse::Motion::VERSION = '3.1.0';
+use Moo;
 extends 'Term::Caca::Event';
 
+use Term::Caca;
 
 has x => 
     is => 'ro',
@@ -40,7 +36,7 @@ Term::Caca::Event::Mouse::Motion - event triggered by mouse movements.
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 AUTHORS
 

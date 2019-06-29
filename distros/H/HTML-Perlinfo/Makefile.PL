@@ -16,8 +16,11 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => ["perlinfo"],
   "LICENSE" => "perl",
   "NAME" => "HTML::Perlinfo",
-  "PREREQ_PM" => {'CGI' => 0},
-  "VERSION" => "1.69",
+  "PREREQ_PM" => {
+    'CGI::Deurl' => 0,
+    'HTML::Entities' => 0,
+   },
+  "VERSION" => "1.71",
   "test" => {
     "TESTS" => "t/*.t"
   }

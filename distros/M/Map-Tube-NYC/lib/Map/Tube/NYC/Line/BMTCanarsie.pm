@@ -1,6 +1,6 @@
 package Map::Tube::NYC::Line::BMTCanarsie;
 
-$Map::Tube::NYC::Line::BMTCanarsie::VERSION   = '0.66';
+$Map::Tube::NYC::Line::BMTCanarsie::VERSION   = '0.68';
 $Map::Tube::NYC::Line::BMTCanarsie::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::NYC::Line::BMTCanarsie - NYC Subway Map: BMT Canarsie Line.
 
 =head1 VERSION
 
-Version 0.66
+Version 0.68
 
 =head1 DESCRIPTION
 
@@ -117,7 +117,7 @@ L<http://search.cpan.org/dist/Map-Tube-NYC/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2016 Mohammad S Anwar.
+Copyright (C) 2014 - 2019 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the   terms  of the the Artistic License (2.0). You may obtain a copy of the full

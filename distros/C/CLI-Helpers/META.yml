@@ -40,10 +40,10 @@ requires:
 resources:
   homepage: https://github.com/reyjrar/CLI-Helpers
   repository: https://github.com/reyjrar/CLI-Helpers.git
-version: '1.4'
+version: '1.6'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
@@ -307,7 +307,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -319,11 +319,11 @@ x_Dist_Zilla:
           git_version: 2.21.0
           repo_root: .
       name: Git::NextVersion
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: OurPkgVersion
-      version: '0.12'
+      version: '0.20'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -341,7 +341,7 @@ x_Dist_Zilla:
           git_version: 2.21.0
           repo_root: .
       name: Git::Check
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
@@ -363,7 +363,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -376,7 +376,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Commit_Dirty_Files
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -384,16 +384,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.4
+          tag: v1.6
           tag_format: v%v
-          tag_message: v%v
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
@@ -403,7 +403,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -416,7 +416,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Commit_Changes
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -428,7 +428,7 @@ x_Dist_Zilla:
           git_version: 2.21.0
           repo_root: .
       name: Git::Push
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -478,5 +478,5 @@ x_contributors:
   - 'Kang-min Liu <gugod@gugod.org>'
   - 'Kevin M. Goess <kgoess@craigslist.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_generated_by_perl: v5.26.0
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

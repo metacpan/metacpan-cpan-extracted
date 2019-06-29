@@ -8,8 +8,8 @@ use experimental qw(smartmatch);
 use Test::More tests => 5;
 
 use Sport::Analytics::NHL::Report::BS;
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Config qw(:basic);
+use Sport::Analytics::NHL::Util qw(:file);
 
 my $report;
 $report = Sport::Analytics::NHL::Report::BS->new(

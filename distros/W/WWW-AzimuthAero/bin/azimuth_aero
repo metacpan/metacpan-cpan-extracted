@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package azimuth_aero;
-$azimuth_aero::VERSION = '0.2';
+$azimuth_aero::VERSION = '0.31';
 
 # ABSTRACT: CLI tool for getting lowest prices from https://azimuth.aero/
 
@@ -45,7 +45,7 @@ azimuth_aero - CLI tool for getting lowest prices from https://azimuth.aero/
 
 =head1 VERSION
 
-version 0.2
+version 0.31
 
 =head1 SYNOPSIS
 

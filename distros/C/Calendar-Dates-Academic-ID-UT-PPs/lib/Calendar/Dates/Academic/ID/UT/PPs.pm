@@ -1,7 +1,7 @@
 package Calendar::Dates::Academic::ID::UT::PPs;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 use Role::Tiny::With;
 
-with 'Calendar::DatesRoles::DataPreparer::CalendarVar::FromData';
+with 'Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple';
 with 'Calendar::DatesRoles::DataUser::CalendarVar';
 
 1;
@@ -25,7 +25,7 @@ Calendar::Dates::Academic::ID::UT::PPs - Academic calendar of Universitas Terbuk
 
 =head1 VERSION
 
-This document describes version 0.002 of Calendar::Dates::Academic::ID::UT::PPs (from Perl distribution Calendar-Dates-Academic-ID-UT-PPs), released on 2019-02-15.
+This document describes version 0.003 of Calendar::Dates::Academic::ID::UT::PPs (from Perl distribution Calendar-Dates-Academic-ID-UT-PPs), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Calendar-D
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com///github.com/perlancar/perl-Calendar-Dates-Academic-ID-UT-PPs>.
+Source repository is at L<https://github.com/perlancar/perl-Calendar-Dates-Academic-ID-UT-PPs>.
 
 =head1 BUGS
 

@@ -1,8 +1,9 @@
 package Telegram::Bot::Object::PhotoSize;
-$Telegram::Bot::Object::PhotoSize::VERSION = '0.010';
+$Telegram::Bot::Object::PhotoSize::VERSION = '0.012';
 # ABSTRACT: The base class for Telegram message 'PhotoSize' type.
 
 use Mojo::Base 'Telegram::Bot::Object::Base';
+use Carp qw/croak/;
 
 has 'file_id';
 has 'width';
@@ -21,7 +22,10 @@ sub fields {
 sub as_hashref {
   my $self = shift;
   my $hash = {};
-  $hash->{photo} = { file => $self->image } if ($self->image);
+  if ($self->image) {
+    croak "no such file '". $self->image . "'." unless -e $self->image;
+    $hash->{photo} = { file => $self->image };
+  }
 
   return $hash;
 }
@@ -44,7 +48,7 @@ Telegram::Bot::Object::PhotoSize - The base class for Telegram message 'PhotoSiz
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 AUTHOR
 

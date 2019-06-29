@@ -1,3 +1,9 @@
+0.601   2019-06-25 (PERLANCAR)
+
+	- Add argument 'summaries' to complete_array_elem() and
+	  complete_hash_key().
+
+
 0.600   2017-12-08 (PERLANCAR)
 
 	- [ux] Do prefix char-mode matching before char-mode matching, this

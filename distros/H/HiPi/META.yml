@@ -8,7 +8,7 @@ configure_requires:
   Module::Build: '0'
   perl: v5.14.0
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,55 +22,55 @@ no_index:
 provides:
   HiPi:
     file: lib/HiPi.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Class:
     file: lib/HiPi/Class.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Constant:
     file: lib/HiPi/Constant.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Device:
     file: lib/HiPi/Device.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Device::GPIO:
     file: lib/HiPi/Device/GPIO.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Device::GPIO::Pin:
     file: lib/HiPi/Device/GPIO/Pin.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Device::I2C:
     file: lib/HiPi/Device/I2C.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Device::OneWire:
     file: lib/HiPi/Device/OneWire.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Device::SPI:
     file: lib/HiPi/Device/SPI.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Device::SerialPort:
     file: lib/HiPi/Device/SerialPort.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Energenie:
     file: lib/HiPi/Energenie.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Energenie::Command:
     file: lib/HiPi/Energenie/Command.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Energenie::ENER314:
     file: lib/HiPi/Energenie/ENER314.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Energenie::ENER314_RT:
     file: lib/HiPi/Energenie/ENER314_RT.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::GPIO:
     file: lib/HiPi/GPIO.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::GPIO::Pin:
     file: lib/HiPi/GPIO/Pin.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Graphics::BitmapFont:
     file: lib/HiPi/Graphics/BitmapFont.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Graphics::BitmapFont::Mono10:
     file: lib/HiPi/Graphics/BitmapFont/Mono10.pm
     version: '0.01'
@@ -298,81 +298,81 @@ provides:
     version: '0.01'
   HiPi::Graphics::DrawingContext:
     file: lib/HiPi/Graphics/DrawingContext.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Graphics::Font5x7:
     file: lib/HiPi/Graphics/Font5x7.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Huawei::E3531:
     file: lib/HiPi/Huawei/E3531.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Huawei::Errors:
     file: lib/HiPi/Huawei/Errors.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Huawei::HiLink:
     file: lib/HiPi/Huawei/HiLink.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Huawei::Modem:
     file: lib/HiPi/Huawei/Modem.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface:
     file: lib/HiPi/Interface.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::Common::HD44780:
     file: lib/HiPi/Interface/Common/HD44780.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::Common::MCP23X17:
     file: lib/HiPi/Interface/Common/MCP23X17.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::Common::MIHomeAdapter:
     file: lib/HiPi/Interface/Common/MIHomeAdapter.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::DS18X20:
     file: lib/HiPi/Interface/DS18X20.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::ENER002:
     file: lib/HiPi/Interface/ENER002.pm
     version: '0.59'
   HiPi::Interface::EPaper:
     file: lib/HiPi/Interface/EPaper.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::DisplayBuffer:
     file: lib/HiPi/Interface/EPaper/DisplayBuffer.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::PartialContext:
     file: lib/HiPi/Interface/EPaper/DisplayBuffer.pm
   HiPi::Interface::EPaper::Pimoroni::EPDInkyPHAT_V2:
     file: lib/HiPi/Interface/EPaper/Pimoroni/EPDInkyPHAT_V2.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::TypeA:
     file: lib/HiPi/Interface/EPaper/TypeA.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::TypeB:
     file: lib/HiPi/Interface/EPaper/TypeB.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::Waveshare::EPD152X152:
     file: lib/HiPi/Interface/EPaper/Waveshare/EPD152X152.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::Waveshare::EPD200X200:
     file: lib/HiPi/Interface/EPaper/Waveshare/EPD200X200.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::Waveshare::EPD200X200B:
     file: lib/HiPi/Interface/EPaper/Waveshare/EPD200X200B.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::Waveshare::EPD212X104:
     file: lib/HiPi/Interface/EPaper/Waveshare/EPD212X104.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::Waveshare::EPD250X122:
     file: lib/HiPi/Interface/EPaper/Waveshare/EPD250X122.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::Waveshare::EPD296X128:
     file: lib/HiPi/Interface/EPaper/Waveshare/EPD296X128.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EPaper::Waveshare::EPD296X128B:
     file: lib/HiPi/Interface/EPaper/Waveshare/EPD296X128B.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::EnergenieSwitch:
     file: lib/HiPi/Interface/EnergenieSwitch.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::HTADCI2C:
     file: lib/HiPi/Interface/HTADCI2C.pm
     version: '0.59'
@@ -381,31 +381,31 @@ provides:
     version: '0.59'
   HiPi::Interface::HobbyTronicsADC:
     file: lib/HiPi/Interface/HobbyTronicsADC.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::HobbyTronicsBackpackV2:
     file: lib/HiPi/Interface/HobbyTronicsBackpackV2.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::HopeRF69:
     file: lib/HiPi/Interface/HopeRF69.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::IS31FL3730:
     file: lib/HiPi/Interface/IS31FL3730.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::LCDBackpackPCF8574:
     file: lib/HiPi/Interface/LCDBackpackPCF8574.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MAX7219:
     file: lib/HiPi/Interface/MAX7219.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MAX7219LEDStrip:
     file: lib/HiPi/Interface/MAX7219LEDStrip.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MCP23017:
     file: lib/HiPi/Interface/MCP23017.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MCP23S17:
     file: lib/HiPi/Interface/MCP23S17.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MCP3004:
     file: lib/HiPi/Interface/MCP3004.pm
     version: '0.59'
@@ -414,84 +414,84 @@ provides:
     version: '0.59'
   HiPi::Interface::MCP3ADC:
     file: lib/HiPi/Interface/MCP3ADC.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MCP49XX:
     file: lib/HiPi/Interface/MCP49XX.pm
     version: '0.59'
   HiPi::Interface::MCP4DAC:
     file: lib/HiPi/Interface/MCP4DAC.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MFRC522:
     file: lib/HiPi/Interface/MFRC522.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MPL3115A2:
     file: lib/HiPi/Interface/MPL3115A2.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MS5611:
     file: lib/HiPi/Interface/MS5611.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MicroDotPHAT:
     file: lib/HiPi/Interface/MicroDotPHAT.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MicroDotPHAT::Font:
     file: lib/HiPi/Interface/MicroDotPHAT/Font.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MonoOLED:
     file: lib/HiPi/Interface/MonoOLED.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::MonoOLED::DisplayBuffer:
     file: lib/HiPi/Interface/MonoOLED/DisplayBuffer.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::PCA9544:
     file: lib/HiPi/Interface/PCA9544.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::PCA9685:
     file: lib/HiPi/Interface/PCA9685.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::PCF8574:
     file: lib/HiPi/Interface/PCF8574.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::SerLCD:
     file: lib/HiPi/Interface/SerLCD.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::Si470N:
     file: lib/HiPi/Interface/Si470N.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::TMP102:
     file: lib/HiPi/Interface/TMP102.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Interface::ZeroSeg:
     file: lib/HiPi/Interface/ZeroSeg.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Pin:
     file: lib/HiPi/Pin.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::RF::OpenThings:
     file: lib/HiPi/RF/OpenThings.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::RF::OpenThings::Message:
     file: lib/HiPi/RF/OpenThings/Message.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::RF::OpenThings::Message::Record:
     file: lib/HiPi/RF/OpenThings/Message.pm
   HiPi::RaspberryPi:
     file: lib/HiPi/RaspberryPi.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Utils:
     file: lib/HiPi/Utils.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Utils::BitBuffer:
     file: lib/HiPi/Utils/BitBuffer.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Utils::Config:
     file: lib/HiPi/Utils/Config.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Utils::Exec:
     file: lib/HiPi/Utils/Exec.pm
-    version: '0.77'
+    version: '0.78'
   HiPi::Utils::OLEDFont:
     file: lib/HiPi/Utils/OLEDFont.pm
-    version: '0.77'
+    version: '0.78'
 requires:
   Bit::Vector: '0'
   Device::SerialPort: '0'
@@ -509,5 +509,5 @@ requires:
 resources:
   homepage: http://raspberry.znix.com/
   license: http://dev.perl.org/licenses/
-version: '0.77'
+version: '0.78'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

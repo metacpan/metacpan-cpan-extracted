@@ -1,12 +1,7 @@
 package Dist::Zilla::Stash::Contributors;
-BEGIN {
-  $Dist::Zilla::Stash::Contributors::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Dist::Zilla::Stash::Contributors::VERSION = '0.1.0';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Stash containing list of contributors
-
+$Dist::Zilla::Stash::Contributors::VERSION = '0.1.1';
 use strict;
 use warnings;
 
@@ -58,13 +53,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dist::Zilla::Stash::Contributors - Stash containing list of contributors
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.1
 
 =head1 SYNOPSIS
 
@@ -141,7 +138,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2019, 2013 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

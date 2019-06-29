@@ -13,10 +13,10 @@ use Storable;
 
 use List::MoreUtils qw(uniq);
 
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Config qw(:all);
+use Sport::Analytics::NHL::Vars qw(:test $IS_AUTHOR);
+use Sport::Analytics::NHL::Util qw(:debug);
+use Sport::Analytics::NHL::Tools qw(:parser :path);
 use Sport::Analytics::NHL::Errors;
 
 =head1 NAME
@@ -455,7 +455,8 @@ sub is_unapplicable ($) {
 	my $data = shift;
 
 	$THIS_SEASON < (
-		$DATA_BY_SEASON{$data} || $STAT_RECORD_FROM{$data} || $data
+		$DATA_BY_SEASON{$data}->{season} ||
+		$STAT_RECORD_FROM{$data} || $data
 	) || $EVENT && $EVENT->{time} eq '00:00' && $EVENT->{period} < 2;
 };
 
@@ -540,7 +541,7 @@ sub test_team_header ($;$) {
 	test_team_code($team->{name},  'team name ok')
 		unless $opts->{es} || $opts->{gs} || $opts->{ro};
 	test_name(     $team->{coach}, 'team coach ok')
-		unless $opts->{es} || $opts->{gs};
+		unless $opts->{es} || $opts->{gs} || $opts->{ti};
 	my_like($team->{shots}, qr/^\d{1,2}$/, 'shots a number') if $opts->{bs};
 	my_like($team->{score}, qr/^1?\d$/, 'goals < 20');
 	my_like($team->{pull},  qr/^1|0$/, 'goalie either pulled or not') if $opts->{bs};
@@ -584,13 +585,15 @@ sub test_player ($;$) {
 	my $opts   = shift || {};
 
 	my @stats = set_tested_stats($player, $opts);
+#	dumper $player;
 	test_position($player->{position}, 'roster position ok');
+	return if $player->{_id} && $BROKEN_PLAYERS{BS}{$BOXSCORE->{_id}} && $BROKEN_PLAYERS{BS}{$BOXSCORE->{_id}}->{$player->{_id}} && $BROKEN_PLAYERS{BS}{$BOXSCORE->{_id}}->{$player->{_id}}{_notest};
 	for my $stat (@stats) {
 		next if is_unapplicable($STAT_RECORD_FROM{$stat})
-			|| $player->{position} eq 'G' && $opts->{es};
-		if (! defined $player->{$stat}) {print Dumper $stat, $player;exit;}
+			|| $player->{position} eq 'G' && ($opts->{es} || ! $player->{timeOnIce});
+		if (! defined $player->{$stat}) {dumper $stat, $player;exit;}
 		$stat =~ /timeonice/i ?
-			$opts->{es} || $opts->{gs} ?
+			$player->{toi_converted} || $opts->{es} || $opts->{gs} || $BROKEN_PLAYERS{BS}{$BOXSCORE->{_id}} && $BROKEN_PLAYERS{BS}{$BOXSCORE->{_id}}->{$player->{_id}} && $BROKEN_PLAYERS{BS}{$BOXSCORE->{_id}}->{$player->{_id}}{number} ?
 				my_like($player->{$stat}, qr/^\d{1,5}$/, "ES $stat ok") :
 				test_time($player->{$stat}, "$stat timeonice ok") :
 			my_like($player->{$stat}, qr/\-?\d{1,2}/, "stat $stat an integer");
@@ -629,8 +632,7 @@ sub test_teams ($;$) {
 		test_decision($decision, 'game decision ok')
 			unless $broken
 			|| $BOXSCORE->{_gs_no_g}
-			|| $opts->{es}
-			|| $opts->{ro};
+			|| $opts->{es} || $opts->{ro} || $opts->{ti};
 		$team->{decision} = $decision if $opts->{merged};
 	}
 	undef $PLAYER;
@@ -703,7 +705,7 @@ sub test_player1 ($$) {
 			unless $opts->{gs}
 				|| ($event->{type} eq 'PENL'
 				&& ($event->{time} eq '20:00'
-				|| $PENALTY_POSSIBLE_NO_OFFENDER{$event->{penalty}})
+				|| $PENALTY_POSSIBLE_NO_OFFENDED{$event->{penalty}})
 			);
 		$DO_NOT_DIE = 0;
 	}
@@ -853,10 +855,11 @@ sub test_boxscore ($;$) {
 	test_header($boxscore);
 	test_periods($boxscore->{periods}) if $opts->{bs};
 	test_officials($boxscore->{officials}, $opts)
-		if ! $opts->{es} && ! $opts->{pl} && $boxscore->{season} >= $DATA_BY_SEASON{officials};
-	test_teams($boxscore->{teams}, $opts) if ! $opts->{pl};
+		if ! $opts->{es} && ! $opts->{pl} && $boxscore->{season} >= $DATA_BY_SEASON{officials}->{season};
+	test_teams($boxscore->{teams}, $opts)
+		if ! $opts->{pl} && ! $opts->{tv} && ! $opts->{th};
 	test_events($boxscore->{events}, $opts) unless
-		$BROKEN_FILES{BS}->{$BOXSCORE->{_id}} && $BROKEN_FILES{BS}->{$BOXSCORE->{_id}} == $NO_EVENTS || $opts->{es} || $opts->{ro};
+		$BROKEN_FILES{BS}->{$BOXSCORE->{_id}} && $BROKEN_FILES{BS}->{$BOXSCORE->{_id}} == $NO_EVENTS || $opts->{es} || $opts->{ro} || $opts->{tv} || $opts->{th} || $opts->{ti};
 	undef $BOXSCORE;
 	undef $PLAYER;
 	undef $EVENT;
@@ -928,6 +931,7 @@ sub test_consistency_goalie ($$$) {
 	my $event_player  = shift;
 	my $boxscore_id   = shift;
 
+	return unless $roster_player->{timeOnIce};
 	my_is(
 		$roster_player->{shots} - $roster_player->{saves},
 		$event_player->{goalsAgainst} || 0,
@@ -944,7 +948,14 @@ sub test_consistency_skater ($$$$) {
 
 	for my $stat (@{$stats}) {
 		next if $stat eq 'penaltyMinutes';
-		if ($stat eq 'goals' || $stat eq 'assists') {
+		if ($stat eq 'goals' || (
+			$stat eq 'assists' &&
+				$BOXSCORE->{season} != 1934 && $BOXSCORE->{season} != 1935
+			)) {
+			if ($roster_player->{_from_na}) {
+				debug "Fixing the NA player";
+				$roster_player->{$stat} ||= $event_player->{$stat} || 0;
+			}
 			my_is(
 				$roster_player->{$stat},
 				$event_player->{$stat} || 0,
@@ -970,6 +981,7 @@ sub test_consistency_playergoals ($$) {
 	my $boxscore      = shift;
 	my $event_summary = shift;
 
+	return if $SPECIAL_EVENTS{$boxscore->{_id}};
 	for my $t (0, 1) {
 		my $team = $boxscore->{teams}[$t];
 		for my $player (@{$team->{roster}}) {
@@ -979,7 +991,7 @@ sub test_consistency_playergoals ($$) {
 					($event_summary->{$player->{_id}}{g_goals} || 0);
 			}
 			else {
-				$event_summary->{$team->{name}}{playergoals} += $player->{goals};
+				$event_summary->{$team->{name}}{playergoals} += $player->{goals}
 			}
 		}
 		my_is(
@@ -1005,6 +1017,7 @@ sub test_consistency ($$) {
 			"Team $team->{name} score $team->{score} consistent"
 		) unless $BROKEN_FILES{$boxscore->{_id}}->{BS};
 		for my $player (@{$team->{roster}}) {
+#			dumper $player->{number};
 			next if $player->{broken} || $player->{position} eq 'N/A';
 			$PLAYER = $player;
 			test_consistency_penalty_minutes($player, $event_summary->{$player->{_id}});
@@ -1054,7 +1067,14 @@ sub test_normalized_roster ($$) {
 	for my $player (@{$roster}) {
 		for (keys %{$player}) {
 			my $field = $_;
-			when ('position') { test_position($player->{$_}, 'position ok') }
+			when ('position') {
+#				dumper $player, $BOXSCORE->{_id};
+				eval { test_position($player->{$_}, 'position ok') };
+				if ($@) {
+					dumper $player, $BOXSCORE->{_id};
+					die $@;
+				}
+			}
 			when ('name')     { test_name($player->{$_}, 'name ok') };
 			when ('status') {
 				my_like($player->{$field}, qr/^(C|A| |X)$/, 'status ok');
@@ -1142,6 +1162,7 @@ sub test_normalized_events ($) {
 		for ($event->{type}) {
 			when ('GOAL') {
 				test_player_id($event->{player1}, "goal scorer player1 ok");
+#				dumper $event;
 				test_player_id($event->{player2}, "goal goalie player2 ok")
 					unless $event->{en};
 				for my $field (qw(en gwg penaltyshot)) {
@@ -1203,6 +1224,7 @@ sub test_arranged_events ($) {
 	my_is(scalar(grep{$_->{type} eq 'GEND'} @{$boxscore->{events}}), 1, '1 gend');
 
 	for my $e (0..$#{$boxscore->{events}}-1) {
+#		dumper 	$boxscore->{events}[$e], 	$boxscore->{events}[$e+1];
 		my_cmp_ok(
 			$boxscore->{events}[$e]{period},
 			'<=',
@@ -1229,7 +1251,8 @@ sub test_arranged_events ($) {
 			$boxscore->{events}[$e]{period} ==
 			$boxscore->{events}[$e+1]{period}
 			&& $boxscore->{events}[$e]{ts} ==
-			$boxscore->{events}[$e+1]{ts};
+			$boxscore->{events}[$e+1]{ts} &&
+			($boxscore->{events}[$e]{period} < 5 || $boxscore->{stage} == $PLAYOFF);
 		my $event = $boxscore->{events}[$e];
 		my_like($event->{_id}, qr/^$boxscore->{_id}\d{4}$/, '_id created');
 		if ($event->{type} eq 'PSTR') {
@@ -1371,11 +1394,11 @@ END {
 	}
 	if ($EVENT) {
 		$Data::Dumper::Varname = 'EVENT';
-		print Dumper $EVENT;
+		dumper $EVENT;
 	}
 	if ($PLAYER) {
 		$Data::Dumper::Varname = 'PLAYER';
-		print Dumper $PLAYER;
+		dumper $PLAYER;
 	}
 }
 

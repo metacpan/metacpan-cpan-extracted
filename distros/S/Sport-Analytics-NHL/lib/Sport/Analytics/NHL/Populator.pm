@@ -5,10 +5,11 @@ use strict;
 use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
+use Sport::Analytics::NHL::Vars qw(:globals);
 use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Scraper;
+use Sport::Analytics::NHL::Util qw(:debug :utils);
+#use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Scraper qw(crawl_player);
 use Sport::Analytics::NHL::Normalizer;
 
 =head1 NAME
@@ -57,16 +58,48 @@ Work in progress. Do not use yet.
 
 use parent 'Exporter';
 
-our @EXPORT = qw(populate_db populate_injured_players);
+our @EXPORT_OK = qw(create_player_id_hash populate_db populate_injured_players);
+our @EXPORT = (@EXPORT_OK);
+our %EXPORT_TAGS = (
+	all => \@EXPORT_OK,
+);
+
+=over 4
+
+=item C<create_player_id_hash>
+
+Creates a hash of player ids from the boxscore as keys and references to their stat entries as values
+
+ Argument: the boxscore
+ Returns: the hash of player ids
+
+=back
+
+=cut
+
+sub create_player_id_hash ($) {
+
+	my $boxscore = shift;
+
+	my $player_ids;
+	for my $t (0,1) {
+		my $team = $boxscore->{teams}[$t];
+		for my $player (@{$team->{roster}}) {
+			$player_ids->{$player->{_id}} = \$player;
+		}
+	}
+	$player_ids;
+}
 
 sub populate_db ($;$$) {
 
 	my $boxscore = shift;
 	my $opts     = shift;
 
-	my $PLAYER_IDS = create_player_id_hash($boxscore);
+	$CACHES->{gameplayers} = create_player_id_hash($boxscore);
 	verbose "Populating $boxscore->{_id}";
 	$DB ||= Sport::Analytics::NHL::DB->new();
+	$DB->remove_game($boxscore) if $opts->{force} || $opts->{repopulate};
 	if ($boxscore->{location}) {
 		my $location = $DB->create_location({
 			name     => $boxscore->{location},
@@ -75,9 +108,9 @@ sub populate_db ($;$$) {
 		$boxscore->{location} = $location->{_id};
 	}
 	unless ($opts->{no_crawl}) {
-		for my $player_id (keys %{$PLAYER_IDS}) {
+		for my $player_id (keys %{$CACHES->{gameplayers}}) {
 			next if $player_id == 8400001;
-			my $team = ${$PLAYER_IDS->{$player_id}}->{team};
+			my $team = ${$CACHES->{gameplayers}{$player_id}}->{team};
 			debug "Crawling $player_id";
 			my $player;
 			if ($CACHES->{players}{$player_id}) {
@@ -98,12 +131,15 @@ sub populate_db ($;$$) {
 		}
 	}
 	$DB->add_game_coaches($boxscore);
-	my @events = ();
+	my %events = (_ids => [], types => {}, events => []);
 	for my $event (@{$boxscore->{events}}) {
-		push(@events, $DB->create_event($event));
+		$DB->prepare_event($event, \%events);
 	}
-	$boxscore->{events} = [@events];
-	$DB->remove_game($boxscore) if $opts->{force};
+	insert('events', @{$events{events}});
+	for my $collection (keys %{$events{types}}) {
+		insert($collection, @{$events{types}->{$collection}});
+	}
+	$boxscore->{events} = $events{_ids};
 	$DB->add_game($boxscore);
 	$boxscore->{_id};
 }

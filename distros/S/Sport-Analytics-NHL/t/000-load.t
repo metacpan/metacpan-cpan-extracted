@@ -4,7 +4,7 @@ use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
 
-use Test::More tests => 21;
+use Test::More tests => 27;
 
 my @MODULES;
 BEGIN {

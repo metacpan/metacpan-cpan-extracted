@@ -1,7 +1,7 @@
 package Term::Caca::Event::Key::Release;
 our $AUTHORITY = 'cpan:YANICK';
 # abstract: event triggered by a key release
-$Term::Caca::Event::Key::Release::VERSION = '3.0.1';
+$Term::Caca::Event::Key::Release::VERSION = '3.1.0';
 
 use strict;
 use warnings;
@@ -29,7 +29,7 @@ Term::Caca::Event::Key::Release
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 SYNOPSIS
 

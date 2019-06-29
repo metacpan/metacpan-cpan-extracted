@@ -10,14 +10,15 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Interface to the Chromaprint library",
   "AUTHOR" => "Sawyer X <xsawyerx\@cpan.org>, Graham Ollis <plicease\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "FFI::CheckLib" => "0.25"
   },
   "DISTNAME" => "Audio-Chromaprint",
   "LICENSE" => "mit",
   "NAME" => "Audio::Chromaprint",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "FFI::CheckLib" => 0,
+    "FFI::CheckLib" => "0.25",
     "FFI::Platypus" => "0.88",
     "Moose" => 0
   },
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,13 +38,19 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
-  "FFI::CheckLib" => 0,
+  "FFI::CheckLib" => "0.25",
   "FFI::Platypus" => "0.88",
   "File::Spec" => 0,
   "Moose" => 0,
   "Path::Tiny" => 0,
   "Test::More" => "0.96"
 );
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
+if (! do { use FFI::CheckLib qw( find_lib ); find_lib( lib => 'chromaprint' ) }) {
+requires('Alien::chromaprint')
+}
+
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -56,3 +63,25 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
+sub _add_prereq {
+  my ($mm_key, $module, $version_or_range) = @_;
+  $version_or_range ||= 0;
+  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+    if exists $WriteMakefileArgs{$mm_key}{$module}
+      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
+      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
+  warn "$module already exists in FallbackPrereqs (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
+        and $FallbackPrereqs{$module} ne $version_or_range;
+  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
+  return;
+}
+
+sub requires { goto &runtime_requires }
+
+sub runtime_requires {
+  my ($module, $version_or_range) = @_;
+  _add_prereq(PREREQ_PM => $module, $version_or_range);
+}

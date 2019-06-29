@@ -22,5 +22,5 @@ requires:
   Kavorka: '0.039'
   Mouse: v2.5.6
   Regexp::Grammars: '1.049'
-version: '2.02'
+version: '2.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

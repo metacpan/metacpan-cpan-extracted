@@ -9,11 +9,11 @@ use Test::More;
 
 use JSON;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB);
 use Sport::Analytics::NHL::DB;
 use Sport::Analytics::NHL::Test;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Tools qw(:schedule);
+use Sport::Analytics::NHL::Util qw(:file);
 
 use t::lib::Util;
 

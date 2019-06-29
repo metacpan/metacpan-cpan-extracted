@@ -2,8 +2,8 @@ NAME
     Complete::Bash - Completion routines for bash shell
 
 VERSION
-    This document describes version 0.320 of Complete::Bash (from Perl
-    distribution Complete-Bash), released on 2018-10-10.
+    This document describes version 0.324 of Complete::Bash (from Perl
+    distribution Complete-Bash), released on 2019-06-28.
 
 DESCRIPTION
     This module provides routines related to tab completion in bash shell.
@@ -132,13 +132,48 @@ FUNCTIONS
 
     *   $opts => *hash*
 
+        Specify options.
+
+        Known options:
+
+        *   word
+
+            A workaround. String. For now, see source code for more details.
+
+        *   show_summaries
+
+            Whether to show item's summaries. Boolean, default is from
+            COMPLETE_BASH_SHOW_SUMMARIES environment variable or 1.
+
+            An answer item contain summary, which is a short description
+            about the item, e.g.:
+
+              [{word=>"-a"    , summary=>"Show hidden files"},
+               {word=>"-l"    , summary=>"Show details"},
+               {word=>"--sort", summary=>"Specify sort order"}],
+
+            When summaries are not shown, user will just be seeing something
+            like:
+
+              -a
+              -l
+              --sort
+
+            But when summaries are shown, user will see:
+
+              -a         -- Show hidden files
+              -l         -- Show details
+              --sort     -- Specify sort order
+
+            which is quite helpful.
+
     Return value: Formatted string (or array, if `as` is set to `array`)
     (str|array)
 
   join_wordbreak_words
     Usage:
 
-     join_wordbreak_words() -> [status, msg, result, meta]
+     join_wordbreak_words() -> [status, msg, payload, meta]
 
     Post-process parse_cmdline() result by joining some words.
 
@@ -169,7 +204,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -329,6 +364,58 @@ FUNCTIONS
     Return value: (any)
 
 ENVIRONMENT
+  COMPLETE_BASH_MAX_COLUMNS
+    Uint.
+
+    Bash will show completion entries in one or several columns, depending
+    on the terminal width and the length of the entries (much like a
+    standard non-long `ls`). If you prefer completion entries to be shown in
+    a single column no matter how wide your terminal is, or how short the
+    entries are, you can set the value of this variable to 1. If you prefer
+    a maximum of two columns, set to 2, and so on. "format_completion" will
+    pad the entries with sufficient spaces to limit the number of columns.
+
+  COMPLETE_BASH_SHOW_SUMMARIES
+    Bool. Will set the default for "show_summaries" option in
+    "format_completion".
+
+  COMPLETE_BASH_SUMMARY_ALIGN
+    String. Either "left" (the default) or "right".
+
+    The "left" align looks something like this:
+
+     --bar      Summary about the bar option
+     --baz      Summary about the baz option
+     --foo      Summary about the foo option
+     --schapen  Summary about the schapen option
+
+    The "right" align will make the completion answer look like what you see
+    in the fish shell:
+
+     --bar                        Summary about the bar option
+     --baz                        Summary about the baz option
+     --foo                        Summary about the foo option
+     --schapen                Summary about the schapen option
+
+    To help match the option and its corresponding summary visually, by
+    default a line of underscores is drawn for every 5 lines (configurable
+    via "COMPLETE_BASH_SUMMARY_LINE_EVERY".
+
+     --bar                        Summary about the bar option
+     --baz                        Summary about the baz option
+     --foo                        Summary about the foo option
+     --foobar   _______________Summary about the foobar option
+     --lam                        Summary about the lam option
+     --qux
+     --quux                                    Alias for --qux
+     --schapen  ______________Summary about the schapen option
+
+  COMPLETE_BASH_SUMMARY_LINE_EVERY
+    Uint. Default: 4.
+
+    Relevant only when "COMPLETE_BASH_SUMMARY_ALIGN" is set to "right" (see
+    its documentation for more detail).
+
   COMPLETE_BASH_TRACE
     Bool. If set to true, will produce more log statements to Log::ger.
 
@@ -366,7 +453,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2018, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

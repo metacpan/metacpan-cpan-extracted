@@ -12,19 +12,21 @@ use POSIX qw(strftime);
 use List::MoreUtils qw(uniq);
 use JSON -convert_blessed_universally;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Vars qw(:all);
+use Sport::Analytics::NHL::Config qw(:basic :league :seasons);
 use Sport::Analytics::NHL::Errors;
 
 use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'Sport::Analytics::NHL::DB';
 use Sport::Analytics::NHL::Merger;
 use Sport::Analytics::NHL::Normalizer;
+use Sport::Analytics::NHL::PenaltyAnalyzer;
+use Sport::Analytics::NHL::Generator;
 use Sport::Analytics::NHL::Populator;
 use Sport::Analytics::NHL::Report;
-use Sport::Analytics::NHL::Scraper;
+use Sport::Analytics::NHL::Scraper qw(crawl_schedule crawl_game);
 use Sport::Analytics::NHL::Test;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Tools qw(:path :basic :schedule set_player_stat);
+use Sport::Analytics::NHL::Util qw(:debug :file);
 
 use parent 'Exporter';
 
@@ -34,7 +36,7 @@ Sport::Analytics::NHL - Crawl data from NHL.com and put it into a database
 
 =head1 VERSION
 
-Version 1.40
+Version 1.51
 
 =cut
 
@@ -42,7 +44,7 @@ our @EXPORT = qw(
 	hdb_version
 );
 
-our $VERSION = "1.40";
+our $VERSION = "1.51";
 
 =head1 SYNOPSIS
 
@@ -150,7 +152,7 @@ Arguments:
    - force: Force overwrite of already existing file
    - test: Test the resulted parsed report
    - doc: limit compilation to these Report types
-   - data_dir: the root directory of the reports
+   - reports_dir: the root directory of the reports
  * The list of game ids
 
 Returns: the location of the compiled storables
@@ -180,7 +182,7 @@ Arguments:
    - force: Force overwrite of already existing file
    - test: Test the resulted parsed report
    - doc: limit compilation to these Report types
-   - data_dir: the root directory of the reports
+   - reports_dir: the root directory of the reports
    - no_compile: don't compile files if required
    - recompile: force recompilation
  * The list of game ids
@@ -208,7 +210,7 @@ Arguments:
    - force: Force overwrite of already existing file
    - test: Test the resulted parsed report
    - doc: limit compilation to these Report types
-   - data_dir: the root directory of the reports
+   - reports_dir: the root directory of the reports
    - no_compile: don't compile files if required
    - recompile: force recompilation
    - no_merge: don't merge files if required
@@ -221,7 +223,6 @@ Returns: the location of the normalized storable(s). The JSON would be in the sa
 
 Populates the Mongo DB from the normalized boxscores. Normalizes the boxscore if necessary and if requested.
 
-
 Arguments:
  * The options hashref -
    - same options as normalize() (q.v.) plus:
@@ -230,6 +231,16 @@ Arguments:
  * The list of the normalized game ids
 
 Returns: the list of inserted game's ids.
+
+=item C<check_series_end>
+
+Checks if the game ended a playoff series and adds the information about it throughout the series.
+
+ Arguments: the boxscore
+
+ Returns: void
+
+ Caveat: Only applicable to Original Six and later eras.
 
 =back
 
@@ -244,7 +255,7 @@ sub new ($$) {
 	unless ($opts->{no_database} || $ENV{HOCKEYDB_NODB} || ! $MONGO_DB) {
 		$self->{db} = Sport::Analytics::NHL::DB->new($opts->{database} || $ENV{HOCKEYDB_DBNAME} || $MONGO_DB);
 	}
-	$ENV{HOCKEYDB_DATA_DIR} = $DATA_DIR = $opts->{data_dir} if $opts->{data_dir};
+	$ENV{HOCKEYDB_REPORTS_DIR} = $REPORTS_DIR = $opts->{reports_dir} if $opts->{reports_dir};
 	bless $self, $class;
 	$self;
 }
@@ -344,8 +355,8 @@ sub get_db_scheduled_games ($$) {
         }
     }
 
-	debug scalar(@{$existing_game_ids}) . " total existing games";
-    @games = $self->{db}{dbh}->get_collection('schedule')->find(
+	timedebug scalar(@{$existing_game_ids}) . " total existing games";
+    @games = $self->{db}->get_collection('schedule')->find(
         {
             game_id => { '$nin' => $existing_game_ids },
             $opts->{stage} ? ( stage => $opts->{stage}+0 ) : (),
@@ -355,6 +366,7 @@ sub get_db_scheduled_games ($$) {
             },
         }
     )->all();
+	timedebug scalar(@games) . " games to tackle";
     @games;
 }
 
@@ -385,7 +397,7 @@ sub scrape_games ($$;@) {
 			@games,
 			$opts->{no_schedule_crawl}
 				? get_games_for_dates(@dates)
-				: $self->get_crawled_games_for_dates( $opts, @dates ),
+				: $self->get_crawled_games_for_dates($opts, @dates),
 		) if @dates;
 	}
 	else {
@@ -396,15 +408,21 @@ sub scrape_games ($$;@) {
 		return ();
 	}
 	my @got_games;
-	@games = sort { ($a->{ts} || $a->{game_id}) <=> ($b->{ts} || $b->{game_id}) } @games;
+	@games = sort {
+		($a->{ts} || $a->{game_id}) <=> ($b->{ts} || $b->{game_id})
+	} @games;
+	my @scraped = ();
 	for my $game (@games) {
 		if ($game->{date} && $game->{date} > strftime("%Y%m%d", localtime)) {
-			print "Game $game->{_id} is in the future ($game->{date}), wrapping up\n";
+			verbose "Game $game->{_id} is in the future ($game->{date}), done\n";
 			last;
 		}
-		my $crawled_game = crawl_game($game);
+		debug "crawling $game->{game_id}";
+		my $crawled_game = crawl_game($game, $opts);
 		push(@got_games, map($_->{file}, values %{$crawled_game->{content}}));
+		push(@scraped, $game->{game_id});
 	}
+	write_file(join(' ', @scraped), $SCRAPED_GAMES);
 	@got_games;
 }
 
@@ -457,7 +475,7 @@ sub compile ($$@) {
 			print STDERR "Skipping defaulted game $game_id\n";
 			next;
 		}
-		my @game_files = get_game_files_by_id($game_id, $opts->{data_dir});
+		my @game_files = get_game_files_by_id($game_id, $opts->{reports_dir});
 		if (
 			$BROKEN_FILES{$game_id}->{BS} &&
 			$BROKEN_FILES{$game_id}->{BS} == $NO_EVENTS &&
@@ -466,7 +484,7 @@ sub compile ($$@) {
 			$ENV{GS_KEEP_PENL} = 1;
 		}
 		for my $game_file (@game_files) {
-			$game_file =~ m|/([A-Z]{2}).[a-z]{4}$|;
+			next unless $game_file =~ m|/([A-Z]{2}).[a-z]{4}$|;
 			my $type = $1;
 			next if ($opts->{doc} && !grep {$_ eq $type} @{$opts->{doc}});
 			my $storable = compile_file($opts, $game_file, $game_id, $type);
@@ -487,6 +505,7 @@ sub retrieve_compiled_report ($$$$) {
 @Sport::Analytics::NHL::Report::PL::ISA = qw(Sport::Analytics::NHL::Report);
 @Sport::Analytics::NHL::Report::GS::ISA = qw(Sport::Analytics::NHL::Report);
 @Sport::Analytics::NHL::Report::ES::ISA = qw(Sport::Analytics::NHL::Report);
+@Sport::Analytics::NHL::Report::TI::ISA = qw(Sport::Analytics::NHL::Report);
 	my $doc_storable = "$path/$doc.storable";
 	my $doc_source   = "$path/$doc." . ($doc eq 'BS' ? 'json' : 'html');
 
@@ -497,7 +516,7 @@ sub retrieve_compiled_report ($$$$) {
 		return undef;
 	}
 	if (! -f $doc_source) {
-		print STDERR "$doc: No storable and no source report available, skipping\n";
+		print STDERR "$doc_source: No storable and no source report available, skipping\n";
 		return undef;
 	}
 	debug "Compiling $doc_source";
@@ -518,7 +537,7 @@ sub merge ($$@) {
 			print STDERR "Skipping defaulted game $game_id\n";
 			next;
 		}
-		my $path = get_game_path_from_id($game_id, $opts->{data_dir});
+		my $path = get_game_path_from_id($game_id, $opts->{reports_dir});
 		my $merged = "$path/$MERGED_FILE";
 		if (! $opts->{force} && ! $opts->{remerge} && -f $merged) {
 			print STDERR "Merged file $merged already exists, skipping\n";
@@ -526,7 +545,7 @@ sub merge ($$@) {
 			next;
 		}
 		$opts->{doc} ||= [];
-		$opts->{doc}   = [qw(PL RO GS ES)];
+		$opts->{doc}   = [qw(RO PL GS ES TV TH)];
 		my $boxscore = retrieve_compiled_report($opts, $game_id, 'BS', $path);
 		$boxscore->{sources} = {BS => 1};
 		next unless $boxscore;
@@ -535,6 +554,11 @@ sub merge ($$@) {
 		for my $doc (@{$opts->{doc}}) {
 			my $report = retrieve_compiled_report($opts, $game_id, $doc, $path);
 			merge_report($boxscore, $report) if $report;
+		}
+		for my $t (0,1) {
+			$boxscore->{teams}[$t]{roster} = [ grep {
+				$_->{position} ne 'N/A'
+			} @{$boxscore->{teams}[$t]{roster}} ];
 		}
 		if ($opts->{test}) {
 			test_merged_boxscore($boxscore);
@@ -676,6 +700,63 @@ sub normalize ($$@) {
 	return @storables;
 }
 
+sub check_series_end ($) {
+
+	my $boxscore = shift;
+	return if $boxscore->{season} < $ORIGINAL_SIX_ERA_START;
+	my $wins = $DB->get_collection('games')->find({
+		season => $boxscore->{season},
+		stage  => $boxscore->{stage},
+		winner => $boxscore->{winner},
+		round  => $boxscore->{round},
+	})->all();
+
+	if ($wins == 2 && $boxscore->{round} == 1 && $boxscore->{season} >= $FOUR_ROUND_PO_START && $boxscore->{season} < $WHA_MERGER || $wins == 3 && $boxscore->{round} == 1 && $boxscore->{season} >= $WHA_MERGER && $boxscore->{season} < $FIRST_ROUND_IN_SEVEN || $wins == 4) {
+		my $w = $boxscore->{teams}[0]{name} eq $boxscore->{winner} ? 0 : 1;
+		my $l = 1 - $w;
+		my $sw = $boxscore->{teams}[$w]{name};
+		my $sl = $boxscore->{teams}[$l]{name};
+		my $cw = $DB->get_collection('coaches')->find_one({
+			name => $boxscore->{teams}[$w]{name}
+		});
+		my $cl = $DB->get_collection('coaches')->find_one({
+			name => $boxscore->{teams}[$w]{name}
+		});
+		$cw = undef if $boxscore->{teams}[$w]{name} =~ /UNKNOWN/;
+		update(1, 'games', {
+			season  => $boxscore->{season},
+			stage   => $boxscore->{stage},
+			round   => $boxscore->{round},
+			pairing => $boxscore->{pairing},
+		}, {
+			'$set' => {
+				series_winner => $sw,
+				series_loser  => $sl,
+				$cw ? (
+					coach_winner  => $cw,
+					coach_loser   => $cl,
+				) : (),
+			}
+		});
+		update(0, 'games', {
+			_id => $boxscore->{_id},
+		}, {
+			'$set' => {
+				last_series_game => 1,
+			}
+		});
+		$DB->get_collection('schedule')->delete_many({
+			season => $boxscore->{season},
+			'$or' =>
+			[
+				{ home => $boxscore->{series_loser} },
+				{ away => $boxscore->{series_loser} },
+			],
+			date => { '$gt' => $boxscore->{date} },
+		});
+	}
+}
+
 sub populate ($$@) {
 
 	my $self = shift;
@@ -719,7 +800,11 @@ sub populate ($$@) {
 		$opts->{repopulate} = $db_game ? 1 : 0;
 		my $db_game_id = populate_db($boxscore, $opts);
 		push(@db_game_ids, $db_game_id);
+		check_series_end($boxscore) if $boxscore->{stage} == $PLAYOFF;
+		analyze_game_penalties($db_game_id);
+		set_strengths($db_game_id);
 	}
+	generate({all => 1}, @db_game_ids);
 	@db_game_ids;
 }
 

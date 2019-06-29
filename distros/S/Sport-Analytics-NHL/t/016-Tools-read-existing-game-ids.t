@@ -7,7 +7,7 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Tools qw(read_existing_game_ids);
 
 use t::lib::Util;
 

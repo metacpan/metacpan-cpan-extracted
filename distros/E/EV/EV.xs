@@ -21,6 +21,11 @@ sv_fileno (SV *fh)
 # define GvCV_set(gv,cv) GvCV (gv) = cv
 #endif
 
+#if EV_ENABLE_ASSERTIONS
+# undef NDEBUG
+# include <assert.h>
+#endif
+
 #define EV_STANDALONE 1
 #define EV_PROTOTYPES 1
 #define EV_USE_NANOSLEEP EV_USE_MONOTONIC

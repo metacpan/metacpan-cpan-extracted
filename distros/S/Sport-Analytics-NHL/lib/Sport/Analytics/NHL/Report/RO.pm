@@ -5,7 +5,8 @@ use strict;
 use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Tools qw(:db);
+use Sport::Analytics::NHL::Util qw(:utils);
 
 use parent 'Sport::Analytics::NHL::Report';
 
@@ -77,6 +78,13 @@ Gets the actual roster and scratches from the roster table of the old RO report.
 =item C<get_scratch_roster>
 
 A wrapper to call get_roster or get_roster_old (q.v.) with 'scratch' flag on.
+
+=item C<is_ready>
+
+Checks if the roster is ready and reflects the ultimate starting lineup of the teams. Used in pre-game polling for prediction generation. As long as the report exceeds 20 players on the starting lineup it's not ready.
+
+ Arguments: the RO report, parsed
+ Returns: 0 or 1.
 
 =item C<parse>
 
@@ -344,6 +352,20 @@ sub parse ($$) {
 	$self->{old} ?
 		$self->read_roster_old() :
 		$self->read_roster();
+}
+
+sub is_ready ($) {
+
+	my $self = shift;
+
+	for my $t (0,1) {
+		my $rs = @{$self->{teams}[$t]{roster}};
+		if ($rs > 20) {
+			return 0;
+		}
+		$self->{teams}[$t]{name} = resolve_team($self->{teams}[$t]{name});
+	}
+	1;
 }
 
 1;

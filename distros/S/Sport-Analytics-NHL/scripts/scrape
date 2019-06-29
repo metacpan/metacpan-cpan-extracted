@@ -4,7 +4,6 @@ use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
 
-use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL;
 use Sport::Analytics::NHL::Usage;
 

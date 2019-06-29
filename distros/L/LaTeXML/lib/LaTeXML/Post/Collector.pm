@@ -63,7 +63,7 @@ sub makeSubCollectionDocuments {
   my $init0    = $initials[0];
   my @ids      = ([$rootid, $init0], map { ["$rootid.$_", $_] } @initials[1 .. $#initials]);
   # Patchup the main node; Replace title, add nav, add the 1st subcollection.
-  my @titles = $doc->findnodes('//ltx:title | //ltx:toctitle', $root);
+  my @titles     = $doc->findnodes('//ltx:title | //ltx:toctitle', $root);
   my @titlestuff = $doc->trimChildNodes($titles[0]);
   $doc->removeNodes(@titles);
   for (my $i = 0 ; $i <= $#ids ; $i++) {
@@ -91,7 +91,7 @@ sub makeSubCollectionDocuments {
     if ($i > 0) {
 ####      $docs[$i  ]->addNavigation(previous=>$ids[$i-1][0]);
 ####      $docs[$i-1]->addNavigation(next    =>$ids[$i  ][0]);
-    } }
+  } }
   return @docs; }
 
 sub rescan {

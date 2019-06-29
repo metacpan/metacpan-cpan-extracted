@@ -41,6 +41,7 @@ WriteMakefile(
 	AUTHOR        => 'Dmitry Karasik <dmitry@karasik.eu.org>',
 	ABSTRACT_FROM => 'lib/IO/Lambda.pm',
 	VERSION_FROM  => 'lib/IO/Lambda.pm',
+	LICENSE       => 'perl',
 	PREREQ_PM     => {
 		'Net::DNS'          => 0,
 		'Storable'          => 0,
@@ -57,4 +58,9 @@ WriteMakefile(
 		# 'threads'         => 0,     # for IO::Lambda::Threads
 	},
 	clean         => { FILES => 't/online.enabled' },
+	META_MERGE    => {
+		resources => {
+			repository => 'https://github.com/dk/IO-Lambda'
+		},
+	},
 );

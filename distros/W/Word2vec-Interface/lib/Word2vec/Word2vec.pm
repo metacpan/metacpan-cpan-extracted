@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 11/06/2017                                                             #
+#    Revised: 06/18/2019                                                             #
 #    UMLS Similarity Word2Vec Executable Interface Module                            #
 #                                                                                    #
 ######################################################################################
@@ -37,7 +37,7 @@ use Encode qw( decode encode );
 
 use vars qw($VERSION);
 
-$VERSION = '0.03';
+$VERSION = '0.031';
 
 
 ######################################################################################
@@ -1346,21 +1346,8 @@ sub IsWordOrCUIVectorData
 
     # Perform Check
     $term = lc( $term );
-    my @terms = split( 'c', $term );
-
-    # Return Word Term If There Are Not Two Elements After Splitting
-    return "word" if( @terms != 2 );
-
-    # If $term Is CUI, Then First Element Should Be Empty String
-    return "word" if ( $terms[0] ne "" );
-
-    # Remove Numbers From Second Element
-    $terms[1] =~ s/[0-9]//g;
-
-    # If $term Is CUI, Then After Removing All Number From Second Element An Empty String Is All That Is Left
-    return "word" if ( $terms[1] ne "" );
-
-    return "cui";
+    return "cui" if ( $term =~ m/c[0-9]+/ );
+    return "word";
 }
 
 sub IsVectorDataSorted

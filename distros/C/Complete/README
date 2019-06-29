@@ -2,8 +2,8 @@ NAME
     Complete - Convention for Complete::* modules family
 
 VERSION
-    This document describes version 0.200 of Complete (from Perl
-    distribution Complete), released on 2018-09-26.
+    This document describes version 0.201 of Complete (from Perl
+    distribution Complete), released on 2019-06-26.
 
 DESCRIPTION
     The namespace "Complete::" is used for the family of modules that deal
@@ -84,10 +84,16 @@ DESCRIPTION
     hints to formatters/tools. It is a hashref which can contain the
     following keys:
 
+    *   message => string
+
+        Experimental. Instead of returning completion entries, a completion
+        answer can also opt to request showing a message (i.e. error
+        message, or informational message) to the user.
+
     *   words => array
 
-        This key is required. Its value is an array of completion entries. A
-        completion entry can be a string or a hashref. Example:
+        Its value is an array of completion entries. A completion entry can
+        be a string or a hashref. Example:
 
          ['apple', 'apricot'] # array of strings
 
@@ -174,7 +180,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

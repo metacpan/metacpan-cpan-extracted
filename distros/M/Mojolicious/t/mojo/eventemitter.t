@@ -9,6 +9,7 @@ my $called;
 $e->on(test1 => sub { $called++ });
 $e->emit('test1');
 is $called, 1, 'event was emitted once';
+$e->unsubscribe('test1');
 
 # Error
 $e->on(die => sub { die "works!\n" });
@@ -33,17 +34,19 @@ eval { $e->emit(error => 'int') };
 like $@, qr/^intentional/, 'right error';
 
 # Normal event again
+$called = undef;
+$e->on(test1 => sub { $called++ });
 $e->emit('test1');
-is $called, 2, 'event was emitted twice';
+is $called, 1, 'event was emitted once';
 is scalar @{$e->subscribers('test1')}, 1, 'one subscriber';
 $e->emit('test1');
 $e->unsubscribe(test1 => $e->subscribers('test1')->[0]);
-is $called, 3, 'event was emitted three times';
+is $called, 2, 'event was emitted twice';
 is scalar @{$e->subscribers('test1')}, 0, 'no subscribers';
 $e->emit('test1');
-is $called, 3, 'event was not emitted again';
+is $called, 2, 'event was not emitted again';
 $e->emit('test1');
-is $called, 3, 'event was not emitted again';
+is $called, 2, 'event was not emitted again';
 
 # One-time event
 my $once;
@@ -148,7 +151,7 @@ is $buffer, 'onetwothreethreetwoone', 'right result';
 $e      = Mojo::EventEmitter->new;
 $buffer = '';
 $e->on(one => sub { $_ = $_[1] .= 'abc' . $_[2] });
-$e->on(one => sub { $_[1] .= '123' . pop });
+$e->on(one => sub { $_[1]      .= '123' . pop });
 is $buffer, '', 'no result';
 $e->emit(one => $buffer => 'two');
 is $buffer, 'abctwo123two', 'right result';

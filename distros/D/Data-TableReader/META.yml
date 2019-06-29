@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/nrdvana/perl-Data-TableReader/issues
   homepage: https://github.com/nrdvana/perl-Data-TableReader
   repository: https://github.com/nrdvana/perl-Data-TableReader.git
-version: '0.010'
+version: '0.011'
 x_contributors:
   - 'Christian Walde <walde.christian@gmail.com>'
 x_generated_by_perl: v5.20.2

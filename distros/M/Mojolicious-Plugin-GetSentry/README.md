@@ -1,4 +1,4 @@
-# Mojolicious-Plugin-GetSentry
+# Mojolicious-Plugin-GetSentry [![Build Status](https://travis-ci.org/crlcu/Mojolicious-Plugin-GetSentry.svg?branch=master)](https://travis-ci.org/crlcu/Mojolicious-Plugin-GetSentry)
 Sentry client for Mojolicious
 
 # Intialization

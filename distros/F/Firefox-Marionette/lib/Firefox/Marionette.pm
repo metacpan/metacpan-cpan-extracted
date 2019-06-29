@@ -14,7 +14,7 @@ use Firefox::Marionette::Proxy();
 use Firefox::Marionette::Exception();
 use Firefox::Marionette::Exception::Response();
 use JSON();
-use IPC::Run();
+use IPC::Open3();
 use Socket();
 use English qw( -no_match_vars );
 use POSIX();
@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.71';
+our $VERSION = '0.75';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -56,6 +56,7 @@ sub _MIN_VERSION_FOR_NEW_SENDKEYS   { return 55 }
 sub _MIN_VERSION_FOR_HEADLESS       { return 55 }
 sub _MIN_VERSION_FOR_WD_HEADLESS    { return 56 }
 sub _MIN_VERSION_FOR_SAFE_MODE      { return 55 }
+sub _MIN_VERSION_FOR_MODERN_EXIT    { return 40 }
 sub _MIN_VERSION_FOR_AUTO_LISTEN    { return 55 }
 sub _MIN_VERSION_FOR_HOSTPORT_PROXY { return 57 }
 sub _MIN_VERSION_FOR_XVFB           { return 12 }
@@ -68,6 +69,7 @@ sub _WIN32_CONNECTION_REFUSED       { return 10_061 }
 sub _OLD_PROTOCOL_NAME_INDEX        { return 2 }
 sub _OLD_PROTOCOL_PARAMETERS_INDEX  { return 3 }
 sub _OLD_INITIAL_PACKET_SIZE        { return 66 }
+sub _READ_LENGTH_OF_OPEN3_OUTPUT    { return 50 }
 
 sub BY_XPATH {
     Carp::carp(
@@ -146,6 +148,9 @@ sub _download_directory {
             File::Spec->catfile( $self->{profile_directory}, 'prefs.js' ) );
         $directory = $profile->get_value('browser.download.downloadDir');
     };
+    if ( $OSNAME eq 'cygwin' ) {
+        $directory = $self->execute( 'cygpath', '-s', '-m', $directory );
+    }
     return $directory;
 }
 
@@ -392,8 +397,8 @@ sub _setup_arguments {
         my $profile_directory =
           $self->_setup_new_profile( $parameters{profile} );
         if ( $OSNAME eq 'cygwin' ) {
-            my $drive = $ENV{SYSTEMDRIVE};
-            $profile_directory = "${drive}/cygwin64$profile_directory";
+            $profile_directory =
+              $self->execute( 'cygpath', '-s', '-m', $profile_directory );
         }
         my $path = File::Spec->catfile( $profile_directory, 'mimeTypes.rdf' );
         my $handle =
@@ -538,16 +543,46 @@ sub _is_auto_listen_okay {
     }
 }
 
+sub execute {
+    my ( $proto, $binary, @arguments ) = @_;
+    my ( $writer, $reader, $error );
+    my $pid;
+    eval {
+        $pid =
+          IPC::Open3::open3( $writer, $reader, $error, $binary, @arguments );
+    } or do {
+        Carp::croak("Failed to execute '$binary':$EXTENDED_OS_ERROR");
+    };
+    waitpid $pid, 0;
+    if ( $CHILD_ERROR == 0 ) {
+        my ( $result, $output );
+        while ( $result = read $reader, my $buffer,
+            _READ_LENGTH_OF_OPEN3_OUTPUT() )
+        {
+            $output .= $buffer;
+        }
+        defined $result
+          or Carp::croak( q[Failed to read STDOUT from ']
+              . ( join q[ ], $binary, @arguments )
+              . "':$EXTENDED_OS_ERROR" );
+        chomp $output;
+        return $output;
+    }
+    else {
+        Carp::croak( q[Failed to execute ']
+              . ( join q[ ], $binary, @arguments ) . q[':]
+              . $proto->_error_message( $binary, $CHILD_ERROR ) );
+    }
+    return;
+}
+
 sub _initialise_version {
     my ($self) = @_;
     if ( defined $self->{_initial_version} ) {
     }
     else {
-        my $binary = $self->_binary();
-        my $version_string;
-        my ( $in, $err );
-        IPC::Run::run( [ $binary, '--version' ], \$in, \$version_string,
-            \$err );
+        my $binary         = $self->_binary();
+        my $version_string = $self->execute( $binary, '--version' );
         if ( $version_string =~
             /^Mozilla[ ]Firefox[ ](\d+)[.](\d+)(?:[.](\d+))?\s*$/smx )
         {
@@ -895,35 +930,47 @@ sub _launch_unix {
     my ( $self, @arguments ) = @_;
     my $binary = $self->_binary();
     my $pid;
-    my $dev_null = File::Spec->devnull();
-    if ( $pid = fork ) {
-    }
-    elsif ( defined $pid ) {
+    if ( $OSNAME eq 'cygwin' ) {
         eval {
-            if ( !$self->_debug() ) {
-                open STDERR, q[>], $dev_null
-                  or Firefox::Marionette::Exception->throw(
-                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
-                  );
-                open STDOUT, q[>], $dev_null
-                  or Firefox::Marionette::Exception->throw(
-                    "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR"
-                  );
-            }
-            exec {$binary} $binary, @arguments
-              or Firefox::Marionette::Exception->throw(
-                "Failed to exec '$binary':$EXTENDED_OS_ERROR");
+            $pid =
+              IPC::Open3::open3( my $writer, my $reader, my $error, $binary,
+                @arguments );
         } or do {
-            if ( $self->_debug() ) {
-                chomp $EVAL_ERROR;
-                warn "$EVAL_ERROR\n";
-            }
+            Firefox::Marionette::Exception->throw(
+                "Failed to exec '$binary':$EXTENDED_OS_ERROR");
         };
-        exit 1;
     }
     else {
-        Firefox::Marionette::Exception->throw(
-            "Failed to fork:$EXTENDED_OS_ERROR");
+        my $dev_null = File::Spec->devnull();
+        if ( $pid = fork ) {
+        }
+        elsif ( defined $pid ) {
+            eval {
+                if ( !$self->_debug() ) {
+                    open STDERR, q[>], $dev_null
+                      or Firefox::Marionette::Exception->throw(
+"Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
+                      );
+                    open STDOUT, q[>], $dev_null
+                      or Firefox::Marionette::Exception->throw(
+"Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR"
+                      );
+                }
+                exec {$binary} $binary, @arguments
+                  or Firefox::Marionette::Exception->throw(
+                    "Failed to exec '$binary':$EXTENDED_OS_ERROR");
+            } or do {
+                if ( $self->_debug() ) {
+                    chomp $EVAL_ERROR;
+                    warn "$EVAL_ERROR\n";
+                }
+            };
+            exit 1;
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+                "Failed to fork:$EXTENDED_OS_ERROR");
+        }
     }
     return $pid;
 }
@@ -959,16 +1006,17 @@ sub _binary {
             $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
         }
         elsif ( $OSNAME eq 'cygwin' ) {
-            if (   ( -e "$ENV{PROGRAMFILES} (x86)" )
-                && ( -e "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe" )
-              )
-            {
-                $binary =
-                  "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
+            my $windows_x86_firefox_path =
+              "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
+            my $windows_firefox_path =
+              "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
+            if ( -e $windows_x86_firefox_path ) {
+                $binary = $windows_x86_firefox_path;
             }
-            elsif ( -e "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe" ) {
-                $binary = "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
+            elsif ( -e $windows_firefox_path ) {
+                $binary = $windows_firefox_path;
             }
+            $binary = $self->execute( 'cygpath', '-s', '-m', $binary );
         }
     }
     return $binary;
@@ -987,11 +1035,16 @@ sub _signal_name {
 
 sub error_message {
     my ($self) = @_;
+    return $self->_error_message( 'Firefox', $self->child_error() );
+}
+
+sub _error_message {
+    my ( $self, $binary, $child_error ) = @_;
     my $message;
-    my $child_error = $self->child_error();
-    if ( !defined $self->child_error() ) {
+    if ( !defined $child_error ) {
     }
     elsif ( $OSNAME eq 'MSWin32' ) {
+        $message = Win32::FormatMessage( Win32::GetLastError() );
     }
     else {
 
@@ -1000,16 +1053,20 @@ sub error_message {
         {
             if ( POSIX::WIFEXITED($child_error) ) {
                 $message =
-                  'Firefox exited with a ' . POSIX::WEXITSTATUS($child_error);
+                    $binary
+                  . ' exited with a '
+                  . POSIX::WEXITSTATUS($child_error);
             }
             elsif ( POSIX::WIFSIGNALED($child_error) ) {
                 my $name = $self->_signal_name( POSIX::WTERMSIG($child_error) );
                 if ( defined $name ) {
-                    $message = "Firefox killed by a $name signal ("
+                    $message = "$binary killed by a $name signal ("
                       . POSIX::WTERMSIG($child_error) . q[)];
                 }
                 else {
-                    $message = 'Firefox killed by a signal ('
+                    $message =
+                        $binary
+                      . ' killed by a signal ('
                       . POSIX::WTERMSIG($child_error) . q[)];
                 }
             }
@@ -1066,7 +1123,6 @@ sub _setup_local_connection_to_firefox {
     my ( $self, @arguments ) = @_;
     my $host = _DEFAULT_HOST();
     my $port;
-    my $binary = $self->_binary();
     my $socket;
     my $connected;
     while ( ( !$connected ) && ( $self->alive() ) ) {
@@ -1457,8 +1513,10 @@ sub _create_capabilities {
         moz_profile      => $parameters->{'moz:profile'}
           || $self->{profile_directory},
         moz_process_id => $pid,
-        browser_name   => $parameters->{browserName},
-        moz_headless   => $headless,
+        moz_build_id   => $parameters->{'moz:buildID'}
+          || $parameters->{appBuildId},
+        browser_name => $parameters->{browserName},
+        moz_headless => $headless,
         %optional,
     );
 }
@@ -2024,7 +2082,7 @@ sub cookies {
             value     => $_->{value},
             expiry    => $_->{expiry},
             name      => $_->{name},
-          )
+        )
     } @cookies;
 }
 
@@ -2395,13 +2453,13 @@ sub selfie {
         && ( ref $element eq 'Firefox::Marionette::Element' ) )
     {
         $parameters = { id => $element->uuid() };
-        %extra = @remaining;
+        %extra      = @remaining;
     }
     elsif (( defined $element )
         && ( not( ref $element ) )
         && ( ( scalar @remaining ) % 2 ) )
     {
-        %extra = ( $element, @remaining );
+        %extra   = ( $element, @remaining );
         $element = undef;
     }
     if ( $extra{highlights} ) {
@@ -2842,18 +2900,31 @@ sub quit {
             );
             my $response = $self->_get_response($message_id);
             my $socket   = delete $self->{_socket};
-            close $socket
-              or Firefox::Marionette::Exception->throw(
-                "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
             if ( $OSNAME eq 'MSWin32' ) {
                 $self->{_win32_process}->Wait( Win32::Process::INFINITE() );
                 $self->_reap();
             }
             else {
+                if (
+                    ( $self->{_initial_version}->{major} )
+                    && ( $self->{_initial_version}->{major} <
+                        _MIN_VERSION_FOR_MODERN_EXIT() )
+                  )
+                {
+                    close $socket
+                      or Firefox::Marionette::Exception->throw(
+                        "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
+                    $socket = undef;
+                }
                 while ( kill 0, $self->_pid() ) {
                     sleep 1;
                     $self->_reap();
                 }
+            }
+            if ( defined $socket ) {
+                close $socket
+                  or Firefox::Marionette::Exception->throw(
+                    "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
             }
         }
     }
@@ -3524,7 +3595,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.71
+Version 0.75
 
 =head1 SYNOPSIS
 
@@ -4239,6 +4310,10 @@ Marionette will stop accepting new connections before ending the current session
 
 This method returns version of firefox.
 
+=head2 execute
+
+This utility method executes a command with arguments and returns STDOUT as a chomped string.  It is a simple method only intended for the Firefox::Marionette::* modules.
+
 =head2 child_error
 
 This method returns the $? (CHILD_ERROR) for the Firefox process, or undefined if the process has not yet exited.
@@ -4383,9 +4458,6 @@ It will also use the HTTP_PROXY, HTTPS_PROXY, FTP_PROXY and ALL_PROXY environmen
 Firefox::Marionette requires the following non-core Perl modules
  
 =over
- 
-=item *
-L<IPC::Run|IPC::Run>
  
 =item *
 L<JSON|JSON>

@@ -1,5 +1,9 @@
 Revision history for Future-IO
 
+0.06    2019-06-26 18:11:54
+        [CHANGES]
+         * Added Future::IO::ImplBase to assist implementation authors
+
 0.05    2019-05-07 01:00:19
         [CHANGES]
          * Misc small docs fixes

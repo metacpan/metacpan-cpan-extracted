@@ -1,0 +1,125 @@
+NAME
+    Calendar::Dates::Perl - Dates/anniversaries related to Perl
+
+VERSION
+    This document describes version 0.001 of Calendar::Dates::Perl (from
+    Perl distribution Calendar-Dates-Perl), released on 2019-06-19.
+
+SYNOPSIS
+  Using from Perl
+     use Calendar::Dates::Perl;
+     my $min_year = Calendar::Dates::Perl->get_min_year; # => 1954
+     my $max_year = Calendar::Dates::Perl->get_max_year; # => 9999
+     my $entries  = Calendar::Dates::Perl->get_entries(2019);
+
+    $entries result:
+
+     [
+       {
+         date      => "2019-09-27",
+         day       => 27,
+         month     => 9,
+         orig_year => 1954,
+         summary   => "Larry Wall's birthday (65th anniversary)",
+         tags      => ["anniversary"],
+         year      => 2019,
+       },
+       {
+         date      => "2019-12-18",
+         day       => 18,
+         month     => 12,
+         orig_year => 1987,
+         summary   => "Perl 1.0 released (32nd anniversary)",
+         tags      => ["anniversary"],
+         year      => 2019,
+       },
+       {
+         date      => "2019-10-17",
+         day       => 17,
+         month     => 10,
+         orig_year => 1994,
+         summary   => "Perl 5.0 released (25th anniversary)",
+         tags      => ["anniversary"],
+         year      => 2019,
+       },
+     ]
+
+  Using from CLI (requires list-calendar-dates and calx)
+     % list-calendar-dates -l -m Perl
+     % calx -c Perl
+
+DESCRIPTION
+DATES STATISTICS
+     +---------------+-------+
+     | key           | value |
+     +---------------+-------+
+     | Earliest year | 1954  |
+     | Latest year   | 9999  |
+     +---------------+-------+
+
+DATES SAMPLES
+    Entries for year 2018:
+
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+     | date       | day | month | orig_year | summary                                  | tags        | year |
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+     | 2018-09-27 | 27  | 9     | 1954      | Larry Wall's birthday (64th anniversary) | anniversary | 2018 |
+     | 2018-12-18 | 18  | 12    | 1987      | Perl 1.0 released (31st anniversary)     | anniversary | 2018 |
+     | 2018-10-17 | 17  | 10    | 1994      | Perl 5.0 released (24th anniversary)     | anniversary | 2018 |
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+
+    Entries for year 2019:
+
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+     | date       | day | month | orig_year | summary                                  | tags        | year |
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+     | 2019-09-27 | 27  | 9     | 1954      | Larry Wall's birthday (65th anniversary) | anniversary | 2019 |
+     | 2019-12-18 | 18  | 12    | 1987      | Perl 1.0 released (32nd anniversary)     | anniversary | 2019 |
+     | 2019-10-17 | 17  | 10    | 1994      | Perl 5.0 released (25th anniversary)     | anniversary | 2019 |
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+
+    Entries for year 2020:
+
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+     | date       | day | month | orig_year | summary                                  | tags        | year |
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+     | 2020-09-27 | 27  | 9     | 1954      | Larry Wall's birthday (66th anniversary) | anniversary | 2020 |
+     | 2020-12-18 | 18  | 12    | 1987      | Perl 1.0 released (33rd anniversary)     | anniversary | 2020 |
+     | 2020-10-17 | 17  | 10    | 1994      | Perl 5.0 released (26th anniversary)     | anniversary | 2020 |
+     +------------+-----+-------+-----------+------------------------------------------+-------------+------+
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Calendar-Dates-Perl>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Calendar-Dates-Perl>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Dates-Perl>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    perlhist
+
+    Calendar::Dates
+
+    App::CalendarDatesUtils contains CLIs to list dates from this module,
+    etc.
+
+    calx from App::calx can display calendar and highlight dates from
+    Calendar::Dates::* modules
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

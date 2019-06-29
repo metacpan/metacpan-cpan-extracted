@@ -1,7 +1,7 @@
 package Term::Caca::Constants;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: libcaca constants from caca.h
-$Term::Caca::Constants::VERSION = '3.0.1';
+$Term::Caca::Constants::VERSION = '3.1.0';
 use strict;
 use warnings;
 
@@ -110,98 +110,6 @@ use constant {
 
 };
 
-@EXPORT_OK = qw(
-
-  BLACK
-  BLUE
-  GREEN
-  CYAN
-  RED
-  MAGENTA
-  BROWN
-  LIGHTGRAY
-  DARKGRAY
-  LIGHTBLUE
-  LIGHTGREEN
-  LIGHTCYAN
-  LIGHTRED
-  LIGHTMAGENTA
-  YELLOW
-  WHITE
-
-
-  BACKGROUND
-  BACKGROUND_BLACK
-  BACKGROUND_SOLID
-
-  BACKGROUND_MIN
-  BACKGROUND_MAX
-
-  ANTIALIASING
-  ANTIALIASING_NONE
-  ANTIALIASING_PREFILTER
-
-  ANTIALIASING_MIN
-  ANTIALIASING_MAX
-
-  DITHERING
-  DITHERING_NONE
-  DITHERING_ORDERED2
-  DITHERING_ORDERED4
-  DITHERING_ORDERED8
-  DITHERING_RANDOM
-
-  DITHERING_MIN
-  DITHERING_MAX
-
-  FEATURE_UNKNOWN
-
-
-  NO_EVENT
-  KEY_PRESS
-  KEY_RELEASE
-  MOUSE_PRESS
-  MOUSE_RELEASE
-  MOUSE_MOTION
-  RESIZE
-  QUIT
-  ANY_EVENT
-
-  KEY_UNKNOWN
-
-  KEY_BACKSPACE
-  KEY_TAB
-  KEY_RETURN
-  KEY_PAUSE
-  KEY_ESCAPE
-  KEY_DELETE
-
-  KEY_UP
-  KEY_DOWN
-  KEY_LEFT
-  KEY_RIGHT
-  KEY_INSERT
-  KEY_HOME
-  KEY_END
-  KEY_PAGEUP
-  KEY_PAGEDOWN
-  KEY_F1
-  KEY_F2
-  KEY_F3
-  KEY_F4
-  KEY_F5
-  KEY_F6
-  KEY_F7
-  KEY_F8
-  KEY_F9
-  KEY_F10
-  KEY_F11
-  KEY_F12
-  KEY_F13
-  KEY_F14
-  KEY_F15
-);
-
 %EXPORT_TAGS = (
   colors => [ qw(
     BLACK
@@ -301,13 +209,18 @@ use constant {
   all => [ ],
 );
 
+
 # add all the other ":class" tags to the ":all" class,
 # deleting duplicates
 {
   my %seen;
 
-  push @{$EXPORT_TAGS{all}},
-    grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS;
+  for (keys %EXPORT_TAGS) {
+    Exporter::export_ok_tags($_);
+
+    push @{$EXPORT_TAGS{all}},
+      grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}}
+  }
 }
 
 
@@ -325,7 +238,7 @@ Term::Caca::Constants - libcaca constants from caca.h
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 SYNOPSIS
 
@@ -348,10 +261,46 @@ Only import the constants pertaining to events and keys:
 
 =head2 :events
 
-    NO_EVENT    ANY_EVENT
-    KEY_PRESS   KEY_RELEASE
-    MOUSE_PRESS MOUSE_RELEASE   MOUSE_MOTION
-    RESIZE      QUIT
+  NO_EVENT    ANY_EVENT
+  KEY_PRESS   KEY_RELEASE
+  MOUSE_PRESS MOUSE_RELEASE   MOUSE_MOTION
+  RESIZE      QUIT
+
+=head2 :keys
+
+  KEY_UNKNOWN
+
+  KEY_DELETE  KEY_TAB   KEY_PAUSE  KEY_RETURN  KEY_BACKSPACE  KEY_ESCAPE
+  KEY_UP      KEY_DOWN  KEY_LEFT   KEY_RIGHT
+  KEY_INSERT  KEY_HOME  KEY_END    KEY_PAGEUP  KEY_PAGEDOWN
+
+  KEY_F1  KEY_F2   KEY_F3   KEY_F4   KEY_F5   KEY_F6   KEY_F7   KEY_F8
+  KEY_F9  KEY_F10  KEY_F11  KEY_F12  KEY_F13  KEY_F14  KEY_F15
+
+=head2 :features
+
+  FEATURE_UNKNOWN
+
+  BACKGROUND
+  BACKGROUND_BLACK
+  BACKGROUND_SOLID
+  BACKGROUND_MIN
+  BACKGROUND_MAX
+
+  ANTIALIASING
+  ANTIALIASING_NONE
+  ANTIALIASING_PREFILTER
+  ANTIALIASING_MIN
+  ANTIALIASING_MAX
+
+  DITHERING
+  DITHERING_NONE
+  DITHERING_ORDERED2
+  DITHERING_ORDERED4
+  DITHERING_ORDERED8
+  DITHERING_RANDOM
+  DITHERING_MIN
+  DITHERING_MAX
 
 =head1 AUTHORS
 

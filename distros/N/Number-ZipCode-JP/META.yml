@@ -22,5 +22,5 @@ requires:
   UNIVERSAL::require: '0'
 resources:
   X_twitter: https://twitter.com/nipotan
-version: '0.20190531'
+version: '0.20190628'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

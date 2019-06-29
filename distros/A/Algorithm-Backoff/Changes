@@ -1,3 +1,10 @@
+0.008   2019-06-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Retry::Backoff and App::AlgorithmBackoffUtils.
+
+
 0.007   2019-06-18 (PERLANCAR)
 
 	- No functional changes.

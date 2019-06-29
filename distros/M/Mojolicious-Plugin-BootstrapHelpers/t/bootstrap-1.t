@@ -24,7 +24,7 @@ my $test = Test::Mojo::Trim->new;
 
 # test from line 1 in bootstrap-1.stencil
 
-my $expected_bootstrap_1_1 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">};
+my $expected_bootstrap_1_1 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">};
 
 get '/bootstrap_1_1' => 'bootstrap_1_1';
 
@@ -32,8 +32,8 @@ $test->get_ok('/bootstrap_1_1')->status_is(200)->trimmed_content_is($expected_bo
 
 # test from line 11 in bootstrap-1.stencil
 
-my $expected_bootstrap_1_11 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap-theme.min.css">};
+my $expected_bootstrap_1_11 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css">};
 
 get '/bootstrap_1_11' => 'bootstrap_1_11';
 
@@ -41,7 +41,7 @@ $test->get_ok('/bootstrap_1_11')->status_is(200)->trimmed_content_is($expected_b
 
 # test from line 22 in bootstrap-1.stencil
 
-my $expected_bootstrap_1_22 = qq{     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>};
+my $expected_bootstrap_1_22 = qq{     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>};
 
 get '/bootstrap_1_22' => 'bootstrap_1_22';
 
@@ -49,9 +49,9 @@ $test->get_ok('/bootstrap_1_22')->status_is(200)->trimmed_content_is($expected_b
 
 # test from line 32 in bootstrap-1.stencil
 
-my $expected_bootstrap_1_32 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap-theme.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>};
+my $expected_bootstrap_1_32 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>};
 
 get '/bootstrap_1_32' => 'bootstrap_1_32';
 
@@ -60,7 +60,7 @@ $test->get_ok('/bootstrap_1_32')->status_is(200)->trimmed_content_is($expected_b
 # test from line 44 in bootstrap-1.stencil
 
 my $expected_bootstrap_1_44 = qq{        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>};
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>};
 
 get '/bootstrap_1_44' => 'bootstrap_1_44';
 
@@ -68,10 +68,10 @@ $test->get_ok('/bootstrap_1_44')->status_is(200)->trimmed_content_is($expected_b
 
 # test from line 55 in bootstrap-1.stencil
 
-my $expected_bootstrap_1_55 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap-theme.min.css">
+my $expected_bootstrap_1_55 = qq{    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css">
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>};
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>};
 
 get '/bootstrap_1_55' => 'bootstrap_1_55';
 

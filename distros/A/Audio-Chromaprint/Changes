@@ -1,3 +1,13 @@
+0.002     2019-06-26 22:21:39+03:00 Asia/Jerusalem
+
+    * If you do not have Chromaprint available, we will install
+      it for you, using Alien::chromaprint!
+    * croak on error: The Chromaprint library does not provide
+      the reason something fails, but at least tells us when it
+      fails. We now croak when an error occurs in the library.
+    * Speed up the class (make_immutable).
+    * Fix POD rendering problem.
+
 0.001     2019-06-24 01:02:11+03:00 Asia/Jerusalem
 
     * Introduce first version built against 1.4.3.

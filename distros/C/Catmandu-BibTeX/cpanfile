@@ -1,18 +1,8 @@
 requires 'perl', 'v5.10.1';
 
-on build => sub {
-	requires 'Module::Build', '0.3601';
-};
+test_requires 'Test2::V0', '>= 0.000122';
 
-on configure => sub {
-	requires 'Module::Build', '0.3601';
-};
-
-on test => sub {
-    requires 'Test::More', '0.88';
-};
-
-requires 'Catmandu';
-requires 'Moo';
-requires 'BibTeX::Parser';
+requires 'Catmandu', '>= 1.2002';
+requires 'BibTeX::Parser', '>= 1.02';
+requires 'Moo', '0';
 requires 'Clone', '0';

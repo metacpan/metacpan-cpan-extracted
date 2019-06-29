@@ -148,7 +148,7 @@ WriteMakefile(
         'POSIX'               => 0,
         'URI'                 => 0,
         'Fcntl'               => 0,
-        'IPC::Run'            => 0,
+        'IPC::Open3'          => 1.03,
         'MIME::Base64'        => 0,
         'Time::HiRes'         => 0,
         'Exporter'            => 0,

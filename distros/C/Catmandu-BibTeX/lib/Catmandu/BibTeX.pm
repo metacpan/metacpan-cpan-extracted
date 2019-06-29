@@ -1,6 +1,6 @@
 package Catmandu::BibTeX;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 
@@ -13,8 +13,6 @@ Catmandu::BibTeX - Catmandu modules for working with BibTeX data
 =head1 STATUS
 
 =begin markdown
-
-# STATUS
 
 [![Build Status](https://travis-ci.org/LibreCat/Catmandu-BibTeX.svg?branch=master)](https://travis-ci.org/LibreCat/Catmandu-BibTeX)
 [![Coverage](https://coveralls.io/repos/LibreCat/Catmandu-BibTeX/badge.png?branch=master)](https://coveralls.io/r/LibreCat/Catmandu-BibTeX)

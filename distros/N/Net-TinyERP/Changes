@@ -1,5 +1,11 @@
 Revision history for Net-TinyERP
 
+0.07    2019-06-28
+    - (fixup) add missing module from previous release.
+
+0.06    2019-06-28
+    - new nota_servicos() method for NFS-e
+
 0.05    2016-04-12
     - emitir() also accepts parameters
 

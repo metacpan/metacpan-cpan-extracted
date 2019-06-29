@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Handle );
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use IO::Async::Handle;
 use IO::Async::OS;

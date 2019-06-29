@@ -2,8 +2,8 @@ NAME
     Proc::Daemon::Prefork - Create preforking, autoreloading daemon
 
 VERSION
-    This document describes version 0.70 of Proc::Daemon::Prefork (from Perl
-    distribution Proc-Daemon-Prefork), released on 2014-12-11.
+    This document describes version 0.710 of Proc::Daemon::Prefork (from
+    Perl distribution Proc-Daemon-Prefork), released on 2019-06-27.
 
 METHODS
   new(%args)
@@ -13,9 +13,25 @@ METHODS
 
         If true, bails out if not running as root.
 
-    *   error_log_path (required if daemonize=1)
+    *   error_log_path => STR (required if daemonize=1)
+
+        Or, alternatively, specify "error_log_handle" instead.
+
+    *   error_log_handle => OBJ
+
+        An alternative to specifying "error_log_path", to allow logging to a
+        filehandle-like object, e.g. tied filehandle, instead of to a
+        regular file.
 
     *   access_log_path => STR (required if daemonize=1)
+
+        Or, alternatively, specify "access_log_handle" instead.
+
+    *   access_log_handle => OBJ
+
+        An alternative to specifying "access_log_path", to allow logging to
+        a filehandle-like object, e.g. tied filehandle, instead of to a
+        regular file.
 
     *   pid_path => STR (required if daemonize=1)
 
@@ -114,7 +130,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2014 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

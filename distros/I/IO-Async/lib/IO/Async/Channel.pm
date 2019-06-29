@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use Carp;
 
@@ -403,6 +403,7 @@ sub setup_async_mode
 
    keys %args and croak "Unrecognised keys for setup_async_mode: " . join( ", ", keys %args );
 
+   defined and $_->blocking( 0 ) for $self->{read_handle}, $self->{write_handle};
    $self->{mode} = "async";
 }
 

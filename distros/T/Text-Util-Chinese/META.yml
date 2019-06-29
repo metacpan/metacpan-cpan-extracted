@@ -16,11 +16,11 @@ name: Text-Util-Chinese
 provides:
   Text::Util::Chinese:
     file: lib/Text/Util/Chinese.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   List::Util: '1.5'
 resources:
   repository: https://github.com/gugod/Text-Util-Chinese.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: '1'

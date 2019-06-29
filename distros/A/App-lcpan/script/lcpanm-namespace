@@ -3,8 +3,8 @@
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint command=_cpanm-namespace
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '1.034'; # VERSION
+our $DATE = '2019-06-26'; # DATE
+our $VERSION = '1.035'; # VERSION
 
 use strict;
 use warnings;
@@ -88,7 +88,7 @@ lcpanm-namespace - cpanm wrapper (set mirror to local CPAN by default, install a
 
 =head1 VERSION
 
-This document describes version 1.034 of lcpanm-namespace (from Perl distribution App-lcpan), released on 2019-06-19.
+This document describes version 1.035 of lcpanm-namespace (from Perl distribution App-lcpan), released on 2019-06-26.
 
 =head1 SYNOPSIS
 

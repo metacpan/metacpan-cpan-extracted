@@ -1,7 +1,7 @@
 package Bread::Board::LifeCycle::Singleton;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: service role for singleton lifecycle
-$Bread::Board::LifeCycle::Singleton::VERSION = '0.36';
+$Bread::Board::LifeCycle::Singleton::VERSION = '0.37';
 use Moose::Role;
 
 use Try::Tiny;
@@ -71,7 +71,7 @@ Bread::Board::LifeCycle::Singleton - service role for singleton lifecycle
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 
@@ -121,7 +121,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

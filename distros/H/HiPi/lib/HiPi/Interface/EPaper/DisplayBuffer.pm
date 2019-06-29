@@ -28,7 +28,7 @@ __PACKAGE__->create_ro_accessors( qw(
 
 __PACKAGE__->create_accessors( qw( pen rotation ) );
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 sub new {
     my( $class, %params) = @_;

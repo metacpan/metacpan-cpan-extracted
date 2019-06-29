@@ -5,11 +5,10 @@ use strict;
 use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
-use Test::More tests => 87;
+use Test::More tests => 89;
 
 use Sport::Analytics::NHL;
 use Sport::Analytics::NHL::Merger;
-use Sport::Analytics::NHL::Tools;
 use Sport::Analytics::NHL::Test;
 
 my $boxscore = Sport::Analytics::NHL::retrieve_compiled_report(
@@ -54,7 +53,7 @@ Sport::Analytics::NHL::Merger::merge_events(
 );
 $Sport::Analytics::NHL::Test::THIS_SEASON = $boxscore->{season};
 Sport::Analytics::NHL::Test::test_merged_events($boxscore->{events});
-is($TEST_COUNTER->{Curr_Test}, 3532, 'team and roster all tested');
+is($TEST_COUNTER->{Curr_Test}, 3525, 'team and roster all tested');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
 
 $boxscore = Sport::Analytics::NHL::retrieve_compiled_report(
@@ -65,7 +64,7 @@ $Sport::Analytics::NHL::Merger::PLAYER_RESOLVE_CACHE = $boxscore->{resolve_cache
 
 $boxscore->set_event_extra_data();
 
-for my $type (qw(PL RO GS ES)) {
+for my $type (qw(PL RO GS ES TV TH)) {
 	my $doc = Sport::Analytics::NHL::retrieve_compiled_report(
 		{}, 201120010, $type, 't/data/2011/0002/0010'
 	);
@@ -73,5 +72,8 @@ for my $type (qw(PL RO GS ES)) {
 }
 
 test_merged_boxscore($boxscore);
-is($TEST_COUNTER->{Curr_Test}, 8549, 'team and roster all tested');
+is($TEST_COUNTER->{Curr_Test}, 8535, 'team and roster all tested');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
+
+ok(defined $boxscore->{shifts}, 'shifts merged');
+isa_ok($boxscore->{shifts}, 'ARRAY', 'it is an array of shifts');

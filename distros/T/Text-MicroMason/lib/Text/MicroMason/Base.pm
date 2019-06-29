@@ -68,8 +68,10 @@ sub compile {
     
     my $code = $self->interpret( $src_type, $src_data );
     
-    $self->eval_sub( $code ) 
-        or $self->croak_msg( "MicroMason compilation failed: $@\n". _number_lines($code)."\n" );
+    unless ( $self->eval_sub($code) ) {
+        ref($@) and die $@;
+        $self->croak_msg( "MicroMason compilation failed: $@\n" . _number_lines($code) . "\n" );
+    }
 
 }
 
@@ -90,9 +92,11 @@ sub _number_lines {
 # $result = $mason->execute( $src_type, $src_data, \%options, @arguments );
 sub execute {
   my $self = shift;
-  my $sub = ( $_[0] eq 'code' ) ? do { shift; shift } : 
-	$self->compile( shift, shift, ref($_[0]) ? %{ shift() } : () )
-    or $self->croak_msg("MicroMason compilation failed: $@");
+  my $sub = ( $_[0] eq 'code' ) ? do { shift; shift } : $self->compile( shift, shift, ref( $_[0] ) ? %{ shift() } : () );
+  unless ($sub) {
+      ref($@) and die $@;
+      $self->croak_msg("MicroMason compilation failed: $@");
+  }
   &$sub( @_ );
 }
 
@@ -223,7 +227,7 @@ sub assembler_rules {
   sub_start  => 'sub { ',
   sub_end  => '}',
   init_errs => 
-    'local $SIG{__DIE__} = sub { die "MicroMason execution failed: ", @_ };',
+    'local $SIG{__DIE__} = sub { ref($_[0]) and die $_[0];  die "MicroMason execution failed: ", @_ };',
   
   # Argument processing elements
   init_args => 'my %ARGS = @_ if ($#_ % 2);',

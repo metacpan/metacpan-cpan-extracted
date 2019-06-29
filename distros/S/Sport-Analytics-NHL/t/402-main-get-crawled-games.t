@@ -7,7 +7,7 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($MONGO_DB);
 use Sport::Analytics::NHL::Test;
 use Sport::Analytics::NHL;
 

@@ -31,6 +31,7 @@
       "runtime" : {
          "requires" : {
             "DBD::mysql" : "4.042",
+            "DBI" : "1.627",
             "Mojolicious" : "8.03",
             "SQL::Abstract" : "1.86"
          }
@@ -53,7 +54,7 @@
          "web" : "https://github.com/jhthorsen/mojo-mysql"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_contributors" : [
       "Curt Hochwender <hochwender@centurytel.net>",
       "Dan Book <dbook@cpan.org>",

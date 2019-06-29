@@ -13,8 +13,9 @@ use t::TimeAbout;
 use IO::Async::Loop;
 use IO::Async::OS;
 
-use Future::IO;
-use Future::IO::Impl::IOAsync;
+eval { require Future::IO; require Future::IO::ImplBase } or
+   plan skip_all => "Future::IO is not available";
+require Future::IO::Impl::IOAsync;
 
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
 
@@ -30,6 +31,7 @@ testing_loop( IO::Async::Loop->new_builtin );
 # ->sysread
 {
    my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
+   $rd->blocking( 0 );
 
    $wr->autoflush();
    $wr->print( "Some bytes\n" );
@@ -37,6 +39,26 @@ testing_loop( IO::Async::Loop->new_builtin );
    my $f = Future::IO->sysread( $rd, 256 );
 
    is( ( wait_for_future $f )->get, "Some bytes\n", 'Future::IO->sysread' );
+}
+
+# ->syswrite
+{
+   my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
+   $wr->blocking( 0 );
+
+   $wr->autoflush();
+   1 while $wr->syswrite( "X" x 4096 ); # This will eventually return undef/EAGAIN
+   $! == Errno::EAGAIN or
+      die "Expected EAGAIN, got $!";
+
+   my $f = Future::IO->syswrite( $wr, "ABCD" );
+
+   $rd->sysread( my $buf, 4096 );
+
+   is( ( wait_for_future $f )->get, 4, 'Future::IO->syswrite' );
+
+   1 while $rd->sysread( $buf, 4096 ) == 4096;
+   is( $buf, "ABCD", 'Future::IO->syswrite wrote data' );
 }
 
 done_testing;

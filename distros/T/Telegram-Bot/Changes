@@ -1,17 +1,27 @@
-0.010  Justin Hawkins <justin@eatmorecode.com>
+0.012     2019-06-28 16:52:52+09:30 Australia/Adelaide
 
-    * improve documentation and metadata
+    - add missing dependency
 
-0.009  Justin Hawkins <justin@eatmorecode.com>
+0.011     2019-06-28 14:22:57+09:30 Australia/Adelaide
 
-    * allow the criteria to be specified with a simple regex
+    - fix kwalitee issues
+    - META.json
+    - use a modern Mojolicious version
 
-0.008  Justin Hawkins <justin@eatmorecode.com>
+0.010     2016-12-22
 
-    * return response from send_message_to_chat_id and send_to_chat_id
+    - improve documentation and metadata
+
+0.009     2016-12-22
+
+    - allow the criteria to be specified with a simple regex
+
+0.008     2016-10-25
+
+    - return response from send_message_to_chat_id and send_to_chat_id
       for capturing things like the message_id
 
-0.007  Justin Hawkins <justin@eatmorecode.com>
+0.007     2016-10-19
 
-    * added Changelog :-)
-    * added support for constructing and sending images
+    - added Changelog :-)
+    - added support for constructing and sending images

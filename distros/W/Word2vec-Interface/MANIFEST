@@ -7,6 +7,7 @@ lib/Word2vec/Xmltow2v.pm
 lib/Word2vec/Wsddata.pm
 lib/Word2vec/Spearmans.pm
 lib/Word2vec/Bst.pm
+lib/Word2vec/Lesk.pm
 lib/Word2vec/Node.pm
 lib/Word2vec/Util.pm
 lib/Word2vec/External/Word2vec/LICENSE
@@ -65,6 +66,7 @@ Similarity/UMNSRS_reduced_sim.cuis.gold
 Similarity/UMNSRS_reduced_sim.terms.gold
 Similarity/UMNSRS_reduced_sim.terms.sim
 t/1BuildExecutables.t
+t/1Lesk.t
 t/1Word2phrase.t
 t/1Word2vec.t
 t/1Xmltow2v.t

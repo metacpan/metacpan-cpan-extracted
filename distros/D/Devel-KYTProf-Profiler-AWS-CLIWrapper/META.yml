@@ -1,0 +1,42 @@
+---
+abstract: 'KYTProf prolifer for AWS::CLIWrapper'
+author:
+  - 'papix <mail@papix.net>'
+build_requires:
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-KYTProf-Profiler-AWS-CLIWrapper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::KYTProf::Profiler::AWS::CLIWrapper:
+    file: lib/Devel/KYTProf/Profiler/AWS/CLIWrapper.pm
+    version: '0.01'
+requires:
+  AWS::CLIWrapper: '0'
+  Devel::KYTProf: '0.9991'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/papix/Devel-KYTProf-Profiler-AWS-CLIWrapper/issues
+  homepage: https://github.com/papix/Devel-KYTProf-Profiler-AWS-CLIWrapper
+  repository: git://github.com/papix/Devel-KYTProf-Profiler-AWS-CLIWrapper.git
+version: '0.01'
+x_authority: cpan:PAPIX
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

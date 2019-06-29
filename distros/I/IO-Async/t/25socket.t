@@ -262,6 +262,8 @@ my @sub_received;
 # Socket errors
 {
    my ( $ES1, $ES2 ) = IO::Async::OS->socketpair or die "Cannot socketpair - $!";
+   $_->blocking( 0 ) for $ES1, $ES2;
+
    $ES2->syswrite( "X" ); # ensuring $ES1 is read- and write-ready
    # cheating and hackery
    bless $ES1, "ErrorSocket";

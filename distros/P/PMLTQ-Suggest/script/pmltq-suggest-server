@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 
+use Getopt::Long;
 use File::Find::Rule;
 use File::Spec;
 use File::Basename 'dirname';
@@ -11,12 +12,17 @@ use Treex::PML;
 
 use PMLTQ::Suggest::Server;
 
+my $port = 8071;
+my $host = 'localhost';
+my $prefork = 0;
+my @resources_path = ();
+GetOptions(
+	'--port=i' => \$port,
+	'--host=s' => \$host,
+	'--prefork=i' => \$prefork,
+	'--resources-path=s{,}' => \@resources_path,
+	);
 
-my %opts = @ARGV;
-my $port = ($opts{'--port'} || 8071);
-my $host = ($opts{'--host'} || 'localhost');
-my $prefork = ($opts{'--prefork'} || 0);
-my $resources_path = $opts{'--resources-path'}; # resources should be in any subdirectory. You can set TrEd extenssions directory.
 my $inputenc = "UTF-8";
 
 start_server();
@@ -25,10 +31,12 @@ sub start_server {
   my $server = PMLTQ::Suggest::Server->new($port);
   $server->host($host);
   $server->prefork($prefork);
-  if($resources_path && (-d $resources_path)){
-    my @resources = File::Find::Rule->directory->name('resources')->in( $resources_path );
-    print STDERR '['.localtime()."] resources: ". join('|',@resources)."\n";
-    Treex::PML::SetResourcePaths(@resources);
+  for my $res_path (@resources_path) {
+    if($res_path && (-d $res_path)){
+      my @resources = File::Find::Rule->directory->name('resources')->in( $res_path );
+      print STDERR '['.localtime()."] resources: ". join('|',@resources)."\n";
+      Treex::PML::SetResourcePaths(@resources);
+    }
   }
   $server->run();
 }

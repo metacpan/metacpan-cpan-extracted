@@ -30,11 +30,14 @@
             "Exporter" : "0",
             "Graph" : "0",
             "JavaScript::V8" : "0",
+            "List::Compare" : "0",
             "List::Util" : "0",
             "Mojo::DOM" : "0",
             "Mojo::UserAgent" : "0",
             "Mojo::UserAgent::Mockable" : "0",
+            "experimental" : "0",
             "feature" : "0",
+            "if" : "0",
             "parent" : "0",
             "strict" : "0",
             "utf8" : "0",
@@ -61,7 +64,7 @@
          "web" : "https://github.com/pavelsr/WWW-AzumuthAero"
       }
    },
-   "version" : "0.2",
+   "version" : "0.31",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

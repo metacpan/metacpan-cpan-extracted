@@ -1,12 +1,9 @@
 package Term::Caca::Event::Mouse::Button::Release;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: event triggered by a button release 
-$Term::Caca::Event::Mouse::Button::Release::VERSION = '3.0.1';
+$Term::Caca::Event::Mouse::Button::Release::VERSION = '3.1.0';
 
-use strict;
-use warnings;
-
-use Moose;
+use Moo;
 extends qw/ Term::Caca::Event::Mouse::Button /;
 
 1;
@@ -23,7 +20,7 @@ Term::Caca::Event::Mouse::Button::Release - event triggered by a button release
 
 =head1 VERSION
 
-version 3.0.1
+version 3.1.0
 
 =head1 DESCRIPTION 
 

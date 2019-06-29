@@ -279,16 +279,89 @@ static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
 
   SuspendedFrame *frame;
   for(frame = state->frames; frame; frame = frame->next) {
-    if(frame->stacklen) {
-      int i;
-      for(i = 0; i < frame->stacklen; i++)
-        ret += DMD_ANNOTATE_SV(sv, frame->stack[i], "a suspended stack temporary");
+    int i;
+
+    for(i = 0; i < frame->stacklen; i++)
+      ret += DMD_ANNOTATE_SV(sv, frame->stack[i], "a suspended stack temporary");
+
+    for(i = 0; i < frame->mortallen; i++)
+      ret += DMD_ANNOTATE_SV(sv, frame->mortals[i], "a suspended mortal");
+
+#ifdef HAVE_ITERVAR
+    if(frame->itervar)
+      ret += DMD_ANNOTATE_SV(sv, frame->itervar, "a suspended loop iteration variable");
+#endif
+
+    switch(frame->type) {
+      case CXt_BLOCK:
+      case CXt_LOOP_PLAIN:
+        break;
+
+      case CXt_LOOP_LAZYSV:
+        ret += DMD_ANNOTATE_SV(sv, frame->el.loop.state_u.lazysv.cur, "a suspended foreach LAZYSV loop iterator value");
+        ret += DMD_ANNOTATE_SV(sv, frame->el.loop.state_u.lazysv.end, "a suspended foreach LAZYSV loop stop value");
+        goto cxt_loop_common;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+      case CXt_LOOP_ARY:
+#else
+      case CXt_LOOP_FOR:
+#endif
+        if(frame->el.loop.state_u.ary.ary)
+          ret += DMD_ANNOTATE_SV(sv, (SV *)frame->el.loop.state_u.ary.ary, "a suspended foreach ARY loop value array");
+        goto cxt_loop_common;
+
+      case CXt_LOOP_LAZYIV:
+#if HAVE_PERL_VERSION(5, 24, 0)
+      case CXt_LOOP_LIST:
+#endif
+      cxt_loop_common:
+#if !defined(HAVE_ITERVAR)
+        ret += DMD_ANNOTATE_SV(sv, frame->el.loop.itersave, "a suspended loop saved iteration variable");
+#endif
+        break;
     }
 
-    if(frame->mortallen) {
-      int i;
-      for(i = 0; i < frame->mortallen; i++)
-        ret += DMD_ANNOTATE_SV(sv, frame->mortals[i], "a suspended mortal");
+    for(i = 0; i < frame->savedlen; i++) {
+      struct Saved *saved = &frame->saved[i];
+      switch(saved->type) {
+#ifdef SAVEt_CLEARPADRANGE
+        case SAVEt_CLEARPADRANGE:
+#endif
+        case SAVEt_CLEARSV:
+        case SAVEt_INT_SMALL:
+        case SAVEt_DESTRUCTOR_X:
+#ifdef SAVEt_STRLEN
+      case SAVEt_STRLEN:
+#endif
+        case SAVEt_SET_SVFLAGS:
+          /* Nothing interesting */
+          break;
+
+        case SAVEt_FREEPV:
+          /* This is interesting but a plain char* pointer so there's nothing
+           * we can do with it in Devel::MAT */
+          break;
+
+        case SAVEt_COMPPAD:
+          ret += DMD_ANNOTATE_SV(sv, saved->cur.ptr, "a suspended SAVEt_COMPPAD");
+          break;
+
+        case SAVEt_FREESV:
+          ret += DMD_ANNOTATE_SV(sv, saved->saved.sv, "a suspended SAVEt_FREESV");
+          break;
+
+        case SAVEt_SV:
+          ret += DMD_ANNOTATE_SV(sv, (SV *)saved->u.gv, "a suspended SAVEt_SV target GV");
+          ret += DMD_ANNOTATE_SV(sv, saved->cur.sv,     "a suspended SAVEt_SV current value");
+          ret += DMD_ANNOTATE_SV(sv, saved->saved.sv,   "a suspended SAVEt_SV saved value");
+          break;
+
+        case SAVEt_PADSV_AND_MORTALIZE:
+          ret += DMD_ANNOTATE_SV(sv, saved->cur.sv,   "a suspended SAVEt_PADSV_AND_MORTALIZE current value");
+          ret += DMD_ANNOTATE_SV(sv, saved->saved.sv, "a suspended SAVEt_PADSV_AND_MORTALIZE saved value");
+          break;
+      }
     }
   }
 
@@ -383,7 +456,14 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
               Safefree(saved->cur.ptr);
               break;
 
+            case SAVEt_SV:
+              SvREFCNT_dec(saved->u.gv);
+              SvREFCNT_dec(saved->saved.sv);
+              SvREFCNT_dec(saved->cur.sv);
+              break;
+
             case SAVEt_PADSV_AND_MORTALIZE:
+              SvREFCNT_dec(saved->saved.sv);
               SvREFCNT_dec(saved->cur.sv);
               break;
 
@@ -396,7 +476,35 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
         Safefree(frame->saved);
       }
 
-      /* TODO: maybe free items of the el.loop */
+      switch(frame->type) {
+        case CXt_BLOCK:
+        case CXt_LOOP_PLAIN:
+          break;
+
+        case CXt_LOOP_LAZYSV:
+          SvREFCNT_dec(frame->el.loop.state_u.lazysv.cur);
+          SvREFCNT_dec(frame->el.loop.state_u.lazysv.end);
+          goto cxt_loop_common;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+        case CXt_LOOP_ARY:
+#else
+        case CXt_LOOP_FOR:
+#endif
+          if(frame->el.loop.state_u.ary.ary)
+            SvREFCNT_dec(frame->el.loop.state_u.ary.ary);
+          goto cxt_loop_common;
+
+        case CXt_LOOP_LAZYIV:
+#if HAVE_PERL_VERSION(5, 24, 0)
+        case CXt_LOOP_LIST:
+#endif
+        cxt_loop_common:
+#if !defined(HAVE_ITERVAR)
+          SvREFCNT_dec(frame->el.loop.itersave);
+#endif
+          break;
+      }
 
 #ifdef HAVE_ITERVAR
       if(frame->itervar) {
@@ -635,7 +743,7 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         saved->saved.sv = val;      /* steal ownership */
 
         /* restore it for now */
-        GvSV(gv) = SvREFCNT_inc(val);
+        GvSV(gv) = val;
 
         break;
       }
@@ -1226,7 +1334,7 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
         break;
 
       case SAVEt_SV:
-        save_pushptrptr(saved->u.gv, saved->saved.sv, SAVEt_SV);
+        save_pushptrptr(saved->u.gv, SvREFCNT_inc(saved->saved.sv), SAVEt_SV);
 
         SvREFCNT_dec(GvSV(saved->u.gv));
         GvSV(saved->u.gv) = saved->cur.sv;

@@ -1,11 +1,13 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use utf8;
 use strict;
 use warnings;
 use lib 't/tlib';
 use Test::More;
+use Test::Fatal 'exception';
 use Test::Mock::Redis;
+use Encode ();
 
 =pod
 x   APPEND
@@ -78,12 +80,18 @@ foreach my $r (@redi){
         ok($r->set('raboof', 'bar', 'XX', EX => 20), 'Called set with XX and EX');
         is($r->get('raboof'), 'bar', ' - updated key');
         ok($r->ttl('raboof') > 19 && $r->ttl('raboof') <= 20, ' - reset TTL');
-        ok(! defined $r->set('finaltest', 'baz', 'NX', 'XX'), 'Returns nil with NX and XX');
 
-        ok($r->set('raboof', 'val', 'EX', 100, 'PX', 10), 'Called set with EX and PX, EX greater');
-        ok($r->ttl('raboof') > 99 && $r->ttl('raboof') <= 100, 'Used EX value');
-        ok($r->set('raboof', 'val', 'PX', 5000, 'EX', 2), 'Called set with EX and PX, PX greater');
-        ok($r->ttl('raboof') > 4 && $r->ttl('raboof') <= 5, 'Used PX value');
+        like exception { $r->set('finaltest', 'baz', 'NX', 'XX') },
+          qr/\[set\] ERR syntax error/,
+          'Combining NX and XX is a syntax error';
+
+        like exception { $r->set('raboof', 'val', 'EX', 100, 'PX', 10) },
+          qr/^\[set\] ERR syntax error/,
+          'Combining EX and PX is a syntax error';
+
+        like exception { $r->set('raboof', 'val', 'EXX') },
+          qr/^\[set\] ERR syntax error/,
+          'Using unknown option is a syntax error';
     };
 
     ok(! $r->setnx('foo', 'foobar'), 'setnx returns false for existing key');
@@ -116,7 +124,7 @@ foreach my $r (@redi){
 
     is($r->strlen('append-test'), 9, 'length of append-test key is now 9');
 
-    is($r->append('append-test', '€'), 12, 'euro character (multi-byte) only counted by bytes');
+    is($r->append('append-test', Encode::encode( 'UTF-8', '€') ), 12, 'euro character (multi-byte) only counted by bytes');
 
     is($r->getset('foo', 'whee!'),  'foobar', 'getset returned old value of foo');
     is($r->getset('foo', 'foobar'), 'whee!',  'getset returned old value of foo again (so it must have been set)');

@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::YANICK;
 our $AUTHORITY = 'cpan:YANICK';
-$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.29.0';
+$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.30.0';
 # ABSTRACT: Be like Yanick when you build your dists
 
 # [TODO] add CONTRIBUTING file
@@ -62,7 +62,7 @@ has travis_perl_versions => (
     is => 'ro',
     isa => $TravisPerlVersions,
     coerce => 1,
-    default => '14..26' 
+    default => '22..30'
 );
 
 has badge => (
@@ -87,7 +87,7 @@ sub configure {
     $self->add_plugins([ $builder, ( \%mb_args ) x ($builder eq 'ModuleBuild' ) ]);
 
     $self->add_plugins(
-        qw/ 
+        qw/
             Git::Contributors
             ContributorsFile
             Test::Compile
@@ -96,15 +96,15 @@ sub configure {
             Covenant
             ContributorCovenant
         /,
-        [ GithubMeta => { 
-            remote => $upstream, 
+        [ GithubMeta => {
+            remote => $upstream,
             issues => 1,
         } ],
         qw/ MetaYAML MetaJSON PodWeaver License
           /,
         [ ReadmeAnyFromPod => { type => 'gfm', filename => 'README.mkdn' } ],
         [ CoderwallEndorse => { users => 'yanick:Yanick' } ],
-        [ NextRelease => { 
+        [ NextRelease => {
                 time_zone => 'America/Montreal',
                 format    => '%-9v %{yyyy-MM-dd}d',
             } ],
@@ -113,20 +113,20 @@ sub configure {
         qw/  ManifestSkip /,
         [ 'Git::GatherDir' => {
             include_dotfiles => $arg->{include_dotfiles},
-            exclude_filename => 'cpanfile',
+            exclude_filename => [ qw/ cpanfile AUTHOR_PLEDGE CODE_OF_CONDUCT.md /],
         } ],
-        [ CopyFilesFromBuild => { copy => 'cpanfile' } ],
+        [ CopyFilesFromBuild => { copy => [ qw/ cpanfile AUTHOR_PLEDGE CODE_OF_CONDUCT.md / ] } ],
         qw/ ExecDir
           PkgVersion /,
-          [ Authority => { 
+          [ Authority => {
             authority => $arg->{authority} // 'cpan:YANICK'
           } ],
           qw/ Test::ReportPrereqs
           Signature /,
-          [ AutoPrereqs => { 
-                  ( skip => $arg->{autoprereqs_skip} ) 
+          [ AutoPrereqs => {
+                  ( skip => $arg->{autoprereqs_skip} )
                             x !!$arg->{autoprereqs_skip}
-            } 
+            }
           ],
           qw/ CheckChangesHasContent
           TestRelease
@@ -134,16 +134,16 @@ sub configure {
           Git::Check
           CopyrightYearFromGit
           /,
-        [ 'Git::CommitBuild' => { 
+        [ 'Git::CommitBuild' => {
                 release_branch => $release_branch ,
                 multiple_inheritance => 1,
         } ],
         [ 'Git::Tag'  => { tag_format => 'v%v', branch => $release_branch } ],
         [ TravisCI => [
             verbose => 0,
-            install => 'cpanm --installdeps -n .',
+            install => 'cpanm --with-recommends --installdeps -n .',
             script => 'prove -l t',
-            
+
             map { ( perl_version => $_ ) } $self->travis_perl_versions->@*
         ]  ],
     );
@@ -157,7 +157,7 @@ sub configure {
             minor => 'NEW FEATURES, ENHANCEMENTS',
             revision => 'BUG FIXES, DOCUMENTATION, STATISTICS',
         } ],
-        [ 'ChangeStats::Git' => { 
+        [ 'ChangeStats::Git' => {
                 group => 'STATISTICS',
                 develop_branch => $dev_branch,
                 release_branch => $release_branch,
@@ -171,14 +171,14 @@ sub configure {
     else {
         $self->add_plugins(
             [ 'Git::Push' => { push_to    => join ' ', $upstream, $dev_branch, $release_branch} ],
-            qw/ UploadToCPAN /, 
+            qw/ UploadToCPAN /,
         );
 
         $self->add_plugins(
             [ Twitter => {
                 tweet_url =>
                     'https://metacpan.org/release/{{$AUTHOR_UC}}/{{$DIST}}-{{$VERSION}}/',
-                tweet => 
+                tweet =>
                     'Released {{$DIST}}-{{$VERSION}}{{$TRIAL}} {{$URL}} !META{resources}{repository}{web}',
                 url_shortener => 'none',
             } ],
@@ -188,10 +188,10 @@ sub configure {
             [ 'InstallRelease' => { install_command => 'cpanm .' } ],
         );
     }
-    
+
     $self->add_plugins(
     qw/
-        SchwartzRatio 
+        SchwartzRatio
         Test::UnusedVars
         RunExtraTests
     /
@@ -205,13 +205,14 @@ sub configure {
         ]);
     }
 
-    $self->add_plugins( 
-        [ DOAP => { 
+    $self->add_plugins(
+        [ DOAP => {
             process_changes => $self->doap_changelog,
 #            ttl_filename => 'project.ttl',
         } ],
-        [ 'CPANFile' ],
+        [ 'CPANFile', 'MinimumPerlFast' ],
     );
+
 
     $self->config_slice( 'mb_class' );
 
@@ -232,7 +233,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 =head1 VERSION
 
-version 0.29.0
+version 0.30.0
 
 =head1 DESCRIPTION
 
@@ -278,6 +279,8 @@ his distributions. It's roughly equivalent to
 
     [Git::GatherDir]
     exclude_filename = cpanfile
+    exclude_filename = AUTHOR_PLEDGE
+    exclude_filename = CODE_OF_CONDUCT.md
 
     [CopyFilesFromBuild]
     copy = cpanfile
@@ -342,6 +345,8 @@ his distributions. It's roughly equivalent to
 
     [GitHubREADME::Badge]
 
+    [MinimumPerlFast]
+
 =head2 ARGUMENTS
 
 =head3 autoprereqs_skip
@@ -355,7 +360,7 @@ Passed to L<Dist::Zilla::Plugin::Authority>.
 =head3 fake_release
 
 If given a true value, uses L<Dist::Zilla::Plugin::FakeRelease>
-instead of 
+instead of
 L<Dist::Zilla::Plugin::Git::Push>,
 L<Dist::Zilla::Plugin::UploadToCPAN>,
 L<Dist::Zilla::Plugin::InstallRelease> and
@@ -363,7 +368,7 @@ L<Dist::Zilla::Plugin::Twitter>.
 
 Can also be triggered via the I<FAKE> environment variable.
 
-=head3 builder 
+=head3 builder
 
 C<ModuleBuild> or C<MakeMaker>. Defaults to C<MakeMaker>.
 
@@ -404,13 +409,13 @@ Defaults to C<github>.
 
 =head3 travis_perl_versions
 
-    travis_perl_versions = 14,16,18,20,22,24,26
+    travis_perl_versions = 22,24,26,28,30
 
 Comma-separated list of perl versions (without the leading '5') that
 travis should test. Ranges can be given (C<14..16>), for which the
 odd numbers will be skipped. So C<14..26> will result in C<14,16,18,...>.
 
-Defaults to C<14..26>.
+Defaults to C<22..30>.
 
 =head1 AUTHOR
 
@@ -418,7 +423,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
+This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

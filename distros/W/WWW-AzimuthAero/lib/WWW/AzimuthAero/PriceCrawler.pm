@@ -1,5 +1,5 @@
 package WWW::AzimuthAero::PriceCrawler;
-$WWW::AzimuthAero::PriceCrawler::VERSION = '0.2';
+$WWW::AzimuthAero::PriceCrawler::VERSION = '0.31';
 
 # ABSTRACT: Crawler for https://azimuth.aero/
 
@@ -10,17 +10,17 @@ use feature 'say';
 sub prepare_requests {
     my ( $self, %params ) = @_;
 
-    my $iata_map = $self->route_map->route_map_iata;
+    my $iata_map = $self->route_map->route_map_iata( $params{cities} );
 
     my $n = 0;
     if ( $params{verbose} ) {
-        say 'Cities total: ' . scalar keys %$iata_map;
+        say 'Cities total: ' . scalar keys %$iata_map if $params{verbose};
         for my $x ( values %$iata_map ) {
             $n += scalar @$x;
         }
         say
 'Amount of WWW::AzimuthAero::get_schedule_dates HTTP requests will be performed: '
-          . $n;
+          if $params{verbose};
     }
 
     my @get_requests;
@@ -37,8 +37,10 @@ sub prepare_requests {
 
     if ( $params{verbose} ) {
         say 'Amount of WWW::AzimuthAero::get HTTP requests will be performed: '
-          . scalar @get_requests;
-        say 'Total HTTP requests: ' . $n + scalar @get_requests;
+          . scalar @get_requests
+          if $params{verbose};
+        say 'Total HTTP requests: ' . $n + scalar @get_requests
+          if $params{verbose};
     }
 
     return @get_requests;
@@ -59,7 +61,7 @@ WWW::AzimuthAero::PriceCrawler - Crawler for https://azimuth.aero/
 
 =head1 VERSION
 
-version 0.2
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -70,23 +72,27 @@ version 0.2
 
     Wrappper under L<WWW::AzimuthAero>
 
-=head1 new
+=head1 METHODS
+
+=head2 new
 
 See L<WWW::AzimuthAero/new>
 
-=head1 prepare_requests
+=head2 prepare_requests
 
 Return arrray of hashes with params (from, to, date) for WWW::AzimuthAero::get method
 
-    my @l = $azo_price_crawler->prepare_requests( max_date => '18.12.2019', verbose => 1 );
+    my @l = $azo_price_crawler->prepare_requests( max_date => '18.12.2019', verbose => 1, cities => [ qw/ROV LED/ ] );
 
 In fact, combines L<WWW::AzimuthAero::RouteMap/route_map_iata> and L<WWW::AzimuthAero/get_schedule_dates>
 
-=head2 Params
+=head3 Params
 
 max_date - '%d.%m.%Y' format, if no specified will looks forward for 2 months, default max_date of L<WWW::AzimuthAero/get_schedule_dates>
 
 verbose - print amount of L<WWW::AzimuthAero/get_schedule_dates> requests and future amount of L<WWW::AzimuthAero/get> requests
+
+cities - filter for L<WWW::AzimuthAero::RouteMap/route_map_iata>
 
 =head1 AUTHOR
 

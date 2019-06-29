@@ -11,9 +11,9 @@ use JSON qw(decode_json);
 
 plan tests => 2;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Tools;
-use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Vars;
+use Sport::Analytics::NHL::Tools qw(:schedule);
+use Sport::Analytics::NHL::Util qw(:file :utils);
 use Sport::Analytics::NHL::Test;
 
 use t::lib::Util;

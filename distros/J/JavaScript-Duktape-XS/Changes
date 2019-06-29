@@ -1,3 +1,10 @@
+0.000077    2019-06-28
+            * Prefer string value for dualvars.
+            * Fix error: "Don't know how to deal with an undetermined Perl
+              reference".
+            * Fix compilation error in 0.76 release.
+            * Compatibility with perl 5.14.
+
 0.000076    2019-04-08
             * Fix handling of large integers between Perl and JS.
 

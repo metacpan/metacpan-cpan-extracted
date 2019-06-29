@@ -44,6 +44,7 @@
             "Data::Dumper" : "0",
             "JSON::PP" : "0",
             "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Output" : "0",
@@ -59,6 +60,6 @@
          "web" : "https://github.com/gonzus/JavaScript-V8-XS"
       }
    },
-   "version" : "0.000012",
+   "version" : "0.000013",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

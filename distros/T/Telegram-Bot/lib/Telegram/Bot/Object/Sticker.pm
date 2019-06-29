@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Sticker;
-$Telegram::Bot::Object::Sticker::VERSION = '0.010';
+$Telegram::Bot::Object::Sticker::VERSION = '0.012';
 # ABSTRACT: The base class for Telegram message 'Sticker' type.
 
 use Mojo::Base 'Telegram::Bot::Object::Base';
@@ -33,7 +33,7 @@ Telegram::Bot::Object::Sticker - The base class for Telegram message 'Sticker' t
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 AUTHOR
 

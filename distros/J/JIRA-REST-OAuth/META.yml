@@ -27,5 +27,5 @@ requires:
   Net::OAuth: '0'
   URI: '0'
   perl: '5.010'
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

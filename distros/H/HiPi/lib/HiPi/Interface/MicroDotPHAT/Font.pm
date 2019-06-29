@@ -43,7 +43,7 @@ use strict;
 use warnings;
 use parent qw( Exporter );
 
-our $VERSION ='0.77';
+our $VERSION ='0.78';
 
 our @EXPORT_OK = qw( phat_tiny_numbers phat_font );
 

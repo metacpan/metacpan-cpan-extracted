@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'FFI::CheckLib' => '0.25'
                                       }
                       },
        'develop' => {
@@ -19,7 +20,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
-                                      'FFI::CheckLib' => '0',
+                                      'FFI::CheckLib' => '0.25',
                                       'FFI::Platypus' => '0.88',
                                       'Moose' => '0'
                                     }

@@ -13,7 +13,7 @@ use Carp qw(croak);
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has level => (
     is      => 'rw',
@@ -89,9 +89,10 @@ sub to_panel {
     my $map_rows = $lm->[0]->$#*;
     croak "x must be within the level map" if $x < 0 or $x > $map_cols;
     croak "y must be within the level map" if $y < 0 or $y > $map_rows;
-    my $scol     = $x - int( $width / 2 );
-    my $srow     = $y - int( $height / 2 );
-    my $s        = '';
+    my $scol = $x - int( $width / 2 );
+    my $srow = $y - int( $height / 2 );
+    my $s    = '';
+
     for my $r ( $srow .. $srow + $height - 1 ) {
         $s .= "\e[" . $row++ . ';' . $col . 'H';
         for my $c ( $scol .. $scol + $width - 1 ) {
@@ -116,12 +117,7 @@ sub to_string {
 
 sub to_terminal {
     my $self = shift;
-    my ( $col, $row );
-    if (@_) {
-        ( $col, $row ) = map int, @_;
-    } else {
-        ( $col, $row ) = ( 1, 1 );
-    }
+    my ( $col, $row ) = map int, @_;
     my $lm = $self->level;
     my $s  = '';
     for my $rowref ( $lm->@* ) {
@@ -131,9 +127,20 @@ sub to_terminal {
     return $self;
 }
 
-# TODO may want an update method that only redraws a list of changed
-# points from the level map (on the assumption something else meanwhile
-# (player, monsters moving, etc) has altered the level map
+sub update_terminal {
+    my $self = $_[0];
+    my ( $col, $row ) = map int, @_[ 1 .. 2 ];
+    my $lm = $self->level;
+    my $s  = '';
+    for my $point ( @_[ 3 .. $#_ ] ) {
+        $s .= "\e["
+          . ( $row + $point->[1] ) . ';'
+          . ( $col + $point->[0] ) . 'H'
+          . $lm->[ $point->[1] ][ $point->[0] ];
+    }
+    print $s;
+    return $self;
+}
 
 1;
 __END__
@@ -157,11 +164,15 @@ Game::LevelMap - level map representation
   # the following methods may require buffering disabled
   STDOUT->autoflush(1);
 
-  $lm->to_terminal;
-  # maybe there's a static border around the map? indent
-  $lm->to_terminal( 2, 2 );
+  $lm->to_terminal( 1, 1 );
 
-  # complicated, see docs and eg/panel-viewer
+  # maybe instead there's a static border, indent
+  $lm->to_terminal( 2, 2 );
+  ...
+  # several points on the map changed, update them
+  $lm->update_terminal( 2, 2, [ 5, 2 ], [ 4, 2 ] );
+
+  # complicated, see docs tests eg/panel-viewer
   $lm->to_panel( ... );
 
 =head1 DESCRIPTION
@@ -174,8 +185,8 @@ representing a level map as might be used in a game.
   x cols
   y rows
 
-Points use the geometric form (x,y) which is backwards from what the
-terminal wants.
+Points use the geometric form (x,y) col,row which is backwards from what
+terminal escape sequences use.
 
 =head1 CONSTRUCTORS
 
@@ -260,14 +271,13 @@ using this method.
 
 Converts the level map to string form and returns it.
 
-=item B<to_terminal> [ I<col> I<row> ]
+=item B<to_terminal> I<col> I<row>
 
 Prints the entire level map to standard output (assumed connected to a
 terminal that supports ANSI or XTerm control sequences) with the upper
 left corner of the map appearing at the given I<row> and I<col> (which
-must be integers greater than zero, defaulting to the upper left
-corner). The level map should not be larger than the terminal, though no
-checks are made regarding this.
+must be integers greater than zero). The level map should not be larger
+than the terminal, though no checks are made regarding this.
 
 Use the more complicated B<to_panel> if the level map is larger than
 the terminal window, or B<to_string> and then view that output with a
@@ -275,6 +285,13 @@ pager program.
 
 Buffering should likely be disabled on the STDOUT filehandle before
 using this method.
+
+=item B<update_terminal> I<col> I<row> I<points ..>
+
+Updates specific points of the level map, presumably after
+B<to_terminal> has already printed the entire level map. Must use the
+same I<col> and I<row> map display offset as used in B<to_terminal>. The
+points should be a list of array references.
 
 =back
 
@@ -297,6 +314,10 @@ There is either too much or too little error checking.
 An actual game may want to adapt code from this module and make it less
 generic, as usually things like the map panel size will be fixed, etc.
 
+B<to_panel> redraws the whole thing each time. With a buffer and change
+checks this might only update points that have changed, which would save
+on display bandwidth (which may be a concern over SSH connections).
+
 =head1 SEE ALSO
 
 =over 4
@@ -312,6 +333,10 @@ that game).
 
 L<Game::TextPatterns> allows the generation and manipulation of
 level maps.
+
+=item *
+
+L<Games::Board> is similar but different.
 
 =item *
 

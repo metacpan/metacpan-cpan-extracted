@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Function );
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 # Socket 2.006 fails to getaddrinfo() AI_NUMERICHOST properly on MSWin32
 use Socket 2.007 qw(

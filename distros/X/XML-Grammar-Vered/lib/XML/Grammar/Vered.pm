@@ -12,20 +12,19 @@ use MooX qw/late/;
 use XML::GrammarBase::Role::RelaxNG v0.2.2;
 use XML::GrammarBase::Role::XSLT v0.2.2;
 
-our $VERSION = '0.0.9';
+our $VERSION = 'v0.0.9';
 
-with ('XML::GrammarBase::Role::RelaxNG');
-with XSLT(output_format => 'docbook');
+with('XML::GrammarBase::Role::RelaxNG');
+with XSLT( output_format => 'docbook' );
 
-has '+module_base' => (default => 'XML-Grammar-Vered');
-has '+rng_schema_basename' => (default => 'vered-xml.rng');
-
+has '+module_base'         => ( default => 'XML-Grammar-Vered' );
+has '+rng_schema_basename' => ( default => 'vered-xml.rng' );
 
 has '+to_docbook_xslt_transform_basename' =>
-    (default => 'vered-xml-to-docbook.xslt');
+    ( default => 'vered-xml-to-docbook.xslt' );
 
-has '_mode' => (is => 'rw', init_arg => 'mode');
-has '_output_mode' => (is => 'rw', init_arg => 'output_mode',);
+has '_mode'        => ( is => 'rw', init_arg => 'mode' );
+has '_output_mode' => ( is => 'rw', init_arg => 'output_mode', );
 
 1;
 
@@ -41,7 +40,7 @@ XML::Grammar::Vered - a vered by any other name will translate as sweet.
 
 =head1 VERSION
 
-version 0.0.9
+version 0.0.10
 
 =head1 SYNOPSIS
 
@@ -74,6 +73,10 @@ Vered gets translated to DocBook 5/XML, and from there to other formats.
 “Vered” is the Hebrew word for “a rose”, and I came up with the name because
 I did not know what to call this format, and thought of “a rose by any other
 name will smell as sweet”.
+
+=head1 VERSION
+
+version 0.0.10
 
 =head1 EXAMPLE
 
@@ -205,8 +208,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Vered or by email to
-bug-xml-grammar-vered@rt.cpan.org.
+L<https://github.com/shlomif/XML-Grammar-Vered/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -235,7 +237,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/XML-Grammar-Vered>
+L<https://metacpan.org/release/XML-Grammar-Vered>
 
 =item *
 
@@ -251,7 +253,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Vered>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Grammar-Vered>
 
 =item *
 
@@ -271,25 +273,17 @@ L<http://cpanratings.perl.org/d/XML-Grammar-Vered>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/XML-Grammar-Vered>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/XML-Grammar-Vered>
+L<http://cpants.cpanauthors.org/dist/XML-Grammar-Vered>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/X/XML-Grammar-Vered>
 
@@ -314,7 +308,7 @@ L<http://deps.cpantesters.org/?module=XML::Grammar::Vered>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-xml-grammar-vered at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-Grammar-Vered>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=XML-Grammar-Vered>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -323,8 +317,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/perl-XML-Grammar-Vered>
+L<https://github.com/shlomif/XML-Grammar-Vered>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/perl-XML-Grammar-Vered
+  git clone git://github.com/shlomif/XML-Grammar-Vered.git
 
 =cut

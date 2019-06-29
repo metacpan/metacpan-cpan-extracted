@@ -1,0 +1,91 @@
+NAME
+    Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple -
+    Populate $CALENDAR from data in __DATA__
+
+VERSION
+    This document describes version 0.003 of
+    Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple (from
+    Perl distribution
+    Calendar-DatesRoles-DataPreparer-CalendarVar-FromDATA-Simple), released
+    on 2019-06-19.
+
+DESCRIPTION
+    This role will set consumer's $CALENDAR package variable from consumer's
+    "__DATA__" section. The format of data in "__DATA__" section is simple.
+
+    Data in "__DATA__" is line-based. Entries should be in the following
+    format:
+
+     YYYY-MM-DD;Summary;tag1,tag2
+
+    Lines that start with "#!" are called directives. Known directives:
+
+     #!default_lang: VALUE
+
+    to set default language.
+
+    Blank lines or lines that start with "#" (other than directives) are
+    ignored.
+
+    Example:
+
+     2019-02-14;Valentine's day
+     2019-06-01;Pancasila day;holiday
+
+    Another example:
+
+     #!default_lang: id
+
+     2019-02-14;Hari Valentine
+     2019-06-01;Hari lahirnya Pancasila;holiday
+
+    Another example to provide translation:
+
+    Another example:
+
+     #!default_lang: id
+
+     2019-02-14;Hari Valentine {en:Valentine's day}
+     2019-06-01;Hari lahirnya Pancasila {en:Pancasila day};holiday
+
+    For more complex stuffs, you can use
+    Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::CSVJF or
+    construct $CALENDAR yourself. Please consult
+    Calendar::DatesRoles::DataUser::CalendarVar.
+
+METHODS
+  prepare_data
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Calendar-DatesRoles-DataPreparer-CalendarV
+    ar-FromDATA-Simple>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Calendar-DatesRoles-DataPreparer-Cale
+    ndarVar-FromDATA-Simple>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-DatesRoles-D
+    ataPreparer-CalendarVar-FromDATA-Simple>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::CSVJF
+
+    Calendar::Dates
+
+    Calendar::DatesRoles::DataUser::CalendarVar
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

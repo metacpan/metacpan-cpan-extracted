@@ -3,15 +3,15 @@ NAME
     address, connection scheme, and more from trusted upstream proxies
 
 VERSION
-    Version 0.03
+    Version 0.04
 
 SYNOPSIS
       use Mojolicious::Lite;
 
       plugin 'TrustedProxy' => {
-        ip_headers      => ['x-real-ip', 'x-forwarded-for'],
-        scheme_headers  => ['x-ssl', 'x-forwarded-proto'],
-        https_values    => ['1', 'true', 'https', 'on', 'enable', 'enabled'],
+        ip_headers      => ['x-forwarded-for', 'x-real-ip'],
+        scheme_headers  => ['x-forwarded-proto', 'x-ssl'],
+        https_values    => ['https', 'on', '1', 'true', 'enable', 'enabled'],
         parse_rfc7239   => 1,
         trusted_sources => ['127.0.0.0/8', '10.0.0.0/8'],
         hide_headers    => 0,
@@ -24,6 +24,7 @@ SYNOPSIS
           'tx.remote_address'            => $c->tx->remote_address,
           'tx.remote_proxy_address'      => $c->tx->remote_proxy_address,
           'req.url.base.scheme'          => $c->req->url->base->scheme,
+          'req.url.base.host'            => $c->req->url->base->host,
           'is_trusted_source'            => $c->is_trusted_source,
           'is_trusted_source("1.1.1.1")' => $c->is_trusted_source('1.1.1.1'),
         });
@@ -60,15 +61,12 @@ DESCRIPTION
     header is matched from a trusted upstream proxy, then
     "tx->remote_proxy_address" will be set to the IP address of that proxy.
 
-    Build status
-    Code coverage
-
 CONFIG
   ip_headers
     List of zero, one, or many HTTP headers where the real user agent IP
     address will be defined by the trusted upstream sources. The first
     matched header is used. An empty value will disable this and keep the
-    original scheme value. Default is "['x-real-ip', 'x-forwarded-for']".
+    original scheme value. Default is "['x-forwarded-for', 'x-real-ip']".
 
     If a header is matched in the request, then "tx->remote_address" is set
     to the value, and "tx->remote_proxy_address" is set to the IP address of
@@ -78,8 +76,8 @@ CONFIG
     List of zero, one, or many HTTP headers where the real user agent
     connection scheme will be defined by the trusted upstream sources. The
     first matched header is used. An empty value will disable this and keep
-    the original remote address value. Default is "['x-ssl',
-    'x-forwarded-proto']".
+    the original remote address value. Default is "['x-forwarded-proto',
+    'x-ssl']".
 
     This tests that the header value is "truthy" but does not contain the
     literal barewords "http", "off", or "false". If the header contains any
@@ -87,13 +85,14 @@ CONFIG
 
   https_values
     List of values to consider as "truthy" when evaluating the headers in
-    "scheme_headers". Default is "['1', 'true', 'https', 'on', 'enable',
+    "scheme_headers". Default is "['https', 'on', '1', 'true', 'enable',
     'enabled']".
 
   parse_rfc7239, parse_forwarded
     Enable support for parsing RFC 7239 <http://tools.ietf.org/html/rfc7239>
-    compliant "Forwarded" HTTP headers. Default is 1 (enabled). If a
-    "Forwarded" header is matched, the following actions occur with the
+    compliant "Forwarded" HTTP headers. Default is 1 (enabled).
+
+    If a "Forwarded" header is matched, the following actions occur with the
     first semicolon-delimited group of parameters found in the header value:
 
     *   If the "for" parameter is found, then "tx->remote_address" is set to
@@ -105,6 +104,9 @@ CONFIG
 
     *   If the "proto" parameter is found, then "req->url->base->scheme" is
         set to the first matching value.
+
+    *   If the "host" parameter is found, then "req->url->base->host" is set
+        to the first matching value.
 
     Note! If enabled, the headers defined in "ip_headers" and
     "scheme_headers" will be overridden by any corresponding values found in
@@ -197,17 +199,31 @@ CDN AND CLOUD SUPPORT
         Go to <https://www.cloudflare.com/ips/> for an updated list of
         Cloudflare's IPv4 and IPv6 CIDR ranges.
 
+SECURITY
+    Caution should be taken that you set only the "CONFIG" values necessary
+    for your application in a most-common-first order, and that your
+    upstream proxies remove any headers you do not want passed through to
+    your application.
+
+    For example, if you use Cloudflare and set "ip_headers" to
+    "['x-real-ip', 'cf-connecting-ip']" and did not configure Cloudflare to
+    remove "x-real-ip" headers from requests, an attacker could use this
+    trick your application into using whatever IP he or she defines due to
+    being passed through your trusted proxy and the "x-real-ip" header being
+    the first to be evaluated.
+
 AUTHOR
-    Kage <kage@kage.wtf>
+    Kage <kage *AT* kage *DOT* wtf>
 
 BUGS
     Please report any bugs or feature requests on Github:
     <https://github.com/Kage/Mojolicious-Plugin-TrustedProxy>
 
     Hostnames not supported
-        This plugin does not currently support hostnames or hostname
-        resolution and there are no plans to implement this. If you have
-        such a requirement, please feel free to submit a pull request.
+        Excluding the "host" parameter of RFC 7239, this plugin does not
+        currently support hostnames or hostname resolution and there are no
+        plans to implement this. If you have a use case that requires this,
+        please feel free to submit a pull request.
 
     HTTP 'Forwarded' only partially supported
         Only partial support for RFC 7239 is currently implemented, but this

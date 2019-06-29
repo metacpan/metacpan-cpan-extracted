@@ -18,8 +18,8 @@ use t::lib::Util;
 test_env();
 $ENV{HOCKEYDB_DATA_DIR} = 't/tmp/data';
 
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Scraper;
+use Sport::Analytics::NHL::Util qw(:file);
+use Sport::Analytics::NHL::Scraper qw(crawl_player);
 
 use JSON;
 

@@ -1,9 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::Builder::Tester tests => 6;
 use Test::More;
+use Test::Builder::Tester;
 
 use Symbol qw( gensym );
 
@@ -35,3 +36,5 @@ foreach my $type (qw( SCALAR ARRAY HASH CODE GLOB Regex )) {
       test_test( "anon $type ref succeeds" );
    }
 }
+
+done_testing;

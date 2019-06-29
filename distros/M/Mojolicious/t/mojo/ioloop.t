@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+use IO::Socket::IP;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
@@ -206,7 +207,7 @@ $delay->wait;
 is $removed, 1, 'connection has been removed';
 
 # Stream throttling
-my ($client, $server, $client_after, $server_before, $server_after);
+my ($client, $server, $client_after, $server_before, $server_after, @waiting);
 $id = Mojo::IOLoop->server(
   {address => '127.0.0.1'} => sub {
     my ($loop, $stream) = @_;
@@ -218,10 +219,12 @@ $id = Mojo::IOLoop->server(
             $server_before = $server;
             $stream->stop;
             $stream->write('works!');
+            push @waiting, $stream->bytes_waiting;
             Mojo::IOLoop->timer(
               0.5 => sub {
                 $server_after = $server;
                 $client_after = $client;
+                push @waiting, $stream->bytes_waiting;
                 $stream->start;
                 Mojo::IOLoop->timer(0.5 => sub { Mojo::IOLoop->stop });
               }
@@ -248,6 +251,24 @@ is $server_before, $server_after, 'stream has been paused';
 ok length($server) > length($server_after), 'stream has been resumed';
 is $client, $client_after, 'stream was writable while paused';
 is $client, 'works!', 'full message has been written';
+is_deeply \@waiting, [6, 0], 'right buffer sizes';
+
+# Watermarks
+my $fake = IO::Socket::IP->new(Listen => 5, LocalAddr => '127.0.0.1');
+$stream = Mojo::IOLoop::Stream->new($fake);
+$stream->start;
+$stream->high_water_mark(10);
+$stream->write('abcd');
+is $stream->bytes_waiting, 4, 'four bytes waiting';
+ok $stream->can_write, 'stream is still writable';
+$stream->write('efghijk');
+is $stream->bytes_waiting, 11, 'eleven bytes waiting';
+ok !$stream->can_write, 'stream is not writable anymore';
+$stream->high_water_mark(12);
+ok $stream->can_write, 'stream is writable again';
+$stream->close;
+ok !$stream->can_write, 'closed stream is not writable anymore';
+undef $stream;
 
 # Graceful shutdown
 $err  = '';
@@ -257,7 +278,7 @@ $port
 $id = $loop->client({port => $port} => sub { shift->stop_gracefully });
 my $finish;
 $loop->on(finish => sub { ++$finish and shift->stream($id)->close });
-$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->timer(30 => sub  { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$loop->stream($id), 'stopped gracefully';
 ok !$err, 'no error';
@@ -267,8 +288,8 @@ is $finish, 1, 'finish event has been emitted once';
 $err  = $finish = '';
 $loop = Mojo::IOLoop->new;
 $loop->on(finish => sub { $finish++ });
-$loop->next_tick(sub { shift->stop_gracefully });
-$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->next_tick(sub    { shift->stop_gracefully });
+$loop->timer(30 => sub  { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $finish, 1, 'finish event has been emitted once';
@@ -279,7 +300,7 @@ $loop = Mojo::IOLoop->new->max_accepts(1);
 $id   = $loop->server({address => '127.0.0.1'} => sub { });
 $port = $loop->acceptor($id)->port;
 $loop->client({port => $port} => sub { pop->close });
-$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->timer(30 => sub               { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $loop->max_accepts, 1, 'right value';
@@ -299,7 +320,7 @@ $id = $loop->server(
 );
 $port = $loop->acceptor($id)->port;
 $loop->client({port => $port} => sub { }) for 1 .. 2;
-$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->timer(30 => sub               { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 ok $accepting[0], 'accepting connections';

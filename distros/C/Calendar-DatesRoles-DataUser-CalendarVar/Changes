@@ -1,3 +1,15 @@
+0.004   2019-06-20 (PERLANCAR)
+
+	- Update to Calendar::Dates 0.2.2 ('exclude_tags' and
+	  'include_tags' param in get_entries()).
+
+
+0.003   2019-06-19 (PERLANCAR)
+
+	- Update to Calendar::Dates 0.2.1 (support anniversaries, by default
+	  excluding entries that have low-priority tag, observe 'all' param).
+
+
 0.002   2019-05-25 (PERLANCAR)
 
 	- Update to Calendar::Dates 0.2.0 (optional \%params as first

@@ -32,8 +32,9 @@ libev/ev_vars.h
 libev/ev_wrap.h
 libev/ev_win32.c
 libev/ev_select.c
-libev/ev_epoll.c
 libev/ev_poll.c
+libev/ev_epoll.c
+libev/ev_linuxaio.c
 libev/ev_kqueue.c
 libev/ev_port.c
 libev/ev.pod

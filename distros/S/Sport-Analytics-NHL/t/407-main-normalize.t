@@ -10,11 +10,7 @@ use Test::More tests => 10;
 use JSON;
 use Storable;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Config;
 use Sport::Analytics::NHL::Test;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
 use Sport::Analytics::NHL;
 
 use t::lib::Util;
@@ -36,7 +32,7 @@ ok(-f $json, 'json exists');
 
 my $boxscore = retrieve $storable;
 test_normalized_boxscore($boxscore);
-is($TEST_COUNTER->{Curr_Test}, 11474, 'team and roster all tested');
+is($TEST_COUNTER->{Curr_Test}, 11534, 'team and roster all tested');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
 $storable = ($nhl->normalize({}, 193020010))[0];
 
@@ -46,7 +42,7 @@ $json = $storable; $json =~ s/storable/json/;
 ok(-f $json, 'json exists');
 $boxscore = retrieve $storable;
 test_normalized_boxscore($boxscore);
-is($TEST_COUNTER->{Curr_Test}, 12347, 'team and roster all tested');
+is($TEST_COUNTER->{Curr_Test}, 12407, 'team and roster all tested');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
 
 END {

@@ -4,13 +4,13 @@
       "Clint Cuffy <cuffyca@vcu.edu, Bridget McInnes <btmcinnes@vcu.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Word2vec-Interface",
    "no_index" : {
@@ -43,5 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.038"
+   "version" : "0.039",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

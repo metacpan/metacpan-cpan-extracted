@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 03/15/2018                                                             #
+#    Revised: 06/25/2019                                                             #
 #    UMLS Similarity Word2Vec Package Interface Module                               #
 #                                                                                    #
 ######################################################################################
@@ -23,12 +23,11 @@ use warnings;
 
 # Standard Package(s)
 use Cwd;
-use threads;
 use File::Type;
-use threads::shared;
 use Sys::CpuAffinity;
 
 # Word2Vec Utility Package(s)
+use Word2vec::Lesk;
 use Word2vec::Spearmans;
 use Word2vec::Word2vec;
 use Word2vec::Word2phrase;
@@ -36,10 +35,20 @@ use Word2vec::Xmltow2v;
 use Word2vec::Wsddata;
 use Word2vec::Util;
 
+# Checking For "threads" and "threads::shared" Module(s)
+my $threads_module_installed        = 0;
+my $threads_shared_module_installed = 0;
+
+eval{ require threads; };
+if( !( $@ ) ) { $threads_module_installed        = 1; }
+
+eval{ require threads::shared; };
+if( !( $@ ) ) { $threads_shared_module_installed = 1; }
+
 
 use vars qw($VERSION);
 
-$VERSION = '0.038';
+$VERSION = '0.039';
 
 
 ######################################################################################
@@ -78,6 +87,7 @@ sub new
         _ignoreFileChecks       => shift,               # Boolean (Binary): 0 = False, 1 = True
         _exitFlag               => shift,               # Boolean (Binary): 0 = False, 1 = True
         _workingDir             => shift,               # String (current working directory)
+        _lesk                   => shift,               # "Word2vec::Lesk" module object
         _spearmans              => shift,               # "Word2vec::Spearmans" module object
         _word2vec               => shift,               # "Word2vec::Word2vec" module object
         _word2phrase            => shift,               # "Word2vec::Word2phrase" module object
@@ -144,6 +154,7 @@ sub new
     # Initialize "Word2vec::Word2vec", "Word2vec::Word2phrase", "Word2vec::Xmltow2v" and "Word2vec::Util" modules
     my $debugLog            = $self->{ _debugLog };
     my $writeLog            = $self->{ _writeLog };
+    $self->{ _lesk }        = Word2vec::Lesk->new( $debugLog, $writeLog )                        if !defined ( $self->{ _lesk } );
     $self->{ _spearmans }   = Word2vec::Spearmans->new( $debugLog, $writeLog )                   if !defined ( $self->{ _spearmans } );
     $self->{ _word2vec }    = Word2vec::Word2vec->new( $debugLog, $writeLog )                    if !defined ( $self->{ _word2vec } );
     $self->{ _word2phrase } = Word2vec::Word2phrase->new( $debugLog, $writeLog )                 if !defined ( $self->{ _word2phrase } );
@@ -206,7 +217,7 @@ sub RunFileChecks
 
     $self->WriteLog( "RunFileChecks - Running Module Check(s)" );
     $self->WriteLog( "RunFileChecks - Word2Vec Dir: $dir" );
-    $self->WriteLog( "RunFileChecks - Word2Vec Directory Exists? Y" ) if ( -e "$dir" );
+    $self->WriteLog( "RunFileChecks - Word2Vec Directory Exists? Y" )         if  ( -e "$dir" );
     $self->WriteLog( "RunFileChecks - Error - Word2Vec Directory Exists? N" ) if !( -e "$dir" );
     return 0 if !( -e "$dir" );
 
@@ -219,10 +230,10 @@ sub RunFileChecks
         if( $self->_CheckIfExecutableFileExists( $dir, $fileName ) == 0 )
         {
             $result = $self->_CheckIfSourceFileExists( $dir, $fileName );
-            $result = $self->_ModifyWord2VecSourceForWindows() if ( $result == 1 && $self->GetOSType() eq "MSWin32" );
-            $result = $self->_CompileSourceFile( $dir, $fileName ) if( $result == 1 );
-            $result = $self->_CheckIfExecutableFileExists( $dir, $fileName ) if( $result == 1 || $self->GetIgnoreCompileErrors() == 1 );
-            $self->_RemoveWord2VecSourceModification() if ( $result == 1 && $self->GetOSType() eq "MSWin32" );
+            $result = $self->_ModifyWord2VecSourceForWindows()               if ( $result == 1 && $self->GetOSType() eq "MSWin32" );
+            $result = $self->_CompileSourceFile( $dir, $fileName )           if ( $result == 1 );
+            $result = $self->_CheckIfExecutableFileExists( $dir, $fileName ) if ( $result == 1 || $self->GetIgnoreCompileErrors() == 1 );
+            $self->_RemoveWord2VecSourceModification()                       if ( $result == 1 && $self->GetOSType() eq "MSWin32" );
         }
         else
         {
@@ -230,6 +241,20 @@ sub RunFileChecks
         }
 
         $self->WriteLog( "RunFileChecks - Failed Word2Vec File Checks" ) if $result == 0;
+
+        if( $result == 0 && $self->GetOSType() eq "MSWin32" )
+        {
+            print( "Error: Unable To Build Word2vec Interface Executable File(s)\n" );
+            print( "       Try Re-Running With Administrative Permissions To Build Required Executable Files.\n" );
+            print( "       Confirm File Checks Pass via \"Word2vec-Interface --test\" Command\n" );
+        }
+        elsif( $result == 0 && $self->GetOSType() ne "MSWin32" )
+        {
+            print( "Error: Unable To Build Word2vec Interface Executable File(s)\n" );
+            print( "       Try Running \"sudo Word2vec-Interface.pl --test\" Command via Terminal To Build Required Executable Files.\n" );
+            print( "       Command Will Report If Files Compiled And Checks Passed\n" );
+        }
+
         return 0 if $result == 0;
     }
 
@@ -435,7 +460,7 @@ sub CLComputeCosineSimilarity
     $self->WriteLog( "CLComputeCosineSimilarity - Unable To Load Vector Data From File: \"$vectorBinaryFile\"" ) if $dataLoaded == -1;
     return -1 if $dataLoaded == -1;
 
-    my $value = $word2vec->ComputeCosineSimilarity( $wordA, $wordB );
+    my $value = $word2vec->ComputeCosineSimilarity( lc( $wordA ), lc( $wordB ) );
 
     $self->WriteLog( "CLComputeCosineSimilarity - Computed Cosine Similarity: $value" ) if defined( $value );
     $self->WriteLog( "CLComputeCosineSimilarity - Error Computing Cosine Similarity" ) if !defined( $value );
@@ -472,7 +497,7 @@ sub CLComputeMultiWordCosineSimilarity
     $self->WriteLog( "CLComputeMultiWordCosineSimilarity - Unable To Load Vector Data From File: \"$vectorBinaryFile\"" ) if $dataLoaded == -1;
     return -1 if $dataLoaded == -1;
 
-    my $value = $word2vec->ComputeMultiWordCosineSimilarity( $wordA, $wordB );
+    my $value = $word2vec->ComputeMultiWordCosineSimilarity( lc( $wordA ), lc( $wordB ) );
 
     $self->WriteLog( "CLComputeMultiWordCosineSimilarity - Computed Multi-Word Cosine Similarity: $value" ) if defined( $value );
     $self->WriteLog( "CLComputeMultiWordCosineSimilarity - Error Computing Cosine Similarity" ) if !defined( $value );
@@ -509,7 +534,7 @@ sub CLComputeAvgOfWordsCosineSimilarity
     $self->WriteLog( "CLComputeAvgOfWordsCosineSimilarity - Unable To Load Vector Data From File: \"$vectorBinaryFile\"" ) if $dataLoaded == -1;
     return -1 if $dataLoaded == -1;
 
-    my $value = $word2vec->ComputeAvgOfWordsCosineSimilarity( $wordA, $wordB ) if ( defined( $wordA ) && defined( $wordB ) );
+    my $value = $word2vec->ComputeAvgOfWordsCosineSimilarity( lc( $wordA ), lc( $wordB ) ) if ( defined( $wordA ) && defined( $wordB ) );
 
     $self->WriteLog( "CLComputeAvgOfWordsCosineSimilarity - Computed Average Cosine Similarity: $value" ) if defined( $value );
     $self->WriteLog( "CLComputeAvgOfWordsCosineSimilarity - Error Computing Cosine Similarity" ) if !defined( $value );
@@ -717,6 +742,88 @@ sub CLStartWord2PhraseTraining
     return $result;
 }
 
+sub CLCleanText
+{
+    my ( $self, $optionsHashRef ) = @_;
+
+    my %options = %{ $optionsHashRef };
+
+    # Clean Text Variables
+    my $inputFile   = undef;
+    my $outputFile  = undef;
+
+    # Parse and Set XMLToW2V Options
+    for my $option ( keys %options )
+    {
+        $inputFile  = $options{$option}      if $option eq "-inputfile";
+        $outputFile = $options{$option}      if $option eq "-outputfile";
+    }
+
+    undef( $optionsHashRef );
+    undef( %options );
+
+
+    # Check(s)
+    print( "Input File Not Defined\n" )                                   if !defined( "$inputFile" ) && $self->GetDebugLog() == 0;
+    $self->WriteLog( "CLCleanText - Warning: Input File Not Defined" )    if !defined( "$inputFile" );
+
+    print( "Input File Does Not Exist\n" )                                if !( -e "$inputFile" ) && $self->GetDebugLog() == 0;
+    $self->WriteLog( "CLCleanText - Warning: Input File Does Not Exist" ) if !( -e "$inputFile" );
+
+    return -1                                                             if !defined( "$inputFile" ) || !( -e "$inputFile" );
+
+    print( "Warning: Save Directory Not Defined - Using Working Directory / Saving To \"clean_text.txt\"\n" )                       if !defined( $outputFile ) && $self->GetDebugLog() == 0;
+    $self->WriteLog( "CLCleanText - Warning: Save Directory Not Defined - Using Working Directory / Saving To \"clean_text.txt\"" ) if !defined( $outputFile );
+    $outputFile = "clean_text.txt"                                                                                                  if !defined( $outputFile );
+
+    # Print Status Messages In The Event Debug Logging Is Disabled
+    print "Input File: $inputFile\n"   if $self->GetDebugLog() == 0;
+    print "Output File: $outputFile\n" if $self->GetDebugLog() == 0;
+
+    $self->WriteLog( "CLCleanText - Input File: \"$inputFile\"" );
+    $self->WriteLog( "CLCleanText - Output File: \"$outputFile\"" );
+
+    my $result = 0;
+
+    $self->WriteLog( "CLCleanText - Opening Read File Handle: \"$inputFile\"" );
+    open( my $rfh, "<:encoding(utf8)", "$inputFile" )  or $result = -1;
+
+    # Check(s)
+    print "Error: Unable To Open Input File \"$inputFile\"\n"                          if $result == -1;
+    $self->WriteLog( "CLCleanText - Error: Unable To Open Input File \"$inputFile\"" ) if $result == -1;
+    return -1                                                                          if $result == -1;
+
+    $self->WriteLog( "CLCleanText - Opening Write File Handle: \"$outputFile\"" );
+    open( my $wfh, ">:encoding(utf8)", "$outputFile" ) or $result = -1;
+    # Check(s)
+    print "Error: Unable To Create Output File \"$outputFile\"\n"                          if $result == -1;
+    $self->WriteLog( "CLCleanText - Error: Unable To Create Output File \"$outputFile\"" ) if $result == -1;
+    return -1                                                                              if $result == -1;
+
+    # Read Input File, Clean String Line And Write To Output File
+    $self->WriteLog( "CLCleanText - Reading File And Normalizing Text" );
+
+    while( my $line = <$rfh> )
+    {
+        my $string = $self->CleanText( $line );
+        print $wfh "$string";
+    }
+
+    $self->WriteLog( "CLCleanText - Cleaning Up" );
+
+    # Clean up
+    close( $rfh );
+    close( $wfh );
+    undef( $rfh );
+    undef( $wfh );
+    undef( $inputFile );
+    undef( $outputFile );
+
+    $self->WriteLog( "CLCleanText - Complete" );
+
+    return $result;
+}
+
 sub CLCompileTextCorpus
 {
     my ( $self, $optionsHashRef ) = @_;
@@ -777,8 +884,10 @@ sub CLCompileTextCorpus
     $self->WriteLog( "CLCompileTextCorpus - Warning: Store As Sentence Per Line Not Defined - Store As Sentence Per Line Disabled" ) if !defined( $storeAsSentencePerLine );
     $storeAsSentencePerLine = 0 if !defined( $storeAsSentencePerLine );
     print "Warning: Number Of Working Threads Not Defined - Using 1 Thread Per CPU Core\n" if !defined( $numOfThreads ) && $self->GetDebugLog() == 0;
-    $self->WriteLog( "CLCompileTextCorpus - Warning: Number Of Working Threads Not Defined - Using 1 Thread Per CPU Core By Default / " . Sys::CpuAffinity::getNumCpus() . " Threads" ) if !defined( $numOfThreads );
-    $numOfThreads = Sys::CpuAffinity::getNumCpus() if !defined( $numOfThreads );
+    $self->WriteLog( "CLCompileTextCorpus - Warning: Number Of Working Threads Not Defined - Using 1 Thread Per CPU Core By Default / " . Sys::CpuAffinity::getNumCpus() . " Threads" ) if !defined( $numOfThreads ) and ( $threads_module_installed == 1 );
+    $numOfThreads = Sys::CpuAffinity::getNumCpus() if !defined( $numOfThreads ) and ( $threads_module_installed == 1 );
+    print "Warning: Perl Not Build To Support Threads / Using 1 Thread\n" if ( $threads_module_installed == 0 );
+    $numOfThreads = 1                                                     if ( $threads_module_installed == 0 );
     print( "Error: File \"$saveDir\" Exists And Overwrite Existing File Option Not Defined\n" ) if !defined( $overwriteExistingFile ) && ( -e "$saveDir" ) && $self->GetDebugLog() == 0;
     $self->WriteLog( "CLCompileTextCorpus - Error: File \"$saveDir\" Exists And Overwrite Existing File Option Not Defined" ) if !defined( $overwriteExistingFile ) && ( -e "$saveDir" );
     return -1 if !defined( $overwriteExistingFile ) && ( -e "$saveDir" );
@@ -1155,9 +1264,11 @@ sub CLFindSimilarTerms
 
     $self->WriteLog( "CLFindSimilarTerms - Warning: Number Of Similar Terms Not Defined / Using Default = 10" ) if !defined( $numberOfSimilarTerms );
     $numberOfSimilarTerms = 10 if !defined( $numberOfSimilarTerms );
-    
-    $self->WriteLog( "CLFindSimilarTerms - Warning: Number Of Threads Not Defined / Using Default = # Of CPUs" ) if !defined( $numberOfThreads );
-    $numberOfThreads  = Sys::CpuAffinity::getNumCpus() if !defined( $numberOfThreads );
+
+    $self->WriteLog( "CLFindSimilarTerms - Warning: Number Of Threads Not Defined / Using Default = # Of CPUs" ) if !defined( $numberOfThreads ) and ( $threads_module_installed == 1 );
+    $numberOfThreads  = Sys::CpuAffinity::getNumCpus() if !defined( $numberOfThreads ) and ( $threads_module_installed == 1 );
+    $self->WriteLog( "CLFindSimilarTerms - Warning: Perl Not Built To Support Threads / Using Default = 1 Thread" ) if ( $threads_module_installed == 0 );
+    $numberOfThreads = 1 if ( $threads_module_installed == 0 );
 
     $self->WriteLog( "CLFindSimilarTerms - Error: Vocabulary Is Empty / No Vector Data In Memory" ) if $self->W2VIsVectorDataInMemory() == 0;
     return undef if $self->W2VIsVectorDataInMemory() == 0;
@@ -1168,69 +1279,79 @@ sub CLFindSimilarTerms
 
     # Check To See If The "$term" Parameters Exists Within The Vocabulary
     my $result = $vocabularyHash->{ $term };
-    
+
     $self->WriteLog( "CLFindSimilarTerms - Error: \"$term\" Does Not Exist Within The Vocabulary" ) if !defined( $result );
     return undef if !defined( $result );
-    
+
     my @remainingWords   = keys %{ $vocabularyHash };
     my %similarWords     = ();
     my $threadListLength = scalar @remainingWords / $numberOfThreads;
-    
+
     my $workerThreadFunction = sub
     {
         my ( $comparisonTerm, $comparisonWords ) = @_;
-        
+
         my @comparisonWords = @{ $comparisonWords };
         my %resultHash      = ();
-        my $tid             = threads->tid();
-        
+        my $tid             = threads->tid() if ( $threads_module_installed == 1 );
+        $tid                = 1              if ( $threads_module_installed == 0 );
+
         $self->WriteLog( "CLFindSimilarTerms - Starting Thread: $tid" );
-        
+
         for( my $index = 0; $index < scalar @comparisonWords; $index++ )
         {
             my $word = $comparisonWords[$index];
-                
+
             #print "$tid -> Count: $index\n";
-            
+
             if( defined( $word ) )
             {
                 # Skip Number Of Words and Vector Length Information
                 next if ( $word eq $self->W2VGetNumberOfWords() );
-                
+
                 my $value = $self->W2VComputeCosineSimilarity( $comparisonTerm, $word );
                 $resultHash{ $value } = $word if defined( $value );
             }
         }
-        
+
         # Clean Up
         undef( @comparisonWords );
         $comparisonWords = undef;
-        
+
         $self->WriteLog( "CLFindSimilarTerms - Ending Thread: $tid" );
         return \%resultHash;
     };
     
-    for( my $i = 0; $i < $numberOfThreads; $i++ )
+    # Multi-Threaded Support
+    if( $threads_module_installed == 1 )
     {
-        my @comparisonWords = splice( @remainingWords, 0, $threadListLength );
-        my $thread = threads->create( $workerThreadFunction, $term, \@comparisonWords );
-    }
+        for( my $i = 0; $i < $numberOfThreads; $i++ )
+        {
+            my @comparisonWords = splice( @remainingWords, 0, $threadListLength );
+            my $thread = threads->create( $workerThreadFunction, $term, \@comparisonWords );
+        }
     
-    # Join All Running Threads Prior To Termination
-    my @threadAry = threads->list();
+        # Join All Running Threads Prior To Termination
+        my @threadAry = threads->list();
+    
+        $self->WriteLog( "CLFindSimilarTerms - Waiting For Threads To Finish" );
+    
+        for my $thread ( @threadAry )
+        {
+            my $resultHashRef = $thread->join() if ( $thread->is_running() || $thread->is_joinable() );
+            %similarWords = ( %similarWords, %{ $resultHashRef } );
+        }
+    }
+    # Single Threaded Support
+    else
+    {
+        %similarWords = %{ $workerThreadFunction->( $term, \@remainingWords ) };
+    }
 
-    $self->WriteLog( "CLFindSimilarTerms - Waiting For Threads To Finish" );
-    
-    for my $thread ( @threadAry )
-    {
-        my $resultHashRef = $thread->join() if ( $thread->is_running() || $thread->is_joinable() );
-        %similarWords = ( %similarWords, %{ $resultHashRef } );
-    }
-    
     $self->WriteLog( "CLFindSimilarTerms - Sorting Results" );
-    
+
     my @sortedValues = sort { $b <=> $a } keys( %similarWords );
-    
+
     # Check
     $numberOfSimilarTerms = scalar @sortedValues if scalar @sortedValues < $numberOfSimilarTerms;
 
@@ -1238,9 +1359,9 @@ sub CLFindSimilarTerms
     {
         push( @returnWords, $similarWords{ $sortedValues[ $_ ] } . " : " . $sortedValues[ $_ ] );
     }
-    
+
     $self->WriteLog( "CLFindSimilarTerms - Finished" );
-    
+
     return \@returnWords;
 }
 
@@ -1904,7 +2025,7 @@ sub WSDParseFile
     print( "Parsing File: $filePath\n" ) if ( $self->GetDebugLog() == 0 );
     $self->WriteLog( "WSDParseFile - Parsing: $filePath" );
 
-    open( my $fileHandle, "<:", $filePath ) or die "Error: Unable To Read File: $filePath";
+    open( my $fileHandle, "<:encoding(utf8)", $filePath ) or die "Error: Unable To Read File: $filePath";
 
     my $line = <$fileHandle>;
     return undef if ( index( $line, "<corpus lang=\"" ) == -1 );
@@ -1976,7 +2097,7 @@ sub WSDParseFile
                     $line =~ s/-/ /g;                                               # Replace all hyphen characters to spaces
                     $line =~ tr/a-z/ /cs;                                           # Remove all characters except a to z
                     $line =~ s/$stopListRegex//g if defined( $stopListRegex );      # Remove "stop" words
-                    $line =~ s/ +/ /g;                                              # Remove duplicate white spaces between words
+                    $line =~ s/\s+/ /g;                                             # Remove duplicate white spaces between words
                     $line = "" if( $line eq " " );                                  # Change line to empty string if line only contains space.
 
                     my $context = $dataEntry->contextStr;
@@ -2414,6 +2535,15 @@ sub GetWorkingDirectory
     return $self->{ _workingDir };
 }
 
+sub GetLeskHandler
+{
+    my ( $self ) = @_;
+    my $debugLog = $self->GetDebugLog();
+    my $writeLog = $self->GetWriteLog();
+    $self->{ _lesk } = Word2vec::Lesk->new( $debugLog, $writeLog ) if !defined( $self->{ _lesk } );
+    return $self->{ _lesk };
+}
+
 sub GetSpearmansHandler
 {
     my ( $self ) = @_;
@@ -2619,8 +2749,8 @@ sub GetDate
 
 sub WriteLog
 {
-    my ( $self ) = shift;
-    my $string = shift;
+    my ( $self )     = shift;
+    my $string       = shift;
     my $printNewLine = shift;
 
     return if !defined ( $string );
@@ -2660,13 +2790,72 @@ sub WriteLog
 
 
 ######################################################################################
+#    Lesk Module Functions
+######################################################################################
+
+sub GetMatchingFeaturesBetweenStrings
+{
+    my ( $self, $string_a, $string_b ) = @_;
+    return $self->GetLeskHandler()->GetMatchingFeatures( $string_a, $string_b );
+}
+
+sub GetPhraseOverlapBetweenStrings
+{
+    my ( $self, $string_a, $string_b ) = @_;
+    return $self->GetLeskHandler()->GetPhraseOverlap( $string_a, $string_b );
+}
+
+sub CalculateLeskScore
+{
+    my ( $self, $string_a, $string_b ) = @_;
+    return $self->GetLeskHandler()->CalculateLeskScore( $string_a, $string_b );
+}
+
+sub CalculateLeskCosineScore
+{
+    my ( $self, $string_a, $string_b ) = @_;
+    return $self->GetLeskHandler()->CalculateCosineScore( $string_a, $string_b );
+}
+
+sub CalculateLeskFScore
+{
+    my ( $self, $string_a, $string_b ) = @_;
+    return $self->GetLeskHandler()->CalculateFScore( $string_a, $string_b );
+}
+
+sub CalculateAllLeskScores
+{
+    my ( $self, $string_a, $string_b ) = @_;
+    return $self->GetLeskHandler()->CalculateAllScores( $string_a, $string_b );
+}
+
+
+######################################################################################
 #    Utility Module Functions
 ######################################################################################
+
+sub CleanText
+{
+    my ( $self, $string ) = @_;
+    return $self->GetUtilHandler()->CleanText( $string );
+}
+
+sub RemoveNewLineEndingsFromString
+{
+    my ( $self, $string ) = @_;
+    return $self->GetUtilHandler()->RemoveNewLineEndingsFromString( $string );
+}
 
 sub IsFileOrDirectory
 {
     my ( $self, $path ) = @_;
     return $self->GetUtilHandler()->IsFileOrDirectory( $path );
+}
+
+sub IsWordOrCUITerm
+{
+    my ( $self, $term ) = @_;
+    return $self->GetUtilHandler()->IsWordOrCUITerm( $term );
 }
 
 sub GetFilesInDirectory
@@ -4419,6 +4608,42 @@ Example:
 
  undef( $interface );
 
+=head3 CLCleanText
+
+Description:
+
+ Command-line Method: Reads an input text file, normalizes based on the settings below and prints to a new file.
+   - All Text Conveted To Lowercase
+   - Duplicate White Spaces Removed
+   - "'s" (Apostrophe 's') Characters Removed
+   - Hyphen "-" Replaced With Whitespace
+   - All Characters Outside Of "a-z" and NewLine Characters Are Removed
+   - Lastly, Whitespace Before And After Text Is Removed
+
+Input:
+
+ $hashRef -> Hash reference of inputfile/outputfile options.
+
+Output:
+
+ $value   -> Returns '0' = Successful / '-1' = Un-successful.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my %options;
+ $options{'-inputfile'} = "../../samples/test.txt";
+ $options{'-outputfile'} = "../../samples/clean_text.txt";
+
+ my $interface = Word2vec::Interface->new();
+ my $result = $interface->CLCleanText( \%options );
+
+ print( "Success!\n" ) if $result == 0;
+ print( "Failed!\n" ) if $result == -1;
+
+ undef( $interface );
+
 =head3 CLCompileTextCorpus
 
 Description:
@@ -5209,11 +5434,63 @@ Example:
 
  undef( $interface );
 
+=head3 GetLeskHandler
+
+Description:
+
+ Returns the _lesk member variable set during Word2vec::Lesk object initialization of new function.
+
+ Note: This returns a new object if not defined with lesk::_debugLog and lesk::_writeLog parameters mirroring interface::_debugLog and interface::_writeLog.
+
+Input:
+
+ None
+
+Output:
+
+ Word2vec::Lesk -> Returns 'Word2vec::Lesk' object.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $lesk = $interface->GetLeskHandler();
+
+ undef( $lesk );
+ undef( $interface );
+
+=head3 GetSpearmansHandler
+
+Description:
+
+ Returns the _spearmans member variable set during Word2vec::Spearmans object initialization of new function.
+
+ Note: This returns a new object if not defined with spearmans::_debugLog and spearmans::_writeLog parameters mirroring interface::_debugLog and interface::_writeLog.
+
+Input:
+
+ None
+
+Output:
+
+ Word2vec::Spearmans -> Returns 'Word2vec::Spearmans' object.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $spearmans = $interface->GetSpearmansHandler();
+
+ undef( $spearmans );
+ undef( $interface );
+
 =head3 GetWord2VecHandler
 
 Description:
 
- Returns the _word2vec member variable set during Word2vec::Word2phrase object initialization of new function.
+ Returns the _word2vec member variable set during Word2vec::Word2vec object initialization of new function.
 
  Note: This returns a new object if not defined with word2vec::_debugLog and word2vec::_writeLog parameters mirroring interface::_debugLog and interface::_writeLog.
 
@@ -5241,7 +5518,7 @@ Description:
 
  Returns the _word2phrase member variable set during Word2vec::Word2phrase object initialization of new function.
 
- Note: This returns a new object if not defined with word2vec::_debugLog and word2vec::_writeLog parameters mirroring interface::_debugLog and interface::_writeLog.
+ Note: This returns a new object if not defined with word2phrase::_debugLog and word2phrase::_writeLog parameters mirroring interface::_debugLog and interface::_writeLog.
 
 Input:
 
@@ -5265,7 +5542,7 @@ Example:
 
 Description:
 
- Returns the _xmltow2v member variable set during Word2vec::Word2phrase object initialization of new function.
+ Returns the _xmltow2v member variable set during Word2vec::Xmltow2v object initialization of new function.
 
  Note: This returns a new object if not defined with word2vec::_debugLog and word2vec::_writeLog parameters mirroring interface::_debugLog and interface::_writeLog.
 
@@ -5287,7 +5564,7 @@ Example:
  undef( $xmltow2v );
  undef( $interface );
 
-=head3 GetInstanceAry
+#=head3 GetInstanceAry
 
 Description:
 
@@ -5748,7 +6025,215 @@ Example:
 
  undef( $interface );
 
+=head2 Lesk Main Functions
+
+=head3 GetPhraseOverlapBetweenStrings
+
+Description:
+
+ Given two strings, this returns a hash of all overlapping (matching) phrases between both strings and their frequency counts. This prioritizes longer phrases as higher priority when matching.
+
+Input:
+
+ $string_a -> First comparison string
+ $string_b -> Second comparison string
+
+Output:
+
+ $hash_ref -> Returns a hash table reference with keys being the unique matching phrase between two input string parameters and the value as the frequency count of each unique phrase.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+
+ my %phrase_overlaps = %{ $interface->GetPhraseOverlapBetweenStrings( "I like to eat cookies", "Sometimes I like to eat cookies" ) };
+
+ for my $phrase ( sort keys %phrase_overlaps )
+ {
+    print "$phrase : $phrase_overlaps{ $phrase }\n";
+ }
+
+ undef( %phrase_overlaps );
+ undef( $interface );
+
+=head3 CalculateLeskScore
+
+Description:
+
+ Given two strings, this returns a lesk score based on overlapping (matching) features between both strings.
+
+Input:
+
+ $string_a -> First comparison string
+ $string_b -> Second comparison string
+
+Output:
+
+ $score    -> Lesk Score (Float)
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+
+ my $lesk_score = $interface->CalculateLeskScore( "I like to eat cookies", "Sometimes I like to eat cookies" );
+
+ print "Lesk Score: $lesk_score\n";
+
+ undef( $interface );
+
+=head3 CalculateLeskCosineScore
+
+Description:
+
+ Given two strings, this returns a cosine score based on overlapping (matching) features between both strings.
+
+Input:
+
+ $string_a -> First comparison string
+ $string_b -> Second comparison string
+
+Output:
+
+ $score    -> Cosine Score (Float)
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+
+ my $cosine_score = $interface->CalculateLeskCosineScore( "I like to eat cookies", "Sometimes I like to eat cookies" );
+
+ print "Cosine Score: $cosine_score\n";
+
+ undef( $interface );
+
+=head3 CalculateLeskFScore
+
+Description:
+
+ Given two strings, this returns a F score based on overlapping (matching) features between both strings.
+
+Input:
+
+ $string_a -> First comparison string
+ $string_b -> Second comparison string
+
+Output:
+
+ $score    -> F Score (Float)
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+
+ my $f_score = $interface->CalculateLeskFScore( "I like to eat cookies", "Sometimes I like to eat cookies" );
+
+ print "F Score: $f_score\n";
+
+ undef( $interface );
+
+=head3 CalculateAllLeskScores
+
+Description:
+
+ Given two strings, this returns a list of scores (F, Cosine, Lesk, Raw Lesk, Precision, Recall), frequency counts (features, phrases, string lengths).
+
+Input:
+
+ $string_a    -> First comparison string
+ $string_b    -> Second comparison string
+
+Output:
+
+ $result_hash -> Hash reference containing: Lesk, Raw Lesk, F, Precision, Recall, Cosine, Matching Feature Frequency, Matching Phrase Frequency, String A Length and String B Length.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+
+ my %scores = %{ $interface->CalculateAllLeskScores( "I like to eat cookies", "Sometimes I like to eat cookies" ) };
+
+ for my $score_name ( sort keys %scores )
+ {
+    print "$score_name : $scores{ $score_name }\n";
+ }
+
+ undef( $interface );
+
 =head2 Util Main Functions
+
+=head3 CleanText
+
+Description:
+
+ Normalizes text based on the following.
+  - Text converted to lowercase
+  - More than one white space is replaced with a single white space
+  - Apostrophe "s" ('s) characters are removed
+  - Hyphen character is replaced with a single white space
+  - All special characters removed outside of lowercase 'a-z' and compoundified terms retained, joined by '_' (underscore).
+  - Line-feed/carriage return (LF-CR) endings are cleaned and converted to OS specific LF-CR endings
+
+Input:
+
+ $string -> String of text to normalize
+
+Output:
+
+ $string -> Cleaned/Normalized text.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $text = "123485clean-text!!@&^#*@";
+
+ print( "Original Text: \"$text\"\n" );
+
+ $text = $interface->CleanText( $text );
+
+ print( "Cleaned Text: \"$text\"\n" );
+
+ undef( $interface );
+
+=head3 RemoveNewLineEndingsFromString
+
+Description:
+
+ Removes new line endings from string. Supports MSWin32, linux and MacOS line endings.
+
+Input:
+
+ $string -> String with line-feed/carriage return ending to remove.
+
+Output:
+
+ $string -> String without line-feed/carriage return ending.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $text = "this is sample text\n";
+
+ print( "Original Text: \"$text\"\n" );
+
+ $text = $interface->RemoveNewLineEndingsFromString( $text );
+
+ print( "Cleaned Text: \"$text\"\n" );
+
+ undef( $interface );
 
 =head3 IsFileOrDirectory
 
@@ -5775,6 +6260,33 @@ Example:
  print( "Path Type Is A File\n" ) if $result eq "file";
  print( "Path Type Is A Directory\n" ) if $result eq "dir";
  print( "Path Type Is Unknown\n" ) if $result eq "unknown";
+
+ undef( $interface );
+
+=head3 IsWordOrCUITerm
+
+Description:
+
+ Determines if string parameter is a 'word' or 'cui'.
+
+Input:
+
+ $string -> String with single term/cui to examine.
+
+Output:
+
+ $string -> Returns "word" or "cui".
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+
+ my $result = $interface->IsWordOrCUITerm( "c12345678" );
+
+ print( "String Is Word\n" )  if $result eq "word";
+ print( "String Is A CUI\n" ) if $result eq "cui";
 
  undef( $interface );
 

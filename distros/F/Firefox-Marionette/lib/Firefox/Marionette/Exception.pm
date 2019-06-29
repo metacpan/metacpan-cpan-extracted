@@ -5,7 +5,7 @@ use warnings;
 use Carp();
 use overload '""' => 'string';
 
-our $VERSION = '0.71';
+our $VERSION = '0.75';
 
 sub throw {
     my ( $class, $string ) = @_;
@@ -21,7 +21,7 @@ sub _throw {
         ( $package, $file, $line ) = caller $index++;
     }
     $self->{origin} = $package eq 'main' ? $file : $package;
-    $self->{line} = $line;
+    $self->{line}   = $line;
     Carp::croak($self);
 }
 
@@ -39,7 +39,7 @@ Firefox::Marionette::Exception - Represents an base exception class for exceptio
 
 =head1 VERSION
 
-Version 0.71
+Version 0.75
 
 =head1 SYNOPSIS
 

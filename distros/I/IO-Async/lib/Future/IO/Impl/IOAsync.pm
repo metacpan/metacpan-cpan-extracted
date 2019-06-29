@@ -7,8 +7,7 @@ package Future::IO::Impl::IOAsync;
 
 use strict;
 use warnings;
-
-use Errno qw( EAGAIN EWOULDBLOCK );
+use base qw( Future::IO::ImplBase );
 
 =head1 NAME
 
@@ -32,12 +31,7 @@ loaded, and will provide the C<Future::IO> implementation methods.
 
 use IO::Async::Loop;
 
-{
-   no warnings 'once';
-   ( $Future::IO::IMPL //= __PACKAGE__ ) eq __PACKAGE__ or
-      warn "Unable to set Future::IO implementation to " . __PACKAGE__ .
-         " as it is already $Future::IO::IMPL\n";
-}
+__PACKAGE__->APPLY;
 
 my $loop;
 
@@ -86,28 +80,40 @@ sub ready_for_read
    return $f;
 }
 
-sub sysread
-{
-   my $self = shift;
-   my ( $fh, $length ) = @_;
+my %watching_write_by_fileno; # {fileno} => [@futures]
 
-   $self->ready_for_read( $fh )->then( sub {
-      my $ret = $fh->sysread( my $buf, $length );
-      if( $ret ) {
-         return Future->done( $buf );
-      }
-      elsif( defined $ret ) {
-         # EOF
-         return Future->done();
-      }
-      elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
-         # Try again
-         return $self->sysread( $fh, $length );
-      }
-      else {
-         return Future->fail( "sysread: $!\n", sysread => $fh, $! );
-      }
-   });
+sub ready_for_write
+{
+   shift;
+   my ( $fh ) = @_;
+
+   my $watching = $watching_write_by_fileno{ $fh->fileno } //= [];
+
+   $loop //= IO::Async::Loop->new;
+   my $f = $loop->new_future;
+
+   my $was = scalar @$watching;
+   push @$watching, $f;
+
+   return $f if $was;
+
+   $loop->watch_io(
+      handle => $fh,
+      on_write_ready => sub {
+         $watching->[0]->done;
+         shift @$watching;
+
+         return if scalar @$watching;
+
+         $loop->unwatch_io(
+            handle => $fh,
+            on_write_ready => 1,
+         );
+         delete $watching_write_by_fileno{ $fh->fileno };
+      },
+   );
+
+   return $f;
 }
 
 =head1 AUTHOR

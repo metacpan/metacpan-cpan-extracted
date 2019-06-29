@@ -10,7 +10,7 @@ use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 require Exporter;
 
 our @ISA = qw(Exporter);
-our($VERSION)='1.0';
+our($VERSION)='1.01';
 our($UntarError) = '';
 
 our %EXPORT_TAGS = ( 'all' => [ qw( $UntarError ) ] );

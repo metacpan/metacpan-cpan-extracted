@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 31;
+use Test::More tests => 35;
 
 BEGIN {
     use_ok( 'String::Validator::Password' ) || print "Bail out!\n";
@@ -48,7 +48,7 @@ is ( $Validator->Check( $allpunct ), 1, 'allpunct string fails.' ) ;
 is ( $Validator->Check( $oneofeach ), 0, 'oneofeach string passes.' ) ;
 is ( $Validator->Check( $twoofeach ), 0, 'twoofeach string passes' ) ;
 
-note( 'Deny_punct.') ;
+note( 'Require_punct.') ;
 # This time change the parameters in the object directly,
 # as this should work. If I had chosen to use Moose I would
 # have gotten a free setter method, but I chose to skip
@@ -61,6 +61,27 @@ is ( $Validator->Check( $numeric ), 1, 'numeric string fails.' ) ;
 is ( $Validator->Check( $allpunct ), 0, 'allpunct string passes.' ) ;
 is ( $Validator->Check( $oneofeach ), 0, 'oneofeach string passes.' ) ;
 is ( $Validator->Check( $twoofeach ), 0, 'twoofeach string passes' ) ;
+
+note( 'Deny_punct.') ;
+# Check that deny punct works.
+$Validator->{ require_punct } = 0 ;
+$Validator->{ deny_punct } = 1 ;
+is ( $Validator->Check( $twoofeach ), 1,
+  'twoofeach string fails with deny_punct 1.' ) ;
+$Validator->{ deny_punct } = 3 ;
+is ( $Validator->Check( $twoofeach ), 0,
+  'twoofeach string passes with deny_punct 3.' ) ;
+diag( 'Validator found punct ' . $Validator->{num_punct} );
+$Validator->{ deny_punct } = 2 ;
+is ( $Validator->Check( $twoofeach ), 1,
+  'twoofeach string fails with deny_punct 2.' ) ;
+$Validator->{ deny_punct } = 5 ;
+my $sixpunct = "\#\$\^$twoofeach ";
+is ( $Validator->Check( $sixpunct ), 1,
+  'sixpunct string fails with deny_punct 5.');
+
+$Validator->{ require_punct } = 1 ;
+$Validator->{ deny_punct } = 0 ;
 
 note('Setting deny_xx to a value greater than 1 should set that as the maximum') ;
 $Validator = String::Validator::Password->new(

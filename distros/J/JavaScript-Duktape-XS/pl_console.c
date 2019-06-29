@@ -39,7 +39,7 @@ static void save_msg(pTHX_ Duk* duk, const char* target, SV* message)
             return;
         }
         data = (AV*) ref;
-        top = av_top_index(data);
+        top = av_len(data);
     } else {
         SV* ref = 0;
         data = newAV();
@@ -68,7 +68,7 @@ static int save_console_messages(duk_uint_t flags, void* data,
     SV* message = newSVpvs("");
     va_list args_copy;
     va_copy(args_copy, ap);
-    sv_vcatpvf(aTHX_ message, fmt, &args_copy);
+    sv_vcatpvf(message, fmt, &args_copy);
     save_msg(aTHX_ duk, target, message);
     return SvCUR(message);
 }

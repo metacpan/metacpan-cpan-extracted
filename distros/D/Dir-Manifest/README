@@ -1,5 +1,5 @@
 This archive contains the distribution Dir-Manifest,
-version 0.0.5:
+version 0.2.0:
 
   treat a directory and a manifest file as a hash/dictionary of keys to texts or blobs
 

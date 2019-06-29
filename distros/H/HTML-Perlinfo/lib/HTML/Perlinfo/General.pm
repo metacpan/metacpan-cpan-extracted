@@ -2,8 +2,8 @@ package HTML::Perlinfo::General;
 
 use base qw(Exporter);
 our @EXPORT = qw(print_httpd print_thesemodules print_config print_variables print_general); 
-use CGI qw(url_param param);
 use POSIX qw(uname);
+use CGI::Deurl as => 'myparams';
 use Config qw(%Config config_sh);
 use Net::Domain qw(hostname);
 use File::Spec;
@@ -17,10 +17,10 @@ sub perl_print_gpcse_array  {
 	  my ($gpcse_name, $gpcse_value);
 	  #POST names should be param() and get in url_param()
 	  if (defined($ENV{'QUERY_STRING'}) && length($ENV{'QUERY_STRING'}) >= 1) {
-            foreach(url_param()) { $html .= print_table_row(2, "GET[\"$_\"]", url_param($_)); }
+            foreach(keys %myparams) { $html .= print_table_row(2, "GET[\"$_\"]", $myparams{$_}); }
 	  }
 	  if (defined($ENV{'CONTENT_LENGTH'})) {
-             foreach(param()) { $html .= print_table_row(2, "POST[\"$_\"]", param($_)); }	     
+             foreach(keys %myparams) { $html .= print_table_row(2, "POST[\"$_\"]", $myparams{$_}); }	     
 	  }	  
           if (defined($ENV{'HTTP_COOKIE'})) {
              $cookies = $ENV{'HTTP_COOKIE'};

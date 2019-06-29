@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalendarDatesUtils
   homepage: https://metacpan.org/release/App-CalendarDatesUtils
   repository: git://github.com/perlancar/perl-App-CalendarDatesUtils.git
-version: '0.005'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

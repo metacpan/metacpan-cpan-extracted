@@ -18,13 +18,13 @@ requires:
   String::Validator::Common: '2.00'
   String::Validator::Email: '2.00'
   String::Validator::Language: '2.00'
-  String::Validator::Password: '2.00'
+  String::Validator::Password: '2.01'
   String::Validator::Phone::NANP: '2.00'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/brainbuz/String-Validator/issues
   homepage: https://github.com/brainbuz/String-Validator
   repository: https://github.com/brainbuz/String-Validator.git
-version: '2.01'
+version: '2.02'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

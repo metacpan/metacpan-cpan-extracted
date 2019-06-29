@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 #
 # borrowed from Redis.pm's test suite with permission
 #
@@ -9,6 +9,7 @@ use lib 't/tlib';
 use Test::More;
 use Test::Fatal;
 use Test::Mock::Redis;
+use Encode ();
 
 ok(my $r = Test::Mock::Redis->new, 'pretended to connect to our test redis-server');
 my @redi = ($r);
@@ -46,8 +47,8 @@ foreach my $o (@redi){
     cmp_ok($o->get('foo'), 'eq', 'baz', 'get foo = baz');
 
     my $euro = "\x{20ac}";
-    ok($o->set(utf8 => $euro), 'set utf8');
-    cmp_ok($o->get('utf8'), 'eq', $euro, 'get utf8');
+    ok($o->set(utf8 => Encode::encode( 'UTF-8', $euro ) ), 'set utf8');
+    cmp_ok( Encode::decode( 'UTF-8', $o->get('utf8') ), 'eq', $euro, 'get utf8');
 
     ok($o->set('test-undef' => 42), 'set test-undef');
     ok($o->exists('test-undef'), 'exists undef');

@@ -153,4 +153,26 @@ subtest 'system_path' => sub {
 
 };
 
+subtest 'alien' => sub {
+
+  @{ $FFI::CheckLib::system_path } = ();
+
+  my $alien = mock 'Alien::libfoo' => (
+    add => [
+      dynamic_libs => sub {
+        'corpus/unix/lib/libfoo.so.2.3.4',
+      },
+    ],
+  );
+
+  is(
+    [FFI::CheckLib::find_lib( lib => 'foo', alien => ['Alien::libfoo'])],
+    array {
+      item 0 => match qr/foo/;
+      end;
+    },
+  );
+
+};
+
 done_testing;

@@ -8,9 +8,9 @@ use Test::More;
 
 use POSIX qw(strftime);
 
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Test;
+use Sport::Analytics::NHL::Config qw(:all);
+use Sport::Analytics::NHL::Vars qw($IS_AUTHOR);
+use Sport::Analytics::NHL::Test qw($TEST_COUNTER);
 use Sport::Analytics::NHL::Util;
 
 use Storable qw(dclone store retrieve);

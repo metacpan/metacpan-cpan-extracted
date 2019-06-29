@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    10/01/2016                                                             #
-#    Revised: 03/06/2018                                                             #
+#    Revised: 06/18/2019                                                             #
 #    UMLS Similarity Word2Vec Package Interface Driver                               #
 #                                                                                    #
 ######################################################################################
@@ -106,6 +106,7 @@ if( $packageInterface->GetExitFlag() == 1 )
         SubVectors()                                        if( $arg eq "--subtractvectors"        );
         W2VTrain()                                          if( $arg eq "--w2vtrain"               );
         W2PTrain()                                          if( $arg eq "--w2ptrain"               );
+        CleanText()                                         if( $arg eq "--cleantext"              );
         CompileTextCorpus()                                 if( $arg eq "--compiletextcorpus"      );
         ConvertBinToText()                                  if( $arg eq "--converttotextvectors"   );
         ConvertTextToBin()                                  if( $arg eq "--converttobinaryvectors" );
@@ -177,6 +178,7 @@ sub FindNextCommandIndex
         return $i if $ARGV[$i] eq "--subtractvectors";
         return $i if $ARGV[$i] eq "--w2vtrain";
         return $i if $ARGV[$i] eq "--w2ptrain";
+        return $i if $ARGV[$i] eq "--cleantext";
         return $i if $ARGV[$i] eq "--compiletextcorpus";
         return $i if $ARGV[$i] eq "--converttotextvectors";
         return $i if $ARGV[$i] eq "--converttobinaryvectors";
@@ -410,6 +412,29 @@ sub W2PTrain
     my $result            = $packageInterface->CLStartWord2PhraseTraining( $optionsHashRef );
     print "Word2Phrase Training Successful\n" if $result == 0;
     print "Word2Phrase Training Not Successful - See \"Word2phraseLog.txt\" For Details\n" if $result != 0;
+}
+
+sub CleanText
+{
+    my $optionsHashRef    = GetCommandOptions( $argIndex );
+    my %optionsHash       = %{ $optionsHashRef };
+    
+    # Argument Check(s)
+    print "Error: \"-inputfile\" Not Defined" if( !defined( $optionsHash{ "-inputfile" } ) );
+    
+    if( !defined( $optionsHash{ "-inputfile" } ) )
+    {
+        print "\nWarning: Improper Format\n";
+        print "Format: --cleantext -inputfile _ -outputfile _\n\n";
+        print "Minimal Requirements: -cleantext\n\n";
+        print "Note: All options not specified will result in text corpus compilation using default options.\n";
+        return;
+    }
+    
+    my $result           = $packageInterface->CLCleanText( $optionsHashRef );
+    print "Finished Text Cleaning\n" if $result == 0;
+    print "Error Cleaning Text\n" if $result == -1;
+    print "See \"util.txt\" log file for details\n" if $result == -1 && $packageInterface->GetWriteLog() == 1;
 }
 
 sub CompileTextCorpus
@@ -988,6 +1013,8 @@ sub ShowHelp
                              user-specified options \n\n";
     print "--w2ptrain                   Executes word2phrase conversion based on\n
                              user-specified options and text corpus \n\n";
+    print "--cleantext                  Cleans text within a user specified input file\n
+                             and writes line-by-line to an output file\n\n";
     print "--compiletextcorpus          Executes Medline XML-To-W2V text corpus \n
                              generation based on user-specified options \n\n";
     print "--converttotextvectors       Converts user-specified word2vec binary \n
@@ -1287,6 +1314,30 @@ Example:
 
  Word2vec-Interface.pl --w2ptrain -trainfile "../../samples/textcorpus.txt" -outputfile "../../samples/phrasecorpus.txt" -min-count 10 -threshold -200 -overwrite 1
 
+=head3 --cleantext
+
+Description:
+
+ Cleans text based on XML-to-W2V text corpus generation text normalization methods.
+   - All Text Conveted To Lowercase
+   - Duplicate White Spaces Removed
+   - "'s" (Apostrophe 's') Characters Removed
+   - Hyphen "-" Replaced With Whitespace
+   - All Characters Outside Of "a-z" and NewLine Characters Are Removed
+   - Lastly, Whitespace Before And After Text Is Removed
+
+Parameters:
+
+ -inputfile       file_path       (String)
+ -outputfile      file_path       (String)
+
+ Note: Minimal required parameter to run is "-inputfile". All other parameters not specified will be set to default settings.
+
+Example:
+
+ Word2vec-Interface.pl --cleantext -inputfile "../../samples/text.txt"
+ Word2vec-Interface.pl --cleantext -inputfile "../../samples/text.txt" -outputfile "../../samples/cleaned_text.txt"
+
 =head3 --compiletextcorpus
 
 Description:
@@ -1431,9 +1482,12 @@ Description:
 
 Parameters:
 
- vector_binary_file          (String)
- term                        (String)
- number_of_similar_neighbors (Integer)
+ -vectors   vector_binary_file          (String)
+ -term      term                        (String)
+ -neighbors number_of_similar_neighbors (Integer)
+
+ ( Optional Parameter(s) )
+ -threads   number of threads           (Integer)
 
 Output:
 
@@ -1441,7 +1495,7 @@ Output:
 
 Example:
 
- Word2vec-Interface.pl --findsimilarterms vectors.bin heart 10
+ Word2vec-Interface.pl --findsimilarterms -vectors vectors.bin -term heart -neighbors 10
 
 =head3 --spearmans
 

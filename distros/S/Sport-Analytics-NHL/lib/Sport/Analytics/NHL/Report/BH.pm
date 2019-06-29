@@ -9,7 +9,7 @@ use parent 'Sport::Analytics::NHL::Report';
 
 use Carp;
 
-use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Config qw(:basic :ids);
 use Sport::Analytics::NHL::Errors;
 use Sport::Analytics::NHL::Util;
 

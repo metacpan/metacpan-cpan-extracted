@@ -4,5 +4,6 @@ MANIFEST
 README
 t/IO-Uncompress-Untar.t
 lib/IO/Uncompress/Untar.pm
+cpanfile
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

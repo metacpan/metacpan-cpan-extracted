@@ -1,3 +1,1415 @@
+Fri Jun 28 23:54:30 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Split perlbrew install-multiple into separate RUN cmd This allows
+    changing which Perls are used etc. without re-bootstrapping
+    perlbrew.
+
+
+      M docker/Dockerfile
+
+Fri Jun 28 21:57:08 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Use Clone backend for Hash::Merge, not Storable (#58) Use Clone
+    backend for Hash::Merge, not Storable
+
+Fri Jun 28 21:11:58 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Use Clone backend for Hash::Merge, not Storable Need to avoid Storable
+    backend, since it can't deal with regexps:
+
+        https://rt.perl.org/Public/Bug/Display.html?id=50608
+
+    This should fix the Docker builds.
+
+
+      M Build.PL
+      M META.json
+      M META.yml
+      M bin/stow.in
+
+Fri Jun 28 21:20:22 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * make maintainer-clean remove cover_db/
+
+      M Makefile.am
+
+Fri Jun 28 20:46:15 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Make testing within Docker containers easier (#56) Make testing within
+    Docker containers easier
+
+Fri Jun 28 20:10:45 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Make testing within Docker containers easier
+
+      M docker/run-stow-tests.sh
+      M test-docker.sh
+
+Fri Jun 28 20:33:30 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #57 from aspiers/strict-tests Allow make to fail if
+    missing modules for test dependencies
+
+Fri Jun 28 20:21:41 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Allow make to fail if missing modules for test dependencies e.g. make
+    STRICT_TESTS=1
+
+    However we don't need this in .travis.yml as explained in the 
+    comments.
+
+
+      M .travis.yml
+      M configure.ac
+
+Fri Jun 28 17:48:04 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Dockerfile: fix Debian jessie sources (#55) Dockerfile: fix Debian
+    jessie sources
+
+Fri Jun 28 17:12:18 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Dockerfile: fix Debian jessie sources 
+    https://superuser.com/questions/1423486/issue-with-fetching-http-deb-debian-org-debian-dists-jessie-updates-inrelease
+
+
+      M docker/Dockerfile
+
+Fri Jun 28 17:14:23 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Make docker scripts use get-version (#54) Make docker scripts use
+    get-version
+
+Fri Jun 28 17:10:42 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * rebuild META.* in preparation for 2.3.0 release (#53) rebuild META.*
+    in preparation for 2.3.0 release
+
+Fri Jun 28 17:08:48 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Make docker scripts use get-version
+
+      M build-docker.sh
+      M test-docker.sh
+
+Fri Jun 28 17:04:40 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * rebuild META.* in preparation for 2.3.0 release
+
+      M META.json
+      M META.yml
+
+Fri Jun 28 16:48:59 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Various improvements to tests (#52) Various improvements to tests
+
+Fri Jun 28 09:56:46 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add separate tests for .stowrc from $HOME and $PWD
+    .stowrc can be obtained from $HOME and/or the current working 
+    directory; however only the $HOME case was tested before, because 
+    during tests Stow was being run from $HOME.
+
+    So switch $TEST_DIR to an absolute path, create a new run_from/ 
+    subdirectory, and chdir to that before invoking any Stow code. 
+    This allows us to test the behaviour of .stowrc in $HOME and
+    run_from/ separately.
+
+
+      M NEWS
+      M bin/stow.in
+      M t/rc_options.t
+      M t/testutil.pm
+
+Fri Jun 28 15:23:52 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Split up is_deeply() assertions in find_stowed_path.t This makes the
+    tests and any failures more readable.
+
+
+      M t/find_stowed_path.t
+
+Fri Jun 28 15:22:44 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Check that find_stowed_path $path matches relative/absolute with
+    target Watch out for a corner case probably only relevant in
+    tests.
+
+
+      M lib/Stow.pm.in
+
+Fri Jun 28 15:22:29 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Improve comments on function parameters for clarity
+
+      M lib/Stow.pm.in
+
+Fri Jun 28 10:32:18 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add examples of how to enable debugging in tests
+
+      M t/find_stowed_path.t
+      M t/stow.t
+
+Fri Jun 28 01:02:48 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Replace testutil::make_dir with File::Path::make_path No need for a
+    custom function here.
+
+
+      M t/chkstow.t
+      M t/cleanup_invalid_links.t
+      M t/cli_options.t
+      M t/dotfiles.t
+      M t/examples.t
+      M t/find_stowed_path.t
+      M t/foldable.t
+      M t/ignore.t
+      M t/stow.t
+      M t/testutil.pm
+      M t/unstow.t
+      M t/unstow_orig.t
+
+Fri Jun 28 00:53:12 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Rename $OUT_DIR to $TEST_DIR This is a more accurate reflection of
+    what it is.
+
+
+      M t/chkstow.t
+      M t/cleanup_invalid_links.t
+      M t/cli_options.t
+      M t/defer.t
+      M t/dotfiles.t
+      M t/examples.t
+      M t/find_stowed_path.t
+      M t/foldable.t
+      M t/ignore.t
+      M t/rc_options.t
+      M t/stow.t
+      M t/testutil.pm
+      M t/unstow.t
+      M t/unstow_orig.t
+
+Fri Jun 28 00:41:55 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Avoid dereferencing $ENV{HOME} if it is undefined (#32) Avoid
+    dereferencing $ENV{HOME} if it is undefined
+
+Thu Jun 27 20:49:44 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Improve the history of individual contributions and repositories (#49) 
+    Improve the history of individual contributions and repositories
+
+Thu Jun 27 20:49:18 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Upgrade to GPL v3 and add headers to files (#50)
+    Upgrade to GPL v3 and add headers to files
+
+Thu Jun 27 20:28:17 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Improve the history of individual contributions and repositories The
+    source code has been through a rather complicated journey, and 
+    it's occasionally useful to understand this history from CVS to a 
+    private Subversion repository to its current location in git.  So 
+    document this more thoroughly, and ensure that everyone involved 
+    is in the THANKS file.
+
+
+      M AUTHORS
+      M README.md
+      M THANKS
+
+Thu Jun 27 20:39:16 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Change -w to "use warnings;" in tools/get-version This is more
+    idiomatic and consistent with everywhere else.
+
+
+      M tools/get-version
+
+Thu Jun 27 20:37:50 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Change #!/usr/local/bin/perl to #!/usr/bin/perl in t/*.t This doesn't
+    really matter, since these are not executed directly, but it's
+    more consistent with everything else and modern systems.
+
+
+      M t/chkstow.t
+      M t/cleanup_invalid_links.t
+      M t/cli.t
+      M t/cli_options.t
+      M t/defer.t
+      M t/dotfiles.t
+      M t/examples.t
+      M t/find_stowed_path.t
+      M t/foldable.t
+      M t/ignore.t
+      M t/join_paths.t
+      M t/parent.t
+      M t/rc_options.t
+      M t/stow.t
+      M t/unstow.t
+      M t/unstow_orig.t
+
+Thu Jun 27 14:02:19 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Upgrade to GPL v3 and add headers to files (#44) Following advice from
+    maintainers@gnu.org, bring Stow in line with other GNU projects by
+    upgrading it from GPL v2 to v3
+
+     
+    https://www.gnu.org/prep/maintain/html_node/Licensing-of-GNU-Packages.html#Licensing-of-GNU-Packages
+
+    as obtained in plain text and texinfo formats from
+
+      https://www.gnu.org/licenses/
+
+    and adding appropriate headers:
+
+     
+    https://www.gnu.org/prep/maintain/html_node/License-Notices-for-Code.html#License-Notices-for-Code
+
+    Fixes #44: https://github.com/aspiers/stow/issues/44
+
+
+      M Build.PL
+      M COPYING
+      M INSTALL.md
+      M Makefile.am
+      M README.md
+      M TODO
+      M bin/chkstow.in
+      M bin/stow.in
+      M configure.ac
+      M doc/stow.texi
+      M docker/Dockerfile
+      M docker/bootstrap-perls.sh
+      M docker/run-stow-tests.sh
+      M lib/Stow.pm.in
+      M lib/Stow/Util.pm.in
+      M t/chkstow.t
+      M t/cleanup_invalid_links.t
+      M t/cli.t
+      M t/cli_options.t
+      M t/defer.t
+      M t/dotfiles.t
+      M t/examples.t
+      M t/find_stowed_path.t
+      M t/foldable.t
+      M t/ignore.t
+      M t/join_paths.t
+      M t/parent.t
+      M t/rc_options.t
+      M t/stow.t
+      M t/testutil.pm
+      M t/unstow.t
+      M t/unstow_orig.t
+
+Thu Jun 27 14:14:23 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Fix Travis failure after merging #42 (#46) Fix Travis failure after
+    merging #42
+
+Thu Jun 27 14:06:19 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * remove trailing whitespace from lines (#45) remove trailing whitespace
+    from lines
+
+Thu Jun 27 13:55:35 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Fix Travis failure after merging #42 Something weird happened with 
+    https://travis-ci.org/aspiers/stow/jobs/551290921 after merging
+    #42, as shown below.  Maybe removing texi2html from the list of
+    packages for Travis to install will help.
+
+    --- Installing APT Packages 15.50s$ travis_apt_get_update 0.11s$
+    sudo -E apt-get -yq --no-install-suggests --no-install-recommends
+    $(travis_apt_get_options) install texinfo texlive texi2html 
+    Reading package lists... Building dependency tree... Reading state
+    information... Package texinfo is not available, but is referred
+    to by another package. This may mean that the package is missing,
+    has been obsoleted, or is only available from another source 
+    However the following packages replace it:
+     info install-info E: Package 'texinfo' has no installation
+    candidate E: Unable to locate package texi2html 
+    apt-get.diagnostics apt-get install failed
+    $ cat ${TRAVIS_HOME}/apt-get-update.log Get:2
+    http://dl.hhvm.com/ubuntu trusty InRelease [3,106 B] Get:3
+    http://security.ubuntu.com/ubuntu trusty-security InRelease [65.9
+    kB] Get:4 http://ppa.launchpad.net/chris-lea/redis-server/ubuntu
+    trusty InRelease [15.4 kB] Ign:5
+    http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.4
+    InRelease Get:6 http://repo.mongodb.org/apt/ubuntu
+    trusty/mongodb-org/3.4 Release [2,495 B] Get:7
+    http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.4
+    Release.gpg [801 B] Get:8 http://dl.hhvm.com/ubuntu trusty/main
+    amd64 Packages [1,812 B] Get:9 http://security.ubuntu.com/ubuntu
+    trusty-security/main Sources [220 kB] Get:10
+    http://security.ubuntu.com/ubuntu trusty-security/restricted
+    Sources [5,050 B] Get:11 http://security.ubuntu.com/ubuntu
+    trusty-security/universe Sources [126 kB] Get:12
+    http://security.ubuntu.com/ubuntu trusty-security/multiverse
+    Sources [3,070 B] Get:13 http://security.ubuntu.com/ubuntu
+    trusty-security/main amd64 Packages [1,032 kB] Get:14
+    http://security.ubuntu.com/ubuntu trusty-security/main i386
+    Packages [934 kB] Get:15 http://security.ubuntu.com/ubuntu
+    trusty-security/main Translation-en [541 kB] Get:16
+    http://security.ubuntu.com/ubuntu trusty-security/restricted amd64
+    Packages [18.1 kB] Get:17 http://security.ubuntu.com/ubuntu
+    trusty-security/restricted i386 Packages [17.8 kB] Get:18
+    http://security.ubuntu.com/ubuntu trusty-security/restricted
+    Translation-en [3,272 B] Get:19 http://security.ubuntu.com/ubuntu
+    trusty-security/universe amd64 Packages [377 kB] Get:20
+    http://security.ubuntu.com/ubuntu trusty-security/universe i386
+    Packages [355 kB] Get:21 http://security.ubuntu.com/ubuntu
+    trusty-security/universe Translation-en [203 kB] Get:22
+    http://security.ubuntu.com/ubuntu trusty-security/multiverse amd64
+    Packages [4,730 B] Get:23 http://security.ubuntu.com/ubuntu
+    trusty-security/multiverse i386 Packages [4,887 B] Get:24
+    http://security.ubuntu.com/ubuntu trusty-security/multiverse
+    Translation-en [2,426 B] Get:25
+    https://download.docker.com/linux/ubuntu trusty InRelease [37.1
+    kB] Get:26 http://repo.mongodb.org/apt/ubuntu
+    trusty/mongodb-org/3.4/multiverse amd64 Packages [14.1 kB] Get:27
+    https://download.docker.com/linux/ubuntu trusty/stable amd64
+    Packages [5,763 B] Get:28 https://download.docker.com/linux/ubuntu
+    trusty/edge amd64 Packages [6,911 B] Ign:29
+    http://ppa.launchpad.net/couchdb/stable/ubuntu trusty InRelease 
+    Get:30 http://ppa.launchpad.net/git-core/ppa/ubuntu trusty
+    InRelease [20.8 kB] Get:31 http://ppa.launchpad.net/hvr/ghc/ubuntu
+    trusty InRelease [15.4 kB] Get:32
+    http://ppa.launchpad.net/pollinate/ppa/ubuntu trusty InRelease
+    [15.4 kB] Get:33 http://ppa.launchpad.net/webupd8team/java/ubuntu
+    trusty InRelease [15.5 kB] Get:34
+    http://ppa.launchpad.net/chris-lea/redis-server/ubuntu trusty/main
+    amd64 Packages [1,843 B] Get:35
+    http://ppa.launchpad.net/chris-lea/redis-server/ubuntu trusty/main
+    i386 Packages [1,842 B] Get:36
+    http://ppa.launchpad.net/chris-lea/redis-server/ubuntu trusty/main
+    Translation-en [990 B] Get:37
+    http://ppa.launchpad.net/couchdb/stable/ubuntu trusty Release
+    [15.1 kB] Get:38 http://ppa.launchpad.net/couchdb/stable/ubuntu
+    trusty Release.gpg [316 B] Ign:39
+    http://dl.google.com/linux/chrome/deb stable InRelease Get:40
+    http://dl.google.com/linux/chrome/deb stable Release [943 B] 
+    Get:41 http://dl.google.com/linux/chrome/deb stable Release.gpg
+    [819 B] Get:42 http://ppa.launchpad.net/git-core/ppa/ubuntu
+    trusty/main amd64 Packages [3,494 B] Get:43
+    http://ppa.launchpad.net/git-core/ppa/ubuntu trusty/main i386
+    Packages [3,496 B] Get:44
+    http://ppa.launchpad.net/git-core/ppa/ubuntu trusty/main
+    Translation-en [2,368 B] Get:45
+    http://ppa.launchpad.net/hvr/ghc/ubuntu trusty/main amd64 Packages
+    [18.5 kB] Get:46 http://ppa.launchpad.net/hvr/ghc/ubuntu
+    trusty/main i386 Packages [15.7 kB] Get:47
+    http://ppa.launchpad.net/hvr/ghc/ubuntu trusty/main Translation-en
+    [1,107 B] Get:48 http://ppa.launchpad.net/pollinate/ppa/ubuntu
+    trusty/main amd64 Packages [430 B] Get:49
+    http://ppa.launchpad.net/pollinate/ppa/ubuntu trusty/main i386
+    Packages [430 B] Get:50
+    http://ppa.launchpad.net/pollinate/ppa/ubuntu trusty/main
+    Translation-en [374 B] Get:51
+    http://ppa.launchpad.net/webupd8team/java/ubuntu trusty/main amd64
+    Packages [20 B] Get:52
+    http://ppa.launchpad.net/webupd8team/java/ubuntu trusty/main i386
+    Packages [20 B] Get:53
+    http://ppa.launchpad.net/webupd8team/java/ubuntu trusty/main
+    Translation-en [20 B] Get:54
+    http://ppa.launchpad.net/couchdb/stable/ubuntu trusty/main amd64
+    Packages [985 B] Get:55
+    http://ppa.launchpad.net/couchdb/stable/ubuntu trusty/main i386
+    Packages [985 B] Get:56
+    http://ppa.launchpad.net/couchdb/stable/ubuntu trusty/main
+    Translation-en [644 B] Get:57
+    http://dl.google.com/linux/chrome/deb stable/main amd64 Packages
+    [1,107 B] Err:58
+    https://packagecloud.io/computology/apt-backport/ubuntu trusty
+    InRelease
+     Failed to connect to packagecloud.io port 443: Connection timed
+    out Err:59 http://us-east-1.ec2.archive.ubuntu.com/ubuntu trusty
+    InRelease
+     Could not connect to apt.cache.travis-ci.com:80 (34.96.81.152),
+    connection timed out Err:60
+    http://us-east-1.ec2.archive.ubuntu.com/ubuntu trusty-updates
+    InRelease
+     Unable to connect to apt.cache.travis-ci.com:http: Err:61
+    http://toolbelt.heroku.com/ubuntu ./ InRelease
+     Could not connect to apt.cache.travis-ci.com:80 (34.96.81.152),
+    connection timed out Err:62
+    http://us-east-1.ec2.archive.ubuntu.com/ubuntu trusty-backports
+    InRelease
+     Unable to connect to apt.cache.travis-ci.com:http: Err:63
+    http://apt.postgresql.org/pub/repos/apt trusty-pgdg InRelease
+     Could not connect to apt.cache.travis-ci.com:80 (34.96.81.152),
+    connection timed out Err:1 http://dl.bintray.com/apache/cassandra
+    39x InRelease
+     Could not connect to apt.cache.travis-ci.com:80 (34.96.81.152),
+    connection timed out Get:64
+    https://packagecloud.io/github/git-lfs/ubuntu trusty InRelease
+    [23.2 kB] Ign:64 https://packagecloud.io/github/git-lfs/ubuntu
+    trusty InRelease Get:65
+    https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu trusty
+    InRelease [23.7 kB] Get:66
+    https://packagecloud.io/github/git-lfs/ubuntu trusty/main Sources
+    [20 B] Get:67 https://packagecloud.io/github/git-lfs/ubuntu
+    trusty/main amd64 Packages [8,003 B] Get:68
+    https://packagecloud.io/github/git-lfs/ubuntu trusty/main i386
+    Packages [7,761 B] Get:69
+    https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu
+    trusty/main Sources [20 B] Get:70
+    https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu
+    trusty/main amd64 Packages [7,866 B] Get:71
+    https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu
+    trusty/main i386 Packages [7,866 B] Fetched 4,218 kB in 15s (279
+    kB/s) Reading package lists... W:
+    http://ppa.launchpad.net/couchdb/stable/ubuntu/dists/trusty/Release.gpg:
+    Signature by key 15866BAFD9BCC4F3C1E0DFC7D69548E1C17EAB57 uses
+    weak digest algorithm (SHA1) W: GPG error:
+    https://packagecloud.io/github/git-lfs/ubuntu trusty InRelease:
+    The following signatures couldn't be verified because the public
+    key is not available: NO_PUBKEY 6B05F25D762E3157 W: The repository
+    'https://packagecloud.io/github/git-lfs/ubuntu trusty InRelease'
+    is not signed. W: There is no public key available for the
+    following key IDs: 6B05F25D762E3157 W: Failed to fetch
+    http://us-east-1.ec2.archive.ubuntu.com/ubuntu/dists/trusty/InRelease
+     Could not connect to apt.cache.travis-ci.com:80 (34.96.81.152),
+    connection timed out W: Failed to fetch
+    http://us-east-1.ec2.archive.ubuntu.com/ubuntu/dists/trusty-updates/InRelease
+     Unable to connect to apt.cache.travis-ci.com:http: W: Failed to
+    fetch
+    http://us-east-1.ec2.archive.ubuntu.com/ubuntu/dists/trusty-backports/InRelease
+     Unable to connect to apt.cache.travis-ci.com:http: W: Failed to
+    fetch
+    http://www.apache.org/dist/cassandra/debian/dists/39x/InRelease 
+    Could not connect to apt.cache.travis-ci.com:80 (34.96.81.152),
+    connection timed out W: Failed to fetch
+    https://packagecloud.io/computology/apt-backport/ubuntu/dists/trusty/InRelease
+     Failed to connect to packagecloud.io port 443: Connection timed
+    out W: Failed to fetch
+    http://toolbelt.heroku.com/ubuntu/./InRelease  Could not connect
+    to apt.cache.travis-ci.com:80 (34.96.81.152), connection timed out 
+    W: Failed to fetch
+    http://apt.postgresql.org/pub/repos/apt/dists/trusty-pgdg/InRelease
+     Could not connect to apt.cache.travis-ci.com:80 (34.96.81.152),
+    connection timed out W: Some index files failed to download. They
+    have been ignored, or old ones used instead. The command "sudo -E
+    apt-get -yq --no-install-suggests --no-install-recommends
+    $(travis_apt_get_options) install texinfo texlive texi2html"
+    failed and exited with 100 during . Your build has been stopped.
+
+
+      M .travis.yml
+
+Wed Jun 26 13:25:53 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * remove trailing whitespace from lines
+
+      M doc/stow.texi
+
+Thu Jun 27 13:27:12 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Update maintainership to reflect reality (#41) Update maintainership
+    to reflect reality
+
+Wed Jun 26 14:08:48 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * switch from unmaintained texi2html to makeinfo --html --no-split (#42) 
+    switch from unmaintained texi2html to makeinfo --html --no-split
+
+Wed Jun 26 13:26:08 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Update maintainership to reflect reality Troy hasn't been active on
+    the project for many years.
+
+    https://lists.gnu.org/archive/html/stow-devel/2011-11/msg00009.html
+
+
+      M AUTHORS
+      M THANKS
+
+Wed Jun 26 13:37:07 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Switch to makeinfo --html --no-split for single-page HTML manual (#21) 
+    Remove the dependency on the ancient and unmaintained texi2html,
+    which was difficult to get running on most distros other than
+    openSUSE.
+
+    There are two more modern alternative approaches which can replace 
+    this:
+
+      - Use texi2any
+     - Use makeinfo --html --no-split
+
+    The latter seems to be the standard way these days, so we switch
+    to that; however we keep Makefile rules for all three, and a phony 
+    meta-rule 'manual-single-html-all' to allow quick comparison
+    between them.  Make tweaks accordingly to minimise the differences
+    and improve the output.
+
+    The rules for the older two approaches do not get triggered by 
+    default.
+
+    Fixes #21: https://github.com/aspiers/stow/issues/21
+
+
+      M .gitignore
+      M MANIFEST.SKIP
+      M Makefile.am
+      M NEWS
+
+Wed Jun 26 13:34:09 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Include the preamble in online versions of the manual This is more
+    inline with the suggestion in the texinfo manual:
+
+    https://www.gnu.org/software/texinfo/manual/texinfo/html_node/_0040top-Command.html
+
+    and also the preamble is useful in all cases.
+
+
+      M doc/stow.texi
+
+Wed Jun 26 13:33:48 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add Guillaume and myself to the list of @authors
+
+      M doc/stow.texi
+
+Wed Jun 26 13:25:53 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * remove trailing whitespace from lines
+
+      M AUTHORS
+
+Tue Jun 25 20:33:48 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * add tools/get-version to MANIFEST Forgot to do this, and it broke
+    ./Build.PL distcheck.
+
+
+      M MANIFEST
+
+Tue Jun 25 20:10:43 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge remote-tracking branch 'bricewge/fix-34'
+
+Tue Jun 25 20:04:11 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add some polish to the release process
+
+      M doc/HOWTO-RELEASE
+      A tools/get-version
+
+Tue Jun 25 19:49:46 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Perform shell expansion on the contents of .stowrc (#40) Perform shell
+    expansion on the contents of .stowrc
+
+Thu Jul 14 14:48:40 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Add function to expand ~ in .stowrc files (#14) Add a new
+    expand_tilde() function that performs tilde expansion of strings,
+    and corresponding unit tests:
+
+        * A ~ at the beginning of a path is expanded to the user's
+    home
+         directory.
+       * Literal '~' can be provided with '\~'
+
+    Combine this with expand_environment() in a new expand_filepath() 
+    function which applies all (both) required expansion functions to
+    a string, and use that in get_config_file_options() to expand
+    .stowrc options.
+
+    Add more tests to check that tilde expanded in correct places,
+    i.e.:
+
+        * expanded for --target and --dir
+       * not expanded for --ignore, --defer, or --override
+
+    Update documentation on stowrc files according to this
+    functionality change.
+
+    Fixes #14: https://github.com/aspiers/stow/issues/14
+
+
+      M NEWS
+      M bin/stow.in
+      M doc/stow.texi
+      M t/rc_options.t
+
+Thu Jul 14 11:37:42 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Apply environment expansion to options in .stowrc files Expand
+    environment variables used in stowrc, as requested in
+
+        https://savannah.gnu.org/bugs/?41826
+
+    This is achieved by creating a new function expand_environment()
+    that replaces any substring of the form '$VAR' or '${VAR}' with
+    contents of environment variable $VAR.  Literal '$' can be given
+    by '\$'.
+
+    N.B. The function is only applied to the --target and --dir
+    options, and only for options specified in .stowrc; cli options
+    are left untouched.
+
+    Undefined variables are expanded to the empty string, as they
+    would be in normal shell parameter expansion.
+
+    Unit tests added accordingly:
+
+      - Test expand_environment():
+       * Expand $HOME
+       * Expand ${HOME}
+       * Expand ${WITH SPACE}
+       * Expand '\$HOME'. Expected is '$HOME'
+       * Expand ${UNDEFINED}. Expected is ''.
+
+      - Test that it's applied to the correct options.
+
+      - Test that CLI options are not expanded.
+
+
+      M bin/stow.in
+      M t/cli_options.t
+      M t/rc_options.t
+
+Fri Jul 1 20:07:28 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Parse cli and stowrc files separately Why:
+
+    * We want to selectively apply expansion to:
+       * Only options from stowrc files.
+       * Only options that take a path.
+    * This requires ability to:
+       * Differentiate cli options from stowrc options
+       * Distinguish between individual stowrc options.
+
+    This change addresses the need by:
+
+    * Options from ARGV and stowrc files are separately parsed,
+    resulting in
+     two options hashes.
+       * Creating an option hash from stowrc files allows modification
+    of
+         specific arguments without having to rely on something like
+    regex
+         parsing of the options.
+
+    * get_config_file_options modified to return options hash.
+       * Uses the same parse_options function that parses ARGV
+
+    * Add Hash:Merge to dependencies in order to merge the two option
+     hashes.
+
+    * process_options() merges the two option hashes.
+       * Get option hash for ARGV
+       * Get option hash from get_config_file_options().
+       * Merge the two hashes with Hash::Merge.
+       * Sanitation and checks are ran on the merged options.
+
+    * The options -S, -D, and -R are ignored in stowrc files.
+       * Due to the way argument parsing happens, the effect of these
+         actions is not carried from stowrc into parsing of cli
+    options.
+       * It doesn't seem to make sense to put these options in stowrc
+         anyway.
+
+
+      M Build.PL
+      M META.json
+      M META.yml
+      M bin/stow.in
+
+Fri Jun 24 16:34:13 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Factor out parsing of options Why:
+
+    * Want to be able to selectively apply filepath expansion to:
+       1. Only options in a stowrc file.
+       2. Only options that take a file path.
+
+    * Because of need 1, any expansion must be performed on stowrc
+    options
+     before merging with cli options.
+
+    * Because of need 2, stowrc options need to be parsed before
+    expansion
+     in order to know which options need expanding.
+
+    This change addresses the need by:
+
+    * Create parse_options()
+       * Implements option parsing logic previously in
+    process_options()
+       * Takes an array as parameter instead of assuming ARGV
+    * Edit process_options() to still work as expected.
+       * Only change was to call parse_options() instead of directly
+         parsing ARGV
+
+    * By factoring out the option parsing code, we can reuse the
+    existing
+     parsing code for stowrc options.
+       * Allows expansion of only the option itself, i.e expansion on
+         "$HOME/target" rather than "--target=$HOME/target"
+       * Allows easy determination of which options need expansion.
+
+
+      M bin/stow.in
+
+Thu Jul 14 08:55:55 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Add test for conflicting stowrc and cli args Why:
+
+    * Want to add feature to stowrc parsing.
+    * Missing regression test for conflicting cli and stowrc options.
+
+    This change addresses the need by:
+
+    * Add missing regression tests to rc_options.t
+       * Two types of tests for the two types of options possible.
+
+    * For scalar options such as --target, cli arguments should
+    overwrite
+     stowrc arguments.
+
+    * For options that result in a list, such as --ignore, the
+    arguments
+     from cli and stowrc files should be merged.
+
+
+      M t/rc_options.t
+
+Fri Jul 1 18:38:25 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Add test harness for stowrc files Why:
+
+    * Planning on developing a new feature for parsing of stowrc
+    files.
+    * Need a test harness that performs initialization and clean up
+       * Initialization: Create directory structure that allows
+    creation of
+         stowrc files without worrying about squashing existing files.
+       * Clean up: Remove all files created during testing.
+
+    This change addresses the need by:
+
+    * Add intialization and cleanup harness in t/rc_options.t
+       * Define the location to write stowrc files to in $RC_FILE
+       * Ensures that location $RC_FILE does not already exist.
+       * Calls the init_test_dirs to bootstrap directory tree.
+       * After all tests are run, removes $RC_FILE and the testing
+         directory tree.
+
+    * Add basic test of stowrc parsing to t/rc_options.t
+       * Provides a template of how to create and test a stowrc file.
+
+    * Newly created t/rc_options.t file added to MANIFEST
+
+
+      M MANIFEST
+      A t/rc_options.t
+
+Fri Jun 24 15:06:06 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Change init_test_dirs to point $HOME at $OUT_DIRS Why:
+
+    * Want to add a new feature to parsing of stowrc files.
+    * Need ability to write .stowrc files for testing without risk of
+     squashing existing files.
+
+    This change addresses the need by:
+
+    * Reusing logic in init_test_dirs
+       * init_test_dirs already creates new directory structure and
+    overwrites
+         $HOME to point into /tmp.
+    * This commit changes init_test_dirs to point $HOME at the newly
+    created
+     directory structure ($OUT_DIR) instead of /tmp.
+       * Grants ability to write .stowrc to $HOME without fear.
+       * Pointing $HOME at $OUT_DIR instead of /tmp also makes cleanup
+    easier.
+           * Remove $OUT_DIR vs remove specific files in /tmp.
+
+
+      M t/testutil.pm
+
+Tue Jun 25 19:05:38 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Don't warn when .stowrc is used We fully support and expect some users
+    using .stowrc, so there is no reason to issue a warning when they
+    do.
+
+
+      M bin/stow.in
+
+Tue Jun 25 19:36:49 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Group news items for 2.3.0 Since 2.3.0 is a long overdue release and
+    has many changes, document them in NEWS in three groups:
+
+    - New features / changes in behaviour
+    - Documentation fixes and enhancements
+    - Fixes for bugs and technical debt
+
+
+      M NEWS
+
+Tue Jun 25 17:48:07 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Update docs according to recent commits (#39) Update docs according to
+    recent commits
+
+Tue Jun 25 17:21:53 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Update NEWS and THANKS according to recent commits
+
+      M NEWS
+      M THANKS
+
+Tue Jun 25 17:25:33 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Synchronise --verbose documentation The man page was updated with
+    regard to higher --verbose levels but not the info manual, so fix
+    that.
+
+
+      M doc/stow.texi
+
+Tue Jun 25 17:05:43 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Fix old descriptions of Stow (#22) (#38) Fix old descriptions of Stow
+    (#22)
+
+Mon Nov 21 14:56:26 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Fix old descriptions of Stow (#22) De-emphasise the package management
+    aspects, since these days almost everyone prefers to use modern
+    package managers such as rpm / dpkg / Nix for (system-wide)
+    package management.
+
+    Also include more popular modern use cases for Stow such as
+    management of dotfiles and software compiled in the user's $HOME
+    directory.
+
+    Fixes #22: https://github.com/aspiers/stow/issues/22
+
+
+      M README.md
+      M bin/stow.in
+      M doc/stow.texi
+      M lib/Stow.pm.in
+
+Tue Jun 25 15:55:15 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Merge pull request #37 from aspiers/invalid-option-exit-code Return
+    non-zero exit code when invalid option is specified (#34)
+
+Tue Jun 25 13:44:35 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Return non-zero exit code when invalid option is specified (#34) Also
+    add a unit test for this.
+
+    Fixes #34: https://github.com/aspiers/stow/issues/34
+
+
+      M bin/stow.in
+      M t/cli.t
+
+Tue Jun 25 15:41:41 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add black box CLI testing and 2 other tweaks (#36) Add black box CLI
+    testing and 2 other tweaks
+
+Tue Jun 25 14:27:56 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add cli.t for testing invocation of stow executable Unlike the other
+    tests, this actually treats stow(1) as a black box script, running
+    it directly rather than require-ing it as a library. This allows
+    us to check things like the exit codes returned.
+
+
+      M MANIFEST
+      A t/cli.t
+
+Tue Jun 25 14:30:08 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Make dotfiles.t executable for consistency with other tests
+
+      M t/dotfiles.t
+
+Tue Jun 25 13:44:17 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * remove duplicate "the" typo
+
+      M bin/chkstow.in
+
+Tue Jun 11 14:13:51 2019 +0200  Brice Waegeneire <brice.wge@gmail.com>
+
+    * retrun exit code 1 when unknown option
+
+      M bin/stow.in
+
+Tue Jun 11 10:53:28 2019 +0200  Brice Waegeneire <brice.wge@gmail.com>
+
+    * make non docker scripts more portable
+
+      M build-docker.sh
+      M test-docker.sh
+
+Tue Jun 11 10:28:25 2019 +0200  Brice Waegeneire <brice.wge@gmail.com>
+
+    * fix dockerfile apt-get lock issue E: Could not open lock file
+    /var/cache/apt/archives/lock - open (2: No such file or directory) 
+    E: Unable to lock the download directory
+
+
+      M docker/Dockerfile
+
+Wed Apr 3 09:48:15 2019 -0600  Will Aoki <waoki@umnh.utah.edu>
+
+    * Avoid dereferencing $ENV{HOME} if it is undefined
+
+      M bin/stow.in
+
+Sat Feb 9 17:08:44 2019 +0000  Adam Spiers <github@adamspiers.org>
+
+    * Merge pull request #30 from aspiers/chkstow-stow-dir make chkstow
+    honour $STOW_DIR environment variable
+
+Sat Feb 9 17:02:47 2019 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * make chkstow honour $STOW_DIR environment variable Thanks to Matan
+    Nassau for reporting this deficiency.
+
+
+      M THANKS
+      M bin/chkstow.in
+
+Sun Feb 11 17:58:33 2018 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * add Jean Louis to THANKS file Forgot to do this in e7e6c7f.
+
+
+      M THANKS
+
+Sun Feb 11 17:55:40 2018 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * avoid "regex" abbreviation for consistency
+
+      M doc/stow.texi
+
+Sun Feb 11 17:47:06 2018 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * fix erroneous glob examples in --ignore documentation Many thanks to
+    Daniel Shahaf for noticing this.
+
+    http://lists.gnu.org/archive/html/bug-stow/2017-07/msg00000.html
+
+
+      M THANKS
+      M doc/stow.texi
+
+Sun Feb 11 11:52:56 2018 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * update aclocal.m4 using aclocal 1.15.1
+
+      M aclocal.m4
+
+Sun Feb 11 11:47:39 2018 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * update the introductory text to clarify Stow's common usage Thanks to
+    Jean Louis for some suggestions on this.
+
+
+      M doc/stow.texi
+
+Sun Mar 19 21:12:46 2017 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * INSTALL.md: document how to build from git (#20) Fixes
+    https://github.com/aspiers/stow/issues/20
+
+
+      M INSTALL.md
+
+Sat Mar 4 14:28:19 2017 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * fix typo in "Deleting Packages" chapter Thanks to Hongyi Zhao for
+    spotting this error and reporting it.
+
+
+      M THANKS
+      M doc/stow.texi
+
+Sun Dec 18 23:16:41 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * clarify that ~/.stowrc args don't get processed by a shell Address
+    confusion reported here:
+
+      http://lists.gnu.org/archive/html/bug-stow/2016-08/msg00000.html
+
+
+      M doc/stow.texi
+
+Sun Dec 18 23:14:39 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * replace a "you" typo with better text The contents are prepended to
+    the arguments; they still come after the stow executable.
+
+
+      M doc/stow.texi
+
+Sun Dec 18 23:10:13 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * fix documentation for --verbose It actually goes up to 5 these days. 
+    Thanks to Kristoffer Haugsbakk for spotting that:
+
+      http://lists.gnu.org/archive/html/bug-stow/2016-08/msg00000.html
+
+
+      M THANKS
+      M bin/stow.in
+
+Sun Nov 20 22:02:19 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Bump version to 2.3.0
+
+      M META.json
+      M META.yml
+      M configure.ac
+
+Sun Nov 20 21:45:17 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Prepare NEWS file for 2.3.0 release
+
+      M NEWS
+
+Sun Nov 20 22:16:43 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: use Docker to test before releasing Charles LeDoux did
+    some awesome work providing this Docker environment which can test
+    across multiple Perl versions using perlbrew, so it would be crazy
+    not to use it.
+
+
+      M doc/HOWTO-RELEASE
+
+Sun Nov 20 22:57:08 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * ignore cover_db generated by Coveralls
+
+      M .gitignore
+
+Sun Nov 20 22:16:10 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * tag Docker images with the corresponding version number
+
+      M build-docker.sh
+      M test-docker.sh
+
+Sun Nov 20 22:02:00 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * use PAUSE upload for final validation step of release
+
+      M doc/HOWTO-RELEASE
+
+Sun Nov 20 22:00:46 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * make sure release tags are also pushed to GitHub
+
+      M doc/HOWTO-RELEASE
+
+Sun Nov 20 21:58:31 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * further refine the release process Let's try a new approach where we
+    increment the version number immediately after publishing a
+    release, not just before.
+
+    This will mean that anyone who builds from git gets a version of
+    Stow which is higher than the release which was just cut, and this
+    could provide valuable debugging hints in case a bug report does
+    not clearly state whether the problem arose with the latest
+    release or with a build from git.
+
+
+      M doc/HOWTO-RELEASE
+
+Sun Nov 20 21:51:41 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * whitespace cleanups
+
+      M doc/HOWTO-RELEASE
+      M docker/Dockerfile
+      M docker/bootstrap-perls.sh
+      M docker/run-stow-tests.sh
+      M test-docker.sh
+
+Sun Nov 20 21:18:08 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * THANKS: add some recent contributors
+
+      M THANKS
+
+Sun Nov 20 21:17:46 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * THANKS: clarify mention of Bob Glickstein
+
+      M THANKS
+
+Sun Nov 20 20:55:14 2016 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: add a reminder to update THANKS Make sure the
+    maintainer always gives credit to contributors :-)
+
+
+      M doc/HOWTO-RELEASE
+
+Wed Oct 5 17:47:51 2016 +0100  Adam Spiers <github@adamspiers.org>
+
+    * Merge pull request #17 from jvkersch/enh/dot-files Special processing
+    for dotfiles
+
+Sun Jul 31 21:55:55 2016 +0100  Joris Vankerschaver <jvankerschaver@enthought.com>
+
+    * Special processing for dotfiles
+
+      M MANIFEST
+      M bin/stow.in
+      M lib/Stow.pm.in
+      M lib/Stow/Util.pm.in
+      A t/dotfiles.t
+
+Sun Sep 25 19:32:08 2016 +0100  Adam Spiers <github@adamspiers.org>
+
+    * Merge pull request #16 from cledoux/feature/docker Added docker files
+    for local testing.
+
+Tue Sep 20 18:27:46 2016 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * fix naming of man page The title of the generated man page was ending
+    up as something like
+
+      IO::FILE=IO(0XA719C0)(1)
+
+    Also, with newer perls (e.g. v5.22.1), pod2man requires --name if 
+    used within a pipeline.
+
+    Closes #18.
+
+    https://github.com/aspiers/stow/issues/18
+
+
+      M Makefile.am
+
+Tue Aug 23 10:37:12 2016 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * remove superfluous space in function call Be consistent with style
+    elsewhere.
+
+
+      M lib/Stow.pm.in
+
+Tue May 10 15:00:13 2016 -0500  Charles LeDoux <charles.a.ledoux@gmail.com>
+
+    * Add docker files for local testing.
+    * Use docker to locally run tests on multiple perl versions
+       * perlbrew used to install multiple perls
+       * perl environments bootstrapped when image built
+    * Based on travis configuration
+    * Adds docker folder to MANIFEST.SKIP
+    * Running image runs all tests.
+       * If exit with no error, then all tests pass.
+    * ./build-docker.sh builds stow testing image.
+    * ./test-docker.sh runs stow testing image.
+       * Assumes built with options in build-docker.sh
+    * *-docker.sh scripts added to MANIFEST.SKIP
+
+
+      M MANIFEST.SKIP
+      A build-docker.sh
+      A docker/Dockerfile
+      A docker/bootstrap-perls.sh
+      A docker/run-stow-tests.sh
+      A test-docker.sh
+
+Sat Feb 27 12:19:57 2016 -0500  Lucas Theisen <lucastheisen@pastdev.com>
+
+    * fixed testutil to support cygwin which reports -z = true on
+    directories
+
+      M t/testutil.pm
+
+Tue Nov 17 17:27:39 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * another attempt to fix automake config d527094b was not the right fix
+    - Util.pm was being installed alongside Stow.pm under $(PMDIR). 
+    This should be the correct fix.
+
+
+      M Makefile.am
+
+Tue Nov 17 01:50:27 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * add coveralls badge
+
+      M README.md
+
+Tue Nov 17 01:43:38 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * add coveralls
+
+      M .travis.yml
+
+Mon Nov 16 22:47:34 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * add make distcheck and Module::Build to Travis tests
+
+      M .travis.yml
+      M Makefile.am
+
+Mon Nov 16 22:50:58 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * add .travis.yml to MANIFEST.SKIP
+
+      M MANIFEST.SKIP
+
+Tue Nov 17 01:34:23 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * fix make distcheck Stow/Util.pm was not being installed correctly
+
+
+      M Makefile.am
+
+Mon Nov 16 22:39:53 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * add Travis CI badge to README.md
+
+      M README.md
+
+Mon Nov 16 22:35:56 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * fix breakage caused by converting files to Markdown
+
+      M MANIFEST
+      M Makefile.am
+      M configure.ac
+
+Mon Nov 16 22:21:44 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * convert INSTALL to Markdown
+
+      D INSTALL
+      A INSTALL.md
+      M README.md
+
+Mon Nov 16 22:12:02 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * convert README to Markdown
+
+R076	README	README.md
+
+Mon Nov 16 21:56:45 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * switch to Travis CI containers
+
+      M .travis.yml
+
+Fri Nov 13 14:50:19 2015 +0000  Adam Spiers <github@adamspiers.org>
+
+    * Merge pull request #9 from Gnouc/master Allow directory with trailing
+    and leading spaces
+
+Fri Nov 13 11:57:21 2015 +0700  LE Manh Cuong <cuong.manhle.vn@gmail.com>
+
+    * Allow directory with trailing and leading spaces
+    - The `sanitize_path_options` functions remove all trailing
+    and leading spaces. So any valid directory like ` 123`,
+    `123 ` can not be used
+
+     - Also if there are two directories ` 123` and `123`, and if
+    user pick the ` 123` as option to `-d` or `-t`, then stow pick
+    directory `123` as the argument instead of ` 123` as user want.
+
+        ```
+       STOW_DIR=. stow -n -v3 -t \ 123 456
+       stow dir is /tmp/test
+       stow dir path relative to target 123 is ..
+       cwd now 123
+       cwd restored to /tmp/test
+       cwd now 123
+       Planning stow of package 456...
+       Stowing contents of ../456 (cwd=/tmp/test/123)
+       Planning stow of package 456... done
+       cwd restored to /tmp/test
+       WARNING: in simulation mode so not modifying filesystem.
+       ```
+    - This commit remove the check in `sanitize_path_options`
+    function,
+    and now stow can work with those directories. There have been a
+    check
+    for valid directory, so we are safe.
+
+
+      M bin/stow.in
+      M t/cli_options.t
+
+Fri Nov 13 11:13:06 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * set up Travis CI
+
+      A .travis.yml
+
+Fri Nov 13 12:04:52 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * add IO::Scalar to build_requires
+
+      M Build.PL
+      M META.json
+      M META.yml
+
+Wed Nov 11 12:25:19 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Do more validation on --dir / --target directories (#7) Previously
+    STOW_DIR=0 would cause the cwd to be used as the STOW_DIR. Make
+    that instead raise an error.  Do similar validation on the target 
+    directory.
+
+    Closes #7 - https://github.com/aspiers/stow/pull/7
+
+
+      M bin/stow.in
+
+Wed Nov 11 11:22:05 2015 +0000  Adam Spiers <stow@adamspiers.org>
+
+    * Correctly handle empty STOW_DIR (#5, #6) In shell, a variable is often
+    considered unset even if it is set to the empty string.  In other
+    words,
+
+      STOW_DIR= stow [args]
+
+    is an idiomatic alternative to writing:
+
+      unset STOW_DIR
+     stow [args]
+
+    and it also has the advantage of temporarily "unsetting" STOW_DIR 
+    for a single command.
+
+    Therefore we should treat STOW_DIR being set to the empty string 
+    as equivalent to it not being set at all.
+
+    Thanks to Cuong Manh Le for highlighting this issue!
+
+    Fixes #6  - https://github.com/aspiers/stow/issues/6 Closes #5 -
+    https://github.com/aspiers/stow/pull/5
+
+
+      M THANKS
+      M bin/stow.in
+
 Mon Nov 9 12:37:09 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
     * More fixes to "make distcheck" As with dc6a141d, the dependency of
@@ -52,8 +1464,7 @@ Mon Nov 9 11:36:11 2015 +0000  Adam Spiers <stow@adamspiers.org>
       M META.yml
       M Makefile.am
       M NEWS
-      D lib/Stow/Util.pm
-      A lib/Stow/Util.pm.in
+R099	lib/Stow/Util.pm	lib/Stow/Util.pm.in
 
 Mon Nov 9 11:05:00 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -555,20 +1966,16 @@ Mon Jan 9 21:32:31 2012 +0000  Adam Spiers <stow@adamspiers.org>
     * Rename test files to reflect their purpose.
 
       M MANIFEST
-      A t/stow.t
-      D t/stow_contents.t
-      A t/unstow.t
-      D t/unstow_contents.t
-      D t/unstow_contents_orig.t
-      A t/unstow_orig.t
+R099	t/stow_contents.t	t/stow.t
+R099	t/unstow_contents.t	t/unstow.t
+R099	t/unstow_contents_orig.t	t/unstow_orig.t
 
 Mon Jan 9 21:31:46 2012 +0000  Adam Spiers <stow@adamspiers.org>
 
     * Rename stow.t to be more consistent with its purpose.
 
       M MANIFEST
-      A t/cli_options.t
-      D t/stow.t
+R098	t/stow.t	t/cli_options.t
 
 Mon Jan 9 22:10:19 2012 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -1097,9 +2504,8 @@ Thu Nov 24 17:00:33 2011 +0000  Adam Spiers <stow@adamspiers.org>
     * Auto-generate ChangeLog from git
 
       M .gitignore
-      D ChangeLog
       M Makefile.am
-      A doc/ChangeLog.OLD
+R099	ChangeLog	doc/ChangeLog.OLD
 
 Thu Nov 24 16:59:45 2011 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -1313,23 +2719,15 @@ Mon Nov 21 13:59:36 2011 +0000  Adam Spiers <stow@adamspiers.org>
       A META.json
       A META.yml
       M Makefile.am
-      A automake/install-sh
-      A automake/mdate-sh
-      A automake/missing
-      A bin/chkstow.in
-      A bin/stow.in
-      D chkstow.in
+R100	install-sh	automake/install-sh
+R100	mdate-sh	automake/mdate-sh
+R100	missing	automake/missing
+R091	chkstow.in	bin/chkstow.in
+R096	stow.in	bin/stow.in
       M configure.ac
-      A doc/stow.8
-      A doc/stow.texi
-      A doc/texinfo.tex
-      D install-sh
-      D mdate-sh
-      D missing
-      D stow.8
-      D stow.in
-      D stow.texi
-      D texinfo.tex
+R099	stow.8	doc/stow.8
+R099	stow.texi	doc/stow.texi
+R099	texinfo.tex	doc/texinfo.tex
 
 Mon Nov 21 14:07:39 2011 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -1360,10 +2758,9 @@ Thu Nov 24 16:28:09 2011 +0000  Adam Spiers <stow@adamspiers.org>
       M t/parent.t
       M t/stow.t
       M t/stow_contents.t
-      A t/testutil.pm
+R083	t/util.pm	t/testutil.pm
       M t/unstow_contents.t
       M t/unstow_contents_orig.t
-      D t/util.pm
 
 Fri Nov 18 15:09:39 2011 +0000  Adam Spiers <stow@adamspiers.org>
 

@@ -1,7 +1,7 @@
 package Complete::Util;
 
-our $DATE = '2017-12-08'; # DATE
-our $VERSION = '0.600'; # VERSION
+our $DATE = '2019-06-25'; # DATE
+our $VERSION = '0.601'; # VERSION
 
 use 5.010001;
 use strict;
@@ -171,7 +171,10 @@ my %complete_array_elem_args = (
         schema => ['array*'=>{of=>'str*'}],
         req => 1,
         pos => 1,
-        greedy => 1,
+        slurpy => 1,
+    },
+    summaries => {
+        schema => ['array*'=>{of=>'str*'}],
     },
     exclude     => {
         schema => ['array*'],
@@ -244,6 +247,7 @@ sub complete_array_elem {
     my %args  = @_;
 
     my $array0    = $args{array} or die "Please specify array";
+    my $summaries = $args{summaries};
     my $word      = $args{word} // "";
 
     my $ci          = $Complete::Common::OPT_CI;
@@ -290,27 +294,37 @@ sub complete_array_elem {
         }
     }
 
-    my @words; # the answer
-    my @array ;  # original array + rmap entries
-    my @arrayn;  # case- & map-case-normalized form of $array + rmap entries
+    my @words;      # the answer
+    my @wordsumms;  # summaries for each item in @words
+    my @array ;     # original array + rmap entries
+    my @arrayn;     # case- & map-case-normalized form of $array + rmap entries
+    my @arraysumms; # summaries for each item in @array (or @arrayn)
 
     # normal string prefix matching. we also fill @array & @arrayn here (which
     # will be used again in word-mode, fuzzy, and char-mode matching) so we
     # don't have to calculate again.
     log_trace("[computil] Trying normal string-prefix matching ...") if $COMPLETE_UTIL_TRACE;
-    for my $el (@$array0) {
+    for my $i (0..$#{$array0}) {
+        my $el = $array0->[$i];
         my $eln = $ci ? uc($el) : $el; $eln =~ s/_/-/g if $map_case;
         next if $excluden && $excluden->{$eln};
         push @array , $el;
         push @arrayn, $eln;
-        push @words , $el if 0==index($eln, $wordn);
+        push @arraysumms, $summaries->[$i] if $summaries;
+        if (0==index($eln, $wordn)) {
+            push @words, $el;
+            push @wordsumms, $summaries->[$i] if $summaries;
+        }
         if ($rmapn && $rmapn->{$eln}) {
             for my $vn (@{ $rmapn->{$eln} }) {
                 push @array , $el;
                 push @arrayn, $vn;
                 # we add the normalized form, because we'll just revert it back
                 # to the original word in the final result
-                push @words , $vn if 0==index($vn, $wordn);
+                if (0==index($vn, $wordn)) {
+                    push @words, $vn;
+                    push @wordsumms, $summaries->[$i] if $summaries;
+                }
             }
         }
     }
@@ -349,6 +363,7 @@ sub complete_array_elem {
             }
             next unless $match;
             push @words, $array[$i];
+            push @wordsumms, $arraysumms[$i] if $summaries;
         }
         log_trace("[computil] Result from word-mode matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
     }
@@ -359,7 +374,10 @@ sub complete_array_elem {
         $re = qr/\A$re/;
         log_trace("[computil] Trying prefix char-mode matching (re=%s) ...", $re) if $COMPLETE_UTIL_TRACE;
         for my $i (0..$#array) {
-            push @words, $array[$i] if $arrayn[$i] =~ $re;
+            if ($arrayn[$i] =~ $re) {
+                push @words, $array[$i];
+                push @wordsumms, $arraysumms[$i] if $summaries;
+            }
         }
         log_trace("[computil] Result from prefix char-mode matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
     }
@@ -370,7 +388,10 @@ sub complete_array_elem {
         $re = qr/$re/;
         log_trace("[computil] Trying char-mode matching (re=%s) ...", $re) if $COMPLETE_UTIL_TRACE;
         for my $i (0..$#array) {
-            push @words, $array[$i] if $arrayn[$i] =~ $re;
+            if ($arrayn[$i] =~ $re) {
+                push @words, $array[$i];
+                push @wordsumms, $arraysumms[$i] if $summaries;
+            }
         }
         log_trace("[computil] Result from char-mode matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
     }
@@ -435,6 +456,7 @@ sub complete_array_elem {
                 #say "D: d($word,$chopped)=$d (maxd=$maxd)";
                 next unless $d <= $maxd;
                 push @words, $array[$i];
+                push @wordsumms, $arraysumms[$i] if $summaries;
                 next ELEM;
             }
         }
@@ -455,7 +477,19 @@ sub complete_array_elem {
         }
     }
 
-    $res =$ci ? [sort {lc($a) cmp lc($b)} @words] : [sort @words];
+    # sort results and insert summaries
+    $res = [
+        map {
+            $summaries ?
+                {word=>$words[$_], summary=>$wordsumms[$_]} :
+                $words[$_]
+            }
+            sort {
+                $ci ?
+                    lc($words[$a]) cmp lc($words[$b]) :
+                    $words[$a]     cmp $words[$b] }
+            0 .. $#words
+        ];
 
   RETURN_RES:
     log_trace("[computil] leaving complete_array_elem(), res=%s", $res)
@@ -469,6 +503,7 @@ $SPEC{complete_hash_key} = {
     args => {
         %arg_word,
         hash      => { schema=>['hash*'=>{}], req=>1 },
+        summaries => { schema=>['hash*'=>{}] },
     },
     result_naked => 1,
     result => {
@@ -479,9 +514,15 @@ sub complete_hash_key {
     my %args  = @_;
     my $hash      = $args{hash} or die "Please specify hash";
     my $word      = $args{word} // "";
+    my $summaries = $args{summaries};
+
+    my @keys = keys %$hash;
+    my @summaries;
+    if ($summaries) { for (@keys) { push @summaries, $summaries->{$_} } }
 
     complete_array_elem(
-        word=>$word, array=>[sort keys %$hash],
+        word=>$word, array=>\@keys,
+        (summaries=>\@summaries) x !!$summaries,
     );
 }
 
@@ -807,7 +848,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.600 of Complete::Util (from Perl distribution Complete-Util), released on 2017-12-08.
+This document describes version 0.601 of Complete::Util (from Perl distribution Complete-Util), released on 2019-06-25.
 
 =head1 DESCRIPTION
 
@@ -855,6 +896,7 @@ Arguments ('*' denotes required arguments):
 Return value:  (array)
 
 
+
 =head2 combine_answers
 
 Usage:
@@ -892,6 +934,7 @@ Return value:  (hash)
 Return a combined completion answer. Words from each input answer will be
 combined, order preserved and duplicates removed. The other keys from each
 answer will be merged.
+
 
 
 =head2 complete_array_elem
@@ -955,6 +998,8 @@ One solution is to add replace_map C<< {'unmount'=E<gt>['umount']} >>. This way,
 will be regarded the same as C<unmount> and when user types C<um> it can be
 completed unambiguously into C<unmount>.
 
+=item * B<summaries> => I<array[str]>
+
 =item * B<word>* => I<str> (default: "")
 
 Word to complete.
@@ -962,6 +1007,7 @@ Word to complete.
 =back
 
 Return value:  (array)
+
 
 
 =head2 complete_comma_sep
@@ -1027,6 +1073,8 @@ completed unambiguously into C<unmount>.
 
 =item * B<sep> => I<str> (default: ",")
 
+=item * B<summaries> => I<array[str]>
+
 =item * B<uniq> => I<bool>
 
 Whether list should contain unique elements.
@@ -1058,6 +1106,7 @@ Word to complete.
 Return value:  (array)
 
 
+
 =head2 complete_hash_key
 
 Usage:
@@ -1074,6 +1123,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<hash>* => I<hash>
 
+=item * B<summaries> => I<hash>
+
 =item * B<word>* => I<str> (default: "")
 
 Word to complete.
@@ -1081,6 +1132,7 @@ Word to complete.
 =back
 
 Return value:  (array)
+
 
 
 =head2 hashify_answer
@@ -1114,6 +1166,7 @@ Metadata (extra keys) for the hash.
 Return value:  (hash)
 
 
+
 =head2 modify_answer
 
 Usage:
@@ -1137,6 +1190,7 @@ Arguments ('*' denotes required arguments):
 =back
 
 Return value:  (undef)
+
 
 
 =head2 ununiquify_answer
@@ -1241,7 +1295,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

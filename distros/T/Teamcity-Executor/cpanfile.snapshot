@@ -1307,14 +1307,6 @@ DISTRIBUTIONS
     requirements:
       Exporter 5.57
       perl 5.006
-  Scope-Guard-0.21
-    pathname: C/CH/CHOCOLATE/Scope-Guard-0.21.tar.gz
-    provides:
-      Scope::Guard 0.21
-    requirements:
-      ExtUtils::MakeMaker 0
-      Test::More 0
-      perl 5.006001
   Struct-Dumb-0.09
     pathname: P/PE/PEVANS/Struct-Dumb-0.09.tar.gz
     provides:
@@ -1541,34 +1533,6 @@ DISTRIBUTIONS
       Fcntl 0
       URI 1.10
       perl 5.008001
-  Want-0.29
-    pathname: R/RO/ROBIN/Want-0.29.tar.gz
-    provides:
-      Want 0.29
-    requirements:
-      ExtUtils::MakeMaker 0
-  autobox-2.85
-    pathname: C/CH/CHOCOLATE/autobox-2.85.tar.gz
-    provides:
-      autobox 2.85
-      autobox::universal undef
-    requirements:
-      ExtUtils::MakeMaker 0
-      Scope::Guard 0.21
-      perl 5.008000
-  autobox-Core-1.33
-    pathname: S/SW/SWALTERS/autobox-Core-1.33.tar.gz
-    provides:
-      autobox::Core 1.33
-      autobox::Core::ARRAY 1.33
-      autobox::Core::CODE 1.33
-      autobox::Core::HASH 1.33
-      autobox::Core::SCALAR 1.33
-    requirements:
-      ExtUtils::MakeMaker 6.46
-      Test::More 0.88
-      Want 0.26
-      autobox 2.71
   common-sense-3.74
     pathname: M/ML/MLEHMANN/common-sense-3.74.tar.gz
     provides:

@@ -4,13 +4,24 @@ Text::MicroMason::Docs::Changes - Change History for the MicroMason Distribution
 
 =head1 VERSION 2 HISTORY
 
+=head2 Version 2.23
+
+=over 4
+
+=item 2019-06-27
+
+Allow templates to throw objects without stringifying them. Thanks to
+Daniel J. Wright for this patch.
+
+=back
+
 =head2 Version 2.22
 
 =over 4
 
 =item 2018-06-04
 
-Add a newline in %args parsed output, to allow for comments in the %args block. 
+Add a newline in %args parsed output, to allow for comments in the %args block.
 Thanks to Daniel J. Wright for this patch.
 
 =back
@@ -21,7 +32,7 @@ Thanks to Daniel J. Wright for this patch.
 
 =item 2016-09-30
 
-Remove Text::::MicroMason::ParseInfo. The module never left "rough
+Remove Text::MicroMason::ParseInfo. The module never left "rough
 draft" status, wasn't tested or documented, and had fatal bugs.
 
 If you used it, please provide complete info on exactly how and what

@@ -4,7 +4,7 @@
       "Sawyer X <xsawyerx@cpan.org>",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
@@ -17,7 +17,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "FFI::CheckLib" : "0.25"
          }
       },
       "develop" : {
@@ -35,7 +36,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "FFI::CheckLib" : "0",
+            "FFI::CheckLib" : "0.25",
             "FFI::Platypus" : "0.88",
             "Moose" : "0"
          }
@@ -55,7 +56,7 @@
    "provides" : {
       "Audio::Chromaprint" : {
          "file" : "lib/Audio/Chromaprint.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/xsawyerx/audio-chromaprint"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -351,7 +352,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.001",
+                  "tag" : "v0.002",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -495,6 +496,17 @@
             "class" : "Dist::Zilla::Plugin::Encoding",
             "name" : "Encoding",
             "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DynamicPrereqs",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "DynamicPrereqs",
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

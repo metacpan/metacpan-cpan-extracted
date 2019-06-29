@@ -16,7 +16,7 @@ my $event = {
 	assists => [3333, 4444 ],
 	t => 0,
 };
-my $boxscore = { teams => [ {name => 'aa'}, { name => 'bb'} ]};
+my $boxscore = { _id => 10, teams => [ {name => 'aa'}, { name => 'bb'} ]};
 my $positions = {
 	1111 => 'C',
 };

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings FATAL => 'all';
 
@@ -127,7 +128,7 @@ foreach my $o (@redi)
 
     like(
         exception { $redis->exec },
-        qr/^\[exec\] ERR Operation against a key holding the wrong kind of value/,
+        qr/^\Q[exec] WRONGTYPE Operation against a key holding the wrong kind of value\E/,
         'a bad transaction results in an exception',
     );
 

@@ -6,12 +6,10 @@ use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
 use Test::More tests => 3;
-use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Vars qw($IS_AUTHOR);
 
 $ENV{HOCKEYDB_DEBUG} = $IS_AUTHOR;
 use Sport::Analytics::NHL::Report::GS;
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::Util;
 use Sport::Analytics::NHL::Test;
 
 my $report;
@@ -22,7 +20,7 @@ $report = Sport::Analytics::NHL::Report::GS->new({
 isa_ok($report, 'Sport::Analytics::NHL::Report::GS');
 $report->process();
 test_boxscore($report, {gs => 1});
-is($TEST_COUNTER->{Curr_Test}, 98, 'full test run');
+is($TEST_COUNTER->{Curr_Test}, 82, 'full test run');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
 $BOXSCORE = undef;
 

@@ -1,5 +1,9 @@
 Revision history for Catmandu-BibTeX
 
+0.12  2019-06-25 16:14:43 CEST
+  - use Test2::V0 for test
+  - travis-ci update
+
 0.11  2019-01-15 13:29:22 CET
   - provide VERSION for all *.pm files
 

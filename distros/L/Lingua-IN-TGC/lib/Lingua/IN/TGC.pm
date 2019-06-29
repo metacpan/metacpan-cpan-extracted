@@ -6,47 +6,53 @@ use Regexp::Grammars;
 use Kavorka -all;
 use utf8;
 
-our $VERSION = '2.02';
+our $VERSION = '2.04';
 
 my @result = ();
 
 method IN::String::X() {
-  for my $element (@{$self->{Tgc}}) {
-    $element->X();
-  }
+    for my $element ( @{ $self->{Tgc} } ) {
+        $element->X();
+    }
 }
 
 method IN::Tgc::X() {
-  ($self->{S} || $self->{Vm} || $self->{CH} || $self->{CHCvm} || $self->{N} || $self->{Other} || $self->{NT})->X() ;
+    (        $self->{S}
+          || $self->{Vm}
+          || $self->{CH}
+          || $self->{CHCvm}
+          || $self->{N}
+          || $self->{Other}
+          || $self->{NT} )->X();
 }
 
 method IN::S::X() {
-  push @result, $self->{''};
+    push @result, $self->{''};
 }
 
 method IN::Vm::X() {
-  push @result, $self->{V}{''}.$self->{m_}{''};
+    push @result, $self->{V}{''} . $self->{m_}{''};
 }
 
 method IN::CH::X() {
-  push @result, $self->{''};
+    push @result, $self->{''};
 }
 
 method IN::CHCvm::X() {
-  push @result, $self->{CH__}{''}.$self->{C}{''}.$self->{v_}{''}.$self->{m_}{''};
+    push @result,
+      $self->{CH__}{''} . $self->{C}{''} . $self->{v_}{''} . $self->{m_}{''};
 }
 
 method IN::N::X() {
-  push @result, $self->{''};
+    push @result, $self->{''};
 }
 
 method IN::Other::X() {
-  push @result, $self->{''};
+    push @result, $self->{''};
 }
 
-
 method IN::NT::X() {
-  push @result, $self->{''};
+    push @result, $self->{''};
 }
 
 qr {
@@ -139,20 +145,55 @@ qr {
     <objtoken: IN::NT>         [^ଁ-୷]
 }xms;
 
+qr {
+    <grammar:  Lingua::IN::TGC::OR>
+
+    <objrule:  IN::Tgc>        <ws: (\s++)*> <S> | <Vm> | <CH> | <CHCvm> | <N> | <Other> | <NT>
+    <objrule:  IN::Vm>         <V><m_>
+    <objrule:  IN::CHCvm>      <CH__><C><v_><m_>
+    <objtoken: IN::CH>         ([କ-ହଡ଼-ୟ])(୍\b)
+    <objtoken: IN::V>          [ଅ-ଔୠୡ]
+    <objtoken: IN::m_>         [ଁ-ଃ଼ଽୖୗ]?
+    <objtoken: IN::CH__>       (([କ-ହଡ଼-ୟ])(୍))*
+    <objtoken: IN::C>          [କ-ହଡ଼-ୟ]
+    <objtoken: IN::v_>         [ା-ୈୋୌୢୣ]?
+    <objtoken: IN::N>          [ା-ୈୋୌୢୣଁ-ଃ଼ଽୖୗ]
+    <objtoken: IN::S>          [ ]
+    <objtoken: IN::Other>      [ଁ-୷]
+    <objtoken: IN::NT>         [^ଁ-୷]
+}xms;
+
+qr {
+    <grammar:  Lingua::IN::TGC::GU>
+
+    <objrule:  IN::Tgc>           <ws: (\s++)*> <S> | <Vm> | <CH> | <CHCvm> | <N> | <Other> | <NT>
+    <objrule:  IN::Vm>            <V><m_>
+    <objrule:  IN::CHCvm>         <CH__><C><v_><m_>
+    <objtoken: IN::CH>            ([క-హౘ-ౚ])(్\b)
+    <objtoken: IN::V>             [అ-ఔౠ-ౡ]
+    <objtoken: IN::m_>            [ఀ-ఄఽౕౖ]?
+    <objtoken: IN::CH__>          (([క-హౘ-ౚ])(్))*
+    <objtoken: IN::C>             [క-హౘ-ౚ]
+    <objtoken: IN::v_>            [ా-ౌౢౣ]?
+    <objtoken: IN::N>             [ా-ౌౢౣఀ-ఄఽౕౖ]
+    <objtoken: IN::S>             [ ]
+    <objtoken: IN::Other>         [ఀ-౿]
+    <objtoken: IN::NT>            [^ఀ-౿]
+}xms;
 
 method TGC( Str $lang, Str $string ) {
-  my $lang_code = "Lingua::IN::TGC::" . $lang; #
-  my $parser = qr {
+    my $lang_code = "Lingua::IN::TGC::" . $lang;
+    my $parser    = qr {
       <extends: $lang_code>
       <nocontext:>
       <String>
       <objrule:  IN::String>        <[Tgc]>+
-  }xms;
+    }xms;
 
-  if( $string =~ $parser ) {
-      $/{String}->X();
-  }
-  return @result;
+    if ( $string =~ $parser ) {
+        $/{String}->X();
+    }
+    return @result;
 }
 
 1;
@@ -169,15 +210,15 @@ Lingua::IN::TGC - Tailored grapheme clusters for Indic scripts.
 	 use utf8;
 	 binmode STDOUT, ":encoding(UTF-8)";
 
-	 my $o = Lingua::IN::TGC->new();
-	 my @re = $o->TGC("TE", "రాజ్కుమార్రెడ్డి");
-	 print $re[1], "\n";
+	 my $tgc = Lingua::IN::TGC->new();
+	 my @result = $tgc->TGC("TE", "రాజ్కుమార్రెడ్డి");
+	 print $result[1], "\n";
 
 
 =head1 DESCRIPTION
 
-    This module provides one function, TGC.
-    This function takes two arguments. First argument is language code and second argument is a string.
+This module provides one function, TGC.
+This function takes two arguments, a language code and a string.
 
 
 =head1 LANGUAGE CODES

@@ -12,7 +12,7 @@ use HTML::Perlinfo::Common;
 use base qw(Exporter HTML::Perlinfo::Base);
 our @EXPORT = qw(perlinfo);
 
-our $VERSION = '1.69';
+our $VERSION = '1.71';
 
 sub perlinfo {
   my ($opt) = @_;
@@ -43,15 +43,6 @@ HTML::Perlinfo - Display a lot of Perl information in HTML format
 
 	perlinfo();
 	
-	
-	use HTML::Perlinfo;
-	use CGI qw(header);
-
-	$|++;
-
-	print header;
-	perlinfo(INFO_MODULES);
-
 =head1 DESCRIPTION
 
 This module outputs a large amount of information about your Perl installation in HTML. So far, this includes information about Perl compilation options, the Perl version, server information and environment, HTTP headers, OS version information, Perl modules, and more. 
@@ -146,10 +137,6 @@ For further details and examples, please see the L<HTML documentation|HTML::Perl
 
 Displaying detailed server information on the internet is not a good idea and HTML::Perlinfo reveals a lot of information about the local environment. While restricting what system users can publish online is wise, you can also hinder them from using the module by installing it outside of the usual module directories (see perldoc -q lib). Of course, preventing users from installing the module in their own home directories is another matter entirely. 
 
-=head1 REQUIREMENTS
-
-HTML::Perlinfo does not require any non-core modules. There are no requirements, except Perl version 5.6 and above. 
-
 =head1 NOTES
 
 1. Print the content-type header first if you are using the module in a CGI setting. (mod_perl handles this for you automatically.) If you do not print the header, you will produce an internal server error. Of course, you can forgo a Web server entirely and use the module at the command-line. Please see the L<perlinfo> tool included in this distribution. 
@@ -168,28 +155,6 @@ Since the module outputs HTML, you may want to use it in a CGI script, but you d
 
 	print "Content-type: text/html\n\n";
 	perlinfo();
-
-I prefer to use the header function from the CGI module:
-
-	use HTML::Perlinfo;
-	use CGI qw(header);
-
-	print header;
-	perlinfo();
-
-HTML::Perlinfo stopped printing the header automatically as of version 1.43.
-
-By flushing the output buffer, you can make the HTML appear immediately. If your program is running slow, then you can try flushing the buffer.
-
-In this example, I am flushing the buffer because I know that there will be a lot of modules:
-
-	use HTML::Perlinfo;
-	use CGI qw(header);
-
-	$|++;
-
-	print header;
-	perlinfo(INFO_MODULES);
 
 Some might notice that HTML::Perlinfo shares the look and feel of the PHP function phpinfo. It was originally inspired by that function and was first released in 2004 as PHP::Perlinfo, which is no longer available on CPAN.   
 
@@ -212,7 +177,7 @@ Mike Accardo <accardo@cpan.org>
 
 =head1 COPYRIGHT
 
-   Copyright (c) 2004-9, Mike Accardo. All Rights Reserved.
+   Copyright (c) 2019, Mike Accardo. All Rights Reserved.
  This module is free software. It may be used, redistributed
 and/or modified under the terms of the Perl Artistic License.
 

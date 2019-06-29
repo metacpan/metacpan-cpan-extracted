@@ -10,7 +10,7 @@ use Sport::Analytics::NHL;
 use Sport::Analytics::NHL::Usage;
 
 my @accepts_opts = qw(
-	data-dir force test
+	data-dir force test doc
 );
 
 my @accepts_args = (

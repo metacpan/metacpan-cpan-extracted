@@ -52,7 +52,8 @@ RawTeX(<<'EoTeX');
 \let\blockquote@prehook\relax
 \newcommand*{\blockquote@prehook}{%
   \def\@elt##1{\global\value{##1}\the\value{##1}\relax}%
-  \edef\csq@tempa{\@elt{page}}% <-- work around it here
+%  \edef\csq@tempa{\@elt{page}}% <-- work around it here
+  \edef\csq@tempa{\@elt{page}\@elt{footnote}}% <-- work around it here
   \let\@elt\relax
   \@fileswfalse}
 EoTeX
@@ -97,6 +98,9 @@ RawTeX(<<'EoTeX');
     \let\csq@iqmark{\csq@qclose\ltxml@iqmark@close}
     \ltxml@iqmark@open\expandafter\csq@qopen
   \fi}
+
+% Simplify, so that we don't fall off end, when looking for next char for kerning.
+\def\csq@qclose@i{\csq@qclose@ii{}}%
 
 % closing mark
 \def\csq@qclose@ii#1{%

@@ -227,6 +227,10 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
     } else if (sv_isa(value, PL_JSON_BOOLEAN_CLASS)) {
         int val = SvTRUE(value);
         ret = Local<Object>::Cast(Boolean::New(ctx->isolate, val));
+    } else if (SvPOK(value)) {
+        STRLEN vlen = 0;
+        const char* vstr = SvPV_const(value, vlen);
+        ret = Local<Object>::Cast(String::NewFromUtf8(ctx->isolate, vstr, NewStringType::kNormal).ToLocalChecked());
     } else if (SvIOK(value)) {
         long val = SvIV(value);
         if (ref && (val == 0 || val == 1)) {
@@ -237,10 +241,6 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
     } else if (SvNOK(value)) {
         double val = SvNV(value);
         ret = Local<Object>::Cast(Number::New(ctx->isolate, val));
-    } else if (SvPOK(value)) {
-        STRLEN vlen = 0;
-        const char* vstr = SvPV_const(value, vlen);
-        ret = Local<Object>::Cast(String::NewFromUtf8(ctx->isolate, vstr, NewStringType::kNormal).ToLocalChecked());
     } else if (SvROK(value)) {
         SV* ref = SvRV(value);
         int type = SvTYPE(ref);

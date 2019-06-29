@@ -7,8 +7,7 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Scraper;
+use Sport::Analytics::NHL::Scraper qw(crawl_schedule);
 use Sport::Analytics::NHL::Test;
 
 use t::lib::Util;

@@ -39,20 +39,31 @@ $t->get_ok('/scheme' => {'Forwarded' => 'proto=https', 'X-Forwarded-Proto' => 'h
     $TEST, $tid)
   );
 
+# Forwarded header host
+$tid++;
+$tc += 3;
+$t->get_ok('/host' => {'Forwarded' => 'host=foo.bar.com'})
+  ->status_is(200)->content_is('foo.bar.com', sprintf(
+    '[%s.%d] Assert from header Forwarded => host=foo.bar.com that req->url->base->host == foo.bar.com',
+    $TEST, $tid)
+  );
+
 # Forwarded with all values in one, plus IPv6 test
 my $fwd_params = {
   for   => 'fc01:c0ff:ee::',
   by    => 'fc01:c0de::',
   proto => 'https',
+  host  => 'foo.bar.com',
 };
 
 $tc += 2;
 my $test = $t->get_ok('/all' => {
   'Forwarded' => sprintf(
-    'for=%s ; by=%s;proto=%s',
+    ' for=%s ; by=%s; proto=%s ;host=%s ',
     $fwd_params->{for},
     $fwd_params->{by},
-    $fwd_params->{proto}
+    $fwd_params->{proto},
+    $fwd_params->{host},
   ),
 })->status_is(200);
 
@@ -76,6 +87,13 @@ $tc++;
 $test->json_is('/scheme' => $fwd_params->{proto}, sprintf(
   '[%s.%d] from header Forwarded "proto" that req->is_secure == %s',
   $TEST, $tid, $fwd_params->{proto})
+);
+# +- Test "host"
+$tid++;
+$tc++;
+$test->json_is('/host' => $fwd_params->{host}, sprintf(
+  '[%s.%d] from header Forwarded "host" that req->url->base->host == %s',
+  $TEST, $tid, $fwd_params->{host})
 );
 
 done_testing($tc);

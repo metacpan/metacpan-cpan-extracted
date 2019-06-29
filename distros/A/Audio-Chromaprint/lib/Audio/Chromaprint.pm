@@ -53,7 +53,7 @@ sub BUILD {
         return $name;
     } );
 
-    $ffi->lib( find_lib_or_exit( 'lib' => 'chromaprint' ) );
+    $ffi->lib( find_lib_or_exit( 'lib' => 'chromaprint', alien => 'Alien::chromaprint' ) );
 
     $ffi->attach( $_, @{ $SUBS{$_} } )
         for keys %SUBS;
@@ -92,7 +92,7 @@ has 'cp' => (
         if ( $self->has_silence_threshold ) {
             _set_option(
                 $cp, 'silence_threshold' => $self->silence_threshold,
-            );
+            ) or croak('Error setting option silence_threshold');
         }
 
         return $cp;
@@ -122,7 +122,8 @@ sub start {
     $num_channels =~ /^[12]$/xms
         or croak 'num_channels must be 1 or 2';
 
-    return _start( $self->cp, $sample_rate, $num_channels );
+    _start( $self->cp, $sample_rate, $num_channels )
+        or croak 'Unable to start (start)';
 }
 
 sub set_option {
@@ -142,25 +143,29 @@ sub set_option {
             or croak('silence_threshold option must be between 0 and 32767');
     }
 
-    return _set_option( $self->cp, $name => $value );
+    _set_option( $self->cp, $name => $value )
+        or croak("Error setting option $name (set_option)");
 }
 
 sub finish {
     my $self = shift;
-    return _finish( $self->cp );
+    _finish( $self->cp )
+        or croak('Unable to finish (finish)');
 }
 
 sub get_fingerprint_hash {
     my $self = shift;
     my $hash;
-    _get_fingerprint_hash( $self->cp, \$hash );
+    _get_fingerprint_hash( $self->cp, \$hash )
+        or croak('Unable to get fingerprint hash (get_fingerprint_hash)');
     return $hash;
 }
 
 sub get_fingerprint {
     my $self = shift;
     my $ptr;
-    _get_fingerprint($self->cp, \$ptr);
+    _get_fingerprint($self->cp, \$ptr)
+        or croak('Unable to get fingerprint (get_fingerprint)');
     my $str = _opaque_to_string($ptr);
     _dealloc($ptr);
     return $str;
@@ -168,9 +173,10 @@ sub get_fingerprint {
 
 sub get_raw_fingerprint {
     my $self = shift;
-    my $ptr;
-    my $size;
-    _get_raw_fingerprint( $self->cp, \$ptr, \$size );
+    my ( $ptr, $size );
+
+    _get_raw_fingerprint( $self->cp, \$ptr, \$size )
+        or croak('Unable to get raw fingerprint (get_raw_fingerprint)');
 
     # not espeically fast, but need a cast with a variable length array
     my $fp = FFI::Platypus->new->cast( 'opaque' => "uint32[$size]", $ptr );
@@ -211,18 +217,21 @@ sub get_delay_ms {
 sub get_raw_fingerprint_size {
     my $self = shift;
     my $size;
-    _get_raw_fingerprint_size($self->cp, \$size);
+    _get_raw_fingerprint_size($self->cp, \$size)
+        or croak('Unable to get raw fingerprint size (get_raw_fingerprint_size)');
     return $size;
 }
 
 sub clear_fingerprint {
     my $self = shift;
-    _clear_fingerprint($self->cp);
+    _clear_fingerprint( $self->cp )
+        or croak('Unable to clear fingerprint (clear_fingerprint)');
 }
 
 sub feed {
     my ( $self, $data ) = @_;
-    return _feed( $self->cp, $data, length($data) / BYTES_PER_SAMPLE() );
+    _feed( $self->cp, $data, length($data) / BYTES_PER_SAMPLE() )
+        or corak("unable to feed");
 }
 
 sub DEMOLISH {
@@ -233,6 +242,9 @@ sub DEMOLISH {
 # TODO: chromaprint_encode_fingerprint
 # TODO: chromaprint_decode_fingerprint
 # TODO: chromaprint_hash_fingerprint
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -248,7 +260,7 @@ Audio::Chromaprint - Interface to the Chromaprint library
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -359,6 +371,7 @@ You can use L<Path::Tiny> to do this easily using the C<slurp_raw>:
 Process any remaining buffered audio data.
 
 This has to be run before you can get the fingerprints.
+
 =head2 get_fingerprint
 
     my $fingerprint = $chromaprint->get_fingerprint();

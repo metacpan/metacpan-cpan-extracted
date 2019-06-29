@@ -6,7 +6,7 @@ WriteMakefile(
     VERSION_FROM   => 'lib/JavaScript/Duktape/XS.pm',
     ABSTRACT_FROM  => 'lib/JavaScript/Duktape/XS.pm',
     LICENSE        => 'mit',
-    MIN_PERL_VERSION => 5.018000,
+    MIN_PERL_VERSION => 5.014000,
     PREREQ_PM      => {
         'JSON::PP'     => 0,
         'XSLoader'     => 0,
@@ -15,6 +15,7 @@ WriteMakefile(
         'Data::Dumper'       => 0,
         'JSON::PP'           => 0,
         'Path::Tiny'         => 0,
+        'Scalar::Util'       => 0,
         'Test::Exception'    => 0,
         'Test::More'         => 0,
         'Test::Output'       => 0,

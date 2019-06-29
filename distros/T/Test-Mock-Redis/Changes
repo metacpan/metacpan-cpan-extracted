@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Mock::Redis
 
+0.22 2019-06-26
+    - Major update via pull request 28 on github (Valery Kalesnik)
+
 0.21 2018-12-19
     - fix lrem issue with array length changing (Thomas Bloor)
 

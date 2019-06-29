@@ -32,4 +32,21 @@ no_growth \&code,
    calls   => 10000,
    'async/await does not grow memory';
 
+sub abandoned
+{
+   my $f1 = Future->new;
+   my $fret = (async sub {
+      local $@;
+      foreach my $i ( 1, 2, 3 ) {
+         await $f1;
+      }
+   })->();
+   undef $fret;
+   undef $f1;
+}
+
+no_growth \&abandoned,
+   calls => 10000,
+   'abandoned async sub does not grow memory';
+
 done_testing;

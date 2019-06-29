@@ -1,0 +1,98 @@
+{
+   "abstract" : "Alien for chromaprint",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-chromaprint",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::CMake" : "0.99",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "Test::Alien" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-chromaprint/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::chromaprint",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-chromaprint.git",
+         "web" : "https://github.com/plicease/Alien-chromaprint"
+      }
+   },
+   "version" : "0.02",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.28",
+      "requires" : {
+         "share" : {
+            "Alien::cmake3" : "0.02",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_use_unsafe_inc" : 0
+}
+

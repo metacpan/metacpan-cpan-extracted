@@ -7,6 +7,8 @@ examples/fast.pl
 examples/hello-template.pl
 examples/hello.pl
 examples/microhttpd.pl
+examples/proxy.pl
+examples/responses.pl
 lib/Mojo.pm
 lib/Mojo/Asset.pm
 lib/Mojo/Asset/File.pm
@@ -300,6 +302,7 @@ t/mojolicious/ojo.t
 t/mojolicious/ojo_signatures.t
 t/mojolicious/pattern.t
 t/mojolicious/production_app.t
+t/mojolicious/proxy_app.t
 t/mojolicious/public/hello.txt
 t/mojolicious/public/hello2.txt
 t/mojolicious/public/hello4.txt

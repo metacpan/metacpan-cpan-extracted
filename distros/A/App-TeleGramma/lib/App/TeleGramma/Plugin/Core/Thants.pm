@@ -1,5 +1,5 @@
 package App::TeleGramma::Plugin::Core::Thants;
-$App::TeleGramma::Plugin::Core::Thants::VERSION = '0.13';
+$App::TeleGramma::Plugin::Core::Thants::VERSION = '0.14';
 # ABSTRACT: TeleGramma plugin to give thants where necessary
 
 use Mojo::Base 'App::TeleGramma::Plugin::Base';
@@ -64,15 +64,15 @@ App::TeleGramma::Plugin::Core::Thants - TeleGramma plugin to give thants where n
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 
-Justin Hawkins <justin@eatmorecode.com>
+Justin Hawkins <justin@hawkins.id.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Justin Hawkins <justin@eatmorecode.com>.
+This software is copyright (c) 2019 by Justin Hawkins <justin@eatmorecode.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

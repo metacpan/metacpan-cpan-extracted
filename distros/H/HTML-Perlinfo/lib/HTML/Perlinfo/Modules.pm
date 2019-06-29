@@ -6,8 +6,8 @@ use File::Find;
 use File::Spec;
 use Carp ();
 use Config qw(%Config);
+use HTML::Entities;
 use base qw(HTML::Perlinfo::Base);
-use CGI qw(escapeHTML);
 use HTML::Perlinfo::Common;
 
 our $VERSION = '1.19';
@@ -22,6 +22,10 @@ sub new {
 
 }
 
+
+sub escapeHTML {
+    return HTML::Entities::encode_entities(@_);
+}
 
 sub module_color_check {
 

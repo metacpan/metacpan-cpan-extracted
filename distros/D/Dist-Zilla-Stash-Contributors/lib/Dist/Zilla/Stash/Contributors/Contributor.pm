@@ -1,19 +1,13 @@
 package Dist::Zilla::Stash::Contributors::Contributor;
-BEGIN {
-  $Dist::Zilla::Stash::Contributors::Contributor::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Dist::Zilla::Stash::Contributors::Contributor::VERSION = '0.1.0';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: a Contributors stash element
-
+$Dist::Zilla::Stash::Contributors::Contributor::VERSION = '0.1.1';
 use strict;
 use warnings;
 
 use Moose;
 
 use overload '""' => \&stringify;
-
 
 
 has name => (
@@ -38,18 +32,20 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dist::Zilla::Stash::Contributors::Contributor - a Contributors stash element
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.1
 
 =head1 SYNOPSIS
 
     if( my $contrib_stash = $self->zilla->stash_named('%Contributors') ) {
-        my @collaborators = sort { $a->email cmp $b->email } 
+        my @collaborators = sort { $a->email cmp $b->email }
             $contrib_stash->all_contributors;
 
         $self->log( "contributor: " . $_->stringify ) for @collaborators;
@@ -63,9 +59,7 @@ Collaborator objects used in the L<Dist::Zilla::Stash::Contributors> stash.
 
 =head2 new( name => $name, email => $address )
 
-Creates a new C<Dist::Zilla::Stash::Contributors::Contributor> object. 
-
-=back
+Creates a new C<Dist::Zilla::Stash::Contributors::Contributor> object.
 
 =head2 name()
 
@@ -77,11 +71,11 @@ Returns the email address of the contributor.
 
 =head2 stringify()
 
-Returns the canonical string for the collaborator, of the form 
+Returns the canonical string for the collaborator, of the form
 "Full Name <email@address.org>".
 
 The object will automatically call this function is used
-as a string. 
+as a string.
 
     say $_ for $stash->all_contributors;
 
@@ -91,7 +85,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2019, 2013 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,18 @@
+# This file is part of GNU Stow.
+#
+# GNU Stow is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GNU Stow is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see https://www.gnu.org/licenses/.
+
 ## Process this file with Automake to produce Makefile.in
 
 bin_SCRIPTS = bin/stow bin/chkstow
@@ -6,14 +21,16 @@ dist_man_MANS = doc/stow.8
 PDF = doc/manual.pdf
 HTML = doc/manual-single.html
 dist_doc_DATA = \
-	README \
+	README.md INSTALL.md \
 	$(PDF) $(HTML) doc/version.texi \
 	ChangeLog doc/ChangeLog.OLD
 
+# automake magic to define where *_DATA files get installed:
 pmdir = $(PMDIR)
-pm_DATA = lib/Stow.pm
 pmstowdir = $(pmdir)/Stow
-dist_pmstow_DATA = lib/Stow/Util.pm
+
+pm_DATA = lib/Stow.pm
+pmstow_DATA = lib/Stow/Util.pm
 
 TEXINFO_TEX = doc/texinfo.tex
 export TEXI2DVI_BUILD_MODE = clean
@@ -81,14 +98,14 @@ EXTRA_DIST = \
 	$(TEXINFO_TEX) \
 	$(DEFAULT_IGNORE_LIST) \
 	$(CPAN_FILES)
-CLEANFILES = $(bin_SCRIPTS) $(pm_DATA)
+CLEANFILES = $(bin_SCRIPTS) $(pm_DATA) $(pmstow_DATA)
 MAINTAINERCLEANFILES = $(dist_man_MANS) $(HTML) $(PDF) ChangeLog
 
 # clean up auto-generated files
 clean-local:
 	-rm -rf $(TESTS_OUT)
 maintainer-clean-local:
-	-rm -rf doc/manual-split
+	-rm -rf doc/manual-split cover_db
 
 # this is more explicit and reliable than the config file trick
 edit = sed -e 's|[@]PERL[@]|$(PERL)|g'       \
@@ -149,9 +166,19 @@ lib/Stow/Util.pm: lib/Stow/Util.pm.in Makefile.am
 # The below rules should only be needed by developers.
 ##############################################################################
 
+cpanm:
+	cpanm --quiet --installdeps --notest .; \
+	CPANM_RESULT=$$?; \
+	if [ $$CPANM_RESULT != 0 ]; then \
+	    echo ---------------------------------------------------; \
+	    cat ~/.cpanm/build.log; \
+	    echo ---------------------------------------------------; \
+	    exit $$CPANM_RESULT; \
+	fi
+
 doc/stow.8: bin/stow.in Makefile.am
 	[ -d doc ] || mkdir doc # required in vpath mode
-	$(edit) < $< | pod2man > $@
+	$(edit) < $< | pod2man --name stow --section 8 > $@
 
 # We use automake's built-in rule to generate stow.info.  The built-in
 # rules would also generate doc/stow.html and doc/stow.pdf, but after
@@ -169,10 +196,42 @@ doc/stow.8: bin/stow.in Makefile.am
 # install.  Instead, by overriding the built-in rules with modified
 # versions, we can kill both birds with one stone.
 
+# Generating the single-page HTML version used to be done with the old
+# texi2html, which is no longer maintained.  This rule is not used,
+# but is kept to allow comparing of results during the transition, and
+# potentially longer for posterity.
+doc/manual-single-old-texi2html.html: $(doc_deps)
+	texi2html --P=$(srcdir) --output=$@ -expandinfo -menu -monolithic -verbose $<
+
+# One alternative to the old texi2html approach is to use the texi2html
+# wrapper around texi2any which is provided as a partial drop-in replacement:
+#
+# https://www.gnu.org/software/texinfo/manual/texinfo/html_node/texi2html.html#texi2html
+#
+# Differences to the old texi2html:
+#
+#   - Doesn't wrap @file{foo} paths with quotes, which looks better.
+#   - Missing certain sections
+doc/manual-single-texi2html-wrapper.html: $(doc_deps)
+	texi2any -P $(srcdir) --output=$@ --verbose \
+		-c TEXI2HTML=1 -c SHOW_MENU=1 -c MONOLITHIC=1 $<
+
+.PHONY: manual-single-html-all
+manual-single-html-all: \
+	$(HTML) \
+	doc/manual-single-texi2html-wrapper.html \
+	doc/manual-single-old-texi2html.html
+
+# Modern approach using $(MAKEINFOHTML) --no-split
+# Differences to the older two approaches:
+#
+#   - Nicer navigation links between sections
 $(HTML): $(doc_deps)
 	[ -d doc ] || mkdir doc # required in vpath mode
 	-rm -f $@
-	texi2html --P=$(srcdir) --output=$@ -expandinfo -menu -monolithic -verbose $<
+	$(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) -I doc -I $(srcdir)/doc \
+		-c USE_TITLEPAGE_FOR_TITLE=1 --no-split -o $@ \
+		`test -f 'doc/stow.texi' || echo '$(srcdir)/'`doc/stow.texi
 
 $(PDF): $(doc_deps)
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \

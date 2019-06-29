@@ -25,4 +25,10 @@ Revision history for Mojolicious::Plugin::ValidateTiny
 0.16
         Maintain compatability with older versions of Validate::Tiny,
         useful for breaking the link between Validate::Tiny and Mojolicious 
-        both forcing you to update each other        
+        both forcing you to update each other
+
+0.17
+        Unknown
+
+0.18
+        Changes to makefile

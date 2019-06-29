@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.24
+    version 0.25
 
 SYNOPSIS
 
@@ -121,8 +121,17 @@ FUNCTIONS
       command (ld) to attempt to resolve the real .so for non-binary files.
       Since there is extra overhead this is off by default.
 
-      An example is libyaml on RedHat based Linux distributions. On Debian
+      An example is libyaml on Red Hat based Linux distributions. On Debian
       these are handled with symlinks and no trickery is required.
+
+    alien
+
+      [version 0.25]
+
+      If no libraries can be found, try the given aliens instead. The Alien
+      classes specified must provide the Alien::Base interface for dynamic
+      libraries, which is to say they should provide a method called
+      dynamic_libs that returns a list of dynamic libraries.
 
  assert_lib
 
@@ -233,6 +242,8 @@ AUTHOR
     Ilya Pavlov (Ilya, ILUX)
 
     Shawn Laffan (SLAFFAN)
+
+    Petr Pisar (ppisar)
 
 COPYRIGHT AND LICENSE
 

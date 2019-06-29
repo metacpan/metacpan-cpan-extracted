@@ -15,15 +15,27 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Try-Harder",
   "LICENSE" => "perl",
   "NAME" => "Try::Harder",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.002",
+  "PREREQ_PM" => {
+    "Filter::Simple" => 0,
+    "Import::Into" => 0,
+    "Module::Load::Conditional" => 0,
+    "Text::Balanced" => 0,
+    "if" => 0
+  },
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Filter::Simple" => 0,
+  "Import::Into" => 0,
+  "Module::Load::Conditional" => 0,
+  "Text::Balanced" => 0,
+  "if" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

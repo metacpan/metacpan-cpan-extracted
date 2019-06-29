@@ -10,11 +10,6 @@ use Test::More;
 use JSON;
 use Storable;
 
-use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::Config;
-use Sport::Analytics::NHL::Test;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
 use Sport::Analytics::NHL;
 
 use t::lib::Util;
@@ -39,6 +34,8 @@ is_deeply(
 		t/tmp/data/2011/0002/0010/GS.storable
 		t/tmp/data/2011/0002/0010/PL.storable
 		t/tmp/data/2011/0002/0010/RO.storable
+		t/tmp/data/2011/0002/0010/TH.storable
+		t/tmp/data/2011/0002/0010/TV.storable
 	)],
 );
 for my $storable (@storables) {

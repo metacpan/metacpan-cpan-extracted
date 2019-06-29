@@ -1,10 +1,10 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 use lib 't/tlib';
 use Test::More;
-use Test::Mock::Redis;
+use Test::Mock::Redis ();
 
 =pod
     BLPOP
@@ -54,8 +54,12 @@ foreach my $r (@redi){
     is $r->llen('list'), 0, "llen returns 0 for a list that doesn't exist";
 
     for my $op (qw/lpush rpush/){
-        eval { $r->lpush('foo', 'barfoo') };
-        like $@, qr/^\Q[lpush] ERR Operation against a key holding the wrong kind of value\E/, "lpush against a key that doesn't hold a list died";
+        eval { $r->$op('foo', 'barfoo') };
+        like $@, qr/^\Q[$op] WRONGTYPE Operation against a key holding the wrong kind of value\E/, "$op against a key that doesn't hold a list died";
+
+        eval { $r->$op('foo') };
+        like $@, qr/^\[$op\] ERR wrong number of arguments for '$op' command/,
+            "$op without values against a key of wrong kind errors out complaining about values, not wrong kind of the key";
 
         ok ! $r->exists("list-$op"), "key 'list-$op' does not exist yet";
         is $r->$op("list-$op", 'foobar'), 1, "$op returns length of list";
@@ -66,6 +70,21 @@ foreach my $r (@redi){
         is $r->llen("list-$op"),          3, "llen agrees";
         is $r->$op("list-$op", 'quxqux'), 4, "$op returns length of list";
         is $r->llen("list-$op"),          4, "llen agrees";
+
+        eval { $r->$op("list-$op") };
+        like $@, qr/^\[$op\] ERR wrong number of arguments for '$op' command/,
+            "$op without values errors out";
+
+        is $r->$op( "list-$op", qw/ a b c / ), 7,
+            "$op can push multiple values at once";
+
+        if ( $op eq 'lpush' ) {
+            is_deeply scalar $r->lrange( "list-$op", 0, 2 ), [ reverse qw/ a b c / ],
+                "$op has multiple values stored in correct order";
+        } else {
+            is_deeply scalar $r->lrange( "list-$op", -3, -1 ), [ qw/ a b c / ],
+                "$op has multiple values stored in correct order";
+        }
     }
 
     $r->rpush('list', $_) for 0..9;
@@ -106,6 +125,16 @@ foreach my $r (@redi){
     is_deeply([$r->lrange(destination => 2, -2)], [qw/x/]);
     is_deeply([$r->lrange(destination => -3, 5)], [qw/c x y/]);
     is_deeply([$r->lrange(destination => 3, 1)], []);
+    is_deeply([$r->lrange(nonexisting => 0, -1)], []);
+
+    # arrayref versions of the above block
+    is_deeply scalar $r->lrange(destination => 0, 2), [qw/z c x/];
+    is_deeply scalar $r->lrange(destination => 1, 2), [qw/c x/];
+    is_deeply scalar $r->lrange(destination => 1, -1), [qw/c x y/];
+    is_deeply scalar $r->lrange(destination => 2, -2), [qw/x/];
+    is_deeply scalar $r->lrange(destination => -3, 5), [qw/c x y/];
+    is_deeply scalar $r->lrange(destination => 3, 1), [];
+    is_deeply scalar $r->lrange(nonexisting => 0, -1), [];
 
     $r->lset(destination => 0, 'a');
     $r->lset(destination => -1, 'f');

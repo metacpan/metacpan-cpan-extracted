@@ -1,3 +1,9 @@
+1.035   2019-06-26 (PERLANCAR)
+
+	- [ux] Show completion message/hint when user hasn't typed any
+	  characters, instead of just returning empty answer.
+
+
 1.034   2019-06-19 (PERLANCAR)
 
 	- Add script: lcpanm-namespace.

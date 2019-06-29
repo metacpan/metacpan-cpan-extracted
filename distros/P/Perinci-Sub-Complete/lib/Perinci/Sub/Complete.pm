@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.933'; # VERSION
+our $DATE = '2019-06-28'; # DATE
+our $VERSION = '0.936'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1047,17 +1047,18 @@ sub complete_cli_arg {
     log_trace('[comp][periscomp] entering %s(), words=%s, cword=%d, word=<%s>',
                  $fname, $words, $cword, $word);
 
-    my $genres = Perinci::Sub::GetArgs::Argv::gen_getopt_long_spec_from_meta(
+    my $ggls_res = Perinci::Sub::GetArgs::Argv::gen_getopt_long_spec_from_meta(
         meta         => $meta,
         common_opts  => $copts,
         per_arg_json => $args{per_arg_json},
         per_arg_yaml => $args{per_arg_yaml},
         ignore_converted_code => 1,
     );
-    die "Can't generate getopt spec from meta: $genres->[0] - $genres->[1]"
-        unless $genres->[0] == 200;
-    my $gospec = $genres->[2];
-    my $specmeta = $genres->[3]{'func.specmeta'};
+    die "Can't generate getopt spec from meta: $ggls_res->[0] - $ggls_res->[1]"
+        unless $ggls_res->[0] == 200;
+    $extras->{ggls_res} = $ggls_res;
+    my $gospec = $ggls_res->[2];
+    my $specmeta = $ggls_res->[3]{'func.specmeta'};
 
     my $gares = Perinci::Sub::GetArgs::Argv::get_args_from_argv(
         argv   => [@$words],
@@ -1282,7 +1283,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.933 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-04-15.
+This document describes version 0.936 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-06-28.
 
 =head1 SYNOPSIS
 

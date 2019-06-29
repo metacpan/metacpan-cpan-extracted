@@ -1,9 +1,53 @@
 ==================================================
-Changes from 2017-06-22 00:00:00 +0000 to present.
+Changes from 2017-06-25 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.4 at 2019-06-22 04:20:26 +0000
+version 1.6 at 2019-06-25 02:26:28 +0000
+----------------------------------------
+
+  Change: ebc44e2e79fd7fc99fc1c810ea2ebfa630e97db7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-24 19:24:08 +0000
+
+    Default to sane privacy settings
+
+    * An explicit --nopaste-service OR environment variable (NOPASTE_SERVICES)
+
+    must be present for the paste to happen. * Default all pastes to private
+    unless the --nopaste-public option is
+
+    specified. * Process --tags before the `kv` option is processed * Instead
+    of using `@input`, use a color stripped `@output` for the
+
+    content of the paste 
+
+----------------------------------------
+version 1.5 at 2019-06-24 16:33:14 +0000
+----------------------------------------
+
+  Change: c138ce745818524db2ce8f4193b2d5c5ee16640d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-06-24 09:33:14 +0000
+
+    Version 1.5 to fix handling of service pass through
+
+    To facilitate both environment variables and a sane default of a working
+    paste service, I reworked how the `service` parameter is passed to
+    `App::Nopaste`. Now the correct thing will happen given:
+
+    * `$ENV{NOPASTE_SERVICES}` is set it will be used unless
+
+    * `--nopaste-service` is set, in which case it'll be parsed as comma
+
+    separated list
+
+    * Barring those cases, `App::Nopaste::Service::Shadowcat` will be
+
+    used 
+
+----------------------------------------
+version 1.4 at 2019-06-22 04:16:30 +0000
 ----------------------------------------
 
   Change: c5891e80dab8a6426fa7c2a2f599e33857be0e0b
@@ -59,5 +103,5 @@ version 1.3 at 2017-07-22 04:20:36 +0000
     Ref::Util counterparts. 
 
 =================================================
-Plus 12 releases after 2017-06-22 00:00:00 +0000.
+Plus 12 releases after 2017-06-25 00:00:00 +0000.
 =================================================

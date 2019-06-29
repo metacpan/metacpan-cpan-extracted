@@ -1,0 +1,124 @@
+==================================================
+Changes from 2018-06-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2019-06-27 17:10:51 +0000
+------------------------------------------
+
+  Change: b0bd5025157cf469c81cd7e1a75107120a9c8829
+  Author: Steve Scaffidi <steve.scaffidi@here.com>
+  Date : 2019-06-27 13:10:42 +0000
+
+    Try to isolate failed tests from CPANTS 
+
+  Change: 77faea0ef3d9dda524821ff4adb43463121a15f8
+  Author: Steve Scaffidi <steve.scaffidi@here.com>
+  Date : 2019-06-26 14:07:53 +0000
+
+    Updated metadata, removed dep on Try::Tiny 
+
+  Change: cc5e7bcf3e91c92d9bcb5b79798dbd0676973807
+  Author: Steve Scaffidi <steve.scaffidi@here.com>
+  Date : 2019-06-24 15:10:10 +0000
+
+    Updated dist metadata, prereqs 
+
+  Change: 21c32e0d6ca4321eb7cc3d341de8ac7b239bac9e
+  Author: Stephen R. Scaffidi <stephen@scaffidi.net>
+  Date : 2019-06-22 19:10:06 +0000
+
+    Merge pull request #2 from manwar/add-missing-prereqs
+
+    Added missing prereqs as reported by CPANTS. 
+
+  Change: 359cc6b5a3d06087d7f236893dd1f7c69400d304
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2019-06-21 15:27:34 +0000
+
+    Added missing prereqs as reported by CPANTS. 
+
+  Change: bb3e118c3ce507e854587b2af2de3f7e697afa91
+  Author: Stephen R. Scaffidi <stephen@scaffidi.net>
+  Date : 2019-06-21 01:44:20 +0000
+
+    Merge pull request #1 from manwar/add-github-meta
+
+    Added github meta using plugin [GitHub::Meta]. 
+
+  Change: a64a0e2a88cc58e0ed2b79e87da84f0b97b4b658
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2019-06-20 22:12:02 +0000
+
+    Added github meta using plugin [GitHub::Meta]. 
+
+  Change: c0b9580b15c34142cba6685eb7a6fa6a6296b0de
+  Author: Steve Scaffidi <steve.scaffidi@here.com>
+  Date : 2019-06-20 16:17:55 +0000
+
+    Renamed to Try::Harder 
+
+  Change: ca483429577710d6f0b516118038f25c3c0be198
+  Author: Steve Scaffidi <steve.scaffidi@here.com>
+  Date : 2019-06-19 14:29:11 +0000
+
+    Clarify injected code with comments 
+
+  Change: 372034b365a99eb20d97628158c3390faf4b15dc
+  Author: Steve Scaffidi <steve.scaffidi@here.com>
+  Date : 2019-06-19 09:00:53 +0000
+
+    Removed unnecessary documentation 
+
+  Change: 660ba3de02e7f2298bd8d78c4034b4eaf9264eb4
+  Author: Steve Scaffidi <steve.scaffidi@here.com>
+  Date : 2019-06-17 15:14:14 +0000
+
+    Added documentation 
+
+  Change: 23b419654ec70f4d88cf48f90ba23f5a2ec10664
+  Author: Steve Scaffidi <stephen@scaffidi.net>
+  Date : 2017-05-05 16:58:32 +0000
+
+    saving test script until I know what I'll do with it. 
+
+  Change: f0a7e82f84908291653af7ef97d276d8b6828d49
+  Author: Steve Scaffidi <stephen@scaffidi.net>
+  Date : 2017-05-05 16:56:43 +0000
+
+    Improved formatting and comments 
+
+  Change: f9d7ee45a4a59f0a0de2371e111132f3f4e13b8f
+  Author: Steve Scaffidi <stephen@scaffidi.net>
+  Date : 2017-05-05 15:27:15 +0000
+
+    This code now passes all tests from Syntax::Keywork::Try, unmodified 
+
+  Change: 7237c92615f575d519a79ff845df9d9fe180cf90
+  Author: Steve Scaffidi <stephen@scaffidi.net>
+  Date : 2017-05-05 15:26:38 +0000
+
+    Got it working with pure eval\! 
+
+  Change: f65b5b9551a929649447852f9acc1dce6b9f2ab1
+  Author: Steve Scaffidi <stephen@scaffidi.net>
+  Date : 2017-02-23 12:59:05 +0000
+
+    Use Syntax::Keyword::Try if available, otherwise fall back to source
+    filtering 
+
+  Change: 4f1fcc5873470a5d32e6ddd34221820400c4fdf3
+  Author: Steve Scaffidi <stephen@scaffidi.net>
+  Date : 2017-02-22 10:07:42 +0000
+
+    Got it working 
+
+  Change: 7e904ea8c37d2daa512347f65a3ee5278bc23645
+  Author: Steve Scaffidi <stephen@scaffidi.net>
+  Date : 2017-02-21 11:31:51 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

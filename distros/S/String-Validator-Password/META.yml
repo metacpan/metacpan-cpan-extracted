@@ -3,13 +3,14 @@ abstract: 'String::Validator Password Checking Module.'
 author:
   - 'John Karr <brainbuz@brainbuz.org>'
 build_requires:
+  Data::Printer: '0'
   Test::More: '0'
   perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +26,6 @@ resources:
   bugtracker: https://github.com/brainbuz/String-Validator/issues
   homepage: https://github.com/brainbuz/String-Validator
   repository: https://github.com/brainbuz/String-Validator.git
-version: '2.00'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '2.01'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

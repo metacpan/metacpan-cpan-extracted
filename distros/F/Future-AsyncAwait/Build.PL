@@ -27,6 +27,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
+      'Test::Refcount' => '0.09',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

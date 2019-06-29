@@ -7,7 +7,6 @@ Makefile.PL
 README.md
 bin/azimuth_aero
 cpanfile
-crawler.pl
 dist.ini
 lib/WWW/AzimuthAero.pm
 lib/WWW/AzimuthAero/Flight.pm
@@ -18,4 +17,6 @@ lib/WWW/AzimuthAero/Utils.pm
 t/01-AzimuthAero.t
 t/02-Utils.t
 t/03-RouteMap.t
+t/04-Flight.t
+t/perltidy.ERR
 t/ua_mock.json

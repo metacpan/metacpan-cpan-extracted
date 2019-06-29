@@ -1,3 +1,9 @@
+0.2.2   2019-06-20 (PERLANCAR)
+
+	- get_entries(): Define 'include_tags' and 'exclude_tags'
+	  parameters.
+
+
 0.2.1   2019-06-19 (PERLANCAR)
 
         - Add STATUS section.

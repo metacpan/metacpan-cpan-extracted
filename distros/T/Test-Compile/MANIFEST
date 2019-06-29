@@ -9,10 +9,12 @@ META.json
 META.yml
 README
 t/000-compile.t
+t/100-internal--find-files.t
+t/100-internal--is-in-taint-mode.t
+t/100-internal--read-shebang.t
 t/100-internal-all-pl-files.t
 t/100-internal-all-pm-files.t
 t/100-internal-basic.t
-t/100-internal-is-in-taint-mode.t
 t/100-internal-mess-with-lib.t
 t/100-internal-pl-file-compiles.t
 t/100-internal-pm-file-compiles.t

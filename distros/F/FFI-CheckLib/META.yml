@@ -20,19 +20,21 @@ meta-spec:
   version: '1.4'
 name: FFI-CheckLib
 requires:
+  Module::Load: '0'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/Perl5-FFI/FFI-CheckLib/issues
   homepage: https://metacpan.org/pod/FFI::CheckLib
   repository: git://github.com/Perl5-FFI/FFI-CheckLib.git
-version: '0.24'
+version: '0.25'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'
   - 'Dan Book (grinnz, DBOOK)'
   - 'Ilya Pavlov (Ilya, ILUX)'
   - 'Shawn Laffan (SLAFFAN)'
-x_generated_by_perl: v5.29.9
+  - 'Petr Pisar (ppisar)'
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

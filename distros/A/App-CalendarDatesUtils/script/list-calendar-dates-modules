@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CalendarDatesUtils/list_calendar_dates_modules
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-05-28'; # DATE
+our $DATE = '2019-06-28'; # DATE
 our $DIST = 'App-CalendarDatesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-calendar-dates-modules - List Calendar::Dates::* modules, without the prefi
 
 =head1 VERSION
 
-This document describes version 0.005 of list-calendar-dates-modules (from Perl distribution App-CalendarDatesUtils), released on 2019-05-28.
+This document describes version 0.009 of list-calendar-dates-modules (from Perl distribution App-CalendarDatesUtils), released on 2019-06-28.
 
 =head1 SYNOPSIS
 

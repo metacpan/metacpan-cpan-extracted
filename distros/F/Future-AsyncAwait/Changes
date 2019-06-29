@@ -1,5 +1,12 @@
 Revision history for Future-AsyncAwait
 
+0.29    2019-06-26 20:23:12
+        [CHANGES]
+         * Further annotations in Devel::MAT::Dumper helper about loop state
+
+        [BUGFIXES]
+         * Fix various memory leaks of abandoned `async sub`s (RT129836)
+
 0.28    2019-06-17 17:06:18
         [BUGFIXES]
          * Fix localisation of hints hash at compiletime so nested `async sub`

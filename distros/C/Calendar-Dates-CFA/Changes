@@ -1,3 +1,17 @@
+0.008   2019-06-27 (PERLANCAR)
+
+        - Fix clash (two 0.006 releases were made).
+
+
+0.006.2 2019-06-20 (PERLANCAR)
+
+        - No functional changes.
+
+	- Switch to
+	  Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple
+	  (renamed role name).
+
+
 0.007   2019-05-25 (PERLANCAR)
 
 	- Recognize two params: exam_month & exam_level.

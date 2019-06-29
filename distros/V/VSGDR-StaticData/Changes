@@ -99,7 +99,9 @@ Revision history for VSGDR::StaticData
         Fixed declarations of money types.
         Optionalised usage of Win32.        (again)
 0.47    21/06/2019
-        Removed computed columns from inserts.
+        Removed computed columns from inserts. (test data only)
+0.48    24/06/2019
+        Fixed the column intersection problem introduced by 0.47.  This applies to generating test data only, not static data.
 
         
 	

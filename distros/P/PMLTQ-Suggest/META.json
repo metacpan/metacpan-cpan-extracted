@@ -4,7 +4,7 @@
       "Maty\u00e1\u0161 Kopp <matyas.kopp@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,9 +28,11 @@
       "runtime" : {
          "requires" : {
             "File::Find::Rule" : "0.34",
+            "Getopt::Long" : "0",
             "HTTP::Server::Simple::CGI" : "0",
             "List::MoreUtils" : "0",
-            "PMLTQ" : "v1.4.0",
+            "PMLTQ" : "v3.0.1",
+            "PMLTQ::Commands" : "v2.0.3",
             "Treex::PML" : "2.18",
             "URI" : "0",
             "URI::file" : "0"
@@ -48,19 +50,19 @@
    "provides" : {
       "PMLTQ::Command::suggest" : {
          "file" : "lib/PMLTQ/Command/suggest.pm",
-         "version" : "v0.0.3"
+         "version" : "v1.0.4"
       },
       "PMLTQ::Suggest" : {
          "file" : "lib/PMLTQ/Suggest.pm",
-         "version" : "v0.0.3"
+         "version" : "v1.0.4"
       },
       "PMLTQ::Suggest::Server" : {
          "file" : "lib/PMLTQ/Suggest/Server.pm",
-         "version" : "v0.0.3"
+         "version" : "v1.0.4"
       },
       "PMLTQ::Suggest::Utils" : {
          "file" : "lib/PMLTQ/Suggest/Utils.pm",
-         "version" : "v0.0.3"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -75,11 +77,10 @@
          "web" : "https://github.com/ufal/pmltq-suggest-server"
       }
    },
-   "version" : "0.0.3",
+   "version" : "1.0.4",
    "x_authority" : "cpan:MATY",
    "x_authority_from_module" : "PMLTQ::Suggest",
-   "x_generated_by_perl" : "v5.28.0",
    "x_permissions_from_module" : "PMLTQ::Suggest",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

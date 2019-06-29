@@ -8,7 +8,7 @@ use Data::Validate::IP qw(is_ip is_ipv4_mapped_ipv6);
 use Net::CIDR::Lite;
 use Net::IP::Lite qw(ip_transform);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant DEBUG => $ENV{MOJO_TRUSTEDPROXY_DEBUG} || 0;
 
@@ -19,15 +19,15 @@ sub register {
     if DEBUG;
 
   # Normalize config and set defaults
-  $conf->{ip_headers}      //= ['x-real-ip', 'x-forwarded-for'];
+  $conf->{ip_headers}      //= ['x-forwarded-for', 'x-real-ip'];
   $conf->{ip_headers}        = [$conf->{ip_headers}]
     unless ref($conf->{ip_headers}) eq 'ARRAY';
 
-  $conf->{scheme_headers}  //= ['x-ssl', 'x-forwarded-proto'];
+  $conf->{scheme_headers}  //= ['x-forwarded-proto', 'x-ssl'];
   $conf->{scheme_headers}    = [$conf->{scheme_headers}]
     unless ref($conf->{scheme_headers}) eq 'ARRAY';
 
-  $conf->{https_values}    //= ['1', 'true', 'https', 'on', 'enable', 'enabled'];
+  $conf->{https_values}    //= ['https', 'on', '1', 'true', 'enable', 'enabled'];
   $conf->{https_values}      = [$conf->{https_values}]
     unless ref($conf->{https_values}) eq 'ARRAY';
 
@@ -52,7 +52,7 @@ sub register {
   my $cidr = Net::CIDR::Lite->new;
   foreach my $trust (@{$conf->{trusted_sources}}) {
     if (ref($trust) eq 'ARRAY') {
-      $cidr->add_any(@$trust);
+      $cidr->add_any(@$trust); # uncoverable statement
     } else {
       $cidr->add_any($trust);
     }
@@ -131,7 +131,7 @@ sub register {
           '[%s] Matched on Forwarded header (value: "%s")',
           __PACKAGE__, $fwd)) if DEBUG;
         my @pairs = map { split /\s*,\s*/, $_ } split ';', $fwd;
-        my ($fwd_for, $fwd_by, $fwd_proto);
+        my ($fwd_for, $fwd_by, $fwd_proto, $fwd_host);
         my $ipv4_mask = qr/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/;
         my $ipv6_mask = qr/(([0-9a-fA-F]{0,4})([:|.])){2,7}([0-9a-fA-F]{0,4})/;
         foreach my $param (@pairs) {
@@ -141,6 +141,8 @@ sub register {
             $fwd_by  = $2 if lc $1 eq 'by';
           } elsif ($param =~ /proto=(https?)/i) {
             $fwd_proto = $1;
+          } elsif ($param =~ /host=((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9]))$/i) {
+            $fwd_host = $1;
           }
         }
         if ($fwd_for && is_ip($fwd_for)) {
@@ -162,6 +164,12 @@ sub register {
             __PACKAGE__, $fwd_proto)) if DEBUG;
           $c->req->url->base->scheme($fwd_proto);
         }
+        if ($fwd_host) {
+          $c->app->log->debug(sprintf(
+            '[%s] Matched Forwarded header "host" parameter (value: "%s")',
+            __PACKAGE__, $fwd_host)) if DEBUG;
+          $c->req->url->base->host($fwd_host);
+        }
       }
     }
 
@@ -182,6 +190,9 @@ sub register {
 
 1;
 __END__
+
+=pod
+
 =head1 NAME
 
 Mojolicious::Plugin::TrustedProxy - Mojolicious plugin to set the remote
@@ -189,16 +200,16 @@ address, connection scheme, and more from trusted upstream proxies
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
   use Mojolicious::Lite;
 
   plugin 'TrustedProxy' => {
-    ip_headers      => ['x-real-ip', 'x-forwarded-for'],
-    scheme_headers  => ['x-ssl', 'x-forwarded-proto'],
-    https_values    => ['1', 'true', 'https', 'on', 'enable', 'enabled'],
+    ip_headers      => ['x-forwarded-for', 'x-real-ip'],
+    scheme_headers  => ['x-forwarded-proto', 'x-ssl'],
+    https_values    => ['https', 'on', '1', 'true', 'enable', 'enabled'],
     parse_rfc7239   => 1,
     trusted_sources => ['127.0.0.0/8', '10.0.0.0/8'],
     hide_headers    => 0,
@@ -211,6 +222,7 @@ Version 0.03
       'tx.remote_address'            => $c->tx->remote_address,
       'tx.remote_proxy_address'      => $c->tx->remote_proxy_address,
       'req.url.base.scheme'          => $c->req->url->base->scheme,
+      'req.url.base.host'            => $c->req->url->base->host,
       'is_trusted_source'            => $c->is_trusted_source,
       'is_trusted_source("1.1.1.1")' => $c->is_trusted_source('1.1.1.1'),
     });
@@ -246,22 +258,6 @@ attribute into C<Mojo::Transaction>. If a remote IP address override header is
 matched from a trusted upstream proxy, then C<< tx->remote_proxy_address >>
 will be set to the IP address of that proxy.
 
-=over
-
-=item Build status
-
-=for html <a href="https://travis-ci.org/Kage/Mojolicious-Plugin-TrustedProxy">
-<img src="https://travis-ci.org/Kage/Mojolicious-Plugin-TrustedProxy.svg?branch=master">
-</a>
-
-=item Code coverage
-
-=for html <a href='https://coveralls.io/github/Kage/Mojolicious-Plugin-TrustedProxy?branch=master'>
-<img src='https://coveralls.io/repos/github/Kage/Mojolicious-Plugin-TrustedProxy/badge.svg?branch=master'>
-</a>
-
-=back
-
 =head1 CONFIG
 
 =head2 ip_headers
@@ -269,7 +265,7 @@ will be set to the IP address of that proxy.
 List of zero, one, or many HTTP headers where the real user agent IP address
 will be defined by the trusted upstream sources. The first matched header is
 used. An empty value will disable this and keep the original scheme value.
-Default is C<['x-real-ip', 'x-forwarded-for']>.
+Default is C<['x-forwarded-for', 'x-real-ip']>.
 
 If a header is matched in the request, then C<< tx->remote_address >> is set to
 the value, and C<< tx->remote_proxy_address >> is set to the IP address of the
@@ -280,7 +276,7 @@ upstream source.
 List of zero, one, or many HTTP headers where the real user agent connection
 scheme will be defined by the trusted upstream sources. The first matched header
 is used. An empty value will disable this and keep the original remote address
-value. Default is C<['x-ssl', 'x-forwarded-proto']>.
+value. Default is C<['x-forwarded-proto', 'x-ssl']>.
 
 This tests that the header value is "truthy" but does not contain the literal
 barewords C<http>, C<off>, or C<false>. If the header contains any other
@@ -290,13 +286,14 @@ barewords C<http>, C<off>, or C<false>. If the header contains any other
 
 List of values to consider as "truthy" when evaluating the headers in
 L</scheme_headers>. Default is
-C<['1', 'true', 'https', 'on', 'enable', 'enabled']>.
+C<['https', 'on', '1', 'true', 'enable', 'enabled']>.
 
 =head2 parse_rfc7239, parse_forwarded
 
 Enable support for parsing L<RFC 7239|http://tools.ietf.org/html/rfc7239>
-compliant C<Forwarded> HTTP headers. Default is C<1> (enabled). If a
-C<Forwarded> header is matched, the following actions occur with the first
+compliant C<Forwarded> HTTP headers. Default is C<1> (enabled).
+
+If a C<Forwarded> header is matched, the following actions occur with the first
 semicolon-delimited group of parameters found in the header value:
 
 =over
@@ -316,6 +313,11 @@ upstream source.
 
 If the C<proto> parameter is found, then C<< req->url->base->scheme >> is set
 to the first matching value.
+
+=item
+
+If the C<host> parameter is found, then C<< req->url->base->host >> is set to
+the first matching value.
 
 =back
 
@@ -435,9 +437,22 @@ IPv4 and IPv6 CIDR ranges.
 
 =back
 
+=head1 SECURITY
+
+Caution should be taken that you set only the L</CONFIG> values necessary for
+your application in a most-common-first order, and that your upstream proxies
+remove any headers you do not want passed through to your application.
+
+For example, if you use Cloudflare and set L</ip_headers> to
+C<['x-real-ip', 'cf-connecting-ip']> and did not configure Cloudflare to
+remove C<x-real-ip> headers from requests, an attacker could use this trick
+your application into using whatever IP he or she defines due to being passed
+through your trusted proxy and the C<x-real-ip> header being the first to be
+evaluated.
+
 =head1 AUTHOR
 
-Kage <kage@kage.wtf>
+Kage <kage I<AT> kage I<DOT> wtf>
 
 =head1 BUGS
 
@@ -448,9 +463,10 @@ L<https://github.com/Kage/Mojolicious-Plugin-TrustedProxy>
 
 =item Hostnames not supported
 
-This plugin does not currently support hostnames or hostname resolution and
-there are no plans to implement this. If you have such a requirement, please
-feel free to submit a pull request.
+Excluding the C<host> parameter of RFC 7239, this plugin does not currently
+support hostnames or hostname resolution and there are no plans to implement
+this. If you have a use case that requires this, please feel free to submit a
+pull request.
 
 =item HTTP 'Forwarded' only partially supported
 

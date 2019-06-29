@@ -19,47 +19,66 @@ sub cmd_sync_bin_deps {
     }
 }
 
-sub cmd_check_header_dependencies {
-    require XS::Install::HeaderDeps;
+sub cmd_check_dependencies {
+    require XS::Install::Deps;
     
     my $objext = shift @ARGV;
     
-    my (@inc, @files);
+    my (@inc, @cfiles, @xsfiles);
+    my $curlist = \@cfiles;
     foreach my $arg (@ARGV) {
         if ($arg =~ s/^-I//) {
             push @inc, $arg;
-        } else {
-            push @files, $arg;
+        }
+        elsif ($arg eq '-xs') {
+            $curlist = \@xsfiles;
+        }
+        else {
+            push @$curlist, $arg;
         }
     }
     
-    my $deps = XS::Install::HeaderDeps::find_deps({
-        files   => \@files,
-        headers => ['./'],
-        inc     => \@inc,
-    });
-    
-    my %mtimes;
-    my @touch_list;
-    foreach my $file (keys %$deps) {
-        my $list = $deps->{$file} or next;
-        my $ofile = $file;
-        $ofile =~ s/\.[^.]+$//;
-        $ofile .= $objext;
-        my $build_time = (stat($ofile))[9] or next;
-        foreach my $hdr (@$list) {
-            my $mtime = $mtimes{$hdr} ||= (stat($hdr))[9];
-            next if $mtime <= $build_time;
-            #warn "for file $file header changed $hdr";
-            push @touch_list, $file;
-            last;
-        }
-    }
+    my @touch_list = (
+        _check_mtimes(
+            XS::Install::Deps::find_header_deps({
+                files   => \@cfiles,
+                headers => ['./'],
+                inc     => \@inc,
+            }),
+            sub {
+                my $ofile = shift;
+                $ofile =~ s/\.[^.]+$//;
+                $ofile .= $objext;
+                return $ofile;
+            },
+        ),
+        _check_mtimes(XS::Install::Deps::find_xsi_deps(\@xsfiles))
+    );
     
     if (@touch_list) {
         my $now = time();
         utime($now, $now, @touch_list);
     }
+}
+
+sub _check_mtimes {
+    my ($deps, $reference_file_sub) = @_;
+    my %mtimes;
+    my @touch_list;
+    foreach my $file (keys %$deps) {
+        my $list = $deps->{$file} or next;
+        my $reference_file = $reference_file_sub ? $reference_file_sub->($file) : $file;
+        my $reference_time = (stat($reference_file))[9] or next;
+        foreach my $depfile (@$list) {
+            my $mtime = $mtimes{$depfile} ||= (stat($depfile))[9];
+            next if $mtime <= $reference_time;
+            #warn "for file $file dependency $depfile changed";
+            push @touch_list, $file;
+            last;
+        }
+    }
+    
+    return @touch_list;
 }
 
 sub module_info_write {

@@ -6,6 +6,7 @@ use Date::Easy;
 use File::Spec;
 use Cwd 'abs_path';
 use File::Basename;
+use Time::Local 1.27 qw< timegm_modern timelocal_modern >;
 use lib File::Spec->catdir(dirname(abs_path($0)), 'lib');
 use DateEasyTestUtil qw< compare_times generate_times_and_compare >;
 
@@ -74,8 +75,10 @@ foreach (@SEXTUPLE_ARGS)
 	s/^0// foreach @args;							# more natural, and avoids any chance of octal number errors
 	foreach my $l (qw< local GMT UTC >)
 	{
-		my @extra_args = $l eq 'local' ? () : (GMT => 1);
-		my $secs = str2time(join(' ', join('/', @args[0,1,2]), join(':', @args[3,4,5])), @extra_args);
+		# Prep args for sending to Time::Local functions.
+		my @tl_args = reverse @args; --$tl_args[-2];
+		# Note that we must use *_modern here to avoid turning 1969 into 2069.
+		my $secs = $l eq 'local' ? timelocal_modern(@tl_args) : timegm_modern(@tl_args);
 		isnt $secs, undef, "sanity check: can parse $_ ($l)";
 
 		compare_times(Date::Easy::Datetime->new($l => @args), $l => $secs, "successfully constructed (7args $l): $_");

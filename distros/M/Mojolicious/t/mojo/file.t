@@ -68,7 +68,7 @@ $dir = tempdir 'mytestXXXXX';
 ok -d $dir, 'directory exists';
 like $dir->basename, qr/mytest.{5}$/, 'right format';
 
-# Temporary diectory (separate object)
+# Temporary directory (separate object)
 $dir  = Mojo::File->new(File::Temp->newdir);
 $path = "$dir";
 ok -d $path, 'directory exists';
@@ -265,8 +265,7 @@ my @two = map { path($lib)->child(split '/') } (
   'BaseTest/Base3.pm',  'DeprecationTest.pm',
   'LoaderException.pm', 'LoaderException2.pm',
   'LoaderTest/A.pm',    'LoaderTest/B.pm',
-  'LoaderTest/C.pm',,
-  'TestConnectProxy.pm'
+  'LoaderTest/C.pm',    'TestConnectProxy.pm'
 );
 is_deeply path($lib)->list_tree({max_depth => 2})->map('to_string')->to_array,
   [@two], 'right files';

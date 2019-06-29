@@ -131,6 +131,34 @@ testing_loop( $loop );
    $loop->remove( $function );
 }
 
+# Queue priority
+{
+   my $serial = 0;
+   my $function = IO::Async::Function->new(
+      # Keep exactly 1 process so captured lexical works for testing
+      min_workers => 1,
+      max_workers => 1,
+      code => sub { return $serial++ },
+   );
+
+   $loop->add( $function );
+
+   # Push something just to make the function busy first
+   $function->call( args => [], on_return => sub {}, on_error => sub {} );
+
+   my $f = Future->needs_all(
+      $function->call( args => [] ), # no priority
+      $function->call( args => [], priority => 1 ),
+      $function->call( args => [], priority => 1 ),
+      $function->call( args => [], priority => 2 ),
+   );
+
+   is_deeply( [ ( wait_for_future $f )->get ],
+      [ 4, 2, 3, 1 ], '$function->call with priority enqueues correctly' );
+
+   $loop->remove( $function );
+}
+
 # References
 {
    my $function = IO::Async::Function->new(

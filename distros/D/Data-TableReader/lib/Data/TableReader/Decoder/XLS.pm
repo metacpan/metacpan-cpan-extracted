@@ -1,5 +1,4 @@
 package Data::TableReader::Decoder::XLS;
-$Data::TableReader::Decoder::XLS::VERSION = '0.010';
 use Moo 2;
 use Carp;
 extends 'Data::TableReader::Decoder::Spreadsheet';
@@ -12,6 +11,7 @@ sub default_xls_module {
 }
 
 # ABSTRACT: Access sheets/rows of a Microsoft Excel '97 workbook
+our $VERSION = '0.011'; # VERSION
 
 
 sub _build_workbook {
@@ -42,7 +42,7 @@ Data::TableReader::Decoder::XLS - Access sheets/rows of a Microsoft Excel '97 wo
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 

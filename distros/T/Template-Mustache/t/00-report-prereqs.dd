@@ -40,6 +40,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::Exception' => '0',
+                                   'Test::Memory::Cycle' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'Test::Requires' => '0',

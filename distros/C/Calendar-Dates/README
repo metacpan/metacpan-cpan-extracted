@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.2.1 of Calendar::Dates (from Perl
-    distribution Calendar-Dates), released on 2019-06-19.
+    This document describes version 0.2.2 of Calendar::Dates (from Perl
+    distribution Calendar-Dates), released on 2019-06-20.
 
 DESCRIPTION
     The "Calendar::Dates::*" namespace is reserved for modules that provide
@@ -98,6 +98,16 @@ METHODS
         Boolean. If set to true, will include all entries that are normally
         not included, e.g. low-priority entries (entries with tag
         "low-priority").
+
+    *   include_tags
+
+        Array. If set, then only entries which contain all tags mentioned in
+        this parameter should be included.
+
+    *   exclude_tags
+
+        Array. If set, then entries which contain any of the tags mentioned
+        in this parameter should NOT be included.
 
     Result. Result is arrayref of entries, where each entry is a DefHash.
     The following keys are recognized, an asterisk ("*") signifies required
