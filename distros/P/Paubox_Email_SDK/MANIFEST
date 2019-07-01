@@ -2,6 +2,7 @@ lib/Paubox_Email_SDK.pm
 lib/Paubox_Email_SDK/ApiHelper.pm
 lib/Paubox_Email_SDK/Message.pm
 LICENSE
+CHANGES
 Makefile.PL
 MANIFEST			This list of files
 README.md

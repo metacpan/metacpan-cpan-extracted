@@ -29,14 +29,6 @@ if ($localconf) {
 
 print "Configuration loaded\n" if $debug;
 
-# Handler cache
-if ( $conf->{localStorage} ) {
-    eval "require $conf->{localStorage}";
-    $conf->{localStorageOptions}->{default_expires_in} ||= 600;
-    my $c = $conf->{localStorage}->new( $conf->{localStorageOptions} );
-    $c->purge();
-}
-
 # Session cache
 if ( $conf->{localSessionStorage} ) {
     eval "require $conf->{localSessionStorage}";

@@ -10,7 +10,7 @@ use Alien::Build::Util qw( _mirror _destdir_prefix );
 use JSON::PP ();
 
 # ABSTRACT: Core gather plugin
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.78'; # VERSION
 
 
 sub init
@@ -112,7 +112,7 @@ sub init
       
       # drop a alien.json file for the runtime properties
       $stage->child('_alien/alien.json')->spew(
-        JSON::PP->new->pretty->encode($build->runtime_prop)
+        JSON::PP->new->pretty->canonical(1)->ascii->encode($build->runtime_prop)
       );
       
       # copy the alienfile, if we managed to keep it around.
@@ -153,7 +153,7 @@ Alien::Build::Plugin::Core::Gather - Core gather plugin
 
 =head1 VERSION
 
-version 1.76
+version 1.78
 
 =head1 SYNOPSIS
 

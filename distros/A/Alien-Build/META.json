@@ -99,7 +99,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.76",
+   "version" : "1.78",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -129,7 +129,7 @@
       "Shawn Laffan (SLAFFAN)",
       "Paul Evans (leonerd, PEVANS)"
    ],
-   "x_generated_by_perl" : "v5.31.1",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0
 }

@@ -6,18 +6,23 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 use strict;
 use Regexp::Common qw/URI/;
 
-my $perlExpr = sub {
+sub perlExpr {
     my ( $val, $conf ) = @_;
-    my $s = '';
-    Safe->new->reval("BEGIN { warnings->unimport; } $s $val");
+    my $cpt = new Safe;
+    $cpt->share_from( 'MIME::Base64', ['&encode_base64'] );
+    $cpt->share_from( 'Lemonldap::NG::Handler::Main::Jail',
+        [ '&encrypt', '&token' ] );
+    $cpt->share_from( 'Lemonldap::NG::Common::Safelib',
+        $Lemonldap::NG::Common::Safelib::functions );
+    $cpt->reval("BEGIN { 'warnings'->unimport; } $val");
     my $err = join( '',
         grep { $_ =~ /Undefined subroutine/ ? () : $_ } split( /\n/, $@ ) );
     return $err ? ( 1, "__badExpression__: $err" ) : (1);
-};
+}
 
 my $url = $RE{URI}{HTTP}{ -scheme => "https?" };
 $url =~ s/(?<=[^\\])\$/\\\$/g;
@@ -90,7 +95,7 @@ sub types {
             msgFail => '__authorizedValues__: -1, 0, 1',
         },
         boolOrExpr => {
-            test    => $perlExpr,
+            test    => sub { return perlExpr(@_) },
             msgFail => '__notAValidPerlExpression__',
         },
         keyTextContainer => {
@@ -424,13 +429,13 @@ sub attributes {
         },
         checkUserIdRule => {
             type          => 'text',
-            test          => $perlExpr,
+            test          => sub { return perlExpr(@_) },
             default       => 1,
             documentation => 'checkUser identities rule',
         },
         checkUserHiddenAttributes => {
             type          => 'text',
-            default       => '_2fDevices _loginHistory hGroups',
+            default       => '_loginHistory hGroups',
             documentation => 'Attributes to hide in CheckUser plugin',
             flags         => 'p',
         },
@@ -448,7 +453,7 @@ sub attributes {
         },
         impersonationMergeSSOgroups => {
             default       => 0,
-            type          => 'bool',
+            type          => 'boolOrExpr',
             documentation => 'Merge spoofed and real SSO groups',
             flags         => 'p',
         },
@@ -465,7 +470,7 @@ sub attributes {
         },
         impersonationIdRule => {
             type          => 'text',
-            test          => $perlExpr,
+            test          => sub { return perlExpr(@_) },
             default       => 1,
             documentation => 'Impersonation identities rule',
         },
@@ -491,6 +496,12 @@ sub attributes {
             type          => 'int',
             default       => 15,
             documentation => 'Handler internal cache timeout',
+            flags         => 'hp',
+        },
+        handlerServiceTokenTTL => {
+            type          => 'int',
+            default       => 30,
+            documentation => 'Handler ServiceToken timeout',
             flags         => 'hp',
         },
 
@@ -614,7 +625,7 @@ sub attributes {
         portalSkinRules => {
             type          => 'keyTextContainer',
             help          => 'portalcustom.html',
-            keyTest       => $perlExpr,
+            keyTest       => sub { return perlExpr(@_) },
             keyMsgFail    => '__badSkinRule__',
             test          => qr/^\w+$/,
             msgFail       => '__badValue__',
@@ -687,18 +698,58 @@ sub attributes {
         },
         grantSessionRules => {
             type          => 'grantContainer',
-            keyTest       => $perlExpr,
+            keyTest       => sub { return perlExpr(@_) },
             test          => sub { 1 },
             documentation => 'Rules to grant sessions',
         },
         hiddenAttributes => {
             type          => 'text',
-            default       => '_password',
+            default       => '_password _2fDevices',
             documentation => 'Name of attributes to hide in logs',
         },
         key => {
             type          => 'password',
             documentation => 'Secret key',
+        },
+        corsEnabled => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Enable Cross-Origin Resource Sharing',
+        },
+        corsAllow_Credentials => {
+            type    => 'text',
+            default => 'true',
+            documentation =>
+              'Allow credentials for Cross-Origin Resource Sharing',
+        },
+        corsAllow_Headers => {
+            type    => 'text',
+            default => '*',
+            documentation =>
+              'Allowed headers for Cross-Origin Resource Sharing',
+        },
+        corsAllow_Methods => {
+            type    => 'text',
+            default => 'POST,GET',
+            documentation =>
+              'Allowed methods for Cross-Origin Resource Sharing',
+        },
+        corsAllow_Origin => {
+            type    => 'text',
+            default => '*',
+            documentation =>
+              'Allowed origine for Cross-Origin Resource Sharing',
+        },
+        corsExpose_Headers => {
+            type    => 'text',
+            default => '*',
+            documentation =>
+              'Exposed headers for Cross-Origin Resource Sharing',
+        },
+        corsMax_Age => {
+            type    => 'text',
+            default => '86400',    # 24 hours
+            documentation => 'MAx-age for Cross-Origin Resource Sharing',
         },
         cspDefault => {
             type          => 'text',
@@ -1006,7 +1057,7 @@ sub attributes {
             type => 'keyTextContainer',
             help =>
               'exportedvars.html#extend_variables_using_macros_and_groups',
-            test          => $perlExpr,
+            test          => sub { return perlExpr(@_) },
             default       => {},
             documentation => 'Groups',
         },
@@ -1016,7 +1067,7 @@ sub attributes {
               'exportedvars.html#extend_variables_using_macros_and_groups',
             keyTest       => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
             keyMsgFail    => '__badMacroName__',
-            test          => $perlExpr,
+            test          => sub { return perlExpr(@_) },
             default       => {},
             documentation => 'Macros',
         },
@@ -1317,6 +1368,10 @@ sub attributes {
             default       => 1,
             documentation => 'Authorize users to remove existing U2F key',
         },
+        u2fTTL => {
+            type          => 'int',
+            documentation => 'U2F device time to live',
+        },
 
         # TOTP second factor
         totp2fActivation => {
@@ -1368,6 +1423,10 @@ sub attributes {
             type          => 'bool',
             default       => 1,
             documentation => 'Authorize users to remove existing TOTP secret',
+        },
+        totp2fTTL => {
+            type          => 'int',
+            documentation => 'TOTP device time to live ',
         },
 
         # UTOTP 2F
@@ -1526,6 +1585,10 @@ sub attributes {
             default       => 1,
             documentation => 'Authorize users to remove existing Yubikey',
         },
+        yubikey2fTTL => {
+            type          => 'int',
+            documentation => 'Yubikey device time to live',
+        },
 
         # Single session
         notifyDeleted => {
@@ -1564,6 +1627,12 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Enable REST session server',
+        },
+        restExportSecretKeys => {
+            default => 0,
+            type    => 'bool',
+            documentation =>
+              'Allow to export secret keys in REST session server',
         },
         restConfigServer => {
             default       => 0,
@@ -1634,11 +1703,7 @@ sub attributes {
                           : ( 0, '__badUrl__' );
                     }
                     $s =~ s/\b(accept|deny|unprotect|skip)\b/1/g;
-                    Safe->new->reval("BEGIN { warnings->unimport; } $s");
-                    my $err = join( '',
-                        grep { $_ =~ /Undefined subroutine/ ? () : $_ }
-                          split( /\n/, $@ ) );
-                    return $err ? ( 1, "__badExpression__: $err" ) : (1);
+                    return &perlExpr( $s, $conf );
                 },
                 msgFail => '__badExpression__',
             },
@@ -1656,15 +1721,7 @@ sub attributes {
             test       => {
                 keyTest    => qr/^(?=[^\-])[\w\-]+(?<=[^-])$/,
                 keyMsgFail => '__badHeaderName__',
-                test       => sub {
-                    my ( $val, $conf ) = @_;
-                    my $s = $val;
-                    Safe->new->reval("BEGIN { warnings->unimport; } $s");
-                    my $err = join( '',
-                        grep { $_ =~ /Undefined subroutine/ ? () : $_ }
-                          split( /\n/, $@ ) );
-                    return $err ? ( 1, "__badExpression__: $err" ) : (1);
-                }
+                test       => sub { return perlExpr(@_) },
             },
             documentation => 'Virtualhost headers',
             flags         => 'h',
@@ -1690,6 +1747,10 @@ sub attributes {
         vhostMaintenance => {
             type    => 'bool',
             default => 0,
+        },
+        vhostServiceTokenTTL => {
+            type    => 'int',
+            default => -1,
         },
         vhostAliases => { type => 'text', },
         vhostType    => {
@@ -1830,7 +1891,7 @@ sub attributes {
         },
         casAppMetaDataOptionsRule => {
             type          => 'text',
-            test          => $perlExpr,
+            test          => sub { return perlExpr(@_) },
             documentation => 'CAS App rule',
         },
 
@@ -2434,7 +2495,7 @@ sub attributes {
         },
         samlSPMetaDataOptionsRule => {
             type          => 'text',
-            test          => $perlExpr,
+            test          => sub { return perlExpr(@_) },
             documentation => 'Rule to grant access to this SP',
         },
 
@@ -2513,6 +2574,37 @@ sub attributes {
             default       => 0,
             help          => 'secondfactor.html',
             documentation => 'Second factor required',
+        },
+        sfRemovedMsgRule => {
+            type    => 'boolOrExpr',
+            default => 0,
+            help    => 'secondfactor.html',
+            documentation =>
+              'Display a message if at leat one expired SF has been removed',
+        },
+        sfRemovedUseNotif => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Use Notifications plugin to display message',
+        },
+        sfRemovedNotifRef => {
+            type          => 'text',
+            default       => 'RemoveSF',
+            help          => 'secondfactor.html',
+            documentation => 'Notification reference',
+        },
+        sfRemovedNotifTitle => {
+            type          => 'text',
+            default       => 'Second factor notification',
+            help          => 'secondfactor.html',
+            documentation => 'Notification title',
+        },
+        sfRemovedNotifMsg => {
+            type => 'text',
+            default =>
+              '_removedSF_ expired second factor(s) has/have been removed!',
+            help          => 'secondfactor.html',
+            documentation => 'Notification message',
         },
         available2F => {
             type          => 'text',
@@ -2613,7 +2705,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'LDAP password encoding',
         },
         ldapUsePasswordResetAttribute => {
-            default       => 0,
             type          => 'bool',
             default       => 1,
             documentation => 'LDAP store reset flag in an attribute',
@@ -3424,7 +3515,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         oidcRPMetaDataOptionsRule => {
             type          => 'text',
-            test          => $perlExpr,
+            test          => sub { return perlExpr(@_) },
             documentation => 'Rule to grant access to this RP',
         },
     };

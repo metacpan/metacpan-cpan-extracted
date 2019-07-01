@@ -1,5 +1,8 @@
 Revision history for Perl module Geo::What3Words.
 
+2.1.2   2019-07-01
+        - replace JSON::XS with Cpanel::JSON::XS (fork/successor)
+
 2.1.0   2018-09-12
         - replace JSON with JSON::XS
         - utf8 encoding issues when running against w3w SDK (API 2.3.0)

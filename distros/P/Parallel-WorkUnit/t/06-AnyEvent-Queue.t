@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2017 Joelle Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -20,17 +20,17 @@ use Test::Exception;
 my %RESULTS;
 
 SKIP: {
-    if (! eval { require AnyEvent }) {
+    if ( !eval { require AnyEvent } ) {
         skip 'AnyEvent not installed', 144;
     }
 
     # Set Timeout
     local $SIG{ALRM} = sub { die "timeout\n"; };
     alarm 120;    # It would be nice if we did this a better way, since
-                # strictly speaking, 120 seconds isn't necessarily
-                # indicative of failure if running this on a VERY
-                # slow machine.
-                # But hopefully nobody has that slow of a machine!
+                  # strictly speaking, 120 seconds isn't necessarily
+                  # indicative of failure if running this on a VERY
+                  # slow machine.
+                  # But hopefully nobody has that slow of a machine!
 
     # Instantiate the object
     require_ok('Parallel::WorkUnit');
@@ -56,7 +56,7 @@ SKIP: {
     # make sure it queue() works basically like async().
     my $PROCS = 10;
     for ( 0 .. $PROCS - 1 ) {
-        my $v = $_;
+        my $v   = $_;
         my $ret = $wu->queue( sub { return $v; }, \&cb );
 
         if ( $_ <= 1 ) {
@@ -81,7 +81,6 @@ SKIP: {
     }
     is( $wu->count, 0, "no processes running after waitall()" );
 
-
     # We're going to spawn 10 children and test the return value, just to
     # make sure it queue() works basically like async().  This time, though,
     # we are testing with an unlimited max_children
@@ -90,7 +89,7 @@ SKIP: {
 
     $PROCS = 10;
     for ( 0 .. $PROCS - 1 ) {
-        my $v = $_;
+        my $v   = $_;
         my $ret = $wu->queue( sub { return $v; }, \&cb );
 
         ok( $ret, "(W1) Worker " . ( 1 + $_ ) . " started" );
@@ -115,7 +114,7 @@ SKIP: {
 
     # Queue up 10 processes
     for ( 0 .. $PROCS - 1 ) {
-        my $v = $_;
+        my $v   = $_;
         my $ret = $wu->queue( sub { return $v; }, \&cb );
 
         if ( $_ <= 1 ) {

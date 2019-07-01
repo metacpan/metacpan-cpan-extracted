@@ -110,8 +110,8 @@ sub appListDiff {
     my ( $self, @conf ) = @_;
     my @res;
     my @keys = (
-        [ sort grep { $_ !~ /^(?:catname|type)$/ } keys %{ $conf[0] } ],
-        [ sort grep { $_ !~ /^(?:catname|type)$/ } keys %{ $conf[1] } ]
+        [ sort grep { $_ !~ /^(?:catname|type|order)$/ } keys %{ $conf[0] } ],
+        [ sort grep { $_ !~ /^(?:catname|type|order)$/ } keys %{ $conf[1] } ]
     );
     while ( my $key = shift @{ $keys[0] } ) {
 

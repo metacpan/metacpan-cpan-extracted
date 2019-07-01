@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.203    2019-06-30
+        - Fetching column names and types: eval sql code.
+        - Keep the cursor hidden, avoid cursor flickering.
+        - Adapt code to work with the updated Term::Choose::LineFold::line_fold routine.
+
+
 2.202    2019-05-09
         - Update minimum version: Term::Choose, Term::Choose::Util, Term::From.
         - Code refactoring.

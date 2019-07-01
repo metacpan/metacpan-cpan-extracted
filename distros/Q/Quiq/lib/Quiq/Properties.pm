@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Parameters;
+use Quiq::String;
 
 # -----------------------------------------------------------------------------
 
@@ -34,7 +35,7 @@ soll.
 
 =item type
 
-Typ der Wertemenge: s (Text), f (Float), d (Integer).
+Typ der Wertemenge: s (String), f (Float), d (Integer).
 
 =item width
 
@@ -54,6 +55,11 @@ vom Typ f (Float).
 =item align
 
 Ausrichtung der Werte der Wertemenge: l (left), r (right).
+
+=item multiLine
+
+Boolscher Wert, der angibt, ob die Wertemenge wenigstens einen
+mehrzeiligen Wert enthält.
 
 =back
 
@@ -99,7 +105,7 @@ Erzeuge eine formatierte Liste von Float-Werten:
 
 =item @arr
 
-Array von skalaren Werten (Integers, Floats, Strings)
+Array von skalaren Werten (Integers, Floats, String)
 
 =back
 
@@ -147,9 +153,10 @@ sub new {
     #                 |   | 2 floatPrefix
     #                 |   | | 3 scale
     #                 |   | | | 4 align
-    #                 |   | | | |   5 Option $noTrailingZeros
-    #                 |   | | | |   |
-    my $self = bless ['d',0,0,0,'r',$noTrailingZeros],$class;
+    #                 |   | | | |   5 multiLine
+    #                 |   | | | |   | 6 Option $noTrailingZeros
+    #                 |   | | | |   | |
+    my $self = bless ['d',0,0,0,'r',0,$noTrailingZeros],$class;
 
     # Analysiere Werte
 
@@ -206,6 +213,32 @@ sub align {
     }
 
     return $self->type eq 's'? ($self->[1] == 0? 'l': $self->[4]): 'r';
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 multiLine() - Mehrzeilige Werte?
+
+=head4 Synopsis
+
+    $bool = $prp->multiLine;
+
+=head4 Returns
+
+Boolean
+
+=head4 Description
+
+Liefere wahr (1), wenn die Wertemenge mehrzeilige Werte enthält,
+andernfalls falsch (0). Kann nur für eine Wertemenge vom Typ s
+wahr sein.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub multiLine {
+    return shift->[5];
 }
 
 # -----------------------------------------------------------------------------
@@ -306,8 +339,13 @@ Liefere die Länge des längsten Werts.
 
 =item *
 
-Die Breite einer Wertemenge des Typs d oder s ist die Länge des
+Die Breite einer Wertemenge des Typs d ist die Länge des
 längsten Werts.
+
+=item *
+
+Die Breite einer Wertemenge des Typs s ist die Länge der
+längsten Zeile eines Werts.
 
 =item *
 
@@ -370,7 +408,7 @@ sub analyze {
     }
 
     # Bisherige Information holen
-    my ($type,$width,$floatPrefix,$scale,$align,$opt) = @$self;
+    my ($type,$width,$floatPrefix,$scale,$align,$multiLine,$opt) = @$self;
 
     # Typ behandeln
 
@@ -417,15 +455,22 @@ sub analyze {
         }
     }
 
-    # Width ermitteln
+    # Width/MultiLine ermitteln
 
-    my $l = length $val;
+    my $l;
+    if ($val =~ tr/\n//) {
+        $l = Quiq::String->maxLineLength($val);
+        $multiLine = 1;
+    }
+    else {
+        $l = length $val;
+    }
     if ($l > $width) {
         $width = $l;
     }
 
     # Neue Information setzen
-    @$self = ($type,$width,$floatPrefix,$scale,$align,$opt);
+    @$self = ($type,$width,$floatPrefix,$scale,$align,$multiLine,$opt);
 
     return;
 }
@@ -489,7 +534,7 @@ sub format {
         }
         elsif ($type eq 'f') {
             $val = sprintf '%*.*f',$width,$self->scale,$val;
-            if ($self->[5]) { # noTrailingZeros
+            if ($self->[6]) { # noTrailingZeros
                 if ($val =~ s/(0+)$/' ' x length($1)/e) {
                     $val =~ s/\.$/ /;
                 }
@@ -509,7 +554,7 @@ sub format {
         elsif ($type eq 'f') {
             $val = sprintf '%*.*f',$width,$self->scale,$val;
             $val =~ s/^ +//g;
-            if ($self->[5]) { # noTrailingZeros
+            if ($self->[6]) { # noTrailingZeros
                 if ($val =~ s/(0+)$/'&nbsp;' x length($1)/e) {
                     $val =~ s/\.$/&nbsp;/;
                 }
@@ -574,7 +619,7 @@ sub set {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

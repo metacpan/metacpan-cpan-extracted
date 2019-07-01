@@ -7,7 +7,7 @@ package Tcl::pTk::DirTree;
 #
 # John Cerney 10/24/08: Modified for Tcl::pTk
 
-our ($VERSION) = ('1.01');
+our ($VERSION) = ('1.02');
 
 use Tcl::pTk;
 use Tcl::pTk::Derived;

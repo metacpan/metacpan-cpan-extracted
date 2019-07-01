@@ -5,7 +5,7 @@ use JSON qw//;
 use Sub::Data::Recursive;
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $MAX_DEPTH = 10;
 
@@ -36,6 +36,7 @@ sub new {
     my $self = bless {
         _opt  => $opt,
         _json => JSON->new->utf8->pretty(!$opt->{no_pretty})->canonical(1),
+        __current_orig_line => undef,
     }, $class;
 
     $self->_lazyload_modules;
@@ -56,33 +57,46 @@ sub run {
 
     my $out = !!$self->opt('stderr') ? *STDERR : *STDOUT;
 
-    while (my $orig_line = <STDIN>) {
-        if (my $line = $self->_run_line($orig_line)) {
+    while ($self->{__current_orig_line} = <STDIN>) {
+        if (my $line = $self->_run_line) {
             print $out $line;
         }
+        $self->{__current_orig_line} = undef;
     }
 }
 
 sub _run_line {
-    my ($self, $orig_line) = @_;
+    my ($self) = @_;
 
-    if ($orig_line !~ m!^\s*[\[\{]!) {
-        return $orig_line;
+    if ($self->{__current_orig_line} =~ m!^[\s\t\r\n]+$!) {
+        return;
     }
 
-    if (my $regexp = $self->opt('grep')) {
-        if ($orig_line !~ m!$regexp!) {
-            return;
+    if ($self->{__current_orig_line} !~ m!^\s*[\[\{]!) {
+        return $self->opt('sweep') ? undef : $self->{__current_orig_line};
+    }
+
+    if (my $rs = $self->opt('grep')) {
+        if (!$self->_match_grep($rs)) {
+            return; # no match
         }
     }
 
-    if (my $regexp = $self->opt('ignore')) {
-        if ($orig_line =~ m!$regexp!) {
-            return;
+    if (my $rs = $self->opt('ignore')) {
+        if ($self->_match_grep($rs)) {
+            return; # ignore if even one match
         }
     }
 
-    return $self->process($orig_line);
+    return $self->_process;
+}
+
+sub _match_grep {
+    my ($self, $rs) = @_;
+
+    for my $r (@{$rs}) {
+        return 1 if $self->{__current_orig_line} =~ m!$r!;
+    }
 }
 
 sub _lazyload_modules {
@@ -100,23 +114,22 @@ sub _lazyload_modules {
     }
 }
 
-sub process {
-    my ($self, $line) = @_;
+sub _process {
+    my ($self) = @_;
 
     my $decoded = eval {
-        $self->{_json}->decode($line);
+        $self->{_json}->decode($self->{__current_orig_line});
     };
     if ($@) {
-        return $line;
+        return $self->{__current_orig_line};
     }
     else {
         $self->_recursive_process($decoded);
-        return $self->_output($decoded);
-
+        return $self->_encode($decoded);
     }
 }
 
-sub _output {
+sub _encode {
     my ($self, $decoded) = @_;
 
     if ($self->opt('yaml')) {
@@ -141,38 +154,62 @@ sub _recursive_process {
 sub _recursive_pre_process {
     my ($self, $decoded) = @_;
 
-    $INVOKER->invoke(\&_split_lf => $decoded) if $self->opt('x');
+    $self->_invoker(\&_split_lf => $decoded) if $self->opt('x');
 }
 
 sub _recursive_post_process {
     my ($self, $decoded) = @_;
 
     if ($self->opt('x')) {
-        $INVOKER->invoke(\&_split_lf => $decoded);
+        $self->_invoker(\&_split_lf => $decoded);
     }
 
     if ($self->opt('xx')) {
-        $INVOKER->invoke(\&_split_comma => $decoded);
+        $self->_invoker(\&_split_comma => $decoded);
     }
 
     if ($self->opt('xxx')) {
-        $INVOKER->invoke(\&_split_label => $decoded);
+        $self->_invoker(\&_split_label => $decoded);
     }
 
     if ($self->opt('xxxx') || $self->opt('timestamp_key')) {
         if ($self->opt('xxxxx')) {
-            $INVOKER->massive_invoke(\&_forcely_convert_timestamp => $decoded);
+            $INVOKER->invoke(\&_forcely_convert_timestamp => $decoded);
         }
         else {
-            $INVOKER->massive_invoke(\&_convert_timestamp => $decoded);
+            $self->_invoker(\&_convert_timestamp => $decoded);
         }
     }
 
     $INVOKER->invoke(\&_trim => $decoded);
 }
 
+my $LAST_VALUE;
+
+sub _invoker {
+    my ($self, $code_ref, $hash) = @_;
+
+    $LAST_VALUE = '';
+    $INVOKER->massive_invoke($code_ref => $hash);
+}
+
+sub _skippable_value {
+    my ($context, $last_value) = @_;
+
+    return $context && $context eq 'HASH'
+            && $last_value && $last_value =~ m!user[\-\_\s]*agent!i;
+}
+
 sub _split_lf {
-    my $line = $_[0];
+    my $line    = $_[0];
+    my $context = $_[1];
+
+    if (_skippable_value($context, $LAST_VALUE)) {
+        $LAST_VALUE = $line;
+        return $line;
+    }
+
+    $LAST_VALUE = $line;
 
     if ($line =~ m![\t\r\n]!) {
         chomp $line;
@@ -182,11 +219,19 @@ sub _split_lf {
 }
 
 sub _split_comma {
-    my $line = $_[0];
+    my $line    = $_[0];
+    my $context = $_[1];
 
-    chomp $line;
+    if (_skippable_value($context, $LAST_VALUE)) {
+        $LAST_VALUE = $line;
+        return $line;
+    }
+
+    $LAST_VALUE = $line;
 
     return $line if $line !~ m!, ! || $line =~ m!\\!;
+
+    chomp $line;
 
     my @elements = split /,\s+/, $line;
 
@@ -194,11 +239,19 @@ sub _split_comma {
 }
 
 sub _split_label {
-    my $line = $_[0];
+    my $line    = $_[0];
+    my $context = $_[1];
 
-    chomp $line;
+    if (_skippable_value($context, $LAST_VALUE)) {
+        $LAST_VALUE = $line;
+        return $line;
+    }
+
+    $LAST_VALUE = $line;
 
     return $line if $line =~ m!\\!;
+
+    chomp $line;
 
     $line =~ s!([])>])\s+([[(<])!$1$2!g;
     $line =~ s!((\[[^])>]+\]|\([^])>]+\)|<[^])>]+>))!$1\n!g; # '\n' already replaced by --x option
@@ -206,8 +259,6 @@ sub _split_label {
 
     $_[0] = \@elements if scalar @elements > 1;
 }
-
-my $LAST_VALUE = '';
 
 sub _convert_timestamp {
     my $line    = $_[0];
@@ -237,6 +288,22 @@ sub _forcely_convert_timestamp {
     }
 }
 
+sub _ts2date {
+    my $unix_timestamp = shift;
+    my $msec           = shift || '';
+
+    # 946684800 = 2000-01-01T00:00:00Z
+    if ($unix_timestamp >= 946684800) {
+        if ($unix_timestamp > 2**31 -1) {
+            ($msec) = ($unix_timestamp =~ m!(\d\d\d)$!);
+            $msec = ".$msec";
+            $unix_timestamp = int($unix_timestamp / 1000);
+        }
+        my @t = $GMTIME ? gmtime($unix_timestamp) : localtime($unix_timestamp);
+        return POSIX::strftime('%Y-%m-%d %H:%M:%S', @t) . $msec;
+    }
+}
+
 sub _trim {
     my $line = $_[0];
 
@@ -254,22 +321,6 @@ sub _trim {
 
     if ($trim) {
         $_[0] = $line;
-    }
-}
-
-sub _ts2date {
-    my $unix_timestamp = shift;
-    my $msec           = shift || '';
-
-    # 946684800 = 2000-01-01T00:00:00Z
-    if ($unix_timestamp >= 946684800) {
-        if ($unix_timestamp > 2**31 -1) {
-            ($msec) = ($unix_timestamp =~ m!(\d\d\d)$!);
-            $msec = ".$msec";
-            $unix_timestamp = int($unix_timestamp / 1000);
-        }
-        my @t = $GMTIME ? gmtime($unix_timestamp) : localtime($unix_timestamp);
-        return POSIX::strftime('%Y-%m-%d %H:%M:%S', @t) . $msec;
     }
 }
 
@@ -308,11 +359,12 @@ sub _parse_opt {
         'xxxxx'     => \$opt->{xxxxx},
         'timestamp-key=s' => \$opt->{timestamp_key},
         'gmtime'    => \$opt->{gmtime},
-        'g|grep=s'  => \$opt->{grep},
-        'ignore=s'  => \$opt->{ignore},
+        'g|grep=s@' => \$opt->{grep},
+        'ignore=s@' => \$opt->{ignore},
         'yaml|yml'  => \$opt->{yaml},
         'unbuffered' => \$opt->{unbuffered},
         'stderr'    => \$opt->{stderr},
+        'sweep'     => \$opt->{sweep},
         'h|help'    => sub {
             $class->_show_usage(1);
         },
@@ -382,16 +434,12 @@ getter of optional values
 
 The main routine
 
-=head2 process
-
-The parser of the line
-
 
 =head1 REPOSITORY
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1561268694"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1561268694&branch=master"/></a>
+<a href="https://github.com/bayashi/App-jl/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1561961170"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1561961170&branch=master"/></a>
 
 =end html
 

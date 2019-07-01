@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "MongoDB" => 2,
     "Moose" => 2,
+    "Moose::Role" => 2,
     "MooseX::AttributeShortcuts" => 0,
     "MooseX::Role::Logger" => 0,
     "MooseX::Role::MongoDB" => 1,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "2.000",
+  "VERSION" => "2.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "MongoDB" => 2,
   "Moose" => 2,
+  "Moose::Role" => 2,
   "MooseX::AttributeShortcuts" => 0,
   "MooseX::Role::Logger" => 0,
   "MooseX::Role::MongoDB" => 1,

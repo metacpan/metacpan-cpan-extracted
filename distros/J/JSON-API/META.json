@@ -40,7 +40,7 @@
    "provides" : {
       "JSON::API" : {
          "file" : "lib/JSON/API.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.1.1"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "git://github.com/geofffranks/json-api.git"
       }
    },
-   "version" : "v1.1.0",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "v1.1.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

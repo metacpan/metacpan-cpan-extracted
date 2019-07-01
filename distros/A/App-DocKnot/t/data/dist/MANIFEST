@@ -1,0 +1,6 @@
+Build.PL
+docs/metadata/metadata.json
+lib/Empty.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/api/empty.t

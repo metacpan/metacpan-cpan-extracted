@@ -1,6 +1,8 @@
-PagerDuty::Agent version 0.01
+PagerDuty::Agent version 0.02
 
-PagerDuty::Agent is a module for submitting events to PagerDuty.
+[![Build status](https://img.shields.io/travis/querry43/perl-pagerduty-agent.svg)](https://travis-ci.org/querry43/perl-pagerduty-agent)
+[![License](https://img.shields.io/github/license/querry43/perl-pagerduty-agent.svg)](LICENSE)
+[![CPAN](https://img.shields.io/cpan/v/PagerDuty-Agent.svg)](https://metacpan.org/pod/PagerDuty::Agent)
 
 SYNOPSIS
 
@@ -16,6 +18,8 @@ SYNOPSIS
 
     print "Event successfully resolved\n"
       if $agent->resolve_event( $dedup_key );
+  } else {
+    warn "Failed to submit event: $@\n";
   }
 
   # additional context can be passed in
@@ -36,10 +40,10 @@ To install this module type the following:
 
 DEPENDENCIES
 
-Perl 5.8 or later.
+Perl 5.10 or later.
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by comScore, Inc
+Copyright (C) 2019 by Matt Harrington
 
 The full text of this license can be found in the LICENSE file included with this module.

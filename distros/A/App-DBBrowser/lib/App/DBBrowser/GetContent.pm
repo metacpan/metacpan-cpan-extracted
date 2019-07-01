@@ -67,7 +67,7 @@ sub from_col_by_col {
         # Choose a number
         my $col_count = choose_a_number( 3,
             { name => 'Number of columns: ', small_first => 1, mouse => $sf->{o}{table}{mouse}, confirm => 'Confirm',
-              back => 'Back', clear_screen => 0 } #
+              back => 'Back', clear_screen => 0, hide_cursor => 0 } #
         );
         if ( ! $col_count ) {
             return;
@@ -80,6 +80,7 @@ sub from_col_by_col {
             $fields,
             { prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
         );
+        print HIDE_CURSOR;
         if ( ! $form ) {
             return;
         }
@@ -94,6 +95,7 @@ sub from_col_by_col {
             $sf->__print_args( $sql );
             # Readline
             my $col = $tf->readline( $col_name . ': ' );
+            print HIDE_CURSOR;
             push @{$sql->{insert_into_args}->[$row_idxs]}, $col;
         }
         my $default = 0;
@@ -449,7 +451,7 @@ sub __new_dir_search {
     my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
     # Choose
     my $dir_ec = choose_a_dir(
-        { dir => $default_dir, decoded => 0, mouse => $sf->{o}{table}{mouse}, clear_screen => 1 }
+        { dir => $default_dir, decoded => 0, mouse => $sf->{o}{table}{mouse}, clear_screen => 1, hide_cursor => 0 }
     );
     if ( $dir_ec ) {
         $sf->{i}{tmp_files_dir} = decode 'locale_fs', $dir_ec;

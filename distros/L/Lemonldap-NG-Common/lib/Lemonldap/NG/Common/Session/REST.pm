@@ -201,8 +201,8 @@ sub delete2F {
     return $self->sendJSONresponse( $req, { result => 1 } );
 }
 
-sub session {
-    my ( $self, $req, $id, $skey ) = @_;
+sub _session {
+    my ( $self, $raw, $req, $id, $skey ) = @_;
     my ( %h, $res );
     return $self->sendError( $req, 'Bad request', 400 ) unless ($id);
     my $mod = $self->getMod($req)
@@ -214,11 +214,13 @@ sub session {
 
     my %session = %{ $apacheSession->data };
 
-    foreach my $k ( keys %session ) {
-        $session{$k} = '**********'
-          if ( $self->hAttr =~ /\b$k\b/ );
-        $session{$k} = [ split /$self->separator/o, $session{$k} ]
-          if ( $session{$k} =~ /$self->separator/o );
+    unless ($raw) {
+        foreach my $k ( keys %session ) {
+            $session{$k} = '**********'
+              if ( $self->hAttr =~ /\b$k\b/ );
+            $session{$k} = [ split /$self->separator/o, $session{$k} ]
+              if ( $session{$k} =~ /$self->separator/o );
+        }
     }
 
     if ($skey) {
@@ -235,6 +237,16 @@ sub session {
     }
 
     # TODO: check for utf-8 problems
+}
+
+sub session {
+    my $self = shift;
+    return $self->_session( 0, @_ );
+}
+
+sub rawSession {
+    my $self = shift;
+    return $self->_session( 1, @_ );
 }
 
 sub getApacheSession {

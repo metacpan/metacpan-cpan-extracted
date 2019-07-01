@@ -4,6 +4,7 @@ author:
   - 'Dai Okabayashi <bayashi@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
+  Encode: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
   Test::More: '0.88'
 configure_requires:
@@ -20,7 +21,7 @@ name: App-jl
 provides:
   App::jl:
     file: lib/App/jl.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Getopt::Long: '2.42'
   JSON: '0'
@@ -35,5 +36,5 @@ resources:
   bugtracker: http://github.com/bayashi/App-jl/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/App-jl
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

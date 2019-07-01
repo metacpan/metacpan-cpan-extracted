@@ -12,6 +12,7 @@ package Lemonldap::NG::Portal::2F::Engines::Default;
 use strict;
 use Mouse;
 use JSON qw(from_json to_json);
+use POSIX qw(strftime);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
   PE_NOTOKEN
@@ -20,17 +21,16 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # INITIALIZATION
 
-has sfModules => ( is => 'rw', default => sub { [] } );
-
+has sfModules  => ( is => 'rw', default => sub { [] } );
 has sfRModules => ( is => 'rw', default => sub { [] } );
-
-has sfReq => ( is => 'rw' );
+has sfReq      => ( is => 'rw' );
+has sfMsgRule  => ( is => 'rw' );
 
 has ott => (
     is      => 'rw',
@@ -106,6 +106,21 @@ sub init {
         return 0;
     }
 
+    unless (
+        $self->sfMsgRule(
+            $self->p->HANDLER->buildSub(
+                $self->p->HANDLER->substitute(
+                    $self->conf->{sfRemovedMsgRule}
+                )
+            )
+        )
+      )
+    {
+        $self->error( 'Error in sfRemovedMsg rule'
+              . $self->p->HANDLER->tsv->{jail}->error );
+        return 0;
+    }
+
     # Enable REST request only if more than 1 2F module is enabled
     if ( @{ $self->{sfModules} } > 1 ) {
         $self->addUnauthRoute( '2fchoice' => '_choice',   ['POST'] );
@@ -126,7 +141,6 @@ sub init {
             );
         }
     }
-
     return 1;
 }
 
@@ -137,12 +151,81 @@ sub init {
 # run() is called at each authentication, just after sessionInfo populated
 sub run {
     my ( $self, $req ) = @_;
-
     my $checkLogins = $req->param('checkLogins');
+    my $spoofId = $req->param('spoofId') || '';
     $self->logger->debug("2F checkLogins set") if ($checkLogins);
 
     # Skip 2F unless a module has been registered
     return PE_OK unless ( @{ $self->sfModules } );
+
+    # Remove expired 2F devices
+    my $session = $req->sessionInfo;
+    if ( $session->{_2fDevices} ) {
+        $self->logger->debug("Loading 2F Devices ...");
+
+        # Read existing 2FDevices
+        my $_2fDevices =
+          eval { from_json( $session->{_2fDevices}, { allow_nonref => 1 } ); };
+        if ($@) {
+            $self->logger->error("Bad encoding in _2fDevices: $@");
+            return PE_ERROR;
+        }
+
+        $self->logger->debug(" -> 2F Device(s) found");
+        my $now     = time();
+        my $removed = 0;
+        $self->logger->debug("Looking for expired 2F device(s)...");
+        foreach my $device (@$_2fDevices) {
+            my $type = lc( $device->{type} );
+            $type =~ s/2f$//i;
+            $type = 'yubikey' if $type eq 'ubk';
+            my $ttl = $self->conf->{ $type . '2fTTL' };
+            if ( $ttl and $ttl > 0 and $now - $device->{epoch} > $ttl ) {
+                $self->logger->debug(
+"Remove $device->{type} -> $device->{name} / $device->{epoch}"
+                );
+                $self->userLogger->info("Remove expired $device->{type}");
+                $device->{type} = 'EXPIRED';
+                $removed++;
+            }
+        }
+
+        if ($removed) {
+            $self->logger->debug(
+"Found $removed EXPIRED 2F device(s) => Update persistent session"
+            );
+            $self->userLogger->notice(
+                " -> $removed EXPIRED 2F device(s) removed");
+            @$_2fDevices =
+              map { $_->{type} =~ /\bEXPIRED\b/ ? () : $_ } @$_2fDevices;
+            $self->p->updatePersistentSession( $req,
+                { _2fDevices => to_json($_2fDevices) } );
+
+            # Display message if required
+            if ( $self->sfMsgRule->( $req, $req->sessionInfo ) ) {
+                my $uid   = $req->user;
+                my $date  = strftime "%Y-%m-%d", localtime;
+                my $ref   = $self->conf->{sfRemovedNotifRef} || 'RemoveSF';
+                my $title = $self->conf->{sfRemovedNotifTitle}
+                  || 'Second factor notification';
+                my $msg = $self->conf->{sfRemovedNotifMsg}
+                  || "$removed expired second factor(s) has/have been removed!";
+                $msg =~ s/_removedSF_/$removed/;
+
+                my $params =
+                  $removed > 1
+                  ? { trspan => "expired2Fremoved, $removed" }
+                  : { trspan => "oneExpired2Fremoved" };
+
+                my $res =
+                  $self->conf->{sfRemovedUseNotif}
+                  ? $self->createNotification( $req, $uid, $date, $ref, $title,
+                    $msg )
+                  : $self->displayTemplate( $req, 'simpleInfo', $params );
+                return $res if $res;
+            }
+        }
+    }
 
     # Search for authorized modules for this user
     my @am;
@@ -186,6 +269,8 @@ sub run {
     $req->sessionInfo->{_2fRealSession} = $req->id;
     $req->sessionInfo->{_2fUrldc}       = $req->urldc;
     $req->sessionInfo->{_2fUtime}       = $req->{sessionInfo}->{_utime};
+    $req->sessionInfo->{_impSpoofId}    = $spoofId;
+    $req->sessionInfo->{_impUser}       = $req->user;
     my $token = $self->ott->createToken( $req->sessionInfo );
     delete $req->{authResult};
 
@@ -203,7 +288,7 @@ sub run {
         '2fchoice',
         params => {
             MAIN_LOGO => $self->conf->{portalMainLogo},
-            SKIN      => $self->conf->{portalSkin},
+            SKIN      => $self->p->getSkin($req),
             TOKEN     => $token,
             MODULES => [ map { { CODE => $_->prefix, LOGO => $_->logo } } @am ],
             CHECKLOGINS => $checkLogins
@@ -358,7 +443,7 @@ sub _displayRegister {
         '2fregisters',
         params => {
             MAIN_LOGO    => $self->conf->{portalMainLogo},
-            SKIN         => $self->conf->{portalSkin},
+            SKIN         => $self->p->getSkin($req),
             MODULES      => \@am,
             SFDEVICES    => $_2fDevices,
             ACTION       => $action,

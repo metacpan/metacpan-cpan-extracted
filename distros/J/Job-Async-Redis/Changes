@@ -1,6 +1,11 @@
 
 Revision history for Job-Async-Redis
 
+0.003     2019-07-01 16:28:24+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - fixes for encoding and switch to await syntax
+
 0.002     2019-02-27 14:47:06+08:00 Asia/Kuala_Lumpur
     New features:
 

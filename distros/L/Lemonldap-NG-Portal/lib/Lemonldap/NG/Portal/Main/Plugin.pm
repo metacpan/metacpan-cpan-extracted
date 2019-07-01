@@ -5,8 +5,13 @@ package Lemonldap::NG::Portal::Main::Plugin;
 use strict;
 use Mouse;
 use HTML::Template;
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_INFO
+  PE_ERROR
+);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -28,6 +33,11 @@ sub addAuthRoute {
 sub addUnauthRoute {
     my $self = shift;
     return $self->_addRoute( 'addUnauthRoute', @_ );
+}
+
+sub addAuthRouteWithRedirect {
+    my $self = shift;
+    return $self->_addRoute( 'addAuthRouteWithRedirect', @_ );
 }
 
 sub _addRoute {
@@ -54,6 +64,43 @@ sub _addRoute {
 sub loadTemplate {
     my $self = shift;
     return $self->p->loadTemplate(@_);
+}
+
+sub displayTemplate {
+    my ( $self, $req, $template, $params ) = @_;
+    $self->logger->debug("Return $template template");
+    $req->info( $self->loadTemplate( $req, $template, params => $params ) );
+    return PE_INFO;
+}
+
+sub createNotification {
+    my ( $self, $req, $uid, $date, $ref, $title, $msg ) = @_;
+    my $notifEngine = $self->p->loadedModules->{
+        'Lemonldap::NG::Portal::Plugins::Notifications'};
+
+    return PE_ERROR unless $notifEngine;
+
+    # Prepare notification
+    my $content =
+      $self->conf->{oldNotifFormat}
+      ? '<?xml version="1.0" encoding="UTF-8"?><root><notification uid="_uid_" date="_date_" reference="_ref_"><title>_title_</title><text>_msg_</text></notification></root>'
+      : '[{"uid":"_uid_","date":"_date_","title":"_title_","reference":"_ref_","text":"_msg_"}]';
+    $content =~ s/_uid_/$uid/;
+    $content =~ s/_date_/$date/;
+    $content =~ s/_ref_/$ref/;
+    $content =~ s/_title_/$title/;
+    $content =~ s/_msg_/$msg/;
+
+    if ( $notifEngine->module->notifObject->newNotification($content) ) {
+        $self->logger->debug("Notification $ref successfully created");
+        $self->userLogger->notice(
+            "Notification $ref / $date successfully created for $uid");
+        return PE_OK;
+    }
+    else {
+        $self->logger->debug("Notification $ref NOT created!");
+        return PE_ERROR;
+    }
 }
 
 1;
@@ -145,6 +192,11 @@ Example:
       ...
       return $self->p->sendHtml($req, 'template', params => { WELLCOME => 1 });
   }
+
+If you want to get a "protected application" behavior, you can use
+B<addAuthRouteWithRedirect>. This methods calls B<addAuthRoute> with given
+arguments and build a "unAuth" route that build a redirection after
+authentication.
 
 =head3 Entry point in auth process
 

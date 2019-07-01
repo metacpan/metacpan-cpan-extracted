@@ -1,5 +1,5 @@
 This archive contains the distribution Database-Async,
-version 0.008:
+version 0.009:
 
   database interface for use with IO::Async
 

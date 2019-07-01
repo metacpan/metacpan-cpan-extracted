@@ -9,10 +9,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.5';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::_tokenRule';
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::_tokenRule
+  Lemonldap::NG::Portal::Lib::OtherSessions
+);
 
 # INITIALIZATION
 
@@ -36,8 +39,8 @@ sub hAttr {
 sub init {
     my ($self) = @_;
     my $hd = $self->p->HANDLER;
-    $self->addAuthRoute( checkuser => 'check',   ['POST'] );
-    $self->addAuthRoute( checkuser => 'display', ['GET'] );
+    $self->addAuthRoute( checkuser => 'check', ['POST'] );
+    $self->addAuthRouteWithRedirect( checkuser => 'display', ['GET'] );
 
     # Parse identity rule
     $self->logger->debug(
@@ -59,7 +62,7 @@ sub init {
 sub check {
     my ( $self, $req ) = @_;
     my ( $attrs, $array_attrs, $array_hdrs ) = ( {}, [], [] );
-    my $msg = my $auth = '';
+    my $msg = my $auth = my $compute = '';
 
     # Check token
     if ( $self->ottRule->( $req, {} ) ) {
@@ -67,13 +70,15 @@ sub check {
         unless ($token) {
             $self->userLogger->warn('checkUser try without token');
             $msg   = PE_NOTOKEN;
-            $token = $self->ott->createToken( $req->userData );
+            $token = $self->ott->createToken();
         }
+
         unless ( $self->ott->getToken($token) ) {
             $self->userLogger->warn('checkUser try with expired/bad token');
             $msg   = PE_TOKENEXPIRED;
-            $token = $self->ott->createToken( $req->userData );
+            $token = $self->ott->createToken();
         }
+
         my $params = {
             PORTAL    => $self->conf->{portal},
             MAIN_LOGO => $self->conf->{portalMainLogo},
@@ -111,7 +116,7 @@ sub check {
                 LOGIN     => '',
                 TOKEN     => (
                       $self->ottRule->( $req, {} )
-                    ? $self->ott->createToken( $req->userData )
+                    ? $self->ott->createToken()
                     : ''
                 )
             }
@@ -119,17 +124,41 @@ sub check {
     }
 
     if ( $user eq $req->{user} or !$user ) {
-        $self->userLogger->notice("Retrieve session from Sessions database");
+        $self->logger->debug("checkUser requested for myself");
+        $self->userLogger->notice("Return userData...");
         $self->userLogger->warn("Using spoofed SSO groups if exist!!!")
           if ( $self->conf->{impersonationRule} );
         $attrs = $req->userData;
+        $user  = $req->{user};
     }
     else {
-        $self->logger->debug("checkUser requested for $req->{user}");
-        $req->{user} = $user;
-        $self->userLogger->notice(
-            "Retrieve session from userDB and compute Groups & Macros");
-        $attrs = $self->_userDatas($req);
+        $self->logger->debug("checkUser requested for $user");
+
+        # Try to retrieve session from sessions DB
+        $self->userLogger->notice('Try to retrieve session from DB...');
+        $self->logger->debug('Try to retrieve session from DB...');
+        my $moduleOptions = $self->conf->{globalStorageOptions} || {};
+        $moduleOptions->{backend} = $self->conf->{globalStorage};
+        my $sessions =
+          $self->module->searchOn( $moduleOptions, $self->conf->{whatToTrace},
+            $user );
+        my $age = '1';
+        foreach my $id ( keys %$sessions ) {
+            my $session = $self->p->getApacheSession($id) or next;
+
+            if ( $session->{data}->{_utime} gt $age ) {
+                $attrs = $session->{data};
+                $age   = $session->{data}->{_utime};
+            }
+        }
+        unless ( defined $attrs->{_session_id} ) {
+            $req->{user} = $user;
+            $self->userLogger->notice(
+                "NO session found in DB. Compute userData...");
+            $self->logger->debug("NO session found in DB. Compute userData...");
+            $attrs   = $self->_userData($req);
+            $compute = 1;
+        }
     }
 
     if ( $req->error ) {
@@ -138,7 +167,11 @@ sub check {
         $attrs       = {};
     }
     else {
-        $msg = 'checkUser';
+        $msg =
+          $self->{conf}->{impersonationMergeSSOgroups} eq 1
+          ? 'checkUserMerged'
+          : 'checkUser';
+        $msg = 'checkUserComputeSession' if $compute;
 
         # Create an array of hashes for template loop
         $self->logger->debug("Delete hidden or empty attributes");
@@ -170,18 +203,19 @@ sub check {
         $url = $self->_urlFormat($url);
 
         # User is allowed ?
-        $auth = $self->_authorization( $req, $url );
         $self->logger->debug(
-            "checkUser requested for user: $req->{user} and URL: $url");
+"checkUser requested for user: $attrs->{ $self->{conf}->{whatToTrace} } and URL: $url"
+        );
+        $auth = $self->_authorization( $req, $url, $attrs );
         if ( $auth >= 0 ) {
-
             $auth = $auth ? "allowed" : "forbidden";
-            $self->userLogger->notice( "checkUser -> $req->{user} is "
+            $self->userLogger->notice(
+                    "checkUser -> $attrs->{ $self->{conf}->{whatToTrace} } is "
                   . uc($auth)
                   . " to access: $url" );
 
             # Return VirtualHost headers
-            $array_hdrs = $self->_headers( $req, $url );
+            $array_hdrs = $self->_headers( $req, $url, $attrs );
         }
         else {
             $auth = 'VHnotFound';
@@ -201,11 +235,8 @@ sub check {
         LANGS     => $self->conf->{showLanguages},
         MSG       => $msg,
         ALERTE    => ( $msg eq 'checkUser' ? 'alert-info' : 'alert-warning' ),
-        LOGIN     => (
-              $self->p->checkXSSAttack( 'LOGIN', $req->{userData}->{uid} ) ? ""
-            : $req->{userData}->{uid}
-        ),
-        URL => (
+        LOGIN     => $user,
+        URL       => (
               $self->p->checkXSSAttack( 'URL', $url ) ? ""
             : $url
         ),
@@ -216,8 +247,7 @@ sub check {
         MACROS      => $array_attrs->[1],
         GROUPS      => $array_attrs->[0],
         TOKEN       => (
-              $self->ottRule->( $req, {} )
-            ? $self->ott->createToken( $req->userData )
+            $self->ottRule->( $req, {} ) ? $self->ott->createToken()
             : ''
         )
     };
@@ -231,6 +261,7 @@ sub display {
     my ( $self, $req ) = @_;
     my ( $attrs, $array_attrs ) = ( {}, [] );
 
+    $self->logger->debug("Display current session data...");
     $self->userLogger->notice("Retrieve session from Sessions database");
     $self->userLogger->warn("Using spoofed SSO groups if exist!!!")
       if ( $self->conf->{impersonationRule} );
@@ -260,18 +291,23 @@ sub display {
 
     # Display form
     my $params = {
-        PORTAL     => $self->conf->{portal},
-        MAIN_LOGO  => $self->conf->{portalMainLogo},
-        LANGS      => $self->conf->{showLanguages},
-        MSG        => 'checkUser',
-        ALERTE     => 'alert-info',
+        PORTAL    => $self->conf->{portal},
+        MAIN_LOGO => $self->conf->{portalMainLogo},
+        LANGS     => $self->conf->{showLanguages},
+        MSG       => (
+            $self->{conf}->{impersonationMergeSSOgroups} ? 'checkUserMerged'
+            : 'checkUser'
+        ),
+        ALERTE => (
+            $self->{conf}->{impersonationMergeSSOgroups} ? 'alert-warning'
+            : 'alert-info'
+        ),
         LOGIN      => $req->{userData}->{uid},
         ATTRIBUTES => $array_attrs->[2],
         MACROS     => $array_attrs->[1],
         GROUPS     => $array_attrs->[0],
         TOKEN      => (
-              $self->ottRule->( $req, {} )
-            ? $self->ott->createToken( $req->userData )
+            $self->ottRule->( $req, {} ) ? $self->ott->createToken()
             : ''
         )
     };
@@ -289,14 +325,13 @@ sub _urlFormat {
     $vhost =~ s/:\d+$//;
     $vhost .= $self->conf->{domain} unless ( $vhost =~ /\./ );
 
-    #$appuri ||= '/';
     return lc("$proto$vhost$port") . "$appuri";
 }
 
-sub _userDatas {
+sub _userData {
     my ( $self, $req ) = @_;
 
-    # Search user in database
+    # Compute session
     my $steps = [ 'getUser', 'setSessionInfo', 'setMacros', 'setGroups' ];
     $self->conf->{checkUserDisplayPersistentInfo}
       ? push @$steps, 'setPersistentSessionInfo', 'setLocalGroups'
@@ -313,6 +348,13 @@ sub _userDatas {
         return $req->error($error);
     }
 
+    unless ( defined $req->sessionInfo->{uid} ) {
+
+        # Avoid error with SAML, OIDC, etc...
+        $self->logger->debug("\"$req->{user}\" NOT found in userDB");
+        return $req->error(PE_BADCREDENTIALS);
+    }
+
     # Check identities rule
     unless ( $self->idRule->( $req, $req->sessionInfo ) ) {
         $self->userLogger->warn(
@@ -327,7 +369,7 @@ sub _userDatas {
 }
 
 sub _authorization {
-    my ( $self, $req, $uri ) = @_;
+    my ( $self, $req, $uri, $attrs ) = @_;
     my ( $vhost, $appuri ) = $uri =~ m#^https?://([^/]*)(.*)#;
     my $exist = 0;
 
@@ -340,23 +382,23 @@ sub _authorization {
         }
     }
 
-    $self->logger->debug("Return \"$req->{user}\" authorization");
+    $self->logger->debug(
+        "Return \"$attrs->{ $self->{conf}->{whatToTrace} }\" authorization");
     return $exist
-      ? $self->p->HANDLER->grant( $req, $req->{userData}, $appuri,
-        undef, $vhost )
+      ? $self->p->HANDLER->grant( $req, $attrs, $appuri, undef, $vhost )
       : -1;
 }
 
 sub _headers {
-    my ( $self, $req, $uri ) = @_;
+    my ( $self, $req, $uri, $attrs ) = @_;
     my ($vhost) = $uri =~ m#^https?://([^/]*).*#;
 
     $vhost =~ s/:\d+$//;
     $req->{env}->{HTTP_HOST} = $vhost;
     $self->p->HANDLER->headersInit( $self->{conf} );
-
-    $self->logger->debug("Return \"$req->{user}\" headers");
-    return $self->p->HANDLER->checkHeaders( $req, $req->{userData} );
+    $self->logger->debug(
+        "Return \"$attrs->{ $self->{conf}->{whatToTrace} }\" headers");
+    return $self->p->HANDLER->checkHeaders( $req, $attrs );
 }
 
 sub _splitAttributes {

@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.514   2019-06-30
+        - "readline": Pressing 'Ctrl-X' clears the input. With the input puffer empty "readline" returns nothing if 'Ctrl-X' is pressed.
+
 0.513   2019-06-08
         - Bugfix in before_readline.
         - Bugfix in add_char.

@@ -28,7 +28,7 @@ use DateTime;
 use vars qw( $MORNINGSTAR_JP_URL);
 
 our @EXPORT_OK = qw(morningstarjp methods labels);
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 # NAV information (basis price)
 $MORNINGSTAR_JP_URL =

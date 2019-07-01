@@ -7,9 +7,10 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose     qw();
-use Term::Form       qw();
-use Term::TablePrint qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Form              qw();
+use Term::TablePrint        qw();
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subqueries; # required
@@ -99,7 +100,7 @@ sub join_tables {
 
         JOIN: while ( 1 ) {
             $ax->print_sql( $join );
-            my $backup_join = $ax->backup_href( $join );
+            #my $backup_join = $ax->backup_href( $join ); #
             my $enough_tables = '  Enough TABLES';
             my @pre = ( undef, $enough_tables );
             # Choose
@@ -286,13 +287,14 @@ sub __add_join_condition {
                     return;
                 }
                 ( my $condition = $join->{stmt} ) =~ s/^\Q$bu_stmt\E\s//;
-                $join->{stmt} = $bu_stmt;
+                $join->{stmt} = $bu_stmt; # ?
                 $ax->print_sql( $join );
                 my $tf = Term::Form->new();
                 # Readline
                 $condition = $tf->readline( 'Edit: ',
                     { default => $condition, show_context => 1 }
                 );
+                print HIDE_CURSOR;
                 if ( ! defined $condition ) {
                     return;
                 }
@@ -353,6 +355,7 @@ sub __print_join_info {
     }
     my $tp = Term::TablePrint->new( $sf->{o}{table} );
     $tp->print_table( $aref, { keep_header => 0, tab_width => 3, grid => 1 } );
+    print HIDE_CURSOR;
 }
 
 

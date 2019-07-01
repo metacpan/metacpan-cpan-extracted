@@ -48,6 +48,6 @@
          "url" : "https://github.com/dk/IO-Lambda"
       }
    },
-   "version" : "1.29",
+   "version" : "1.30",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

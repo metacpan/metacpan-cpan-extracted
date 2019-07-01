@@ -1,6 +1,6 @@
 package MsgPack::RPC::Event::Write;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::RPC::Event::Write::VERSION = '2.0.2';
+$MsgPack::RPC::Event::Write::VERSION = '2.0.3';
 use Moose;
 
 extends 'Beam::Event';
@@ -37,7 +37,7 @@ MsgPack::RPC::Event::Write
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 AUTHOR
 

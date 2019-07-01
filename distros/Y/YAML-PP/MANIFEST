@@ -46,6 +46,7 @@ lib/YAML/PP/Schema.pm
 lib/YAML/PP/Schema/Binary.pm
 lib/YAML/PP/Schema/Core.pm
 lib/YAML/PP/Schema/Failsafe.pm
+lib/YAML/PP/Schema/Include.pm
 lib/YAML/PP/Schema/JSON.pm
 lib/YAML/PP/Schema/Merge.pm
 lib/YAML/PP/Schema/Perl.pm
@@ -88,6 +89,14 @@ t/45.binary.t
 t/46.line-endings.t
 t/47.header-footer.t
 t/48.merge.t
+t/49.include.t
+t/50.clone.t
+t/data/include/circular1.yaml
+t/data/include/circular2.yaml
+t/data/include/include.yaml
+t/data/include/include1.yaml
+t/data/include/include2.yaml
+t/data/include/include3.yaml
 t/data/simple.yaml
 t/invalid/i032/===
 t/invalid/i032/in.yaml

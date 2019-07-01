@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Logger::Syslog;
 use strict;
 use Sys::Syslog qw(:standard);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.5';
 
 sub new {
     my ( $class, $conf, %args ) = @_;
@@ -23,7 +23,8 @@ sub new {
             my $name = $_;
             $name = 'warning' if ( $_ eq 'warn' );
             $name = 'err'     if ( $_ eq 'error' );
-            eval qq'sub $_ {syslog("$name|".\$_[0]->{facility},\$_[1])}';
+            eval
+              qq'sub $_ {syslog("$name|".\$_[0]->{facility},"[$_] ". \$_[1])}';
             die $@ if ($@);
         }
         else {

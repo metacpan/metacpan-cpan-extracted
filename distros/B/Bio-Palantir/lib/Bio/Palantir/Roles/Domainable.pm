@@ -1,9 +1,10 @@
 package Bio::Palantir::Roles::Domainable;
 # ABSTRACT: Domainable Moose role for Domain and DomainPlus objects
-$Bio::Palantir::Roles::Domainable::VERSION = '0.191620';
+$Bio::Palantir::Roles::Domainable::VERSION = '0.191800';
 use Moose::Role;
 
 use autodie;
+
 
 requires qw(                   
     rank function chemistry
@@ -18,7 +19,7 @@ requires qw(
 
 has 'symbol' => (
     is       => 'ro',
-    isa      => 'Maybe[Str]',
+    isa      => 'Str',
     init_arg => undef,
     lazy     => 1,
     default  => sub {
@@ -29,18 +30,58 @@ has 'symbol' => (
         return 'na' unless $name;
 
         my $symbol = 
-        $name =~ m/^A$ | AMP-binding | A-OX/xms ? 'A' : 
-        $name =~ m/^PCP | PP-binding/xms ? 'PCP' : 
-        $name =~ m/^C$ | Condensation | ^X$ | Cglyc | Cter/xms ? 'C' :
-        $name =~ m/^E$ | Epimerization/xms ? 'E' :
-        $name =~ m/^H$ | Heterocyclization/xms ? 'H' :
-        $name =~ m/^TE$ | Thioesterase/xmsi ? 'Te' :
-        $name =~ m/^Red$ | ^TD$ /xmsi ? 'Red' : 
-        $name =~ m/Aminotran/xms ? 'Amt' :
-        $name =~ m/^PKS_/xms ? $name =~ s/PKS_//r :
-        $name;  # no need to reappoint domains like cMT, oMT, B, Hal,... 
+            $name =~ m/^A$ | AMP-binding | A-OX/xms 
+            ? 'A' 
+            : $name =~ m/^PCP | PP-binding/xms
+            ? 'PCP' 
+            : $name =~ m/^C$ | Condensation | ^X$ | Cglyc | Cter$/xms 
+            ? 'C' 
+            : $name =~ m/^E$ | Epimerization/xms 
+            ? 'E' 
+            : $name =~ m/^H$ | Heterocyclization/xms
+            ? 'H' 
+            : $name =~ m/^TE$ | Thioesterase/xmsi
+            ? 'Te' 
+            : $name =~ m/^Red$ | ^TD$ /xmsi
+            ? 'Red' 
+            : $name =~ m/Aminotran/xms
+            ? 'Amt' 
+            : $name =~ m/^PKS_/xms 
+            ? $name =~ s/PKS_//r 
+            : $name
+        ;  # no need to reappoint domains like cMT, oMT, B, Hal,... 
         
         return $symbol;
+    },
+);
+
+has 'class' => (
+    is       => 'ro',
+    isa      => 'Str',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub {
+        my $self = shift;
+        
+        my $name = $self->function;
+
+        return 'NA'
+            if $name eq 'NA';
+
+        my $class = 
+            $name =~ m/^A$ | AMP-binding | A-OX | Minowa | Khayatt | CAL | AT/xms
+            ? 'substrate-selection'
+            : $name =~ m/PCP | ACP$ | ACP_beta | PP-binding/xms
+            ? 'carrier-protein'
+            : $name =~ m/^C$ | Condensation | ^X$ | Cglyc | ^KS$ | _KS
+                | Heterocyclization | ^H$/xms
+            ? 'condensation'
+            : $name =~ m/Thioesterase | TE | Red | TD | Cter | NAD/xms
+            ? 'termination'
+            : 'tailoring/other'
+        ;
+
+        return $class;
     },
 );
     
@@ -58,7 +99,7 @@ Bio::Palantir::Roles::Domainable - Domainable Moose role for Domain and DomainPl
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

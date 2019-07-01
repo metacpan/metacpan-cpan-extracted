@@ -1,0 +1,2 @@
+TYPEMAP
+struct decode_ctx*  T_PTROBJ

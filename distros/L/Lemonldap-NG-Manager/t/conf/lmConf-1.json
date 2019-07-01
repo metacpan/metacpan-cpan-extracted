@@ -1,7 +1,6 @@
 {
   "applicationList": {
     "0001-cat": {
-      "catname": "Sample applications",
       "0002-app": {
         "options": {
           "description": "A simple application displaying authenticated user",
@@ -10,6 +9,7 @@
           "name": "Application Test 1",
           "uri": "http://test1.example.com/"
         },
+        "order": 2,
         "type": "application"
       },
       "0003-app": {
@@ -20,12 +20,14 @@
           "name": "Application Test 2",
           "uri": "http://test2.example.com/"
         },
+        "order": 3,
         "type": "application"
       },
+      "catname": "Sample applications",
+      "order": 1,
       "type": "category"
     },
     "0004-cat": {
-      "catname": "Administration",
       "0005-app": {
         "options": {
           "description": "Configure LemonLDAP::NG WebSSO",
@@ -34,6 +36,7 @@
           "name": "WebSSO Manager",
           "uri": "http://manager.example.com/"
         },
+        "order": 5,
         "type": "application"
       },
       "0006-app": {
@@ -44,6 +47,7 @@
           "name": "Notifications explorer",
           "uri": "http://manager.example.com/notifications"
         },
+        "order": 6,
         "type": "application"
       },
       "0007-app": {
@@ -54,12 +58,14 @@
           "name": "Sessions explorer",
           "uri": "http://manager.example.com/sessions"
         },
+        "order": 7,
         "type": "application"
       },
+      "catname": "Administration",
+      "order": 4,
       "type": "category"
     },
     "0008-cat": {
-      "catname": "Documentation",
       "0009-app": {
         "options": {
           "description": "Documentation supplied with LemonLDAP::NG",
@@ -68,6 +74,7 @@
           "name": "Local documentation",
           "uri": "http://manager.example.com/doc/"
         },
+        "order": 9,
         "type": "application"
       },
       "0010-app": {
@@ -78,8 +85,11 @@
           "name": "Official Website",
           "uri": "http://lemonldap-ng.org/"
         },
+        "order": 10,
         "type": "application"
       },
+      "catname": "Documentation",
+      "order": 8,
       "type": "category"
     }
   },
@@ -104,8 +114,7 @@
       "Auth-User": "$uid"
     }
   },
-  "exportedVars": {
-  },
+  "exportedVars": {},
   "globalStorage": "Apache::Session::File",
   "globalStorageOptions": {
     "Directory": "t/sessions",
@@ -132,11 +141,11 @@
     "_whatToTrace": "$_auth eq 'SAML' ? \"$_user\\@$_idpConfKey\" : \"$_user\""
   },
   "notification": 1,
-  "oldNotifFormat": 0,
   "notificationStorage": "File",
   "notificationStorageOptions": {
     "dirName": "t/notifications"
   },
+  "oldNotifFormat": 0,
   "passwordDB": "Demo",
   "persistentStorage": "Apache::Session::File",
   "persistentStorageOptions": {

@@ -1,6 +1,9 @@
 Revision history for Perl extension Test-Compile
 
-v2.1.0    2019-XX-XX
+v2.1.1    2019-07-01              (Evan Giles <egiles@cpan.org>)
+    - Correct the POD
+
+v2.1.0    2019-06-29              (Evan Giles <egiles@cpan.org>)
     - Update copyright
     - Add all_pm_files_ok() and all_pl_files_ok() methods to the internal class
 

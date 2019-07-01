@@ -182,13 +182,13 @@ sub print_sql {
         $str = $filled
     }
     $str .= "\n";
-    $str = line_fold( $str, term_width() - 2, '', ' ' x 4 );
+    $str = line_fold( $str, term_width() - 2, { init_tab => '', subseq => ' ' x 4 } );
     if ( defined wantarray ) {
         return $str;
     }
     print CLEAR_SCREEN;
     print $str;
-    #print line_fold( $str, term_width() - 2, '', ' ' x 4 );
+    #print line_fold( $str, term_width() - 2, { init_tab => '', subseq => ' ' x 4 } );
     if ( defined $waiting ) {
         local $| = 1;
         print HIDE_CURSOR;
@@ -242,6 +242,7 @@ sub alias {
         $alias = $tf->readline( $identifier,
             { info => $info }
         );
+        print HIDE_CURSOR;
     }
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;
@@ -336,14 +337,19 @@ sub print_error_message {
 }
 
 
-sub column_names_and_types {
+sub column_names_and_types { # db
     my ( $sf, $tables ) = @_;
     my ( $col_names, $col_types );
     for my $table ( @$tables ) {
-        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
-        $sth->execute() if $sf->{i}{driver} ne 'SQLite';
-        $col_names->{$table} ||= $sth->{NAME};
-        $col_types->{$table} ||= $sth->{TYPE};
+        if ( ! eval {
+            my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
+            $sth->execute() if $sf->{i}{driver} ne 'SQLite';
+            $col_names->{$table} ||= $sth->{NAME};
+            $col_types->{$table} ||= $sth->{TYPE};
+            1 }
+        ) {
+            $sf->print_error_message( $@, 'Column names and types' );
+        }
     }
     return $col_names, $col_types;
 }

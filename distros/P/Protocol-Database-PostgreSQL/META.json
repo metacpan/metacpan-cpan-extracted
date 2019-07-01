@@ -92,119 +92,119 @@
    "provides" : {
       "Protocol::Database::PostgreSQL" : {
          "file" : "lib/Protocol/Database/PostgreSQL.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::AuthenticationRequest" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/AuthenticationRequest.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::BackendKeyData" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/BackendKeyData.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::BindComplete" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/BindComplete.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::CloseComplete" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/CloseComplete.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::CommandComplete" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/CommandComplete.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::CopyBothResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/CopyBothResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::CopyData" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/CopyData.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::CopyDone" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/CopyDone.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::CopyInResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/CopyInResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::CopyOutResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/CopyOutResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::DataRow" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/DataRow.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::EmptyQueryResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/EmptyQueryResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::ErrorResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/ErrorResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::FunctionCallResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/FunctionCallResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::NoData" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/NoData.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::NoticeResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/NoticeResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::NotificationResponse" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/NotificationResponse.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::ParameterDescription" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/ParameterDescription.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::ParameterStatus" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/ParameterStatus.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::ParseComplete" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/ParseComplete.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::PortalSuspended" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/PortalSuspended.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::ReadyForQuery" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/ReadyForQuery.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Backend::RowDescription" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Backend/RowDescription.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Client" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Client.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Constants" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Constants.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Error" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Error.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "Protocol::Database::PostgreSQL::Message" : {
          "file" : "lib/Protocol/Database/PostgreSQL/Message.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       }
    },
    "release_status" : "stable",
@@ -219,9 +219,9 @@
          "web" : "https://github.com/team-at-cpan/Protocol-Database-PostgreSQL"
       }
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_authority" : "cpan:TEAM",
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

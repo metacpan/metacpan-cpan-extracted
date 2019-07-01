@@ -19,16 +19,25 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "perl" : "v5.22.0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "DateTime" : "0",
+            "File::Find::Rule" : "0",
             "File::Slurp" : "0",
-            "Getopt::Args" : "0",
             "IO::Prompt::Simple" : "0",
+            "Module::Installed::Tiny" : "0",
+            "Module::Load" : "0",
+            "OptArgs" : "0",
             "Template" : "0",
             "Text::Levenshtein::XS" : "0",
             "feature" : "0",
-            "perl" : "v5.22.0",
+            "perl" : "v5.12.0",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -36,20 +45,21 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Script" : "1.10",
+            "perl" : "v5.12.0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/borisdaeppen/School-Code-Compare",
+      "homepage" : "https://gitlab.com/borisdaeppen/School-Code-Compare",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/borisdaeppen/School-Code-Compare.git",
-         "web" : "https://github.com/borisdaeppen/School-Code-Compare"
+         "web" : "https://gitlab.com/borisdaeppen/School-Code-Compare"
       }
    },
-   "version" : "0.007",
+   "version" : "0.101",
    "x_generated_by_perl" : "v5.22.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

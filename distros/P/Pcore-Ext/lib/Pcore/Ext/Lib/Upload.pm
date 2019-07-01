@@ -295,7 +295,7 @@ JS
             upload.cancelButton = progressCmp.add({
                 xtype: 'button',
                 iconCls: '$FAS_TIMES',
-                handler: function() {upload.cancel()},
+                handler: function() {upload.cancel();},
                 tooltip: $l10n{'Cancel upload'},
             });
 

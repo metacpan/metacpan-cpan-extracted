@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2;
+plan tests => 5;
 
 my @module_files = (
-    'MongoDBx/Queue.pm'
+    'MongoDBx/Queue.pm',
+    'MongoDBx/Queue/Role/_CommonOptions.pm',
+    'MongoDBx/Queue/_V1.pm',
+    'MongoDBx/Queue/_V2.pm'
 );
 
 

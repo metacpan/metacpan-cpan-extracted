@@ -44,6 +44,12 @@ sub EXT_override_grid_PagingToolbar : Override('Ext.grid.PagingToolbar') {
     };
 }
 
+sub EXT_override_field_Display : Override('Ext.field.Display') {
+    return {    #
+        defaultBindProperty => 'value',
+    };
+}
+
 1;
 __END__
 =pod

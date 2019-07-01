@@ -1026,6 +1026,33 @@ sub test_insertRows_values : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_insertMulti : Test(1) {
+    my $self = shift;
+
+    my $db = $self->get('db');
+
+    $db->begin;
+
+    $db->insertMulti($PersonTable,
+        [qw/per_id per_vorname per_nachname/],[
+            [qw/100 Frank Seitz/],
+            [qw/101 Hanno Seitz/],
+            [qw/102 Linus Seitz/],
+        ]
+    );
+
+    my @rows = $db->select(
+        -from => $PersonTable,
+        -where => 'per_id >= 100',
+        -raw => 1,
+    );
+    $self->is(scalar(@rows),3);
+
+    $db->rollback;
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_update : Ignore(2) {
     my $self = shift;
 

@@ -3,16 +3,23 @@ use warnings;
 use Test::More;
 use Capture::Tiny qw/capture/;
 use JSON qw/encode_json/;
+use Encode qw//;
 
 use App::jl;
 
 sub jl_test {
-    my ($name, $src_json, $opt) = @_;
+    my ($name, $src_json, $opt, $test_ref, $do_note) = @_;
 
-    note $name;
-    note(
-        App::jl->new($opt ? @{$opt} : ())->process($src_json)
-    );
+    my $jl = App::jl->new($opt ? @{$opt} : ());
+    $jl->{__current_orig_line} = $src_json;
+    my $output = $jl->_run_line;
+
+    note $name  if $do_note;
+    note $output if $do_note;
+
+    if (ref $test_ref eq 'CODE') {
+        $test_ref->($output, $src_json);
+    }
 }
 
 my $JSON = encode_json({
@@ -27,34 +34,75 @@ my $JSON = encode_json({
 
 note $JSON;
 
-jl_test('BASIC', $JSON);
+jl_test('BASIC', $JSON, [], sub {
+    my ($output, $src) = @_;
 
-jl_test('NOT_JSON', 'aikoの詩。');
+    ok $output =~ m!foo!;
+});
 
-jl_test('SORT_KEYS', encode_json({ z => 1, b => 1, a => 1 }));
+{
+    my $like_json_not_json = '{"not":"JSON"';
+    jl_test('LIKE_JSON_NOT_JSON', $like_json_not_json, [], sub {
+        my ($output, $src) = @_;
 
-jl_test('JA', encode_json({ aiko => '詩' }));
+        is $output, $like_json_not_json;
+    });
+}
 
-jl_test('NO_PRETTY', $JSON, ['--no-pretty']);
+jl_test('SORT_KEYS', encode_json({ z => 1, b => 1, a => 1 }), [], sub {
+    my ($output, $src) = @_;
 
-jl_test('DEPTH', $JSON, ['--depth', '1']);
+    ok $output =~ m!a.*b.*z!sm;
+});
+
+jl_test('JA', encode_json({ aiko => '詩' }), [], sub {
+    my ($output, $src) = @_;
+
+    my $s = Encode::encode('utf8', '詩');
+
+    ok $output =~ m!"aiko"\s*:\s*"$s"!;
+});
+
+jl_test('NO_PRETTY', $JSON, ['--no-pretty'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!foo.*bar.*baz.*hoge!;
+});
+
+jl_test('DEPTH', $JSON, ['--depth', '1'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!\\"baz\\"!;
+});
 
 {
     my $src_json = encode_json({ foo => 'bar' });
     my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51]\t[warn]\t$src_json\n| });
-    jl_test('X', $json_in_log, ['-x']);
+    jl_test('X', $json_in_log, ['-x'], sub {
+        my ($output, $src) = @_;
+
+        ok $output =~ m!\Q"[warn]",!;
+    });
 }
 
 {
     my $src_json = encode_json({ foo => 'bar' });
     my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] foo, bar, baz \n$src_json\n| });
-    jl_test('XX', $json_in_log, ['-xx']);
+    jl_test('XX', $json_in_log, ['-xx'], sub {
+        my ($output, $src) = @_;
+
+        ok $output =~ m!"bar",! && $output =~ m!"baz"! && $output =~ m!"foo"\s*:\s*"bar"!;
+    });
 }
 
 {
     my $src_json = encode_json({ foo => 'bar' });
     my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51](warn)<server> \n$src_json\n| });
-    jl_test('XXX', $json_in_log, ['-xxx']);
+    jl_test('XXX', $json_in_log, ['-xxx'], sub {
+        my ($output, $src) = @_;
+
+        ok $output =~ m!"\Q(warn)"! && $output =~ m!"<server>"! && $output =~ m!"foo"\s*:\s*"bar"!;
+    });
 }
 
 {
@@ -68,8 +116,18 @@ jl_test('DEPTH', $JSON, ['--depth', '1']);
         { ts         => 1560026367 },
     ]);
     my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51] (warn) <server>\n$src_json\n| });
-    jl_test('XXXX', $json_in_log, ['-xxxx', '--timestamp-key', 'ts']);
+    jl_test('XXXX', $json_in_log, ['-xxxx', '--timestamp-key', 'ts'], sub {
+        my ($output, $src) = @_;
+
+        ok $output =~ m!"\Q(warn)"! && $output =~ m!"<server>"! && $output !~ m!1560026367!;
+    });
 }
+
+jl_test('NO_CONTENT_LINE', "\t \r\n\t\n", [], sub {
+    my ($output, $src) = @_;
+
+    is $output, undef;
+});
 
 STDIN: {
     open my $IN, '<', \$JSON;
@@ -78,8 +136,11 @@ STDIN: {
         App::jl->new->run;
     };
     close $IN;
-    note 'STDIN';
-    note $stdout;
+    ok $stdout !~ m!\\!;
+    if (0) {
+        note 'STDIN';
+        note $stdout;
+    }
 }
 
 STDERR: {
@@ -89,12 +150,16 @@ STDERR: {
         App::jl->new('--stderr')->run;
     };
     close $IN;
-    note 'STDERR';
     is $stdout, '';
     ok $stderr;
+    if (0) {
+        note 'STDERR';
+        note $stdout;
+        note $stderr;
+    }
 }
 
-STDIN_WITH_NOT_JSON: {
+STDIN_NOT_JSON: {
     my $str = 'aikoの詩。';
     open my $IN, '<', \$str;
     local *STDIN = *$IN;
@@ -102,63 +167,148 @@ STDIN_WITH_NOT_JSON: {
         App::jl->new->run;
     };
     close $IN;
-    note 'NOT JSON';
-    note $stdout;
     is $stdout, $str;
+    if (0) {
+        note 'NOT JSON';
+        note $stdout;
+    }
 }
 
-GREP: {
-    open my $IN, '<', \$JSON;
+STDIN_SWEEP: {
+    my $str = 'aikoの詩。';
+    open my $IN, '<', \$str;
     local *STDIN = *$IN;
     my ($stdout, $stderr) = capture {
-        App::jl->new('--grep', 'baz')->run;
+        App::jl->new('--sweep')->run;
     };
     close $IN;
-    note 'GREP';
-    ok $stdout;
+    is $stdout, '';
+    if (0) {
+        note 'SWEEP';
+        note $stdout;
+    }
 }
 
-IGNORE: {
-    open my $IN, '<', \$JSON;
-    local *STDIN = *$IN;
-    my ($stdout, $stderr) = capture {
-        App::jl->new('--ignore', 'baz')->run;
-    };
-    close $IN;
-    note 'IGNORE';
-    ok !$stdout;
-}
+jl_test('GREP', $JSON, ['--grep', 'baz'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!baz!;
+});
+
+jl_test('GREP_MULTI', $JSON, ['--grep', 'baz', '--grep', 'no_match_cond'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!baz!;
+});
+
+jl_test('GREP_MULTI2', $JSON, ['--grep', 'baz', '--grep', 'bar'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!baz!;
+});
+
+jl_test('GREP_NO_MATCH', $JSON, ['--grep', 'no match'], sub {
+    my ($output, $src) = @_;
+
+    is $output, undef;
+});
+
+jl_test('IGNORE', $JSON, ['--ignore', 'baz'], sub {
+    my ($output, $src) = @_;
+
+    is $output, undef;
+});
+
+jl_test('IGNORE_MULTI', $JSON, ['--ignore', 'baz', '--ignore', 'bar'], sub {
+    my ($output, $src) = @_;
+
+    is $output, undef;
+});
+
+jl_test('IGNORE_BUT_SHOW', $JSON, ['--ignore', 'baz', '--ignore', 'no_match_cond'], sub {
+    my ($output, $src) = @_;
+
+    is $output, undef;
+});
 
 {
     my $src_json = encode_json([
         { created => 1560026367 },
     ]);
     my $json_in_log = encode_json({ message => qq|[info]\n$src_json\n| });
-    jl_test('GMTIME', $json_in_log, ['-xxxx', '--gmtime']);
+    jl_test('GMTIME', $json_in_log, ['-xxxx', '--gmtime'], sub {
+        my ($output, $src) = @_;
+
+        ok $output =~ m!2019-06-!;
+    });
 }
 
-jl_test('TRIM', encode_json({ message => qq|  info\tfoo\tbar\tbaz  | }), ['-x']);
+jl_test('TRIM', encode_json({ message => qq|  info\tfoo\tbar\tbaz  | }), ['-x'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!"info! && $output =~ m!baz"!;
+});
 
 {
     my $json = encode_json({
         service => 'Foo-Service',
         message => encode_json({
-            timestamp => time(),
+            timestamp => 1560026367,
             log => "[PID:12345]<info>\nThis is log message. foo, bar, baz, qux, long message is going to be splitted nicely to treat JSON by jq without any special function",
         }),
         pod     => 'bar-baz-12345',
     });
-    jl_test('LONG', $json, ['-xxxx']);
+    jl_test('LONG', $json, ['-xxxx'], sub {
+        my ($output, $src) = @_;
+
+        ok $output =~ m!\Q[PID:12345]! && $output =~ m!"<info>"! && $output =~ m!"bar"! && $output =~ m!2019-06-!;
+    });
 }
 
-jl_test('YAML', $JSON, ['-yaml']);
+jl_test('YAML', $JSON, ['-yaml'], sub {
+    my ($output, $src) = @_;
+
+    ok $output =~ m!foo:!;
+});
 
 {
     my $src_json = encode_json([
         { created => 946684800 },
     ]);
     my $json_in_log = encode_json({ message => qq|[info]\n$src_json\n| });
-    jl_test('XXXXX', $json_in_log, ['-xxxxx']);
+    jl_test('XXXXX', $json_in_log, ['-xxxxx'], sub {
+        my ($output, $src) = @_;
+
+        ok $output =~ m!\Q[info]! && $output !~ m!946684800!;
+    });
 }
+
+jl_test('UA', encode_json({
+    'user agent' => "L\nF",
+    'user-agent' => "L\nF",
+    user_agent => "L\nF",
+    userAgent => "L\nF",
+    UserAgent => "L\nF",
+}), ['-x'], sub {
+    my ($output, $src) = @_;
+
+    ok $output !~ m!"L"!;
+});
+
+jl_test('UA-COMMA', encode_json({
+    useragent => "L, F",
+}), ['-xx'], sub {
+    my ($output, $src) = @_;
+
+    ok $output !~ m!"L"!;
+});
+
+jl_test('UA-LABEL', encode_json({
+    useragent => "foo [bar] baz",
+}), ['-xxx'], sub {
+    my ($output, $src) = @_;
+
+    ok $output !~ m!"foo"!;
+});
 
 done_testing;

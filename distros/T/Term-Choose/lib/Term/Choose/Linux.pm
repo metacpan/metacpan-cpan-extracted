@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.648';
+our $VERSION = '1.649';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -176,6 +176,9 @@ sub __set_mode {
     my ( $self, $config ) = @_;
     $self->{mouse}       = $config->{mouse};        # so options passed with $config are
     $self->{hide_cursor} = $config->{hide_cursor};  # also available in __reset_mode
+    if ( $self->{hide_cursor} ) {
+        print HIDE_CURSOR;
+    }
     my $mode_stty;
     if ( ! $config->{mode} ) {
         die "No mode!";
@@ -231,18 +234,12 @@ sub __set_mode {
             }
         }
     }
-    if ( $self->{hide_cursor} ) {
-        print HIDE_CURSOR;
-    }
     return $self->{mouse};
 };
 
 
 sub __reset_mode {
     my ( $self ) = @_;
-    if ( $self->{hide_cursor} ) {
-        print SHOW_CURSOR;
-    }
     if ( $self->{mouse} ) {
         binmode STDIN, ':encoding(UTF-8)' or warn "binmode STDIN, :encoding(UTF-8): $!\n";
         print UNSET_EXT_MODE_MOUSE_1005     if $self->{mouse} == 3;
@@ -260,6 +257,9 @@ sub __reset_mode {
         else {
             system( "stty sane" ) == 0 or die $?;
         }
+    }
+    if ( $self->{hide_cursor} ) {
+        print SHOW_CURSOR;
     }
 }
 

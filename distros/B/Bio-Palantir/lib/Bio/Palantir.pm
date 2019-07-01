@@ -1,7 +1,7 @@
 package Bio::Palantir;
-# ABSTRACT: core classes and utilities for Bio::Palantir CONTRIBUTOR: Denis
-# BAURAIN <denis.baurain@uliege.be>
-$Bio::Palantir::VERSION = '0.191620';
+# ABSTRACT: core classes and utilities for Bio::Palantir 
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
+$Bio::Palantir::VERSION = '0.191800';
 use strict; use warnings;
 
 use Bio::Palantir::Parser; use Bio::Palantir::Refiner; use
@@ -15,11 +15,11 @@ __END__
 
 =head1 NAME
 
-Bio::Palantir - core classes and utilities for Bio::Palantir CONTRIBUTOR: Denis
+Bio::Palantir - core classes and utilities for Bio::Palantir 
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 
@@ -200,6 +200,12 @@ downstream analyses)
 =head1 AUTHOR
 
 Loic MEUNIER <lmeunier@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

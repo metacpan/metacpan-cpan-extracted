@@ -1,6 +1,6 @@
 package School::Code::Compare::Out::Template::Path;
 # ABSTRACT: pseudo class to help locating the path of the template files
-$School::Code::Compare::Out::Template::Path::VERSION = '0.007';
+$School::Code::Compare::Out::Template::Path::VERSION = '0.101';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ School::Code::Compare::Out::Template::Path - pseudo class to help locating the p
 
 =head1 VERSION
 
-version 0.007
+version 0.101
 
 =head1 AUTHOR
 

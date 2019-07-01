@@ -167,6 +167,8 @@ count(1);
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' );
 count(1);
+
+diag 'Waiting';
 sleep 1;
 
 ## Sixth failed connection -> Rejected
@@ -184,6 +186,8 @@ count(1);
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' );
 count(1);
+
+diag 'Waiting';
 sleep 2;
 
 ## Sixth successful connection -> Rejected
@@ -201,6 +205,8 @@ count(1);
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' );
 count(1);
+
+diag 'Waiting';
 sleep 3;
 
 ## Seventh successful connection -> Accepted

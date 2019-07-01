@@ -11,10 +11,12 @@ use File::Spec::Functions qw( catfile );
 use FindBin               qw( $RealBin $RealScript );
 #use Pod::Usage            qw( pod2usage ); # required
 
-use Encode::Locale     qw();
-use Term::Choose       qw();
-use Term::Choose::Util qw( insert_sep print_hash choose_a_number choose_a_subset settings_menu choose_a_dir );
-use Term::Form         qw();
+use Encode::Locale qw();
+
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( insert_sep choose_a_number choose_a_subset settings_menu choose_a_dir );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Opt::DBSet;
@@ -225,18 +227,13 @@ sub set_options {
                 Pod::Usage::pod2usage( { -exitval => 'NOEXIT', -verbose => 2 } );
             }
             elsif ( $opt eq 'path' ) {
-                my $key_version = 'version';
-                my $key_bin     = '  bin  ';
-                my $key_app_dir = 'app-dir';
                 my $app_dir = $sf->{i}{app_dir};
                 eval { $app_dir = decode( 'locale', $app_dir ) };
-                my $path = {
-                    $key_version => $main::VERSION,
-                    $key_bin     => catfile( $RealBin, $RealScript ),
-                    $key_app_dir => $app_dir,
-                };
-                my $opts = [ $key_version, $key_bin, $key_app_dir ];
-                print_hash( $path, { keys => $opts, preface => ' Close with ENTER', clear_screen => 1 } );
+                my $info = 'db-browser:'                                  . "\n";
+                $info .= '  version  ' . $main::VERSION                   . "\n";
+                $info .= '  path     ' . catfile( $RealBin, $RealScript ) . "\n";
+                $info .= '  app-dir  ' . $app_dir;
+                $tc->choose( [ '<<' ], { prompt => $info, color => 1 } );
             }
             elsif ( $opt eq '_db_defaults' ) {
                 my $odb = App::DBBrowser::Opt::DBSet->new( $sf->{i}, $sf->{o} );
@@ -598,6 +595,7 @@ sub __group_readline {
         $list,
         { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
+    print HIDE_CURSOR;
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {
             $sf->{o}{$section}{$items->[$i]{name}} = $new_list->[$i][1];

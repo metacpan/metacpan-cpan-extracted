@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Dumper;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use Scalar::Util qw/ blessed refaddr reftype /;
 use YAML::PP;
@@ -49,6 +49,20 @@ sub new {
         footer => $footer,
     }, $class;
     return $self;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $clone = {
+        representer => $self->representer->clone,
+        emitter => $self->emitter->clone,
+        seen => {},
+        anchors => {},
+        anchor_num => 0,
+        header => $self->header,
+        footer => $self->footer,
+    };
+    return bless $clone, ref $self;
 }
 
 sub init {

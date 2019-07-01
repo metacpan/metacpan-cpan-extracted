@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Loader;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use YAML::PP::Parser;
 use YAML::PP::Constructor;
@@ -17,11 +17,18 @@ sub new {
         boolean => 'perl',
     );
 
-    my $parser = delete $args{parser} || YAML::PP::Parser->new;
     my $constructor = delete $args{constructor} || YAML::PP::Constructor->new(
         schema => $schema,
         cyclic_refs => $cyclic_refs,
     );
+    my $parser = delete $args{parser};
+    unless ($parser) {
+        $parser = YAML::PP::Parser->new;
+    }
+    unless ($parser->receiver) {
+        $parser->set_receiver($constructor);
+    }
+
     if (keys %args) {
         die "Unexpected arguments: " . join ', ', sort keys %args;
     }
@@ -29,12 +36,31 @@ sub new {
         parser => $parser,
         constructor => $constructor,
     }, $class;
-    $parser->set_receiver($constructor);
     return $self;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $clone = {
+        parser => $self->parser->clone,
+        constructor => $self->constructor->clone,
+    };
+    bless $clone, ref $self;
+    $clone->parser->set_receiver($clone->constructor);
+    return $clone;
 }
 
 sub parser { return $_[0]->{parser} }
 sub constructor { return $_[0]->{constructor} }
+
+sub filename {
+    my ($self) = @_;
+    my $reader = $self->parser->reader;
+    if ($reader->isa('YAML::PP::Reader::File')) {
+        return $reader->input;
+    }
+    die "Reader is not a YAML::PP::Reader::File";
+}
 
 sub load_string {
     my ($self, $yaml) = @_;

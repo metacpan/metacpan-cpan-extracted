@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/parse_date
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-01-29'; # DATE
+our $DATE = '2019-06-19'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.120'; # VERSION
+our $VERSION = '0.121'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ parse-date - Parse date string(s) using one of several modules
 
 =head1 VERSION
 
-This document describes version 0.120 of parse-date (from Perl distribution App-DateUtils), released on 2019-01-29.
+This document describes version 0.121 of parse-date (from Perl distribution App-DateUtils), released on 2019-06-19.
 
 =head1 SYNOPSIS
 
@@ -52,8 +52,8 @@ Examples:
  | module                     | original    | is_parseable | as_epoch   | as_datetime_obj     | error_msg                                                                                                                    |
  +----------------------------+-------------+--------------+------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+
  | DateTime::Format::Flexible | 23 sep 2015 | 1            | 1442966400 | 2015-09-23T00:00:00 |                                                                                                                              |
- | DateTime::Format::Flexible | tomorrow    | 1            | 1548806400 | 2019-01-30T00:00:00 |                                                                                                                              |
- | DateTime::Format::Flexible | foo         | 0            |            |                     | Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Perinci/CmdLine/POD.pm line 480.  |
+ | DateTime::Format::Flexible | tomorrow    | 1            | 1560988800 | 2019-06-20T00:00:00 |                                                                                                                              |
+ | DateTime::Format::Flexible | foo         | 0            |            |                     | Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/CmdLine/POD.pm line 480.  |
  +----------------------------+-------------+--------------+------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+
 
 =head1 OPTIONS

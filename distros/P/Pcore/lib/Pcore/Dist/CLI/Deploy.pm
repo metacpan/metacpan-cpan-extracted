@@ -8,8 +8,8 @@ sub CLI ($self) {
     return {
         abstract => 'deploy distribution',
         opt      => {
-            all        => { desc => 'implies --develop, --recommends and --suggeests', },
-            install    => { desc => 'install bin/ to PATH and lib/ to PERL5LIB', },
+            all        => { desc => 'implies --devel, --recommends and --suggeests', },
+            install    => { desc => 'install "bin" to $PATH and "lib" to $PERL5LIB', },
             devel      => { desc => 'cpanm --with-develop', },
             recommends => { desc => 'cpanm --with-recommends', },
             suggests   => { desc => 'cpanm --with-suggests', },
@@ -27,6 +27,16 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    1 | 12                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

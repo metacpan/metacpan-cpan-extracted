@@ -587,7 +587,7 @@ sub limit_offset {
             $ax->print_sql( $sql );
             # Choose_a_number
             my $limit = choose_a_number( $digits,
-                { name => 'LIMIT: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
+                { name => 'LIMIT: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0, hide_cursor => 0 }
             );
             if ( ! defined $limit ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
@@ -605,7 +605,7 @@ sub limit_offset {
             $ax->print_sql( $sql );
             # Choose_a_number
             my $offset = choose_a_number( $digits,
-                { name => 'OFFSET: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
+                { name => 'OFFSET: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0, hide_cursor => 0 }
             );
             if ( ! defined $offset ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};

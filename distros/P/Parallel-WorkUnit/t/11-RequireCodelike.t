@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2018 Joelle Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -31,54 +31,37 @@ alarm 120;    # It would be nice if we did this a better way, since
 my $wu = Parallel::WorkUnit->new();
 ok( defined($wu), "Constructer returned object" );
 
-like(
-    dies { $wu->queue( 1 ); },
-    qr/is not a code/,
-    "queue() dies when passed an integer",
-);
-like(
-    dies { $wu->async( 1 ); },
-    qr/is not a code/,
-    "async() dies when passed an integer",
-);
+like( dies { $wu->queue(1); }, qr/is not a code/, "queue() dies when passed an integer", );
+like( dies { $wu->async(1); }, qr/is not a code/, "async() dies when passed an integer", );
 
 #
 # Things that should work:
 
-ok(
-    lives { $wu->queue( \&testfunc ); },
-    "queue() lives when passed an function ref",
-);
-ok(
-    lives { $wu->async( \&testfunc ); },
-    "async() lives when passed an function ref",
-);
+ok( lives { $wu->queue( \&testfunc ); }, "queue() lives when passed an function ref", );
+ok( lives { $wu->async( \&testfunc ); }, "async() lives when passed an function ref", );
 
 ok(
-    lives { $wu->queue( sub { return 42*42; } ); },
+    lives {
+        $wu->queue( sub { return 42 * 42; } );
+    },
     "queue() lives when passed an code ref",
 );
 ok(
-    lives { $wu->async( sub { return 42*42; } ); },
+    lives {
+        $wu->async( sub { return 42 * 42; } );
+    },
     "async() lives when passed an code ref",
 );
 
 my $codelike = Parallel::WorkUnit::Test::Overload->new();
-is($codelike->(), 42, "Object overloaded properly");
+is( $codelike->(), 42, "Object overloaded properly" );
 
-ok(
-    lives { $wu->queue( $codelike ); },
-    "queue() lives when passed an overloaded code-like thingy",
-);
-ok(
-    lives { $wu->async( $codelike ); },
-    "async() lives when passed an overloaded code-like thingy",
-);
+ok( lives { $wu->queue($codelike); }, "queue() lives when passed an overloaded code-like thingy", );
+ok( lives { $wu->async($codelike); }, "async() lives when passed an overloaded code-like thingy", );
 
 $wu->waitall();
 
 done_testing();
-
 
 sub testfunc() {
     return -42;

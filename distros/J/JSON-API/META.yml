@@ -21,7 +21,7 @@ name: JSON-API
 provides:
   JSON::API:
     file: lib/JSON/API.pm
-    version: v1.1.0
+    version: v1.1.1
 requires:
   JSON: '0'
   LWP::UserAgent: '0'
@@ -31,5 +31,5 @@ resources:
   homepage: https://github.com/geofffranks/json-api
   license: http://dev.perl.org/licenses/
   repository: git://github.com/geofffranks/json-api.git
-version: v1.1.0
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -33,6 +33,7 @@ expectOK($res);
 my $id1 = expectCookie($res);
 count(1);
 
+diag 'Waiting';
 sleep 3;
 
 ok(
@@ -48,6 +49,7 @@ ok( $res->[2]->[0] =~ qr%<span trspan="yourApps">Your applications</span>%,
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
+diag 'Waiting';
 sleep 5;
 
 ok(

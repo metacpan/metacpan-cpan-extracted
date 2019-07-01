@@ -18,7 +18,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 # e.g., http://fixedincome.fidelity.com/fi/FIIndividualBondsSearch?cusip=912810QT8
 # This URL should really be "https://fixedincome.fidelity.com/", but that host name

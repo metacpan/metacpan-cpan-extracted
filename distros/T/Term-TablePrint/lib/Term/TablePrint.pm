@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -122,7 +122,6 @@ sub __set_defaults {
 
 sub __reset {
     my ( $self ) = @_;
-    print SHOW_CURSOR;
     if ( exists $self->{backup_opt} ) {
         my $backup_opt = $self->{backup_opt};
         for my $key ( keys %$self ) {
@@ -137,6 +136,7 @@ sub __reset {
             }
         }
     }
+    print SHOW_CURSOR;
 }
 
 
@@ -158,7 +158,7 @@ sub print_table {
     if ( ! @$table_ref ) {
         choose(
             [ 'Close with ENTER' ],
-            { prompt => "'print_table': empty table without header row!" }
+            { prompt => "'print_table': empty table without header row!", hide_cursor => 0 }
         );
         $self->__reset();
         return;
@@ -216,7 +216,7 @@ sub __recursive_code {
     if ( ! defined $w_cols ) {
         return;
     }
-    my $list = $self->__cols_to_string( $w_cols );
+    my $list = $self->__cols_to_string( $w_cols ); # $self->{table_copy} is now $list
     my $table_w = sum( @$w_cols, $self->{tab_w} * $#{$w_cols} );
     my @header;
     if ( length $self->{prompt} ) {
@@ -230,6 +230,7 @@ sub __recursive_code {
     }
     else {
         splice( @$list, 1, 0, $self->__header_sep( $w_cols ) ) if $self->{grid};
+        unshift( @$list, $self->__header_sep( $w_cols ) )      if $self->{grid} == 2;
     }
     if ( $self->{info_row} ) {
         if ( print_columns( $self->{info_row} ) > $table_w ) {
@@ -308,9 +309,26 @@ sub __recursive_code {
                 $row++;
             }
             else {
-                if ( $self->{grid} ) {
-                    next   if $row == 1;
-                    $row-- if $row > 1;
+                if ( $self->{grid} == 1 ) {
+                    if ( $row == 1 ) {
+                        # $row = 0;
+                        next;
+                    }
+                    if ( $row > 1 ) {
+                        $row--;
+                    }
+                }
+                elsif ( $self->{grid} == 2 ) {
+                    if ( $row == 0 || $row  == 2 ) {
+                        #$row = 1;
+                        next;
+                    }
+                    if ( $row == 1 ) {
+                        $row--;
+                    }
+                    else {
+                        $row -= 2;
+                    }
                 }
             }
             $self->__print_single_row( $row, $self->{longest_col_name} + 1 );
@@ -546,7 +564,7 @@ sub __cols_to_string {
             else {
                 $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col] );
             }
-            if ( $self->{color} && defined $self->{orig_table}[$row][$col] ) { ##
+            if ( $self->{color} && defined $self->{orig_table}[$row][$col] ) {
                 my @color = $self->{orig_table}[$row][$col] =~ /(\e\[[\d;]*m)/msg;
                 $str =~ s/\x{feff}/shift @color/ge;
                 $str = $str . $color[-1] if @color;
@@ -565,7 +583,7 @@ sub __cols_to_string {
     if ( $self->{progress}{type} ) {                              #
         $self->{progress}->last_update_progress_bar( $count );    #
     }                                                             #
-    return $self->{table_copy}; # now $list
+    return $self->{table_copy};
 }
 
 
@@ -639,7 +657,7 @@ sub __print_single_row {
         if ( ref $value ) {
             $value = _handle_reference( $value );
         }
-        for my $line ( split /\n+/, line_fold( $value, $col_max, '', '' ) ) {
+        for my $line ( split /\n+/, line_fold( $value, $col_max ) ) {
             push @{$row_data}, sprintf "%*.*s%*s%s", $len_key, $len_key, $key, $len_sep, $copy_sep, $line;
             $key      = '' if $key;
             $copy_sep = '' if $copy_sep;
@@ -712,7 +730,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.111
+Version 0.112
 
 =cut
 
@@ -914,16 +932,32 @@ Default: 0
 
 =head3 grid
 
-If enabled, columns are separated from each other with lines and the header row is separated with a line from the rest
-of the table.
+If I<grid> is set to 0, the table is shown with no grid.
+
+If I<grid> is set to 1, lines separate the columns from each other and the header from the body.
+
+    .----------------------------.
+    |col1 | col2   | col3 | col3 |
+    |-----|--------|------|------|
+    |.... | ...... | .... | .... |
+    |.... | ...... | .... | .... |
+    |.... | ...... | .... | .... |
+    |.... | ...... | .... | .... |
+    |.... | ...... | .... | .... |
+    |.... | ...... | .... | .... |
+    |.... | ...... | .... | .... |
+    |.... | ...... | .... | .... |
+    '----------------------------'
+
+I<grid> set to 2 is like I<grid> set to 1 plus a separator line on top of the header row.
 
 Default: 1
 
-=head3 keep_header
+=head3 keep-header
 
-If I<keep_header> is set to 1, the table header is shown on top of each page.
+If I<keep-header> is set to 0, the table header is shown on top of the first page.
 
-If I<keep_header> is set to 0, the table header is shown on top of the first page.
+If I<keep-header> is set to 1, the table header is shown on top of each page.
 
 Default: 1
 

@@ -1,5 +1,5 @@
 This archive contains the distribution DBIx-Class-InflateColumn-Authen-Passphrase,
-version 0.02:
+version 0.03:
 
   Inflate/deflate columns to Authen::Passphrase instances
 

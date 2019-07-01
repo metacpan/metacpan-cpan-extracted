@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::OtherSessions';
@@ -15,10 +15,10 @@ sub init { 1 }
 
 sub run {
     my ( $self, $req ) = @_;
-    my $deleted       = [];
-    my $otherSessions = [];
-
-    my $moduleOptions = $self->conf->{globalStorageOptions} || {};
+    my $deleted         = [];
+    my $otherSessions   = [];
+    my $linkedSessionId = '';
+    my $moduleOptions   = $self->conf->{globalStorageOptions} || {};
     $moduleOptions->{backend} = $self->conf->{globalStorage};
 
     my $sessions = $self->module->searchOn(
@@ -26,8 +26,20 @@ sub run {
         $self->conf->{whatToTrace},
         $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
     );
+
+    if ( $self->conf->{securedCookie} == 2 ) {
+        $self->logger->debug("Looking for double sessions...");
+        $linkedSessionId = $sessions->{ $req->id }->{_httpSession};
+        my $msg =
+          $linkedSessionId
+          ? "Linked session found -> $linkedSessionId / " . $req->id
+          : "NO linked session found!";
+        $self->logger->debug($msg);
+    }
+
     foreach my $id ( keys %$sessions ) {
         next if ( $req->id eq $id );
+        next if ( $linkedSessionId and $id eq $linkedSessionId );
         my $session = $self->p->getApacheSession($id) or next;
         if (
             $self->conf->{singleSession}
@@ -57,10 +69,12 @@ sub run {
             }
         }
     }
-    $req->info( $self->p->mkSessionArray( $deleted, 'sessionsDeleted', 1 ) )
+    $req->info(
+        $self->p->mkSessionArray( $req, $deleted, 'sessionsDeleted', 1 ) )
       if ( $self->conf->{notifyDeleted} and @$deleted );
-    $req->info( $self->p->mkSessionArray( $otherSessions, 'otherSessions', 1 )
-          . $self->_mkRemoveOtherLink() )
+    $req->info(
+            $self->p->mkSessionArray( $req, $otherSessions, 'otherSessions', 1 )
+          . $self->_mkRemoveOtherLink($req) )
       if ( $self->conf->{notifyOther} and @$otherSessions );
 
     PE_OK;
@@ -70,10 +84,11 @@ sub run {
 # Last part of URL is built trough javascript
 # @return removeOther link in HTML code
 sub _mkRemoveOtherLink {
-    my $self = shift;
+    my ( $self, $req ) = @_;
 
     # TODO: remove this
     return $self->loadTemplate(
+        $req,
         'removeOther',
         params => {
             link => $self->conf->{portal} . "?removeOther=1"

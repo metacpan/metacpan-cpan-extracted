@@ -3,12 +3,13 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
 use YAML::PP::Loader;
 use YAML::PP::Dumper;
+use Scalar::Util qw/ blessed /;
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ Load LoadFile Dump DumpFile /;
@@ -30,10 +31,16 @@ sub new {
         writer => $writer,
     };
 
-    my $schema = YAML::PP::Schema->new(
-        boolean => $bool,
-    );
-    $schema->load_subschemas(@$schemas);
+    my $schema;
+    if (blessed($schemas) and $schemas->isa('YAML::PP::Schema')) {
+        $schema = $schemas;
+    }
+    else {
+        $schema = YAML::PP::Schema->new(
+            boolean => $bool,
+        );
+        $schema->load_subschemas(@$schemas);
+    }
 
     my $loader = YAML::PP::Loader->new(
         schema => $schema,
@@ -53,6 +60,16 @@ sub new {
         dumper => $dumper,
     }, $class;
     return $self;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $clone = {
+        schema => $self->schema,
+        loader => $self->loader->clone,
+        dumper => $self->dumper->clone,
+    };
+    return bless $clone, ref $self;
 }
 
 sub loader {
@@ -193,7 +210,7 @@ Here are a few examples of the basic load and dump methods:
     my $yaml = $yp->dump_string($data_with_perl_objects);
 
 
-Some utility scripts:
+Some utility scripts, mostly useful for debugging:
 
     # Load YAML into a data structure and dump with Data::Dumper
     yamlpp5-load < file.yaml
@@ -204,23 +221,19 @@ Some utility scripts:
     # Print the events from the parser in yaml-test-suite format
     yamlpp5-events < file.yaml
 
-    # Create ANSI colored YAML
-    yamlpp5-highlight < file.yaml
-
     # Parse and emit events directly without loading
     yamlpp5-parse-emit < file.yaml
+
+    # Create ANSI colored YAML. Can also be useful for invalid YAML, showing
+    # you the exact location of the error
+    yamlpp5-highlight < file.yaml
 
 
 =head1 DESCRIPTION
 
-This is Yet Another YAML Framework. For why this project was started, see
-L<"WHY">.
+YAML::PP is a modern, modular YAML processor.
 
 It aims to support C<YAML 1.2> and C<YAML 1.1>. See L<http://yaml.org/>.
-
-You can check out all current parse and load results from the
-yaml-test-suite here:
-L<https://perlpunk.github.io/YAML-PP-p5/test-suite.html>
 
 YAML is a serialization language. The YAML input is called "YAML Stream".
 A stream consists of one or more "Documents", seperated by a line with a
@@ -236,6 +249,11 @@ the last if called with scalar context.
 The YAML backend is implemented in a modular way that allows to add
 custom handling of YAML tags, perl objects and data types. The inner API
 is not yet stable. Suggestions welcome.
+
+You can check out all current parse and load results from the
+yaml-test-suite here:
+L<https://perlpunk.github.io/YAML-PP-p5/test-suite.html>
+
 
 =head1 PLUGINS
 
@@ -276,7 +294,14 @@ In progress. Keeping hash key order.
 
 YAML 1.1 merge keys for mappings
 
+=item L<YAML::PP::Schema::Include>
+
+Include other YAML files via C<!include> tags
+
 =back
+
+To make the parsing process faster, you can plugin the libyaml parser
+with L<YAML::PP::LibYAML>.
 
 =head1 IMPLEMENTATION
 
@@ -347,13 +372,22 @@ Still TODO:
 
 =over 4
 
-=item Flow Style
+=item Implicit collection keys
 
-Flow style is partially implemented.
+    ---
+    [ a, b, c ]: value
 
-Not yet working: Implicit flow collection keys, implicit keys in
-flow sequences, content directly after the colon, empty nodes, explicit
-keys
+=item Implicit mapping in flow syle sequences
+
+    ---
+    [ a, b, c: d ]
+    # equals
+    [ a, b, { c: d } ]
+
+=item Plain mapping keys ending with colons
+
+    ---
+    key ends with two colons::: value
 
 =item Supported Characters
 
@@ -415,12 +449,6 @@ dumped correctly by modules like L<JSON::PP> or L<JSON::XS>, for example.
 
 See L<"NUMBERS"> for an example.
 
-=back
-
-TODO:
-
-=over 4
-
 =item Complex Keys
 
 Mapping Keys in YAML can be more than just scalars. Of course, you can't load
@@ -452,6 +480,12 @@ Example:
        }
     }
 
+=back
+
+TODO:
+
+=over 4
+
 =item Parse Tree
 
 I would like to generate a complete parse tree, that allows you to manipulate
@@ -475,10 +509,19 @@ they will be dumped with double quotes.
 It will recognize JSON::PP::Boolean and boolean.pm objects and dump them
 correctly.
 
-TODO: Correctly recognize numbers which also have a string flag, like:
+Numbers which also have a PV flag will be recognized as numbers and not
+as strings:
 
     my $int = 23;
     say "int: $int"; # $int will now also have a PV flag
+
+That means that if you accidentally use a string in numeric context, it will
+also be recognized as a number:
+
+    my $string = "23";
+    my $something = $string + 0;
+    print $yp->dump_string($string);
+    # will be emitted as an integer without quotes!
 
 The layout is like libyaml output:
 
@@ -536,14 +579,14 @@ The layout is like libyaml output:
     my $doc = $ypp->load_string("foo: bar");
     my @docs = $ypp->load_string("foo: bar\n---\n- a");
 
-Input should be utf-8 decoded.
+Input should be Unicode characters (decoded).
 
 =item load_file
 
     my $doc = $ypp->load_file("file.yaml");
     my @docs = $ypp->load_file("file.yaml");
 
-UTF-8 decoding will be done automatically
+Strings will be loaded as unicode characters (decoded).
 
 =item dump_string
 
@@ -551,10 +594,10 @@ UTF-8 decoding will be done automatically
     my $yaml = $ypp->dump_string($doc1, $doc2);
     my $yaml = $ypp->dump_string(@docs);
 
-Input data should be UTF-8 decoded. If not, it will be upgraded with
+Input strings should be Unicode characters. If not, they will be upgraded with
 C<utf8::upgrade>.
 
-Output will be UTF-8 decoded.
+Output will return Unicode characters (decoded).
 
 =item dump_file
 
@@ -564,8 +607,6 @@ Output will be UTF-8 decoded.
 
 Input data should be UTF-8 decoded. If not, it will be upgraded with
 C<utf8::upgrade>.
-
-File will be written UTF-8 encoded.
 
 =item dump
 
@@ -610,6 +651,8 @@ No function is exported by default.
     my $doc = Load($yaml);
     my @docs = Load($yaml);
 
+Works like C<load_string>.
+
 =item LoadFile
 
     use YAML::PP qw/ LoadFile /;
@@ -617,11 +660,15 @@ No function is exported by default.
     my @docs = LoadFile($file);
     my @docs = LoadFile($filehandle);
 
+Works like C<load_file>.
+
 =item Dump
 
     use YAML::PP qw/ Dump /;
     my $yaml = Dump($doc);
     my $yaml = Dump(@docs);
+
+Works like C<dump_string>.
 
 =item DumpFile
 
@@ -629,6 +676,8 @@ No function is exported by default.
     DumpFile($file, $doc);
     DumpFile($file, @docs);
     DumpFile($filehandle, @docs);
+
+Works like C<dump_file>.
 
 =back
 

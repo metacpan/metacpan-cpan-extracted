@@ -12,7 +12,7 @@ BEGIN {
 
 use Pcore;
 use Test::More;
-use Pcore::App::API;
+use Pcore::App::Auth;
 use Pcore::Node;
 
 our $TESTS = 5;
@@ -25,27 +25,32 @@ package App {
 
     with qw[Pcore::App];
 
-    our $API_ROLES = [ 'admin', 'user' ];
+    our $PERMISSIONS = [ 'admin', 'user' ];
+
+    # PERMISSIONS
+    sub get_permissions ($self) {
+        return $PERMISSIONS;
+    }
 
     sub run { }
 
 }
 
 my $app = bless {
-    app_cfg => {
-        api => {
-            connect => 'sqlite:',
-            rpc     => { workers => 1 }
+    cfg => {
+        auth => {
+            backend => 'sqlite:',
+            node    => { workers => 1 }
         }
     },
     node => Pcore::Node->new(
         type     => 'main',
-        requires => { 'Pcore::App::API::Node' => undef },
+        requires => { 'Pcore::App::Auth::Node' => undef },
     ),
   },
   'App';
 
-my $api = Pcore::App::API->new($app);
+my $api = Pcore::App::Auth->new($app);
 
 my $res = $api->init;
 ok( $res, 'api_init' );
@@ -53,8 +58,8 @@ ok( $res, 'api_init' );
 $res = $api->get_user('root');
 ok( $res, 'get_user' );
 
-my $sess = $api->create_user_session('root');
-ok( $sess, 'create_user_session' );
+my $sess = $api->create_session('root');
+ok( $sess, 'create_session' );
 
 my $auth;
 $auth = $api->authenticate( $sess->{data}->{token} );

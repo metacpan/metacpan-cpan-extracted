@@ -12,6 +12,7 @@ examples/README.md
 examples/box-slice.pl
 examples/calendar.pl		This example requires the DateTime module.
 examples/frontpage.pl
+examples/hello.pl
 examples/hexgrid.pl
 examples/images.pl
 examples/inkle-draft.pl

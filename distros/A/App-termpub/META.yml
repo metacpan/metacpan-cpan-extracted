@@ -10,7 +10,7 @@ configure_requires:
   Mojolicious: '0'
   perl: 5.010_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,22 +29,26 @@ no_index:
 provides:
   App::termpub:
     file: lib/App/termpub.pm
-    version: '1.04'
+    version: '1.05'
   App::termpub::Epub:
     file: lib/App/termpub/Epub.pm
   App::termpub::Epub::Chapter:
     file: lib/App/termpub/Epub/Chapter.pm
+  App::termpub::Hyphen:
+    file: lib/App/termpub/Hyphen.pm
   App::termpub::InfoBox:
     file: lib/App/termpub/InfoBox.pm
   App::termpub::Pager:
     file: lib/App/termpub/Pager.pm
-  App::termpub::Renderer:
-    file: lib/App/termpub/Renderer.pm
+  App::termpub::Pager::HTML:
+    file: lib/App/termpub/Pager/HTML.pm
+  App::termpub::Pager::Text:
+    file: lib/App/termpub/Pager/Text.pm
 resources:
   bugtracker: https://github.com/mdom/termpub/issues
   homepage: https://github.com/mdom/termpub
   repository: git://github.com/mdom/termpub.git
-version: '1.04'
+version: '1.05'
 x_contributors:
   - 'Adrian Petrescu <apetresc@gmail.com>'
   - 'Mario Domgoergen <mario@domgoergen.com>'

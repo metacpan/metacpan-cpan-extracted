@@ -112,10 +112,14 @@ my %makeArgs = (
     NAME => "Tcl::pTk",
     VERSION_FROM => 'lib/Tcl/pTk.pm',
     LICENSE => 'perl_5',
+    MIN_PERL_VERSION => '5.008',
     EXE_FILES => \@SCRIPTS,
     META_MERGE => {
         "meta-spec" => { version => 2 },
-        no_index => { directory => [ qw! benchmarks TableMatrixDemos lib/Tcl/pTk/demos ! ] },
+        no_index => {
+            directory => [ qw! benchmarks TableMatrixDemos lib/Tcl/pTk/demos ! ],
+            'package' => [ 'MainWindow' ],
+        },
         keywords => [ qw/ Tk Tcl Tix GUI /],
         resources => {
             repository => {
@@ -138,6 +142,7 @@ my $MMversion = $ExtUtils::MakeMaker::VERSION;
 #print "VERSION = $MMversion\n";
 $MMversion =~ s/_\d+$//; # Get rid of underscores in the version for numeric compare
 delete $makeArgs{META_MERGE} if( $MMversion < 6.45 );
+delete $makeArgs{MIN_PERL_VERSION} if ( $MMversion < 6.48 );
 
 WriteMakefile(
 %makeArgs

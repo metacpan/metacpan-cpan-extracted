@@ -4,11 +4,13 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.648';
+our $VERSION = '1.649';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
+
+use Term::Choose::Constants qw( :screen );
 
 BEGIN {
     if ( $ENV{TC_AMBIGUOUS_WIDE} ) {
@@ -93,9 +95,9 @@ sub cut_to_printwidth {
 
 
 sub line_fold {
-    my ( $string, $avail_width, $init_tab, $subseq_tab ) = @_; #copy
+    my ( $string, $avail_width, $opt ) = @_; #copy $string
     return $string if ! defined $string || ! length $string;
-    for ( $init_tab, $subseq_tab ) {
+    for ( $opt->{init_tab}, $opt->{subseq_tab} ) {
         if ( defined $_ && length $_ ) {
             s/\t/ /g;
             s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
@@ -108,20 +110,25 @@ sub line_fold {
             $_ = '';
         }
     }
+    my @color;
+    if ( $opt->{color} ) {
+        $string =~ s/\x{feff}//g;
+        $string =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge; # ms
+    }
     $string =~ s/\t/ /g;
     $string =~ s/[^\x{0a}\x{0b}\x{0c}\x{0d}\x{85}\P{Cc}]//g; # remove control chars but keep vertical spaces
     $string =~ s/[\p{Noncharacter_Code_Point}\p{Cs}]//g;
     my $regex = qr/\x{0d}\x{0a}|[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]/; # \R 5.10
-    if ( $string !~ /$regex/ && print_columns( $init_tab . $string ) <= $avail_width ) {
-        return $init_tab . $string;
+    if ( $string !~ /$regex/ && print_columns( $opt->{init_tab} . $string ) <= $avail_width ) {
+        return $opt->{init_tab} . $string;
     }
-    my @paragraph;
+    my @paragraph; # s
 
     for my $row ( split /$regex/, $string, -1 ) { # -1 to keep trailing empty fields
         my @lines;
         $row =~ s/\s+\z//;
         my @words = split( /(?<=\S)(?=\s)/, $row );
-        my $line = $init_tab;
+        my $line = $opt->{init_tab};
 
         for my $i ( 0 .. $#words ) {
             if ( print_columns( $line . $words[$i] ) <= $avail_width ) {
@@ -130,17 +137,17 @@ sub line_fold {
             else {
                 my $tmp;
                 if ( $i == 0 ) {
-                    $tmp = $init_tab . $words[$i];
+                    $tmp = $opt->{init_tab} . $words[$i];
                 }
                 else {
                     push( @lines, $line );
                     $words[$i] =~ s/^\s+//;
-                    $tmp = $subseq_tab . $words[$i];
+                    $tmp = $opt->{subseq_tab} . $words[$i];
                 }
                 ( $line, my $remainder ) = cut_to_printwidth( $tmp, $avail_width, 1 );
                 while ( length $remainder ) {
                     push( @lines, $line );
-                    $tmp = $subseq_tab . $remainder;
+                    $tmp = $opt->{subseq_tab} . $remainder;
                     ( $line, $remainder ) = cut_to_printwidth( $tmp, $avail_width, 1 );
                 }
             }
@@ -150,10 +157,17 @@ sub line_fold {
         }
         push( @paragraph, join( "\n", @lines ) );
     }
+    if ( @color ) {
+        for my $para ( @paragraph ) {
+            $para =~ s/\x{feff}/shift @color/ge;
+            if ( ! @color ) {
+                last;
+            }
+        }
+        $paragraph[-1] .= RESET;
+    }
     return join( "\n", @paragraph );
 }
-
-
 
 
 

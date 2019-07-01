@@ -156,17 +156,42 @@ sub prepare_query ( $self, $query ) {
         }
     }
 
-    return join( $SPACE, @sql ), @bind ? \@bind : undef;
+    my $sql = join $SPACE, @sql;
+
+    utf8::encode $sql if utf8::is_utf8 $sql;
+
+    return $sql, @bind ? \@bind : undef;
 }
 
 sub query_to_string ( $self, $query, $bind = undef ) {
+
+    # auery is arrayref
     if ( is_plain_arrayref $query) {
         ( $query, my $bind1 ) = $self->prepare_query($query);
 
         $bind //= $bind1;
     }
 
-    $query =~ s/\$(\d+)/$self->quote($bind->[$1 - 1])/smge;
+    # query is prepared sth
+    elsif ( ref $query eq 'Pcore::Handle::DBI::STH' ) {
+        $query = $query->{query};
+    }
+
+    # query is plain text
+    else {
+
+        # convert "?" placeholders to the "$1" style
+        if ( defined $bind ) {
+            my $i;
+
+            $query =~ s/[?]/'$' . ++$i/smge;
+        }
+
+        utf8::encode $query if utf8::is_utf8 $query;
+    }
+
+    # substitute bind params
+    $query =~ s/\$(\d+)/$self->quote($bind->[$1 - 1])/smge if defined $bind;
 
     return $query;
 }
@@ -178,13 +203,14 @@ sub prepare ( $self, $query ) {
         ( $query, $bind ) = $self->prepare_query($query);
     }
     else {
+
         # convert "?" placeholders to postgres "$1" style
         my $i;
 
         $query =~ s/[?]/'$' . ++$i/smge;
-    }
 
-    utf8::encode $query if utf8::is_utf8 $query;
+        utf8::encode $query if utf8::is_utf8 $query;
+    }
 
     my $sth = Pcore::Handle::DBI::STH->new( query => $query );
 

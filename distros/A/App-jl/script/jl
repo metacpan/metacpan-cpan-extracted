@@ -123,7 +123,7 @@ Supports unixtime C<1560026367>, msec C<1560026367123> and C<1560026367.123>
 
 =head3 xxxxx
 
-If you set C<xxxxx> option, then forcely convert integer value which is over 946684800 (2000-01-01T00:00:00Z).
+If you set C<xxxxx> option, then forcely convert to datetime string from integer value which is over 946684800 (2000-01-01T00:00:00Z).
 
 B<NOTE> that if you set C<xxxx> option, then it means that C<x>, C<xx> and C<xxx> are enabled as well. C<xxx> is going to be enabled C<x> and C<xx> as well. So C<xx> is including C<x>.
 
@@ -158,6 +158,12 @@ If set C<unbuffered> option, flush the output after each line is printed.
 =head3 stderr
 
 If set C<stderr> option, output line to STDERR instead.
+
+=head3 sweep
+
+If set C<sweep> option, filtering non-JSON lines. By default, non-JSON line prints as raw.
+
+NOTE that non-JSON line, a line just consists of [\t\s\r\n] will be filtered.
 
 
 =head1 AUTHOR

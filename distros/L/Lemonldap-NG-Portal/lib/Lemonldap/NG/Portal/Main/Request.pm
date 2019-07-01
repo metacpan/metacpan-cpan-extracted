@@ -7,7 +7,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants ':all';
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Common::PSGI::Request';
 
@@ -64,6 +64,9 @@ has menuError => ( is => 'rw' );
 
 # Frame flag (used by Run to not send Content-Security-Policy header)
 has frame => ( is => 'rw' );
+
+# Refresh flag to avoid double cookies sessions to be renewed
+has refresh => ( is => 'rw' );
 
 # Security
 #

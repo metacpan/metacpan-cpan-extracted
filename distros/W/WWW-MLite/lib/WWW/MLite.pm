@@ -1,4 +1,4 @@
-package WWW::MLite; # $Id: MLite.pm 44 2019-05-31 10:06:54Z minus $
+package WWW::MLite; # $Id: MLite.pm 50 2019-06-21 21:05:37Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ WWW::MLite - Lite Web Application Framework
 
 =head1 VERSION
 
-Version 2.00
+Version 2.01
 
 =head1 SYNOPSIS
 
@@ -363,6 +363,27 @@ See L<JSON::Schema>, L<JSON::Validator>, L<http://json-schema.org/>
 
 =back
 
+
+=head2 middleware
+
+The middleware method. Runs before every Your registered methods.
+
+You can override this method in Your class.
+
+This method MUST returns HTTP status code.
+If code is a Successful status code (2xx) then Your registered method will called
+
+For examle:
+
+    sub response {
+            my $self = shift;
+            my @params = @_;
+
+            # . . .
+
+            return HTTP::Status::HTTP_OK
+    }
+
 =head2 response
 
 The method for response prepare.
@@ -375,10 +396,13 @@ For examle:
 
     sub response {
         my $self = shift;
+        my @params = @_;
         my $rc = $self->code; # RC HTTP code (from yuor methods)
         my $head = $self->head; # HTTP Headers (hashref)
         my $data = $self->data; # The working data
         my $msg = $self->message || HTTP::Status::status_message($rc) || "Unknown code";
+
+        # . . .
 
         my @res = (sprintf("Status: %s %s", $rc, $msg));
         push @res, sprintf("Content-Type: %s", "text/plain; charset=utf-8");
@@ -432,13 +456,13 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '2.00';
+$VERSION = '2.01';
 
 use base qw/ CTK /;
 $CTK::PLUGIN_ALIAS_MAP{log} = "WWW::MLite::Log";
 
 use Storable qw/dclone/; # for dclone
-use HTTP::Status qw//;
+use HTTP::Status qw/ :is /;
 use HTTP::Message;
 use HTTP::Headers;
 use HTTP::Response;
@@ -651,7 +675,7 @@ sub lookup_method {
         return $methods->{$ikey} if $methods->{$ikey}
             && $methods->{$ikey}{deep}
             && $methods->{$ikey}{name}
-            && $methods->{$key}{code};
+            && $methods->{$ikey}{code};
     }
     $self->error(sprintf("Method not found (%s %s)", $meth, $path));
     return undef;
@@ -685,9 +709,13 @@ sub call_method {
     }
     $self->{info} = dclone(\%info);
 
+    # Call middleware method
+    my $rc = $self->middleware(@params);
+
     # Call method
-    my $rc;
-    if(ref($func) eq 'CODE') {
+    if ($rc && !is_success($rc)) {
+        # Skip!
+    } elsif (ref($func) eq 'CODE') {
         $rc = &$func($self, @params);
     } else {
         $self->message(sprintf("The code of method %s not found!", $self->name));
@@ -695,7 +723,7 @@ sub call_method {
     }
     $self->{code} = $rc;
 
-    # Call response
+    # Call response method
     unless (HTTP::Status::status_message($rc)) {
         $self->message(sprintf("Method %s returns incorrect HTTP status code!", $self->name));
         $self->{code} = HTTP::Status::HTTP_INTERNAL_SERVER_ERROR;
@@ -718,6 +746,10 @@ sub cleanup {
     return 1;
 }
 
+sub middleware {
+    my $self = shift;
+    return HTTP::Status::HTTP_OK;
+}
 sub response {
     my $self = shift;
     my $rc = $self->code;

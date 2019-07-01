@@ -1,4 +1,5 @@
 Changes
+examples/colspan.pl
 examples/header.pl
 examples/header_repeat_with_cell_props.pl
 examples/row_height.pl
@@ -11,6 +12,7 @@ MANIFEST.SKIP
 README
 README.md
 t/Basics.t
+t/Colspan.t
 t/lib/PDFAPI2Mock.pm
 t/lib/TestData.pm
 t/PDF-Table.t

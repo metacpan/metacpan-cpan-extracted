@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.202';
+our $VERSION = '2.203';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -16,6 +16,8 @@ binmode STDERR, ':encoding(utf-8)';
 my $old_out_codepage;
 
 BEGIN {
+    print HIDE_CURSOR;
+    $ENV{TC_RESET_AUTO_UP} = 0;
     if ( $^O eq "MSWin32" ) {
         require Win32::Console;
         require Win32::Console::ANSI;
@@ -26,13 +28,14 @@ BEGIN {
 }
 
 END {
-    print SHOW_CURSOR;
     if ( $^O eq "MSWin32" && $old_out_codepage ) {
         Win32::Console::OutputCP( $old_out_codepage );
     }
+    delete $ENV{TC_RESET_AUTO_UP};
+    print CLEAR_TO_END_OF_SCREEN;
+    print SHOW_CURSOR;
 }
 
-print HIDE_CURSOR;
 
 my $db_browser = App::DBBrowser->new();
 $db_browser->run();
@@ -50,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.202
+Version 2.203
 
 =head1 BACKWARD INCOMPATIBLE CHANGES
 

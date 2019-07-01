@@ -14,6 +14,12 @@
       <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
     </foaf:Person>
   </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <homepage rdf:resource="https://github.com/yanick/MsgPack-RPC" />
   <bug-database rdf:resource="https://github.com/yanick/MsgPack-RPC/issues" />
@@ -69,6 +75,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.0.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-11-27</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.0.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-03-18</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

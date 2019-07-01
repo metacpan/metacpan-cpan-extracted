@@ -3,7 +3,7 @@ package Job::Async::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 
@@ -31,16 +31,19 @@ sub data {
     return $self->{data}{$key};
 }
 
+sub encode_keypair {
+    my ($self, $k, $v) = @_;
+    return !ref($v)
+        ? ("text_$k" => $v)
+        : SEREAL_DEFAULT
+        ? ("sereal_$k" => $sereal_encode->encode($v))
+        : ("json_$k" => encode_json_utf8($v))
+}
+
 sub flattened_data {
     my ($self, $data) = @_;
     $data //= $self->{data};
-    return { map {
-        !ref($data->{$_})
-        ? ("text_$_" => $data->{$_})
-        : SEREAL_DEFAULT
-        ? ("sereal_$_" => $sereal_encode->encode($data->{$_}))
-        : ("json_$_" => encode_json_utf8($data->{$_}))
-    } keys %$data };
+    return { map { $self->encode_keypair($_ => $data->{$_}) } keys %$data };
 }
 
 sub structured_data {

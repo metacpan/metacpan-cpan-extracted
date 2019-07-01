@@ -146,7 +146,9 @@ sub purge {
         $self->logger->warn("Bad reference $myref");
         return 0;
     }
-    unless ( $d =~ s/^(\d{4})(\d{2})(\d{2}).*$/$1-$2-$3/ ) {
+    unless ( $d =~ s/^(\d{4})(\d{2})(\d{2}).*$/$1-$2-$3/
+        or $d =~ s/^(\d{4}-\d{2}-\d{2}).*$/$1/ )
+    {
         $self->logger->warn("Bad date $d");
         return 0;
     }

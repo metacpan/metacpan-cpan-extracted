@@ -2,12 +2,20 @@
 ################################################################################
 # [% description %]
 ################################################################################
+# [% signature %]
+# [% endreport %]
+# This Perl Program is Opensource: [% link %].
+################################################################################
 # SUSPICIOUS
 # some judgement if this might be worth a look
-# RATIO
-# distance/edits devided by length
+# SIMILARITY
+# equality of file1 and file2 in percent
 # DISTANCE
 # edits/changes needed to come from file1 to file2
+# LENGTH 1
+# length of file 1
+# LENGTH 2
+# length of file 2
 # DELTA LENGTH
 # difference in length of file 1 to file2
 # FILE1

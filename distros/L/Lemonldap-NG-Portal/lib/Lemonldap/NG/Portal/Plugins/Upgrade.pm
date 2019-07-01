@@ -58,7 +58,9 @@ sub ask {
 
 sub confirm {
     my ( $self, $req ) = @_;
-    $req->pdata->{keepPdata} = 1;
+
+    # Disabled due to #1821
+    #$req->pdata->{keepPdata} = 1;
     my $upg;
     if ( my $t = $req->param('upgrading') ) {
         if ( $self->ott->getToken($t) ) {

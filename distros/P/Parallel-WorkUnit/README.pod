@@ -8,7 +8,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.181850
+version 2.191821
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,13 @@ version 2.181850
   $wu->use_anyevent(1);
   $wu->async( sub { ... }, \&callback );
   $wu->waitall();  # Not strictly necessary
+
+  #
+  # Just spawn something into another process, don't capture return
+  # values, don't allow waiting on process, etc.
+  #
+  my $wu = Parallel::Workunit->new();
+  $wu->start( { ... } );
 
 =head1 DESCRIPTION
 
@@ -246,6 +253,24 @@ callback function (if provided) with the unserialized return value.
 
 If a callback is not provided, the parent, in the C<waitall()> call,
 will gather these results and return them as an ordered list.
+
+=head2 start( sub { ... } );
+
+Added in 1.191810.
+
+Spawns work on a new forked process, doing so immediately regardless of how
+many other children are running.
+
+This method is similar to C<async()>, but unlike C<async()>, no provision to
+receive return value or wait on the child is made.  This is somewhat similar
+to C<start> in Perl 6 (but differs as this starts a subprocess, not a new
+thread (except on Windows), and there is thus no shared data (changes to data
+in the child process will not be seen in the parent process).
+
+Note that the child inherits all open file descriptors.
+
+Not also that the child process will be part of the same process group as the
+parent process.  Additional work is required to daemonize the child.
 
 =head1 AUTHOR
 

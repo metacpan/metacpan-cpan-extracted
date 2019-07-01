@@ -8,7 +8,7 @@ use warnings;
 package PDF::Table;
 
 use Carp;
-our $VERSION = '0.10.1';
+our $VERSION = '0.11.0';
 
 print __PACKAGE__.' is version: '.$VERSION.$/ if($ENV{'PDF_TABLE_DEBUG'});
 
@@ -495,7 +495,7 @@ sub table
             }
 
             # This should fix a bug with very long words like serial numbers etc.
-            if( $max_word_len > 0 )
+            if( $max_word_len > 0 && $data->[$row_idx][$column_idx])
             {
                 $data->[$row_idx][$column_idx] =~ s#(\S{$max_word_len})(?=\S)#$1 #g;
             }
@@ -506,7 +506,7 @@ sub table
             $max_col_w                    = 0;
             $min_col_w                    = 0;
 
-            my @words = split( /\s+/, $data->[$row_idx][$column_idx] );
+            my @words = split( /\s+/, $data->[$row_idx][$column_idx] ) if $data->[$row_idx][$column_idx];
 
             foreach( @words )
             {
@@ -636,6 +636,9 @@ sub table
             $gfx = undef;
         }
 
+        my @actual_column_widths;
+        my %colspanned;
+
         # Each iteration adds a row to the current page until the page is full
         #  or there are no more rows to add
         # Row_Loop
@@ -658,7 +661,6 @@ sub table
             # Row coloumn props - TODO in another commit
 
             # Row cell props - TODO in another commit
-
 
             # Choose colors for this row
             $background_color = $row_index % 2 ? $background_color_even  : $background_color_odd;
@@ -686,6 +688,7 @@ sub table
             {
                 next unless $col_props->[$column_idx]->{'max_w'};
                 next unless $col_props->[$column_idx]->{'min_w'};
+                next if $colspanned{$row_index.'_'.$column_idx};
                 $leftovers->[$column_idx] = undef;
 
                 # look for font information for this cell
@@ -732,19 +735,31 @@ sub table
                                        //  $col_props->[$column_idx]->{'default_text'}
                                        //  $default_text;
 
+                my $cell_props = $cell_props->[$row_index][$column_idx];
+                my $this_cell_width = $calc_column_widths->[$column_idx];
+                # Handle colspan (issue#46)
+                if ($cell_props && $cell_props->{colspan} && $cell_props->{colspan} > 1) {
+                    my $colspan = $cell_props->{colspan};
+                    for my $offset (1 .. $colspan - 1) {
+                        $this_cell_width += $calc_column_widths->[$column_idx + $offset] if $calc_column_widths->[$column_idx + $offset];
+                        $colspanned{$row_index.'_'.($column_idx + $offset)} = 1;
+                    }
+                }
+                $actual_column_widths[$row_index][$column_idx] = $this_cell_width;
+
                 # If the content is wider than the specified width, we need to add the text as a text block
                 if( $record->[$column_idx] !~ m/(.\n.)/ and
                     $record_widths->[$column_idx] and
-                    $record_widths->[$column_idx] <= $calc_column_widths->[$column_idx]
+                    $record_widths->[$column_idx] <= $this_cell_width
                 ){
                     my $space = $pad_left;
                     if ($justify eq 'right')
                     {
-                        $space = $calc_column_widths->[$column_idx] -($txt->advancewidth($record->[$column_idx]) + $pad_right);
+                        $space = $this_cell_width -($txt->advancewidth($record->[$column_idx]) + $pad_right);
                     }
                     elsif ($justify eq 'center')
                     {
-                        $space = ($calc_column_widths->[$column_idx] - $txt->advancewidth($record->[$column_idx])) / 2;
+                        $space = ($this_cell_width - $txt->advancewidth($record->[$column_idx])) / 2;
                     }
                     $txt->translate( $cur_x + $space, $text_start );
                     my %text_options;
@@ -759,7 +774,7 @@ sub table
                         $record->[$column_idx],
                         x        => $cur_x + $pad_left,
                         y        => $text_start,
-                        w        => $calc_column_widths->[$column_idx] - $pad_left - $pad_right,
+                        w        => $this_cell_width - $pad_left - $pad_right,
                         h        => $cur_y - $bot_marg - $pad_top - $pad_bot,
                         align    => $justify,
                         lead     => $lead
@@ -787,12 +802,12 @@ sub table
                                             $column_idx,
                                             $cur_x,
                                             $cur_y-$row_h,
-                                            $calc_column_widths->[$column_idx],
+                                            $this_cell_width,
                                             $row_h
                                            );
                 }
 
-                $cur_x += $calc_column_widths->[$column_idx];
+                $cur_x += $this_cell_width;
             }
             if( $do_leftovers )
             {
@@ -819,12 +834,20 @@ sub table
                                ||  $col_props->[$column_idx]->{'background_color'}
                                ||  $background_color;
 
-                if ($cell_bg_color)
+                if ($cell_bg_color && !$colspanned{$row_index.'_'.$column_idx})
                 {
-                    $gfx_bg->rect( $cur_x, $cur_y-$current_row_height, $calc_column_widths->[$column_idx], $current_row_height);
+                    $gfx_bg->rect( $cur_x, $cur_y-$current_row_height,  $actual_column_widths[$row_index][$column_idx], $current_row_height);
                     $gfx_bg->fillcolor($cell_bg_color);
                     $gfx_bg->fill();
                 }
+
+                # draw left vertical border of this cell
+                if ($gfx && $vert_borders && !$colspanned{$row_index.'_'.$column_idx})
+                {
+                    $gfx->move($cur_x, $cur_y-$current_row_height);
+                    $gfx->vline( $cur_y );
+                }
+
                 $cur_x += $calc_column_widths->[$column_idx];
             }#End of for(my $column_idx....
 
@@ -841,18 +864,11 @@ sub table
 
         if ($gfx)
         {
-            # Draw vertical lines
             if ($vert_borders)
             {
-                $gfx->move(  $xbase, $table_top_y);
+                # Draw right table border
+                $gfx->move(  $xbase + $width, $table_top_y);
                 $gfx->vline( $cur_y );
-                my $cur_x = $xbase;
-                for( my $j = 0; $j < $columns_number; $j++ )
-                {
-                    $cur_x += $calc_column_widths->[$j];
-                    $gfx->move(  $cur_x, $table_top_y );
-                    $gfx->vline( $cur_y );
-                }
             }
 
             # ACTUALLY draw all the lines
@@ -1171,7 +1187,7 @@ B<Default:> 1
     horizontal_borders => 1     # horizontal borders will be 1 overriding 3
     vertical_borders   => undef # vertical borders will be 3 as it will fallback to 'border'
 
-=item B<vertical_borders> -  Width of vertical border lines. Overrides 'border' value.
+=item B<border_color> -  Border color for all borders.
 
 B<Value:> Color specifier as 'name' or 'HEX'
 B<Default:> 'black'
@@ -1428,6 +1444,30 @@ B<Default:> undef
 B<Value:> One of 'left', 'right', 'center'
 B<Default:> 'left'
 
+=item B<colspan> - Span this cell over multiple columns to the right
+
+B<Value:> can be any positive number less than the number of columns to the right of the current column
+B<Default:> undef
+
+NOTE: If you want to have regular columns B<after> a colspan, you have to provide C<undef> for the columns that should be spanned
+
+NOTE: If you use C<colspan> to span a column, but provide data for it, your table will be mangled: the spanned-but-data-provided-column will be rendered! But as HTML works the same way, we do not consider this a bug.
+
+Example:
+
+  # row2 col1 should span 2 cols:
+  @data = ( [ 'r1c1', 'r1c2', 'r1c3' ], ['r2c1+',undef,'r2c3'] );
+  $tab->table( $pdf, $page, \@data, %TestData::required,
+    cell_props => [
+        [],
+        [{colspan=>2}]
+    ]
+  );
+
+=back
+
+See L<examples/colspan.pl> for detailed usage.
+
 Example:
 
     my $cell_props = [
@@ -1451,6 +1491,12 @@ Example:
             },
             # etc.
         ],
+        [#Row 3
+            {    #Row 3 cell 1 span cell 2
+                colspan          => 2
+            },
+            # etc.
+        ],
         # etc.
     ];
 
@@ -1462,8 +1508,6 @@ Example:
         background_color => '#CCCC00',
         font_color       => 'blue',
     };
-
-=back
 
 NOTE: In case of a conflict between column, odd/even and cell formatting, cell formatting will overwrite the other two.
 In case of a conflict between header row and cell formatting, header formatting will override cell.
@@ -1488,7 +1532,7 @@ Leftover text will be returned and has to be handled by the caller - i.e. add a 
     $data - a string that will be placed inside the block
     %settings - HASH with geometry and formatting parameters.
 
-=item Reuturns
+=item Returns
 
 The return value is a 3 items list where
 
@@ -1526,7 +1570,7 @@ The return value is a 3 items list where
 
 =head1 VERSION
 
-0.9.7
+0.10.1
 
 =head1 AUTHOR
 

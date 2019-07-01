@@ -1,4 +1,4 @@
-package Pcore::Ext v0.33.3;
+package Pcore::Ext v0.34.0;
 
 use Pcore -dist, -class;
 use Pcore::Ext::App;
@@ -30,6 +30,7 @@ sub create_app ( $self, $package, $cfg ) {
 
         $cfg->{prefixes}->{pcore} //= 'Pcore/Ext/Lib';
         $cfg->{prefixes}->{dist}  //= ref( $self->{app} ) . '::Ext' =~ s[::][/]smgr;
+        $cfg->{prefixes}->{lib}   //= ref( $self->{app} ) . '::Ext' =~ s[::][/]smgr . '/Lib';
         $cfg->{prefixes}->{app}   //= $cfg->{namespace} =~ s[::][/]smgr;
 
         $app = $self->{ext_app}->{$package} = Pcore::Ext::App->new($cfg);
@@ -151,7 +152,7 @@ sub _init_reload ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 51                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 52                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

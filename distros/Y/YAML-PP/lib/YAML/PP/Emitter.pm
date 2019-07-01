@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
@@ -21,6 +21,14 @@ sub new {
     }, $class;
     $self->init;
     return $self;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $clone = {
+        indent => $self->indent,
+    };
+    return bless $clone, ref $self;
 }
 
 sub event_stack { return $_[0]->{event_stack} }

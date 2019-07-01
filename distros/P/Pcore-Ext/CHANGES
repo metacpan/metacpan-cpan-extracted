@@ -1,3 +1,20 @@
+v0.34.0 2019-06-30T19:05:54Z
+ - l10n updated
+ - media class created
+ - displayfiled bind overload
+ - app api refactored
+ - api methods validator fixed
+ - menu item left padding
+ - themes panel width
+ - auth form
+ - jshint temporary disabled
+ - jshint fixes
+ - lzy panel class
+ - ext routing
+ - lib prefix
+ - lazy items
+ - auth is_root removed
+
 v0.33.3 2019-06-19T05:31:21Z
  - cdn upload call updated
 

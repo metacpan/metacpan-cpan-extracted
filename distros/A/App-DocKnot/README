@@ -1,4 +1,4 @@
-                               DocKnot 2.00
+                               DocKnot 3.00
                     (package documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -55,6 +55,8 @@ REQUIREMENTS
 
   * File::BaseDir
   * File::ShareDir
+  * IPC::Run
+  * IPC::System::Simple
   * JSON
   * Perl6::Slurp
   * Template (part of Template Toolkit)
@@ -81,8 +83,9 @@ TESTING
 
       ./Build test --test_files <path-to-test>
 
-  IPC::System::Simple is required to run the test suite.  The following
-  additional Perl modules will be used by the test suite if present:
+  Capture::Tiny and File::Copy::Recursive are required to run the test
+  suite.  The following additional Perl modules will be used by the test
+  suite if present:
 
   * Devel::Cover
   * Test::MinimumVersion

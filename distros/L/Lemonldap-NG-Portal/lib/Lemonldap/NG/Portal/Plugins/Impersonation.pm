@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants
   qw( PE_OK PE_BADCREDENTIALS PE_IMPERSONATION_SERVICE_NOT_ALLOWED PE_MALFORMEDUSER );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -37,17 +37,16 @@ sub init {
     $self->rule($rule);
 
     # Parse identity rule
-    $self->logger->debug( "Impersonation identities rule -> "
+    $self->logger->debug( "Impersonation identity rule -> "
           . $self->conf->{impersonationIdRule} );
     $rule =
       $hd->buildSub( $hd->substitute( $self->conf->{impersonationIdRule} ) );
     unless ($rule) {
         $self->error(
-            "Bad impersonation identities rule -> " . $hd->tsv->{jail}->error );
+            "Bad impersonation identity rule -> " . $hd->tsv->{jail}->error );
         return 0;
     }
     $self->idRule($rule);
-
     return 1;
 }
 
@@ -55,12 +54,23 @@ sub init {
 
 sub run {
     my ( $self, $req ) = @_;
-    my $spoofId = $req->param('spoofId') || $req->{user};
+
+    return $req->authResult
+      if $req->authResult >
+      PE_OK;    # Skip Impersonation if error during Auth process
+
+    my $statut = PE_OK;
+    my $loginHistory =
+      $req->{sessionInfo}->{_loginHistory};    # Store login history
+    $req->{user} ||= $req->{sessionInfo}->{_impUser};    # If 2FA is enabled
+    my $spoofId = $req->param('spoofId')       # Impersonation required
+      || $req->{sessionInfo}->{_impSpoofId}    # If 2FA is enabled
+      || $req->{user};                         # NO Impersonation required
+
     $self->logger->debug("No impersonation required")
       if ( $spoofId eq $req->{user} );
-    my $statut = PE_OK;
 
-    if ( $spoofId !~ /$self->{conf}->{userControl}/o ) {
+    unless ( $spoofId =~ /$self->{conf}->{userControl}/o ) {
         $self->userLogger->error('Malformed spoofed Id');
         $self->logger->debug("Impersonation tried with spoofed Id: $spoofId");
         $spoofId = $req->{user};
@@ -69,7 +79,7 @@ sub run {
 
     # Check activation rule
     if ( $spoofId ne $req->{user} ) {
-        $self->logger->debug("Spoofied Id: $spoofId / Real Id: $req->{user}");
+        $self->logger->debug("Spoof Id: $spoofId / Real Id: $req->{user}");
         unless ( $self->rule->( $req, $req->sessionInfo ) ) {
             $self->userLogger->error('Impersonation service not authorized');
             $spoofId = $req->{user};
@@ -86,7 +96,9 @@ sub run {
             next unless defined $req->{sessionInfo}->{$k};
         }
         $spk = "$self->{conf}->{impersonationPrefix}$k";
-        unless ( $self->hAttr =~ /\b$k\b/ ) {
+        unless ( $self->hAttr =~ /\b$k\b/
+            || $k =~ /^(?:_imp|token|_type)\w*\b/ )
+        {
             $realSession->{$spk} = $req->{sessionInfo}->{$k};
             $self->logger->debug("-> Store $k in realSession key: $spk");
         }
@@ -94,7 +106,7 @@ sub run {
         delete $req->{sessionInfo}->{$k};
     }
 
-    $spoofSession = $self->_userDatas( $req, $spoofId, $realSession );
+    $spoofSession = $self->_userData( $req, $spoofId, $realSession );
     if ( $req->error ) {
         if ( $req->error == PE_BADCREDENTIALS ) {
             $statut = PE_BADCREDENTIALS;
@@ -104,8 +116,8 @@ sub run {
         }
     }
 
-    # Update spoofed session
-    $self->logger->debug("Populating spoofed session...");
+    # Update spoof session
+    $self->logger->debug("Populating spoof session...");
     foreach (qw (_auth _userDB)) {
         $self->logger->debug("Processing $_...");
         $spk = "$self->{conf}->{impersonationPrefix}$_";
@@ -113,34 +125,54 @@ sub run {
     }
 
     # Merging SSO Groups and hGroups & dedup
-    $spoofSession->{groups} ||= '';
+    $spoofSession->{groups}  ||= '';
+    $spoofSession->{hGroups} ||= {};
     if ( $self->{conf}->{impersonationMergeSSOgroups} ) {
         $self->userLogger->warn("MERGING SSO groups and hGroups...");
         my $spg       = "$self->{conf}->{impersonationPrefix}groups";
         my $sphg      = "$self->{conf}->{impersonationPrefix}hGroups";
         my $separator = $self->{conf}->{multiValuesSeparator};
-        $realSession->{$spg} ||= '';
+
+        ## GROUPS
+        my @spoofGrps = split /\Q$separator/, $spoofSession->{groups};
+        my @realGrps  = split /\Q$separator/, $realSession->{$spg};
+
+        ## hGROUPS
+        $realSession->{$sphg} ||= {};
+
+        # Merge specified groups/hGroups only
+        unless ( $self->{conf}->{impersonationMergeSSOgroups} eq 1 ) {
+            my %SSOgroups = map { $_, 1 } split /\Q$separator/,
+              $self->{conf}->{impersonationMergeSSOgroups};
+
+            $self->logger->debug("Filtering specified groups/hGroups...");
+            @realGrps = grep { exists $SSOgroups{$_} } @realGrps;
+            my %intersct =
+              map {
+                $realSession->{$sphg}->{$_}
+                  ? ( $_, $realSession->{$sphg}->{$_} )
+                  : ()
+              } keys %SSOgroups;
+            $realSession->{$sphg} = \%intersct;
+        }
 
         $self->logger->debug("Processing groups...");
-        my @spoofGrps = my @realGrps = ();
-        @spoofGrps = split /\Q$separator/, $spoofSession->{groups};
-        @realGrps  = split /\Q$separator/, $realSession->{$spg};
         @spoofGrps = ( @spoofGrps, @realGrps );
         my %hash = map { $_, 1 } @spoofGrps;
         $spoofSession->{groups} = join $separator, sort keys %hash;
 
         $self->logger->debug("Processing hGroups...");
-        $spoofSession->{hGroups} ||= {};
-        $realSession->{$sphg} ||= {};
         $spoofSession->{hGroups} =
           { %{ $spoofSession->{hGroups} }, %{ $realSession->{$sphg} } };
     }
 
     # Main session
     $self->p->updateSession( $req, $spoofSession );
+    $req->{sessionInfo}->{_loginHistory} =
+      $loginHistory;    # Restore login history
     $req->steps( [ $self->p->validSession, @{ $self->p->endAuth } ] );
 
-    # Restore _httpSession for double Cookies
+    # Restore _httpSession for Double Cookies
     if ( $self->conf->{securedCookie} >= 2 ) {
         $self->p->updateSession( $req, $spoofSession,
             $req->{sessionInfo}->{real__httpSession} );
@@ -150,13 +182,13 @@ sub run {
     return $statut;
 }
 
-sub _userDatas {
+sub _userData {
     my ( $self, $req, $spoofId, $realSession ) = @_;
     my $realId = $req->{user};
     $req->{user} = $spoofId;
     my $raz = 0;
 
-    # Compute Macros and Groups with real and spoofed sessions
+    # Compute Macros and Groups with real and spoof sessions
     $req->{sessionInfo} = {%$realSession};
 
     # Search user in database
@@ -178,7 +210,7 @@ sub _userDatas {
         $raz = 1;
     }
 
-    # Check identity rule if impersonation required
+    # Check identity rule if Impersonation required
     if ( $realId ne $spoofId ) {
         unless ( $self->idRule->( $req, $req->sessionInfo ) ) {
             $self->userLogger->warn(
@@ -190,7 +222,7 @@ sub _userDatas {
         }
     }
 
-    # Same real and spoofed session - Compute Macros and Groups
+    # Same real and spoof session - Compute Macros and Groups
     if ($raz) {
         $req->{sessionInfo} = {};
         $req->{sessionInfo} = {%$realSession};
@@ -201,14 +233,13 @@ sub _userDatas {
                 'setLocalGroups'
             ]
         );
-        $self->logger->debug('Spoofed session equal real session');
+        $self->logger->debug('Spoof session equal real session');
         $req->error(PE_BADCREDENTIALS);
         if ( my $error = $self->p->process($req) ) {
             $self->logger->debug("Process returned error: $error");
             $req->error($error);
         }
     }
-
     return $req->{sessionInfo};
 }
 

@@ -22,7 +22,7 @@ for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
 
 $action ||= "help";
 
-if ( $action =~ /^(?:[gs]et|(?:add|del)Key)$/ ) {
+if ( $action =~ /^(?:[gs]et|(?:add|del)Key|save|restore)$/ ) {
     eval { require Lemonldap::NG::Manager::Cli; };
     die "Manager libraries not available, aborting ($@)" if ($@);
     Lemonldap::NG::Manager::Cli->run(@ARGV);
@@ -61,18 +61,31 @@ lemonldap-ng-cli - Command-line manager for Lemonldap::NG web-SSO system.
 
 =head1 SYNOPSIS
 
-  # Get information about current configuration
+Get information about current configuration
+
   $ lemonldap-ng-cli info
 
-  # Update local configuration cache
+Update local configuration cache
+
   $ lemonldap-ng-cli update-cache
 
-  # Get some configuration parameter values
+Save configuration
+
+  $ lemonldap-ng-cli save >conf.json
+
+Restore configuration
+
+  $ lemonldap-ng-cli restore conf.json
+  # OR
+  $ lemonldap-ng-cli restore - <conf.json
+
+Get a configuration parameter value
+
   $ lemonldap-ng-cli get portal domain cookieName
 
-  # Set some values
-  $ lemonldap-ng-cli set portal http://auth.e.com/ domain e.com
+Set some values
 
+  $ lemonldap-ng-cli set portal http://auth.e.com/ domain e.com
   # add or set a key
   $ lemonldap-ng-cli addKey macro fullname '$givenName." ".$lastName'
 
@@ -81,6 +94,28 @@ lemonldap-ng-cli - Command-line manager for Lemonldap::NG web-SSO system.
 lemonldap-ng-cli is a command line interface to interact with Lemonldap::NG
 configuration. Commands are described in L<Lemonldap::NG::Manager::Cli>
 and L<Lemonldap::NG::Common::CLi>
+
+=head2 Available commands
+
+=over
+
+=item info
+
+=item update-cache
+
+=item save
+
+=item restore
+
+=item get
+
+=item set
+
+=item addKey
+
+=item delKey
+
+=back
 
 =head1 SEE ALSO
 

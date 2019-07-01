@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.11';
+    $VERSION = '0.12';
     XSLoader::load();
 }
 
@@ -30,6 +30,9 @@ CBOR::Free - Fast CBOR for everyone
     $thing = CBOR::Free::decode( $cbor )
 
     my $tagged = CBOR::Free::tag( 1, '2019-01-02T00:01:02Z' );
+
+Also see L<CBOR::Free::Decoder> for an object-oriented interface
+to the decoder.
 
 =head1 DESCRIPTION
 
@@ -103,7 +106,9 @@ An exception is thrown if the decoder finds anything else as a map key.
 =item * CBOR booleans become the corresponding L<Types::Serialiser> values.
 Both CBOR null and undefined become Perl undef.
 
-=item * Tags are IGNORED for now. (This may become configurable later.)
+=item * This function does not interpret tags; if you need that, look
+at L<CBOR::Free::Decoder>. Any tags that this function sees prompt a warning
+but are otherwise ignored.
 
 =back
 

@@ -4,11 +4,12 @@ WriteMakefile1(
     NAME                => 'PagerDuty::Agent',
     ABSTRACT_FROM       => 'lib/PagerDuty/Agent.pm',
     VERSION_FROM        => 'lib/PagerDuty/Agent.pm',
-    MIN_PERL_VERSION    => '5.008',
-    AUTHOR              => 'comScore, Inc',
+    MIN_PERL_VERSION    => '5.010',
+    AUTHOR              => 'Matt Harrington',
     LICENSE             => 'mit',
 
     PREREQ_PM           => {
+        'Data::Dump'                   => 0,
         'English'                      => 0,
         'HTTP::Request::Common'        => 0,
         'JSON'                         => 0,
@@ -37,14 +38,14 @@ WriteMakefile1(
             url     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
         },
 
-        #homepage    => 'https://github.com/getsentry/perl-raven',
-        #resources   => {
-        #    repository => {
-        #        type => 'git',
-        #        url  => 'git@github.com:getsentry/perl-raven.git',
-        #        web  => 'https://github.com/getsentry/perl-raven',
-        #    },
-        #},
+        homepage    => 'https://github.com/querry43/perl-pagerduty-agent',
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'git@github.com:querry43/perl-pagerduty-agent.git',
+                web  => 'https://github.com/querry43/perl-pagerduty-agent',
+            },
+        },
     },
 );
 

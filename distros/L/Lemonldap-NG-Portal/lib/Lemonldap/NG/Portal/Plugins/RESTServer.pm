@@ -6,6 +6,8 @@
 #   * GET /sessions/<type>/<session-id>/<key>    : get a session key value
 #   * GET /sessions/<type>/<session-id>/[k1,k2]  : get some session key value
 #   * POST /sessions/<type>                      : create a session
+#   * POST /sessions/<type>?all=1                : get all sessions (needs a token)
+#   * POST /sessions/<type>?all=1&search=uid,dwho: search all sessions where uid=dwho (needs a token)
 #   * PUT /sessions/<type>/<session-id>          : update some keys
 #   * DELETE /sessions/<type>/<session-id>       : delete a session
 #
@@ -48,7 +50,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -134,7 +136,13 @@ sub init {
 
         # Methods inherited from Lemonldap::NG::Common::Session::REST
         $self->addUnauthRoute(
-            sessions => { ':sessionType' => 'session' },
+            sessions => {
+                ':sessionType' => (
+                    $self->conf->{restExportSecretKeys}
+                    ? 'rawSession'
+                    : 'session'
+                )
+            },
             ['GET']
         );
         $self->addUnauthRoute(
@@ -197,7 +205,7 @@ sub newSession {
         if ( $t =
                 $self->conf->{cipher}->decrypt($s)
             and $t <= time
-            and $t > time - 30 )
+            and $t > time - 15 )
         {
             $force = 1;
         }
@@ -206,6 +214,29 @@ sub newSession {
         }
     }
 
+    if ( $req->param('all') and not $id ) {
+        return $self->p->sendError( $req,
+            'Bad key, refuse to send all sessions', 400 )
+          unless ($force);
+        my $data = $infos->{data};
+        my $opts = $self->conf->{globalStorageOptions} || {};
+        $opts->{backend} = $self->conf->{globalStorage};
+        my $sessions;
+        if ( my $query = $req->param('search') ) {
+            my ( $field, @values ) = split /,/, $query;
+            $sessions = Lemonldap::NG::Common::Apache::Session->searchOn(
+                $opts, $field,
+                join( ',', @values ),
+                ( $data ? @$data : () )
+            );
+        }
+        else {
+            $sessions =
+              Lemonldap::NG::Common::Apache::Session
+              ->get_key_from_all_sessions( $opts, $data );
+        }
+        return $self->p->sendJSONresponse( $req, $sessions );
+    }
     my $session = $self->getApacheSession( $mod, $id, $infos, $force );
     return $self->p->sendError( $req, 'Unable to create session', 500 )
       unless ($session);

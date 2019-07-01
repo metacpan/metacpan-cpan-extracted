@@ -15,9 +15,9 @@ package PDF::API2::Basic::PDF::Page;
 use base 'PDF::API2::Basic::PDF::Pages';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;
@@ -64,52 +64,19 @@ should be inserted (so that new pages need not be appended)
 
 =cut
 
-sub new
-{
+sub new {
     my ($class, $pdf, $parent, $index) = @_;
-    my ($self) = {};
+    my $self = {};
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     $self = $class->SUPER::new($pdf, $parent);
     $self->{'Type'} = PDFName('Page');
     delete $self->{'Count'};
     delete $self->{'Kids'};
     $parent->add_page($self, $index);
-    $self;
+
+    return $self;
 }
-
-
-=head2 $p->add($str)
-
-Adds the string to the currently active stream for this page. If no stream
-exists, then one is created and added to the list of streams for this page.
-
-The slightly cryptic name is an aim to keep it short given the number of times
-people are likely to have to type it.
-
-=cut
-
-sub add
-{
-    my ($self, $str) = @_;
-    my ($strm) = $self->{' curstrm'};
-
-    if (!defined $strm)
-    {
-        $strm = PDF::API2::Basic::PDF::Dict->new;
-        foreach (@{$self->{' outto'}})
-        { $_->new_obj($strm); }
-        $self->{'Contents'} = PDFArray() unless defined $self->{'Contents'};
-        unless (ref $self->{'Contents'} eq "PDF::API2::Basic::PDF::Array")
-        { $self->{'Contents'} = PDFArray($self->{'Contents'}); }
-        $self->{'Contents'}->add_elements($strm);
-        $self->{' curstrm'} = $strm;
-    }
-
-    $strm->{' stream'} .= $str;
-    $self;
-}
-
 
 =head2 $p->ship_out($pdf)
 
@@ -117,14 +84,15 @@ Ships the page out to the given output file context
 
 =cut
 
-sub ship_out
-{
+sub ship_out {
     my ($self, $pdf) = @_;
 
     $pdf->ship_out($self);
-    if (defined $self->{'Contents'})
-    { $pdf->ship_out($self->{'Contents'}->elementsof); }
-    $self;
+    if (defined $self->{'Contents'}) {
+        $pdf->ship_out($self->{'Contents'}->elements());
+    }
+
+    return $self;
 }
 
 1;

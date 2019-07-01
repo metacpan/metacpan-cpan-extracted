@@ -40,8 +40,8 @@
             "Convert::PEM" : "0",
             "Crypt::OpenSSL::RSA" : "0",
             "LWP::UserAgent" : "0",
-            "Lemonldap::NG::Common" : "v2.0.4",
-            "Lemonldap::NG::Handler" : "v2.0.4"
+            "Lemonldap::NG::Common" : "v2.0.5",
+            "Lemonldap::NG::Handler" : "v2.0.5"
          }
       }
    },
@@ -54,6 +54,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.4",
+   "version" : "v2.0.5",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

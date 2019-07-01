@@ -10,7 +10,7 @@ has util => ( init_arg => undef );    # InstanceOf ['<: $module_name :>::Util']
 
 with qw[Pcore::App];
 
-const our $API_ROLES => [ 'admin', 'user' ];
+const our $PERMISSIONS => [ 'admin', 'user' ];
 
 const our $NODE_REQUIRES => {
     '<: $module_name :>::Node::Worker' => undef,
@@ -33,10 +33,21 @@ const our $LOCALES => {
     ru => 'Русский',
 };
 
+# PERMISSIONS
+sub get_permissions ($self) {
+    return $PERMISSIONS;
+}
+
+# LOCALES
 sub get_locales ($self) {
     return $LOCALES;
 }
 
+sub get_default_locale ( $self, $req ) {
+    return 'en';
+}
+
+# RUN
 sub run ( $self ) {
     $self->{util} = <: $module_name ~ "::Util" :>->new;
 
@@ -83,9 +94,9 @@ sub run ( $self ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 4, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 16, 17, 54           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 16, 17, 65           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 93                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 97 does not match the package declaration       |
+## |    1 | 104                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 108 does not match the package declaration      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

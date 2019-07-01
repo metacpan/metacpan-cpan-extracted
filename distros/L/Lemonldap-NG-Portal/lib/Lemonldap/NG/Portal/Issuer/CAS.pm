@@ -6,10 +6,11 @@ use URI;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_CAS_SERVICE_NOT_ALLOWED
-  PE_CONFIRM
+  PE_INFO
   PE_ERROR
   PE_LOGOUT_OK
   PE_OK
+  PE_BADURL
   PE_SENDRESPONSE
 );
 
@@ -55,6 +56,18 @@ sub init {
         },
         ['GET']
     );
+
+    # Add CAS Services, so we can check service= parameter on logout
+    foreach my $casSrv ( keys %{ $self->conf->{casAppMetaDataOptions} } ) {
+        if ( my $serviceUrl =
+            $self->conf->{casAppMetaDataOptions}->{$casSrv}
+            ->{casAppMetaDataOptionsService} )
+        {
+            push @{ $self->p->{additionalTrustedDomains} }, $serviceUrl;
+            $self->logger->debug(
+                "CAS Service $serviceUrl added in trusted domains");
+        }
+    }
     return $res;
 }
 
@@ -64,6 +77,7 @@ sub storeEnvAndCheckGateway {
     my ( $self, $req ) = @_;
     my $service = $self->p->getHiddenFormValue( $req, 'service' )
       || $req->param('service');
+    $service = '' if ( $self->p->checkXSSAttack( 'service', $service ) );
     my $gateway = $self->p->getHiddenFormValue( $req, 'gateway' )
       || $req->param('gateway');
 
@@ -124,6 +138,7 @@ sub run {
         # GET parameters
         my $service = $self->p->getHiddenFormValue( $req, 'service' )
           || $req->param('service');
+        $service = '' if ( $self->p->checkXSSAttack( 'service', $service ) );
         my $renew = $self->p->getHiddenFormValue( $req, 'renew' )
           || $req->param('renew');
         my $gateway = $self->p->getHiddenFormValue( $req, 'gateway' )
@@ -260,6 +275,21 @@ sub run {
         # GET parameters
         my $logout_url     = $req->param('url');        # CAS 2.0
         my $logout_service = $req->param('service');    # CAS 3.0
+        $logout_service = ''
+          if ( $self->p->checkXSSAttack( 'service', $logout_service ) );
+
+        # If we use access control, check that the service URL is trusted
+        if ( $self->conf->{casAccessControlPolicy} =~ /^(error|faketicket)$/i )
+        {
+            if ( $logout_service
+                and not $self->p->isTrustedUrl($logout_service) )
+            {
+                $self->userLogger->error(
+                        "Untrusted service URL $logout_service"
+                      . "specified for CAS Logout" );
+                return PE_BADURL;
+            }
+        }
 
         # Delete linked CAS sessions
         $self->deleteCasSecondarySessions($session_id);
@@ -278,12 +308,14 @@ sub run {
 
                 $req->info(
                     $self->loadTemplate(
-                        'casBack2Url', params => { url => $logout_url }
+                        $req, 'casBack2Url',
+                        params => { url => $logout_url }
                     )
                 );
                 $req->data->{activeTimer} = 0;
 
-                return PE_CONFIRM;
+                delete $req->pdata->{_url};
+                return PE_INFO;
             }
 
             if ($logout_service) {

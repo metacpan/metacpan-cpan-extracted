@@ -114,6 +114,7 @@ sub authenticate {
             my $remainingTime = $_pwdExpire - $timestamp;
             $req->info(
                 $self->loadTemplate(
+                    $req,
                     'pwdWillExpire',
                     params => {
                         time => join(

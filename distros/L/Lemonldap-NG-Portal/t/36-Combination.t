@@ -5,7 +5,7 @@ use IO::String;
 require 't/test-lib.pm';
 
 my $res;
-my $maintests = 0;
+my $maintests = 3;
 my $client;
 
 eval { unlink 't/userdb.db' };
@@ -35,7 +35,15 @@ SKIP: {
     $client = iniCmb(
 'if($env->{HTTP_X} eq "rtyler") then [Dm] and [DB] else if($env->{HTTP_X} eq "dvador") then [DB] else [DB]'
     );
-    expectCookie( try('rtyler') );
+    my $id = expectCookie( try('rtyler') );
+    my $res;
+    ok( $res = $client->_get("/sessions/global/$id"), 'Get session content' );
+    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+      or print STDERR $@;
+    ok(
+        ( $res->{demo} eq 'rtyler' and $res->{dbi} eq 'rtyler' ),
+        ' Demo and DBI exported variables exist in session'
+    );
     expectCookie( try('dvador') );
     expectReject( try('dwho') );
 }
@@ -66,10 +74,11 @@ sub iniCmb {
     if (
         my $res = LLNG::Manager::Test->new( {
                 ini => {
-                    logLevel       => 'error',
-                    useSafeJail    => 1,
-                    authentication => 'Combination',
-                    userDB         => 'Same',
+                    logLevel          => 'error',
+                    useSafeJail       => 1,
+                    authentication    => 'Combination',
+                    userDB            => 'Same',
+                    restSessionServer => 1,
 
                     combination => $expr,
                     combModules => {
@@ -90,8 +99,8 @@ sub iniCmb {
                     dbiAuthLoginCol     => 'user',
                     dbiAuthPasswordCol  => 'password',
                     dbiAuthPasswordHash => '',
-                    dbiExportedVars     => {},
-                    demoExportedVars    => {},
+                    dbiExportedVars     => { dbi => 'user' },
+                    demoExportedVars    => { demo => 'uid' },
                 }
             }
         )

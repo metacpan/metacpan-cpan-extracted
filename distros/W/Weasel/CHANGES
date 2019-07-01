@@ -1,3 +1,6 @@
+** 0.24 / 2019-06-25
+   - Add attribute tracking session usage to Weasel::Session ('state')
+
 ** 0.23 / 2019-06-21
    - Mark multiple methods DEPRECATED (up for removal on 1.0 or
      in 2 years -- whichever comes first)

@@ -1,6 +1,13 @@
 
 Revision history for Job-Async
 
+0.004     2019-07-01 16:17:33+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - clean up internal key/encoding handling
+
 0.003     2019-02-27 13:55:17+08:00 Asia/Kuala_Lumpur
     New features:
 

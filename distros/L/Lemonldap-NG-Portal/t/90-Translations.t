@@ -86,4 +86,9 @@ ok( @unTr == 0,
     'All "trspan" attribute translated' . ( @unTr ? " (@unTr)" : "" ) );
 $count += 2;
 
+foreach my $lang (@langs) {
+    ok( -f "site/htdocs/static/common/$lang.png", "Flag icon found for $lang" );
+    $count += 1;
+}
+
 done_testing($count);

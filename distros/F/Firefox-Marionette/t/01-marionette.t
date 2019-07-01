@@ -1403,9 +1403,7 @@ SKIP: {
 	my $install_id;
 	my $install_path = Cwd::abs_path("t/addons/test.xpi");
 	if ($^O eq 'cygwin') {
-		my $drive = $ENV{SYSTEMDRIVE};
-		$install_path = "${drive}/cygwin64$install_path";
-		$install_path =~ s/\//\\/smxg;
+		$install_path = $firefox->execute( 'cygpath', '-s', '-w', $install_path );
 	} elsif ($^O eq 'MSWin32') {
 		$install_path =~ s/\//\\/smxg;
 	}

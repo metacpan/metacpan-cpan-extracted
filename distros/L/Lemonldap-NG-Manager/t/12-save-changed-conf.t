@@ -38,8 +38,8 @@ foreach my $i ( 0 .. 1 ) {
 }
 
 ok(
-    @{ $resBody->{details}->{__changes__} } == 20,
-    'JSON response contains 20 changes'
+    @{ $resBody->{details}->{__changes__} } == 22,
+    'JSON response contains 22 changes'
 ) or print STDERR Dumper($resBody);
 
 #print STDERR Dumper($resBody);
@@ -192,6 +192,16 @@ sub changes {
             'key' => 'exportedHeaders, test3.example.com, Auth-User',
             'old' => undef,
             'new' => '$uid'
+        },
+        {
+            'key' => 'exportedHeaders, test3.example.com, cipherId',
+            'old' => undef,
+            'new' => 'encrypt($uid)'
+        },
+        {
+            'key' => 'exportedHeaders, test3.example.com, encodeId',
+            'old' => undef,
+            'new' => 'encode_base64($uid)'
         },
         {
             'new' => 'test3.example.com',

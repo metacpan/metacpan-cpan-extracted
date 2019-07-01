@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::DomainPlus;
 # ABSTRACT: Refiner internal class for handling DomainPlus objects
-$Bio::Palantir::Refiner::DomainPlus::VERSION = '0.191620';
+$Bio::Palantir::Refiner::DomainPlus::VERSION = '0.191800';
 use Moose;
 use namespace::autoclean;
 
@@ -38,7 +38,7 @@ has $_ => (
     isa     => 'Maybe[Str]',
 	default => undef,
 	writer  => '_set_'. $_,
-) for qw(function chemistry phmm_name subtype class protein_sequence 
+) for qw(function chemistry phmm_name subtype protein_sequence 
     target_name query_name subtype_evalue subtype_score base_uui monomer);
 
 has $_ => (
@@ -67,7 +67,7 @@ Bio::Palantir::Refiner::DomainPlus - Refiner internal class for handling DomainP
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

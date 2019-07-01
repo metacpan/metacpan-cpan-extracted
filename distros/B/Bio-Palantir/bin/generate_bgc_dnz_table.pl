@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: generate_bgc_dnz_table.pl
-# ABSTRACT: Generates a denormalized table from BGC architectures
+# ABSTRACT: Generates a denormalized table for BGC data
 # CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
 
 use Modern::Perl '2011';
@@ -8,6 +8,7 @@ use autodie;
 
 use Smart::Comments;
 
+use Carp;
 use File::Basename qw(fileparse);
 use Getopt::Euclid qw(:vars);
 use Path::Class qw(dir file);
@@ -15,6 +16,11 @@ use Path::Class qw(dir file);
 use aliased 'Bio::Palantir::Parser';
 use aliased 'Bio::Palantir::Refiner::ClusterPlus';
 
+
+# check BGC type
+if (@ARGV_types) {
+    Parser->is_cluster_type_ok(@ARGV_types);
+}
 
 # report parsing
 my $report = Parser->new( file => $ARGV_report_file );
@@ -29,8 +35,9 @@ my @clusters
 my @lines;
 for my $cluster (@clusters) {
 
-    unless ($ARGV_type eq 'none' || lc $cluster->type eq $ARGV_type) {
-        next;
+    if (@ARGV_types) {
+        next unless
+            grep { $cluster->type =~ m/$_/xmsi } @ARGV_types;
     }
 
     for my $gene ($cluster->all_genes) {
@@ -67,9 +74,7 @@ for my $cluster (@clusters) {
 }
 
 # Tabular format (denormalized table)
-my $tab_outfile = $ARGV_out // 'bgc_output.tsv';
-
-open my $out, '>', $tab_outfile;
+open my $out, '>', $ARGV_outfile;
 
 say {$out} join "\t", 
     qw( filename
@@ -95,23 +100,21 @@ __END__
 
 =head1 NAME
 
-generate_bgc_dnz_table.pl - Generates a denormalized table from BGC architectures
+generate_bgc_dnz_table.pl - Generates a denormalized table for BGC data
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 NAME
 
-generate_bgc_dnz_table.pl - This tool parses and filters biosynthetic gene cluster information from antiSMASH results and resume it in a denormalized table.
-
-=head1 VERSION
-
-This documentation refers to the version 0.0.1
+generate_bgc_dnz_table.pl - This tool parses and filters biosynthetic gene 
+cluster information from antiSMASH results and resume it in a denormalized 
+table.
 
 =head1 USAGE
 
-	$0 [options] --path <biosynml_path> --taxdir <dir>
+	$0 [options] --report-file <infile>
 
 =head1 REQUIRED ARGUMENTS
 
@@ -119,14 +122,14 @@ This documentation refers to the version 0.0.1
 
 =item --report[-file] [=] <infile>
 
-Path to the output file of antismash, which can be either the 
-biosynML.xml file (antiSMASH 3-4) or the regions.js (antiSMASH 5).
+Path to the output file of antismash, which can be either a 
+biosynML.xml (antiSMASH 3-4) or a regions.js file (antiSMASH 5).
 
 =for Euclid: infile.type: readable
 
 =back
 
-=head1 OPTIONS
+=head1 OPTIONAL ARGUMENTS
 
 =over
 
@@ -138,20 +141,29 @@ or antismash [default: palantir]
 =for Euclid: str.type: /antismash|palantir/
     str.default: 'palantir'
 
-=item --out <outfile>
+=item --outfile [=] <filename>
 
-TSV output filename. [default: bgc_output.tsv]
+TSV output filename. [default: bgc_data.tsv]
 
-=item --type <str> ...
+=for Euclid: filename.type: writable
+    filename.default: 'bgc_data.tsv'
 
-Filter the report for only a selection of biosynthetic gene cluster types. [default: none]
+=item --types [=] <str>...
 
-=for Euclid: str.type: str
-    str.default: 'none'
+Filter clusters on a/several specific type(s). 
 
-=item --id <str>
+Types allowed: acyl_amino_acids, amglyccycl, arylpolyene, bacteriocin, 
+butyrolactone, cyanobactin, ectoine, hserlactone, indole, ladderane, 
+lantipeptide, lassopeptide, microviridin, nrps, nucleoside, oligosaccharide, 
+otherks, phenazine, phosphonate, proteusin, PUFA, resorcinol, siderophore, 
+t1pks, t2pks, t3pks, terpene.
 
-ID corresponding to the first column of the table. [default: directory/filename]
+Any combination of these types, such as nrps-t1pks or t1pks-nrps, is also
+allowed. The argument is repeatable.
+
+=item --id [=]<str>
+
+ID corresponding to the first column of the table [default: directory/filename].
 
 =item --version
 

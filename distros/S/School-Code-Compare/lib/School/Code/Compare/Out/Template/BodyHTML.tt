@@ -23,14 +23,20 @@
     <p>
     [% description %]
     </p>
+    <p>
+    <small><em>[% signature %]</em></small><br>
+    <small><em>[% endreport %]</em></small><br>
+    <small><em>This Perl Program is <a href='[% link %]'>Opensource</a>.<em><small>
+    </p>
     <table>
       <tr>
-        <th>ratio</th> <!-- distance/edits devided by length -->
-        <th>distance</th> <!-- edits/changes needed to come from file1 to file2 -->
-        <th>delta length</th> <!-- difference in length of file 1 to file2 -->
-        <th>file1</th> <!-- path to file1 -->
-        <th>file2</th> <!-- path to file2 -->
-        <th>comment</th> <!-- some reasoning -->
+        <th>Similarity</th>
+        <th>Levenshtein<br>Distance</th>
+        <th>Length</th>
+        <th>Delta Length</th>
+        <th>file1</th>
+        <th>file2</th>
+        <th>comment</th>
       </tr>
 [% data %]
     </table>

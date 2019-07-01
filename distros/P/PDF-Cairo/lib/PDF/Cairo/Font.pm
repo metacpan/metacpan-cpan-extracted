@@ -7,7 +7,7 @@ use Carp;
 use Cairo;
 use Font::FreeType;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -161,6 +161,8 @@ sub new {
 			load_flags => FT_LOAD_NO_HINTING,
 			index => $collection_index,
 	);
+	croak("PDF::Cairo::Font::new($font[0]): bitmap fonts not supported")
+		unless $ft_face->is_scalable;
 	if ($metrics_file) {
 		$ft_face->attach_file($metrics_file);
 	}
@@ -449,16 +451,16 @@ sub find_api2font {
 	if ($fontname =~ /^(times|courier|helvetica|georgia|verdana)/) {
 		$family = $1;
 	}elsif ($fontname =~ /^(traditional|ming)/) {
-		$lang = ':lang=zh-cn';
+		$lang = 'lang=zh-cn';
 	}elsif ($fontname =~ /^(simplified|song)/) {
-		$lang = ':lang=zh-tw';
+		$lang = 'lang=zh-tw';
 	}elsif ($fontname =~ /^(japanese|kozmin)/) {
-		$lang = ':lang=ja';
+		$lang = 'lang=ja';
 	}elsif ($fontname =~ /^kozgo/) {
 		$family = 'sans';
-		$lang = ':lang=ja';
+		$lang = 'lang=ja';
 	}
-	my $search = join(':', $family, $weight, $style, $lang);
+	my $search = join(':', $family, $weight, $style, $lang, 'scalable=true');
 	my $match = `fc-match -f '%{file}\t%{index}' $search`;
 	my ($file, $index) = split(/\t/, $match);
 	if (defined $file) {

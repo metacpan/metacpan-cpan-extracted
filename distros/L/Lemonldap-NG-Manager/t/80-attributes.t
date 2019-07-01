@@ -54,7 +54,8 @@ my @notManagedAttributes = (
     # Other ini-only prms
     'configStorage', 'status', 'localStorageOptions', 'localStorage',
     'max2FDevices',              'max2FDevicesNameLength', 'checkTime',
-    'mySessionAuthorizedRWKeys', 'handlerInternalCache'
+    'mySessionAuthorizedRWKeys', 'handlerInternalCache',
+    'handlerServiceTokenTTL'
 );
 
 # Words used either as attribute name and node title

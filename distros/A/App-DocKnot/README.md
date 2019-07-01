@@ -1,4 +1,4 @@
-# DocKnot 2.00
+# DocKnot 3.00
 
 [![Build
 status](https://travis-ci.org/rra/docknot.svg?branch=master)](https://travis-ci.org/rra/docknot)
@@ -58,6 +58,8 @@ The following additional Perl modules are required to use it:
 
 * File::BaseDir
 * File::ShareDir
+* IPC::Run
+* IPC::System::Simple
 * JSON
 * Perl6::Slurp
 * Template (part of Template Toolkit)
@@ -90,8 +92,9 @@ If a test fails, you can run a single test with verbose output via:
     ./Build test --test_files <path-to-test>
 ```
 
-IPC::System::Simple is required to run the test suite.  The following
-additional Perl modules will be used by the test suite if present:
+Capture::Tiny and File::Copy::Recursive are required to run the test
+suite.  The following additional Perl modules will be used by the test
+suite if present:
 
 * Devel::Cover
 * Test::MinimumVersion

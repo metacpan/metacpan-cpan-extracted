@@ -8,7 +8,12 @@
 [% copr.holder %].  [% END %]This software is distributed under
 [% license.summary %].  Please see the section [License](#license) below
 for more information.
+[% IF orphaned %]
+## Warning
 
+**This package is orphaned.**
+[% orphaned %]
+[% END %]
 ## Blurb
 
 [% blurb %]

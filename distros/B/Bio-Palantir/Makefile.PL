@@ -13,7 +13,7 @@ install_share dist => "data";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "core classes and utilities for Bio::Palantir CONTRIBUTOR: Denis",
+  "ABSTRACT" => "core classes and utilities for Bio::Palantir ",
   "AUTHOR" => "Loic MEUNIER <lmeunier\@uliege.be>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -39,12 +39,12 @@ my %WriteMakefileArgs = (
     "Bio::MUST::Core::Taxonomy" => 0,
     "Carp" => 0,
     "Const::Fast" => 0,
+    "DBD::SQLite" => 0,
     "DBI" => 0,
     "Data::UUID" => 0,
     "File::Basename" => 0,
     "File::ShareDir" => 0,
     "File::Temp" => 0,
-    "GD::Simple" => 0,
     "Getopt::Euclid" => 0,
     "JSON::Create" => 0,
     "JSON::Parse" => 0,
@@ -69,7 +69,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Most" => 0
   },
-  "VERSION" => "0.191620",
+  "VERSION" => "0.191800",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -84,12 +84,12 @@ my %FallbackPrereqs = (
   "Bio::MUST::Core::Taxonomy" => 0,
   "Carp" => 0,
   "Const::Fast" => 0,
+  "DBD::SQLite" => 0,
   "DBI" => 0,
   "Data::UUID" => 0,
   "File::Basename" => 0,
   "File::ShareDir" => 0,
   "File::Temp" => 0,
-  "GD::Simple" => 0,
   "Getopt::Euclid" => 0,
   "JSON::Create" => 0,
   "JSON::Parse" => 0,

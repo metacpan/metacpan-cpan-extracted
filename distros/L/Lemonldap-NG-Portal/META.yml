@@ -43,17 +43,16 @@ recommends:
   Net::OpenID::Consumer: '0'
   Net::OpenID::Server: '0'
   SOAP::Lite: '0'
-  String::Random: '0'
   Unicode::String: '0'
   Web::ID: '0'
 requires:
   Clone: '0'
-  Lemonldap::NG::Handler: v2.0.4
+  Lemonldap::NG::Handler: v2.0.5
   Regexp::Assemble: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
   X_twitter: https://twitter.com/lemonldapng
   homepage: http://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.4
+version: v2.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

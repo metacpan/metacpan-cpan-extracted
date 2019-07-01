@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::CIDFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Resource::CIDFont::TrueType::FontFile;
@@ -132,7 +132,7 @@ sub glyphNum { return ( $_[0]->fontfile->glyphNum ); }
 
 sub outobjdeep
 {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     my $notdefbefore=1;
 
@@ -174,7 +174,7 @@ sub outobjdeep
         #}
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    $self->SUPER::outobjdeep($fh, $pdf);
 }
 
 =back

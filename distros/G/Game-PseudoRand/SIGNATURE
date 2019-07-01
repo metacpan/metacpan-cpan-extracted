@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 8aeab0fe3de22d78c742b586b4a72135ace01d50d4cb8c26fa3d7cd47def3dfb Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 d9af3cc9dbe2c86c78fa64971a2ad2a0b0e9ea1f2f918b646440cf6ab6977c3c MANIFEST
+SHA256 ca054eb777f12dea713f4ef53248f834f2dd83f62e35a4a8e82d1e2f3b7e8a92 META.json
+SHA256 63ba7950554a3e133ffe675d3be2fffa9c00ef42f851af1c278733961694f34c META.yml
+SHA256 0799061d81360772e8850dfc2ca50cc5ef814cca995fc6d0f80d9f2e4c1f7f77 Makefile.PL
+SHA256 8a7ffdbcc65575faebd7190a69d21bf7ae88929a18e5e401aa563a5ac17b4a37 README
+SHA256 6937955f8748da84a31cf961a935eedf4ceca36bb43ed208dae67e8448b510c0 eg/runstats
+SHA256 26118eec72d40d95f80f150e3c07c08ac73fdbff18d04a56ebfdd9cd0451130e eg/trial
+SHA256 d71d47b5fcb226383aa2611b75f99f7c33c8bb43471fa8681d4c09fa53e1973a lib/Game/PseudoRand.pm
+SHA256 3ab9ea4243384f0c9e0f3c1e7de885fae68cb8a7109d01ebf83ebab27f8dc328 t/00-load.t
+SHA256 de8f33b47e8b48121e1d7424170b15dda8fc0f8cb126981e63f875b735b5beed t/Game-PseudoRand.t
+SHA256 b083166c319d8ee2a89bb4a4705e549f450d282618a1773f8772bed0296640f5 t/pod-coverage.t
+SHA256 903b477522c73bfcd5db74bd63282c490e4dd4cb774f0b70132c4486b84e0c49 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEExz5nATgiJJxZ/1+dgZku4eEsA4UFAl0Zj0oACgkQgZku4eEs
+A4Ub+QgAiFDOqmlGdRcXF6DH/0tMKnz78ZpF27QctTB0OoJrENxYTcdiW09Ma8PJ
+G+UpaGPof8tQyUzWSoygXGF5u9z2FSIcbi7oMOGCeHrALz8Q6cF4qSSJvKZZHVAB
+n0KLekHM9TBarODkSOQltAZUwe4u5Z8nLLTOmOtPayKp0tm6dnTBi9rxbWtTihth
+RrZ+3H/jXoFvpa4aVeKO646lVhxs0MMg1rhRuRDbrFTPEghe1Q7Al95vl23Tqtbz
+LmzfBmMRo4ZD/o3Eplt4RJHBLwnQ8l+X6v6O7Eb6iZiUV9hCxlr4wX1CJUq1bhHV
+tjKp9nRQcddppc5n1DjnU4F0mkpBmg==
+=Pc8M
+-----END PGP SIGNATURE-----

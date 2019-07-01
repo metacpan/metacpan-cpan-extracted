@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::GenePlus;
 # ABSTRACT: Refiner internal class for handling GenePlus objects
-$Bio::Palantir::Refiner::GenePlus::VERSION = '0.191620';
+$Bio::Palantir::Refiner::GenePlus::VERSION = '0.191800';
 use Moose;
 use namespace::autoclean;
 
@@ -171,9 +171,6 @@ sub BUILD {
         # get all domain properties
         $self->_get_domain_features($_, $_->begin) for @domains_plus;
         
-        # attribute a class
-        $self->_get_domain_class($_) for @domains_plus;
-
         # delete domains from antismash where we can't retrieve traces with all pHMMs (bugs ? -> P pisi Pren)
         if ($self->undef_cleaning == 1 ) {
             @domains_plus = grep { $_->function ne 'to_remove' } @domains_plus;
@@ -269,7 +266,7 @@ Bio::Palantir::Refiner::GenePlus - Refiner internal class for handling GenePlus 
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

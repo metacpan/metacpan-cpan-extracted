@@ -6,12 +6,13 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Hash;
 use Quiq::Option;
 use Quiq::String;
 use Scalar::Util ();
+use Quiq::Unindent;
 use Quiq::Reference;
 
 # -----------------------------------------------------------------------------
@@ -1329,6 +1330,63 @@ sub setSchema {
 
 # -----------------------------------------------------------------------------
 
+=head3 setSearchPath() - Generiere Statement zum Setzen des Search Path
+
+=head4 Synopsis
+
+    $stmt = $class->setSearchPath(@schemas);
+
+=head4 Description
+
+B<Oracle>
+
+    <not implemented>
+
+B<PostgreSQL>
+
+    SET search_path TO SCHEMA, ...
+
+B<SQLite>
+
+    <not implemented>
+
+B<MySQL>
+
+    <not implemented>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub setSearchPath {
+    my ($self,@schemas) = @_;
+
+    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+
+    # Statement generieren
+
+    my $stmt;
+    if ($oracle) {
+        $self->throw('Not implemented');
+    }
+    elsif ($postgresql) {
+        $stmt = sprintf 'SET search_path TO %s',join(', ',@schemas);
+    }
+    elsif ($sqlite) {
+        $self->throw('Not implemented');
+    }
+    elsif ($mysql) {
+        $self->throw('Not implemented');
+    }
+    else {
+        $self->throw('Not implemented');
+    }
+
+    return $stmt;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 setEncoding() - Generiere Statement zum Setzen des Client-Encodings
 
 =head4 Synopsis
@@ -1363,7 +1421,7 @@ B<MySQL>
 # -----------------------------------------------------------------------------
 
 sub setEncoding {
-    my ($self,$charset) = shift;
+    my ($self,$charset) = @_;
 
     my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
 
@@ -4452,6 +4510,73 @@ sub insert {
 
 # -----------------------------------------------------------------------------
 
+=head3 insertMulti() - Generiere INSERT-Statement mit mehreren Zeilen
+
+=head4 Synopsis
+
+    $stmt = $sql->insertMulti($table,\@keys,[
+            [@vals1],
+            [@vals2],
+            ...
+        ]
+    );
+
+=head4 Description
+
+Generiere ein INSERT-Statement für Tabelle $table mit den Kolumnen
+@keys  und den Datensätzen @records. @records ist eine Liste von
+Arrays mit gleich vielen Elementen wie @keys.
+
+=head4 Example
+
+    $stmt = $sql->insertMulti('person',
+        [qw/per_id per_vorname per_nachname per_geburtstag/],[
+            [qw/1 Linus Seitz 2002-11-11/],
+            [qw/2 Hanno Seitz 2000-04-07/],
+            [qw/3 Emily Philippi 1997-05-05/],
+        ]
+    );
+    =>
+    INSERT INTO person
+        (per_id, per_vorname, per_nachname, per_geburtstag)
+    VALUES
+        ('1', 'Linus', 'Seitz', '2002-11-11'),
+        ('2', 'Hanno', 'Seitz', '2000-04-07')
+        ('3', 'Emily', 'Philippi', '1997-05-05')
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub insertMulti {
+    my ($self,$table,$keyA,$recA) = @_;
+
+    if (!@$recA) {
+        # Keine Daten => kein Statement
+        return '';
+    }
+
+    my $sql = sprintf Quiq::Unindent->string('
+        INSERT INTO %s
+            (%s)
+        VALUES
+    '),$table,join(', ',@$keyA);
+
+    my $i = 0;
+    my $fmt = sprintf '    (%s)',join ', ',('%s') x @$keyA;
+    for my $rec (@$recA) {
+        if ($i++) {
+            $sql .= ",\n";
+        }
+        $sql .= sprintf $fmt,map {$self->valExpr($_)} @$rec;
+    }
+    $sql .= "\n";    
+
+    return $sql;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 update() - Generiere UPDATE Statement
 
 =head4 Synopsis
@@ -5504,7 +5629,7 @@ sub diff {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

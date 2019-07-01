@@ -2,18 +2,18 @@
 
 
 package Geo::What3Words;
-$Geo::What3Words::VERSION = '2.1.1';
+$Geo::What3Words::VERSION = '2.1.2';
 use strict;
 use warnings;
 use URI;
 use LWP::UserAgent;
 use LWP::Protocol::https;
-use JSON::XS;
+use Cpanel::JSON::XS;
 use Data::Dumper;
 use Net::Ping;
 use Net::Ping::External;
 use Encode;
-my $JSONXS = JSON::XS->new->allow_nonref(1);
+my $JSONXS = Cpanel::JSON::XS->new->allow_nonref(1);
 
 
 
@@ -228,7 +228,7 @@ Geo::What3Words - turn WGS84 coordinates into three word addresses and vice-vers
 
 =head1 VERSION
 
-version 2.1.1
+version 2.1.2
 
 =head1 SYNOPSIS
 
@@ -256,7 +256,7 @@ coordinates into those 3 word addresses (forward) and 3 words into coordinates
 Version 1 is deprecated and will stop working December 2016.
 
 You need to sign up at http://what3words.com/login and then register for an API key
-at http://what3words.com/api/signup”
+at https://what3words.com/get-api-key/
 
 =head1 METHODS
 
@@ -426,7 +426,7 @@ mtmail <mtmail-cpan@gmx.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by OpenCage Data Limited.
+This software is copyright (c) 2019 by OpenCage Data Limited.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

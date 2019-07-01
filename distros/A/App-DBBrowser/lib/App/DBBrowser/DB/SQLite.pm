@@ -84,7 +84,7 @@ sub get_databases {
         my $info = 'Del ' . join( ', ', @$dirs );
         my $name = ' OK ';
         my $new_dirs = choose_dirs(
-            { name => $name, info => "Where to search for databases?\n" . $info }
+            { name => $name, info => "Where to search for databases?\n" . $info, hide_cursor => 0 }
         );
         if ( defined $new_dirs && @$new_dirs ) {
             $dirs = $new_dirs;

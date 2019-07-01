@@ -315,6 +315,7 @@ sub get_all_bucket_content ( $self, @args ) {
     return $cv ? $cv->recv : ();
 }
 
+# TODO \$data - content, $data - path
 sub upload ( $self, $path, $data, @args ) {
     my $cb = is_plain_coderef $_[-1] ? pop @args : ();
 
@@ -589,7 +590,7 @@ sub sync ( $self, $locations, $tree ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 496, 499             | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 497, 500             | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

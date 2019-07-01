@@ -1,6 +1,10 @@
 Revision history for App-YTDL
 
 
+0.305   2019-06-30
+        - Adapt code to work with the updated Term::Choose::LineFold::line_fold.
+        - Update info output.
+
 0.304   2018-11-30
         - MSWin32: set codepage temporarily to 65001.
         - Bugfix default quality.

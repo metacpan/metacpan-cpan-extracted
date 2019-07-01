@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('1.01');
+our ($VERSION) = ('1.02');
 
 use IO::Handle; 
 
@@ -977,6 +977,23 @@ sub focusFollowsMouse {
     $interp->icall('tk_focusFollowsMouse');
 }
 
+# Perl/Tk-compatible focusNext and focusPrev
+# These set focus, rather than only get which widget to focus to (as in Tcl/Tk)
+
+sub focusNext {
+    my $self = shift;
+    my $interp = $self->interp;
+    my $wp = $self->path;
+    $interp->Eval("focus [tk_focusNext $wp]");
+}
+
+sub focusPrev {
+    my $self = shift;
+    my $interp = $self->interp;
+    my $wp = $self->path;
+    $interp->Eval("focus [tk_focusPrev $wp]");
+}
+
 sub grabRelease {
     my $self = shift;
     my $wp = $self->path;
@@ -1788,7 +1805,7 @@ sub MainWindow{
 #
 # walk and descendants adapted from Stephen's composite
 # versions as they only use core features they can go here.
-# hierachy is reversed in that descendants calls walk rather
+# hierarchy is reversed in that descendants calls walk rather
 # than vice versa as this avoids building a list.
 # Walk should possibly be enhanced so allow early termination
 # like '-prune' of find.

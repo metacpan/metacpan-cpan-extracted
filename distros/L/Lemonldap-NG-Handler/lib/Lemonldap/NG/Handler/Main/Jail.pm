@@ -103,7 +103,7 @@ sub build_jail {
 
 # Import crypto methods for jail
 sub encrypt {
-    return &Lemonldap::NG::Handler::Main::tsv->{cipher}->encrypt(@_);
+    return &Lemonldap::NG::Handler::Main::tsv->{cipher}->encrypt( $_[0], 1 );
 }
 
 sub token {

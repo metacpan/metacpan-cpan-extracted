@@ -1,0 +1,83 @@
+NAME
+    Acme::CPANModules::DataStructureWalker - Modules that traverse your data
+    structure
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::DataStructureWalker (from Perl distribution
+    Acme-CPANModules-DataStructureWalker), released on 2019-06-19.
+
+DESCRIPTION
+    Modules that traverse your data structure.
+
+    This list catalogs modules that let you traverse your data structure by
+    visiting each node/item: each element of an array, each key/value pair
+    of a hash, recursively. Sort of like File::Find for your data instead of
+    filesystem. These modules can be used for searching or modifying your
+    data.
+
+    Many modules in this mimic Perl's "map" interface, for example:
+    Data::Rmap, Data::Dmap, Data::Traverse. These modules differ in the
+    details: in how you specify option to skip unsupported types of
+    references, whether some let you control the recursion (e.g.
+    Data::Rmap's and Data::Dmap's "cut"),
+
+    Data::Walk models its interface on File::Find. It lets you choose
+    whether you want to go depth-first or breadth-first.
+
+    Benchmarks for these modules coming soon.
+
+    Related modules:
+
+    Data::Clean can be used to clean/sanitize your data structure more
+    performantly compared to your manual walking (e.g. using Data::Rmap). It
+    works by generating Perl code specifically for your cleaning needs.
+
+INCLUDED MODULES
+    *   Data::Rmap
+
+    *   Data::Dmap
+
+    *   Data::Visitor
+
+    *   Data::Transformer
+
+    *   Data::Traverse
+
+    *   Data::Leaf::Walker
+
+    *   Data::Walk
+
+    *   Data::Clean
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-DataStructureWalker>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-DataStructureWalker>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Data
+    StructureWalker>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

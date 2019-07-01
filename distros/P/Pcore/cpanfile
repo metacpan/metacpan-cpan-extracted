@@ -88,15 +88,16 @@ feature linux => sub {
 requires 'Sub::Util', v1.50.0;
 
 # Pcore::Util::Data
-requires 'YAML::XS',         v0.76.0;
-requires 'Cpanel::JSON::XS', v4.7.0;
-requires 'CBOR::XS',         v1.7.0;
-requires 'XML::Hash::XS',    v0.53.0;
-requires 'Crypt::CBC',       v2.33.0;
-requires 'Crypt::DES',       v2.7.0;
-requires 'Compress::Zlib',   v2.81.0;
-requires 'MIME::Base64',     v3.15.0;
-requires 'Text::CSV_XS',     v1.37.0;
+requires 'YAML::XS',              v0.76.0;
+requires 'Cpanel::JSON::XS',      v4.7.0;
+requires 'CBOR::XS',              v1.7.0;
+requires 'XML::Hash::XS',         v0.53.0;
+requires 'Crypt::CBC',            v2.33.0;
+requires 'Crypt::DES',            v2.7.0;
+requires 'Compress::Zlib',        v2.81.0;
+requires 'MIME::Base64',          v3.15.0;
+requires 'MIME::Base64::URLSafe', v0.1.0;
+requires 'Text::CSV_XS',          v1.37.0;
 
 # Pcore::Util::Date
 requires 'Time::Moment', v0.44.0;

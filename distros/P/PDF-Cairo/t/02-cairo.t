@@ -80,7 +80,7 @@ $pdf->polygon(0, 0, in(0.5), 12, edge => 1);
 $pdf->fill;
 $pdf->newpage;
 
-push(@test_desc, "misc: linecap, line, rel_poly, rel_rect");
+push(@test_desc, "misc: linecap, line, rel_poly, rel_rect, roundrect, rel_roundrect");
 $pdf->linewidth(4);
 $pdf->move(10, 10)->line(100, 10)->stroke;
 $pdf->linecap('round');
@@ -89,6 +89,9 @@ $pdf->linecap('square');
 $pdf->move(10, 30)->line(100, 30)->stroke;
 $pdf->move(10, 40)->rel_rect(10, 10, 80, 20)->fill;
 $pdf->move(10, 80)->rel_poly(10,10, 80,0, 0,20, -80,0, 0,-20)->close->stroke;
+$pdf->roundrect(120, 10, 20, 50)->fill;
+$pdf->linewidth(0.1);
+$pdf->move(130, 110)->rel_roundrect(-10, -25, 20, 50, 10)->stroke;
 $pdf->newpage;
 
 push(@test_desc, "simple text");
@@ -183,7 +186,7 @@ SKIP: {
 	my $tmp = `pdftocairo -v 2>&1` || '';
 	skip("need poppler's pdftocairo to compare images")
 		unless $tmp =~ /pdftocairo/;
-	my $PDFTOCAIRO = "pdftocairo -png -r 200 -antialias gray";
+	my $PDFTOCAIRO = "pdftocairo -png -r 200";
 	system("$PDFTOCAIRO t/02-cairo.pdf $TMP/ref");
 	system("$PDFTOCAIRO $OUT $TMP/02");
 	foreach my $i (1..@test_desc) {

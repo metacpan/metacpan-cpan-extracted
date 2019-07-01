@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2017 Joelle Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -47,7 +47,7 @@ is( $wu->max_children(), 2, 'Max children defaults to 2' );
 my %RESULTS;
 my $PROCS = 10;
 for ( 0 .. $PROCS - 1 ) {
-    my $v = $_;
+    my $v   = $_;
     my $ret = $wu->queue( sub { return $v; }, \&cb );
 
     if ( $_ <= 1 ) {
@@ -72,7 +72,6 @@ for ( 0 .. $PROCS - 1 ) {
 }
 is( $wu->count, 0, "no processes running after waitall()" );
 
-
 # We're going to spawn 10 children and test the return value, just to
 # make sure it queue() works basically like async().  This time, though,
 # we are testing with an unlimited max_children
@@ -81,7 +80,7 @@ is( $wu->max_children(), undef, 'Max children defaults to undef' );
 
 $PROCS = 10;
 for ( 0 .. $PROCS - 1 ) {
-    my $v = $_;
+    my $v   = $_;
     my $ret = $wu->queue( sub { return $v; }, \&cb );
 
     ok( $ret, "(W1) Worker " . ( 1 + $_ ) . " started" );
@@ -106,7 +105,7 @@ is( $wu->max_children(), 2, 'Max children defaults to 2' );
 
 # Queue up 10 processes
 for ( 0 .. $PROCS - 1 ) {
-    my $v = $_;
+    my $v   = $_;
     my $ret = $wu->queue( sub { return $v; }, \&cb );
 
     if ( $_ <= 1 ) {

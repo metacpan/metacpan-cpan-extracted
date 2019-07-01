@@ -10,7 +10,7 @@ package Tcl::pTk::Dialog;
 
 # Documentation after __END__
 
-our ($VERSION) = ('1.01');
+our ($VERSION) = ('1.02');
 
 use Carp;
 use strict;

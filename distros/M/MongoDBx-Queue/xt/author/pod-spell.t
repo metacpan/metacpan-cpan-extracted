@@ -15,5 +15,9 @@ Golden
 MongoDB
 MongoDBx
 Queue
+Role
+_CommonOptions
+_V1
+_V2
 dagolden
 lib

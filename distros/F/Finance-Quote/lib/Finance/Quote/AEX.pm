@@ -44,7 +44,7 @@ use HTTP::Request::Common qw(POST);
 use HTML::TableExtract;
 use CGI;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 # URLs of where to obtain information
 
@@ -86,11 +86,12 @@ sub aex {
   if ($reply->is_success) {
 
     # Write retreived data to temp file for debugging
-    use POSIX;
-    my $filename = tmpnam();
+    use File::Temp;
+    my ($tmp_fh, $filename) = File::Temp::tempfile();
     open my $fw, ">", $filename or die "$filename: $!";
     print $fw $reply->content;
     close $fw;
+    close $tmp_fh;
 
     # Open reply to read lins
     open FP, "<", \$reply->content or die "Unable to read data: $!";

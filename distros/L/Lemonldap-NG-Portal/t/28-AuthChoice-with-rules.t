@@ -120,7 +120,7 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
     # Test SQL
     my $postString = 'user=dwho&password=dwho&test=2_sql';
 
-    # Try yo authenticate
+    # Try to authenticate
     # -------------------
     ok(
         $res = $client->_post(

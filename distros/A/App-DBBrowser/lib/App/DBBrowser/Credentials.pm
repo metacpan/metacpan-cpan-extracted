@@ -5,7 +5,8 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Form qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Form              qw();
 
 
 sub new {
@@ -35,6 +36,7 @@ sub get_login {
         my $new = $tf->readline( $prompt,
             { info => $info, no_echo => $no_echo }
         );
+        print HIDE_CURSOR;
         return $new;
     }
 }

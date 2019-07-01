@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Constructor;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use YAML::PP;
 use Scalar::Util qw/ reftype /;
@@ -29,6 +29,15 @@ sub new {
         schema => $schema,
         cyclic_refs => $cyclic_refs,
     }, $class;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $clone = {
+        schema => $self->schema,
+        cyclic_refs => $self->cyclic_refs,
+    };
+    return bless $clone, ref $self;
 }
 
 sub init {
@@ -123,8 +132,15 @@ sub mapping_end_event {
             push @ref, $key, $ref->[ $i + 1 ];
         }
     }
+    for my $merge (@merge_keys) {
+        for my $key (keys %$merge) {
+            unless (exists $data->{ $key }) {
+                $data->{ $key } = $merge->{ $key };
+            }
+        }
+    }
     my $on_data = $last->{on_data} || sub {
-        my ($self, $hash, $items, $merge_keys) = @_;
+        my ($self, $hash, $items) = @_;
         for (my $i = 0; $i < @$items; $i += 2) {
             my ($key, $value) = @$items[ $i, $i + 1 ];
             $key = '' unless defined $key;
@@ -133,19 +149,8 @@ sub mapping_end_event {
             }
             $$hash->{ $key } = $value;
         }
-        for my $merge (@$merge_keys) {
-            for my $key (keys %$merge) {
-                $key = '' unless defined $key;
-                if (ref $key) {
-                    $key = $self->stringify_complex($key);
-                }
-                unless (exists $$hash->{ $key }) {
-                    $$hash->{ $key } = $merge->{ $key };
-                }
-            }
-        }
     };
-    $on_data->($self, \$data, \@ref, \@merge_keys);
+    $on_data->($self, \$data, \@ref);
     push @{ $stack->[-1]->{ref} }, $data;
     if (defined(my $anchor = $last->{event}->{anchor})) {
         $self->anchors->{ $anchor }->{finished} = 1;

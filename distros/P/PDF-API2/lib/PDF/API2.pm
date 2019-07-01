@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -112,10 +112,10 @@ sub new {
     $self->{'forcecompress'} = 1;
     $self->preferences(%options);
     if ($options{'-file'}) {
-        $self->{' filed'} = $options{'-file'};
         $self->{'pdf'}->create_file($options{'-file'});
+        $self->{'partial_save'} = 1;
     }
-    $self->{'infoMeta'}=[qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
+    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
     my $version = eval { $PDF::API2::VERSION } || '(Unreleased Version)';
     $self->info('Producer' => "PDF::API2 $version [$^O]");
@@ -210,7 +210,7 @@ sub open_scalar {
     weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     weaken $self->{'catalog'};
-    $self->{'reopened'} = 1;
+    $self->{'opened_scalar'} = 1;
     $self->{'forcecompress'} = 1;
     $self->{'fonts'} = {};
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
@@ -635,15 +635,7 @@ sub info {
     if (scalar @_) {
         foreach my $k (@{$self->{'infoMeta'}}) {
             next unless defined $opt{$k};
-            if (is_utf8($opt{$k})) {
-                $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
-            }
-            #elsif (is_utf8($opt{$k}) || utf8::valid($opt{$k})) {
-            #    $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
-            #}
-            else {
-                $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
-            }
+            $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
         }
         $self->{'pdf'}->out_obj($self->{'pdf'}->{'Info'});
     }
@@ -847,10 +839,15 @@ sub pageLabel {
         $nums->add_elements(PDFNum($index));
 
         my $d = PDFDict();
-        $d->{'S'} = PDFName($opts->{'-style'} eq 'Roman' ? 'R' :
-                            $opts->{'-style'} eq 'roman' ? 'r' :
-                            $opts->{'-style'} eq 'Alpha' ? 'A' :
-                            $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
+        if (defined $opts->{'-style'}) {
+            $d->{'S'} = PDFName($opts->{'-style'} eq 'Roman' ? 'R' :
+                                $opts->{'-style'} eq 'roman' ? 'r' :
+                                $opts->{'-style'} eq 'Alpha' ? 'A' :
+                                $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
+        }
+        else {
+            $d->{'S'} = PDFName('D');
+        }
 
         if (defined $opts->{'-prefix'}) {
             $d->{'P'} = PDFStr($opts->{'-prefix'});
@@ -862,6 +859,8 @@ sub pageLabel {
 
         $nums->add_elements($d);
     }
+
+    return;
 }
 
 =item $pdf->finishobjects(@objects)
@@ -881,15 +880,17 @@ B<Example:>
 sub finishobjects {
     my ($self, @objs) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         die "invalid method invocation: no file, use 'saveas' instead.";
     }
-    elsif ($self->{' filed'}) {
+    elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->ship_out(@objs);
     }
     else {
         die "invalid method invocation: no file, use 'saveas' instead.";
     }
+
+    return;
 }
 
 sub proc_pages {
@@ -903,7 +904,7 @@ sub proc_pages {
 
     my @pages;
     $pdf->{' apipagecount'} ||= 0;
-    foreach my $page ($object->{'Kids'}->elementsof()) {
+    foreach my $page ($object->{'Kids'}->elements()) {
         $page->realise();
         if ($page->{'Type'}->val() eq 'Pages') {
             push @pages, proc_pages($pdf, $page);
@@ -938,6 +939,7 @@ B<Example:>
 sub update {
     my $self = shift();
     $self->saveas($self->{'pdf'}->{' fname'});
+    return;
 }
 
 =item $pdf->saveas($file)
@@ -955,7 +957,7 @@ B<Example:>
 sub saveas {
     my ($self, $file) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         my $fh;
         CORE::open($fh, '>', $file) or die "Unable to open $file for writing: $!";
@@ -963,7 +965,7 @@ sub saveas {
         print $fh ${$self->{'content_ref'}};
         CORE::close($fh);
     }
-    elsif ($self->{' filed'}) {
+    elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->close_file();
     }
     else {
@@ -971,15 +973,16 @@ sub saveas {
     }
 
     $self->end();
+    return;
 }
 
 sub save {
     my ($self, $file) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         die "invalid method invocation: use 'saveas' instead.";
     }
-    elsif ($self->{' filed'}) {
+    elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->close_file();
     }
     else {
@@ -987,6 +990,7 @@ sub save {
     }
 
     $self->end();
+    return;
 }
 
 =item $string = $pdf->stringify()
@@ -1014,8 +1018,8 @@ B<Example:>
 sub stringify {
     my $self = shift();
 
-    my $str;
-    if ((defined $self->{'reopened'}) and ($self->{'reopened'} == 1)) {
+    my $str = '';
+    if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         $str = ${$self->{'content_ref'}};
     }
@@ -1168,7 +1172,7 @@ sub openpage {
                 $page->{'Rotate'} = PDFNum(0);
                 foreach my $mediatype (qw(MediaBox CropBox BleedBox TrimBox ArtBox)) {
                     if ($media = $page->find_prop($mediatype)) {
-                        $media = [ map { $_->val() } $media->elementsof() ];
+                        $media = [ map { $_->val() } $media->elements() ];
                     }
                     else {
                         $media = [0, 0, 612, 792];
@@ -1205,7 +1209,7 @@ sub openpage {
             if ($self->default('pageencaps')) {
                 $content->{' stream'} .= ' q ';
             }
-            foreach my $k ($uncontent->elementsof()) {
+            foreach my $k ($uncontent->elements()) {
                 $k->realise();
                 $content->{' stream'} .= ' ' . unfilter($k->{'Filter'}, $k->{' stream'}) . ' ';
             }
@@ -1234,7 +1238,6 @@ sub openpage {
     $page->{' api'} = $self;
     weaken $page->{' apipdf'};
     weaken $page->{' api'};
-    $page->{' reopened'} = 1;
     return $page;
 }
 
@@ -1258,7 +1261,7 @@ sub walk_obj {
 
     if (ref($source_object) =~ /Array$/) {
         $target_object->{' val'} = [];
-        foreach my $k ($source_object->elementsof()) {
+        foreach my $k ($source_object->elements()) {
             $k->realise() if ref($k) =~ /Objind$/;
             $target_object->add_elements(walk_obj($object_cache, $source_pdf, $target_pdf, $k));
         }
@@ -1344,7 +1347,7 @@ sub importPageIntoForm {
         # my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
         next unless defined $s_page->find_prop($k);
         my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
-        $xo->bbox(map { $_->val() } $box->elementsof());
+        $xo->bbox(map { $_->val() } $box->elements());
         last;
     }
     $xo->bbox(0, 0, 612, 792) unless defined $xo->{'BBox'};
@@ -1378,7 +1381,7 @@ sub importPageIntoForm {
 
         $xo->{' stream'} = '';
         # openpage pages only contain one stream
-        my ($k) = $s_page->{'Contents'}->elementsof();
+        my ($k) = $s_page->{'Contents'}->elements();
         $k->realise();
         if ($k->{' nofilt'}) {
           # we have a finished stream here
@@ -1470,7 +1473,7 @@ sub import_page {
         my $box = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $prop);
         my $method = lc $k;
 
-        $t_page->$method(map { $_->val() } $box->elementsof());
+        $t_page->$method(map { $_->val() } $box->elements());
     }
 
     $t_page->gfx->formimage($xo, 0, 0, 1);
@@ -1486,7 +1489,7 @@ sub import_page {
         }
         my @Fields = ();
         my @Annots = ();
-        foreach my $a ($s_page->{'Annots'}->elementsof()) {
+        foreach my $a ($s_page->{'Annots'}->elements()) {
             $a->realise();
             my $t_a = PDFDict();
             $self->{'pdf'}->new_obj($t_a);
@@ -1718,7 +1721,7 @@ sub corefont {
     require PDF::API2::Resource::Font::CoreFont;
     my $obj = PDF::API2::Resource::Font::CoreFont->new($self->{'pdf'}, $name, %opts);
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
     return $obj;
 }
 
@@ -1768,7 +1771,7 @@ sub psfont {
     my $obj = PDF::API2::Resource::Font::Postscript->new($self->{'pdf'}, $psf, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
 
     return $obj;
 }
@@ -1855,7 +1858,7 @@ sub cjkfont {
     my $obj = PDF::API2::Resource::CIDFont::CJKFont->new($self->{'pdf'}, $name, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
 
     return $obj;
 }
@@ -2399,14 +2402,39 @@ __END__
 
 =back
 
+=head1 SUPPORTED PERL VERSIONS
+
+PDF::API2 will aim to support all major Perl versions that were released in the
+past six years, plus one, in order to continue working for the life of most
+long-term-stable (LTS) server distributions.
+
+For example, a version of PDF::API2 released on 2018-01-01 would support the
+last major version of Perl released before 2012-01-01, which happens to be 5.14.
+
+If you need to use this module on a server with an extremely out-of-date version
+of Perl, consider using either plenv or Perlbrew to run a newer version of Perl
+without needing admin privileges.
+
 =head1 KNOWN ISSUES
 
 This module does not work with perl's -l command-line switch.
 
 =head1 AUTHOR
 
-PDF::API2 was originally written by Alfred Reibenschuh.
+PDF::API2 was originally written by Alfred Reibenschuh, extending code written
+by Martin Hosken.
 
-It is currently being maintained by Steve Simms.
+It is currently being maintained and developed by Steve Simms.
+
+=head1 LICENSE
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, either version 2.1 of the License, or (at your option) any
+later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
 
 =cut

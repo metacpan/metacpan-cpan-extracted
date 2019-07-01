@@ -48,7 +48,7 @@
    "provides" : {
       "App::termpub" : {
          "file" : "lib/App/termpub.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "App::termpub::Epub" : {
          "file" : "lib/App/termpub/Epub.pm"
@@ -56,14 +56,20 @@
       "App::termpub::Epub::Chapter" : {
          "file" : "lib/App/termpub/Epub/Chapter.pm"
       },
+      "App::termpub::Hyphen" : {
+         "file" : "lib/App/termpub/Hyphen.pm"
+      },
       "App::termpub::InfoBox" : {
          "file" : "lib/App/termpub/InfoBox.pm"
       },
       "App::termpub::Pager" : {
          "file" : "lib/App/termpub/Pager.pm"
       },
-      "App::termpub::Renderer" : {
-         "file" : "lib/App/termpub/Renderer.pm"
+      "App::termpub::Pager::HTML" : {
+         "file" : "lib/App/termpub/Pager/HTML.pm"
+      },
+      "App::termpub::Pager::Text" : {
+         "file" : "lib/App/termpub/Pager/Text.pm"
       }
    },
    "release_status" : "stable",
@@ -77,12 +83,12 @@
          "web" : "https://github.com/mdom/termpub"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_contributors" : [
       "Adrian Petrescu <apetresc@gmail.com>",
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

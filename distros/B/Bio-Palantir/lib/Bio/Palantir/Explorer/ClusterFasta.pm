@@ -1,6 +1,6 @@
 package Bio::Palantir::Explorer::ClusterFasta;
 # ABSTRACT: Explorer internal class for handling ClusterFasta objects
-$Bio::Palantir::Explorer::ClusterFasta::VERSION = '0.191620';
+$Bio::Palantir::Explorer::ClusterFasta::VERSION = '0.191800';
 use Moose;
 use namespace::autoclean;
 
@@ -137,7 +137,7 @@ Bio::Palantir::Explorer::ClusterFasta - Explorer internal class for handling Clu
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

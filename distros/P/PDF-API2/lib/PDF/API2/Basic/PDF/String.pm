@@ -16,7 +16,7 @@ use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 =head1 NAME
 
@@ -186,13 +186,13 @@ sub as_pdf {
     my ($self) = @_;
     my $str = $self->{'val'};
 
-    if ($self->{' isutf'}) {
-        $str = join('', map { sprintf('%04X' , $_) } unpack('U*', $str) );
-        return "<FEFF$str>";
-    }
-    elsif ($self->{' ishex'}) { # imported as hex ?
+    if ($self->{' ishex'}) { # imported as hex ?
         $str = unpack('H*', $str);
         return "<$str>";
+    }
+    elsif ($self->{' isutf'} or (utf8::is_utf8($str) and $str =~ /[^[:ascii:]]/)) {
+        $str = join('', map { sprintf('%04X' , $_) } unpack('U*', $str) );
+        return "<FEFF$str>";
     }
     else {
         if ($str =~ m/[^\n\r\t\b\f\040-\176\200-\377]/oi) {
@@ -213,7 +213,7 @@ Outputs the string in PDF format, complete with necessary conversions
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     $fh->print($self->as_pdf($pdf));
 }

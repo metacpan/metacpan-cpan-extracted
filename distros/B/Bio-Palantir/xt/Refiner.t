@@ -5,8 +5,6 @@ use Test::Most;
 use autodie;
 use feature qw(say);
 
-use Smart::Comments;
-
 use List::AllUtils;
 use Path::Class qw(file);
 
@@ -178,10 +176,9 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
 
     my @expected_domain_classes = [
         'condensation', 'substrate-selection', 
-        'tailoring', 'tailoring', 'tailoring', 
-        'tailoring',
+        'tailoring/other', 'tailoring/other', 'tailoring/other', 
+        'tailoring/other',
     ];
-
 
     my (@domain_symbols, @domain_classes);
     for my $gene ($ClusterPlus->all_genes) {

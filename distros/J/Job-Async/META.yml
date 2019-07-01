@@ -33,28 +33,28 @@ no_index:
 provides:
   Job::Async:
     file: lib/Job/Async.pm
-    version: '0.003'
+    version: '0.004'
   Job::Async::Client:
     file: lib/Job/Async/Client.pm
-    version: '0.003'
+    version: '0.004'
   Job::Async::Client::Memory:
     file: lib/Job/Async/Client/Memory.pm
-    version: '0.003'
+    version: '0.004'
   Job::Async::Job:
     file: lib/Job/Async/Job.pm
-    version: '0.003'
+    version: '0.004'
   Job::Async::Test::Compliance:
     file: lib/Job/Async/Test/Compliance.pm
-    version: '0.003'
+    version: '0.004'
   Job::Async::Utils:
     file: lib/Job/Async/Utils.pm
-    version: '0.003'
+    version: '0.004'
   Job::Async::Worker:
     file: lib/Job/Async/Worker.pm
-    version: '0.003'
+    version: '0.004'
   Job::Async::Worker::Memory:
     file: lib/Job/Async/Worker/Memory.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Future: '0.37'
   Future::Utils: '0'
@@ -73,7 +73,7 @@ requires:
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.003'
+version: '0.004'
 x_authority: cpan:TEAM
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

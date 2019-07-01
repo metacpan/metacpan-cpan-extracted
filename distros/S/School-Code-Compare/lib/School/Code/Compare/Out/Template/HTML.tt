@@ -1,1 +1,1 @@
-      <tr class='suspect[% suspicious %]'> <td>[% ratio %]</td> <td>[% distance %]</td> <td>[% delta_length %]</td> <td>[% file1 %]</td> <td>[% file2 %]</td> <td>[% comment %]</td> </tr>
+      <tr class='suspect[% suspicious %]'> <td>[% ratio %]</td> <td>[% distance %]</td> <td>[% length1 %];[% length2 %]</td> <td>[% delta_length %]</td> <td>[% file1 %]</td> <td>[% file2 %]</td> <td>[% comment %]</td> </tr>

@@ -7,8 +7,9 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose qw();
-use Term::Form   qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 
@@ -44,7 +45,8 @@ sub attach_db {
             }
             push @tmp_info, '';
             my $info = join( "\n", @tmp_info );
-            my $prompt = "ATTACH DATABASE"; # \n
+            my $prompt = "ATTACH DATABASE";
+            # Choose
             my $db = $tc->choose(
                 $choices,
                 { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, info => $info, undef => $sf->{i}{back} }
@@ -64,11 +66,13 @@ sub attach_db {
                 my $alias = $tf->readline( 'alias: ',
                     { info => $info, clear_screen => 1 }
                 );
+                print HIDE_CURSOR;
                 if ( ! length $alias ) {
                     last ALIAS;
                 }
                 elsif ( any { $_->[1] eq $alias } @$cur_attached, @$new_attached ) {
                     my $prompt = "alias '$alias' already used:";
+                    # Choose
                     my $retry = $tc->choose(
                         [ undef, 'New alias' ],
                         { prompt => $prompt, info => $info, undef => $sf->{i}{back}, clear_screen => 1 }
@@ -88,6 +92,7 @@ sub attach_db {
                 push @tmp_info, '';
                 my $info = join( "\n", @tmp_info );
                 my ( $ok, $more ) = ( 'OK', '++' );
+                # Choose
                 my $choice = $tc->choose(
                     [ undef, $ok, $more ],
                     { info => $info, clear_screen => 1 }
@@ -130,7 +135,6 @@ sub detach_db {
 
     while ( 1 ) {
         my @tmp_info = ( $sf->{d}{db_string}, 'Detach:' );
-
         for my $detach ( @chosen ) {
             push @tmp_info, sprintf 'DETACH DATABASE %s (%s)', $detach->[1], $detach->[0];
         }

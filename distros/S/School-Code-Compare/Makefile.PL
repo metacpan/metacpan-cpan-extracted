@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.022000;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,13 +17,16 @@ my %WriteMakefileArgs = (
     "bin/compare-code"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.022000",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "School::Code::Compare",
   "PREREQ_PM" => {
     "DateTime" => 0,
+    "File::Find::Rule" => 0,
     "File::Slurp" => 0,
-    "Getopt::Args" => 0,
     "IO::Prompt::Simple" => 0,
+    "Module::Installed::Tiny" => 0,
+    "Module::Load" => 0,
+    "OptArgs" => 0,
     "Template" => 0,
     "Text::Levenshtein::XS" => 0,
     "feature" => 0,
@@ -32,22 +35,27 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Script" => "1.10"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.101",
   "test" => {
-    "TESTS" => "t/simplify/*.t"
+    "TESTS" => "t/app/*.t t/charset/*.t t/compare/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "DateTime" => 0,
+  "File::Find::Rule" => 0,
   "File::Slurp" => 0,
-  "Getopt::Args" => 0,
   "IO::Prompt::Simple" => 0,
+  "Module::Installed::Tiny" => 0,
+  "Module::Load" => 0,
+  "OptArgs" => 0,
   "Template" => 0,
   "Test::More" => 0,
+  "Test::Script" => "1.10",
   "Text::Levenshtein::XS" => 0,
   "feature" => 0,
   "strict" => 0,

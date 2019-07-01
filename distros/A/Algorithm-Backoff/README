@@ -2,7 +2,7 @@ NAME
     Algorithm::Backoff - Various backoff strategies for retry
 
 VERSION
-    This document describes version 0.008 of Algorithm::Backoff (from Perl
+    This document describes version 0.009 of Algorithm::Backoff (from Perl
     distribution Algorithm-Backoff), released on 2019-06-20.
 
 SYNOPSIS

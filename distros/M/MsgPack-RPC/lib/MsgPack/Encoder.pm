@@ -1,7 +1,7 @@
 package MsgPack::Encoder;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Encode a structure into a MessagePack binary string
-$MsgPack::Encoder::VERSION = '2.0.2';
+$MsgPack::Encoder::VERSION = '2.0.3';
 
 use strict;
 use warnings;
@@ -489,7 +489,7 @@ MsgPack::Encoder - Encode a structure into a MessagePack binary string
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 SYNOPSIS
 
@@ -574,8 +574,6 @@ MessagePack representations.
 Which is equivalent to
 
     $packed = MsgPack::Encoder->new(struct=>$data);
-
-=back
 
 =head1 OBJECT OVERLOADING
 

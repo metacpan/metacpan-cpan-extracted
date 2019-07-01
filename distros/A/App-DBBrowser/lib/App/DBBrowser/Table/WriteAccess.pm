@@ -5,9 +5,10 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose       qw();
-use Term::Choose::Util qw( insert_sep );
-use Term::TablePrint   qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( insert_sep );
+use Term::TablePrint        qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -155,6 +156,7 @@ sub commit_sql {
                 { grid => 2, prompt => $prompt, max_rows => 0, keep_header => 1,
                   table_expand => $sf->{o}{G}{info_expand} }
             );
+            print HIDE_CURSOR;
         }
     }
     $ax->print_sql( $sql, $waiting );

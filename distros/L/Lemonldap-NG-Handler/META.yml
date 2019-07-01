@@ -28,7 +28,7 @@ recommends:
   SOAP::Lite: '0'
 requires:
   LWP::UserAgent: '0'
-  Lemonldap::NG::Common: v2.0.4
+  Lemonldap::NG::Common: v2.0.5
   Mouse: '0'
   URI: '0'
 resources:
@@ -36,5 +36,5 @@ resources:
   X_twitter: https://twitter.com/lemonldapng
   homepage: http://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.4
+version: v2.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

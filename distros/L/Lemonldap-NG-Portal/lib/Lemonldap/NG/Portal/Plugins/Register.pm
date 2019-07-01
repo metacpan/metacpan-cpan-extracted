@@ -310,6 +310,7 @@ sub _register {
 
         # Use HTML template
         $body = $self->loadTemplate(
+            $req,
             'mail_register_confirm',
             filter => $tr,
             params => \%tplPrms
@@ -369,6 +370,7 @@ sub _register {
 
     # Use HTML template
     $body = $self->loadTemplate(
+        $req,
         'mail_register_done',
         filter => $tr,
         params => \%tplPrms

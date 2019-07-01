@@ -384,7 +384,7 @@ sub deleteSession {
     my ( $self, $req, $id ) = @_;
     die('id parameter is required') unless ($id);
 
-    my $session = $self->p->getApacheSession($id);
+    my $session = $self->p->getApacheSession( $id, kind => '' );
 
     return 0 unless ($session);
 

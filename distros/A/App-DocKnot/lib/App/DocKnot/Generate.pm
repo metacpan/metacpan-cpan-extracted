@@ -10,18 +10,15 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 2.00;
+package App::DocKnot::Generate 3.00;
 
 use 5.024;
 use autodie;
+use parent qw(App::DocKnot);
 use warnings;
 
+use App::DocKnot::Config;
 use Carp qw(croak);
-use File::BaseDir qw(config_files);
-use File::ShareDir qw(module_file);
-use File::Spec;
-use JSON;
-use Perl6::Slurp;
 use Template;
 use Text::Wrap qw(wrap);
 
@@ -306,93 +303,6 @@ sub _code_for_to_thread {
 # Helper methods
 ##############################################################################
 
-# Internal helper routine to return the path of a file from the application
-# data.  These data files are installed with App::DocKnot, but each file can
-# be overridden by the user via files in $HOME/.config/docknot or
-# /etc/xdg/docknot (or whatever $XDG_CONFIG_DIRS is set to).
-#
-# We therefore try File::BaseDir first (which handles the XDG paths) and fall
-# back on using File::ShareDir to locate the data.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The relative path of the file as a list of components
-#
-# Returns: The absolute path to the application data
-#  Throws: Text exception on failure to locate the desired file
-sub _appdata_path {
-    my ($self, @path) = @_;
-
-    # Try XDG paths first.
-    my $path = config_files('docknot', @path);
-
-    # If that doesn't work, use the data that came with the module.
-    if (!defined($path)) {
-        $path = module_file('App::DocKnot', File::Spec->catfile(@path));
-    }
-    return $path;
-}
-
-# Internal helper routine that locates an application data file, interprets it
-# as JSON, and returns the resulting decoded contents.  This uses the relaxed
-# parsing mode, so comments and commas after data elements are supported.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The path of the file to load, as a list of components
-#
-# Returns: Anonymous hash or array resulting from decoding the JSON object
-#  Throws: slurp or JSON exception on failure to load or decode the object
-sub _load_appdata_json {
-    my ($self, @path) = @_;
-    my $path = $self->_appdata_path(@path);
-    my $json = JSON->new;
-    $json->relaxed;
-    return $json->decode(scalar(slurp($path)));
-}
-
-# Internal helper routine to return the path of a file or directory from the
-# package metadata directory.  The resulting file or directory path is not
-# checked for existence.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The relative path of the file as a list of components
-#
-# Returns: The absolute path in the metadata directory
-sub _metadata_path {
-    my ($self, @path) = @_;
-    return File::Spec->catdir($self->{metadata}, @path);
-}
-
-# Internal helper routine to read a file from the package metadata directory
-# and return the contents.  The file is specified as a list of path
-# components.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The path of the file to load, as a list of components
-#
-# Returns: The contents of the file as a string
-#  Throws: slurp exception on failure to read the file
-sub _load_metadata {
-    my ($self, @path) = @_;
-    return slurp($self->_metadata_path(@path));
-}
-
-# Like _load_metadata, but interprets the contents of the metadata file as
-# JSON and decodes it, returning the resulting object.  This uses the relaxed
-# parsing mode, so comments and commas after data elements are supported.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The path of the file to load, as a list of components
-#
-# Returns: Anonymous hash or array resulting from decoding the JSON object
-#  Throws: slurp or JSON exception on failure to load or decode the object
-sub _load_metadata_json {
-    my ($self, @path) = @_;
-    my $data = $self->_load_metadata(@path);
-    my $json = JSON->new;
-    $json->relaxed;
-    return $json->decode($data);
-}
-
 # Word-wrap a paragraph of text.  This is a helper function for _wrap, mostly
 # so that it can be invoked recursively to wrap bulleted paragraphs.
 #
@@ -516,19 +426,17 @@ sub _wrap {
 sub new {
     my ($class, $args_ref) = @_;
 
-    # Ensure we were given a valid metadata argument.
-    my $metadata = $args_ref->{metadata};
-    if (!defined($metadata)) {
-        $metadata = 'docs/metadata';
+    # Create the config reader.
+    my %config_args;
+    if ($args_ref->{metadata}) {
+        $config_args{metadata} = $args_ref->{metadata};
     }
-    if (!-d $metadata) {
-        croak("metadata path $metadata does not exist or is not a directory");
-    }
+    my $config = App::DocKnot::Config->new(\%config_args);
 
     # Create and return the object.
     my $self = {
-        metadata => $metadata,
-        width    => $args_ref->{width} // 74,
+        config => $config,
+        width  => $args_ref->{width} // 74,
     };
     bless($self, $class);
     return $self;
@@ -546,86 +454,12 @@ sub new {
 sub generate {
     my ($self, $template) = @_;
 
-    # Load the package metadata from JSON.
-    my $data_ref = $self->_load_metadata_json('metadata.json');
-
-    # Load supplemental README sections.  readme.sections will contain a list
-    # of sections to add to the README file.
-    for my $section ($data_ref->{readme}{sections}->@*) {
-        my $title = $section->{title};
-
-        # The file containing the section data will match the title, converted
-        # to lowercase and with spaces changed to dashes.
-        my $file = lc($title);
-        $file =~ tr{ }{-};
-
-        # Load the section content.
-        $section->{body} = $self->_load_metadata('sections', $file);
-
-        # If this contains a testing section, that overrides our default.  Set
-        # a flag so that the templates know this has happened.
-        if ($file eq 'testing') {
-            $data_ref->{readme}{testing} = 1;
-        }
-    }
-
-    # If the package is marked orphaned, load the explanation.
-    if ($data_ref->{orphaned}) {
-        $data_ref->{orphaned} = $self->_load_metadata('orphaned');
-    }
-
-    # If the package has a quote, load the text of the quote.
-    if ($data_ref->{quote}) {
-        $data_ref->{quote}{text} = $self->_load_metadata('quote');
-    }
-
-    # Expand the package license into license text.
-    my $license      = $data_ref->{license};
-    my $licenses_ref = $self->_load_appdata_json('licenses.json');
-    if (!exists($licenses_ref->{$license})) {
-        die "Unknown license $license\n";
-    }
-    my $license_text = slurp($self->_appdata_path('licenses', $license));
-    $data_ref->{license} = { $licenses_ref->{$license}->%* };
-    $data_ref->{license}{full} = $license_text;
-
-    # Load additional license notices if they exist.
-    eval { $data_ref->{license}{notices} = $self->_load_metadata('notices') };
+    # Load the package metadata.
+    my $data_ref = $self->{config}->config();
 
     # Create the variable information for the template.  Start with all
     # metadata as loaded above.
     my %vars = %{$data_ref};
-
-    # Load the standard sections.
-    $vars{blurb}        = $self->_load_metadata('blurb');
-    $vars{description}  = $self->_load_metadata('description');
-    $vars{requirements} = $self->_load_metadata('requirements');
-
-    # Load bootstrap, Debian summary information, and extra packaging
-    # information if they exist.
-    eval { $vars{bootstrap} = $self->_load_metadata('bootstrap') };
-    eval {
-        $vars{debian}{summary} = $self->_load_metadata('debian', 'summary');
-    };
-    eval {
-        $vars{packaging}{extra} = $self->_load_metadata('packaging', 'extra');
-    };
-
-    # Load build sections if they exist.
-    eval { $vars{build}{middle} = $self->_load_metadata('build', 'middle') };
-    eval { $vars{build}{suffix} = $self->_load_metadata('build', 'suffix') };
-
-    # build.install defaults to true.
-    if (!exists($vars{build}{install})) {
-        $vars{build}{install} = 1;
-    }
-
-    # Load testing sections if they exist.
-    eval { $vars{test}{prefix} = $self->_load_metadata('test', 'prefix') };
-    eval { $vars{test}{suffix} = $self->_load_metadata('test', 'suffix') };
-
-    # Load support sections if they exist.
-    eval { $vars{support}{extra} = $self->_load_metadata('support', 'extra') };
 
     # Add code references for our defined helper functions.
     $vars{center}    = $self->_code_for_center;
@@ -635,7 +469,7 @@ sub generate {
     $vars{to_thread} = $self->_code_for_to_thread;
 
     # Ensure we were given a valid template.
-    $template = $self->_appdata_path('templates', "${template}.tmpl");
+    $template = $self->appdata_path('templates', "${template}.tmpl");
 
     # Run Template Toolkit processing.
     my $tt = Template->new({ ABSOLUTE => 1 }) or croak(Template->error());
@@ -707,7 +541,6 @@ App::DocKnot::Generate - Generate documentation from package metadata
 
 =head1 SYNOPSIS
 
-    use App::DocKnot;
     use App::DocKnot::Generate;
     my $docknot = App::DocKnot::Generate->new({ metadata => 'docs/metadata' });
     my $readme = $docknot->generate('readme');
@@ -818,7 +651,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2018 Russ Allbery <rra@cpan.org>
+Copyright 2013-2019 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

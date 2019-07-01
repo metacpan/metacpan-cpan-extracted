@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth;
-our $VERSION = '1.034';
+our $VERSION = '1.035';
 # ABSTRACT: Add one or more authentication plugins to your site
 
 #pod =head1 SYNOPSIS
@@ -215,7 +215,7 @@ sub register {
     $self->route->to( cb => currym( $self, 'login_form' ) );
 }
 
-#pod =method
+#pod =method current_user
 #pod
 #pod Returns the currently logged-in user, if any.
 #pod
@@ -231,7 +231,7 @@ sub current_user {
     return undef;
 }
 
-#pod =method
+#pod =method plugins
 #pod
 #pod Returns the list of configured auth plugins.
 #pod
@@ -312,7 +312,7 @@ Yancy::Plugin::Auth - Add one or more authentication plugins to your site
 
 =head1 VERSION
 
-version 1.034
+version 1.035
 
 =head1 SYNOPSIS
 
@@ -364,11 +364,11 @@ directly if you want.
 
 =head1 METHODS
 
-=head2
+=head2 current_user
 
 Returns the currently logged-in user, if any.
 
-=head2
+=head2 plugins
 
 Returns the list of configured auth plugins.
 

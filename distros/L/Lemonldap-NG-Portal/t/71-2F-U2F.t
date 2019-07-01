@@ -18,6 +18,7 @@ SKIP: {
                 u2fSelfRegistration => 1,
                 u2fActivation       => 1,
                 portalMainLogo      => 'common/logos/logo_llng_old.png',
+                totp2fTTL           => 2,
             }
         }
     );
@@ -186,7 +187,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
 
     # See https://github.com/mschout/perl-authen-u2f-tester/issues/2
     if ( $Authen::U2F::Tester::VERSION >= 0.03 ) {
-        expectCookie($res);
+        $id = expectCookie($res);
+        $client->logout($id);
     }
     else {
         count(1);

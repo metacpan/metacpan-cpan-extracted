@@ -3,181 +3,374 @@ abstract: 'lazily calculate the tuples of a cartesian-product'
 author:
   - 'Stephen R. Scaffidi <sscaffidi@cpan.org>'
 build_requires:
-  Module::Build: 0.3601
-  Test::More: 0
+  Module::Build: '0.28'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Set-CartesianProduct-Lazy
+provides:
+  Set::CartesianProduct::Lazy:
+    file: lib/Set/CartesianProduct/Lazy.pm
+    version: '0.004'
 requires:
-  Carp: 0
-  Data::Dumper: 0
-  List::Util: 0
-  Scalar::Util: 0
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Data::Dumper: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
 resources:
-  homepage: https://github.com/Hercynium/Set-CartesianProduct-Lazy
-  repository: https://github.com/Hercynium/Set-CartesianProduct-Lazy.git
-version: 0.002
+  homepage: https://github.com/hercynium/Set-CartesianProduct-Lazy
+  repository: https://github.com/hercynium/Set-CartesianProduct-Lazy.git
+version: '0.004'
 x_Dist_Zilla:
+  perl:
+    version: '5.030000'
   plugins:
     -
-      class: Dist::Zilla::Plugin::FakeRelease
-      name: FakeRelease
-      version: 4.300018
-    -
       class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - Build.PL
+            - Makefile.PL
+            - README.mkdn
+            - dist.ini
+            - weaver.ini
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
       name: Git::GatherDir
-      version: 1.121010
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/ExtraTests'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
       name: '@Filter/MakeMaker'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: '2.20.1 (Apple Git-117)'
+          repo_root: .
       name: '@Filter/Check'
-      version: 1.121010
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v0.004
+          tag_format: v%V
+          tag_message: v%V
+        Dist::Zilla::Role::Git::Repo:
+          git_version: '2.20.1 (Apple Git-117)'
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
       name: '@Filter/Tag'
-      version: 1.121010
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
-      version: 0.103510
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::ChangelogFromGit
       name: ChangelogFromGit
-      version: 0.005
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: -Transformer
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::EnsureUniqueSections
+              name: -EnsureUniqueSections
+              version: '0.163250'
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Name
+              name: Name
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Version
+              name: Version
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: prelude
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: Leftovers
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: postlude
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Extends
+              name: Extends
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::Consumes
+              name: Consumes
+              version: '0.010'
+            -
+              class: Pod::Weaver::Section::Support
+              name: Support
+              version: '1.010'
+            -
+              class: Pod::Weaver::Section::SeeAlso
+              name: SeeAlso
+              version: '1.003'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: Authors
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: Legal
+              version: '4.015'
       name: PodWeaver
-      version: 3.101641
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
+      config:
+        Dist::Zilla::Plugin::Git::NextVersion:
+          first_version: '0.001'
+          version_by_branch: 0
+          version_regexp: (?^:^v(.+)$)
+        Dist::Zilla::Role::Git::Repo:
+          git_version: '2.20.1 (Apple Git-117)'
+          repo_root: .
       name: Git::NextVersion
-      version: 1.121010
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ModuleBuild
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
       name: ModuleBuild
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PkgDist
       name: PkgDist
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodVersion
       name: PodVersion
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
-      version: 0.28
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
       name: ReadmeMarkdownFromPod
-      version: 0.120120
+      version: '0.141140'
     -
       class: Dist::Zilla::Plugin::ArchiveRelease
       name: ArchiveRelease
-      version: 4.00
+      version: '6.000'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerlFast
+      name: MinimumPerlFast
+      version: '0.003'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+              version: '6.012'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000036'
+          version: '0.006'
+      name: MetaProvides::Package
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: 4.300018
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: 4.300018
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: 4.300018
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: 4.300018
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: 0
-    version: 4.300018
+      is_trial: '0'
+    version: '6.012'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

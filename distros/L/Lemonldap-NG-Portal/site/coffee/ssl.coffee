@@ -19,5 +19,6 @@ tryssl = () ->
 		error: () ->
 			$('#lform').submit()
 			console.log 'Error'
+	false
 $(document).ready ->
 	$('.sslclick').on 'click', tryssl

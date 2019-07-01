@@ -41,7 +41,8 @@
             "DBI" : "0",
             "LWP::Protocol::https" : "0",
             "Net::LDAP" : "0",
-            "SOAP::Lite" : "0"
+            "SOAP::Lite" : "0",
+            "String::Random" : "0"
          },
          "requires" : {
             "Apache::Session" : "0",
@@ -71,6 +72,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.4",
+   "version" : "v2.0.5",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

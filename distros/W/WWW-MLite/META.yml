@@ -21,7 +21,7 @@ no_index:
 recommends:
   Data::Dumper: '0'
 requires:
-  CTK: '2'
+  CTK: '2.01'
   File::Temp: '0.22'
   HTTP::Message: '6.08'
   IO: '0'
@@ -32,4 +32,4 @@ resources:
   homepage: https://www.serzik.com
   license: https://dev.perl.org/licenses
   repository: http://svn.serzik.com/WWW-MLite/trunk
-version: '2.00'
+version: '2.01'

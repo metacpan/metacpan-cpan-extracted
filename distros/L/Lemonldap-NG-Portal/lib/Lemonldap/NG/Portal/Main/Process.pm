@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.5';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -160,7 +160,7 @@ sub authLogout {
 sub deleteSession {
     my ( $self, $req ) = @_;
     if ( my $id = $req->id || $req->userData->{_session_id} ) {
-        my $apacheSession = $self->getApacheSession( $req->id );
+        my $apacheSession = $self->getApacheSession($id);
         unless ($apacheSession) {
             $self->logger->debug("Session $id already deleted");
             return PE_OK;
@@ -183,7 +183,8 @@ sub deleteSession {
 
         $req->info(
             $self->loadTemplate(
-                'simpleInfo', params => { trspan => 'logoutFromOtherApp' }
+                $req, 'simpleInfo',
+                params => { trspan => 'logoutFromOtherApp' }
             )
         );
 
@@ -356,6 +357,9 @@ sub setSessionInfo {
           if $self->conf->{timeoutActivity};
     }
 
+    # Currently selected language
+    $req->{sessionInfo}->{_language} = $req->cookies->{llnglanguage} || 'en';
+
     # Store URL origin in session
     $req->{sessionInfo}->{_url} = $req->{urldc};
 
@@ -404,7 +408,6 @@ sub setPersistentSessionInfo {
             }
         }
     }
-
     PE_OK;
 }
 
@@ -433,20 +436,16 @@ sub store {
     $req->userData( $req->sessionInfo );
 
     # Create second session for unsecure cookie
-    if ( $self->conf->{securedCookie} == 2 ) {
-
+    if ( $self->conf->{securedCookie} == 2 and !$req->refresh() ) {
         my %infos = %{ $req->{sessionInfo} };
+        $infos{_updateTime} = strftime( "%Y%m%d%H%M%S", localtime() );
+        $self->logger->debug("Set _updateTime with $infos{_updateTime}");
         $infos{_httpSessionType} = 1;
 
         my $session2 = $self->getApacheSession( undef, info => \%infos );
-
+        $self->logger->debug("Create second session for unsecured cookie...");
         $req->{sessionInfo}->{_httpSession} = $session2->id;
-    }
-
-    # Compute unsecure cookie value if needed
-    if ( $self->conf->{securedCookie} == 3 ) {
-        $req->{sessionInfo}->{_httpSession} =
-          $self->conf->{cipher}->encryptHex( $req->{id}, "http" );
+        $self->logger->debug( " -> Cookie value : " . $session2->id );
     }
 
     # Fill session
@@ -472,6 +471,15 @@ sub store {
     );
     return PE_APACHESESSIONERROR unless ($session);
     $req->id( $session->{id} );
+
+    # Compute unsecured cookie value if needed
+    if ( $self->conf->{securedCookie} == 3 and !$req->refresh() ) {
+        $req->{sessionInfo}->{_httpSession} =
+          $self->conf->{cipher}->encryptHex( $req->{id}, "http" );
+        $self->logger->debug( " -> Compute unsecured cookie value : "
+              . $req->{sessionInfo}->{_httpSession} );
+    }
+    $req->refresh(0);
 
     PE_OK;
 }

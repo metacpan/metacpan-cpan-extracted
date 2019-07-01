@@ -21,6 +21,8 @@ my $client = $jobman->client(
 my $worker = $jobman->worker(
     redis => {
         uri => 'redis://127.0.0.1',
+        use_multi => 1,
+        timeout => 5,
     }
 );
 Future->needs_all(
@@ -43,7 +45,7 @@ my $count = 0;
         second => $y,
     )->on_done(sub {
         ++$count;
-        warn 'bad result' unless $x + $y == shift
+        warn 'bad result - ' . $_[0] unless $x + $y == $_[0]
     })->on_fail(sub {
         warn 'failure ' . shift
     })

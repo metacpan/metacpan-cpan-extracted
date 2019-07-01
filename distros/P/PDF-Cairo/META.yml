@@ -29,5 +29,5 @@ requires:
   perl: '5.016'
 resources:
   repository: https://github.com/jgreely/PDF-Cairo.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

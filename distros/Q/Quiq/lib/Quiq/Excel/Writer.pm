@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Path;
 
@@ -24,10 +24,19 @@ Excel::Writer::XLSX
 =head1 DESCRIPTION
 
 Diese Klasse ist abgeleitet von Excel::Writer::XLSX.
-Sie erweitert ihre Basisklasse um
+Sie erweitert die Basisklasse um
 
-    * Tilde-Expansion im Dateinamen
-    * Exceptions im Fehlerfall
+=over 2
+
+=item *
+
+Tilde-Expansion im Dateinamen
+
+=item *
+
+Exceptions im Fehlerfall
+
+=back
 
 Dokumentation siehe Basisklasse.
 
@@ -91,7 +100,7 @@ sub new {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

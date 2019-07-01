@@ -2,13 +2,21 @@
 .gitignore
 .travis.yml
 Changes
+Free.xs
 LICENSE
 MANIFEST
 Makefile.PL
 README.md
+cbor_free_boolean.c
+cbor_free_boolean.h
+cbor_free_common.h
+cbor_free_decode.c
+cbor_free_decode.h
+cbor_free_encode.c
+cbor_free_encode.h
 lib/CBOR/Free.pm
-lib/CBOR/Free.xs
 lib/CBOR/Free/AddOne.pm
+lib/CBOR/Free/Decoder.pm
 lib/CBOR/Free/Tagged.pm
 lib/CBOR/Free/X.pm
 lib/CBOR/Free/X/Base.pm
@@ -38,8 +46,10 @@ t/hash.t
 t/negint.t
 t/string.t
 t/tag.t
+t/tag_decode.t
 t/uint.t
 t/undef.t
 t_manual/upstream_test_vectors.t
+typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

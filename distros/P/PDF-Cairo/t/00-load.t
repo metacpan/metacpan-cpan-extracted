@@ -5,9 +5,9 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    use_ok( 'Cairo' ) || print "No Cairo!\n";
-    use_ok( 'Pango' ) || print "No Pango!\n";
-    use_ok( 'Font::FreeType' ) || print "No Font::FreeType!\n";
+    use_ok( 'Cairo' ) || BAIL_OUT("No Cairo!");
+    use_ok( 'Pango' ) || BAIL_OUT("No Pango!");
+    use_ok( 'Font::FreeType' ) || BAIL_OUT("No Font::FreeType!");
 }
 BEGIN {
     # need this to debug CPAN test failures
@@ -15,12 +15,11 @@ BEGIN {
     diag ( "  cairo: " . Cairo->lib_version_string );
     diag ( "  pango: " . join(".", Pango->GET_VERSION_INFO) );
     diag ( "  freetype: " . Font::FreeType->new->version() );
-    ok (Cairo->lib_version >= Cairo->LIB_VERSION_ENCODE(1,10,0),
-        'libcairo recording surface support');
-    use_ok( 'PDF::Cairo' ) || print "Bail out!\n";
-    use_ok( 'PDF::Cairo::Box' ) || print "Bail out!\n";
-    use_ok( 'PDF::Cairo::Font' ) || print "Bail out!\n";
-    use_ok( 'PDF::Cairo::Layout' ) || print "Bail out!\n";
+	BAIL_OUT("libcairo version must be >= 1.10.0")
+		unless Cairo->lib_version >= Cairo->LIB_VERSION_ENCODE(1,10,0);
+	foreach my $mod ("", "::Box", "::Font", "::Layout", "::Util") {
+		use_ok("PDF::Cairo$mod") || BAIL_OUT("can't load PDF::Cairo$mod");
+	}
 }
 
 diag( "Testing PDF::Cairo $PDF::Cairo::VERSION, Perl $], $^X" );
@@ -37,7 +36,7 @@ isa_ok($pdf->{context}, 'Cairo::Context');
 my $surface = $pdf->{context}->get_target;
 isa_ok($surface, 'Cairo::PdfSurface');
 
-my $font = $pdf->loadfont('Times-BoldItalic');
+my $font = $pdf->loadfont("data/Karla-Regular.ttf");
 isa_ok($font, 'PDF::Cairo::Font');
 isa_ok($font->{face}, 'Cairo::FtFontFace');
 ok($font->{type} eq 'freetype', 'FreeType font lookup');

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package DBIx::Class::InflateColumn::Authen::Passphrase; # git description: 0.01-8-ga3c77cf
+package DBIx::Class::InflateColumn::Authen::Passphrase; # git description: v0.02-2-gdc402d1
 # ABSTRACT: Inflate/deflate columns to Authen::Passphrase instances
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Authen::Passphrase;
 use parent 'DBIx::Class';
@@ -98,7 +98,7 @@ DBIx::Class::InflateColumn::Authen::Passphrase - Inflate/deflate columns to Auth
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

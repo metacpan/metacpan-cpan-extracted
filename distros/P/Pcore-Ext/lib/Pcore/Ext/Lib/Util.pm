@@ -66,22 +66,17 @@ sub EXT_theme : Extend('Ext.Panel') {
 
         items => [
             {   reference => 'columns',
-
-                layout => {
+                layout    => {
                     type  => 'hbox',
                     align => 'start',
                     pack  => 'start',
                 },
-
                 defaults => {
                     layout => {
                         type  => 'vbox',
                         align => 'start',
                         pack  => 'start',
                     },
-
-                    width => 300,
-
                     defaults => {
                         xtype   => 'button',
                         iconCls => $FAS_PALETTE,

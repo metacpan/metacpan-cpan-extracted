@@ -3,7 +3,7 @@ package Database::Async::Engine::PostgreSQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 =head1 NAME
 
@@ -177,6 +177,7 @@ Returns a list of SQL commands to run.
 sub create_table {
     my ($self, $tbl) = @_;
     my $tt = $self->tt;
+    $log->tracef('Creating table %s', $tbl->name);
     my $data = {
         table => {
             defined_in => $tbl->defined_in,

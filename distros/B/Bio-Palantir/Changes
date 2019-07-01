@@ -1,3 +1,14 @@
+0.191800  2019-06-29 15:01:31+02:00 Europe/Brussels
+	- Additions
+	  - documentation: added Manual.pod
+	  - Roles::Domainable: added a class attribute
+	  - Parser: added is_cluster_type_ok method
+	- Changes
+	  - binaries: renamed '--type' option in '--types' (repeatable argument)
+	  - binaries: improved the '--help' documentation
+	  - Roles::Fillable: removed _get_class method
+	- Fixes
+	  - all: fixed minor bugs
+
 0.191620  2019-06-11 22:32:01+02:00 Europe/Brussels
-	- first release
-	
+	- First release

@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta name="generator" content="Pherkin::Extension::Weasel [% program.version %]">
     <title>[% feature.title | html %]</title>
     <style>
       img:hover {
@@ -20,20 +21,31 @@
   <body>
     <h1 class="feature">[% feature.title | html %]</h1>
     <p>[% feature.satisfaction | html %]</p>
+
+    <section class="toc">
+      <ol class="toc">
+[% FOR scenario IN feature.scenarios -%]
+        <li><a href="#s[% loop.index %]">[% scenario.title | html %]</a></li>
+[% END -%]
+      </ol>
+    </section>
 [% FOR scenario IN feature.scenarios %]
     <section class="scenario">
-      <h2 class="scenario">[% scenario.title | html %]</h2>
+      <a name="s[% loop.index %]">
+        <h2 class="scenario">[% scenario.title | html %]</h2>
+      </a>
       <table>
         <colgroup>
           <col class="steps">
           <col class="session-log">
+          <col class="results">
         </colgroup>
 [% FOR row IN scenario.rows -%]
 [% IF row.screenshot -%]
         <tr class="screenshot">
           <td></td>
           <td colspan="2">
-            <img src="[% row.screenshot.location | uri %]"
+            <img src="[% screens_base_url %][% row.screenshot.location | uri %]"
                  alt="[% row.screenshot.description | html %]"
                  class="[% row.screenshot.classes.join(' ') %]" />
           </td>
@@ -42,18 +54,30 @@
         <tr class="step">
           <td>[% row.step.text | html %]</td>
           <td></td>
-          <td>[% row.step.result | html %]</td>
+          <td class="[% row.step.result.remove('[<>]') # compensate '<missing>'
+                     %]">[% row.step.result | html %]</td>
         </tr>
-[% ELSIF row.log -%]
-        <tr class="result">
+[% FOR log IN row.step.logs -%]
+        <tr class="log">
           <td></td>
+          <td>[% log.text | html %]</td>
           <td></td>
-          <td>[% row.log.text | html %]</td>
         </tr>
+[% END -%]
 [% END -%]
 [% END -%]
       </table>
     </section>
 [% END -%]
+<!--
+---
+title: [% feature.title | html %]
+filename: [% feature.filename | html %]
+log_filename: [% feature.log_filename | html %]
+stats:
+  success: [% feature.successes | html %]
+  fail: [% feature.failures | html %]
+---
+-->
   </body>
 </html>

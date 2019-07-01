@@ -32,6 +32,7 @@ expectOK($res);
 my $id1 = expectCookie($res);
 count(1);
 
+diag 'Waiting';
 sleep 3;
 
 ok(

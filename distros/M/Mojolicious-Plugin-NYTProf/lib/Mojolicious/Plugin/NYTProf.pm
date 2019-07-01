@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.21
+0.22
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 METHODS
 
@@ -77,6 +77,10 @@ is started using a before_routes hook and the stopped with an around_dispatch ho
 
 The consequence of this is that you should see profiling only for your routes and
 rendering code and will not see most of the actual Mojolicious framework detail.
+
+The caveat with the use of hooks is that some hooks can fire out of order, and when
+asynchronous code is used in your controllers you may see incomplete/odd profiling
+behaviour - you can play around with the hook configuration to try to fix this.
 
 You can override the hooks used to control when the profiling runs, see the
 CONFIGURATION section below.

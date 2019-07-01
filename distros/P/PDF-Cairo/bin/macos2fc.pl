@@ -80,7 +80,7 @@ foreach my $file (sort { $a->{filename} cmp $b->{filename} } @fonts) {
 	symlink($file->{location}, "$NAME-new/$filename");
 	if (@{$file->{fonts}} == 1) {	
 		my $font = $file->{fonts}->[0];
-		print $Out join("\t", $file->{filename}, $font->{full_name},
+		print $Out join("\t", $filename, $font->{full_name},
 			$font->{family}, $font->{style}), "\n";
 	}else{
 		# system_profiler does not report the contents of
@@ -130,7 +130,7 @@ foreach my $file (sort { $a->{filename} cmp $b->{filename} } @fonts) {
 		}
 		close($In);
 		foreach my $font (sort { $a->{index} <=> $b->{index}} @tmp) {
-			print $Out $file->{filename};
+			print $Out $filename;
 			print $Out "," . $font->{index} if $font->{index} > 0;
 			print $Out "\t", join("\t", $font->{full_name},
 				$font->{family}, $font->{style}), "\n";

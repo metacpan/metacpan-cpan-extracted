@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Common::Conf;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.5';
 
 has confAccess => (
     is      => 'rw',
@@ -31,6 +31,9 @@ sub info {
     my $conf =
       $self->confAccess->getConf( { cfgNum => $self->cfgNum, raw => 1 } )
       or die $Lemonldap::NG::Common::Conf::msg;
+    $conf->{cfgAuthorIP} ||= "No IP provided";
+    $conf->{cfgDate}     ||= 0;
+    $conf->{cfgLog}      ||= "No log provided";
     print qq{
 Num      : $conf->{cfgNum}
 Author   : $conf->{cfgAuthor}

@@ -1,3 +1,32 @@
+v0.95.0 2019-06-30T19:18:06Z
+ - cdn upload call updated
+ - wget replaced with curl
+ - auth db prefix changed
+ - app api refactored
+ - pgsql tag parser improved
+ - auth state queries
+ - various improvements
+ - auth username lowercase
+ - dbi key_field -> key_col
+ - user token is not hashed iwth argon2
+ - DBH use NULL if param value it not defined
+ - query_to_string refactored
+ - api tokens refactored
+ - api tokens interface
+ - pgsql repo
+ - generate rand password if user password is empty
+ - create user form
+ - eslint filter added
+ - js_hint renamed to jshint
+ - resources updated
+ - b64 url speed optimized
+ - code cleanup
+ - dockerfile fixed
+ - fixes
+ - token api fixed
+ - auth is_root removed
+ - api test fixed
+
 v0.94.0 2019-06-19T03:29:16Z
  - internal cdn config
  - md5_stream added

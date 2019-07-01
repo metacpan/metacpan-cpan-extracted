@@ -14,6 +14,6 @@
 <span><img src="cid:key:../common/key.png" /></span>
 <b>$password</b>
 </p>
-<p><a href="$url"><span trspan"goToPortal">Click here to access to portal</span></a></p>
+<p><a href="$url"><span trspan="goToPortal">Click here to access to portal</span></a></p>
 
 <TMPL_INCLUDE NAME="mail_footer.tpl">

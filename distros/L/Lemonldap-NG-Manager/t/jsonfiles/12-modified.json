@@ -1870,6 +1870,16 @@
         "type": "keyText",
         "title": "Auth-User",
         "data": "$uid"
+      },{
+        "id": "virtualHosts/test2.example.com/exportedHeaders/2",
+        "type": "keyText",
+        "title": "cipherId",
+        "data": "encrypt($uid)"
+      },{
+        "id": "virtualHosts/test2.example.com/exportedHeaders/3",
+        "type": "keyText",
+        "title": "encodeId",
+        "data": "encode_base64($uid)"
       }]
     }, {
       "id": "virtualHosts/test2.example.com/post",

@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser;
 # ABSTRACT: front-end class for Bio::Palantir::Parser module, wich handles the parsing of biosynML.xml and regions.js antiSMASH reports
-$Bio::Palantir::Parser::VERSION = '0.191620';
+$Bio::Palantir::Parser::VERSION = '0.191800';
 use Moose;
 use namespace::autoclean;
 
@@ -262,6 +262,32 @@ sub _convert_js2biosynml {
     return($xmlstr);
 }
 
+sub is_cluster_type_ok {
+
+    my $self = shift;
+
+    my @filter_types  = shift;
+
+    my @allowed_types = qw(
+        acyl_amino_acids amglyccycl arylpolyene bacteriocin butyrolactone 
+        cyanobactin ectoine hserlactone hglE-KS indole ladderane lantipeptide
+        lassopeptide microviridin nrps nucleoside oligosaccharide otherks 
+        phenazine phosphonate PKS proteusin PUFA resorcinol siderophore t1pks 
+        t2pks t3pks terpene
+    );
+
+    for my $type (@filter_types) {
+
+        unless (grep { $type =~ m/$_/xmsi } @allowed_types) {
+
+            croak 'Error: value "' . $type . '" from --types option is '
+            . 'incorrect. Please look allowed values with --help option';
+        }
+    }
+    
+    return(1);
+}
+
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -276,7 +302,7 @@ Bio::Palantir::Parser - front-end class for Bio::Palantir::Parser module, wich h
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

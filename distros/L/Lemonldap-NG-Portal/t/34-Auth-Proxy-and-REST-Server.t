@@ -16,12 +16,11 @@ my %handlerOR = ( issuer => [], sp => [] );
 LWP::Protocol::PSGI->register(
     sub {
         my $req = Plack::Request->new(@_);
-        ok(
-            $req->uri =~ m#http://auth.idp.com(.*)#,
-            ' @ REST request (' . $req->method . " $1)"
-        );
+        ok( $req->uri =~ m#http://auth.idp.com([^\?]*?)(?:\?(.*))?$#,
+            ' @ REST request (' . $req->method . " $1)" );
         count(1);
-        my $url = $1;
+        my $url   = $1;
+        my $query = $2;
         my $res;
         my $s = $req->content;
         if ( $req->method =~ /^(post|put)$/i ) {
@@ -31,6 +30,7 @@ LWP::Protocol::PSGI->register(
                 $res = $issuer->$mth(
                     $url,
                     IO::String->new($s),
+                    ( $query ? ( query => $query ) : () ),
                     length => length($s),
                     type   => $req->header('Content-Type'),
                 ),
@@ -38,13 +38,14 @@ LWP::Protocol::PSGI->register(
             );
             count(1);
             expectOK($res);
-            $idpId = expectCookie($res);
+            $idpId = expectCookie($res) unless ( $req->param('all') );
         }
         elsif ( $req->method =~ /^(get|delete)$/i ) {
             my $mth = '_' . lc($1);
             ok(
                 $res = $issuer->$mth(
                     $url,
+                    ( $query ? ( query => $query ) : () ),
                     accept => $req->header('Accept'),
                     cookie => $req->header('Cookie')
                 ),
@@ -168,6 +169,76 @@ ok( $res = $issuer->_get("/sessions/global/$newId/cn"), 'Verify cn' );
 ok( $res->[2]->[0] eq 'CN', ' CN is good' );
 count(2);
 
+use_ok('Lemonldap::NG::Common::Apache::Session::REST');
+ok(
+    $res =
+      Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions( {
+            baseUrl => 'http://auth.idp.com/sessions/global/',
+        }
+      ),
+    'Search all sessions'
+);
+
+my ( $c1, $c2 ) = ( 0, 0 );
+if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
+    my $tmp = 1;
+    foreach ( keys %$res ) {
+        $c1++;
+        unless ( $res->{$_}->{_session_id} ) {
+            $tmp = 0;
+            diag "Bad session:\n" . Dumper( $res->{$_} );
+        }
+    }
+    ok( $c1,  " Found $c1 sessions" );
+    ok( $tmp, ' All sessions are valid' );
+    count(2);
+}
+count(3);
+
+ok($res=Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions( {baseUrl => 'http://auth.idp.com/sessions/global/'},sub{return 'a'}),'Search all sessions with a code');
+
+if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
+    my $tmp = 1;
+    my $c = 0;
+    foreach ( keys %$res ) {
+        $c++;
+        unless ( $res->{$_} eq 'a' ) {
+            $tmp = 0;
+            diag "Bad session:\n" . Dumper( $res->{$_} );
+        }
+    }
+    ok( $c == $c1, " Found the same count") or explain($c,$c1);
+    ok( $tmp, ' All sessions are valid' );
+    count(2);
+}
+count(2);
+
+ok(
+    $res = Lemonldap::NG::Common::Apache::Session::REST->searchOn( {
+            baseUrl => 'http://auth.idp.com/sessions/global/'
+        },
+        'uid', 'dwho'
+    ),
+    'Search dwho sessions'
+);
+if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
+    my $tmp = 1;
+    foreach ( keys %$res ) {
+        $c2++;
+        unless ( $res->{$_}->{_session_id} ) {
+            $tmp = 0;
+            diag "Bad session:\n" . Dumper( $res->{$_} );
+        }
+    }
+    ok( $c2,  " Found $c2 sessions" );
+    ok( $tmp, ' All sessions are valid' );
+    count(2);
+}
+
+ok( $c2 < $c1,
+    'searchOn() count is lower than get_key_from_all_sessions() count' );
+count(3);
+
 # Del new session
 ok(
     $res = $issuer->app->( {
@@ -237,7 +308,6 @@ sub issuer {
     return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
-                templatesDir      => 'site/htdocs/static',
                 domain            => 'idp.com',
                 portal            => 'http://auth.idp.com',
                 authentication    => 'Demo',

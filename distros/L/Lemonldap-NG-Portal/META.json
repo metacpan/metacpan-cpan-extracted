@@ -57,13 +57,12 @@
             "Net::OpenID::Consumer" : "0",
             "Net::OpenID::Server" : "0",
             "SOAP::Lite" : "0",
-            "String::Random" : "0",
             "Unicode::String" : "0",
             "Web::ID" : "0"
          },
          "requires" : {
             "Clone" : "0",
-            "Lemonldap::NG::Handler" : "v2.0.4",
+            "Lemonldap::NG::Handler" : "v2.0.5",
             "Regexp::Assemble" : "0"
          }
       }
@@ -77,6 +76,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.4",
+   "version" : "v2.0.5",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2018 Joelle Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -37,17 +37,17 @@ $wu2->async( sub { sleep 1; return -9; } );
 
 $wu->async(
     sub {
-        $wu->async( sub { return 42; } );
+        $wu->async( sub  { return 42; } );
         $wu2->async( sub { return -42; } );
         return [ $wu->waitall, $wu2->waitall ];
     }
 );
 
 my (@result) = $wu->waitall();
-is(\@result, [ [ 42, -42 ] ], "Nested work units function properly");
+is( \@result, [ [ 42, -42 ] ], "Nested work units function properly" );
 
 @result = $wu2->waitall();
-is(\@result, [ -9 ], "Second waitall in main process functions properly" );
+is( \@result, [-9], "Second waitall in main process functions properly" );
 
 done_testing();
 

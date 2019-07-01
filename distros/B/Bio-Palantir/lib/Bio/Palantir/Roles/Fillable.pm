@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Fillable;
 # ABSTRACT: Fillable Moose role for the construction of DomainPlus object arrays and Exploratory methods
-$Bio::Palantir::Roles::Fillable::VERSION = '0.191620';
+$Bio::Palantir::Roles::Fillable::VERSION = '0.191800';
 use Moose::Role;
 
 use autodie;
@@ -11,6 +11,7 @@ use File::Temp;
 
 use aliased 'Bio::FastParsers::Hmmer::DomTable';
 use aliased 'Bio::Palantir::Refiner::DomainPlus';
+
 
 const my $DATA_PATH => dist_dir('Bio-Palantir') . '/';
 
@@ -112,14 +113,13 @@ sub detect_domains {                        ## no critic (RequireArgUnpacking)
     $_->_set_protein_sequence($seq) for @domains;
     
     $self->_use_hit_information($_, $gene_pos) for @domains;
-    $self->_get_domain_class($_) for @domains;
     
     $self->_elongate_coordinates(\@domains, $gap_coords);
     @domains = $self->_handle_overlaps(@domains);
     $self->_refine_coordinates(@domains);
 
     # subtype the domains
-    $self->_get_domain_subtype($_) for $self->all_domains;
+    $self->_get_domain_subtype($_) for @domains;
 
     return (@domains);
 }
@@ -412,30 +412,6 @@ sub _get_domain_subtype {
 #     return \%hit_for;
 # }
 
-sub _get_domain_class {
-        my $self = shift;
-
-        my $domain = shift;
-
-        my $class 
-            = $domain->function =~ m/^A$  | AMP-binding | A-OX | CAL | ^AT$ 
-            | PKS_AT | Trans-AT/xms 
-            ? 'substrate-selection' 
-            : $domain->function =~ m/PCP  | ACP$ | ACP_beta/xms 
-            ? 'carrier-protein'
-            : $domain->function =~ m/^C$  |Condensation | ^X$ | Cglyc | ^KS$ 
-                | PKS_KS/xms 
-            ? 'condensation' 
-            : $domain->function =~ m/^TE$ | Thioesterase | TD | NAD | Cter/xms 
-            ? 'termination'
-            : 'tailoring'
-        ;
-
-        $domain->_set_class($class);
-
-        return;
-}
-
 
 ## no critic (ProhibitUnusedPrivateSubroutines)
 
@@ -503,7 +479,7 @@ sub _parse_generic_domains {
 
     my $ug = Data::UUID->new;
     my %hit_for;
-    my $evalue_threshold = 10e-2;
+    my $evalue_threshold = 10e-3;
     my $i = 1;
 
     HIT:
@@ -541,9 +517,9 @@ sub _do_hmmscan {
 
     my $pgm = 'hmmscan';
 
-    my $ARGV_cpu = 1;
+    my $cpu_n = 1;
     my $tbout = File::Temp->new(suffix => '_domtblout.tsv'); 
-    my $opt = ' --domtblout ' . $tbout . ' --cpu ' . $ARGV_cpu;
+    my $opt = ' --domtblout ' . $tbout . ' --cpu ' . $cpu_n;
     my $log = File::Temp->new(suffix => '_hmmscan.log', unlock => 1);
 
     my $cmd = "$pgm $opt $hmmdb $query > $log"; 
@@ -565,7 +541,7 @@ Bio::Palantir::Roles::Fillable - Fillable Moose role for the construction of Dom
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

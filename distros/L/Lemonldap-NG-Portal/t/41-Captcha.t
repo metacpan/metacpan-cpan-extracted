@@ -10,7 +10,7 @@ my $maintests = 16;
 SKIP: {
     eval 'use GD::SecurityImage;use Image::Magick;';
     if ($@) {
-        skip 'Lasso not found', $maintests;
+        skip 'Image::Magick not found', $maintests;
     }
 
     my $client = LLNG::Manager::Test->new( {

@@ -9,7 +9,7 @@
 # The canonical version of this file is maintained in the rra-c-util package,
 # which can be found at <https://www.eyrie.org/~eagle/software/rra-c-util/>.
 #
-# Copyright 2018 Russ Allbery <eagle@eyrie.org>
+# Copyright 2018-2019 Russ Allbery <eagle@eyrie.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -67,6 +67,7 @@ my @IGNORE_PATHS = (
     qr{ \A [.] /share/ }xms,                  # Package license should be fine
     qr{ \A [.] /t/data .* /metadata/ }xms,    # Test metadata
     qr{ \A [.] /t/data .* /output/ }xms,      # Test output
+    qr{ \A [.] /t/data .* [.] json \z }xms,   # Test metadata
 );
 ## use critic
 

@@ -202,6 +202,7 @@ t/ffi_probe_runner_builder.t
 t/ffi_probe_runner_result.t
 t/forks.t
 t/gh117.t
+t/gh129.t
 t/lib/Test/Cleanup.pm
 t/lib/Test/Platypus.pm
 t/threads.t

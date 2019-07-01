@@ -2,9 +2,9 @@ package Lemonldap::NG::Portal::Register::Demo;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
+use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_MALFORMEDUSER);
 
-extends 'Lemonldap::NG::Portal::Main::Plugin';
+extends 'Lemonldap::NG::Portal::Register::Base';
 
 our $VERSION = '2.0.0';
 
@@ -18,13 +18,15 @@ sub computeLogin {
     my ( $self, $req ) = @_;
 
     # Get first letter of firstname and lastname
-    my $login =
-      substr( lc $req->data->{registerInfo}->{firstname}, 0, 1 )
-      . lc $req->data->{registerInfo}->{lastname};
+    my $login = $self->applyLoginRule($req);
 
-    $req->data->{registerInfo}->{login} = $login;
-
-    return PE_OK;
+    if ($login) {
+        $req->data->{registerInfo}->{login} = $login;
+        return PE_OK;
+    }
+    else {
+        return PE_MALFORMEDUSER;
+    }
 }
 
 ## @method int createUser

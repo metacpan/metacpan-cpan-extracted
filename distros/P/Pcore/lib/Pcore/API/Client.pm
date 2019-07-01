@@ -1,7 +1,8 @@
 package Pcore::API::Client;
 
 use Pcore -class, -res;
-use Pcore::WebSocket;
+
+# use Pcore::WebSocket;
 use Pcore::Util::Scalar qw[is_callback is_plain_arrayref is_plain_coderef weaken];
 use Pcore::Util::Data qw[to_cbor from_cbor];
 use Pcore::Util::UUID qw[uuid_v1mc_str];
@@ -42,17 +43,15 @@ sub DESTROY ( $self ) {
     return;
 }
 
-around BUILDARGS => sub ( $orig, $self, $uri, @ ) {
-    my %args = ( splice @_, 3 );
-
+sub BUILDARGS ( $self, $uri, %args ) {
     $args{uri} = P->uri($uri);
 
-    $args{token} = $args{uri}->{userinfo} if !$args{token};
+    $args{token} //= $args{uri}->{userinfo};
 
     $args{_is_http} = $args{uri}->{is_http};
 
-    return $self->$orig( \%args );
-};
+    return \%args;
+}
 
 sub set_token ( $self, $token = undef ) {
     if ( $token // $EMPTY ne $self->{token} // $EMPTY ) {
@@ -78,7 +77,7 @@ sub api_call ( $self, $method, @args ) {
             $method = "/$self->{api_ver}/$method";
         }
         else {
-            die q[You need to defined default "api_ver" to use relative methods names];
+            die q[You need to define default "api_ver" to use relative methods names];
         }
     }
 
@@ -115,15 +114,16 @@ sub _send_http ( $self, $method, $args, $cb ) {
     my $payload = {
         type   => 'rpc',
         method => $method,
-        data   => $args,
+        args   => $args,
         ( $cb ? ( tid => uuid_v1mc_str ) : () ),
     };
 
     P->http->post(
         $self->{uri},
         connect_timeout => $self->{connect_timeout},
-        persistent      => $self->{persistent},
-        tls_ctx         => $self->{tls_ctx},
+
+        # persistent      => $self->{persistent},
+        tls_ctx => $self->{tls_ctx},
         ( $self->{timeout} ? ( timeout => $self->{timeout} ) : () ),
         headers => [
             Referer        => undef,

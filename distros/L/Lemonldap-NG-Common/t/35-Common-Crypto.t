@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use strict;
 
@@ -30,7 +30,11 @@ foreach my $i ( 1 .. 17 ) {
     my $s = '';
     $s = join( '', map { chr( int( rand(94) ) + 33 ) } ( 1 .. $i ) );
     ok( $c->decrypt( $c->encrypt($s) ) eq $s,
-        "Test of base64 encrypting with $i characters string" );
+        "Test of base64 encrypting with $i characters string" )
+      or diag "Source: $s\nCypher: "
+      . $c->encrypt($s)
+      . "\nUncipher:"
+      . $c->decrypt( $c->encrypt($s) );
 }
 
 my $data      = md5_hex(rand);
@@ -42,6 +46,9 @@ ok(
 
 # Test a long value, and replace carriage return by %0A
 my $long = "f5a1f72e7ab2f7712855a068af0066f36bfcf2c87e6feb9cf4200da1868e1dfe";
-my $cryptedlong =
-"Da6sYxp9NCXv8+8TirqHmPWwTQHyEGmkCBGCLCX/81dPSMwIQVQNV7X9KG3RrKZfyRmzJR6DZYdU%0Ab75+VH3+CA==";
-ok( $c->decrypt($cryptedlong) eq $long, "Test of long value encrypting" );
+ok( $c->decrypt( $c->encrypt($long) ) eq $long,
+    "Test of long value encrypting" );
+ok(
+    $c->decryptHex( $c->encryptHex($long) ) eq $long,
+    "Test of long value encrypting (hex)"
+);

@@ -19,7 +19,7 @@ use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
@@ -73,6 +73,7 @@ sub loadOPs {
     {
         $self->logger->warn(
             "No OpenID Connect Provider found in configuration");
+        return 1;
     }
 
     # Extract JSON data
@@ -97,6 +98,7 @@ sub loadRPs {
     {
         $self->logger->warn(
             "No OpenID Connect Relying Party found in configuration");
+        return 1;
     }
     $self->oidcRPList( $self->conf->{oidcRPMetaDataOptions} );
     foreach my $rp ( keys %{ $self->oidcRPList } ) {

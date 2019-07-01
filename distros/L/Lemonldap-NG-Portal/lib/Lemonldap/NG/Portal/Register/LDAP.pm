@@ -6,9 +6,11 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_LDAPCONNECTFAILED
   PE_LDAPERROR
   PE_OK
+  PE_MALFORMEDUSER
 );
 
-extends 'Lemonldap::NG::Portal::Lib::LDAP';
+extends 'Lemonldap::NG::Portal::Lib::LDAP',
+  'Lemonldap::NG::Portal::Register::Base';
 
 our $VERSION = '2.0.0';
 
@@ -21,9 +23,11 @@ sub computeLogin {
     return PE_LDAPCONNECTFAILED unless $self->ldap and $self->bind();
 
     # Get first letter of firstname and lastname
-    my $login =
-      substr( lc $req->data->{registerInfo}->{firstname}, 0, 1 )
-      . lc $req->data->{registerInfo}->{lastname};
+    my $login = $self->applyLoginRule($req);
+
+    unless ($login) {
+        return PE_MALFORMEDUSER;
+    }
 
     my $finalLogin = $login;
 

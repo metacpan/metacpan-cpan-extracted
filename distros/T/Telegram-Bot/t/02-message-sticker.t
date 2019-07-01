@@ -1,5 +1,5 @@
 use Test::More;
-use Mojo::JSON qw/encode_json/;
+use utf8;
 
 my $msg = {
   'sticker' => {
@@ -32,10 +32,9 @@ my $msg = {
 'date' => 1471261929
 };
 
-use_ok ('Telegram::Bot::Message');
-
-my $json1 = encode_json($msg);
-my $msg1 = Telegram::Bot::Message->create_from_json($json1);
+use_ok ('Telegram::Bot::Object::Message');
+my $fake_brain = {}; bless $fake_brain, 'Telegram::Bot::Brain';
+my $msg1 = Telegram::Bot::Object::Message->create_from_hash($msg, $fake_brain);
 
 ok (defined $msg1->sticker);
 is ($msg1->sticker->emoji, '✋');

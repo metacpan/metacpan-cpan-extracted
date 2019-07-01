@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Mojolicious/Plugin/Yancy.pm',
@@ -23,6 +23,7 @@ my @module_files = (
     'Yancy/Plugin/Auth/Password.pm',
     'Yancy/Plugin/Auth/Token.pm',
     'Yancy/Plugin/Editor.pm',
+    'Yancy/Plugin/File.pm',
     'Yancy/Plugin/Form.pm',
     'Yancy/Plugin/Form/Bootstrap4.pm',
     'Yancy/Util.pm'

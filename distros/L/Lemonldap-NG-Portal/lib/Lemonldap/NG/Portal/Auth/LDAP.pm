@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_PASSWORD_EXPIRED
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.5';
 
 # Inheritance: UserDB::LDAP provides all needed ldap functions
 extends
@@ -42,7 +42,8 @@ sub authenticate {
     # Set the dn unless done before
     unless ( $req->data->{dn} ) {
         if ( my $tmp = $self->getUser($req) ) {
-            $self->setSecurity($req);
+            eval { $self->setSecurity($req) };
+            $self->logger->warn($@) if ($@);
             return $tmp;
         }
     }
@@ -70,6 +71,7 @@ sub authenticate {
     my $res =
       $self->userBind( $req, $req->data->{dn},
         password => $req->data->{password} );
+    $self->setSecurity($req) if ( $res > PE_OK );
 
     # Remember password if password reset needed
     if (

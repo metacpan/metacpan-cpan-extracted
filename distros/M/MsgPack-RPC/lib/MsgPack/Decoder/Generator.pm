@@ -1,6 +1,6 @@
 package MsgPack::Decoder::Generator;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Decoder::Generator::VERSION = '2.0.2';
+$MsgPack::Decoder::Generator::VERSION = '2.0.3';
 use 5.10.0;
 
 use strict;
@@ -133,7 +133,7 @@ MsgPack::Decoder::Generator
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 AUTHOR
 

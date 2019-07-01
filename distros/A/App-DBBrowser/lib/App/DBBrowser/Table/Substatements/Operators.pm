@@ -7,8 +7,9 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose qw();
-use Term::Form   qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
@@ -62,7 +63,7 @@ sub add_operator_with_value {
     my ( $sf, $sql, $clause, $quote_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{default} );
-    my $tf = Term::Form->new();
+    #my $tf = Term::Form->new();
     my $stmt = $clause . '_stmt';
     my $args = $clause . '_args';
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
@@ -254,6 +255,7 @@ sub __regex_op {
     my $tf = Term::Form->new();
     # Readline
     my $value = $tf->readline( 'Pattern: ' );
+    print HIDE_CURSOR;
     if ( ! defined $value ) {
         return;
     }
@@ -281,6 +283,7 @@ sub __in_op {
         $ax->print_sql( $sql );
         # Readline
         my $value = $tf->readline( 'Value: ' );
+        print HIDE_CURSOR;
         if ( ! defined $value ) {
             return;
         }
@@ -310,6 +313,7 @@ sub __between_op {
     $ax->print_sql( $sql );
     # Readline
     my $value_1 = $tf->readline( 'Value 1: ' );
+    print HIDE_CURSOR;
     if ( ! defined $value_1 ) {
         return;
     }
@@ -318,6 +322,7 @@ sub __between_op {
     $ax->print_sql( $sql );
     # Readline
     my $value_2 = $tf->readline( 'Value 2: ' );
+    print HIDE_CURSOR;
     if ( ! defined $value_2 ) {
         return;
     }
@@ -340,6 +345,7 @@ sub __default_op {
     my $prompt = $op =~ /^(?:NOT\s)?LIKE\z/ ? 'Pattern: ' : 'Value: '; #
     # Readline
     my $value = $tf->readline( $prompt );
+    print HIDE_CURSOR;
     if ( ! defined $value ) {
         return;
     }

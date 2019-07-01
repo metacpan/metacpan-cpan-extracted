@@ -17,7 +17,7 @@ use base 'PDF::API2::Basic::PDF::Objind';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -119,7 +119,7 @@ stream's dictionary.
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     if (defined $self->{' stream'} or defined $self->{' streamfile'} or defined $self->{' streamloc'}) {
         if ($self->{'Filter'} and $self->{' nofilt'}) {
@@ -131,8 +131,6 @@ sub outobjdeep {
         }
         else {
             $self->{'Length'} = PDF::API2::Basic::PDF::Number->new(length($self->{' stream'}));
-            ## $self->{'Length'} = PDF::API2::Basic::PDF::Number->new(length($self->{' stream'}) + 1);
-            ## this old code seams to burp acro6, lets see what breaks next -- fredo
         }
     }
 
@@ -144,7 +142,7 @@ sub outobjdeep {
         next if $key =~ m/^[\s\-]/o;
         next unless $self->{$key};
         $fh->print('/' . PDF::API2::Basic::PDF::Name::string_to_name($key, $pdf) . ' ');
-        $self->{$key}->outobj($fh, $pdf, %opts);
+        $self->{$key}->outobj($fh, $pdf);
         $fh->print(' ');
     }
     $fh->print('>>');
@@ -253,7 +251,7 @@ sub read_stream {
     my @filters;
     if (defined $self->{'Filter'}) {
         my $i = 0;
-        foreach my $filter ($self->{'Filter'}->elementsof()) {
+        foreach my $filter ($self->{'Filter'}->elements()) {
             my $filter_class = "PDF::API2::Basic::PDF::Filter::" . $filter->val();
             unless ($self->{'DecodeParms'}) {
                 push(@filters, $filter_class->new());

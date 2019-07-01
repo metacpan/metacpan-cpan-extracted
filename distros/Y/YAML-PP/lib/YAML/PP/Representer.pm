@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Representer;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use Scalar::Util qw/ reftype blessed refaddr /;
 
@@ -22,6 +22,14 @@ sub new {
         schema => $args{schema},
     }, $class;
     return $self;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $clone = {
+        schema => $self->schema,
+    };
+    return bless $clone, ref $self;
 }
 
 sub schema { return $_[0]->{schema} }

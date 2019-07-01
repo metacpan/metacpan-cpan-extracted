@@ -25,12 +25,15 @@ no_index:
     - benchmarks
     - TableMatrixDemos
     - lib/Tcl/pTk/demos
+  package:
+    - MainWindow
 requires:
   Class::ISA: '0.36'
   Sub::Name: '0.05'
   Tcl: '0.9'
+  perl: '5.008'
 resources:
   MailingList: mailto:tcltk@perl.org
   repository: https://github.com/chrstphrchvz/perl-tcl-ptk.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

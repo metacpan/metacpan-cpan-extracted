@@ -13,14 +13,14 @@ WORKDIR $DIST_PATH/data
 RUN /bin/bash -c ' \
     \
     # setup perl build env
-    source <( wget -q -O - https://bitbucket.org/softvisio/scripts/raw/tip/perl-build-env.sh || echo false ) setup \
+    source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/tip/perl-build-env.sh || echo false ) setup \
     \
     # deploy nginx
     # && yum -y install ... \
     \
     # deploy non-CPAN deps
     # && mkdir "$PCORE_LIB/pcore-cdn-static-data" \
-    # && wget -q -O - https://bitbucket.org/softvisio/pcore-cdn-static-data/get/tip.tar.gz | tar -C "$PCORE_LIB/pcore-cdn-static-data" --strip-components=1 -xzf - \
+    # && curl -fsSL https://bitbucket.org/softvisio/pcore-cdn-static-data/get/tip.tar.gz | tar -C "$PCORE_LIB/pcore-cdn-static-data" --strip-components=1 -xzf - \
     \
     # deploy and test distribution
     && pcore deploy --recommends --suggests \
@@ -28,7 +28,7 @@ RUN /bin/bash -c ' \
     && pcore test -j $(nproc) \
     \
     # cleanup perl build env
-    && source <( wget -q -O - https://bitbucket.org/softvisio/scripts/raw/tip/perl-build-env.sh || echo false ) cleanup \
+    && source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/tip/perl-build-env.sh || echo false ) cleanup \
 '
 
 ENTRYPOINT ["../bin/main.pl"]

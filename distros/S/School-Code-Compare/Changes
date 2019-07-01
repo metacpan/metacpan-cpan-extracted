@@ -1,5 +1,22 @@
 Revision history for School-Code-Compare
  
+0.101     2019-07-01 14:48:49+02:00 Europe/Zurich
+ - move test data from t/ to xt/ to hide it from toolchain
+
+0.1       2019-06-24 11:47:45+02:00 Europe/Zurich (TRIAL RELEASE)
+ - interface changes / partial rewrite
+   program has different behaviour now
+   - some old options have new names
+   - new options and features added
+   - folders can now directly be fed as input (no lists needed)
+ - new charset 'numsignes' as new default
+ - no more multiple files as output
+ - use STDIN and STDOUT as defaults for processing
+ - all criterions are now relative to compared files
+ - more tests
+ - switch repo from github to gitlab in dist.ini meta information
+ - update documentation / fix typos and spelling
+
 0.007     2019-01-17 13:54:55+01:00 Europe/Zurich
  - throw "skipped" comparisons away
  - mention html in help as option for output format

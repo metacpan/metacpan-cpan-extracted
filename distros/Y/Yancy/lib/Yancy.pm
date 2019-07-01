@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.034';
+our $VERSION = '1.035';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -96,6 +96,12 @@ our $VERSION = '1.034';
 #pod L<The Editor plugin|Yancy::Plugin::Editor> allows for customization of
 #pod the Yancy editor application, including adding your own components and
 #pod editors.
+#pod
+#pod =item *
+#pod
+#pod L<The File plugin|Yancy::Plugin::File> manages files uploaded to the
+#pod site via the L<editor|Yancy::Plugin::Editor> or via
+#pod a L<controller|Yancy::Controller::Yancy>.
 #pod
 #pod =item *
 #pod
@@ -203,7 +209,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.034
+version 1.035
 
 =head1 SYNOPSIS
 
@@ -295,6 +301,12 @@ Yancy comes with plugins to enhance your website.
 L<The Editor plugin|Yancy::Plugin::Editor> allows for customization of
 the Yancy editor application, including adding your own components and
 editors.
+
+=item *
+
+L<The File plugin|Yancy::Plugin::File> manages files uploaded to the
+site via the L<editor|Yancy::Plugin::Editor> or via
+a L<controller|Yancy::Controller::Yancy>.
 
 =item *
 

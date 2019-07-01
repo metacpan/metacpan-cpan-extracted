@@ -1,7 +1,7 @@
 ---
 abstract: 'A perl sentry client'
 author:
-  - 'Rentrak Corporation'
+  - 'Matt Harrington'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,6 +44,6 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/getsentry/perl-raven
-version: '1.10'
+version: '1.11'
 x_homepage: https://github.com/getsentry/perl-raven
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

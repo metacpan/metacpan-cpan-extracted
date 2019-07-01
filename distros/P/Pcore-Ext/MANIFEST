@@ -22,6 +22,7 @@ lib/Pcore/Ext/Lib/Form/Auth.pm
 lib/Pcore/Ext/Lib/Form/ChangePassword.pm
 lib/Pcore/Ext/Lib/Form/ConnectionError.pm
 lib/Pcore/Ext/Lib/Link.pm
+lib/Pcore/Ext/Lib/Media.pm
 lib/Pcore/Ext/Lib/Menu.pm
 lib/Pcore/Ext/Lib/Mixin.pm
 lib/Pcore/Ext/Lib/PDF.pm

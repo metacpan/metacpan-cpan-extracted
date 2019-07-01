@@ -139,7 +139,29 @@ ok(
 count(1);
 
 my $id = expectCookie($res);
+my $id2 = expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
+
+# Check lemonldap Cookie
+ok( $id =~ /^\w{64}$/, " -> Get cookie : lemonldap=something" )
+  or explain( $res->[1], "Set-Cookie: lemonldap=$id" );
+ok( ${ $res->[1] }[3] =~ /HttpOnly=1/, " -> Cookie 'lemonldap' is HttpOnly" )
+  or explain( $res->[1] );
+ok( ${ $res->[1] }[3] =~ /secure/, " -> Cookie 'lemonldap' is secure" )
+  or explain( $res->[1] );
+count(3);
+
+# ????????
+# # Check lemonldaphttp Cookie
+# ok( $id2 =~ /^\w{64}$/, " -> Get cookie lemonldaphttp=something" )
+#   or explain( $res->[1], "Set-Cookie: lemonldaphttp=$id2" );
+# ok(
+#     ${ $res->[1] }[5] =~ /HttpOnly=1/,
+#     " -> Cookie 'lemonldaphttp' is HttpOnly"
+# ) or explain( $res->[1] );
+# ok( ${ $res->[1] }[5] !~ /secure/, " -> Cookie 'lemonldaphttp' is NOT secure" )
+#   or explain( $res->[1] );
+# count(3);
 
 # CheckUser form
 # ------------------------
@@ -170,10 +192,10 @@ ok(
 );
 count(1);
 
-ok( $res->[2]->[0] =~ m%<td class="align-middle">test_impersonation</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">test_impersonation</td>%,
     'Found macro test_impersonation' )
   or explain( $res->[2]->[0], 'test_impersonation' );
-ok( $res->[2]->[0] =~ m%<td class="align-middle">msmith/msmith</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">msmith/msmith</td>%,
     'Found msmith/msmith' )
   or explain( $res->[2]->[0], 'Found msmith/msmith' );
 count(2);
@@ -202,6 +224,23 @@ count(1);
 
 $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
+
+# Get Menu
+# ------------------------
+ok(
+    $res = $client->_get(
+        '/',
+        cookie => "lemonldap=$id",
+        accept => 'text/html'
+    ),
+    'Get Menu',
+);
+count(1);
+expectOK($res);
+ok( $res->[2]->[0] =~ m%<span trspan="connectedAs">Connected as</span> dwho%,
+    'Connected as dwho' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(1);
 
 # CheckUser form
 # ------------------------
@@ -240,7 +279,7 @@ ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
 ok(
     $res->[2]->[0] =~
-m%<div class="alert alert-success"><b><span trspan="allowed"></span></b></div>%,
+m%<div class="alert alert-success"><div class="text-center"><b><span trspan="allowed"></span></b></div></div>%,
     'Found trspan="allowed"'
 ) or explain( $res->[2]->[0], 'trspan="allowed"' );
 ok( $res->[2]->[0] =~ m%<span trspan="headers">%, 'Found trspan="headers"' )
@@ -255,54 +294,51 @@ ok( $res->[2]->[0] =~ m%<span trspan="macros">%, 'Found trspan="macros"' )
 ok( $res->[2]->[0] =~ m%<span trspan="attributes">%,
     'Found trspan="attributes"' )
   or explain( $res->[2]->[0], 'trspan="attributes"' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">_userDB</td>%, 'Found _userDB' )
+ok( $res->[2]->[0] =~ m%<td scope="row">_userDB</td>%, 'Found _userDB' )
   or explain( $res->[2]->[0], '_userDB' );
-ok( $res->[2]->[0] =~ m%<td class="align-middle">Auth-User</td>%,
-    'Found Auth-User' )
+ok( $res->[2]->[0] =~ m%Auth-User: %, 'Found Auth-User' )
   or explain( $res->[2]->[0], 'Header Key: Auth-User' );
-ok( $res->[2]->[0] =~ m%<td class="align-middle">dwho</td>%, 'Found dwho' )
+ok( $res->[2]->[0] =~ m%: dwho%, 'Found dwho' )
   or explain( $res->[2]->[0], 'Header Value: dwho' );
 
-ok( $res->[2]->[0] =~ m%<td class="align-middle">_whatToTrace</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
     'Found _whatToTrace' )
   or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">testPrefix_groups</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">testPrefix_groups</td>%,
     'Found testPrefix_groups' )
   or explain( $res->[2]->[0], 'testPrefix_groups' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">su</td>%, 'Found su' )
+ok( $res->[2]->[0] =~ m%<td scope="row">su; su_test; test_su</td>%,
+    'Found "su; su_test; test_su"' )
   or explain( $res->[2]->[0], 'su' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">testPrefix_uid</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">testPrefix_uid</td>%,
     'Found testPrefix_uid' )
   or explain( $res->[2]->[0], 'testPrefix_groups' );
-ok( $res->[2]->[0] =~ m%<td class="text-left">rtyler</td>%, 'Found rtyler' )
+ok( $res->[2]->[0] =~ m%<td scope="row">rtyler</td>%, 'Found rtyler' )
   or explain( $res->[2]->[0], 'su' );
-ok( $res->[2]->[0] =~ m%<td class="align-middle">test_impersonation</td>%,
+ok( $res->[2]->[0] =~ m%<td scope="row">test_impersonation</td>%,
     'Found macro test_impersonation' )
   or explain( $res->[2]->[0], 'test_impersonation' );
-ok( $res->[2]->[0] =~ m%<td class="align-middle">rtyler/dwho</td>%,
-    'Found rtyler/dwo' )
+ok( $res->[2]->[0] =~ m%<td scope="row">rtyler/dwho</td>%, 'Found rtyler/dwo' )
   or explain( $res->[2]->[0], 'Found rtyler/dwo' );
 count(16);
 
-my @attributes = map /<td class="text-left">(.+)?<\/td>/g, $res->[2]->[0];
-ok( scalar @attributes == 62, 'Found 61 attributes' )
-  or print STDERR ( @attributes < 62 )
-  ? "Missing attributes -> " . scalar @attributes
-  : "Too much attributes -> " . scalar @attributes;
-ok( $attributes[0] eq '_auth', '_auth' ) or print STDERR Dumper( \@attributes );
-ok( $attributes[1] eq 'Demo',  'Demo' )  or print STDERR Dumper( \@attributes );
-ok( $attributes[2] eq '_httpSession', '_httpSession' )
-  or print STDERR Dumper( \@attributes );
-ok( $attributes[28] eq 'uid', 'uid' ) or print STDERR Dumper( \@attributes );
-ok( $attributes[30] eq 'testPrefix__auth', 'testPrefix__auth' )
-  or print STDERR Dumper( \@attributes );
-ok( $attributes[32] eq 'testPrefix__httpSession', 'testPrefix__httpSession' )
-  or print STDERR Dumper( \@attributes );
-ok( $attributes[60] eq 'testPrefix_uid', 'testPrefix_uid' )
-  or print STDERR Dumper( \@attributes );
-ok( $attributes[61] eq 'rtyler', 'rtyler' )
-  or print STDERR Dumper( \@attributes );
-count(9);
+my %attributes = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
+ok( scalar keys %attributes == 35, 'Found 35 attributes' )
+  or print STDERR ( keys %attributes < 35 )
+  ? "Missing attributes -> " . scalar keys %attributes
+  : "Too much attributes -> " . scalar keys %attributes;
+ok( $attributes{'_auth'} eq 'Demo', '_auth' )
+  or print STDERR Dumper( \%attributes );
+ok( $attributes{'_httpSession'}, '_httpSession' )
+  or print STDERR Dumper( \%attributes );
+ok( $attributes{'uid'}, 'uid' ) or print STDERR Dumper( \%attributes );
+ok( $attributes{'testPrefix__auth'}, 'testPrefix__auth' )
+  or print STDERR Dumper( \%attributes );
+ok( $attributes{'testPrefix__httpSession'}, 'testPrefix__httpSession' )
+  or print STDERR Dumper( \%attributes );
+ok( $attributes{'testPrefix_uid'} eq 'rtyler', 'testPrefix_uid' )
+  or print STDERR Dumper( \%attributes );
+count(7);
 
 $client->logout($id);
 clean_sessions();

@@ -28,7 +28,7 @@ I<Tcl::pTk::widget> is a module for loading multiple widgets, without having to 
 package Tcl::pTk::widgets;
 use Carp;
 
-our ($VERSION) = ('1.01');
+our ($VERSION) = ('1.02');
 
 sub import
 {

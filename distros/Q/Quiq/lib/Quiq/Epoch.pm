@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -32,6 +32,10 @@ L<Quiq::Object>
 Anzahl der Sekunden seit 1.1.1970, 0 Uhr UTC in hoher Auflösung,
 also mit Nachkommastellen.
 
+=item ISO-Zeitangabe
+
+Zeitangabe in der Darstellung C<YYYY-MM-DD HH:MI:SS.X>.
+
 =back
 
 =head1 DESCRIPTION
@@ -54,8 +58,9 @@ Zeitpunkt ist hochauflösend, umfasst also auch Sekundenbruchteile.
 
 =head4 Description
 
-Instantiiere ein Zeitpunkt-Objekt für Epoch-Wert $epoch und
-liefere dieses zurück. Ist kein Epoch-Wert angegeben, wird
+Instantiiere ein Zeitpunkt-Objekt für Epoch-Wert $epoch bzw.
+ISO-Zeitangabe $iso, interpretiert in der lokalen Zeitzone, und
+liefere dieses Objekt zurück. Ist kein Argument angegeben, wird
 der aktuelle Zeitpunkt genommen.
 
 =cut
@@ -184,7 +189,7 @@ sub as {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

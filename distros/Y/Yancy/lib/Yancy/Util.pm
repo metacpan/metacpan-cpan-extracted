@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.034';
+our $VERSION = '1.035';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -41,7 +41,8 @@ use Mojo::JSON qw( to_json );
 use Mojo::Util qw( xml_escape );
 use Carp qw( carp );
 
-our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp fill_brackets );
+our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp fill_brackets
+    is_type );
 
 #pod =sub load_backend
 #pod
@@ -278,6 +279,31 @@ sub fill_brackets {
     return scalar $template =~ s/(?<!\\)\{\s*([^\s\}]+)\s*\}/xml_escape $item->{$1}/reg;
 }
 
+#pod =sub is_type
+#pod
+#pod     my $bool = is_type( $schema->{properties}{myprop}{type}, 'boolean' );
+#pod
+#pod Returns true if the given JSON schema type value (which can be a string or
+#pod an array of strings) contains the given value, allowing the given type for
+#pod the property.
+#pod
+#pod     # true
+#pod     is_type( 'boolean', 'boolean' );
+#pod     is_type( [qw( boolean null )], 'boolean' );
+#pod     # false
+#pod     is_type( 'string', 'boolean' );
+#pod     is_type( [qw( string null )], 'boolean' );
+#pod
+#pod =cut
+
+sub is_type {
+    my ( $type, $is_type ) = @_;
+    return unless $type;
+    return ref $type eq 'ARRAY'
+        ? !!grep { $_ eq $is_type } @$type
+        : $type eq $is_type;
+}
+
 #pod =sub derp
 #pod
 #pod     derp "This feature is deprecated in file '%s'", $file;
@@ -318,7 +344,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.034
+version 1.035
 
 =head1 SYNOPSIS
 
@@ -443,6 +469,21 @@ Values in the C<$item> hashref will be escaped with L<Mojo::Util/xml_escape>.
 
     # I &lt;3 Perl
     fill_brackets( '{quote}', $item );
+
+=head2 is_type
+
+    my $bool = is_type( $schema->{properties}{myprop}{type}, 'boolean' );
+
+Returns true if the given JSON schema type value (which can be a string or
+an array of strings) contains the given value, allowing the given type for
+the property.
+
+    # true
+    is_type( 'boolean', 'boolean' );
+    is_type( [qw( boolean null )], 'boolean' );
+    # false
+    is_type( 'string', 'boolean' );
+    is_type( [qw( string null )], 'boolean' );
 
 =head2 derp
 

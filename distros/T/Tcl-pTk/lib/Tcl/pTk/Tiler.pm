@@ -4,7 +4,7 @@
 # An example of a geometry manager "widget" in perl
 package Tcl::pTk::Tiler;
 
-our ($VERSION) = ('1.01');
+our ($VERSION) = ('1.02');
 
 require Tcl::pTk;
 require Tcl::pTk::Frame;

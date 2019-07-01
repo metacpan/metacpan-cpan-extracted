@@ -4,7 +4,7 @@ use IO::String;
 use Data::Dumper;
 
 require 't/test-lib.pm';
-my $maintests = 51;
+my $maintests = 52;
 
 SKIP: {
     eval { require Convert::Base32 };
@@ -92,7 +92,7 @@ SKIP: {
     ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
         'Code' );
     ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
-    my $s = "code=$code&token=$token";
+    my $s = "code=$code&token=$token&TOTPName=myTOTP";
     ok(
         $res = $client->_post(
             '/2fregisters/totp/verify',
@@ -172,6 +172,7 @@ SKIP: {
     ) or print STDERR Dumper( $res->[2]->[0] );
 
     # Wait to have two different epoch values
+    diag 'Waiting';
     sleep 1;
 
     # Ajax registration request
@@ -275,6 +276,9 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
       or print STDERR Dumper($res);
     ok( $sf[0] eq 'TOTP', 'TOTP device found' ) or print STDERR Dumper( \@sf );
     ok( $sf[1] eq 'U2F',  'U2F device found' )  or print STDERR Dumper( \@sf );
+    ok( $res->[2]->[0] =~ qr%<td class="align-middle">myTOTP</td>%,
+        'Found TOTP name' )
+      or print STDERR Dumper($res);
 
     # Unregister TOTP
     ok( $res->[2]->[0] =~ qr%TOTP.*epoch.*(\d{10})%m, "TOTP epoch $1 found" )

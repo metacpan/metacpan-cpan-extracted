@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 =head1 ATTRIBUTES
@@ -66,9 +66,9 @@ Holds a reference to the sessions's driver.
 has 'driver' => (is => 'ro',
                  required => 1,
                  handles => {
-                     'start' => 'start',
+                     '_start' => 'start',
                      'stop' => 'stop',
-                     'restart' => 'restart',
+                     '_restart' => 'restart',
                      'started' => 'started',
                  },
     );
@@ -166,6 +166,31 @@ has 'poll_delay' => (is => 'rw',
                      default => 0.5,
                      isa => 'Num',
     );
+
+
+=item state
+
+Holds one of
+
+=over
+
+=item * initial
+
+=item * started
+
+=item * stopped
+
+=back
+
+Before the first page is loaded into the browser, the value of the
+C<state> property is C<initial>. After the first C<get> call, the
+value changes to C<started>.
+
+=cut
+
+has 'state' => (is => 'rw',
+                default => 'initial',
+                isa => 'Str');
 
 =back
 
@@ -289,6 +314,7 @@ sub get {
              ? $ENV{$1} // 'http://localhost:5000'
              : $self->base_url;
     $url = $base . $url;
+    $self->state('started');
     ###TODO add logging warning of urls without protocol part
     # which might indicate empty 'base_url' where one is assumed to be set
     return $self->_logged(
@@ -421,6 +447,39 @@ sub screenshot {
         sub {
             $self->driver->screenshot($fh);
         }, 'screenshot', 'screenshot');
+}
+
+=item start
+
+Starts a new or stopped session.
+
+Sets C<state> back to the value C<initial>.
+
+=item restart
+
+
+Restarts a session by resetting it and starting.
+
+Sets C<state> back to the value C<initial>.
+
+=item stop
+
+=item started
+
+Returns a C<true> value when the session has been started.
+
+=cut
+
+sub start {
+    my $self = shift;
+    $self->_start;
+    $self->state('initial');
+}
+
+sub restart {
+    my $self = shift;
+    $self->_restart;
+    $self->state('initial');
 }
 
 =item get_page_source($fh)

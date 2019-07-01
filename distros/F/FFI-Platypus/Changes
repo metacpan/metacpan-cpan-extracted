@@ -1,7 +1,17 @@
 Revision history for FFI-Platypus
 
+0.90      2019-07-01 09:47:31 -0400
+  - Documentation improvements (gh#137, et. al.)
+
+0.89_01   2019-06-24 08:33:05 -0400
+  - Fixed bug where prototypes to attach were sometimes being
+    ignored.
+  - Add sub_ref method to FFI::Platypus::Function (gh#133)
+  - Better file/line number diagnostics for croak inside a
+    wrapper (gh#129, gh#132)
+
 0.88      2019-06-19 06:56:57 -0400
-  - Add mangler attribute for FFI::Platypus
+  - Add mangler attribute for FFI::Platypus (gh#128)
 
 0.87      2019-04-23 08:25:35 -0400
   - Add probe for intptr_t and uintptr_t types (gh#123)

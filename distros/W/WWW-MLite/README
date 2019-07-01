@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 2.00
+    Version 2.01
 
 SYNOPSIS
 
@@ -357,6 +357,26 @@ METHODS
 
       See JSON::Schema, JSON::Validator, http://json-schema.org/
 
+ middleware
+
+    The middleware method. Runs before every Your registered methods.
+
+    You can override this method in Your class.
+
+    This method MUST returns HTTP status code. If code is a Successful
+    status code (2xx) then Your registered method will called
+
+    For examle:
+
+        sub response {
+                my $self = shift;
+                my @params = @_;
+    
+                # . . .
+    
+                return HTTP::Status::HTTP_OK
+        }
+
  response
 
     The method for response prepare.
@@ -370,10 +390,13 @@ METHODS
 
         sub response {
             my $self = shift;
+            my @params = @_;
             my $rc = $self->code; # RC HTTP code (from yuor methods)
             my $head = $self->head; # HTTP Headers (hashref)
             my $data = $self->data; # The working data
             my $msg = $self->message || HTTP::Status::status_message($rc) || "Unknown code";
+    
+            # . . .
     
             my @res = (sprintf("Status: %s %s", $rc, $msg));
             push @res, sprintf("Content-Type: %s", "text/plain; charset=utf-8");

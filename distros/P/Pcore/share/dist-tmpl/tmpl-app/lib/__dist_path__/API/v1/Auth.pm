@@ -6,20 +6,20 @@ use <: $module_name ~ "::Const qw[:CONST]" :>;
 
 extends qw[Pcore::App::API::Base];
 
-const our $API_NAMESPACE_PERMS => undef;
+const our $API_NAMESPACE_PERMISSIONS => undef;
 
-sub API_app_init : Perms('*') ( $self, $req, $data = undef ) {
+sub API_app_init : Permissions('*') ( $self, $req, $data = undef ) {
     return $req->( 200, { user_name => $req->{auth} ? ( $req->{auth}->{user_name} ) : undef, } );
 }
 
-sub API_signin : Perms('*') ( $self, $req, $data ) {
-    my $auth = $self->{app}->{api}->authenticate( [ $data->{user_name}, $data->{password} ] );
+sub API_signin : Permissions('*') ( $self, $req, $data ) {
+    my $auth = $self->{app}->{auth}->authenticate( [ $data->{user_name}, $data->{password} ] );
 
     # authentication error
     return $req->(401) if !$auth;
 
     # create user session
-    my $session = $self->{app}->{api}->create_user_session( $auth->{user_id} );
+    my $session = $self->{app}->{auth}->create_session( $auth->{user_id} );
 
     # user session creation error
     return $req->(500) if !$session;
@@ -28,13 +28,13 @@ sub API_signin : Perms('*') ( $self, $req, $data ) {
     return $req->( 200, { user_name => $data->{user_name}, token => $session->{data}->{token} } );
 }
 
-sub API_signout : Perms('*') ( $self, $req, @ ) {
+sub API_signout : Permissions('*') ( $self, $req, @ ) {
 
-    # request is authenticated from session token
-    if ( $req->{auth}->{private_token}->[0] && $req->{auth}->{private_token}->[0] == $TOKEN_TYPE_USER_SESSION ) {
+    # request is authenticated from the session token
+    if ( $req->{auth}->{private_token}->[$PRIVATE_TOKEN_TYPE] && $req->{auth}->{private_token}->[$PRIVATE_TOKEN_TYPE] == $TOKEN_TYPE_SESSION ) {
 
         # remove user session
-        return $req->( $self->{app}->{api}->remove_user_session( $req->{auth}->{private_token}->[1] ) );
+        return $req->( $self->{app}->{auth}->remove_user_session( $req->{auth}->{private_token}->[$PRIVATE_TOKEN_ID] ) );
     }
 
     # not a session token

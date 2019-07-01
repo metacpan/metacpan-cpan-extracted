@@ -1,10 +1,10 @@
 
-# Copyright (C) 2015-2018 Joelle Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '2.181850';
+$Parallel::WorkUnit::VERSION = '2.191821';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -25,7 +25,7 @@ my $use_anyevent_pipe;
 $use_anyevent_pipe = eval 'use AnyEvent::Util qw//; 1' if $^O eq 'MSWin32';
 ## critic
 
-my $use_threads;
+our $use_threads;
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 $use_threads = eval 'use threads qw//; 1' if ( ( $^O eq 'MSWin32' ) && ( !$use_anyevent_pipe ) );
 ## critic
@@ -65,7 +65,7 @@ sub use_anyevent {
 
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -78,7 +78,7 @@ sub _cv {
         $self->{_cv} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -91,7 +91,7 @@ sub _last_error {
         $self->{_last_error} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -109,7 +109,7 @@ sub _ordered_count {
         $self->{_ordered_count} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -127,7 +127,7 @@ sub _ordered_responses {
         $self->{_ordered_responses} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -159,7 +159,7 @@ sub max_children {
 
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -177,7 +177,7 @@ sub _subprocs {
         $self->{_subprocs} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -190,7 +190,7 @@ sub _queue {
         $self->{_queue} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -203,7 +203,7 @@ sub _child_queue {
         $self->{_child_queue} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -222,7 +222,7 @@ sub _count {
         $self->{_count} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -236,7 +236,7 @@ sub _parent_pid {
         $self->{_parent_pid} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -255,7 +255,7 @@ sub _queued_children {
         $self->{_queued_children} = $val;
         return $val;
     } else {
-        croak("Invalid call");
+        confess("Invalid call");
     }
 }
 
@@ -291,7 +291,7 @@ sub async {
 
     # Test $sub to make sure it is a code ref or a sub ref
     if ( !_codelike($sub) ) {
-        croak("Parameter to async() is not a code (or codelike) reference");
+        confess("Parameter to async() is not a code (or codelike) reference");
     }
 
     my $callback;
@@ -381,10 +381,10 @@ sub asyncs {
     my $self     = shift;
     my $children = shift;
     my $sub      = shift;
-    if ( scalar(@_) > 1 ) { croak("invalid call"); }
+    if ( scalar(@_) > 1 ) { confess("invalid call"); }
 
     if ( $children !~ m/^[1-9][0-9]*$/s ) {
-        croak("Number of children must be a numeric value > 0");
+        confess("Number of children must be a numeric value > 0");
     }
 
     for ( my $i = 0; $i < $children; $i++ ) {
@@ -407,8 +407,7 @@ sub _child {
     try {
         my $result = $sub->();
         $self->_send_result( $pipe, $result, $pid );
-    }
-    catch {
+    } catch {
         $self->_send_error( $pipe, $_, $pid );
     };
 
@@ -604,7 +603,7 @@ sub queue {
 
     # Test $sub to make sure it is a code ref or a sub ref
     if ( !_codelike($sub) ) {
-        croak("Parameter to queue() is not a code (or codelike) reference");
+        confess("Parameter to queue() is not a code (or codelike) reference");
     }
 
     my $callback;
@@ -847,6 +846,21 @@ sub _clear_all {
     return;
 }
 
+
+sub start {
+    if ( $#_ != 1 ) { confess 'invalid call'; }
+    my $self = shift;
+    my $sub  = shift;
+
+    # Test $sub to make sure it is a code ref or a sub ref
+    if ( !_codelike($sub) ) {
+        confess("Parameter to start() is not a code (or codelike) reference");
+    }
+
+    _start_child($sub);
+    return;
+}
+
 # Tests to see if something is codelike
 #
 # Borrowed from Params::Util (written by Adam Kennedy)
@@ -858,6 +872,29 @@ sub _codelike {
     if ( blessed($thing) && overload::Method( $thing, '()' ) ) { return 1; }
 
     return;
+}
+
+# Start sub process and/or thread
+#
+sub _start_child {
+    if ( $#_ != 0 ) { confess 'invalid call'; }
+    my ($sub) = @_;
+
+    if ($use_threads) {
+        my $thr = threads->create($sub);
+        if ( !defined($thr) ) { die "thread creation failed: $!"; }
+
+        # Windows doesn't do fork(), it does threads...
+        return;
+    } else {
+        my $pid = fork();
+
+        if ( !$pid ) {
+            # We are in the child process.
+            $sub->();
+            exit();
+        }
+    }
 }
 
 # Destructor emits warning if sub processes are running
@@ -885,7 +922,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.181850
+version 2.191821
 
 =head1 SYNOPSIS
 
@@ -933,6 +970,13 @@ version 2.181850
   $wu->use_anyevent(1);
   $wu->async( sub { ... }, \&callback );
   $wu->waitall();  # Not strictly necessary
+
+  #
+  # Just spawn something into another process, don't capture return
+  # values, don't allow waiting on process, etc.
+  #
+  my $wu = Parallel::Workunit->new();
+  $wu->start( { ... } );
 
 =head1 DESCRIPTION
 
@@ -1123,6 +1167,24 @@ callback function (if provided) with the unserialized return value.
 
 If a callback is not provided, the parent, in the C<waitall()> call,
 will gather these results and return them as an ordered list.
+
+=head2 start( sub { ... } );
+
+Added in 1.191810.
+
+Spawns work on a new forked process, doing so immediately regardless of how
+many other children are running.
+
+This method is similar to C<async()>, but unlike C<async()>, no provision to
+receive return value or wait on the child is made.  This is somewhat similar
+to C<start> in Perl 6 (but differs as this starts a subprocess, not a new
+thread (except on Windows), and there is thus no shared data (changes to data
+in the child process will not be seen in the parent process).
+
+Note that the child inherits all open file descriptors.
+
+Not also that the child process will be part of the same process group as the
+parent process.  Additional work is required to daemonize the child.
 
 =head1 AUTHOR
 

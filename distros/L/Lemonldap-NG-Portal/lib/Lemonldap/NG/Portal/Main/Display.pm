@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.5';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -36,7 +36,7 @@ sub displayInit {
 sub display {
     my ( $self, $req ) = @_;
 
-    my $skin_dir = $self->conf->{templatesDir};
+    my $skin_dir = $self->conf->{templateDir};
     my ( $skinfile, %templateParams );
 
     # 1. Authentication not complete
@@ -388,7 +388,8 @@ sub display {
             else {
 
                 my $displayType =
-                  eval { $self->_authentication->getDisplayType($req) };
+                  eval { $self->_authentication->getDisplayType($req) }
+                  || 'logo';
 
                 $self->logger->debug("Display type $displayType ");
 
@@ -437,9 +438,9 @@ sub staticFile {
     require Plack::Util;
     require Cwd;
     require HTTP::Date;
-    open my $fh, '<:raw', $self->conf->{templatesDir} . "/$file"
+    open my $fh, '<:raw', $self->conf->{templateDir} . "/$file"
       or return $self->sendError( $req,
-        $self->conf->{templatesDir} . "/$file: $!", 403 );
+        $self->conf->{templateDir} . "/$file: $!", 403 );
     my @stat = stat $file;
     Plack::Util::set_io_path( $fh, Cwd::realpath($file) );
     return [
@@ -526,12 +527,13 @@ sub getSkin {
 # @param $displaError To display "Error" column
 # @return HTML string
 sub mkSessionArray {
-    my ( $self, $sessions, $title, $displayUser, $displayError ) = @_;
+    my ( $self, $req, $sessions, $title, $displayUser, $displayError ) = @_;
 
     return "" unless ( ref $sessions eq "ARRAY" and @$sessions );
 
     my @fields = sort keys %{ $self->conf->{sessionDataToRemember} };
     return $self->loadTemplate(
+        $req,
         'sessionArray',
         params => {
             title        => $title,
@@ -559,7 +561,7 @@ sub mkSessionArray {
 }
 
 sub mkOidcConsent {
-    my ( $self, $session ) = @_;
+    my ( $self, $req, $session ) = @_;
 
     if ( defined( $self->conf->{oidcRPMetaDataOptions} )
         and ref( $self->conf->{oidcRPMetaDataOptions} ) )
@@ -602,6 +604,7 @@ sub mkOidcConsent {
 
     # Display existing oidcConsents
     return $self->loadTemplate(
+        $req,
         'oidcConsents',
         params => {
             partners => [

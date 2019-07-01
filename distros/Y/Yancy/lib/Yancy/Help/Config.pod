@@ -11,7 +11,7 @@ Yancy::Help::Config - How to configure Yancy
 
 =head1 VERSION
 
-version 1.034
+version 1.035
 
 =head1 SYNOPSIS
 
@@ -186,6 +186,10 @@ to that field.
 =item * C<< enum => [...], type => "..." >> - A C<< <select> >> element.
 This can be of any type.
 
+=item * C<< type => "string", format => "filepath" >> - A file upload
+field (C<< <input type="file"> >>). See L<Yancy::Plugin::File> for more
+information.
+
 =back
 
 JSON schemas allow specifying multiple types for a field using an array.
@@ -269,21 +273,6 @@ C<type> field by using an array of types:
 If you don't do this, and still include the field in an object, you will
 get an error: C<Expected string - Got null.>. The correct way to fix
 this error is to add C<null> as an option for the field's type.
-
-=head2 Example Values
-
-Setting an example value makes it easier to add new data. When a user
-tries to add a new item, Yancy will fill in the data from the C<example>
-key of the schema. This key holds an example object using fake data.
-As an example of our C<people> schema:
-
-    people => {
-        example => {
-            name => 'Philip J. Fry',
-            email => 'fry@aol.com',
-        },
-        properties => { ... },
-    },
 
 =head2 Extended Collection Configuration
 

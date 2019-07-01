@@ -1,4 +1,4 @@
-# $Id: Changes 41 2019-05-29 17:01:36Z minus $
+# $Id: Changes 52 2019-06-29 16:21:14Z minus $
 # Version/Revision history.
 
 1.00 Tue May 20 11:39:42 2014 GMT
@@ -32,3 +32,6 @@
 
 2.00 Wed May 29 12:25:34 MSK 2019
     * Adapted for CTKlib v2.00
+
+2.01 Sat 29 Jun 19:19:47 MSK 2019
+    + Added client base class

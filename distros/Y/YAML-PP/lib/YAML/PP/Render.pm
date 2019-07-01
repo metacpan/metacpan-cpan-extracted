@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Render;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 

@@ -1,7 +1,7 @@
 package MsgPack::RPC::Message::Notification;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: a MessagePack-RPC request
-$MsgPack::RPC::Message::Notification::VERSION = '2.0.2';
+$MsgPack::RPC::Message::Notification::VERSION = '2.0.3';
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ MsgPack::RPC::Message::Notification - a MessagePack-RPC request
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 SYNOPSIS
 

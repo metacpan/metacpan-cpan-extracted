@@ -54,11 +54,11 @@ $ALPHAVANTAGE_CURRENCY_URL = "https://www.alphavantage.co/query?function=CURRENC
 
 @ISA    = qw/Exporter/;
 @EXPORT = ();
-@EXPORT_OK = qw/yahoo yahoo_europe fidelity troweprice asx tiaacref
+@EXPORT_OK = qw/fidelity troweprice asx tiaacref
                 currency_lookup/;
 @EXPORT_TAGS = ( all => [@EXPORT_OK]);
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 $USE_EXPERIMENTAL_UA = 0;
 
@@ -171,19 +171,22 @@ sub new {
 
   # If we get an empty new(), or one starting with -defaults,
   # then load up the default methods.
-  if (!@reqmodules or $reqmodules[0] eq "-defaults") {
+
+  if ( !@reqmodules or $reqmodules[0] eq "-defaults" ) {
     shift(@reqmodules) if (@reqmodules);
+
     # Default modules
+
     @modules = qw/AEX AIAHK AlphaVantage ASEGR ASX BMONesbittBurns
-            BSERO Bourso Cdnfundlibrary Citywire CSE Currencies Deka
-            DWS FTPortfolios Fidelity FidelityFixed FinanceCanada Fool
-            FTfunds HU GoldMoney HEX IndiaMutual LeRevenu
-            ManInvestments Morningstar MorningstarJP MStaruk NZX
-            Platinum SEB SIXfunds SIXshares StockHouseCanada TSP TSX
-            Tdefunds Tdwaterhouse Tiaacref TNetuk Troweprice Trustnet
-            Union USFedBonds VWD ZA Cominvest Finanzpartner YahooJSON
-            Yahoo::Asia Yahoo::Australia Yahoo::Brasil Yahoo::Europe
-            Yahoo::NZ Yahoo::USA YahooYQL ZA_UnitTrusts/; }
+        BSERO Bourso Cdnfundlibrary Citywire CSE Currencies Deka
+        DWS FTPortfolios Fidelity FidelityFixed FinanceCanada Fool
+        FTfunds HU GoldMoney HEX IEXCloud IndiaMutual LeRevenu
+        ManInvestments Morningstar MorningstarAU MorningstarCH
+        MorningstarJP MStaruk NZX Platinum SEB SIXfunds SIXshares
+        StockHouseCanada TSP TSX Tdefunds Tdwaterhouse Tiaacref
+        TNetuk Troweprice Trustnet Union USFedBonds VWD ZA
+        Cominvest Finanzpartner YahooJSON YahooYQL ZA_UnitTrusts/;
+  }
 
   $this->_load_modules(@modules,@reqmodules);
 
@@ -251,25 +254,32 @@ sub currency {
 
   my $ALPHAVANTAGE_API_KEY = $ENV{'ALPHAVANTAGE_API_KEY'};
   return undef unless ( defined $ALPHAVANTAGE_API_KEY );
- 
-  my $reply = $ua->request(GET "${ALPHAVANTAGE_CURRENCY_URL}"
-    . "&from_currency=" . ${from}
-    . "&to_currency=" . ${to}
-    . "&apikey=" . ${ALPHAVANTAGE_API_KEY} );
 
-  my $code = $reply->code;
-  my $desc = HTTP::Status::status_message($code);
-  return undef unless ($code == 200);
-  
-  my $body = $reply->content;
+  my $try_cnt = 0;
+  my $json_data;
+  do {
+    $try_cnt += 1;
+    my $reply = $ua->request(GET "${ALPHAVANTAGE_CURRENCY_URL}"
+      . "&from_currency=" . ${from}
+      . "&to_currency=" . ${to}
+      . "&apikey=" . ${ALPHAVANTAGE_API_KEY} );
 
-  my $json_data = JSON::decode_json $body;
-  if ( !$json_data || $json_data->{'Error Message'} ) {
-    return undef;
-  }
-  
+    my $code = $reply->code;
+    my $desc = HTTP::Status::status_message($code);
+    return undef unless ($code == 200);
+
+    my $body = $reply->content;
+
+    $json_data = JSON::decode_json $body;
+    if ( !$json_data || $json_data->{'Error Message'} ) {
+      return undef;
+    }
+#     print "Failed: " . $json_data->{'Information'} . "\n" if (($try_cnt < 5) && ($json_data->{'Information'}));
+    sleep (20) if (($try_cnt < 5) && ($json_data->{'Information'}));
+  } while (($try_cnt < 5) && ($json_data->{'Information'}));
+
   my $exchange_rate = $json_data->{'Realtime Currency Exchange Rate'}->{'5. Exchange Rate'};
-  
+
   {
     local $^W = 0;  # Avoid undef warnings.
 
@@ -737,26 +747,26 @@ sub store_date
     $this_month = $month;
     $year_specified = 0;
 
-    # Proces the inputs
-    if (defined $piecesref->{isodate}) {
+    # Process the inputs
+    if ((defined $piecesref->{isodate}) && ($piecesref->{isodate})) {
       ($year, $month, $day) = ($piecesref->{isodate} =~ m/(\d+)\W+(\w+)\W+(\d+)/);
       $year += 2000 if $year < 100;
       $year_specified = 1;
-#      printf ("ISO Date %s: Year %d, Month %s, Day %d\n", $piecesref->{isodate}, $year, $month, $day);
+#      printf "ISO Date %s: Year %d, Month %s, Day %d\n", $piecesref->{isodate}, $year, $month, $day;
     }
 
-    if (defined $piecesref->{usdate}) {
+    if ((defined $piecesref->{usdate}) && ($piecesref->{usdate})) {
       ($month, $day, $year) = ($piecesref->{usdate} =~ /(\w+)\W+(\d+)\W+(\d+)/);
       $year += 2000 if $year < 100;
       $year_specified = 1;
-#      printf ("US Date %s: Month %s, Day %d, Year %d\n", $piecesref->{usdate}, $month, $day, $year);
+#      printf "US Date %s: Month %s, Day %d, Year %d\n", $piecesref->{usdate}, $month, $day, $year;
     }
 
-    if (defined $piecesref->{eurodate}) {
-      ($day, $month, $year) = ($piecesref->{eurodate} =~ /(\d+)\W+(\w+)\W+(\d+)/);
+    if ((defined $piecesref->{eurodate}) && ($piecesref->{eurodate})) {
+        ($day, $month, $year) = ($piecesref->{eurodate} =~ /(\d+)\W+(\w+)\W+(\d+)/);
       $year += 2000 if $year < 100;
       $year_specified = 1;
-#      printf ("Euro Date %s: Day %d, Month %s, Year %d\n", $piecesref->{eurodate}, $day, $month, $year);
+#      printf "Euro Date %s: Day %d, Month %s, Year %d\n", $piecesref->{eurodate}, $day, $month, $year;
     }
 
     if (defined ($piecesref->{year})) {

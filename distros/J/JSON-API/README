@@ -43,6 +43,10 @@ METHODS
 
            Specifying debug => 1 in the parameters hash will also enable debugging output within JSON::API.
 
+           Additionally you can specify predecodehook in the parameters hash with a reference to a subroutine. The subroutine will then be called with the received raw content as only
+           parameter before it is decoded. It then can preprocess the content e.g. alter it to be valid json. An example use case for this is calling a JSON API that prefixes the json with garbage
+           to prevent CSRF. The pre-decode hook can then strip the garbage from the raw content before the JSON data is being decoded.
+
    get|post|put|del
        Perform an HTTP action (GET|POST|PUT|DELETE) against the given API. All methods take the path to the API endpoint as the first parameter. The put() and post() methods also accept a second data
        parameter, which should be a reference to be serialized into JSON for POST/PUTing to the endpoint.

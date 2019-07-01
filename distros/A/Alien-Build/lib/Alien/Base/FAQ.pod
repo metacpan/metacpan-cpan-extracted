@@ -14,7 +14,7 @@ Alien::Base::FAQ - Frequently asked questions
 
 =head1 VERSION
 
-version 1.76
+version 1.78
 
 =head1 SYNOPSIS
 

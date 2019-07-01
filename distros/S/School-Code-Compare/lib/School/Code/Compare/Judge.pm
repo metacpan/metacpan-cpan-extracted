@@ -1,6 +1,6 @@
 package School::Code::Compare::Judge;
-# ABSTRACT: guess if two strings are so similary, that it's maybe cheating
-$School::Code::Compare::Judge::VERSION = '0.007';
+# ABSTRACT: guess if two strings are so similar, that it's maybe cheating
+$School::Code::Compare::Judge::VERSION = '0.101';
 use strict;
 use warnings;
 
@@ -9,8 +9,8 @@ sub new {
     my $class = shift;
 
     my $self = {
-                    suspicious_ratio        => 40,
-                    highly_suspicious_ratio => 20,
+                    suspicious_ratio        => 60,
+                    highly_suspicious_ratio => 80,
                };
     bless $self, $class;
 
@@ -42,9 +42,9 @@ sub look {
 
     return () unless (defined $comparison->{ratio});
 
-    if ($comparison->{ratio} <= $self->{suspicious_ratio}) {
+    if ($comparison->{ratio} >= $self->{suspicious_ratio}) {
         $comparison->{suspicious} = 1;
-        if ($comparison->{ratio} <= $self->{highly_suspicious_ratio}) {
+        if ($comparison->{ratio} >= $self->{highly_suspicious_ratio}) {
             $comparison->{suspicious} = 2;
         }
     }
@@ -60,11 +60,28 @@ __END__
 
 =head1 NAME
 
-School::Code::Compare::Judge - guess if two strings are so similary, that it's maybe cheating
+School::Code::Compare::Judge - guess if two strings are so similar, that it's maybe cheating
 
 =head1 VERSION
 
-version 0.007
+version 0.101
+
+=head1 SYNOPSIS
+
+ use School::Code::Compare::Judge;
+
+ my $judge  = School::Code::Compare::Judge->new();
+
+ # this will alter the content of the hash argument provided
+ $judge->look($comparison);
+
+=head1 FUNCTIONS
+
+=head2 set_suspicious_ratio
+
+=head2 set_highly_suspicious_ratio
+
+=head2 look
 
 =head1 AUTHOR
 

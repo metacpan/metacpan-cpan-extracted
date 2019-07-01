@@ -15,7 +15,7 @@ package PDF::API2::Basic::PDF::Objind;
 use strict;
 use warnings;
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 =head1 NAME
 
@@ -154,7 +154,10 @@ Makes sure that the object is fully read in, etc.
 =cut
 
 sub realise {
-    $_[0]->{' realised'} ? $_[0] : $_[0]->{' objnum'} ? $_[0]->{' parent'}->read_obj(@_) : $_[0];
+    my $self = shift();
+    return $self if $self->{' realised'};
+    return $self->{' parent'}->read_obj($self, @_) if $self->{' objnum'};
+    return $self;
 }
 
 =head2 $r->outobjdeep($fh, $pdf)
@@ -165,9 +168,9 @@ This also means that all direct subclasses must subclass this method or loop for
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
-    $self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf, %opts) unless $self->{' realised'};
+    $self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf) unless $self->{' realised'};
 }
 
 =head2 $r->outobj($fh)
@@ -178,31 +181,33 @@ outobjdeep to output the contents of the object at this point.
 =cut
 
 sub outobj {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     if (defined $pdf->{' objects'}{$self->uid}) {
         $fh->printf("%d %d R", @{$pdf->{' objects'}{$self->uid}}[0..1]);
     }
     else {
-        $self->outobjdeep($fh, $pdf, %opts);
+        $self->outobjdeep($fh, $pdf);
     }
 }
 
-=head2 $r->elementsof
+=head2 $r->elements
 
 Abstract superclass function filler. Returns self here but should return
 something more useful if an array.
 
 =cut
 
-sub elementsof {
+sub elementsof { return elements(@_) }
+
+sub elements {
     my ($self) = @_;
 
     if ($self->{' realised'}) {
         return $self;
     }
     else {
-        return $self->{' parent'}->read_obj($self)->elementsof;
+        return $self->{' parent'}->read_obj($self)->elements();
     }
 }
 

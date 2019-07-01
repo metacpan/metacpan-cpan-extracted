@@ -26,6 +26,9 @@
          "benchmarks",
          "TableMatrixDemos",
          "lib/Tcl/pTk/demos"
+      ],
+      "package" : [
+         "MainWindow"
       ]
    },
    "prereqs" : {
@@ -43,7 +46,8 @@
          "requires" : {
             "Class::ISA" : "0.36",
             "Sub::Name" : "0.05",
-            "Tcl" : "0.9"
+            "Tcl" : "0.9",
+            "perl" : "5.008"
          }
       }
    },
@@ -56,6 +60,6 @@
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

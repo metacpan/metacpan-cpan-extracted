@@ -1,5 +1,13 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+0.007     2019-06-30 01:52:53+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - improved query performance, particularly in COPY operations,
+    by allowing multiple smaller writes to be combined
+
 0.006     2019-06-04 23:47:47+08:00 Asia/Kuala_Lumpur
     New features:
 

@@ -1,5 +1,14 @@
 Revision history for Protocol-Database-PostgreSQL
 
+1.005     2019-06-30 01:46:24+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - inconsistent encoding in some messages, *UTF-8 is now applied for SQL query content
+    to match COPY statements and other cases including passwords*. In future, the choice
+    of encoding may be exposed as an option - for now, hardcoded as UTF-8.
+
 1.004     2019-06-02 01:31:48+08:00 Asia/Kuala_Lumpur
     New features:
 

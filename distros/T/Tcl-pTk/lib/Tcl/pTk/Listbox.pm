@@ -2,7 +2,7 @@
 
 package Tcl::pTk::Listbox;
 
-our ($VERSION) = ('1.01');
+our ($VERSION) = ('1.02');
 
 @Tcl::pTk::Listbox::ISA = (Tcl::pTk::Widget);
 

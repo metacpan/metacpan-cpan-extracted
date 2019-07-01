@@ -1039,6 +1039,36 @@ sub test_insert_4 : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_insertMulti_1 : Test(2) {
+    my $self = shift;
+
+    my $expected = sprintf Quiq::Unindent->string(q~
+        INSERT INTO person
+            (per_id, per_vorname, per_nachname, per_geburtstag)
+        VALUES
+            ('1', 'Linus', 'Seitz', '2002-11-11'),
+            ('2', 'Hanno', 'Seitz', '2000-04-07')
+    ~);
+
+    my $sql = Quiq::Sql->new('PostgreSQL');
+
+    my $stmt = $sql->insertMulti('person',
+        [qw/per_id per_vorname per_nachname per_geburtstag/],
+        [], # keine Daten
+    );
+    $self->is($stmt,'');
+
+    $stmt = $sql->insertMulti('person',
+        [qw/per_id per_vorname per_nachname per_geburtstag/],[
+            [qw/1 Linus Seitz 2002-11-11/],
+            [qw/2 Hanno Seitz 2000-04-07/],
+        ]
+    );
+    $self->is($stmt,$expected);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_update : Test(3) {
     my $self = shift;
 

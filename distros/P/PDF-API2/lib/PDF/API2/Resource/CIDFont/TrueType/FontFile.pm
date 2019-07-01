@@ -5,8 +5,9 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
+use Carp;
 use Encode qw(:all);
 use Font::TTF::Font;
 use POSIX qw(ceil floor);
@@ -423,7 +424,7 @@ sub new {
     my ($class,$pdf,$file,%opts)=@_;
     my $data={};
 
-    die "cannot find font '$file' ..." unless(-f $file);
+    confess "cannot find font '$file'" unless -f $file;
     my $font=Font::TTF::Font->open($file);
     $data->{obj}=$font;
 
@@ -644,7 +645,7 @@ sub subvec {
 sub glyphNum { return ( $_[0]->font->{'maxp'}->read->{'numGlyphs'} ); }
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     my $f = $self->font;
 
@@ -673,7 +674,7 @@ sub outobjdeep {
 		}
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    $self->SUPER::outobjdeep($fh, $pdf);
 }
 
 

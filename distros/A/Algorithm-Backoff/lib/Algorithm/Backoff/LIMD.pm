@@ -1,7 +1,7 @@
 package Algorithm::Backoff::LIMD;
 
 our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use strict;
 use warnings;
@@ -70,7 +70,7 @@ Algorithm::Backoff::LIMD - Linear Increment, Multiplicative Decrement (LIMD) bac
 
 =head1 VERSION
 
-This document describes version 0.008 of Algorithm::Backoff::LIMD (from Perl distribution Algorithm-Backoff), released on 2019-06-20.
+This document describes version 0.009 of Algorithm::Backoff::LIMD (from Perl distribution Algorithm-Backoff), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ This document describes version 0.008 of Algorithm::Backoff::LIMD (from Perl dis
  $secs = $ab->success();   # =>  1   (max(2 * 0.2, 1))
  $secs = $ab->failure();   # =>  5   (1 + 4)
 
-Illustration using CLI L<show-backoff-delays> (4 failures followed by 5
+Illustration using CLI L<show-backoff-delays> (3 failures followed by 3
 successes, followed by 3 failures):
 
  % show-backoff-delays -a LILD --initial-delay 2 --min-delay 1 \

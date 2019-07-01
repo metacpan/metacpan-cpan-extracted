@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Pcore-Ext\n"
 "Report-Msgid-Bugs-To: zdm <zdm@softvisio.net>\n"
-"POT-Creation-Date: 2019-06-13 17:03+0300\n"
+"POT-Creation-Date: 2019-06-19 12:43+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: zdm <zdm@softvisio.net>\n"
 "Language-Team: \n"
@@ -115,7 +115,7 @@ msgstr "Новый Пароль"
 msgid "Confirm New Password"
 msgstr "Подтвердите Новый Пароль"
 
-#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:91
+#: lib/Pcore/Ext/Lib/Form/ChangePassword.pm:91 lib/Pcore/Ext/Lib/Upload.pm:370
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -131,31 +131,63 @@ msgstr "Ошибка соединения с сервером приложени
 msgid "Try again."
 msgstr "Попробовать еще раз."
 
-#: lib/Pcore/Ext/Lib/Menu.pm:148
+#: lib/Pcore/Ext/Lib/Menu.pm:139
 msgid "Profile"
 msgstr "Профиль"
 
-#: lib/Pcore/Ext/Lib/Menu.pm:152
+#: lib/Pcore/Ext/Lib/Menu.pm:143
 msgid "Sign out"
 msgstr "Выйти"
 
-#: lib/Pcore/Ext/Lib/Menu.pm:167
+#: lib/Pcore/Ext/Lib/Menu.pm:158 lib/Pcore/Ext/Lib/Util.pm:93
 msgid "DARK MODE"
 msgstr "ТЕМНЫЙ РЕЖИМ"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:31
+msgid "Cancelled"
+msgstr "Отменена"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:90 lib/Pcore/Ext/Lib/Upload.pm:99
+msgid "Calculating checksum"
+msgstr "Рассчитывается контрольная сумма"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:159
+msgid "Uploading"
+msgstr "Загружается"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:170
+msgid "Uploaded"
+msgstr "Загружен"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:299
+msgid "Cancel upload"
+msgstr "Отменить загрузку"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:343
+msgid "UPLOAD FILES"
+msgstr "ЗАГРУЗИТЬ ФАЙЛЫ"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:358
+msgid "Drop files here"
+msgstr "Перетяните файлы сюда"
+
+#: lib/Pcore/Ext/Lib/Upload.pm:366
+msgid "Select files"
+msgstr "Выбрать файлы"
 
 #: lib/Pcore/Ext/Lib/Util.pm:12
 msgid "No item selected"
 msgstr "Ничего не выбрано"
 
-#: lib/Pcore/Ext/Lib/Viewport.pm:297
+#: lib/Pcore/Ext/Lib/Viewport.pm:331
 msgid "You have no permissions to access this area"
 msgstr "У вас нет прав доступа к этому разделу"
 
-#: lib/Pcore/Ext/Lib/Viewport.pm:347
+#: lib/Pcore/Ext/Lib/Viewport.pm:381
 msgid "Password changed"
 msgstr "Пароль изменен"
 
-#: lib/Pcore/Ext/Lib/Viewport.pm:364
+#: lib/Pcore/Ext/Lib/Viewport.pm:398
 msgid ""
 "Password change instructions was sent to the email address, associated with "
 "your account."
@@ -163,11 +195,11 @@ msgstr ""
 "Инструкции по смене пароля были отправлены на email адрес, связанный с вашей "
 "учетной записью."
 
-#: lib/Pcore/Ext/Lib/Viewport.pm:421
+#: lib/Pcore/Ext/Lib/Viewport.pm:455
 msgid "Thank you, your email is confirmed."
 msgstr "Спасибо, Ваш email подтвержден."
 
-#: lib/Pcore/Ext/Lib/Viewport.pm:424
+#: lib/Pcore/Ext/Lib/Viewport.pm:458
 msgid "Email confirmation error. Token is invalid."
 msgstr "Ошибка подтверждения email. Неизвестный токен."
 

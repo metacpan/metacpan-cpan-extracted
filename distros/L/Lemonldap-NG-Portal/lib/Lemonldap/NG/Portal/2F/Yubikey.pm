@@ -106,7 +106,7 @@ sub run {
         'ext2fcheck',
         params => {
             MAIN_LOGO   => $self->conf->{portalMainLogo},
-            SKIN        => $self->conf->{portalSkin},
+            SKIN        => $self->p->getSkin($req),
             TOKEN       => $token,
             TARGET      => '/yubikey2fcheck',
             INPUTLOGO   => 'yubikey.png',

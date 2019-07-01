@@ -5,6 +5,7 @@ LICENSE
 MANIFEST
 META.yml
 Makefile.PL
+Manual.pod
 README
 bin/draw_bgc_maps.pl
 bin/explore_bgc_domains.pl
@@ -52,7 +53,6 @@ lib/Bio/Palantir/Parser/Cluster.pm
 lib/Bio/Palantir/Parser/Domain.pm
 lib/Bio/Palantir/Parser/Gene.pm
 lib/Bio/Palantir/Parser/Location.pm
-lib/Bio/Palantir/Parser/Module.pm
 lib/Bio/Palantir/Parser/Motif.pm
 lib/Bio/Palantir/Parser/Qualifier.pm
 lib/Bio/Palantir/Parser/Root.pm

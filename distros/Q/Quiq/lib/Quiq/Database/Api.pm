@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Database::Api::Dbi::Connection;
 
@@ -26,15 +26,15 @@ L<Quiq::Object>
 Eine grundlegende Datenbank-Schnittstelle Quiq::Database::Api::*
 wird durch zwei Klassen definiert:
 
-Quiq::Database::Api::*::Connection
+B<< Quiq::Database::Api::*::Connection >>
 
     $db = $class->new($udlObj);  # Datenbankverbindung aufbauen
     $cur = $db->sql($stmt);      # SQL-Statement ausführen
     $db->destroy;                # Datenbankverbindung abbauen
 
-Quiq::Database::Api::*::Cursor
+B<< Quiq::Database::Api::*::Cursor >>
 
-    $cur = $class->new(@keyVal); # Curson instantiieren
+    $cur = $class->new(@keyVal); # Cursor instantiieren
     
     $n = $cur->bindVars;         # Anzahl Bind-Variablen
     $n = $cur->hits;             # Anzahl "Treffer"
@@ -49,8 +49,17 @@ Quiq::Database::Api::*::Cursor
 Die bislang einzige Lowlevel-Datenbank-Schnittstelle ist DBI, die
 die beiden Klassen umfasst:
 
-    Quiq::Database::Api::Dbi::Connection
-    Quiq::Database::Api::Dbi::Cursor
+=over 2
+
+=item *
+
+Quiq::Database::Api::Dbi::Connection
+
+=item *
+
+Quiq::Database::Api::Dbi::Cursor
+
+=back
 
 Potentielle andere Lowlevel-Datenbank-Schnittstellen müssen
 die gleichen Methoden implementieren.
@@ -100,7 +109,7 @@ sub connect {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

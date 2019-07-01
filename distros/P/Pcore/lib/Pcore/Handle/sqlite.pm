@@ -339,7 +339,11 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
         if ( is_blessed_arrayref $bind[$i] ) {
             $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[0] );
 
-            if ( $bind[$i]->[0] == $SQL_BOOL ) {
+            # values is not defined
+            if ( !defined $bind[$i]->[1] ) {
+                $bind[$i] = undef;
+            }
+            elsif ( $bind[$i]->[0] == $SQL_BOOL ) {
                 $bind[$i] = $bind[$i]->[1] ? 1 : 0;
             }
             elsif ( $bind[$i]->[0] == $SQL_JSON ) {
@@ -512,7 +516,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
     }
 }
 
-# key_field => [0, 1, 'id'], key_field => 'id'
+# key_col => [0, 1, 'id'], key_col => 'id'
 sub selectall ( $self, @ ) {
     my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
@@ -527,12 +531,12 @@ sub selectall ( $self, @ ) {
     else {
         my $data;
 
-        if ( defined $args->{key_field} ) {
+        if ( defined $args->{key_col} ) {
 
             # make fields indexes 0-based
-            my @key_fields = map { looks_like_number $_ ? $_ + 1 : $_ } is_plain_arrayref $args->{key_field} ? $args->{key_field}->@* : $args->{key_field};
+            my @key_cols = map { looks_like_number $_ ? $_ + 1 : $_ } is_plain_arrayref $args->{key_col} ? $args->{key_col}->@* : $args->{key_col};
 
-            $data = $sth->fetchall_hashref( \@key_fields );
+            $data = $sth->fetchall_hashref( \@key_cols );
 
             # check error
             if ( defined $DBI::err ) {
@@ -754,13 +758,13 @@ sub attach ( $self, $name, $path = undef ) {
 ## |    3 | 145                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 372                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
+## |    3 | 376                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 455                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 459                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 338                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 662                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 666                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -117,6 +117,7 @@
             "List::AllUtils" : "0",
             "List::Util::XS" : "0",
             "MIME::Base64" : "v3.15.0",
+            "MIME::Base64::URLSafe" : "v0.1.0",
             "Module::CPANfile" : "0",
             "Net::DNS::Resolver" : "v1.18.0",
             "Net::SSLeay" : "0",
@@ -165,6 +166,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.94.0",
-   "x_serialization_backend" : "JSON::PP version 4.03"
+   "version" : "v0.95.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

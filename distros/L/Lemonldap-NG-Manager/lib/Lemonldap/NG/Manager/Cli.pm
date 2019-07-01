@@ -6,7 +6,7 @@ use Mouse;
 use Data::Dumper;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.5';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -30,6 +30,8 @@ has format => ( is => 'rw', isa => 'Str', default => "%-25s | %-25s | %-25s" );
 has yes => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has force => ( is => 'rw', isa => 'Bool', default => 0 );
+
+has log => ( is => 'rw' );
 
 sub get {
     my ( $self, @keys ) = @_;
@@ -192,6 +194,31 @@ sub lastCfg {
     return $self->jsonResponse('/confs/latest')->{cfgNum};
 }
 
+sub save {
+    my ($self) = @_;
+    my $conf = $self->jsonResponse( '/confs/latest', 'full=1' );
+    my $json = JSON->new->indent->canonical;
+    print $json->encode($conf);
+}
+
+sub restore {
+    my ( $self, $file ) = @_;
+    require IO::String;
+    my $conf;
+    if ( $file eq '-' ) {
+        $conf = join '', <STDIN>;
+    }
+    else {
+        open my $f, $file;
+        $conf = join '', <$f>;
+        close $f;
+    }
+    my $res = $self->_post( '/confs/raw', '', IO::String->new($conf),
+        'application/json', length($conf) );
+    use Data::Dumper;
+    print STDERR Dumper($res);
+}
+
 sub _getKey {
     my ( $self, $key ) = @_;
     my $sep = $self->sep;
@@ -248,12 +275,12 @@ sub _save {
         $saveParams->{cfgNum}      = $self->cfgNum;
         $saveParams->{cfgNumFixed} = 1;
     }
-    $new->{cfgAuthor} = 'lmConfigEditor: ' . `whoami`;
+    $new->{cfgAuthor} = scalar( getpwuid $< ) . '(command-line)';
     chomp $new->{cfgAuthor};
-    $new->{cfgAuthorIP} = '';
+    $new->{cfgAuthorIP} = '127.0.0.1';
     $new->{cfgDate}     = time;
-    $new->{cfgVersion}  = $VERSION;
-    $new->{cfgLog}      = '';
+    $new->{cfgVersion}  = $Lemonldap::NG::Manager::VERSION;
+    $new->{cfgLog}      = $self->log // 'Modified using LLNG cli';
     $new->{key} ||= join( '',
         map { chr( int( ord( Crypt::URandom::urandom(1) ) * 94 / 256 ) + 33 ) }
           ( 1 .. 16 ) );
@@ -302,7 +329,7 @@ sub run {
     }
     $self->cfgNum( $self->lastCfg ) unless ( $self->cfgNum );
     my $action = shift;
-    unless ( $action =~ /^(?:get|set|addKey|delKey)$/ ) {
+    unless ( $action =~ /^(?:get|set|addKey|delKey|save|restore)$/ ) {
         die
 "unknown action $action. Only get, set, addKey or delKey are accepted";
     }
@@ -394,6 +421,10 @@ Set it to 1 to save a configuration earlier than latest
 =head3 format()
 
 Confirmation array line format. Default to "%-25s | %-25s | %-25s"
+
+=head3 log()
+
+String to insert in configuration log field (cfgLog)
 
 =head2 run()
 

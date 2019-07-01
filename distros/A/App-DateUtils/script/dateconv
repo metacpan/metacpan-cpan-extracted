@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/dateconv
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-01-29'; # DATE
+our $DATE = '2019-06-19'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.120'; # VERSION
+our $VERSION = '0.121'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ dateconv - Convert date to another format
 
 =head1 VERSION
 
-This document describes version 0.120 of dateconv (from Perl distribution App-DateUtils), released on 2019-01-29.
+This document describes version 0.121 of dateconv (from Perl distribution App-DateUtils), released on 2019-06-19.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ Examples:
 Convert "today" to epoch:
 
  % dateconv today
- 1548720000
+ 1560902400
 
 Convert epoch to ymd:
 

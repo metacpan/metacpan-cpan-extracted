@@ -10,7 +10,7 @@ use strict;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 sub methods { return (deka => \&deka); }
 sub labels { return (deka => [qw/exchange name date isodate price method/]); }
@@ -73,7 +73,7 @@ sub deka
         $info{$q[0], "last"}     = convert_price($q[4]);
 
         $info{$q[0], "method"}   = "deka";
-        $info{$q[0], "currency"} = $q[12];
+        $info{$q[0], "currency"} = $q[8];
         $info{$q[0], "success"}  = 1;
       }
     }

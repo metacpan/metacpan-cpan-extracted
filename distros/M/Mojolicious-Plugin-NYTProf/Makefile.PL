@@ -14,7 +14,7 @@ WriteMakefile(
   LICENSE       => 'perl',
   PREREQ_PM => {
     'Devel::NYTProf'        => '6.06',
-    'Mojolicious'           => '6.00',
+    'Mojolicious'           => '8.00',
     'File::Which'           => '1.09',
     'File::Temp'            => '0.22',
     'Time::HiRes'           => '1.9719',

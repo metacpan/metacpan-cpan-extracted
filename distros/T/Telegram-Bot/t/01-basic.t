@@ -1,6 +1,35 @@
 use Test::More;
 
+use_ok('Telegram::Bot');
 use_ok('Telegram::Bot::Brain');
-use_ok('Telegram::Bot::Message');
 
+use_ok("Telegram::Bot::Object::Animation");
+use_ok("Telegram::Bot::Object::Audio");
+use_ok("Telegram::Bot::Object::Base");
+use_ok("Telegram::Bot::Object::CallbackGame");
+use_ok("Telegram::Bot::Object::Chat");
+use_ok("Telegram::Bot::Object::ChatPhoto");
+use_ok("Telegram::Bot::Object::Contact");
+use_ok("Telegram::Bot::Object::Document");
+use_ok("Telegram::Bot::Object::EncryptedCredentials");
+use_ok("Telegram::Bot::Object::EncryptedPassportElement");
+use_ok("Telegram::Bot::Object::Game");
+use_ok("Telegram::Bot::Object::InlineKeyboardButton");
+use_ok("Telegram::Bot::Object::InlineKeyboardMarkup");
+use_ok("Telegram::Bot::Object::Invoice");
+use_ok("Telegram::Bot::Object::Location");
+use_ok("Telegram::Bot::Object::LoginUrl");
+use_ok("Telegram::Bot::Object::Message");
+use_ok("Telegram::Bot::Object::MessageEntity");
+use_ok("Telegram::Bot::Object::PassportData");
+use_ok("Telegram::Bot::Object::PhotoSize");
+use_ok("Telegram::Bot::Object::Poll");
+use_ok("Telegram::Bot::Object::PollOption");
+use_ok("Telegram::Bot::Object::Sticker");
+use_ok("Telegram::Bot::Object::SuccessfulPayment");
+use_ok("Telegram::Bot::Object::User");
+use_ok("Telegram::Bot::Object::Venue");
+use_ok("Telegram::Bot::Object::Video");
+use_ok("Telegram::Bot::Object::VideoNote");
+use_ok("Telegram::Bot::Object::Voice");
 done_testing();

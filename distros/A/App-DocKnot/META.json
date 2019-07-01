@@ -1,7 +1,7 @@
 {
    "abstract" : "Package documentation generator",
    "author" : [
-      "Russ Allbery <eagle@eyrie.org>"
+      "Russ Allbery <rra@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
@@ -16,13 +16,15 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.36"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "File::BaseDir" : "0",
             "File::ShareDir" : "1.00",
+            "IPC::Run" : "0",
+            "IPC::System::Simple" : "0",
             "JSON" : "0",
             "Perl6::Slurp" : "0",
             "Template" : "0",
@@ -31,18 +33,31 @@
       },
       "test" : {
          "requires" : {
-            "IPC::System::Simple" : "0"
+            "Capture::Tiny" : "0",
+            "File::Copy::Recursive" : "0"
          }
       }
    },
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "2.00"
+         "version" : "3.00"
+      },
+      "App::DocKnot::Command" : {
+         "file" : "lib/App/DocKnot/Command.pm",
+         "version" : "3.00"
+      },
+      "App::DocKnot::Config" : {
+         "file" : "lib/App/DocKnot/Config.pm",
+         "version" : "3.00"
+      },
+      "App::DocKnot::Dist" : {
+         "file" : "lib/App/DocKnot/Dist.pm",
+         "version" : "3.00"
       },
       "App::DocKnot::Generate" : {
          "file" : "lib/App/DocKnot/Generate.pm",
-         "version" : "2.00"
+         "version" : "3.00"
       }
    },
    "release_status" : "stable",
@@ -61,6 +76,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "2.00",
+   "version" : "3.00",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

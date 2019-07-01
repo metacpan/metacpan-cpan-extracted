@@ -44,7 +44,7 @@ SKIP: {
         $res = $client->_post(
             '/register',
             IO::String->new(
-                'firstname=fôo&lastname=bar&mail=foobar%40badwolf.org'),
+                'firstname=Fôo&lastname=Bàr&mail=foobar%40badwolf.org'),
             length => 53,
             accept => 'text/html'
         ),
@@ -57,7 +57,7 @@ SKIP: {
         'Found register token' );
     $query = $1;
     ok( $query =~ /register_token=/, 'Found register_token' );
-    ok( $mail =~ /fôo/, 'UTF-8 works' ) or explain( $mail, 'fôo' );
+    ok( $mail =~ /Fôo/, 'UTF-8 works' ) or explain( $mail, 'Fôo' );
 
     ok(
         $res =
@@ -77,7 +77,7 @@ SKIP: {
 
     ok(
         $res = $client->_post(
-            '/', IO::String->new('user=fbar&password=fbar'),
+            '/', IO::String->new("user=fbar&password=fbar"),
             length => 23,
             accept => 'text/html'
         ),

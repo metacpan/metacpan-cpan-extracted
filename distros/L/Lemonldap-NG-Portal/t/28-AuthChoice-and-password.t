@@ -31,8 +31,9 @@ SKIP: {
 
                 authChoiceParam   => 'test',
                 authChoiceModules => {
-                    ldap => 'LDAP;LDAP;LDAP',
-                    sql  => 'DBI;DBI;DBI',
+                    ldap  => 'LDAP;LDAP;LDAP',
+                    sql   => 'DBI;DBI;DBI',
+                    slave => 'Slave;LDAP;LDAP',
                 },
 
                 dbiAuthChain        => 'dbi:SQLite:dbname=t/userdb.db',
@@ -47,6 +48,11 @@ SKIP: {
                 ldapBase        => 'ou=users,dc=example,dc=com',
                 managerDn       => 'cn=admin,dc=example,dc=com',
                 managerPassword => 'admin',
+
+                slaveUserHeader   => 'My-Test',
+                slaveExportedVars => {
+                    name => 'Name',
+                }
             }
         }
     );
@@ -58,11 +64,11 @@ SKIP: {
       )
     {
 
-        # Try yo authenticate
+        # Try to authenticate
         # -------------------
         ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get menu' );
         my @form = ( $res->[2]->[0] =~ m#<form.*?</form>#sg );
-        ok( @form == 2, 'Display 2 choices' );
+        ok( @form == 3, 'Display 3 choices' ) or explain(scalar(@form),3);
         foreach (@form) {
             expectForm( [ $res->[0], $res->[1], [$_] ], undef, undef, 'test' );
         }

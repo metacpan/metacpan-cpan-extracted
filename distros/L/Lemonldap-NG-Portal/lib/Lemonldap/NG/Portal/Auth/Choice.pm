@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_FIRSTACCESS PE_ERROR);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Portal::Lib::Choice';
 
@@ -44,18 +44,13 @@ sub extractFormInfo {
                 }
             }
         }
-
-        foreach my $mod ( values %{ $self->modules } ) {
-            if ( $mod->can('setSecurity') ) {
-                $mod->setSecurity($req);
-                last;
-            }
-        }
+        $self->setSecurity($req);
         $self->logger->debug(
             "Send init/script -> " . $req->data->{customScript} )
           if $req->data->{customScript};
         return PE_FIRSTACCESS;
     }
+
     my $res = $req->data->{enabledMods0}->[0]->extractFormInfo($req);
     delete $req->pdata->{_choice} if ( $res > 0 );
     return $res;
@@ -81,6 +76,16 @@ sub authLogout {
     delete $_[1]->pdata->{_choice};
     delete $_[1]->data->{_authChoice};
     return $res;
+}
+
+sub setSecurity {
+    my ( $self, $req ) = @_;
+    foreach my $mod ( values %{ $self->modules } ) {
+        if ( $mod->can('setSecurity') ) {
+            $mod->setSecurity($req);
+            last;
+        }
+    }
 }
 
 1;

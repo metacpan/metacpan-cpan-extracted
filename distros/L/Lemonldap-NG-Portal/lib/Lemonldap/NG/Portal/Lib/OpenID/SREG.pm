@@ -73,6 +73,7 @@ sub sregHook {
         }
     }
     $req->data->{_openIdTrustExtMsg} .= $self->loadTemplate(
+        $req,
         'openIdPol',
         params => {
             policies => \@pol,
@@ -96,7 +97,8 @@ sub sregHook {
 
             $req->info(
                 $self->loadTemplate(
-                    'simpleInfo', params => { trspan => "openidRpns,$k" }
+                    $req, 'simpleInfo',
+                    params => { trspan => "openidRpns,$k" }
                 )
             );
             return ( 0, {} );
@@ -198,6 +200,7 @@ sub sregHook {
         }
 
         $req->data->{_openIdTrustExtMsg} .= $self->loadTemplate(
+            $req,
             'openIdTrust',
             params => {
                 required => \@mreq,

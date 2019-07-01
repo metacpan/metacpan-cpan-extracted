@@ -1,7 +1,7 @@
 package Algorithm::Backoff;
 
 our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -279,7 +279,7 @@ Algorithm::Backoff - Various backoff strategies for retry
 
 =head1 VERSION
 
-This document describes version 0.008 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-20.
+This document describes version 0.009 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-20.
 
 =head1 SYNOPSIS
 

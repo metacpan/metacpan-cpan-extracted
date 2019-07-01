@@ -22,7 +22,6 @@ my $client = LLNG::Manager::Test->new( {
             useSafeJail                => 1,
             notification               => 1,
             notificationServer         => 1,
-            templatesDir               => 'site/templates/',
             notificationStorage        => 'File',
             notificationStorageOptions => {
                 dirName => 't'

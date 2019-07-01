@@ -1,4 +1,6 @@
 Change history for Perl extension PDF::Table.
+Version 0.11.0 Colspan feature by domm
+
 Version 0.10.0 Introduces underlined text in cells
 
 Version 0.9.13 Fixed issue #33 - Desislav Kamenov

@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Geo::What3Words",
   "PREREQ_PM" => {
+    "Cpanel::JSON::XS" => 0,
     "Data::Dumper" => 0,
-    "JSON::XS" => 0,
     "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
     "List::Util" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "URI" => 0
   },
-  "VERSION" => "2.1.1",
+  "VERSION" => "2.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +38,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Cpanel::JSON::XS" => 0,
   "Data::Dumper" => 0,
-  "JSON::XS" => 0,
   "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
   "List::Util" => 0,

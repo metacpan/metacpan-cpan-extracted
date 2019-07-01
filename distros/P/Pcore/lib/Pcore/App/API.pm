@@ -1,186 +1,179 @@
 package Pcore::App::API;
 
-use Pcore -role, -const, -export;
-use Pcore::App::API::Map;
+use Pcore -class, -res;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
-use Pcore::Util::Data qw[from_b64 from_b64_url];
-use Pcore::Util::Digest qw[sha3_512];
-use Pcore::Util::Text qw[encode_utf8];
-use Pcore::Util::UUID qw[uuid_from_bin];
-use Pcore::App::API::Auth;
-
-our $EXPORT = { CONST => [qw[$TOKEN_TYPE $TOKEN_TYPE_USER_PASSWORD $TOKEN_TYPE_USER_TOKEN $TOKEN_TYPE_USER_SESSION]] };
+use Package::Stash::XS qw[];
 
 has app => ( required => 1 );    # ConsumerOf ['Pcore::App']
 
-has map => ( init_arg => undef );    # InstanceOf ['Pcore::App::API::Map']
+has method => ( init_arg => undef );    # HashRef
+has obj    => ( init_arg => undef );    # HashRef
 
-has _auth_cb_queue => ( init_arg => undef );    # HashRef
-has _auth_cache    => ( init_arg => undef );    # HashRef
+# TODO https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
-const our $TOKEN_TYPE_USER_PASSWORD => 1;
-const our $TOKEN_TYPE_USER_TOKEN    => 3;
-const our $TOKEN_TYPE_USER_SESSION  => 4;
+sub init ($self) {
+    print 'Scanning API classes ... ';
 
-const our $TOKEN_TYPE => {
-    $TOKEN_TYPE_USER_PASSWORD => undef,
-    $TOKEN_TYPE_USER_TOKEN    => undef,
-    $TOKEN_TYPE_USER_SESSION  => undef,
-};
+    my $method = {};
 
-sub new ( $self, $app ) {
-    state $scheme_class = {
-        sqlite => 'Pcore::App::API::Local::sqlite',
-        pgsql  => 'Pcore::App::API::Local::pgsql',
-        ws     => 'Pcore::App::API::Local::Remote',
-        wss    => 'Pcore::App::API::Local::Remote',
+    # index permissions
+    my $permissions = { map { $_ => 1 } $self->{app}->get_permissions->@* };
+
+    my $ns_path = ( ref( $self->{app} ) =~ s[::][/]smgr ) . '/API';
+
+    my $class;
+
+    # scan %INC
+    for my $class_path ( keys %INC ) {
+
+        # API class must be located in V\d+ directory
+        next if $class_path !~ m[\A$ns_path/V\d+/]sm;
+
+        # remove .pm suffix
+        my $class_name = $class_path =~ s/[.]pm\z//smr;
+
+        $class_name =~ s[/][::]smg;
+
+        $class->{$class_path} = $class_name;
+    }
+
+    # scan filesystem namespace, find and preload controllers
+    for my $inc ( grep { !ref } @INC ) {
+        for my $file ( ( P->path("$inc/$ns_path")->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+
+            # .pm file
+            if ( $file =~ s/[.]pm\z//sm ) {
+
+                # API class must be located in V\d+ directory
+                return if $file !~ m[\Av\d+/]sm;
+
+                $class->{$file} = "$ns_path/$file" =~ s[/][::]smgr;
+            }
+        }
+    }
+
+    my $MODIFY_CODE_ATTRIBUTES = sub ( $pkg, $ref, @attrs ) {
+        my @bad;
+
+        for my $attr (@attrs) {
+            if ( $attr =~ /(Permissions) [(] ([^)]*) [)]/smxx ) {
+                my ( $attr, $val ) = ( $1, $2 );
+
+                if ( $attr eq 'Permissions' ) {
+
+                    # parse args
+                    my @val = split /\s*,\s*/sm, $val;
+
+                    # dequote
+                    for (@val) {s/['"]//smg}
+
+                    $val = \@val;
+                }
+
+                ${"$pkg\::_API_MAP"}->{$ref}->{ lc $attr } = $val;
+            }
+            else {
+                push @bad, $attr;
+            }
+        }
+
+        return @bad;
     };
 
-    if ( defined $app->{app_cfg}->{api}->{connect} ) {
-        my $uri = P->uri( $app->{app_cfg}->{api}->{connect} );
+    for my $class_path ( sort keys $class->%* ) {
+        my $class_name = $class->{$class_path};
 
-        if ( my $class = $scheme_class->{ $uri->{scheme} } ) {
-            return P->class->load($class)->new( { app => $app } );
-        }
-        else {
-            die 'Unknown API scheme';
-        }
-    }
-    else {
-        return P->class->load('Pcore::App::API::LocalNoAuth')->new( { app => $app } );
-    }
-}
+        my $attrs = do {
+            local *{"$class_name\::MODIFY_CODE_ATTRIBUTES"} = $MODIFY_CODE_ATTRIBUTES;
 
-# setup events listeners
-around init => sub ( $orig, $self ) {
+            eval { P->class->load($class_name) };
 
-    # build map
-    # using class name as string to avoid conflict with Type::Standard Map subroutine, exported to Pcore::App::API
-    $self->{map} = 'Pcore::App::API::Map'->new( { app => $self->{app} } );
+            if ($@) {
+                say qq[Can't load API class "$class_name": $@];
 
-    # init map
-    print 'Scanning API classes ... ';
-    $self->{map}->init;
-    say 'done';
+                exit 3;
+            }
 
-    # setup events listeners
-    P->bind_events(
-        'app.api.auth',
-        sub ($ev) {
-            $self->{_auth_cache}->%* = ();
-
-            return;
-        }
-    );
-
-    return $self->$orig;
-};
-
-# AUTHENTICATE
-# parse token, create private token, forward to authenticate_private
-sub authenticate ( $self, $token ) {
-
-    # no auth token provided
-    return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if !defined $token;
-
-    my ( $token_type, $token_id, $private_token_hash );
-
-    # authenticate user password
-    if ( is_plain_arrayref $token) {
-
-        # generate private token hash
-        $private_token_hash = eval { sha3_512 encode_utf8( $token->[1] ) . encode_utf8 $token->[0] };
-
-        # error decoding token
-        return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if $@;
-
-        $token_type = $TOKEN_TYPE_USER_PASSWORD;
-
-        \$token_id = \$token->[0];
-    }
-
-    # authenticate token
-    else {
-
-        # decode token
-        eval {
-            my $token_bin = from_b64_url $token;
-
-            # unpack token type
-            $token_type = unpack 'C', $token_bin;
-
-            # unpack token id
-            $token_id = uuid_from_bin( substr $token_bin, 1, 16 )->str;
-
-            $private_token_hash = sha3_512 $token;
+            ${"$class_name\::_API_MAP"};
         };
 
-        # error decoding token
-        return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if $@;
+        die qq["$class_name" must be an instance of "Pcore::App::API::Base"] if !$class_name->isa('Pcore::App::API::Base');
 
-        # invalid token type
-        return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if !exists $TOKEN_TYPE->{$token_type};
+        # prepare API object route
+        $class_path =~ s/\AV/v/sm;
+
+        # create API object and store in cache
+        my $obj = $self->{obj}->{$class_name} = $class_name->new( { app => $self->{app} } );
+
+        # parse API version
+        my ($version) = $class_path =~ /\Av(\d+)/sm;
+
+        # scan api methods
+        for my $method_name ( grep {/\AAPI_/sm} Package::Stash::XS->new($class_name)->list_all_symbols('CODE') ) {
+
+            # get method permissions
+            my $perms = do {
+                my $ref = *{"$class_name\::$method_name"}{CODE};
+
+                $attrs->{$ref}->{permissions} // ${"$class_name\::API_NAMESPACE_PERMISSIONS"};
+            };
+
+            my $local_method_name = $method_name;
+
+            $method_name =~ s/\AAPI_//sm;
+
+            my $method_id = qq[/$class_path/$method_name];
+
+            $method->{$method_id} = {
+                id                => $method_id,
+                version           => "v$version",
+                class_name        => $class_name,
+                class_path        => "/$class_path",
+                method_name       => $method_name,
+                local_method_name => $local_method_name,
+                permissions       => $perms,
+            };
+
+            # check method permissions
+            if ( $method->{$method_id}->{permissions} ) {
+
+                # convert to ArrayRef
+                $method->{$method_id}->{permissions} = [ $method->{$method_id}->{permissions} ] if !is_plain_arrayref $method->{$method_id}->{permissions};
+
+                # methods permissions are empty
+                if ( !$method->{$method_id}->{permissions}->@* ) {
+                    $method->{$method_id}->{permissions} = undef;
+                }
+
+                # check permissions
+                else {
+                    for my $permission ( $method->{$method_id}->{permissions}->@* ) {
+
+                        # expand "*"
+                        if ( $permission eq q[*] ) {
+                            $method->{$method_id}->{permissions} = [ keys $permissions->%* ];
+
+                            last;
+                        }
+
+                        if ( !exists $permissions->{$permission} ) {
+                            die qq[Invalid API method permission "$permission" for method "$method_id"];
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    return $self->authenticate_private( [ $token_type, $token_id, $private_token_hash ] );
+    $self->{method} = $method;
+
+    say 'done';
+
+    return res 200;
 }
 
-sub authenticate_private ( $self, $private_token ) {
-
-    # try to find token in cache
-    my $auth = $self->{_auth_cache}->{ $private_token->[2] };
-
-    # token was cached
-    return $auth if defined $auth;
-
-    my $cv = P->cv;
-
-    my $cache = $self->{_auth_cb_queue};
-
-    push $cache->{ $private_token->[2] }->@*, $cv;
-
-    return $cv->recv if $cache->{ $private_token->[2] }->@* > 1;
-
-    # authenticate on backend
-    my $res = $self->do_authenticate_private($private_token);
-
-    # authentication error
-    if ( !$res ) {
-
-        # delete private token from cache
-        delete $self->{_auth_cache}->{ $private_token->[2] };
-
-        # return new unauthenticated auth object
-        $auth = bless {
-            app              => $self->{app},
-            is_authenticated => 0,
-            private_token    => $private_token,
-          },
-          'Pcore::App::API::Auth';
-    }
-
-    # authenticated
-    else {
-
-        # create auth
-        $auth = bless $res->{data}, 'Pcore::App::API::Auth';
-
-        $auth->{app}              = $self->{app};
-        $auth->{is_authenticated} = 1;
-        $auth->{private_token}    = $private_token;
-
-        # store in cache
-        $self->{_auth_cache}->{ $private_token->[2] } = $auth;
-    }
-
-    # call callbacks
-    $cache = delete $cache->{ $private_token->[2] };
-
-    while ( my $cb = shift $cache->@* ) {
-        $cb->($auth);
-    }
-
-    return $cv->recv;
+sub get_method ( $self, $method_id ) {
+    return $self->{method}->{$method_id};
 }
 
 1;
@@ -190,7 +183,11 @@ sub authenticate_private ( $self, $private_token ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 106                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "init" with high complexity score (23)                      |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 89                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 153, 159             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -209,31 +206,7 @@ Pcore::App::API
 
 =head1 ATTRIBUTES
 
-=head1 AUTHENTICATION METHODS
-
-=head2 authentocate( $user_name, $token, $cb )
-
-Performs user authentication and returns instance of Pcore::App::API::Auth.
-
-C<$user_name> can be undefined.
-
-=head2 authentocate_private( $private_token, $cb )
-
-Performs private token authentication and returns instance of Pcore::App::API::Auth.
-
-Private token structure is [ %token_type, $token_id, $token_hash ].
-
-=head1 USER METHODS
-
-=head2 create_user ( $user_name, $password, $enabled, $permissions, $cb )
-
-Creates user and returns user id.
-
-C<$permissions> - ArrayRef[ 'role1', 'role2', ... ]
-
-=head2 get_users ( $cb )
-
-Returns all users.
+=head1 METHODS
 
 =head1 SEE ALSO
 

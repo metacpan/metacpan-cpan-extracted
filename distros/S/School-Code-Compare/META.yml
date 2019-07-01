@@ -4,6 +4,8 @@ author:
   - 'Boris Däppen <bdaeppen.perl@gmail.com>'
 build_requires:
   Test::More: '0'
+  Test::Script: '1.10'
+  perl: v5.12.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,19 +17,22 @@ meta-spec:
 name: School-Code-Compare
 requires:
   DateTime: '0'
+  File::Find::Rule: '0'
   File::Slurp: '0'
-  Getopt::Args: '0'
   IO::Prompt::Simple: '0'
+  Module::Installed::Tiny: '0'
+  Module::Load: '0'
+  OptArgs: '0'
   Template: '0'
   Text::Levenshtein::XS: '0'
   feature: '0'
-  perl: v5.22.0
+  perl: v5.12.0
   strict: '0'
   utf8: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/borisdaeppen/School-Code-Compare
-  repository: git://github.com/borisdaeppen/School-Code-Compare.git
-version: '0.007'
+  homepage: https://gitlab.com/borisdaeppen/School-Code-Compare
+  repository: https://gitlab.com/borisdaeppen/School-Code-Compare
+version: '0.101'
 x_generated_by_perl: v5.22.4
 x_serialization_backend: 'YAML::Tiny version 1.70'

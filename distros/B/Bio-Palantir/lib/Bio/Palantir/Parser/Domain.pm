@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Domain;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Domain::VERSION = '0.191620';
+$Bio::Palantir::Parser::Domain::VERSION = '0.191800';
 use Moose;
 use namespace::autoclean;
 
@@ -193,7 +193,7 @@ Bio::Palantir::Parser::Domain - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

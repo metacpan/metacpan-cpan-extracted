@@ -24,7 +24,7 @@ use App::DocKnot::Generate;
 # subdirectory using the metadata subdirectory and the template matching the
 # output name.  Special-case the docknot subdirectory, which uses DocKnot's
 # own metadata.
-my $data = File::Spec->catdir('t', 'data');
+my $data = File::Spec->catdir('t', 'data', 'generate');
 opendir(my $datadir, $data);
 my @packages = grep { -d File::Spec->catdir($data, $_) }
   File::Spec->no_upwards(readdir($datadir));

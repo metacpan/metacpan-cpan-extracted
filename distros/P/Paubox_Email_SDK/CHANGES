@@ -1,0 +1,17 @@
+Revision history for Perl module Paubox_Email_SDK
+
+1.2 2019-07-01
+    
+    - Added cc property
+
+    - Added changes file
+ 
+1.1 2019-06-05
+
+    - Added force secure notification property.
+
+    - Base64 encoded html content.
+ 
+1.0 2019-04-06
+
+    - Initial release.

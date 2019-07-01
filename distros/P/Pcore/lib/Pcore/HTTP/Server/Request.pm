@@ -4,7 +4,7 @@ use Pcore -class, -const, -res;
 use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref];
 use Pcore::Util::List qw[pairs];
 use Pcore::Util::Text qw[encode_utf8];
-use Pcore::App::API::Auth;
+use Pcore::App::Auth::Descriptor;
 
 use overload    #
   '&{}' => sub ( $self, @ ) {
@@ -211,8 +211,8 @@ sub authenticate ( $self ) {
     if ( exists $self->{_auth} ) {
         return $self->{_auth};
     }
-    elsif ( !$self->{app}->{api} ) {
-        return $self->{_auth} = bless { app => $self->{app} }, 'Pcore::App::API::Auth';
+    elsif ( !$self->{app}->{auth} ) {
+        return $self->{_auth} = bless { app => $self->{app} }, 'Pcore::App::Auth::Descriptor';
     }
     else {
         my $env = $self->{env};
@@ -237,7 +237,7 @@ sub authenticate ( $self ) {
             $token = $1;
         }
 
-        return $self->{_auth} = $self->{app}->{api}->authenticate($token);
+        return $self->{_auth} = $self->{app}->{auth}->authenticate($token);
     }
 }
 

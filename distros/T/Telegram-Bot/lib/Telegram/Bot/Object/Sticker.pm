@@ -1,6 +1,7 @@
 package Telegram::Bot::Object::Sticker;
-$Telegram::Bot::Object::Sticker::VERSION = '0.012';
+$Telegram::Bot::Object::Sticker::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'Sticker' type.
+
 
 use Mojo::Base 'Telegram::Bot::Object::Base';
 use Telegram::Bot::Object::PhotoSize;
@@ -8,14 +9,16 @@ use Telegram::Bot::Object::PhotoSize;
 has 'file_id';
 has 'width';
 has 'height';
-has 'thumb';
-has 'file_size';
+has 'thumb'; # PhotoSize
 has 'emoji';
+has 'set_name';
+# has 'mask_position'; # XXX TODO
+has 'file_size';
 
 sub fields {
-  return { scalar => [qw/file_id width height file_size emoji/],
-           object => [ { thumb => 'Telegram::Bot::Object::PhotoSize' } ],
-           array  => [ ],
+  return { scalar                             => [qw/file_id width height emoji
+                                                     set_name file_size /],
+           'Telegram::Bot::Object::PhotoSize' => [ qw/thumb/ ],
          };
 }
 
@@ -33,7 +36,12 @@ Telegram::Bot::Object::Sticker - The base class for Telegram message 'Sticker' t
 
 =head1 VERSION
 
-version 0.012
+version 0.021
+
+=head1 DESCRIPTION
+
+See L<https://core.telegram.org/bots/api#sticker> for details of the
+attributes available for L<Telegram::Bot::Object::Sticker> objects.
 
 =head1 AUTHOR
 
@@ -41,7 +49,7 @@ Justin Hawkins <justin@eatmorecode.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Justin Hawkins.
+This software is copyright (c) 2019 by Justin Hawkins.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

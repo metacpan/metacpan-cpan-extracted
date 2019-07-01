@@ -11,6 +11,9 @@ cpanfile
 dist.ini
 examples/synopsis.pl
 lib/MongoDBx/Queue.pm
+lib/MongoDBx/Queue/Role/_CommonOptions.pm
+lib/MongoDBx/Queue/_V1.pm
+lib/MongoDBx/Queue/_V2.pm
 perlcritic.rc
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -19,7 +22,6 @@ t/search.t
 xt/author/00-compile.t
 xt/author/critic.t
 xt/author/minimum-version.t
-xt/author/pod-coverage.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t

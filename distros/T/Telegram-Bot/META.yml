@@ -18,8 +18,9 @@ requires:
   Mojolicious: '8.00'
   Test::Exception: '0.43'
 resources:
+  bugtracker: https://github.com/EatMoreCode/Telegram-Bot/issues
   homepage: https://github.com/EatMoreCode/Telegram-Bot
   repository: https://github.com/EatMoreCode/Telegram-Bot.git
-version: '0.012'
-x_generated_by_perl: v5.28.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.021'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

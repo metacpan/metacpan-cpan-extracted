@@ -8,7 +8,7 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'CTK'                   => 2.00,
+        'CTK'                   => 2.01,
         'HTTP::Message'         => 6.08,
         'File::Temp'            => 0.22,
         'IO'                    => 0,

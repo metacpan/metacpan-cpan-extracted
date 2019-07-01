@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OIDC_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect',
@@ -556,6 +556,7 @@ sub run {
                         }
                         $req->info(
                             $self->loadTemplate(
+                                $req,
                                 'oidcGiveConsent',
                                 params => {
                                     displayName => $display_name,
@@ -947,7 +948,7 @@ sub run {
                   : PE_OK;
             }
 
-            $req->info( $self->loadTemplate('oidcLogout') );
+            $req->info( $self->loadTemplate( $req, 'oidcLogout' ) );
             $req->data->{activeTimer} = 0;
             return PE_CONFIRM;
         }
@@ -996,18 +997,23 @@ sub token {
             $self->logger->error(
 "Relying Party $rp is confidential but no client secret was provided to authenticate on token endpoint"
             );
-            return $self->p->sendError( 'invalid_request', 400 );
+            return $self->p->sendError( $req, 'invalid_request', 400 );
         }
         unless ( $client_secret eq $self->conf->{oidcRPMetaDataOptions}->{$rp}
             ->{oidcRPMetaDataOptionsClientSecret} )
         {
             $self->logger->error("Wrong credentials for $rp");
-            return $self->p->sendError( 'invalid_request', 400 );
+            return $self->p->sendError( $req, 'invalid_request', 400 );
         }
     }
 
     # Get code session
     my $code = $req->param('code');
+
+    unless ($code) {
+        $self->logger->error("No code found on token endpoint");
+        return $self->p->sendError( $req, 'invalid_request', 400 );
+    }
 
     $self->logger->debug("OpenID Connect Code: $code");
 

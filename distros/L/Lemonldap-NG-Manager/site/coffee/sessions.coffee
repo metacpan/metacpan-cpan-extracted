@@ -9,8 +9,10 @@ max = 25
 # of opened nodes in the tree
 schemes =
 	_whatToTrace: [
+		# First level: display 1 letter
 		(t,v) ->
 			"groupBy=substr(#{t},1)"
+		# Second level (if no overScheme), display usernames
 		(t,v) ->
 			"#{t}=#{v}*&groupBy=#{t}"
 		(t,v) ->
@@ -59,15 +61,26 @@ schemes =
 			q.replace(/\&groupBy.*$/, '') + "&ipAddr=#{v}"
 	]
 
+# When number of children nodes exceeds "max" value and if "overScheme.<type>"
+# is available and does not return "null", a level is added. See
+# "$scope.updateTree" method
 overScheme =
 	_whatToTrace: (t,v,level,over) ->
+		# "v.length > over" avoids a loop if one user opened more than "max"
+		# sessions
 		if level == 1 and v.length > over
 			"#{t}=#{v}*&groupBy=substr(#{t},#{(level+over+1)})"
 		else
 			null
+	# Note: IPv4 only
 	ipAddr: (t,v,level,over) ->
 		if level > 0 and level < 4
 			"#{t}=#{v}*&groupBy=net(#{t},#{16*level+4*(over+1)},2)"
+		else
+			null
+	_startTime: (t,v,level,over) ->
+		if level > 3
+			"#{t}=#{v}*&groupBy=substr(#{t},#{(9+level+over+1)})"
 		else
 			null
 
@@ -410,7 +423,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 		scheme = if schemes[$scope.type]
 			schemes[$scope.type]
 
-		#  - _updateTime must be displayed as startDate
+		#  - _updateTime must be displayed as startTime
 		else if $scope.type == '_updateTime'
 			schemes._startTime
 

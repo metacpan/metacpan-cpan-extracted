@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '1.76'
+version: '1.78'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'
@@ -76,6 +76,6 @@ x_contributors:
   - 'Shoichi Kaji (SKAJI)'
   - 'Shawn Laffan (SLAFFAN)'
   - 'Paul Evans (leonerd, PEVANS)'
-x_generated_by_perl: v5.31.1
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

@@ -1,6 +1,6 @@
 package MsgPack::Type::Ext;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Type::Ext::VERSION = '2.0.2';
+$MsgPack::Type::Ext::VERSION = '2.0.3';
 use strict;
 use warnings;
 
@@ -69,7 +69,7 @@ MsgPack::Type::Ext
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 AUTHOR
 

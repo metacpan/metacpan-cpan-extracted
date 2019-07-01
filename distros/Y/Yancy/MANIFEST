@@ -22,6 +22,7 @@ eg/doc-site/myapp.preaction.conf
 eg/doc-site/public/screenshot-custom-element.png
 eg/doc-site/public/screenshot-edit.png
 eg/doc-site/public/screenshot.png
+eg/test-app/.gitignore
 eg/test-app/myapp.auth.conf
 eg/test-app/myapp.conf
 eg/test-app/myapp.null.conf
@@ -86,6 +87,7 @@ lib/Yancy/Plugin/Auth/OAuth2.pm
 lib/Yancy/Plugin/Auth/Password.pm
 lib/Yancy/Plugin/Auth/Token.pm
 lib/Yancy/Plugin/Editor.pm
+lib/Yancy/Plugin/File.pm
 lib/Yancy/Plugin/Form.pm
 lib/Yancy/Plugin/Form/Bootstrap4.pm
 lib/Yancy/Util.pm
@@ -126,6 +128,7 @@ t/plugin/auth/oauth2.t
 t/plugin/auth/password.t
 t/plugin/auth/token.t
 t/plugin/editor.t
+t/plugin/file.t
 t/plugin/form/bootstrap4.t
 t/schema/dbicdump.pl
 t/schema/mysql.sql
@@ -134,6 +137,8 @@ t/schema/pg.sql
 t/schema/sqlite.sql
 t/selenium/.gitignore
 t/selenium/editor.t
+t/share/avatar.jpg
+t/share/file.txt
 t/share/openapi-spec.json
 t/share/templates/blog_delete.html.ep
 t/share/templates/blog_edit.html.ep
@@ -144,6 +149,7 @@ t/share/templates/extend/blog_view.html.ep
 t/share/templates/people.html.ep
 t/share/templates/people/index.html.ep
 t/share/templates/plugin/editor/custom_element.html.ep
+t/share/templates/user.html.ep
 t/share/templates/user_edit.html.ep
 t/share/templates/user_profile_edit.html.ep
 t/share/withindex/templates/index.html.ep

@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -584,7 +584,10 @@ sub _initialise_version {
         my $binary         = $self->_binary();
         my $version_string = $self->execute( $binary, '--version' );
         if ( $version_string =~
-            /^Mozilla[ ]Firefox[ ](\d+)[.](\d+)(?:[.](\d+))?\s*$/smx )
+            /Mozilla[ ]Firefox[ ](\d+)[.](\d+)(?:[.](\d+))?\s*$/smx )
+            # not anchoring the start of the regex b/c of issues with
+            # RHEL6 and dbus crashing with error messages like 
+            # 'Failed to open connection to "session" message bus: /bin/dbus-launch terminated abnormally without any error message'
         {
             $self->{_initial_version}->{major} = $1;
             $self->{_initial_version}->{minor} = $2;
@@ -3595,7 +3598,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.75
+Version 0.76
 
 =head1 SYNOPSIS
 

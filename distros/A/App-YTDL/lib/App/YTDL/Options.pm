@@ -15,7 +15,7 @@ use FindBin               qw( $RealBin $RealScript );
 use Pod::Usage            qw( pod2usage );
 
 use Term::Choose       qw( choose );
-use Term::Choose::Util qw( print_hash choose_a_dir choose_a_file choose_a_number settings_menu insert_sep );
+use Term::Choose::Util qw( choose_a_dir choose_a_file choose_a_number settings_menu insert_sep );
 use Term::Form         qw();
 
 use App::YTDL::ChooseVideos qw( set_sort_videolist );
@@ -47,26 +47,20 @@ sub _show_info {
             $ffprobe_version = '';
         }
     };
-    my $info = '';
-    $info .= "Video dir: $opt->{video_dir}"   . "\n";
-    $info .= "Config dir: $opt->{video_dir}"  . "\n";
-    $info .= catfile( $RealBin, $RealScript ) . ": ";
-    $info .= $main::VERSION                   . "\n";
-    $info .= $opt->{youtube_dl}[0]            . ": ";
-    $info .= ( $youtube_dl_version // '?' )   . "\n";
-
+    my $info = "INFO\n\n";
+    $info .= "Directories:\n";
+    $info .= "    Video : $opt->{video_dir}"   . "\n";
+    $info .= "    Config: $opt->{config_file}" . "\n";
+    $info .= "\n";
+    $info .= "Versions:\n";
+    $info .= '    ' . catfile( $RealBin, $RealScript ) . ": " . $main::VERSION                 . "\n";
+    $info .= '    ' . $opt->{youtube_dl}[0]            . ": " . ( $youtube_dl_version // '?' ) . "\n";
     if ( $opt->{ffmpeg} ) {
-        $info .= $opt->{ffmpeg} . ": ";
-        $info .= ( $ffmpeg_version // '?' );
-        $info .= "\n";
+        $info .= '    ' . $opt->{ffmpeg} . " : " . ( $ffmpeg_version // '?' ) . "\n";
     }
     if ( $opt->{ffprobe} ) {
-        $info .= $opt->{ffprobe} . ": ";
-        $info .= ( $ffprobe_version // '?' );
-        $info .= "\n";
+        $info .= '    ' . $opt->{ffprobe} . ": " . ( $ffprobe_version // '?' ) . "\n";
     }
-    $info =~ s/\n/\n\n/g;
-    chomp $info;
     choose( [ 'Close' ], { prompt => "\n$info" } );
 }
 

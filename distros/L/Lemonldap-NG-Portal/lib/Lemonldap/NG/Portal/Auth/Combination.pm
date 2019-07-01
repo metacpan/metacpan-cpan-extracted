@@ -3,10 +3,10 @@ package Lemonldap::NG::Portal::Auth::Combination;
 use strict;
 use Mouse;
 use Lemonldap::NG::Common::Combination::Parser;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR);
+use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_FIRSTACCESS);
 use Scalar::Util 'weaken';
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.5';
 
 # TODO: See Lib::Wrapper
 extends 'Lemonldap::NG::Portal::Main::Auth';
@@ -197,7 +197,7 @@ sub try {
     $req->sessionInfo->{ [ '_auth', '_userDB' ]->[$type] } = $name;
     $req->sessionInfo->{_combinationTry} =
       $req->data->{dataKeep}->{combinationTry};
-    if ( $res > 0 ) {
+    if ( $res > 0 and $res != PE_FIRSTACCESS ) {
         $self->userLogger->warn( 'All schemes failed'
               . ( $req->user ? ' for user ' . $req->user : '' ) );
     }

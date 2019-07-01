@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use PDF::Cairo::Util qw(paper_size);
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -22,7 +22,7 @@ paper, calendars, practice sheets, etc.
 
     my $page = PDF::Cairo::Box->new(paper => "a4");
     my $half = $page->fold;
-    $half->shrink(36)->rotate;
+    $half->shrink(all => 36)->rotate;
     $page->center($half);
     ...
 

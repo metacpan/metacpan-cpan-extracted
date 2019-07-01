@@ -10,7 +10,6 @@ SKIP: {
 
     require Test::Spellunker;
     Test::Spellunker->import();
-    add_stopwords('comScore');
     all_pod_files_spelling_ok();
 }
 

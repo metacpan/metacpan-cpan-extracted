@@ -4,13 +4,13 @@
       "www.litres.ru <gu@litres.ru>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "FB3-Convert",
    "prereqs" : {
@@ -53,7 +53,7 @@
    "provides" : {
       "FB3::Convert" : {
          "file" : "lib/FB3/Convert.pm",
-         "version" : "0.33"
+         "version" : "0.34"
       },
       "FB3::Convert::Epub" : {
          "file" : "lib/FB3/Convert/Epub.pm"
@@ -71,5 +71,6 @@
          "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ]
    },
-   "version" : "0.33"
+   "version" : "0.34",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

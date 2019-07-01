@@ -14,7 +14,7 @@ Alien::Build::Manual::Contributing - Over-detailed contributing guide
 
 =head1 VERSION
 
-version 1.76
+version 1.78
 
 =head1 SYNOPSIS
 

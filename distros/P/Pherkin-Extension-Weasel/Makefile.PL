@@ -24,20 +24,22 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Pherkin::Extension::Weasel",
   "PREREQ_PM" => {
+    "File::Find::Rule" => 0,
     "File::Share" => 0,
     "Module::Runtime" => 0,
     "Moose" => 0,
     "Template" => 0,
     "Test::BDD::Cucumber" => "0.57",
     "Weasel" => 0,
-    "Weasel::Session" => "0.08"
+    "Weasel::Session" => "0.11",
+    "YAML::Syck" => 0
   },
   "TEST_REQUIRES" => {
     "Carp::Always" => 0,
     "Test::More" => 0,
     "Weasel::Driver::Mock" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp::Always" => 0,
+  "File::Find::Rule" => 0,
   "File::Share" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,
@@ -54,7 +57,8 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Weasel" => 0,
   "Weasel::Driver::Mock" => 0,
-  "Weasel::Session" => "0.08"
+  "Weasel::Session" => "0.11",
+  "YAML::Syck" => 0
 );
 
 

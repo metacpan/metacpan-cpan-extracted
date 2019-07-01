@@ -10,10 +10,11 @@ use File::Basename qw( basename );
 use List::MoreUtils   qw( none any duplicates );
 #use SQL::Type::Guess qw(); # required
 
-use Term::Choose       qw();
-use Term::Choose::Util qw( insert_sep );
-use Term::Form         qw();
-use Term::TablePrint   qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( insert_sep );
+use Term::Form              qw();
+use Term::TablePrint        qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -100,6 +101,7 @@ sub __drop {
             { grid => 2, prompt => $prompt_pt, max_rows => 0, keep_header => 1,
               table_expand => $sf->{o}{G}{info_expand} }
         );
+        print HIDE_CURSOR;
         $prompt = sprintf 'DROP %s %s  (%s %s)', uc $type, $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
         1; }
     ) {
@@ -138,6 +140,7 @@ sub create_view {
         $ax->print_sql( $sql );
         # Readline
         my $view = $tf->readline( 'View name: ' );
+        print HIDE_CURSOR;
         if ( ! length $view ) {
             return;
         }
@@ -322,6 +325,7 @@ sub __set_table_name {
         $table = $tf->readline( 'Table name: ',
             { info => $info, default => $default }
         );
+        print HIDE_CURSOR;
         if ( ! length $table ) {
             return;
         }
@@ -478,6 +482,7 @@ sub __column_names {
         $fields,
         { prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
+    print HIDE_CURSOR;
     if ( ! $form ) {
         return;
     }
@@ -518,6 +523,7 @@ sub __data_types {
         { prompt => 'Data types:', auto_up => 2, read_only => $read_only, confirm => $sf->{i}{_confirm},
           back => $sf->{i}{_back} . '   ' }
     );
+    print HIDE_CURSOR;
     if ( ! $col_name_and_type ) {
         return;
     }

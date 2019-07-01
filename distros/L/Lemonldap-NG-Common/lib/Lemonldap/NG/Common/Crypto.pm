@@ -11,10 +11,33 @@ package Lemonldap::NG::Common::Crypto;
 use strict;
 use Crypt::Rijndael;
 use MIME::Base64;
-use Digest::MD5 qw(md5);
+use Digest::SHA;
 use bytes;
 
 our $VERSION = '2.0.0';
+my ( $newIv, $randG, $hash );
+$hash = \&Digest::SHA::sha256;
+
+use constant HMAC_LENGTH => 32;
+use constant IV_LENGTH   => 16;
+
+BEGIN {
+    eval { require Crypt::URandom; Crypt::URandom::urandom(IV_LENGTH) };
+    if ($@) {
+        $newIv = sub {
+            return bytes::substr( Digest::SHA::sha1( rand() . time . {} ),
+                0, IV_LENGTH );
+        };
+        $randG = sub { return int( rand( $_[0] ) ) };
+    }
+    else {
+        $newIv = sub { return Crypt::URandom::urandom(IV_LENGTH) };
+        $randG = sub {
+            return
+              int( unpack( "C", Crypt::URandom::urandom(1) ) * $_[0] / 256 );
+        };
+    }
+}
 
 our $msg;
 
@@ -44,7 +67,7 @@ sub _getCipher {
     my ( $self, $key ) = @_;
     $key ||= "";
     $self->{ciphers}->{$key} ||=
-      Crypt::Rijndael->new( md5( $self->{key}, $key ), $self->{mode} );
+      Crypt::Rijndael->new( $hash->( $self->{key}, $key ), $self->{mode} );
     return $self->{ciphers}->{$key};
 }
 
@@ -53,13 +76,23 @@ sub _getCipher {
 # @param data data to encrypt
 # @return encrypted data in Base64 format
 sub encrypt {
-    my ( $self, $data ) = @_;
+    my ( $self, $data, $low ) = @_;
 
     # pad $data so that its length be multiple of 16 bytes
     my $l = bytes::length($data) % 16;
     $data .= "\0" x ( 16 - $l ) unless ( $l == 0 );
 
-    eval { $data = encode_base64( $self->_getCipher->encrypt($data), '' ); };
+    my $iv =
+      $low
+      ? bytes::substr( Digest::SHA::sha1( rand() . time . {} ), 0, IV_LENGTH )
+      : $newIv->();
+    my $hmac = $hash->($data);
+    eval {
+        $data =
+          encode_base64(
+            $iv . $self->_getCipher->set_iv($iv)->encrypt( $hmac . $data ),
+            '' );
+    };
     if ($@) {
         $msg = "Crypt::Rijndael error : $@";
         return undef;
@@ -81,9 +114,20 @@ sub decrypt {
     $data =~ s/%2F/\//ig;
     $data =~ s/%3D/=/ig;
     $data =~ s/%0A/\n/ig;
-    eval { $data = $self->_getCipher->decrypt( decode_base64($data) ); };
+    $data = decode_base64($data);
+    my $iv;
+    $iv = bytes::substr( $data, 0, IV_LENGTH );
+    $data = bytes::substr( $data, IV_LENGTH );
+    eval { $data = $self->_getCipher->set_iv($iv)->decrypt($data); };
+
     if ($@) {
         $msg = "Crypt::Rijndael error : $@";
+        return undef;
+    }
+    my $hmac = bytes::substr( $data, 0, HMAC_LENGTH );
+    $data = bytes::substr( $data, HMAC_LENGTH );
+    if ( $hash->($data) ne $hmac ) {
+        $msg = "Bad MAC";
         return undef;
     }
     else {
@@ -141,15 +185,34 @@ sub _cryptHex {
 "Lemonldap::NG::Common::Crypto::${sub}Hex error : data length must be multiple of 32";
         return undef;
     }
+    my $iv;
+    if ( $sub eq 'encrypt' ) {
+        $iv = $newIv->();
+    }
     $data = pack "H*", $data;
-    eval { $data = $self->_getCipher($key)->$sub($data); };
+    if ( $sub eq 'decrypt' ) {
+        $iv = bytes::substr( $data, 0, IV_LENGTH );
+        $data = bytes::substr( $data, IV_LENGTH );
+    }
+    eval { $data = $self->_getCipher($key)->set_iv($iv)->$sub($data); };
     if ($@) {
         $msg = "Crypt::Rijndael error : $@";
         return undef;
     }
+    if ( $sub eq 'encrypt' ) {
+        $data = $iv . $data;
+    }
     $msg = "";
     $data = unpack "H*", $data;
     return $data;
+}
+
+sub srandom {
+    eval { require String::Random };
+    if ($@) {
+        die 'Missing recommended dependency to String::Random';
+    }
+    return String::Random->new( rand_gen => $randG );
 }
 
 1;

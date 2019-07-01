@@ -1,7 +1,7 @@
 package MsgPack::Decoder::Event::Decoded;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: MsgPacker::Decoder decoding event 
-$MsgPack::Decoder::Event::Decoded::VERSION = '2.0.2';
+$MsgPack::Decoder::Event::Decoded::VERSION = '2.0.3';
 
 use Moose;
 extends 'Beam::Event';
@@ -30,7 +30,7 @@ MsgPack::Decoder::Event::Decoded - MsgPacker::Decoder decoding event
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 DESCRIPTION 
 

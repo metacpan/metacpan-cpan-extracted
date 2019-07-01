@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: draw_bgc_maps.pl
-# ABSTRACT: This script draws NRPS/PKS gene clusters in PNG
+# ABSTRACT: This script draws NRPS/PKS BGC clusters maps in PNG
 # CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
 
 use Modern::Perl '2011';
@@ -60,6 +60,7 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
     my @clusters = @_;
 
     # create all objects to draw
+    my $cluster_i = 1;
     my $y_cluster = 0;
     my ($cluster_rank, $cluster_type);
     my (@genes, @modules, @domains);
@@ -67,11 +68,26 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
     CLUSTER:
     for my $cluster (@clusters) {
 
-        my $domains_size;
-
-        unless (lc $cluster->type =~ m/nrps | pks/xms) {
+        unless ($cluster->type =~ m/nrps | pks/xmsi) {
             return;
         }
+
+        if ($ARGV_verbose) {
+
+            if (@clusters == 3) {
+                my $annotation = $cluster_i == 1
+                    ? 'antiSMASH annotation'
+                    : $cluster_i == 2
+                    ? 'Palantir standard annotation'
+                    : 'Palantir exploratory annotation'
+                ;
+
+                say $annotation;
+            }
+            say 'Cluster' . $cluster->rank . ': ' . $cluster->type;
+        }
+
+        my $domains_size;
 
         $cluster_rank = $cluster->rank;
         $cluster_type = $cluster->type;
@@ -86,6 +102,9 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
 
             next GENE unless $gene->all_domains;
            
+            say 'for Gene' . $gene->rank . '(' . $gene->name . '):'
+                if $ARGV_verbose;
+
             $gene_begin += $gene_size + 1;  # + 10 to space genes
             $gene_size   = abs($gene->genomic_prot_size);
 
@@ -111,14 +130,6 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
                 my $domain_begin = $gene_begin + $domain->begin;
                 my $domain_end   = $gene_begin + $domain->end;
 
-                # TODO need to create a class to handle domain classes
-                my $class;
-                $class = 'substrate-selection' if $domain->function =~ m/ ^A$ | AMP-binding | Minowa | Khayatt | A-OX | CAL | AT/xms;
-                $class = 'carrier-protein'     if $domain->function =~ m/PCP | ACP$ | ACP_beta/xms;
-                $class = 'condensation'        if $domain->function =~ m/^C$ | Condensation | ^X$ | Cglyc | Hetreocyclization | KS | Epimerization/xms;
-                $class = 'termination'         if $domain->function =~ m/Thioesterase | Red | TD | Cter | NAD/xms;
-                $class = 'other'               unless $class;
-
                 # handle overlapping domains
                 if ($domain->begin > $overlapping_end) {
                     $y_overlap -= 50 unless $y_overlap == 0;
@@ -132,11 +143,18 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
                 }
                
                 my ($evalue, $subtype, $subevalue) = ('NULL') x 3;
-                if ($cluster->meta->name eq 'Bio::Palantir::Refiner::ClusterPlus') {
+                if ($cluster->meta->name eq 
+                    'Bio::Palantir::Refiner::ClusterPlus') {
                     $evalue = $domain->evalue // 'NULL';
                     $subtype = $domain->subtype // 'NULL';
                     $subevalue = $domain->subtype_evalue // 'NULL';
                 }
+
+                say 'Domain' . $domain->rank . ': '. $domain->symbol . '['
+                    . $evalue . '] | ' . $domain->begin . '-' . $domain->end
+                    . "\n" . $domain->protein_sequence . "\n"
+                    if $ARGV_verbose
+                ;
 
                 push @domains, {
                     function  => $domain->function . '['. $evalue . ']', 
@@ -144,15 +162,11 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
                     subtype   => $subtype . '[' . $subevalue . ']',
                     begin     => $domain_begin, 
                     end       => $domain_end, 
-                    class     => $class,
+                    class     => $domain->class,
                     y_cluster => $y_cluster,
                     y_overlap => $y_overlap,
                 };
 
-                if ($ARGV_verbose) {
-                    say 'domain' . $domain->rank . '|' . $domain->function . '[ ' . $evalue . ']' . '|' . $domain->begin . '-' . $domain->end;
-                    say $domain->protein_sequence;
-                }
             }
         }
         
@@ -170,7 +184,8 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
         # Module objects
         if (scalar $cluster->all_modules > 0 && $nomodule == 0) {
 
-            for my $module (sort { $a->rank <=> $b->rank } $cluster->all_modules) {
+            for my $module (sort { $a->rank <=> $b->rank } 
+                $cluster->all_modules) {
             
                 my @gene_uuis = @{ $module->gene_uuis };
 
@@ -194,6 +209,7 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
         }
 
         $y_cluster += $max_y_overlap + 625;
+        $cluster_i++;
     }
 
     # do not draw if no @genes or @domains
@@ -202,8 +218,6 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
     }
         
     # make the background transparent and interlaced
-    #     $img->transparent('white');
-    #     $img->interlaced('true');
     my @sorted_ends = sort { $b <=> $a } map{ $_->{end} } @genes;
     my $width = $sorted_ends[0];
     my $height = $y_cluster + 600;
@@ -262,7 +276,8 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
         my $y2 = 200 + $gene->{y_cluster};
 
         $img->rectangle($x1, $y1, $x2, $y2); # (top_left_x, top_left_y, bottom_right_x, bottom_right_y)
-        $img->moveTo( ($x1 + $x2)/2 - (15 * length $gene->{name}), (100 + 200)/2 + 12.5 + $gene->{y_cluster} );
+        $img->moveTo( ($x1 + $x2)/2 - (15 * length $gene->{name}), 
+            (100 + 200)/2 + 12.5 + $gene->{y_cluster} );
         $img->font($font);
         $img->fontsize(40);
         $img->string($gene->{name});
@@ -285,7 +300,8 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
             my $y2 = 350 + $module->{y_cluster};
 
             $img->rectangle($x1, $y1, $x2, $y2); # (top_left_x, top_left_y, bottom_right_x, bottom_right_y)
-            $img->moveTo( ($x1 + $x2)/2 - (15 * length $module->{name}), ((250 + 350)/2) + 12.5 + $module->{y_cluster} );
+            $img->moveTo( ($x1 + $x2)/2 - (15 * length $module->{name}), 
+                ((250 + 350)/2) + 12.5 + $module->{y_cluster} );
             $img->font($font);
             $img->fontsize(40);
             $img->string($module->{name});
@@ -297,7 +313,7 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
         'carrier-protein'     => 'mediumseagreen', 
         condensation          => 'orangered',
         termination           => 'peru',
-        other                 => 'navajowhite',
+        'tailoring/other'     => 'navajowhite',
     );
 
     # draw domains
@@ -316,7 +332,12 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
         my $y2 = $y_end + $domain->{y_cluster} + $domain->{y_overlap};
 
         $img->rectangle($x1, $y1, $x2, $y2); # (top_left_x, top_left_y, bottom_right_x, bottom_right_y)
-        $img->moveTo( ($x1 + $x2)/2 - (15 * length $domain->{$ARGV_label}), ($y_start + $y_end)/2 + 12.5 + $domain->{y_cluster} + $domain->{y_overlap} );
+
+        $img->moveTo( ($x1 + $x2)/2 - (15 * length $domain->{$ARGV_label}), 
+            ($y_start + $y_end)/2 + 12.5 + 
+            $domain->{y_cluster} + $domain->{y_overlap} )
+        ;
+
         $img->font($font);
         $img->fontsize(30);
         $img->string($domain->{$ARGV_label});
@@ -324,11 +345,16 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
 
     # draw legend
     my %legend_for = (
-        'substrate-selection' => { x_start => 0   + $left_margin, y_start => 150 + $y_cluster, color => 'deepskyblue' },
-        'carrier-protein'     => { x_start => 525 + $left_margin, y_start => 150 + $y_cluster, color => 'mediumseagreen' },
-        'condensation'        => { x_start => 0   + $left_margin, y_start => 300 + $y_cluster, color => 'orangered' },
-        'termination'         => { x_start => 525 + $left_margin, y_start => 300 + $y_cluster, color => 'peru' },
-        'tailoring'           => { x_start => 0   + $left_margin, y_start => 450 + $y_cluster, color => 'navajowhite' },
+        'substrate-selection' => { x_start => 0   + $left_margin, 
+            y_start => 150 + $y_cluster, color => 'deepskyblue' },
+        'carrier-protein'     => { x_start => 525 + $left_margin, 
+            y_start => 150 + $y_cluster, color => 'mediumseagreen' },
+        'condensation'        => { x_start => 0   + $left_margin, 
+            y_start => 300 + $y_cluster, color => 'orangered' },
+        'termination'         => { x_start => 525 + $left_margin, 
+            y_start => 300 + $y_cluster, color => 'peru' },
+        'tailoring/other'     => { x_start => 0   + $left_margin, 
+            y_start => 450 + $y_cluster, color => 'navajowhite' },
     );
 
     for my $legend (keys %legend_for) {
@@ -349,7 +375,8 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
     }
 
     # convert into png data
-    my $output = $ARGV_outdir . $ARGV_prefix . 'Cluster' . $cluster_rank . '_' . $cluster_type . '.png'; 
+    my $output = $ARGV_outdir . $ARGV_prefix . 'Cluster' . $cluster_rank . '_' 
+        . $cluster_type . '.png'; 
     open my $out, '>', $output;
     binmode $out;
     print $out $img->png;
@@ -363,24 +390,20 @@ __END__
 
 =head1 NAME
 
-draw_bgc_maps.pl - This script draws NRPS/PKS gene clusters in PNG
+draw_bgc_maps.pl - This script draws NRPS/PKS BGC clusters maps in PNG
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 NAME
 
 draw_bgc_maps.pl - This tool draws NRPS/PKS gene clusters in PNG format. 
-3 modes are allowed: antiSMASH, Palantir and Exploratory.
-
-=head1 VERSION
-
-This documentation refers to  version 0.0.1
+Four modes are allowed: antiSMASH, Palantir, Palantir'exploratory mode, or all.
 
 =head1 USAGE
 
-	$0 [options] --report-file [=] <file.xml> --mode <antismash|palantir|exploratory>
+	$0 [options] --report-file [=] <infile>
 
 =head1 REQUIRED ARGUMENTS
 
@@ -388,23 +411,23 @@ This documentation refers to  version 0.0.1
 
 =item --report[-file] [=] <infile>
 
-Path to the output file of antismash, which can be either the 
-biosynML.xml file (antiSMASH 3-4) or the regions.js (antiSMASH 5).
+Path to the output file of antismash, which can be either a 
+biosynML.xml (antiSMASH 3-4) or a regions.js file (antiSMASH 5).
 
 =for Euclid: infile.type: readable
 
 =back
 
-=head1 OPTIONS
+=head1 OPTIONAL ARGUMENTS
 
 =over
 
 =item --mode [=] <str>
 
-Mode from which drawing must be made: antismash (raw antismash data), palantir
-(extended domain coordinates + potentially new domain detected), exploratory
-(give a noisy overview of all domain protein signature found without consensus
-architecture). [default: palantir]
+Mode from which drawings must be made: antismash (untreated antiSMASH data),
+palantir (extended domain coordinates + potentially new detected domains),
+exploratory (noisy overview of all domain protein signatures found without 
+a consensus architecture) [default: all].
 
 =for Euclid: str.type:       /all|antismash|palantir|exploratory/
     str.type.error: <str> must be of all, antismash, palantir, exploratory (not str)
@@ -412,8 +435,8 @@ architecture). [default: palantir]
 
 =item --label [=] <str>
 
-What information use to label domains: symbol, function, subtype. 
-[default: symbol]
+Label to use for the mapping of domains: symbol, function, subtype
+[default: symbol]. 
 
 =for Euclid: str.type:   /symbol|function|subtype/
     str.type.error: <str> must be of symbol, function, subtype (not str)
@@ -421,24 +444,22 @@ What information use to label domains: symbol, function, subtype.
 
 =item --verbose
 
-Print information concerning domains functions, coordinates et sequences.
+Print additionnal information concerning domains (functions, 
+coordinates and sequence).
 
 =item --outdir [=] <dir_path>
 
-Output repository name and path. [default: ./png/]
+Output directory name and path [default: ./png/].
 
 =for Euclid: dir_path.type:    str
     dir_path.default: 'png/'
 
 =item --prefix [=] <str>
 
-String to put before usual cluster name for png files, allow for instance to 
-create png files for different biosynml reports. [default: ''].
+String to use for prefixing the PNG files in output [default: none].
 
 =for Euclid: str.type:    str
     str.default: ''
-
-=item --more
 
 =item --version
 

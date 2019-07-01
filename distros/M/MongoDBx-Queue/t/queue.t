@@ -14,90 +14,100 @@ my $conn = eval {
 };
 plan skip_all => "No MongoDB on localhost" unless $conn;
 
-my $cl_name = "mongodbx_queue_" . time . $$;
+for my $version ( 1, 2 ) {
+  subtest "MongoDBx::Queue::v$version" => sub {
+    test_queue($version)
+  };
+}
 
-my ( $queue, $task, $task2 );
+sub test_queue {
+    my $version = shift;
+    my $cl_name = "mongodbx_queue_" . time . $$;
 
-$queue = new_ok( 'MongoDBx::Queue', [ { collection_name => $cl_name } ] );
-$queue->_mongo_collection($cl_name)->drop;
+    my ( $queue, $task, $task2 );
 
-ok( $queue->add_task( { msg => "Hello World" } ), "added a task" );
+    $queue = new_ok( 'MongoDBx::Queue', [ { collection_name => $cl_name, version => $version } ] );
+    $queue->_implementation->_mongo_collection($cl_name)->drop;
 
-ok( $task = $queue->reserve_task, "reserved a task" );
+    ok( $queue->add_task( { msg => "Hello World" } ), "added a task" );
 
-is( $task->{msg}, "Hello World", "task has correct data" )
-  or diag explain $task;
+    ok( $task = $queue->reserve_task, "reserved a task" );
 
-$task2 = $queue->reserve_task;
+    is( $task->{msg}, "Hello World", "task has correct data" )
+      or diag explain $task;
 
-ok( !defined $task2, "another reserve finds nothing" )
-  or diag explain $task2;
+    $task2 = $queue->reserve_task;
 
-is( $queue->size, 1, "size() shows 1" );
+    ok( !defined $task2, "another reserve finds nothing" )
+      or diag explain $task2;
 
-is( $queue->waiting, 0, "waiting() shows 0" );
+    is( $queue->size, 1, "size() shows 1" );
 
-sleep 2; # let task timeout
+    is( $queue->waiting, 0, "waiting() shows 0" );
 
-ok( $queue->apply_timeout(1), "applied timeout to pending tasks" );
+    sleep 2; # let task timeout
 
-is( $queue->waiting, 1, "waiting() shows 1" );
+    ok( $queue->apply_timeout(1), "applied timeout to pending tasks" );
 
-ok( $queue->add_task( { msg => "Goodbye World" } ), "added another task" );
+    is( $queue->waiting, 1, "waiting() shows 1" );
 
-is( $queue->waiting, 2, "waiting() shows 2" );
+    ok( $queue->add_task( { msg => "Goodbye World" } ), "added another task" );
 
-ok( $task = $queue->reserve_task, "reserved a task" );
+    is( $queue->waiting, 2, "waiting() shows 2" );
 
-is( $queue->waiting, 1, "waiting() shows 1" );
+    ok( $task = $queue->reserve_task, "reserved a task" );
 
-is( $task->{msg}, "Hello World", "got first task, not second task" )
-  or diag explain $task;
+    is( $queue->waiting, 1, "waiting() shows 1" );
 
-ok( $queue->reschedule_task($task), "rescheduled task without setting time" );
+    is( $task->{msg}, "Hello World", "got first task, not second task" )
+      or diag explain $task;
 
-is( $queue->waiting, 2, "waiting() shows 2" );
+    ok( $queue->reschedule_task($task), "rescheduled task without setting time" );
 
-ok( $task = $queue->reserve_task, "reserved a task" );
+    is( $queue->waiting, 2, "waiting() shows 2" );
 
-is( $task->{msg}, "Hello World", "got first task" )
-  or diag explain $task;
+    ok( $task = $queue->reserve_task, "reserved a task" );
 
-ok( $queue->reschedule_task( $task, { priority => time() + 10 } ),
-    "rescheduled task for later" );
+    is( $task->{msg}, "Hello World", "got first task" )
+      or diag explain $task;
 
-ok( $task = $queue->reserve_task( { max_priority => time() + 100 } ),
-    "reserved a task" );
+    ok( $queue->reschedule_task( $task, { priority => time() + 10 } ),
+        "rescheduled task for later" );
 
-is( $task->{msg}, "Goodbye World", "got second task" )
-  or diag explain $task;
+    ok( $task = $queue->reserve_task( { max_priority => time() + 100 } ),
+        "reserved a task" );
 
-ok( $queue->remove_task($task), "removed task" );
+    is( $task->{msg}, "Goodbye World", "got second task" )
+      or diag explain $task;
 
-ok( $task = $queue->reserve_task( { max_priority => time() + 100 } ),
-    "reserved a task" );
+    ok( $queue->remove_task($task), "removed task" );
 
-ok( $queue->remove_task($task), "removed task" );
+    ok( $task = $queue->reserve_task( { max_priority => time() + 100 } ),
+        "reserved a task" );
 
-is( $queue->size, 0, "size() shows 0" );
+    ok( $queue->remove_task($task), "removed task" );
 
-ok( $queue->add_task( { msg => "Save for later" }, { priority => time() + 100 } ),
-    "added another task scheduled for future" );
+    is( $queue->size, 0, "size() shows 0" );
 
-ok( !( $task = $queue->reserve_task ), "reserve_task() doesn't see future task" );
+    ok( $queue->add_task( { msg => "Save for later" }, { priority => time() + 100 } ),
+        "added another task scheduled for future" );
 
-ok(
-    $task = $queue->reserve_task( { max_priority => time() + 1000 } ),
-    "reserve_task( {max_priority => \$future} ) retrieves future task"
-);
+    ok( !( $task = $queue->reserve_task ), "reserve_task() doesn't see future task" );
 
-ok( $queue->remove_task($task), "removed task" );
+    ok(
+        $task = $queue->reserve_task( { max_priority => time() + 1000 } ),
+        "reserve_task( {max_priority => \$future} ) retrieves future task"
+    );
 
-ok( $queue->remove_task($task), "removed task" );
+    ok( $queue->remove_task($task), "removed task" );
 
-is( $queue->size, 0, "size() shows 0" );
+    ok( $queue->remove_task($task), "removed task" );
 
-$queue->_mongo_collection($cl_name)->drop unless $ENV{PERL_MONGODBX_QUEUE_DEBUG};
+    is( $queue->size, 0, "size() shows 0" );
+
+    $queue->_implementation->_mongo_collection($cl_name)->drop
+      unless $ENV{PERL_MONGODBX_QUEUE_DEBUG};
+}
 
 done_testing;
 

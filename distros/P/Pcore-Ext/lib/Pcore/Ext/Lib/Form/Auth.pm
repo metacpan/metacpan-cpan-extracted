@@ -175,7 +175,7 @@ sub EXT_signin_form : Extend('Ext.Panel') {
                 items => [
                     {   xtype      => 'textfield',
                         name       => 'username',
-                        label      => l10n('User Name or Email'),
+                        label      => l10n('User Name'),
                         allowBlank => \0,
                         required   => \1,
                     },
@@ -251,6 +251,12 @@ sub EXT_signup_form : Extend('Ext.Panel') {
                 items => [
                     {   xtype      => 'textfield',
                         name       => 'username',
+                        label      => l10n('User Name'),
+                        allowBlank => \0,
+                        required   => \1,
+                    },
+                    {   xtype      => 'emailfield',
+                        name       => 'email',
                         label      => l10n('Email'),
                         allowBlank => \0,
                         required   => \1,

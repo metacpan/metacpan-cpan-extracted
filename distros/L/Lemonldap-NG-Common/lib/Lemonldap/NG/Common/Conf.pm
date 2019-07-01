@@ -141,7 +141,7 @@ sub saveConf {
     if ( $self->{refLocalStorage} ) {
         $self->setDefault($conf);
         $self->compactConf($conf);
-        $self->setLocalConf($conf);
+        eval { Lemonldap::NG::Handler::Main->reload() };
     }
 
     return ( $self->unlock() ? $tmp : UNKNOWN_ERROR );

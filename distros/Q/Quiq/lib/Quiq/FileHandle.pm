@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -43,23 +43,23 @@ Datei lesen:
     }
     $fh->close;
 
-=head1 DESCRIPTION
-
-Ein Objekt der Klasse repräsentiert eine Dateihandle, über die
-Daten gelesen oder geschrieben werden können.
-
-=head1 EXAMPLES
-
 Zähler-Datei mit Locking:
 
-    my $fh = Quiq::FileHandle->open('+>>',$file,-lock=>'EX');
+    my $fh = Quiq::FileHandle->new('+>>',$file,-lock=>'EX');
     $fh->seek(0);
     my $count = <$fh> || "0\n";
     chomp $count;
     $fh->truncate;
     $fh->print(++$count,"\n");
+    
+    # Der Lock bleibt so lange bestehen bis $fh aus dem Scope geht
 
 Siehe auch Quiq::LockedCounter.
+
+=head1 DESCRIPTION
+
+Ein Objekt der Klasse repräsentiert eine Dateihandle, über die
+Daten gelesen oder geschrieben werden können.
 
 =head1 METHODS
 
@@ -935,7 +935,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

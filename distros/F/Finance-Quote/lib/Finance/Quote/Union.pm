@@ -38,7 +38,7 @@ use strict;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 sub methods { return (unionfunds => \&unionfunds); }
 sub labels { return (unionfunds => [qw/exchange name date isodate price method/]); }
@@ -128,7 +128,7 @@ sub unionfunds
 
 sub unionurl
 {
-  return "http://www.union-invest.de/preise.csv";
+  return "http://privatkunden.union-investment.de/preise.csv";
 }
 
 1;

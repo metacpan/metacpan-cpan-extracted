@@ -1,0 +1,11 @@
+{
+    "name": "Empty",
+    "version": "1.00",
+    "license": "Expat",
+    "build": {
+        "type": "Module::Build",
+    },
+    "distribution": {
+        "tarname": "Empty",
+    },
+}

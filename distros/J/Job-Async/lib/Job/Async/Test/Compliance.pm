@@ -3,7 +3,7 @@ package Job::Async::Test::Compliance;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -64,24 +64,18 @@ Test::More erlaubt die Angabe der Gesamtanzahl nun auch am Ende
 
 =over 2
 
-=item o
+=item *
 
 Init(N)
-
-=back
 
 Zunächst werden alle Methoden vom Typ Init(N) aufgerufen. In diesen
 Methoden können jegliche Vorabprüfungen vor Ausführung des eigentlichen
 Testcodes durchgeführt werden, z.B. ob die Systemumgebung die Ausführung
 der Tests überhaupt gestattet oder ob das Modul überhaupt ladbar ist.
 
-=over 2
-
-=item o
+=item *
 
 Foreach
-
-=back
 
 Danach werden die Methoden vom Typ Foreach aufgerufen. Diese führen
 selbst keine Tests durch, sondern liefern jeweils eine Liste, über
@@ -91,51 +85,37 @@ wiederholt durchlaufen wird. Bei jedem Iterationsschritt wird der
 nächste Wert als zweiter Parameter (erster ist das Testobjekt) an die
 Testmethoden übergeben.
 
-=over 2
-
-=item o
+=item *
 
 Test(N)
-
-=back
 
 Die normale Testmethode ist vom Typ Test(N), sie wird im Zuge des
 Gesamttests genau einmal aufgerufen.
 
-=over 2
-
-=item o
+=item *
 
 Setup(N), Teardown(N)
-
-=back
 
 Vor jeder Testmethode vom Typ Test(N) werden alle Methoden vom
 Typ Setup(N) aufgerufen und danach alle Methoden vom Typ Teardown(N).
 
-=over 2
-
-=item o
+=item *
 
 Startup(N), Shutdown(N)
-
-=back
 
 Mit jedem Iterationsschritt werden alle Testmethoden vom Typ Startup(N)
 aufgerufen, am Ende alle Testmethoden vom Typ Shutdown(N).
 
-=over 2
-
-=item o
+=item *
 
 Ignore...
-
-=back
 
 Beginnt der Typ mit der Zeichenkette "Ignore", wird die betreffende
 Testmethode ignoriert, also nicht ausgeführt. Dies kann angewendet
 werden, um Testmethoden als Ganzes auszukommentieren, z.B. wenn
 eine Reihe von Tests umgearbeitet werden.
+
+=back
 
 =head2 Testobjekt
 
@@ -1156,7 +1136,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

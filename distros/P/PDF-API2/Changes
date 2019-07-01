@@ -1,3 +1,34 @@
+2.034     2019-06-29
+
+    - SUPPORTED PERL VERSIONS: Starting with this release, PDF::API2 will
+      support major Perl versions released in the past six years, plus the major
+      release before that one.  This should provide backward compatibility for
+      the life of most LTS server distributions, while eliminating the need to
+      troubleshoot warnings and bugs that only show up in increasingly-ancient
+      versions of Perl.
+
+      For this release, it means that the minimum supported Perl is 5.18, which
+      was first released on 2013-05-18.
+
+    - Add support for cross-reference streams using 64-bit field widths.
+
+    - When the utf8 flag is set for a PDF string, automatically encode it as
+      UCS-16BE instead of requiring a separate flag to be set in the PDF object.
+      This resolves [RT #33497] and [RT #117031] in addition to making the code
+      easier to maintain.
+
+    - [RT #126274] Fix alignment when using UniFont with text_center or
+      text_right when all characters are in the same block.
+
+    - [RT #121911] Fix adding pages to a document structure with nested Pages
+      elements.  This included a fairly substantial rewrite of the relevant
+      code, so please report any new bugs related to adding pages (report and
+      troubleshooting by Vadim Repin).
+
+    - Renamed pdfile() to pdf_file() in PDF::API2::Annotation and
+      PDF::API2::Outline.  The old name continues to work, but is deprecated.
+
+
 2.033     2017-07-06
 
     - [RT #122371] Remove a couple of improperly-placed weaken statements

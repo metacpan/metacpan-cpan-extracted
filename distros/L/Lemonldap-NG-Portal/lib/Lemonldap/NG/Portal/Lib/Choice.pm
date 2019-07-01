@@ -7,7 +7,7 @@ use Safe;
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.5';
 
 has modules => ( is => 'rw', default => sub { {} } );
 
@@ -231,8 +231,10 @@ sub _buildAuthLoop {
 
                 # Get displayType for this module
                 no strict 'refs';
-                my $displayType = "Lemonldap::NG::Portal::Auth::${auth}"
-                  ->can('getDisplayType')->( $self, $req );
+                my $displayType = eval {
+                    "Lemonldap::NG::Portal::Auth::${auth}"
+                      ->can('getDisplayType')->( $self, $req );
+                } || 'logo';
 
                 $self->logger->debug(
                     "Display type $displayType for module $auth");

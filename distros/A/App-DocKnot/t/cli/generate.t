@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot command dispatch for generate.
 #
-# Copyright 2018 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2019 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -21,19 +21,23 @@ use Test::RRA qw(is_file_contents);
 use Test::More tests => 7;
 
 # Load the module.
-BEGIN { use_ok('App::DocKnot') }
+BEGIN { use_ok('App::DocKnot::Command') }
 
 # Create the command-line parser.
-my $docknot = App::DocKnot->new();
-isa_ok($docknot, 'App::DocKnot');
+my $docknot = App::DocKnot::Command->new();
+isa_ok($docknot, 'App::DocKnot::Command');
 
 # Generate the package README file to a temporary file, read it into memory,
 # and compare it to the actual README file.  This duplicates part of the
 # generate/self.t test, but via the command-line parser.
+#
+# Always apply a CRLF conversion layer (which should be harmless on UNIX) to
+# ensure correct behavior on Windows, where we should have automatically
+# converted newlines to CRLF when writing.
 my $tempdir     = File::Temp->newdir();
 my $output_path = File::Temp->new(DIR => $tempdir);
 $docknot->run('generate', 'readme', $output_path);
-my $output = slurp($output_path);
+my $output = slurp('<:crlf', $output_path);
 is_file_contents($output, 'README', 'Generated README from argument list');
 unlink($output_path);
 
@@ -42,7 +46,7 @@ unlink($output_path);
 # instead of the path and just get end of file.
 local @ARGV = ('generate', 'readme-md', $output_path);
 $docknot->run();
-$output = slurp("$output_path");
+$output = slurp('<:crlf', "$output_path");
 is_file_contents($output, 'README.md', 'Generated README.md from ARGV');
 
 # Save the paths to various files in the source directory.
@@ -54,14 +58,14 @@ my $metadata_path  = File::Spec->catfile(getcwd(), 'docs', 'metadata');
 my $tmpdir = File::Temp->newdir();
 chdir($tmpdir);
 $docknot->run('generate-all', '-m', $metadata_path);
-$output = slurp('README');
+$output = slurp('<:crlf', 'README');
 is_file_contents($output, $readme_path, 'README from generate_all');
-$output = slurp('README.md');
+$output = slurp('<:crlf', 'README.md');
 is_file_contents($output, $readme_md_path, 'README.md from generate_all');
 
 # Ensure that generate works with a default argument.
 $docknot->run('generate', '-m', $metadata_path, 'readme');
-$output = slurp('README');
+$output = slurp('<:crlf', 'README');
 is_file_contents($output, $readme_path, 'README from generate default args');
 
 # Allow cleanup to delete our temporary directory.

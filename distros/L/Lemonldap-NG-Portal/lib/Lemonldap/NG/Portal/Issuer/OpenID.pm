@@ -231,6 +231,7 @@ sub _openIDResponse {
             # TODO
             $req->info(
                 $self->loadTemplate(
+                    $req,
                     'simpleInfo',
                     params => { trspan => "openidExchange,$data->{trust_root}" }
                 )

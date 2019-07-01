@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.76'; # VERSION
+our $VERSION = '1.78'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -227,7 +227,7 @@ sub checkpoint
   my($self) = @_;
   my $root = $self->root;
   _path("$root/state.json")->spew(
-    JSON::PP->new->pretty->canonical(1)->encode({
+    JSON::PP->new->pretty->canonical(1)->ascii->encode({
       install => $self->install_prop,
       runtime => $self->runtime_prop,
       args    => $self->{args},
@@ -1161,7 +1161,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.76
+version 1.78
 
 =head1 SYNOPSIS
 

@@ -3,8 +3,8 @@ requires 'curry', 0;
 requires 'Future', '>= 0.37';
 requires 'Log::Any', '>= 1.050';
 
-requires 'Job::Async', '>= 0.003';
-requires 'Net::Async::Redis', '>= 1.004';
+requires 'Job::Async', '>= 0.004';
+requires 'Net::Async::Redis', '>= 2.000';
 
 on 'test' => sub {
     requires 'Log::Any::Adapter::TAP', 0;

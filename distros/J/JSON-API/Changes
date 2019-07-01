@@ -1,5 +1,8 @@
 Revision history for Perl module JSON::API
 
+1.1.1 Thu Jun 27 21:32:23 2019
+    - Add predecode hook
+
 1.1.0 Sun Oct 23 11:36:00 2016
     - Added support for customizing and retrieving reqest/response headers
     - Added support for accessing the raw HTTP response object after issuing

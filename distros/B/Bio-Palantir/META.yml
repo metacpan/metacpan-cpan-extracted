@@ -1,5 +1,5 @@
 ---
-abstract: 'core classes and utilities for Bio::Palantir CONTRIBUTOR: Denis'
+abstract: 'core classes and utilities for Bio::Palantir '
 author:
   - 'Loic MEUNIER <lmeunier@uliege.be>'
 build_requires:
@@ -24,12 +24,12 @@ requires:
   Bio::MUST::Core::Taxonomy: '0'
   Carp: '0'
   Const::Fast: '0'
+  DBD::SQLite: '0'
   DBI: '0'
   Data::UUID: '0'
   File::Basename: '0'
   File::ShareDir: '0'
   File::Temp: '0'
-  GD::Simple: '0'
   Getopt::Euclid: '0'
   JSON::Create: '0'
   JSON::Parse: '0'
@@ -51,6 +51,6 @@ requires:
   perl: '5.013002'
   strict: '0'
   warnings: '0'
-version: '0.191620'
+version: '0.191800'
 x_generated_by_perl: v5.22.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

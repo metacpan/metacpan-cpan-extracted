@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
                           sendMessage                         
                   );
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 use Paubox_Email_SDK::ApiHelper;
 use Paubox_Email_SDK::Message;
@@ -111,6 +111,7 @@ sub _convertMsgObjtoJSONReqObj {
         data => {
             message => {
                 recipients => $msg -> {'to'},
+                cc => $msg -> {'cc'},
                 bcc => $msg -> {'bcc'},
                 headers => {
                     subject => $msg -> {'subject'},
@@ -133,6 +134,7 @@ sub _convertMsgObjtoJSONReqObj {
             data => {
                 message => {
                     recipients => $msg -> {'to'},
+                    cc => $msg -> {'cc'},
                     bcc => $msg -> {'bcc'},
                     headers => {
                         subject => $msg -> {'subject'},

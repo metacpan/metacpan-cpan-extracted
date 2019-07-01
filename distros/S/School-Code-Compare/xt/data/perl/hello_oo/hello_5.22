@@ -1,0 +1,24 @@
+use strict;
+use warnings;
+use v5.22;
+
+my $hi = Hello->new();
+
+$hi->memorize('Hi, how are you?');
+$hi->say();
+
+package Hello;
+
+sub new {
+    bless { memory => [] }, shift
+}
+
+sub memorize {
+    # push on reference is experimental
+    push shift->{memory}, shift
+}
+
+sub say {
+    print join('. ', @{shift->{memory}}), "\n"
+}
+

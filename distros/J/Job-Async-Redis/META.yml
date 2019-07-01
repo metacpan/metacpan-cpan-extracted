@@ -36,31 +36,34 @@ no_index:
 provides:
   Job::Async::Client::Redis:
     file: lib/Job/Async/Client/Redis.pm
-    version: '0.002'
+    version: '0.003'
   Job::Async::Redis:
     file: lib/Job/Async/Redis.pm
-    version: '0.002'
+    version: '0.003'
   Job::Async::Worker::Redis:
     file: lib/Job/Async/Worker/Redis.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Future: '0.37'
+  Future::AsyncAwait: '0'
   Future::Utils: '0'
-  Job::Async: '0.003'
+  JSON::MaybeUTF8: '0'
+  Job::Async: '0.004'
   Job::Async::Client: '0'
   Job::Async::Utils: '0'
   Job::Async::Worker: '0'
   Log::Any: '1.050'
-  Net::Async::Redis: '1.004'
+  Net::Async::Redis: '2.000'
   Ryu::Async: '0'
   Syntax::Keyword::Try: '0'
   curry: '0'
   curry::weak: '0'
+  indirect: '0'
   mro: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.002'
+version: '0.003'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'

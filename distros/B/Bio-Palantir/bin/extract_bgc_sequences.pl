@@ -1,18 +1,23 @@
 #!/usr/bin/env perl
 # PODNAME: extract_bgc_sequences.pl
-# ABSTRACT: This script extracts protein sequences at several gene cluster levels and generates a FASTA file in output
-# COAUTHOR: Denis BAURAIN <denis.baurain@uliege.be>
+# ABSTRACT: Extracts protein sequences for different BGC scales into a FASTA file
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
 
 use Smart::Comments;
 
+use Carp;
 use Getopt::Euclid qw(:vars);
 
 use aliased 'Bio::Palantir::Parser';
 use aliased 'Bio::Palantir::Refiner::ClusterPlus';
 
+# check BGC type
+if (@ARGV_types) {
+    Parser->is_cluster_type_ok(@ARGV_types);
+}
 
 # report parsing
 my $report = Parser->new( file => $ARGV_report_file );
@@ -31,7 +36,10 @@ open my $out, '>', $ARGV_outfile;
 CLUSTER:
 for my $cluster (@clusters) {
 
-    next CLUSTER unless lc $cluster->type eq $ARGV_type;
+    if (@ARGV_types) {
+        next CLUSTER unless 
+            grep { $cluster->type =~ m/$_/xmsi } @ARGV_types;
+    }
 
     if ($ARGV_scale eq 'cluster') {
 
@@ -106,23 +114,21 @@ __END__
 
 =head1 NAME
 
-extract_bgc_sequences.pl - This script extracts protein sequences at several gene cluster levels and generates a FASTA file in output
+extract_bgc_sequences.pl - Extracts protein sequences for different BGC scales into a FASTA file
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 NAME
 
-extract_bgc_sequences.pl - This tool extracts sequences from Palantir (or antiSMASH) annotations and returns a FASTA file. The sequences may be extracted at different levels: 
-
-=head1 VERSION
-
-This documentation refers to  version 0.0.1
+extract_bgc_sequences.pl - This tool extracts sequences from Palantir 
+(or antiSMASH) annotations and returns a FASTA file. The sequences may be 
+extracted at different levels: cluster, gene, module and domain.
 
 =head1 USAGE
 
-	$0 [options] --paths <biosynml_path> --taxdir <dir> 	
+	$0 [options] --report-file [=] <infile>
 
 =head1 REQUIRED ARGUMENTS
 
@@ -130,20 +136,14 @@ This documentation refers to  version 0.0.1
 
 =item --report[-file] [=] <infile>
 
-Path to the output file of antismash, which can be either the 
-biosynML.xml file (antiSMASH 3-4) or the regions.js (antiSMASH 5).
+Path to the output file of antismash, which can be either a 
+biosynML.xml (antiSMASH 3-4) or a regions.js file (antiSMASH 5).
 
 =for Euclid: infile.type: readable
 
-=item --type [=] <str>
-
-Filter cluster on a specific type. For instance: nrps, t1pks, t2pks, t3pks, nrps-t1pks, t1pks-nrps,...
-
-=for Euclid: str.type: str
-
 =back
 
-=head1 OPTIONS
+=head1 OPTIONAL ARGUMENTS
 
 =over
 
@@ -155,26 +155,39 @@ or antismash [default: palantir]
 =for Euclid: str.type: /antismash|palantir/
     str.default: 'palantir'
 
+=item --types [=] <str>...
+
+Filter clusters on a/several specific type(s). 
+
+Types allowed: acyl_amino_acids, amglyccycl, arylpolyene, bacteriocin, 
+butyrolactone, cyanobactin, ectoine, hserlactone, indole, ladderane, 
+lantipeptide, lassopeptide, microviridin, nrps, nucleoside, oligosaccharide, 
+otherks, phenazine, phosphonate, proteusin, PUFA, resorcinol, siderophore, 
+t1pks, t2pks, t3pks, terpene.
+
+Any combination of these types, such as nrps-t1pks or t1pks-nrps, is also
+allowed. The argument is repeatable.
+
 =item --prefix [=] <str>
 
 Prefix string to use in sequences ids (e.g., if Strain1: >Strain1@Cluster...)
 
 =for Euclid: str.type: str
 
-=item --outfile [=] <outfile>
+=item --outfile [=] <filename>
 
 FASTA output filename.
 
-=for Euclid: outfile.default: 'bgc_sequences.fasta'
+=for Euclid: filename.type: writable
+    filename.default: 'bgc_sequences.fasta'
 
 =item --scale [=] <str>
 
-Sequence scale to write in fasta: cluster, gene. 
+BGC scale from which extracts sequences: cluster, gene, module and domain
+[default: gene].
 
 =for Euclid: str.type: /cluster|gene|module|domain/
     str.default: 'gene'
-
-=item --more
 
 =item --version
 
@@ -190,11 +203,13 @@ print the usual program information
 
 =head1 AUTHOR
 
-=head1 COPYRIGHT
-
-=head1 AUTHOR
-
 Loic MEUNIER <lmeunier@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

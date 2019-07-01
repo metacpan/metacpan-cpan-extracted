@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.202';
+our $VERSION = '2.203';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -39,7 +39,7 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        default     => { undef => '<<', prompt => 'Choose:' },
+        default     => { undef => '<<', prompt => 'Choose:', hide_cursor => 0 },
         lyt_h       => { order => 0, justify => 2 },
         lyt_v       => { undef => '  BACK', layout => 3, },
         lyt_v_clear => { undef => '  BACK', layout => 3, clear_screen => 1 },
@@ -63,8 +63,6 @@ sub __init {
     if ( ! $home ) {
         print "'File::HomeDir->my_home()' could not find the home directory!\n";
         print "'db-browser' requires a home directory\n";
-        print CLEAR_TO_END_OF_SCREEN;
-        print SHOW_CURSOR;
         exit;
     }
     my $config_home;
@@ -118,23 +116,16 @@ sub __init {
     }
 }
 
-END {
-    print CLEAR_TO_END_OF_SCREEN;
-    print SHOW_CURSOR;
-}
 
 sub run {
     my ( $sf ) = @_;
     local $SIG{INT} = sub {
-        unlink $sf->{i}{f_copy_paste} if defined $sf->{i}{f_copy_paste} && -e $sf->{i}{f_copy_paste};
-        delete $ENV{TC_RESET_AUTO_UP} if exists $ENV{TC_RESET_AUTO_UP};
-        print CLEAR_TO_END_OF_SCREEN;
-        print SHOW_CURSOR;
+        if ( defined $sf->{i}{f_copy_paste} && -e $sf->{i}{f_copy_paste} ) {
+            unlink $sf->{i}{f_copy_paste};
+        }
         exit;
     };
-    print HIDE_CURSOR;
     $sf->__init();
-    $ENV{TC_RESET_AUTO_UP} = 0;
     my $tc = Term::Choose->new( $sf->{i}{default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $auto_one = 0;
@@ -564,6 +555,7 @@ sub __browse_the_table {
         }
 
         print_table( $all_arrayref, $sf->{o}{table} );
+        print HIDE_CURSOR;
 
         delete $sf->{o}{table}{max_rows};
     }
@@ -716,7 +708,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.202
+Version 2.203
 
 =head1 DESCRIPTION
 

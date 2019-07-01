@@ -1,7 +1,7 @@
 package App::DateUtils;
 
-our $DATE = '2019-01-29'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2019-06-19'; # DATE
+our $VERSION = '0.121'; # VERSION
 
 use 5.010001;
 use strict;
@@ -559,6 +559,75 @@ sub durconv {
     }
 }
 
+$SPEC{datediff} = {
+    v => 1.1,
+    summary => 'Diff (subtract) two dates, show as ISO8601 duration',
+    args => {
+        date1 => {
+            schema => ['date*', {
+                'x.perl.coerce_rules' => ['str_natural','str_iso8601','float_epoch'],
+                'x.perl.coerce_to' => 'DateTime',
+            }],
+            req => 1,
+            pos => 0,
+        },
+        date2 => {
+            schema => ['date*', {
+                'x.perl.coerce_rules' => ['str_natural','str_iso8601','float_epoch'],
+                'x.perl.coerce_to' => 'DateTime',
+            }],
+            req => 1,
+            pos => 1,
+        },
+        as => {
+            schema => ['str*', in=>['iso8601', 'concise_hms', 'hms', 'seconds']],
+            default => 'iso8601',
+        },
+    },
+    result_naked => 1,
+    examples => [
+        {
+            argv => [qw/2019-06-18T20:08:42 2019-06-19T06:02:03/],
+            result => 'PT9H53M21S',
+        },
+        {
+            argv => [qw/2019-06-18T20:08:42 2019-06-19T06:02:03 --as hms/],
+            result => '09:53:21',
+        },
+        {
+            argv => [qw/2019-06-18T20:08:42 2019-06-22T06:02:03 --as concise_hms/],
+            result => '3d 09:53:21',
+        },
+        {
+            argv => [qw/2019-06-18T20:08:42 2019-06-19T06:02:03 --as seconds/],
+            result => '35601',
+        },
+    ],
+};
+sub datediff {
+    my %args = @_;
+    my $date1 = $args{date1};
+    my $date2 = $args{date2};
+    my $as = $args{as} // 'iso8601';
+
+    my $dur = $date1->subtract_datetime($date2);
+
+    if ($as eq 'seconds') {
+        $dur->years  * 365.25 * 86400 +
+        $dur->months * 30.5   * 86400 +
+        $dur->days            * 86400 +
+        $dur->hours           *  3600 +
+        $dur->minutes         *    60 +
+        $dur->seconds;
+    } elsif ($as eq 'concise_hms' || $as eq 'hms') {
+        require DateTime::Format::Duration::ConciseHMS;
+        DateTime::Format::Duration::ConciseHMS->format_duration($dur);
+    } else {
+        require DateTime::Format::Duration::ISO8601;
+        DateTime::Format::Duration::ISO8601->format_duration($dur);
+    }
+}
+
 1;
 # ABSTRACT: An assortment of date-/time-related CLI utilities
 
@@ -574,7 +643,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.120 of App::DateUtils (from Perl distribution App-DateUtils), released on 2019-01-29.
+This document describes version 0.121 of App::DateUtils (from Perl distribution App-DateUtils), released on 2019-06-19.
 
 =head1 SYNOPSIS
 
@@ -584,6 +653,8 @@ date/time:
 =over
 
 =item * L<dateconv>
+
+=item * L<datediff>
 
 =item * L<durconv>
 
@@ -626,7 +697,7 @@ Examples:
 
 =item * Convert "today" to epoch:
 
- dateconv(date => "today"); # -> [200, "OK", 1548720000]
+ dateconv(date => "today"); # -> [200, "OK", 1560902400]
 
 =item * Convert epoch to ymd:
 
@@ -647,6 +718,79 @@ Arguments ('*' denotes required arguments):
 =back
 
 Return value:  (any)
+
+
+
+=head2 datediff
+
+Usage:
+
+ datediff(%args) -> any
+
+Diff (subtract) two dates, show as ISO8601 duration.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ datediff( date1 => "2019-06-18T20:08:42", date2 => "2019-06-19T06:02:03"); # -> "PT9H53M21S"
+
+=item * Example #2:
+
+ datediff(
+   date1 => "2019-06-18T20:08:42",
+   date2 => "2019-06-19T06:02:03",
+   as => "hms"
+ );
+
+Result:
+
+ "09:53:21"
+
+=item * Example #3:
+
+ datediff(
+   date1 => "2019-06-18T20:08:42",
+   date2 => "2019-06-22T06:02:03",
+   as => "concise_hms"
+ );
+
+Result:
+
+ "3d 09:53:21"
+
+=item * Example #4:
+
+ datediff(
+   date1 => "2019-06-18T20:08:42",
+   date2 => "2019-06-19T06:02:03",
+   as => "seconds"
+ );
+
+Result:
+
+ 35601
+
+=back
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<as> => I<str> (default: "iso8601")
+
+=item * B<date1>* => I<date>
+
+=item * B<date2>* => I<date>
+
+=back
+
+Return value:  (any)
+
 
 
 =head2 durconv
@@ -682,6 +826,7 @@ Arguments ('*' denotes required arguments):
 Return value:  (any)
 
 
+
 =head2 parse_date
 
 Usage:
@@ -712,14 +857,14 @@ Result:
      module          => "DateTime::Format::Flexible",
      original        => "tomorrow",
      is_parseable    => 1,
-     as_epoch        => 1548806400,
-     as_datetime_obj => "2019-01-30T00:00:00",
+     as_epoch        => 1560988800,
+     as_datetime_obj => "2019-06-20T00:00:00",
    },
    {
      module       => "DateTime::Format::Flexible",
      original     => "foo",
      is_parseable => 0,
-     error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Perinci/Access.pm line 81. ",
+     error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/Access.pm line 81. ",
    },
  ]
 
@@ -753,6 +898,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 parse_date_using_df_alami_en
@@ -824,6 +970,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 parse_date_using_df_alami_id
 
 Usage:
@@ -893,6 +1040,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 parse_date_using_df_flexible
 
 Usage:
@@ -948,7 +1096,7 @@ Result:
      module       => "DateTime::Format::Flexible",
      original     => "foo",
      is_parseable => 0,
-     error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Perinci/Access.pm line 81. ",
+     error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/Access.pm line 81. ",
    },
  ]
 
@@ -978,6 +1126,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 parse_date_using_df_natural
@@ -1049,6 +1198,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 parse_duration
 
 Usage:
@@ -1083,6 +1233,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 parse_duration_using_df_alami_en
@@ -1151,6 +1302,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 parse_duration_using_df_alami_id
 
 Usage:
@@ -1217,6 +1369,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 parse_duration_using_df_natural
 
 Usage:
@@ -1242,8 +1395,8 @@ Result:
      is_parseable => 1,
      as_secs => 1209600,
      as_dtdur_obj => "P14D",
-     date2 => "2019-02-12T10:02:26",
-     date1 => "2019-01-29T10:02:26",
+     date2 => "2019-07-03T13:29:56",
+     date1 => "2019-06-19T13:29:56",
    },
  ]
 
@@ -1258,10 +1411,10 @@ Result:
      module => "DateTime::Format::Natural",
      original => "from 23 Jun to 29 Jun",
      is_parseable => 1,
-     as_secs => 13161454,
-     as_dtdur_obj => "P4M30DT13H57M34S",
+     as_secs => 815404,
+     as_dtdur_obj => "P9DT10H30M4S",
      date2 => "2019-06-29T00:00:00",
-     date1 => "2019-01-29T10:02:26",
+     date1 => "2019-06-19T13:29:56",
    },
  ]
 
@@ -1302,6 +1455,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 parse_duration_using_td_parse

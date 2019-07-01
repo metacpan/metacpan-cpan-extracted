@@ -12,17 +12,17 @@ use 5.024;
 use autodie;
 use warnings;
 
-use App::DocKnot;
+use App::DocKnot::Command;
 
 # Dispatch everything to the module.
-my $docknot = App::DocKnot->new();
+my $docknot = App::DocKnot::Command->new();
 $docknot->run();
 
 __END__
 
 =for stopwords
 Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense subcommand
-subcommands
+subcommands distdir
 
 =head1 NAME
 
@@ -31,6 +31,8 @@ docknot - Generate human-readable documentation from package metadata
 =head1 SYNOPSIS
 
 B<docknot> B<-h>
+
+B<docknot> dist [B<-m> I<metadata>] B<-d> I<distdir>
 
 B<docknot> generate [B<-m> I<metadata>] [B<-w> I<width>] I<template> [I<output>]
 
@@ -42,6 +44,12 @@ B<docknot> can perform various actions related to documenting or releasing
 software packages, organized into subcommands.  The supported subcommands are:
 
 =over 4
+
+=item dist
+
+Build, test, and generate a distribution tarball of the package in the
+current directory.  The exact commands used is determined by the package
+metadata (see L<App::DocKnot::Generate> for format documentation).
 
 =item generate
 
@@ -68,6 +76,26 @@ Each B<docknot> subcommand takes its own options.
 =item B<-h>, B<--help>
 
 Print out usage information and exit.
+
+=back
+
+=head2 dist
+
+=over 4
+
+=item B<-d> I<distdir>, B<--distdir>=I<distdir>
+
+The directory into which to put the generated distribution tarball.  This is
+also used as a working directory for a temporary copy of the package source.
+Required.
+
+=item B<-m> I<metadata>, B<--metadata>=I<metadata>
+
+The path to the metadata files for the package whose distribution tarball is
+being generated.  This should be a directory containing all the package
+metadata files required by App::DocKnot.  Default: F<docs/metadata> relative
+to the current directory (which is the recommended metadata path for a
+project).
 
 =back
 
@@ -154,7 +182,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016, 2018 Russ Allbery <rra@cpan.org>
+Copyright 2016, 2018-2019 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

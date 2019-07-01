@@ -73,7 +73,7 @@ sub run {
                 $self->logger->debug("Transformed message -> $msg");
                 $req->info(
                     $self->loadTemplate(
-                        'simpleInfo', params => { trspan => $msg }
+                        $req, 'simpleInfo', params => { trspan => $msg }
                     )
                 );
                 $self->userLogger->error( 'User '

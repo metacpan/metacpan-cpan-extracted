@@ -2,8 +2,8 @@
 
 =head1 WINDOWS
 
-This program should work on dos/windows.
-But it is mainly designed and tested for GNU/Linux.
+This program is mainly designed and tested for GNU/Linux.
+But it should work on dos/windows too.
 
 Users who wan't to use this program and are not familiar with Perl, ar most likely going to try this on Windows.
 This assumption is the reason for this little guide.
@@ -26,6 +26,6 @@ A simple way to create a file with the paths to other files:
 
 When you have a file containing your paths, you can run the program:
 
- compare-code java -i paths.txt -o html
+ compare-code -i java -f paths.txt -o html -p
 
-You should the find some html files in your current directory.
+You should then find some html files in your current directory.

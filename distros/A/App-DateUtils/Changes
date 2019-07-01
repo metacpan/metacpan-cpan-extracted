@@ -1,3 +1,8 @@
+0.121   2019-06-19 (PERLANCAR)
+
+	- Add utility: datediff.
+
+
 0.120   2019-01-29 (PERLANCAR)
 
 	- Add backend module: Date::Parse.

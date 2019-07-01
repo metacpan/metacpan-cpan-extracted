@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_LOAD_SERVICE_ERROR
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Common::Module', 'Lemonldap::NG::Portal::Lib::SAML';
 
@@ -43,29 +43,34 @@ sub setSessionInfo {
     my $exportedAttr;
 
     # Force UTF-8
-    my $force_utf8 = $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
-      ->{samlIDPMetaDataOptionsForceUTF8};
+    my $force_utf8 =
+      $self->conf->{samlIDPMetaDataOptions}->{$idpConfKey}
+      ->{samlIDPMetaDataOptionsForceUTF8}
+      if $idpConfKey;
 
     # Get all required attributes, not already set
     # in setAuthSessionInfo()
-    foreach (
-        keys %{ $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey}
-        } )
-    {
+    if ($idpConfKey) {
+        foreach (
+            keys
+            %{ $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey} }
+          )
+        {
 
-        # Extract fields from exportedAttr value
-        my ( $mandatory, $name, $format, $friendly_name ) =
-          split( /;/,
-            $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey}
-              ->{$_} );
+            # Extract fields from exportedAttr value
+            my ( $mandatory, $name, $format, $friendly_name ) =
+              split( /;/,
+                $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey}
+                  ->{$_} );
 
-        # Keep mandatory attributes not sent in authentication response
-        if ( $mandatory and not defined $req->{sessionInfo}->{$_} ) {
-            $exportedAttr->{$_} =
-              $self->conf->{samlIDPMetaDataExportedAttributes}->{$idpConfKey}
-              ->{$_};
-            $self->logger->debug(
-                "Attribute $_ will be requested to $idpConfKey");
+            # Keep mandatory attributes not sent in authentication response
+            if ( $mandatory and not defined $req->{sessionInfo}->{$_} ) {
+                $exportedAttr->{$_} =
+                  $self->conf->{samlIDPMetaDataExportedAttributes}
+                  ->{$idpConfKey}->{$_};
+                $self->logger->debug(
+                    "Attribute $_ will be requested to $idpConfKey");
+            }
         }
     }
 

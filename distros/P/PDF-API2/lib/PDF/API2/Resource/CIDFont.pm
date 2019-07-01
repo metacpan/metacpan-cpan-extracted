@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::BaseFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 use Encode qw(:all);
 
@@ -332,13 +332,6 @@ sub glyphNum
         return ( $self->data->{glyphs} );
     }
     return ( scalar @{$self->data->{wx}} );
-}
-
-sub outobjdeep
-{
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
 }
 
 =back

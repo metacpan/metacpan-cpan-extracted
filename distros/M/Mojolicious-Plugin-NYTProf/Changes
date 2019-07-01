@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.22     2019-07-01
+        - Bump Mojolicious version requirement to 8.00
+        - Add nonblocking example to ExampleApp
+        - Document caveats with using async code with profiling
+
 0.21     2018-10-01
         - Bump Devel::NYTProf version requirement to 6.06 for recent fixes
 

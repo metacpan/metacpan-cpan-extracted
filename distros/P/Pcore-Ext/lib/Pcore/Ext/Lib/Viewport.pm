@@ -33,6 +33,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
                 mask            => 'mask',
                 unmask          => 'unmask',
                 unmatchedRoute  => 'onUnmatchedRoute',
+                redirectTo      => 'onRedirectTo',
                 remoteEvent     => 'onRemoteEvent',
                 requestError    => 'onRequestError',
                 signin          => 'onSignin',
@@ -137,12 +138,23 @@ JS
 JS
 
         checkSession => func ['session'], <<'JS',
-            session.hasRole = function (role) {
+            session.hasPermissions = function (permissions) {
+                if (!permissions) return 1;
+
                 if (!this.is_authenticated) return 0;
 
-                if (this.is_root) return 1;
+                if (Ext.isArray(permissions)) {
+                    if (!permissions.length) return 1;
 
-                return this.permissions[role] ? 1 : 0;
+                    for ( let permission of permissions ) {
+                        if (this.permissions[permission]) return 1;
+                    }
+
+                    return 0;
+                }
+                else {
+                    return this.permissions[permissions] ? 1 : 0;
+                }
             };
 
             if (!Ext.isObject(session.locales)) session.locales = {};
@@ -201,19 +213,24 @@ JS
 JS
 
         # EVENTS
-        onUnmatchedRoute => func ['hash'], <<"JS",
+        onUnmatchedRoute => func ['hash'], <<~'JS',
             this.redirectTo('', {replace: true});
-JS
+        JS
 
-        onRequestError => func ['res'], <<"JS",
-                Ext.toast("Error: " + res.reason, 3000);
-JS
+        onRedirectTo => func [ 'hash', 'args' ], <<~'JS',
+            this.redirectTo( hash, args );
+        JS
 
-        onRemoteEvent => func ['ev'], <<"JS",
-JS
+        onRequestError => func ['res'], <<~'JS',
+            Ext.toast("Error: " + res.reason, 3000);
+        JS
+
+        # TODO
+        onRemoteEvent => func ['ev'], <<~'JS',
+        JS
 
         # TOKEN
-        setToken => func [ 'token', 'persistent' ], <<'JS',
+        setToken => func [ 'token', 'persistent' ], <<~'JS',
             this.removeToken();
 
             if (persistent) {
@@ -222,7 +239,7 @@ JS
             else {
                 sessionStorage.token = token;
             }
-JS
+        JS
 
         getToken => func <<'JS',
             return sessionStorage.token || localStorage.token;

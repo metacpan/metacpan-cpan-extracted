@@ -62,7 +62,7 @@ sub checkForNotifications {
         # Go to next file if no notification found
         next unless $j;
         $i++;
-        $form .= $self->toForm(@res);
+        $form .= $self->toForm( $req, @res );
     }
 
     # Stop here if nothing to display
@@ -192,7 +192,7 @@ sub getNotifBack {
 }
 
 sub toForm {
-    my ( $self, @notifs ) = @_;
+    my ( $self, $req, @notifs ) = @_;
     my $i = 0;
     @notifs = map {
         $i++;
@@ -205,7 +205,7 @@ sub toForm {
         $_->{id} = "1x$i";
         $_;
     } @notifs;
-    return $self->loadTemplate( 'notifinclude',
+    return $self->loadTemplate( $req, 'notifinclude',
         params => { notifications => \@notifs } );
 }
 

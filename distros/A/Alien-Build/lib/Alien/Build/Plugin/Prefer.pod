@@ -14,7 +14,7 @@ Alien::Build::Plugin::Prefer - Prefer Alien::Build plugins
 
 =head1 VERSION
 
-version 1.76
+version 1.78
 
 =head1 SYNOPSIS
 

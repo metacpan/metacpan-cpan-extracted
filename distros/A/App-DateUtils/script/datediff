@@ -1,0 +1,200 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/DateUtils/datediff
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
+
+our $DATE = '2019-06-19'; # DATE
+our $DIST = 'App-DateUtils'; # DIST
+our $VERSION = '0.121'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/DateUtils/datediff",
+    program_name => "datediff",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Diff (subtract) two dates, show as ISO8601 duration
+# PODNAME: datediff
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+datediff - Diff (subtract) two dates, show as ISO8601 duration
+
+=head1 VERSION
+
+This document describes version 0.121 of datediff (from Perl distribution App-DateUtils), released on 2019-06-19.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % datediff [options] <date1> <date2>
+
+Examples:
+
+ % datediff 2019-06-18T20:08:42 2019-06-19T06:02:03
+ PT9H53M21S
+
+ % datediff 2019-06-18T20:08:42 2019-06-19T06:02:03 --as hms
+ 09:53:21
+
+ % datediff 2019-06-18T20:08:42 2019-06-22T06:02:03 --as concise_hms
+ 3d 09:53:21
+
+ % datediff 2019-06-18T20:08:42 2019-06-19T06:02:03 --as seconds
+ 35601
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--as>=I<s>
+
+Default value:
+
+ "iso8601"
+
+Valid values:
+
+ ["iso8601","concise_hms","hms","seconds"]
+
+=item B<--date1>=I<s>*
+
+=item B<--date2>=I<s>*
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C datediff datediff
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete datediff 'p/*/`datediff`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DateUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DateUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -6,22 +6,18 @@ package MongoDBx::Queue;
 
 # ABSTRACT: A message queue implemented with MongoDB
 
-our $VERSION = '2.000';
+our $VERSION = '2.001';
 
 use Moose 2;
 use MooseX::Types::Moose qw/:all/;
 use MooseX::AttributeShortcuts;
 
 use MongoDB 2 ();
-use Tie::IxHash;
-use boolean;
 use namespace::autoclean;
 
-my $ID       = '_id';
-my $RESERVED = '_r';
-my $PRIORITY = '_p';
-
-with 'MooseX::Role::Logger', 'MooseX::Role::MongoDB' => { -version => 1.000 };
+with (
+    'MongoDBx::Queue::Role::_CommonOptions',
+);
 
 #--------------------------------------------------------------------------#
 # Public attributes
@@ -33,64 +29,86 @@ with 'MooseX::Role::Logger', 'MooseX::Role::MongoDB' => { -version => 1.000 };
 #pod C<client_options> attribute, this database will be the default for
 #pod authentication.  Defaults to 'test'
 #pod
-#pod =cut
-
-has database_name => (
-    is      => 'ro',
-    isa     => Str,
-    default => 'test',
-);
-
 #pod =attr client_options
 #pod
 #pod A hash reference of L<MongoDB::MongoClient> options that will be passed to its
 #pod C<connect> method.
 #pod
-#pod =cut
-
-has client_options => (
-    is      => 'ro',
-    isa     => HashRef,
-    default => sub { {} },
-);
-
 #pod =attr collection_name
 #pod
 #pod A collection name for the queue.  Defaults to 'queue'.  The collection must
 #pod only be used by MongoDBx::Queue or unpredictable awful things will happen.
 #pod
+#pod =attr version
+#pod
+#pod The implementation version to use as a backend.  Defaults to '1', which is the
+#pod legacy implementation for backwards compatibility.  Version '2' has better
+#pod index coverage and will perform better for very large queues.
+#pod
+#pod B<WARNING> Versions are not compatible.  You MUST NOT have V1 and V2 clients
+#pod using the same database+collection name.  See L</MIGRATION BETWEEN VERSIONS>
+#pod for more.
+#pod
 #pod =cut
 
-has collection_name => (
+has version => (
     is      => 'ro',
-    isa     => Str,
-    default => 'queue',
+    isa     => Int,
+    default => 1,
 );
 
-sub _build__mongo_default_database { $_[0]->database_name }
+#--------------------------------------------------------------------------#
+# Private attributes and builders
+#--------------------------------------------------------------------------#
 
-sub _build__mongo_client_options {
-    return {
-        write_concern => { w     => "majority" },
-        read_concern  => { level => "majority" },
-        %{ $_[0]->client_options },
+has _implementation => (
+    is => 'lazy',
+    handles => [ qw(
+        add_task
+        reserve_task
+        reschedule_task
+        remove_task
+        apply_timeout
+        search
+        peek
+        size
+        waiting
+    )],
+);
+
+sub _build__implementation {
+    my ($self) = @_;
+    my $options = {
+        client_options => $self->client_options,
+        database_name => $self->database_name,
+        collection_name => $self->collection_name,
     };
+    if ($self->version == 1) {
+        require MongoDBx::Queue::_V1;
+        return MongoDBx::Queue::_V1->new($options);
+    }
+    elsif ($self->version == 2) {
+        require MongoDBx::Queue::_V2;
+        return MongoDBx::Queue::_V2->new($options);
+    }
+    else {
+        die "Invalid MongoDBx::Queue 'version' (must be 1 or 2)"
+    }
 }
 
 sub BUILD {
     my ($self) = @_;
-    # ensure index on PRIORITY in the same order we use for reserving
-    $self->_mongo_collection( $self->collection_name )
-      ->indexes->create_one( [ $PRIORITY => 1 ] );
+    $self->_implementation->create_indexes;
 }
 
 #--------------------------------------------------------------------------#
-# Public methods
+# Public method documentation
 #--------------------------------------------------------------------------#
 
 #pod =method new
 #pod
 #pod    $queue = MongoDBx::Queue->new(
+#pod         version => 2,
 #pod         database_name   => "my_app",
 #pod         client_options  => {
 #pod             host => "mongodb://example.net:27017",
@@ -118,15 +136,6 @@ sub BUILD {
 #pod Note that setting a "future" priority may cause a task to be invisible
 #pod to C<reserve_task>.  See that method for more details.
 #pod
-#pod =cut
-
-sub add_task {
-    my ( $self, $data, $opts ) = @_;
-
-    $self->_mongo_collection( $self->collection_name )
-      ->insert_one( { %$data, $PRIORITY => $opts->{priority} // time() } );
-}
-
 #pod =method reserve_task
 #pod
 #pod   $task = $queue->reserve_task;
@@ -151,22 +160,6 @@ sub add_task {
 #pod the lowest task priority is greater than the C<max_priority>, this method
 #pod returns C<undef>.
 #pod
-#pod =cut
-
-sub reserve_task {
-    my ( $self, $opts ) = @_;
-
-    my $now = time();
-    return $self->_mongo_collection( $self->collection_name )->find_one_and_update(
-        {
-            $PRIORITY => { '$lte'    => $opts->{max_priority} // $now },
-            $RESERVED => { '$exists' => boolean::false },
-        },
-        { '$set' => { $RESERVED => $now } },
-        { sort   => [ $PRIORITY => 1 ] },
-    );
-}
-
 #pod =method reschedule_task
 #pod
 #pod   $queue->reschedule_task( $task );
@@ -182,33 +175,12 @@ sub reserve_task {
 #pod Note that setting a "future" priority may cause a task to be invisible
 #pod to C<reserve_task>.  See that method for more details.
 #pod
-#pod =cut
-
-sub reschedule_task {
-    my ( $self, $task, $opts ) = @_;
-    $self->_mongo_collection( $self->collection_name )->update_one(
-        { $ID => $task->{$ID} },
-        {
-            '$unset' => { $RESERVED => 0 },
-            '$set'   => { $PRIORITY => $opts->{priority} // $task->{$PRIORITY} },
-        },
-    );
-}
-
 #pod =method remove_task
 #pod
 #pod   $queue->remove_task( $task );
 #pod
 #pod Removes a task from the queue (i.e. indicating the task has been processed).
 #pod
-#pod =cut
-
-sub remove_task {
-    my ( $self, $task ) = @_;
-    $self->_mongo_collection( $self->collection_name )
-      ->delete_one( { $ID => $task->{$ID} } );
-}
-
 #pod =method apply_timeout
 #pod
 #pod   $queue->apply_timeout( $seconds );
@@ -218,18 +190,6 @@ sub remove_task {
 #pod should be set longer than the expected task processing time, so that
 #pod only dead/hung tasks are returned to the active queue.
 #pod
-#pod =cut
-
-sub apply_timeout {
-    my ( $self, $timeout ) = @_;
-    $timeout //= 120;
-    my $cutoff = time() - $timeout;
-    $self->_mongo_collection( $self->collection_name )->update_many(
-        { $RESERVED => { '$lt'     => $cutoff } },
-        { '$unset'  => { $RESERVED => 0 } },
-    );
-}
-
 #pod =method search
 #pod
 #pod   my @results = $queue->search( \%query, \%options );
@@ -241,22 +201,6 @@ sub apply_timeout {
 #pod supports a C<reserved> option.  If present, results will be limited to reserved
 #pod tasks if true or unreserved tasks if false.
 #pod
-#pod =cut
-
-sub search {
-    my ( $self, $query, $opts ) = @_;
-    $query = {} unless ref $query eq 'HASH';
-    $opts  = {} unless ref $opts eq 'HASH';
-    if ( exists $opts->{reserved} ) {
-        $query->{$RESERVED} =
-          { '$exists' => $opts->{reserved} ? boolean::true : boolean::false };
-        delete $opts->{reserved};
-    }
-    my $cursor =
-      $self->_mongo_collection( $self->collection_name )->find( $query, $opts );
-    return $cursor->all;
-}
-
 #pod =method peek
 #pod
 #pod   $task = $queue->peek( $task );
@@ -268,27 +212,12 @@ sub search {
 #pod
 #pod Returns undef if the task is not found.
 #pod
-#pod =cut
-
-sub peek {
-    my ( $self, $task ) = @_;
-    my @result = $self->search( { $ID => $task->{$ID} } );
-    return wantarray ? @result : $result[0];
-}
-
 #pod =method size
 #pod
 #pod   $queue->size;
 #pod
 #pod Returns the number of tasks in the queue, including in-progress ones.
 #pod
-#pod =cut
-
-sub size {
-    my ($self) = @_;
-    return $self->_mongo_collection( $self->collection_name )->count_documents( {} );
-}
-
 #pod =method waiting
 #pod
 #pod   $queue->waiting;
@@ -296,12 +225,6 @@ sub size {
 #pod Returns the number of tasks in the queue that have not been reserved.
 #pod
 #pod =cut
-
-sub waiting {
-    my ($self) = @_;
-    return $self->_mongo_collection( $self->collection_name )
-      ->count_documents( { $RESERVED => { '$exists' => boolean::false } } );
-}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -322,7 +245,7 @@ MongoDBx::Queue - A message queue implemented with MongoDB
 
 =head1 VERSION
 
-version 2.000
+version 2.001
 
 =head1 SYNOPSIS
 
@@ -330,6 +253,7 @@ version 2.000
     use MongoDBx::Queue;
 
     my $queue = MongoDBx::Queue->new(
+        version => 2,
         database_name => "queue_db",
         client_options => {
             host => "mongodb://example.net:27017",
@@ -430,11 +354,22 @@ C<connect> method.
 A collection name for the queue.  Defaults to 'queue'.  The collection must
 only be used by MongoDBx::Queue or unpredictable awful things will happen.
 
+=head2 version
+
+The implementation version to use as a backend.  Defaults to '1', which is the
+legacy implementation for backwards compatibility.  Version '2' has better
+index coverage and will perform better for very large queues.
+
+B<WARNING> Versions are not compatible.  You MUST NOT have V1 and V2 clients
+using the same database+collection name.  See L</MIGRATION BETWEEN VERSIONS>
+for more.
+
 =head1 METHODS
 
 =head2 new
 
    $queue = MongoDBx::Queue->new(
+        version => 2,
         database_name   => "my_app",
         client_options  => {
             host => "mongodb://example.net:27017",
@@ -566,6 +501,18 @@ Returns the number of tasks in the queue, including in-progress ones.
 Returns the number of tasks in the queue that have not been reserved.
 
 =for Pod::Coverage BUILD
+
+=head1 MIGRATION BETWEEN VERSIONS
+
+Implementation versions are not compatible.  Migration of active tasks from
+version '1' to version '2' is an exercise left to end users.
+
+One approach to migration could be to run a script with two C<MongoDBx::Queue>
+clients, one using version '1' and one using version '2', using different
+C<database_name> attributes.  Such a script could iteratively reserve a task
+with the v1 client, add the task via the v2 client, then remove it via the v1
+client.  Workers could be operating on one or both versions of the queue while
+migration is going on, depending on your needs.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -22,13 +22,15 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Find::Rule" : "0",
             "File::Share" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
             "Template" : "0",
             "Test::BDD::Cucumber" : "0.57",
             "Weasel" : "0",
-            "Weasel::Session" : "0.08",
+            "Weasel::Session" : "0.11",
+            "YAML::Syck" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -51,7 +53,7 @@
          "web" : "https://github.com/ehuelsmann/pherkin-extension-weasel"
       }
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

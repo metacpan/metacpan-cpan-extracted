@@ -12,7 +12,7 @@ use strict;
 use Convert::PEM;
 use Crypt::OpenSSL::RSA;
 use Lemonldap::NG::Common::Conf;
-use String::Random qw(random_string);
+use Lemonldap::NG::Common::Crypto;
 
 my $debug = 0;
 
@@ -28,9 +28,10 @@ print "Configuration loaded\n" if $debug;
 #=============================================================================
 # Generate new key
 #=============================================================================
-my $rsa    = Crypt::OpenSSL::RSA->generate_key(2048);
-my $key_id = random_string("ssssssssss");
-my $keys   = {
+my $rsa = Crypt::OpenSSL::RSA->generate_key(2048);
+my $key_id =
+  Lemonldap::NG::Common::Crypto::srandom()->randpattern("ssssssssss");
+my $keys = {
     'private' => $rsa->get_private_key_string(),
     'public'  => $rsa->get_public_key_x509_string(),
     'id'      => $key_id,

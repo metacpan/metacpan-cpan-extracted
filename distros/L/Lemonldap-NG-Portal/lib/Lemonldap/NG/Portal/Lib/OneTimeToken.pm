@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Crypt::URandom;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -78,8 +78,14 @@ sub createToken {
         # Create a new session
         my $tsession =
           $self->p->getApacheSession( undef, info => $infos, kind => 'TOKEN' );
-        $self->logger->debug("Token $tsession->{id} created");
-        return $tsession->id;
+        if ( $tsession->{id} ) {
+            $self->logger->debug("Token $tsession->{id} created");
+            return $tsession->id;
+        }
+        else {
+            $self->logger->error("NO token created");
+            return undef;
+        }
     }
 }
 

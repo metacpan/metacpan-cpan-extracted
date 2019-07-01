@@ -1,6 +1,6 @@
 package MsgPack::Decoder::Generator::Float;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Decoder::Generator::Float::VERSION = '2.0.2';
+$MsgPack::Decoder::Generator::Float::VERSION = '2.0.3';
 use Moose;
 use MooseX::MungeHas 'is_ro';
 
@@ -32,7 +32,7 @@ MsgPack::Decoder::Generator::Float
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 AUTHOR
 

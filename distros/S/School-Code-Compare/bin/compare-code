@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Autor: Boris Däppen, 2015-2017
+# Autor: Boris Däppen, 2015-2019
 # No guarantee given, use at own risk and will
 
 # PODNAME: compare-code
@@ -8,17 +8,20 @@
 use strict;
 use warnings;
 no warnings 'experimental'; # disable warnings from given/when
-use v5.22;
+use v5.12;
 use utf8;
 use feature 'say';
 
 use File::Slurp;
-use Getopt::Args;
+use File::Find::Rule;
 use DateTime;
 use IO::Prompt::Simple;
+use Module::Load;
+use Module::Installed::Tiny 'module_installed';
 
 use School::Code::Compare;
-use School::Code::Simplify::Comments;
+use School::Code::Compare::Options;
+use School::Code::Compare::Charset;
 use School::Code::Compare::Judge;
 use School::Code::Compare::Out;
 
@@ -40,116 +43,67 @@ use School::Code::Compare::Out;
 # OPTION PARSING #
 ##################
 
-my $s = '                   ';
-my $opt_desc_lang =
-    "$s" . 'Supportet arguments:'
-. "\n$s" . '  - hashy:  python, perl, bash'
-. "\n$s" . '  - slashy: php, js, c++, c#'
-. "\n$s" . '  - html'
-. "\n$s" . '  - txt';
+# safe options to string, as given by user
+my $argv_signature = join ' ', @ARGV;
 
-my $opt_desc_out =
-    "$s" . 'You can define an output format:'
-. "\n$s" . '  - html'
-. "\n$s" . '  - tab'
-. "\n$s" . '  - csv';
-
-my $opt_desc_file =
-    "$s" . 'You can define a prefix to the filename:'
-. "\n$s" . '  - any string to identifiy the output suiting your needs.'
-. "\n$s" . '  - any path, to not store in local directory.';
-
-my $opt_desc_algo =
-    "$s" . 'Define one or more algorithms, used to compare the files:'
-. "\n$s" . '  - visibles'
-. "\n$s" . '  - signes'
-. "\n$s" . '  - signes_ordered'
-. "\n$s" . '  - any combination of above, comma separated';
-
-my $opt_desc_yes =
-    "$s" . 'Programm will start working without further confirmation.'
-. "\n$s" . '(Answer all user prompts with [yes])';
-
-arg lang => (
-    isa      => 'Str',
-    required => 1,
-    comment  => "language to parse\n" . $opt_desc_lang,
-);
-
-opt in => (
-    isa     => 'Str',
-    alias   => 'i',
-    comment => 'file to read from (containing filepaths)' . "\n$s" . 'otherwise read from STDIN',
-);
-
-opt out => (
-    isa     => 'Str',
-    alias   => 'o',
-    default => 'tab',
-    comment => "output format\n" . $opt_desc_out,
-);
-
-opt file => (
-    isa     => 'Str',
-    alias   => 'f',
-    default => '',
-    comment => "file prefix\n" . $opt_desc_file,
-);
-
-opt algo => (
-    isa     => 'Str',
-    alias   => 'a',
-    default => 'visibles,signes,signes_ordered',
-    comment => "algorithm\n" . $opt_desc_algo,
-);
-
-opt yes => (
-    isa     => 'Bool',
-    alias   => 'y',
-    default =>  0,
-    comment => "Don't prompt for questions\n" . $opt_desc_yes,
-);
-
-my $o = optargs;
+my $o = School::Code::Compare::Options->new(@ARGV);
 
 # try not to use outside interface further down in the code...
-my $lang          = $o->{lang};
+my @dir           = defined $o->{dir} ? @{$o->{dir}} : ();
+my $file          = $o->{file};
+my $lang          = $o->{in};
 my $output_format = $o->{out};
-my $file_prefix   = $o->{file};
-my @algos         = split(',', $o->{algo});
+my $to_file       = $o->{persist};
+my $verbose       = $o->{verbose};
+my $algo          = $o->{charset};
 my $do_prompt     = !$o->{yes};
+my $hide_skipped  = !$o->{all};
+my $mime_match    = $o->{mime};
+my $sort          = $o->{sort};
+my $basedir       = $o->{basedir};
+
+chop $basedir if (defined $basedir and $basedir =~ /\/$/);
 
 # some input checking...
-for my $algo (@algos) {
-    if ($algo !~ /^visibles$|^signes$|^signes_ordered$/) {
-        die("algorithm not supported\n$opt_desc_algo\n");
+if ($algo !~ /^visibles$|^numsignes$|^signes$/) {
+    say "charset not supported";
+    exit 1;
+}
+if ($lang !~ /hashy|python|perl|bash|slashy|php|js|cpp|cs|c|java|html|xml|txt/) {
+    say "lang not supported";
+    exit 1;
+}
+
+my $magic;
+if ($mime_match) {
+    if (module_installed 'File::LibMagic') {
+        load File::LibMagic;
+        $magic = File::LibMagic->new();
+    }
+    else {
+        say 'Option --mime needs the module File::LibMagic installed';
+        exit 1;
     }
 }
-if ($lang !~ /hashy|python|perl|bash|slashy|php|js|c\+\+|c#|java|html|txt/) {
-    die("lang not supported\n$opt_desc_lang\n");
+
+#####################
+# GATHER INPUT DATA #
+#####################
+
+my @FILE_LIST  = ();
+if (defined $file) {
+    @FILE_LIST = read_file( $file, binmode => ':utf8' );
 }
-
-##################
-# PREPARING DATA #
-##################
-
-my $comparer   = School::Code::Compare->new()
-                                      ->set_max_char_difference(400)
-                                      ->set_min_char_total     ( 20)
-                                      ->set_max_distance       (400);
-my $comparer2  = School::Code::Compare->new()
-                                      ->set_max_char_difference(800)
-                                      ->set_min_char_total     ( 20)
-                                      ->set_max_distance       (800);
-my $simplifier = School::Code::Simplify::Comments->new();
-
-my @FILE_LIST = ();
-if (defined $o->{in}) {
-    @FILE_LIST = read_file( $o->{in}, binmode => ':utf8' );
+elsif ( @dir ) {
+    @FILE_LIST = File::Find::Rule->file()->in( @dir );
 }
 else {
     @FILE_LIST = <STDIN>;
 }
+
+say scalar @FILE_LIST . ' files to compare, aborting...'
+    and exit 1
+    if (@FILE_LIST <= 1);
 
 # Calulate how many comparisons will be needed
 # TODO: maybe use math insead of loop
@@ -171,18 +125,22 @@ open STDIN, "<", "/dev/tty";
 
 # (maybe) ask if job should be started with the current input
 if ($do_prompt) {
-    my $answer = prompt(scalar @algos
-                  . " x $comparison_count comparisons needed, continue? [Y/n]");
+    my $answer = prompt("$comparison_count comparisons needed, continue? [Y/n]"
+                 , { output => *STDERR });
     exit 0 if ($answer =~ /n/);
 }
 
 # close STDIN again, to undo our sins from above
 close STDIN;
 
-say 'reading and preparing files...';
+###################
+# PREPROCESS DATA #
+###################
+
+say STDERR 'reading and preparing files...';
 
 # simplify all file content and store it together with the path
-my @files = ();
+my @files    = ();
 
 foreach my $filepath ( @FILE_LIST ) {
     chomp( $filepath );
@@ -193,113 +151,224 @@ foreach my $filepath ( @FILE_LIST ) {
 
     my @content = read_file( $filepath, binmode => ':utf8' ) ;
 
-    my $cleaned;
+    # try to detect MIME-type
+    my $mimetype = '';
+    my $mini_data = '';
+    if ($mime_match) {
+        $mini_data .= $content[0] if (defined $content[0]);
+        $mini_data .= $content[1] if (defined $content[1]);
+        $mini_data .= $content[2] if (defined $content[2]);
 
-    if ($lang eq 'python'
-     or $lang eq 'perl'
-     or $lang eq 'bash'
-     or $lang eq 'hashy'
-     ) {
-        $cleaned = $simplifier->hashy ( \@content );
-    }
-    elsif ($lang eq 'php'
-     or $lang eq 'js'
-     or $lang eq 'c++'
-     or $lang eq 'c#'
-     or $lang eq 'java'
-     or $lang eq 'slashy'
-     ) {
-        $cleaned = $simplifier->slashy ( \@content );
-    }
-    elsif ($lang eq 'html') {
-        $cleaned = $simplifier->html ( \@content );
-    }
-    elsif ($lang eq 'txt') {
-        $cleaned = $simplifier->txt ( \@content );
+        $mimetype = $magic->info_from_string($mini_data)->{mime_type};
     }
 
-    push @files, {  path                => $filepath,
-                    code_visibles       => $cleaned->{visibles},
-                    code_signes         => $cleaned->{signes},
-                    code_signes_ordered => $cleaned->{signes_ordered},
-    };
+    my $charset  = School::Code::Compare::Charset->new();
+    $charset->set_language($lang);
+
+    my $filtered;
+    $filtered = $charset->get_visibles (\@content) if ($algo  eq 'visibles');
+    $filtered = $charset->get_numsignes(\@content) if ($algo  eq 'numsignes');
+    $filtered = $charset->get_signes   (\@content) if ($algo  eq 'signes'  );
+
+    # sort if required
+    $filtered = $charset->sort_by_lines($filtered) if ($sort);
+
+    my $info = {};
+
+    $info->{"code_$algo"} = join '', @{$filtered};
+    $info->{path}         = $filepath;
+    $info->{mime_type}    = $mimetype if ($mimetype);
+
+    push @files, $info;
 }
 
 ################################################
 # DO THE ACTUAL WORK... COMPARING ALL THE DATA #
 ################################################
 
-my $now = DateTime->now;
+my $now      = DateTime->now;
+my $comparer = School::Code::Compare->new()
+                                    ->set_max_relative_difference(2)
+                                    ->set_min_char_total        (20)
+                                    ->set_max_relative_distance(0.8);
 
 my %info = (
     visibles =>
-        "All visible chars in normal order. Whitespace removed.",
+        "All visible chars. Whitespace removed.",
+    numsignes=>
+        "Words and numbers ignored in meaning, but not in position. Whitespace removed",
     signes =>
-        "Only special chars in normal order. Whitespace and english letters removed.",
-    signes_ordered =>
-        "Only special chars. Whitespace and english letters removed. Chars in lines keep order, but lines get ordered.",
+        "Only special chars. Whitespace, letters, numbers and underscore removed.",
 );
 
 # measure Levenshtein distance within all possible file combinations
-for my $algo ( @algos ) {
+print STDERR "working on $algo... ";
 
-    print "working on $algo... ";
+my @result = ();
+my $judge  = School::Code::Compare::Judge->new();
 
-    my @result = ();
-    my $judge  = School::Code::Compare::Judge->new();
-    my $count  = 0;
+my $skip_report   = '';
+my $skip_count    = 0;
+my $lift_count = 0;
 
-    for (my $i=0; $i < @files - 1; $i++) {
-        for (my $j=$i+1; $j < @files; $j++) {
-    
-            # Levenshtein
-            my $comparison = $comparer->measure( $files[$i]->{"code_$algo"},
-                                                 $files[$j]->{"code_$algo"}
-                                               );
+for (my $i=0; $i < @files - 1; $i++) {
+    for (my $j=$i+1; $j < @files; $j++) {
 
-            # throw the "skipped" comparisons away, to thin out the result
-            next if ( $comparison->{comment} =~ /^skipped/);
-    
-            $comparison->{file1} = $files[$i]->{path};
-            $comparison->{file2} = $files[$j]->{path};
-    
-            $judge->look($comparison);
-    
-            push @result, $comparison;
-            $count++;
+        my $comparison = {};
+        my $do_comparison = 1;
+
+        if ($basedir) {
+            my $path1 = $files[$i]->{path};
+            my $path2 = $files[$j]->{path};
+
+            chop $path1 if ($path1 =~ /\/$/);
+            chop $path2 if ($path2 =~ /\/$/);
+
+            my $project1 = '';
+            if ($path1 =~ qr!^$basedir/([^/]+)/! ){
+                $project1 = $1
+            }
+            my $project2 = '';
+            if ($path2 =~ qr!^$basedir/([^/]+)/! ){
+                $project2 = $1
+            }
+
+            if ($project1 eq $project2) {
+                $comparison = {
+                    distance     => undef,
+                    ratio        => undef,
+                    length1      => undef,
+                    length2      => undef,
+                    delta_length => undef,
+                    comment      => "skipped: same project: $project1",
+                };
+                $do_comparison = 0;
+            }
         }
-    }
-    
-    print "\tdone";
 
-    ####################
-    # RENDERING OUTPUT #
-    ####################
+        if ($mime_match and $files[$i]->{mime_type}
+                            ne $files[$j]->{mime_type}) {
+            $comparison = {
+                distance     => undef,
+                ratio        => undef,
+                length1      => undef,
+                length2      => undef,
+                delta_length => undef,
+                comment      => 'skipped: different mime:'
+                                . $files[$i]->{mime_type}
+                                . ' ; '
+                                . $files[$j]->{mime_type},
+            };
+            $do_comparison = 0;
+        }
 
-    print "\trendering...";
-    
-    my $format = 'CSV';
-    given ($output_format) {
-    	$format = 'CSV'  when /^csv/;
-    	$format = 'HTML' when /^html/;
-    	$format = 'TAB'  when /^tab/;
+        if ($do_comparison) {
+            # Levenshtein
+            $comparison = $comparer->measure( $files[$i]->{"code_$algo"},
+                                              $files[$j]->{"code_$algo"}
+                                            );
+        }
+        $do_comparison = 1;
+
+        if ($verbose) {
+            say STDERR '';
+            say STDERR "---comparison $algo $i;$j---";
+            say STDERR 'path1: '     . $files[$i]->{path};
+            say STDERR 'path2: '     . $files[$j]->{path};
+            say STDERR 'mime1:'      . $files[$i]->{mime_type}
+                            if defined $files[$i]->{mime_type};
+            say STDERR 'mime2:'      . $files[$j]->{mime_type}
+                            if defined $files[$j]->{mime_type};
+            say STDERR 'data1: '     . $files[$i]->{"code_$algo"}
+                            if defined $files[$i]->{"code_$algo"};
+            say STDERR 'data2: '     . $files[$j]->{"code_$algo"}
+                            if defined $files[$j]->{"code_$algo"};
+            say STDERR 'distance: '  . $comparison->{distance}
+                            if defined $comparison->{distance};
+            say STDERR 'length1: '   . $comparison->{length1}
+                            if defined $comparison->{length1};
+            say STDERR 'length2: '   . $comparison->{length2}
+                            if defined $comparison->{length2};
+            say STDERR 'similarity: '. $comparison->{ratio}
+                            if defined $comparison->{ratio};
+            say STDERR 'comment: '   . $comparison->{comment};
+        }
+
+        # throw the "skipped" comparisons away, to thin out the result
+        if ( $comparison->{comment} =~ /^skipped/ ) {
+            $skip_count++;
+            next if ($hide_skipped);
+        }
+        else {
+            $lift_count++;
+        }
+
+        $comparison->{file1} = $files[$i]->{path};
+        $comparison->{file2} = $files[$j]->{path};
+
+        $judge->look($comparison);
+
+        push @result, $comparison;
     }
-    
-    my $filename =    $file_prefix
-                    . $now->ymd() . '_' 
-                    . $now->hms('-') . '_'
-                    . $algo
-                    . '.' 
-                    . lc $format;
-    
-    my $out = School::Code::Compare::Out->new();
-    
-    $out->set_name($filename)->set_format($format)->set_lines(\@result);
-    $out->set_title($algo)->set_description($info{$algo});
-    
-    $out->write();
-    
-    say "\tdone. See $filename";
+}
+
+say STDERR "\tdone";
+
+####################
+# RENDERING OUTPUT #
+####################
+
+print STDERR "rendering...";
+
+my $format = 'CSV';
+given ($output_format) {
+    $format = 'CSV'  when /^csv/;
+    $format = 'HTML' when /^html/;
+    $format = 'TAB'  when /^tab/;
+}
+
+my $filename = undef;
+if ($to_file) {
+    $filename =    'comparison_'
+                 . $now->ymd() . '_' 
+                 . $now->hms('-') . '_'
+                 . $algo
+                 . '.' 
+                 . lc $format;
+}
+
+my $version = defined $School::Code::Compare::VERSION ?
+                      $School::Code::Compare::VERSION : 'unknown';
+my $signature = 'Created at '
+                . $now->ymd() . ' '
+                . $now->hms('-') . ' '
+                . "with '$0 $argv_signature' in '$version' version.";
+
+$skip_report = "From a total of $comparison_count possible comparisons,"
+             . " $skip_count where skipped and $lift_count actually compared.";
+$skip_report .= $hide_skipped ?
+               ' Skipped results are not shown.' :
+               ' All results listed.' ;
+
+my $out = School::Code::Compare::Out->new();
+
+$out->set_name($filename)
+    ->set_format($format)
+    ->set_lines(\@result)
+    ->set_title($algo)
+    ->set_description($info{$algo})
+    ->set_signature($signature)
+    ->set_endreport($skip_report)
+    ->set_link('https://metacpan.org/pod/School::Code::Compare')
+;
+
+$out->write();
+
+if (defined $filename) {
+    say STDERR "\tdone. See $filename";
+}
+else {
+    say STDERR "\tdone.";
 }
 
 __END__
@@ -314,7 +383,7 @@ compare-code - find similar pieces of code (file based)
 
 =head1 VERSION
 
-version 0.007
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -323,8 +392,8 @@ It's purpose is to help detect similiarities in the code of IT projects,
 and therefore making assessments (more) fair.
 
 The script compares files containing source code (or any plain text) to each other.
-The approach for comparison is simplistic:
-Whitespace and comments are removed, then the comparison is done using the Levenshtein algorithm.
+The general approach for comparison is:
+whitespace and comments are always removed (see C<--help> for more), then the comparison is done using the Levenshtein algorithm.
 Future releases may bring more sophisticated techniques.
 
 This program is written in the Perl Programming Language.
@@ -333,43 +402,61 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
 
 =head2 Example Usage
 
- compare-code c++ -i list_of_filepaths.txt -o html
+ compare-code cpp -f list_of_filepaths.txt -o html -p
 
- find path/to/projects -type f -name Cow.java | compare-code java -o tab
+ find path/to/projects -type f -name Cow.java | compare-code java 
 
 =head2 Options
 
- usage: compare-code LANG [OPTIONS...]
- 
-   Arguments:
-     LANG         language to parse
-                    Supportet arguments:
-                      - hashy:  python, perl, bash
-                      - slashy: php, js, c++, c#
-                      - html
-                      - txt
- 
-   Options:
-     --in,   -i   file to read from (containing filepaths)
-                    otherwise read from STDIN
-     --out,  -o   output format
-                    You can define an output format:
-                      - html
-                      - tab
-                      - csv
-     --file, -f   file prefix
-                    You can define a prefix to the filename:
-                      - any string to identifiy the output suiting your needs.
-                      - any path, to not store in local directory.
-     --algo, -a   algorithm
-                    Define one or more algorithms, used to compare the files:
-                      - visibles
-                      - signes
-                      - signes_ordered
-                      - any combination of above, comma separated
-     --yes,  -y   Don't prompt for questions
-                    Programm will start working without further confirmation.
-                    (Answer all user prompts with [yes])
+ compare-code [DIR...] [OPTIONS...]
+
+ Arguments:
+   DIR             analyse files in given directory
+                   Input can otherwise also be specified over:
+                     - the option --file / -f
+                     - STDIN, receiving filepaths (e.g. from a find command)
+
+ Options:
+   --all,     -a   show all results in output
+                   Don't hide skipped comparisons.
+                   Will somethimes cause a lot of output.
+   --basedir, -b   skip comparisons within projects under base directory
+                   Folders one below will be seen as project directories.
+                   Files inside projects will not be compared with each other.
+   --charset, -c   chars used for comparison
+                   Define one or more subsets of chars, used to compare the files:
+                     - visibles
+                         all chars without witespace
+                     - numsignes (default)
+                         like visibles, but words ignored in meaning (but not in position)
+                     - signes
+                         only special chars, no words or numbers
+   --file,    -f   file to read from (containing filepaths)
+   --help,    -h   show this manual
+   --in,      -i   input format, optimize for language
+                   Supportet arguments:
+                     - hashy:  python, perl, bash
+                     - slashy: php, js, java, cpp, cs, c
+                     - html, xml
+                     - txt (default)
+   --mime,    -m   only compare if same MIME-type
+                   This options needs the Perl Library File::LibMagic installed.
+                   You will also need libmagic development files on your system.
+   --out,     -o   output format
+                   You can define an output format:
+                     - html
+                     - tab (default)
+                     - csv
+   --persist, -p   print result to file (instead STDOUT)
+                   Saved in local directory with name pattern:
+                     - comparison_[year-month-day-hour-minute]_[method].[format]
+   --sort,    -s   sort data by line before comparison
+                   Useful to ignore order of method declaration.
+                   Will most likely also find more false positives.
+   --verbose, -v   show actually compared data on STDERR
+   --yes,     -y   Don't prompt for questions
+                   Program will start working without further confirmation.
+                   (Answer all user prompts with [yes])
 
 =head1 AUTHOR
 

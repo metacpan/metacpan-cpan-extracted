@@ -28,6 +28,7 @@ recommends:
   LWP::Protocol::https: '0'
   Net::LDAP: '0'
   SOAP::Lite: '0'
+  String::Random: '0'
 requires:
   Apache::Session: '0'
   Cache::Cache: '0'
@@ -49,5 +50,5 @@ resources:
   X_twitter: https://twitter.com/lemonldapng
   homepage: http://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.4
+version: v2.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

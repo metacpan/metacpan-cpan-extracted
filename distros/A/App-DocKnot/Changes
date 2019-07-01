@@ -1,5 +1,34 @@
                        User-Visible DocKnot Changes
 
+DocKnot 3.00 (2019-06-29)
+
+    Separate configuration parsing into a new App::DocKnot::Config module,
+    used by App::DocKnot::Generate.
+
+    Move the entry point for command-line commands from App::DocKnot to
+    App::DocKnot::Command.  The App::DocKnot module now only provides some
+    helper methods to load application data, used by both
+    App::DocKnot::Config and App::DocKnot::Generate.  It's no longer
+    necessary to explicitly load App::DocKnot before using one of the
+    submodules.
+
+    Add new docknot dist command and App::DocKnot::Dist module, which runs
+    appropriate commands to create a distribution tarball.  This command
+    will also run the test suite, with both Clang and GCC for packages
+    using Autoconf, and will also build and test with C++ if the package
+    indicates that it supports C++ via the build.cplusplus key in the
+    package metadata.
+
+    Support orphaned warnings in the README and README.md output as well
+    as thread output.
+
+    Add bug tracker links pointing to the CPAN RT installation to the
+    developer documentation links section of the thread template if
+    support.cpan is set.
+
+    Output more helpful information about test failures on Windows and
+    other systems that don't have the diff command.
+
 DocKnot 2.00 (2019-01-12)
 
     Move previous docknot command functionality to a new docknot generate

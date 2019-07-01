@@ -5,7 +5,7 @@ use base qw(PDF::API2::Content PDF::API2::Resource::XObject::Form);
 use strict;
 use warnings;
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;
@@ -42,17 +42,11 @@ sub new {
 }
 
 sub outobjdeep {
-    my ($self, @options) = @_;
+    my $self = shift();
+
     $self->textend() unless $self->{' nofilt'};
 
-    # Maintainer's Note: This list of keys isn't the same as the list
-    # in new().  Should it be?
-    foreach my $key (qw(api apipdf apipage font fontsize charspace hscale
-                        wordspace lead rise render matrix fillcolor
-                        strokecolor translate scale skew rotate)) {
-        delete $self->{" $key"};
-    }
-    return PDF::API2::Basic::PDF::Dict::outobjdeep($self, @options);
+    return PDF::API2::Basic::PDF::Dict::outobjdeep($self, @_);
 }
 
 1;

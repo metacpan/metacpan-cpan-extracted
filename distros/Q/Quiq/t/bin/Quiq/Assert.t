@@ -15,6 +15,39 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_isEnumValue : Test(4) {
+    my $self = shift;
+
+    eval {Quiq::Assert->isEnumValue(undef,[qw/a b c/])};
+    $self->is($@,'');
+
+    eval {Quiq::Assert->isEnumValue('',[qw/a b c/])};
+    $self->is($@,'');
+
+    eval {Quiq::Assert->isEnumValue('b',[qw/a b c/])};
+    $self->is($@,'');
+
+    eval {Quiq::Assert->isEnumValue('x',[qw/a b c/])};
+    $self->like($@,qr/Not an enum value/i);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_isNotNull : Test(3) {
+    my $self = shift;
+
+    eval {Quiq::Assert->isNotNull(undef)};
+    $self->like($@,qr/is null/i);
+
+    eval {Quiq::Assert->isNotNull('')};
+    $self->like($@,qr/is null/i);
+
+    eval {Quiq::Assert->isNotNull('x')};
+    $self->is($@,'');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_isNumber : Test(5) {
     my $self = shift;
 
@@ -32,21 +65,6 @@ sub test_isNumber : Test(5) {
 
     eval {Quiq::Assert->isNumber('x')};
     $self->like($@,qr/Not a number/i);
-}
-
-# -----------------------------------------------------------------------------
-
-sub test_notNull : Test(3) {
-    my $self = shift;
-
-    eval {Quiq::Assert->notNull(undef)};
-    $self->like($@,qr/is null/i);
-
-    eval {Quiq::Assert->notNull('')};
-    $self->like($@,qr/is null/i);
-
-    eval {Quiq::Assert->notNull('x')};
-    $self->is($@,'');
 }
 
 # -----------------------------------------------------------------------------

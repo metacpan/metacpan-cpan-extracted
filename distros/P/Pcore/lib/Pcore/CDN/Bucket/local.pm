@@ -1,7 +1,7 @@
 package Pcore::CDN::Bucket::local;
 
 use Pcore -class, -res;
-use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_coderef];
+use Pcore::Util::Scalar qw[is_plain_scalarref is_plain_arrayref is_plain_coderef];
 
 with qw[Pcore::CDN::Bucket];
 
@@ -99,7 +99,12 @@ sub upload ( $self, $path, $data, @args ) {
 
     P->file->mkpath( $path->{dirname}, mode => 'rwxr-xr-x' ) || return $on_finish->( $cb, res [ 500, qq[Can't create CDN path "$path", $!] ] ) if !-d $path->{dirname};
 
-    P->file->write_bin( $path, { mode => 'rw-r--r--' }, $data );    # TODO or return res [ 500, qq[Can't write "$path", $!] ];
+    if ( is_plain_scalarref $data) {
+        P->file->write_bin( $path, { mode => 'rw-r--r--' }, $data );    # TODO or return res [ 500, qq[Can't write "$path", $!] ];
+    }
+    else {
+        P->file->copy( $data, $path, mode => 'rw-r--r--' );             # TODO or return res [ 500, qq[Can't write "$path", $!] ];
+    }
 
     return $on_finish->( $cb, res 200 );
 }

@@ -11,12 +11,12 @@ count(1);
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel         => 'error',
-            mail2fActivation => 1,
-            mail2fCodeRegex  => '\d{4}',
-            authentication   => 'Demo',
-            userDB           => 'Same',
-	    tokenUseGlobalStorage => 1,
+            logLevel              => 'error',
+            mail2fActivation      => 1,
+            mail2fCodeRegex       => '\d{4}',
+            authentication        => 'Demo',
+            userDB                => 'Same',
+            tokenUseGlobalStorage => 1,
         }
     }
 );

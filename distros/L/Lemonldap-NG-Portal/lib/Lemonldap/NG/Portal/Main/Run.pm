@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -153,6 +153,9 @@ sub refresh {
     foreach ( keys %data ) {
         delete $data{$_} unless ( /^_/ or /^(?:startTime)$/ );
     }
+    $data{_updateTime} = strftime( "%Y%m%d%H%M%S", localtime() );
+    $self->logger->debug(
+        "Set session $req->{id} _updateTime with $data{_updateTime}");
     $req->steps( [
             'getUser',
             @{ $self->betweenAuthAndData },
@@ -163,6 +166,7 @@ sub refresh {
             'setLocalGroups',
             sub {
                 $req->sessionInfo->{$_} = $data{$_} foreach ( keys %data );
+                $req->refresh(1);
                 return PE_OK;
             },
             'store',
@@ -172,6 +176,7 @@ sub refresh {
     if ($res) {
         $req->info(
             $self->loadTemplate(
+                $req,
                 'simpleInfo', params => { trspan => 'rightsReloadNeedsLogout' }
             )
         );
@@ -228,7 +233,7 @@ sub do {
                 [qq'{"result":0,"error":$err}']
             ];
         }
-        elsif ( $err > 0 and $err != PE_PASSWORD_OK ) {
+        elsif ( $err > 0 and $err != PE_PASSWORD_OK and $err != PE_LOGOUT_OK ) {
             return $self->sendJSONresponse(
                 $req,
                 { result => 0, error => $err },
@@ -788,6 +793,13 @@ sub sendHtml {
       'Pragma'        => 'no-cache',                               # HTTP 1.0
       'Expires'       => '0';                                      # Proxies
 
+    my @cors = split /;/, $self->cors;
+    if ( $self->conf->{corsEnabled} ) {
+        push @{ $res->[1] }, @cors;
+        $self->logger->debug(
+            "Apply following CORS policy : " . Data::Dumper::Dumper( \@cors ) );
+    }
+
     # Set authorized URL for POST
     my $csp = $self->csp . "form-action " . $self->conf->{cspFormAction};
     if ( my $url = $req->urldc ) {
@@ -873,6 +885,15 @@ sub lmError {
 
     # Check URL
     $self->controlUrl($req);
+    $req->pdata( {} ) unless ( $httpError == 404 );
+
+    if ( $req->wantJSON ) {
+        return $self->sendJSONresponse(
+            $req,
+            { error => $httpError, result => 0 },
+            code => $httpError
+        );
+    }
 
     my %templateParams = (
         MAIN_LOGO  => $self->conf->{portalMainLogo},
@@ -880,7 +901,6 @@ sub lmError {
         LOGOUT_URL => $self->conf->{portal} . "?logout=1",
         URL        => $req->{urldc},
     );
-    $req->pdata( {} );
 
     # Error code
     $templateParams{"ERROR$_"} = ( $httpError == $_ ? 1 : 0 )
@@ -1004,12 +1024,12 @@ sub _sumUpSession {
 
 # Temlate loader
 sub loadTemplate {
-    my ( $self, $name, %prm ) = @_;
+    my ( $self, $req, $name, %prm ) = @_;
     $name .= '.tpl';
     my $tpl = HTML::Template->new(
         filename => $name,
         path     => [
-            $self->conf->{templateDir} . '/' . $self->conf->{portalSkin},
+            $self->conf->{templateDir} . '/' . $self->getSkin($req),
             $self->conf->{templateDir} . '/bootstrap/',
             $self->conf->{templateDir} . '/common/'
         ],

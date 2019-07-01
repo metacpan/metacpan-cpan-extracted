@@ -15,19 +15,23 @@
       <div class="card-body">
         <TMPL_VAR NAME="MSG">
       </div>
+      <TMPL_IF NAME="ACTIVE_TIMER">
       <div id="divToHide" class="card-footer text-white bg-info">
         <p id="timer" trspan="redirectedIn">You'll be redirected in 30 seconds</p>
       </div>
+      </TMPL_IF>
     </div>
     <div class="buttons">
       <button type="submit" class="positive btn btn-success">
         <span class="fa fa-check-circle"></span>
         <span trspan="continue">Continue</span>
       </button>
+      <TMPL_IF NAME="ACTIVE_TIMER">
       <button id="wait" type="reset" class="negative btn btn-danger">
         <span class="fa fa-stop"></span>
         <span trspan="wait">Wait</span>
       </button>
+      </TMPL_IF>
     </div>
   </form>
   <!-- //if:jsminified

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -36,6 +36,16 @@ sub new {
     }
     return $self;
 }
+
+sub clone {
+    my ($self) = @_;
+    my $clone = {
+        lexer => YAML::PP::Lexer->new(
+        ),
+    };
+    return bless $clone, ref $self;
+}
+
 sub receiver { return $_[0]->{receiver} }
 sub set_receiver {
     my ($self, $receiver) = @_;

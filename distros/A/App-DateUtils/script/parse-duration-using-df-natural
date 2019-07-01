@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/parse_duration_using_df_natural
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.490
 
-our $DATE = '2019-01-29'; # DATE
+our $DATE = '2019-06-19'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.120'; # VERSION
+our $VERSION = '0.121'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ parse-duration-using-df-natural - Parse duration string(s) using DateTime::Forma
 
 =head1 VERSION
 
-This document describes version 0.120 of parse-duration-using-df-natural (from Perl distribution App-DateUtils), released on 2019-01-29.
+This document describes version 0.121 of parse-duration-using-df-natural (from Perl distribution App-DateUtils), released on 2019-06-19.
 
 =head1 SYNOPSIS
 
@@ -51,15 +51,15 @@ Examples:
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
  | module                    | original    | is_parseable | as_secs | as_dtdur_obj | date1               | date2               |
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
- | DateTime::Format::Natural | for 2 weeks | 1            | 1209600 | P14D         | 2019-01-29T10:02:27 | 2019-02-12T10:02:27 |
+ | DateTime::Format::Natural | for 2 weeks | 1            | 1209600 | P14D         | 2019-06-19T13:29:58 | 2019-07-03T13:29:58 |
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
 
  % parse-duration-using-df-natural 'from 23 Jun to 29 Jun'
- +---------------------------+-----------------------+--------------+----------+------------------+---------------------+---------------------+
- | module                    | original              | is_parseable | as_secs  | as_dtdur_obj     | date1               | date2               |
- +---------------------------+-----------------------+--------------+----------+------------------+---------------------+---------------------+
- | DateTime::Format::Natural | from 23 Jun to 29 Jun | 1            | 13161453 | P4M30DT13H57M33S | 2019-01-29T10:02:27 | 2019-06-29T00:00:00 |
- +---------------------------+-----------------------+--------------+----------+------------------+---------------------+---------------------+
+ +---------------------------+-----------------------+--------------+---------+--------------+---------------------+---------------------+
+ | module                    | original              | is_parseable | as_secs | as_dtdur_obj | date1               | date2               |
+ +---------------------------+-----------------------+--------------+---------+--------------+---------------------+---------------------+
+ | DateTime::Format::Natural | from 23 Jun to 29 Jun | 1            | 815402  | P9DT10H30M2S | 2019-06-19T13:29:58 | 2019-06-29T00:00:00 |
+ +---------------------------+-----------------------+--------------+---------+--------------+---------------------+---------------------+
 
  % parse-duration-using-df-natural foo
  +---------------------------+----------+--------------+-------------------------------------------------------+

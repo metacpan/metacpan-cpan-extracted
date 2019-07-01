@@ -23,7 +23,7 @@ sub run {
         $self->logger->debug('History asked');
         $req->info( (
                 $req->sessionInfo->{_loginHistory}->{successLogin}
-                ? $self->p->mkSessionArray(
+                ? $self->p->mkSessionArray( $req,
                     $req->sessionInfo->{_loginHistory}->{successLogin},
                     'lastLogins', 0, 0 )
                 : ""
@@ -31,14 +31,14 @@ sub run {
             . ("<hr>")
               . (
                 $req->sessionInfo->{_loginHistory}->{failedLogin}
-                ? $self->p->mkSessionArray(
+                ? $self->p->mkSessionArray( $req,
                     $req->sessionInfo->{_loginHistory}->{failedLogin},
                     'lastFailedLogins', 0, 1 )
                 : ""
               )
         );
         unless ( $req->info ) {
-            $req->info( $self->loadTemplate('noHistory') );
+            $req->info( $self->loadTemplate( $req, 'noHistory' ) );
         }
         return PE_INFO;
     }

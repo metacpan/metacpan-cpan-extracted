@@ -20,19 +20,18 @@ my $class = 'Bio::Palantir::Explorer::ClusterFasta';
     ok my $report = $class->new( file => $infile ), 'Explorer constructor';
 
     my @expected_symbols = [
-        'A', 'C', 'PCP', 'H',
-        'Te', 'PCP', 'Te', 'Amt'
+        'A', 'C', 'PCP',
+        'Te', 'Te', 'Amt'
     ];
 
     my @expected_evalues = [
-        '3e-103', '1.7e-59', '1.5e-14', '3.3e-13',
-        '3.5e-11', '2.8e-10', '2.8', '1.9e-45'
+        '3e-103', '1.7e-59', '1.5e-14', 
+        '3.5e-11', '2.8', '1.9e-45'
     ];
    
     my @expected_coordinates = [
         [608, 1112], [120, 589], [1140, 1208],
-        [120, 439], [1214, 1445], [1140, 1207],
-        [85, 312], [12, 372]
+        [1214, 1445], [85, 312], [12, 372]
     ];
 
     my (@symbols, @evalues, @coordinates);

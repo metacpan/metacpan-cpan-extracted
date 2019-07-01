@@ -49,7 +49,7 @@ $pdf->strokecolor('black');
 $pdf->linewidth(0.1);
 $pdf->linedash(4);
 $pdf->move(in(1), in(8));
-$pdf->rel_rect($ink->{bbox});
+$pdf->rel_rect($ink->bbox);
 $pdf->stroke;
 $pdf->linedash;
 
@@ -66,7 +66,7 @@ $pdf->strokecolor('black');
 # change the width and justification, add a paragraph indent,
 # rotate it, scale it, and show it again in a different location.
 #
-$pdf->move(in(2) + $ink->{width}, in(8));
+$pdf->move(in(2) + $ink->width, in(8));
 $pdf->save;
 $pdf->rotate(10);
 $pdf->scale(0.9, 0.9);

@@ -1,5 +1,13 @@
 Revision history for Perl module CBOR::Free
 
+0.12 30 Jun 2019
+- BREAKING CHANGE (minor): Unrecognized tagged values now prompt a warning.
+  This means that decode() will warn() on every tagged value.
+- Fix bug in parsing arguments to encode().
+- Create CBOR::Free::Decoder class, which allows configurable parsing
+  of tagged values.
+- Refactor C code to be more modular and maintainable.
+
 0.11 20 Jun 2019
 - BREAKING CHANGE: $CBOR::Free::true and $CBOR::Free::false no longer exist.
 - Lighten memory usage significantly by deferring load of Types::Serialiser

@@ -8,7 +8,6 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use XML::Simple;
 use MIME::Base64;
-use String::Random;
 use HTTP::Request;         # SOAP call
 use POSIX qw(strftime);    # Convert SAML2 date into timestamp
 use Time::Local;           # Convert SAML2 date into timestamp
@@ -20,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.5';
 
 # PROPERTIES
 
@@ -1287,7 +1286,7 @@ sub getAttributeValue {
             $value .= $content . $self->conf->{multiValuesSeparator}
               if $content;
         }
-        $value =~ s/$self->{conf}->{multiValuesSeparator}$//;
+        $value =~ s/$self->{conf}->{multiValuesSeparator}$// if $value;
 
         # Encode UTF-8 if force_utf8 flag
         $value = encode( "utf8", $value ) if $force_utf8;
@@ -2548,6 +2547,7 @@ sub sendLogoutRequestToProvider {
 
         # Create iFrame
         $info .= $self->loadTemplate(
+            $req,
             'samlSpLogout',
             params => {
                 url  => $slo_url,
@@ -2583,6 +2583,7 @@ sub sendLogoutRequestToProvider {
 
         # Create iFrame
         $info .= $self->loadTemplate(
+            $req,
             'samlSpLogout',
             params => {
                 url  => $slo_url,
@@ -2621,6 +2622,7 @@ sub sendLogoutRequestToProvider {
 
             # Display information to the user
             $info .= $self->loadTemplate(
+                $req,
                 'samlSpSoapLogout',
                 params => {
                     imgUrl => $slo_url,
@@ -2719,7 +2721,7 @@ sub sendLogoutRequestToProviders {
     # Print some information to the user.
     $req->info(
         $self->loadTemplate(
-            'samlSpsLogout', params => { content => $content }
+            $req, 'samlSpsLogout', params => { content => $content }
         )
     ) if $providersCount;
 

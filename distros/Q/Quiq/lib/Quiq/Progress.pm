@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Option;
 use Time::HiRes ();
@@ -79,7 +79,7 @@ Ausgabe I/N nur I, statt ZEIT/GESAMTZEIT(RESTZEIT) nur ZEIT)
     $| = 1;
     my $p = Quiq::Progress->new;
     for my $i (1 .. 5) {
-        print $pro->msg($i,'i/n x% t/t(t) x/h x/s t/1');
+        print $p->msg($i,'i/n x% t/t(t) x/h x/s t/1');
         sleep 1;
     }
     print $p->msg;
@@ -737,7 +737,7 @@ sub warn {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

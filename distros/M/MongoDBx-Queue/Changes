@@ -1,5 +1,12 @@
 Revision history for MongoDBx-Queue
 
+2.001     2019-06-30 23:26:26-04:00 America/New_York
+
+    [ADDED]
+
+    - Added 'version' option to toggle between legacy 'v1' implementation and
+      a new 'v2' implementation with better index coverage.
+
 2.000     2018-10-04 15:44:27-04:00 America/New_York
 
     [INCOMPATIBLE CHANGES]

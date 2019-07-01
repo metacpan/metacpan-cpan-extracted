@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -1437,7 +1437,7 @@ sub sql {
 
     if ($log) {
         $self->timeToLog(sprintf '%.6f sec, %s rows%s',$execTime,
-            $apiCur? $apiCur->hits: 0,$@? ' ERROR': '');
+            $hits,$@? ' ERROR': '');
     }
 
     # Exception nach Log-Protokollierung werfen
@@ -1652,6 +1652,42 @@ sub setNumberFormat {
 
     my $cur;
     for my $stmt ($self->stmt->setNumberFormat) {
+        $cur = $self->sqlAtomic($stmt);
+    }
+
+    return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 setSearchPath() - Setze Schema-Suchpfad
+
+=head4 Synopsis
+
+    $cur = $db->setSearchPath(@schemas);
+
+=head4 Description
+
+Setze den Schema-Suchpfad und liefere einen Cursor mit dem Ergebnis
+der Statementausführung zurück.
+
+B<PostgreSQL / Greenplum>
+
+Der Schema-Suchpfad wird von PostgreSQL genutzt, um Datenbank-Objekte
+zu finden, die nicht mit einem Schema-Präfix qualifiziert sind.
+Das erste Schema der Liste ist gleichzeitig das Default-Schema, in
+dem Datenbank-Objekte erzeugt werden (unabhängig davon, ob sie
+sich in einem anderen Schema des Suchpfads befinden).
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub setSearchPath {
+    my ($self,@schemas) = @_;
+
+    my $cur;
+    for my $stmt ($self->stmt->setSearchPath(@schemas)) {
         $cur = $self->sqlAtomic($stmt);
     }
 
@@ -2602,6 +2638,56 @@ sub insertRows {
     # @_: @data
 
     return $self->insert($table,$keyA,[(\'?') x @$keyA])->bind(@_);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 insertMulti() - Füge mehrere Datensätze zu Tabelle hinzu
+
+=head4 Synopsis
+
+    $cur = $db->insertMulti($table,\@keys,[
+            [@vals1],
+            [@vals2],
+            ...
+        ]
+    );
+
+=head4 Description
+
+Füge mehrere Datensätze zu Tabelle $table hinzu. Die Datensätze
+haben die Kolumnen @keys und die Werte @valsI. Die Methode liefert
+das Resultat der Ausführung (Cursor) zurück.
+Im Unterschied zur Methode $db->L<insertRows|"insertRows() - Füge mehrere Datensätze zu Tabelle hinzu">() führt diese
+Methode ein einziges INSERT-Statement mit allen Daten aus, à la
+
+    INSERT INTO person
+        (per_id, per_vorname, per_nachname, per_geburtstag)
+    VALUES
+        ('1', 'Linus', 'Seitz', '2002-11-11'),
+        ('2', 'Hanno', 'Seitz', '2000-04-07')
+        ('3', 'Emily', 'Philippi', '1997-05-05')
+        ...
+
+=head4 Example
+
+    $db->insertMulti('person',
+        [qw/per_id per_vorname per_nachname per_geburtstag/],[
+            [qw/1 Linus Seitz 2002-11-11/],
+            [qw/2 Hanno Seitz 2000-04-07/],
+            [qw/3 Emily Philippi 1997-05-05/],
+        ]
+    );
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub insertMulti {
+    my $self = shift;
+    # @_: $table,$keyA,$recordA
+    my $stmt = $self->stmt->insertMulti(@_);
+    return $self->sql($stmt);
 }
 
 # -----------------------------------------------------------------------------
@@ -4817,7 +4903,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

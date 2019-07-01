@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.5';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -571,7 +571,8 @@ sub authChoiceModules {
 #@return PSGI JSON response
 sub grantSessionRules {
     my ( $self, $req, $key ) = @_;
-    return $self->sendError( 'Subkeys forbidden for grantSessionRules', 400 )
+    return $self->sendError( $req, 'Subkeys forbidden for grantSessionRules',
+        400 )
       if ($key);
     my $value = $self->getConfKey( $req, 'grantSessionRules' );
     my @res;
@@ -605,7 +606,7 @@ sub grantSessionRules {
 # Split openIdIDPList parameter into 2 elements
 sub openIdIDPList {
     my ( $self, $req, $key ) = @_;
-    return $self->sendError( 'Subkeys forbidden for openIdIDPList', 400 )
+    return $self->sendError( $req, 'Subkeys forbidden for openIdIDPList', 400 )
       if ($key);
     my $value = $self->getConfKey( $req, 'openIdIDPList' );
     $value //= '0;';
@@ -644,7 +645,14 @@ sub _scanCatsAndApps {
     my ( $self, $apps, $baseId ) = @_;
     my @res;
 
-    foreach my $cat ( grep { not /^(?:catname|type)$/ } sort keys %$apps ) {
+    foreach my $cat (
+        sort {
+            ( $apps->{$a}->{order} || 0 ) <=> ( $apps->{$b}->{order} || 0 )
+              or $a cmp $b
+        }
+        grep { not /^(?:catname|type|order)$/ } keys %$apps
+      )
+    {
         my $item = { id => "$baseId/$cat" };
         if ( $apps->{$cat}->{type} eq 'category' ) {
             $item->{title} = $apps->{$cat}->{catname};
@@ -673,7 +681,7 @@ sub _scanCatsAndApps {
 # Returns raw value, just transform "over" key
 sub combModules {
     my ( $self, $req, $key ) = @_;
-    return $self->sendError( 'Subkeys forbidden for combModules', 400 )
+    return $self->sendError( $req, 'Subkeys forbidden for combModules', 400 )
       if ($key);
     my $val = $self->getConfKey( $req, 'combModules' ) // {};
     my $res = [];

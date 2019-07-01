@@ -2,13 +2,14 @@ NAME
     MongoDBx::Queue - A message queue implemented with MongoDB
 
 VERSION
-    version 2.000
+    version 2.001
 
 SYNOPSIS
         use v5.10;
         use MongoDBx::Queue;
 
         my $queue = MongoDBx::Queue->new(
+            version => 2,
             database_name => "queue_db",
             client_options => {
                 host => "mongodb://example.net:27017",
@@ -77,9 +78,19 @@ ATTRIBUTES
     must only be used by MongoDBx::Queue or unpredictable awful things will
     happen.
 
+  version
+    The implementation version to use as a backend. Defaults to '1', which
+    is the legacy implementation for backwards compatibility. Version '2'
+    has better index coverage and will perform better for very large queues.
+
+    WARNING Versions are not compatible. You MUST NOT have V1 and V2 clients
+    using the same database+collection name. See "MIGRATION BETWEEN
+    VERSIONS" for more.
+
 METHODS
   new
        $queue = MongoDBx::Queue->new(
+            version => 2,
             database_name   => "my_app",
             client_options  => {
                 host => "mongodb://example.net:27017",
@@ -189,6 +200,18 @@ METHODS
       $queue->waiting;
 
     Returns the number of tasks in the queue that have not been reserved.
+
+MIGRATION BETWEEN VERSIONS
+    Implementation versions are not compatible. Migration of active tasks
+    from version '1' to version '2' is an exercise left to end users.
+
+    One approach to migration could be to run a script with two
+    "MongoDBx::Queue" clients, one using version '1' and one using version
+    '2', using different "database_name" attributes. Such a script could
+    iteratively reserve a task with the v1 client, add the task via the v2
+    client, then remove it via the v1 client. Workers could be operating on
+    one or both versions of the queue while migration is going on, depending
+    on your needs.
 
 SUPPORT
   Bugs / Feature Requests

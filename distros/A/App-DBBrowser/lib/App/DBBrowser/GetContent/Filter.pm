@@ -5,9 +5,10 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose       qw();
-use Term::Choose::Util qw( choose_a_subset choose_a_number settings_menu insert_sep );
-use Term::Form         qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( choose_a_subset choose_a_number settings_menu insert_sep );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 
@@ -128,7 +129,7 @@ sub __empty_to_null {
     settings_menu(
         [ [ 'empty_to_null', "  Empty fields to NULL", [ 'NO', 'YES' ] ] ],
         $tmp,
-        { mouse => $sf->{o}{table}{mouse} }
+        { mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
     );
     $sf->{empty_to_null} = $tmp->{empty_to_null};
 }
@@ -178,8 +179,8 @@ sub __choose_columns {
     # Choose
     my $col_idx = choose_a_subset(
         $header,
-        { name => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1,
-          mouse => $sf->{o}{table}{mouse}, index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0 } # order
+        { name => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1, mouse => $sf->{o}{table}{mouse},
+          index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0, hide_cursor => 0 } # order
     );
     if ( ! defined $col_idx ) {
         return;
@@ -397,6 +398,7 @@ sub __merge_rows {
         $fields,
         { prompt => 'Edit result:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
+    print HIDE_CURSOR;
     if ( ! $form ) {
         return;
     }
@@ -414,7 +416,7 @@ sub __split_table {
     # Choose
     my $col_count = choose_a_number(
         length( scalar @{$aoa->[0]} ),
-        { name => 'Number columns new table: ', small_first => 1 }
+        { name => 'Number columns new table: ', small_first => 1, hide_cursor => 0 }
     );
     if ( ! defined $col_count ) {
         return;
@@ -471,16 +473,19 @@ sub __split_column {
     my $tf = Term::Form->new();
     # Readline
     my $sep = $tf->readline( 'Separator: ' );
+    print HIDE_CURSOR;
     if ( ! defined $sep ) {
         return;
     }
     # Readline
     my $left_trim = $tf->readline( 'Left trim: ', '\s+' );
+    print HIDE_CURSOR;
     if ( ! defined $left_trim ) {
         return;
     }
     # Readline
     my $right_trim = $tf->readline( 'Right trim: ', '\s+' );
+    print HIDE_CURSOR;
     if ( ! defined $right_trim ) {
         return;
     }
@@ -553,6 +558,7 @@ sub __search_and_replace {
         my $pattern = $tf->readline( 'Pattern: ',
             { info => $info }
         );
+        print HIDE_CURSOR;
         if ( ! defined $pattern ) {
             next SEARCH_AND_REPLACE;
         }
@@ -563,6 +569,7 @@ sub __search_and_replace {
         my $replacement = $tf->readline( 'Replacement: ',
             { info => $info }
         );
+        print HIDE_CURSOR;
         if ( ! defined $replacement ) {
             next SEARCH_AND_REPLACE;
         }
@@ -574,7 +581,7 @@ sub __search_and_replace {
         my $col_idx = choose_a_subset(
             $header,
             { name => 'Columns: ', info => $info, layout => 0, all_by_default => 1, mouse => $sf->{o}{table}{mouse},
-              index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0 }
+              index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0, hide_cursor => 0 }
         );
         if ( ! defined $col_idx ) {
             next SEARCH_AND_REPLACE;

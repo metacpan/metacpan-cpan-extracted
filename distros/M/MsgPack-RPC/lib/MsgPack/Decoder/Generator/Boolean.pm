@@ -1,6 +1,6 @@
 package MsgPack::Decoder::Generator::Boolean;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Decoder::Generator::Boolean::VERSION = '2.0.2';
+$MsgPack::Decoder::Generator::Boolean::VERSION = '2.0.3';
 use Moose;
 use MooseX::MungeHas 'is_ro';
 
@@ -27,7 +27,7 @@ MsgPack::Decoder::Generator::Boolean
 
 =head1 VERSION
 
-version 2.0.2
+version 2.0.3
 
 =head1 AUTHOR
 

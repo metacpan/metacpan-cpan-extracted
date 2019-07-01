@@ -10,6 +10,9 @@ CBOR::Free - Fast CBOR for everyone
 
     my $tagged = CBOR::Free::tag( 1, '2019-01-02T00:01:02Z' );
 
+Also see [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder) for an object-oriented interface
+to the decoder.
+
 # DESCRIPTION
 
 This library implements [CBOR](https://tools.ietf.org/html/rfc7049)
@@ -68,7 +71,9 @@ become Perl byte strings. (This may become configurable later.)
 An exception is thrown if the decoder finds anything else as a map key.
 - CBOR booleans become the corresponding [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) values.
 Both CBOR null and undefined become Perl undef.
-- Tags are IGNORED for now. (This may become configurable later.)
+- This function does not interpret tags; if you need that, look
+at [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder). Any tags that this function sees prompt a warning
+but are otherwise ignored.
 
 ## $obj = tag( $NUMBER, $DATA )
 

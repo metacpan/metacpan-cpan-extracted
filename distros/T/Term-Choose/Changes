@@ -1,6 +1,14 @@
 Revision history for Term::Choose
 
 
+1.649   2019-06-30
+    - Update TC_RESET_AUTO_UP.
+    - Refactoring __goto.
+    - Renaming p_begin to first_page_row.
+    - hide cursor as early as possible, show cursor as late as possible
+    - "line_fold": 'init_tab' and 'subseq_tab' are passed as options; new option 'color'.
+    - Remove color code from _prepare_promptline and use the 'line_fold' option 'color' instead.
+
 1.648   2019-05-06
     - Code refactoring.
 

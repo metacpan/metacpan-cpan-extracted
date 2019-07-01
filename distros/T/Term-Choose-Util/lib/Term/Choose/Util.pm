@@ -4,10 +4,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.073';
+our $VERSION = '0.074';
 use Exporter 'import';
-our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
-                     length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
+our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu
+                     insert_sep term_size term_width unicode_sprintf );
 
 use Cwd                   qw( realpath );
 use Encode                qw( decode encode );
@@ -618,79 +618,6 @@ sub insert_sep {
 }
 
 
-sub length_longest {
-    my ( $list ) = @_;
-    my $len = [];
-    my $longest = 0;
-    for my $i ( 0 .. $#$list ) {
-        $len->[$i] = print_columns( "$list->[$i]" );
-        $longest = $len->[$i] if $len->[$i] > $longest;
-    }
-    return wantarray ? ( $longest, $len ) : $longest;
-}
-
-
-sub print_hash {
-    my ( $hash, $opt ) = @_;
-    if ( ! defined $opt ) {
-        $opt = {};
-    }
-    my $left_margin  = defined $opt->{left_margin}  ? $opt->{left_margin}  : 1;
-    my $right_margin = defined $opt->{right_margin} ? $opt->{right_margin} : 2;
-    my $keys         = defined $opt->{keys}         ? $opt->{keys}         : [ sort keys %$hash ];
-    my $key_w        = defined $opt->{len_key}      ? $opt->{len_key}      : length_longest( $keys );
-    my $maxcols      = $opt->{maxcols};
-    my $clear        = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $mouse        = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $prompt       = defined $opt->{prompt}       ? $opt->{prompt}       : ( defined $opt->{preface} ? '' : 'Close with ENTER' );
-    my $hide_cursor  = defined $opt->{hide_cursor}  ? $opt->{hide_cursor}  : 1;
-    my $preface      = $opt->{preface};
-    #-----------------------------------------------------------------#
-    my $term_width = term_width();
-    if ( ! $maxcols || $maxcols > $term_width  ) {
-        $maxcols = $term_width - $right_margin;
-    }
-    $key_w += $left_margin;
-    my $sep = ' : ';
-    my $len_sep = print_columns( "$sep" );
-    if ( $key_w + $len_sep > int( $maxcols / 3 * 2 ) ) {
-        $key_w = int( $maxcols / 3 * 2 ) - $len_sep;
-    }
-    my @vals = ();
-    if ( defined $preface ) {
-        for my $line ( split "\n", $preface ) {
-            push @vals, split "\n", line_fold( $line, $maxcols, '', '' );
-        }
-    }
-    for my $key ( @$keys ) {
-        next if ! exists $hash->{$key};
-        my $val;
-        if ( ! defined $hash->{$key} ) {
-            $val = '';
-        }
-        elsif ( ref $hash->{$key} eq 'ARRAY' ) {
-            $val = '[ ' . join( ', ', map { defined $_ ? "\"$_\"" : '' } @{$hash->{$key}} ) . ' ]';
-        }
-        else {
-            $val = $hash->{$key};
-        }
-        my $pr_key = sprintf "%*.*s%*s", $key_w, $key_w, $key, $len_sep, $sep;
-        my $text = line_fold( $pr_key . $val, $maxcols, '' , ' ' x ( $key_w + $len_sep ) );
-        $text =~ s/\n+\z//;
-        for my $val ( split /\n+/, $text ) {
-            push @vals, $val;
-        }
-    }
-    return join "\n", @vals if defined wantarray;
-    # Choose
-    choose(
-        [ @vals ],
-        { prompt => $prompt, layout => 3, justify => 0, mouse => $mouse,
-          clear_screen => $clear, hide_cursor => $hide_cursor }
-    );
-}
-
-
 sub term_size {
     #my ( $handle_out ) = defined $_[0] ? $_[0] : \*STDOUT;
     if ( $^O eq 'MSWin32' ) {
@@ -703,7 +630,6 @@ sub term_size {
 sub term_width {
     return( ( term_size( $_[0] ) )[0] );
 }
-
 
 
 sub unicode_sprintf {
@@ -727,12 +653,6 @@ sub unicode_sprintf {
 
 
 
-sub unicode_trim {
-    #my ( $unicode, $len ) = @_;
-    return '' if $_[1] <= 0;
-    cut_to_printwidth( $_[0], $_[1] );
-}
-
 
 
 1;
@@ -749,7 +669,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.073
+Version 0.074
 
 =cut
 
@@ -1026,7 +946,7 @@ Values: 0,1,2,[3].
 
 mark
 
-Expects as its value a reference to an array with indexes. Elements corresponding to these indexes are preselected when
+Expects as its value a reference to an array with indexes. Elements corresponding to these indexes are pre-selected when
 C<choose_a_subset> is called.
 
 =item

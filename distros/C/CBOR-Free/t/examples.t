@@ -158,7 +158,17 @@ push @decode, (
 );
 
 for my $t (@decode) {
-    my $decoded = CBOR::Free::decode( pack( 'H*', $t->[1] ) );
+    my @w;
+
+    my $decoded = do {
+        local $SIG{'__WARN__'} = sub { push @w, @_ };
+        CBOR::Free::decode( pack( 'H*', $t->[1] ) );
+    };
+
+    if (@w && (@w != 1 || $w[0] !~ m<tag>)) {
+        warn "Unexpected warning(s): @w";
+    }
+
     is_deeply(
         $decoded,
         $t->[0],

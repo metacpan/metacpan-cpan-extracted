@@ -5,9 +5,10 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose       qw();
-use Term::Choose::Util qw( choose_a_number choose_a_subset );
-use Term::Form         qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( choose_a_number choose_a_subset );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -88,7 +89,7 @@ sub __choose_columns {
         return choose_a_subset(
             $cols,
             { name => $function . ': ', layout => 1, sofar_separator => ',', mouse => $sf->{o}{table}{mouse},
-              keep_chosen => 1 }
+              keep_chosen => 1, hide_cursor => 0 }
         );
     }
 }
@@ -126,7 +127,7 @@ sub __prepare_col_func {
         my $info = $func . ': ' . $qt_col;
         my $name = "Decimal places: ";
         my $precision = choose_a_number( 2,
-            { name => $name, info => $info, small_first => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
+            { name => $name, info => $info, small_first => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0, hide_cursor => 0 }
         );
         return if ! defined $precision;
         $quote_f = $plui->truncate( $qt_col, $precision );
@@ -143,6 +144,7 @@ sub __prepare_col_func {
         my $sep = $tf->readline( 'Separator: ',
             { info => $info }
         );
+        print HIDE_CURSOR;
         return if ! defined $sep;
         $quote_f = $plui->concatenate( $qt_col, $sep );
     }

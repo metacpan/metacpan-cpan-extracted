@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# wget -q https://bitbucket.org/softvisio/<: $dist_path :>/raw/tip/contrib/<: $dist_path :>.sh && chmod +x <: $dist_path :>.sh
+# curl -fsSLO https://bitbucket.org/softvisio/<: $dist_path :>/raw/tip/contrib/<: $dist_path :>.sh && chmod +x <: $dist_path :>.sh
 
 set -e
 
@@ -27,4 +27,4 @@ DOCKER_CONTAINER_ARGS="
     -p 443:443/tcp \
 "
 
-source <( wget -q -O - https://bitbucket.org/softvisio/scripts/raw/tip/docker.sh || echo false ) "$@"
+source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/tip/docker.sh || echo false ) "$@"

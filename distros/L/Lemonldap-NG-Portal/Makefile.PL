@@ -27,7 +27,6 @@ WriteMakefile(
             'Net::OpenID::Consumer' => 0,
             'Net::OpenID::Server'   => 0,
             'SOAP::Lite'            => 0,
-            'String::Random'        => 0,
             'Unicode::String'       => 0,
             'Web::ID'               => 0,
         },
@@ -59,7 +58,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Clone'                  => 0,
-        'Lemonldap::NG::Handler' => '2.0.4',
+        'Lemonldap::NG::Handler' => '2.0.5',
         'Regexp::Assemble'       => 0,
     },
     (

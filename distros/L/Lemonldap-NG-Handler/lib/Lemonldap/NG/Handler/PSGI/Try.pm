@@ -37,6 +37,19 @@ sub addUnauthRoute {
     return $self->SUPER::addRoute(@_);
 }
 
+sub addAuthRouteWithRedirect {
+    my $self = shift;
+    $self->logger->debug("Route with redirect to $_[0]");
+    $self->addAuthRoute(@_);
+    $self->addUnauthRoute( $_[0] => '_auth_and_redirect', [ 'GET', 'POST' ] );
+}
+
+sub _auth_and_redirect {
+    my ( $self, $req ) = @_;
+    $self->api->goToPortal( $req, $req->{env}->{REQUEST_URI} );
+    return [ 302, $req->respHeaders, [] ];
+}
+
 sub defaultAuthRoute {
     my $self = shift;
     $self->routes( $self->authRoutes );

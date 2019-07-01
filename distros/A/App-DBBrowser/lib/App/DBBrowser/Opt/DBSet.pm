@@ -7,9 +7,10 @@ use 5.010001;
 
 use File::Spec::Functions qw( catfile );
 
-use Term::Choose       qw();
-use Term::Choose::Util qw( choose_a_subset settings_menu );
-use Term::Form         qw();
+use Term::Choose            qw();
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( choose_a_subset settings_menu );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -144,7 +145,7 @@ sub database_setting {
                 }
                 my $choices = choose_a_subset(
                     [ sort @databases ],
-                    { name => 'Reset DB: ', mouse => $sf->{o}{table}{mouse} }
+                    { name => 'Reset DB: ', mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
                 );
                 if ( ! $choices->[0] ) {
                     next GROUP;
@@ -208,7 +209,7 @@ sub __settings_menu_wrap_db {
     my ( $sf, $db_opt, $section, $sub_menu, $prompt ) = @_;
     my $changed = settings_menu(
         $sub_menu, $db_opt->{$section},
-        { prompt => $prompt, mouse => $sf->{o}{table}{mouse} }
+        { prompt => $prompt, mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
     );
     return if ! $changed;
     $sf->{write_config}++;
@@ -228,6 +229,7 @@ sub __group_readline_db {
         $list,
         { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
+    print HIDE_CURSOR;
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {
             $db_opt->{$section}{$items->[$i]{name}} = $new_list->[$i][1];

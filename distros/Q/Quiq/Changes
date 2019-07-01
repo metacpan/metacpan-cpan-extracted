@@ -1,3 +1,51 @@
+1.148 2019-07-01
+================
+[Quiq::Assert]
+* Methode isEnumValue() hinzugefügt
+* Doku bearbeitet
+
+[Quiq::Color]
+* Doku bearbeitet
+
+[Quiq::Database::Connection]
+* Anzeige Hits im Log korrigiert
+* Methode setSearchPath() hinzugefügt
+* Methode insertMulti() hinzugefügt
+
+[Quiq::Epoch]
+* Doku bearbeitet
+
+[Quiq::Excel::Writer]
+* Doku bearbeitet
+
+[Quiq::FileHandle]
+* Doku bearbeitet
+
+[Quiq::ModelCache]
+* Doku bearbeitet
+
+[Quiq::Database::Api]
+* Doku bearbeitet
+
+[Quiq::Progress]
+* Doku bearbeitet
+
+[Quiq::Properties]
+* MultiLine-Eigenschaft hinzugefügt
+
+[Quiq::Sql]
+* Methode setSearchPath() hinzugefügt
+* Methode insertMulti() hinzugefügt
+
+[Quiq::Ssh]
+* Doku bearbeitet
+
+[Quiq::Test::Class]
+* Doku bearbeitet
+
+[Quiq::TreeFormatter]
+* Doku bearbeitet
+
 1.147 2019-06-22
 ================
 [Makefile.PL]

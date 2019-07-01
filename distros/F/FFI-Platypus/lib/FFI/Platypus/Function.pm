@@ -5,7 +5,7 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: An FFI function object
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.90'; # VERSION
 
 
 use overload '&{}' => sub {
@@ -40,6 +40,20 @@ sub attach
   $self;
 }
 
+sub sub_ref
+{
+  my($self) = @_;
+
+  my $frame = -1;
+  my($caller, $filename, $line);
+
+  do {
+    ($caller, $filename, $line) = caller(++$frame);
+  } while( $caller =~ /^FFI::Platypus(|::Function|::Function::Wrapper|::Declare)$/ );
+
+  $self->_sub_ref("$filename:$line");
+}
+
 package FFI::Platypus::Function::Wrapper;
 
 use base qw( FFI::Platypus::Function );
@@ -53,10 +67,9 @@ sub new
 sub call
 {
   my($function, $wrapper) = @{ shift() };
-  $wrapper->($function, @_);
+  @_ = ($function, @_);
+  goto &$wrapper;
 }
-
-my $counter = 0;
 
 sub attach
 {
@@ -71,16 +84,34 @@ sub attach
     $perl_name = join '::', $caller, $perl_name
   }
 
-  my $attach_name = "FFI::Platypus::Inner::xsub@{[ $counter++ ]}";
-  $function->attach($attach_name);
-  my $xsub = \&{$attach_name};
+  my $xsub = $function->sub_ref;
 
   {
+    my $code = sub {
+      unshift @_, $xsub;
+      goto &$wrapper;
+    };
+    if(defined $proto)
+    {
+      _set_prototype($proto, $code);
+    }
     no strict 'refs';
-    *{$perl_name} = sub { $wrapper->($xsub, @_) };
+    *{$perl_name} = $code;
   }
 
   $self;
+}
+
+sub sub_ref
+{
+  my($self) = @_;
+  my($function, $wrapper) = @{ $self };
+  my $xsub = $function->sub_ref;
+
+  return sub {
+    unshift @_, $xsub;
+    goto &$wrapper;
+  };
 }
 
 1;
@@ -97,7 +128,7 @@ FFI::Platypus::Function - An FFI function object
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -119,13 +150,29 @@ context and better examples see L<FFI::Platypus>.
 
 =head1 METHODS
 
+=head2 attach
+
+ $f->attach($name);
+ $f->attach($name, $prototype);
+
+Attaches the function as an xsub (similar to calling attach directly
+from an L<FFI::Platypus> instance).  You may optionally include a
+prototype.
+
 =head2 call
 
  my $ret = $f->call(@arguments);
  my $ret = $f->(@arguments);
 
-Calls the function and returns the result.  You can also use the
-function object like a code reference.
+Calls the function and returns the result. You can also use the
+function object B<like> a code reference.
+
+=head2 sub_ref
+
+ my $code = $f->sub_ref;
+
+Returns an anonymous code reference.  This will usually be faster
+than using the C<call> method above.
 
 =head1 AUTHOR
 

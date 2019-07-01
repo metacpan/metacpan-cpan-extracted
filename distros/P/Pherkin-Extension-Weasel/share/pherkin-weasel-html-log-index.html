@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <meta name="generator" content="Pherkin::Extension::Weasel [% program.version %]">
+    <title>Pherkin test report</title>
+    <style>
+      table.features {
+         border: 0;
+      }
+      table.features tr:hover {
+         background-color: gainsboro;
+      }
+      table.features td:hover {
+         cursor: pointer;
+      }
+      table.features td {
+         margin: 4px 20px;
+      }
+      table.features td.filename {
+         font-family: monospace;
+      }
+      table.features td.title {
+         font-style: italic;
+      }
+    </style>
+    <script>
+      function rc(elm, evt) {
+         window.location.href = elm.getAttribute('data-href');
+         return false;
+      }
+    </script>
+  </head>
+  <body>
+    <h1 class="index">Pherkin test report</h1>
+    <section class="index">
+      <table class="features">
+[% FOR feature IN features %]
+        <tr class="feature"
+            data-href="[% feature.log_filename | url | html %]"
+            onclick="rc(this, event)">
+          <td class="filename">[% feature.filename | html %]</td>
+          <td class="title">[% feature.title | html %]</td>
+        </tr>
+[% END -%]
+      </table>
+    </section>
+  </body>
+</html>

@@ -512,8 +512,9 @@ sub _prepare_js ( $self, $js ) {
 
     if ( $self->{devel} ) {
         $js = P->src->decompress(
-            path => '1.js',
-            data => $js,
+            path   => '1.js',
+            data   => $js,
+            filter => { jshint => 0, },
         )->{data};
     }
     else {

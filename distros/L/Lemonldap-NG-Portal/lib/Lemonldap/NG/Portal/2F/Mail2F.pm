@@ -2,7 +2,6 @@ package Lemonldap::NG::Portal::2F::Mail2F;
 
 use strict;
 use Mouse;
-use String::Random;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
   PE_ERROR
@@ -23,7 +22,7 @@ has prefix => ( is => 'ro', default => 'mail' );
 has random => (
     is      => 'rw',
     default => sub {
-        return String::Random->new;
+        return Lemonldap::NG::Common::Crypto::srandom();
     }
 );
 
@@ -87,6 +86,7 @@ sub run {
 
         # Use HTML template
         $body = $self->loadTemplate(
+            $req,
             'mail_2fcode',
             filter => $tr,
             params => \%tplPrms
@@ -110,7 +110,7 @@ sub run {
         'ext2fcheck',
         params => {
             MAIN_LOGO   => $self->conf->{portalMainLogo},
-            SKIN        => $self->conf->{portalSkin},
+            SKIN        => $self->p->getSkin($req),
             TOKEN       => $token,
             TARGET      => '/' . $self->prefix . '2fcheck',
             CHECKLOGINS => $checkLogins

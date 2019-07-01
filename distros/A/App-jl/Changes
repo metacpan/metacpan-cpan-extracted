@@ -1,5 +1,14 @@
 Revision history for Perl extension App::jl
 
+0.13    Mon Jul  1 15:03:15 JST 2019
+        - Add `sweep` option
+        - Support multiple grep/ignore options
+        - Not affect such an UserAgent value
+        - Skip a line just consists of [\t\s\r\n]
+        - Fix .travis.yml
+        - Improve POD/README
+        - Tiny refactors
+
 0.12    Sun Jun 23 14:42:37 JST 2019
         - Add `grep` and `ignore` options
         - Add `stderr` option

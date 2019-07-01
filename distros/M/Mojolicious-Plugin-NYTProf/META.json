@@ -4,13 +4,13 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-NYTProf",
    "no_index" : {
@@ -38,7 +38,7 @@
             "File::Spec::Functions" : "3.30",
             "File::Temp" : "0.22",
             "File::Which" : "1.09",
-            "Mojolicious" : "6.00",
+            "Mojolicious" : "8.00",
             "Time::HiRes" : "1.9719",
             "perl" : "5.010001"
          }
@@ -57,6 +57,6 @@
          "url" : "https://github.com/Humanstate/mojolicious-plugin-nytprof"
       }
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

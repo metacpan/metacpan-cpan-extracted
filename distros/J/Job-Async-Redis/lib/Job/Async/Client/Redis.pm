@@ -7,7 +7,7 @@ use mro;
 
 use parent qw(Job::Async::Client);
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 =head1 NAME
 
@@ -19,6 +19,10 @@ Job::Async::Client::Redis - L<Net::Async::Redis> client implementation for L<Job
 
 =cut
 
+no indirect;
+
+use Syntax::Keyword::Try;
+use JSON::MaybeUTF8 qw(:v1);
 use Ryu::Async;
 use Job::Async::Utils;
 use Net::Async::Redis 1.003;
@@ -89,20 +93,25 @@ sub queue { shift->{queue} //= 'pending' }
 sub start {
     my ($self) = @_;
     local $log->{context}{client_id} = $self->id;
-    $log->tracef("Client awaiting Redis connections");
-    Future->wait_all(
-        $self->client->connect,
-        $self->submitter->connect,
-        $self->subscriber->connect
-    )->then(sub {
-        local $log->{context}{client_id} = $self->id;
-        $log->tracef("Subscribing to notifications");
-        return $self->subscriber
-            ->subscribe('client::' . $self->id)
-            ->on_done(
-                $self->curry::weak::on_subscribed
-            );
-    })
+    try {
+        $log->tracef("Client awaiting Redis connections via %s", '' . $self->uri);
+        return Future->wait_all(
+            $self->client->connect,
+            $self->submitter->connect,
+            $self->subscriber->connect
+        )->then(sub {
+            local $log->{context}{client_id} = $self->id;
+            $log->tracef("Subscribing to notifications");
+            return $self->subscriber
+                ->subscribe('client::' . $self->id)
+                ->on_done(
+                    $self->curry::weak::on_subscribed
+                );
+        })
+    } catch {
+        $log->errorf('Failed on connection setup - %s', $@);
+        die $@;
+    }
 }
 
 =head2 on_subscribed
@@ -125,6 +134,8 @@ sub on_subscribed {
             ($job ? $client->hmget('job::' . $id, 'result')->then(sub {
                     local @{$log->{context}}{qw(client_id job_id)} = ($self->id, $id);
                     my ($result) = @{$_[0]};
+                    my $type = substr $result, 0, 1, '';
+                    $result = decode_json_utf8($result) if $type eq 'J';
                     $log->tracef('Job result %s', $result);
                     $job->done($result);
             }) : Future->done)->then(sub {
@@ -155,7 +166,7 @@ sub submit {
     my $code = sub {
         my $tx = shift;
         my $id = $job->id // die 'no job ID?';
-        (
+        return Future->needs_all(
             $tx->hmset(
                 'job::' . $id,
                 _reply_to => $self->id,
@@ -169,11 +180,12 @@ sub submit {
                     $self->queue_length
                         ->emit($count);
                 })
-        )
+        );
     };
-    ($self->use_multi
-    ? $self->submitter->multi($code)
-    : Future->needs_all($code->($self->submitter))
+    return (
+        $self->use_multi
+        ? $self->submitter->multi($code)
+        : $code->($self->submitter)
     )->then(sub { $job->future })
      ->retain
 }

@@ -1203,6 +1203,13 @@ function templates(tpl,key) {
             "id" : tpl+"s/"+key+"/"+"vhostAuthnLevel",
             "title" : "vhostAuthnLevel",
             "type" : "int"
+         },
+         {
+            "default" : -1,
+            "get" : tpl+"s/"+key+"/"+"vhostServiceTokenTTL",
+            "id" : tpl+"s/"+key+"/"+"vhostServiceTokenTTL",
+            "title" : "vhostServiceTokenTTL",
+            "type" : "int"
          }
       ],
       "help" : "configvhost.html#options",

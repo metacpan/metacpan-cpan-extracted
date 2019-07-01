@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.112   2019-06-30
+        - Option 'grid': new value 2.
+        - Adapt code to work with the updated Term::Choose::LineFold::line_fold.
+
 0.111   2019-05-09
         - Term::Choose minimum version 1.648.
         - Term::Choose::Util minimum version 0.072.

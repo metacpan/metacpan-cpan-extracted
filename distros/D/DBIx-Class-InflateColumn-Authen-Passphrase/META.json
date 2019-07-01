@@ -162,7 +162,7 @@
    "provides" : {
       "DBIx::Class::InflateColumn::Authen::Passphrase" : {
          "file" : "lib/DBIx/Class/InflateColumn/Authen/Passphrase.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -178,7 +178,7 @@
          "web" : "https://github.com/karenetheridge/DBIx-Class-InflateColumn-Authen-Passphrase"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -221,7 +221,12 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "CONTRIBUTING",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
+                  ],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
@@ -1011,7 +1016,11 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
-                     "Changes"
+                     "CONTRIBUTING",
+                     "Changes",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
                   ],
                   "allow_dirty_match" : [],
                   "changelog" : "Changes"
@@ -1034,7 +1043,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.02",
+                  "tag" : "v0.03",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

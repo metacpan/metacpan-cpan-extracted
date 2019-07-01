@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -367,8 +367,14 @@ sub readline {
         elsif ( $char == KEY_BSPACE || $char == CONTROL_H ) { $self->__bspace( $m ) }
         elsif ( $char == VK_DELETE  || $char == CONTROL_D ) { $self->__delete( $m ) }
         elsif ( $char == CONTROL_X ) {
-            $self->__reset_term( $opt, $self->{i}{pre_text_row_count} );
-            return;
+            if ( @{$m->{str}} ) {
+                my $list = [ [ $prompt, '' ] ];
+                $m = $self->__string_and_pos( $list );
+            }
+            else {
+                $self->__reset_term( $opt, $self->{i}{pre_text_row_count} );
+                return;
+            }
         }
         elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
@@ -1195,7 +1201,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.513
+Version 0.514
 
 =cut
 
@@ -1250,7 +1256,7 @@ C<Down-Arrow>: in C<fill_form> move down one row, in C<readline> move forward 10
 
 Only in C<readline>:
 
-C<Ctrl-X>: C<readline> returns nothing (undef).
+C<Ctrl-X>: clears the input. With the input puffer empty "readline" returns nothing if C<Ctrl-X> is pressed.
 
 Only in C<fill_form>:
 

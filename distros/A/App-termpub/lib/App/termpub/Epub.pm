@@ -26,6 +26,11 @@ has toc => sub {
     my $toc  = $self->root_dom->find('guide reference[type="toc"]')
       ->map( attr => 'href' )->first;
 
+    if ( !$toc ) {
+        $toc = $self->root_dom->find('manifest item[properties="nav"]')
+          ->map( attr => 'href' )->first;
+    }
+
     if ( !$toc && $self->nav_doc ) {
         $toc = $self->nav_doc->find(
             'nav[epub\:type="landmarks"] a[epub\:type="toc"]')
@@ -84,17 +89,21 @@ has chapters => sub {
     my $self = shift;
     my @idrefs =
       $self->root_dom->find('spine itemref')->map( attr => 'idref' )->each;
+
     my @chapters;
     for my $idref (@idrefs) {
-        my $item = $self->root_dom->at("manifest item#$idref");
+        my $item = $self->root_dom->at(qq{manifest item[id="$idref"]});
         next if !$item || $item->attr('media-type') ne 'application/xhtml+xml';
         my $href = $item->attr('href');
         next if !$href;
 
         my $title;
         if ( $self->nav_doc ) {
-            $title =
+            my $text_node =
               $self->nav_doc->find("a[href=$href]")->map('content')->first;
+            if ($text_node) {
+                $title = Mojo::DOM->new($text_node)->all_text;
+            }
         }
 
         push @chapters,
@@ -132,6 +141,12 @@ has root_dom => sub {
     return Mojo::DOM->new($root);
 };
 
+has language => sub {
+    my $self = shift;
+    return html_unescape(
+        eval { $self->root_dom->at('metadata')->at('dc\:language')->content } );
+};
+
 has creator => sub {
     my $self = shift;
     return html_unescape(
@@ -149,7 +164,8 @@ has title => sub {
 sub read_metadata {
     my $self = shift;
     my $content =
-      $self->archive->contents('META-INF/com.domgoergen.termpub.json') || '{}';
+      $self->archive->contents('META-INF/com.domgoergen.termpub.json')
+      || '{}';
     my $data = decode_json($content);
     if ( $data->{version} == 1 ) {
         $data->{position} = {

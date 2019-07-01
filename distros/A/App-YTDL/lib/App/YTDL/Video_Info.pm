@@ -116,7 +116,7 @@ sub linefolded_print_info {
         my $text = line_fold(
             $pr_key . $info->{$ex}{$video_id}{$key},
             $col_max,
-            '' , ' ' x $s_tab
+            { init_tab => '' , subseq_tab => ' ' x $s_tab }
         );
         $text =~ s/\R+\z//;
         push @$print_array, map { "$_\n" } split /\R+/, $text;
@@ -143,7 +143,7 @@ sub linefolded_print_info {
             my $text = line_fold(
                 $pr_key . $info->{$ex}{$video_id}{$key},
                 $col_max,
-                '' , ' ' x $s_tab
+                { init_tab => '' , subseq_tab => ' ' x $s_tab }
             );
             $text =~ s/\R+\z//;
             push @$print_array, map { "$_\n" } split /\R+/, $text;
@@ -159,7 +159,7 @@ sub linefolded_print_info {
             my $text = line_fold(
                 $pr_key . $info->{$ex}{$video_id}{$key},
                 $col_max,
-                '' , ' ' x $s_tab
+                { init_tab => '' , subseq_tab => ' ' x $s_tab }
             );
             $text =~ s/\R+\z//;
             push @$print_array, map { "$_\n" } split /\R+/, $text;

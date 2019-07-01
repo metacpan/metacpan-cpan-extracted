@@ -10,7 +10,6 @@ package Lemonldap::NG::Common::Apache::Session::Generate::SHA256;
 
 use strict;
 use Crypt::URandom;
-use Digest::SHA qw(sha256 sha256_hex sha256_base64);
 
 our $VERSION = '2.0.2';
 
@@ -22,15 +21,17 @@ sub generate {
         $length = $session->{args}->{IDLength};
     }
 
-    $session->{data}->{_session_id} = substr(
-        Digest::SHA::sha256_hex(
-            Digest::SHA::sha256_hex(
-                time() . {} . Crypt::URandom::urandom($length) . $$
-            )
-        ),
-        0, $length
-    );
-
+    eval {
+        $session->{data}->{_session_id} =
+          unpack( 'H*', Crypt::URandom::urandom( int( $length / 2 ) ) );
+    };
+    if ($@) {
+        print STDERR "Crypt::URandom::urandom failed: $@\n";
+        require Digest::SHA;
+        $session->{data}->{_session_id} =
+          substr( Digest::SHA::sha256_hex( time() . {} . rand() . $$ ),
+            0, $length );
+    }
 }
 
 sub validate {

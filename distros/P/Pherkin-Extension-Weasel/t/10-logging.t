@@ -31,7 +31,6 @@ my $ext = Pherkin::Extension::Weasel->new(
         screenshot_events => {
             'pre-step' => 0,
                 'post-step' => 0,
-                'pre-scenario' => 0,
                 'post-scenario' => 0,
         },
         sessions => {
@@ -39,10 +38,6 @@ my $ext = Pherkin::Extension::Weasel->new(
                 driver => {
                     drv_name => 'Weasel::Driver::Mock',
                     states => [
-                        {
-                            cmd => 'screenshot',
-                            content => 'pre-scenario2',
-                        },
                         {
                             cmd => 'screenshot',
                             content => 'pre-step1',
@@ -69,6 +64,10 @@ my $ext = Pherkin::Extension::Weasel->new(
                             cmd => 'tag_name', # def
                             ret => 'div',
                         },
+                        {
+                            cmd => 'screenshot',
+                            content => 'post-scenario2',
+                        },
                         ],
                 },
             },
@@ -91,8 +90,8 @@ sub _flush_and_read_log {
 mkdir $screen_dir;
 mkdir $log_dir;
 
-
 $ext->pre_execute; #_initialize_logging;
+
 ok($ext->_log, q{logger correctly created});
 ok($ext->_log->{template}, q{logger template processor correctly created});
 
@@ -100,6 +99,7 @@ my $f = Test::BDD::Cucumber::Model::Feature->new(
     name => 'feature1',
     document => Test::BDD::Cucumber::Model::Document->new(
         filename => 'feature1',
+        content => '',
         ),
     satisfaction => [
         Test::BDD::Cucumber::Model::Line->new(
@@ -128,6 +128,8 @@ my $s = Test::BDD::Cucumber::Model::Scenario->new(
 
 my $scenario_stash = {};
 $ext->pre_scenario($s, $feature_stash, $scenario_stash);
+$ext->_weasel->session->state('started');
+
 $content = _flush_and_read_log();
 
 
@@ -139,14 +141,10 @@ $s = Test::BDD::Cucumber::Model::Scenario->new(
     tags => [ qw| weasel | ],
     );
 
-$ext->screenshot_on('pre-scenario', 1);
 $ext->pre_scenario($s, $feature_stash, $scenario_stash);
+$ext->_weasel->session->state('started');
+
 $content = _flush_and_read_log();
-
-
-like($content, qr!<img src="[a-z0-9]+-scenario-pre-\d+\.png"!,
-     q{Pre-scenario screenshot correctly added});
-
 
 # simple step; no step data or data table
 
@@ -173,7 +171,7 @@ $ext->pre_step($f, $context);
 $content = _flush_and_read_log();
 
 
-like($content, qr!<img src="[a-z0-9]+-step-pre-\d+\.png"!,
+like($content, qr!<img src="[a-z0-9./]+-step-pre-\d+\.png"!,
      q{Pre-step screenshot correctly added});
 like($content, qr!<td>Given step 1</td>!,
      q{Step 1 correctly included in log output});
@@ -187,10 +185,20 @@ like($content, qr!<td>found 2 elements for //div!,
 
 
 $ext->post_step($f, $context, 1); # failed step
+
+$ext->screenshot_on('post-scenario', 1);
+$ext->post_scenario($s, $feature_stash, $scenario_stash);
+
 $content = _flush_and_read_log();
 
+# it doesn't make sense to screenshot pre-scenario: we always start
+# a brand new session...
+like($content, qr!<img src="[a-z0-9./]+-scenario-post-\d+\.png"!,
+     q{Pre-scenario screenshot correctly added});
+
+
 # early versions (at least Pherkin <= 0.56) repoort "<missing>" due to a bug
-like($content, qr!<td>(?:FAIL|&lt;missing&gt;)</td>!,
+like($content, qr!<td class="[a-zA-Z0-9\s]+">(?:FAIL|&lt;missing&gt;)</td>!,
      q{Step status correctly included in the logs});
 
 

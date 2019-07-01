@@ -1,5 +1,15 @@
 Revision history for PDF-Cairo
 
+1.05    2019/06/30 13:35 PDT
+        RT 129786: support older versions of pdftocairo (remove -antialias)
+        RT 129789: bail out of tests if libcairo < 1.10.0 (recording support)
+        RT 129790: croak on bitmap fonts, force tests to use known good font
+        bugfix: print() horizontal centering now accounts for x_bearing
+        bugfix: macos2fc.pl now records corrected filename in README.txt
+        bugfix: Layout::ink() now returns a PDF::Cairo::Box
+        new text methods autosize() and extents()
+        new example hello.pl
+
 1.04    2019/06/08 19:00 PDT
         bugfix: correct height/width methods for recording()/loadsvg()
         bugfix: use correct color mapping in print()/_api2_print()

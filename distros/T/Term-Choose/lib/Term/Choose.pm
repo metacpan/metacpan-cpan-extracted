@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.648';
+our $VERSION = '1.649';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -288,7 +288,7 @@ sub __choose {
     if ( exists $ENV{TC_RESET_AUTO_UP} ) {
         $ENV{TC_RESET_AUTO_UP} = 0;
     }
-    $self->__init_term();
+    $self->__init_term(); #
     ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
     $self->__write_first_screen();
     my $fast_page = 10;
@@ -324,15 +324,17 @@ sub __choose {
         next GET_KEY if $key == NEXT_get_key;
         next GET_KEY if $key == KEY_Tilde;
         if ( exists $ENV{TC_RESET_AUTO_UP} ) {
-            $ENV{TC_RESET_AUTO_UP} = 1 if $key != KEY_ENTER;
+            if ( $key != KEY_ENTER && $key != 0x0a ) {
+                $ENV{TC_RESET_AUTO_UP} = 1;
+            }
         }
         my $page_step = 1;
         if ( $key == VK_INSERT ) {
-            $page_step = $fast_page if $self->{p_begin} - $fast_page * $self->{avail_height} >= 0;
+            $page_step = $fast_page if $self->{first_page_row} - $fast_page * $self->{avail_height} >= 0;
             $key = VK_PAGE_UP;
         }
         elsif ( $key == VK_DELETE ) {
-            $page_step = $fast_page if $self->{p_end} + $fast_page * $self->{avail_height} <= $#{$self->{rc2idx}};
+            $page_step = $fast_page if $self->{last_page_row} + $fast_page * $self->{avail_height} <= $#{$self->{rc2idx}};
             $key = VK_PAGE_DOWN;
         }
         if ( $saved_pos && $key != VK_PAGE_UP && $key != CONTROL_B && $key != VK_PAGE_DOWN && $key != CONTROL_F ) {
@@ -361,14 +363,14 @@ sub __choose {
             }
             else {
                 $self->{pos}[ROW]++;
-                if ( $self->{pos}[ROW] <= $self->{p_end} ) {
+                if ( $self->{pos}[ROW] <= $self->{last_page_row} ) {
                     $self->__wr_cell( $self->{pos}[ROW] - 1, $self->{pos}[COL] );
                     $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                 }
                 else {
-                    $self->{p_begin} = $self->{p_end} + 1;
-                    $self->{p_end}   = $self->{p_end} + $self->{avail_height};
-                    $self->{p_end}   = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
+                    $self->{first_page_row} = $self->{last_page_row} + 1;
+                    $self->{last_page_row}  = $self->{last_page_row} + $self->{avail_height};
+                    $self->{last_page_row}  = $#{$self->{rc2idx}} if $self->{last_page_row} > $#{$self->{rc2idx}};
                     $self->__wr_screen();
                 }
             }
@@ -379,14 +381,14 @@ sub __choose {
             }
             else {
                 $self->{pos}[ROW]--;
-                if ( $self->{pos}[ROW] >= $self->{p_begin} ) {
+                if ( $self->{pos}[ROW] >= $self->{first_page_row} ) {
                     $self->__wr_cell( $self->{pos}[ROW] + 1, $self->{pos}[COL] );
                     $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                 }
                 else {
-                    $self->{p_end}   = $self->{p_begin} - 1;
-                    $self->{p_begin} = $self->{p_begin} - $self->{avail_height};
-                    $self->{p_begin} = 0 if $self->{p_begin} < 0;
+                    $self->{last_page_row}  = $self->{first_page_row} - 1;
+                    $self->{first_page_row} = $self->{first_page_row} - $self->{avail_height};
+                    $self->{first_page_row} = 0 if $self->{first_page_row} < 0;
                     $self->__wr_screen();
                 }
             }
@@ -405,15 +407,15 @@ sub __choose {
                 }
                 else {
                     $self->{pos}[ROW]++;
-                    if ( $self->{pos}[ROW] <= $self->{p_end} ) {
+                    if ( $self->{pos}[ROW] <= $self->{last_page_row} ) {
                         $self->{pos}[COL] = 0;
                         $self->__wr_cell( $self->{pos}[ROW] - 1, $#{$self->{rc2idx}[$self->{pos}[ROW] - 1]} );
                         $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                     }
                     else {
-                        $self->{p_begin} = $self->{p_end} + 1;
-                        $self->{p_end}   = $self->{p_end} + $self->{avail_height};
-                        $self->{p_end}   = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
+                        $self->{first_page_row} = $self->{last_page_row} + 1;
+                        $self->{last_page_row}  = $self->{last_page_row} + $self->{avail_height};
+                        $self->{last_page_row}  = $#{$self->{rc2idx}} if $self->{last_page_row} > $#{$self->{rc2idx}};
                         $self->{pos}[COL] = 0;
                         $self->__wr_screen();
                     }
@@ -432,15 +434,15 @@ sub __choose {
                 }
                 else {
                     $self->{pos}[ROW]--;
-                    if ( $self->{pos}[ROW] >= $self->{p_begin} ) {
+                    if ( $self->{pos}[ROW] >= $self->{first_page_row} ) {
                         $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
                         $self->__wr_cell( $self->{pos}[ROW] + 1, 0 );
                         $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                     }
                     else {
-                        $self->{p_end}   = $self->{p_begin} - 1;
-                        $self->{p_begin} = $self->{p_begin} - $self->{avail_height};
-                        $self->{p_begin} = 0 if $self->{p_begin} < 0;
+                        $self->{last_page_row}  = $self->{first_page_row} - 1;
+                        $self->{first_page_row} = $self->{first_page_row} - $self->{avail_height};
+                        $self->{first_page_row} = 0 if $self->{first_page_row} < 0;
                         $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
                         $self->__wr_screen();
                     }
@@ -468,14 +470,14 @@ sub __choose {
             }
         }
         elsif ( $key == VK_PAGE_UP || $key == CONTROL_B ) {
-            if ( $self->{p_begin} <= 0 ) {
+            if ( $self->{first_page_row} <= 0 ) {
                 $self->{plugin}->__beep();
             }
             else {
-                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - $page_step );
-                $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
+                $self->{first_page_row} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - $page_step );
+                $self->{last_page_row}  = $self->{first_page_row} + $self->{avail_height} - 1;
                 if ( $saved_pos ) {
-                    $self->{pos}[ROW] = $saved_pos->[ROW] + $self->{p_begin};
+                    $self->{pos}[ROW] = $saved_pos->[ROW] + $self->{first_page_row};
                     $self->{pos}[COL] = $saved_pos->[COL];
                     $saved_pos = undef;
                 }
@@ -486,14 +488,14 @@ sub __choose {
             }
         }
         elsif ( $key == VK_PAGE_DOWN || $key == CONTROL_F ) {
-            if ( $self->{p_end} >= $#{$self->{rc2idx}} ) {
+            if ( $self->{last_page_row} >= $#{$self->{rc2idx}} ) {
                 $self->{plugin}->__beep();
             }
             else {
-                my $backup_p_begin = $self->{p_begin};
-                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) + $page_step );
-                $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
-                $self->{p_end}   = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
+                my $backup_p_begin = $self->{first_page_row};
+                $self->{first_page_row} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) + $page_step );
+                $self->{last_page_row}  = $self->{first_page_row} + $self->{avail_height} - 1;
+                $self->{last_page_row}  = $#{$self->{rc2idx}} if $self->{last_page_row} > $#{$self->{rc2idx}};
                 if (   $self->{pos}[ROW] + $self->{avail_height} > $#{$self->{rc2idx}}
                     || $self->{pos}[COL] > $#{$self->{rc2idx}[$self->{pos}[ROW] + $self->{avail_height}]}
                 ) {
@@ -516,9 +518,9 @@ sub __choose {
             else {
                 $self->{pos}[ROW] = 0;
                 $self->{pos}[COL] = 0;
-                $self->{p_begin} = 0;
-                $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
-                $self->{p_end}   = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
+                $self->{first_page_row} = 0;
+                $self->{last_page_row}  = $self->{first_page_row} + $self->{avail_height} - 1;
+                $self->{last_page_row}  = $#{$self->{rc2idx}} if $self->{last_page_row} > $#{$self->{rc2idx}};
                 $self->__wr_screen();
             }
         }
@@ -530,15 +532,15 @@ sub __choose {
                     $self->{plugin}->__beep();
                 }
                 else {
-                    $self->{p_begin} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
+                    $self->{first_page_row} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
                     $self->{pos}[ROW] = $#{$self->{rc2idx}} - 1;
                     $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
-                    if ( $self->{p_begin} == $#{$self->{rc2idx}} ) {
-                        $self->{p_begin} = $self->{p_begin} - $self->{avail_height};
-                        $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
+                    if ( $self->{first_page_row} == $#{$self->{rc2idx}} ) {
+                        $self->{first_page_row} = $self->{first_page_row} - $self->{avail_height};
+                        $self->{last_page_row}  = $self->{first_page_row} + $self->{avail_height} - 1;
                     }
                     else {
-                        $self->{p_end}   = $#{$self->{rc2idx}};
+                        $self->{last_page_row}  = $#{$self->{rc2idx}};
                     }
                     $self->__wr_screen();
                 }
@@ -550,8 +552,8 @@ sub __choose {
                     $self->{plugin}->__beep();
                 }
                 else {
-                    $self->{p_begin} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
-                    $self->{p_end}   = $#{$self->{rc2idx}};
+                    $self->{first_page_row} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
+                    $self->{last_page_row}  = $#{$self->{rc2idx}};
                     $self->{pos}[ROW] = $#{$self->{rc2idx}};
                     $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
                     $self->__wr_screen();
@@ -663,20 +665,14 @@ sub __prepare_promptline {
     }
     my $init   = $self->{lf}[0] ? $self->{lf}[0] : 0;
     my $subseq = $self->{lf}[1] ? $self->{lf}[1] : 0;
-    my @color;
-    if ( $self->{color} ) {
-        $prompt =~ s/\x{feff}//g;
-        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
-    }
-    $self->{prompt_copy} = line_fold( $prompt, $self->{avail_width}, ' ' x $init, ' ' x $subseq );
+    $self->{prompt_copy} = line_fold(
+        $prompt, $self->{avail_width},
+        { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color} }
+    );
     $self->{prompt_copy} .= "\n\r";
     # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
     #                 don't translate newline to carriage return-newline
     $self->{count_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
-    if ( @color ) {
-        $self->{prompt_copy} =~ s/\x{feff}/shift @color/ge;
-        $self->{prompt_copy} .= RESET;
-    }
 }
 
 
@@ -713,9 +709,9 @@ sub __set_default_cell {
             }
         }
     }
-    $self->{p_begin} = $self->{avail_height} * int( $self->{pos}[ROW] / $self->{avail_height} );
-    $self->{p_end} = $self->{p_begin} + $self->{avail_height} - 1;
-    $self->{p_end} = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
+    $self->{first_page_row} = $self->{avail_height} * int( $self->{pos}[ROW] / $self->{avail_height} );
+    $self->{last_page_row} = $self->{first_page_row} + $self->{avail_height} - 1;
+    $self->{last_page_row} = $#{$self->{rc2idx}} if $self->{last_page_row} > $#{$self->{rc2idx}};
 }
 
 
@@ -756,8 +752,8 @@ sub __write_first_screen {
         $self->__prepare_page_number();
     }
     $self->{avail_height_idx} = $self->{avail_height} - 1;
-    $self->{p_begin} = 0;
-    $self->{p_end}   = $self->{avail_height_idx} > $#{$self->{rc2idx}} ? $#{$self->{rc2idx}} : $self->{avail_height_idx};
+    $self->{first_page_row} = 0;
+    $self->{last_page_row}  = $self->{avail_height_idx} > $#{$self->{rc2idx}} ? $#{$self->{rc2idx}} : $self->{avail_height_idx};
     $self->{i_row}   = 0;
     $self->{i_col}   = 0;
     $self->{pos}     = [ 0, 0 ];
@@ -791,11 +787,11 @@ sub __wr_screen {
     print "\r" . CLEAR_TO_END_OF_SCREEN;
     if ( $self->{pp_row} ) {
         $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
-        my $pp_line = sprintf $self->{footer_fmt}, int( $self->{p_begin} / $self->{avail_height} ) + 1;
+        my $pp_line = sprintf $self->{footer_fmt}, int( $self->{first_page_row} / $self->{avail_height} ) + 1;
         print $pp_line;
         $self->{i_col} += length $pp_line;
      }
-    for my $row ( $self->{p_begin} .. $self->{p_end} ) {
+    for my $row ( $self->{first_page_row} .. $self->{last_page_row} ) {
         for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
             $self->__wr_cell( $row, $col );
         }
@@ -810,7 +806,7 @@ sub __wr_cell {
     my $emphasised = ( $self->{marked}[$row][$col] ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
     my $idx = $self->{rc2idx}[$row][$col];
     if ( $self->{ll} ) {
-        $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width_plus} );
+        $self->__goto( $row - $self->{first_page_row}, $col * $self->{col_width_plus} );
         $self->{i_col} = $self->{i_col} + $self->{col_width};
         if ( $self->{color} ) {
             my $str = $self->{list}[$idx];
@@ -846,12 +842,12 @@ sub __wr_cell {
                     $x += $self->{length}[$i] + $self->{pad};
                 }
             }
-            $self->__goto( $row - $self->{p_begin}, $x );
+            $self->__goto( $row - $self->{first_page_row}, $x );
             $self->{i_col} = $self->{i_col} + $self->{length}[$idx];
             $str = $self->{list}[$idx];
         }
         else {
-            $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width_plus} );
+            $self->__goto( $row - $self->{first_page_row}, $col * $self->{col_width_plus} );
             $self->{i_col} = $self->{i_col} + $self->{col_width};
             $str = $self->__pad_str_to_colwidth( $idx );
         }
@@ -923,23 +919,23 @@ sub __goto {
     # up, down, left, right: 1 or greater
     if ( $newrow > $self->{i_row} ) {
         print "\r\n" x ( $newrow - $self->{i_row} );
-        $self->{i_row} = $self->{i_row} + ( $newrow - $self->{i_row} );
+        $self->{i_row} = $newrow;
         $self->{i_col} = 0;
     }
     elsif ( $newrow < $self->{i_row} ) {
         print "\e[" . ( $self->{i_row} - $newrow ) . "A";
         #print UP x ( $self->{i_row} - $newrow );
-        $self->{i_row} = $self->{i_row} - ( $self->{i_row} - $newrow );
+        $self->{i_row} = $newrow;
     }
     if ( $newcol > $self->{i_col} ) {
         print "\e[" . ( $newcol - $self->{i_col} ) . "C";
         #print RIGHT x ( $newcol - $self->{i_col} );
-        $self->{i_col} = $self->{i_col} + ( $newcol - $self->{i_col} );
+        $self->{i_col} = $newcol;
     }
     elsif ( $newcol < $self->{i_col} ) {
         print "\e[" . ( $self->{i_col} - $newcol ) . "D";
         #print LEFT x ( $self->{i_col} - $newcol );
-        $self->{i_col} = $self->{i_col} - ( $self->{i_col} - $newcol );
+        $self->{i_col} = $newcol;
     }
 }
 
@@ -1123,7 +1119,7 @@ sub __mouse_info_to_key {
     }
     my $matched_col;
     my $end_last_col = 0;
-    my $row = $mouse_row + $self->{p_begin};
+    my $row = $mouse_row + $self->{first_page_row};
 
     COL: for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
         my $end_this_col;
@@ -1185,7 +1181,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.648
+Version 1.649
 
 =cut
 

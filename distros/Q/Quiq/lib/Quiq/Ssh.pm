@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
@@ -29,6 +29,26 @@ Ein Objekt der Klasse repräsentiert eine SSH-Verbindung zu einem Host.
 Über die Verbindung können Shell-Kommandos ausgeführt werden. Die
 Klasse ist ein Wrapper fr die Klasse Net::SSH::Perl, die das
 SSH Netzprotokoll direkt spricht.
+
+=head2 Installation
+
+Sollte es bei der Installation von Net::SSH::Perl in
+Crypt::Curve25519 zu dem Fehler kommen
+
+    curve25519-donna-c64.c:99:1: error: conflicting types for ‘fmul’
+     fmul(felem output, const felem in2, const felem in) {
+     ^~~~
+    In file included from /home/fs2/sys/opt/perlbrew/perls/perl-5.30.0/lib/5.30.0/x86_64-linux/CORE/perl.h:2068,
+                     from Curve25519.xs:3:
+    /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:30:20: note: previous declaration of ‘fmul’ was here
+     __MATHCALL_NARROW (__MATHCALL_NAME (mul), __MATHCALL_REDIR_NAME (mul), 2);
+                ^~~~~~~~~~~~~~~
+
+kann dieser mit
+
+    $ grep -rl "fmul" ./ | xargs sed -i 's/fmul/fixedvar/g'
+
+behoben werden. Siehe: L<https://github.com/ajgb/crypt-curve25519/issues/9#issuecomment-447845725>
 
 =head1 EXAMPLE
 
@@ -224,7 +244,7 @@ sub exec {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

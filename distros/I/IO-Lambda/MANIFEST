@@ -3,6 +3,7 @@ MANIFEST
 Changes
 Makefile.PL
 lib/IO/Lambda.pm
+lib/IO/Lambda/HTTP.pm
 lib/IO/Lambda/HTTP/HTTPS.pm
 lib/IO/Lambda/HTTP/Server.pm
 lib/IO/Lambda/HTTP/Client.pm

@@ -35,7 +35,6 @@ lives_ok ( sub {
 }, 'pl_file_ok imported correctly');
 
 # finally use the "all" tag to import all methods and check if it worked
-diag 'Use :all import tag and check if methods got imported correctly';
 Test::Compile->import(':all');
 can_ok(__PACKAGE__, @EXPORTED,@NOTEXPORTED);
 done_testing();

@@ -81,22 +81,27 @@ sub is_file_contents {
         return;
     }
 
-    # Otherwise, we show a diff, but only if we have IPC::System::Simple.
-    eval { require IPC::System::Simple };
+    # Otherwise, we show a diff, but only if we have IPC::System::Simple and
+    # diff succeeds.  Otherwise, we fall back on showing the full expected and
+    # seen output.
+    eval {
+        require IPC::System::Simple;
+
+        my $tmp     = File::Temp->new();
+        my $tmpname = $tmp->filename;
+        print {$tmp} $got or BAIL_OUT("Cannot write to $tmpname: $!\n");
+        my @command = ('diff', '-u', $expected, $tmpname);
+        my $diff    = IPC::System::Simple::capturex([0 .. 1], @command);
+        diag($diff);
+    };
     if ($@) {
-        ok(0, $message);
-        return;
+        diag('Expected:');
+        diag($expected);
+        diag('Seen:');
+        diag($data);
     }
 
-    # They're not equal.  Write out what we got so that we can run diff.
-    my $tmp     = File::Temp->new();
-    my $tmpname = $tmp->filename;
-    print {$tmp} $got or BAIL_OUT("Cannot write to $tmpname: $!\n");
-    my @command = ('diff', '-u', $expected, $tmpname);
-    my $diff    = IPC::System::Simple::capturex([0 .. 1], @command);
-    diag($diff);
-
-    # Remove the temporary file and report failure.
+    # Report failure.
     ok(0, $message);
     return;
 }
@@ -274,7 +279,7 @@ Russ Allbery <eagle@eyrie.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016, 2018 Russ Allbery <eagle@eyrie.org>
+Copyright 2016, 2018-2019 Russ Allbery <eagle@eyrie.org>
 
 Copyright 2013-2014 The Board of Trustees of the Leland Stanford Junior
 University

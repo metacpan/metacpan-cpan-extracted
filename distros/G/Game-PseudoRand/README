@@ -1,0 +1,19 @@
+Game::PseudoRand - pseudo random distribution functions
+
+this module can be installed using cpanm:
+
+    cpanm Game::PseudoRand
+
+
+run perldoc(1) on Game::PseudoRand for documentation
+
+
+to install from source code, with dependencies:
+
+    git clone https://github.com/thrig/Game-PseudoRand
+    cd Game-PseudoRand
+    cpanm .
+
+or the manual old fashioned way:
+
+    perl Makefile.PL && make && make test && make install

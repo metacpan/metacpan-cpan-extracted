@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 use Quiq::Option;
 
@@ -48,33 +48,33 @@ Der Code
 
 produziert
 
-    +--A
+    A
+    |
+    +--B
+    |  |
+    |  +--C
+    |  |  |
+    |  |  +--D
+    |  |
+    |  +--E
+    |  |
+    |  +--F
+    |     |
+    |     +--G
+    |        |
+    |        +--H
+    |
+    +--I
+    |
+    +--J
+    |  |
+    |  +--K
+    |  |
+    |  +--L
+    |
+    +--M
        |
-       +--B
-       |  |
-       |  +--C
-       |  |  |
-       |  |  +--D
-       |  |
-       |  +--E
-       |  |
-       |  +--F
-       |     |
-       |     +--G
-       |        |
-       |        +--H
-       |
-       +--I
-       |
-       +--J
-       |  |
-       |  +--K
-       |  |
-       |  +--L
-       |
-       +--M
-          |
-          +--N
+       +--N
 
 =head1 DESCRIPTION
 
@@ -519,7 +519,7 @@ sub asText {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

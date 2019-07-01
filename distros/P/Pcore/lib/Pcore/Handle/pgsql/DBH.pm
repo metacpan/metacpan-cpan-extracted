@@ -4,7 +4,6 @@ use Pcore -class, -res, -const;
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Handle::pgsql qw[:ALL];
 use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
-use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Digest qw[md5_hex];
 use Pcore::Util::Data qw[from_json];
 
@@ -239,7 +238,7 @@ sub _finish_sth ($self) {
         $cb->( $sth, res [ 500, $sth->{error} ] );
     }
     else {
-        $cb->( $sth, res 200, $sth->{tag}->%* );
+        $cb->( $sth, res 200, rows => $sth->{rows_tag} );
     }
 
     return;
@@ -501,39 +500,8 @@ sub _ON_COMMAND_COMPLETE ( $self, $dataref ) {
     # remove trailing "\x00"
     chop $dataref->$*;
 
-    my @val = split /\s/sm, $dataref->$*;
-
-    my $tag;
-
-    if ( looks_like_number $val[-1] ) {
-        if ( $val[0] eq 'INSERT' ) {
-            $tag = {
-                tag  => $val[0],
-                oid  => $val[1],
-                rows => $val[2],
-            };
-        }
-        else {
-            my $rows = pop @val;
-
-            $tag = {
-                tag  => join( ' ', @val ),
-                rows => $rows,
-            };
-        }
-    }
-    else {
-        $tag = {
-            tag  => join( ' ', @val ),
-            rows => 0,
-        };
-    }
-
-    if ( exists $self->{sth}->{tag} ) {
-        $self->{sth}->{tag}->{rows} += $tag->{rows};
-    }
-    else {
-        $self->{sth}->{tag} = $tag;
+    if ( $dataref->$* =~ /\s(\d+)\z/sm ) {
+        $self->{sth}->{rows_tag} = $1;
     }
 
     return;
@@ -612,10 +580,12 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
     # query is plain text
     else {
 
-        # convert "?" placeholders to postgres "$1" style
-        my $i;
+        # convert "?" placeholders to the "$1" style
+        if ( defined $bind ) {
+            my $i;
 
-        $query =~ s/[?]/'$' . ++$i/smge;
+            $query =~ s/[?]/'$' . ++$i/smge;
+        }
 
         utf8::encode $query if utf8::is_utf8 $query;
     }
@@ -650,7 +620,16 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
 
             for my $param (@bind) {
                 if ( is_blessed_arrayref $param) {
-                    if ( $param->[0] == $SQL_BYTEA ) {
+
+                    # value is not defined
+                    if ( !defined $param->[1] ) {
+                        $param_format_codes .= "\x00\x00";    # text
+
+                        $param = undef;
+                    }
+
+                    # BLOB
+                    elsif ( $param->[0] == $SQL_BYTEA ) {
                         $param_format_codes .= "\x00\x01";    # binary
 
                         $param = $param->[1];
@@ -669,11 +648,15 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
                         }
                     }
                 }
+
+                # array
                 elsif ( is_plain_arrayref $param) {
                     $param_format_codes .= "\x00\x00";    # text
 
                     $param = $self->encode_array($param)->$*;
                 }
+
+                # text by default
                 else {
                     $param_format_codes .= "\x00\x00";    # text
                 }
@@ -782,7 +765,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
     }
 }
 
-# key_field => [0, 1, 'id'], key_field => 'id'
+# key_col => [0, 1, 'id'], key_col => 'id'
 sub selectall ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
@@ -792,7 +775,7 @@ sub selectall ( $self, $query, @args ) {
         if ( $res && defined $sth->{rows} ) {
             my @cols_names = map { $_->[0] } $sth->{cols}->@*;
 
-            if ( defined $args->{key_field} ) {
+            if ( defined $args->{key_col} ) {
                 my $name2idx;
 
                 # create columns index
@@ -801,32 +784,32 @@ sub selectall ( $self, $query, @args ) {
                 }
 
                 my $num_of_fields = $sth->{cols}->@*;
-                my @key_field_idx;
+                my @key_col_idx;
 
-                for my $key_field ( is_plain_arrayref $args->{key_field} ? $args->{key_field}->@* : $args->{key_field} ) {
-                    if ( looks_like_number $key_field) {
-                        if ( $key_field + 1 > $num_of_fields ) {
-                            my $res = res [ 400, qq[Invalid field index "$key_field"] ];
+                for my $key_col ( is_plain_arrayref $args->{key_col} ? $args->{key_col}->@* : $args->{key_col} ) {
+                    if ( looks_like_number $key_col) {
+                        if ( $key_col + 1 > $num_of_fields ) {
+                            my $res = res [ 400, qq[Invalid field index "$key_col"] ];
 
                             warn $res;
 
                             return $cb ? $cb->($res) : $res;
                         }
 
-                        push @key_field_idx, $key_field;
+                        push @key_col_idx, $key_col;
                     }
                     else {
-                        my $idx = $name2idx->{$key_field};
+                        my $idx = $name2idx->{$key_col};
 
                         if ( !defined $idx ) {
-                            my $res = res [ 400, qq[DBI: Invalid field name "$key_field"] ];
+                            my $res = res [ 400, qq[DBI: Invalid field name "$key_col"] ];
 
                             warn $res;
 
                             return $cb ? $cb->($res) : $res;
                         }
 
-                        push @key_field_idx, $idx;
+                        push @key_col_idx, $idx;
                     }
                 }
 
@@ -835,7 +818,7 @@ sub selectall ( $self, $query, @args ) {
                 for my $row ( $sth->{rows}->@* ) {
                     my $ref = $data;
 
-                    $ref = $ref->{ $row->[$_] // $EMPTY } //= {} for @key_field_idx;
+                    $ref = $ref->{ $row->[$_] // $EMPTY } //= {} for @key_col_idx;
 
                     $ref->@{@cols_names} = $row->@*;
                 }
@@ -1109,15 +1092,13 @@ sub encode_json ( $self, $var ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 571                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (29)                  |
+## |    3 | 539                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (31)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 661, 990             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 640, 973             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 520, 527             | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 782, 973             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 799, 990             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 838                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 821                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -1133,6 +1114,8 @@ Pcore::Handle::pgsql::DBH
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+->selectrow method don't returns number of rows.
 
 =head1 ATTRIBUTES
 

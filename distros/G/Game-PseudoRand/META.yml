@@ -1,0 +1,30 @@
+---
+abstract: 'pseudo random distribution functions'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Game-PseudoRand
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  perl: '5.010000'
+  strict: '0'
+resources:
+  repository: https://github.com/thrig/Game-PseudoRand
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

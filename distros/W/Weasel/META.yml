@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/perl-weasel/weasel/issues
   homepage: https://weasel.pm/
   repository: https://github.com/perl-weasel/weasel.git
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'YAML::Tiny version 1.70'

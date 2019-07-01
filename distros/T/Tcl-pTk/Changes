@@ -1,5 +1,15 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.02:  2019-06-29
+
+ * Support focusNext and focusPrev methods as used with Perl/Tk
+
+Release 1.01_01:  2019-06-24
+
+ * Makefile.PL: fix some of the issues reported by CPAN indexer and CPANTS
+   - Specify minimum Perl version for ExtUtils::MakeMaker
+   - Don't index unauthorized package MainWindow to avoid permission issue
+
 Release 1.01:  2019-06-23
 
  * More adjustments for macOS Aqua dark mode (Tk 8.6.10 or later)

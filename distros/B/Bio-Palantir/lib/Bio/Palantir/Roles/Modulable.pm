@@ -1,16 +1,15 @@
 package Bio::Palantir::Roles::Modulable;
-# ABSTRACT: Modulable Moose role for Module and ModulesPlus object construction
-$Bio::Palantir::Roles::Modulable::VERSION = '0.191620';
+# ABSTRACT: Modulable Moose role for Module object construction
+$Bio::Palantir::Roles::Modulable::VERSION = '0.191800';
 use Moose::Role;
 
 use autodie;
 use feature qw(say); 
 
-use Smart::Comments;
-
 use aliased 'Bio::Palantir::Roles::Modulable::Module';
 
 requires 'genes';
+
 
 has 'modules' => (
     traits   => ['Array'],
@@ -33,7 +32,7 @@ sub _build_modules {
     my $self = shift;
  
     # process other cluster types
-    unless ($self->type =~ m/nrps | pks/xms) {
+    unless ($self->type =~ m/nrps | pks/xmsi) {
         return [];
     }
 
@@ -162,11 +161,11 @@ __END__
 
 =head1 NAME
 
-Bio::Palantir::Roles::Modulable - Modulable Moose role for Module and ModulesPlus object construction
+Bio::Palantir::Roles::Modulable - Modulable Moose role for Module object construction
 
 =head1 VERSION
 
-version 0.191620
+version 0.191800
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@
       "Erik Colson <eco@ecocode.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -41,8 +41,10 @@
             "CGI" : "0",
             "Carp" : "0",
             "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
             "Encode" : "0",
             "Exporter" : "0",
+            "File::Temp" : "0",
             "HTML::Parser" : "0",
             "HTML::TableExtract" : "0",
             "HTML::TokeParser" : "0",
@@ -52,11 +54,15 @@
             "HTTP::Request::Common" : "0",
             "HTTP::Status" : "0",
             "JSON" : "0",
+            "JSON::Parse" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::Simple" : "0",
             "LWP::UserAgent" : "0",
             "Mozilla::CA" : "0",
             "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "String::Util" : "0",
+            "Text::Template" : "0",
             "Time::Piece" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
@@ -73,7 +79,9 @@
          "requires" : {
             "Data::Dumper" : "0",
             "File::Spec" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "feature" : "0"
          }
       }
    },
@@ -89,7 +97,8 @@
          "web" : "https://github.com/finance-quote/finance-quote"
       }
    },
-   "version" : "1.47",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.49",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

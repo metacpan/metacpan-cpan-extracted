@@ -26,9 +26,9 @@ translatePage = (lang) ->
 			txt = translate args.shift()
 			for v in args
 				txt = txt.replace /%[sd]/, v
-			$(this).text txt
+			$(this).html txt
 		$("[trmsg]").each ->
-			$(this).text translate "PE#{$(this).attr 'trmsg'}"
+			$(this).html translate "PE#{$(this).attr 'trmsg'}"
 			msg = translate "PE#{$(this).attr 'trmsg'}"
 			if msg.match /_hide_/
 				$(this).parent().hide()

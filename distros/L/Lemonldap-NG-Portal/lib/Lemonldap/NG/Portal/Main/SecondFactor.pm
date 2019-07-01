@@ -37,6 +37,14 @@ sub init {
     my ($self) = @_;
     unless ( $self->noRoute ) {
         $self->logger->debug( 'Adding ' . $self->prefix . '2fcheck routes' );
+        $self->addAuthRoute(
+            $self->prefix . '2fcheck' => '_verify',
+            ['POST']
+        );
+        $self->addAuthRoute(
+            $self->prefix . '2fcheck' => '_redirect',
+            ['GET']
+        );
         $self->addUnauthRoute(
             $self->prefix . '2fcheck' => '_verify',
             ['POST']

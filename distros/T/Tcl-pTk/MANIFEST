@@ -289,6 +289,7 @@ t/entryValidate.t
 t/fileevent.t
 t/fileevent2.t
 t/fileeventSubProcesses
+t/focusMethods.t
 t/folder.xpm
 t/font.t
 t/font2.t

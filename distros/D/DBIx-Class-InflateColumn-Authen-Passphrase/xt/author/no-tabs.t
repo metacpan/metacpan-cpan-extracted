@@ -12,6 +12,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/basic.t',
     't/lib/TestSchema.pm',
+    't/lib/TestSchema.sql',
     't/lib/TestSchema/Result/Foo.pm',
     'xt/author/00-compile.t',
     'xt/author/changes_has_content.t',

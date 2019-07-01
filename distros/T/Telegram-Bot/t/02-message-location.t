@@ -1,5 +1,4 @@
 use Test::More;
-use Mojo::JSON qw/encode_json/;
 
 my $msg = {
           'date' => 1471259722,
@@ -23,10 +22,10 @@ my $msg = {
                   }
         };
 
-use_ok ('Telegram::Bot::Message');
+use_ok ('Telegram::Bot::Object::Message');
 
-my $json1 = encode_json($msg);
-my $msg1 = Telegram::Bot::Message->create_from_json($json1);
+my $fake_brain = {}; bless $fake_brain, 'Telegram::Bot::Brain';
+my $msg1 = Telegram::Bot::Object::Message->create_from_hash($msg, $fake_brain);
 
 ok (defined $msg1->location);
 is ($msg1->location->latitude, -34.8);

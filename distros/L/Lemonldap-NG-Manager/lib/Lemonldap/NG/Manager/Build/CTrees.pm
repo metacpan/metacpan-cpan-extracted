@@ -30,6 +30,7 @@ sub cTrees {
                     'vhostPort',        'vhostHttps',
                     'vhostMaintenance', 'vhostAliases',
                     'vhostType',        'vhostAuthnLevel',
+                    'vhostServiceTokenTTL'
                 ],
             },
         ],

@@ -1,9 +1,7 @@
 use strict;
 use warnings;
 package Set::CartesianProduct::Lazy;
-{
-  $Set::CartesianProduct::Lazy::VERSION = '0.002';
-}
+$Set::CartesianProduct::Lazy::VERSION = '0.004';
 {
   $Set::CartesianProduct::Lazy::DIST = 'Set-CartesianProduct-Lazy';
 }
@@ -89,6 +87,7 @@ sub last_idx { return shift->count - 1 }
 
 1 && q{a set in time saves nine};
 
+__END__
 
 =pod
 
@@ -98,7 +97,7 @@ Set::CartesianProduct::Lazy - lazily calculate the tuples of a cartesian-product
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -255,7 +254,7 @@ Which I feel is more readable.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-set-cartesianproduct-lazy at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Set-CartesianProduct-Lazy>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Set-CartesianProduct-Lazy>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -264,9 +263,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/Hercynium/Set-CartesianProduct-Lazy>
+L<https://github.com/hercynium/Set-CartesianProduct-Lazy>
 
-  git clone https://github.com/Hercynium/Set-CartesianProduct-Lazy.git
+  git clone https://github.com/hercynium/Set-CartesianProduct-Lazy.git
 
 =head1 AUTHOR
 
@@ -274,13 +273,9 @@ Stephen R. Scaffidi <sscaffidi@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Stephen R. Scaffidi.
+This software is copyright (c) 2019 by Stephen R. Scaffidi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

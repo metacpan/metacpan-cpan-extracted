@@ -11,5 +11,6 @@ lib/Pherkin/Extension/Weasel.pm
 lib/Pherkin/Extension/weasel_steps/nav_steps.pl
 lib/Pherkin/Extension/weasel_steps/widget_steps.pl
 share/pherkin-weasel-html-log-default.html
+share/pherkin-weasel-html-log-index.html
 t/00-load.t
 t/10-logging.t

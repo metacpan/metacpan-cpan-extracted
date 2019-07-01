@@ -48,7 +48,9 @@ for my $t (@canonical_tests) {
     local $Data::Dumper::Useqq = 1;
     local $Data::Dumper::Indent = 0;
 
-    _cmpbin( CBOR::Free::encode($in, canonical => 1), $enc, "Encode canonical: " . Dumper($in) );
+    _cmpbin( CBOR::Free::encode($in, canonical => 1), $enc, "Encode canonical (first arg): " . Dumper($in) );
+
+    _cmpbin( CBOR::Free::encode($in, hahaha => 0, canonical => 1), $enc, "Encode canonical (later arg): " . Dumper($in) );
 }
 
 #----------------------------------------------------------------------

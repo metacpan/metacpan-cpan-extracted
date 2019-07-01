@@ -110,7 +110,7 @@ sub build ( $self ) {
         $method_id = "/v1/$method_id" if substr( $method_id, 0, 1 ) ne '/';
 
         # check, that API method exists
-        die qq[API method "$method_id" is not exists in "$self->{path}"] if $self->{app}->{app} && $self->{app}->{app}->{api} && !$self->{app}->{app}->{api}->{map}->get_method($method_id);
+        die qq[API method "$method_id" is not exists in "$self->{path}"] if !$self->{app}->{ext}->{app}->{api}->get_method($method_id);
 
         my ( $action, $name ) = $method_id =~ m[/(.+)/([^/]+)\z]sm;
 

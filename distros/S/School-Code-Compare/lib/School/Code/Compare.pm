@@ -1,6 +1,6 @@
 package School::Code::Compare;
 # ABSTRACT: 'naive' metrics for code similarity
-$School::Code::Compare::VERSION = '0.007';
+$School::Code::Compare::VERSION = '0.101';
 use strict;
 use warnings;
 
@@ -10,19 +10,19 @@ sub new {
     my $class = shift;
 
     my $self = {
-                    max_char_diff  => 70,
-                    min_char_total => 20,
-                    max_distance   => 300,
+                    max_relative_diff     => 2,
+                    min_char_total        => 20,
+                    max_relative_distance => 0.8,
                };
     bless $self, $class;
 
     return $self;
 }
 
-sub set_max_char_difference {
+sub set_max_relative_difference {
     my $self = shift;
 
-    $self->{max_char_diff} = shift;
+    $self->{max_relative_diff} = shift;
 
     # make this chainable in OO-interface
     return $self;
@@ -37,10 +37,10 @@ sub set_min_char_total {
     return $self;
 }
 
-sub set_max_distance {
+sub set_max_relative_distance {
     my $self = shift;
 
-    $self->{max_distance} = shift;
+    $self->{max_relative_distance} = shift;
 
     # make this chainable in OO-interface
     return $self;
@@ -55,29 +55,38 @@ sub measure {
     my $length_str1 = length($str1);
     my $length_str2 = length($str2);
 
+    my ($short, $long) =  $length_str1 < $length_str2 ?
+                         ($length_str1,  $length_str2) :
+                         ($length_str2,  $length_str1) ;
+
+    my $diff           = $long - $short;
 
     if ($self->{min_char_total} > $length_str1
      or $self->{min_char_total} > $length_str2) {
         return {
             distance     => undef,
             ratio        => undef,
-            delta_length => undef,
+            length1      => $length_str1,
+            length2      => $length_str2,
+            delta_length => $diff,
             comment      => 'skipped: smaller than '
                             . $self->{min_char_total},
         };
     }
 
-    my $diff = $length_str1 - $length_str2;
+    my $longer_percent = $long / $short;
 
-    $diff = $diff * -1 if ($diff < 0);
+    $self->{max_distance} = $short * $self->{max_relative_distance};
 
-    if ($diff > $self->{max_char_diff}) {
+    if ($longer_percent > $self->{max_relative_diff}) {
         return {
             distance     => undef,
             ratio        => undef,
+            length1      => $length_str1,
+            length2      => $length_str2,
             delta_length => $diff,
-            comment      => 'skipped: delta in length bigger than '
-                            . $self->{max_char_diff},
+            comment      => 'skipped: delta in length bigger than factor '
+                            . $self->{max_relative_diff},
         };
     }
     else {
@@ -85,13 +94,16 @@ sub measure {
 
         if (defined $distance) {
 
-            my $total_chars = $length_str1 + $length_str2;
-            my $proportion_chars_changes =
-                                    int(($distance / ($total_chars / 2))*100);
+            my $shorter_strlen = $length_str1 > $length_str2
+                                ? $length_str1 : $length_str2;
+            # 100 - (different in %) = (equal in %)
+            my $chars_equal_percent = 100 - int($distance/$shorter_strlen*100 + 0.5);
 
             return {
                 distance     => $distance,
-                ratio        => $proportion_chars_changes,
+                ratio        => $chars_equal_percent,
+                length1      => $length_str1,
+                length2      => $length_str2,
                 delta_length => $diff,
                 comment      => 'comparison done',
             };
@@ -100,9 +112,12 @@ sub measure {
             return {
                 distance     => undef,
                 ratio        => undef,
+                length1      => $length_str1,
+                length2      => $length_str2,
                 delta_length => $diff,
                 comment      => 'skipped: distance higher than '
-                                . $self->{max_distance},
+                                . $self->{max_distance} . ' (factor '
+                                . $self->{max_relative_distance} . ')',
             };
         }
     }
@@ -122,7 +137,7 @@ School::Code::Compare - 'naive' metrics for code similarity
 
 =head1 VERSION
 
-version 0.007
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -134,16 +149,15 @@ This calculates the Levenshtein Difference for two files, if they meet certain c
 
  use School::Code::Compare;
 
- my $comparer   = School::Code::Compare->new()                                    
-                                       ->set_max_char_difference(400)             
-                                       ->set_min_char_total     ( 20)             
-                                       ->set_max_distance       (400);
- 
- my $comparison = $comparer->measure( 'use strict; print "Hello\n";',
-                                      'use v5.22; say "Hello";'
-                                    ); 
-
- print $comparison->{distance} if $comparison   # 13
+ my $comparer   = School::Code::Compare->new()                                      
+                                       ->set_max_relative_difference(2)             
+                                       ->set_min_char_total        (20)             
+                                       ->set_max_relative_distance(0.8);         
+                                                                                    
+ my $comparison1 = $comparer->measure('use v5.22; say "Hi"!',               
+                                      'use v5.22; say "Hello";'                     
+                                   );                                           
+ print $comparison1->{distance} if $comparison #
 
 =head1 FUNCTIONS
 
@@ -166,10 +180,12 @@ Gives back a hash reference with different information:
 
  # (example output from synopsis)
  {
-   'distance'     => 13,
-   'ratio'        => 50,
-   'comment'      => 'comparison done',
-   'delta_length' => 5
+     'delta_length' => 3,
+     'length1' => 20,
+     'ratio' => 79,
+     'length2' => 23,
+     'comment' => 'comparison done',
+     'distance' => 5
  };
 
 =over 4

@@ -2,7 +2,6 @@ package Lemonldap::NG::Portal::2F::Ext2F;
 
 use strict;
 use Mouse;
-use String::Random;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
   PE_ERROR
@@ -38,7 +37,7 @@ sub init {
             $self->error("Missing 'ext2FSendCommand' parameter, aborting");
             return 0;
         }
-        $self->random( String::Random->new );
+        $self->random( Lemonldap::NG::Common::Crypto::srandom() );
         $self->logo( $self->conf->{ext2fLogo} )
           if ( $self->conf->{ext2fLogo} );
         return $self->SUPER::init();
@@ -81,7 +80,7 @@ sub run {
         'ext2fcheck',
         params => {
             MAIN_LOGO   => $self->conf->{portalMainLogo},
-            SKIN        => $self->conf->{portalSkin},
+            SKIN        => $self->p->getSkin($req),
             TOKEN       => $token,
             CHECKLOGINS => $checkLogins
         }

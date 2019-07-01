@@ -23,5 +23,5 @@ requires:
 resources:
   bugtracker: https://github.com/makamaka/JSON-PP/issues
   repository: https://github.com/makamaka/JSON-PP
-version: '4.03'
+version: '4.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

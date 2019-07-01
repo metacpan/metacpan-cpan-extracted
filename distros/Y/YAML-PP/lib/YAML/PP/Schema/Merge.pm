@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Merge;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use YAML::PP::Type::MergeKey;
 
@@ -86,6 +86,10 @@ have to handle duplicate keys, and YAML::PP allows to write your own
 handler for processing mappings.
 
 So the inner API of that is not stable at this point.
+
+Note that if you enable this schema, a plain scalar `<<` will be seen as
+special anywhere in your document, so if you want a literal `<<`, you have
+to put it in quotes.
 
 =head1 METHODS
 

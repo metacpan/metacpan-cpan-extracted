@@ -2,14 +2,16 @@ NAME
     App::DateUtils - An assortment of date-/time-related CLI utilities
 
 VERSION
-    This document describes version 0.120 of App::DateUtils (from Perl
-    distribution App-DateUtils), released on 2019-01-29.
+    This document describes version 0.121 of App::DateUtils (from Perl
+    distribution App-DateUtils), released on 2019-06-19.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
     to date/time:
 
     *   dateconv
+
+    *   datediff
 
     *   durconv
 
@@ -45,7 +47,7 @@ FUNCTIONS
 
     *   Convert "today" to epoch:
 
-         dateconv(date => "today"); # -> [200, "OK", 1548720000]
+         dateconv(date => "today"); # -> [200, "OK", 1560902400]
 
     *   Convert epoch to ymd:
 
@@ -58,6 +60,67 @@ FUNCTIONS
     *   date* => *date*
 
     *   to => *str* (default: "epoch")
+
+    Return value: (any)
+
+  datediff
+    Usage:
+
+     datediff(%args) -> any
+
+    Diff (subtract) two dates, show as ISO8601 duration.
+
+    Examples:
+
+    *   Example #1:
+
+         datediff( date1 => "2019-06-18T20:08:42", date2 => "2019-06-19T06:02:03"); # -> "PT9H53M21S"
+
+    *   Example #2:
+
+         datediff(
+           date1 => "2019-06-18T20:08:42",
+           date2 => "2019-06-19T06:02:03",
+           as => "hms"
+         );
+
+        Result:
+
+         "09:53:21"
+
+    *   Example #3:
+
+         datediff(
+           date1 => "2019-06-18T20:08:42",
+           date2 => "2019-06-22T06:02:03",
+           as => "concise_hms"
+         );
+
+        Result:
+
+         "3d 09:53:21"
+
+    *   Example #4:
+
+         datediff(
+           date1 => "2019-06-18T20:08:42",
+           date2 => "2019-06-19T06:02:03",
+           as => "seconds"
+         );
+
+        Result:
+
+         35601
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   as => *str* (default: "iso8601")
+
+    *   date1* => *date*
+
+    *   date2* => *date*
 
     Return value: (any)
 
@@ -111,14 +174,14 @@ FUNCTIONS
              module          => "DateTime::Format::Flexible",
              original        => "tomorrow",
              is_parseable    => 1,
-             as_epoch        => 1548806400,
-             as_datetime_obj => "2019-01-30T00:00:00",
+             as_epoch        => 1560988800,
+             as_datetime_obj => "2019-06-20T00:00:00",
            },
            {
              module       => "DateTime::Format::Flexible",
              original     => "foo",
              is_parseable => 0,
-             error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Perinci/Access.pm line 81. ",
+             error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/Access.pm line 81. ",
            },
          ]
 
@@ -317,7 +380,7 @@ FUNCTIONS
              module       => "DateTime::Format::Flexible",
              original     => "foo",
              is_parseable => 0,
-             error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Perinci/Access.pm line 81. ",
+             error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/Access.pm line 81. ",
            },
          ]
 
@@ -565,8 +628,8 @@ FUNCTIONS
              is_parseable => 1,
              as_secs => 1209600,
              as_dtdur_obj => "P14D",
-             date2 => "2019-02-12T10:02:26",
-             date1 => "2019-01-29T10:02:26",
+             date2 => "2019-07-03T13:29:56",
+             date1 => "2019-06-19T13:29:56",
            },
          ]
 
@@ -581,10 +644,10 @@ FUNCTIONS
              module => "DateTime::Format::Natural",
              original => "from 23 Jun to 29 Jun",
              is_parseable => 1,
-             as_secs => 13161454,
-             as_dtdur_obj => "P4M30DT13H57M34S",
+             as_secs => 815404,
+             as_dtdur_obj => "P9DT10H30M4S",
              date2 => "2019-06-29T00:00:00",
-             date1 => "2019-01-29T10:02:26",
+             date1 => "2019-06-19T13:29:56",
            },
          ]
 

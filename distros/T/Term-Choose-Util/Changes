@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.074   2019-06-30
+        - Removed functions 'print_hash', 'length_longest' and 'unicode_trim'.
+
 0.073   2019-06-08
         - Update menu behavior of settings_menu.
         - Removed deprecated options 'fmt_chosen', 'remove_chosen' and 'small_on_top'.

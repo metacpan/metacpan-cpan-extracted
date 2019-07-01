@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Array';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
@@ -68,15 +68,6 @@ Returns properly formatted color-parameters based on the colorspace.
 sub param {
     my $self=shift @_;
     return(@_);
-}
-
-sub outobjdeep {
-    my ($self, @opts) = @_;
-    foreach my $k (qw/ api apipdf /) {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
-    }
-    $self->SUPER::outobjdeep(@opts);
 }
 
 =back

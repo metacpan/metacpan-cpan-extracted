@@ -313,7 +313,6 @@ sub issuer {
             ini => {
                 skipRenewConfirmation => 1,
                 logLevel              => $debug,
-                templatesDir          => 'site/htdocs/static',
                 domain                => 'idp.com',
                 portal                => 'http://auth.idp.com',
                 authentication        => 'Choice',

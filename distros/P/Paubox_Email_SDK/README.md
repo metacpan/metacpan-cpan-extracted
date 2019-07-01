@@ -24,7 +24,7 @@ Otherwise, you can install from the included archive.
 ```bash
 git clone https://github.com/Paubox/paubox-perl-sdk.git
 cd paubox-perl-sdk
-cpanm Paubox_Email_SDK-1.0.tar.gz
+cpanm Paubox_Email_SDK-1.2.tar.gz
 ```
 
 ### Getting Paubox API Credentials
@@ -134,6 +134,7 @@ my $messageObj = new Paubox_Email_SDK::Message(
    'replyTo' => 'sender@domain.com', 
    'to' => ['recipient@example.com'],
    'bcc' => ['recipient@example.com'],
+   'cc' => ['recipientcc@example.com'],
    'subject' => 'Testing!',
    'text_content' => 'Hello World!',
    'html_content' => '<html><body><h1>Hello World!</h1></body></html>', 

@@ -98,6 +98,7 @@ sub EXT_panel : Extend('Ext.ActionSheet') {
 sub EXT_item : Extend('Ext.Button') {
     return {
         textAlign => 'left',
+        padding   => '0 0 0 5',
         handler   => 'defaultMenuItemHandler',
     };
 }

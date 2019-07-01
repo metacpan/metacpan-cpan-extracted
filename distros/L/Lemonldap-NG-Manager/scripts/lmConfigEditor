@@ -3,6 +3,7 @@
 use Lemonldap::NG::Common::Conf;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Manager::Conf::Parser;
+use Lemonldap::NG::Handler::Main::Jail;
 use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Temp;

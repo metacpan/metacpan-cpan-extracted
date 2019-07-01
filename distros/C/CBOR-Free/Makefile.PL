@@ -27,11 +27,17 @@ WriteMakefile1(
     ABSTRACT_FROM => 'lib/CBOR/Free.pm',
     LICENSE      => 'perl',
 
-    XSMULTI        => 1,
     INC => '-I.',
 
+    OBJECT => [
+        '$(BASEEXT)$(OBJ_EXT)',
+        'cbor_free_boolean.o',
+        'cbor_free_encode.o',
+        'cbor_free_decode.o',
+    ],
+
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => 7.12,
+        # 'ExtUtils::MakeMaker' => 7.12,
         'Devel::PPPort' => 0,
     },
 

@@ -335,6 +335,7 @@ sub _reset {
 
             # Use HTML template
             $body = $self->loadTemplate(
+                $req,
                 'mail_confirm',
                 filter => $tr,
                 params => \%tplPrms
@@ -473,6 +474,7 @@ sub changePwd {
 
         # Use HTML template
         $body = $self->loadTemplate(
+            $req,
             'mail_password',
             filter => $tr,
             params => \%tplPrms

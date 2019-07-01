@@ -3,8 +3,7 @@ package Lemonldap::NG::Portal::UserDB::LDAP;
 use strict;
 use Mouse;
 use utf8;
-use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_OK PE_LDAPCONNECTFAILED PE_LDAPERROR PE_BADCREDENTIALS);
+use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
 extends 'Lemonldap::NG::Portal::Lib::LDAP';
 
@@ -25,50 +24,9 @@ has ldapGroupAttributeNameSearch => (
     }
 );
 
-has attrs => (
-    is      => 'rw',
-    lazy    => 1,
-    builder => sub {
-        return [
-            values %{ $_[0]->{conf}->{exportedVars} },
-            values %{ $_[0]->{conf}->{ldapExportedVars} }
-        ];
-    }
-);
-
 # RUNNING METHODS
-
-sub getUser {
-    my ( $self, $req, %args ) = @_;
-    return PE_LDAPCONNECTFAILED unless $self->ldap and $self->bind();
-    my $mesg = $self->ldap->search(
-        base   => $self->conf->{ldapBase},
-        scope  => 'sub',
-        filter => (
-              $args{useMail}
-            ? $self->mailFilter->($req)
-            : $self->filter->($req)
-        ),
-        defer => $self->conf->{ldapSearchDeref} || 'find',
-        attrs => $self->attrs,
-    );
-    if ( $mesg->code() != 0 ) {
-        $self->logger->error( 'LDAP Search error: ' . $mesg->error );
-        return PE_LDAPERROR;
-    }
-    if ( $mesg->count() > 1 ) {
-        $self->logger->error('More than one entry returned by LDAP directory');
-        eval { $self->p->_authentication->setSecurity($req) };
-        return PE_BADCREDENTIALS;
-    }
-    unless ( $req->data->{entry} = $mesg->entry(0) ) {
-        $self->userLogger->warn("$req->{user} was not found in LDAP directory");
-        eval { $self->p->_authentication->setSecurity($req) };
-        return PE_BADCREDENTIALS;
-    }
-    $req->data->{dn} = $req->data->{entry}->dn();
-    PE_OK;
-}
+#
+# getUser is provided by Portal::Lib::LDAP
 
 # Load all parameters included in exportedVars parameter.
 # Multi-value parameters are loaded in a single string with

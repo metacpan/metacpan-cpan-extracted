@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.1.0");
+use version; our $VERSION = qv("v2.1.1");
 use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;
@@ -16,8 +16,9 @@ Test::Compile - Check whether Perl files compile correctly.
 
 =head1 SYNOPSIS
 
-    # The OO way (recommended)
     use Test::Compile;
+
+    # The OO way (recommended)
     my $test = Test::Compile->new();
     $test->all_files_ok();
     $test->done_testing();
@@ -101,7 +102,7 @@ Returns a list of all the perl module files - that is any files ending in F<.pm>
 in C<@dirs> and in directories below. If C<@dirs> is undefined, it
 searches F<blib> if F<blib> exists, or else F<lib>.
 
-Skips any files in C<CVS> or C<.svn> directories.
+Skips any files in C<CVS>, C<.svn>, or C<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
@@ -114,7 +115,7 @@ either have a F<.pl> extension, or have no extension and have a perl shebang lin
 If C<@dirs> is undefined, it searches F<script> if F<script> exists, or else
 F<bin> if F<bin> exists.
 
-Skips any files in C<CVS> or C<.svn> directories.
+Skips any files in C<CVS>, C<.svn>, or C<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
@@ -185,7 +186,11 @@ no longer considered best practise.  At some stage in the future, this will
 stop and you'll have to import them explicitly.
 
 Even then, you really should use the object oriented methods as they provide
-a more consistent interface.
+a more consistent interface.  For example: C<all_pm_files_ok()> calls the
+C<plan()> function - so you can't call multiple test functions in the same test file.
+
+You should definately use the object oriented interface described in the L</SYNOPSIS>
+and in L<Test::Compile::Internal> instead of calling these functions.
 
 =over 4
 
@@ -196,7 +201,7 @@ Checks all the perl module files it can find for compilation errors.
 It uses C<all_pm_files(@files)> to find the perl module files.
 
 It also calls the C<plan()> function for you (one test for each module), so
-you can't have already called C<plan>. Unfortunately, this also means
+you can't have already called C<plan()>. Unfortunately, this also means
 you can't use this function with C<all_pl_files_ok()>.  If this is a problem
 you should really be using the object oriented interface.
 

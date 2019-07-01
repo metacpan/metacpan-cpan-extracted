@@ -1,0 +1,18 @@
+# -*- conf -*-
+
+# Avoid generated build files.
+\bblib/
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid MYMETA files
+^MYMETA\.
+
+# Avoid archives of this distribution
+\bEmpty-[\d\.\_]+

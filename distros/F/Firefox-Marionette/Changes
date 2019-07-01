@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.76  Sat Jun 29 19:22:00 2019
+       Fixes to cygwin test suite.  Fixes to cope with dbus crashes in RHEL6.
+
 0.75  Sat Jun 29 11:36:00 2019
        Set minimum version of IPC::Open3 after CPAN Tester issues.
 

@@ -123,6 +123,18 @@ sub clean_sessions {
     $cache->clear;
 }
 
+sub count_sessions {
+    my $dir = shift;
+    $dir ||= 't/sessions';
+    my $nbr = 0;
+
+    opendir D, $dir or die $!;
+    foreach ( grep { /^\w{64}$/ } readdir(D) ) {
+        $nbr++;
+    }
+    $nbr;
+}
+
 sub getCache {
     require Cache::FileCache;
     return Cache::FileCache->new( {
@@ -534,6 +546,11 @@ has ini => (
             uid  => 'french',
             cn   => 'Frédéric Accents',
             mail => 'fa@badwolf.org',
+        };
+        $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{davros} = {
+            uid  => 'davros',
+            cn   => 'Bad Guy',
+            mail => 'davros@badguy.org',
         };
         $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{russian} = {
             uid  => 'russian',

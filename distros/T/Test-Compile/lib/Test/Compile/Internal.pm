@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.1.0");
+use version; our $VERSION = qv("v2.1.1");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -273,7 +273,7 @@ sub ok {
     $self->{test}->ok(@args);
 }
 
-=item C<plan($count)>
+=item C<plan(tests => $count)>
 
 Defines how many tests you plan to run.
 

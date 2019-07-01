@@ -21,7 +21,7 @@ sub CLI {
 my $cfg = P->cfg->read( "$ENV->{DATA_DIR}/cfg.yaml", params => { DATA_DIR => $ENV->{DATA_DIR} } );
 
 my $app = <: $module_name :>->new( {    #
-    app_cfg => {
+    cfg => {
         server => {                     # passed directly to the Pcore::HTTP::Server constructor
             listen => '/var/run/<: $dist_path :>.sock',
             ssl    => 0,
@@ -49,7 +49,6 @@ my $app = <: $module_name :>->new( {    #
         }
     },
     devel => $ENV->{cli}->{opt}->{devel},
-    cfg   => $cfg,
 } );
 
 my $cv = P->cv;

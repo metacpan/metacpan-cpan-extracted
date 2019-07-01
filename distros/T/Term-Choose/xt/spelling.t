@@ -5,6 +5,8 @@ use Test::More;
 
 use Test::Spelling;
 
+set_spell_cmd('aspell list -l en -p /dev/null');
+
 add_stopwords(<DATA>);
 
 all_pod_files_spelling_ok();
@@ -13,16 +15,23 @@ all_pod_files_spelling_ok();
 __DATA__
 BackSpace
 Ctrl
+de
 EOT
-Kiem
-Matthäus
-PageDown
-PageUp
-ReadKey
-SGR
-SpaceBar
 hjkl
+Kiem
 lf
 ll
-stackoverflow
+markable
+Matthäus
 noncharacter
+OEM
+PageDown
+PageUp
+preselection
+preselected
+preselects
+ReadKey
+selectable
+SGR
+SpaceBar
+stackoverflow

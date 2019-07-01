@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+#
+# brute force to ensure that some desired percentage is being hit
+# (comment out the `say` to only see the final odds when not piping to
+# `runstats`)
+
+use 5.10.0;
+use warnings;
+
+use Game::PseudoRand qw(prd_step prd_table);
+
+my ( $randfn, undef ) = prd_step( start => 0.25, step => 0.41675 );
+#my ( $randfn, undef ) =
+#  prd_table( start => 0.12, table => [ 0.05, 0.05, 0.1, 0.1 ] );
+
+my $trials = 1e6;
+my $hits   = 0;
+for ( 1 .. $trials ) {
+    if (&$randfn) {
+        $hits++;
+        say 1;
+    } else {
+        say 0;
+    }
+}
+warn sprintf "%.4f\n", $hits / $trials * 100;

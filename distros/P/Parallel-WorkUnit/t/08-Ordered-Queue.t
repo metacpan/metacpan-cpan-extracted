@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2018 Joelle Maslak
+# Copyright (C) 2015-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -75,7 +75,7 @@ is( $wu->max_children(), undef, 'Max children defaults to undef' );
 
 $PROCS = 10;
 for ( 0 .. $PROCS - 1 ) {
-    my $v = $_;
+    my $v   = $_;
     my $ret = $wu->queue( sub { return $v * 10; } );
 
     ok( $ret, "(W1) Worker " . ( 1 + $_ ) . " started" );
@@ -99,7 +99,7 @@ is( $wu->max_children(), 2, 'Max children defaults to 2' );
 
 # Queue up 10 processes
 for ( 0 .. $PROCS - 1 ) {
-    my $v = $_;
+    my $v   = $_;
     my $ret = $wu->queue( sub { return $v / 10.0; } );
 
     if ( $_ <= 1 ) {

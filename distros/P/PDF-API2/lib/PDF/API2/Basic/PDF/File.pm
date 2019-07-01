@@ -16,7 +16,7 @@ package PDF::API2::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '2.033'; # VERSION
+our $VERSION = '2.034'; # VERSION
 
 =head1 NAME
 
@@ -540,7 +540,10 @@ sub readval {
         }
         $result->{' parent'} = $self;
         weaken $result->{' parent'};
-        $result->{' realised'} = 0;
+
+        # Removed to address changes being lost when an indirect object is realised twice
+        # $result->{' realised'} = 0;
+
         # gdj: FIXME: if any of the ws chars were crs, then the whole
         # string might not have been read.
     }
@@ -947,7 +950,7 @@ sub ship_out {
         $self->{' locs'}{$objind->uid()} = $fh->tell();
         my ($objnum, $objgen) = @{$self->{' objects'}{$objind->uid()}}[0..1];
         $fh->printf('%d %d obj ', $objnum, $objgen);
-        $objind->outobjdeep($fh, $self, 'objnum' => $objnum, 'objgen' => $objgen);
+        $objind->outobjdeep($fh, $self);
         $fh->print(" endobj\n");
 
         # Note that we've output this obj, not forgetting to update
@@ -1134,6 +1137,7 @@ sub _unpack_xref_stream {
     return unpack('n', $data)       if $width == 2;
     return unpack('N', "\x00$data") if $width == 3;
     return unpack('N', $data)       if $width == 4;
+    return unpack('Q', $data)       if $width == 8;
 
     die "Invalid column width: $width";
 }

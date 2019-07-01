@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.07
+0.09
 
 =head1 SYNOPSIS
 
@@ -17,7 +17,9 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
          screenshots_dir: img
          screenshot_events:
             pre_step: 1
+            post_step: 1
             post_scenario: 1
+            post_feature: 1
          sessions:
             selenium:
               base_url: http://localhost:5000
@@ -45,14 +47,16 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 
-use File::Share ':all';
 use Digest::MD5 qw(md5_hex);
+use File::Find::Rule;
+use File::Share ':all';
 use Module::Runtime qw(use_module);
 use Template;
 use Test::BDD::Cucumber::Extension;
+use YAML::Syck qw(Load);
 
 use Weasel;
 use Weasel::Session;
@@ -67,6 +71,8 @@ has _weasel_log => (is => 'rw', isa => 'Maybe[ArrayRef]');
 
 has feature_template => (is => 'ro', isa => 'Str',
                          default => 'pherkin-weasel-html-log-default.html');
+has index_template => (is => 'ro', isa => 'Str',
+                       default => 'pherkin-weasel-html-log-index.html');
 
 has logging_dir => (is => 'ro', isa => 'Maybe[Str]');
 
@@ -77,6 +83,7 @@ has templates_dir => (is => 'ro', isa => 'Str',
                           return dist_dir $dist;
                       });
 
+our $tmp_disable_logging = 0;
 
 sub _weasel_log_hook {
     my $self = shift;
@@ -84,13 +91,64 @@ sub _weasel_log_hook {
     my $log_text = (ref $log_item eq 'CODE') ? $log_item->() : $log_item;
 
     my $log = $self->_log;
-    if ($log) {
-        push @{$log->{scenario}->{rows}}, {
-            log => {
-                text => $log_text
-            },
+    if ($log and not $tmp_disable_logging) {
+        push @{$log->{step}->{logs}}, {
+            text => $log_text
         };
     }
+}
+
+sub _rel_url {
+    my $self = shift;
+
+    my @screen_dirs = File::Spec->splitdir( File::Spec->rel2abs($self->screenshots_dir) );
+    my @logs_dirs = File::Spec->splitdir( File::Spec->rel2abs($self->logging_dir) );
+
+    while (@screen_dirs and @logs_dirs) {
+        if ($screen_dirs[0] eq $logs_dirs[0]) {
+            shift @screen_dirs;
+            shift @logs_dirs;
+        }
+        else {
+            last;
+        }
+    }
+    my $up_dirs = '../' x (scalar(@logs_dirs));
+    return $up_dirs . join('/', @screen_dirs, '');
+}
+
+sub _update_index {
+    my $self = shift;
+
+    my @yaml_snippets;
+    for my $log (File::Find::Rule
+                 ->name( '*.html' )
+                 ->in( $self->logging_dir )) {
+        local $/ = undef;
+        open my $fh, '<:utf8', $log;
+        my $content = <$fh>;
+        close $fh;
+
+        my ($snippet) = ($content =~ m/<!--\n---\n(.*)---\n-->\n/s);
+        push @yaml_snippets, Load($snippet)
+            if $snippet;
+    }
+
+    my $order = 'filename';
+    @yaml_snippets = sort { $a->{$order} cmp $b->{$order} } @yaml_snippets;
+    my $vars = {
+        features => \@yaml_snippets,
+        program => {
+            version => $VERSION,
+        },
+    };
+    my $engine = $self->_log->{template};
+    $engine->process(
+        $self->index_template,
+        $vars,
+        'index.html',
+        { binmode => ':utf8' })
+        or die $engine->error();
 }
 
 sub _flush_log {
@@ -99,12 +157,16 @@ sub _flush_log {
     return if ! $log || ! $log->{feature};
 
     my $f = md5_hex($log->{feature}->{filename}) . '.html';
+    $log->{screens_base_url} = $self->_rel_url;
+    $log->{feature}->{log_filename} = $f;
     $log->{template}->process(
         $self->feature_template,
         { %{$log} }, # using the $log object directly destroys it...
         $f,
         { binmode => ':utf8' })
         or die $log->{template}->error();
+
+    $self->_update_index;
 
     return File::Spec->catfile($self->logging_dir, $f);
 }
@@ -252,34 +314,38 @@ sub pre_step {
     my ($self, $step, $context) = @_;
 
     return if ! defined $context->stash->{scenario}->{ext_wsl};
-    $self->_save_screenshot("step", "pre");
+
+    # In the logs, first announce the step, *then* show the
+    #  screenshot
     my $log = $self->_log;
     if ($log) {
-        push @{$log->{scenario}->{rows}}, {
-            step => {
-                text => $context->step->verb_original
-                    . ' ' . $context->step->text,
-            },
+        my $step = {
+            text => $context->step->verb_original
+                . ' ' . $context->step->text,
+            logs => [],
+            result => '',
         };
+        $log->{step} = $step;
+        push @{$log->{scenario}->{rows}}, { step => $step };
     }
+    $self->_save_screenshot("step", "pre");
 }
 
 sub post_step {
     my ($self, $step, $context, $fail, $result) = @_;
 
     return if ! defined $context->stash->{scenario}->{ext_wsl};
-    $self->_save_screenshot("step", "post");
     my $log = $self->_log;
+    $self->_save_screenshot("step", "post");
     if ($log) {
         if (ref $result) {
-            ${$log->{scenario}->{rows}}[-1]->{step}->{result} =
-                $result->result;
+            $log->{step}->{result} = $result->result;
         }
         else {
-            ${$log->{scenario}->{rows}}[-1]->{step}->{result} =
-                '<missing>'; # Pherkin <= 0.56
+            $log->{step}->{result} = '<missing>'; # Pherkin <= 0.56
         }
         $self->_flush_log;
+        $log->{step} = undef;
     }
 }
 
@@ -357,9 +423,13 @@ sub _save_screenshot {
 
     return if ! $self->screenshots_dir;
     return if ! $self->screenshot_event_on("$phase-$event");
+    return if $self->_weasel->session->state ne 'started';
 
     my $img_name = md5_hex($self->_log->{feature}->{filename}) . "-$event-$phase-" . ($img_num++) . '.png';
     if (open my $fh, ">", $self->screenshots_dir . '/' . $img_name) {
+        local $tmp_disable_logging = 1;
+        # As this is a Weasel 'command' we concoct up ourselves, don't include
+        # it in the logs for the session...
         $self->_weasel->session->screenshot($fh);
         close $fh
             or warn "Couldn't close screenshot image '$img_name': $!";

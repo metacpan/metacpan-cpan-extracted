@@ -64,107 +64,107 @@
    "provides" : {
       "MsgPack::Decoder" : {
          "file" : "lib/MsgPack/Decoder.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Event::Decoded" : {
          "file" : "lib/MsgPack/Decoder/Event/Decoded.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator" : {
          "file" : "lib/MsgPack/Decoder/Generator.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Any" : {
          "file" : "lib/MsgPack/Decoder/Generator/Any.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Array" : {
          "file" : "lib/MsgPack/Decoder/Generator/Array.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::ArraySize" : {
          "file" : "lib/MsgPack/Decoder/Generator/ArraySize.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Boolean" : {
          "file" : "lib/MsgPack/Decoder/Generator/Boolean.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Ext" : {
          "file" : "lib/MsgPack/Decoder/Generator/Ext.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::FixInt" : {
          "file" : "lib/MsgPack/Decoder/Generator/FixInt.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Float" : {
          "file" : "lib/MsgPack/Decoder/Generator/Float.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Int" : {
          "file" : "lib/MsgPack/Decoder/Generator/Int.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Nil" : {
          "file" : "lib/MsgPack/Decoder/Generator/Nil.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Noop" : {
          "file" : "lib/MsgPack/Decoder/Generator/Noop.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Size" : {
          "file" : "lib/MsgPack/Decoder/Generator/Size.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::Str" : {
          "file" : "lib/MsgPack/Decoder/Generator/Str.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Decoder::Generator::UInt" : {
          "file" : "lib/MsgPack/Decoder/Generator/UInt.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Encoder" : {
          "file" : "lib/MsgPack/Encoder.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::RPC" : {
          "file" : "lib/MsgPack/RPC.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::RPC::Event::Receive" : {
          "file" : "lib/MsgPack/RPC/Event/Receive.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::RPC::Event::Write" : {
          "file" : "lib/MsgPack/RPC/Event/Write.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::RPC::Message" : {
          "file" : "lib/MsgPack/RPC/Message.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::RPC::Message::Notification" : {
          "file" : "lib/MsgPack/RPC/Message/Notification.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::RPC::Message::Request" : {
          "file" : "lib/MsgPack/RPC/Message/Request.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::RPC::Message::Response" : {
          "file" : "lib/MsgPack/RPC/Message/Response.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Type::Boolean" : {
          "file" : "lib/MsgPack/Type/Boolean.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "MsgPack::Type::Ext" : {
          "file" : "lib/MsgPack/Type/Ext.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       }
    },
    "release_status" : "stable",
@@ -179,7 +179,7 @@
          "web" : "https://github.com/yanick/MsgPack-RPC"
       }
    },
-   "version" : "2.0.2",
+   "version" : "2.0.3",
    "x_author_pledge" : {
       "version" : 1
    },
@@ -187,6 +187,9 @@
    "x_contributor_covenant" : {
       "version" : 0.01
    },
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_generated_by_perl" : "v5.20.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }

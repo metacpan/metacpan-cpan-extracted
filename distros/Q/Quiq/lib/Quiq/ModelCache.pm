@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.147';
+our $VERSION = '1.148';
 
 # -----------------------------------------------------------------------------
 
@@ -49,18 +49,12 @@ kann über die Datensätze navigiert werden, wobei diese sukzessive
 geladen werden. Tabellen, deren Inhalt nicht zugegriffen wird,
 werden auch nicht geladen.
 
-Da eine Tabelle/View beim ersten Zugriff vollständig geladen
+ACHTUNG: Da eine Tabelle/View beim ersten Zugriff vollständig geladen
 wird, ist die Klasse nicht für Tabellen mit Massendaten geeignet.
 
 =head1 EXAMPLES
 
-=over 2
-
-=item *
-
-Telefonliste
-
-=back
+=head2 Telefonliste
 
 Tabellen:
 
@@ -87,13 +81,7 @@ Programm:
     Frank Seitz
       0176/78243503
 
-=over 2
-
-=item *
-
-Kolumnen mit Präfix
-
-=back
+=head2 Kolumnen mit Präfix
 
 Tabellen:
 
@@ -373,7 +361,7 @@ sub fk {
 
 =head1 VERSION
 
-1.147
+1.148
 
 =head1 AUTHOR
 

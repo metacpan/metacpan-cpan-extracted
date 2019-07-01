@@ -10,8 +10,9 @@ use strict;
 use warnings;
 use Cairo;
 use Pango;
+use PDF::Cairo::Box;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 $VERSION = eval $VERSION;
 =head1 NAME
 
@@ -241,19 +242,8 @@ sub indent {
 
 =item B<ink>
 
-Returns the ink extents of the current layout as a hash reference
-containing the scalars x, y, width, height, and the array reference
-bbox containing all four in that order with the height negated to
-reflect that (x,y) is the offset from the upper-left corner of the
-layout:
-
-    {
-      x => $x,
-      y => $y,
-      width => $width,
-      height => $height,
-      bbox => [$x, $y, $width, -$height],
-    }
+Returns the ink extents of the current layout as a L<PDF::Cairo::Box>
+object.
 
 Note that a trailing newline in the markup will count as extra "ink".
 
@@ -262,9 +252,12 @@ Note that a trailing newline in the markup will count as extra "ink".
 sub ink {
 	my $self = shift;
 	my ($ink, $logical) = $self->{_layout}->get_pixel_extents;
-	$ink->{y} *= -1;
-	$ink->{bbox} = [ $ink->{x}, $ink->{y}, $ink->{width}, - $ink->{height} ];
-	return $ink;
+	return PDF::Cairo::Box->new(
+		x => $ink->{x},
+		y => -$ink->{y} - $ink->{height},
+		width => $ink->{width},
+		height => $ink->{height},
+	);
 }
 
 =item B<justify> [1|0]
