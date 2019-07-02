@@ -1,5 +1,5 @@
 package Lab::Connection;
-$Lab::Connection::VERSION = '3.681';
+$Lab::Connection::VERSION = '3.682';
 #ABSTRACT: Connection base class
 
 use strict;
@@ -339,7 +339,7 @@ Lab::Connection - Connection base class
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

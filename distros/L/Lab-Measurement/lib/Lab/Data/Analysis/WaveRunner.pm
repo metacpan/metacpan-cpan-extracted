@@ -1,6 +1,6 @@
 package Lab::Data::Analysis::WaveRunner;
 #ABSTRACT: Analysis routine for LeCroy WaveRunner/etc. scopes
-$Lab::Data::Analysis::WaveRunner::VERSION = '3.681';
+$Lab::Data::Analysis::WaveRunner::VERSION = '3.682';
 use 5.006;
 use strict;
 use warnings;
@@ -1221,7 +1221,7 @@ Lab::Data::Analysis::WaveRunner - Analysis routine for LeCroy WaveRunner/etc. sc
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SUBROUTINES/METHODS
 

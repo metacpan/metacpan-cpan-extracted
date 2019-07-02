@@ -96,7 +96,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.681",
+  "VERSION" => "3.682",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }

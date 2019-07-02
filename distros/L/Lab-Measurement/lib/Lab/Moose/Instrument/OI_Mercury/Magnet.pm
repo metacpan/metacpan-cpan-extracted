@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.681';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.682';
 #ABSTRACT: Oxford Instruments Mercury magnet power supply
 
 use 5.010;
@@ -12,6 +12,7 @@ use Lab::Moose::Instrument::Cache;
 use Carp;
 use namespace::autoclean;
 use YAML::XS;
+use Lab::Moose::Countdown;
 
 extends 'Lab::Moose::Instrument';
 
@@ -25,6 +26,12 @@ has magnet => (
     is      => 'ro',
     isa     => enum( [qw/X Y Z/] ),
     default => 'Z'
+);
+
+has heater_delay => (
+    is      => 'ro',
+    isa     => 'Lab::Moose::PosInt',
+    default => 60
 );
 
 # default connection options:
@@ -180,6 +187,16 @@ sub oim_get_field {
 }
 
 
+sub oim_get_persistent_field {
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
+
+    my $field
+        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:PFLD", %args );
+    $field =~ s/T$//;
+    return $field;
+}
+
+
 sub oim_get_heater {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
     return $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:SWHT", %args );
@@ -197,6 +214,19 @@ sub oim_set_heater {
         value => $value,
         %args
     );
+}
+
+
+sub heater_on {
+    my $self = shift;
+    $self->oim_set_heater( value => 'ON' );
+    countdown( $self->heater_delay, "OI Mercury heater ON: " );
+}
+
+sub heater_off {
+    my $self = shift;
+    $self->oim_set_heater( value => 'OFF' );
+    countdown( $self->heater_delay(), "OI Mercury heater OFF: " );
 }
 
 
@@ -354,12 +384,9 @@ sub get_field {
     return $self->oim_get_field(@_);
 }
 
-sub set_persistent_mode {
-    croak "persistent mode is not yet implemented";
-}
-
 sub get_persistent_field {
-    croak "persistent mode is not yet implemented";
+    my $self = shift;
+    return $self->oim_get_persistent_field(@_);
 }
 
 sub sweep_to_field {
@@ -487,7 +514,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury magnet p
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 
@@ -602,7 +629,13 @@ TODO: what happens if we're in persistent mode?
 
 Read PSU field in Tesla.
 
-TODO: what happens if we're in persistent mode?
+Returns 0 when in persistent mode.
+
+=head2 oim_get_persistent_field
+
+ $field = $m->oim_get_persistent_field();
+
+Read PSU field for persistent mode in Tesla.
 
 =head2 oim_get_heater
 
@@ -617,6 +650,14 @@ Returns the persistent mode switch heater status as B<ON> or B<OFF>.
 
 Switches the persistent mode switch heater.
 Nothing happens if the power supply thinks the magnet current and the lead current are different.
+
+=head2 heater_on/heater_off
+
+ $m->heater_on();
+ $m->heater_off();
+
+Enable/disable switch heater. Wait for 60s after changing the state of the
+heater.
 
 =head2 oim_force_heater
 
@@ -699,6 +740,7 @@ This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

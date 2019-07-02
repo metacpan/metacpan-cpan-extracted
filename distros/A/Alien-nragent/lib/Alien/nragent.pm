@@ -8,7 +8,7 @@ use List::Util qw( first );
 use base qw( Alien::Base );
 
 # ABSTRACT: Download and install the NewRelic agent
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 {
@@ -46,7 +46,7 @@ Alien::nragent - Download and install the NewRelic agent
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -72,10 +72,12 @@ Otherwise the NewRelic agent library will be downloaded, and installed.
 =head2 Platform Limitations
 
 The SDK binaries provided by New Relic only work on Linux x86_64.  The binaries are labeled
-as a "beta" and were released in July 2016.  It doesn't seem likely that New Relic will be
-releasing new versions of the SDK.  The author of this module has had good success getting
-this module to work on Ubuntu Precise and Xenial, and heard from user feedback that it works
-with Bionic.  I have heard that it does NOT work with CentOS 7.  Your mileage may vary.
+as a "beta".  The most recent version available (as of this writing) is dated July 1, 2019.
+However, I believe the New Relic Agent SDK is no longer being actively developed, and you
+are encouraged to consider the New Relic C SDK instead.
+
+I have found that previous versions worked on Ubuntu Precise and Xenial, but not Cent OS 7.
+Your mileage my vary.
 
 =head2 Not Fork Safe!
 

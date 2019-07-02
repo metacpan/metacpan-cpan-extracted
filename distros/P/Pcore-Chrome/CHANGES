@@ -1,3 +1,7 @@
+v0.5.0 2019-07-01T23:13:16Z
+ - get_screenshot method
+ - tab various improvements
+
 v0.4.7 2019-01-03T18:57:24Z
  - to_json return plain scalar
 

@@ -23,7 +23,7 @@ name: Time-OlsonTZ-Data
 provides:
   Time::OlsonTZ::Data:
     file: lib/Time/OlsonTZ/Data.pm
-    version: '0.201901'
+    version: '0.201902'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Time-OlsonTZ-Download
   license: http://dev.perl.org/licenses/
-version: '0.201901'
+version: '0.201902'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

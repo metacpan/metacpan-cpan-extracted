@@ -6,6 +6,20 @@ use FFI::Platypus::Memory qw( strdup free );
 
 my $license_key = $ENV{NEWRELIC_AGENT_FFI_TEST};
 
+subtest 'diag' => sub {
+
+  diag '';
+  diag '';
+  diag '';
+
+  diag "lib=$_" for @NewRelic::Agent::FFI::Procedural::lib;
+
+  diag '';
+  diag '';
+
+  pass 'good stuff';
+};
+
 subtest 'export' => sub {
 
   imported_ok 'newrelic_init';
@@ -77,8 +91,6 @@ subtest 'newrelic_segment_datastore_begin' => sub {
   newrelic_transaction_end $tx;
   ok 1, 'newrelic_transaction_end';
 };
-
-#use Test2::Tools::Subtest qw/subtest_streamed/;
 
 subtest 'newrelic_request_shutdown' => sub {
 

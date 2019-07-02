@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Repeater;
 #ABSTRACT: Simple repeater
-$Lab::XPRESS::Sweep::Repeater::VERSION = '3.681';
+$Lab::XPRESS::Sweep::Repeater::VERSION = '3.682';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -70,7 +70,7 @@ Lab::XPRESS::Sweep::Repeater - Simple repeater
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

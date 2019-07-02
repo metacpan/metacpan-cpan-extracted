@@ -1,6 +1,6 @@
-package Pcore::Chrome v0.4.7;
+package Pcore::Chrome v0.5.0;
 
-use Pcore -dist, -class, -res;
+use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
 use Pcore::Util::Scalar qw[is_plain_coderef];
 use Pcore::Util::Data qw[from_json];
@@ -15,6 +15,9 @@ has _proc => ();
 
 # https://chromedevtools.github.io/devtools-protocol/tot/
 
+const our $CHECK_PORT_TIMEOUT => 0.1;
+const our $CONNECT_TIMEOUT    => 10;
+
 sub DESTROY ( $self ) {
 
     # term process group
@@ -23,7 +26,6 @@ sub DESTROY ( $self ) {
     return;
 }
 
-# TODO use ping instead of timeout
 around new => sub ( $orig, $self, %args ) {
     $args{bin} ||= $MSWIN ? "$ENV{'ProgramFiles(x86)'}/Google/Chrome/Application/chrome.exe" : '/usr/bin/google-chrome';
 
@@ -88,7 +90,15 @@ around new => sub ( $orig, $self, %args ) {
 
     $self->{_proc} = P->sys->run_proc( join( $SPACE, $cmd->@* ), win32_create_no_window => 1 );
 
-    Coro::AnyEvent::sleep( $args{timeout} // 3 );
+    my $time = time + ( $args{timeout} // $CONNECT_TIMEOUT );
+
+    while () {
+        Coro::AnyEvent::sleep($CHECK_PORT_TIMEOUT);
+
+        last if P->net->check_port( $self->{host}, $self->{port}, $CHECK_PORT_TIMEOUT );
+
+        die qq[Unable to connect to the goocle chrome on $self->{host}:$self->{port}] if time > $time;
+    }
 
     return $self;
 };
@@ -130,7 +140,7 @@ sub new_tab ( $self, $url = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 77                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 79                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -31,5 +31,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-TablePrint.git
-version: '0.112'
+version: '0.113'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,33 @@
+{
+	"type" : "regular",
+	"response" : {
+		"scanID" : "2",
+		"scanResult" : {
+			"initiatorID" : "1",
+			"ownerID" : "1",
+			"ownerGID" : "0",
+			"scanID" : "2",
+			"repositoryID" : "1",
+			"jobID" : "143301",
+			"name" : "test",
+			"description" : null,
+			"details" : "Plugin #",
+			"status" : "Queued",
+			"importStatus" : "No Results",
+			"downloadFormat" : "v2",
+			"dataFormat" : "IPv4",
+			"running" : false,
+			"errorDetails" : "",
+			"importErrorDetails" : "",
+			"totalIPs" : -1,
+			"scannedIPs" : 0,
+			"startTime" : -1,
+			"finishTime" : 0,
+			"id" : "3"
+		}
+	},
+	"error_code" : 0,
+	"error_msg" : "",
+	"warnings" : [],
+	"timestamp" : 1407510276
+}

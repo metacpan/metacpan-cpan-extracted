@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Triton;
-$Lab::Moose::Instrument::OI_Triton::VERSION = '3.681';
+$Lab::Moose::Instrument::OI_Triton::VERSION = '3.682';
 #ABSTRACT: Oxford Instruments Triton gas handling system control
 
 use 5.010;
@@ -50,6 +50,17 @@ sub get_temperature {
     $args{channel} = 'T' . $args{channel};
 
     return $self->get_temperature_channel(%args);
+}
+
+
+sub get_temperature_resistance {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        channel => { isa => 'Int', default => 1 }
+    );
+    $args{channel} = 'T' . $args{channel};
+
+    return $self->get_temperature_channel_resistance(%args);
 }
 
 
@@ -207,7 +218,7 @@ Lab::Moose::Instrument::OI_Triton - Oxford Instruments Triton gas handling syste
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 
@@ -228,6 +239,10 @@ version 3.681
 =head2 get_temperature
 
  $temp = $oi_triton->get_temperature(channel => 1);
+
+=head2 get_temperature_resistance
+
+ $resistance = $oi_triton->get_temperature_resistance(channel => 1);
 
 =head2 get_T
 
@@ -293,6 +308,7 @@ Obviously this only makes sense while we're not in loop control mode.
 This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

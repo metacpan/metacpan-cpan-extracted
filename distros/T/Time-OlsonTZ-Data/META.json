@@ -47,7 +47,7 @@
    "provides" : {
       "Time::OlsonTZ::Data" : {
          "file" : "lib/Time/OlsonTZ/Data.pm",
-         "version" : "0.201901"
+         "version" : "0.201902"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.201901",
+   "version" : "0.201902",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

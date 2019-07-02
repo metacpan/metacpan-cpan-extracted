@@ -1,0 +1,16 @@
+{
+	"type" : "regular",
+	"response" : {
+		"failedLoginIP": "255.255.255.255",
+		"failedLogins": "1",
+		"lastFailedLogin": "1452889027",
+		"lastLogin": "1452884944",
+		"lastLoginIP": "255.255.255.255",
+		"token" : 123456789,
+		"unassociatedCert" : "false"
+	},
+	"error_code" : 0,
+	"error_msg" : "",
+	"warnings" : [],
+	"timestamp" : 1403115433
+}

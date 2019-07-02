@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Test::Map::Tube;
-$Dist::Zilla::Plugin::Test::Map::Tube::VERSION = '0.41';
+$Dist::Zilla::Plugin::Test::Map::Tube::VERSION = '0.42';
 $Dist::Zilla::Plugin::Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -8,7 +8,7 @@ Dist::Zilla::Plugin::Test::Map::Tube - Provides release test for Test::Map::Tube
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =cut
 
@@ -168,7 +168,7 @@ L<http://search.cpan.org/dist/Dist-Zilla-Plugin-Test-Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2016 Mohammad S Anwar.
+Copyright (C) 2015 - 2019 Mohammad S Anwar.
 
 This  program  is  free software; you can redistribute it  and/or modify it under
 the  terms  of the the Artistic License (2.0). You may  obtain a copy of the full

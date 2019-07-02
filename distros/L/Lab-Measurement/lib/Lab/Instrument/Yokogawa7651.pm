@@ -1,6 +1,6 @@
 package Lab::Instrument::Yokogawa7651;
 #ABSTRACT: Yokogawa 7651 DC source
-$Lab::Instrument::Yokogawa7651::VERSION = '3.681';
+$Lab::Instrument::Yokogawa7651::VERSION = '3.682';
 use warnings;
 use strict;
 use Time::HiRes qw/usleep/;
@@ -786,7 +786,7 @@ Lab::Instrument::Yokogawa7651 - Yokogawa 7651 DC source
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

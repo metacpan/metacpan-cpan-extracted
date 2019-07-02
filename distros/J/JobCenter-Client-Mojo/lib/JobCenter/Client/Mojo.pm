@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.36'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -36,8 +36,8 @@ use JSON::MaybeXS qw(decode_json encode_json);
 use MojoX::NetstringStream 0.06; # for the enhanced close
 
 has [qw(
-	actions address auth clientid conn daemon debug jobs json lastping
-	log method ns ping_timeout port rpc timeout tls token who
+	actions address auth clientid conn debug ioloop jobs json
+	lastping log method ns ping_timeout port rpc timeout tls token who
 )];
 
 # keep in sync with the jobcenter
@@ -53,6 +53,7 @@ sub new {
 
 	my $address = $args{address} // '127.0.0.1';
 	my $debug = $args{debug} // 0; # or 1?
+	$self->{ioloop} = $args{ioloop} // Mojo::IOLoop->singleton;
 	my $json = $args{json} // 1;
 	my $log = $args{log} // Mojo::Log->new(level => ($debug) ? 'debug' : 'info');
 	my $method = $args{method} // 'password';
@@ -66,7 +67,6 @@ sub new {
 	my $who = $args{who} or croak 'no who?';
 
 	$self->{address} = $address;
-	$self->{daemon} = $args{daemon} // 0;
 	$self->{debug} = $args{debug} // 1;
 	$self->{jobs} = {};
 	$self->{json} = $json;
@@ -101,8 +101,7 @@ sub connect {
 	$self->on(disconnect => sub {
 		my ($self, $code) = @_;
 		$self->{_exit} = $code;
-		Mojo::IOLoop->stop;
-		#exit(1);
+		$self->ioloop->stop;
 	});
 
 	my $rpc = JSON::RPC2::TwoWay->new(debug => $self->{debug}) or croak 'no rpc?';
@@ -120,7 +119,7 @@ sub connect {
 	$clarg->{tls_cert} = $self->{tls_cert} if $self->{tls_cert};
 	$clarg->{tls_key} = $self->{tls_key} if $self->{tls_key};
 
-	my $clientid = Mojo::IOLoop->client(
+	my $clientid = $self->ioloop->client(
 		$clarg => sub {
 		my ($loop, $err, $stream) = @_;
 		if ($err) {
@@ -144,6 +143,10 @@ sub connect {
 			$ns->close if $err[0];
 		});
 		$ns->on(close => sub {
+			# this cb is called during global destruction, at
+			# least on old perls where
+			# Mojo::Util::_global_destruction() won't work
+			return unless $conn;
 			$conn->close;
 			$self->log->info('connection to API closed');
 			$self->emit(disconnect => WORK_CONNECTION_CLOSED); # todo doc
@@ -154,7 +157,7 @@ sub connect {
 	$self->{clientid} = $clientid;
 
 	# handle timeout?
-	my $tmr = Mojo::IOLoop->timer($self->{timeout} => sub {
+	my $tmr = $self->ioloop->timer($self->{timeout} => sub {
 		my $loop = shift;
 		$self->log->error('timeout wating for greeting');
 		$loop->remove($clientid);
@@ -167,7 +170,8 @@ sub connect {
 
 	$self->log->debug('done with handhake?');
 
-	Mojo::IOLoop->remove($tmr);
+	$self->ioloop->remove($tmr);
+	$self->unsubscribe('disconnect');
 	1;
 }
 
@@ -178,7 +182,7 @@ sub is_connected {
 
 sub rpc_greetings {
 	my ($self, $c, $i) = @_;
-	Mojo::IOLoop->delay->steps(
+	$self->ioloop->delay(
 		sub {
 			my $d = shift;
 			die "wrong api version $i->{version} (expected 1.1)" unless $i->{version} eq '1.1';
@@ -276,7 +280,7 @@ sub call_nb {
 	$inargsj = decode_utf8($inargsj);
 	$self->log->debug("calling $wfname with '" . $inargsj . "'" . (($vtag) ? " (vtag $vtag)" : ''));
 
-	my $delay = Mojo::IOLoop->delay->steps(
+	$self->ioloop->delay(
 		sub {
 			my $d = shift;
 			$self->conn->call('create_job', {
@@ -334,7 +338,7 @@ sub find_jobs {
 	$filter = encode_json($filter) if ref $filter eq 'HASH';
 
 	my ($done, $err, $jobs);
-	Mojo::IOLoop->delay->steps(
+	$self->ioloop->delay(
 	sub {
 		my $d = shift;
 		# fixme: check results?
@@ -368,7 +372,7 @@ sub get_api_status {
 	croak('no what?') unless $what;
 
 	my $result;
-	Mojo::IOLoop->delay->steps(
+	$self->ioloop->delay(
 	sub {
 		my $d = shift;
 		$self->conn->call('get_api_status', { what => $what }, $d->begin(0));
@@ -395,7 +399,7 @@ sub get_job_status {
 	croak('no job_id?') unless $job_id;
 
 	my ($done, $job_id2, $outargs);
-	Mojo::IOLoop->delay->steps(
+	$self->ioloop->delay(
 	sub {
 		my $d = shift;
 		# fixme: check results?
@@ -431,7 +435,7 @@ sub ping {
 	$timeout //= $self->timeout;
 	my ($done, $ret);
 
-	Mojo::IOLoop->timer($timeout => sub {
+	$self->ioloop->timer($timeout => sub {
 		$done++;
 	});
 
@@ -452,13 +456,10 @@ sub ping {
 
 sub work {
 	my ($self) = @_;
-	if ($self->daemon) {
-		_daemonize();
-	}
 
 	my $pt = $self->ping_timeout;
 	my $tmr;
-	$tmr = Mojo::IOLoop->recurring($pt => sub {
+	$tmr = $self->ioloop->recurring($pt => sub {
 		my $ioloop = shift;
 		$self->log->debug('in ping_timeout timer: lastping: '
 			 . ($self->lastping // 0) . ' limit: ' . (time - $pt) );
@@ -469,14 +470,25 @@ sub work {
 		$ioloop->remove($tmr);
 		$ioloop->stop;
 	}) if $pt > 0;
+	$self->on(disconnect => sub {
+		my ($self, $code) = @_;
+		$self->{_exit} = $code;
+		$self->ioloop->stop;
+	});
 
 	$self->{_exit} = WORK_OK;
 	$self->log->debug('JobCenter::Client::Mojo starting work');
-	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+	$self->ioloop->start unless Mojo::IOLoop->is_running;
 	$self->log->debug('JobCenter::Client::Mojo done?');
-	Mojo::IOLoop->remove($tmr) if $tmr;
+	$self->ioloop->remove($tmr) if $tmr;
 
 	return $self->{_exit};
+}
+
+sub stop {
+	my ($self, $exit) = @_;
+	$self->{_exit} = $exit;
+	$self->ioloop->stop;
 }
 
 sub announce {
@@ -494,7 +506,7 @@ sub announce {
 	croak "already have action $actionname" if $self->actions->{$actionname};
 
 	my $err;
-	Mojo::IOLoop->delay->steps(
+	$self->ioloop->delay(
 	sub {
 		my $d = shift;
 		# fixme: check results?
@@ -548,7 +560,7 @@ sub rpc_task_ready {
 	}
 
 	$self->log->debug("got task_ready for $actionname job_id $job_id calling get_task");
-	Mojo::IOLoop->delay->steps(sub {
+	$self->ioloop->delay(sub {
 		my $d = shift;
 		$c->call('get_task', {actionname => $actionname, job_id => $job_id}, $d->begin(0));
 	},
@@ -596,7 +608,7 @@ sub _subproc {
 	my ($self, $c, $action, $job_id, $cookie, @args) = @_;
 
 	# based on Mojo::IOLoop::Subprocess
-	my $ioloop = Mojo::IOLoop->singleton;
+	my $ioloop = $self->ioloop;
 
 	# Pipe for subprocess communication
 	pipe(my $reader, my $writer) or die "Can't create pipe: $!";
@@ -666,26 +678,11 @@ sub _subproc {
 	);
 }
 
-# copied from Mojo::Server
-sub _daemonize {
-	use POSIX;
-
-	# Fork and kill parent
-	die "Can't fork: $!" unless defined(my $pid = fork);
-	exit 0 if $pid;
-	POSIX::setsid or die "Can't start a new session: $!";
-
-	# Close filehandles
-	open STDIN,  '</dev/null';
-	open STDOUT, '>/dev/null';
-	open STDERR, '>&STDOUT';
-}
-
 # tick while Mojo::Reactor is still running and condition callback is true
 sub _loop {
 	warn __PACKAGE__." recursing into IO loop" if state $looping++;
 
-	my $reactor = Mojo::IOLoop->singleton->reactor;
+	my $reactor = $_[0]->ioloop->singleton->reactor;
 	my $err;
 
 	if (ref $reactor eq 'Mojo::Reactor::EV') {
@@ -798,6 +795,10 @@ Valid arguments are:
 =item - debug: when true prints debugging using L<Mojo::Log>
 
 (default: false)
+
+=item - ioloop: L<Mojo::IOLoop> object to use
+
+(per default the L<Mojo::IOLoop>->singleton object is used)
 
 =item - json: flag wether input is json or perl.
 
@@ -998,6 +999,20 @@ Starts the L<Mojo::IOLoop>.  Returns a non-zero value when the IOLoop was
 stopped due to some error condition (like a lost connection or a ping
 timeout).
 
+=head3 Possible work() exit codes
+
+The JobCenter::Client::Mojo library currently defines the following exit codes:
+
+	WORK_OK
+	WORK_PING_TIMEOUT
+	WORK_CONNECTION_CLOSED
+
+=head2 stop
+
+  $client->stop($exit);
+
+Makes the work() function exit with the provided exit code.
+
 =head1 SEE ALSO
 
 =over 4
@@ -1008,9 +1023,7 @@ L<Mojo::IOLoop>, L<Mojo::IOLoop::Stream>, L<http://mojolicious.org>: the L<Mojol
 
 =item *
 
-L<examples/jcclient>, L<examples/jcworker>
-
-=item *
+L<jcclient|https://github.com/a6502/JobCenter-Client-Mojo/blob/master/examples/jcclient>, L<jcworker|https://github.com/a6502/JobCenter-Client-Mojo/blob/master/examples/jcworker>
 
 =back
 

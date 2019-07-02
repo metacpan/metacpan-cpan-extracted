@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.050';
+our $VERSION = '1.051';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -2672,7 +2672,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.050
+This document describes Regexp::Grammars version 1.051
 
 
 =head1 SYNOPSIS
@@ -2769,47 +2769,50 @@ This document describes Regexp::Grammars version 1.050
 
 =head2 Matching rules in your grammar...
 
-    <RULENAME>               Call named subrule (may be fully qualified)
-                             save result to $MATCH{RULENAME}
+    <RULENAME>                Call named subrule (may be fully qualified)
+                              save result to $MATCH{RULENAME}
 
-    <RULENAME(...)>          Call named subrule, passing args to it
+    <RULENAME(...)>           Call named subrule, passing args to it
 
-    <!RULENAME>              Call subrule and fail if it matches
-    <!RULENAME(...)>         (shorthand for (?!<.RULENAME>) )
+    <!RULENAME>               Call subrule and fail if it matches
+    <!RULENAME(...)>          (shorthand for (?!<.RULENAME>) )
 
-    <:IDENT>                 Match contents of $ARG{IDENT} as a pattern
-    <\:IDENT>                Match contents of $ARG{IDENT} as a literal
-    </:IDENT>                Match closing delimiter for $ARG{IDENT}
+    <:IDENT>                  Match contents of $ARG{IDENT} as a pattern
+    <\:IDENT>                 Match contents of $ARG{IDENT} as a literal
+    </:IDENT>                 Match closing delimiter for $ARG{IDENT}
 
-    <%HASH>                  Match longest possible key of hash
-    <%HASH {PAT}>            Match any key of hash that also matches PAT
+    <%HASH>                   Match longest possible key of hash
+    <%HASH {PAT}>             Match any key of hash that also matches PAT
 
-    </IDENT>                 Match closing delimiter for $MATCH{IDENT}
-    <\_IDENT>                Match the literal contents of $MATCH{IDENT}
+    </IDENT>                  Match closing delimiter for $MATCH{IDENT}
+    <\_IDENT>                 Match the literal contents of $MATCH{IDENT}
 
-    <ALIAS= RULENAME>        Call subrule, save result in $MATCH{ALIAS}
-    <ALIAS= %HASH>           Match a hash key, save key in $MATCH{ALIAS}
-    <ALIAS= ( PATTERN )>     Match pattern, save match in $MATCH{ALIAS}
-    <ALIAS= (?{ CODE })>     Execute code, save value in $MATCH{ALIAS}
-    <ALIAS= 'STR' >          Save specified string in $MATCH{ALIAS}
-    <ALIAS= 42 >             Save specified number in $MATCH{ALIAS}
-    <ALIAS= /IDENT>          Match closing delim, save as $MATCH{ALIAS}
-    <ALIAS= \_IDENT>         Match '$MATCH{IDENT}', save as $MATCH{ALIAS}
+    <ALIAS= RULENAME>         Call subrule, save result in $MATCH{ALIAS}
+    <ALIAS= %HASH>            Match a hash key, save key in $MATCH{ALIAS}
+    <ALIAS= ( PATTERN )>      Match pattern, save match in $MATCH{ALIAS}
+    <ALIAS= (?{ CODE })>      Execute code, save value in $MATCH{ALIAS}
+    <ALIAS= 'STR' >           Save specified string in $MATCH{ALIAS}
+    <ALIAS= 42 >              Save specified number in $MATCH{ALIAS}
+    <ALIAS= /IDENT>           Match closing delim, save as $MATCH{ALIAS}
+    <ALIAS= \_IDENT>          Match '$MATCH{IDENT}', save as $MATCH{ALIAS}
 
-    <.SUBRULE>               Call subrule (one of the above forms),
-                             but don't save the result in %MATCH
+    <.SUBRULE>                Call subrule (one of the above forms),
+                              but don't save the result in %MATCH
 
 
-    <[SUBRULE]>              Call subrule (one of the above forms), but
-                             append result instead of overwriting it
+    <[SUBRULE]>               Call subrule (one of the above forms), but
+                              append result instead of overwriting it
 
-    <SUBRULE1>+ % <SUBRULE2> Match one or more repetitions of SUBRULE1
-                             as long as they're separated by SUBRULE2
-    <SUBRULE1> ** <SUBRULE2> Same (only for backwards compatibility)
+    <SUBRULE1>+ % <SUBRULE2>  Match one or more repetitions of SUBRULE1
+                              as long as they're separated by SUBRULE2
+    <SUBRULE1> ** <SUBRULE2>  Same (only for backwards compatibility)
 
-    <SUBRULE1>* % <SUBRULE2> Match zero or more repetitions of SUBRULE1
-                             as long as they're separated by SUBRULE2
+    <SUBRULE1>* % <SUBRULE2>  Match zero or more repetitions of SUBRULE1
+                              as long as they're separated by SUBRULE2
 
+    <SUBRULE1>* %% <SUBRULE2> Match zero or more repetitions of SUBRULE1
+                              as long as they're separated by SUBRULE2
+                              and allow an optional trailing SUBRULE2
 
 =head2 In your grammar's code blocks...
 
@@ -2843,7 +2846,7 @@ This document describes Regexp::Grammars version 1.050
 This module adds a small number of new regex constructs that can be used
 within Perl 5.10 patterns to implement complete recursive-descent parsing.
 
-Perl 5.10 already supports recursive=descent I<matching>, via the new
+Perl 5.10 already supports recursive-descent I<matching>, via the new
 C<< (?<name>...) >> and C<< (?&name) >> constructs. For example, here is
 a simple matcher for a subset of the LaTeX markup language:
 
@@ -3008,7 +3011,7 @@ quietly adds a C</x> to every regex within the scope of its usage.
 Otherwise, the default I<"a whitespace character matches exactly that
 whitespace character"> behaviour of Perl regexes would mess up your
 grammar's parsing. If you need the non-C</x> behaviour, you can still
-use the C<(?-x)> of C<(?-x:...)> directives to switch of C</x> within
+use the C<(?-x)> of C<(?-x:...)> directives to switch off C</x> within
 one or more of your grammar's components.
 
 Once the grammar has been processed, you can then match text against the
@@ -3115,7 +3118,7 @@ So Regexp::Grammars provides the C<< <ws:> >> directive, which allows
 you to override the implicit whitespace-matches-whitespace behaviour
 only within the current rule.
 
-Note that this directive does I<not> redefined C<< <ws> >> within the
+Note that this directive does I<not> redefine C<< <ws> >> within the
 rule; it simply specifies what to replace each whitespace sequence with
 (instead of replacing each with a C<< <ws> >> call).
 
@@ -3981,6 +3984,35 @@ variant. That is:
     <[item]>* * <sep>      # error (two * qualifiers in a row)
 
 
+=head3 Matching separated lists with a trailing separator
+
+Some languages allow a separated list to include an extra trailing
+separator. For example:
+
+    ~/bin/perl5/        # Trailing /-separator in filepath
+    (1,2,3,)            # Trailing ,-separator in Perl list
+
+To match such constructs using the C<%> operator, you would need
+to add something to explicitly match the optional trailing separator:
+
+    <dir>+ % [/] [/]?    # Slash-separated dirs, then optional final slash
+
+    <elem>+ % [,] [,]?   # Comma-separated elems, then optional final comma
+
+which is tedious.
+
+So the module also supports a second kind of "separated list" operator,
+that allows an optional trailing separator as well: the C<%%> operator.
+THis operator behaves exactly like the C<%> operator, except that it
+also matches a final trailing separator, if one is present.
+
+So the previous examples could be (better) written as:
+
+    <dir>+ %% [/]     # Slash-separated dirs, with optional final slash
+
+    <elem>+ %% [,]    # Comma-separated elems, with optional final comma
+
+
 =head2 Matching hash keys
 
 In some situations a grammar may need a rule that matches dozens,
@@ -4309,7 +4341,7 @@ to get C<< </IDENT> >>.
 
 =head2 Rematching parametric results and delimiters
 
-The C<< <\I<IDENTIFIER>> >> and C<< </I<IDENTIFIER>> >> mechanisms
+The C<< <\_I<IDENTIFIER>> >> and C<< </I<IDENTIFIER>> >> mechanisms
 normally locate the literal to be matched by looking in
 C<$MATCH{I<IDENTIFIER>}>.
 
@@ -4778,7 +4810,7 @@ pattern, or code block as its complete result, and return that value
 instead of the usual result-hash it constructs. This is the case even if
 the result has other entries that would normally also be returned.
 
-For example, in a rule like:
+For example, consider a rule like:
 
     <rule: term>
           <MATCH=literal>

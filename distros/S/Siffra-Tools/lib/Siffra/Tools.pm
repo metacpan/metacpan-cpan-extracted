@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.11';
+    $VERSION = '0.13';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -400,7 +400,7 @@ sub parseBlockText()
             {
                 if ( $auxiliar->{ $field->{ field } } !~ /$field->{match}/ )
                 {
-                    my $msg = "O campo [ $auxiliar->{ $field->{ field } } ] não corresponde a regra de validação [ $field->{match} ]...";
+                    my $msg = "O campo [ $field->{ field } ] com o valor [ $auxiliar->{ $field->{ field } } ] não corresponde a regra de validação [ $field->{match} ] no registro [ $. ]...";
                     $log->error( $msg );
                     $retorno->{ rows }    = undef;
                     $retorno->{ message } = $msg;

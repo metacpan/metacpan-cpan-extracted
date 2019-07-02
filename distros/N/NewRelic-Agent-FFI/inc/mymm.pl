@@ -17,7 +17,7 @@ sub myWriteMakefile
 
   unless(@system)
   {
-    $args{PREREQ_PM}->{'Alien::nragent'} = 0;
+    $args{PREREQ_PM}->{'Alien::nragent'} = '0.06';
   }
   
   WriteMakefile(%args);

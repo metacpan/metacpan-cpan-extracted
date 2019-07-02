@@ -1,6 +1,6 @@
 package Lab::Bus::IsoBus;
 #ABSTRACT: Oxford Instruments ISOBUS bus
-$Lab::Bus::IsoBus::VERSION = '3.681';
+$Lab::Bus::IsoBus::VERSION = '3.682';
 use strict;
 use Lab::Connection;
 use Scalar::Util qw(weaken);
@@ -224,7 +224,7 @@ Lab::Bus::IsoBus - Oxford Instruments ISOBUS bus
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

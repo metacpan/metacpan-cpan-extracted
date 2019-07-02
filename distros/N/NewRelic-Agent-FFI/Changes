@@ -1,5 +1,10 @@
 Revision history for NewRelic-Agent-FFI
 
+0.09      2019-07-01 20:01:17 -0400
+  - Requrie Alien::nragent 0.06 if the system New Relic SDK libraries
+    are not found.  That will force 0.17.0, the latest version as of
+    this writing.
+
 0.08      2018-11-30 11:18:08 -0500
   - Document important limitations of the New Relic SDK
 

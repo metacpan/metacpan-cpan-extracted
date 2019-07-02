@@ -1,6 +1,6 @@
 package Lab::Bus::DEBUG;
 #ABSTRACT: Interactive debug bus
-$Lab::Bus::DEBUG::VERSION = '3.681';
+$Lab::Bus::DEBUG::VERSION = '3.682';
 use warnings;
 use strict;
 use 5.010;
@@ -237,7 +237,7 @@ Lab::Bus::DEBUG - Interactive debug bus
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 DESCRIPTION
 

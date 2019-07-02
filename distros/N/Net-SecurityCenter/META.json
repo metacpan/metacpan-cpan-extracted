@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl interface to Tenable SecurityCenter REST API",
+   "abstract" : "Perl interface to Tenable.sc (SecurityCenter) REST API",
    "author" : [
       "Giuseppe Di Terlizzi <gdt@cpan.org>"
    ],
@@ -33,11 +33,14 @@
       "runtime" : {
          "requires" : {
             "JSON" : "0",
-            "LWP::UserAgent" : "6.04"
+            "LWP::UserAgent" : "6.04",
+            "Time::Piece" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
+            "HTTP::Daemon" : "0",
             "Test::More" : "0"
          }
       }
@@ -50,6 +53,6 @@
          "web" : "https://github.com/LotarProject/perl-Net-SecurityCenter"
       }
    },
-   "version" : "0.100",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.200",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

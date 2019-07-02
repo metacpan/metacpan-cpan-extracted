@@ -1,0 +1,42 @@
+NAME
+
+    Device::Chip::Adapter::UART - a Device::Chip::Adapter implementation
+    for serial devices
+
+DESCRIPTION
+
+    This class implements the Device::Chip::Adapter interface around a
+    regular serial port, such as a USB UART adapter, allowing an instance
+    of a Device::Chip driver to communicate with actual chip hardware using
+    this adapter.
+
+    At present, this adapter only provides the GPIO protocol as a wrapper
+    around the modem control and handshaking lines. A future version will
+    also provide access to the actual transmit and receive data, once a
+    suitable interface is designed.
+
+CONSTRUCTOR
+
+ new
+
+       $adapter = Device::Chip::Adapter::UART->new( %args )
+
+    Returns a new instance of a Device::Chip::Adapter::UART.
+
+    Takes the following named arguments:
+
+    dev => STRING
+
+      Path to the device node representing the UART; usually something like
+      /dev/ttyUSB0 or /dev/ttyACM0.
+
+PROTOCOLS
+
+    The following Device::Chip::Adapter protocol types are supported
+
+      * GPIO
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

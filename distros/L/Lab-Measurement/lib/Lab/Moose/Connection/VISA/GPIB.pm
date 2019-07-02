@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA::GPIB;
-$Lab::Moose::Connection::VISA::GPIB::VERSION = '3.681';
+$Lab::Moose::Connection::VISA::GPIB::VERSION = '3.682';
 #ABSTRACT: GPIB frontend to National Instruments' VISA library.
 
 
@@ -77,7 +77,7 @@ Lab::Moose::Connection::VISA::GPIB - GPIB frontend to National Instruments' VISA
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

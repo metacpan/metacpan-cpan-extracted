@@ -4,30 +4,48 @@ use warnings;
 use strict;
 
 use Carp;
-use LWP::UserAgent;
+use Data::Dumper;
+use English qw( -no_match_vars );
 use HTTP::Cookies;
 use JSON;
+use LWP::UserAgent;
 
-our $VERSION = '0.100';
+use Net::SecurityCenter::Utils qw(:all);
+
+our $VERSION = '0.200';
+
+#-------------------------------------------------------------------------------
+# CONSTRUCTOR
+#-------------------------------------------------------------------------------
 
 sub new {
 
-    my ($class, $host, $options) = @_;
+    my ( $class, $host, $options ) = @_;
+
+    if ( !$host ) {
+        $@ = 'Specify valid Tenable.sc (SecurityCenter) hostname or IP address';    ## no critic
+        return;
+    }
 
     my $agent      = LWP::UserAgent->new();
-    my $cookie_jar = HTTP::Cookies->new;();
+    my $cookie_jar = HTTP::Cookies->new();
 
-    croak('Specify valid SecurityCenter hostname or IP address')
-        unless ($host);
+    $agent->agent( _agent() );
+    $agent->ssl_opts( verify_hostname => 0 );
 
-    $agent->agent(_agent());
-    $agent->ssl_opts(verify_hostname => 0);
+    my $timeout  = delete( $options->{'timeout'} );
+    my $ssl_opts = delete( $options->{'ssl_options'} ) || {};
+    my $logger   = delete( $options->{'logger'} ) || undef;
+    my $no_check = delete( $options->{'no_check'} ) || 0;
 
-    my $timeout  = delete($options->{timeout});
-    my $ssl_opts = delete($options->{ssl_options}) || {};
+    if ($timeout) {
+        $agent->timeout($timeout);
+    }
 
-    $agent->timeout($timeout);
-    $agent->ssl_opts($ssl_opts);
+    if ($ssl_opts) {
+        $agent->ssl_opts($ssl_opts);
+    }
+
     $agent->cookie_jar($cookie_jar);
 
     my $self = {
@@ -36,201 +54,361 @@ sub new {
         url     => "https://$host/rest",
         token   => undef,
         agent   => $agent,
+        logger  => $logger,
+        _error  => undef,
     };
 
     bless $self, $class;
 
-    #$self->_init();
+    if ( !$no_check ) {
+        $self->check();
+    }
 
     return $self;
 
 }
 
+#-------------------------------------------------------------------------------
+# UTILS
+#-------------------------------------------------------------------------------
+
 sub _agent {
 
     my $class = __PACKAGE__;
-    (my $agent = $class) =~ s{::}{-}g;
+    ( my $agent = $class ) =~ s{::}{-}g;
 
-    return $agent . "/" . $class->VERSION;
+    return "$agent/" . $class->VERSION;
 
 }
+
+#-------------------------------------------------------------------------------
+
+sub _dumper {
+
+    my (@data) = @_;
+
+    local $Data::Dumper::Terse  = 1;
+    local $Data::Dumper::Indent = 0;
+
+    return Dumper(@data);
+
+}
+
+#-------------------------------------------------------------------------------
 
 sub _trim {
 
-  my $string = shift;
-  return $string unless($string);
+    my ($string) = @_;
 
-  $string =~ s/^\s+|\s+$//g;
-  return $string;
+    return if ( !$string );
+
+    $string =~ s/^\s+|\s+$//g;
+    return $string;
 
 }
 
-sub _init {
+#-------------------------------------------------------------------------------
+
+sub check {
 
     my ($self) = @_;
 
-    my $response = eval { $self->request('GET', '/system') };
+    my $response = $self->request( 'GET', '/system' );
 
-    croak('Failed to connect to Security Center via ', $self->{url})
-        if ($@);
+    if ( !$response ) {
+        $self->error( 'Failed to connect to Tenable.sc (SecurityCenter) : ', $self->{'host'}, 500 );
+        return;
+    }
 
-    if ($response) {
+    $self->{'version'}  = $response->{'version'};
+    $self->{'build_id'} = $response->{'buildID'};
+    $self->{'license'}  = $response->{'licenseStatus'};
+    $self->{'uuid'}     = $response->{'uuid'};
 
-        $self->{version}  = $response->{'version'};
-        $self->{build_id} = $response->{'buildID'};
-        $self->{license}  = $response->{'licenseStatus'};
-        $self->{uuid}     = $response->{'uuid'};
+    if ( $self->{'logger'} ) {
+        $self->logger( 'info',
+            'Tenable.sc (SecurityCenter) ' . $self->{'version'} . ' (Build ID:' . $self->{'build_id'} . ')' );
+    }
 
+    return 1;
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub error {
+
+    my ( $self, $message, $code ) = @_;
+
+    if ( defined $message ) {
+        $self->{'_error'} = Net::SecurityCenter::Error->new( $message, $code );
+        return;
+    } else {
+        return $self->{'_error'};
     }
 
 }
 
-sub post {
+#-------------------------------------------------------------------------------
+# REST HELPER METHODS (get, head, put, post, delete and patch)
+#-------------------------------------------------------------------------------
 
-    my ($self, $path, $params) = @_;
+for my $sub_name (qw/get head put post delete patch/) {
 
-    (@_ == 2 || (@_ == 3 && ref $params eq 'HASH'))
-        or croak(q/Usage: $sc->post(PATH, [HASHREF])/);
-
-    return $self->request('POST', $path, $params);
-
-}
-
-sub get {
-
-    my ($self, $path, $params) = @_;
-
-    (@_ == 2 || (@_ == 3 && ref $params eq 'HASH'))
-        or croak(q/Usage: $sc->get(PATH, [HASHREF])/);
-
-    return $self->request('GET', $path, $params);
+    my $req_method = uc $sub_name;
+    no strict 'refs';    ## no critic
+    eval <<"HERE";       ## no critic
+    sub $sub_name {
+        my ( \$self, \$path, \$params ) = \@_;
+        my \$class = ref \$self;
+        ( \@_ == 2 || ( \@_ == 3 && ref \$params eq 'HASH' ) )
+            or croak("Usage: \$class->$sub_name( PATH, [HASHREF] )\n");
+        return \$self->request('$req_method', \$path, \$params || {});
+    }
+HERE
 
 }
 
-sub put {
-
-    my ($self, $path, $params) = @_;
-
-    (@_ == 2 || (@_ == 3 && ref $params eq 'HASH'))
-        or croak(q/Usage: $sc->put(PATH, [HASHREF])/);
-
-    return $self->request('PUT', $path, $params);
-
-}
-
-sub delete {
-
-    my ($self, $path, $params) = @_;
-
-    (@_ == 2 || (@_ == 3 && ref $params eq 'HASH'))
-        or croak(q/Usage: $sc->delete(PATH, [HASHREF])/);
-
-    return $self->request('DELETE', $path, $params);
-
-}
-
-sub patch {
-
-    my ($self, $path, $params) = @_;
-
-    (@_ == 2 || (@_ == 3 && ref $params eq 'HASH'))
-        or croak(q/Usage: $sc->patch(PATH, [HASHREF])/);
-
-    return $self->request('PATCH', $path, $params);
-
-}
+#-------------------------------------------------------------------------------
 
 sub request {
 
-    my ($self, $method, $path, $params) = @_;
+    my ( $self, $method, $path, $params ) = @_;
 
-#     (@_ == 3 || (@_ == 4 && ref $params eq 'HASH'))
-#         or croak(q/Usage: $sc->request(METHOD, PATH, [HASHREF])/);
+    ( @_ == 3 || @_ == 4 )
+        or croak( 'Usage: ' . __PACKAGE__ . '->request(GET|POST|PUT|DELETE|PATCH, $PATH, [\%PARAMS])' );
 
-    croak('Unsupported request method')
-        if ($method !~ /(get|post|put|delete|patch)/i);
+    $method = uc($method);
+    $path =~ s{^/}{};
 
-    $path =~ s/^\///;
-
-    my $url     = $self->{url} . "/$path";
-    my $request = HTTP::Request->new( uc($method) => $url );
-    my $content = undef;
-       $content = encode_json($params) if ($params);
-
-    $request->header('Content-Type', 'application/json');
-
-    if ($content) {
-        $request->content($content);
+    if ( $method !~ m/(GET|POST|PUT|DELETE|PATCH)/ ) {
+        carp( $method, ' is an unsupported request method' );
+        croak( 'Usage: ' . __PACKAGE__ . '->request(GET|POST|PUT|DELETE|PATCH, $PATH, [\%PARAMS])' );
     }
 
-    my $response = $self->{agent}->request($request);
+    my $url             = $self->{'url'} . "/$path";
+    my $agent           = $self->{'agent'};
+    my $request         = HTTP::Request->new( $method => $url );
+    my $request_content = undef;
 
-    my $result  = {};
-    my $is_json = ($response->headers->{'content-type'} =~ /application\/json/);
+    if ( $self->{'logger'} ) {
 
-    if ($is_json) {
-        $result = eval { decode_json($response->content()) };
+        $self->logger( 'info', "Method: $method" );
+        $self->logger( 'info', "Path: $path" );
+        $self->logger( 'info', "URL: $url" );
+
+        # Don't log credential
+        if ( $path !~ /token/ ) {
+            $self->logger( 'info', "Params: " . _dumper($params) );
+        }
+
     }
 
-    if ($response->is_success()) {
+    if ( $params->{'file'} ) {
 
-        if ($is_json) {
+        require HTTP::Request::Common;
 
-            if (defined($result->{'response'})) {
-                return $result->{'response'};
-            } elsif ($result->{'error_msg'}) {
-                croak _trim($result->{'error_msg'});
-            }
+        $request = HTTP::Request::Common::POST(
+            $url,
+            'Content-Type' => 'multipart/form-data',
+            'Content'      => [
+                Filedata => [ $params->{'file'}, undef, 'Content-Type' => 'application/octet-stream' ]
+            ],
+        );
 
-        } else {
-            return $response->content();
+        if ( $self->{'logger'} ) {
+            $self->logger( 'debug', $request->dump );
         }
 
     } else {
 
-        if ($response->code() == 403) {
-            $result  = eval { decode_json($response->content()) };
-            $is_json = 1;
+        $request->header( 'Content-Type', 'application/json' );
+
+        if ($params) {
+            $request_content = encode_json($params);
         }
 
-        if ($is_json && exists($result->{'error_msg'})) {
-            croak _trim($result->{'error_msg'});
-        } else {
-            croak $response->content();
+        if ($request_content) {
+            $request->content($request_content);
         }
 
     }
 
+    my $response         = $agent->request($request);
+    my $response_content = $response->content();
+    my $response_ctype   = $response->headers->{'content-type'};
+    my $response_code    = $response->code();
+
+    my $result  = {};
+    my $is_json = ( $response_ctype =~ /application\/json/ );
+
+    # Force JSON decode for 403 Forbidden message without JSON Content-Type header
+    if ( $response_code == 403 && $response_ctype !~ /application\/json/ ) {
+        $is_json = 1;
+    }
+
+    if ($is_json) {
+        $result = eval { decode_json($response_content) };
+    }
+
+    if ( $self->{'logger'} ) {
+
+        my $log_http_status = 'Response status: ' . $response->status_line;
+
+        if ( $response->is_success() ) {
+            $self->logger( 'info', $log_http_status );
+        } else {
+            $self->logger( 'error', $log_http_status );
+        }
+
+    }
+
+    if ( $response->is_success() ) {
+
+        if ($is_json) {
+
+            if ( defined( $result->{'response'} ) ) {
+                return $result->{'response'};
+
+            } elsif ( $result->{'error_msg'} ) {
+
+                my $error_msg = _trim( $result->{'error_msg'} );
+
+                if ( $self->{'logger'} ) {
+                    $self->logger( 'error', $error_msg );
+                }
+
+                $self->error( $error_msg, $response_code );
+                return;
+            }
+
+        }
+
+        return $response_content;
+
+    }
+
+    if ( $is_json && exists( $result->{'error_msg'} ) ) {
+
+        my $error_msg = _trim( $result->{'error_msg'} );
+
+        if ( $self->{'logger'} ) {
+            $self->logger( 'error', $error_msg );
+        }
+
+        $self->error( $error_msg, $response_code );
+        return;
+
+    }
+
+    if ( $self->{'logger'} ) {
+        $self->logger( 'error', $response_content );
+    }
+
+    $self->error( $response_content, $response_code );
+    return;
+
 }
 
-sub login {
+#-------------------------------------------------------------------------------
+# HELPER METHODS
+#-------------------------------------------------------------------------------
 
-    my ($self, $username, $password) = @_;
+sub upload {
 
-    (@_ == 3) or croak(q/Usage: $sc->login(USERNAME, PASSWORD)/);
+    my ( $self, $file ) = @_;
 
-    my $response = $self->request('POST', '/token', { username => $username, password => $password });
+    ( @_ == 2 )
+        or croak( 'Usage: ' . __PACKAGE__ . 'upload( $FILE )' );
 
-    $self->{token} = $response->{'token'};
-    $self->{agent}->default_header('X-SecurityCenter', $self->{token});
+    return $self->request( 'POST', '/file/upload', { 'file' => $file } );
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub logger {
+
+    my ( $self, $level, $message ) = @_;
+
+    if ( !$self->{'logger'} ) {
+        return 0;
+    }
+
+    $level = lc($level);
+
+    my $caller = ( caller(1) )[3] || q{};
+    $caller =~ s/(::)(\w+)$/->$2/;
+
+    $self->{'logger'}->$level("$caller - $message");
 
     return 1;
 
 }
+
+#-------------------------------------------------------------------------------
+
+sub login {
+
+    my ( $self, $username, $password ) = @_;
+
+    ( @_ == 3 ) or croak( 'Usage: ' . __PACKAGE__ . '->login( $USERNAME, $PASSWORD )' );
+
+    my $response = $self->request(
+        'POST', '/token',
+        {
+            username => $username,
+            password => $password
+        }
+    );
+
+    if ( !$response ) {
+        return;
+    }
+
+    $self->{'token'} = $response->{'token'};
+    $self->{'agent'}->default_header( 'X-SecurityCenter', $self->{'token'} );
+
+    if ( $self->{'logger'} ) {
+        $self->logger( 'info',  'Connected to SecurityCenter (' . $self->{'host'} . ')' );
+        $self->logger( 'debug', "User: $username" );
+        $self->logger( 'debug', "Token: " . $self->{'token'} );
+    }
+
+    return 1;
+
+}
+
+#-------------------------------------------------------------------------------
 
 sub logout {
 
     my ($self) = @_;
-    $self->request('DELETE', '/token');
+
+    $self->request( 'DELETE', '/token' );
+    $self->{'token'} = undef;
+
+    if ( $self->{'logger'} ) {
+        $self->logger( 'info', 'Disconnected from SecurityCenter (' . $self->{'host'} . ')' );
+    }
 
     return 1;
 
 }
 
+#-------------------------------------------------------------------------------
+
 sub DESTROY {
+
     my ($self) = @_;
-    $self->logout() if $self->{token};
+
+    if ( $self->{'token'} ) {
+        $self->logout();
+    }
+
 }
+
+#-------------------------------------------------------------------------------
 
 1;
 
@@ -242,11 +420,13 @@ __END__
 
 =head1 NAME
 
-Net::SecurityCenter::REST - Perl interface to Tenable SecurityCenter REST API
+Net::SecurityCenter::REST - Perl interface to Tenable.sc (SecurityCenter) REST API
+
 
 =head1 SYNOPSIS
 
     use Net::SecurityCenter::REST;
+
     my $sc = Net::SecurityCenter::REST('sc.example.org');
 
     $sc->login('secman', 'password');
@@ -255,20 +435,24 @@ Net::SecurityCenter::REST - Perl interface to Tenable SecurityCenter REST API
 
     $sc->logout();
 
+
 =head1 DESCRIPTION
 
-This module provides Perl scripts easy way to interface the REST API of Tenable
-SecurityCenter.
+This module provides Perl scripts easy way to interface the REST API of Tenable.sc
+(SecurityCenter).
 
-For more information about the SecurityCenter REST API follow the online documentation:
+For more information about the Tenable.sc (SecurityCenter) REST API follow the online documentation:
 
 L<https://docs.tenable.com/sccv/api/index.html>
 
+
 =head1 CONSTRUCTOR
 
-=head2 Net::SecurityCenter::REST->new ( host [, { timeout => $timeout , ssl_options => $ssl_options } ] )
+=head2 Net::SecurityCenter::REST->new ( host [, $params ] )
 
-Create a new instance of B<Net::Security::Center::REST>.
+Create a new instance of L<Net::SecurityCenter::REST>.
+
+Params:
 
 =over 4
 
@@ -277,29 +461,40 @@ read or write takes longer than the timeout, an exception is thrown.
 
 =item * C<ssl_options> : A hashref of C<SSL_*> options to pass through to L<IO::Socket::SSL>.
 
+=item * C<logger> : A logger instance (eg. L<Log::Log4perl> or L<Log::Any> for log
+the REST request and response messages.
+
+=item * C<no_check> : Disable the check of SecurityCenter installation.
+
 =back
+
 
 =head1 METHODS
 
-=head2 $sc->post|get|put|delete|patch ( path [, { param => value, ... } ] )
+=head2 $sc->post|get|put|delete|patch ( $path [, \%params ] )
 
 Execute a request to SecurityCenter REST API. These methods are shorthand for
 calling C<request()> for the given method.
 
     my $nessus_scan = $sc->post('/scanResult/1337/download',  { 'downloadType' => 'v2' });
 
-=head2 $sc->request (method, path [, { param => value, ... } ] )
+=head2 $sc->request ( $method, $path [, \%params ] )
 
 Execute a HTTP request of the given method type ('GET', 'POST', 'PUT', 'DELETE',
 ''PATCH') to SecurityCenter REST API.
 
-=head2 $sc->login ( username, password )
+=head2 $sc->login ( $username, $password )
 
 Login into SecurityCenter.
 
 =head2 $sc->logout
 
 Logout from SecurityCenter.
+
+=head2 $sc->upload ( $file )
+
+Upload a file into SecurityCenter.
+
 
 =head1 SUPPORT
 
@@ -318,7 +513,8 @@ L<https://github.com/LotarProject/perl-Net-SecurityCenter>
 
     git clone https://github.com/LotarProject/perl-Net-SecurityCenter.git
 
-=head1 AUTHORS
+
+=head1 AUTHOR
 
 =over 4
 
@@ -326,9 +522,10 @@ L<https://github.com/LotarProject/perl-Net-SecurityCenter>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Giuseppe Di Terlizzi.
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

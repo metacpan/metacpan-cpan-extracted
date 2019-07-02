@@ -1,5 +1,5 @@
 package Lab::XPRESS::hub;
-$Lab::XPRESS::hub::VERSION = '3.681';
+$Lab::XPRESS::hub::VERSION = '3.682';
 #ABSTRACT: The XPRESS main hub
 
 use Lab::Exception;
@@ -190,7 +190,7 @@ Lab::XPRESS::hub - The XPRESS main hub
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 COPYRIGHT AND LICENSE
 

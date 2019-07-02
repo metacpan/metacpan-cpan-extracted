@@ -4,661 +4,253 @@ use warnings;
 use strict;
 
 use Carp;
-use List::Util qw(first);
-use IO::Uncompress::Unzip qw(unzip $UnzipError);
 
 use Net::SecurityCenter::REST;
+use Net::SecurityCenter::Error;
 
-use Data::Dumper;
+require Net::SecurityCenter::API::Analysis;
+require Net::SecurityCenter::API::Credential;
+require Net::SecurityCenter::API::Feed;
+require Net::SecurityCenter::API::File;
+require Net::SecurityCenter::API::Plugin;
+require Net::SecurityCenter::API::PluginFamily;
+require Net::SecurityCenter::API::Policy;
+require Net::SecurityCenter::API::Report;
+require Net::SecurityCenter::API::Repository;
+require Net::SecurityCenter::API::Scan;
+require Net::SecurityCenter::API::ScanResult;
+require Net::SecurityCenter::API::Scanner;
+require Net::SecurityCenter::API::System;
+require Net::SecurityCenter::API::User;
+require Net::SecurityCenter::API::Zone;
 
-our $VERSION = '0.100';
+our $VERSION = '0.200';
+
+#-------------------------------------------------------------------------------
+# CONSTRUCTOR
+#-------------------------------------------------------------------------------
 
 sub new {
 
-    my ($class, $host, $options) = @_;
+    my ( $class, $host, $options ) = @_;
+
+    my $client = Net::SecurityCenter::REST->new( $host, $options ) or return;
 
     my $self = {
         host    => $host,
         options => $options,
-        rest    => Net::SecurityCenter::REST->new($host, $options),
+        client  => $client,
     };
 
     bless $self, $class;
+
+    $self->{'analysis'}      = Net::SecurityCenter::API::Analysis->new($client);
+    $self->{'credential'}    = Net::SecurityCenter::API::Credential->new($client);
+    $self->{'feed'}          = Net::SecurityCenter::API::Feed->new($client);
+    $self->{'file'}          = Net::SecurityCenter::API::File->new($client);
+    $self->{'plugin'}        = Net::SecurityCenter::API::Plugin->new($client);
+    $self->{'plugin_family'} = Net::SecurityCenter::API::PluginFamily->new($client);
+    $self->{'policy'}        = Net::SecurityCenter::API::Policy->new($client);
+    $self->{'report'}        = Net::SecurityCenter::API::Report->new($client);
+    $self->{'repository'}    = Net::SecurityCenter::API::Repository->new($client);
+    $self->{'scan'}          = Net::SecurityCenter::API::Scan->new($client);
+    $self->{'scan_result'}   = Net::SecurityCenter::API::ScanResult->new($client);
+    $self->{'scanner'}       = Net::SecurityCenter::API::Scanner->new($client);
+    $self->{'system'}        = Net::SecurityCenter::API::System->new($client);
+    $self->{'user'}          = Net::SecurityCenter::API::User->new($client);
+    $self->{'zone'}          = Net::SecurityCenter::API::Zone->new($client);
 
     return $self;
 
 }
 
-sub rest {
+#-------------------------------------------------------------------------------
+# COMMON METHODS
+#-------------------------------------------------------------------------------
+
+sub client {
 
     my ($self) = @_;
-    return $self->{rest};
+    return $self->{'client'};
 
 }
 
-sub get_device_info {
+#-------------------------------------------------------------------------------
 
-    my ($self, $repository_id, $ip_address, $params) = @_;
+sub error {
 
-    (@_ == 3 || @_ == 4 || @_ == 5) or croak(q/Usage: $sc->get_device_info(REPOSITORY_ID, IP_ADDRESS [,PARAMS])/);
+    my ( $self, $message, $code ) = @_;
 
-    croak('Invalid Repository ID') unless ($repository_id =~ /\d/);
-
-    my %params = (
-        'ip' => $ip_address,
-    );
-
-    if (defined($params->{'fields'})) {
-        if (ref $params->{'fields'} eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$params->{'fields'}});
-        } else {
-            $params{'fields'} = $params->{'fields'};
-        }
-    }
-
-    return $self->rest->get("/repository/$repository_id/deviceInfo", \%params);
-
-}
-
-sub get_ip_info {
-
-    my ($self, $ip_address, $params) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_ip_info(IP_ADDRESS [,PARAMS])/);
-
-    $params->{'ip'} = $ip_address;
-
-    if (defined($params->{'fields'})) {
-        if (ref $params->{'fields'} eq 'ARRAY') {
-            $params->{'fields'} = join(',', @{$params->{'fields'}});
-        }
-    }
-
-    return $self->rest->get("/ipInfo", \%{$params});
-
-}
-
-sub get_status {
-
-    my ($self, $fields) = @_;
-
-    (@_ == 1 || @_ == 2) or croak(q/Usage: $sc->get_status([FIELDS])/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get('/status', \%params);
-
-
-}
-
-sub get_system_info {
-
-    my ($self) = @_;
-    return $self->rest->get('/system');
-
-}
-
-sub get_system_diagnostics_info {
-
-    my ($self) = @_;
-    return $self->rest->get('/system/diagnostics');
-
-}
-
-sub generate_app_status_diagnostics {
-
-    my ($self) = @_;
-    $self->rest->post('/system/diagnostics/generate', { 'task' => 'appStatus' });
-    return 1;
-
-}
-
-sub generate_diagnostics_file {
-
-    my ($self, $options) = @_;
-
-    my @options = ( 'all' );
-
-    if ($options && ref $options ne 'ARRAY') {
-        @options = split(/,/, $options);
-    }
-
-    my @allowed_options = ( 'all', 'apacheLog', 'configuration', 'dependencies',
-                            'dirlist', 'environment', 'installLog', 'logs',
-                            'sanitize', 'scans', 'serverConf', 'setup', 'sysinfo',
-                            'upgradeLog');
-
-    foreach my $option (@options) {
-        unless (grep $_ eq $option, @allowed_options) {
-            carp(sprintf('Unknown option (allowed: %s)', join(',', @allowed_options)));
-            croak(q/Usage: $sc->generate_diagnostics_file([ OPTIONS ])/);
-        }
-    }
-
-    return $self->rest->post('/system/diagnostics/generate', { 'task' => 'diagnosticsFile', 'options' => \@options });
-
-}
-
-sub download_system_diagnostics {
-
-    my ($self) = @_;
-    return $self->rest->post('/system/diagnostics/download');
-
-}
-
-sub get_feed {
-
-    my ($self, $type) = @_;
-
-    if ($type) {
-
-        my @allowed_type = ( 'active', 'passive', 'lce', 'sc' );
-
-        unless (grep $_ eq $type, @allowed_type) {
-            carp(sprintf('Unknown type (allowed: %s)', join(',', @allowed_type)));
-            croak(q/Usage: $sc->get_feed([ TYPE ])/);
-        }
-
-        return $self->rest->get("/feed/$type");
-    }
-
-    return $self->rest->get('/feed');
-
-}
-
-sub get_repository_list {
-
-    my ($self, $fields) = @_;
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get('/repository', \%params);
-
-}
-
-sub get_repository {
-
-    my ($self, $repository_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_repository(REPOSITORY_ID [,FIELDS])/);
-
-    croak('Invalid Repository ID') unless ($repository_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/repository/$repository_id", \%params);
-
-}
-
-sub get_scan_zone_list {
-
-    my ($self, $fields) = @_;
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get('/zone', \%params);
-
-}
-
-sub get_scan_zone {
-
-    my ($self, $zone_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_scan_zone(ZONE_ID, [FIELDS])/);
-
-    croak('Invalid Scan Zone ID') unless ($zone_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/zone/$zone_id", \%params);
-
-}
-
-sub get_policy_list {
-
-    my ($self, $fields) = @_;
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get('/policy', \%params);
-
-}
-
-sub get_policy {
-
-    my ($self, $policy_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_policy(POLICY_ID [,FIELDS])/);
-
-    croak('Invalid Policy ID') unless ($policy_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/policy/$policy_id", \%params);
-
-}
-
-sub get_report_list {
-
-    my ($self, %params) = @_;
-    return $self->rest->get('/report', \%params);
-
-}
-
-sub get_report {
-
-    my ($self, $report_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_report(REPORT_ID [,FIELDS])/);
-
-    croak('Invalid Report ID') unless ($report_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/report/$report_id", \%params);
-
-}
-
-sub download_report {
-
-    my ($self, $report_id) = @_;
-    return $self->rest->post("/report/$report_id/download");
-
-}
-
-sub get_user_list {
-
-    my ($self, %params) = @_;
-    return $self->rest->get('/user', \%params);
-
-}
-
-sub get_user {
-
-    my ($self, $user_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_user(CREDENTIAL_ID [,FIELDS])/);
-
-    croak('Invalid User ID') unless ($user_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/user/$user_id", \%params);
-
-}
-
-sub get_credential_list {
-
-    my ($self, %params) = @_;
-    return $self->rest->get('/credential', \%params);
-
-}
-
-sub get_credential {
-
-    my ($self, $credential_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_credential(CREDENTIAL_ID [,FIELDS])/);
-
-    croak('Invalid Credential ID') unless ($credential_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/credential/$credential_id", \%params);
-
-}
-
-sub download_nessus_scan {
-
-    my ($self, $scan_id, $filename) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->download_nessus_scan(SCAN_ID [,FILE])/);
-
-    croak('Invalid Scan ID') unless ($scan_id =~ /\d/);
-
-    my $sc_scan_data     = $self->rest->post("/scanResult/$scan_id/download",  { 'downloadType' => 'v2' });
-    my $nessus_scan_data = '';
-
-    if ($sc_scan_data) {
-        unzip \$sc_scan_data => \$nessus_scan_data or croak "Failed to uncompress Nessus scan: $UnzipError\n";
-    }
-
-    return $nessus_scan_data unless($filename);
-
-    open(my $fh, '>', $filename)
-        or croak("Could not open file '$filename': $!");
-
-    print $fh $nessus_scan_data;
-    close $fh;
-
-    return 1;
-
-}
-
-sub get_plugin_list {
-
-    my ($self, %params) = @_;
-    return $self->rest->get('/plugin', \%params);
-
-}
-
-sub get_plugin {
-
-    my ($self, $plugin_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_plugin(PLUGIN_ID [,FIELDS])/);
-
-    croak('Invalid Plugin ID') unless ($plugin_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/plugin/$plugin_id", \%params);
-
-}
-
-sub get_plugin_family_list {
-
-    my ($self, %params) = @_;
-    return $self->rest->get('/pluginFamily', \%params);
-
-}
-
-sub get_plugin_family {
-
-    my ($self, $plugin_family_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_plugin_family(PLUGIN_FAMILY_ID [,FIELDS])/);
-
-    croak('Invalid Plugin Family ID') unless ($plugin_family_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/pluginFamily/$plugin_family_id", \%params);
-
-}
-
-sub add_scan {
-
-    my ($self, %params) = @_;
-
-    my $scan_data = {
-        'type'     => 'policy',
-        'schedule' => { 'repeatRule' => 'FREQ=NOW;INTERVAL=1', 'type' => 'now' },
-    };
-
-    my @default_params = qw/name description ipList zone policy repository maxScanTime/;
-
-    foreach (@default_params) {
-
-        next unless (defined($params{$_}));
-
-        if ($_ eq 'ipList' && ref $params{$_} eq 'ARRAY') {
-            $params{$_} = join(',', @{$params{$_}});
-        }
-
-           if ($_ eq 'policy')     { $scan_data->{$_} = { 'id' => $params{$_} } }
-        elsif ($_ eq 'zone')       { $scan_data->{$_} = { 'id' => $params{$_} } }
-        elsif ($_ eq 'repository') { $scan_data->{$_} = { 'id' => $params{$_} } }
-        else                       { $scan_data->{$_} = $params{$_} }
-
-    }
-
-    my $result = $self->rest->post('/scan', $scan_data);
-
-    if (defined($result->{'scanResultID'})) {
-        return $result->{'scanResultID'};
+    if ( defined $message ) {
+        $self->{'client'}->{'_error'} = Net::SecurityCenter::Error->new( $message, $code );
+        return;
+    } else {
+        return $self->{'client'}->{'_error'};
     }
 
 }
 
-sub get_scan_list {
-
-    my ($self, %params) = @_;
-
-    my $scans = $self->rest->get('/scanResult', \%params);
-
-    # NOTE: 'running' and 'completed' filters return always 'manageable' and 'usable' scans
-    if (defined($params{'filter'}) && ($params{'filter'} ne 'running' && $params{'filter'} ne 'completed')) {
-        if (defined($scans->{$params{'filter'}})) {
-            return $scans->{$params{'filter'}};
-        } else {
-            return [];
-        }
-    }
-
-    return $scans;
-
-}
-
-sub get_running_scans {
-
-    my ($self, $fields) = @_;
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    $params{'filter'} = 'running';
-    return $self->get_scan_list( %params );
-
-}
-
-sub get_completed_scans {
-
-    my ($self, $fields) = @_;
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    $params{'filter'} = 'completed';
-    return $self->get_scan_list( %params );
-
-}
-
-sub get_scan {
-
-    my ($self, $scan_id, $fields) = @_;
-
-    (@_ == 2 || @_ == 3) or croak(q/Usage: $sc->get_scan(SCAN_ID [,FIELDS])/);
-
-    croak('Invalid scan ID') unless ($scan_id =~ /\d/);
-
-    my %params = ();
-
-    if ($fields) {
-        if (ref $fields eq 'ARRAY') {
-            $params{'fields'} = join(',', @{$fields});
-        } else {
-            $params{'fields'} = $fields;
-        }
-    }
-
-    return $self->rest->get("/scanResult/$scan_id", \%params);
-
-}
-
-sub get_scan_progress {
-
-    my ($self, $scan_id) = @_;
-
-    (@_ == 2) or croak(q/Usage: $sc->get_scan_progress(SCAN_ID)/);
-
-    my $scan_data = $self->get_scan($scan_id, { 'fields' => 'id,totalChecks,completedChecks' });
-    return sprintf('%d', ( $scan_data->{'completedChecks'} * 100 ) / $scan_data->{'totalChecks'});
-
-}
-
-sub get_scan_status {
-
-    my ($self, $scan_id) = @_;
-
-    (@_ == 2) or croak(q/Usage: $sc->get_scan_status(SCAN_ID)/);
-
-    my $scan_data = $self->get_scan($scan_id, { 'fields' => 'id,status' });
-    return lc($scan_data->{'status'});
-
-}
-
-sub pause_scan {
-
-    my ($self, $scan_id) = @_;
-
-    (@_ == 2) or croak(q/Usage: $sc->pause_scan(SCAN_ID)/);
-
-    $self->rest->post("/scanResult/$scan_id/pause");
-    return 1;
-
-}
-
-sub resume_scan {
-
-    my ($self, $scan_id) = @_;
-
-    (@_ == 2) or croak(q/Usage: $sc->resume_scan(SCAN_ID)/);
-
-    $self->rest->post("/scanResult/$scan_id/resume");
-    return 1;
-
-}
-
-sub stop_scan {
-
-    my ($self, $scan_id) = @_;
-
-    (@_ == 2) or croak(q/Usage: $sc->stop_scan(SCAN_ID)/);
-
-    $self->rest->post("/scanResult/$scan_id/stop");
-    return 1;
-
-}
+#-------------------------------------------------------------------------------
 
 sub login {
 
-    my ($self, $username, $password) = @_;
+    my ( $self, $username, $password ) = @_;
 
-    (@_ == 3) or croak(q/Usage: $sc->login(USERNAME, PASSWORD)/);
+    ( @_ == 3 ) or croak(q/Usage: $sc->login(USERNAME, PASSWORD)/);
 
-    $self->rest->login($username, $password);
+    $self->client->login( $username, $password ) or return;
     return 1;
 
 }
+
+#-------------------------------------------------------------------------------
 
 sub logout {
 
     my ($self) = @_;
-    $self->rest->logout();
+    $self->client->logout() or return;
     return 1;
 
 }
+
+#-------------------------------------------------------------------------------
+# HELPER METHODS
+#-------------------------------------------------------------------------------
+
+sub analysis {
+
+    my ($self) = @_;
+    return $self->{'analysis'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub credential {
+
+    my ($self) = @_;
+    return $self->{'credential'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub feed {
+
+    my ($self) = @_;
+    return $self->{'feed'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub file {
+
+    my ($self) = @_;
+    return $self->{'file'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub plugin {
+
+    my ($self) = @_;
+    return $self->{'plugin'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub plugin_family {
+
+    my ($self) = @_;
+    return $self->{'plugin_family'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub policy {
+
+    my ($self) = @_;
+    return $self->{'policy'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub report {
+
+    my ($self) = @_;
+    return $self->{'report'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub repository {
+
+    my ($self) = @_;
+    return $self->{'repository'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub scan {
+
+    my ($self) = @_;
+    return $self->{'scan'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub scan_result {
+
+    my ($self) = @_;
+    return $self->{'scan_result'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub scanner {
+
+    my ($self) = @_;
+    return $self->{'scanner'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub system {
+
+    my ($self) = @_;
+    return $self->{'system'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub user {
+
+    my ($self) = @_;
+    return $self->{'user'};
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub zone {
+
+    my ($self) = @_;
+    return $self->{'zone'};
+
+}
+
+#-------------------------------------------------------------------------------
 
 1;
 
@@ -667,52 +259,65 @@ __END__
 
 =encoding UTF-8
 
+
 =head1 NAME
 
-Net::SecurityCenter - Perl interface to Tenable SecurityCenter REST API
+Net::SecurityCenter - Perl interface to Tenable.sc (SecurityCenter) REST API
+
 
 =head1 SYNOPSIS
 
     use Net::SecurityCenter;
+
     my $sc = Net::SecurityCenter('sc.example.org');
 
     $sc->login('secman', 'password');
 
-    my $running_scans = $sc->get_running_scan;
+    my $running_scans = $sc->scan_result->list_running;
 
     $sc->logout();
 
+
 =head1 DESCRIPTION
 
-This module provides Perl scripts easy way to interface the REST API of Tenable
-SecurityCenter.
+This module provides Perl scripts easy way to interface the REST API of Tenable.sc
+(SecurityCenter).
 
-For more information about the SecurityCenter REST API follow the online documentation:
+For more information about the Tenable.sc (SecurityCenter) REST API follow the online documentation:
 
 L<https://docs.tenable.com/sccv/api/index.html>
 
+
 =head1 CONSTRUCTOR
 
-=head2 Net::SecurityCenter->new ( host [, { timeout => $timeout , ssl_options => $ssl_options } ] )
+=head2 Net::SecurityCenter->new ( host [, $params ] )
 
-Create a new instance of B<Net::Security::Center> using B<Net::Security::Center::REST> package.
+Create a new instance of B<Net::Security::Center> using L<Net::SecurityCenter::REST> class.
+
+Params:
 
 =over 4
 
-=item * C<timeout> : Request timeout in seconds (default is 180) If a socket open,
-read or write takes longer than the timeout, an exception is thrown.
+=item * C<timeout> : Request timeout in seconds (default is C<180> seconds).
+If a socket open, read or write takes longer than the timeout, an exception is thrown.
 
 =item * C<ssl_options> : A hashref of C<SSL_*> options to pass through to L<IO::Socket::SSL>.
 
+=item * C<logger> : A logger instance (eg. L<Log::Log4perl> or L<Log::Any> for log
+the REST request and response messages.
+
+=item * C<no_check> : Disable the check of SecurityCenter instance.
+
 =back
 
-=head1 CORE METHODS
 
-=head2 $sc->rest ()
+=head1 COMMON METHODS
+
+=head2 $sc->client ()
 
 Return the instance of L<Net::SecurityCenter::REST> class
 
-=head2 $sc->login ( username, password )
+=head2 $sc->login ( $username, $password )
 
 Login into SecurityCenter.
 
@@ -720,191 +325,68 @@ Login into SecurityCenter.
 
 Logout from SecurityCenter.
 
+=head1 HELPER METHODS
 
-=head1 SCAN METHODS
+=head2 analysis
 
-=head2 $sc->add_scan ( name => $name, ipList => $ip_list, description => $description, policy => $policy_id, repository => $repository_id, zone => $zone_id )
+Return L<Net::SecurityCenter::API::Analisys> instance.
 
-Create a new scan on SecurityCenter.
+=head2 credential
 
-    $sc->add_scan(
-        name        => 'Test API scan',
-        ipList      => [ '192.168.1.2', '192.168.1.3' ],
-        description => 'Test from Net::SecurityCenter Perl module',
-        policy      => 1,
-        repository  => 2,
-        zone        => 1
-    );
+Return L<Net::SecurityCenter::API::Credential> instance.
 
-Params:
+=head2 feed
 
-=over 4
+Return L<Net::SecurityCenter::API::Feed> instance.
 
-=item * C<name> : Name of scan (required)
+=head2 file
 
-=item * C<description> : Description of scan
+Return L<Net::SecurityCenter::API::File> instance.
 
-=item * C<ipList> : One or more IP address
+=head2 plugin
 
-=item * C<zone> : Scan Zone ID
+Return L<Net::SecurityCenter::API::Plugin> instance.
 
-=item * C<policy> : Policy ID
+=head2 plugin_family
 
-=item * C<repository> : Repository ID
+Return L<Net::SecurityCenter::API::PluginFamily> instance.
 
-=item * C<maxScanTime> : Max Scan Time
+=head2 policy
 
-=back
+Return L<Net::SecurityCenter::API::Policy> instance.
 
-=head2 $sc->download_nessus_scan ( scan_id [, filename ] )
+=head2 report
 
-Download the Nessus (XML) scan result.
+Return L<Net::SecurityCenter::API::Report> instance.
 
-    my $nessus_scan = $sc->download_nessus_scan(1337);
+=head2 repository
 
-    $sc->download_nessus_scan(1337, '/var/nessus/scans/1337.nessus');
+Return L<Net::SecurityCenter::API::Repository> instance.
 
-=head2 $sc->get_scan_list ( [ fields => $fields, filter => $filter ] )
+=head2 scan
 
-Get list of scans (completed, running, etc.).
+Return L<Net::SecurityCenter::API::Scan> instance.
 
-=head2 $sc->get_running_scans ( [fields] )
+=head2 scan_result
 
-Get list of running scans.
+Return L<Net::SecurityCenter::API::ScanResult> instance.
 
-=head2 $sc->get_completed_scans ( [fields] )
+=head2 scanner
 
-Get list of completed scans
+Return L<Net::SecurityCenter::API::Scanner> instance.
 
-=head2 $sc->get_scan ( scan_id [, fields ] )
+=head2 system
 
-Get scan information.
+Return L<Net::SecurityCenter::API::System> instance.
 
-=head2 $sc->get_scan_progress ( scan_id )
+=head2 user
 
-Get scan progress.
+Return L<Net::SecurityCenter::API::User> instance.
 
-    print 'Scan progress: ' . $sc->get_scan_progress(1337) . '%';
+=head2 zone
 
-=head2 $sc->get_scan_status ( scan_id )
+Return L<Net::SecurityCenter::API::Zone> instance.
 
-Get scan status.
-
-    print 'Scan status: ' . $sc->get_scan_status(1337);
-
-=head2 $sc->pause_scan ( scan_id )
-
-Pause a scan.
-
-    if ($sc->get_scan_status(1337) eq 'running') {
-        $sc->pause_scan(1337);
-    }
-
-=head2 $sc->resume_scan ( scan_id )
-
-Resume a paused scan.
-
-    if ($sc->get_scan_status(1337) eq 'paused') {
-        $sc->resume_scan(1337);
-    }
-
-=head2 $sc->stop_scan ( scan_id )
-
-Stop a scan.
-
-    if ($sc->get_scan_status(1337) eq 'running') {
-        $sc->stop_scan(1337);
-   }
-
-=head1 PLUGIN METHODS
-
-=head2 $sc->get_plugin_list ( [ fields ] )
-
-Gets the list of all Nessus Plugins.
-
-=head2 $sc->get_plugin ( plugin_id [, fields ] )
-
-Get information about Nessus Plugin.
-
-    $sc->get_plugin(19506, [ 'description', 'name' ]);
-
-=head2 $sc->get_plugin_family_list ( [ fields ] )
-
-Get list of Nessus Plugin Family.
-
-=head2 $sc->get_plugin_family ( plugin_family_id [, fields ])
-
-Get ifnrmation about Nessus Plugin Family.
-
-=head1 SYSTEM INFORMATION AND MAINTENANCE METHODS
-
-=head2 $sc->get_status ( [ fields ] )
-
-Gets a collection of status information, including license.
-
-=head2 $sc->get_system_info ()
-
-Gets the system initialization information.
-
-=head2 $sc->get_system_diagnostics_info ()
-
-Gets the system diagnostics information.
-
-=head2 $sc->generate_app_status_diagnostics ()
-
-Starts an on-demand, diagnostics analysis for the System that can be downloaded after its job completes.
-
-=head2 $sc->generate_diagnostics_file ( [ options ] )
-
-Starts an on-demand, diagnostics analysis for the System that can be downloaded after its job completes.
-
-=head2 $sc->download_system_diagnostics ()
-
-Downloads the system diagnostics, debug file that was last generated.
-
-=head2 $sc->get_feed ( [ type ] )
-
-=head1 REPOSITORY METHODS
-
-=head2 $sc->get_repository_list ( [ fields ] )
-
-=head2 $sc->get_repository ( repository_id [, fields ])
-
-=head2 $sc->get_device_info ( repository_id, ip_address [, params ] )
-
-=head2 $sc->get_ip_info ( ip_address [, params ])
-
-=head1 SCAN ZONE METHODS
-
-=head2 $sc->get_scan_zone_list ( [ fields ] )
-
-=head2 $sc->get_scan_zone ( zone_id [, fields ] )
-
-=head1 SCAN POLICY METHODS
-
-=head2 $sc->get_policy_list ( [ fields ] )
-
-=head2 $sc->get_policy ( policy_id [, fields ])
-
-=head1 REPORT METHODS
-
-=head2 $sc->get_report_list ( [ fields ] )
-
-=head2 $sc->get_report ( report_id [, fields ])
-
-=head2 $sc->download_report ( report_id )
-
-=head1 USER METHODS
-
-=head2 $sc->get_user_list ( [ fields ] )
-
-=head2 $sc->get_user ( user_id [, fields ] )
-
-=head1 CREDENTIAL METHODS
-
-=head2 $sc->get_credential_list ( [ fields ] )
-
-=head2 $sc->get_credential ( credential_id [, fields ] )
 
 =head1 SUPPORT
 
@@ -923,7 +405,8 @@ L<https://github.com/LotarProject/perl-Net-SecurityCenter>
 
     git clone https://github.com/LotarProject/perl-Net-SecurityCenter.git
 
-=head1 AUTHORS
+
+=head1 AUTHOR
 
 =over 4
 
@@ -931,9 +414,10 @@ L<https://github.com/LotarProject/perl-Net-SecurityCenter>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Giuseppe Di Terlizzi.
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

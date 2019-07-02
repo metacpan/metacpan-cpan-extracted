@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous::Voltage;
-$Lab::Moose::Sweep::Continuous::Voltage::VERSION = '3.681';
+$Lab::Moose::Sweep::Continuous::Voltage::VERSION = '3.682';
 #ABSTRACT: Continuous sweep of voltage
 
 
@@ -27,7 +27,7 @@ Lab::Moose::Sweep::Continuous::Voltage - Continuous sweep of voltage
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

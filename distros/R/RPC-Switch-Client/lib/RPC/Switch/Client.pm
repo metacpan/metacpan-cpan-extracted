@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -179,6 +179,7 @@ sub connect {
 	$self->log->debug('done with handhake?');
 
 	$self->ioloop->remove($tmr);
+	$self->unsubscribe('disconnect');
 
 	return $self->{auth};
 }
@@ -444,7 +445,11 @@ sub work {
 		$ioloop->stop;
 		$ioloop->remove($tmr);
 	}) if $pt > 0;
-
+	$self->on(disconnect => sub {
+		my ($self, $code) = @_;
+		$self->{_exit} = $code;
+		$self->ioloop->stop;
+	});
 	$self->{_exit} = WORK_OK;
 	$self->log->debug(blessed($self) . ' starting work');
 	$self->ioloop->start unless $self->ioloop->is_running;
@@ -467,7 +472,6 @@ sub announce {
 	#my $async = $args{async} // 0;
 	my $mode = $args{mode} // (($args{async}) ? 'async' : 'sync');
 	croak "unknown callback mode $mode" unless $mode =~ /^(subproc|async|async2|sync)$/;
-	my $undocb = $args{undocb};
 	my $host = hostname;
 	my $workername = $args{workername} // "$self->{who} $host $0 $$";
 	
@@ -503,7 +507,8 @@ sub announce {
 		my $action = {
 			cb => $cb,
 			mode => $mode,
-			undocb => $undocb,
+			undocb => $args{undocb},
+			meta => $args{meta},
 			worker_id => $worker_id,
 		};
 		$self->actions->{$method} = $action;
@@ -533,7 +538,6 @@ sub _magic {
 	my ($self, $action, $con, $request, $rpccb) = @_;
 	my $method = $request->{method};
 	my $req_id = $request->{id};
-	my $params = $request->{params};
 	unless ($action) {
 		$self->log->info("_magic for unknown action $method");
 		return;
@@ -550,6 +554,8 @@ sub _magic {
 		$resp->{result} = \@_;
 		$rpccb->($resp);
 	};
+	my @args = ($req_id, $request->{params});
+	push @args, $rpcswitch if $action->{meta};
 
 	local $@;
 	# fastest to slowest?
@@ -564,7 +570,7 @@ sub _magic {
 			$con->write($request);
 		};
 		eval {
-			$action->{cb}->($req_id, $params, $cb1, $cb2);
+			$action->{cb}->(@args, $cb1, $cb2);
 		};
 		if ($@) {
 			$cb1->(RES_ERROR, $@);
@@ -580,7 +586,7 @@ sub _magic {
 			$con->write($request);
 		};
 		eval {
-			$action->{cb}->($req_id, $params, $cb2);
+			$action->{cb}->(@args, $cb2);
 		};
 		if ($@) {
 			$cb1->(RES_ERROR, $@);
@@ -588,7 +594,7 @@ sub _magic {
 			$cb1->(RES_WAIT, $req_id);
 		}
 	} elsif ($action->{mode} eq 'sync') {
-		my @outargs = eval { $action->{cb}->($req_id, $params) };
+		my @outargs = eval { $action->{cb}->(@args) };
 		if ($@) {
 			$cb1->(RES_ERROR, $@);
 		} else {
@@ -605,7 +611,7 @@ sub _magic {
 			$con->write($request);
 		};
 		eval {
-			$self->_subproc($cb2, $action, $req_id, $params);
+			$self->_subproc($cb2, $action, @args);
 		};
 		if ($@) {
 			$cb1->(RES_ERROR, $@);
@@ -922,7 +928,8 @@ Valid arguments are:
 
 (required)
 
-=item - cb: callback to be called for the method
+=item - cb: callback to be called for the method, default arguments are
+the request_id and the contents of the JSON-RPC 2.0 params field.
 
 (required)
 
@@ -951,6 +958,9 @@ some Mojo-callbacks.
 =item - async: backwards compatible way for specifying mode 'async'
 
 (optional, default false)
+
+=item - meta: pass RPC-Switch meta information to the callback as an extra
+argument after the JSON-RPC 2.0 params field.
 
 =item - undocb: a callback that gets called when the original callback
 returns an error object or throws an error.  Called with the same arguments

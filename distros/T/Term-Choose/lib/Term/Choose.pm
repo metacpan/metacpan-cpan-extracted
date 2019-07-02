@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.649';
+our $VERSION = '1.651';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -324,7 +324,7 @@ sub __choose {
         next GET_KEY if $key == NEXT_get_key;
         next GET_KEY if $key == KEY_Tilde;
         if ( exists $ENV{TC_RESET_AUTO_UP} ) {
-            if ( $key != KEY_ENTER && $key != 0x0a ) {
+            if ( $key != LINE_FEED && $key != CARRIAGE_RETURN ) {
                 $ENV{TC_RESET_AUTO_UP} = 1;
             }
         }
@@ -569,7 +569,7 @@ sub __choose {
             print STDERR "^C\n";
             exit 1;
         }
-        elsif ( $key == KEY_ENTER ) {
+        elsif ( $key == LINE_FEED || $key == CARRIAGE_RETURN ) { # ENTER key
             my $index = $self->{index} || $self->{ll};
             if ( ! defined $self->{wantarray} ) {
                 $self->__reset_term( 1 );
@@ -1148,7 +1148,7 @@ sub __mouse_info_to_key {
     if ( $button == 1 ) {
         $self->{pos}[ROW] = $row;
         $self->{pos}[COL] = $matched_col;
-        return KEY_ENTER;
+        return LINE_FEED;
     }
     if ( $row != $self->{pos}[ROW] || $matched_col != $self->{pos}[COL] ) {
         my $not_pos = $self->{pos};
@@ -1181,7 +1181,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.649
+Version 1.651
 
 =cut
 

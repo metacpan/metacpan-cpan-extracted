@@ -22,5 +22,5 @@ resources:
   bugtracker: https://github.com/a6502/RPC-Switch-Client/issues
   homepage: https://github.com/a6502/RPC-Switch-Client
   repository: https://github.com/a6502/RPC-Switch-Client.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'YAML::Tiny version 1.73'

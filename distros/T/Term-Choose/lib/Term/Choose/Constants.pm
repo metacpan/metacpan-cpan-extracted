@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.649';
+our $VERSION = '1.651';
 
 use Exporter qw( import );
 
@@ -19,7 +19,7 @@ our @EXPORT_OK = qw(
         RESET REVERSE UNDERLINE BOLD_UNDERLINE BEEP
         UP DOWN RIGHT LEFT
         NEXT_get_key
-        CONTROL_SPACE KEY_ENTER CONTROL_A CONTROL_B CONTROL_C CONTROL_D CONTROL_E CONTROL_F CONTROL_H
+        CONTROL_SPACE LINE_FEED CARRIAGE_RETURN CONTROL_A CONTROL_B CONTROL_C CONTROL_D CONTROL_E CONTROL_F CONTROL_H
         CONTROL_I CONTROL_K CONTROL_Q CONTROL_U CONTROL_X
         KEY_BTAB KEY_TAB KEY_ESC KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
         VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE
@@ -35,13 +35,13 @@ our %EXPORT_TAGS = (
         MAX_ROW_MOUSE_1003 MAX_COL_MOUSE_1003
         NEXT_get_key
         CONTROL_SPACE CONTROL_A CONTROL_B CONTROL_C CONTROL_E CONTROL_F CONTROL_H KEY_BTAB CONTROL_I CONTROL_Q KEY_TAB
-        KEY_ENTER KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
+        LINE_FEED CARRIAGE_RETURN KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
         VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE
     ) ],
     form => [ qw(
         NEXT_get_key
         CONTROL_A CONTROL_B CONTROL_D CONTROL_E CONTROL_F CONTROL_H KEY_BTAB KEY_TAB CONTROL_K CONTROL_U CONTROL_X
-        KEY_ENTER KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_BSPACE KEY_ESC
+        LINE_FEED CARRIAGE_RETURN KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_BSPACE KEY_ESC
         VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE
     ) ],
     screen => [ qw(
@@ -117,31 +117,32 @@ use constant {
 use constant {
     NEXT_get_key  => -1,
 
-    CONTROL_SPACE => 0x00,
-    CONTROL_A     => 0x01,
-    CONTROL_B     => 0x02,
-    CONTROL_C     => 0x03,
-    CONTROL_D     => 0x04,
-    CONTROL_E     => 0x05,
-    CONTROL_F     => 0x06,
-    CONTROL_H     => 0x08,
-    KEY_BTAB      => 0x08,
-    CONTROL_I     => 0x09,
-    KEY_TAB       => 0x09,
-    CONTROL_K     => 0x0b,
-    KEY_ENTER     => 0x0d,
-    CONTROL_Q     => 0x11,
-    CONTROL_U     => 0x15,
-    CONTROL_X     => 0x18,
-    KEY_ESC       => 0x1b,
-    KEY_SPACE     => 0x20,
-    KEY_h         => 0x68,
-    KEY_j         => 0x6a,
-    KEY_k         => 0x6b,
-    KEY_l         => 0x6c,
-    KEY_q         => 0x71,
-    KEY_Tilde     => 0x7e,
-    KEY_BSPACE    => 0x7f,
+    CONTROL_SPACE   => 0x00,
+    CONTROL_A       => 0x01,
+    CONTROL_B       => 0x02,
+    CONTROL_C       => 0x03,
+    CONTROL_D       => 0x04,
+    CONTROL_E       => 0x05,
+    CONTROL_F       => 0x06,
+    CONTROL_H       => 0x08,
+    KEY_BTAB        => 0x08,
+    CONTROL_I       => 0x09,
+    KEY_TAB         => 0x09,
+    LINE_FEED       => 0x0a,
+    CONTROL_K       => 0x0b,
+    CARRIAGE_RETURN => 0x0d,
+    CONTROL_Q       => 0x11,
+    CONTROL_U       => 0x15,
+    CONTROL_X       => 0x18,
+    KEY_ESC         => 0x1b,
+    KEY_SPACE       => 0x20,
+    KEY_h           => 0x68,
+    KEY_j           => 0x6a,
+    KEY_k           => 0x6b,
+    KEY_l           => 0x6c,
+    KEY_q           => 0x71,
+    KEY_Tilde       => 0x7e,
+    KEY_BSPACE      => 0x7f,
 
     VK_PAGE_UP    => 333,
     VK_PAGE_DOWN  => 334,

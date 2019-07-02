@@ -8,16 +8,21 @@ WriteMakefile(
     VERSION_FROM     => 'lib/Net/SecurityCenter.pm',
     ABSTRACT_FROM    => 'lib/Net/SecurityCenter.pm',
     LICENSE          => 'artistic_2',
-    EXE_FILES        => [],
+    EXE_FILES        => [
+        'bin/sc-api'
+    ],
+    MIN_PERL_VERSION => 5.008,
     PL_FILES         => {},
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test::More' => '0',
+        'Test::More'   => '0',
+        'HTTP::Daemon' => '0',
     },
     PREREQ_PM => {
         'JSON'           => '0',
+        'Time::Piece'    => '0',
         'LWP::UserAgent' => 6.04,
     },
     META_MERGE => {

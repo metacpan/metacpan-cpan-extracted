@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Common;
-$Lab::Moose::Instrument::OI_Common::VERSION = '3.681';
+$Lab::Moose::Instrument::OI_Common::VERSION = '3.682';
 #ABSTRACT: Role for handling Oxfords Instruments pseudo-SCPI commands
 
 use Moose::Role;
@@ -21,6 +21,20 @@ sub get_temperature_channel {
     my $rv
         = $self->oi_getter( cmd => "READ:DEV:$channel:TEMP:SIG:TEMP", %args );
     $rv =~ s/K.*$//;
+    return $rv;
+}
+
+sub get_temperature_channel_resistance {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        channel => { isa => 'Str' }
+    );
+
+    my $channel = delete $args{channel};
+
+    my $rv
+        = $self->oi_getter( cmd => "READ:DEV:$channel:TEMP:SIG:RES", %args );
+    $rv =~ s/Ohm.*$//;
     return $rv;
 }
 
@@ -83,7 +97,7 @@ Lab::Moose::Instrument::OI_Common - Role for handling Oxfords Instruments pseudo
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 DESCRIPTION
 
@@ -94,6 +108,12 @@ version 3.681
  $t = $m->get_temperature_channel(channel => 'MB1.T1');
 
 Read out the designated temperature channel. The result is in Kelvin.
+
+=head2 get_temperature_channel_resistance
+
+ $r = $m->get_temperature_channel_resistance(channel => 'MB1.T1');
+
+Read out the designated temperature channel resistance. The result is in Ohm.
 
 =head2 oi_getter
 
@@ -116,6 +136,7 @@ Perform set/query with I<SET:*> command and parse return value.
 This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

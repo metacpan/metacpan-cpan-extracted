@@ -1,5 +1,9 @@
 Revision history for Alien-nragent
 
+0.06      2019-07-01 19:45:44 -0400
+  - Update to download tarball for most recent version
+    (0.17.0.0-beta)
+
 0.05      2018-11-30 11:15:15 -0500
   - Important documentation of limitations of the SDK.
   - Include LICENSE file in share install Oops.

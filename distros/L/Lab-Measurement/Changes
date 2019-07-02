@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.682 2019-07-02
+  * OI_Triton: enable read out of thermometer resistances
+  * Step magnet sweep: Enable persistent mode usage
+
 3.681 2019-04-29
   * Add driver for KeysightE3633E current/voltage source
   * Fixes in Moose::Connection::VISA and the Lakeshore drivers

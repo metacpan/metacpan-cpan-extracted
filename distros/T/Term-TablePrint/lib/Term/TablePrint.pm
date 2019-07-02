@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -66,6 +66,7 @@ sub __validate_options {
         binary_filter     => '[ 0 1 ]',
         codepage_mapping  => '[ 0 1 ]',
         color             => '[ 0 1 ]',
+        hide_cursor       => '[ 0 1 ]', # documentation
         keep_header       => '[ 0 1 ]',
         squash_spaces     => '[ 0 1 ]',
         grid              => '[ 0 1 2 ]',
@@ -104,6 +105,7 @@ sub __set_defaults {
     $self->{color}             = 0      if ! defined $self->{color};
     $self->{decimal_separator} = '.'    if ! defined $self->{decimal_separator};
     $self->{grid}              = 1      if ! defined $self->{grid};
+    $self->{hide_cursor}       = 1      if ! defined $self->{hide_cursor};
     $self->{keep_header}       = 1      if ! defined $self->{keep_header};
     $self->{squash_spaces}     = 0      if ! defined $self->{squash_spaces};
     $self->{max_rows}          = 200000 if ! defined $self->{max_rows};
@@ -122,6 +124,9 @@ sub __set_defaults {
 
 sub __reset {
     my ( $self ) = @_;
+    if ( $self->{hide_cursor} ) {
+        print SHOW_CURSOR;
+    }
     if ( exists $self->{backup_opt} ) {
         my $backup_opt = $self->{backup_opt};
         for my $key ( keys %$self ) {
@@ -136,7 +141,6 @@ sub __reset {
             }
         }
     }
-    print SHOW_CURSOR;
 }
 
 
@@ -154,7 +158,9 @@ sub print_table {
     }
     $self->__set_defaults();
     local $| = 1;
-    print HIDE_CURSOR;
+    if ( $self->{hide_cursor} ) {
+        print HIDE_CURSOR;
+    }
     if ( ! @$table_ref ) {
         choose(
             [ 'Close with ENTER' ],
@@ -172,7 +178,9 @@ sub print_table {
     my $table_rows = @$table_ref - 1;
     if ( $self->{max_rows} && $table_rows >= $self->{max_rows} ) {
         $self->{info_row} = sprintf( 'Reached the row LIMIT %s', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
-        if ( $table_rows > $self->{max_rows} ) { # because for App::DBBrowser adding "(Total %d)" would be wrong
+        # App::DBBrowser: $table_rows already cut to $self->{max_rows} so total rows are not known at this point.
+        # Therefore add 'total' only if $table_rows > $self->{max_rows}
+        if ( $table_rows > $self->{max_rows} ) {
             $self->{info_row} .= sprintf( '  (total %s)', insert_sep( $table_rows, $self->{thsd_sep} ) );
         }
         $self->{row_idxs} = [ 0 .. $self->{max_rows} ]; # -1 for index and +1 for header row
@@ -730,7 +738,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.112
+Version 0.113
 
 =cut
 

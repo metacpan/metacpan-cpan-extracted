@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.514';
+our $VERSION = '0.515';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -67,8 +67,11 @@ sub __reset_term {
         print UP x $up;
     }
     print "\r" . CLEAR_TO_END_OF_SCREEN;
-    if ( $opt->{hide_cursor} ) {
+    if ( $opt->{hide_cursor} == 1 ) {
         print SHOW_CURSOR;
+    }
+    elsif ( $opt->{hide_cursor} == 2 ) { # documentation
+        print HIDE_CURSOR;
     }
 }
 
@@ -281,6 +284,10 @@ sub __init_readline {
 
 sub readline {
     my ( $self, $prompt, $opt ) = @_;
+    local $SIG{INT} = sub {
+        $self->__reset_term( $opt );
+        exit;
+    };
     $prompt = ''                                         if ! defined $prompt;
     croak "readline: a reference is not a valid prompt." if ref $prompt;
     $opt = {}                                            if ! defined $opt;
@@ -295,7 +302,7 @@ sub readline {
         codepage_mapping => 0,
         default          => '',
         info             => '',
-        hide_cursor      => '[ 0 1 ]',
+        hide_cursor      => '[ 0 1 2 ]',
         no_echo          => '[ 0 1 2 ]',
         show_context     => '[ 0 1 ]',
     };
@@ -876,6 +883,10 @@ sub __write_first_screen {
 
 sub fill_form {
     my ( $self, $orig_list, $opt ) = @_;
+    local $SIG{INT} = sub {
+        $self->__reset_term( $opt );
+        exit;
+    };
     croak "'fill_form' called with no argument." if ! defined $orig_list;
     croak "'fill_form' requires an ARRAY reference as its argument." if ref $orig_list ne 'ARRAY';
     $opt = {} if ! defined $opt;
@@ -887,7 +898,7 @@ sub fill_form {
         clear_screen     => '[ 0 1 ]',
         codepage_mapping => 0,
         confirm          => '',
-        hide_cursor      => '[ 0 1 ]',
+        hide_cursor      => '[ 0 1 2 ]',
         info             => '',
         prompt           => '',
         read_only        => 'ARRAY',
@@ -1201,7 +1212,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.514
+Version 0.515
 
 =cut
 

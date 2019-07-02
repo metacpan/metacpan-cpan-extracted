@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.113   2019-07-02
+        - New option 'hide_cursor'.
+
 0.112   2019-06-30
         - Option 'grid': new value 2.
         - Adapt code to work with the updated Term::Choose::LineFold::line_fold.

@@ -1,0 +1,75 @@
+NAME
+
+  UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
+
+SYNOPSIS
+
+  use UTF8::R2;
+  use UTF8::R2 qw( RFC3629 );
+  use UTF8::R2 qw( RFC2279 );
+
+DESCRIPTION
+
+  UTF8::R2 module provides minimal UTF-8 subroutines for stable scripting
+  environment, using no utf8 pragma, no UTF-8 flag.
+
+    # on use UTF8::R2;
+    # or use UTF8::R2 qw( RFC3629 );
+    # m/./ means
+    qr{(?>
+        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
+        [\xED-\xED][\x80-\x9F][\x80-\xBF]            |
+        [\xEE-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    )}x;
+
+    # on use UTF8::R2 qw( RFC2279 );
+    # m/./ means
+    qr{(?>
+        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    )}x;
+
+SUBROUTINES
+
+  VERY USEFUL UTF-8 CODEPOINT FEATURE
+    UTF8::R2::qr(qr/ regex here ., \D, \H, \N, \R, \S, \V, \W, \b, \d, \h, \s, \v, \w, \x{Unicode}, [ \D \H \S \V \W \b \d \h \s \v \w \x{Unicode} ] /imsxo)
+    UTF8::R2::split(qr/$utf8regex/, $_, 3)
+    UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
+    tie my %utf8r2, 'UTF8::R2';
+      $_ =~ $utf8r2{qr/$utf8regex/}
+      $_ =~ s<$utf8r2{qr/before/}><after>egr
+
+  OTHER UTF-8 CODEPOINT FEATURE
+    UTF8::R2::chop(@_)
+    UTF8::R2::chr($_)
+    UTF8::R2::getc(FILE)
+    UTF8::R2::index($_, 'ABC', 5)
+    UTF8::R2::lc($_)
+    UTF8::R2::lcfirst($_)
+    UTF8::R2::length($_)
+    UTF8::R2::ord($_)
+    UTF8::R2::reverse(@_)
+    UTF8::R2::rindex($_, 'ABC', 5)
+    UTF8::R2::substr($_, 0, 5)
+    UTF8::R2::uc($_)
+    UTF8::R2::ucfirst($_)
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.005_03 to newest perl
+
+SEE ALSO
+
+  http://search.cpan.org/~ina/
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

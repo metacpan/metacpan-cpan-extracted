@@ -31,5 +31,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Form.git
-version: '0.514'
+version: '0.515'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

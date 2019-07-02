@@ -1,6 +1,6 @@
 package Lab::Bus::VICP;
 #ABSTRACT: VICP bus
-$Lab::Bus::VICP::VERSION = '3.681';
+$Lab::Bus::VICP::VERSION = '3.682';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -676,7 +676,7 @@ Lab::Bus::VICP - VICP bus
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

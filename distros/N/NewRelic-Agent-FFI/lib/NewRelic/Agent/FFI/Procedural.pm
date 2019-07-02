@@ -6,7 +6,7 @@ use 5.010;
 use FFI::Platypus 0.56;
 use FFI::Platypus::Memory qw( strdup free );
 use FFI::Platypus::DL qw( dlopen dlerror RTLD_NOW RTLD_GLOBAL );
-use FFI::CheckLib qw( find_lib );
+use FFI::CheckLib 0.25 qw( find_lib_or_die );
 use base qw( Exporter );
 use constant NEWRELIC_RETURN_CODE_OK                      => 0;
 use constant NEWRELIC_RETURN_CODE_OTHER                   => -0x10001;
@@ -24,27 +24,21 @@ use constant NEWRELIC_STATUS_CODE_STOPPING => 2;
 use constant NEWRELIC_STATUS_CODE_STARTED  => 3;
 
 # ABSTRACT: Procedural interface for NewRelic APM
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 my $ffi;
+our @lib;
 
 BEGIN {
   $ffi = FFI::Platypus->new;
-  $ffi->lib(sub {
+  $ffi->lib(@lib = do {
     my @find_lib_args = (
-      lib => [ qw(newrelic-collector-client newrelic-common newrelic-transaction) ]
+      lib => [ qw(newrelic-collector-client newrelic-common newrelic-transaction) ],
+      alien => ['Alien::nragent'],
     );
     push @find_lib_args, libpath => ['/opt/newrelic/lib/'] if -d '/opt/newrelic/lib/';
-    my @system = find_lib(@find_lib_args);
-    if(@system)
-    {
-      my($common) = grep /newrelic-common/, @system;
-      my $handle = dlopen($common, RTLD_NOW | RTLD_GLOBAL ) || die "error dlopen $common @{[ dlerror ]}";
-      return @system;
-    }
-    require Alien::nragent;
-    Alien::nragent->dynamic_libs;
+    find_lib_or_die(@find_lib_args);
   });
 }
 
@@ -164,7 +158,7 @@ NewRelic::Agent::FFI::Procedural - Procedural interface for NewRelic APM
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

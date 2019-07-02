@@ -476,3 +476,10 @@ Revision history for Regexp-Grammars
       spurious whitespace matching after debugged constructs
       (Thanks, Louis!)
 
+
+
+1.051  Tue Jul  2 20:17:55 2019
+
+    * Documented %% operator
+
+    * Numerous POD nits fixed (thanks, Ruud and Alex!)

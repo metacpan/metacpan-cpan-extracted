@@ -1,0 +1,28 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
+name: UTF8-R2
+version: 0.01
+abstract: makes UTF-8 scripting easy for enterprise use or LTS
+author:
+  - ina <ina@cpan.org>
+license: perl
+generated_by: pmake.bat
+requires:
+  Archive::Tar: 0.072
+  Compress::Zlib: 1.03
+  Config: 0
+  ExtUtils::MakeMaker: 5.4302
+  Fcntl: 1.03
+  File::Basename: 2.6
+  File::Copy: 2.02
+  File::Path: 1.0401
+  FindBin: 1.42
+  Getopt::Std: 1.01
+  perl: 5.005_03
+  strict: 1.01
+build_requires:
+  Test: 1.122
+resources:
+  license: http://dev.perl.org/licenses/

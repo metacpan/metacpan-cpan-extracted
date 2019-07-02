@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureControl::TLK43;
 #ABSTRACT: Electronic process controller TLKA41/42/43 (SIKA GmbH) with RS485 MODBUS-RTU interface
-$Lab::Instrument::TemperatureControl::TLK43::VERSION = '3.681';
+$Lab::Instrument::TemperatureControl::TLK43::VERSION = '3.682';
 use strict;
 use Lab::Instrument;
 use Lab::Bus::MODBUS_RS232;
@@ -471,7 +471,7 @@ Lab::Instrument::TemperatureControl::TLK43 - Electronic process controller TLKA4
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 SYNOPSIS
 

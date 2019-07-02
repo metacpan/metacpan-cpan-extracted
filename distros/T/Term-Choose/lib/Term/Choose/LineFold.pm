@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.649';
+our $VERSION = '1.651';
 
 use Exporter qw( import );
 
@@ -122,7 +122,7 @@ sub line_fold {
     if ( $string !~ /$regex/ && print_columns( $opt->{init_tab} . $string ) <= $avail_width ) {
         return $opt->{init_tab} . $string;
     }
-    my @paragraph; # s
+    my @paragraphs;
 
     for my $row ( split /$regex/, $string, -1 ) { # -1 to keep trailing empty fields
         my @lines;
@@ -155,18 +155,18 @@ sub line_fold {
                 push( @lines, $line );
             }
         }
-        push( @paragraph, join( "\n", @lines ) );
+        push( @paragraphs, join( "\n", @lines ) );
     }
     if ( @color ) {
-        for my $para ( @paragraph ) {
-            $para =~ s/\x{feff}/shift @color/ge;
+        for my $paragraph ( @paragraphs ) {
+            $paragraph =~ s/\x{feff}/shift @color/ge;
             if ( ! @color ) {
                 last;
             }
         }
-        $paragraph[-1] .= RESET;
+        $paragraphs[-1] .= RESET;
     }
-    return join( "\n", @paragraph );
+    return join( "\n", @paragraphs );
 }
 
 

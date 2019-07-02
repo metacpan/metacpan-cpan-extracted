@@ -1,3 +1,8 @@
+0.724   2019-06-20 (PERLANCAR)
+
+	- pmless: Accept multiple arguments.
+
+
 0.723   2019-06-02 (PERLANCAR)
 
 	- [ux] pmchkver/pmlatest: Show a human friendly message when run

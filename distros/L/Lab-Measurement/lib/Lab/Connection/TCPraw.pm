@@ -1,6 +1,6 @@
 package Lab::Connection::TCPraw;
 #ABSTRACT: Raw TCP connection; deprecated, use Socket instead
-$Lab::Connection::TCPraw::VERSION = '3.681';
+$Lab::Connection::TCPraw::VERSION = '3.682';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -50,7 +50,7 @@ Lab::Connection::TCPraw - Raw TCP connection; deprecated, use Socket instead
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 COPYRIGHT AND LICENSE
 

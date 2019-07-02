@@ -1,7 +1,7 @@
 package App::PMUtils;
 
-our $DATE = '2019-06-02'; # DATE
-our $VERSION = '0.723'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.724'; # VERSION
 
 use 5.010001;
 
@@ -188,7 +188,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.723 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-06-02.
+This document describes version 0.724 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -305,6 +305,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 pmpath
 
 Usage:
@@ -360,6 +361,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 rel2mod

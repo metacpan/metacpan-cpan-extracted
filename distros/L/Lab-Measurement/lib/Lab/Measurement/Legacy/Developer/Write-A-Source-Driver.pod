@@ -14,7 +14,7 @@ Lab::Measurement::Legacy::Developer::Write-A-Source-Driver - Implementing a curr
 
 =head1 VERSION
 
-version 3.681
+version 3.682
 
 =head1 Implementing a current/voltage source driver
 

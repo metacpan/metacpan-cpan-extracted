@@ -1,13 +1,17 @@
 package Pcore::Chrome::Tab;
 
-use Pcore -class;
-use Pcore::Util::Data qw[to_json from_json];
+use Pcore -class, -res;
+use Pcore::Util::Data qw[to_json from_json from_b64];
 use Pcore::Util::Scalar qw[weaken is_plain_coderef];
 use Pcore::WebSocket::raw;
 
 use overload    #
   q[&{}] => sub ( $self, @ ) {
-    return sub { return _cmd( $self, @_ ) };
+    return sub {
+        my $cb = is_plain_coderef $_[-1] ? pop @_ : undef;
+
+        return $self->_call( shift, {@_}, $cb );
+    };
   },
   fallback => undef;
 
@@ -15,6 +19,9 @@ has chrome => ( required => 1 );
 has id     => ( required => 1 );
 
 has listen => ();    # {method => callback} hook
+
+has network_enabled => ( 0, init_arg => undef );
+has page_enabled    => ( 0, init_arg => undef );
 
 has _ws => ();       # websocket connection
 has _cb => ();       # { msgid => callback }
@@ -35,10 +42,19 @@ sub activate ( $self ) {
     return P->http->get("http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/activate/$self->{id}");
 }
 
-sub _cmd ( $self, $cmd, @args ) {
-    my $h = $self->{_ws} // $self->_connect;
+sub listen ( $self, $event, $cb = undef ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    if ($cb) {
+        $self->{listen}->{$event} = $cb;
+    }
+    else {
+        delete $self->{listen}->{$event};
+    }
 
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+    return;
+}
+
+sub _call ( $self, $method, $args = undef, $cb = undef ) {
+    my $h = $self->{_ws} // $self->_connect;
 
     my $id = $_MSG_ID++;
 
@@ -49,8 +65,8 @@ sub _cmd ( $self, $cmd, @args ) {
     $self->{_ws}->send_text(
         \to_json {
             id     => $id,
-            method => $cmd,
-            params => {@args},
+            method => $method,
+            params => $args,
         }
     );
 
@@ -73,8 +89,13 @@ sub _connect ( $self ) {
             # call pending callbacks
             if ( my $callbacks = delete $self->{_cb} ) {
                 for my $cb ( values $callbacks->%* ) {
-                    $cb->[1]->( $cb->[0], undef );
+                    $cb->( res 500 );
                 }
+            }
+
+            # call pending events callbacks
+            for my $cb ( values $self->{listen}->%* ) {
+                $cb->( undef, undef );
             }
 
             return;
@@ -84,7 +105,16 @@ sub _connect ( $self ) {
 
             if ( exists $msg->{id} ) {
                 if ( my $cb = delete $self->{_cb}->{ $msg->{id} } ) {
-                    $cb->( $msg->{result} );
+                    my $res;
+
+                    if ( my $error = $msg->{error} ) {
+                        $res = res [ 400, "$error->{message} $error->{data}" ], $msg->{result};
+                    }
+                    else {
+                        $res = res 200, $msg->{result};
+                    }
+
+                    $cb->($res);
                 }
             }
             elsif ( $msg->{method} ) {
@@ -93,7 +123,7 @@ sub _connect ( $self ) {
                 }
             }
             else {
-                dump $msg;
+                die $msg;
             }
 
             return;
@@ -105,13 +135,80 @@ sub _connect ( $self ) {
     return $h;
 }
 
+# NETWORK
+sub network_enable ( $self, $cb = undef ) {
+    return $cb ? $cb->( res 200 ) : res 200 if $self->{network_enabled};
+
+    return $self->_call(
+        'Network.enable',
+        undef,
+        sub ($res) {
+            $self->{network_enabled} = 1 if $res;
+
+            return $cb ? $cb->($res) : $res;
+        }
+    );
+}
+
+sub network_disable ( $self, $cb = undef ) {
+    return $cb ? $cb->( res 200 ) : res 200 if !$self->{network_enabled};
+
+    return $self->_call(
+        'Network.disable',
+        undef,
+        sub ($res) {
+            $self->{network_enabled} = 0 if $res;
+
+            return $cb ? $cb->($res) : $res;
+        }
+    );
+}
+
+# PAGE
+sub page_enable ( $self, $cb = undef ) {
+    return $cb ? $cb->( res 200 ) : res 200 if $self->{page_enabled};
+
+    return $self->_call(
+        'Page.enable',
+        undef,
+        sub ($res) {
+            $self->{page_enabled} = 1 if $res;
+
+            return $cb ? $cb->($res) : $res;
+        }
+    );
+}
+
+sub page_disable ( $self, $cb = undef ) {
+    return $cb ? $cb->( res 200 ) : res 200 if !$self->{page_enabled};
+
+    return $self->_call(
+        'Page.disable',
+        undef,
+        sub ($res) {
+            $self->{page_enabled} = 0 if $res;
+
+            return $cb ? $cb->($res) : $res;
+        }
+    );
+}
+
+# COOKIES
 sub get_cookies ( $self, $cb = undef ) {
     weaken $self;
 
-    return $self->(
+    return $self->_call(
         'Network.getCookies',
-        sub ( $data ) {
-            my $cookies = defined $self ? $self->convert_cookies( $data->{cookies} ) : undef;
+        undef,
+        sub ( $res ) {
+            my $cookies;
+
+            if ( !$res ) {
+                warn $res;
+            }
+            else {
+                $cookies = defined $self ? $self->convert_cookies( $res->{data}->{cookies} ) : undef;
+            }
 
             return $cb ? $cb->($cookies) : $cookies;
         }
@@ -128,6 +225,63 @@ sub convert_cookies ( $self, $chrome_cookies ) {
     }
 
     return $cookies;
+}
+
+# format, png, jpeg
+# quality, 0 .. 100, for jpeg only
+# clip, { x, y, width, height, scale }
+sub get_screenshot ( $self, @args ) {
+    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+
+    return $self->_call(
+        'Page.captureScreenshot',
+        {@args},
+        sub ( $res ) {
+            my $img;
+
+            if ($res) {
+                $img = from_b64 $res->{data}->{data};
+            }
+            else {
+                warn $res;
+            }
+
+            return $cb ? $cb->($img) : $img;
+        }
+    );
+}
+
+sub navigate_to ( $self, $url, %args ) {
+    my $listener     = $self->{listen}->{'Page.loadEventFired'};
+    my $page_enabled = $self->{page_enabled};
+
+    my $res;
+
+    if ( !$page_enabled ) {
+        $res = $self->page_enable;
+
+        return $res if !$res;
+    }
+
+    my $cv = P->cv;
+
+    $self->{listen}->{'Page.loadEventFired'} = sub { $cv->() };
+
+    $res = $self->_call( 'Page.navigate', { url => $url, %args }, undef );
+
+    if ( !$res ) {
+        $self->page_disable if !$page_enabled;
+        $self->listen( 'Page.loadEventFired', $listener );
+
+        return $res;
+    }
+
+    $cv->recv;
+
+    $self->page_disable if !$page_enabled;
+    $self->listen( 'Page.loadEventFired', $listener );
+
+    return $res;
 }
 
 1;

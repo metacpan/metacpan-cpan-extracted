@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-02'; # DATE
-our $VERSION = '0.723'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.724'; # VERSION
 
 use 5.010;
 use strict;
@@ -15,7 +15,7 @@ $SPEC{pmless} = {
     v => 1.1,
     summary => 'Show Perl module source code with `less`',
     args => {
-        module => $App::PMUtils::arg_module_single,
+        modules => $App::PMUtils::arg_module_multiple,
         pod => {
             schema => 'bool',
             default => 0,
@@ -28,15 +28,20 @@ $SPEC{pmless} = {
 sub pmless {
     require Module::Path::More;
     my %args = @_;
-    my $mod = $args{module};
-    my $mpath = Module::Path::More::module_path(
-        module => $mod, find_pmc=>0, find_pod=>$args{pod}, find_prefix=>0);
-    if (defined $mpath) {
-        system "less", $mpath;
-        [200, "OK"];
-    } else {
-        [404, "Can't find module $mod"];
+    my $mods = $args{modules};
+    my @mpaths;
+    for my $mod (@$mods) {
+        my $mpath = Module::Path::More::module_path(
+            module => $mod, find_pmc=>0, find_pod=>$args{pod}, find_prefix=>0);
+        if (defined $mpath) {
+            push @mpaths, $mpath;
+        } else {
+            warn "pmless: Can't find path for module '$mod'\n";
+        }
     }
+    return [404, "Can't find path(s) for module(s)"] unless @mpaths;
+    system "less", @mpaths;
+    [200, "OK"];
 }
 
 Perinci::CmdLine::Any->new(
@@ -58,7 +63,7 @@ pmless - Show Perl module source code with `less`
 
 =head1 VERSION
 
-This document describes version 0.723 of pmless (from Perl distribution App-PMUtils), released on 2019-06-02.
+This document describes version 0.724 of pmless (from Perl distribution App-PMUtils), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -74,7 +79,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--module>=I<s>*
+=item B<--modules-json>=I<s>
+
+See C<--modules>.
+
+=item B<--modules>=I<s@>*
+
+Can be specified multiple times.
 
 =item B<--pod>
 
@@ -214,7 +225,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 List of available configuration parameters:
 
  format (see --format)
- module (see --module)
+ modules (see --modules)
  naked_res (see --naked-res)
  pod (see --pod)
 

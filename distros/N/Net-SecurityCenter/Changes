@@ -1,0 +1,26 @@
+Revision history for Net-SecurityCenter
+ 
+0.100 2018/12/28
+    - initial release
+
+0.200 2019/05/xx
+    - Created new API structure and splitted Net::Security::Center class in
+      indipendent API modules:
+      - Analisys
+      - Credential
+      - Feed
+      - File
+      - Plugin
+      - PluginFamily
+      - Policy
+      - Report
+      - Repository
+      - Scan
+      - Scanner
+      - ScanResult
+      - System
+      - User
+      - Zone
+    - Improved documentation
+    - Improved test suite
+    - Added support for Log::Log4perl and Log::Any logging modules
