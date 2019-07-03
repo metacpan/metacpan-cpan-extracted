@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.35';
+our $VERSION = '2.36';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB;
@@ -248,21 +248,18 @@ sub until {
 sub until_year { $_[0]->{until}[0] }
 
 sub until_month {
-    (
-        defined $_[0]->{until}[1]
-        ? $DateTime::TimeZone::OlsonDB::MONTHS{ $_[0]->{until}[1] }
-        : 1
-    );
+    return 1 unless defined $_[0]->{until}[1];
+    return $DateTime::TimeZone::OlsonDB::MONTHS{ $_[0]->{until}[1] };
 }
 
 sub until_day {
-    (
-        defined $_[0]->{until}[2]
-        ? DateTime::TimeZone::OlsonDB::parse_day_spec(
-            $_[0]->{until}[2], $_[0]->until_month, $_[0]->until_year
-            )
-        : 1
+    return 1 unless defined $_[0]->{until}[2];
+    my ( undef, $day ) = DateTime::TimeZone::OlsonDB::parse_day_spec(
+        $_[0]->{until}[2],
+        $_[0]->until_month,
+        $_[0]->until_year,
     );
+    return $day;
 }
 
 sub until_time_spec {

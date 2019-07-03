@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/SahUtils/is_sah_simple_builtin_type
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-01-06'; # DATE
+our $DATE = '2019-06-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.462'; # VERSION
+our $VERSION = '0.463'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ is-sah-simple-builtin-type - Check that a string or array schema is a Sah simple
 
 =head1 VERSION
 
-This document describes version 0.462 of is-sah-simple-builtin-type (from Perl distribution App-SahUtils), released on 2019-01-06.
+This document describes version 0.463 of is-sah-simple-builtin-type (from Perl distribution App-SahUtils), released on 2019-06-20.
 
 =head1 SYNOPSIS
 

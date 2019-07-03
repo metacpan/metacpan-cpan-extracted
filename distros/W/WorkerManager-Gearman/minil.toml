@@ -1,0 +1,7 @@
+name = "WorkerManager-Gearman"
+# badges = ["travis-ci.com"]
+authority="cpan:HATENA"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

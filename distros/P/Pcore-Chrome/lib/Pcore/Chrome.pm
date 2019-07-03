@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.5.0;
+package Pcore::Chrome v0.6.0;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
@@ -97,7 +97,7 @@ around new => sub ( $orig, $self, %args ) {
 
         last if P->net->check_port( $self->{host}, $self->{port}, $CHECK_PORT_TIMEOUT );
 
-        die qq[Unable to connect to the goocle chrome on $self->{host}:$self->{port}] if time > $time;
+        die qq[Unable to connect to the google chrome on $self->{host}:$self->{port}] if time > $time;
     }
 
     return $self;

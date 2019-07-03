@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 $VERSION = $VERSION;
 
 use strict;

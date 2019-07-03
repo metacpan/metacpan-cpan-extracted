@@ -21,6 +21,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Git::Tag' => '0',
                                       'Dist::Zilla::Plugin::GitHub::Meta' => '0.46',
                                       'Dist::Zilla::Plugin::GitHub::UploadRelease' => '0',
+                                      'Dist::Zilla::Plugin::MetaProvides::Package' => '0',
                                       'Dist::Zilla::Plugin::OurPkgVersion' => '0',
                                       'Dist::Zilla::Plugin::PodWeaver' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::FromCPANfile' => '0',
@@ -33,7 +34,9 @@ do { my $x = {
                                       'Git::Wrapper' => '0',
                                       'Moose' => '0',
                                       'Pod::Weaver::Section::Contributors' => '0',
-                                      'namespace::autoclean' => '0'
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.14.0',
+                                      'version' => '0'
                                     }
                     },
        'test' => {

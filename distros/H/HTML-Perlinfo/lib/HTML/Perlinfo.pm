@@ -12,7 +12,7 @@ use HTML::Perlinfo::Common;
 use base qw(Exporter HTML::Perlinfo::Base);
 our @EXPORT = qw(perlinfo);
 
-our $VERSION = '1.71';
+our $VERSION = '1.73';
 
 sub perlinfo {
   my ($opt) = @_;

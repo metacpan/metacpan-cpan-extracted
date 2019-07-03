@@ -19,6 +19,6 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-aereal &lt;aereal@aereal.org>
+aereal <aereal@aereal.org>
 
 Original implementation written by stanaka.

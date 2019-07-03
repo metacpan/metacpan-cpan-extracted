@@ -2,8 +2,6 @@
 use strict;
 use warnings;
 
-
-
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -16,11 +14,8 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => ["perlinfo"],
   "LICENSE" => "perl",
   "NAME" => "HTML::Perlinfo",
-  "PREREQ_PM" => {
-    'CGI::Deurl' => 0,
-    'HTML::Entities' => 0,
-   },
-  "VERSION" => "1.71",
+  "PREREQ_PM" => { 'CGI' => 0 },
+  "VERSION" => "1.73",
   "test" => {
     "TESTS" => "t/*.t"
   }

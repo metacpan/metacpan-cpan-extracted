@@ -1,6 +1,6 @@
 package Catmandu::Exporter::BibTeX;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -25,7 +25,7 @@ my $TAGS = [qw(
     isbn
     issn
     journal
-    keyword
+    keywords
     language
     location
     month
@@ -143,7 +143,7 @@ The following BibTeX fields are supported. All other fields are ignored.
     isbn
     issn
     journal
-    keyword
+    keywords
     language
     location
     month

@@ -4,9 +4,9 @@ author:
   - 'aereal <aereal@aereal.org>'
 build_requires: {}
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,59 +25,44 @@ no_index:
 provides:
   WorkerManager:
     file: lib/WorkerManager.pm
-    version: '0.003'
-  WorkerManager::Client::Gearman:
-    file: lib/WorkerManager/Client/Gearman.pm
-  WorkerManager::Client::Gearman::Async:
-    file: lib/WorkerManager/Client/Gearman/Async.pm
-  WorkerManager::Client::Gearman::Sync:
-    file: lib/WorkerManager/Client/Gearman/Sync.pm
+    version: '0.1000'
   WorkerManager::Client::TheSchwartz:
     file: lib/WorkerManager/Client/TheSchwartz.pm
-  WorkerManager::Gearman:
-    file: lib/WorkerManager/Gearman.pm
   WorkerManager::TheSchwartz:
     file: lib/WorkerManager/TheSchwartz.pm
-  WorkerManager::Worker::Gearman:
-    file: lib/WorkerManager/Worker/Gearman.pm
   WorkerManager::Worker::TheSchwartz:
     file: lib/WorkerManager/Worker/TheSchwartz.pm
-recommends:
-  Gearman::Task: '0'
-  Gearman::Worker: '0'
 requires:
-  Class::Accessor::Fast: '0'
-  Class::Data::Inheritable: '0'
   DBI: '0'
-  Danga::Socket: '0'
   File::Pid: '0'
+  Module::Load: '0'
   Parallel::ForkManager: '0'
   Proc::Daemon: '0'
   TheSchwartz: '0'
   TheSchwartz::Simple: '0'
-  TheSchwartz::Worker: '0'
   Time::HiRes: '0'
   Time::Piece: '0'
-  UNIVERSAL::require: '0'
   YAML::Syck: '0'
 resources:
   bugtracker: https://github.com/hatena/WorkerManager/issues
   homepage: https://github.com/hatena/WorkerManager
   repository: git://github.com/hatena/WorkerManager.git
-version: '0.003'
+version: '0.1000'
 x_authority: cpan:HATENA
 x_contributors:
-  - 'marqs <marqs@hatena.ne.jp>'
-  - 'hideoki <hideoki@hatena.ne.jp>'
-  - 'onishi <onishi@hatena.ne.jp>'
-  - 'Shinji Tanaka <stanaka@hatena.ne.jp>'
-  - 'wakabatan <wakabatan@localhost.localdomain>'
-  - 'mechairoi <ttsujikawa@gmail.com>'
   - 'Kentaro Kuribayashi <kentarok@gmail.com>'
-  - 'shiba_yu36 <shibayu36@gmail.com>'
-  - 'motemen <motemen@hatena.ne.jp>'
-  - 'hagihala <hagihala@hatena.ne.jp>'
-  - 'motemen <motemen@gmail.com>'
+  - 'Shinji Tanaka <stanaka@hatena.ne.jp>'
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
   - 'aereal <aereal@users.noreply.github.com>'
+  - 'hagihala <hagihala@hatena.ne.jp>'
+  - 'hideoki <hideoki@hatena.ne.jp>'
+  - 'marqs <marqs@hatena.ne.jp>'
+  - 'mechairoi <ttsujikawa@gmail.com>'
+  - 'motemen <motemen@gmail.com>'
+  - 'motemen <motemen@hatena.ne.jp>'
   - 'nanto_vi, TOYAMA Nao <nanto@moon.email.ne.jp>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'onishi <onishi@hatena.ne.jp>'
+  - 'shiba_yu36 <shibayu36@gmail.com>'
+  - 'wakabatan <wakabatan@localhost.localdomain>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -8,7 +8,7 @@
 
 package XML::Compile::Schema::Specs;
 use vars '$VERSION';
-$VERSION = '1.62';
+$VERSION = '1.63';
 
 
 use warnings;

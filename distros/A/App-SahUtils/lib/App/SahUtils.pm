@@ -1,7 +1,7 @@
 package App::SahUtils;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.462'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.463'; # VERSION
 
 use 5.010001;
 use strict;
@@ -346,7 +346,7 @@ App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.462 of App::SahUtils (from Perl distribution App-SahUtils), released on 2019-01-06.
+This document describes version 0.463 of App::SahUtils (from Perl distribution App-SahUtils), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -441,6 +441,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 is_sah_builtin_type
 
 Usage:
@@ -474,6 +475,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 is_sah_collection_builtin_type
 
 Usage:
@@ -505,6 +507,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 is_sah_collection_type
@@ -541,6 +544,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 is_sah_numeric_builtin_type
 
 Usage:
@@ -572,6 +576,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 is_sah_numeric_type
@@ -608,6 +613,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 is_sah_ref_builtin_type
 
 Usage:
@@ -639,6 +645,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 is_sah_ref_type
@@ -675,6 +682,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 is_sah_simple_builtin_type
 
 Usage:
@@ -706,6 +714,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 is_sah_simple_type
@@ -740,6 +749,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 is_sah_type

@@ -1,16 +1,19 @@
 package WorkerManager::Gearman;
 use strict;
 use warnings;
-use UNIVERSAL::require;
+use Module::Load ();
 use Gearman::Worker;
-use base qw(Class::Accessor::Fast);
 
-__PACKAGE__->mk_accessors(qw(
-    job_servers
-    prefix
-    worker_classes
-    workers
-));
+our $VERSION = '0.1000';
+
+use Class::Accessor::Lite (
+    rw => [qw(
+        job_servers
+        prefix
+        worker_classes
+        workers
+    )],
+);
 
 sub new {
     my ($class, $worker_classes, $options) = @_;
@@ -39,7 +42,7 @@ sub new {
 sub init {
     my $self = shift;
     for my $worker_class (@{$self->worker_classes}) {
-        $worker_class->use or warn $@;
+        Module::Load::load($worker_class);
         push @{$self->workers}, $worker_class->new({
             job_servers => $self->job_servers,
             prefix      => $self->prefix,
@@ -82,3 +85,26 @@ sub terminate {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+WorkerManager::Gearman - Gearman backend for WorkerManager
+
+=head1 LICENSE
+
+Copyright (C) Hatena Co., Ltd..
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+aereal E<lt>aereal@aereal.orgE<gt>
+
+Original implementation written by stanaka.
+
+=cut

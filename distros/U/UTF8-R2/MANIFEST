@@ -6,6 +6,7 @@ META.json
 Makefile.PL
 pmake.bat
 MANIFEST
+LICENSE
 t/1001_chop.t
 t/1002_chr.t
 t/1004_getc.t

@@ -2,9 +2,9 @@ NAME
     CPAN::Critic::Module::Abstract - Critic CPAN module abstract
 
 VERSION
-    This document describes version 0.090 of CPAN::Critic::Module::Abstract
+    This document describes version 0.091 of CPAN::Critic::Module::Abstract
     (from Perl distribution CPAN-Critic-Module-Abstract), released on
-    2019-01-06.
+    2019-07-03.
 
 SYNOPSIS
      % critic-cpan-module-abstract 'Perl extension for blah blah blah'
@@ -13,6 +13,9 @@ SYNOPSIS
      # TODO
 
 DESCRIPTION
+    STATUS: This module is deprecated in favor of
+    Module::Abstract::Cwalitee.
+
     This is a proof-of-concept module to critic CPAN module abstract.
 
     Dist::Zilla plugin coming shortly.

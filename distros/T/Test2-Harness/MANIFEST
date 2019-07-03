@@ -45,6 +45,7 @@ lib/Test2/Harness/Job/Runner/Dummy.pm
 lib/Test2/Harness/Job/Runner/Fork.pm
 lib/Test2/Harness/Job/Runner/IPC.pm
 lib/Test2/Harness/Job/Runner/Open3.pm
+lib/Test2/Harness/LogFormat.pm
 lib/Test2/Harness/Logger.pm
 lib/Test2/Harness/Logger/JSONL.pm
 lib/Test2/Harness/Preload.pm

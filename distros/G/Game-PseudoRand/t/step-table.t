@@ -4,7 +4,7 @@ use warnings;
 use Game::PseudoRand qw(prd_step prd_table);
 use Test::Most;
 
-# missing required arguments
+# missing required arguments (TODO improve)
 dies_ok { Game::PseudoRand::prd_step };
 for my $arg (qw(start step)) {
     dies_ok { Game::PseudoRand::prd_step( $arg => 42 ) };

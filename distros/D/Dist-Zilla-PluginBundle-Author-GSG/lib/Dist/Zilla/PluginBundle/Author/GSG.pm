@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
-our $VERSION = '0.0.9'; # VERSION
+our $VERSION = '0.0.11'; # VERSION
 
 use Moose;
 with qw(
@@ -12,10 +12,12 @@ use namespace::autoclean;
 sub configure {
     my ($self) = @_;
 
+    my $meta_provides
+        = 'MetaProvides::' . ( $self->payload->{meta_provides} || 'Package' );
+
     $self->add_bundle( 'Filter' => {
         -bundle => '@Basic',
         -remove => [ qw(
-            MetaYAML
             UploadToCPAN
             GatherDir
         ) ]
@@ -28,6 +30,7 @@ sub configure {
         'OurPkgVersion',
         'Prereqs::FromCPANfile',
         'ReadmeAnyFromPod',
+        $meta_provides,
 
         [   'StaticInstall' => $self->config_slice(
             {   static_install_mode    => 'mode',
@@ -121,7 +124,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version 0.0.9
+version 0.0.11
 
 =head1 SYNOPSIS
 
@@ -142,7 +145,6 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
 
     [@Filter]
     -bundle = @Basic
-    -remove = MetaYAML
     -remove = UploadToCPAN
     -remove = GatherDir
 
@@ -153,6 +155,7 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     [OurPkgVersion]
     [Prereqs::FromCPANfile]
     [ReadmeAnyFromPod]
+    [$meta_provides] # defaults to MetaProvides::Package
 
     [StaticInstall]
     # mode    from static_install_mode
@@ -207,6 +210,18 @@ L<Git::NextVersion Plugin|Dist::Zilla::Plugin::Git::NextVersion> documentation.
 
 =over
 
+=item meta_provides
+
+    [@Author::GSG]
+    meta_provides = Class
+
+The L<MetaProvides|Dist::Zilla::Plugin::MetaProvides> subclass to use.
+
+Defaults to C<Package|Dist::Zilla::Plugin::MetaProvides::Package>.
+
+If you choose something other than the default,
+you will need to add an "on develop" dependency to your C<cpanfile>.
+
 =item static_install_mode
 
 Passed to L<Dist::Zilla::Plugin::StaticInstall> as C<mode>.
@@ -253,7 +268,7 @@ might look like this:
     # Copy the SHARE_DIR Makefile over this one:
     # Making it .PHONY will force it to copy even if this one is newer.
     .PHONY: Makefile
-    Makefile: $(SHARE_DIR)/Makefile
+    Makefile: $(SHARE_DIR)/Makefile.inc
     	cp $< $@
 
 Using this example Makefile does require you run C<carton install> after
@@ -284,8 +299,10 @@ so you will need to add it to the cpanfile temporarily for this target to work.
 
 =item Makefile
 
-Copies the Makefile included in this PluginBundle's C<share_dir> into
-your distribution.
+Copies the C<Makefile.inc> included in this PluginBundle's C<share_dir>
+into your distribution.
+
+This should happen automatically through the magic of C<make>.
 
 =item update
 

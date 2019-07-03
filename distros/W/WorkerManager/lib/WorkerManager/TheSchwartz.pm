@@ -4,7 +4,7 @@ use warnings;
 
 use TheSchwartz;
 use Time::Piece;
-use UNIVERSAL::require;
+use Module::Load ();
 use Time::HiRes qw( time );
 use POSIX qw(getppid);
 use Carp;
@@ -52,12 +52,12 @@ sub init {
         });
     if (UNIVERSAL::isa($self->{worker}, 'ARRAY')){
         for (@{$self->{worker}}){
-            "$_"->use or warn $@;
+            Module::Load::load($_);
             $_->can('work') or die "cannot ${_}->work";
             $self->{client}->can_do($_);
         }
     } else {
-        "$self->{worker}"->use or warn $@;
+        Module::Load::load($self->{worker});
         $_->can('work') or die "cannot ${_}->work";
         $self->{client}->can_do($self->{worker});
     }

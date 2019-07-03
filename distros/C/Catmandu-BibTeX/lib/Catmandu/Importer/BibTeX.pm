@@ -1,6 +1,6 @@
 package Catmandu::Importer::BibTeX;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use namespace::clean;
 use Catmandu::Sane;

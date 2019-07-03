@@ -1,0 +1,106 @@
+NAME
+    CPAN::Changes::Cwalitee - Calculate the cwalitee of your CPAN Changes
+    file
+
+VERSION
+    This document describes version 0.000 of CPAN::Changes::Cwalitee (from
+    Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-03.
+
+SYNOPSIS
+     use CPAN::Changes::Cwalitee qw(
+         calc_cpan_changes_cwalitee
+         list_cpan_changes_cwalitee_indicators
+     );
+
+     my $res = calc_cpan_changes_cwalitee(
+         path => 'Changes',
+     );
+
+DESCRIPTION
+    EARLY RELEASE. CURRENTLY ONLY CONTAINS A MINIMUM SET OF INDICATORS.
+
+    What is CPAN Changes cwalitee? A metric to attempt to gauge the quality
+    of your CPAN Changes file. Since actual quality is hard to measure, this
+    metric is called a "cwalitee" instead. The cwalitee concept follows
+    "kwalitee" [1] which is specifically to measure the quality of CPAN
+    distribution. I pick a different spelling to avoid confusion with
+    kwalitee. And unlike kwalitee, the unqualified term "cwalitee" does not
+    refer to a specific, particular subject. There can be "CPAN Changes
+    cwalitee" (which is handled by this module), "module abstract cwalitee",
+    and so on.
+
+FUNCTIONS
+  calc_cpan_changes_cwalitee
+    Usage:
+
+     calc_cpan_changes_cwalitee(%args) -> [status, msg, payload, meta]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path* => *pathname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_cpan_changes_cwalitee_indicators
+    Usage:
+
+     list_cpan_changes_cwalitee_indicators(%args) -> [status, msg, payload, meta]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CPAN-Changes-Cwalitee>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-CPAN-Changes-Cwalitee>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Changes-Cwalitee
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    [1] <https://cpants.cpanauthors.org/>
+
+    App::CPANChangesCwaliteeUtils for the CLI's.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

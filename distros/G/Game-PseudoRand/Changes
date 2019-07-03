@@ -1,5 +1,11 @@
 Revision history for Game-PseudoRand
 
+0.03    2019-07-02
+        Not shipping the *.pm file seems problematic.
+
+0.02    2019-07-02
+        Add prd_bistep and prd_bitable functions. Other fixes.
+
 0.01    2019-07-01
         First version, released on an unsuspecting world.
 

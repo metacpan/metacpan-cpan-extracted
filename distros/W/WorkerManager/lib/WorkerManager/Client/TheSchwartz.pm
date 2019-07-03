@@ -4,7 +4,7 @@ use warnings;
 
 use DBI;
 use TheSchwartz::Simple;
-use UNIVERSAL::require;
+use Module::Load ();
 use Carp;
 
 sub new {
@@ -17,8 +17,8 @@ sub new {
 
     my $client;
     if ($ENV{DISABLE_WORKER}) {
-        TheSchwartz->require;
-        TheSchwartz::Job->require;
+        Module::Load::load('TheSchwartz');
+        Module::Load::load('TheSchwartz::Job');
     } else {
         my $dbh = DBI->connect($dsn, $user, $pass, {RaiseError => 1, %$opts});
         $client = TheSchwartz::Simple->new([$dbh]);
@@ -42,7 +42,7 @@ sub insert {
 
     if ($ENV{DISABLE_WORKER}) {
         eval {
-            $funcname->require;
+            Module::Load::load($funcname);
             $funcname->work($job);
             warn $@ if $@;
             return !$@;

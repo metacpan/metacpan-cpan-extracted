@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.462'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.463'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -97,7 +97,7 @@ show-sah-coerce-module - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.462 of show-sah-coerce-module (from Perl distribution App-SahUtils), released on 2019-01-06.
+This document describes version 0.463 of show-sah-coerce-module (from Perl distribution App-SahUtils), released on 2019-06-20.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/WorkerManager/Client/Gearman.pm
+lib/WorkerManager/Client/Gearman/Async.pm
+lib/WorkerManager/Client/Gearman/Sync.pm
+lib/WorkerManager/Gearman.pm
+lib/WorkerManager/Worker/Gearman.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

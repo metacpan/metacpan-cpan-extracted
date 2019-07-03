@@ -1,18 +1,25 @@
-0.090   2019-01-06 (PERLANCAR)
+0.091   2019-07-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Deprecate in favor of Module::Abstract::Cwalitee.
+
+
+0.090   2019-01-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace the use of Package::MoreUtil with Package::Stash.
 
 
-0.08    2017-07-10 (PERLANCAR)
+0.08    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.07    2015-09-03 (PERLANCAR)
+0.07    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -21,14 +28,14 @@
 	  requirement.
 
 
-0.06    2015-08-17 (PERLANCAR)
+0.06    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.05    2014-12-05 (PERLANCAR)
+0.05    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -45,7 +52,7 @@
          - Rename CLI script.
 
 
-0.03     2014-07-22 (SHARYANTO)
+0.03     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -53,7 +60,7 @@
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.02     2012-08-09 (SHARYANTO)
+0.02     2012-08-09  Released-By: SHARYANTO
 
          - Catch redundant phrase 'Perl XS binding for' and 'Perl interface for'
            [suggested by Ben Bullock].
@@ -65,6 +72,6 @@
          - Adjust to Perinci::Sub::DepChecker 0.07.
 
 
-0.01     2012-07-17 (SHARYANTO)
+0.01     2012-07-17  Released-By: SHARYANTO
 
          - First release.

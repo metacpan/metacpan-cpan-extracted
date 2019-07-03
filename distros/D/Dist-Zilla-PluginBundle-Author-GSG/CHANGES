@@ -1,9 +1,95 @@
 ==================================================
-Changes from 2018-06-10 00:00:00 +0000 to present.
+Changes from 2018-06-28 00:00:00 +0000 to present.
 ==================================================
 
+-------------------------------------------
+version 0.0.11 at 2019-06-28 19:33:29 +0000
+-------------------------------------------
+
+  Change: 4f804dd70de177ca4f28ef890bfe2842e6621834
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-28 12:42:30 +0000
+
+    Merge pull request #7 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from improve-kwalitee
+    to master
+
+    * commit '6355c0ca8876aa6a3961528d0cbd44fdb3efd330':
+
+    Stop if we detect git is too old
+
+    Update README
+
+    Add MetaProvides Plugin support
+
+    Add requires perl version, for kwalitee
+
+    Include a META.yml 
+
+  Change: 6355c0ca8876aa6a3961528d0cbd44fdb3efd330
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-21 11:05:50 +0000
+
+    Stop if we detect git is too old 
+
+  Change: 1b5001a9ce01c619daa03bd5b3b900a0c4695d30
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-14 13:57:59 +0000
+
+    Update README 
+
+  Change: 6614e6ad513fc97a70154e4dcc72f21982a6fcb0
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-14 13:56:40 +0000
+
+    Add MetaProvides Plugin support 
+
+  Change: 517da014db60e3ffdae5edce12c3e9fc35b65430
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-13 18:42:06 +0000
+
+    Add requires perl version, for kwalitee
+
+    We would work with earlier versions than our upstream tools, but lets
+    just pick what they say so that cpants is happy.
+
+    https://cpants.cpanauthors.org/kwalitee/meta_yml_declares_perl_versio
+    n 
+
+  Change: 3c3b994dc4a714d4feb1ff9fa56ffa251e2ce4cb
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-13 18:36:48 +0000
+
+    Include a META.yml
+
+    Because the cpants kwalitee checker thinks it's important to have.
+
+    https://cpants.cpanauthors.org/kwalitee/has_meta_yml 
+
+-------------------------------------------
+version 0.0.10 at 2019-06-11 21:36:34 +0000
+-------------------------------------------
+
+  Change: f79ab3b70dcd7a7a6a117c7c2643f8fcdab69058
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-11 17:36:34 +0000
+
+    Merge pull request #6 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
+    correct-docs-on-Makefile to master
+
+    * commit 'd1f6151491a766df210a72f5496fd92f21ba239d':
+
+    Fix Makefile examples in documentation 
+
+  Change: d1f6151491a766df210a72f5496fd92f21ba239d
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-10 16:21:01 +0000
+
+    Fix Makefile examples in documentation 
+
 ------------------------------------------
-version 0.0.9 at 2019-06-10 18:48:39 +0000
+version 0.0.9 at 2019-06-10 18:48:05 +0000
 ------------------------------------------
 
   Change: dc315bdb2deba1f804087c8ca200fea982266dca

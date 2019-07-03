@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.35';
+our $VERSION = '2.36';
 
 use DateTime::TimeZone::OlsonDB::Rule;
 use DateTime::TimeZone::OlsonDB::Zone;
@@ -96,7 +96,7 @@ sub _parse_zone {
     my $name = shift;
 
     my $expect = $name ? 5 : 6;
-    my @items = grep { defined && length } split /\s+/, $zone, $expect;
+    my @items  = grep { defined && length } split /\s+/, $zone, $expect;
 
     my %obs;
     unless ($name) {
@@ -178,7 +178,7 @@ sub rules_by_name {
 sub parse_day_spec {
     my ( $day, $month, $year ) = @_;
 
-    return $day if $day =~ /^\d+$/;
+    return ( $month, $day ) if $day =~ /^\d+$/;
 
     if ( $day =~ /^last(\w\w\w)$/ ) {
         my $dow = $DAYS{$1};
@@ -200,7 +200,7 @@ sub parse_day_spec {
             $dt -= $PLUS_ONE_DAY_DUR;
         }
 
-        return $dt->day;
+        return ( $dt->month, $dt->day );
     }
     elsif ( $day =~ /^(\w\w\w)([><])=(\d\d?)$/ ) {
         my $dow = $DAYS{$1};
@@ -218,7 +218,7 @@ sub parse_day_spec {
             $dt += $dur;
         }
 
-        return $dt->day;
+        return ( $dt->month, $dt->day );
     }
     else {
         die "Invalid on spec for rule: $day\n";
@@ -300,7 +300,7 @@ DateTime::TimeZone::OlsonDB - An object to represent an Olson time zone database
 
 =head1 VERSION
 
-version 2.35
+version 2.36
 
 =head1 SYNOPSIS
 

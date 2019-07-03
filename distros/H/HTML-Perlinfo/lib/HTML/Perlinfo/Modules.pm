@@ -6,7 +6,7 @@ use File::Find;
 use File::Spec;
 use Carp ();
 use Config qw(%Config);
-use HTML::Entities;
+use CGI qw(escapeHTML);
 use base qw(HTML::Perlinfo::Base);
 use HTML::Perlinfo::Common;
 
@@ -20,11 +20,6 @@ sub new {
 
     $class->SUPER::new(%params);
 
-}
-
-
-sub escapeHTML {
-    return HTML::Entities::encode_entities(@_);
 }
 
 sub module_color_check {
@@ -273,13 +268,12 @@ sub print_module_results {
 
 sub search_dir {
 
-  my ($from, $show_only, $core_dir1, $core_dir2) = @_;
-
+  my ($from, $show_only, $core_dir) = @_;
   
   my %seen = ();
   
   my @user_dir = (ref($from) eq 'ARRAY') && $show_only ne 'core' ? @{$from} :
-                ($show_only eq 'core')  ? ($core_dir1, $core_dir2) : $from;
+                ($show_only eq 'core')  ? (@$core_dir) : $from;
 
   # Make sure only unique entries and readable directories in @mod_dir
   my @mod_dir = grep { -d $_ && -r $_ && !$seen{$_}++ } map {File::Spec->canonpath($_)}@user_dir;
@@ -349,8 +343,8 @@ sub get_input {
 sub print_modules {
  
   my %input = get_input(@_);
- 
-  my ($found_mod, $mod_count, $overall_total, @mod_dir, $core_dir1, $core_dir2);
+
+  my ($found_mod, $mod_count, $overall_total, @mod_dir, @core_dir);
   
   # Check to see if a search is even needed
   if (defined $input{'files_in'}) {
@@ -370,13 +364,16 @@ sub print_modules {
   else {
    
     # Get ready to search 
-    $core_dir1 = File::Spec->canonpath($Config{installarchlib});
-    $core_dir2 = File::Spec->canonpath($Config{installprivlib});
-   
-    @mod_dir = search_dir($input{'from'}, $input{'show_only'}, $core_dir1, $core_dir2);
+
+    @core_dir = map{ File::Spec->canonpath($_) } 
+    			($Config{installarchlib},
+		         $Config{installprivlib},
+			 $Config{archlib},
+			 $Config{privlib});
+
+    @mod_dir = search_dir($input{'from'}, $input{'show_only'}, \@core_dir);
 
     ($overall_total, $found_mod, $mod_count) = find_modules($input{'show_only'}, \@mod_dir);
-  
     return undef unless $overall_total;
 
   }
@@ -401,7 +398,7 @@ sub print_modules {
                                                         add_link('cpan', $module->{'name'}, $input{'link'});
                                                     }
                                                     elsif ($_ eq 'core') {
-					                                    (grep File::Spec->rel2abs($module->{'path'}) =~ /\Q$_/, ($core_dir1, $core_dir2)) ? 'yes' : 'no'; 
+					                                    (grep File::Spec->rel2abs($module->{'path'}) =~ /\Q$_/, (@core_dir)) ? 'yes' : 'no'; 
                                                     }
 													elsif ($_ eq 'path') {
     													add_link('local', $module->{'path'});

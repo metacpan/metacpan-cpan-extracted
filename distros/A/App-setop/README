@@ -3,8 +3,8 @@ NAME
     diff) on lines of files
 
 VERSION
-    This document describes version 0.120 of App::setop (from Perl
-    distribution App-setop), released on 2019-04-24.
+    This document describes version 0.122 of App::setop (from Perl
+    distribution App-setop), released on 2019-07-03.
 
 SYNOPSIS
     See the command-line script setop.

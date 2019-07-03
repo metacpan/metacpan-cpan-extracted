@@ -1,0 +1,52 @@
+---
+abstract: 'Gearman backend for WorkerManager'
+author:
+  - 'aereal <aereal@aereal.org>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WorkerManager-Gearman
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WorkerManager::Client::Gearman:
+    file: lib/WorkerManager/Client/Gearman.pm
+  WorkerManager::Client::Gearman::Async:
+    file: lib/WorkerManager/Client/Gearman/Async.pm
+  WorkerManager::Client::Gearman::Sync:
+    file: lib/WorkerManager/Client/Gearman/Sync.pm
+  WorkerManager::Gearman:
+    file: lib/WorkerManager/Gearman.pm
+    version: '0.1000'
+  WorkerManager::Worker::Gearman:
+    file: lib/WorkerManager/Worker/Gearman.pm
+requires:
+  Class::Accessor::Lite: '0'
+  Class::Data::Lite: '0'
+  Danga::Socket: '0'
+  Gearman::Worker: '0'
+  Module::Load: '0'
+resources:
+  bugtracker: https://github.com/hatena/WorkerManager-Gearman/issues
+  homepage: https://github.com/hatena/WorkerManager-Gearman
+  repository: git://github.com/hatena/WorkerManager-Gearman.git
+version: '0.1000'
+x_authority: cpan:HATENA
+x_contributors:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

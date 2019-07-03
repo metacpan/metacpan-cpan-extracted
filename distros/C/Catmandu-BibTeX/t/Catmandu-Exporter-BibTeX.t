@@ -7,6 +7,7 @@ use Catmandu::Exporter::BibTeX;
 my $bibtex = <<TEX;
 \@inproceedings{2602779,
   author       = {Boukricha, Hana and Wachsmuth, Ipke and Carminati, Maria Nella and Knoeferle, Pia and Müller-Leßmann, Stephan},
+  keywords     = {computer science},
   language     = {English},
   publisher    = {IEEE},
   title        = {A Computational Model of Empathy: Empirical Evaluation},
@@ -23,6 +24,7 @@ my $data = {
 	publisher => 'IEEE',
 	year => 2013,
 	title => 'A Computational Model of Empathy: Empirical Evaluation',
+  keywords => 'computer science'
 };
 
 my $data2 = clone($data);

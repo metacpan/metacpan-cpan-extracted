@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-XML-Compile>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/XML-Compile/>
-    and <https://metacpan.org/release/XML-Compile>
+  * Indexed from CPAN: <https://metacpan.org/release/XML-Compile>
 
 The XML-Compile suite is a large set of modules for various XML related
 standards.  It requires Schemas or WSDLs to be present (otherwise use

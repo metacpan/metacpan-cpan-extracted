@@ -1,5 +1,12 @@
 Revision history for this software.
 
+0.02  2019-07-03 00:00:00
+  - fix Kwalitee Issues: meta_json_conforms_to_known_spec
+  - fix Kwalitee Issues: meta_yml_conforms_to_known_spec
+  - fix Kwalitee Issues: meta_json_is_parsable
+  - fix Experimental Issues: has_separate_license_file
+  - created by INABA Hitoshi
+
 0.01  2019-07-02 00:00:00
   - original version
   - created by INABA Hitoshi

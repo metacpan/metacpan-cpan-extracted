@@ -1,6 +1,6 @@
 {
     "name" : "UTF8-R2",
-    "version" : "0.01",
+    "version" : "0.02",
     "abstract" : "makes UTF-8 scripting easy for enterprise use or LTS",
     "author" : [
         "ina <ina@cpan.org>"
@@ -11,14 +11,14 @@
         "perl_5"
     ],
     "meta-spec" : {
-        "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
-        "version" : 2
+       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+       "version" : 2
     },
     "release_status" : "stable",
     "resources" : {
         "license" : [
             "http://dev.perl.org/licenses/"
-        ],
+        ]
     },
     "prereqs" : {
         "build" : {

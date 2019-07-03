@@ -1,0 +1,105 @@
+NAME
+    Module::Abstract::Cwalitee - Calculate the cwalitee of your module
+    Abstract
+
+VERSION
+    This document describes version 0.001 of Module::Abstract::Cwalitee
+    (from Perl distribution Module-Abstract-Cwalitee), released on
+    2019-07-03.
+
+SYNOPSIS
+     use Module::Abstract::Cwalitee qw(
+         calc_module_abstract_cwalitee
+         list_module_abstract_cwalitee_indicators
+     );
+
+     my $res = calc_module_abstract_cwalitee(
+         abstract => 'Calculate the cwalitee of your module Abstract',
+     );
+
+DESCRIPTION
+    What is module abstract cwalitee? A metric to attempt to gauge the
+    quality of your module's Abstract. Since actual quality is hard to
+    measure, this metric is called a "cwalitee" instead. The cwalitee
+    concept follows "kwalitee" [1] which is specifically to measure the
+    quality of CPAN distribution. I pick a different spelling to avoid
+    confusion with kwalitee. And unlike kwalitee, the unqualified term
+    "cwalitee" does not refer to a specific, particular subject. There can
+    be "module abstract cwalitee" (which is handled by this module), "CPAN
+    Changes cwalitee", and so on.
+
+FUNCTIONS
+  calc_module_abstract_cwalitee
+    Usage:
+
+     calc_module_abstract_cwalitee(%args) -> [status, msg, payload, meta]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   abstract* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_module_abstract_cwalitee_indicators
+    Usage:
+
+     list_module_abstract_cwalitee_indicators(%args) -> [status, msg, payload, meta]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Abstract-Cwalitee>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Abstract-Cwalitee>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Abstract-Cwali
+    tee>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    [1] <https://cpants.cpanauthors.org/>
+
+    App::ModuleAbstractCwaliteeUtils for the CLI's.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

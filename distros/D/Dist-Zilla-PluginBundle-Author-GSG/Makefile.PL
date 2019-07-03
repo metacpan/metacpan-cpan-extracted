@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-GSG",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Dist::Zilla::PluginBundle::Author::GSG",
   "PREREQ_PM" => {
     "Dist::Zilla" => 0,
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Git::Tag" => 0,
     "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",
     "Dist::Zilla::Plugin::GitHub::UploadRelease" => 0,
+    "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
     "Dist::Zilla::Plugin::OurPkgVersion" => 0,
     "Dist::Zilla::Plugin::PodWeaver" => 0,
     "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
@@ -44,7 +46,8 @@ my %WriteMakefileArgs = (
     "Git::Wrapper" => 0,
     "Moose" => 0,
     "Pod::Weaver::Section::Contributors" => 0,
-    "namespace::autoclean" => 0
+    "namespace::autoclean" => 0,
+    "version" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -59,7 +62,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Strict" => 0
   },
-  "VERSION" => "0.0.9",
+  "VERSION" => "0.0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,6 +79,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Git::Tag" => 0,
   "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",
   "Dist::Zilla::Plugin::GitHub::UploadRelease" => 0,
+  "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
   "Dist::Zilla::Plugin::OurPkgVersion" => 0,
   "Dist::Zilla::Plugin::PodWeaver" => 0,
   "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
@@ -99,7 +103,8 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Pod" => "1.14",
   "Test::Strict" => 0,
-  "namespace::autoclean" => 0
+  "namespace::autoclean" => 0,
+  "version" => 0
 );
 
 

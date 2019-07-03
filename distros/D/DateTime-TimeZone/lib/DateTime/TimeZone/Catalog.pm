@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.35';
+our $VERSION = '2.36';
 
 our @ALL =
 qw(
@@ -1450,7 +1450,6 @@ Europe/Belgrade
   'ru' => [ qw(
 Europe/Kaliningrad
 Europe/Moscow
-Europe/Simferopol
 Europe/Kirov
 Europe/Astrakhan
 Europe/Volgograd
@@ -1591,6 +1590,7 @@ Asia/Taipei
 Africa/Dar_es_Salaam
 ) ],
   'ua' => [ qw(
+Europe/Simferopol
 Europe/Kiev
 Europe/Uzhgorod
 Europe/Zaporozhye
@@ -1900,7 +1900,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2019a' }
+sub OlsonVersion { '2019b' }
 
 
 1;
@@ -2249,10 +2249,10 @@ so that applications can easily present a list of timezones.
 
 =head3 Indian
 
+  Indian/Kerguelen
   Indian/Mahe
   Indian/Mauritius
   Indian/Reunion
-  Indian/Kerguelen
   Indian/Christmas
   Indian/Cocos
   Indian/Chagos
@@ -3145,7 +3145,6 @@ so that applications can easily present a list of timezones.
 
   Europe/Kaliningrad - MSK-01 - Kaliningrad
   Europe/Moscow - MSK+00 - Moscow area
-  Europe/Simferopol - MSK+00 - Crimea
   Europe/Kirov - MSK+00 - Kirov
   Europe/Astrakhan - MSK+01 - Astrakhan
   Europe/Volgograd - MSK+01 - Volgograd
@@ -3313,7 +3312,7 @@ so that applications can easily present a list of timezones.
 
   Asia/Dushanbe
 
-=head3 Tanzania, United Republic of (TZ)
+=head3 Tanzania, the United Republic of (TZ)
 
   Africa/Dar_es_Salaam
 
@@ -3367,6 +3366,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Ukraine (UA)
 
+  Europe/Simferopol - MSK+00 - Crimea
   Europe/Kiev - Ukraine (most areas)
   Europe/Uzhgorod - Ruthenia
   Europe/Zaporozhye - Zaporozh'ye/Zaporizhia; Lugansk/Luhansk (east)

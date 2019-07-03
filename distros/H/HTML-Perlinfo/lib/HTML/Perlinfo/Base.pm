@@ -2,7 +2,7 @@ package HTML::Perlinfo::Base;
 
 
 use HTML::Perlinfo::Common;
-use HTML::Perlinfo::General;
+require HTML::Perlinfo::General;
 use Carp ();
 use warnings;
 use strict;
@@ -53,9 +53,9 @@ sub info_all {
   my $html;
   $self->{title} = 'perlinfo(INFO_ALL)' unless $self->{title};
   $html .= $self->print_htmlhead() if $self->{full_page};
-  $html .= print_general();
-  $html .= print_variables();
-  $html .= print_thesemodules('core');
+  $html .= HTML::Perlinfo::General::print_general();
+  $html .= HTML::Perlinfo::General::print_variables();
+  $html .= HTML::Perlinfo::General::print_thesemodules('core') || "";
   $html .= print_license();
   $html .= "</div></body></html>" if $self->{full_page};
   defined wantarray ? return $html : print $html;
@@ -68,7 +68,7 @@ sub info_general {
   my $html = "";
   $self->{title} = 'perlinfo(INFO_GENERAL)' unless $self->{title};
   $html .= $self->print_htmlhead() if $self->{full_page};
-  $html .= print_general('top');
+  $html .= HTML::Perlinfo::General::print_general('top');
   $html .= "</div></body></html>" if $self->{full_page};
   defined wantarray ? return $html : print $html;
 }
@@ -79,10 +79,10 @@ my $self = shift;
 $self->{'title'} = 'perlinfo(INFO_LOADED)' unless $self->{'title'};
 my $html;
 $html .= $self->print_htmlhead() if $self->{'full_page'};
-$html .= print_general();
+$html .= HTML::Perlinfo::General::print_general();
 delete $INC{'HTML/Perlinfo.pm'};
-$html .= print_thesemodules('loaded',[values %INC]);
-$html .= print_variables();
+$html .= HTML::Perlinfo::General::print_thesemodules('loaded',[values %INC]) || "";
+$html .= HTML::Perlinfo::General::print_variables();
 $html .= '</div></body></html>' if $self->{'full_page'};
 defined wantarray ? return $html : print $html;
 
@@ -91,8 +91,8 @@ eval qq{
 
 END {
     delete \$INC{'HTML/Perlinfo.pm'};
-    \$html .= print_thesemodules('loaded',[values %INC]);
-    \$html .= print_variables();
+    \$html .= HTML::Perlinfo::General::print_thesemodules('loaded',[values %INC]) || "";
+    \$html .= HTML::Perlinfo::General::print_variables();
     \$html .= '</div></body></html>' if \$self->{'full_page'};
     print \$html; 
  }
@@ -109,7 +109,7 @@ sub info_modules {
   my $html;
   $self->{title} = 'perlinfo(INFO_MODULES)' unless $self->{title};
   $html .= $self->print_htmlhead() if $self->{'full_page'};
-  $html .= print_thesemodules('all');
+  $html .= HTML::Perlinfo::General::print_thesemodules('all') || "";
   $html .= "</div></body></html>"  if $self->{'full_page'};
   defined wantarray ? return $html : print $html;
 }
@@ -121,7 +121,7 @@ sub info_config {
   my $html;
   $self->{title} = 'perlinfo(INFO_CONFIG)' unless $self->{title};
   $html .= $self->print_htmlhead() if $self->{full_page};
-  $html .= print_config('info_config');
+  $html .= HTML::Perlinfo::General::print_config('info_config');
   $html .= "</div></body></html>" if $self->{full_page};
   defined wantarray ? return $html : print $html;
 }
@@ -145,7 +145,7 @@ sub info_variables {
   my $html;
   $self->{title} = 'perlinfo(INFO_VARIABLES)' unless $self->{title};
   $html .= $self->print_htmlhead() if $self->{full_page};
-  $html .= print_variables();
+  $html .= HTML::Perlinfo::General::print_variables();
   $html .= "</div></body></html>" if $self->{full_page};
   defined wantarray ? return $html : print $html;
 }

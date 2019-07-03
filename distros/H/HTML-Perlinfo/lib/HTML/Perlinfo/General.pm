@@ -1,26 +1,28 @@
 package HTML::Perlinfo::General;
 
-use base qw(Exporter);
-our @EXPORT = qw(print_httpd print_thesemodules print_config print_variables print_general); 
+our @ISA = qw(Exporter);
+our @EXPORT = qw(print_httpd print_thesemodules print_config print_variables print_general);
+require Exporter;
 use POSIX qw(uname);
-use CGI::Deurl as => 'myparams';
 use Config qw(%Config config_sh);
 use Net::Domain qw(hostname);
+use CGI qw(url_param param);
 use File::Spec;
 use HTML::Perlinfo::Common;
 use HTML::Perlinfo::Apache;
+use HTML::Perlinfo::Modules;
 
 # Should search for Get, Post, Cookies, Session, and Environment.
 sub perl_print_gpcse_array  {
 	  my $html;
 	  my($name) = @_;
 	  my ($gpcse_name, $gpcse_value);
-	  #POST names should be param() and get in url_param()
+	  #CGI.pm: POST names should be param() and get in url_param()
 	  if (defined($ENV{'QUERY_STRING'}) && length($ENV{'QUERY_STRING'}) >= 1) {
-            foreach(keys %myparams) { $html .= print_table_row(2, "GET[\"$_\"]", $myparams{$_}); }
+            foreach(keys %myparams) { $html .= print_table_row(2, "GET[\"$_\"]", url_param($_)); }
 	  }
 	  if (defined($ENV{'CONTENT_LENGTH'})) {
-             foreach(keys %myparams) { $html .= print_table_row(2, "POST[\"$_\"]", $myparams{$_}); }	     
+            foreach(keys %myparams) { $html .= print_table_row(2, "POST[\"$_\"]", param($_)); }	     
 	  }	  
           if (defined($ENV{'HTTP_COOKIE'})) {
              $cookies = $ENV{'HTTP_COOKIE'};
@@ -108,10 +110,10 @@ sub print_httpd {
 }
 
  sub print_thesemodules {
-    my $opt = shift;	 
+    my $opt = shift;
     $m = HTML::Perlinfo::Modules->new();
     if ($opt eq 'core') {
-    	return $m->print_modules(show_only=>$opt, full_page=>0);
+      return $m->print_modules(show_only=>$opt, full_page=>0);
     }
     elsif ($opt eq 'all') {
     	return $m->print_modules(section=>'All Perl modules', full_page=>0);

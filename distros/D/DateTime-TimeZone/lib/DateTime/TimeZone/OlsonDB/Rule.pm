@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.35';
+our $VERSION = '2.36';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB;
@@ -60,15 +60,16 @@ sub utc_start_datetime_for_year {
     # should be the offset of the _previous_ rule
     my $offset_from_std = shift;
 
-    my $day = DateTime::TimeZone::OlsonDB::parse_day_spec(
+    my ( $month, $day ) = DateTime::TimeZone::OlsonDB::parse_day_spec(
         $self->on,
-        $self->month, $year
+        $self->month,
+        $year,
     );
 
     my $utc = DateTime::TimeZone::OlsonDB::utc_datetime_for_time_spec(
         spec            => $self->at,
         year            => $year,
-        month           => $self->month,
+        month           => $month,
         day             => $day,
         offset_from_utc => $offset_from_utc,
         offset_from_std => $offset_from_std,

@@ -1,0 +1,82 @@
+NAME
+    App::KwaliteeUtils - Utilities related to Kwalitee
+
+VERSION
+    This document describes version 0.002 of App::KwaliteeUtils (from Perl
+    distribution App-KwaliteeUtils), released on 2019-07-03.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   calc-kwalitee
+
+FUNCTIONS
+  calc_kwalitee
+    Usage:
+
+     calc_kwalitee(%args) -> [status, msg, payload, meta]
+
+    Calculate kwalitee of a local distribution.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dist => *pathname* (default: ".")
+
+        Distribution archive file (e.g. tarball) or directory.
+
+        Although a directory (top-level directory of an extracted Perl
+        distribution) can be analyzed, distribution Kwalitee is supposed to
+        be calculated on a distribution archive file (e.g. tarball) because
+        there are metrics like "extractable", "extracts_nicely",
+        "no_pax_headers" which can only be tested on a distribution archive
+        file. Running this on a directory will result in a less-than-full
+        score.
+
+    *   raw => *true*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-KwaliteeUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-KwaliteeUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-KwaliteeUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Alternative to calc-kwalitee: cpants_lint.pl from App::CPANTS::Lint, the
+    "official" script, which again I only found after writing
+    "calc-kwalitee".
+
+    Module::CPANTS::Kwalitee
+
+    <https://cpants.cpanauthors.org/kwalitee/>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

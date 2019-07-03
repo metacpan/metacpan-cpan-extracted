@@ -1,7 +1,7 @@
 package CPAN::Critic::Module::Abstract;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.090'; # VERSION
+our $DATE = '2019-07-03'; # DATE
+our $VERSION = '0.091'; # VERSION
 
 use 5.010;
 use strict;
@@ -325,7 +325,7 @@ CPAN::Critic::Module::Abstract - Critic CPAN module abstract
 
 =head1 VERSION
 
-This document describes version 0.090 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2019-01-06.
+This document describes version 0.091 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2019-07-03.
 
 =head1 SYNOPSIS
 
@@ -335,6 +335,8 @@ This document describes version 0.090 of CPAN::Critic::Module::Abstract (from Pe
  # TODO
 
 =head1 DESCRIPTION
+
+B<STATUS:> This module is deprecated in favor of L<Module::Abstract::Cwalitee>.
 
 This is a proof-of-concept module to critic CPAN module abstract.
 
@@ -375,6 +377,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 policy_prohibit_empty
 
 Usage:
@@ -403,6 +406,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 policy_prohibit_ends_with_full_stop
@@ -435,6 +439,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 policy_prohibit_just_module_name
 
 Usage:
@@ -463,6 +468,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 policy_prohibit_multiline
@@ -495,6 +501,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 policy_prohibit_redundancy
 
 Usage:
@@ -523,6 +530,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 policy_prohibit_shouting
@@ -555,6 +563,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 policy_prohibit_starts_with_lowercase_letter
 
 Usage:
@@ -585,6 +594,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 policy_prohibit_template
 
 Usage:
@@ -613,6 +623,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 policy_prohibit_too_long
@@ -647,6 +658,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 policy_prohibit_too_short
 
 Usage:
@@ -677,6 +689,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 policy_require_english

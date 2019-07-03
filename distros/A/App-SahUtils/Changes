@@ -1,3 +1,10 @@
+0.463   2019-06-20 (PERLANCAR)
+
+	- [ux] coerce-with-sah: Add example for --coerce-rule.
+
+	- Use Package::Stash's list_all_symbols instead of get_all_symbols.
+
+
 0.462   2019-01-06 (PERLANCAR)
 
 	- Replace use of Package::MoreUtil with Package::Stash.

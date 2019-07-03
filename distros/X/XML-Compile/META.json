@@ -60,6 +60,6 @@
          "web" : "https://github.com/markov2/perl5-XML-Compile"
       }
    },
-   "version" : "1.62",
+   "version" : "1.63",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,5 +1,9 @@
 Revision history for Perl extension HTML::Perlinfo 
 
+1.73 version bump because of a wrong upload on PAUSE
+
+1.72 Reverted back to CGI.pm. The alternatives were too troublesome. Added some new core directories.
+
 1.71 Fixed test file and pod 
 
 1.70 Replaced CGI.pm with HTML-Entities and CGI-Deurl.  

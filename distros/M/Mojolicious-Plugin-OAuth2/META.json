@@ -1,16 +1,16 @@
 {
    "abstract" : "Auth against OAuth2 APIs",
    "author" : [
-      "Marcus Ramberg <marcus.ramberg@gmail.com>"
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-OAuth2",
    "no_index" : {
@@ -43,15 +43,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2/issues"
+         "web" : "https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2/issues"
       },
-      "homepage" : "https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2",
+      "homepage" : "https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2.git",
-         "web" : "https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2"
+         "web" : "https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2"
       }
    },
-   "version" : "1.57",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.58",
+   "x_contributors" : [
+      "Marcus Ramberg <mramberg@cpan.org>",
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

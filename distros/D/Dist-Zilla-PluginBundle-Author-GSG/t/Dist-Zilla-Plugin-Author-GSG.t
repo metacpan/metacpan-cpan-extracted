@@ -8,22 +8,22 @@ use Test::DZil;
 use Git::Wrapper;
 use File::Temp qw();
 use File::pushd qw();
+use version;
 
 use lib qw(lib);
-my $module;
+use Dist::Zilla::Plugin::Author::GSG;
 
-BEGIN {
-    $module = 'Dist::Zilla::Plugin::Author::GSG';
-    use_ok($module);
-}
-
-#diag( "Testing $module " . $module->VERSION );
+#$Git::Wrapper::DEBUG = 1;
 
 my $dir = File::Temp->newdir("dzpag-XXXXXXXXX");
 
 {
     my $git = Git::Wrapper->new($dir);
     plan skip_all => "No Git!" unless $git->has_git_in_path;
+
+    my $version = $git->version;
+    plan skip_all => "Git is too old: $version"
+        if $version < version->parse(v1.7.5);
 
     $git->init;
     $git->commit( { m => 'init', date => '2001-02-03 04:05:06' },
@@ -33,6 +33,25 @@ my $dir = File::Temp->newdir("dzpag-XXXXXXXXX");
 my $author = 'Grant Street Group <developers@grantstreet.com>';
 my $holder = 'Grant Street Group';
 my $year   = 1900 + (localtime)[5];
+
+subtest 'Require git v1.7.5' => sub {
+    no warnings 'redefine';
+    local *Git::Wrapper::version = sub {'1.7.4.9'};
+    use warnings 'redefine';
+
+    local $@;
+    eval { local $SIG{__DIE__}; Builder->from_config(
+        { dist_root => 'corpus/dist/old-git' },
+        {   add_files => {
+                'source/dist.ini' =>
+                    dist_ini( { name => 'Old-Git', }, 'Author::GSG', ),
+            }
+        }
+    ) };
+
+    like $@, qr/\QGit 1.7.5 or greater is required, only have 1.7.4.9./,
+        "Fatal error with old git versions";
+};
 
 subtest 'Dist with defaults' => sub {
     my $tzil = Builder->from_config(

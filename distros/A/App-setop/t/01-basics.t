@@ -32,6 +32,9 @@ write_text("f2a", lines(qw/b a E/));
 write_text("f1s", lines("1 ", 2, "3 ", 3, 4));
 write_text("f2s", lines(2, 1, "5 "));
 
+write_text("f1c", lines(qw/aaa aab aba abb baa bab/));
+write_text("f2c", lines(qw/aax abx/));
+
 subtest "no operation -> error" => sub {
     test_setop(
         args     => [qw/f1 f2/],
@@ -154,12 +157,17 @@ subtest "diff" => sub {
     test_setop(
         name    => 'ignore case',
         args    => [qw/-i --diff f1a f2a/],
-        output  => lines(qw/C d/),
+        output  => lines(qw/C c d/),
     );
     test_setop(
         name    => 'ignore all space',
         args    => [qw/-w --diff f1s f2s/],
-        output  => lines("3 ", 4),
+        output  => lines("3 ", 3, 4),
+    );
+    test_setop(
+        name    => 'check-chars',
+        args    => [qw/-w --diff --check-chars 2 f1c f2c/],
+        output  => lines(qw/baa bab/),
     );
 };
 

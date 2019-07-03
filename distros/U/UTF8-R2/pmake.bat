@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.07';
+$VERSIONE = '0.08';
 $VERSIONE = $VERSIONE;
 use strict;
 use FindBin;
@@ -210,13 +210,30 @@ END
         check_usascii('Makefile.PL');
 
         # write META.yml
+        #
+        # CPANTS Kwalitee shows us following message, but never believe it.
+        # It's a trap. #'
+        #
+        # Kwalitee Indicator: meta_yml_conforms_to_known_spec core
+        # META.yml does not conform to any recognised META.yml Spec.
+        # How to fix
+        # Take a look at the META.yml Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
+        # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
+        # and change your META.yml accordingly. 
+        #
+        # How to escape from trap
+        #
+        #   meta-spec:
+        #     version: 1.4
+        #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
+
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
         printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
-  url: https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: %s
 version: %s
 abstract: %s
@@ -246,6 +263,24 @@ END
         check_usascii('META.yml');
 
         # write META.json
+        #
+        # CPANTS Kwalitee shows us following message, but never believe it.
+        # It's a trap. #'
+        #
+        # Kwalitee Indicator: meta_json_conforms_to_known_spec
+        # META.json does not conform to any recognised META Spec.
+        # How to fix
+        # Take a look at the META.json Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
+        # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
+        # and change your META.json accordingly. 
+        #
+        # How to escape from trap
+        #
+        #   "meta-spec" : {
+        #       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        #       "version" : 2
+        #   },
+
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
         printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract);
@@ -262,14 +297,14 @@ END
         "perl_5"
     ],
     "meta-spec" : {
-        "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
-        "version" : 2
+       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+       "version" : 2
     },
     "release_status" : "stable",
     "resources" : {
         "license" : [
             "http://dev.perl.org/licenses/"
-        ],
+        ]
     },
     "prereqs" : {
         "build" : {

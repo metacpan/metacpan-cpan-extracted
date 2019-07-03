@@ -3,13 +3,14 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
+lib/Game/PseudoRand.pm
 eg/runstats
 eg/trial
-lib/Game/PseudoRand.pm
 t/00-load.t
-t/Game-PseudoRand.t
+t/bistep-bitable.t
 t/pod-coverage.t
 t/pod.t
+t/step-table.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

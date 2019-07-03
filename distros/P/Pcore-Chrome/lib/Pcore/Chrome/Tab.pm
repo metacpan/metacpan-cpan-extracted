@@ -233,9 +233,22 @@ sub convert_cookies ( $self, $chrome_cookies ) {
 sub get_screenshot ( $self, @args ) {
     my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
 
+    my $args = {@args};
+
+    if ( delete $args->{full} ) {
+        my $metrics = $self->_call('Page.getLayoutMetrics');
+
+        my $res = $self->_call(
+            'Emulation.setVisibleSize',
+            {   width  => $metrics->{data}->{contentSize}->{width},
+                height => $metrics->{data}->{contentSize}->{height}
+            }
+        );
+    }
+
     return $self->_call(
         'Page.captureScreenshot',
-        {@args},
+        $args,
         sub ( $res ) {
             my $img;
 

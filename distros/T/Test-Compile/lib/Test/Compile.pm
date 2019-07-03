@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.1.1");
+use version; our $VERSION = qv("v2.1.2");
 use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;
@@ -153,7 +153,7 @@ Declares that you are done testing, no more tests will be run after this point.
 Your basic test. Pass if C<$test> is true, fail if C<$test> is false. Just
 like C<Test::Simple>'s C<ok()>.
 
-=item C<plan($count)>
+=item C<plan(tests => $count)>
 
 Defines how many tests you plan to run.
 

@@ -11,24 +11,25 @@ use File::Temp qw();
 use File::pushd qw();
 
 use lib qw(lib);
-my $module;
-BEGIN {
-    $module = 'Dist::Zilla::PluginBundle::Author::GSG';
-    use_ok($module);
+use Dist::Zilla::PluginBundle::Author::GSG;
+
+{
+    my $git = Git::Wrapper->new('.');
+    plan skip_all => "No Git!" unless $git->has_git_in_path;
+
+    my $version = $git->version;
+    plan skip_all => "Git is too old: $version"
+        if $version < version->parse(v1.7.5);
 }
 
 my $year   = 1900 + (localtime)[5];
 my $holder = 'Grant Street Group';
-
-#diag( "Testing $module " . $module->VERSION );
 
 subtest 'Build a basic dist' => sub {
     my $dir = File::Temp->newdir("dzpbag-XXXXXXXXX");
 
     #local $Git::Wrapper::DEBUG = 1;
     my $git = Git::Wrapper->new($dir);
-    plan skip_all => "No Git!" unless $git->has_git_in_path;
-
     my $upstream = 'GrantStreetGroup/p5-OurExternal-Package';
 
     $git->init;
@@ -43,6 +44,8 @@ subtest 'Build a basic dist' => sub {
         { dist_root => 'corpus/dist/basic' },
         {   also_copy => { $dir => 'source' },
             add_files => {
+                'source/cpanfile' =>
+                    "requires 'perl', 'v5.10.0';",
                 'source/dist.ini' => dist_ini(
                     { name => 'OurExternal-Package' },
                     '@Author::GSG',
@@ -88,24 +91,81 @@ subtest 'Build a basic dist' => sub {
         }
     }
 
+    my %expect = (
+        name           => 'OurExternal-Package',
+        abstract       => 'ABSTRACT',
+        author         => ['Grant Street Group <developers@grantstreet.com>'],
+        x_contributors => [$contributor],
+
+        version => '0.0.1',
+
+        requires => { perl => 'v5.10.0' },
+        provides => {
+            "External::Package" => {
+                file    => "lib/External/Package.pm",
+                version => "v0.0.1"
+            }
+        },
+
+        dynamic_config   => 0,
+        x_static_install => 1,
+    );
+
+    # the YAML only has the git repository, not the rest.
+    $expect{resources}{repository} = $resources{resources}{repository}{url}
+        if %resources;
+
+    is_yaml(
+        $tzil->slurp_file('build/META.yml'),
+        Test::Deep::superhashof(\%expect),
+        "Built the expected META.yml"
+    );
+
+    %expect = (
+        prereqs => Test::Deep::superhashof(
+            { runtime => { requires => delete $expect{requires} } }
+        ),
+
+        %expect,
+        license        => ['artistic_2'],
+        release_status => 'stable',
+        %resources,
+    );
+
     is_json(
         $tzil->slurp_file('build/META.json'),
-        Test::Deep::superhashof( {
-            name     => 'OurExternal-Package',
-            license  => ['artistic_2'],
-            abstract => 'ABSTRACT',
-            author   => ['Grant Street Group <developers@grantstreet.com>'],
-            x_contributors => [$contributor],
-
-            release_status => 'stable',
-            version        => '0.0.1',
-
-            %resources,
-
-            dynamic_config   => 0,
-            x_static_install => 1,
-        } ),
+        Test::Deep::superhashof(\%expect),
         "Built the expected META.json"
+    );
+};
+
+subtest "Override MetaProvides subclass" => sub {
+    {   package Dist::Zilla::Plugin::MetaProvides::Fake;
+        use Moose;
+        with 'Dist::Zilla::Role::MetaProvider';
+        sub metadata { +{} }
+    }
+
+    my $tzil = Builder->from_config(
+        { dist_root => 'corpus/dist/metaprovides_subclass' },
+        {   add_files => {
+                'source/dist.ini' => dist_ini(
+                    { name           => 'External-Fake' },
+                    [ '@Author::GSG' => { meta_provides => 'Fake' } ],
+                ),
+                'source/lib/External/Fake.pm' =>
+                    "package External::Fake;\n# ABSTRACT: ABSTRACT\n1;",
+            }
+        }
+    );
+
+    my @meta_provides_plugins = grep {/\bMetaProvides\b/}
+        map { $_->plugin_name } @{ $tzil->plugins_with( -MetaProvider ) };
+
+    Test::Deep::cmp_bag(
+        \@meta_provides_plugins,
+        ['@Author::GSG/MetaProvides::Fake'],
+        "Correctly only have the fake MetaProvides Plugin"
     );
 };
 

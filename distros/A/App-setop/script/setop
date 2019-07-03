@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-04-24'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2019-07-03'; # DATE
+our $VERSION = '0.122'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,6 +13,7 @@ my %Opts = (
     op => undef,
     ignore_case => 0,
     ignore_all_space => 0,
+    skip_chars => 0,
     glue => ',',
 );
 
@@ -27,6 +28,8 @@ sub parse_cmdline {
         'symdiff'       => sub { $Opts{op} = 'symdiff' },
         'cross'         => sub { $Opts{op} = 'cross' },
         'glue=s'        => \$Opts{glue},
+        'skip-chars=i'  => \$Opts{skip_chars},
+        'check-chars=i' => \$Opts{check_chars},
         'version|v'     => sub {
             no warnings;
             say "setop version $main::VERSION ($main::DATE)";
@@ -46,6 +49,8 @@ Options:
   --diff (shortcut for --op=diff)
   --symdiff (shortcut for --op=symdiff)
   --cross (shortcut for --op=cross)
+  --check-chars=i
+  --skip-chars=i
 For more details, see the manpage/documentation.
 USAGE
             exit 0;
@@ -71,12 +76,18 @@ USAGE
 sub run {
     require Tie::IxHash;
 
+    # a regular hash
+    my %res0;
+
+    # a hash that remembers insert order
     tie my(%res), 'Tie::IxHash';
 
     my $op  = $Opts{op};
     my $ic  = $Opts{ignore_case};
     my $ias = $Opts{ignore_all_space};
-    my $ign = $ic || $ias;
+    my $sch = $Opts{skip_chars};
+    my $cch = $Opts{check_chars};
+    my $ign = $ic || $ias || $sch || defined($cch);
 
     my @aoaos;
 
@@ -164,19 +175,30 @@ sub run {
                 if ($i == 1) {
                     while (<$fh>) {
                         my $k = $ic ? lc($_) : $_;
-                        $k =~ s/\s+//g if $ias;
-                        $res{$k} = $_ unless exists $res{$k};
+                        chomp $k;
+                        $k = substr($k, $sch) if $sch;
+                        $k = substr($k, 0, $cch) if defined $cch;
+                        $k =~ s/[ \t]+//g if $ias;
+                        $res0{$k} //= [];
+                        push @{ $res0{$k} }, [$., $_];
                     }
+                    #use DD; dd \%res0;
                 } else {
                     while (<$fh>) {
                         my $k = $ic ? lc($_) : $_;
+                        chomp $k;
+                        $k = substr($k, $sch) if $sch;
+                        $k = substr($k, 0, $cch) if defined $cch;
                         $k =~ s/\s+//g if $ias;
-                        delete $res{$k};
+                        delete $res0{$k};
                     }
                 }
                 # print result
                 if ($i == @ARGV) {
-                    print $res{$_} for keys %res;
+                    my @lines = map { @{ $res0{$_} } } keys %res0;
+                    for (sort { $a->[0] <=> $b->[0] } @lines) {
+                        print $_->[1];
+                    }
                 }
             } else {
                 if ($i == 1) {
@@ -281,7 +303,7 @@ setop - Set operations (union, intersection, difference, symmetric diff) on line
 
 =head1 VERSION
 
-This document describes version 0.120 of setop (from Perl distribution App-setop), released on 2019-04-24.
+This document describes version 0.122 of setop (from Perl distribution App-setop), released on 2019-07-03.
 
 =head1 SYNOPSIS
 
@@ -356,6 +378,20 @@ Shortcut for C<--op cross>.
 =item * --glue=s
 
 Glue character to use to combine lines when operation is B<cross>.
+
+=item * --skip-chars=i
+
+Number of characters to skip when comparing, much like the same option in
+B<uniq> command.
+
+Currently this is only implemented for C<diff> operation.
+
+=item * --check-chars=i
+
+Number of characters to check when comparing, much like the same option in
+B<uniq> command.
+
+Currently this is only implemented for C<diff> operation.
 
 =back
 

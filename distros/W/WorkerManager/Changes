@@ -1,5 +1,14 @@
 Revision history for Perl extension WorkerManager
 
+0.1000 2019-07-03T08:54:59Z
+
+  [BREAKING CHANGES]
+    - remove WorkerManager::Gearman from core dist
+      if you keep using it, you have to add dependency for WorkerManager::Gearman
+
+    - replace old-style modules (UNIVERSAL::require, Class::Accessor::Fast, Class::Data::Inheritable)
+    - switch to Module::Build::Tiny
+
 0.003 2016-03-29T09:53:59Z
 
     - #4 Allow WM::Client ::TheSchwartz to pass DBI options (thanks @nanto)

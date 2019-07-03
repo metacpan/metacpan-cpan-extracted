@@ -295,8 +295,8 @@ other modules.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.62,
-built on May 15, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.63,
+built on July 02, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 

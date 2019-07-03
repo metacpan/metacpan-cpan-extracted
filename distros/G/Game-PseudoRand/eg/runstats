@@ -1,26 +1,29 @@
 #!/usr/bin/env perl
 #
-# how long are consecutive runs of values? with r-fu
+# how long are consecutive runs of values?
 #
-#   https://github.com/thrig/r-fu/
-#
-# one can compare e.g.
-#
-#   ./trial | ./runstats | r-fu table
-#   perl -E 'say rand()>0.5 ? 1:0 for 1..1e6' | ./runstats | r-fu table
+#   ./trial | ./runstats
+#   perl -E 'say rand > 0.5 ? 1 : 0 for 1..1e5' | ./runstats
 
 use 5.10.0;
 use warnings;
 
+my %table;
+
 my $prev = readline;
 chomp $prev;
-my $len = 1;
+my $run = 1;
 while ( my $value = readline ) {
     chomp $value;
     if ( $value != $prev ) {
-        say $len;
-        $len = 1;
+        $table{$run}++;
+        $run  = 1;
+        $prev = $value;
         next;
     }
-    $len++;
+    $run++;
+}
+
+for my $k ( sort { $a <=> $b } keys %table ) {
+    printf "%-2d %d\n", $k, $table{$k};
 }

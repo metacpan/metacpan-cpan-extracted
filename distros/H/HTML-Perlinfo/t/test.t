@@ -1,6 +1,3 @@
-# a hack for CGI::Deurl 
-$ENV{'REQUEST_METHOD'}="POST";
-
 $|=1;
 
 use Test::More tests => 5;

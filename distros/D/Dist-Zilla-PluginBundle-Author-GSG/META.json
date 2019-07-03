@@ -36,6 +36,7 @@
             "Dist::Zilla::Plugin::Git::Tag" : "0",
             "Dist::Zilla::Plugin::GitHub::Meta" : "0.46",
             "Dist::Zilla::Plugin::GitHub::UploadRelease" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::OurPkgVersion" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
@@ -48,7 +49,9 @@
             "Git::Wrapper" : "0",
             "Moose" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
-            "namespace::autoclean" : "0"
+            "namespace::autoclean" : "0",
+            "perl" : "v5.14.0",
+            "version" : "0"
          }
       },
       "test" : {
@@ -70,6 +73,16 @@
          }
       }
    },
+   "provides" : {
+      "Dist::Zilla::Plugin::Author::GSG" : {
+         "file" : "lib/Dist/Zilla/Plugin/Author/GSG.pm",
+         "version" : "v0.0.11"
+      },
+      "Dist::Zilla::PluginBundle::Author::GSG" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/GSG.pm",
+         "version" : "v0.0.11"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -81,7 +94,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
       }
    },
-   "version" : "0.0.9",
+   "version" : "0.0.11",
    "x_contributors" : [
       "Andrew Fresh <andrew.fresh@grantstreet.com>",
       "Mark Flickinger <mark.flickinger@grantstreet.com>"

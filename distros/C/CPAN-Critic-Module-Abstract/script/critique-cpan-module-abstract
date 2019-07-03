@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /CPAN/Critic/Module/Abstract/critique_cpan_module_abstract
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-01-06'; # DATE
+our $DATE = '2019-07-03'; # DATE
 our $DIST = 'CPAN-Critic-Module-Abstract'; # DIST
-our $VERSION = '0.090'; # VERSION
+our $VERSION = '0.091'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ critique-cpan-module-abstract - Critic CPAN module abstract
 
 =head1 VERSION
 
-This document describes version 0.090 of critique-cpan-module-abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2019-01-06.
+This document describes version 0.091 of critique-cpan-module-abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2019-07-03.
 
 =head1 SYNOPSIS
 

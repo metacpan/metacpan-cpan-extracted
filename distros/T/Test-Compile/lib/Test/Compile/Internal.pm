@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.1.1");
+use version; our $VERSION = qv("v2.1.2");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -99,7 +99,7 @@ sub all_pl_files_ok {
     my $test = $self->{test};
 
     for my $file ( $self->all_pl_files(@dirs) ) {
-        my $ok = $self->pm_file_compiles($file);
+        my $ok = $self->pl_file_compiles($file);
         $test->ok($ok, "$file compiles");
     }
 }

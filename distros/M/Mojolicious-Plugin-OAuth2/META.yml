@@ -1,13 +1,13 @@
 ---
 abstract: 'Auth against OAuth2 APIs'
 author:
-  - 'Marcus Ramberg <marcus.ramberg@gmail.com>'
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +21,11 @@ requires:
   IO::Socket::SSL: '1.94'
   Mojolicious: '7.53'
 resources:
-  bugtracker: https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2/issues
-  homepage: https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2
+  bugtracker: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2/issues
+  homepage: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2
   repository: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2.git
-version: '1.57'
+version: '1.58'
+x_contributors:
+  - 'Marcus Ramberg <mramberg@cpan.org>'
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

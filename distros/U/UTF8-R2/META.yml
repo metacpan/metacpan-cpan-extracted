@@ -1,9 +1,9 @@
 --- #YAML:1.0
 meta-spec:
   version: 1.4
-  url: https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: UTF8-R2
-version: 0.01
+version: 0.02
 abstract: makes UTF-8 scripting easy for enterprise use or LTS
 author:
   - ina <ina@cpan.org>

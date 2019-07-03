@@ -2,13 +2,14 @@ package WorkerManager::Worker::Gearman;
 use strict;
 use warnings;
 use Gearman::Worker;
-use base qw(Class::Accessor::Fast);
 
-__PACKAGE__->mk_accessors(qw(
-    worker
-    job_servers
-    prefix
- ));
+use Class::Accessor::Lite (
+    rw => [qw(
+        worker
+        job_servers
+        prefix
+    )],
+);
 
 sub new {
     my ($class, $arg) = @_;

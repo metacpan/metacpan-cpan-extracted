@@ -1,5 +1,10 @@
 Revision history for Perl extension Test-Compile
 
+v2.1.2    2019-07-03
+    - More corrections to the POD
+    - More tests, try specifying specific files to all_pX_files()
+    - Use the correct method in all_pl_files_ok() (Noel Maddy)
+
 v2.1.1    2019-07-01              (Evan Giles <egiles@cpan.org>)
     - Correct the POD
 
