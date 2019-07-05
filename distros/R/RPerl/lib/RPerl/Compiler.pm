@@ -7,7 +7,7 @@ package RPerl::Compiler;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.042_000;
+our $VERSION = 0.044_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit::Module::Class);
@@ -200,7 +200,9 @@ sub find_dependencies {
 #RPerl::diag( 'in Compiler::find_dependencies(), received $file_name = ' . $file_name . "\n" );
 
     # trim unnecessary (and possibly problematic) @INC & absolute & current-directory paths from input file name
-    $file_name = post_processor__INC_paths_delete($file_name, 1, 0);  # $leading_slash_delete = 1, $leading_lib_delete = 0
+    my boolean $leading_lib_delete = 0;
+    my string $file_name_pre_process = $file_name;
+    $file_name = post_processor__INC_paths_delete($file_name, 1, $leading_lib_delete);  # $leading_slash_delete = 1, $leading_lib_delete = 0
     $file_name = post_processor__absolute_path_delete($file_name);
     $file_name = post_processor__current_directory_path_delete($file_name);
 #RPerl::diag( 'in Compiler::find_dependencies(), have possibly-trimmed $file_name = ' . $file_name . "\n" );
@@ -209,8 +211,17 @@ sub find_dependencies {
 #    my string_arrayref $pmc_disable_paths = [];  # DISABLE_DYNAMIC_DEPS_ANALYSIS
 
     if ( not -f $file_name ) {
-        die 'ERROR ECOCODE00, COMPILER, FIND DEPENDENCIES: File not found, ' . q{'} . $file_name . q{'} . ', dying' . "\n";
+        $leading_lib_delete = 1;
+        my string $file_name_nolib = post_processor__INC_paths_delete($file_name_pre_process, 1, $leading_lib_delete);  # $leading_slash_delete = 1, $leading_lib_delete = 1
+        if ( not -f $file_name_nolib ) {
+            die 'ERROR ECOCODE00, COMPILER, FIND DEPENDENCIES: File not found, ' . q{'} . $file_name . q{'} . ', or ' . q{'} . $file_name_nolib . q{'} . ', dying' . "\n";
+        }
+        else {
+            $file_name = $file_name_nolib;
+#RPerl::diag('in Compiler::find_dependencies(), using $file_name_nolib = ' . q{'} . $file_name_nolib . q{'} . "\n");
+        }
     }
+#else { RPerl::diag('in Compiler::find_dependencies(), using $file_name = ' . q{'} . $file_name . q{'} . "\n"); }
 
     open my filehandleref $FILE_HANDLE, '<', $file_name
         or die 'ERROR ECOCODE01, COMPILER, FIND DEPENDENCIES: Cannot open file ' . q{'} . $file_name . q{'} . ' for reading, ' . $OS_ERROR . ', dying' . "\n";
@@ -362,7 +373,7 @@ sub find_dependencies {
 =cut
 
                 # DEV NOTE, CORRELATION #rp055: handle removal of current directory & all @INC directories, so as not to hard-code system-specific dirs in #include statements
-                foreach my string $INC_directory (File::Spec->catpath( '', getcwd, 'lib' ), @INC) {
+                foreach my string $INC_directory (getcwd, File::Spec->catpath( '', getcwd, 'lib' ), @INC) { # search current directory, current w/ '/lib', and @INC dirs
 #RPerl::diag( 'in Compiler::find_dependencies(), top of @INC foreach loop, have $INC_directory = ' . $INC_directory . "\n" );
                     $package_file_name_included = File::Spec->catpath( '', $INC_directory, $package_file_name );
 #RPerl::diag( 'in Compiler::find_dependencies(), inside @INC foreach loop, have $package_file_name_included = ' . $package_file_name_included . "\n" );
@@ -387,7 +398,7 @@ sub find_dependencies {
 
             # trim unnecessary (and possibly problematic) @INC & absolute & current-directory paths from input file name
             my string $package_file_name_included_relative = $package_file_name_included;
-            $package_file_name_included_relative = post_processor__INC_paths_delete($package_file_name_included_relative, 1, 0);  # $leading_slash_delete = 1, $leading_lib_delete = 0
+            $package_file_name_included_relative = post_processor__INC_paths_delete($package_file_name_included_relative, 1, $leading_lib_delete);  # $leading_slash_delete = 1, $leading_lib_delete = [value set above]
             $package_file_name_included_relative = post_processor__absolute_path_delete( $package_file_name_included_relative );
             $package_file_name_included_relative = post_processor__current_directory_path_delete( $package_file_name_included_relative );
             push @{$dependencies}, $package_file_name_included_relative;
@@ -398,7 +409,15 @@ sub find_dependencies {
             if ($find_subdependencies_recurse) {
     
                 # recursively find subdependencies
-                my string_arrayref $subdependencies = find_dependencies( $package_file_name_included, $find_subdependencies_recurse, $modes );
+                # NEED ANSWER: is this logic correct, to always use the relative (lib-stripped) file name for recursive deps?
+                # or should we use the relative file name if and only if we have already had to delete the leading lib?
+                my string_arrayref $subdependencies;
+#                if ($leading_lib_delete) {
+                    $subdependencies = find_dependencies( $package_file_name_included_relative, $find_subdependencies_recurse, $modes );
+#                }
+#                else {
+#                    $subdependencies = find_dependencies( $package_file_name_included, $find_subdependencies_recurse, $modes );
+#                }
     
                 # discard duplicate dependencies that now appear in subdependencies
                 $dependencies = [ uniq @{$subdependencies}, @{$dependencies} ];

@@ -1,7 +1,7 @@
 package CPAN::Changes::Cwalitee;
 
 our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.000'; # VERSION
+our $VERSION = '0.001'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -103,9 +103,10 @@ sub calc_cpan_changes_cwalitee {
         } @{ $res->[2] }) {
 
         if ($ind->{priority} > 1 && !$parse_attempted++) {
-            require CPAN::Changes;
+            require CPAN::Changes::Subclass::Cwalitee;
             eval {
-                $r->{parsed} = CPAN::Changes->load_string($r->{file_content});
+                $r->{parsed} = CPAN::Changes::Subclass::Cwalitee->load_string(
+                    $r->{file_content});
             };
         }
 
@@ -165,7 +166,7 @@ CPAN::Changes::Cwalitee - Calculate the cwalitee of your CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.000 of CPAN::Changes::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-03.
+This document describes version 0.001 of CPAN::Changes::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-03.
 
 =head1 SYNOPSIS
 

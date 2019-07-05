@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.148';
+our $VERSION = '1.149';
 
 use POSIX ();
 
@@ -55,7 +55,7 @@ sub serverTime {
 
 =head1 VERSION
 
-1.148
+1.149
 
 =head1 AUTHOR
 

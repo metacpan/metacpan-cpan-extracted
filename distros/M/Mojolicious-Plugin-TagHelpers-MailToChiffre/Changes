@@ -1,6 +1,10 @@
+0.10 2019-07-04
+        - Removed call to deprecated
+          Mojo::Collection::slice().
+
 0.09 2015-01-03
         - Fixed parameter handling in Mojo::URL >= 5.71.
-	- Update minimum version of Mojolicious to 5.71.
+        - Update minimum version of Mojolicious to 5.71.
 
 0.08 2015-01-02
         - Fixed test suite regarding parameter order.
@@ -10,23 +14,23 @@
 
 0.06 2014-11-30
         - Improved css.
-	- Modified js to replace + with spaces.
+	      - Modified js to replace + with spaces.
 
 0.05 2014-10-09
         - Updated to Mojolicious 5.48 (security update).
-	- Removed experimental AssetPack support.
+	      - Removed experimental AssetPack support.
 
 0.04 2014-09-18
         - Small documentation fixes.
-	- Improved test suite.
-	- Added experimental support for AssetPack.
+	      - Improved test suite.
+	      - Added experimental support for AssetPack.
 
 0.03 2014-01-29
         - Fixed ByteStream stringification bug in tests.
 
 0.02 2014-01-28
         - Fixed M::P::Util::RandomString dependency.
-	- Fixed Test::Mojo dependency.
+	      - Fixed Test::Mojo dependency.
 
 0.01 2014-01-25
         - Initial submission to GitHub.

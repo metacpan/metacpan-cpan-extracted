@@ -23,11 +23,15 @@ my $meta = {
                                          requires => {
                                            "Attean"            => 0.023,
                                            "HTTP::Message"     => 0,
+                                           "LWP::UserAgent"    => 0,
                                            "Moo"               => "1.006000",
                                            "Path::Tiny"        => 0,
+                                           "perl"              => 5.014,
                                            "RDF::NS::Curated"  => 1.002,
                                            "RDF::Prefixes"     => 0,
                                            "Test::FITesque"    => 0,
+                                           "Try::Tiny"         => 0,
+                                           "Types::Path::Tiny" => 0,
                                            "Types::Standard"   => 0,
                                            "Types::URI"        => 0,
                                            "URI::NamespaceMap" => 1.08,
@@ -43,7 +47,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => 0.008 },
+                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => "0.010" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -58,7 +62,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.008,
+  "version"          => "0.010",
   "x_static_install" => 1,
 };
 

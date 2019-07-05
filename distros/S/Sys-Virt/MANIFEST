@@ -41,6 +41,7 @@ lib/Sys/Virt/Error.pm
 lib/Sys/Virt/Event.pm
 lib/Sys/Virt/Interface.pm
 lib/Sys/Virt/Network.pm
+lib/Sys/Virt/NetworkPort.pm
 lib/Sys/Virt/NodeDevice.pm
 lib/Sys/Virt/NWFilter.pm
 lib/Sys/Virt/NWFilterBinding.pm

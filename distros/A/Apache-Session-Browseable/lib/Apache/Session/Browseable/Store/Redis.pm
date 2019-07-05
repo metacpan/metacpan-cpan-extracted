@@ -2,7 +2,7 @@ package Apache::Session::Browseable::Store::Redis;
 
 use strict;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.2';
 our $redis;
 
 BEGIN {
@@ -22,6 +22,15 @@ sub new {
     $session->{args}->{encoding} = undef
       if (  $session->{args}->{encoding}
         and $session->{args}->{encoding} eq "undef" );
+
+    # If sentinels is not given as an array ref, try to parse
+    # a comma delimited list instead
+    if ( $session->{args}->{sentinels}
+        and ref $session->{args}->{sentinels} ne 'ARRAY' )
+    {
+        $session->{args}->{sentinels} =
+          [ split /[,\s]+/, $session->{args}->{sentinels} ];
+    }
 
     $self->{cache} = $redis->new( %{ $session->{args} } );
 

@@ -1,0 +1,27 @@
+---
+abstract: 'Automatically create search methods for boolean columns.'
+author:
+  - 'Mathieu Arnold <mat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Helper-ResultSet-BooleanMethods
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Class::Helper::ResultSet::Me: '2.033'
+  Package::Variant: '1.003'
+  Role::Tiny: '2.0'
+  perl: '5.008'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

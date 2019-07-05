@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::SchwartzRatio - display the Schwartz ratio of the distribut
 
 # VERSION
 
-version 0.3.2
+version 0.3.3
 
 # SYNOPSIS
 
@@ -19,7 +19,7 @@ In dist.ini:
 The Schwartz Ratio of CPAN is the number of number of latest
 releases over the total number of releases that CPAN has. For
 a single distribution, it boils down to the less exciting
-number of previous releases still on CPAN. 
+number of previous releases still on CPAN.
 
 After a successful release, the plugin displays
 the releases of the distribution still kicking around on CPAN,
@@ -28,7 +28,7 @@ to do some cleanup.
 
 # SEE ALSO
 
-- [App-PAUSE-cleanup](https://metacpan.org/release/App-PAUSE-cleanup) 
+- [App-PAUSE-cleanup](https://metacpan.org/release/App-PAUSE-cleanup)
 
     CLI utility to list and help you delete easily your distributions on CPAN.
 
@@ -38,7 +38,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2019, 2017, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

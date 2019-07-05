@@ -1,25 +1,33 @@
-@prefix test: <http://example.org/test-fixtures#> .
+@prefix test: <http://ontologi.es/doap-tests#> .
 @prefix deps: <http://ontologi.es/doap-deps#>.
 @prefix dc:   <http://purl.org/dc/terms/> .
 @prefix my:   <http://example.org/my-parameters#> .
+@prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
 
 
 <#test-list> a test:FixtureTable ;
     test:fixtures <#test1>, <#test2> . 
 
-<#test1> a test:Test ;
-    test:handler "Internal::Fixture::Simple"^^deps:CpanId ;
+<#test1> a test:AutomatedTest ;
     test:param_base <http://example.org/my-parameters#> ;
-    dc:identifier "string_found" ;
+    test:purpose "Echo a string"@en ;    
+    test:test_script <http://example.org/simple#string_found> ;
     test:params [ my:all "counter-clockwise dahut" ] .
         
-<#test2> a test:Test ;
-    test:handler "Internal::Fixture::Multi"^^deps:CpanId ;
+<#test2> a test:AutomatedTest ;
     test:param_base <http://example.org/my-parameters#> ;
-    dc:identifier "multiplication" ;
+    test:purpose "Multiply two numbers"@en ;
+    test:test_script <http://example.org/multi#multiplication> ;
     test:params [
         my:factor1 6 ;
         my:factor2 7 ;
         my:product 42 
     ] .
         
+<http://example.org/simple#string_found> a nfo:SoftwareItem ;
+    nfo:definesFunction "string_found" ;
+    deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .
+
+<http://example.org/multi#multiplication> a nfo:SoftwareItem ;
+    nfo:definesFunction "multiplication" ;
+    deps:test-requirement "Internal::Fixture::Multi"^^deps:CpanId .

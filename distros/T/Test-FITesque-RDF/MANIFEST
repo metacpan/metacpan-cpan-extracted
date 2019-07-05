@@ -14,8 +14,10 @@ dist.ini
 doap.ttl
 lib/Test/FITesque/RDF.pm
 t/01basic.t
+t/data/#http-list-multi.ttl#
 t/data/http-list-multi.ttl
 t/data/http-list.ttl
+t/data/http-mix.ttl
 t/data/list.ttl
 t/data/multi-vocab.ttl
 t/data/multi.ttl
@@ -27,6 +29,7 @@ t/lib/Internal/Fixture/HTTPList.pm
 t/lib/Internal/Fixture/Multi.pm
 t/lib/Internal/Fixture/Simple.pm
 t/unit-http-list.t
+t/unit-http-mix.t
 t/unit-list.t
 t/unit-multi-http.t
 t/unit-multi-vocab.t

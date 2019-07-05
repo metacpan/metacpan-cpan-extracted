@@ -1,0 +1,11 @@
+Revision history for DBIx-Class-Helper-ResultSet-BooleanMethods
+
+0.03    2018-12-21 16:21:57 +0100
+        Don't use each(%hash).
+
+0.02    2018-05-01 09:48:40
+        Add Helper::ResultSet::Me to make sure the right columns are searched.
+
+0.01    2018-05-01 09:27:05 +0000
+        First version.
+

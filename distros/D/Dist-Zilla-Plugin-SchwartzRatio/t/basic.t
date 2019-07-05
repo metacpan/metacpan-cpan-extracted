@@ -9,26 +9,27 @@ use Dist::Zilla::Plugin::SchwartzRatio;
 
 use Test::MockObject;
 use MetaCPAN::Client;
-use List::Lazy qw/ lazy_fixed_list /;
 
 package FakeRelease {
     use Moose;
     has version => ( is => 'ro' );
     has date    => ( is => 'ro' );
+    has status => ( is => 'ro' );
 }
 
 my $fake_client = Test::MockObject->new;
 my $releases = Test::MockObject->new;
-$releases->set_series( next 
-    => map { 
-        FakeRelease->new( version => '1.1.'.$_, date => '2017-01-0'.$_) 
-    } 1..3 
+$releases->set_series( next
+    => map {
+        FakeRelease->new( version => '1.1.'.$_, date => '2017-01-0'.$_,
+        status => $_ % 2 ? 'cpan' : 'backpan' )
+    } 1..3
 );
 
 $fake_client->set_always( release => $releases );
 
-{ 
-    no warnings; 
+{
+    no warnings;
     sub MetaCPAN::Client::new { $fake_client }
 }
 
@@ -62,9 +63,19 @@ cmp_deeply(
         superhashof({
             level => 'info',
             message => re(qr/v1.1.$_, 2017-01-0$_/) })
-        } 1..3
+        } 1, 3
     ),
     'versions are listed',
+);
+
+cmp_deeply(
+    $tzil->chrome->logger->events,
+    superbagof(
+        superhashof({
+            level => 'info',
+            message => re('Total number.*?3') })
+    ),
+    'total nbr of releases is given',
 );
 
 done_testing;

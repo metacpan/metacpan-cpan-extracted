@@ -52,26 +52,26 @@
       "test" : {
          "requires" : {
             "JSON::PP" : "0",
-            "Test2::V0" : "0"
+            "Test2::V0" : "0.000111"
          }
       }
    },
    "provides" : {
       "Sub::Meta" : {
          "file" : "lib/Sub/Meta.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Sub::Meta::Param" : {
          "file" : "lib/Sub/Meta/Param.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Sub::Meta::Parameters" : {
          "file" : "lib/Sub/Meta/Parameters.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Sub::Meta::Returns" : {
          "file" : "lib/Sub/Meta/Returns.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -85,8 +85,11 @@
          "web" : "https://github.com/kfly8/p5-Sub-Meta"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_authority" : "cpan:KFLY",
+   "x_contributors" : [
+      "Kenta Kobayashi <kentafly88@gmail.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

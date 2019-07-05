@@ -1,6 +1,10 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.26 2019-06-08T15:16:33
+0.27 2019-07-05T17:21:58
+ - Add documentation for usage of promptuser_default option
+ - Fix Italian translation
+
+0.26 2019-06-08T15:16:33Z
  - Add dependency to LWP::Protocol::https
 
 0.25 2019-06-08T10:51:03Z

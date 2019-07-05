@@ -1,0 +1,14 @@
+=pod
+
+The following is a random 64-character command name generated from
+characters in the set [0-9A-Za-z_-]. My previous try was 'bad cmd',
+which did not work as advertized under FreeBSD. Under that OS, the
+argument appeard to be split on space by C<man -w>, and since C<man> is
+a valid manpage, the returned status was 0. If you change this, make
+sure constant RANDOM_CMD in t/pod_file_ok.t is changed to match.
+
+L<2d8S4rU0svlIoqpA01ntUV1w_NWiKZ8TvSbbhnmYkvLPCHhv8ccYxCLIXNlQcnVv (1)>
+
+=cut
+
+# ex: set textwidth=72 :

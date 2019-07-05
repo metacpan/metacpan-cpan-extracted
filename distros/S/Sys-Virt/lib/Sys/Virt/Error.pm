@@ -844,6 +844,18 @@ Domain checkpoint not found
 
 Domain backup job id not found
 
+=item Sys::Virt::Error::ERR_NO_NETWORK_PORT
+
+No matching network port
+
+=item Sys::Virt::Error::ERR_INVALID_NETWORK_PORT
+
+Invalid network port object
+
+=item Sys::Virt::Error::ERR_NETWORK_PORT_EXIST
+
+Network port already exists
+
 =back
 
 =head1 AUTHORS

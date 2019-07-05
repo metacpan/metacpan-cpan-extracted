@@ -1,0 +1,95 @@
+NAME
+    Dist::Zilla::Plugin::Rinci::GenSchemaV - Generate Sah::SchemaV::*
+    modules for all modules that contain Rinci function metadata
+
+VERSION
+    This document describes version 0.000 of
+    Dist::Zilla::Plugin::Rinci::GenSchemaV (from Perl distribution
+    Dist-Zilla-Plugin-Rinci-GenSchemaV), released on 2019-07-04.
+
+SYNOPSIS
+    In dist.ini:
+
+     [Rinci::GenSchemaV]
+
+DESCRIPTION
+    This plugin will generate a corresponding "Sah::SchemaV::*" modules for
+    all modules that contain Rinci function metadata. For example, if
+    lib/My/Lib.pm contains:
+
+     package My::Lib;
+
+     our %SPEC;
+
+     $SPEC{func1} = {
+         v => 1.1,
+         summary => 'Blah blah',
+         args => {
+             arg1 => {
+                 summary => 'Blah blah',
+                 schema => ['str*', len_between=>[1, 10]],
+             },
+             arg2 => {
+                 summary => 'Blah blah',
+                 schema => ['str*', len_between=>[1, 10]],
+             },
+             arg3 => {
+                 summary => 'Blah blah',
+                 schema => 'uint*',
+             },
+         },
+     };
+     sub func1 {
+        ...
+     }
+
+     1;
+
+    then this plugin will generate lib/Sah/SchemaV/My/Lib.pm with the
+    contents like the following:
+
+     package Sah::SchemaV::My::Lib;
+
+     our %Validators;
+     our %Args_Validators;
+
+     # for ["str*","len_between",[1,10]]
+     $Validators{'12bb9471cf257c92a9028dcd9bfa2078c186fd32'} = sub {
+         ... validator code ...
+     };
+     # for "uint*"
+     $Validators{'3668dd65767787facd64512dd40026ab6f7090d9'} = sub {
+         ... validator code ...
+     };
+
+     $Args_Validators{func1} = {
+        arg1 => $Validators{'12bb9471cf257c92a9028dcd9bfa2078c186fd32'},
+        arg2 => $Validators{'12bb9471cf257c92a9028dcd9bfa2078c186fd32'},
+     };
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Rinci-GenSchemaV>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Rinci-GenSchemaV>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Rin
+    ci-GenSchemaV>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -39,4 +39,8 @@ subtest 'compat' => sub{
   is $uri->split_path_compat, ['', 'foo', 'bar'], 'includes empty leading segment';
 };
 
+subtest 'oddballs' => sub{
+  ok lives{ uri->path([]) }, 'regression (bug #21): path([]) does not explode';
+};
+
 done_testing;

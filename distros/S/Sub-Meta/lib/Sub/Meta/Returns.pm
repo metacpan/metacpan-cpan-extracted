@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 sub new {
     my $class = shift;
@@ -38,7 +38,17 @@ Sub::Meta::Returns - meta information about return values
 
     use Sub::Meta::Returns;
 
-    my $r = Sub::Meta::Returns->new;
+    my $r = Sub::Meta::Returns->new(
+        scalar  => 'Int',      # optional
+        list    => 'ArrayRef', # optional
+        void    => 'Void',     # optional
+        coerce  => 1,          # optional
+    );
+
+    $r->scalar; # 'Int'
+    $r->list;   # 'ArrayRef'
+    $r->void;   # 'Void'
+    $r->coerce; # 1
 
 =head1 METHODS
 
@@ -46,46 +56,37 @@ Sub::Meta::Returns - meta information about return values
 
 Constructor of C<Sub::Meta::Returns>.
 
-    my $r = Sub::Meta::Returns->new(
-        scalar  => 'Str', # optional
-        list    => 'Str', # optional
-        void    => 'Str', # optional
-        coerce  => 1,     # optional
-    );
-
-
-
 =head2 scalar
 
 A type for value when called in scalar context.
 
-=head2 set_scalar(Any)
+=head2 set_scalar($scalar)
 
-Setter of scalar.
+Setter for C<scalar>.
 
 =head2 list
 
 A type for value when called in list context.
 
-=head2 set_list(Any)
+=head2 set_list($list)
 
-Setter of list.
+Setter for C<list>.
 
 =head2 void
 
 A type for value when called in void context.
 
-=head2 set_void(Any)
+=head2 set_void($void)
 
-Setter of void.
+Setter for C<void>.
 
 =head2 coerce
 
 A boolean whether with coercions.
 
-=head2 set_coerce(Bool)
+=head2 set_coerce($bool)
 
-Setter of coerce.
+Setter for C<coerce>.
 
 =head1 LICENSE
 

@@ -1,23 +1,43 @@
 ---
-abstract: 'Execute external (shell) command and gather stdout and stderr'
+abstract: 'Execute an external command conveniently by hiding the details of IPC::Open3.'
 author:
-  - 'Mikko Koivunalho <mikko.koivunalho@iki.fi>'
+  - "'Mikko Koivunalho <mikko.koivunalho@iki.fi>'"
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0'
+  lib: '0'
+  perl: '5.010'
+  utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010000'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - ipc
+  - open3
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IPC-RunExternal
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  IPC::RunExternal:
+    file: lib/IPC/RunExternal.pm
+    version: '0.100'
 requires:
-  Test::More: 0
-  perl: 5.006002
-version: 0.09
+  Carp: '0'
+  English: '0'
+  Exporter: '0'
+  IO::Select: '0'
+  IPC::Open3: '0'
+  Symbol: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=IPC-RunExternal
+  homepage: https://metacpan.org/release/IPC-RunExternal
+  repository: https://github.com/mikkoi/ipc-runexternal.git
+version: '0.100'
+x_generated_by_perl: v5.14.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

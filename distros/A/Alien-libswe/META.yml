@@ -1,0 +1,59 @@
+---
+abstract: 'Build and install Swiss Ephemeris shared library'
+author:
+  - unknown
+build_requires:
+  Alien::Build: '1.05'
+  Alien::Build::MM: '0.25'
+  Archive::Tar: '0'
+  Config: '0'
+  HTML::LinkExtor: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Net::SSLeay: '1.49'
+  Sort::Versions: '0'
+  Test2::V0: '0'
+  Test::Alien: '0'
+  Test::More: '0.88'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.25'
+  Alien::Build::Plugin::Build::Make: '0.99'
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libswe
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '0'
+  Alien::Build: '0.25'
+  Sort::Versions: '1.62'
+  parent: '0'
+version: '0.009'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 1.48'
+  requires:
+    share:
+      Alien::Build: '1.05'
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

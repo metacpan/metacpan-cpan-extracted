@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.651';
+our $VERSION = '1.652';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -37,7 +37,8 @@ sub new {
     my $self = bless {}, $class;
     if ( defined $opt ) {
         croak "new: the (optional) argument must be a HASH reference" if ref $opt ne 'HASH';
-        $self->__validate_and_add_options( $opt );
+        my $valid = $self->__valid_options();
+        $self->__validate_and_add_options( $valid, $opt );
     }
     $self->{backup_opt} = { defined $opt ? %$opt : () };
     $self->{plugin} = $Plugin->new();
@@ -126,10 +127,9 @@ sub __valid_options {
 };
 
 
-sub __validate_and_add_options {
-    my ( $self, $opt ) = @_;
+sub __validate_and_add_options { # used by Term::TablePrint, Term::Form
+    my ( $self, $valid, $opt ) = @_;
     return if ! defined $opt;
-    my $valid = $self->__valid_options();
     my $sub =  ( caller( 1 ) )[3];
     $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
     $sub .= ':';
@@ -270,7 +270,8 @@ sub __choose {
     croak "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
     if ( defined $opt ) {
         croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
-        $self->__validate_and_add_options( $opt );
+        my $valid = $self->__valid_options();
+        $self->__validate_and_add_options( $valid, $opt );
     }
     if ( ! @$orig_list_ref ) {
         return;
@@ -1181,7 +1182,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.651
+Version 1.652
 
 =cut
 

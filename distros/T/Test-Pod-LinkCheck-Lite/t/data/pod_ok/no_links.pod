@@ -1,0 +1,7 @@
+=pod
+
+This is a POD file that contains no links.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -5,10 +5,9 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( insert_sep );
-use Term::TablePrint        qw();
+use Term::Choose       qw();
+use Term::Choose::Util qw( insert_sep );
+use Term::TablePrint   qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -29,7 +28,7 @@ sub new {
 
 sub table_write_access {
     my ( $sf, $sql ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @stmt_types;
@@ -156,7 +155,6 @@ sub commit_sql {
                 { grid => 2, prompt => $prompt, max_rows => 0, keep_header => 1,
                   table_expand => $sf->{o}{G}{info_expand} }
             );
-            print HIDE_CURSOR;
         }
     }
     $ax->print_sql( $sql, $waiting );
@@ -180,7 +178,7 @@ sub commit_sql {
 sub __transaction {
     my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $dbh = $sf->{d}{dbh};
     my $rolled_back;
     if ( ! eval {
@@ -221,7 +219,7 @@ sub __transaction {
 sub __auto_commit {
     my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $dbh = $sf->{d}{dbh};
     my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
     $ax->print_sql( $sql ); #
@@ -254,7 +252,7 @@ sub __build_insert_stmt {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $ax->reset_sql( $sql );
     my @cu_keys = ( qw/insert_col insert_copy insert_file/ );
     my %cu = (
@@ -310,7 +308,7 @@ sub __insert_into_stmt_columns {
     my ( $sf, $sql ) = @_;
     my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $sql->{insert_into_cols} = [];
     my @cols = ( @{$sql->{cols}} );
     if ( $plui->first_column_is_autoincrement( $sf->{d}{dbh}, $sf->{d}{schema}, $sf->{d}{table} ) ) {

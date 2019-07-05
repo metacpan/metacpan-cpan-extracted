@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Argument;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Moo;
 

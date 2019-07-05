@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.822'; # VERSION
+our $DATE = '2019-07-04'; # DATE
+our $VERSION = '1.824'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -224,11 +224,14 @@ sub hook_before_parse_argv {
 }
 
 sub hook_before_action {
+
     my ($self, $r) = @_;
 
     # validate arguments using schema from metadata
   VALIDATE_ARGS:
     {
+        no strict 'refs';
+
         last unless $self->validate_args;
 
         # unless we're feeding the arguments to function, don't bother
@@ -242,39 +245,85 @@ sub hook_before_action {
             (grep { $_->{validate_args} }
              @{ $meta->{'x.perinci.sub.wrapper.logs'} });
 
-        require Data::Sah;
+        # function can validate its args, so we don't have to do validation for
+        # it
+        last if $meta->{features} && $meta->{features}{validate_vars};
 
         # to be cheap, we simply use "$ref" as key as cache key. to be proper,
         # it should be hash of serialized content.
-        my %validators; # key = "$schema"
+        my %validators_by_arg; # key = argname
 
-        for my $arg (sort keys %{ $meta->{args} // {} }) {
-            next unless exists($r->{args}{$arg});
+      USE_VALIDATORS_FROM_SCHEMA_V: {
+            my $url = $r->{subcommand_data}{url};
+            $url =~ m!\A/(.+)/(\w+)\z! or last;
+            my $func = $2;
+            (my $mod = $1) =~ s!/!::!g;
+            my $schemav_mod = "Sah::SchemaV::$mod";
+            (my $schemav_mod_pm = "$schemav_mod.pm") =~ s!::!/!g;
+            eval { require $schemav_mod_pm };
+            last if $@;
 
-            # we don't support validation of input stream because this must be
-            # done after each 'get item' (but periswrap does)
-            next if $meta->{args}{$arg}{stream};
+            #say "D:we have pre-compiled validator codes";
 
-            my $schema = $meta->{args}{$arg}{schema};
-            next unless $schema;
-            unless ($validators{"$schema"}) {
-                my $v = Data::Sah::gen_validator($schema, {
-                    return_type => 'str+val',
-                    schema_is_normalized => 1,
-                });
-                $validators{"$schema"} = $v;
+            for my $arg (sort keys %{ $meta->{args} // {} }) {
+                next unless exists($r->{args}{$arg});
+
+                # we don't support validation of input stream because this must
+                # be done after each 'get item' (but periswrap does)
+                next if $meta->{args}{$arg}{stream};
+
+                my $v = ${"$schemav_mod\::Args_Validators"}{$func}{$arg}
+                    or next;
+                #say "D:using precompiled validator for arg $arg";
+                $validators_by_arg{$arg} = $v;
             }
-            my $res = $validators{"$schema"}->($r->{args}{$arg});
-            if ($res->[0]) {
-                die [400, "Argument '$arg' fails validation: $res->[0]"];
-            }
-            my $val0 = $r->{args}{$arg};
-            my $coerced_val = $res->[1];
-            $r->{args}{$arg} = $coerced_val;
-            $r->{args}{"-orig_$arg"} = $val0 unless equal2($val0, $coerced_val);
         }
 
-        if ($meta->{args_rels}) {
+      GEN_VALIDATORS: {
+            my %validators_by_schema; # key = "$schema"
+            require Data::Sah;
+            for my $arg (sort keys %{ $meta->{args} // {} }) {
+                next unless exists($r->{args}{$arg});
+
+                # we don't support validation of input stream because this must
+                # be done after each 'get item' (but periswrap does)
+                next if $meta->{args}{$arg}{stream};
+
+                my $schema = $meta->{args}{$arg}{schema};
+                next unless $schema;
+
+                unless ($validators_by_schema{"$schema"}) {
+                    my $v = Data::Sah::gen_validator($schema, {
+                        return_type => 'str+val',
+                        schema_is_normalized => 1,
+                    });
+                    $validators_by_schema{"$schema"} = $v;
+                    $validators_by_arg{$arg} = $v;
+                }
+            }
+        }
+
+      DO_VALIDATE: {
+            for my $arg (sort keys %{ $meta->{args} // {} }) {
+                my $v = $validators_by_arg{$arg} or next;
+                my $res = $v->($r->{args}{$arg});
+                if ($res->[0]) {
+                    die [400, "Argument '$arg' fails validation: $res->[0]"];
+                }
+                my $val0 = $r->{args}{$arg};
+                my $coerced_val = $res->[1];
+                $r->{args}{$arg} = $coerced_val;
+                $r->{args}{"-orig_$arg"} = $val0
+                    unless equal2($val0, $coerced_val);
+            }
+        } # DO_VALIDATE
+
+      DO_VALIDATE_ARGS_RELS: {
+            last unless $meta->{args_rels};
+
+            # we haven't precompiled validator for args_rels yet
+            require Data::Sah;
+
             my $schema = [hash => $meta->{args_rels}];
             my $sah = Data::Sah->new;
             my $hc  = $sah->get_compiler("human");
@@ -291,7 +340,7 @@ sub hook_before_action {
             if ($res) {
                 die [400, $res];
             }
-        }
+        } # DO_VALIDATE_ARGS_RELS
 
     }
 }
@@ -571,7 +620,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.822 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2019-06-26.
+This document describes version 1.824 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2019-07-04.
 
 =head1 SYNOPSIS
 

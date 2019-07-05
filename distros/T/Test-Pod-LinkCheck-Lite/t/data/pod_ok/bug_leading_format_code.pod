@@ -1,0 +1,15 @@
+=pod
+
+=head1 DESCRIPTION
+
+This POD tests the ability of Test::Pod::LinkCheck::Lite to resolve a
+link to a section that starts with a formatting code, to wit
+L<table_info()|/table_info>.
+
+=head3 C<table_info>
+
+This method returns table info.
+
+=cut
+
+# ex: set textwidth=72 :

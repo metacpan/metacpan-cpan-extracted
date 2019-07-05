@@ -1,7 +1,7 @@
 package Test::Data::Sah::Perl;
 
-our $DATE = '2018-12-16'; # DATE
-our $VERSION = '0.895'; # VERSION
+our $DATE = '2019-07-04'; # DATE
+our $VERSION = '0.896'; # VERSION
 
 use 5.010001;
 use strict;
@@ -139,7 +139,7 @@ Test::Data::Sah::Perl - Routines for testing Data::Sah (perl compiler)
 
 =head1 VERSION
 
-This document describes version 0.895 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2018-12-16.
+This document describes version 0.896 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2019-07-04.
 
 =head1 FUNCTIONS
 
@@ -167,7 +167,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

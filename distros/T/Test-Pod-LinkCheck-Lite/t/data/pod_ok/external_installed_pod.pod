@@ -1,0 +1,9 @@
+=pod
+
+Link to external POD documentation, like L<perldelta|perldelta>.
+
+Or to L<vianame()|charnames/charnames::vianame(I<name>)>.
+
+=cut
+
+# ex: set textwidth=72 :

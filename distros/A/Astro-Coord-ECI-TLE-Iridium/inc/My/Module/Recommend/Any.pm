@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.122';
+our $VERSION = '0.123';
 
 our @EXPORT_OK = qw{ __any };
 

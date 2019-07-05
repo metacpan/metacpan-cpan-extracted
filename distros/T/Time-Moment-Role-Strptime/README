@@ -1,0 +1,66 @@
+NAME
+
+    Time::Moment::Role::Strptime - strptime constructor for Time::Moment
+
+SYNOPSIS
+
+      use Time::Moment;
+      use Role::Tiny ();
+    
+      my $class = Role::Tiny->create_class_with_roles('Time::Moment', 'Time::Moment::Role::Strptime');
+      my $moment = $class->strptime('2019-06-01', '%Y-%m-%d');
+
+DESCRIPTION
+
+    This role composes the "strptime" method, which parses the input string
+    according to a strptime(3) format, and constructs a Time::Moment
+    object.
+
+    By default the returned Time::Moment object is in UTC (possibly
+    adjusted by a parsed offset); to interpret the parsed time in another
+    time zone, you can use Time::Moment::Role::TimeZone:
+
+      use Time::Moment;
+      use Role::Tiny ();
+    
+      my $class = Role::Tiny->create_class_with_roles('Time::Moment',
+        'Time::Moment::Role::Strptime', 'Time::Moment::Role::TimeZone');
+      my $moment = $class->strptime($input, $format)->with_system_offset_same_local;
+    
+      use DateTime::TimeZone::Olson 'olson_tz';
+      my $tz = olson_tz('America/Los_Angeles');
+      my $moment = $class->strptime($input, $format)->with_time_zone_offset_same_local($tz);
+
+METHODS
+
+ strptime
+
+      my $moment = $class->strptime($input, $format);
+
+    Parses the input string according to the strptime(3) format, and
+    returns a Time::Moment object in UTC. Throws an exception on parsing or
+    out-of-bounds errors.
+
+    Currently, Time::Piece is used to implement strptime portably, but this
+    is considered an implementation detail.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Time::Moment
+

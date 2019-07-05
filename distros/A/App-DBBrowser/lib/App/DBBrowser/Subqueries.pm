@@ -9,11 +9,10 @@ use File::Spec::Functions qw( catfile );
 
 use List::MoreUtils qw( any uniq );
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::LineFold  qw( print_columns line_fold );
-use Term::Choose::Util      qw( term_width );
-use Term::Form              qw();
+use Term::Choose           qw();
+use Term::Choose::LineFold qw( print_columns line_fold );
+use Term::Choose::Util     qw( term_width );
+use Term::Form             qw();
 
 use App::DBBrowser::Auxil;
 
@@ -78,7 +77,7 @@ sub __get_history {
 sub choose_subquery {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $history_comb = $sf->__get_history();
     my $edit_sq_file = 'Choose SQ:';
     my $readline     = '  Read-Line';
@@ -119,12 +118,11 @@ sub choose_subquery {
             $idx -= @pre;
             $default = $history_comb->[$idx][0];
         }
-        my $tf = Term::Form->new();
+        my $tf = Term::Form->new( $sf->{i}{tf_default} );
         # Readline
         my $stmt = $tf->readline( $prompt,
             { default => $default, show_context => 1 }
         );
-        print HIDE_CURSOR;
         if ( ! defined $stmt || ! length $stmt ) {
             $ax->print_sql( $sql );
             next SUBQUERY;
@@ -142,7 +140,7 @@ sub choose_subquery {
 sub __edit_sq_file {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $driver = $sf->{i}{driver};
     my $db = $sf->{d}{db};
     my @pre = ( undef );
@@ -193,8 +191,8 @@ sub __edit_sq_file {
 
 sub __add_subqueries {
     my ( $sf, $history_HD, $top_lines ) = @_;
-    my $tf = Term::Form->new();
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $history_RAM = $sf->__tmp_history( $history_HD );
     my $used = [];
     my $readline = '  Read-Line';
@@ -234,7 +232,6 @@ sub __add_subqueries {
             my $stmt = $tf->readline( 'Stmt: ',
                 { info => $info, show_context => 1, clear_screen => 1  }
             );
-            print HIDE_CURSOR;
             if ( ! defined $stmt || ! length $stmt ) {
                     next;
             }
@@ -246,7 +243,6 @@ sub __add_subqueries {
             my $name = $tf->readline( 'Name: ',
                 { info => $info . $folded_stmt, show_context => 1 }
             );
-            print HIDE_CURSOR;
             if ( ! defined $name ) {
                 next;
             }
@@ -263,7 +259,6 @@ sub __add_subqueries {
             my $name = $tf->readline( 'Name: ',
                 { info => $info . $folded_stmt, show_context => 1 }
             );
-            print HIDE_CURSOR;
             if ( ! defined $name ) {
                 ( $tmp_new, $history_RAM, $used ) = @{pop @$bu};
                 next;
@@ -279,7 +274,7 @@ sub __edit_subqueries {
     if ( ! @$history_HD ) {
         return;
     }
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $indexes = [];
     my @pre = ( undef, $sf->{i}{_confirm} );
     my $bu = [];
@@ -333,12 +328,11 @@ sub __edit_subqueries {
             }
             push @tmp_info, ' ';
             my $info = join "\n", @tmp_info;
-            my $tf = Term::Form->new();
+            my $tf = Term::Form->new( $sf->{i}{tf_default} );
             # Readline
             my $stmt = $tf->readline( 'Stmt: ',
                 { info => $info, default => $history_HD->[$idx][0], show_context => 1, clear_screen => 1 }
             );
-            print HIDE_CURSOR;
             if ( ! defined $stmt || ! length $stmt ) {
                 next STMT;
             }
@@ -351,7 +345,6 @@ sub __edit_subqueries {
             my $name = $tf->readline( 'Name: ',
                 { info => $info . $folded_stmt, default => $default, show_context => 1 }
             );
-            print HIDE_CURSOR;
             if ( ! defined $name ) {
                 next STMT;
             }
@@ -370,7 +363,7 @@ sub __remove_subqueries {
     if ( ! @$history_HD ) {
         return;
     }
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @backup;
     my @pre = ( undef, $sf->{i}{_confirm} );
     my @remove;

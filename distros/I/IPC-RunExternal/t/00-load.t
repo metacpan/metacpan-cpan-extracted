@@ -3,14 +3,16 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+# use Test::More tests => 21;
+use Test::More;
 
 BEGIN {
 	use lib qw{lib};
 	use_ok( 'IPC::RunExternal' ) || print "Bail out!\n";
 }
 
-diag( "Testing IPC::RunExternal $IPC::RunExternal::VERSION, Perl $], $^X" );
+my $version = $IPC::RunExternal::VERSION // '(version N/A)';
+diag( "Testing IPC::RunExternal $version, Perl $], $^X" );
 
 my $EXIT_STATUS_OK = 1;
 my $EXIT_STATUS_TIMEOUT = 0;
@@ -19,8 +21,6 @@ my $EXIT_STATUS_FAILED = -1;
 my $TRUE = 1;
 my $FALSE = 0;
 my $EMPTY_STR = '';
-
-
 
 my $command = $EMPTY_STR;
 my $input = $EMPTY_STR;
@@ -91,7 +91,7 @@ my $allout = $EMPTY_STR;
 
 	$ENV{"PATH"} = ""; # Testing in tainted mode (-T)
 	$ENV{"ENV"} = ""; # Testing in tainted mode (-T)
-	($exit_code, $stdout, $stderr, $allout) = runexternal('t/TestRunExternal_01.pl loop 4 simple', $EMPTY_STR, 0, 
+	($exit_code, $stdout, $stderr, $allout) = runexternal('t/TestRunExternal_01.pl loop 4 simple', $EMPTY_STR, 0,
 			{ #print_progress_indicator => $TRUE
 			});
 	#print " END PROGRESS...\n";
@@ -102,7 +102,7 @@ my $allout = $EMPTY_STR;
 
 	$ENV{"PATH"} = ""; # Testing in tainted mode (-T)
 	$ENV{"ENV"} = ""; # Testing in tainted mode (-T)
-	($exit_code, $stdout, $stderr, $allout) = runexternal('t/TestRunExternal_01.pl loop 6', $EMPTY_STR, 1, 
+	($exit_code, $stdout, $stderr, $allout) = runexternal('t/TestRunExternal_01.pl loop 6', $EMPTY_STR, 1,
 			{ #print_progress_indicator => $TRUE,
 				progress_indicator_char => '#'
 			});
@@ -114,4 +114,6 @@ my $allout = $EMPTY_STR;
 
 	is(length($stdout) + length($stderr), length($allout), "TestRunExternal_01.pl output OK Timeout result (4)");
 	# 24
+
+done_testing();
 

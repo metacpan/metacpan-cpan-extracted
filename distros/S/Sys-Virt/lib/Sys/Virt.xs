@@ -6829,6 +6829,27 @@ PREINIT:
 
 
 void
+list_all_ports(net, flags=0)
+      virNetworkPtr net;
+      unsigned int flags;
+ PREINIT:
+      virNetworkPortPtr *ports;
+      int i, nport;
+      SV *portrv;
+  PPCODE:
+      if ((nport = virNetworkListAllPorts(net, &ports, flags)) < 0)
+          _croak_error();
+
+      EXTEND(SP, nport);
+      for (i = 0 ; i < nport ; i++) {
+          portrv = sv_newmortal();
+          sv_setref_pv(portrv, "Sys::Virt::NetworkPort", ports[i]);
+          PUSHs(portrv);
+      }
+      free(ports);
+
+
+void
 destroy(net_rv)
       SV *net_rv;
  PREINIT:
@@ -6849,6 +6870,150 @@ DESTROY(net_rv)
       if (net) {
 	virNetworkFree(net);
 	sv_setiv((SV*)SvRV(net_rv), 0);
+      }
+
+
+MODULE = Sys::Virt::NetworkPort  PACKAGE = Sys::Virt::NetworkPort
+
+
+virNetworkPortPtr
+_create_xml(net, xml, flags=0)
+      virNetworkPtr net;
+      const char *xml;
+      unsigned int flags;
+    CODE:
+      if (!(RETVAL = virNetworkPortCreateXML(net, xml, flags)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+virNetworkPortPtr
+_lookup_by_uuid(net, uuid)
+      virNetworkPtr net;
+      const unsigned char *uuid;
+    CODE:
+      if (!(RETVAL = virNetworkPortLookupByUUID(net, uuid)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+virNetworkPortPtr
+_lookup_by_uuid_string(net, uuid)
+      virNetworkPtr net;
+      const char *uuid;
+    CODE:
+      if (!(RETVAL = virNetworkPortLookupByUUIDString(net, uuid)))
+          _croak_error();
+
+  OUTPUT:
+      RETVAL
+
+
+SV *
+get_uuid(port)
+      virNetworkPortPtr port;
+  PREINIT:
+      unsigned char rawuuid[VIR_UUID_BUFLEN];
+    CODE:
+      if ((virNetworkPortGetUUID(port, rawuuid)) < 0)
+          _croak_error();
+
+      RETVAL = newSVpv((char*)rawuuid, sizeof(rawuuid));
+  OUTPUT:
+      RETVAL
+
+
+SV *
+get_uuid_string(port)
+      virNetworkPortPtr port;
+  PREINIT:
+      char uuid[VIR_UUID_STRING_BUFLEN];
+    CODE:
+      if ((virNetworkPortGetUUIDString(port, uuid)) < 0)
+          _croak_error();
+
+      RETVAL = newSVpv(uuid, 0);
+  OUTPUT:
+      RETVAL
+
+
+SV *
+get_xml_description(port, flags=0)
+      virNetworkPortPtr port;
+      unsigned int flags;
+  PREINIT:
+      char *xml;
+    CODE:
+      if (!(xml = virNetworkPortGetXMLDesc(port, flags)))
+	 _croak_error();
+
+      RETVAL = newSVpv(xml, 0);
+      free(xml);
+  OUTPUT:
+      RETVAL
+
+
+HV *
+get_parameters(port, flags=0)
+      virNetworkPortPtr port;
+      unsigned int flags;
+  PREINIT:
+      virTypedParameterPtr params = NULL;
+      int nparams = 0;
+    CODE:
+      if (virNetworkPortGetParameters(port, &params, &nparams, flags) < 0) {
+          vir_typed_param_safe_free(params, nparams);
+          _croak_error();
+      }
+
+      RETVAL = vir_typed_param_to_hv(params, nparams);
+      vir_typed_param_safe_free(params, nparams);
+  OUTPUT:
+      RETVAL
+
+
+void
+set_parameters(port, newparams, flags=0)
+      virNetworkPortPtr port;
+      HV *newparams;
+      unsigned int flags;
+  PREINIT:
+      virTypedParameterPtr params = NULL;
+      int nparams = 0;
+    PPCODE:
+      if (virNetworkPortGetParameters(port, &params, &nparams, 0) < 0) {
+          vir_typed_param_safe_free(params, nparams);
+          _croak_error();
+      }
+
+      nparams = vir_typed_param_from_hv(newparams, params, nparams);
+
+      if (virNetworkPortSetParameters(port, params, nparams, flags) < 0)
+          _croak_error();
+      vir_typed_param_safe_free(params, nparams);
+
+
+void
+delete(port, flags=0)
+      virNetworkPortPtr port;
+      unsigned int flags;
+    PPCODE:
+      if (virNetworkPortDelete(port, flags) < 0)
+          _croak_error();
+
+
+void
+DESTROY(port_rv)
+      SV *port_rv;
+ PREINIT:
+      virNetworkPortPtr port;
+  PPCODE:
+      port = (virNetworkPortPtr)SvIV((SV*)SvRV(port_rv));
+      if (port) {
+	virNetworkPortFree(port);
+	sv_setiv((SV*)SvRV(port_rv), 0);
       }
 
 
@@ -9577,6 +9742,17 @@ BOOT:
       REGISTER_CONSTANT(VIR_NETWORK_EVENT_STOPPED, EVENT_STOPPED);
 
 
+      stash = gv_stashpv( "Sys::Virt::NetworkPort", TRUE );
+      REGISTER_CONSTANT(VIR_NETWORK_PORT_CREATE_RECLAIM, CREATE_RECLAIM);
+
+      REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_IN_AVERAGE, BANDWIDTH_IN_AVERAGE);
+      REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_IN_BURST, BANDWIDTH_IN_BURST);
+      REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_IN_FLOOR, BANDWIDTH_IN_FLOOR);
+      REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_IN_PEAK, BANDWIDTH_IN_PEAK);
+      REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_OUT_AVERAGE, BANDWIDTH_OUT_AVERAGE);
+      REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_OUT_BURST, BANDWIDTH_OUT_BURST);
+      REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_OUT_PEAK, BANDWIDTH_OUT_PEAK);
+
       stash = gv_stashpv( "Sys::Virt::Interface", TRUE );
       REGISTER_CONSTANT(VIR_INTERFACE_XML_INACTIVE, XML_INACTIVE);
 
@@ -9863,4 +10039,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_ERR_INVALID_DOMAIN_CHECKPOINT, ERR_INVALID_DOMAIN_CHECKPOINT);
       REGISTER_CONSTANT(VIR_ERR_NO_DOMAIN_BACKUP, ERR_NO_DOMAIN_BACKUP);
       REGISTER_CONSTANT(VIR_ERR_NO_DOMAIN_CHECKPOINT, ERR_NO_DOMAIN_CHECKPOINT);
+      REGISTER_CONSTANT(VIR_ERR_NO_NETWORK_PORT, ERR_NO_NETWORK_PORT);
+      REGISTER_CONSTANT(VIR_ERR_INVALID_NETWORK_PORT, ERR_INVALID_NETWORK_PORT);
+      REGISTER_CONSTANT(VIR_ERR_NETWORK_PORT_EXIST, ERR_NETWORK_PORT_EXIST);
     }

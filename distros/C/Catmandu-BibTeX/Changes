@@ -1,5 +1,8 @@
 Revision history for Catmandu-BibTeX
 
+0.14  2019-07-04 09:34:49 CEST
+  - fix typo
+
 0.13  2019-07-03 15:45:24 CEST
   - fix typo (keyword --> keywords) in exporter
 

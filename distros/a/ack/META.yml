@@ -36,10 +36,11 @@ requires:
   if: '0'
   parent: '0'
   perl: '5.010001'
+  version: '0'
 resources:
   MailingList: https://groups.google.com/group/ack-users
   bugtracker: https://github.com/beyondgrep/ack3
   homepage: https://beyondgrep.com/
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/beyondgrep/ack3.git
-version: v3.0.1
+version: v3.0.2

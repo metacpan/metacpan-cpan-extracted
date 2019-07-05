@@ -69,6 +69,7 @@ use warnings;
 use Sys::Virt::Error;
 use Sys::Virt::Domain;
 use Sys::Virt::Network;
+use Sys::Virt::NetworkPort;
 use Sys::Virt::StoragePool;
 use Sys::Virt::StorageVol;
 use Sys::Virt::NodeDevice;
@@ -79,7 +80,7 @@ use Sys::Virt::NWFilterBinding;
 use Sys::Virt::DomainSnapshot;
 use Sys::Virt::Stream;
 
-our $VERSION = '5.4.0';
+our $VERSION = '5.5.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 

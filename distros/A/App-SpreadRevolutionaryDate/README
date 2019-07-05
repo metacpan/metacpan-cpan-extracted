@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.26
+    version 0.27
 
 DESCRIPTION
 
@@ -51,7 +51,7 @@ USAGE
 
       # Just execute the script in your shell
       # to spread current date to configured accounts
-      # on Twitter, Mastodon and Freenode:
+      # to Twitter, Mastodon and Freenode:
       $ spread-revolutionary-date
     
       # Or, since this script does nothing but calling
@@ -83,6 +83,13 @@ USAGE
       $ spread-revolutionary-date \
           --targets mastodon \
           --msgwriter UserPrompt
+    
+      # Spread message as command line parameter to
+      # Twitter, Mastodon and Freenode
+      $ spread-revolutionary-date \
+          --msgwriter UserPrompt \
+          --promptuser_default \
+            'This is my message to the world'
 
 CONFIGURATION
 

@@ -1922,6 +1922,47 @@ static SV *MY_lex_scan_ident(pTHX)
   return NULL;
 }
 
+#define lex_scan_attr()  MY_lex_scan_attr(aTHX)
+static SV *MY_lex_scan_attr(pTHX)
+{
+  SV *ret = lex_scan_ident();
+  if(!ret)
+    return ret;
+
+  lex_read_space(0);
+
+  if(lex_peek_unichar(0) != '(')
+    return ret;
+  sv_cat_c(ret, lex_read_unichar(0));
+
+  int count = 1;
+  I32 c = lex_peek_unichar(0);
+  while(count && c != -1) {
+    if(c == '(')
+      count++;
+    if(c == ')')
+      count--;
+    if(c == '\\') {
+      /* The next char does not bump count even if it is ( or );
+       * the \\ is still captured
+       */
+      sv_cat_c(ret, lex_read_unichar(0));
+      c = lex_peek_unichar(0);
+      if(c == -1)
+        goto unterminated;
+    }
+
+    sv_cat_c(ret, lex_read_unichar(0));
+    c = lex_peek_unichar(0);
+  }
+
+  if(c != -1)
+    return ret;
+
+unterminated:
+  croak("Unterminated attribute parameter in attribute list");
+}
+
 enum {
   NO_FORBID,
   FORBID_FOREACH_NONLEXICAL,
@@ -2022,11 +2063,33 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   SV *name = lex_scan_ident();
   lex_read_space(0);
 
-  if(lex_peek_unichar(0) != '{')
-    croak("Expected async sub %sto be followed by '{'", name ? "NAME " : "");
-
   I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
+
+  /* Parse subroutine attrs
+   * These are supplied to newATTRSUB() as an OP_LIST containing OP_CONSTs,
+   *   one attribute in each as a plain SV. Note that we don't have to parse
+   *   inside the contents of the parens; that is handled by the attribute
+   *   handlers themselves
+   */
+  OP *attrs = NULL;
+  if(lex_peek_unichar(0) == ':') {
+    SV *attr;
+    lex_read_unichar(0);
+    lex_read_space(0);
+
+    while((attr = lex_scan_attr())) {
+      lex_read_space(0);
+
+      if(!attrs)
+        attrs = newLISTOP(OP_LIST, 0, NULL, NULL);
+
+      attrs = op_append_elem(OP_LIST, attrs, newSVOP(OP_CONST, 0, attr));
+    }
+  }
+
+  if(lex_peek_unichar(0) != '{')
+    croak("Expected async sub %sto be followed by '{'", name ? "NAME " : "");
 
   /* Save the identity of the currently-compiling sub so that 
    * await_keyword_plugin() can check
@@ -2062,8 +2125,11 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   CV *cv = newATTRSUB(floor_ix,
     name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(name)) : NULL,
     NULL,
-    NULL,
+    attrs,
     op);
+
+  if(CvLVALUE(cv))
+    warn("Pointless use of :lvalue on async sub");
 
   if(name) {
     *op_ptr = newOP(OP_NULL, 0);

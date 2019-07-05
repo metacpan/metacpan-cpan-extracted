@@ -188,10 +188,7 @@ sub print_sql {
     }
     print CLEAR_SCREEN;
     print $str;
-    #print line_fold( $str, term_width() - 2, { init_tab => '', subseq => ' ' x 4 } );
     if ( defined $waiting ) {
-        local $| = 1;
-        print HIDE_CURSOR;
         print $waiting;
     }
 }
@@ -237,12 +234,11 @@ sub alias {
     }
     my $alias;
     if ( $sf->{o}{alias}{$type} ) {
-        my $tf = Term::Form->new();
+        my $tf = Term::Form->new( $sf->{i}{tf_default} );
         # Readline
         $alias = $tf->readline( $identifier,
             { info => $info }
         );
-        print HIDE_CURSOR;
     }
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;
@@ -329,7 +325,7 @@ sub print_error_message {
     $info = "$title:" if $title; #
     utf8::decode( $message );
     chomp( $message );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $tc->choose(
         [ 'Press ENTER to continue' ],
         { prompt => $message, info => $info }

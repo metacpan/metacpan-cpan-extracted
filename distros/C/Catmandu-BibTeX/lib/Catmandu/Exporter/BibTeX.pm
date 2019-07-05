@@ -1,6 +1,6 @@
 package Catmandu::Exporter::BibTeX;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -48,7 +48,7 @@ my $JOIN = {
     author   => ' and ',
     editor   => ' and ',
     language => ',',
-    keyword  => ',',
+    keywords  => ',',
 };
 
 sub add {

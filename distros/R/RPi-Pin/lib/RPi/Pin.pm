@@ -5,16 +5,17 @@ use warnings;
 
 use parent 'WiringPi::API';
 
-our $VERSION = '2.3606';
+our $VERSION = '2.3607';
 
 sub new {
-    my ($class, $pin) = @_;
+    my ($class, $pin, $comment) = @_;
 
     if (! defined $pin || $pin !~ /^\d+$/){
         die "pin must be an integer\n";
     }
 
     my $self = bless {}, $class;
+    $self->comment($comment);
 
     if (! $ENV{NO_BOARD}){
         if (! defined $ENV{RPI_PIN_MODE}){
@@ -26,6 +27,13 @@ sub new {
     $self->{pin} = $pin;
 
     return $self;
+}
+sub comment {
+    my ($self, $comment) = @_;
+    if (defined $comment){
+        $self->{comment} = $comment;
+    }
+    return $self->{comment};
 }
 sub mode {
     my ($self, $mode) = @_;
@@ -136,7 +144,7 @@ We use the C<BCM> (C<GPIO>) pin numbering scheme.
 
 =head1 METHODS
 
-=head2 new($pin_num)
+=head2 new($pin_num, $comment)
 
 Takes the number representing the Pi's GPIO pin you want to use, and returns
 an object for that pin.
@@ -146,6 +154,23 @@ Parameters:
     $pin_num
 
 Mandatory, Integer: The pin number to attach to.
+
+    $comment
+
+Optional, String: A custom name or purpose description to associate this pin
+with.
+
+=head2 comment($comment)
+
+Sets/gets a description or name for the pin.
+
+Parameters:
+    
+    $comment
+
+Optional, String: If sent in, we'll set the pin's comment to this value.
+
+Return: The currently set comment for the pin.
 
 =head2 mode($mode)
 

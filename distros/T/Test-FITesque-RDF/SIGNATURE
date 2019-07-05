@@ -14,53 +14,56 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 d0f84e8845ba222bbdb37185beff0960fa54a640 COPYRIGHT
+SHA1 d64c8746e57fc7fae393041863059dfdb9513e67 COPYRIGHT
 SHA1 db0fcc7c711ab6cff41ab2db8c5298ab24fb8e7e CREDITS
-SHA1 74666ae8ce4ad263a1b4d72a4c8b6de70d1b2058 Changes
+SHA1 1182c88300b1ef50154ccfcf7a9fea16fa80a9f9 Changes
 SHA1 00ed1c4e03f3d2e5a9697fe9b287551d8fb058f0 INSTALL
 SHA1 31b362b768abdb2e21227f74a760b338c6450ac6 LICENSE
-SHA1 31719c411753ae5de1c0b856178203fdea9e3b9d MANIFEST
-SHA1 4de0cebfae0d8a4be435cf0aea178382880068d9 META.json
-SHA1 343922d88d59d38f0c81bee90292e7fff107fdac META.yml
-SHA1 e0ebb07f172dbebb40b652609384ea0b68682daf Makefile.PL
-SHA1 c7f7641057e942352ff2204ed4b5b8a9d2fd0a76 README
-SHA1 4f4e67891018f1245faa2a7ebed6304bccc97a5b README.md
+SHA1 4bb40f1d32f6cb3acc007b116b6d065d4e011598 MANIFEST
+SHA1 c361bd2bf13aca63be422aae8df166d31e895309 META.json
+SHA1 e1846f9b4ee30a1a8c07ecf99e0bcd4bada67afe META.yml
+SHA1 ea715e56ca3cc87dd4770ae42562239d57b8abeb Makefile.PL
+SHA1 71429cb3ce6f5a324856263ca544b7f658d3b21a README
+SHA1 65e81c1aa2d4baeb9b10a63d5c4db89abe1cf7e1 README.md
 SHA1 d83c3f511994b134f0cac628f1e4e5961bc1a851 dist.ini
-SHA1 8b4e90444fb3fdaf2408b4a457838dfd76bd5eb6 doap.ttl
-SHA1 a6e173fa3d3d4c4aa5c01e0f97904d00a254c0ec lib/Test/FITesque/RDF.pm
+SHA1 96c17e2db5fb0694277d3537d420d32ea46c55ce doap.ttl
+SHA1 1f9f6bc8946e6e33e023e970c54fffd87cf66c35 lib/Test/FITesque/RDF.pm
 SHA1 e8348aad8c7e8fc8ae7988850e7c9dbe769ff78a t/01basic.t
-SHA1 23d656236c4057badbebece1de91e6a26503f373 t/data/http-list-multi.ttl
-SHA1 582bebf4981d3748b41922a568974ab1286f5c3b t/data/http-list.ttl
-SHA1 5c0e50cb7e204f3273f769c6064ea41570cd875b t/data/list.ttl
-SHA1 1ae2df61888c31c0ba39ea0c9d81245a21386814 t/data/multi-vocab.ttl
-SHA1 115304861d91411ff695e8e59ac128d91770eecd t/data/multi.ttl
-SHA1 9bef5d3880069e694817e2c1aecb99d8355a4945 t/data/relative.ttl
-SHA1 5a9673340be450ffa98a56c9b7f81764436700a6 t/data/simple.ttl
+SHA1 afd064f4474557de30bba3c980c33a5ae9f89872 t/data/#http-list-multi.ttl#
+SHA1 f620103c4d6cc47ccd85eafbf78353fc892e9754 t/data/http-list-multi.ttl
+SHA1 e7bdd28beac6081e3633e8e4322bc7d9fde5c4a6 t/data/http-list.ttl
+SHA1 781f55c50f3a1501c6a87ddb3ca485592190c56a t/data/http-mix.ttl
+SHA1 05b02ed400a7e933bf6744573f14e350dfa45665 t/data/list.ttl
+SHA1 68ec02391648f9ed9094e8f77cc43bfd91c9f5ed t/data/multi-vocab.ttl
+SHA1 7bd609d1146a410b431240f8182fe91444b0a917 t/data/multi.ttl
+SHA1 6f5d42cbb711bcc075d6bd7e21eb8f85ed4ba3fc t/data/relative.ttl
+SHA1 9f62a21da552999adfa2ba5ef51fb69591052c41 t/data/simple.ttl
 SHA1 e1ec8c84afd5b8223150519ca6bb08f910c80e00 t/integration-basic.t
 SHA1 7c06cfa8a0385eb90949bbea4b2459b311bfc131 t/integration-http-list.t
-SHA1 9eafab920ea32ba429081eeff2b670aee3dfc9a0 t/lib/Internal/Fixture/HTTPList.pm
-SHA1 cf4af74798330e2f1e53e46c807db69de81a20ea t/lib/Internal/Fixture/Multi.pm
-SHA1 9774a7c18ca13fa3d4b3d1affc0860a16cae7337 t/lib/Internal/Fixture/Simple.pm
-SHA1 5bfced2cdc70c63af53f686c2b1758e61cc8770b t/unit-http-list.t
-SHA1 c484fa6b912777abdf1b27aa28a66f2c8d9db0e8 t/unit-list.t
-SHA1 dab085961766191ac6bbc8e446374261e5913173 t/unit-multi-http.t
-SHA1 49a21f73cb9dee7b73f6c6c798fe784e36591949 t/unit-multi-vocab.t
-SHA1 84666a79d03c3293d72fe31f7c6957f6773b0c3f t/unit-multi.t
-SHA1 fb54fcd2c58bc68257c23577deec393d81413372 t/unit-relative.t
-SHA1 f29af521782591d89e77ec639f84f15d98abc551 t/unit-simple.t
+SHA1 b2c0207d812a78f1e67548b04c14bbea415f34c4 t/lib/Internal/Fixture/HTTPList.pm
+SHA1 7c17c922177bbd55a273b9ce0b29c1c702ad8c32 t/lib/Internal/Fixture/Multi.pm
+SHA1 2395106156fe8c819028fcb5df79c3dc56cdfb6f t/lib/Internal/Fixture/Simple.pm
+SHA1 b8e54f708baab8242424aa96b4c5790915f6fcba t/unit-http-list.t
+SHA1 be7a08636c641c0e141eaded9788baf96b161abb t/unit-http-mix.t
+SHA1 322bbcd667eb0085320c389a9131a24897ea08a9 t/unit-list.t
+SHA1 58254c03bfab6234a148f77926f549c9f906249c t/unit-multi-http.t
+SHA1 fec310b777af065217847b5e19518a5b75bc2bab t/unit-multi-vocab.t
+SHA1 1666e743051c0855a4290a7cdde3553813a8a86d t/unit-multi.t
+SHA1 4f6cbddca9b4b7798d1cdf76f591b91682329ab0 t/unit-relative.t
+SHA1 b1d0e34655e5fc6ce0c77005d78874c1db0555e8 t/unit-simple.t
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAl0LeyMACgkQf77o3zqe
-SqWv7g//RylJPAcIDK8u/f4rvit6voGN/a/aC38KfLUBGz65MJSlIsZcXShibxPW
-Z3rLm+OcadGzmi0Bva5Rho6w2pC32x8ZNqLzzrnjrOIyX2r0lKUU1I8HCztqnweL
-5hbW/KP4HAuvVygyrXc5TkFUpYEiK/x3n70KhiuaxXguhKCVBEifSBK4lI7Lx9j2
-4JXI67Qj5iZaasFlryDEMU5eaf+9db5BPHcrEUfCu1wiajGwwXl6nKTI44ylAVEL
-z66EAVfXnZQ4I8G0FYviXgEYXIKtLxDKLC9P5iq6sIz8EjF1ZiW5CsiTPAOSR9YZ
-bCnprIIbWHCZ9iPYNhxOpie1BkyTm5msusFxHNhDXy6OH/i1h+6MCM9JPL9KYObE
-ByN1f06z4v5RqG7cvtYOPd8xS/2witLyaFVvHBs6y63iDyoMEKU3abAzOT5++tHl
-gs17OUjzMAxNzCr43qiLOWJ6W0RnJZdu2Sgm6+Iz8O6fK4Hq3RiQlf62Sj98fWMM
-DB21UPZbNkk4BIzMgh7dcjGrFTyYLCLNfsx03Llj5gKL+y/m2fu92q/rP/0FShVu
-T4DcOobHJhH0c2WkKxWU3QXqU3UxpfIQGHYWYeQxoiTGJGYjZ980KFwTbUCKXULI
-U9SI3hwbcHLj08Bqas8sSCZxU33PyhJ2dNMoIE2Os4zzXFIVkNM=
-=zvf1
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAl0feFYACgkQf77o3zqe
+SqX1BQ/+MYIGGT8IQsg44r7zysK0HA7S3zpSUG4llgWjWsZqQ1UEsM3yvXVbY3GB
+LvHUfKGif3PH3Qm5ZhUinL7e74I+AZ1KdMjGutjEj2eOJVS5N8yP+FVNK/L/t4uO
+wS4j12WKxq28AYYi1mUH486My4X2/ORG512owevWUXrVkXc8SgcrK3x94kcHjEmV
+HirQ7ibDMPwGhXnVZ8XXikyfdNHd7MuOecSFHLEOAXsdI3DcbqhVLSApq+74C1Dr
+rc1GItINY7uCiBgSBVqaFy/pRcosgfQQBtzua+z385STSdcp9/c5JhEojjdkpJQL
+YTEYOIOrSwzSEbql7y0aaGGqXiZwJ6hKL9eo8tpPORKMceBCRwHPrgyymr1fySnV
+srMfn5xhoesMU2cbDfOOdPx9mag65Y8E0rLJnum+9SBUMh6iD/NuR68h2cf/C0Dr
+17qg0Vl3cb0uvzufPSg7kLjxUhuoyHpXPewDKTOZUvdp1UefGN5zzEk0dxqgcJRV
+0G17EtnW0/ZPSD8d6wThVs1Xboi9RFv5nzjmqmUw0JYyftOlSoe0O3/OwLSU7qx2
+wL/3O7Aqh+vls9b2aEYzrYB8w9PyuRXvdIrFeuCFCmc/LWSyf1eCH8PGySIfLJfP
+ePKWiUSftyeKHkUY3Lj53nVjdVMHvFfTcwonobn1Ic3DEdQbt9Y=
+=laYa
 -----END PGP SIGNATURE-----

@@ -8,27 +8,27 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'Class::C3::Adopt::NEXT'=> 0.13,
-        'CTK'                   => 1.16,
+        'Class::C3::Adopt::NEXT'=> 0,
+        'CGI',                  => 4.36,
+        'CTK'                   => 2.01,
         'DBI'                   => 1.60,
+        'DBD::SQLite'           => 1.50,
         'Digest::MD5'           => 2.51,
         'Digest::SHA1'          => 2.13,
         'File::Copy'            => 2.18,
         'File::Find'            => 1.15,
         'File::Path'            => 2.00,
-        'HTTP::Headers'         => 5.80,
-        'HTTP::Request'         => 5.80,
-        'HTTP::Response'        => 5.80,
+        'HTTP::Message'         => 5.00,
+        'List::Util'            => 1.45,
         'LWP'                   => 5.80,
         'LWP::MediaTypes'       => 6.00,
-        'LWP::UserAgent'        => 5.80,
+        'Net::FTP'              => 2.60,
+        'Net::SFTP::Foreign'    => 1.90,
         'Socket'                => 0,
+        'Sys::Hostname'         => 0,
         'Text::SimpleTable'     => 2.03,
-        'Text::Unidecode'       => 0.04,
-        'Try::Tiny'             => 0.07,
-        'WWW::MLite'            => 1.05,
+        'WWW::MLite'            => 2.01,
         'URI'                   => 1.50,
-        'XML::Simple'           => 2.20,
     };
 my $exefiles = [qw[
         bin/mbutiny
@@ -36,26 +36,26 @@ my $exefiles = [qw[
 
 WriteMakefile(
     'NAME'                  => 'App::MBUtiny',
-    'DISTNAME'              => 'App-MBUtiny',
-    'MIN_PERL_VERSION'      => 5.008001,
-    'VERSION_FROM'          => 'lib/App/MBUtiny.pm', 
-    'ABSTRACT_FROM'         => 'lib/App/MBUtiny.pm', ,
+    'MIN_PERL_VERSION'      => 5.016001,
+    'VERSION_FROM'          => 'lib/App/MBUtiny.pm',
+    'ABSTRACT_FROM'         => 'lib/App/MBUtiny.pm',
     'BUILD_REQUIRES'        => $build_requires,
     'PREREQ_PM'             => $prereq_pm,
     'EXE_FILES'             => $exefiles,
-    'AUTHOR'                => 'Lepenkov Sergey (Serz Minus) <minus@mail333.com>',
-    'LICENSE'               => 'gpl',
-    'META_MERGE' => {
+    'AUTHOR'                => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
+    'LICENSE'               => 'perl',
+    'META_MERGE' => { 'meta-spec' => { version => 2 },
         recommends => {
-            'DBI'           => 0,
             'Data::Dumper'  => 0,
         },
         resources => {
             homepage        => 'http://app-mbutiny.sourceforge.net',
             repository      => 'https://svn.code.sf.net/p/app-mbutiny/code/trunk',
-            license         => 'http://opensource.org/licenses/gpl-license.php',
+            license         => 'https://dev.perl.org/licenses',
         },
     },
-);
+    clean => {
+        FILES => '*.db *.tmp',
+    },
 
-1;
+);

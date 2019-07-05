@@ -9,6 +9,6 @@ my $package = 'Term::Form';
 ok( $package->ReadLine() eq 'Term::Form', "$package->ReadLine() eq 'Term::Form'" );
 
 my $new;
-ok( $new = $package->new( 'name' ), "$package->new( 'name' )" );
+ok( $new = $package->new(), "$package->new()" );
 
 done_testing;

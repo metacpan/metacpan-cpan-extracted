@@ -1,7 +1,7 @@
 package Calendar::Dates;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.2.2'; # VERSION
+our $DATE = '2019-06-22'; # DATE
+our $VERSION = '0.2.3'; # VERSION
 
 1;
 # ABSTRACT: Modules that contain calendar dates
@@ -22,7 +22,7 @@ Calendar::Dates - Modules that contain calendar dates
 
 =head1 VERSION
 
-This document describes version 0.2.2 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-06-20.
+This document describes version 0.2.3 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-06-22.
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Examples:
   Calendar::Dates::SG::FestivalsEvents
   Calendar::Dates::ID::Tax
 
-=item * Country-specific (public) holiday calendars go to XX::Holiday::*
+=item * Country-specific (public) holiday calendars go to <XX>::Holiday::*
 
 Examples:
 
@@ -79,7 +79,7 @@ Examples:
 
 =head1 STATUS
 
-Draft series (0.x), expect to be stable in 1.0.
+Draft series (0.x), expected to be stable in 1.0.
 
 =head1 METHODS
 
@@ -113,8 +113,9 @@ Return entries for a particular year (or month, or day). Method must die if year
 (or month, or day) is not supported.
 
 B<Parameters.> The optional C<%params> can be specified for more complex
-querying/filtering. Each calendar might support different parameters. Currently
-known common/standardized parameters:
+querying/filtering. Each calendar module might support different parameters, and
+should die if a parameter is unsupported. Currently known common/standardized
+parameters:
 
 =over
 
@@ -132,6 +133,11 @@ parameter should be included.
 
 Array. If set, then entries which contain any of the tags mentioned in this
 parameter should NOT be included.
+
+=item * q
+
+String. String/keyword matching. Only include entries that match this
+keyword/string.
 
 =back
 

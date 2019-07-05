@@ -28,7 +28,7 @@ sub test_isEnumValue : Test(4) {
     $self->is($@,'');
 
     eval {Quiq::Assert->isEnumValue('x',[qw/a b c/])};
-    $self->like($@,qr/Not an enum value/i);
+    $self->like($@,qr/Value not allowed/i);
 }
 
 # -----------------------------------------------------------------------------

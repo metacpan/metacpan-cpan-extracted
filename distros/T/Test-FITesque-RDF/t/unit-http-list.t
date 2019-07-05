@@ -52,8 +52,9 @@ cmp_deeply($data,
             [
               'http_req_res_list_unauthenticated',
               {
-                'http-requests' => ignore(),
-                'http-responses' => ignore()
+					'http-requests' => ignore(),
+					'http-responses' => ignore(),
+					'description' => 'More elaborate HTTP vocab for PUT then GET test',
               }
             ]
           ]
@@ -87,6 +88,9 @@ foreach my $res (@{$params->{'http-responses'}}) {
 
 is(${$params->{'http-responses'}}[0]->code, '201', 'First code is 201');
 is(${$params->{'http-responses'}}[1]->content_type, 'text/turtle', 'Second ctype is turtle');
+
+cmp_deeply([${$params->{'http-responses'}}[1]->header('Content-Type')], bag("text/turtle"), 'Response header field value bag comparison can be used for single values');
+cmp_deeply([${$params->{'http-responses'}}[1]->header('Accept-Post')], bag("text/turtle", "application/ld+json"), 'Response header field value bag comparison');
 
 # TODO: Test retrieving content from URI
 

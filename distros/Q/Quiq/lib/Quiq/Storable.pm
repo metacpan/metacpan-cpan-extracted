@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.148';
+our $VERSION = '1.149';
 
 use Storable ();
 use Quiq::Path;
@@ -140,7 +140,7 @@ sub memoize {
 
 =head1 VERSION
 
-1.148
+1.149
 
 =head1 AUTHOR
 

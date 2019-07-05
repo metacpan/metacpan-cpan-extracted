@@ -52,7 +52,7 @@
    "provides" : {
       "Astro::Coord::ECI::TLE::Iridium" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Iridium.pm",
-         "version" : "0.122"
+         "version" : "0.123"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium"
       }
    },
-   "version" : "0.122",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.123",
+   "x_serialization_backend" : "JSON::PP version 4.03"
 }

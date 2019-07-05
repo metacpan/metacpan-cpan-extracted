@@ -4,6 +4,7 @@ const unsigned char *    T_PV
 virConnectPtr O_OBJECT_connect
 virDomainPtr O_OBJECT_domain
 virNetworkPtr O_OBJECT_network
+virNetworkPortPtr O_OBJECT_network_port
 virNWFilterPtr O_OBJECT_nwfilter
 virNWFilterBindingPtr O_OBJECT_nwfilter_binding
 virInterfacePtr O_OBJECT_interface
@@ -54,6 +55,19 @@ O_OBJECT_network
 OUTPUT
 O_OBJECT_network
         sv_setref_pv( $arg, "Sys::Virt::Network", (void*)$var );
+
+INPUT
+O_OBJECT_network_port
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = INT2PTR($type, SvIV((SV*)SvRV( $arg )));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_network_port
+        sv_setref_pv( $arg, "Sys::Virt::NetworkPort", (void*)$var );
 
 
 INPUT

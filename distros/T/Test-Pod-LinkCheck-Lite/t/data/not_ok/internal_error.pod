@@ -1,0 +1,8 @@
+=pod
+
+This POD contains erroneous internal links, specifically
+L<this empty one|/> and L<this one to a non-existent section|/FUBAR>.
+
+=cut
+
+# ex: set textwidth=72 :

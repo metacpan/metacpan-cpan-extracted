@@ -7,10 +7,9 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Form              qw();
-use Term::TablePrint        qw();
+use Term::Choose     qw();
+use Term::Form       qw();
+use Term::TablePrint qw();
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subqueries; # required
@@ -38,7 +37,7 @@ sub new {
 
 sub join_tables {
     my ( $sf ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tables = [ sort keys %{$sf->{d}{tables_info}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
@@ -100,7 +99,6 @@ sub join_tables {
 
         JOIN: while ( 1 ) {
             $ax->print_sql( $join );
-            #my $backup_join = $ax->backup_href( $join ); #
             my $enough_tables = '  Enough TABLES';
             my @pre = ( undef, $enough_tables );
             # Choose
@@ -156,7 +154,7 @@ sub join_tables {
 sub __add_slave_with_join_condition {
     my ( $sf, $join, $tables, $join_type, $info ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $used = ' (used)';
     my $from_subquery = '  Derived';
     my @choices;
@@ -237,7 +235,7 @@ sub __add_slave_with_join_condition {
 
 sub __add_join_condition {
     my ( $sf, $join, $tables, $slave, $slave_alias ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aliases_by_tables = {};
     for my $ref ( @{$join->{aliases}} ) {
@@ -287,14 +285,13 @@ sub __add_join_condition {
                     return;
                 }
                 ( my $condition = $join->{stmt} ) =~ s/^\Q$bu_stmt\E\s//;
-                $join->{stmt} = $bu_stmt; # ?
+                $join->{stmt} = $bu_stmt; # add condition to the info print only after edit (?)
                 $ax->print_sql( $join );
-                my $tf = Term::Form->new();
+                my $tf = Term::Form->new( $sf->{i}{tf_default} );
                 # Readline
                 $condition = $tf->readline( 'Edit: ',
                     { default => $condition, show_context => 1 }
                 );
-                print HIDE_CURSOR;
                 if ( ! defined $condition ) {
                     return;
                 }
@@ -355,7 +352,6 @@ sub __print_join_info {
     }
     my $tp = Term::TablePrint->new( $sf->{o}{table} );
     $tp->print_table( $aref, { keep_header => 0, tab_width => 3, grid => 1 } );
-    print HIDE_CURSOR;
 }
 
 

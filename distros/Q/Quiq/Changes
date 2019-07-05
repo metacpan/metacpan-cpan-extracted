@@ -1,3 +1,17 @@
+1.149 2019-07-05
+================
+[Quiq::Assert]
+* Kosmetik
+
+[Quiq::Cascm]
+* Selektion für das Finden von Items verbessert
+
+[Quiq::Converter]
+* Kosmetik
+
+[Quiq::Process]
+* Von Quiq::System abgeleitet
+
 1.148 2019-07-01
 ================
 [Quiq::Assert]

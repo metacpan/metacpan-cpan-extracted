@@ -1,0 +1,7 @@
+=pod
+
+This POD contains a link to a built-in command, L<unlink|unlink>.
+
+=cut
+
+# ex: set textwidth=72 :

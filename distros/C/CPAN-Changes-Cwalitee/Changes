@@ -1,3 +1,9 @@
+0.001   2019-07-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add indicators: releases_in_descending_date_order,
+	  release_dates_not_future.
+
+
 0.000    2019-07-03  Released-By: PERLANCAR
 
          - First, early release.

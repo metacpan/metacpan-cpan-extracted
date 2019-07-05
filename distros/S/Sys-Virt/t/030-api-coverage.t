@@ -152,7 +152,7 @@ virNetworkDHCPLeaseFree
 );
 
 foreach my $func (sort { $a cmp $b } @functions) {
-    if ($func =~ /(GetConnect|Ref|GetDomain)$/ ||
+    if ($func =~ /(GetConnect|Ref|GetDomain|GetNetwork)$/ ||
 	grep {/$func/ } @blacklist) {
 	ok(1, $func);
 	next;

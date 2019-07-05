@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.2.2 of Calendar::Dates (from Perl
-    distribution Calendar-Dates), released on 2019-06-20.
+    This document describes version 0.2.3 of Calendar::Dates (from Perl
+    distribution Calendar-Dates), released on 2019-06-22.
 
 DESCRIPTION
     The "Calendar::Dates::*" namespace is reserved for modules that provide
@@ -25,7 +25,7 @@ DESCRIPTION
           Calendar::Dates::SG::FestivalsEvents
           Calendar::Dates::ID::Tax
 
-    *   Country-specific (public) holiday calendars go to XX::Holiday::*
+    *   Country-specific (public) holiday calendars go to <XX>::Holiday::*
 
         Examples:
 
@@ -60,7 +60,7 @@ DESCRIPTION
          Calendar::Dates::ID::Jakarta::Sports::Marathon
 
 STATUS
-    Draft series (0.x), expect to be stable in 1.0.
+    Draft series (0.x), expected to be stable in 1.0.
 
 METHODS
   get_min_year
@@ -90,8 +90,9 @@ METHODS
     if year (or month, or day) is not supported.
 
     Parameters. The optional %params can be specified for more complex
-    querying/filtering. Each calendar might support different parameters.
-    Currently known common/standardized parameters:
+    querying/filtering. Each calendar module might support different
+    parameters, and should die if a parameter is unsupported. Currently
+    known common/standardized parameters:
 
     *   all
 
@@ -108,6 +109,11 @@ METHODS
 
         Array. If set, then entries which contain any of the tags mentioned
         in this parameter should NOT be included.
+
+    *   q
+
+        String. String/keyword matching. Only include entries that match
+        this keyword/string.
 
     Result. Result is arrayref of entries, where each entry is a DefHash.
     The following keys are recognized, an asterisk ("*") signifies required

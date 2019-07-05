@@ -1,0 +1,8 @@
+=pod
+
+Link to a section of an external installed module -- to wit
+L<Scalar::Util::blessed()|Scalar::Util/blessed>.
+
+=cut
+
+# ex: set textwidth=72 :

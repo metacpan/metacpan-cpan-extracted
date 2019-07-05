@@ -1,3 +1,6 @@
+0.003     2019-07-03 22:53:50 EDT
+  - Add 1900 to positive year values passed to Time::Local so the year is consistently interpreted
+
 0.002     2018-03-26 20:56:20 EDT
   - Add with_system_offset_same_local and with_system_offset_same_instant methods (chansen)
 

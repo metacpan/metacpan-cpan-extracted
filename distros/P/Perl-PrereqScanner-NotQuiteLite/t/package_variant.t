@@ -5,6 +5,10 @@ use lib "$FindBin::Bin/..";
 use Test::More;
 use t::Util;
 
+test('', <<'END', {'Package::Variant' => 0}); # MAT/DBIx-Class-Helper-ResultSet-EnumMethods-0.01/lib/DBIx/Class/Helper/ResultSet/EnumMethods.pm
+use Package::Variant 'install' => 1, 'importing' => ['Moo::Role'];
+END
+
 test('no importing', <<'END', {'Package::Variant' => 0}); # MSTROUT/Package-Variant-1.003002/t/01simple.t
   use Package::Variant ();
 END

@@ -21,7 +21,7 @@ Calendar::DatesRoles::PublicInterface::Basic - Basic public interface of Calenda
 
 =head1 VERSION
 
-This document describes version 0.2.2 of Calendar::DatesRoles::PublicInterface::Basic (from Perl distribution Calendar-Dates), released on 2019-06-20.
+This document describes version 0.2.3 of Calendar::DatesRoles::PublicInterface::Basic (from Perl distribution Calendar-Dates), released on 2019-06-22.
 
 =head1 HOMEPAGE
 

@@ -41,7 +41,7 @@ sub select {
     my ( $sf, $sql ) = @_;
     my $clause = 'select';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $choices = [];
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
@@ -96,7 +96,7 @@ sub select {
 sub distinct {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef, $sf->{i}{ok} );
     $sql->{distinct_stmt} = '';
 
@@ -146,7 +146,7 @@ sub aggregate {
 
 sub __add_aggregate_substmt {
     my ( $sf, $sql ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @pre = ( undef, $sf->{i}{ok} );
     my $i = @{$sql->{aggr_cols}};
@@ -212,7 +212,7 @@ sub set {
     my $clause = 'set';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $col_sep = ' ';
     $sql->{set_args} = [];
     $sql->{set_stmt} = " SET";
@@ -256,7 +256,7 @@ sub where {
     my $clause = 'where';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @cols = @{$sql->{cols}};
     my $AND_OR = '';
     $sql->{where_args} = [];
@@ -348,7 +348,7 @@ sub group_by {
     my ( $sf, $sql ) = @_;
     my $clause = 'group_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $sql->{group_by_stmt} = " GROUP BY";
     $sql->{group_by_cols} = [];
     $sql->{select_cols} = [];
@@ -403,7 +403,7 @@ sub having {
     my $clause = 'having';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $op = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef, $sf->{i}{ok} );
     my $AND_OR = '';
     $sql->{having_args} = [];
@@ -489,7 +489,7 @@ sub order_by {
     my ( $sf, $sql ) = @_;
     my $clause = 'order_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
     my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
@@ -556,7 +556,7 @@ sub order_by {
 sub limit_offset {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef, $sf->{i}{ok} );
     $sql->{limit_stmt}  = '';
     $sql->{offset_stmt} = '';

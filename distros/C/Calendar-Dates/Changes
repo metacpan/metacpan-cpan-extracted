@@ -1,16 +1,32 @@
+0.2.3   2019-06-22 (PERLANCAR)
+
+        [SPEC CHANGES]
+
+        - get_entries(): Specify that when a module does not support a
+          parameter, it should die.
+
+        - get_entries(): Define 'q' parameter.
+
+
 0.2.2   2019-06-20 (PERLANCAR)
 
-	- get_entries(): Define 'include_tags' and 'exclude_tags'
+	[SPEC CHANGES]
+
+        - get_entries(): Define 'include_tags' and 'exclude_tags'
 	  parameters.
 
 
 0.2.1   2019-06-19 (PERLANCAR)
 
-        - Add STATUS section.
+	[SPEC CHANGES]
 
         - get_entries(): Define parameter 'all'.
 
         - Define the meaning of entry's tags: 'low-priority' and 'anniversary'.
+
+        [DOCUMENTATION]
+
+        - Add STATUS section.
 
 
 0.2.0   2019-05-25 (PERLANCAR)
@@ -36,7 +52,9 @@
 
 0.1.1   2019-02-13 (PERLANCAR)
 
-	- [doc] Reorganize See Also section, mention Date::Holidays.
+	[DOCUMENTATION]
+
+        - Reorganize See Also section, mention Date::Holidays.
 
 
 0.1.0    2019-02-12 (PERLANCAR)

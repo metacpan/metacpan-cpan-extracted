@@ -1,3 +1,8 @@
+0.093   2019-06-20 (PERLANCAR)
+
+	- Add options: --include-dow, --exclude-dow.
+
+
 0.092   2019-05-26 (PERLANCAR)
 
 	- [ux] Make 'from' argument optional, defaults to today.

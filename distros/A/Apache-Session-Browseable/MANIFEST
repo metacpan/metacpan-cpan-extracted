@@ -35,6 +35,7 @@ MANIFEST
 META.json
 META.yml			Module meta-data (added by MakeMaker)
 README.md
+rpm/Apache-Session-Browseable.spec
 t/Apache-Session-Browseable-common.t
 t/Apache-Session-Browseable-DBI.t
 t/Apache-Session-Browseable-File.t

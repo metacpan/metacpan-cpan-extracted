@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test2::Tools::Basic: '0'
+  Test::Output: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -24,5 +25,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/SpareRoom/Test2-Aggregate.git
-version: '0.05'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

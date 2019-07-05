@@ -1,5 +1,9 @@
 Revision history for Future-AsyncAwait
 
+0.30    2019-07-05 16:09:02
+        [CHANGES]
+         * Parse attribute lists on `async sub`s (RT129985)
+
 0.29    2019-06-26 20:23:12
         [CHANGES]
          * Further annotations in Devel::MAT::Dumper helper about loop state

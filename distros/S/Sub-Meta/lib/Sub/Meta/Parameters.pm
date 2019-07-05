@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 use Carp ();
 use Scalar::Util ();
@@ -175,41 +175,41 @@ Constructor of C<Sub::Meta::Parameters>.
         slurpy => 0,       # optional. whether get all rest arguments
     );
 
-=head2 args -> ArrayRef
+=head2 args
 
-Subroutine arguments.
+Subroutine arguments arrayref.
 
-=head2 set_args(LIST|ArrayRef)
+=head2 set_args(LIST), set_args(ArrayRef)
 
 Setter for subroutine arguments.
 An element can be an argument of C<Sub::Meta::Param> or any object which has C<positional>,C<named>,C<required> and C<optional> methods.
 
-=head2 nshift -> NonNegativeInt
+=head2 nshift
 
 Number of shift arguments.
 
-=head2 set_nshift(NonNegativeInt)
+=head2 set_nshift($nshift)
 
 Setter for nshift.
 For example, it is assumed that 1 is specified in the case of methods, and 0 is specified in the case of normal functions.
 
-=head2 slurpy -> Bool
+=head2 slurpy
 
 A boolean whether get all rest arguments.
 
-=head2 set_slurpy(Bool)
+=head2 set_slurpy($bool)
 
 Setter for slurpy.
 
-=head2 positional -> ArrayRef.
+=head2 positional
 
 Returns an arrayref of parameter objects for the positional arguments.
 
-=head2 positional_required -> ArrayRef
+=head2 positional_required
 
 Returns an arrayref of parameter objects for the required positional arguments.
 
-=head2 positional_optional -> ArrayRef
+=head2 positional_optional
 
 Returns an arrayref of parameter objects for the optional positional arguments.
 
@@ -229,11 +229,11 @@ Returns an arrayref of parameter objects for the optional named arguments.
 
 First element of invocants.
 
-=head2 invocants -> ArrayRef
+=head2 invocants
 
 Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
 
-=head2 args_min -> NonNegativeInt
+=head2 args_min
 
 Returns the minimum number of required arguments.
 
@@ -243,7 +243,7 @@ This is computed as follows:
   Required named parameters count 2 each (key + value).
   Slurpy parameters don't count either because they accept empty lists.
 
-=head2 args_max -> NonNegativeInt|Inf
+=head2 args_max
 
 Returns the maximum number of arguments.
 

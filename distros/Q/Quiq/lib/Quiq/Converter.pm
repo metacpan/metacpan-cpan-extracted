@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.148';
+our $VERSION = '1.149';
 
 use POSIX ();
 use Time::Local ();
@@ -583,16 +583,16 @@ weggelassen werden:
 
     $key=$val
 
+=head4 Caveats
+
+Wenn $val mit einem doppelten Anführungsstrich beginnt, darf $val
+keine doppelten Anführungsstiche enthalten.
+
 =head4 Example
 
     $class->stringToKeyVal(q|var1=val1 var2="val2"|);
     =>
     ('var1','val1','var2','val2a')
-
-=head4 Caveats
-
-Wenn $val mit einem doppelten Anführungsstrich beginnt, darf $val
-keine doppelten Anführungsstiche enthalten.
 
 =cut
 
@@ -616,7 +616,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.148
+1.149
 
 =head1 AUTHOR
 

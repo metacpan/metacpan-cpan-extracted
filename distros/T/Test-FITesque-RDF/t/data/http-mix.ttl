@@ -1,0 +1,34 @@
+@prefix test: <http://ontologi.es/doap-tests#> .
+@prefix deps: <http://ontologi.es/doap-deps#>.
+@prefix httph:<http://www.w3.org/2007/ont/httph#> .
+@prefix http: <http://www.w3.org/2007/ont/http#> .
+@prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix my:   <http://example.org/my-parameters#> .
+
+<#test-list> a test:FixtureTable ;
+    test:fixtures <#public-mix> .
+
+
+<#public-mix> a test:AutomatedTest ;
+    test:purpose "Mix HTTP and ordinary params."@en ;
+    test:test_script <http://example.org/httplist#http_req_res_list_unauthenticated> ;
+    test:param_base <http://example.org/my-parameters#> ;
+    test:params [
+        my:user "alice" ;
+        test:requests ( <#public-writeread-unauthn-alt-get-req> ) ;
+        test:responses ( <#public-writeread-unauthn-alt-get-res> ) 
+                ] .
+                
+
+<#public-writeread-unauthn-alt-get-req> a http:RequestMessage ;
+    http:method "GET" ;
+    http:requestURI </public/foobar.ttl> .
+            
+<#public-writeread-unauthn-alt-get-res> a http:ResponseMessage ;
+            httph:accept_post  "text/turtle", "application/ld+json" ;
+            httph:content_type "text/turtle" .
+            
+
+<http://example.org/httplist#http_req_res_list_unauthenticated> a nfo:SoftwareItem ;
+            deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
+            nfo:definesFunction "http_req_res_list_unauthenticated" .

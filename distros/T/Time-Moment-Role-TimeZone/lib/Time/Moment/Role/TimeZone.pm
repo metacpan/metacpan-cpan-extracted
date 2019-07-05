@@ -4,7 +4,7 @@ use Role::Tiny;
 use Carp ();
 use Time::Local ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 requires qw(epoch offset with_offset_same_instant with_offset_same_local
   utc_rd_as_seconds utc_rd_values local_rd_as_seconds local_rd_values utc_year);
@@ -31,14 +31,18 @@ sub with_time_zone_offset_same_local {
 sub with_system_offset_same_instant {
   my ($self) = @_;
   my $time = $self->epoch;
-  my $offset = Time::Local::timegm_nocheck(localtime $time) - $time;
+  my @localtime = localtime $time;
+  $localtime[5] += 1900 if $localtime[5] >= 0; # avoid timegm year heuristic
+  my $offset = Time::Local::timegm_nocheck(@localtime) - $time;
   return $self->with_offset_same_instant($offset / 60);
 }
 
 sub with_system_offset_same_local {
   my ($self) = @_;
   my $time = $self->epoch + $self->offset * 60;
-  my $offset = $time - Time::Local::timelocal_nocheck(gmtime $time);
+  my @gmtime = gmtime $time;
+  $gmtime[5] += 1900 if $gmtime[5] >= 0; # avoid timelocal year heuristic
+  my $offset = $time - Time::Local::timelocal_nocheck(@gmtime);
   return $self->with_offset_same_local($offset / 60);
 }
 

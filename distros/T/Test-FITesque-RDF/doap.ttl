@@ -14,11 +14,11 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [
-		doap-deps:on "RDF::NS::Curated 1.002"^^doap-deps:CpanId;
-	], [ doap-deps:on "RDF::Prefixes"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "HTTP::Message"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.023"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "Test::FITesque"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "Test::FITesque"^^doap-deps:CpanId ], [
 		doap-deps:on "URI::NamespaceMap 1.08"^^doap-deps:CpanId;
-	];
+	], [
+		doap-deps:on "RDF::NS::Curated 1.002"^^doap-deps:CpanId;
+	], [ doap-deps:on "RDF::Prefixes"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "HTTP::Message"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ], [ doap-deps:on "Types::Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.023"^^doap-deps:CpanId ], [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [ doap-deps:on "Test::Deep"^^doap-deps:CpanId ], [ doap-deps:on "FindBin"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>;
 	doap:created         "2019-04-09"^^xsd:date;
@@ -30,7 +30,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "Test-FITesque-RDF";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-008>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-010>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-test-fitesque-rdf>;
@@ -112,6 +112,53 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.008.tar.gz>;
 	doap:revision        "0.008"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-009>
+	a                    doap:Version;
+	rdfs:label           "Improve vocabulary usage";
+	dc:identifier        "Test-FITesque-RDF-0.009"^^xsd:string;
+	dc:issued            "2019-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improve Travis usage.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Some improvements to how ontologies are used.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Improve documentation.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Tests for multi-field values.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Improve error handling.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-008>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-010>
+	a                    doap:Version;
+	rdfs:label           "Adapt to existing vocabularies";
+	dc:identifier        "Test-FITesque-RDF-0.010"^^xsd:string;
+	dc:issued            "2019-07-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Adapt to existing vocabularies.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow mixing parameters.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-009>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
@@ -124,8 +171,8 @@
 
 <http://purl.org/NET/cpan-uri/person/konobi>
 	a                    foaf:Person;
-	foaf:name            "Scott McWirther";
-	foaf:nick            "KONOBI";
+	foaf:name            "Scott McWhirter", "Scott McWirther";
+	foaf:nick            "KONOBI", "konobi";
 	foaf:page            <https://metacpan.org/author/KONOBI>.
 
 <http://www.kjetil.kjernsmo.net/foaf#me>

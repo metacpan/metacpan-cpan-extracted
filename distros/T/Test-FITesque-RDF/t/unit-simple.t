@@ -45,6 +45,7 @@ cmp_deeply($data, [
 			  [ [ 'Internal::Fixture::Simple' ],
 				 [ 'string_found',
 					{
+                'description' => 'Echo a string',
 					 'all' => 'counter-clockwise dahut'
 					}
 				 ]

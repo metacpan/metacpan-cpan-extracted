@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 package App::Spec::Plugin::Format;
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use YAML::PP;
 use Ref::Util qw/ is_arrayref /;

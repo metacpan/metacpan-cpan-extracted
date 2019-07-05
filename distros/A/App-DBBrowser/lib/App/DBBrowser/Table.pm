@@ -25,7 +25,7 @@ sub new {
 
 sub on_table {
     my ( $sf, $sql ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sub_stmts = [
@@ -129,7 +129,7 @@ sub on_table {
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
             local $| = 1;
-            print HIDE_CURSOR; #
+            print HIDE_CURSOR; # safety
             print CLEAR_SCREEN;
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );

@@ -2,106 +2,21 @@ NAME
     App::ProcUtils - Command line utilities related to processes
 
 VERSION
-    This document describes version 0.031 of App::ProcUtils (from Perl
-    distribution App-ProcUtils), released on 2018-04-03.
+    This document describes version 0.032 of App::ProcUtils (from Perl
+    distribution App-ProcUtils), released on 2019-07-04.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
-
-    *   ppgrep
 
     *   proc-list-parents
 
     *   proc-table
 
 FUNCTIONS
-  grep_parents
-    Usage:
-
-     grep_parents(%args) -> [status, msg, result, meta]
-
-    Look up parents' processes based on name and other attributes.
-
-    This utility is similar to pgrep except that we only look at our
-    descendants (parent, parent's parent, and so on up to PID 1).
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   count => *true*
-
-        Suppress normal output; instead print a count of matching processes.
-
-    *   euid => *array[str]*
-
-        Only match processes whose effective user ID is listed. Either the
-        numerical or symbolical value may be used.
-
-    *   exact => *true*
-
-        Only match processes whose names (or command line if -f is
-        specified) exactly match the pattern.
-
-    *   full => *true*
-
-        The pattern is normally only matched against the process name. When
-        -f is set, the full command line is used.
-
-    *   group => *array[str]*
-
-        Only match processes whose real group ID is listed. Either the
-        numerical or symbolical value may be used.
-
-    *   inverse => *true*
-
-        Negates the matching.
-
-    *   list_full => *true*
-
-        List the full command line as well as the process ID.
-
-    *   list_name => *true*
-
-        List the process name as well as the process ID.
-
-    *   pattern => *str*
-
-        Only match processes whose name/cmdline match the pattern.
-
-    *   pgroup => *array[uint]*
-
-        Only match processes in the process group IDs listed.
-
-    *   session => *array[uint]*
-
-        Only match processes whose process session ID is listed.
-
-    *   terminal => *array[str]*
-
-        Only match processes whose controlling terminal is listed. The
-        terminal name should be specified without the "/dev/" prefix.
-
-    *   uid => *array[str]*
-
-        Only match processes whose user ID is listed. Either the numerical
-        or symbolical value may be used.
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
   list_parents
     Usage:
 
-     list_parents() -> [status, msg, result, meta]
+     list_parents() -> [status, msg, payload, meta]
 
     List all the parents of the current process.
 
@@ -114,7 +29,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -123,7 +38,7 @@ FUNCTIONS
   table
     Usage:
 
-     table() -> [status, msg, result, meta]
+     table() -> [status, msg, payload, meta]
 
     Run Proc::ProcessTable and display the result.
 
@@ -136,7 +51,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -157,14 +72,12 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
-SEE ALSO
-    pgrep.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

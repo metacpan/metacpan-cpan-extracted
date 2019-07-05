@@ -1,11 +1,11 @@
 package Quiq::Process;
-use base qw/Quiq::Object/;
+use base qw/Quiq::System/;
 
 use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.148';
+our $VERSION = '1.149';
 
 use Cwd ();
 use Quiq::System;
@@ -20,7 +20,7 @@ Quiq::Process - Information über den laufenden Prozess
 
 =head1 BASE CLASS
 
-L<Quiq::Object>
+L<Quiq::System>
 
 =head1 METHODS
 
@@ -201,7 +201,7 @@ sub homeDir {
 
 =head1 VERSION
 
-1.148
+1.149
 
 =head1 AUTHOR
 

@@ -72,6 +72,7 @@ sub defaults {
             binary_filter     => 0,
             binary_string     => 'BNRY',
             codepage_mapping  => 0, # not an option, always 0
+            hide_cursor       => 0, # not an option, always 0
             color             => 0,
             decimal_separator => '.',
             grid              => 1,

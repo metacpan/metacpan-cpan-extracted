@@ -6,6 +6,19 @@ Home page:    <https://metacpan.org/release/Test-FITesque-RDF>
 Bug tracker:  <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.010	2019-07-05	Adapt to existing vocabularies
+
+ - Adapt to existing vocabularies.
+ - Allow mixing parameters.
+
+0.009	2019-07-04	Improve vocabulary usage
+
+ - Added: Improve documentation.
+ - Added: Improve error handling.
+ - Added: Tests for multi-field values.
+ - Improve Travis usage.
+ - Some improvements to how ontologies are used.
+
 0.008	2019-06-20	Fix bug in HTTP param selection
 
 0.007	2019-06-13	Support content for HTTP request objects

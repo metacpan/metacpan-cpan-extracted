@@ -1,0 +1,8 @@
+=pod
+
+Link to an invalid section of an external installed module -- to wit
+L<Scalar::Util::fubar()|Scalar::Util/fubar>.
+
+=cut
+
+# ex: set textwidth=72 :

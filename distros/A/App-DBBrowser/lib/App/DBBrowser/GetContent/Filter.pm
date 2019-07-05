@@ -5,10 +5,9 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( choose_a_subset choose_a_number settings_menu insert_sep );
-use Term::Form              qw();
+use Term::Choose       qw();
+use Term::Choose::Util qw( choose_a_subset choose_a_number settings_menu insert_sep );
+use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
 
@@ -27,7 +26,7 @@ sub new {
 sub input_filter {
     my ( $sf, $sql, $default_e2n ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $backup = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ];
     my $waiting = 'Working ... ';
     my $confirm          = '    OK';
@@ -193,7 +192,7 @@ sub __choose_columns {
 sub __choose_rows {
     my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $aoa = $sql->{insert_into_args};
     my %group; # group rows by the number of cols
     for my $row_idx ( 0 .. $#$aoa ) {
@@ -298,7 +297,7 @@ sub __range_of_rows {
 sub __choose_range {
     my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $aoa = $sql->{insert_into_args};
     my @pre = ( undef );
     my $choices;
@@ -392,13 +391,12 @@ sub __merge_rows {
     }
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
-    my $tf = Term::Form->new();
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
         { prompt => 'Edit result:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
-    print HIDE_CURSOR;
     if ( ! $form ) {
         return;
     }
@@ -411,7 +409,7 @@ sub __merge_rows {
 
 sub __split_table {
     my ( $sf, $sql, $waiting ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $aoa = $sql->{insert_into_args};
     # Choose
     my $col_count = choose_a_number(
@@ -457,7 +455,7 @@ sub __split_table {
 
 sub __split_column {
     my ( $sf, $sql, $waiting ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $aoa = $sql->{insert_into_args};
     my ( $header, $mark ) = $sf->__prepare_header_and_mark( $aoa );
     my @pre = ( undef );
@@ -470,22 +468,19 @@ sub __split_column {
         return;
     }
     $idx -= @pre;
-    my $tf = Term::Form->new();
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     # Readline
     my $sep = $tf->readline( 'Separator: ' );
-    print HIDE_CURSOR;
     if ( ! defined $sep ) {
         return;
     }
     # Readline
     my $left_trim = $tf->readline( 'Left trim: ', '\s+' );
-    print HIDE_CURSOR;
     if ( ! defined $left_trim ) {
         return;
     }
     # Readline
     my $right_trim = $tf->readline( 'Right trim: ', '\s+' );
-    print HIDE_CURSOR;
     if ( ! defined $right_trim ) {
         return;
     }
@@ -508,7 +503,7 @@ sub __split_column {
 sub __search_and_replace {
     my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
 
     SEARCH_AND_REPLACE: while ( 1 ) {
         my $mods = [ 'g', 'i', 'e', 'e' ];
@@ -553,12 +548,11 @@ sub __search_and_replace {
         my $mods_str = join '', $insensitive, $globally, @e_s;
         my $info = sprintf $info_fmt, '', '', $mods_str;
         $ax->print_sql( $sql, $waiting );
-        my $tf = Term::Form->new();
+        my $tf = Term::Form->new( $sf->{i}{tf_default} );
         # Readline
         my $pattern = $tf->readline( 'Pattern: ',
             { info => $info }
         );
-        print HIDE_CURSOR;
         if ( ! defined $pattern ) {
             next SEARCH_AND_REPLACE;
         }
@@ -569,7 +563,6 @@ sub __search_and_replace {
         my $replacement = $tf->readline( 'Replacement: ',
             { info => $info }
         );
-        print HIDE_CURSOR;
         if ( ! defined $replacement ) {
             next SEARCH_AND_REPLACE;
         }

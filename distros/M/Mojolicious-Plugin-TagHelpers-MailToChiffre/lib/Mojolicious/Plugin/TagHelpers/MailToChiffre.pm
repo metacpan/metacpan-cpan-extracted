@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::URL;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Cache for generated CSS and JavaScript
 has [qw/js css pattern_rotate/];
@@ -52,34 +52,34 @@ sub register {
       # In case method name is given, set asset paths
       if ($plugin_param->{method_name}) {
 
-	# Styles
-	$r->get('/style.css')->to(
-	  cb => sub {
-	    my $c = shift;
-	    $c->render(
-	      text   => $c->mail_to_chiffre_css,
-	      format => 'css'
-	    );
-	  }
-	)->name($name . 'CSS');
+        # Styles
+        $r->get('/style.css')->to(
+          cb => sub {
+            my $c = shift;
+            $c->render(
+              text   => $c->mail_to_chiffre_css,
+              format => 'css'
+            );
+          }
+        )->name($name . 'CSS');
 
-	# Styles
-	$r->get('/script.js')->to(
-	  cb => sub {
-	    my $c = shift;
-	    $c->render(
-	      text   => $c->mail_to_chiffre_js,
-	      format => 'js'
-	    );
-	  }
-	)->name($name . 'JS');
+        # Styles
+        $r->get('/script.js')->to(
+          cb => sub {
+            my $c = shift;
+            $c->render(
+              text   => $c->mail_to_chiffre_js,
+              format => 'js'
+            );
+          }
+        )->name($name . 'JS');
       };
 
       # Fallback path
       $r->under('/:xor/:host')->to(
-	cb => sub {
-	  $plugin->_chiffre_to_mail(shift)
-	}
+        cb => sub {
+          $plugin->_chiffre_to_mail(shift)
+        }
       )->get('/')->name($name)->to(@_);
     }
   );
@@ -98,7 +98,7 @@ sub register {
       # Get embedded code
       my $text;
       if (ref($_[-1]) && ref($_[-1]) eq 'CODE') {
-	$text = pop;
+        $text = pop;
       };
 
       my %param = @_;
@@ -106,78 +106,79 @@ sub register {
       # Split the address and do some encodings
       my $obf_address = b($address)->xml_escape->split('@');
       my $account = $obf_address->first;
-      my $host = $obf_address->slice(1 .. $obf_address->size - 1)->join('@');
+
+      my $host = join '@', @{$obf_address}[1 .. $obf_address->size - 1];
 
       # Reget the pattern rotate (maybe)
       my $pattern_rotate = $plugin->pattern_rotate;
 
       # Obfuscate address parts
       $host = $plugin->to_sequence(
-	$host,
-	$xor,
-	$pattern_rotate
+        $host,
+        $xor,
+        $pattern_rotate
       );
 
       $account = $plugin->to_sequence(
-	$account,
-	$xor,
-	$pattern_rotate
+        $account,
+        $xor,
+        $pattern_rotate
       );
 
       # Create Mojo::URL for path
       my ($url, $no_fallback);
       if ($routes->lookup('mailToChiffre')) {
-	$url = $c->url_for('mailToChiffre', xor => $xor, host => $host);
+        $url = $c->url_for('mailToChiffre', xor => $xor, host => $host);
       }
       else {
-	$url = $c->url_for("/$xor/$host");
-	$no_fallback = 1;
+        $url = $c->url_for("/$xor/$host");
+        $no_fallback = 1;
       };
 
       # Encrypt certain mail parameters
       foreach (qw/to cc bcc/) {
 
-	# No parameter
-	next unless exists $param{$_};
+        # No parameter
+        next unless exists $param{$_};
 
-	# Parameter invalid
-	unless ($param{$_}) {
-	  delete $param{$_};
-	  next;
-	};
+        # Parameter invalid
+        unless ($param{$_}) {
+          delete $param{$_};
+          next;
+        };
 
-	# Array for this parameter
-	if (ref $param{$_}) {
-	  my @temp;
-	  foreach (@{$param{$_}}) {
-	    push(@temp, $plugin->to_sequence($_, $xor, $pattern_rotate)) if $_;
-	  };
+        # Array for this parameter
+        if (ref $param{$_}) {
+          my @temp;
+          foreach (@{$param{$_}}) {
+            push(@temp, $plugin->to_sequence($_, $xor, $pattern_rotate)) if $_;
+          };
 
-	  # Check if there are converted parameters
-	  if (@temp) {
-	    $param{$_} = \@temp;
-	  }
-	  # Remove parameter from list
-	  else {
-	    delete $param{$_};
-	  };
-	}
+          # Check if there are converted parameters
+          if (@temp) {
+            $param{$_} = \@temp;
+          }
+          # Remove parameter from list
+          else {
+            delete $param{$_};
+          };
+        }
 
-	# Single value
-	else {
-	  $param{$_} = $plugin->to_sequence(
-	    $param{$_},
-	    $xor,
-	    $pattern_rotate
-	  );
-	};
+        # Single value
+        else {
+          $param{$_} = $plugin->to_sequence(
+            $param{$_},
+            $xor,
+            $pattern_rotate
+          );
+        };
       };
 
       # Return path
       $url->query({sid => $account, %param});
 
       if ($no_fallback) {
-	$url = qq!javascript:$method_name(false,'$url')!;
+        $url = qq!javascript:$method_name(false,'$url')!;
       };
 
       # Create anchor link
@@ -187,14 +188,14 @@ sub register {
 
       # Obfuscate display string using css
       unless ($text) {
-	my ($pre, @post) = split('@', reverse($address));
-	$str .= '">' .
-	        '<span>' . b($pre)->xml_escape . '</span>' .
-	        '<span>' . b($xor)->split('')->reverse->join . '</span>' .
-		c(@post)->join->xml_escape;
+        my ($pre, @post) = split('@', reverse($address));
+        $str .= '">' .
+          '<span>' . b($pre)->xml_escape . '</span>' .
+          '<span>' . b($xor)->split('')->reverse->join . '</span>' .
+          c(@post)->join->xml_escape;
       }
       else {
-	$str .= ';' . int(rand(50)) . '">' . $text->();
+        $str .= ';' . int(rand(50)) . '">' . $text->();
       };
 
       $str .= '</a>';
@@ -209,8 +210,8 @@ sub register {
       return $plugin->css if $plugin->css;
       my $css = qq!a[onclick\$='return $method_name(this,false)']!;
       $css = $css . '{direction:rtl;unicode-bidi:bidi-override;text-align:left}'.
-	     $css . '>span:nth-child(1n+2){display:none}' .
-	     $css . '>span:nth-child(1):after{content:\'@\'}';
+        $css . '>span:nth-child(1n+2){display:none}' .
+       $css . '>span:nth-child(1):after{content:\'@\'}';
       $plugin->css(b($css));
       return $plugin->css;
     }
@@ -230,9 +231,9 @@ sub register {
       # Template variables
       my ($i, %v) = (0);
       foreach (qw/obj seq url char pos num str regex string_obj
-		  from_char_code param_array temp to_seq
-		  path_array query padded str_len pow bool/) {
-	$v{$_} = $v->[$i++];
+      from_char_code param_array temp to_seq
+      path_array query padded str_len pow bool/) {
+        $v{$_} = $v->[$i++];
       };
 
       # Obfuscate pattern rotate
@@ -256,8 +257,8 @@ sub register {
         $v{num}='';
         $v{char}=$v{seq}.charAt($v{pos}++);
         while($v{char}.match(/\\d/)){
-  	  $v{num}+=$v{char};
-	  $v{char}=$v{seq}.charAt($v{pos}++)
+      $v{num}+=$v{char};
+    $v{char}=$v{seq}.charAt($v{pos}++)
         }
         $v{pos}--;
         $v{str}+=$v{from_char_code}(parseInt($v{num}))
@@ -287,7 +288,6 @@ sub register {
 }!;
       $js =~ s/\s*\n\s*//g;
       $plugin->js(b($js));
-
       return $plugin->js;
     }
   );
@@ -337,11 +337,11 @@ sub _chiffre_to_mail {
 
       # Append new deobfuscated parameters
       $p->append($type => [map {
-	$plugin->to_string(
-	  $_,
-	  $xor,
-	  $plugin->pattern_rotate
-	)
+        $plugin->to_string(
+          $_,
+          $xor,
+          $plugin->pattern_rotate
+        )
       } @val]);
     };
   };
@@ -431,8 +431,8 @@ sub to_string {
 
       # Collect number segments
       while ($c =~ /[0-9]/) {
-	$num .= $c;
-	$c = substr($seq, $pos++, 1);
+        $num .= $c;
+        $c = substr($seq, $pos++, 1);
       };
 
       $pos--;
@@ -678,7 +678,7 @@ Returns the deobfuscating JavaScript code.
 
   # Mojolicious
   my $r = $app->routes;
-  $r->get('/contactme')->mail_to_chiffre('Mail#capture');
+  $r->any('/contactme')->mail_to_chiffre('Mail#capture');
 
   # Mojolicious::Lite
   any('/contactme')->mail_to_chiffre(
@@ -723,7 +723,7 @@ L<Mojolicious::Plugin::Util::RandomString>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014, Nils Diewald.
+Copyright (C) 2014-2019, Nils Diewald.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

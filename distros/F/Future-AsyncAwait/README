@@ -330,10 +330,6 @@ KNOWN BUGS
     bugs, see the RT queue at
     https://rt.cpan.org/Dist/Display.html?Name=Future-AsyncAwait.
 
-      * Warnings and memory leaks when dropping still-pending Futures
-
-      https://rt.cpan.org/Ticket/Display.html?id=128620
-
       * await inside map or grep blocks does not work. This is due to the
       difficulty of detecting the map or grep context from internal perl
       state at suspend time, sufficient to be able to restore it again when
@@ -355,6 +351,16 @@ KNOWN BUGS
          }
 
       with a similar transformation for grep expressions.
+
+      Alternatively, consider using the fmap* family of functions from
+      Future::Utils to provide a concurrent version of the same code, which
+      can keep multiple items running concurrently:
+
+         use Future::Utils qw( fmap );
+      
+         my @results = await fmap { func( shift ) }
+            foreach    => [ ITEMS ],
+            concurrent => 5;
 
 ACKNOWLEDGEMENTS
 

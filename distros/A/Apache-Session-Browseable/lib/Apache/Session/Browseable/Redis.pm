@@ -9,7 +9,7 @@ use Apache::Session::Lock::Null;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.2';
 our @ISA     = qw(Apache::Session);
 
 our $redis = $Apache::Session::Browseable::Store::Redis::redis;
@@ -29,7 +29,7 @@ sub populate {
 
 sub unserialize {
     my $session = shift;
-    my $tmp = { serialized => $session };
+    my $tmp     = { serialized => $session };
     Apache::Session::Serialize::JSON::unserialize($tmp);
     return $tmp->{data};
 }
@@ -37,19 +37,12 @@ sub unserialize {
 sub searchOn {
     my ( $class, $args, $selectField, $value, @fields ) = @_;
 
-    # Manage undef encoding
-    $args->{encoding} = undef
-      if ( $args->{encoding} and $args->{encoding} eq "undef" );
-
     my %res = ();
     my $index =
       ref( $args->{Index} ) ? $args->{Index} : [ split /\s+/, $args->{Index} ];
     if ( grep { $_ eq $selectField } @$index ) {
-        my $redisObj = $redis->new(%$args);
 
-        # Manage database
-        $redisObj->select( $args->{database} ) if defined $args->{database};
-
+        my $redisObj = $class->_getRedis($args);
         my @keys = $redisObj->smembers("${selectField}_$value");
         foreach my $k (@keys) {
             next unless ($k);
@@ -92,16 +85,7 @@ sub get_key_from_all_sessions {
     my $data  = shift;
     my %res;
 
-    # Manage undef encoding
-    $args->{encoding} = undef
-      if ( $args->{encoding} and $args->{encoding} eq "undef" );
-
-    # TODO new Redis object
-    my $redisObj = $redis->new(%$args);
-
-    # Manage database
-    $redisObj->select( $args->{database} ) if defined $args->{database};
-
+    my $redisObj = $class->_getRedis($args);
     my @keys = $redisObj->keys('*');
     foreach my $k (@keys) {
         next if ( !$k or $k =~ /_/ );
@@ -120,6 +104,32 @@ sub get_key_from_all_sessions {
         }
     }
     return \%res;
+}
+
+sub _getRedis {
+    my $class = shift;
+    my $args  = shift;
+
+    # Manage undef encoding
+    $args->{encoding} = undef
+      if (  $args->{encoding}
+        and $args->{encoding} eq "undef" );
+
+    # If sentinels is not given as an array ref, try to parse
+    # a comma delimited list instead
+    if ( $args->{sentinels}
+        and ref $args->{sentinels} ne 'ARRAY' )
+    {
+        $args->{sentinels} =
+          [ split /[,\s]+/, $args->{sentinels} ];
+    }
+
+    my $redisObj = $redis->new( %{$args} );
+
+    # Manage database
+    $redisObj->select( $args->{database} )
+      if defined $args->{database};
+    return $redisObj;
 }
 
 1;

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Completion::Zsh;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Moo;
 extends 'App::Spec::Completion';
@@ -319,7 +319,7 @@ EOM
 $function_name() \{
     local __dynamic_completion
     local CURRENT_WORD="\$words\[CURRENT\]"
-    IFS=\$'\\n' set -A __dynamic_completion \$( $string )
+    IFS=\$'\\n' __dynamic_completion=( \$( $string ) )
     compadd -X "$shell_name:" \$__dynamic_completion
 \}
 EOM

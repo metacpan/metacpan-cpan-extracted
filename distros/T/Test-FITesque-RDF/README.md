@@ -46,6 +46,34 @@ This module implements the following attributes and methods:
 
     A [IRI](https://metacpan.org/pod/IRI) to use in parsing the RDF fixture tables to resolve any relative URIs.
 
+## REQUIRED RDF
+
+The following must exist in the test description (see below for an example and prefix expansions):
+
+- `test:fixtures`
+
+    The object(s) of this predicate lists the test fixtures that will run
+    for this test suite. May take an RDF List. Links to the test
+    descriptions, which follow below.
+
+- `test:script`
+
+    The object of this predicate contains the function name of the actual test script as a literal.
+
+- `dc:description`
+
+    The object of this predicate provides a literal description of the test.
+
+- `test:params`
+
+    The object of this predicate links to the paramaters, which may have many different shapes.
+
+- `rdf:type` aka `<a`>
+
+    The object of this predicate is the class of test, which again links
+    contains the required `deps:test-requirement` predicate, whose object
+    contains the class name of the implementation of the tests.
+
 ## RDF EXAMPLE
 
 The below example starts with prefix declarations. Since this is a
@@ -55,12 +83,16 @@ using the `test:fixtures` predicate will be used. Tests may be an RDF
 List, in which case, the tests will run in the specified sequence, if
 not, no sequence may be assumed.
 
-Then, two test fixtures are declared. The `test:handler` predicate is
-used to identify the class containing implementations, while
-`dc:identifier` is used to name the function within that class.
+Then, two test fixtures are declared. The RDF class of the test
+fixture is used to denote identify the Perl class containing the
+implementations, through the `deps:test-requirement` predicate which is the
+concrete class name. The `test:script` predicate is used to name the
+function within that class.
 
 The `test:params` predicate is used to link the parameters that will
-be sent as a hashref into the function.
+be sent as a hashref into the function. The &lt;dc:description> predicate
+is required to exist outside of the parameters, but will be included
+as a parameter as well.
 
 There are two different mechanisms for passing parameters to the test
 scripts, one is simply to pass arbitrary key-value pairs, the other is
@@ -79,26 +111,32 @@ resolution itself happens in [URI::NamespaceMap](https://metacpan.org/pod/URI::N
     @prefix deps: <http://ontologi.es/doap-deps#>.
     @prefix dc:   <http://purl.org/dc/terms/> .
     @prefix my:   <http://example.org/my-parameters#> .
-
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
 
     <#test-list> a test:FixtureTable ;
-      test:fixtures <#test1>, <#test2> .
+      test:fixtures ( <#test1> <#test2> ) .
 
-    <#test1> a test:Test ;
-      test:handler "Internal::Fixture::Simple"^^deps:CpanId ;
-      dc:identifier "string_found" ;
+    <#test1> a <http://example.org/SimpleTest> ;
       test:param_base <http://example.org/my-parameters#> ;
+      dc:description "Echo a string"@en ;
+      test:script "string_found" ;
       test:params [ my:all "counter-clockwise dahut" ] .
 
-    <#test2> a test:Test ;
-      test:handler "Internal::Fixture::Multi"^^deps:CpanId ;
-      dc:identifier "multiplication" ;
+    <#test2> a <http://example.org/MultiTest> ;
       test:param_base <http://example.org/my-parameters#> ;
+      test:script "multiplication" ;
+      dc:description "Multiply two numbers"@en ;
       test:params [
           my:factor1 6 ;
           my:factor2 7 ;
           my:product 42
       ] .
+
+    <http://example.org/SimpleTest> rdfs:subClassOf test:ScriptClass ;
+      deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .
+
+    <http://example.org/MultiTest> rdfs:subClassOf test:ScriptClass ;
+      deps:test-requirement "Internal::Fixture::Multi"^^deps:CpanId .
 
 ### HTTP request-response lists
 
@@ -116,7 +154,7 @@ This gets more complex, please see the test data file
 
 # TODO
 
-Separate the implementation-specific details (such as `test:handler`)
+Separate the implementation-specific details (such as `deps:test-requirement`)
 from the actual fixture tables.
 
 # BUGS

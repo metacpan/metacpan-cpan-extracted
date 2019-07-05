@@ -25,11 +25,11 @@ Test2::Aggregate - Aggregate tests
 
 =head1 VERSION
 
-Version 0.05
+Version 0.08
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 
 =head1 DESCRIPTION
@@ -44,11 +44,15 @@ which makes it more likely to work with your test suite and also with more
 modern Test2 bundles. It does not try to package each test which may be good or
 bad (e.g. redefines), depending on your requirements.
 
+Generally, the way to use this module is to try to aggregate sets of quick tests
+(e.g. unit tests). Try to iterativelly add tests to the aggregator dropping those
+that do not work.
+
 =head1 METHODS
  
 =head2 C<run_tests>
 
-    Test2::Aggregate::run_tests(
+    my $stats = Test2::Aggregate::run_tests(
         dirs          => \@dirs,              # optional if lists defined
         lists         => \@lists,             # optional if dirs defined
         root          => '/testroot/',        # optional
@@ -59,10 +63,22 @@ bad (e.g. redefines), depending on your requirements.
         slow          => 0,                   # optional
         override      => \%override,          # optional, requires Sub::Override
         stats_output  => $stats_output_path,  # optional, requires Time::HiRes
+        extend_stats  => 0,                   # optional
         test_warnings => 0                    # optional
     );
 
-Runs the aggregate tests. Hash parameter specifies:
+Runs the aggregate tests. Returns a hashref with stats like this:
+
+  $stats = {
+    'test.t' => {
+      'test_no'   => 1,                 # numbering starts at 1
+      'pass_perc' => 100,               # for single runs pass/fail is 100/0
+      'timestamp' => '20190705T145043', # start of test
+      'time'      => '0.1732'           # only with stats_output
+    }
+  };
+
+The parameters to pass:
 
 =over 4
  
@@ -122,10 +138,16 @@ C<stats_output_path> when defined specifies a path where a file with running
 time per test (average if multiple iterations are specified), starting with the
 slowest test and passing percentage gets written. On negative C<repeat> the
 stats of each successful run will be written separately instead of the averages.
-The name of the file is C<caller_script-YYYYMMDD_HHmmss.txt>.
+The name of the file is C<caller_script-YYYYMMDDTHHmmss.txt>.
 If C<-> is passed instead of a path, then STDOUT will be used instead.
-The timing stats are useful because the test harness doesn not normally measure
-type by subtest.
+The timing stats are useful because the test harness doesn't normally measure
+time per subtest.
+
+=item * C<extend_stats> (optional)
+
+This is to allow default output of C<stats_output_path> to be fixed/reliable and
+anything additional in future versions requires C<extend_stats> to be shown.
+Currently starting date/time in ISO_8601 is added.
 
 =back
 
@@ -174,7 +196,7 @@ sub run_tests {
 
     my $warnings=[];
     if ($args{repeat} && $args{repeat} < 0) {
-        require Test2::Plugin::BailOnFail;
+        eval 'use Test2::Plugin::BailOnFail';
         my $iter = 0;
         while (!@$warnings) {
             $iter++;
@@ -195,7 +217,10 @@ sub run_tests {
     } else {
         _run_tests(\@tests, \%args);
     }
+
     warn "Test warning output:\n".join("\n", @$warnings)."\n" if @$warnings;
+
+    return $args{stats};
 }
 
 sub _run_tests {
@@ -205,22 +230,27 @@ sub _run_tests {
     $repeat = 1 if $repeat < 0;
     my %stats;
 
-    require Time::HiRes if $args->{stats_output};
+    eval 'require Time::HiRes' if $args->{stats_output};
 
     for (1 .. $repeat) {
         my $iter = $repeat > 1 ? "Iter: $_/$repeat - " : '';
+        my $count = 0;
         foreach my $test (@$tests) {
-            my $start  = Time::HiRes::time() if $args->{stats_output};
+            my $start;
+            $stats{$test}{test_no}=++$count;
+            $start = Time::HiRes::time() if $args->{stats_output};
+            $stats{$test}{timestamp} = _timestamp();
             my $result = subtest $iter. "Running test $test" => sub {
                 do $test;
             };
-            $stats{time}{$test} += (Time::HiRes::time() - $start)/$repeat
-                 if $args->{stats_output};
-            $stats{pass_perc}{$test} += $result ? 100/$repeat : 0;
+            $stats{$test}{time} += (Time::HiRes::time() - $start)/$repeat
+                if $args->{stats_output};
+            $stats{$test}{pass_perc} += $result ? 100/$repeat : 0;
         }
     }
 
     _print_stats(\%stats, $args) if $args->{stats_output};
+    $args->{stats} = \%stats;
 }
 
 sub _override {
@@ -253,12 +283,14 @@ sub _print_stats {
         open($fh, '>', $file) or die "Can't open > $file: $!";
     }
 
-    print $fh "TIME PASS% TEST\n";
+    my $extra = $args->{extend_stats} ? ' TIMESTAMP' : '';
+    print $fh "TIME PASS%$extra TEST\n";
     my $total = 0;
-    foreach my $test (sort {$stats->{time}->{$b}<=>$stats->{time}->{$a}} keys %{$stats->{time}}) {
-        $total += $stats->{time}->{$test};
-        printf $fh "%.2f %d $test\n",
-            $stats->{time}->{$test}, $stats->{pass_perc}->{$test};
+    foreach my $test (sort {$stats->{$b}->{time}<=>$stats->{$a}->{time}} keys %$stats) {
+        $extra = ' '.$stats->{$test}->{timestamp} if $args->{extend_stats};
+        $total += $stats->{$test}->{time};
+        printf $fh "%.2f %d$extra $test\n",
+            $stats->{$test}->{time}, $stats->{$test}->{pass_perc};
     }
     printf $fh "TOTAL TIME: %.1f sec\n", $total;
     close $fh unless $args->{stats_output} =~ /^-$/;
@@ -266,7 +298,7 @@ sub _print_stats {
 
 sub _timestamp {
     my ($s, $m, $h, $D, $M, $Y) = localtime(time);
-    return sprintf "%04d%02d%02d_%02d%02d%02d", $Y+1900, $M+1, $D, $h, $m, $s;
+    return sprintf "%04d%02d%02dT%02d%02d%02d", $Y+1900, $M+1, $D, $h, $m, $s;
 }
 
 =head1 USAGE NOTES

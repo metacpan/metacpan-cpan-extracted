@@ -7,9 +7,8 @@ use 5.010001;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Form              qw();
+use Term::Choose qw();
+use Term::Form   qw();
 
 use App::DBBrowser::Auxil;
 
@@ -27,7 +26,7 @@ sub new {
 sub attach_db {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $cur_attached;
     if ( -s $sf->{i}{f_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
@@ -58,7 +57,7 @@ sub attach_db {
                 }
                 return;
             }
-            my $tf = Term::Form->new();
+            my $tf = Term::Form->new( $sf->{i}{tf_default} );
             push @tmp_info, "ATTACH DATABASE $db AS";
             $info = join( "\n", @tmp_info );
 
@@ -66,7 +65,6 @@ sub attach_db {
                 my $alias = $tf->readline( 'alias: ',
                     { info => $info, clear_screen => 1 }
                 );
-                print HIDE_CURSOR;
                 if ( ! length $alias ) {
                     last ALIAS;
                 }
@@ -125,7 +123,7 @@ sub attach_db {
 sub detach_db {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $attached_db;
     if ( -s $sf->{i}{f_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );

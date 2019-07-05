@@ -26,6 +26,18 @@
       <foaf:mbox rdf:resource="mailto:matt@sergeant.org" />
     </foaf:Person>
   </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <homepage rdf:resource="https://github.com/yanick/xml-xpathscript" />
   <bug-database rdf:resource="https://github.com/yanick/xml-xpathscript/issues" />
@@ -175,6 +187,12 @@
   <release>
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.54</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.55</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-06-20</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

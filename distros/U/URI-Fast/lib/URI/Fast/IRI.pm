@@ -3,7 +3,8 @@ package URI::Fast::IRI;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+require URI::Fast;
+our $VERSION = $URI::Fast::VERSION;
 
 our @ISA = qw(URI::Fast);
 

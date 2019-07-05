@@ -1,0 +1,8 @@
+=pod
+
+Link to an external installed module -- to wit
+L<Scalar::Util|Scalar::Util>.
+
+=cut
+
+# ex: set textwidth=72 :

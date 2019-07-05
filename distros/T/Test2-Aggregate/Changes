@@ -1,5 +1,16 @@
 Revision history for Test2-Aggregate
 
+0.08    2019-07-05
+        Return stats of test run to caller.
+
+0.07    2019-07-04
+        Fix stats bug from 0.06.
+
+0.06    2019-07-04
+        extend_stats option.
+        Fix repeat<0.
+        Perl critic test & fix.
+
 0.05    2019-06-21
         Avoid Test::More redefine warnings.
         Defaults shown in POD method description.

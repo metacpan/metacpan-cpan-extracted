@@ -1,0 +1,13 @@
+=pod
+
+=head1 DESCRIPTION
+
+This POD tests the ability of Test::Pod::LinkCheck::Lite to resolve a
+link split over two lines, like this: L</AUTHORS
+AFTERWORD>.
+
+=head1 AUTHORS AFTERWORD
+
+=cut
+
+# ex: set textwidth=72 :

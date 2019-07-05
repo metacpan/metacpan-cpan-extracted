@@ -1,0 +1,178 @@
+0.250   2019-07-04  Released-By: PERLANCAR; Urgency: high
+
+	- Rename module
+	  Dist::Zilla::Plugin::Rinci::{Validate,EmbedValidator}.
+
+        - [bugfix] Assign default value from argument spec, no matter argument
+          has schema or not.
+
+        - [bugfix] Enclose validator code with { ... } to limit the effect of
+          pragmas in the generated code, e.g. no warnings 'void'.
+
+        - [bugfix] Modules required by the validator code had not been added to
+          the distro's prereqs.
+
+	- No longer skip running when detecting [Rinci::Wrap]. Both plugins
+	  are equally valid alternatives; no one supersedes or precedes the
+	  other.
+
+	- [doc] Mention [Rinci::GenSchemaV].
+
+
+0.24    2017-06-24  Released-By: PERLANCAR
+
+	- [Bugfix] Don't include Sah compile-time modules [RT#122145].
+
+
+0.23    2016-07-22  Released-By: PERLANCAR
+
+	- Handle (skip) non-OnDisk files.
+
+
+0.22    2016-06-02  Released-By: PERLANCAR
+
+	- Adjust to Data::Sah 0.79 (v introduced to compilation data,
+	  modules becomes array of records).
+
+	- [doc] Mention Data::Sah::Manual::ParamsValidating.
+
+
+0.21    2016-02-25  Released-By: PERLANCAR
+
+        - No functional changes.
+
+	- Replace Data::Dumper with Data::Dmp.
+
+
+0.20    2015-01-03  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.19    2014-10-29  Released-By: PERLANCAR
+
+	- [Bugfix] Schema default and default from 'default' argument spec
+	  property were not applied.
+
+
+0.18    2014-09-12  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Fix syntax error (d'oh).
+
+
+0.17    2014-09-12  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Tweak die message: add sub name prefix to make it clearer.
+
+
+0.16    2014-09-12  Released-By: PERLANCAR
+
+	- Bugfix: allow args_as=array/whatever if we're validating arg one
+	  by one.
+
+	- Bugfix: Avoid use of Perinci::Access::Perl to avoid changing
+	  result_naked, args_as.
+
+
+0.15    2014-09-06  Released-By: PERLANCAR
+
+	- Adjust to Perinci::Sub::Wrapper 0.62
+	  (_perinci.sub.wrapper.validate_args is now renamed).
+
+
+0.14     2014-06-27  Released-By: SHARYANTO
+
+         - Fix regex for package declaration so false positives are reduced.
+
+
+0.13     2014-04-30  Released-By: SHARYANTO
+
+         - Adjust to Perinci::Access::Perl 0.66 (no longer has
+           extra_wrapper_args, but remove_internal_properties is now off by
+           default in Perinci::Sub::Normalize).
+
+
+0.12     2014-03-08  Released-By: SHARYANTO
+
+         - Skip running if DZP::Rinci::Wrap is loaded.
+
+
+0.11     2013-12-18  Released-By: SHARYANTO
+
+         - No functional changes. Fix coding error.
+
+
+0.10     2013-12-18  Released-By: SHARYANTO
+
+         - No functional changes. Adjust to Perinci::Access::Perl 0.54+.
+
+
+0.09     2013-09-11  Released-By: SHARYANTO
+
+         - No functional changes. Adjust to Data::Sah 0.18.
+
+
+0.08     2013-09-11  Released-By: SHARYANTO
+
+         - No functional changes. Add 'use experimental smartmatch' for Perl
+           5.18+".
+
+
+0.07     2013-09-08  Released-By: SHARYANTO
+
+         - Bugfix: make sure all uri's fed to Perinci::Access::Perl are pl: uris.
+
+
+0.06     2013-09-08  Released-By: SHARYANTO
+
+         - No functional changes. Replace Perinci::Access::InProcess with
+           ::Perl.
+
+
+0.05     2013-03-02  Released-By: SHARYANTO
+
+         [BUG FIXES]
+
+         - Validate (to set default value) non-required arguments if their
+           schemas specify default values.
+
+
+0.04     2013-03-02  Released-By: SHARYANTO
+
+         [BUG FIXES]
+
+         - Don't validate non-required (req=>0) arguments if they are not
+           passed.
+
+
+0.03     2013-01-11  Released-By: SHARYANTO
+
+         - No functional changes.
+
+         [BUG FIXES]
+
+         - Make sure data_name is alphanum only (foo.contains -> foo_contains).
+
+         - Wrapping fixes (declare variables and require modules required by the
+           generated validator code).
+
+
+0.02     2012-11-06  Released-By: SHARYANTO
+
+         - Add # NO_VALIDATE_ARG(S?)
+
+         - Add notice about setting _perinci.sub.wrapper.validate_args => 0 if
+           validated arguments.
+
+         - Some fixes.
+
+
+0.01     2012-11-06  Released-By: SHARYANTO
+
+         - First release.

@@ -16,7 +16,7 @@ sub parse_package_variant_args {
   my $tokens = convert_string_tokens($raw_tokens);
 
   while(my $token = shift @$tokens) {
-    if ($token->[0] eq 'importing') {
+    if (ref $token and $token->[0] eq 'importing') {
       shift @$tokens if @$tokens && $tokens->[0][1] eq 'COMMA';
       my $next_token = shift @$tokens or last;
       if (!ref $next_token) {
@@ -49,11 +49,11 @@ sub parse_package_variant_args {
         }
       }
     }
-    elsif (!ref $token->[0] && $token->[1] eq 'WORD') {
+    elsif (ref $token && !ref $token->[0] && $token->[1] eq 'WORD') {
       shift @$tokens if @$tokens && $tokens->[0][1] eq 'COMMA';
       shift @$tokens if @$tokens;
     }
-    shift @$tokens if @$tokens && !ref $tokens->[0] && $tokens->[0][1] eq 'COMMA';
+    shift @$tokens if @$tokens && ref $tokens->[0] && $tokens->[0][1] eq 'COMMA';
   }
 }
 

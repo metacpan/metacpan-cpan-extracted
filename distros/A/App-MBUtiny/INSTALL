@@ -4,20 +4,3 @@ INSTALLATION INSTRUCTIONS
     make
     make test
     make install
-
-DIST CREATING
-
-    perl Makefile.PL
-    make
-    make test
-    make tardist
-    # perl -Ilib bin\mbutiny -d -c conf\mbutiny.conf test
-    # D:\Temp\p2e\perl2exe.exe -v -noopt bin\mbutiny
-
-CREATE NEW VERSION (FOR DEVELOPER ONLY)
-
-    * README             -- In documentation
-    * CHANGES            -- Result of command: localtime | gclip
-    * lib/App/MBUtiny.pm -- In documentation (VERSION) & in code $VERSION
-    * bin/mbutiny        -- In documentation (VERSION)
-    * sftp://abalama@web.sourceforge.net:22/home/project-web/app-mbutiny/htdocs

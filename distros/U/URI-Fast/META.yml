@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/sysread/URI-Fast/issues
   homepage: https://github.com/sysread/URI-Fast
   repository: https://github.com/sysread/URI-Fast.git
-version: '0.46'
+version: '0.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

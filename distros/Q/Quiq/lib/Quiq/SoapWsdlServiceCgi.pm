@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.148';
+our $VERSION = '1.149';
 
 use Pod::WSDL ();
 use SOAP::Transport::HTTP ();
@@ -217,7 +217,7 @@ sub run {
 
 =head1 VERSION
 
-1.148
+1.149
 
 =head1 AUTHOR
 

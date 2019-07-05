@@ -1,17 +1,22 @@
-@prefix test: <http://example.org/test-fixtures#> .
+@prefix test: <http://ontologi.es/doap-tests#> .
 @prefix deps: <http://ontologi.es/doap-deps#>.
 @prefix dc:   <http://purl.org/dc/terms/> .
 @prefix my:   <http://example.org/my-parameters#> .
+@prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
 
 
 <#test-list> a test:FixtureTable ;
     test:fixtures <#test1> . 
 
-<#test1> a test:Test ;
-    test:handler "Internal::Fixture::Simple"^^deps:CpanId ;
+<#test1> a test:AutomatedTest ;
     test:param_base <http://example.org/my-parameters#> ;
-    dc:identifier "multi_vocabs" ;
+    test:purpose "Echo a string"@en ;
+    test:test_script <http://example.org/simple#multi_vocabs> ;
     test:params [
         my:all "counter-clockwise dahut" ;
         <http://example.org/other-vocab#foo> 42 
         ] .
+
+<http://example.org/simple#multi_vocabs> a nfo:SoftwareItem ;
+    nfo:definesFunction "multi_vocabs" ;
+    deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .

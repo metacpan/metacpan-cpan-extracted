@@ -70,6 +70,7 @@
             "Net::FTP" : "0",
             "Net::Ping" : "0",
             "Parse::CPAN::Meta" : "0",
+            "Pod::Perldoc::ToMan" : "0",
             "Scalar::Util" : "0",
             "Socket" : "0",
             "Term::ReadKey" : "0",
@@ -92,6 +93,6 @@
          "url" : "https://github.com/andk/cpanpm"
       }
    },
-   "version" : "2.26",
+   "version" : "2.27",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

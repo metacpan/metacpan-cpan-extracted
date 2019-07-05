@@ -405,7 +405,8 @@ C<uri_encode> and C<uri_decode>.
 
 Traverses a data structure, escaping or unescaping I<defined> scalar values in
 place. Accepts a reference to be traversed. Any further parameters are passed
-unchanged to L</encode> or L</decode>.
+unchanged to L</encode> or L</decode>. Croaks if the input to escape/unescape
+is a non-reference value.
 
   my $obj = {
     foo => ['bar baz', 'bat%fnord'],

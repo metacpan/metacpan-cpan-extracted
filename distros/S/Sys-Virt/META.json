@@ -41,7 +41,7 @@
    "provides" : {
       "Sys::Virt" : {
          "file" : "lib/Sys/Virt.pm",
-         "version" : "v5.4.0"
+         "version" : "v5.5.0"
       },
       "Sys::Virt::Domain" : {
          "file" : "lib/Sys/Virt/Domain.pm"
@@ -66,6 +66,9 @@
       },
       "Sys::Virt::Network" : {
          "file" : "lib/Sys/Virt/Network.pm"
+      },
+      "Sys::Virt::NetworkPort" : {
+         "file" : "lib/Sys/Virt/NetworkPort.pm"
       },
       "Sys::Virt::NodeDevice" : {
          "file" : "lib/Sys/Virt/NodeDevice.pm"
@@ -94,6 +97,6 @@
       },
       "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
    },
-   "version" : "v5.4.0",
+   "version" : "v5.5.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

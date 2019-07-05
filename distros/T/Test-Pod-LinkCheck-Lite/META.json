@@ -1,0 +1,75 @@
+{
+   "abstract" : "Test POD links",
+   "author" : [
+      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Pod-LinkCheck-Lite",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Keywords" : "0",
+            "Carp" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "HTTP::Tiny" : "0",
+            "IPC::Cmd" : "0",
+            "Module::Load::Conditional" : "0",
+            "Pod::Perldoc" : "0",
+            "Pod::Simple" : "0",
+            "Pod::Simple::LinkSection" : "0",
+            "Pod::Simple::PullParser" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::Builder" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Pod::LinkCheck::Lite" : {
+         "file" : "lib/Test/Pod/LinkCheck/Lite.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite.git",
+         "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.03"
+}

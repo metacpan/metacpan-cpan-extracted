@@ -43,6 +43,7 @@ t/40croak.t
 t/41end.t
 t/42unresolved.t
 t/43failure.t
+t/44sub-attrs.t
 t/80await+try.t
 t/81memory-growth.t
 t/82devel-mat-dumper-helper.t

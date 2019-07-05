@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 use Carp ();
 use Scalar::Util ();
@@ -28,9 +28,14 @@ sub new {
 }
 
 sub sub()         { $_[0]{sub} }
-sub subname()     { $_[0]{subname}     ||= $_[0]->_build_subname }
-sub fullname()    { $_[0]{fullname}    ||= $_[0]->_build_fullname  }
-sub stashname()   { $_[0]{stashname}   ||= $_[0]->_build_stashname }
+sub subname()     { $_[0]->subinfo->[1] || '' }
+sub stashname()   { $_[0]->subinfo->[0] || '' }
+sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname, $_[0]->subname) : '' }
+sub subinfo()     {
+    return $_[0]{subinfo} if $_[0]{subinfo};
+    $_[0]{subinfo} = $_[0]->_build_subinfo
+}
+
 sub file()        { $_[0]{file}        ||= $_[0]->_build_file }
 sub line()        { $_[0]{line}        ||= $_[0]->_build_line }
 sub is_constant() { $_[0]{is_constant} ||= $_[0]->_build_is_constant }
@@ -40,10 +45,23 @@ sub is_method()   { $_[0]{is_method} }
 sub parameters()  { $_[0]{parameters} }
 sub returns()     { $_[0]{returns} }
 
-sub set_sub($)         { $_[0]{sub}         = $_[1]; $_[0] }
-sub set_subname($)     { $_[0]{subname}     = $_[1]; $_[0] }
-sub set_fullname($)    { $_[0]{fullname}    = $_[1]; $_[0] }
-sub set_stashname($)   { $_[0]{stashname}   = $_[1]; $_[0] }
+sub set_sub($)    {
+    $_[0]{sub} = $_[1];
+    $_[0]->subinfo; # rebuild subinfo
+    $_[0];
+}
+
+sub set_subname($)     { $_[0]{subinfo}[1]  = $_[1]; $_[0] }
+sub set_stashname($)   { $_[0]{subinfo}[0]  = $_[1]; $_[0] }
+sub set_fullname($)    {
+    $_[0]{subinfo} = $_[1] =~ m!^(.+)::([^:]+)$! ? [$1, $2] : [];
+    $_[0];
+}
+sub set_subinfo($)     {
+    $_[0]{subinfo} = @_ > 2 ? [ $_[1], $_[2] ] : $_[1];
+    $_[0];
+}
+
 sub set_file($)        { $_[0]{file}        = $_[1]; $_[0] }
 sub set_line($)        { $_[0]{line}        = $_[1]; $_[0] }
 sub set_is_constant($) { $_[0]{is_constant} = $_[1]; $_[0] }
@@ -63,9 +81,7 @@ sub set_returns($) {
     return $self
 }
 
-sub _build_subname()     { $_[0]->sub ? Sub::Identify::sub_name($_[0]->sub) : '' }
-sub _build_fullname()    { $_[0]->sub ? Sub::Identify::sub_fullname($_[0]->sub) : '' }
-sub _build_stashname()   { $_[0]->sub ? Sub::Identify::stash_name($_[0]->sub) : '' }
+sub _build_subinfo()     { $_[0]->sub ? [ Sub::Identify::get_code_info($_[0]->sub) ] : [] }
 sub _build_file()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[0] : '' }
 sub _build_line()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[1] : undef }
 sub _build_is_constant() { $_[0]->sub ? Sub::Identify::is_sub_constant($_[0]->sub) : undef }
@@ -75,8 +91,8 @@ sub _build_attribute()   { $_[0]->sub ? [ attributes::get($_[0]->sub) ] : undef 
 sub apply_subname($) {
     my ($self, $subname) = @_;
     _croak 'apply_subname requires subroutine reference' unless $self->sub;
-    Sub::Util::set_subname($subname, $self->sub);
     $self->set_subname($subname);
+    Sub::Util::set_subname($self->fullname, $self->sub);
     return $self;
 }
 
@@ -112,18 +128,41 @@ Sub::Meta - handle subroutine meta information
 
     use Sub::Meta;
 
-    sub hello { }
+    sub hello($) :mehtod { }
     my $meta = Sub::Meta->new(\&hello);
     $meta->subname; # => hello
-    $meta->apply_subname('world'); # rename subroutine name
 
-    # specify parameters types ( without validation )
+    $meta->sub;        # \&hello
+    $meta->subname;    # hello
+    $meta->fullname    # main::hello
+    $meta->stashname   # main
+    $meta->file        # path/to/file.pl
+    $meta->line        # 5
+    $meta->is_constant # !!0
+    $meta->prototype   # $
+    $meta->attribute   # ['method']
+    $meta->is_method   # undef
+    $meta->parameters  # undef
+    $meta->returns     # undef
+
+    # setter
+    $meta->set_subname('world');
+    $meta->subname; # world
+    $meta->fullname; # main::world
+
+    # apply to sub
+    $meta->apply_prototype('$@');
+    $meta->prototype; # $@
+    Sub::Util::prototype($meta->sub); # $@
+
+And you can hold meta information of parameter type and return type. See also L<Sub::Meta::Parameters> and L<Sub::Meta::Returns>.
+
     $meta->set_parameters( Sub::Meta::Parameters->new(args => [ { type => 'Str' }]) );
-    $meta->parameters->args; # => Sub::Meta::Param->new({ type => 'Str' })
+    $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
-    # specify returns types ( without validation )
     $meta->set_returns( Sub::Meta::Returns->new('Str') );
-    $meta->returns->scalar; # => 'Str'
+    $meta->returns->scalar; # 'Str'
+
 
 =head1 DESCRIPTION
 
@@ -131,96 +170,127 @@ C<Sub::Meta> provides methods to handle subroutine meta information. In addition
 
 =head1 METHODS
 
-=head2 Constructor
-
-=head3 new
+=head2 new
 
 Constructor of C<Sub::Meta>.
 
-=head2 Getter
+=head2 sub
 
-=head3 sub
+A subroutine reference.
 
-A subroutine reference
+=head2 set_sub
 
-=head3 subname
+Setter for subroutine reference.
+
+=head2 subname
 
 A subroutine name, e.g. C<hello>
 
-=head3 fullname
+=head2 set_subname($subname)
+
+Setter for subroutine name.
+
+    $meta->subname; # hello
+    $meta->set_subname('world');
+    $meta->subname; # world
+    Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
+
+=head2 apply_subname($subname)
+
+Sets subroutine name and apply to the subroutine reference.
+
+    $meta->subname; # hello
+    $meta->apply_subname('world');
+    $meta->subname; # world
+    Sub::Util::subname($meta->sub); # world
+
+=head2 fullname
 
 A subroutine full name, e.g. C<main::hello>
 
-=head3 stashname
+=head2 set_fullname($fullname)
+
+Setter for subroutine full name.
+
+=head2 stashname
 
 A subroutine stash name, e.g. C<main>
 
-=head3 file
+=head2 set_stashname($stashname)
+
+Setter for subroutine stash name.
+
+=head2 subinfo
+
+A subroutine information, e.g. C<['main', 'hello']>
+
+=head2 set_subinfo([$stashname, $subname])
+
+Setter for subroutine information.
+
+=head2 file
 
 A filename where subroutine is defined, e.g. C<path/to/main.pl>.
 
-=head3 line
+=head2 set_file($filepath)
 
-A line where the definition of subroutine started.
+Setter for C<file>.
 
-=head3 is_constant
+=head2 line
+
+A line where the definition of subroutine started, e.g. C<5>
+
+=head2 set_line($line)
+
+Setter for C<line>.
+
+=head2 is_constant
 
 A boolean value indicating whether the subroutine is a constant or not.
 
-=head3 prototype
+=head2 set_is_constant($bool)
 
-A prototype of subroutine reference.
+Setter for C<is_constant>.
 
-=head3 attribute
+=head2 prototype
 
-A attribute of subroutine reference.
+A prototype of subroutine reference, e.g. C<$@>
 
-=head3 is_method
+=head2 set_prototype($prototype)
+
+Setter for C<prototype>.
+
+=head2 apply_prototype($prototype)
+
+Sets subroutine prototype and apply to the subroutine reference.
+
+=head2 attribute
+
+A attribute of subroutine reference, e.g. C<undef>, C<['method']>
+
+=head2 set_attribute($attribute)
+
+Setter for C<attribute>.
+
+=head2 apply_attribute(@attribute)
+
+Sets subroutine attributes and apply to the subroutine reference.
+
+=head2 is_method
 
 A boolean value indicating whether the subroutine is a method or not.
 
-=head3 parameters
+=head2 set_is_method($bool)
+
+Setter for C<is_method>.
+
+=head2 parameters
 
 Parameters object of L<Sub::Meta::Parameters>.
 
-=head3 returns
+=head2 set_parameters($parameters)
 
-Returns object of L<Sub::Meta::Returns>.
-
-=head2 Setter
-
-You can set meta information of subroutine. C<set_xxx> sets C<xxx> and does not affect subroutine reference. On the other hands, C<apply_xxx> sets C<xxx> and apply C<xxx> to subroutine reference.
-
-Setter methods of C<Sub::Meta> returns meta object. So you can chain setting: 
-
-    $meta->set_subname('foo')
-         ->set_stashname('Some')
-
-=head3 set_xxx
-
-=head4 set_sub($)
-
-=head4 set_subname($)
-
-=head4 set_fullname($)
-
-=head4 set_stashname($)
-
-=head4 set_file($)
-
-=head4 set_line($)
-
-=head4 set_is_constant($)
-
-=head4 set_prototype($)
-
-=head4 set_attribute($)
-
-=head4 set_is_method($)
-
-=head4 set_parameters($)
-
-Sets the parameters object of L<Sub::Meta::Parameters> or any object:
+Sets the parameters object of L<Sub::Meta::Parameters> or any object which has C<positional>,C<named>,C<required> and C<optional> methods.
 
     my $meta = Sub::Meta->new;
     $meta->set_parameters({ type => 'Type'});
@@ -230,7 +300,11 @@ Sets the parameters object of L<Sub::Meta::Parameters> or any object:
     $meta->set_parameters(Sub::Meta::Parameters->new(type => 'Foo'));
     $meta->set_parameters(MyParamters->new)
 
-=head4 set_returns($)
+=head2 returns
+
+Returns object of L<Sub::Meta::Returns>.
+
+=head2 set_returns($returns)
 
 Sets the returns object of L<Sub::Meta::Returns> or any object.
 
@@ -242,15 +316,16 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
 
-=head3 apply_xxx
-
-=head4 apply_subname($)
-
-=head4 apply_prototype($)
-
-=head4 apply_attribute(@)
-
 =head1 NOTE
+
+=head2 setter
+
+You can set meta information of subroutine. C<set_xxx> sets C<xxx> and does not affect subroutine reference. On the other hands, C<apply_xxx> sets C<xxx> and apply C<xxx> to subroutine reference.
+
+Setter methods of C<Sub::Meta> returns meta object. So you can chain setting:
+
+    $meta->set_subname('foo')
+         ->set_stashname('Some')
 
 =head2 Pure-Perl version
 

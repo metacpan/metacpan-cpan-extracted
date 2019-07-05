@@ -193,6 +193,45 @@ The client ID or DUID
 
 =back
 
+=item @port = $net->list_all_ports($flags=0)
+
+List all ports associated with the network. The return array elements
+are instances of the C<Sys::Virt::NetworkPort> class.
+
+=item $port = $net->create_port($xml, $flags=0)
+
+Create a new network port from the given C<$xml> description. The C<$flags>
+parameter can optionally taken one or more of the network port creation
+constants. The returned C<$port> object is an instance of the
+C<Sys::Virt::NetworkPort> class.
+
+=cut
+
+sub create_port {
+    my $self = shift;
+    my $xml = shift;
+    my $flags = shift || 0;
+
+    return Sys::Virt::NetworkPort->_new(net => $self, xml => $xml, flags => $flags);
+}
+
+
+=item $port = $net->get_port_by_uuid($uuid);
+
+Lookup a network port from a raw or printable UUID.
+The returned C<$port> object is an instance of the C<Sys::Virt::NetworkPort>
+class.
+
+=cut
+
+sub get_port_by_uuid {
+    my $self = shift;
+    my $uuid = shift;
+
+    return Sys::Virt::NetworkPort->_new(net => $self, uuid => $uuid);
+}
+
+
 =back
 
 =head1 CONSTANTS

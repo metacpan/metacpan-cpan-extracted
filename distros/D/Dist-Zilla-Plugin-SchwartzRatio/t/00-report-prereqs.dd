@@ -31,7 +31,6 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'List::Lazy' => '0',
                                    'Test::DZil' => '0',
                                    'Test::Deep' => '0',
                                    'Test::MockObject' => '0',

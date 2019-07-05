@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.516   2019-07-04
+        - Use constants LINE_FEED/CARRIAGE_RETURN.
+        - The construcor 'new' can now take options.
+
 0.515   2019-07-02
         - "hide_cursor": 3 allowed values.
 

@@ -33,7 +33,7 @@ sub __parse_file_Text_CSV { # 0
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $ax->print_sql( $sql, $waiting );
     seek $fh, 0, 0;
     my $rows_of_cols = [];
@@ -98,7 +98,7 @@ sub __parse_file_split { # 1
 
 sub __parse_file_Spreadsheet_Read { # 2
     my ( $sf, $sql, $file_ec, $book ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );

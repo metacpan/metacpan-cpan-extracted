@@ -1,7 +1,7 @@
 package XML::XPathScript;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: a Perl framework for XML stylesheets
-$XML::XPathScript::VERSION = '1.55';
+$XML::XPathScript::VERSION = '2.00';
 use strict;
 use warnings;
 use Carp;
@@ -748,7 +748,7 @@ XML::XPathScript - a Perl framework for XML stylesheets
 
 =head1 VERSION
 
-version 1.55
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -1209,7 +1209,7 @@ Matt Sergeant <matt@sergeant.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+This software is copyright (c) 2019, 2018, 2008, 2007 by Matt Sergeant.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

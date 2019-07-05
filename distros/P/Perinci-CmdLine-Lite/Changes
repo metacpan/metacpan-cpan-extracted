@@ -1,4 +1,25 @@
-1.822   2019-06-26 (PERLANCAR)
+1.824   2019-07-04  Released-By: PERLANCAR; Urgency: low
+
+	- [experimental] Use pre-compiled validator code in
+	  Sah::SchemaV::*.
+
+
+1.823   2019-07-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe function feature 'validate_args' and skip validating args
+	  if function states that it can validate args.
+
+	- [ux][completion] Show message when trying to complete
+	  --config-profile but no config is read.
+
+	- [ux][completion] Show message when trying to complete not from
+	  cmdline.
+
+	- [Rinci] Remove usage of the deprecated x.schema.element_entity
+	  attribute, use schema instead.
+
+
+1.822   2019-06-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,21 +27,21 @@
 	  Perinci::Sub::Complete=0.935.
 
 
-1.821   2019-06-25 (PERLANCAR)
+1.821   2019-06-25  Released-By: PERLANCAR
 
 	- [ux] Show summaries when completing subcommands (via
 	  Complete::Util 0.601) and option names (via
 	  Perinci::Sub::Complete 0.934).
 
 
-1.820   2019-06-20 (PERLANCAR)
+1.820   2019-06-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update dep: Perinci::Sub::GetArgs::Argv=0.842.
 
 
-1.819   2019-06-02 (PERLANCAR)
+1.819   2019-06-02  Released-By: PERLANCAR
 
 	- Introduce cmdline.resut.interactive and
 	  cmdline.result.noninteractive.
@@ -32,33 +53,33 @@
 	  in the future).
 
 
-1.818   2019-05-24 (PERLANCAR)
+1.818   2019-05-24  Released-By: PERLANCAR
 
 	- Get result's schema in resmeta's schema (Rinci 1.1.90) before
 	  function metadata result property.
 
 
-1.817   2019-01-14 (PERLANCAR)
+1.817   2019-01-14  Released-By: PERLANCAR
 
 	- Remove --format, --json, --naked-res when function metadata
 	  specifies cmdline.skip_format => 1.
 
 
-1.816   2018-11-22 (PERLANCAR)
+1.816   2018-11-22  Released-By: PERLANCAR
 
 	- [ux] Dump %main::SPEC to x.main.spec.
 
 	- Avoid duplicate config file reading.
 
 
-1.815   2018-07-16 (PERLANCAR)
+1.815   2018-07-16  Released-By: PERLANCAR
 
 	- Invoke hook_before_parse_argv() in do_completion() and do_dump()
 	  so command-line options that might be introduced in this hook are
 	  also recognized.
 
 
-1.814   2018-06-14 (PERLANCAR)
+1.814   2018-06-14  Released-By: PERLANCAR
 
 	- [ux] When response status is not between 200 and 555 (e.g. when
 	  we use HTTP::Tiny's HTTP response status 599 Internal Exception
@@ -67,14 +88,14 @@
 	  meta's x.orig_status.
 
 
-1.813   2018-05-29 (PERLANCAR)
+1.813   2018-05-29  Released-By: PERLANCAR
 
 	- [Bugfix] To check whether script uses -P, -c, -C we need to get
 	  meta first and this is only possible in script without
 	  subcommand.
 
 
-1.812   2018-05-01 (PERLANCAR)
+1.812   2018-05-01  Released-By: PERLANCAR
 
         - [ux] Add shortcut options when there is no conflict: -P for
 	  --config-profile, -c for --config-path, -C for --no-config.
@@ -86,37 +107,37 @@
 	- [doc] Format/sort POD sections, document PERINCI_CMDLINE_DUMP.
 
 
-1.811   2018-03-05 (PERLANCAR)
+1.811   2018-03-05  Released-By: PERLANCAR
 
 	- Introduce new hook_config_file_section.
 
 	- [doc] Remove documentation of old attribute.
 
 
-1.810   2017-12-11 (PERLANCAR)
+1.810   2017-12-11  Released-By: PERLANCAR
 
         - [Experimental] Observe PERINCI_CMDLINE_OUTPUT_DIR to save program
           output to a JSON file.
 
 
-1.80    2017-11-01 (PERLANCAR)
+1.80    2017-11-01  Released-By: PERLANCAR
 
 	- [Bugfix] Wrap stream arguments as iterator.
 
 	- [Bugfix] Make sure we turn off result stream when self-dumping.
 
 
-1.79    2017-08-09 (PERLANCAR)
+1.79    2017-08-09  Released-By: PERLANCAR
 
 	- Lite: Support format 'perl'.
 
 
-1.78    2017-08-04 (PERLANCAR)
+1.78    2017-08-04  Released-By: PERLANCAR
 
 	- Second attempt to switch from JSON to JSON::MaybeXS.
 
 
-1.77    2017-07-22 (PERLANCAR)
+1.77    2017-07-22  Released-By: PERLANCAR
 
 	- [ux] Add -n as a shortcut for common option --dry-run when there
 	  is no conflict.
@@ -128,36 +149,36 @@
 	- [doc] Update: per_arg_yaml actually defaults to off for Lite.
 
 
-1.76    2017-07-14 (PERLANCAR)
+1.76    2017-07-14  Released-By: PERLANCAR
 
          - No functional changes since last dev release.
 
 
-1.75_001 2017-07-12 (PERLANCAR)
+1.75_001 2017-07-12  Released-By: PERLANCAR
 
 	- Use Log::ger::App, move up logger initialization code from Lite
 	  to Base.
 
 
-1.75     2017-06-28 (PERLANCAR)
+1.75     2017-06-28  Released-By: PERLANCAR
 
          - No functional changes since last dev release.
 
 
-1.74_004 2017-06-21 (PERLANCAR)
+1.74_004 2017-06-21  Released-By: PERLANCAR
 
         - Remove Log::Any support. To show logs from Log::Any, install
           Log::Any::Adapter::LogGer and run CLI scripts with
           PERL5OPT=-MLog::Any::Adapter=LogGer.
 
 
-1.74_003 2017-06-19 (PERLANCAR)
+1.74_003 2017-06-19  Released-By: PERLANCAR
 
         - Really replace Log::Any with Log::ger, previous couple of commits were
           screwed up.
 
 
-1.74_002 2017-06-19 (PERLANCAR)
+1.74_002 2017-06-19  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -167,7 +188,7 @@
         - UPDATE: this release was broken.
 
 
-1.74_001 2017-06-19 (PERLANCAR)
+1.74_001 2017-06-19  Released-By: PERLANCAR
 
 	- [Experimental] Switch from Log::Any to Log::ger. Log::ger provides
           smaller startup overhead and will allow us to change levels during
@@ -178,23 +199,23 @@
         - UPDATE: this release was broken.
 
 
-1.74    2017-06-17 (PERLANCAR)
+1.74    2017-06-17  Released-By: PERLANCAR
 
 	- [Bugfix] Don't check deps when in completion/dump mode.
 
 
-1.73    2017-06-17 (PERLANCAR)
+1.73    2017-06-17  Released-By: PERLANCAR
 
         - Support cooperative dump mode to help Perinci::CmdLine::Dump create a
           more proper dump.
 
 
-1.72    2017-01-16 (PERLANCAR)
+1.72    2017-01-16  Released-By: PERLANCAR
 
         - Add attribute: use_cleanser to allow skipping data cleansing.
 
 
-1.71    2017-01-13 (PERLANCAR)
+1.71    2017-01-13  Released-By: PERLANCAR
 
 	- [dist] Bump prereq versions Test::Perinci::CmdLine=1.47 &
 	  Perinci::CmdLine::Util::Config=1.71 (to force upgrade of
@@ -204,7 +225,7 @@
 	  digit (so: 2plural -> _2PLURAL_OPT).
 
 
-1.70    2017-01-10 (PERLANCAR)
+1.70    2017-01-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -213,7 +234,7 @@
 	  scripts).
 
 
-1.69    2017-01-04 (PERLANCAR)
+1.69    2017-01-04  Released-By: PERLANCAR
 
 	- [dist] Split Perinci::CmdLine::Util::Config to its own dist so it
 	  can be depended by Perinci::CmdLine::Inline-generated scripts
@@ -225,7 +246,7 @@
 	  override VIEW_RESULT & FORMAT_PRETTY_TABLE_BACKEND.
 
 
-1.68    2016-12-29 (PERLANCAR)
+1.68    2016-12-29  Released-By: PERLANCAR
 
 	[ENHANCEMENTS]
 
@@ -244,20 +265,20 @@
 	- Observe PAGE_RESULT to force paging or explicitly disable paging.
 
 
-1.67    2016-12-17 (PERLANCAR)
+1.67    2016-12-17  Released-By: PERLANCAR
 
 	- [ux] Add attribute: auto_abbrev_subcommand (default true) to
 	  automatically complete subcommand name if given an unambiguous
 	  abbreviation, like auto_abbrev behavior in Getopt::Long.
 
 
-1.66    2016-12-15 (PERLANCAR)
+1.66    2016-12-15  Released-By: PERLANCAR
 
         - Observe default=>1 in 'dry_run' feature property in Rinci function
           metadata (Rinci 1.1.83).
 
 
-1.65    2016-12-15 (PERLANCAR)
+1.65    2016-12-15  Released-By: PERLANCAR
 
 	- [Enhancement] Add default_dry_run attribute to allow a script to be in
           dry-run mode by default.
@@ -270,17 +291,17 @@
           --arg k1=v1 --arg k2=v2 ...).
 
 
-1.64    2016-12-02 (PERLANCAR)
+1.64    2016-12-02  Released-By: PERLANCAR
 
 	- Set Getopt::Long configuration gnu_compat.
 
 
-1.63    2016-10-27 (PERLANCAR)
+1.63    2016-10-27  Released-By: PERLANCAR
 
 	- Add attribute: default_format.
 
 
-1.62    2016-10-26 (PERLANCAR)
+1.62    2016-10-26  Released-By: PERLANCAR
 
         - Adjust with new version of Complete::{Fish,Zsh} which have their
           parse_cmdline() routine removed.
@@ -288,12 +309,12 @@
         - Avoid perl undef warning (for older perl, e.g. 5.10).
 
 
-1.61    2016-09-28 (PERLANCAR)
+1.61    2016-09-28  Released-By: PERLANCAR
 
 	- Also clean stream record before encoding to JSON.
 
 
-1.60    2016-09-25 (PERLANCAR)
+1.60    2016-09-25  Released-By: PERLANCAR
 
 	- Revert from JSON::MaybeXS to JSON because JSON::MaybeXS is not
 	  depakable ATM (hard dependency to Cpanel::JSON::XS).
@@ -305,19 +326,19 @@
 	  -orig_ARGNAME special arguments.
 
 
-1.59    2016-08-30 (PERLANCAR)
+1.59    2016-08-30  Released-By: PERLANCAR
 
         - [Bugfix] Forgot to add no_getopt_compat Getopt::Long option (we don't
           want to use + to start option e.g. for +h, +help).
 
 
-1.58    2016-08-18 (PERLANCAR)
+1.58    2016-08-18  Released-By: PERLANCAR
 
 	- [Bugfix][Regression] When section is not specified in
 	  'config_filenames', include all sections from that config file.
 
 
-1.57    2016-08-03 (PERLANCAR)
+1.57    2016-08-03  Released-By: PERLANCAR
 
         - The 'config_filename' attribute can now be an array of hash instead of
           just array of strings. Each hash can contain these keys: 'filename',
@@ -338,7 +359,7 @@
           will be assumed to be a section name.
 
 
-1.56    2016-07-20 (PERLANCAR)
+1.56    2016-07-20  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -347,12 +368,12 @@
           Perinci::Sub::GetArgs::Argv to 0.72.
 
 
-1.55    2016-05-20 (PERLANCAR)
+1.55    2016-05-20  Released-By: PERLANCAR
 
 	- Replace Perinci::Sub::CoerceArgs with Data::Sah 0.76+ coercion.
 
 
-1.54    2016-05-09 (PERLANCAR)
+1.54    2016-05-09  Released-By: PERLANCAR
 
         - Properly complete Unicode filenames. This include converting
           command-line arguments from octets into Unicode strings (though this
@@ -363,7 +384,7 @@
         - [Internal] Move up attribute 'use_utf8' from PC:Lite to PC:Base.
 
 
-1.53    2016-04-04 (PERLANCAR)
+1.53    2016-04-04  Released-By: PERLANCAR
 
 	- [ux] For argument with cmdline_src=stdin_or_args, only get from
 	  stdin when stdin is piped, otherwise sometimes user gets confused
@@ -371,19 +392,19 @@
 	  specified.
 
 
-1.52    2016-03-16 (PERLANCAR)
+1.52    2016-03-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-1.51    2016-02-26 (PERLANCAR)
+1.51    2016-02-26  Released-By: PERLANCAR
 
 	- Implement cmdline_src=stdin_or_args (Rinci 1.1.79).
 
 
-1.50    2016-02-04 (PERLANCAR)
+1.50    2016-02-04  Released-By: PERLANCAR
 
 	- [Bugfix] When streaming input (argument) has schema=array, use
 	  its 'of' clause subschema.
@@ -395,7 +416,7 @@
 	  specified in ARGV, parse_argv() will skip directly to --help.
 
 
-1.49    2016-01-23 (PERLANCAR)
+1.49    2016-01-23  Released-By: PERLANCAR
 
 	- Allow filtering config section with env=...
 
@@ -403,7 +424,7 @@
 	  they are seen in the files.
 
 
-1.48    2016-01-22 (PERLANCAR)
+1.48    2016-01-22  Released-By: PERLANCAR
 
 	- Bump prereq version Test::Perinci::CmdLine to 1.37.
 
@@ -411,13 +432,13 @@
 	  streaming input record).
 
 
-1.47    2016-01-22 (PERLANCAR)
+1.47    2016-01-22  Released-By: PERLANCAR
 
         - Chomp streaming input record, unless type is 'buf'. Adjust to
           Test::Perinci::CmdLine 1.36.
 
 
-1.46    2016-01-21 (PERLANCAR)
+1.46    2016-01-21  Released-By: PERLANCAR
 
 	- Update to Test::Perinci::CmdLine 1.33.
 
@@ -426,17 +447,17 @@
 	- Add use_utf8 to Lite, just like in Classic.
 
 
-1.45    2016-01-14 (PERLANCAR) (unreleased)
+1.45    2016-01-14  Released-By: PERLANCAR
 
 	- [Lite] Add attribute 'use_utf8' just like in Classic.
 
 
-1.44    2016-01-07 (PERLANCAR)
+1.44    2016-01-07  Released-By: PERLANCAR
 
 	- Allow multiple config_filename.
 
 
-1.43    2015-12-30 (PERLANCAR)
+1.43    2015-12-30  Released-By: PERLANCAR
 
 	- Use Complete::Bash 0.23's new option truncate_current_word, like
 	  in Getopt::Long::Complete and Getopt::Long::Subcommand.
@@ -444,7 +465,7 @@
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-1.42    2015-12-02 (PERLANCAR)
+1.42    2015-12-02  Released-By: PERLANCAR
 
         - Adopt a new syntax for specifying configuration for subcommand.
           Previously to specify configuration for a subcommand, you use
@@ -459,31 +480,31 @@
           in the future.
 
 
-1.41    2015-11-29 (PERLANCAR)
+1.41    2015-11-29  Released-By: PERLANCAR
 
 	- [Experimental] Detect 'td' (see App::td) at the right side of
 	  pipeline and set default output format to json.
 
 
-1.40    2015-11-27 (PERLANCAR)
+1.40    2015-11-27  Released-By: PERLANCAR
 
 	- On error, don't display result as stream but show format &
 	  display error message instead.
 
 
-1.39    2015-11-21 (PERLANCAR)
+1.39    2015-11-21  Released-By: PERLANCAR
 
 	- Adjust to Perinci::Result::Format::Lite 0.07 (CSV support).
 
 
-1.38    2015-11-17 (PERLANCAR)
+1.38    2015-11-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Bump prereq version Test::Perinci::CmdLine to 1.27 [CT].
 
 
-1.37    2015-11-11 (PERLANCAR)
+1.37    2015-11-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -493,7 +514,7 @@
 	  in Perinci::CmdLine::Manual).
 
 
-1.36    2015-10-20 (PERLANCAR)
+1.36    2015-10-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -504,7 +525,7 @@
 	  module is more convenient when used in fatpacking/datapacking).
 
 
-1.35    2015-10-03 (PERLANCAR)
+1.35    2015-10-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -512,26 +533,26 @@
 	  App::depak).
 
 
-1.34    2015-09-29 (PERLANCAR)
+1.34    2015-09-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - Adjust to Test::Perinci::CmdLine 1.25.
 
 
-1.33    2015-09-29 (PERLANCAR)
+1.33    2015-09-29  Released-By: PERLANCAR
 
 	- Workaround for Perinci::CmdLine::Classic.
 
 
-1.32    2015-09-18 (PERLANCAR)
+1.32    2015-09-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Move manual to Perinci-CmdLine.
 
 
-1.31    2015-09-17 (PERLANCAR)
+1.31    2015-09-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -539,18 +560,18 @@
 	  computed during object construction?).
 
 
-1.30    2015-09-15 (PERLANCAR)
+1.30    2015-09-15  Released-By: PERLANCAR
 
 	- [ux] Prefix error message with program name.
 
 
-1.29    2015-09-11 (PERLANCAR)
+1.29    2015-09-11  Released-By: PERLANCAR
 
 	- Extract result formatting functionality to
 	  Perinci-Result-Format-Lite.
 
 
-1.28    2015-09-06 (PERLANCAR)
+1.28    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -559,23 +580,23 @@
 	  requirement.
 
 
-1.27    2015-08-17 (PERLANCAR)
+1.27    2015-08-17  Released-By: PERLANCAR
 
 	- [ux] Since we are moving to Log::Any::IfLOG for most, add note
 	  about having to enable logging using env LOG=1 etc.
 
 
-1.26    2015-08-09 (PERLANCAR)
+1.26    2015-08-09  Released-By: PERLANCAR
 
 	- [Bugfix] Add missing newline in error message.
 
 
-1.25    2015-08-09 (PERLANCAR)
+1.25    2015-08-09  Released-By: PERLANCAR
 
 	- [ux] Show error message even under skip_format=>1.
 
 
-1.24    2015-07-28 (PERLANCAR)
+1.24    2015-07-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -583,7 +604,7 @@
 	  post.
 
 
-1.23    2015-07-28 (PERLANCAR)
+1.23    2015-07-28  Released-By: PERLANCAR
 
 	- [ux] Give suggestion for similar subcommand/option names in error
 	  message when user types unknown subcommand name or common option.
@@ -600,29 +621,29 @@
 	- [pod] Fix formatting (need whitespace after C<< >>).
 
 
-1.22    2015-07-15 (PERLANCAR)
+1.22    2015-07-15  Released-By: PERLANCAR
 
 	- Show dynamic generator modules' (x.dynamic_generator_modules)
 	  version in --version.
 
 
-1.21    2015-07-08 (PERLANCAR)
+1.21    2015-07-08  Released-By: PERLANCAR
 
 	- Add attribute: skip_format.
 
 
-1.20    2015-07-07 (PERLANCAR)
+1.20    2015-07-07  Released-By: PERLANCAR
 
 	- [Bugfix] In help, get meta first so if function has dry_run
 	  feature, we can show the option.
 
 
-1.19    2015-07-06 (PERLANCAR)
+1.19    2015-07-06  Released-By: PERLANCAR
 
 	- Fix newlines in -v output.
 
 
-1.18    2015-07-06 (PERLANCAR)
+1.18    2015-07-06  Released-By: PERLANCAR
 
 	- Observe Rinci function metadata attribute cmdline.skip_format (in
 	  addition to result metadata attribute).
@@ -631,12 +652,12 @@
 	  module: x.perinci.cmdline._skip_format -> cmdline.skip_format.
 
 
-1.17    2015-06-30 (PERLANCAR)
+1.17    2015-06-30  Released-By: PERLANCAR
 
 	- Add extra_urls_for_version attribute.
 
 
-1.16    2015-06-19 (PERLANCAR)
+1.16    2015-06-19  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -644,7 +665,7 @@
 	  Log::Any::Adapter::{ScreenColoredLevel,Screen}.
 
 
-1.15    2015-06-19 (PERLANCAR)
+1.15    2015-06-19  Released-By: PERLANCAR
 
 	- Add FAQ items about debugging (show log messages, show stack
 	  trace).
@@ -653,7 +674,7 @@
 	  error message.
 
 
-1.14    2015-06-11 (PERLANCAR)
+1.14    2015-06-11  Released-By: PERLANCAR
 
 	- Split Test::Perinci::CmdLine to its own dist (to be modified to
           support Perinci::CmdLine::Inline as well).
@@ -661,41 +682,41 @@
         - Replace tests with test suite from Test::Perinci::CmdLine.
 
 
-1.13    2015-05-06 (PERLANCAR)
+1.13    2015-05-06  Released-By: PERLANCAR
 
 	- Check args_rels property.
 
 
-1.12    2015-04-25 (PERLANCAR)
+1.12    2015-04-25  Released-By: PERLANCAR
 
 	- [ux] --json will default to json-pretty when in interactive mode,
 	  but compact when non-interactive.
 
 
-1.11    2015-04-25 (PERLANCAR)
+1.11    2015-04-25  Released-By: PERLANCAR
 
 	- Add attribute: validate_args to allow disabling args validation.
 
 
-1.10    2015-04-12 (PERLANCAR)
+1.10    2015-04-12  Released-By: PERLANCAR
 
 	- [Bugfix] Respect table_column_orders for table in simple-text
 	  format.
 
 
-1.09    2015-04-12 (PERLANCAR)
+1.09    2015-04-12  Released-By: PERLANCAR
 
 	- [Bugfix] Regression since 1.02 (the addition of coercing):
 	  required argument was not checked because of variable reuse.
 
 
-1.08    2015-04-11 (PERLANCAR)
+1.08    2015-04-11  Released-By: PERLANCAR
 
 	- Add common option: --no-env to prevent reading env for default
 	  options.
 
 
-1.07    2015-04-11 (PERLANCAR)
+1.07    2015-04-11  Released-By: PERLANCAR
 
 	- [Bugfix] regex for checking config section names was too strict.
 
@@ -704,7 +725,7 @@
 	  producing completion for int arg and str arg + in clause.
 
 
-1.06    2015-04-09 (PERLANCAR)
+1.06    2015-04-09  Released-By: PERLANCAR
 
         [ENHANCEMENTS]
 
@@ -722,7 +743,7 @@
           their nature.
 
 
-1.05    2015-04-07 (PERLANCAR)
+1.05    2015-04-07  Released-By: PERLANCAR
 
         - Configuration can now set some common options like log_level, format,
           and naked_res (any option that is specified as is_settable_via_config
@@ -741,14 +762,14 @@
           well as POD/manpage) looks nicer and more scannable/skimmable.
 
 
-1.04    2015-04-02 (PERLANCAR)
+1.04    2015-04-02  Released-By: PERLANCAR
 
 	- [Bugfix] Fix/tweak config reading, when running subcommand
 	  [profile=PROFILE] section is also read in addition to [SUBCMD
 	  profile=PROFILE] section.
 
 
-1.03    2015-04-01 (PERLANCAR)
+1.03    2015-04-01  Released-By: PERLANCAR
 
 	- Add hook: after_read_config_file.
 
@@ -757,31 +778,31 @@
 	- New Complete::Bash no longer has 3rd parameter (word_breaks).
 
 
-1.02    2015-03-30 (PERLANCAR)
+1.02    2015-03-30  Released-By: PERLANCAR
 
 	- Add argument coercing (Perinci::Sub::CoerceArgs).
 
 
-1.01    2015-03-26 (PERLANCAR)
+1.01    2015-03-26  Released-By: PERLANCAR
 
 	- Put cleanser as an attribute to allow it be configurable.
 
 
-1.00    2015-03-24 (PERLANCAR)
+1.00    2015-03-24  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [opt] Shave +- 2-3ms startup time by avoiding experimental+Carp.
 
 
-0.99    2015-03-22 (PERLANCAR)
+0.99    2015-03-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add more attractive Synopsis, link to tutorial blog series.
 
 
-0.98    2015-03-20 (PERLANCAR)
+0.98    2015-03-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -791,12 +812,12 @@
 	- [opt] Replace Log::Any if Log::Any::IfLOG.
 
 
-0.97    2015-03-19 (PERLANCAR)
+0.97    2015-03-19  Released-By: PERLANCAR
 
 	- Set naked_res & format from common option's default.
 
 
-0.96    2015-03-18 (PERLANCAR)
+0.96    2015-03-18  Released-By: PERLANCAR
 
         - Support cmdline_src=stdin_or_file (Rinci 1.1.74).
 
@@ -806,13 +827,13 @@
           same for when cmdline_src=stdin_or_file.
 
 
-0.95    2015-03-18 (PERLANCAR)
+0.95    2015-03-18  Released-By: PERLANCAR
 
 	- Provide special arguments -cmdline_srcfilenames_ARG for arguments
 	  with cmdline_src=stdin_or_files.
 
 
-0.94    2015-03-18 (PERLANCAR)
+0.94    2015-03-18  Released-By: PERLANCAR
 
 	- Allow --no-naked-res.
 
@@ -820,12 +841,12 @@
 	  structure.
 
 
-0.93    2015-03-17 (PERLANCAR)
+0.93    2015-03-17  Released-By: PERLANCAR
 
 	- [Bugfix] dry_run hasn't been passed to function yet.
 
 
-0.92    2015-03-10 (PERLANCAR)
+0.92    2015-03-10  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename result metadata key
 	  'result_format_options' to 'format_options' (also, try to look
@@ -838,35 +859,35 @@
 	  status).
 
 
-0.91    2015-03-07 (PERLANCAR)
+0.91    2015-03-07  Released-By: PERLANCAR
 
 	- Add option to normalize metadata in get_args_from_config(), for
 	  lcpanm.
 
 
-0.90    2015-03-07 (PERLANCAR)
+0.90    2015-03-07  Released-By: PERLANCAR
 
         - Check dependencies before run ('deps' property).
 
 
-0.89    2015-03-05 (PERLANCAR)
+0.89    2015-03-05  Released-By: PERLANCAR
 
 	- [Bugfix] Environment PROG_OPT should be read and added to ARGV
 	  after _parse_argv1 (after we extract subcommand name).
 
 
-0.88    2015-02-27 (PERLANCAR)
+0.88    2015-02-27  Released-By: PERLANCAR
 
 	- Search $HOME/.config before $HOME for config files.
 
 
-0.87    2015-02-26 (PERLANCAR)
+0.87    2015-02-26  Released-By: PERLANCAR
 
 	- [Bugfix] Pass subcommands hash to Perinci::CmdLine::Help even
 	  though subcommands list is dynamic (coderef).
 
 
-0.86    2015-02-24 (PERLANCAR)
+0.86    2015-02-24  Released-By: PERLANCAR
 
         - [ux] Reorder columns in table output according to result metadata's
           result_format_options->table_column_orders, result metadata's
@@ -875,13 +896,13 @@
         - [ux] Tweak formatting of table with header row.
 
 
-0.85    2015-02-21 (PERLANCAR)
+0.85    2015-02-21  Released-By: PERLANCAR
 
         - [Bugfix] Assume all 2xx (not just 200) as well as 304 as success (exit
           code 0).
 
 
-0.84    2015-02-06 (PERLANCAR)
+0.84    2015-02-06  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -889,7 +910,7 @@
           in the documentation.
 
 
-0.83    2015-01-28 (PERLANCAR)
+0.83    2015-01-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -898,13 +919,13 @@
 	  Perinci::CmdLine.
 
 
-0.82    2015-01-22 (PERLANCAR)
+0.82    2015-01-22  Released-By: PERLANCAR
 
 	- Add progress bar feature to Perinci::CmdLine::Lite, like in
 	  Perinci::CmdLine.
 
 
-0.81    2015-01-20 (PERLANCAR)
+0.81    2015-01-20  Released-By: PERLANCAR
 
         - Add JSON stream (input, output) support. Currently this is only
           minimally documented. Basically, if argument type is non-simple, then
@@ -914,7 +935,7 @@
           every record will be encoded to JSON to produce JSON stream.
 
 
-0.80    2015-01-17 (PERLANCAR)
+0.80    2015-01-17  Released-By: PERLANCAR
 
         - Support Rinci 1.1.71, where streaming input & output uses coderef
           only.
@@ -927,13 +948,13 @@
           FAQ to Examples. Add examples for result streaming. Update examples.
 
 
-0.79    2015-01-15 (PERLANCAR)
+0.79    2015-01-15  Released-By: PERLANCAR
 
 	- Fixes in help message (program summary from meta was not
 	  displayed, show subcommands, passed wrong variable).
 
 
-0.78    2015-01-14 (PERLANCAR)
+0.78    2015-01-14  Released-By: PERLANCAR
 
 	- Refactor config reading routine to
 	  Perinci::CmdLine::Util::Config, change 'read_config_file' request
@@ -941,27 +962,27 @@
 	  the whole config.
 
 
-0.77    2015-01-10 (PERLANCAR)
+0.77    2015-01-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add logging messages.
 
 
-0.76    2015-01-09 (PERLANCAR)
+0.76    2015-01-09  Released-By: PERLANCAR
 
 	- [Bugfix] Fix completing positional function arguments when there
 	  are subcommands.
 
 
-0.75    2015-01-09 (PERLANCAR)
+0.75    2015-01-09  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Some fixes.
 
 
-0.74    2015-01-09 (PERLANCAR)
+0.74    2015-01-09  Released-By: PERLANCAR
 
 	[ENHANCEMENTS]
 
@@ -987,36 +1008,36 @@
         - Add section 'Program Flow' and 'Configuration File'.
 
 
-0.73    2015-01-04 (PERLANCAR)
+0.73    2015-01-04  Released-By: PERLANCAR
 
 	- Re-add support for fish and zsh.
 
 
-0.72    2014-12-29 (PERLANCAR)
+0.72    2014-12-29  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.14 which contains workaround for the
 	  annoyance of completing word containing ':' in bash.
 
 
-0.71    2014-12-23 (PERLANCAR)
+0.71    2014-12-23  Released-By: PERLANCAR
 
 	- Split help message generating functionality to
 	  Perinci-CmdLine-Help so it's usable too by App-riap.
 
 
-0.70    2014-12-20 (PERLANCAR)
+0.70    2014-12-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to periscomp 0.68+.
 
 
-0.69    2014-12-19 (PERLANCAR)
+0.69    2014-12-19  Released-By: PERLANCAR
 
         - Add completion for --config-profile.
 
 
-0.68    2014-12-19 (PERLANCAR)
+0.68    2014-12-19  Released-By: PERLANCAR
 
         - [Bugfix] Assigned to wrong 'args' variable so -cmdline was not passed
           even though user had specified -pass_cmdline_object.
@@ -1025,19 +1046,19 @@
           ::Lite to ::Base to reduce code duplication.
 
 
-0.67    2014-12-18 (PERLANCAR)
+0.67    2014-12-18  Released-By: PERLANCAR
 
 	- Fix proper location of config dir on Windows
 
         - HOME gets a priority over /etc.
 
 
-0.66    2014-12-18 (PERLANCAR)
+0.66    2014-12-18  Released-By: PERLANCAR
 
 	- Use HOMEPATH instead of HOME on Windows for default config_dirs.
 
 
-0.65    2014-12-18 (PERLANCAR)
+0.65    2014-12-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -1045,32 +1066,32 @@
 	  Windows.
 
 
-0.64    2014-12-18 (PERLANCAR)
+0.64    2014-12-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dzil] Make Complete::* modules prereq on Unix only for now.
 
 
-0.63    2014-12-15 (PERLANCAR)
+0.63    2014-12-15  Released-By: PERLANCAR
 
 	- [ux] Don't show aos as table, because the border is often
 	  annoying, what most people want is a simple 1-element-per-line.
 
 
-0.62    2014-12-13 (PERLANCAR)
+0.62    2014-12-13  Released-By: PERLANCAR
 
 	- Avoid running phase 1 of parse_argv() twice if parse_argv() happens to
           be called after _parse_argv1() (for example, inside custom completion
           which wants to call parse_argv() to get command-line arguments).
 
 
-0.61    2014-12-13 (PERLANCAR)
+0.61    2014-12-13  Released-By: PERLANCAR
 
 	- Pass r and cmdline as extra arguments to completion routine.
 
 
-0.60    2014-12-13 (PERLANCAR)
+0.60    2014-12-13  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -1078,50 +1099,50 @@
           completion (mention shcompgen), logging.
 
 
-0.59    2014-12-03 (PERLANCAR)
+0.59    2014-12-03  Released-By: PERLANCAR
 
         - [Experimental] Add --naked-res (this is not yet introduced in
           Perinci::CmdLine) for convenience when piping JSON result to something
           else.
 
 
-0.58    2014-12-02 (PERLANCAR)
+0.58    2014-12-02  Released-By: PERLANCAR
 
 	- Switch Perinci::Sub::To::{CLIOptSpec,CLIDocData}.
 
         - Render examples in help message.
 
 
-0.57    2014-11-29 (PERLANCAR)
+0.57    2014-11-29  Released-By: PERLANCAR
 
 	- Use zsh-specific module for zsh completion.
 
 
-0.56    2014-11-29 (PERLANCAR)
+0.56    2014-11-29  Released-By: PERLANCAR
 
         - Support tab completion for fish shell.
 
         - [ux] Change 'argv' to 'arg' in help message.
 
 
-0.55    2014-11-23 (PERLANCAR)
+0.55    2014-11-23  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Mention about zsh support.
 
 
-0.54    2014-11-23 (PERLANCAR)
+0.54    2014-11-23  Released-By: PERLANCAR
 
         - Add support for tcsh tab completion.
 
 
-0.53    2014-11-21 (PERLANCAR)
+0.53    2014-11-21  Released-By: PERLANCAR
 
         - Tweak --help output: show cmdline_src, positional arguments.
 
 
-0.52    2014-11-21 (PERLANCAR)
+0.52    2014-11-21  Released-By: PERLANCAR
 
         [REMOVED FEATURES]
 
@@ -1129,19 +1150,19 @@
           message nicer).
 
 
-0.51    2014-11-20 (PERLANCAR)
+0.51    2014-11-20  Released-By: PERLANCAR
 
         - Tweak --help message (show default value, note about base64/json/yaml
           encoding).
 
 
-0.50    2014-11-20 (PERLANCAR)
+0.50    2014-11-20  Released-By: PERLANCAR
 
         - Use the new Perinci::Sub::To::CLIOptSpec for nicer display of options
           in --help.
 
 
-0.49    2014-11-13 (PERLANCAR)
+0.49    2014-11-13  Released-By: PERLANCAR
 
         - Handle arrayifying scalar parameter from config file to array
           arguments [GH#3].
@@ -1149,36 +1170,36 @@
         - A couple of bug fixes.
 
 
-0.48    2014-11-12 (PERLANCAR)
+0.48    2014-11-12  Released-By: PERLANCAR
 
 	- Regard 304 as success aside from 2xx.
 
 
-0.47    2014-11-12 (PERLANCAR)
+0.47    2014-11-12  Released-By: PERLANCAR
 
 	- Pass -cmdline_src_ARGNAME and -cmdline_srcfilename_ARGNAME
 	  special hint arguments.
 
 
-0.46    2014-11-09 (PERLANCAR)
+0.46    2014-11-09  Released-By: PERLANCAR
 
 	- Introduce request stash keys:
 	  ignore_missing_config_profile_section & read_config_file.
 
 
-0.45    2014-11-08 (PERLANCAR)
+0.45    2014-11-08  Released-By: PERLANCAR
 
 	- [ux] Prefix log messages with program name.
 
 
-0.44    2014-11-07 (PERLANCAR)
+0.44    2014-11-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] Fix typo in help message.
 
 
-0.43    2014-11-07 (PERLANCAR)
+0.43    2014-11-07  Released-By: PERLANCAR
 
         [ENHANCEMENTS]
 
@@ -1193,18 +1214,18 @@
         - Forgot to use Mo's qw/default/ to make default work.
 
 
-0.42    2014-10-31 (PERLANCAR)
+0.42    2014-10-31  Released-By: PERLANCAR
 
 	- Tweak help message: show --subcommands when program has
 	  subcommands and doesn't specify one.
 
 
-0.41    2014-10-30 (PERLANCAR)
+0.41    2014-10-30  Released-By: PERLANCAR
 
         - Add support for streaming input and output.
 
 
-0.40    2014-10-28 (PERLANCAR)
+0.40    2014-10-28  Released-By: PERLANCAR
 
         [BUG FIXES]
 
@@ -1222,26 +1243,26 @@
           result.
 
 
-0.39    2014-10-25 (PERLANCAR)
+0.39    2014-10-25  Released-By: PERLANCAR
 
 	- Only do converting of ARG -> ARG:base64 when riap_version is 1.2.
 
 
-0.38    2014-10-24 (PERLANCAR)
+0.38    2014-10-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add example for dealing with binary data.
 
 
-0.37    2014-10-24 (PERLANCAR)
+0.37    2014-10-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Avoid perl undef warning.
 
 
-0.36    2014-10-24 (PERLANCAR)
+0.36    2014-10-24  Released-By: PERLANCAR
 
         - Send as-is (no newline) if result is binary and format is text.
 
@@ -1250,24 +1271,24 @@
         - Allow buf args to have cmdline_src set.
 
 
-0.35    2014-10-24 (PERLANCAR)
+0.35    2014-10-24  Released-By: PERLANCAR
 
 	- Add attribute: riap_version.
 
 
-0.34    2014-10-23 (PERLANCAR)
+0.34    2014-10-23  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Typo: unimplemented status is 501, not 502.
 
 
-0.33    2014-10-16 (PERLANCAR)
+0.33    2014-10-16  Released-By: PERLANCAR
 
         - Add hook: before_read_config_file.
 
 
-0.32    2014-10-09 (PERLANCAR)
+0.32    2014-10-09  Released-By: PERLANCAR
 
         - Better error message when metadata does not specify argument schema
           (now die with "BUG: Schema not defined for arg $arg").
@@ -1276,7 +1297,7 @@
           for argument submetadata breaks other stuffs.
 
 
-0.31    2014-09-17 (PERLANCAR)
+0.31    2014-09-17  Released-By: PERLANCAR
 
 	- [Bugfix] Didn't set default value of args (from default property
 	  of arg spec or schema default).
@@ -1284,19 +1305,19 @@
 	- Tweak die string.
 
 
-0.30    2014-09-16 (PERLANCAR)
+0.30    2014-09-16  Released-By: PERLANCAR
 
 	- Handle output paging and streaming output (functionality moved from
           Perinci::CmdLine).
 
 
-0.29    2014-09-11 (PERLANCAR)
+0.29    2014-09-11  Released-By: PERLANCAR
 
 	- Handle arguments with cmdline_src=stdin_line and is_password
 	  (Rinci 1.1.53).
 
 
-0.28     2014-09-05 (PERLANCAR)
+0.28     2014-09-05  Released-By: PERLANCAR
 
          - Fix doc: function metadata is 'cmdline.default_format', not
            'x.perinci.cmdline.default_format'.
@@ -1305,18 +1326,18 @@
            over function metadata's.
 
 
-0.27     2014-09-03 (PERLANCAR)
+0.27     2014-09-03  Released-By: PERLANCAR
 
          - Handle the case when we must send ARGV instead of args hash (when
            parse_args_from_argv returns 501).
 
 
-0.26     2014-09-03 (PERLANCAR)
+0.26     2014-09-03  Released-By: PERLANCAR
 
          - [Bugfix] Ordering.
 
 
-0.25     2014-09-03 (PERLANCAR)
+0.25     2014-09-03  Released-By: PERLANCAR
 
          - No functional change.
 
@@ -1324,18 +1345,18 @@
            to add http support.
 
 
-0.24     2014-08-29 (PERLANCAR)
+0.24     2014-08-29  Released-By: PERLANCAR
 
          - Avoid failure in 00-compile.t [CT].
 
 
-0.23     2014-08-27 (PERLANCAR)
+0.23     2014-08-27  Released-By: PERLANCAR
 
          - Handle cmdline_src argument spec property (functionality moved from
            Perinci::CmdLine).
 
 
-0.22     2014-08-26 (SHARYANTO)
+0.22     2014-08-26  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -1344,7 +1365,7 @@
            profile=PROFILENAME]'.
 
 
-0.21     2014-08-25 (SHARYANTO)
+0.21     2014-08-25  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -1352,14 +1373,14 @@
            used by Moo subclass (in Perinci::CmdLine).
 
 
-0.20     2014-08-25 (SHARYANTO)
+0.20     2014-08-25  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Add support for configuration file.
 
 
-0.19     2014-08-24 (SHARYANTO)
+0.19     2014-08-24  Released-By: SHARYANTO
 
          - Base: Use Mo if used by Perinci::CmdLine::Lite, otherwise use Moo
            when used by Perinci::CmdLine use Moo. This is because there is a
@@ -1367,23 +1388,23 @@
            extends Mo class.
 
 
-0.18     2014-08-24 (SHARYANTO)
+0.18     2014-08-24  Released-By: SHARYANTO
 
          - Fix logic errors.
 
 
-0.17     2014-08-23 (SHARYANTO)
+0.17     2014-08-23  Released-By: SHARYANTO
 
          - Handle result metadata: cmdline.default_format, cmdline.skip_format,
            cmdline.result.
 
 
-0.16     2014-08-22 (SHARYANTO)
+0.16     2014-08-22  Released-By: SHARYANTO
 
          - Fixes, mainly to make Perinci::CmdLine work again.
 
 
-0.15     2014-08-21 (SHARYANTO)
+0.15     2014-08-21  Released-By: SHARYANTO
 
          - Fix passing $r to common option's handler in parse_argv().
 
@@ -1398,14 +1419,14 @@
          - A few minor bug fixes.
 
 
-0.12     2014-08-07 (SHARYANTO)
+0.12     2014-08-07  Released-By: SHARYANTO
 
          - Complete --cmd value.
 
          - [Bugfix] Fix completion of subcommands ('gu ^').
 
 
-0.11     2014-07-31 (SHARYANTO)
+0.11     2014-07-31  Released-By: SHARYANTO
 
          - Add usage and argument position information in help.
 
@@ -1416,7 +1437,7 @@
          - Add more tests.
 
 
-0.10     2014-07-29 (SHARYANTO)
+0.10     2014-07-29  Released-By: SHARYANTO
 
          - Adjust to Perinci::Sub::Complete 0.60.
 
@@ -1426,7 +1447,7 @@
            'custom_arg_completer'.
 
 
-0.09     2014-07-25 (SHARYANTO)
+0.09     2014-07-25  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -1434,7 +1455,7 @@
            parse_cmdline() no longer strips command name).
 
 
-0.08     2014-07-24 (SHARYANTO)
+0.08     2014-07-24  Released-By: SHARYANTO
 
          - Adjust to Getopt::Long::Util 0.46 (required by
            Perinci::Sub::GetArgs::Argv 0.46) which already sorts options.
@@ -1450,7 +1471,7 @@
          - Add some tests.
 
 
-0.07     2014-07-23 (SHARYANTO)
+0.07     2014-07-23  Released-By: SHARYANTO
 
          - [Bugfix] A couple of bug fixes.
 
@@ -1465,7 +1486,7 @@
          - Adjust to Perinci::Sub::GetArgs::Argv 0.46.
 
 
-0.06     2014-07-18 (SHARYANTO)
+0.06     2014-07-18  Released-By: SHARYANTO
 
          - No new features.
 
@@ -1476,7 +1497,7 @@
          - Add minimal tests.
 
 
-0.02     2014-07-18 (SHARYANTO)
+0.02     2014-07-18  Released-By: SHARYANTO
 
          - Require Perinci::CmdLine::Base 0.04 (which contains fixes, especially
            completion).
@@ -1486,6 +1507,6 @@
          - Implement run_help() to display decent help message.
 
 
-0.01     2014-07-16 (SHARYANTO)
+0.01     2014-07-16  Released-By: SHARYANTO
 
          - First release, early release, completion not yet implemented.

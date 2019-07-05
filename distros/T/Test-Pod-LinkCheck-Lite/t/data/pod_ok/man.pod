@@ -1,0 +1,7 @@
+=pod
+
+L<man (1)>
+
+=cut
+
+# ex: set textwidth=72 :

@@ -1,5 +1,5 @@
-Build.PL
 CODE_OF_CONDUCT.md
+CONTRIBUTORS
 Changes
 INSTALL
 LICENSE
@@ -24,8 +24,6 @@ lib/XML/XPathScript/Stylesheet.pod
 lib/XML/XPathScript/Stylesheet/DocBook2LaTeX.pm
 lib/XML/XPathScript/Template.pm
 lib/XML/XPathScript/Template/Tag.pm
-lib_axkit/Apache/AxKit/Language/YPathScript.pm
-lib_tomkit/Apache2/TomKit/Processor/XPathScript.pm
 manual/DocBook2LaTeX.pm
 manual/Makefile
 manual/manual.pl
@@ -33,7 +31,6 @@ manual/mkdocbook
 manual/mydocbook.xps
 manual/xpathscript.docbook
 manual/xps_logo.jpg
-misc/Babel.pm
 misc/icon.png
 misc/icon.svg
 misc/trac_logo.png
@@ -70,9 +67,6 @@ t/25stylesheetlines.t
 t/26bxpath.t
 t/27template_import.t
 t/28function_overload.t
-t/40axkit.t
-t/50tomkit.t
-t/99signature.t
 t/document_file.txt
 t/include.xps
 t/include2.xps
@@ -113,5 +107,4 @@ t_dist/96perlcritic.t
 t_dist/97kwalitee.t
 t_dist/98pod.t
 t_dist/99pod-coverage.t
-tools/modversion
 xt/release/unused-vars.t

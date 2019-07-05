@@ -1,6 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta;
+use Sub::Identify;
 
 subtest 'non sub' => sub {
     my $meta = Sub::Meta->new;
@@ -29,7 +30,7 @@ subtest 'has sub' => sub {
         is $meta->fullname, 'main::hello', 'fullname';
         is $meta->stashname, 'main', 'stashname';
         is $meta->file, 't/01_meta.t', 'file';
-        is $meta->line, 23, 'line';
+        is $meta->line, 24, 'line';
         ok !$meta->is_constant, 'is_constant';
         is $meta->prototype, '$$', 'prototype';
         is $meta->attribute, ['method'], 'attribute';
@@ -44,12 +45,31 @@ subtest 'has sub' => sub {
         my $meta = Sub::Meta->new(sub => \&hello);
         is $meta->set_sub(\&hello2), $meta, 'set_sub';
         is $meta->sub, \&hello2, 'subname';
+
         is $meta->set_subname('world'), $meta, 'set_subname';
         is $meta->subname, 'world', 'subname';
-        is $meta->set_fullname('test::world'), $meta, 'set_fullname';
-        is $meta->fullname, 'test::world', 'fullname';
+        is $meta->stashname, 'main', 'stashname';
+        is $meta->fullname, 'main::world', 'fullname';
+        is $meta->subinfo, ['main', 'world'], 'subinfo';
+
+        is $meta->set_fullname('foo::bar::baz'), $meta, 'set_fullname';
+        is $meta->subname, 'baz', 'subname';
+        is $meta->fullname, 'foo::bar::baz', 'fullname';
+        is $meta->stashname, 'foo::bar', 'stashname';
+        is $meta->subinfo, ['foo::bar', 'baz'], 'subinfo';
+
         is $meta->set_stashname('test'), $meta, 'set_stashname';
+        is $meta->subname, 'baz', 'subname';
+        is $meta->fullname, 'test::baz', 'fullname';
         is $meta->stashname, 'test', 'stashname';
+        is $meta->subinfo, ['test', 'baz'], 'subinfo';
+
+        is $meta->set_subinfo(['hoge', 'fuga']), $meta, 'set_subinfo';
+        is $meta->subname, 'fuga', 'subname';
+        is $meta->fullname, 'hoge::fuga', 'fullname';
+        is $meta->stashname, 'hoge', 'stashname';
+        is $meta->subinfo, ['hoge', 'fuga'], 'subinfo';
+
         is $meta->set_file('test/file.t'), $meta, 'set_file';
         is $meta->file, 'test/file.t', 'file';
         is $meta->set_line(999), $meta, 'set_line';
@@ -73,7 +93,7 @@ subtest 'has sub' => sub {
         my $meta = Sub::Meta->new(sub => \&hello3);
         is $meta->apply_subname('HELLO'), $meta, 'apply_subname';
         is $meta->subname, 'HELLO', 'subname';
-        is $meta->_build_subname, 'HELLO', 'build_subname';
+        is [ Sub::Identify::get_code_info(\&hello3) ], ['main','HELLO'], 'build_subinfo';
 
         is $meta->apply_prototype('$'), $meta, 'apply_prototype';
         is $meta->prototype, '$', 'prototype';
@@ -123,6 +143,25 @@ subtest 'set_parameters/returns' => sub {
 
     $meta->set_returns($obj);
     is $meta->returns, $obj, 'return can set any object';
+};
+
+subtest 'set invalid fullname' => sub {
+    my $meta = Sub::Meta->new;
+
+    is $meta->set_fullname('invalid'), $meta, 'set_fullname';
+    is $meta->subinfo, [], 'subinfo';
+};
+
+subtest 'set_subinfo' => sub {
+    my $meta = Sub::Meta->new;
+
+    is $meta->subinfo, [], 'subinfo';
+
+    is $meta->set_subinfo(['foo', 'bar']), $meta, 'set_subinfo';
+    is $meta->subinfo, ['foo','bar'], 'subinfo';
+
+    is $meta->set_subinfo('hoge', 'fuga'), $meta, 'set_subinfo';
+    is $meta->subinfo, ['hoge','fuga'], 'subinfo';
 };
 
 

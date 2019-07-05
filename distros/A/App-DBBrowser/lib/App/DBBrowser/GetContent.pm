@@ -59,8 +59,8 @@ sub __print_args {
 sub from_col_by_col {
     my ( $sf, $sql ) = @_;
     $sql->{insert_into_args} = [];
-    my $tf = Term::Form->new();
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $col_names = $sql->{insert_into_cols};
     if ( ! @$col_names ) {
         $sf->__print_args( $sql );
@@ -80,7 +80,6 @@ sub from_col_by_col {
             $fields,
             { prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
         );
-        print HIDE_CURSOR;
         if ( ! $form ) {
             return;
         }
@@ -95,7 +94,6 @@ sub from_col_by_col {
             $sf->__print_args( $sql );
             # Readline
             my $col = $tf->readline( $col_name . ': ' );
-            print HIDE_CURSOR;
             push @{$sql->{insert_into_args}->[$row_idxs]}, $col;
         }
         my $default = 0;
@@ -264,7 +262,7 @@ sub from_file {
     my ( $sf, $sql ) = @_;
     my $pf = App::DBBrowser::GetContent::ParseFile->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
 
     DIR: while ( 1 ) {
         my $dir_ec = $sf->__directory();
@@ -397,7 +395,7 @@ sub from_file {
 sub __directory {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     if ( ! $sf->{o}{insert}{history_dirs} ) {
         return $sf->__new_dir_search();
     }

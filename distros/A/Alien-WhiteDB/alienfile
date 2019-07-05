@@ -1,0 +1,25 @@
+use alienfile;
+
+probe sub { $_[0]->runtime_prop->{ffi_name} = 'wgdb' };
+
+plugin qw'Probe::CBuilder libs -lwgdb';
+plugin qw'Probe::CommandLine secondary 1 command wgdb',
+    args    => [ '-v' ],
+    match   => qr/libwgdb/,
+    version => qr/libwgdb version: ([0-9\.]+)/;
+
+share {
+    start_url 'http://whitedb.org/download.html';
+    plugin 'Download' => (
+        filter => qr/^whitedb-[0-9\.]+\.tar\.gz$/,
+        version => qr/^whitedb-([0-9\.]+)\.tar\.gz$/ );
+    plugin 'Extract' => 'tar.gz';
+    plugin 'Build::Autoconf';
+    build ['%{configure}', '%{make}', '%{make} install'];
+    plugin 'Gather::IsolateDynamic';
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        $build->runtime_prop->{cflags} = "-I$prefix/include ";
+        $build->runtime_prop->{libs} = "-L$prefix/lib -lwgdb ";
+        $build->runtime_prop->{bin_dir} = "$prefix/bin" } };

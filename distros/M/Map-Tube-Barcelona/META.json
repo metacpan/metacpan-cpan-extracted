@@ -44,51 +44,51 @@
    "provides" : {
       "Map::Tube::Barcelona" : {
          "file" : "lib/Map/Tube/Barcelona.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L1" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L1.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L10" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L10.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L11" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L11.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L2" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L2.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L3" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L3.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L4" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L4.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L5" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L5.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L6" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L6.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L7" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L7.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L8" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L8.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Map::Tube::Barcelona::Line::L9" : {
          "file" : "lib/Map/Tube/Barcelona/Line/L9.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       }
    },
    "release_status" : "stable",
@@ -99,6 +99,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Barcelona"
       }
    },
-   "version" : "0.73",
+   "version" : "0.74",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

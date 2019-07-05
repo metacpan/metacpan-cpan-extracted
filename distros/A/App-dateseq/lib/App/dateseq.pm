@@ -1,7 +1,7 @@
 package App::dateseq;
 
-our $DATE = '2019-05-26'; # DATE
-our $VERSION = '0.092'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.093'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,11 +56,23 @@ _
             summary => 'Only list business days (Mon-Fri), '.
                 'or non-business days',
             schema => ['bool*'],
+            tags => ['category:filtering'],
+        },
+        include_dow => {
+            summary => 'Only show dates with these day-of-weeks',
+            schema => 'date::dow_nums*',
+            tags => ['category:filtering'],
+        },
+        exclude_dow => {
+            summary => 'Only show dates with these day-of-weeks',
+            schema => 'date::dow_nums*',
+            tags => ['category:filtering'],
         },
         business6 => {
             summary => 'Only list business days (Mon-Sat), '.
                 'or non-business days',
             schema => ['bool*'],
+            tags => ['category:filtering'],
         },
         header => {
             summary => 'Add a header row',
@@ -137,6 +149,18 @@ _
         {
             summary => 'Generate first 5 non-business days (Sat-Sun) after 2015-01-01',
             src => '[[prog]] 2015-01-01 --no-business -n 5',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 5,
+        },
+        {
+            summary => 'Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28',
+            src => '[[prog]] 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 5,
+        },
+        {
+            summary => 'Show dates (except Mondays) after 2015-01-01 and 2015-02-28',
+            src => '[[prog]] 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 5,
         },
@@ -220,6 +244,14 @@ sub dateseq {
                 return 0 if $dow <  7;
             }
         }
+        if (defined $args{include_dow}) {
+            my $dt_dow = $dt->day_of_week;
+            return 0 unless grep { $dt_dow == $_ } @{ $args{include_dow} };
+        }
+        if (defined $args{exclude_dow}) {
+            my $dt_dow = $dt->day_of_week;
+            return 0 if     grep { $dt_dow == $_ } @{ $args{exclude_dow} };
+        }
         1;
     };
 
@@ -279,7 +311,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.092 of App::dateseq (from Perl distribution App-dateseq), released on 2019-05-26.
+This document describes version 0.093 of App::dateseq (from Perl distribution App-dateseq), released on 2019-06-20.
 
 =head1 FUNCTIONS
 
@@ -316,6 +348,10 @@ strftime() format for each date.
 Default is C<%Y-%m-%d>, unless when hour/minute/second is specified, then it is
 C<%Y-%m-%dT%H:%M:%S>.
 
+=item * B<exclude_dow> => I<date::dow_nums>
+
+Only show dates with these day-of-weeks.
+
 =item * B<from> => I<date>
 
 Starting date.
@@ -323,6 +359,10 @@ Starting date.
 =item * B<header> => I<str>
 
 Add a header row.
+
+=item * B<include_dow> => I<date::dow_nums>
+
+Only show dates with these day-of-weeks.
 
 =item * B<increment> => I<duration>
 

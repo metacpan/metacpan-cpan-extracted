@@ -1,5 +1,12 @@
 Revision history for IPC-RunExternal
 
+0.100     2019-07-05 11:35:04+02:00 Europe/Stockholm
+    - Bump version number to 0.100 because 0.010 is less than 0.09.
+        Obvious, really!
+
+0.010     2019-07-05 11:28:37+02:00 Europe/Stockholm 
+    - Modernize repository. Use Dist::Zilla. Put repo to GitHub.
+
 0.09    2013-Jun-27
 	- Used use-devel-assertos in Devel-CheckOS to package Devel::AssertOS Unix into the distribution.
 
@@ -26,6 +33,6 @@ Revision history for IPC-RunExternal
 0.02    2011-Aug-09
 	- Removed dependence from module Readonly.
 
-0.01    Date/time
-        - First version.
+0.01    2011-Aug-01
+    - First version.
 

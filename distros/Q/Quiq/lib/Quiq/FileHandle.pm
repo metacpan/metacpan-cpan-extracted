@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.148';
+our $VERSION = '1.149';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -935,7 +935,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.148
+1.149
 
 =head1 AUTHOR
 

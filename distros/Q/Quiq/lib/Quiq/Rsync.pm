@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.148';
+our $VERSION = '1.149';
 
 use Quiq::Option;
 use File::Rsync ();
@@ -203,7 +203,7 @@ sub exec {
 
 =head1 VERSION
 
-1.148
+1.149
 
 =head1 AUTHOR
 

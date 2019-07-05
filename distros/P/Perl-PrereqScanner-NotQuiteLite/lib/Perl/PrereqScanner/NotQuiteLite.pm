@@ -6,7 +6,7 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.9905';
+our $VERSION = '0.9906';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
@@ -84,7 +84,7 @@ my %regexp_may_follow = map {$_ => 1} qw(
   return
 );
 
-my $re_namespace = qr/(?:::|')?(?:\w+(?:(?:::|')\w+)*)/;
+my $re_namespace = qr/(?:::|')?(?:[a-zA-Z0-9_]+(?:(?:::|')[a-zA-Z0-9_]+)*)/;
 my $re_nonblock_chars = qr/[^\\\(\)\{\}\[\]\<\>\/"'`#q~,\s]*/;
 my $re_variable = qr/
   (?:$re_namespace)

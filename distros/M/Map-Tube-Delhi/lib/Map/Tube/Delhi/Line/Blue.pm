@@ -1,6 +1,6 @@
 package Map::Tube::Delhi::Line::Blue;
 $Map::Tube::Delhi::Line::Blue::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Delhi::Line::Blue::VERSION = '0.91';
+$Map::Tube::Delhi::Line::Blue::VERSION = '0.92';
 use 5.006;
 use strict; use warnings;
 
@@ -10,7 +10,7 @@ Map::Tube::Delhi::Line::Blue - Delhi Metro Map: Blue Line.
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -148,7 +148,7 @@ L<http://search.cpan.org/dist/Map-Tube-Delhi/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2016 Mohammad S Anwar.
+Copyright (C) 2014 - 2019 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

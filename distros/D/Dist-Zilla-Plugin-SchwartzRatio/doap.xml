@@ -20,6 +20,12 @@
       <foaf:mbox rdf:resource="mailto:0briang0@gmail.com" />
     </foaf:Person>
   </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <homepage rdf:resource="https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio" />
   <bug-database rdf:resource="https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio/issues" />
@@ -45,6 +51,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.3.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-07-04</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.3.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-07-05</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

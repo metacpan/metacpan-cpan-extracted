@@ -1,0 +1,130 @@
+NAME
+
+    Time::FFI - libffi interface to POSIX date and time functions
+
+SYNOPSIS
+
+      use Time::FFI qw(localtime mktime strptime strftime);
+    
+      my $tm = strptime '1995-01-02 13:15:39', '%Y-%m-%d %H:%M:%S';
+      my $epoch = mktime $tm;
+      print "$epoch: ", strftime('%I:%M:%S %p on %B %e, %Y', $tm);
+      my $piece = $tm->to_object('Time::Piece', 1);
+    
+      my $tm = localtime time;
+      my $datetime = $tm->to_object('DateTime', 1);
+    
+      my $tm = gmtime time;
+      my $moment = $tm->to_object('Time::Moment', 0);
+
+DESCRIPTION
+
+    Time::FFI provides a libffi interface to POSIX date and time functions
+    found in time.h.
+
+    The "gmtime" and "localtime" functions behave very differently from the
+    core functions of the same name, as well as those exported by
+    Time::Piece, so you may wish to call them as e.g. Time::FFI::gmtime
+    rather than importing them.
+
+    All functions will throw an exception in the event of an error. For
+    functions other than "strftime" and "strptime", this exception will
+    contain the syscall error message, and "$!" in perlvar will also have
+    been set by the syscall, so you could check it after trapping the
+    exception for finer exception handling.
+
+FUNCTIONS
+
+    All functions are exported individually, or with the :all export tag.
+
+ asctime
+
+      my $str = asctime $tm;
+
+    Returns a string in the format Wed Jun 30 21:49:08 1993\n representing
+    the passed Time::FFI::tm record. The thread-safe asctime_r(3) function
+    is used if available.
+
+ ctime
+
+      my $str = ctime $epoch;
+      my $str = ctime;
+
+    Returns a string in the format Wed Jun 30 21:49:08 1993\n representing
+    the passed epoch timestamp (defaulting to the current time) in the
+    local time zone. This is equivalent to "ctime" in POSIX but uses the
+    thread-safe ctime_r(3) function if available.
+
+ gmtime
+
+      my $tm = gmtime $epoch;
+      my $tm = gmtime;
+
+    Returns a Time::FFI::tm record representing the passed epoch timestamp
+    (defaulting to the current time) in UTC. The thread-safe gmtime_r(3)
+    function is used if available.
+
+ localtime
+
+      my $tm = localtime $epoch;
+      my $tm = localtime;
+
+    Returns a Time::FFI::tm record representing the passed epoch timestamp
+    (defaulting to the current time) in the local time zone. The
+    thread-safe localtime_r(3) function is used if available.
+
+ mktime
+
+      my $epoch = mktime $tm;
+
+    Returns the epoch timestamp representing the passed Time::FFI::tm
+    record interpreted in the local time zone.
+
+ strftime
+
+      my $str = strftime $format, $tm;
+
+    Returns a string formatted according to the passed format string,
+    representing the passed Time::FFI::tm record. Consult your system's
+    strftime(3) manual for available format descriptors.
+
+ strptime
+
+      my $tm = strptime $str, $format;
+         $tm = strptime $str, $format, $tm;
+      my $tm = strptime $str, $format, undef, \my $remaining;
+         $tm = strptime $str, $format, $tm, \my $remaining;
+
+    Returns a Time::FFI::tm record representing the passed string, parsed
+    according to the passed format. Consult your system's strptime(3)
+    manual for available format descriptors.
+
+    A Time::FFI::tm record may be passed as the third argument, in which
+    case it will be modified in place to (on most systems) update only the
+    date/time elements which were parsed from the string. Additionally, an
+    optional scalar reference may be passed as the fourth argument, in
+    which case it will be set to the remaining unprocessed characters of
+    the input string if any.
+
+    This function is usually not available on Windows.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Time::Piece, Time::Moment, DateTime, POSIX, POSIX::strptime
+

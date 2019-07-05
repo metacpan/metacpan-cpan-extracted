@@ -1,5 +1,15 @@
 Revision history for Perl module XML::XPathScript
 
+2.00 2019-07-04
+  [ API CHANGES ]
+    - Remove old Apache/Apache2 bindings. 
+
+  [ DOCUMENTATION ]
+    - Fixed pod error as reported by CPANTS. (GH#1, Mohammad S Anwar)
+
+  [ STATISTICS ]
+    - code churn: 16 files changed, 234 insertions(+), 1085 deletions(-)
+
 1.55 2018-06-20
   - Improve namespace support
   - Fix a bug where "xmlns:" was duplicated in the top-level element
@@ -127,13 +137,13 @@ Revision history for Perl module XML::XPathScript
 0.15 2005-06-26
   - Template now supports two new tags: intro and extro. When a tag  is
     processed, the elements of the templates are outputed as follow: pre
-    <tag>	  # if showtag == 1 intro    prechildren	# if <tag>
+    <tag>    # if showtag == 1 intro	   prechildren	      # if <tag>
     has children
 
   [ children ... ]
-    - postchildren     # if <tag> has children extro </tag>		#
-      if showtag == 1 post - In stylesheets under A::A::L::YPS, the
-      variable $r is now pre-defined. - Added function document() for
+    - postchildren     # if <tag> has children extro </tag>	    # if
+      showtag == 1 post - In stylesheets under A::A::L::YPS, the variable
+      $r is now pre-defined. - Added function document() for
       XML::XPathScript and Apache::Axkit::Language::YPathScript. - Fixed
       argument interpolation bugs ("<foo bar='&lt;"> was being transformed
       into "<foo bar='<'>") - Bug fixes

@@ -88,67 +88,67 @@
    "provides" : {
       "App::SpreadRevolutionaryDate" : {
          "file" : "lib/App/SpreadRevolutionaryDate.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::Config" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Config.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::PromptUser" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Calendar.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/en.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/es.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it" : {
          "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::Target" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::Target::Freenode" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Freenode.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::Target::Freenode::Bot" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::Target::Mastodon" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       },
       "App::SpreadRevolutionaryDate::Target::Twitter" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Twitter.pm",
-         "version" : "0.26"
+         "version" : "0.27"
       }
    },
    "release_status" : "stable",
@@ -164,7 +164,7 @@
          "web" : "https://github.com/gibus/SpreadRevolutionaryDate"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

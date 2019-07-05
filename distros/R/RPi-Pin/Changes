@@ -1,5 +1,9 @@
 Revision history for RPi-Pin
 
+2.3607  2019-07-03
+        - added comment(), allows you to associate a note or purpose to a pin.
+          We've also added a comment parameter in new()
+
 2.3606  2018-04-16
         - removed RPi::Const from t/40, it wasn't required, and eliminated a
           prereq we didn't need

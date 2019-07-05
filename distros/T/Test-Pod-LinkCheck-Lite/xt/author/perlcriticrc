@@ -1,0 +1,66 @@
+severity	= stern
+theme		= core
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval]
+
+allow_includes	= 1
+
+[Perl::Critic::Policy::Documentation::PodSpelling]
+
+spell_command = aspell list
+
+[Perl::Critic::Policy::ErrorHandling::RequireCheckingReturnValueOfEval]
+
+# The default is 3 ('harsh'), but I think this is more severe than that.
+
+severity	= stern
+
+[Perl::Critic::Policy::InputOutput::ProhibitInteractiveTest]
+
+# Perl::Critic and Perl Best Practices prefer the IO::Interactive
+# is_interactive() subroutine to -T STDIN. But that assumes that
+# ARGV is used for input, and that you don't want to be interactive
+# if output goes to a pipe. I do not want these assumptions, but
+# rather than disable them in the code I am simply assigning them
+# a severity slightly higher than I currently use.
+
+severity	= harsh
+
+[Perl::Critic::Policy::InputOutput::RequireCheckedOpen]
+
+# For some reason the default is 3 ('harsh'). But IM(NS)HO this
+# kind of thing should be a 5. So:
+
+severity	= gentle
+
+[Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
+
+short_subroutine_statements	= 3
+
+[Perl::Critic::Policy::Subroutines::RequireFinalReturn]
+
+terminal_funcs	= CORE::exit
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict]
+
+allow = refs
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoWarnings]
+
+allow	= exiting once substr uninitialized
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma]
+
+# Perl::Critic and Perl Best Practices do not like the 'constant'
+# pragma because it does not interpolate. It really does, the
+# syntax is just different. Rather than disable the things in the
+# source, I'm just assigning them a severity slightly greater than
+# I customarily use.
+
+severity	= harsh
+
+[Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter]
+
+add_themes	= core
+allow_unused_subroutine_arguments	= 0
+severity	= stern

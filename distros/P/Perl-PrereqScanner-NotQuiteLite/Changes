@@ -1,6 +1,10 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
-0.9954 2019/05/10
+0.9906 2019/07/06
+  - fixed PackageVariant parser not to die when it finds something
+    other than importing
+
+0.9905 2019/05/10
   - changed scan-perl-prereqs-nqlite to use only :bundled parsers
     by default
   - added perl_minimum_version option

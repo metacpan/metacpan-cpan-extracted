@@ -13,10 +13,9 @@ use FindBin               qw( $RealBin $RealScript );
 
 use Encode::Locale qw();
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( insert_sep choose_a_number choose_a_subset settings_menu choose_a_dir );
-use Term::Form              qw();
+use Term::Choose       qw();
+use Term::Choose::Util qw( insert_sep choose_a_number choose_a_subset settings_menu choose_a_dir );
+use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Opt::DBSet;
@@ -120,7 +119,7 @@ sub set_options {
         my $opt_get = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
         $sf->{o} = $opt_get->read_config_files();
     }
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $groups;
     if ( $arg_groups ) {
         $groups = [ @$arg_groups ];
@@ -590,12 +589,11 @@ sub __group_readline {
             $sf->{o}{$section}{$_->{name}}
         ]
     } @{$items} ];
-    my $tf = Term::Form->new();
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $new_list = $tf->fill_form(
         $list,
         { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
-    print HIDE_CURSOR;
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {
             $sf->{o}{$section}{$items->[$i]{name}} = $new_list->[$i][1];

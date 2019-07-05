@@ -1,7 +1,7 @@
 package XML::XPathScript::Processor;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: XML::XPathScript transformation engine
-$XML::XPathScript::Processor::VERSION = '1.55';
+$XML::XPathScript::Processor::VERSION = '2.00';
 use strict;
 use warnings;
 use Carp;
@@ -689,7 +689,7 @@ XML::XPathScript::Processor - XML::XPathScript transformation engine
 
 =head1 VERSION
 
-version 1.55
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -1106,7 +1106,7 @@ Returns true iff $object is a processing instruction node.
 Returns true if $node is a node list (as returned by L</findnodes> in
 scalar context), false otherwise.
 
-=item is_utf_tainted
+=item is_utf8_tainted
 
     $bool = is_utf8_tainted( $string )
 
@@ -1465,7 +1465,7 @@ Matt Sergeant <matt@sergeant.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+This software is copyright (c) 2019, 2018, 2008, 2007 by Matt Sergeant.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

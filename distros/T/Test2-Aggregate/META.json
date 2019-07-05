@@ -39,7 +39,8 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Tools::Basic" : "0"
+            "Test2::Tools::Basic" : "0",
+            "Test::Output" : "0"
          }
       }
    },
@@ -51,6 +52,6 @@
          "web" : "https://github.com/SpareRoom/Test2-Aggregate"
       }
    },
-   "version" : "0.05",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

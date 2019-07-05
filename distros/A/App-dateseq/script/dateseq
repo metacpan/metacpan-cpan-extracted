@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-05-26'; # DATE
+our $DATE = '2019-06-20'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.092'; # VERSION
+our $VERSION = '0.093'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.092 of dateseq (from Perl distribution App-dateseq), released on 2019-05-26.
+This document describes version 0.093 of dateseq (from Perl distribution App-dateseq), released on 2019-06-20.
 
 =head1 SYNOPSIS
 
@@ -63,8 +63,8 @@ Generate dates from 2015-01-01 to 2015-01-31:
 Generate dates from yesterday to 2 weeks from now:
 
  % dateseq yesterday "2 weeks from now"
- 2019-05-25T00:00:00
- 2019-05-26T00:00:00
+ 2019-06-19T00:00:00
+ 2019-06-20T00:00:00
 
 Generate dates from 2015-01-31 to 2015-01-01 (reverse):
 
@@ -120,6 +120,24 @@ Generate first 5 non-business days (Sat-Sun) after 2015-01-01:
  2015-01-11
  2015-01-17
 
+Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28:
+
+ % dateseq 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"
+ 2015-01-02(Fri)
+ 2015-01-05(Mon)
+ ... 21 more lines ...
+ 2015-02-25(Wed)
+ 2015-02-27(Fri)
+
+Show dates (except Mondays) after 2015-01-01 and 2015-02-28:
+
+ % dateseq 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"
+ 2015-01-01(Thu)
+ 2015-01-02(Fri)
+ ... 46 more lines ...
+ 2015-02-26(Thu)
+ 2015-02-27(Fri)
+
 Generate a CSV data:
 
  % dateseq 2010-01-01 2015-01-31 -f "%Y,%m,%d" --header "year,month,day"
@@ -141,12 +159,12 @@ Generate periods (YYYY-MM):
 List non-holidays in 2015 (using Indonesian holidays):
 
  % setop --diff <(dateseq 2015-01-01 2015-12-31) <(list-id-holidays --year 2015)
+ 2015-01-01
  2015-01-02
+ 2015-01-03
  2015-01-04
  2015-01-05
- 2015-01-06
- 2015-01-07
- ... 335 more lines ...
+ ... 355 more lines ...
  2015-12-27
  2015-12-28
  2015-12-29
@@ -155,13 +173,13 @@ List non-holidays in 2015 (using Indonesian holidays):
 List non-holidays business days in 2015 (using Indonesian holidays):
 
  % setop --diff <(dateseq 2015-01-01 2015-12-31 --business) <(list-id-holidays --year 2015)
+ 2015-01-01
  2015-01-02
  2015-01-05
  2015-01-06
  2015-01-07
- 2015-01-08
- ... 235 more lines ...
- 2015-12-23
+ ... 251 more lines ...
+ 2015-12-25
  2015-12-28
  2015-12-29
  2015-12-30
@@ -182,14 +200,6 @@ C<*> marks required options.
 =head2 Main options
 
 =over
-
-=item B<--business>
-
-Only list business days (Mon-Fri), or non-business days.
-
-=item B<--business6>
-
-Only list business days (Mon-Sat), or non-business days.
 
 =item B<--date-format>=I<s>, B<-f>
 
@@ -220,6 +230,28 @@ Decrement instead of increment.
 =item B<--to>=I<s>
 
 End date, if not specified will generate an infinite* stream of dates.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--business>
+
+Only list business days (Mon-Fri), or non-business days.
+
+=item B<--business6>
+
+Only list business days (Mon-Sat), or non-business days.
+
+=item B<--exclude-dow>=I<s>
+
+Only show dates with these day-of-weeks.
+
+=item B<--include-dow>=I<s>
+
+Only show dates with these day-of-weeks.
 
 =back
 

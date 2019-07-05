@@ -7,14 +7,16 @@ use Test::More;
 my $mod = 'RPi::Pin';
 
 if (! $ENV{PI_BOARD}){
-    warn "\n*** PI_BOARD is not set! ***\n";
     $ENV{NO_BOARD} = 1;
     plan skip_all => "not on a pi board\n";
 }
 
 {# pin
 
-    my $pin = $mod->new(18);
+    my $pin = $mod->new(18, "blah");
+
+    is $pin->comment, 'blah', "comment in new ok";
+    is $pin->comment('test'), 'test', "comment() sets and gets ok";
 
     is $pin->mode, 0, "pin mode is INPUT by default";
     is $pin->read, 0, "pin status is LOW by default";

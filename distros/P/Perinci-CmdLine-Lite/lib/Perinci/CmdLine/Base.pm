@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.822'; # VERSION
+our $DATE = '2019-07-04'; # DATE
+our $VERSION = '1.824'; # VERSION
 
 use 5.010001;
 use strict;
@@ -249,8 +249,7 @@ _
 
     config_path => {
         getopt  => 'config-path=s@',
-        schema  => ['array*', of => 'str*'],
-        'x.schema.element_entity' => 'filename',
+        schema  => ['array*', of => 'filename*'],
         summary => 'Set path to configuration file',
         handler => sub {
             my ($go, $val, $r) = @_;
@@ -295,7 +294,8 @@ _
             # we are not called from cmdline, bail (actually we might want to
             # return list of programs anyway, but we want to read the value of
             # bash_global_dir et al)
-            return undef unless $cmdline;
+            return {message=>'No completion (not called from cmdline)'}
+                unless $cmdline;
 
             # since this is common option, at this point we haven't parsed
             # argument or even read config file. let's parse argv first (argv
@@ -316,7 +316,8 @@ _
             }
 
             # we are not reading any config file, return empty list
-            return [] unless $r->{config};
+            return {message=>'No completion (not reading any config file)'}
+                unless $r->{config};
 
             my @profiles;
             for my $section (keys %{$r->{config}}) {
@@ -1739,7 +1740,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.822 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-06-26.
+This document describes version 1.824 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-07-04.
 
 =head1 DESCRIPTION
 

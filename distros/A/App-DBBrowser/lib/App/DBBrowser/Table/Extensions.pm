@@ -24,7 +24,7 @@ sub new {
 
 sub extended_col {
     my ( $sf, $sql, $clause ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my ( $none, $function, $subquery, $all ) = @{$sf->{i}{expand_signs}};
     my $set_to_null = '=N';
     my @values;

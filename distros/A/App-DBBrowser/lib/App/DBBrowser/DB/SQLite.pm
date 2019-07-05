@@ -72,7 +72,7 @@ sub get_databases {
         return $databases;
     }
     my ( $ok, $change ) = ( '- Confirm', '- Change' );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $choice = $tc->choose(
         [ undef, $ok, $change ],
         { %{$sf->{i}{lyt_v_clear}}, prompt => 'Search path: ' . join( ', ', @$dirs ), info => 'SQLite Databases' }

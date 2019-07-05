@@ -1,5 +1,12 @@
 Revision history for Perl extension Sub-Meta
 
+0.03 2019-07-05T06:59:02Z
+    - improve coverage
+
+0.02 2019-07-04T14:14:17Z
+    - Fixed test #1 (Thanks @eserte)
+    - Sync subinfo #2
+
 0.01 2019-06-27T10:59:04Z
 
     - original version

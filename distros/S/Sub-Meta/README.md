@@ -8,18 +8,42 @@ Sub::Meta - handle subroutine meta information
 ```perl
 use Sub::Meta;
 
-sub hello { }
+sub hello($) :mehtod { }
 my $meta = Sub::Meta->new(\&hello);
 $meta->subname; # => hello
-$meta->apply_subname('world'); # rename subroutine name
 
-# specify parameters types ( without validation )
+$meta->sub;        # \&hello
+$meta->subname;    # hello
+$meta->fullname    # main::hello
+$meta->stashname   # main
+$meta->file        # path/to/file.pl
+$meta->line        # 5
+$meta->is_constant # !!0
+$meta->prototype   # $
+$meta->attribute   # ['method']
+$meta->is_method   # undef
+$meta->parameters  # undef
+$meta->returns     # undef
+
+# setter
+$meta->set_subname('world');
+$meta->subname; # world
+$meta->fullname; # main::world
+
+# apply to sub
+$meta->apply_prototype('$@');
+$meta->prototype; # $@
+Sub::Util::prototype($meta->sub); # $@
+```
+
+And you can hold meta information of parameter type and return type. See also [Sub::Meta::Parameters](https://metacpan.org/pod/Sub::Meta::Parameters) and [Sub::Meta::Returns](https://metacpan.org/pod/Sub::Meta::Returns).
+
+```perl
 $meta->set_parameters( Sub::Meta::Parameters->new(args => [ { type => 'Str' }]) );
-$meta->parameters->args; # => Sub::Meta::Param->new({ type => 'Str' })
+$meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
-# specify returns types ( without validation )
 $meta->set_returns( Sub::Meta::Returns->new('Str') );
-$meta->returns->scalar; # => 'Str'
+$meta->returns->scalar; # 'Str'
 ```
 
 # DESCRIPTION
@@ -28,98 +52,131 @@ $meta->returns->scalar; # => 'Str'
 
 # METHODS
 
-## Constructor
-
-### new
+## new
 
 Constructor of `Sub::Meta`.
 
-## Getter
+## sub
 
-### sub
+A subroutine reference.
 
-A subroutine reference
+## set\_sub
 
-### subname
+Setter for subroutine reference.
+
+## subname
 
 A subroutine name, e.g. `hello`
 
-### fullname
+## set\_subname($subname)
+
+Setter for subroutine name.
+
+```perl
+$meta->subname; # hello
+$meta->set_subname('world');
+$meta->subname; # world
+Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
+```
+
+## apply\_subname($subname)
+
+Sets subroutine name and apply to the subroutine reference.
+
+```perl
+$meta->subname; # hello
+$meta->apply_subname('world');
+$meta->subname; # world
+Sub::Util::subname($meta->sub); # world
+```
+
+## fullname
 
 A subroutine full name, e.g. `main::hello`
 
-### stashname
+## set\_fullname($fullname)
+
+Setter for subroutine full name.
+
+## stashname
 
 A subroutine stash name, e.g. `main`
 
-### file
+## set\_stashname($stashname)
+
+Setter for subroutine stash name.
+
+## subinfo
+
+A subroutine information, e.g. `['main', 'hello']`
+
+## set\_subinfo(\[$stashname, $subname\])
+
+Setter for subroutine information.
+
+## file
 
 A filename where subroutine is defined, e.g. `path/to/main.pl`.
 
-### line
+## set\_file($filepath)
 
-A line where the definition of subroutine started.
+Setter for `file`.
 
-### is\_constant
+## line
+
+A line where the definition of subroutine started, e.g. `5`
+
+## set\_line($line)
+
+Setter for `line`.
+
+## is\_constant
 
 A boolean value indicating whether the subroutine is a constant or not.
 
-### prototype
+## set\_is\_constant($bool)
 
-A prototype of subroutine reference.
+Setter for `is_constant`.
 
-### attribute
+## prototype
 
-A attribute of subroutine reference.
+A prototype of subroutine reference, e.g. `$@`
 
-### is\_method
+## set\_prototype($prototype)
+
+Setter for `prototype`.
+
+## apply\_prototype($prototype)
+
+Sets subroutine prototype and apply to the subroutine reference.
+
+## attribute
+
+A attribute of subroutine reference, e.g. `undef`, `['method']`
+
+## set\_attribute($attribute)
+
+Setter for `attribute`.
+
+## apply\_attribute(@attribute)
+
+Sets subroutine attributes and apply to the subroutine reference.
+
+## is\_method
 
 A boolean value indicating whether the subroutine is a method or not.
 
-### parameters
+## set\_is\_method($bool)
+
+Setter for `is_method`.
+
+## parameters
 
 Parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub::Meta::Parameters).
 
-### returns
+## set\_parameters($parameters)
 
-Returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub::Meta::Returns).
-
-## Setter
-
-You can set meta information of subroutine. `set_xxx` sets `xxx` and does not affect subroutine reference. On the other hands, `apply_xxx` sets `xxx` and apply `xxx` to subroutine reference.
-
-Setter methods of `Sub::Meta` returns meta object. So you can chain setting: 
-
-```perl
-$meta->set_subname('foo')
-     ->set_stashname('Some')
-```
-
-### set\_xxx
-
-#### set\_sub($)
-
-#### set\_subname($)
-
-#### set\_fullname($)
-
-#### set\_stashname($)
-
-#### set\_file($)
-
-#### set\_line($)
-
-#### set\_is\_constant($)
-
-#### set\_prototype($)
-
-#### set\_attribute($)
-
-#### set\_is\_method($)
-
-#### set\_parameters($)
-
-Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub::Meta::Parameters) or any object:
+Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub::Meta::Parameters) or any object which has `positional`,`named`,`required` and `optional` methods.
 
 ```perl
 my $meta = Sub::Meta->new;
@@ -131,7 +188,11 @@ $meta->set_parameters(Sub::Meta::Parameters->new(type => 'Foo'));
 $meta->set_parameters(MyParamters->new)
 ```
 
-#### set\_returns($)
+## returns
+
+Returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub::Meta::Returns).
+
+## set\_returns($returns)
 
 Sets the returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub::Meta::Returns) or any object.
 
@@ -145,15 +206,18 @@ $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
 $meta->set_returns(MyReturns->new)
 ```
 
-### apply\_xxx
-
-#### apply\_subname($)
-
-#### apply\_prototype($)
-
-#### apply\_attribute(@)
-
 # NOTE
+
+## setter
+
+You can set meta information of subroutine. `set_xxx` sets `xxx` and does not affect subroutine reference. On the other hands, `apply_xxx` sets `xxx` and apply `xxx` to subroutine reference.
+
+Setter methods of `Sub::Meta` returns meta object. So you can chain setting:
+
+```perl
+$meta->set_subname('foo')
+     ->set_stashname('Some')
+```
 
 ## Pure-Perl version
 

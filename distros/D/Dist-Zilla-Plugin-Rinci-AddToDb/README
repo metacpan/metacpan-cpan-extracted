@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Rinci::AddToDb - Add Rinci metadata to database
 
+VERSION
+    This document describes version 0.020 of
+    Dist::Zilla::Plugin::Rinci::AddToDb (from Perl distribution
+    Dist-Zilla-Plugin-Rinci-AddToDb), released on 2019-07-04.
+
+SYNOPSIS
     In dist.ini:
 
      [Rinci::AddToDb]
@@ -8,15 +15,38 @@ SYNOPSIS
      ;password=...
 
 DESCRIPTION
-
     This plugin will search Rinci metadata in all modules and scripts, and
     add them to database using rimetadb. Later, you can gather various
     statistics from the database, e.g. average number of arguments per
     function, top argument types, etc.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Rinci-AddToDb>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Rinci-AddToDb>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Rin
+    ci-AddToDb>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci
 
     App::rimetadb
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

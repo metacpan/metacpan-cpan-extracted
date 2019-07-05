@@ -55,6 +55,7 @@ requires:
   Net::FTP: '0'
   Net::Ping: '0'
   Parse::CPAN::Meta: '0'
+  Pod::Perldoc::ToMan: '0'
   Scalar::Util: '0'
   Socket: '0'
   Term::ReadKey: '0'
@@ -69,5 +70,5 @@ requires:
   perl: '5.006002'
 resources:
   repository: https://github.com/andk/cpanpm
-version: '2.26'
+version: '2.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

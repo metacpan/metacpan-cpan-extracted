@@ -1,7 +1,7 @@
 package CPAN::Changes::Cwalitee::Core;
 
 our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.000'; # VERSION
+our $VERSION = '0.001'; # VERSION
 
 use 5.010001;
 use strict;
@@ -111,34 +111,119 @@ sub indicator_date_correct_format {
     [200, "OK", ''];
 }
 
-# $SPEC{indicator_releases_in_descending_date_order} = {
+$SPEC{indicator_releases_in_descending_date_order} = {
+    v => 1.1,
+    summary => 'Releases are ordered descendingly by its date (newest first)',
+    description => <<'_',
+
+This order is, in my opinion, the best order optimized for reading by users.
+
+_
+    args => {
+    },
+    'x.indicator.severity' => 2,
+};
+sub indicator_releases_in_descending_date_order {
+    require Data::Cmp;
+
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+    my @dates = map { $_->{date} } @{ $p->{_releases_array} // [] };
+    if (grep { !defined($_) || !$_ } @dates) {
+        return [412, "Some releases have unparsable dates"];
+    }
+
+    my @sorted_dates = sort { $b cmp $a } @dates;
+    if (Data::Cmp::cmp_data(\@dates, \@sorted_dates) == 0) {
+        return [200, "OK", ''];
+    } else {
+        return [200, "OK", "Releases are not ordered by descending date"];
+    }
+}
+
+$SPEC{indicator_release_dates_not_future} = {
+    v => 1.1,
+    summary => 'No release dates are in the future',
+    args => {
+    },
+    'x.indicator.severity' => 2,
+};
+sub indicator_release_dates_not_future {
+    require DateTime;
+    require DateTime::Format::ISO8601;
+
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+    my @dates        = map { $_->{date} }         @{ $p->{_releases_array} // [] };
+    my @parsed_dates = map { $_->{_parsed_date} } @{ $p->{_releases_array} // [] };
+    if (grep { !defined($_) || !$_ } @dates) {
+        return [412, "Some releases have unparsable dates"];
+    }
+
+    my $dt_now = DateTime->now(time_zone => 'UTC');
+    for my $i (0..$#dates) {
+        my $date = $dates[$i];
+        my $parsed_date = $parsed_dates[$i];
+        my $dt_rel = DateTime::Format::ISO8601->parse_datetime($date);
+        if (DateTime->compare($dt_now, $dt_rel) == -1) {
+            return [200, "OK", "Release date '$parsed_date' ($date) is in the future"];
+        }
+    }
+    [200, "OK", ''];
+}
+
+# currently commented-out, not good results
+#
+# $SPEC{indicator_preamble_english} = {
 #     v => 1.1,
-#     summary => 'Releases are ordered descendingly by its date (newest first)',
-#     description => <<'_',
-
-# This order is, in my opinion, the best order optimized for reading by users.
-
-# _
+#     summary => 'Preamble, if exists, is in English',
 #     args => {
 #     },
 #     'x.indicator.severity' => 2,
 # };
-# sub indicator_releases_in_descending_date_order {
+# sub indicator_preamble_english {
+#     require Lingua::Identify;
+
 #     my %args = @_;
 #     my $r = $args{r};
 
 #     my $p = $r->{parsed};
 #     defined $p or return [412];
 
-#     for my $v (sort keys %{ $p->{releases} }) {
-#         my $rel = $p->{releases}{$v};
+#     return [200, "OK", ''] unless $p->{preamble} =~ /\S/;
+
+#     my %langs = Lingua::Identify::langof($p->{preamble});
+#     return [412, "Lingua::Identify cannot detect language"] unless keys(%langs);
+
+#     my @langs = sort { $langs{$b}<=>$langs{$a} } keys %langs;
+#     my $confidence = Lingua::Identify::confidence(%langs);
+#     log_trace(
+#         "Lingua::Identify result: langof=%s, langs=%s, confidence=%s",
+#         \%langs, \@langs, $confidence);
+#     if ($langs[0] ne 'en') {
+#         [200, "OK", "Language not detected as English, ".
+#              sprintf("%d%% %s (confidence %.2f)",
+#                      $langs{$langs[0]}*100, $langs[0], $confidence)];
+#     } else {
+#         [200, "OK", ''];
 #     }
-#     [200, "OK", ''];
 # }
 
-# TODO: indicator_date_not_future
-# TODO: indicator_preamble_english
 # TODO: indicator_entries_english
+# TODO: indicator_sufficient_entries_length
+# TODO: indicator_version_correct_format
+# TODO: indicator_entries_not_commit_logs
+# TODO: indicator_entries_not_useless (e.g. 'Update/prepare Changes for v0.01')
+# TODO: indicator_name_preferred (e.g. Changes and not ChangeLog.txt)
+# TODO: indicator_text_not_too_wide
 
 1;
 # ABSTRACT: A collection of core indicators for CPAN Changes cwalitee
@@ -155,7 +240,7 @@ CPAN::Changes::Cwalitee::Core - A collection of core indicators for CPAN Changes
 
 =head1 VERSION
 
-This document describes version 0.000 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-03.
+This document describes version 0.001 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-03.
 
 =head1 FUNCTIONS
 
@@ -231,6 +316,58 @@ Usage:
  indicator_parsable() -> [status, msg, payload, meta]
 
 Parseable by CPAN::Changes.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_release_dates_not_future
+
+Usage:
+
+ indicator_release_dates_not_future() -> [status, msg, payload, meta]
+
+No release dates are in the future.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_releases_in_descending_date_order
+
+Usage:
+
+ indicator_releases_in_descending_date_order() -> [status, msg, payload, meta]
+
+Releases are ordered descendingly by its date (newest first).
+
+This order is, in my opinion, the best order optimized for reading by users.
 
 This function is not exported.
 

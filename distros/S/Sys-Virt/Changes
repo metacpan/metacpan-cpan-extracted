@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+5.5.0 2019-07-03
+
+ - Add support for virNetworkPortPtr object and its APIs
+
 5.4.0 2019-06-12
 
  - Add VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGALLOC and

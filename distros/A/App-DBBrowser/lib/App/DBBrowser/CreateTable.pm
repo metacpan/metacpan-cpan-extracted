@@ -10,11 +10,10 @@ use File::Basename qw( basename );
 use List::MoreUtils   qw( none any duplicates );
 #use SQL::Type::Guess qw(); # required
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( insert_sep );
-use Term::Form              qw();
-use Term::TablePrint        qw();
+use Term::Choose       qw();
+use Term::Choose::Util qw( insert_sep );
+use Term::Form         qw();
+use Term::TablePrint   qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -47,7 +46,7 @@ sub drop_view {
 sub __choose_drop_item {
     my ( $sf, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $sql = {};
     $ax->reset_sql( $sql );
     my $tables = [ grep { $sf->{d}{tables_info}{$_}[3] eq uc $type } @{$sf->{d}{user_tables}} ];
@@ -75,7 +74,7 @@ sub __drop {
     my $stmt_type = 'Drop_' . $type;
     $sf->{i}{stmt_types} = [ $stmt_type ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $ax->print_sql( $sql );
     # Choose
     my $ok = $tc->choose(
@@ -101,7 +100,6 @@ sub __drop {
             { grid => 2, prompt => $prompt_pt, max_rows => 0, keep_header => 1,
               table_expand => $sf->{o}{G}{info_expand} }
         );
-        print HIDE_CURSOR;
         $prompt = sprintf 'DROP %s %s  (%s %s)', uc $type, $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
         1; }
     ) {
@@ -129,7 +127,7 @@ sub create_view {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tf = Term::Form->new();
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $sql = {};
     $ax->reset_sql( $sql );
     $sf->{i}{stmt_types} = [ 'Create_view' ];
@@ -140,7 +138,6 @@ sub create_view {
         $ax->print_sql( $sql );
         # Readline
         my $view = $tf->readline( 'View name: ' );
-        print HIDE_CURSOR;
         if ( ! length $view ) {
             return;
         }
@@ -174,7 +171,7 @@ sub create_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $sql = {};
     $ax->reset_sql( $sql );
     my @cu_keys = ( qw/create_table_plain create_table_form_file create_table_form_copy/ );
@@ -255,7 +252,7 @@ sub create_table {
 sub __create {
     my ( $sf, $sql, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $ax->print_sql( $sql );
     # Choose
     my $create_table_ok = $tc->choose(
@@ -301,8 +298,8 @@ sub __insert_data {
 sub __set_table_name {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
-    my $tf = Term::Form->new();
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $table;
     my $c = 0;
 
@@ -325,7 +322,6 @@ sub __set_table_name {
         $table = $tf->readline( 'Table name: ',
             { info => $info, default => $default }
         );
-        print HIDE_CURSOR;
         if ( ! length $table ) {
             return;
         }
@@ -349,7 +345,7 @@ sub __set_table_name {
 sub __set_columns {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $row_count = @{$sql->{insert_into_args}};
     my $first_row = $sql->{insert_into_args}[0];
 
@@ -420,7 +416,7 @@ sub __set_columns {
 
 sub __header_row {
     my ( $sf, $sql ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $header_row;
     my ( $first_row, $user_input ) = ( '- First row', '- Add row' );
     # Choose
@@ -448,7 +444,7 @@ sub __autoincrement_column {
     my ( $sf, $sql ) = @_;
     $sf->{col_auto} = '';
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     if ( $sf->{constraint_auto} = $plui->primary_key_autoincrement_constraint( $sf->{d}{dbh} ) ) {
         $sf->{col_auto} = $sf->{o}{create}{autoincrement_col_name};
     }
@@ -476,13 +472,12 @@ sub __column_names {
     my ( $sf, $sql ) = @_;
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @{$sql->{create_table_cols}} ];
-    my $tf = Term::Form->new();
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
         { prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
-    print HIDE_CURSOR;
     if ( ! $form ) {
         return;
     }
@@ -515,7 +510,7 @@ sub __data_types {
         unshift @$fields, [ $ax->quote_col_qualified( [ $sf->{col_auto} ] ), $sf->{constraint_auto} ];
         $read_only = [ 0 ];
     }
-    my $tf = Term::Form->new();
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     $ax->print_sql( $sql );
     # Fill_form
     my $col_name_and_type = $tf->fill_form(
@@ -523,7 +518,6 @@ sub __data_types {
         { prompt => 'Data types:', auto_up => 2, read_only => $read_only, confirm => $sf->{i}{_confirm},
           back => $sf->{i}{_back} . '   ' }
     );
-    print HIDE_CURSOR;
     if ( ! $col_name_and_type ) {
         return;
     }

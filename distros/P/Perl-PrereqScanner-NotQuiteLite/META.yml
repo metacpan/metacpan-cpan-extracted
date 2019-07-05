@@ -33,5 +33,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite
-version: '0.9905'
+version: '0.9906'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

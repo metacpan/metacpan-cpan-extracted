@@ -43,6 +43,7 @@ my $put_expect = [
             [
               'http_req_res_list_unauthenticated',
               {
+					'description' => 'More elaborate HTTP vocab for PUT then GET test',
 					'http-requests' => [
 											  methods(method => 'PUT'),
 											  methods(method => 'GET')
@@ -61,6 +62,7 @@ my $cors_expect = [
             [
               'http_req_res_list_unauthenticated',
               {
+					'description' => 'Testing CORS header when Origin is supplied by client',
 					'http-requests' => [
 											  methods(method => 'GET')
 											 ],

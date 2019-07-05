@@ -5,10 +5,9 @@ use warnings;
 use strict;
 use 5.010001;
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( choose_a_number choose_a_subset );
-use Term::Form              qw();
+use Term::Choose       qw();
+use Term::Choose::Util qw( choose_a_number choose_a_subset );
+use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -26,7 +25,7 @@ sub new {
 
 sub col_function {
     my ( $sf, $sql, $clause ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $changed = 0;
     my $cols;
     if ( $clause eq 'select' && ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) ) {
@@ -73,7 +72,7 @@ sub col_function {
 
 sub __choose_columns {
     my ( $sf, $sql, $function, $arg_count, $cols ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     if ( ! $arg_count ) {
         return;
     }
@@ -98,7 +97,7 @@ sub __choose_columns {
 sub __prepare_col_func {
     my ( $sf, $func, $qt_col ) = @_; # $qt_col -> $arg
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $quote_f;
     if ( $func =~ /^Epoch_to_Date(?:Time)?\z/ ) {
         my $prompt = $func eq 'Epoch_to_Date' ? 'DATE' : 'DATETIME';
@@ -140,11 +139,10 @@ sub __prepare_col_func {
     }
     elsif ( $func eq 'Concat' ) {
         my $info = "\n" . 'Concat( ' . join( ',', @$qt_col ) . ' )';
-        my $tf = Term::Form->new();
+        my $tf = Term::Form->new( $sf->{i}{tf_default} );
         my $sep = $tf->readline( 'Separator: ',
             { info => $info }
         );
-        print HIDE_CURSOR;
         return if ! defined $sep;
         $quote_f = $plui->concatenate( $qt_col, $sep );
     }

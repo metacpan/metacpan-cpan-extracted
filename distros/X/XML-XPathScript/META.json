@@ -6,13 +6,13 @@
       "Matt Sergeant <matt@sergeant.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-XPathScript",
    "prereqs" : {
@@ -72,39 +72,39 @@
    "provides" : {
       "XML::XPathScript" : {
          "file" : "lib/XML/XPathScript.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Processor" : {
          "file" : "lib/XML/XPathScript/Processor.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Processor::B" : {
          "file" : "lib/XML/XPathScript/Processor/B.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Processor::LibXML" : {
          "file" : "lib/XML/XPathScript/Processor/LibXML.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Processor::XPath" : {
          "file" : "lib/XML/XPathScript/Processor/XPath.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Stylesheet::DocBook2LaTeX" : {
          "file" : "lib/XML/XPathScript/Stylesheet/DocBook2LaTeX.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Template" : {
          "file" : "lib/XML/XPathScript/Template.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Template::Content" : {
          "file" : "lib/XML/XPathScript/Processor.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       },
       "XML::XPathScript::Template::Tag" : {
          "file" : "lib/XML/XPathScript/Template/Tag.pm",
-         "version" : "1.55"
+         "version" : "2.00"
       }
    },
    "release_status" : "stable",
@@ -119,11 +119,16 @@
          "web" : "https://github.com/yanick/xml-xpathscript"
       }
    },
-   "version" : "1.55",
+   "version" : "2.00",
    "x_authority" : "cpan:YANICK",
    "x_contributor_covenant" : {
       "version" : 0.01
    },
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Yanick Champoux <yanick@babyl.ca>"
+   ],
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

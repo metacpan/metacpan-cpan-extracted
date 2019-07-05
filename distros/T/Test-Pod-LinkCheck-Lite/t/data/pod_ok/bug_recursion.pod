@@ -1,0 +1,9 @@
+=pod
+
+Versions through 0.000_002 suffered from a bug that generated an
+infinite recursion when the content of some node of the parse tree was
+false. This was tickled by, e.g., C<0>.
+
+=cut
+
+# ex: set textwidth=72 :

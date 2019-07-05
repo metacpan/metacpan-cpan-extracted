@@ -1,0 +1,47 @@
+---
+abstract: 'Test POD links'
+author:
+  - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Pod-LinkCheck-Lite
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Test::Pod::LinkCheck::Lite:
+    file: lib/Test/Pod/LinkCheck/Lite.pm
+    version: '0.001'
+requires:
+  B::Keywords: '0'
+  Carp: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  HTTP::Tiny: '0'
+  IPC::Cmd: '0'
+  Module::Load::Conditional: '0'
+  Pod::Perldoc: '0'
+  Pod::Simple: '0'
+  Pod::Simple::LinkSection: '0'
+  Pod::Simple::PullParser: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Test::Builder: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

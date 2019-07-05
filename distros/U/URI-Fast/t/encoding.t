@@ -117,6 +117,9 @@ subtest 'structured data' => sub{
   $circular->{foo}{fnord} = $circular->{foo};
   URI::Fast::escape_tree($circular);
   is $circular->{foo}{fnord}{bar}, 'baz%20bat', 'circular reference is escaped once';
+
+  ok dies{ URI::Fast::escape_tree('non-reference scalar value') }, 'escape_tree dies when called with non-reference scalar value';
+  ok dies{ URI::Fast::unescape_tree('non-reference scalar value') }, 'unescape_tree dies when called with non-reference scalar value';
 };
 
 done_testing;

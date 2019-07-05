@@ -7,10 +7,9 @@ use 5.010001;
 
 use File::Spec::Functions qw( catfile );
 
-use Term::Choose            qw();
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( choose_a_subset settings_menu );
-use Term::Form              qw();
+use Term::Choose       qw();
+use Term::Choose::Util qw( choose_a_subset settings_menu );
+use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -28,7 +27,7 @@ sub new {
 
 sub database_setting {
     my ( $sf, $db ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $old_idx_sec = 0;
 
     SECTION: while ( 1 ) {
@@ -224,12 +223,11 @@ sub __group_readline_db {
             $db_opt->{$section}{$_->{name}}
         ]
     } @{$items} ];
-    my $tf = Term::Form->new();
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $new_list = $tf->fill_form(
         $list,
         { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
-    print HIDE_CURSOR;
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {
             $db_opt->{$section}{$items->[$i]{name}} = $new_list->[$i][1];

@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 use overload
     fallback => 1,
@@ -74,67 +74,77 @@ Sub::Meta::Param - element of Sub::Meta::Parameters
 
 =head1 METHODS
 
-=head2 Constructor
-
-=head3 new
+=head2 new
 
 Constructor of C<Sub::Meta::Param>.
 
-=head2 Getter
-
-=head3 name
+=head2 name
 
 variable name, e.g. C<$msg>, C<@list>.
 
-=head3 type
+=head2 set_name(Str $name)
 
-Any type constraints
+Setter for C<name>.
 
-=head3 default
+=head2 type
 
-default value.
+Any type constraints, e.g. C<Str>.
 
-=head3 coerce
+=head2 set_type($type)
+
+Setter for C<type>.
+
+=head2 default
+
+default value, e.g. C<"HELLO">, C<sub { ... }>
+
+=head2 set_default($default)
+
+Setter for C<default>.
+
+=head2 coerce
 
 A boolean value indicating whether to coerce. Default to false.
 
-=head3 optional
+=head2 set_coerce($bool)
+
+Setter for C<coerce>.
+
+=head2 optional
 
 A boolean value indicating whether to optional. Default to false.
 This boolean is the opposite of C<required>.
 
-=head3 required
+=head2 set_optional($bool=true)
+
+Setter for C<optional>.
+
+=head2 required
 
 A boolean value indicating whether to required. Default to true.
 This boolean is the opposite of C<optional>.
 
-=head3 named
+=head2 set_required($bool=true)
+
+Setter for C<required>.
+
+=head2 named
 
 A boolean value indicating whether to named arguments. Default to false.
 This boolean is the opposite of C<positional>.
 
-=head3 positional
+=head2 set_named($bool=true)
+
+Setter for C<named>.
+
+=head2 positional
 
 A boolean value indicating whether to positional arguments. Default to true.
 This boolean is the opposite of C<positional>.
 
-=head2 Setter
+=head2 set_positional($bool=true)
 
-=head3 set_name(Str)
-
-=head3 set_type(Any)
-
-=head3 set_default(Any)
-
-=head3 set_coerce(Bool)
-
-=head3 set_optional(Bool = true)
-
-=head3 set_required(Bool = true)
-
-=head3 set_named(Bool = true)
-
-=head3 set_positional(Bool = true)
+Setter for C<positional>.
 
 =head1 SEE ALSO
 

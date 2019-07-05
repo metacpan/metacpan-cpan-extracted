@@ -4,11 +4,15 @@ AUTHORS
 Changes
 CONTRIBUTING
 Copying
+Docker/rperl_for_endusers/Dockerfile
+Docker/rperl_for_git_release_testing/Dockerfile
 docs/appveyor_notes.txt
 docs/compile_modes.txt
 docs/compile_notes.txt
+docs/compilers.txt
 docs/dev_notes.txt
 docs/devs_getting_started.txt
+docs/learning_rperl_need_add.txt
 docs/magic_plan.txt
 docs/oo_modes.txt
 docs/perl_modes.txt
@@ -1334,11 +1338,13 @@ lib/RPerl/Test/Operator15LogicalAnd/program_00_bad_00.pl
 lib/RPerl/Test/Operator15LogicalAnd/program_00_bad_01.pl
 lib/RPerl/Test/Operator15LogicalAnd/program_00_bad_02.pl
 lib/RPerl/Test/Operator15LogicalAnd/program_00_bad_03.pl
+lib/RPerl/Test/Operator15LogicalAnd/program_00_good.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Operator15LogicalAnd/program_00_good.pl
 lib/RPerl/Test/Operator16LogicalOr/program_00_bad_00.pl
 lib/RPerl/Test/Operator16LogicalOr/program_00_bad_01.pl
 lib/RPerl/Test/Operator16LogicalOr/program_00_bad_02.pl
 lib/RPerl/Test/Operator16LogicalOr/program_00_bad_03.pl
+lib/RPerl/Test/Operator16LogicalOr/program_00_good.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Operator16LogicalOr/program_00_good.pl
 lib/RPerl/Test/Operator17ListRange/program_00_bad_00.pl
 lib/RPerl/Test/Operator17ListRange/program_00_bad_01.pl
@@ -1387,12 +1393,19 @@ lib/RPerl/Test/Operator23LogicalAnd/program_00_bad_00.pl
 lib/RPerl/Test/Operator23LogicalAnd/program_00_bad_01.pl
 lib/RPerl/Test/Operator23LogicalAnd/program_00_bad_02.pl
 lib/RPerl/Test/Operator23LogicalAnd/program_00_bad_03.pl
+lib/RPerl/Test/Operator23LogicalAnd/program_00_good.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Operator23LogicalAnd/program_00_good.pl
 lib/RPerl/Test/Operator24LogicalOrXor/program_00_bad_00.pl
 lib/RPerl/Test/Operator24LogicalOrXor/program_00_bad_01.pl
 lib/RPerl/Test/Operator24LogicalOrXor/program_00_bad_02.pl
 lib/RPerl/Test/Operator24LogicalOrXor/program_00_bad_03.pl
+lib/RPerl/Test/Operator24LogicalOrXor/program_00_good.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Operator24LogicalOrXor/program_00_good.pl
+lib/RPerl/Test/Operator24LogicalOrXor/program_01_bad_00.pl
+lib/RPerl/Test/Operator24LogicalOrXor/program_01_bad_01.pl
+lib/RPerl/Test/Operator24LogicalOrXor/program_01_bad_02.pl
+lib/RPerl/Test/Operator24LogicalOrXor/program_01_bad_03.pl
+lib/RPerl/Test/Operator24LogicalOrXor/program_01_good.pl
 lib/RPerl/Test/OperatorVoid01NamedPushPop/program_00_bad_00.pl
 lib/RPerl/Test/OperatorVoid01NamedPushPop/program_00_bad_01.pl
 lib/RPerl/Test/OperatorVoid01NamedPushPop/program_00_bad_02.pl
@@ -1879,6 +1892,8 @@ lib/RPerl/Test/Shebang/program_02_good.pl
 lib/RPerl/Test/Shebang/program_03_good.pl
 lib/RPerl/Test/SimpleA.pm
 lib/RPerl/Test/SimpleB.pm
+lib/RPerl/Test/SSE/program_00_good.pl
+lib/RPerl/Test/SSE/program_01_good.pl
 lib/RPerl/Test/Statement/program_00_good.pl
 lib/RPerl/Test/Statement/program_01_good.pl
 lib/RPerl/Test/Statement/program_02_good.pl
@@ -2244,7 +2259,6 @@ lib/typemap.rperl
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
 README
 README.md
 script/demo/bubble_sort.pl
@@ -2327,3 +2341,4 @@ t/20_compile_oo_inherit.t.empty
 t/22_compile_execute.t.not_ready_yet
 THANKS
 META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

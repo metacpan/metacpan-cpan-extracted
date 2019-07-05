@@ -39,7 +39,7 @@
    "provides" : {
       "Apache::Session::Browseable" : {
          "file" : "lib/Apache/Session/Browseable.pm",
-         "version" : "v1.2.8"
+         "version" : "v1.3.2"
       },
       "Apache::Session::Browseable::DBI" : {
          "file" : "lib/Apache/Session/Browseable/DBI.pm",
@@ -83,7 +83,7 @@
       },
       "Apache::Session::Browseable::Redis" : {
          "file" : "lib/Apache/Session/Browseable/Redis.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.3.2"
       },
       "Apache::Session::Browseable::SQLite" : {
          "file" : "lib/Apache/Session/Browseable/SQLite.pm",
@@ -119,7 +119,7 @@
       },
       "Apache::Session::Browseable::Store::Redis" : {
          "file" : "lib/Apache/Session/Browseable/Store/Redis.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.3.2"
       },
       "Apache::Session::Browseable::Store::SQLite" : {
          "file" : "lib/Apache/Session/Browseable/Store/SQLite.pm",
@@ -155,6 +155,6 @@
          "url" : "https://github.com/LemonLDAPNG/Apache-Session-Browseable"
       }
    },
-   "version" : "v1.3.1",
+   "version" : "v1.3.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

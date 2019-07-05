@@ -4,7 +4,7 @@ author:
   - 'kfly8 <kfly@cpan.org>'
 build_requires:
   JSON::PP: '0'
-  Test2::V0: '0'
+  Test2::V0: '0.000111'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -27,16 +27,16 @@ no_index:
 provides:
   Sub::Meta:
     file: lib/Sub/Meta.pm
-    version: '0.01'
+    version: '0.03'
   Sub::Meta::Param:
     file: lib/Sub/Meta/Param.pm
-    version: '0.01'
+    version: '0.03'
   Sub::Meta::Parameters:
     file: lib/Sub/Meta/Parameters.pm
-    version: '0.01'
+    version: '0.03'
   Sub::Meta::Returns:
     file: lib/Sub/Meta/Returns.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Carp: '0'
   Scalar::Util: '0'
@@ -47,7 +47,9 @@ resources:
   bugtracker: https://github.com/kfly8/p5-Sub-Meta/issues
   homepage: https://github.com/kfly8/p5-Sub-Meta
   repository: git://github.com/kfly8/p5-Sub-Meta.git
-version: '0.01'
+version: '0.03'
 x_authority: cpan:KFLY
+x_contributors:
+  - 'Kenta Kobayashi <kentafly88@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

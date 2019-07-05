@@ -1,0 +1,8 @@
+=pod
+
+Link to an external module which exists but which is (very probably) not
+installed: L<Invalid module|Invalid module>.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -1,5 +1,8 @@
-Revision history for Dist-Zilla-Plugin-Rinci-AddToDb
+0.020   2019-07-04  Released-By: PERLANCAR; Urgency: medium
 
-0.01     2015-12-01 (PERLANCAR)
+	- Skip non-OnDisk files for now.
 
-         - First release.
+
+0.01    2015-12-01  Released-By: PERLANCAR
+
+        - First release.

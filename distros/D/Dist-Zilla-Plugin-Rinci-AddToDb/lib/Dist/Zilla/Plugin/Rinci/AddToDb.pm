@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Rinci::AddToDb;
 
-our $DATE = '2015-12-01'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2019-07-04'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -78,6 +78,13 @@ sub process_file {
 
     my ($self, $file) = @_;
 
+    my $fname = $file->name;
+
+    unless ($file->isa("Dist::Zilla::File::OnDisk")) {
+        $self->log_debug(["skipping %s: not an ondisk file, currently only ondisk files are processed", $fname]);
+        return;
+    }
+
     local @INC = ('lib', @INC);
 
     if (my ($pkg_pm, $pkg) = $file->name =~ m!^lib/((.+)\.pm)$!) {
@@ -113,7 +120,7 @@ Dist::Zilla::Plugin::Rinci::AddToDb - Add Rinci metadata to database
 
 =head1 VERSION
 
-This document describes version 0.01 of Dist::Zilla::Plugin::Rinci::AddToDb (from Perl distribution Dist-Zilla-Plugin-Rinci-AddToDb), released on 2015-12-01.
+This document describes version 0.020 of Dist::Zilla::Plugin::Rinci::AddToDb (from Perl distribution Dist-Zilla-Plugin-Rinci-AddToDb), released on 2019-07-04.
 
 =head1 SYNOPSIS
 
@@ -133,12 +140,6 @@ etc.
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
-
-L<Rinci>
-
-L<App::rimetadb>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-Rinci-AddToDb>.
@@ -155,13 +156,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Rinci>
+
+L<App::rimetadb>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

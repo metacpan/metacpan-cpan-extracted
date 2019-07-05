@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.113';
+our $VERSION = '0.115';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -41,7 +41,8 @@ sub new {
     my $self = bless {}, $class;
     if ( defined $opt ) {
         croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
-        $self->__validate_options( $opt );
+        my $valid = $self->__valid_options();
+        $self->__validate_and_add_options( $valid, $opt );
     }
     $self->{backup_opt} = { defined $opt ? %$opt : () };
     $self->{plugin} = $Plugin->new();
@@ -51,13 +52,14 @@ sub new {
 
 sub DESTROY {
     my ( $self ) = @_;
-    print SHOW_CURSOR;
+    if ( $self->{hide_cursor} ) {
+        print SHOW_CURSOR;
+    }
 }
 
 
-sub __validate_options {
-    my ( $self, $opt ) = @_;
-    my $valid = {
+sub __valid_options {
+    return {
         max_rows          => '[ 0-9 ]+',
         min_col_width     => '[ 0-9 ]+',
         progress_bar      => '[ 0-9 ]+',
@@ -72,26 +74,33 @@ sub __validate_options {
         grid              => '[ 0 1 2 ]',
         table_expand      => '[ 0 1 2 ]',
         mouse             => '[ 0 1 2 3 4 ]',
-        binary_string     => '',
-        decimal_separator => '',
-        prompt            => '',
-        undef             => '',
-        #thsd_sep         => '',
+        binary_string     => 'Str',
+        decimal_separator => 'Str',
+        prompt            => 'Str',
+        undef             => 'Str',
+        #thsd_sep         => 'Str',
     };
+}
+
+
+sub __validate_and_add_options {
+    my ( $self, $valid, $opt ) = @_;
+    return if ! defined $opt;
+    my $sub =  ( caller( 1 ) )[3];
+    $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
+    $sub .= ':';
     for my $key ( keys %$opt ) {
         if ( ! exists $valid->{$key} ) {
-            croak "print_table: '$key' is not a valid option name.";
+            croak "$sub '$key' is not a valid option name";
         }
         next if ! defined $opt->{$key};
-        if ( $valid->{$key} eq '' ) {
-            $self->{$key} = $opt->{$key};
+        if ( $valid->{$key} eq 'Str' ) {
+            croak "$sub $key => references are not valid values." if ref $opt->{$key} ne '';
         }
-        elsif ( $opt->{$key} =~ /^$valid->{$key}\z/x ) {
-            $self->{$key} = $opt->{$key};
+        elsif ( $opt->{$key} !~ m/^$valid->{$key}\z/x ) {
+            croak "$sub $key => '$opt->{$key}' is not a valid value.";
         }
-        else {
-            croak "print_table: '$opt->{$key}' is not a valid value for option '$key'.";
-        }
+        $self->{$key} = $opt->{$key};
     }
 }
 
@@ -154,7 +163,8 @@ sub print_table {
     croak "print_table: requires an ARRAY reference as its first argument."            if ref $table_ref  ne 'ARRAY';
     if ( defined $opt ) {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
-        $self->__validate_options( $opt );
+        my $valid = $self->__valid_options();
+        $self->__validate_and_add_options( $valid, $opt );
     }
     $self->__set_defaults();
     local $| = 1;
@@ -579,7 +589,7 @@ sub __cols_to_string {
             }
             $str = $str . $tab if $col != $#$w_cols;
         }
-        $str = $str . RESET if $self->{color};
+        #$str = $str . RESET if $self->{color};
         $self->{table_copy}[$row] = $str;   # overwrite table_copy to save memory
         if ( $self->{progress}{type} ) {                          #
             if ( $count >= $self->{progress}{next_update} ) {     #
@@ -738,7 +748,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.113
+Version 0.115
 
 =cut
 
@@ -933,8 +943,6 @@ Default: 0
 =head3 color
 
 Setting this option to C<1> enables the support for color and text formatting escape sequences.
-
-At the end of each row it is added automatically a reset (C<\e[0m>) if I<color> is enabled.
 
 Default: 0
 

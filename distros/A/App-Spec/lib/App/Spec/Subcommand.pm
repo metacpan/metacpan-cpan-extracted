@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package App::Spec::Subcommand;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use App::Spec::Option;
 use App::Spec::Parameter;

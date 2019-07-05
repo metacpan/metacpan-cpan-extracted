@@ -44,7 +44,8 @@ my $simple = [[
 					 'multi_vocabs',
 					 {
 					  'http://example.org/other-vocab#foo' => '42',
-					  'all' => 'counter-clockwise dahut'
+					  'all' => 'counter-clockwise dahut',
+					  'description' => 'Echo a string',
 					 }
 					]
 				  ]];

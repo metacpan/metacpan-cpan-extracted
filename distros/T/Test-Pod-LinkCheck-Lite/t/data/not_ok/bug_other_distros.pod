@@ -1,0 +1,26 @@
+=pod
+
+This document contains POD that tickles bugs reported against other link
+checkers, to wit:
+
+=head1 Test-Pod-LinkCheck
+
+=head2 RT #73281 for Test-Pod-LinkCheck: Doesn't handle unknown link types gracefully
+
+L<mail(1)> or L<mailx(1)>
+
+=head2 RT #112112 for Test-Pod-LinkCheck: Says that Compress::Deflate7 doesn't exist
+
+L<Compress::Deflate7>
+
+=head1 Test-Pod-Links
+
+None outstanding.
+
+=head1 Test-Pod-No404s
+
+None relevant.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -4,13 +4,13 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-SchwartzRatio",
    "prereqs" : {
@@ -46,7 +46,6 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "List::Lazy" : "0",
             "Test::DZil" : "0",
             "Test::Deep" : "0",
             "Test::MockObject" : "0",
@@ -57,7 +56,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::SchwartzRatio" : {
          "file" : "lib/Dist/Zilla/Plugin/SchwartzRatio.pm",
-         "version" : "v0.3.2"
+         "version" : "v0.3.3"
       }
    },
    "release_status" : "stable",
@@ -72,14 +71,19 @@
          "web" : "https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio"
       }
    },
-   "version" : "0.3.2",
+   "version" : "0.3.3",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
    "x_contributors" : [
-      "brian greenfield <0briang0@gmail.com>"
+      "brian greenfield <0briang0@gmail.com>",
+      "Yanick Champoux <yanick@babyl.ca>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test2::Tools::Basic' => '0'
+        'Test2::Tools::Basic' => '0',
+        'Test::Output'        => '0'
     },
     PREREQ_PM => {
         'File::Slurp' => '0',

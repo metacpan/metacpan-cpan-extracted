@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate;
-$App::SpreadRevolutionaryDate::VERSION = '0.26';
+$App::SpreadRevolutionaryDate::VERSION = '0.27';
 # ABSTRACT: Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon and Freenode.
 
 use Moose;
@@ -107,7 +107,7 @@ App::SpreadRevolutionaryDate - Spread date and time from Revolutionary (Republic
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 METHODS
 

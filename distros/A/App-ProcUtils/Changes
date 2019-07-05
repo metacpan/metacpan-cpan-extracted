@@ -1,22 +1,28 @@
-0.031   2018-04-03 (PERLANCAR)
+0.032   2019-07-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [removed] Spin off ppgrep to its own distro to have a
+	  small-dependency App-ppgrep distro.
+
+
+0.031   2018-04-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace nonnegint with uint.
 
 
-0.030   2018-01-17 (PERLANCAR)
+0.030   2018-01-17  Released-By: PERLANCAR
 
         - Add utilities: ppgrep, proc-table.
 
 
-0.02    2016-01-18 (PERLANCAR)
+0.02    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.01    2015-12-16 (PERLANCAR)
+0.01    2015-12-16  Released-By: PERLANCAR
 
         - First release.

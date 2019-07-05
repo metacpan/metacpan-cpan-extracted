@@ -1,0 +1,8 @@
+=pod
+
+This is a POD file containing only a URL link; specifically
+L<https://metacpan.org/release/Test-Pod-LinkCheck>.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -1,0 +1,4 @@
+0.032   2019-07-04  Released-By: PERLANCAR
+
+        - First release. Spin ppgrep out of App-ProcUtils and build it using
+          Perinci::CmdLine::Inline to have a distro with small dependency.

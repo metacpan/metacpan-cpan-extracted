@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.203';
+our $VERSION = '2.205';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -39,7 +39,8 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        default     => { undef => '<<', prompt => 'Choose:', hide_cursor => 0 },
+        tc_default  => { undef => '<<', prompt => 'Choose:', hide_cursor => 0 },
+        tf_default  => { hide_cursor => 2 },
         lyt_h       => { order => 0, justify => 2 },
         lyt_v       => { undef => '  BACK', layout => 3, },
         lyt_v_clear => { undef => '  BACK', layout => 3, clear_screen => 1 },
@@ -93,7 +94,7 @@ sub __init {
         );
         if ( $help ) {
             if ( $sf->{o}{table}{mouse} ) {
-                $sf->{i}{default}{mouse} = $sf->{o}{table}{mouse};
+                $sf->{i}{tc_default}{mouse} = $sf->{o}{table}{mouse};
             }
             print CLEAR_SCREEN; #
             require App::DBBrowser::Opt::Set;
@@ -112,13 +113,14 @@ sub __init {
         }
     }
     if ( $sf->{o}{table}{mouse} ) {
-        $sf->{i}{default}{mouse} = $sf->{o}{table}{mouse};
+        $sf->{i}{tc_default}{mouse} = $sf->{o}{table}{mouse};
     }
 }
 
 
 sub run {
     my ( $sf ) = @_;
+    local $| = 1;
     local $SIG{INT} = sub {
         if ( defined $sf->{i}{f_copy_paste} && -e $sf->{i}{f_copy_paste} ) {
             unlink $sf->{i}{f_copy_paste};
@@ -126,7 +128,7 @@ sub run {
         exit;
     };
     $sf->__init();
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $auto_one = 0;
     my $old_idx_plugin = 0;
@@ -524,9 +526,6 @@ sub run {
         }
     }
     # END of App
-    delete $ENV{TC_RESET_AUTO_UP};
-    print CLEAR_TO_END_OF_SCREEN;
-    print SHOW_CURSOR;
 }
 
 
@@ -555,7 +554,6 @@ sub __browse_the_table {
         }
 
         print_table( $all_arrayref, $sf->{o}{table} );
-        print HIDE_CURSOR;
 
         delete $sf->{o}{table}{max_rows};
     }
@@ -566,18 +564,18 @@ sub __create_drop_or_attach {
     my ( $sf, $table ) = @_;
     my $old_idx = exists $sf->{old_idx_hidden} ? delete $sf->{old_idx_hidden} : 0;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     require App::DBBrowser::CreateTable;
     require App::DBBrowser::AttachDB;
 
     HIDDEN: while ( 1 ) {
         my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases ) = (
-          '- CREATE Table', '- DROP Table', '- CREATE View', '- DROP View', '- Attach DB',     '- Detach DB',
+          '- Create TABLE', '- Drop   TABLE', '- Create VIEV', '- Drop   VIEW', '- Attach DB',     '- Detach DB',
         );
         my @choices;
         push @choices, $create_table if $sf->{o}{enable}{create_table};
-        push @choices, $create_view  if $sf->{o}{enable}{create_view};
         push @choices, $drop_table   if $sf->{o}{enable}{drop_table};
+        push @choices, $create_view  if $sf->{o}{enable}{create_view};
         push @choices, $drop_view    if $sf->{o}{enable}{drop_view};
         if ( $sf->{i}{driver} eq 'SQLite' ) {
             push @choices, $attach_databases;
@@ -604,7 +602,7 @@ sub __create_drop_or_attach {
         }
         die if $idx < @pre;
         my $choice = $choices[$idx-@pre];
-        if ( $choice =~ /^-\ (?:CREATE|DROP)/ ) {
+        if ( $choice =~ /^-\ (?:Create|Drop)/i ) {
             #require App::DBBrowser::CreateTable;
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
@@ -708,7 +706,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.203
+Version 2.205
 
 =head1 DESCRIPTION
 

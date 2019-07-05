@@ -26,7 +26,7 @@ sub union_tables {
     my ( $sf ) = @_;
     $sf->{i}{stmt_types} = [ 'Union' ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
     my $union = {
@@ -127,7 +127,7 @@ sub union_tables {
 sub __union_table_columns {
     my ( $sf, $union, $union_table, $qt_union_table ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my ( $privious_cols, $void ) = ( q['^'], q[' '] );
     my $next_idx = @{$union->{subselect_data}};
     my $table_cols = [];
@@ -179,7 +179,7 @@ sub __union_table_columns {
 sub __union_all_tables {
     my ( $sf, $union ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{default} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @tables_union_auto;
     for my $table ( @{$sf->{d}{user_tables}} ) {
         if ( $sf->{d}{tables_info}{$table}[3] ne 'TABLE' ) {

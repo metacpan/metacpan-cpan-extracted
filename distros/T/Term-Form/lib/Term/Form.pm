@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.515';
+our $VERSION = '0.516';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -33,94 +33,156 @@ sub ReadLine { 'Term::Form' }
 
 sub new {
     my $class = shift;
-    my ( $arg ) = @_;
+    croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
+    my ( $opt ) = @_;
     my $self = bless {}, $class;
-    $self->__set_defaults();
-    $self->{pg} = $Plugin->new();
+    if ( defined $opt ) {
+        croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
+        my $valid = $self->__valid_options( 'new' );
+        $self->__validate_and_add_options( $valid, $opt );
+    }
+    $self->{backup_opt} = { defined $opt ? %$opt : () };
+    $self->{plugin} = $Plugin->new();
     return $self;
 }
 
 
-sub DESTROY {
-    my ( $self ) = @_;
-    $self->__reset_term( { hide_cursor => 1 } );
+sub __valid_options {
+    my ( $self, $caller ) = @_;
+    if ( $caller eq 'new' ) {
+        return {
+            clear_screen     => '[ 0 1 ]',
+            codepage_mapping => '[ 0 1 ]',
+            show_context     => '[ 0 1 ]',
+            auto_up          => '[ 0 1 2 ]',
+            hide_cursor      => '[ 0 1 2 ]',
+            no_echo          => '[ 0 1 2 ]',
+            read_only        => 'ARRAY',
+            back             => 'Str',
+            confirm          => 'Str',
+            default          => 'Str',
+            info             => 'Str',
+            prompt           => 'Str',
+        };
+    }
+    if ( $caller eq 'readline' ) {
+        return {
+            clear_screen     => '[ 0 1 ]',
+            codepage_mapping => '[ 0 1 ]',
+            show_context     => '[ 0 1 ]',
+            hide_cursor      => '[ 0 1 2 ]',
+            no_echo          => '[ 0 1 2 ]',
+            default          => 'Str',
+            info             => 'Str',
+        };
+    }
+    if ( $caller eq 'fill_form' ) {
+        return {
+            clear_screen     => '[ 0 1 ]',
+            codepage_mapping => '[ 0 1 ]',
+            auto_up          => '[ 0 1 2 ]',
+            hide_cursor      => '[ 0 1 2 ]',
+            read_only        => 'ARRAY',
+            back             => 'Str',
+            confirm          => 'Str',
+            info             => 'Str',
+            prompt           => 'Str',
+        };
+    }
 }
 
 
-sub __init_term {
-    my ( $self ) = @_;
-    $self->{pg}->__set_mode( { mode => 'cbreak', hide_cursor => 0 } );
-}
-
-
-sub __reset_term {
-    my ( $self, $opt, $up ) = @_;
-    if ( defined $self->{pg} ) {
-        $self->{pg}->__reset_mode();
-    }
-    for my $key ( keys %$self ) {
-        next if $key eq 'pg' || $key eq 'name';
-        delete $self->{$key};
-    }
-    $self->__set_defaults();
-    if ( $up ) {
-        print UP x $up;
-    }
-    print "\r" . CLEAR_TO_END_OF_SCREEN;
-    if ( $opt->{hide_cursor} == 1 ) {
-        print SHOW_CURSOR;
-    }
-    elsif ( $opt->{hide_cursor} == 2 ) { # documentation
-        print HIDE_CURSOR;
+sub __validate_and_add_options {
+    my ( $self, $valid, $opt ) = @_;
+    return if ! defined $opt;
+    my $sub =  ( caller( 1 ) )[3];
+    $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
+    $sub .= ':';
+    for my $key ( keys %$opt ) {
+        if ( ! exists $valid->{$key} ) {
+            croak "$sub '$key' is not a valid option name";
+        }
+        next if ! defined $opt->{$key};
+        if ( $valid->{$key} eq 'ARRAY' ) {
+            croak "$sub $key => the passed value has to be an ARRAY reference." if ref $opt->{$key} ne 'ARRAY';
+            {
+                no warnings 'uninitialized';
+                for ( @{$opt->{$key}} ) {
+                    /^[0-9]+\z/ or croak "$sub $key => $_ is an invalid array element";
+                }
+            }
+        }
+        elsif ( $valid->{$key} eq 'Str' ) {
+            croak "$sub $key => references are not valid values." if ref $opt->{$key} ne '';
+        }
+        elsif ( $opt->{$key} !~ m/^$valid->{$key}\z/x ) {
+            croak "$sub $key => '$opt->{$key}' is not a valid value.";
+        }
+        $self->{$key} = $opt->{$key};
     }
 }
 
 
 sub __set_defaults {
     my ( $self ) = @_;
-    $self->{no_echo}          = 0;
-    $self->{default}          = '';
-    $self->{clear_screen}     = 0;
-    $self->{codepage_mapping} = 0;
-    $self->{hide_cursor}      = 1;
-    $self->{info}             = '';
-    $self->{prompt}           = '';
-    $self->{auto_up}          = 0;
-    $self->{back}             = '   BACK';
-    $self->{confirm}          = 'CONFIRM';
-    $self->{read_only}        = [];
-    $self->{show_context}     = 0;
+    $self->{auto_up}          = 0         if ! defined $self->{auto_up};
+    $self->{back}             = '   BACK' if ! defined $self->{back};
+    $self->{clear_screen}     = 0         if ! defined $self->{clear_screen};
+    $self->{codepage_mapping} = 0         if ! defined $self->{codepage_mapping};
+    $self->{confirm}          = 'CONFIRM' if ! defined $self->{confirm};
+    $self->{default}          = ''        if ! defined $self->{default};
+    $self->{hide_cursor}      = 1         if ! defined $self->{hide_cursor};
+    $self->{info}             = ''        if ! defined $self->{info};
+    $self->{no_echo}          = 0         if ! defined $self->{no_echo};
+    $self->{prompt}           = ''        if ! defined $self->{prompt} ;
+    $self->{read_only}        = []        if ! defined $self->{read_only};
+    $self->{show_context}     = 0         if ! defined $self->{show_context};
 }
 
 
-sub __validate_options {
-    my ( $self, $opt, $valid ) = @_;
-    my $sub =  ( caller( 1 ) )[3];
-    $sub =~ s/^.+::([^:]+)\z/$1/;
-    for my $k ( keys %$opt ) {
-        if ( ! exists $valid->{$k} ) {
-            croak $sub . ": '$k' is not a valid option name";
-        }
-        if ( ! defined $opt->{$k} ) {
-            next;
-        }
-        if ( ref $opt->{$k} ) {
-            if ( $valid->{$k} eq 'ARRAY' ) {
+sub DESTROY {
+    my ( $self ) = @_;
+    if ( $self->{hide_cursor} ) { ##
+        $self->__reset_term( { hide_cursor => $self->{hide_cursor} } );
+    }
+}
+
+
+sub __init_term {
+    my ( $self ) = @_;
+    $self->{plugin}->__set_mode( { mode => 'cbreak', hide_cursor => 0 } );
+}
+
+
+sub __reset_term {
+    my ( $self, $opt, $up ) = @_;
+    if ( defined $self->{plugin} ) {
+        $self->{plugin}->__reset_mode();
+    }
+    if ( $up ) {
+        print UP x $up;
+    }
+    print "\r" . CLEAR_TO_END_OF_SCREEN;
+    if ( $self->{hide_cursor} == 1 ) {
+        print SHOW_CURSOR;
+    }
+    elsif ( $self->{hide_cursor} == 2 ) { # documentation
+        print HIDE_CURSOR;
+    }
+    if ( exists $self->{backup_opt} ) {
+        my $backup_opt = $self->{backup_opt};
+        for my $key ( keys %$self ) {
+            if ( $key eq 'plugin' || $key eq 'backup_opt' ) {
                 next;
             }
-            croak $sub . ": option '$k' : a reference is not a valid value.";
-        }
-        if ( $valid->{$k} eq '' ) {
-            next;
-        }
-        if ( $opt->{$k} !~ m/^$valid->{$k}\z/x ) {
-            croak $sub . ": option '$k' : '$opt->{$k}' is not a valid value.";
+            elsif ( exists $backup_opt->{$key} ) {
+                $self->{$key} = $backup_opt->{$key};
+            }
+            else {
+                delete $self->{$key};
+            }
         }
     }
-    for my $k ( keys %$valid ) {
-        $opt->{$k} = $self->{$k} if ! defined $opt->{$k};
-    }
-    return $opt;
 }
 
 
@@ -165,8 +227,8 @@ sub __calculate_threshold {
 
 sub __before_readline {
     my ( $self, $opt, $m ) = @_;
-    my @info = split /\n/, line_fold( $opt->{info}, $self->{i}{term_w} ), -1;
-    if ( $opt->{show_context} ) {
+    my @info = split /\n/, line_fold( $self->{info}, $self->{i}{term_w} ), -1;
+    if ( $self->{show_context} ) {
         my @before_lines;
         if ( $m->{diff} ) {
             my $line = '';
@@ -220,7 +282,7 @@ sub __before_readline {
 sub __after_readline {
     my ( $self, $opt, $m ) = @_;
     my $count_chars_after = @{$m->{str}} - ( @{$m->{p_str}} + $m->{diff} );
-    if (  ! $opt->{show_context} || ! $count_chars_after ) {
+    if (  ! $self->{show_context} || ! $count_chars_after ) {
         $self->{i}{post_text} = '';
         $self->{i}{post_text_row_count} = 0;
         return;
@@ -261,7 +323,7 @@ sub __init_readline {
         $self->{i}{max_key_w} = int( $term_w / 3 );
         $self->{i}{prompt} = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
     }
-    if ( $opt->{show_context} ) {
+    if ( $self->{show_context} ) {
         $self->{i}{arrow_left}  = '';
         $self->{i}{arrow_right} = '';
         $self->{i}{arrow_w} = 0;
@@ -276,7 +338,7 @@ sub __init_readline {
     }
     $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
     $self->{i}{th} = 40 if $self->{i}{th} > 40;
-    my $list = [ [ $prompt, $opt->{default} ] ];
+    my $list = [ [ $prompt, $self->{default} ] ];
     my $m = $self->__string_and_pos( $list );
     return $m;
 }
@@ -297,35 +359,31 @@ sub readline {
     elsif ( ref $opt ne 'HASH' ) {
         croak "readline: the (optional) second argument must be a string or a HASH reference";
     }
-    my $valid = {
-        clear_screen     => '[ 0 1 ]',
-        codepage_mapping => 0,
-        default          => '',
-        info             => '',
-        hide_cursor      => '[ 0 1 2 ]',
-        no_echo          => '[ 0 1 2 ]',
-        show_context     => '[ 0 1 ]',
-    };
-    $opt = $self->__validate_options( $opt, $valid );
+    if ( %$opt ) {
+        my $valid = $self->__valid_options( 'readline' );
+        $self->__validate_and_add_options( $valid, $opt );
+    }
+    $self->__set_defaults();
+
     if ( $^O eq "MSWin32" ) {
-        print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
+        print $self->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     local $| = 1;
     $self->__init_term();
-    my $term_w = ( $self->{pg}->__get_term_size() )[0];
+    my $term_w = ( $self->{plugin}->__get_term_size() )[0];
     my $m = $self->__init_readline( $opt, $term_w, $prompt );
     my $big_step = 10;
     my $up_before = 0;
-    if ( $opt->{clear_screen} ) {
+    if ( $self->{clear_screen} ) {
         print CLEAR_SCREEN;
     }
 
     CHAR: while ( 1 ) {
         if ( $self->{i}{beep} ) {
-            $self->{pg}->__beep();
+            $self->{plugin}->__beep();
             $self->{i}{beep} = 0;
         }
-        my $tmp_term_w = ( $self->{pg}->__get_term_size() )[0];
+        my $tmp_term_w = ( $self->{plugin}->__get_term_size() )[0];
         if ( $tmp_term_w != $term_w ) {
             $term_w = $tmp_term_w;
             $m = $self->__init_readline( $opt, $term_w, $prompt );
@@ -336,7 +394,7 @@ sub readline {
         print "\r" . CLEAR_TO_END_OF_SCREEN;
         $self->__before_readline( $opt, $m );
         $up_before = $self->{i}{pre_text_row_count};
-        if ( $opt->{hide_cursor} ) {
+        if ( $self->{hide_cursor} ) {
             print HIDE_CURSOR;
         }
         if ( length $self->{i}{pre_text} ) {
@@ -348,7 +406,7 @@ sub readline {
             print UP x $self->{i}{post_text_row_count};
         }
         $self->__print_readline( $opt, $m );
-        my $char = $self->{pg}->__get_key_OS();
+        my $char = $self->{plugin}->__get_key_OS();
         if ( ! defined $char ) {
             $self->__reset_term( $opt );
             carp "EOT: $!";
@@ -386,16 +444,14 @@ sub readline {
         elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
         }
+        elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
+            $self->__reset_term( $opt, $self->{i}{pre_text_row_count} );
+            return join( '', map { $_->[0] } @{$m->{str}} );
+        }
         else {
             $char = chr $char;
             utf8::upgrade $char;
-            if ( $char eq "\n" || $char eq "\r" ) { #
-                $self->__reset_term( $opt, $self->{i}{pre_text_row_count} );
-                return join( '', map { $_->[0] } @{$m->{str}} );
-            }
-            else {
-                $self->__add_char( $m, $char );
-            }
+            $self->__add_char( $m, $char );
         }
     }
 }
@@ -669,7 +725,7 @@ sub __print_readline {
     my ( $self, $opt, $m ) = @_;
     print "\r" . CLEAR_TO_END_OF_LINE;
     my $i = $self->{i}{curr_row};
-    if ( $opt->{no_echo} && $opt->{no_echo} == 2 ) {
+    if ( $self->{no_echo} && $self->{no_echo} == 2 ) {
         print "\r" . $self->{i}{keys}[$i]; # no_echo only in readline -> in readline no separator
         return;
     }
@@ -680,7 +736,7 @@ sub __print_readline {
         $print_str .= $self->{i}{arrow_left};
     }
     # input text:
-    if ( $opt->{no_echo} ) {
+    if ( $self->{no_echo} ) {
         $print_str .= ( '*' x @{$m->{p_str}} );
     }
     else {
@@ -694,7 +750,7 @@ sub __print_readline {
     for ( @{$m->{p_str}}[$m->{p_pos} .. $#{$m->{p_str}}] ) {
         $back_to_pos += $_->[1];
     }
-    if ( $opt->{hide_cursor} ) {
+    if ( $self->{hide_cursor} ) {
         print SHOW_CURSOR;
     }
     print $print_str;
@@ -865,13 +921,13 @@ sub __write_first_screen {
     }
     $self->{i}{seps} = [];
     $self->{i}{keys} = [];
-    if ( $opt->{clear_screen} ) {
+    if ( $self->{clear_screen} ) {
         print CLEAR_SCREEN;
     }
     else {
         print "\r" . CLEAR_TO_END_OF_SCREEN;
     }
-    if ( $opt->{hide_cursor} ) {
+    if ( $self->{hide_cursor} ) {
         print HIDE_CURSOR;
     }
     if ( defined $self->{i}{pre_text} ) {  # empty info add newline ?
@@ -892,24 +948,17 @@ sub fill_form {
     $opt = {} if ! defined $opt;
     croak "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
     return [] if ! @$orig_list; ##
-    my $valid = {
-        auto_up          => '[ 0 1 2 ]',
-        back             => '',
-        clear_screen     => '[ 0 1 ]',
-        codepage_mapping => 0,
-        confirm          => '',
-        hide_cursor      => '[ 0 1 2 ]',
-        info             => '',
-        prompt           => '',
-        read_only        => 'ARRAY',
-    };
-    $opt = $self->__validate_options( $opt, $valid );
+    if ( %$opt ) {
+        my $valid = $self->__valid_options( 'fill_form' );
+        $self->__validate_and_add_options( $valid, $opt );
+    }
+    $self->__set_defaults(); ##
     if ( $^O eq "MSWin32" ) {
-        print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
+        print $self->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     my @tmp;
-    push @tmp, $opt->{info}   if length $opt->{info};
-    push @tmp, $opt->{prompt} if length $opt->{prompt};
+    push @tmp, $self->{info}   if length $self->{info};
+    push @tmp, $self->{prompt} if length $self->{prompt};
     $self->{i}{pre_text} = join "\n", @tmp;
     $self->{i}{sep}    = ': ';
     $self->{i}{sep_ro} = '| ';
@@ -917,19 +966,19 @@ sub fill_form {
     $self->{i}{arrow_left}  = '<';
     $self->{i}{arrow_right} = '>';
     $self->{i}{arrow_w} = 1;
-    $self->{i}{pre} = [ [ $opt->{confirm}, ] ];
-    if ( length $opt->{back} ) {
-        unshift @{$self->{i}{pre}}, [ $opt->{back}, ];
+    $self->{i}{pre} = [ [ $self->{confirm}, ] ];
+    if ( length $self->{back} ) {
+        unshift @{$self->{i}{pre}}, [ $self->{back}, ];
     }
     $self->{i}{read_only} = [];
-    if ( @{$opt->{read_only}} ) {
-        $self->{i}{read_only} = [ map { $_ + @{$self->{i}{pre}} } @{$opt->{read_only}} ];
+    if ( @{$self->{read_only}} ) {
+        $self->{i}{read_only} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{read_only}} ];
     }
     my $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
-    my $auto_up = $opt->{auto_up};
+    my $auto_up = $self->{auto_up};
     local $| = 1;
     $self->__init_term();
-    my ( $term_w, $term_h ) = $self->{pg}->__get_term_size();
+    my ( $term_w, $term_h ) = $self->{plugin}->__get_term_size();
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
     $self->__prepare_hight( $list, $term_w, $term_h );
@@ -943,16 +992,16 @@ sub fill_form {
             $locked = 1;
         }
         if ( $self->{i}{beep} ) {
-            $self->{pg}->__beep();
+            $self->{plugin}->__beep();
             $self->{i}{beep} = 0;
         }
         else {
-            if ( $opt->{hide_cursor} ) {
+            if ( $self->{hide_cursor} ) {
                 print HIDE_CURSOR;
             }
             $self->__print_current_row( $opt, $list, $m );
         }
-        my $char = $self->{pg}->__get_key_OS();
+        my $char = $self->{plugin}->__get_key_OS();
         if ( ! defined $char ) {
             $self->__reset_term( $opt );
             carp "EOT: $!";
@@ -960,7 +1009,7 @@ sub fill_form {
         }
         next CHAR if $char == NEXT_get_key;
         next CHAR if $char == KEY_TAB;
-        my ( $tmp_term_w, $tmp_term_h ) = $self->{pg}->__get_term_size();
+        my ( $tmp_term_w, $tmp_term_h ) = $self->{plugin}->__get_term_size();
         if ( $tmp_term_w != $term_w || $tmp_term_h != $term_h && $tmp_term_h < ( @$list + 1 ) ) {
             print UP x ( $self->{i}{curr_row} + $self->{i}{pre_text_row_count} );
             ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
@@ -1099,69 +1148,66 @@ sub fill_form {
         elsif ( $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
         }
-        else {
-
-            $char = chr $char;
-            utf8::upgrade $char;
-            if ( $char eq "\n" || $char eq "\r" ) {                                                                     # ENTER
-                $self->{i}{lock_ENTER} = 0 if $k;                                                                       # any previously pressed key other than ENTER removes lock_ENTER
-                if ( $auto_up == 2 && $opt->{auto_up} == 1 && ! $self->{i}{lock_ENTER} ) {                              # a removed lock_ENTER resets "auto_up" from 2 to 1 if the 2 was originally a 1
-                    $auto_up = 1;
-                }
-                if ( $auto_up == 1 && @$list - @{$self->{i}{pre}} == 1 ) {                                              # else auto_up 1 sticks on the last==first data row
-                    $auto_up = 2;
-                }
-                $k = 0;                                                                                                 # if ENTER set $k to 0
-                my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
-                $up += $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
-                if ( $list->[$self->{i}{curr_row}][0] eq $opt->{back} ) {                                               # if ENTER on   {back/0}: leave and return nothing
-                    $self->__reset_term( $opt, $up );
-                    return;
-                }
-                elsif ( $list->[$self->{i}{curr_row}][0] eq $opt->{confirm} ) {                                         # if ENTER on {confirm/1}: leave and return result
-                    splice @$list, 0, @{$self->{i}{pre}};
-                    $self->__reset_term( $opt, $up );
-                    return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
-                }
-                if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
-                    print UP x $up;
-                    print "\r" . CLEAR_TO_END_OF_SCREEN;
-                    $self->__write_first_screen( $opt, $list, 0, $auto_up );                                            # cursor on {back}
-                    $m = $self->__string_and_pos( $list );
-                }
-                elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
-                    print UP x $up;
-                    print "\r" . CLEAR_TO_END_OF_SCREEN;
-                    $self->__write_first_screen( $opt, $list, scalar( @{$self->{i}{pre}} ), $auto_up );                 # cursor on the first data row
-                    $m = $self->__string_and_pos( $list );
-                    $self->{i}{lock_ENTER} = 1;                                                                         # set lock_ENTER when jumped automatically from the {last row} to the {first data row/2}
-                }
-                else {
-                    if ( $auto_up == 1 && $self->{i}{curr_row} == @{$self->{i}{pre}} && $self->{i}{lock_ENTER} ) {      # if ENTER && "auto_up" == 1 $$ "curr_row" == {first data row/2} && lock_ENTER is true:
-                        $self->{i}{beep} = 1;                                                                           # set "auto_up" temporary to 2 so a second ENTER moves the cursor to {back/0}
-                        $auto_up = 2;
-                        next CHAR;
-                    }
-                    $self->{i}{curr_row}++;
-                    $m = $self->__string_and_pos( $list );                                                              # or go to the next row if not on the last row
-                    if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
-                        $self->__reset_previous_row( $list, $self->{i}{curr_row} - 1 );
-                        print DOWN x 1;
-                    }
-                    else {
-                        print UP x $up;                                                                                 # or else to the next page
-                        $self->__print_next_page( $list );
-                    }
-                }
+        elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {                                                  # ENTER
+            $self->{i}{lock_ENTER} = 0 if $k;                                                                       # any previously pressed key other than ENTER removes lock_ENTER
+            if ( $auto_up == 2 && $self->{auto_up} == 1 && ! $self->{i}{lock_ENTER} ) {                              # a removed lock_ENTER resets "auto_up" from 2 to 1 if the 2 was originally a 1
+                $auto_up = 1;
+            }
+            if ( $auto_up == 1 && @$list - @{$self->{i}{pre}} == 1 ) {                                              # else auto_up 1 sticks on the last==first data row
+                $auto_up = 2;
+            }
+            $k = 0;                                                                                                 # if ENTER set $k to 0
+            my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
+            $up += $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
+            if ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {                                               # if ENTER on   {back/0}: leave and return nothing
+                $self->__reset_term( $opt, $up );
+                return;
+            }
+            elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{confirm} ) {                                         # if ENTER on {confirm/1}: leave and return result
+                splice @$list, 0, @{$self->{i}{pre}};
+                $self->__reset_term( $opt, $up );
+                return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
+            }
+            if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
+                print UP x $up;
+                print "\r" . CLEAR_TO_END_OF_SCREEN;
+                $self->__write_first_screen( $opt, $list, 0, $auto_up );                                            # cursor on {back}
+                $m = $self->__string_and_pos( $list );
+            }
+            elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
+                print UP x $up;
+                print "\r" . CLEAR_TO_END_OF_SCREEN;
+                $self->__write_first_screen( $opt, $list, scalar( @{$self->{i}{pre}} ), $auto_up );                 # cursor on the first data row
+                $m = $self->__string_and_pos( $list );
+                $self->{i}{lock_ENTER} = 1;                                                                         # set lock_ENTER when jumped automatically from the {last row} to the {first data row/2}
             }
             else {
-                $k = 1;
-                if ( $locked ) {
-                    $self->{i}{beep} = 1;
+                if ( $auto_up == 1 && $self->{i}{curr_row} == @{$self->{i}{pre}} && $self->{i}{lock_ENTER} ) {      # if ENTER && "auto_up" == 1 $$ "curr_row" == {first data row/2} && lock_ENTER is true:
+                    $self->{i}{beep} = 1;                                                                           # set "auto_up" temporary to 2 so a second ENTER moves the cursor to {back/0}
+                    $auto_up = 2;
+                    next CHAR;
+                }
+                $self->{i}{curr_row}++;
+                $m = $self->__string_and_pos( $list );                                                              # or go to the next row if not on the last row
+                if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
+                    $self->__reset_previous_row( $list, $self->{i}{curr_row} - 1 );
+                    print DOWN x 1;
                 }
                 else {
-                    $self->__add_char( $m, $char );
+                    print UP x $up;                                                                                 # or else to the next page
+                    $self->__print_next_page( $list );
                 }
+            }
+        }
+        else {
+            $k = 1;
+            if ( $locked ) {
+                $self->{i}{beep} = 1;
+            }
+            else {
+                $char = chr $char;
+                utf8::upgrade $char;
+                $self->__add_char( $m, $char );
             }
         }
     }
@@ -1212,7 +1258,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.515
+Version 0.516
 
 =cut
 
@@ -1282,6 +1328,8 @@ C<Page-Down> or C<Ctrl-F>: Move forward one page.
 The C<new> method returns a C<Term::Form> object.
 
     my $new = Term::Form->new();
+
+To set the different options it can be passed a reference to a hash as an optional argument.
 
 =head2 readline
 

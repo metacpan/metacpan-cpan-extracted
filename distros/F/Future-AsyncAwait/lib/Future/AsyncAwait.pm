@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 
@@ -391,12 +391,6 @@ at L<https://rt.cpan.org/Dist/Display.html?Name=Future-AsyncAwait>.
 
 =item *
 
-Warnings and memory leaks when dropping still-pending Futures
-
-L<https://rt.cpan.org/Ticket/Display.html?id=128620>
-
-=item *
-
 C<await> inside C<map> or C<grep> blocks does not work. This is due to the
 difficulty of detecting the map or grep context from internal perl state at
 suspend time, sufficient to be able to restore it again when resuming.
@@ -416,6 +410,16 @@ becomes
    }
 
 with a similar transformation for C<grep> expressions.
+
+Alternatively, consider using the C<fmap*> family of functions from
+L<Future::Utils> to provide a concurrent version of the same code, which can
+keep multiple items running concurrently:
+
+   use Future::Utils qw( fmap );
+
+   my @results = await fmap { func( shift ) }
+      foreach    => [ ITEMS ],
+      concurrent => 5;
 
 =back
 

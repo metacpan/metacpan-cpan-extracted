@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.652   2019-07-04
+    - Make __validate_and_add_options more portable.
+
 1.651   2019-07-02
     - Bugfix constant LINE_FEED.
 

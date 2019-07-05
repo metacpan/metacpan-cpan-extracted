@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.46';
+our $XS_VERSION = our $VERSION = '0.47';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -293,6 +293,7 @@ sub _walk {
 
 sub escape_tree {
   my ($ref, @args) = @_;
+  ref $ref || croak "escape_tree: reference expected";
 
   my $sub = sub{
     push @_, @args;
@@ -304,6 +305,7 @@ sub escape_tree {
 
 sub unescape_tree {
   my ($ref, @args) = @_;
+  ref $ref || croak "unescape_tree: reference expected";
 
   my $sub = sub{
     push @_, @args;
@@ -720,7 +722,8 @@ C<uri_encode> and C<uri_decode>.
 
 Traverses a data structure, escaping or unescaping I<defined> scalar values in
 place. Accepts a reference to be traversed. Any further parameters are passed
-unchanged to L</encode> or L</decode>.
+unchanged to L</encode> or L</decode>. Croaks if the input to escape/unescape
+is a non-reference value.
 
   my $obj = {
     foo => ['bar baz', 'bat%fnord'],

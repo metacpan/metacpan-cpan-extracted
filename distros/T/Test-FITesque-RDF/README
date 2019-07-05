@@ -39,6 +39,31 @@ DESCRIPTION
         A IRI to use in parsing the RDF fixture tables to resolve any relative
         URIs.
 
+  REQUIRED RDF
+    The following must exist in the test description (see below for an example
+    and prefix expansions):
+
+    `test:fixtures`
+        The object(s) of this predicate lists the test fixtures that will run
+        for this test suite. May take an RDF List. Links to the test
+        descriptions, which follow below.
+
+    `test:test_script`
+        The object of this predicate points to information on how the actual
+        test will be run. That is formulated in a separate resource which
+        requires two predicates, `deps:test-requirement` predicate, whose
+        object contains the class name of the implementation of the tests; and
+        `nfo:definesFunction` whose object is a string which matches the
+        actual function name withing that class.
+
+    `test:purpose`
+        The object of this predicate provides a literal description of the
+        test.
+
+    `test:params`
+        The object of this predicate links to the parameters, which may have
+        many different shapes. See below for examples.
+
   RDF EXAMPLE
     The below example starts with prefix declarations. Since this is a
     pre-release, some of the prefixes are preliminary examples. Then, the
@@ -47,16 +72,17 @@ DESCRIPTION
     List, in which case, the tests will run in the specified sequence, if not,
     no sequence may be assumed.
 
-    Then, two test fixtures are declared. The `test:handler` predicate is used
-    to identify the class containing implementations, while `dc:identifier` is
-    used to name the function within that class.
+    Then, two test fixtures are declared. The actual implementation is
+    referenced through `test:test_script` for both functions.
 
     The `test:params` predicate is used to link the parameters that will be
-    sent as a hashref into the function.
+    sent as a hashref into the function. The <test:purpose> predicate is
+    required to exist outside of the parameters, but will be included as a
+    parameter as well, named `description`.
 
-    There are two different mechanisms for passing parameters to the test
-    scripts, one is simply to pass arbitrary key-value pairs, the other is to
-    pass lists of HTTP request-response objects.
+    There are two mechanisms for passing parameters to the test scripts, one
+    is simply to pass arbitrary key-value pairs, the other is to pass lists of
+    HTTP request-response objects. Both mechanisms may be used.
 
    Key-value parameters
     The key of the hashref passed as arguments will be the local part of the
@@ -66,30 +92,38 @@ DESCRIPTION
     local part can be resolved, if wanted. The resolution itself happens in
     URI::NamespaceMap.
 
-      @prefix test: <http://example.org/test-fixtures#> .
-      @prefix deps: <http://ontologi.es/doap-deps#>.
-      @prefix dc:   <http://purl.org/dc/terms/> .
-      @prefix my:   <http://example.org/my-parameters#> .
+     @prefix test: <http://ontologi.es/doap-tests#> .
+     @prefix deps: <http://ontologi.es/doap-deps#>.
+     @prefix my:   <http://example.org/my-parameters#> .
+     @prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
 
 
-      <#test-list> a test:FixtureTable ;
-        test:fixtures <#test1>, <#test2> .
+     <#test-list> a test:FixtureTable ;
+        test:fixtures <#test1>, <#test2> . 
 
-      <#test1> a test:Test ;
-        test:handler "Internal::Fixture::Simple"^^deps:CpanId ;
-        dc:identifier "string_found" ;
+     <#test1> a test:AutomatedTest ;
         test:param_base <http://example.org/my-parameters#> ;
+        test:purpose "Echo a string"@en ;    
+        test:test_script <http://example.org/simple#string_found> ;
         test:params [ my:all "counter-clockwise dahut" ] .
-
-      <#test2> a test:Test ;
-        test:handler "Internal::Fixture::Multi"^^deps:CpanId ;
-        dc:identifier "multiplication" ;
+        
+     <#test2> a test:AutomatedTest ;
         test:param_base <http://example.org/my-parameters#> ;
+        test:purpose "Multiply two numbers"@en ;
+        test:test_script <http://example.org/multi#multiplication> ;
         test:params [
             my:factor1 6 ;
             my:factor2 7 ;
-            my:product 42
+            my:product 42 
         ] .
+        
+     <http://example.org/simple#string_found> a nfo:SoftwareItem ;
+        nfo:definesFunction "string_found" ;
+        deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .
+
+     <http://example.org/multi#multiplication> a nfo:SoftwareItem ;
+        nfo:definesFunction "multiplication" ;
+        deps:test-requirement "Internal::Fixture::Multi"^^deps:CpanId .
 
    HTTP request-response lists
     To allow testing HTTP-based interfaces, this module also allows the
@@ -103,9 +137,16 @@ DESCRIPTION
     This gets more complex, please see the test data file
     `t/data/http-list.ttl` file for example.
 
+    You may maintain client state in a test script (i.e. for one
+    `test:AutomatedTest`, as it is simply one script, so the result of one
+    request may be used to influence the next. Server state can be relied on
+    between different tests by using an `rdf:List` of test fixtures if it
+    writes something into the server, there is nothing in the framework that
+    changes that.
+
 TODO
-    Separate the implementation-specific details (such as `test:handler`) from
-    the actual fixture tables.
+    Separate the implementation-specific details (such as
+    `deps:test-requirement`) from the actual fixture tables.
 
 BUGS
     Please report any bugs to

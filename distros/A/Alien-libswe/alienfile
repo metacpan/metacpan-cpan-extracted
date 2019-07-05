@@ -1,0 +1,27 @@
+use alienfile;
+
+plugin 'Build::Make' => make_type => 'gmake';
+
+share {
+  start_url 'https://www.astro.com/ftp/swisseph';
+  plugin 'Download' => (
+    filter => qr/^swe_unix_src_.*\.tar\.gz$/,
+    version => qr/([0-9\.]+)/,
+  );
+
+  plugin Extract => format => 'tar.gz';
+  build [
+    [ 'cd src && %{make}' ],
+    [ '%{make_path} %{.install.prefix}/lib/' ],
+    [ '%{cp} src/libswe.a %{.install.prefix}/lib/' ],
+  ];
+  
+  gather sub {
+    my ($build) = @_;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{cflags}        = "-I$prefix/include ";
+    $build->runtime_prop->{cflags_static} = "-I$prefix/include ";
+    $build->runtime_prop->{libs}          = "-L$prefix/lib -lswe ";
+    $build->runtime_prop->{libs_static}   = "-L$prefix/lib -lswe ";
+  };
+};

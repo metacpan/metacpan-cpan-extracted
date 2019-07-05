@@ -1225,6 +1225,10 @@ void set_path_array(pTHX_ SV *sv_uri, SV *sv_path) {
   av_path = (AV*) SvRV(sv_path);
   av_idx  = av_top_index(av_path);
 
+  if (av_idx == -1) {
+    return;
+  }
+
   // Build the new path
   for (i = 0; i <= av_idx; ++i) {
     // Add separator. If the next value fetched from the array is invalid, it

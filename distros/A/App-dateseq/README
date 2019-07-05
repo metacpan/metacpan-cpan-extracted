@@ -2,8 +2,8 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.092 of App::dateseq (from Perl
-    distribution App-dateseq), released on 2019-05-26.
+    This document describes version 0.093 of App::dateseq (from Perl
+    distribution App-dateseq), released on 2019-06-20.
 
 FUNCTIONS
   dateseq
@@ -35,6 +35,10 @@ FUNCTIONS
         Default is "%Y-%m-%d", unless when hour/minute/second is specified,
         then it is "%Y-%m-%dT%H:%M:%S".
 
+    *   exclude_dow => *date::dow_nums*
+
+        Only show dates with these day-of-weeks.
+
     *   from => *date*
 
         Starting date.
@@ -42,6 +46,10 @@ FUNCTIONS
     *   header => *str*
 
         Add a header row.
+
+    *   include_dow => *date::dow_nums*
+
+        Only show dates with these day-of-weeks.
 
     *   increment => *duration*
 
