@@ -2,14 +2,14 @@ use strict;
 use warnings;
 package YAML::PP::Schema::YAML1_1;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use YAML::PP::Schema::JSON qw/
     represent_int represent_float represent_literal represent_bool
     represent_undef
 /;
 
-use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE YAML_QUOTED_SCALAR_STYLE /;
+use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
 
 #https://yaml.org/type/bool.html
 # y|Y|yes|Yes|YES|n|N|no|No|NO

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2018, 2019 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -21,9 +21,85 @@ use 5.004;
 use strict;
 use X11::Protocol;
 use X11::Protocol::WM;
+$|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+
+{
+  # sample code in the POD
+
+  my $display = $ENV{DISPLAY} || ':0';
+  my $X = X11::Protocol->new ($display);
+    my @net_supported = X11::Protocol::Other::get_property_atoms
+                         ($X, $X->root, $X->atom('_NET_SUPPORTED'));
+    if (grep {$_ == $X->atom('_NET_WM_STATE_FULLSCREEN')}
+             @net_supported) {
+      print "Have _NET_WM_STATE_FULLSCREEN\n";
+    } else {
+      print "Do not have _NET_WM_STATE_FULLSCREEN\n";
+    }
+
+  exit 0;
+}
+{
+  # Maybe:
+  my $display = $ENV{DISPLAY} || ':0';
+  my $X = X11::Protocol->new ($display);
+
+  system('xprop','-d',$display,'-root','_NET_SUPPORTED');
+
+  my @supported = X11::Protocol::Other::get_property_atoms ($X, $X->root, $X->atom('_NET_SUPPORTED'));
+  ### len: scalar(@supported)
+  ### @supported
+  foreach my $atom (@supported) {
+    print $X->atom_name($atom),"\n";
+  }
+
+  @supported = X11::Protocol::Other::get_property_atoms ($X, $X->root, $X->atom('NOSUCH'));
+  ### len: scalar(@supported)
+
+  @supported = X11::Protocol::Other::get_property_atoms ($X, 0xa0001b, $X->atom('_NET_SUPPORTED'));
+  ### len: scalar(@supported)
+
+  exit 0;
+}
+{
+  # urgency hint
+  # cf fvwm hints_test.c program for making a window with some hints
+
+  my $X = X11::Protocol->new (':0');
+  my $window = $X->new_rsrc;
+  $X->CreateWindow ($window,
+                    $X->root,         # parent
+                    'InputOutput',
+                    0,                # depth, from parent
+                    'CopyFromParent', # visual
+                    0,0,              # x,y
+                    100,100,          # width,height
+                    0,                # border
+                    background_pixel => $X->black_pixel,
+                   );
+  $X->MapWindow ($window);
+  $X->QueryPointer($X->root); # sync
+  sleep 1;
+  X11::Protocol::WM::set_wm_hints ($X, $window,
+                                   # input => 1,
+                                   urgency => 1);
+  $X->QueryPointer($X->root); # sync
+  sleep 30;
+  print "urgency\n";
+  X11::Protocol::WM::change_wm_hints ($X, $window, urgency => 1);
+  # $X->QueryPointer($X->root); # sync
+  $X->flush;
+  sleep 30;
+
+  # my %hints = X11::Protocol::WM::get_wm_hints($X,$window);
+  # ### %hints
+
+  exit 0;
+}
 
 {
   my $X = X11::Protocol->new ($ENV{DISPLAY} || ':0');
@@ -94,8 +170,6 @@ use Smart::Comments;
   sleep 100;
   exit 0;
 }
-
-
 
 {
   # withdraw()

@@ -1,0 +1,28 @@
+---
+abstract: 'interface to the language detection API at DetectLanguage.com'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-DetectLanguage
+requires:
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
+  JSON::MaybeXS: '0'
+  Moo: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/neilb/WebService-DetectLanguage
+  repository: https://github.com/neilb/WebService-DetectLanguage.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.62'

@@ -1,6 +1,6 @@
 = Chargeur Sudoc Koha par Tamil =
 Tamil s.a.r.l. <contact@tamil.fr>
-v2.26, novembre 2018
+v2.30, juillet 2019
 :linkcss:
 :icons: font
 :toc: right
@@ -572,7 +572,10 @@ biblio::
   converter;;
     Généralement laissé vide. Peut contenir le nom d'une sous-classe
     Perl spécifique de conversion des notices. Accessible uniquement à
-    un programmeur Perl.
+    un programmeur Perl. Si le champs est renseigné mais que le Chargeur
+    n'arrive pas à charger la sous-classe (à cause d'une erreur de
+    syntaxe ou parce qu'il ne trouve pas la sous-classe), le Chargeur
+    retournera une erreur et s'interrompra.
   exclure;;
     Contient la liste des champs de la notice Sudoc qu'il faut supprimer.
   proteger;;

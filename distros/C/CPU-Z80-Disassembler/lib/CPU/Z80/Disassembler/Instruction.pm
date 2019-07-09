@@ -17,7 +17,7 @@ use Asm::Z80::Table;
 use CPU::Z80::Disassembler::Memory;
 use CPU::Z80::Disassembler::Format;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 #------------------------------------------------------------------------------
 

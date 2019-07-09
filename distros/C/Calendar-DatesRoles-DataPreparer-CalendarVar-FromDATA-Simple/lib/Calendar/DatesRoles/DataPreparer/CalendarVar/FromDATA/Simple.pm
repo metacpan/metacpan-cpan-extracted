@@ -1,7 +1,7 @@
 package Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ sub prepare_data {
         my @fields = split /;/, $line;
         my $e = {};
         $e->{date} = $fields[0];
-        $e->{date} =~ /\A(\d{4})-(\d{2})-(\d{2})(?:T|\z)/a
+        $e->{date} =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:T|\z)/
             or die "BUG: $mod:data #$i: Invalid date syntax '$e->{date}'";
         $e->{year}  = $1;
         $e->{month} = $2 + 0;
@@ -67,7 +67,7 @@ Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple - Populate $CA
 
 =head1 VERSION
 
-This document describes version 0.003 of Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple (from Perl distribution Calendar-DatesRoles-DataPreparer-CalendarVar-FromDATA-Simple), released on 2019-06-19.
+This document describes version 0.004 of Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple (from Perl distribution Calendar-DatesRoles-DataPreparer-CalendarVar-FromDATA-Simple), released on 2019-07-08.
 
 =head1 DESCRIPTION
 

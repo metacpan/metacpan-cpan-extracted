@@ -15,7 +15,7 @@ CPU::Z80::Assembler::Program - Represents one assembly program
 use strict;
 use warnings;
 
-our $VERSION = '2.16';
+our $VERSION = '2.18';
 
 use CPU::Z80::Assembler::Parser;
 use CPU::Z80::Assembler::Segment;

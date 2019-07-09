@@ -322,9 +322,83 @@ subtest "modifiers" => sub {
     is( $hash->dor_equals( 'a', 23 ), '1a', "dor_equals on existing key" );
     is( $hash->dor_equals( 'c', 0 ),  '0',  "dor_equals on new key" );
     is( $hash->dor_equals( 'c', 42 ), '0',  "dor_equals on existing, false key" );
+};
+
+subtest 'key ordering' => sub {
+
+    my $hash = new_ok( HO, [] );
+
+    cmp_deeply(
+        [ $hash->keys ],
+        [],
+        'New hash has no keys'
+    );
+
+    my $rc = $hash->set( 'Rogers' => 'Captain America' );
+    is( $rc, 'Captain America', 'Proper return value' );
+    cmp_deeply(
+        [ $hash->keys ],
+        [ 'Rogers' ],
+        'Added Rogers'
+    );
+    cmp_deeply(
+        [ $hash->values ],
+        [ 'Captain America' ],
+        'Added Rogers'
+    );
+
+    # Try to replace an existing entry with or_equals.
+    $rc = $hash->or_equals( 'Rogers' => 'Human Torch' );
+    is( $rc, 'Captain America', 'Rogers is still Captain America' );
+
+    # Try to replace an existing entry with dor_equals.
+    $rc = $hash->dor_equals( 'Rogers' => 'The Impossible Man' );
+    is( $rc, 'Captain America', 'Rogers is *still* Captain America' );
+
+    $rc = $hash->or_equals( 'Banner' => 'Hulk' );
+    is( $rc, 'Hulk', 'Proper return value' );
+    cmp_deeply(
+        [ $hash->keys ],
+        [ 'Rogers', 'Banner' ],
+        'Added Banner through or_equals'
+    );
+    cmp_deeply(
+        [ $hash->values ],
+        [ 'Captain America', 'Hulk' ],
+        'Added Banner through or_equals'
+    );
+
+    $rc = $hash->dor_equals( 'Romanoff' => 'Black Widow' );
+    is( $rc, 'Black Widow', 'Proper return value' );
+    cmp_deeply(
+        [ $hash->keys ],
+        [ 'Rogers', 'Banner', 'Romanoff' ],
+        'Added Romanoff through or_equals'
+    );
+    cmp_deeply(
+        [ $hash->values ],
+        [ 'Captain America', 'Hulk', 'Black Widow' ],
+        'Added Romanoff through or_equals'
+    );
+
+    # In Captain America #180, Rogers becomes Nomad.
+    # Replace him with a call to push().
+    $rc = $hash->push( 'Rogers' => 'Nomad' );
+    is( $rc, 3, 'There are still three keys' );
+    cmp_deeply(
+        [ $hash->keys ],
+        [ 'Banner', 'Romanoff', 'Rogers' ],
+        'Changing Rogers puts him at the end of the list'
+    );
+    cmp_deeply(
+        [ $hash->values ],
+        [ 'Hulk', 'Black Widow', 'Nomad' ],
+        'Changing Rogers puts him at the end of the list'
+    );
+
 
 };
 
-done_testing;
 
-# vim: ts=4 sts=4 sw=4 et:
+done_testing;
+exit 0;

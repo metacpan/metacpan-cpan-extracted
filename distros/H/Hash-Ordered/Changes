@@ -1,5 +1,15 @@
 Revision history for Hash-Ordered
 
+0.014     2019-07-08 09:09:15-04:00 America/New_York
+
+    - No changes from 0.013-TRIAL.
+
+0.013     2019-07-03 11:37:59-04:00 America/New_York (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Fixed bugs in or_equals and dor_equals. (GH #8)
+
 0.012     2017-03-09 11:35:00-05:00 America/New_York
 
     - No changes from 0.011-TRIAL.

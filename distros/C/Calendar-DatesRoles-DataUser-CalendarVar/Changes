@@ -1,21 +1,26 @@
-0.004   2019-06-20 (PERLANCAR)
+0.005   2019-07-08  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] /a regex modifier is 5.14+ only [CT].
+
+
+0.004   2019-06-20  Released-By: PERLANCAR
 
 	- Update to Calendar::Dates 0.2.2 ('exclude_tags' and
 	  'include_tags' param in get_entries()).
 
 
-0.003   2019-06-19 (PERLANCAR)
+0.003   2019-06-19  Released-By: PERLANCAR
 
 	- Update to Calendar::Dates 0.2.1 (support anniversaries, by default
 	  excluding entries that have low-priority tag, observe 'all' param).
 
 
-0.002   2019-05-25 (PERLANCAR)
+0.002   2019-05-25  Released-By: PERLANCAR
 
 	- Update to Calendar::Dates 0.2.0 (optional \%params as first
 	  argument to get_entries()).
 
 
-0.001    2019-02-15 (PERLANCAR)
+0.001    2019-02-15  Released-By: PERLANCAR
 
          - First release.

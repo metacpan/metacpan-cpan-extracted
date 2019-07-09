@@ -2,13 +2,17 @@ Build.PL
 Changes
 cpanfile
 lib/App/jl.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+META.json
 README.pod
 script/jl
 t/00_compile.t
 t/01_basic.t
 t/02_jl.t
+t/03_parse_opt.t
+t/04_log.t
 xt/01_perlcritic.t
 xt/02_pod-coverage.t
 xt/03_pod.t
@@ -16,6 +20,4 @@ xt/04_notabs.t
 xt/05_code_metrics.t
 xt/06_no_use_vars.t
 xt/07_no_conflict.t
-LICENSE
 META.yml
-META.json

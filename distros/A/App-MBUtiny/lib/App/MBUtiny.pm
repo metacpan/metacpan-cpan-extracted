@@ -1,4 +1,4 @@
-package App::MBUtiny; # $Id: MBUtiny.pm 123 2019-07-02 14:23:28Z abalama $
+package App::MBUtiny; # $Id: MBUtiny.pm 129 2019-07-07 11:21:56Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MBUtiny - Websites and any file system elements backup tool
 
 =head1 VERSION
 
-Version 1.11
+Version 1.12
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ Recommended: Apache 2.2+ with CGI/FCGI modules
 
 By default configuration file located in C</etc/mbutiny> directory
 
-Every configuration directive detailed described in C<mutiny.conf> file, also
+Every configuration directive detailed described in C<mbutiny.conf> file, also
 see C<hosts/foo.conf.sample> file for MBUtiny backup hosts configuration
 
 =head2 CRONTAB
@@ -206,7 +206,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION @EXPORT /;
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 use feature qw/say/;
 use Carp;

@@ -1,0 +1,120 @@
+NAME
+    Lingua::Identify::Any - Detect language of text using one of several
+    available backends
+
+VERSION
+    This document describes version 0.001 of Lingua::Identify::Any (from
+    Perl distribution Lingua-Identify-Any), released on 2019-07-08.
+
+SYNOPSIS
+     use Lingua::Identify::Any qw(
+         detect_text_language
+     );
+
+     my $res = detect_text_language(text => 'Blah blah blah');
+
+    Sample result:
+
+     [200, "OK", {
+         backend     => 'Lingua::Identify',
+         lang_code   => "en",
+         confidence  => 0.78, # 1 would mean certainty
+         is_reliable => 1,
+     }]
+
+DESCRIPTION
+    This module offers a common interface to several language detection
+    backends.
+
+FUNCTIONS
+  detect_text_language
+    Usage:
+
+     detect_text_language(%args) -> [status, msg, payload, meta]
+
+    Detect language of text using one of several available backends.
+
+    Backends will be tried in order. When a backend is not available, or
+    when it fails to detect the language, the next backend will be tried.
+    Currently supported backends:
+
+    *   Lingua::Identify::CLD
+
+    *   Lingua::Identify
+
+    *   WebService::DetectLanguage (only when "try_remote_backends" is set
+        to true)
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backends => *array[str]*
+
+    *   dlcom_api_key => *str*
+
+        API key for detectlanguage.com.
+
+        Only required if you use WebService::DetectLanguage backend.
+
+    *   text* => *str*
+
+    *   try_remote_backends => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (hash)
+
+    Status: will return 200 status if detection is successful. Otherwise,
+    will return 400 if a specified backend is unknown/unsupported, or 500 if
+    detection has failed.
+
+    Payload: a hash with the following keys: "backend" (the backend name
+    used to produce the result), "lang_code" (str, 2-letter ISO language
+    code), "confidence" (float), "is_reliable" (bool).
+
+ENVIRONMENT
+  PERL_LINGUA_IDENTIFY_ANY_BACKENDS
+    String. Comma-separated list of backends.
+
+  PERL_LINGUA_IDENTIFY_ANY_TRY_REMOTE_BACKENDS
+    Boolean. Set the default for "detect_text_language"'s
+    "try_remote_backends" argument.
+
+    If set to 1, will also include backends that query remotely, e.g.
+    WebService::DetectLanguage.
+
+  PERL_LINGUA_IDENTIFY_ANY_DLCOM_API_KEY
+    String. Set the default for "detect_text_language"'s "dlcom_api_key".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Lingua-Identify-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Lingua-Identify-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-Identify-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader;
 # ABSTRACT: Classe de base pour le chargement de notices biblio/autorité
-$Koha::Contrib::Sudoc::Loader::VERSION = '2.29';
+$Koha::Contrib::Sudoc::Loader::VERSION = '2.31';
 use Moose;
 use Modern::Perl;
 use utf8;
@@ -78,13 +78,12 @@ sub BUILD {
     # Instanciation du converter
     my $class = 'Koha::Contrib::Sudoc::Converter';
     if ( my $local_class = $self->sudoc->c->{biblio}->{converter} ) {
-        if ( try_load_class($local_class) ) {
+        my ($retcod, $error ) = try_load_class($local_class);
+        if ( $retcod ) {
             $class = $local_class;
         }
         else {
-            $self->log->warning(
-                "Attention : le convertisseur $local_class est introuvable dans le répertoire 'lib'. " .
-                "Le convertisseur par défaut sera utilisé.\n");
+            die $error ;
         }
     }
     load_class($class);
@@ -145,7 +144,7 @@ Koha::Contrib::Sudoc::Loader - Classe de base pour le chargement de notices bibl
 
 =head1 VERSION
 
-version 2.29
+version 2.31
 
 =head1 AUTHOR
 

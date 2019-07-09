@@ -9,6 +9,7 @@ lib/Firefox/Marionette/Element.pm
 lib/Firefox/Marionette/Element/Rect.pm
 lib/Firefox/Marionette/Exception.pm
 lib/Firefox/Marionette/Exception/Response.pm
+lib/Firefox/Marionette/Exception/InsecureCertificate.pm
 lib/Firefox/Marionette/Exception/NotFound.pm
 lib/Firefox/Marionette/Exception/StaleElement.pm
 lib/Firefox/Marionette/Exception/NoSuchAlert.pm

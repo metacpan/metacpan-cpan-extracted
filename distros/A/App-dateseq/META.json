@@ -44,6 +44,7 @@
             "Data::Sah::Coerce::perl::duration::str_human" : "0.025",
             "Data::Sah::Coerce::perl::duration::str_iso8601" : "0",
             "Data::Sah::Coerce::perl::int::str_convert_en_dow_name_to_num" : "0",
+            "Data::Sah::Coerce::perl::int::str_convert_en_month_name_to_num" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::date" : "0",
@@ -56,6 +57,8 @@
             "Perinci::CmdLine::Lite" : "1.820",
             "Sah::Schema::date::dow_num" : "0",
             "Sah::Schema::date::dow_nums" : "0",
+            "Sah::Schema::date::month_num" : "0",
+            "Sah::Schema::date::month_nums" : "0",
             "Sah::Schema::true" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -83,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-App-dateseq"
       }
    },
-   "version" : "0.093",
+   "version" : "0.094",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

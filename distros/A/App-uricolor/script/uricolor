@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+#
+# uricolor - Colorize URIs with ANSI colors.
+#
+# A script to colorize URIs with ANSI colors.
+# Reads from STDIN, writes to STDOUT.
+# 
+# Current limitations :
+# - hardcoded style (underline blue)
+# - no --schemeless option (yet)
+#
+# 2019.06.18 v0.12 jul : dropped file extension, added pod
+# 2019.06.15 v0.11 jul : changed shebang
+# 2018.09.10 v0.10 jul : created
+
+use strict;
+use warnings;
+use utf8;
+use Getopt::Std;
+use File::Basename;
+use URI::Find;
+use Term::ANSIColor;
+
+our $VERSION    = '0.12';
+my $program     = basename($0);
+my $usage       = <<EOF;
+
+Usage: $program [-hVd]
+
+    -h, --help      help
+    -V, --version   version
+    -d              debug
+EOF
+
+# options
+
+my %options = ();
+getopts("hVd", \%options) or die $usage;
+
+my $help        = $options{h} || 0;
+my $version     = $options{V} || 0;
+my $debug       = $options{d} || 0;
+
+die $usage if $help;
+die $VERSION . "\n" if $version;
+
+
+########
+# MAIN #
+########
+
+my $finder = URI::Find->new( sub {
+	my($uri, $orig_uri) = @_;
+	return colored ($orig_uri, 'underline blue');
+});
+
+
+############
+# RUN LOOP #
+############
+
+my $n = 0;
+
+while (<>)
+{
+	my $res = $finder->find(\$_);	
+	print "$_";
+	$n += $res;
+}
+
+warn "$n URIs colorized\n" if $debug;
+
+exit 1;
+
+__END__
+
+=head1 NAME
+
+uricolor - Colorize URIs with ANSI colors.
+
+=head1 SYNOPSIS
+
+    $ uricolor
+
+=head1 DESCRIPTION
+
+A script to colorize URIs with ANSI colors.
+Reads from STDIN, writes to STDOUT.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-uricolor at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-uricolor>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 AUTHOR
+
+jul, C<< <kal247 at gmail.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by jul.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=head1 SEE ALSO
+
+urifind, URI::Find, URI::Find::Schemeless

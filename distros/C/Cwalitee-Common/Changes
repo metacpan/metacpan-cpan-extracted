@@ -1,0 +1,9 @@
+0.002   2019-07-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Provide args_list() & args_calc() to return args specs with
+	  completion.
+
+
+0.001    2019-07-05  Released-By: PERLANCAR
+
+         - First release.

@@ -2,7 +2,7 @@ NAME
     Hash::Ordered - A fast, pure-Perl ordered hash class
 
 VERSION
-    version 0.012
+    version 0.014
 
 SYNOPSIS
         use Hash::Ordered;
@@ -442,6 +442,8 @@ AUTHOR
     David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
+    *   Andy Lester <andy@petdance.com>
+
     *   Benct Philip Jonsson <bpjonsson@gmail.com>
 
     *   Mario Roy <marioeroy@gmail.com>

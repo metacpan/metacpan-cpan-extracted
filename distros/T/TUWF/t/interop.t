@@ -81,7 +81,7 @@ subtest 'JSON::XS coercion', sub {
 };
 
 subtest 'Cpanel::JSON::XS coercion', sub {
-  eval { require Cpanel::JSON::XS; 1 } or plan skip_all => 'Cpanel::JSON::XS not installed';
+  eval { require Cpanel::JSON::XS; require Cpanel::JSON::XS::Type; 1 } or return plan skip_all => 'Cpanel::JSON::XS not installed or too old';
   my @extra = (
     [ { type => 'num' }, '10', '10.0' ],
   );

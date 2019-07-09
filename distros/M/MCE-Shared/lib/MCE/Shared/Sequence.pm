@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 use Scalar::Util qw( looks_like_number );
 use MCE::Shared::Base ();
@@ -72,7 +72,6 @@ sub _reset {
 
 sub _sprintf {
    my ( $fmt, $arg ) = @_;
-
    # remove tainted'ness
    ($fmt) = $fmt =~ /(.*)/;
 
@@ -230,7 +229,7 @@ MCE::Shared::Sequence - Sequence helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Sequence version 1.840
+This document describes MCE::Shared::Sequence version 1.841
 
 =head1 DESCRIPTION
 
@@ -289,11 +288,13 @@ A number sequence class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 API DOCUMENTATION
 
-=over 3
+=head2 MCE::Shared::Sequence->new ( { options }, begin, end [, step, format ] )
 
-=item new ( { options }, begin, end [, step, format ] )
+=head2 MCE::Shared::Sequence->new ( begin, end [, step, format ] )
 
-=item new ( begin, end [, step, format ] )
+=head2 MCE::Shared->sequence ( { options }, begin, end [, step, format ] )
+
+=head2 MCE::Shared->sequence ( begin, end [, step, format ] )
 
 Constructs a new object. C<step>, if omitted, defaults to C<1> if C<begin> is
 smaller than C<end> or C<-1> if C<begin> is greater than C<end>. The C<format>
@@ -371,7 +372,7 @@ Parameters may be given later with C<rewind> before calling C<next>.
     { chunk_size => 10, bounds_only => 1 }, 1, 100
  );
 
-=item next
+=head2 next
 
 Returns the next computed sequence(s). An undefined value is returned when
 the computed C<begin> value exceeds the value held by C<end>.
@@ -405,9 +406,9 @@ the computed C<begin> value exceeds the value held by C<end>.
     }
  }
 
-=item rewind ( { options }, begin, end [, step, format ] )
+=head2 rewind ( { options }, begin, end [, step, format ] )
 
-=item rewind ( begin, end [, step, format ] )
+=head2 rewind ( begin, end [, step, format ] )
 
 Sets the initial value back to the value held by C<begin> when no arguments
 are given. Otherwise, resets the sequence with given criteria.
@@ -427,8 +428,6 @@ are given. Otherwise, resets the sequence with given criteria.
  while ( defined ( my $num = $seq->next ) ) {
     ...
  }
-
-=back
 
 =head1 INDEX
 

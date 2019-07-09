@@ -1,5 +1,22 @@
 Revision history for IPC-RunExternal
 
+0.101     2019-07-06 02:30:28+02:00 Europe/Stockholm
+    - Change author to mikkoi@cpan.org
+    - Fix dist.ini, remove needless quotation marks
+    - Devel::AssertOS included again in distro, in subdir inc
+    - Add Slaven Rezić as a contributor (CPAN tester report)
+    - Change spelling of initialized to initialised (en_GB)
+    - Assign Magic var $OUTPUT_AUTOFLUSH as local
+    - no critic (Subroutines::ProhibitExcessComplexity)
+    - Fix critic (Objects::ProhibitIndirectSyntax)
+    - no critic (ControlStructures::ProhibitCStyleForLoops)
+    - no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+    - Fix critic (References::ProhibitDoubleSigils)
+    - Fix critic (InputOutput::RequireBracedFileHandleWithPrint)
+    - Fix critic (Modules::ProhibitAutomaticExportation) and (ClassHierarchies::ProhibitExplicitISA)
+    -Fix pod spelling
+    - Fix critic (InputOutput::RequireCheckedSyscalls)
+
 0.100     2019-07-05 11:35:04+02:00 Europe/Stockholm
     - Bump version number to 0.100 because 0.010 is less than 0.09.
         Obvious, really!

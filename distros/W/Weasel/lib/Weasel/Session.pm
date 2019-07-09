@@ -525,7 +525,9 @@ sub tag_name {
 
     return $self->_logged(sub { return $self->driver->tag_name($element->_id) },
          'tag_name',
-         sub { my $tag = shift; return "found tag with name $tag" },
+         sub { my $tag = shift;
+               return ($tag)
+                   ? "found tag with name '$tag'" : 'no tag name found' },
          'getting tag name');
 }
 

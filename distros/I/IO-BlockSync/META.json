@@ -1,0 +1,56 @@
+{
+   "abstract" : "Syncronize changed blocks",
+   "author" : [
+      "Thor Dreier-Hansen <43479811+thordreier@users.noreply.github.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-BlockSync",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl" : "1.48",
+            "Moo" : "2.002",
+            "MooX::Options" : "4.023",
+            "MooseX::Log::Log4perl" : "0.47",
+            "Try::Tiny" : "0.28",
+            "namespace::clean" : "0.27",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/thordreier/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/thordreier/perl-IO-BlockSync.git",
+         "web" : "https://github.com/thordreier/perl-IO-BlockSync"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

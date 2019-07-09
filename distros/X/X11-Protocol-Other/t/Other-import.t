@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2019 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -36,6 +36,7 @@ use X11::Protocol::Other qw(root_to_screen
                             visual_class_is_dynamic
                             window_size
                             window_visual
+                            get_property_atoms
                             hexstr_to_rgb
                           );
 
@@ -76,6 +77,7 @@ visual_is_dynamic($X,$visual_id);
 
 window_size($X,$X->{'root'});
 window_visual($X,$X->{'root'});
+get_property_atoms($X,$X->{'root'},$X->atom('WM_PROTOCOLS'));
 
 my @rgb = hexstr_to_rgb('#FAB');
 ok ($rgb[0],0xFFFF);

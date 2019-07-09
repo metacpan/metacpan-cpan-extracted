@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -25,6 +25,7 @@ $Carp::Internal{ (__PACKAGE__) }++;
 
 no overloading;
 
+use MCE::Mutex ();
 use MCE::Shared::Server ();
 use Scalar::Util qw( blessed );
 
@@ -54,24 +55,28 @@ sub share {
    # construction via module option
    if ( ref $_[0] eq 'HASH' && $_[0]->{module} ) {
       my $_params = shift;
+      my $_class  = $_params->{module};
 
-      return MCE::Shared->condvar(@_)
-         if ( $_params->{module} eq 'MCE::Shared::Condvar' );
-      return MCE::Shared->handle(@_)
-         if ( $_params->{module} eq 'MCE::Shared::Handle' );
-      return MCE::Shared->queue(@_)
-         if ( $_params->{module} eq 'MCE::Shared::Queue' );
+      return MCE::Shared->condvar(@_) if ( $_class eq 'MCE::Shared::Condvar' );
+      return MCE::Shared->handle(@_)  if ( $_class eq 'MCE::Shared::Handle' );
+      return MCE::Shared->queue(@_)   if ( $_class eq 'MCE::Shared::Queue' );
 
       $_params->{class} = ':construct_module:';
 
-      return MCE::Shared::Server::_new(
+      my $_obj = MCE::Shared::Server::_new(
          $_params, [ @_, delete $_params->{new} || 'new' ]
       );
+
+      $_obj->[6] = MCE::Mutex->new( impl => 'Channel' ) unless (
+         caller->isa('MCE::Hobo') || exists( $_params->{_DEEPLY_} )
+      );
+
+      return $_obj;
    }
 
    my $_params = ref $_[0] eq 'HASH' && ref $_[1] ? shift : {};
    my $_class  = blessed($_[0]);
-   my $_item;
+   my $_obj;
 
    # class construction failed: e.g. share( class->new(...) )
    return '' if @_ && !$_[0] && $!;
@@ -81,28 +86,31 @@ sub share {
       _incr_count($_[0]), return $_[0] if $_[0]->can('SHARED_ID');
       $_params->{'class'} = $_class;
 
-      $_item = MCE::Shared::Server::_new($_params, $_[0]);
+      $_obj = MCE::Shared::Server::_new($_params, $_[0]);
+
+      $_obj->[6] = MCE::Mutex->new( impl => 'Channel' )
+         unless ( exists $_params->{_DEEPLY_} );
    }
    elsif ( ref $_[0] eq 'ARRAY' ) {
       if ( tied(@{ $_[0] }) && tied(@{ $_[0] })->can('SHARED_ID') ) {
          _incr_count(tied(@{ $_[0] })), return tied(@{ $_[0] });
       }
-      $_item = MCE::Shared->array($_params, @{ $_[0] });
-      @{ $_[0] } = ();  tie @{ $_[0] }, 'MCE::Shared::Object', $_item;
+      $_obj = MCE::Shared->array($_params, @{ $_[0] });
+      @{ $_[0] } = ();  tie @{ $_[0] }, 'MCE::Shared::Object', $_obj;
    }
    elsif ( ref $_[0] eq 'HASH' ) {
       if ( tied(%{ $_[0] }) && tied(%{ $_[0] })->can('SHARED_ID') ) {
          _incr_count(tied(%{ $_[0] })), return tied(%{ $_[0] });
       }
-      $_item = MCE::Shared->hash($_params, %{ $_[0] });
-      %{ $_[0] } = ();  tie %{ $_[0] }, 'MCE::Shared::Object', $_item;
+      $_obj = MCE::Shared->hash($_params, %{ $_[0] });
+      %{ $_[0] } = ();  tie %{ $_[0] }, 'MCE::Shared::Object', $_obj;
    }
    elsif ( ref $_[0] eq 'SCALAR' && !ref ${ $_[0] } ) {
       if ( tied(${ $_[0] }) && tied(${ $_[0] })->can('SHARED_ID') ) {
          _incr_count(tied(${ $_[0] })), return tied(${ $_[0] });
       }
-      $_item = MCE::Shared->scalar($_params, ${ $_[0] });
-      undef ${ $_[0] }; tie ${ $_[0] }, 'MCE::Shared::Object', $_item;
+      $_obj = MCE::Shared->scalar($_params, ${ $_[0] });
+      undef ${ $_[0] }; tie ${ $_[0] }, 'MCE::Shared::Object', $_obj;
    }
 
    # synopsis
@@ -118,7 +126,7 @@ sub share {
       _croak('Synopsis: blessed object, \@array, \%hash, or \$scalar');
    }
 
-   $_item;
+   return $_obj;
 }
 
 ###############################################################################
@@ -145,32 +153,33 @@ sub AUTOLOAD {
       $_params->{module} = ( $_fcn eq 'array' )
          ? 'MCE::Shared::Array' : 'MCE::Shared::Hash';
 
-      my $_item = &share($_params);  delete $_params->{module};
+      my $_obj = &share($_params);
+      delete $_params->{module};
 
       if ( scalar @_ ) {
          $_params->{_DEEPLY_} = 1;
          if ( $_fcn eq 'array' ) {
             for ( my $i = 0; $i <= $#_; $i += 1 ) {
-               &_share($_params, $_item, $_[$i]) if ref($_[$i]);
+               &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
             }
          } else {
             for ( my $i = 1; $i <= $#_; $i += 2 ) {
-               &_share($_params, $_item, $_[$i]) if ref($_[$i]);
+               &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
             }
          }
-         $_item->assign(@_);
+         $_obj->assign(@_);
       }
 
-      return $_item;
+      return $_obj;
    }
    elsif ( $_fcn eq 'handle' ) {
       require MCE::Shared::Handle unless $INC{'MCE/Shared/Handle.pm'};
 
-      my $_item = &share( MCE::Shared::Handle->new([]) );
-      my $_fh   = \do { no warnings 'once'; local *FH };
+      my $_obj = &share( MCE::Shared::Handle->new([]) );
+      my $_fh  = \do { no warnings 'once'; local *FH };
 
-      tie *{ $_fh }, 'MCE::Shared::Object', $_item;
-      if ( @_ ) { $_item->OPEN(@_) or return ''; }
+      tie *{ $_fh }, 'MCE::Shared::Object', $_obj;
+      if ( @_ ) { $_obj->OPEN(@_) or return ''; }
 
       return $_fh;
    }
@@ -180,7 +189,13 @@ sub AUTOLOAD {
       $_fcn = $1 if ( $_fcn ne 'pdl' );
       push @_, $_fcn; _use('PDL') or _croak($@);
 
-      return MCE::Shared::Server::_new({ 'class' => ':construct_pdl:' }, [ @_ ]);
+      my $_obj = MCE::Shared::Server::_new(
+         { 'class' => ':construct_pdl:' }, [ @_ ]
+      );
+
+      $_obj->[6] = MCE::Mutex->new( impl => 'Channel' );
+
+      return $_obj;
    }
 
    # cache, condvar, minidb, ordhash, queue, scalar, sequence, et cetera
@@ -191,7 +206,6 @@ sub AUTOLOAD {
       $_pkg = "MCE::Shared::$_pkg";
 
       return &share({}, $_pkg->new(@_)) if ( $_fcn =~ /^(?:condvar|queue)$/ );
-
       return &share({ module => $_pkg }, @_);
    }
 
@@ -202,27 +216,27 @@ sub open (@) {
    shift if ( defined $_[0] && $_[0] eq 'MCE::Shared' );
    require MCE::Shared::Handle unless $INC{'MCE/Shared/Handle.pm'};
 
-   my $_item;
+   my $_obj;
    if ( ref $_[0] eq 'GLOB' && tied *{ $_[0] } &&
         ref tied(*{ $_[0] }) eq 'MCE::Shared::Object' ) {
 
-      $_item = tied *{ $_[0] };
+      $_obj = tied *{ $_[0] };
    }
    elsif ( @_ ) {
       if ( ref $_[0] eq 'GLOB' && tied *{ $_[0] } ) {
          close $_[0] if defined ( fileno $_[0] );
       }
-      $_item = &share( MCE::Shared::Handle->new([]) );
-      $_[0]  = \do { no warnings 'once'; local *FH };
-      tie *{ $_[0] }, 'MCE::Shared::Object', $_item;
+      $_obj = &share( MCE::Shared::Handle->new([]) );
+      $_[0] = \do { no warnings 'once'; local *FH };
+      tie *{ $_[0] }, 'MCE::Shared::Object', $_obj;
    }
 
    shift; _croak("Not enough arguments for open") unless @_;
 
    if ( !defined wantarray ) {
-      $_item->OPEN(@_) or _croak("open error: $!");
+      $_obj->OPEN(@_) or _croak("open error: $!");
    } else {
-      $_item->OPEN(@_);
+      $_obj->OPEN(@_);
    }
 }
 
@@ -254,10 +268,10 @@ sub TIEHANDLE {
       }
    }
    else {
-      my $_item = &share( MCE::Shared::Handle->new([]) );
-      if ( @_ ) { $_item->OPEN(@_) or return ''; }
+      my $_obj = &share( MCE::Shared::Handle->new([]) );
+      if ( @_ ) { $_obj->OPEN(@_) or return ''; }
 
-      $_item;
+      $_obj;
    }
 }
 
@@ -335,44 +349,46 @@ sub _tie {
    $_params->{class} = ':construct_module:';
    $_params->{tied } = 1;
 
-   my $_item;
+   my $_obj;
 
    if ( $_params->{'module'}->isa('MCE::Shared::Array') ) {
-      $_item = MCE::Shared::Server::_new($_params, [ (), $_fcn ]);
+      $_obj = MCE::Shared::Server::_new($_params, [ (), $_fcn ]);
       if ( @_ ) {
-         delete $_params->{module}; $_params->{_DEEPLY_} = 1;
+         $_params->{_DEEPLY_} = 1; delete $_params->{module};
          for ( my $i = 0; $i <= $#_; $i += 1 ) {
-            &_share($_params, $_item, $_[$i]) if ref($_[$i]);
+            &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
          }
-         $_item->assign(@_);
+         $_obj->assign(@_);
       }
    }
    elsif ( $_params->{'module'}->isa('MCE::Shared::Hash') ) {
-      $_item = MCE::Shared::Server::_new($_params, [ (), $_fcn ]);
+      $_obj = MCE::Shared::Server::_new($_params, [ (), $_fcn ]);
       if ( @_ ) {
-         delete $_params->{module}; $_params->{_DEEPLY_} = 1;
+         $_params->{_DEEPLY_} = 1; delete $_params->{module};
          for ( my $i = 1; $i <= $#_; $i += 2 ) {
-            &_share($_params, $_item, $_[$i]) if ref($_[$i]);
+            &_share($_params, $_obj, $_[$i]) if ref($_[$i]);
          }
-         $_item->assign(@_);
+         $_obj->assign(@_);
       }
    }
    else {
-      $_item = MCE::Shared::Server::_new($_params, [ @_, $_fcn ]);
+      $_obj = MCE::Shared::Server::_new($_params, [ @_, $_fcn ]);
    }
 
-   if ( $_item && $_item->[2] ) {
+   if ( $_obj && $_obj->[2] ) {
       ##
       # Set encoder/decoder automatically for supported DB modules.
       # - AnyDBM_File, DB_File, GDBM_File, NDBM_File, ODBM_File, SDBM_File,
       # - CDB_File, SQLite_File, Tie::Array::DBD, Tie::Hash::DBD,
       # - BerkeleyDB::*, KyotoCabinet::DB, TokyoCabinet::*
       ##
-      $_item->[2] = MCE::Shared::Server::_get_freeze(),
-      $_item->[3] = MCE::Shared::Server::_get_thaw();
+      $_obj->[2] = MCE::Shared::Server::_get_freeze(),
+      $_obj->[3] = MCE::Shared::Server::_get_thaw();
    }
 
-   $_item;
+   $_obj->[6] = MCE::Mutex->new( impl => 'Channel' );
+
+   return $_obj;
 }
 
 sub _use {
@@ -432,7 +448,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.840
+This document describes MCE::Shared version 1.841
 
 =head1 SYNOPSIS
 
@@ -452,6 +468,15 @@ This document describes MCE::Shared version 1.840
  my $se = MCE::Shared->sequence( $begin, $end, $step, $fmt );
  my $ob = MCE::Shared->share( $blessed_object );
 
+ # Mutex locking is supported for all shared objects since 1.841.
+ # Previously only shared C<condvar>s allowed locking.
+
+ $ar->lock;
+ $ar->unlock;
+ ...
+ $ob->lock;
+ $ob->unlock;
+
  # The Perl-like mce_open function is available since 1.002.
 
  mce_open my $fh, ">>", "/foo/bar.log" or die "open error: $!";
@@ -466,7 +491,7 @@ This document describes MCE::Shared version 1.840
  my @pairs = ( foo => 'bar', woo => 'baz' );
  my @list  = ( 'a' .. 'z' );
 
- tie my $va1, 'MCE::Shared', { module => 'MCE::Shared::Scalar' }, 'foo';
+ tie my $va1, 'MCE::Shared', { module => 'MCE::Shared::Scalar' }, 0;
  tie my @ar1, 'MCE::Shared', { module => 'MCE::Shared::Array' }, @list;
  tie my %ca1, 'MCE::Shared', { module => 'MCE::Shared::Cache' }, %args;
  tie my %ha1, 'MCE::Shared', { module => 'MCE::Shared::Hash' }, @pairs;
@@ -479,14 +504,24 @@ This document describes MCE::Shared version 1.840
  tie my %ha2, 'MCE::Shared', { module => 'Tie::StdHash' }, @pairs;
  tie my %ha3, 'MCE::Shared', { module => 'Tie::ExtraHash' }, @pairs;
 
+ tie my $cnt, 'MCE::Shared', 0; # default MCE::Shared::Scalar
+ tie my @foo, 'MCE::Shared';    # default MCE::Shared::Array
+ tie my %bar, 'MCE::Shared';    # default MCE::Shared::Hash
+
  tie my @ary, 'MCE::Shared', qw( a list of values );
- tie my %ca,  'MCE::Shared', { max_keys => 500, max_age => 60 };
  tie my %ha,  'MCE::Shared', key1 => 'val1', key2 => 'val2';
+ tie my %ca,  'MCE::Shared', { max_keys => 500, max_age => 60 };
  tie my %oh,  'MCE::Shared', { ordered => 1 }, key1 => 'value';
 
- tie my $cnt, 'MCE::Shared', 0;
- tie my @foo, 'MCE::Shared';
- tie my %bar, 'MCE::Shared';
+ # Mutex locking is supported for all shared objects since 1.841.
+
+ tied($va1)->lock;
+ tied($va1)->unlock;
+ ...
+ tied(%bar)->lock;
+ tied(%bar)->unlock;
+
+ # Demonstration.
 
  my $mutex = MCE::Mutex->new;
 
@@ -508,10 +543,18 @@ This document describes MCE::Shared version 1.840
     $foo[ $wid - 1 ] = $pid;
     $bar{ $pid }     = $wid;
 
+    # From 1.841 onwards, all shared objects include mutex locking
+    # to not need to construct MCE::Mutex separately.
+
+    tied($va1)->lock;
+    $va1 += 1;
+    tied($va1)->unlock;
+
     return;
  };
 
  say "scalar : $cnt";
+ say "scalar : $va1";
  say " array : $_" for (@foo);
  say "  hash : $_ => $bar{$_}" for (sort keys %bar);
 
@@ -519,6 +562,7 @@ This document describes MCE::Shared version 1.840
 
  # Output
 
+ scalar : 4
  scalar : 4
   array : 37847
   array : 37848
@@ -609,25 +653,25 @@ Install 1.1 or later to rid of limitations described above.
 
 =over 3
 
-=item * array L<MCE::Shared::Array>
+=item MCE::Shared->array L<MCE::Shared::Array>
 
-=item * cache L<MCE::Shared::Cache>
+=item MCE::Shared->cache L<MCE::Shared::Cache>
 
-=item * condvar L<MCE::Shared::Condvar>
+=item MCE::Shared->condvar L<MCE::Shared::Condvar>
 
-=item * handle L<MCE::Shared::Handle>
+=item MCE::Shared->handle L<MCE::Shared::Handle>
 
-=item * hash L<MCE::Shared::Hash>
+=item MCE::Shared->hash L<MCE::Shared::Hash>
 
-=item * minidb L<MCE::Shared::Minidb>
+=item MCE::Shared->minidb L<MCE::Shared::Minidb>
 
-=item * ordhash L<MCE::Shared::Ordhash>
+=item MCE::Shared->ordhash L<MCE::Shared::Ordhash>
 
-=item * queue L<MCE::Shared::Queue>
+=item MCE::Shared->queue L<MCE::Shared::Queue>
 
-=item * scalar L<MCE::Shared::Scalar>
+=item MCE::Shared->scalar L<MCE::Shared::Scalar>
 
-=item * sequence L<MCE::Shared::Sequence>
+=item MCE::Shared->sequence L<MCE::Shared::Sequence>
 
 =back
 
@@ -670,11 +714,13 @@ is that the object must not have file-handles nor code-blocks.
 
 =over 3
 
-=item open ( filehandle, expr )
+=item mce_open ( filehandle, expr )
 
-=item open ( filehandle, mode, expr )
+=item mce_open ( filehandle, mode, expr )
 
-=item open ( filehandle, mode, reference )
+=item mce_open ( filehandle, mode, reference )
+
+=back
 
 In version 1.002 and later, constructs a new object by opening the file
 whose filename is given by C<expr>, and associates it with C<filehandle>.
@@ -723,11 +769,13 @@ and for writing:
  mce_open my $fh, ">", "output.txt" or die "open error: $!";
  mce_open my $fh, ">", \*STDOUT     or die "open error: $!";
 
+=over 3
+
 =item num_sequence
 
-C<num_sequence> is an alias for C<sequence>.
-
 =back
+
+C<num_sequence> is an alias for C<sequence>.
 
 =head1 DEEPLY SHARING
 
@@ -838,7 +886,9 @@ For further reading, see L<MCE::Shared::Minidb>.
 
 =over 3
 
-=item share
+=item MCE::Shared->share
+
+=back
 
 This class method transfers the blessed-object to the shared-manager
 process and returns a C<MCE::Shared::Object> containing the C<SHARED_ID>.
@@ -954,8 +1004,6 @@ by FETCH.
 
  MCE::Hobo->waitall;
 
-=back
-
 =head1 DBM SHARING
 
 Construting a shared DBM object is possible starting with the 1.827 release.
@@ -976,6 +1024,8 @@ C<CDB_File> is given in the prior section.
 
 =item AnyDBM_File
 
+=back
+
  use MCE::Shared;
  use Fcntl;
  use AnyDBM_File;
@@ -985,7 +1035,11 @@ C<CDB_File> is given in the prior section.
  tie my %h1, 'MCE::Shared', { module => 'AnyDBM_File' },
     'foo_a', O_CREAT|O_RDWR or die "open error: $!";
 
+=over 3
+
 =item BerkeleyDB
+
+=back
 
  use MCE::Shared;
  use BerkeleyDB;
@@ -1006,7 +1060,11 @@ C<CDB_File> is given in the prior section.
     -Filename => 'foo_d', -Flags => DB_CREATE -Len => 20
        or die "open error: $!";
 
+=over 3
+
 =item DB_File
+
+=back
 
  use MCE::Shared;
  use Fcntl;
@@ -1034,9 +1092,13 @@ C<CDB_File> is given in the prior section.
  tie my %h3, 'MCE::Shared', { module => 'DB_File' },
     'foo_d', O_CREAT|O_RDWR, 0640, $opt_h or die "open error: $!";
 
+=over 3
+
 =item KyotoCabinet
 
 =item TokyoCabinet
+
+=back
 
  use MCE::Shared;
  use KyotoCabinet;
@@ -1072,9 +1134,13 @@ C<CDB_File> is given in the prior section.
  tie my %h7, 'MCE::Shared', { module => 'KyotoCabinet::DB' }, '%#pccap=256m';
  tie my %h8, 'MCE::Shared', { module => 'TokyoCabinet::ADB' }, '+';
 
+=over 3
+
 =item Tie::Array::DBD
 
 =item Tie::Hash::DBD
+
+=back
 
  use MCE::Shared;
  use Tie::Array::DBD;
@@ -1116,8 +1182,6 @@ C<CDB_File> is given in the prior section.
  $h2{'foo'} = 'plain value';
  $h2{'bar'} = { @pairs };
  $h2{'baz'} = [ @list ];
-
-=back
 
 =head1 DBM SHARING (CONT)
 
@@ -1185,49 +1249,52 @@ of the documentation.
 
 =over 3
 
-=item * pdl_byte
+=item MCE::Shared->pdl_byte
 
-=item * pdl_short
+=item MCE::Shared->pdl_short
 
-=item * pdl_ushort
+=item MCE::Shared->pdl_ushort
 
-=item * pdl_long
+=item MCE::Shared->pdl_long
 
-=item * pdl_longlong
+=item MCE::Shared->pdl_longlong
 
-=item * pdl_float
+=item MCE::Shared->pdl_float
 
-=item * pdl_double
+=item MCE::Shared->pdl_double
 
-=item * pdl_ones
+=item MCE::Shared->pdl_ones
 
-=item * pdl_sequence
+=item MCE::Shared->pdl_sequence
 
-=item * pdl_zeroes
+=item MCE::Shared->pdl_zeroes
 
-=item * pdl_indx
+=item MCE::Shared->pdl_indx
 
-=item * pdl
+=item MCE::Shared->pdl
 
 =back
 
 C<pdl_byte>, C<pdl_short>, C<pdl_ushort>, C<pdl_long>, C<pdl_longlong>,
 C<pdl_float>, C<pdl_double>, C<pdl_ones>, C<pdl_sequence>, C<pdl_zeroes>,
-C<pdl_indx>, and C<pdl> are sugar syntax for PDL construction take place
-under the shared-manager process.
+C<pdl_indx>, and C<pdl> are sugar syntax for L<PDL> construction to take
+place under the shared-manager process. The helper routines are made
+available if C<PDL> is present before loading C<MCE::Shared>.
 
  use PDL;                 # must load PDL before MCE::Shared
  use MCE::Shared;
 
- # makes extra copy/transfer and unnecessary destruction
+ # this makes extra copy, transfer, and unnecessary destruction
  my $ob1 = MCE::Shared->share( zeroes( 256, 256 ) );
 
- # do this instead, efficient
+ # do this instead to not involve an extra copy
  my $ob1 = MCE::Shared->zeroes( 256, 256 );
 
 =over 3
 
 =item ins_inplace
+
+=back
 
 The C<ins_inplace> method applies to shared PDL objects. It supports
 three forms for writing elements back to the PDL object, residing under
@@ -1307,8 +1374,6 @@ reading, the MCE-Cookbook on Github provides two PDL demonstrations.
 
 L<https://github.com/marioroy/mce-cookbook>
 
-=back
-
 =head1 COMMON API
 
 =over 3
@@ -1339,6 +1404,34 @@ shared-manager process. The unbless option is passed to export.
  my $exported_ob = $shared_ob->destroy();
 
  $shared_ob;     # becomes undef
+
+=item lock
+
+=item unlock
+
+Shared objects embed a MCE::Mutex object for locking since 1.841.
+
+ use MCE::Shared;
+
+ tie my @shared_array, 'MCE::Shared', { module => 'MCE::Shared::Array' }, 0;
+
+ tied(@shared_array)->lock;
+ $shared_array[0] += 1;
+ tied(@shared_array)->unlock;
+
+ print $shared_array[0], "\n";    # 1
+
+Locking is not necessary typically when using the OO interface.
+Although, exclusive access is necessary when involving a FETCH and STORE.
+
+ my $shared_total = MCE::Shared->scalar(2);
+
+ $shared_total->lock;
+ my $val = $shared_total->get;
+ $shared_total->set( $val * 2 );
+ $shared_total->unlock;
+
+ print $shared_total->get, "\n";  # 4
 
 =item encoder ( CODE )
 
@@ -2235,7 +2328,7 @@ Mario E. Roy, S<E<lt>marioeroy AT gmail DOT comE<gt>>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2018 by Mario E. Roy
+Copyright (C) 2016-2019 by Mario E. Roy
 
 MCE::Shared is released under the same license as Perl.
 

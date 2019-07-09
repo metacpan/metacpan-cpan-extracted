@@ -1,0 +1,10 @@
+Revision history for App-uricolor
+
+0.12    2019.06.18 
+        dropped file extension, added pod
+
+0.11    2019.06.15 
+        changed shebang
+
+0.10    2018.09.10 
+        created

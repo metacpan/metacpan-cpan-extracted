@@ -12,7 +12,7 @@ my $build = Module::Build->new (
     license  => 'perl',
     configure_requires => { 'Module::Build' => 0.38 },
     requires => {
-       'perl'               => '5.6.2',
+       'perl'               => '5.10.0',
        'UNIVERSAL::require' => 0,
        'version'            => 0,
        'parent'             => '0.225',

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;

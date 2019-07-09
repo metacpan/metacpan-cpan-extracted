@@ -118,6 +118,10 @@ subtest 'has sub' => sub {
 subtest 'new' => sub {
     sub test_new { }
     is(Sub::Meta->new({ sub => \&test_new})->sub, \&test_new, 'args hashref');
+
+    is(Sub::Meta->new(subname => 'foo')->subname, 'foo', 'subname args');
+    is(Sub::Meta->new(stashname => 'foo')->stashname, 'foo', 'stashname args');
+    is(Sub::Meta->new(fullname => 'foo::bar')->fullname, 'foo::bar', 'fullname args');
 };
 
 subtest 'constant' => sub {
@@ -162,6 +166,19 @@ subtest 'set_subinfo' => sub {
 
     is $meta->set_subinfo('hoge', 'fuga'), $meta, 'set_subinfo';
     is $meta->subinfo, ['hoge','fuga'], 'subinfo';
+};
+
+
+subtest 'set_sub' => sub {
+    my $meta = Sub::Meta->new;
+
+    is $meta->subinfo, [], 'subinfo 1';
+
+    $meta->set_sub(\&hello);
+    is $meta->subinfo, ['main', 'hello'], 'subinfo 2';
+
+    $meta->set_sub(\&hello2);
+    is $meta->subinfo, ['main', 'hello2'], 'subinfo 3';
 };
 
 

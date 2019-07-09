@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.035';
+our $VERSION = '1.036';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -201,6 +201,11 @@ use Yancy::Util qw( derp );
 #pod This overrides any query filters and so can be used to enforce
 #pod authorization / security.
 #pod
+#pod =item order_by
+#pod
+#pod Set the default order for the items. Supports any L<Yancy::Backend/list>
+#pod C<order_by> structure.
+#pod
 #pod =back
 #pod
 #pod The following stash values are set by this method:
@@ -237,6 +242,12 @@ use Yancy::Util qw( derp );
 #pod Instead of using the C<limit> stash value, you can use the C<$limit>
 #pod query parameter to allow users to specify their own page size.
 #pod
+#pod =item $order_by
+#pod
+#pod One or more fields to order by. Must be specified as C<< asc:<name> >>
+#pod to sort in ascending order or C<< desc:<field> >> to sort in descending
+#pod order.
+#pod
 #pod =item Additional Field Filters
 #pod
 #pod Any named query parameter that matches a field in the schema will be
@@ -270,6 +281,9 @@ sub list {
             map +[ split /:/ ],
             split /,/, $order_by
         ];
+    }
+    elsif ( $order_by = $c->stash( 'order_by' ) ) {
+        $opt->{order_by} = $order_by;
     }
 
     my $schema = $c->yancy->schema( $schema_name )  ;
@@ -308,15 +322,19 @@ sub list {
     #; $c->app->log->info( Dumper $opt );
 
     my $items = $c->yancy->backend->list( $schema_name, $filter, $opt );
+    # By the time `any` is reached, the format will be blank. To support
+    # any format of template, we need to restore the format stash
+    my $format = $c->stash( 'format' );
     return $c->respond_to(
         json => sub {
             $c->stash( json => { %$items, offset => $offset } );
         },
-        html => sub {
+        any => sub {
             if ( !$c->stash( 'template' ) ) {
                 $c->stash( template => 'yancy/table' );
             }
             $c->stash(
+                ( format => $format )x!!$format,
                 %$items,
                 total_pages => int( $items->{total} / $limit ) + 1,
             );
@@ -383,9 +401,12 @@ sub get {
         $c->reply->not_found;
         return;
     }
+    # By the time `any` is reached, the format will be blank. To support
+    # any format of template, we need to restore the format stash
+    my $format = $c->stash( 'format' );
     return $c->respond_to(
         json => sub { $c->stash( json => $item ) },
-        html => sub { $c->stash( item => $item ) },
+        any => sub { $c->stash( item => $item, ( format => $format )x!!$format ) },
     );
 }
 
@@ -559,7 +580,7 @@ sub set {
                     ],
                 },
             },
-            html => { },
+            any => { },
         );
         return;
     }
@@ -596,7 +617,7 @@ sub set {
         }
         # Upload files
         elsif ( $format eq 'filepath' and my $upload = $c->param( $key ) ) {
-            my $path = $c->yancy->file->write( $upload->filename, $upload->asset );
+            my $path = $c->yancy->file->write( $upload );
             $data->{ $key } = $path;
         }
     }
@@ -630,7 +651,7 @@ sub set {
         my $item = $c->yancy->get( $schema_name, $id );
         $c->respond_to(
             json => { json => { errors => $errors } },
-            html => { item => $item, errors => $errors },
+            any => { item => $item, errors => $errors },
         );
         return;
     }
@@ -643,7 +664,7 @@ sub set {
                 json => $item,
             );
         },
-        html => sub {
+        any => sub {
             if ( my $route = $c->stash( 'forward_to' ) ) {
                 $c->redirect_to( $route, %$item );
                 return;
@@ -744,7 +765,7 @@ sub delete {
                     ],
                 },
             },
-            html => { item => $item },
+            any => { item => $item },
         );
         return;
     }
@@ -770,7 +791,7 @@ sub delete {
             $c->rendered( 204 );
             return;
         },
-        html => sub {
+        any => sub {
             if ( my $route = $c->stash( 'forward_to' ) ) {
                 $c->redirect_to( $route );
                 return;
@@ -809,7 +830,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.035
+version 1.036
 
 =head1 SYNOPSIS
 
@@ -896,6 +917,11 @@ the current controller object (C<$c>).
 This overrides any query filters and so can be used to enforce
 authorization / security.
 
+=item order_by
+
+Set the default order for the items. Supports any L<Yancy::Backend/list>
+C<order_by> structure.
+
 =back
 
 The following stash values are set by this method:
@@ -931,6 +957,12 @@ C<$page> query parameter.
 
 Instead of using the C<limit> stash value, you can use the C<$limit>
 query parameter to allow users to specify their own page size.
+
+=item $order_by
+
+One or more fields to order by. Must be specified as C<< asc:<name> >>
+to sort in ascending order or C<< desc:<field> >> to sort in descending
+order.
 
 =item Additional Field Filters
 

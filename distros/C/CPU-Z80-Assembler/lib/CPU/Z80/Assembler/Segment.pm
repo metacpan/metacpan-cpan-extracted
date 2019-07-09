@@ -15,7 +15,7 @@ CPU::Z80::Assembler::Segment - Represents one segment of assembly opcodes
 use strict;
 use warnings;
 
-our $VERSION = '2.16';
+our $VERSION = '2.18';
 
 use Asm::Preproc::Line;
 

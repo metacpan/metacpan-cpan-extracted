@@ -3,13 +3,13 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.149';
+our $VERSION = '1.151';
 
 =encoding utf8
 
 =head1 NAME
 
-Quiq - Class library for rapid development
+Quiq - Class library for rapid development (Documentation in German)
 
 =head1 DESCRIPTION
 
@@ -225,6 +225,14 @@ L<Quiq::FileHandle> - Datei-Handle
 =item *
 
 L<Quiq::Formatter> - Formatierung von Werten
+
+=item *
+
+L<Quiq::GD::Font> - GD- oder TrueType-Font
+
+=item *
+
+L<Quiq::GD::Image> - Schnittstelle zur GD Graphics Library
 
 =item *
 
@@ -690,7 +698,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.149
+1.151
 
 =head1 AUTHOR
 

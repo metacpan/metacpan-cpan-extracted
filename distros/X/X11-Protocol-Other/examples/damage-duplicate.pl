@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -26,8 +26,8 @@
 #
 # A new $window toplevel displays the contents of a $source window.  The key
 # feature of the damage extension is that it reports when $source changes.
-# Without that a duplicating program like this would have to re-copy every 1
-# second or something like that.
+# Without that, a duplicating program like this would have to re-copy every
+# 1 second or something like that.
 #
 # The source window can be given as an XID with the "--id" command line
 # option, otherwise an X11::Protocol::ChooseWindow is run so you can click
@@ -79,16 +79,16 @@
 # pixel colour conversions would be required.  If the destination was on a
 # different server or different screen then some data transfers with
 # GetImage() and PutImage() would be needed as well as pixel conversions.
-# (As usual X11::Protocol::Ext::MIT_SHM might do that through shared memory
-# if the program is on the same machine as the server.)
+# (X11::Protocol::Ext::MIT_SHM might do that through shared memory if the
+# program is on the same machine as the server.)
 #
-# Duplicating the root window is specifically disallowed.  The problem is
-# that a draw to $window is a change to the root window contents, so
-# generates another DamageNotify, which does another draw, etc, in an
-# infinite loop.  It might work if attention was paid to what parts of the
-# root had changed.  Changes to the part of the root which is unobscured
-# parts of $window will be due to the duplicating drawing and so don't
-# require any further drawing.
+# Duplicating the root window is specifically disallowed here.  The problem
+# is that a draw to $window is a change to the root contents, so generates
+# another DamageNotify, which does another draw, in an infinite loop.  It
+# might work if attention was paid to what parts of the root had changed.
+# Changes to the part of the root which is unobscured parts of $window will
+# be due to the duplicating drawing and so don't require any further
+# drawing.
 #
 
 BEGIN { require 5 }

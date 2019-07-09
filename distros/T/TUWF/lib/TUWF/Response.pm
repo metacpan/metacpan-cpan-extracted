@@ -9,7 +9,7 @@ use POSIX 'strftime';
 use Carp 'croak';
 
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 our @EXPORT = qw|
   resInit resHeader resCookie resBuffer resFd resStatus resRedirect
   resNotFound resJSON resBinary resFile resFinish

@@ -1,0 +1,271 @@
+#!perl
+
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.000'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
+
+my $prefix = "/App/bwk/mn/";
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => $prefix,
+    log => 1,
+    pass_cmdline_object => 1,
+    subcommands => {
+        'status'    => { url => "${prefix}status", },
+    },
+);
+Perinci::CmdLineX::CommonOptions::SelfUpgrade->apply_to_object($cli);
+$cli->run;
+
+# ABSTRACT: Some commands to manage Bulwark masternode
+# PODNAME: bwk-mn
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bwk-mn - Some commands to manage Bulwark masternode
+
+=head1 VERSION
+
+This document describes version 0.000 of bwk-mn (from Perl distribution App-bwk-mn), released on 2019-07-08.
+
+=head1 SYNOPSIS
+
+To see masternode status:
+
+ % bwk-mn status
+
+To upgrade to the latest version:
+
+ % bwk-mn -U
+
+=head1 DESCRIPTION
+
+Early release. More functionality will be added in the future.
+
+=head1 SUBCOMMANDS
+
+=head2 B<status>
+
+bulwark-cli getblockcount + masternode status.
+
+This is mostly just a shortcut for running C<bulwark-cli getblockcount> and
+C<bulwark-cli masternode status>.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--self-upgrade>, B<-U>
+
+Update program to latest version from CPAN.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bwk-mn bwk-mn
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bwk-mn 'p/*/`bwk-mn`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/bwk-mn.conf>, F<~/bwk-mn.conf>, or F</etc/bwk-mn.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand status
+
+=head1 ENVIRONMENT
+
+=head2 BWK_MN_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/bwk-mn.conf>
+
+F<~/bwk-mn.conf>
+
+F</etc/bwk-mn.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-bwk-mn>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-bwk-mn>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-bwk-mn>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<cryp-mn>
+
+Other C<cryp-*> in the L<App::cryp> family.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

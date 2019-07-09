@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.149';
+our $VERSION = '1.151';
 
 use POSIX ();
 use Time::Local ();
@@ -616,7 +616,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.149
+1.151
 
 =head1 AUTHOR
 

@@ -63,6 +63,6 @@
          "web" : "https://github.com/sysread/URI-Fast"
       }
    },
-   "version" : "0.47",
+   "version" : "0.48",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

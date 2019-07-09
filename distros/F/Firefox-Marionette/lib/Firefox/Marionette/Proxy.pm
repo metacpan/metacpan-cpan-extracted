@@ -3,7 +3,7 @@ package Firefox::Marionette::Proxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -68,7 +68,7 @@ Firefox::Marionette::Proxy - Represents a Proxy used by Firefox Capabilities usi
 
 =head1 VERSION
 
-Version 0.76
+Version 0.77
 
 =head1 SYNOPSIS
 
@@ -175,7 +175,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

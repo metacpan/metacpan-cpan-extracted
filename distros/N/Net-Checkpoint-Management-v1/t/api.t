@@ -28,6 +28,18 @@ is( $cpmgmt->api_versions, array {
     etc();
 }, 'api_versions successful');
 
+ok(my $session = $cpmgmt->get_session(), 'fetching session information ok');
+
+is($session->{description}, '', 'session has no description');
+
+ok($cpmgmt->update_session({}, {
+    description => 'test session',
+}));
+
+ok($session = $cpmgmt->get_session(), 'fetching session information ok');
+
+is($session->{description}, 'test session', 'session has set description');
+
 ok(my $policy = $cpmgmt->create_package({
     name => $ENV{NET_CHECKPOINT_MANAGEMENT_V1_POLICY},
 }), 'policy package created');

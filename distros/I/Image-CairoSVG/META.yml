@@ -31,5 +31,5 @@ resources:
         Image::Similar: '0.02'
   bugtracker: https://github.com/benkasminbullock/image-cairosvg/issues
   repository: git://github.com/benkasminbullock/image-cairosvg.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

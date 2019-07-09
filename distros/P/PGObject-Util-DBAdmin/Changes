@@ -1,6 +1,15 @@
 Revision history for PGObject-Util-DBAdmin
 
 
+1.0.0   2019-07-08
+        Extend API with 'verify_helpers' class method to allow users to
+        assert whether the module can successfully run its helpers or not
+
+0.131.0 2019-07-06
+        Sanitize the environment before shelling out to external programs,
+        because (a) that's the secure thing to do and (b) it breaks the
+        called programs if the environment contains debugging settings
+
 0.130.1 2018-06-05
         Correct typos in documentation
 

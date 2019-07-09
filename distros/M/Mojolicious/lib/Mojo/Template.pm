@@ -146,8 +146,7 @@ sub process {
   unless ($compiled) {
     my $code = $self->_compile->code;
     monkey_patch $self->namespace, '_escape', $self->escape;
-    return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
-      ->trace->verbose(1)
+    return Mojo::Exception->new($@)->inspect($self->unparsed, $code)->trace
       unless $compiled = eval $self->_wrap($code, @_);
     $self->compiled($compiled);
   }
@@ -156,7 +155,7 @@ sub process {
   local $SIG{__DIE__} = sub {
     CORE::die $_[0] if ref $_[0];
     CORE::die Mojo::Exception->new(shift)
-      ->trace->inspect($self->unparsed, $self->code)->verbose(1);
+      ->trace->inspect($self->unparsed, $self->code);
   };
 
   my $output;
@@ -413,14 +412,16 @@ L<Mojo::Template> will return L<Mojo::Exception> objects that stringify to
 error messages with context.
 
   Bareword "xx" not allowed while "strict subs" in use at template line 4.
-  2: </head>
-  3: <body>
-  4: % my $i = 2; xx
-  5: %= $i * 2
-  6: </body>
-  template:4 (Mojo::Template::Sandbox)
-  path/to/Mojo/Template.pm:123 (Mojo::Template)
-  path/to/myapp.pl:123 (main)
+  Context:
+    2: </head>
+    3: <body>
+    4: % my $i = 2; xx
+    5: %= $i * 2
+    6: </body>
+  Traceback (most recent call first):
+    File "template", line 4, in "Mojo::Template::Sandbox"
+    File "path/to/Mojo/Template.pm", line 123, in "Mojo::Template"
+    File "path/to/myapp.pl", line 123, in "main"
 
 =head1 ATTRIBUTES
 

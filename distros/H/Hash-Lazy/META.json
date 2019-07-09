@@ -1,0 +1,53 @@
+{
+   "abstract" : "A Hash implementation with lazy evaluation feature",
+   "author" : [
+      "Kang-min Liu E<lt>gugod@gugod.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.026",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Hash-Lazy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.026"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::Lazy" : {
+         "file" : "lib/Hash/Lazy.pm",
+         "version" : "0.02"
+      },
+      "Hash::Lazy::Tie" : {
+         "file" : "lib/Hash/Lazy/Tie.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Hash-Lazy/issues"
+      },
+      "homepage" : "https://github.com/gugod/Hash-Lazy",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/Hash-Lazy.git",
+         "web" : "https://github.com/gugod/Hash-Lazy"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_spdx_expression" : "MIT",
+   "x_static_install" : 1
+}

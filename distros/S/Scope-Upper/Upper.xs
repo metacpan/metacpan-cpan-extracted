@@ -2022,12 +2022,17 @@ static int su_uplevel_runops_hook_entersub(pTHX) {
   */
  assert(sud);
  if (sud->argarray) {
+  I32 fill;
   AV *av = newAV();
   AvREAL_off(av);
   AvREIFY_on(av);
-  av_extend(av, AvMAX(sud->argarray));
-  AvFILLp(av) = AvFILLp(sud->argarray);
-  Copy(AvARRAY(sud->argarray), AvARRAY(av), AvFILLp(av) + 1, SV *);
+
+  fill = AvFILLp(sud->argarray);
+  if (fill >= 0) {
+   av_extend(av, fill);
+   Copy(AvARRAY(sud->argarray), AvARRAY(av), fill + 1, SV *);
+   AvFILLp(av) = fill;
+  }
 
   /* should be referenced by PL_curpad[0] and *_ */
   assert(SvREFCNT(PL_curpad[0]) > 1);

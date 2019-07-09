@@ -1,6 +1,11 @@
 Revision history for Term::Form
 
 
+0.517   2019-07-07
+        - Removed DESTROY.
+        - Use validate_options from Term::Choose.
+        - Update options handling.
+
 0.516   2019-07-04
         - Use constants LINE_FEED/CARRIAGE_RETURN.
         - The construcor 'new' can now take options.

@@ -1,27 +1,60 @@
 package Mojo::Feed;
 use Mojo::Base '-base';
+use Mojo::File;
+use Mojo::URL;
+use Mojo::UserAgent;
+use Mojo::Util qw(decode trim);
+use Carp qw(carp croak);
+use Scalar::Util qw(blessed);
+
 
 use overload
   bool     => sub { shift->is_valid },
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 use Mojo::Feed::Item;
 use Mojo::DOM;
 use HTTP::Date;
-use Scalar::Util 'weaken';
 
-has body => '';
-has 'source';
+has charset => 'UTF-8';
+
+has ua => sub { Mojo::UserAgent->new() };
+has max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 3 };
+has redirects => sub { [] };
+
+has url => sub { Mojo::URL->new() };
+has file => sub { Mojo::File->new() };
+has source => sub {
+    my $self = shift;
+    return
+        ( $self->url ne '' ) ? $self->url
+      : ( -f $self->file )   ? $self->file
+      :                        undef;
+};
+
+has body => sub {
+    my $self = shift;
+    if ($self->url ne '') {
+        return $self->_load();
+    }
+    else { # skip file tests, just slurp (for Mojo::Asset::File)
+        return $self->file->slurp();
+    }
+};
+
+has text => sub {
+    my $self = shift;
+    return decode($self->charset, $self->body) || '';
+};
 
 has dom => sub {
   my ($self) = @_;
-  my $body = $self->body;
-  return if !$body;
-  return Mojo::DOM->new($body);
+  return Mojo::DOM->new($self->text);
 };
+
 has feed_type => sub {
   my $top     = shift->dom->children->first;
   my $tag     = $top->tag;
@@ -33,7 +66,6 @@ has feed_type => sub {
     : ($tag =~ /rdf/i)  ? 'RSS 1.0'
     :                     'unknown';
 };
-
 
 my %generic = (
   description => ['description', 'tagline', 'subtitle'],
@@ -53,9 +85,9 @@ foreach my $k (keys %generic) {
     for my $generic (@{$generic{$k}}) {
       if (my $p = $self->dom->at("channel > $generic, feed > $generic")) {
         if ($k eq 'author' && $p->at('name')) {
-          return $p->at('name')->text;
+          return trim $p->at('name')->text;
         }
-        my $text = $p->text || $p->content || $p->attr('href');
+        my $text = trim( $p->text || $p->content || $p->attr('href') || '');
         if ($k eq 'published') {
           return str2time($text);
         }
@@ -69,13 +101,31 @@ foreach my $k (keys %generic) {
 has items => sub {
   my $self = shift;
   $self->dom->find('item, entry')
-    ->map(sub { Mojo::Feed::Item->new(dom => $_, feed => $self) })
-    ->each(sub { weaken $_->{feed} });
+    ->map(sub { Mojo::Feed::Item->new(dom => $_, feed => $self) });
 };
 
 sub is_valid {
   shift->dom->children->first->tag =~ /^(feed|rss|rdf|rdf:rdf)$/i;
 }
+
+sub _load {
+    my ( $self ) = @_;
+    my $tx     = $self->ua->get($self->url);
+    my $result = $tx->result;            # this will croak on network errors
+    if ( $result->is_error ) {
+        croak "Error getting feed from url ", $self->url, ": ", $result->message;
+    }
+    elsif ( $result->code == 301 || $result->code == 302 ) {
+        my $new_url = Mojo::URL->new( $result->headers->location );
+        push @{$self->redirects}, $self->url;
+        $self->url($new_url);
+        croak "Number of redirects exceeded when loading feed" if (@{$self->redirects} > $self->max_redirects);
+        return $self->_load();
+    }
+    $self->charset($result->content->charset) if ($result->content->charset);
+    return $result->body;
+}
+
 
 sub to_hash {
   my $self = shift;
@@ -101,14 +151,21 @@ Mojo::Feed - Mojo::DOM-based parsing of RSS & Atom feeds
 
 =head1 SYNOPSIS
 
-    use Mojo::Feed::Reader;
     use Mojo::Feed;
+    use Mojo::File qw(path);
 
-    my $feed = Mojo::Feed::Reader->new->parse("atom.xml");
+    my $feed = Mojo::Feed->new->parse(file => path("atom.xml"));
     print $feed->title, "\n",
       $feed->items->map('title')->join("\n");
 
     $feed = Mojo::Feed->new( body => $string );
+    $feed = Mojo::Feed->new( url => $rss_url );
+
+    my $feed = Mojo::Feed->new(
+      url => "https://github.com/dotandimet/Mojo-Feed/commits/master.atom");
+    say $feed->title;
+    $feed->items->each(
+      sub { say $_->title, q{ }, Mojo::Date->new($_->published); });
 
 =head1 DESCRIPTION
 
@@ -117,7 +174,9 @@ fetching and parsing RSS and Atom Feeds.  It relies on
 L<Mojo::DOM> for XML/HTML parsing. Date parsing is done with L<HTTP::Date>.
 
 L<Mojo::Feed> represents the parsed RSS/Atom feed; you can construct it
-by setting an XML string as the C<body>, or by using a L<Mojo::Feed::Reader> object.
+by setting an XML string as the C<body> attribute, by setting the C<file> or C<url>
+attributes to a L<Mojo::File> or L<Mojo::URL> respectively, or by using a
+L<Mojo::Feed::Reader> object.
 
 =head1 ATTRIBUTES
 
@@ -133,7 +192,7 @@ The parsed feed as <Mojo::DOM> object.
 
 =head2 source
 
-The source of the feed; either a L<Mojo::Path> or L<Mojo::URL> object, or
+The source of the feed; either a L<Mojo::File> or L<Mojo::URL> object, or
 undef if the feed source was a string.
 
 =head2  title
@@ -163,6 +222,15 @@ Name from C<author>, C<dc:creator> or C<webMaster> field
 =head2  published
 
 Time in epoch seconds (may be filled with pubDate, dc:date, created, issued, updated or modified)
+
+=head2 url
+
+A L<Mojo::URL> object from which to load the file. If set, it will set C<source>. The C<url> attribute
+may change when the feed is loaded if the user agent receives a redirect.
+
+=head2 file
+
+A L<Mojo::File> object from which to read the file. If set, it will set C<source>.
 
 =head1 METHODS
 
@@ -213,8 +281,6 @@ it under the same terms as Perl itself.
 =head1 AUTHOR
 
 Dotan Dimet E<lt>dotan@corky.netE<gt>
-
-Mario Domgoergen
 
 =cut
 

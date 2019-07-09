@@ -22,7 +22,7 @@ use CPU::Z80::Disassembler::Labels;
 
 use Path::Tiny;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 #------------------------------------------------------------------------------
 
@@ -411,10 +411,29 @@ sub _write_instr {
 	if (defined $instr) {
 		# instruction
 		if (defined($instr->NN) && !defined($instr->format->{NN})) {
-			my $NN = ref($instr->NN) ? $instr->NN->[0] : $instr->NN;
-			my $ref_label = $self->labels->search_addr($NN);
-			if (defined($ref_label)) {
-				$instr->format->{NN} = sub { $ref_label->name };
+			# nac the special case of 16-bit (defw) values which can
+			# nac potentially be converted to a label
+			if (ref($instr->NN)) {
+				my $max = scalar(@{$instr->NN});
+				for (my $i=0; $i<$max; $i++) {
+					my $NN = $instr->NN->[$i];
+					my $ref_label = $self->labels->search_addr($NN);
+					if (defined($ref_label)) {
+						$instr->NN->[$i] = $ref_label->name;
+						$instr->format->{NN} = 
+							sub { my $foo=shift; 
+								if (/^\d+$/) {return format_hex4($foo)} 
+								else {return $foo}
+							};
+					}
+				}
+			}
+			else {
+				my $NN = $instr->NN;
+				my $ref_label = $self->labels->search_addr($NN);
+				if (defined($ref_label)) {
+					$instr->format->{NN} = sub { $ref_label->name };
+				}
 			}
 		}
 		elsif (defined($instr->DIS) && !defined($instr->format->{DIS})) {
@@ -648,6 +667,14 @@ sub code {
 		while (@stack) {
 			my $addr = pop @stack;
 			
+			# if address is not loaded, assume a ROM entry point
+			if (!defined $self->memory->peek($addr)) {
+				if (!$self->labels->search_addr($addr)) {
+					my $instr = $self->labels->add($addr);
+				}
+				next;
+			}
+			
 			# skip if already checked
 			next if $self->get_type($addr) eq TYPE_CODE;
 			
@@ -752,7 +779,12 @@ sub _check_call {
 		if (defined $can_call) {
 			return $can_call if $sp_level == 0;
 		}
-		
+
+		# if address is not loaded, return "dont know"
+		if (!defined $self->memory->peek($addr)) {
+			return undef;
+		}
+
 		# get the instruction
 		my $instr = $self->_get_instr($addr);
 		local $_ = $instr->opcode;
@@ -1158,7 +1190,7 @@ sub load_control_file {
 			}
 			
 			# Procedure
-			elsif (($label, $signature) = /^ P \s+ (\w+) \s+ (.*)/ix) {
+			elsif (($label, $signature) = /^ P \s+ (\w+) \s* (.*)/ix) {
 				$self->code($addr, $label);
 				$signature =~ s/,/ /g;
 				my @types = split(' ', $signature);
@@ -1186,7 +1218,7 @@ sub load_control_file {
 			}
 			
 			# Byte | Word
-			elsif (my($type, $ipl, $label) = /^ (B2 | B | W) (?: \[ (\d+) \] )? \s* (\w+)?/ix) {
+			elsif (my($type, $ipl, $label) = /^ (B2 | B | W | M) (?: \[ (\d+) \] )? \s* (\w+)?/ix) {
 				$self->labels->add($addr, $label) if defined $label;
 				$ipl = 16 unless $ipl;
 
@@ -1194,6 +1226,7 @@ sub load_control_file {
 				if    ($type eq 'B') {	($func, $size) = ('defb', 1); }
 				elsif ($type eq 'B2') {	($func, $size) = ('defb2', 1); }
 				elsif ($type eq 'W') {	($func, $size) = ('defw', 2); }
+				elsif ($type eq 'M') {	($func, $size) = ('defm', 1); $ipl = 32; }
 				else {					die "type $type unknown"; }
 				
 				if ($size == 2 && $addr == $end_addr) {

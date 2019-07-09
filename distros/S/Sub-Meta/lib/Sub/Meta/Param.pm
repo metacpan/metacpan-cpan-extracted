@@ -3,11 +3,12 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use overload
     fallback => 1,
     '""'     => sub { $_[0]->name || '' },
+    eq       =>  \&is_same_interface,
 ;
 
 my %DEFAULT = ( named => 0, optional => 0 );
@@ -17,6 +18,9 @@ sub new {
     my %args = @_ == 1 ? ref $_[0] && (ref $_[0] eq 'HASH') ? %{$_[0]}
                        : ( type => $_[0] )
              : @_;
+
+    $args{optional} = !delete $args{required} if exists $args{required};
+    $args{named}    = !delete $args{positional} if exists $args{positional};
 
     %args = (%DEFAULT, %args);
 
@@ -41,6 +45,29 @@ sub set_required($;)   { $_[0]{optional} =  !(defined $_[1] ? $_[1] : 1); $_[0] 
 sub set_named($;)      { $_[0]{named}    = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_positional($;) { $_[0]{named}    =  !(defined $_[1] ? $_[1] : 1); $_[0] }
 
+sub is_same_interface {
+    my ($self, $other) = @_;
+
+    if (defined $self->name) {
+        return unless $self->name eq $other->name;
+    }
+    else {
+        return if defined $other->name;
+    }
+
+    if (defined $self->type) {
+        return unless $self->type eq $other->type;
+    }
+    else {
+        return if defined $other->type;
+    }
+
+    return unless $self->optional eq $other->optional;
+    return unless $self->named eq $other->named;
+
+    return 1;
+}
+
 1;
 __END__
 
@@ -60,8 +87,8 @@ Sub::Meta::Param - element of Sub::Meta::Parameters
         name     => '$msg',
         default  => 'world',
         coerce   => 0,
-        optional => 0,
-        named    => 0,
+        optional => 0, # default
+        named    => 0, # default
     );
 
     $param->type; # => 'Str'
@@ -77,6 +104,14 @@ Sub::Meta::Param - element of Sub::Meta::Parameters
 =head2 new
 
 Constructor of C<Sub::Meta::Param>.
+
+    use Types::Standard -types;
+
+    Sub::Meta::Param->new({
+        type       => ArrayRef[Int],
+        required   => 1,
+        positional => 1,
+    })
 
 =head2 name
 
@@ -145,6 +180,11 @@ This boolean is the opposite of C<positional>.
 =head2 set_positional($bool=true)
 
 Setter for C<positional>.
+
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
+Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
 
 =head1 SEE ALSO
 

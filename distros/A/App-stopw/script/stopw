@@ -1,0 +1,249 @@
+#!perl
+
+our $DATE = '2019-06-23'; # DATE
+our $VERSION = '0.040'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config gnu_getopt no_ignore_case auto_version);
+use Term::ReadKey;
+use Time::HiRes qw(time sleep);
+
+my %opts = (
+    update_delay => 0.02,
+    banner_size  => 0,
+    start_stopped => 0,
+    start_at => 0,
+);
+Getopt::Long::Configure("bundling");
+GetOptions(
+    'update-delay|d=f' => \$opts{update_delay},
+    'banner-size|b=i'  => \$opts{banner_size},
+    'start-stopped|S'  => \$opts{start_stopped},
+    'start-at|s=f'     => \$opts{start_at},
+    'help|h|?' => sub {
+        print <<'_';
+Usage:
+  stopw [options]
+Options:
+  --banner-size=i (-b).   Set 1-5 print large ASCII-art letters.
+  --start-at=f (-s).      Start timer at particular time in seconds.
+  --start-stopped, -S.    Start in stopped state.
+  --update-delay=f (-d).  Defaults to 0.02.
+
+For more details, see manpage.
+_
+        exit 0;
+    },
+);
+
+# borrowed from Games::2048
+sub read_key {
+    my $self = shift;
+    state @keys;
+
+    if (@keys) {
+        return shift @keys;
+    }
+
+    my $char;
+    my $packet = '';
+    while (defined($char = ReadKey -1)) {
+        $packet .= $char;
+    }
+
+    while ($packet =~ m(
+                           \G(
+                               \e \[          # CSI
+                               [\x30-\x3f]*   # Parameter Bytes
+                               [\x20-\x2f]*   # Intermediate Bytes
+                               [\x40-\x7e]    # Final Byte
+                           |
+                               .              # Otherwise just any character
+                           )
+                   )gsx) {
+        push @keys, $1;
+    }
+
+    return shift @keys;
+}
+
+$|++;
+ReadMode "cbreak";
+
+my $now       = time();
+my $time0     = $now - $opts{start_at};
+my $time      = $now;
+my $stop_time = $now;
+my $stopped   = $opts{start_stopped};
+
+if ($opts{banner_size} > 0) {
+    require Text::Banner;
+    require Text::NonWideChar::Util;
+    $opts{update_delay} = 1;
+}
+
+TIMER:
+while (1) {
+    my $str;
+    my $size;
+
+    while (defined(my $key = read_key())) {
+        if ($key eq 'q' || $key eq 'Q') {
+            if ($opts{banner_size} > 0) {
+                if ($str) {
+                    for (1..$size->[1]) { print "\n" }
+                }
+            } else {
+                print "\n";
+            }
+            last TIMER;
+        } elsif ($key eq ' ' || $key eq 'r' || $key eq 'R') {
+            print "\n" unless $opts{banner_size} > 0;
+        } elsif ($key eq 'z' || $key eq 'Z') {
+            $time0 = time();
+            $time       = $time0 if $stopped;
+            $stop_time  = $time0 if $stopped;
+        } elsif ($key eq "\n" || $key eq 's' || $key eq 'S') {
+            $stopped  = !$stopped;
+            $stop_time = time() if $stopped;
+            $time0 += (time()-$stop_time) if !$stopped;
+        }
+    }
+
+    {
+        $time = time() unless $stopped;
+        my $elapsed = $time - $time0;
+        my $hours   = int( $elapsed/3600);
+        my $minutes = int(($elapsed-$hours*3600)/60);
+        my $seconds = int( $elapsed-$hours*3600-$minutes*60);
+        my $millis  = int(($elapsed-$hours*3600-$minutes*60-$seconds)*1000);
+
+        if ($opts{banner_size} > 0) {
+            my $str2 = sprintf("%02d:%02d", $minutes, $seconds);
+            my $ban = Text::Banner->new;
+            $ban->set($str2);
+            $ban->size($opts{banner_size});
+            $ban->fill('*');
+            $str = $ban->get;
+            print $str;
+            sleep $opts{update_delay};
+            $size = Text::NonWideChar::Util::length_height($str);
+            print "\x08" x $size->[0]; # move left
+            printf "\e[%dA", ($size->[1]-1); # move up
+        } else {
+            $str = sprintf("%02d:%02d:%02d.%03d ",
+                           $hours, $minutes, $seconds, $millis);
+            print $str;
+            sleep $opts{update_delay};
+            print "\x08" x length($str);
+        }
+    }
+}
+ReadMode "normal";
+
+# ABSTRACT: A console-based virtual stopwatch and timer
+# PODNAME: stopw
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+stopw - A console-based virtual stopwatch and timer
+
+=head1 VERSION
+
+This document describes version 0.040 of stopw (from Perl distribution App-stopw), released on 2019-06-23.
+
+=head1 SYNOPSIS
+
+ % stopw [options]
+
+=head1 DESCRIPTION
+
+B<stopw> is a console-based virtual stopwatch and timer. After you run the
+program, you can press:
+
+=over
+
+=item * C<z> to reset the timer back to zero
+
+=item * C<r> (or spacebar) to record time
+
+This will print the current value of timer and move to the next line.
+
+=item * C<s> (or Enter) to start/stop the timer
+
+=item * C<q> (or Ctrl-C) to quit the program
+
+=back
+
+=head1 OPTIONS
+
+=head2 --banner-size (-b)
+
+Integer, 0-5. Default: 0.
+
+If set to a number between 1-5, will print a large banner (ASCII-art) of
+C<mm:ss> digits instead of regular text (using L<Text::Banner>). This will also
+automatically set --update-delay to 1.
+
+=head2 --start-at (-s)
+
+Float.
+
+Instead of 0 (00:00), start the timer at a particular second.
+
+=head2 --start-stopped (-S)
+
+Start in stopped state. You need to press a single Return to start the
+stopwatch.
+
+=head2 --update-delay (-d)
+
+Float, default: 0.02. Number of seconds between updates.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-stopw>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-stopw>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-stopw>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<App::Stopwatch> which includes the L<stopwatch> console utility. This utility
+is geared more towards executing a command after a specified time period.
+
+The B<stopwatch> Debian package, a graphical (Tk-based) virtual stopwatch and
+timer.
+
+The L<time> Unix command.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2016, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

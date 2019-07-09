@@ -1,12 +1,14 @@
 package Module::Abstract::Cwalitee;
 
-our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
+
+use Cwalitee::Common;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
@@ -19,56 +21,22 @@ our %SPEC;
 $SPEC{list_module_abstract_cwalitee_indicators} = {
     v => 1.1,
     args => {
-        detail => {
-            schema => 'bool*',
-            cmdline_aliases=>{l=>{}},
-        },
-        # XXX filter by severity
-        # XXX filter by module
-        # XXX filter by status
+        Cwalitee::Common::args_list('Module::Abstract::'),
     },
 };
 sub list_module_abstract_cwalitee_indicators {
-    require PERLANCAR::Module::List;
-
     my %args = @_;
 
-    my @res;
-
-    my $mods = PERLANCAR::Module::List::list_modules(
-        'Module::Abstract::Cwalitee::', {list_modules=>1, recurse=>1});
-    for my $mod (sort keys %$mods) {
-        (my $mod_pm = "$mod.pm") =~ s!::!/!g;
-        require $mod_pm;
-        my $spec = \%{"$mod\::SPEC"};
-        for my $func (sort keys %$spec) {
-            next unless $func =~ /\Aindicator_/;
-            my $funcmeta = $spec->{$func};
-            (my $name = $func) =~ s/\Aindicator_//;
-            my $rec = {
-                name => $name,
-                summary  => $funcmeta->{summary},
-                priority => $funcmeta->{'x.indicator.priority'} // 50,
-                severity => $funcmeta->{'x.indicator.severity'} // 3,
-                status   => $funcmeta->{'x.indicator.status'} // 'stable',
-            };
-            if ($args{_return_coderef}) {
-                $rec->{code} = \&{"$mod\::$func"};
-            }
-            push @res, $rec;
-        }
-    }
-
-    unless ($args{detail}) {
-        @res = map { $_->{name} } @res;
-    }
-
-    [200, "OK", \@res];
+    Cwalitee::Common::list_cwalitee_indicators(
+        prefix => 'Module::Abstract::',
+        %args,
+    );
 }
 
 $SPEC{calc_module_abstract_cwalitee} = {
     v => 1.1,
     args => {
+        Cwalitee::Common::args_calc('Module::Abstract::'),
         abstract => {
             schema => 'str*',
             req => 1,
@@ -77,65 +45,18 @@ $SPEC{calc_module_abstract_cwalitee} = {
     },
 };
 sub calc_module_abstract_cwalitee {
-    my %args = @_;
+    my %fargs = @_;
 
-    my $res = list_module_abstract_cwalitee_indicators(
-        detail => 1,
-        _return_coderef => 1,
+    Cwalitee::Common::calc_cwalitee(
+        prefix => 'Module::Abstract::',
+        %fargs,
+        code_init_r => sub {
+            return {
+                # module => ...
+                abstract => $fargs{abstract},
+            },
+        },
     );
-    return $res unless $res->[0] == 200;
-
-    my @res;
-    my $r = {
-        # module => ...
-        abstract => $args{abstract},
-    };
-    my $num_run = 0;
-    my $num_success = 0;
-    my $num_fail = 0;
-    for my $ind (sort {
-        $a->{priority} <=> $b->{priority} ||
-            $a->{name} cmp $b->{name}
-        } @{ $res->[2] }) {
-        my $indres = $ind->{code}->(r => $r);
-        $num_run++;
-        my ($result, $result_summary);
-        if ($indres->[0] == 200) {
-            if ($indres->[2]) {
-                $result = 0;
-                $num_fail++;
-                $result_summary = $indres->[2];
-            } else {
-                $result = 1;
-                $num_success++;
-                $result_summary = '';
-            }
-        } elsif ($indres->[0] == 412) {
-            $result = undef;
-            $result_summary = "Cannot be run".($indres->[1] ? ": $indres->[1]" : "");
-        } else {
-            return [500, "Unexpected result when checking indicator ".
-                        "'$ind->{name}': $indres->[0] - $indres->[1]"];
-        }
-        my $res = {
-            num => $num_run,
-            indicator => $ind->{name},
-            priority => $ind->{priority},
-            severity => $ind->{severity},
-            summary  => $ind->{summary},
-            result => $result,
-            result_summary => $result_summary,
-        };
-        push @res, $res;
-    }
-
-    push @res, {
-        indicator      => 'Score',
-        result         => sprintf("%.2f", $num_run ? ($num_success / $num_run)*100 : 0),
-        result_summary => "$num_success out of $num_run",
-    };
-
-    [200, "OK", \@res];
 }
 
 1;
@@ -153,7 +74,7 @@ Module::Abstract::Cwalitee - Calculate the cwalitee of your module Abstract
 
 =head1 VERSION
 
-This document describes version 0.001 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-03.
+This document describes version 0.004 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-08.
 
 =head1 SYNOPSIS
 
@@ -194,6 +115,34 @@ Arguments ('*' denotes required arguments):
 
 =item * B<abstract>* => I<str>
 
+=item * B<exclude_indicator> => I<array[str]>
+
+Do not use these indicators.
+
+=item * B<exclude_indicator_module> => I<array[perl::modname]>
+
+Do not use indicators from these modules.
+
+=item * B<exclude_indicator_status> => I<array[str]>
+
+Do not use indicators having these statuses.
+
+=item * B<include_indicator> => I<array[str]>
+
+Only use these indicators.
+
+=item * B<include_indicator_module> => I<array[perl::modname]>
+
+Only use indicators from these modules.
+
+=item * B<include_indicator_status> => I<array[str]> (default: ["stable"])
+
+Only use indicators having these statuses.
+
+=item * B<min_indicator_severity> => I<uint> (default: 1)
+
+Minimum indicator severity.
+
 =back
 
 Returns an enveloped result (an array).
@@ -222,6 +171,38 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<detail> => I<bool>
+
+=item * B<exclude> => I<array[str]>
+
+Exclude by name.
+
+=item * B<exclude_module> => I<array[perl::modname]>
+
+Exclude by module.
+
+=item * B<exclude_status> => I<array[str]>
+
+Exclude by status.
+
+=item * B<include> => I<array[str]>
+
+Include by name.
+
+=item * B<include_module> => I<array[perl::modname]>
+
+Include by module.
+
+=item * B<include_status> => I<array[str]> (default: ["stable"])
+
+Include by status.
+
+=item * B<max_severity> => I<int> (default: 5)
+
+Maximum severity.
+
+=item * B<min_severity> => I<int> (default: 1)
+
+Minimum severity.
 
 =back
 

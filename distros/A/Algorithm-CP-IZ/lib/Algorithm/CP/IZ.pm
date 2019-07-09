@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Carp;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken blessed);
 
 require Exporter;
 use AutoLoader;
@@ -14,6 +14,11 @@ use AutoLoader;
 use Algorithm::CP::IZ::Int;
 use Algorithm::CP::IZ::RefVarArray;
 use Algorithm::CP::IZ::RefIntArray;
+use Algorithm::CP::IZ::ParamValidator qw(validate);
+use Algorithm::CP::IZ::ValueSelector;
+use Algorithm::CP::IZ::CriteriaValueSelector;
+use Algorithm::CP::IZ::NoGoodSet;
+use Algorithm::CP::IZ::SearchNotify;
 
 our @ISA = qw(Exporter);
 
@@ -24,19 +29,23 @@ our @ISA = qw(Exporter);
 # This allows declaration	use Algorithm::CP::IZ ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	CS_INT_MAX
-	CS_INT_MIN
-) ] );
+our %EXPORT_TAGS = ( 'value_selector' => [ qw(
+    CS_VALUE_SELECTOR_MIN_TO_MAX
+    CS_VALUE_SELECTOR_MAX_TO_MIN
+    CS_VALUE_SELECTOR_LOWER_AND_UPPER
+    CS_VALUE_SELECTOR_UPPER_AND_LOWER
+    CS_VALUE_SELECTOR_MEDIAN_AND_REST
+    CS_VALUE_SELECTION_EQ
+    CS_VALUE_SELECTION_NEQ
+    CS_VALUE_SELECTION_LE
+    CS_VALUE_SELECTION_LT
+    CS_VALUE_SELECTION_GE
+    CS_VALUE_SELECTION_GT
+) ]);
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'value_selector'} } );
 
-our @EXPORT = qw(
-	CS_INT_MAX
-	CS_INT_MIN
-);
-
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -70,11 +79,16 @@ XSLoader::load('Algorithm::CP::IZ', $VERSION);
 
 my $Instances = 0;
 
+sub _report_error {
+    my $msg = shift;
+    croak __PACKAGE__ . ": ". $msg;
+}
+
 sub new {
     my $class = shift;
 
     if ($Instances > 0) {
-	croak __PACKAGE__ . ": another instance is working.";
+	_report_error("another instance is working.");
     }
 
     Algorithm::CP::IZ::cs_init();
@@ -122,7 +136,7 @@ sub restore_context {
 
     my $cxt = $self->{_cxt};
     if (@$cxt == 0) {
-	croak "restore_context: bottom of context stack";
+	_report_error("restore_context: bottom of context stack");
     }
 
     Algorithm::CP::IZ::cs_restoreContext();
@@ -132,12 +146,45 @@ sub restore_context_until {
     my $self = shift;
     my $label = shift;
 
+    validate([$label], ["I"],
+	     "Usage: restore_context_until(int_label)");
+
+    my $cxt = $self->{_cxt};
+    if (@$cxt == 0) {
+	_report_error("restore_context_until: invalid label");
+    }
+
     Algorithm::CP::IZ::cs_restoreContextUntil($label);
+}
+
+sub forget_save_context {
+    my $self = shift;
+
+    my $cxt = $self->{_cxt};
+    if (@$cxt == 0) {
+	_report_error("forget_save_context: bottom of context stack");
+    }
+
+    Algorithm::CP::IZ::cs_forgetSaveContext();
+}
+
+sub forget_save_context_until {
+    my $self = shift;
+    my $label = shift;
+
+    validate([$label], ["I"],
+	     "Usage: forget_save_context_until(int_label)");
+
+    my $cxt = $self->{_cxt};
+    if (@$cxt == 0) {
+	_report_error("forget_save_context_until: invalid label");
+    }
+
+    Algorithm::CP::IZ::cs_forgetSaveContextUntil($label);
 }
 
 sub restore_all {
     my $self = shift;
-    my $label = shift;
 
     Algorithm::CP::IZ::cs_restoreAll();
 
@@ -151,7 +198,7 @@ sub accept_context {
 
     my $cxt = $self->{_cxt};
     if (@$cxt == 0) {
-	croak "accept_context: bottom of context stack";
+	_report_error("accept_context: bottom of context stack");
     }
 
     Algorithm::CP::IZ::cs_acceptContext();
@@ -164,10 +211,12 @@ sub accept_context_until {
     my $self = shift;
     my $label = shift;
 
-    my $cxt = $self->{_cxt};
+    validate([$label], ["I"],
+	     "Usage: accept_context_until(int_label)");
 
-    unless (1 <= $label && $label <= @$cxt) {
-	croak "accept_context_until: invalid label";
+    my $cxt = $self->{_cxt};
+    if (@$cxt == 0) {
+	_report_error("accept_context_until: invalid label");
     }
 
     while (@$cxt >= $label) {
@@ -194,6 +243,11 @@ sub backtrack {
     my $self = shift;
     my ($var, $index, $handler) = @_;
 
+    validate([$var, $index, $handler], ["oV", "I", "C"],
+	     "Usage: backtrack(variable, index, code_ref)");
+
+    $var = _safe_var($var) if (defined($var));
+    
     my $id = $Backtrack_id++;
     $self->{_backtracks}->{$id} = [$var, $index, $handler];
 
@@ -209,31 +263,21 @@ sub backtrack {
 	delete $backtracks->{$bid};
     };
 
-    my $vptr = defined($var) ? $var->{_ptr} : 0;
+    my $vptr = defined($var) ? $$var : 0;
 
     Algorithm::CP::IZ::cs_backtrack($vptr, $id,
 				    $self->{_backtrack_code_ref});
 }
 
-sub get_nb_fails {
-    my $self = shift;
-
-    return Algorithm::CP::IZ::cs_getNbFails();
-}
-
-sub get_nb_choice_points {
-    my $self = shift;
-
-    return Algorithm::CP::IZ::cs_getNbChoicePoints();
-}
-
 sub _create_int_from_min_max {
     my ($self, $min, $max) = @_;
+    validate([$min, $max], ["I", "I"], "Usage: create_int(min, max), create_int(constant), create_int([domain])");
     return Algorithm::CP::IZ::cs_createCSint(int($min), int($max));
 }
 
 sub _create_int_from_domain {
     my ($self, $int_array) = @_;
+    validate([$int_array], ["iA1"], "Usage: create_int(min, max), create_int(constant), create_int([domain])");
 
     my $parray = Algorithm::CP::IZ::alloc_int_array([map { int($_) } @$int_array]);
     my $ptr = Algorithm::CP::IZ::cs_createCSintFromDomain($parray, scalar @$int_array);
@@ -255,6 +299,10 @@ sub create_int {
     elsif (ref $p1 && ref $p1 eq 'ARRAY') {
 	$name = shift;
 	$ptr = $self->_create_int_from_domain($p1);
+	unless ($ptr) {
+	    my $param_str = join(", ", @$p1);
+	    _report_error("cannot create variable from [$param_str]");
+	}
     }
     else {
 	my $min = $p1;
@@ -262,6 +310,10 @@ sub create_int {
 	$name = shift;
 
 	$ptr = $self->_create_int_from_min_max($min, $max);
+	unless ($ptr) {
+	    my $param_str = join(", ", $min, $max);
+	    _report_error("cannot create variable from ($param_str)");
+	}
     }
 
     my $ret = Algorithm::CP::IZ::Int->new($ptr);
@@ -276,26 +328,105 @@ sub create_int {
     return $ret;
 }
 
+sub _validate_search_params {
+    my ($var_array, $params) = @_;
+    return 1 unless (defined($params));
+    return 0 unless (ref $params eq 'HASH');
+
+    my %checker = (
+	FindFreeVar => sub {
+	    my $x = shift;
+	    if (ref $x) {
+		validate([$x], ["C"], "search: FindFreeVar must be a number or a coderef");
+	    }
+	    else {
+		validate([$x], ["I"], "search: FindFreeVar must be a number or a coderef");
+	    }
+	},
+	Criteria => sub {
+	    my $x = shift;
+	    validate([$x], ["C"], "search: Criteria must be a coderef");
+	    return 1;
+	},
+	MaxFail => sub {
+	    my $x = shift;
+	    validate([$x], ["I"], "search: MaxFail must be an integer");
+	},
+	ValueSelectors => sub {
+	    my $x = shift;
+	    validate([$x], [
+			 sub {
+			     my $vs = shift;
+			     return unless (ref $vs eq 'ARRAY'
+					    && scalar @$vs == scalar @$var_array);
+			     for my $obj (@$vs) {
+				 return unless (blessed($obj)
+						&& $obj->isa("Algorithm::CP::IZ::ValueSelector"));
+			     }
+			     1;
+			 }], "search: ValueSelectos must be a arrayref of Algorithm::CP::IZ::ValueSelector instance for each variables");
+	},
+	MaxFailFunc => sub {
+	    my $x = shift;
+	    validate([$x], ["C"], "search: MaxFailFunc must be a coderef");
+	},
+	NoGoodSet => sub {
+	    my $x = shift;
+	    validate([$x], [
+			 sub {
+			     my $ngs = shift;
+			     return blessed($ngs) && $ngs->isa("Algorithm::CP::IZ::NoGoodSet");
+			 }], "search: NoGoodSet must be a instance of Algorithm::CP::IZ::NoGoodSet");
+	},
+	Notify => sub {
+	    my $x = shift;
+	    validate([$x], [
+			 sub {
+			     my $notify = shift;
+			     return 1 if (ref $notify eq 'HASH');
+			     return 1 if (blessed($notify));
+			     return 0;
+			 }], "search: Notify must be an hashref or object");
+	},
+    );
+
+    my @keys = sort keys %$params;
+
+    for my $k (@keys) {
+	if (exists $checker{$k}) {
+	    my $func = $checker{$k};
+	    &$func($params->{$k});
+	}
+	else {
+	    _report_error("search: Unknown Key $k in params");
+	}
+    }
+
+    return 1;
+}
+
 sub search {
     my $self = shift;
     my $var_array = shift;
     my $params = shift;
 
-    my $array = [map { $_->{_ptr } } @$var_array];
+    validate([$var_array, $params], ["vA0", sub {_validate_search_params($var_array, @_)}],
+	     "Usage: search([variables], {key=>value,...}");
 
+    my $array = [map { $$_ } @$var_array];
     my $max_fail = -1;
     my $find_free_var_id = 0;
     my $find_free_var_func = sub { die "search: Internal error"; };
-    my $criteria_func = undef;
-
+    my $criteria_func;
+    my $value_selectors;
+    my $max_fail_func;
+    my $ngs;
+    my $notify;
+    
     if ($params->{FindFreeVar}) {
 	my $ffv = $params->{FindFreeVar};
 
 	if (ref $ffv) {
-	    unless (ref $ffv eq 'CODE') {
-		croak "search: FindFreeVar must be number or coderef";
-	    }
-
 	    $find_free_var_id = -1;
 	    $find_free_var_func = sub {
 		return &$ffv($var_array);
@@ -307,18 +438,98 @@ sub search {
     }
 
     if ($params->{Criteria}) {
-	my $cr = $params->{Criteria};
-	unless (ref $cr && ref $cr eq 'CODE') {
-	    croak "search: Criteria must be coderef";
-	}
-
-	$criteria_func = $cr;
+	$criteria_func = $params->{Criteria};
     }
 
     if ($params->{MaxFail}) {
 	$max_fail = int($params->{MaxFail});
     }
 
+    if ($params->{ValueSelectors}) {
+	$value_selectors = $params->{ValueSelectors};
+    }
+
+    if ($params->{MaxFailFunc}) {
+	$max_fail_func = $params->{MaxFailFunc};
+    }
+
+    if ($params->{NoGoodSet}) {
+	$ngs = $params->{NoGoodSet};
+    }
+
+    if ($params->{Notify}) {
+	$notify = $params->{Notify};
+	unless (ref $notify eq 'Algorithm::CP::IZ::SearchNotify') {
+	    $notify = Algorithm::CP::IZ::SearchNotify->new($notify);
+	}
+
+	$notify->set_var_array($var_array);
+    }
+
+    my $is_search35 = $value_selectors || $max_fail_func || $ngs || $notify;
+
+    if ($is_search35) {
+	unless ($value_selectors) {
+	    if ($criteria_func) {
+		$Algorithm::CP::IZ::CriteriaValueSelector::CriteriaFunction = $criteria_func;
+		
+		$value_selectors = [
+		    map {
+			$self->create_value_selector_simple("Algorithm::CP::IZ::CriteriaValueSelector")
+		    } (0..scalar(@$var_array)-1)];
+	    }
+	    else {
+		$value_selectors = [
+		    map {
+			$self->get_value_selector(&CS_VALUE_SELECTOR_MIN_TO_MAX)
+		    } (0..scalar(@$var_array)-1)];
+	    }
+	}
+	
+	my $i = 0;
+	for my $v (@$array) {
+	    my $vs = $value_selectors->[$i];
+	    $vs->prepare($i);
+	    $i++;
+	}
+
+	if ($max_fail_func) {
+	    return Algorithm::CP::IZ::cs_searchValueSelectorRestartNG(
+		$array,
+		$value_selectors,
+		$find_free_var_id,
+		$find_free_var_func,
+		$max_fail_func,
+		$max_fail,
+		defined($ngs) ? $ngs->{_ngs} : 0,
+		defined($notify) ? $notify->{_ptr} : 0);
+	}
+	else {
+	    return Algorithm::CP::IZ::cs_searchValueSelectorFail(
+		$array,
+		$value_selectors,
+		$find_free_var_id,
+		$find_free_var_func,
+		$max_fail,
+		defined($notify) ? $notify->{_ptr} : 0);
+	}
+    }
+    else {
+	if ($criteria_func) {
+	    return Algorithm::CP::IZ::cs_searchCriteria($array,
+							$find_free_var_id,
+							$find_free_var_func,
+							$criteria_func,
+							$max_fail);
+	}
+	else {
+	    return Algorithm::CP::IZ::cs_search($array,
+						$find_free_var_id,
+						$find_free_var_func,
+						$max_fail);
+	}
+    }
+	
     if ($criteria_func) {
 	return Algorithm::CP::IZ::cs_searchCriteria($array,
 						    $find_free_var_id,
@@ -334,17 +545,49 @@ sub search {
    }
 }
 
+sub _validate_find_all_params {
+    my $params = shift;
+    return 1 unless (defined($params));
+    return 0 unless (ref $params eq 'HASH');
+
+    my %checker = (
+	FindFreeVar => sub {
+	    my $x = shift;
+	    if (ref $x) {
+		validate([$x], ["C"], "find_all: FindFreeVar must be a number or coderef");
+	    }
+	    else {
+		validate([$x], ["I"], "search: FindFreeVar must be a number or coderef");
+	    }
+	},
+    );
+
+    my @keys = sort keys %$params;
+
+    for my $k (@keys) {
+	if (exists $checker{$k}) {
+	    my $func = $checker{$k};
+	    &$func($params->{$k});
+	}
+	else {
+	    _report_error("find_all: Unknown Key $k in params");
+	}
+    }
+
+    return 1;
+}
+
 sub find_all {
     my $self = shift;
     my $var_array = shift;
     my $found_func = shift;
     my $params = shift;
 
-    unless (ref $found_func eq 'CODE') {
-	croak "find_all: usage: find_all([vars], &callback_func, {params})";
-    }
+    validate([$var_array, $found_func, $params],
+	     ["vA0", "C", \&_validate_find_all_params],
+	     "find_all: usage: find_all([vars], &callback_func, {params})");
 
-    my $array = [map { $_->{_ptr } } @$var_array];
+    my $array = [map { $$_ } @$var_array];
 
     my $find_free_var_id = 0;
     my $find_free_var_func = sub { die "find_all: Internal error"; };
@@ -353,10 +596,6 @@ sub find_all {
 	my $ffv = $params->{FindFreeVar};
 
 	if (ref $ffv) {
-	    unless (ref $ffv eq 'CODE') {
-		croak "find_all: FindFreeVar must be number or coderef";
-	    }
-
 	    $find_free_var_id = -1;
 	    $find_free_var_func = sub {
 		return &$ffv($var_array);
@@ -395,7 +634,7 @@ sub _create_registered_var_array {
     my $self = shift;
     my $var_array = shift;;
 
-    my $key = join(",", map { sprintf("%x", $_->{_ptr}) } @$var_array);
+    my $key = join(",", map { sprintf("%x", $$_) } @$var_array);
     my $r = $self->{_ref_var_arrays}->{$key};
     return $r if ($r);
 
@@ -433,6 +672,66 @@ sub _const_var {
     return $v;
 }
 
+sub _safe_var {
+    my ($vc) = @_;
+    confess "undef cannot be used as variable" unless (defined($vc));
+
+    return $vc if (ref $vc);
+    return _const_var($vc);
+}
+
+sub get_version {
+    my $self = shift;
+    my ($err, $major) = constant('IZ_VERSION_MAJOR');
+
+    if (defined($major)) {
+	return sprintf("%d.%d.%d",
+		       $major,
+		       $self->IZ_VERSION_MINOR,
+		       $self->IZ_VERSION_PATCH);
+    }
+
+    # not supported
+    return;
+}
+
+sub get_value_selector {
+    my $self = shift;
+    my $id = shift;
+
+    return Algorithm::CP::IZ::ValueSelector::IZ->new($self, $id);
+}
+
+sub create_value_selector_simple {
+    my $self = shift;
+    my $id = shift;
+
+    return Algorithm::CP::IZ::ValueSelector::Simple->new($self, $id);
+}
+
+sub create_no_good_set {
+    my $self = shift;
+    my ($var_array, $prefilter, $max_no_good, $ext) = @_;
+    $max_no_good ||= 0;
+    validate([$var_array, $prefilter, $max_no_good], ["vA0", "C0", "I"],
+	     "Usage: create_no_good_set([variables], prefilter, max_no_good, ext)");
+
+    my $ngsObj = Algorithm::CP::IZ::NoGoodSet->new($var_array, $prefilter, $ext);
+    my $ptr = Algorithm::CP::IZ::cs_createNoGoodSet($ngsObj->_parray->ptr,
+						    scalar(@$var_array),
+						    ($prefilter ? 1 : 0),
+						    $max_no_good,
+						    $ngsObj);
+    $ngsObj->_init($ptr);
+    return $ngsObj;
+}
+
+sub create_search_notify {
+    my $iz = shift;
+    my $obj = shift;
+    return Algorithm::CP::IZ::SearchNotify->new($obj);
+}
+
 #####################################################
 # Demon
 #####################################################
@@ -440,6 +739,9 @@ sub _const_var {
 sub event_all_known {
     my $self = shift;
     my ($var_array, $handler, $ext) = @_;
+
+    validate([$var_array, $handler], ["vA0", "C"],
+	     "Usage: event_all_known([variables], code_ref, ext)");
 
     my $parray = $self->_create_registered_var_array($var_array);
 
@@ -455,6 +757,9 @@ sub event_all_known {
 sub event_known {
     my $self = shift;
     my ($var_array, $handler, $ext) = @_;
+
+    validate([$var_array, $handler], ["vA0", "C"],
+	     "Usage: event_known([variables], code_ref, ext)");
 
     my $parray = $self->_create_registered_var_array($var_array);
 
@@ -472,6 +777,9 @@ sub event_new_min {
     my $self = shift;
     my ($var_array, $handler, $ext) = @_;
 
+    validate([$var_array, $handler], ["vA0", "C"],
+	     "Usage: event_new_min([variables], code_ref, ext)");
+
     my $parray = $self->_create_registered_var_array($var_array);
 
     my $h = sub {
@@ -488,6 +796,9 @@ sub event_new_max {
     my $self = shift;
     my ($var_array, $handler, $ext) = @_;
 
+    validate([$var_array, $handler], ["vA0", "C"],
+	     "Usage: event_new_max([variables], code_ref, ext)");
+
     my $parray = $self->_create_registered_var_array($var_array);
 
     my $h = sub {
@@ -503,6 +814,9 @@ sub event_new_max {
 sub event_neq {
     my $self = shift;
     my ($var_array, $handler, $ext) = @_;
+
+    validate([$var_array, $handler], ["vA0", "C"],
+	     "Usage: event_eq([variables], code_ref, ext)");
 
     my $parray = $self->_create_registered_var_array($var_array);
 
@@ -563,9 +877,14 @@ sub Add {
     my $self = shift;
     my @params = @_;
 
+    my $usage_msg = 'usage: Add(v1, v2, ...)';
     if (@params < 1) {
-	croak 'usage: Add(v1, v2, ...)';
+	_report_error($usage_msg);
     }
+    for my $v (@params) {
+	validate([$v], ["V"], $usage_msg);
+    }
+
     if (@params == 1) {
 	return $params[0] if (ref $params[0]);
 	return $self->_const_var(int($params[0]));
@@ -573,7 +892,7 @@ sub Add {
 
     my @v = map { ref $_ ? $_ : $self->_const_var(int($_)) } @params;
 
-    my $ptr = _argv_func([map { $_->{_ptr}} @v], 10,
+    my $ptr = _argv_func([map { $$_} @v], 10,
 			 "Algorithm::CP::IZ::cs_Add",
 			 "Algorithm::CP::IZ::cs_VAdd");
 
@@ -587,9 +906,14 @@ sub Mul {
     my $self = shift;
     my @params = @_;
 
+    my $usage_msg = 'usage: Mul(v1, v2, ...)';
     if (@params < 1) {
-	croak 'usage: Mul(v1, v2, ...)';
+	_report_error($usage_msg);
     }
+    for my $v (@params) {
+	validate([$v], ["V"], $usage_msg);
+    }
+
     if (@params == 1) {
 	return $params[0] if (ref $params[0]);
 	return $self->_const_var(int($params[0]));
@@ -597,7 +921,7 @@ sub Mul {
 
     my @v = map { ref $_ ? $_ : $self->_const_var(int($_)) } @params;
 
-    my $ptr = _argv_func([map { $_->{_ptr}} @v], 10,
+    my $ptr = _argv_func([map { $$_ } @v], 10,
 			 "Algorithm::CP::IZ::cs_Mul",
 			 "Algorithm::CP::IZ::cs_VMul");
 
@@ -612,13 +936,30 @@ sub Sub {
     my $self = shift;
     my @params = @_;
 
-    if (@params != 2) {
-	croak 'usage: Sub(v1, v2)';
+    my $usage_msg = 'usage: Sub(v1, v2, ...)';
+    if (@params < 1) {
+	_report_error($usage_msg);
+    }
+    for my $v (@params) {
+	validate([$v], ["V"], $usage_msg);
+    }
+
+    if (@params == 1) {
+	return $params[0] if (ref $params[0]);
+	return $self->_const_var(int($params[0]));
     }
 
     my @v = map { ref $_ ? $_ : $self->_const_var(int($_)) } @params;
-    my $ptr = Algorithm::CP::IZ::cs_Sub(map {$_->{_ptr}} @v);
+
+    my $ptr = _argv_func([map { $$_} @v], 10,
+			 "Algorithm::CP::IZ::cs_Sub",
+			 "Algorithm::CP::IZ::cs_VSub");
+
     my $ret = Algorithm::CP::IZ::Int->new($ptr);
+
+    $self->_register_variable($ret);
+
+    return $ret;
 
     $self->_register_variable($ret);
 
@@ -629,12 +970,24 @@ sub Div {
     my $self = shift;
     my @params = @_;
 
+    my $usage_msg = 'usage: Div(v1, v2)';
     if (@params != 2) {
-	croak 'usage: Div(v1, v2)';
+	_report_error($usage_msg);
+    }
+    for my $v (@params) {
+	validate([$v], ["V"], $usage_msg);
+    }
+
+    if (@params == 1) {
+	return $params[0] if (ref $params[0]);
+	return $self->_const_var(int($params[0]));
     }
 
     my @v = map { ref $_ ? $_ : $self->_const_var(int($_)) } @params;
-    my $ptr = Algorithm::CP::IZ::cs_Div(map {$_->{_ptr}} @v);
+    my $ptr = Algorithm::CP::IZ::cs_Div(map { $$_ } @v);
+
+    # cannot divide number
+    return undef if ($ptr == 0);
 
     my $ret = Algorithm::CP::IZ::Int->new($ptr);
 
@@ -648,9 +1001,11 @@ sub ScalProd {
     my $vars = shift;
     my $coeffs = shift;
 
-    if (@$coeffs != @$vars) {
-	croak 'usage: ScalProd([ceoffs], [vars])';
-    }
+    validate([$vars, $coeffs, 1], ["vA0", "iA0",
+				   sub {
+				       @$coeffs == @$vars
+				   }],
+	     "Usage: ScalProd([variables], [coeffs])");
 
     @$vars = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$vars;
 
@@ -670,6 +1025,8 @@ sub AllNeq {
     my $self = shift;
     my $var_array = shift;;
 
+    validate([$var_array], ["vA0"], "Usage: AllNeq([variables])");
+
     my $parray = $self->_create_registered_var_array($var_array);
 
     return Algorithm::CP::IZ::cs_AllNeq($$parray, scalar(@$var_array));
@@ -679,9 +1036,7 @@ sub Sigma {
     my $self = shift;
     my $var_array = shift;;
 
-    unless (ref $var_array eq 'ARRAY') {
-	croak "Sigma: usage: Sigma([vars])";
-    }
+    validate([$var_array], ["vA0"], "Usage: Sigma([variables])");
 
     @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
 
@@ -700,12 +1055,11 @@ sub Abs {
     my $self = shift;
     my @params = @_;
 
-    if (@params != 1) {
-	croak 'usage: Abs(v)'
-    }
+    validate([scalar @params, $params[0]],
+	     [sub { shift == 1 }, "V"], "Usage: Abs(v)");
 
     my @v = map { ref $_ ? $_ : $self->_const_var(int($_)) } @params;
-    my $ptr = Algorithm::CP::IZ::cs_Abs(map {$_->{_ptr}} @v);
+    my $ptr = Algorithm::CP::IZ::cs_Abs(map { $$_ } @v);
     my $ret = Algorithm::CP::IZ::Int->new($ptr);
 
     $self->_register_variable($ret);
@@ -717,9 +1071,8 @@ sub Min {
     my $self = shift;
     my $var_array = shift;;
 
-    unless (ref $var_array eq 'ARRAY') {
-	croak "Min: usage: Min([vars])";
-    }
+    validate([$var_array], ["vA1"],
+	     "Usage: Min([variables])");
 
     @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
 
@@ -738,9 +1091,8 @@ sub Max {
     my $self = shift;
     my $var_array = shift;;
 
-    unless (ref $var_array eq 'ARRAY') {
-	croak "Max: usage: Max([vars])";
-    }
+    validate([$var_array], ["vA1"],
+	     "Usage: Max([variables])");
 
     @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
 
@@ -757,33 +1109,35 @@ sub Max {
 
 sub IfEq {
     my $self = shift;
-    unless (scalar @_ == 4 && ref $_[0] && ref $_[1]) {
-	croak "IfEq: usage: IfEq(vint1, vint2, val1, val2)";
-    }
     my ($vint1, $vint2, $val1, $val2) = @_;
 
-    return Algorithm::CP::IZ::cs_IfEq($vint1->{_ptr}, $vint2->{_ptr},
+    validate([scalar @_, $vint1, $vint2, $val1, $val2],
+	     [sub { shift == 4 }, "V", "V", "I", "I"],
+	     "Usage: IfEq(vint1, vint2, val1, val2)");
+
+    return Algorithm::CP::IZ::cs_IfEq($$vint1, $$vint2,
 				      int($val1), int($val2));
 }
 
 sub IfNeq {
     my $self = shift;
-    unless (scalar @_ == 4 && ref $_[0] && ref $_[1]) {
-	croak "IfNeq: usage: IfNeq(vint1, vint2, val1, val2)";
-    }
     my ($vint1, $vint2, $val1, $val2) = @_;
 
-    return Algorithm::CP::IZ::cs_IfNeq($vint1->{_ptr}, $vint2->{_ptr},
+    validate([scalar @_, $vint1, $vint2, $val1, $val2],
+	     [sub { shift == 4 }, "V", "V", "I", "I"],
+	     "Usage: IfNeq(vint1, vint2, val1, val2)");
+
+    return Algorithm::CP::IZ::cs_IfNeq($$vint1, $$vint2,
 				       $val1, $val2);
 }
 
 sub OccurDomain {
     my $self = shift;
-
-    unless (scalar @_ == 2 && !ref $_[0] && ref $_[1] && ref $_[1] eq 'ARRAY') {
-	croak "OccurDomain: usage: OccurDomain(val, [array])";
-    }
     my ($val, $var_array) = @_;
+
+    validate([scalar @_, $val, $var_array],
+	     [sub { shift == 2 }, "I", "vA0"],
+	     "Usage: OccurDomain(val, [variables])");
 
     @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
 
@@ -801,21 +1155,18 @@ sub OccurDomain {
 
 sub OccurConstraints {
     my $self = shift;
-
-    unless (scalar @_ == 3
-	    && !ref $_[1]
-	    && ref $_[2] && ref $_[2] eq 'ARRAY') {
-
-	croak "usage: OccurConstraints(vint, val, [array])";
-    }
     my ($vint, $val, $var_array) = @_;
+
+    validate([scalar @_, $vint, $val, $var_array],
+	     [sub { shift == 3 }, "V", "I", "vA0"],
+	     "Usage: OccurConstraints(vint, val, [variables])");
 
     $vint = ref $vint ? $vint : $self->_const_var(int($vint));
     @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
 
     my $parray = $self->_create_registered_var_array($var_array);
 
-    my $ret = Algorithm::CP::IZ::cs_OccurConstraints($vint->{_ptr}, int($val),
+    my $ret = Algorithm::CP::IZ::cs_OccurConstraints($$vint, int($val),
 						     $$parray,
 						     scalar(@$var_array));
     return $ret;
@@ -823,14 +1174,11 @@ sub OccurConstraints {
 
 sub Index {
     my $self = shift;
-
-    unless (scalar @_ == 2
-	    && ref $_[0] && ref $_[0] eq 'ARRAY'
-	    && !ref $_[1]) {
-
-	croak "usage: Index([var_array], val)";
-    }
     my ($var_array, $val) = @_;
+
+    validate([scalar @_, $var_array, $val],
+	     [sub { shift == 2 }, "vA0", "I"],
+	     "Usage: Index([variables], val)");
 
     @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
 
@@ -846,25 +1194,112 @@ sub Index {
 
 sub Element {
     my $self = shift;
-
-    unless (scalar @_ == 2
-	    && ref $_[0]
-	    && ref $_[1] && ref $_[1] eq 'ARRAY') {
-
-	croak "usage: Element(index, [value_array])";
-    }
     my ($index, $val_array) = @_;
 
+    validate([scalar @_, $index, $val_array],
+	     [sub { shift == 2 }, "V", "iA1"],
+	     "Usage: Element(index_var, [values])");
+
     @$val_array = map { int($_) } @$val_array;
+    $index = ref $index ? $index : $self->_const_var(int($index));
 
     my $parray = $self->_create_registered_int_array($val_array);
 
-    my $ptr = Algorithm::CP::IZ::cs_Element($index->{_ptr},
+    my $ptr = Algorithm::CP::IZ::cs_Element($$index,
 					    $$parray, scalar(@$val_array));
     my $ret = Algorithm::CP::IZ::Int->new($ptr);
 
     $self->_register_variable($ret);
 
+    return $ret;
+}
+
+sub VarElement {
+    my $self = shift;
+    my ($index, $var_array) = @_;
+
+    validate([scalar @_, $index, $var_array],
+	     [sub { shift == 2 }, "V", "vA1"],
+	     "Usage: VarElement(index_var, [value_vars])");
+
+    @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
+    $index = ref $index ? $index : $self->_const_var(int($index));
+
+    my $parray = $self->_create_registered_var_array($var_array);
+
+    my $ptr = Algorithm::CP::IZ::cs_VarElement($$index,
+					    $$parray, scalar(@$var_array));
+    my $ret = Algorithm::CP::IZ::Int->new($ptr);
+
+    $self->_register_variable($ret);
+
+    return $ret;
+}
+
+sub VarElementRange {
+    my $self = shift;
+    my ($index, $var_array) = @_;
+
+    validate([scalar @_, $index, $var_array],
+	     [sub { shift == 2 }, "V", "vA1"],
+	     "Usage: VarElementRange(index_var, [value_vars])");
+
+    @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
+    $index = ref $index ? $index : $self->_const_var(int($index));
+
+    my $parray = $self->_create_registered_var_array($var_array);
+
+    my $ptr = Algorithm::CP::IZ::cs_VarElementRange($$index,
+					    $$parray, scalar(@$var_array));
+    my $ret = Algorithm::CP::IZ::Int->new($ptr);
+
+    $self->_register_variable($ret);
+
+    return $ret;
+}
+
+sub Cumulative {
+    my $self = shift;
+    my ($starts, $durations, $resources, $limit) = @_;
+
+    validate([$starts, $durations, $resources, $limit, 1],
+	     ["vA0", "vA0", "vA0", "V", sub {
+		 @$starts == @$durations && @$durations == @$resources
+	      }],
+	     "Usage: Cumulative([starts], [durations], [resources], limit)");
+
+    @$starts = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$starts;
+    @$durations = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$durations;
+    @$resources = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$resources;
+    $limit = ref $limit ? $limit : $self->_const_var(int($limit));
+
+    my $pstarts = $self->_create_registered_var_array($starts);
+    my $pdurs = $self->_create_registered_var_array($durations);
+    my $pres = $self->_create_registered_var_array($resources);
+
+    my $ret = Algorithm::CP::IZ::cs_Cumulative($$pstarts, $$pdurs, $$pres,
+					       scalar(@$starts), $$limit);
+    return $ret;
+}
+
+sub Disjunctive {
+    my $self = shift;
+    my ($starts, $durations) = @_;
+
+    validate([$starts, $durations, 1],
+	     ["vA0", "vA0",  sub {
+		 @$starts == @$durations
+	      }],
+	     "Usage: Disjunctive([starts], [durations])");
+
+    @$starts = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$starts;
+    @$durations = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$durations;
+
+    my $pstarts = $self->_create_registered_var_array($starts);
+    my $pdurs = $self->_create_registered_var_array($durations);
+
+    my $ret = Algorithm::CP::IZ::cs_Disjunctive($$pstarts, $$pdurs,
+						scalar(@$starts));
     return $ret;
 }
 
@@ -880,11 +1315,11 @@ sub Element {
 
 	my $meth = sub {
 	    my $self = shift;
-	    unless (@_ == 2) {
-		carp "Usage: $meth_name(v1, v2)";
-	    }
-
 	    my ($v1, $v2) = @_;
+	    validate([scalar @_, $v1, $v2],
+		     [sub { shift == 2 }, "V", "V"],
+		     "Usage: $meth_name(v1, v2)");
+
 	    my $ptr;
 
 	    if (!ref $v1) {
@@ -895,13 +1330,13 @@ sub Element {
 		my $func = "Algorithm::CP::IZ::cs_Reif$n";
 
 		no strict "refs";
-		$ptr = &$func($v1->{_ptr}, $v2->{_ptr});
+		$ptr = &$func($$v1, $$v2);
 	    }
 	    else {
 		my $func = "Algorithm::CP::IZ::cs_Reif$ucn";
 
 		no strict "refs";
-		$ptr = &$func($v1->{_ptr}, int($v2));
+		$ptr = &$func($$v1, $v2);
 	    }
 	    my $ret = Algorithm::CP::IZ::Int->new($ptr);
 
@@ -957,7 +1392,7 @@ and search related functions
 
 =item methods of Algorithm::CP::IZ::Int
 
-accessors of variable attributes and some constraints
+accessors of variable attributes and some relationship constraints
 
 =back
 
@@ -1003,16 +1438,16 @@ only one per process.
 
 =item create_int(INT)
 
-Create Algorithm::CP::IZ::Int instance. Its domain contains INT.
+Create an instance of Algorithm::CP::IZ::Int. Its domain contains INT.
 
 =item create_int(VALUES [, NAME])
 
-Create Algorithm::CP::IZ::Int instance. Its domain contains values
+Create an instance of Algorithm::CP::IZ::Int. Its domain contains values
 specified by VALUES(arrayref).
 
 =item create_int(MIN, MAX, [, NAME])
 
-Create Algorithm::CP::IZ::Int instance. Its domain is {MIN..MAX}.
+Create an instance of Algorithm::CP::IZ::Int. Its domain is {MIN..MAX}.
 
 =item search(VARIABLES [, PARAMS])
 
@@ -1055,10 +1490,43 @@ Specify your own function as coderef here.
       return $val;
     };
 
+(If ValueSelector is specified, this parameter is ignored.)
 
 =item MaxFail
 
 Upper limit of fail count while searching solutions.
+
+=item ValueSelectors
+
+Arrayref of Algorithm::CP::IZ::ValueSelector instances created via
+get_value_selector or create_value_selector_simple method.
+
+(If ValueSelector is specified, this parameter is ignored.)
+
+=item MaxFailFunc
+
+CodeRef of subroutine which returns maxfail for restart.
+
+=item NoGoodSet
+
+A Algorithm::CP::IZ::NoGoodSet instance which collects NoGoods.
+
+=Item Notify
+
+Specify a notify object receives following notification by search function.
+
+    search_start
+    search_end
+    before_value_selection
+    after_value_selection
+    enter
+    leave
+    found
+
+if OBJECT is a object, method having notification name will be called.
+
+if OBJECT is a hashref, notification name must be a key of hash and
+value must be a coderef.
 
 =back
 
@@ -1090,11 +1558,11 @@ Returns 1 (success) or 0 (fail).
 
 =item get_nb_fails
 
-Returns fail count while search solution.
+Returns fail count while searching solution.
 
 =item get_nb_choice_points
 
-Returns choice count while search solution.
+Returns choice count while searching solution.
 
 =item save_context
 
@@ -1122,6 +1590,19 @@ which 'save_context' returns.
 Restore status of variables and constraints to point of first
 'save_context' call.
 
+=item forget_save_context
+
+Last save_context point is forgotten by calling this function.
+
+=item forgest_save_context_until(LABEL)
+
+save_context points until LABEL are forgotten by calling this function.
+
+=item cancel_search
+
+Cancel running search from other thread or signal handler.
+Context will be restored using restore_context_until if needed.
+
 =item backtrack(VAR, INDEX, CALLBACK)
 
 Set a callback function which will be called when context is restored to
@@ -1143,7 +1624,7 @@ CALLBACK is a coderef which takes parameters like:
 Set a callback function which will be called when all variables in VARIABLES are
 instantiated.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 CALLBACK is a coderef and takes parameters and must return like:
 
@@ -1162,7 +1643,7 @@ EXTRA is a just a data passed to callbeck as parameter (it can be anything).
 Set a callback function which will be called when any variable in VARIABLES is
 instantiated.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 CALLBACK is a coderef and takes parameters and must return like:
 
@@ -1183,7 +1664,7 @@ EXTRA is a just a data passed to callbeck as parameter (it can be anything).
 Set a callback function which will be called when lower bound of any variable
 in VARIABLES is changed.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 CALLBACK is a coderef and takes parameters and must return like:
 
@@ -1204,7 +1685,7 @@ EXTRA is a just a data passed to callbeck as parameter (it can be anything).
 Set a callback function which will be called when upper bound of any variable
 in VARIABLES is changed.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 CALLBACK is a coderef and takes parameters and must return like:
 
@@ -1225,7 +1706,7 @@ EXTRA is a just a data passed to callbeck as parameter (it can be anything).
 Set a callback function which will be called when value of any variable is
 removed in VARIABLES is changed.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances Algorithm::CP::IZ::Int.
 
 CALLBACK is a coderef and takes parameters and must return like:
 
@@ -1241,7 +1722,97 @@ CALLBACK is a coderef and takes parameters and must return like:
 
 EXTRA is a just a data passed to callbeck as parameter (it can be anything).
 
+=item get_version
+
+Returns version string like "3.5.0".
+undef will be returned if getVersion() is not supported in iZ-C (old version).
+
 =back
+
+=item get_value_selector(ID)
+
+Get built-in value selector (instance of Algorithm::CP::IZ::ValueSelector) specifed by ID.
+ID must be selected from following constants defined in package Algorithm::CP::IZ.
+
+=over
+
+=item CS_VALUE_SELECTOR_MIN_TO_MAX
+
+=item CS_VALUE_SELECTOR_MAX_TO_MIN
+
+=item CS_VALUE_SELECTOR_LOWER_AND_UPPER
+
+=item CS_VALUE_SELECTOR_UPPER_AND_LOWER
+
+=item CS_VALUE_SELECTOR_MEDIAN_AND_REST
+
+=back
+
+(These values are exported by Algorithm::CP::IZ and can be imported using tag 'value_selector')
+
+Returned object will be used as a parameter ValueSelectors when calling "search" method.
+
+  use Algorithm::CP::IZ qw(:value_selector);
+  my $vs = $iz->get_value_selector(CS_VALUE_SELECTOR_MIN_TO_MAX);
+
+  my $v1 = $iz->create_int(1, 9);
+  my $v2 = $iz->create_int(1, 9);
+  $iz->Add($v1, $v2)->Eq(12);
+  my $rc = $iz->search([$v1, $v2], {
+      ValueSelectors => [ $vs, $vs ],
+  });
+
+
+=item create_value_selector_simple(CLASS_NAME)
+
+Create user defined value-seelctor defined by class named CLASS_NAME.
+This class must have constructor named "new" and method namaed "next".
+
+  use Algorithm::CP::IZ qw(:value_selector);
+  
+  package VSSample1;
+  sub new {
+    my $class = shift;
+    my ($v, $index) = @_;
+
+    my $self = {
+      _pos => 0,
+    };
+    bless $self, $class;
+  }
+
+  sub next {
+    my $self = shift;
+    my ($v, $index) = @_;
+
+    my $pos = $self->{_pos};
+    my $domain = $v->domain;
+
+    # return empty after enumerate all values
+    return if ($pos >= @$domain);
+
+    my @ret = (CS_VALUE_SELECTION_EQ, $domain->[$pos]);
+    $self->{_pos} = ++$pos;
+
+    # return pair of (CS_VALUE_SELECTION_*, value)
+    return @ret;
+  }
+
+  my $v1 = $iz->create_int(1, 9);
+  my $v2 = $iz->create_int(1, 9);
+  $iz->Add($v1, $v2)->Eq(12);
+  my $vs = $iz->create_value_selector_simple("VSSample1");
+  my $rc = $iz->search([$v1, $v2], {
+      ValueSelectors => [ $vs, $vs ],
+  });
+
+=item create_no_good_set(VARIABLES, PRE_FILTER, MAX_NO_GOOD, EXT)
+
+Create an instance of Algorithm::CP::IZ::NoGoodSet. Returned object will be used as a
+parameter NoGoodSet when calling "search" method.
+
+=back
+
 
 =head1 METHODS (Constraints)
 
@@ -1249,74 +1820,74 @@ EXTRA is a just a data passed to callbeck as parameter (it can be anything).
 
 =item Add(VAR1, VAR2 [, VAR3....])
 
-Create new Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int constrainted to be:
 
-  CREATED = VAR1 + VAR2 + ....
+  Created_instance  = VAR1 + VAR2 + ....
 
 =item Mul(VAR1, VAR2 [, VAR3....])
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int constrainted to be:
 
-  CREATED = VAR1 * VAR2 * ....
+  Created_instance = VAR1 * VAR2 * ....
 
 =item Sub(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int constrainted to be:
 
-  CREATED = VAR1 - VAR2
+  Created_instance = VAR1 - VAR2
 
 =item Div(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int constrainted to be:
 
-  CREATED = VAR1 / VAR2
+  Created_instance = VAR1 / VAR2
 
 =item ScalProd(VARIABLES, COEFFICIENTS)
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int constrainted to be:
 
-  CREATED = COEFFICIENTS[0]*VARIABLES[0] + COEFFICIENTS[1]*VARIABLES[1] + ...
+  Created_instance = COEFFICIENTS[0]*VARIABLES[0] + COEFFICIENTS[1]*VARIABLES[1] + ...
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int,
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int,
 and COEFFICIENTS is an arreyref contains integer values.
 
 =item AllNeq(VARIABLES)
 
 Constraint all variables in VARIABLES to be different each other.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 Returns 1 (success) or 0 (fail).
 
 =item Sigma(VARIABLES)
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an Algorithm::CP::IZ::Int instance constrainted to be:
 
-  CREATED = VARIABLES[0] + VARIABLES[1] + ...
+  Created_instance = VARIABLES[0] + VARIABLES[1] + ...
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 =item Abs(VAR)
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int constrainted to be:
 
-  CREATED = abs(VAR)
+  Created_instance = abs(VAR)
 
 =item Min(VARIABLES)
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int constrainted to be:
 
-  CREATED = minimum value of (VARIABLES[0], VARIABLES[1], ...)
+  Created_value = minimum value of (VARIABLES[0], VARIABLES[1], ...)
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 =item Max(VARIABLES)
 
-Create Algorithm::CP::IZ::Int instance constrainted to be:
+Create an instance of Algorithm::CP::IZ::Int to be:
 
-  CREATED = maximum value of (VARIABLES[0], VARIABLES[1], ...)
+  Created_instance = maximum value of (VARIABLES[0], VARIABLES[1], ...)
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 =item IfEq(VAR1, VAR2, VAL1, VAL2)
 
@@ -1337,62 +1908,94 @@ Returns 1 (success) or 0 (fail).
 
 =item OccurDomain(VAL, VARIABLES)
 
-Create Algorithm::CP::IZ::Int instance represents count of VAL in VARIABLES.
+Create instance of Algorithm::CP::IZ::Int represents count of VAL in VARIABLES.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 =item OccurConstraints(VAR, VAL, VARIABLES)
 
 Constraint VAR to represent count of VAL in VARIABLES.
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 Returns 1 (success) or 0 (fail).
 
 =item Index(VARIABLES, VAL)
 
-Create Algorithm::CP::IZ::Int instance represents position of VAL in VARIABLES.
+Create an instance of Algorithm::CP::IZ::Int represents position of VAL in VARIABLES.
 
   VAL = VARIABLES[CREATED]
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VARIABLES is an arrayref contains instances Algorithm::CP::IZ::Int.
 
 =item Element(VAR, VALUES)
 
-Create Algorithm::CP::IZ::Int instance represents value at VAR in VARIABLES.
+Create an instance of Algorithm::CP::IZ::Int represents a value at VAR in VALUES. This relation is:
 
-  CREATED = VARIABLES[VAR]
+  Created_instance = VALUES[VAR]
 
-VARIABLES is an arrayref contains Create Algorithm::CP::IZ::Int.
+VALUES is an arrayref contains integer values.
+
+=item VarElement(VAR, VARIABLES)
+
+Create an instance of Algorithm::CP::IZ::Int represents a value at VAR in VARIABLES. This relation is:
+
+  Created_instance = VARIABLES[VAR]
+
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
+
+=item VarElementRange(VAR, VARIABLES)
+
+Create an instance of Algorithm::CP::IZ::Int represents a value at VAR in VARIABLES. This relation is:
+
+  Created_instance = VARIABLES[VAR]
+
+In contrast to VarElement, constraint propagation for variables in
+VARIABLES will occur only when upper or lower bound is changed.
+
+VARIABLES is an arrayref contains instances of Algorithm::CP::IZ::Int.
+
+=item Cumulative(START_VARS, DURATION_VARS, RESOUCE_VARS, LIMIT_VAR)
+
+Constraint variables as "Cumulative".
+
+START_VARS, DURATION_VARS and RESOUCE_VARS are an arrayref contains instances of
+Algorithm::CP::IZ::Int and LIMIT_VAR is an instance of Algorithm::CP::IZ::Int.
+
+=item Disjunctive(START_VARS, DURATION_VARS)
+
+Constraint variables as "Disjunctive".
+
+START_VARS and DURATION_VARS are an arrayref contains instances of Algorithm::CP::IZ::Int.
 
 =item ReifEq(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance represents VAR1 == VAR2.
+Create an instance of Algorithm::CP::IZ::Int represents state of VAR1 == VAR2.
 Created variable will be instantiated to 1 when VAR1 == VAR2 otherwise to 0.
 
 =item ReifNeq(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance represents VAR1 != VAR2.
+Create an instance of Algorithm::CP::IZ::Int represents state of VAR1 != VAR2.
 Created variable will be instantiated to 1 when VAR1 != VAR2 otherwise to 0.
 
 =item ReifLt(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance represents VAR1 < VAR2.
+Create an instance of Algorithm::CP::IZ::Int represents state of VAR1 < VAR2.
 Created variable will be instantiated to 1 when VAR1 < VAR2 otherwise to 0.
 
 =item ReifLe(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance represents VAR1 <= VAR2.
+Create an instance of Algorithm::CP::IZ::Int represents state of VAR1 <= VAR2.
 Created variable will be instantiated to 1 when VAR1 <= VAR2 otherwise to 0.
 
 =item ReifGt(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance represents VAR1 > VAR2.
+Create an instance of Algorithm::CP::IZ::Int represents state of VAR1 > VAR2.
 Created variable will be instantiated to 1 when VAR1 > VAR2 otherwise to 0.
 
 =item ReifGe(VAR1, VAR2)
 
-Create Algorithm::CP::IZ::Int instance represents VAR1 >= VAR2.
+Create an instance of Algorithm::CP::IZ::Int represents state of VAR1 >= VAR2.
 Created variable will be instantiated to 1 when VAR1 >= VAR2 otherwise to 0.
 
 =back
@@ -1401,6 +2004,9 @@ Created variable will be instantiated to 1 when VAR1 >= VAR2 otherwise to 0.
 
 L<Algorithm::CP::IZ::Int>
 L<Algorithm::CP::IZ::FindFreeVar>
+
+L<http://www.constraint.org/en/izc_download.html>
+L<https://github.com/tofjw/Algorithm-CP-IZ/wiki>
 
 =head1 AUTHOR
 

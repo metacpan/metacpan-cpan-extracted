@@ -1,7 +1,7 @@
 package Gepok;
 
-our $DATE = '2019-04-24'; # DATE
-our $VERSION = '0.290'; # VERSION
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.291'; # VERSION
 
 use 5.010001;
 use strict;
@@ -521,8 +521,17 @@ sub _set_label_serving {
                              "remote_ip=$remote_ip, ",
                              "remote_port=$remote_port"));
         }
-        $self->_daemon->set_label("serving TCP :$server_port (https=$is_ssl, ".
-                                      "remote=$remote_ip:$remote_port)");
+        my $num_clients = keys %{$self->_daemon->{children}};
+        my $max_clients = $self->max_clients;
+        $self->_daemon->set_label(
+            sprintf(
+                "%d/%d serving TCP :%d (https=%s, remote=%s:%s",
+                $num_clients, $max_clients,
+                $server_port,
+                $is_ssl,
+                $remote_ip, $remote_port,
+            ),
+        );
     }
 }
 
@@ -594,7 +603,7 @@ Gepok - PSGI server with built-in HTTPS support, Unix sockets, preforking
 
 =head1 VERSION
 
-This document describes version 0.290 of Gepok (from Perl distribution Gepok), released on 2019-04-24.
+This document describes version 0.291 of Gepok (from Perl distribution Gepok), released on 2019-07-08.
 
 =head1 SYNOPSIS
 

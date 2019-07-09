@@ -28,6 +28,7 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
             "Getopt::Long" : "2.42",
             "JSON" : "0",
             "POSIX" : "0",
@@ -50,7 +51,7 @@
    "provides" : {
       "App::jl" : {
          "file" : "lib/App/jl.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -65,6 +66,6 @@
          "url" : "http://github.com/bayashi/App-jl"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

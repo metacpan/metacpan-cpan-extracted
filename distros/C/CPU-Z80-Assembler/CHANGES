@@ -1,3 +1,13 @@
+2.18	2019-07-06
+
+	Bug Fixes
+	* Dollar in strings was causing evaluation error
+
+2.17	2019-07-06
+
+	Feature Changes
+	* Accept C-like escape sequences in double-quoted strings
+
 2.16	2018-02-20
 
 	Bug Fixes

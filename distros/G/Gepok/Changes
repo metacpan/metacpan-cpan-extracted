@@ -1,16 +1,21 @@
-0.290   2019-04-24 (PERLANCAR)
+0.291   2019-07-08  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Show M/N in process label.
+
+
+0.290   2019-04-24  Released-By: PERLANCAR
 
 	- Avoid undef warning.
 
 
-0.28    2014-12-11 (PERLANCAR)
+0.28    2014-12-11  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Use new name of renamed module {SHARYANTO-,}Proc-Daemon-Prefork.
 
 
-0.27    2014-06-03 (SHARYANTO)
+0.27    2014-06-03  Released-By: SHARYANTO
 
         - Do not pass Timeout param to HTTP::Daemon::SSL to avoid hanging
           problem when fed largish request (I'm experiencing request packet, GET
@@ -18,13 +23,13 @@
           RT#45625 [queue HTTP::Daemon:SSL].
 
 
-0.26    2014-04-16 (SHARYANTO)
+0.26    2014-04-16  Released-By: SHARYANTO
 
         - Bugfix: fix setting _sock_peerhost (it used to display 127.0.0.1 all
           the time).
 
 
-0.25    2014-03-21 (SHARYANTO)
+0.25    2014-03-21  Released-By: SHARYANTO
 
         - Provide 'gepok.httpd_socket' in PSGI environment (mainly so we can
           call peercred() for Unix sockets).
@@ -32,12 +37,12 @@
         - Currently t/certs.t is fudged because I want to rush this release.
 
 
-0.24    2013-02-14 (SHARYANTO)
+0.24    2013-02-14  Released-By: SHARYANTO
 
         - No functional changes. Avoid Module::Patch warning.
 
 
-0.23    2012-10-17 (SHARYANTO)
+0.23    2012-10-17  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -46,13 +51,13 @@
         - Build: update patch module name.
 
 
-0.22    2012-08-03 (SHARYANTO)
+0.22    2012-08-03  Released-By: SHARYANTO
 
         - No functional changes. Avoid Perl undef warning (fatal under
           strictures) in logging.
 
 
-0.21    2012-07-19 (SHARYANTO)
+0.21    2012-07-19  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -63,7 +68,7 @@
         - Setting scoreboard status "R" should be done before each HTTP request.
 
 
-0.20    2012-05-03 (SHARYANTO)
+0.20    2012-05-03  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -71,17 +76,17 @@
           attributes ssl_{verify_mode,verify_callback,ca_file,ca_path}.
 
 
-0.19    2012-04-03 (SHARYANTO)
+0.19    2012-04-03  Released-By: SHARYANTO
 
         - Try out HTTP::Daemon::patch::ipv6.
 
 
-0.18    2012-03-13 (SHARYANTO)
+0.18    2012-03-13  Released-By: SHARYANTO
 
         - No functional changes. Add FAQ entry.
 
 
-0.17    2012-03-12 (SHARYANTO)
+0.17    2012-03-12  Released-By: SHARYANTO
 
         [FIXES]
 
@@ -91,22 +96,22 @@
          only up to 16k of buffer is written.
 
 
-0.16    2011-08-31 (SHARYANTO)
+0.16    2011-08-31  Released-By: SHARYANTO
 
         - Provide 'gepok.start_request_time' in $env.
 
 
-0.15    2011-08-20 (SHARYANTO)
+0.15    2011-08-20  Released-By: SHARYANTO
 
         - Fix setting REMOTE_ADDR
 
 
-0.14    2011-08-20 (SHARYANTO)
+0.14    2011-08-20  Released-By: SHARYANTO
 
         - Fix logging time
 
 
-0.13    2011-08-20 (SHARYANTO)
+0.13    2011-08-20  Released-By: SHARYANTO
 
         - Fix getting socket information (for process label), listening over
           Unix socket now works.
@@ -114,12 +119,12 @@
         - Provide 'gepok.socket', 'gepok.unix_socket' in $env.
 
 
-0.12    2011-08-19 (SHARYANTO)
+0.12    2011-08-19  Released-By: SHARYANTO
 
         - No functional changes. Re-upload to CPAN with the correct account.
 
 
-0.11    2011-08-18 (SHARYANTO)
+0.11    2011-08-18  Released-By: SHARYANTO
 
         - Some fixes to chunking response, keep-alive, etc.
 
@@ -128,19 +133,19 @@
         - Provide 'gepok.client_protocol' in $env.
 
 
-0.10    2011-08-16 (SHARYANTO)
+0.10    2011-08-16  Released-By: SHARYANTO
 
         - (internal) Minor refactoring on _finalize_response.
 
         - Provide 'gepok' and 'HTTPS' in $env.
 
 
-0.09    2011-08-09 (SHARYANTO)
+0.09    2011-08-09  Released-By: SHARYANTO
 
         - Provide gepok.{connect_time,finish_request_time} in $env.
 
 
-0.08    2011-08-09 (SHARYANTO)
+0.08    2011-08-09  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -148,17 +153,17 @@
           anyway [thanks mst]
 
 
-0.07    2011-08-05 (SHARYANTO)
+0.07    2011-08-05  Released-By: SHARYANTO
 
         - No functional changes. Polish POD.
 
 
-0.06    2011-08-05 (SHARYANTO)
+0.06    2011-08-05  Released-By: SHARYANTO
 
         - No functional changes. Polish POD.
 
 
-0.05    2011-08-05 (SHARYANTO)
+0.05    2011-08-05  Released-By: SHARYANTO
 
         - Work better with plackup: accept string (comma-separator) http_ports,
           https_ports, unix_sockets so they can be specified as command-line
@@ -168,14 +173,14 @@
         - Fix access log format: 31/Aug/2011, not 31/08/2011.
 
 
-0.04    2011-07-21 (SHARYANTO)
+0.04    2011-07-21  Released-By: SHARYANTO
 
         [FIXES]
 
         - Various fixes, now passes Plack server test suite.
 
 
-0.03    2011-07-21 (SHARYANTO)
+0.03    2011-07-21  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -196,7 +201,7 @@
         - Keep-Alive disabled for now.
 
 
-0.02    2011-07-18 (SHARYANTO)
+0.02    2011-07-18  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -214,6 +219,6 @@
         - Some documentation fixes/revising.
 
 
-0.01    2011-07-15 (SHARYANTO)
+0.01    2011-07-15  Released-By: SHARYANTO
 
         - First release.

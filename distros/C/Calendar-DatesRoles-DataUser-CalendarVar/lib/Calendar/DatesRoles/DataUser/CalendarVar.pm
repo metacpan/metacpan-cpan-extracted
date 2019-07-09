@@ -1,7 +1,7 @@
 package Calendar::DatesRoles::DataUser::CalendarVar;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +25,7 @@ sub _calc_min_max_year {
     my ($min_anniv, $max_anniv);
     for my $e (@{ $cal->{entries} }) {
         my $year;
-        if ($e->{date} =~ /\A(\d{4})-(\d{2})-(\d{2})(?:T|\z)/a) {
+        if ($e->{date} =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:T|\z)/) {
             $e->{year}  //= $1;
             $e->{month} //= $2 + 0;
             $e->{day}   //= $3 + 0;
@@ -37,13 +37,13 @@ sub _calc_min_max_year {
                 $min = $e->{year} if !defined($min) || $min > $e->{year};
                 $max = $e->{year} if !defined($max) || $max < $e->{year};
             }
-        } elsif ($e->{date} =~ /\A(?:--)(\d{2})-(\d{2})\z/a) {
+        } elsif ($e->{date} =~ /\A(?:--)([0-9]{2})-([0-9]{2})\z/) {
             # anniversary without starting year
             $min_anniv = 1582 if !defined($min_anniv) || $min_anniv > 1582; # start of gregorian calendar :-)
             $max_anniv = 9999 if !defined($max_anniv) || $max_anniv < 9999;
             $e->{month} //= $1 + 0;
             $e->{day}   //= $2 + 0;
-        } elsif ($e->{date} =~ m!\AR/(\d{4})-(\d{2})-(\d{2})/P1Y\z!a) {
+        } elsif ($e->{date} =~ m!\AR/([0-9]{4})-([0-9]{2})-([0-9]{2})/P1Y\z!) {
             # anniversary with starting year
             $min_anniv = $1   if !defined($min_anniv) || $min_anniv > $1;
             $max_anniv = 9999 if !defined($max_anniv) || $max_anniv < 9999;
@@ -97,11 +97,11 @@ sub get_entries {
         my $e = {%$e0}; # shallow copy
 
         # filter by year
-        if ($e->{date} =~ /\A(?:--)(\d{2})-(\d{2})/a) {
+        if ($e->{date} =~ /\A(?:--)([0-9]{2})-([0-9]{2})/a) {
             # anniversary without starting year
             $e->{date} = sprintf "%04d-%02d-%02d", $year, $1, $2;
             $e->{year} = $year;
-        } elsif ($e->{date} =~ m!\AR/(\d{4})-(\d{2})-(\d{2})/P1Y\z!a) {
+        } elsif ($e->{date} =~ m!\AR/([0-9]{4})-([0-9]{2})-([0-9]{2})/P1Y\z!a) {
             # anniversary with starting year
             next unless $year >= $1;
             $e->{date} = sprintf "%04d-%02d-%02d", $year, $2, $3;
@@ -180,7 +180,7 @@ Calendar::DatesRoles::DataUser::CalendarVar - Provide Calendar::Dates interface 
 
 =head1 VERSION
 
-This document describes version 0.004 of Calendar::DatesRoles::DataUser::CalendarVar (from Perl distribution Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-06-20.
+This document describes version 0.005 of Calendar::DatesRoles::DataUser::CalendarVar (from Perl distribution Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-07-08.
 
 =head1 DESCRIPTION
 

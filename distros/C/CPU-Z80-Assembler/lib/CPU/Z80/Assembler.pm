@@ -25,7 +25,7 @@ use Regexp::Trie;
 
 use vars qw(@EXPORT $verbose);
 
-our $VERSION = '2.16';
+our $VERSION = '2.18';
 our $verbose;
 our $fill_byte = 0xFF;
 
@@ -231,6 +231,36 @@ my $SYMBOLS_RE = _regexp("
 
 #------------------------------------------------------------------------------
 # lexer
+my $expand_escapes = sub {
+	local $_ = shift;
+	my $out = '';
+	
+	# remove quotes
+	s/^(['"])(.*)\1$/$2/ or die;
+	
+	while (! /\G \z/gcx) {
+		if    (/\G \\   ([0-7]{1,3}) /gcx) 		{ $out .= chr(oct($1)); }
+		elsif (/\G \\ x ([0-9a-f]{1,2}) /gcxi)	{ $out .= chr(hex($1)); }
+		elsif (/\G \\ a   /gcx)					{ $out .= "\a"; }
+		elsif (/\G \\ b   /gcx)					{ $out .= "\b"; }
+		elsif (/\G \\ e   /gcx)					{ $out .= "\e"; }
+		elsif (/\G \\ f   /gcx)					{ $out .= "\f"; }
+		elsif (/\G \\ n   /gcx)					{ $out .= "\n"; }
+		elsif (/\G \\ r   /gcx)					{ $out .= "\r"; }
+		elsif (/\G \\ t   /gcx)					{ $out .= "\t"; }
+		elsif (/\G \\ v   /gcx)					{ $out .= "\x0B"; }
+		elsif (/\G \\ '   /gcx)					{ $out .= "'"; }
+		elsif (/\G \\ "   /gcx)					{ $out .= '"'; }
+		elsif (/\G \\ \\  /gcx)					{ $out .= "\\"; }
+		elsif (/\G \\ (.) /gcx)					{ $out .= $1; }
+		elsif (/\G \\     /gcx)					{ $out .= "\\"; }
+		elsif (/\G (.)    /gcx)					{ $out .= $1; }
+		else { die; }
+	}
+	
+	return $out;
+};
+	
 my $lexer = Asm::Preproc::Lexer->new;
 $lexer->make_lexer(
 	
@@ -243,10 +273,9 @@ $lexer->make_lexer(
 
 	# string - return without quotes
 	# Sequence (?|...) not recognized in regex in Perl 5.8
-	STRING	=> qr/ (?: ' [^']* '
-					 | " [^"]* " ) /ix,	sub {[$_[0], 
-											substr($_[1], 1, length($_[1])-2)]},
-	
+	STRING	=> qr/ (?: \" (?: \\. | [^\\\"] )* \" 
+					 | \' (?: \\. | [^\\\'] )* \' ) /ix,
+										sub {[$_[0], $expand_escapes->($_[1])]},	
 	# numbers
 	NUMBER	=> qr/ ( \d [0-9a-f]+ ) h \b /ix,
 										sub {[$_[0], oct("0x".$1)]},

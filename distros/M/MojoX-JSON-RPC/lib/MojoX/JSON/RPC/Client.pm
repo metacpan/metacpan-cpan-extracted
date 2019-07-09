@@ -29,7 +29,7 @@ sub call {
         if ( $body ne q{} ) {
             return $self->_process_result(
                 $self->ua->post(
-                    $uri, { Content_Type => $self->content_type }, $body
+                    $uri, { 'Content-Type' => $self->content_type }, $body
                 )
             );
         }
@@ -41,7 +41,7 @@ sub call {
         if ( $body ne q{} ) {
             $self->ua->post(
                 $uri,
-                { Content_Type => $self->content_type },
+                { 'Content-Type' => $self->content_type },
                 $body,
                 sub {    # callback
                     $callback->( $self->_process_result(pop) );

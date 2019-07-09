@@ -83,8 +83,8 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Algorithm/CP/IZ.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => { UNIVERSAL => 0, "Scalar::Util" => 0,}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Algorithm/CP/IZ.pm', # retrieve abstract from module
-    AUTHOR            => 'A. U. Thor <a.u.thor@a.galaxy.far.far.away>',
-    #LICENSE           => 'perl',
+    AUTHOR            => 'Toshimitsu FUJIWARA <tttfjw at gmail.com>',
+    LICENSE           => 'artistic_2',
     #Value must be from legacy list of licenses here
     #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
     LIBS              => ["-L$iz_lib_dir -liz"], # e.g., '-lm'
@@ -92,13 +92,35 @@ WriteMakefile(
     INC               => "-I$iz_inc_dir", # e.g., '-I. -I/usr/include/other'
     # Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
+    clean             => {FILES => "cs_reif2.inc cs_vadd.inc cs_vmul.inc cs_vsub.inc"},
 );
 if  (eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,
   # you will need to use the generated const-c.inc and const-xs.inc
   # files to replace their "fallback" counterparts before distributing your
   # changes.
-  my @names = (qw(CS_INT_MAX CS_INT_MIN));
+  my @names = (
+      qw(
+CS_ERR_NONE
+CS_ERR_GETVALUE
+CS_ERR_OVERFLOW
+CS_ERR_NO_MEMORY
+CS_VALUE_SELECTOR_MIN_TO_MAX
+CS_VALUE_SELECTOR_MAX_TO_MIN
+CS_VALUE_SELECTOR_LOWER_AND_UPPER
+CS_VALUE_SELECTOR_UPPER_AND_LOWER
+CS_VALUE_SELECTOR_MEDIAN_AND_REST
+CS_VALUE_SELECTION_EQ
+CS_VALUE_SELECTION_NEQ
+CS_VALUE_SELECTION_LE
+CS_VALUE_SELECTION_LT
+CS_VALUE_SELECTION_GE
+CS_VALUE_SELECTION_GT
+IZ_VERSION_MAJOR
+IZ_VERSION_MINOR
+IZ_VERSION_PATCH
+      ));
+
   ExtUtils::Constant::WriteConstants(
                                      NAME         => 'Algorithm::CP::IZ',
                                      NAMES        => \@names,
@@ -157,6 +179,30 @@ unless (-f "cs_vmul.inc") {
 
 	print $fh "CODE:\n";
 	print $fh "    RETVAL = cs_VMul($i, ";
+	print $fh join(", ", map { "vint$_" } (1..$i));
+	print $fh ");\n";
+	print $fh "OUTPUT:\n";
+	print $fh "    RETVAL\n\n";
+    }
+    close($fh);
+}
+
+# VSub
+unless (-f "cs_vsub.inc") {
+    open (my $fh, ">", "cs_vsub.inc") or die "cs_vsub.inc: cannot create: $!";
+
+    for my $i (3..10) {
+	print $fh "void*\n";
+	print $fh "cs_VSub$i(";
+
+	print $fh join(", ", map { "vint$_" } (1..$i));
+
+	print $fh ")\n";
+
+	print $fh map { "    void* vint$_\n" } (1..$i);
+
+	print $fh "CODE:\n";
+	print $fh "    RETVAL = cs_VSub($i, ";
 	print $fh join(", ", map { "vint$_" } (1..$i));
 	print $fh ");\n";
 	print $fh "OUTPUT:\n";

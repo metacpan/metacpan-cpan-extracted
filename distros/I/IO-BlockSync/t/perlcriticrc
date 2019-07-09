@@ -1,0 +1,70 @@
+# Severity: 5
+
+
+# Severity: 4
+
+# Allow @EXPORT
+[-Modules::ProhibitAutomaticExportation]
+
+# Allow short functions to use @_ directly
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 3
+
+
+# Severity: 3
+
+# Private functions (beginning with underscore) should always be fine
+# in Moo roles - even if they aren't used directly inside that role
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+skip_when_using = Moose::Role Moo::Role Role::Tiny
+
+# If regex is under 15 long then don't require /x (even if we use /x it's
+# no guarantee that they will be commented)
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 15
+
+
+# Severity: 2
+
+# Do not require a lot of POD sections
+[-Documentation::RequirePodSections]
+
+# Why should q{} be more readable than '' for an empty string?
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+# Numbers always explain them themselves! Or not!
+# But it is just silly. Without disabling this I need to install extra modules
+# (Readonly or Const::Fast) - because using "use constant" (as mentioned in
+# perdoc for ProhibitMagicNumbers) just raises another critic:
+# ValuesAndExpressions::ProhibitConstantPragma
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+# Aaarrgghh! One will only allow regex with /s - the other only with /m
+# So to satisfy both you need to declare all regex's with /ms
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::RequireDotMatchAnything]
+
+# I don't find q{::} more readable than '::'
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+
+
+# Severity: 1
+
+# I like inline POD!
+[-Documentation::RequirePodAtEnd]
+
+# I like camelCase!
+[-NamingConventions::Capitalization]
+
+# This one is silly! Correct precedence can be very hard with this one
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+# Why would anyone check return value of print (to screen!)?
+[InputOutput::RequireCheckedSyscalls]
+exclude_functions = print say
+
+# Baaaahhhh. Not everything in a man file is in the english dictionary!
+[-Documentation::PodSpelling]
+
+# I don't think that \d always make regex more readable than [0-9]
+[-RegularExpressions::ProhibitEnumeratedClasses]

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -86,7 +86,7 @@ sub to_hex {
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 30;
+my $want_version = 31;
 ok ($X11::Protocol::WM::VERSION,
     $want_version,
     'VERSION variable');
@@ -613,16 +613,17 @@ X11::Protocol::WM::set_wm_protocols ($X, $window2, 'WM_DELETE_WINDOW');
     = $X->GetProperty ($window2,
                        $X->atom('WM_PROTOCOLS'),
                        'AnyPropertyType',
-                       0,  # offset
-                       1,  # length, 1 x CARD32
-                       0); # delete
+                       0,   # offset
+                       100, # max length x CARD32
+                       0);  # delete
   ok ($format, 32);
   ok ($type, $X->atom('ATOM'));
   ok ($X->atom_name($type), 'ATOM');
   ok (length($value), 4);
   my ($value_atom) = unpack 'L', $value;
   ok ($value_atom, $X->atom('WM_DELETE_WINDOW'));
-  ok ($X->atom_name($value_atom), 'WM_DELETE_WINDOW');
+  ok (length($value)>=4 && $X->atom_name($value_atom),
+      'WM_DELETE_WINDOW');
   ok ($bytes_after, 0);
 }
 
@@ -634,9 +635,9 @@ X11::Protocol::WM::set_wm_protocols ($X, $window2,
     = $X->GetProperty ($window2,
                        $X->atom('WM_PROTOCOLS'),
                        'AnyPropertyType',
-                       0,  # offset
-                       2,  # length, 2 x CARD32
-                       0); # delete
+                       0,   # offset
+                       100, # max length x CARD32
+                       0);  # delete
   ok ($format, 32);
   ok ($type, $X->atom('ATOM'));
   ok ($X->atom_name($type), 'ATOM');

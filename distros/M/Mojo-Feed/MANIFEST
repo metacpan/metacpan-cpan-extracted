@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 examples/extending.pl
+examples/find_old_feeds.pl
 lib/Mojo/Feed.pm
 lib/Mojo/Feed/Item.pm
 lib/Mojo/Feed/Item/Enclosure.pm
@@ -13,6 +14,7 @@ lib/Mojolicious/Plugin/FeedReader.pm
 minil.toml
 t/00_compile.t
 t/01-parse.t
+t/02-no-reader.t
 t/03-feed-find.t
 t/04-opml.t
 t/06-atom10.t

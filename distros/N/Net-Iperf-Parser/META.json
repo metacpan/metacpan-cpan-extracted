@@ -1,0 +1,46 @@
+{
+   "abstract" : "Parse a single iperf line result",
+   "author" : [
+      "Emiliano Bruni <info@ebruni.it>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Iperf-Parser",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::UseAllModules" : "0.15"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EmilianoBruni/net-iperf-parser",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EmilianoBruni/net-iperf-parser.git",
+         "web" : "https://github.com/EmilianoBruni/net-iperf-parser"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+}
+

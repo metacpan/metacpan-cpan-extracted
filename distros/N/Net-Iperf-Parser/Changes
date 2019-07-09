@@ -1,0 +1,6 @@
+Changelog for Net-Iperf-Parser
+
+0.01 2019-07-09T16:17:38
+ - Add some documentation
+ - CRLF to LF
+ - First commit

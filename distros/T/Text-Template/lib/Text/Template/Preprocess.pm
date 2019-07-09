@@ -1,6 +1,6 @@
 
 package Text::Template::Preprocess;
-$Text::Template::Preprocess::VERSION = '1.55';
+$Text::Template::Preprocess::VERSION = '1.56';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -53,7 +53,7 @@ Text::Template::Preprocess - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.55
+version 1.56
 
 =head1 SYNOPSIS
 

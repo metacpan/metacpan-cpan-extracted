@@ -34,7 +34,7 @@ use strict;
 use X11::Protocol;
 
 use vars '$VERSION', '@CARP_NOT';
-$VERSION = 30;
+$VERSION = 31;
 @CARP_NOT = ('X11::Protocol');
 
 # uncomment this to run the ### lines
@@ -295,7 +295,7 @@ might be less than requested (but not more).
 
 The current code supports up to 1.1.  If asking for higher then be careful
 that it's upwardly compatible.  The module code negotiates a version in
-C<init_extension()> so an explicit C<DamageQueryVersion()> is normally not
+C<init_extension()> so explicit C<DamageQueryVersion()> is normally not
 needed.
 
 =item C<$X-E<gt>DamageCreate ($damage, $drawable, $level)>

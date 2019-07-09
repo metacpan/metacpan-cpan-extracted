@@ -1,4 +1,11 @@
-Revision history for Net-Cisco-FMC-v1: 0.003001
+Revision history for Net-Cisco-FMC-v1: 0.004001
+
+0.004001  2019-07-09 09:32:45+02:00 Europe/Vienna
+    - add tests which require the FMC, policy name, username and password set
+      in environment variables
+    - add methods for networkaddresses and ports
+    - fix update on response returned from a previous update
+    - fix update_accessrule when rule contains users
 
 0.003001  2019-03-12 16:09:16+01:00 Europe/Vienna
     - add support for query parameters to create_accessrule

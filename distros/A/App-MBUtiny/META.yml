@@ -44,4 +44,4 @@ requires:
 resources:
   homepage: http://app-mbutiny.sourceforge.net
   license: https://dev.perl.org/licenses
-version: '1.11'
+version: '1.12'

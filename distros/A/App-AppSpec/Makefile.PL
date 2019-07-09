@@ -27,14 +27,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "App::AppSpec",
   "PREREQ_PM" => {
-    "App::Spec" => "0.008",
+    "App::Spec" => "0.012",
     "App::Spec::Pod" => 0,
     "App::Spec::Run::Cmd" => 0,
+    "App::Spec::Schema" => 0,
     "Data::Dumper" => 0,
     "Exporter" => 0,
     "File::Basename" => 0,
     "File::Path" => 0,
-    "File::Share" => 0,
     "JSON::Validator" => 0,
     "List::Util" => "1.33",
     "Moo" => 0,
@@ -46,9 +46,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Share" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,9 +57,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::Spec" => "0.008",
+  "App::Spec" => "0.012",
   "App::Spec::Pod" => 0,
   "App::Spec::Run::Cmd" => 0,
+  "App::Spec::Schema" => 0,
   "Data::Dumper" => 0,
   "Exporter" => 0,
   "File::Basename" => 0,

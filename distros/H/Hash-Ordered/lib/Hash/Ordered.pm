@@ -5,7 +5,7 @@ use warnings;
 package Hash::Ordered;
 # ABSTRACT: A fast, pure-Perl ordered hash class
 
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 
 use Carp ();
 
@@ -577,7 +577,13 @@ sub concat {
 #pod =cut
 
 sub or_equals {
-    return $_[0]->[_DATA]{ $_[1] } ||= $_[2];
+    my ($self,$key) = @_;
+
+    if ( my $val = $self->get($key) ) {
+        return $val;
+    }
+
+    return $self->set($key,$_[2]);
 }
 
 #pod =method dor_equals
@@ -592,30 +598,14 @@ sub or_equals {
 #pod
 #pod =cut
 
-BEGIN {
-    if ( $] ge '5.010' ) {
-        ## no critic
-        eval q{
-                sub dor_equals {
-                    return $_[0]->[_DATA]{$_[1]} //= $_[2];
-                }
-            };
-        die $@ if $@; # uncoverable branch true
+sub dor_equals {
+    my ($self,$key) = @_;
+
+    if ( defined( my $val = $self->get($key) ) ) {
+        return $val;
     }
-    else {
-        ## no critic
-        eval q{
-                sub dor_equals {
-                    if ( defined $_[0]->[_DATA]{$_[1]} ) {
-                        return $_[0]->[_DATA]{$_[1]};
-                    }
-                    else {
-                        return $_[0]->[_DATA]{$_[1]} = $_[2];
-                    }
-                }
-            };
-        die $@ if $@; # uncoverable branch true
-    }
+
+    return $self->set($key,$_[2]);
 }
 
 #--------------------------------------------------------------------------#
@@ -668,7 +658,7 @@ Hash::Ordered - A fast, pure-Perl ordered hash class
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -1185,9 +1175,13 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Benct Philip Jonsson Mario Roy
+=for stopwords Andy Lester Benct Philip Jonsson Mario Roy
 
 =over 4
+
+=item *
+
+Andy Lester <andy@petdance.com>
 
 =item *
 

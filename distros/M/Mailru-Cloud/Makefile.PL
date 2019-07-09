@@ -15,7 +15,7 @@ WriteMakefile(
         'LWP::UserAgent'        => 6.27,
         'LWP::Protocol::https'  => 6.06,
         'JSON::XS'              => 3.04,
-        'File::Basename'        => 2.85,
+        'File::Basename'        => 2.80,
         'Encode'                => 2.60,
         'IO::Socket::SSL'       => 2.002,
     },

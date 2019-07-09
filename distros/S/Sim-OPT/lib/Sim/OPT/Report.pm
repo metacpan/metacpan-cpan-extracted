@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( retrieve report newretrieve newreport get_files );
 
-$VERSION = '0.071'; # our $VERSION = '';
+$VERSION = '0.075'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -1171,7 +1171,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
               if ( ( not ( defined ( $afterlines ) ) ) or ( $afterlines eq "" ) )
               {
-                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                if ( ( $textpattern ne "" ) and ( $line =~ m/$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
                   #chomp( $line )
                   if ( $foundhit == 0 )
@@ -1201,7 +1201,7 @@ sub newreport # This function retrieves the results of interest from the texts f
               }
               else
               {
-                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                if ( ( $textpattern ne "" ) and ( $line =~ m/$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
                   $signalhit++;
                 }

@@ -140,8 +140,7 @@ $feed = $t->app->parse_feed(File::Spec->catdir($sample_dir, 'itunes_summary.xml'
 $entry = $feed->{items}[0];
 isnt($entry->{summary}, 'This is for &8220;itunes sake&8221;.');
 is($entry->{description}, 'this is a <b>test</b>');
-is($entry->{content}, '<p>This is more of the same</p>
-');
+is($entry->{content}, '<p>This is more of the same</p>');
 
 # Let's do some errors - trying to parse html responses, basically
 $feed = $t->app->parse_feed( $t->app->ua->get('/link1.html')->res->content->asset );

@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Dita::GB::Standard;
-our $VERSION = 20190622;
+our $VERSION = 20190708;
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -365,6 +365,16 @@ Files are automatically flattened by the L<GBStandard> as files with the same
 content have the same name and so can safely share one global folder without
 fear of name collisions or having multiple names for identical content.
 
+`head3 No Relative Paths in References
+
+If all the topic files share one global folder there is no need for complicated
+path expressions in references such as:
+
+  <image href="../../../image\x{200B}files/size\x{200B}large/aaa.png"/>
+
+Extended path names that are repeated across many references are, in effect, a
+form of boiler plate which can be avoided by applying this standard.
+
 `head3 Relocating Dita References After Folder Restructuring
 
 In the ideal implementation all files named with the L<GBStandard> occupy one
@@ -650,6 +660,16 @@ Files are automatically flattened by the L<GB Standard|http://metacpan.org/pod/D
 content have the same name and so can safely share one global folder without
 fear of name collisions or having multiple names for identical content.
 
+=head3 No Relative Paths in References
+
+If all the topic files share one global folder there is no need for complicated
+path expressions in references such as:
+
+  <image href="../../../image{200B}files/size{200B}large/aaa.png"/>
+
+Extended path names that are repeated across many references are, in effect, a
+form of boiler plate which can be avoided by applying this standard.
+
 =head3 Relocating Dita References After Folder Restructuring
 
 In the ideal implementation all files named with the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> occupy one
@@ -829,7 +849,7 @@ as a universal standard.
 The Gearhart-Brenan Dita Topic Naming Standard.
 
 
-Version 20190622.
+Version 20190708.
 
 
 The following sections describe the methods in each functional area of this

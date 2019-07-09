@@ -8,8 +8,9 @@ t/00.1-critic.t
 t/00.2-load.t
 t/01.1-dbtests.t
 t/01.2-backup_globals.t
+t/01.3-run_file-with-tempfile.t
 t/02-dbexceptions.t
-t/03-shellexceptions.t
+t/03-file_errors.t
 t/boilerplate.t
 t/data/an_existing_file
 t/data/backup.sqlc

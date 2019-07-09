@@ -7,7 +7,7 @@ use Exporter 'import';
 use Carp 'croak';
 
 our @EXPORT_OK = ('analyze');
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 
 # Analyzed ("flattened") object:

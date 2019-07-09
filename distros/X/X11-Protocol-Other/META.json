@@ -4,13 +4,13 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "X11-Protocol-Other",
    "no_index" : {
@@ -69,6 +69,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "30",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : 31,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

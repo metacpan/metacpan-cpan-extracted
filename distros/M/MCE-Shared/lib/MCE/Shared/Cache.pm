@@ -16,7 +16,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -900,7 +900,7 @@ MCE::Shared::Cache - A hybrid LRU-plain cache helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Cache version 1.840
+This document describes MCE::Shared::Cache version 1.841
 
 =head1 DESCRIPTION
 
@@ -1128,9 +1128,9 @@ involving LRU movement on keys residing in the upper section of the cache.
 When C<max_age> is set, accessing an item which has expired will behave
 similarly to a non-existing item.
 
-=over 3
+=head2 MCE::Shared::Cache->new ( { options }, key, value [, key, value, ... ] )
 
-=item new ( { options }, key, value [, key, value, ... ] )
+=head2 MCE::Shared->cache ( { options }, key, value [, key, value, ... ] )
 
 Constructs a new object.
 
@@ -1184,7 +1184,7 @@ Constructs a new object.
 
 Reorder: Yes, when given key-value pairs contain duplicate keys
 
-=item assign ( key, value [, key, value, ... ] )
+=head2 assign ( key, value [, key, value, ... ] )
 
 Clears the cache, then sets multiple key-value pairs and returns the number of
 keys stored in the cache. This is equivalent to C<clear>, C<mset>.
@@ -1193,14 +1193,14 @@ keys stored in the cache. This is equivalent to C<clear>, C<mset>.
 
 Reorder: Yes, when given key-value pairs contain duplicate keys
 
-=item clear
+=head2 clear
 
 Removes all key-value pairs from the cache.
 
  $ca->clear;
  %{$ca} = ();
 
-=item delete ( key )
+=head2 delete ( key )
 
 Deletes and returns the value by given key or C<undef> if the key does not
 exists in the cache.
@@ -1208,11 +1208,11 @@ exists in the cache.
  $val = $ca->delete( "some_key" );
  $val = delete $ca->{ "some_key" };
 
-=item del
+=head2 del
 
 C<del> is an alias for C<delete>.
 
-=item exists ( key )
+=head2 exists ( key )
 
 Determines if a key exists in the cache.
 
@@ -1221,7 +1221,7 @@ Determines if a key exists in the cache.
 
 Reorder: No
 
-=item get ( key )
+=head2 get ( key )
 
 Gets the value of a cache key or C<undef> if the key does not exists.
 LRU reordering occurs only if the key is found in the lower section of the
@@ -1232,7 +1232,7 @@ cache. See C<peek> to not promote the key internally to the top of the list.
 
 Reorder: Yes
 
-=item iterator ( key [, key, ... ] )
+=head2 iterator ( key [, key, ... ] )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1254,7 +1254,7 @@ returned for deleted keys.
 
 Reorder: No
 
-=item iterator ( "query string" )
+=head2 iterator ( "query string" )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1273,7 +1273,7 @@ The syntax for the C<query string> is described above.
 
 Reorder: No
 
-=item keys ( key [, key, ... ] )
+=head2 keys ( key [, key, ... ] )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1288,7 +1288,7 @@ of the cache.
 
 Reorder: No
 
-=item keys ( "query string" )
+=head2 keys ( "query string" )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1303,7 +1303,7 @@ above. In scalar context, returns the size of the resulting list.
 
 Reorder: No
 
-=item len ( key )
+=head2 len ( key )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1317,7 +1317,7 @@ key does not exists.
 
 Reorder: Yes, only when key is given
 
-=item max_age ( [ secs ] )
+=head2 max_age ( [ secs ] )
 
 Returns the maximum age set on the cache or "never" if not defined internally.
 It sets the default expiry time when seconds is given.
@@ -1333,7 +1333,7 @@ It sets the default expiry time when seconds is given.
  $ca->max_age( undef );     # no expiration
  $ca->max_age( 0 );         # now
 
-=item max_keys ( [ size ] )
+=head2 max_keys ( [ size ] )
 
 Returns the size limit set on the cache or "unlimited" if not defined
 internally. When size is given, it adjusts the cache accordingly to the
@@ -1346,14 +1346,14 @@ new size by pruning the head of the list if necessary.
  $ca->max_keys( "1 MiB" );  # 1*1024*1024
  $ca->max_keys( 500 );
 
-=item mdel ( key [, key, ... ] )
+=head2 mdel ( key [, key, ... ] )
 
 Deletes one or more keys in the cache and returns the number of keys deleted.
 A given key which does not exist in the cache is not counted.
 
  $cnt = $ca->mdel( "key1", "key2" );
 
-=item mexists ( key [, key, ... ] )
+=head2 mexists ( key [, key, ... ] )
 
 Returns a true value if all given keys exists in the cache. A false value is
 returned otherwise.
@@ -1362,7 +1362,7 @@ returned otherwise.
 
 Reorder: No
 
-=item mget ( key [, key, ... ] )
+=head2 mget ( key [, key, ... ] )
 
 Gets the values of all given keys. It returns C<undef> for keys which do not
 exists in the cache.
@@ -1371,7 +1371,7 @@ exists in the cache.
 
 Reorder: Yes
 
-=item mset ( key, value [, key, value, ... ] )
+=head2 mset ( key, value [, key, value, ... ] )
 
 Sets multiple key-value pairs in a cache and returns the number of keys stored
 in the cache.
@@ -1380,11 +1380,11 @@ in the cache.
 
 Reorder: Yes
 
-=item merge
+=head2 merge
 
 C<merge> is an alias for C<mset>.
 
-=item pairs ( key [, key, ... ] )
+=head2 pairs ( key [, key, ... ] )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1399,7 +1399,7 @@ In scalar context, returns the size of the cache.
 
 Reorder: No
 
-=item pairs ( "query string" )
+=head2 pairs ( "query string" )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1414,7 +1414,7 @@ described above. In scalar context, returns the size of the resulting list.
 
 Reorder: No
 
-=item peek ( key )
+=head2 peek ( key )
 
 Same as C<get> without changing the order of the keys. Gets the value of a
 cache key or C<undef> if the key does not exists.
@@ -1424,7 +1424,7 @@ cache key or C<undef> if the key does not exists.
 
 Reorder: No
 
-=item pipeline ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
 Combines multiple commands for the object to be processed serially. For shared
 objects, the call is made atomically due to single IPC to the shared-manager
@@ -1454,7 +1454,7 @@ from the last command in the pipeline.
 
 Reorder: Very likely, see API on given method
 
-=item pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
@@ -1466,17 +1466,17 @@ Same as C<pipeline>, but returns data for every command in the pipeline.
 
 Reorder: Very likely, see API on given command
 
-=item purge ( )
+=head2 purge ( )
 
 Remove all tombstones and expired data from the cache.
 
  $ca->purge;
 
-=item remove
+=head2 remove
 
 C<remove> is an alias for C<delete>.
 
-=item set ( key, value [, expires_in ] )
+=head2 set ( key, value [, expires_in ] )
 
 Sets the value of the given cache key and returns its new value.
 Optionally in v1.839 and later releases, give the number of seconds
@@ -1497,7 +1497,7 @@ before the key is expired.
 
 Reorder: Yes
 
-=item values ( key [, key, ... ] )
+=head2 values ( key [, key, ... ] )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1512,7 +1512,7 @@ returns the size of the cache.
 
 Reorder: No
 
-=item values ( "query string" )
+=head2 values ( "query string" )
 
 When C<max_age> is set, prunes any expired keys at the head of the list.
 
@@ -1527,11 +1527,9 @@ above. In scalar context, returns the size of the resulting list.
 
 Reorder: No
 
-=item vals
+=head2 vals
 
 C<vals> is an alias for C<values>.
-
-=back
 
 =head1 SUGAR METHODS
 
@@ -1545,9 +1543,7 @@ L<http://redis.io/commands#strings> with key representing the cache key.
 Optionally in v1.839 and later releases, give the number of seconds
 before the key is expired, similarly to C<set>.
 
-=over 3
-
-=item append ( key, string [, expires_in ] )
+=head2 append ( key, string [, expires_in ] )
 
 Appends a value to a key and returns its new length.
 
@@ -1555,7 +1551,7 @@ Appends a value to a key and returns its new length.
 
 Reorder: Yes
 
-=item decr ( key [, expires_in ] )
+=head2 decr ( key [, expires_in ] )
 
 Decrements the value of a key by one and returns its new value.
 
@@ -1563,7 +1559,7 @@ Decrements the value of a key by one and returns its new value.
 
 Reorder: Yes
 
-=item decrby ( key, number [, expires_in ] )
+=head2 decrby ( key, number [, expires_in ] )
 
 Decrements the value of a key by the given number and returns its new value.
 
@@ -1571,7 +1567,7 @@ Decrements the value of a key by the given number and returns its new value.
 
 Reorder: Yes
 
-=item getdecr ( key [, expires_in ] )
+=head2 getdecr ( key [, expires_in ] )
 
 Decrements the value of a key by one and returns its old value.
 
@@ -1579,7 +1575,7 @@ Decrements the value of a key by one and returns its old value.
 
 Reorder: Yes
 
-=item getincr ( key [, expires_in ] )
+=head2 getincr ( key [, expires_in ] )
 
 Increments the value of a key by one and returns its old value.
 
@@ -1587,7 +1583,7 @@ Increments the value of a key by one and returns its old value.
 
 Reorder: Yes
 
-=item getset ( key, value [, expires_in ] )
+=head2 getset ( key, value [, expires_in ] )
 
 Sets the value of a key and returns its old value.
 
@@ -1595,7 +1591,7 @@ Sets the value of a key and returns its old value.
 
 Reorder: Yes
 
-=item incr ( key [, expires_in ] )
+=head2 incr ( key [, expires_in ] )
 
 Increments the value of a key by one and returns its new value.
 
@@ -1603,15 +1599,13 @@ Increments the value of a key by one and returns its new value.
 
 Reorder: Yes
 
-=item incrby ( key, number [, expires_in ] )
+=head2 incrby ( key, number [, expires_in ] )
 
 Increments the value of a key by the given number and returns its new value.
 
  $num = $ca->incrby( $key, 2 );
 
 Reorder: Yes
-
-=back
 
 =head1 PERFORMANCE TESTING
 

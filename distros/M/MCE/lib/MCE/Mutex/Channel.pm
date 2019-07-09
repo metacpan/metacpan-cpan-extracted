@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.838';
+our $VERSION = '1.841';
 
 use base 'MCE::Mutex';
 use Scalar::Util qw(refaddr weaken);
@@ -29,25 +29,36 @@ sub CLONE {
 sub DESTROY {
     my ($pid, $obj) = ($has_threads ? $$ .'.'. $tid : $$, @_);
 
-    MCE::Util::_syswrite($obj->{_w_sock}, '0'), $obj->{ $pid } = 0
-        if $obj->{ $pid };
+    syswrite($obj->{_w_sock}, '0'), $obj->{$pid    } = 0 if $obj->{$pid    };
+    syswrite($obj->{_r_sock}, '0'), $obj->{$pid.'b'} = 0 if $obj->{$pid.'b'};
 
-    if ($obj->{'_init_pid'} eq $pid) {
+    if ( $obj->{_init_pid} eq $pid ) {
         my $addr = refaddr $obj;
 
-        ($^O eq 'MSWin32')
+        ($^O eq 'MSWin32' && $obj->{impl} eq 'Channel')
             ? MCE::Util::_destroy_pipes($obj, qw(_w_sock _r_sock))
             : MCE::Util::_destroy_socks($obj, qw(_w_sock _r_sock));
 
-        @MUTEX = map { refaddr($_) == $addr ? () : $_ } @MUTEX;
+        if ( ! $has_threads ) {
+            @MUTEX = map { refaddr($_) == $addr ? () : $_ } @MUTEX;
+        }
     }
 
     return;
 }
 
 sub _destroy {
-    # Called by MCE::_exit && MCE::Hobo::_exit. Must iterate a copy.
+    # Called by { MCE, MCE::Child, and MCE::Hobo }::_exit.
+    # This must iterate a copy.
+
     if ( @MUTEX ) { local $_; &DESTROY($_) for @{[ @MUTEX ]}; }
+}
+
+sub _save_for_global_destruction {
+    if ( ! $has_threads ) {
+        push @MUTEX, $_[0];
+        weaken $MUTEX[-1];
+    }
 }
 
 ###############################################################################
@@ -64,13 +75,15 @@ sub new {
         ? MCE::Util::_pipe_pair(\%obj, qw(_r_sock _w_sock))
         : MCE::Util::_sock_pair(\%obj, qw(_r_sock _w_sock));
 
-    MCE::Util::_syswrite($obj{_w_sock}, '0');
+    syswrite $obj{_w_sock}, '0';
 
-    if (caller !~ /^MCE:?/ || caller(1) !~ /^MCE:?/) {
-        push(@MUTEX, \%obj); weaken($MUTEX[-1]);
+    bless \%obj, $class;
+
+    if ( caller !~ /^MCE:?/ || caller(1) !~ /^MCE:?/ ) {
+        MCE::Mutex::Channel::_save_for_global_destruction(\%obj);
     }
 
-    return bless(\%obj, $class);
+    return \%obj;
 }
 
 sub lock {
@@ -88,7 +101,7 @@ sub lock {
 sub unlock {
     my ($pid, $obj) = ($has_threads ? $$ .'.'. $tid : $$, @_);
 
-    MCE::Util::_syswrite($obj->{_w_sock}, '0'), $obj->{ $pid } = 0
+    syswrite($obj->{_w_sock}, '0'), $obj->{ $pid } = 0
         if $obj->{ $pid };
 
     return;
@@ -108,7 +121,7 @@ sub synchronize {
       ? @ret = wantarray ? $code->(@_) : scalar $code->(@_)
       : $code->(@_);
 
-    MCE::Util::_syswrite($obj->{_w_sock}, '0'), $obj->{ $pid } = 0;
+    syswrite($obj->{_w_sock}, '0'), $obj->{ $pid } = 0;
 
     return wantarray ? @ret : $ret[-1];
 }
@@ -131,7 +144,7 @@ MCE::Mutex::Channel - Mutex locking via a pipe or socket
 
 =head1 VERSION
 
-This document describes MCE::Mutex::Channel version 1.838
+This document describes MCE::Mutex::Channel version 1.841
 
 =head1 DESCRIPTION
 

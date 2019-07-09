@@ -29,9 +29,13 @@ is format_dis(1),  		"+\$01";
 is format_dis(0),  		"";
 is format_dis(-1), 		"-\$01";
 
-is format_str(1),  		"'1'";
-is format_str(''),  	"''";
-is format_str("'a'"),	"'''a'''";
-is format_str("\n"),	"'\n'";
+my $Q = "'";
+my $QQ = '"';
+my $BS = "\\";
+
+is format_str(1),  				"${QQ}1${QQ}";
+is format_str(''),  			"${QQ}${QQ}";
+is format_str("${Q}a${Q}"),		"${QQ}${Q}a${Q}${QQ}";
+is format_str("${QQ}a${QQ}"),	"${QQ}${BS}${QQ}a${BS}${QQ}${QQ}";
 
 done_testing;

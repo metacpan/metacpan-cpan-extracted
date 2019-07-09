@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -37,7 +37,6 @@
             "Dist::Zilla::Plugin::Meta::Contributors" : "0",
             "Dist::Zilla::Plugin::ReleaseStatus::FromVersion" : "0",
             "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
-            "English" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
@@ -48,12 +47,12 @@
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1",
-            "blib" : "1.01"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -85,7 +84,7 @@
    "provides" : {
       "Hash::Ordered" : {
          "file" : "lib/Hash/Ordered.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -100,12 +99,14 @@
          "web" : "https://github.com/dagolden/Hash-Ordered"
       }
    },
-   "version" : "0.012",
+   "version" : "0.014",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
+      "Andy Lester <andy@petdance.com>",
       "Benct Philip Jonsson <bpjonsson@gmail.com>",
       "Mario Roy <marioeroy@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

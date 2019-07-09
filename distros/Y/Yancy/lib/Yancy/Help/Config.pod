@@ -11,7 +11,7 @@ Yancy::Help::Config - How to configure Yancy
 
 =head1 VERSION
 
-version 1.035
+version 1.036
 
 =head1 SYNOPSIS
 

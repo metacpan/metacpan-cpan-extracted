@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 67;
+use Test::More tests => 77;
 BEGIN { use_ok('Algorithm::CP::IZ') };
 
 # create(min, max)
@@ -196,4 +196,58 @@ is($vdom->is_in(7), 0);
   is($v->NotInInterval(0, 200), 0);
 
   $iz->restore_context;
+}
+
+# error
+{
+    my $err = 1;
+    eval {
+	my $i = $iz->create_int("a");
+	$err = 0;
+    };
+    my $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+}
+
+# error
+{
+    my $err = 1;
+    eval {
+	my $i = $iz->create_int([]);
+	$err = 0;
+    };
+    my $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+
+    # zero value is bad, but one value is good.
+    my $i = $iz->create_int([3]);
+    is("$i", "3");
+}
+
+SKIP: {
+    skip "old iZ", 4
+	unless (defined($iz->get_version)
+		&& $iz->IZ_VERSION_MAJOR >= 3
+		&& $iz->IZ_VERSION_MINOR >= 6);
+
+    my $v = $iz->create_int(0, 10);
+    ok($v->select_value(&Algorithm::CP::IZ::CS_VALUE_SELECTION_GE, 4));
+    is($v->min, 4);
+    is($v->max, 10);
+
+    ok(!$v->select_value(&Algorithm::CP::IZ::CS_VALUE_SELECTION_EQ, 1));
+}
+
+# memory leak
+SKIP: {
+    eval "use Test::LeakTrace";
+    my $leak_test_enabled = !$@;
+    skip "Test::LeakTrace is not installed", 1
+        unless ($leak_test_enabled);
+
+    my $v = $iz->create_int(0, 1);
+
+    eval 'use Test::LeakTrace; no_leaks_ok { my $d = $v->domain;  };';
 }

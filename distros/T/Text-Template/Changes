@@ -1,5 +1,8 @@
 Revision history for Text::Template
 
+1.56  2019-07-09
+    - Fix typos in Changes
+
 1.55  2019-02-25
     - Improve AppVeyor tests for older Perls (Thanks Roy Ivy)
     - Check for Test::More 0.94 and skip tests if not installed where
@@ -87,7 +90,7 @@ NOTE: Changes for versions prior to 1.47 have been imported from README
 1.45  2008-04-16
 
 1.44  2003-04-29
-    - This is a maintentance release.  There are no feature changes.
+    - This is a maintenance release.  There are no feature changes.
     - _scrubpkg, which was responsible for eptying out temporary packages after
       the module had done with them, wasn't always working; the result was
       memory leaks in long-running applications. This should be fixed now, and
@@ -102,13 +105,13 @@ NOTE: Changes for versions prior to 1.47 have been imported from README
       and the ->fill_in call would fail.
 
 1.42  2001-11-05
-    - This is a maintentance release.  There are no feature changes.
+    - This is a maintenance release.  There are no feature changes.
     - Fixed a bug relating to use of UNTAINT under perl 5.005_03 and possibly
       other versions.
     - Taint-related tests are now more comprehensive.
 
 1.41  2001-09-04
-    - This is a maintentance release.  There are no feature changes.
+    - This is a maintenance release.  There are no feature changes.
     - Tests now work correctly on Windows systems and possibly on other
       non-unix systems.
 
@@ -146,7 +149,7 @@ NOTE: Changes for versions prior to 1.47 have been imported from README
     - Bug fix:  $OUT was not correctly initialized when used in conjunction
       with SAFE.
     - You may now use a glob ref when passing a filehandle to the ->new
-      funcion.  Formerly, a glob was reuqired.
+      function.  Formerly, a glob was required.
     - New subclass:  Text::Template::Preprocess.  Just like Text::Template, but
       you may supply a PREPROCESS option in the constructor or the fill_in
       call; this is a function which receives each code fragment prior to
@@ -168,7 +171,7 @@ NOTE: Changes for versions prior to 1.47 have been imported from README
       Itamar Almeida de Carvalho.
     - Bug fix: $OUT was not always correctly initialized when used in
       conjunction with SAFE.
-    - You may now use a glob ref when passing a filehandle to the new funcion.
+    - You may now use a glob ref when passing a filehandle to the new function.
       Formerly, a glob was required.
     - Error messages passed to BROKEN subroutines will now report the correct
       line number of the template at which the error occurred:
@@ -226,7 +229,7 @@ NOTE: Changes for versions prior to 1.47 have been imported from README
       incompatible with the beta versions and was also inconvenient.  (`\n' in
       templates was replaced with `n' before it was given to Perl for
       evaluation.)  The new behavior is also incompatible with the beta
-      versions, but it is only a little bit incompatible, and it is probbaly
+      versions, but it is only a little bit incompatible, and it is probably
       better.
     - Documentation for the new behavior, and tests for the bug.
 

@@ -1,3 +1,7 @@
+** 0.25 / 2019-07-07
+   - Suppress 'uninitialized variable' warning in "tag_name"
+     Weasel::Session subroutine.
+
 ** 0.24 / 2019-06-25
    - Add attribute tracking session usage to Weasel::Session ('state')
 

@@ -1,3 +1,8 @@
+0.004   2019-07-08  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] /a regex modifier is 5.14+ only [CT].
+
+
 0.003   2019-06-19 (PERLANCAR)
 
         - Rename module/dist from

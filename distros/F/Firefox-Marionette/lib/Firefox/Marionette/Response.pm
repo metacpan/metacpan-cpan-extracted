@@ -5,15 +5,23 @@ use warnings;
 use Firefox::Marionette::Exception::NotFound();
 use Firefox::Marionette::Exception::NoSuchAlert();
 use Firefox::Marionette::Exception::StaleElement();
+use Firefox::Marionette::Exception::InsecureCertificate();
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 sub _TYPE_INDEX            { return 0 }
 sub _MESSAGE_ID_INDEX      { return 1 }
 sub _ERROR_INDEX           { return 2 }
 sub _RESULT_INDEX          { return 3 }
 sub _DEFAULT_RESPONSE_TYPE { return 1 }
+
+my %_known_exceptions = (
+    'stale element reference' => 'Firefox::Marionette::Exception::StaleElement',
+    'no such alert'           => 'Firefox::Marionette::Exception::NoSuchAlert',
+    'insecure certificate' =>
+      'Firefox::Marionette::Exception::InsecureCertificate',
+);
 
 sub new {
     my ( $class, $message, $parameters ) = @_;
@@ -67,13 +75,9 @@ sub new {
             Firefox::Marionette::Exception::NotFound->throw( $response,
                 $parameters );
         }
-        elsif ( $response->error()->{error} eq 'stale element reference' ) {
-            Firefox::Marionette::Exception::StaleElement->throw( $response,
-                $parameters );
-        }
-        elsif ( $response->error()->{error} eq 'no such alert' ) {
-            Firefox::Marionette::Exception::NoSuchAlert->throw( $response,
-                $parameters );
+        elsif ( my $class = $_known_exceptions{ $response->error()->{error} } )
+        {
+            $class->throw( $response, $parameters );
         }
         else {
             Firefox::Marionette::Exception::Response->throw($response);
@@ -111,7 +115,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.76
+Version 0.77
 
 =head1 SYNOPSIS
 
@@ -188,7 +192,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

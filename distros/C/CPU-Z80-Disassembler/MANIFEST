@@ -11,6 +11,8 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
+t/bug_201905312147_Klaus_Richter_rom_call.t
+t/bug_201907012304_Neal_Crook_defw_list.t
 t/data/zx48.asm
 t/data/zx48.rom
 t/data/zx48_base.asm

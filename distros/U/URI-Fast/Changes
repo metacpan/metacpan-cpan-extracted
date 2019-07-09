@@ -1,4 +1,10 @@
-0.47 2019-??-??
+0.48 2019-07-09
+-make 0.47_01 official
+
+0.47_01 2019-07-06
+-bugfix: fix dynamically set $VERSION in URI::Fast::IRI
+
+0.47 2019-07-05
 -bugfix: escape_tree and unescape_tree die when called with non-reference
  argument
 -workaround: an older release had a versioned URI::Fast::IRI, requiring that it

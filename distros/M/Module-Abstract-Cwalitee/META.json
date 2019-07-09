@@ -33,10 +33,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Cwalitee::Common" : "0.002",
             "Exporter" : "5.57",
-            "Lingua::Identify" : "0",
+            "Lingua::Identify::Any" : "0",
             "Log::ger" : "0.027",
-            "PERLANCAR::Module::List" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Module-Abstract-Cwalitee"
       }
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

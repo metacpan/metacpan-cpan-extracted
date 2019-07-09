@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Carp ();
 use Scalar::Util ();
@@ -19,12 +19,27 @@ BEGIN {
     $ENV{PERL_SUB_IDENTIFY_PP} = $ENV{PERL_SUB_META_PP};
 }
 
+use overload
+    fallback => 1,
+    eq => \&is_same_interface
+    ;
+
 sub _croak { require Carp; Carp::croak(@_) }
 
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
-    bless \%args => $class;
+
+    my $self = bless \%args => $class;
+
+    $self->set_subname(delete $args{subname})     if exists $args{subname};
+    $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
+    $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
+
+    $self->set_parameters($args{parameters}) if exists $args{parameters};
+    $self->set_returns($args{returns})       if exists $args{returns};
+
+    return $self;
 }
 
 sub sub()         { $_[0]{sub} }
@@ -47,7 +62,10 @@ sub returns()     { $_[0]{returns} }
 
 sub set_sub($)    {
     $_[0]{sub} = $_[1];
-    $_[0]->subinfo; # rebuild subinfo
+
+    # rebuild subinfo
+    delete $_[0]{subinfo};
+    $_[0]->subinfo;
     $_[0];
 }
 
@@ -115,6 +133,35 @@ sub apply_attribute(@) {
     return $self;
 }
 
+sub is_same_interface {
+    my ($self, $other) = @_;
+
+    if ($self->subname) {
+        return unless $self->subname eq $other->subname;
+    }
+    else {
+        return if $other->subname;
+    }
+
+    if ($self->parameters) {
+        return unless $other->parameters;
+        return unless $self->parameters->is_same_interface($other->parameters);
+    }
+    else {
+        return if $other->parameters;
+    }
+
+    if ($self->returns) {
+        return unless $other->returns;
+        return unless $self->returns->is_same_interface($other->returns);
+    }
+    else {
+        return if $other->returns;
+    }
+
+    return 1;
+}
+
 1;
 __END__
 
@@ -129,7 +176,7 @@ Sub::Meta - handle subroutine meta information
     use Sub::Meta;
 
     sub hello($) :mehtod { }
-    my $meta = Sub::Meta->new(\&hello);
+    my $meta = Sub::Meta->new(sub => \&hello);
     $meta->subname; # => hello
 
     $meta->sub;        # \&hello
@@ -163,6 +210,11 @@ And you can hold meta information of parameter type and return type. See also L<
     $meta->set_returns( Sub::Meta::Returns->new('Str') );
     $meta->returns->scalar; # 'Str'
 
+And you can compare meta informations:
+
+    my $other = Sub::Meta->new(subname => 'hello');
+    $meta->is_same_interface($other); # 1
+    $meta eq $other; # 1
 
 =head1 DESCRIPTION
 
@@ -173,6 +225,16 @@ C<Sub::Meta> provides methods to handle subroutine meta information. In addition
 =head2 new
 
 Constructor of C<Sub::Meta>.
+
+    Sub::Meta->new(
+        fullname    => 'Greeting::hello',
+        is_constant => 0,
+        prototype   => '$',
+        attribute   => ['method'],
+        is_method   => 1,
+        parameters  => Sub::Meta::Parameters->new(args => [{ type => 'Str' }]),
+        returns     => Sub::Meta::Returns->new('Str'),
+    );
 
 =head2 sub
 
@@ -315,6 +377,11 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     # or
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
+
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether the subroutine's interface is same or not.
+Specifically, check whether C<subname>, C<parameters> and C<returns> are equal.
 
 =head1 NOTE
 

@@ -4,14 +4,15 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.652';
+our $VERSION = '1.654';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
 use Carp qw( croak carp );
 
-use Term::Choose::Constants qw( :choose :screen );
-use Term::Choose::LineFold  qw( line_fold print_columns cut_to_printwidth );
+use Term::Choose::Constants       qw( :choose :screen );
+use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
+use Term::Choose::ValidateOptions qw( validate_options );
 
 
 my $Plugin;
@@ -34,29 +35,24 @@ sub new {
     my $class = shift;
     my ( $opt ) = @_;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
-    my $self = bless {}, $class;
+    my $instance_defaults = _defaults();
     if ( defined $opt ) {
         croak "new: the (optional) argument must be a HASH reference" if ref $opt ne 'HASH';
-        my $valid = $self->__valid_options();
-        $self->__validate_and_add_options( $valid, $opt );
+        validate_options( _valid_options(), $opt );
+        for my $key ( keys %$opt ) {
+            $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
+        }
     }
-    $self->{backup_opt} = { defined $opt ? %$opt : () };
+    my $self = bless $instance_defaults, $class;
+    $self->{backup_instance_defaults} = { %$instance_defaults };
     $self->{plugin} = $Plugin->new();
     return $self;
 }
 
 
-sub DESTROY {
-    my ( $self ) = @_;
-    $self->__reset_term();
-}
-
-
-sub __defaults {
-    my ( $self ) = @_;
-    my $prompt = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
+sub _defaults {
     return {
-        prompt              => $prompt,
+        #prompt             => undef,
         info                => '',
         beep                => 0,
         clear_screen        => 0,
@@ -86,16 +82,7 @@ sub __defaults {
 }
 
 
-sub __undef_to_defaults {
-    my ( $self ) = @_;
-    my $defaults = $self->__defaults();
-    for my $option ( keys %$defaults ) {
-        $self->{$option} = $defaults->{$option} if ! defined $self->{$option};
-    }
-}
-
-
-sub __valid_options {
+sub _valid_options {
     return {
         beep                => '[ 0 1 ]',
         clear_screen        => '[ 0 1 ]',
@@ -125,40 +112,6 @@ sub __valid_options {
         undef               => 'Str',
     };
 };
-
-
-sub __validate_and_add_options { # used by Term::TablePrint, Term::Form
-    my ( $self, $valid, $opt ) = @_;
-    return if ! defined $opt;
-    my $sub =  ( caller( 1 ) )[3];
-    $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
-    $sub .= ':';
-    for my $key ( keys %$opt ) {
-        if ( ! exists $valid->{$key} ) {
-            croak "$sub '$key' is not a valid option name";
-        }
-        next if ! defined $opt->{$key};
-        if ( $valid->{$key} eq 'ARRAY' ) {
-            croak "$sub $key => the passed value has to be an ARRAY reference." if ref $opt->{$key} ne 'ARRAY';
-            {
-                no warnings 'uninitialized';
-                for ( @{$opt->{$key}} ) {
-                    /^[0-9]+\z/ or croak "$sub $key => $_ is an invalid array element";
-                }
-            }
-            if ( $key eq 'lf' ) {
-                croak "$sub $key => too many array elements." if @{$opt->{$key}} > 2;
-            }
-        }
-        elsif ( $valid->{$key} eq 'Str' ) {
-            croak "$sub $key => references are not valid values." if ref $opt->{$key} ne '';
-        }
-        elsif ( $opt->{$key} !~ m/^$valid->{$key}\z/x ) {
-            croak "$sub $key => '$opt->{$key}' is not a valid value.";
-        }
-        $self->{$key} = $opt->{$key};
-    }
-}
 
 
 sub __copy_orig_list {
@@ -230,14 +183,14 @@ sub __reset_term {
         print UP x $up if $up;
         print "\r" . CLEAR_TO_END_OF_SCREEN;
     }
-    if ( exists $self->{backup_opt} ) {
-        my $backup_opt = $self->{backup_opt};
+    if ( exists $self->{backup_instance_defaults} ) {  # backup_instance_defaults exists if ObjectOriented
+        my $instance_defaults = $self->{backup_instance_defaults};
         for my $key ( keys %$self ) {
-            if ( $key eq 'plugin' || $key eq 'backup_opt' ) {
+            if ( $key eq 'plugin' || $key eq 'backup_instance_defaults' ) {
                 next;
             }
-            elsif ( exists $backup_opt->{$key} ) {
-                $self->{$key} = $backup_opt->{$key};
+            elsif ( exists $instance_defaults->{$key} ) {
+                $self->{$key} = $instance_defaults->{$key};
             }
             else {
                 delete $self->{$key};
@@ -257,7 +210,7 @@ sub __get_key {
 
 sub choose {
     if ( ref $_[0] ne 'Term::Choose' ) {
-        return __choose( bless( { plugin => $Plugin->new() }, 'Term::Choose' ), @_ );
+        return __choose( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::Choose' ), @_ );
     }
     my $self = shift;
     return $self->__choose( @_ );
@@ -270,8 +223,10 @@ sub __choose {
     croak "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
     if ( defined $opt ) {
         croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
-        my $valid = $self->__valid_options();
-        $self->__validate_and_add_options( $valid, $opt );
+        validate_options( _valid_options(), $opt );
+        for my $key ( keys %$opt ) {
+            $self->{$key} = $opt->{$key} if defined $opt->{$key};
+        }
     }
     if ( ! @$orig_list_ref ) {
         return;
@@ -280,7 +235,9 @@ sub __choose {
     local $, = undef;
     local $| = 1;
     $self->{wantarray} = wantarray;
-    $self->__undef_to_defaults();
+    if ( ! defined $self->{prompt} ) {
+        $self->{prompt} = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
+    }
     if ( $^O eq "MSWin32" ) {
         print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
     }
@@ -289,7 +246,11 @@ sub __choose {
     if ( exists $ENV{TC_RESET_AUTO_UP} ) {
         $ENV{TC_RESET_AUTO_UP} = 0;
     }
-    $self->__init_term(); #
+    local $SIG{INT} = sub {
+        $self->__reset_term();
+        exit;
+    };
+    $self->__init_term();
     ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
     $self->__write_first_screen();
     my $fast_page = 10;
@@ -1182,7 +1143,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.652
+Version 1.654
 
 =cut
 

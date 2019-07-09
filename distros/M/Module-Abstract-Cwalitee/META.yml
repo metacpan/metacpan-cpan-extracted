@@ -17,10 +17,10 @@ meta-spec:
   version: '1.4'
 name: Module-Abstract-Cwalitee
 requires:
+  Cwalitee::Common: '0.002'
   Exporter: '5.57'
-  Lingua::Identify: '0'
+  Lingua::Identify::Any: '0'
   Log::ger: '0.027'
-  PERLANCAR::Module::List: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Abstract-Cwalitee
   homepage: https://metacpan.org/release/Module-Abstract-Cwalitee
   repository: git://github.com/perlancar/perl-Module-Abstract-Cwalitee.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

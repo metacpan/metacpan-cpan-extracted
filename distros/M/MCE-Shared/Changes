@@ -1,6 +1,22 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.841 Sun Jul 07 04:30:00 EST 2019
+
+  * IPC update; raising reliability across multiple platforms.
+  * Improved the hack for the Windows platform to MCE::Shared::Server.
+
+  * Support reading a shared <DATA> handle residing in the main script
+    without involving the IO::FDPass module.
+
+  * Added barrier option to MCE::Shared::Queue allowing one to disable.
+  * Added mutex locking for all shared objects, previously just condvars.
+  * Added void_context option to MCE::Hobo.
+
+  * Renamed POD method headers from '=item' to '=head2' in Shared classes.
+  * Bumped MCE dependency to 1.839.
+  * Removed MANIFEST.SKIP.
+
 1.840 Thu Jan 03 23:30:00 EST 2019
 
   * Improved destroy and exit cleanup in MCE::Shared::Server.

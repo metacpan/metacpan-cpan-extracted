@@ -22,14 +22,14 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Spec" : "0.008",
+            "App::Spec" : "0.012",
             "App::Spec::Pod" : "0",
             "App::Spec::Run::Cmd" : "0",
+            "App::Spec::Schema" : "0",
             "Data::Dumper" : "0",
             "Exporter" : "0",
             "File::Basename" : "0",
             "File::Path" : "0",
-            "File::Share" : "0",
             "JSON::Validator" : "0",
             "List::Util" : "1.33",
             "Moo" : "0",
@@ -44,6 +44,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Share" : "0",
             "Test::More" : "0"
          }
       }
@@ -51,15 +52,15 @@
    "provides" : {
       "App::AppSpec" : {
          "file" : "lib/App/AppSpec.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::AppSpec::Schema::Validator" : {
          "file" : "lib/App/AppSpec/Schema/Validator.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::AppSpec::Spec" : {
          "file" : "lib/App/AppSpec/Spec.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -70,7 +71,7 @@
          "web" : "https://github.com/perlpunk/App-AppSpec-p5"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

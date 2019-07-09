@@ -30,7 +30,7 @@
 #
 # If not, or if _XROOTPMAP_ID is invalid for some reason, then all windows
 # are iconified to reveal the root.  This is probably not particularly good,
-# but hope that usually _XROOTPMAP_ID is available.
+# but hope usually _XROOTPMAP_ID is available.
 #
 
 use strict;

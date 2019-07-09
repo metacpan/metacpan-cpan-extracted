@@ -4,13 +4,13 @@
       "G. Wade Johnson <gwadej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-USB",
    "no_index" : {
@@ -41,7 +41,7 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 0.38,
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

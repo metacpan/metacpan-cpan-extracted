@@ -31,12 +31,16 @@ requires:
   Mojolicious::Plugin::PODViewer: '0.004'
   Mojolicious::Plugin::RoutesConfig: '0.05'
   Net::SMTP: '3.11'
+  Perl::Critic: '1.132'
   Role::Tiny: '2.000006'
+  Test::Perl::Critic: '1.04'
+  Test::PerlTidy: '20130104'
+  Test::Pod: '1.52'
   perl: '5.020000'
 resources:
   bugtracker: https://github.com/kberov/Slovo/issues
   homepage: https://github.com/kberov/Slovo
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Slovo.git
-version: v2019.06.23
+version: v2019.07.07
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,162 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings FATAL => 'all';
+
+use IO::BlockSync::App;
+
+our $VERSION = '0.002';
+
+IO::BlockSync::App->run;
+
+__END__
+=head1 NAME
+
+blocksync - CLI command
+
+=head1 VERSION
+
+Version 0.002
+
+
+=cut
+
+=head1 SYNOPSIS
+
+BlockSync can some of the same stuff that bigsync (by Egor Egorov) can
+- it's just written in perl.
+
+BlockSync copies data from source file to destination file (can be a block
+device) and calculates checksum on each block it copies.
+On all runs after the first only the changed blocks will be copied.
+
+    blocksync -S -s /source/path -d /destination/path
+
+
+=cut
+
+=head1 INSTALLATION
+
+Look in C<README.pod>
+
+Can also be found on
+L<GitHub|https://github.com/thordreier/perl-IO-BlockSync/blob/master/README.pod>
+or L<meta::cpan|https://metacpan.org/pod/distribution/IO-BlockSync/README.pod>
+
+
+=cut
+
+=head1 COMMAND LINE OPTIONS
+
+
+=cut
+
+=head2 -V --version
+
+Print version and exit
+
+
+=cut
+
+=head2 -v --verbose
+
+Print version and exit
+
+
+=cut
+
+=head2 -s --src
+
+Path to source file.
+
+mandatory - string (containing path)
+
+
+=cut
+
+=head2 -d --dst
+
+Destination file. If not set, then only checksum file will be updated.
+
+optional - string (containing path)
+
+
+=cut
+
+=head2 -c --chk
+
+Path to checksum file.
+
+mandatory - string (containing path)
+
+
+=cut
+
+=head2 -b --bs
+
+Block size to use in bytes.
+
+optional - integer - defaults to 1_048_576 B (1 MB)
+
+
+=cut
+
+=head2 -S --sparse
+
+Seek in dst file, instead of writing blocks only containing \0
+
+optional - boolean - defaults to 0 (false)
+
+
+=cut
+
+=head2 -t --truncate
+
+Truncate the destination file to same size as source file. Does not work on block devices. Will only be tried if C<data> has default value (whole file is copied).
+
+optional - boolean - defaults to 0 (false)
+
+
+=cut
+
+=head1 METHODS
+
+
+=cut
+
+=head2 run
+
+C<bin/blocksync> calls C<IO::BlockSync::App::run> to start the program.
+
+If you just run C<blocksync> command then ignore this method.
+
+
+=cut
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2019 by Thor Dreier-Hansen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Terms of the Perl programming language system itself:
+
+=over
+
+=item * the 
+        L<GNU General Public License|http://dev.perl.org/licenses/gpl1.html>
+        as published by the Free Software Foundation; either
+        L<version 1|http://dev.perl.org/licenses/gpl1.html>,
+        or (at your option) any later version, or
+
+=item * the L<"Artistic License"|http://dev.perl.org/licenses/artistic.html>
+
+=back
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+
+=cut
+

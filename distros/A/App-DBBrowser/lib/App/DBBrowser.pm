@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.205';
+our $VERSION = '2.206';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -83,7 +83,11 @@ sub __init {
     $sf->{i}{f_dir_history} = catfile $app_dir, 'dir_history.json';
     $sf->{i}{f_subqueries}  = catfile $app_dir, 'subqueries.json';
     $sf->{i}{f_copy_paste}  = catfile $app_dir, 'tmp_copy_and_paste.csv';
+}
 
+
+sub __options {
+    my ( $sf ) = @_;
     if ( ! eval {
         my $opt_get = App::DBBrowser::Opt::Get->new( $sf->{i}, {} );
         $sf->{o} = $opt_get->read_config_files();
@@ -128,6 +132,7 @@ sub run {
         exit;
     };
     $sf->__init();
+    $sf->__options();
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $auto_one = 0;
@@ -706,7 +711,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.205
+Version 2.206
 
 =head1 DESCRIPTION
 

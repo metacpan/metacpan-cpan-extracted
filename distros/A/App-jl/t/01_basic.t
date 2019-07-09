@@ -69,12 +69,6 @@ jl_test('NO_PRETTY', $JSON, ['--no-pretty'], sub {
     ok $output =~ m!foo.*bar.*baz.*hoge!;
 });
 
-jl_test('DEPTH', $JSON, ['--depth', '1'], sub {
-    my ($output, $src) = @_;
-
-    ok $output =~ m!\\"baz\\"!;
-});
-
 {
     my $src_json = encode_json({ foo => 'bar' });
     my $json_in_log = encode_json({ message => qq|[05/09/2019 23:51:51]\t[warn]\t$src_json\n| });

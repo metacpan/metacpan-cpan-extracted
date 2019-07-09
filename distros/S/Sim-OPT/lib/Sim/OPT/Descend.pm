@@ -38,7 +38,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank ); # our @EXPORT = qw( );
 
-$VERSION = '0.133'; # our $VERSION = '';
+$VERSION = '0.137'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -831,6 +831,15 @@ sub descend
       }
     }
 
+    if ( $dowhat{preprep} ne "" )
+    {
+      $sortmixed = $dowhat{preprep};
+      unless ( -e $sortmixed )
+      {
+        die;
+      }
+    }
+
     my %dirfiles = %{ $dirfiles_r };
     my @blockelts = @{ $blockelts_r }; #say $tee " IN metamodel \@blockelts : " . dump( @blockelts );
     my %carrier = %{ $carrier_r };
@@ -1036,6 +1045,28 @@ sub descend
 	    #say $tee "WITH, IN TAKEOPTIMA \$metafile: " . dump($metafile);
 	    #say $tee "WITH, IN TAKEOPTIMA \@blockelts: " . dump(@blockelts);
       #say $tee "WITH, IN TAKEOPTIMA \$countblock: " . dump($countblock);
+
+
+      my @prepwelds = @{ $dowhat{prewelds} };
+      my @parswelds = @{ $dowhat{parswelds} };
+      my @weldsprepared;
+
+      if ( scalar( @prepwelds ) > 0 )
+      {
+        my $c = 0;
+        foreach my $weld ( @prepwelds )
+        {
+          unless ( -e $weld )
+          {
+            die;
+          }
+          my $prepared = $weld . ".weldprep.csv";
+          push ( @weldsprepared, $prepared );
+
+          $c++;
+        }
+      }
+
 	    Sim::OPT::Interlinear::interlinear( $prepfile, $confinterlinear, $rawmetafile, \@blockelts, $tofile, $countblock );
 
       open( RAWMETAFILE, "$rawmetafile" ) or die;

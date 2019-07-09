@@ -302,8 +302,8 @@ is $instr = CPU::Z80::Disassembler::Instruction->defm($mem, 0x3FFF, 2),
 			undef;
 t_instr	defm => 0x153B, 	22,
 				22,	'defm STR', {STR => "1982 Sinclair Research"}, 0, 0, 0, 
-					"defm '1982 Sinclair Research'",
-	"153B 3139383220 defm '1982 Sinclair Research'\n".
+					"defm \"1982 Sinclair Research\"",
+	"153B 3139383220 defm \"1982 Sinclair Research\"\n".
 	"     53696E636C \n".
 	"     6169722052 \n".
 	"     6573656172 \n".
@@ -316,8 +316,8 @@ is $instr = CPU::Z80::Disassembler::Instruction->defm7($mem, 0x3FFF),
 			undef;
 t_instr	defm7 => 0x153B, 	undef,
 				26,	'defm7 STR', {STR => "1982 Sinclair Research Ltd"}, 0, 0, 0, 
-					"defm7 '1982 Sinclair Research Ltd'",
-	"153B 3139383220 defm7 '1982 Sinclair Research Ltd'\n".
+					"defm7 \"1982 Sinclair Research Ltd\"",
+	"153B 3139383220 defm7 \"1982 Sinclair Research Ltd\"\n".
 	"     53696E636C \n".
 	"     6169722052 \n".
 	"     6573656172 \n".
@@ -333,8 +333,8 @@ is $instr = CPU::Z80::Disassembler::Instruction->defmz($mem, 0x3FFF),
 $mem->poke(0x153B + 22, 0);		# create a zero-terminated string
 t_instr	defmz => 0x153B, 	undef,
 				23,	'defmz STR', {STR => "1982 Sinclair Research"}, 0, 0, 0, 
-					"defmz '1982 Sinclair Research'",
-	"153B 3139383220 defmz '1982 Sinclair Research'\n".
+					"defmz \"1982 Sinclair Research\"",
+	"153B 3139383220 defmz \"1982 Sinclair Research\"\n".
 	"     53696E636C \n".
 	"     6169722052 \n".
 	"     6573656172 \n".
@@ -403,7 +403,7 @@ is		$instr->as_string,	"inc (iy+VAR-BASE)";
 isa_ok	$instr = CPU::Z80::Disassembler::Instruction->defm(
 												$mem, 0x153B, 22), 
 			'CPU::Z80::Disassembler::Instruction';
-is		$instr->as_string,	"defm '1982 Sinclair Research'";
+is		$instr->as_string,	"defm \"1982 Sinclair Research\"";
 $instr->format->{STR} = sub { '"'.(shift).'"' };
 is		$instr->as_string,	'defm "1982 Sinclair Research"';
 $instr->format->{STR} = sub { 'STR' };

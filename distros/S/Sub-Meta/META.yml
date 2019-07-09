@@ -27,16 +27,16 @@ no_index:
 provides:
   Sub::Meta:
     file: lib/Sub/Meta.pm
-    version: '0.03'
+    version: '0.04'
   Sub::Meta::Param:
     file: lib/Sub/Meta/Param.pm
-    version: '0.03'
+    version: '0.04'
   Sub::Meta::Parameters:
     file: lib/Sub/Meta/Parameters.pm
-    version: '0.03'
+    version: '0.04'
   Sub::Meta::Returns:
     file: lib/Sub/Meta/Returns.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Carp: '0'
   Scalar::Util: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/kfly8/p5-Sub-Meta/issues
   homepage: https://github.com/kfly8/p5-Sub-Meta
   repository: git://github.com/kfly8/p5-Sub-Meta.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:KFLY
 x_contributors:
   - 'Kenta Kobayashi <kentafly88@gmail.com>'

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 BEGIN { use_ok('Algorithm::CP::IZ') };
 
 my $iz = Algorithm::CP::IZ->new();
@@ -142,6 +142,17 @@ my $v1 = $iz->create_int(0, 10);
     };
 
     is($err, 1);
+}
+
+# version
+{
+    my $version = $iz->get_version;
+    if (defined($version)) {
+	ok($version =~ /^[0-9]+\.[0-9]+\.[0-9]+$/);
+    }
+    else {
+	ok(1);
+    }
 }
 
 # duplicated instance

@@ -1,3 +1,15 @@
+0.07	2019-07-07
+
+	Bug Fixes
+	* Allow calls outside of the code being analysed, e.g. calling the system ROM
+	  Thank you to Klaus Richter for reporting
+	* Wrong disassembly of list of 16-bit words that may be labels
+	  Thank you to Neal Crook for reporting and suggesting a fix
+
+	Other
+	* Update to be compatible with CPU::Z80::Assembler 2.18
+	  Uses C-like escapes and double-quoted strings
+
 0.06	2019-03-17
 
 	Bug Fixes

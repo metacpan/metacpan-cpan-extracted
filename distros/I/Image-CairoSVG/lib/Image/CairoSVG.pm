@@ -2,9 +2,9 @@ package Image::CairoSVG;
 use warnings;
 use strict;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
-use Carp qw/carp croak confess cluck/;
+use Carp qw/carp croak/;
 use XML::Parser;
 use Cairo;
 use Image::SVG::Path qw/extract_path_info create_path_string/;
@@ -60,7 +60,7 @@ sub make_cr
 {
     my ($self) = @_;
     if (! $self->{surface}) {
-	confess "BUG: No surface";
+	die "BUG: No surface";
     }
     $self->{cr} = Cairo::Context->create ($self->{surface});
     if (! $self->{cr}) {
@@ -152,6 +152,9 @@ sub svg
 	    );
 	}
 	else {
+	    if ($self->{verbose}) {
+		debugmsg ("Creating new surface");
+	    }
 	    $surface = Cairo::ImageSurface->create (
 		$default_surface_type,
 		$width,
@@ -196,12 +199,18 @@ sub handle_start
     elsif ($tag eq 'g') {
 	$self->{attr} = \%attr;
     }
+    elsif ($tag eq 'polyline') {
+	$self->polyline (%attr);
+    }
     else {
+	if ($self->{verbose}) {
+	    print "Unhandled tag '$tag'.\n";
+	}
 #	warn "Unknown tag '$tag' in $self->{file}";
     }
 
     # http://www.princexml.com/doc/7.1/svg/
-    # g, rect, circle, ellipse, line, polyline, polygon, path, text, tspan
+    # g, rect, circle, ellipse, line, path, text, tspan
 }
 
 sub rect
@@ -263,12 +272,18 @@ sub circle
     $self->do_svg_attr (%attr);
 }
 
+sub split_points
+{
+    my ($points) = @_;
+    my @points = split /,\s*|\s+/, $points;
+    die "Bad points $points" if @points % 2 != 0;
+    return @points;
+}
+
 sub polygon
 {
     my ($self, %attr) = @_;
-    my $points = $attr{points};
-    my @points = split /,|\s+/, $points;
-    die if @points % 2 != 0;
+    my @points = split_points ($attr{points});
 
     my $cr = $self->{cr};
 
@@ -284,6 +299,27 @@ sub polygon
 	$cr->line_to ($x, $y);
     }
     $cr->close_path ();
+    $self->do_svg_attr (%attr);
+}
+
+sub polyline
+{
+    my ($self, %attr) = @_;
+    my @points = split_points ($attr{points});
+
+    my $cr = $self->{cr};
+
+    # Render it.
+
+    my $y = pop @points;
+    my $x = pop @points;
+    $cr->move_to ($x, $y);
+
+    while (@points) {
+	$y = pop @points;
+	$x = pop @points;
+	$cr->line_to ($x, $y);
+    }
     $self->do_svg_attr (%attr);
 }
 
@@ -519,8 +555,6 @@ sub do_svg_attr
 	}
     }
 
-    # Barking insanity
-    
     if ($attr{style}) {
 	my @styles = split /;/, $attr{style};
 	for (@styles) {
@@ -530,7 +564,13 @@ sub do_svg_attr
 	}
     }
     my $fill = $attr{fill};
+    if ($fill) {
+	$fill =~ s/^\s+|\s+$//g;
+    }
     my $stroke = $attr{stroke};
+    if ($stroke) {
+	$stroke =~ s/^\s+|\s+$//g;
+    }
     my $cr = $self->{cr};
     my $stroke_width = $attr{"stroke-width"};
     if ($stroke_width) {
@@ -574,10 +614,10 @@ sub set_colour
 	$cr->set_source_rgb (1, 1, 1);
     }
     elsif ($colour =~ /^#($h)($h)($h)$/) {
-	$cr->set_source_rgb (hex ($1), hex ($2), hex ($3));
+	$cr->set_source_rgb (hex ($1)/15, hex ($2)/15, hex ($3)/15);
     }
     elsif ($colour =~ /^#($hh)($hh)($hh)$/) {
-	$cr->set_source_rgb (hex ($1), hex ($2), hex ($3));
+	$cr->set_source_rgb (hex ($1)/255, hex ($2)/255, hex ($3)/255);
     }
     else {
 	warn "Unknown colour '$colour'";

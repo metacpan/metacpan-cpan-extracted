@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -16,7 +16,7 @@
 # with X11-Protocol-Other.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# /usr/share/doc/xorg-docs/specs/CTEXT/ctext.txt.gz
+# /usr/share/doc/xorg-docs/ctext/ctext.txt.gz
 # lcCT.c
 # lcUTF8.c
 # RFC2237 2022-jp
@@ -31,7 +31,7 @@ use Carp;
 use Encode ();
 use Encode::Encoding;
 
-our $VERSION = 30;
+our $VERSION = 31;
 our @ISA = ('Encode::Encoding');
 
 # uncomment this to run the ### lines
@@ -482,7 +482,7 @@ L<Encode>,
 L<Encode::HanExtra>
 
 "Compound Text Encoding" specification,
-F</usr/share/doc/xorg-docs/specs/CTEXT/ctext.txt.gz>,
+F</usr/share/doc/xorg-docs/ctext/ctext.txt.gz>,
 L<http://www.x.org/docs/CTEXT/ctext.pdf>
 
 =head1 HOME PAGE
@@ -491,7 +491,7 @@ L<http://user42.tuxfamily.org/x11-protocol-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 X11-Protocol-Other is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

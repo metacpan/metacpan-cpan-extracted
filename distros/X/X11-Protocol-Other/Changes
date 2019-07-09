@@ -1,4 +1,4 @@
-Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
 
 This file is part of X11-Protocol-Other.
 
@@ -16,6 +16,8 @@ You can get a copy of the GNU General Public License online at
 <http://www.gnu.org/licenses/>.
 
 
+Version 31, June 2019
+    - X11::Protocol::Other new get_property_atoms(),set_property_atoms()
 
 Version 30, April 2017
     - view-root.pl in examples dir

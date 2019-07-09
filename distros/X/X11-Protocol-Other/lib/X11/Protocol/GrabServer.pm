@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -33,7 +33,7 @@ HERE
 #use Smart::Comments;
 
 use vars '$VERSION';
-$VERSION = 30;
+$VERSION = 31;
 
 sub new {
   my ($class, $X) = @_;
@@ -218,7 +218,7 @@ L<http://user42.tuxfamily.org/x11-protocol-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 X11-Protocol-Other is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

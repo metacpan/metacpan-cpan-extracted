@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 
 # Store the object in a global variable for some functions that don't get it

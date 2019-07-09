@@ -1,7 +1,4 @@
 Changes
-cs_reif2.inc
-cs_vadd.inc
-cs_vmul.inc
 fallback/const-c.inc
 fallback/const-xs.inc
 IZ.xs

@@ -113,7 +113,7 @@ hook after_dispatch => sub {
 hook around_dispatch => sub {
   my ($next, $c) = @_;
   unless (eval { $next->(); 1 }) {
-    die $@ unless $@ eq "CUSTOM\n";
+    die $@ unless $@ =~ /^CUSTOM\n/;
     $c->render(text => 'Custom handling works!');
   }
 };
@@ -125,6 +125,17 @@ get '/custom' => sub { die "CUSTOM\n" };
 get '/dead_helper';
 
 my $t = Test::Mojo->new;
+
+# Missing error
+my $c = $t->app->build_controller;
+$c->reply->exception(undef);
+like $c->res->body, qr/Exception!/, 'right result';
+$c = $t->app->build_controller;
+$c->reply->exception;
+like $c->res->body, qr/Exception!/, 'right result';
+$c = $t->app->build_controller;
+$c->reply->exception(Mojo::Exception->new);
+like $c->res->body, qr/Exception!/, 'right result';
 
 # Debug
 $t->get_ok('/logger?level=debug&message=one')->status_is(200)
@@ -211,7 +222,8 @@ $t->get_ok('/dead_action.json')->status_is(500)
 
 # Dead action with custom exception rendering
 $t->get_ok('/dead_action' => {Accept => 'text/plain'})->status_is(500)
-  ->content_type_is('text/plain;charset=UTF-8')->content_is("dead action!\n");
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_like(qr/^dead action!\n/);
 
 # Action dies twice
 $t->get_ok('/double_dead_action_☃')->status_is(500)

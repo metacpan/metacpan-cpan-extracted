@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::AppSpec::Spec;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ $SPEC /;

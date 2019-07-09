@@ -1,6 +1,6 @@
 name = "Mojo-Feed"
 badges = ["travis"]
 authority="cpan:DOTAN"
-authors=["Dotan Dimet, Mario Domgoergen"]
 module_maker="ModuleBuildTiny"
+license="artistic_2"
 

@@ -52,35 +52,35 @@ sub invalid_args {
             args => [ 'Prompt: ', [] ],
         },
         {
-            expected => "<readline: option 'default' : a reference is not a valid value.>",
+            expected => "<readline: option 'default' => a reference is not a valid value.>",
             args => [ 'Prompt: ', { default => [] } ],
         },
         {
-            expected => "<readline: option 'default' : a reference is not a valid value.>",
+            expected => "<readline: option 'default' => a reference is not a valid value.>",
             args => [ 'Prompt: ', { default => {} } ],
         },
         {
-            expected => "<readline: option 'no_echo' : '-1' is not a valid value.>",
+            expected => "<readline: option 'no_echo' => '-1' is not a valid value.>",
             args => [ 'Prompt: ', { no_echo => -1 } ],
         },
         {
-            expected => "<readline: option 'no_echo' : '3' is not a valid value.>",
+            expected => "<readline: option 'no_echo' => '3' is not a valid value.>",
             args => [ 'Prompt: ', { no_echo => 3 } ],
         },
         {
-            expected => "<readline: option 'no_echo' : 'a' is not a valid value.>",
+            expected => "<readline: option 'no_echo' => 'a' is not a valid value.>",
             args => [ 'Prompt: ', { no_echo => 'a' } ],
         },
         {
-            expected => "<readline: option 'no_echo' : a reference is not a valid value.>",
+            expected => "<readline: option 'no_echo' => a reference is not a valid value.>",
             args => [ 'Prompt: ', { no_echo => [] } ],
         },
         {
-            expected => "<readline: option 'no_echo' : a reference is not a valid value.>",
+            expected => "<readline: option 'no_echo' => a reference is not a valid value.>",
             args => [ 'Prompt: ', { no_echo => {} } ],
         },
         {
-            expected => "<readline: option 'default' : a reference is not a valid value.>",
+            expected => "<readline: option 'default' => a reference is not a valid value.>",
             args => [ 'Prompt: ', { default => {}, no_echo => 1 } ],
         },
         {
@@ -89,6 +89,13 @@ sub invalid_args {
         },
     ];
 }
+
+
+
+
+
+
+
 
 
 1;

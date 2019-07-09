@@ -1,5 +1,16 @@
 Revision history for Perl extension Test-Compile
 
+v2.2.1    2019-07-09
+    - Ooops, the module still depends on UNIVERSAL::require
+    - Oh, and the subprocess function now requires perl 5.10.0 
+
+v2.2.0    2019-07-08
+    - RT-118530: Capture (and optionally suppress) all output from subcommands
+    - RT-102817: Change the default value for 'verbose', from 1 to undef
+    - RT-118419: pm and pl files are now both checked using 'perl -c'
+    - Changes to POD: fixes to escaping, update for new functionality, simplify it
+    - The module no longer depends on UNIVERSAL::require
+
 v2.1.2    2019-07-03
     - More corrections to the POD
     - More tests, try specifying specific files to all_pX_files()

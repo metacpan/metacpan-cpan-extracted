@@ -3,9 +3,9 @@ NAME
     interface from consumer's $CALENDAR
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     Calendar::DatesRoles::DataUser::CalendarVar (from Perl distribution
-    Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-06-20.
+    Calendar-DatesRoles-DataUser-CalendarVar), released on 2019-07-08.
 
 DESCRIPTION
     This role provides Calendar::Dates interface to consumer that has

@@ -1,7 +1,7 @@
 ---
 abstract: 'Act on upper scopes.'
 author:
-  - 'Vincent Pit <perl@profvince.com>'
+  - 'Vincent Pit <vpit@cpan.org>'
 build_requires:
   Config: '0'
   Exporter: '0'
@@ -33,6 +33,6 @@ resources:
   bugtracker: http://rt.cpan.org/Dist/Display.html?Name=Scope-Upper
   homepage: http://search.cpan.org/dist/Scope-Upper/
   license: http://dev.perl.org/licenses/
-  repository: http://git.profvince.com/?p=perl%2Fmodules%2FScope-Upper.git
-version: '0.31'
+  repository: http://git.vpit.fr/?p=perl%2Fmodules%2FScope-Upper.git
+version: '0.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,12 +5,14 @@ lib/Term/Choose/LineFold.pm
 lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm
 lib/Term/Choose/LineFold/CharWidthDefault.pm
 lib/Term/Choose/Linux.pm
+lib/Term/Choose/ValidateOptions.pm
 lib/Term/Choose/Win32.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
 t/00_load/00-load.t
+t/00_load/01-new.t
 t/01_arguments/01_new.t
 t/01_arguments/01_new_invalid.t
 t/01_arguments/Data_Test_Arguments.pm

@@ -1,5 +1,10 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.30 2019-07-08
+
+  - Si converter local pas chargeable, arrêt du Chargeur plutôt qu'utilisation
+    du converter par défaut.
+
 2.28 2019-02-18
 
   - Tenir compte du paramètre "itemize"

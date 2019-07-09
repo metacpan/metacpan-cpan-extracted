@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /CPAN/Changes/Cwalitee/list_cpan_changes_cwalitee_indicators
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-07-03'; # DATE
+our $DATE = '2019-07-06'; # DATE
 our $DIST = 'App-CPANChangesCwaliteeUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-cpan-changes-cwalitee-indicators - list-cpan-changes-cwalitee-indicators
 
 =head1 VERSION
 
-This document describes version 0.001 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-03.
+This document describes version 0.002 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-06.
 
 =head1 SYNOPSIS
 
@@ -54,6 +54,104 @@ C<*> marks required options.
 =over
 
 =item B<--detail>, B<-l>
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--exclude-json>=I<s>, B<-X>
+
+Exclude by name (JSON-encoded).
+
+See C<--exclude>.
+
+=item B<--exclude-module-json>=I<s>
+
+Exclude by module (JSON-encoded).
+
+See C<--exclude-module>.
+
+=item B<--exclude-module>=I<s@>
+
+Exclude by module.
+
+Can be specified multiple times.
+
+=item B<--exclude-status-json>=I<s>
+
+Exclude by status (JSON-encoded).
+
+See C<--exclude-status>.
+
+=item B<--exclude-status>=I<s@>
+
+Exclude by status.
+
+Can be specified multiple times.
+
+=item B<--exclude>=I<s@>
+
+Exclude by name.
+
+Can be specified multiple times.
+
+=item B<--include-json>=I<s>, B<-I>
+
+Include by name (JSON-encoded).
+
+See C<--include>.
+
+=item B<--include-module-json>=I<s>
+
+Include by module (JSON-encoded).
+
+See C<--include-module>.
+
+=item B<--include-module>=I<s@>
+
+Include by module.
+
+Can be specified multiple times.
+
+=item B<--include-status-json>=I<s>
+
+Include by status (JSON-encoded).
+
+See C<--include-status>.
+
+=item B<--include-status>=I<s@>
+
+Include by status.
+
+Default value:
+
+ ["stable"]
+
+Can be specified multiple times.
+
+=item B<--include>=I<s@>
+
+Include by name.
+
+Can be specified multiple times.
+
+=item B<--max-severity>=I<s>
+
+Maximum severity.
+
+Default value:
+
+ 5
+
+=item B<--min-severity>=I<s>
+
+Minimum severity.
+
+Default value:
+
+ 1
 
 =back
 

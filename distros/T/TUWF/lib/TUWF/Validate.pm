@@ -7,7 +7,7 @@ use Exporter 'import';
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = qw/compile validate/;
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 
 # Unavailable as custom validation names

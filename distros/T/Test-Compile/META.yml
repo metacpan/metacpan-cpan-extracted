@@ -15,20 +15,20 @@ name: Test-Compile
 provides:
   Test::Compile:
     file: lib/Test/Compile.pm
-    version: v2.1.2
+    version: v2.2.1
   Test::Compile::Internal:
     file: lib/Test/Compile/Internal.pm
-    version: v2.1.2
+    version: v2.2.1
 recommends:
   Devel::CheckOS: '0'
 requires:
   Exporter: '5.68'
   UNIVERSAL::require: '0'
   parent: '0.225'
-  perl: v5.6.2
+  perl: v5.10.0
   version: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/egiles/test-compile
-version: v2.1.2
+version: v2.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

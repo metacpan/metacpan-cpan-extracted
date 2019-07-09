@@ -2,7 +2,7 @@ package Hash::Lazy;
 
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Sub::Exporter -setup => {
     exports => [ qw(Hash) ],
@@ -85,8 +85,7 @@ static. The builder will not be called through any access to the
 %fib hash. Please be aware of this if you intend to do so.
 
 The example code of fibonacci number above are also available at
-examples/fib.pl in the distribution tarball, or at
-L<http://cpansearch.perl.org/src/GUGOD/Hash-Lazy-0.01/examples/fib.pl>.
+examples/fib.pl in the distribution tarball.
 
 =head1 AUTHOR
 
@@ -105,7 +104,7 @@ L<http://en.wikibooks.org/wiki/Fibonacci_number_program#Perl_6>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009, Kang-min Liu C<< <gugod@gugod.org> >>.
+Copyright (c) 2009-2019, Kang-min Liu C<< <gugod@gugod.org> >>.
 
 This is free software, licensed under:
 

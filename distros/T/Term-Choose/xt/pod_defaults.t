@@ -20,7 +20,7 @@ my %option_default;
 
 open $fh, '<', $file or die $!;
 while ( my $line = <$fh> ) {
-    if ( $line =~ /^sub __defaults \{/ .. $line =~ /^\}/ ) {
+    if ( $line =~ /^sub _defaults \{/ .. $line =~ /^\}/ ) {
         if ( $line =~ m|^\s+#?\s*(\w+)\s+=>\s(\S+),| ) {
             my $op = $1;
             #next if $op eq 'prompt';

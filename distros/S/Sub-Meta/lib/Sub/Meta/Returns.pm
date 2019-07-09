@@ -3,7 +3,12 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
+
+use overload
+    fallback => 1,
+    eq => \&is_same_interface
+    ;
 
 sub new {
     my $class = shift;
@@ -24,6 +29,49 @@ sub set_void($)      { $_[0]{void}   = $_[1]; $_[0] }
 
 sub coerce()      { !!$_[0]{coerce} }
 sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
+
+sub is_same_interface {
+    my ($self, $other) = @_;
+
+    if (defined $self->scalar) {
+        return if !_eq($self->scalar, $other->scalar);
+    }
+    else {
+        return if defined $other->scalar;
+    }
+
+    if (defined $self->list) {
+        return if !_eq($self->list, $other->list);
+    }
+    else {
+        return if defined $other->list;
+    }
+
+    if (defined $self->void) {
+        return if !_eq($self->void, $other->void);
+    }
+    else {
+        return if defined $other->void;
+    }
+
+    return 1;
+}
+
+sub _eq {
+    my ($type, $other) = @_;
+
+    if (ref $type && ref $type eq "ARRAY") {
+        return unless ref $other eq "ARRAY";
+        return unless @$type == @$other;
+        for (my $i = 0; $i < @$type; $i++) {
+            return unless $type->[$i] eq $other->[$i];
+        }
+    }
+    else {
+        return unless $type eq $other;
+    }
+    return 1;
+}
 
 1;
 __END__
@@ -87,6 +135,11 @@ A boolean whether with coercions.
 =head2 set_coerce($bool)
 
 Setter for C<coerce>.
+
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
+Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 
 =head1 LICENSE
 

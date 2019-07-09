@@ -19,7 +19,7 @@ no_index:
     - inc
 requires:
   Encode: '2.6'
-  File::Basename: '2.85'
+  File::Basename: '2.8'
   IO::Socket::SSL: '2.002'
   JSON::XS: '3.04'
   LWP::Protocol::https: '6.06'
@@ -30,4 +30,4 @@ resources:
   bugtracker: https://github.com/vrag86/perl-mailru-cloud-api/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vrag86/perl-mailru-cloud-api
-version: '0.06'
+version: '0.07'

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.149';
+our $VERSION = '1.151';
 
 use Quiq::Math;
 
@@ -44,7 +44,9 @@ Methode zurück, im Fehlerfall wirft sie eine Exception.
 
 =head1 EXAMPLE
 
-    $ perl -MQuiq::Assert -E 'Quiq::Assert->isNotNull("",-name=>'x')'
+Test von der Kommandozeile aus:
+
+    $ perl -MQuiq::Assert -E 'Quiq::Assert->isNotNull("",-name=>"x")'
     Exception:
         ASSERT-00002: Value is null
     Name:
@@ -96,7 +98,7 @@ Objektmethode aufgerufen werden.
 
 =head4 Synopsis
 
-    $val = $this->isEnumValue($val,\@values,@opt);
+    $bool = $this->isEnumValue($val,\@values,@opt);
 
 =head4 Arguments
 
@@ -122,11 +124,17 @@ Name, der bei Verletzung der Bedingung als Teil der Fehlermeldung
 ausgegeben wird. Dies kann der Name der geprüften Variable,
 des geprüften Parameters o.ä. sein.
 
+=item -sloppy => $bool
+
+Wirf keine Exception, sondern zeige über den Returnwert an, ob die
+Bedingung erfüllt ist. Liefere 1, wenn die Bedingung erfüllt ist,
+andernfalls 0. Ist der Wert leer, liefere C<undef>.
+
 =back
 
 =head4 Returns
 
-Geprüften Wert (Skalar)
+Boolean oder C<undef>
 
 =head4 Description
 
@@ -145,9 +153,11 @@ sub isEnumValue {
     # Optionen
 
     my $name = undef;
-    
+    my $sloppy = 0;
+
     $this->parameters(\@_,
         -name => \$name,
+        -sloppy => \$sloppy,
     );
 
     # Prüfung
@@ -157,6 +167,9 @@ sub isEnumValue {
     }
 
     if (!grep {$val eq $_} @$valueA) {
+        if ($sloppy) {
+            return 0;
+        }
         $this->throw(
             'ASSERT-00001: Value not allowed',
             defined $name? (Name => $name): (),
@@ -165,7 +178,7 @@ sub isEnumValue {
         );
     }
 
-    return $val;
+    return 1;
 }
 
 # -----------------------------------------------------------------------------
@@ -174,7 +187,7 @@ sub isEnumValue {
 
 =head4 Synopsis
 
-    $val = $this->isNotNull($val,@opt);
+    $bool = $this->isNotNull($val,@opt);
 
 =head4 Arguments
 
@@ -196,11 +209,17 @@ Name, der bei Verletzung der Bedingung als Teil der Fehlermeldung
 ausgegeben wird. Dies kann der Name der geprüften Variable,
 des geprüften Parameters o.ä. sein.
 
+=item -sloppy => $bool
+
+Wirf keine Exception, sondern zeige über den Returnwert an, ob die
+Bedingung erfüllt ist. Liefere 1, wenn die Bedingung erfüllt ist,
+andernfalls 0. Ist der Wert leer, liefere CL<lt>undef>.
+
 =back
 
 =head4 Returns
 
-Geprüften Wert (nichtleerer Skalar)
+Boolean oder C<undef>
 
 =head4 Description
 
@@ -219,21 +238,26 @@ sub isNotNull {
     # Optionen
 
     my $name = undef;
-    
+    my $sloppy = 0;
+
     $this->parameters(\@_,
         -name => \$name,
+        -sloppy => \$sloppy,
     );
 
     # Prüfung
 
     if (!defined($val) || $val eq '') {
+        if ($sloppy) {
+            return 0;
+        }
         $this->throw(
             'ASSERT-00002: Value is null',
             defined $name? (Name => $name): (),
         );
     }
 
-    return $val;
+    return 1;
 }
 
 # -----------------------------------------------------------------------------
@@ -242,7 +266,7 @@ sub isNotNull {
 
 =head4 Synopsis
 
-    $val = $this->isNumber($val,@opt);
+    $bool = $this->isNumber($val,@opt);
 
 =head4 Arguments
 
@@ -264,11 +288,17 @@ Name, der bei Verletzung der Bedingung als Teil der Fehlermeldung
 ausgegeben wird. Dies kann der Name der geprüften Variable,
 des geprüften Parameters o.ä. sein.
 
+=item -sloppy => $bool
+
+Wirf keine Exception, sondern zeige über den Returnwert an, ob die
+Bedingung erfüllt ist. Liefere 1, wenn die Bedingung erfüllt ist,
+andernfalls 0. Ist der Wert leer, liefere CL<lt>undef>.
+
 =back
 
 =head4 Returns
 
-Geprüften Wert (Number)
+Boolean oder C<undef>
 
 =head4 Description
 
@@ -287,9 +317,11 @@ sub isNumber {
     # Optionen
 
     my $name = undef;
-    
+    my $sloppy = 0;
+
     $this->parameters(\@_,
         -name => \$name,
+        -sloppy => \$sloppy,
     );
 
     # Prüfung
@@ -299,6 +331,9 @@ sub isNumber {
     }
 
     if (!Quiq::Math->isNumber($val)) {
+        if ($sloppy) {
+            return 0;
+        }
         $this->throw(
             'ASSERT-00001: Not a number',
             defined $name? (Name => $name): (),
@@ -306,14 +341,14 @@ sub isNumber {
         );
     }
 
-    return $val;
+    return 1;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.149
+1.151
 
 =head1 AUTHOR
 

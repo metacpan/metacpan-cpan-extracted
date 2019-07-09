@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-SHARYANTO-Proc-Daemon-Prefork"
       }
    },
-   "version" : "0.710",
+   "version" : "0.711",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -157,7 +157,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.596"
+            "version" : "0.597"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -408,12 +408,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Author::PERLANCAR/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Rinci::Validate",
-            "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.24"
+            "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
+            "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
+            "version" : "0.250"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

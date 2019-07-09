@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::ArgEntity - Convention for Perinci::Sub::ArgEntity::*
+    modules
 
+VERSION
+    This document describes version 0.020 of Perinci::Sub::ArgEntity (from
+    Perl distribution Perinci-Sub-ArgEntity), released on 2019-06-24.
+
+SYNOPSIS
     In your Rinci function metadata:
 
      {
@@ -23,32 +30,38 @@ SYNOPSIS
 
      % myprog --file <tab>
 
-    will use completion routine from function complete_arg_val in module
+    will use completion routine from function "complete_arg_val" in module
     Perinci::Sub::ArgEntity::filename, while:
 
      % myprog --url <tab>
 
-    will use element completion routine from function complete_arg_val in
+    will use element completion routine from function "complete_arg_val" in
     module Perinci::Sub::ArgEntity::riap_url.
 
 DESCRIPTION
+    STATUS: This module is now deprecated. It is now preferred to express
+    the "type" or "entity" of a schema in the schema name itself, e.g.
+    Sah::Schema::filename instead of Perinci::Sub::ArgEntity::filename,
+    reducing duplication. To specify completion rule in the Sah schema
+    instead of in the Rinci argument specification, you can use
+    Perinci::Sub::XCompletion. So far, Perinci::Sub::ArgEntity *is* only
+    used to specify completion rule.
 
-    The namespace Perinci::Sub::ArgEntity::* is used to put data and
+    The namespace "Perinci::Sub::ArgEntity::*" is used to put data and
     routine related to certain types (entities) of function arguments.
 
- Completion
-
+  Completion
     The idea is: instead of having to put completion routine (coderef)
     directly in argument specification, like:
 
      file => {
          # specification for 'file' argument
          schema  => 'str*',
-         completion => \&Complete::Util::complete_file,
+         completion => \&Complete::File::complete_file,
      },
 
     you just specify the argument as being of a certain entity using the
-    attribute x.schema.entity:
+    attribute "x.schema.entity":
 
      file => {
          # specification for 'file' argument
@@ -58,16 +71,40 @@ DESCRIPTION
 
     and module like Perinci::Sub::Complete will search the appropriate
     completion routine (if any) for your argument. In this case, it will
-    search for the module named Perinci::Sub::ArgEntity:: + entity_name and
-    then look up the function complete_arg_val.
+    search for the module named "Perinci::Sub::ArgEntity::" + *entity_name*
+    and then look up the function "complete_arg_val".
 
     Note that aside from completion, there are other uses for the
-    x.schema.entity attribute, e.g. in help message generation, etc. More
+    "x.schema.entity" attribute, e.g. in help message generation, etc. More
     things will be formally specified in the future.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-ArgEntity>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-ArgEntity>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-ArgEntity
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci, Rinci::function
 
     Complete, Perinci::Sub::Complete
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

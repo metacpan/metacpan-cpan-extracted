@@ -71,8 +71,10 @@ devel/shm.pl
 devel/sync-info.pl
 devel/sync.pl
 devel/tog-cup.pl
+devel/wm-delete-window.pl
 devel/wm-icon-size.pl
 devel/WM-maybe.pl
+devel/wm-save-yourself-not.pl
 devel/wm-size-hints.pl
 devel/wm-state-exercise.pl
 devel/wm-user-time.pl

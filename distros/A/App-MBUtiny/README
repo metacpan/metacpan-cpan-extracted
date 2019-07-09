@@ -1,10 +1,13 @@
 NAME
+
     App::MBUtiny - Websites and any file system elements backup tool
 
 VERSION
-    Version 1.11
+
+    Version 1.12
 
 SYNOPSIS
+
         # mbutiny test
 
         # mbutiny backup
@@ -14,43 +17,61 @@ SYNOPSIS
         # mbutiny report
 
 DESCRIPTION
+
     Websites and any file system elements backup tool
 
-  FEATURES
+ FEATURES
+
     Backup Files and Folders
+
     Backup small databases
+
     Run external utilities for object preparation
+
     Supported storage of backups on local drives
+
     Supported storage of backups on remote SFTP storages
+
     Supported storage of backups on remote FTP storages
+
     Supported storage of backups on remote HTTP storages
+
     Easy configuration
+
     Monitoring feature enabled
 
-  SYSTEM REQUIREMENTS
+ SYSTEM REQUIREMENTS
+
     Perl v5.16+
+
     SSH client
+
     libwww
+
     libnet
+
     zlib
 
     Recommended: Apache 2.2+ with CGI/FCGI modules
 
-  INSTALLATION
+ INSTALLATION
+
         # sudo cpan install App::MBUtiny
 
     ...and then:
 
         # sudo mbutiny configure
 
-  CONFIGURATION
-    By default configuration file located in "/etc/mbutiny" directory
+ CONFIGURATION
 
-    Every configuration directive detailed described in "mutiny.conf" file,
-    also see "hosts/foo.conf.sample" file for MBUtiny backup hosts
+    By default configuration file located in /etc/mbutiny directory
+
+    Every configuration directive detailed described in mbutiny.conf file,
+    also see hosts/foo.conf.sample file for MBUtiny backup hosts
     configuration
 
-  CRONTAB
+ CRONTAB
+
     To automatically launch the program, we recommend using standard
     scheduling tools, such as crontab
 
@@ -65,10 +86,11 @@ DESCRIPTION
 
         0 9 * * * mbutiny -l report >/dev/null 2>>/var/log/mbutiny-error.log
 
-  COLLECTOR
+ COLLECTOR
+
     Collector is a monitoring server that allows you to collect data on the
-    status of performs backups. The collector allows you to build reports on
-    the collected data from various servers.
+    status of performs backups. The collector allows you to build reports
+    on the collected data from various servers.
 
     How it work?
 
@@ -85,68 +107,84 @@ DESCRIPTION
         +----------+
 
     For installation of the collector Your need Apache 2.2/2.4 web server
-    and CGI/FastCGI script. See "collector.cgi.sample" in "/etc/mbutiny"
+    and CGI/FastCGI script. See collector.cgi.sample in /etc/mbutiny
     directory
 
-  HTTP SERVER
-    If you want to use the HTTP server as a storage for backups, you need to
-    install the CGI/FastCGI script on Apache 2.2/2.4 web server.
+ HTTP SERVER
 
-    See "server.cgi"
+    If you want to use the HTTP server as a storage for backups, you need
+    to install the CGI/FastCGI script on Apache 2.2/2.4 web server.
+
+    See server.cgi
 
 INTERNAL METHODS
-    again
-        The CTK method for classes extension. For internal use only!
 
-        See "again" in CTK
+    again
+
+      The CTK method for classes extension. For internal use only!
+
+      See "again" in CTK
 
     configure
-        The internal method for initializing the project
+
+      The internal method for initializing the project
 
     excdir
-            my $excdir = $app->excdir;
 
-        Returns path to processed exclusions
+          my $excdir = $app->excdir;
+
+      Returns path to processed exclusions
 
     getdbi
-            my $dbi = $app->getdbi;
 
-        Returns DBI object
+          my $dbi = $app->getdbi;
+
+      Returns DBI object
 
     objdir
-            my $objdir = $app->objdir;
 
-        Returns path to processed objects
+          my $objdir = $app->objdir;
+
+      Returns path to processed objects
 
     rstdir
-            my $rstdir = $app->rstdir;
 
-        Returns path to restored backups
+          my $rstdir = $app->rstdir;
+
+      Returns path to restored backups
 
 HISTORY
-    See "Changes" file
+
+    See Changes file
 
 DEPENDENCIES
+
     CTK
 
 TO DO
-    See "TODO" file
+
+    See TODO file
 
 BUGS
+
     * none noted
 
 SEE ALSO
+
     CTK, WWW::MLite
 
 AUTHOR
-    Serż Minus (Sergey Lepenkov) <http://www.serzik.com> <abalama@cpan.org>
+
+    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
 
 COPYRIGHT
+
     Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 LICENSE
+
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See "LICENSE" file and <https://dev.perl.org/licenses/>
+    See LICENSE file and https://dev.perl.org/licenses/
 

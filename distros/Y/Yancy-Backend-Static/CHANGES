@@ -1,5 +1,14 @@
 Changelog for Yancy-Backend-Static
 
+0.004     2019-07-06 18:55:13-05:00 America/Chicago
+
+    [Added]
+
+    - Added better support for search and ordering in the `list`
+      function. This is provided directly by Yancy::Util's `match` and
+      `order_by` functions, so any improvements to those will improve
+      this.
+
 0.003     2019-04-25 09:50:29+01:00 Europe/London
 
     [Fixed]

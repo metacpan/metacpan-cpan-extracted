@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.206    2019-07-07
+        - Fixed cursor visibility by raising the required Term::Form version.
+
 2.205    2019-07-05
         - Added autoflush at the beginning of run.
         - Create/Drop menu changes.

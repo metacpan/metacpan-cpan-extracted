@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -31,9 +31,10 @@ package X11::Protocol::WM;
 use strict;
 use Carp;
 use X11::AtomConstants;
+use X11::Protocol::Other;
 
 use vars '$VERSION', '@ISA', '@EXPORT_OK';
-$VERSION = 30;
+$VERSION = 31;
 
 use Exporter;
 @ISA = ('Exporter');
@@ -589,20 +590,17 @@ sub set_wm_name {
 sub set_wm_protocols {
   my $X = shift;
   my $window = shift;
-
-  # ENHANCE-ME: intern all atoms in one round-trip
-  my $prop = $X->atom('WM_PROTOCOLS');
+  my $property = $X->atom('WM_PROTOCOLS');
   if (@_) {
-    $X->ChangeProperty($window,
-                       $prop,                       # property
-                       X11::AtomConstants::ATOM(),  # type
-                       32,                          # format
-                       'Replace',
-                       pack('L*',_to_atom_nums($X,@_)));
+    X11::Protocol::Other::set_property_atoms ($X, $window, $property,
+                                              _to_atom_nums($X,@_));
   } else {
-    $X->DeleteProperty ($window, $prop);
+    $X->DeleteProperty ($window, $property);
   }
 }
+
+# Take atom names or numbers, return atom numbers.  Convenient, but atom
+# names can be numbers so this is good only where don't have such names.
 sub _to_atom_nums {
   my $X = shift;
   return map { ($_ =~ /^\d+$/ ? $_ : $X->atom($_)) } @_;
@@ -782,7 +780,7 @@ sub set_wm_transient_for {
 # =item C<$transient_for = X11::Protocol::WM::get_wm_transient_for ($X, $window)>
 # sub get_wm_transient_for {
 #   my ($X, $window) = @_;
-#   _get_card32_property ($X, $window,
+#   _get_property_card32 ($X, $window,
 #                         X11::AtomConstants::WM_TRANSIENT_FOR(),
 #                         X11::AtomConstants::WINDOW());
 # }
@@ -896,24 +894,18 @@ sub _net_wm_state_interp {
   $state =~ s/^_NET_WM_STATE_//;
   return $state;
 }
+
 sub get_net_wm_state_atoms {
   my ($X, $window) = @_;
-  my ($value, $type, $format, $bytes_after)
-    = $X->GetProperty ($window,
-                       $X->atom('_NET_WM_STATE'),   # property
-                       X11::AtomConstants::ATOM(),  # type
-                       0,    # offset
-                       999,  # length limit
-                       0);   # delete
-  if ($format == 32) {
-    return unpack('L*', $value);
-  } else {
-    return;
-  }
+  return X11::Protocol::Other::get_property_atoms
+    ($X, $window, $X->atom('_NET_WM_STATE'));
 }
 
-# $state is a string "_NET_WM_STATE_FULLSCREEN" etc, or an integer atom
-# number.  Return an integer atom number.
+# $state can be string like "FULLSCREEN"
+#               string like "_NET_WM_STATE_FULLSCREEN"
+#               integer atom number
+# Integer returned unchanged.
+# Otherwise get atom number of full name like "_NET_WM_STATE_FULLSCREEN".
 sub _net_wm_state_num {
   my ($X, $state) = @_;
   if (! defined $state) {
@@ -931,12 +923,10 @@ sub _net_wm_state_num {
 sub set_net_wm_state {
   my $X = shift;
   my $window = shift;
-  $X->ChangeProperty($window,
-                     $X->atom('_NET_WM_STATE'),   # property
-                     X11::AtomConstants::ATOM(),  # type
-                     32,                          # format
-                     'Replace',
-                     pack('L*', map {_net_wm_state_num($X,$_)} @_));
+  X11::Protocol::Other::set_property_atoms
+      ($X, $window,
+       $X->atom('_NET_WM_STATE'),           # property
+       map {_net_wm_state_num($X,$_)} @_);  # states
 }
 
 {
@@ -1012,11 +1002,9 @@ sub change_net_wm_state {
 
 sub set_net_wm_window_type {
   my ($X, $window, $window_type) = @_;
-  _set_card32_property ($X,
-                        $window,
-                        $X->atom('_NET_WM_WINDOW_TYPE'),
-                        X11::AtomConstants::ATOM(),
-                        _net_wm_window_type_to_atom ($X, $window_type));
+  X11::Protocol::Other::set_property_atoms
+      ($X, $window, $X->atom('_NET_WM_WINDOW_TYPE'),
+       _net_wm_window_type_to_atom($X, $window_type));
 }
 
 # not documented yet ...
@@ -1035,8 +1023,7 @@ sub _net_wm_window_type_to_atom {
 #                              '_NET_WM_WINDOW_TYPE',
 #                              "_NET_WM_WINDOW_TYPE_$window_type");
 #  a type stringcan be an atom integer, a full atom name like
-# "_NET_WM_WINDOW_TYPE_NORMAL", or just the type part "NORMAL".  The types in
-# the EWMH spec are
+# "_NET_WM_WINDOW_TYPE_NORMAL", or just the type part "NORMAL".
 
 
 #------------------------------------------------------------------------------
@@ -1221,6 +1208,7 @@ sub _aspect_reduce {
 1;
 __END__
 
+# Maybe:
 
 # =item C<$window_type = X11::Protocol::WM::get_net_wm_window_type_atom ($X, $window)>
 #
@@ -1229,13 +1217,13 @@ __END__
 # not documented ...
 # sub _get_net_wm_window_type_atom {
 #   my ($X, $window) = @_;
-#   _get_card32_property ($X, $window,
+#   _get_property_card32 ($X, $window,
 #                         $X->atom('_NET_WM_WINDOW_TYPE'),
 #                         X11::AtomConstants::ATOM());
 # }
 
 # not documented ...
-# sub _get_card32_property {
+# sub _get_property_card32 {
 #   my ($X, $window, $prop, $type) = @_;
 #   my ($value, $got_type, $format, $bytes_after)
 #     = $X->GetProperty ($window,
@@ -1278,7 +1266,7 @@ Net-WM "Extended Window Manager Hints".
 
 =over
 
-F</usr/share/doc/xorg-docs/specs/ICCCM/icccm.txt.gz>
+F</usr/share/doc/xorg-docs/icccm/icccm.txt.gz>
 
 L<http://www.freedesktop.org/wiki/Specifications/wm-spec>
 
@@ -1434,17 +1422,31 @@ client.  C<$command> is the program name, followed by any argument strings.
                                        '--option',
                                        'filename.txt');
 
-A client can set this at any time, or if participating in the
-C<WM_SAVE_YOURSELF> session manager protocol then it should set in response
-to a C<ClientMessage> of C<WM_SAVE_YOURSELF> .
-
-The command should start the client in its current state as far as possible,
-so the command might include a filename, command line options for current
-settings, etc.
+The command should start the client in its current state, so the command
+might include a filename, command line options for current settings, etc.
 
 Non-ASCII is allowed per L</Text Properties> above.  The ICCCM spec is for
 Latin-1 to work on a POSIX Latin-1 system, but how well anything else
 survives a session manager etc is another matter.
+
+A client can set this at any time, or if participating in the
+C<WM_SAVE_YOURSELF> session manager protocol then it should set in response
+to a C<ClientMessage> of C<WM_SAVE_YOURSELF> .
+
+For reference, under C<mwm> circa 2017, a client with C<WM_SAVE_YOURSELF>
+receives that message for the C<mwm> Close button (C<f.kill>) and is
+expected to respond within a timeout (default 1 second), whereupon C<mwm>
+closes the client connection (C<KillClient>).  Unfortunately if both
+C<WM_SAVE_YOURSELF> and C<WM_DELETE_WINDOW> then C<mwm> still does the
+C<WM_SAVE_YOURSELF> and close, defeating the aim of letting
+C<WM_DELETE_WINDOW> query the user and perhaps not close.
+
+The easiest workaround would be use only C<WM_DELETE_WINDOW>, keep
+C<WM_COMMAND> always up-to-date, and be prepared to save state on connection
+loss.  This is quite reasonable anyway actually, since a C<WM_SAVE_YOURSELF>
+message is fairly limited use, given that connection loss or other
+termination could happen at any time so if state is important that it'd be
+prudent to keep it saved.
 
 =back
 
@@ -1521,7 +1523,7 @@ root and should use the default visual and colormap of the screen.  The
 window manager might resize the window and/or border.
 
 The window manager might set a C<WM_ICON_SIZE> property on the root window
-for good icon sizes.  See L</WM_ICON_SIZE>.
+for good icon sizes.  See L</WM_ICON_SIZE> above.
 
 C<window_group> is the XID of a window which is the group leader of a group
 of top-level windows being used by the client.  The window manager might
@@ -1560,7 +1562,7 @@ C<$X-E<gt>{'do_interp'}> is disabled then all are numbers.
 
 X11R2 Xlib had a bug in its C<XSetWMHints()> which chopped off the
 C<window_group> value from the hints stored.  The C<window_group> field is
-omitted from the return in that case.
+omitted from the return if the data read is missing that field.
 
 =item C<(key =E<gt> $value, ...) = X11::Protocol::WM::change_wm_hints ($X, $window, key=E<gt>value, ...)>
 
@@ -1838,7 +1840,7 @@ nothing (eg. some tiling window managers).  If there's no window manager
 running then iconification is not possible and this message will do nothing.
 
 C<$root> should be the root window of C<$window>.  If not given or C<undef>
-then it's obtained from a C<QueryTree()>.  Any client can iconify any top
+then it's obtained by a C<QueryTree()> here.  Any client can iconify any top
 level window.
 
 If C<$window> has other windows which are C<WM_TRANSIENT_FOR> for it then
@@ -1856,7 +1858,7 @@ If there's no window manager running then the C<UnmapWindow()> unmaps and
 the C<UnmapNotify> message does nothing.
 
 C<$root> should be the root window of C<$window>.  If not given or
-C<undef> then it's obtained from a C<$X-E<gt>QueryTree()>.
+C<undef> then it's obtained by a C<QueryTree()> here.
 
 If other windows are C<WM_TRANSIENT_FOR> this C<$window> (eg. open dialog
 windows) then generally the client should withdraw them too.  The window
@@ -2061,16 +2063,25 @@ set too, to know where the client is running.
 An EWMH compliant window manager maintains a set of state flags for each
 client window.  A state is an atom such as C<_NET_WM_STATE_FULLSCREEN> and
 each such state can be present or absent.  The supported states are listed
-in C<_NET_SUPPORTED>.  Any client can ask the window manager to change
-states on any window.  A client might be able to ask for an initial set of
-states for a new window (see C<set_net_wm_state()> below).  Possible states
-include
+in property C<_NET_SUPPORTED> on the root (together with other features).
+For example,
+
+    my @net_supported = X11::Protocol::Other::get_property_atoms
+                         ($X, $X->root, $X->atom('_NET_SUPPORTED'));
+    if (grep {$_ == $X->atom('_NET_WM_STATE_FULLSCREEN')}
+             @net_supported) { 
+      print "Have _NET_WM_STATE_FULLSCREEN\n";
+    }
+
+Any client can ask the window manager to change states of any window.
+A client might set initial states on a new window with C<set_net_wm_state()>
+below.  Possible states include
 
 =over
 
 =item _NET_WM_STATE_MODAL
 
-The window is modal to its C<WM_TRANSIENT_FOR> parent or if
+The window is modal to its C<WM_TRANSIENT_FOR> parent, or if
 C<WM_TRANSIENT_FOR> not set then modal to its window group.
 
 See L</_MOTIF_WM_HINTS> to set modal with the Motif style hints.
@@ -2093,7 +2104,7 @@ The window is the full screen with no decoration around it, thus being the
 full screen.
 
 The window manager remembers the "normal" size of the window so that when
-maximize or fullscreen state is removed the previous size is restored.
+maximize or fullscreen states are removed the previous size is restored.
 
 =item _NET_WM_STATE_SHADED
 
@@ -2171,8 +2182,8 @@ The further optional key/value parameters are
     source   => "none", "normal", "user", 0,1,2
     root     => integer XID, or undef
 
-A change message can act on one or two states.  For two states the second is
-C<state2>.  For example to maximize vertically and horizontally in one
+A change message can act on one or two states.  For two states, the second
+is C<state2>.  For example to maximize vertically and horizontally in one
 operation,
 
     change_net_wm_state ($X, $window, "add", "MAXIMIZED_VERT",
@@ -2183,7 +2194,7 @@ which means a normal application.  "user" is for a user-interface control
 program such as a pager.  ("none"=0 is what clients prior to EWMH 1.2 gave.)
 
 C<root> is the root window (integer XID) of C<$window>.  If C<undef> or not
-given then it's found with C<$X-E<gt>QueryTree()>.  If you already know the
+given then it's found by C<$X-E<gt>QueryTree()>.  If you already know the
 root then giving it avoids that round-trip query.
 
 =item C<@strings = get_net_wm_state ($X, $window)>
@@ -2193,26 +2204,28 @@ root then giving it avoids that round-trip query.
 Get the C<_NET_WM_STATE> property from C<$window>.  C<get_net_wm_state()>
 returns a list of strings such as "FULLSCREEN".  C<get_net_wm_state_atoms()>
 returns a list of atom integers such as
-C<$X-E<gt>atom('_NET_WM_STATE_FULLSCREEN')>.  In both cases if there's no
+C<$X-E<gt>atom('_NET_WM_STATE_FULLSCREEN')>.  In both cases, if there's no
 such property or if it's empty then return an empty list.
 
 =item C<set_net_wm_state ($X, $window, $state,...)>
 
-Set the C<_NET_WM_STATE> property on C<$window>.  Each C<$state> can be a
-string such as "FULLSCREEN" or an atom integer such as
-C<$X-E<gt>atom('_NET_WM_STATE_FULLSCREEN')>.
+Set the C<_NET_WM_STATE> property on C<$window>.  Each C<$state> can be
+
+   string like "FULLSCREEN"
+   string like "_NET_WM_STATE_FULLSCREEN"
+   integer atom of a name like _NET_WM_STATE_FULLSCREEN
 
 A client can set C<_NET_WM_STATE> on a new window to tell the window manager
-of desired initial states.  However this is only a "should" in the EWMH spec
-so it might not be obeyed.
+of desired initial states.  This is only a "should" in the EWMH spec so it
+might not be obeyed.
 
     # initial desired state
     set_net_wm_state ($X, $window,
                       "MAXIMIZED_HORZ", "MAXIMIZED_VERT");
 
-After the window is managed by the window manager (once mapped) clients
+After the window is managed by the window manager (once mapped), clients
 should not set C<_NET_WM_STATE> but instead ask the window manager with
-C<change_net_wm_state()> per above.
+C<change_net_wm_state()> message above.
 
 =back
 
@@ -2228,14 +2241,14 @@ C<$time> should be a server time value (an integer) from the last user
 keypress etc event in C<$window>.  Or when C<$window> is created then the
 time from the event which caused it to be opened.
 
-On a newly created window a special C<$time> value 0 means the window should
-not receive the focus when mapped -- assuming the window manager recognises
-C<_NET_WM_USER_TIME> of course.
+On a newly created window, a special C<$time> value 0 means the window
+should not receive the focus when mapped -- assuming the window manager
+recognises C<_NET_WM_USER_TIME> of course.
 
 If the client has the active window it should update C<_NET_WM_USER_TIME>
 for every user input.  Generally KeyPress and ButtonPress events are user
-input, but KeyRelease and ButtonRelease are not since it's the Press events
-which are the user actively doing something.
+input, but normally KeyRelease and ButtonRelease are not since it's the
+Press events which are the user actively doing something.
 
 The window manager might use C<_NET_WM_USER_TIME> to control focus and/or
 stacking order so that for example a slow popup doesn't steal the focus if
@@ -2250,7 +2263,12 @@ you've gone to another window to do other work in the interim.
 =item C<X11::Protocol::WM::set_net_wm_window_type ($X, $window, $window_type)>
 
 Set the C<_NET_WM_WINDOW_TYPE> property on C<$window> (an XID).
-C<$window_type> can be a type string as follows from the EWMH,
+C<$window_type> can be
+
+    string like "NORMAL"
+    integer atom of a name like _NET_WM_WINDOW_TYPE_NORMAL
+
+The window types from from the EWMH are as follows.
 
     "NORMAL"
     "DIALOG"
@@ -2261,9 +2279,6 @@ C<$window_type> can be a type string as follows from the EWMH,
     "UTILITY"
     "SPLASH"
 
-C<$window_type> can also be an integer atom such as
-C<$X-E<gt>atom('_NET_WM_WINDOW_TYPE_DIALOG')>.
-
 =back
 
 =head2 Frame to Client
@@ -2272,7 +2287,7 @@ C<$X-E<gt>atom('_NET_WM_WINDOW_TYPE_DIALOG')>.
 
 =item C<$window = X11::Protocol::WM::frame_window_to_client ($X, $frame)>
 
-Return the client window (XID) contained within window manager C<$frame>
+Return the client window (an XID) contained within window manager C<$frame>
 window (an XID).  C<$frame> is usually an immediate child of the root
 window.
 
@@ -2301,8 +2316,8 @@ excessive windows (which would be traversed if there's no window manager).
     +----------------------------------+
 
 Care is taken not to error out if some windows are destroyed during the
-search.  The windows may belong to other clients and could be destroyed at
-any time.  If C<$frame> itself doesn't exist then the return is C<undef>.
+search.  When a window belongs to other clients it could be destroyed at any
+time.  If C<$frame> itself doesn't exist then the return is C<undef>.
 
 This function is similar to what C<xwininfo> and similar programs do to go
 from a toplevel root window child down to the client window, per
@@ -2358,10 +2373,10 @@ and to import as-yet unknown things would be asking for name clashes.
 =head1 BUGS
 
 Not much attention is paid to text on an EBCDIC system.  Wide char strings
-probably work, but byte strings may go straight through where they ought to
-be re-coded to Latin-1.  But the same probably applies to parts of the core
-C<X11::Protocol> such as C<$X-E<gt>atom_name()> where you'd want to convert
-Latin-1 from the server to native EBCDIC.
+probably work, but byte strings may go straight through whereas they ought
+to be re-coded to Latin-1.  But the same probably applies to parts of the
+core C<X11::Protocol> such as C<$X-E<gt>atom_name()> where you'd want to
+convert Latin-1 from the server to native EBCDIC.
 
 =head1 SEE ALSO
 
@@ -2371,11 +2386,11 @@ L<X11::Protocol::ChooseWindow>,
 L<X11::Protocol::XSetRoot>
 
 "Inter-Client Communication Conventions Manual",
-F</usr/share/doc/xorg-docs/specs/ICCCM/icccm.txt.gz>,
+F</usr/share/doc/xorg-docs/icccm/icccm.txt.gz>,
 L<http://www.x.org/docs/ICCCM/>
 
 "Compound Text Encoding" specification.
-F</usr/share/doc/xorg-docs/specs/CTEXT/ctext.txt.gz>,
+F</usr/share/doc/xorg-docs/ctext/ctext.txt.gz>,
 L<http://www.x.org/docs/CTEXT/>
 
 "Extended Window Manager Hints" which is the C<_NET_WM> things.
@@ -2390,7 +2405,7 @@ L<http://user42.tuxfamily.org/x11-protocol-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2017, 2018, 2019 Kevin Ryde
 
 X11-Protocol-Other is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

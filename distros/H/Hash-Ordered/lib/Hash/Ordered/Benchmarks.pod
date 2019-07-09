@@ -13,7 +13,7 @@ Hash::Ordered::Benchmarks - Ordered hash benchmarking
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 INTRODUCTION
 

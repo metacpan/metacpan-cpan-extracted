@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,6 @@
          "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler"
       }
    },
-   "version" : "2.16",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "2.18",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Chargeur Koha par Tamil",
+   "author" : [
+      "Frédéric Demians <f.demians@tamil.fr>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Koha-Contrib-Sudoc",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::Processor" : "0",
+            "Business::ISBN" : "0",
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "DBI" : "0",
+            "DateTime" : "0",
+            "Encode" : "0",
+            "File::Copy" : "0",
+            "File::ShareDir" : "0",
+            "Format::Human::Bytes" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "0",
+            "Log::Dispatch" : "0",
+            "Log::Dispatch::File" : "0",
+            "Log::Dispatch::Screen" : "0",
+            "Log::Dispatch::Syslog" : "0",
+            "MARC::Moose::Field::Control" : "0",
+            "MARC::Moose::Field::Std" : "0",
+            "MARC::Moose::Parser::Iso2709" : "0",
+            "MARC::Moose::Reader::File::Iso2709" : "0",
+            "MARC::Moose::Record" : "0",
+            "Mail::Box::Manager" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::RW::Reader" : "0",
+            "MooseX::RW::Reader::File" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Usage" : "0",
+            "Search::Elasticsearch" : "0",
+            "Sys::Syslog" : "0",
+            "Try::Tiny" : "0",
+            "XML::Simple" : "0",
+            "YAML" : "0",
+            "YAML::Tiny" : "0",
+            "ZOOM" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fredericd/koha-sudoc/issues"
+      },
+      "homepage" : "http://www.tamil.fr/sudoc/sudoc.html",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/fredericd/koha-sudoc"
+      }
+   },
+   "version" : "2.31"
+}
+

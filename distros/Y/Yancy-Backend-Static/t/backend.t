@@ -84,6 +84,32 @@ is_deeply $result->{items},
     ],
     'list() reports correct items matching path "index"';
 
+$result = $be->list( pages => { path => { -like => 'in%' } } );
+is $result->{total}, 1, 'list() reports one page matching path "in%"';
+is_deeply $result->{items},
+    [
+        {
+            %index_page,
+            html => qq{<h1>Index</h1>\n\n<p>This is my index page</p>\n},
+        }
+    ],
+    'list() reports correct items matching path "index"';
+
+$result = $be->list( 'pages', {}, { order_by => { -desc => 'path' } } );
+is $result->{total}, 2, 'list() reports two pages total';
+is_deeply $result->{items},
+    [
+        {
+            %index_page,
+            html => qq{<h1>Index</h1>\n\n<p>This is my index page</p>\n},
+        },
+        {
+            %about_page,
+            html => qq{<h1>About</h1>\n\n<p>This is my about page</p>\n},
+        },
+    ],
+    'list() reports correct items in correct order';
+
 $success = $be->set( pages => 'index', { markdown => '# Index' } );
 ok $success, 'partial set was successful';
 $item = $be->get( pages => 'index' );

@@ -3,9 +3,9 @@ NAME
     Abstract
 
 VERSION
-    This document describes version 0.001 of Module::Abstract::Cwalitee
+    This document describes version 0.004 of Module::Abstract::Cwalitee
     (from Perl distribution Module-Abstract-Cwalitee), released on
-    2019-07-03.
+    2019-07-08.
 
 SYNOPSIS
      use Module::Abstract::Cwalitee qw(
@@ -40,6 +40,34 @@ FUNCTIONS
 
     *   abstract* => *str*
 
+    *   exclude_indicator => *array[str]*
+
+        Do not use these indicators.
+
+    *   exclude_indicator_module => *array[perl::modname]*
+
+        Do not use indicators from these modules.
+
+    *   exclude_indicator_status => *array[str]*
+
+        Do not use indicators having these statuses.
+
+    *   include_indicator => *array[str]*
+
+        Only use these indicators.
+
+    *   include_indicator_module => *array[perl::modname]*
+
+        Only use indicators from these modules.
+
+    *   include_indicator_status => *array[str]* (default: ["stable"])
+
+        Only use indicators having these statuses.
+
+    *   min_indicator_severity => *uint* (default: 1)
+
+        Minimum indicator severity.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -61,6 +89,38 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   detail => *bool*
+
+    *   exclude => *array[str]*
+
+        Exclude by name.
+
+    *   exclude_module => *array[perl::modname]*
+
+        Exclude by module.
+
+    *   exclude_status => *array[str]*
+
+        Exclude by status.
+
+    *   include => *array[str]*
+
+        Include by name.
+
+    *   include_module => *array[perl::modname]*
+
+        Include by module.
+
+    *   include_status => *array[str]* (default: ["stable"])
+
+        Include by status.
+
+    *   max_severity => *int* (default: 5)
+
+        Maximum severity.
+
+    *   min_severity => *int* (default: 1)
+
+        Minimum severity.
 
     Returns an enveloped result (an array).
 

@@ -1,4 +1,9 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001002
+Revision history for Net-Checkpoint-Management-v1: 0.001003
+
+0.001003  2019-07-09 15:48:51+02:00 Europe/Vienna
+    - fix get methods required an unnecessary id
+      has to be specified as uid in the parameters for most objects
+    - add service_groups and session methods
 
 0.001002  2019-04-23 11:06:31+02:00 Europe/Vienna
     - fix Role::ObjectMethods abstract and list_$object documentation

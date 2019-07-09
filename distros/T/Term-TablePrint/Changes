@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.116   2019-07-07
+        - Use validate_options form Term::Choose.
+        - Update handling options.
+        - Removed DESTROY.
+
 0.115   2019-07-05
         - Restored code.
 

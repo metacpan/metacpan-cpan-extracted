@@ -55,18 +55,6 @@ WriteMakefile
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
 
-     optional_features =>
-     { maximum_interoperation =>
-       { description => 'All the optional things which may be used.',
-         prereqs =>
-         { runtime =>
-           { requires => 
-             { %encode_modules },
-           },
-         },
-       },
-     },
-
      prereqs =>
      { test =>
        { suggests =>
@@ -75,6 +63,18 @@ WriteMakefile
           'Module::Util' => 0, # checking for HanExtra
           %encode_modules,
          }
+       },
+     },
+
+     optional_features =>
+     { maximum_interoperation =>
+       { description => 'All the optional things which may be used.',
+         prereqs =>
+         { runtime =>
+           { requires =>
+             { %encode_modules },
+           },
+         },
        },
      },
    },

@@ -15,7 +15,7 @@ CPU::Z80::Assembler::Expr - Represents one assembly expression to be computed at
 use strict;
 use warnings;
 
-our $VERSION = '2.16';
+our $VERSION = '2.18';
 
 use CPU::Z80::Assembler;
 use CPU::Z80::Assembler::Parser;
@@ -104,6 +104,8 @@ The text bytes used in defm / deft are a string of bytes in big endian format, n
 
 A STRING value is encoded with the list of characters in the string. If the string is 
 used in an expression, then the expression applies to the last character of the string. This allows expressions like "CALL"+0x80 to invert bit 7 of the last character of the string.
+
+C-like escape sequences are expanded both in single- and double-quoted strings.
 
 =head2 child
 

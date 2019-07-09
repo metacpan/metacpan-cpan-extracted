@@ -52,7 +52,7 @@ $id     = $minion->enqueue('test');
 my (@finished, @failed);
 my $promise
   = $minion->result_p($id, {interval => 0})->then(sub { @finished = @_ })
-  ->catch(sub { @failed = @_ });
+  ->catch(sub                                         { @failed   = @_ });
 my $job = $worker->dequeue(0);
 is $job->id, $id, 'same id';
 Mojo::IOLoop->one_tick;
@@ -69,7 +69,7 @@ is_deeply \@failed, [], 'not failed';
 my $id2 = $minion->enqueue('test');
 $promise
   = $minion->result_p($id2, {interval => 0})->then(sub { @finished = @_ })
-  ->catch(sub { @failed = @_ });
+  ->catch(sub                                          { @failed   = @_ });
 $job = $worker->dequeue(0);
 is $job->id, $id2, 'same id';
 $job->fail({works => 'too!'});
@@ -138,6 +138,16 @@ $worker->unregister;
 $minion->repair;
 is $job->info->{state},  'failed',           'job is no longer active';
 is $job->info->{result}, 'Worker went away', 'right result';
+
+# Repair abandoned job in minion_foreground queue (have to be handled manually)
+$worker->register;
+$id  = $minion->enqueue('test', [], {queue  => 'minion_foreground'});
+$job = $worker->dequeue(0,          {queues => ['minion_foreground']});
+is $job->id, $id, 'right id';
+$worker->unregister;
+$minion->repair;
+is $job->info->{state},  'active', 'job is still active';
+is $job->info->{result}, undef,    'no result';
 
 # Repair old jobs
 $worker->register;
@@ -372,7 +382,7 @@ is $batch->[0]{state},     'inactive', 'right state';
 is $batch->[0]{retries},   0, 'job has not been retried';
 like $batch->[0]{created}, qr/^[\d.]+$/, 'has created timestamp';
 is $batch->[1]{task},      'fail', 'right task';
-is_deeply $batch->[1]{args}, [], 'right arguments';
+is_deeply $batch->[1]{args}, [],  'right arguments';
 is_deeply $batch->[1]{notes}, {}, 'right metadata';
 is_deeply $batch->[1]{result}, ['works'], 'right result';
 is $batch->[1]{state},    'finished', 'right state';
@@ -442,6 +452,7 @@ $job = $worker->register->dequeue(0);
 is $worker->info->{jobs}[0], $job->id, 'right job';
 like $job->info->{created}, qr/^[\d.]+$/, 'has created timestamp';
 like $job->info->{started}, qr/^[\d.]+$/, 'has started timestamp';
+like $job->info->{time},    qr/^[\d.]+$/, 'has server time';
 is_deeply $job->args, [2, 2], 'right arguments';
 is $job->info->{state}, 'active', 'right state';
 is $job->task,    'add', 'right task';

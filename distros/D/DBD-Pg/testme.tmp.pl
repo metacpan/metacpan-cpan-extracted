@@ -26,7 +26,8 @@ my $dbh = DBI->connect($DSN, '', '', {AutoCommit=>0,RaiseError=>1,PrintError=>0}
   or die "Connection failed!\n";
 
 my $me = $dbh->{Driver}{Name};
-print "DBI is version $DBI::VERSION, I am $me, version of DBD::Pg is $DBD::Pg::VERSION\n";
+my $sversion = $dbh->{pg_server_version};
+print "DBI is version $DBI::VERSION, I am $me, version of DBD::Pg is $DBD::Pg::VERSION, server is $sversion\n";
 
 print "Name: $dbh->{Name}\n";
 
@@ -34,9 +35,9 @@ $dbh->{RaiseError} = 0;
 $dbh->{PrintError} = 1;
 $dbh->{AutoCommit} = 1;
 
-column_types_github_issue_24();
-
 exit;
+
+#column_types_github_issue_24();
 
 #read_only_arrays();
 

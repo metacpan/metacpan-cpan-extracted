@@ -10,163 +10,168 @@ use Scalar::Util qw(blessed);
 
 # feed mime-types:
 our @feed_types = (
-  'application/x.atom+xml', 'application/atom+xml',
-  'application/xml',        'text/xml',
-  'application/rss+xml',    'application/rdf+xml'
+    'application/x.atom+xml', 'application/atom+xml',
+    'application/xml',        'text/xml',
+    'application/rss+xml',    'application/rdf+xml'
 );
 our %is_feed = map { $_ => 1 } @feed_types;
 
-has ua => sub { Mojo::UserAgent->new };
 has charset => 'UTF-8';
 
+has ua            => sub { Mojo::UserAgent->new };
+
 sub parse {
-  my ($self, $xml, $charset) = @_;
-  my ($body, $source, $url, $file);
-  return undef unless ($xml);
-  $body = $self->_from_string($xml) || undef;
-  if (!$body && ($url = $self->_from_url($xml))) {
-    ($body, $charset) = $self->load($url);
-  }
-  if (!$body && ($file = $self->_from_file($xml))) {
-    $body = $file->slurp;
-  }
-  croak "unknown argument $xml" unless ($body);
-  $charset ||= $self->charset;
-  $body = $charset ? decode($charset, $body) // $body : $body;
-  $source = $url || $file;
-  my $feed = Mojo::Feed->new(body => $body, source => $source);
-  return ($feed->is_valid) ? $feed : undef;
-}
-
-sub _from_file {
-  my ($self, $xml) = @_;
-  my $file
-    = (ref $xml)
-    ? (blessed $xml && $xml->can('slurp'))
-      ? $xml
-      : undef
-    : (-r "$xml") ? Mojo::File->new($xml)
-    :               undef;
-  return $file;
-}
-
-sub _from_url {
-  my ($self, $xml) = @_;
-  my $url
-    = (blessed $xml && $xml->isa('Mojo::URL')) ? $xml->clone()
-    : ($xml =~ /^https?\:/) ? Mojo::URL->new("$xml")
-    :                         undef;
-  return $url;
+    my ( $self, $xml, $charset ) = @_;
+    return undef unless ($xml);
+    my ( $body, $source, $url, $file, $feed );
+    if ( $body = $self->_from_string($xml) ) {
+        $feed = Mojo::Feed->new( body => $body );
+    }
+    elsif ( $file = $self->_from_file($xml) ) {
+        $feed = Mojo::Feed->new( file => $file );
+    }
+    elsif ( $url = $self->_from_url($xml) ) {
+        $feed = Mojo::Feed->new( url => $url, ua => $self->ua );
+    }
+    else {
+        croak "unknown argument $xml";
+    }
+    $feed->charset($charset) if ($charset);
+    return ( $feed->is_valid ) ? $feed : undef;
 }
 
 sub _from_string {
-  my ($self, $xml) = @_;
-  my $str = (!ref $xml) ? $xml : (ref $xml eq 'SCALAR') ? $$xml : '';
-  return ($str =~ /^\s*\</s) ? $str : undef;
+    my ( $self, $xml ) = @_;
+    my $str = ( !ref $xml ) ? $xml : ( ref $xml eq 'SCALAR' ) ? $$xml : '';
+    return ( $str =~ /^\s*\</s ) ? $str : undef;
 }
 
-sub load {
-  my ($self, $url) = @_;
-  my $tx = $self->ua->get($url);
-  my $result = $tx->result; # this will croak on network errors
-  if ($result->is_error) {
-    croak "Error getting feed from url ", $url, ": ", $result->message;
-  }
-  return ($result->body, $result->content->charset);
+sub _from_url {
+    my ( $self, $xml ) = @_;
+    my $url =
+        ( blessed $xml && $xml->isa('Mojo::URL') ) ? $xml->clone()
+      : ( $xml =~ /^https?\:/ ) ? Mojo::URL->new("$xml")
+      :                           undef;
+    return $url;
+}
+
+sub _from_file {
+    my ( $self, $xml ) = @_;
+    my $file =
+        ( ref $xml )
+      ? ( blessed $xml && $xml->can('slurp') )
+          ? $xml
+          : undef
+      : ( -r "$xml" ) ? Mojo::File->new($xml)
+      :                 undef;
+    return $file;
 }
 
 # discover - get RSS/Atom feed URL from argument.
 # Code adapted to use Mojolicious from Feed::Find by Benjamin Trott
 # Any stupid mistakes are my own
 sub discover {
-  my ($self, $url) = @_;
+    my ( $self, $url ) = @_;
 
-#  $self->ua->max_redirects(5)->connect_timeout(30);
-  return $self->ua->get_p($url)
-    ->catch(sub { my ($err) = shift; croak "Connection Error: $err" })->then(sub {
-    my ($tx) = @_;
-    if ($tx->res->is_success && $tx->res->code == 200) {
-      return $self->_find_feed_links($tx->req->url, $tx->res);
-    }
-    return;
-    });
+    #  $self->ua->max_redirects(5)->connect_timeout(30);
+    return $self->ua->get_p($url)
+      ->catch( sub { my ($err) = shift; croak "Connection Error: $err" } )
+      ->then(
+        sub {
+            my ($tx) = @_;
+            if ( $tx->res->is_success && $tx->res->code == 200 ) {
+                return $self->_find_feed_links( $tx->req->url, $tx->res );
+            }
+            return;
+        }
+      );
 }
 
 sub _find_feed_links {
-  my ($self, $url, $res) = @_;
+    my ( $self, $url, $res ) = @_;
 
-  state $feed_exp = qr/((\.(?:rss|xml|rdf)$)|(\/feed\/)|(feeds*\.))/;
-  my @feeds;
+    state $feed_exp = qr/((\.(?:rss|xml|rdf)$)|(\/feed\/)|(feeds*\.))/;
+    my @feeds;
 
-  # use split to remove charset attribute from content_type
-  my ($content_type) = split(/[; ]+/, $res->headers->content_type);
-  if ($is_feed{$content_type}) {
-    push @feeds, Mojo::URL->new($url)->to_abs;
-  }
-  else {
-    # we are in a web page. PHEAR.
-    my $base
-      = Mojo::URL->new(
-      $res->dom->find('head base')->map('attr', 'href')->join('') || $url)
-      ->to_abs($url);
-    my $title = $res->dom->find('head > title')->map('text')->join('') || $url;
-    $res->dom->find('head link')->each(sub {
-      my $attrs = $_->attr();
-      return unless ($attrs->{'rel'});
-      my %rel = map { $_ => 1 } split /\s+/, lc($attrs->{'rel'});
-      my $type = ($attrs->{'type'}) ? lc trim $attrs->{'type'} : '';
-      if ($is_feed{$type} && ($rel{'alternate'} || $rel{'service.feed'})) {
-        push @feeds, Mojo::URL->new($attrs->{'href'})->to_abs($base);
-      }
-    });
-    $res->dom->find('a')->grep(sub {
-      $_->attr('href')
-        && $_->attr('href') =~ /$feed_exp/io;
-    })->each(sub {
-      push @feeds, Mojo::URL->new($_->attr('href'))->to_abs($base);
-    });
-
-    # call me crazy, but maybe this is just a feed served as HTML?
-    unless (@feeds) {
-      if ($self->parse($res->body, $res->content->charset)) {
+    # use split to remove charset attribute from content_type
+    my ($content_type) = split( /[; ]+/, $res->headers->content_type );
+    if ( $is_feed{$content_type} ) {
         push @feeds, Mojo::URL->new($url)->to_abs;
-      }
     }
-  }
-  return @feeds;
+    else {
+        # we are in a web page. PHEAR.
+        my $base = Mojo::URL->new(
+                 $res->dom->find('head base')->map( 'attr', 'href' )->join('')
+              || $url )->to_abs($url);
+        my $title =
+          $res->dom->find('head > title')->map('text')->join('') || $url;
+        $res->dom->find('head link')->each(
+            sub {
+                my $attrs = $_->attr();
+                return unless ( $attrs->{'rel'} );
+                my %rel = map { $_ => 1 } split /\s+/, lc( $attrs->{'rel'} );
+                my $type = ( $attrs->{'type'} ) ? lc trim $attrs->{'type'} : '';
+                if ( $is_feed{$type}
+                    && ( $rel{'alternate'} || $rel{'service.feed'} ) )
+                {
+                    push @feeds,
+                      Mojo::URL->new( $attrs->{'href'} )->to_abs($base);
+                }
+            }
+        );
+        $res->dom->find('a')->grep(
+            sub {
+                $_->attr('href')
+                  && $_->attr('href') =~ /$feed_exp/io;
+            }
+        )->each(
+            sub {
+                push @feeds, Mojo::URL->new( $_->attr('href') )->to_abs($base);
+            }
+        );
+
+        # call me crazy, but maybe this is just a feed served as HTML?
+        unless (@feeds) {
+            if ( $self->parse( $res->body, $res->content->charset ) ) {
+                push @feeds, Mojo::URL->new($url)->to_abs;
+            }
+        }
+    }
+    return @feeds;
 }
 
 sub parse_opml {
-  my ($self, $opml_file) = @_;
-  my $opml_str = decode $self->charset,
-    (ref $opml_file) ? $opml_file->slurp : Mojo::File->new($opml_file)->slurp;
-  my $d = Mojo::DOM->new->parse($opml_str);
-  my (%subscriptions, %categories);
-  for my $item ($d->find(q{outline})->each) {
-    my $node = $item->attr;
-    if (!defined $node->{xmlUrl}) {
-      my $cat = $node->{title} || $node->{text};
-      $categories{$cat} = $item->children('[xmlUrl]')->map('attr', 'xmlUrl');
+    my ( $self, $opml_file ) = @_;
+    my $opml_str = decode $self->charset,
+      ( ref $opml_file )
+      ? $opml_file->slurp
+      : Mojo::File->new($opml_file)->slurp;
+    my $d = Mojo::DOM->new->parse($opml_str);
+    my ( %subscriptions, %categories );
+    for my $item ( $d->find(q{outline})->each ) {
+        my $node = $item->attr;
+        if ( !defined $node->{xmlUrl} ) {
+            my $cat = $node->{title} || $node->{text};
+            $categories{$cat} =
+              $item->children('[xmlUrl]')->map( 'attr', 'xmlUrl' );
+        }
+        else {    # file by RSS URL:
+            $subscriptions{ $node->{xmlUrl} } = $node;
+        }
     }
-    else {    # file by RSS URL:
-      $subscriptions{$node->{xmlUrl}} = $node;
-    }
-  }
 
-
-  # assign categories
-  for my $cat (keys %categories) {
-    for my $rss ($categories{$cat}->each) {
-      next
-        unless ($subscriptions{$rss})
-        ;     # don't auto-vivify for empty "categories"
-      $subscriptions{$rss}{'categories'} ||= [];
-      push @{$subscriptions{$rss}{'categories'}}, $cat;
+    # assign categories
+    for my $cat ( keys %categories ) {
+        for my $rss ( $categories{$cat}->each ) {
+            next
+              unless ( $subscriptions{$rss} )
+              ;    # don't auto-vivify for empty "categories"
+            $subscriptions{$rss}{'categories'} ||= [];
+            push @{ $subscriptions{$rss}{'categories'} }, $cat;
+        }
     }
-  }
-  return (values %subscriptions);
+    return ( values %subscriptions );
 }
-
 
 1;
 __END__

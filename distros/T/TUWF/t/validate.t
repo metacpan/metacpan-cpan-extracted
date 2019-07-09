@@ -140,7 +140,7 @@ t { ascii => 1 }, "a\nb", "a\nb", { validation => 'ascii', got => "a\nb" };
 
 # custom validations
 t { hex => 1 }, 'DeadBeef', 'DeadBeef', undef;
-t { hex => 1 }, 'x', 'x', { validation => 'hex', error => { validation => 'regex', regex => '(?^i:^[0-9a-f]*$)', got => 'x' } };
+t { hex => 1 }, 'x', 'x', { validation => 'hex', error => { validation => 'regex', regex => "$validations{hex}{regex}", got => 'x' } };
 t { prefix => 'a' }, 'abc', 'abc', undef;
 t { prefix => 'a' }, 'cba', 'cba', { validation => 'prefix', error => { validation => 'func', result => '' } };
 t { bool => 1 }, 'abc', 1, undef;

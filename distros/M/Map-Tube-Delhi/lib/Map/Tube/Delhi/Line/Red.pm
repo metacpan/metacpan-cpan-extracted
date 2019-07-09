@@ -1,6 +1,6 @@
 package Map::Tube::Delhi::Line::Red;
 $Map::Tube::Delhi::Line::Red::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Delhi::Line::Red::VERSION = '0.92';
+$Map::Tube::Delhi::Line::Red::VERSION = '0.93';
 use 5.006;
 use strict; use warnings;
 
@@ -10,7 +10,7 @@ Map::Tube::Delhi::Line::Red - Delhi Metro Map: Red Line.
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

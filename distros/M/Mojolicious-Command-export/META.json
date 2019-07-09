@@ -51,7 +51,11 @@
    "provides" : {
       "Mojolicious::Command::export" : {
          "file" : "lib/Mojolicious/Command/export.pm",
-         "version" : "0.004"
+         "version" : "0.005"
+      },
+      "Mojolicious::Plugin::Export" : {
+         "file" : "lib/Mojolicious/Plugin/Export.pm",
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -66,7 +70,7 @@
          "web" : "https://github.com/preaction/Mojolicious-Command-export"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:PREACTION",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"

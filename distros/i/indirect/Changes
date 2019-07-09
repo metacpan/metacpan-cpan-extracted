@@ -1,5 +1,11 @@
 Revision history for indirect
 
+0.39    2019-07-08 12:00 UTC
+        + Fix : [RT #127118] : Fails on perl >= v5.28.0 with -DDEBUGGING
+                The module has been amended to accomodate with a change of
+                behaviour of a core macro.
+        + Upd : Contact info.
+
 0.38    2017-11-04 15:40 UTC
         + Fix : [RT #123374] : Compatibility with CV-in-stash optimisation
                 Thanks Father Chrysostomos for reporting and contributing a

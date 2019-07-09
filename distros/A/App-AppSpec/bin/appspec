@@ -6,7 +6,7 @@ use warnings;
 use 5.010;
 use Data::Dumper;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use App::Spec;
 use App::AppSpec;

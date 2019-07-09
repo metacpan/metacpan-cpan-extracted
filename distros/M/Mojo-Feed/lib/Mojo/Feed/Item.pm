@@ -1,5 +1,6 @@
 package Mojo::Feed::Item;
 use Mojo::Base '-base';
+use Mojo::Util qw( trim );
 
 use overload
   bool     => sub {1},
@@ -17,7 +18,7 @@ has tags => sub {
 };
 
 has 'dom';
-has 'feed';
+has feed => undef, weak => 1;
 
 has summary => sub { shift->description };
 
@@ -50,9 +51,9 @@ foreach my $k (keys %selector) {
     for my $selector (@{$selector{$k}}) {
       if (my $p = $self->_at($selector)) {
         if ($k eq 'author' && $p->at('name')) {
-          return $p->at('name')->text;
+          return trim $p->at('name')->text;
         }
-        my $text = $p->text || $p->content;
+        my $text = trim ($p->text || $p->content || '');
         if ($k eq 'published') {
           return str2time($text);
         }
@@ -88,11 +89,11 @@ has link => sub {
     if ($l->attr('href')
       && (!$l->attr('rel') || $l->attr('rel') eq 'alternate'))
     {
-      $link = $l->attr('href');
+      $link = trim $l->attr('href');
     }
     else {
       if ($l->text =~ /\w+/) {
-        $link = $l->text;    # simple link
+        $link = trim $l->text;    # simple link
       }
     }
   });

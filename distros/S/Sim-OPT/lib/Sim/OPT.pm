@@ -2,7 +2,7 @@ package Sim::OPT;
 # Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by block coordinate search.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-$VERSION = '0.395';
+$VERSION = '0.411';
 use v5.14;
 # use v5.20;
 use Exporter;
@@ -163,6 +163,51 @@ sub countnetarray
 	@bag = uniq( @bag );
 	return scalar( @bag ); # TO BE CALLED WITH: countnetarray(@array)
 }
+
+
+sub addnear
+{
+  my ( $this_bulkref, $varnums_ref ) = @_;
+	my $this = $this_bulkref->[0][0];
+	my $pass = dclone($this_bulkref);
+	my %varnums = %{ $varnums_ref };
+	my @keys = ( keys %varnums );
+	my @signs = ( "+", "-" );
+	my %thiselts = split( "_|-", $this );
+
+  my $that;
+	my $done = "no";
+	while ( $done eq "no" )
+	{
+		my @pars = shuffle( @keys );
+		my @signs = shuffle( @signs );
+		my $par = $pars[0];
+		my $sign = $signs[0];
+		my $maxlev = $varnums{$par};
+		my $lev = $thiselts{$par};
+		my $newlev;
+		if ( $sign eq "+" )
+		{
+			$newlev = ( $lev + 1 );
+		}
+		elsif ( $sign eq "-" )
+		{
+			$newlev = ( $lev - 1 );
+		}
+
+		my $bit = $par . "-" . $newlev;
+		unless( ( $newlev == $lev ) or ( $newlev == 0 ) or ( $newlev > $maxlev ) )
+		{
+			my $firstbit = $par . "-"; #say "\$firstbit $firstbit";
+			$that = $this;
+			$that =~ s/$firstbit(\d)/$bit/ ; #say "\$that $that";
+			$done = "yes"; #say "\$done $done";
+		}
+	}
+	$pass->[0][0] = $that;
+	return( $pass );
+}
+
 
 sub sorttable # TO SORT A TABLE ON THE BASIS OF A COLUMN
 {
@@ -1801,6 +1846,17 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			}
 		} #say $tee "In cleanduplicates \@finals!: " . dump ( @finals );
 		return( @finals );
+	}
+
+	if ( $dowhat{pairpoints} eq "yes" )
+	{
+		my @boox;
+		foreach my $el ( @buux )
+		{
+			my $newel = addnear( $el, \%varnums );
+			push( @boox, $el, $newel );
+		}
+		@buux = @boox;
 	}
 
 	my ( @finalbox );

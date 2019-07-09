@@ -2,10 +2,10 @@ use strict;
 use warnings;
 package App::AppSpec::Schema::Validator;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use App::Spec;
-use File::Share qw/ dist_file /;
+use App::Spec::Schema qw/ $SCHEMA /;
 use YAML::PP;
 use Moo;
 
@@ -20,11 +20,8 @@ sub validate_spec {
     my ($self, $spec) = @_;
     eval { require JSON::Validator }
         or die "JSON::Validator is needed for validating a spec file";
-    my $schema_file = dist_file("App-Spec", "schema.yaml");
     my $json_validator = JSON::Validator->new;
-    my $yp = YAML::PP->new( boolean => 'JSON::PP', schema => [qw/ JSON /] );
-    my $schema = $yp->load_file($schema_file);
-    $json_validator->schema($schema);
+    $json_validator->schema($SCHEMA);
     my @errors = $json_validator->validate($spec);
     return @errors;
 }

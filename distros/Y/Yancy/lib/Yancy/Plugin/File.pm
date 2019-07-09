@@ -1,17 +1,18 @@
 package Yancy::Plugin::File;
-our $VERSION = '1.035';
+our $VERSION = '1.036';
 # ABSTRACT: Manage file uploads, attachments, and other assets
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     # XXX
+#pod     # Write a file
+#pod     $c->yancy->file->write( $c->param( 'upload' ) );
 #pod
 #pod =head1 DESCRIPTION
 #pod
 #pod B<Note:> This module is C<EXPERIMENTAL> and its API may change before
 #pod Yancy v2.000 is released.
 #pod
-#pod XXX
+#pod This plugin manages file uploads. Files are stored in the C<file_root> by
 #pod
 #pod This plugin API is meant to be subclassed by other asset storage
 #pod mechanisms such as Hadoop or Amazon S3.
@@ -30,7 +31,19 @@ our $VERSION = '1.035';
 #pod
 #pod This plugin has the following configuration options.
 #pod
-#pod XXX
+#pod =head2 file_root
+#pod
+#pod The root path to store files. Defaults to C<public/uploads> in the application's home
+#pod directory.
+#pod
+#pod =head2 url_root
+#pod
+#pod The URL used to reach the C<file_root>. Defaults to C</uploads>.
+#pod
+#pod =head2 moniker
+#pod
+#pod The name to use for the helper. Defaults to C<file> (creating a C<yancy.file> helper).
+#pod Change this to add multiple file plugins.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -60,8 +73,23 @@ sub register {
     $app->helper( 'yancy.' . $moniker, sub { $self } );
 }
 
+#pod =method write
+#pod
+#pod     $url_path = $c->yancy->file->write( $upload );
+#pod     $url_path = $c->yancy->file->write( $name, $asset );
+#pod
+#pod Write a file into storage. C<$upload> is a L<Mojo::Upload> object. C<$name>
+#pod is a filename and C<$asset> is a L<Mojo::Asset> object. Returns the URL
+#pod of the uploaded file.
+#pod
+#pod =cut
+
 sub write {
     my ( $self, $name, $asset ) = @_;
+    if ( ref $name eq 'Mojo::Upload' ) {
+        $asset = $name->asset;
+        $name = $name->filename;
+    }
     my $digest = $self->_digest_file( $asset );
     my @path_parts = grep $_, split /(..)/, $digest, 3;
     my $root = $self->file_root;
@@ -71,19 +99,19 @@ sub write {
     return join '/', $self->url_root, $file_path->to_rel( $root );
 }
 
-sub read {
-    my ( $self, $path ) = @_;
-    my $asset = Mojo::Asset::File->new( path => $self->file_root->child( $path ) );
-    return $asset;
-}
-
-sub exists {
-    my ( $self, $path ) = @_;
-    return -e $self->file_root->child( $path );
-}
+#pod =method cleanup
+#pod
+#pod     $app->yancy->file->cleanup( $app->yancy->backend );
+#pod     $app->yancy->file->cleanup( $app->yancy->backend, $app->yancy->schema );
+#pod
+#pod Clean up any files that do not exist in the given backend. Call this daily
+#pod or weekly to remove files that aren't needed anymore.
+#pod
+#pod =cut
 
 sub cleanup {
     my ( $self, $backend, $schema ) = @_;
+    $schema ||= $backend->schema;
     # Clean up any unlinked files by scanning the entire database for
     # files and then leaving only those files.
     my ( %files, %linked );
@@ -161,18 +189,19 @@ Yancy::Plugin::File - Manage file uploads, attachments, and other assets
 
 =head1 VERSION
 
-version 1.035
+version 1.036
 
 =head1 SYNOPSIS
 
-    # XXX
+    # Write a file
+    $c->yancy->file->write( $c->param( 'upload' ) );
 
 =head1 DESCRIPTION
 
 B<Note:> This module is C<EXPERIMENTAL> and its API may change before
 Yancy v2.000 is released.
 
-XXX
+This plugin manages file uploads. Files are stored in the C<file_root> by
 
 This plugin API is meant to be subclassed by other asset storage
 mechanisms such as Hadoop or Amazon S3.
@@ -187,11 +216,42 @@ in cron:
     # Clean up files every week
     0 0 * * 0 ./myapp.pl eval 'app->yancy->file->cleanup( app->yancy->backend, app->yancy->schema )'
 
+=head1 METHODS
+
+=head2 write
+
+    $url_path = $c->yancy->file->write( $upload );
+    $url_path = $c->yancy->file->write( $name, $asset );
+
+Write a file into storage. C<$upload> is a L<Mojo::Upload> object. C<$name>
+is a filename and C<$asset> is a L<Mojo::Asset> object. Returns the URL
+of the uploaded file.
+
+=head2 cleanup
+
+    $app->yancy->file->cleanup( $app->yancy->backend );
+    $app->yancy->file->cleanup( $app->yancy->backend, $app->yancy->schema );
+
+Clean up any files that do not exist in the given backend. Call this daily
+or weekly to remove files that aren't needed anymore.
+
 =head1 CONFIGURATION
 
 This plugin has the following configuration options.
 
-XXX
+=head2 file_root
+
+The root path to store files. Defaults to C<public/uploads> in the application's home
+directory.
+
+=head2 url_root
+
+The URL used to reach the C<file_root>. Defaults to C</uploads>.
+
+=head2 moniker
+
+The name to use for the helper. Defaults to C<file> (creating a C<yancy.file> helper).
+Change this to add multiple file plugins.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension App::jl
 
+0.14    Sun Jul  7 06:01:30 JST 2019
+        - Remove `depth` option
+        - Add `X` option
+        - Add test for aliases of CLI option parser
+        - Fix bug: Not call recursively if value would be number
+
 0.13    Mon Jul  1 15:03:15 JST 2019
         - Add `sweep` option
         - Support multiple grep/ignore options

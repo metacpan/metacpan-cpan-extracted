@@ -3,11 +3,12 @@ use strict;
 use warnings;
 use JSON qw//;
 use Sub::Data::Recursive;
+use B;
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
-my $MAX_DEPTH = 10;
+my $MAX_RECURSIVE_CALL = 255;
 
 my $MAYBE_UNIXTIME = join '|', (
     'create',
@@ -145,7 +146,7 @@ sub _recursive_process {
 
     $self->_recursive_pre_process($decoded);
 
-    $self->{_depth} = $self->opt('depth');
+    $self->{_recursive_call} = $MAX_RECURSIVE_CALL;
     $self->_recursive_decode_json($decoded);
 
     $self->_recursive_post_process($decoded);
@@ -153,6 +154,8 @@ sub _recursive_process {
 
 sub _recursive_pre_process {
     my ($self, $decoded) = @_;
+
+    $INVOKER->invoke(\&_trim => $decoded);
 
     $self->_invoker(\&_split_lf => $decoded) if $self->opt('x');
 }
@@ -328,19 +331,31 @@ sub _recursive_decode_json {
     my ($self, $hash) = @_;
 
     Sub::Data::Recursive->invoke(sub {
-        if ($self->{_depth} > 0) {
+        if ($self->{_recursive_call} > 0) {
             my $orig = $_[0];
             return if $orig =~ m!^\[\d+\]$!;
-            my $decoded = eval {
-                $self->{_json}->decode($orig);
-            };
-            if (!$@) {
-                $self->{_depth}--;
-                $_[0] = $decoded;
-                $self->_recursive_decode_json($_[0]); # recursive calling
+            if (!_is_number($_[0])) {
+                my $decoded = eval {
+                    $self->{_json}->decode($orig);
+                };
+                if (!$@) {
+                    $_[0] = $decoded;
+                    $self->{_recursive_call}--;
+                    $self->_recursive_decode_json($_[0]); # recursive calling
+                }
             }
         }
     } => $hash);
+}
+
+# copied from Data::Recursive::Encode
+sub _is_number {
+    my $value = shift;
+    return 0 unless defined $value;
+
+    my $b_obj = B::svref_2object(\$value);
+    my $flags = $b_obj->FLAGS;
+    return $flags & ( B::SVp_IOK | B::SVp_NOK ) && !( $flags & B::SVp_POK ) ? 1 : 0;
 }
 
 sub _parse_opt {
@@ -350,13 +365,12 @@ sub _parse_opt {
 
     GetOptionsFromArray(
         \@argv,
-        'depth=s'   => \$opt->{depth},
         'no-pretty' => \$opt->{no_pretty},
         'x'         => \$opt->{x},
         'xx'        => \$opt->{xx},
         'xxx'       => \$opt->{xxx},
         'xxxx'      => \$opt->{xxxx},
-        'xxxxx'     => \$opt->{xxxxx},
+        'X|xxxxx'   => \$opt->{xxxxx},
         'timestamp-key=s' => \$opt->{timestamp_key},
         'gmtime'    => \$opt->{gmtime},
         'g|grep=s@' => \$opt->{grep},
@@ -373,8 +387,6 @@ sub _parse_opt {
             exit 1;
         },
     ) or $class->_show_usage(2);
-
-    $opt->{depth} ||= $MAX_DEPTH;
 
     $opt->{xxxx} ||= $opt->{xxxxx};
     $opt->{xxx}  ||= $opt->{xxxx};
@@ -439,7 +451,7 @@ The main routine
 
 =begin html
 
-<a href="https://github.com/bayashi/App-jl/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1561961170"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1561961170&branch=master"/></a>
+<a href="https://github.com/bayashi/App-jl/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1562446988"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1562446988&branch=master"/></a>
 
 =end html
 

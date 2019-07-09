@@ -9,7 +9,6 @@ use Test::More ;
 plan skip_all => "Distribution hasn't been built yet" unless -d "blib/lib";
 
 my $test = Test::Compile::Internal->new();
-$test->verbose(0);
 
 # lib.pl has a dodgy begin block which messes with @INC.
 # - that should force it to *only* look in blib/lib for

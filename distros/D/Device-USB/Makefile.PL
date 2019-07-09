@@ -71,6 +71,7 @@ WriteMakefile(
         FILES => 'Device-USB-* USB.inl _Inline'
     },
     META_MERGE          => {
+        x_deprecated => 1,
         resources => {
             repository => {
                 type => 'git',

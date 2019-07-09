@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -24,11 +24,11 @@
 # loop below drawing is done to the back buffer then swapped to the front to
 # display.
 #
-# The drawing shows alternatively a circle and square.  The new figure is
+# The drawing shows alternately a circle and square.  The new figure is
 # drawn to the back buffer and then swapped to the front so it changes
 # immediately, without a separate clear and draw which the user might see as
 # a flash or flicker.  Of course a circle or square will draw fast enough
-# that double buffering is hardly needed, but for more complex contents can
+# that double buffering is hardly needed, but more complex contents can
 # benefit.
 #
 # When a window gets an "expose", as happens here on the initial MapWindow,
@@ -37,10 +37,10 @@
 # there's no need to explicitly erase the back buffer.
 #
 # In a realistic program of course you'd listen and read events from the
-# server in between drawing, and might work in at least one server
-# round-trip between drawing so as to wait if the server is under a heavy
-# load etc.  (Or wait if no synchronizing reply is received for a certain
-# time or number of frames, etc.)
+# server in between drawing, and might wait for at least one server
+# round-trip between drawing so as not to hammer the server it it's under a
+# heavy load.  Could wait a certain time or certain number of frames for a
+# synchronizing reply, in case it's network latency rather than server load.
 #
 
 use strict;

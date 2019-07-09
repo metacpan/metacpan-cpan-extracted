@@ -113,13 +113,13 @@ my %META = (
   bugtracker => "http://rt.cpan.org/Dist/Display.html?Name=$dist",
   homepage   => "http://search.cpan.org/dist/$dist/",
   license    => 'http://dev.perl.org/licenses/',
-  repository => "http://git.profvince.com/?p=perl%2Fmodules%2F$dist.git",
+  repository => "http://git.vpit.fr/?p=perl%2Fmodules%2F$dist.git",
  },
 );
 
 WriteMakefile(
  NAME             => $name,
- AUTHOR           => 'Vincent Pit <perl@profvince.com>',
+ AUTHOR           => 'Vincent Pit <vpit@cpan.org>',
  LICENSE          => 'perl',
  VERSION_FROM     => $file,
  ABSTRACT_FROM    => $file,

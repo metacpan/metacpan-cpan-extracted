@@ -28,6 +28,7 @@
             "HTTP::Daemon" : "0",
             "HTTP::Response" : "0",
             "HTTP::Status" : "0",
+            "IO::Socket::SSL" : "0",
             "Test::More" : "0"
          }
       },
@@ -62,6 +63,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.76",
+   "version" : "0.77",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

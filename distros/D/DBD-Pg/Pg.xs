@@ -283,7 +283,7 @@ quote(dbh, to_quote_sv, type_sv=Nullsv)
 			}
 
 			/* At this point, type_info points to a valid struct, one way or another */
-			utf8 = imp_dbh->client_encoding_utf8 && PG_BYTEA != type_info->type_id;
+			utf8 = imp_dbh->client_encoding_utf8 && PG_BYTEA != type_info->type_id && SQL_VARBINARY != type_info->type_id;
 
 			if (SvMAGICAL(to_quote_sv))
 				(void)mg_get(to_quote_sv);
@@ -317,15 +317,20 @@ void state(dbh)
           : sv_2mortal(newSVpv(imp_dbh->sqlstate, 5));
 
 
-void do(dbh, statement, attr=Nullsv, ...)
+void do(dbh, statement_sv, attr=Nullsv, ...)
 	SV * dbh
-	char * statement
+	SV * statement_sv
 	SV * attr
 	PROTOTYPE: $$;$@
 	CODE:
 	{
 		long retval;
 		int asyncflag = 0;
+		char *statement;
+		D_imp_dbh(dbh);
+
+		statement_sv = pg_rightgraded_sv(aTHX_ statement_sv, imp_dbh->pg_utf8_flag);
+		statement = SvPV_nolen(statement_sv);
 
 		if (statement[0] == '\0') { /* Corner case */
 			XST_mUNDEF(0);

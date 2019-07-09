@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -585,9 +585,10 @@ sub _initialise_version {
         my $version_string = $self->execute( $binary, '--version' );
         if ( $version_string =~
             /Mozilla[ ]Firefox[ ](\d+)[.](\d+)(?:[.](\d+))?\s*$/smx )
-            # not anchoring the start of the regex b/c of issues with
-            # RHEL6 and dbus crashing with error messages like 
-            # 'Failed to open connection to "session" message bus: /bin/dbus-launch terminated abnormally without any error message'
+
+# not anchoring the start of the regex b/c of issues with
+# RHEL6 and dbus crashing with error messages like
+# 'Failed to open connection to "session" message bus: /bin/dbus-launch terminated abnormally without any error message'
         {
             $self->{_initial_version}->{major} = $1;
             $self->{_initial_version}->{minor} = $2;
@@ -3598,7 +3599,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.76
+Version 0.77
 
 =head1 SYNOPSIS
 
@@ -4542,7 +4543,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

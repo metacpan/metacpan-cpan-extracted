@@ -51,6 +51,8 @@ lib/Quiq/File/Image.pm
 lib/Quiq/File/Video.pm
 lib/Quiq/FileHandle.pm
 lib/Quiq/Formatter.pm
+lib/Quiq/GD/Font.pm
+lib/Quiq/GD/Image.pm
 lib/Quiq/Gnuplot/Arrow.pm
 lib/Quiq/Gnuplot/Graph.pm
 lib/Quiq/Gnuplot/Label.pm
@@ -220,6 +222,8 @@ t/bin/Quiq/File/Image.t
 t/bin/Quiq/File/Video.t
 t/bin/Quiq/FileHandle.t
 t/bin/Quiq/Formatter.t
+t/bin/Quiq/GD/Font.t
+t/bin/Quiq/GD/Image.t
 t/bin/Quiq/Gnuplot/Arrow.t
 t/bin/Quiq/Gnuplot/Graph.t
 t/bin/Quiq/Gnuplot/Label.t
@@ -342,6 +346,7 @@ t/data/db/person.tab
 t/data/db/test-databases.conf
 t/data/etc/test1.conf
 t/data/etc/test2.conf
+t/data/font/pala.ttf
 t/data/gnuplot/process/cpu_count.dat
 t/data/gnuplot/process/cpu_percent.dat
 t/data/gnuplot/process/processes.dat

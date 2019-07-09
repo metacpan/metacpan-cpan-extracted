@@ -1,0 +1,158 @@
+NAME
+    Cwalitee::Common - Common Cwalitee routines
+
+VERSION
+    This document describes version 0.002 of Cwalitee::Common (from Perl
+    distribution Cwalitee-Common), released on 2019-07-07.
+
+SYNOPSIS
+DESCRIPTION
+    What is cwalitee? Metric to attempt to gauge the quality of something.
+    Since actual quality is hard to measure, this metric is called a
+    "cwalitee" instead. The cwalitee concept follows "kwalitee" [1] which is
+    specifically to measure the quality of CPAN distribution. I pick a
+    different spelling to avoid confusion with kwalitee. And unlike
+    kwalitee, the unqualified term "cwalitee" does not refer to a specific,
+    particular subject. There can be "module abstract cwalitee" (which is
+    handled by this module), "CPAN Changes cwalitee", and so on.
+
+FUNCTIONS
+  calc_cwalitee
+    Usage:
+
+     calc_cwalitee(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code_fixup_r => *code*
+
+    *   code_init_r* => *code*
+
+    *   exclude_indicator => *array[str]*
+
+        Do not use these indicators.
+
+    *   exclude_indicator_module => *array[perl::modname]*
+
+        Do not use indicators from these modules.
+
+    *   exclude_indicator_status => *array[str]*
+
+        Do not use indicators having these statuses.
+
+    *   include_indicator => *array[str]*
+
+        Only use these indicators.
+
+    *   include_indicator_module => *array[perl::modname]*
+
+        Only use indicators from these modules.
+
+    *   include_indicator_status => *array[str]* (default: ["stable"])
+
+        Only use indicators having these statuses.
+
+    *   min_indicator_severity => *uint* (default: 1)
+
+        Minimum indicator severity.
+
+    *   prefix => *perl::modprefix* (default: "")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_cwalitee_indicators
+    Usage:
+
+     list_cwalitee_indicators(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   exclude => *array[str]*
+
+        Exclude by name.
+
+    *   exclude_module => *array[perl::modname]*
+
+        Exclude by module.
+
+    *   exclude_status => *array[str]*
+
+        Exclude by status.
+
+    *   include => *array[str]*
+
+        Include by name.
+
+    *   include_module => *array[perl::modname]*
+
+        Include by module.
+
+    *   include_status => *array[str]* (default: ["stable"])
+
+        Include by status.
+
+    *   max_severity => *int* (default: 5)
+
+        Maximum severity.
+
+    *   min_severity => *int* (default: 1)
+
+        Minimum severity.
+
+    *   prefix => *perl::modprefix* (default: "")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Cwalitee-Common>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Cwalitee-Common>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Cwalitee-Common>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    CPAN::Changes::Cwalitee
+
+    Module::Abstract::Cwalitee
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -22,7 +22,7 @@ use Carp;
 use X11::Protocol;
 
 use vars '$VERSION', '@CARP_NOT';
-$VERSION = 30;
+$VERSION = 31;
 @CARP_NOT = ('X11::Protocol');
 
 # uncomment this to run the ### lines
@@ -240,8 +240,8 @@ the client to adapt to the server's layout, which can be a bit of a chore.
 A shared memory segment can be created from Perl with C<shmget()>, then read
 or write its contents with C<shmread()> and C<shmwrite()>.  Those functions
 attach and detach it each time with C<shmat()> and C<shmdt()> system calls,
-which is fine for grabbing the lot, but will be a bit slow for lots of
-little accesses.
+which is fine for grabbing the lot but will be a bit slow for lots of little
+accesses.
 
 C<IPC::SysV> (version 2 up) offers a C<shmat()> to keep the block attached
 and C<memread()> and C<memwrite()> to access it (see L<IPC::SysV>).  See
@@ -250,7 +250,7 @@ L<IPC::SharedMem> for an object-oriented wrapper around this too.
 Incidentally, if C<shmget()> is not available on the system then Perl's
 C<shmget()> croaks.  It's always possible for it to return C<undef> too for
 not enough memory etc.  With that, not being on the same machine, not having
-identifiable perms, etc, there's a quite a few cases where a fallback to
+identifiable permissions, etc, there's several cases where a fallback to
 plain I/O will be necessary.
 
 =head2 Shm Permissions
@@ -267,12 +267,12 @@ world-readable (or world read-writable) segments.
 
 You can make a shm segment world-readable to ensure the server can read it.
 If the data for a PutImage etc is already from a world-readable file or is
-public then it doesn't matter who else reads the segment.  Remember to ask
-for read-only in the C<MitShmAttach()> so the server doesn't want writable
-too.
+public then it shouldn't matter much who else reads the segment.  Remember
+to ask for read-only in the C<MitShmAttach()> so the server doesn't want
+writable too.
 
-There's probably no need to risk relaxing permissions for writing.  Chances
-are that if client UID/GID can't be identified then it's because the
+There's probably no need to risk relaxing permissions for segment writing.
+Chances are that if client UID/GID can't be identified then it's because the
 connection is not local and the server is on a different machine so shared
 memory can't be used anyway.
 
@@ -446,7 +446,8 @@ L<IPC::SharedMem>
 L<X11::Protocol::Ext::Damage>
 
 F</usr/share/doc/x11proto-xext-dev/shm.txt.gz>,
-F</usr/share/X11/doc/hardcopy/Xext/mit-shm.PS.gz>
+F</usr/share/X11/doc/hardcopy/Xext/mit-shm.PS.gz>,
+F<ftp://ftp.xfree86.org/pub/mirror/X.Org/pub/R6.6/xc/doc/hardcopy/Xext/mit-shm.PS.gz>
 
 =head1 HOME PAGE
 

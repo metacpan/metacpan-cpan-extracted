@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CPANChangesCwaliteeUtils/calc_cpan_changes_cwalitee
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-07-03'; # DATE
+our $DATE = '2019-07-06'; # DATE
 our $DIST = 'App-CPANChangesCwaliteeUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ calc-cpan-changes-cwalitee - Calculate CPAN Changes cwalitee
 
 =head1 VERSION
 
-This document describes version 0.001 of calc-cpan-changes-cwalitee (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-03.
+This document describes version 0.002 of calc-cpan-changes-cwalitee (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-06.
 
 =head1 SYNOPSIS
 
@@ -54,6 +54,96 @@ C<*> marks required options.
 =over
 
 =item B<--path>=I<s>
+
+=back
+
+=head2 Indicator selection options
+
+=over
+
+=item B<--exclude-indicator-json>=I<s>, B<-X>
+
+Do not use these indicators (JSON-encoded).
+
+See C<--exclude-indicator>.
+
+=item B<--exclude-indicator-module-json>=I<s>
+
+Do not use indicators from these modules (JSON-encoded).
+
+See C<--exclude-indicator-module>.
+
+=item B<--exclude-indicator-module>=I<s@>
+
+Do not use indicators from these modules.
+
+Can be specified multiple times.
+
+=item B<--exclude-indicator-status-json>=I<s>
+
+Do not use indicators having these statuses (JSON-encoded).
+
+See C<--exclude-indicator-status>.
+
+=item B<--exclude-indicator-status>=I<s@>
+
+Do not use indicators having these statuses.
+
+Can be specified multiple times.
+
+=item B<--exclude-indicator>=I<s@>
+
+Do not use these indicators.
+
+Can be specified multiple times.
+
+=item B<--include-indicator-json>=I<s>, B<-I>
+
+Only use these indicators (JSON-encoded).
+
+See C<--include-indicator>.
+
+=item B<--include-indicator-module-json>=I<s>
+
+Only use indicators from these modules (JSON-encoded).
+
+See C<--include-indicator-module>.
+
+=item B<--include-indicator-module>=I<s@>
+
+Only use indicators from these modules.
+
+Can be specified multiple times.
+
+=item B<--include-indicator-status-json>=I<s>
+
+Only use indicators having these statuses (JSON-encoded).
+
+See C<--include-indicator-status>.
+
+=item B<--include-indicator-status>=I<s@>
+
+Only use indicators having these statuses.
+
+Default value:
+
+ ["stable"]
+
+Can be specified multiple times.
+
+=item B<--include-indicator>=I<s@>
+
+Only use these indicators.
+
+Can be specified multiple times.
+
+=item B<--min-indicator-severity>=I<s>
+
+Minimum indicator severity.
+
+Default value:
+
+ 1
 
 =back
 

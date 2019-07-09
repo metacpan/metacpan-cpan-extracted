@@ -11,7 +11,7 @@ Yancy::Help::Upgrading - Changes and deprecations when upgrading Yancy
 
 =head1 VERSION
 
-version 1.035
+version 1.036
 
 =head1 DESCRIPTION
 

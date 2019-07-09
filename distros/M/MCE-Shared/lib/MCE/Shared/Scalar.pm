@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -101,7 +101,7 @@ MCE::Shared::Scalar - Scalar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Scalar version 1.840
+This document describes MCE::Shared::Scalar version 1.841
 
 =head1 DESCRIPTION
 
@@ -169,9 +169,9 @@ This module may involve TIE when accessing the object via scalar dereferencing.
 Only shared instances are impacted if doing so. Although likely fast enough for
 many use cases, the OO interface is recommended for best performance.
 
-=over 3
+=head2 MCE::Shared::Scalar->new ( [ value ] )
 
-=item new ( [ value ] )
+=head2 MCE::Shared->scalar ( [ value ] )
 
 Constructs a new object. Its value is undefined when C<value> is not specified.
 
@@ -189,7 +189,7 @@ Constructs a new object. Its value is undefined when C<value> is not specified.
  $var = MCE::Shared->scalar( "bar" );
  $var = MCE::Shared->scalar;
 
-=item set ( value )
+=head2 set ( value )
 
 Preferably, set the value via the OO interface. Otherwise, C<TIE> is activated
 on-demand for setting the value. The new value is returned in scalar context.
@@ -198,7 +198,7 @@ on-demand for setting the value. The new value is returned in scalar context.
  $var->set( "baz" );
  ${$var} = "baz";
 
-=item get
+=head2 get
 
 Likewise, obtain the value via the OO interface. C<TIE> is utilized for
 retrieving the value otherwise.
@@ -206,15 +206,13 @@ retrieving the value otherwise.
  $val = $var->get;
  $val = ${$var};
 
-=item len
+=head2 len
 
 Returns the length of the value. It returns the C<undef> value if the value
 is not defined.
 
  $len = $var->len;
  length ${$var};
-
-=back
 
 =head1 SUGAR METHODS
 
@@ -225,57 +223,53 @@ reduction in inter-process communication.
 The API resembles a subset of the Redis primitives
 L<http://redis.io/commands#strings> without the key argument.
 
-=over 3
-
-=item append ( value )
+=head2 append ( value )
 
 Appends a value at the end of the current value and returns its new length.
 
  $len = $var->append( "foo" );
 
-=item decr
+=head2 decr
 
 Decrements the value by one and returns its new value.
 
  $num = $var->decr;
 
-=item decrby ( number )
+=head2 decrby ( number )
 
 Decrements the value by the given number and returns its new value.
 
  $num = $var->decrby( 2 );
 
-=item getdecr
+=head2 getdecr
 
 Decrements the value by one and returns its old value.
 
  $old = $var->getdecr;
 
-=item getincr
+=head2 getincr
 
 Increments the value by one and returns its old value.
 
  $old = $var->getincr;
 
-=item getset ( value )
+=head2 getset ( value )
 
 Sets the value and returns its old value.
 
  $old = $var->getset( "baz" );
 
-=item incr
+=head2 incr
 
 Increments the value by one and returns its new value.
 
  $num = $var->incr;
 
-=item incrby ( number )
+=head2 incrby ( number )
 
 Increments the value by the given number and returns its new value.
 
  $num = $var->incrby( 2 );
-
-=back
 
 =head1 CREDITS
 

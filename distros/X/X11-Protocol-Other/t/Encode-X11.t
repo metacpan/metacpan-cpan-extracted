@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -43,7 +43,7 @@ require Encode::X11;
 # VERSION
 
 {
-  my $want_version = 30;
+  my $want_version = 31;
   ok ($Encode::X11::VERSION, $want_version, 'VERSION variable');
   ok (Encode::X11->VERSION,  $want_version, 'VERSION class method');
 

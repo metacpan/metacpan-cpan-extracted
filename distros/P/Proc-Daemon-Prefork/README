@@ -2,8 +2,8 @@ NAME
     Proc::Daemon::Prefork - Create preforking, autoreloading daemon
 
 VERSION
-    This document describes version 0.710 of Proc::Daemon::Prefork (from
-    Perl distribution Proc-Daemon-Prefork), released on 2019-06-27.
+    This document describes version 0.711 of Proc::Daemon::Prefork (from
+    Perl distribution Proc-Daemon-Prefork), released on 2019-07-08.
 
 METHODS
   new(%args)
@@ -69,6 +69,11 @@ METHODS
 
     *   auto_reload_handler => CODEREF (required if auto_reload_check_every
         is set)
+
+    *   before_daemonize => CODEREF (default none)
+
+        Run code before daemonizing. If code returns false, will abort
+        daemonizing and exit with non-zero status (1).
 
     *   after_init => CODEREF (default none)
 

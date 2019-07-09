@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1::Role::REST::Client;
-$Net::Cisco::FMC::v1::Role::REST::Client::VERSION = '0.003001';
+$Net::Cisco::FMC::v1::Role::REST::Client::VERSION = '0.004001';
 # ABSTRACT: Cisco Firepower Management Center (FMC) REST client
 
 use 5.024;
@@ -67,7 +67,7 @@ Net::Cisco::FMC::v1::Role::REST::Client - Cisco Firepower Management Center (FMC
 
 =head1 VERSION
 
-version 0.003001
+version 0.004001
 
 =head1 AUTHOR
 

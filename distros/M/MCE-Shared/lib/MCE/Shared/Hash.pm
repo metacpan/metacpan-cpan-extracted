@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -312,7 +312,7 @@ MCE::Shared::Hash - Hash helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Hash version 1.840
+This document describes MCE::Shared::Hash version 1.841
 
 =head1 DESCRIPTION
 
@@ -475,9 +475,9 @@ This module may involve TIE when accessing the object via hash-like behavior.
 Only shared instances are impacted if doing so. Although likely fast enough for
 many use cases, the OO interface is recommended for best performance.
 
-=over 3
+=head2 MCE::Shared::Hash->new ( key, value [, key, value, ... ] )
 
-=item new ( key, value [, key, value, ... ] )
+=head2 MCE::Shared->hash ( key, value [, key, value, ... ] )
 
 Constructs a new object, with an optional list of key-value pairs.
 
@@ -495,7 +495,7 @@ Constructs a new object, with an optional list of key-value pairs.
  $ha = MCE::Shared->hash( @pairs );
  $ha = MCE::Shared->hash( );
 
-=item assign ( key, value [, key, value, ... ] )
+=head2 assign ( key, value [, key, value, ... ] )
 
 Clears the hash, then sets multiple key-value pairs and returns the number of
 keys stored in the hash. This is equivalent to C<clear>, C<mset>.
@@ -505,14 +505,14 @@ keys stored in the hash. This is equivalent to C<clear>, C<mset>.
 
 API available since 1.007.
 
-=item clear
+=head2 clear
 
 Removes all key-value pairs from the hash.
 
  $ha->clear;
  %{$ha} = ();
 
-=item clone ( key [, key, ... ] )
+=head2 clone ( key [, key, ... ] )
 
 Creates a shallow copy, a C<MCE::Shared::Hash> object. It returns an exact
 copy if no arguments are given. Otherwise, the object includes only the given
@@ -521,7 +521,7 @@ keys. Keys that do not exist in the hash will have the C<undef> value.
  $ha2 = $ha->clone( "key1", "key2" );
  $ha2 = $ha->clone;
 
-=item delete ( key )
+=head2 delete ( key )
 
 Deletes and returns the value by given key or C<undef> if the key does not
 exists in the hash.
@@ -529,29 +529,29 @@ exists in the hash.
  $val = $ha->delete( "some_key" );
  $val = delete $ha->{ "some_key" };
 
-=item del
+=head2 del
 
 C<del> is an alias for C<delete>.
 
-=item exists ( key )
+=head2 exists ( key )
 
 Determines if a key exists in the hash.
 
  if ( $ha->exists( "some_key" ) ) { ... }
  if ( exists $ha->{ "some_key" } ) { ... }
 
-=item flush ( key [, key, ... ] )
+=head2 flush ( key [, key, ... ] )
 
 Same as C<clone>. Though, clears all existing items before returning.
 
-=item get ( key )
+=head2 get ( key )
 
 Gets the value of a hash key or C<undef> if the key does not exists.
 
  $val = $ha->get( "some_key" );
  $val = $ha->{ "some_key" };
 
-=item iterator ( key [, key, ... ] )
+=head2 iterator ( key [, key, ... ] )
 
 Returns a code reference for iterating a list of key-value pairs stored in
 the hash when no arguments are given. Otherwise, returns a code reference for
@@ -569,7 +569,7 @@ returned for deleted keys.
     ...
  }
 
-=item iterator ( "query string" )
+=head2 iterator ( "query string" )
 
 Returns a code reference for iterating a list of key-value pairs that match
 the given criteria. It returns an empty list if the search found nothing.
@@ -584,7 +584,7 @@ The syntax for the C<query string> is described above.
     ...
  }
 
-=item keys ( key [, key, ... ] )
+=head2 keys ( key [, key, ... ] )
 
 Returns all keys in the hash when no arguments are given. Otherwise, returns
 the given keys in the same order. Keys that do not exist will have the C<undef>
@@ -598,7 +598,7 @@ value. In scalar context, returns the size of the hash.
  $len  = $ha->keys;     # ditto
  $len  = keys %{$ha};
 
-=item keys ( "query string" )
+=head2 keys ( "query string" )
 
 Returns only keys that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
@@ -609,7 +609,7 @@ above. In scalar context, returns the size of the resulting list.
  @keys = $ha->keys( "val eq sun :OR val eq moon :OR val eq foo" );
  $len  = $ha->keys( "key =~ /$pattern/" );
 
-=item len ( key )
+=head2 len ( key )
 
 Returns the size of the hash when no arguments are given. For the given key,
 returns the length of the value stored at key or the C<undef> value if the
@@ -619,39 +619,39 @@ key does not exists.
  $len  = $ha->len( "key1" );
  $len  = length $ha->{ "key1" };
 
-=item mdel ( key [, key, ... ] )
+=head2 mdel ( key [, key, ... ] )
 
 Deletes one or more keys in the hash and returns the number of keys deleted.
 A given key which does not exist in the hash is not counted.
 
  $cnt = $ha->mdel( "key1", "key2" );
 
-=item mexists ( key [, key, ... ] )
+=head2 mexists ( key [, key, ... ] )
 
 Returns a true value if all given keys exists in the hash. A false value is
 returned otherwise.
 
  if ( $ha->mexists( "key1", "key2" ) ) { ... }
 
-=item mget ( key [, key, ... ] )
+=head2 mget ( key [, key, ... ] )
 
 Gets the values of all given keys. It returns C<undef> for keys which do not
 exists in the hash.
 
  ( $val1, $val2 ) = $ha->mget( "key1", "key2" );
 
-=item mset ( key, value [, key, value, ... ] )
+=head2 mset ( key, value [, key, value, ... ] )
 
 Sets multiple key-value pairs in a hash and returns the number of keys stored
 in the hash.
 
  $len = $ha->mset( "key1" => "val1", "key2" => "val2" );
 
-=item merge
+=head2 merge
 
 C<merge> is an alias for C<mset>.
 
-=item pairs ( key [, key, ... ] )
+=head2 pairs ( key [, key, ... ] )
 
 Returns key-value pairs in the hash when no arguments are given. Otherwise,
 returns key-value pairs for the given keys in the same order. Keys that do not
@@ -663,7 +663,7 @@ hash.
  @pairs = $ha->pairs;
  $len   = $ha->pairs;
 
-=item pairs ( "query string" )
+=head2 pairs ( "query string" )
 
 Returns only key-value pairs that match the given criteria. It returns an
 empty list if the search found nothing. The syntax for the C<query string> is
@@ -674,7 +674,7 @@ described above. In scalar context, returns the size of the resulting list.
  @pairs = $ha->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
  $len   = $ha->pairs( "key =~ /$pattern/" );
 
-=item pipeline ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
 Combines multiple commands for the object to be processed serially. For shared
 objects, the call is made atomically due to single IPC to the shared-manager
@@ -704,7 +704,7 @@ from the last command in the pipeline.
 
 Current API available since 1.809.
 
-=item pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
@@ -716,14 +716,14 @@ Same as C<pipeline>, but returns data for every command in the pipeline.
 
 Current API available since 1.809.
 
-=item set ( key, value )
+=head2 set ( key, value )
 
 Sets the value of the given hash key and returns its new value.
 
  $val = $ha->set( "key", "value" );
  $val = $ha->{ "key" } = "value";
 
-=item values ( key [, key, ... ] )
+=head2 values ( key [, key, ... ] )
 
 Returns all values in the hash when no arguments are given. Otherwise, returns
 values for the given keys in the same order. Keys that do not exist will have
@@ -737,7 +737,7 @@ the C<undef> value. In scalar context, returns the size of the hash.
  $len  = $ha->values;     # ditto
  $len  = values %{$ha};
 
-=item values ( "query string" )
+=head2 values ( "query string" )
 
 Returns only values that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
@@ -748,11 +748,9 @@ above. In scalar context, returns the size of the resulting list.
  @vals = $ha->values( "val eq sun :OR val eq moon :OR val eq foo" );
  $len  = $ha->values( "key =~ /$pattern/" );
 
-=item vals
+=head2 vals
 
 C<vals> is an alias for C<values>.
-
-=back
 
 =head1 SUGAR METHODS
 
@@ -763,57 +761,53 @@ reduction in inter-process communication.
 The API resembles a subset of the Redis primitives
 L<http://redis.io/commands#strings> with key representing the hash key.
 
-=over 3
-
-=item append ( key, string )
+=head2 append ( key, string )
 
 Appends a value to a key and returns its new length.
 
  $len = $ha->append( $key, "foo" );
 
-=item decr ( key )
+=head2 decr ( key )
 
 Decrements the value of a key by one and returns its new value.
 
  $num = $ha->decr( $key );
 
-=item decrby ( key, number )
+=head2 decrby ( key, number )
 
 Decrements the value of a key by the given number and returns its new value.
 
  $num = $ha->decrby( $key, 2 );
 
-=item getdecr ( key )
+=head2 getdecr ( key )
 
 Decrements the value of a key by one and returns its old value.
 
  $old = $ha->getdecr( $key );
 
-=item getincr ( key )
+=head2 getincr ( key )
 
 Increments the value of a key by one and returns its old value.
 
  $old = $ha->getincr( $key );
 
-=item getset ( key, value )
+=head2 getset ( key, value )
 
 Sets the value of a key and returns its old value.
 
  $old = $ha->getset( $key, "baz" );
 
-=item incr ( key )
+=head2 incr ( key )
 
 Increments the value of a key by one and returns its new value.
 
  $num = $ha->incr( $key );
 
-=item incrby ( key, number )
+=head2 incrby ( key, number )
 
 Increments the value of a key by the given number and returns its new value.
 
  $num = $ha->incrby( $key, 2 );
-
-=back
 
 =head1 CREDITS
 

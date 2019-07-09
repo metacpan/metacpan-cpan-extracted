@@ -5,14 +5,21 @@ Mojo::Feed - Mojo::DOM-based parsing of RSS & Atom feeds
 
 # SYNOPSIS
 
-    use Mojo::Feed::Reader;
     use Mojo::Feed;
+    use Mojo::File qw(path);
 
-    my $feed = Mojo::Feed::Reader->new->parse("atom.xml");
+    my $feed = Mojo::Feed->new->parse(file => path("atom.xml"));
     print $feed->title, "\n",
       $feed->items->map('title')->join("\n");
 
     $feed = Mojo::Feed->new( body => $string );
+    $feed = Mojo::Feed->new( url => $rss_url );
+
+    my $feed = Mojo::Feed->new(
+      url => "https://github.com/dotandimet/Mojo-Feed/commits/master.atom");
+    say $feed->title;
+    $feed->items->each(
+      sub { say $_->title, q{ }, Mojo::Date->new($_->published); });
 
 # DESCRIPTION
 
@@ -21,7 +28,9 @@ fetching and parsing RSS and Atom Feeds.  It relies on
 [Mojo::DOM](https://metacpan.org/pod/Mojo::DOM) for XML/HTML parsing. Date parsing is done with [HTTP::Date](https://metacpan.org/pod/HTTP::Date).
 
 [Mojo::Feed](https://metacpan.org/pod/Mojo::Feed) represents the parsed RSS/Atom feed; you can construct it
-by setting an XML string as the `body`, or by using a [Mojo::Feed::Reader](https://metacpan.org/pod/Mojo::Feed::Reader) object.
+by setting an XML string as the `body` attribute, by setting the `file` or `url`
+attributes to a [Mojo::File](https://metacpan.org/pod/Mojo::File) or [Mojo::URL](https://metacpan.org/pod/Mojo::URL) respectively, or by using a
+[Mojo::Feed::Reader](https://metacpan.org/pod/Mojo::Feed::Reader) object.
 
 # ATTRIBUTES
 
@@ -37,7 +46,7 @@ The parsed feed as <Mojo::DOM> object.
 
 ## source
 
-The source of the feed; either a [Mojo::Path](https://metacpan.org/pod/Mojo::Path) or [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object, or
+The source of the feed; either a [Mojo::File](https://metacpan.org/pod/Mojo::File) or [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object, or
 undef if the feed source was a string.
 
 ## title
@@ -67,6 +76,15 @@ Name from `author`, `dc:creator` or `webMaster` field
 ## published
 
 Time in epoch seconds (may be filled with pubDate, dc:date, created, issued, updated or modified)
+
+## url
+
+A [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object from which to load the file. If set, it will set `source`. The `url` attribute
+may change when the feed is loaded if the user agent receives a redirect.
+
+## file
+
+A [Mojo::File](https://metacpan.org/pod/Mojo::File) object from which to read the file. If set, it will set `source`.
 
 # METHODS
 
@@ -117,5 +135,3 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Dotan Dimet <dotan@corky.net>
-
-Mario Domgoergen

@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-06-20'; # DATE
+our $DATE = '2019-06-24'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.093'; # VERSION
+our $VERSION = '0.094'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.093 of dateseq (from Perl distribution App-dateseq), released on 2019-06-20.
+This document describes version 0.094 of dateseq (from Perl distribution App-dateseq), released on 2019-06-24.
 
 =head1 SYNOPSIS
 
@@ -63,8 +63,8 @@ Generate dates from 2015-01-01 to 2015-01-31:
 Generate dates from yesterday to 2 weeks from now:
 
  % dateseq yesterday "2 weeks from now"
- 2019-06-19T00:00:00
- 2019-06-20T00:00:00
+ 2019-06-23T00:00:00
+ 2019-06-24T00:00:00
 
 Generate dates from 2015-01-31 to 2015-01-01 (reverse):
 
@@ -247,11 +247,19 @@ Only list business days (Mon-Sat), or non-business days.
 
 =item B<--exclude-dow>=I<s>
 
-Only show dates with these day-of-weeks.
+Do not show dates with these day-of-weeks.
+
+=item B<--exclude-month>=I<s>
+
+Do not show dates with these month numbers.
 
 =item B<--include-dow>=I<s>
 
 Only show dates with these day-of-weeks.
+
+=item B<--include-month>=I<s>
+
+Only show dates with these month numbers.
 
 =back
 

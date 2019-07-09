@@ -1,0 +1,118 @@
+=head1 NAME
+
+IO::BlockSync - Syncronize changed blocks
+
+=head1 VERSION
+
+Version 0.002
+
+=head1 SYNOPSIS
+
+BlockSync can some of the same stuff that bigsync (by Egor Egorov) can
+- it's just written in perl.
+
+BlockSync copies data from source file to destination file (can be a block
+device) and calculates checksum on each block it copies.
+On all runs after the first only the changed blocks will be copied.
+
+Perl module:
+
+    use IO::BlockSync;
+    BlockSync( src => 'sfile', dst => 'dfile', chk => 'cfile' );
+
+Executable:
+
+    blocksync -s /source/file -d /destination/file
+
+=head1 INSTALLATION
+
+When installing this module you install the C<IO::BlockSync> Perl module
+and the C<blocksync> command.
+
+=head2 CPAN
+
+Install directly from CPAN mirror:
+
+    cpan IO::BlockSync
+
+Or see
+L<How to install CPAN modules|http://www.cpan.org/modules/INSTALL.html>.
+
+=head2 Local dir
+
+You can get a copy of this module from GitHub:
+
+    git clone https://github.com/thordreier/perl-IO-BlockSync.git
+
+Then you can just use CPAN to install the module and take care of dependencies:
+
+    cpan .
+
+Or manual install (you need to fix dependencies manually):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=head2 Debian/Ubuntu
+
+If you want to use as many packages from your distro as possible instead of
+getting them from CPAN you can run this command before any of the ones above:
+
+    apt-get install \
+        libnamespace-clean-perl \
+        liblog-log4perl-perl \
+        libmoo-perl \
+        libmoosex-log-log4perl-perl \
+        libmoox-options-perl \
+        libtry-tiny-perl
+
+=head1 USAGE AND DOCUMENTATION
+
+=head2 Perl module
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc IO::BlockSync
+
+This documentation can also be found on
+L<GitHub|https://github.com/thordreier/perl-IO-BlockSync/blob/master/pod/IO-BlockSync.pod>
+or L<meta::cpan|https://metacpan.org/pod/IO::BlockSync>
+
+=head2 Executable
+
+After installing, you can find documentation for the executable with one
+of these commands:
+
+    blocksync --help
+    blocksync --man
+    perldoc $(which blocksync)
+
+Documentation can also be found on 
+L<GitHub|https://github.com/thordreier/perl-IO-BlockSync/blob/master/pod/blocksync.pod>
+or L<meta::cpan|https://metacpan.org/pod/distribution/IO-BlockSync/bin/blocksync>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2019 by Thor Dreier-Hansen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Terms of the Perl programming language system itself:
+
+=over
+
+=item * the 
+        L<GNU General Public License|http://dev.perl.org/licenses/gpl1.html>
+        as published by the Free Software Foundation; either
+        L<version 1|http://dev.perl.org/licenses/gpl1.html>,
+        or (at your option) any later version, or
+
+=item * the L<"Artistic License"|http://dev.perl.org/licenses/artistic.html>
+
+=back
+
+See L<http://dev.perl.org/licenses/> for more information.

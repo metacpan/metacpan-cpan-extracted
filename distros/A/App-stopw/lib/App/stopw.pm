@@ -1,7 +1,7 @@
 package App::stopw;
 
-our $DATE = '2016-07-30'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2019-06-23'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 1;
 # ABSTRACT: A console-based virtual stopwatch and timer
@@ -18,11 +18,11 @@ App::stopw - A console-based virtual stopwatch and timer
 
 =head1 VERSION
 
-This document describes version 0.03 of App::stopw (from Perl distribution App-stopw), released on 2016-07-30.
+This document describes version 0.040 of App::stopw (from Perl distribution App-stopw), released on 2019-06-23.
 
 =head1 SYNOPSIS
 
-This distribution provides the C<stopw> command-line utility.
+This distribution provides the L<stopw> command-line utility.
 
 =head1 HOMEPAGE
 
@@ -40,17 +40,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 SEE ALSO
-
-L<stopw>
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

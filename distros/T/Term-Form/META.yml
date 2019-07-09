@@ -24,12 +24,12 @@ requires:
   Carp: '0'
   Exporter: '0'
   List::Util: '1.33'
-  Term::Choose: '1.652'
+  Term::Choose: '1.654'
   parent: '0'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Form.git
-version: '0.516'
+version: '0.517'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

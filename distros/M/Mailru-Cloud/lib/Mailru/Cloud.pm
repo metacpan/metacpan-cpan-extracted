@@ -14,7 +14,7 @@ use Encode;
 use IO::Socket::SSL;
 use base qw/Mailru::Cloud::Auth/;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my $BUFF_SIZE = 512;
 

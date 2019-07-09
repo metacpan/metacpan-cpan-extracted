@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -19,9 +19,10 @@ package X11::Protocol::Other;
 use 5.004;
 use strict;
 use Carp;
+use X11::AtomConstants;
 
 use vars '$VERSION', '@ISA', '@EXPORT_OK';
-$VERSION = 30;
+$VERSION = 31;
 
 use Exporter;
 @ISA = ('Exporter');
@@ -33,6 +34,7 @@ use Exporter;
                 visual_class_is_dynamic
                 window_size
                 window_visual
+                get_property_atoms
                 hexstr_to_rgb
               );
 
@@ -157,6 +159,49 @@ sub hexstr_to_rgb {
 
 #------------------------------------------------------------------------------
 
+sub get_property_atoms {
+  my ($X, $window, $property) = @_;
+  (my $value,
+   undef,            # type
+   my $format,
+   my $bytes_after)
+    = $X->GetProperty ($window, $property,
+                       X11::AtomConstants::ATOM(), # type
+                       0,          # offset
+                       0x7FFFFFFF, # long-length: CARD32, unlimited
+                       0);         # delete
+  ### $value
+  ### $format
+  $format == 32 or return;  # not atoms
+  if ($bytes_after) {
+    croak "oops, extremely long property, has $bytes_after more";
+  }
+  return unpack('L*', $value);
+}
+
+sub set_property_atoms {
+  my $X = shift;
+  my $window = shift;
+  my $property = shift;
+  $X->ChangeProperty($window,
+                     $property,                   # property
+                     X11::AtomConstants::ATOM(),  # type
+                     32,                          # format
+                     'Replace',
+                     pack('L*',@_));
+}
+
+# sub set_property_atom_names {
+#   my ($X, $window, $property, @atoms) = @_;
+#   # ENHANCE-ME: might like to intern all atoms in one round-trip, or perhaps
+#   # that's better left to a single big pre-fill of atoms in mainline code
+#   set_property_atoms($X,$window,$property,
+#                      map {$X->atom($_)} @atoms);
+# }
+
+
+#------------------------------------------------------------------------------
+
 # # return true if $pixel is black or white in the default root window colormap
 # sub pixel_is_black_or_white {
 #   my ($X, $pixel) = @_;
@@ -260,6 +305,18 @@ C<GetWindowAttributes()> (for the visual).
 These functions are handy when there's a good chance C<$window> might be a
 root window and therefore not need a server round trip.
 
+=item C<@atoms = get_property_atoms($X, $window, $property)>
+
+Get from C<$window> (integer XID) a list-of-atoms property C<$property>
+(atom integer).  The return is a list of atom integers, possibly an empty
+list.  If C<$property> doesn't exist or is not atoms then return an empty
+list.
+
+=item C<set_property_atoms($X, $window, $property, @atoms)>
+
+Set on C<$window> (integer XID) a list-of-atoms property C<$property> (atom
+integer) as the given list of C<@atoms> (possibly empty).
+
 =back
 
 =head2 Colour Parsing
@@ -311,7 +368,7 @@ L<http://user42.tuxfamily.org/x11-protocol-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
 
 X11-Protocol-Other is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -31,5 +31,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo.git
-version: '8.18'
+version: '8.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

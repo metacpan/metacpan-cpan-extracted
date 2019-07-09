@@ -1,14 +1,14 @@
 ---
 abstract: 'Mojo::DOM-based parsing of RSS & Atom feeds'
 author:
-  - 'Dotan Dimet, Mario Domgoergen'
+  - 'Dotan Dimet <dotan@corky.net>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -26,7 +26,7 @@ no_index:
 provides:
   Mojo::Feed:
     file: lib/Mojo/Feed.pm
-    version: '0.17'
+    version: '0.18'
   Mojo::Feed::Item:
     file: lib/Mojo/Feed/Item.pm
   Mojo::Feed::Item::Enclosure:
@@ -35,19 +35,19 @@ provides:
     file: lib/Mojo/Feed/Reader.pm
   Mojolicious::Plugin::FeedReader:
     file: lib/Mojolicious/Plugin/FeedReader.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   HTTP::Date: '6.02'
-  Mojolicious: '7.52'
+  Mojolicious: '8.03'
   Time::Zone: '2.2'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/dotandimet/Mojo-Feed/issues
   homepage: https://github.com/dotandimet/Mojo-Feed
   repository: git://github.com/dotandimet/Mojo-Feed.git
-version: '0.17'
+version: '0.18'
 x_authority: cpan:DOTAN
 x_contributors:
-  - 'Dotan Dimet <dotan@corky.net>'
   - 'Mario Domgoergen <mdom@taz.de>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -17,10 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Module::Abstract::Cwalitee",
   "PREREQ_PM" => {
+    "Cwalitee::Common" => "0.002",
     "Exporter" => "5.57",
-    "Lingua::Identify" => 0,
+    "Lingua::Identify::Any" => 0,
     "Log::ger" => "0.027",
-    "PERLANCAR::Module::List" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,13 +38,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Cwalitee::Common" => "0.002",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Lingua::Identify" => 0,
+  "Lingua::Identify::Any" => 0,
   "Log::ger" => "0.027",
-  "PERLANCAR::Module::List" => 0,
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0

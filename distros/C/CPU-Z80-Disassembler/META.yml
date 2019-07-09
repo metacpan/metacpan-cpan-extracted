@@ -20,7 +20,7 @@ no_index:
 requires:
   Asm::Z80::Table: '0.03'
   Bit::Vector: '7.4'
-  CPU::Z80::Assembler: '2.16'
+  CPU::Z80::Assembler: '2.18'
   Class::Accessor: '0.51'
   File::Slurp: '9999.26'
   Path::Tiny: '0.108'
@@ -29,5 +29,5 @@ requires:
   Tie::File: '1'
   perl: '5.01'
 resources: {}
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

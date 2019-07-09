@@ -22,6 +22,10 @@ get '/plasm' => sub {
     );
 };
 
+get '/feed' => sub {
+    shift->redirect_to('atom.xml');
+};
+
 # test the parse_feed helper.
 
 # tests lifted from XML::Feed
@@ -48,7 +52,7 @@ my $str = Mojo::File->new($file)->slurp;
 $feed = Mojo::Feed->new( body => $str);
 isa_ok( $feed, 'Mojo::Feed' );
 is( $feed->title, 'First Weblog', 'title ok' );
-ok ( !$feed->source,'source ok' );
+ok ( !$feed->source,'feed created from string has no source' );
 
 # parse a URL
 $feed =
@@ -56,6 +60,13 @@ $feed =
 isa_ok( $feed, 'Mojo::Feed' );
 is( $feed->title, 'First Weblog', 'title ok' );
 is ( $feed->source->path, '/atom.xml' , 'source ok' );
+
+# parse a URL with a redirect
+$feed =
+  Mojo::Feed::Reader->new->ua( $t->app->ua )->parse( Mojo::URL->new("/feed") );
+isa_ok( $feed, 'Mojo::Feed', 'got feed on redirect' );
+is( $feed->title, 'First Weblog', 'title ok' );
+is ( $feed->source->path, 'atom.xml' , 'source changed on redirect' );
 
 ## Callback and non-blocking no longer supported - how do we make a promise API?
 
@@ -136,8 +147,7 @@ $entry = $feed->items->[0];
 isnt( $entry->summary, 'This is for &8220;itunes sake&8221;.' );
 is( $entry->description, 'this is a <b>test</b>' );
 is(
-    $entry->content, '<p>This is more of the same</p>
-'
+    $entry->content, '<p>This is more of the same</p>'
 );
 
 # author vs itunes:author:

@@ -46,6 +46,7 @@
       },
       "test" : {
          "requires" : {
+            "Test2::Suite" : "0.000119",
             "Test::More" : "1.302140"
          }
       }
@@ -58,10 +59,10 @@
          "web" : "https://github.com/abraxxa/Net-Cisco-FMC-v1"
       }
    },
-   "version" : "0.003001",
+   "version" : "0.004001",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -343,12 +344,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
             "name" : "@Git/Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -367,7 +368,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -375,7 +376,7 @@
                }
             },
             "name" : "@Git/Commit",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -384,12 +385,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003001",
+                  "tag" : "0.004001",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -397,7 +398,7 @@
                }
             },
             "name" : "@Git/Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -409,12 +410,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
             "name" : "@Git/Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -497,7 +498,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

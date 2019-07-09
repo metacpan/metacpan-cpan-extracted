@@ -261,7 +261,8 @@ static void indirect_map_store(pTHX_ const OP *o, STRLEN pos, SV *sv, line_t lin
   XSH_LOCAL_REALLOC(oi->buf, oi->size, len, char);
   oi->size = len;
  }
- Copy(s, oi->buf, len, char);
+ if (oi->buf)
+  Copy(s, oi->buf, len, char);
 
  oi->len  = len;
  oi->pos  = pos;

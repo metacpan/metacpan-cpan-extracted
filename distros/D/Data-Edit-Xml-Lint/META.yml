@@ -15,19 +15,19 @@ name: Data-Edit-Xml-Lint
 provides:
   Data::Edit::Xml::Lint:
     file: lib/Data/Edit/Xml/Lint.pm
-    version: '20190524'
+    version: '20190708'
   Data::Edit::Xml::Lint::Report:
     file: lib/Data/Edit/Xml/Lint.pm
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Edit::Xml: '20190523'
-  Data::Table::Text: '20190524'
+  Data::Edit::Xml: '20190708'
+  Data::Table::Text: '20190708'
   Digest::SHA: '0'
   Encode: '0'
   Test::More: '0'
   Test::SharedFork: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190524'
+version: '20190708'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

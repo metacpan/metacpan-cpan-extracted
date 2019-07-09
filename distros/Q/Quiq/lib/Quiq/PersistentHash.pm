@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.149';
+our $VERSION = '1.151';
 
 use Fcntl ();
 use DB_File ();
@@ -31,17 +31,19 @@ L<Quiq::Hash>
 
 =head4 Synopsis
 
-    my $h = $class->new($file,$mode,@args);
+    my $h = $class->new($file,$mode);
 
-=head4 Description
+=head4 Arguments
 
-Öffne einen Hash mit Datei $file als persistentem Speicher
-im Modus $mode und liefere eine Referenz auf diesen Hash zurück.
+=over 4
 
-Die Argumente @args entspechen den Argumenten des Konstruktors
-der Basisklasse. Details siehe dort.
+=item $file
 
-B<Modes>
+Datei, in dem der Hash gespeichert wird.
+
+=item $mode
+
+Modus, in dem die Datei geöffnet wird:
 
     Mode  Bedeutung
     ----  --------------------------------------------------------------
@@ -49,15 +51,23 @@ B<Modes>
      w    nur schreiben, Datei wird angelegt, falls nicht existent
      rw   lesen und schreiben, Datei wird angelegt, falls nicht existent
 
+=back
+
+=head4 Returns
+
+Referenz auf das Hash-Objekt.
+
+=head4 Description
+
+Öffne einen Hash mit Datei $file als persistentem Speicher
+im Modus $mode und liefere eine Referenz auf das Objekt zurück.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub new {
-    my $class = shift;
-    my $file = shift;
-    my $mode = shift;
-    # @_: Argumente
+    my ($class,$file,$mode) = @_;
 
     my $openMode = 0;
     if ($mode eq 'rw') {
@@ -101,10 +111,6 @@ sub new {
 
     $h->sync;
 
-=head4 Returns
-
-nichts
-
 =cut
 
 # -----------------------------------------------------------------------------
@@ -133,6 +139,12 @@ sub sync {
 
     $h->close;
 
+=head4 Description
+
+Schreibe den Persistenten Hash auf Platte und zerstöre das Objekt.
+Das gleiche geschieht, wenn die letzte Referenz auf das Objekt aus
+dem Scope geht.
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -147,7 +159,7 @@ sub close {
 
 =head1 VERSION
 
-1.149
+1.151
 
 =head1 AUTHOR
 

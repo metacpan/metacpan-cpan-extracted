@@ -18,7 +18,7 @@ WriteMakefile(
 		'Asm::Z80::Table'		=> 0.03,
 		'Bit::Vector'			=> 7.4,
 		'Class::Accessor'		=> 0.51,
-		'CPU::Z80::Assembler'	=> 2.16,	# test fails if z80masm is not up-to-date
+		'CPU::Z80::Assembler'	=> 2.18,	# test fails if z80masm is not up-to-date
 		'File::Slurp'			=> 9999.26,
 		'Test::Output'			=> 1.031,
 		'Tie::File'				=> 1.00,

@@ -25,16 +25,16 @@ This example converts an SVG into a PNG:
 <p>
 This renders the following image:
 </p>
-<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.09/examples/locust.png'>
+<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/locust.png'>
 
 =end html
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.09/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.09/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.09/examples/locust.png> are also included.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/locust.png> are also included.)
 
 =head1 VERSION
 
-This documents Image::CairoSVG version 0.09
-corresponding to git commit L<b0c2d08809b840b365b3977e43c110da7bf7a2b3|https://github.com/benkasminbullock/image-cairosvg/commit/b0c2d08809b840b365b3977e43c110da7bf7a2b3> released on Thu Oct 11 10:09:11 2018 +0900. 
+This documents Image::CairoSVG version 0.11
+corresponding to git commit L<20ccb770f1e9457986846e90d3dc8183040fabdb|https://github.com/benkasminbullock/image-cairosvg/commit/20ccb770f1e9457986846e90d3dc8183040fabdb> released on Mon Jul 8 07:27:15 2019 +0900. 
 
 =head1 DESCRIPTION
 
@@ -132,6 +132,14 @@ converts quadratic bezier curves into cubic bezier curves.
 
     $cairosvg->polygon (%attr);
 
+Draws a polygon based on the C<points> attribute, closing the path.
+
+=head2 polyline
+
+    $cairosvg->polyline (%attr);
+
+The same as L</polygon> except that it doesn't close the path.
+
 =head1 DEPENDENCIES
 
 =over
@@ -219,7 +227,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2014-2018
+2014-2019
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.003001';
+$Net::Cisco::FMC::v1::VERSION = '0.004001';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -94,6 +94,7 @@ sub _update ($self, $url, $object, $object_data) {
     my $updated_data = clone($object);
     delete $updated_data->{links};
     delete $updated_data->{metadata};
+    delete $updated_data->{error};
     $updated_data = { %$updated_data, %$object_data };
 
     my $res = $self->put($url, $updated_data);
@@ -196,6 +197,16 @@ Net::Cisco::FMC::v1::Role::ObjectMethods->apply([
         object   => 'accesspolicies',
         singular => 'accesspolicy',
     },
+    {
+        path     => 'object',
+        object   => 'networkaddresses',
+        singular => 'networkaddress',
+    },
+    {
+        path     => 'object',
+        object   => 'ports',
+        singular => 'port',
+    },
 ]);
 
 
@@ -269,6 +280,10 @@ sub get_accessrule ($self, $accesspolicy_id, $id, $query_params = {}) {
 
 sub update_accessrule ($self, $accesspolicy_id, $object, $object_data) {
     my $id = $object->{id};
+    my $fmc_rule = clone($object);
+    for my $user ($fmc_rule->{users}->{objects}->@*) {
+        delete $user->{realm};
+    }
     return $self->_update(join('/',
         '/api/fmc_config/v1/domain',
         $self->domain_uuid,
@@ -277,7 +292,7 @@ sub update_accessrule ($self, $accesspolicy_id, $object, $object_data) {
         $accesspolicy_id,
         'accessrules',
         $id
-    ), $object, $object_data);
+    ), $fmc_rule, $object_data);
 }
 
 
@@ -598,7 +613,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.003001
+version 0.004001
 
 =head1 SYNOPSIS
 

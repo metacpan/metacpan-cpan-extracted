@@ -199,14 +199,24 @@ int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, cha
 	imp_dbh->pg_server_version = PQserverVersion(imp_dbh->conn);
 
 	if (imp_dbh->pg_server_version < 80000) {
-		TRACE_PQERRORMESSAGE;
-		strncpy(imp_dbh->sqlstate, "08001", 6); /* sqlclient_unable_to_establish_sqlconnection */
-		pg_error(aTHX_ dbh, CONNECTION_BAD, "Server version 8.0 required");
-		TRACE_PQFINISH;
-		PQfinish(imp_dbh->conn);
-		sv_free((SV *)imp_dbh->savepoints);
-		if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_db_login (error)\n", THEADER_slow);
-		return 0;
+		/* 
+		   Special workaround for PgBouncer, which has the unfortunate habit of modifying 'server_version', 
+		   something it should never do. If we think this is the case for the version failure, we 
+		   simply allow things to continue with a faked version. See github issue #47
+		*/
+		if (NULL != strstr(PQparameterStatus(imp_dbh->conn, "server_version"), "bouncer")) {
+		   imp_dbh->pg_server_version = 90600;
+		}
+		else {
+			TRACE_PQERRORMESSAGE;
+			strncpy(imp_dbh->sqlstate, "08001", 6); /* sqlclient_unable_to_establish_sqlconnection */
+			pg_error(aTHX_ dbh, CONNECTION_BAD, "Server version 8.0 required");
+			TRACE_PQFINISH;
+			PQfinish(imp_dbh->conn);
+			sv_free((SV *)imp_dbh->savepoints);
+			if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_db_login (error)\n", THEADER_slow);
+			return 0;
+		}
 	}
 
 	pg_db_detect_client_encoding_utf8(aTHX_ imp_dbh);
@@ -467,7 +477,7 @@ int dbd_db_ping (SV * dbh)
 	}
 
 	/* No matter what state we are in, send an empty query to the backend */
-	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.8.0 */");
+	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.8.1 */");
 	status = PQresultStatus(result);
 	PQclear(result);
 	if (PGRES_FATAL_ERROR == status) {
@@ -1708,7 +1718,7 @@ static void pg_st_split_statement (pTHX_ imp_sth_t * imp_sth, char * statement)
 
 	unsigned char oldch; /* The previous character */
 
-	char non_standard_strings = -1; /* Status 0=standard 1=non_standard -1=unknown  */
+	signed char non_standard_strings = -1; /* Status 0=standard 1=non_standard -1=unknown  */
 
 	int xint;
 

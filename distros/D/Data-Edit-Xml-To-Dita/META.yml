@@ -13,16 +13,16 @@ meta-spec:
   version: '1.4'
 name: Data-Edit-Xml-To-Dita
 provides:
-  Data::Edit::Xml::To::Dita:
-    file: lib/Data/Edit/Xml/To/Dita.pm
-    version: '2018'
+  Data::Edit::Xml::To::DitaVb:
+    file: lib/Data/Edit/Xml/To/DitaVb.pm
+    version: '20190708'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Edit::Xml: '0'
-  Data::Edit::Xml::Lint: '0'
-  Data::Edit::Xml::Xref: '20181018'
-  Data::Table::Text: '20181018'
+  Data::Edit::Xml: '20190708'
+  Data::Edit::Xml::Lint: '20190708'
+  Data::Edit::Xml::Xref: '20190708'
+  Data::Table::Text: '20190708'
   Exporter: '0'
   Flip::Flop: '0'
   Scalar::Util: '0'
@@ -32,5 +32,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2018'
+version: '20190708'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

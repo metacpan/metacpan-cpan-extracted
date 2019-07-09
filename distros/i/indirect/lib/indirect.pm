@@ -11,13 +11,13 @@ indirect - Lexically warn about using the indirect method call syntax.
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
 our $VERSION;
 BEGIN {
- $VERSION = '0.38';
+ $VERSION = '0.39';
 }
 
 =head1 SYNOPSIS
@@ -284,7 +284,7 @@ L<Carp> (standard since perl 5), L<XSLoader> (since perl 5.6.0).
 
 =head1 AUTHOR
 
-Vincent Pit, C<< <perl at profvince.com> >>, L<http://www.profvince.com>.
+Vincent Pit C<< <vpit@cpan.org> >>.
 
 You can contact me by mail or on C<irc.perl.org> (vincent).
 
@@ -307,7 +307,7 @@ Andrew Main and Florian Ragwitz, for testing on real-life code and reporting iss
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Vincent Pit, all rights reserved.
+Copyright 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2019 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

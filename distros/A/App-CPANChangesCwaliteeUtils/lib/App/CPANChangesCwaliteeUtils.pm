@@ -1,11 +1,13 @@
 package App::CPANChangesCwaliteeUtils;
 
-our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-06'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+use Cwalitee::Common;
 
 our %SPEC;
 
@@ -13,9 +15,12 @@ $SPEC{calc_cpan_changes_cwalitee} = {
     v => 1.1,
     summary => 'Calculate CPAN Changes cwalitee',
     args => {
+        %Cwalitee::Common::args_calc,
         path => {
             schema => 'pathname*',
             pos => 0,
+            # in our version, path is optional. we try to look at files named
+            # Changes, ChangeLog, etc and use that.
         },
     },
 };
@@ -24,24 +29,30 @@ sub calc_cpan_changes_cwalitee {
 
     my %args = @_;
 
-    my $path;
-    for my $f (
-        "Changes",
-        "CHANGES",
-        "ChangeLog",
-        "CHANGELOG",
-        (grep {/change|chn?g/i} glob("*")),
-    ) {
-        if (-f $f) {
-            $path = $f;
-            last;
+    my $path = delete $args{path};
+    {
+        last if defined $path;
+
+        for my $f (
+            "Changes",
+            "CHANGES",
+            "ChangeLog",
+            "CHANGELOG",
+            (grep {/change|chn?g/i} glob("*")),
+        ) {
+            if (-f $f) {
+                $path = $f;
+                last;
+            }
         }
     }
     unless ($path) {
         return [400, "Please specify path"];
     }
+
     CPAN::Changes::Cwalitee::calc_cpan_changes_cwalitee(
         path => $path,
+        %args,
     );
 }
 
@@ -60,7 +71,7 @@ App::CPANChangesCwaliteeUtils - CLI Utilities related to CPAN Changes cwalitee
 
 =head1 VERSION
 
-This document describes version 0.001 of App::CPANChangesCwaliteeUtils (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-03.
+This document describes version 0.002 of App::CPANChangesCwaliteeUtils (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-06.
 
 =head1 DESCRIPTION
 
@@ -90,6 +101,34 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<exclude_indicator> => I<array[str]>
+
+Do not use these indicators.
+
+=item * B<exclude_indicator_module> => I<array[perl::modname]>
+
+Do not use indicators from these modules.
+
+=item * B<exclude_indicator_status> => I<array[str]>
+
+Do not use indicators having these statuses.
+
+=item * B<include_indicator> => I<array[str]>
+
+Only use these indicators.
+
+=item * B<include_indicator_module> => I<array[perl::modname]>
+
+Only use indicators from these modules.
+
+=item * B<include_indicator_status> => I<array[str]> (default: ["stable"])
+
+Only use indicators having these statuses.
+
+=item * B<min_indicator_severity> => I<uint> (default: 1)
+
+Minimum indicator severity.
 
 =item * B<path> => I<pathname>
 

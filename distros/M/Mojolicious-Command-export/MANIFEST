@@ -10,8 +10,10 @@ README
 cpanfile
 dist.ini
 lib/Mojolicious/Command/export.pm
+lib/Mojolicious/Plugin/Export.pm
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/command.t
+t/plugin.t
 weaver.ini

@@ -1,0 +1,51 @@
+{
+   "abstract" : "interface to the language detection API at DetectLanguage.com",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-DetectLanguage",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::MaybeXS" : "0",
+            "Moo" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/WebService-DetectLanguage",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/WebService-DetectLanguage.git",
+         "web" : "https://github.com/neilb/WebService-DetectLanguage"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+}
+

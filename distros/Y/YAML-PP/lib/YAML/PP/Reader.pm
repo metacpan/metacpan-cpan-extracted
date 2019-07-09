@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Reader;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 sub input { return $_[0]->{input} }
 sub set_input { $_[0]->{input} = $_[1] }

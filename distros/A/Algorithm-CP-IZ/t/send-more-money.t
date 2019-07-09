@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 5;
 BEGIN { use_ok('Algorithm::CP::IZ') };
 
 {
@@ -26,9 +26,17 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
     my $rc = $iz->search([$s, $e, $n, $d, $m, $o, $r, $y]);
     is($rc, 1);
 
-    print STDERR "\n";
-    print STDERR "  ", join(" ", map { $_->value } ($s, $e, $n, $d)), "\n";
-    print STDERR "  ", join(" ", map { $_->value } ($m, $o, $r, $e)), "\n";
-    print STDERR join(" ", map { $_->value } ($m, $o, $n, $e, $y)), "\n";
-    print STDERR "\n";
+    my $l1 = join(" ", map { $_->value } ($s, $e, $n, $d));
+    my $l2 = join(" ", map { $_->value } ($m, $o, $r, $e));
+    my $l3 = join(" ", map { $_->value } ($m, $o, $n, $e, $y));
+
+    is($l1, "9 5 6 7");
+    is($l2, "1 0 8 5");
+    is($l3, "1 0 6 5 2");
+
+    # print STDERR "\n";
+    # print STDERR "  ", join(" ", map { $_->value } ($s, $e, $n, $d)), "\n";
+    # print STDERR "  ", join(" ", map { $_->value } ($m, $o, $r, $e)), "\n";
+    # print STDERR join(" ", map { $_->value } ($m, $o, $n, $e, $y)), "\n";
+    # print STDERR "\n";
 }

@@ -4,12 +4,12 @@ This Yancy::Backend allows Yancy to work with a site made up of Markdown
 files with YAML frontmatter, like a Statocles site. In other words, this
 module works with a flat-file database made up of YAML + Markdown files.
 
-  Collections
+  Schemas
 
-You should configure the "pages" collection to have all of the fields
-that could be in the frontmatter of your Markdown files. This is JSON
-Schema and will be validated, but if you're using the Yancy editor, make
-sure only to use the types Yancy supports.
+You should configure the "pages" schema to have all of the fields that
+could be in the frontmatter of your Markdown files. This is JSON Schema
+and will be validated, but if you're using the Yancy editor, make sure
+only to use the types Yancy supports.
 
   Limitations
 
@@ -18,8 +18,8 @@ some list() queries may not work (please make a pull request).
 
   Future Developments
 
-This backend could be enhanced to provide collections for static files
-(CSS, JavaScript, etc...) and templates.
+This backend could be enhanced to provide schema for static files (CSS,
+JavaScript, etc...) and templates.
 
 INSTALLATION
 

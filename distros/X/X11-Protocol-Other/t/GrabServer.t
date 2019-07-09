@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -59,7 +59,7 @@ require X11::Protocol::GrabServer;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 30;
+my $want_version = 31;
 ok ($X11::Protocol::GrabServer::VERSION,
     $want_version,
     'VERSION variable');

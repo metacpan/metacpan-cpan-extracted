@@ -1,4 +1,4 @@
-package App::MBUtiny::Collector::DBI; # $Id: DBI.pm 121 2019-07-01 19:51:50Z abalama $
+package App::MBUtiny::Collector::DBI; # $Id: DBI.pm 128 2019-07-06 15:27:48Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MBUtiny::Collector::DBI - Collector database interface
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -116,13 +116,45 @@ Format:
 
 =over 4
 
+=item B<addr>
+
+Client ip addr (IPv4/IPv6)
+
+=item B<comment>
+
+Comment data
+
+=item B<error>
+
+Error message
+
+=item B<file>
+
+Backup filename
+
 =item B<id>
 
-    Record ID. Autoincremented value!
+Record ID. Autoincremented value!
 
-=item B<type>
+=item B<md5>
 
-Type of collector:  0=internal, 1=external
+MD5-checksum of backup file
+
+=item B<name>
+
+Name of mbutiny host
+
+=item B<sha1>
+
+SHA1-checksum of backup file
+
+=item B<size>
+
+ Size of backup file
+
+=item B<status>
+
+Backup status: 0=false, 1=true
 
 Default: 0
 
@@ -132,43 +164,11 @@ Time of record insert
 
 Default: time()
 
-=item B<name>
+=item B<type>
 
-Name of mbutiny host
-
-=item B<addr>
-
-Client ip addr (IPv4/IPv6)
-
-=item B<status>
-
-Backup status: 0=false, 1=true
+Type of collector: 0=internal, 1=external
 
 Default: 0
-
-=item B<file>
-
-Backup filename
-
-=item B<size>
-
- Size of backup file
-
-=item B<md5>
-
-MD5-checksum of backup file
-
-=item B<sha1>
-
-SHA1-checksum of backup file
-
-=item B<error>
-
-Error message
-
-=item B<comment>
-
-Comment data
 
 =back
 
@@ -220,7 +220,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION @EXPORT_OK/;
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 use Carp;
 use CTK::DBI;
@@ -317,7 +317,7 @@ sub new {
     unless ($args{dsn}) {
         my $dda = DEFAULT_DBI_ATTR;
         foreach (%$dda) {
-            $args{$_} = $dda->{$_}
+            $args{$_} //= $dda->{$_}
         }
     }
     my $file = $args{file} || COLLECTOR_DB_FILE();
@@ -328,20 +328,20 @@ sub new {
         -dsn    => $dsn,
         -debug  => 0,
         -username => $args{'user'},
-        -passwprd => $args{'password'},
+        -password => $args{'password'},
         -attr     => _attr($args{'set'}),
         $args{timeout} ? (
-            -timeout_connect => $args{timeout}
-            -timeout_request => $args{timeout}
+            -timeout_connect => $args{timeout},
+            -timeout_request => $args{timeout},
         ) : (),
         $args{user} ? () : (),
     );
-    my $dbh = $db->connect;
+    my $dbh = $db->connect if $db;
 
     # SQLite
     my $fnew = 0;
     my $issqlite = 0;
-    if (($dsn =~ /SQLite/i)) {
+    if ($dbh && $dsn =~ /SQLite/i) {
         $file = $dbh->sqlite_db_filename();
         unless ($file && (-e $file) && !(-z $file)) {
             touch($file);
@@ -512,7 +512,7 @@ sub report {
 
 sub _attr { # Sets attributes
     my $in = shift;
-    my $attr = array($in => "set");
+    my $attr = is_array($in) ? $in : array($in => "set");
     my %attrs;
     foreach (@$attr) {
         $attrs{$1} = $2 if $_ =~ /^\s*(\S+)\s+(.+)$/;

@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.035';
+our $VERSION = '1.036';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -33,7 +33,7 @@ our $VERSION = '1.035';
 
 use Mojo::Base '-strict';
 use Exporter 'import';
-use List::Util qw( any );
+use List::Util qw( any first );
 use Mojo::Loader qw( load_class );
 use Scalar::Util qw( blessed );
 use Mojo::JSON::Pointer;
@@ -42,7 +42,7 @@ use Mojo::Util qw( xml_escape );
 use Carp qw( carp );
 
 our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp fill_brackets
-    is_type );
+    is_type order_by );
 
 #pod =sub load_backend
 #pod
@@ -223,6 +223,16 @@ sub match {
                 $value =~ s/(?<!\\)\\%/.*/g;
                 $test{ $key } = qr{^$value$};
             }
+            elsif ( exists $match->{ $key }{ '!=' } ) {
+                my $expect = $match->{ $key }{ '!=' };
+                $test{ $key } = sub {
+                    my ( $got, $key ) = @_;
+                    if ( !defined $expect ) {
+                        return defined $got;
+                    }
+                    return $got ne $expect;
+                };
+            }
             else {
                 die "Unimplemented query type: " . to_json( $match->{ $key } );
             }
@@ -243,13 +253,51 @@ sub match {
 
     my $passes
         = grep {
-            ref $test{ $_ } eq 'Regexp' ? $item->{ $_ } =~ $test{ $_ }
+            !defined $test{ $_ } ? !defined $item->{ $_ }
+            : ref $test{ $_ } eq 'Regexp' ? $item->{ $_ } =~ $test{ $_ }
             : ref $test{ $_ } eq 'CODE' ? $test{ $_ }->( $item->{ $_ }, $_ )
             : $item->{ $_ } eq $test{ $_ }
         }
         keys %test;
 
     return $passes == keys %test;
+}
+
+#pod =sub order_by
+#pod
+#pod     my $ordered_array = order_by( $order_by, $unordered_array );
+#pod
+#pod Order the given arrayref by the given L<SQL::Abstract> order-by clause.
+#pod
+#pod =cut
+
+sub order_by {
+    my ( $order_by, $unordered ) = @_;
+    # Array of [ (-asc/-desc), (field) ]
+    my @sort_items;
+
+    if ( ref $order_by eq 'ARRAY' ) {
+        @sort_items = map { [ ref $_ ? %$_ : ( -asc => $_ ) ] } @$order_by;
+    }
+    elsif ( ref $order_by eq 'HASH' ) {
+        @sort_items = [ %$order_by ];
+    }
+    else {
+        @sort_items = [ -asc => $order_by ];
+    }
+
+    my @ordered = sort {
+            for my $item ( @sort_items ) {
+                my $cmp = $item->[0] eq '-asc'
+                    ? ($a->{ $item->[1] }//'') cmp ($b->{ $item->[1] }//'')
+                    : ($b->{ $item->[1] }//'') cmp ($a->{ $item->[1] }//'')
+                    ;
+                return $cmp || next;
+            }
+        }
+        @$unordered;
+
+    return \@ordered;
 }
 
 #pod =sub fill_brackets
@@ -344,7 +392,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.035
+version 1.036
 
 =head1 SYNOPSIS
 
@@ -449,6 +497,12 @@ Test if the given C<$item> matches the given L<SQL::Abstract> C<$where>
 data structure. See L<SQL::Abstract/WHERE CLAUSES> for the full syntax.
 
 Not all of SQL::Abstract's syntax is supported yet, so patches are welcome.
+
+=head2 order_by
+
+    my $ordered_array = order_by( $order_by, $unordered_array );
+
+Order the given arrayref by the given L<SQL::Abstract> order-by clause.
 
 =head2 fill_brackets
 

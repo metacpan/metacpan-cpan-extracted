@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -390,7 +390,7 @@ MCE::Shared::Array - Array helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Array version 1.840
+This document describes MCE::Shared::Array version 1.841
 
 =head1 DESCRIPTION
 
@@ -559,9 +559,9 @@ This module may involve TIE when accessing the object via array-like behavior.
 Only shared instances are impacted if doing so. Although likely fast enough for
 many use cases, the OO interface is recommended for best performance.
 
-=over 3
+=head2 MCE::Shared::Array->new ( val [, val, ... ] )
 
-=item new ( val [, val, ... ] )
+=head2 MCE::Shared->array ( val [, val, ... ] )
 
 Constructs a new object, with an optional list of values.
 
@@ -579,7 +579,7 @@ Constructs a new object, with an optional list of values.
  $ar = MCE::Shared->array( @list );
  $ar = MCE::Shared->array( );
 
-=item assign ( value [, value, ... ] )
+=head2 assign ( value [, value, ... ] )
 
 Clears the list, then appends one or multiple values and returns the new length.
 This is equivalent to C<clear>, C<push>.
@@ -589,14 +589,14 @@ This is equivalent to C<clear>, C<push>.
 
 API available since 1.007.
 
-=item clear
+=head2 clear
 
 Removes all elements from the array.
 
  $ar->clear;
  @{$ar} = ();
 
-=item clone ( index [, index, ... ] )
+=head2 clone ( index [, index, ... ] )
 
 Creates a shallow copy, a C<MCE::Shared::Array> object. It returns an exact
 copy if no arguments are given. Otherwise, the object includes only the given
@@ -606,7 +606,7 @@ the C<undef> value.
  $ar2 = $ar->clone( 0, 1 );
  $ar2 = $ar->clone;
 
-=item delete ( index )
+=head2 delete ( index )
 
 Deletes and returns the value associated by index or C<undef> if index exceeds
 the size of the list.
@@ -614,11 +614,11 @@ the size of the list.
  $val = $ar->delete( 20 );
  $val = delete $ar->[ 20 ];
 
-=item del
+=head2 del
 
 C<del> is an alias for C<delete>.
 
-=item exists ( index )
+=head2 exists ( index )
 
 Determines if an element by its index exists in the array. The behavior is
 strongly tied to the use of delete on lists.
@@ -632,11 +632,11 @@ strongly tied to the use of delete on lists.
  $ar->exists( 3 );   # True
  exists $ar->[ 3 ];  # True
 
-=item flush ( index [, index, ... ] )
+=head2 flush ( index [, index, ... ] )
 
 Same as C<clone>. Though, clears all existing items before returning.
 
-=item get ( index )
+=head2 get ( index )
 
 Gets the value of an element by its index or C<undef> if the index does not
 exists.
@@ -644,7 +644,7 @@ exists.
  $val = $ar->get( 2 );
  $val = $ar->[ 2 ];
 
-=item iterator ( index [, index, ... ] )
+=head2 iterator ( index [, index, ... ] )
 
 Returns a code reference for iterating a list of index-value pairs stored in
 the array when no arguments are given. Otherwise, returns a code reference for
@@ -662,7 +662,7 @@ returned for deleted indices.
     ...
  }
 
-=item iterator ( "query string" )
+=head2 iterator ( "query string" )
 
 Returns a code reference for iterating a list of index-value pairs that match
 the given criteria. It returns an empty list if the search found nothing.
@@ -677,7 +677,7 @@ The syntax for the C<query string> is described above.
     ...
  }
 
-=item keys ( index [, index, ... ] )
+=head2 keys ( index [, index, ... ] )
 
 Returns all indices in the array when no arguments are given. Otherwise,
 returns the given indices in the same order. Indices that do not exist will
@@ -691,7 +691,7 @@ have the C<undef> value. In scalar context, returns the size of the array.
  $len  = $ar->keys;     # ditto
  $len  = keys @{$ar};
 
-=item keys ( "query string" )
+=head2 keys ( "query string" )
 
 Returns only indices that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
@@ -702,7 +702,7 @@ above. In scalar context, returns the size of the resulting list.
  @keys = $ar->keys( "val eq sun :OR val eq moon :OR val eq foo" );
  $len  = $ar->keys( "key =~ /$pattern/" );
 
-=item len ( index )
+=head2 len ( index )
 
 Returns the size of the array when no arguments are given. For the given
 index, returns the length of the value stored at index or the C<undef> value
@@ -712,38 +712,38 @@ if the index does not exists.
  $len = $ar->len( 0 );
  $len = length $ar->[ 0 ];
 
-=item mdel ( index [, index, ... ] )
+=head2 mdel ( index [, index, ... ] )
 
 Deletes one or more elements by its index and returns the number of indices
 deleted. A given index which does not exist in the list is not counted.
 
  $cnt = $ar->mdel( 0, 1 );
 
-=item mexists ( index [, index, ... ] )
+=head2 mexists ( index [, index, ... ] )
 
 Returns a true value if all given indices exists in the list. A false value is
 returned otherwise.
 
  if ( $ar->mexists( 0, 1 ) ) { ... }
 
-=item mget ( index [, index, ... ] )
+=head2 mget ( index [, index, ... ] )
 
 Gets multiple values from the list by its index. It returns C<undef> for indices
 which do not exists in the list.
 
  ( $val1, $val2 ) = $ar->mget( 0, 1 );
 
-=item mset ( index, value [, index, value, ... ] )
+=head2 mset ( index, value [, index, value, ... ] )
 
 Sets multiple index-value pairs in the list and returns the length of the list.
 
  $len = $ar->mset( 0 => "val1", 1 => "val2" );
 
-=item merge
+=head2 merge
 
 C<merge> is an alias for C<mset>.
 
-=item pairs ( index [, index, ... ] )
+=head2 pairs ( index [, index, ... ] )
 
 Returns index-value pairs in the array when no arguments are given. Otherwise,
 returns index-value pairs for the given indices in the same order. Indices that
@@ -755,7 +755,7 @@ of the array.
  @pairs = $ar->pairs;
  $len   = $ar->pairs;
 
-=item pairs ( "query string" )
+=head2 pairs ( "query string" )
 
 Returns only index-value pairs that match the given criteria. It returns an
 empty list if the search found nothing. The syntax for the C<query string> is
@@ -766,7 +766,7 @@ described above. In scalar context, returns the size of the resulting list.
  @pairs = $ar->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
  $len   = $ar->pairs( "key =~ /$pattern/" );
 
-=item pipeline ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
 Combines multiple commands for the object to be processed serially. For shared
 objects, the call is made atomically due to single IPC to the shared-manager
@@ -796,7 +796,7 @@ from the last command in the pipeline.
 
 Current API available since 1.809.
 
-=item pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
@@ -808,7 +808,7 @@ Same as C<pipeline>, but returns data for every command in the pipeline.
 
 Current API available since 1.809.
 
-=item pop
+=head2 pop
 
 Removes and returns the last value of the list. If there are no elements in the
 list, returns the undefined value.
@@ -816,7 +816,7 @@ list, returns the undefined value.
  $val = $ar->pop;
  $val = pop @{$ar};
 
-=item push ( value [, value, ... ] )
+=head2 push ( value [, value, ... ] )
 
 Appends one or multiple values to the tail of the list and returns the new
 length.
@@ -824,14 +824,14 @@ length.
  $len = $ar->push( "val1", "val2" );
  $len = push @{$ar}, "val1", "val2";
 
-=item set ( index, value )
+=head2 set ( index, value )
 
 Sets the value of the given array index and returns its new value.
 
  $val = $ar->set( 2, "value" );
  $val = $ar->[ 2 ] = "value";
 
-=item shift
+=head2 shift
 
 Removes and returns the first value of the list. If there are no elements in the
 list, returns the undefined value.
@@ -839,7 +839,7 @@ list, returns the undefined value.
  $val = $ar->shift;
  $val = shift @{$ar};
 
-=item range ( start, stop )
+=head2 range ( start, stop )
 
 Returns the specified elements of the list. The offsets C<start> and C<stop>
 can also be negative numbers indicating offsets starting at the end of the
@@ -852,7 +852,7 @@ of the list.
  @list = $ar->range( 20, 29 );
  @list = $ar->range( -4, -1 );
 
-=item sort ( "BY val [ ASC | DESC ] [ ALPHA ]" )
+=head2 sort ( "BY val [ ASC | DESC ] [ ALPHA ]" )
 
 Returns sorted values in list context, leaving the elements intact. In void
 context, sorts the list in-place. By default, sorting is numeric when no
@@ -876,7 +876,7 @@ sort the list from large to small, specify the C<DESC> modifier.
 
  $ar->sort( "DESC ALPHA" );
 
-=item splice ( offset [, length [, list ] ] )
+=head2 splice ( offset [, length [, list ] ] )
 
 Removes the elements designated by C<offset> and C<length> from the array, and
 replaces them with the elements of C<list>, if any. The behavior is similar to
@@ -886,7 +886,7 @@ the Perl C<splice> function.
  @items = $ar->splice( 20, 2 );
  @items = $ar->splice( 20 );
 
-=item unshift ( value [, value, ... ] )
+=head2 unshift ( value [, value, ... ] )
 
 Prepends one or multiple values to the head of the list and returns the new
 length.
@@ -894,7 +894,7 @@ length.
  $len = $ar->unshift( "val1", "val2" );
  $len = unshift @{$ar}, "val1", "val2";
 
-=item values ( index [, index, ... ] )
+=head2 values ( index [, index, ... ] )
 
 Returns all values in the array when no arguments are given. Otherwise, returns
 values for the given indices in the same order. Indices that do not exist will
@@ -908,7 +908,7 @@ have the C<undef> value. In scalar context, returns the size of the array.
  $len  = $ar->values;     # ditto
  $len  = values @{$ar};
 
-=item values ( "query string" )
+=head2 values ( "query string" )
 
 Returns only values that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
@@ -919,11 +919,9 @@ above. In scalar context, returns the size of the resulting list.
  @keys = $ar->values( "val eq sun :OR val eq moon :OR val eq foo" );
  $len  = $ar->values( "key =~ /$pattern/" );
 
-=item vals
+=head2 vals
 
 C<vals> is an alias for C<values>.
-
-=back
 
 =head1 SUGAR METHODS
 
@@ -934,57 +932,53 @@ reduction in inter-process communication.
 The API resembles a subset of the Redis primitives
 L<http://redis.io/commands#strings> with key representing the array index.
 
-=over 3
-
-=item append ( key, string )
+=head2 append ( key, string )
 
 Appends a value to a key and returns its new length.
 
  $len = $ar->append( 0, "foo" );
 
-=item decr ( key )
+=head2 decr ( key )
 
 Decrements the value of a key by one and returns its new value.
 
  $num = $ar->decr( 0 );
 
-=item decrby ( key, number )
+=head2 decrby ( key, number )
 
 Decrements the value of a key by the given number and returns its new value.
 
  $num = $ar->decrby( 0, 2 );
 
-=item getdecr ( key )
+=head2 getdecr ( key )
 
 Decrements the value of a key by one and returns its old value.
 
  $old = $ar->getdecr( 0 );
 
-=item getincr ( key )
+=head2 getincr ( key )
 
 Increments the value of a key by one and returns its old value.
 
  $old = $ar->getincr( 0 );
 
-=item getset ( key, value )
+=head2 getset ( key, value )
 
 Sets the value of a key and returns its old value.
 
  $old = $ar->getset( 0, "baz" );
 
-=item incr ( key )
+=head2 incr ( key )
 
 Increments the value of a key by one and returns its new value.
 
  $num = $ar->incr( 0 );
 
-=item incrby ( key, number )
+=head2 incrby ( key, number )
 
 Increments the value of a key by the given number and returns its new value.
 
  $num = $ar->incrby( 0, 2 );
-
-=back
 
 =head1 CREDITS
 

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Carp;
 
 use vars '$VERSION', '$_instance';
-$VERSION = 30;
+$VERSION = 31;
 
 use X11::Protocol::WM;
 
@@ -424,7 +424,7 @@ L<http://user42.tuxfamily.org/x11-protocol-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2019 Kevin Ryde
 
 X11-Protocol-Other is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
@@ -454,6 +454,7 @@ X11-Protocol-Other.  If not, see <http://www.gnu.org/licenses/>.
 # ->chosen_client
 # ->chosen_window
 
-# /usr/share/doc/x11proto-core-dev/x11protocol.txt.gz
+# /z/usr/share/doc/x11proto-core-dev/x11protocol.txt.gz
+# /usr/share/doc/x11proto-dev/
 
 

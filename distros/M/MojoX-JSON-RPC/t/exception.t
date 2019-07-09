@@ -18,8 +18,6 @@ use Mojolicious::Lite;
 use MojoX::JSON::RPC::Service;
 
 # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
-plugin 'PODRenderer';
-
 plugin 'json_rpc_dispatcher' => {
     services => {
         '/jsonrpc' => MojoX::JSON::RPC::Service->new->register(

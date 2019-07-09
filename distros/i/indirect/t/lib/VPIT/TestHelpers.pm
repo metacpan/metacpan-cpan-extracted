@@ -837,11 +837,11 @@ sub DESTROY { $_[0]->{code}->() }
 
 =head1 AUTHOR
 
-Vincent Pit, C<< <perl at profvince.com> >>, L<http://www.profvince.com>.
+Vincent Pit C<< <vpit at cpan.org> >>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012,2013,2014,2015 Vincent Pit, all rights reserved.
+Copyright 2012,2013,2014,2015,2019 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

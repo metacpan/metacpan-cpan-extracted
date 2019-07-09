@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.1.2");
+use version; our $VERSION = qv("v2.2.1");
 use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;
@@ -120,21 +120,6 @@ Skips any files in C<CVS>, C<.svn>, or C<.git> directories.
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
 
-=item C<pl_file_compiles($file)>
-
-Returns true if C<$file> compiles as a perl script.
-
-=item C<pm_file_compiles($file)>
-
-Returns true if C<$file> compiles as a perl module.
-
-=item C<verbose($verbose)>
-
-An accessor to get/set the verbose flag.  If C<verbose> is set, you can get some
-extra diagnostics when compilation fails.
-
-Verbose is set on by default.
-
 =back
 
 =head2 Test Methods
@@ -147,15 +132,6 @@ access to some of its methods.
 =item C<done_testing()>
 
 Declares that you are done testing, no more tests will be run after this point.
-
-=item C<ok($test, $name)>
-
-Your basic test. Pass if C<$test> is true, fail if C<$test> is false. Just
-like C<Test::Simple>'s C<ok()>.
-
-=item C<plan(tests => $count)>
-
-Defines how many tests you plan to run.
 
 =item C<diag(@msgs)>
 
@@ -170,10 +146,6 @@ We encourage using this rather than calling print directly.
 =item C<skip($reason)>
 
 Skips the current test, reporting the C<$reason>.
-
-=item C<skip_all($reason)>
-
-Skips all the tests, using the given C<$reason>. Exits immediately with 0.
 
 =back
 
@@ -206,21 +178,6 @@ you can't use this function with C<all_pl_files_ok()>.  If this is a problem
 you should really be using the object oriented interface.
 
 Returns true if all Perl module files are ok, or false if any fail.
-
-Module authors can include the following in a F<t/00_compile.t> file
-and have C<Test::Compile> automatically find and check all Perl module files
-in a module distribution:
-
-    #!perl -w
-    use strict;
-    use warnings;
-    use Test::More;
-    eval "use Test::Compile";
-    Test::More->builder->BAIL_OUT(
-        "Test::Compile required for testing compilation") if $@;
-    my $test = Test::Compile->new();
-    $test->all_pm_files_ok();
-    $test->done_testing();
 
 =cut
 

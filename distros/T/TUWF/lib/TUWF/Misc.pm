@@ -12,7 +12,7 @@ use Scalar::Util 'looks_like_number';
 use TUWF::Validate;
 
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 our @EXPORT_OK = ('uri_escape', 'kv_validate');
 
 

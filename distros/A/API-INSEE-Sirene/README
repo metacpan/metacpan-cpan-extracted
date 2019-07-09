@@ -1,0 +1,31 @@
+API-INSEE-Sirene version 3.501
+=============================
+
+API::INSEE::Sirene - An interface for the Sirene API of INSEE
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+JSON
+LWP::UserAgent
+POSIX
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019 by FOUQUET Justin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

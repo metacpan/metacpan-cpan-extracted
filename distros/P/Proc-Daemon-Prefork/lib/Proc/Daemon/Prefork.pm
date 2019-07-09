@@ -1,7 +1,7 @@
 package Proc::Daemon::Prefork;
 
-our $DATE = '2019-06-27'; # DATE
-our $VERSION = '0.710'; # VERSION
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.711'; # VERSION
 
 use 5.010001;
 use strict;
@@ -123,6 +123,10 @@ sub close_logs {
 
 sub daemonize {
     my ($self) = @_;
+
+    if ($self->{before_daemonize} && !$self->{before_daemonize}->()) {
+        die "Failed initializing before daemonizing, exiting ...\n";
+    }
 
     local *ERROR_LOG;
     $self->open_logs;
@@ -643,7 +647,7 @@ Proc::Daemon::Prefork - Create preforking, autoreloading daemon
 
 =head1 VERSION
 
-This document describes version 0.710 of Proc::Daemon::Prefork (from Perl distribution Proc-Daemon-Prefork), released on 2019-06-27.
+This document describes version 0.711 of Proc::Daemon::Prefork (from Perl distribution Proc-Daemon-Prefork), released on 2019-07-08.
 
 =for Pod::Coverage .*
 
@@ -708,6 +712,11 @@ needs to communicate with children.
 In seconds.
 
 =item * auto_reload_handler => CODEREF (required if auto_reload_check_every is set)
+
+=item * before_daemonize => CODEREF (default none)
+
+Run code before daemonizing. If code returns false, will abort daemonizing and
+exit with non-zero status (1).
 
 =item * after_init => CODEREF (default none)
 

@@ -1,5 +1,11 @@
 Revision history for Scope-Upper
 
+0.32    2019-07-08 12:50 UTC
+        + Fix : [RT #129539] : fails with v5.27.3 and later with DEBUGGING
+                The module has been amended to accomodate with a change of
+                behaviour of a core macro.
+        + Upd : Contact info.
+
 0.31    2018-08-26 19:50 UTC
         + Fix : [RT #125931] : localized SCALAR doesn't get imported
                 localize '$Foo::x' => $var now properly imports $x into Foo.

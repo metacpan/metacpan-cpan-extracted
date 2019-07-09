@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1::Role::ObjectMethods;
-$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001002';
+$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001003';
 # ABSTRACT: Role for Checkpoint Management API version 1.x method generation
 
 use 5.024;
@@ -40,7 +40,7 @@ role {
         ), $params->{list_key}, $query_params);
     });
 
-    $mop->method('get_' . $params->{singular} => sub ($self, $id, $query_params = {}) {
+    $mop->method('get_' . $params->{singular} => sub ($self, $query_params = {}) {
         return $self->_get(join('/',
             '/web_api',
             'v' . $self->api_version,
@@ -106,7 +106,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods - Role for Checkpoint Manag
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of X11-Protocol-Other.
 #
@@ -20,7 +20,7 @@ Section: perl
 Priority: optional
 Build-Depends: libtest-perl | perl (>= 5.004.05), cdbs, debhelper (>= 5)
 Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
-Standards-Version: 3.9.8
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/x11-protocol-other/index.html
 Bugs: mailto:user42_kevin@yahoo.com.au
 

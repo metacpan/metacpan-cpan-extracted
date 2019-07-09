@@ -1,4 +1,5 @@
-package Sim::OPT::Interlinear;
+#package Sim::OPT::Interlinear;
+# NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
 
 # INTERLINEAR
 # Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
@@ -21,19 +22,19 @@ use feature 'say';
 no strict;
 no warnings;
 
-use Sim::OPT;
-use Sim::OPT::Morph;
-use Sim::OPT::Sim;
-use Sim::OPT::Report;
-use Sim::OPT::Descend;
-use Sim::OPT::Takechance;
-use Sim::OPT::Parcoord3d;
-# NOTE THAT TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted.
+#use Sim::OPT;
+#use Sim::OPT::Morph;
+#use Sim::OPT::Sim;
+#use Sim::OPT::Report;
+#use Sim::OPT::Descend;
+#use Sim::OPT::Takechance;
+#use Sim::OPT::Parcoord3d;
+# NOTE: TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted.
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.135';
+$VERSION = '0.147';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -41,47 +42,6 @@ $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, m
 #######################################################################
 
 ########## AN EXAMPLE OF SETTINGS TO BE PUT IN A CONFIGURATION FILE FOLLOWS.
-
-$tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
-my $maxloops= 1000;
-my $sourcefile = "./prepfile.csv";
-my $newfile = $sourcefile . "_meta.csv";
-my $report = $newfile . "_report.txt";
-my @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
-#my @mode = ( "near" ); # "nea" means "nearest neighbour"
-#@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
-#my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
-my @weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
-# THEY ARE FRACTIONS OF 1 AND MUST GIVE 1 IN TOTAL. IF THE VALUES ARE UNSPECIFIED (IE. IF THE ARRAY IS EMPTY), THE VALUES ARE UNWEIGHTED.
-my $linearprecedence = "no"; # PRECEDENCE TO LINEAR INTERPOLATES. IF "yes", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "no", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
-
-my $relaxmethod = "logarithmic"; #It is relative to the "linnear" method. Options: "logarithmic", "linear" or "exponential". THE FARTHER NEIGHBOURS ARE WEIGHT LESS THAN THE NEAREST ONES: INDEED, LOGARITHMICALLY, LINEARLY OR EXPONENTIALLY. THE LOGARITHM BASE IS $relaxlimit OR $nearrelaxlimit, DEPENDING FROM THE CONTEXT. THE LINEAR MULTIPLICATOR OR THE EXPONENT IS DEFINED BY $overwerightnearest.
-my $relaxlimit = 1; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF PURE LINEAR INTERPOLATION. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INTERPOLATES ALSO NEAREST NEIGHBOURS. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS.
-my $overweightnearest = 1; #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "yes". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
-my $nearrelaxlimit = 0; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF THE NEAREST NEIGHBOUR STRATEGY. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INCREASES THE DISTANCE OF THE NEAREST NEIGHBOURS INCLUDED. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS. ONE IS NOT LIKELY TO WANT TO USE THIS OPTION.
-my $nearconcurrencies = 1; #Requested minimum number of concurrencies for the nearest neighbour method. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-my $parconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each parameter of each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-my $instconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-# my %factlevels = ( pairs => { 1=>3, 2=>3, 3=>3, 4=>3, 5=>3 } ); #The keys are the factor numbers and the values are the number of levels in the data series. OBSOLETE.
-my $minreq_forgrad = [1, 1, 1 ]; #THIS VALUES SPECIFY THE NUMBER OF PARAMETER DIFFERENCES (INTEGER NUMBERS) TELLING HOW WELL-ROOTED IN SIMULATED REALITY (I.E, NEAR FROM IT) A POINT MUST BE TO SELECT IT FOR CALCULATING THE GRADIENTS FOR THE METAMODEL. THEY ARE INTEGERS STARTING FROM 1 OR GREATER.
-# THE FIRST VALUE IS RELATIVE TO THE FACTORS AND TELLS HOW RELAXED A SEARCH IS.
-# THE SECOND VALUE IS RELATIVE TO THE LEVELS. ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
-# ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
-# THE THIRD VALUE HOW DIFFERENT (FAR, IN TERMS OF PARAMETER DIFFERENCES) MAY AN INSTANCE BE TO BE CALCULATED THROUGH THE GRADIENT IN QUESTION.
-# ONE MAY WANT TO SET TO THE NUMBER OF PARAMETERS.
-# A LARGE NUMBER, WEAK ENTRY BARRIER. NEVER LESS THAN 1.
-
-my $minreq_forinclusion = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT (META-POINT) MUST BE FOR INCLUDING IT IN THE SET OF POINTS USED FOR THE METAMODEL.If 0, no entry barrier.
-my $minreq_forcalc = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR INCLUDING IT IN THE CALCULATIONS FOR CREATING NEW META-POINTS.  A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0. If 0, no entry barrier.
-my $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR MERGING IT IN THE CALCULATIONS FOR MERGING IT IN THE METAMODEL. A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0 (SIMULATED POINTS AND "META"POINTS WITH THE SAME RIGHT ) MUST BE SPECIFIED. If 0, no entry barrier.
-my $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
-my $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
-my $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
-my $nfilter = "100"; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
-my $limit_checkdistgrades = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-my $limit_checkdistpoints = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-my $fulldo = "yes"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE. "super" even more. "tight" NO.
-my $lvconversion = ""; # IF "EQUAL", A FRACTION OF LEVEL HAS THE VALUE OF 1, WHATEVER THE NUMBER OF A FRATION OF LEVEL IN A FACTOR. OTHERWISE, A NUMBER.
 
 ############# END OF THE EXAMPLE SETTINGS TO BE PUT IN A CONFIGURATION FILE.
 
@@ -143,7 +103,7 @@ sub union
   return @union;
 }
 
-sub diff_old
+sub diff_OLD
 {
   my $aref = shift;
   my $bref = shift;
@@ -617,7 +577,7 @@ sub calcdistgrad
 
 sub calcmaxdist
 {
-  my ( $arr_ref, $factlevels_ref) = @_;
+  my ( $arr_ref, $factlevels_ref ) = @_;
   my @arr = @{ $arr_ref };
   #my @sortarr = sort { $a->[0] <=> $b->[0] } @arr;
   my $first = $arr[0];
@@ -736,15 +696,25 @@ sub isnear
 sub wei
 {
   my ( $arr_ref, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count,
-    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, $bank_ref, $fulldo, $first0, $last0, $nears_ref, $checkstop ) = @_;
+    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, $bank_ref, $fulldo, $first0, $last0, $nears_ref, $checkstop,
+    $weldsprepared_ref, $weldaarrs_ref, $parswelds_ref, $recedes_ref ) = @_;
   my @arr = @{ $arr_ref };
   #say $tee "ARR VERY_BEFORE: " . dump(@arr);
   my %factlevels = %{ $factlevels_ref };  #say $tee "AND \%factlevels: " . dump( %factlevels );
   # my ( %magic, %wand, %spell, %bank );
   my %bank = %{ $bank_ref };
-  my %nears = %{ $nears_ref };
+  my %nears = %{ $nears_ref }; #say $tee " \%nearsIN1: " . dump( \%nears );
 
-  say "nfilter: $nfilter.";
+  my %weldnears;
+
+###--###
+  my @weldsprepared = @{ $weldsprepared_ref }; #say $tee "NOW \@weldsprepared: " . dump( @weldsprepared );
+  my @weldaarrs = @{ $weldaarrs_ref }; #say $tee "NOW \@weldaarrs: " . dump( @weldaarrs );
+  my @parswelds = @{ $parswelds_ref }; #say $tee "NOW \@parswelds: " . dump( @parswelds );
+  my @recedes = @{ $recedes_ref }; #say $tee "NOW \@recedes: " . dump( @recedes );
+###--###
+
+  #say "nfilter: $nfilter.";
   $nfilter = ( $nfilter - 1 );
 
   my @arr__;
@@ -783,14 +753,15 @@ sub wei
     @arrb = @arr__;
   }
 
+
   sub fillbank
   { #say $tee "NOW IN FILLBANK.";
+    #say $tee " \%nearsIN2: " . dump( \%nears );
     my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r, $nfilter, $arra_r, $first0, $last0, $nears_ref ) = @_;
     my @arr = @{ $arr_r };
     my @arra = @{ $arra_r };
     my %factlevels = %{ $factlevels_r };
-    my %nears = %{ $nears_ref };
-
+    my %nears = %{ $nears_ref }; #say $tee " \%nearsIN3: " . dump( \%nears );
     #my $nstop;
     #if ( $nfilter ne "" )
     #{
@@ -1011,59 +982,177 @@ sub wei
         }
       }
     }
+    #_#say $tee " \%bank: " . dump( %bank );
     return ( \%bank, \%nears );
   }
 
   sub clean
   {
-    my ( $bank_ref, $nfilter ) = @_;
+    my ( $bank_ref, $nfilter, $message, $recedes_ref ) = @_;
     my %bank = %{ $bank_ref };
     my $n2filter = ( 2 * $nfilter );
-    foreach my $trio ( keys ( %bank ) )
+    my @recedes = @{ $recedes_ref };
+    if ( scalar( @recedes ) > 0 )
     {
-      my ( @grads, @ordists, @dists, @strengths );
-      unless( ( $bank{$trio}{grad} eq "" ) or ( $bank{$trio}{ordists} eq "" )
-        or ( $bank{$trio}{dists} eq "" ) or ( $bank{$trio}{strengths} eq "" ) )
-      {
-        push ( @grads, $bank{$trio}{grad} );
-        @grads = map { $_ =~ s/ // } @grads;
-        push ( @ordists, $bank{$trio}{ordists} );
-        @ordists = map { $_ =~ s/ // } @ordists;
-        push ( @dists, $bank{$trio}{dists} );
-        @dists = map { $_ =~ s/ // } @dists;
-        push ( @strengths, $bank{$trio}{strengths} );
-
-        @grads = map { $b <=> $a } @grads;
-        @grads = @grads[0..$n2filter];
-        @ordists = map { $b <=> $a } @ordists;
-        @ordists = @ordists[0..$n2filter];
-        @dists = map { $b <=> $a } @dists;
-        @dists = @dists[0..$n2filter];
-        @strengths = map { $_ =~ s/ // } @strengths;
-        @strengths = map { $b <=> $a } @strengths;
-        @strengths = @strengths[0..$n2filter];
-
-        $bank{$trio}{grad} = [ @grads ];
-        $bank{$trio}{ordists} = [ @ordists ];
-        $bank{$trio}{dists} = [ @dists ];
-        $bank{$trio}{strengths} = [ @strengths ];
-      }
+      say "RECEDE " . dump( @recedes ); #say "MESSAGE $message";
     }
 
+    foreach my $trio ( keys ( %bank ) )
+    {
+      my @els = split( "-", $trio );
+      my $first = $els[0];
+      unless ( ( $message eq "principal" ) and ( $first ~~ @recedes ) )
+      {
+        my ( @grads, @ordists, @dists, @strengths );
+        unless( ( $bank{$trio}{grad} eq "" ) or ( $bank{$trio}{ordists} eq "" )
+          or ( $bank{$trio}{dists} eq "" ) or ( $bank{$trio}{strengths} eq "" ) )
+        {
+          push ( @grads, $bank{$trio}{grad} );
+          @grads = map { $_ =~ s/ // } @grads;
+          push ( @ordists, $bank{$trio}{ordists} );
+          @ordists = map { $_ =~ s/ // } @ordists;
+          push ( @dists, $bank{$trio}{dists} );
+          @dists = map { $_ =~ s/ // } @dists;
+          push ( @strengths, $bank{$trio}{strengths} );
+
+          @grads = map { $b <=> $a } @grads;
+          @grads = @grads[0..$n2filter];
+          @ordists = map { $b <=> $a } @ordists;
+          @ordists = @ordists[0..$n2filter];
+          @dists = map { $b <=> $a } @dists;
+          @dists = @dists[0..$n2filter];
+          @strengths = map { $_ =~ s/ // } @strengths;
+          @strengths = map { $b <=> $a } @strengths;
+          @strengths = @strengths[0..$n2filter];
+
+          $bank{$trio}{grad} = [ @grads ];
+          $bank{$trio}{ordists} = [ @ordists ];
+          $bank{$trio}{dists} = [ @dists ];
+          $bank{$trio}{strengths} = [ @strengths ];
+        }
+      }
+      #else
+      #{
+      #  say $tee "RECEDE $first";
+      #}
+    }
     return( \%bank );
-  }
+  } #END FILLBANK
 
   unless( ( $fulldo eq "$tight" ) and ( $count > 0 ) )
   {
     say $tee "Entering gradients' \%bank.";
     my ( $bank_ref, $nears_ref ) = fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra, $first0, $last0, \%nears );
-    %bank = %{ $bank_ref };
+    %bank = %{ $bank_ref }; #say $tee "\%bank: " . dump( %bank );
     %nears = %{ $nears_ref };
-
-    %bank = %{ clean( \%bank, $nfilter ) }; say $tee "BANK DONE."; #say $tee "CLEANED \%bank: " . dump( %bank ) ;
-    #my %bank =  %{ $bank_ref }; say $tee "CLEANED \%bank: " . dump( %bank );
+    %bank = %{ clean( \%bank, $nfilter, "principal", \@recedes ) }; say $tee "BANK DONE."; #say $tee "CLEANED \%bank: " . dump( %bank ) ;
   }
 
+###--###
+  sub mixbank
+  {
+    my ( $bank_ref, $weldbank_ref, $parsws_ref ) = @_;
+    my %bank = %{ $bank_ref };
+    my %weldbank = %{ $weldbank_ref };
+    my @parsws = @{ $parsws_ref };
+    say $tee "Mixing for welding " . dump( @parsws );
+    foreach my $trio ( keys %weldbank )
+    {
+      unless ( $trio eq "" )
+      {
+        my @splits = split( "-", $trio ); #say $tee "\@splits " . dump( @splits );
+        my $num = $splits[0];
+        if ( $num ~~ @parsws )
+        {
+          push ( @{ $bank{$trio}{orderedtrio} }, @{ $weldbank{$trio}{orderedtrio} } );
+          push ( @{ $bank{$trio}{grad} }, @{ $weldbank{$trio}{grad} } );
+          push ( @{ $bank{$trio}{grads} }, @{ $weldbank{$trio}{grads} } );
+          push ( @{ $bank{$trio}{ordists} }, @{ $weldbank{$trio}{ordists} } );
+          push ( @{ $bank{$trio}{strengths} }, @{ $weldbank{$trio}{strengths} } );
+          push ( @{ $bank{$trio}{orvals} }, @{ $weldbank{$trio}{orvals} } );
+          push ( @{ $bank{$trio}{origins} }, @{ $weldbank{$trio}{origins} } );
+          push ( @{ $bank{$trio}{orstrings} }, @{ $weldbank{$trio}{orstrings} } );
+          push ( @{ $bank{$trio}{orstring} }, @{ $weldbank{$trio}{orstring} } );
+          say $tee "weld $num.";
+        }
+      }
+    }
+    return( \%bank );
+  }
+
+  unless ( ( scalar( @weldsprepared ) == 0 )
+  #or ( $count > 0 )
+  )
+  { say $tee "Entering gradients' bank for welding.";
+    my $co = 0;
+    foreach my $weldref ( @weldaarrs )
+    {
+      my @parsws = @{ $parswelds[$co] }; say $tee "\@parsws: " . dump( @parsws );
+      my @weldarr = @{ $weldref }; #_#say $tee "THIS \@weldarr: " . dump( @weldarr ) . " DONE THIS \@weldarr.";
+      my @weldarr__;
+      if ( ( $limit_checkdistgrades ne "" ) or ( $limit_checkdistpoints ne "" ) )
+      {
+        @weldarr__ = shuffle( @weldarr );
+      }
+      else
+      {
+        @weldarr__ = @weldarr;
+      }
+
+      my ( @weldarra, @weldarrah );
+      if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
+      {
+        @weldarrah = @weldarr__;
+        @weldarra = @weldarrah[0..$limit_checkdistgrades];
+      }
+      else
+      {
+        @weldarra = @weldarr__;
+      }
+
+      my @weldarrb;
+      if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
+      {
+        @weldarrb = @weldarrah[0..$limit_checkdistpoints];
+      }
+      elsif ( ( $limit_checkdistpoints ne "" ) and ( $limit_checkdistpoints > $checkstop ) )
+      {
+        my @weldarrb_ = @weldarr__;
+        @weldarrb = @weldarrb_[0..$limit_checkdistpoints];
+      }
+      else
+      {
+        @weldarrb = @weldarr__;
+      }
+
+
+      #foreach my $el ( @weldarr )
+      #{
+      #  if ( ( $weldnears{$el->[0]}{all}->[2] eq "" ) or ( ( $weldnears{$el->[0]}{all}->[3] < 1 ) and ( $weldnears{$el->[0]}{all}->[2] != $el->[2] ) ) )
+      #  {
+      #    $weldnears{$el->[0]}{all} = $el;
+      #  }
+      #}
+      #say $tee " \%weldnears: " . dump( \%weldnears );
+
+      #say $tee "FIRST0 $first0,  LAST0 $last0 ";
+      #say $tee " \@weldarr__: " . dump( \@weldarr__ ) ;
+      #say $tee " \%factlevels: " . dump( \%factlevels ) ;
+      #say $tee " \@weldarra: " . dump( \@weldarra ) ;
+      my ( $weldbank_ref, $weldnears_ref ) = fillbank( \@weldarr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@weldarra, $first0, $last0, \%nears );##%weldnears!!!!
+      %weldbank = %{ $weldbank_ref }; #say $tee " \%weldbank: " . dump( \%weldbank ) ;
+      %weldnears = %{ $weldnears_ref };
+
+      %weldbank = %{ clean( \%weldbank, $nfilter, "weld" ) }; #say $tee "CLEANED \%weldbank: " . dump( \%weldbank ) ;
+
+      %bank = %{ mixbank( \%bank, \%weldbank, \@parsws ) };
+      #say $tee "COMPLETED \%bank:" . dump( \%bank ) . ": COMPLETED \%bank.";
+      say $tee "KEYS \%bank: " . ( keys %bank );
+
+      $co++;
+    }
+  }
+###--###
 
   sub cyclearr
   {
@@ -1416,7 +1505,7 @@ sub purelin
                         $indinc--;
                       }
                     }
-                    $co++;
+                    $co++;$nears_ref
                   }
                   $count++;
                 }
@@ -1829,10 +1918,11 @@ sub interlinear
   #say $tee "ARRIVED IN INTERLINEAR \$blockelts_r ". dump( $blockelts_r );
   #say $tee "ARRIVED IN INTERLINEAR \$reportf $reportf";
   #say $tee "ARRIVED IN INTERLINEAR \$countblock $countblock";
+
+  say "DOING";
   my ( %bank, %nears );
 
   if ( $reportf ne "" ){ $report = $reportf; } #say $tee "CHECK5 \$report: " . dump( $report );
-  $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 
   if ( $configf eq "" )
   {
@@ -1846,21 +1936,33 @@ sub interlinear
 
   if ( -e $confile )
   {
-    #eval $confile; ############## FIX THIS!
+    require $confile; ############## TRULY FIX THIS!!!!!
+  }
+  else
+  {
+
+
+
   }
 
+
+  $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
+
+  #say $tee "ENTERED.";
+
   if ( $sourcef ne "" ){ $sourcefile = $sourcef; } #say $tee "CHECK5 \$sourcefile: " . dump( $sourcefile );
+
   if ( $metafile ne "" ){ $newfile = $metafile; } #say $tee "CHECK5 \$newfile: " . dump( $newfile );
 
   my @blockelts;
   if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; } #say $tee "CHECK5 \@blockelts: " . dump( @blockelts );
 
   my @mode = adjustmode( $maxloops, \@mode );
-  say "Opening $sourcefile";
+  say $tee "Opening $sourcefile";
   open( SOURCEFILE, "$sourcefile" ) or die;
   my @lines = <SOURCEFILE>; #say $tee "REALLY \@lines: " . dump( @lines );
   close SOURCEFILE;
-
+  #print "THIS $tee";
   say $tee "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
   say "nfilter: $nfilter";
   my $checkstop;
@@ -1874,11 +1976,31 @@ sub interlinear
   my %factlevels = %{ prepfactlev( \@aarr ) }; #say $tee "IN INTERLINEAR REALLY \%factlevels: " . dump( \%factlevels );
   say $tee "Done.";
 
+
   my ( $factlev_ref ) = tellstepsize( \%factlevels, $lvconversion );
-  my %factlev = %{ $factlev_ref }; #say $tee "REALLY \%factlev: " . dump( %factlev );
+  my %factlev = %{ $factlev_ref }; say $tee " \%factlev: " . dump( %factlev );
   say $tee "Understood step sizes.";
 
-  my ( $maxdist, $first0, $last0 ) = calcmaxdist( \@aarr, \%factlev, $limit_checkdistpoints );
+###--###
+  my ( @weldaarrs );
+  if ( scalar( @weldsprepared ) > 0 )
+  {
+    foreach my $weldsourcefile ( @weldsprepared )
+    {
+      open( WELDSOURCEFILE, "$weldsourcefile" ) or die;
+      my @weldlines = <WELDSOURCEFILE>; #say $tee "REALLY \@lines: " . dump( @lines );
+      close WELDSOURCEFILE;
+
+      my ( $weldaarr_ref, $optformat ) = preparearr( @weldlines );
+
+      my @weldaarr = @{ $weldaarr_ref }; #say $tee "REALLY \@weldaarr: " . dump( @weldaarr );
+      push ( @weldaarrs, [ @weldaarr ] );
+    }
+  }
+
+  my ( $maxdist, $first0, $last0 ) = calcmaxdist( \@aarr, \%factlev );
+###--###
+
   #say $tee "\$first0: " . dump( $first0 );
   #say $tee "\$last0: " . dump( $last0 );
   #say $tee "DONE CALCMAXDIST: " . dump( $maxdist );
@@ -1947,15 +2069,15 @@ sub interlinear
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      my ( $limbo_wei_ref, $bank_ref, $nears_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop );
+      my ( $limbo_wei_ref, $bank_ref, $nears_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop, \@weldsprepared, \@weldaarrs, \@parswelds, \@recedes );
 
       @limbo_wei = @{ $limbo_wei_ref };
       %bank = %{ $bank_ref };
-      %nears = %{ $nears_ref };
+      %nears = %{ $nears_ref }; say $tee "OBTAINED \%nears: " . dump( \%nears );
 
       say $tee "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
     }
-    #say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
+    say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
 
     if ( ( $mode__ eq "purelin" ) or ( $mode__ eq "mix" ) )
     {
@@ -2119,11 +2241,11 @@ Sim::OPT::Interlinear
   # As a Perl function:
   re.#!/usr/bin/env perl
   use Sim::OPT::Interlinear
-  Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.csv", "./obtainedmetamodel.csv" );
+  Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.pl", "./obtainedmetamodel.csv" );
 
   # or as a script, from the command line:
-  perl ./Interlinear.pm . "" ./sourcefile.csv
-  # (note the dot and <"">).
+  perl ./Interlinear.pm  .  ./sourcefile.csv
+  # (note the dot).
 
   # or, again, from the command line, for beginning with a dialogue question:
   interlinear interstart
@@ -2204,7 +2326,7 @@ The number of computations required for the creation of a metamodel in OPT incre
 To call Interlinear as a Perl function (best strategy):
 re.pl # open Perl shell
 use Sim::OPT::Interlinear; # load Interlinear
-Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.csv", "./obtainedmetamodel.csv" );
+Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./configfile.pl", "./obtainedmetamodel.csv" );
 "configfile.pl" is the configuration file. If that file is an empty file, Interlinear will assume its defaults.
 "./sourcefile.csv" is the only information which is truly mandatory: the path to the csv dataseries to be completed.
 

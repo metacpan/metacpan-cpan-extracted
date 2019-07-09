@@ -1,4 +1,4 @@
-# Copyright 2011, 2013 Kevin Ryde
+# Copyright 2011, 2013, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -22,8 +22,6 @@ use strict;
 use vars '$VERSION';
 $VERSION = 10;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 # Generated with:
 # (shell-command "perl -n -e '/define XC_([^ ]*).*?([0-9]+)/ and do { printf qq{use constant %-20s => %d;\n}, $1, $2;}' </usr/include/X11/cursorfont.h" 'insert)
@@ -119,7 +117,7 @@ X11::CursorConstants - cursor font glyph constants
 =head1 SYNOPSIS
 
  use X11::CursorConstants;
- my $glyphnum = X11::CursorConstants::crosshair; # is 34
+ my $glyphnum = X11::CursorConstants::crosshair(); # is 34
 
 =head1 DESCRIPTION
 
@@ -131,8 +129,8 @@ The subr names are per the Xlib F</usr/include/X11/cursorfont.h>, without
 the C<XC_> prefixes.  Each glyph is a character for the foreground shape,
 and the next character is the background mask.
 
-    X11::CursorConstants::fleur,       # glyph
-    X11::CursorConstants::fleur + 1,   # and its mask
+    X11::CursorConstants::fleur(),       # glyph
+    X11::CursorConstants::fleur() + 1,   # and its mask
 
 So for example to create a "crosshair" cursor,
 
@@ -144,12 +142,12 @@ So for example to create a "crosshair" cursor,
           ($cursor,
            $cursor_font,  # font
            $cursor_font,  # mask font
-           X11::CursorConstants::crosshair,      # glyph
-           X11::CursorConstants::crosshair + 1,  # and its mask
+           X11::CursorConstants::crosshair(),      # glyph
+           X11::CursorConstants::crosshair() + 1,  # and its mask
            0,0,0,                  # foreground, black
            0xFFFF,0xFFFF,0xFFFF);  # background, white
 
-The images can be viewed with the C<xfd> font display program,
+All cursors can be viewed with the C<xfd> font display program,
 
      xfd -fn cursor
 
@@ -247,8 +245,8 @@ needed, and usually only in one or two places each.  The full list is
 
     num_glyphs            154
 
-C<X11::CursorConstants::num_glyphs()> is how many glyphs plus their masks
-are in the font, ie. characters C<0> to C<num_glyphs-1> exist.
+C<X11::CursorConstants::num_glyphs()> is how many glyphs plus masks are in
+the font, ie. characters C<0> to C<num_glyphs-1> exist.
 
 =head1 SEE ALSO
 
@@ -259,7 +257,7 @@ L<X11::Protocol::Other>,
 L<xfd(1)>
 
 F</usr/include/X11/cursorfont.h> and listed in the Xlib manual appendix B
-(F</usr/share/doc/libx11-dev/libX11.txt.gz>).
+(F</usr/share/doc/libx11-dev/libX11/libX11.txt.gz>).
 
 Xlib Xmu C<XmuCursorNameToIndex()>
 
@@ -269,7 +267,7 @@ L<http://user42.tuxfamily.org/x11-protocol-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2013 Kevin Ryde
+Copyright 2011, 2013, 2017 Kevin Ryde
 
 X11-Protocol-Other is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

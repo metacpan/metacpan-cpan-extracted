@@ -1,0 +1,15 @@
+App-uricolor-0.12.tar.gz
+Changes
+lib/App/uricolor.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/uricolor
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

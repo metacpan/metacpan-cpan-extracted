@@ -2,7 +2,7 @@
 
 # my-wunused.sh -- run warnings::unused on dist files
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2015 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2015, 2019 Kevin Ryde
 
 # my-wunused.sh is shared by several distributions.
 #
@@ -46,9 +46,9 @@ done
 echo "$LINT_FILES"
 for i in $LINT_FILES; do
   # warnings::unused broken by perl 5.14, so use 5.10 for checks
-  # perl-5.10.0 -I /usr/share/perl5 -Mwarnings::unused=-global -I lib -c $i
+  perl -I /usr/share/perl5 -Mwarnings::unused=-global -I lib -c $i
 
-  # full path name or else the "require" looks through @INC
-  echo "\"$i\""
-  perl -e 'use Test::More tests=>1; use Test::Vars; Test::Vars::vars_ok($ARGV[0])' "`pwd`/$i"
+  # # full path name or else the "require" looks through @INC
+  # echo "\"$i\""
+  # perl -e 'use Test::More tests=>1; use Test::Vars; Test::Vars::vars_ok($ARGV[0])' "`pwd`/$i"
 done

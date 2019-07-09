@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -22,7 +22,7 @@ use Carp;
 use X11::Protocol;
 
 use vars '$VERSION', '@CARP_NOT';
-$VERSION = 30;
+$VERSION = 31;
 @CARP_NOT = ('X11::Protocol');
 
 # uncomment this to run the ### lines

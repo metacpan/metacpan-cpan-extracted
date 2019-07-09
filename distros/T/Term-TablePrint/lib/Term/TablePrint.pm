@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -15,6 +15,7 @@ use Scalar::Util qw( looks_like_number );
 use Term::Choose                  qw( choose );
 use Term::Choose::Constants       qw( :screen );
 use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
+use Term::Choose::ValidateOptions qw( validate_options ); #
 use Term::Choose::Util            qw( term_width insert_sep unicode_sprintf );
 use Term::TablePrint::ProgressBar qw();
 
@@ -38,27 +39,22 @@ sub new {
     my $class = shift;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
     my ( $opt ) = @_;
-    my $self = bless {}, $class;
+    my $instance_defaults = _defaults();
     if ( defined $opt ) {
         croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
-        my $valid = $self->__valid_options();
-        $self->__validate_and_add_options( $valid, $opt );
+        validate_options( _valid_options(), $opt );
+        for my $key ( keys %$opt ) {
+            $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
+        }
     }
-    $self->{backup_opt} = { defined $opt ? %$opt : () };
+    my $self = bless $instance_defaults, $class;
+    $self->{backup_instance_defaults} = { %$instance_defaults };
     $self->{plugin} = $Plugin->new();
     return $self;
 }
 
 
-sub DESTROY {
-    my ( $self ) = @_;
-    if ( $self->{hide_cursor} ) {
-        print SHOW_CURSOR;
-    }
-}
-
-
-sub __valid_options {
+sub _valid_options {
     return {
         max_rows          => '[ 0-9 ]+',
         min_col_width     => '[ 0-9 ]+',
@@ -83,51 +79,28 @@ sub __valid_options {
 }
 
 
-sub __validate_and_add_options {
-    my ( $self, $valid, $opt ) = @_;
-    return if ! defined $opt;
-    my $sub =  ( caller( 1 ) )[3];
-    $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
-    $sub .= ':';
-    for my $key ( keys %$opt ) {
-        if ( ! exists $valid->{$key} ) {
-            croak "$sub '$key' is not a valid option name";
-        }
-        next if ! defined $opt->{$key};
-        if ( $valid->{$key} eq 'Str' ) {
-            croak "$sub $key => references are not valid values." if ref $opt->{$key} ne '';
-        }
-        elsif ( $opt->{$key} !~ m/^$valid->{$key}\z/x ) {
-            croak "$sub $key => '$opt->{$key}' is not a valid value.";
-        }
-        $self->{$key} = $opt->{$key};
+sub _defaults {
+    return {
+        binary_filter     => 0,
+        binary_string     => 'BNRY',
+        choose_columns    => 0,
+        codepage_mapping  => 0,
+        color             => 0,
+        decimal_separator => '.',
+        grid              => 1,
+        hide_cursor       => 1,
+        keep_header       => 1,
+        squash_spaces     => 0,
+        max_rows          => 200000,
+        min_col_width     => 30,
+        mouse             => 0,
+        progress_bar      => 40000,
+        prompt            => '',
+        tab_width         => 2,
+        table_expand      => 1,
+        undef             => '',
+        thsd_sep          => ',', #
     }
-}
-
-
-sub __set_defaults {
-    my ( $self ) = @_;
-    $self->{binary_filter}     = 0      if ! defined $self->{binary_filter};
-    $self->{binary_string}     = 'BNRY' if ! defined $self->{binary_string};
-    $self->{choose_columns}    = 0      if ! defined $self->{choose_columns};
-    $self->{codepage_mapping}  = 0      if ! defined $self->{codepage_mapping};
-    $self->{color}             = 0      if ! defined $self->{color};
-    $self->{decimal_separator} = '.'    if ! defined $self->{decimal_separator};
-    $self->{grid}              = 1      if ! defined $self->{grid};
-    $self->{hide_cursor}       = 1      if ! defined $self->{hide_cursor};
-    $self->{keep_header}       = 1      if ! defined $self->{keep_header};
-    $self->{squash_spaces}     = 0      if ! defined $self->{squash_spaces};
-    $self->{max_rows}          = 200000 if ! defined $self->{max_rows};
-    $self->{min_col_width}     = 30     if ! defined $self->{min_col_width};
-    $self->{mouse}             = 0      if ! defined $self->{mouse};
-    $self->{progress_bar}      = 40000  if ! defined $self->{progress_bar};
-    $self->{prompt}            = ''     if ! defined $self->{prompt};
-    $self->{tab_width}         = 2      if ! defined $self->{tab_width};
-    $self->{table_expand}      = 1      if ! defined $self->{table_expand};
-    $self->{undef}             = ''     if ! defined $self->{undef};
-    $self->{thsd_sep} = ',';
-    $self->{tab_w}    = $self->{tab_width};
-    $self->{tab_w}++    if $self->{grid} && ! ( $self->{tab_width} % 2 );
 }
 
 
@@ -136,14 +109,14 @@ sub __reset {
     if ( $self->{hide_cursor} ) {
         print SHOW_CURSOR;
     }
-    if ( exists $self->{backup_opt} ) {
-        my $backup_opt = $self->{backup_opt};
+    if ( exists $self->{backup_instance_defaults} ) {
+        my $instance_defaults = $self->{backup_instance_defaults};
         for my $key ( keys %$self ) {
-            if ( $key eq 'plugin' || $key eq 'backup_opt' ) {
+            if ( $key eq 'plugin' || $key eq 'backup_instance_defaults' ) {
                 next;
             }
-            elsif ( exists $backup_opt->{$key} ) {
-                $self->{$key} = $backup_opt->{$key};
+            elsif ( exists $instance_defaults->{$key} ) {
+                $self->{$key} = $instance_defaults->{$key};
             }
             else {
                 delete $self->{$key};
@@ -155,7 +128,7 @@ sub __reset {
 
 sub print_table {
     if ( ref $_[0] ne 'Term::TablePrint' ) {
-        return print_table( bless( { plugin => $Plugin->new() }, 'Term::TablePrint' ), @_ );
+        return print_table( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::TablePrint' ), @_ );
     }
     my $self = shift;
     my ( $table_ref, $opt ) = @_;
@@ -163,11 +136,21 @@ sub print_table {
     croak "print_table: requires an ARRAY reference as its first argument."            if ref $table_ref  ne 'ARRAY';
     if ( defined $opt ) {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
-        my $valid = $self->__valid_options();
-        $self->__validate_and_add_options( $valid, $opt );
+        validate_options( _valid_options(), $opt );
+        for my $key ( keys %$opt ) {
+            $self->{$key} = $opt->{$key} if defined $opt->{$key};
+        }
     }
-    $self->__set_defaults();
+    $self->{tab_w} = $self->{tab_width};
+    if ( $self->{grid} && ! ( $self->{tab_width} % 2 ) ) {
+        ++$self->{tab_w};
+    }
     local $| = 1;
+    local $SIG{INT} = sub {
+        $self->__reset();
+        print "\n";
+        exit;
+    };
     if ( $self->{hide_cursor} ) {
         print HIDE_CURSOR;
     }
@@ -748,7 +731,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.115
+Version 0.116
 
 =cut
 

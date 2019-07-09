@@ -1,6 +1,7 @@
 Build.PL
-lib/Data/Edit/Xml/To/Dita.pm
+CONTRIBUTING.md
+lib/Data/Edit/Xml/To/DitaVb.pm
 MANIFEST			This list of files
-t/1.t
+test.pl
 META.yml
 META.json

@@ -1,3 +1,29 @@
+0.004   2019-07-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Activate indicator: english using Lingua::Identify::Any.
+
+
+0.003   2019-07-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Use Cwalitee::Common's args_list() & args_calc() for better
+          completion.
+
+
+0.002   2019-07-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Refactor common stuffs into Cwalitee::Common, which now
+          offers filtering indicator by name, module, status, and severity
+
+        - Add indicators: no_empty_group, not_too_wide, not_all_caps,
+          no_shouting, no_useless_text.
+
+	- [ux] Do not show indicator summary and priority when returning
+	  calc result.
+
+	- list_cpan_changes_cwalitee(): Warn duplicate name, include module name
+          in result.
+
+
 0.001   2019-07-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add indicators: releases_in_descending_date_order,

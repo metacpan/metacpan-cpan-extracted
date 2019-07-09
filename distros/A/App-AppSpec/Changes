@@ -1,5 +1,9 @@
 Revision history for Perl module App::AppSpec
 
+0.005 2019-07-06 18:18:00+02:00
+
+    - Use App::Spec::Schema (App::Spec 0.012) for validator
+
 0.004 2019-05-18 20:58:36+02:00
 
     - Generated spec into a module instead of using YAML file

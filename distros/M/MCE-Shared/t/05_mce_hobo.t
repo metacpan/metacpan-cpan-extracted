@@ -106,6 +106,8 @@ BEGIN {
       push @result, $res;
    }
 
+   @result = sort @result;
+
    is ( "@result", "1 2 3", 'check wait_all' );
    is ( $cnt_start , 4, 'check on_start'  );
    is ( $cnt_finish, 4, 'check on_finish' );

@@ -1,5 +1,5 @@
 requires 'perl', '5.010';
-requires 'Mojolicious', '7.52';
+requires 'Mojolicious', '8.03';
 requires 'HTTP::Date', '6.02';
 requires 'Time::Zone', '2.2';
 

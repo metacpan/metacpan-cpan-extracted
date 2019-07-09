@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension MojoX::JSON::RPC.
 
+0.12 2019-07-08 00:00:00
+     - Remove deprectaed PODRenderer
+
 0.11 2018-06-14 00:00:00
      - Bump to Mojolicios v7
 

@@ -14,7 +14,7 @@ use Inline (
         ),
         ($ENV{LIBUSB_INCDIR} ? ( INC => "-I\"$ENV{LIBUSB_INCDIR}\"" ) : () ),
         NAME => 'Device::USB',
-        VERSION => '0.37',
+        VERSION => '0.38',
    );
 
 Inline->init();
@@ -47,14 +47,17 @@ Device::USB - Use libusb to access USB devices. (DEPRECATED)
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
-our $VERSION=0.37;
+our $VERSION=0.38;
 
 
 =head1 SYNOPSIS
+
+Device::USB has now been superceded by L<USB::LibUSB|https://metacpan.org/pod/USB::LibUSB>,
+which supports the v1.0 libusb API.
 
 Device::USB provides a Perl wrapper around the libusb library. This
 supports Perl code controlling and accessing USB devices.
@@ -79,13 +82,13 @@ the method name prepended with "usb_".
 
 =head1 DESCRIPTION
 
-This module is deprecated as of version 0.37. I have not had the time
+This module is deprecated as of version 0.38. I have not had the time
 or need to update the module, and no one has been willing to take it
 over.
 
 This module provides a Perl interface to the C library libusb. This library
 supports a relatively full set of functionality to access a USB device. In
-addition to the libusb, functioality, Device::USB provides a few
+addition to the libusb functionality Device::USB provides a few
 convenience features that are intended to produce a more Perl-ish interface.
 
 These features include:

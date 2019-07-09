@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.001002';
+$Net::Checkpoint::Management::v1::VERSION = '0.001003';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -231,6 +231,24 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         delete   => 'delete-service-other',
         list_key => 'objects',
     },
+    {
+        object   => 'service_groups',
+        singular => 'service_group',
+        create   => 'add-service-group',
+        list     => 'show-service-groups',
+        get      => 'show-service-group',
+        update   => 'set-service-group',
+        delete   => 'delete-service-group',
+        list_key => 'objects',
+    },
+    {
+        object   => 'sessions',
+        singular => 'session',
+        list     => 'show-sessions',
+        get      => 'show-session',
+        update   => 'set-session',
+        list_key => 'objects',
+    },
 ]);
 
 
@@ -295,7 +313,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 SYNOPSIS
 

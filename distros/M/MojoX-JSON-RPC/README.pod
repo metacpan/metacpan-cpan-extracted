@@ -1,9 +1,10 @@
-NAME
-    MojoX::JSON::RPC - a Perl implementation of the JSON-RPC 2.0 protocol
-    for Mojolicious
+=head1 NAME
 
-SYNOPSIS
-    Server as a plugin (Mojolicious::Plugin::JsonRpcDispatcher):
+MojoX::JSON::RPC - a Perl implementation of the JSON-RPC 2.0 protocol for Mojolicious
+
+=head1 SYNOPSIS
+
+Server as a plugin (L<Mojolicious::Plugin::JsonRpcDispatcher>):
 
         #!/usr/bin/env perl
         use Mojolicious::Lite;
@@ -25,7 +26,7 @@ SYNOPSIS
 
         app->start;
 
-    Client (MojoX::JSON::RPC::Client):
+Client (L<MojoX::JSON::RPC::Client>):
 
         #!/usr/bin/env perl
         use MojoX::JSON::RPC::Client;
@@ -53,7 +54,7 @@ SYNOPSIS
             print 'HTTP response '.$tx_res->code.' '.$tx_res->message;
         }
 
-    Non-blocking client:
+Non-blocking client:
 
         #!/usr/bin/env perl
         use MojoX::JSON::RPC::Client;
@@ -88,38 +89,48 @@ SYNOPSIS
 
         Mojo::IOLoop->start;
 
-DESCRIPTION
-    This module implments a client plugin and a server plugin for JSON-RPC
-    2.0 for use with Mojolicious.
+=head1 DESCRIPTION
 
-    This module follows the draft specficiation for JSON-RPC 2.0. More
-    information can be found at
-    <http://groups.google.com/group/json-rpc/web/json-rpc-2-0>.
+This module implments a client plugin and a server plugin for JSON-RPC
+2.0 for use with Mojolicious.
 
-SEE ALSO
-    Mojolicious::Plugin::JsonRpcDispatcher, MojoX::JSON::RPC::Dispatcher,
-    MojoX::JSON::RPC::Client
+This module follows the draft specficiation for JSON-RPC 2.0. More
+information can be found at
+L<http://groups.google.com/group/json-rpc/web/json-rpc-2-0>.
 
-AUTHOR
-    Henry Tang
+=head1 SEE ALSO
+ 
+L<Mojolicious::Plugin::JsonRpcDispatcher>, L<MojoX::JSON::RPC::Dispatcher>,
+L<MojoX::JSON::RPC::Client>
 
-CREDITS
-      Igor Afanasyev
+=head1 AUTHOR
 
-      Renee Baecker (https://github.com/reneeb)
+Henry Tang
 
-      Vidar Tyldum <vidar@tyldum.com>
+=head1 CREDITS
 
-COPYRIGHT & LICENSE
-    Copyright (C) 2011-2016, Henry Tang.
+=over 2
 
-    MojoX::JSON::RPC is provided "as is" and without any express or implied
-    warranties, including, without limitation, the implied warranties of
-    merchantibility and fitness for a particular purpose.
+Igor Afanasyev
 
-    This program is free software, you can redistribute it and/or modify it
-    under the terms of the Artistic License version 2.0.
+Renee Baecker (https://github.com/reneeb)
 
-SUPPORT
-    Dmitry Karasik <dmitry@karasik.eu.org>
+Vidar Tyldum <vidar@tyldum.com>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2011-2016, Henry Tang.
+
+MojoX::JSON::RPC is provided "as is" and without any express or
+implied warranties, including, without limitation, the implied
+warranties of merchantibility and fitness for a particular purpose.
+
+This program is free software, you can redistribute it and/or modify
+it under the terms of the Artistic License version 2.0.
+
+=head1 SUPPORT
+
+Dmitry Karasik <dmitry@karasik.eu.org>
 

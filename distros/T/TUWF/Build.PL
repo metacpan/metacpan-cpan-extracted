@@ -4,7 +4,7 @@ use Module::Build;
 
 Module::Build->new(
   dist_name     => 'TUWF',
-  dist_version  => '1.3',
+  dist_version  => '1.4',
   dist_author   => 'Yoran Heling <projects@yorhel.nl>',
   dist_abstract => 'The Ultimate Website Framework',
   license       => 'mit',

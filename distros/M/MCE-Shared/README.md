@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.840.
+This document describes MCE::Shared version 1.841.
 
 ### Description
 
@@ -112,6 +112,7 @@ MCE::Shared utilizes the following modules:
     constant
     overload
     Carp
+    Errno
     IO::FDPass  1.2+ (optional, recommended on UNIX and Windows)
     MCE::Mutex  1.832+
     MCE::Util   1.832+
@@ -139,7 +140,7 @@ and [MCE Cookbook](https://github.com/marioroy/mce-cookbook) for recipes.
 
 ### Copyright and Licensing
 
-Copyright (C) 2016-2018 by Mario E. Roy <marioeroy AT gmail DOT com>
+Copyright (C) 2016-2019 by Mario E. Roy <marioeroy AT gmail DOT com>
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself:

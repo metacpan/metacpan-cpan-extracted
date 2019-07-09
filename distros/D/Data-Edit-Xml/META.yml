@@ -15,13 +15,13 @@ name: Data-Edit-Xml
 provides:
   Data::Edit::Xml:
     file: lib/Data/Edit/Xml.pm
-    version: '20190621'
+    version: '20190708'
   ditaSyntaxDiagramFromDocBookCmdSynopsis:
     file: lib/Data/Edit/Xml.pm
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20190620'
+  Data::Table::Text: '20190708'
   Storable: '0'
   Test2::API: '0'
   Test::More: '0'
@@ -29,5 +29,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190621'
+version: '20190708'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

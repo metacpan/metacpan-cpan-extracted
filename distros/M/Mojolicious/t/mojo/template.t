@@ -607,7 +607,6 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->message, "x\n", 'right message';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->lines_before->[1][0], 2,      'right number';
@@ -629,7 +628,6 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/Missing right curly/, 'right message';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,          'right number';
 is $output->lines_before->[0][1], 'test',     'right line';
 is $output->lines_before->[1][0], 2,          'right number';
@@ -654,7 +652,6 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 14,  'right number';
 is $output->lines_before->[0][1], '}', 'right line';
 is $output->lines_before->[1][0], 15,  'right number';
@@ -686,7 +683,6 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/oops!/, 'right message';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,               'right number';
 is $output->lines_before->[0][1], 'test',          'right line';
 is $output->lines_before->[1][0], 2,               'right number';
@@ -704,15 +700,17 @@ is $output->lines_after->[1][1], 'test',     'right line';
 $output->frames([['Sandbox', 'template', 5], ['main', 'template.t', 673]]);
 is $output, <<EOF, 'right result';
 oops! at template line 5.
-1: test
-2: 123\\
-3: 456
-4:  %# This dies
-5: % die 'oops!';
-6: %= 1 + 1
-7: test
-template:5 (Sandbox)
-template.t:673 (main)
+Context:
+  1: test
+  2: 123\\
+  3: 456
+  4:  %# This dies
+  5: % die 'oops!';
+  6: %= 1 + 1
+  7: test
+Traceback (most recent call first):
+  File "template", line 5, in "Sandbox"
+  File "template.t", line 673, in "main"
 EOF
 
 # Exception in template (empty perl lines)
@@ -730,7 +728,6 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/oops!/, 'right message';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,          'right number';
 is $output->lines_before->[0][1], 'test\\\\', 'right line';
 ok $output->lines_before->[0][2], 'contains code';
@@ -767,8 +764,7 @@ EOT
 -$]
 $-= $output
 EOF
-like $output,
-  qr/test\n\nBareword "bar".+in use at template line 1\.\n1: %= bar/,
+like $output, qr/test\n\nBareword "bar".+in use at template line 1\./,
   'exception in nested template';
 
 # Control structures
@@ -1139,7 +1135,6 @@ $file   = path(__FILE__)->sibling('templates', 'exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt line 2/, 'message contains filename';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
@@ -1154,7 +1149,6 @@ $output = $mt->name('"foo.mt" from DATA section')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/foo\.mt from DATA section line 2/,
   'message contains filename';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
@@ -1168,7 +1162,6 @@ $mt     = Mojo::Template->new;
 $file   = path(__FILE__)->sibling('templates', 'utf8_exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][1], '☃', 'right line';
 is $output->line->[1], '% die;♥', 'right line';
 is $output->lines_after->[0][1], '☃', 'right line';
@@ -1178,7 +1171,6 @@ $mt     = Mojo::Template->new;
 $output = $mt->render('<% die "Test at template line 99\n"; %>');
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->message, "Test at template line 99\n", 'right message';
-ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0], undef, 'no lines before';
 is $output->line->[0],         1,     'right number';
 is $output->line->[1], '<% die "Test at template line 99\n"; %>', 'right line';

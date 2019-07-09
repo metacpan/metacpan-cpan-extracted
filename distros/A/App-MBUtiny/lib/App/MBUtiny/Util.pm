@@ -1,4 +1,4 @@
-package App::MBUtiny::Util; # $Id: Util.pm 120 2019-07-01 11:57:45Z abalama $
+package App::MBUtiny::Util; # $Id: Util.pm 126 2019-07-04 22:43:29Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MBUtiny::Util - Internal utilities used by App::MBUtiny module
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION @EXPORT_OK /;
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 our $DEBUG = 0;
 
@@ -307,14 +307,13 @@ sub hide_password {
 }
 sub set2attr {
     my $in = shift;
-    my $attr = array($in => "set");
+    my $attr = is_array($in) ? $in : array($in => "set");
     my %attrs;
     foreach (@$attr) {
         $attrs{$1} = $2 if $_ =~ /^\s*(\S+)\s+(.+)$/;
     }
     return {%attrs};
 }
-
 
 sub _td { # Test of base directory
     my $d = shift; # exclude directory

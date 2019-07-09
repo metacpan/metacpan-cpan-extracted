@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1::Role::REST::Client;
-$Net::Checkpoint::Management::v1::Role::REST::Client::VERSION = '0.001002';
+$Net::Checkpoint::Management::v1::Role::REST::Client::VERSION = '0.001003';
 # ABSTRACT: Checkpoint Management API version 1.x client
 use Moo::Role;
 
@@ -19,7 +19,7 @@ Net::Checkpoint::Management::v1::Role::REST::Client - Checkpoint Management API 
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 AUTHOR
 

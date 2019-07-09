@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 368;
+use Test::More tests => 380;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
 use HTTP::Daemon();
 use HTTP::Status();
 use HTTP::Response();
+use IO::Socket::SSL();
 
 my $segv_detected;
 my $at_least_one_success;
@@ -23,7 +24,9 @@ sub out_of_time {
 		($package, $file, $line) = caller;
 	}
 	diag("Testing has been running for " . (time - $^T) . " seconds at $file line $line");
-	if (time - $^T > $test_time_limit) {
+	if ($ENV{FIREFOX_BINARY}) {
+		return;
+	} elsif (time - $^T > $test_time_limit) {
 		return 1;
 	} else {
 		return;
@@ -297,6 +300,29 @@ eval {
 };
 chomp $@;
 ok((($@) and (not($firefox))), "Firefox::Marionette->new() threw an exception when launched with a path to a non firefox binary:$@");
+my $tls_tests_ok;
+if ( 
+	!IO::Socket::SSL->new(
+	PeerAddr => 'missing.example.org:443',
+	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE(),
+		) &&
+	IO::Socket::SSL->new(
+	PeerAddr => 'untrusted-root.badssl.com:443',
+	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE(),
+		) &&
+	!IO::Socket::SSL->new(
+	PeerAddr => 'untrusted-root.badssl.com:443',
+	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
+		) &&
+	IO::Socket::SSL->new(
+	PeerAddr => 'metacpan.org:443',
+	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
+		)) {
+	diag("TLS/Network seem okay");
+	$tls_tests_ok = 1;
+} else {
+	diag("TLS/Network are NOT okay");
+}
 my $skip_message;
 ok($profile = Firefox::Marionette::Profile->new(), "Firefox::Marionette::Profile->new() correctly returns a new profile");
 ok(((defined $profile->get_value('marionette.port')) && ($profile->get_value('marionette.port') == 0)), "\$profile->get_value('marionette.port') correctly returns 0");
@@ -599,7 +625,74 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 0, script => 5432, profile => $profile);
+	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1));
+	if (!$skip_message) {
+		$at_least_one_success = 1;
+	}
+	if ($skip_message) {
+		skip($skip_message, 4);
+	}
+	if (!$tls_tests_ok) {
+		skip("TLS test infrastructure seems compromised", 4);
+	}
+	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	my $capabilities = $firefox->capabilities();
+	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
+	if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
+		diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
+		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 2);
+	}
+	ok($capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is true");
+	ok($firefox->go(URI->new("https://untrusted-root.badssl.com/")), "https://untrusted-root.badssl.com/ has been loaded");
+}
+
+SKIP: {
+	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
+	if (!$skip_message) {
+		$at_least_one_success = 1;
+	}
+	if ($skip_message) {
+		skip($skip_message, 4);
+	}
+	if (!$tls_tests_ok) {
+		skip("TLS test infrastructure seems compromised", 4);
+	}
+	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	my $capabilities = $firefox->capabilities();
+	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
+	if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
+		diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
+		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 2);
+	}
+	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
+	eval { $firefox->go(URI->new("https://untrusted-root.badssl.com/")) };
+	ok(ref $@ eq 'Firefox::Marionette::Exception::InsecureCertificate', "https://untrusted-root.badssl.com/ threw an exception:$@");
+}
+
+SKIP: {
+	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
+	if (!$skip_message) {
+		$at_least_one_success = 1;
+	}
+	if ($skip_message) {
+		skip($skip_message, 4);
+	}
+	if (!$tls_tests_ok) {
+		skip("TLS test infrastructure seems compromised", 4);
+	}
+	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	my $capabilities = $firefox->capabilities();
+	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
+	if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
+		diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
+		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 2);
+	}
+	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
+	ok($firefox->go(URI->new("https://metacpan.org/")), "https://metacpan.org/ has been loaded");
+}
+
+SKIP: {
+	($skip_message, $firefox) = start_firefox(0, debug => 0, script => 5432, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}

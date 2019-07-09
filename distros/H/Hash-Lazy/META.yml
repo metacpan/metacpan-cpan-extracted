@@ -1,25 +1,28 @@
 ---
 abstract: 'A Hash implementation with lazy evaluation feature'
 author:
-  - 'Kang-min Liu <gugod@gugod.org>'
-build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  - 'Kang-min Liu E<lt>gugod@gugod.orgE<gt>'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.91'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.026, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Hash-Lazy
-no_index:
-  directory:
-    - examples
-    - inc
-    - t
-    - xt
+provides:
+  Hash::Lazy:
+    file: lib/Hash/Lazy.pm
+    version: '0.02'
+  Hash::Lazy::Tie:
+    file: lib/Hash/Lazy/Tie.pm
 resources:
-  license: http://opensource.org/licenses/mit-license.php
-version: 0.01
+  bugtracker: https://github.com/gugod/Hash-Lazy/issues
+  homepage: https://github.com/gugod/Hash-Lazy
+  repository: git://github.com/gugod/Hash-Lazy.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: MIT
+x_static_install: 1

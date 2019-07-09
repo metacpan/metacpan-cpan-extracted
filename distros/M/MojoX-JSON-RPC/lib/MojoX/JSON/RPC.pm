@@ -2,7 +2,7 @@ package MojoX::JSON::RPC;
 
 use strict;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 

@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Compile;
-Test::Compile::_verbose(0);
 
 plan skip_all => "Test::Exception required for checking exceptions"
     unless eval "use Test::Exception; 1";

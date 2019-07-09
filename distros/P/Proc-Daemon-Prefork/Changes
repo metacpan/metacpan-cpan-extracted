@@ -1,22 +1,27 @@
-0.710   2019-06-27 (PERLANCAR)
+0.711   2019-07-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add attribute: before_daemonize.
+
+
+0.710   2019-06-27  Released-By: PERLANCAR
 
 	- Accept error_log_handle & access_log_handle as alternatives to
 	  specifying error_log_path & access_log_path.
 
 
-0.70    2014-12-11 (PERLANCAR)
+0.70    2014-12-11  Released-By: PERLANCAR
 
         - Rename dist from {SHARYANTO-,}Proc-Daemon-Prefork.
 
 
-0.69    2014-04-05 (SHARYANTO)
+0.69    2014-04-05  Released-By: SHARYANTO
 
         - No functional changes.
 
         - [build] Rebuild because backup file (*~) got included (steven--).
 
 
-0.68    2014-02-17 (SHARYANTO)
+0.68    2014-02-17  Released-By: SHARYANTO
 
         - First release, split from SHARYANTO-Utils to resolve circular
           dependency problem.

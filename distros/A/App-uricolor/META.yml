@@ -1,0 +1,27 @@
+---
+abstract: 'Colorize URIs with ANSI colors.'
+author:
+  - 'jul <kal247@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-uricolor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Term::ANSIColor: '0'
+  URI::Find: '0'
+  URI::Find::Schemeless: '0'
+  perl: '5.006'
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

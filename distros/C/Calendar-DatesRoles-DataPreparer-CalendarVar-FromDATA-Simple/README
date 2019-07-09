@@ -3,11 +3,11 @@ NAME
     Populate $CALENDAR from data in __DATA__
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple (from
     Perl distribution
     Calendar-DatesRoles-DataPreparer-CalendarVar-FromDATA-Simple), released
-    on 2019-06-19.
+    on 2019-07-08.
 
 DESCRIPTION
     This role will set consumer's $CALENDAR package variable from consumer's

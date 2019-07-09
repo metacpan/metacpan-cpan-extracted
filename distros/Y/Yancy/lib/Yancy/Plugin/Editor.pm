@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.035';
+our $VERSION = '1.036';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -221,7 +221,7 @@ sub register {
         ->to( cb => sub {
             my ( $c ) = @_;
             my $upload = $c->param( 'upload' );
-            my $path = $c->yancy->file->write( $upload->filename, $upload->asset );
+            my $path = $c->yancy->file->write( $upload );
             $c->res->headers->location( $path );
             $c->render( status => 201, text => $path );
         } );
@@ -620,7 +620,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.035
+version 1.036
 
 =head1 SYNOPSIS
 

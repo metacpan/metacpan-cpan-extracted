@@ -1,7 +1,7 @@
 package App::dateseq;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.093'; # VERSION
+our $DATE = '2019-06-24'; # DATE
+our $VERSION = '0.094'; # VERSION
 
 use 5.010001;
 use strict;
@@ -58,16 +58,29 @@ _
             schema => ['bool*'],
             tags => ['category:filtering'],
         },
+
         include_dow => {
             summary => 'Only show dates with these day-of-weeks',
             schema => 'date::dow_nums*',
             tags => ['category:filtering'],
         },
         exclude_dow => {
-            summary => 'Only show dates with these day-of-weeks',
+            summary => 'Do not show dates with these day-of-weeks',
             schema => 'date::dow_nums*',
             tags => ['category:filtering'],
         },
+
+        include_month => {
+            summary => 'Only show dates with these month numbers',
+            schema => 'date::month_nums*',
+            tags => ['category:filtering'],
+        },
+        exclude_month => {
+            summary => 'Do not show dates with these month numbers',
+            schema => 'date::month_nums*',
+            tags => ['category:filtering'],
+        },
+
         business6 => {
             summary => 'Only list business days (Mon-Sat), '.
                 'or non-business days',
@@ -252,6 +265,14 @@ sub dateseq {
             my $dt_dow = $dt->day_of_week;
             return 0 if     grep { $dt_dow == $_ } @{ $args{exclude_dow} };
         }
+        if (defined $args{include_month}) {
+            my $dt_mon = $dt->month;
+            return 0 unless grep { $dt_mon == $_ } @{ $args{include_month} };
+        }
+        if (defined $args{exclude_dow}) {
+            my $dt_mon = $dt->month;
+            return 0 if     grep { $dt_mon == $_ } @{ $args{exclude_month} };
+        }
         1;
     };
 
@@ -311,7 +332,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.093 of App::dateseq (from Perl distribution App-dateseq), released on 2019-06-20.
+This document describes version 0.094 of App::dateseq (from Perl distribution App-dateseq), released on 2019-06-24.
 
 =head1 FUNCTIONS
 
@@ -350,7 +371,11 @@ C<%Y-%m-%dT%H:%M:%S>.
 
 =item * B<exclude_dow> => I<date::dow_nums>
 
-Only show dates with these day-of-weeks.
+Do not show dates with these day-of-weeks.
+
+=item * B<exclude_month> => I<date::month_nums>
+
+Do not show dates with these month numbers.
 
 =item * B<from> => I<date>
 
@@ -363,6 +388,10 @@ Add a header row.
 =item * B<include_dow> => I<date::dow_nums>
 
 Only show dates with these day-of-weeks.
+
+=item * B<include_month> => I<date::month_nums>
+
+Only show dates with these month numbers.
 
 =item * B<increment> => I<duration>
 

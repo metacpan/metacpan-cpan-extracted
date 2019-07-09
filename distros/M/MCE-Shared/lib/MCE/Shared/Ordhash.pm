@@ -25,7 +25,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -800,7 +800,7 @@ MCE::Shared::Ordhash - An ordered hash class featuring tombstone deletion
 
 =head1 VERSION
 
-This document describes MCE::Shared::Ordhash version 1.840
+This document describes MCE::Shared::Ordhash version 1.841
 
 =head1 DESCRIPTION
 
@@ -995,9 +995,9 @@ Both non-shared and shared instances are impacted if doing so. Although likely
 fast enough for many use cases, the OO interface is recommended for best
 performance.
 
-=over 3
+=head2 MCE::Shared::Ordhash->new ( key, value [, key, value, ... ] )
 
-=item new ( key, value [, key, value, ... ] )
+=head2 MCE::Shared->ordhash ( key, value [, key, value, ... ] )
 
 Constructs a new object, with an optional list of key-value pairs.
 
@@ -1015,7 +1015,7 @@ Constructs a new object, with an optional list of key-value pairs.
  $oh = MCE::Shared->ordhash( @pairs );
  $oh = MCE::Shared->ordhash( );
 
-=item assign ( key, value [, key, value, ... ] )
+=head2 assign ( key, value [, key, value, ... ] )
 
 Clears the hash, then sets multiple key-value pairs and returns the number of
 keys stored in the hash. This is equivalent to C<clear>, C<mset>.
@@ -1025,14 +1025,14 @@ keys stored in the hash. This is equivalent to C<clear>, C<mset>.
 
 API available since 1.007.
 
-=item clear
+=head2 clear
 
 Removes all key-value pairs from the hash.
 
  $oh->clear;
  %{$oh} = ();
 
-=item clone ( key [, key, ... ] )
+=head2 clone ( key [, key, ... ] )
 
 Creates a shallow copy, a C<MCE::Shared::Ordhash> object. It returns an exact
 copy if no arguments are given. Otherwise, the object includes only the given
@@ -1042,7 +1042,7 @@ C<undef> value.
  $oh2 = $oh->clone( "key1", "key2" );
  $oh2 = $oh->clone;
 
-=item delete ( key )
+=head2 delete ( key )
 
 Deletes and returns the value by given key or C<undef> if the key does not
 exists in the hash.
@@ -1050,29 +1050,29 @@ exists in the hash.
  $val = $oh->delete( "some_key" );
  $val = delete $oh->{ "some_key" };
 
-=item del
+=head2 del
 
 C<del> is an alias for C<delete>.
 
-=item exists ( key )
+=head2 exists ( key )
 
 Determines if a key exists in the hash.
 
  if ( $oh->exists( "some_key" ) ) { ... }
  if ( exists $oh->{ "some_key" } ) { ... }
 
-=item flush ( key [, key, ... ] )
+=head2 flush ( key [, key, ... ] )
 
 Same as C<clone>. Though, clears all existing items before returning.
 
-=item get ( key )
+=head2 get ( key )
 
 Gets the value of a hash key or C<undef> if the key does not exists.
 
  $val = $oh->get( "some_key" );
  $val = $oh->{ "some_key" };
 
-=item iterator ( key [, key, ... ] )
+=head2 iterator ( key [, key, ... ] )
 
 Returns a code reference for iterating a list of key-value pairs stored in
 the hash when no arguments are given. Otherwise, returns a code reference for
@@ -1090,7 +1090,7 @@ returned for deleted keys.
     ...
  }
 
-=item iterator ( "query string" )
+=head2 iterator ( "query string" )
 
 Returns a code reference for iterating a list of key-value pairs that match
 the given criteria. It returns an empty list if the search found nothing.
@@ -1105,7 +1105,7 @@ The syntax for the C<query string> is described above.
     ...
  }
 
-=item keys ( key [, key, ...] )
+=head2 keys ( key [, key, ...] )
 
 Returns hash keys in the same insertion order when no arguments are given.
 Otherwise, returns the given keys in the same order. Keys that do not exist
@@ -1119,7 +1119,7 @@ will have the C<undef> value. In scalar context, returns the size of the hash.
  $len  = $oh->keys;     # ditto
  $len  = keys %{$oh};
 
-=item keys ( "query string" )
+=head2 keys ( "query string" )
 
 Returns only keys that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
@@ -1130,7 +1130,7 @@ above. In scalar context, returns the size of the resulting list.
  @keys = $oh->keys( "val eq sun :OR val eq moon :OR val eq foo" );
  $len  = $oh->keys( "key =~ /$pattern/" );
 
-=item len ( key )
+=head2 len ( key )
 
 Returns the size of the hash when no arguments are given. For the given key,
 returns the length of the value stored at key or the C<undef> value if the
@@ -1140,39 +1140,39 @@ key does not exists.
  $len  = $oh->len( "key1" );
  $len  = length $oh->{ "key1" };
 
-=item mdel ( key [, key, ... ] )
+=head2 mdel ( key [, key, ... ] )
 
 Deletes one or more keys in the hash and returns the number of keys deleted.
 A given key which does not exist in the hash is not counted.
 
  $cnt = $oh->mdel( "key1", "key2" );
 
-=item mexists ( key [, key, ... ] )
+=head2 mexists ( key [, key, ... ] )
 
 Returns a true value if all given keys exists in the hash. A false value is
 returned otherwise.
 
  if ( $oh->mexists( "key1", "key2" ) ) { ... }
 
-=item mget ( key [, key, ... ] )
+=head2 mget ( key [, key, ... ] )
 
 Gets the values of all given keys. It returns C<undef> for keys which do not
 exists in the hash.
 
  ( $val1, $val2 ) = $oh->mget( "key1", "key2" );
 
-=item mset ( key, value [, key, value, ... ] )
+=head2 mset ( key, value [, key, value, ... ] )
 
 Sets multiple key-value pairs in a hash and returns the number of keys stored
 in the hash.
 
  $len = $oh->mset( "key1" => "val1", "key2" => "val2" );
 
-=item merge
+=head2 merge
 
 C<merge> is an alias for C<mset>.
 
-=item pairs ( key [, key, ... ] )
+=head2 pairs ( key [, key, ... ] )
 
 Returns key-value pairs in the same insertion order when no arguments are given.
 Otherwise, returns key-value pairs for the given keys in the same order. Keys
@@ -1184,7 +1184,7 @@ size of the hash.
  @pairs = $oh->pairs;
  $len   = $oh->pairs;
 
-=item pairs ( "query string" )
+=head2 pairs ( "query string" )
 
 Returns only key-value pairs that match the given criteria. It returns an
 empty list if the search found nothing. The syntax for the C<query string> is
@@ -1195,7 +1195,7 @@ described above. In scalar context, returns the size of the resulting list.
  @pairs = $oh->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
  $len   = $oh->pairs( "key =~ /$pattern/" );
 
-=item pipeline ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
 Combines multiple commands for the object to be processed serially. For shared
 objects, the call is made atomically due to single IPC to the shared-manager
@@ -1225,7 +1225,7 @@ from the last command in the pipeline.
 
 Current API available since 1.809.
 
-=item pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
+=head2 pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
@@ -1237,7 +1237,7 @@ Same as C<pipeline>, but returns data for every command in the pipeline.
 
 Current API available since 1.809.
 
-=item pop
+=head2 pop
 
 Removes and returns the last key-value pair or value in scalar context of the
 ordered hash. If there are no keys in the hash, returns the undefined value.
@@ -1246,7 +1246,7 @@ ordered hash. If there are no keys in the hash, returns the undefined value.
 
  $val = $oh->pop;
 
-=item purge
+=head2 purge
 
 A utility method for purging any *tombstones* in the keys array. It also
 resets a couple counters internally. Call this method before serializing
@@ -1254,7 +1254,7 @@ to a file, which is the case in C<MCE::Shared::Minidb>.
 
  $oh->purge;
 
-=item push ( key, value [, key, value, ... ] )
+=head2 push ( key, value [, key, value, ... ] )
 
 Appends one or multiple key-value pairs to the tail of the ordered hash and
 returns the new length. Any keys already existing in the hash are re-inserted
@@ -1262,14 +1262,14 @@ with the new values.
 
  $len = $oh->push( "key1", "val1", "key2", "val2" );
 
-=item set ( key, value )
+=head2 set ( key, value )
 
 Sets the value of the given hash key and returns its new value.
 
  $val = $oh->set( "key", "value" );
  $val = $oh->{ "key" } = "value";
 
-=item shift
+=head2 shift
 
 Removes and returns the first key-value pair or value in scalar context of the
 ordered hash. If there are no keys in the hash, returns the undefined value.
@@ -1278,9 +1278,9 @@ ordered hash. If there are no keys in the hash, returns the undefined value.
 
  $val = $oh->shift;
 
-=item sort ( "BY key [ ASC | DESC ] [ ALPHA ]" )
+=head2 sort ( "BY key [ ASC | DESC ] [ ALPHA ]" )
 
-=item sort ( "BY val [ ASC | DESC ] [ ALPHA ]" )
+=head2 sort ( "BY val [ ASC | DESC ] [ ALPHA ]" )
 
 Returns sorted keys in list context, leaving the elements intact. In void
 context, sorts the hash in-place. By default, sorting is numeric and applied
@@ -1304,7 +1304,7 @@ sort the hash from large to small, specify the C<DESC> modifier.
 
  $oh->sort( "BY key DESC ALPHA" );
 
-=item splice ( offset [, length [, key, value, ... ] ] )
+=head2 splice ( offset [, length [, key, value, ... ] ] )
 
 Removes the key-value pairs designated by C<offset> and C<length> from the
 ordered hash, and replaces them with C<key-value pairs>, if any. The behavior
@@ -1314,7 +1314,7 @@ is similar to the Perl C<splice> function.
  @pairs = $oh->splice( 20, 2 );
  @pairs = $oh->splice( 20 );
 
-=item unshift ( key, value [, key, value, ... ] )
+=head2 unshift ( key, value [, key, value, ... ] )
 
 Prepends one or multiple key-value pairs to the head of the ordered hash and
 returns the new length. Any keys already existing in the hash are re-inserted
@@ -1322,7 +1322,7 @@ with the new values.
 
  $len = $oh->unshift( "key1", "val1", "key2", "val2" );
 
-=item values ( key [, key, ... ] )
+=head2 values ( key [, key, ... ] )
 
 Returns hash values in the same insertion order when no arguments are given.
 Otherwise, returns values for the given keys in the same order. Keys that do
@@ -1337,7 +1337,7 @@ of the hash.
  $len  = $oh->values;     # ditto
  $len  = values %{$oh};
 
-=item values ( "query string" )
+=head2 values ( "query string" )
 
 Returns only values that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
@@ -1348,11 +1348,9 @@ above. In scalar context, returns the size of the resulting list.
  @vals = $oh->values( "val eq sun :OR val eq moon :OR val eq foo" );
  $len  = $oh->values( "key =~ /$pattern/" );
 
-=item vals
+=head2 vals
 
 C<vals> is an alias for C<values>.
-
-=back
 
 =head1 SUGAR METHODS
 
@@ -1363,57 +1361,53 @@ reduction in inter-process communication.
 The API resembles a subset of the Redis primitives
 L<http://redis.io/commands#strings> with key representing the hash key.
 
-=over 3
-
-=item append ( key, string )
+=head2 append ( key, string )
 
 Appends a value to a key and returns its new length.
 
  $len = $oh->append( $key, "foo" );
 
-=item decr ( key )
+=head2 decr ( key )
 
 Decrements the value of a key by one and returns its new value.
 
  $num = $oh->decr( $key );
 
-=item decrby ( key, number )
+=head2 decrby ( key, number )
 
 Decrements the value of a key by the given number and returns its new value.
 
  $num = $oh->decrby( $key, 2 );
 
-=item getdecr ( key )
+=head2 getdecr ( key )
 
 Decrements the value of a key by one and returns its old value.
 
  $old = $oh->getdecr( $key );
 
-=item getincr ( key )
+=head2 getincr ( key )
 
 Increments the value of a key by one and returns its old value.
 
  $old = $oh->getincr( $key );
 
-=item getset ( key, value )
+=head2 getset ( key, value )
 
 Sets the value of a key and returns its old value.
 
  $old = $oh->getset( $key, "baz" );
 
-=item incr ( key )
+=head2 incr ( key )
 
 Increments the value of a key by one and returns its new value.
 
  $num = $oh->incr( $key );
 
-=item incrby ( key, number )
+=head2 incrby ( key, number )
 
 Increments the value of a key by the given number and returns its new value.
 
  $num = $oh->incrby( $key, 2 );
-
-=back
 
 =head1 CREDITS
 

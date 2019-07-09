@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Localisation;
 # ABSTRACT: Localisation auto de notices biblio
-$Koha::Contrib::Sudoc::Localisation::VERSION = '2.29';
+$Koha::Contrib::Sudoc::Localisation::VERSION = '2.31';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -624,7 +624,7 @@ Koha::Contrib::Sudoc::Localisation - Localisation auto de notices biblio
 
 =head1 VERSION
 
-version 2.29
+version 2.31
 
 =head1 AUTHOR
 

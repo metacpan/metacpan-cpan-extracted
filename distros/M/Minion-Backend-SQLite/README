@@ -351,6 +351,12 @@ METHODS
 
       Task name.
 
+    time
+
+        time => 78411177
+
+      Current time.
+
     worker
 
         worker => '154'

@@ -1207,7 +1207,7 @@ is ($warning, undef, $t);
 SKIP: {
     $t = q{When client_min_messages is FATAL, we do our best to alert the caller it's a Bad Idea};
     $dbh->do(q{SET client_min_messages = 'FATAL'});
-    skip "This version of PostgreSQL caps client_min_messages to ERROR", 1
+    skip 'This version of PostgreSQL caps client_min_messages to ERROR', 1
         unless $dbh->selectrow_array('SHOW client_min_messages') eq 'fatal';
 
     $dbh->{RaiseError} = 0;
@@ -1216,7 +1216,7 @@ SKIP: {
         $dbh->do('SELECT 1 FROM nonesuh');
     };
     my $errorstring = $dbh->errstr;
-    like ( $errorstring, qr/Perhaps client_min_messages/, $t);
+    like ($errorstring, qr/Perhaps client_min_messages/, $t);
 }
 $dbh->rollback();
 $dbh->do(q{SET client_min_message = 'NOTICE'});
@@ -1316,36 +1316,39 @@ $dbh4->disconnect();
 
 $t='Database handle attribute "ShowErrorStatemnt" starts out false';
 is ($dbh->{ShowErrorStatement}, '', $t);
+
+$t='Database handle attribute "ShowErrorStatement" has no effect if not set';
 $SQL = 'Testing the ShowErrorStatement attribute';
 eval {
 	$sth = $dbh->prepare($SQL);
 	$sth->execute();
 };
-$t='Database handle attribute "ShowErrorStatement" has no effect if not set';
 unlike ($@, qr{for Statement "Testing}, $t);
+
+$t='Database handle attribute "ShowErrorStatement" adds statement to errors';
 $dbh->{ShowErrorStatement} = 1;
 eval {
 	$sth = $dbh->prepare($SQL);
 	$sth->execute();
 };
-$t='Database handle attribute "ShowErrorStatement" adds statement to errors';
 like ($@, qr{for Statement "Testing}, $t);
 
+$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors';
 $SQL = q{SELECT 'Another ShowErrorStatement Test' FROM pg_class WHERE relname = ? AND reltuples = ?};
 eval {
 	$sth = $dbh->prepare($SQL);
 	$sth->execute(123);
 };
-$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors';
 like ($@, qr{with ParamValues}, $t);
 
+$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors';
 $SQL = q{SELECT 'Another ShowErrorStatement Test' FROM pg_class WHERE relname = ? AND reltuples = ?};
 eval {
 	$sth = $dbh->prepare($SQL);
 	$sth->execute(123,456);
 };
-$t='Database handle attribute "ShowErrorStatement" adds statement and placeholders to errors';
 like ($@, qr{with ParamValues: 1='123', 2='456'}, $t);
+
 $dbh->commit();
 
 #

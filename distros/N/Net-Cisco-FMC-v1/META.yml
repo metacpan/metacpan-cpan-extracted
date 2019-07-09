@@ -3,6 +3,7 @@ abstract: 'Cisco Firepower Management Center (FMC) API version 1 client library'
 author:
   - 'Alexander Hartmaier <abraxxa@cpan.org>'
 build_requires:
+  Test2::Suite: '0.000119'
   Test::More: '1.302140'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,10 +28,10 @@ requires:
   perl: '5.024000'
 resources:
   repository: https://github.com/abraxxa/Net-Cisco-FMC-v1.git
-version: '0.003001'
+version: '0.004001'
 x_Dist_Zilla:
   perl:
-    version: '5.028001'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
@@ -250,10 +251,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -268,12 +269,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -281,16 +282,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003001'
+          tag: '0.004001'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -299,10 +300,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -364,5 +365,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

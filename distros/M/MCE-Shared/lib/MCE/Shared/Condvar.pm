@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -41,7 +41,6 @@ sub DESTROY {
 
    if ($_cv->{_init_pid} eq $_pid) {
       MCE::Util::_destroy_socks($_cv, qw(_cw_sock _cr_sock));
-      delete $_cv->{'_mutex'};
    }
 
    return;
@@ -57,7 +56,6 @@ sub new {
    my ($_class, $_cv) = (shift, {});
 
    $_cv->{_init_pid} = $_has_threads ? $$ .'.'. $_tid : $$;
-   $_cv->{_mutex}    = MCE::Mutex->new( impl => 'Channel' );
    $_cv->{_value}    = shift || 0;
    $_cv->{_count}    = 0;
 
@@ -150,7 +148,7 @@ sub len {
             print {$_DAU_R_SOCK} $LF;
          };
          for my $_i (1 .. $_var->{_count}) {
-            1 until syswrite($_var->{_cw_sock}, $LF) || ($! && !$!{'EINTR'});
+            syswrite($_var->{_cw_sock}, $LF);
          }
 
          $_var->{_count} = 0;
@@ -167,7 +165,7 @@ sub len {
             print {$_DAU_R_SOCK} $LF;
          };
          if ( $_var->{_count} >= 0 ) {
-            1 until syswrite($_var->{_cw_sock}, $LF) || ($! && !$!{'EINTR'});
+            syswrite($_var->{_cw_sock}, $LF);
             $_var->{_count} -= 1;
          }
 
@@ -242,30 +240,12 @@ no overloading;
 
 my $_is_MSWin32 = ($^O eq 'MSWin32') ? 1 : 0;
 
-my ($_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj);
+my ($_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj);
 
 sub _init_condvar {
-   ($_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj) = @_;
+   ($_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj) = @_;
 
    return;
-}
-
-# lock ( )
-
-sub lock {
-   return unless ( my $_CV = $_obj->{ $_[0]->[0] } );
-   return unless ( exists $_CV->{_mutex} );
-
-   $_CV->{_mutex}->lock;
-}
-
-# unlock ( )
-
-sub unlock {
-   return unless ( my $_CV = $_obj->{ $_[0]->[0] } );
-   return unless ( exists $_CV->{_mutex} );
-
-   $_CV->{_mutex}->unlock;
 }
 
 # broadcast ( floating_seconds )
@@ -279,7 +259,7 @@ sub broadcast {
    sleep($_[1]) if defined $_[1];
 
    _req1('O~CVB', $_id.$LF);
-   $_CV->{_mutex}->unlock();
+   $_[0]->[6]->unlock();
 
    sleep(0);
 }
@@ -295,7 +275,7 @@ sub signal {
    sleep($_[1]) if defined $_[1];
 
    _req1('O~CVS', $_id.$LF);
-   $_CV->{_mutex}->unlock();
+   $_[0]->[6]->unlock();
 
    sleep(0);
 }
@@ -314,7 +294,7 @@ sub timedwait {
       if (!looks_like_number($_timeout) || $_timeout < 0);
 
    _req1('O~CVW', $_id.$LF);
-   $_CV->{_mutex}->unlock();
+   $_[0]->[6]->unlock();
 
    local $@; eval {
       local $SIG{ALRM} = sub { die "alarm clock restart\n" };
@@ -323,7 +303,7 @@ sub timedwait {
       die "alarm clock restart\n"
          if $_is_MSWin32 && MCE::Util::_sock_ready($_CV->{_cr_sock}, $_timeout);
 
-      1 until sysread($_CV->{_cr_sock}, my($_b), 1) || ($! && !$!{'EINTR'});
+      MCE::Util::_sysread($_CV->{_cr_sock}, my($_b), 1);
 
       alarm 0 unless $_is_MSWin32;
    };
@@ -348,10 +328,10 @@ sub wait {
    return unless ( exists $_CV->{_cr_sock} );
 
    _req1('O~CVW', $_id.$LF);
-   $_CV->{_mutex}->unlock();
+   $_[0]->[6]->unlock();
 
    MCE::Util::_sock_ready($_CV->{_cr_sock}) if $_is_MSWin32;
-   1 until sysread($_CV->{_cr_sock}, my($_b), 1) || ($! && !$!{'EINTR'});
+   MCE::Util::_sysread($_CV->{_cr_sock}, my($_b), 1);
 
    return 1;
 }
@@ -372,7 +352,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.840
+This document describes MCE::Shared::Condvar version 1.841
 
 =head1 DESCRIPTION
 
@@ -425,7 +405,7 @@ The following example demonstrates barrier synchronization.
  my $count = MCE::Shared->condvar(0);
  my $state = MCE::Shared->scalar('ready');
 
- my $microsecs = ( lc $^O =~ /mswin|mingw|msys|cygwin/ ) ? 0 : 200;
+ my $microsecs = ( $^O =~ /mswin|mingw|msys|cygwin/i ) ? 0 : 200;
 
  # The lock is released upon entering ->broadcast, ->signal, ->timedwait,
  # and ->wait. For performance reasons, the condition variable is *not*
@@ -472,9 +452,7 @@ The following example demonstrates barrier synchronization.
 
 =head1 API DOCUMENTATION
 
-=over 3
-
-=item new ( [ value ] )
+=head2 MCE::Shared->condvar ( [ value ] )
 
 Constructs a new condition variable. Its value defaults to C<0> when C<value>
 is not specified.
@@ -484,7 +462,7 @@ is not specified.
  $cv = MCE::Shared->condvar( 100 );
  $cv = MCE::Shared->condvar;
 
-=item set ( value )
+=head2 set ( value )
 
 Sets the value associated with the C<cv> object. The new value is returned
 in scalar context.
@@ -492,20 +470,20 @@ in scalar context.
  $val = $cv->set( 10 );
  $cv->set( 10 );
 
-=item get
+=head2 get
 
 Returns the value associated with the C<cv> object.
 
  $val = $cv->get;
 
-=item len
+=head2 len
 
 Returns the length of the value. It returns the C<undef> value if the value
 is not defined.
 
  $len = $var->len;
 
-=item lock
+=head2 lock
 
 Attempts to grab the lock and waits if not available. Multiple calls to
 C<$cv->lock> by the same process or thread is safe. The mutex will remain
@@ -513,14 +491,14 @@ locked until C<$cv->unlock> is called.
 
  $cv->lock;
 
-=item unlock
+=head2 unlock
 
 Releases the lock. A held lock by an exiting process or thread is released
 automatically.
 
  $cv->unlock;
 
-=item signal ( [ floating_seconds ] )
+=head2 signal ( [ floating_seconds ] )
 
 Releases a held lock on the variable. Then, unblocks one process or thread
 that's C<wait>ing on that variable. The variable is *not* locked upon return.
@@ -530,7 +508,7 @@ Optionally, delay C<floating_seconds> before signaling.
  $count->signal;
  $count->signal( 0.5 );
 
-=item broadcast ( [ floating_seconds ] )
+=head2 broadcast ( [ floating_seconds ] )
 
 The C<broadcast> method works similarly to C<signal>. It releases a held lock
 on the variable. Then, unblocks all the processes or threads that are blocked
@@ -542,7 +520,7 @@ Optionally, delay C<floating_seconds> before broadcasting.
  $count->broadcast;
  $count->broadcast( 0.5 );
 
-=item wait
+=head2 wait
 
 Releases a held lock on the variable. Then, waits until another thread does a
 C<signal> or C<broadcast> for the same variable. The variable is *not* locked
@@ -550,7 +528,7 @@ upon return.
 
  $count->wait() while $state->get() eq "bar";
 
-=item timedwait ( floating_seconds )
+=head2 timedwait ( floating_seconds )
 
 Releases a held lock on the variable. Then, waits until another thread does a
 C<signal> or C<broadcast> for the same variable or if the timeout exceeds
@@ -561,8 +539,6 @@ In either case, the variable is *not* locked upon return.
 
  $count->timedwait( 10 ) while $state->get() eq "foo";
 
-=back
-
 =head1 SUGAR METHODS
 
 This module is equipped with sugar methods to not have to call C<set>
@@ -572,57 +548,53 @@ reduction in inter-process communication.
 The API resembles a subset of the Redis primitives
 L<http://redis.io/commands#strings> without the key argument.
 
-=over 3
-
-=item append ( value )
+=head2 append ( value )
 
 Appends a value at the end of the current value and returns its new length.
 
  $len = $cv->append( "foo" );
 
-=item decr
+=head2 decr
 
 Decrements the value by one and returns its new value.
 
  $num = $cv->decr;
 
-=item decrby ( number )
+=head2 decrby ( number )
 
 Decrements the value by the given number and returns its new value.
 
  $num = $cv->decrby( 2 );
 
-=item getdecr
+=head2 getdecr
 
 Decrements the value by one and returns its old value.
 
  $old = $cv->getdecr;
 
-=item getincr
+=head2 getincr
 
 Increments the value by one and returns its old value.
 
  $old = $cv->getincr;
 
-=item getset ( value )
+=head2 getset ( value )
 
 Sets the value and returns its old value.
 
  $old = $cv->getset( "baz" );
 
-=item incr
+=head2 incr
 
 Increments the value by one and returns its new value.
 
  $num = $cv->incr;
 
-=item incrby ( number )
+=head2 incrby ( number )
 
 Increments the value by the given number and returns its new value.
 
  $num = $cv->incrby( 2 );
-
-=back
 
 =head1 CHAMENEOS DEMONSTRATION
 

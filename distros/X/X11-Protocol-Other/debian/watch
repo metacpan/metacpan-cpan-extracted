@@ -1,6 +1,6 @@
 # Web site version watch, for devscripts uscan program.
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2017 Kevin Ryde
 #
 # This file is part of X11-Protocol-Other.
 #
@@ -23,5 +23,5 @@
 # test with: uscan --report --verbose --watchfile=debian/watch
 
 version=3
-http://user42.tuxfamily.org/x11-protocol-other/index.html \
+https://user42.tuxfamily.org/x11-protocol-other/index.html \
 	.*/X11-Protocol-Other-([0-9]+)\.tar\.gz

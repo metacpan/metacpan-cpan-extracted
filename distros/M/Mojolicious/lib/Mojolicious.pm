@@ -59,7 +59,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.18';
+our $VERSION  = '8.19';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -197,10 +197,11 @@ sub start {
 
 sub startup { }
 
+sub _die { CORE::die ref $_[0] ? $_[0] : Mojo::Exception->new(shift)->trace }
+
 sub _exception {
   my ($next, $c) = @_;
-  local $SIG{__DIE__}
-    = sub { ref $_[0] ? CORE::die $_[0] : Mojo::Exception->throw(shift) };
+  local $SIG{__DIE__} = \&_die;
   $c->helpers->reply->exception($@) unless eval { $next->(); 1 };
 }
 
@@ -1155,6 +1156,8 @@ Sergey Zasenko
 Simon Bertrang
 
 Simone Tampieri
+
+Shoichi Kaji
 
 Shu Cho
 

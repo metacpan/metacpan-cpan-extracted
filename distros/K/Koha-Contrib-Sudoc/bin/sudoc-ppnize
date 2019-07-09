@@ -4,7 +4,7 @@
 # ABSTRACT: Ajout de PPN aux notices biblio d'un Catalogue Koha
 
 package Main;
-$Main::VERSION = '2.29';
+$Main::VERSION = '2.31';
 use Modern::Perl;
 use Getopt::Long;
 use Pod::Usage;
@@ -51,7 +51,7 @@ sudoc--ppnize - Ajout de PPN aux notices biblio d'un Catalogue Koha
 
 =head1 VERSION
 
-version 2.29
+version 2.31
 
 =head1 AUTHOR
 

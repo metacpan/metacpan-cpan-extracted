@@ -2,11 +2,11 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
-    YAML_DOUBLE_QUOTED_SCALAR_STYLE YAML_QUOTED_SCALAR_STYLE
+    YAML_DOUBLE_QUOTED_SCALAR_STYLE
     YAML_LITERAL_SCALAR_STYLE YAML_FOLDED_SCALAR_STYLE
     YAML_FLOW_SEQUENCE_STYLE YAML_FLOW_MAPPING_STYLE
 /;
@@ -373,9 +373,6 @@ sub scalar_event {
         $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
     }
     $style ||= YAML_PLAIN_SCALAR_STYLE;
-    if ($style eq YAML_QUOTED_SCALAR_STYLE) {
-        $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
-    }
 
     my $first = substr($value, 0, 1);
     # no control characters anywhere

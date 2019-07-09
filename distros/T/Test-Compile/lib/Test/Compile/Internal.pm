@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.1.2");
+use version; our $VERSION = qv("v2.2.1");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -107,20 +107,22 @@ sub all_pl_files_ok {
 
 =item C<verbose($verbose)>
 
-An accessor to get/set the verbose flag.  If C<verbose> is set, you can get some
-extra diagnostics when compilation fails.
+An accessor to get/set the verbosity.  The default value (undef) will suppress output
+unless the compilation fails.  This is probably what you want.
 
-Verbose is set on by default.
+If C<verbose> is set to true, you'll get the output from 'perl -c'. If it's set to
+false, all diagnostic output is supressed.
+
 =cut
 
 sub verbose {
     my ($self, $verbose) = @_;
 
-    if ( defined($verbose) ) {
+    if ( @_ eq 2 ) {
         $self->{verbose} = $verbose;
     }
 
-    return defined($self->{verbose}) ? $self->{verbose} : 1;
+    return $self->{verbose};
 }
 
 =item C<all_pm_files(@dirs)>
@@ -196,20 +198,8 @@ Returns true if C<$file> compiles as a perl script.
 
 sub pl_file_compiles {
     my ($self, $file) = @_;
-    return $self->_run_subprocess(
-        sub{
-            if ( -f $file ) {
-                my @inc = ('blib/lib', @INC);
-                my $taint = $self->_is_in_taint_mode($file);
-                system($^X, (map { "-I$_" } @inc), "-c$taint", $file);
-                return ($? == 0);
-            }
-            else {
-                $self->{test}->diag("$file could not be found") if $self->verbose();
-                return 0;
-            }
-        }
-    );
+
+    return $self->_perl_file_compiles($file);
 }
 
 =item C<pm_file_compiles($file)>
@@ -221,28 +211,9 @@ Returns true if C<$file> compiles as a perl module.
 =cut
 
 sub pm_file_compiles {
-    my ($self, $file, %args) = @_;
+    my ($self, $file) = @_;
 
-    return $self->_run_subprocess(
-        sub{
-            if ( -f $file ) {
-                my $module = $file;
-                $module =~ s!^(blib[/\\])?lib[/\\]!!;
-                $module =~ s![/\\]!::!g;
-                $module =~ s/\.pm$//;
-
-                return 1 if $module->require;
-
-                $self->{test}->diag("Compilation of $module failed: $@")
-                  if $self->verbose();
-                return 0;
-            }
-            else {
-                $self->{test}->diag("$file could not be found") if $self->verbose();
-                return 0;
-            }
-        }
-    );
+    return $self->_perl_file_compiles($file);
 }
 
 =head1 TEST METHODS
@@ -273,7 +244,7 @@ sub ok {
     $self->{test}->ok(@args);
 }
 
-=item C<plan(tests => $count)>
+=item C<plan(tests =E<gt> $count)>
 
 Defines how many tests you plan to run.
 
@@ -323,24 +294,24 @@ sub skip_all {
     $self->{test}->skip_all(@args);
 }
 
-sub _run_subprocess {
-    my ($self, $closure) = @_;
+# Run a subcommand, catching STDOUT, STDERR and return code
+sub _run_command {
+    my ($self, $cmd) = @_;
 
-    my $pid = fork();
-    if ( ! defined($pid) ) {
-        return 0;
-    } elsif ( $pid ) {
-        wait();
-        return ($? ? 0 : 1);
+    my $pid = open my $fh, "-|" // die "$0: fork: $!";
+    if ($pid == 0) {
+        open STDERR, ">&STDOUT" or die "$0: dup: $!";
+        exec $cmd               or die "$0: exec: $!";
     }
 
-    if ( ! $self->verbose() ) {
-        open STDERR, '>', File::Spec->devnull;
+    wait();
+    my $ok = ($? == 0 ? 1 : 0);
+    my $output;
+    while (my $line = <$fh>) {
+        chomp($line);
+        push @$output, $line;
     }
-
-    my $rv = $closure->();
-
-    exit ($rv ? 0 : 1);
+    return ($ok, $output);
 }
 
 # Works it's way through the input array (files and/or directories), recursively
@@ -372,16 +343,43 @@ sub _find_files {
     return @output;
 }
 
+# Check the syntax of a perl file
+sub _perl_file_compiles {
+    my ($self, $file) = @_;
+
+    if ( ! -f $file ) {
+        $self->{test}->diag("$file could not be found") if $self->verbose();
+        return 0;
+    }
+
+    my @inc = ('blib/lib', @INC);
+    my $taint = $self->_is_in_taint_mode($file);
+    my $command = join(" ", ($^X, (map { "-I$_" } @inc), "-c$taint", $file));
+    my ($compiles, $output) = $self->_run_command($command);
+    if ( $output && (!defined($self->verbose()) || $self->verbose() != 0) ) {
+        if ( !$compiles || $self->verbose() ) {
+            for my $line ( @$output ) {
+                $self->{test}->diag($line);
+            }
+        }
+    }
+
+    return $compiles;
+}
+
+# Where do we expect to find perl modules?
 sub _pm_starting_points {
     return 'blib' if -e 'blib';
     return 'lib';
 }
 
+# Where do we expect to find perl programs?
 sub _pl_starting_points {
     return 'script' if -e 'script';
     return 'bin'    if -e 'bin';
 }
 
+# Extract the shebang line from a perl program
 sub _read_shebang {
     my ($self, $file) = @_;
 
@@ -392,6 +390,7 @@ sub _read_shebang {
     }
 }
 
+# Should the given file be checked with taint mode on?
 sub _is_in_taint_mode {
     my ($self, $file) = @_;
 

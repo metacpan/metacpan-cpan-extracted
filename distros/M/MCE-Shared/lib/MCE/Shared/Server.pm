@@ -13,12 +13,15 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
+
+use if $^O eq 'MSWin32', 'threads';
+use if $^O eq 'MSWin32', 'threads::shared';
 
 no overloading;
 
@@ -30,16 +33,13 @@ my ($_has_threads, $_spawn_child, $_freeze, $_thaw);
 BEGIN {
    local $@;
 
-   eval 'use threads ()'
-      if ($^O eq 'MSWin32' && $] lt '5.018000' && !$INC{'threads.pm'});
-
    eval 'use IO::FDPass ()'
       if (!$INC{'IO/FDPass.pm'} && $^O ne 'cygwin');
 
    $_has_threads = $INC{'threads.pm'} ? 1 : 0;
    $_spawn_child = $_has_threads  ? 0 : 1;
 
-   if (!exists $INC{'PDL.pm'}) {
+   if (!defined $INC{'PDL.pm'}) {
       eval '
          use Sereal::Encoder 3.015 qw( encode_sereal );
          use Sereal::Decoder 3.015 qw( decode_sereal );
@@ -68,14 +68,14 @@ use Scalar::Util qw( blessed looks_like_number reftype weaken );
 use Socket qw( SOL_SOCKET SO_RCVBUF );
 use Time::HiRes qw( alarm sleep time );
 
-use MCE::Util ();
+use MCE::Util 1.838 ();
 use MCE::Signal ();
 use MCE::Mutex ();
 use bytes;
 
 use constant {
    # Max data channels. This cannot be greater than 8 on MSWin32.
-   DATA_CHANNELS => ($^O eq 'MSWin32') ? 8 : 12,
+   DATA_CHANNELS => ($^O eq 'MSWin32') ? 8 : 10,
 
    SHR_M_NEW => 'M~NEW',  # New share
    SHR_M_CID => 'M~CID',  # ClientID request
@@ -156,7 +156,7 @@ sub _new {
          if !$INC{'IO/FDPass.pm'};
 
       for my $_k (qw(
-         _qw_sock _qr_sock _aw_sock _ar_sock _cw_sock _cr_sock _mutex
+         _qw_sock _qr_sock _aw_sock _ar_sock _cw_sock _cr_sock
          _mutex_0 _mutex_1 _mutex_2 _mutex_3 _mutex_4 _mutex_5
       )) {
          if ( defined $_[1]->{ $_k } ) {
@@ -190,7 +190,8 @@ sub _new {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   $_DAT_LOCK->lock();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_DAT_LOCK->lock() if !$_is_MSWin32;
 
    print({$_DAT_W_SOCK} SHR_M_NEW.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} length($_buf).$LF, $_buf, length($_bu2).$LF, $_bu2,
@@ -212,7 +213,7 @@ sub _new {
    chomp($_id = <$_DAU_W_SOCK>), chomp($_len = <$_DAU_W_SOCK>);
    read($_DAU_W_SOCK, $_buf, $_len) if $_len;
 
-   $_DAT_LOCK->unlock();
+   $_DAT_LOCK->unlock() if !$_is_MSWin32;
    $! = $_id, return '' unless $_len;
 
    if (keys %_hndls) {
@@ -242,12 +243,13 @@ sub _incr_count {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   $_DAT_LOCK->lock();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_DAT_LOCK->lock() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} SHR_M_INC.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[0].$LF);
    <$_DAU_W_SOCK>;
 
-   $_DAT_LOCK->unlock();
+   $_DAT_LOCK->unlock() if !$_is_MSWin32;
 
    return;
 }
@@ -315,7 +317,7 @@ sub _share {
 
          if ( $_class->isa('Tie::File') ) {
             # enable autoflush, enable raw layer
-            select(( select($_obj{ $_id }->{'fh'}), $| = 1 )[0]);
+            $_obj{ $_id }->{'fh'}->autoflush(1);
             binmode($_obj{ $_id }->{'fh'}, ':raw');
          }
 
@@ -340,8 +342,6 @@ sub _share {
 
 sub _start {
    return if $_svr_pid;
-   require threads, $_spawn_child = 0, $_has_threads = 1
-      if ( $INC{'Win32/GUI.pm'} && !$_has_threads );
 
    if ($INC{'PDL.pm'}) { local $@;
       eval 'use PDL::IO::Storable' unless $INC{'PDL/IO/Storable.pm'};
@@ -350,17 +350,34 @@ sub _start {
 
    local $_;  $_init_pid = "$$.$_tid";
 
-   my $_data_channels = ($_oid eq $_init_pid) ? DATA_CHANNELS : 2;
+   my $_data_channels = ($_init_pid eq $_oid)
+      ? ( $INC{'MCE/Channel.pm'} ? 6 : DATA_CHANNELS )
+      : 2;
+
    $_SVR = { _data_channels => $_data_channels };
 
    MCE::Util::_sock_pair($_SVR, qw(_dat_r_sock _dat_w_sock), $_)
       for (0 .. $_data_channels);
-   $_SVR->{'_mutex_'.$_} = MCE::Mutex->new( impl => 'Channel' )
-      for (1 .. $_data_channels);
+
    setsockopt($_SVR->{_dat_r_sock}[0], SOL_SOCKET, SO_RCVBUF, 4096)
       if ($^O ne 'aix' && $^O ne 'linux');
 
+   if ($_is_MSWin32) {
+      for (1 .. $_data_channels) {
+         my $_mutex;
+         $_SVR->{'_mutex_'.$_} = threads::shared::share($_mutex);
+      }
+   }
+   else {
+      $_SVR->{'_mutex_'.$_} = MCE::Mutex->new( impl => 'Channel' )
+         for (1 .. $_data_channels);
+   }
+
    MCE::Shared::Object::_start();
+
+   local $SIG{TTIN}  unless $_is_MSWin32;
+   local $SIG{TTOU}  unless $_is_MSWin32;
+   local $SIG{WINCH} unless $_is_MSWin32;
 
    if ($_spawn_child) {
       $_svr_pid = fork();
@@ -381,7 +398,9 @@ sub _start {
 
 sub _stop {
    return unless ($_is_client && $_init_pid && $_init_pid eq "$$.$_tid");
-   MCE::Hobo->finish('MCE') if $INC{'MCE/Hobo.pm'};
+
+   MCE::Child->finish('MCE') if $INC{'MCE/Child.pm'};
+   MCE::Hobo->finish('MCE')  if $INC{'MCE/Hobo.pm'};
 
    local ($!, $?, $@);
 
@@ -1113,37 +1132,14 @@ sub _loop {
    # Call on hash function.
 
    if ($_is_MSWin32) {
-      # The normal loop hangs on Windows when processes/threads start/exit.
-      # Using ioctl() properly, http://www.perlmonks.org/?node_id=780083
-
-      my $_val_bytes = "\x00\x00\x00\x00";
-      my $_ptr_bytes = unpack( 'I', pack('P', $_val_bytes) );
-      my ($_count, $_nbytes, $_start);
+      MCE::Util::_nonblocking($_DAT_R_SOCK, 1);
 
       while (!$_done) {
-         $_start = time, $_count = 1;
+         MCE::Util::_sysread($_DAT_R_SOCK, $_func, 8);
+         last() unless length($_func) == 8;
+         $_DAU_R_SOCK = $_channels->[ substr($_func, -2, 2, '') ];
 
-         # MSWin32 FIONREAD
-         IOCTL: ioctl($_DAT_R_SOCK, 0x4004667f, $_ptr_bytes);
-
-         unless ($_nbytes = unpack('I', $_val_bytes)) {
-            if ($_count) {
-                # delay after a while to not consume a CPU core
-                $_count = 0 if ++$_count % 50 == 0 && time - $_start > 0.030;
-            } else {
-                sleep 0.030;
-            }
-            goto IOCTL;
-         }
-
-         do {
-            sysread($_DAT_R_SOCK, $_func, 8);
-            $_done = 1, last() unless length($_func) == 8;
-            $_DAU_R_SOCK = $_channels->[ substr($_func, -2, 2, '') ];
-
-            $_output_function{$_func}();
-
-         } while (($_nbytes -= 8) >= 8);
+         $_output_function{$_func}();
       }
    }
    else {
@@ -1173,7 +1169,7 @@ use bytes;
 
 use constant {
    _ID    => 0, _CLASS => 1, _ENCODE => 2, _DECODE => 3, # shared object
-   _DREF  => 4, _ITER  => 5,
+   _DREF  => 4, _ITER  => 5, _MUTEX  => 6,
 };
 use constant {
    _UNDEF => 0, _ARRAY => 1, _SCALAR => 2, # wantarray
@@ -1271,17 +1267,17 @@ sub TIESCALAR { $_[1] }
 
 sub _reset {
    MCE::Shared::Object::_init_condvar(
-      $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, \%_obj,
+      $_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, \%_obj,
       $_freeze, $_thaw
    ) if $INC{'MCE/Shared/Condvar.pm'};
 
    MCE::Shared::Object::_init_handle(
-      $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, \%_obj,
+      $_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, \%_obj,
       $_freeze, $_thaw
    ) if $INC{'MCE/Shared/Handle.pm'};
 
    MCE::Shared::Object::_init_queue(
-      $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, \%_obj,
+      $_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, \%_obj,
       $_freeze, $_thaw
    ) if $INC{'MCE/Shared/Queue.pm'};
 }
@@ -1295,7 +1291,7 @@ sub _start {
    # inlined for performance
    $_dat_ex = sub {
       my $_pid = $_has_threads ? $$ .'.'. $_tid : $$;
-      sysread($_DAT_LOCK->{_r_sock}, my($b), 1), $_DAT_LOCK->{ $_pid } = 1
+      MCE::Util::_sysread($_DAT_LOCK->{_r_sock}, my($b), 1), $_DAT_LOCK->{ $_pid } = 1
          unless $_DAT_LOCK->{ $_pid };
    };
    $_dat_un = sub {
@@ -1324,10 +1320,12 @@ sub _get_client_id {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+
+   $_dat_ex->() if !$_is_MSWin32;
    print {$_DAT_W_SOCK} 'M~CID'.$LF . $_chn.$LF;
    chomp($_ret = <$_DAU_W_SOCK>);
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    return $_ret;
 }
@@ -1355,25 +1353,29 @@ sub _init {
 
 # Called by AUTOLOAD, STORE, set, and keys.
 
+my %_nofreeze = map { $_ => undef } qw( enqueue decrby incrby );
+
 sub _auto {
    my $_wa = !defined wantarray ? _UNDEF : wantarray ? _ARRAY : _SCALAR;
-
    local $\ = undef if (defined $\);
 
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+
    if ( @_ == 2 ) {
-      $_dat_ex->();
+      $_dat_ex->() if !$_is_MSWin32;
       print({$_DAT_W_SOCK} 'M~OB0'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF);
    }
-   elsif ( @_ == 3 && !looks_like_number $_[2] && !ref $_[2] && defined $_[2] ) {
-      $_dat_ex->();
+   elsif ( @_ == 3 && ( !looks_like_number $_[2] || exists $_nofreeze{ $_[0] } )
+                   && !ref $_[2] && defined $_[2] ) {
+      $_dat_ex->() if !$_is_MSWin32;
       print({$_DAT_W_SOCK} 'M~OB1'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
          length($_[2]).$LF, $_[2]);
    }
    elsif ( @_ == 4 && !looks_like_number $_[3] && !ref $_[3] && defined $_[3]
                    && !looks_like_number $_[2] && !ref $_[2] && defined $_[2] ) {
-      $_dat_ex->();
+      $_dat_ex->() if !$_is_MSWin32;
       print({$_DAT_W_SOCK} 'M~OB2'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
          length($_[2]).$LF . length($_[3]).$LF, $_[2], $_[3]);
@@ -1382,7 +1384,7 @@ sub _auto {
       my ( $_fcn, $_id, $_tmp ) = ( shift, shift()->[_ID], $_freeze->([ @_ ]) );
       my $_buf = $_id.$LF . $_fcn.$LF . $_wa.$LF . length($_tmp).$LF;
 
-      $_dat_ex->();
+      $_dat_ex->() if !$_is_MSWin32;
       print({$_DAT_W_SOCK} 'M~OBJ'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_buf, $_tmp);
    }
@@ -1393,14 +1395,14 @@ sub _auto {
 
       my $_frozen = chop $_len;
       read $_DAU_W_SOCK, my($_buf), $_len;
-      $_dat_un->();
+      $_dat_un->() if !$_is_MSWin32;
 
       return ( $_wa != _ARRAY )
          ? $_frozen ? $_thaw->($_buf)[0] : $_buf
          : @{ $_thaw->($_buf) };
    }
 
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 }
 
 # Called by MCE::Hobo ( ->join, ->wait_one ).
@@ -1409,7 +1411,8 @@ sub _get_hobo_data {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'O~DAT'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[0]->[_ID].$LF . $_[1].$LF);
 
@@ -1418,7 +1421,7 @@ sub _get_hobo_data {
 
    read($_DAU_W_SOCK, my($_result), $_le1) if $_le1;
    read($_DAU_W_SOCK, my($_error ), $_le2) if $_le2;
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    return ($_result, $_error);
 }
@@ -1432,12 +1435,13 @@ sub _req1 {
    local $\ = undef if (defined $\);
    local $/ = $LF   if ($/ ne $LF );
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} $_[0].$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[1]);
 
    chomp(my $_ret = <$_DAU_W_SOCK>);
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    $_ret;
 }
@@ -1447,10 +1451,11 @@ sub _req1 {
 sub _req2 {
    local $\ = undef if (defined $\);
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} $_[0].$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[1], $_[2]);
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    1;
 }
@@ -1464,10 +1469,11 @@ sub _req3 {
 
    delete $self->[_ITER] if defined $self->[_ITER];
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'O~CLR'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $self->[_ID].$LF . $_fcn.$LF);
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    return;
 }
@@ -1485,15 +1491,20 @@ sub _req4 {
          ? $_[2].'0' : $_freeze->([ $_[2] ]).'1';
    }
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'O~FCH'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . length($_key).$LF, $_key);
    chomp(my $_len = <$_DAU_W_SOCK>);
 
-   $_dat_un->(), return undef if ($_len < 0);
+   if ($_len < 0) {
+      $_dat_un->() if !$_is_MSWin32;
+      return undef;
+   }
+
    my $_frozen = chop($_len);
    read $_DAU_W_SOCK, my($_buf), $_len;
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    if ( $_[1]->[_DECODE] && $_[0] eq 'FETCH' ) {
       local $@; $_buf = $_thaw->($_buf)[0] if $_frozen;
@@ -1509,12 +1520,13 @@ sub _size {
    local $\ = undef if (defined $\);
    local $/ = $LF   if ($/ ne $LF );
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'O~SZE'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF);
 
    chomp(my $_size = <$_DAU_W_SOCK>);
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    length($_size) ? int($_size) : undef;
 }
@@ -1601,15 +1613,20 @@ sub export {
       local $\ = undef if (defined $\);
       local $/ = $LF if ($/ ne $LF);
 
-      $_dat_ex->();
+      CORE::lock $_DAT_LOCK if $_is_MSWin32;
+      $_dat_ex->() if !$_is_MSWin32;
       print({$_DAT_W_SOCK} 'M~EXP'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_buf, $_tmp); undef $_buf;
 
       chomp(my $_len = <$_DAU_W_SOCK>);
-      $_dat_un->(), return undef if ($_len < 0);
+
+      if ($_len < 0) {
+         $_dat_un->() if !$_is_MSWin32;
+         return undef;
+      }
 
       read $_DAU_W_SOCK, $_buf, $_len;
-      $_dat_un->();
+      $_dat_un->() if !$_is_MSWin32;
 
       $_item = $_lkup->{ $_id } = Storable::thaw($_buf);
       undef $_buf;
@@ -1715,14 +1732,19 @@ sub next {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'M~INX'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[0]->[_ID].$LF);
    chomp(my $_len = <$_DAU_W_SOCK>);
 
-   $_dat_un->(), return if ($_len < 0);
+   if ($_len < 0) {
+      $_dat_un->() if !$_is_MSWin32;
+      return;
+   }
+
    read $_DAU_W_SOCK, my($_buf), $_len;
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    my $_b; return wantarray ? () : undef unless @{ $_b = $_thaw->($_buf) };
 
@@ -1810,6 +1832,24 @@ sub keys {
    ( @_ == 1 && !wantarray ) ? _size('keys', @_) : _auto('keys', @_);
 }
 
+sub lock {
+   my ( $self ) = @_;
+   Carp::croak( sprintf(
+      "Mutex not enabled for the shared %s instance", $self->[_CLASS]
+   )) unless $self->[_MUTEX];
+
+   $self->[_MUTEX]->lock();
+}
+
+sub unlock {
+   my ( $self ) = @_;
+   Carp::croak( sprintf(
+      "Mutex not enabled for the shared %s instance", $self->[_CLASS]
+   )) unless $self->[_MUTEX];
+
+   $self->[_MUTEX]->unlock();
+}
+
 {
    no strict 'refs'; *{ __PACKAGE__.'::store' } = \&STORE;
 }
@@ -1830,7 +1870,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.840
+This document describes MCE::Shared::Server version 1.841
 
 =head1 DESCRIPTION
 

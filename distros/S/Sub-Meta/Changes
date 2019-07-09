@@ -1,5 +1,10 @@
 Revision history for Perl extension Sub-Meta
 
+0.04 2019-07-08T15:13:22Z
+    - add `is_same_interface` method #4
+    - allow `required`, `positional` args #5
+    - fixed bug: set_sub.
+
 0.03 2019-07-05T06:59:02Z
     - improve coverage
 

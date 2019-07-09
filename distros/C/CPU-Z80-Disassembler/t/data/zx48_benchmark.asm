@@ -533,102 +533,102 @@ SKIPS:
 ;; TKN-TABLE
 
 TKN_TABLE:
-        defm7 '?'
-        defm7 'RND'
-        defm7 'INKEY$'
-        defm7 'PI'
-        defm7 'FN'
-        defm7 'POINT'
-        defm7 'SCREEN$'
-        defm7 'ATTR'
-        defm7 'AT'
-        defm7 'TAB'
-        defm7 'VAL$'
-        defm7 'CODE'
-        defm7 'VAL'
-        defm7 'LEN'
-        defm7 'SIN'
-        defm7 'COS'
-        defm7 'TAN'
-        defm7 'ASN'
-        defm7 'ACS'
-        defm7 'ATN'
-        defm7 'LN'
-        defm7 'EXP'
-        defm7 'INT'
-        defm7 'SQR'
-        defm7 'SGN'
-        defm7 'ABS'
-        defm7 'PEEK'
-        defm7 'IN'
-        defm7 'USR'
-        defm7 'STR$'
-        defm7 'CHR$'
-        defm7 'NOT'
-        defm7 'BIN'
+        defm7 "?"
+        defm7 "RND"
+        defm7 "INKEY$"
+        defm7 "PI"
+        defm7 "FN"
+        defm7 "POINT"
+        defm7 "SCREEN$"
+        defm7 "ATTR"
+        defm7 "AT"
+        defm7 "TAB"
+        defm7 "VAL$"
+        defm7 "CODE"
+        defm7 "VAL"
+        defm7 "LEN"
+        defm7 "SIN"
+        defm7 "COS"
+        defm7 "TAN"
+        defm7 "ASN"
+        defm7 "ACS"
+        defm7 "ATN"
+        defm7 "LN"
+        defm7 "EXP"
+        defm7 "INT"
+        defm7 "SQR"
+        defm7 "SGN"
+        defm7 "ABS"
+        defm7 "PEEK"
+        defm7 "IN"
+        defm7 "USR"
+        defm7 "STR$"
+        defm7 "CHR$"
+        defm7 "NOT"
+        defm7 "BIN"
 
 ;   The previous 32 function-type words are printed without a leading space
 ;   The following have a leading space if they begin with a letter
 
-        defm7 'OR'
-        defm7 'AND'
-        defm7 '<='              ; <=
-        defm7 '>='              ; >=
-        defm7 '<>'              ; <>
-        defm7 'LINE'
-        defm7 'THEN'
-        defm7 'TO'
-        defm7 'STEP'
-        defm7 'DEF FN'
-        defm7 'CAT'
-        defm7 'FORMAT'
-        defm7 'MOVE'
-        defm7 'ERASE'
-        defm7 'OPEN #'
-        defm7 'CLOSE #'
-        defm7 'MERGE'
-        defm7 'VERIFY'
-        defm7 'BEEP'
-        defm7 'CIRCLE'
-        defm7 'INK'
-        defm7 'PAPER'
-        defm7 'FLASH'
-        defm7 'BRIGHT'
-        defm7 'INVERSE'
-        defm7 'OVER'
-        defm7 'OUT'
-        defm7 'LPRINT'
-        defm7 'LLIST'
-        defm7 'STOP'
-        defm7 'READ'
-        defm7 'DATA'
-        defm7 'RESTORE'
-        defm7 'NEW'
-        defm7 'BORDER'
-        defm7 'CONTINUE'
-        defm7 'DIM'
-        defm7 'REM'
-        defm7 'FOR'
-        defm7 'GO TO'
-        defm7 'GO SUB'
-        defm7 'INPUT'
-        defm7 'LOAD'
-        defm7 'LIST'
-        defm7 'LET'
-        defm7 'PAUSE'
-        defm7 'NEXT'
-        defm7 'POKE'
-        defm7 'PRINT'
-        defm7 'PLOT'
-        defm7 'RUN'
-        defm7 'SAVE'
-        defm7 'RANDOMIZE'
-        defm7 'IF'
-        defm7 'CLS'
-        defm7 'DRAW'
-        defm7 'CLEAR'
-        defm7 'RETURN'
-        defm7 'COPY'
+        defm7 "OR"
+        defm7 "AND"
+        defm7 "<="              ; <=
+        defm7 ">="              ; >=
+        defm7 "<>"              ; <>
+        defm7 "LINE"
+        defm7 "THEN"
+        defm7 "TO"
+        defm7 "STEP"
+        defm7 "DEF FN"
+        defm7 "CAT"
+        defm7 "FORMAT"
+        defm7 "MOVE"
+        defm7 "ERASE"
+        defm7 "OPEN #"
+        defm7 "CLOSE #"
+        defm7 "MERGE"
+        defm7 "VERIFY"
+        defm7 "BEEP"
+        defm7 "CIRCLE"
+        defm7 "INK"
+        defm7 "PAPER"
+        defm7 "FLASH"
+        defm7 "BRIGHT"
+        defm7 "INVERSE"
+        defm7 "OVER"
+        defm7 "OUT"
+        defm7 "LPRINT"
+        defm7 "LLIST"
+        defm7 "STOP"
+        defm7 "READ"
+        defm7 "DATA"
+        defm7 "RESTORE"
+        defm7 "NEW"
+        defm7 "BORDER"
+        defm7 "CONTINUE"
+        defm7 "DIM"
+        defm7 "REM"
+        defm7 "FOR"
+        defm7 "GO TO"
+        defm7 "GO SUB"
+        defm7 "INPUT"
+        defm7 "LOAD"
+        defm7 "LIST"
+        defm7 "LET"
+        defm7 "PAUSE"
+        defm7 "NEXT"
+        defm7 "POKE"
+        defm7 "PRINT"
+        defm7 "PLOT"
+        defm7 "RUN"
+        defm7 "SAVE"
+        defm7 "RANDOMIZE"
+        defm7 "IF"
+        defm7 "CLS"
+        defm7 "DRAW"
+        defm7 "CLEAR"
+        defm7 "RETURN"
+        defm7 "COPY"
 
 ; ----------------
 ; THE 'KEY' TABLES
@@ -647,45 +647,45 @@ TKN_TABLE:
 ;; MAIN-KEYS
 
 MAIN_KEYS:
-        defm 'B'                ; B
-        defm 'H'                ; H
-        defm 'Y'                ; Y
-        defm '6'                ; 6
-        defm '5'                ; 5
-        defm 'T'                ; T
-        defm 'G'                ; G
-        defm 'V'                ; V
-        defm 'N'                ; N
-        defm 'J'                ; J
-        defm 'U'                ; U
-        defm '7'                ; 7
-        defm '4'                ; 4
-        defm 'R'                ; R
-        defm 'F'                ; F
-        defm 'C'                ; C
-        defm 'M'                ; M
-        defm 'K'                ; K
-        defm 'I'                ; I
-        defm '8'                ; 8
-        defm '3'                ; 3
-        defm 'E'                ; E
-        defm 'D'                ; D
-        defm 'X'                ; X
+        defm "B"                ; B
+        defm "H"                ; H
+        defm "Y"                ; Y
+        defm "6"                ; 6
+        defm "5"                ; 5
+        defm "T"                ; T
+        defm "G"                ; G
+        defm "V"                ; V
+        defm "N"                ; N
+        defm "J"                ; J
+        defm "U"                ; U
+        defm "7"                ; 7
+        defm "4"                ; 4
+        defm "R"                ; R
+        defm "F"                ; F
+        defm "C"                ; C
+        defm "M"                ; M
+        defm "K"                ; K
+        defm "I"                ; I
+        defm "8"                ; 8
+        defm "3"                ; 3
+        defm "E"                ; E
+        defm "D"                ; D
+        defm "X"                ; X
         defb $0E                ; SYMBOL SHIFT
-        defm 'L'                ; L
-        defm 'O'                ; O
-        defm '9'                ; 9
-        defm '2'                ; 2
-        defm 'W'                ; W
-        defm 'S'                ; S
-        defm 'Z'                ; Z
-        defm ' '                ; SPACE
+        defm "L"                ; L
+        defm "O"                ; O
+        defm "9"                ; 9
+        defm "2"                ; 2
+        defm "W"                ; W
+        defm "S"                ; S
+        defm "Z"                ; Z
+        defm " "                ; SPACE
         defb $0D                ; ENTER
-        defm 'P'                ; P
-        defm '0'                ; 0
-        defm '1'                ; 1
-        defm 'Q'                ; Q
-        defm 'A'                ; A
+        defm "P"                ; P
+        defm "0"                ; 0
+        defm "1"                ; 1
+        defm "Q"                ; Q
+        defm "A"                ; A
 
 
 ;; E-UNSHIFT
@@ -726,13 +726,13 @@ E_UNSHIFT:
 ;  The red keywords below keys on the original keyboard.
 
 EXT_SHIFT:
-        defm '~'                ; ~
+        defm "~"                ; ~
         defb $DC                ; BRIGHT
         defb $DA                ; PAPER
-        defm '\'                ; \ ;
+        defm "\\"               ; \ ;
         defb $B7                ; ATN
-        defm '{'                ; {
-        defm '}'                ; }
+        defm "{"                ; {
+        defm "}"                ; }
         defb $D8                ; CIRCLE
         defb $BF                ; IN
         defb $AE                ; VAL$
@@ -744,13 +744,13 @@ EXT_SHIFT:
         defb $7F                ; (Copyright character)
         defb $B5                ; ASN
         defb $D6                ; VERIFY
-        defm '|'                ; |
+        defm "|"                ; |
         defb $D5                ; MERGE
-        defm ']'                ; ]
+        defm "]"                ; ]
         defb $DB                ; FLASH
         defb $B6                ; ACS
         defb $D9                ; INK
-        defm '['                ; [
+        defm "["                ; [
         defb $D7                ; BEEP
 
 
@@ -778,31 +778,31 @@ CTL_CODES:
 
 SYM_CODES:
         defb $E2                ; STOP
-        defm '*'                ; *
-        defm '?'                ; ?
+        defm "*"                ; *
+        defm "?"                ; ?
         defb $CD                ; STEP
         defb $C8                ; >=
         defb $CC                ; TO
         defb $CB                ; THEN
-        defm '^'                ; ^
+        defm "^"                ; ^
         defb $AC                ; AT
-        defm '-'                ; -
-        defm '+'                ; +
-        defm '='                ; =
-        defm '.'                ; .
-        defm ','                ; ,
-        defm ';'                ; ;
-        defm '"'                ; "
+        defm "-"                ; -
+        defm "+"                ; +
+        defm "="                ; =
+        defm "."                ; .
+        defm ","                ; ,
+        defm ";"                ; ;
+        defm "\""               ; "
         defb $C7                ; <=
-        defm '<'                ; <
+        defm "<"                ; <
         defb $C3                ; NOT
-        defm '>'                ; >
+        defm ">"                ; >
         defb $C5                ; OR
-        defm '/'                ; /
+        defm "/"                ; /
         defb $C9                ; <>
         defb $60                ; pound
         defb $C6                ; AND
-        defm ':'                ; :
+        defm ":"                ; :
 
 ;; E-DIGITS
 ;  The ten keywords assigned to the digits in extended mode.
@@ -3431,17 +3431,17 @@ SA_1_SEC:
 
 tape_msgs:
         defb $80
-        defm7 'Start tape, then press any key.'
+        defm7 "Start tape, then press any key."
 
 tape_msgs_2:
         defb $0D
-        defm7 'Program: '
+        defm7 "Program: "
         defb $0D
-        defm7 'Number array: '
+        defm7 "Number array: "
         defb $0D
-        defm7 'Character array: '
+        defm7 "Character array: "
         defb $0D
-        defm7 'Bytes: '
+        defm7 "Bytes: "
 
 
 ;**************************************************
@@ -4484,7 +4484,7 @@ PO_SCR_3A:
 
 scrl_mssg:
         defb $80                ; initial step-over byte.
-        defm7 'scroll?'
+        defm7 "scroll?"
 
 ;; REPORT-D
 
@@ -6679,56 +6679,56 @@ MAIN_9:
 
 rpt_mesgs:
         defb $80
-        defm7 'OK'              ; 0
-        defm7 'NEXT without FOR'
+        defm7 "OK"              ; 0
+        defm7 "NEXT without FOR"
                                 ; 1
-        defm7 'Variable not found'
+        defm7 "Variable not found"
                                 ; 2
-        defm7 'Subscript wrong' ; 3
-        defm7 'Out of memory'   ; 4
-        defm7 'Out of screen'   ; 5
-        defm7 'Number too big'  ; 6
-        defm7 'RETURN without GOSUB'
+        defm7 "Subscript wrong" ; 3
+        defm7 "Out of memory"   ; 4
+        defm7 "Out of screen"   ; 5
+        defm7 "Number too big"  ; 6
+        defm7 "RETURN without GOSUB"
                                 ; 7
-        defm7 'End of file'     ; 8
-        defm7 'STOP statement'  ; 9
-        defm7 'Invalid argument'
+        defm7 "End of file"     ; 8
+        defm7 "STOP statement"  ; 9
+        defm7 "Invalid argument"
                                 ; A
-        defm7 'Integer out of range'
+        defm7 "Integer out of range"
                                 ; B
-        defm7 'Nonsense in BASIC'
+        defm7 "Nonsense in BASIC"
                                 ; C
-        defm7 'BREAK - CONT repeats'
+        defm7 "BREAK - CONT repeats"
                                 ; D
-        defm7 'Out of DATA'     ; E
-        defm7 'Invalid file name'
+        defm7 "Out of DATA"     ; E
+        defm7 "Invalid file name"
                                 ; F
-        defm7 'No room for line'
+        defm7 "No room for line"
                                 ; G
-        defm7 'STOP in INPUT'   ; H
-        defm7 'FOR without NEXT'
+        defm7 "STOP in INPUT"   ; H
+        defm7 "FOR without NEXT"
                                 ; I
-        defm7 'Invalid I/O device'
+        defm7 "Invalid I/O device"
                                 ; J
-        defm7 'Invalid colour'  ; K
-        defm7 'BREAK into program'
+        defm7 "Invalid colour"  ; K
+        defm7 "BREAK into program"
                                 ; L
-        defm7 'RAMTOP no good'  ; M
-        defm7 'Statement lost'  ; N
-        defm7 'Invalid stream'  ; O
-        defm7 'FN without DEF'  ; P
-        defm7 'Parameter error' ; Q
-        defm7 'Tape loading error'
+        defm7 "RAMTOP no good"  ; M
+        defm7 "Statement lost"  ; N
+        defm7 "Invalid stream"  ; O
+        defm7 "FN without DEF"  ; P
+        defm7 "Parameter error" ; Q
+        defm7 "Tape loading error"
                                 ; R
                                 ; ; comma-sp
 
 comma_sp:
-        defm7 ', '              ; used in report line.
+        defm7 ", "              ; used in report line.
                                 ; ; copyright
 
 copyright:
         defb $7F                ; copyright
-        defm7 ' 1982 Sinclair Research Ltd'
+        defm7 " 1982 Sinclair Research Ltd"
 
 
 ; -------------
@@ -7077,11 +7077,11 @@ CALL_JUMP:
 ;; chn-cd-lu
 
 chn_cd_lu:
-        defm 'K'                ; offset $06 to CHAN-K
+        defm "K"                ; offset $06 to CHAN-K
         defb CHAN_K - $
-        defm 'S'                ; offset $12 to CHAN-S
+        defm "S"                ; offset $12 to CHAN-S
         defb CHAN_S - $
-        defm 'P'                ; offset $1B to CHAN-P
+        defm "P"                ; offset $1B to CHAN-P
         defb CHAN_P - $
 
         defb $00                ; end marker.
@@ -7539,11 +7539,11 @@ ROM_TRAP:
 ;; cl-str-lu
 
 cl_str_lu:
-        defm 'K'                ; offset 5 to CLOSE-STR
+        defm "K"                ; offset 5 to CLOSE-STR
         defb CLOSE_STR - $
-        defm 'S'                ; offset 3 to CLOSE-STR
+        defm "S"                ; offset 3 to CLOSE-STR
         defb CLOSE_STR - $
-        defm 'P'                ; offset 1 to CLOSE-STR
+        defm "P"                ; offset 1 to CLOSE-STR
         defb CLOSE_STR - $
 
 
@@ -7725,11 +7725,11 @@ OPEN_3:
 ;; op-str-lu
 
 op_str_lu:
-        defm 'K'                ; $06 offset to OPEN-K
+        defm "K"                ; $06 offset to OPEN-K
         defb OPEN_K - $
-        defm 'S'                ; $08 offset to OPEN-S
+        defm "S"                ; $08 offset to OPEN-S
         defb OPEN_S - $
-        defm 'P'                ; $0A offset to OPEN-P
+        defm "P"                ; $0A offset to OPEN-P
         defb OPEN_P - $
 
         defb $00                ; end-marker.
@@ -13841,11 +13841,11 @@ S_ATTR_S:
 scan_func:
         defb $22                ; $1C offset to S-QUOTE
         defb S_QUOTE - $
-        defm '('                ; $4F offset to S-BRACKET
+        defm "("                ; $4F offset to S-BRACKET
         defb S_BRACKET - $
-        defm '.'                ; $F2 offset to S-DECIMAL
+        defm "."                ; $F2 offset to S-DECIMAL
         defb S_DECIMAL - $
-        defm '+'                ; $12 offset to S-U-PLUS
+        defm "+"                ; $12 offset to S-U-PLUS
         defb S_U_PLUS - $
 
         defb $A8                ; $56 offset to S-FN
@@ -14643,21 +14643,21 @@ S_NEXT:
 ;; tbl-of-ops
 
 tbl_of_ops:
-        defm '+'                ;        $C0 + 'addition'
+        defm "+"                ;        $C0 + 'addition'
         defb $CF
-        defm '-'                ;        $C0 + 'subtract'
+        defm "-"                ;        $C0 + 'subtract'
         defb $C3
-        defm '*'                ;        $C0 + 'multiply'
+        defm "*"                ;        $C0 + 'multiply'
         defb $C4
-        defm '/'                ;        $C0 + 'division'
+        defm "/"                ;        $C0 + 'division'
         defb $C5
-        defm '^'                ;        $C0 + 'to-power'
+        defm "^"                ;        $C0 + 'to-power'
         defb $C6
-        defm '='                ;        $C0 + 'nos-eql'
+        defm "="                ;        $C0 + 'nos-eql'
         defb $CE
-        defm '>'                ;        $C0 + 'no-grtr'
+        defm ">"                ;        $C0 + 'no-grtr'
         defb $CC
-        defm '<'                ;        $C0 + 'no-less'
+        defm "<"                ;        $C0 + 'no-less'
         defb $CD
 
         defb $C7                ; '<='   $C0 + 'no-l-eql'

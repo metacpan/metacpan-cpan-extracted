@@ -29,9 +29,10 @@ my %WriteMakefileArgs = (
     "Type::Tiny" => "1.004002"
   },
   "TEST_REQUIRES" => {
+    "Test2::Suite" => "0.000119",
     "Test::More" => "1.302140"
   },
-  "VERSION" => "0.003001",
+  "VERSION" => "0.004001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "Role::REST::Client::Auth::Basic" => "0.05",
   "Sub::Retry" => "0.06",
   "Syntax::Keyword::Try" => "0.09",
+  "Test2::Suite" => "0.000119",
   "Test::More" => "1.302140",
   "Type::Tiny" => "1.004002"
 );

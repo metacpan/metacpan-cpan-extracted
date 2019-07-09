@@ -1,5 +1,14 @@
 Revision log for Perl module "Image::CairoSVG"
 
+0.11 2019-07-08
+
+- Bug fixes
+
+0.10 2019-07-06
+
+- Handle "polyline" instructions
+- Bug in handling of hex colours fixed
+
 0.09 2018-10-11
 
 - Return value of "render" is now set correctly

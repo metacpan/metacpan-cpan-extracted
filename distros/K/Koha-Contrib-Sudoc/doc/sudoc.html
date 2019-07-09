@@ -18,8 +18,8 @@
 <div class="details">
 <span id="author" class="author">Tamil s.a.r.l.</span><br>
 <span id="email" class="email"><a href="mailto:contact@tamil.fr">contact@tamil.fr</a></span><br>
-<span id="revnumber">version 2.26,</span>
-<span id="revdate">novembre 2018</span>
+<span id="revnumber">version 2.30,</span>
+<span id="revdate">juillet 2019</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -969,7 +969,10 @@ l&#8217;absence d&#8217;autoritisation.</p>
 <dd>
 <p>Généralement laissé vide. Peut contenir le nom d&#8217;une sous-classe
 Perl spécifique de conversion des notices. Accessible uniquement à
-un programmeur Perl.</p>
+un programmeur Perl. Si le champs est renseigné mais que le Chargeur
+n&#8217;arrive pas à charger la sous-classe (à cause d&#8217;une erreur de
+syntaxe ou parce qu&#8217;il ne trouve pas la sous-classe), le Chargeur
+retournera une erreur et s&#8217;interrompra.</p>
 </dd>
 <dt class="hdlist1">exclure</dt>
 <dd>
@@ -1364,8 +1367,8 @@ sudoc-ppnize L035-ILN80-abcd.raw --doit</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 2.26<br>
-Last updated 2018-12-31 12:18:24 CET
+Version 2.30<br>
+Last updated 2019-07-08 14:22:31 CEST
 </div>
 </div>
 </body>

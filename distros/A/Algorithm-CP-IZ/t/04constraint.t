@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 197;
+use Test::More tests => 253;
 BEGIN { use_ok('Algorithm::CP::IZ') };
 
 # Add
@@ -56,6 +56,30 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
     }
 }
 
+# Add error
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my @vars = map{$iz->create_int($_, $_)} (1..2);
+    my $err = 1;
+    eval {
+	my $v = $iz->Add();
+	$err = 0;
+    };
+
+    my $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+
+    eval {
+	my $v = $iz->Add("x");
+	$err = 0;
+    };
+
+    $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+}
+
 # Mul
 {
     my $iz = Algorithm::CP::IZ->new();
@@ -104,6 +128,30 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
   is($v->value, 6 * 6 * 6 * 6 * 6);
 }
 
+# Mul error
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my @vars = map{$iz->create_int($_, $_)} (1..2);
+    my $err = 1;
+    eval {
+	my $v = $iz->Mul();
+	$err = 0;
+    };
+
+    my $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+
+    eval {
+	my $v = $iz->Mul("x");
+	$err = 0;
+    };
+
+    $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+}
+
 # Sub
 {
     my $iz = Algorithm::CP::IZ->new();
@@ -144,6 +192,38 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
     is($v1->value, 3);
 }
 
+# Sub
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my $v1 = $iz->Sub(5, 2, 1);
+
+    is($v1->value, 2);
+}
+
+# Sub error
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my @vars = map{$iz->create_int($_, $_)} (1..2);
+    my $err = 1;
+    eval {
+	my $v = $iz->Sub();
+	$err = 0;
+    };
+
+    my $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+
+    eval {
+	my $v = $iz->Sub("x", "y");
+	$err = 0;
+    };
+
+    $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+}
+
 # Div
 {
     my $iz = Algorithm::CP::IZ->new();
@@ -180,8 +260,32 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
 {
     my $iz = Algorithm::CP::IZ->new();
     # my $v1 = $iz->Div(7, 2);
-    # is($v1->value, 9);
+    # ok(!defined($v1));
     ok(1);
+}
+
+# Div error
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my @vars = map{$iz->create_int($_, $_)} (1..2);
+    my $err = 1;
+    eval {
+	my $v = $iz->Div();
+	$err = 0;
+    };
+
+    my $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
+
+    eval {
+	my $v = $iz->Div(5, "a");
+	$err = 0;
+    };
+
+    $msg = $@;
+    is($err, 1);
+    ok($msg =~ /^Algorithm::CP::IZ:/);
 }
 
 # Sigma
@@ -192,6 +296,14 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
 
     $v1->Eq(3);
     is($v2->value, 12);
+}
+
+# Sigma empty
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my $v = $iz->Sigma([]);
+
+    is($v->value, 0);
 }
 
 # ScalProd
@@ -206,6 +318,14 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
     # using same variables and constants
     my $v3 = $iz->ScalProd([9, $v1], [4, 3]);
     is($v3->value, $v2->value);
+}
+
+# ScalProd empty
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my $v = $iz->ScalProd([], []);
+
+    is($v->value, 0);
 }
 
 # Abs
@@ -412,6 +532,179 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
     is($elem->value, 5);
 
     $iz->restore_context;
+}
+
+# Element (constant)
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my $elem = $iz->Element(3, [1, 3, 5, 7, 9]);
+
+    $iz->save_context;
+
+    is($elem->value, 7);
+
+    $iz->restore_context;
+}
+
+# VarElement
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my $index = $iz->create_int(0, 10);
+    my $v1 = $iz->create_int(2, 12);
+    my $v2 = $iz->create_int(0, 5);
+    my $elem = $iz->VarElement($index, [1, 3, 5, $v1, 9, $v2]);
+
+    $iz->save_context;
+
+    is($index->Eq(2), 1);
+    is($elem->value, 5);
+
+    $iz->restore_context;
+
+    $iz->save_context;
+
+    is($index->Eq(3), 1);
+    is($elem->min, 2);
+    is($elem->max, 12);
+
+    is($elem->nb_elements, 12-2+1);
+    is($v1->Neq(4), 1);
+    is($elem->min, 2);
+    is($elem->max, 12);
+    is($elem->nb_elements, 12-2+1-1);
+    ok(!$elem->is_in(4));
+
+    is($v1->Eq(5), 1);
+    is($elem->min, 5);
+    is($elem->max, 5);
+
+    $iz->restore_context;
+}
+
+# VarElement (constant)
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my $index = $iz->create_int(0, 10);
+    my $elem = $iz->VarElement(1, [1, 3, 5]);
+
+    is($elem->value, 3);
+}
+
+# VarElementRange
+SKIP: {
+    my $iz = Algorithm::CP::IZ->new();
+
+    skip "old iZ", 14
+	unless (defined($iz->get_version)
+		&& $iz->IZ_VERSION_MAJOR >= 3
+		&& $iz->IZ_VERSION_MINOR >= 6);
+
+    my $index = $iz->create_int(0, 10);
+    my $v1 = $iz->create_int(2, 12);
+    my $v2 = $iz->create_int(0, 5);
+    my $elem = $iz->VarElementRange($index, [$v1, $v2]);
+
+    $iz->save_context;
+
+    is($index->Eq(1), 1);
+    is($elem->min, 0);
+    is($elem->max, 5);
+
+    ok($v2->Eq(5));
+    is($elem->min, 5);
+    is($elem->max, 5);
+
+    $iz->restore_context;
+
+    # hole is ignored
+    $iz->save_context;
+
+    is($index->Eq(1), 1);
+    is($elem->min, 0);
+    is($elem->max, 5);
+    is($elem->nb_elements, 5-0+1);
+
+    ok($v2->Neq(3));
+    is($elem->min, 0);
+    is($elem->max, 5);
+    is($elem->nb_elements, 5-0+1);
+
+    $iz->restore_context;
+}
+
+# VarElementRange (constant)
+SKIP: {
+    my $iz = Algorithm::CP::IZ->new();
+
+    skip "old iZ", 1
+	unless (defined($iz->get_version)
+		&& $iz->IZ_VERSION_MAJOR >= 3
+		&& $iz->IZ_VERSION_MINOR >= 6);
+
+    my $elem = $iz->VarElementRange(0, [3, 5, 7]);
+
+    is($elem->value, 3);
+}
+
+# Cumulative
+SKIP: {
+    my $iz = Algorithm::CP::IZ->new();
+
+    skip "old iZ", 1
+	unless (defined($iz->get_version)
+		&& $iz->IZ_VERSION_MAJOR >= 3
+		&& $iz->IZ_VERSION_MINOR >= 6);
+    
+    my @s = (0, $iz->create_int(0, 10));
+    my @d = ($iz->create_int(0, 5), 5);
+    my @r = ($iz->create_int(0, 5), 5);
+    my $limit = $iz->create_int(2, 5);
+    ok($iz->Cumulative(\@s, \@d, \@r, $limit));
+}
+
+# Cumulative (constant)
+SKIP: {
+    my $iz = Algorithm::CP::IZ->new();
+
+    skip "old iZ", 2
+	unless (defined($iz->get_version)
+		&& $iz->IZ_VERSION_MAJOR >= 3
+		&& $iz->IZ_VERSION_MINOR >= 6);
+    
+    my @s = (0, $iz->create_int(0, 10));
+    my @d = (5, 5);
+    my @r = (1, 1);
+    ok($iz->Cumulative(\@s, \@d, \@r, 1));
+    is($s[1]->min, 5);
+}
+
+# Disjunctive
+SKIP: {
+    my $iz = Algorithm::CP::IZ->new();
+
+    skip "old iZ", 1
+	unless (defined($iz->get_version)
+		&& $iz->IZ_VERSION_MAJOR >= 3
+		&& $iz->IZ_VERSION_MINOR >= 6);
+
+    my @s = (0, $iz->create_int(0, 10));
+    my @d = ($iz->create_int(0, 5), 5);
+    ok($iz->Disjunctive(\@s, \@d));
+}
+
+# Disjunctive (constant)
+SKIP: {
+    my $iz = Algorithm::CP::IZ->new();
+
+    skip "old iZ", 2
+	unless (defined($iz->get_version)
+		&& $iz->IZ_VERSION_MAJOR >= 3
+		&& $iz->IZ_VERSION_MINOR >= 6);
+
+    my @s = (0, $iz->create_int(0, 10));
+    my @d = (5, 5);
+    ok($iz->Disjunctive(\@s, \@d));
+    is($s[1]->min, 5);
 }
 
 # ReifEq(var, var)

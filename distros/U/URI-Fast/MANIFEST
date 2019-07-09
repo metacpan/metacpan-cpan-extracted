@@ -10,6 +10,7 @@ MANIFEST.SKIP
 ppport.h
 README.pod
 t/abs.t
+t/author.t
 t/basics.t
 t/compare.t
 t/encoding.t

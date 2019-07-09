@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.77  Sun Jun  7 21:34:00 2019
+       Adding support for insecure certificate exceptions.
+
 0.76  Sat Jun 29 19:22:00 2019
        Fixes to cygwin test suite.  Fixes to cope with dbus crashes in RHEL6.
 

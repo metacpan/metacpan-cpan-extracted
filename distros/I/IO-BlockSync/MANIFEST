@@ -1,0 +1,16 @@
+bin/blocksync
+Changes
+lib/IO/BlockSync.pm
+lib/IO/BlockSync/App.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/critic.t
+t/manifest.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

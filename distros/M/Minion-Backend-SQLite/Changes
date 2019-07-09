@@ -1,3 +1,6 @@
+4.004     2019-07-09 00:53:20 EDT
+  - Add time field to list_jobs method.
+
 4.003     2019-06-21 18:06:07 EDT
   - Ignore missing workers for jobs in the minion_foreground named queue to
     make debugging very slow jobs easier.

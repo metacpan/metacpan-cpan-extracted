@@ -1,7 +1,7 @@
 {
    "abstract" : "Act on upper scopes.",
    "author" : [
-      "Vincent Pit <perl@profvince.com>"
+      "Vincent Pit <vpit@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -56,9 +56,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FScope-Upper.git"
+         "url" : "http://git.vpit.fr/?p=perl%2Fmodules%2FScope-Upper.git"
       }
    },
-   "version" : "0.31",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.32",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

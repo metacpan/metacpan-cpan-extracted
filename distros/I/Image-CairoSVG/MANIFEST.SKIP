@@ -1,4 +1,4 @@
-(build|make-pod)\.pl
+(build|make-pod|clean)\.pl
 blib/.*
 .gitignore
 .git/.*

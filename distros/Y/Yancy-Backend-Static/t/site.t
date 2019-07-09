@@ -23,7 +23,7 @@ $t->app->plugin( Yancy => {
 } );
 $t->app->routes->get( '/*id' )->to(
     'yancy#get',
-    collection => 'pages',
+    schema => 'pages',
     id => 'index',
     template => 'page',
     layout => 'default',

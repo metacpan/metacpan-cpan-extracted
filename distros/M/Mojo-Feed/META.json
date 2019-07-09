@@ -1,12 +1,12 @@
 {
    "abstract" : "Mojo::DOM-based parsing of RSS & Atom feeds",
    "author" : [
-      "Dotan Dimet, Mario Domgoergen"
+      "Dotan Dimet <dotan@corky.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.14",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -44,7 +44,7 @@
       "runtime" : {
          "requires" : {
             "HTTP::Date" : "6.02",
-            "Mojolicious" : "7.52",
+            "Mojolicious" : "8.03",
             "Time::Zone" : "2.2",
             "perl" : "5.010"
          }
@@ -58,7 +58,7 @@
    "provides" : {
       "Mojo::Feed" : {
          "file" : "lib/Mojo/Feed.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Mojo::Feed::Item" : {
          "file" : "lib/Mojo/Feed/Item.pm"
@@ -71,7 +71,7 @@
       },
       "Mojolicious::Plugin::FeedReader" : {
          "file" : "lib/Mojolicious/Plugin/FeedReader.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -85,11 +85,11 @@
          "web" : "https://github.com/dotandimet/Mojo-Feed"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_authority" : "cpan:DOTAN",
    "x_contributors" : [
-      "Dotan Dimet <dotan@corky.net>",
       "Mario Domgoergen <mdom@taz.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

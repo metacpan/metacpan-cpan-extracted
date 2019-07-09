@@ -914,7 +914,7 @@ L<Exporter>, L<Test::More>.
 
 =head1 AUTHOR
 
-Vincent Pit, C<< <perl at profvince.com> >>, L<http://www.profvince.com>.
+Vincent Pit C<< <vpit at cpan.org> >>.
 
 You can contact me by mail or on C<irc.perl.org> (vincent).
 
@@ -931,7 +931,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010,2011,2013 Vincent Pit, all rights reserved.
+Copyright 2010,2011,2013,2019 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = '1.149';
+our $VERSION = '1.151';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -15,6 +15,7 @@ use Quiq::Object;
 use Quiq::Converter;
 use Test::More ();
 use Quiq::System;
+use Quiq::Assert;
 use Quiq::Test::Class::Method;
 
 # -----------------------------------------------------------------------------
@@ -807,6 +808,40 @@ sub ok {
 
 # -----------------------------------------------------------------------------
 
+=head3 in() - Prüfe, ob Wert dem erwarteten Wert entspricht
+
+=head4 Synopsis
+
+    $bool = $test->in($got,\@expected);
+    $bool = $test->in($got,\@expected,$text);
+
+=head4 Alias
+
+inTest()
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub in {
+    my ($self,$got,$expectedA,$text) = @_;
+
+    my $ok = Quiq::Assert->isEnumValue($got,$expectedA,-sloppy=>1);
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Quiq::Converter->umlautToAscii($text);
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return Test::More::ok($ok,$text);    
+}
+
+{
+    no warnings 'once';
+    *inTest = \&in;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 is() - Prüfe, ob Wert dem erwarteten Wert entspricht
 
 =head4 Synopsis
@@ -1136,7 +1171,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.149
+1.151
 
 =head1 AUTHOR
 

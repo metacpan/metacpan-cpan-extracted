@@ -13,17 +13,20 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.840';
+our $VERSION = '1.841';
 
+## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
 use MCE::Shared::Base ();
+use Errno ();
 use bytes;
 
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
+my $_max_fd = eval 'fileno(\*main::DATA)' // 2;
 my $_reset_flg = 1;
 
 sub _croak {
@@ -31,7 +34,7 @@ sub _croak {
 }
 
 sub import {
-   if (!exists $INC{'MCE/Shared.pm'}) {
+   if (!defined $INC{'MCE/Shared.pm'}) {
       no strict 'refs'; no warnings 'redefine';
       *{ caller().'::mce_open' } = \&open;
    }
@@ -232,9 +235,9 @@ sub WRITE {
           : ( @_ == 3 )
               ? syswrite($_[0], $_[1], $_[2] - $wrote, $wrote)
               : syswrite($_[0], $_[1], $_[2] - $wrote, $_[3] + $wrote)
-      ) || do {
+      ) or do {
          if ( $! ) {
-            redo WRITE if $!{'EINTR'};
+            redo WRITE if $! == Errno::EINTR();
             return undef;
          }
       };
@@ -291,7 +294,7 @@ sub WRITE {
          read($_DAU_R_SOCK, $_buf, $_len);
          print {$_DAU_R_SOCK} $LF;
 
-         if ($_fd > 2) {
+         if ($_fd > $_max_fd) {
             $_fd = IO::FDPass::recv(fileno $_DAU_R_SOCK); $_fd >= 0
                or _croak("cannot receive file handle: $!");
          }
@@ -446,9 +449,9 @@ sub WRITE {
          WRITE: {
             $_wrote += ( syswrite (
                $_obj->{ $_id }, $_buf, length($_buf) - $_wrote, $_wrote
-            )) || do {
+            )) or do {
                if ( $! ) {
-                  redo WRITE if $!{'EINTR'};
+                  redo WRITE if $! == Errno::EINTR();
                   print {$_DAU_R_SOCK} ''.$LF;
 
                   return;
@@ -496,10 +499,14 @@ use bytes;
 
 no overloading;
 
-my ($_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj, $_freeze);
+my $_is_MSWin32 = ($^O eq 'MSWin32') ? 1 : 0;
+
+my ($_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj,
+    $_freeze);
 
 sub _init_handle {
-   ($_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj, $_freeze) = @_;
+   ($_DAT_LOCK, $_DAT_W_SOCK, $_DAU_W_SOCK, $_dat_ex, $_dat_un, $_chn, $_obj,
+    $_freeze) = @_;
 
    return;
 }
@@ -515,6 +522,9 @@ sub OPEN {
    if (ref $_[-1] && reftype($_[-1]) ne 'GLOB') {
       _croak("open error: not a GLOB reference");
    }
+   elsif (@_ == 1 && ref $_[0] && defined($_fd = fileno($_[0]))) {
+      $_buf = $_freeze->([ "<&=$_fd" ]);
+   }
    elsif (@_ == 2 && ref $_[1] && defined($_fd = fileno($_[1]))) {
       $_buf = $_freeze->([ $_[0]."&=$_fd" ]);
    }
@@ -526,7 +536,7 @@ sub OPEN {
       _croak("open error: unsupported use-case");
    }
 
-   if ($_fd > 2 && !$INC{'IO/FDPass.pm'}) {
+   if ($_fd > $_max_fd && !$INC{'IO/FDPass.pm'}) {
       _croak(
          "\nSharing a handle object while the server is running\n",
          "requires the IO::FDPass module.\n\n"
@@ -536,14 +546,15 @@ sub OPEN {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'O~OPN'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_id.$LF . $_fd.$LF . length($_buf).$LF . $_buf);
    <$_DAU_W_SOCK>;
 
-   IO::FDPass::send( fileno $_DAU_W_SOCK, fileno $_fd ) if ($_fd > 2);
+   IO::FDPass::send( fileno $_DAU_W_SOCK, fileno $_fd ) if ($_fd > $_max_fd);
    chomp(my $_err = <$_DAU_W_SOCK>);
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    if ($_err) {
       $! = $_err; '';
@@ -555,7 +566,8 @@ sub OPEN {
 sub READ {
    local $\ = undef if (defined $\);
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'O~REA'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[0]->[0].$LF . $_[2].$LF . length($/).$LF . $/);
 
@@ -565,7 +577,8 @@ sub READ {
 
    if ($_len) {
       if ($_len < 0) {
-         $_dat_un->(); $. = 0, $! = $_len * -1;
+         $_dat_un->() if !$_is_MSWin32;
+         $. = 0, $! = $_len * -1;
          return undef;
       }
       (defined $_[3])
@@ -581,14 +594,16 @@ sub READ {
       }
    }
 
-   $_dat_un->(); $. = $_ret, $! = 0;
+   $_dat_un->() if !$_is_MSWin32;
+   $. = $_ret, $! = 0;
    $_len;
 }
 
 sub READLINE {
    local $\ = undef if (defined $\);
 
-   $_dat_ex->();
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+   $_dat_ex->() if !$_is_MSWin32;
    print({$_DAT_W_SOCK} 'O~RLN'.$LF . $_chn.$LF),
    print({$_DAU_W_SOCK} $_[0]->[0].$LF . length($/).$LF . $/);
 
@@ -598,13 +613,15 @@ sub READLINE {
 
    if ($_len) {
       if ($_len < 0) {
-         $_dat_un->(); $. = 0, $! = $_len * -1;
+         $_dat_un->() if !$_is_MSWin32;
+         $. = 0, $! = $_len * -1;
          return undef;
       }
       read($_DAU_W_SOCK, $_buf, $_len);
    }
 
-   $_dat_un->(); $. = $_ret, $! = 0;
+   $_dat_un->() if !$_is_MSWin32;
+   $. = $_ret, $! = 0;
    $_buf;
 }
 
@@ -633,20 +650,22 @@ sub WRITE {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
 
+   CORE::lock $_DAT_LOCK if $_is_MSWin32;
+
    if (@_ == 1 || (@_ == 2 && $_[1] == length($_[0]))) {
-      $_dat_ex->();
+      $_dat_ex->() if !$_is_MSWin32;
       print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_id.$LF . length($_[0]).$LF, $_[0]);
    }
    else {
       my $_buf = substr($_[0], ($_[2] || 0), $_[1]);
-      $_dat_ex->();
+      $_dat_ex->() if !$_is_MSWin32;
       print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_id.$LF . length($_buf).$LF, $_buf);
    }
 
    chomp(my $_ret = <$_DAU_W_SOCK>);
-   $_dat_un->();
+   $_dat_un->() if !$_is_MSWin32;
 
    (length $_ret) ? $_ret : undef;
 }
@@ -667,7 +686,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.840
+This document describes MCE::Shared::Handle version 1.841
 
 =head1 DESCRIPTION
 
@@ -741,13 +760,11 @@ A handle helper class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 API DOCUMENTATION
 
-=over 3
+=head2 mce_open ( filehandle, expr )
 
-=item open ( filehandle, expr )
+=head2 mce_open ( filehandle, mode, expr )
 
-=item open ( filehandle, mode, expr )
-
-=item open ( filehandle, mode, reference )
+=head2 mce_open ( filehandle, mode, reference )
 
 In version 1.007 and later, constructs a new object by opening the file
 whose filename is given by C<expr>, and associates it with C<filehandle>.
@@ -787,8 +804,6 @@ and for writing:
  mce_open my $fh, "> output.txt"    or die "open error: $!";
  mce_open my $fh, ">", "output.txt" or die "open error: $!";
  mce_open my $fh, ">", \*STDOUT     or die "open error: $!";
-
-=back
 
 =head1 CHUNK IO
 

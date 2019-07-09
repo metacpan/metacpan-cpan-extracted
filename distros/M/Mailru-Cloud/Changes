@@ -18,3 +18,6 @@ Revision history for Perl extension Mailru::Cloud.
 0.06  Wed Nov  21 10:04:00 2018
     - Version 0.06
         - Fix error with info by bytes_used space
+0.07  Sat Jul  06 18:15:00 2018
+    - Version 0.07
+        - Fix File::Basename version in dependences

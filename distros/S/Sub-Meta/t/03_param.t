@@ -71,6 +71,9 @@ subtest 'new' => sub {
     is(Sub::Meta::Param->new(name => '$foo')->name, '$foo', 'args list');
 
     is(Sub::Meta::Param->new([])->type, [], 'args NOT HASH');
+
+    ok(Sub::Meta::Param->new(required => 0)->optional, 'args required');
+    ok(Sub::Meta::Param->new(positional => 0)->named, 'args positional');
 };
 
 done_testing;

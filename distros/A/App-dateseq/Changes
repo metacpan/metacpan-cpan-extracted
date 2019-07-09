@@ -1,3 +1,8 @@
+0.094   2019-06-24 (PERLANCAR)
+
+	- Add options: --include-month, --exclude-month.
+
+
 0.093   2019-06-20 (PERLANCAR)
 
 	- Add options: --include-dow, --exclude-dow.

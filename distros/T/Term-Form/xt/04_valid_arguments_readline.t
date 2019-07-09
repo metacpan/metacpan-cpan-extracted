@@ -15,7 +15,7 @@ BEGIN {
 }
 
 
-plan skip_all => 'Test not yet updated ### ### ###';
+plan skip_all => '### ### ###';
 
 
 eval "use Expect";

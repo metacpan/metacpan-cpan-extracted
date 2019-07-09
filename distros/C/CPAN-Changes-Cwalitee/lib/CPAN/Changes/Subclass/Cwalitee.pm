@@ -1,7 +1,7 @@
 package CPAN::Changes::Subclass::Cwalitee;
 
-our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ CPAN::Changes::Subclass::Cwalitee - CPAN::Changes subclass for CPAN::Changes::Cw
 
 =head1 VERSION
 
-This document describes version 0.001 of CPAN::Changes::Subclass::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-03.
+This document describes version 0.004 of CPAN::Changes::Subclass::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-08.
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/MojoX/JSON/RPC.pm',
     ABSTRACT     => 'Perl implementation of JSON-RPC 2.0 protocol for Mojolicious',
     AUTHOR       => 'Henry Tang <henryykt@gmail.com>',
-    PREREQ_PM    => { 'Mojolicious' => '7' },
+    PREREQ_PM    => { 'Mojolicious' => '7.13' },
     LICENSE      => 'artistic_2',
     test         => { TESTS => 't/*.t t/*/*.t t/*/*/*.t' },
     META_MERGE => {

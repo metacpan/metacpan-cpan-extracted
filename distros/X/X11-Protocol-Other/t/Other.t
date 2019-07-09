@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -25,7 +25,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 106)[1];
+my $test_count = (tests => 113)[1];
 plan tests => $test_count;
 
 require X11::Protocol::Other;
@@ -59,7 +59,7 @@ $X->QueryPointer($X->{'root'});  # sync
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 30;
+my $want_version = 31;
 ok ($X11::Protocol::Other::VERSION,
     $want_version,
     'VERSION variable');
@@ -74,6 +74,68 @@ my $check_version = $want_version + 1000;
 ok (! eval { X11::Protocol::Other->VERSION($check_version); 1 },
     1,
     "VERSION class check $check_version");
+
+
+#------------------------------------------------------------------------------
+# get_property_atoms()
+
+my $test_window = $X->new_rsrc;
+$X->CreateWindow ($test_window,
+                  $X->root,         # parent
+                  'InputOutput',    # class
+                  0,                # depth, from parent
+                  'CopyFromParent', # visual
+                  0,0,              # x,y
+                  1,1,              # width,height
+                  0,                # border
+                  # event_mask => $X->pack_event_mask('PropertyChange'),
+                 );
+
+{
+  my $property = $X->atom('X11_PROTOCOL_OTHER__TEST');
+  my $property2 = $X->atom('X11_PROTOCOL_OTHER__TEST_2');
+  my $root = $X->root;
+  my @want_atoms_one = ($X->atom('ONE'),
+                        $X->atom('TWO'));
+  $X->ChangeProperty($root,
+                     $property,                   # property
+                     X11::AtomConstants::ATOM(),  # type
+                     32,                          # format
+                     'Replace',
+                     pack('L*', @want_atoms_one));
+
+  my @want_atoms_two = ($X->atom('TWO'),
+                        $X->atom('THREE'));
+  ok (join(',',@want_atoms_one) ne join(',',@want_atoms_two),
+      1);
+  $X->ChangeProperty($test_window,
+                     $property2,                  # property
+                     X11::AtomConstants::ATOM(),  # type
+                     32,                          # format
+                     'Replace',
+                     pack('L*', @want_atoms_two));
+
+  {
+    my @got_atoms
+      = X11::Protocol::Other::get_property_atoms ($X, $root, $property);
+    ok (scalar(@got_atoms), 2);
+    ok (join(',',@got_atoms), join(',',@want_atoms_one));
+  }
+  {
+    my @got_atoms
+      = X11::Protocol::Other::get_property_atoms ($X, $test_window, $property2);
+    ok (scalar(@got_atoms), 2);
+    ok (join(',',@got_atoms), join(',',@want_atoms_two));
+  }
+
+  $X->DeleteProperty ($root, $property);
+  {
+    my @got_atoms
+      = X11::Protocol::Other::get_property_atoms ($X, $root, $property);
+    ok (scalar(@got_atoms), 0);
+    ok (join(',',@got_atoms), '');
+  }
+}
 
 #------------------------------------------------------------------------------
 # root_to_screen()

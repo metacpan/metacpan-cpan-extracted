@@ -6,7 +6,12 @@ use warnings;
 use Test::More;
 
 require_ok('Test::Compile::Internal');
+my $test = new_ok('Test::Compile::Internal');
 
-my $internal = new_ok('Test::Compile::Internal');
+# Run some of the basic meithods, with basic test conditions
+# ..mostly just to ensure they get executed
+$test->all_pl_files_ok('t/scripts/lib.pl');
+$test->all_pm_files_ok('lib/');
 
-$internal->done_testing();
+# Fin...
+$test->done_testing();

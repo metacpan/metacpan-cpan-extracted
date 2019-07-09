@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of X11-Protocol-Other.
 #
@@ -27,7 +27,7 @@ use Exporter;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-$VERSION = 30;
+$VERSION = 31;
 
 %CURSOR_GLYPH
   = (
@@ -279,7 +279,7 @@ be selected in usual C<Exporter> style (see L<Exporter>),
 
 =head1 EXAMPLE
 
-For reference, here's how to create a cursor from a desired glyph,
+To create a cursor from a desired glyph,
 
     my $cursor_name = 'spraycan';
     my $cursor_glyph = $CURSOR_GLYPH{$cursor_name}; # number
@@ -310,7 +310,7 @@ appearance on screen will be limited by the hardware.
 
 All cursors in the core protocol are two-colours with pixels fully opaque or
 fully transparent as per this create.  The RENDER extension, when available,
-can do multi-colour and partial transparency if desired (see
+can make multi-colour and partial transparency if desired (see
 L<X11::Protocol::Ext::RENDER>).
 
 =head1 SEE ALSO
@@ -335,7 +335,7 @@ L<http://user42.tuxfamily.org/x11-protocol-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 X11-Protocol-Other is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -11,6 +11,7 @@ lib/Net/Cisco/FMC/v1.pm
 lib/Net/Cisco/FMC/v1/Role/FixAccessruleLiterals.pm
 lib/Net/Cisco/FMC/v1/Role/ObjectMethods.pm
 lib/Net/Cisco/FMC/v1/Role/REST/Client.pm
+t/api.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-portability.t

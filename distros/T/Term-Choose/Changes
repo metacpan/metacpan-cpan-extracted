@@ -1,6 +1,14 @@
 Revision history for Term::Choose
 
 
+1.654   2019-07-07
+    - Bugfix backup instance defaults.
+
+1.653   2019-07-07
+    - New file ValidateOptions.pm.
+    - Refactoring options handling.
+    - Removed DESTROY.
+
 1.652   2019-07-04
     - Make __validate_and_add_options more portable.
 

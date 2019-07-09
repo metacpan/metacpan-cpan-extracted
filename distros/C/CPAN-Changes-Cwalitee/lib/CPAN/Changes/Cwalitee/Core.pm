@@ -1,14 +1,12 @@
 package CPAN::Changes::Cwalitee::Core;
 
-our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
-
-#use CPAN::Changes::CwaliteeCommon;
 
 our %SPEC;
 
@@ -105,7 +103,7 @@ sub indicator_date_correct_format {
                      )?
                      \z/x) {
 
-            return [200, "OK", "Some dates are not in the correct format, e.g. '$rel->{_parsed_date}'"];
+            return [200, "OK", "Some dates are not in the correct format, e.g. in version $v"];
         }
     }
     [200, "OK", ''];
@@ -121,7 +119,6 @@ This order is, in my opinion, the best order optimized for reading by users.
 _
     args => {
     },
-    'x.indicator.severity' => 2,
 };
 sub indicator_releases_in_descending_date_order {
     require Data::Cmp;
@@ -150,7 +147,6 @@ $SPEC{indicator_release_dates_not_future} = {
     summary => 'No release dates are in the future',
     args => {
     },
-    'x.indicator.severity' => 2,
 };
 sub indicator_release_dates_not_future {
     require DateTime;
@@ -180,50 +176,234 @@ sub indicator_release_dates_not_future {
     [200, "OK", ''];
 }
 
-# currently commented-out, not good results
-#
-# $SPEC{indicator_preamble_english} = {
-#     v => 1.1,
-#     summary => 'Preamble, if exists, is in English',
-#     args => {
-#     },
-#     'x.indicator.severity' => 2,
-# };
-# sub indicator_preamble_english {
-#     require Lingua::Identify;
+$SPEC{indicator_no_useless_text} = {
+    v => 1.1,
+    summary => 'No useless text in the change lines, e.g. "Release v1.23"',
+    args => {
+    },
+};
+sub indicator_no_useless_text {
+    my %args = @_;
+    my $r = $args{r};
 
-#     my %args = @_;
-#     my $r = $args{r};
+    my $p = $r->{parsed};
+    defined $p or return [412];
 
-#     my $p = $r->{parsed};
-#     defined $p or return [412];
+    # XXX useless text in preamble, group
 
-#     return [200, "OK", ''] unless $p->{preamble} =~ /\S/;
+    for my $ver (sort keys %{ $p->{releases} }) {
+        my $rel = $p->{releases}{$ver};
+        for my $chgroup (sort keys %{ $rel->{changes} }) {
+            my $gchanges = $rel->{changes}{$chgroup}{changes};
+            for my $change (@$gchanges) {
+                if ($change =~
+                        m!\A\s*(
+                              (version \s+|v)? \d\S* \s+ released |
+                              (release(d|s)? \s+)? (version \s+|v)? \d\S* |
+                          )\s*(\.)?\s*\z!ix) {
+                    return [200, "OK", "Useless change text: $change"];
+                }
+            }
+        }
+    }
+    [200, "OK", ''];
+}
 
-#     my %langs = Lingua::Identify::langof($p->{preamble});
-#     return [412, "Lingua::Identify cannot detect language"] unless keys(%langs);
+$SPEC{indicator_not_all_caps} = {
+    v => 1.1,
+    summary => 'No all-caps (shouting) text in the change lines, e.g. "REMOVE THE BUG!"',
+    args => {
+    },
+    'x.indicator.status' => 'optional',
+};
+sub indicator_not_all_caps {
+    my %args = @_;
+    my $r = $args{r};
 
-#     my @langs = sort { $langs{$b}<=>$langs{$a} } keys %langs;
-#     my $confidence = Lingua::Identify::confidence(%langs);
-#     log_trace(
-#         "Lingua::Identify result: langof=%s, langs=%s, confidence=%s",
-#         \%langs, \@langs, $confidence);
-#     if ($langs[0] ne 'en') {
-#         [200, "OK", "Language not detected as English, ".
-#              sprintf("%d%% %s (confidence %.2f)",
-#                      $langs{$langs[0]}*100, $langs[0], $confidence)];
-#     } else {
-#         [200, "OK", ''];
-#     }
-# }
+    my $p = $r->{parsed};
+    defined $p or return [412];
 
-# TODO: indicator_entries_english
+    # XXX all-caps in group name? in preamble?
+
+    my $code_is_all_caps = sub {
+        my $text = shift;
+        my $num_letters;
+        my $num_capitals = 0;
+        for (split //, $text) {
+            if (/[A-Za-z]/) { $num_letters++  }
+            if (/[A-Z]/)    { $num_capitals++ }
+        }
+        return unless $num_letters;
+        $num_capitals / $num_letters >= 0.9;
+    };
+
+    for my $ver (sort keys %{ $p->{releases} }) {
+        my $rel = $p->{releases}{$ver};
+        for my $chgroup (sort keys %{ $rel->{changes} }) {
+            my $gchanges = $rel->{changes}{$chgroup}{changes};
+            for my $change (@$gchanges) {
+                if ($code_is_all_caps->($change)) {
+                    return [200, "OK", "All-caps in text: $change"];
+                }
+            }
+        }
+    }
+    [200, "OK", ''];
+}
+
+$SPEC{indicator_no_shouting} = {
+    v => 1.1,
+    summary => 'No shouting in the change lines, e.g. "dammit!!!"',
+    args => {
+    },
+};
+sub indicator_no_shouting {
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+    # XXX shouting in group name? shouting in preamble?
+
+    for my $ver (sort keys %{ $p->{releases} }) {
+        my $rel = $p->{releases}{$ver};
+        for my $chgroup (sort keys %{ $rel->{changes} }) {
+            my $gchanges = $rel->{changes}{$chgroup}{changes};
+            for my $change (@$gchanges) {
+                if ($change =~ /(!\s*){3,}/) {
+                    return [200, "OK", "Shouting in text: $change"];
+                }
+            }
+        }
+    }
+    [200, "OK", ''];
+}
+
+$SPEC{indicator_no_empty_group} = {
+    v => 1.1,
+    summary => 'No empty change group',
+    args => {
+    },
+};
+sub indicator_no_empty_group {
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+    for my $ver (sort keys %{ $p->{releases} }) {
+        my $rel = $p->{releases}{$ver};
+        for my $chgroup (sort keys %{ $rel->{changes} }) {
+            my $gchanges = $rel->{changes}{$chgroup}{changes};
+            if (!@$gchanges) {
+                return [200, "OK", "Empty change group '$chgroup' in release $rel"];
+            }
+        }
+    }
+    [200, "OK", ''];
+}
+
+$SPEC{indicator_not_too_wide} = {
+    v => 1.1,
+    summary => 'Text is not too wide',
+    args => {
+        max_width => {
+            schema => 'uint*',
+            default => 125,
+        },
+    },
+    'x.indicator.priority' => 1, # before Changes file is parsed
+};
+sub indicator_not_too_wide {
+    my %args = @_;
+    my $r = $args{r};
+
+    my $max_width = $args{max_width} // 125;
+
+    my $longest = 0;
+    for (split /^/m, $r->{file_content}) {
+        chomp;
+        $longest = length() if $longest < length();
+    }
+
+    if ($longest > $max_width) {
+        return [200, "OK", "Some lines exceed $max_width characters ($longest)"];
+    } else {
+        [200, "OK", ''];
+    }
+}
+
+$SPEC{indicator_english} = {
+    v => 1.1,
+    summary => 'Preamble and change entries are in English',
+    args => {
+    },
+};
+sub indicator_english {
+    require Lingua::Identify::Any;
+
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+  DETECT_PREAMBLE_LANGUAGE: {
+        last unless $p->{preamble} =~ /\S/;
+        my $dlres = Lingua::Identify::Any::detect_text_language(text=>$p->{preamble});
+        return [412, "Cannot detect language of preamble: $dlres->[0] - $dlres->[1]"]
+            unless $dlres->[0] == 200;
+        if ($dlres->[2]{'lang_code'} ne 'en') {
+            return [
+                200,
+                "OK", "Language of preamble not detected as English ".
+                    sprintf("(%s, confidence %.2f)",
+                            $dlres->[2]{lang_code},
+                            $dlres->[2]{confidence} // 0,
+                        ),
+            ];
+        }
+    }
+
+  DETECT_ENTRIES:
+
+    for my $ver (sort keys %{ $p->{releases} }) {
+        my $rel = $p->{releases}{$ver};
+        for my $chgroup (sort keys %{ $rel->{changes} }) {
+            my $gchanges = $rel->{changes}{$chgroup}{changes};
+            for my $change (@$gchanges) {
+                last unless $change =~ /\S/;
+                my $dlres = Lingua::Identify::Any::detect_text_language(text=>$change);
+                return [412, "Cannot detect language in release $ver: $dlres->[0] - $dlres->[1]"]
+                    unless $dlres->[0] == 200;
+                if ($dlres->[2]{'lang_code'} ne 'en') {
+                    return [
+                        200,
+                        "OK", "Language in release $ver not detected as English ".
+                            sprintf("(%s, confidence %.2f)",
+                                    $dlres->[2]{lang_code},
+                                    $dlres->[2]{confidence} // 0,
+                                ),
+                    ];
+                }
+            }
+        }
+    }
+    [200, "OK", ''];
+}
+
 # TODO: indicator_sufficient_entries_length
 # TODO: indicator_version_correct_format
-# TODO: indicator_entries_not_commit_logs
-# TODO: indicator_entries_not_useless (e.g. 'Update/prepare Changes for v0.01')
+# TODO: indicator_not_commit_logs
 # TODO: indicator_name_preferred (e.g. Changes and not ChangeLog.txt)
-# TODO: indicator_text_not_too_wide
+# TODO: indicator_no_duplicate_version
+# TODO: indicator_preamble_not_template
+# TODO: indicator_entries_not_template
+# TODO: indicator_entries_english_tense_consistent (all past tense, or all present tense)
+# TODO: indicator_preamble_not_too_long (this could indicate misparsing releases as preamble, e.g. when each version is prefixed by a non-number, e.g. in XML-Compile)
+# TODO: indicator_indentation_consistent
 
 1;
 # ABSTRACT: A collection of core indicators for CPAN Changes cwalitee
@@ -240,7 +420,7 @@ CPAN::Changes::Cwalitee::Core - A collection of core indicators for CPAN Changes
 
 =head1 VERSION
 
-This document describes version 0.001 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-03.
+This document describes version 0.004 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-08.
 
 =head1 FUNCTIONS
 
@@ -295,6 +475,162 @@ Dates are parsable by CPAN::Changes.
 This function is not exported.
 
 No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_english
+
+Usage:
+
+ indicator_english() -> [status, msg, payload, meta]
+
+Preamble and change entries are in English.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_no_empty_group
+
+Usage:
+
+ indicator_no_empty_group() -> [status, msg, payload, meta]
+
+No empty change group.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_no_shouting
+
+Usage:
+
+ indicator_no_shouting() -> [status, msg, payload, meta]
+
+No shouting in the change lines, e.g. "dammit!!!".
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_no_useless_text
+
+Usage:
+
+ indicator_no_useless_text() -> [status, msg, payload, meta]
+
+No useless text in the change lines, e.g. "Release v1.23".
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_not_all_caps
+
+Usage:
+
+ indicator_not_all_caps() -> [status, msg, payload, meta]
+
+No all-caps (shouting) text in the change lines, e.g. "REMOVE THE BUG!".
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_not_too_wide
+
+Usage:
+
+ indicator_not_too_wide(%args) -> [status, msg, payload, meta]
+
+Text is not too wide.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<max_width> => I<uint> (default: 125)
+
+=back
 
 Returns an enveloped result (an array).
 

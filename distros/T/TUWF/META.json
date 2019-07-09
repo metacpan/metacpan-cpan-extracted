@@ -35,44 +35,44 @@
    "provides" : {
       "TUWF" : {
          "file" : "lib/TUWF.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::DB" : {
          "file" : "lib/TUWF/DB.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::Exception" : {
          "file" : "lib/TUWF.pm"
       },
       "TUWF::Misc" : {
          "file" : "lib/TUWF/Misc.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::Object" : {
          "file" : "lib/TUWF.pm"
       },
       "TUWF::Request" : {
          "file" : "lib/TUWF/Request.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::Response" : {
          "file" : "lib/TUWF/Response.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::Validate" : {
          "file" : "lib/TUWF/Validate.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::Validate::Interop" : {
          "file" : "lib/TUWF/Validate/Interop.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::Validate::Result" : {
          "file" : "lib/TUWF/Validate.pm"
       },
       "TUWF::XML" : {
          "file" : "lib/TUWF/XML.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "TUWF::func" : {
          "file" : "lib/TUWF.pm"
@@ -91,6 +91,6 @@
          "url" : "https://code.blicky.net/yorhel/tuwf"
       }
    },
-   "version" : "1.3",
+   "version" : "1.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

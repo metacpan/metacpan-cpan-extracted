@@ -62,119 +62,119 @@
    "provides" : {
       "YAML::PP" : {
          "file" : "lib/YAML/PP.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Common" : {
          "file" : "lib/YAML/PP/Common.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Constructor" : {
          "file" : "lib/YAML/PP/Constructor.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Dumper" : {
          "file" : "lib/YAML/PP/Dumper.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Emitter" : {
          "file" : "lib/YAML/PP/Emitter.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Exception" : {
          "file" : "lib/YAML/PP/Exception.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Grammar" : {
          "file" : "lib/YAML/PP/Grammar.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Highlight" : {
          "file" : "lib/YAML/PP/Highlight.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Lexer" : {
          "file" : "lib/YAML/PP/Lexer.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Loader" : {
          "file" : "lib/YAML/PP/Loader.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Parser" : {
          "file" : "lib/YAML/PP/Parser.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Perl" : {
          "file" : "lib/YAML/PP/Perl.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Reader" : {
          "file" : "lib/YAML/PP/Reader.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Reader::File" : {
          "file" : "lib/YAML/PP/Reader.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Render" : {
          "file" : "lib/YAML/PP/Render.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Representer" : {
          "file" : "lib/YAML/PP/Representer.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema" : {
          "file" : "lib/YAML/PP/Schema.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::Binary" : {
          "file" : "lib/YAML/PP/Schema/Binary.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::Core" : {
          "file" : "lib/YAML/PP/Schema/Core.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::Failsafe" : {
          "file" : "lib/YAML/PP/Schema/Failsafe.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::Include" : {
          "file" : "lib/YAML/PP/Schema/Include.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::JSON" : {
          "file" : "lib/YAML/PP/Schema/JSON.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::Merge" : {
          "file" : "lib/YAML/PP/Schema/Merge.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::Perl" : {
          "file" : "lib/YAML/PP/Schema/Perl.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::Tie::IxHash" : {
          "file" : "lib/YAML/PP/Schema/Tie/IxHash.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Schema::YAML1_1" : {
          "file" : "lib/YAML/PP/Schema/YAML1_1.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Type::MergeKey" : {
          "file" : "lib/YAML/PP/Type/MergeKey.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Writer" : {
          "file" : "lib/YAML/PP/Writer.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "YAML::PP::Writer::File" : {
          "file" : "lib/YAML/PP/Writer/File.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -188,7 +188,7 @@
          "web" : "https://github.com/perlpunk/YAML-PP-p5"
       }
    },
-   "version" : "0.017",
+   "version" : "0.018",
    "x_generated_by_perl" : "v5.24.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

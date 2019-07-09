@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.149';
+our $VERSION = '1.151';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
@@ -22,13 +22,28 @@ L<Quiq::Object>
 
 =head1 METHODS
 
-=head2 Datenstruktur ausgeben
+=head2 Datenstrukturen
 
 =head3 dump() - Liefere Datenstruktur in lesbarer Form
 
 =head4 Synopsis
 
     $str = $this->dump($ref,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $ref
+
+Referenz auf eine Datenstruktur.
+
+=item @opt
+
+Optionen der Funktion np() des Moduls Data::Printer. Dokumentation siehe
+dort.
+
+=back
 
 =head4 Description
 
@@ -93,7 +108,7 @@ sub modulePaths {
 
 =head1 VERSION
 
-1.149
+1.151
 
 =head1 AUTHOR
 
