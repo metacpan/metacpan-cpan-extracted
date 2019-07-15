@@ -1,12 +1,12 @@
 {
-   "abstract" : "Simple Monitoring Tools",
+   "abstract" : "Simple monitoring tool",
    "author" : [
-      "Lepenkov Sergey (Serz Minus) <minus@mail333.com>"
+      "Serz Minus (Sergey Lepenkov) <abalama@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "open_source"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,38 +32,30 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Data::Dumper" : "0"
-         },
          "requires" : {
-            "CTK" : "1.16",
+            "CTK" : "2.01",
             "Class::C3::Adopt::NEXT" : "0.13",
-            "DBD::SQLite" : "1.4",
+            "DBD::SQLite" : "1.5",
             "DBI" : "1.6",
-            "Data::Dumper" : "0",
             "File::Copy" : "2.18",
             "File::Find" : "1.15",
             "File::Path" : "2",
-            "HTTP::Cookies" : "6",
             "HTTP::Message" : "6.02",
-            "JSON" : "2.53",
             "LWP" : "5.8",
             "LWP::MediaTypes" : "6",
-            "LWP::UserAgent" : "5.8",
             "Mail::POP3Client" : "2.18",
             "Module::Loaded" : "0.04",
             "Net::Ping" : "2.36",
             "Net::SMTP" : "2.31",
             "Net::Telnet" : "3.03",
-            "TemplateM" : "3.03",
+            "Socket" : "0",
+            "Sys::Hostname" : "0",
+            "Term::ReadKey" : "2.33",
             "Text::SimpleTable" : "2.03",
-            "Text::Unidecode" : "0.04",
             "Try::Tiny" : "0.07",
             "URI" : "1.5",
-            "WWW::MLite" : "1.05",
-            "XML::Simple" : "2.2",
-            "YAML::Tiny" : "1.5",
-            "perl" : "5.008001"
+            "WWW::MLite" : "2.01",
+            "perl" : "5.016001"
          }
       }
    },
@@ -71,11 +63,8 @@
    "resources" : {
       "homepage" : "http://app-monm.sourceforge.net",
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
-      ],
-      "repository" : {
-         "url" : "https://svn.code.sf.net/p/app-monm/code/trunk"
-      }
+         "https://dev.perl.org/licenses"
+      ]
    },
-   "version" : "1.05"
+   "version" : "1.06"
 }

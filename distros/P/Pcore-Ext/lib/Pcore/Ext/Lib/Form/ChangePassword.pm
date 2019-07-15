@@ -6,9 +6,9 @@ use Pcore::CDN::Static::FA qw[:ALL];
 sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
     return {
         submit => func <<"JS",
-            var me = this;
-            var view = this.getView();
-            var form = view.down('fieldpanel');
+            var me = this,
+                view = this.getView(),
+                form = view.down('fieldpanel');
 
             if (form.validate()) {
                 var password = form.getFields('password').getValue(),
@@ -20,17 +20,32 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
                     return;
                 }
 
-                Ext.fireEvent('mask');
+                var token = view.getToken(),
+                    callback = function (res) {
+                        view.unmask();
 
-                Ext.fireEvent('changePassword',
-                    password,
-                    view.getToken(),
-                    function (success) {
-                        Ext.fireEvent('unmask');
+                        if (res.isSuccess()) {
+                            Ext.toast($l10n{'Password changed'}, 3000);
 
-                        if (success) me.close();
-                    }
-                );
+                            me.close();
+                        }
+                        else {
+                            Ext.fireEvent('requestError', res);
+                        }
+                    };
+
+                Ext.fireEvent('mask', view);
+
+                if (token) {
+                    let api = view.getApiChangePasswordToken();
+
+                    Ext.direct.Manager.parseMethod(api)(token, password, callback);
+                }
+                else {
+                    let api = view.getApiChangePasswordProfile();
+
+                    Ext.direct.Manager.parseMethod(api)(password, callback);
+                }
             }
 JS
 
@@ -54,11 +69,13 @@ sub EXT_dialog : Extend('Ext.Dialog') : Type('widget') {
         controller => $type{controller},
 
         config => {
-            token           => undef,    # change password token
-            redirectOnClose => undef,    # hash, to redirect to on destroy
+            apiChangePasswordProfile => $api{'Profile/change_password'},
+            apiChangePasswordToken   => $api{'Auth/change_password'},
+            token                    => undef,                             # change password token
+            redirectOnClose          => undef,                             # hash, to redirect to on destroy
         },
 
-        title => { text => l10n('PASSWORD CHANGING') },
+        title => { text => l10n('CHANGE PASSWORD') },
 
         # defaultFocus => 'passwordfield[name=password]',
         closable   => \1,
@@ -92,7 +109,7 @@ sub EXT_dialog : Extend('Ext.Dialog') : Type('widget') {
                     ui      => 'decline',
                     handler => 'close',
                 },
-                {   text    => l10n('Change Password'),
+                {   text    => l10n('Change'),
                     ui      => 'confirm',
                     handler => 'submit',
                 },

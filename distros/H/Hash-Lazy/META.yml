@@ -2,7 +2,8 @@
 abstract: 'A Hash implementation with lazy evaluation feature'
 author:
   - 'Kang-min Liu E<lt>gugod@gugod.orgE<gt>'
-build_requires: {}
+build_requires:
+  Test::More: '0.9'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -15,14 +16,17 @@ name: Hash-Lazy
 provides:
   Hash::Lazy:
     file: lib/Hash/Lazy.pm
-    version: '0.02'
+    version: '0.04'
   Hash::Lazy::Tie:
     file: lib/Hash/Lazy/Tie.pm
+requires:
+  Sub::Exporter: '0'
+  self: '0'
 resources:
   bugtracker: https://github.com/gugod/Hash-Lazy/issues
   homepage: https://github.com/gugod/Hash-Lazy
   repository: git://github.com/gugod/Hash-Lazy.git
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: 1

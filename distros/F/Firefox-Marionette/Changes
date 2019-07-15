@@ -1,5 +1,10 @@
 Revision history for Firefox-Marionette
 
+0.78  Thu Jun 11 17:18:00 2019
+       Adding support for Firefox 68.
+       Adding strict_file_interactability, unhandled_prompt_behavior, set_window_rect and moz_shutdown_timeout to capabilities.
+       Added the raw parameter for the selfie method
+
 0.77  Sun Jun  7 21:34:00 2019
        Adding support for insecure certificate exceptions.
 

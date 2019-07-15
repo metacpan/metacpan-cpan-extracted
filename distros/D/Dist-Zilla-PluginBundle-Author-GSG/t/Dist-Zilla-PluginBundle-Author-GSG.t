@@ -13,6 +13,9 @@ use File::pushd qw();
 use lib qw(lib);
 use Dist::Zilla::PluginBundle::Author::GSG;
 
+$ENV{EMAIL} = 'fake@example.com'; # force a default for git
+delete $ENV{V}; # because it could mess up Git::NextVersion
+
 {
     my $git = Git::Wrapper->new('.');
     plan skip_all => "No Git!" unless $git->has_git_in_path;
@@ -20,6 +23,8 @@ use Dist::Zilla::PluginBundle::Author::GSG;
     my $version = $git->version;
     plan skip_all => "Git is too old: $version"
         if $version < version->parse(v1.7.5);
+
+    diag "Have git $version";
 }
 
 my $year   = 1900 + (localtime)[5];

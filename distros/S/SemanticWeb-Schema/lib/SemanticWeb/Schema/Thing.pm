@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has additional_type => (
@@ -130,7 +130,7 @@ SemanticWeb::Schema::Thing - The most generic type of item.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -213,9 +213,9 @@ A identifier should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PropertyValue']>
+
+=item C<Str>
 
 =back
 
@@ -301,15 +301,15 @@ A same_as should be one of the following types:
 
 C<subjectOf>
 
-A CreativeWork or Event about this Thing..
+A CreativeWork or Event about this Thing.
 
 A subject_of should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Event']>
-
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Event']>
 
 =back
 

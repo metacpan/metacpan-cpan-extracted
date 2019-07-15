@@ -1,12 +1,13 @@
 lib/DBD/PgPPSjis.pm
 Changes
-Makefile.PL
-pmake.bat
-MANIFEST
-README
-META.yml
 LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
 PostgreSjis.pl
+README
+pmake.bat
 t/00_load.t
 t/05_connect.t
 t/06_setup.t
@@ -16,4 +17,5 @@ t/09_update.t
 t/10_delete.t
 t/11_transaction.t
 t/12_errorhandle.t
+t/2001_podtest.t
 t/99_cleanup.t

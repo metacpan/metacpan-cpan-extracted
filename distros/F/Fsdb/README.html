@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title></title>
+<title>Fsdb - a flat-text database for shell scripting</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
 </head>
@@ -173,14 +173,26 @@
 
 <h1 id="WHATS-NEW">WHAT&#39;S NEW</h1>
 
-<h2 id="date-tba-desc-tba">2.65, date-tba desc-tba</h2>
+<h2 id="date-tbd-summary-tdb">2.67, date tbd summary tdb</h2>
 
 <dl>
 
-<dt id="ENHANCEMENT">ENHANCEMENT</dt>
+<dt id="IMPROVEMENT">IMPROVEMENT</dt>
 <dd>
 
-<p><a>dbmultistats</a> and <a>dbmapreduce</a> now both take a <code>-F x</code> option to set the field separator.</p>
+<p><a>dbformmail</a> now has an &quot;mh&quot; mechanism that writes messages to individual files (an mh-style mailbox).</p>
+
+</dd>
+<dt id="BUG-FIX">BUG FIX</dt>
+<dd>
+
+<p><a>dbrow</a> failed to include the Carp library, leading to fails on croak.</p>
+
+</dd>
+<dt id="BUG-FIX1">BUG FIX</dt>
+<dd>
+
+<p>Fixed <a>dbjoin</a> error message for an unsorted right stream was incorrect (it said left).</p>
 
 </dd>
 </dl>
@@ -362,6 +374,11 @@
 <pre><code>        cat DATA/passwd | dbroweval &#39;_fullname =~ s/(\w+)_(\w+)/$2,_$1/&#39;</code></pre>
 
 <p>converts &quot;John_Heidemann&quot; into &quot;Heidemann,_John&quot;. Not too much more work could split fullname into firstname and lastname fields.</p>
+
+<p>(Or:</p>
+
+<pre><code>        cat DATA/passwd | dbcolcreate sort | dbroweval -b &#39;use Fsdb::Support&#39;
+                &#39;_sort = _fullname; _sort =~ s/_/ /g; _sort = fullname_to_sort(_sort);&#39;</code></pre>
 
 <h1 id="TALKING-ABOUT-COLUMNS">TALKING ABOUT COLUMNS</h1>
 
@@ -1020,6 +1037,28 @@
 
 <p>Fsdb (in its various forms) has been used extensively by its author since 1991. Since 1995 it&#39;s been used by two other researchers at UCLA and several at ISI. In February 1998 it was announced to the Internet. Since then it has found a few users, some outside where I work.</p>
 
+<p>Major changes:</p>
+
+<dl>
+
+<dt id="first-public-release">1.0 1997-07-22: first public release.</dt>
+<dd>
+
+</dd>
+<dt id="rewrite-to-use-a-common-library-and-starting-to-use-threads">2.0 2008-01-25: rewrite to use a common library, and starting to use threads.</dt>
+<dd>
+
+</dd>
+<dt id="completion-of-the-rewrite-and-first-RPM-package">2.12 2008-10-16: completion of the rewrite, and first RPM package.</dt>
+<dd>
+
+</dd>
+<dt id="abandoning-threads-for-improved-performance">2.44 2013-10-02: abandoning threads for improved performance</dt>
+<dd>
+
+</dd>
+</dl>
+
 <h2 id="Fsdb-2.0-Rationale">Fsdb 2.0 Rationale</h2>
 
 <p>I&#39;ve thought about fsdb-2.0 for many years, but it was started in earnest in 2007. Fsdb-2.0 has the following goals:</p>
@@ -1058,7 +1097,7 @@
 
 <p>Fsdb includes code ported from Geoff Kuenning (<code>Fsdb::Support::TDistribution</code>).</p>
 
-<p>Fsdb contributors: Ashvin Goel <i>goel@cse.oge.edu</i>, Geoff Kuenning <i>geoff@fmg.cs.ucla.edu</i>, Vikram Visweswariah <i>visweswa@isi.edu</i>, Kannan Varadahan <i>kannan@isi.edu</i>, Lars Eggert <i>larse@isi.edu</i>, Arkadi Gelfond <i>arkadig@dyna.com</i>, David Graff <i>graff@ldc.upenn.edu</i>, Haobo Yu <i>haoboy@packetdesign.com</i>, Pavlin Radoslavov <i>pavlin@catarina.usc.edu</i>, Graham Phillips, Yuri Pradkin, Alefiya Hussain, Ya Xu, Michael Schwendt, Fabio Silva <i>fabio@isi.edu</i>, Jerry Zhao <i>zhaoy@isi.edu</i>, Ning Xu <i>nxu@aludra.usc.edu</i>, Martin Lukac <i>mlukac@lecs.cs.ucla.edu</i>, Xue Cai, Michael McQuaid, Christopher Meng, Calvin Ardi, H. Merijn Brand, Lan Wei.</p>
+<p>Fsdb contributors: Ashvin Goel <i>goel@cse.oge.edu</i>, Geoff Kuenning <i>geoff@fmg.cs.ucla.edu</i>, Vikram Visweswariah <i>visweswa@isi.edu</i>, Kannan Varadahan <i>kannan@isi.edu</i>, Lars Eggert <i>larse@isi.edu</i>, Arkadi Gelfond <i>arkadig@dyna.com</i>, David Graff <i>graff@ldc.upenn.edu</i>, Haobo Yu <i>haoboy@packetdesign.com</i>, Pavlin Radoslavov <i>pavlin@catarina.usc.edu</i>, Graham Phillips, Yuri Pradkin, Alefiya Hussain, Ya Xu, Michael Schwendt, Fabio Silva <i>fabio@isi.edu</i>, Jerry Zhao <i>zhaoy@isi.edu</i>, Ning Xu <i>nxu@aludra.usc.edu</i>, Martin Lukac <i>mlukac@lecs.cs.ucla.edu</i>, Xue Cai, Michael McQuaid, Christopher Meng, Calvin Ardi, H. Merijn Brand, Lan Wei, Hang Guo.</p>
 
 <p>Fsdb includes datasets contributed from NIST (<i>DATA/nist_zarr13.fsdb</i>), from <a href="http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm">http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm</a>, the NIST/SEMATECH e-Handbook of Statistical Methods, section 1.4.2.8.1. Background and Data. The source is public domain, and reproduced with permission.</p>
 
@@ -1612,7 +1651,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT1">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.2: <a>dbrowaccumulate</a>, <a>dbformmail</a>. <a>dbcolmovingstats</a>. <a>dbrowuniq</a>. <a>dbrowdiff</a>. <a>dbcolmerge</a>. <a>dbcolsplittocols</a>. <a>dbcolsplittorows</a>. <a>dbmapreduce</a>. <a>dbmultistats</a>. <a>dbrvstatdiff</a>. Also <a>dbrowenumerate</a> exists only as a front-end (command-line) program.</p>
@@ -1680,13 +1719,13 @@
 
 <dl>
 
-<dt id="BUG-FIX">BUG FIX</dt>
+<dt id="BUG-FIX2">BUG FIX</dt>
 <dd>
 
 <p>Dbsort no longer hangs if given an input file with no rows.</p>
 
 </dd>
-<dt id="BUG-FIX1">BUG FIX</dt>
+<dt id="BUG-FIX3">BUG FIX</dt>
 <dd>
 
 <p>Dbjoin now works with unsorted input coming from a pipeline (like stdin). Perl-5.8.8 has a bug (?) that was making this case fail---opening stdin in one thread, reading some, then reading more in a different thread caused an lseek which works on files, but fails on pipes like stdin. Go figure.</p>
@@ -1706,13 +1745,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT2">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT1">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrow</a> now defaults to running user supplied code without warnings (as with fsdb-1.x). Use <code>--warnings</code> or <code>-w</code> to turn them back on.</p>
 
 </dd>
-<dt id="ENHANCEMENT3">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT2">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> can now write different format output than the input, using the <code>-m</code> option.</p>
@@ -1742,13 +1781,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT4">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT3">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> can now tolerate non-map-aware reducers that pass back the key column in put. It also passes the current key as the last argument to external reducers.</p>
 
 </dd>
-<dt id="BUG-FIX2">BUG FIX</dt>
+<dt id="BUG-FIX4">BUG FIX</dt>
 <dd>
 
 <p><a>Fsdb::IO::Reader</a>, correctly handle <code>-header</code> option again. (Broken since fsdb-2.3.)</p>
@@ -1762,7 +1801,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT5">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT4">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.2: <a>dbcolpercentile</a>.</p>
@@ -1772,19 +1811,19 @@
 <dd>
 
 </dd>
-<dt id="BUG-FIX3">BUG FIX</dt>
+<dt id="BUG-FIX5">BUG FIX</dt>
 <dd>
 
 <p>Sigh, the sense of the --warnings option in <a>dbrow</a> was inverted. No longer.</p>
 
 </dd>
-<dt id="BUG-FIX4">BUG FIX</dt>
+<dt id="BUG-FIX6">BUG FIX</dt>
 <dd>
 
 <p>I found and fixed the string leaks (errors like &quot;Unbalanced string table refcount&quot; and &quot;Scalars leaked&quot;) in <a>dbmapreduce</a> and <a>dbmultistats</a>. (All <code>IO::Handle</code>s in threads must be manually destroyed.)</p>
 
 </dd>
-<dt id="BUG-FIX5">BUG FIX</dt>
+<dt id="BUG-FIX7">BUG FIX</dt>
 <dd>
 
 <p>The <code>-C</code> option to specify the column separator in <a>dbcolsplittorows</a> now works again (broken since it was ported).</p>
@@ -1800,7 +1839,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT6">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT5">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.7: <a>dbcolscorellate</a>. <a>dbcolsregression</a>. <a>cgi_to_db</a>. <a>dbfilevalidate</a>. <a>db_to_csv</a>. <a>csv_to_db</a>, <a>db_to_html_table</a>, <a>kitrace_to_db</a>, <a>tcpdump_to_db</a>, <a>tabdelim_to_db</a>, <a>ns_to_db</a>.</p>
@@ -1812,7 +1851,7 @@
 <p>The following programs have been dropped from fsdb-2.x: <a>db2dcliff</a>, <a>dbcolmultiscale</a>, <a>crl_to_db</a>. <a>ipchain_logs_to_db</a>. They may come back, but seemed overly specialized. The following program <a>dbrowsplituniq</a> was dropped because it is superseded by <a>dbmapreduce</a>. <a>dmalloc_to_db</a> was dropped pending a test cases and examples.</p>
 
 </dd>
-<dt id="ENHANCEMENT7">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT6">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilevalidate</a> now has a <code>-c</code> option to correct errors.</p>
@@ -1832,7 +1871,7 @@
 
 <dl>
 
-<dt id="BUG-FIX6">BUG FIX</dt>
+<dt id="BUG-FIX8">BUG FIX</dt>
 <dd>
 
 <p>Complete editing pass over the manual, making sure it aligns with fsdb-2.x.</p>
@@ -1844,7 +1883,7 @@
 <p>The header of fsdb files has changed, it is now #fsdb, not #h (or #L) and parsing of -F and -R are also different. See <a>dbfilealter</a> for the new specification. The v1 file format will be read, compatibly, but not written.</p>
 
 </dd>
-<dt id="BUG-FIX7">BUG FIX</dt>
+<dt id="BUG-FIX9">BUG FIX</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now tolerates comments that precede the first key, instead of failing with an error message.</p>
@@ -1858,7 +1897,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT8">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT7">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
@@ -1872,25 +1911,25 @@
 
 <dl>
 
-<dt id="ENHANCEMENT9">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT8">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
 
 </dd>
-<dt id="ENHANCEMENT10">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT9">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> the warnings option was backwards; now corrected. As a result, warnings in user code now default off (like in fsdb-1.x).</p>
 
 </dd>
-<dt id="BUG-FIX8">BUG FIX</dt>
+<dt id="BUG-FIX10">BUG FIX</dt>
 <dd>
 
 <p><a>dbcolpercentile</a> now defaults to assuming the target column is numeric. The new option <code>-N</code> allows selection of a non-numeric target.</p>
 
 </dd>
-<dt id="BUG-FIX9">BUG FIX</dt>
+<dt id="BUG-FIX11">BUG FIX</dt>
 <dd>
 
 <p><a>dbcolscorrelate</a> now includes <code>--sample</code> and <code>--nosample</code> options to compute the sample or full population correlation coefficients. Thanks to Xue Cai for finding this bug.</p>
@@ -1904,19 +1943,19 @@
 
 <dl>
 
-<dt id="ENHANCEMENT11">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT10">ENHANCEMENT</dt>
 <dd>
 
 <p><a>html_table_to_db</a> is now more aggressive about filling in empty cells with the official empty value, rather than leaving them blank or as whitespace.</p>
 
 </dd>
-<dt id="ENHANCEMENT12">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT11">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbpipeline</a> now catches failures during pipeline element setup and exits reasonably gracefully.</p>
 
 </dd>
-<dt id="BUG-FIX10">BUG FIX</dt>
+<dt id="BUG-FIX12">BUG FIX</dt>
 <dd>
 
 <p><a>dbsubprocess</a> now reaps child processes, thus avoiding running out of processes when used a lot.</p>
@@ -1948,13 +1987,13 @@
 
 <dl>
 
-<dt id="BUG-FIX11">BUG FIX</dt>
+<dt id="BUG-FIX13">BUG FIX</dt>
 <dd>
 
 <p><a>dbrowaccumulate</a> now treats non-numeric data as zero by default.</p>
 
 </dd>
-<dt id="BUG-FIX12">BUG FIX</dt>
+<dt id="BUG-FIX14">BUG FIX</dt>
 <dd>
 
 <p>Fixed a perl-5.10ism in <a>dbmapreduce</a> that breaks that program under 5.8. Thanks to Martin Lukac for reporting the bug.</p>
@@ -1966,13 +2005,13 @@
 
 <dl>
 
-<dt id="BUG-FIX13">BUG FIX</dt>
+<dt id="BUG-FIX15">BUG FIX</dt>
 <dd>
 
 <p>Improved documentation for <a>dbmapreduce</a>&#39;s <code>-f</code> option.</p>
 
 </dd>
-<dt id="ENHANCEMENT13">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT12">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolmovingstats</a> how computes a moving standard deviation in addition to a moving mean.</p>
@@ -1984,7 +2023,7 @@
 
 <dl>
 
-<dt id="BUG-FIX14">BUG FIX</dt>
+<dt id="BUG-FIX16">BUG FIX</dt>
 <dd>
 
 <p>Fix a <i>make install</i> bug reported by Shalindra Fernando.</p>
@@ -1996,7 +2035,7 @@
 
 <dl>
 
-<dt id="BUG-FIX15">BUG FIX</dt>
+<dt id="BUG-FIX17">BUG FIX</dt>
 <dd>
 
 <p>Another minor release bug: on some systems <i>programize_module</i> looses executable permissions. Again reported by Shalindra Fernando.</p>
@@ -2014,13 +2053,13 @@
 <p>Typo in the <i>dbroweval</i> manual fixed.</p>
 
 </dd>
-<dt id="IMPROVEMENT">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT1">IMPROVEMENT</dt>
 <dd>
 
 <p>There is no longer a comment line to label columns in <i>dbcolneaten</i>, instead the header line is tweaked to line up. This change restores the Jdb-1.x behavior, and means that repeated runs of dbcolneaten no longer add comment lines each time.</p>
 
 </dd>
-<dt id="BUG-FIX16">BUG FIX</dt>
+<dt id="BUG-FIX18">BUG FIX</dt>
 <dd>
 
 <p>It turns out <i>dbcolneaten</i> was not correctly handling trailing spaces when given the <code>-E</code> option to suppress them. This regression is now fixed.</p>
@@ -2044,13 +2083,13 @@
 
 <dl>
 
-<dt id="IMPROVEMENT1">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT2">IMPROVEMENT</dt>
 <dd>
 
 <p>Documentation for <i>Fsdb::IO::Reader</i> has been improved.</p>
 
 </dd>
-<dt id="IMPROVEMENT2">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT3">IMPROVEMENT</dt>
 <dd>
 
 <p>The package should now be PGP-signed.</p>
@@ -2062,7 +2101,7 @@
 
 <dl>
 
-<dt id="BUG-FIX17">BUG FIX</dt>
+<dt id="BUG-FIX19">BUG FIX</dt>
 <dd>
 
 <p>Internal improvements to debugging output and robustness of <i>dbmapreduce</i> and <i>dbpipeline</i>. <i>TEST/dbpipeline_first_fails.cmd</i> re-enabled.</p>
@@ -2074,43 +2113,43 @@
 
 <dl>
 
-<dt id="BUG-FIX18">BUG FIX</dt>
+<dt id="BUG-FIX20">BUG FIX</dt>
 <dd>
 
 <p>Loging for <i>dbmapreduce</i> with code refs is now stable (it no longer includes a hex pointer to the code reference).</p>
 
 </dd>
-<dt id="BUG-FIX19">BUG FIX</dt>
+<dt id="BUG-FIX21">BUG FIX</dt>
 <dd>
 
 <p>Better handling of mixed blank lines in <i>Fsdb::IO::Reader</i> (see test case <i>dbcolize_blank_lines.cmd</i>).</p>
 
 </dd>
-<dt id="BUG-FIX20">BUG FIX</dt>
+<dt id="BUG-FIX22">BUG FIX</dt>
 <dd>
 
 <p><i>html_table_to_db</i> now handles multi-line input better, and handles tables with COLSPAN.</p>
 
 </dd>
-<dt id="BUG-FIX21">BUG FIX</dt>
+<dt id="BUG-FIX23">BUG FIX</dt>
 <dd>
 
 <p><i>dbpipeline</i> now cleans up threads in an <code>eval</code> to prevent &quot;cannot detach a joined thread&quot; errors that popped up in perl-5.10. Hopefully this prevents a race condition that causes the test suites to hang about 20% of the time (in <i>dbpipeline_first_fails</i>).</p>
 
 </dd>
-<dt id="IMPROVEMENT3">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT4">IMPROVEMENT</dt>
 <dd>
 
 <p><i>dbmapreduce</i> now detects and correctly fails when the input and reducer have incompatible field separators.</p>
 
 </dd>
-<dt id="IMPROVEMENT4">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT5">IMPROVEMENT</dt>
 <dd>
 
 <p><i>dbcolstats</i>, <i>dbcolhisto</i>, <i>dbcolscorrelate</i>, <i>dbcolsregression</i>, and <i>dbrowcount</i> now all take an <code>-F</code> option to let one specify the output field separator (so they work better with <i>dbmapreduce</i>).</p>
 
 </dd>
-<dt id="BUG-FIX22">BUG FIX</dt>
+<dt id="BUG-FIX24">BUG FIX</dt>
 <dd>
 
 <p>An omitted <code>-k</code> from the manual page of <i>dbmultistats</i> is now there. Bug reported by Unkyu Park.</p>
@@ -2122,25 +2161,25 @@
 
 <dl>
 
-<dt id="BUG-FIX23">BUG FIX</dt>
+<dt id="BUG-FIX25">BUG FIX</dt>
 <dd>
 
 <p><i>Fsdb::IO::Writer</i> now no longer fails with -outputheader =&gt; never (an obscure bug).</p>
 
 </dd>
-<dt id="IMPROVEMENT5">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT6">IMPROVEMENT</dt>
 <dd>
 
 <p><i>Fsdb</i> (in the warnings section) and <i>dbcolstats</i> now more carefully document how they handle (and do not handle) numerical precision problems, and other general limits. Thanks to Yuri Pradkin for prompting this documentation.</p>
 
 </dd>
-<dt id="IMPROVEMENT6">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT7">IMPROVEMENT</dt>
 <dd>
 
 <p><code>Fsdb::Support::fullname_to_sortkey</code> is now restored from <code>Jdb</code>.</p>
 
 </dd>
-<dt id="IMPROVEMENT7">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT8">IMPROVEMENT</dt>
 <dd>
 
 <p>Documention for multiple styles of input approaches (including performance description) added to <a>Fsdb::IO</a>.</p>
@@ -2152,7 +2191,7 @@
 
 <dl>
 
-<dt id="BUG-FIX24">BUG FIX</dt>
+<dt id="BUG-FIX26">BUG FIX</dt>
 <dd>
 
 <p><i>dbmerge</i> now correctly handles n-way merges. Bug reported by Yuri Pradkin.</p>
@@ -2176,7 +2215,7 @@
 <p>New program <i>dbcolcopylast</i> copies the last value of a column into a new column copylast_column of the next row. New program requested by Fabio Silva; useful for converting dbmultistats output into dbrvstatdiff input.</p>
 
 </dd>
-<dt id="BUG-FIX25">BUG FIX</dt>
+<dt id="BUG-FIX27">BUG FIX</dt>
 <dd>
 
 <p>Several tools (particularly <i>dbmapreduce</i> and <i>dbmultistats</i>) would report errors like &quot;Unbalanced string table refcount: (1) for &quot;STDOUT&quot; during global destruction&quot; on exit, at least on certain versions of Perl (for me on 5.10.1), but similar errors have been off-and-on for several Perl releases. Although I think my code looked OK, I worked around this problem with a different way of handling standard IO redirection.</p>
@@ -2188,19 +2227,19 @@
 
 <dl>
 
-<dt id="IMPROVEMENT8">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT9">IMPROVEMENT</dt>
 <dd>
 
 <p>Documentation to <i>dbrvstatdiff</i> was changed to use &quot;sd&quot; to refer to standard deviation, not &quot;ss&quot; (which might be confused with sum-of-squares).</p>
 
 </dd>
-<dt id="BUG-FIX26">BUG FIX</dt>
+<dt id="BUG-FIX28">BUG FIX</dt>
 <dd>
 
 <p>This documentation about <i>dbmultistats</i> was missing the <i>-k</i> option in some cases.</p>
 
 </dd>
-<dt id="BUG-FIX27">BUG FIX</dt>
+<dt id="BUG-FIX29">BUG FIX</dt>
 <dd>
 
 <p><i>dbmapreduce</i> was failing on MacOS-10.6.3 for some tests with the error</p>
@@ -2210,19 +2249,19 @@
 <p>The problem seemed to be only in the error, not in operation. On MacOS, the error is now suppressed. Thanks to Alefiya Hussain for providing access to a Mac system that allowed debugging of this problem.</p>
 
 </dd>
-<dt id="IMPROVEMENT9">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT10">IMPROVEMENT</dt>
 <dd>
 
 <p>The <i>csv_to_db</i> command requires an external Perl library (<i>Text::CSV_XS</i>). On computers that lack this optional library, previously Fsdb would configure with a warning and then test cases would fail. Now those test cases are skipped with an additional warning.</p>
 
 </dd>
-<dt id="BUG-FIX28">BUG FIX</dt>
+<dt id="BUG-FIX30">BUG FIX</dt>
 <dd>
 
 <p>The test suite now supports alternative valid output, as a hack to account for last-digit floating point differences. (Not very satisfying :-(</p>
 
 </dd>
-<dt id="BUG-FIX29">BUG FIX</dt>
+<dt id="BUG-FIX31">BUG FIX</dt>
 <dd>
 
 <p><i>dbcolstats</i> output for confidence intervals on very large datasets has changed. Previously it failed for more than 2^31-1 records, and handling of T-Distributions with thousands of rows was a bit dubious. Now datasets with more than 10000 are considered infinitely large and hopefully correctly handled.</p>
@@ -2234,13 +2273,13 @@
 
 <dl>
 
-<dt id="IMPROVEMENT10">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT11">IMPROVEMENT</dt>
 <dd>
 
 <p>The <i>dbfilealter</i> command had a <code>--correct</code> option to work-around from incompatible field-separators, but it did nothing. Now it does the correct but sad, data-loosing thing.</p>
 
 </dd>
-<dt id="IMPROVEMENT11">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT12">IMPROVEMENT</dt>
 <dd>
 
 <p>The <i>dbmultistats</i> command previously failed with an error message when invoked on input with a non-default field separator. The root cause was the underlying <i>dbmapreduce</i> that did not handle the case of reducers that generated output with a different field separator than the input. We now detect and repair incompatible field separators. This change corrects a problem originally documented and detected in Fsdb-2.20. Bug re-reported by Unkyu Park.</p>
@@ -2252,7 +2291,7 @@
 
 <dl>
 
-<dt id="IMPROVEMENT12">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT13">IMPROVEMENT</dt>
 <dd>
 
 <p><i>kitrace_to_db</i> now supports a <i>--utc</i> option, which also fixes this test case for users outside of the Pacific time zone. Bug reported by David Graff, and also by Peter Desnoyers (within a week of each other :-)</p>
@@ -2276,13 +2315,13 @@
 
 <dl>
 
-<dt id="BUG-FIX30">BUG FIX</dt>
+<dt id="BUG-FIX32">BUG FIX</dt>
 <dd>
 
 <p>Bugs fixed in <a href="http://man.he.net/man3/Fsdb::IO::Reader">Fsdb::IO::Reader(3)</a> manual page.</p>
 
 </dd>
-<dt id="BUG-FIX31">BUG FIX</dt>
+<dt id="BUG-FIX33">BUG FIX</dt>
 <dd>
 
 <p>Fixed problems where <a>dbcolstats</a> was truncating floating point numbers when sorting. This strange behavior happens as of perl-5.14.2 and it <i>seems</i> like a Perl bug. I&#39;ve worked around it for the test suites, but I&#39;m a bit nervous.</p>
@@ -2294,19 +2333,19 @@
 
 <dl>
 
-<dt id="IMPROVEMENT13">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT14">IMPROVEMENT</dt>
 <dd>
 
 <p><i>csv_to_db</i> now reports errors in CVS input with real diagnostics.</p>
 
 </dd>
-<dt id="IMPROVEMENT14">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT15">IMPROVEMENT</dt>
 <dd>
 
 <p><i>dbcolmovingstats</i> can now compute median, when given the <code>-m</code> option.</p>
 
 </dd>
-<dt id="BUG-FIX32">BUG FIX</dt>
+<dt id="BUG-FIX34">BUG FIX</dt>
 <dd>
 
 <p><i>dbcolmovingstats</i> non-numeric handling (the <code>-a</code> option) now works properly.</p>
@@ -2318,7 +2357,7 @@
 <p>The internal <i>t/test_command.t</i> test framework is now documented.</p>
 
 </dd>
-<dt id="BUG-FIX33">BUG FIX</dt>
+<dt id="BUG-FIX35">BUG FIX</dt>
 <dd>
 
 <p><i>dbrowuniq</i> now correctly handles the case where there is no input (previously it output a blank line, which is a malformed fsdb file). Thanks to Yuri Pradkin for reporting this bug.</p>
@@ -2330,7 +2369,7 @@
 
 <dl>
 
-<dt id="BUG-FIX34">BUG FIX</dt>
+<dt id="BUG-FIX36">BUG FIX</dt>
 <dd>
 
 <p>Fixed a number of minor release problems (wrong permissions, old FSF address, etc.) found by rpmlint.</p>
@@ -2342,13 +2381,13 @@
 
 <dl>
 
-<dt id="IMPROVEMENT15">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT16">IMPROVEMENT</dt>
 <dd>
 
 <p>Tweaked the RPM spec.</p>
 
 </dd>
-<dt id="IMPROVEMENT16">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT17">IMPROVEMENT</dt>
 <dd>
 
 <p>Modified <i>Makefile.PL</i> to fail gracefully on Perl installations that lack threads. (Without this fix, I get massive failures in the non-ithreads test system.)</p>
@@ -2360,19 +2399,19 @@
 
 <dl>
 
-<dt id="BUG-FIX35">BUG FIX</dt>
+<dt id="BUG-FIX37">BUG FIX</dt>
 <dd>
 
 <p>Removed unicode character in documention of <i>dbcolscorrelated</i> so pod tests will pass. (Sigh, that should work :-( )</p>
 
 </dd>
-<dt id="BUG-FIX36">BUG FIX</dt>
+<dt id="BUG-FIX38">BUG FIX</dt>
 <dd>
 
 <p>Fixed test suite failures on 5 tests (<i>dbcolcreate_double_creation</i> was the first) due to <a>Carp</a>&#39;s addition of a period. This problem was breaking Fsdb on perl-5.17. Thanks to Michael McQuaid for helping diagnose this problem.</p>
 
 </dd>
-<dt id="IMPROVEMENT17">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT18">IMPROVEMENT</dt>
 <dd>
 
 <p>The test suite now prints out the names of tests it tries.</p>
@@ -2384,25 +2423,25 @@
 
 <dl>
 
-<dt id="BUG-FIX37">BUG FIX</dt>
+<dt id="BUG-FIX39">BUG FIX</dt>
 <dd>
 
 <p>Documentation fixes: typos in <a>dbcolscorrelated</a>, bugs in <a>dbfilepivot</a>, clarification for comment handling in <a>Fsdb::IO::Reader</a>.</p>
 
 </dd>
-<dt id="IMPROVEMENT18">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT19">IMPROVEMENT</dt>
 <dd>
 
 <p>Previously <a>dbfilepivot</a> assumed the input was grouped by keys and didn&#39;t very that pre-condition. Now there is no pre-condition (it will sort the input by default), and it checks if the invariant is violated.</p>
 
 </dd>
-<dt id="BUG-FIX38">BUG FIX</dt>
+<dt id="BUG-FIX40">BUG FIX</dt>
 <dd>
 
 <p>Previously <a>dbfilepivot</a> failed if the input had comments (oops :-); no longer.</p>
 
 </dd>
-<dt id="IMPROVEMENT19">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT20">IMPROVEMENT</dt>
 <dd>
 
 <p>Now <a>dbrowuniq</a> has the <code>-L</code> option to preserve the last unique row (instead of the first), a common idiom.</p>
@@ -2420,7 +2459,7 @@
 <p>New <a>dbfilediff</a> does fsdb-aware file differencing. It does not do smart intuition of add/removes like Unix diff(1), but it does know about columns, and with <code>-E</code>, it does numeric-aware differences.</p>
 
 </dd>
-<dt id="IMPROVEMENT20">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT21">IMPROVEMENT</dt>
 <dd>
 
 <p>Test suites that are numeric now use <a>dbfilediff</a> to do numeric-aware comparisons, so the test suite should now be robust to slightly different computers and operating systems and compilers than <i>exactly</i> what I use.</p>
@@ -2432,19 +2471,19 @@
 
 <dl>
 
-<dt id="IMPROVEMENT21">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT22">IMPROVEMENT</dt>
 <dd>
 
 <p><a>dbfilediff</a> and <a>dbrowuniq</a> now supports the <code>-N</code> option to give the new column a different name. (And a test cases where this duplication mattered have been fixed.)</p>
 
 </dd>
-<dt id="IMPROVEMENT22">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT23">IMPROVEMENT</dt>
 <dd>
 
 <p><a>dbrvstatdiff</a> now show the t-test breakpoint with a reasonable number of floating point digits.</p>
 
 </dd>
-<dt id="BUG-FIX39">BUG FIX</dt>
+<dt id="BUG-FIX41">BUG FIX</dt>
 <dd>
 
 <p>Fixed a numerical stability problem in the <i>dbroweval_last</i> test case.</p>
@@ -2458,19 +2497,19 @@
 
 <dl>
 
-<dt id="IMPROVEMENT23">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT24">IMPROVEMENT</dt>
 <dd>
 
 <p>Documention for <a>dbjoin</a> now includes resource requirements.</p>
 
 </dd>
-<dt id="IMPROVEMENT24">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT25">IMPROVEMENT</dt>
 <dd>
 
 <p>Default memory usage for <a>dbsort</a> is now about 256MB. (The world keeps moving forward.)</p>
 
 </dd>
-<dt id="IMPROVEMENT25">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT26">IMPROVEMENT</dt>
 <dd>
 
 <p><a>dbmerge</a> now does merging in parallel. As a side-effect, <a>dbsort</a> should be faster when input overflows memory. The level of parallelism can be limited with the <code>--parallelism</code> option. (There is more work to do here, but we&#39;re off to a start.)</p>
@@ -2482,19 +2521,19 @@
 
 <dl>
 
-<dt id="BUG-FIX40">BUG FIX</dt>
+<dt id="BUG-FIX42">BUG FIX</dt>
 <dd>
 
 <p>Fsdb temporary files are now created more securely (with File::Temp).</p>
 
 </dd>
-<dt id="IMPROVEMENT26">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT27">IMPROVEMENT</dt>
 <dd>
 
 <p>Programs that sort or merge on fields (<a>dbmerge2</a>, <a>dbmerge</a>, <a>dbsort</a>, <a>dbjoin</a>) now report an error if no fields on which to join or merge are given.</p>
 
 </dd>
-<dt id="IMPROVEMENT27">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT28">IMPROVEMENT</dt>
 <dd>
 
 <p>Parallelism in <a>dbmerge</a> is should now be more consistent, with less starting and stopping.</p>
@@ -2540,7 +2579,7 @@
 <p>Configure now rejects Windows since tests seem to hang on some versions of Windows. (I would love help from a Windows developer to get this problem fixed, but I cannot do it.) See <i>https://rt.cpan.org/Ticket/Display.html?id=84201</i>.</p>
 
 </dd>
-<dt id="IMPROVEMENT28">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT29">IMPROVEMENT</dt>
 <dd>
 
 <p>All programs that use temporary files (<a>dbcolpercentile</a>, <a>dbcolscorrelate</a>, <a>dbcolstats</a>, <a>dbcolstatscores</a>) now take the <code>-T</code> option and set the temporary directory consistently.</p>
@@ -2548,13 +2587,13 @@
 <p>In addition, error messages are better when the temporary directory has problems. Problem reported by Liang Zhu.</p>
 
 </dd>
-<dt id="BUG-FIX41">BUG FIX</dt>
+<dt id="BUG-FIX43">BUG FIX</dt>
 <dd>
 
 <p><a>dbmapreduce</a> was failing with external, map-reduce aware reducers (when invoked with -M and an external program). (Sigh, did this case ever work?) This case should now work. Thanks to Yuri Pradkin for reporting this bug (in 2011).</p>
 
 </dd>
-<dt id="BUG-FIX42">BUG FIX</dt>
+<dt id="BUG-FIX44">BUG FIX</dt>
 <dd>
 
 <p>Fixed perl-5.10 problem with <a>dbmerge</a>. Thanks to Yuri Pradkin for reporting this bug (in 2013).</p>
@@ -2566,19 +2605,19 @@
 
 <dl>
 
-<dt id="BUG-FIX43">BUG FIX</dt>
+<dt id="BUG-FIX45">BUG FIX</dt>
 <dd>
 
 <p>Actually in 2.38, the Fedora <i>.spec</i> got cleaner dependencies. Suggestion from Christopher Meng via <a href="https://bugzilla.redhat.com/show_bug.cgi?id=877096">https://bugzilla.redhat.com/show_bug.cgi?id=877096</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT14">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT13">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb files are now explicitly set into UTF-8 encoding, unless one specifies <code>-encoding</code> to <code>Fsdb::IO</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT15">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT14">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrowuniq</a> now supports <code>-I</code> for incremental counting.</p>
@@ -2590,19 +2629,19 @@
 
 <dl>
 
-<dt id="BUG-FIX44">BUG FIX</dt>
+<dt id="BUG-FIX46">BUG FIX</dt>
 <dd>
 
 <p><a>dbsort</a> now has more respect for a user-given temporary directory; it no longer is ignored for merging.</p>
 
 </dd>
-<dt id="IMPROVEMENT29">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT30">IMPROVEMENT</dt>
 <dd>
 
 <p><a>dbrowuniq</a> now has options to output the first, last, and both first and last rows of a run (<code>-F</code>, <code>-L</code>, and <code>-B</code>).</p>
 
 </dd>
-<dt id="BUG-FIX45">BUG FIX</dt>
+<dt id="BUG-FIX47">BUG FIX</dt>
 <dd>
 
 <p><a>dbrowuniq</a> now correctly handles <code>-N</code>. Sigh, it didn&#39;t work before.</p>
@@ -2614,37 +2653,37 @@
 
 <dl>
 
-<dt id="ENHANCEMENT16">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT15">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation to <a>dbrvstatdiff</a> improved (inspired by questions from Qian Kun).</p>
 
 </dd>
-<dt id="BUG-FIX46">BUG FIX</dt>
+<dt id="BUG-FIX48">BUG FIX</dt>
 <dd>
 
 <p><a>dbrowuniq</a> no longer duplicates singleton unique lines when outputting both (with <code>-B</code>).</p>
 
 </dd>
-<dt id="BUG-FIX47">BUG FIX</dt>
+<dt id="BUG-FIX49">BUG FIX</dt>
 <dd>
 
 <p>Add missing <code>XML::Simple</code> dependency to <i>Makefile.PL</i>.</p>
 
 </dd>
-<dt id="ENHANCEMENT17">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT16">ENHANCEMENT</dt>
 <dd>
 
 <p>Tests now show the diff of the failing output if run with <code>make test TEST_VERBOSE=1</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT18">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT17">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> now includes documentation for how to output extra rows. Suggestion from Yuri Pradkin.</p>
 
 </dd>
-<dt id="BUG-FIX48">BUG FIX</dt>
+<dt id="BUG-FIX50">BUG FIX</dt>
 <dd>
 
 <p>Several improvements to the Fedora package from Michael Schwendt via <a href="https://bugzilla.redhat.com/show_bug.cgi?id=877096">https://bugzilla.redhat.com/show_bug.cgi?id=877096</a>, and from the harsh master that is <i>rpmlint</i>. (I am stymied at teaching it that &quot;outliers&quot; is spelled correctly. Maybe I should send it Schneier&#39;s book. And an unresolvable invalid-spec-name lurks in the SRPM.)</p>
@@ -2656,25 +2695,25 @@
 
 <dl>
 
-<dt id="ENHANCEMENT19">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT18">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation to <a>dbjoin</a> improved to better memory usage. (Based on problem report by Lin Quan.)</p>
 
 </dd>
-<dt id="BUG-FIX49">BUG FIX</dt>
+<dt id="BUG-FIX51">BUG FIX</dt>
 <dd>
 
 <p>The <i>.spec</i> is now <i>perl-Fsdb.spec</i> to satisfy <i>rpmlint</i>. Thanks to Christopher Meng for a specific bug report.</p>
 
 </dd>
-<dt id="BUG-FIX50">BUG FIX</dt>
+<dt id="BUG-FIX52">BUG FIX</dt>
 <dd>
 
 <p>Test <i>dbroweval_last.cmd</i> no longer has a column that caused failures because of numerical instability.</p>
 
 </dd>
-<dt id="BUG-FIX51">BUG FIX</dt>
+<dt id="BUG-FIX53">BUG FIX</dt>
 <dd>
 
 <p>Some tests now better handle bugs in old versions of perl (5.10, 5.12). Thanks to Calvin Ardi for help debugging this on a Mac with perl-5.12, but the fix should affect other platforms.</p>
@@ -2686,7 +2725,7 @@
 
 <dl>
 
-<dt id="BUG-FIX52">BUG FIX</dt>
+<dt id="BUG-FIX54">BUG FIX</dt>
 <dd>
 
 <p>Changed the sort on <i>TEST/dbsort_merge.cmd</i> to strings (from numerics) so we&#39;re less susceptible to false test-failures due to floating point IO differences.</p>
@@ -2698,25 +2737,25 @@
 <p>Yet more parallelism in <a>dbmerge</a>: new &quot;endgame-mode&quot; builds a merge tree of processes at the end of large merge tasks to get maximally parallelism. Currently this feature is off by default because it can hang for some inputs. Enable this experimental feature with <code>--endgame</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT20">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT19">ENHANCEMENT</dt>
 <dd>
 
 <p><code>Fsdb::IO</code> now handles being given <code>IO::Pipe</code> objects (as exercised by <a>dbmerge</a>).</p>
 
 </dd>
-<dt id="BUG-FIX53">BUG FIX</dt>
+<dt id="BUG-FIX55">BUG FIX</dt>
 <dd>
 
 <p>Handling of NamedTmpfiles now supports concurrency. This fix will hopefully fix occasional &quot;Use of uninitialized value $_ in string ne at ...NamedTmpfile.pm line 93.&quot; errors.</p>
 
 </dd>
-<dt id="BUG-FIX54">BUG FIX</dt>
+<dt id="BUG-FIX56">BUG FIX</dt>
 <dd>
 
 <p>Fsdb now requires perl 5.10. This is a bug fix because some test cases used to require it, but this fact was not properly documented. (Back-porting to 5.008 would require removing all <code>//</code> operators.)</p>
 
 </dd>
-<dt id="ENHANCEMENT21">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT20">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb now handles automatic compression of file contents. Enable compression with <code>dbfilealter -Z xz</code> (or <code>gz</code> or <code>bz2</code>). All programs should operate on compressed files and leave the output with the same level of compression. <code>xz</code> is recommended as fastest and most efficient. <code>gz</code> is produces unrepeatable output (and so has no output test), it seems to insist on adding a timestamp.</p>
@@ -2728,7 +2767,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT22">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT21">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb is now thread free and only uses processes for parallelism. This change is a big change--the entire motivation for Fsdb-2 was to exploit parallelism via threading. Parallelism--good, but perl threading--bad for performance. Horribly bad for performance. About 20x worse than pipes on my box. (See perl bug #119445 for the discussion.)</p>
@@ -2740,13 +2779,13 @@
 <p><code>Fsdb::Support::Freds</code> provides a thread-like abstraction over forking, with some nice support for callbacks in the parent upon child termination.</p>
 
 </dd>
-<dt id="ENHANCEMENT23">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT22">ENHANCEMENT</dt>
 <dd>
 
 <p>Details about removing threads: <code>dbpipeline</code> is thread free, and new tests to verify each of its parts. The easy cases are <code>dbcolpercentile</code>, <code>dbcolstats</code>, <code>dbfilepivot</code>, <code>dbjoin</code>, and <code>dbcolstatscores</code>, each of which use it in simple ways (2013-09-09). <code>dbmerge</code> is now thread free (2013-09-13), but was a significant rewrite, which brought <code>dbsort</code> along. <code>dbmapreduce</code> is partly thread free (2013-09-21), again as a rewrite, and it brings <code>dbmultistats</code> along. Full <code>dbmapreduce</code> support took much longer (2013-10-02).</p>
 
 </dd>
-<dt id="BUG-FIX55">BUG FIX</dt>
+<dt id="BUG-FIX57">BUG FIX</dt>
 <dd>
 
 <p>When running with user-only output (<code>-n</code>), <a>dbroweval</a> now resets the output vector <code>$ofref</code> after it has been output.</p>
@@ -2764,7 +2803,7 @@
 <p><a>dbfilecat</a> will concatenate two files, verifying that they have the same schema.</p>
 
 </dd>
-<dt id="ENHANCEMENT24">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT23">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now passes comments through, rather than eating them as before.</p>
@@ -2790,19 +2829,19 @@
 
 <dl>
 
-<dt id="BUG-FIX56">BUG FIX</dt>
+<dt id="BUG-FIX58">BUG FIX</dt>
 <dd>
 
 <p>Corrected a fast busy-wait in <a>dbmerge</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT25">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT24">ENHANCEMENT</dt>
 <dd>
 
 <p>Endgame mode enabled in <a>dbmerge</a>; it (and also large cases of <a>dbsort</a>) should now exploit greater parallelism.</p>
 
 </dd>
-<dt id="BUG-FIX57">BUG FIX</dt>
+<dt id="BUG-FIX59">BUG FIX</dt>
 <dd>
 
 <p>Test case with <code>Fsdb::BoundedQueue</code> (gone since 2.44) now removed.</p>
@@ -2814,13 +2853,13 @@
 
 <dl>
 
-<dt id="BUG-FIX58">BUG FIX</dt>
+<dt id="BUG-FIX60">BUG FIX</dt>
 <dd>
 
 <p>Fixed some packaging details. (Really, threads are no longer required, missing tests in the MANIFEST.)</p>
 
 </dd>
-<dt id="IMPROVEMENT30">IMPROVEMENT</dt>
+<dt id="IMPROVEMENT31">IMPROVEMENT</dt>
 <dd>
 
 <p><a>dbsort</a> now better communicates with the merge process to avoid bursty parallelism.</p>
@@ -2834,19 +2873,19 @@
 
 <dl>
 
-<dt id="BUG-FIX59">BUG FIX</dt>
+<dt id="BUG-FIX61">BUG FIX</dt>
 <dd>
 
 <p>Removed some stray &quot;use threads&quot; in some test cases. We didn&#39;t need them, and these were breaking non-threaded perls.</p>
 
 </dd>
-<dt id="BUG-FIX60">BUG FIX</dt>
+<dt id="BUG-FIX62">BUG FIX</dt>
 <dd>
 
 <p>Better handling of Fred cleanup; should fix intermittent <a>dbmapreduce</a> failures on BSD.</p>
 
 </dd>
-<dt id="ENHANCEMENT26">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT25">ENHANCEMENT</dt>
 <dd>
 
 <p>Improved test framework to show output when tests fail. (This time, for real.)</p>
@@ -2858,25 +2897,25 @@
 
 <dl>
 
-<dt id="ENHANCEMENT27">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT26">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites now skip tests for libraries that are missing. (Patch for missing <code>IO::Compresss:Xz</code> contributed by Calvin Ardi.)</p>
 
 </dd>
-<dt id="ENHANCEMENT28">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT27">ENHANCEMENT</dt>
 <dd>
 
 <p>Removed references to Jdb in the package specification. Since the name was changed in 2008, there&#39;s no longer a huge need for backwards comparability. (Suggestion form Petr &Scaron;abata.)</p>
 
 </dd>
-<dt id="ENHANCEMENT29">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT28">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites now invoke the perl using the path from <code>$Config{perlpath}</code>. Hopefully this helps testing in environments where there are multiple installed perls and the default perl is not the same as the perl-under-test (as happens in cpantesters.org).</p>
 
 </dd>
-<dt id="BUG-FIX61">BUG FIX</dt>
+<dt id="BUG-FIX63">BUG FIX</dt>
 <dd>
 
 <p>Added specific encoding to this manpage to account for Unicode. Required to build correctly against perl-5.18.</p>
@@ -2888,19 +2927,19 @@
 
 <dl>
 
-<dt id="BUG-FIX62">BUG FIX</dt>
+<dt id="BUG-FIX64">BUG FIX</dt>
 <dd>
 
 <p>Restored a line in the <i>.spec</i> to chmod g-s.</p>
 
 </dd>
-<dt id="BUG-FIX63">BUG FIX</dt>
+<dt id="BUG-FIX65">BUG FIX</dt>
 <dd>
 
 <p>Unicode decoding is now handled correctly for programs that read from standard input. (Also: New test scripts cover unicode input and output.)</p>
 
 </dd>
-<dt id="BUG-FIX64">BUG FIX</dt>
+<dt id="BUG-FIX66">BUG FIX</dt>
 <dd>
 
 <p>Fix to <a>Fsdb</a> documentation encoding line. Addresses test failure in perl-5.16 and earlier. (Who knew &quot;encoding&quot; had to be followed by a blank line.)</p>
@@ -2914,19 +2953,19 @@
 
 <dl>
 
-<dt id="ENHANCEMENT30">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT29">ENHANCEMENT</dt>
 <dd>
 
 <p>In <a>dbroweval</a>, the <code>-N</code> (no output, even comments) option now implies <code>-n</code>, and it now suppresses the header and trailer.</p>
 
 </dd>
-<dt id="BUG-FIX65">BUG FIX</dt>
+<dt id="BUG-FIX67">BUG FIX</dt>
 <dd>
 
 <p>A few more tweaks to the <i>perl-Fsdb.spec</i> from Petr &Scaron;abata.</p>
 
 </dd>
-<dt id="BUG-FIX66">BUG FIX</dt>
+<dt id="BUG-FIX68">BUG FIX</dt>
 <dd>
 
 <p>Fixed 3 uses of <code>use v5.10</code> in test suites that were causing test failures (due to warnings, not real failures) on some platforms.</p>
@@ -2938,25 +2977,25 @@
 
 <dl>
 
-<dt id="ENHANCEMENT31">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT30">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolcreate</a> now has a <code>--no-recreate-fatal</code> that causes it to ignore creation of existing columns (instead of failing).</p>
 
 </dd>
-<dt id="ENHANCEMENT32">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT31">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> once again is robust to reducers that output the key; <code>--no-prepend-key</code> is no longer mandatory.</p>
 
 </dd>
-<dt id="ENHANCEMENT33">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT32">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolsplittorows</a> can now enumerate the output rows with <code>-E</code>.</p>
 
 </dd>
-<dt id="BUG-FIX67">BUG FIX</dt>
+<dt id="BUG-FIX69">BUG FIX</dt>
 <dd>
 
 <p><a>dbcolmovingstats</a> is more mathematically robust. Previously for some inputs and some platforms, floating point rounding could sometimes cause squareroots of negative numbers.</p>
@@ -2980,7 +3019,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT34">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT33">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites changes to be robust to exact line numbers of failures, since different Perl releases fail on different lines. <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1158380">https://bugzilla.redhat.com/show_bug.cgi?id=1158380</a></p>
@@ -2992,13 +3031,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT35">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT34">ENHANCEMENT</dt>
 <dd>
 
 <p>The <a>dbfilediff</a> how supports a <code>--quiet</code> option.</p>
 
 </dd>
-<dt id="ENHANCEMENT36">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT35">ENHANCEMENT</dt>
 <dd>
 
 <p>Better documention of <a>dbpipeline_filter</a>.</p>
@@ -3040,19 +3079,19 @@
 
 <dl>
 
-<dt id="ENHANCEMENT37">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT36">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilediff</a> now can be extra quiet, as I continue to try to track down a numeric difference on FreeBSD AMD boxes.</p>
 
 </dd>
-<dt id="ENHANCEMENT38">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT37">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolmovingstats</a> gave different test output (just reflecting rounding error) when stddev approaches zero. We now detect hand handle this case. See &lt;https://rt.cpan.org/Public/Bug/Display.html?id=101220&gt; and thanks to H. Merijn Brand for the bug report.</p>
 
 </dd>
-<dt id="BUG-FIX68">BUG FIX</dt>
+<dt id="BUG-FIX70">BUG FIX</dt>
 <dd>
 
 <p>Many, many spelling bugs found by H. Merijn Brand; thanks for the bug report.</p>
@@ -3070,13 +3109,13 @@
 
 <dl>
 
-<dt id="BUG-FIX69">BUG FIX</dt>
+<dt id="BUG-FIX71">BUG FIX</dt>
 <dd>
 
 <p>Internal argument parsing uses Getopt::Long, but mixed pass-through and &lt;&gt;. Bug reported by Petr Pisar at <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1188538">https://bugzilla.redhat.com/show_bug.cgi?id=1188538</a>.a</p>
 
 </dd>
-<dt id="BUG-FIX70">BUG FIX</dt>
+<dt id="BUG-FIX72">BUG FIX</dt>
 <dd>
 
 <p>Added missing BuildRequires for <code>XML::Simple</code>.</p>
@@ -3088,7 +3127,7 @@
 
 <dl>
 
-<dt id="BUG-FIX71">BUG FIX</dt>
+<dt id="BUG-FIX73">BUG FIX</dt>
 <dd>
 
 <p><a>dbfilecat</a> now honors <code>--remove-inputs</code> (previously it didn&#39;t). This omission meant that <a>dbmapreduce</a> (and <a>dbmultistats</a>) would accumulate files in <i>/tmp</i> when running. Bad news for inputs with 4M keys.</p>
@@ -3108,7 +3147,7 @@
 
 <dl>
 
-<dt id="BUG-FIX72">BUG FIX</dt>
+<dt id="BUG-FIX74">BUG FIX</dt>
 <dd>
 
 <p>Fixed a case where <a>dbmerge</a> suffered mojobake in endgame mode. This bug surfaced when <a>dbsort</a> was applied to large files (big enough to require merging) with unicode in them; the symptom was soemthing like: Wide character in print at /usr/lib64/perl5/IO/Handle.pm line 420, &lt;GEN12&gt; line 111.</p>
@@ -3120,25 +3159,25 @@
 
 <dl>
 
-<dt id="BUG-FIX73">BUG FIX</dt>
+<dt id="BUG-FIX75">BUG FIX</dt>
 <dd>
 
 <p>More IO is explicitly marked UTF-8 to avoid Perl&#39;s tendency to mojibake on otherwise valid unicode input. This change helps <a>html_table_to_db</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT39">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT38">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolscorrelate</a> now crossreferences <a>dbcolsregression</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT40">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT39">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation for <a>dbrowdiff</a> now clarifies that the default is baseline mode.</p>
 
 </dd>
-<dt id="BUG-FIX74">BUG FIX</dt>
+<dt id="BUG-FIX76">BUG FIX</dt>
 <dd>
 
 <p><a>dbjoin</a> now propagates <code>-T</code> into the sorting process (if it is required). Thanks to Lan Wei for reporting this bug.</p>
@@ -3150,7 +3189,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT41">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT40">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> now supports hash joins with <code>-t lefthash</code> and <code>-t righthash</code>. Hash joins cache a table in memory, but do not require that the other table be sorted. They are ideal when joining a large table against a small one.</p>
@@ -3162,13 +3201,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT42">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT41">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> now handles left and right outer joins with <code>-t left</code> and <code>-t right</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT43">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT42">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> hash joins are now selected with <code>-m lefthash</code> and <code>-m righthash</code> (not the shortlived <code>-t righthash</code> option). (Technically this change is incompatible with Fsdd-2.60, but no one but me ever used that version.)</p>
@@ -3180,7 +3219,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT44">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT43">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation for <a>xml_to_db</a> now includes sample output.</p>
@@ -3192,31 +3231,31 @@
 <p><a>yaml_to_db</a> converts a specific form of YAML to fsdb.</p>
 
 </dd>
-<dt id="BUG-FIX75">BUG FIX</dt>
+<dt id="BUG-FIX77">BUG FIX</dt>
 <dd>
 
 <p>The test suite now uses <code>diff -c -b</code> rather than <code>diff -cb</code> to make OpenBSD-5.9 happier, I hope.</p>
 
 </dd>
-<dt id="ENHANCEMENT45">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT44">ENHANCEMENT</dt>
 <dd>
 
 <p>Comments that log operations at the end of each file now do simple quoting of spaces. (It is not guaranteed to be fully shell-compliant.)</p>
 
 </dd>
-<dt id="ENHANCEMENT46">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT45">ENHANCEMENT</dt>
 <dd>
 
 <p>There is a new standard option, <code>--header</code>, allowing one to specify an Fsdb header for inputs that lack it. Currently it is supported by <a>dbcoldefine</a>, <a>dbrowuniq</a>, <a>dbmapreduce</a>, <a>dbmultistats</a>, <a>dbsort</a>, <a>dbpipeline</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT47">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT46">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilepivot</a> now allows the <b>--possible-pivots</b> option, and if it is provided processes the data in one pass.</p>
 
 </dd>
-<dt id="ENHANCEMENT48">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT47">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> logs are now quoted.</p>
@@ -3228,25 +3267,25 @@
 
 <dl>
 
-<dt id="ENHANCEMENT49">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT48">ENHANCEMENT</dt>
 <dd>
 
 <p>The option <b>-j</b> is now a synonym for <b>--parallelism</b>. (And several documention bugs about this option are fixed.)</p>
 
 </dd>
-<dt id="ENHANCEMENT50">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT49">ENHANCEMENT</dt>
 <dd>
 
 <p>Additional support for <code>--header</code> in <a>dbcolmerge</a>, <a>dbcol</a>, <a>dbrow</a>, and <a>dbroweval</a>.</p>
 
 </dd>
-<dt id="BUG-FIX76">BUG FIX</dt>
+<dt id="BUG-FIX78">BUG FIX</dt>
 <dd>
 
 <p>Version 2.62 was supposed to have this improvement, but did not (and now does): <a>dbfilepivot</a> now allows the <b>--possible-pivots</b> option, and if it is provided processes the data in one pass.</p>
 
 </dd>
-<dt id="BUG-FIX77">BUG FIX</dt>
+<dt id="BUG-FIX79">BUG FIX</dt>
 <dd>
 
 <p>Version 2.62 was supposed to have this improvement, but did not (and now does): <a>dbroweval</a> logs are now quoted.</p>
@@ -3258,19 +3297,19 @@
 
 <dl>
 
-<dt id="BUG-FIX78">BUG FIX</dt>
+<dt id="BUG-FIX80">BUG FIX</dt>
 <dd>
 
 <p>In <a>dbroweval</a>, the <code>next row</code> option previously did not correctly set up <code>_last_fieldname</code>. It now does.</p>
 
 </dd>
-<dt id="ENHANCEMENT51">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT50">ENHANCEMENT</dt>
 <dd>
 
 <p>The <a>csv_to_db</a> converter now has an optional <code>-F x</code> option to set the field separator.</p>
 
 </dd>
-<dt id="ENHANCEMENT52">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT51">ENHANCEMENT</dt>
 <dd>
 
 <p>Finally <a>dbcolsplittocols</a> has a <code>--header</code> option, and a new <code>-N</code> option to give the list of resulting output columns.</p>
@@ -3280,6 +3319,48 @@
 <dd>
 
 <p>Now <a>dbcolstats</a> and <a>dbmultistats</a> produce no output (but a schema) when given no input but a schema. Previously they gave a null row of output. The <code>--output-on-no-input</code> and <code>--no-output-on-no-input</code> options can control this behavior.</p>
+
+</dd>
+</dl>
+
+<h2 id="Minor-release-bug-fix-and--F-option">2.65, 2018-02-16 Minor release, bug fix and -F option.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT52">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbmultistats</a> and <a>dbmapreduce</a> now both take a <code>-F x</code> option to set the field separator.</p>
+
+</dd>
+<dt id="BUG-FIX81">BUG FIX</dt>
+<dd>
+
+<p>Fixed missing <code>use Carp</code> in <a>dbcolstats</a>. Also went back and cleaned up all uses of <code>croak()</code>. Thanks to Zefram for the bug report.</p>
+
+</dd>
+</dl>
+
+<h2 id="Critical-bug-fix-in-dbjoin">2.66, 2018-12-20 Critical bug fix in dbjoin.</h2>
+
+<dl>
+
+<dt id="BUG-FIX82">BUG FIX</dt>
+<dd>
+
+<p>Removed old tests from MANIFEST. (Thanks to Hang Guo for reporting this bug.)</p>
+
+</dd>
+<dt id="IMPROVEMENT32">IMPROVEMENT</dt>
+<dd>
+
+<p>Errors for non-existing input files now include the bad filename (before: &quot;cannot setup filehandle&quot;, now: &quot;cannot open input: cannot open TEST/bad_filename&quot;).</p>
+
+</dd>
+<dt id="BUG-FIX83">BUG FIX</dt>
+<dd>
+
+<p>Hash joins with three identical rows were failing with the assertion failure &quot;internal error: confused about overflow&quot; due to a now-fixed bug.</p>
 
 </dd>
 </dl>

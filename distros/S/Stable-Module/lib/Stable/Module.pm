@@ -5,15 +5,15 @@ package Stable::Module;
 #
 # http://search.cpan.org/dist/Stable-Module/
 #
-# Copyright (c) 2014, 2016, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2016, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
-local $^W = 1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use Carp;
 use FindBin;
 use IO::File;

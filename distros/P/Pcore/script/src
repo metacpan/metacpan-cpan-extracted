@@ -5,7 +5,7 @@ package main v0.1.0;
 use Pcore;
 
 sub CLI ($self) {
-    return 'Pcore::Util::Src';
+    return 'Pcore::Lib::Src';
 }
 
 __END__

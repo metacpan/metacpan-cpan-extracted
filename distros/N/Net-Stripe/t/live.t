@@ -158,11 +158,13 @@ Charges: {
         } 'Created a charge object';
         isa_ok $charge, 'Net::Stripe::Charge';
         for my $field (qw/id amount created currency description
-                          livemode paid refunded/) {
+                          livemode paid refunded status/) {
             ok defined($charge->$field), "charge has $field";
         }
         ok !$charge->refunded, 'charge is not refunded';
         ok $charge->paid, 'charge was paid';
+        is $charge->status, 'paid', 'charge status is paid';
+        ok $charge->captured, 'charge was captured';
 
         # Check out the returned card object
         my $card = $charge->card;
@@ -258,6 +260,7 @@ Charges: {
         );
         isa_ok $charge, 'Net::Stripe::Charge';
         ok $charge->paid, 'charge was paid';
+        is $charge->status, 'paid', 'charge status is paid';
 
         my $cards = $stripe->get_cards(customer => $customer, limit => 1);
         isa_ok $cards, "Net::Stripe::List";
@@ -275,6 +278,7 @@ Charges: {
         );
         isa_ok $charge, 'Net::Stripe::Charge';
         ok $charge->paid, 'charge was paid';
+        is $charge->status, 'paid', 'charge status is paid';
     }
 
     Rainy_day: {
@@ -348,6 +352,54 @@ Charges: {
         is $charge->receipt_email, 'stripe@example.com', 'charge receipt_email';
         my $charge2 = $stripe->get_charge(charge_id => $charge->id);
         is $charge2->receipt_email, 'stripe@example.com', 'charge receipt_email in retrieved object';
+    }
+
+    Auth_then_capture: {
+        my $charge;
+        lives_ok {
+            $charge = Net::Stripe::Charge->new(
+                amount => 3300,
+                currency => 'usd',
+                card => $fake_card,
+                description => 'Wikileaks donation',
+                capture => 0,
+            );
+        } 'Created a charge object';
+        isa_ok $charge, 'Net::Stripe::Charge';
+        is $charge->capture, 0, 'capture is zero';
+
+        my $amount = 1234;
+        lives_ok {
+            $charge = $stripe->post_charge(
+                amount => $amount,
+                currency => 'usd',
+                card => $fake_card,
+                description => 'Wikileaks donation',
+                capture => 0,
+            );
+        } 'Created a charge object';
+
+        isa_ok $charge, 'Net::Stripe::Charge';
+        for my $field (qw/id amount created currency description
+                          livemode paid refunded/) {
+            ok defined($charge->$field), "charge has $field";
+        }
+        ok !$charge->refunded, 'charge is not refunded';
+        ok $charge->paid, 'charge was paid';
+        ok !$charge->captured, 'charge was not captured';
+        is $charge->balance_transaction, undef, 'balance_transaction is undef';
+        is $charge->amount, $amount, "amount is $amount";
+
+        my $auth_charge_id = $charge->id;
+        my $captured_charge = $stripe->capture_charge(
+            charge => $auth_charge_id,
+        );
+        ok !$captured_charge->refunded, 'charge is not refunded';
+        ok $captured_charge->paid, 'charge was paid';
+        ok $captured_charge->captured, 'charge was captured';
+        ok defined($captured_charge->balance_transaction), 'balance_transaction is defined';
+        is $captured_charge->amount, $amount, "amount is $amount";
+        is $captured_charge->id, $charge->id, 'Charge ids match';
     }
 }
 
@@ -701,13 +753,12 @@ Invoices_and_items: {
         is $resp->{deleted}, '1', 'invoiceitem deleted';
         is $resp->{id}, $item->id, 'deleted id is correct';
 
-        # swallow the expected warning rather than have it print out durring tests.
-        close STDERR;
-        open(STDERR, ">", "/dev/null");
-        eval { $stripe->get_invoiceitem(invoice_item => $item->id) };
-        like $@, qr/No such invoiceitem/, 'correct error message';
-        close STDERR;
-        open(STDERR, ">&", STDOUT);
+        eval {
+            # swallow the expected warning rather than have it print out during tests.
+            local $SIG{__WARN__} = sub {};
+            $stripe->get_invoiceitem(invoice_item => $item->id);
+        };
+        like $@, qr/invalid_request_error.*resource_missing/s, 'correct error message';
     }
 }
 

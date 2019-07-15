@@ -1,6 +1,20 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.023 2014-12-23T17:02:32
+0.025 2019-07-15T11:27:58
+ - Failing test fixes (Stanislaw Pusep)
+
+0.024 2019-07-12T12:22:28
+ - PUT test should no longer fail (Stanislaw Pusep)
+ - die() is still OK (Stanislaw Pusep)
+ - Regenerated README (Stanislaw Pusep)
+ - Updated libcurl symbols (Stanislaw Pusep)
+ - A less exotic URL for redirect test (Stanislaw Pusep)
+ - Not every installation of Net::Curl does support select() polling
+   (Stanislaw Pusep)
+ - Add and populate META files with MetaJSON and MetaProvides::Package
+   (José Joaquín Atria)
+
+0.023 2014-12-23T17:01:56
  - Dist::Zilla maintenance (Stanislaw Pusep)
  - Cleanup (Stanislaw Pusep)
  - Fixes duplicate content-length header in HTTP PUT (Peter Williams)
@@ -146,4 +160,3 @@ Changelog for LWP-Protocol-Net-Curl
  - compatible with Perl v5.8 (Stanislaw Pusep)
  - Dist::Zillified (Stanislaw Pusep)
  - INIT (Stanislaw Pusep)
-

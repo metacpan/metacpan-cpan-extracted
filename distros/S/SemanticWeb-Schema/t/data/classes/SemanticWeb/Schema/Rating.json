@@ -11,8 +11,8 @@
          "rdfs:comment" : "The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably.",
          "rdfs:label" : "author",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:Rating"
+            "schema:Rating",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -25,13 +25,13 @@
          "rdfs:label" : "bestRating",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:ratingValue" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The rating for the content.",
+         "rdfs:comment" : "The rating for the content.<br/><br/>\n\nUsage guidelines:<br/><br/>\n\n<ul>\n<li>Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.</li>\n<li>Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.</li>\n</ul>\n",
          "rdfs:label" : "ratingValue",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
@@ -46,8 +46,8 @@
          "rdfs:label" : "reviewAspect",
          "schema:category" : "issue-1689",
          "schema:domainIncludes" : [
-            "schema:Review",
-            "schema:Rating"
+            "schema:Rating",
+            "schema:Review"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

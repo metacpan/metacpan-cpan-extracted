@@ -8,7 +8,7 @@ with qw[<: $module_name ~ "::Node" :>];
 const our $NODE_REQUIRES => {
 
     # '*' => 'test',
-    '<: $module_name :>' => ['app.settings-updated'],
+    '<: $module_name :>' => ['app.settings.updated'],
 };
 
 sub NODE_ON_EVENT ( $self, $ev ) {

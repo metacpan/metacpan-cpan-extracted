@@ -1,6 +1,6 @@
 package Lingua::EN::Tagger;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use warnings;
 use strict;
@@ -51,7 +51,7 @@ BEGIN {     #  REGEX SETUP
                              CACHESIZE => 1000,
                             ]);
 
-    memoize(\&Linua::EN::Tagger::_assign_tag,
+    memoize(\&Lingua::EN::Tagger::_assign_tag,
                     TIE => ['Memoize::ExpireLRU',
                             CACHESIZE => 10000,
                             ]);

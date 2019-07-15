@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has associated_anatomy => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::PhysicalActivity - Any bodily activity that enhances or mai
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -88,11 +88,11 @@ A associated_anatomy should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
+
 =item C<InstanceOf['SemanticWeb::Schema::AnatomicalSystem']>
 
 =item C<InstanceOf['SemanticWeb::Schema::SuperficialAnatomy']>
-
-=item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
 
 =back
 
@@ -105,11 +105,11 @@ A category should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PhysicalActivityCategory']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
 
 =back
 

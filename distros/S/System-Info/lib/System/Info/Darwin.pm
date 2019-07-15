@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::BSD";
 
-our $VERSION = "0.052";
+our $VERSION = "0.053";
 
 =head1 NAME
 
@@ -43,6 +43,8 @@ sub prepare_sysinfo {
 	if $system_profiler->{"cpu type"};
     $self->{__cpu}       = "$model ($system_profiler->{'cpu speed'})";
     $self->{__cpu_count} = $ncpu;
+
+    chomp ($self->{__osvers} = `sw_vers -productVersion` || "");
 
     return $self;
     } # prepare_sysinfo
@@ -111,10 +113,13 @@ Darwin
 $ uname -v
 Darwin Kernel Version 16.5.0: Fri Mar  3 16:52:33 PST 2017; root:xnu-3789.51.2~3/RELEASE_X86_64
 
+=head1 SEE ALSO
+
+Mac::OSVersion
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2018, Abe Timmerman & H.Merijn Brand All rights reserved.
+(c) 2016-2019, Abe Timmerman & H.Merijn Brand All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

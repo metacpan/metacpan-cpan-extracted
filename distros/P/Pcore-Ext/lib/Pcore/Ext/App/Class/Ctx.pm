@@ -1,7 +1,7 @@
 package Pcore::Ext::App::Class::Ctx;
 
 use Pcore -role;
-use Pcore::Util::Scalar qw[refaddr];
+use Pcore::Lib::Scalar qw[refaddr];
 
 requires qw[generate];
 

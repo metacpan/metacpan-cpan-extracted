@@ -24,7 +24,7 @@ use HiPi::Device::SPI;
 use HiPi::GPIO;
 use Carp;
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 __PACKAGE__->create_accessors( qw( reset_pin gpio scanwait scaniter _allow_write_st _allow_write_block0 debug ) );
 

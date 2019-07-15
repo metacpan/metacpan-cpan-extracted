@@ -40,8 +40,8 @@
          "rdfs:comment" : "The product that this structured value is referring to.",
          "rdfs:label" : "typeOfGood",
          "schema:domainIncludes" : [
-            "schema:TypeAndQuantityNode",
-            "schema:OwnershipInfo"
+            "schema:OwnershipInfo",
+            "schema:TypeAndQuantityNode"
          ],
          "schema:rangeIncludes" : [
             "schema:Product",

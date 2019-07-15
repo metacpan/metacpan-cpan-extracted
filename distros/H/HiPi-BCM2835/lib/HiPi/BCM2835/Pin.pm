@@ -18,7 +18,7 @@ use parent qw( HiPi::Pin );
 use Carp;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.63';
+our $VERSION ='0.64';
 
 sub _open {
     my ($class, %params) = @_;
@@ -91,6 +91,10 @@ sub _do_clear_interrupt {
 
 sub _do_setpud {
     HiPi::BCM2835::bcm2835_gpio_set_pud($_[0]->pinid, $_[1]);
+}
+
+sub _do_getpud {
+    HiPi::BCM2835::bcm2835_gpio_get_pud($_[0]->pinid);
 }
 
 sub _do_get_function_name {

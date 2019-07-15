@@ -2,7 +2,7 @@ package Hash::Lazy;
 
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Sub::Exporter -setup => {
     exports => [ qw(Hash) ],

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Module::CoreList;
 
-our $VERSION = '5.20180420';
+our $VERSION = '5.20190620';
 our %utilities;
 
 sub utilities {
@@ -1387,6 +1387,133 @@ my %delta = (
         changed => {
         },
         removed => {
+        }
+    },
+    5.028000 => {
+        delta_from => 5.027011,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029000 => {
+        delta_from => 5.028,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029001 => {
+        delta_from => 5.029000,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029002 => {
+        delta_from => 5.029001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029003 => {
+        delta_from => 5.029002,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029004 => {
+        delta_from => 5.029003,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029005 => {
+        delta_from => 5.029004,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.026003 => {
+        delta_from => 5.026002,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.028001 => {
+        delta_from => 5.028000,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029006 => {
+        delta_from => 5.029005,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029007 => {
+        delta_from => 5.029006,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029008 => {
+        delta_from => 5.029007,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029009 => {
+        delta_from => 5.029008,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.028002 => {
+        delta_from => 5.028001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029010 => {
+        delta_from => 5.029009,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.030000 => {
+        delta_from => 5.029010,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031000 => {
+        delta_from => 5.03,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031001 => {
+        delta_from => 5.031000,
+        changed => {
+        },
+        removed => {
+            'podselect'             => 1,
         }
     },
 );

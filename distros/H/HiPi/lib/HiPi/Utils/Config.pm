@@ -23,7 +23,7 @@ use Carp;
 __PACKAGE__->create_ro_accessors( qw( configclass filepath default ) );
 __PACKAGE__->create_accessors( qw( config _configkey ) );
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 sub new {
     my( $class, %userparams ) = @_;

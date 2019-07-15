@@ -1,8 +1,8 @@
 package Pcore::API::PAUSE;
 
 use Pcore -class, -res;
-use Pcore::Util::Text qw[encode_utf8];
-use Pcore::Util::Scalar qw[is_coderef];
+use Pcore::Lib::Text qw[encode_utf8];
+use Pcore::Lib::Scalar qw[is_coderef];
 
 has username => ( required => 1 );
 has password => ( required => 1 );

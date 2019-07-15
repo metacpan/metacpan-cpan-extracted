@@ -32,6 +32,6 @@
          "url" : "http://github.com/jib/cpanplus-devel"
       }
    },
-   "version" : "0.9176",
+   "version" : "0.9178",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

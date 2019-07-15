@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:IIT-CNR.it",
-         "schemadotorgsources:Tourism"
+         "schemadotorgsources:Tourism",
+         "schemadotorgsources:IIT-CNR.it"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A tourist attraction.  In principle any Thing can be a <a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>, from a <a class=\"localLink\" href=\"http://schema.org/Mountain\">Mountain</a> and <a class=\"localLink\" href=\"http://schema.org/LandmarksOrHistoricalBuildings\">LandmarksOrHistoricalBuildings</a> to a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a>.  This Type can be used on its own to describe a general <a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>, or be used as an <a class=\"localLink\" href=\"http://schema.org/additionalType\">additionalType</a> to add tourist attraction properties to any other type.  (See examples below)",
@@ -17,8 +17,8 @@
          "schema:domainIncludes" : [
             "schema:TouristAttraction",
             "schema:ContactPoint",
-            "schema:ServiceChannel",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:ServiceChannel"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -27,8 +27,8 @@
       },
       "schema:touristType" : {
          "dc:source" : [
-            "schemadotorgsources:Tourism",
-            "schemadotorgsources:IIT-CNR.it"
+            "schemadotorgsources:IIT-CNR.it",
+            "schemadotorgsources:Tourism"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Attraction suitable for type(s) of tourist. eg. Children, visitors from a particular country, etc.",
@@ -40,8 +40,8 @@
             "schema:TouristAttraction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Audience"
+            "schema:Audience",
+            "schema:Text"
          ]
       }
    }

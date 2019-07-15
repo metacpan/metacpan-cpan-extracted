@@ -7,6 +7,7 @@ use autodie;
 use feature qw(say);
 
 use List::AllUtils;
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 
 use Bio::MUST::Core;
@@ -17,12 +18,15 @@ my $db_class = 'Bio::MUST::Drivers::Blast::Database';
 my $db_tmp_class = 'Bio::MUST::Drivers::Blast::Database::Temporary';
 
 
-# skip all BLAST tests unless blastp is available in the $PATH
-unless ( qx{which blastp} ) {
+# Note: provisioning system is not enabled to help tests to pass on CPANTS
+my $app = use_module('Bio::MUST::Provision::Blast')->new;
+unless ( $app->condition ) {
     plan skip_all => <<"EOT";
-skipped all BLAST tests!
-If you want to use this module you need to install NCBI BLAST+ executables:
+skipped all NCBI-BLAST+ tests!
+If you want to use this module you need to install NCBI-BLAST+ executables:
 ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
+If you --force installation, I will eventually try to install NCBI-BLAST+ with brew:
+https://brew.sh/
 EOT
 }
 
@@ -152,10 +156,17 @@ sub filter {
     $line =~ s{\t\ +}{\t}xmsg;      # normalize whitespace
     $line =~ s{\ +\t}{\t}xmsg;      # normalize whitespace
 
+    # version- and job-dependent tags
     return q{} if $line =~ m/BlastOutput_version/xms;
     return q{} if $line =~ m/BlastOutput_db/xms;
-
     return q{} if $line =~ m/RID:/xms;
+
+    # unstable attr values for specific hit in tabular report
+    return q{} if m{gi\|29377108\|ref\|NP_816262.1\| \s+ seq17}xms;
+
+    # unstable gap positions in XML report alignments
+    return q{} if $line =~ m/<Hsp_qseq>/xms;
+    return q{} if $line =~ m/<Hsp_midline>/xms;
 
     return $line;
 }

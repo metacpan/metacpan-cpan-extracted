@@ -16,6 +16,31 @@ you get a 500 (Internal Server Error) or a 404 (Not Found), but it
 would not be suitable for use if you get a Connection Refused TCP
 error when trying to connect.
 
+Subclasses L<X::Tiny::Base>.
+
+=head1 PROPERTIES
+
+Unless otherwise indicated, these come directly from
+L<HTTP::Tiny::UA::Response>:
+
+=over
+
+=item * C<method> - The request’s HTTP method.
+
+=item * C<url> - The URL for which the request was intended.
+
+=item * C<status>
+
+=item * C<reason>
+
+=item * C<headers>
+
+=item * C<content>
+
+=item * C<redirects>
+
+=back
+
 =cut
 
 use strict;

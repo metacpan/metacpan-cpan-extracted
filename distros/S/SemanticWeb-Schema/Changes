@@ -1,5 +1,22 @@
 Revision history for SemanticWeb-Schema:
 
+v3.8.1    2019-07-14 14:24:23+01:00 Europe/London
+  [Other Changes]
+  - Classes and POD data is dumped in alphabetical order, to avoid
+    unnecessary source code churn.
+
+v3.8.0    2019-07-13 11:40:42+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 3.8 of the schema.
+
+v3.7.0    2019-07-13 11:31:18+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 3.7 of the schema.
+
+v3.6.0    2019-07-13 11:24:37+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 3.6 of the schema.
+
 v3.5.1    2019-04-11 13:39:49+01:00 Europe/London
   [Documentation]
   - Fix broken link in POD, @manwar++.

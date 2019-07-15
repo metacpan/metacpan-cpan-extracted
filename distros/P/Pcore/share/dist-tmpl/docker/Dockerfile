@@ -15,7 +15,7 @@ RUN /bin/bash -c ' \
     # setup perl build env
     source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/tip/perl-build-env.sh || echo false ) setup \
     \
-    # deploy nginx
+    # deploy deps
     # && yum -y install ... \
     \
     # deploy non-CPAN deps

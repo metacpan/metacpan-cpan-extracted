@@ -30,7 +30,7 @@ __PACKAGE__->create_ro_accessors( qw(
     display_update_setting
 ) );
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 use constant {
     DRIVER_OUTPUT_CONTROL                       => 0x01,

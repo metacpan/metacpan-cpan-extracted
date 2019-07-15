@@ -47,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-chrome/overview"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.7.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

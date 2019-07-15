@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-Weasel::FindExpanders::Dojo - 
+Weasel::FindExpanders::Dojo - XPath mnemonic hooks for Dojo 1.x widgets
 
 =head1 VERSION
 
@@ -101,7 +101,9 @@ sub option_expander {
 }
 
 
+=back
 
+=cut
 
 
 

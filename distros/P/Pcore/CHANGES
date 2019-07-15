@@ -1,3 +1,38 @@
+v0.96.0 2019-07-12T12:29:41Z
+ - net check_port method
+ - local auth backend code optimized
+ - permissions as constants
+ - app permissions
+ - api uploads refactored
+ - run_proc arguments for setpgid, setsid
+ - mark create_process result as pcore result
+ - websocket upload
+ - telegram login prototype
+ - create_session method returns more data
+ - TODO
+ - settings object updated
+ - create token returns permissions
+ - repo packages renamed
+ - username restricted
+ - validate user name
+ - token type in token
+ - user id autoincrement
+ - api refactored
+ - sqlite select return undef on empty set
+ - api permissions check updated
+ - resources updated
+ - validate email method
+ - profile interface
+ - smtp test method added
+ - settings interface
+ - app api settings ccache
+ - api invalidate cache event renamed
+ - set user password in transaction
+ - support transactions in api methods
+ - api methods renamed
+ - Pcore::Util -> Pcore::Lib
+ - api tests fixed
+
 v0.95.0 2019-06-30T19:18:06Z
  - cdn upload call updated
  - wget replaced with curl

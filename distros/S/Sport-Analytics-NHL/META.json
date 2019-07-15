@@ -4,7 +4,7 @@
       "More Hockey Stats <contact@morehockeystats.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "unknown"
    ],
@@ -58,6 +58,7 @@
             "Try::Tiny" : "0.27",
             "boolean" : "v0.28.4",
             "experimental" : "0.016",
+            "if" : "0.05",
             "parent" : "0"
          }
       }
@@ -65,7 +66,7 @@
    "provides" : {
       "Sport::Analytics::NHL" : {
          "file" : "lib/Sport/Analytics/NHL.pm",
-         "version" : "1.51"
+         "version" : "1.53"
       },
       "Sport::Analytics::NHL::Config" : {
          "file" : "lib/Sport/Analytics/NHL/Config.pm"
@@ -147,6 +148,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.51",
+   "version" : "1.53",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

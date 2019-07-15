@@ -1,7 +1,10 @@
 package Linux::Capabilities;
 use XS::Loader;
 
-our $VERSION = '0.3';
+use strict;
+use warnings;
+
+our $VERSION = '1.0.1';
 
 XS::Loader::load();
 

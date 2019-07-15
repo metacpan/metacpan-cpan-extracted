@@ -26,17 +26,17 @@ no_index:
 provides:
   App::optex::textconv:
     file: lib/App/optex/textconv.pm
-    version: '0.04'
+    version: '0.05'
   App::optex::textconv::Converter:
     file: lib/App/optex/textconv/Converter.pm
   App::optex::textconv::default:
     file: lib/App/optex/textconv/default.pm
   App::optex::textconv::msdoc:
     file: lib/App/optex/textconv/msdoc.pm
-    version: '0.04'
+    version: '0.05'
   App::optex::textconv::pdf:
     file: lib/App/optex/textconv/pdf.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   App::optex: v0.3.0
   List::Util: '1.45'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex-textconv/issues
   homepage: https://github.com/kaz-utashiro/optex-textconv
   repository: git://github.com/kaz-utashiro/optex-textconv.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

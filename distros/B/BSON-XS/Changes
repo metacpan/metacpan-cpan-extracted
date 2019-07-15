@@ -1,5 +1,11 @@
 Revision history for BSON-XS
 
+v0.8.0    2019-07-12 13:57:20-04:00 America/New_York
+
+    [Added]
+
+    - Added support for BSON::Array from BSON v1.12.0.
+
 v0.6.0    2018-11-29 17:08:47-05:00 America/New_York
 
     [Changed]

@@ -1,5 +1,8 @@
 Revision history for Perl module Crypt::Format
 
+0.10 Web Jul 10 2019
+    - Add split_pem_chain().
+
 0.09 Fri Aug 24 2018
     - LICENSE update
 

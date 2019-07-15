@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use autodie;
 
-use Test::More tests => 1 + 3;
-use Test::NoWarnings;
+use Test::More;
+use Test::FailWarnings;
 use Test::Deep;
 use Test::Exception;
 
@@ -49,6 +49,20 @@ ok(
     'challenge path is removed on DESTROY',
 );
 
+{
+    my $authz = bless [], 'Mock::Authz';
+
+    my $handler = $challenge->create_handler( $authz, $docroot );
+
+    my $contents = File::Slurp::read_file($fs_path);
+
+    is(
+        $contents,
+        'my_object_key_authz',
+        'create_handler() does the right thing with an authz object',
+    );
+}
+
 #This ensures that there’s no warning or error otherwise
 #if the file goes away prematurely.
 {
@@ -57,4 +71,20 @@ ok(
     my $fs_path = File::Spec->catdir( $docroot, $challenge->path() );
 
     unlink $fs_path;
+}
+
+done_testing();
+
+#----------------------------------------------------------------------
+
+package Mock::Authz;
+
+use Test::More;
+
+sub make_key_authorization {
+    my ($self, $challenge) = @_;
+
+    isa_ok( $challenge, 'Net::ACME2::Challenge::http_01', 'challenge given to make_key_authorization()');
+
+    return 'my_object_key_authz';
 }

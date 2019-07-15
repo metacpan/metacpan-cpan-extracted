@@ -14,8 +14,8 @@
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
             "schema:Place",
-            "schema:Accommodation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
       },
@@ -34,14 +34,15 @@
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
             "schema:Apartment",
+            "schema:Accommodation",
+            "schema:Suite",
             "schema:House",
             "schema:SingleFamilyResidence",
-            "schema:Suite",
-            "schema:Accommodation"
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:permittedUsage" : {
@@ -62,8 +63,8 @@
             "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:Text"
          ]
       }
    }

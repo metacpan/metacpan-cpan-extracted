@@ -21,13 +21,13 @@ name: Travel-Status-DE-IRIS
 provides:
   Travel::Status::DE::IRIS:
     file: lib/Travel/Status/DE/IRIS.pm
-    version: '1.28'
+    version: '1.29'
   Travel::Status::DE::IRIS::Result:
     file: lib/Travel/Status/DE/IRIS/Result.pm
-    version: '1.28'
+    version: '1.29'
   Travel::Status::DE::IRIS::Stations:
     file: lib/Travel/Status/DE/IRIS/Stations.pm
-    version: '1.28'
+    version: '1.29'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -47,5 +47,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-IRIS
-version: '1.28'
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

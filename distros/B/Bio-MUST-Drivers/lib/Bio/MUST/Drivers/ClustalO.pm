@@ -1,18 +1,19 @@
 package Bio::MUST::Drivers::ClustalO;
 # ABSTRACT: Bio::MUST driver for running the Clustal Omega program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::ClustalO::VERSION = '0.181160';
+$Bio::MUST::Drivers::ClustalO::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
+# use Smart::Comments;
+
 use Carp;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
-
-use Smart::Comments '###';
 
 use Bio::MUST::Core;
 extends 'Bio::FastParsers::Base';
@@ -22,29 +23,36 @@ use aliased 'Bio::MUST::Core::Ali';
 
 
 sub align_all {                             ## no critic (RequireArgUnpacking)
+    #### in align_all
     return shift->_clustalo('align_all', @_);
 }
 
 sub seqs2profile {                          ## no critic (RequireArgUnpacking)
+    #### in seqs2profile
     my $self = shift;
 
-    carp 'Warning: align seqs before aligning on profile!'
+    carp '[BMD] Warning: align seqs before aligning on profile!'
         unless Ali->load( $self->file )->is_aligned;
     return $self->_clustalo('seqs2profile', @_);
 }
 
 sub profile2profile {                       ## no critic (RequireArgUnpacking)
+    #### in profile2profile
     return shift->_clustalo('profile2profile', @_);
 }
 
 sub _clustalo {
+    #### in _clustalo
+
     my $self    = shift;
     my $mode    = shift;
     my $profile;            # conditional declaring is bad...
        $profile = shift unless $mode eq 'align_all';
     my $args    = shift // {};
 
-    #### in _clustalo
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::ClustalO')->new;
+       $app->meet();
 
     # setup input/output files
     my $infile  = $self->filename;
@@ -65,7 +73,7 @@ sub _clustalo {
     # try to robustly execute clustalo
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Cannot execute $pgm command";
+        carp "[BMD] Warning: cannot execute $pgm command; returning nothing!";
         return;
     }
 
@@ -92,7 +100,7 @@ Bio::MUST::Drivers::ClustalO - Bio::MUST driver for running the Clustal Omega pr
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

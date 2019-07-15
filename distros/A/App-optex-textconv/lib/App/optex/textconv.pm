@@ -4,7 +4,9 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+use Encode;
+
+our $VERSION = "0.05";
 
 =encoding utf-8
 
@@ -14,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -153,8 +155,13 @@ sub textconv {
 	    };
 	    use App::optex::Tmpfile;
 	    my $tmp = $persist[@persist] = new App::optex::Tmpfile;
-	    no strict 'refs';
-	    $tmp->write(&$func($_))->rewind;
+	    my $data = do {
+		no strict 'refs';
+		local $_ = decode 'utf8', &$func($_);
+		s/[\p{Private_Use}\p{Unassigned}]/\N{GETA MARK}/g;
+		encode 'utf8', $_;
+	    };
+	    $tmp->write($data)->rewind;
 	    $_ = $tmp->path;
 	}
 	@_;

@@ -1,0 +1,266 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Array - XS::Framework Array C++ class reference
+
+=head1 Array
+
+=head2 Overview
+
+The C<Array> class is the wrapper around Perls C<AV*> type, which is a variant
+of C<SV*>. As with C<Sv>, it might hold an underlying Perl array C<AV*> or might
+not.
+
+=head2 Construction
+
+    static Array noinc  (SV* val)
+    static Array noinc  (AV* val)
+
+    Array (std::nullptr_t = nullptr)
+    Array (SV* sv, bool policy = INCREMENT)
+    Array (AV* sv, bool policy = INCREMENT)
+
+The new C<Array> is created, and it either takes ownership on the underlying
+C<SV*>/C<AV*> with corresponding refcounting policy, or just empty wrapper
+is created, which holds no value. On invalid C<SV*>, e.g. pointer to Hash,
+an exception will be thrown. The valid C<SV*> should be either C<AV*> or
+reference to C<AV*> or C<undef>.
+
+Please, note, that empty C<Array> means that it holds no value (aka NULL),
+it is not the same, when it holds underlying empty AV* with zero items.
+
+    static Array create()
+    static Array create (size_t cap)
+
+It is possible to create new C<Array> with empty underlying C<AV*>, optionally
+reserving space for C<cap> items (SV*).
+
+If there is a list of items, it it possible to create new C<Array> filled with
+them. However, the C<SV*> values can be either copied/cloned into new values,
+or may be just I<aliased>; in the later case refcounter just increased. The
+inteface is the following:
+
+    enum create_type_t { ALIAS, COPY };
+
+    static Array create (size_t size, SV** content, create_type_t type = ALIAS);
+    static Array create (std::initializer_list<Scalar> l, create_type_t type = ALIAS)
+    static Array create (const Array& from, create_type_t type = ALIAS)
+    Array (std::initializer_list<Scalar> l, create_type_t type = ALIAS);
+
+For example,
+
+    Array source = ...;
+    Array dest = Array::create(source, Array::COPY);
+
+The copy and move constructors are also available:
+
+    Array (const Array& oth)
+    Array (Array&& oth)
+    Array (const Sv& oth)
+    Array (Sv&& oth)
+
+It it possible to create C<Array> object from C<CallProxy> invocation:
+
+    Array (const CallProxy& p)
+
+however, please note, that the C<CallProxy> will be called in B<scalar context>.
+If the B<list context> is needed, then instead of C<Array> class it's descendant
+class C<List> should be used.
+
+=head2 assignment operators
+
+    Array& operator= (SV* val)
+    Array& operator= (AV* val)
+    Array& operator= (const Array& oth)
+    Array& operator= (Array&& oth)
+    Array& operator= (const Sv& oth)
+    Array& operator= (Sv&& oth)
+    Array& operator= (const CallProxy& p)
+
+The assignment operators are complementaty to the constructors above. They
+inherit behaviour from C<Sv>, including NULL-safety. The previously held
+C<SV*> will be C<dec>-remented.
+
+The last operator performs proxy call in B<scalar> context, the same as in
+appropriate constructor above.
+
+    void set (SV* val)
+
+The C<set> method directly assigns the value to the underlying C<SV*>,
+I<bypassing all checks>. Use the method with caution.
+
+=head2 getters
+
+There are zero-cost NULL-safe getters:
+
+    operator AV* () const
+    AV* operator-> () const
+    template <typename T = SV> one_of_t<T,SV,AV>* get () const
+
+For example,
+
+    Array arr = ...;
+    AV* av = *arr;
+
+=head2 element access
+
+    Scalar front () const
+    Scalar back  () const
+
+To access first or last element of an array the C<front> and C<back> methods
+can be used (simiar to C<std::vector>). The result type is always C<Scalar>.
+The both methods are NULL-safe.
+
+    Scalar fetch (size_t key) const
+    Scalar at (size_t key) const
+    Scalar operator[] (size_t key) const
+    KeyProxy operator[] (size_t key)
+
+The first three methods return C<Scalar> type. C<fetch> provides bounary-safe
+access to the elements, if the index is out of bounds, then empty C<Scalar>
+is returned and underlying C<AV*> is kept untouched. The C<at> method also
+checks array bounds, and if the index is out of bounds, then exception will
+be thrown (similar to C<std::vector::at()>). The C<operator[]> does not
+boundary check, so this is the fastest method, however memory corruption
+is possible on usafe usage. The non-const acccessor is needed to allow
+in-place fast modification of underlying element, i.e.
+
+    Array arr = ...;
+    arr[10] = Simple(10);
+
+C<fetch> is NULL-safe method, while C<at> and C<operator[]> are NULL-unsafe.
+
+    void store (size_t key, const Scalar& val);
+    void store (size_t key, std::nullptr_t)
+    void store (size_t key, SV* v)
+    void store (size_t key, const Sv& v)
+    void store (size_t key, const CallProxy& p)
+
+The C<store> method is used store item in the array. If underlyging Perl
+array AV* is NULL, then C<store> will throw exception. The last method
+invokes C<CallProxy> in B<scalar context>, as the array elements are
+always scalars.
+
+To check element existance, the NULL-safe C<exist> method can be used:
+
+    bool exists (size_t key) const
+
+To delete arbitrary element by index the NULL-safe and boundary-safe
+C<del> method can be used (the previous value is returned).
+
+    Scalar del (size_t key)
+
+To access the first element with discarding it, as well as to access
+the last element with discarding it the C<shift>/C<pop> NULL-safe methods
+can be used.
+
+    Scalar shift()
+    Scalar pop()
+
+The opposite operations, i.e. C<push> and C<unshift>
+
+    void push (const std::initializer_list<Scalar>& l)
+    void push (const List& l)
+    void push (const Scalar& v)
+    void push (SV* v)
+    void push (const Sv& v)
+    void push (const CallProxy& p)
+
+    void unshift (const std::initializer_list<Scalar>& l);
+    void unshift (const List& l);
+    void unshift (const Scalar& v);
+    void unshift (SV* v)
+    void unshift (const Sv& v)
+    void unshift (const CallProxy& p)
+
+Please note, that C<push> and C<unshift> are NULL-unsafe methods. The
+C<CallProxy> is invoked in B<scalar context>.
+
+=head2 clear()
+
+    void clear ()
+
+Frees all items in the underlying C<AV*> array. This is NULL-safe method.
+
+=head2 undef()
+
+    void undef()
+
+Frees all items in the underlying C<AV*> array; the array container C<AV*>
+itself remains alive. This is NULL-safe method.
+
+
+=head2 push_on_stack()
+
+    U32 push_on_stack (SV** sp, U32 max = 0) const
+
+This method copies all array items into perl stack C<SV**>, possibly extending
+it upto C<max> size. If C<max> is less then the actual number of elemetns, then
+C<max> value is ignored.
+
+It returns the count of copied items. The method takes care of all needed
+mechanis, e.g. C<sv_2mortal> and increasing refcounter of the items.
+
+This is NULL-unsafe method.
+
+=head2 size()
+
+    size_t  size      () const
+
+Returns size of underlying array. If it is NULL, then C<0> is returned. In
+other words, this method is NULL-safe.
+
+=head2 capacity()
+
+    size_t  capacity  () const
+
+Returns capacity of underlying array. If it is NULL, then C<0> is returned. In
+other words, this method is NULL-safe.
+
+=head2 top_index ()
+
+    SSize_t top_index () const
+
+Returns index of top element of underlying array. If it is NULL, then C<-1>
+is returned. In  other words, this method is NULL-safe.
+
+=head2 resize()
+
+    void resize  (size_t newsz)
+
+Resizes the container to contain count elements. If the current size is greater
+than count, the container is reduced to its first count elements.
+
+This is NULL-unsafe method.
+
+=head2 reserve()
+
+    void reserve (size_t newsz)
+
+Increases the capacity of the container. This is NULL-unsafe method.
+
+=head2 itearators
+
+C<Array> provides iterator and const-iterator random-access accessors for it's content:
+
+    const_iterator cbegin () const
+    const_iterator cend   () const
+    const_iterator begin  () const
+    const_iterator end    () const
+    iterator       begin  ()
+    iterator       end    ()
+
+This methods are NULL-safe. As usually, when underlying array is modified, the
+used iterators become invalid, and should not used any longer.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Sv>
+
+L<XS::Framework::Manual::SVAPI::List>
+
+
+=cut

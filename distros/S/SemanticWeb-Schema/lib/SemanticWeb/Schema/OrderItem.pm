@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has order_delivery => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::OrderItem - An order item is a line of an order
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -150,9 +150,11 @@ A ordered_item should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::OrderItem']>
+
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
-=item C<InstanceOf['SemanticWeb::Schema::OrderItem']>
+=item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
 

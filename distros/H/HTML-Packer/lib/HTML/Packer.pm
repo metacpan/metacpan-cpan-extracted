@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # -----------------------------------------------------------------------------
 
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 
 our @BOOLEAN_ACCESSORS = (
     'remove_comments',
@@ -323,7 +323,7 @@ sub minify {
 
     unless (
         ref( $_[0] ) and
-        ref( $_[0] ) eq __PACKAGE__
+        $_[0]->isa( __PACKAGE__ )
     ) {
         $self = __PACKAGE__->init();
 
@@ -381,7 +381,7 @@ sub minify {
 	$reggrp_ws       = $self->reggrp_whitespaces;
 
 	# FIXME: hacky way to get around ->init being called before ->minify
-	$self = __PACKAGE__->init if $remove_comments_aggressive;
+	$self = ref( $self )->init if $remove_comments_aggressive;
 
     $self->reggrp_global()->exec( $html );
     $self->reggrp_whitespaces()->exec( $html );
@@ -448,7 +448,7 @@ HTML::Packer - Another HTML code cleaner
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 DESCRIPTION
 
@@ -522,6 +522,7 @@ Johnson (LEEJO) with contributions from:
 	Alexander Krizhanovsky <ak@natsys-lab.com>
 	Bas Bloemsaat <bas@bloemsaat.com>
 	girst <girst@users.noreply.github.com>
+	Ankit Pati (ANKITPATI) <contact@ankitpati.in>
 
 =head1 BUGS
 

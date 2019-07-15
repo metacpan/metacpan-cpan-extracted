@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More; 
+use Test::More;
 use Test::Exception;
 use Test::Requires;
 
@@ -10,7 +10,7 @@ use File::Serialize;
 
 use Module::Runtime qw/ use_module /;
 
-for my $serializer ( 
+for my $serializer (
     map { "File::Serialize::Serializer::$_" } qw/
         JSON::MaybeXS
         TOML
@@ -18,12 +18,13 @@ for my $serializer (
         YAML::Tiny
         YAML::XS
         Data::Dumper
+        JSON5
     /
 ) {
     subtest $serializer => sub {
         use_module( $serializer );
 
-        plan skip_all => "dependencies for $serializer not met" 
+        plan skip_all => "dependencies for $serializer not met"
             unless use_module($serializer)->is_operative;
 
         my $ext = $serializer->extension;

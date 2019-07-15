@@ -7,11 +7,11 @@ package [% class_name %];
 use Moo;
 
 [% IF parents.size -%]
-extends qw/[% FOREACH parent IN parents %] [% parent %][% END %] /;
+extends qw/[% FOREACH parent IN parents.sort %] [% parent %][% END %] /;
 [% END -%]
 
 [% IF roles.size -%]
-with qw/[% FOREACH role IN roles %] [% role %][% END %] /;
+with qw/[% FOREACH role IN roles.sort %] [% role %][% END %] /;
 [% END -%]
 
 use MooX::JSON_LD '[% label %]';
@@ -43,7 +43,7 @@ our $VERSION = '[% version %]';
 A [% name %] should be one of the following types:
 
 =over
-[% FOREACH type IN attributes.$name.types %]
+[% FOREACH type IN attributes.$name.types.sort %]
 =item C<[% type %]>
 [% END -%]
 
@@ -65,11 +65,11 @@ has [% name %] => (
 
 =head1 SEE ALSO
 
-[% FOREACH role in roles %]
+[% FOREACH role in roles.sort %]
 L<[% role %]>
 [% END -%]
 
-[% FOREACH parent in parents %]
+[% FOREACH parent in parents.sort %]
 L<[% parent %]>
 [% END -%]
 

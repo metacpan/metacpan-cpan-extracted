@@ -47,6 +47,8 @@ dircopy($dataroot, $sourcedir)
 my $testpath = File::Spec->catfile($sourcedir, 't', 'api', 'empty.t');
 rename($testpath . '.in', $testpath);
 chdir($sourcedir);
+systemx(qw(git config --add user.name Test));
+systemx(qw(git config --add user.email test@example.com));
 systemx(qw(git add -A .));
 systemx(qw(git commit -q -m Initial));
 
@@ -70,7 +72,7 @@ require_ok('App::DocKnot::Dist');
 mkdir($distdir);
 chdir($sourcedir);
 eval {
-    my $dist = App::DocKnot::Dist->new({ distdir => $distdir });
+    my $dist = App::DocKnot::Dist->new({ distdir => $distdir, perl => $^X });
     capture_stdout { $dist->make_distribution() };
 };
 ok(-f File::Spec->catfile($distdir, 'Empty-1.00.tar.gz'), 'dist exists');

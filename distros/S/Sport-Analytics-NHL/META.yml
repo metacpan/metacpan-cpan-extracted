@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Sport-Analytics-NHL
 provides:
   Sport::Analytics::NHL:
     file: lib/Sport/Analytics/NHL.pm
-    version: '1.51'
+    version: '1.53'
   Sport::Analytics::NHL::Config:
     file: lib/Sport/Analytics/NHL/Config.pm
   Sport::Analytics::NHL::DB:
@@ -101,6 +101,7 @@ requires:
   Try::Tiny: '0.27'
   boolean: v0.28.4
   experimental: '0.016'
+  if: '0.05'
   parent: '0'
-version: '1.51'
+version: '1.53'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,6 @@
 package Algorithm::CP::IZ;
 
-# use 5.020001;
-use 5.009000; # need Newx in XS
+use 5.010000; # need Newx in XS
 use strict;
 use warnings;
 
@@ -45,7 +44,7 @@ our %EXPORT_TAGS = ( 'value_selector' => [ qw(
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'value_selector'} } );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -1511,7 +1510,7 @@ CodeRef of subroutine which returns maxfail for restart.
 
 A Algorithm::CP::IZ::NoGoodSet instance which collects NoGoods.
 
-=Item Notify
+=item Notify
 
 Specify a notify object receives following notification by search function.
 
@@ -1727,7 +1726,6 @@ EXTRA is a just a data passed to callbeck as parameter (it can be anything).
 Returns version string like "3.5.0".
 undef will be returned if getVersion() is not supported in iZ-C (old version).
 
-=back
 
 =item get_value_selector(ID)
 

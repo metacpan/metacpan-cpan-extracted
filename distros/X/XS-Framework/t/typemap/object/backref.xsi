@@ -1,0 +1,129 @@
+MODE: INLINE
+
+struct BRUnit : panda::Refcnt {
+    int id;
+
+    BRUnit (int id) : id(id) {}
+
+    virtual BRUnit* clone () {
+        //printf("br unit clone\n");
+        return new BRUnit(id);
+    }
+
+    virtual ~BRUnit () {
+        //printf("~BRUnit\n");
+        dcnt.c++;
+    }
+};
+
+struct BRUnitEnabled : BRUnit, Backref {
+    using BRUnit::BRUnit;
+
+    BRUnit* clone () override {
+        //printf("BRUnitEnabled::clone()\n");
+        return new BRUnitEnabled(this->id);
+    }
+
+    ~BRUnitEnabled () { Backref::dtor(); }
+};
+
+struct BRStorage {
+    BRStorage () : unit(NULL) {}
+
+    const panda::iptr<BRUnit>& get_unit () const { return unit; }
+
+    void set_unit          (BRUnit* val) { unit = val; }
+    void set_unit_with_id  (int id)      { unit = new BRUnit(id); }
+    void set_unit_with_id2 (int id)      { unit = new BRUnitEnabled(id); }
+
+    virtual ~BRStorage () {
+        //printf("~BRStorage\n");
+        dcnt.c++;
+    }
+
+    virtual BRStorage* clone () {
+        //printf("BRStorage::clone()\n");
+        BRStorage* ret = new BRStorage();
+        ret->set_unit(unit->clone());
+        return ret;
+    }
+private:
+    panda::iptr<BRUnit> unit;
+};
+
+namespace xs {
+    template <> struct Typemap<BRUnit*> : TypemapObject<BRUnit*, BRUnit*, ObjectTypeRefcntPtr, ObjectStorageMGBackref, DynamicCast> {
+        static std::string package () { return "MyTest::BRUnit"; }
+        static BRUnit* dup (BRUnit* obj) { return obj->clone(); }
+    };
+    
+    template <> struct Typemap<BRStorage*> : TypemapObject<BRStorage*, BRStorage*, ObjectTypePtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::BRStorage"; }
+        static BRStorage* dup (BRStorage* obj) { return obj->clone(); }
+    };    
+}
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::BRUnit
+PROTOTYPES: DISABLE
+
+BRUnit* BRUnit::new (int id)
+
+BRUnit* new_enabled (SV* CLASS, int id) {
+    PROTO = CLASS;
+    RETVAL = new BRUnitEnabled(id);
+}
+
+void BRUnit::retain ()
+
+uint64_t BRUnit::br_addr () {
+    auto xsbr = panda::dyn_cast<xs::Backref*>(THIS);
+    if (!xsbr) throw "no xsbr";
+    RETVAL = (uint64_t)xsbr->svobj;
+}
+
+int BRUnit::rcnt_c () {
+    RETVAL = THIS->refcnt();
+}
+
+int BRUnit::rcnt_sv () {
+    auto xsbr = panda::dyn_cast<xs::Backref*>(THIS);
+    if (!xsbr) throw "no xsbr";
+    //printf("xsbr=%llu\n", xsbr);
+    RETVAL = SvREFCNT(xsbr->svobj);
+}
+
+int BRUnit::id (SV* newval = NULL) {
+    if (newval) THIS->id = SvIV(newval);
+    RETVAL = THIS->id;
+}
+
+void BRUnit::DESTROY () {
+    //printf("BRUnit::DESTROY id=%d\n", THIS->id);
+    dcnt.perl++;
+}
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::BRStorage
+PROTOTYPES: DISABLE
+
+BRStorage* BRStorage::new ()
+
+BRUnit* BRStorage::unit (BRUnit* unit = NULL) {
+    if (items > 1) {
+        THIS->set_unit(unit);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->get_unit();
+}
+
+void BRStorage::set_unit_with_id (int id) : ALIAS(set_unit_with_id2=1) {
+    if (ix == 1) THIS->set_unit_with_id2(id);
+    else THIS->set_unit_with_id(id);
+}
+
+void BRStorage::DESTROY () {
+    //printf("BRStorage::DESTROY\n");
+    dcnt.perl++;
+}
+

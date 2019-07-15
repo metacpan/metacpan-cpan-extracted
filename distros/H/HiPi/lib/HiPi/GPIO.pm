@@ -17,7 +17,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 __PACKAGE__->create_accessors( );
 
@@ -132,6 +132,11 @@ sub set_pin_pud {
     return xs_gpio_set_pud( $gpio, $pud);
 }
 
+sub get_pin_pud {
+    my($class, $gpio ) = @_;
+    return xs_gpio_get_pud( $gpio );
+}
+
 sub set_pin_activelow {
     my($class, $gpio, $alow ) = @_;
     warn q(HiPi::GPIO does not support active_low);
@@ -196,6 +201,10 @@ sub get_pin_function {
     }
     
     return ( wantarray ) ? ( $funcname, $altnum ) : $funcname;
+}
+
+sub get_peripheral_base_address {
+    return xs_gpio_get_peripheral_base_address();
 }
 
 ## edge detect functions conflict with system

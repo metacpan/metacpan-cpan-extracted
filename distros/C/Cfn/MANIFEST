@@ -75,6 +75,9 @@ lib/Cfn/Resource/AWS/AutoScaling/LifecycleHook.pm
 lib/Cfn/Resource/AWS/AutoScaling/ScalingPolicy.pm
 lib/Cfn/Resource/AWS/AutoScaling/ScheduledAction.pm
 lib/Cfn/Resource/AWS/AutoScalingPlans/ScalingPlan.pm
+lib/Cfn/Resource/AWS/Backup/BackupPlan.pm
+lib/Cfn/Resource/AWS/Backup/BackupSelection.pm
+lib/Cfn/Resource/AWS/Backup/BackupVault.pm
 lib/Cfn/Resource/AWS/Batch/ComputeEnvironment.pm
 lib/Cfn/Resource/AWS/Batch/JobDefinition.pm
 lib/Cfn/Resource/AWS/Batch/JobQueue.pm
@@ -112,6 +115,7 @@ lib/Cfn/Resource/AWS/Config/ConfigRule.pm
 lib/Cfn/Resource/AWS/Config/ConfigurationAggregator.pm
 lib/Cfn/Resource/AWS/Config/ConfigurationRecorder.pm
 lib/Cfn/Resource/AWS/Config/DeliveryChannel.pm
+lib/Cfn/Resource/AWS/Config/RemediationConfiguration.pm
 lib/Cfn/Resource/AWS/DAX/Cluster.pm
 lib/Cfn/Resource/AWS/DAX/ParameterGroup.pm
 lib/Cfn/Resource/AWS/DAX/SubnetGroup.pm
@@ -300,6 +304,9 @@ lib/Cfn/Resource/AWS/Logs/LogStream.pm
 lib/Cfn/Resource/AWS/Logs/MetricFilter.pm
 lib/Cfn/Resource/AWS/Logs/SubscriptionFilter.pm
 lib/Cfn/Resource/AWS/MSK/Cluster.pm
+lib/Cfn/Resource/AWS/MediaLive/Channel.pm
+lib/Cfn/Resource/AWS/MediaLive/Input.pm
+lib/Cfn/Resource/AWS/MediaLive/InputSecurityGroup.pm
 lib/Cfn/Resource/AWS/MediaStore/Container.pm
 lib/Cfn/Resource/AWS/Neptune/DBCluster.pm
 lib/Cfn/Resource/AWS/Neptune/DBClusterParameterGroup.pm
@@ -391,6 +398,7 @@ lib/Cfn/Resource/AWS/SecretsManager/ResourcePolicy.pm
 lib/Cfn/Resource/AWS/SecretsManager/RotationSchedule.pm
 lib/Cfn/Resource/AWS/SecretsManager/Secret.pm
 lib/Cfn/Resource/AWS/SecretsManager/SecretTargetAttachment.pm
+lib/Cfn/Resource/AWS/SecurityHub/Hub.pm
 lib/Cfn/Resource/AWS/Serverless/Api.pm
 lib/Cfn/Resource/AWS/Serverless/Application.pm
 lib/Cfn/Resource/AWS/Serverless/Function.pm
@@ -407,6 +415,7 @@ lib/Cfn/Resource/AWS/ServiceCatalog/PortfolioPrincipalAssociation.pm
 lib/Cfn/Resource/AWS/ServiceCatalog/PortfolioProductAssociation.pm
 lib/Cfn/Resource/AWS/ServiceCatalog/PortfolioShare.pm
 lib/Cfn/Resource/AWS/ServiceCatalog/ResourceUpdateConstraint.pm
+lib/Cfn/Resource/AWS/ServiceCatalog/StackSetConstraint.pm
 lib/Cfn/Resource/AWS/ServiceCatalog/TagOption.pm
 lib/Cfn/Resource/AWS/ServiceCatalog/TagOptionAssociation.pm
 lib/Cfn/Resource/AWS/ServiceDiscovery/HttpNamespace.pm

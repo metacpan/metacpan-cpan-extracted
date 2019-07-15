@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Exonerate;
-# ABSTRACT: Bio::MUST driver for running the exonerate alignment program
-$Bio::MUST::Drivers::Exonerate::VERSION = '0.181160';
+# ABSTRACT: Bio::MUST driver for running the Exonerate alignment program
+$Bio::MUST::Drivers::Exonerate::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
@@ -11,6 +11,7 @@ use Carp;
 use Const::Fast;
 use IPC::System::Simple qw(system);
 use List::AllUtils qw(mesh);
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 
 use Bio::MUST::Core;
@@ -70,6 +71,10 @@ const my @attrs => qw(
 sub BUILD {
     my $self = shift;
 
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Exonerate')->new;
+       $app->meet();
+
     # build temp Ali file for input DNA seq
     my $dna = Ali->new(
         seqs => [ $self->dna_seq ],
@@ -100,7 +105,7 @@ sub BUILD {
     # try to robustly execute exonerate
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Warning: Cannot execute $pgm command; returning nothing!";
+        carp "[BMD] Warning: Cannot execute $pgm command; returning nothing!";
         return;
     }
     # TODO: try to bypass shell (need for absolute path to executable then)
@@ -158,7 +163,7 @@ sub complete_cds {
     my $new_seq = join q{}, map { $_->seq } $self->all_exons_in_order;
 
     # warn of unexpected CDS length
-    carp "Warning: spliced CDS length not a multiple of 3 for $full_id!"
+    carp "[BMD] Warning: spliced CDS length not a multiple of 3 for $full_id!"
         unless length($new_seq) % 3 == 0;
 
     return Seq->new(seq_id => $full_id, seq => $new_seq);
@@ -187,11 +192,11 @@ __END__
 
 =head1 NAME
 
-Bio::MUST::Drivers::Exonerate - Bio::MUST driver for running the exonerate alignment program
+Bio::MUST::Drivers::Exonerate - Bio::MUST driver for running the Exonerate alignment program
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

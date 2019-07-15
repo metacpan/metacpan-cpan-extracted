@@ -1,0 +1,47 @@
+MODE: INLINE
+
+using MyBaseAV = _MyBase<2>;
+using MyBaseHV = _MyBase<3>;
+
+namespace xs {
+    template <> struct Typemap<MyBaseAV*> : TypemapObject<MyBaseAV*, MyBaseAV*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::MyBaseAV"; }
+    };
+    template <> struct Typemap<MyBaseHV*> : TypemapObject<MyBaseHV*, MyBaseHV*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::MyBaseHV"; }
+    };
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyBaseAV
+PROTOTYPES: DISABLE
+
+MyBaseAV* new (SV*, int arg) {
+    if (!arg) XSRETURN_UNDEF;
+    RETVAL = new MyBaseAV(arg);
+    PROTO = Array::create();
+}
+
+int MyBaseAV::val () {
+    RETVAL = THIS->val;
+}
+
+void MyBaseAV::DESTROY () {
+    dcnt.perl++;
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyBaseHV
+PROTOTYPES: DISABLE
+
+MyBaseHV* new (SV*, int arg) {
+    if (!arg) XSRETURN_UNDEF;
+    RETVAL = new MyBaseHV(arg);
+    PROTO = Hash::create();
+}
+
+int MyBaseHV::val () {
+    RETVAL = THIS->val;
+}
+
+void MyBaseHV::DESTROY () {
+    dcnt.perl++;
+}

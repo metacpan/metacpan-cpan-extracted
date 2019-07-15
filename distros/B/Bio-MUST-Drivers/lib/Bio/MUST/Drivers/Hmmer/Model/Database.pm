@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Hmmer::Model::Database;
 # ABSTRACT: Internal class for HMMER3 driver
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
-$Bio::MUST::Drivers::Hmmer::Model::Database::VERSION = '0.181160';
+$Bio::MUST::Drivers::Hmmer::Model::Database::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
@@ -26,7 +26,7 @@ sub BUILD {
     # check for existence of HMMER database
     my $basename = $self->filename;
     unless ( List::AllUtils::all { -e "$basename.h3$_" } qw(f i m p) ) {
-        croak "Error: HMMER database not found at $basename; aborting!";
+        croak "[BMD] Error: HMMER database not found at $basename; aborting!";
     }
 
     return;
@@ -45,7 +45,7 @@ Bio::MUST::Drivers::Hmmer::Model::Database - Internal class for HMMER3 driver
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

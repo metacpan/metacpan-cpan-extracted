@@ -1,0 +1,42 @@
+MODE: INLINE
+
+class MyOther {
+    public:
+    int val;
+    MyOther (int arg) : val(arg) {}
+    virtual ~MyOther () { dcnt.c++; }
+};
+
+namespace xs {
+    template <> struct Typemap<MyOther*> : TypemapObject<MyOther*, MyOther*, ObjectTypePtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MyOther"; }
+    };
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyOther
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::MyOther").inherit(Stash("MyTest::MyChild"));
+}
+
+MyOther* MyOther::new (int arg1, int arg2) {
+    PROTO = Sub(cv).SUPER().call(&ST(0), items);
+    if (!PROTO.defined()) XSRETURN_UNDEF;
+    RETVAL = new MyOther(arg1 + arg2);
+}
+
+int MyOther::other_val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MyOther::set_from (MyOther* other) {
+    Sub(cv).SUPER().call(&ST(0), items);
+    if (other) THIS->val = other->val;
+}
+
+void MyOther::DESTROY () {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}

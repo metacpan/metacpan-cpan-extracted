@@ -1,0 +1,85 @@
+# Crazy Panda LLC
+
+TYPEMAP
+
+Sv         T_xs_Sv
+xs::Sv     T_xs_Sv
+Scalar     T_xs_AnyScalar
+xs::Scalar T_xs_AnyScalar
+Simple     T_xs_AnyScalar
+xs::Simple T_xs_AnyScalar
+Ref        T_xs_AnyScalar
+xs::Ref    T_xs_AnyScalar
+Glob       T_xs_AnyScalar
+xs::Glob   T_xs_AnyScalar
+Sub        T_xs_AnyRef
+xs::Sub    T_xs_AnyRef
+Array      T_xs_AnyRef
+xs::Array  T_xs_AnyRef
+Hash       T_xs_AnyRef
+xs::Hash   T_xs_AnyRef
+Stash      T_xs_AnyRef
+xs::Stash  T_xs_AnyRef
+Object     T_xs_Object
+xs::Object T_xs_Object
+List       T_xs_List
+xs::List   T_xs_List
+
+panda::string  T_STRING
+
+######################################################################
+OUTPUT
+
+T_xs_Sv
+    $arg = NULL;
+    if (!$var) XSRETURN_UNDEF;
+    if ($var.is_scalar()) $arg = $var.detach();
+    else switch ($var.type()) {
+        case SVt_PVAV: XSRETURN(xs::Array($var.get<AV>()).push_on_stack(MARK));
+        case SVt_PVHV: XSRETURN(xs::Hash($var.get<HV>()).push_on_stack(MARK));
+        case SVt_PVCV:
+        case SVt_PVIO:
+            $arg = newRV_noinc($var.detach());
+            break;
+        default: throw \"unknown type of Sv to return\";
+    }
+    
+T_xs_AnyScalar
+    $arg = NULL;
+    if (!$var) XSRETURN_UNDEF;
+    $arg = $var.detach();
+    
+T_xs_AnyRef
+    $arg = NULL;
+    if (!$var) XSRETURN_UNDEF;
+    $arg = newRV_noinc($var.detach());
+
+T_xs_Object
+    $arg = NULL;
+    if (!$var) XSRETURN_UNDEF;
+    $arg = SvREFCNT_inc_NN($var.ref().get());
+
+T_xs_List
+    $arg = NULL;
+    XSRETURN($var.push_on_stack(MARK));
+
+######################################################################
+INPUT
+
+T_xs_Sv
+    $var = $arg;
+    
+T_xs_AnyScalar
+    $var = $arg;
+    if (!$var && SvOK($arg)) throw \"arg is not a '$type' value\";
+    
+T_xs_AnyRef
+    $var = $arg;
+    if (!$var && SvOK($arg)) throw \"arg is not a '$type' reference\";
+
+T_xs_Object
+    $var = $arg;
+    if (!$var && SvOK($arg)) throw \"arg is not a blessed reference\";
+
+T_xs_List
+    static_assert(false, \"xs::List cannot be used as INPUT typemap\");

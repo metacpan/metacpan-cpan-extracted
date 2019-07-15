@@ -7,6 +7,8 @@ package Comics::Plugin::TheWarehouse;
 
 use parent qw(Comics::Fetcher::Single);
 
+our $disabled = 1;		# seems defunct
+
 our $VERSION = "0.02";
 
 sub register {

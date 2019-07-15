@@ -18,13 +18,14 @@ my %module_build_args = (
     "Matthias Vandermaesen <matthias.vandermaesen\@vlaamsekunstcollectie.be>"
   ],
   "dist_name" => "Datahub-Factory",
-  "dist_version" => "1.74",
+  "dist_version" => "1.75",
   "license" => "gpl",
   "module_name" => "Datahub::Factory",
   "recursive_test_files" => 1,
   "requires" => {
     "App::Cmd" => 0,
     "Catmandu" => "1.0603",
+    "Catmandu::DBI" => 0,
     "Catmandu::Importer::XML" => 0,
     "Catmandu::LIDO" => 0,
     "Catmandu::OAI" => 0,

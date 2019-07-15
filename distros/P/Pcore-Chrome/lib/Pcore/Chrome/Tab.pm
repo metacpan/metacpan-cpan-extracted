@@ -1,8 +1,8 @@
 package Pcore::Chrome::Tab;
 
 use Pcore -class, -res;
-use Pcore::Util::Data qw[to_json from_json from_b64];
-use Pcore::Util::Scalar qw[weaken is_plain_coderef];
+use Pcore::Lib::Data qw[to_json from_json from_b64];
+use Pcore::Lib::Scalar qw[weaken is_plain_coderef];
 use Pcore::WebSocket::raw;
 
 use overload    #

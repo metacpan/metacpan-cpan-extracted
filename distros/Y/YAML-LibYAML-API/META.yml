@@ -9,8 +9,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0.98'
-  YAML::PP: '0.012'
-  YAML::PP::Parser: '0'
+  YAML::PP: '0.018'
   blib: '1.01'
   perl: v5.8.0
 configure_requires:
@@ -25,10 +24,10 @@ name: YAML-LibYAML-API
 provides:
   YAML::LibYAML::API:
     file: lib/YAML/LibYAML/API.pm
-    version: '0.006'
+    version: '0.007'
   YAML::LibYAML::API::XS:
     file: LibYAML/lib/YAML/LibYAML/API/XS.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   XSLoader: '0'
   YAML::PP::Common: '0'
@@ -38,6 +37,6 @@ requires:
 resources:
   bugtracker: https://github.com/perlpunk/YAML-LibYAML-API-p5/issues
   repository: https://github.com/perlpunk/YAML-LibYAML-API-p5
-version: '0.006'
+version: '0.007'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

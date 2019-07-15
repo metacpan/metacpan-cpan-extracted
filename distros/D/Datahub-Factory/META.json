@@ -47,6 +47,7 @@
          "requires" : {
             "App::Cmd" : "0",
             "Catmandu" : "1.0603",
+            "Catmandu::DBI" : "0",
             "Catmandu::Importer::XML" : "0",
             "Catmandu::LIDO" : "0",
             "Catmandu::OAI" : "0",
@@ -105,7 +106,7 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.74",
+   "version" : "1.75",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

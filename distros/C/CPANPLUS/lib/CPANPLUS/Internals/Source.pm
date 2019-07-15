@@ -19,7 +19,7 @@ use Module::Load::Conditional   qw[can_load];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[$VERSION];
-$VERSION = "0.9176";
+$VERSION = "0.9178";
 
 $Params::Check::VERBOSE = 1;
 
@@ -825,86 +825,6 @@ sub __create_dslip_tree {
     my $conf = $self->configure_object;
 
     return {}; # Quick hack
-
-    my $tmpl = {
-        path     => { default => $conf->get_conf('base') },
-        verbose  => { default => $conf->get_conf('verbose') },
-        uptodate => { default => 0 },
-    };
-
-    my $args = check( $tmpl, \%hash ) or return;
-
-    ### get the file name of the source ###
-    my $file = File::Spec->catfile($args->{path}, $conf->_get_source('dslip'));
-
-    ### extract the file ###
-    my $ae      = Archive::Extract->new( archive => $file ) or return;
-    my $out     = STRIP_GZ_SUFFIX->($file);
-
-    ### make sure to set the PREFER_BIN flag if desired ###
-    {   local $Archive::Extract::PREFER_BIN = $conf->get_conf('prefer_bin');
-        $ae->extract( to => $out )                              or return;
-    }
-
-    my $in      = $self->_get_file_contents( file => $out ) or return;
-
-    ### don't need it anymore ###
-    unlink $out;
-
-
-    ### get rid of the comments and the code ###
-    ### need a smarter parser, some people have this in their dslip info:
-    # [
-    # 'Statistics::LTU',
-    # 'R',
-    # 'd',
-    # 'p',
-    # 'O',
-    # '?',
-    # 'Implements Linear Threshold Units',
-    # ...skipping...
-    # "\x{c4}dd \x{fc}ml\x{e4}\x{fc}ts t\x{f6} \x{eb}v\x{eb}r\x{ff}th\x{ef}ng!",
-    # 'BENNIE',
-    # '11'
-    # ],
-    ### also, older versions say:
-    ### $cols = [....]
-    ### and newer versions say:
-    ### $CPANPLUS::Modulelist::cols = [...]
-    ### split '$cols' and '$data' into 2 variables ###
-    ### use this regex to make sure dslips with ';' in them don't cause
-    ### parser errors
-    my ($ds_one, $ds_two) = ($in =~ m|.+}\s+
-                              (\$(?:CPAN::Modulelist::)?cols.*?)
-                              (\$(?:CPAN::Modulelist::)?data.*)
-                           |sx);
-
-    ### eval them into existence ###
-    ### still not too fond of this solution - kane ###
-    my ($cols, $data);
-    {   #local $@; can't use this, it's buggy -kane
-
-        $cols = eval $ds_one;
-        error( loc("Error in eval of dslip source files: %1", $@) ) if $@;
-
-        $data = eval $ds_two;
-        error( loc("Error in eval of dslip source files: %1", $@) ) if $@;
-
-    }
-
-    my $tree = {};
-    my $primary = "modid";
-
-    ### this comes from CPAN::Modulelist
-    ### which is in 03modlist.data.gz
-    for (@$data){
-        my %hash;
-        @hash{@$cols} = @$_;
-        $tree->{$hash{$primary}} = \%hash;
-    }
-
-    return $tree;
-
 } #__create_dslip_tree
 
 =pod

@@ -49,6 +49,7 @@ devel/bson-types-survey.md
 devel/typemap.md
 dist.ini
 lib/BSON.pm
+lib/BSON/Array.pm
 lib/BSON/Binary.pm
 lib/BSON/Bool.pm
 lib/BSON/Bytes.pm
@@ -76,6 +77,7 @@ perlcritic.rc
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/backend.t
+t/common/bson_array.t
 t/common/create_oid.t
 t/common/cycle.t
 t/common/dualvar.t

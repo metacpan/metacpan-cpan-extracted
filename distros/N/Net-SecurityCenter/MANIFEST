@@ -18,6 +18,7 @@ lib/Net/SecurityCenter/API/ScanResult.pm
 lib/Net/SecurityCenter/API/System.pm
 lib/Net/SecurityCenter/API/User.pm
 lib/Net/SecurityCenter/API/Zone.pm
+lib/Net/SecurityCenter/Error.pm
 lib/Net/SecurityCenter/REST.pm
 lib/Net/SecurityCenter/Utils.pm
 LICENSE

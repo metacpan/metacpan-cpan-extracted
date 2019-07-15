@@ -1,7 +1,7 @@
 package Media::Info;
 
-our $DATE = '2016-11-28'; # DATE
-our $VERSION = '0.12'; # VERSION
+our $DATE = '2019-07-03'; # DATE
+our $VERSION = '0.130'; # VERSION
 
 use 5.010001;
 use strict;
@@ -99,7 +99,7 @@ Media::Info - Return information on media file/URL
 
 =head1 VERSION
 
-This document describes version 0.12 of Media::Info (from Perl distribution Media-Info), released on 2016-11-28.
+This document describes version 0.130 of Media::Info (from Perl distribution Media-Info), released on 2019-07-03.
 
 =head1 SYNOPSIS
 
@@ -134,7 +134,11 @@ L<Media::Info::Mplayer>, L<Media::Info::Ffmpeg>, L<Media::Info::Mediainfo>.
 =head1 FUNCTIONS
 
 
-=head2 get_media_info(%args) -> [status, msg, result, meta]
+=head2 get_media_info
+
+Usage:
+
+ get_media_info(%args) -> [status, msg, payload, meta]
 
 Return information on media file/URL.
 
@@ -162,7 +166,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -174,7 +178,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Media-Info
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Media-Info>.
+Source repository is at L<https://github.com/perlancar/perl-Media-Info>.
 
 =head1 BUGS
 
@@ -197,7 +201,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

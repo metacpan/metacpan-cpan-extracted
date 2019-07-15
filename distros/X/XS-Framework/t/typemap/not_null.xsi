@@ -1,0 +1,30 @@
+MODE: INLINE
+
+struct TestNN : panda::Refcnt {
+    int val;
+    TestNN (int val) : val(val) {}
+};
+using TestNNi = panda::iptr<TestNN>;
+
+namespace xs {
+    template <> struct Typemap<TestNN*> : TypemapObject<TestNN*, TestNN*, ObjectTypePtr, ObjectStorageIV> {};
+}
+
+MODULE = MyTest::Typemap                PACKAGE = MyTest::NotNull
+PROTOTYPES: DISABLE
+
+TestNN* TestNN::new (int arg) {
+    RETVAL = new TestNN(arg);
+}
+
+int TestNN::val () {
+    RETVAL = THIS->val;
+}
+
+void TestNN::set_from (xs::nn<TestNN*> other) {
+    THIS->val = (&*other)->val;
+}
+
+void TestNN::set_from2 (xs::nn<TestNNi> other) {
+    THIS->val = other->val;
+}

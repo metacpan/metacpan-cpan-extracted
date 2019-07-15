@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has accepted_payment_method => (
@@ -362,7 +362,7 @@ SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to p
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -451,11 +451,11 @@ A area_served should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
+
 =item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
-
-=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =item C<Str>
 
@@ -557,11 +557,11 @@ A category should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PhysicalActivityCategory']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
 
 =back
 
@@ -638,11 +638,11 @@ A eligible_region should be one of the following types:
 
 =over
 
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
-=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
+=item C<Str>
 
 =back
 
@@ -755,11 +755,11 @@ A ineligible_region should be one of the following types:
 
 =over
 
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
-=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
+=item C<Str>
 
 =back
 
@@ -867,9 +867,9 @@ A price should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<Num>
+
+=item C<Str>
 
 =back
 
@@ -959,9 +959,9 @@ A seller should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

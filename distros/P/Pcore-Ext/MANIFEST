@@ -22,13 +22,16 @@ lib/Pcore/Ext/Lib/Form/Auth.pm
 lib/Pcore/Ext/Lib/Form/ChangePassword.pm
 lib/Pcore/Ext/Lib/Form/ConnectionError.pm
 lib/Pcore/Ext/Lib/Link.pm
+lib/Pcore/Ext/Lib/Mask.pm
 lib/Pcore/Ext/Lib/Media.pm
 lib/Pcore/Ext/Lib/Menu.pm
 lib/Pcore/Ext/Lib/Mixin.pm
 lib/Pcore/Ext/Lib/PDF.pm
 lib/Pcore/Ext/Lib/Plugin.pm
+lib/Pcore/Ext/Lib/Telegram.pm
 lib/Pcore/Ext/Lib/Upload.pm
 lib/Pcore/Ext/Lib/Util.pm
+lib/Pcore/Ext/Lib/Validator.pm
 lib/Pcore/Ext/Lib/Viewport.pm
 lib/Pcore/Ext/Overrides/core.pm
 lib/Pcore/Ext/Overrides/modern.pm

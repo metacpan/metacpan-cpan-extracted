@@ -1,7 +1,7 @@
 package Pcore::CDN::Bucket::local;
 
 use Pcore -class, -res;
-use Pcore::Util::Scalar qw[is_plain_scalarref is_plain_arrayref is_plain_coderef];
+use Pcore::Lib::Scalar qw[is_plain_scalarref is_plain_arrayref is_plain_coderef];
 
 with qw[Pcore::CDN::Bucket];
 

@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001013';
+our $VERSION = '0.001014';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -360,10 +360,13 @@ sub _install_data_handler {
         # Convert to data handle...
         my $data = $$src_ref;
         $data =~ s{ \A [^\n]* \n }{}xms;
-        open *::DATA, '<', \$data;
+        $data .= "\n" unless substr($data,-1) eq "\n";
 
-        # Remove trailing code...
-        $$src_ref = q{};
+        # Create end-of-__DATA__ marker unlikely to be in the data...
+        my $END_DATA = "\3" x 253;  # \3 is ASCII END-OF-TEXT, 253 is max ident length
+
+        # Replace trailing code with code that opens a local *DATA handle...
+        $$src_ref = qq{BEGIN {open *DATA, '<', \\<<'$END_DATA'\n$data$END_DATA\n} 1; };
     };
     _replacement_define('__DATA__', $DATA_HANDLER);
 }
@@ -1071,7 +1074,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001013
+This document describes Keyword::Declare version 0.001014
 
 
 =head1 STATUS

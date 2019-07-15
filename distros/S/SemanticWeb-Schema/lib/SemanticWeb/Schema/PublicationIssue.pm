@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has issue_number => (
@@ -66,13 +66,13 @@ SemanticWeb::Schema::PublicationIssue - A part of a successively published publi
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
 =for html A part of a successively published publication such as a periodical or
 publication volume, often numbered, usually containing a grouping of works
-such as articles.<br/><br/> <a
+such as articles.<br/><br/> See also <a
 href="http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.
 html">blog post</a>.
 
@@ -104,9 +104,9 @@ A page_end should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=item C<Str>
 
 =back
 

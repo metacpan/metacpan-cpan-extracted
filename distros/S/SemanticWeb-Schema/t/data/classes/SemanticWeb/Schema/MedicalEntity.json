@@ -28,8 +28,8 @@
          "rdfs:comment" : "The drug or supplement's legal status, including any controlled substance schedules that apply.",
          "rdfs:label" : "legalStatus",
          "schema:domainIncludes" : [
-            "schema:DietarySupplement",
             "schema:MedicalEntity",
+            "schema:DietarySupplement",
             "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

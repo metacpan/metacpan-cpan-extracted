@@ -7,7 +7,7 @@ README.md
 cpanfile
 lib/Build.PL
 lib/Pcore/GeoIP.pm
-lib/Pcore/Util/GeoIP.pm
+lib/Pcore/Lib/GeoIP.pm
 script/update-geoip-share.pl
 share/dist-id.yaml
 share/dist.yaml

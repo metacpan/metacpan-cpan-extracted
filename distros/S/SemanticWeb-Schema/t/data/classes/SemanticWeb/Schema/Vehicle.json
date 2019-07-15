@@ -23,8 +23,8 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:QualitativeValue",
+            "schema:Text",
             "schema:URL"
          ]
       },
@@ -51,8 +51,8 @@
          "rdfs:label" : "driveWheelConfiguration",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:DriveWheelConfigurationValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:DriveWheelConfigurationValue"
          ]
       },
       "schema:emissionsCO2" : {
@@ -99,9 +99,9 @@
             "schema:Vehicle"
          ],
          "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
             "schema:URL",
-            "schema:Text",
-            "schema:QualitativeValue"
+            "schema:Text"
          ]
       },
       "schema:knownVehicleDamages" : {
@@ -120,8 +120,8 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:URL",
+            "schema:Text",
             "schema:QualitativeValue"
          ]
       },
@@ -149,8 +149,8 @@
          "rdfs:label" : "numberOfAirbags",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:numberOfAxles" : {
@@ -193,8 +193,8 @@
          "rdfs:label" : "numberOfPreviousOwners",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:payload" : {
@@ -212,8 +212,8 @@
          "rdfs:comment" : "The date of production of the item, e.g. vehicle.",
          "rdfs:label" : "productionDate",
          "schema:domainIncludes" : [
-            "schema:Vehicle",
-            "schema:Product"
+            "schema:Product",
+            "schema:Vehicle"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -223,8 +223,8 @@
          "rdfs:comment" : "The date the item e.g. vehicle was purchased by the current owner.",
          "rdfs:label" : "purchaseDate",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -343,8 +343,8 @@
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CarUsageType"
+            "schema:CarUsageType",
+            "schema:Text"
          ]
       },
       "schema:vehicleTransmission" : {

@@ -1,6 +1,5 @@
 #include "test.h"
 #include <panda/lib/owning_list.h>
-#include <iostream>
 #include <panda/log.h>
 
 using panda::lib::owning_list;

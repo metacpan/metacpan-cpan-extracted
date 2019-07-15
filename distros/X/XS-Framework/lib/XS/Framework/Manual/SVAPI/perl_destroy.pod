@@ -1,0 +1,31 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::perl_destroy - XF::Framework at_perl_destroy() reference
+
+=head1 C++ at_perl_destroy()
+
+    void at_perl_destroy (const panda::function<void()>& f);
+
+Sometimes you need to be notified, when Perl interpreter is about to be
+destroyed. This is needed when you captured some Perl structures and want
+to release them properly or invoke other clean-up functions.
+
+This hook function is similar to C<END> block of a perl module, but on C++
+layer.
+
+The added hook-functions are executed in the order they added (FIFO). Here is
+an example:
+
+    at_perl_destroy([](){
+        std::cout << "perl interpreter is about to be destoryed\n";
+    });
+
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+=cut
+

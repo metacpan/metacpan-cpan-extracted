@@ -1,3 +1,7 @@
+0.03 2019-07-10
+    * fix differing behaviour between file based form templates and
+      inline form templates
+
 0.02 2014-10-02
     * simple version numbers
     * test db now in-memory sqlite

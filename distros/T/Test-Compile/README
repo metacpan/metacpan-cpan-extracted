@@ -5,7 +5,7 @@ DESCRIPTION
     individual files.
 
 DEPENDENCIES
-    Requires perl v5.6.2, plus
+    Requires perl v5.10.0, plus
     * UNIVERSAL::require
     * version
     * parent

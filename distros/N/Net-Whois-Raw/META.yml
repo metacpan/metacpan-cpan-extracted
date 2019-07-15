@@ -36,6 +36,6 @@ requires:
 resources:
   bugtracker: https://github.com/regru/Net-Whois-Raw/issues
   repository: git://github.com/regru/Net-Whois-Raw.git
-version: 2.99021
+version: 2.99022
 x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.56'

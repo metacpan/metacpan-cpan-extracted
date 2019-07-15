@@ -20,7 +20,7 @@ git-up-to-date - Check that git branches include latest production branch/tag
 
 =head1 VERSION
 
-This documentation refers to git-up-to-date version 1.1.3
+This documentation refers to git-up-to-date version 1.1.4
 
 =head1 SYNOPSIS
 

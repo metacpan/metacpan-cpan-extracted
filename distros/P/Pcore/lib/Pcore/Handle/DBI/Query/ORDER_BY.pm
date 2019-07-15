@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::ORDER_BY;
 
 use Pcore -const, -class;
-use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
+use Pcore::Lib::Scalar qw[is_ref is_plain_arrayref];
 
 has _buf => ( required => 1 );    # ArrayRef
 

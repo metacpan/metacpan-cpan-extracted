@@ -13,8 +13,8 @@
          "schema:domainIncludes" : [
             "schema:TouristAttraction",
             "schema:ContactPoint",
-            "schema:ServiceChannel",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:ServiceChannel"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",

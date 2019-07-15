@@ -1,31 +1,37 @@
 Revision history for this software.
 
-2.13.81.6 2019/04/01 00:00:00
+2.13.81.7 2019-07-13 00:00:00
+  - fix Extra Issues: has_meta_json
+  - fix Extra Issues: use_warnings
+  - fix Experimental Issues: meta_yml_has_repository_resource
+  - created by INABA Hitoshi
+
+2.13.81.6 2019-04-01 00:00:00
   - support 'utf8.1' for $OUTPUT_encoding and $INPUT_encoding
   - support 'cp932ibm' for $OUTPUT_encoding
   - support 'cp932nec' for $OUTPUT_encoding
   - created by INABA Hitoshi
 
-2.13.81.5 2019/01/03 00:00:00
+2.13.81.5 2019-01-03 00:00:00
   - avoid ActiveState Code PPM INDEX: Too much output (limit is 10.0 MB)
   - support INPUT_LAYOUT option when $INPUT_encoding is cp932x, cp932, sjis2004
   - created by INABA Hitoshi
 
-2.13.81.4 2018/12/10 00:00:00
+2.13.81.4 2018-12-10 00:00:00
   - add some documents
   - add make__DATA__/JIS/*
   - created by INABA Hitoshi
 
-2.13.81.3 2018/12/07 00:00:00
+2.13.81.3 2018-12-07 00:00:00
   - support UNISYS LetsJ encoding
   - add some tests
   - created by INABA Hitoshi
 
-2.13.81.2 2018/12/01 00:00:00
+2.13.81.2 2018-12-01 00:00:00
   - re-versioning 2.13.81.2 to fix module: Jacode4e::RoundTrip version: 2.013006007081001 in file: Jacode4e-RoundTrip-2.13.6.7.81.1/lib/Jacode4e/RoundTrip.pm status: Version string exceeds maximum allowed length of 16b
   - remove jacode4e.pl to fix Kwalitee Issue: main_module_version_matches_dist_version
   - created by INABA Hitoshi
 
-2.13.6.7.81.1 2018/11/28 00:00:00
+2.13.6.7.81.1 2018-11-28 00:00:00
   - branched from Jacode4e 2.13.6.7 2018/08/19 00:00:00
   - created by INABA Hitoshi

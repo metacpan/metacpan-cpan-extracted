@@ -2,7 +2,7 @@ package Pcore::Core::OOP::Role;
 
 use Pcore;
 use Pcore::Core::OOP::Class qw[];
-use Pcore::Util::Scalar qw[is_ref is_plain_hashref is_coderef];
+use Pcore::Lib::Scalar qw[is_ref is_plain_hashref is_coderef];
 
 sub import ( $self, $caller = undef ) {
     $caller //= caller;

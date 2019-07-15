@@ -1,0 +1,20 @@
+0.003   2019-07-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix some typos/mistakes.
+
+
+0.002   2019-07-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Mention perl hash slice notation and the difference with
+	  hash_subset.
+
+	- Rename variable to be clearer.
+
+
+0.001   2019-07-10  Released-By: PERLANCAR
+
+        - First release.

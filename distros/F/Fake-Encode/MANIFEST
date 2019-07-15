@@ -1,10 +1,12 @@
 lib/Fake/Encode.pm
 Changes
-Makefile.PL
-pmake.bat
-MANIFEST
-README
-META.yml
 LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+pmake.bat
 t/001_encode.t
 t/002_decode.t
+t/2001_podtest.t

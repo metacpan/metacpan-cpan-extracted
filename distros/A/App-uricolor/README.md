@@ -1,9 +1,26 @@
-# App::uricolor
+uricolor - Colorize URIs with ANSI colors.
+==========================================
+
+SYNOPSIS
+--------
+
+    $ uricolor [-hVds] [file ...]
+
+    -h, --help      help
+    -V, --version   version
+    -d              debug
+    -s              schemeless
+
+DESCRIPTION
+-----------
 
 uricolor is a Perl script to colorize URIs with ANSI colors.
-It reads from STDIN and writes to STDOUT.
+It reads files sequentially, and writes them to STDOUT,
+with all URIs colored (underline blue). If file is a dash "-"
+or if no file is given, uricolor reads from STDIN.
 
-## INSTALLATION
+INSTALLATION
+------------
 
 To install this module automatically from CPAN :
 
@@ -15,41 +32,36 @@ To install this module automatically from Git repository :
 
 To install this module manually, run the following commands :
 
-        perl Makefile.PL
-        make
-        make test
-        make install
+    perl Makefile.PL
+    make     
+    make test
+    make install
 
-## PREREQUISITES
+PREREQUISITES
+-------------
 
 URI::Find, URI::Find::Schemeless, Term::ANSIColor
 
-## SUPPORT AND DOCUMENTATION
+SUPPORT AND DOCUMENTATION
+-------------------------
 
 After installing, you can find documentation for this module with the
-perldoc command.
+perldoc command :
 
     perldoc uricolor
 
-You can also look for information at:
+You can also look for information at :
 
-- RT: CPAN's request tracker (report bugs here)
-
-    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-uricolor](https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-uricolor)
-
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/App-uricolor](http://annocpan.org/dist/App-uricolor)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/d/App-uricolor](https://cpanratings.perl.org/d/App-uricolor)
-
-- Search CPAN
+- CPAN
 
     [https://metacpan.org/release/App-uricolor](https://metacpan.org/release/App-uricolor)
 
-## LICENSE AND COPYRIGHT
+- GITHUB
+
+    [https://github.com/kal247/App-uricolor](https://github.com/kal247/App-uricolor)
+
+LICENSE AND COPYRIGHT
+---------------------
 
 This software is Copyright (c) 2019 by jul.
 

@@ -3,11 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0400';
 
 use strict;
 use warnings;
 
+use MIDI;
+use MIDI::Event;
 use MIDI::Track;
 use MIDI::Simple;
 use Music::Tempo;
@@ -68,6 +70,93 @@ sub set_chan_patch {
     $score->noop( 'c' . $channel );
 }
 
+
+sub dump {
+    my ($key) = @_;
+
+    if ( lc $key eq 'volume' ) {
+        return [
+            map { "$_ => $MIDI::Simple::Volume{$_}" }
+                sort { $MIDI::Simple::Volume{$a} <=> $MIDI::Simple::Volume{$b} }
+                    keys %MIDI::Simple::Volume
+        ];
+    }
+    elsif ( lc $key eq 'length' ) {
+        return [
+            map { "$_ => $MIDI::Simple::Length{$_}" }
+                sort { $MIDI::Simple::Length{$a} <=> $MIDI::Simple::Length{$b} }
+                    keys %MIDI::Simple::Length
+        ];
+    }
+    elsif ( lc $key eq 'note' ) {
+        return [
+            map { "$_ => $MIDI::Simple::Note{$_}" }
+                sort { $MIDI::Simple::Note{$a} <=> $MIDI::Simple::Note{$b} }
+                    keys %MIDI::Simple::Note
+        ];
+    }
+    elsif ( lc $key eq 'note2number' ) {
+        return [
+            map { "$_ => $MIDI::note2number{$_}" }
+                sort { $MIDI::note2number{$a} <=> $MIDI::note2number{$b} }
+                    keys %MIDI::note2number
+        ];
+    }
+    elsif ( lc $key eq 'number2note' ) {
+        return [
+            map { "$_ => $MIDI::number2note{$_}" }
+                sort { $a <=> $b }
+                    keys %MIDI::number2note
+        ];
+    }
+    elsif ( lc $key eq 'patch2number' ) {
+        return [
+            map { "$_ => $MIDI::patch2number{$_}" }
+                sort { $MIDI::patch2number{$a} <=> $MIDI::patch2number{$b} }
+                    keys %MIDI::patch2number
+        ];
+    }
+    elsif ( lc $key eq 'number2patch' ) {
+        return [
+            map { "$_ => $MIDI::number2patch{$_}" }
+                sort { $a <=> $b }
+                    keys %MIDI::number2patch
+        ];
+    }
+    elsif ( lc $key eq 'notenum2percussion' ) {
+        return [
+            map { "$_ => $MIDI::notenum2percussion{$_}" }
+                sort { $a <=> $b }
+                    keys %MIDI::notenum2percussion
+        ];
+    }
+    elsif ( lc $key eq 'percussion2notenum' ) {
+        return [
+            map { "$_ => $MIDI::percussion2notenum{$_}" }
+                sort { $MIDI::percussion2notenum{$a} <=> $MIDI::percussion2notenum{$b} }
+                    keys %MIDI::percussion2notenum
+        ];
+    }
+    elsif ( lc $key eq 'all_events' ) {
+        return \@MIDI::Event::All_events;
+    }
+    elsif ( lc $key eq 'midi_events' ) {
+        return \@MIDI::Event::MIDI_events;
+    }
+    elsif ( lc $key eq 'meta_events' ) {
+        return \@MIDI::Event::Meta_events;
+    }
+    elsif ( lc $key eq 'text_events' ) {
+        return \@MIDI::Event::Text_events;
+    }
+    elsif ( lc $key eq 'nontext_meta_events' ) {
+        return \@MIDI::Event::Nontext_meta_events;
+    }
+    else {
+        return [];
+    }
+}
+
 1;
 
 __END__
@@ -82,7 +171,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0300
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -93,6 +182,8 @@ version 0.0300
   MIDI::Util::set_chan_patch( $score, 0, 1 );
 
   my $track = MIDI::Util::new_track( channel => 0, patch => 1, tempo => 450_000 );
+
+  my $dump = MIDI::Util::dump('volume');
 
 =head1 DESCRIPTION
 
@@ -146,6 +237,28 @@ Positional parameters and defaults:
   score:   undef (required)
   channel: 0
   patch:   0
+
+=head2 dump()
+
+  $dump = MIDI::Util::dump($list_name);
+
+Return sorted array references of the following L<MIDI>,
+L<MIDI::Simple>, and L<MIDI::Event> internal lists:
+
+  Volume
+  Length
+  Note
+  note2number
+  number2note
+  patch2number
+  number2patch
+  notenum2percussion
+  percussion2notenum
+  All_events
+  MIDI_events
+  Meta_events
+  Text_events
+  Nontext_meta_events
 
 =head1 SEE ALSO
 

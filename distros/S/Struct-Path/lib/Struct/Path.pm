@@ -28,11 +28,11 @@ Struct::Path - Path for nested structures where path is also a structure
 
 =head1 VERSION
 
-Version 0.83
+Version 0.84
 
 =cut
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 =head1 SYNOPSIS
 
@@ -88,17 +88,18 @@ should be a list of desired keys and compiled regular expressions. Empty
 hash or empty list for C<K> means all keys, sequence in the list define
 resulting sequence.
 
-Coderef step is a hook - subroutine which may filter and/or modify
-structure. Path as first argument and a stack (arrayref) of refs to traversed
-substructures as second passed to it when executed, C<$_> set to current
-substructure, C<$_{opts}> contains passed options. Some true (match) value or
-false (doesn't match) value expected as output.
+Coderef step is a hook - subroutine which may filter out items and/or modify
+structure. Traversed path for first, stack of passed structured for secong and
+path remainder for third agrument passed to hook when executed; all passed args
+are arrayrefs. Among this two global variables available within hook: C<$_> is
+set to current substructure and C<$_{opts}> contains c<path()>'s options. Some
+true (match) value or false (doesn't match) value expected as output.
 
 Sample:
 
     $path = [
         [1,7],                      # first spep
-        {R => [qr/foo/,qr/bar/]}    # second step
+        {K => [qr/foo/,qr/bar/]}    # second step
         sub { exists $_->{bar} }    # third step
     ];
 
@@ -120,7 +121,6 @@ sub implicit_step {
     if (ref $_[0] eq 'ARRAY') {
         return 1 unless (@{$_[0]});
     } elsif (ref $_[0] eq 'HASH') {
-        return 1 if (exists $_[0]->{R} and @{$_[0]->{R}});
         return 1 unless (exists $_[0]->{K});
         return 1 unless (@{$_[0]->{K}});
         ref $_ eq 'Regexp' && return 1 for (@{$_[0]->{K}})
@@ -217,124 +217,129 @@ All options are disabled (C<undef>) by default.
 =cut
 
 sub path($$;@) {
-    my (undef, $path, %opts) = @_;
+    my (undef, $init_path, %opts) = @_;
 
-    croak "Arrayref expected for path" unless (ref $path eq 'ARRAY');
+    croak "Arrayref expected for path" unless (ref $init_path eq 'ARRAY');
     croak "Unable to remove passed thing entirely (empty path passed)"
-        if ($opts{delete} and not @{$path});
+        if ($opts{delete} and not @{$init_path});
 
-    my @level = ([], [\$_[0]]); # alias - to be able to rewrite passed scalar
-    my $sc = 0; # step counter
-    my ($items, @next, $steps, $refs, $step_type, @types);
+    # use alias for refs - to be able to rewrite passed scalar
+    my @stack = ([], [\$_[0]], [@{$_[1]}]);
+    my (@done, $items, $path, $pos, $refs, $rest, $step, $step_type);
 
-    for my $step (@{$path}) {
-        while (($steps, $refs) = splice @level, 0, 2) {
-            croak "Reference expected for refs stack entry, step #$sc"
-                unless (ref $refs->[-1]);
+    while (($path, $refs, $rest) = splice @stack, 0, 3) {
+        if (not ref $refs->[-1]) {
+            croak "Reference expected for refs stack entry, step #$pos";
+        } elsif (not @{$rest}) {
+            ${$refs->[-1]} = $opts{assign} if (exists $opts{assign});
 
-            if (($step_type = ref $step) eq 'ARRAY') {
-                if (ref ${$refs->[-1]} ne 'ARRAY') {
-                    croak "ARRAY expected on step #$sc, got " . ref ${$refs->[-1]}
-                        if ($opts{strict});
-                    next unless ($opts{expand});
-                    ${$refs->[-1]} = [];
-                }
-
-                $items = @{$step} ? $step : [0 .. $#${$refs->[-1]}];
-                for (@{$items}) {
-                    unless (
-                        $opts{expand} or
-                        @{${$refs->[-1]}} > ($_ >= 0 ? $_ : abs($_ + 1))
-                    ) {
-                        croak "[$_] doesn't exist, step #$sc" if ($opts{strict});
-                        next;
-                    }
-
-                    if ($_ < 0) {
-                        if (@{${$refs->[-1]}} < abs($_)) {
-                            # expand smoothly for out of range negative indexes
-                            $_ = @{${$refs->[-1]}};
-                        } else {
-                            $_ += @{${$refs->[-1]}};
-                        }
-                    }
-
-                    push @next, [@{$steps}, [$_]], [@{$refs}, \${$refs->[-1]}->[$_]];
-                }
-
-                if ($opts{delete} and $sc == $#{$path}) {
-                    map { splice(@{${$refs->[-1]}}, $_, 1) if ($_ < @{${$refs->[-1]}}) }
-                        reverse sort @{$items};
-                }
-            } elsif ($step_type eq 'HASH') {
-                if (ref ${$refs->[-1]} ne 'HASH') {
-                    croak "HASH expected on step #$sc, got " . ref ${$refs->[-1]}
-                        if ($opts{strict});
-                    next unless ($opts{expand});
-                    ${$refs->[-1]} = {};
-                }
-
-                @types = grep { exists $step->{$_} } qw(K R);
-                croak "Unsupported HASH definition, step #$sc" if (@types != keys %{$step});
-                undef $items;
-
-                for my $t (@types) {
-                    unless (ref $step->{$t} eq 'ARRAY') {
-                        my $type = $t eq 'K' ? "keys" : "regs";
-                        croak "Unsupported HASH $type definition, step #$sc";
-                    }
-
-                    if ($t eq 'K') {
-                        for my $i (@{$step->{K}}) {
-                            if (ref $i eq 'Regexp') {
-                                push @{$items}, grep { $_ =~ $i }
-                                    keys %{${$refs->[-1]}};
-                            } else {
-                                unless ($opts{expand} or exists ${$refs->[-1]}->{$i}) {
-                                    croak "{$i} doesn't exist, step #$sc" if $opts{strict};
-                                    next;
-                                }
-                                push @{$items}, $i;
-                            }
-                        }
-                    } else {
-                        for my $g (@{$step->{R}}) {
-                            push @{$items}, grep { $_ =~ $g } keys %{${$refs->[-1]}};
-                        }
-                    }
-                }
-
-                for (@types ? @{$items} : keys %{${$refs->[-1]}}) {
-                    push @next, [@{$steps}, {K => [$_]}], [@{$refs}, \${$refs->[-1]}->{$_}];
-                    delete ${$refs->[-1]}->{$_} if ($opts{delete} and $sc == $#{$path});
-                }
-            } elsif ($step_type eq 'CODE') {
-                local $_ = ${$refs->[-1]};
-                local $_{opts} = \%opts;
-                $step->($steps, $refs) and push @next, $steps, $refs;
+            if ($opts{stack}) {
+                map { $_ = ${$_} } @{$refs} if ($opts{deref});
             } else {
-                croak "Unsupported thing in the path, step #$sc";
+                $refs = $opts{deref} ? ${$refs->[-1]} : $refs->[-1];
             }
+
+            push @done, ($opts{paths} ? ($path, $refs) : $refs);
+
+            next;
         }
 
-        @level = splice @next;
-        $sc++;
-    }
+        $step = shift @{$rest};
+        $pos = $#{$init_path} - @{$rest};
 
-    my @out;
-    while (($path, $refs) = splice @level, 0, 2) {
-        ${$refs->[-1]} = $opts{assign} if (exists $opts{assign});
+        if (($step_type = ref $step) eq 'HASH') {
+            if (ref ${$refs->[-1]} ne 'HASH') {
+                croak "HASH expected on step #$pos, got " . ref ${$refs->[-1]}
+                    if ($opts{strict});
+                next unless ($opts{expand});
+                ${$refs->[-1]} = {};
+            }
 
-        if ($opts{stack}) {
-            map { $_ = ${$_} } @{$refs} if ($opts{deref});
+            undef $items;
+
+            if (exists $step->{K}) {
+                croak "Unsupported HASH definition, step #$pos"
+                    if (keys %{$step} > 1);
+                croak "Unsupported HASH keys definition, step #$pos"
+                    unless (ref $step->{K} eq 'ARRAY');
+
+                for my $i (@{$step->{K}}) {
+                    if (ref $i eq 'Regexp') {
+                        push @{$items}, grep { /$i/ } keys %{${$refs->[-1]}};
+                    } else {
+                        unless ($opts{expand} or exists ${$refs->[-1]}->{$i}) {
+                            croak "{$i} doesn't exist, step #$pos"
+                                if $opts{strict};
+                            next;
+                        }
+                        push @{$items}, $i;
+                    }
+                }
+            } else {
+                croak "Unsupported HASH definition, step #$pos"
+                    if (keys %{$step});
+            }
+
+            for (exists $step->{K} ? @{$items} : keys %{${$refs->[-1]}}) {
+                push @stack,
+                    [@{$path}, {K => [$_]}],
+                    [@{$refs}, \${$refs->[-1]}->{$_}],
+                    [@{$rest}];
+
+                delete ${$refs->[-1]}->{$_}
+                    if ($opts{delete} and not @{$rest});
+            }
+        } elsif ($step_type eq 'ARRAY') {
+            if (ref ${$refs->[-1]} ne 'ARRAY') {
+                croak "ARRAY expected on step #$pos, got " . ref ${$refs->[-1]}
+                    if ($opts{strict});
+                next unless ($opts{expand});
+                ${$refs->[-1]} = [];
+            }
+
+            $items = @{$step} ? $step : [0 .. $#${$refs->[-1]}];
+            for (@{$items}) {
+                unless (
+                    $opts{expand} or
+                    @{${$refs->[-1]}} > ($_ >= 0 ? $_ : abs($_ + 1))
+                ) {
+                    croak "[$_] doesn't exist, step #$pos" if ($opts{strict});
+                    next;
+                }
+
+                if ($_ < 0) {
+                    if (@{${$refs->[-1]}} < abs($_)) {
+                        # expand smoothly for out of range negative indexes
+                        $_ = @{${$refs->[-1]}};
+                    } else {
+                        $_ += @{${$refs->[-1]}};
+                    }
+                }
+
+                push @stack,
+                    [@{$path}, [$_]],
+                    [@{$refs}, \${$refs->[-1]}->[$_]],
+                    [@{$rest}];
+            }
+
+            if ($opts{delete} and not @{$rest}) {
+                for (reverse sort @{$items}) {
+                    splice(@{${$refs->[-1]}}, $_, 1)
+                        if ($_ < @{${$refs->[-1]}});
+                }
+            }
+        } elsif ($step_type eq 'CODE') {
+            local $_ = ${$refs->[-1]};
+            local $_{opts} = \%opts;
+
+            $step->($path, $refs, $rest) and
+                push @stack, $path, $refs, [@{$rest}];
         } else {
-            $refs = $opts{deref} ? ${pop @{$refs}} : pop @{$refs};
+            croak "Unsupported thing in the path, step #$pos";
         }
-
-        push @out, ($opts{paths} ? ($path, $refs) : $refs);
     }
 
-    return @out;
+    return @done;
 }
 
 =head2 path_delta
@@ -443,7 +448,7 @@ L<Struct::Diff> L<Struct::Path::PerlStyle> L<Struct::Path::JsonPointer>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Michael Samoglyadov.
+Copyright 2016-2019 Michael Samoglyadov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

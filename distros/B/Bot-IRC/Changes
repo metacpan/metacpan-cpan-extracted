@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.24      2019-07-12 07:06:31-07:00 America/Los_Angeles
+        - Send USER and NICK lines to IRC server based on an optional parameter
+
 1.23      2019-01-24 12:42:33-08:00 America/Los_Angeles
         - Fix for bot help topics listing display
         - Uprade TravisCD Perl test version head

@@ -1,0 +1,11 @@
+Revision history for perl distribution Mojo-Base-Tiny
+
+0.03 2019-07-13T06:31:34+0200
+ - Remove development stuff
+
+0.02 2019-07-11T19:19:06+0200
+ - Correct dependency on Sub::Util
+   Contributor: Mohammad S Anwar
+
+0.01 2019-07-10T06:44:48+0200
+ - Start with code from Mojolicious 8.18

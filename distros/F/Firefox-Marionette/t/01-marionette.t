@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 380;
+use Test::More tests => 385;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -46,6 +46,9 @@ sub start_firefox {
 			delete $parameters{capabilities}->{moz_webdriver_click};
 			delete $parameters{capabilities}->{moz_accessibility_checks};
 			delete $parameters{capabilities}->{accept_insecure_certs};
+			delete $parameters{capabilities}->{strict_file_interactability};
+			delete $parameters{capabilities}->{unhandled_prompt_behavior};
+			delete $parameters{capabilities}->{set_window_rect};
 			delete $parameters{capabilities}->{moz_use_non_spec_compliant_pointer_origin};
 		}
 	}
@@ -65,6 +68,15 @@ sub start_firefox {
 			}
 			if (defined $old->accept_insecure_certs()) {
 				$new{accept_insecure_certs} = $old->accept_insecure_certs();
+			}
+			if (defined $old->strict_file_interactability()) {
+				$new{strict_file_interactability} = $old->strict_file_interactability();
+			}
+			if (defined $old->unhandled_prompt_behavior()) {
+				$new{unhandled_prompt_behavior} = $old->unhandled_prompt_behavior();
+			}
+			if (defined $old->set_window_rect()) {
+				$new{set_window_rect} = $old->set_window_rect();
 			}
 			if (defined $old->page_load_strategy()) {
 				$new{page_load_strategy} = $old->page_load_strategy();
@@ -459,17 +471,45 @@ SKIP: {
 	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
 	my $localPort = URI->new($daemon->url())->port();
 	my $proxy = Firefox::Marionette::Proxy->new( http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', ftp => 'ftp.example.org:2121', none => [ 'local.example.org' ], socks => 'socks.example.org:1081' );
-	($skip_message, $firefox) = start_firefox(0, debug => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1, moz_use_non_spec_compliant_pointer_origin => 1, timeouts => Firefox::Marionette::Timeouts->new(page_load => 54_321, script => 4567, implicit => 6543)));
+	($skip_message, $firefox) = start_firefox(0, debug => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, strict_file_interactability => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', unhandled_prompt_behavior => 'accept and notify', moz_webdriver_click => 1, moz_accessibility_checks => 1, moz_use_non_spec_compliant_pointer_origin => 1, timeouts => Firefox::Marionette::Timeouts->new(page_load => 54_321, script => 4567, implicit => 6543)));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 22);
+		skip($skip_message, 26);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	ok($firefox->sleep_time_in_ms() == 5, "\$firefox->sleep_time_in_ms() is 5 milliseconds");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
+	SKIP: {
+		if (!grep /^set_window_rect$/, $capabilities->enumerate()) {
+			diag("\$capabilities->set_window_rect is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->set_window_rect is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->set_window_rect() =~ /^[10]$/smx, "\$capabilities->set_window_rect() is a 0 or 1");
+	}
+	SKIP: {
+		if (!grep /^unhandled_prompt_behavior$/, $capabilities->enumerate()) {
+			diag("\$capabilities->unhandled_prompt_behavior is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->unhandled_prompt_behavior is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->unhandled_prompt_behavior() eq 'accept and notify', "\$capabilities->unhandled_prompt_behavior() is 'accept and notify'");
+	}
+	SKIP: {
+		if (!grep /^moz_shutdown_timeout$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_shutdown_timeout is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_shutdown_timeout is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_shutdown_timeout() =~ /^\d+$/smx, "\$capabilities->moz_shutdown_timeout() is an integer");
+	}
+	SKIP: {
+		if (!grep /^strict_file_interactability$/, $capabilities->enumerate()) {
+			diag("\$capabilities->strict_file_interactability is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->strict_file_interactability is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->strict_file_interactability() == 1, "\$capabilities->strict_file_interactability() is set to true");
+	}
 	SKIP: {
 		if (!grep /^page_load_strategy$/, $capabilities->enumerate()) {
 			diag("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version());
@@ -690,14 +730,13 @@ SKIP: {
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
 	ok($firefox->go(URI->new("https://metacpan.org/")), "https://metacpan.org/ has been loaded");
 }
-
 SKIP: {
 	($skip_message, $firefox) = start_firefox(0, debug => 0, script => 5432, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 243);
+		skip($skip_message, 244);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -1234,6 +1273,7 @@ SKIP: {
 	ok($firefox->delete_cookies() && ((scalar $firefox->cookies()) == 0), "\$firefox->delete_cookies() clears all cookies");
 	my $capabilities = $firefox->capabilities();
 	my $buffer = undef;
+	ok($firefox->selfie(raw => 1) =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->selfie(raw => 1) returns a PNG image");
 	my $handle = $firefox->selfie();
 	$handle->read($buffer, 20);
 	ok($buffer =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->selfie() returns a PNG file");

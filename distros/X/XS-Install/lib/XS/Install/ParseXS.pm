@@ -21,7 +21,8 @@ my $re_comment_single = qr#//[^\n]*\n#;
 my $re_comment_multi  = qr#/\*.*?\*/#ms;
 my $re_ignored = qr/(?:$re_quot|$re_comment_single|$re_comment_multi)/ms;
 my $re_braces = qr#(?<braces>\{(?>[^/"'{}]+|$re_ignored|(?&braces)|/)*\})#ms;
-our $re_xsub   = qr/(XS_EUPXS\(XS_[a-zA-Z0-9_]+\))[^{]+($re_braces)/ms;
+our $re_xsub = qr/(XS_EUPXS\(XS_[a-zA-Z0-9_]+\))[^{]+($re_braces)/ms;
+our $re_boot = qr/(XS_EXTERNAL\(boot_[a-zA-Z0-9_]+\))[^{]+($re_braces)/ms; 
 
 sub add_pre_callback        { push @pre_callbacks, shift; }
 sub add_post_callback       { push @CatchEnd::post_callbacks, shift; }
@@ -369,7 +370,12 @@ sub default_constructor {
         select $orig_stdout;
 
         $out =~ s/^MODE\s*:.+//mg;
+        
+        # remove XS function C-prototype (it causes warnings on many compilers)
         $out =~ s/XS_EUPXS\(XS_[a-zA-Z0-9_]+\);.*\n/\n/mg;
+        
+        # remove XS BOOT function C-prototype
+        $out =~ s/XS_EXTERNAL\(boot_[a-zA-Z0-9_]+\);.*\n/\n/mg;
 
         XS::Install::ParseXS::call(\@post_callbacks, \$out);
         print $out;

@@ -12,14 +12,14 @@
          "rdfs:comment" : "The anatomy of the underlying organ system or structures associated with this entity.",
          "rdfs:label" : "associatedAnatomy",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:PhysicalActivity"
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
+            "schema:AnatomicalStructure",
             "schema:AnatomicalSystem",
-            "schema:SuperficialAnatomy",
-            "schema:AnatomicalStructure"
+            "schema:SuperficialAnatomy"
          ]
       },
       "schema:category" : {
@@ -29,17 +29,17 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:PhysicalActivity",
             "schema:Product",
-            "schema:ActionAccessSpecification",
+            "schema:PhysicalActivity",
             "schema:Offer",
-            "schema:Invoice"
+            "schema:ActionAccessSpecification",
+            "schema:Invoice",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:Thing",
             "schema:PhysicalActivityCategory",
-            "schema:Thing"
+            "schema:Text"
          ]
       },
       "schema:epidemiology" : {

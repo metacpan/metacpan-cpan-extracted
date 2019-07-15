@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -584,7 +584,7 @@ sub _initialise_version {
         my $binary         = $self->_binary();
         my $version_string = $self->execute( $binary, '--version' );
         if ( $version_string =~
-            /Mozilla[ ]Firefox[ ](\d+)[.](\d+)(?:[.](\d+))?\s*$/smx )
+            /Mozilla[ ]Firefox[ ](\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?\s*$/smx )
 
 # not anchoring the start of the regex b/c of issues with
 # RHEL6 and dbus crashing with error messages like
@@ -1353,36 +1353,28 @@ sub _new_session_parameters {
         && ( ref $capabilities )
         && ( ref $capabilities eq 'Firefox::Marionette::Capabilities' ) )
     {
-        my $actual = {};
-        if ( defined $capabilities->accept_insecure_certs() ) {
-
-            $actual->{acceptInsecureCerts} =
-              $capabilities->accept_insecure_certs()
-              ? JSON::true()
-              : JSON::false();
+        my $actual   = {};
+        my %booleans = (
+            set_window_rect             => 'setWindowRect',
+            accept_insecure_certs       => 'acceptInsecureCerts',
+            moz_webdriver_click         => 'moz:webdriverClick',
+            strict_file_interactability => 'strictFileInteractability',
+            moz_use_non_spec_compliant_pointer_origin =>
+              'moz:useNonSpecCompliantPointerOrigin',
+            moz_accessibility_checks => 'moz:accessibilityChecks',
+        );
+        foreach my $method ( sort { $a cmp $b } keys %booleans ) {
+            if ( defined $capabilities->$method() ) {
+                $actual->{ $booleans{$method} } =
+                  $capabilities->$method() ? JSON::true() : JSON::false();
+            }
         }
         if ( defined $capabilities->page_load_strategy() ) {
             $actual->{pageLoadStrategy} = $capabilities->page_load_strategy();
         }
-        if ( defined $capabilities->moz_webdriver_click() ) {
-            $actual->{'moz:webdriverClick'} =
-              $capabilities->moz_webdriver_click()
-              ? JSON::true()
-              : JSON::false();
-        }
-        if (
-            defined $capabilities->moz_use_non_spec_compliant_pointer_origin() )
-        {
-            $actual->{'moz:useNonSpecCompliantPointerOrigin'} =
-              $capabilities->moz_use_non_spec_compliant_pointer_origin()
-              ? JSON::true()
-              : JSON::false();
-        }
-        if ( defined $capabilities->moz_accessibility_checks() ) {
-            $actual->{'moz:accessibilityChecks'} =
-              $capabilities->moz_accessibility_checks()
-              ? JSON::true()
-              : JSON::false();
+        if ( defined $capabilities->unhandled_prompt_behavior() ) {
+            $actual->{unhandledPromptBehavior} =
+              $capabilities->unhandled_prompt_behavior();
         }
         if ( $capabilities->proxy() ) {
             $actual->{proxy} = $self->_request_proxy( $capabilities->proxy() );
@@ -1537,6 +1529,20 @@ sub _get_optional_capabilities {
     if ( defined $parameters->{'moz:accessibilityChecks'} ) {
         $optional{moz_accessibility_checks} =
           $parameters->{'moz:accessibilityChecks'} ? 1 : 0;
+    }
+    if ( defined $parameters->{strictFileInteractability} ) {
+        $optional{strict_file_interactability} =
+          $parameters->{strictFileInteractability} ? 1 : 0;
+    }
+    if ( defined $parameters->{'moz:shutdownTimeout'} ) {
+        $optional{moz_shutdown_timeout} = $parameters->{'moz:shutdownTimeout'};
+    }
+    if ( defined $parameters->{unhandledPromptBehavior} ) {
+        $optional{unhandled_prompt_behavior} =
+          $parameters->{unhandledPromptBehavior};
+    }
+    if ( defined $parameters->{setWindowRect} ) {
+        $optional{set_window_rect} = $parameters->{setWindowRect} ? 1 : 0;
     }
     if ( defined $parameters->{'moz:webdriverClick'} ) {
         $optional{moz_webdriver_click} =
@@ -2486,6 +2492,11 @@ sub selfie {
     if ( $extra{hash} ) {
         return $self->_response_result_value($response);
     }
+    elsif ( $extra{raw} ) {
+        my $content = $self->_response_result_value($response);
+        $content =~ s/^data:image\/png;base64,//smx;
+        return MIME::Base64::decode_base64($content);
+    }
     else {
         my $handle = File::Temp::tempfile(
             File::Spec->catfile(
@@ -3120,21 +3131,8 @@ sub json {
 sub strip {
     my ($self)  = @_;
     my $content = $self->html();
-    my $header  = quotemeta
-'<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="alternate stylesheet" type="text/css" href="resource://gre-resources/plaintext.css" title="Wrap Long Lines" /></head><body><pre>';
-    my $footer = quotemeta '</pre></body></html>';
-    $content =~ s/^$header(.*)$footer$/$1/smx;
-    $header = quotemeta
-'<html><head><link rel="alternate stylesheet" type="text/css" href="resource://content-accessible/plaintext.css" title="Wrap Long Lines"></head><body><pre>';
-    $content =~ s/^$header(.*)$footer$/$1/smx;
-    $header = quotemeta
-'<html><head><link rel="alternate stylesheet" type="text/css" href="resource://gre-resources/plaintext.css" title="Wrap Long Lines"></head><body><pre>';
-    $content =~ s/^$header(.*)$footer$/$1/smx;
-    $header = quotemeta
-'<html><head><link rel="alternate stylesheet" type="text/css" href="resource://content-accessible/plaintext.css" title="Wrap Long Lines"></head><body><pre>';
-    $content =~ s/^$header(.*)$footer$/$1/smx;
-    $header = quotemeta
-'<html xmlns="http://www.w3.org/1999/xhtml"><head><link title="Wrap Long Lines" href="resource://gre-resources/plaintext.css" type="text/css" rel="alternate stylesheet" /></head><body><pre>';
+    my $header  = qr/<html[^>]*><head><link[^>]+><\/head><body><pre>/smx;
+    my $footer  = qr/<\/pre><\/body><\/html>/smx;
     $content =~ s/^$header(.*)$footer$/$1/smx;
     return $content;
 }
@@ -3599,7 +3597,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =head1 SYNOPSIS
 
@@ -4193,6 +4191,8 @@ The parameters after the L<element|Firefox::Marionette::Element> parameter are t
 =item * hash - return a SHA256 hex encoded digest of the PNG image rather than the image itself
 
 =item * full - take a screenshot of the whole document unless the first L<element|Firefox::Marionette::Element> parameter has been supplied.
+
+=item * raw - rather than a file handle containing the screenshot, the binary PNG image will be returned.
 
 =item * scroll - scroll to the L<element|Firefox::Marionette::Element> supplied
 

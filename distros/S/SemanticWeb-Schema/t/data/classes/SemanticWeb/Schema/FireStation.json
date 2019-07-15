@@ -4,8 +4,8 @@
       "rdfs:comment" : "A fire station. With firemen.",
       "rdfs:label" : "FireStation",
       "rdfs:subClassOf" : [
-         "schema:CivicStructure",
-         "schema:EmergencyService"
+         "schema:EmergencyService",
+         "schema:CivicStructure"
       ]
    },
    "properties" : {}

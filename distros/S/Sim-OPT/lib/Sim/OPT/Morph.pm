@@ -58,7 +58,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.105'; # our $VERSION = '';
+$VERSION = '0.109'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH
@@ -2380,8 +2380,17 @@ sub change_thickness
 	{
 		foreach my $entrypair_to_change ( @entries_to_change )
 		{   #say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; say $tee "\$countstep: " . dump( $countstep ) ; say $tee "\$stepsvar: " . dump( $stepsvar ) ;
-			my $group_to_change = $entrypair_to_change->[0];
-			my $entry_to_change = $entrypair_to_change->[1];
+
+			if ( not( ref( $entrypair_to_change ) ) )
+			{
+				$entry_to_change = $entrypair_to_change;
+			}
+			else
+			{
+				my $group_to_change = $entrypair_to_change->[0];
+				my $entry_to_change = $entrypair_to_change->[1];
+			}
+
 			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; #say $tee "\@strata_to_change: " . dump( @strata_to_change ) ;
 			$countstrata = 0;
 			foreach $stratum_to_change ( @strata_to_change )
@@ -2395,7 +2404,35 @@ sub change_thickness
 				my $layers = ( i => 1, j => 2, k => 3, l => 4, m => 5, n => 6, o => 7, p => 8, q => 9, r => 10, s => 11, t => 12, u => 13, v => 14, w => 15 );
 
 
-                my $printthis = "prj $launchline<<YYY
+        my $printthis;
+
+				if ( not( ref( $entrypair_to_change ) ) )
+				{
+				  $printthis = "prj $launchline<<YYY
+b
+b
+e
+a
+$entry_to_change
+$stratum_to_change
+n
+$thickness
+-
+>
+a
+y
+-
+-
+-
+y
+y
+-
+YYY
+";
+		    }
+				else
+				{
+					$printthis = "prj $launchline<<YYY
 b
 b
 e
@@ -2417,6 +2454,7 @@ y
 -
 YYY
 ";
+				}
 
 				unless ($exeonfiles eq "n")
 				{

@@ -1,0 +1,99 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI - XS::Framework C++ typemap API reference
+
+=head1 DESCRIPTION
+
+The SVAPI is I<C++ perl API> makes it convenient to write C++ XS-code. Out of
+the box Perl offers only C API for Perl interpreter, SVAPI tries to fill that
+gap.
+
+We assume that all SVAPI belongs to C<xs> namespace so we omit C<xs::> name
+resolution, i.e.
+
+    using namespace xs;
+
+=head2 CLASS HIERARCHY & Overview
+
+=begin HTML
+
+<p>
+  <img src="uml.png" style="max-width:100%;">
+</p>
+
+=end HTML
+
+The type hierarhcy reflects C-type hirerachy defined by Perl. The most generic
+class is L<XS::Framework::Manual::SVAPI::Sv>, which owns underlying Perl C<SV*>.
+The direct descedant classes are L<XS::Framework::Manual::SVAPI::Sub> (callable
+Perl subroutine), L<XS::Framework::Manual::SVAPI::Array>,
+L<XS::Framework::Manual::SVAPI::Hash>, L<XS::Framework::Manual::SVAPI::Object>
+and L<XS::Framework::Manual::SVAPI::Scalar>. The L<XS::Framework::Manual::SVAPI::List>
+is defined as descendant of L<XS::Framework::Manual::SVAPI::Array>; the
+L<XS::Framework::Manual::SVAPI::Stash> (Perl package names resolver, symbol table)
+is L<XS::Framework::Manual::SVAPI::Hash>'s child.
+
+The L<XS::Framework::Manual::SVAPI::Scalar> is artificial type defined by
+L<XS::Framework>, which represents a value which can be placed in scalar
+context, as opposite to all other types above.
+
+The L<XS::Framework::Manual::SVAPI::Ref> is child class of C<Scalar>, which is
+able to point to any other Perl value (array, hash, object, glob, simple scalar
+or other reference).
+
+The L<XS::Framework::Manual::SVAPI::Simple> object is intendent to present
+Perl primitive values, i.e. string or numbers.
+
+L<XS::Framework::Manual::SVAPI::Glob> object holds a pointer to a scalar, an array, a hash etc. and usually can be found in C<Stash>'es.
+
+The rule of thumb for wrappers creation (i.e. constructor, assignment): if
+the incorrect underlying C<SV*> is supplied (e.g. C<SV*> holding a number
+is supplied for C<Object>), then exception is thrown. If C<NULL> / C<nullptr>
+is provided, then a wrapper will be empty (no exception is thrown); if an
+C<SV*> with C<undef> a wrapper also will be empty, unless C<undef> is acceptable
+value (e.g. for C<Scalar>).
+
+C<create> vs constructor difference: the C<create> methods for appropriate
+type create underlying C<SV*> in I<Perl itself> and return wrapper for it. The
+constructors just create an wrapper around already exsisting Perl <SV*>.
+
+See also
+
+L<XS::Framework::Manual::SVAPI::Sv>
+
+L<XS::Framework::Manual::SVAPI::Sub>
+
+L<XS::Framework::Manual::SVAPI::Array>
+
+L<XS::Framework::Manual::SVAPI::Glob>
+
+L<XS::Framework::Manual::SVAPI::Hash>
+
+L<XS::Framework::Manual::SVAPI::List>
+
+L<XS::Framework::Manual::SVAPI::Object>
+
+L<XS::Framework::Manual::SVAPI::Ref>
+
+L<XS::Framework::Manual::SVAPI::Scalar>
+
+L<XS::Framework::Manual::SVAPI::Simple>
+
+L<XS::Framework::Manual::SVAPI::Stash>
+
+
+=head2 MISCELLANEOUS
+
+The L<XS::Framework> supports L<threaded perl | XS::Framework::Manual::SVAPI::threads>.
+
+It is possible to use custom C++ L<XS::Framework::Manual::SVAPI::exceptions>
+as well as custom exception handler to pass them through into the Perl.
+
+The L<XS::Framework::Manual::SVAPI::CallProxy> class describes context-aware Perl
+subroutine invocation details.
+
+If you need custom C++ hook on Perl destruction, please refer
+L<XS::Framework::Manual::SVAPI::perl_destroy>.
+
+=cut
+

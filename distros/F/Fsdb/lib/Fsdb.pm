@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.65';
+our $VERSION = '2.67';
 
 =head1 SYNOPSIS
 
@@ -235,21 +235,29 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.65, 2018-02-16
-Minor release, bug fix and -F option.
+=head2 2.67, 2019-07-10
+summary tdb
 
 =over 4
 
-=item ENHANCEMENT
+=item IMPROVEMENT
 
-L<dbmultistats> and L<dbmapreduce> now both take a C<-F x> option
-to set the field separator.
+L<dbformmail> now has an "mh" mechanism that writes messages to 
+individual files (an mh-style mailbox).
 
 =item BUG FIX
 
-Fixed missing C<use Carp> in L<dbcolstats>.
-Also went back and cleaned up all uses of C<croak()>.
-Thanks to Zefram for the bug report.
+L<dbrow> failed to include the Carp library, leading to fails on croak.
+
+=item BUG FIX
+
+Fixed L<dbjoin> error message for an unsorted right stream was incorrect
+(it said left).
+
+=item IMPROVEMENT
+
+All Fsdb programs can now read from and write to HDFS,
+when files that start with "hdfs:" are given to -i and -o options.
 
 =back
 
@@ -449,6 +457,11 @@ to do powerful things.
 converts "John_Heidemann" into "Heidemann,_John".
 Not too much more work could split fullname into firstname and lastname
 fields.
+
+(Or:
+
+	cat DATA/passwd | dbcolcreate sort | dbroweval -b 'use Fsdb::Support'
+		'_sort = _fullname; _sort =~ s/_/ /g; _sort = fullname_to_sort(_sort);'
 
 
 =head1 TALKING ABOUT COLUMNS
@@ -1081,6 +1094,20 @@ UCLA and several at ISI.  In February 1998 it was announced to the
 Internet.  Since then it has found a few users, some outside where I
 work.
 
+Major changes: 
+
+=over 4
+
+=item 1.0 1997-07-22: first public release.
+
+=item 2.0 2008-01-25: rewrite to use a common library, and starting to use threads.
+
+=item 2.12 2008-10-16: completion of the rewrite, and first RPM package.
+
+=item 2.44 2013-10-02: abandoning threads for improved performance
+
+=back
+
 =head2 Fsdb 2.0 Rationale
 
 I've thought about fsdb-2.0 for many years, but it was started
@@ -1158,7 +1185,8 @@ Michael McQuaid,
 Christopher Meng,
 Calvin Ardi,
 H. Merijn Brand,
-Lan Wei.
+Lan Wei,
+Hang Guo.
 
 Fsdb includes datasets contributed from NIST (F<DATA/nist_zarr13.fsdb>),
 from
@@ -3466,6 +3494,47 @@ Now L<dbcolstats> and L<dbmultistats> produce no output
 Previously they gave a null row of output.
 The C<--output-on-no-input> and C<--no-output-on-no-input> 
 options can control this behavior.
+
+=back
+
+=head2 2.65, 2018-02-16
+Minor release, bug fix and -F option.
+
+=over 4
+
+=item ENHANCEMENT
+
+L<dbmultistats> and L<dbmapreduce> now both take a C<-F x> option
+to set the field separator.
+
+=item BUG FIX
+
+Fixed missing C<use Carp> in L<dbcolstats>.
+Also went back and cleaned up all uses of C<croak()>.
+Thanks to Zefram for the bug report.
+
+=back
+
+=head2 2.66, 2018-12-20
+Critical bug fix in dbjoin.
+
+=over 4
+
+=item BUG FIX
+
+Removed old tests from MANIFEST.  (Thanks to Hang Guo for reporting this bug.)
+
+=item IMPROVEMENT
+
+Errors for non-existing input files now include the bad filename
+(before: "cannot setup filehandle", now: "cannot open input: cannot
+open TEST/bad_filename").
+
+=item BUG FIX
+
+Hash joins with three identical rows were failing with the assertion
+failure "internal error: confused about overflow" due to a now-fixed
+bug.
 
 =back
 

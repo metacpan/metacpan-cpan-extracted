@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -76,11 +76,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::GSG" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GSG.pm",
-         "version" : "v0.0.11"
+         "version" : "v0.0.12"
       },
       "Dist::Zilla::PluginBundle::Author::GSG" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GSG.pm",
-         "version" : "v0.0.11"
+         "version" : "v0.0.12"
       }
    },
    "release_status" : "stable",
@@ -94,12 +94,12 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
       }
    },
-   "version" : "0.0.11",
+   "version" : "0.0.12",
    "x_contributors" : [
       "Andrew Fresh <andrew.fresh@grantstreet.com>",
       "Mark Flickinger <mark.flickinger@grantstreet.com>"
    ],
-   "x_generated_by_perl" : "v5.24.4",
+   "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "JSON::XS version 3.04",
    "x_static_install" : 1
 }

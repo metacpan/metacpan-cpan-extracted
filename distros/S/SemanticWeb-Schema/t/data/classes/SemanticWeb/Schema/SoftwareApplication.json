@@ -75,8 +75,8 @@
          "rdfs:label" : "featureList",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:fileSize" : {
@@ -140,8 +140,8 @@
          "rdfs:label" : "requirements",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ],
          "schema:supersededBy" : "schema:softwareRequirements"
       },
@@ -151,8 +151,8 @@
          "rdfs:label" : "screenshot",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:URL"
          ]
       },
       "schema:softwareAddOn" : {
@@ -175,8 +175,8 @@
          "rdfs:label" : "softwareRequirements",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:softwareVersion" : {

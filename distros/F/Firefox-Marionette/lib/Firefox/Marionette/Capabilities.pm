@@ -3,7 +3,7 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -92,6 +92,26 @@ sub moz_build_id {
     return $self->{moz_build_id};
 }
 
+sub strict_file_interactability {
+    my ($self) = @_;
+    return $self->{strict_file_interactability};
+}
+
+sub moz_shutdown_timeout {
+    my ($self) = @_;
+    return $self->{moz_shutdown_timeout};
+}
+
+sub unhandled_prompt_behavior {
+    my ($self) = @_;
+    return $self->{unhandled_prompt_behavior};
+}
+
+sub set_window_rect {
+    my ($self) = @_;
+    return $self->{set_window_rect};
+}
+
 sub proxy {
     my ($self) = @_;
     return $self->{proxy};
@@ -106,7 +126,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =head1 SYNOPSIS
 
@@ -160,6 +180,9 @@ To temporarily disable the WebDriver conformant behavior use 0 as value for this
 
 Please note that this capability exists only temporarily, and that it will be removed once all Selenium bindings can handle the new behavior.
 
+=item * strict_file_interactability - a boolean value to indicate if interactability checks will be applied to <input type=file>. Allowed values are 1 or 0.  Default is 0.
+
+=item * unhandled_prompt_behavior - defines what firefox should do on encountering a L<user prompt|https://html.spec.whatwg.org/#user-prompts>.  There are a range of L<allowed values|https://w3c.github.io/webdriver/#dfn-user-prompt-handler>, including "dismiss", "accept", "dismiss and notify", "accept and notify" and "ignore".
 
 =back
 
@@ -208,6 +231,22 @@ returns the directory that contains the browsers profile
 =head2 moz_build_id
 
 returns the L<Firefox BuildId|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/buildID>
+
+=head2 strict_file_interactability
+
+returns the current value of L<strictFileInteractability|https://w3c.github.io/webdriver/#dfn-strict-file-interactability>
+
+=head2 unhandled_prompt_behavior
+
+returns the current value of L<unhandledPromptBehavior|https://w3c.github.io/webdriver/#dfn-user-prompt-handler>.  
+
+=head2 set_window_rect
+
+returns true if Firefox fully supports L<setWindowRect|https://w3c.github.io/webdriver/#dfn-window-dimensioning-positioning>, otherwise it returns false.
+
+=head2 moz_shutdown_timeout
+
+returns the value of L<moz:shutdownTimeout|https://github.com/mozilla/gecko-dev/commit/7aad85995b21bdaf440dc9dad35c5769a35e90eb#diff-48053ba06cc33be0efb2d7256a1affd9> (aka the value of config toolkit.asyncshutdown.crash_timeout)
 
 =head2 moz_webdriver_click
 

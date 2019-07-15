@@ -27,7 +27,7 @@ no_index:
 provides:
   vars::i:
     file: lib/vars/i.pm
-    version: '1.07'
+    version: '1.10'
 requires:
   Carp: '0'
   perl: '5.006'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/cxw42/Perl-vars-i/issues
   homepage: https://github.com/cxw42/Perl-vars-i
   repository: git://github.com/cxw42/Perl-vars-i.git
-version: '1.07'
+version: '1.10'
 x_contributors:
   - 'Christopher White <cxw@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package CatalystX::Resource::TraitFor::Controller::Resource::Delete;
-$CatalystX::Resource::TraitFor::Controller::Resource::Delete::VERSION = '0.02';
+$CatalystX::Resource::TraitFor::Controller::Resource::Delete::VERSION = '0.03';
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
@@ -35,7 +35,7 @@ CatalystX::Resource::TraitFor::Controller::Resource::Delete - a delete action fo
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 ACTIONS
 

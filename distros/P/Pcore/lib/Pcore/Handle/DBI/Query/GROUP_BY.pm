@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::GROUP_BY;
 
 use Pcore -const, -class;
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Lib::Scalar qw[is_ref];
 
 has _buf => ( required => 1 );    # ArrayRef
 

@@ -14,6 +14,7 @@ requires "parent" => "0";
 requires "perl" => "v5.16.0";
 requires "strict" => "0";
 requires "warnings" => "0";
+recommends "JSON5" => "0";
 recommends "JSON::MaybeXS" => "0";
 recommends "YAML::Tiny" => "0";
 

@@ -50,6 +50,21 @@ sub EXT_override_field_Display : Override('Ext.field.Display') {
     };
 }
 
+sub EXT_override_grid_plugin_ViewOptions : Override('Ext.grid.plugin.ViewOptions') {
+    return {
+        onColumnAdd => func [ 'grid', 'column' ],
+        <<~'JS',
+            var text = column.getText();
+
+            if (Ext.isObject(text)) {
+                column.setText('' + text);
+            }
+
+            this.callParent(arguments);
+JS
+    };
+}
+
 1;
 __END__
 =pod

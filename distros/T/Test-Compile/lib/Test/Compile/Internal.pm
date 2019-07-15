@@ -3,10 +3,11 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.2.1");
+use version; our $VERSION = qv("v2.2.2");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
+use IPC::Open3 ();
 
 =head1 NAME
 
@@ -298,20 +299,23 @@ sub skip_all {
 sub _run_command {
     my ($self, $cmd) = @_;
 
-    my $pid = open my $fh, "-|" // die "$0: fork: $!";
-    if ($pid == 0) {
-        open STDERR, ">&STDOUT" or die "$0: dup: $!";
-        exec $cmd               or die "$0: exec: $!";
+    my ($stdout, $stderr);
+    my $pid = IPC::Open3::open3(0, $stdout, $stderr, $cmd)
+        or die "open3() failed $!";
+
+    my $output;
+    for my $handle ( $stdout, $stderr ) {
+	if ( $handle ) {
+            while ( my $line = <$handle> ) {
+                push @$output, $line;
+            }
+        }
     }
 
-    wait();
-    my $ok = ($? == 0 ? 1 : 0);
-    my $output;
-    while (my $line = <$fh>) {
-        chomp($line);
-        push @$output, $line;
-    }
-    return ($ok, $output);
+    waitpid($pid, 0);
+    my $success = ($? == 0 ? 1 : 0);
+
+    return ($success, $output);
 }
 
 # Works it's way through the input array (files and/or directories), recursively

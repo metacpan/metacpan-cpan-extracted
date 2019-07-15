@@ -39,7 +39,7 @@ were generated automatically from the following sources:
 
 =over
 
-[% FOREACH uri IN sources %]
+[% FOREACH uri IN sources.sort %]
 =item L<[% uri %]>
 [% END -%]
 

@@ -16,7 +16,6 @@ $args = XS::Install::makemaker_args(NAME => 'TestMod', CPLUS => 1, XSOPT => 'jop
 is($args->{CC}, 'c++');
 is($args->{LD}, '$(CC)');
 like $args->{XSOPT}, qr/-C\+\+/;
-like $args->{XSOPT}, qr/-csuffix \.cc/;
 like $args->{XSOPT}, qr/-hiertype/;
 like $args->{XSOPT}, qr/jopanah/;
 like($args->{CCFLAGS}, qr/-std=c\+\+11/);

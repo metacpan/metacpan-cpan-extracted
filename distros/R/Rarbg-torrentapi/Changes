@@ -1,5 +1,9 @@
 Revision history for Rarbg-torrentapi
 
+v0.1.9  2019-07-10 10:42:27 CEST
+        - better handling the api request limit thanks to Baptiste C.
+        - Added list of categories to docs.
+
 v0.1.8  2018-11-17 19:47:42 CET
         - search by tvrage id is deprecated
         - you can now search by themoviedb id

@@ -20,7 +20,18 @@
          "schema:domainIncludes" : "schema:Course",
          "schema:rangeIncludes" : [
             "schema:Course",
-            "schema:AlignmentObject",
+            "schema:Text",
+            "schema:AlignmentObject"
+         ]
+      },
+      "schema:educationalCredentialAwarded" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A description of the qualification, award, certificate, diploma or other educational credential awarded as a consequence of successful completion of this course.",
+         "rdfs:label" : "educationalCredentialAwarded",
+         "schema:domainIncludes" : "schema:Course",
+         "schema:rangeIncludes" : [
+            "schema:EducationalOccupationalCredential",
+            "schema:URL",
             "schema:Text"
          ]
       },

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has about => (
@@ -738,7 +738,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -788,7 +788,7 @@ A access_mode_sufficient should be one of the following types:
 
 =over
 
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
 
 =back
 
@@ -971,9 +971,9 @@ A author should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1081,9 +1081,9 @@ A content_rating should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Rating']>
+
+=item C<Str>
 
 =back
 
@@ -1095,9 +1095,9 @@ A contributor should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1363,9 +1363,9 @@ A funder should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1477,19 +1477,18 @@ A is_accessible_for_free should be one of the following types:
 
 C<isBasedOn>
 
-A resource that was used in the creation of this resource. This term can be
-repeated for multiple sources. For example,
-http://example.com/great-multiplication-intro.html.
+A resource from which this work is derived or from which it is a
+modification or adaption.
 
 A is_based_on should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =item C<Str>
-
-=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
 
@@ -1505,11 +1504,11 @@ A is_based_on_url should be one of the following types:
 
 =over
 
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
-=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+=item C<Str>
 
 =back
 
@@ -1678,9 +1677,9 @@ A producer should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1765,9 +1764,9 @@ A publishing_principles should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
 
 =back
 
@@ -1903,9 +1902,9 @@ A sponsor should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1988,7 +1987,7 @@ A thumbnail_url should be one of the following types:
 C<timeRequired>
 
 Approximate or typical time it takes to work with or through this learning
-resource for the typical intended target audience, e.g. 'P30M', 'P1H25M'.
+resource for the typical intended target audience, e.g. 'PT30M', 'PT1H25M'.
 
 A time_required should be one of the following types:
 
@@ -2023,9 +2022,9 @@ A translator should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

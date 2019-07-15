@@ -1,0 +1,76 @@
+MODE: INLINE
+
+template <int i>
+struct _MyConst {
+    int val;
+    _MyConst (int arg) : val(arg) {}
+    int get_val () const { return val; }
+    virtual _MyConst* clone () const { return new _MyConst(val); }
+    virtual ~_MyConst () { dcnt.c++; }
+};
+
+using MyConst  = _MyConst<0>;
+using MyConst2 = _MyConst<1>;
+
+namespace xs {
+    template <class TYPE> struct Typemap<MyConst*, TYPE> : TypemapObject<MyConst*, TYPE, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::MyConst"; }
+    };
+
+    template <class TYPE> struct Typemap<MyConst2*, TYPE> : TypemapObject<MyConst2*, TYPE, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::MyConst2"; }
+        static Sv out (pTHX_ TYPE var, const Sv& proto = {}) {
+            var->val = 555;
+            return TypemapObject<MyConst2*, TYPE, ObjectTypePtr, ObjectStorageMG>::out(aTHX_ var, proto);
+        }
+    };
+    template <class TYPE> struct Typemap<const MyConst2*, TYPE> : TypemapObject<const MyConst2*, TYPE, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::MyConst2"; }
+    };
+}
+
+
+MODULE = MyTest::Typemap                PACKAGE = MyTest::MyConst
+PROTOTYPES: DISABLE
+
+MyConst* new (SV*, int arg)
+
+const MyConst* new_const (SV*, int arg) {
+    RETVAL = new MyConst(arg);
+}
+
+int MyConst::get_val () : const
+
+void MyConst::set_val (SV* newval) { THIS->val = SvIV(newval); }
+
+void MyConst::set_from (const MyConst* other) { if (other) THIS->val = other->val; }
+
+void MyConst::DESTROY () : const {
+    dcnt.perl++;
+}
+
+
+MODULE = MyTest::Typemap                PACKAGE = MyTest::MyConst2
+PROTOTYPES: DISABLE
+
+MyConst2* new (SV*, int arg)
+
+const MyConst2* new_const (SV*, int arg) {
+    RETVAL = new MyConst2(arg);
+}
+
+int MyConst2::get_val () : const {
+    RETVAL = THIS->val;
+}
+
+void MyConst2::set_val (SV* newval) {
+    THIS->val = SvIV(newval);
+}
+
+void MyConst2::set_from (const MyConst2* other) {
+    if (other) THIS->val = other->val;
+}
+
+void MyConst2::DESTROY () : const {
+    dcnt.perl++;
+}

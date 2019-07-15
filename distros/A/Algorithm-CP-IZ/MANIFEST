@@ -1,12 +1,19 @@
 Changes
+cpanfile
 fallback/const-c.inc
 fallback/const-xs.inc
 IZ.xs
 lib/Algorithm/CP/IZ.pm
+lib/Algorithm/CP/IZ/CriteriaValueSelector.pm
 lib/Algorithm/CP/IZ/FindFreeVar.pm
 lib/Algorithm/CP/IZ/Int.pm
+lib/Algorithm/CP/IZ/NoGoodElement.pm
+lib/Algorithm/CP/IZ/NoGoodSet.pm
+lib/Algorithm/CP/IZ/ParamValidator.pm
 lib/Algorithm/CP/IZ/RefIntArray.pm
 lib/Algorithm/CP/IZ/RefVarArray.pm
+lib/Algorithm/CP/IZ/SearchNotify.pm
+lib/Algorithm/CP/IZ/ValueSelector.pm
 Makefile.PL
 MANIFEST
 ppport.h
@@ -16,6 +23,11 @@ t/01int.t
 t/02search.t
 t/03demon.t
 t/04constraint.t
+t/05error.t
+t/06stringify.t
+t/07vs.t
+t/08ng.t
+t/09notify.t
 t/number-place.t
 t/send-more-money.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

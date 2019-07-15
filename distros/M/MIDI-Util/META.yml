@@ -20,6 +20,8 @@ meta-spec:
   version: '1.4'
 name: MIDI-Util
 requires:
+  MIDI: '0'
+  MIDI::Event: '0'
   MIDI::Simple: '0'
   MIDI::Track: '0'
   Music::Tempo: '0'
@@ -29,7 +31,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MIDI-Util
   repository: https://github.com/ology/MIDI-Util
-version: '0.0300'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -329,4 +331,4 @@ x_Dist_Zilla:
     version: '6.012'
 x_authority: cpan:GENE
 x_generated_by_perl: v5.27.7
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Hmmer::Model::Temporary;
 # ABSTRACT: Internal class for HMMER3 driver
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Drivers::Hmmer::Model::Temporary::VERSION = '0.181160';
+$Bio::MUST::Drivers::Hmmer::Model::Temporary::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
@@ -11,6 +11,7 @@ use feature qw(say);
 use Carp;
 use File::Temp qw(tempfile);
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class;
 
 extends 'Bio::MUST::Core::Ali::Temporary';
@@ -47,9 +48,13 @@ sub _build_args {
 sub _build_model {
     my $self = shift;
 
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Hmmer')->new;
+       $app->meet();
+
     # skip model creation if no seqs
     unless ($self->count_seqs) {
-        carp 'Warning: no sequence provided; returning without model!';
+        carp '[BMD] Warning: no sequence provided; returning without model!';
         return;
     }
 
@@ -69,7 +74,8 @@ sub _build_model {
     # try to robustly execute hmmbuild
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Warning: cannot execute $pgm command; returning without model!";
+        carp "[BMD] Warning: cannot execute $pgm command;"
+            . ' returning without model!';
         return;
     }
 
@@ -91,7 +97,7 @@ Bio::MUST::Drivers::Hmmer::Model::Temporary - Internal class for HMMER3 driver
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

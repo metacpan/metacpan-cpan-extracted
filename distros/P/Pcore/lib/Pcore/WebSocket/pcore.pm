@@ -2,9 +2,9 @@ package Pcore::WebSocket::pcore;
 
 use Pcore -class, -const, -res;
 use Pcore::WebSocket::pcore::Request;
-use Pcore::Util::Data qw[to_b64];
-use Pcore::Util::UUID qw[uuid_v1mc_str];
-use Pcore::Util::Scalar qw[is_callback weaken is_plain_arrayref is_plain_coderef];
+use Pcore::Lib::Data qw[to_b64];
+use Pcore::Lib::UUID qw[uuid_v1mc_str];
+use Pcore::Lib::Scalar qw[is_callback weaken is_plain_arrayref is_plain_coderef];
 use Clone qw[];
 
 with qw[Pcore::WebSocket::Handle];
@@ -34,8 +34,8 @@ const our $TX_TYPE_AUTH  => 'auth';
 const our $TX_TYPE_EVENT => 'event';
 const our $TX_TYPE_RPC   => 'rpc';
 
-my $CBOR = Pcore::Util::Data::get_cbor();
-my $JSON = Pcore::Util::Data::get_json( utf8 => 1 );
+my $CBOR = Pcore::Lib::Data::get_cbor();
+my $JSON = Pcore::Lib::Data::get_json( utf8 => 1 );
 
 sub auth ( $self, $token, $bindings = undef ) {
     die q[Connection is not ready] if !$self->{is_ready};
@@ -254,7 +254,7 @@ sub _on_message ( $self, $msg ) {
                     if ( my $cb = delete $self->{_req_cb}->{ $tx->{tid} } ) {
 
                         # convert result to response object
-                        $cb->( bless $tx->{result}, 'Pcore::Util::Result::Class' );
+                        $cb->( bless $tx->{result}, 'Pcore::Lib::Result::Class' );
                     }
                 }
             }
@@ -326,7 +326,7 @@ sub _on_auth_response ( $self, $tx ) {
     $self->{is_ready} = 1;
 
     # create and store auth object
-    $self->{auth} = bless $tx->{auth}, 'Pcore::Util::Result::Class';
+    $self->{auth} = bless $tx->{auth}, 'Pcore::Lib::Result::Class';
 
     # set events listeners
     $self->_bind_events( $tx->{bindings} ) if defined $tx->{bindings};

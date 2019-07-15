@@ -40,6 +40,7 @@
             "IO::Socket::SSL" : "0",
             "JSON" : "2.9",
             "MIME::Base64" : "3.11",
+            "Module::Runtime" : "0",
             "X::Tiny" : "0.12",
             "autodie" : "0",
             "constant" : "1.23",
@@ -70,6 +71,6 @@
          "web" : "https://github.com/FGasper/p5-Net-ACME2"
       }
    },
-   "version" : "0.27",
+   "version" : "0.29",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

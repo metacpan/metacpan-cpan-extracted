@@ -57,7 +57,7 @@ sub run ( $self ) {
     return $res if !$res;
 
     # load settings
-    $res = $self->{util}->load_settings;
+    $res = $self->{util}->settings_load;
 
     # run local nodes
     print 'Starting nodes ... ';

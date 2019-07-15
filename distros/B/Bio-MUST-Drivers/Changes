@@ -1,3 +1,15 @@
+0.191910  2019-07-10 15:50:22+02:00 Europe/Rome
+    Additions
+      - all: now try to install external dependencies using Homebrew
+      - Cap3: added support for optional args to constructor
+      - CdHit: added autoselection of cd-hit-est for nt seqs
+    Changes
+      - all: improved warning and error messages (now prefixed by [BMD])
+      - Blast: now explicitly requires perl-5.18
+    Fixes
+      - Hmmer: updated tests to HMMER 3.2.1
+      - Cap3: fixed inconsistent contig names between seqs and clusters
+
 0.181160  2018-04-26 23:43:10+02:00 Europe/Brussels
     - Additions
       - CdHit: added support for optional args to constructor

@@ -2,7 +2,7 @@ package Datahub::Factory::Command::index;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use parent 'Datahub::Factory::Cmd';
 
@@ -76,8 +76,6 @@ sub execute {
     try {
         $indexer_module->index();
         $self->success('Indexing job completed.');
-        $indexer_module->commit();
-        $self->success('Commit job completed.');
     } catch {
         my $error = ($_->can('message')) ? $_->message : $_;
 

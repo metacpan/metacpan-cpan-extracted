@@ -2,7 +2,7 @@ package Pcore::Node::Node;
 
 use Pcore -res;
 use Pcore::Node;
-use Pcore::Util::Data qw[to_cbor];
+use Pcore::Lib::Data qw[to_cbor];
 use if $MSWIN, 'Win32API::File';
 use Symbol;
 

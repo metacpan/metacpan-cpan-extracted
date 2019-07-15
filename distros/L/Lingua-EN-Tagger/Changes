@@ -1,5 +1,8 @@
 Revision history for Perl extension Lingua::EN::Tagger
 
+0.31            Aaron Coburn            7/12/19
+        Fix memoize function
+
 0.30            Aaron Coburn            8/27/18
         Re-release without PaxHeader garbage in tar distribution.
 

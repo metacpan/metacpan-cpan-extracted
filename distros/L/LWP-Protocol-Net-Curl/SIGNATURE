@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,55 +12,57 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 01853b6d8aa6d824e08b8e76f45730374f704452 Changes
-SHA1 d57d49453ae8e1f06611a169b9958fa805fd5f83 LICENSE
-SHA1 a6c149d0b7eae1ebb33c26e82e51c1607a348cbe MANIFEST
-SHA1 f6e7dad40a4e07ddb1192052c2961ee7e3b2fc7c MANIFEST.SKIP
-SHA1 9e09e8d466607ac503ee5f7801147e881a8bbc4b META.yml
-SHA1 1c8fc5bf0820b28bb27ee8c0ca8414aecbcd8a8c Makefile.PL
-SHA1 3512c18b6f0973330854c5bd7405c78a1340ab42 README
-SHA1 6fb8decedefb6ede0fabb6b9fecaa1d0c6303687 dist.ini
-SHA1 4a4d4e8f524ae9098737c09bb5e0d992c2a752f7 eg/async.pl
-SHA1 d94d77316d4703bcf795a8cbc5d13c34ccfcd6a5 eg/benchmark.pl
-SHA1 9356cddd9b0303698d7441ad013f1b3b33606f35 lib/LWP/Protocol/Net/Curl.pm
-SHA1 41b7251366b2eeb10817591a705c1b7150308404 perlcritic.rc
-SHA1 a6b82da66eeb325db6dc67bac0c8be33bebdcb5b t/00-compile.t
-SHA1 74f7836045d68e154227ae9b963621275ee31781 t/00-load.t
-SHA1 478bae64c20fa36a7e0e811c931906d74a1c2909 t/01-simple.t
-SHA1 0febfb2e86988c58eb75850731499b108760dbc2 t/02-ua.t
-SHA1 05d375db0c65f0c02fd747f836965fe9a3ed1ce8 t/03-file.t
-SHA1 4202059c9d8ee5314fe1c2e1a45c08aa869a81ef t/04-callback.t
-SHA1 6132c9dc393ccbe720f9638e62222b04464f247e t/05-live.t
-SHA1 bdcaa7154506307da3c8bfab30327d4ca48563a1 t/06-edge.t
-SHA1 d148a8f73806bd64344d1a71f8e5304536011984 t/07-min-libcurl.t
-SHA1 3c09d6f4be9fbf09d66fd35f93cda5490bcb784c t/08-curlopt-fwd.t
-SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
-SHA1 00a59482fa74fd536a1a3ea919bbe46b0ff91ae1 t/author-eol.t
-SHA1 769c79cf1f7fead8df0a501ba706ce568ff30eb6 t/author-no-tabs.t
-SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
-SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
-SHA1 d165f8ec069354540640243399f536af695046dd t/release-distmeta.t
-SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
-SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
-SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
-SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
-SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
-SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
-SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
-SHA1 44aad671b03350a7f2d915c721dab2f1c2e068f5 t/release-synopsis.t
-SHA1 af34d5f9f8bd79b21b6c01c69e0afdd81f25c16b t/release-test-version.t
-SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
-SHA1 0e14f49aa86c16a2c24271c32101394f118d0b09 weaver.ini
+SHA256 275ddcab571807374d227215914e9fb31548b70c7c74ada0675a11b003136980 Changes
+SHA256 c0ff2601d1fc87dd367eba9c46eedf04f3c7d1749912fb5198fbdcdb0839aaf3 LICENSE
+SHA256 7e61a812a730ae986413f72dd42a2af99efe1ae48e835c391726656820318049 MANIFEST
+SHA256 8e8030da5c8e9bb2e4edd20c45a9b8251c233063e7fc66c2927ee3197b96fa7c MANIFEST.SKIP
+SHA256 9a31c05251a63ae557ae95ec30a4588722ebb329544243d5c32eee2dd1e58200 META.json
+SHA256 5f002ecc561a99795da89a53143f8abc897898fdaaba6ad731a255c80f4fd386 META.yml
+SHA256 6427e2a38b7806be0db25fd1f5723770d0a1bc2b17297f83135af671beac7b5b Makefile.PL
+SHA256 9ea97732cd07a31e2e2c1925339df9c0868d95dc2c80aaf2123f1923e92a1e7c README
+SHA256 61b5304e6f6359f4d11a512553dc6e05d80239b55a1cd0c8b6d01d68842c5a3b dist.ini
+SHA256 5f60dabdb305263c2d7f365cf7d7457d9d1e45e5c84faf7d0061501709bf3cf5 eg/async.pl
+SHA256 21afb10d3da7cb084cc68cd2c09607c34c18f2e26602190a65508fd60fc515fd eg/benchmark.pl
+SHA256 1ee6cb6097f205e109287e04c6502b36454293f144bf23f2fb00b5908fe7d41f lib/LWP/Protocol/Net/Curl.pm
+SHA256 8ec3fe9fbeffbf9d31daf69d3e9f70fe4753f1d821963af22838049403dc928d perlcritic.rc
+SHA256 8292ff927d49180ced807c556e2bda92a1b742508e0b0d17aa10eb3c67f428db t/00-compile.t
+SHA256 7ce0dc18014e9bbfde3d1b16a82486a200bc5a16f66e0652d549867fa4bf54cf t/00-load.t
+SHA256 4fc28af0e08b04898a3e3f4008cab1c5b0e05744b67ebafc442584724bcceb3e t/01-simple.t
+SHA256 8e557414aa6fdad3a75229e63d229e85694ed76aefb398a602b14a68271e9741 t/02-ua.t
+SHA256 2b4a76b27e3dd54cd6bce5e69539b5442927fd8da7d76369981d7f4ab838da79 t/03-file.t
+SHA256 49a3aedab89561bad9adf66d6344d6fbca8d6d280b67a1cd945ceede5cfc0a86 t/04-callback.t
+SHA256 cebd19e797cf432567248b8d05385bc900453a5439dc85c9fa114a143f08ce72 t/05-live.t
+SHA256 09ca318ed1c51ab1e4d940bfd116bb285cb83c4d8e04d3f52ee8fb80ccf86d57 t/06-edge.t
+SHA256 f073d8a53f0c30b94f7a2e999a4fc7cf33ab67a7c0614484e852f13131ce40f9 t/07-min-libcurl.t
+SHA256 dc35d17a44644c5e85acb89841631962df9ef7cbe066d612dd891b051a47e5ee t/08-curlopt-fwd.t
+SHA256 d58e5c4f2e2d61f37b23600a075825ae1c125754dd16408f827f415d4b35912a t/author-critic.t
+SHA256 1e162f319ee296dcd8fd072a278d1aa856639a6f3dd60e63c3b5deceadf85212 t/author-eol.t
+SHA256 914bde9f0ea3cadd6afb992b32d87f5027d1a0921b6b8fec75db045bac31956e t/author-minimum-version.t
+SHA256 d133dc41f4b627c251d87ab02df87227fbc843f8d1aceeda21afbb772741bfac t/author-mojibake.t
+SHA256 4868c704b047d24b598bb9572153abd99fabeae2e9ab56c0f463323443d1bec3 t/author-no-tabs.t
+SHA256 8a96a1b54dca225db0ffc545d4e0d58b3fd1605bece1d3e434ba1d988d479473 t/author-pod-coverage.t
+SHA256 8835ccb71da79a1b53a576dd349e188d444fce139e1f9f62976458c066b8edf9 t/author-pod-linkcheck.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 c1f29c0000903a78a9a6f6d4d84f375740d5bb333d532c0502bedbe613918127 t/author-portability.t
+SHA256 7f944176702e107521ced19e9455988b11d4a53238e95c10a68d8a598d32d716 t/author-synopsis.t
+SHA256 93c1a730291eb0f2a2ad31a7cec777d76b2753693f31b2ab7b5e920c4fe1cc44 t/author-test-version.t
+SHA256 991f0e31a0b5eacae63fc3145d6b2e6124d705a56d305bf0f25fd7dcd17e7c22 t/release-cpan-changes.t
+SHA256 bc23bad264d6d211e1a54c1a894163fe3d0733e7a6b50b76e5233d8b48a92216 t/release-dist-manifest.t
+SHA256 dfc7e9cec28d277b251510bae4eabdbc4e72397d041c11a50cdf23d566757d0a t/release-distmeta.t
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 c79f02d04a1db8a985e36276558117f21c35c660ebfafc59353679c0cb983e94 t/release-meta-json.t
+SHA256 776a34230dc8d993abebca82ac8d6cfb0bbd98c60ce98ba8273abf83fbeb057a t/release-unused-vars.t
+SHA256 e45e1a810939d80714d8ac7d4b38f58d2ff2209693ba984d7a53944dc821f9d0 weaver.ini
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJUmaAqAAoJEDlxU7ZVUpmizKUIALFX0cN8YJhtzRmKAjtmOyj3
-IuXR/1TVVirefodIr+bGZx8snw7vgm/ABRh4oXhtvO8zEoXoWMWDNLw5MjoToMgn
-HtSRz4fpfEYLyf8bmQO+YkY7oOFk/H00Lx7yKNwwXW559O9yr90fSvpqJ4hYC1xa
-KFN6JBeocLfK4KwnBdh+k1dwdX1HqF3F9/sb2DIDRCbL6nX3otpE+7JkfRKbRHh7
-3baMKS//fusVgZ3qe50O/Mb0Pp6YkTGFhAhQsM3SCLjnFxxW3A8WYA1CC9ffxonY
-KgOJEvzFKVIzNkQXruqiin8oHbtfcGgOrQjxtok4dbVX9KQQ/wNjYKnXMtkWiB8=
-=nKSa
+iQEzBAEBCAAdFiEEwuFdTvHSZXOoXyXwNSGjbXzcoH4FAl0sY0AACgkQNSGjbXzc
+oH4AZQf/a0gKfDUY6CilxTQIpJIHIkfKHayJGcFFhl/fQjycXmFJ3MQYGBBa9rMA
+JvbO4rmu6QM/oLjKawyDy72JCbsBwrCk0wL4D+FhU60JMLxv7vSXe+lW++cGT81f
+ZQqIKWkpVPGgg3A8jzS9M1OctkUZ9y9Cy+MEfK4TkZgMQqObnyuAX0sbV4EHC/Nu
+yWL1t3HPnwltut/NA0cSdLOqSaIUUNv+R2A917PWrS1MXKSXNlQQ+HJ+qSOrHDkQ
+vK+vC2hN9w5VRxpDM2BAbn4i5G7lEyPpxnuwWZf7YHF2n3SIIPKjDhyvWlzpwl9p
+dtVuA2A360uHBLLADOA8Upm+4TbCQw==
+=G0tc
 -----END PGP SIGNATURE-----

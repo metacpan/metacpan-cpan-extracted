@@ -1,0 +1,160 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Sub - XS::Framework Sub C++ class reference
+
+=head1 Sub
+
+=head2 Overview
+
+C<Sub> is C++ wrapper around callable Perl subroutine. It inherits all methods
+from C<Sv> and disables a few ones, which have no sense for the class, e.g.
+construction of C<Sub> object from array C<AV*> or coercion to C<AV*>.
+
+As the C<Sv> it might hold the underlying Perl C<SV*> or may not.
+
+=head2 Construction
+
+    static Sub noinc (SV* val)
+    static Sub noinc (CV* val)
+
+    Sub (std::nullptr_t = nullptr) {}
+    Sub (SV* sv, bool policy = INCREMENT)
+    Sub (CV* sv, bool policy = INCREMENT)
+
+The C<Sub> object can be constructed either from Perl C<CV*> or from C<SV*>, which
+is perl subroutine pointer. If the supplied C<SV*>/C<SV*> points to C<NULL> or
+C<undef>, then the object will held NULL. Otherwise, on all other invalid C<SV*>
+an exception will be thrown. The valid C<SV*> should be either C<CV*> or
+reference to C<CV*> or C<undef>.
+
+    explicit Sub (std::string_view subname, I32 flags = 0)
+
+The Perl subroutine reference can be get via string literal, please refer
+C<get_cvn_flags> in L<perlapi>. In other words, if the named Perl subroutine
+C<subname> is found, than non-empty C<Sub> object will be created, e.g.
+
+    Sub sub("MyPackage::my_fun");
+
+Copy and move-constructors are also available:
+
+    Sub (const Sub& oth)
+    Sub (Sub&& oth)
+    Sub (const Sv& oth)
+    Sub (Sv&& oth)
+    Sub (const CallProxy& p)
+
+=head2 assignment operators
+
+    Sub& operator= (SV* val)
+    Sub& operator= (CV* val)
+    Sub& operator= (const Sub& oth)
+    Sub& operator= (Sub&& oth)
+    Sub& operator= (const Sv& oth)
+    Sub& operator= (Sv&& oth)
+    Sub& operator= (const CallProxy& p)
+
+The assignment operators are complementaty to the constructors above. They
+inherit behaviour from C<Sv>, including NULL-safety. The previously held
+C<SV*> will be C<dec>-remented.
+
+    void set (SV* val)
+
+The C<set> method directly assigns the value to the underlying C<SV*>,
+I<bypassing all checks>. Use the method with caution.
+
+=head2 getters
+
+Theere are zero-cost NULL-safe getters:
+
+    CV* operator-> () const
+    template <typename T = SV> one_of_t<T,SV,CV>* get () const
+
+This are NULL-safe methods.
+
+=head2 stash()
+
+    Stash stash () const
+
+Returns stash object, i.e. package / symbol table, where underlying subroutine
+belongs to. This is NULL-unsafe method.
+
+=head2 glob()
+
+    Glob  glob  () const;
+
+Returns glob object. This is NULL-unsafe method.
+
+=head2 name()
+
+    std::string_view name () const;
+
+Returns subroutine name. This is NULL-unsafe method.
+
+=head2 bool named()
+
+    bool named () const
+
+Returns C<true> if the underlying subroutine points to named subrouitene, and
+C<false> for anonymous one. This is NULL-unsafe method.
+
+=head2 SUPER ()
+
+=head2 SUPER_strict ()
+
+
+    Sub SUPER () const
+    Sub SUPER_strict () const
+
+This methods return C<Sub> object, which represends the same subroutine but for
+base class of the current one. They differ in behaviour, when the SUPER
+subroutine cannot be found. The C<SUPER()> method just returns empty C<Sub>,
+while C<SUPER_strict()> throwns exception.
+
+The method resolution is performed via C<DFS> algorithm (see L<mro>).
+
+This are NULL-unsafe methods.
+
+=head2 call()
+
+=head2 operator()
+
+    CallProxy call       ()                                                    const
+    CallProxy call       (const Scalar& arg)                                   const
+    CallProxy call       (SV*const* args, size_t items)                        const
+    CallProxy call       (const Scalar& arg0, SV*const* args, size_t items)    const
+    CallProxy call       (std::initializer_list<Scalar> l)                     const
+    CallProxy call       (const Scalar& arg0, std::initializer_list<Scalar> l) const
+    CallProxy operator() ()                                                    const
+    CallProxy operator() (const Scalar& arg)                                   const
+    CallProxy operator() (SV*const* args, size_t items)                        const
+    CallProxy operator() (const Scalar& arg0, SV*const* args, size_t items)    const
+    CallProxy operator() (std::initializer_list<Scalar> l)                     const
+    CallProxy operator() (const Scalar& arg0, std::initializer_list<Scalar> l) const
+
+This methods just curry call invocation, i.e. remember the Perl subroutine and
+arguments. The actuall call is performed by C<CallProxy> later, once it's
+I<result> being accessed. The rationale behind that is that Oerl subroutine can
+be invoked in I<list> or in I<scalar> context and that context is not known
+yet (in C++ place of invocation). Here are a few examples:
+
+    Sub sub = ...;
+    Scalar p1 = sub.call();
+    Scalar p2 = sub.call(Simple(123));
+
+    Simple arg1(1), arg2(2), arg3(3);
+    SV* args[] = {arg1, arg2, arg3};
+    List p3 = sub(args, 3);
+
+    // invoked in void context
+    sub.call({Simple(2), Scalar(Simple(3)), Sv(Simple(4))});
+
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Sv>
+
+=cut

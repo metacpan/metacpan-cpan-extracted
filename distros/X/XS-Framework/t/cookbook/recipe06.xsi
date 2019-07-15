@@ -1,0 +1,62 @@
+MODE: INLINE
+
+struct Base06 {
+    virtual const char* method() { return "from base"; }
+    virtual ~Base06() { }
+};
+
+struct Derived06A: public Base06 {
+    virtual const char* method() { return "from derived-A"; }
+    const char* specific_method() { return "specific-A"; }
+};
+
+struct Derived06B: public Base06 {
+    virtual const char* method() { return "from derived-B"; }
+    const char* specific_method() { return "specific-B"; }
+};
+
+
+namespace xs {
+    template <typename D>
+    struct Typemap<Base06*, D> : TypemapObject<Base06*, D, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::Base04"; }
+    };
+
+    template <> struct Typemap<Derived06A*> : Typemap<Base06*, Derived06A*> {
+        static std::string package () { return "MyTest::Cookbook::Derived06A"; }
+    };
+
+    template <> struct Typemap<Derived06B*> : Typemap<Base06*, Derived06B*> {
+        static std::string package () { return "MyTest::Cookbook::Derived06B"; }
+    };
+
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Base06
+PROTOTYPES: DISABLE
+
+const char* Base06::method()
+
+Base06* Base06::new()
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Derived06A
+PROTOTYPES: DISABLE
+
+Derived06A* Derived06A::new()
+
+const char* Derived06A::specific_method()
+
+BOOT {
+    Stash(__PACKAGE__).inherit("MyTest::Cookbook::Base06");
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Derived06B
+PROTOTYPES: DISABLE
+
+Derived06B* Derived06B::new()
+
+const char* Derived06B::specific_method()
+
+BOOT {
+    Stash(__PACKAGE__).inherit("MyTest::Cookbook::Base06");
+}

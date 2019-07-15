@@ -17,9 +17,10 @@
 # Eliminate unused ids?
 # Concepts can be nested inside concepts and so each sub concept can establish its own address range.  If there is duplication of referenced ids in teh sub ranges then we have to account for the topic id to help disambiguate references -at the moment the ids are assumed to be unique and so no effort is made to use this extra information
 # Reports after fix references can be done in parallel as can reports before reportReferencesFromBookMaps
+# ADD xref expansion from id in file as it is a pain to code up the full details by hand
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20190708;
+our $VERSION = 20190714;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -41,7 +42,7 @@ sub newXref(%)                                                                  
   my $xref = genHash(__PACKAGE__,                                               # Attributes used by the Xref cross referencer.
     addNavTitles=>undef,                                                        #I If true, add navtitle to outgoing bookmap references to show the title of the target topic.
     allowUniquePartialMatches=>undef,                                           # Allow unique partial matches - i.e ignore the stuff to the right of the # in a reference if doing so produces a unique result. This feature has been explicitly disabled for conrefs (PS2-561) and might need to be disabled for other types of reference as well.
-    attributeCount=>{},                                   # Make input folder absolute                      # {file}{attribute name} == count of the different xml attributes found in the xml files.
+    attributeCount=>{},                                                         # {file}{attribute name} == count of the different xml attributes found in the xml files.
     attributeNamesAndValuesCount=>{},                                           # {file}{attribute name}{value} = count
     author=>{},                                                                 # {file} = author of this file.
 #   badBookMaps=>{},                                                            # Bad book maps.
@@ -105,7 +106,7 @@ sub newXref(%)                                                                  
     inputFolder=>undef,                                                         #I A folder containing the dita and ditamap files to be cross referenced.
     ltgt=>{},                                                                   # {text between &lt; and &gt}{filename} = count giving the count of text items found between &lt; and &gt;
     matchTopics=>undef,                                                         #I Match topics by title and by vocabulary to the specified confidence level between 0 and 1.  This operation might take some time to complete on a large corpus.
-    maximumNumberOfProcesses=>4,                                                #I Maximum number of processes to run in parallel at any one time.
+    maximumNumberOfProcesses=>undef,                                            #I Maximum number of processes to run in parallel at any one time with a sensible default.
     maxZoomIn=>undef,                                                           #I Optional hash of names to regular expressions to look for in each file
     maxZoomOut=>{},                                                             # Results from L<maxZoomIn|/maxZoomIn>  where {file name}{regular expression key name in L<maxZoomIn|/maxZoomIn>}++
     md5Sum=>{},                                                                 # MD5 sum for each input file.
@@ -115,6 +116,13 @@ sub newXref(%)                                                                  
     notReferenced=>{},                                                          # {file name} Files in input area that are not referenced by a conref, image, bookmapref or xref tag and are not a bookmap.
     olBody=>{},                                                                 # The number of ol under body by file
     originalSourceFileAndIdToNewFile=>{},                                       # {original file}{id} = new file: Record mapping from original source file and id to the new file containing the id
+    otherMeta=>{},                                                              # {original file}{othermeta name}{othermeta content}++ : the contents of the other meta tags
+    otherMetaDuplicatesSeparately =>[],                                         # Duplicate othermeta in bookmaps and topics considered separately
+    otherMetaDuplicatesCombined   =>[],                                         # Duplicate othermeta in bookmaps with called topics othermeta included
+    otherMetaRemainWithTopic=>[],                                               # Othermeta that must stay in the topic
+    otherMetaPushToBookMap=>[],                                                 # Othermeta that can be pushed to the calling book map
+    otherMetaBookMapsBeforeTopicIncludes=>[],                                   # Bookmap othermeta before topic othermeta has been included
+    otherMetaBookMapsAfterTopicIncludes=>[],                                    # Bookmap othermeta after  topic othermeta has been included
     parseFailed=>{},                                                            # {file} files that failed to parse.
     printSummaryLine=>1,                                                        #I Print the summary line if true - on by default.
     references=>{},                                                             # {file}{reference}++ - the various references encountered
@@ -157,6 +165,8 @@ sub xref(%)                                                                     
  {my $xref = newXref(@_);                                                       # create the cross referencer
 
   $xref->timeStart = time;                                                      # Start time
+
+  $xref->maximumNumberOfProcesses //= 4 * numberOfCpus;                         # Set a sensible default for the maximum number of processes
 
   $xref->inputFolder or confess "Please supply a value for: inputFolder";
   $xref->inputFolder =~ s(\/+\Z) (\/)gs;                                        # Cleanup path names
@@ -214,6 +224,7 @@ sub xref(%)                                                                     
                   q(reportHrefUrlEncoding),
                   q(reportFixRefs),
                   q(reportSourceFiles),
+                  q(reportOtherMeta),
                  );
 
   if ($xref->addNavTitles)                                                      # Add nav titles to bookmaps if requested
@@ -373,18 +384,19 @@ sub externalReference($)                                                        
 
 sub loadInputFiles($)                                                           #P Load the names of the files to be processed
  {my ($xref) = @_;                                                              # Cross referencer
-  my @in = $xref->inputFiles =
+  my $in = $xref->inputFiles =
    [searchDirectoryTreesForMatchingFiles
     $xref->inputFolder, @{$xref->fileExtensions}];
 
-  if (@in == 0)                                                                 # Complain if there are no input files to analyze
+  if (!$in or @$in == 0)                                                                 # Complain if there are no input files to analyze
    {my $i = $xref->inputFolder;
     my $e = join " ", @{$xref->fileExtensions};
     my $x = -d $i ? "The input folder does exist." :
                     "The input folder does NOT exist!";
-    lll "No files with the specified file extensions",
-        " in the specified input folder:\n",
-        "$e\n$i\n$x";
+    confess join '',
+      "No files with the specified file extensions ",
+      "in the specified input folder:\n",
+      "$e\n$i\n$x\n";
    }
 
   my @images = searchDirectoryTreesForMatchingFiles($xref->inputFolder);        # Input files
@@ -595,6 +607,11 @@ sub analyzeOneFile($$)                                                          
          }
        }
      }
+    elsif ($tag =~ m(\Aothermeta\Z))                                            # Other meta tags
+     {my $c = $o->attrX_content;
+      my $n = $o->attrX_name;
+      $xref->otherMeta->{$iFile}{$n}{$c}++;
+     }
 
     if (my $h = $o->href)                                                       # Check href
      {if ($h =~ m(\s)s and externalReference($h))                               # Check href for url encoding needed
@@ -666,18 +683,36 @@ END
     file     =>fpe($xref->reports, q(lists), qw(guidsToFiles txt)));
  }
 
-sub editXml($$$)                                                                #P Edit an xml file
- {my ($in, $out, $x) = @_;                                                      # Input file, output file, parse tree
-  my $s = readFile($in);
-  my ($l1, $l2)      = split m/\n/, $s, 3;                                      # Header lines
-  my (undef, $lint)  = split m/(?=\<\!\-\-linted\:)/, $s, 2;                    # Lint comments
-  my $t = (-p $x).($lint ? qq(\n$lint) : q());                                  # Insert new file contents
-  if ($l1 =~ m(\A<\?xml))                                                       # Check headers - should be improved
-   {owf($out, qq($l1\n$l2\n$t));
+sub editXml($$$)                                                                #P Edit an xml file retaining any existing XML headers and lint trailers
+ {my ($in, $out, $source) = @_;                                                 # Input file, output file, source to write
+
+  my @s = readFile($in);                                                        # Read existing source
+
+  my @h;                                                                        # Headers if any present
+  if (@s > 0)                                                                   # Remove header lines using a very basic parse that is not a general solution
+   {if ($s[0] =~ m(\A\<\?xml)is)                                                # First line
+     {push @h, shift @s;
+      if (@s > 0 and $s[0] =~ m(\A<!DOCTYPE)s)                                  # Second line start
+       {push @h, shift @s;
+        while(@s > 0 and $s[0] !~ m(\A\s*<[a-z])i)                              # Parse to root tag
+         {push @h, shift @s;
+         }
+       }
+     }
    }
-  else
-   {owf($out, $t);
+
+  my @l;                                                                        # Lint data if any
+  if (1)
+   {my $state;
+    for my $s(@s)
+     {if (!$state && $s =~ m(\A\<\!\-\-linted\:)s or $state)
+       {push @l, $s;
+        $state++;
+       }
+     }
    }
+
+  owf($out, join '', @h, $source, @l)                                           # Insert new source between old headers and trailers
  }
 
 # Fix a file by moving its hrefs and conrefs to the xtrf attribute unless
@@ -928,6 +963,7 @@ sub fixReferencesInOneFile($$)                                                  
    };
 
   my $x = Data::Edit::Xml::new($sourceFile);                                    # Parse xml - should parse OK else otherwise how did we find out that this file needed to be fixed
+  my $s = -p $x;                                                                # Source before any changes
 
   $x->by(sub                                                                    # Check any references encountered on each node, Ameliorate some specific cases. If the reference is still invalid report the discrepancy.
    {my ($o) = @_;                                                               # Current node
@@ -954,22 +990,16 @@ sub fixReferencesInOneFile($$)                                                  
      }
    });
 
-  if (my $fixedFolder = $xref->fixedFolder)                                     # Write the fixed file to the fixedFolder copying the doctype
-   {my $s = readFile($sourceFile);
-
-    if ($s =~ m((<!DOCTYPE[^>]*>))s)
-     {my $d = $1;
-      my $t = -p $x;
-      my $f = swapFolderPrefix($sourceFile, $xref->inputFolder, $fixedFolder);
-      owf($f, <<END);
-<?xml version="1.0" encoding="UTF-8"?>
-$d
-$t
-END
+  if (my $S = -p $x)                                                            # Source after any changes
+   {if ($S ne $s)                                                               # Write any changes
+     {if (my $fixedFolder = $xref->fixedFolder)                                 # New output file in fixedFolder
+       {my $f = swapFolderPrefix($sourceFile, $xref->inputFolder, $fixedFolder);# File name
+        editXml($sourceFile, $f, $S);                                           # Write the fixed file to the fixedFolder retaining headers and trailers
+       }
+      else
+       {editXml($sourceFile, $sourceFile, $S);                                  # Edit existing xml retaining headers and trailers
+       }
      }
-   }
-  else
-   {editXml($sourceFile, $sourceFile, $x);                                      # Edit xml processed by Data::Edit::Xml::Lint
    }
 
   [\@good, \@bad]
@@ -1264,10 +1294,8 @@ sub fixOneFileGB($$)                                                            
      }
    });
 
-
-# editXml($file, fpf($xref->flattenFolder, $xref->flattenFiles->{$file}), $x);  # Edit xml
   my $target = fpf($xref->flattenFolder, $xref->flattenFiles->{$file});         # Previously assigned GB name.  We cannot use the very latest name because other files have to be told about it and in changing them to reflect the latest name we would change their name as well.  So close has to be good enough.
-  editXml($file, $target, $x);                                                  # Edit xml
+  editXml($file, $target, -p $x);                                                  # Edit xml
 
   \@r                                                                           # Return report of items fixed
  }
@@ -1371,6 +1399,7 @@ q(maxZoomOut),
 q(md5Sum),
 q(noHref),
 q(olBody),
+q(otherMeta),
 q(parseFailed),
 q(references),
 q(tagCount),
@@ -1950,15 +1979,14 @@ END
 
 sub reportImages($)                                                             #P Reports on images and references to images
  {my ($xref) = @_;                                                              # Cross referencer
+
   my @bad =                                                                     # Image reference failures
     sort {$$a[1] cmp $$b[1]}                                                    # Sort by source file
     sort {$$a[0] cmp $$b[0]}                                                    # Sort by href
     map  {[@$_[3..5]]}                                                          # Relevant details
     grep {$$_[1] =~ m(\Aimage\Z)s} @{$xref->fixedRefsFailed};                   # Bad images
 
-  $xref->missingImageFiles = [@bad];                                            # Missing image file names
-
-  formatTable([@bad], <<END,                                                    # Report missing images references
+  formatTable($xref->missingImageFiles = [@bad], <<END,                         # Report missing images references
 Href           The image reference that could not be resolved
 File           The source file in which the image reference appears
 Source_Files   One or more files that contained the content in this source file
@@ -2615,6 +2643,223 @@ END
   }                                                                             # From multiverse to universe
  } # reportReferencesFromBookMaps
 
+
+=pod
+
+=head1 Assumptions
+
+=head2 All othermeta is at the root level in the maps not at the topic ref level
+
+There are 138 maps that have othermeta in them. For at least one of them this
+assumption is not true, see: help/bundle_setup/setup.ditamap
+
+=cut
+
+sub reportOtherMeta($)
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %t; my %b; my %B;                                                          # Othermeta at topic level and bookmap level
+  for     my $b(sort keys $xref->bookMapRefs->%*)
+   {for   my $n(sort keys $xref->otherMeta->{$b}->%*)
+     {for my $c(sort keys $xref->otherMeta->{$b}->{$n}->%*)
+       {$b{$b}{$n}{$c}++;
+        $B{$b}{$n}{$c}++;
+       }
+     }
+
+    for my $r(sort keys $xref->bookMapRefs->{$b}->%*)                           # Each topic reached from the bookmap
+     {my $t = absFromAbsPlusRel($b, $r);                                        # Topic references are relative
+      if (my $o = $xref->otherMeta->{$t})
+       {for   my $n(sort keys $o->%*)
+         {for my $c(sort keys $o->{$n}->%*)
+           {$t{$t}{$n}{$c}{$b}++;                                               # Othermeta by topic
+            $b{$b}{$n}{$c}++;                                                   # Put topic othermeta in bookmap
+           }
+         }
+       }
+     }
+   }
+
+  if (1)                                                                        # Bookmaps and topics with duplicate othermeta should be empty
+   {my @d;
+    for     my $b(sort keys %B)                                                 # Bookmaps
+     {for   my $n(sort keys $B{$b}->%*)
+       {if (my $N =    keys $B{$b}{$n}->%*)
+         {if ($N > 1)
+           {my ($c, @c) = sort keys $B{$b}{$n}->%*;
+            push @d, [$b, $n, $N, $c], map {[(q()) x 3, $_]} @c;
+           }
+         }
+       }
+     }
+
+    for     my $t(sort keys %t)                                                 # Topics
+     {for   my $n(sort keys $t{$t}->%*)
+       {if (my $N =    keys $t{$t}{$n}->%*)
+         {if ($N > 1)
+           {my ($c, @c) = sort keys $t{$t}{$n}->%*;
+            push @d, [$t, $n, $N, $c], map {[(q()) x 3, $_]} @c;
+           }
+         }
+       }
+     }
+
+    formatTable($xref->otherMetaDuplicatesSeparately = [@d], <<END,             # Duplicate othermeta in bookmaps and topics considered separately
+Source   Bookmaps or topic files with duplicate othermeta data
+Name     Duplicated othermeta name field
+Count    Number of duplicates
+Content  Othermeta content
+END
+    title=>q(Duplicate othermeta data in bookmaps and topics considered separately),
+    head =>q(Found NNNN duplicate othermeta items on DDDD),
+    clearUpLeft => -1,
+    file =>fpe($xref->reports, qw(other_meta duplicates_separately txt)));
+   }
+
+  if (1)                                                                        # Report duplicate othermeta in bookmaps with called topics othermeta included
+   {my @d;
+
+    for     my $b(sort keys %b)                                                 # Bookmaps
+     {for   my $n(sort keys $b{$b}->%*)
+       {if (my $N =    keys $b{$b}{$n}->%*)
+         {if ($N > 1)
+           {my ($c, @c) = sort keys $b{$b}{$n}->%*;
+            push @d, [$b, $n, $N, $c], map {[(q()) x 3, $_]} @c;
+           }
+         }
+       }
+     }
+
+    formatTable($xref->otherMetaDuplicatesCombined = [@d], <<END,               # Duplicate othermeta in bookmaps with called topics othermeta included
+Source   Bookmap with duplicate othermeta with called topics othermeta included
+Name     Duplicated othermeta name field
+Count    Number of duplicates
+Content  Othermeta content
+END
+      title=>q(Duplicate othermeta in bookmaps with called topic othermeta included),
+      head =>q(Found NNNN duplicate othermeta items on DDDD),
+      clearUpLeft => -1,
+      file =>fpe($xref->reports, qw(other_meta duplicates txt)));
+   }
+
+  my %o;                                                                        # Topic overrides
+  for       my $t(sort keys %t)                                                 # Find topic othermeta which must override bookmap othermeta
+   {for     my $n(sort keys $t{$t}->%*)
+     {for   my $c(sort keys $t{$t}{$n}->%*)
+       {for my $b(sort keys $t{$t}{$n}{$c}->%*)
+         {if (!$b{$b}{$n}{$c} or keys($b{$b}{$n}->%*) != 1)                     # Override the othermeta from the bookmap unless the bookmap agrees that there is only value for this name
+           {$o{$t}{$n}{$c}{$b}++;
+           }
+         }
+       }
+     }
+   }
+
+  if (1)                                                                        # Keep in topic because we cannot push the meta data to all the calling bookmaps
+   {my @k;
+    for       my $t(sort keys %o)
+     {for     my $n(sort keys $o{$t}->%*)
+       {for   my $c(sort keys $o{$t}{$n}->%*)
+         {push @k, [$t, $n, $c, sort keys $o{$t}{$n}{$c}->%*];                  # The bookmaps that cause the over ride
+         }
+       }
+     }
+
+    formatTable($xref->otherMetaRemainWithTopic = [@k],                         # Othermeta that must stay in the topic
+         <<END,
+Topic    Topic file name
+Name     Othermeta name field to be retained
+Content  Othermeta name content to be retained
+Bookmaps One or more bookmaps that prevented the migration of this othermeta to the calling bookmaps
+END
+    title=>q(Othermeta kept in topics because calling bookmaps disagree),
+    zero => 1, clearUpLeft => -1,
+    head =>qq(Found NNNN othermeta items that must remain in topic on DDDD),
+    file =>fpe($xref->reports, qw(other_meta must_remain_in_topic txt)));
+   }
+
+  if (1)                                                                        # Report othermeta pushed to the bookmaps
+   {my @p;
+    for       my $t(sort keys %t)
+     {for     my $n(sort keys $t{$t}->%*)
+       {for   my $c(sort keys $t{$t}{$n}->%*)
+         {for my $b(sort keys $t{$t}{$n}{$c}->%*)
+           {push @p, [$t, $n, $c, $b] unless $o{$t}{$n}{$c}{$b}                 # Can be pushed to bookmap
+           }
+         }
+       }
+     }
+
+    formatTable($xref->otherMetaPushToBookMap = [@p],                           # Othermeta that can be pushed to the calling book map
+         <<END,
+Topic    Topic file name
+Name     Othermeta name field to be retained
+Content  Othermeta name content to be retained
+Bookmap  The bookmap data othermeta can be migrated to
+END
+    title=>q(Othermeta data that can be pushed to the calling bookmaps),
+    zero => 1, clearUpLeft => -1,
+    head =>qq(Found NNNN othermeta items that can be pushed to the calling bookmaps on DDDD),
+    file =>fpe($xref->reports, qw(other_meta push_to_book_maps txt)));
+   }
+
+  if (1)                                                                        # Report bookmap othermeta before topic othermeta has been included
+   {my @b;
+
+    for       my $b(sort keys %B)
+     {for     my $n(sort keys $B{$b}->%*)
+       {for   my $c(sort keys $B{$b}{$n}->%*)
+         {push @b, [$b, $n, scalar(keys $B{$b}{$n}->%*), $c];
+
+         }
+       }
+     }
+
+  formatTable($xref->otherMetaBookMapsBeforeTopicIncludes = [@b], <<END,        # Bookmap othermeta before topic othermeta has been included
+Bookmap Bookmap file name
+Name    Bookmap othermeta name
+Count   Number of distinct values for this othermeta name in this bookmap
+Content Othermeta content for this name
+END
+    title=> q(Bookmap othermeta before topic othermeta has been included),
+    zero => 1, clearUpLeft => -1,
+    head => qq(Xref found NNNN Bookmap othermeta tags before topic othermeta was included),
+    file => fpe($xref->reports, qw(other_meta book_maps_before_topics_included txt)));
+   }
+
+  if (1)                                                                        # Report bookmap othermeta after topic othermeta has been included
+   {my @b;
+
+    for       my $b(sort keys %b)
+     {for     my $n(sort keys $b{$b}->%*)
+       {for   my $c(sort keys $b{$b}{$n}->%*)
+         {push @b, [$b, $n, scalar(keys $b{$b}{$n}->%*), $c];
+         }
+       }
+     }
+
+    formatTable($xref->otherMetaBookMapsAfterTopicIncludes = [@b], <<END,       # Bookmap othermeta after topic othermeta data has been included
+Bookmap Bookmap file name
+Name    Bookmap or topic othermeta name
+Count   Number of distinct values for this othermeta name
+Content Othermeta content for this name
+END
+    title=> q(Bookmap othermeta data after topic othermeta has been included),
+    zero => 1, clearUpLeft => -1,
+    head => qq(Xref found NNNN Bookmap othermeta tags after topic othermeta was included on DDDD),
+    file =>fpe($xref->reports, qw(other_meta book_maps_after_topics_included txt)));
+   }
+
+   {otherMetaDuplicatesSeparately         => $xref->otherMetaDuplicatesSeparately,
+    otherMetaDuplicatesCombined           => $xref->otherMetaDuplicatesCombined,
+    otherMetaRemainWithTopic              => $xref->otherMetaRemainWithTopic,
+    otherMetaPushToBookMap                => $xref->otherMetaPushToBookMap,
+    otherMetaBookMapsBeforeTopicIncludes  => $xref->otherMetaBookMapsBeforeTopicIncludes,
+    otherMetaBookMapsAfterTopicIncludes   => $xref->otherMetaBookMapsAfterTopicIncludes,
+   }
+
+ } # reportOtherMeta
+
 sub reportSimilarTopicsByTitle($)                                               #P Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
  {my ($xref) = @_;                                                              # Cross referencer
 
@@ -2648,19 +2893,17 @@ sub reportSimilarTopicsByTitle($)                                               
     $b->[0] = '' if $a->[1] eq $b->[1];
    }
 
-  formatTable($t,                                                               # Format report
-               <<END,
+  formatTable($t, <<END,                                                        # Format report
 Similar          The number of topics similar to this one
 Prefix           The prefix of the target file names being used for matching
 Source           Topics that have the current prefix
 END
-    title=>qq(Topic Reuses),
-    head=><<END,
+    title => qq(Topic Reuses),
+    head  => <<END,
 Xref found NNNN topics that might be similar on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists similar byTitle txt))),
-    zero=>1,
-    summarize=>1);
+    file  => fpe($xref->reports, qw(lists similar byTitle txt)),
+    zero  =>1, summarize=>1);
   {}                                                                            # From multiverse to universe
  } # reportSimilarTopicsByTitle
 
@@ -2677,8 +2920,7 @@ sub reportSimilarTopicsByVocabulary($)                                          
     push @t, [scalar(@$a), $first], map {[q(), $_]} @rest;
     push @t, [q(), q()];
    }
-  formatTable(\@t,                                                              # Format report
-               <<END,
+  formatTable(\@t, <<END,                                                       # Format report
 Similar          The number of similar topics in this block
 Topic            One of the similar topics
 END
@@ -2863,7 +3105,7 @@ sub addNavTitlesToOneMap($$)                                                    
    });
 
   if ($changes)                                                                 # Replace xml in source file if we changed anything successfully
-   {editXml($file, $file, $x);                                                  # Edit xml
+   {editXml($file, $file, -p $x);                                               # Edit xml
    }
 
   \@r                                                                           # Return report of actions taken
@@ -2972,8 +3214,8 @@ sub oneBadRef($$$)                                                              
         $targetTopicId, $file, $targetFile];
      };
 
-    return &$bad(q(No such file)) unless &$fileExists($targetFile);             # Check target file exists
-
+    return &$bad(q(No such file))            unless &$fileExists($targetFile);  # Check target file exists
+    return &$bad(q(No topic id))             unless $targetTopicId;             # Check the target has a topic id
     return &$bad(q(Topic id does not match)) unless $targetTopicId eq $topicId; # Check topic id of referenced topic against supplied topicId.  It is safe to assume that the target does have topic id as Dita requires one
 
     if ($id)                                                                    # Checkid if supplied
@@ -2991,6 +3233,1243 @@ sub oneBadRef($$$)                                                              
 
   undef                                                                         # No error to report
  } # oneBadRef
+
+#D0
+# podDocumentation
+=pod
+
+=encoding utf-8
+
+=head1 Name
+
+Data::Edit::Xml::Xref - Cross reference Dita XML, match topics and ameliorate missing references.
+
+=head1 Synopsis
+
+Check the references in a large corpus of Dita XML documents held in folder
+L<inputFolder|/inputFolder> running processes in parallel where ever possible
+to take advantage of multi-cpu computers:
+
+  use Data::Edit::Xml::Xref;
+
+  my $x = xref(inputFolder              => q(in),
+               maximumNumberOfProcesses => 512,
+               fixBadRefs               => 1,
+               flattenFolder            => q(out2),
+               matchTopics              => 0.9,
+              );
+
+The cross reference analysis can be requested as a L<status line|/statusLine>:
+
+  ok nws($x->statusLine) eq nws(<<END);
+Xref: 108 references fixed, 50 bad xrefs, 16 missing image files, 16 missing image references, 13 bad first lines, 13 bad second lines, 9 bad conrefs, 9 duplicate topic ids, 9 files with bad conrefs, 9 files with bad xrefs, 8 duplicate ids, 6 bad topicrefs, 6 files not referenced, 4 invalid guid hrefs, 2 bad book maps, 2 bad tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing
+END
+
+Or as a tabular report:
+
+  ok nws($x->statusTable) eq nws(<<END);
+Xref:
+    Count  Condition
+ 1    108  references fixed
+ 2     50  bad xrefs
+ 3     16  missing image files
+ 4     16  missing image references
+ 5     13  bad first lines
+ 6     13  bad second lines
+ 7      9  files with bad conrefs
+ 8      9  bad conrefs
+ 9      9  files with bad xrefs
+10      9  duplicate topic ids
+11      8  duplicate ids
+12      6  bad topicrefs
+13      6  files not referenced
+14      4  invalid guid hrefs
+15      2  bad book maps
+16      2  bad tables
+17      1  href missing
+18      1  file failed to parse
+19      1  External xrefs with no format=html
+20      1  External xrefs with no scope=external
+END
+
+More detailed reports are produced in the L<reports|/reports> folder:
+
+  $x->reports
+
+and indexed by the L<reports> report:
+
+  reports/reports.txt
+
+which contains a list of all the L<reports> generated:
+
+    Rows  Title                                                           File
+ 1     5  Attributes                                                      reports/count/attributes.txt
+ 2    13  Bad Xml line 1                                                  reports/bad/xmlLine1.txt
+ 3    13  Bad Xml line 2                                                  reports/bad/xmlLine2.txt
+ 4     9  Bad conRefs                                                     reports/bad/ConRefs.txt
+ 5     2  Bad external xrefs                                              reports/bad/externalXrefs.txt
+ 6    16  Bad image references                                            reports/bad/imageRefs.txt
+ 7     9  Bad topicrefs                                                   reports/bad/bookMapRefs.txt
+ 8    50  Bad xRefs                                                       reports/bad/XRefs.txt
+ 9     2  Bookmaps with errors                                            reports/bad/bookMap.txt
+10     2  Document types                                                  reports/count/docTypes.txt
+11     8  Duplicate id definitions within files                           reports/bad/idDefinitionsDuplicated.txt
+12     3  Duplicate topic id definitions                                  reports/bad/topicIdDefinitionsDuplicated.txt
+13     3  File extensions                                                 reports/count/fileExtensions.txt
+14     1  Files failed to parse                                           reports/bad/parseFailed.txt
+15     0  Files types                                                     reports/count/fileTypes.txt
+16    16  Files whose short names are bi-jective with their md5 sums      reports/good/shortNameToMd5Sum.txt
+17     0  Files whose short names are not bi-jective with their md5 sums  reports/bad/shortNameToMd5Sum.txt
+18   108  Fixes Applied To Failing References                             reports/lists/referencesFixed.txt
+19     0  Good bookmaps                                                   reports/good/bookMap.txt
+20     9  Good conRefs                                                    reports/good/ConRefs.txt
+21     5  Good topicrefs                                                  reports/good/bookMapRefs.txt
+22     8  Good xRefs                                                      reports/good/XRefs.txt
+23     1  Guid topic definitions                                          reports/lists/guidsToFiles.txt
+24     2  Image files                                                     reports/good/imagesFound.txt
+25     1  Missing hrefs                                                   reports/bad/missingHrefAttributes.txt
+26    16  Missing image references                                        reports/bad/imagesMissing.txt
+27     4  Possible improvements                                           reports/improvements.txt
+28     2  Resolved GUID hrefs                                             reports/good/guidHrefs.txt
+29     2  Tables with errors                                              reports/bad/tables.txt
+30    23  Tags                                                            reports/count/tags.txt
+31    11  Topic Reuses                                                    reports/lists/topicReuse.txt
+32     0  Topic Reuses                                                    reports/lists/similar/byTitle.txt
+33    16  Topics                                                          reports/lists/topics.txt
+34    15  Topics with similar vocabulary                                  reports/lists/similar/byVocabulary.txt
+35     0  Topics with validation errors                                   reports/bad/validationErrors.txt
+36     0  Topics without ids                                              reports/bad/topicIdDefinitionsMissing.txt
+37     6  Unreferenced files                                              reports/bad/notReferenced.txt
+38    11  Unresolved GUID hrefs                                           reports/bad/guidHrefs.txt
+
+=head2 Add navigation titles to topic references
+
+Xref will create or update the navigation titles B<navtitles> of topic refs
+B<appendix|chapter|topicref> in maps if requested by both file name and GUID
+reference:
+
+  addNavTitle => 1
+
+Reports of successful updates will be written to:
+
+  reports/good/navTitles.txt
+
+Reports of unsuccessful updates will be written to:
+
+  reports/bad/navTitles.txt
+
+=head2 Fix bad references
+
+It is often desirable to ameliorate unresolved Dita href attributes so that
+incomplete content can be loaded into a content management system.  The:
+
+  fixBadRefs => 1
+
+attribute requests that the:
+
+ conref and href
+
+attributes be renamed to:
+
+ xtrf
+
+if the B<conref> or B<href> attribute specification cannot be resolved in the
+current corpus.
+
+If the L<fixedFolder|/fixedFolder> attribute is set, the fixed files are
+written into this folder, else they are written back into the
+L<inputFolder|/inputFolder>.  Two reports are generated by this action:
+
+  reports/bad/fixedRefs.txt
+
+  reports/bad/fixedRefsNoAction.txt
+
+This feature designed by L<mailto:mim@cpan.org>.
+
+=head2 Deguidize
+
+Some content management systems use guids, some content management systems use
+file names as their means of identifying content. When moving from a guid to a
+file name content management system it might be necessary to replace the guids
+representing file names with the actual underlying file names.  If the
+
+  deguidize => 1
+
+parameter is set to true, Xref will replace any such file guids with the
+underlying file name if it is present in the content being cross referenced.
+
+=head2 File flattening
+
+It is often desirable to flatten or reflatten the topic files in a corpus so
+that they can coexist in a single folder of a content management system without
+colliding with each other.
+
+The presence of the input attribute:
+
+ flattenFolder => folder-to-flatten-files-into
+
+causes topic files to be flattened into the named folder using the
+L<GBStandard> to generate the flattened file names.  Xref will then update all
+L<Dita> references to match these new file names.  If the L<flattenFolder>
+folder is the same as the L<inputFolder> then the input files are flattened in
+place.
+
+=head2 Locating relocated files
+
+File references in B<conref> or B<hrefs> that have a unique valid base file
+name and an invalid path can be fixed by setting the input attribute:
+
+ fixRelocatedRefs => 1
+
+to a true value to request that Xref should replace the incorrect paths to the
+unique bases file names with the correct path.
+
+If coded in conjunction with the B<fixBadRefs> input attribute this will cause
+Xref to first try and fix any missing xrefs, any that still fail to resolve
+will then be ameliorated by moving them to the B<xtrf> attribute.
+
+=head2 Fix Xrefs by Title
+
+L<Dita> B<xref> tags with broken or missing B<href> attributes can sometimes be
+fixed by matching the text content of the B<xref> with the titles of topics.
+
+If:
+
+  fixXrefsByTitle => 1
+
+is specified, L<Xref> will locate possible targets for a broken B<href> by
+matching the white space normalized L<Data::Table::Text::nws> of the text
+content of the B<xref> with the similarly normalized title of each topic.  If a
+single matching candidate is located then it will be used to update the B<href>
+attribute of the B<xref>.
+
+=head2 Fix References in Dita To Dita Conversions
+
+When converting a L<Dita> input source corpus to L<Dita> the referenced topics
+are usually renamed and flattened via the L<GBStandard>. If enabled:
+
+  fixDitaRefs => targets/
+
+updates valid L<Dita> references in the input corpus with the latest name for
+the referenced topic to make links that were valid in the input corpus valid in
+the output corpus as well.
+
+The B<targets/> folder should contain the same set of file names as the
+original input corpus, each such file should contain the name of a B<bookmap>
+topic present in the B<inputFolder=> whose B<chapter> and B<topicref>s identify
+the new names of the files cut out and flattened from the existing input
+corpus.
+
+The creation of the B<target/> folder is usually done by some other piece of
+software such as L<Data::Edit::Xml::To::Dita> as it is too complex and
+laborious to be performed reliably by hand.  No validation of the contents of
+this folder is performed as it is assumed that it has been created reliably in
+software.
+
+=head2 Topic Matching
+
+Topics can be matched on title and vocabulary to assist authors in finding
+similar topics by specifying the:
+
+  matchTopics => 0.9
+
+attribute where the value of this attribute is the confidence level between 0
+and 1.
+
+Topic matching produces the reports:
+
+  reports/lists/similar/byTitle.txt
+  reports/lists/similar/byVocabulary.txt
+
+Topic matching might take some time for large input folders.
+
+=head3 Title matching
+
+This report can be found at:
+
+  reports/lists/similar/byTitle.txt
+
+Title sorts topics by their titles so that topic with similar titles can be
+easily located:
+
+    Similar  Prefix        Source
+ 1       14  c_Notices__   c_Notices_5614e96c7a3eaf3dfefc4a455398361b
+ 2           c_Notices__   c_Notices_14a9f467215dea879d417de884c21e6d
+ 3           c_Notices__   c_Notices_19011759a2f768d76581dc3bba170a44
+ 4           c_Notices__   c_Notices_aa741e6223e6cf8bc1a5ebdcf0ba867c
+ 5           c_Notices__   c_Notices_f0009b28c3c273094efded5fac32b83f
+ 6           c_Notices__   c_Notices_b1480ac1af812da3945239271c579bb1
+ 7           c_Notices__   c_Notices_5f3aa15d024f0b6068bd8072d4942f6d
+ 8           c_Notices__   c_Notices_17c1f39e8d70c765e1fbb6c495bedb03
+ 9           c_Notices__   c_Notices_7ea35477554f979b3045feb369b69359
+10           c_Notices__   c_Notices_4f200259663703065d247b35d5500e0e
+11           c_Notices__   c_Notices_e3f2eb03c23491c5e96b08424322e423
+12           c_Notices__   c_Notices_06b7e9b0329740fc2b50fedfecbc5a94
+13           c_Notices__   c_Notices_550a0d84dfc94982343f58f84d1c11c2
+14           c_Notices__   c_Notices_fa7e563d8153668db9ed098d0fe6357b
+15        3  c_Overview__  c_Overview_f9e554ee9be499368841260344815f58
+16           c_Overview__  c_Overview_f234dc10ea3f4229d0e1ab4ad5e8f5fe
+17           c_Overview__  c_Overview_96121d7bcd41cf8be318b96da0049e73
+
+
+=head3 Vocabulary matching
+
+This report can be found at:
+
+  reports/lists/similar/byVocabulary.txt
+
+Vocabulary matching compares the vocabulary of pairs of topics: topics with
+similar vocabularies within the confidence level specified are reported
+together:
+
+    Similar  Topic
+ 1        8  in/1.dita
+ 2           in/2.dita
+ 3           in/3.dita
+ 4           in/4.dita
+ 5           in/5.dita
+ 6           in/6.dita
+ 7           in/7.dita
+ 8           in/8.dita
+ 9
+10        2  in/map/bookmap.ditamap
+11           in/map/bookmap2.ditamap
+12
+13        2  in/act4. dita
+14           in/act5.dita
+
+=head1 Description
+
+Cross reference Dita XML, match topics and ameliorate missing references.
+
+
+Version 20190712.
+
+
+The following sections describe the methods in each functional area of this
+module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
+
+
+
+=head1 Cross reference
+
+Check the cross references in a set of Dita files and report the results.
+
+=head2 xref(%)
+
+Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
+
+     Parameter                 Description
+  1  {my $xref = newXref(@_);  Create the cross referencer
+
+B<Example:>
+
+
+  if (1)                                                                           References from a topic that has been cut out to a topic that has been cut out
+   {clearFolder(tests, 111);
+    createTestReferenceToCutOutTopic(tests);
+
+    my $x = 𝘅𝗿𝗲𝗳(inputFolder => out, fixDitaRefs => targets);
+    ok $x->statusLine eq q(Xref: 1 ref);
+
+    is_deeply checkXrefStructure($x, q(inputFileToTargetTopics),          in, targets), { "a.xml" => { "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita" => 1, "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita" => 1, "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita" => 1, "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita" => 1, }, "b.xml" => { "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita" => 1, "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita" => 1, "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita" => 1, "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita" => 1, }, };
+    is_deeply checkXrefStructure($x, q(targetTopicToInputFiles),          in, targets), { "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita" => { "a.xml" => 1, }, "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita" => { "a.xml" => 1, }, "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita" => { "a.xml" => 1, }, "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita" => { "a.xml" => 1, }, "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita" => { "b.xml" => 1, }, "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita" => { "b.xml" => 1, }, "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita" => { "b.xml" => 1, }, "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita" => { "b.xml" => 1, }, };
+    is_deeply checkXrefStructure($x, q(sourceTopicToTargetBookMap),       in, targets), { "a.xml" => bless({ source => "a.xml", sourceDocType => "concept", target => "bm_a_9d0a9f8e0ac234de9e22c19054b6e455.ditamap", targetType => "bookmap", }, "Bookmap"), "b.xml" => bless({ source => "b.xml", sourceDocType => "concept", target => "bm_b_d2806ba589f908da1106574afd9db642.ditamap", targetType => "bookmap", }, "Bookmap"), };
+    is_deeply checkXrefStructure($x, q(topicFlattening),                  in, targets), {};
+    is_deeply checkXrefStructure($x, q(originalSourceFileAndIdToNewFile), in, targets), { "a.xml" => { "GUID-400c2c59-95e1-7bf3-4647-3a135281bfaf" => "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita", "GUID-68822563-d568-f418-38ae-f1c62cb4ac8d" => "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita", "GUID-c67821ef-3da2-c89f-0fc9-9fba3937f368" => "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita", "GUID-f0c0e170-8128-10ef-045d-97602fdde76f" => "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita", }, "b.xml" => { "GUID-2b6aab4f-9328-e326-f55f-160771a8c3dd" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", "GUID-86a684b0-1a0b-4c30-6da9-24c74ff1f0cc" => "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita", "GUID-96a20d7f-bbaf-deef-55ef-e09a0a059251" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "GUID-cfe7cb3d-05e7-a147-db10-dcbacaeecef7" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p1" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "p2" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p3" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", }, };
+   }
+
+
+=head1 Create test data
+
+Create files to test the various capabilities provided by Xref
+
+
+=head2 Data::Edit::Xml::Xref Definition
+
+
+Attributes used by the Xref cross referencer.
+
+
+
+
+=head3 Input fields
+
+
+B<addNavTitles> - If true, add navtitle to outgoing bookmap references to show the title of the target topic.
+
+B<changeBadXrefToPh> - Change xrefs being placed in B<M3> by L<fixBadRefs> to B<ph>.
+
+B<deguidize> - Set true to replace guids in dita references with file name. Given reference B<g1#g2/id> convert B<g1> to a file name by locating the topic with topicId B<g2>.  This requires the guids to be genuinely unique. SDL guids are thought to be unique by language code but the same topic, translated to a different language might well have the same guid as the original topic with a different language code: =(de|en|es|fr).  If the source is in just one language then the guid uniqueness is a reasonable assumption.  If the conversion can be done in phases by language then the uniqueness of guids is again reasonably assured. L<Data::Edit::Xml::Lint> provides an alternative solution to deguidizing by using labels to record the dita reference in the input corpus for each id encountered, these references can then be resolved in the usual manner by L<Data::Edit::Xml::Lint::relint>.
+
+B<fixBadRefs> - Try to fix bad references in L<these files|/fixRefs> where possible by either changing a guid to a file name assuming the right file is present in the corpus being scanned and L<deguidize|/deguidize> has been set true or failing that by moving the failing reference to the B<xtrf> attribute i.e. placing it in B<M3> possibly renaming the tag to B<ph> if L<changeBadXrefToPh> is in effect.
+
+B<fixDitaRefs> - Fix references in a corpus of L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> documents that have been converted to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> and whose target structure has been written to the named folder.
+
+B<fixRelocatedRefs> - Fix references to topics that have been moved around in the out folder structure assuming that all file names are unique.
+
+B<fixXrefsByTitle> - Try to fix invalid xrefs by the Gearhart Title Method if true
+
+B<flattenFolder> - Files are renamed to the Gearhart standard and placed in this folder if set.  References to the unflattened files are updated to references to the flattened files.  This option will eventually be deprecated as the Dita::GB::Standard is now fully available allowing files to be easily flattened before being processed by Xref.
+
+B<inputFolder> - A folder containing the dita and ditamap files to be cross referenced.
+
+B<matchTopics> - Match topics by title and by vocabulary to the specified confidence level between 0 and 1.  This operation might take some time to complete on a large corpus.
+
+B<maxZoomIn> - Optional hash of names to regular expressions to look for in each file
+
+B<maximumNumberOfProcesses> - Maximum number of processes to run in parallel at any one time with a sensible default.
+
+B<printSummaryLine> - Print the summary line if true - on by default.
+
+B<reports> - Reports folder: the cross referencer will write reports to files in this folder.
+
+B<requestAttributeNameAndValueCounts> - Report attribute name and value counts
+
+
+
+=head3 Output fields
+
+
+B<allowUniquePartialMatches> - Allow unique partial matches - i.e ignore the stuff to the right of the # in a reference if doing so produces a unique result. This feature has been explicitly disabled for conrefs (PS2-561) and might need to be disabled for other types of reference as well.
+
+B<attributeCount> - {file}{attribute name} == count of the different xml attributes found in the xml files.
+
+B<attributeNamesAndValuesCount> - {file}{attribute name}{value} = count
+
+B<author> - {file} = author of this file.
+
+B<badGuidHrefs> - Bad conrefs - all.
+
+B<badNavTitles> - Details of nav titles that were not resolved
+
+B<badReferencesCount> - The number of bad references encountered
+
+B<badTables> - Array of tables that need fixing.
+
+B<badXml1> - [Files] with a bad xml encoding header on the first line.
+
+B<badXml2> - [Files] with a bad xml doc type on the second line.
+
+B<baseTag> - Base Tag for each file
+
+B<bookMapRefs> - {bookmap full file name}{href}{navTitle}++ References from bookmaps to topics via appendix, chapter, bookmapref.
+
+B<conRefs> - {file}{href}   Count of conref definitions in each file.
+
+B<currentFolder> - The current working folder used to make absolute file names from relative ones
+
+B<docType> - {file} == docType:  the docType for each xml file.
+
+B<duplicateIds> - [file, id]     Duplicate id definitions within each file.
+
+B<duplicateTopicIds> - [topicId, [files]] Files with duplicate topic ids - the id on the outermost tag.
+
+B<fileExtensions> - Default file extensions to load
+
+B<fixRefs> - {file}{ref} where the href or conref target is not valid.
+
+B<fixedFolder> - Fixed files are placed in this folder if L<fixBadRefs|/fixBadRefs> has been specified.
+
+B<fixedRefs> - [] hrefs and conrefs from L<fixRefs|/fixRefs> which were invalid but have been fixed by L<deguidizing|/deguidize> them to a valid file name.
+
+B<fixedRefsFailed> - [] hrefs and conrefs from L<fixRefs|/fixRefs> which were moved to the "xtrf" attribute as requested by the L<fixBadHrefs|/fixBadHrefs> attribute because the reference was invalid and could not be improved by L<deguidization|/deguidize>.
+
+B<fixedRefsGB> - [] files fixed to the Gearhart-Brenan file naming standard
+
+B<fixedRefsNoAction> - [] hrefs and conrefs from L<fixRefs|/fixRefs> for which no action was taken.
+
+B<flattenFiles> - {old full file name} = file renamed to Gearhart-Brenan file naming standard
+
+B<goodNavTitles> - Details of nav titles that were resolved
+
+B<guidHrefs> - {file}{href} = location where href starts with GUID- and is thus probably a guid.
+
+B<guidToFile> - {topic id which is a guid} = file defining topic id.
+
+B<hrefUrlEncoding> - Hrefs that need url encoding because they contain white space
+
+B<ids> - {file}{id}     Id definitions across all files.
+
+B<images> - {file}{href}   Count of image references in each file.
+
+B<imagesReferencedFromBookMaps> - {bookmap full file name}{full name of image referenced from topic referenced from bookmap}++
+
+B<imagesReferencedFromTopics> - {topic full file name}{full name of image referenced from topic}++
+
+B<improvements> - Suggested improvements - a list of improvements that might be made.
+
+B<inputFileToTargetTopics> - {input file}{target file}++ : Tells us the topics an input file was split into
+
+B<inputFiles> - Input files from L<inputFolder|/inputFolder>.
+
+B<inputFolderImages> - {full image file name} for all files in input folder thus including any images resent
+
+B<ltgt> - {text between &lt; and &gt}{filename} = count giving the count of text items found between &lt; and &gt;
+
+B<maxZoomOut> - Results from L<maxZoomIn|/maxZoomIn>  where {file name}{regular expression key name in L<maxZoomIn|/maxZoomIn>}++
+
+B<md5Sum> - MD5 sum for each input file.
+
+B<missingImageFiles> - [file, href] == Missing images in each file.
+
+B<missingTopicIds> - Missing topic ids.
+
+B<noHref> - Tags that should have an href but do not have one.
+
+B<notReferenced> - {file name} Files in input area that are not referenced by a conref, image, bookmapref or xref tag and are not a bookmap.
+
+B<olBody> - The number of ol under body by file
+
+B<originalSourceFileAndIdToNewFile> - {original file}{id} = new file: Record mapping from original source file and id to the new file containing the id
+
+B<otherMeta> - {original file}{othermeta name}{othermeta content}++ : the contents of the other meta tags
+
+B<otherMetaBookMapsAfterTopicIncludes> - Bookmap othermeta after  topic othermeta has been included
+
+B<otherMetaBookMapsBeforeTopicIncludes> - Bookmap othermeta before topic othermeta has been included
+
+B<otherMetaDuplicatesCombined> - Duplicate othermeta in bookmaps with called topics othermeta included
+
+B<otherMetaDuplicatesSeparately> - Duplicate othermeta in bookmaps and topics considered separately
+
+B<otherMetaPushToBookMap> - Othermeta that can be pushed to the calling book map
+
+B<otherMetaRemainWithTopic> - Othermeta that must stay in the topic
+
+B<parseFailed> - {file} files that failed to parse.
+
+B<references> - {file}{reference}++ - the various references encountered
+
+B<relocatedReferencesFailed> - Failing references that were not fixed by relocation
+
+B<relocatedReferencesFixed> - Relocated references fixed
+
+B<results> - Summary of results table.
+
+B<sourceFile> - The source file from which this structure was generated.
+
+B<sourceTopicToTargetBookMap> - {input topic cut into multiple pieces} = output bookmap representing pieces
+
+B<statusLine> - Status line summarizing the cross reference.
+
+B<statusTable> - Status table summarizing the cross reference.
+
+B<tagCount> - {file}{tags} == count of the different tag names found in the xml files.
+
+B<tags> - Number of tags encountered
+
+B<tagsTextsRatio> - Ratio of tags to text encountered
+
+B<targetFolderContent> - {file} = bookmap file name : the target folder content which shows us where an input file went
+
+B<targetTopicToInputFiles> - {current file} = the source file from which the current file was obtained
+
+B<texts> - Number of texts encountered
+
+B<timeEnded> - Time the run ended
+
+B<timeStart> - Time the run started
+
+B<title> - {file} = title of file.
+
+B<titleToFile> - {title}{file}++ if L<fixXrefsByTitle> is in effect
+
+B<topicFlattening> - {topic}{sources}++ : the source files for each topic that was flattened
+
+B<topicFlatteningFactor> - Topic flattening factor - higher is better
+
+B<topicIds> - {file} = topic id - the id on the outermost tag.
+
+B<topicsFlattened> - Number of topics flattened
+
+B<topicsReferencedFromBookMaps> - {bookmap file, file name}{topic full file name}++
+
+B<validationErrors> - True means that Lint detected errors in the xml contained in the file.
+
+B<vocabulary> - The text of each topic shorn of attributes for vocabulary comparison.
+
+B<xRefs> - {file}{href}++ Xrefs references.
+
+B<xrefBadFormat> - External xrefs with no format=html.
+
+B<xrefBadScope> - External xrefs with no scope=external.
+
+B<xrefsFixedByTitle> - Xrefs fixed by locating a matching topic title from their text content.
+
+
+
+=head1 Private Methods
+
+=head2 newXref(%)
+
+Create a new cross referencer
+
+     Parameter    Description
+  1  %attributes  Attributes
+
+=head2 countLevels($$)
+
+Count has elements to the specified number of levels
+
+     Parameter  Description
+  1  $l         Levels
+  2  $h         Hash
+
+=head2 externalReference($)
+
+Check for an external reference
+
+     Parameter   Description
+  1  $reference  Reference to check
+
+=head2 loadInputFiles($)
+
+Load the names of the files to be processed
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 analyzeOneFile($$)
+
+Analyze one input file
+
+     Parameter  Description
+  1  $Xref      Xref request
+  2  $iFile     File to analyze
+
+=head2 reportGuidsToFiles($)
+
+Map and report guids to files
+
+     Parameter  Description
+  1  $xref      Xref results
+
+=head2 editXml($$$)
+
+Edit an xml file retaining any existing XML headers and lint trailers
+
+     Parameter  Description
+  1  $in        Input file
+  2  $out       Output file
+  3  $source    Source to write
+
+=head2 fixReferencesInOneFile($$)
+
+Fix one file by moving unresolved references to the xtrf attribute
+
+     Parameter    Description
+  1  $xref        Xref results
+  2  $sourceFile  Source file to fix
+
+=head2 fixReferences($)
+
+Fix just the file containing references using a number of techniques and report those references that cannot be so fixed.
+
+     Parameter  Description
+  1  $xref      Xref results
+
+=head2 fixOneFileGB($$)
+
+Fix one file to the Gearhart-Brenan standard
+
+     Parameter  Description
+  1  $xref      Xref results
+  2  $file      File to fix
+
+=head2 fixFilesGB($)
+
+Rename files to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
+
+     Parameter  Description
+  1  $xref      Xref results
+
+=head2 analyzeInputFiles($)
+
+Analyze the input files
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportDuplicateIds($)
+
+Report duplicate ids
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportDuplicateTopicIds($)
+
+Report duplicate topic ids
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportNoHrefs($)
+
+Report locations where an href was expected but not found
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 checkReferences($)
+
+Check each reference, report bad references and mark them for fixing.
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportGuidHrefs($)
+
+Report on guid hrefs
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportImages($)
+
+Reports on images and references to images
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportParseFailed($)
+
+Report failed parses
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportXml1($)
+
+Report bad xml on line 1
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportXml2($)
+
+Report bad xml on line 2
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportDocTypeCount($)
+
+Report doc type count
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTagCount($)
+
+Report tag counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTagsAndTextsCount($)
+
+Report tags and texts counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportLtGt($)
+
+Report items found between &lt; and &gt;
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportAttributeCount($)
+
+Report attribute counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportAttributeNameAndValueCounts($)
+
+Report attribute value counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportValidationErrors($)
+
+Report the files known to have validation errors
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTables($)
+
+Report on tables that have problems
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportFileExtensionCount($)
+
+Report file extension counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportFileTypes($)
+
+Report file type counts - takes too long in series
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportExternalXrefs($)
+
+Report external xrefs missing other attributes
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportPossibleImprovements($)
+
+Report improvements possible
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportMaxZoomOut($)
+
+Text located via Max Zoom In
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTopicDetails($)
+
+Things that occur once in each file
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTopicReuse($)
+
+Count how frequently each topic is reused
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportFixRefs($)
+
+Report of hrefs that need to be fixed
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportSourceFiles($)
+
+Source file for each topic
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportReferencesFromBookMaps($)
+
+Topics and images referenced from bookmaps
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportSimilarTopicsByTitle($)
+
+Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportSimilarTopicsByVocabulary($)
+
+Report topics likely to be similar on the basis of their vocabulary
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportMd5Sum($)
+
+Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportOlBody($)
+
+ol under body - indicative of a task
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportHrefUrlEncoding($)
+
+href needs url encoding
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 addNavTitlesToOneMap($$)
+
+Fix navtitles in one map
+
+     Parameter  Description
+  1  $xref      Xref results
+  2  $file      File to fix
+
+=head2 addNavTitlesToMaps($)
+
+Add nav titles to files containing maps.
+
+     Parameter  Description
+  1  $xref      Xref results
+
+=head2 oneBadRef($$$)
+
+Check one reference and return the first error encountered or B<undef> if no errors encountered. Relies on L<topicIds> to test files present and test the B<topicId> is valid, relies on L<ids> to check that the referenced B<id> is valid.
+
+     Parameter  Description
+  1  $xref      Cross referencer
+  2  $file      File containing reference
+  3  $href      Reference
+
+=head2 createSampleInputFiles($$)
+
+Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
+
+     Parameter  Description
+  1  $in        Input folder
+  2  $N         Number of sample files
+
+=head2 createSampleInputFilesFixFolder($)
+
+Create sample input files for testing fixFolder
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSampleInputFilesLtGt($)
+
+Create sample input files for testing items between &lt; and &gt;
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSampleInputFilesForFixDitaRefs($$)
+
+Create sample input files for fixing renamed topic refs
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+  2  $targets   Targets folder
+
+=head2 createSampleInputFilesForFixDitaRefsXref($)
+
+Create sample input files for fixing references into renamed topics by xref
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 changeFolderAndWriteFiles($$)
+
+Change file structure to the current folder and write
+
+     Parameter  Description
+  1  $f         Data structure as a string
+  2  $D         Target folder
+
+=head2 createSampleInputFilesForFixDitaRefsImproved1($)
+
+Create sample input files for fixing references via the targets/ folder
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createSampleInputFilesForFixDitaRefsImproved2($)
+
+Create sample input files for fixing conref references via the targets/ folder
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createSampleInputFilesForFixDitaRefsImproved3($)
+
+Create sample input files for fixing bookmap references to topics that get cut into multiple pieces
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createSampleInputFilesForFixDitaRefsImproved4($)
+
+Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createSampleImageTest($)
+
+Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createTestTopicFlattening($)
+
+Create sample input files for testing topic flattening ratio reporting
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createTestReferencedToFlattenedTopic($)
+
+Full reference to a topic that has been flattened
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createTestReferenceToCutOutTopic($)
+
+References from a topic that has been cut out to a topic that has been cut out
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createSampleOtherMeta($)
+
+Create sample data for othermeta reports
+
+     Parameter  Description
+  1  $out       Folder
+
+=head2 checkXrefStructure($$@)
+
+Check an output structure produced by Xrf
+
+     Parameter  Description
+  1  $x         Cross references
+  2  $field     Field to check
+  3  @folders   Folders to suppress
+
+=head2 writeXrefStructureTest($$@)
+
+Write the test for an Xref structure
+
+     Parameter  Description
+  1  $x         Cross referencer
+  2  $field     Field
+  3  @folders   Names of the folders to suppress
+
+=head2 testReferenceChecking()
+
+Test reference checking
+
+
+
+=head1 Index
+
+
+1 L<addNavTitlesToMaps|/addNavTitlesToMaps> - Add nav titles to files containing maps.
+
+2 L<addNavTitlesToOneMap|/addNavTitlesToOneMap> - Fix navtitles in one map
+
+3 L<analyzeInputFiles|/analyzeInputFiles> - Analyze the input files
+
+4 L<analyzeOneFile|/analyzeOneFile> - Analyze one input file
+
+5 L<changeFolderAndWriteFiles|/changeFolderAndWriteFiles> - Change file structure to the current folder and write
+
+6 L<checkReferences|/checkReferences> - Check each reference, report bad references and mark them for fixing.
+
+7 L<checkXrefStructure|/checkXrefStructure> - Check an output structure produced by Xrf
+
+8 L<countLevels|/countLevels> - Count has elements to the specified number of levels
+
+9 L<createSampleImageTest|/createSampleImageTest> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
+
+10 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
+
+11 L<createSampleInputFilesFixFolder|/createSampleInputFilesFixFolder> - Create sample input files for testing fixFolder
+
+12 L<createSampleInputFilesForFixDitaRefs|/createSampleInputFilesForFixDitaRefs> - Create sample input files for fixing renamed topic refs
+
+13 L<createSampleInputFilesForFixDitaRefsImproved1|/createSampleInputFilesForFixDitaRefsImproved1> - Create sample input files for fixing references via the targets/ folder
+
+14 L<createSampleInputFilesForFixDitaRefsImproved2|/createSampleInputFilesForFixDitaRefsImproved2> - Create sample input files for fixing conref references via the targets/ folder
+
+15 L<createSampleInputFilesForFixDitaRefsImproved3|/createSampleInputFilesForFixDitaRefsImproved3> - Create sample input files for fixing bookmap references to topics that get cut into multiple pieces
+
+16 L<createSampleInputFilesForFixDitaRefsImproved4|/createSampleInputFilesForFixDitaRefsImproved4> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
+
+17 L<createSampleInputFilesForFixDitaRefsXref|/createSampleInputFilesForFixDitaRefsXref> - Create sample input files for fixing references into renamed topics by xref
+
+18 L<createSampleInputFilesLtGt|/createSampleInputFilesLtGt> - Create sample input files for testing items between &lt; and &gt;
+
+19 L<createSampleOtherMeta|/createSampleOtherMeta> - Create sample data for othermeta reports
+
+20 L<createTestReferencedToFlattenedTopic|/createTestReferencedToFlattenedTopic> - Full reference to a topic that has been flattened
+
+21 L<createTestReferenceToCutOutTopic|/createTestReferenceToCutOutTopic> - References from a topic that has been cut out to a topic that has been cut out
+
+22 L<createTestTopicFlattening|/createTestTopicFlattening> - Create sample input files for testing topic flattening ratio reporting
+
+23 L<editXml|/editXml> - Edit an xml file retaining any existing XML headers and lint trailers
+
+24 L<externalReference|/externalReference> - Check for an external reference
+
+25 L<fixFilesGB|/fixFilesGB> - Rename files to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
+
+26 L<fixOneFileGB|/fixOneFileGB> - Fix one file to the Gearhart-Brenan standard
+
+27 L<fixReferences|/fixReferences> - Fix just the file containing references using a number of techniques and report those references that cannot be so fixed.
+
+28 L<fixReferencesInOneFile|/fixReferencesInOneFile> - Fix one file by moving unresolved references to the xtrf attribute
+
+29 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
+
+30 L<newXref|/newXref> - Create a new cross referencer
+
+31 L<oneBadRef|/oneBadRef> - Check one reference and return the first error encountered or B<undef> if no errors encountered.
+
+32 L<reportAttributeCount|/reportAttributeCount> - Report attribute counts
+
+33 L<reportAttributeNameAndValueCounts|/reportAttributeNameAndValueCounts> - Report attribute value counts
+
+34 L<reportDocTypeCount|/reportDocTypeCount> - Report doc type count
+
+35 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
+
+36 L<reportDuplicateTopicIds|/reportDuplicateTopicIds> - Report duplicate topic ids
+
+37 L<reportExternalXrefs|/reportExternalXrefs> - Report external xrefs missing other attributes
+
+38 L<reportFileExtensionCount|/reportFileExtensionCount> - Report file extension counts
+
+39 L<reportFileTypes|/reportFileTypes> - Report file type counts - takes too long in series
+
+40 L<reportFixRefs|/reportFixRefs> - Report of hrefs that need to be fixed
+
+41 L<reportGuidHrefs|/reportGuidHrefs> - Report on guid hrefs
+
+42 L<reportGuidsToFiles|/reportGuidsToFiles> - Map and report guids to files
+
+43 L<reportHrefUrlEncoding|/reportHrefUrlEncoding> - href needs url encoding
+
+44 L<reportImages|/reportImages> - Reports on images and references to images
+
+45 L<reportLtGt|/reportLtGt> - Report items found between &lt; and &gt;
+
+46 L<reportMaxZoomOut|/reportMaxZoomOut> - Text located via Max Zoom In
+
+47 L<reportMd5Sum|/reportMd5Sum> - Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
+
+48 L<reportNoHrefs|/reportNoHrefs> - Report locations where an href was expected but not found
+
+49 L<reportOlBody|/reportOlBody> - ol under body - indicative of a task
+
+50 L<reportParseFailed|/reportParseFailed> - Report failed parses
+
+51 L<reportPossibleImprovements|/reportPossibleImprovements> - Report improvements possible
+
+52 L<reportReferencesFromBookMaps|/reportReferencesFromBookMaps> - Topics and images referenced from bookmaps
+
+53 L<reportSimilarTopicsByTitle|/reportSimilarTopicsByTitle> - Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
+
+54 L<reportSimilarTopicsByVocabulary|/reportSimilarTopicsByVocabulary> - Report topics likely to be similar on the basis of their vocabulary
+
+55 L<reportSourceFiles|/reportSourceFiles> - Source file for each topic
+
+56 L<reportTables|/reportTables> - Report on tables that have problems
+
+57 L<reportTagCount|/reportTagCount> - Report tag counts
+
+58 L<reportTagsAndTextsCount|/reportTagsAndTextsCount> - Report tags and texts counts
+
+59 L<reportTopicDetails|/reportTopicDetails> - Things that occur once in each file
+
+60 L<reportTopicReuse|/reportTopicReuse> - Count how frequently each topic is reused
+
+61 L<reportValidationErrors|/reportValidationErrors> - Report the files known to have validation errors
+
+62 L<reportXml1|/reportXml1> - Report bad xml on line 1
+
+63 L<reportXml2|/reportXml2> - Report bad xml on line 2
+
+64 L<testReferenceChecking|/testReferenceChecking> - Test reference checking
+
+65 L<writeXrefStructureTest|/writeXrefStructureTest> - Write the test for an Xref structure
+
+66 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
+
+=head1 Installation
+
+This module is written in 100% Pure Perl and, thus, it is easy to read,
+comprehend, use, modify and install via B<cpan>:
+
+  sudo cpan install Data::Edit::Xml::Xref
+
+=head1 Author
+
+L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
+
+L<http://www.appaapps.com|http://www.appaapps.com>
+
+=head1 Copyright
+
+Copyright (c) 2016-2019 Philip R Brenan.
+
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
+
+=cut
+
+
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  binmode($_, ":utf8") for *STDOUT, *STDERR;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+  1
+ }
+
+test unless caller;
+
+1;
+# podDocumentation
+__DATA__
+use Test::More;
+use warnings FATAL=>qw(all);
+use strict;
+
+if ($^O =~ m(bsd|linux)i)
+ {plan tests => 73;
+ }
+else
+ {plan skip_all => 'Not supported';
+ }
+
+Test::More->builder->output("/dev/null")                                        # Show only errors during testing
+  if ((caller(1))[0]//'Data::Edit::Xml::Xref') eq "Data::Edit::Xml::Xref";
+
+#goto latestTest;
+
+sub tests      {fpd currentDirectory, q(test)}                                  # Tests folder
+sub in         {fpd tests, q(in)}                                               # Input folder
+sub out        {fpd tests, q(out)}                                              # Output folder
+sub outFixed   {fpd tests, q(outFixed)}                                         # Fixed output folder
+sub reports    {fpd tests, q(report)}                                           # Reports folder
+sub targets    {fpf(tests, q(targets))}                                         # Tests targets folder
 
 #D1 Create test data                                                            # Create files to test the various capabilities provided by Xref
 
@@ -3434,6 +4913,69 @@ sub createTestReferenceToCutOutTopic($)                                         
   changeFolderAndWriteFiles($f, $folder);                                       # Change folder and write files
  }
 
+sub createSampleOtherMeta($)                                                    #P Create sample data for othermeta reports
+ {my ($out) = @_;                                                               # Folder
+
+  package CreateSampleOtherMeta;
+  use Carp;
+  use Data::Dump qw(dump);
+  use Data::Edit::Xml;
+  use Data::Table::Text qw(:all);
+
+  sub genMeta(%)                                                                # Generate meta data
+   {my %m = @_;
+    my @m;
+    for my $n(sort keys %m)
+     {my $c = $m{$n};
+      push @m, qq(<othermeta name="$n" content="$c"/>);
+     }
+    join "\n", @m;
+   }
+
+  sub genTopic($$$)                                                             # Generate a topic
+   {my ($out, $name, $meta) = @_;
+
+    my $c      = Data::Edit::Xml::ditaSampleConcept
+     (title    => $name,
+      metadata => $meta,
+     );
+
+    owf(fpe($out, $name, qw(dita)), $c->ditaPrettyPrintWithHeaders);
+   }
+
+  sub genMap($$$@)                                                              # Generate a bookmap
+   {my ($out, $name, $meta, @chapters) = @_;
+
+    my @r;
+    for my $f(@chapters)
+     {my $F = swapFilePrefix($f, $out);
+      push @r, qq(<chapter href="$F"/>);
+     }
+
+    my $r = join "\n", @r;
+
+    my $b = Data::Edit::Xml::ditaSampleBookMap
+     (chapters  => $r,
+      metadata  => $meta,
+      title     => $name,
+     );
+
+    owf(fpe($out, $name, qw(ditamap)), $b->ditaPrettyPrintWithHeaders);
+   }
+
+  clearFolder($out, 1e2);
+
+  my %common = (aa=>q(AAAA), bb=>q(BBBB));
+
+  my @topics =                                                                  # Topics
+   (genTopic($out, q(ca), genMeta(%common, dd=>q(DD))),
+    genTopic($out, q(cb), genMeta(%common, dd=>q(DD))),
+   );
+
+  genMap($out, q(b1), genMeta(%common, dd=>q(DD1111)), @topics);                # Bookmaps
+  genMap($out, q(b2), genMeta(%common, dd=>q(DD2222)), @topics);
+ } # createSampleOtherMeta
+
 sub checkXrefStructure($$@)                                                     #P Check an output structure produced by Xrf
  {my ($x, $field, @folders) = @_;                                               # Cross references, field to check, folders to suppress
   my $s = nws dump($x->{$field});                                               # Structure to be tested
@@ -3463,1214 +5005,7 @@ END
   say STDERR $t;                                                                # Write test
  }
 
-#D
-# podDocumentation
-=pod
-
-=encoding utf-8
-
-=head1 Name
-
-Data::Edit::Xml::Xref - Cross reference Dita XML, match topics and ameliorate missing references.
-
-=head1 Synopsis
-
-Check the references in a large corpus of Dita XML documents held in folder
-L<inputFolder|/inputFolder> running processes in parallel where ever possible
-to take advantage of multi-cpu computers:
-
-  use Data::Edit::Xml::Xref;
-
-  my $x = xref(inputFolder              => q(in),
-               maximumNumberOfProcesses => 512,
-               fixBadRefs               => 1,
-               flattenFolder            => q(out2),
-               matchTopics              => 0.9,
-              );
-
-The cross reference analysis can be requested as a L<status line|/statusLine>:
-
-  ok nws($x->statusLine) eq nws(<<END);
-Xref: 108 references fixed, 50 bad xrefs, 16 missing image files, 16 missing image references, 13 bad first lines, 13 bad second lines, 9 bad conrefs, 9 duplicate topic ids, 9 files with bad conrefs, 9 files with bad xrefs, 8 duplicate ids, 6 bad topicrefs, 6 files not referenced, 4 invalid guid hrefs, 2 bad book maps, 2 bad tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing
-END
-
-Or as a tabular report:
-
-  ok nws($x->statusTable) eq nws(<<END);
-Xref:
-    Count  Condition
- 1    108  references fixed
- 2     50  bad xrefs
- 3     16  missing image files
- 4     16  missing image references
- 5     13  bad first lines
- 6     13  bad second lines
- 7      9  files with bad conrefs
- 8      9  bad conrefs
- 9      9  files with bad xrefs
-10      9  duplicate topic ids
-11      8  duplicate ids
-12      6  bad topicrefs
-13      6  files not referenced
-14      4  invalid guid hrefs
-15      2  bad book maps
-16      2  bad tables
-17      1  href missing
-18      1  file failed to parse
-19      1  External xrefs with no format=html
-20      1  External xrefs with no scope=external
-END
-
-More detailed reports are produced in the L<reports|/reports> folder:
-
-  $x->reports
-
-and indexed by the L<reports> report:
-
-  reports/reports.txt
-
-which contains a list of all the L<reports> generated:
-
-    Rows  Title                                                           File
- 1     5  Attributes                                                      reports/count/attributes.txt
- 2    13  Bad Xml line 1                                                  reports/bad/xmlLine1.txt
- 3    13  Bad Xml line 2                                                  reports/bad/xmlLine2.txt
- 4     9  Bad conRefs                                                     reports/bad/ConRefs.txt
- 5     2  Bad external xrefs                                              reports/bad/externalXrefs.txt
- 6    16  Bad image references                                            reports/bad/imageRefs.txt
- 7     9  Bad topicrefs                                                   reports/bad/bookMapRefs.txt
- 8    50  Bad xRefs                                                       reports/bad/XRefs.txt
- 9     2  Bookmaps with errors                                            reports/bad/bookMap.txt
-10     2  Document types                                                  reports/count/docTypes.txt
-11     8  Duplicate id definitions within files                           reports/bad/idDefinitionsDuplicated.txt
-12     3  Duplicate topic id definitions                                  reports/bad/topicIdDefinitionsDuplicated.txt
-13     3  File extensions                                                 reports/count/fileExtensions.txt
-14     1  Files failed to parse                                           reports/bad/parseFailed.txt
-15     0  Files types                                                     reports/count/fileTypes.txt
-16    16  Files whose short names are bi-jective with their md5 sums      reports/good/shortNameToMd5Sum.txt
-17     0  Files whose short names are not bi-jective with their md5 sums  reports/bad/shortNameToMd5Sum.txt
-18   108  Fixes Applied To Failing References                             reports/lists/referencesFixed.txt
-19     0  Good bookmaps                                                   reports/good/bookMap.txt
-20     9  Good conRefs                                                    reports/good/ConRefs.txt
-21     5  Good topicrefs                                                  reports/good/bookMapRefs.txt
-22     8  Good xRefs                                                      reports/good/XRefs.txt
-23     1  Guid topic definitions                                          reports/lists/guidsToFiles.txt
-24     2  Image files                                                     reports/good/imagesFound.txt
-25     1  Missing hrefs                                                   reports/bad/missingHrefAttributes.txt
-26    16  Missing image references                                        reports/bad/imagesMissing.txt
-27     4  Possible improvements                                           reports/improvements.txt
-28     2  Resolved GUID hrefs                                             reports/good/guidHrefs.txt
-29     2  Tables with errors                                              reports/bad/tables.txt
-30    23  Tags                                                            reports/count/tags.txt
-31    11  Topic Reuses                                                    reports/lists/topicReuse.txt
-32     0  Topic Reuses                                                    reports/lists/similar/byTitle.txt
-33    16  Topics                                                          reports/lists/topics.txt
-34    15  Topics with similar vocabulary                                  reports/lists/similar/byVocabulary.txt
-35     0  Topics with validation errors                                   reports/bad/validationErrors.txt
-36     0  Topics without ids                                              reports/bad/topicIdDefinitionsMissing.txt
-37     6  Unreferenced files                                              reports/bad/notReferenced.txt
-38    11  Unresolved GUID hrefs                                           reports/bad/guidHrefs.txt
-
-=head2 Add navigation titles to topic references
-
-Xref will create or update the navigation titles B<navtitles> of topic refs
-B<appendix|chapter|topicref> in maps if requested by both file name and GUID
-reference:
-
-  addNavTitle => 1
-
-Reports of successful updates will be written to:
-
-  reports/good/navTitles.txt
-
-Reports of unsuccessful updates will be written to:
-
-  reports/bad/navTitles.txt
-
-=head2 Fix bad references
-
-It is often desirable to ameliorate unresolved Dita href attributes so that
-incomplete content can be loaded into a content management system.  The:
-
-  fixBadRefs => 1
-
-attribute requests that the:
-
- conref and href
-
-attributes be renamed to:
-
- xtrf
-
-if the B<conref> or B<href> attribute specification cannot be resolved in the
-current corpus.
-
-If the L<fixedFolder|/fixedFolder> attribute is set, the fixed files are
-written into this folder, else they are written back into the
-L<inputFolder|/inputFolder>.  Two reports are generated by this action:
-
-  reports/bad/fixedRefs.txt
-
-  reports/bad/fixedRefsNoAction.txt
-
-This feature designed by L<mailto:mim@cpan.org>.
-
-=head2 Deguidize
-
-Some content management systems use guids, some content management systems use
-file names as their means of identifying content. When moving from a guid to a
-file name content management system it might be necessary to replace the guids
-representing file names with the actual underlying file names.  If the
-
-  deguidize => 1
-
-parameter is set to true, Xref will replace any such file guids with the
-underlying file name if it is present in the content being cross referenced.
-
-=head2 File flattening
-
-It is often desirable to flatten or reflatten the topic files in a corpus so
-that they can coexist in a single folder of a content management system without
-colliding with each other.
-
-The presence of the input attribute:
-
- flattenFolder => folder-to-flatten-files-into
-
-causes topic files to be flattened into the named folder using the
-L<GBStandard> to generate the flattened file names.  Xref will then update all
-L<Dita> references to match these new file names.  If the L<flattenFolder>
-folder is the same as the L<inputFolder> then the input files are flattened in
-place.
-
-=head2 Locating relocated files
-
-File references in B<conref> or B<hrefs> that have a unique valid base file
-name and an invalid path can be fixed by setting the input attribute:
-
- fixRelocatedRefs => 1
-
-to a true value to request that Xref should replace the incorrect paths to the
-unique bases file names with the correct path.
-
-If coded in conjunction with the B<fixBadRefs> input attribute this will cause
-Xref to first try and fix any missing xrefs, any that still fail to resolve
-will then be ameliorated by moving them to the B<xtrf> attribute.
-
-=head2 Fix Xrefs by Title
-
-L<Dita> B<xref> tags with broken or missing B<href> attributes can sometimes be
-fixed by matching the text content of the B<xref> with the titles of topics.
-
-If:
-
-  fixXrefsByTitle => 1
-
-is specified, L<Xref> will locate possible targets for a broken B<href> by
-matching the white space normalized L<Data::Table::Text::nws> of the text
-content of the B<xref> with the similarly normalized title of each topic.  If a
-single matching candidate is located then it will be used to update the B<href>
-attribute of the B<xref>.
-
-=head2 Fix References in Dita To Dita Conversions
-
-When converting a L<Dita> input source corpus to L<Dita> the referenced topics
-are usually renamed and flattened via the L<GBStandard>. If enabled:
-
-  fixDitaRefs => targets/
-
-updates valid L<Dita> references in the input corpus with the latest name for
-the referenced topic to make links that were valid in the input corpus valid in
-the output corpus as well.
-
-The B<targets/> folder should contain the same set of file names as the
-original input corpus, each such file should contain the name of a B<bookmap>
-topic present in the B<inputFolder=> whose B<chapter> and B<topicref>s identify
-the new names of the files cut out and flattened from the existing input
-corpus.
-
-The creation of the B<target/> folder is usually done by some other piece of
-software such as L<Data::Edit::Xml::To::Dita> as it is too complex and
-laborious to be performed reliably by hand.  No validation of the contents of
-this folder is performed as it is assumed that it has been created reliably in
-software.
-
-=head2 Topic Matching
-
-Topics can be matched on title and vocabulary to assist authors in finding
-similar topics by specifying the:
-
-  matchTopics => 0.9
-
-attribute where the value of this attribute is the confidence level between 0
-and 1.
-
-Topic matching produces the reports:
-
-  reports/lists/similar/byTitle.txt
-  reports/lists/similar/byVocabulary.txt
-
-Topic matching might take some time for large input folders.
-
-=head3 Title matching
-
-This report can be found at:
-
-  reports/lists/similar/byTitle.txt
-
-Title sorts topics by their titles so that topic with similar titles can be
-easily located:
-
-    Similar  Prefix        Source
- 1       14  c_Notices__   c_Notices_5614e96c7a3eaf3dfefc4a455398361b
- 2           c_Notices__   c_Notices_14a9f467215dea879d417de884c21e6d
- 3           c_Notices__   c_Notices_19011759a2f768d76581dc3bba170a44
- 4           c_Notices__   c_Notices_aa741e6223e6cf8bc1a5ebdcf0ba867c
- 5           c_Notices__   c_Notices_f0009b28c3c273094efded5fac32b83f
- 6           c_Notices__   c_Notices_b1480ac1af812da3945239271c579bb1
- 7           c_Notices__   c_Notices_5f3aa15d024f0b6068bd8072d4942f6d
- 8           c_Notices__   c_Notices_17c1f39e8d70c765e1fbb6c495bedb03
- 9           c_Notices__   c_Notices_7ea35477554f979b3045feb369b69359
-10           c_Notices__   c_Notices_4f200259663703065d247b35d5500e0e
-11           c_Notices__   c_Notices_e3f2eb03c23491c5e96b08424322e423
-12           c_Notices__   c_Notices_06b7e9b0329740fc2b50fedfecbc5a94
-13           c_Notices__   c_Notices_550a0d84dfc94982343f58f84d1c11c2
-14           c_Notices__   c_Notices_fa7e563d8153668db9ed098d0fe6357b
-15        3  c_Overview__  c_Overview_f9e554ee9be499368841260344815f58
-16           c_Overview__  c_Overview_f234dc10ea3f4229d0e1ab4ad5e8f5fe
-17           c_Overview__  c_Overview_96121d7bcd41cf8be318b96da0049e73
-
-
-=head3 Vocabulary matching
-
-This report can be found at:
-
-  reports/lists/similar/byVocabulary.txt
-
-Vocabulary matching compares the vocabulary of pairs of topics: topics with
-similar vocabularies within the confidence level specified are reported
-together:
-
-    Similar  Topic
- 1        8  in/1.dita
- 2           in/2.dita
- 3           in/3.dita
- 4           in/4.dita
- 5           in/5.dita
- 6           in/6.dita
- 7           in/7.dita
- 8           in/8.dita
- 9
-10        2  in/map/bookmap.ditamap
-11           in/map/bookmap2.ditamap
-12
-13        2  in/act4. dita
-14           in/act5.dita
-
-=head1 Description
-
-Cross reference Dita XML, match topics and ameliorate missing references.
-
-
-Version 20190708.
-
-
-The following sections describe the methods in each functional area of this
-module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
-
-
-
-=head1 Cross reference
-
-Check the cross references in a set of Dita files and report the results.
-
-=head2 xref(%)
-
-Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
-
-     Parameter                 Description
-  1  {my $xref = newXref(@_);  Create the cross referencer
-
-B<Example:>
-
-
-  if (1)                                                                           References from a topic that has been cut out to a topic that has been cut out
-   {clearFolder(tests, 111);
-    createTestReferenceToCutOutTopic(tests);
-  
-    my $x = 𝘅𝗿𝗲𝗳(inputFolder => out, fixDitaRefs => targets);
-    ok $x->statusLine eq q(Xref: 1 ref);
-  
-    is_deeply checkXrefStructure($x, q(inputFileToTargetTopics),          in, targets), { "a.xml" => { "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita" => 1, "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita" => 1, "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita" => 1, "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita" => 1, }, "b.xml" => { "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita" => 1, "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita" => 1, "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita" => 1, "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita" => 1, }, };
-    is_deeply checkXrefStructure($x, q(targetTopicToInputFiles),          in, targets), { "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita" => { "a.xml" => 1, }, "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita" => { "a.xml" => 1, }, "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita" => { "a.xml" => 1, }, "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita" => { "a.xml" => 1, }, "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita" => { "b.xml" => 1, }, "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita" => { "b.xml" => 1, }, "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita" => { "b.xml" => 1, }, "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita" => { "b.xml" => 1, }, };
-    is_deeply checkXrefStructure($x, q(sourceTopicToTargetBookMap),       in, targets), { "a.xml" => bless({ source => "a.xml", sourceDocType => "concept", target => "bm_a_9d0a9f8e0ac234de9e22c19054b6e455.ditamap", targetType => "bookmap", }, "Bookmap"), "b.xml" => bless({ source => "b.xml", sourceDocType => "concept", target => "bm_b_d2806ba589f908da1106574afd9db642.ditamap", targetType => "bookmap", }, "Bookmap"), };
-    is_deeply checkXrefStructure($x, q(topicFlattening),                  in, targets), {};
-    is_deeply checkXrefStructure($x, q(originalSourceFileAndIdToNewFile), in, targets), { "a.xml" => { "GUID-400c2c59-95e1-7bf3-4647-3a135281bfaf" => "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita", "GUID-68822563-d568-f418-38ae-f1c62cb4ac8d" => "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita", "GUID-c67821ef-3da2-c89f-0fc9-9fba3937f368" => "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita", "GUID-f0c0e170-8128-10ef-045d-97602fdde76f" => "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita", }, "b.xml" => { "GUID-2b6aab4f-9328-e326-f55f-160771a8c3dd" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", "GUID-86a684b0-1a0b-4c30-6da9-24c74ff1f0cc" => "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita", "GUID-96a20d7f-bbaf-deef-55ef-e09a0a059251" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "GUID-cfe7cb3d-05e7-a147-db10-dcbacaeecef7" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p1" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "p2" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p3" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", }, };
-   }
-  
-
-=head1 Create test data
-
-Create files to test the various capabilities provided by Xref
-
-
-=head2 Data::Edit::Xml::Xref Definition
-
-
-Attributes used by the Xref cross referencer.
-
-
-
-
-=head3 Input fields
-
-
-B<addNavTitles> - If true, add navtitle to outgoing bookmap references to show the title of the target topic.
-
-B<changeBadXrefToPh> - Change xrefs being placed in B<M3> by L<fixBadRefs> to B<ph>.
-
-B<deguidize> - Set true to replace guids in dita references with file name. Given reference B<g1#g2/id> convert B<g1> to a file name by locating the topic with topicId B<g2>.  This requires the guids to be genuinely unique. SDL guids are thought to be unique by language code but the same topic, translated to a different language might well have the same guid as the original topic with a different language code: =(de|en|es|fr).  If the source is in just one language then the guid uniqueness is a reasonable assumption.  If the conversion can be done in phases by language then the uniqueness of guids is again reasonably assured. L<Data::Edit::Xml::Lint> provides an alternative solution to deguidizing by using labels to record the dita reference in the input corpus for each id encountered, these references can then be resolved in the usual manner by L<Data::Edit::Xml::Lint::relint>.
-
-B<fixBadRefs> - Try to fix bad references in L<these files|/fixRefs> where possible by either changing a guid to a file name assuming the right file is present in the corpus being scanned and L<deguidize|/deguidize> has been set true or failing that by moving the failing reference to the B<xtrf> attribute i.e. placing it in B<M3> possibly renaming the tag to B<ph> if L<changeBadXrefToPh> is in effect.
-
-B<fixDitaRefs> - Fix references in a corpus of L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> documents that have been converted to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> and whose target structure has been written to the named folder.
-
-B<fixRelocatedRefs> - Fix references to topics that have been moved around in the out folder structure assuming that all file names are unique.
-
-B<fixXrefsByTitle> - Try to fix invalid xrefs by the Gearhart Title Method if true
-
-B<flattenFolder> - Files are renamed to the Gearhart standard and placed in this folder if set.  References to the unflattened files are updated to references to the flattened files.  This option will eventually be deprecated as the Dita::GB::Standard is now fully available allowing files to be easily flattened before being processed by Xref.
-
-B<inputFolder> - A folder containing the dita and ditamap files to be cross referenced.
-
-B<matchTopics> - Match topics by title and by vocabulary to the specified confidence level between 0 and 1.  This operation might take some time to complete on a large corpus.
-
-B<maxZoomIn> - Optional hash of names to regular expressions to look for in each file
-
-B<maximumNumberOfProcesses> - Maximum number of processes to run in parallel at any one time.
-
-B<printSummaryLine> - Print the summary line if true - on by default.
-
-B<reports> - Reports folder: the cross referencer will write reports to files in this folder.
-
-B<requestAttributeNameAndValueCounts> - Report attribute name and value counts
-
-
-
-=head3 Output fields
-
-
-B<allowUniquePartialMatches> - Allow unique partial matches - i.e ignore the stuff to the right of the # in a reference if doing so produces a unique result. This feature has been explicitly disabled for conrefs (PS2-561) and might need to be disabled for other types of reference as well.
-
-B<attributeCount> - Make input folder absolute                      # {file}{attribute name} == count of the different xml attributes found in the xml files.
-
-B<attributeNamesAndValuesCount> - {file}{attribute name}{value} = count
-
-B<author> - {file} = author of this file.
-
-B<badGuidHrefs> - Bad conrefs - all.
-
-B<badNavTitles> - Details of nav titles that were not resolved
-
-B<badReferencesCount> - The number of bad references encountered
-
-B<badTables> - Array of tables that need fixing.
-
-B<badXml1> - [Files] with a bad xml encoding header on the first line.
-
-B<badXml2> - [Files] with a bad xml doc type on the second line.
-
-B<baseTag> - Base Tag for each file
-
-B<bookMapRefs> - {bookmap full file name}{href}{navTitle}++ References from bookmaps to topics via appendix, chapter, bookmapref.
-
-B<conRefs> - {file}{href}   Count of conref definitions in each file.
-
-B<currentFolder> - The current working folder used to make absolute file names from relative ones
-
-B<docType> - {file} == docType:  the docType for each xml file.
-
-B<duplicateIds> - [file, id]     Duplicate id definitions within each file.
-
-B<duplicateTopicIds> - [topicId, [files]] Files with duplicate topic ids - the id on the outermost tag.
-
-B<fileExtensions> - Default file extensions to load
-
-B<fixRefs> - {file}{ref} where the href or conref target is not valid.
-
-B<fixedFolder> - Fixed files are placed in this folder if L<fixBadRefs|/fixBadRefs> has been specified.
-
-B<fixedRefs> - [] hrefs and conrefs from L<fixRefs|/fixRefs> which were invalid but have been fixed by L<deguidizing|/deguidize> them to a valid file name.
-
-B<fixedRefsFailed> - [] hrefs and conrefs from L<fixRefs|/fixRefs> which were moved to the "xtrf" attribute as requested by the L<fixBadHrefs|/fixBadHrefs> attribute because the reference was invalid and could not be improved by L<deguidization|/deguidize>.
-
-B<fixedRefsGB> - [] files fixed to the Gearhart-Brenan file naming standard
-
-B<fixedRefsNoAction> - [] hrefs and conrefs from L<fixRefs|/fixRefs> for which no action was taken.
-
-B<flattenFiles> - {old full file name} = file renamed to Gearhart-Brenan file naming standard
-
-B<goodNavTitles> - Details of nav titles that were resolved
-
-B<guidHrefs> - {file}{href} = location where href starts with GUID- and is thus probably a guid.
-
-B<guidToFile> - {topic id which is a guid} = file defining topic id.
-
-B<hrefUrlEncoding> - Hrefs that need url encoding because they contain white space
-
-B<ids> - {file}{id}     Id definitions across all files.
-
-B<images> - {file}{href}   Count of image references in each file.
-
-B<imagesReferencedFromBookMaps> - {bookmap full file name}{full name of image referenced from topic referenced from bookmap}++
-
-B<imagesReferencedFromTopics> - {topic full file name}{full name of image referenced from topic}++
-
-B<improvements> - Suggested improvements - a list of improvements that might be made.
-
-B<inputFileToTargetTopics> - {input file}{target file}++ : Tells us the topics an input file was split into
-
-B<inputFiles> - Input files from L<inputFolder|/inputFolder>.
-
-B<inputFolderImages> - {full image file name} for all files in input folder thus including any images resent
-
-B<ltgt> - {text between &lt; and &gt}{filename} = count giving the count of text items found between &lt; and &gt;
-
-B<maxZoomOut> - Results from L<maxZoomIn|/maxZoomIn>  where {file name}{regular expression key name in L<maxZoomIn|/maxZoomIn>}++
-
-B<md5Sum> - MD5 sum for each input file.
-
-B<missingImageFiles> - [file, href] == Missing images in each file.
-
-B<missingTopicIds> - Missing topic ids.
-
-B<noHref> - Tags that should have an href but do not have one.
-
-B<notReferenced> - {file name} Files in input area that are not referenced by a conref, image, bookmapref or xref tag and are not a bookmap.
-
-B<olBody> - The number of ol under body by file
-
-B<originalSourceFileAndIdToNewFile> - {original file}{id} = new file: Record mapping from original source file and id to the new file containing the id
-
-B<parseFailed> - {file} files that failed to parse.
-
-B<references> - {file}{reference}++ - the various references encountered
-
-B<relocatedReferencesFailed> - Failing references that were not fixed by relocation
-
-B<relocatedReferencesFixed> - Relocated references fixed
-
-B<results> - Summary of results table.
-
-B<sourceFile> - The source file from which this structure was generated.
-
-B<sourceTopicToTargetBookMap> - {input topic cut into multiple pieces} = output bookmap representing pieces
-
-B<statusLine> - Status line summarizing the cross reference.
-
-B<statusTable> - Status table summarizing the cross reference.
-
-B<tagCount> - {file}{tags} == count of the different tag names found in the xml files.
-
-B<tags> - Number of tags encountered
-
-B<tagsTextsRatio> - Ratio of tags to text encountered
-
-B<targetFolderContent> - {file} = bookmap file name : the target folder content which shows us where an input file went
-
-B<targetTopicToInputFiles> - {current file} = the source file from which the current file was obtained
-
-B<texts> - Number of texts encountered
-
-B<timeEnded> - Time the run ended
-
-B<timeStart> - Time the run started
-
-B<title> - {file} = title of file.
-
-B<titleToFile> - {title}{file}++ if L<fixXrefsByTitle> is in effect
-
-B<topicFlattening> - {topic}{sources}++ : the source files for each topic that was flattened
-
-B<topicFlatteningFactor> - Topic flattening factor - higher is better
-
-B<topicIds> - {file} = topic id - the id on the outermost tag.
-
-B<topicsFlattened> - Number of topics flattened
-
-B<topicsReferencedFromBookMaps> - {bookmap file, file name}{topic full file name}++
-
-B<validationErrors> - True means that Lint detected errors in the xml contained in the file.
-
-B<vocabulary> - The text of each topic shorn of attributes for vocabulary comparison.
-
-B<xRefs> - {file}{href}++ Xrefs references.
-
-B<xrefBadFormat> - External xrefs with no format=html.
-
-B<xrefBadScope> - External xrefs with no scope=external.
-
-B<xrefsFixedByTitle> - Xrefs fixed by locating a matching topic title from their text content.
-
-
-
-=head1 Private Methods
-
-=head2 newXref(%)
-
-Create a new cross referencer
-
-     Parameter    Description
-  1  %attributes  Attributes
-
-=head2 countLevels($$)
-
-Count has elements to the specified number of levels
-
-     Parameter  Description
-  1  $l         Levels
-  2  $h         Hash
-
-=head2 externalReference($)
-
-Check for an external reference
-
-     Parameter   Description
-  1  $reference  Reference to check
-
-=head2 loadInputFiles($)
-
-Load the names of the files to be processed
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 analyzeOneFile($$)
-
-Analyze one input file
-
-     Parameter  Description
-  1  $Xref      Xref request
-  2  $iFile     File to analyze
-
-=head2 reportGuidsToFiles($)
-
-Map and report guids to files
-
-     Parameter  Description
-  1  $xref      Xref results
-
-=head2 editXml($$$)
-
-Edit an xml file
-
-     Parameter  Description
-  1  $in        Input file
-  2  $out       Output file
-  3  $x         Parse tree
-
-=head2 fixReferencesInOneFile($$)
-
-Fix one file by moving unresolved references to the xtrf attribute
-
-     Parameter    Description
-  1  $xref        Xref results
-  2  $sourceFile  Source file to fix
-
-=head2 fixReferences($)
-
-Fix just the file containing references using a number of techniques and report those references that cannot be so fixed.
-
-     Parameter  Description
-  1  $xref      Xref results
-
-=head2 fixOneFileGB($$)
-
-Fix one file to the Gearhart-Brenan standard
-
-     Parameter  Description
-  1  $xref      Xref results
-  2  $file      File to fix
-
-=head2 fixFilesGB($)
-
-Rename files to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
-
-     Parameter  Description
-  1  $xref      Xref results
-
-=head2 analyzeInputFiles($)
-
-Analyze the input files
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportDuplicateIds($)
-
-Report duplicate ids
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportDuplicateTopicIds($)
-
-Report duplicate topic ids
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportNoHrefs($)
-
-Report locations where an href was expected but not found
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 checkReferences($)
-
-Check each reference, report bad references and mark them for fixing.
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportGuidHrefs($)
-
-Report on guid hrefs
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportImages($)
-
-Reports on images and references to images
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportParseFailed($)
-
-Report failed parses
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportXml1($)
-
-Report bad xml on line 1
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportXml2($)
-
-Report bad xml on line 2
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportDocTypeCount($)
-
-Report doc type count
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportTagCount($)
-
-Report tag counts
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportTagsAndTextsCount($)
-
-Report tags and texts counts
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportLtGt($)
-
-Report items found between &lt; and &gt;
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportAttributeCount($)
-
-Report attribute counts
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportAttributeNameAndValueCounts($)
-
-Report attribute value counts
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportValidationErrors($)
-
-Report the files known to have validation errors
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportTables($)
-
-Report on tables that have problems
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportFileExtensionCount($)
-
-Report file extension counts
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportFileTypes($)
-
-Report file type counts - takes too long in series
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportExternalXrefs($)
-
-Report external xrefs missing other attributes
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportPossibleImprovements($)
-
-Report improvements possible
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportMaxZoomOut($)
-
-Text located via Max Zoom In
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportTopicDetails($)
-
-Things that occur once in each file
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportTopicReuse($)
-
-Count how frequently each topic is reused
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportFixRefs($)
-
-Report of hrefs that need to be fixed
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportSourceFiles($)
-
-Source file for each topic
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportReferencesFromBookMaps($)
-
-Topics and images referenced from bookmaps
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportSimilarTopicsByTitle($)
-
-Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportSimilarTopicsByVocabulary($)
-
-Report topics likely to be similar on the basis of their vocabulary
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportMd5Sum($)
-
-Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportOlBody($)
-
-ol under body - indicative of a task
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 reportHrefUrlEncoding($)
-
-href needs url encoding
-
-     Parameter  Description
-  1  $xref      Cross referencer
-
-=head2 addNavTitlesToOneMap($$)
-
-Fix navtitles in one map
-
-     Parameter  Description
-  1  $xref      Xref results
-  2  $file      File to fix
-
-=head2 addNavTitlesToMaps($)
-
-Add nav titles to files containing maps.
-
-     Parameter  Description
-  1  $xref      Xref results
-
-=head2 oneBadRef($$$)
-
-Check one reference and return the first error encountered or B<undef> if no errors encountered. Relies on L<topicIds> to test files present and test the B<topicId> is valid, relies on L<ids> to check that the referenced B<id> is valid.
-
-     Parameter  Description
-  1  $xref      Cross referencer
-  2  $file      File containing reference
-  3  $href      Reference
-
-=head2 createSampleInputFiles($$)
-
-Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
-
-     Parameter  Description
-  1  $in        Input folder
-  2  $N         Number of sample files
-
-=head2 createSampleInputFilesFixFolder($)
-
-Create sample input files for testing fixFolder
-
-     Parameter  Description
-  1  $in        Folder to create the files in
-
-=head2 createSampleInputFilesLtGt($)
-
-Create sample input files for testing items between &lt; and &gt;
-
-     Parameter  Description
-  1  $in        Folder to create the files in
-
-=head2 createSampleInputFilesForFixDitaRefs($$)
-
-Create sample input files for fixing renamed topic refs
-
-     Parameter  Description
-  1  $in        Folder to create the files in
-  2  $targets   Targets folder
-
-=head2 createSampleInputFilesForFixDitaRefsXref($)
-
-Create sample input files for fixing references into renamed topics by xref
-
-     Parameter  Description
-  1  $in        Folder to create the files in
-
-=head2 changeFolderAndWriteFiles($$)
-
-Change file structure to the current folder and write
-
-     Parameter  Description
-  1  $f         Data structure as a string
-  2  $D         Target folder
-
-=head2 createSampleInputFilesForFixDitaRefsImproved1($)
-
-Create sample input files for fixing references via the targets/ folder
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 createSampleInputFilesForFixDitaRefsImproved2($)
-
-Create sample input files for fixing conref references via the targets/ folder
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 createSampleInputFilesForFixDitaRefsImproved3($)
-
-Create sample input files for fixing bookmap references to topics that get cut into multiple pieces
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 createSampleInputFilesForFixDitaRefsImproved4($)
-
-Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 createSampleImageTest($)
-
-Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 createTestTopicFlattening($)
-
-Create sample input files for testing topic flattening ratio reporting
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 createTestReferencedToFlattenedTopic($)
-
-Full reference to a topic that has been flattened
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 createTestReferenceToCutOutTopic($)
-
-References from a topic that has been cut out to a topic that has been cut out
-
-     Parameter  Description
-  1  $folder    Folder to switch to
-
-=head2 checkXrefStructure($$@)
-
-Check an output structure produced by Xrf
-
-     Parameter  Description
-  1  $x         Cross references
-  2  $field     Field to check
-  3  @folders   Folders to suppress
-
-=head2 writeXrefStructureTest($$@)
-
-Write the test for an Xref structure
-
-     Parameter  Description
-  1  $x         Cross referencer
-  2  $field     Field
-  3  @folders   Names of the folders to suppress
-
-
-=head1 Index
-
-
-1 L<addNavTitlesToMaps|/addNavTitlesToMaps> - Add nav titles to files containing maps.
-
-2 L<addNavTitlesToOneMap|/addNavTitlesToOneMap> - Fix navtitles in one map
-
-3 L<analyzeInputFiles|/analyzeInputFiles> - Analyze the input files
-
-4 L<analyzeOneFile|/analyzeOneFile> - Analyze one input file
-
-5 L<changeFolderAndWriteFiles|/changeFolderAndWriteFiles> - Change file structure to the current folder and write
-
-6 L<checkReferences|/checkReferences> - Check each reference, report bad references and mark them for fixing.
-
-7 L<checkXrefStructure|/checkXrefStructure> - Check an output structure produced by Xrf
-
-8 L<countLevels|/countLevels> - Count has elements to the specified number of levels
-
-9 L<createSampleImageTest|/createSampleImageTest> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
-
-10 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
-
-11 L<createSampleInputFilesFixFolder|/createSampleInputFilesFixFolder> - Create sample input files for testing fixFolder
-
-12 L<createSampleInputFilesForFixDitaRefs|/createSampleInputFilesForFixDitaRefs> - Create sample input files for fixing renamed topic refs
-
-13 L<createSampleInputFilesForFixDitaRefsImproved1|/createSampleInputFilesForFixDitaRefsImproved1> - Create sample input files for fixing references via the targets/ folder
-
-14 L<createSampleInputFilesForFixDitaRefsImproved2|/createSampleInputFilesForFixDitaRefsImproved2> - Create sample input files for fixing conref references via the targets/ folder
-
-15 L<createSampleInputFilesForFixDitaRefsImproved3|/createSampleInputFilesForFixDitaRefsImproved3> - Create sample input files for fixing bookmap references to topics that get cut into multiple pieces
-
-16 L<createSampleInputFilesForFixDitaRefsImproved4|/createSampleInputFilesForFixDitaRefsImproved4> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
-
-17 L<createSampleInputFilesForFixDitaRefsXref|/createSampleInputFilesForFixDitaRefsXref> - Create sample input files for fixing references into renamed topics by xref
-
-18 L<createSampleInputFilesLtGt|/createSampleInputFilesLtGt> - Create sample input files for testing items between &lt; and &gt;
-
-19 L<createTestReferencedToFlattenedTopic|/createTestReferencedToFlattenedTopic> - Full reference to a topic that has been flattened
-
-20 L<createTestReferenceToCutOutTopic|/createTestReferenceToCutOutTopic> - References from a topic that has been cut out to a topic that has been cut out
-
-21 L<createTestTopicFlattening|/createTestTopicFlattening> - Create sample input files for testing topic flattening ratio reporting
-
-22 L<editXml|/editXml> - Edit an xml file
-
-23 L<externalReference|/externalReference> - Check for an external reference
-
-24 L<fixFilesGB|/fixFilesGB> - Rename files to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
-
-25 L<fixOneFileGB|/fixOneFileGB> - Fix one file to the Gearhart-Brenan standard
-
-26 L<fixReferences|/fixReferences> - Fix just the file containing references using a number of techniques and report those references that cannot be so fixed.
-
-27 L<fixReferencesInOneFile|/fixReferencesInOneFile> - Fix one file by moving unresolved references to the xtrf attribute
-
-28 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
-
-29 L<newXref|/newXref> - Create a new cross referencer
-
-30 L<oneBadRef|/oneBadRef> - Check one reference and return the first error encountered or B<undef> if no errors encountered.
-
-31 L<reportAttributeCount|/reportAttributeCount> - Report attribute counts
-
-32 L<reportAttributeNameAndValueCounts|/reportAttributeNameAndValueCounts> - Report attribute value counts
-
-33 L<reportDocTypeCount|/reportDocTypeCount> - Report doc type count
-
-34 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
-
-35 L<reportDuplicateTopicIds|/reportDuplicateTopicIds> - Report duplicate topic ids
-
-36 L<reportExternalXrefs|/reportExternalXrefs> - Report external xrefs missing other attributes
-
-37 L<reportFileExtensionCount|/reportFileExtensionCount> - Report file extension counts
-
-38 L<reportFileTypes|/reportFileTypes> - Report file type counts - takes too long in series
-
-39 L<reportFixRefs|/reportFixRefs> - Report of hrefs that need to be fixed
-
-40 L<reportGuidHrefs|/reportGuidHrefs> - Report on guid hrefs
-
-41 L<reportGuidsToFiles|/reportGuidsToFiles> - Map and report guids to files
-
-42 L<reportHrefUrlEncoding|/reportHrefUrlEncoding> - href needs url encoding
-
-43 L<reportImages|/reportImages> - Reports on images and references to images
-
-44 L<reportLtGt|/reportLtGt> - Report items found between &lt; and &gt;
-
-45 L<reportMaxZoomOut|/reportMaxZoomOut> - Text located via Max Zoom In
-
-46 L<reportMd5Sum|/reportMd5Sum> - Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
-
-47 L<reportNoHrefs|/reportNoHrefs> - Report locations where an href was expected but not found
-
-48 L<reportOlBody|/reportOlBody> - ol under body - indicative of a task
-
-49 L<reportParseFailed|/reportParseFailed> - Report failed parses
-
-50 L<reportPossibleImprovements|/reportPossibleImprovements> - Report improvements possible
-
-51 L<reportReferencesFromBookMaps|/reportReferencesFromBookMaps> - Topics and images referenced from bookmaps
-
-52 L<reportSimilarTopicsByTitle|/reportSimilarTopicsByTitle> - Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
-
-53 L<reportSimilarTopicsByVocabulary|/reportSimilarTopicsByVocabulary> - Report topics likely to be similar on the basis of their vocabulary
-
-54 L<reportSourceFiles|/reportSourceFiles> - Source file for each topic
-
-55 L<reportTables|/reportTables> - Report on tables that have problems
-
-56 L<reportTagCount|/reportTagCount> - Report tag counts
-
-57 L<reportTagsAndTextsCount|/reportTagsAndTextsCount> - Report tags and texts counts
-
-58 L<reportTopicDetails|/reportTopicDetails> - Things that occur once in each file
-
-59 L<reportTopicReuse|/reportTopicReuse> - Count how frequently each topic is reused
-
-60 L<reportValidationErrors|/reportValidationErrors> - Report the files known to have validation errors
-
-61 L<reportXml1|/reportXml1> - Report bad xml on line 1
-
-62 L<reportXml2|/reportXml2> - Report bad xml on line 2
-
-63 L<writeXrefStructureTest|/writeXrefStructureTest> - Write the test for an Xref structure
-
-64 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
-
-=head1 Installation
-
-This module is written in 100% Pure Perl and, thus, it is easy to read,
-comprehend, use, modify and install via B<cpan>:
-
-  sudo cpan install Data::Edit::Xml::Xref
-
-=head1 Author
-
-L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
-
-L<http://www.appaapps.com|http://www.appaapps.com>
-
-=head1 Copyright
-
-Copyright (c) 2016-2019 Philip R Brenan.
-
-This module is free software. It may be used, redistributed and/or modified
-under the same terms as Perl itself.
-
-=cut
-
-
-
-# Tests and documentation
-
-sub test
- {my $p = __PACKAGE__;
-  binmode($_, ":utf8") for *STDOUT, *STDERR;
-  return if eval "eof(${p}::DATA)";
-  my $s = eval "join('', <${p}::DATA>)";
-  $@ and die $@;
-  eval $s;
-  $@ and die $@;
-  1
- }
-
-test unless caller;
-
-1;
-# podDocumentation
-__DATA__
-use Test::More;
-use warnings FATAL=>qw(all);
-use strict;
-
-if ($^O =~ m(bsd|linux)i)
- {plan tests => 66;
- }
-else
- {plan skip_all => 'Not supported';
- }
-
-Test::More->builder->output("/dev/null")                                        # Show only errors during testing
-  if ((caller(1))[0]//'Data::Edit::Xml::Xref') eq "Data::Edit::Xml::Xref";
-
-#goto latestTest;
-
-sub tests      {fpd currentDirectory, q(test)}                                  # Tests folder
-sub in         {fpd tests, q(in)}                                               # Input folder
-sub out        {fpd tests, q(out)}                                              # Output folder
-sub outFixed   {fpd tests, q(outFixed)}                                         # Fixed output folder
-sub reports    {fpd tests, q(report)}                                           # Reports folder
-sub targets    {fpf(tests, q(targets))}                                         # Tests targets folder
-
-sub testReferenceChecking                                                       # Test reference checking
+sub testReferenceChecking                                                       #P Test reference checking
  {my $folder = q(/home/phil/);
   my @names  = qw(aaa bbb ccc);
   my @ids    = map {q(p).$_}                   @names;
@@ -4680,7 +5015,7 @@ sub testReferenceChecking                                                       
    (currentFolder  => q(/aaa),
     reports        => fpd(currentDirectory, qw(test resports)),
     topicIds       => {map {$files[$_]=>$names[$_]}      0..$#names},
-    ids            => {map {$files[$_]=>{$ids[$_]=>1}}    0..$#names},
+    ids            => {map {$files[$_]=>{$ids[$_]=>1}}   0..$#names},
    );
 
   for my $i(0..$#names)                                                         # Create some references
@@ -5123,7 +5458,6 @@ if (1)                                                                          
   createSampleImageTest(tests);
 
   my $x = xref(inputFolder => out, fixDitaRefs => targets);
-
   ok $x->statusLine eq q(Xref: 1 image ref, 1 ref);
   ok $x->missingImageFiles->[0][0] eq q(../images/b.png);
  }
@@ -5166,8 +5500,6 @@ if (1)                                                                          
 
  }
 
-latestTest:;
-
 if (1)                                                                          #Txref References from a topic that has been cut out to a topic that has been cut out
  {clearFolder(tests, 111);
   createTestReferenceToCutOutTopic(tests);
@@ -5182,8 +5514,58 @@ if (1)                                                                          
   is_deeply checkXrefStructure($x, q(originalSourceFileAndIdToNewFile), in, targets), { "a.xml" => { "GUID-400c2c59-95e1-7bf3-4647-3a135281bfaf" => "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita", "GUID-68822563-d568-f418-38ae-f1c62cb4ac8d" => "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita", "GUID-c67821ef-3da2-c89f-0fc9-9fba3937f368" => "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita", "GUID-f0c0e170-8128-10ef-045d-97602fdde76f" => "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita", }, "b.xml" => { "GUID-2b6aab4f-9328-e326-f55f-160771a8c3dd" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", "GUID-86a684b0-1a0b-4c30-6da9-24c74ff1f0cc" => "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita", "GUID-96a20d7f-bbaf-deef-55ef-e09a0a059251" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "GUID-cfe7cb3d-05e7-a147-db10-dcbacaeecef7" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p1" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "p2" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p3" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", }, };
  }
 
+if (1)                                                                          # Othermeta migration
+ {clearFolder(tests, 111);
+  createSampleOtherMeta(in);
+
+  my $x = xref(inputFolder => in);
+
+  ok !$x->statusLine;
+
+  is_deeply checkXrefStructure($x, q(otherMetaDuplicatesSeparately)), [];
+
+  is_deeply checkXrefStructure($x, q(otherMetaDuplicatesCombined)),
+   [["b1.ditamap", "dd", 2, "DD"], ["", "", "", "DD1111"],
+    ["b2.ditamap", "dd", 2, "DD"], ["", "", "", "DD2222"]];
+
+  is_deeply checkXrefStructure($x, q(otherMetaRemainWithTopic)),
+   [[ "ca.dita", "dd", "DD", "b1.ditamap", "b2.ditamap"],
+    [ "cb.dita", "dd", "DD", "b1.ditamap", "b2.ditamap"]];
+
+  is_deeply checkXrefStructure($x, q(otherMetaPushToBookMap)),
+   [[ "ca.dita", "aa", "AAAA", "b1.ditamap"],
+    [ "ca.dita", "aa", "AAAA", "b2.ditamap"],
+    [ "ca.dita", "bb", "BBBB", "b1.ditamap"],
+    [ "ca.dita", "bb", "BBBB", "b2.ditamap"],
+    [ "cb.dita", "aa", "AAAA", "b1.ditamap"],
+    [ "cb.dita", "aa", "AAAA", "b2.ditamap"],
+    [ "cb.dita", "bb", "BBBB", "b1.ditamap"],
+    [ "cb.dita", "bb", "BBBB", "b2.ditamap"]];
+
+  is_deeply checkXrefStructure($x, q(otherMetaBookMapsBeforeTopicIncludes)),
+   [["b1.ditamap", "aa", 1, "AAAA"],
+    ["b1.ditamap", "bb", 1, "BBBB"],
+    ["b1.ditamap", "dd", 1, "DD1111"],
+    ["b2.ditamap", "aa", 1, "AAAA"],
+    ["b2.ditamap", "bb", 1, "BBBB"],
+    ["b2.ditamap", "dd", 1, "DD2222"]];
+
+  is_deeply checkXrefStructure($x, q(otherMetaBookMapsAfterTopicIncludes)),
+   [["b1.ditamap", "aa", 1, "AAAA"],
+    ["b1.ditamap", "bb", 1, "BBBB"],
+    ["b1.ditamap", "dd", 2, "DD"],
+    ["b1.ditamap", "dd", 2, "DD1111"],
+    ["b2.ditamap", "aa", 1, "AAAA"],
+    ["b2.ditamap", "bb", 1, "BBBB"],
+    ["b2.ditamap", "dd", 2, "DD"],
+    ["b2.ditamap", "dd", 2, "DD2222"]];
+ }
+
+latestTest:;
+
 clearFolder($_, 1e3) for in, out, outFixed, reports, tests, targets, q(zzzParseErrors);
 
 1
 
 # &writeXrefStructureTest($x, qw(topicFlattening in targets));
+

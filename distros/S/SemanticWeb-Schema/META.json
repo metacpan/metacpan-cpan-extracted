@@ -69,2911 +69,2911 @@
    "provides" : {
       "SemanticWeb::Schema" : {
          "file" : "lib/SemanticWeb/Schema.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AMRadioChannel" : {
          "file" : "lib/SemanticWeb/Schema/AMRadioChannel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::APIReference" : {
          "file" : "lib/SemanticWeb/Schema/APIReference.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AboutPage" : {
          "file" : "lib/SemanticWeb/Schema/AboutPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AcceptAction" : {
          "file" : "lib/SemanticWeb/Schema/AcceptAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Accommodation" : {
          "file" : "lib/SemanticWeb/Schema/Accommodation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AccountingService" : {
          "file" : "lib/SemanticWeb/Schema/AccountingService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AchieveAction" : {
          "file" : "lib/SemanticWeb/Schema/AchieveAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Action" : {
          "file" : "lib/SemanticWeb/Schema/Action.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ActionAccessSpecification" : {
          "file" : "lib/SemanticWeb/Schema/ActionAccessSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ActionStatusType" : {
          "file" : "lib/SemanticWeb/Schema/ActionStatusType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ActivateAction" : {
          "file" : "lib/SemanticWeb/Schema/ActivateAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AddAction" : {
          "file" : "lib/SemanticWeb/Schema/AddAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AdministrativeArea" : {
          "file" : "lib/SemanticWeb/Schema/AdministrativeArea.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AdultEntertainment" : {
          "file" : "lib/SemanticWeb/Schema/AdultEntertainment.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AggregateOffer" : {
          "file" : "lib/SemanticWeb/Schema/AggregateOffer.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AggregateRating" : {
          "file" : "lib/SemanticWeb/Schema/AggregateRating.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AgreeAction" : {
          "file" : "lib/SemanticWeb/Schema/AgreeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Airline" : {
          "file" : "lib/SemanticWeb/Schema/Airline.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Airport" : {
          "file" : "lib/SemanticWeb/Schema/Airport.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AlignmentObject" : {
          "file" : "lib/SemanticWeb/Schema/AlignmentObject.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AllocateAction" : {
          "file" : "lib/SemanticWeb/Schema/AllocateAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AmusementPark" : {
          "file" : "lib/SemanticWeb/Schema/AmusementPark.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AnatomicalStructure" : {
          "file" : "lib/SemanticWeb/Schema/AnatomicalStructure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AnatomicalSystem" : {
          "file" : "lib/SemanticWeb/Schema/AnatomicalSystem.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AnimalShelter" : {
          "file" : "lib/SemanticWeb/Schema/AnimalShelter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Answer" : {
          "file" : "lib/SemanticWeb/Schema/Answer.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Apartment" : {
          "file" : "lib/SemanticWeb/Schema/Apartment.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ApartmentComplex" : {
          "file" : "lib/SemanticWeb/Schema/ApartmentComplex.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AppendAction" : {
          "file" : "lib/SemanticWeb/Schema/AppendAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ApplyAction" : {
          "file" : "lib/SemanticWeb/Schema/ApplyAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ApprovedIndication" : {
          "file" : "lib/SemanticWeb/Schema/ApprovedIndication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Aquarium" : {
          "file" : "lib/SemanticWeb/Schema/Aquarium.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ArriveAction" : {
          "file" : "lib/SemanticWeb/Schema/ArriveAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ArtGallery" : {
          "file" : "lib/SemanticWeb/Schema/ArtGallery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Artery" : {
          "file" : "lib/SemanticWeb/Schema/Artery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Article" : {
          "file" : "lib/SemanticWeb/Schema/Article.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AskAction" : {
          "file" : "lib/SemanticWeb/Schema/AskAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AssessAction" : {
          "file" : "lib/SemanticWeb/Schema/AssessAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AssignAction" : {
          "file" : "lib/SemanticWeb/Schema/AssignAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Atlas" : {
          "file" : "lib/SemanticWeb/Schema/Atlas.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Attorney" : {
          "file" : "lib/SemanticWeb/Schema/Attorney.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Audience" : {
          "file" : "lib/SemanticWeb/Schema/Audience.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AudioObject" : {
          "file" : "lib/SemanticWeb/Schema/AudioObject.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Audiobook" : {
          "file" : "lib/SemanticWeb/Schema/Audiobook.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AuthorizeAction" : {
          "file" : "lib/SemanticWeb/Schema/AuthorizeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutoBodyShop" : {
          "file" : "lib/SemanticWeb/Schema/AutoBodyShop.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutoDealer" : {
          "file" : "lib/SemanticWeb/Schema/AutoDealer.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutoPartsStore" : {
          "file" : "lib/SemanticWeb/Schema/AutoPartsStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutoRental" : {
          "file" : "lib/SemanticWeb/Schema/AutoRental.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutoRepair" : {
          "file" : "lib/SemanticWeb/Schema/AutoRepair.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutoWash" : {
          "file" : "lib/SemanticWeb/Schema/AutoWash.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutomatedTeller" : {
          "file" : "lib/SemanticWeb/Schema/AutomatedTeller.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::AutomotiveBusiness" : {
          "file" : "lib/SemanticWeb/Schema/AutomotiveBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Bakery" : {
          "file" : "lib/SemanticWeb/Schema/Bakery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BankAccount" : {
          "file" : "lib/SemanticWeb/Schema/BankAccount.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BankOrCreditUnion" : {
          "file" : "lib/SemanticWeb/Schema/BankOrCreditUnion.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BarOrPub" : {
          "file" : "lib/SemanticWeb/Schema/BarOrPub.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Barcode" : {
          "file" : "lib/SemanticWeb/Schema/Barcode.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Beach" : {
          "file" : "lib/SemanticWeb/Schema/Beach.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BeautySalon" : {
          "file" : "lib/SemanticWeb/Schema/BeautySalon.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BedAndBreakfast" : {
          "file" : "lib/SemanticWeb/Schema/BedAndBreakfast.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BedDetails" : {
          "file" : "lib/SemanticWeb/Schema/BedDetails.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BedType" : {
          "file" : "lib/SemanticWeb/Schema/BedType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BefriendAction" : {
          "file" : "lib/SemanticWeb/Schema/BefriendAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BikeStore" : {
          "file" : "lib/SemanticWeb/Schema/BikeStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Blog" : {
          "file" : "lib/SemanticWeb/Schema/Blog.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BlogPosting" : {
          "file" : "lib/SemanticWeb/Schema/BlogPosting.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BloodTest" : {
          "file" : "lib/SemanticWeb/Schema/BloodTest.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BoardingPolicyType" : {
          "file" : "lib/SemanticWeb/Schema/BoardingPolicyType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BodyOfWater" : {
          "file" : "lib/SemanticWeb/Schema/BodyOfWater.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Bone" : {
          "file" : "lib/SemanticWeb/Schema/Bone.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Book" : {
          "file" : "lib/SemanticWeb/Schema/Book.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BookFormatType" : {
          "file" : "lib/SemanticWeb/Schema/BookFormatType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BookSeries" : {
          "file" : "lib/SemanticWeb/Schema/BookSeries.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BookStore" : {
          "file" : "lib/SemanticWeb/Schema/BookStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BookmarkAction" : {
          "file" : "lib/SemanticWeb/Schema/BookmarkAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BorrowAction" : {
          "file" : "lib/SemanticWeb/Schema/BorrowAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BowlingAlley" : {
          "file" : "lib/SemanticWeb/Schema/BowlingAlley.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BrainStructure" : {
          "file" : "lib/SemanticWeb/Schema/BrainStructure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Brand" : {
          "file" : "lib/SemanticWeb/Schema/Brand.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BreadcrumbList" : {
          "file" : "lib/SemanticWeb/Schema/BreadcrumbList.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Brewery" : {
          "file" : "lib/SemanticWeb/Schema/Brewery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Bridge" : {
          "file" : "lib/SemanticWeb/Schema/Bridge.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BroadcastChannel" : {
          "file" : "lib/SemanticWeb/Schema/BroadcastChannel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BroadcastEvent" : {
          "file" : "lib/SemanticWeb/Schema/BroadcastEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BroadcastFrequencySpecification" : {
          "file" : "lib/SemanticWeb/Schema/BroadcastFrequencySpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BroadcastService" : {
          "file" : "lib/SemanticWeb/Schema/BroadcastService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BuddhistTemple" : {
          "file" : "lib/SemanticWeb/Schema/BuddhistTemple.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusOrCoach" : {
          "file" : "lib/SemanticWeb/Schema/BusOrCoach.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusReservation" : {
          "file" : "lib/SemanticWeb/Schema/BusReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusStation" : {
          "file" : "lib/SemanticWeb/Schema/BusStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusStop" : {
          "file" : "lib/SemanticWeb/Schema/BusStop.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusTrip" : {
          "file" : "lib/SemanticWeb/Schema/BusTrip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusinessAudience" : {
          "file" : "lib/SemanticWeb/Schema/BusinessAudience.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusinessEntityType" : {
          "file" : "lib/SemanticWeb/Schema/BusinessEntityType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusinessEvent" : {
          "file" : "lib/SemanticWeb/Schema/BusinessEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BusinessFunction" : {
          "file" : "lib/SemanticWeb/Schema/BusinessFunction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::BuyAction" : {
          "file" : "lib/SemanticWeb/Schema/BuyAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CableOrSatelliteService" : {
          "file" : "lib/SemanticWeb/Schema/CableOrSatelliteService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CafeOrCoffeeShop" : {
          "file" : "lib/SemanticWeb/Schema/CafeOrCoffeeShop.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Campground" : {
          "file" : "lib/SemanticWeb/Schema/Campground.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CampingPitch" : {
          "file" : "lib/SemanticWeb/Schema/CampingPitch.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Canal" : {
          "file" : "lib/SemanticWeb/Schema/Canal.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CancelAction" : {
          "file" : "lib/SemanticWeb/Schema/CancelAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Car" : {
          "file" : "lib/SemanticWeb/Schema/Car.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CarUsageType" : {
          "file" : "lib/SemanticWeb/Schema/CarUsageType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Casino" : {
          "file" : "lib/SemanticWeb/Schema/Casino.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CatholicChurch" : {
          "file" : "lib/SemanticWeb/Schema/CatholicChurch.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Cemetery" : {
          "file" : "lib/SemanticWeb/Schema/Cemetery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Chapter" : {
          "file" : "lib/SemanticWeb/Schema/Chapter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CheckAction" : {
          "file" : "lib/SemanticWeb/Schema/CheckAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CheckInAction" : {
          "file" : "lib/SemanticWeb/Schema/CheckInAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CheckOutAction" : {
          "file" : "lib/SemanticWeb/Schema/CheckOutAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CheckoutPage" : {
          "file" : "lib/SemanticWeb/Schema/CheckoutPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ChildCare" : {
          "file" : "lib/SemanticWeb/Schema/ChildCare.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ChildrensEvent" : {
          "file" : "lib/SemanticWeb/Schema/ChildrensEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ChooseAction" : {
          "file" : "lib/SemanticWeb/Schema/ChooseAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Church" : {
          "file" : "lib/SemanticWeb/Schema/Church.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::City" : {
          "file" : "lib/SemanticWeb/Schema/City.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CityHall" : {
          "file" : "lib/SemanticWeb/Schema/CityHall.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CivicStructure" : {
          "file" : "lib/SemanticWeb/Schema/CivicStructure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ClaimReview" : {
          "file" : "lib/SemanticWeb/Schema/ClaimReview.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Class" : {
          "file" : "lib/SemanticWeb/Schema/Class.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Clip" : {
          "file" : "lib/SemanticWeb/Schema/Clip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ClothingStore" : {
          "file" : "lib/SemanticWeb/Schema/ClothingStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Code" : {
          "file" : "lib/SemanticWeb/Schema/Code.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Collection" : {
          "file" : "lib/SemanticWeb/Schema/Collection.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CollectionPage" : {
          "file" : "lib/SemanticWeb/Schema/CollectionPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CollegeOrUniversity" : {
          "file" : "lib/SemanticWeb/Schema/CollegeOrUniversity.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComedyClub" : {
          "file" : "lib/SemanticWeb/Schema/ComedyClub.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComedyEvent" : {
          "file" : "lib/SemanticWeb/Schema/ComedyEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComicCoverArt" : {
          "file" : "lib/SemanticWeb/Schema/ComicCoverArt.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComicIssue" : {
          "file" : "lib/SemanticWeb/Schema/ComicIssue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComicSeries" : {
          "file" : "lib/SemanticWeb/Schema/ComicSeries.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComicStory" : {
          "file" : "lib/SemanticWeb/Schema/ComicStory.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Comment" : {
          "file" : "lib/SemanticWeb/Schema/Comment.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CommentAction" : {
          "file" : "lib/SemanticWeb/Schema/CommentAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CommunicateAction" : {
          "file" : "lib/SemanticWeb/Schema/CommunicateAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CompoundPriceSpecification" : {
          "file" : "lib/SemanticWeb/Schema/CompoundPriceSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComputerLanguage" : {
          "file" : "lib/SemanticWeb/Schema/ComputerLanguage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ComputerStore" : {
          "file" : "lib/SemanticWeb/Schema/ComputerStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ConfirmAction" : {
          "file" : "lib/SemanticWeb/Schema/ConfirmAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ConsumeAction" : {
          "file" : "lib/SemanticWeb/Schema/ConsumeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ContactPage" : {
          "file" : "lib/SemanticWeb/Schema/ContactPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ContactPoint" : {
          "file" : "lib/SemanticWeb/Schema/ContactPoint.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ContactPointOption" : {
          "file" : "lib/SemanticWeb/Schema/ContactPointOption.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Continent" : {
          "file" : "lib/SemanticWeb/Schema/Continent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ControlAction" : {
          "file" : "lib/SemanticWeb/Schema/ControlAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ConvenienceStore" : {
          "file" : "lib/SemanticWeb/Schema/ConvenienceStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Conversation" : {
          "file" : "lib/SemanticWeb/Schema/Conversation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CookAction" : {
          "file" : "lib/SemanticWeb/Schema/CookAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Corporation" : {
          "file" : "lib/SemanticWeb/Schema/Corporation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Country" : {
          "file" : "lib/SemanticWeb/Schema/Country.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Course" : {
          "file" : "lib/SemanticWeb/Schema/Course.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CourseInstance" : {
          "file" : "lib/SemanticWeb/Schema/CourseInstance.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Courthouse" : {
          "file" : "lib/SemanticWeb/Schema/Courthouse.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CoverArt" : {
          "file" : "lib/SemanticWeb/Schema/CoverArt.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CreateAction" : {
          "file" : "lib/SemanticWeb/Schema/CreateAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CreativeWork" : {
          "file" : "lib/SemanticWeb/Schema/CreativeWork.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CreativeWorkSeason" : {
          "file" : "lib/SemanticWeb/Schema/CreativeWorkSeason.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CreativeWorkSeries" : {
          "file" : "lib/SemanticWeb/Schema/CreativeWorkSeries.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CreditCard" : {
          "file" : "lib/SemanticWeb/Schema/CreditCard.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Crematorium" : {
          "file" : "lib/SemanticWeb/Schema/Crematorium.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::CurrencyConversionService" : {
          "file" : "lib/SemanticWeb/Schema/CurrencyConversionService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DDxElement" : {
          "file" : "lib/SemanticWeb/Schema/DDxElement.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DanceEvent" : {
          "file" : "lib/SemanticWeb/Schema/DanceEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DanceGroup" : {
          "file" : "lib/SemanticWeb/Schema/DanceGroup.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DataCatalog" : {
          "file" : "lib/SemanticWeb/Schema/DataCatalog.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DataDownload" : {
          "file" : "lib/SemanticWeb/Schema/DataDownload.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DataFeed" : {
          "file" : "lib/SemanticWeb/Schema/DataFeed.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DataFeedItem" : {
          "file" : "lib/SemanticWeb/Schema/DataFeedItem.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Dataset" : {
          "file" : "lib/SemanticWeb/Schema/Dataset.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DatedMoneySpecification" : {
          "file" : "lib/SemanticWeb/Schema/DatedMoneySpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DayOfWeek" : {
          "file" : "lib/SemanticWeb/Schema/DayOfWeek.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DaySpa" : {
          "file" : "lib/SemanticWeb/Schema/DaySpa.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DeactivateAction" : {
          "file" : "lib/SemanticWeb/Schema/DeactivateAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DefenceEstablishment" : {
          "file" : "lib/SemanticWeb/Schema/DefenceEstablishment.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DeleteAction" : {
          "file" : "lib/SemanticWeb/Schema/DeleteAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DeliveryChargeSpecification" : {
          "file" : "lib/SemanticWeb/Schema/DeliveryChargeSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DeliveryEvent" : {
          "file" : "lib/SemanticWeb/Schema/DeliveryEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DeliveryMethod" : {
          "file" : "lib/SemanticWeb/Schema/DeliveryMethod.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Demand" : {
          "file" : "lib/SemanticWeb/Schema/Demand.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Dentist" : {
          "file" : "lib/SemanticWeb/Schema/Dentist.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DepartAction" : {
          "file" : "lib/SemanticWeb/Schema/DepartAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DepartmentStore" : {
          "file" : "lib/SemanticWeb/Schema/DepartmentStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DepositAccount" : {
          "file" : "lib/SemanticWeb/Schema/DepositAccount.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DiagnosticLab" : {
          "file" : "lib/SemanticWeb/Schema/DiagnosticLab.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DiagnosticProcedure" : {
          "file" : "lib/SemanticWeb/Schema/DiagnosticProcedure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Diet" : {
          "file" : "lib/SemanticWeb/Schema/Diet.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DietarySupplement" : {
          "file" : "lib/SemanticWeb/Schema/DietarySupplement.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DigitalDocument" : {
          "file" : "lib/SemanticWeb/Schema/DigitalDocument.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DigitalDocumentPermission" : {
          "file" : "lib/SemanticWeb/Schema/DigitalDocumentPermission.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DigitalDocumentPermissionType" : {
          "file" : "lib/SemanticWeb/Schema/DigitalDocumentPermissionType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DisagreeAction" : {
          "file" : "lib/SemanticWeb/Schema/DisagreeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DiscoverAction" : {
          "file" : "lib/SemanticWeb/Schema/DiscoverAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DiscussionForumPosting" : {
          "file" : "lib/SemanticWeb/Schema/DiscussionForumPosting.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DislikeAction" : {
          "file" : "lib/SemanticWeb/Schema/DislikeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Distance" : {
          "file" : "lib/SemanticWeb/Schema/Distance.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Distillery" : {
          "file" : "lib/SemanticWeb/Schema/Distillery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DonateAction" : {
          "file" : "lib/SemanticWeb/Schema/DonateAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DoseSchedule" : {
          "file" : "lib/SemanticWeb/Schema/DoseSchedule.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DownloadAction" : {
          "file" : "lib/SemanticWeb/Schema/DownloadAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrawAction" : {
          "file" : "lib/SemanticWeb/Schema/DrawAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrinkAction" : {
          "file" : "lib/SemanticWeb/Schema/DrinkAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DriveWheelConfigurationValue" : {
          "file" : "lib/SemanticWeb/Schema/DriveWheelConfigurationValue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Drug" : {
          "file" : "lib/SemanticWeb/Schema/Drug.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrugClass" : {
          "file" : "lib/SemanticWeb/Schema/DrugClass.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrugCost" : {
          "file" : "lib/SemanticWeb/Schema/DrugCost.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrugCostCategory" : {
          "file" : "lib/SemanticWeb/Schema/DrugCostCategory.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrugLegalStatus" : {
          "file" : "lib/SemanticWeb/Schema/DrugLegalStatus.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrugPregnancyCategory" : {
          "file" : "lib/SemanticWeb/Schema/DrugPregnancyCategory.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrugPrescriptionStatus" : {
          "file" : "lib/SemanticWeb/Schema/DrugPrescriptionStatus.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DrugStrength" : {
          "file" : "lib/SemanticWeb/Schema/DrugStrength.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::DryCleaningOrLaundry" : {
          "file" : "lib/SemanticWeb/Schema/DryCleaningOrLaundry.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Duration" : {
          "file" : "lib/SemanticWeb/Schema/Duration.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EatAction" : {
          "file" : "lib/SemanticWeb/Schema/EatAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EducationEvent" : {
          "file" : "lib/SemanticWeb/Schema/EducationEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EducationalAudience" : {
          "file" : "lib/SemanticWeb/Schema/EducationalAudience.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EducationalOrganization" : {
          "file" : "lib/SemanticWeb/Schema/EducationalOrganization.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Electrician" : {
          "file" : "lib/SemanticWeb/Schema/Electrician.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ElectronicsStore" : {
          "file" : "lib/SemanticWeb/Schema/ElectronicsStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ElementarySchool" : {
          "file" : "lib/SemanticWeb/Schema/ElementarySchool.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EmailMessage" : {
          "file" : "lib/SemanticWeb/Schema/EmailMessage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Embassy" : {
          "file" : "lib/SemanticWeb/Schema/Embassy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EmergencyService" : {
          "file" : "lib/SemanticWeb/Schema/EmergencyService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EmployeeRole" : {
          "file" : "lib/SemanticWeb/Schema/EmployeeRole.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EmployerAggregateRating" : {
          "file" : "lib/SemanticWeb/Schema/EmployerAggregateRating.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EmploymentAgency" : {
          "file" : "lib/SemanticWeb/Schema/EmploymentAgency.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EndorseAction" : {
          "file" : "lib/SemanticWeb/Schema/EndorseAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EndorsementRating" : {
          "file" : "lib/SemanticWeb/Schema/EndorsementRating.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Energy" : {
          "file" : "lib/SemanticWeb/Schema/Energy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EngineSpecification" : {
          "file" : "lib/SemanticWeb/Schema/EngineSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EntertainmentBusiness" : {
          "file" : "lib/SemanticWeb/Schema/EntertainmentBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EntryPoint" : {
          "file" : "lib/SemanticWeb/Schema/EntryPoint.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Enumeration" : {
          "file" : "lib/SemanticWeb/Schema/Enumeration.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Episode" : {
          "file" : "lib/SemanticWeb/Schema/Episode.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Event" : {
          "file" : "lib/SemanticWeb/Schema/Event.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EventReservation" : {
          "file" : "lib/SemanticWeb/Schema/EventReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EventStatusType" : {
          "file" : "lib/SemanticWeb/Schema/EventStatusType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::EventVenue" : {
          "file" : "lib/SemanticWeb/Schema/EventVenue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ExerciseAction" : {
          "file" : "lib/SemanticWeb/Schema/ExerciseAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ExerciseGym" : {
          "file" : "lib/SemanticWeb/Schema/ExerciseGym.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ExercisePlan" : {
          "file" : "lib/SemanticWeb/Schema/ExercisePlan.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ExhibitionEvent" : {
          "file" : "lib/SemanticWeb/Schema/ExhibitionEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FAQPage" : {
          "file" : "lib/SemanticWeb/Schema/FAQPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FMRadioChannel" : {
          "file" : "lib/SemanticWeb/Schema/FMRadioChannel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FastFoodRestaurant" : {
          "file" : "lib/SemanticWeb/Schema/FastFoodRestaurant.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Festival" : {
          "file" : "lib/SemanticWeb/Schema/Festival.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FilmAction" : {
          "file" : "lib/SemanticWeb/Schema/FilmAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FinancialProduct" : {
          "file" : "lib/SemanticWeb/Schema/FinancialProduct.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FinancialService" : {
          "file" : "lib/SemanticWeb/Schema/FinancialService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FindAction" : {
          "file" : "lib/SemanticWeb/Schema/FindAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FireStation" : {
          "file" : "lib/SemanticWeb/Schema/FireStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Flight" : {
          "file" : "lib/SemanticWeb/Schema/Flight.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FlightReservation" : {
          "file" : "lib/SemanticWeb/Schema/FlightReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Florist" : {
          "file" : "lib/SemanticWeb/Schema/Florist.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FollowAction" : {
          "file" : "lib/SemanticWeb/Schema/FollowAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FoodEstablishment" : {
          "file" : "lib/SemanticWeb/Schema/FoodEstablishment.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FoodEstablishmentReservation" : {
          "file" : "lib/SemanticWeb/Schema/FoodEstablishmentReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FoodEvent" : {
          "file" : "lib/SemanticWeb/Schema/FoodEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FoodService" : {
          "file" : "lib/SemanticWeb/Schema/FoodService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::FurnitureStore" : {
          "file" : "lib/SemanticWeb/Schema/FurnitureStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Game" : {
          "file" : "lib/SemanticWeb/Schema/Game.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GamePlayMode" : {
          "file" : "lib/SemanticWeb/Schema/GamePlayMode.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GameServer" : {
          "file" : "lib/SemanticWeb/Schema/GameServer.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GameServerStatus" : {
          "file" : "lib/SemanticWeb/Schema/GameServerStatus.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GardenStore" : {
          "file" : "lib/SemanticWeb/Schema/GardenStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GasStation" : {
          "file" : "lib/SemanticWeb/Schema/GasStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GatedResidenceCommunity" : {
          "file" : "lib/SemanticWeb/Schema/GatedResidenceCommunity.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GenderType" : {
          "file" : "lib/SemanticWeb/Schema/GenderType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GeneralContractor" : {
          "file" : "lib/SemanticWeb/Schema/GeneralContractor.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GeoCircle" : {
          "file" : "lib/SemanticWeb/Schema/GeoCircle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GeoCoordinates" : {
          "file" : "lib/SemanticWeb/Schema/GeoCoordinates.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GeoShape" : {
          "file" : "lib/SemanticWeb/Schema/GeoShape.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GiveAction" : {
          "file" : "lib/SemanticWeb/Schema/GiveAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GolfCourse" : {
          "file" : "lib/SemanticWeb/Schema/GolfCourse.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GovernmentBuilding" : {
          "file" : "lib/SemanticWeb/Schema/GovernmentBuilding.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GovernmentOffice" : {
          "file" : "lib/SemanticWeb/Schema/GovernmentOffice.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GovernmentOrganization" : {
          "file" : "lib/SemanticWeb/Schema/GovernmentOrganization.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GovernmentPermit" : {
          "file" : "lib/SemanticWeb/Schema/GovernmentPermit.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GovernmentService" : {
          "file" : "lib/SemanticWeb/Schema/GovernmentService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::GroceryStore" : {
          "file" : "lib/SemanticWeb/Schema/GroceryStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HVACBusiness" : {
          "file" : "lib/SemanticWeb/Schema/HVACBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HairSalon" : {
          "file" : "lib/SemanticWeb/Schema/HairSalon.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HardwareStore" : {
          "file" : "lib/SemanticWeb/Schema/HardwareStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HealthAndBeautyBusiness" : {
          "file" : "lib/SemanticWeb/Schema/HealthAndBeautyBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HealthClub" : {
          "file" : "lib/SemanticWeb/Schema/HealthClub.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HighSchool" : {
          "file" : "lib/SemanticWeb/Schema/HighSchool.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HinduTemple" : {
          "file" : "lib/SemanticWeb/Schema/HinduTemple.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HobbyShop" : {
          "file" : "lib/SemanticWeb/Schema/HobbyShop.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HomeAndConstructionBusiness" : {
          "file" : "lib/SemanticWeb/Schema/HomeAndConstructionBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HomeGoodsStore" : {
          "file" : "lib/SemanticWeb/Schema/HomeGoodsStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Hospital" : {
          "file" : "lib/SemanticWeb/Schema/Hospital.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Hostel" : {
          "file" : "lib/SemanticWeb/Schema/Hostel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Hotel" : {
          "file" : "lib/SemanticWeb/Schema/Hotel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HotelRoom" : {
          "file" : "lib/SemanticWeb/Schema/HotelRoom.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::House" : {
          "file" : "lib/SemanticWeb/Schema/House.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HousePainter" : {
          "file" : "lib/SemanticWeb/Schema/HousePainter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowTo" : {
          "file" : "lib/SemanticWeb/Schema/HowTo.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowToDirection" : {
          "file" : "lib/SemanticWeb/Schema/HowToDirection.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowToItem" : {
          "file" : "lib/SemanticWeb/Schema/HowToItem.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowToSection" : {
          "file" : "lib/SemanticWeb/Schema/HowToSection.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowToStep" : {
          "file" : "lib/SemanticWeb/Schema/HowToStep.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowToSupply" : {
          "file" : "lib/SemanticWeb/Schema/HowToSupply.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowToTip" : {
          "file" : "lib/SemanticWeb/Schema/HowToTip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::HowToTool" : {
          "file" : "lib/SemanticWeb/Schema/HowToTool.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::IceCreamShop" : {
          "file" : "lib/SemanticWeb/Schema/IceCreamShop.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::IgnoreAction" : {
          "file" : "lib/SemanticWeb/Schema/IgnoreAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ImageGallery" : {
          "file" : "lib/SemanticWeb/Schema/ImageGallery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ImageObject" : {
          "file" : "lib/SemanticWeb/Schema/ImageObject.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ImagingTest" : {
          "file" : "lib/SemanticWeb/Schema/ImagingTest.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::IndividualProduct" : {
          "file" : "lib/SemanticWeb/Schema/IndividualProduct.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InfectiousAgentClass" : {
          "file" : "lib/SemanticWeb/Schema/InfectiousAgentClass.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InfectiousDisease" : {
          "file" : "lib/SemanticWeb/Schema/InfectiousDisease.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InformAction" : {
          "file" : "lib/SemanticWeb/Schema/InformAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InsertAction" : {
          "file" : "lib/SemanticWeb/Schema/InsertAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InstallAction" : {
          "file" : "lib/SemanticWeb/Schema/InstallAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InsuranceAgency" : {
          "file" : "lib/SemanticWeb/Schema/InsuranceAgency.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Intangible" : {
          "file" : "lib/SemanticWeb/Schema/Intangible.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InteractAction" : {
          "file" : "lib/SemanticWeb/Schema/InteractAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InteractionCounter" : {
          "file" : "lib/SemanticWeb/Schema/InteractionCounter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InternetCafe" : {
          "file" : "lib/SemanticWeb/Schema/InternetCafe.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InvestmentOrDeposit" : {
          "file" : "lib/SemanticWeb/Schema/InvestmentOrDeposit.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::InviteAction" : {
          "file" : "lib/SemanticWeb/Schema/InviteAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Invoice" : {
          "file" : "lib/SemanticWeb/Schema/Invoice.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ItemAvailability" : {
          "file" : "lib/SemanticWeb/Schema/ItemAvailability.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ItemList" : {
          "file" : "lib/SemanticWeb/Schema/ItemList.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ItemListOrderType" : {
          "file" : "lib/SemanticWeb/Schema/ItemListOrderType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ItemPage" : {
          "file" : "lib/SemanticWeb/Schema/ItemPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::JewelryStore" : {
          "file" : "lib/SemanticWeb/Schema/JewelryStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::JobPosting" : {
          "file" : "lib/SemanticWeb/Schema/JobPosting.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::JoinAction" : {
          "file" : "lib/SemanticWeb/Schema/JoinAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Joint" : {
          "file" : "lib/SemanticWeb/Schema/Joint.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LakeBodyOfWater" : {
          "file" : "lib/SemanticWeb/Schema/LakeBodyOfWater.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Landform" : {
          "file" : "lib/SemanticWeb/Schema/Landform.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LandmarksOrHistoricalBuildings" : {
          "file" : "lib/SemanticWeb/Schema/LandmarksOrHistoricalBuildings.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Language" : {
          "file" : "lib/SemanticWeb/Schema/Language.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LeaveAction" : {
          "file" : "lib/SemanticWeb/Schema/LeaveAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LegalService" : {
          "file" : "lib/SemanticWeb/Schema/LegalService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LegislativeBuilding" : {
          "file" : "lib/SemanticWeb/Schema/LegislativeBuilding.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LendAction" : {
          "file" : "lib/SemanticWeb/Schema/LendAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Library" : {
          "file" : "lib/SemanticWeb/Schema/Library.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LifestyleModification" : {
          "file" : "lib/SemanticWeb/Schema/LifestyleModification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Ligament" : {
          "file" : "lib/SemanticWeb/Schema/Ligament.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LikeAction" : {
          "file" : "lib/SemanticWeb/Schema/LikeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LiquorStore" : {
          "file" : "lib/SemanticWeb/Schema/LiquorStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ListItem" : {
          "file" : "lib/SemanticWeb/Schema/ListItem.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ListenAction" : {
          "file" : "lib/SemanticWeb/Schema/ListenAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LiteraryEvent" : {
          "file" : "lib/SemanticWeb/Schema/LiteraryEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LiveBlogPosting" : {
          "file" : "lib/SemanticWeb/Schema/LiveBlogPosting.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LoanOrCredit" : {
          "file" : "lib/SemanticWeb/Schema/LoanOrCredit.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LocalBusiness" : {
          "file" : "lib/SemanticWeb/Schema/LocalBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LocationFeatureSpecification" : {
          "file" : "lib/SemanticWeb/Schema/LocationFeatureSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LockerDelivery" : {
          "file" : "lib/SemanticWeb/Schema/LockerDelivery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Locksmith" : {
          "file" : "lib/SemanticWeb/Schema/Locksmith.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LodgingBusiness" : {
          "file" : "lib/SemanticWeb/Schema/LodgingBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LodgingReservation" : {
          "file" : "lib/SemanticWeb/Schema/LodgingReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LoseAction" : {
          "file" : "lib/SemanticWeb/Schema/LoseAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::LymphaticVessel" : {
          "file" : "lib/SemanticWeb/Schema/LymphaticVessel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Map" : {
          "file" : "lib/SemanticWeb/Schema/Map.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MapCategoryType" : {
          "file" : "lib/SemanticWeb/Schema/MapCategoryType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MarryAction" : {
          "file" : "lib/SemanticWeb/Schema/MarryAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Mass" : {
          "file" : "lib/SemanticWeb/Schema/Mass.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MaximumDoseSchedule" : {
          "file" : "lib/SemanticWeb/Schema/MaximumDoseSchedule.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MediaObject" : {
          "file" : "lib/SemanticWeb/Schema/MediaObject.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MediaSubscription" : {
          "file" : "lib/SemanticWeb/Schema/MediaSubscription.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalAudience" : {
          "file" : "lib/SemanticWeb/Schema/MedicalAudience.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalBusiness" : {
          "file" : "lib/SemanticWeb/Schema/MedicalBusiness.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalCause" : {
          "file" : "lib/SemanticWeb/Schema/MedicalCause.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalClinic" : {
          "file" : "lib/SemanticWeb/Schema/MedicalClinic.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalCondition" : {
          "file" : "lib/SemanticWeb/Schema/MedicalCondition.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalConditionStage" : {
          "file" : "lib/SemanticWeb/Schema/MedicalConditionStage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalContraindication" : {
          "file" : "lib/SemanticWeb/Schema/MedicalContraindication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalDevice" : {
          "file" : "lib/SemanticWeb/Schema/MedicalDevice.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalDevicePurpose" : {
          "file" : "lib/SemanticWeb/Schema/MedicalDevicePurpose.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalEntity" : {
          "file" : "lib/SemanticWeb/Schema/MedicalEntity.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalEnumeration" : {
          "file" : "lib/SemanticWeb/Schema/MedicalEnumeration.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalEvidenceLevel" : {
          "file" : "lib/SemanticWeb/Schema/MedicalEvidenceLevel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalGuideline" : {
          "file" : "lib/SemanticWeb/Schema/MedicalGuideline.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalGuidelineContraindication" : {
          "file" : "lib/SemanticWeb/Schema/MedicalGuidelineContraindication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalGuidelineRecommendation" : {
          "file" : "lib/SemanticWeb/Schema/MedicalGuidelineRecommendation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalImagingTechnique" : {
          "file" : "lib/SemanticWeb/Schema/MedicalImagingTechnique.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalIndication" : {
          "file" : "lib/SemanticWeb/Schema/MedicalIndication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalIntangible" : {
          "file" : "lib/SemanticWeb/Schema/MedicalIntangible.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalObservationalStudy" : {
          "file" : "lib/SemanticWeb/Schema/MedicalObservationalStudy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalObservationalStudyDesign" : {
          "file" : "lib/SemanticWeb/Schema/MedicalObservationalStudyDesign.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalOrganization" : {
          "file" : "lib/SemanticWeb/Schema/MedicalOrganization.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalProcedure" : {
          "file" : "lib/SemanticWeb/Schema/MedicalProcedure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalProcedureType" : {
          "file" : "lib/SemanticWeb/Schema/MedicalProcedureType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalRiskCalculator" : {
          "file" : "lib/SemanticWeb/Schema/MedicalRiskCalculator.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalRiskEstimator" : {
          "file" : "lib/SemanticWeb/Schema/MedicalRiskEstimator.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalRiskFactor" : {
          "file" : "lib/SemanticWeb/Schema/MedicalRiskFactor.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalRiskScore" : {
          "file" : "lib/SemanticWeb/Schema/MedicalRiskScore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalScholarlyArticle" : {
          "file" : "lib/SemanticWeb/Schema/MedicalScholarlyArticle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalSign" : {
          "file" : "lib/SemanticWeb/Schema/MedicalSign.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalSignOrSymptom" : {
          "file" : "lib/SemanticWeb/Schema/MedicalSignOrSymptom.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalSpecialty" : {
          "file" : "lib/SemanticWeb/Schema/MedicalSpecialty.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalStudy" : {
          "file" : "lib/SemanticWeb/Schema/MedicalStudy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalStudyStatus" : {
          "file" : "lib/SemanticWeb/Schema/MedicalStudyStatus.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalSymptom" : {
          "file" : "lib/SemanticWeb/Schema/MedicalSymptom.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalTest" : {
          "file" : "lib/SemanticWeb/Schema/MedicalTest.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalTestPanel" : {
          "file" : "lib/SemanticWeb/Schema/MedicalTestPanel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalTherapy" : {
          "file" : "lib/SemanticWeb/Schema/MedicalTherapy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalTrial" : {
          "file" : "lib/SemanticWeb/Schema/MedicalTrial.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalTrialDesign" : {
          "file" : "lib/SemanticWeb/Schema/MedicalTrialDesign.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicalWebPage" : {
          "file" : "lib/SemanticWeb/Schema/MedicalWebPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MedicineSystem" : {
          "file" : "lib/SemanticWeb/Schema/MedicineSystem.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MeetingRoom" : {
          "file" : "lib/SemanticWeb/Schema/MeetingRoom.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MensClothingStore" : {
          "file" : "lib/SemanticWeb/Schema/MensClothingStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Menu" : {
          "file" : "lib/SemanticWeb/Schema/Menu.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MenuItem" : {
          "file" : "lib/SemanticWeb/Schema/MenuItem.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MenuSection" : {
          "file" : "lib/SemanticWeb/Schema/MenuSection.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Message" : {
          "file" : "lib/SemanticWeb/Schema/Message.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MiddleSchool" : {
          "file" : "lib/SemanticWeb/Schema/MiddleSchool.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MobileApplication" : {
          "file" : "lib/SemanticWeb/Schema/MobileApplication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MobilePhoneStore" : {
          "file" : "lib/SemanticWeb/Schema/MobilePhoneStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MonetaryAmount" : {
          "file" : "lib/SemanticWeb/Schema/MonetaryAmount.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MonetaryAmountDistribution" : {
          "file" : "lib/SemanticWeb/Schema/MonetaryAmountDistribution.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Mosque" : {
          "file" : "lib/SemanticWeb/Schema/Mosque.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Motel" : {
          "file" : "lib/SemanticWeb/Schema/Motel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Motorcycle" : {
          "file" : "lib/SemanticWeb/Schema/Motorcycle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MotorcycleDealer" : {
          "file" : "lib/SemanticWeb/Schema/MotorcycleDealer.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MotorcycleRepair" : {
          "file" : "lib/SemanticWeb/Schema/MotorcycleRepair.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MotorizedBicycle" : {
          "file" : "lib/SemanticWeb/Schema/MotorizedBicycle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Mountain" : {
          "file" : "lib/SemanticWeb/Schema/Mountain.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MoveAction" : {
          "file" : "lib/SemanticWeb/Schema/MoveAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Movie" : {
          "file" : "lib/SemanticWeb/Schema/Movie.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MovieClip" : {
          "file" : "lib/SemanticWeb/Schema/MovieClip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MovieRentalStore" : {
          "file" : "lib/SemanticWeb/Schema/MovieRentalStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MovieSeries" : {
          "file" : "lib/SemanticWeb/Schema/MovieSeries.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MovieTheater" : {
          "file" : "lib/SemanticWeb/Schema/MovieTheater.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MovingCompany" : {
          "file" : "lib/SemanticWeb/Schema/MovingCompany.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Muscle" : {
          "file" : "lib/SemanticWeb/Schema/Muscle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Museum" : {
          "file" : "lib/SemanticWeb/Schema/Museum.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicAlbum" : {
          "file" : "lib/SemanticWeb/Schema/MusicAlbum.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicAlbumProductionType" : {
          "file" : "lib/SemanticWeb/Schema/MusicAlbumProductionType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicAlbumReleaseType" : {
          "file" : "lib/SemanticWeb/Schema/MusicAlbumReleaseType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicComposition" : {
          "file" : "lib/SemanticWeb/Schema/MusicComposition.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicEvent" : {
          "file" : "lib/SemanticWeb/Schema/MusicEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicGroup" : {
          "file" : "lib/SemanticWeb/Schema/MusicGroup.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicPlaylist" : {
          "file" : "lib/SemanticWeb/Schema/MusicPlaylist.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicRecording" : {
          "file" : "lib/SemanticWeb/Schema/MusicRecording.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicRelease" : {
          "file" : "lib/SemanticWeb/Schema/MusicRelease.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicReleaseFormatType" : {
          "file" : "lib/SemanticWeb/Schema/MusicReleaseFormatType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicStore" : {
          "file" : "lib/SemanticWeb/Schema/MusicStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicVenue" : {
          "file" : "lib/SemanticWeb/Schema/MusicVenue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::MusicVideoObject" : {
          "file" : "lib/SemanticWeb/Schema/MusicVideoObject.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::NGO" : {
          "file" : "lib/SemanticWeb/Schema/NGO.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::NailSalon" : {
          "file" : "lib/SemanticWeb/Schema/NailSalon.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Nerve" : {
          "file" : "lib/SemanticWeb/Schema/Nerve.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::NewsArticle" : {
          "file" : "lib/SemanticWeb/Schema/NewsArticle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Newspaper" : {
          "file" : "lib/SemanticWeb/Schema/Newspaper.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::NightClub" : {
          "file" : "lib/SemanticWeb/Schema/NightClub.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Notary" : {
          "file" : "lib/SemanticWeb/Schema/Notary.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::NoteDigitalDocument" : {
          "file" : "lib/SemanticWeb/Schema/NoteDigitalDocument.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::NutritionInformation" : {
          "file" : "lib/SemanticWeb/Schema/NutritionInformation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Occupation" : {
          "file" : "lib/SemanticWeb/Schema/Occupation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OccupationalTherapy" : {
          "file" : "lib/SemanticWeb/Schema/OccupationalTherapy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OceanBodyOfWater" : {
          "file" : "lib/SemanticWeb/Schema/OceanBodyOfWater.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Offer" : {
          "file" : "lib/SemanticWeb/Schema/Offer.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OfferCatalog" : {
          "file" : "lib/SemanticWeb/Schema/OfferCatalog.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OfferItemCondition" : {
          "file" : "lib/SemanticWeb/Schema/OfferItemCondition.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OfficeEquipmentStore" : {
          "file" : "lib/SemanticWeb/Schema/OfficeEquipmentStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OnDemandEvent" : {
          "file" : "lib/SemanticWeb/Schema/OnDemandEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OpeningHoursSpecification" : {
          "file" : "lib/SemanticWeb/Schema/OpeningHoursSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Optician" : {
          "file" : "lib/SemanticWeb/Schema/Optician.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Order" : {
          "file" : "lib/SemanticWeb/Schema/Order.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OrderAction" : {
          "file" : "lib/SemanticWeb/Schema/OrderAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OrderItem" : {
          "file" : "lib/SemanticWeb/Schema/OrderItem.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OrderStatus" : {
          "file" : "lib/SemanticWeb/Schema/OrderStatus.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Organization" : {
          "file" : "lib/SemanticWeb/Schema/Organization.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OrganizationRole" : {
          "file" : "lib/SemanticWeb/Schema/OrganizationRole.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OrganizeAction" : {
          "file" : "lib/SemanticWeb/Schema/OrganizeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OutletStore" : {
          "file" : "lib/SemanticWeb/Schema/OutletStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::OwnershipInfo" : {
          "file" : "lib/SemanticWeb/Schema/OwnershipInfo.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PaintAction" : {
          "file" : "lib/SemanticWeb/Schema/PaintAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Painting" : {
          "file" : "lib/SemanticWeb/Schema/Painting.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PalliativeProcedure" : {
          "file" : "lib/SemanticWeb/Schema/PalliativeProcedure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ParcelDelivery" : {
          "file" : "lib/SemanticWeb/Schema/ParcelDelivery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ParcelService" : {
          "file" : "lib/SemanticWeb/Schema/ParcelService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ParentAudience" : {
          "file" : "lib/SemanticWeb/Schema/ParentAudience.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Park" : {
          "file" : "lib/SemanticWeb/Schema/Park.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ParkingFacility" : {
          "file" : "lib/SemanticWeb/Schema/ParkingFacility.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PathologyTest" : {
          "file" : "lib/SemanticWeb/Schema/PathologyTest.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Patient" : {
          "file" : "lib/SemanticWeb/Schema/Patient.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PawnShop" : {
          "file" : "lib/SemanticWeb/Schema/PawnShop.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PayAction" : {
          "file" : "lib/SemanticWeb/Schema/PayAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PaymentCard" : {
          "file" : "lib/SemanticWeb/Schema/PaymentCard.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PaymentChargeSpecification" : {
          "file" : "lib/SemanticWeb/Schema/PaymentChargeSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PaymentMethod" : {
          "file" : "lib/SemanticWeb/Schema/PaymentMethod.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PaymentService" : {
          "file" : "lib/SemanticWeb/Schema/PaymentService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PaymentStatusType" : {
          "file" : "lib/SemanticWeb/Schema/PaymentStatusType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PeopleAudience" : {
          "file" : "lib/SemanticWeb/Schema/PeopleAudience.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PerformAction" : {
          "file" : "lib/SemanticWeb/Schema/PerformAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PerformanceRole" : {
          "file" : "lib/SemanticWeb/Schema/PerformanceRole.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PerformingArtsTheater" : {
          "file" : "lib/SemanticWeb/Schema/PerformingArtsTheater.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PerformingGroup" : {
          "file" : "lib/SemanticWeb/Schema/PerformingGroup.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Periodical" : {
          "file" : "lib/SemanticWeb/Schema/Periodical.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Permit" : {
          "file" : "lib/SemanticWeb/Schema/Permit.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Person" : {
          "file" : "lib/SemanticWeb/Schema/Person.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PetStore" : {
          "file" : "lib/SemanticWeb/Schema/PetStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Pharmacy" : {
          "file" : "lib/SemanticWeb/Schema/Pharmacy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Photograph" : {
          "file" : "lib/SemanticWeb/Schema/Photograph.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PhotographAction" : {
          "file" : "lib/SemanticWeb/Schema/PhotographAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PhysicalActivity" : {
          "file" : "lib/SemanticWeb/Schema/PhysicalActivity.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PhysicalActivityCategory" : {
          "file" : "lib/SemanticWeb/Schema/PhysicalActivityCategory.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PhysicalExam" : {
          "file" : "lib/SemanticWeb/Schema/PhysicalExam.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PhysicalTherapy" : {
          "file" : "lib/SemanticWeb/Schema/PhysicalTherapy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Physician" : {
          "file" : "lib/SemanticWeb/Schema/Physician.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Place" : {
          "file" : "lib/SemanticWeb/Schema/Place.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PlaceOfWorship" : {
          "file" : "lib/SemanticWeb/Schema/PlaceOfWorship.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PlanAction" : {
          "file" : "lib/SemanticWeb/Schema/PlanAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PlayAction" : {
          "file" : "lib/SemanticWeb/Schema/PlayAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Playground" : {
          "file" : "lib/SemanticWeb/Schema/Playground.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Plumber" : {
          "file" : "lib/SemanticWeb/Schema/Plumber.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PoliceStation" : {
          "file" : "lib/SemanticWeb/Schema/PoliceStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Pond" : {
          "file" : "lib/SemanticWeb/Schema/Pond.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PostOffice" : {
          "file" : "lib/SemanticWeb/Schema/PostOffice.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PostalAddress" : {
          "file" : "lib/SemanticWeb/Schema/PostalAddress.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PreOrderAction" : {
          "file" : "lib/SemanticWeb/Schema/PreOrderAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PrependAction" : {
          "file" : "lib/SemanticWeb/Schema/PrependAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Preschool" : {
          "file" : "lib/SemanticWeb/Schema/Preschool.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PresentationDigitalDocument" : {
          "file" : "lib/SemanticWeb/Schema/PresentationDigitalDocument.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PreventionIndication" : {
          "file" : "lib/SemanticWeb/Schema/PreventionIndication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PriceSpecification" : {
          "file" : "lib/SemanticWeb/Schema/PriceSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Product" : {
          "file" : "lib/SemanticWeb/Schema/Product.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ProductModel" : {
          "file" : "lib/SemanticWeb/Schema/ProductModel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ProfessionalService" : {
          "file" : "lib/SemanticWeb/Schema/ProfessionalService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ProfilePage" : {
          "file" : "lib/SemanticWeb/Schema/ProfilePage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ProgramMembership" : {
          "file" : "lib/SemanticWeb/Schema/ProgramMembership.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Property" : {
          "file" : "lib/SemanticWeb/Schema/Property.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PropertyValue" : {
          "file" : "lib/SemanticWeb/Schema/PropertyValue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PropertyValueSpecification" : {
          "file" : "lib/SemanticWeb/Schema/PropertyValueSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PsychologicalTreatment" : {
          "file" : "lib/SemanticWeb/Schema/PsychologicalTreatment.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PublicSwimmingPool" : {
          "file" : "lib/SemanticWeb/Schema/PublicSwimmingPool.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PublicationEvent" : {
          "file" : "lib/SemanticWeb/Schema/PublicationEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PublicationIssue" : {
          "file" : "lib/SemanticWeb/Schema/PublicationIssue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::PublicationVolume" : {
          "file" : "lib/SemanticWeb/Schema/PublicationVolume.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::QAPage" : {
          "file" : "lib/SemanticWeb/Schema/QAPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::QualitativeValue" : {
          "file" : "lib/SemanticWeb/Schema/QualitativeValue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::QuantitativeValue" : {
          "file" : "lib/SemanticWeb/Schema/QuantitativeValue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::QuantitativeValueDistribution" : {
          "file" : "lib/SemanticWeb/Schema/QuantitativeValueDistribution.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Quantity" : {
          "file" : "lib/SemanticWeb/Schema/Quantity.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Question" : {
          "file" : "lib/SemanticWeb/Schema/Question.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::QuoteAction" : {
          "file" : "lib/SemanticWeb/Schema/QuoteAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RVPark" : {
          "file" : "lib/SemanticWeb/Schema/RVPark.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RadiationTherapy" : {
          "file" : "lib/SemanticWeb/Schema/RadiationTherapy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RadioChannel" : {
          "file" : "lib/SemanticWeb/Schema/RadioChannel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RadioClip" : {
          "file" : "lib/SemanticWeb/Schema/RadioClip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RadioEpisode" : {
          "file" : "lib/SemanticWeb/Schema/RadioEpisode.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RadioSeason" : {
          "file" : "lib/SemanticWeb/Schema/RadioSeason.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RadioSeries" : {
          "file" : "lib/SemanticWeb/Schema/RadioSeries.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RadioStation" : {
          "file" : "lib/SemanticWeb/Schema/RadioStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Rating" : {
          "file" : "lib/SemanticWeb/Schema/Rating.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReactAction" : {
          "file" : "lib/SemanticWeb/Schema/ReactAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReadAction" : {
          "file" : "lib/SemanticWeb/Schema/ReadAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RealEstateAgent" : {
          "file" : "lib/SemanticWeb/Schema/RealEstateAgent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReceiveAction" : {
          "file" : "lib/SemanticWeb/Schema/ReceiveAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Recipe" : {
          "file" : "lib/SemanticWeb/Schema/Recipe.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RecommendedDoseSchedule" : {
          "file" : "lib/SemanticWeb/Schema/RecommendedDoseSchedule.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RecyclingCenter" : {
          "file" : "lib/SemanticWeb/Schema/RecyclingCenter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RegisterAction" : {
          "file" : "lib/SemanticWeb/Schema/RegisterAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RejectAction" : {
          "file" : "lib/SemanticWeb/Schema/RejectAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RentAction" : {
          "file" : "lib/SemanticWeb/Schema/RentAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RentalCarReservation" : {
          "file" : "lib/SemanticWeb/Schema/RentalCarReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReplaceAction" : {
          "file" : "lib/SemanticWeb/Schema/ReplaceAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReplyAction" : {
          "file" : "lib/SemanticWeb/Schema/ReplyAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Report" : {
          "file" : "lib/SemanticWeb/Schema/Report.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReportedDoseSchedule" : {
          "file" : "lib/SemanticWeb/Schema/ReportedDoseSchedule.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Reservation" : {
          "file" : "lib/SemanticWeb/Schema/Reservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReservationPackage" : {
          "file" : "lib/SemanticWeb/Schema/ReservationPackage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReservationStatusType" : {
          "file" : "lib/SemanticWeb/Schema/ReservationStatusType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReserveAction" : {
          "file" : "lib/SemanticWeb/Schema/ReserveAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Reservoir" : {
          "file" : "lib/SemanticWeb/Schema/Reservoir.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Residence" : {
          "file" : "lib/SemanticWeb/Schema/Residence.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Resort" : {
          "file" : "lib/SemanticWeb/Schema/Resort.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Restaurant" : {
          "file" : "lib/SemanticWeb/Schema/Restaurant.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RestrictedDiet" : {
          "file" : "lib/SemanticWeb/Schema/RestrictedDiet.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ResumeAction" : {
          "file" : "lib/SemanticWeb/Schema/ResumeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReturnAction" : {
          "file" : "lib/SemanticWeb/Schema/ReturnAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Review" : {
          "file" : "lib/SemanticWeb/Schema/Review.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ReviewAction" : {
          "file" : "lib/SemanticWeb/Schema/ReviewAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RiverBodyOfWater" : {
          "file" : "lib/SemanticWeb/Schema/RiverBodyOfWater.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Role" : {
          "file" : "lib/SemanticWeb/Schema/Role.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RoofingContractor" : {
          "file" : "lib/SemanticWeb/Schema/RoofingContractor.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Room" : {
          "file" : "lib/SemanticWeb/Schema/Room.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RsvpAction" : {
          "file" : "lib/SemanticWeb/Schema/RsvpAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::RsvpResponseType" : {
          "file" : "lib/SemanticWeb/Schema/RsvpResponseType.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SaleEvent" : {
          "file" : "lib/SemanticWeb/Schema/SaleEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ScheduleAction" : {
          "file" : "lib/SemanticWeb/Schema/ScheduleAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ScholarlyArticle" : {
          "file" : "lib/SemanticWeb/Schema/ScholarlyArticle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::School" : {
          "file" : "lib/SemanticWeb/Schema/School.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ScreeningEvent" : {
          "file" : "lib/SemanticWeb/Schema/ScreeningEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Sculpture" : {
          "file" : "lib/SemanticWeb/Schema/Sculpture.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SeaBodyOfWater" : {
          "file" : "lib/SemanticWeb/Schema/SeaBodyOfWater.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SearchAction" : {
          "file" : "lib/SemanticWeb/Schema/SearchAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SearchResultsPage" : {
          "file" : "lib/SemanticWeb/Schema/SearchResultsPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Season" : {
          "file" : "lib/SemanticWeb/Schema/Season.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Seat" : {
          "file" : "lib/SemanticWeb/Schema/Seat.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SelfStorage" : {
          "file" : "lib/SemanticWeb/Schema/SelfStorage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SellAction" : {
          "file" : "lib/SemanticWeb/Schema/SellAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SendAction" : {
          "file" : "lib/SemanticWeb/Schema/SendAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Series" : {
          "file" : "lib/SemanticWeb/Schema/Series.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Service" : {
          "file" : "lib/SemanticWeb/Schema/Service.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ServiceChannel" : {
          "file" : "lib/SemanticWeb/Schema/ServiceChannel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ShareAction" : {
          "file" : "lib/SemanticWeb/Schema/ShareAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ShoeStore" : {
          "file" : "lib/SemanticWeb/Schema/ShoeStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ShoppingCenter" : {
          "file" : "lib/SemanticWeb/Schema/ShoppingCenter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SingleFamilyResidence" : {
          "file" : "lib/SemanticWeb/Schema/SingleFamilyResidence.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SiteNavigationElement" : {
          "file" : "lib/SemanticWeb/Schema/SiteNavigationElement.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SkiResort" : {
          "file" : "lib/SemanticWeb/Schema/SkiResort.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SocialEvent" : {
          "file" : "lib/SemanticWeb/Schema/SocialEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SocialMediaPosting" : {
          "file" : "lib/SemanticWeb/Schema/SocialMediaPosting.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SoftwareApplication" : {
          "file" : "lib/SemanticWeb/Schema/SoftwareApplication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SoftwareSourceCode" : {
          "file" : "lib/SemanticWeb/Schema/SoftwareSourceCode.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SomeProducts" : {
          "file" : "lib/SemanticWeb/Schema/SomeProducts.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SpeakableSpecification" : {
          "file" : "lib/SemanticWeb/Schema/SpeakableSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Specialty" : {
          "file" : "lib/SemanticWeb/Schema/Specialty.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SportingGoodsStore" : {
          "file" : "lib/SemanticWeb/Schema/SportingGoodsStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SportsActivityLocation" : {
          "file" : "lib/SemanticWeb/Schema/SportsActivityLocation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SportsClub" : {
          "file" : "lib/SemanticWeb/Schema/SportsClub.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SportsEvent" : {
          "file" : "lib/SemanticWeb/Schema/SportsEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SportsOrganization" : {
          "file" : "lib/SemanticWeb/Schema/SportsOrganization.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SportsTeam" : {
          "file" : "lib/SemanticWeb/Schema/SportsTeam.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SpreadsheetDigitalDocument" : {
          "file" : "lib/SemanticWeb/Schema/SpreadsheetDigitalDocument.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::StadiumOrArena" : {
          "file" : "lib/SemanticWeb/Schema/StadiumOrArena.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::State" : {
          "file" : "lib/SemanticWeb/Schema/State.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SteeringPositionValue" : {
          "file" : "lib/SemanticWeb/Schema/SteeringPositionValue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Store" : {
          "file" : "lib/SemanticWeb/Schema/Store.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::StructuredValue" : {
          "file" : "lib/SemanticWeb/Schema/StructuredValue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SubscribeAction" : {
          "file" : "lib/SemanticWeb/Schema/SubscribeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Substance" : {
          "file" : "lib/SemanticWeb/Schema/Substance.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SubwayStation" : {
          "file" : "lib/SemanticWeb/Schema/SubwayStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Suite" : {
          "file" : "lib/SemanticWeb/Schema/Suite.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SuperficialAnatomy" : {
          "file" : "lib/SemanticWeb/Schema/SuperficialAnatomy.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SurgicalProcedure" : {
          "file" : "lib/SemanticWeb/Schema/SurgicalProcedure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::SuspendAction" : {
          "file" : "lib/SemanticWeb/Schema/SuspendAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Synagogue" : {
          "file" : "lib/SemanticWeb/Schema/Synagogue.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TVClip" : {
          "file" : "lib/SemanticWeb/Schema/TVClip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TVEpisode" : {
          "file" : "lib/SemanticWeb/Schema/TVEpisode.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TVSeason" : {
          "file" : "lib/SemanticWeb/Schema/TVSeason.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TVSeries" : {
          "file" : "lib/SemanticWeb/Schema/TVSeries.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Table" : {
          "file" : "lib/SemanticWeb/Schema/Table.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TakeAction" : {
          "file" : "lib/SemanticWeb/Schema/TakeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TattooParlor" : {
          "file" : "lib/SemanticWeb/Schema/TattooParlor.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Taxi" : {
          "file" : "lib/SemanticWeb/Schema/Taxi.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TaxiReservation" : {
          "file" : "lib/SemanticWeb/Schema/TaxiReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TaxiService" : {
          "file" : "lib/SemanticWeb/Schema/TaxiService.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TaxiStand" : {
          "file" : "lib/SemanticWeb/Schema/TaxiStand.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TechArticle" : {
          "file" : "lib/SemanticWeb/Schema/TechArticle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TelevisionChannel" : {
          "file" : "lib/SemanticWeb/Schema/TelevisionChannel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TelevisionStation" : {
          "file" : "lib/SemanticWeb/Schema/TelevisionStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TennisComplex" : {
          "file" : "lib/SemanticWeb/Schema/TennisComplex.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TextDigitalDocument" : {
          "file" : "lib/SemanticWeb/Schema/TextDigitalDocument.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TheaterEvent" : {
          "file" : "lib/SemanticWeb/Schema/TheaterEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TheaterGroup" : {
          "file" : "lib/SemanticWeb/Schema/TheaterGroup.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TherapeuticProcedure" : {
          "file" : "lib/SemanticWeb/Schema/TherapeuticProcedure.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Thesis" : {
          "file" : "lib/SemanticWeb/Schema/Thesis.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Thing" : {
          "file" : "lib/SemanticWeb/Schema/Thing.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Ticket" : {
          "file" : "lib/SemanticWeb/Schema/Ticket.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TieAction" : {
          "file" : "lib/SemanticWeb/Schema/TieAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TipAction" : {
          "file" : "lib/SemanticWeb/Schema/TipAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TireShop" : {
          "file" : "lib/SemanticWeb/Schema/TireShop.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TouristAttraction" : {
          "file" : "lib/SemanticWeb/Schema/TouristAttraction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TouristInformationCenter" : {
          "file" : "lib/SemanticWeb/Schema/TouristInformationCenter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ToyStore" : {
          "file" : "lib/SemanticWeb/Schema/ToyStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TrackAction" : {
          "file" : "lib/SemanticWeb/Schema/TrackAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TradeAction" : {
          "file" : "lib/SemanticWeb/Schema/TradeAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TrainReservation" : {
          "file" : "lib/SemanticWeb/Schema/TrainReservation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TrainStation" : {
          "file" : "lib/SemanticWeb/Schema/TrainStation.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TrainTrip" : {
          "file" : "lib/SemanticWeb/Schema/TrainTrip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TransferAction" : {
          "file" : "lib/SemanticWeb/Schema/TransferAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TravelAction" : {
          "file" : "lib/SemanticWeb/Schema/TravelAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TravelAgency" : {
          "file" : "lib/SemanticWeb/Schema/TravelAgency.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TreatmentIndication" : {
          "file" : "lib/SemanticWeb/Schema/TreatmentIndication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Trip" : {
          "file" : "lib/SemanticWeb/Schema/Trip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::TypeAndQuantityNode" : {
          "file" : "lib/SemanticWeb/Schema/TypeAndQuantityNode.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UnRegisterAction" : {
          "file" : "lib/SemanticWeb/Schema/UnRegisterAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UnitPriceSpecification" : {
          "file" : "lib/SemanticWeb/Schema/UnitPriceSpecification.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UpdateAction" : {
          "file" : "lib/SemanticWeb/Schema/UpdateAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UseAction" : {
          "file" : "lib/SemanticWeb/Schema/UseAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserBlocks" : {
          "file" : "lib/SemanticWeb/Schema/UserBlocks.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserCheckins" : {
          "file" : "lib/SemanticWeb/Schema/UserCheckins.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserComments" : {
          "file" : "lib/SemanticWeb/Schema/UserComments.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserDownloads" : {
          "file" : "lib/SemanticWeb/Schema/UserDownloads.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserInteraction" : {
          "file" : "lib/SemanticWeb/Schema/UserInteraction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserLikes" : {
          "file" : "lib/SemanticWeb/Schema/UserLikes.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserPageVisits" : {
          "file" : "lib/SemanticWeb/Schema/UserPageVisits.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserPlays" : {
          "file" : "lib/SemanticWeb/Schema/UserPlays.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserPlusOnes" : {
          "file" : "lib/SemanticWeb/Schema/UserPlusOnes.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::UserTweets" : {
          "file" : "lib/SemanticWeb/Schema/UserTweets.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Vehicle" : {
          "file" : "lib/SemanticWeb/Schema/Vehicle.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Vein" : {
          "file" : "lib/SemanticWeb/Schema/Vein.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Vessel" : {
          "file" : "lib/SemanticWeb/Schema/Vessel.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VeterinaryCare" : {
          "file" : "lib/SemanticWeb/Schema/VeterinaryCare.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VideoGallery" : {
          "file" : "lib/SemanticWeb/Schema/VideoGallery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VideoGame" : {
          "file" : "lib/SemanticWeb/Schema/VideoGame.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VideoGameClip" : {
          "file" : "lib/SemanticWeb/Schema/VideoGameClip.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VideoGameSeries" : {
          "file" : "lib/SemanticWeb/Schema/VideoGameSeries.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VideoObject" : {
          "file" : "lib/SemanticWeb/Schema/VideoObject.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::ViewAction" : {
          "file" : "lib/SemanticWeb/Schema/ViewAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VisualArtsEvent" : {
          "file" : "lib/SemanticWeb/Schema/VisualArtsEvent.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VisualArtwork" : {
          "file" : "lib/SemanticWeb/Schema/VisualArtwork.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VitalSign" : {
          "file" : "lib/SemanticWeb/Schema/VitalSign.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Volcano" : {
          "file" : "lib/SemanticWeb/Schema/Volcano.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::VoteAction" : {
          "file" : "lib/SemanticWeb/Schema/VoteAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WPAdBlock" : {
          "file" : "lib/SemanticWeb/Schema/WPAdBlock.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WPFooter" : {
          "file" : "lib/SemanticWeb/Schema/WPFooter.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WPHeader" : {
          "file" : "lib/SemanticWeb/Schema/WPHeader.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WPSideBar" : {
          "file" : "lib/SemanticWeb/Schema/WPSideBar.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WantAction" : {
          "file" : "lib/SemanticWeb/Schema/WantAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WarrantyPromise" : {
          "file" : "lib/SemanticWeb/Schema/WarrantyPromise.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WarrantyScope" : {
          "file" : "lib/SemanticWeb/Schema/WarrantyScope.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WatchAction" : {
          "file" : "lib/SemanticWeb/Schema/WatchAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Waterfall" : {
          "file" : "lib/SemanticWeb/Schema/Waterfall.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WearAction" : {
          "file" : "lib/SemanticWeb/Schema/WearAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WebApplication" : {
          "file" : "lib/SemanticWeb/Schema/WebApplication.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WebPage" : {
          "file" : "lib/SemanticWeb/Schema/WebPage.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WebPageElement" : {
          "file" : "lib/SemanticWeb/Schema/WebPageElement.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WebSite" : {
          "file" : "lib/SemanticWeb/Schema/WebSite.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WholesaleStore" : {
          "file" : "lib/SemanticWeb/Schema/WholesaleStore.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WinAction" : {
          "file" : "lib/SemanticWeb/Schema/WinAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Winery" : {
          "file" : "lib/SemanticWeb/Schema/Winery.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WorkersUnion" : {
          "file" : "lib/SemanticWeb/Schema/WorkersUnion.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::WriteAction" : {
          "file" : "lib/SemanticWeb/Schema/WriteAction.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       },
       "SemanticWeb::Schema::Zoo" : {
          "file" : "lib/SemanticWeb/Schema/Zoo.pm",
-         "version" : "v3.5.1"
+         "version" : "v3.8.1"
       }
    },
    "release_status" : "stable",
@@ -2987,7 +2987,7 @@
          "web" : "https://github.com/robrwo/SemanticWeb-Schema"
       }
    },
-   "version" : "v3.5.1",
+   "version" : "v3.8.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

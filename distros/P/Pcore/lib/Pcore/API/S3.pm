@@ -1,11 +1,11 @@
 package Pcore::API::S3;
 
 use Pcore -class, -res, -const;
-use Pcore::Util::Digest qw[sha256_hex hmac_sha256 hmac_sha256_hex];
-use Pcore::Util::Scalar qw[is_ref is_plain_coderef];
-use Pcore::Util::Data qw[to_uri_query from_xml];
-use Pcore::Util::Scalar qw[weaken];
-use Pcore::Util::Term::Progress;
+use Pcore::Lib::Digest qw[sha256_hex hmac_sha256 hmac_sha256_hex];
+use Pcore::Lib::Scalar qw[is_ref is_plain_coderef];
+use Pcore::Lib::Data qw[to_uri_query from_xml];
+use Pcore::Lib::Scalar qw[weaken];
+use Pcore::Lib::Term::Progress;
 use IO::Compress::Gzip qw[gzip];
 
 has key         => ();
@@ -522,7 +522,7 @@ sub sync ( $self, $locations, $tree ) {
 
         say 'Uploading files ...';
 
-        my $progress = Pcore::Util::Term::Progress::get_indicator( network => 0, total => scalar $tree->{files}->%*, value => 0 );
+        my $progress = Pcore::Lib::Term::Progress::get_indicator( network => 0, total => scalar $tree->{files}->%*, value => 0 );
 
         for my $file ( values $tree->{files}->%* ) {
             $cv->begin;
@@ -554,7 +554,7 @@ sub sync ( $self, $locations, $tree ) {
     if ( my @to_remove = grep { !exists $tree->{files}->{$_} } keys $remote_files->%* ) {
         say 'Removing files ...';
 
-        my $progress = Pcore::Util::Term::Progress::get_indicator( network => 0, total => scalar @to_remove, value => 0 );
+        my $progress = Pcore::Lib::Term::Progress::get_indicator( network => 0, total => scalar @to_remove, value => 0 );
 
         my $cv = P->cv->begin;
 

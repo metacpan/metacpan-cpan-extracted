@@ -110,7 +110,7 @@ sub _open {
 		((ref($_[0]) eq 'HASH') ? %{$_[0]} : @_)
 	);
 
-	my $table = $self->{table} || ref($self);
+	my $table = $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 
 	if($self->{'logger'}) {
@@ -126,6 +126,7 @@ sub _open {
 	if($self->{'logger'}) {
 		$self->{'logger'}->debug("_open: try to open $slurp_file");
 	}
+
 	if(-r $slurp_file) {
 		$dbh = DBI->connect("dbi:SQLite:dbname=$slurp_file", undef, undef, {
 			sqlite_open_flags => SQLITE_OPEN_READONLY,
@@ -193,6 +194,16 @@ sub _open {
 				# }
 			};
 
+			# my %options = (
+				# allow_loose_quotes => 1,
+				# blank_is_undef => 1,
+				# empty_is_undef => 1,
+				# binary => 1,
+				# f_file => $slurp_file,
+				# escape_char => '\\',
+				# sep_char => $sep_char,
+			# );
+
 			# $dbh->{csv_tables}->{$table} = \%options;
 			# delete $options{f_file};
 
@@ -252,7 +263,8 @@ sub _open {
 # Returns a reference to an array of hash references of all the data meeting
 # the given criteria
 sub selectall_hashref {
-	my @rc = selectall_hash(@_);
+	my $self = shift;
+	my @rc = $self->selectall_hash(@_);
 	return \@rc;
 }
 
@@ -327,6 +339,7 @@ sub fetchrow_hashref {
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	$self->{'logger'}->debug(Data::Dumper->new([\%params])->Dump());
 	my $table = $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 

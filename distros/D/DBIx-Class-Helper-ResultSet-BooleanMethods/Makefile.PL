@@ -16,10 +16,15 @@ my %args = (
 	'TEST_REQUIRES' => {
 		'Test::More' => '0',
 	},
+	'CONFIGURE_REQUIRES' => {
+		'strictures'          => 0,
+		'ExtUtils::MakeMaker' => 0,
+	},
 	'PREREQ_PM' => {
 		'Package::Variant'                   => '1.003',
 		'Role::Tiny'                         => '2.0',
 		'DBIx::Class::Helper::ResultSet::Me' => '2.033',
+		'strictures'                         => 0,
 	},
 	'dist' => {
 		'COMPRESS' => 'gzip -9f',
@@ -27,6 +32,18 @@ my %args = (
 	},
 	'clean' => {
 		'FILES' => 'DBIx-Class-Helper-ResultSet-BooleanMethods-*',
+	},
+	'META_MERGE' => {
+		'meta-spec' => {
+			'version' => 2,
+		},
+		'resources' => {
+			'repository' => {
+				'type' => 'git',
+				'url'  => 'https://github.com/mat813/DBIx-Class-Helper-ResultSet-BooleanMethods.git',
+				'web'  => 'https://github.com/mat813/DBIx-Class-Helper-ResultSet-BooleanMethods',
+			},
+		},
 	},
 );
 

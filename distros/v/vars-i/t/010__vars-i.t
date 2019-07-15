@@ -5,7 +5,7 @@
 # Do not `use strict` or else this file won't compile in the event of errors.
 # Leaving off `use strict` permits us to use the more detailed test results.
 
-use Test::More tests => 19;
+use Test::More tests => 35;
 
 use vars::i;     # Fatal if we can't load
 
@@ -18,7 +18,19 @@ use vars::i;     # Fatal if we can't load
         '$REVISION'=> '$Id: GENERIC.pm,v 1.3 2002/06/02 11:12:38 _ Exp $',
     ];
 
-BEGIN {
+    # Initialize from a hashref - #2
+    use vars::i '%HASH' => { answer => 'forty-two' };
+
+    # Initialize from an arrayref
+    use vars::i '@ARR' => [1337, qw(Mike Oldfield)];
+
+    # Initialize from hashref and arrayref within wrapper
+    use vars::i [
+        '%HASH2' => { answer => 'forty-two' },
+        '@ARR2' => [1337, qw(Mike Oldfield)],
+    ];
+
+BEGIN {     # so that we are testing compile-time effects
     # Use string eval + `use strict` to trap undefined variables
     ok(eval q[use strict; no warnings 'all'; @BORG; 1],
                 q[use vars::i '@BORG' => 6 .. 6;]);
@@ -47,7 +59,28 @@ BEGIN {
     is(defined $REVISION, 1, q|use vars::i [...];|);
     is($REVISION, '$Id: GENERIC.pm,v 1.3 2002/06/02 11:12:38 _ Exp $', q[is $REVISION, '$Id: GENERIC.pm,v 1.3 2002/06/02 11:12:38 _ Exp $']);
 
-}
+    ok(eval q[use strict; no warnings 'all'; %HASH; 1],
+                q[use vars::i '%HASH' => { answer=>42 }]);
+    cmp_ok(keys %HASH, '==', 1, q[%HASH size]);
+    is($HASH{answer}, 'forty-two', q[%HASH properly filled]);
 
-#perl -lne"print qq|is($2, $3, q[$1]);| if /(use vars::i '([^']+)' => (.*?);)$/" >2
-#is( $VERSION, 3.44, q[use vars::i '$VERSION' => 3.44;]);
+    ok(eval q[use strict; no warnings 'all'; @ARR; 1],
+                q[use vars::i '@ARR' => [1337, qw(Mike Oldfield)]]);
+    cmp_ok(@ARR, '==', 3, q[@ARR size]);
+    cmp_ok($ARR[0], '==', 1337, '$ARR[0]');
+    is($ARR[1], 'Mike', '$ARR[1]');
+    is($ARR[2], 'Oldfield', '$ARR[2]');
+
+    ok(eval q[use strict; no warnings 'all'; %HASH2; 1],
+                q[use vars::i '%HASH2' => { answer=>42 }]);
+    cmp_ok(keys %HASH2, '==', 1, q[%HASH2 size]);
+    is($HASH2{answer}, 'forty-two', q[%HASH2 properly filled]);
+
+    ok(eval q[use strict; no warnings 'all'; @ARR2; 1],
+                q[use vars::i '@ARR2' => [1337, qw(Mike Oldfield)]]);
+    cmp_ok(@ARR2, '==', 3, q[@ARR2 size]);
+    cmp_ok($ARR2[0], '==', 1337, '$ARR2[0]');
+    is($ARR2[1], 'Mike', '$ARR2[1]');
+    is($ARR2[2], 'Oldfield', '$ARR2[2]');
+
+}

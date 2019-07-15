@@ -1,4 +1,4 @@
-package Pcore v0.95.0;
+package Pcore v0.96.0;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -17,7 +17,7 @@ our $EXPORT_PRAGMA = {
     export   => undef,    # install standart import method
     forktmpl => undef,    # run fork template on startup
     l10n     => undef,    # register package L10N domain
-    res      => undef,    # export Pcore::Util::Result qw[res]
+    res      => undef,    # export Pcore::Lib::Result qw[res]
     role     => undef,    # package is a Moo role
     sql      => undef,    # export Pcore::Handle::DBI::Const qw[:TYPES]
 };
@@ -31,13 +31,13 @@ our $CON_ENC     = undef;
 our $P = sub : const {'Pcore'};
 
 # configure standard library
-our $UTIL = {
+our $LIB = {
     handle => 'Pcore::Handle',
-    html   => 'Pcore::Util::HTML',
+    html   => 'Pcore::Lib::HTML',
     http   => 'Pcore::HTTP',
-    mime   => 'Pcore::Util::MIME',
-    uri    => 'Pcore::Util::URI',
-    uuid   => 'Pcore::Util::UUID',
+    mime   => 'Pcore::Lib::MIME',
+    uri    => 'Pcore::Lib::URI',
+    uuid   => 'Pcore::Lib::UUID',
 };
 
 sub import {
@@ -112,9 +112,9 @@ sub import {
 
         # process -res pragma
         if ( $import->{pragma}->{res} ) {
-            require Pcore::Util::Result;
+            require Pcore::Lib::Result;
 
-            Pcore::Util::Result->import( -caller => $caller, qw[res] );
+            Pcore::Lib::Result->import( -caller => $caller, qw[res] );
         }
 
         # process -sql pragma
@@ -204,7 +204,7 @@ sub _CORE_INIT ($import) {
     require Pcore::Core::Exception;    # set $SIG{__DIE__}, $SIG{__WARN__}, $SIG->{INT}, $SIG->{TERM} handlers
 
     # process -forktmpl pragma
-    require Pcore::Util::Sys::ForkTmpl if !$MSWIN && $import->{pragma}->{forktmpl};
+    require Pcore::Lib::Sys::ForkTmpl if !$MSWIN && $import->{pragma}->{forktmpl};
 
     _CORE_INIT_AFTER_FORK();
 
@@ -283,15 +283,15 @@ sub set_locale ( $self, $locale = undef ) {
 
 # AUTOLOAD
 sub AUTOLOAD ( $self, @ ) {    ## no critic qw[ClassHierarchies::ProhibitAutoloading]
-    my $util = lc our $AUTOLOAD =~ s/\A.*:://smr;
+    my $lib = lc our $AUTOLOAD =~ s/\A.*:://smr;
 
-    my $class = $UTIL->{$util} // 'Pcore::Util::' . ucfirst $util;
+    my $class = $LIB->{$lib} // 'Pcore::Lib::' . ucfirst $lib;
 
     require $class =~ s[::][/]smgr . '.pm';
 
     if ( $class->can('new') ) {
         eval <<"PERL";         ## no critic qw[BuiltinFunctions::ProhibitStringyEval ErrorHandling::RequireCheckingReturnValueOfEval]
-            *{$util} = sub {
+            *{$lib} = sub {
                 shift;
 
                 return $class->new(\@_);
@@ -300,9 +300,9 @@ PERL
     }
     else {
 
-        # create util namespace with AUTOLOAD method
+        # create lib namespace with AUTOLOAD method
         eval <<"PERL";         ## no critic qw[BuiltinFunctions::ProhibitStringyEval ErrorHandling::RequireCheckingReturnValueOfEval]
-            package $self\::Util::_$util;
+            package $self\::Lib::_$lib;
 
             use Pcore;
 
@@ -313,7 +313,7 @@ PERL
 
                 # install method wrapper
                 eval <<"EVAL";
-                    *{"$self\::Util::_$util\::\$method"} = sub {
+                    *{"$self\::Lib::_$lib\::\$method"} = sub {
                         shift;
 
                         return &$class\::\$method;
@@ -324,11 +324,11 @@ EVAL
             }
 PERL
 
-        # create util namespace access method
-        *{$util} = sub : const {"$self\::Util::_$util"};
+        # create lib namespace access method
+        *{$lib} = sub : const {"$self\::Lib::_$lib"};
     }
 
-    goto &{$util};
+    goto &{$lib};
 }
 
 # EVENT

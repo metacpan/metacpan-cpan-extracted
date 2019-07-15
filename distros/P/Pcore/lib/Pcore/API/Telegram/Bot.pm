@@ -1,7 +1,7 @@
 package Pcore::API::Telegram::Bot;
 
 use Pcore -class, -res;
-use Pcore::Util::Scalar qw[weaken];
+use Pcore::Lib::Scalar qw[weaken];
 
 has key          => ( required => 1 );
 has poll_timeout => 1;

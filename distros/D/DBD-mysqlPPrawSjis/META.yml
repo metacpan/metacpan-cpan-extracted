@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: DBD-mysqlPPrawSjis
-version: 0.13
+version: 0.16
 abstract: Pure Perl MySQL driver for raw ShiftJIS
 author:
   - ina <ina@cpan.org>
@@ -30,3 +30,4 @@ build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/DBD-mysqlPPrawSjis

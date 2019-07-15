@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-textconv
 
+0.05 2019-07-10T09:02:58Z
+
+    - Convert Private_Use and Unassigned character to GETA MARK.
+
 0.04 2019-05-15T06:41:27Z
 
     - introduce textconv::pdf.pm

@@ -16,7 +16,6 @@ t/01-all_from.t
 t/02-configure_requires.t
 t/03-xs.t
 t/04-c.t
-t/05-h.t
 t/06-src.t
 t/07-cplus.t
 t/09-payload.t

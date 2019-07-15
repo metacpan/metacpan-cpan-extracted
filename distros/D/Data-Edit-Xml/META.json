@@ -35,7 +35,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "20190708"
+         "version" : "20190714"
       },
       "ditaSyntaxDiagramFromDocBookCmdSynopsis" : {
          "file" : "lib/Data/Edit/Xml.pm"
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20190708",
+   "version" : "20190714",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

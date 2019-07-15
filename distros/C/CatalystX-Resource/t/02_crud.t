@@ -163,4 +163,39 @@ lives_ok(sub { $artist->albums->create({ id => 1, name => 'Mach et einfach!' });
     like($res->decoded_content, '/Es gibt Reis, Baby/', "$path content contains 'Es gibt Reis, Baby'");
 }
 
+# EDIT with TT variable interpolation (example: [% moby %])
+# album.name is using an inline form template
+# artist.name is using a form.tt file
+# this test makes sure the behaviour of the two is the same
+{
+    my $path ='/artists/2/albums/1/edit';
+    my $res = request($path);
+    ok($res->is_success, "$path returns HTTP 200");
+    like($res->decoded_content, '/method="post"/', "$path content contains 'method=\"post\"'");
+    like($res->decoded_content, '/Es gibt Reis, Baby/', "POST $path content contains 'Es gibt Reis, Baby'");
+    $res = request(POST $path, [ name => 'Es gibt [% Reis %], Baby' ]);
+    ok($res->is_redirect, "$path returns HTTP 302");
+    $path ='/artists/2/albums/1/show';
+    $res = request($path);
+    like($res->decoded_content, '/Es gibt \[% Reis %\], Baby/', "GET $path content contains 'Es gibt [% Reis %], Baby'");
+
+    $path ='/artists/2/albums/1/edit';
+    $res = request($path);
+    ok($res->is_success, "$path returns HTTP 200");
+    like($res->decoded_content, '/value="Es gibt \[% Reis %\], Baby/', "GET $path content contains 'Es gibt [% Reis %], Baby'");
+
+    $path ='/artists/2/edit';
+    $res = request($path);
+    ok($res->is_success, "$path returns HTTP 200");
+    my $content = $res->decoded_content;
+    like($content, '/method="post"/', "$path content contains 'method=\"post\"'");
+    like($content, '/willy/', "$path content contains 'willy'");
+    unlike($content, '/password/', "$path does not contain 'password'");
+    $res = request(POST $path, [ name => '[% moby %]' ]);
+    ok($res->is_redirect, "$path returns HTTP 302");
+    $path ='/artists/2/show';
+    $res = request($path);
+    like($res->decoded_content, '/\[% moby %\]/', "$path content contains '[% moby %]'");
+}
+
 done_testing;

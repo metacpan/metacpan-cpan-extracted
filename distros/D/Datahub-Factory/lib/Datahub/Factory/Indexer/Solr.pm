@@ -2,7 +2,7 @@ package Datahub::Factory::Indexer::Solr;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use Moo;
 use Catmandu;
@@ -39,7 +39,7 @@ sub index {
     # Index the JSON data
 
     $request_handler = url $self->{request_handler};
-    $request_handler->equery('commit=false&delete_boost_fields=false');
+    $request_handler->equery('commit=true');
 
     $request = HTTP::Request::StreamingUpload->new(
         POST    => "$request_handler",
@@ -55,58 +55,13 @@ sub index {
     if ($response->is_success) {
         return decode_json($response->decoded_content);
     } else {
-        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
             code             => $response->code,
-            message          => $message->{error}->{msg},
+            message          => $response->message,
             url              => $response->request->uri->as_string,
             method           => $response->request->method,
             request_headers  => [],
-            request_body     => $response->request->decoded_content,
-            response_headers => [],
-            response_body    => $response->decoded_content,
-        });
-        return undef;
-    }
-}
-
-sub commit {
-    my $self = shift;
-
-    my ($request_handler, $response, $request, $result); 
-
-    $request_handler = url $self->{request_handler};
-
-    # Commit the index
-    my @path = $request_handler->path_components;
-    pop @path;
-    $request_handler->path_components(@path);
-    $request_handler->equery('commit=true');
-
-    $request = HTTP::Request->new(
-         GET     => $request_handler,
-    );
-
-    $response = $self->out->request($request);
-
-    if ($response->is_success) {
-        my $dom = XML::LibXML->load_xml(string => $response->decoded_content);
-        
-        foreach my $int ($dom->findnodes('/response/lst'))  {
-            $result->{responseHeader}->{status} = $int->findvalue('./int[@name="status"]');
-            $result->{responseHeader}->{QTime} = $int->findvalue('./int[@name="QTime"]');
-        }
-
-        return $result;
-    } else {
-        my $message = decode_json($response->decoded_content);
-        Catmandu::HTTPError->throw({
-            code             => $response->code,
-            message          => $message->{error}->{msg},
-            url              => $response->request->uri->as_string,
-            method           => $response->request->method,
-            request_headers  => [],
-            request_body     => $response->request->decoded_content,
+            request_body     => $response->request->content,
             response_headers => [],
             response_body    => $response->decoded_content,
         });
@@ -131,7 +86,6 @@ Datahub::Factory::Indexer::Solr - Index data in Solr via a data import handler.
     my $indexer = Datahub::Factory->indexer('Solr')->new('request_handler' => 'http://path');
 
     $indexer->index();
-    $indexer->commit();
 
 =head1 DESCRIPTION
 

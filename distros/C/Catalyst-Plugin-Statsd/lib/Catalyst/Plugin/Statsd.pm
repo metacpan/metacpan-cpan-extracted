@@ -1,6 +1,6 @@
 package Catalyst::Plugin::Statsd;
 
-# ABSTRACT: log Catalyst stats to statsd
+# ABSTRACT: Log Catalyst stats to statsd
 
 use v5.10.1;
 
@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.6.2';
 
 
 sub statsd_client {
@@ -76,11 +76,11 @@ __END__
 
 =head1 NAME
 
-Catalyst::Plugin::Statsd - log Catalyst stats to statsd
+Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.2
 
 =head1 SYNOPSIS
 
@@ -88,6 +88,8 @@ version v0.6.1
      Statsd
      -Stats=1
    /;
+
+  use Net::Statsd::Tiny;
 
   __PACKAGE__->config(
     'psgi_middleware', [
@@ -135,6 +137,8 @@ This defaults to
   $c->statsd_client;
 
 Returns the statsd client.
+
+This is the statsd client used by L<Plack::Middleware::Statsd>.
 
 =head2 C<statsd_metric_name_filter>
 
@@ -207,6 +211,8 @@ L<Catalyst::Stats>
 =item *
 
 L<Plack::Middleware::Statsd>
+
+L<Net::Statsd::Tiny>
 
 =back
 

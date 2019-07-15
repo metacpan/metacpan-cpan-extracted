@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Whois::Raw.
 
+
+2.99022  Jul 12 2019 Dave Hayes
+    Fix caching for QRY_ALL (https://github.com/regru/Net-Whois-Raw/pull/19)
+
 2.99021  Nov 20 2018 Eugeny Subachev
     - Fixed/added 'not found' patterns of net.ua vg gd kiwi sx TLDs.
 

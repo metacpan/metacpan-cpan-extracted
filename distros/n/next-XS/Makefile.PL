@@ -9,10 +9,7 @@ my %params = (
     MIN_PERL_VERSION => '5.18.0', # need GV_SUPER
     CCFLAGS          => '-Wall -Wextra -Wno-nonnull',
     test             => {TESTS => 't/*.t t/perl/*.t'},
-    BIN_SHARE        => {
-        CPLUS    => 11,
-        INCLUDE  => {'src' => '/'},
-    },
+    BIN_SHARE        => {INCLUDE  => {'src' => '/'}},
 );
 
 write_makefile(%params);

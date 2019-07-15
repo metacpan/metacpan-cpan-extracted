@@ -38,6 +38,7 @@
       "test" : {
          "requires" : {
             "Test::Exception" : "0.4",
+            "Test::FailWarnings" : "0",
             "Test::More" : "1",
             "Test::Simple" : "0.44"
          }
@@ -51,6 +52,6 @@
          "web" : "https://github.com/FGasper/p5-Crypt-Format"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

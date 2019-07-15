@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has amenity_feature => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::Accommodation - An accommodation is a place that can accomm
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -165,9 +165,9 @@ A pets_allowed should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<Bool>
+
+=item C<Str>
 
 =back
 

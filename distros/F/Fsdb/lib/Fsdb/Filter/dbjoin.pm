@@ -576,14 +576,16 @@ sub run_merge_join($) {
 	$prev_frefs[0] = $frefs[0];
 	$frefs[0] = &{$fastpath_subs[0]}();
 	if (defined($frefs[0])) {
-	    &{$check_compare_subs[0]}() <= 0 or croak("dbjoin: left stream is unsorted.\n");
+	    &{$check_compare_subs[0]}() <= 0 or 
+                croak("dbjoin: left stream is unsorted, compare:\n" . "\t" . join(" ", @{$prev_frefs[0]}) . "\n\t" . join(" ", @{$frefs[0]}) . "\n");
 	};
     };
     my $advance_right = sub {
 	$prev_frefs[1] = $frefs[1];
 	$frefs[1] = &{$fastpath_subs[1]}();
 	if (defined($frefs[1])) {
-	    &{$check_compare_subs[1]}() <= 0 or croak("dbjoin: right stream is unsorted.\n");
+	    &{$check_compare_subs[1]}() <= 0 or
+                croak("dbjoin: right stream is unsorted, compare:\n" . "\t" . join(" ", @{$prev_frefs[1]}) . "\n\t" . join(" ", @{$frefs[1]}) . "\n");
 	};
     };
 
@@ -747,14 +749,14 @@ sub run_hash_join($$$) {
     # Build phase:
     #
     # Load the hashed table into memory,
-    # building a hash table %h.
+    # building a hash table %hashed_table.
     #
     # Probe phase:
     #
     # Then walk the larger table,
     # checking against the hash table for matches.
     #
-    # We currently require it fit in memory.
+    # We currently require that it fits in memory.
     #
 
     #
@@ -782,11 +784,21 @@ sub run_hash_join($$$) {
     $@ && croak($self->{_prog} . ":  internal eval error in hash build code: $@.\n$code\n");
 
     while ($fref = &{$fastpath_subs[$hashside]}()) {
+        #
 	# build the hash entry
+        #
+        # Note that each entry in %hashed_table is either an ARRAY,
+        # in which case it is the ONE hit.
+        # Or it's a SCALAR (ref == ''), in which case
+        # there is an array of matchines in $hashed_table_overflow{$key}.
+        #
+        # This two-level structure avoids building arrays of arrays
+        # in the common case of one reference for each element.
+        #
 	my($key, $aref) = &{$build_key_from_hashside}($fref);
 	if (defined($hashed_table{$key})) {
-	    # overflow
-	    if (ref($hashed_table{$key}) eq 'SCALAR') {
+	    # overflow?
+	    if (ref($hashed_table{$key}) eq '') {
 		# already overflowed
 		push(@{$hashed_table_overflow{$key}}, $aref);
 	    } else {

@@ -9,7 +9,6 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   blib: '0'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -23,7 +22,7 @@ requires:
   Dist::Zilla: '6'
   Dist::Zilla::PluginBundle::Basic: '0'
   Dist::Zilla::PluginBundle::Filter: '0'
-  Dist::Zilla::PluginBundle::Git: '2'
+  Dist::Zilla::PluginBundle::Git: '0'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
@@ -32,12 +31,13 @@ requires:
   Pod::Elemental::Transformer::List: '0'
   Pod::Weaver::Section::Contributors: '0'
   Test::CPAN::Meta: '0'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/wscherz/Dist-Zilla-PluginBundle-WCS
   repository: https://github.com/wscherz/Dist-Zilla-PluginBundle-WCS.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.022001'
@@ -50,7 +50,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.8.1.windows.1
+          git_version: 2.21.0.windows.1
           repo_root: .
       name: Git::NextVersion
       version: '2.046'
@@ -63,7 +63,7 @@ x_Dist_Zilla:
       name: CopyFilesFromBuild
       version: '0.170880'
     -
-      class: Dist::Zilla::Plugin::GatherDir
+      class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
@@ -74,8 +74,10 @@ x_Dist_Zilla:
           prefix: ''
           prune_directory: []
           root: .
-      name: GatherDir
-      version: '6.008'
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: Git::GatherDir
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
@@ -96,7 +98,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.8.1.windows.1
+          git_version: 2.21.0.windows.1
           repo_root: .
       name: '@Git/Check'
       version: '2.046'
@@ -113,7 +115,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.8.1.windows.1
+          git_version: 2.21.0.windows.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -126,11 +128,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.002
+          tag: v0.003
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.8.1.windows.1
+          git_version: 2.21.0.windows.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -141,11 +143,12 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::Push:
           push_to:
-            - "'origin :'"
-            - "'backup :'"
+            - "'origin master:master'"
+            - "'origin release/master:release/master'"
+            - "'backup master:master'"
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.8.1.windows.1
+          git_version: 2.21.0.windows.1
           repo_root: .
       name: '@Git/Push'
       version: '2.046'
@@ -208,7 +211,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.8.1.windows.1
+          git_version: 2.21.0.windows.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -227,6 +230,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
       version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerlFast
+      name: MinimumPerlFast
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -321,9 +328,17 @@ x_Dist_Zilla:
       name: AutoPrereqs
       version: '6.008'
     -
+      class: Dist::Zilla::Plugin::TravisYML
+      name: TravisYML
+      version: '1.15'
+    -
       class: Dist::Zilla::Plugin::MetaTests
       name: MetaTests
       version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::TravisCI::StatusBadge
+      name: TravisCI::StatusBadge
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: Test::ChangesHasContent
@@ -405,10 +420,10 @@ x_Dist_Zilla:
           build_root: ~
           message: 'Build results of %h (on %b)'
           multiple_inheritance: 0
-          release_branch: release
+          release_branch: release/%b
           release_message: 'Build release of %v (on %b)'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.8.1.windows.1
+          git_version: 2.21.0.windows.1
           repo_root: .
       name: Git::CommitBuild
       version: '2.046'
@@ -473,4 +488,6 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.008'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -5,187 +5,15 @@ use Pcore::CDN::Static::FA qw[:ALL];
 
 # accept
 # https://www.w3schools.com/tags/att_input_accept.asp
-# image/*|video/*
+# image/*,video/*,.jpeg
 
-# TODO setAccept is not working
 sub EXT_controller : Extend('Ext.app.ViewController') {
     return {
-        uploads    => [],
+        mixins => [ $class{'/pcore/Mixin/upload'} ],
+
+        uploads    => {},
+        uploadId   => 0,
         dropTarget => undef,    # drop target
-
-        # TODO move to pcoreApi
-        createPcoreUpload => func [ 'file', 'api', 'calcHash', 'onProgress' ], <<"JS",
-            return {
-                file: file,
-                api: api,
-                calcHash: calcHash,
-                onProgress: onProgress,
-
-                cancelled: 0,
-                chunkSize: 1024 * 1024, // 1M
-                hash: null,
-
-                cancel: function () {
-                    this.cancelled = 1;
-
-                    if (this.onProgress) this.onProgress(1, $l10n{Cancelled});
-                },
-
-                onRequestError: function (res) {
-                    this.cancelled = 1;
-
-                    if (this.onProgress) this.onProgress(1, res);
-                },
-
-                    getFileReader: function (cb) {
-                        var me = this,
-                            offset = 0;
-
-                        return function () {
-                            var chunk = me.file.slice(offset, offset + me.chunkSize);
-
-                            // finished
-                            if (!chunk.size) {
-                                cb();
-
-                                return;
-                            }
-
-                            var reader = new FileReader();
-
-                            reader.onload = (function () {
-                                var oldOffset = offset;
-
-                                offset += me.chunkSize;
-
-                                cb( oldOffset, reader.result );
-                            });
-
-                            reader.readAsBinaryString(chunk);
-
-                            return;
-                        };
-                    },
-
-                    getHash: function (cb) {
-                        if (this.hash) {
-                            cb(this.hash);
-
-                            return;
-                        }
-
-                        var me = this,
-                            hash = new jsSHA("SHA-1", "BYTES"),
-                            readChunk = me.getFileReader(function (offset, chunk) {
-
-                                // upload is cancelled
-                                if (me.cancelled) {
-                                    cb();
-                                }
-
-                                // next chunk
-                                else if ( chunk !== undefined ) {
-                                    hash.update(chunk);
-
-                                    if (me.onProgress) me.onProgress(0, $l10n{'Calculating checksum'}, offset / me.file.size);
-
-                                    readChunk();
-                                }
-
-                                // finished
-                                else {
-                                    me.hash = hash.getHash("HEX");
-
-                                    if (me.onProgress) me.onProgress(0, $l10n{'Calculating checksum'}, 1);
-
-                                    cb(me.hash);
-                                }
-
-                                return;
-                            });
-
-                        readChunk();
-                    },
-
-                    upload: function (cb) {
-                        var me = this,
-                        uploadCb = function(hash) {
-                            if (me.cancelled) {
-                                return;
-                            }
-
-                            me.api({
-                                name: me.file.name,
-                                size: me.file.size,
-                                type: me.file.type,
-                                hash: hash,
-                            }, function(res) {
-
-                                // request error
-                                if (!res.isSuccess()) {
-                                    me.onRequestError(res);
-
-                                    return;
-                                }
-
-                                var id = res.data,
-                                    readChunk = me.getFileReader(function (offset, chunk) {
-
-                                        // upload is cancelled
-                                        if (me.cancelled) {
-                                            return;
-                                        }
-
-                                        // next chunk
-                                        else if ( chunk !== undefined ) {
-                                            me.api({
-                                                id: id,
-                                                offset: offset,
-                                                chunk: btoa(chunk)
-                                            }, function (res) {
-
-                                                // upload is cancelled
-                                                if (me.cancelled) {
-                                                    return;
-                                                }
-
-                                                // upload error
-                                                if (!res.isSuccess()) {
-                                                    me.onRequestError(res);
-                                                }
-
-                                                // chunk uploaded
-                                                else {
-                                                    if (me.onProgress) me.onProgress(0, $l10n{Uploading}, offset / me.file.size);
-
-                                                    readChunk();
-                                                }
-
-                                                return;
-                                            });
-                                        }
-
-                                        // finished
-                                        else {
-                                            if (me.onProgress) me.onProgress(1, $l10n{Uploaded}, 1);
-                                        }
-
-                                        return;
-                                    });
-
-                                readChunk();
-                            });
-                        };
-
-                        if (me.calcHash) {
-                            me.getHash(uploadCb);
-                        }
-                        else {
-                            uploadCb();
-                        }
-                    },
-                };
-JS
 
         init => func ['view'], <<'JS',
             this.callParent(arguments);
@@ -241,80 +69,112 @@ JS
 JS
 
         # UPLOAD
-        upload => func ['file'], <<"JS",
+        upload => func [ 'file', 'data' ], <<"JS",
             var me = this,
-                view = me.getView(),
-                upload = {
-                    pcoreUpload: me.createPcoreUpload(file, view.getApi(), view.getCalcHash()),
-                    progressBar: null,
-                    cancelButton: null,
-                    component: me.lookup('uploads').add({
-                        layout: 'vbox',
-                        items: [{
-                            html: file.name
-                        }],
-                    }),
+                uploadId = 'upload' + ++this.uploadId,
+                upload = pcoreApi.newUpload( file, me.getView().getApi(), function (upload, status, reason, progress) {
+                    var viewModel = me.getViewModel();
 
-                    cancel: function () {
-                        this.pcoreUpload.cancel();
-                    },
-                };
+                    if (progress !== undefined) viewModel.set( uploadId + '.progressValue', progress );
 
-            upload.pcoreUpload.onProgress = function (final, text, progress) {
-                if (final) {
-                    upload.cancelButton.disable();
-                }
+                    viewModel.set( uploadId + '.progressText', me.getUploadStatusTextProgress(status, reason, progress) );
 
-                var percent;
+                    // upload is starting
+                    if (upload.isStarting()) {
 
-                if (progress !== undefined) {
-                    upload.progressBar.setValue(progress);
+                        // increase uploading files counter
+                        viewModel.set('uploading', viewModel.get('uploading') + 1);
 
-                    percent = Math.round(progress * 100);
-                }
-                else {
-                    percent = Math.round(upload.progressBar.getValue() * 100);
-                }
+                        let cancelButton = me.lookup('cancel-button');
+                        if (cancelButton) cancelButton.setText($l10n{Cancel});
+                    }
 
-                upload.progressBar.setText(text + ' ' + percent + '%');
-            };
+                    // upload is finished
+                    else if (upload.isFinished()) {
+                        let uploadCancelButton = me.lookup(uploadId + '-cancel-button');
+                        if (uploadCancelButton) uploadCancelButton.disable();
 
-            var progressCmp = upload.component.add({
-                layout: {
-                    type: 'hbox',
-                    align: 'center',
-                    pack: 'space-between',
-                },
-            });
+                        viewModel.set('uploading', viewModel.get('uploading') - 1);
 
-            upload.progressBar = progressCmp.add({
-                xtype: 'progress',
-                flex: 1,
-            });
+                        if (upload.isCancelled()) {
+                            viewModel.set('cancelled', viewModel.get('cancelled') + 1);
+                        }
+                        else if (upload.isError()) {
+                            viewModel.set('error', viewModel.get('error') + 1);
+                        }
+                        else if (upload.isDone()) {
+                            viewModel.set('done', viewModel.get('done') + 1);
+                        }
 
-            upload.cancelButton = progressCmp.add({
-                xtype: 'button',
-                iconCls: '$FAS_TIMES',
-                handler: function() {upload.cancel();},
-                tooltip: $l10n{'Cancel upload'},
-            });
+                        if (!viewModel.get('uploading')) {
+                            let cancelButton = me.lookup('cancel-button');
+                            if (cancelButton) cancelButton.setText($l10n{Close});
+                        }
 
-            this.uploads.push(upload);
+                        delete me.uploads[uploadId];
+                    }
+                });
+
+            // create component
+            me._createUploadComponent(file, uploadId);
+
+            // register upload
+            this.uploads[uploadId] = upload;
+            this.getViewModel().set(uploadId, {});
 
             // run upload
-            upload.pcoreUpload.upload(function () {
-                return;
-            });
-
-            return;
+            upload.start(data);
 JS
 
-        cancellAll => func <<"JS",
-            this.uploads.forEach(function(el) {
-                el.pcoreUpload.onProgress = null;
-                Ext.destroy(el.pcoreUpload);
-                Ext.destroy(el);
+        _createUploadComponent => func [ 'file', 'uploadId' ], <<~"JS",
+            this.lookup('uploads').add({
+                layout: 'vbox',
+                items: [
+                    {
+                        html: file.name
+                    },
+                    {
+                        layout: {
+                            type: 'hbox',
+                            align: 'center',
+                            pack: 'space-between',
+                        },
+
+                        items: [
+                            {
+                                xtype: 'progress',
+                                flex: 1,
+                                bind: {
+                                    text: '{' + uploadId + '.progressText}',
+                                    value: '{' + uploadId + '.progressValue}',
+                                },
+                            },
+                            {
+                                reference: uploadId + '-cancel-button',
+                                xtype: 'button',
+                                iconCls: '$FAS_TIMES',
+                                handler: 'cancelUpload',
+                                tooltip: $l10n{'Cancel upload'},
+                                value: uploadId,
+                            }
+                        ],
+                    }
+                ],
             });
+JS
+
+        cancelUpload => func ['button'], <<~'JS',
+            this.uploads[button.getValue()].cancel();
+JS
+
+        cancellAll => func <<~'JS',
+            for (let uploadId in this.uploads) {
+                let upload = this.uploads[uploadId];
+
+                delete this.uploads[uploadId];
+
+                upload.cancel();
+            }
 JS
 
         onDestroy => func [], <<"JS",
@@ -331,9 +191,17 @@ sub EXT_dialog : Extend('Ext.Dialog') {
     return {
         controller => $type{controller},
 
+        viewModel => {
+            data => {
+                uploading => 0,
+                cancelled => 0,
+                error     => 0,
+                done      => 0,
+            },
+        },
+
         config => {
             api      => undef,
-            calcHash => \0,
             accept   => undef,
             multiple => \0,
         },
@@ -341,7 +209,7 @@ sub EXT_dialog : Extend('Ext.Dialog') {
         closable  => \1,
         draggable => \0,
         title     => { text => l10n('UPLOAD FILES') },
-        width     => 500,
+        width     => 600,
         maxHeight => '90%',
 
         listeners => { destroy => 'onDestroy' },
@@ -357,19 +225,28 @@ sub EXT_dialog : Extend('Ext.Dialog') {
                 style     => 'border:5px dashed blue;color:grey;font-size:2em;text-align:center;',
                 html      => '<br/><br/>' . l10n('Drop files here'),
             },
-            {   layout  => 'hbox',
+            {   layout => {
+                    type  => 'hbox',
+                    align => 'center',
+                },
                 padding => '10 0 0 0',
                 items   => [
+                    {   xtype => 'component',
+                        bind  => { html => 'Uploading: {uploading} / Cancelled: {cancelled} / Error: {error} / Done: {done}' },
+                    },
                     { xtype => 'spacer' },
                     {   reference => 'file-button',
                         xtype     => 'filebutton',
                         text      => l10n('Select files'),
                         listeners => { change => 'onFileSelected', },
                     },
-                    {   xtype   => 'button',
-                        text    => l10n('Cancel'),
-                        ui      => 'decline',
-                        handler => 'close',
+                    {   reference => 'cancel-button',
+                        xtype     => 'button',
+                        text      => l10n('Close'),
+                        ui        => 'decline',
+                        handler   => 'close',
+                        margin    => '0 0 0 10',
+                        minWidth  => 100,
                     },
                 ],
             },

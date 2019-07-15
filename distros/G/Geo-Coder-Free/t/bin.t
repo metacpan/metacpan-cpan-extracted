@@ -5,18 +5,18 @@ use strict;
 use Test::Most tests => 22;
 
 BIN: {
-	eval 'use Test::Script';
+	SKIP: {
+		eval 'use Test::Script';
 
-	if($@) {
-		plan skip_all => 'Test::Script required for testing scripts';
-	} else {
-		SKIP: {
+		if($@) {
+			skip('Test::Script required for testing scripts', 22);
+		} else {
 			script_compiles('bin/testcgibin');
 			script_compiles('bin/address_lookup');
 			if($ENV{AUTHOR_TESTING}) {
 				my $foo;
 				script_runs(['bin/testcgibin', 3], { stdout => \$foo });
-				diag $foo;
+				diag($foo);
 
 				script_runs(['bin/testcgibin', 1]);
 				ok(script_stdout_like(qr/\-77\.03/, 'test 1'));

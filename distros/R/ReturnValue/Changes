@@ -1,5 +1,8 @@
 Revision history for Perl module ReturnValue
 
+0.113 2019-07-15T04:10:20Z
+	* Fixed the example in the synopsis
+
 0.112 2018-05-17T14:38:45Z
 	* Clarify that it's the Artistic License 2.0.
 

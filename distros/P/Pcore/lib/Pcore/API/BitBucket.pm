@@ -1,7 +1,7 @@
 package Pcore::API::BitBucket;
 
 use Pcore -class, -res;
-use Pcore::Util::Scalar qw[is_plain_coderef];
+use Pcore::Lib::Scalar qw[is_plain_coderef];
 use Pcore::API::SCM::Const qw[:SCM_TYPE];
 
 has username => ( required => 1 );

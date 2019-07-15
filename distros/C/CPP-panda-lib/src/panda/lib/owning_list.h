@@ -1,9 +1,7 @@
 #pragma once
-
 #include <panda/refcnt.h>
 
-namespace panda {
-namespace lib {
+namespace panda { namespace lib {
 /**
  * owning_list where iterators share owning of nodes with list.
  * Removing of any iterator never invalidates value under it.
@@ -29,15 +27,15 @@ namespace lib {
 template <typename T>
 struct owning_list {
 public:
-    struct node_t : RefCounted {
+    struct node_t : Refcnt {
         node_t(const T& value) : value(value), valid(true), next(nullptr), prev(nullptr) {}
 
         T value;
         bool valid;
-        shared_ptr<node_t, true> next;
+        iptr<node_t> next;
         node_t* prev;
     };
-    using node_sp = shared_ptr<node_t, true>;
+    using node_sp = iptr<node_t>;
 
     static void next_strategy(node_sp& node) {
         node = node->next;
@@ -77,11 +75,11 @@ public:
             return res;
         }
 
-        bool operator ==(const base_iterator& oth) {
+        bool operator ==(const base_iterator& oth) const {
             return node == oth.node;
         }
 
-        bool operator !=(const base_iterator& oth) {
+        bool operator !=(const base_iterator& oth) const {
             return !operator==(oth);
         }
     };
@@ -109,11 +107,24 @@ public:
 
     template<typename TT = T>
     void push_back(TT&& val) {
-        node_sp node = panda::make_shared<node_t>(std::forward<TT>(val));
+        node_sp node = new node_t(std::forward<TT>(val));
         if (last) {
             node->prev = last;
             last->next = node;
             last = node;
+        } else {
+            first = last = node;
+        }
+        ++_size;
+    }
+
+    template<typename TT = T>
+    void push_front(TT&& val) {
+        node_sp node = new node_t(std::forward<TT>(val));
+        if (first) {
+            node->next = first;
+            first->prev = node;
+            first = node;
         } else {
             first = last = node;
         }
@@ -179,5 +190,4 @@ void owning_list<T>::remove_node(owning_list::node_t* node) {
     _size--;
 }
 
-}
-}
+}}

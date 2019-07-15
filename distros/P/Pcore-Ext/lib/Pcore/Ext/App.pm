@@ -1,8 +1,8 @@
 package Pcore::Ext::App;
 
 use Pcore -class, -const;
-use Pcore::Util::Scalar qw[is_ref];
-use Pcore::Util::Data qw[to_json];
+use Pcore::Lib::Scalar qw[is_ref];
+use Pcore::Lib::Data qw[to_json];
 use Package::Stash::XS qw[];
 use Pcore::Ext::App::Class;
 
@@ -348,7 +348,7 @@ sub _build_app ($self) {
         Ext.application({
             name: 'APP',
             appCdn: '@{[ $self->{cdn}->("/app/$self->{id}") ]}',
-            api: new PCORE({
+            api: pcoreApi.newConnection({
                 url: '$data->{api_url}',
                 version: '$self->{ext_api_ver}',
                 listenEvents: null,

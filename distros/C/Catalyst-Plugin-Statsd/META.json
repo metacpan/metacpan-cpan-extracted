@@ -1,5 +1,5 @@
 {
-   "abstract" : "log Catalyst stats to statsd",
+   "abstract" : "Log Catalyst stats to statsd",
    "author" : [
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
@@ -80,7 +80,7 @@
    "provides" : {
       "Catalyst::Plugin::Statsd" : {
          "file" : "lib/Catalyst/Plugin/Statsd.pm",
-         "version" : "v0.6.1"
+         "version" : "v0.6.2"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/robrwo/CatalystX-Statsd"
       }
    },
-   "version" : "v0.6.1",
+   "version" : "v0.6.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Slaven Rezi\u0107 <slaven@rezic.de>"

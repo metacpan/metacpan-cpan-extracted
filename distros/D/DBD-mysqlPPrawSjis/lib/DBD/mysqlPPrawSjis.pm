@@ -1,11 +1,12 @@
 package DBD::mysqlPPrawSjis;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 use DBI;
 use Carp;
 use vars qw($VERSION $err $errstr $state $drh);
 
-$VERSION = '0.13';
+$VERSION = '0.16';
 $VERSION = $VERSION;
 $err = 0;
 $errstr = '';

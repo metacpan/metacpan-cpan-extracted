@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has additional_property => (
@@ -354,7 +354,7 @@ SemanticWeb::Schema::Place - Entities that have a somewhat fixed
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -536,9 +536,9 @@ A geo should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeoCoordinates']>
+
+=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =back
 
@@ -593,9 +593,9 @@ A geo_covers should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Place']>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
 
@@ -653,9 +653,9 @@ A geo_equals should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Place']>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
 
@@ -690,9 +690,9 @@ A geo_overlaps should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Place']>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
 
@@ -885,9 +885,9 @@ A photos should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Photograph']>
-
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Photograph']>
 
 =back
 

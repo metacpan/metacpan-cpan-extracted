@@ -1,0 +1,79 @@
+MODULE = MyTest::Typemap                PACKAGE = MyTest::SvAPI
+PROTOTYPES: DISABLE
+
+Sv sv_out (SV* retv = NULL, bool deref = false) {
+    if (deref) retv = SvRV(retv);
+    RETVAL = retv;
+}
+
+uint64_t scalar_in (Scalar val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Scalar scalar_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t simple_in (Simple val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Simple simple_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t ref_in (Ref val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Ref ref_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t glob_in (Glob val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Glob glob_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t sub_in (Sub val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Sub sub_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t array_in (Array val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Array array_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t hash_in (Hash val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Hash hash_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t stash_in (Stash val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Stash stash_out (SV* val = NULL) {
+    RETVAL = val;
+}
+
+uint64_t object_in (Object val) {
+    RETVAL = (uint64_t)val.get();
+}
+
+Object object_out (SV* val = NULL) {
+    RETVAL = val;
+}

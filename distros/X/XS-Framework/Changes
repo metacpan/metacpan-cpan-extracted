@@ -1,0 +1,5 @@
+1.0.0  12.07.2019
+           - rewritten and refactored from Panda::XS
+           - add std::map, std::vector and bool typemap's
+           - add multi XS support (XS_BOOT helper)
+           - BOOT function is also catch-guarded now

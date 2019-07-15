@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Dita::GB::Standard;
-our $VERSION = 20190708;
+our $VERSION = 20190710;
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -873,7 +873,7 @@ Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name g
 B<Example:>
 
 
-  if (1) {                                                                        
+  if (1) {
     if (useWords)
      {ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(<<END, q(dita)) eq q(c_abc_Plume_VApoR_CaPER_eqUAl_qUAIL_saInT_mEdia_Irony.dita);
   <concept>
@@ -891,7 +891,7 @@ B<Example:>
   END
      }
    }
-  
+
 
 This method can be imported via:
 
@@ -908,8 +908,8 @@ Return the name of the L<Companion File> given a file whose name complies with t
 B<Example:>
 
 
-  ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);                             
-  
+  ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);
+
 
 This method can be imported via:
 
@@ -926,42 +926,42 @@ Return the content of the L<Companion File> given a file whose name complies wit
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($c) eq $S;
-  
+
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-  
+
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-  
+
     ok 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($F) eq $S;                                  # Check companion file content
-  
+
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-  
+
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -981,38 +981,38 @@ Create a file in the specified B<$Folder> whose name is the L<GB Standard|http:/
 B<Example:>
 
 
-  if (1) {                                                                           
+  if (1) {
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗿𝗲𝗮𝘁𝗲𝗙𝗶𝗹𝗲($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-  
+
     my $F = gbStandardCopyFile($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-  
+
     ok !gbStandardRename($F);                                                     # No rename required to standardize file name
-  
+
     gbStandardDelete($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1030,38 +1030,38 @@ Check whether a file needs to be renamed to match the L<GB Standard|http://metac
 B<Example:>
 
 
-  if (1) {                                                                           
+  if (1) {
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-  
+
     my $F = gbStandardCopyFile($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-  
+
     ok !𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗥𝗲𝗻𝗮𝗺𝗲($F);                                                     # No rename required to standardize file name
-  
+
     gbStandardDelete($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1079,38 +1079,38 @@ Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|
 B<Example:>
 
 
-  if (1) {                                                                           
+  if (1) {
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-  
+
     my $F = 𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗽𝘆𝗙𝗶𝗹𝗲($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-  
+
     ok !gbStandardRename($F);                                                     # No rename required to standardize file name
-  
+
     gbStandardDelete($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1127,38 +1127,38 @@ Delete a file and its companion file if there is one.
 B<Example:>
 
 
-  if (1) {                                                                           
+  if (1) {
     my $s = q(abc 𝝰𝝱𝝲);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbStandardCreateFile($d, $s, q(xml), companionContent=>$S);           # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbStandardCompanionFileName($f);                                      # Check companion file
     ok -e $c;
     ok readFile($c) eq $S;
-  
+
     my $F = gbStandardCopyFile($f, target=>$D);                                   # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbStandardCompanionFileName($F);                                      # Check companion file
     ok -e $C;
     ok readFile($C) eq $S;
-  
+
     ok !gbStandardRename($F);                                                     # No rename required to standardize file name
-  
+
     𝗴𝗯𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗗𝗲𝗹𝗲𝘁𝗲($F);                                                         # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1180,7 +1180,7 @@ Return the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> file name g
 B<Example:>
 
 
-  if (1) {                                                                        
+  if (1) {
     if (useWords)
      {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(png)) eq q(png_thInk_BUSHy_dRYER_spaCE_KNOwN_lepeR_SeNse_MaJor.png);
      }
@@ -1188,7 +1188,7 @@ B<Example:>
      {ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(qq(\0abc\1), q(png)) eq q(png_2786f1147a331ec6ebf60c1ba636a458.png);
      }
    }
-  
+
 
 This method can be imported via:
 
@@ -1205,8 +1205,8 @@ Return the name of the companion file given a file whose name complies with the 
 B<Example:>
 
 
-  ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);                       
-  
+  ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(q(a/b.c)) eq q(a/b);
+
 
 This method can be imported via:
 
@@ -1223,42 +1223,42 @@ Return the content of the L<Companion File> given a file whose name complies wit
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-  
+
     ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($f) eq $S;                            # Check companion file content
-  
+
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗺𝗽𝗮𝗻𝗶𝗼𝗻𝗙𝗶𝗹𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁($C) eq $S;
-  
+
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-  
+
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-  
+
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1278,42 +1278,42 @@ Create a file in the specified B<$Folder> whose name is the L<GB Standard|http:/
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗿𝗲𝗮𝘁𝗲𝗙𝗶𝗹𝗲($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-  
+
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-  
+
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-  
+
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-  
+
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-  
+
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1330,42 +1330,42 @@ Check whether a file needs to be renamed to match the L<GB Standard|http://metac
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-  
+
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-  
+
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-  
+
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-  
+
     ok !𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗥𝗲𝗻𝗮𝗺𝗲($F);                                               # No rename required to standardize file name
-  
+
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1383,42 +1383,42 @@ Copy a file to the specified B<$target> folder renaming it to the L<GB Standard|
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-  
+
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-  
+
     my $F = 𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗖𝗼𝗽𝘆𝗙𝗶𝗹𝗲($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-  
+
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-  
+
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-  
+
     gbBinaryStandardDelete($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 
@@ -1435,42 +1435,42 @@ Delete a file and its L<Companion File> if there is one.
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $s = qq(\0abc\1);
     my $S = q(Hello World);
     my $d = q(out/);
     my $D = q(out2/);
     clearFolder($_, 10) for $d, $D;
-  
+
     my $f = gbBinaryStandardCreateFile($d, $s, q(xml), $S);                       # Create file
     ok -e $f;
     ok readFile($f) eq $s;
-  
+
     my $c = gbBinaryStandardCompanionFileName($f);                                # Check companion file
     ok -e $c;
     ok gbStandardCompanionFileContent($c) eq $S;
-  
+
     ok gbBinaryStandardCompanionFileContent($f) eq $S;                            # Check companion file content
-  
+
     my $F = gbBinaryStandardCopyFile($f, $D);                                     # Copy file
     ok -e $F;
     ok readFile($F) eq $s;
-  
+
     my $C = gbBinaryStandardCompanionFileName($F);                                # Check companion file
     ok -e $C;
     ok gbBinaryStandardCompanionFileContent($C) eq $S;
-  
+
     ok gbStandardCompanionFileContent($F) eq $S;                                  # Check companion file content
-  
+
     ok !gbBinaryStandardRename($F);                                               # No rename required to standardize file name
-  
+
     𝗴𝗯𝗕𝗶𝗻𝗮𝗿𝘆𝗦𝘁𝗮𝗻𝗱𝗮𝗿𝗱𝗗𝗲𝗹𝗲𝘁𝗲($F);                                                   # Delete file and its companion file
     ok !-e $F;
     ok !-e $C;
-  
+
     clearFolder($_, 10) for $d, $D;
    }
-  
+
 
 This method can be imported via:
 

@@ -44,7 +44,7 @@ $support_jcode_package_too = 1;
 #
 #   ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
 #
-$VERSION = '2.13.4.20';
+$VERSION = '2.13.4.21';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 

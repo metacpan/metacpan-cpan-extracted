@@ -1,5 +1,15 @@
 Revision history for Perl extension DBD::PgPPSjis.
 
+0.0801006  2019-07-15 00:00:00
+  - fix Kwalitee Issues: meta_json_is_parsable
+  - created by INABA Hitoshi
+
+0.0801005  2019-07-14 00:00:00
+  - fix Extra Issues: has_meta_json
+  - fix Extra Issues: use_warnings
+  - fix Experimental Issues: meta_yml_has_repository_resource
+  - created by INABA Hitoshi
+
 0.0801004  2018-02-21 00:00:00
   - change META.yml version 1.3 to 1.4
   - remove pMakefile.PL

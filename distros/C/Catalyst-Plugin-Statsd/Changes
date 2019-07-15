@@ -1,5 +1,15 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.6.2    2019-07-14 14:37:43+01:00 Europe/London
+  [Documentation]
+  - Adjusted case of ABSTRACT.
+
+  - Added missing import to SYNOPSIS.
+
+  - Added Net::Statsd::Tiny to SEE ALSO.
+
+  - Added info about the statsd_client method.
+
 v0.6.1    2019-06-01 14:34:40+01:00 Europe/London
   [Documentation]
   - Fixed typo.

@@ -5,13 +5,15 @@ package Perl::Exactly;
 #
 # http://search.cpan.org/dist/Perl-Exactly/
 #
-# Copyright (c) 2014, 2015, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2015, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-use 5.00503;
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
+
+use 5.00503;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 if ($0 eq __FILE__) {
     print $];
@@ -160,6 +162,8 @@ Perl::Exactly - ensures exactly version of perl
           5.022 => 'C:/Perl522/bin/perl.exe',
           5.024 => 'C:/Perl524/bin/perl.exe',
           5.026 => 'C:/Perl526/bin/perl.exe',
+          5.028 => 'C:/Perl528/bin/perl.exe',
+          5.030 => 'C:/Perl530/bin/perl.exe',
       ) :
 
       # UNIX-like system
@@ -176,6 +180,8 @@ Perl::Exactly - ensures exactly version of perl
           5.022 => '/path/to/perl/5.022/bin/perl',
           5.024 => '/path/to/perl/5.024/bin/perl',
           5.026 => '/path/to/perl/5.026/bin/perl',
+          5.028 => '/path/to/perl/5.028/bin/perl',
+          5.030 => '/path/to/perl/5.030/bin/perl',
       )
   }
   __END__

@@ -1,0 +1,80 @@
+NAME
+    Hash::Subset - Produce subset of a hash
+
+VERSION
+    This document describes version 0.003 of Hash::Subset (from Perl
+    distribution Hash-Subset), released on 2019-07-10.
+
+SYNOPSIS
+     use Hash::Subset qw(hash_subset hashref_subset);
+
+     # using keys specified in an array
+     my %subset = hash_subset   ({a=>1, b=>2, c=>3}, ['b','c','d']); # => (b=>2, c=>3)
+     my $subset = hashref_subset({a=>1, b=>2, c=>3}, ['b','c','d']); # => {b=>2, c=>3}
+
+     # using keys specified in another hash
+     my %subset = hash_subset   ({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => (b=>2, c=>3)
+     my $subset = hashref_subset({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => {b=>2, c=>3}
+
+DESCRIPTION
+FUNCTIONS
+    None exported by default.
+
+  hash_subset
+    Usage:
+
+     my %subset  = hash_subset   (\%hash, \@keys);
+     my $subset  = hashref_subset(\%hash, \@keys);
+     my %subset  = hash_subset   (\%hash, \%another_hash);
+     my $subset  = hashref_subset(\%hash, \%another_hash);
+
+    Produce subset of %hash, returning the subset hash (or hashref, in the
+    case of "hashref_subset" function).
+
+    Perl lets you produce a hash subset using the hash slice notation:
+
+     my %subset = %hash{"b","c","d"};
+
+    The difference with "hash_subset" is: 1) hash slice is only available
+    since perl 5.20 (in previous versions, only array slice is available);
+    2) when the key does not exist in the array, perl will create it for you
+    with "undef" as the value:
+
+     my %hash   = (a=>1, b=>2, c=>3);
+     my %subset = %hash{"b","c","d"}; # => (b=>2, c=>3, d=>undef)
+
+    So basically "hash_subset" is equivalent to:
+
+     my %subset = %hash{grep {exists $hash{$_}} "b","c","d"}; # => (b=>2, c=>3)
+
+    and available for perl earlier than 5.20.
+
+  hashref_subset
+    See "hash_subset".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Hash-Subset>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Hash-Subset>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Subset>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Some other hash utilities: Hash::MostUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

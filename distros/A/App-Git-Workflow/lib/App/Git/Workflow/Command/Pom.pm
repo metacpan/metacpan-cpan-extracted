@@ -14,7 +14,7 @@ use App::Git::Workflow::Pom;
 use App::Git::Workflow::Command qw/get_options/;
 use Path::Tiny;
 
-our $VERSION = version->new(1.1.3);
+our $VERSION = version->new(1.1.4);
 our $workflow = App::Git::Workflow::Pom->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -30,6 +30,8 @@ sub run {
         \%option,
         'pom|P=s',
         'update|u!',
+        'skip|s=s',
+        'match|m=s',
         'fetch|f!',
         'tag|t=s',
         'branch|b=s',
@@ -57,7 +59,7 @@ sub run {
 
 sub do_uniq {
     my (undef, $pom) = @_;
-    my $versions  = $workflow->get_pom_versions($pom);
+    my $versions  = $workflow->get_pom_versions($pom, $option{match}, $option{skip});
     my $numerical = my $version = $workflow->pom_version((scalar path($pom)->slurp), $pom, 1);
     $numerical =~ s/-SNAPSHOT$//xms;
 
@@ -97,7 +99,7 @@ sub do_whos {
 
     $version =~ s/-SNAPSHOT$//;
 
-    my $versions = $workflow->get_pom_versions($pom);
+    my $versions = $workflow->get_pom_versions($pom, $option{match}, $option{skip});
 
     my $version_re = $version =~ /^\d+[.]\d+[.]\d+/ ? qr/^$version$/ : qr/$version/;
     my %versions = map {%{ $versions->{$_} }} grep {/$version_re/} keys %{ $versions };
@@ -149,7 +151,7 @@ git-pom - Manage pom.xml (or package.json) file versions
 
 =head1 VERSION
 
-This documentation refers to git-pom version 1.1.3
+This documentation refers to git-pom version 1.1.4
 
 =head1 SYNOPSIS
 

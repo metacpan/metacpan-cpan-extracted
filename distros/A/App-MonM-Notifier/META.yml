@@ -1,15 +1,15 @@
 ---
-abstract: 'a monitoring tool that provides notifications on different communication channels'
+abstract: 'extension for the monm notifications'
 author:
-  - 'Sergey Lepenkov (Serz Minus) http://www.serzik.com <abalama@cpan.org>'
+  - 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '6.6'
   Test::More: '0.94'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.150010'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,34 +19,23 @@ no_index:
     - t
     - inc
 requires:
-  CTK: '1.18'
+  App::MonM: '1.06'
+  CTK: '2.01'
   Class::C3::Adopt::NEXT: '0.13'
+  Compress::Raw::Zlib: '0'
   DBD::SQLite: '1.4'
   DBI: '1.6'
-  Data::Dumper: '0'
-  DateTime: '0'
-  DateTime::Format::W3CDTF: '0'
   Email::MIME: '1.9'
   Email::Sender: '1.3'
   File::Copy: '2.18'
   File::Find: '1.15'
-  File::Path: '2'
-  HTTP::Cookies: '6'
-  HTTP::Message: '6.02'
-  IO::String: '1.08'
-  JSON: '2.53'
-  LWP: '5.8'
-  LWP::MediaTypes: '6'
-  LWP::UserAgent: '5.8'
-  MRO::Compat: '0.13'
-  Net::SSLeay: '1.52'
+  File::HomeDir: '1'
   Text::SimpleTable: '2.03'
+  Time::Local: '0'
   Try::Tiny: '0.07'
-  URI: '1.5'
-  perl: '5.012001'
+  perl: '5.016001'
 resources:
-  homepage: http://www.serzik.com
-  license: http://opensource.org/licenses/gpl-license.php
+  homepage: https://sourceforge.net/projects/app-monm-notifier/
+  license: https://dev.perl.org/licenses
   repository: https://svn.code.sf.net/p/app-monm-notifier/code/trunk
-version: '1.01'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.02'

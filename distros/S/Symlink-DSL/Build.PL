@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Symlink-DSL",
-  "dist_version" => "0.0.1",
+  "dist_version" => "0.2.1",
   "license" => "mit",
   "module_name" => "Symlink::DSL",
   "recursive_test_files" => 1,
@@ -26,10 +26,15 @@ my %module_build_args = (
     "Cwd" => 0,
     "File::Basename" => 0,
     "File::Path" => 0,
+    "File::Spec" => 0,
+    "Getopt::Long" => 0,
     "autodie" => 0,
     "strict" => 0,
     "warnings" => 0
   },
+  "script_files" => [
+    "bin/symlink-dsl"
+  ],
   "test_requires" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,

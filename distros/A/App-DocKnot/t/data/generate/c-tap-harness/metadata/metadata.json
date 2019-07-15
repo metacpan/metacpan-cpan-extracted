@@ -22,6 +22,7 @@
         "install": false,
         "manpages": true,
         "type": "Autoconf",
+        "valgrind": true,
     },
     "support": {
         "email": "eagle@eyrie.org",

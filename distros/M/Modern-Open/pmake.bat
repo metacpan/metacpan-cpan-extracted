@@ -1,31 +1,35 @@
 :<<BATCHFILE
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
+set PERL5LIB=lib
 perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
+set PERL5LIB=lib
 perl -x -S "%0" %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 goto endofperl
 BATCHFILE
+PERL5LIB=lib
 perl -x -S $0 ${1+"$@"}
 exit
 #!perl
-#line 16
+#line 19
 ######################################################################
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.01';
+$VERSIONE = '0.09';
+$VERSIONE = $VERSIONE;
 use strict;
+use FindBin;
 use File::Path;
 use File::Copy;
 use File::Basename;
-use Test::Harness;
 
 unless (@ARGV) {
     if ($^O =~ /\A (?: MSWin32 | NetWare | symbian | dos ) \z/oxms) {
@@ -37,12 +41,9 @@ C:\> pmake
 C:\> pmake test
 C:\> pmake xtest
 C:\> pmake install
+C:\> pmake dist
 C:\> pmake ptar
 C:\> pmake pwget
-C:\> pmake Makefile.PL
-C:\> pmake META.yml
-C:\> pmake LICENSE
-C:\> pmake dist
 END
     }
     elsif (1 or ($^O =~ /(?:solaris|linux)/i)) {
@@ -54,12 +55,9 @@ $ ./pmake.bat
 $ ./pmake.bat test
 $ ./pmake.bat xtest
 $ ./pmake.bat install
+$ ./pmake.bat dist
 $ ./pmake.bat ptar
 $ ./pmake.bat pwget
-$ ./pmake.bat Makefile.PL
-$ ./pmake.bat META.yml
-$ ./pmake.bat LICENSE
-$ ./pmake.bat dist
 
 END
     }
@@ -71,16 +69,22 @@ chomp(my @file = <FH_MANIFEST>);
 close FH_MANIFEST;
 
 for my $target (@ARGV) {
+
+    # make test
     if ($target eq 'test') {
         my @test = grep m{ \A (?: test\.pl | t/.+\.t ) \z }xmsi, @file;
-        runtests(@test);
+        _runtests(@test);
         print STDERR "\a";
     }
+
+    # make xtest
     elsif ($target eq 'xtest') {
         my @test = grep m{ \A (?: test\.pl | t/.+\.t | xt/.+\.t ) \z }xmsi, @file;
-        runtests(@test);
+        _runtests(@test);
         print STDERR "\a";
     }
+
+    # make install
     elsif ($target eq 'install') {
 
         # install *.pm files to /Perl/site/lib
@@ -129,83 +133,103 @@ for my $target (@ARGV) {
             }
         }
     }
-    elsif ($target eq 'Makefile.PL') {
+
+    # make dist
+    elsif ($target eq 'dist') {
+
+        # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
         chomp(my $name_as_filesystem = <FH_MANIFEST>);
         close(FH_MANIFEST);
+        die "'NAME_AS_FILESYSTEM' not found.\n" unless $name_as_filesystem;
+        check_usascii('MANIFEST');
 
-        my $package = '';
-        open(FH_PACKAGE,$name_as_filesystem) || die "Can't open file: $name_as_filesystem.\n";
-        while (<FH_PACKAGE>) {
-            if ($package eq '') {
-                if (/^package\s+([^;]+);/) {
-                    $package = $1;
-                }
-            }
-        }
-        close(FH_PACKAGE);
-
-        die "'NAME' not found.\n" unless $package;
-
-        open(FH_MAKEFILEPL,'>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
-        binmode FH_MAKEFILEPL;
-        printf FH_MAKEFILEPL (<<'END', $package, $name_as_filesystem, $name_as_filesystem);
-use strict;
-use ExtUtils::MakeMaker;
-
-WriteMakefile(
-    'NAME'          => '%s',
-    'VERSION_FROM'  => '%s',
-    'ABSTRACT_FROM' => '%s',
-    'PREREQ_PM'     => { },
-    'AUTHOR'        => 'ina <ina@cpan.org> in a CPAN',
-);
-
-__END__
-END
-        close(FH_MAKEFILEPL);
-    }
-    elsif ($target eq 'META.yml') {
-        open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
-        chomp(my $name_as_filesystem = <FH_MANIFEST>);
-        close(FH_MANIFEST);
-
+        # get $name_as_dist_on_url
         my $name_as_dist_on_url = $name_as_filesystem;
         $name_as_dist_on_url =~ s#^lib/##;
         $name_as_dist_on_url =~ s#\.(pl|pm)$##i;
         $name_as_dist_on_url =~ s#/#-#g;
+        die "'NAME_AS_DIST_ON_URL' not found.\n" unless $name_as_dist_on_url;
 
+        # get $name_as_perlsyntax
         my $name_as_perlsyntax = $name_as_filesystem;
-        $name_as_perlsyntax =~ s#^lib/##;
+        $name_as_perlsyntax =~ s#^lib/(Char/)?##;
         $name_as_perlsyntax =~ s#\.(pl|pm)$##i;
         $name_as_perlsyntax =~ s#/#::#g;
+        die "'NAME_AS_PERLSYNTAX' not found.\n" unless $name_as_perlsyntax;
 
+        # get $package, $version, and $abstract
+        my $package  = '';
         my $version  = '';
         my $abstract = '';
         open(FH_NAME,$name_as_filesystem) || die "Can't open file: $name_as_filesystem.\n";
         while (<FH_NAME>) {
+            if ($package eq '') {
+                if (/^#/) {
+                }
+                elsif (/^package\s+([^;]+);/) {
+                    $package = $1;
+                }
+            }
             if ($version eq '') {
-                if (/\$VERSION\s*=\s*([^;]+);/) {
+                if (/^#/) {
+                }
+                elsif (/\$VERSION\s*=\s*([^;]+);/) {
                     $version = eval "$1";
                 }
             }
             if ($abstract eq '') {
-                if (/^$name_as_perlsyntax\s+-\s+(.+)/) {
+                if (/\b$name_as_perlsyntax\s+-\s+(.+)/) {
                     $abstract = $1;
                 }
             }
         }
         close(FH_NAME);
+        die "'PACKAGE' not found.\n"  unless $package;
+        die "'VERSION' not found.\n"  unless $version;
+        die "'ABSTRACT' not found.\n" unless $abstract;
 
-        die "'NAME_AS_FILESYSTEM' not found.\n"  unless $name_as_filesystem;
-        die "'NAME_AS_DIST_ON_URL' not found.\n" unless $name_as_dist_on_url;
-        die "'NAME_AS_PERLSYNTAX' not found.\n"  unless $name_as_perlsyntax;
-        die "'VERSION' not found.\n"             unless $version;
-        die "'ABSTRACT' not found.\n"            unless $abstract;
+        # write Makefile.PL
+        open(FH_MAKEFILEPL,'>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
+        binmode FH_MAKEFILEPL;
+        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract);
+use strict;
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    'NAME'      => q{%s},
+    'VERSION'   => q{%s},
+    'ABSTRACT'  => q{%s},
+    'PREREQ_PM' => { },
+    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
+);
+
+__END__
+END
+        close(FH_MAKEFILEPL);
+        check_usascii('Makefile.PL');
+
+        # write META.yml
+        #
+        # CPANTS Kwalitee shows us following message, but never believe it.
+        # It's a trap. #'
+        #
+        # Kwalitee Indicator: meta_yml_conforms_to_known_spec core
+        # META.yml does not conform to any recognised META.yml Spec.
+        # How to fix
+        # Take a look at the META.yml Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
+        # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
+        # and change your META.yml accordingly. 
+        #
+        # How to escape from trap
+        #
+        #   meta-spec:
+        #     version: 1.4
+        #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
 
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
@@ -228,18 +252,129 @@ requires:
   File::Path: 1.0401
   FindBin: 1.42
   Getopt::Std: 1.01
-  Test: 1.122
-  Test::Harness: 1.1602
   perl: 5.005_03
   strict: 1.01
 build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/%s
 END
         close(FH_METAYML);
+        check_usascii('META.yml');
+
+        # write META.json
+        #
+        # CPANTS Kwalitee shows us following message, but never believe it.
+        # It's a trap. #'
+        #
+        # Kwalitee Indicator: meta_json_conforms_to_known_spec
+        # META.json does not conform to any recognised META Spec.
+        # How to fix
+        # Take a look at the META.json Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
+        # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
+        # and change your META.json accordingly. 
+        #
+        # How to escape from trap
+        #
+        #   "meta-spec" : {
+        #       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        #       "version" : 2
+        #   },
+
+        open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
+        binmode FH_METAJSON;
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
+{
+    "name" : "%s",
+    "version" : "%s",
+    "abstract" : "%s",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+       "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "repository" : {
+             "url" : "https://github.com/ina-cpan/%s"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        }
     }
-    elsif ($target eq 'LICENSE') {
+}
+END
+        close(FH_METAJSON);
+        check_usascii('META.json');
+
+        # write LICENSE
         open(FH_LICENSE,'>LICENSE') || die "Can't open file: LICENSE\n";
         binmode FH_LICENSE;
         print FH_LICENSE <<'LICENSING';
@@ -641,41 +776,15 @@ The End
 
 LICENSING
         close FH_LICENSE;
-    }
-    elsif ($target eq 'dist') {
+        check_usascii('LICENSE');
 
         # make work directory
-        my($changes) = grep(/^Changes$/i,@file);
-        open(FH_CHANGES, $changes) || die "Can't open file: $changes\n";
-        my $version = 0;
-        while (<FH_CHANGES>) {
-            if (/^(\d+\.\d+(\.\d+\.\d+)*)/) {
-                if ($1 > $version) {
-                    $version = $1;
-                }
-            }
-        }
-        close FH_CHANGES;
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
         $dirname =~ tr#/#-#;
         my $basename = basename($file[0], '.pm','.pl','.bat');
         my $tardir = "$dirname-$basename-$version";
         $tardir =~ s#^lib-##;
         rmtree($tardir,0,0);
-
-        # rewrite META.yml file
-        if (my($metayml) = grep(/^META\.yml$/i,@file)) {
-            if (open(FH_METAYML, $metayml)) {
-                $_ = join('',<FH_METAYML>);
-                close FH_METAYML;
-                if (open(FH_METAYML, ">$metayml")) {
-                    s/^(version:\s*)\d+\.\d+(\.\d+\.\d+)*/$1$version/m;
-                    binmode FH_METAYML;
-                    print FH_METAYML $_;
-                    close FH_METAYML;
-                }
-            }
-        }
 
         if ($^O =~ /(?:solaris|linux)/i) {
             for my $file (@file) {
@@ -701,13 +810,21 @@ LICENSING
             system(qq{gzip $tardir.tar});
         }
         else {
+
+#-----------------------------------------------------------------------------
+# https://metacpan.org/search?q=Archive%3A%3ATar%3A%3AConstant
+# https://metacpan.org/release/Archive-Tar-Streamed
+#-----------------------------------------------------------------------------
             eval q{
                 use Compress::Zlib;
                 use Archive::Tar;
             };
+            my $BLOCK_SIZE = 512;
+            my $ZERO_BLOCK = "\0" x $BLOCK_SIZE;
 
             # make *.tar file
-            my $tar = Archive::Tar->new;
+            open(FH_TAR, ">$tardir.tar") || die "Can't open file: $tardir.tar\n"; #'
+            binmode FH_TAR;
             for my $file (@file) {
                 if (-e $file) {
                     mkpath(dirname("$tardir/$file"), 0, 0777);
@@ -723,7 +840,7 @@ LICENSING
 #-----------------------------------------------------------------------------
 #                   $tar->add_files("$tardir/$file");
 #-----------------------------------------------------------------------------
-                    open(FH, $file) || die "Can't open file: $file\n";
+                    open(FH, $file) || die "Can't open file: $file\n"; #'
                     binmode FH;
                     local $/ = undef; # slurp mode
                     my $data = <FH>;
@@ -738,6 +855,7 @@ LICENSING
 # Change the permissions of Build.PL/Makefile.PL to not-executable.
 #-----------------------------------------------------------------------------
 
+                    my $tar = Archive::Tar->new;
                     if ($file =~ m/ (?: Build\.PL | Makefile\.PL ) \z/oxmsi) {
                         $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
                     }
@@ -747,6 +865,10 @@ LICENSING
                     else {
                         $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
                     }
+                    my $format_tar_file = $tar->write;
+                    syswrite FH_TAR, $format_tar_file, length($format_tar_file) - length($ZERO_BLOCK . $ZERO_BLOCK);
+                    undef $tar;
+
 #-----------------------------------------------------------------------------
                 }
                 else {
@@ -754,14 +876,19 @@ LICENSING
                 }
             }
 
-            $tar->write("$tardir.tar");
+            # syswrite FH_TAR, $ZERO_BLOCK; makes "tar: A lone zero block at %s"
+            syswrite FH_TAR, ($ZERO_BLOCK . $ZERO_BLOCK);
+
+            close FH_TAR;
             rmtree($tardir,0,0);
 
             # make *.tar.gz file
             my $gz = gzopen("$tardir.tar.gz", 'wb');
             open(FH_TAR, "$tardir.tar") || die "Can't open file: $tardir.tar\n";
             binmode FH_TAR;
-            $gz->gzwrite(join('',<FH_TAR>));
+            while (sysread(FH_TAR, $_, 1024*1024)) {
+                $gz->gzwrite($_);
+            }
             close FH_TAR;
             $gz->gzclose;
             unlink "$tardir.tar";
@@ -784,6 +911,8 @@ LICENSING
             system(qq{./ptar xzvf $tardir.tar.gz});
         }
     }
+
+    # make ptar
     elsif ($target =~ /^ptar(?:\.bat)?$/) {
 
         my $ptar = <<'PTAR_END';
@@ -791,7 +920,7 @@ LICENSING
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -882,6 +1011,8 @@ END
             chmod 0755, 'ptar';
         }
     }
+
+    # make pwget
     elsif ($target =~ /^pwget(?:\.bat)?$/) {
 
         my $pwget = <<'PWGET_END';
@@ -889,7 +1020,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1004,6 +1135,101 @@ sub which {
     }
 }
 
+# Test::Harness::runtests cannot work heavy load.
+sub _runtests {
+    my @script = @_;
+    my @fail_testno = ();
+    my $ok_script = 0;
+    my $not_ok_script = 0;
+    my $total_ok = 0;
+    my $total_not_ok = 0;
+
+    # cygwin warning:
+    #   MS-DOS style path detected: C:/cpan/Char-X.XX
+    #   Preferred POSIX equivalent is: /cygdrive/c/cpan/Char-X.XX
+    #   CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+    #   Consult the user's guide for more details about POSIX paths: #'
+    #     http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+
+    if ($ENV{'CYGWIN'} !~ /\b nodosfilewarning \b/x) {
+        $ENV{'CYGWIN'} = join(' ', $ENV{'CYGWIN'}, 'nodosfilewarning');
+    }
+
+    my $scriptno = 0;
+    for my $script (@script) {
+        my @result = qx{$^X $script};
+        my($tests) = $result[0] =~ /^1..([0-9]+)/;
+
+        my $testno = 1;
+        my $ok = 0;
+        my $not_ok = 0;
+        for my $result (@result) {
+            if ($result =~ /^ok /) {
+                $ok++;
+            }
+            elsif ($result =~ /^not ok /) {
+                push @{$fail_testno[$scriptno]}, $testno;
+                $not_ok++;
+            }
+            $testno++;
+        }
+
+        if ($ok == $tests) {
+            printf("$script ok\n");
+            $ok_script++;
+        }
+        else {
+            printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
+            $not_ok_script++;
+        }
+
+        $total_ok += $ok;
+        $total_not_ok += $not_ok;
+        $scriptno++;
+    }
+
+    if (scalar(@script) == $ok_script) {
+        printf <<'END', scalar(@script), $total_ok + $total_not_ok;
+All tests successful.
+Files=%d, Tests=%d
+Result: PASS
+END
+    }
+    else {
+        print <<'END';
+
+Test Summary Report
+-------------------
+END
+        my $scriptno = 0;
+        for my $fail_testno (@fail_testno) {
+            if (defined $fail_testno) {
+                print $script[$scriptno], "\n";
+                print '  Failed test:  ', join(', ', @{$fail_testno[$scriptno]}), "\n";
+            }
+            $scriptno++;
+        }
+        printf("Files=%d, Tests=%d\n", scalar(@script), $total_ok + $total_not_ok);
+        printf("Result: FAIL\n");
+        printf("Failed %d/%d test programs. %d/%d subtests failed.\n", $not_ok_script, scalar(@script), $total_not_ok, $total_ok + $total_not_ok);
+    }
+}
+
+sub check_usascii {
+    my($file) = @_;
+    if (open(FILE,$file)) {
+        while (<FILE>) {
+            if (not /^[\x0A\x20-\x7E]+$/) {
+                die "error not US-ASCII: $file, q(;_;)bad!!";
+            }
+        }
+        close(FILE);
+    }
+    else {
+        die "error open: $file, q(;_;)bad!!";
+    }
+}
+
 __END__
 
 =pod
@@ -1018,12 +1244,9 @@ pmake - make of Perl Poor Tools
   pmake.bat test
   pmake.bat xtest
   pmake.bat install
+  pmake.bat dist
   pmake.bat ptar
   pmake.bat pwget
-  pmake.bat Makefile.PL
-  pmake.bat META.yml
-  pmake.bat LICENSE
-  pmake.bat dist
 
 =head1 DEPENDENCIES
 

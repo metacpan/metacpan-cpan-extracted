@@ -1,0 +1,113 @@
+MODE: INLINE
+
+class MixBase {
+    public:
+    int val;
+    MixBase (int arg) : val(arg) {}
+    virtual ~MixBase () { dcnt.c++; }
+};
+
+class MixPluginA {
+    public:
+    int val;
+    MixPluginA () : val(0) {}
+    virtual ~MixPluginA () { dcnt.c++; }
+};
+
+class MixPluginB {
+    public:
+    int val;
+    MixPluginB () : val(0) {}
+    virtual ~MixPluginB () { dcnt.c++; }
+};
+
+namespace xs {
+
+    template <> struct Typemap<MixBase*> : TypemapObject<MixBase*, MixBase*, ObjectTypePtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MixBase"; }
+    };
+    
+    template <> struct Typemap<MixPluginA*> : TypemapObject<MixPluginA*, MixPluginA*, ObjectTypePtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MixPluginA"; }
+    };
+    
+    template <> struct Typemap<MixPluginB*> : TypemapObject<MixPluginB*, MixPluginB*, ObjectTypePtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MixPluginB"; }
+    };
+
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MixBase
+PROTOTYPES: DISABLE
+
+MixBase* MixBase::new (int arg) {
+    if (!arg) XSRETURN_UNDEF;
+    RETVAL = new MixBase(arg);
+}
+
+int MixBase::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MixBase::set_from (MixBase* other) {
+    if (other) THIS->val = other->val;
+}
+
+void MixBase::DESTROY () {
+    dcnt.perl++;
+    Object(ST(0)).call_next_maybe(cv, &ST(1), items-1);
+}
+
+int CLONE_SKIP (SV*) { RETVAL = 1; }
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MixPluginA
+PROTOTYPES: DISABLE
+
+MixPluginA* MixPluginA::new (...) {
+    PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), items-1);
+    if (!PROTO.defined()) XSRETURN_UNDEF;
+    RETVAL = new MixPluginA();
+}
+
+int MixPluginA::val_a (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MixPluginA::set_from (MixPluginA* other) {
+    Object(ST(0)).call_next(cv, &ST(1), items-1);
+    if (other) THIS->val = other->val;
+}
+
+void MixPluginA::DESTROY () {
+    dcnt.perl++;
+    Object(ST(0)).call_next(cv, &ST(1), items-1);
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MixPluginB
+PROTOTYPES: DISABLE
+
+MixPluginB* MixPluginB::new (...) {
+    PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), items-1);
+    if (!PROTO.defined()) XSRETURN_UNDEF;
+    RETVAL = new MixPluginB();
+}
+
+int MixPluginB::val_b (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MixPluginB::set_from (MixPluginB* other) {
+    Object(ST(0)).call_next(cv, &ST(1), items-1);
+    if (other) THIS->val = other->val;
+}
+
+void MixPluginB::DESTROY () {
+    dcnt.perl++;
+    Object(ST(0)).call_next(cv, &ST(1), items-1);
+}

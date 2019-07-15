@@ -1,8 +1,8 @@
 package Pcore::API::Facebook;
 
 use Pcore -const, -class, -res;
-use Pcore::Util::Data qw[to_uri];
-use Pcore::Util::Scalar qw[is_plain_arrayref weaken];
+use Pcore::Lib::Data qw[to_uri];
+use Pcore::Lib::Scalar qw[is_plain_arrayref weaken];
 
 with qw[Pcore::API::Facebook::User Pcore::API::Facebook::Marketing];
 

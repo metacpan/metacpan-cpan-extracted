@@ -17,8 +17,8 @@
             "schema:VideoObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:Text"
          ]
       },
       "schema:transcript" : {
@@ -26,8 +26,8 @@
          "rdfs:comment" : "If this MediaObject is an AudioObject or VideoObject, the transcript of that object.",
          "rdfs:label" : "transcript",
          "schema:domainIncludes" : [
-            "schema:VideoObject",
-            "schema:AudioObject"
+            "schema:AudioObject",
+            "schema:VideoObject"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

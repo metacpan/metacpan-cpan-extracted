@@ -1,71 +1,44 @@
 #!/usr/bin/perl -w
-use strict; # $Id: monotifier 43 2017-12-01 16:30:32Z abalama $
+use strict; # $Id: monotifier 59 2019-07-14 09:14:38Z abalama $
 
 =head1 NAME
 
-monotifier - a monitoring tool that provides notifications
-on different communication channels
-
-=head1 VERSION
-
-Version 1.00
+monotifier - extension for the monm notifications 
 
 =head1 SYNOPSIS
 
     monotifier [options] [commands [args]]
-
-    monotifier send [-I <IDENT>] [-L debug] [-F anonymous]
-               [-P 123456789] [-X 60]
-               <TO> "<SUBJECT>" "<MESSAGE>"
-
-    monotifier send <TO> "<SUBJECT>" "<MESSAGE>"
+    monotifier -u username -s "Subject" < /path/to/message/file.txt
+    monotifier show
+    monotifier show <ID>
+    monotifier remove <ID>
+    monotifier clean
+    monotifier truncate
 
 =head1 OPTIONS
 
-=over 8
+=over 4
 
 =item B<-c CONFIG_FILE, --config=CONFIG_FILE>
 
-Use CONFIG_FILE as configuration file
+Full path of the monm configuration file. The configuration file allows determine the
+basic default settings, which will use the system if it fails to specify additional
+configuration files in $CONFDIR directory. The default system
+path /etc/monm/monm.conf
 
-=item B<-D DIR, --datadir=DIR, --workdir=DIR>
+=item B<-D DATADIR, --datadir=DATADIR, --dir=DATADIR>
 
-Use DIR as DataDir directory
+The directory of temporary files.
+
+Default: system temp directory
 
 =item B<-d, --debug>
 
-Print debug information on STDOUT
-
-=item B<-X STR, --expires=STR>
-
-Integer value! Defines time offset (in seconds) between publishing
-date and expiry of publishing
-
-=item B<-F FROM, --from=FROM>
-
-Defines the From field for message
+Enable debug mode. In this mode, debug messages are displayed on the screen
 
 =item B<-h, --help>
 
 Show short help information and quit
-
-=item B<-L LEVELNAME, --level=LEVELNAME>
-
-Set priority level name for sending or updating the message.
-Supported levels:
-
-    debug
-    info
-    notice
-    warning
-    error
-    crit
-    alert
-    emerg
-    fatal
-    except
-
-Default: debug
 
 =item B<-H, --longhelp>
 
@@ -73,34 +46,34 @@ Show long help information and quit
 
 =item B<-l, --log>
 
-Writing debug information in the general log-file - monotifier.log
+Enabling write debug information to syslog or user log file.
 
-=item B<--logclear>
+Do not confuse the debug logging from regular logging to a file monm.log.
+Regular logging allows you to store information in monm.log on the progress of the processes 
+module, whereas debug logging for debugging of the internal components 
+of the module.
 
-Cleraing the monotifier.log file before the program's run
+To control the level of debugging see parameter LogEnable and LogLevel.
 
-=item B<-n, --notupdate>
+=item B<-s SUBJECT, --subject=SUBJECT, --subj=SUBJECT>
 
-Don't update file; display results on stdout.
+Sets the subject of message
 
-=item B<-P PUBDATE, --pubdate=PUBDATE>
-
-Integer value! Defines the time (in Unix-Time format) of starting
-publishing of the message
-
-=item B<-I IDENT, --signature=IDENT>
-
-Mark each line of the log file (monotifier.log) by a message with MESSAGE.
-Also signature is ident-string of the message for sending (see send command)
+Default: System subject
 
 =item B<-t, --testmode>
 
-Enable test mode. Not recommended, because the test mode suppress any
-modifications in database and on your hard disk
+Enabling test mode. This key allows force sending notification while checking
+
+=item B<-u USERNAME, --user=USERNAME, --to=USERNAME>
+
+Recipient username
+
+Default: all users
 
 =item B<-v, --verbose>
 
-Verbose option. Include Verbose debug data in the STDOUT and to error-log output
+Enabling at which displays information about the progress on the screen
 
 =item B<-V, --version>
 
@@ -110,30 +83,20 @@ Print the version number of the program and quit
 
 =head1 COMMANDS
 
-=over 8
+=over 4
 
-=item B<check>
+=item B<clean>
 
-    monotifier check <ID>
+    monotifier clean
 
-Check the message by ID
+Remove incorrect messages
 
-=item B<gentoken>
+=item B<create>
 
-    monotifier gentoken
+    monotifier create -u username -s "Subject" < /path/to/message/file.txt
+    monotifier -u username -s "Subject" < /path/to/message/file.txt
 
-Generate token for client-server interaction and save it to configuration file
-
-    monotifier gentoken -n
-
-Generate token for client-server interaction and display results on stdout.
-
-=item B<init>
-
-    monotifier init
-
-This command provides initialize of the monotifier: creates configuration
-files and different related files
+Create the message. This command name is optional and use by default!
 
 =item B<remove>
 
@@ -141,292 +104,114 @@ files and different related files
 
 Remove the message by ID
 
-=item B<send>
+=item B<show>
 
-    monotifier send <TO> "<SUBJECT>" "<MESSAGE>"
-    monotifier send -F <FROM> -L <LEVEL> <TO> "<SUBJECT>" "<MESSAGE>"
+    monotifier show
+    monotifier show <ID>
 
-Send the message
+Show data table or selected record by id
 
-=item B<test>
+=item B<truncate>
 
-    monotifier test
+    monotifier truncate
 
-Complete test of the project
-
-    monotifier test short
-
-Short test of the project
-
-=item B<update>
-
-    monotifier update <ID> -F <NEWFROM> <NEWTO> "<NEWSBJ>" "<NEWMSG>"
-    monotifier update <ID> -L <NEWLEVEL>
-
-Update the message by ID
-
-=item B<void>
-
-The program runs and does nothing
-
-    monotifier void
+Remove all messages
 
 =back
 
 =head1 DESCRIPTION
 
-This is a monitoring tool that provides notifications
-on different communication channels
-
-See C<README> file
-
-=head1 HISTORY
-
-=over 8
-
-=item B<1.00 / Wed Oct 11 11:13:25 2017 GMT>
-
-Init version
-
-=back
-
-See C<CHANGES> file
-
-=head1 DEPENDENCIES
-
-L<CTK>
-
-=head1 TO DO
-
-See C<TODO> file
-
-=head1 BUGS
-
-Coming soon
-
-=head1 SEE ALSO
-
-C<perl>, L<CTK>
-
-=head1 DIAGNOSTICS
-
-The usual warnings if it can't read or write the files involved.
+This is an extension for the monm notifications over different
+communication channels
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serz Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is distributed under the GNU GPL v3.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See L<https://dev.perl.org/licenses/>
 
 =cut
-
-use constant {
-    PIDFILE   => 'monotifier.pid',
-    LOGFILE   => 'monotifier.log',
-
-    CMDDEFAULT => 'void',
-    CMD => {
-        void => {
-            pidcheck => 0, # 0 - OFF, 1 - ON
-            logfile  => '[PREFIX].[COMMAND].log',
-        },
-        test => {
-            pidcheck => 1,
-            logfile  => '[PREFIX].[COMMAND].log',
-            foo      => 'qwerty',
-            bar      => [],
-            baz      => {},
-        },
-        init => {
-            pidcheck => 1,
-        },
-        send => {
-            pidcheck => 0,
-            logfile  => '[PREFIX].[COMMAND].log',
-        },
-        check => {
-            pidcheck => 0,
-            logfile  => '[PREFIX].[COMMAND].log',
-        },
-        remove => {
-            pidcheck => 0,
-            logfile  => '[PREFIX].[COMMAND].log',
-        },
-        update => {
-            pidcheck => 0,
-            logfile  => '[PREFIX].[COMMAND].log',
-        },
-        gentoken => {
-            pidcheck => 1,
-        },
-    },
-};
 
 use Getopt::Long;
 use Pod::Usage;
 
-# CTK Packages
-use base qw/App::MonM::Notifier/;
-use CTK;
-use CTK::Util;
-use CTKx;
-use CTK::FilePid;
-use CTK::ConfGenUtil;
+use App::MonM::Notifier;
+use App::MonM::Const;
 
-Getopt::Long::Configure ("bundling");
-GetOptions(\%OPT,
+use constant {
+    CMDDEFAULT  => 'create',
+};
 
-    #
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
     # NoUsed keys map:
     #
     # a A b B   C     e E
-    # f   g G     i   j J
-    # k K       M   N o O
-    # p   q Q r R s S   T
-    # u U     w W x   y Y
+    # f F g G     i I j J
+    # k K   L m M n N o O
+    # p P q Q r R   S   T
+    #   U     w W x X y Y
     # z Z
-    #
 
-    # Help
-    "help|usage|h|?",       # Show short help page
-    "longhelp|H",           # Show long help page
-    "version|ver|V",        # Show VERSION
-
-    # Debugging
+    # Information and debug
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+    "version|vers|ver|V",   # Print VERSION of the App::MonM
     "debug|d",              # Debug mode
+    "verbose|v",            # Verbose mode
     "log|l",                # Log mode
-    "verbose|v",            # Verbose mode. Default: Silent mode
-    "logclear|logclean",    # Clear log
-    "signature|ident|I=s",    # Sign to log
-    "testmode|test|t",      # Testmode
+    "test|testmode|t",      # Test mode
 
-    # CTK
-    "cfgfile|config|c=s",   # CfgFile
-    "datadir|workdir|D=s",  # DataDir
+    # CTK Application
+    "config|conf|c=s",      # Config file
+    "datadir|dir|D=s",      # DataDir
 
-    # Application (send)
-    "level|L=s",            # Message priority level
-    "from|F=s",             # From. Optional
-    "pubdate|P=i",          # Unix-time starting of the publishing (real sending)
-    "expires|X=i",          # Time offset for expire starting of the publishing. In seconds
-    "notupdate|n",          # Don't update file; display results on stdout.
+    # General
+    "username|user|to|u=s@",# Username (array)
+    "subject|subj|sbj|s=s", # Subject
 
 ) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
-pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
-pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
-say(App::MonM::Notifier->VERSION) && exit(0) if $OPT{version};
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+printf("Version: %s\n", App::MonM::Notifier->VERSION) && exit(0) if $options->{version};
 
 # VARS
-my %cmddata;
+my $command = shift(@ARGV) || CMDDEFAULT;
+my @arguments = @ARGV;
 
-# Commands
-my $command   = @ARGV ? shift @ARGV : CMDDEFAULT;
-my @arguments = @ARGV ? @ARGV : ();
-my @commands  = keys %{sub{CMD}->()};
+# App::MonM::Notifier instance
+my $app = new App::MonM::Notifier(
+        project => PROJECTNAME,
+        prefix  => PREFIX,
+        ($options->{config} && -e $options->{config} ? (configfile => $options->{config}) : ()),
+        ($options->{datadir} ? (datadir => $options->{datadir}) : ()),
+        options => $options,
+        debug   => $options->{debug},
+        verbose => $options->{verbose},
+        log     => $options->{log},
+        test    => $options->{test},
+    );
 pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
-    if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
+    unless $command && grep {$_ eq $command} ($app->list_handlers());
 
-# Singleton object
-my $c = defined($OPT{cfgfile})
-        ? new CTK(
-                cfgfile => $OPT{cfgfile},
-                logdir  => syslogdir(),
-                datadir => '.'
-            )
-        : new CTK( syspaths => 1 );
-if (defined($OPT{datadir})) {
-    $c->datadir($OPT{datadir});
-} else {
-    $c->datadir(catdir(sharedstatedir(), $c->prefix));
-}
+# Run
+my $exitval = $app->run($command, @arguments) ? 0 : 1;
+printf STDERR "%s\n", $app->error if $exitval && $app->error;
 
-my $ctkx = CTKx->instance( c => $c );
-
-unlink( $LOGFILE ) if( $OPT{logclear} && -e $LOGFILE ); # Remove unnesessary log
-
-START:  debug "-"x16, " START ", (testmode() ? 'IN TEST MODE ' : ''), tms," ","-"x16;
-#########################
-### START
-#########################
-my $pidfile;
-my $kstatus = 0;
-my $code = __PACKAGE__->can(uc($command)) || __PACKAGE__->can($command);
-if ($code && ref($code) eq 'CODE') {
-    %cmddata = %{CMD->{$command}};
-    $cmddata{arguments} = [@arguments];
-    my $config = $c->config;
-
-    CTK::preparedir({ datadir => $c->datadir() });
-
-    # Log File define
-    if (value($config => "logenable") && $cmddata{logfile}) {
-        $c->loglevel(value($config => "loglevel"));
-        $c->logfile(CTK::catfile($c->logdir(),
-            CTK::dformat($cmddata{logfile}, {
-                        COMMAND  => $command,
-                        PREFIX   => $c->prefix(),
-                        SUFFIX   => $c->suffix(),
-                        EXT      => 'log',
-                        DEFAULT  => LOGFILE,
-                    }
-                )
-            )
-        )
-    }
-
-    $c->loglevel("debug");
-
-    # PID File define
-    $pidfile = new CTK::FilePid({ file => CTK::catfile($c->datadir(), $cmddata{pidfile} || PIDFILE) });
-    my $pidstat = $pidfile->running || 0;
-
-    debug "==== START COMMAND: ".uc($command)." ($$) ====";
-
-    if ($cmddata{pidcheck}) {
-        exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
-        $pidfile->write;
-    }
-
-    my $lstatus = &{$code}(%cmddata);
-    if ($lstatus) {
-        debug("OK");
-    } else {
-        debug("NOT OK");
-        $kstatus = 1;
-    }
-
-    if ($cmddata{pidcheck}) {
-        $pidfile->remove;
-    }
-
-    debug "==== FINISH COMMAND: ".uc($command)." ($$) ====";
-} else {
-    exception("Sub \"".uc($command)."\" undefined");
-}
-
-#########################
-### FINISH
-#########################
-FINISH: debug "-"x16, " FINISH ", (testmode() ? 'IN TEST MODE ' : '') ,tms," ","-"x16;
-exit($kstatus);
+exit $exitval;
 
 1;
+
 __END__

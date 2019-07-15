@@ -41,11 +41,11 @@ Geo::Coder::Free::OpenAddresses - Provides a geocoding functionality to the data
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -235,7 +235,8 @@ sub geocode {
 		return Geo::Location::Point->new({
 			'lat' => $rc->{'latitude'},
 			'long' => $rc->{'longitude'},
-			'location' => $location
+			'location' => $location,
+			'database' => 'OpenAddresses'
 		});
 	}
 
@@ -369,7 +370,7 @@ sub geocode {
 					$city = uc($href->{city});
 				}
 				if($street = $href->{street}) {
-					if($href->{'type'} && (my $type = $self->_normalize($href->{'type'}))) {
+					if($href->{'type'} && (my $type = Geo::Coder::Free::_normalize($href->{'type'}))) {
 						$street .= " $type";
 					}
 					if($href->{suffix}) {
@@ -470,7 +471,7 @@ sub geocode {
 						$args{number} = $href->{number};
 					}
 					if($street = $href->{street}) {
-						if(my $type = $self->_normalize($href->{'type'})) {
+						if(my $type = Geo::Coder::Free::_normalize($href->{'type'})) {
 							$street .= " $type";
 						}
 						if($href->{suffix}) {
@@ -493,7 +494,7 @@ sub geocode {
 							return $rc;
 						}
 					}
-					warn "Fast lookup of US location' $location' failed";
+					warn "Fast lookup of US location '$location' failed";
 				} else {
 					if($city =~ /^(\d.+),\s*([\w\s]+),\s*([\w\s]+)/) {
 						my $lookup = "$1, $2, $state";
@@ -521,7 +522,7 @@ sub geocode {
 								$args{number} = $href->{number};
 							}
 							if($street = $href->{street}) {
-								if(my $type = $self->_normalize($href->{'type'})) {
+								if(my $type = Geo::Coder::Free::_normalize($href->{'type'})) {
 									$street .= " $type";
 								}
 								if($href->{suffix}) {
@@ -629,7 +630,7 @@ sub geocode {
 						$args{number} = $href->{number};
 					}
 					if($street = $href->{street}) {
-						if(my $type = $self->_normalize($href->{'type'})) {
+						if(my $type = Geo::Coder::Free::_normalize($href->{'type'})) {
 							$street .= " $type";
 						}
 						if($href->{suffix}) {
@@ -851,6 +852,9 @@ sub geocode {
 			}
 		}
 	}
+	if($location =~ s/,//g) {
+		return $self->geocode($location);
+	}
 	undef;
 }
 
@@ -880,7 +884,7 @@ sub _get {
 	my $digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
 	# my @call_details = caller(0);
 	# print "line ", $call_details[2], "\n";
-	# print("$location: $digest\n");
+	# print "$location: $digest\n";
 	# ::diag("line " . $call_details[2]);
 	# ::diag("$location: $digest");
 	if(my $cache = $self->{'cache'}) {
@@ -910,62 +914,14 @@ sub _get {
 		$rc = Geo::Location::Point->new({
 			'lat' => $rc->{'latitude'},
 			'long' => $rc->{'longitude'},
-			'location' => $location
+			'location' => $location,
+			'database' => 'OpenAddresses'
 		});
 		if(my $cache = $self->{'cache'}) {
 			$cache->set($digest, Storable::freeze($rc), '1 week');
 		}
 
 		return $rc;
-	}
-}
-
-sub _normalize {
-	my ($self, $type) = @_;
-
-	$type = uc($type);
-
-	if(($type eq 'AVENUE') || ($type eq 'AVE')) {
-		return 'AVE';
-	} elsif(($type eq 'STREET') || ($type eq 'ST')) {
-		return 'ST';
-	} elsif(($type eq 'ROAD') || ($type eq 'RD')) {
-		return 'RD';
-	} elsif(($type eq 'COURT') || ($type eq 'CT')) {
-		return 'CT';
-	} elsif(($type eq 'CIR') || ($type eq 'CIRCLE')) {
-		return 'CIR';
-	} elsif(($type eq 'FT') || ($type eq 'FORT')) {
-		return 'FT';
-	} elsif(($type eq 'CTR') || ($type eq 'CENTER')) {
-		return 'CTR';
-	} elsif(($type eq 'PARKWAY') || ($type eq 'PKWY')) {
-		return 'PKWY';
-	} elsif($type eq 'BLVD') {
-		return 'BLVD';
-	} elsif($type eq 'PIKE') {
-		return 'PIKE';
-	} elsif(($type eq 'DRIVE') || ($type eq 'DR')) {
-		return 'DR';
-	} elsif(($type eq 'SPRING') || ($type eq 'SPG')) {
-		return 'SPRING';
-	} elsif(($type eq 'RDG') || ($type eq 'RIDGE')) {
-		return 'RDG';
-	} elsif(($type eq 'CRK') || ($type eq 'CREEK')) {
-		return 'CRK';
-	} elsif(($type eq 'LANE') || ($type eq 'LN')) {
-		return 'LN';
-	} elsif(($type eq 'PLACE') || ($type eq 'PL')) {
-		return 'PL';
-	} elsif(($type eq 'GRDNS') || ($type eq 'GARDENS')) {
-		return 'GRDNS';
-	} elsif(($type eq 'HWY') || ($type eq 'HIGHWAY')) {
-		return 'HWY';
-	}
-
-	# Most likely failure of Geo::StreetAddress::US, but warn anyway, just in case
-	if($ENV{AUTHOR_TESTING}) {
-		warn $self->{'location'}, ": add type $type";
 	}
 }
 

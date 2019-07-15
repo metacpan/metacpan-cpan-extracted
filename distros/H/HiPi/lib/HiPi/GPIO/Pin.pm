@@ -15,7 +15,7 @@ use parent qw( HiPi::Pin );
 use Carp;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 __PACKAGE__->create_accessors( );
 
@@ -62,10 +62,14 @@ sub _do_setinterrupt {
     return HiPi::GPIO->set_pin_interrupt($self->pinid, $newedge);
 }
 
-
 sub _do_setpud {
     my($self, $pudval) = @_;
     return HiPi::GPIO->set_pin_pud($self->pinid, $pudval);
+}
+
+sub _do_getpud {
+    my($self ) = @_;
+    return HiPi::GPIO->get_pin_pud($self->pinid);
 }
 
 sub _do_get_interrupt_filepath {

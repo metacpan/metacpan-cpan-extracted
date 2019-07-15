@@ -143,6 +143,38 @@ test_psgi app => builder {
          [ "Content-Type" => 'text/html; charset=utf-8'],
          $fh];
     };
+
+    # delayed response
+    mount '/code_200_delayed' => sub {
+        sub {
+            my $respond = shift;
+            $respond->( [200, [ "Content-Type" => 'text/plain' ], ['OK']] );
+        };
+    };
+    mount '/code_304_delayed' => sub {
+        sub {
+            my $respond = shift;
+            $respond->( [304, [ "Content-Type" => 'text/plain' ], ['OK']] );
+        };
+    };
+
+    # streaming response
+    mount '/code_200_writer' => sub {
+        sub {
+            my $respond = shift;
+            my $writer = $respond->( [200, [ "Content-Type" => 'text/plain' ]] );
+            $writer->write( ref($writer) );
+            $writer->close;
+        };
+    };
+    mount '/code_304_writer' => sub {
+        sub {
+            my $respond = shift;
+            my $writer = $respond->( [304, [ "Content-Type" => 'text/plain' ]] );
+            $writer->write( ref($writer) );
+            $writer->close;
+        };
+    };
 },
 client => sub {
     my $cb = shift;
@@ -208,6 +240,26 @@ client => sub {
           '',
           304,
           'text/html; charset=utf-8' ],
+
+        # delayed response
+        [ '/code_200_delayed',
+          'OK',
+          200,
+          'text/plain' ],
+        [ '/code_304_delayed',
+          '',
+          304,
+          'text/plain' ],
+
+        # streaming response
+        [ '/code_200_writer',
+          'Plack::Util::Prototype',
+          200,
+          'text/plain' ],
+        [ '/code_304_writer',
+          'Plack::Util::Prototype',
+          304,
+          'text/plain' ],
     );
 
     foreach my $response ( @responses ) {

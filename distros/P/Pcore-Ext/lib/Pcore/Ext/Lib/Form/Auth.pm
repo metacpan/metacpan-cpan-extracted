@@ -6,7 +6,7 @@ use Pcore::CDN::Static::FA qw[:ALL];
 sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
     return {
         init => func ['view'],
-        <<"JS",
+        <<~'JS',
             this.callParent(arguments);
 
             if (view.getShowSignup() && view.getCanSignup()) {
@@ -17,7 +17,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
             }
 JS
 
-        showSignin => func <<"JS",
+        showSignin => func <<~"JS",
             var me = this,
                 view = this.getView();
 
@@ -62,25 +62,32 @@ JS
             }
 JS
 
-        doSignin => func <<"JS",
-                var me = this,
-                    view = this.getView(),
-                    form = view.down('fieldpanel');
+        doSignin => func <<'JS',
+            var view = this.getView(),
+                form = view.down('fieldpanel');
 
-                if (form.validate()) {
-                    Ext.fireEvent('mask');
+            if (form.validate()) {
+                this.fireSigninEvent(form.getFields('username').getValue(), form.getFields('password').getValue());
+            }
+JS
 
-                    Ext.fireEvent('signin',
-                        form.getFields('username').getValue(),
-                        form.getFields('password').getValue(),
-                        this.lookup('remember_me').isChecked(),
-                        function (success) {
-                            Ext.fireEvent('unmask');
+        fireSigninEvent => func [ 'username', 'password' ], <<"JS",
+            var me = this,
+                view = this.getView(),
+                form = view.down('fieldpanel');
 
-                            if (success) view.destroy();
-                        }
-                    );
+            Ext.fireEvent('mask', view);
+
+            Ext.fireEvent('signin',
+                username,
+                password,
+                this.lookup('remember_me').isChecked(),
+                function (success) {
+                    view.unmask();
+
+                    if (success) view.destroy();
                 }
+            );
 JS
 
         doSignup => func <<"JS",
@@ -98,10 +105,10 @@ JS
                         return;
                     }
 
-                    Ext.fireEvent('mask');
+                    Ext.fireEvent('mask', view);
 
                     $api{'Admin/Users/create'}(form.getValues(), function(res) {
-                        Ext.fireEvent('unmask');
+                        view.unmask();
 
                         if (res.isSuccess()) {
                             Ext.toast($l10n{'Account created'}, 5000);
@@ -129,12 +136,12 @@ JS
                 form.clearErrors();
 
                 if (username_field.validate()) {
-                    Ext.fireEvent('mask');
+                    Ext.fireEvent('mask', view);
 
                     Ext.fireEvent('recoverPassword',
                         username_field.getValue(),
                         function (success) {
-                            Ext.fireEvent('unmask');
+                            view.unmask();
 
                             form.reset(true);
                         }
@@ -175,7 +182,7 @@ sub EXT_signin_form : Extend('Ext.Panel') {
                 items => [
                     {   xtype      => 'textfield',
                         name       => 'username',
-                        label      => l10n('User Name'),
+                        label      => l10n('User Name or Email'),
                         allowBlank => \0,
                         required   => \1,
                     },
@@ -222,6 +229,22 @@ sub EXT_signin_form : Extend('Ext.Panel') {
             {   xtype  => 'spacer',
                 height => 20,
             },
+
+            {   layout => {
+                    type  => 'vbox',
+                    pack  => 'center',
+                    align => 'center',
+                },
+
+                items => [
+
+                    # TELEGRAM
+                    {   xtype => $type{'/pcore/Telegram/button'},
+                        bind  => { telegramBotId => '{settings.telegram_bot_name}' },
+                    },
+                ],
+            },
+
             {   reference => 'signup-link',
                 layout    => {
                     type  => 'hbox',

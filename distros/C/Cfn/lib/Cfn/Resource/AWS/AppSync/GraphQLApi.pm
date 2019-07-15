@@ -1,4 +1,4 @@
-# AWS::AppSync::GraphQLApi generated from spec 3.2.0
+# AWS::AppSync::GraphQLApi generated from spec 4.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::AppSync::GraphQLApi {
     [ 'ApiId','Arn','GraphQLUrl' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-southeast-2','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

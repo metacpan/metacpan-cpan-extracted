@@ -40,9 +40,9 @@
          "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
          "rdfs:label" : "indication",
          "schema:domainIncludes" : [
+            "schema:TherapeuticProcedure",
             "schema:MedicalProcedure",
-            "schema:MedicalDevice",
-            "schema:TherapeuticProcedure"
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalIndication"
@@ -52,8 +52,8 @@
          "rdfs:comment" : "Expected or actual outcomes of the study.",
          "rdfs:label" : "outcome",
          "schema:domainIncludes" : [
-            "schema:MedicalProcedure",
-            "schema:MedicalStudy"
+            "schema:MedicalStudy",
+            "schema:MedicalProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
@@ -85,9 +85,9 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
-            "schema:MedicalStudy",
             "schema:MedicalCondition",
-            "schema:MedicalProcedure"
+            "schema:MedicalProcedure",
+            "schema:MedicalStudy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [

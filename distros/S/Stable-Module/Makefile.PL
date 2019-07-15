@@ -2,11 +2,11 @@ use strict;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    'NAME'          => 'Stable::Module',
-    'VERSION_FROM'  => 'lib/Stable/Module.pm',
-    'ABSTRACT_FROM' => 'lib/Stable/Module.pm',
-    'PREREQ_PM'     => { },
-    'AUTHOR'        => 'ina <ina@cpan.org> in a CPAN',
+    'NAME'      => 'Stable::Module',
+    'VERSION'   => '0.09',
+    'ABSTRACT'  => 'frequently used modules on Perl5 application',
+    'PREREQ_PM' => { },
+    'AUTHOR'    => 'ina <ina@cpan.org> in a CPAN',
 );
 
 __END__

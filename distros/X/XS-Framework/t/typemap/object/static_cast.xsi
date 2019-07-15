@@ -1,0 +1,112 @@
+MODE: INLINE
+
+template <int i>
+class _MyStatic {
+public:
+    int val;
+    _MyStatic (int val) : val(val) { }
+    virtual ~_MyStatic () {}
+};
+
+template <int i>
+class _MyStaticChild : public _MyStatic<i> {
+public:
+    int val2;
+    _MyStaticChild (int val, int val2) : _MyStatic<i>(val), val2(val2) { }
+};
+
+using PTRMyStatic      = _MyStatic<0>;
+using PTRMyStaticChild = _MyStaticChild<0>;
+using MyStatic         = _MyStatic<1>;
+using MyStaticChild    = _MyStaticChild<1>;
+
+namespace xs {
+
+    template <class TYPE> struct Typemap<PTRMyStatic*, TYPE> : TypemapObject<PTRMyStatic*, TYPE, ObjectTypePtr, ObjectStorageIV, StaticCast> {
+        static std::string package () { return "MyTest::PTRMyStatic"; }
+    };
+    
+    template <> struct Typemap<PTRMyStaticChild*> : Typemap<PTRMyStatic*, PTRMyStaticChild*> {
+        static std::string package () { return "MyTest::PTRMyStaticChild"; }
+    };
+    
+    template <class TYPE> struct Typemap<MyStatic*, TYPE> : TypemapObject<MyStatic*, TYPE, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::MyStatic"; }
+    };
+    
+    template <> struct Typemap<MyStaticChild*> : Typemap<MyStatic*, MyStaticChild*> {
+        static std::string package () { return "MyTest::MyStaticChild"; }
+    };
+
+}
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyStatic
+PROTOTYPES: DISABLE
+
+PTRMyStatic* PTRMyStatic::new (int arg) {
+    if (arg) RETVAL = new PTRMyStatic(arg);
+    else RETVAL = NULL;
+}
+
+int PTRMyStatic::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void PTRMyStatic::DESTROY ()
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyStaticChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::PTRMyStaticChild").inherit(Stash("MyTest::PTRMyStatic"));
+}
+
+PTRMyStaticChild* PTRMyStaticChild::new (int arg1, int arg2) {
+    if (arg1 || arg2) RETVAL = new PTRMyStaticChild(arg1, arg2);
+    else RETVAL = NULL;
+}
+
+int PTRMyStaticChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyStatic
+PROTOTYPES: DISABLE
+
+MyStatic* MyStatic::new (int arg) {
+    if (arg) RETVAL = new MyStatic(arg);
+    else RETVAL = NULL;
+}
+
+int MyStatic::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MyStatic::DESTROY ()
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyStaticChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::MyStaticChild").inherit(Stash("MyTest::MyStatic"));
+}
+
+MyStaticChild* MyStaticChild::new (int arg1, int arg2) {
+    if (arg1 || arg2) RETVAL = new MyStaticChild(arg1, arg2);
+    else RETVAL = NULL;
+}
+
+int MyStaticChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}

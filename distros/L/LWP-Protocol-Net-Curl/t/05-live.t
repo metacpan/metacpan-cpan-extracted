@@ -37,7 +37,7 @@ like($res->content, qr(\bUptime\s+known\s+gopher\s+servers\b)x, q(gopher content
 # known to have a long redir chain
 $ua->max_redirect(1);
 $ua->{show_progress} = 1;
-$res = $ua->get(q(http://terra.com.br));
+$res = $ua->get(q(http://en.wikipedia.org));
 ok($res->is_redirect, q(is_redirect()));
 
 done_testing(8);

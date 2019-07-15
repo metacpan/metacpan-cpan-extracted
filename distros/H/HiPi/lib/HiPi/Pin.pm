@@ -15,7 +15,7 @@ use warnings;
 use parent qw( HiPi::Class );
 use HiPi qw( :rpi );
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 __PACKAGE__->create_ro_accessors( qw( pinid ) );
 
@@ -53,6 +53,12 @@ sub set_pud {
     } else {
         croak(qq(Invalid PUD setting $newval));
     }
+    return $rval;
+}
+
+sub get_pud {
+    my( $self ) = @_;
+    my $rval = $self->_do_getpud();
     return $rval;
 }
 

@@ -45,11 +45,7 @@
             "Mojolicious::Plugin::PODViewer" : "0.004",
             "Mojolicious::Plugin::RoutesConfig" : "0.05",
             "Net::SMTP" : "3.11",
-            "Perl::Critic" : "1.132",
             "Role::Tiny" : "2.000006",
-            "Test::Perl::Critic" : "1.04",
-            "Test::PerlTidy" : "20130104",
-            "Test::Pod" : "1.52",
             "perl" : "5.020000"
          }
       },
@@ -72,6 +68,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2019.07.07",
+   "version" : "v2019.07.11",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

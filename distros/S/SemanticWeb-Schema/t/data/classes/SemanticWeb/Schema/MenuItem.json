@@ -14,8 +14,8 @@
          "schema:category" : "issue-1541",
          "schema:domainIncludes" : "schema:MenuItem",
          "schema:rangeIncludes" : [
-            "schema:MenuItem",
-            "schema:MenuSection"
+            "schema:MenuSection",
+            "schema:MenuItem"
          ]
       },
       "schema:nutrition" : {
@@ -23,8 +23,8 @@
          "rdfs:comment" : "Nutrition information about the recipe or menu item.",
          "rdfs:label" : "nutrition",
          "schema:domainIncludes" : [
-            "schema:MenuItem",
-            "schema:Recipe"
+            "schema:Recipe",
+            "schema:MenuItem"
          ],
          "schema:rangeIncludes" : "schema:NutritionInformation"
       },
@@ -34,12 +34,12 @@
          "rdfs:label" : "offers",
          "schema:domainIncludes" : [
             "schema:Event",
+            "schema:Trip",
             "schema:MenuItem",
-            "schema:Service",
             "schema:AggregateOffer",
             "schema:Product",
-            "schema:Trip",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },

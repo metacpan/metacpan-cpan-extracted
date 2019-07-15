@@ -108,6 +108,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/README
 t/backend.t
+t/common/bson_array.t
 t/common/create_oid.t
 t/common/cycle.t
 t/common/dualvar.t

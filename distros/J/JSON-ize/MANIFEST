@@ -5,9 +5,11 @@ lib/JSON/ize.pm
 MANIFEST
 LICENSE
 t/001_simple.t
-t/002_pod.t
+t/002_yaml.t
 t/sample/bad.json
 t/sample/good.json
+t/sample/bad.yaml
+t/sample/good.yaml
 t/sample/good.json.gz
 META.yml
 META.json

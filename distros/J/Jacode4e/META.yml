@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Jacode4e
-version: 2.13.6.12
+version: 2.13.6.13
 abstract: jacode.pl-like program for enterprise
 author:
   - ina <ina@cpan.org>
@@ -19,9 +19,11 @@ requires:
   File::Copy: 2.02
   File::Path: 1.0401
   FindBin: 1.42
+  Getopt::Std: 1.01
   perl: 5.005_03
   strict: 1.01
 build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/Jacode4e

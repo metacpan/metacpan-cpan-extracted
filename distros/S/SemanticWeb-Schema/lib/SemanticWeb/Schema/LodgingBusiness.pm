@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has amenity_feature => (
@@ -58,6 +58,14 @@ has checkout_time => (
 
 
 
+has number_of_rooms => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'numberOfRooms',
+);
+
+
+
 has pets_allowed => (
     is        => 'rw',
     predicate => 1,
@@ -90,7 +98,7 @@ SemanticWeb::Schema::LodgingBusiness - A lodging business
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -140,9 +148,9 @@ A available_language should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Language']>
+
+=item C<Str>
 
 =back
 
@@ -174,6 +182,25 @@ A checkout_time should be one of the following types:
 
 =back
 
+=head2 C<number_of_rooms>
+
+C<numberOfRooms>
+
+The number of rooms (excluding bathrooms and closets) of the accommodation
+or lodging business. Typical unit code(s): ROM for room or C62 for no unit.
+The type of room can be put in the unitText property of the
+QuantitativeValue.
+
+A number_of_rooms should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Num>
+
+=back
+
 =head2 C<pets_allowed>
 
 C<petsAllowed>
@@ -185,9 +212,9 @@ A pets_allowed should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<Bool>
+
+=item C<Str>
 
 =back
 

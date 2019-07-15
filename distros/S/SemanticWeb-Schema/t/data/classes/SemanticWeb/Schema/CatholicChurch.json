@@ -3,7 +3,7 @@
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A Catholic church.",
       "rdfs:label" : "CatholicChurch",
-      "rdfs:subClassOf" : "schema:PlaceOfWorship"
+      "rdfs:subClassOf" : "schema:Church"
    },
    "properties" : {}
 }

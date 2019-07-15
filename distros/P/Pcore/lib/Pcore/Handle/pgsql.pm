@@ -2,10 +2,10 @@ package Pcore::Handle::pgsql;
 
 use Pcore -class, -const, -res, -export;
 use Pcore::Handle::DBI::Const qw[:CONST];
-use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref is_plain_coderef];
-use Pcore::Util::UUID qw[uuid_v1mc_str];
-use Pcore::Util::Data qw[to_json];
-use Pcore::Util::Hash::HashArray;
+use Pcore::Lib::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref is_plain_coderef];
+use Pcore::Lib::UUID qw[uuid_v1mc_str];
+use Pcore::Lib::Data qw[to_json];
+use Pcore::Lib::Hash::HashArray;
 
 with qw[Pcore::Handle::DBI];
 
@@ -33,7 +33,7 @@ has on_notification => ();            # CodeRef->( $self, $pid, $channel, $paylo
 
 has is_pgsql   => 1, init_arg => undef;
 has active_dbh => 0, init_arg => undef;
-has _dbh_pool => sub { Pcore::Util::Hash::HashArray->new }, init_arg => undef;
+has _dbh_pool => sub { Pcore::Lib::Hash::HashArray->new }, init_arg => undef;
 has _get_dbh_queue => sub { [] }, init_arg => undef;    # ArrayRef
 
 # DBH POOL METHODS

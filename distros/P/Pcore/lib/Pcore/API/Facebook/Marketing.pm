@@ -1,7 +1,7 @@
 package Pcore::API::Facebook::Marketing;
 
 use Pcore -role, -const, -export;
-use Pcore::Util::Scalar qw[is_plain_coderef];
+use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 our $EXPORT = {
     ALL                     => [qw[$FB_ADACC_STATUS_TEXT $FB_ADACC_DISABLE_REASON_TEXT]],

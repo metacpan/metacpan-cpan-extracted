@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CPP-panda-lib",
    "no_index" : {
@@ -21,22 +21,16 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.76",
-            "ExtUtils::ParseXS" : "3.24"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "CPP::catch::test" : "v1.0.1",
-            "ExtUtils::MakeMaker" : "6.76",
-            "Panda::Install" : "v1.2.15"
+            "XS::Install" : "v1.2.4"
          }
       },
       "runtime" : {
          "requires" : {
-            "CPP::catch::test" : "v1.0.1",
-            "Panda::Install" : "v1.2.15",
+            "XS::Install" : "v1.2.4",
             "perl" : "5.012000"
          }
       },
@@ -49,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.3",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.2.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

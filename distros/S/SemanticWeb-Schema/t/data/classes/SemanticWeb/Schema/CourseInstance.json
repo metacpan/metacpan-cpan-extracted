@@ -12,8 +12,8 @@
          "rdfs:label" : "courseMode",
          "schema:domainIncludes" : "schema:CourseInstance",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:instructor" : {

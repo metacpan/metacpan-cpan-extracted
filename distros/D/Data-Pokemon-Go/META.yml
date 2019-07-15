@@ -1,5 +1,5 @@
 ---
-abstract: 'Datas for every Pokemon in Pokemon Go'
+abstract: 'Data for every Pokemon in Pokemon Go'
 author:
   - 'Yuki Yoshida <worthmine@gmail.com>'
 build_requires:
@@ -28,7 +28,7 @@ no_index:
 provides:
   Data::Pokemon::Go:
     file: lib/Data/Pokemon/Go.pm
-    version: '0.08'
+    version: '0.09'
   Data::Pokemon::Go::IV:
     file: lib/Data/Pokemon/Go/IV.pm
   Data::Pokemon::Go::Pokemon:
@@ -55,11 +55,11 @@ resources:
   bugtracker: https://github.com/worthmine/Data-Pokemon-Go/issues
   homepage: https://github.com/worthmine/Data-Pokemon-Go
   repository: git://github.com/worthmine/Data-Pokemon-Go.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:WORTHMINE
 x_contributors:
   - 'AnaTofuZ <anatofuz@gmail.com>'
   - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
   - 'worthmine <worthmine@cpan.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

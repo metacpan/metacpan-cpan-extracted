@@ -1,0 +1,338 @@
+MODE: INLINE
+
+template <int i>
+class _MyRefCounted : public panda::Refcnt {
+public:
+    int val;
+    _MyRefCounted (int val) : val(val) { }
+    virtual ~_MyRefCounted () {
+        dcnt.c++;
+    }
+};
+
+template <int i>
+class _MyRefCountedChild : public _MyRefCounted<i> {
+public:
+    int val2;
+    _MyRefCountedChild (int val, int val2) : _MyRefCounted<i>(val), val2(val2) { }
+    virtual ~_MyRefCountedChild () {
+        dcnt.c++;
+    }
+};
+
+using MyRefCounted             = _MyRefCounted<0>;
+using MyRefCountedChild        = _MyRefCountedChild<0>;
+using MyRefCountedIPTR         = panda::iptr<MyRefCounted>;
+using MyRefCountedChildIPTR    = panda::iptr<MyRefCountedChild>;
+using PTRMyRefCounted          = _MyRefCounted<1>;
+using PTRMyRefCountedChild     = _MyRefCountedChild<1>;
+using PTRMyRefCountedIPTR      = panda::iptr<PTRMyRefCounted>;
+using PTRMyRefCountedChildIPTR = panda::iptr<PTRMyRefCountedChild>;
+
+static MyRefCounted*       st_myrefcounted;
+static PTRMyRefCounted*    st_ptr_myrefcounted;
+static MyRefCountedIPTR    st_myrefcounted_iptr;
+static PTRMyRefCountedIPTR st_ptr_myrefcounted_iptr;
+
+using MyBaseSP     = std::shared_ptr<MyBase>;
+using MyChildSP    = std::shared_ptr<MyChild>;
+using PTRMyBaseSP  = std::shared_ptr<PTRMyBase>;
+using PTRMyChildSP = std::shared_ptr<PTRMyChild>;
+
+static MyBaseSP    st_mybase_sp;
+static PTRMyBaseSP st_ptr_mybase_sp;
+
+namespace xs {
+    template <class TYPE> struct Typemap<PTRMyRefCounted*,TYPE> : TypemapObject<PTRMyRefCounted*, TYPE, ObjectTypeRefcntPtr, ObjectStorageIV, DynamicCast> {
+        static std::string package () { return "MyTest::PTRMyRefCounted"; }
+    };
+
+    template <> struct Typemap<PTRMyRefCountedChild*> : Typemap<PTRMyRefCounted*, PTRMyRefCountedChild*> {
+        static std::string package () { return "MyTest::PTRMyRefCountedChild"; }
+    };
+
+    template <class TYPE> struct Typemap<MyRefCounted*,TYPE> : TypemapObject<MyRefCounted*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MyRefCounted"; }
+    };
+
+    template <> struct Typemap<MyRefCountedChild*> : Typemap<MyRefCounted*, MyRefCountedChild*> {
+        static std::string package () { return "MyTest::MyRefCountedChild"; }
+    };
+
+    template <class TYPE> struct Typemap<PTRMyBaseSP,TYPE> : TypemapObject<PTRMyBaseSP, TYPE, ObjectTypeSharedPtr, ObjectStorageIV, DynamicCast> {
+        static std::string package () { return "MyTest::PTRMyBaseSP"; }
+    };
+
+    template <> struct Typemap<PTRMyChildSP> : Typemap<PTRMyBaseSP, PTRMyChildSP> {
+        static std::string package () { return "MyTest::PTRMyChildSP"; }
+    };
+
+    template <class TYPE> struct Typemap<MyBaseSP,TYPE> : TypemapObject<MyBaseSP, TYPE, ObjectTypeSharedPtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MyBaseSP"; }
+        static MyBaseSP dup (const MyBaseSP& obj) { return MyBaseSP(obj->clone()); }
+    };
+
+    template <> struct Typemap<MyChildSP> : Typemap<MyBaseSP, MyChildSP> {
+        static std::string package () { return "MyTest::MyChildSP"; }
+    };
+
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest
+PROTOTYPES: DISABLE
+
+void hold_ptr_myrefcounted (PTRMyRefCounted* obj) {
+    obj->retain();
+    st_ptr_myrefcounted = obj;
+}
+
+PTRMyRefCounted* release_ptr_myrefcounted () {
+    PTRMyRefCountedIPTR autorel(st_ptr_myrefcounted);
+    st_ptr_myrefcounted->release();
+    RETVAL = st_ptr_myrefcounted;
+}
+
+void hold_myrefcounted (MyRefCounted* obj) {
+    obj->retain();
+    st_myrefcounted = obj;
+}
+
+MyRefCounted* release_myrefcounted () {
+    MyRefCountedIPTR autorel(st_myrefcounted);
+    st_myrefcounted->release();
+    RETVAL = st_myrefcounted;
+}
+
+void hold_ptr_myrefcounted_iptr (PTRMyRefCountedIPTR obj) {
+    st_ptr_myrefcounted_iptr = obj;
+}
+
+PTRMyRefCountedIPTR release_ptr_myrefcounted_iptr () {
+    RETVAL = st_ptr_myrefcounted_iptr;
+    st_ptr_myrefcounted_iptr.reset();
+}
+
+void hold_myrefcounted_iptr (MyRefCountedIPTR obj) {
+    st_myrefcounted_iptr = obj;
+}
+
+MyRefCountedIPTR release_myrefcounted_iptr () {
+    RETVAL = st_myrefcounted_iptr;
+    st_myrefcounted_iptr.reset();
+}
+
+void hold_ptr_mybase_sp (PTRMyBaseSP obj) {
+    st_ptr_mybase_sp = obj;
+}
+
+PTRMyBaseSP release_ptr_mybase_sp () {
+    RETVAL = st_ptr_mybase_sp;
+    st_ptr_mybase_sp.reset();
+}
+
+void hold_mybase_sp (MyBaseSP obj) {
+    st_mybase_sp = obj;
+}
+
+MyBaseSP release_mybase_sp () {
+    RETVAL = st_mybase_sp;
+    st_mybase_sp.reset();
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyRefCounted
+PROTOTYPES: DISABLE
+
+PTRMyRefCounted* PTRMyRefCounted::new (int val)
+
+int PTRMyRefCounted::val () {
+    RETVAL = THIS->val;
+}
+
+void PTRMyRefCounted::DESTROY () { dcnt.perl++; }
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyRefCountedChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::PTRMyRefCountedChild").inherit(Stash("MyTest::PTRMyRefCounted"));
+}
+
+PTRMyRefCountedChild* PTRMyRefCountedChild::new (int val, int val2)
+
+int PTRMyRefCountedChild::val2 () {
+    RETVAL = THIS->val2;
+}
+
+void PTRMyRefCountedChild::DESTROY () {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyRefCounted
+PROTOTYPES: DISABLE
+
+MyRefCounted* MyRefCounted::new (int val)
+
+int MyRefCounted::val () {
+    RETVAL = THIS->val;
+}
+
+void MyRefCounted::DESTROY () { dcnt.perl++; }
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyRefCountedChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::MyRefCountedChild").inherit(Stash("MyTest::MyRefCounted"));
+}
+
+MyRefCountedChild* MyRefCountedChild::new (int val, int val2)
+
+int MyRefCountedChild::val2 () {
+    RETVAL = THIS->val2;
+}
+
+void MyRefCountedChild::DESTROY () {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyRefCountedIPTR
+PROTOTYPES: DISABLE
+
+PTRMyRefCountedIPTR PTRMyRefCounted::new (int val)
+
+int val (PTRMyRefCountedIPTR THIS) {
+    RETVAL = THIS->val;
+}
+
+void DESTROY (PTRMyRefCountedIPTR THIS) { dcnt.perl++; }
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyRefCountedChildIPTR
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::PTRMyRefCountedChildIPTR").inherit(Stash("MyTest::PTRMyRefCountedIPTR"));
+}
+
+PTRMyRefCountedChildIPTR PTRMyRefCountedChild::new (int val, int val2)
+
+int val2 (PTRMyRefCountedChildIPTR THIS) {
+    RETVAL = THIS->val2;
+}
+
+void DESTROY (PTRMyRefCountedChildIPTR THIS) {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyRefCountedIPTR
+PROTOTYPES: DISABLE
+
+MyRefCountedIPTR MyRefCounted::new (int val)
+
+int val (MyRefCountedIPTR THIS) {
+    RETVAL = THIS->val;
+}
+
+void DESTROY (MyRefCountedIPTR THIS) { dcnt.perl++; }
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyRefCountedChildIPTR
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::MyRefCountedChildIPTR").inherit(Stash("MyTest::MyRefCountedIPTR"));
+}
+
+MyRefCountedChildIPTR MyRefCountedChild::new (int v1, int v2)
+
+int val2 (MyRefCountedChildIPTR THIS) {
+    RETVAL = THIS->val2;
+}
+
+void DESTROY (MyRefCountedChildIPTR THIS) {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyBaseSP
+PROTOTYPES: DISABLE
+
+PTRMyBaseSP PTRMyBase::new (int val)
+
+int val (PTRMyBaseSP THIS) {
+    RETVAL = THIS->val;
+}
+
+void DESTROY (PTRMyBaseSP THIS) { dcnt.perl++; }
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyChildSP
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::PTRMyChildSP").inherit(Stash("MyTest::PTRMyBaseSP"));
+}
+
+PTRMyChildSP PTRMyChild::new (int val, int val2)
+
+int val2 (PTRMyChildSP THIS) {
+    RETVAL = THIS->val2;
+}
+
+void DESTROY (PTRMyChildSP THIS) {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyBaseSP
+PROTOTYPES: DISABLE
+
+MyBaseSP MyBase::new (int val)
+
+int val (MyBaseSP THIS) {
+    RETVAL = THIS->val;
+}
+
+void DESTROY (MyBaseSP THIS) { dcnt.perl++; }
+
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyChildSP
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::MyChildSP").inherit(Stash("MyTest::MyBaseSP"));
+}
+
+MyChildSP MyChild::new (int val, int val2)
+
+int val2 (MyChildSP THIS) {
+    RETVAL = THIS->val2;
+}
+
+void DESTROY (MyChildSP THIS) {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}

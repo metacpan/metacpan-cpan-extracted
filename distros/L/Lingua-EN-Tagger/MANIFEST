@@ -1,8 +1,7 @@
 Changes
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
-Tagger.pm
 t/clean.t
 t/load.t
 t/nouns.t
@@ -13,8 +12,9 @@ t/relax.t
 t/sentence.t
 t/threads.t
 t/weighted.t
+Tagger.pm
 Tagger/tags.yml
 Tagger/unknown.yml
 Tagger/words.yml
-META.yml                                 Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml
+META.json

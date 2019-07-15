@@ -25,6 +25,9 @@ LWP::Protocol::Net::Curl::_setopt_ifdef($easy, _DUMMY2 => 1 => 1);
 my $ua = LWP::UserAgent->new;
 my $res = $ua->get(q(http://0.42.42.42/));
 ok($res->is_error, q(bad address 1));
-like($res->message, qr/couldn't\s+connect\s+to\s+server/ix, q(bad address 2));
+like($res->message, qr/(
+    couldn't\s+connect\s+to\s+server |
+    internal\s+error\s+-\s+server\s+connection\s+terminated
+)/ix, q(bad address 2));
 
 done_testing(3);

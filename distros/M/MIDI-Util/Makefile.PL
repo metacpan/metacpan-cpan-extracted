@@ -17,6 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "MIDI::Util",
   "PREREQ_PM" => {
+    "MIDI" => 0,
+    "MIDI::Event" => 0,
     "MIDI::Simple" => 0,
     "MIDI::Track" => 0,
     "Music::Tempo" => 0,
@@ -30,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0300",
+  "VERSION" => "0.0400",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +43,8 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "MIDI" => 0,
+  "MIDI::Event" => 0,
   "MIDI::Simple" => 0,
   "MIDI::Track" => 0,
   "Music::Tempo" => 0,

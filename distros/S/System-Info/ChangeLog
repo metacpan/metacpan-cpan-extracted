@@ -1,3 +1,16 @@
+0.059	- 2019-07-11,  H.Merijn Brand
+    * Add CentOS 7.5
+    * Add DSM-6.2
+    * Add openSUSE-42.3
+    * Add openSUSE-15.0
+    * Add Mac::OSVersion to Darwin's SEE ALSO
+    * It's 2019
+    * Add Oracle Linux 7.6
+    * Add CentOS 7.6
+    * Add Oracle Solaris 11.4
+    * Provide cpanfile
+    * Add osvers from sw_vers for Darwin
+
 0.058	- 2018-05-01,  H.Merijn Brand
     * Include Windows build number in OS version
     * Git repo has CSV with summary from distrowatch

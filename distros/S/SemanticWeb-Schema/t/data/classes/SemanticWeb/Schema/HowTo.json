@@ -24,8 +24,8 @@
          "rdfs:comment" : "The length of time it takes to perform instructions or a direction (not including time to prepare the supplies), in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 duration format</a>.",
          "rdfs:label" : "performTime",
          "schema:domainIncludes" : [
-            "schema:HowTo",
-            "schema:HowToDirection"
+            "schema:HowToDirection",
+            "schema:HowTo"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -45,9 +45,9 @@
          "rdfs:label" : "step",
          "schema:domainIncludes" : "schema:HowTo",
          "schema:rangeIncludes" : [
+            "schema:HowToStep",
             "schema:HowToSection",
             "schema:Text",
-            "schema:HowToStep",
             "schema:CreativeWork"
          ]
       },
@@ -60,9 +60,9 @@
             "schema:HowToSection"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:ItemList",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Text"
          ],
          "schema:supersededBy" : "schema:step"
       },
@@ -76,8 +76,8 @@
             "schema:HowToDirection"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:HowToSupply"
+            "schema:HowToSupply",
+            "schema:Text"
          ]
       },
       "schema:tool" : {
@@ -86,8 +86,8 @@
          "rdfs:label" : "tool",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
-            "schema:HowToDirection",
-            "schema:HowTo"
+            "schema:HowTo",
+            "schema:HowToDirection"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -99,8 +99,8 @@
          "rdfs:comment" : "The total time required to perform instructions or a direction (including time to prepare the supplies), in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 duration format</a>.",
          "rdfs:label" : "totalTime",
          "schema:domainIncludes" : [
-            "schema:HowTo",
-            "schema:HowToDirection"
+            "schema:HowToDirection",
+            "schema:HowTo"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -110,8 +110,8 @@
          "rdfs:label" : "yield",
          "schema:domainIncludes" : "schema:HowTo",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QuantitativeValue"
          ]
       }
    }

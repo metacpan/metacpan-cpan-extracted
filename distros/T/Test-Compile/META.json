@@ -35,11 +35,11 @@
    "provides" : {
       "Test::Compile" : {
          "file" : "lib/Test/Compile.pm",
-         "version" : "v2.2.1"
+         "version" : "v2.2.2"
       },
       "Test::Compile::Internal" : {
          "file" : "lib/Test/Compile/Internal.pm",
-         "version" : "v2.2.1"
+         "version" : "v2.2.2"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "url" : "http://github.com/egiles/test-compile"
       }
    },
-   "version" : "v2.2.1",
+   "version" : "v2.2.2",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

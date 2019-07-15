@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
+    'bin/symlink-dsl',
     'lib/Symlink/DSL.pm',
     't/00-compile.t'
 );

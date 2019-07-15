@@ -1,5 +1,8 @@
 Revision history for MIDI-Util
 
+0.0400 2019-07-12 02:43:42
+    - Add the ->dump function.
+
 0.0300 2019-03-02 13:19:22
     - Add the new_track() function.
     - Improve tests.

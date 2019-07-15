@@ -12,14 +12,20 @@
          "rdfs:comment" : "The expected arrival time.",
          "rdfs:label" : "arrivalTime",
          "schema:domainIncludes" : "schema:Trip",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Time"
+         ]
       },
       "schema:departureTime" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The expected departure time.",
          "rdfs:label" : "departureTime",
          "schema:domainIncludes" : "schema:Trip",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Time"
+         ]
       },
       "schema:offers" : {
          "rdf:type" : "rdf:Property",
@@ -27,12 +33,12 @@
          "rdfs:label" : "offers",
          "schema:domainIncludes" : [
             "schema:Event",
+            "schema:Trip",
             "schema:MenuItem",
-            "schema:Service",
             "schema:AggregateOffer",
             "schema:Product",
-            "schema:Trip",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
@@ -41,16 +47,16 @@
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Trip",
-            "schema:Reservation",
             "schema:Service",
+            "schema:Reservation",
             "schema:ParcelDelivery",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Trip",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       }
    }

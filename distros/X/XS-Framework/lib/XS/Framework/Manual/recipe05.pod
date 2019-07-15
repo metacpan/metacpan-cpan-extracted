@@ -1,0 +1,93 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe05 - XS::Framework basics
+
+=cut
+
+=head1 DESCRIPTION
+
+L<CPP::panda::lib> offers lightweight intrusive smart pointer C<iptr>. Please,
+referer intrusive pointer from L<Boost|http::/boost.org> library for introduction.
+The easiest way to add refcounted property to C++ class is to inherit from
+C<panda::Refcnt (1)>:
+
+    struct TimezoneRecipe05: public panda::Refcnt {
+        //                                  (1)
+        const char* get_name() const { return name.c_str(); }
+        TimezoneRecipe05(const char* name_): name{name_} { }
+        ~TimezoneRecipe05() { std::cerr << "~TimezoneRecipe05()\n"; }
+    private:
+        std::string name;
+    };
+
+    using TimezoneRecipe05SP = panda::iptr<TimezoneRecipe05>;
+
+Let's define typemap for timezone:
+
+    namespace xs {
+        template <>
+        struct Typemap<TimezoneRecipe05*> : TypemapObject<TimezoneRecipe05*, TimezoneRecipe05*, ObjectTypeRefcntPtr, ObjectStorageMG, StaticCast> {
+            ///             (2)                                                                       (e)
+            static std::string package () { return "MyTest::Cookbook::TimezoneRecipe05"; }
+        };
+    }
+
+The typemap specialization (2) should be for timezone pointer (C<TimezoneRecipe05*>),
+as L<XS::Framework> ships with auto-deduced typemaps for iptr<T>. The
+C<ObjectTypeRefcntPtr> lifetime policy should be specified.
+
+There is no constraint for C++ class to let it inherit C<panda::Refcnt>: all is
+needed is that the class with refcounter semantics should define global functions
+C<refcnt_inc>, C<refcnt_dec> and C<refcnt_get>.
+
+The xs-adapter is trivial; it should be defined for timezone I<pointer>:
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::TimezoneRecipe05
+    PROTOTYPES: DISABLE
+
+    const char* TimezoneRecipe05::get_name() { RETVAL = THIS->get_name(); }
+
+    TimezoneRecipe05SP create(const char* name) { RETVAL = TimezoneRecipe05SP(new TimezoneRecipe05(name)); }
+
+
+For the sake of completeness there is another mapped C++ class, which uses
+C<TimezoneRecipe05SP>. There is nothing new for a reader familiar with the
+previous recipes.
+
+    // C++ class
+    struct DateRecipe05 {
+        DateRecipe05()  { update() ; }
+        void update()   { epoch = std::time(nullptr); }
+
+        int get_epoch() const { return epoch; }
+        void set_timezone(TimezoneRecipe05SP tz_) { tz = tz_; }
+        TimezoneRecipe05SP get_timezone() { return tz; }
+    private:
+        std::time_t epoch;
+        TimezoneRecipe05SP tz;
+    };
+
+    // typemap
+    namespace xs {
+        template <>
+        struct Typemap<DateRecipe05*> : TypemapObject<DateRecipe05*, DateRecipe05*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+            static std::string package () { return "MyTest::Cookbook::DateRecipe05"; }
+        };
+    }
+
+    // xs-adapter
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::DateRecipe05
+    PROTOTYPES: DISABLE
+
+    DateRecipe05* DateRecipe05::new() { RETVAL = new DateRecipe05(); }
+
+    void DateRecipe05::update()
+
+    std::time_t DateRecipe05::get_epoch()
+
+    TimezoneRecipe05SP DateRecipe05::get_timezone()
+
+    void DateRecipe05::set_timezone(TimezoneRecipe05SP tz)
+
+The SV* wrapper identity is not preserved when it is set to Date and returned back,
+i.e. the same as in previous recipe.

@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-WCS
 
+0.003     2019-07-12
+
+  -  Check Min Perl Version
+  -  Switch to Git::Gatherdir
+  -  Setup Travis-CI
+
 0.002     2019-05-01
 
   -  Fix plugin typo

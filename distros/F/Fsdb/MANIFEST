@@ -138,6 +138,8 @@ TEST/dbcol_ex.out
 TEST/dbcol_ex_S.cmd
 TEST/dbcol_ex_S.in
 TEST/dbcol_ex_S.out
+TEST/dbcol_missing_file.cmd
+TEST/dbcol_missing_file.out
 TEST/dbcol_numeric.cmd
 TEST/dbcol_numeric.out
 TEST/dbcol_omit.cmd
@@ -348,8 +350,6 @@ TEST/dbcolstats_extrema_wrong.in
 TEST/dbcolstats_extrema_wrong.out
 TEST/dbcolstats_fieldseparator.cmd
 TEST/dbcolstats_fieldseparator.out
-TEST/dbcolstats_fieldseperator.cmd
-TEST/dbcolstats_fieldseperator.out
 TEST/dbcolstats_large_input.cmd
 TEST/dbcolstats_large_input.in
 TEST/dbcolstats_large_input.out
@@ -511,6 +511,7 @@ TEST/dbjoin_ex.cmd
 TEST/dbjoin_ex.in
 TEST/dbjoin_ex.in-2
 TEST/dbjoin_ex.out
+TEST/dbjoin_ex_overflow.in-2
 TEST/dbjoin_ex_R.cmd
 TEST/dbjoin_ex_R.in
 TEST/dbjoin_ex_R.in-2
@@ -533,8 +534,8 @@ TEST/dbjoin_left_outer_righthash.cmd
 TEST/dbjoin_left_outer_righthash.out
 TEST/dbjoin_lefthash.cmd
 TEST/dbjoin_lefthash.out
-TEST/dbjoin_lefthash_unshorted.cmd
-TEST/dbjoin_lefthash_unshorted.out
+TEST/dbjoin_lefthash_unsorted.cmd
+TEST/dbjoin_lefthash_unsorted.out
 TEST/dbjoin_missing_last_1.cmd
 TEST/dbjoin_missing_last_1.in
 TEST/dbjoin_missing_last_1.in-2
@@ -570,6 +571,8 @@ TEST/dbjoin_right_outer_righthash.cmd
 TEST/dbjoin_right_outer_righthash.out
 TEST/dbjoin_righthash.cmd
 TEST/dbjoin_righthash.out
+TEST/dbjoin_righthash_overflow.cmd
+TEST/dbjoin_righthash_overflow.out
 TEST/dbjoin_righthash_unsorted.cmd
 TEST/dbjoin_righthash_unsorted.out
 TEST/dbjoin_unsorted.cmd

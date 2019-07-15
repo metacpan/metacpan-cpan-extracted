@@ -1,5 +1,15 @@
 Revision history for this software.
 
+0.16 2019-07-14 00:00:00
+  - fix quoting in Makefile.PL
+  - created by INABA Hitoshi
+
+0.15 2019-07-12 00:00:00
+  - fix Extra Issues: has_meta_json
+  - fix Extra Issues: use_warnings
+  - fix Experimental Issues: meta_yml_has_repository_resource
+  - created by INABA Hitoshi
+
 0.14 2018-02-19 00:00:00
   - remove pMakefile.PL
   - add pmake.bat

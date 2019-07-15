@@ -16,8 +16,8 @@
          "schema:category" : "issue-1004",
          "schema:domainIncludes" : "schema:BroadcastFrequencySpecification",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       }
    }

@@ -1,5 +1,9 @@
 Revision history for Perl module YAML::LibYAML::API
 
+0.007 2019-07-12 18:48:13+02:00
+
+    - Change test to use YAML::PP::Common constants
+
 0.006 2019-06-20 20:11:54+02:00
 
     - Include libyaml sources

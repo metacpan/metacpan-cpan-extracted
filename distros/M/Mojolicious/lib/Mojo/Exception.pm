@@ -3,11 +3,12 @@ use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Exporter 'import';
-use Mojo::Util qw(decode deprecated);
+use Mojo::Util 'decode';
 use Scalar::Util 'blessed';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message                                    => 'Exception!';
+has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} };
 
 our @EXPORT_OK = qw(check raise);
 
@@ -17,24 +18,23 @@ sub check {
   # Finally (search backwards since it is usually at the end)
   my $guard;
   for (my $i = $#spec - 1; $i >= 0; $i -= 2) {
-    next unless $spec[$i] eq 'finally';
-    $guard = Mojo::Exception::_Guard->new(finally => $spec[$i + 1]);
-    last;
+    ($guard = Mojo::Exception::_Guard->new(finally => $spec[$i + 1])) and last
+      if $spec[$i] eq 'finally';
   }
 
   return undef unless $err;
 
   my ($default, $handler);
-  my $is_obj = blessed $err;
+  my ($is_obj, $str) = (!!blessed($err), "$err");
 CHECK: for (my $i = 0; $i < @spec; $i += 2) {
     my ($checks, $cb) = @spec[$i, $i + 1];
 
     ($default = $cb) and next if $checks eq 'default';
 
     for my $c (ref $checks eq 'ARRAY' ? @$checks : $checks) {
-      my $is_re = ref $c eq 'Regexp';
-      ($handler = $cb) and last CHECK if $is_obj  && !$is_re && $err->isa($c);
-      ($handler = $cb) and last CHECK if !$is_obj && $is_re  && $err =~ $c;
+      my $is_re = !!ref $c;
+      ($handler = $cb) and last CHECK if $is_obj && !$is_re && $err->isa($c);
+      ($handler = $cb) and last CHECK if $is_re  && $str =~ $c;
     }
   }
 
@@ -103,9 +103,12 @@ sub to_string {
   }
 
   my $frames = $self->frames;
-  if (@$frames) {
+  if (my $max = @$frames) {
     $str .= "Traceback (most recent call first):\n";
-    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n} for @$frames;
+    my $offset = $self->verbose ? $#$frames : $#$frames <= 4 ? $#$frames : 4;
+    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n}
+      for @$frames[0 .. $offset];
+    $str .= "  ...\n" if $max > ($offset + 1);
   }
 
   return $str;
@@ -118,12 +121,6 @@ sub trace {
   my @frames;
   while (my @trace = caller($start++)) { push @frames, \@trace }
   return $self->frames(\@frames);
-}
-
-# DEPRECATED!
-sub verbose {
-  deprecated 'Mojo::Exception::verbose is DEPRECATED';
-  return $_[0];
 }
 
 sub _append {
@@ -190,7 +187,7 @@ Mojo::Exception - Exception base class
     'MyApp::X::Bar' => sub { say "Bar: $_" }
   );
 
-  # Create exceptions dynamically and handle them gracefully
+  # Generate exception classes on demand
   use Mojo::Exception qw(check raise);
   eval {
     raise 'MyApp::X::Name', 'The name Minion is already taken';
@@ -225,51 +222,36 @@ change without warning!
     dangerous_code();
   };
   check(
-    'MyApp::X::Foo' => sub {
-      say "Foo: $_";
-    },
-    qr/Could not open/ => sub {
-      say "Open error: $_";
-    },
-    default => sub {
-      say "Something went wrong: $_";
-    },
-    finally => sub {
-      say 'Dangerous code is done';
-    }
+    'MyApp::X::Foo'     => sub { say "Foo: $_" },
+    qr/^Could not open/ => sub { say "Open error: $_" },
+    default             => sub { say "Something went wrong: $_" },
+    finally             => sub { say 'Dangerous code is done' }
   );
 
 Matching conditions can be class names for ISA checks on exception objects, or
-regular expressions to match string exceptions. The matching exception will be
-the first argument passed to the callback, and is also available as C<$_>.
+regular expressions to match string exceptions and stringified exception
+objects. The matching exception will be the first argument passed to the
+callback, and is also available as C<$_>.
 
   # Catch MyApp::X::Foo object or a specific string exception
   eval {
     dangerous_code();
   };
   check(
-    'MyApp::X::Foo' => sub {
-      say "Foo: $_";
-    },
-    qr/^Could not open/ => sub {
-      say "Open error: $_";
-    }
+    'MyApp::X::Foo'     => sub { say "Foo: $_" },
+    qr/^Could not open/ => sub { say "Open error: $_" }
   );
 
 An array reference can be used to share the same handler with multiple
-conditions, of which only one needs to match.
+conditions, of which only one needs to match. And since exception handlers are
+just callbacks, they can also throw their own exceptions.
 
   # Handle MyApp::X::Foo and MyApp::X::Bar the same
   eval {
     dangerous_code();
   };
   check(
-    ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub {
-      say "Foo/Bar: $_";
-    },
-    'MyApp::X::Yada' => sub {
-      say "Yada: $_";
-    }
+    ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub { die "Foo/Bar: $_" }
   );
 
 There are currently two keywords you can use to set special handlers. The
@@ -282,12 +264,8 @@ exception was rethrown or if there was no exception to be handled at all.
     dangerous_code();
   };
   check(
-    default => sub {
-      say "Error: $_";
-    },
-    finally => sub {
-      say 'Dangerous code is done';
-    }
+    default => sub { say "Error: $_" },
+    finally => sub { say 'Dangerous code is done' }
   );
 
 =head2 raise
@@ -341,6 +319,14 @@ Lines before the line where the exception occurred if available.
   $e      = $e->message('Died at test.pl line 3.');
 
 Exception message, defaults to C<Exception!>.
+
+=head2 verbose
+
+  my $bool = $e->verbose;
+  $e       = $e->verbose($bool);
+
+Show more information with L</"to_string">, such as additional L</"frames">,
+defaults to the value of the C<MOJO_EXCEPTION_VERBOSE> environment variable.
 
 =head1 METHODS
 

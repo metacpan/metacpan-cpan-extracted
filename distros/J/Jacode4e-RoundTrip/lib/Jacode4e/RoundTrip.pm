@@ -1,5 +1,5 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.6';
+$VERSION = '2.13.81.7';
 ######################################################################
 #
 # Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
@@ -127,6 +127,7 @@ $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 my %tr = ();
 my @encodings = qw(

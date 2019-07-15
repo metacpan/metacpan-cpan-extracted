@@ -1,29 +1,29 @@
 package Pcore::Dist::Build::PAR::Script;
 
 use Pcore -class, -ansi;
-use Pcore::Util::Text qw[add_num_sep];
-use Pcore::Util::File::Tree;
+use Pcore::Lib::Text qw[add_num_sep];
+use Pcore::Lib::File::Tree;
 use Archive::Zip qw[];
 use PAR::Filter;
 use Config;
 use Fcntl qw[:DEFAULT SEEK_END];
 
 has dist    => ( required => 1 );    # InstanceOf ['Pcore::Dist']
-has script  => ( required => 1 );    # InstanceOf ['Pcore::Util::Path']
+has script  => ( required => 1 );    # InstanceOf ['Pcore::Lib::Path']
 has release => ( required => 1 );
 has crypt   => ( required => 1 );
 has clean   => ( required => 1 );
 has gui     => ( required => 1 );
 has mod     => ( required => 1 );    # HashRef
 
-has tree         => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Util::File::Tree']
+has tree         => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Lib::File::Tree']
 has par_suffix   => ( is => 'lazy', init_arg => undef );
 has exe_filename => ( is => 'lazy', init_arg => undef );
 has main_mod       => ( sub { {} }, is => 'lazy', init_arg => undef );    # HashRef, main modules, found during deps processing
 has shared_objects => ( init_arg       => undef );                        # HashRef
 
 sub _build_tree ($self) {
-    return Pcore::Util::File::Tree->new;
+    return Pcore::Lib::File::Tree->new;
 }
 
 sub _build_par_suffix ($self) {

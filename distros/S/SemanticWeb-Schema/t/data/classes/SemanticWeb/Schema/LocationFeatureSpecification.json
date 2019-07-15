@@ -12,9 +12,9 @@
          "rdfs:comment" : "The hours during which this service or contact is available.",
          "rdfs:label" : "hoursAvailable",
          "schema:domainIncludes" : [
-            "schema:LocationFeatureSpecification",
             "schema:Service",
-            "schema:ContactPoint"
+            "schema:ContactPoint",
+            "schema:LocationFeatureSpecification"
          ],
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
       },
@@ -25,14 +25,17 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
-            "schema:MonetaryAmount",
+            "schema:OpeningHoursSpecification",
             "schema:Demand",
+            "schema:MonetaryAmount",
             "schema:PriceSpecification",
             "schema:Permit",
-            "schema:Offer",
-            "schema:OpeningHoursSpecification"
+            "schema:Offer"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
       },
       "schema:validThrough" : {
          "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
@@ -40,15 +43,18 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
+            "schema:LocationFeatureSpecification",
             "schema:Offer",
             "schema:OpeningHoursSpecification",
             "schema:JobPosting",
             "schema:PriceSpecification",
-            "schema:Demand",
             "schema:MonetaryAmount",
-            "schema:LocationFeatureSpecification"
+            "schema:Demand"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
       }
    }
 }

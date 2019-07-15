@@ -13,6 +13,7 @@ use version;
 use lib qw(lib);
 use Dist::Zilla::Plugin::Author::GSG;
 
+$ENV{EMAIL} = 'fake@example.com'; # force a default for git
 #$Git::Wrapper::DEBUG = 1;
 
 my $dir = File::Temp->newdir("dzpag-XXXXXXXXX");
@@ -24,6 +25,8 @@ my $dir = File::Temp->newdir("dzpag-XXXXXXXXX");
     my $version = $git->version;
     plan skip_all => "Git is too old: $version"
         if $version < version->parse(v1.7.5);
+
+    diag "Have git $version";
 
     $git->init;
     $git->commit( { m => 'init', date => '2001-02-03 04:05:06' },

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has base_salary => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::EmployeeRole - A subclass of OrganizationRole used to descr
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -68,11 +68,11 @@ A base_salary should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =item C<Num>
-
-=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
 
 =back
 

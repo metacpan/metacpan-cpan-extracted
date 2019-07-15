@@ -14,11 +14,11 @@
          "rdfs:label" : "currency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
+            "schema:ExchangeRateSpecification",
+            "schema:DatedMoneySpecification",
             "schema:LoanOrCredit",
             "schema:MonetaryAmount",
-            "schema:ExchangeRateSpecification",
-            "schema:MonetaryAmountDistribution",
-            "schema:DatedMoneySpecification"
+            "schema:MonetaryAmountDistribution"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -28,10 +28,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:PropertyValueSpecification",
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:QuantitativeValue"
+            "schema:PropertyValue",
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -41,10 +41,10 @@
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValue",
-            "schema:PropertyValueSpecification"
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification",
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -55,14 +55,17 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
-            "schema:MonetaryAmount",
+            "schema:OpeningHoursSpecification",
             "schema:Demand",
+            "schema:MonetaryAmount",
             "schema:PriceSpecification",
             "schema:Permit",
-            "schema:Offer",
-            "schema:OpeningHoursSpecification"
+            "schema:Offer"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
       },
       "schema:validThrough" : {
          "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
@@ -70,31 +73,34 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
+            "schema:LocationFeatureSpecification",
             "schema:Offer",
             "schema:OpeningHoursSpecification",
             "schema:JobPosting",
             "schema:PriceSpecification",
-            "schema:Demand",
             "schema:MonetaryAmount",
-            "schema:LocationFeatureSpecification"
+            "schema:Demand"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
       },
       "schema:value" : {
          "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The value of the quantitative value or property value node.<br/><br/>\n\n<ul>\n<li>For <a class=\"localLink\" href=\"http://schema.org/QuantitativeValue\">QuantitativeValue</a> and <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a>, the recommended type for values is 'Number'.</li>\n<li>For <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a>, it can be 'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li>\n</ul>\n",
+         "rdfs:comment" : "The value of the quantitative value or property value node.<br/><br/>\n\n<ul>\n<li>For <a class=\"localLink\" href=\"http://schema.org/QuantitativeValue\">QuantitativeValue</a> and <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a>, the recommended type for values is 'Number'.</li>\n<li>For <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a>, it can be 'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li>\n<li>Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.</li>\n<li>Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.</li>\n</ul>\n",
          "rdfs:label" : "value",
          "schema:domainIncludes" : [
             "schema:PropertyValue",
-            "schema:MonetaryAmount",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : [
             "schema:Number",
+            "schema:StructuredValue",
             "schema:Boolean",
-            "schema:Text",
-            "schema:StructuredValue"
+            "schema:Text"
          ]
       }
    }

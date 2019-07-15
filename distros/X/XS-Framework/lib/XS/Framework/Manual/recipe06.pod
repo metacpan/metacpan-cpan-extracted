@@ -1,0 +1,130 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework basics
+
+=cut
+
+=head1 DESCRIPTION
+
+Let's assume that the following type hierarchy in C++:
+
+    struct Base06 {
+        virtual const char* method() { return "from base"; }
+        virtual ~Base06() { }
+    };
+
+    struct Derived06A: public Base06 {
+        virtual const char* method() { return "from derived-A"; }
+        const char* specific_method() { return "specific-A"; }
+    };
+
+    struct Derived06B: public Base06 {
+        virtual const char* method() { return "from derived-B"; }
+        const char* specific_method() { return "specific-B"; }
+    };
+
+The typemaps should also reflect the hierarchy as:
+
+    namespace xs {
+        template <typename D>
+        //              (1)
+        struct Typemap<Base06*, D> : TypemapObject<Base06*, D, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        //                      (2)                         (3)
+            static std::string package () { return "MyTest::Cookbook::Base04"; }
+        //                      (4)
+        };
+
+        template <> struct Typemap<Derived06A*> : Typemap<Base06*, Derived06A*> {
+        //                                                  (5)
+            static std::string package () { return "MyTest::Cookbook::Derived06A"; }
+        };
+
+        template <> struct Typemap<Derived06B*> : Typemap<Base06*, Derived06B*> {
+        //                                                  (6)
+            static std::string package () { return "MyTest::Cookbook::Derived06B"; }
+        };
+    }
+
+The base type in C++, which has to be base class in Perl too, have to be defined
+as I<partial> template specialization (1). This is important moment: the partial
+specialization for base class defines typemap for base class itself B<and>
+for all derived classes. This is done when template parameter C<D> is substituted
+in (2) and (3) either with C<Base06> class or any child (grand-child,
+grand-grand-...-child) derived class.
+
+The base typemap also B<defines and fixes> life time, storage and casting policies
+for all hierarchy. In almost all cases this follows DWIM principle.
+
+The default package name (4) is used for base class on C<xs::out> when no C<hint>
+parameter is supplied.
+
+The derived classes, as they are final (i.e. no other derived classes expected),
+should do full specialization of typemap and B<inherit the specialized> base
+typemap (5), (6). If the derived classes are non final, they should be patrially
+specialized. In other words, if you are writing library, which is supposed
+to be extended in XS/C++, then, make your typemaps extendable (partially
+specialized).
+
+That complexity with typemap<B, D> is needed to perform B<fast> casting right
+from Base* pointer to DerivedN* pointer, ommiting all intermediate classes.
+
+The xs-adapters will be:
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::Base06
+    PROTOTYPES: DISABLE
+
+    const char* Base06::method()
+
+    Base06* Base06::new()
+    #             (7)
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::Derived06A
+    PROTOTYPES: DISABLE
+
+    Derived06A* Derived06A::new()
+    #                   (8)
+
+    const char* Derived06A::specific_method()
+    #                   (9)
+
+    BOOT {
+        Stash(__PACKAGE__).inherit("MyTest::Cookbook::Base06");
+        //  (10)
+    }
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::Derived06B
+    PROTOTYPES: DISABLE
+
+    Derived06B* Derived06B::new()
+    #               (10)
+
+    const char* Derived06B::specific_method()
+    #               (11)
+
+    BOOT {
+        Stash(__PACKAGE__).inherit("MyTest::Cookbook::Base06");
+        //          (12)
+    }
+
+
+It is possible to use short-cut constructors (7), (8), (10). It will
+automatically call the base constructor of the related class and forward all
+parameters. All constructors for all XS-adapters have to be defined,
+as they are not inherited.
+
+The xs-adapters B<should also reflect classes hierarhy>. That way the adapted
+C<method> can be written once in base xs-adapter only (assuming, that no
+additional/specific actions in XS-adapter are needed). That way the following
+code works as expected:
+
+    MyTest::Cookbook::Derived06A->new->method;  # => "from derived-A"
+
+The xs-hierarhy is defined as hierarchy between corresponding stashes at
+C<BOOT> method (10), (12). The macros C<__PACKAGE__> is substituted to
+C string literal of the most recently parsed C<PACKAGE> preambula.
+
+That's way there is need to define only class-specific methods (9), (11)
+
+The short summary: typemaps for base classes should be extensible (patrially
+specialized) and typemaps and xs-adapters should reflect original C++
+hierarchy.

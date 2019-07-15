@@ -1,12 +1,12 @@
 package Pcore::API::AntiCaptcha::Result;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[weaken];
+use Pcore::Lib::Scalar qw[weaken];
 use overload
   bool     => sub { ( $_[0]->{is_finished} // 0 ) && ( $_[0]->{is_resolved} // 0 ) },
   fallback => 1;
 
-with qw[Pcore::Util::Result::Role];
+with qw[Pcore::Lib::Result::Role];
 
 has api => ( required => 1 );
 

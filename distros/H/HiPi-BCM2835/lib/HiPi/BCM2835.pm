@@ -21,7 +21,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi :i2c );
 
-our $VERSION ='0.63';
+our $VERSION ='0.64';
 
 XSLoader::load('HiPi::BCM2835', $VERSION) if HiPi::is_raspberry_pi();
 
@@ -230,9 +230,10 @@ _register_exported_constants( qw(
 #----------------------------------------------------------
 
 use constant {
-    BCM2835_GPIO_PUD_OFF  => 0,  # < Off ? disable pull-up/down
-    BCM2835_GPIO_PUD_DOWN => 1,  # < Enable Pull Down control
-    BCM2835_GPIO_PUD_UP   => 2   # < Enable Pull Up control
+    BCM2835_GPIO_PUD_OFF   => 0,  # < Off ? disable pull-up/down
+    BCM2835_GPIO_PUD_DOWN  => 1,  # < Enable Pull Down control
+    BCM2835_GPIO_PUD_UP    => 2,   # < Enable Pull Up control
+    BCM2835_GPIO_PUD_ERROR => 0x100,
 };
 
 _register_exported_constants( qw(
@@ -240,6 +241,7 @@ _register_exported_constants( qw(
     BCM2835_GPIO_PUD_OFF
     BCM2835_GPIO_PUD_DOWN
     BCM2835_GPIO_PUD_UP
+    BCM2835_GPIO_PUD_ERROR
     ) );
 
 #----------------------------------------------------------
@@ -826,6 +828,7 @@ _register_exported_constants( qw(
         gpio_write_multi
         gpio_write_mask
         gpio_set_pud
+        gpio_get_pud
         spi_begin
         spi_end
         spi_setBitOrder
@@ -887,13 +890,13 @@ our @_altnames = (
     [qw( UART0_TXD     SD6          ALT2   ALT3   ALT4   UART1_TXD ) ], # GPIO 14
     [qw( UART0_RXD     SD7          ALT2   ALT3   ALT4   UART1_RXD ) ], # GPIO 15
     
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 16
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_CE2_N        ALT5 ) ], # GPIO 16
     [qw( ALT0          SD9          ALT2   UART0_RTS   SPI1_CE1_N  UART1_RTS ) ], # GPIO 17
     [qw( PCM_CLK       SD10         ALT2   BSCSL_SDA/MOSI   SPI1_CE0_N   PWM0 ) ], # GPIO 18
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 19
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MISO        ALT5 ) ], # GPIO 19
     
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 20
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        GPCLK1 ) ], # GPIO 21
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MOSI        ALT5 ) ], # GPIO 20
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_SCLK        GPCLK1 ) ], # GPIO 21
     [qw( ALT0          SD14         ALT2   SD1_CLK   ARM_TRST ALT5 ) ], # GPIO 22
     [qw( ALT0          SD15         ALT2   SD1_CMD   ARM_RTCK ALT5 ) ], # GPIO 23
     

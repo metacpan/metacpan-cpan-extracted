@@ -1,6 +1,6 @@
 NAME
 
-  japerl - JPerl-again Perl (glocalization scripting environment)
+  App::japerl - JPerl-again Perl glocalization scripting environment
 
 SYNOPSIS
 
@@ -34,8 +34,8 @@ DESCRIPTION
 INSTALLATION
 
   1. Install a member of Char software family
-  2. Copy japerl.bat or japerl.sh to any directory
-  3. Customize japerl.bat or japerl.sh
+  2. Copy japerl.bat to any directory
+  3. Customize japerl.bat
 
 SEE ALSO
 

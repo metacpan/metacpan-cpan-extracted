@@ -53,6 +53,6 @@
          "web" : "https://github.com/LotarProject/perl-Net-SecurityCenter"
       }
    },
-   "version" : "0.200",
+   "version" : "0.201",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

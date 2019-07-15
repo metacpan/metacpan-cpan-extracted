@@ -1,0 +1,279 @@
+#!/usr/bin/perl -w
+use strict; # $Id: monm_dbi 80 2019-07-08 10:41:47Z abalama $
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+monm_dbi - tiny DBI checker for App::MonM
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    monm_dbi [ --dsn=DSN | --sid=SID ] [ --user=DB_USERNAME ]
+             [ --password=DB_PASSWORD ] [ --sql=SQL ]
+             [-a "DBI_ATTR_1=Value"] [-a "DBI_ATTR_n=Value"]
+
+    monm_dbi -n "DBI:mysql:database=test;host=192.0.0.1"
+             -u user -p password -q "SELECT * FROM mytable"
+             -a "mysql_enable_utf8=1" -a "PrintError=0"
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-a "DBI_Attribute=Value">
+
+    -a "DBI_Attribute=Value"
+    -a "DBI_Attribute Value"
+
+This is multiple option for setting DBI attributes
+
+Default: "PrintError = 0"
+
+=item B<-n DSN, --dsn=DSN>
+
+DSN of database connection
+
+    DBI:mysql:database=DATABASE;host=HOST;port=PORT
+    DBI:Pg:dbname=DATABASE;host=HOST;port=PORT;options=OPTIONS
+    DBI:Oracle:SID
+    DBI:Oracle:host=HOST;sid=SID
+    DBI:SQLite:dbname=mybase.db
+    DBI:CSV:f_dir=/path/to/csvdb
+
+Default: "DBI:Sponge:"
+
+See also L<DBI>
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-p DB_PASSWORD, --password=DB_PASSWORD>
+
+DB password
+
+=item B<-q SQL, --sql=SQL>
+
+SQL query string
+
+=item B<-s SID, --sid=SID>
+
+Oracle SID (Service Name)
+
+B<NOTE!> For Oracle only!
+
+=item B<-u DB_USERNAME, --user=DB_USERNAME>
+
+DB username
+
+=back
+
+=head1 DESCRIPTION
+
+Tiny DBI checker for App::MonM. Based on oradebug
+
+=head1 DEPENDENCES
+
+L<DBI>
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use DBI;
+use CTK;
+use CTK::Util qw/ variant_stf /;
+
+use App::MonM::Util qw/ explain red green yellow set2attr /;
+use App::MonM::Const qw/
+        IS_TTY SCREENWIDTH
+        OK DONE ERROR SKIPPED PASSED FAILED UNKNOWN PROBLEM
+    /;
+
+use constant {
+    DSN      => "dbi:Sponge:",
+    SQL      => "SELECT 'OK' AS STATUS FROM DUAL",
+    DBI_ATTRIBUTES => [
+            "PrintError = 0",
+        ],
+};
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # Information
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+
+    # General
+    "dsn|n=s",              # DSN
+    "sid|orasid|s=s",       # SID
+    "user|username|login|u=s",  # DB Login
+    "password|passwd|pass|p=s", # DB Password
+    "sql|query|q=s",        # SQL
+    "attr|attribute|a=s@",  # List of attributes
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+
+my $sw = (SCREENWIDTH() - 9);
+my $status = 1;
+
+sub _start {
+    my $s = shift // '';
+    my $l = length($s);
+    return $s.($l<$sw?('.'x($sw-$l)):'').' '
+}
+
+my $ctk = new CTK;
+my $sid         = $options->{sid} || "";
+my $default_dsn = sprintf("DBI:Oracle:%s", $sid) if $sid;
+my $dsn         = $options->{dsn} || $default_dsn || DSN;
+my $user        = $options->{user} // '';
+my $password    = $options->{password} // '';
+my $sql         = $options->{sql} || SQL;
+my $attr_src    = $options->{attr} || DBI_ATTRIBUTES;
+my $attr        = [];
+foreach my $v (@$attr_src) {
+    $v =~ s/\=/ /;
+    push @$attr, $v;
+}
+START: printf("START TRANSACTION [$$] {TimeStamp: %s}\n", $ctk->tms);
+
+# Connect
+print _start(sprintf("> 1/7 Connecting to \"%s\"", $dsn));
+my $ora = DBI->connect($dsn, $user, $password, set2attr($attr));
+if ($ora) {
+    print IS_TTY ? green(PASSED) : PASSED, "\n";
+} else {
+    print IS_TTY ? red(FAILED) : FAILED, "\n";
+    print STDERR $DBI::errstr, "\n";
+    $status = 0;
+    goto FINISH;
+}
+
+# Prepare
+print _start(sprintf("> 2/7 SQL preparing \"%s\"", variant_stf($sql, 50)));
+my $sth = $ora->prepare($sql);
+if (!$ora->err) {
+    if ($sth) {
+        print IS_TTY ? green(PASSED) : PASSED, "\n";
+    } else {
+        print IS_TTY ? red(FAILED) : FAILED, "\n";
+        printf STDERR "Can't prepare SQL: %s\n", $sql;
+        $status = 0;
+        goto FINISH;
+    }
+} else {
+    print IS_TTY ? red(FAILED) : FAILED, "\n";
+    print STDERR $ora->errstr, "\n" if $ora->errstr;
+    $status = 0;
+    goto FINISH;
+}
+
+# Execute
+print _start("> 3/7 SQL executing");
+my $rv = $sth->execute();
+if (!$ora->err) {
+    if ($rv) {
+        print IS_TTY ? green(PASSED) : PASSED, "\n";
+    } else {
+        print IS_TTY ? red(FAILED) : FAILED, "\n";
+        printf STDERR "Can't execute SQL: %s\n", $sql;
+        $status = 0;
+        goto FINISH;        
+    }
+} else {
+    print IS_TTY ? red(FAILED) : FAILED, "\n";
+    print STDERR $ora->errstr, "\n" if $ora->errstr;
+    $status = 0;
+    goto FINISH;
+}
+
+# Fetching
+print _start("> 4/7 Result fetching");
+my $result = $sth->fetchrow_hashref;
+if (!$ora->err) {
+    print IS_TTY ? green(PASSED) : PASSED, "\n";
+} else {
+    print IS_TTY ? red(FAILED) : FAILED, "\n";
+    print STDERR $ora->errstr, "\n" if $ora->errstr;
+    $status = 0;
+    goto FINISH;
+}
+
+# Finishing
+print _start("> 5/7 Finishing");
+$sth->finish;
+if (!$ora->err) {
+    print IS_TTY ? green(PASSED) : PASSED, "\n";
+} else {
+    print IS_TTY ? red(FAILED) : FAILED, "\n";
+    print STDERR $ora->errstr, "\n" if $ora->errstr;
+    $status = 0;
+    goto FINISH;
+}
+
+# Disconnecting
+print _start("> 6/7 Disconnecting");
+$ora->disconnect or do {
+    print IS_TTY ? red(FAILED) : FAILED, "\n";
+    print STDERR $ora->errstr, "\n" if $ora->errstr;
+    $status = 0;
+    goto FINISH;
+};
+print IS_TTY ? green(PASSED) : PASSED, "\n";
+
+# Result
+print _start("> 7/7 Show content");
+if (defined($result)) {
+    if (length($result) && !ref($result)) {
+        print IS_TTY ? green(PASSED) : PASSED, "\n";
+        printf("-----BEGIN RESPONSE CONTENT-----\n%s\n-----END RESPONSE CONTENT-----\n", $result)
+    } elsif (length($result) && ref($result)) {
+        print IS_TTY ? green(PASSED) : PASSED, "\n";
+        printf("-----BEGIN RESPONSE CONTENT-----\n%s\n-----END RESPONSE CONTENT-----\n", explain($result))
+    } else {
+        print IS_TTY ? yellow(SKIPPED) : SKIPPED, "\n";
+    }
+} else {
+    print IS_TTY ? yellow(SKIPPED) : SKIPPED, "\n";
+}
+
+FINISH: printf("FINISH TRANSACTION [$$] {TimeStamp: %s} WITH STATUS = %s\n", $ctk->tms, $status ? OK : ERROR);
+
+exit($status ? 0 : 1);
+
+
+__END__

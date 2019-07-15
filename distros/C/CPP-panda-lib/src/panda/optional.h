@@ -9,31 +9,57 @@ namespace panda {
 #else
 
 namespace panda {
-  template <typename T>
-  struct optional {
-    optional() : exists(false) {}
-    optional(const T& val) :val(val), exists(true) {}
 
-    T value() const {
-      return val;
+// see catch_option.hpp from Catch2 
+template <typename T> struct optional {
+    ~optional() { reset(); }
+
+    optional() : nullable_val(nullptr) {}
+    
+    optional(const T& val) : nullable_val(new (storage) T(val)) {}
+    
+    optional(const optional& oth) : nullable_val(oth ? new (storage) T(*oth) : nullptr) {}
+    
+    optional& operator=(optional const& oth) {
+        if (&oth != this) {
+            reset();
+            if (oth)
+                nullable_val = new (storage) T(*oth);
+        }
+        return *this;
+    }
+    
+    optional& operator=(const T& val) {
+        reset();
+        nullable_val = new (storage) T(val);
+        return *this;
     }
 
-    T value_or(const T& def) const {
-      return exists ? val : def;
+    void reset() {
+        if (nullable_val)
+            nullable_val->~T();
+        nullable_val = nullptr;
     }
 
-    explicit operator bool() const {
-      return exists;
-    }
+    T&       operator*() { return *nullable_val; }
+    const T& operator*() const { return *nullable_val; }
+    T*       operator->() { return nullable_val; }
+    const T* operator->() const { return nullable_val; }
 
-    T val;
-    bool exists;
-  };
+    T value_or(const T& default_val) const { return nullable_val ? *nullable_val : default_val; }
 
-  template <typename T>
-  struct optional_tools {
-      using type = optional<T>;
-      static type default_value() {return type{};}
+    T value() const { return *nullable_val; }
+
+    explicit operator bool() const { return nullable_val != nullptr; }
+
+private:
+    T* nullable_val;
+    alignas(alignof(T)) char storage[sizeof(T)];
+};
+
+template <typename T> struct optional_tools {
+    using type = optional<T>;
+    static type default_value() { return type{}; }
   };
 
   template <>
@@ -44,4 +70,3 @@ namespace panda {
 }
 
 #endif
-

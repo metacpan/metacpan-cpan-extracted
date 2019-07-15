@@ -14,17 +14,23 @@
             "schema:LodgingReservation",
             "schema:LodgingBusiness"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
       },
       "schema:checkoutTime" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:LodgingReservation"
+            "schema:LodgingReservation",
+            "schema:LodgingBusiness"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
       },
       "schema:lodgingUnitDescription" : {
          "rdf:type" : "rdf:Property",
@@ -39,8 +45,8 @@
          "rdfs:label" : "lodgingUnitType",
          "schema:domainIncludes" : "schema:LodgingReservation",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QualitativeValue"
          ]
       },
       "schema:numAdults" : {

@@ -1,9 +1,11 @@
 lib/Strict/Perl.pm
 Changes
-Makefile.PL
-pmake.bat
-MANIFEST
-README
-META.yml
 LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+pmake.bat
 t/001_test.t
+t/2001_podtest.t

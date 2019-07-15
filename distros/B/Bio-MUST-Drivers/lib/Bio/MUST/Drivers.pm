@@ -3,7 +3,7 @@ package Bio::MUST::Drivers;
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
-$Bio::MUST::Drivers::VERSION = '0.181160';
+$Bio::MUST::Drivers::VERSION = '0.191910';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Bio::MUST::Drivers - Bio::MUST classes for driving external programs
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,12 @@ version 0.181160
 
 =head1 DESCRIPTION
 
-    # TODO
+External dependencies are installed automatically at first use if the C<brew>
+executable is available in the C<$PATH>. Alternatively, dependencies can be
+installed (either using C<apt-get>, C<brew> or manually) by the user prior or
+after installing the distribution itself. C<brew> is the main command of the I<Homebrew> package manager L<https://brew.sh/>.
+
+Note that any test requiring a missing dependency is skipped when testing.
 
 =head1 AUTHOR
 

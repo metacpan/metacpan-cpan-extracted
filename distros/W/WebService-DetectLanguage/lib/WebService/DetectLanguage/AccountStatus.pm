@@ -1,5 +1,5 @@
 package WebService::DetectLanguage::AccountStatus;
-$WebService::DetectLanguage::AccountStatus::VERSION = '0.01';
+$WebService::DetectLanguage::AccountStatus::VERSION = '0.02';
 use 5.006;
 use Moo;
 

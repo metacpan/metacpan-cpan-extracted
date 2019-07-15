@@ -1,3 +1,5 @@
+.drone.yml
+.travis.yml
 Build.PL
 Changes
 LICENSE
@@ -5,6 +7,7 @@ MANIFEST
 META.json
 META.yml
 README
+cpanfile
 examples/fib.pl
 lib/Hash/Lazy.pm
 lib/Hash/Lazy/Tie.pm

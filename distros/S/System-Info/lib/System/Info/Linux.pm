@@ -177,9 +177,10 @@ sub prepare_os {
 	}
     else {
 	# /etc/issue:
-	#  Welcome to SUSE LINUX 10.0 (i586) - Kernel \r (\l).
+	#  Welcome to SUSE LINUX 10.0 "Prague" (i586) - Kernel \r (\l).
+	#  Welcome to openSUSE 10.1 "Agama Lizard" (i586) - Kernel \r (\l).
 	#  Welcome to openSUSE 10.2 (i586) - Kernel \r (\l).
-	#  Welcome to openSUSE 10.2 (X86-64) - Kernel \r (\l).
+	#  Welcome to openSUSE 10.2 "Basilisk Lizard" (X86-64) - Kernel \r (\l).
 	#  Welcome to openSUSE 10.3 (i586) - Kernel \r (\l).
 	#  Welcome to openSUSE 10.3 (X86-64) - Kernel \r (\l).
 	#  Welcome to openSUSE 11.1 - Kernel \r (\l).
@@ -497,7 +498,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2018, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2019, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

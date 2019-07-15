@@ -5,15 +5,15 @@ package Strict::Perl;
 #
 # http://search.cpan.org/dist/Strict-Perl/
 #
-# Copyright (c) 2014, 2015, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2015, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2018.03';
+$VERSION = '2019.07';
 $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
-local $^W = 1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 # use strict;
 sub _strict {
@@ -306,7 +306,7 @@ Strict::Perl - Perl module to restrict old/unsafe constructs
 
 =head1 SYNOPSIS
 
-  use Strict::Perl 2018.03; # must version, must match
+  use Strict::Perl 2019.07; # must version, must match
 
 =head1 DESCRIPTION
 
@@ -318,7 +318,7 @@ in your script.
 
 Version specify is required when use Strict::Perl, like;
 
-  use Strict::Perl 2018.03;
+  use Strict::Perl 2019.07;
 
 It's die if specified version doesn't match Strict::Perl's version.
 

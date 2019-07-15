@@ -4,7 +4,13 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "Moo",
+      "data-driven",
+      "development",
+      "testing"
+   ],
    "license" : [
       "artistic_2"
    ],
@@ -73,7 +79,7 @@
    "provides" : {
       "Test::Roo::DataDriven" : {
          "file" : "lib/Test/Roo/DataDriven.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       }
    },
    "release_status" : "stable",
@@ -87,12 +93,13 @@
          "web" : "https://github.com/robrwo/Test-Roo-DataDriven"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has associated_pathophysiology => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::AnatomicalSystem - An anatomical system is a group of anato
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -115,9 +115,9 @@ A comprised_of should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::AnatomicalSystem']>
-
 =item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
+
+=item C<InstanceOf['SemanticWeb::Schema::AnatomicalSystem']>
 
 =back
 

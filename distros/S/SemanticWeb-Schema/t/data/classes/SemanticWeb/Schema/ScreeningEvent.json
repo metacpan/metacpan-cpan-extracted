@@ -11,13 +11,13 @@
          "rdfs:comment" : "Languages in which subtitles/captions are available, in <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard format</a>.",
          "rdfs:label" : "subtitleLanguage",
          "schema:domainIncludes" : [
+            "schema:TVEpisode",
             "schema:Movie",
-            "schema:ScreeningEvent",
-            "schema:TVEpisode"
+            "schema:ScreeningEvent"
          ],
          "schema:rangeIncludes" : [
-            "schema:Language",
-            "schema:Text"
+            "schema:Text",
+            "schema:Language"
          ]
       },
       "schema:videoFormat" : {
@@ -25,9 +25,9 @@
          "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
-            "schema:ScreeningEvent",
             "schema:BroadcastService",
-            "schema:BroadcastEvent"
+            "schema:BroadcastEvent",
+            "schema:ScreeningEvent"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

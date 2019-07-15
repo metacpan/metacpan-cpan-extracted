@@ -105,10 +105,24 @@ already include the necessary logic (i.e., [Net::SSLeay](https://metacpan.org/po
 All thrown exceptions are instances of [Net::ACME2::X::Base](https://metacpan.org/pod/Net::ACME2::X::Base).
 Specific error classes aren’t yet defined.
 
-# SPEED
+# CRYPTOGRAPHY & SPEED
 
-If you notice speed problems, check to see if your [Math::BigInt](https://metacpan.org/pod/Math::BigInt)
-installation can be made faster.
+[Crypt::Perl](https://metacpan.org/pod/Crypt::Perl) provides all cryptographic operations that this library
+needs using pure Perl. While this satisfies this module’s intent to be
+as pure-Perl as possible, there are a couple of significant drawbacks
+to this approach: firstly, it’s slower than XS-based code, and secondly,
+it loses the security benefits of the vetting that more widely-used
+cryptography libraries receive.
+
+To address these problems, Net::ACME2 will, after parsing a key, look
+for and prefer the following XS-based libraries for cryptography instead:
+
+- [Crypt::OpenSSL::RSA](https://metacpan.org/pod/Crypt::OpenSSL::RSA) (based on [OpenSSL](http://openssl.org))
+- [CryptX](https://metacpan.org/pod/CryptX) (based on [LibTomCrypt](http://www.libtom.net/LibTomCrypt/))
+
+If the above are unavailable to you, then you may be able to speed up
+your [Math::BigInt](https://metacpan.org/pod/Math::BigInt) installation; see that module’s documentation
+for more details.
 
 # METHODS
 
@@ -132,9 +146,10 @@ emptor.
 Returns the object’s cached key ID, either as given at instantiation
 or as fetched in `create_account()`.
 
-## $url = _OBJ_->get\_terms\_of\_service()
+## $url = _CLASS_->get\_terms\_of\_service()
 
-Returns the URL for the terms of service.
+Returns the URL for the terms of service. Callable as either
+a class method or an instance method.
 
 **NOTE:** For [Let’s Encrypt](http://letsencrypt.org) you can
 unofficially resolve against
@@ -227,8 +242,8 @@ simple as possible.)
 
 # SEE ALSO
 
-[Crypt::Perl](https://metacpan.org/pod/Crypt::Perl) provides this library’s cryptography backend. See
-this distribution’s `/examples` directory for sample usage
+[Crypt::Perl](https://metacpan.org/pod/Crypt::Perl) provides this library’s default cryptography backend.
+See this distribution’s `/examples` directory for sample usage
 to generate keys and CSRs.
 
 [Net::ACME](https://metacpan.org/pod/Net::ACME) implements client logic for the variant of this

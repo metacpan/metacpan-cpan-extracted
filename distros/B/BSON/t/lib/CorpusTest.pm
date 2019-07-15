@@ -425,7 +425,7 @@ sub _parse_error_tests {
 #
 # This file is part of BSON
 #
-# This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
+# This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

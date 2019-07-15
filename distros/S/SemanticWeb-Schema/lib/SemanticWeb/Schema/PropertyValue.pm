@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has max_value => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::PropertyValue - A property-value pair, e
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -194,19 +194,23 @@ class="localLink"
 href="http://schema.org/MonetaryAmount">MonetaryAmount</a>, the recommended
 type for values is 'Number'.</li> <li>For <a class="localLink"
 href="http://schema.org/PropertyValue">PropertyValue</a>, it can be
-'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li> </ul> 
+'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li> <li>Use values
+from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039))
+rather than superficially similiar Unicode symbols.</li> <li>Use '.'
+(Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point.
+Avoid using these symbols as a readability separator.</li> </ul> 
 
 A value should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<Bool>
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
+
+=item C<Num>
+
+=item C<Str>
 
 =back
 
@@ -227,9 +231,9 @@ A value_reference should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
-=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
 
 =back
 

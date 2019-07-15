@@ -1,574 +1,160 @@
-$Id: README 52 2015-06-30 12:03:13Z abalama $
-App::MonM v1.05 and later  
-This document written in cp-866 (OEM) charset
-=============================================
+NAME
 
-КОРОТКО О ПРОЕКТЕ
------------------
+    App::MonM - Simple monitoring tool
 
-App::MonM - набор инструментов для простого мониторинга работы основных WEB-сервисов (сайтов, баз 
-данных, интерфейсов и т.д.).
+VERSION
 
-ВОЗМОЖНОСТИ
------------
+    Version 1.06
 
-    - Проверка доступности веб-сайтов (checkit http)
-    - Проверка работоспособности различных баз данных (checkit dbi)
-    - Проверка внешних счетчиков посредством выполнения системных команд (checkit command)
-    - Проверка доступности серверов SMTP, POP3, FTP, SSH и др. (checkers)
-    - Выполнение отладочных запросов SQL (dbi)
-    - Выполнение отладочных запросов HTTP (http)
-    - Интерфейс для SMS информинга (sendalertsms)
-    - Механизм сбора и хранения статистических данных от различных источников (alertgrid)
-    - Отрисовка (построение) графиков по данным собранным с помощью AlertGrid (rrd)
-    - Быстрая настройка путем простого редактирования конфигурационных файлов
-    - Установка проекта средствами CPAN или в ручном режиме через make install
-    - Возможность интегрирования проекта в WEB интерфейсы
+SYNOPSIS
 
-ЗАВИСИМОСТИ
------------
+        # monm checkit
+        # monm report
+        # monm show
 
-Перед началом установки, Вам необходимо проверить наличие следующих пакетов, установленных в Вашей
-системе где будет "работать" App::MonM:
+DESCRIPTION
 
-    - gcc последней версии
-    - perl v5.10 или выше (рекомендуется не ниже v5.12)
-    - libwww (p5-libwww / perl-libwww)
-    - libnet
+    Simple monitoring tool
 
-Помимо этого, некоторые компоненты App::MonM требуют наличие WEB сервера Apache 2.2
-или выше. Сервер должен быть настроен на выполнение CGI (perl) скриптов. Также должны быть
-установлены пакеты:
+ FEATURES
 
-    - Net-SNMP (net-snmp + net-snmp-perl)
-    - RRDtool (rrdtool + rrdtool-perl)
+    Checking availability of sites (http/https)
 
-УСТАНОВКА
----------
+    Checking of database health (DBI)
 
-Установка выполняется двумя путями. Первый - автоматизированный; второй - ручной.
+    Checking internal and external counters using system commands and tools
+    (command)
 
-В автоматизированном режиме для установки достаточно выполнить команду:
+    Supports SMTP, POP3, FTP, SSH protocols, and etc.
 
-    # cpan install App::MonM
+    Interface for SMS sending
 
-или (для ActivePerl):
+    Easy installation and configuration
 
-    # ppm install App-MonM
+    A small number of system dependencies
 
-В ручном режиме Вам потребуется выполнить следующий набор операций:
+ SYSTEM REQUIREMENTS
 
-    - Скачать дистрибутив с CPAN или официальный релиз с сайта SourceForge:
-    
-      https://metacpan.org/pod/App::MonM
-      http://search.cpan.org/~abalama/
-      https://sourceforge.net/projects/app-monm/
-    
-    - Разархивировать полученный архив, и перейти в извлеченную папку с помощью консоли
-    
-    - Находясь в извлеченной папке выполнить последовательно следующие команды:
-    
-      perl Makefile.PL
-      make
-      make test
-      make install
-    
-В процессе установки система предложит установить необходимые модули (пакеты), зависимых модулей
-не так много и большая их часть уже установлена на Вашей системе.
+    Perl v5.16+
 
-ИНИЦИАЛИЗАЦИЯ
--------------
+    libwww
 
-Процесс инициализации активирует работу приложение monm (далее просто monm). Это приложение
-является интерфейсом системной оболочки и предоставляет доступ к функциональным 
-возможностям модуля App::MonM.
+    libnet
 
-В процессе инициализации будут созданы необходимые директории и конфигурационные файлы.
+    Net-SNMP <http://net-snmp.sourceforge.net>
 
-Для инициализации следует выполнить следующую команду:
+      To use this module, you must have Net-SNMP installed on your system.
+      More specifically you need the Perl modules that come with it.
 
-    # monm config
+      DO NOT INSTALL SNMP or Net::SNMP from CPAN!
 
-Если Вы желаете устанавливать конфигурационные файлы в свой каталог, то следует запустить 
-инициализатор с ключем -c DIRECTORY/monm.conf:
+      The SNMP module is matched to an install of net-snmp, and must be
+      installed from the net-snmp source tree.
 
-    # monm -c /my/config/files/monm.conf config
+      The Perl module SNMP is found inside the net-snmp distribution. Go to
+      the perl/ directory of the distribution to install it, or run
+      ./configure --with-perl-modules from the top directory of the
+      net-snmp distribution.
 
-Данная инструкция "развернет" конфигурационные файлы в каталоге /my/config/files
+      Net-SNMP can be found at http://net-snmp.sourceforge.net
 
-КОНФИГУРАЦИЯ
-------------
+ INSTALLATION
 
-Большое внимание следует уделить конфигурации. Именно правильное настроенное приложение гарантирует
-корректную работу всего приложения.
+        # sudo cpan install App::MonM
 
-В процессе инициализации Вам был показан на экране консоли путь, по которому расположены
-конфигурационные файлы. Этот конфигурационный каталог содержит по умолчанию файлы: 
+    ...and then:
 
-    conf.d/alertgrid.conf.sample
-    conf.d/checkit-foo.conf
-    conf.d/checkit-foo.conf.sample
-    conf.d/dbi-foo.conf.sample
-    conf.d/http-foo.conf.sample
-    conf.d/rrd.conf.sample
-    extra/sendmail.conf
-    extra/checkit.conf
-    monm.conf
+        # sudo monm configure
 
-Главным конфигурационным файлом является файл monm.conf. Он содержит глобальные определения и 
-определяет какие дополнительные файлы будут прочитаны и использоваться. Файл extra/sendmail.conf
-содержит определения для отправки электронной почты по умолчанию. Файл extra/checkit.conf
-служит для определений используемых в своей работе обработчиком checkit. Каталога conf.d
-содержит файлы описывающие секции для работы всех обработчиков, например dbi, checkit, http
+ CONFIGURATION
 
-monm.conf
-~~~~~~~~~~~~
+    By default configuration file located in /etc/monm directory
 
-Как уже упоминалось выше, файл monm.conf содержит глобальные определения.
+    Every configuration directive detailed described in monm.conf file,
+    also see conf.d/checkit-foo.conf.sample file for MonM checkit
+    configuration
 
-    LogEnable   on
-    LogEnable   off
+ CRONTAB
 
-Директива позволяет включить или выключить логирование процессов monm. По умолчанию - off
+    To automatically launch the program, we recommend using standard
+    scheduling tools, such as crontab
 
-    LogLevel warning
+        * * * * * monm -l checkit >/dev/null 2>>/var/log/monm-error.log
 
-Директива определяет уровень отладки. Существует следующий набор уровней отладки: debug, info, 
-notice, warning, error, crit, alert, emerg, fatal, except. По умолчанию используется значение debug
+    For daily reporting:
 
-Всю отладочную информацию monm записывает в файл monm.log системного каталога журнальных 
-файлов, например: /var/log/monm.log
+        0 8 * * * monm -l report >/dev/null 2>>/var/log/monm-error.log
 
-В случае запуска программы monm с параметром -l помимо файла monm.log будет записываться файл 
-системного лога - monm_debug.log. Данный файл нужен для детальной отладки работы зависимых 
-компонентов App::MonM.
+INTERNAL METHODS
 
-extra/sendmail.conf
-~~~~~~~~~~~~~~~~~~~
+    again
 
-Файл содержит блок определений <SendMail>...</SendMail> с определеними для отправки отчета
-по электронной почте. Названия директив соответствуют полям протокола SMTP, за исключением 
-следующих полей:
+      The CTK method for classes extension. For internal use only!
 
-    Sendmail   /usr/sbin/sendmail
-    Flags      -t
+      See "again" in CTK
 
-Директива Sendmail определяет альтернативное SMTP приложение, отправлющее письмо. Запуск приложения
-проходит с ключом -t, определенного директивной Flags
+    configure
 
-    SMTP       192.168.0.1
-    SMTPuser   user
-    SMTPpass   password
+      The internal method for initializing the project
 
-Данные директивы определяют параметры соединения с SMTP сервером для отправки сообщения. Параметр
-SMTPuser и SMTPpass необязательны.
+    getdbi
 
-НАЧАЛО РАБОТЫ
--------------
+          my $dbi = $app->getdbi;
 
-После успешной работы по установке, инициализации и настройке - переходим к первому запуску программы
-monm. Для уточнений синтаксиса всегда можно воспользоваться командой:
+      Returns DBI object
 
-    # monm -h
+    nope, skip, wow, yep
 
-Общий синтаксис команды monm таков:
+          my $status = $app->nope("Format %s", "text");
 
-    # monm [OPTIONS] [COMMANDS [ARGS]]
+      Prints status message and returns status.
 
-Существует ряд ключевых опций команды:
+      For nope returns - 0; for skip, wow, yep - 1
 
-    -D DATADIR
+    notify
 
-Данная опция (ключ) определяет локальную папку, в которую будут помещаться временные файлы, 
-необходимые для работы. По умолчанию используется системный каталог временных файлов.
+          $app->notify();
 
-    -c CONFFILE
-    --config=CONFFILE
+      Sends notifications
 
-Ключ заставляет программу использовать в качестве конфигурационного файла CONFFILE. По умолчанию 
-используется системный путь к файлу monm.conf.
+    trigger
 
-    -v
+          $app->trigger();
 
-Ключ позволяет видеть на экране результат работы программы mbutiny. Для более детальной информации
-можно воспользоваться дополнительным ключем -d.
+      Runs triggers
 
-КОМАНДЫ И АРГУМЕНТЫ
--------------------
+HISTORY
 
-Программа monm поддерживает следующие команды
+    See Changes file
 
-test
-~~~~
+DEPENDENCIES
 
-Тестирование всех основных компонентов программы. После тестирование возвращается набор данных, 
-таких как: переменные окружений, конфигурационные данные, список подключенных директорий библиотек
+    CTK
 
-Данная команда не требует никаких аргументов
+TO DO
 
-void
-~~~~
+    See TODO file
 
-Пустой контекст, программа запускается и ничего не делает. Возвращает "пустой" ответ
+BUGS
 
-Данная команда не требует никаких аргументов
+    * none noted
 
-dbi
-~~~
+SEE ALSO
 
-Тестирование работы различных баз данных используя интерфейс DBI и выполнение указанной команды. 
-Ниже примеры использования
+    CTK
 
-    monm dbi -d -F text -s TEST -u USER -p PASSWORD --sql="select sysdate from dual"
+AUTHOR
 
-Этот пример демонстрирует то как работает простой запрос (select sysdate from dual) в БД Oracle. Для
-соединения используются данные SID (ключ -s), логин и пароль (ключи -u и -p).
+    Ser┼╝ Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
 
-    echo select sysdate from dual | monm -d --stdin -F text -s TEST -u USER -p PASSWORD
+COPYRIGHT
 
-Этот пример аналогичен предыдущиму за исключением того что в качестве SQL используется не аргумент
-командной строки а стандартный ввод.
+    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
-    monm dbi -d -F text -s TEST -u USER -p PASSWORD
+LICENSE
 
-Этот пример аналогичен первому, но в качестве SQL запроса выступает запрос по умолчанию. Для БД
-Oracle запрос используется как: SELECT SYSDATE FROM DUAL
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-    monm dbi -d -F xml -s TEST -u USER -p PASSWORD -o oracle.xml
+    See LICENSE file and https://dev.perl.org/licenses/
 
-Этот запрос аналогичен предыдущему только результативный XML документ записывается в файл. Если 
-опустить ключ -d и -F то результативный XML документ будет выведен в стандартный вывод, в частности, 
-на экран. Примером стандартного XML см. раздел "API"
-
-    monm dbi -d -F yml --sid=TEST -u USER -p PASSWORD -T 10
-
-Данный пример демонстрирует работу когда в качестве выводимого формата данных используется дамп YAML
-и установлен таймаут на открытие соединения в БД и выполнение запроса по умолчанию.
-
-    monm dbi -d foo
-
-Пример основывается на метаопределении foo. Метопределение foo описывается секцией конфигураций 
-<DBI foo>. Описание полей см. в конфигурационном файле dbi-foo.conf.sample. Данный подход 
-"облегчает" работу с командной строкой вынося большинство необходимых аргументов в конфигурационный 
-файл.
-
-    monm dbi -dF text -s TEST -u USER -p PASSWORD 
-       --sql="select rownum from dual connect by level <= 5"
-
-Пример позвояющий увидеть простую табличку возвращаемую Oracle
-
-    monm dbi -d -n DBI:mysql:database=MYBASE;host=www.example.com -u LOGIN -p PASSWORD
-
-Тестирование работы указанной базы данных и выполнение указанной команды. Данная команда практически
-полностью идентична предыдущим за исключением того что ключ -s (--sid) заменен ключом -n (--dsn) 
-куда следует передавать DSN в явном виде.
-
-http
-~~~~
-
-Тестирование работы URL запроса. Работа команды основывается на вызове LWP с богатым выбором опций, 
-список которых приведен в секции конфигурации <HTTP foo>. 
-Описание полей см. в конфигурационном файле http-foo.conf.sample. Данный подход "облегчает" работу 
-с командной строкой вынося большинство необходимых аргументов в конфигурационный файл.
-
-Здесь же стоит привести несколько типовых примеров работы с командной строкой.
-
-    monm http -d -q http://www.example.com
-
-Этот пример позволяет получить информацию о запрашиваемом контенте и вывести ее на экран.
-
-    monm http -q http://www.example.com
-
-Этот пример идентичен предыдущему, но на экран выводится информация в формате TXT
-
-    monm http -q http://www.example.com -F xml
-
-Этот пример позволит увидеть на экране и само содержимое ресурса http://www.example.com в секции
-XML <result></result>
-
-    monm http -q http://www.example.com -u LOGIN -p PASSWORD
-    monm http -q http://LOGIN:PASSWORD@www.example.com
-
-Примеры позволяют получить доступ к ресурсу требующему авторизацию HTTP
-
-    monm http -q http://www.example.com -m POST --request="foo=1&bar=2"
-
-Этот пример демонстрирует как можно передавать данные методом POST
-
-    monm http -q http://www.example.com -f file.txt -T 20
-
-Этот пример показывает как можно помещать "скаченный" контент в файл file.txt. Помимо этого ключ -T 
-определяет таймаут запроса
-
-    echo foo=123 | monm http --stdin -m POST -q http://www.example.com
-
-Пример демонстрирует как передать данные для POST запроса с помощью стандартного входного канала
-
-    monm http foo
-
-Пример демонстрирует использование секции конфигурации <HTTP foo> в качестве источника данных для
-выполнения запросов. Помимо этого в секцию можно добавлять данные необходимые для агента, кукесов и
-дополнительных заголовков.
-
-checkit
-~~~~~~~
-
-Это один из сложнейших обработчиков системы, но в тоже время один из самых простых для понимания 
-пользователем. Обработчик пробегается по списку счетчиков и проверяет их. Счетчики всегда возвращают
-данные либо OK либо ERROR и ничего лишнего. В качестве источника данных может быть база данных или
-результат на простой запрос HTTP. Помимо этого поддерживаются счетчики выполняющие SHELL команду.
-
-    monm checkit
-
-Пример позволяет выполнить работу над всеми найденными счетчиками.
-
-    monm checkit www.example.com
-
-Этот же пример показывает как можно отработать только один счетчик с именем www.example.com
-
-По изменению статуса любого счетчика срабатывают триггеры, например, отправка сообщения E-Mail или 
-SMS. Также есть возможность выполнить любую команду в текущей системе (там, где установлен 
-пакет App::MonM).
-
-Ниже пример описыающий самый простой счетчик и триггеры:
-
-    <Checkit "foo">
-        Enable      yes
-        URL         http://www.example.com
-        Target      code
-        IsTrue      200
-        
-        <Triggers>
-            emailalert  foo@example.com
-            emailalert  bar@example.com
-            emailalert  baz@example.com
-
-            smsalert    11231230001
-            smsalert    11231230002
-            smsalert    11231230003
-
-            # Список команд, которые будут выполнены по срабатыванию триггера
-            # Работают подстановки:
-            #   [SUBJECT] -- Тема
-            #   [MESSAGE] -- Сообщение
-            #command     "mycommand1 "[SUBJECT]" "[MESSAGE]""
-            #command     "mycommand2 "[MESSAGE]""
-            #command     "mycommand3"
-        </Triggers>
-    </Checkit>
-
-alertgrid
-~~~~~~~~~~
-
-Обработчик создан для предоставления возможности сбора статистических данных состояния работы
-всевозможного оборудования и сервисов. Данные собранные от источников сохраняются в плоской
-таблице с возможностью их чтения для последующей обработки или отображения в виде итоговой
-таблицы.
-
-Обработчик alertgrid в связке с rrd обеспечивают отличный способ наглядного отображения собранных
-данных в виде графиков. Более подробно о связке alertgrid и rrd см. в разделе ALERTGRID AND RRD.
-
-Рассмотрим работу основных операций AlertGrid на примерах.
-
-    monm alertgrid init
-
-Команда позволит инициализировать базу данных alertgrid.
-
-    monm alertgrid agent
-
-Команда позволяет пройтись по всем счетчикам и забрать данные сохранив их в базе данных alertgrid
-
-    monm alertgrid export -F xml
-    monm alertgrid export -F xml -o index.xml
-
-Команда позволяет выполнить экспорт данных в виде XML документа на стандартный вывод. Когда как
-вторая команда выводит данные в файл test.xml. Следует заметить, что при выставлении параметра
-конфигурационного файла alertgrid.conf - AlertGrid/Agent/TransferType в значение равное http
-данные экспорта будут забираться из указанного URI секции AlertGrid/Agent/HTTP.
-
-    monm alertgrid snapshot
-    monm alertgrid snapshot -o index.txt
-
-Данные команды идентичны export за исключением формата вывода. Структура выводимого документа будет
-адаптирована для генерации HTML документов или текстовых документов.
-
-    monm alertgrid config
-
-Команда позволяет получить основные конфигурационные данные alertGrid на локальной машине. Данную команду
-полезно использовать для связки с другими приложениями
-
-rrd
-~~~
-
-Обработчик позволяет выполнять построение графиков по данных собранным с помощью 
-AlertGrid (см. выше). Более подробно о связке alertgrid и rrd см. в разделе ALERTGRID AND RRD.
-
-Рассмотрим работу основных операций RRD на примерах.
-
-    monm rrd init
-
-Команда позволит инициализировать базы RRDtool
-
-    monm alertgrid export -F xml | monm rrd update -I
-
-Команда позволяет сделать выгрузку AlertGrid и передать данные механизму RRD для последующего
-обновления баз RRD.
-
-    monm alertgrid export -F xml -o alertgrid.xml
-    monm rrd update -i alertgrid.xml
-
-Аналогичный пример, отличае состоит в том что используется промежуточный документ alertgrid.xml
-
-    monm rrd graph
-
-Команда позволяет отрисовать данные на графиках - построить их
-
-    monm rrd index
-
-Команда позволяет сформировать индексный файл для отображения построенных
-графиков в браузере
-
-ALERTGRID AND RRD
------------------
-
-Обработчик alertgrid в связке с rrd позволяют строить графики по данным, полученным
-от различных источников (счетчиков).
-
-Задача построения графиков сводится к сбору данных, их накоплению и
-их отображению в виде графиков. Эти процессы имеют распределенную клиент/сервер 
-систему, где одни компьютеры выполняют функцию агентов, другие выполняют функцию 
-источников данных, а третьи - функцию сервера. Рассмотрим пример
-
-         +-----+
-         | PC2 |
-         +--+--+
- +-----+    |    +-----+
- | PC1 +--+ | +--+ PC3 |
- +-----+  | | |  +-----+
-          | | |
-    inet ~~~~~~~
-          | | |
-       +--+-+-+--+ 
-       | AGENT_1 | 
-       +----+----+   +---------+
-            | +------+ AGENT_2 |
-            | |      +---------+
-      inet ~~~~~
-            | | 
-        +---+-+--+
-        | SERVER | 
-        +---+----+
-
-Общая схема работы. Сервер (SERVER) принимает собранные данные от агентов (AGENT_1 и AGENT_2). 
-AGENT_1 собирает данные от себя самого (если это требуется) и от компьютеров-источников 
-(PC1, PC2 и PC3). AGENT_2 собирает данные только от самого себя. Все данные до агента и сервера 
-передаются через сеть internet/intranet, это позволяет миновать многие трудности.
-
-PC1, PC2, PC3 - это конечные узлы, источники данных (компьютеры, сервера, маршрутизаторы, 
-коммутаторы и др.) на которых установлено соответствующее программное обеспечение для сборки 
-данных счетчиков. В качестве такого ПО может выступать Net-SNMP сервер.
-
-AGENT_1 и AGENT_2 - это компьютеры, с установленной системой MonM в связке с ПО призванным
-собирать данные от источников. Примером такого ПО может выступать Net-SNMP клиент.
-Собранные данные передаются в активном режиме на SERVER. Отправка данных может осуществляться,
-например, посредством планировщика задач cron, или его аналогов. Помимо этого могут быть 
-использованы и другие способы систематического опроса источников данных.
-
-SERVER - это более мощное оборудование, с установленным WEB-сервером Apache и системой MonM.
-Сервер выполняет задачи приема данных от агентов, сохранения их в базе данных, а также 
-выполняет функции построения графиков, используя при этом систему RRDtool.
-
-Данные на сервере собираются от агентов в виде единой таблицы SQLite путем их постоянного 
-обновления. Затем, все собранные данные запрашиваются и передаются в распределенную 
-базу RRD, где для каждого графика свой набор данных собирается в отдельные локальные БД RRDtool. 
-В момент обновления данных в RRD базах данных происходит автоматическое построение графиков. 
-Более подробно о цикле см. ALERTGRID AND RRD WORK CYCLE и файл monm_agrrd.sh
-
-ALERTGRID AND RRD WORK CYCLE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-while not the end of the universe
-    do
-      get result of
-         monm alertgrid export
-      into variable $in
-
-      echo $in | monm rrd update -I -o /dev/null
-
-      # Creating graphs
-      monm rrd graph -o /dev/null
-
-      wait for 5 minutes
-    done
-
-Typical example of use:
-
-    # Run local agent
-    monm alertgrid agent -o /dev/null
-
-    # Export data from alertgrid database into rrd database 
-    monm alertgrid export | monm rrd update -I -o /dev/null
-
-    # Creating graphs
-    monm rrd graph -o /dev/null
-
-API
----
-
-Общие правила передачи данных между процессами нашли применение и в частных случаях,
-таких, например, как передача данных между сабпроцессами обработчиков.
-
-Передача даннх alertgrid
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Формат XML для передачи от конечных источников данных агенту.
-
-<response>
-    <count name="COUNT_NAME">
-        <expires>+5m</expires>
-        <status>OK|ERROR</status>
-        <error code="0"><![CDATA[MESSAGE]]></error>
-        <value type="DIG|STR|TAB"><![CDATA[VALUE]]></value>
-    </count>
-    ...
-</response>
-
-Формат XML для передачи от агента серверу.
-
-<alertgrid>
-    <name>ALERTGRID_NAME</name>
-    <count name="COUNT_NAME">
-        <pubdate date="123456789">Wed, 05 Mar 2014 09:50:04 GMT</pubdate>
-        <expires date="123456799">Wed, 05 Mar 2014 09:50:14 GMT</expires>
-        <worktms>[25059] {TimeStamp: +0.9428 sec}</worktms>
-        <status>OK|ERROR</status>
-        <error code="0"><![CDATA[MESSAGE]]></error>
-        <value type="DIG|STR"><![CDATA[VALUE]]></value>
-    </count>
-    ...
-</alertgrid>
-
-Имя формируется так:
-
-    <IP>::<ALERTGRID_NAME>::<COUNT_NAME>
-
-Например:
-
-    127.0.0.1::foo::resources::hdd::used     = ...
-    127.0.0.1::bar::SNMPv2-MIB::sysDescr.0   = ...
-
-В таблицу alertgrid данные ложатся в поля по образцу:
-
- ID | IP | ALERTGID_NAME | COUNT_NAME | TYPE | VALUE | PUBDATE | EXPIRES | STATUS | ERRCODE | ERRMSG
-----+----+---------------+------------+------+-------+---------+---------+--------+---------+--------
-  1 | 127.0.0.1 |    foo | resources::hdd::used | DIG | 0 | DTS | DTF |        OK |       0 |
-
-Замечания:
- 
-Если статус == "OK" то error = "" а code = 0. Если статус == "ERROR" то error = "ТЕКСТ_ПРИЧИНЫ_ОШИБКИ"
-когда как code = 1 или любое иное отличное от 0. Поле pubdate -- дата публикации результата; 
-expires -- дата истечения срока действия результата и в том и другом полях аттрибут date содержит 
-время в формате "unix time". Поле value содержит значение счетчика. Даже при статусе ERROR значение 
-учитывается.
-
-__END__

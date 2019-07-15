@@ -1,0 +1,58 @@
+NAME
+    DateTime::Format::Duration::ConciseHMS - Format DateTime::Duration
+    object as concise HMS format
+
+VERSION
+    This document describes version 0.001 of
+    DateTime::Format::Duration::ConciseHMS (from Perl distribution
+    DateTime-Format-Duration-ConciseHMS), released on 2019-06-19.
+
+SYNOPSIS
+     use DateTime::Format::Duration::ConciseHMS;
+
+     my $format = DateTime::Format::Duration::ConciseHMS->new;
+     say $format->format_duration(
+         DateTime::Duration->new(years=>3, months=>5, seconds=>10),
+     ); # => "3y 5mo 00:00:10"
+
+DESCRIPTION
+    This module formats DateTime::Duration objects as "concise HMS" format.
+    Duration of days and larger will be represented like "1y" (1 year),
+    "2mo" (2 months), "3d" (3 days) while duration of hours/minutes/seconds
+    will be represented using hh:mm:ss e.g. 04:05:06. Examples:
+
+     00:00:00
+     1d
+     3y 5mo 00:00:10.123
+
+METHODS
+  new
+  format_duration
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DateTime-Format-Duration-ConciseHMS>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DateTime-Format-Duration-ConciseHMS>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Durat
+    ion-ConciseHMS>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DateTime::Duration
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

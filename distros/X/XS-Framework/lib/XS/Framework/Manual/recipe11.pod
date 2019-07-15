@@ -1,0 +1,132 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+
+=cut
+
+=head1 DESCRIPTION
+
+If you have control on C++ API you'd like to port on Perl, or the API was
+designed for integration with scripting languages, then C++ objects give
+dedicated or, more commonly, C<shared> ownership, i.e. they might be held
+from a script or from other C++ objects together.
+
+The most common approach to achive that is to use refcounted policy on
+a C++ class. The most common approach in C++ world is to use C<std::shared_ptr>,
+however, if you have access to sources, we do not recommend using it as
+it provides B<non-zero costs> on its thread-safety guarantees. In Perl
+it is rather exceptional use threads and do inter-thread communications,
+that's why we'd recommend to avoid using C<std::shared_ptr>.
+
+Another approach is to use L<local_shared_ptr> or L<intrusive_ptr> from
+L<boost|https://www.boost.org/> library. The former is similar to
+C<std::shared_ptr> without the thread-safety guarantees, i.e. optimal
+for using in Perl. The later assumes that refcounted policy is injected
+into C++ class itself, so it is able to do basic refcount-related operations:
+C<dec>, C<inc> and get use count. To simplify additions of the operations
+in C++ class the C<intrusive_ref_counter> is shipped: your class just
+have to inherit from it, and the counter and the operations will appear
+in the C++ class.
+
+The L<CPP::panda::lib> already ships the C<Refcnt> / C<iptr> with the
+similar to boost's intrusive pointer policy. Let's show how to use it
+
+    struct TimezoneRecipe11: public panda::Refcnt {
+        //                              (1)
+        const char* get_name() const { return name.c_str(); }
+    private:
+        TimezoneRecipe11(const char* name_): name{name_} { }
+        std::string name;
+        friend class DateRecipe11;
+    };
+
+    using TimezoneRecipe11SP = panda::iptr<TimezoneRecipe11>;
+
+    struct DateRecipe11: public panda::Refcnt {
+        //                      (2)
+        DateRecipe11(const char* tz_ = "Europe/Minsk"): tz(new TimezoneRecipe11(tz_)) { update(); }
+        void update()   { epoch = std::time(nullptr); }
+
+        int get_epoch() const { return epoch; }
+        TimezoneRecipe11SP get_timezone() { return tz; }
+        // (3)
+    private:
+        std::time_t epoch;
+        TimezoneRecipe11SP tz;
+        // (4)
+    };
+
+All is required to support refcount-policy on a C++ class, is just inherit from
+C<panda::Refcnt> in your classes (1) and (2). Then, obviously, C++ class have
+to hold smpart pointer (C<iptr>) of the dependendent class, instead of object
+or object pointer or object reference. If a object embeds another object, that
+means B<exclusive ownership>; if the object embeds a reference to another object,
+that means <no ownership> on it; and the pointer case means either exlcusive or
+no ownership. C<iptr> (or C<std::shared_ptr>) grants I<shared ownership> (4).
+The operation C<get_timezone> (3) above actually does timezone sharing.
+
+    namespace xs {
+        template <>
+        struct Typemap<DateRecipe11*> : TypemapObject<DateRecipe11*, DateRecipe11*, ObjectTypeRefcntPtr, ObjectStorageMG> {
+            //                                                                           (5)
+            static std::string package () { return "MyTest::Cookbook::DateRecipe11"; }
+        };
+
+        template <>
+        struct Typemap<TimezoneRecipe11*> : TypemapObject<TimezoneRecipe11*, TimezoneRecipe11*, ObjectTypeRefcntPtr, ObjectStorageMG> {
+            //                                                                                          (6)
+            static std::string package () { return "MyTest::Cookbook::TimezoneRecipe11"; }
+        };
+    };
+
+The typemaps for the C<Date> and C<Timezone> are rather trivial; the only
+moment to note is the C<ObjectTypeRefcntPtr> lifetime policy in (5) and (6).
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::TimezoneRecipe11
+    PROTOTYPES: DISABLE
+
+    const char* TimezoneRecipe11::get_name()
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::DateRecipe11
+    PROTOTYPES: DISABLE
+
+    DateRecipe11* DateRecipe11::new(const char* name)
+
+    void DateRecipe11::update()
+
+    std::time_t DateRecipe11::get_epoch()
+
+    TimezoneRecipe11SP DateRecipe11::get_timezone()
+
+The xs-adapters are also pretty trivial.
+
+Please note, that L<XS::Framework> is shipsed with typemap auto-deduction rules.
+Defining typemap for type C<T>, the typemap for iptr<T> is auto-decuded.
+
+That's not true for C<std::shared_ptr> (and for C<boost::local_shared_ptr>) as
+the refcounter is stored B<outside> of an object. So, if in xs-adapter the
+std::shared_ptr<T> is used, the typemap for std::shared_ptr<T> should be
+defined; if, in addition, the T* pointer is used, then, in addition the
+typemap<T*> for it should be defined also. Do not be confused with the shipped
+C<ObjectTypeSharedPtr> lifetime policy for C<std::shared_ptr> for
+C<TypemapObject>: the typemap for std::shared_ptr<T> still have to be defined,
+probaby with help of C<TypemapObject>.
+
+It is possible, that C++ class has it's own refcounted inferface. Then, to
+use C<ObjectTypeRefcntPtr> lifetime policy, the following free functions must be
+defined for it:
+
+    void refcnt_inc(MyClass*);
+    void refcnt_dec(MyClass*);
+    std::uint32_t refcnt_get(MyClass*);
+
+Short summary: if C++ API offers shared ownership on objects, then it is friendly
+for integration into scripting languages. L<CPP::panda::lib> ships C<Refcnt>
+and C<iptr> helpers following intrusive refcounter approach. C<ObjectTypeRefcntPtr>
+lifetime policy for C<TypemapObject> helps to adopt refcounted objects into Perl.
+
+=head1 SEE ALSO
+
+L<https://www.boost.org/>
+
+L<CPP::panda::lib>

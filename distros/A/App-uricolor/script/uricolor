@@ -2,44 +2,50 @@
 #
 # uricolor - Colorize URIs with ANSI colors.
 #
-# A script to colorize URIs with ANSI colors.
-# Reads from STDIN, writes to STDOUT.
+# uricolor is a Perl script to colorize URIs with ANSI colors.
+# It reads files sequentially, and writes them to STDOUT,
+# with all URIs colored (underline blue). If file is a dash "-"
+# or if no file is given, uricolor reads from STDIN.
 # 
 # Current limitations :
 # - hardcoded style (underline blue)
-# - no --schemeless option (yet)
 #
+# 2019.07.09 v0.13 jul : added -s (schemeless), use 5.010, better doc
 # 2019.06.18 v0.12 jul : dropped file extension, added pod
 # 2019.06.15 v0.11 jul : changed shebang
 # 2018.09.10 v0.10 jul : created
 
+use 5.010;
 use strict;
 use warnings;
 use utf8;
 use Getopt::Std;
 use File::Basename;
 use URI::Find;
+use URI::Find::Schemeless;
 use Term::ANSIColor;
 
-our $VERSION    = '0.12';
+our $VERSION    = '0.13';
 my $program     = basename($0);
 my $usage       = <<EOF;
 
-Usage: $program [-hVd]
+Usage: $program [-hVds] [file ...]
 
     -h, --help      help
     -V, --version   version
     -d              debug
+    -s              schemeless
 EOF
 
 # options
 
 my %options = ();
-getopts("hVd", \%options) or die $usage;
+getopts("hVds", \%options) or die $usage;
 
-my $help        = $options{h} || 0;
-my $version     = $options{V} || 0;
-my $debug       = $options{d} || 0;
+my $help        = $options{h} // 0;
+my $version     = $options{V} // 0;
+my $debug       = $options{d} // 0;
+my $schemeless  = $options{s} // 0;
 
 die $usage if $help;
 die $VERSION . "\n" if $version;
@@ -49,7 +55,8 @@ die $VERSION . "\n" if $version;
 # MAIN #
 ########
 
-my $finder = URI::Find->new( sub {
+my $class = $schemeless ? "URI::Find::Schemeless" : "URI::Find";	# copy-paste from urifind
+my $finder = $class->new( sub {
 	my($uri, $orig_uri) = @_;
 	return colored ($orig_uri, 'underline blue');
 });
@@ -80,12 +87,19 @@ uricolor - Colorize URIs with ANSI colors.
 
 =head1 SYNOPSIS
 
-    $ uricolor
+    $ uricolor [-hVds] [file ...]
+
+    -h, --help      help
+    -V, --version   version
+    -d              debug
+    -s              schemeless
 
 =head1 DESCRIPTION
 
-A script to colorize URIs with ANSI colors.
-Reads from STDIN, writes to STDOUT.
+uricolor is a Perl script to colorize URIs with ANSI colors.
+It reads files sequentially, and writes them to STDOUT,
+with all URIs colored (underline blue). If file is a dash "-"
+or if no file is given, uricolor reads from STDIN.
 
 =head1 BUGS
 

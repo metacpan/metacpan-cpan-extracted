@@ -1,9 +1,9 @@
-package Pcore::GeoIP v1.4.0;
+package Pcore::GeoIP v1.5.0;
 
 use Pcore -dist;
 
-# register Pcore util
-$Pcore::UTIL->{geoip} = 'Pcore::Util::GeoIP';
+# register Pcore lib
+$Pcore::LIB->{geoip} = 'Pcore::Lib::GeoIP';
 
 1;
 __END__

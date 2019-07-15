@@ -1,0 +1,183 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Glob - XS::Framework Glob C++ class reference
+
+=head1 Glob
+
+=head2 Overview
+
+The C<Glob> class is the wrapper around Perls C<GV*> type, which is a variant
+of C<SV*>. As with C<Scalar>, it might hold an underlying Perl C<SV*> or might
+not.
+
+The C<Glob> object does not holds C<undef>; if C<undef> is assigned or supplied
+in constructor, the object is considered I<empty>. In other words the
+C<undef> and C<NULL> have the same meaning for the class.
+
+A C<GV >is a structure which corresponds to to a Perl typeglob, ie C<*foo>. It
+is a structure that holds a pointer to a scalar, an array, a hash etc,
+corresponding to C<$foo>, C<@foo>, C<%foo>.
+
+C<GVs> are usually found as values in stashes (symbol table hashes) where
+Perl stores its global variables.
+
+=head2 Construction
+
+To create a new C<GV*> in Perl, the C<Stash> object and the name should be
+provided:
+
+    static Glob create (const Stash& stash, std::string_view name, U32 flags = 0);
+
+For the C<flags> description please refer C<gv_init_pvn> in L<perlapi>.
+
+To create an wrapper around existing C<GV*> the following constructors can be
+used:
+
+    Glob (std::nullptr_t = nullptr)
+    Glob (SV* sv, bool policy = INCREMENT)
+    Glob (GV* sv, bool policy = INCREMENT)
+
+If C<SV*> or <GV*> are C<undef> or C<NULL>, the returned C<Glob> object will be
+empty. Otherwise, if unappropriate C<SV*> is supplied, then exception will be
+thrown.
+
+Copy and move-constructore are also available:
+
+    Glob (const Glob&   oth)
+    Glob (Glob&&        oth)
+    Glob (const Scalar& oth)
+    Glob (Scalar&&      oth)
+    Glob (const Sv&     oth)
+    Glob (Sv&&          oth)
+
+It it possible to create C<Glbo> object from C<CallProxy> invocation:
+
+    Glob (const CallProxy& p) : Glob(p.sv()) {}
+
+however, please note, that the C<CallProxy> will be called in B<scalar context>.
+If the C<CallProxy> returns unacceptable C<SV*> the execption will be thrown.
+
+=head2 assignment operators
+
+    Glob& operator= (SV* val)
+    Glob& operator= (GV* val)
+    Glob& operator= (const Glob& oth)
+    Glob& operator= (Glob&& oth)
+    Glob& operator= (const Scalar& oth)
+    Glob& operator= (Scalar&& oth)
+    Glob& operator= (const Sv& oth)
+    Glob& operator= (Sv&& oth)
+    Glob& operator= (const CallProxy& p)
+
+The assignment operators are complementaty to the constructors above. They
+inherit behaviour from C<Scalar>, including NULL-safety. The previously held
+C<SV*> will be C<dec>-remented.
+
+The last operator performs proxy call in B<scalar> context, the same as in
+appropriate constructor above.
+
+    void set (SV* val)
+    void set (GV* val)
+
+The C<set> method directly assigns the value to the underlying C<SV*>,
+I<bypassing all checks>. Use the method with caution.
+
+=head2 getters
+
+Theere are zero-cost NULL-safe getters:
+
+    operator GV* () const
+    GV* operator->() const
+    template <typename T = SV> one_of_t<T,SV,GV>* get () const
+
+This are NULL-safe methods. The returned value, however, might be C<NULL>.
+
+=head2 slot ()
+
+    template <typename T> one_of_t<T,Scalar,Array,Hash,Sub> slot () const
+    void slot (SV*)
+    void slot (AV*)
+    void slot (HV*)
+    void slot (CV*)
+    void slot (const Scalar&)
+    void slot (const Sv&     v)
+    void slot (const Array&  v)
+    void slot (const Hash&   v)
+    void slot (const Sub&    v)
+    void slot (const CallProxy& p)
+
+This are read/write accessors for appropriate slot type in the C<Glob> instance.
+For example:
+
+    Stash s = ...;
+    Glob o = s["some_name"];
+    Sub sub = o.slot<Sub>();
+
+The C<slot> methods are NULL-unsafe.
+
+=head2 scalar()
+
+=head2 array()
+
+=head2 hash()
+
+=head2 sub()
+
+    Scalar scalar () const
+    Array  array  () const
+    Hash   hash   () const
+    Sub    sub    () const
+
+    void scalar (const Scalar& val)
+    void array  (const Array&  val)
+    void hash   (const Hash&   val)
+    void sub    (const Sub&    val)
+
+This group of methods provide convenient access to scalar/array/hash/sub slot
+of the C<Glob>. The read accessors are NULL-safe, while write-accessors are
+NULL-unsafe.
+
+=head2 get_const()
+
+    Sv get_const () const
+
+If C<Sub>-slot is eligible for inlining it returns the valuer returned by the
+C<Sub> wrapped into C<Sv>. Otherwise emptu C<Sv> is returned.
+
+This is NULL-unsafe method.
+
+=head2 stash()
+
+=head2 effective_stash
+
+    Stash stash           () const
+    Stash effective_stash () const
+
+Returns the current or effective C<Stash> associated with the C<Glob> instance.
+
+This are NULL-unsafe methods.
+
+=head2 name()
+
+=head2 effective_name ()
+
+    std::string_view name           () const
+    std::string_view effective_name () const
+
+Returns the name of the current or effective C<Stash> associated with the
+C<Glob> instance.
+
+This are NULL-unsafe methods.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Scalar>
+
+L<XS::Framework::Manual::SVAPI::Stash>
+
+
+=cut

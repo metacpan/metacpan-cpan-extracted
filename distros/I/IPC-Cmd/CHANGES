@@ -1,3 +1,8 @@
+1.04 Sat Jul 13 10:08:08 BST 2019
+
+  Bug fixes:
+  - Fixed usage of setsid()
+
 1.02 Thu May  3 09:42:15 BST 2018
 
   Bug fixes:

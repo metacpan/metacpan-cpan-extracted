@@ -27,6 +27,20 @@ sub run {
             option => {},
             name   => 'Default 1',
         },
+        #{
+        #    ARGV => [""],
+        #    mock => [
+        #        { 'rev-parse' => [qw/.git/] },
+        #        { 'rev-parse' => [qw/.git/] },
+        #        { checkout    => [qw//] },
+        #    ],
+        #    STD => {
+        #        OUT => '',
+        #        ERR => "git pushb: no other branch\n",
+        #    },
+        #    option => {},
+        #    name   => 'Default 1',
+        #},
     );
 
     local $Test::Git::Workflow::Command::workflow = 'App::Git::Workflow::Brs';

@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-  use Strict::Perl 2018.03; # must version, must match
+  use Strict::Perl 2019.07; # must version, must match
 
 DESCRIPTION
 
@@ -16,7 +16,7 @@ DESCRIPTION
 
   Version specify is required when use Strict::Perl, like;
 
-    use Strict::Perl 2018.03;
+    use Strict::Perl 2019.07;
 
   It's die if specified version doesn't match Strict::Perl's version.
 

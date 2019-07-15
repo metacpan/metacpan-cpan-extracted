@@ -4,8 +4,6 @@
 #include <cstring> // memcpy
 #include <stdexcept>
 
-#include <iostream>
-
 namespace std {
 
 using std::from_chars_result;

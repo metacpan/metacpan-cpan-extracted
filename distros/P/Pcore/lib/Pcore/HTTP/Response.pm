@@ -1,9 +1,9 @@
 package Pcore::HTTP::Response;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_plain_coderef is_plain_scalarref];
+use Pcore::Lib::Scalar qw[is_plain_coderef is_plain_scalarref];
 
-with qw[Pcore::Util::Result::Role];
+with qw[Pcore::Lib::Result::Role];
 
 has url => ();
 

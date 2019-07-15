@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Media::Info - Return information on media file/URL
 
+VERSION
+    This document describes version 0.130 of Media::Info (from Perl
+    distribution Media-Info), released on 2019-07-03.
+
+SYNOPSIS
      use Media::Info qw(get_media_info);
      my $res = get_media_info(media => '/path/to/celine.mp4');
 
@@ -22,18 +28,74 @@ SYNOPSIS
      ]
 
 DESCRIPTION
-
     This module provides a common interface for Media::Info::* modules,
     which you can use to get information about a media file (like video,
     music, etc) using specific backends. Currently the available backends
     include Media::Info::Mplayer, Media::Info::Ffmpeg,
     Media::Info::Mediainfo.
 
-SEE ALSO
+FUNCTIONS
+  get_media_info
+    Usage:
 
+     get_media_info(%args) -> [status, msg, payload, meta]
+
+    Return information on media file/URL.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *str*
+
+        Choose specific backend.
+
+    *   media* => *str*
+
+        Media file/URL.
+
+        Note that not every backend can retrieve URL. At the time of this
+        writing, only the Mplayer backend can.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Media-Info>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Media-Info>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Media-Info>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Video::Info - This module is first written because I couldn't install
     Video::Info. That module doesn't seem maintained (last release is in
     2003 at the time of this writing), plus I want a per-backend namespace
     organization instead of per-format one, and a simple functional
     interface instead of OO interface.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

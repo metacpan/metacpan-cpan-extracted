@@ -1,4 +1,4 @@
-package App::MonM::Notifier::Channel; # $Id: Channel.pm 32 2017-11-22 16:05:22Z abalama $
+package App::MonM::Notifier::Channel; # $Id: Channel.pm 59 2019-07-14 09:14:38Z abalama $
 use strict;
 use utf8;
 
@@ -10,229 +10,235 @@ App::MonM::Notifier::Channel - monotifier channel base class
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use App::MonM::Notifier::Channel;
 
-    my $channel = new App::MonM::Notifier::Channel(
-            timeout => 300, # Default: 300
-        );
+    my $channel = new App::MonM::Notifier::Channel;
 
     my $data = {
         id      => 1,
         to      => "recipient",
-        from    => "sender",
         subject => "Test message",
         message => "Content of the message",
     };
 
-    $channel->send( default => $data ) or warn($channel->error);
-    # ...or...
-    $channel->default( $data ) or warn($channel->error);
+    my $ch_conf = {
+        'fri' => '18:01-19',
+        'from' => 'root@example.com',
+        'host' => 'mail.example.com',
+        'mon' => '7:35-17:45',
+        'period' => '7:30-16:30',
+        'port' => '25',
+        'set' => [
+          'User TeStUser',
+          'Password MyPassword'
+        ],
+        'sun' => '-',
+        'thu' => '16-18:01',
+        'to' => 'test@example.com',
+        'tue' => '15-19',
+        'type' => 'Email',
+        'wed' => '-'
+    };
 
-    # Run Email::MIME methods
-    print $channel->{email}->body_str if $channel->status;
+    my $status = $channel->process($data, $ch_conf);
+    die($channel->error) unless $channel->status;
 
 =head1 DESCRIPTION
 
 This module provides channel base methods
 
-=head2 METHODS
+=head2 new
 
-=over 8
+    my $channel = new App::MonM::Notifier::Channel;
 
-=item B<new>
+Returns the channel object
 
-    my $channel = new App::MonM::Notifier::Channel(
-            timeout => 300, # Default: 300
+=head2 cleanup
+
+    my $self = $channel->cleanup;
+
+Cleaning up of working variables
+
+=head2 config
+
+    my $conf_hash = $channel->config;
+
+Returns the channel configuration ($ch_conf)
+
+=head2 data
+
+    my $data = $channel->data;
+    my $data = $channel->data( { ... } );
+
+Sets/gets data structure
+
+=head2 error
+
+    my $error = $channel->error;
+    my $error = $channel->error( "New error" );
+
+Sets/gets error message
+
+=head2 genId
+
+    my $message_id = $self->genId(
+            $self->data->{id} || 0,
+            $self->data->{pubdate} || 0,
+            $self->data->{to} || "anonymous",
         );
 
-Constructor
+Return ID of message
 
-The "timeout" attribute is maximum time to run the channel process. Default: 300 secs
+=head2 message
 
-=item B<status>
+    my $email = $channel->message;
+    my $email = $channel->message( new Email::MIME );
+
+Gets/sets the Email::MIME object
+
+=head2 process
+
+    my $status = $channel->process( $data, $ch_conf )
+        or die($channel->error);
+
+This method runs process of sending message to channel and returns
+operation status.
+
+See L</DATA> and L</DIRECTIVES> for details
+
+=head2 status
 
     my $status = $channel->status;
     my $status = $channel->status( 1 ); # Sets the status value and returns it
 
 Get/set BOOL status of the operation
 
-=item B<error>
+=head2 type
 
-    my $error = $channel->error;
+    my $type = $channel->type;
+    my $type = $channel->type( "File" );
 
-Gets error message
+Gets/sets the type value
 
-    my $status = $channel->error( "Error message", "Trace dump" );
-
-Sets error message and trace dump if second argument is provided.
-This method in "set" context returns status of the operation as status() method.
-See L</trace> about tracing
-
-=item B<trace>
-
-    my $trace = $channel->trace;
-
-Gets trace message
-
-=item B<timeout>
-
-    my $timeout = $channel->timeout;
-
-    # Sets the timeout value and returns it
-    my $timeout = $channel->timeout( 500 );
-
-Get/set timeout of the operation
-
-=item B<channels>
-
-    my @available_channels = $channel->channels;
-    my $available_channel = $channel->channels( "default" );
-
-Returns list of available channels.
-To check the availability of the channel, you must specify its name as an argument
-
-=item B<check>
-
-    my $status = $channel->check( file => $data, $opts )
-        or warn($channel->error);
-
-Runs validation of the data and options and returns status
-
-=item B<send>
-
-    my $status = $channel->send( default => $data, $opts )
-        or warn($channel->error);
-    my $status = $channel->default( $data, $opts )
-        or warn($channel->error);
-
-This method runs process of sending message to selected channel and returns
-status this operation.
-
-For selecting the channel you must be provided name it as the first argument
-or call the method of the same name.
-
-See L</DATA> and L</OPTIONS> for more details on data and options of method
-
-=item B<handler>
-
-Local default method that provides base process. See L</send> method
-
-=back
-
-=head2 DATA
+=head1 DATA
 
 It is a structure (hash), that can contain the following fields:
 
-=over 8
+    'data' => {
+        'channel'   => "MyEmail",
+        'comment'   => "Comment",
+        'errcode'   => 0,
+        'errmsg'    => 'Ok',
+        'expires'   => 1565599719,
+        'id'        => 31,
+        'message'   => "Message body",
+        'pubdate'   => 1563007719,
+        'status'    => 'NEW',
+        'subject'   => "My message",
+        'to'        => 'testuser'
+    }
+
+=over 4
+
+=item B<channel>
+
+Channel name
+
+=item B<comment>
+
+Comment string
+
+=item B<errcode>
+
+Error code
+
+=item B<errmsg>
+
+Error message
+
+=item B<expires>
+
+Expires time value
 
 =item B<id>
 
 Contains internal ID of the message. This ID is converted to an X-Id header
 
-=item B<to>
+=item B<message>
 
-Recipient address or name
+Body of the message
 
-=item B<from>
+=item B<pubdate>
 
-Sender address or name
+The time of message publication
+
+=item B<status>
+
+Status of record (text formst). See L<App::MonM::Notifier::Const>
 
 =item B<subject>
 
 Subject of the message
 
-=item B<message>
+=item B<to>
 
-Body of the message
-
-=item B<headers>
-
-Optional field. Contains eXtra headers (extension headers). For example:
-
-    headers => {
-            "bcc" => "bcc\@example.com",
-            "X-Mailer" => "My mailer",
-        }
+Recipient address or name
 
 =back
 
-=head2 OPTIONS
+=head2 DIRECTIVES
 
 It is a structure (hash), that can contain the following fields:
 
-=over 8
+=over 4
 
-=item B<encoding>
+=item B<Charset>
 
-Encoding: 'quoted-printable', base64' or '8bit'
-
-Default: 8bit
-
-See L<Email::MIME>
-
-=item B<content_type>
-
-The content type
-
-Default: text/plain
-
-See L<Email::MIME>
-
-=item B<charset>
-
-Part of common Content-Type attribute. Defines charset
+Sets the charset
 
 Default: utf-8
 
-See L<Email::MIME>
+See also L<Email::MIME>
 
-=item B<io>
+=item B<ContentType>
 
-This attribute defines method of the returned serialized data
+Sets the content type
 
-    my $ret;
-    $channel->default( $data, {io => \$ret} );
+Default: text/plain
 
-Returns serialized data as scalar variable $ret
+See also L<Email::MIME>
 
-    $channel->default( $data, {io => $fh} );
+=item B<Encoding>
 
-Returns serialized data to file by file handler (IO::File)
+Sets encoding (8bit, base64, quoted-printable)
 
-    $channel->default( $data, {io => \*STDERR} );
+Default: 8bit
 
-Returns serialized data to STDERR pipe
+See also L<Email::MIME>
 
-    $channel->default( $data, {io => IO::Pipe->new} );
+=item B<Headers>
 
-Returns serialized data to custom pipe
+Container for MIME headers definitions
 
-    $channel->default( $data, {io => 'NONE'} );
+=item B<Type>
 
-Returns serialized data to STDOUT
+Defines type of channel
 
-    $channel->default( $data, {io => undef} );
-
-No returns any serialized data! See email attrribute, get it
-via $channel->{email} access
-
-=item B<signature>
-
-Set/unset add signature to the message's body
+Allowed types: File, Command, Email
 
 =back
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
 
 =head1 DEPENDENCIES
 
-L<CTK>, L<Email::MIME>
+L<CTK>, L<App::MonM>, L<Email::MIME>
 
 =head1 TO DO
 
@@ -244,322 +250,117 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-L<App::MonM::Notifier>, L<Email::MIME>
+L<Email::MIME>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
+
+use vars qw/$VERSION/;
+$VERSION = '1.01';
+
+use Class::C3::Adopt::NEXT;
+use Email::MIME;
+use Compress::Raw::Zlib qw//; # CRC32
 
 use CTK::Util;
 use CTK::ConfGenUtil;
 use CTK::TFVals qw/ :ALL /;
-use Module::Load;
-use IO::Handle;
-use IO::String;
-use App::MonM::Notifier::Util;
-use Email::MIME;
-use Sys::Hostname;
+
+use base qw/
+        App::MonM::Notifier::Channel::File
+        App::MonM::Notifier::Channel::Email
+        App::MonM::Notifier::Channel::Command
+    /;
 
 use constant {
-    PREFIX      => 'monotifier',
     TIMEOUT     => 300, # 5 min timeout
-    SUBCLASSES => [qw/
-            App::MonM::Notifier::Channel::File
-            App::MonM::Notifier::Channel::Email
-            App::MonM::Notifier::Channel::Script
-        /],
     CONTENT_TYPE=> "text/plain",
     CHARSET     => "utf-8",
     ENCODING    => "8bit", # "base64"
+    USERNAME    => "anonymous",
 };
-
-use vars qw/$VERSION $BANNER/;
-$VERSION = '1.00';
-$BANNER = sprintf("%s/%.2f", PREFIX, "$VERSION");
-
-our $AUTOLOAD;
-
-my %subclasses;
-foreach my $sc (@{(SUBCLASSES)}) {
-    next if exists $subclasses{$sc};
-    load $sc;
-    $subclasses{$sc} ||= {version => $sc->VERSION, inited => 0, type => undef, init => undef};
-}
 
 sub new {
     my $class = shift;
-    my %opts = @_;
+    my %args = @_;
+    my $self = bless {%args}, $class;
+    return $self->cleanup;
+}
+sub cleanup {
+    my $self = shift;
+    $self->{config}  = {}; # Channel config
+    $self->{status}  = 0; # 1 - Ok; 0 - Error
+    $self->{error}   = ''; # Error message
+    $self->{type}    = ''; # email/file/command
+    $self->{message} = undef; # Message
+    $self->{data}    = {};
 
-    my %props = (
-            error       => '',
-            status      => 1,
-            trace       => '',
-            #subclasses  => \%subclasses,
-            channels     => {
-                default => {
-                        class => bless({},__PACKAGE__),
-                    },
-            },
-            timeout     => $opts{timeout} || TIMEOUT,
-            email       => undef,
-        );
-
-    # Init subclasses
-    my @errs = ();
-    foreach my $sc (keys %subclasses) {
-        if ($subclasses{$sc}{inited}) {
-            my $it = $subclasses{$sc}{init};
-            my $tp = $subclasses{$sc}{type};
-            $props{channels}{$tp} = $it;
-            next;
-        }
-        $subclasses{$sc}{inited}++;
-        my %initopts = ();
-        if ($sc->can("init")) {
-            %initopts = $sc->init(%opts);
-            unless (%initopts) {
-                push @errs, sprintf("Can't init module %s", $sc);
-                next;
-            }
-        } else {
-            next;
-        }
-
-        # Register class $sc with %initopts
-        unless ($initopts{type}) {
-            push @errs, sprintf("Can't init module %s: incorrect channel type", $sc);
-            next;
-        }
-        my $type = lc($initopts{type});
-        delete $initopts{type};
-
-        my $it = {
-                %initopts,
-                class => bless({ }, $sc)
-            };
-        $props{channels}{$type} = $it;
-        $subclasses{$sc}{type} = $type;
-        $subclasses{$sc}{init} = $it;
-    }
-    if (@errs) {
-        $props{status} = 0;
-        $props{error} = join "; ", @errs;
-    }
-
-     #print Dumper(\%subclasses);
-    #print Dumper(\%props);
-    return bless { %props }, $class;
+    return $self;
+}
+sub config {
+    my $self = shift;
+    return $self->{config};
 }
 sub status {
     my $self = shift;
-    my $value = shift;
-    return fv2zero($self->{status}) unless defined($value);
-    $self->{status} = $value ? 1 : 0;
+    my $v = shift;
+    $self->{status} = $v if defined $v;
     return $self->{status};
 }
 sub error {
     my $self = shift;
-    my $value = shift;
-    my $trace = shift;
-    return uv2null($self->{error}) unless defined($value);
-    $self->{error} = $value;
-    $self->{trace} = $trace;
-    $self->status($value ne "" ? 0 : 1);
-    return $self->status;
+    my $v = shift;
+    $self->{error} = $v if defined $v;
+    return $self->{error};
 }
-sub trace {
+sub type {
     my $self = shift;
-    return uv2null($self->{trace});
+    my $v = shift;
+    $self->{type} = $v if defined $v;
+    return $self->{type};
 }
-sub timeout {
+sub message {
     my $self = shift;
-    my $value = shift;
-    return fv2zero($self->{timeout}) unless defined($value);
-    $value = 0 unless is_int16($value);
-    $value = 0 if $value < 0;
-    $self->{timeout} = $value;
-    return $self->{timeout};
+    my $v = shift;
+    $self->{message} = $v if defined $v;
+    return $self->{message};
 }
-sub channels {
+sub data {
     my $self = shift;
-    my $req = shift;
-    my $channels = $self->{channels};
-    return () unless $channels && is_hash($channels);
-    if (defined($req) && length($req)) {
-        my ($ret) = grep {$_ eq lc($req)} keys %$channels;
-        return $ret if defined $ret;
-        return ();
-    }
-    return keys %$channels;
+    my $v = shift;
+    $self->{data} = $v if defined $v;
+    return $self->{data};
 }
-sub check {
-    my $self = shift;
-    my $type = lc(shift || 'default');
-    my $data = shift;
-    my $options = shift;
-    my $channel = hash($self->{channels}, $type);
-    unless ($channel && $channel->{class}) {
-        return $self->error(sprintf("Can't find %s channel", $type));
-    }
-    unless ($data && is_hash($data) && keys %$data) {
-        return $self->error("Message data incorrect");
-    }
-    unless (!$channel or (is_hash($channel) && keys %$channel)) {
-        return $self->error("Channel options incorrect");
-    }
-    my $validation = hash($channel => "validation");
-    return 1 unless (keys %$validation);
-
-    my $val_data = hash($validation => "data");
-    foreach my $k (keys %$val_data) {
-        return 0 unless _chk($self, $k, $val_data->{$k}, $data->{$k});
-    }
-    my $val_opts = hash($validation => "options");
-    foreach my $k (keys %$val_opts) {
-        return 0 unless _chk($self, $k, $val_opts->{$k}, $options->{$k});
-    }
-
-    return 1;
-}
-sub _chk {
-    my ($self, $k, $v, $t) = @_;
-    return 1 unless $v && is_hash($v) && keys %$v;
-    my $e = $v->{error} || sprintf("Incorrect \"%s\" field", $k);
-
-    # Defined
-    my $optional = $v->{optional} || 0;
-    return $self->error(sprintf("%s: undefined value", $e)) if !defined($t) && !$optional;
-    return 1 unless defined($t);
-
-    # Length
-    my $max = $v->{maxlength} || 0;
-    my $min = $v->{minlength} || 0;
-    return $self->error(sprintf("%s: value is too long", $e))
-        if $max && is_int($max) && length($t) > $max;
-    return $self->error(sprintf("%s: value is too short", $e))
-        if $min && is_int($min) && length($t) < $min;
-
-    # Type
-    my $type = $v->{type} || '';
-    if ($type) {
-        if ($type =~ /^int$/i) {
-            return $self->error(sprintf("%s: type of the value is not int", $e))
-                unless is_int($t);
-        } elsif ($type =~ /^str$/i) {
-            return $self->error(sprintf("%s: type of the value is not string", $e))
-                unless length($t);
-        }
-    }
-
-    # Regexp
-    my $regexp = $v->{regexp} || undef;
-    if ($regexp && ref($regexp) eq 'Regexp') {
-        return $self->error(sprintf("%s: not match by mask (regexp)", $e))
-            unless $t =~ $regexp;
-    }
-
-    return 1;
-}
-sub send {
-    my $self = shift;
-    my $type = lc(shift || 'default');
-    my $data = shift;
-    my $options = shift;
-    my $channel = hash($self->{channels}, $type);
-    return 0 unless $self->check($type, $data, $options);
-
-    my $class = $channel->{class};
-    unless ($class && $class->can("handler")) {
-        $class = $self->{channels}{default}{class};
-    }
-    my $code = $class->can("handler");
-
-    # Run with timeout!
-    my $timeout = $self->timeout;
-    my $prev_alarm = alarm 0; # suspend outer alarm early
-    my $sigcount = 0;
-    my $res;
-
-    eval {
-        local $SIG{ALRM} = sub { $sigcount++; die "Got timeout\n"; };
-        local $SIG{PIPE} = sub { $sigcount++; die "Broken pipe\n" };
-        local $SIG{__DIE__};
-        alarm($timeout);
-        eval {
-            $res = &$code($self, $data, $options);
-        };
-        alarm(0); # avoid race conditions
-        die $@ if $@;
-    };
-    my $err = $@;
-    alarm $prev_alarm;
-
-    # this shouldn't happen anymore?
-    return($self->error("Unknown error")) if $sigcount && !$err; # seems to happen sometimes
-    return($self->error($err)) if $err;
-
-    return $res // 0;
-}
-sub handler {
+sub process {
     my $self = shift;
     my $data = shift;
-    my $options = shift;
+    my $conf = shift;
+    $self->cleanup;
+    $self->{config} = $conf if ref($conf) eq 'HASH';
+    $self->data($data) if ref($data) eq 'HASH';
+    $self->type(lc(uv2null(value($conf, 'type'))));
 
-    my $ioin = $options->{io};
-    my $io;
-    if (defined($ioin) && ref($ioin) eq 'SCALAR') { # Scalar ref
-        $io = IO::String->new( $options->{io} )
-    } elsif (defined($ioin) && ref($ioin) eq 'GLOB') { # Glob ref
-        $io = IO::Handle->new();
-        unless ($io->fdopen($ioin,"w")) {
-            return $self->error("Can't use io handler as GLOB");
-        }
-        binmode($io);
-    } elsif (defined($ioin) && ref($ioin) eq 'IO::File') { # IO::File object
-        $io = IO::Handle->new();
-        unless ($io->fdopen($ioin,"w")) {
-            return $self->error("Can't use io handler as IO::File object");
-        }
-        binmode($io);
-    } elsif (defined($ioin) && ref($ioin) =~ 'IO') { # IO::* object
-        $io = $ioin;
-        binmode($io);
-    } elsif (defined($ioin)) {
-        $io = IO::Handle->new();
-        unless ($io->fdopen(fileno(STDOUT),"w")) {
-            return $self->error("Can't use STDOUT handler");
-        }
-        binmode($io);
-    }
-
-    my $to = value($data => "to");
-    return $self->error("Field \"to\" incorrect") unless(defined($to) && length($to));
-
-    my $headers = hash($data => "headers");
+    # Create message
+    my $headers = hash($conf => "headers");
+    my $from = value($conf, "from") // '';
     my %hset = (
-            To      => $to,
-            From    => value($data => "from"),
-            Subject => value($data => "subject"),
+            To      => value($conf, "to") || value($data, "to") || USERNAME,
+            $from ? (From => $from) : (),
+            Subject => value($data, "subject") || '',
         );
     if ($headers && is_hash($headers) && keys(%$headers)) {
         while (my ($k,$v) = each %$headers) {
@@ -571,57 +372,34 @@ sub handler {
             }
         }
     }
+
+    # Create message object
     my $email = Email::MIME->create(
         header_str => [%hset],
     );
-    $email->content_type_set( value($options => "content_type") // CONTENT_TYPE );
-    $email->charset_set( value($options => "charset") // CHARSET );
-    $email->encoding_set( value($options => "encoding") // ENCODING );
-    my $message = defined($data->{message}) ? value($data => "message") : '';
-    my $signature = "";
-    if (value($options => "signature")) {
-        $signature = sprintf(join("\n",
-                    "",
-                    "---",
-                    "Hostname     : %s",
-                    "Mailer       : %s",
-                    "Worker [pid] : %s [%d]",
-                    "Generated    : %s"
-                ),
-                hostname(),
-                $BANNER,
-                PREFIX, $$,
-                dtf("%w, %DD %MON %YYYY %hh:%mm:%ss ".tz_diff()),
-            );
-    }
-    $email->body_str_set($message.$signature);
+    $email->content_type_set( value($conf => "contenttype") // CONTENT_TYPE );
+    $email->charset_set( value($conf => "charset") // CHARSET );
+    $email->encoding_set( value($conf => "encoding") // ENCODING );
 
-    if ($io && $io->can("print")) { # No output. Set obj.prop
-        $io->print($email->as_string);
-        $io->close;
-    } else {
-        $self->{email} = $email;
-    }
+    # Add message content
+    my $message = uv2null(value($data => "message"));
+    $email->body_str_set($message);
+    $self->message($email);
 
-    1;
+    # Go!
+    $self->maybe::next::method();
+    return $self->status;
 }
-
-sub DESTROY {}; # avoid problems with autoload
-sub AUTOLOAD {
-    my ($self) = @_;
-    my $sub = $AUTOLOAD;
-    (my $method = $sub) =~ s/.*:://;
-    #print ">>> CATCHED <<<\n";
-    my $channel = hash($self->{channels}, $method);
-    unless ($channel && $channel->{class}) {
-        return $self->error(sprintf("Can't find %s method", $method));
-    }
-    no strict 'refs';
-    *{$sub} = sub {
-        my $self = shift;
-        return $self->send("$method", @_);
-    };
-    goto &$AUTOLOAD;
+sub genId {
+    my $self = shift;
+    my @arr = @_;
+    unshift @arr, $$;
+    my $text = join("|", @arr);
+    my $short = time & 0x7FFFFF;
+    my $crc8 = Compress::Raw::Zlib::crc32($text) & 0xFF;
+    return hex(sprintf("%x%x",$short, $crc8));
 }
 
 1;
+
+__END__

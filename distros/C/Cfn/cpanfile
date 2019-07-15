@@ -8,6 +8,7 @@ requires 'Module::Runtime';
 requires 'Module::Find';
 
 on test => sub {
+  requires 'JSON::MaybeXS';
   requires 'Data::Printer';
   requires 'File::Slurp';
   requires 'Test::More';

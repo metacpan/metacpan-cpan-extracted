@@ -1,5 +1,5 @@
 package Jacode4e;
-$VERSION = '2.13.6.12';
+$VERSION = '2.13.6.13';
 ######################################################################
 #
 # Jacode4e - jacode.pl-like program for enterprise
@@ -130,6 +130,7 @@ $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 my %tr = ();
 my @encodings = qw(

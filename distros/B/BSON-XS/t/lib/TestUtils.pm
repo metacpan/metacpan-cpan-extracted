@@ -139,7 +139,7 @@ sub create_nest {
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2018 by MongoDB, Inc.
+# This software is Copyright (c) 2019 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

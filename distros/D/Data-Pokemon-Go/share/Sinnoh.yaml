@@ -358,7 +358,7 @@
         - いわ
     From:
     To:
-        - ラムバルド
+        - ラムパルド
     Stamina: 167
     Attack: 218
     Defense: 71
@@ -366,10 +366,10 @@
         Grown: 1820
         Hatched: 1040
         Boosted: 1300
-- # ラムバルド(409) --------------------------------------------------
+- # ラムパルド(409) --------------------------------------------------
     ID: 409
     Name:
-        ja: ラムバルド
+        ja: ラムパルド
         en:
     Types:
         - いわ
@@ -596,18 +596,16 @@
     Name:
         ja: チェリンボ
         en:
-    isNotAvailable: 1
     Types:
-    - くさ
+        - くさ
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 108
-    Defense: 96
+    Defense: 92
     MAXCP:
-        Grown: 829
-        Hatched:
-        Boosted:
+        Hatched: 542
+        Boosted: 678
 - # チェリム(421) --------------------------------------------------
     ID: 421
     Name:

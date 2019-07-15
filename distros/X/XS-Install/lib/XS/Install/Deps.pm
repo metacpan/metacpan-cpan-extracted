@@ -3,6 +3,7 @@ package
 use strict;
 use warnings;
 use Cwd 'abs_path';
+use File::Spec;
 
 sub find_header_deps {
     my $p = shift;
@@ -54,7 +55,7 @@ sub _find_header_deps {
         }
         next unless $absdep;
         
-        $deps->{$absdep}++;
+        $deps->{File::Spec->abs2rel($absdep)}++;
         my $subdeps = _find_header_deps($absdep, $cache, $inc, $headers);
         $deps->{$_}++ for keys %$subdeps;
     }
@@ -84,7 +85,7 @@ sub _find_xsi_deps {
     my $deps = {};
     while ($content =~ /^\s*INCLUDE\s*:\s*(.+)/mg) {
         my $xsi = getfile($dir.$1) or next;
-        $deps->{$xsi}++;
+        $deps->{File::Spec->abs2rel($xsi)}++;
         my $subdeps = _find_xsi_deps($xsi);
         $deps->{$_}++ for keys %$subdeps;
     }

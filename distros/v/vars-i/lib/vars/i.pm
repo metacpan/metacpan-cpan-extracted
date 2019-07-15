@@ -1,7 +1,7 @@
 package vars::i;
 use 5.006;
 
-our $VERSION = '1.07'; # TRIAL
+our $VERSION = '1.10'; # TRIAL
 
 use strict qw(vars subs);
 use warnings;
@@ -11,28 +11,30 @@ sub import {
     my( $pack, $var, @value ) = @_;
     my $callpack = caller;
 
-    my %stuff;
+    my %definitions;
 
     if( not @value ){
-        if( ref $var ){
-            %stuff = @$var;
+        if( ref $var ){     # E.g., use vars [ foo=>, bar=>... ];
+            %definitions = @$var;
         } else {
             return;     # No value given --- no-op; not an error.
         }
+    } elsif(@value == 1 && ref $value[0]) {     # E.g., use vars foo=>{}
+        %definitions = ( $var => $value[0] );
     } else {
-        %stuff = ( $var, [@value] );
+        %definitions = ( $var => [@value] );
     }
 
-    for my $k( keys %stuff ){
+    for my $k( keys %definitions ){
         $var = $k;
-        if( ref $stuff{$k} eq 'ARRAY' ){
-            @value = @{ $stuff{$k} };
+        if( ref $definitions{$k} eq 'ARRAY' ){
+            @value = @{ $definitions{$k} };
         }
-        elsif( ref $stuff{$k} eq 'HASH' ){
-            @value = %{ $stuff{$k} };
+        elsif( ref $definitions{$k} eq 'HASH' ){
+            @value = %{ $definitions{$k} };
         }
         else {
-            @value = $stuff{$k};
+            @value = $definitions{$k};
         }
 
 

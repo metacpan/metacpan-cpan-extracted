@@ -1,6 +1,6 @@
 {
     "name" : "UTF8-R2",
-    "version" : "0.02",
+    "version" : "0.03",
     "abstract" : "makes UTF-8 scripting easy for enterprise use or LTS",
     "author" : [
         "ina <ina@cpan.org>"
@@ -18,7 +18,10 @@
     "resources" : {
         "license" : [
             "http://dev.perl.org/licenses/"
-        ]
+        ],
+        "repository" : {
+             "url" : "https://github.com/ina-cpan/UTF8-R2"
+        }
     },
     "prereqs" : {
         "build" : {

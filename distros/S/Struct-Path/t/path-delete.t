@@ -78,7 +78,7 @@ is_deeply(
 
 # delete hash keys defined by regex
 $t = dclone($s_mixed);
-@r = path($t, [ {R => [qr/^a$/]},[0],{R => [qr/2c$/,qr/2b$/]},{R => [qr/^a2.a$/]} ], delete => 1);
+@r = path($t, [ {K => [qr/^a$/]},[0],{K => [qr/2c$/,qr/2b$/]},{K => [qr/^a2.a$/]} ], delete => 1);
 is_deeply(
     $t,
     {a => [{a2a => {a2aa => 0},a2b => {},a2c => {}},['a0','a1']],b => {ba => 'vba',bb => 'vbb'},c => 'vc'},

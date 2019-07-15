@@ -1,8 +1,8 @@
 package Pcore::Core::Event::Listener::file;
 
 use Pcore -class, -ansi, -const;
-use Pcore::Util::Data qw[to_json];
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Lib::Data qw[to_json];
+use Pcore::Lib::Scalar qw[is_ref];
 use Fcntl qw[:flock];
 use IO::File;
 use Time::HiRes qw[];
@@ -11,8 +11,8 @@ with qw[Pcore::Core::Event::Listener];
 
 has tmpl => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>' . "\n" . '<: $text | raw :>';
 
-has _tmpl => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
-has _path => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Path']
+has _tmpl => ( init_arg => undef );    # InstanceOf ['Pcore::Lib::Tmpl']
+has _path => ( init_arg => undef );    # InstanceOf ['Pcore::Lib::Path']
 has _h    => ( init_arg => undef );    # InstanceOf ['IO::File']
 has _init => ( init_arg => undef );
 

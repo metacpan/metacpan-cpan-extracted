@@ -1,5 +1,10 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+3.502  Wed Jul 10 10:28:00 2019
+    - Documentation uniformisation
+    - Minor code improvements
+    - Errors handling improvement
+
 3.501  Mon Jul  8 12:40:26 2019
 	- original version; created by h2xs 1.23 with options
 		-AX -n API::INSEE::Sirene -v 3.501

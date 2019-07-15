@@ -8,19 +8,7 @@
 
 $| = 1;
 print "1..1\n";
-
-if (($^O =~ /MSWin32/) and (`chcp 2>NUL` =~ / 932$/)) {
-    my $return = system("$^X -x bin/japerl.bat t/hello.pl > NUL");
-    if ($return == 0) {
-        print "ok - 1\n";
-    }
-    else {
-        print "not ok - 1\n";
-    }
-}
-else {
-    print "ok - 1 SKIP\n";
-}
+print "ok - 1 SKIP\n";
 
 ######################### End of black magic.
 

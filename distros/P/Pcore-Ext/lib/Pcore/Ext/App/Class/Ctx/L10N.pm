@@ -1,8 +1,8 @@
 package Pcore::Ext::App::Class::Ctx::L10N;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[refaddr is_ref weaken];
-use Pcore::Util::Data qw[to_json];
+use Pcore::Lib::Scalar qw[refaddr is_ref weaken];
+use Pcore::Lib::Data qw[to_json];
 
 has class => ( required => 1 );
 has buf   => ( required => 1 );

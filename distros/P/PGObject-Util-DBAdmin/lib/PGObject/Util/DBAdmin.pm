@@ -19,11 +19,11 @@ PGObject
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =cut
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 
 =head1 SYNOPSIS
@@ -313,6 +313,13 @@ as C<PGObject::Util::DBAdmin->verify_helpers()>.
 =cut
 
 
+sub _run_capturing_output {
+    my @args = @_;
+    my ($stdout, $stderr, $exitcode) = capture { _run_with_env(@args); };
+
+    return $exitcode;
+}
+
 sub verify_helpers {
     my ($class, %args) = @_;
 
@@ -325,7 +332,8 @@ sub verify_helpers {
     }
     return {
         map {
-            $_ => not _run_with_env(command => [ $helper_paths{$_} , '--help' ])
+            $_ => not _run_capturing_output(command =>
+                                            [ $helper_paths{$_} , '--help' ])
         } @helpers
     };
 }

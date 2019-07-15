@@ -1,5 +1,5 @@
 {
-   "abstract" : "Datas for every Pokemon in Pokemon Go",
+   "abstract" : "Data for every Pokemon in Pokemon Go",
    "author" : [
       "Yuki Yoshida <worthmine@gmail.com>"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Data::Pokemon::Go" : {
          "file" : "lib/Data/Pokemon/Go.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Data::Pokemon::Go::IV" : {
          "file" : "lib/Data/Pokemon/Go/IV.pm"
@@ -97,13 +97,13 @@
          "web" : "https://github.com/worthmine/Data-Pokemon-Go"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "AnaTofuZ <anatofuz@gmail.com>",
       "Yuki Yoshida <worthmine@users.noreply.github.com>",
       "worthmine <worthmine@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

@@ -1,0 +1,39 @@
+---
+abstract: 'Minimal base class for !Mojo projects'
+author:
+  - 'Rolf Stöckli <tekki@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Base-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Sub::Util: '1.41'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/Tekki/mojo-base-tiny/issues
+  homepage: https://github.com/Tekki/mojo-base-tiny
+  repository: https://github.com/Tekki/mojo-base-tiny.git
+version: '0.03'
+x_contributors:
+  - 'Sebastian Riedel <sri@cpan.org>'
+  - 'William Lindley <wlindley+remove+this@wlindley.com>'
+  - 'Maxim Vuets <mvuets@cpan.org>'
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+  - 'Dan Book <dbook@cpan.org>'
+  - 'Dotan Dimet <dotan@cpan.org>'
+  - 'Zoffix Znet <cpan@zoffix.com>'
+  - 'Ask Bjørn Hansen <ask@perl.org>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

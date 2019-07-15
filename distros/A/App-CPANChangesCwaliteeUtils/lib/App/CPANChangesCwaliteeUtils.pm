@@ -1,7 +1,7 @@
 package App::CPANChangesCwaliteeUtils;
 
-our $DATE = '2019-07-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,7 +15,7 @@ $SPEC{calc_cpan_changes_cwalitee} = {
     v => 1.1,
     summary => 'Calculate CPAN Changes cwalitee',
     args => {
-        %Cwalitee::Common::args_calc,
+        Cwalitee::Common::args_calc('CPAN::Changes::'),
         path => {
             schema => 'pathname*',
             pos => 0,
@@ -71,7 +71,7 @@ App::CPANChangesCwaliteeUtils - CLI Utilities related to CPAN Changes cwalitee
 
 =head1 VERSION
 
-This document describes version 0.002 of App::CPANChangesCwaliteeUtils (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-06.
+This document describes version 0.003 of App::CPANChangesCwaliteeUtils (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-10.
 
 =head1 DESCRIPTION
 

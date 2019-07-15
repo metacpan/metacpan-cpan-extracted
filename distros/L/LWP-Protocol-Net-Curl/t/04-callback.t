@@ -4,11 +4,13 @@ use utf8;
 use warnings qw(all);
 
 use LWP::Protocol::Net::Curl;
-$LWP::Protocol::Net::Curl::use_select = 1;
 
 use LWP::UserAgent;
 use Test::HTTP::Server;
 use Test::More;
+
+plan skip_all => 'Your installation of Net::Curl::Multi does not implement wait()'
+    unless $LWP::Protocol::Net::Curl::use_select;
 
 my $server = Test::HTTP::Server->new;
 local $ENV{no_proxy} = '*';

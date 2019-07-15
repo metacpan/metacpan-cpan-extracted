@@ -33,7 +33,10 @@
             "schema:FoodEstablishmentReservation",
             "schema:MediaObject"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
       },
       "schema:error" : {
          "rdf:type" : "rdf:Property",
@@ -54,9 +57,9 @@
          "rdfs:comment" : "The location of for example where the event is happening, an organization is located, or where an action takes place.",
          "rdfs:label" : "location",
          "schema:domainIncludes" : [
-            "schema:Event",
             "schema:Action",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
             "schema:Place",
@@ -93,11 +96,14 @@
          "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December. For media, including audio and video, it's the time offset of the start of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
          "rdfs:label" : "startTime",
          "schema:domainIncludes" : [
-            "schema:FoodEstablishmentReservation",
             "schema:MediaObject",
-            "schema:Action"
+            "schema:Action",
+            "schema:FoodEstablishmentReservation"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
       },
       "schema:target" : {
          "rdf:type" : "rdf:Property",

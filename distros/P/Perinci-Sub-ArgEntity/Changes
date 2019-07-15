@@ -1,10 +1,17 @@
-0.020   2019-06-24 (PERLANCAR)
+0.021   2019-07-03  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Mark deprecated in Abstract.
+
+
+0.020   2019-06-24  Released-By: PERLANCAR; Urgency: low
 
 	- No spec changes.
 
 	- Mark deprecated.
 
 
-0.01    2015-03-01 (PERLANCAR)
+0.01    2015-03-01  Released-By: PERLANCAR
 
         - First release.

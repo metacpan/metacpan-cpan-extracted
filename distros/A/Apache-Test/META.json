@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Apache-Test",
    "no_index" : {
@@ -33,11 +33,12 @@
       "runtime" : {
          "requires" : {
             "Cwd" : "2.06",
-            "File::Spec" : "0.8"
+            "File::Spec" : "0.8",
+            "Win32::Process" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.40",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.41",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

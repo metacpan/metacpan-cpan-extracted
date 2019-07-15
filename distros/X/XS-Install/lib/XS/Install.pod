@@ -316,13 +316,6 @@ Flags to build external library with.
 
 =back
 
-=item H_DEPS [true]
-
-For development: by default, if any of header files changed, C<Makefile> will rebuild everything. If enabled (this is the default)
-C<make> will only rebuild those C files that are dependent on changed headers.
-
-This option has no effect if C<make> is neither C<GNU make> nor C<BSD make>. 
-
 =head1 C-LIKE XS
 
 If you're using XS::Install then all of your XS files support C-like XS. It means that code

@@ -1,0 +1,31 @@
+MODE: INLINE
+
+struct MyForeign {
+    int val;
+    MyForeign (int arg) : val(arg) {}
+    virtual ~MyForeign () { dcnt.c++; }
+};
+
+static MyForeign _myforeign(789);
+
+namespace xs {
+    template <> struct Typemap<MyForeign*,MyForeign*> : TypemapObject<MyForeign*, MyForeign*, ObjectTypeForeignPtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::MyForeign"; }
+    };
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyForeign
+PROTOTYPES: DISABLE
+
+MyForeign* get (SV*) {
+    RETVAL = &_myforeign;
+}
+
+int MyForeign::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MyForeign::DESTROY () {
+    dcnt.perl++;
+}

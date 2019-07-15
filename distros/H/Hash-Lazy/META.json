@@ -21,14 +21,25 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.026"
+            "App::ModuleBuildTiny" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Sub::Exporter" : "0",
+            "self" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.9"
          }
       }
    },
    "provides" : {
       "Hash::Lazy" : {
          "file" : "lib/Hash/Lazy.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Hash::Lazy::Tie" : {
          "file" : "lib/Hash/Lazy/Tie.pm"
@@ -46,8 +57,8 @@
          "web" : "https://github.com/gugod/Hash-Lazy"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_spdx_expression" : "MIT",
    "x_static_install" : 1
 }

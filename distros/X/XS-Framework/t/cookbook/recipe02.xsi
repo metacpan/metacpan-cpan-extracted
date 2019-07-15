@@ -1,0 +1,65 @@
+MODE: INLINE
+
+#include <ctime>
+#include <iostream>
+
+struct DateRecipe02a {
+    DateRecipe02a()  { update() ; }
+    void update()    { epoch = std::time(nullptr); }
+
+    int get_epoch() const { return epoch; }
+private:
+    std::time_t epoch;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe02a*> : TypemapObject<DateRecipe02a*, DateRecipe02a*, ObjectTypePtr, ObjectStorageIV, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe02a"; }
+    };
+}
+
+struct DateRecipe02b {
+    DateRecipe02b()  { update() ; }
+    void update()    { epoch = std::time(nullptr); }
+
+    int get_epoch() const { return epoch; }
+private:
+    std::time_t epoch;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe02b*> : TypemapObject<DateRecipe02b*, DateRecipe02b*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe02b"; }
+    };
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe02a
+PROTOTYPES: DISABLE
+
+DateRecipe02a* DateRecipe02a::new() { RETVAL = new DateRecipe02a(); }
+
+void DateRecipe02a::update()
+
+std::time_t DateRecipe02a::get_epoch()
+
+BOOT {
+    Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+}
+
+void DateRecipe02a::DESTROY() {
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe02b
+PROTOTYPES: DISABLE
+
+DateRecipe02b* DateRecipe02b::new() { RETVAL = new DateRecipe02b(); }
+
+void DateRecipe02b::update()
+
+std::time_t DateRecipe02b::get_epoch()
+
+BOOT {
+    Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+}

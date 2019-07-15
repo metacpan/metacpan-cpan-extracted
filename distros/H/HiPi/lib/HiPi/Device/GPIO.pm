@@ -17,7 +17,7 @@ use HiPi qw( :rpi );
 use HiPi::Device::GPIO::Pin;
 use Fcntl;
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 my $sysroot = '/sys/class/gpio';
 
@@ -133,6 +133,17 @@ sub set_pin_pud {
     _get_pin_filepath( $gpio, 'value' );
     
     return HiPi::GPIO->set_pin_pud( $gpio, $pud );
+}
+
+sub get_pin_pud {
+    my($class, $gpio ) = @_;
+    
+    require HiPi::GPIO;
+    
+    # we want to force pin export
+    _get_pin_filepath( $gpio, 'value' );
+    
+    return HiPi::GPIO->get_pin_pud( $gpio );
 }
 
 sub set_pin_activelow {

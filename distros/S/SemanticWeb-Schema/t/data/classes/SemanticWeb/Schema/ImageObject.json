@@ -17,8 +17,8 @@
             "schema:VideoObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:Text"
          ]
       },
       "schema:exifData" : {
@@ -27,8 +27,8 @@
          "rdfs:label" : "exifData",
          "schema:domainIncludes" : "schema:ImageObject",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:Text"
          ]
       },
       "schema:representativeOfPage" : {

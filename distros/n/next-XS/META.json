@@ -25,12 +25,12 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Install" : "v1.0.14"
+            "XS::Install" : "v1.2.4"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.0.14",
+            "XS::Install" : "v1.2.4",
             "perl" : "5.018000"
          }
       },
@@ -43,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.4",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v1.0.6",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

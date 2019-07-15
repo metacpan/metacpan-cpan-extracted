@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month_num;
 
-our $DATE = '2017-06-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["int",[{max=>12,min=>1,summary=>"Month number"}],["int"]];
+our $rschema = ["int",[{max=>12,min=>1,summary=>"Month number","x.perl.coerce_rules"=>["str_convert_en_month_name_to_num"]}],["int"]];
 
 1;
 # ABSTRACT: Month number
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month_num - Month number
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2017-06-17.
+This document describes version 0.003 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2019-06-20.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

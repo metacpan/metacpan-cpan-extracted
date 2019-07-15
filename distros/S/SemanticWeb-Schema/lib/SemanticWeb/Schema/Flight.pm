@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has aircraft => (
@@ -154,7 +154,7 @@ SemanticWeb::Schema::Flight - An airline flight.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -170,9 +170,9 @@ A aircraft should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Vehicle']>
+
+=item C<Str>
 
 =back
 
@@ -298,9 +298,9 @@ A estimated_flight_duration should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
+
+=item C<Str>
 
 =back
 
@@ -314,9 +314,9 @@ A flight_distance should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
+
+=item C<Str>
 
 =back
 
@@ -359,9 +359,9 @@ A seller should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

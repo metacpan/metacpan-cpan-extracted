@@ -1,0 +1,28 @@
+digraph G {
+        node [
+                shape = "record"
+        ]
+
+        Sv [label = "{Sv|- sv : SV*}" ]
+        Sub [label = "{Sub}" ];
+        Array [label = "{Array}" ];
+        List [label = "{List}" ];
+        Hash [label = "{Hash}" ];
+        Stash [label = "{Stash|- name_sv : Simple}" ]
+        Object [label = "{Object|- ref : Ref}" ];
+        Scalar [label = "{Scalar}" ];
+        Simple [label = "{Simple}" ];
+        Ref [label = "{Ref}" ];
+        Glob [label = "{Glob}" ];
+
+        Sub     -> Sv;
+        Array   -> Sv;
+        List    -> Array;
+        Hash    -> Sv;
+        Stash   -> Hash;
+        Object  -> Sv;
+        Scalar  -> Sv;
+        Simple  -> Scalar;
+        Ref     -> Scalar;
+        Glob    -> Scalar;
+}

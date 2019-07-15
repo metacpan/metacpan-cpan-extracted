@@ -7,7 +7,7 @@ use warnings;
 
 use Math::Expression;
 
-our $VERSION = '1.23'; # VERSION
+our $VERSION = '1.24'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -43,7 +43,7 @@ Bot::IRC::Math - Bot::IRC evaluate math expressions and return results
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is copyright (c) 2019 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

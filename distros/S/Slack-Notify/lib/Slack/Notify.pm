@@ -1,5 +1,5 @@
 package Slack::Notify {
-$Slack::Notify::VERSION = '0.001';
+$Slack::Notify::VERSION = '0.002';
 # ABSTRACT: Trigger Slack incoming webhooks
 
 use namespace::autoclean;

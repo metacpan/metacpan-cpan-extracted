@@ -16,8 +16,8 @@
          "rdfs:comment" : "One or more alternative conditions considered in the differential diagnosis process as output of a diagnosis process.",
          "rdfs:label" : "diagnosis",
          "schema:domainIncludes" : [
-            "schema:DDxElement",
-            "schema:Patient"
+            "schema:Patient",
+            "schema:DDxElement"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"
@@ -27,10 +27,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
+            "schema:DrugClass",
             "schema:TherapeuticProcedure",
-            "schema:MedicalCondition",
             "schema:Patient",
-            "schema:DrugClass"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
@@ -40,8 +40,8 @@
          "rdfs:comment" : "Specifying the health condition(s) of a patient, medical study, or other target audience.",
          "rdfs:label" : "healthCondition",
          "schema:domainIncludes" : [
-            "schema:Patient",
             "schema:PeopleAudience",
+            "schema:Patient",
             "schema:MedicalStudy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

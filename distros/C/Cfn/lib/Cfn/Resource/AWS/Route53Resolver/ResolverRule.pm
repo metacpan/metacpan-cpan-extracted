@@ -1,4 +1,4 @@
-# AWS::Route53Resolver::ResolverRule generated from spec 2.25.0
+# AWS::Route53Resolver::ResolverRule generated from spec 4.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Route53Resolver::ResolverRule',
@@ -61,7 +61,7 @@ package Cfn::Resource::Properties::AWS::Route53Resolver::ResolverRule::TargetAdd
   extends 'Cfn::Value::TypedValue';
   
   has Ip => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Port => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Port => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::Route53Resolver::ResolverRule {

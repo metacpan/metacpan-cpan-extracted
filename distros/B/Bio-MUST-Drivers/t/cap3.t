@@ -6,6 +6,7 @@ use autodie;
 use feature qw(say);
 
 use List::AllUtils;
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 
 use Bio::MUST::Core;
@@ -14,21 +15,24 @@ use Bio::MUST::Drivers;
 my $class = 'Bio::MUST::Drivers::Cap3';
 
 
-# skip all CAP3 tests unless cap3 is available in the $PATH
-unless ( qx{which cap3} ) {
+# Note: provisioning system is not enabled to help tests to pass on CPANTS
+my $app = use_module('Bio::MUST::Provision::Cap3')->new;
+unless ( $app->condition ) {
     plan skip_all => <<"EOT";
 skipped all CAP3 tests!
 If you want to use this module you need to install the CAP3 executable:
 http://seq.cs.iastate.edu/cap3.html
+If you --force installation, I will eventually try to install CAP3 with brew:
+https://brew.sh/
 EOT
 }
 
 my @exp_contig_names = (
-    'Contig 1',
-    'Contig 2',
-    'Contig 3',
-    'Contig 4',
-    'Contig 5',
+    'Contig1',
+    'Contig2',
+    'Contig3',
+    'Contig4',
+    'Contig5',
 );
 
 my @exp_singlet_ids = (
@@ -181,7 +185,7 @@ is_deeply [ map { $_->seq } $cap->all_singlets ],
             'got expected Seqs for all singlets';
 
 for my $i (1..5) {
-    is_deeply [ map { $_->full_id } @{ $cap->seq_ids_for('Contig ' . $i) } ],
+    is_deeply [ map { $_->full_id } @{ $cap->seq_ids_for('Contig' . $i) } ],
             $exp_contig_seq_ids[$i-1],
             "got expected SeqIds for fragments of Contig $i";
 }

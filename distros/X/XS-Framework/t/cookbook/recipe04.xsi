@@ -1,0 +1,63 @@
+MODE: INLINE
+
+#include <iostream>
+#include <memory>
+
+struct TimezoneRecipe04 {
+    const char* get_name() const { return name.c_str(); }
+    static std::shared_ptr<TimezoneRecipe04> create(const char* name) {
+        return std::make_shared<TimezoneRecipe04>(name);
+    }
+    TimezoneRecipe04(const char* name_): name{name_} { }
+    ~TimezoneRecipe04() { std::cout << "~TimezoneRecipe04()\n"; }
+private:
+    std::string name;
+};
+
+using TimezoneRecipe04SP = std::shared_ptr<TimezoneRecipe04>;
+
+namespace xs {
+    template <>
+    struct Typemap<TimezoneRecipe04SP> : TypemapObject<TimezoneRecipe04SP, TimezoneRecipe04SP, ObjectTypeSharedPtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::TimezoneRecipe04"; }
+    };
+}
+
+struct DateRecipe04 {
+    DateRecipe04()  { update() ; }
+    void update()   { epoch = std::time(nullptr); }
+
+    int get_epoch() const { return epoch; }
+    void set_timezone(TimezoneRecipe04SP tz_) { tz = tz_; }
+    TimezoneRecipe04SP get_timezone() { return tz; }
+private:
+    std::time_t epoch;
+    TimezoneRecipe04SP tz;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe04*> : TypemapObject<DateRecipe04*, DateRecipe04*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe04"; }
+    };
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::TimezoneRecipe04
+PROTOTYPES: DISABLE
+
+const char* get_name(TimezoneRecipe04SP tz) { RETVAL = tz->get_name(); }
+
+TimezoneRecipe04SP create(const char* name) { RETVAL = TimezoneRecipe04::create(name); }
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe04
+PROTOTYPES: DISABLE
+
+DateRecipe04* DateRecipe04::new() { RETVAL = new DateRecipe04(); }
+
+void DateRecipe04::update()
+
+std::time_t DateRecipe04::get_epoch()
+
+TimezoneRecipe04SP DateRecipe04::get_timezone()
+
+void DateRecipe04::set_timezone(TimezoneRecipe04SP tz)

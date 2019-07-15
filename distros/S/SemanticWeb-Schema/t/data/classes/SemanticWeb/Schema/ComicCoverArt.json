@@ -4,8 +4,8 @@
       "rdfs:comment" : "The artwork on the cover of a comic.",
       "rdfs:label" : "ComicCoverArt",
       "rdfs:subClassOf" : [
-         "schema:ComicStory",
-         "schema:CoverArt"
+         "schema:CoverArt",
+         "schema:ComicStory"
       ],
       "schema:category" : "Comics",
       "schema:isPartOf" : "http:bib.schema.org"

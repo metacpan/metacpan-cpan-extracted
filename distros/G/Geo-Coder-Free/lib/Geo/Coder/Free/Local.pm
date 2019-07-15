@@ -19,11 +19,11 @@ inspecting GeoTagged photographs.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -31,9 +31,9 @@ our $libpostal_is_installed = LIBPOSTAL_UNKNOWN;
 
 # See also lib/Geo/Coder/Free.pm
 our %alternatives = (
-	'St Lawrence, Thanet, Kent' => 'Ramsgate, Kent',
-	'St Peters, Thanet, Kent' => 'St Peters, Kent',
-	'Minster, Thanet, Kent' => 'Ramsgate, Kent',
+	'ST LAWRENCE, THANET, KENT' => 'RAMSGATE, KENT',
+	'ST PETERS, THANET, KENT' => 'ST PETERS, KENT',
+	'MINSTER, THANET, KENT' => 'RAMSGATE, KENT',
 );
 
 =head1 SYNOPSIS
@@ -140,7 +140,7 @@ sub geocode {
 	}
 	if($ap) {
 		my $l = $location;
-		if($l =~ /(.+), (England|UK)$/) {
+		if($l =~ /(.+), (England|UK)$/i) {
 			$l = "$1, GB";
 		}
 		if(my $error = $ap->parse($l)) {
@@ -188,12 +188,12 @@ sub geocode {
 					}
 				}
 			}
-			$addr{'house_number'} = $c{'property_identifier'};
+			$addr{'number'} = $c{'property_identifier'};
 			$addr{'city'} = $c{'suburb'};
-			if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state', 'country'))) {
+			if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 				return $rc;
 			}
-			if($addr{'house_number'}) {
+			if($addr{'number'}) {
 				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 					return $rc;
 				}
@@ -221,7 +221,7 @@ sub geocode {
 					$city = uc($href->{city});
 				}
 				if(my $street = $href->{street}) {
-					if($href->{'type'} && (my $type = $self->_normalize($href->{'type'}))) {
+					if($href->{'type'} && (my $type = Geo::Coder::Free::_normalize($href->{'type'}))) {
 						$street .= " $type";
 					}
 					if($href->{suffix}) {
@@ -231,19 +231,19 @@ sub geocode {
 						$street = "$prefix $street";
 					}
 					my %addr = (
-						house_number => $href->{'number'},
+						number => $href->{'number'},
 						road => $street,
 						city => $city,
 						state => $state,
 						country => 'US'
 					);
 					if($href->{'number'}) {
-						if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state_district', 'state', 'country'))) {
+						if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 							$rc->{'country'} = 'US';
 							return $rc;
 						}
 					}
-					if(my $rc = $self->_search(\%addr, ('road', 'city', 'state_district', 'state', 'country'))) {
+					if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 						$rc->{'country'} = 'US';
 						return $rc;
 					}
@@ -263,13 +263,13 @@ sub geocode {
 			}
 			if(length($state) == 2) {
 				my %addr = (
-					house_number => $addr[0],
+					number => $addr[0],
 					road => $addr[1],
 					city => $addr[2],
 					state => $state,
 					country => 'US'
 				);
-				if(my $rc = $self->_get($addr[0], $addr[1], $addr[2], $state, 'US')) {
+				if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 					# ::diag(Data::Dumper->new([$rc])->Dump());
 					$rc->{'country'} = 'US';
 					return $rc;
@@ -340,14 +340,14 @@ sub geocode {
 			}
 			if($addr{'state_district'}) {
 				$addr{'state_district'} =~ s/^(.+)\s+COUNTY/$1/i;
-				if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state_district', 'state', 'country'))) {
+				if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state_district', 'state', 'country'))) {
 					return $rc;
 				}
 			}
-			if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state', 'country'))) {
+			if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 				return $rc;
 			}
-			if($addr{'house_number'}) {
+			if($addr{'number'}) {
 				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 					return $rc;
 				}
@@ -355,68 +355,21 @@ sub geocode {
 		}
 	}
 
+	$location = uc($location);
 	foreach my $left(keys %alternatives) {
+		# ::diag("$location/$left");
 		if($location =~ $left) {
 			# ::diag($left, '=>', $alternatives{$left});
 			$location =~ s/$left/$alternatives{$left}/;
 			$param{'location'} = $location;
-			# ::diag($location, '>>>>>>');
+			# ::diag(__LINE__, ": $location");
 			if(my $rc = $self->geocode(\%param)) {
-				# ::diag($location, '<<<<<<');
+				# ::diag(__LINE__, ": $location");
 				return $rc;
 			}
 		}
 	}
-	undef;
-}
-
-sub _normalize {
-	my ($self, $type) = @_;
-
-	$type = uc($type);
-
-	if(($type eq 'AVENUE') || ($type eq 'AVE')) {
-		return 'AVE';
-	} elsif(($type eq 'STREET') || ($type eq 'ST')) {
-		return 'ST';
-	} elsif(($type eq 'ROAD') || ($type eq 'RD')) {
-		return 'RD';
-	} elsif(($type eq 'COURT') || ($type eq 'CT')) {
-		return 'CT';
-	} elsif(($type eq 'CIR') || ($type eq 'CIRCLE')) {
-		return 'CIR';
-	} elsif(($type eq 'FT') || ($type eq 'FORT')) {
-		return 'FT';
-	} elsif(($type eq 'CTR') || ($type eq 'CENTER')) {
-		return 'CTR';
-	} elsif(($type eq 'PARKWAY') || ($type eq 'PKWY')) {
-		return 'PKWY';
-	} elsif($type eq 'BLVD') {
-		return 'BLVD';
-	} elsif($type eq 'PIKE') {
-		return 'PIKE';
-	} elsif(($type eq 'DRIVE') || ($type eq 'DR')) {
-		return 'DR';
-	} elsif(($type eq 'SPRING') || ($type eq 'SPG')) {
-		return 'SPRING';
-	} elsif(($type eq 'RDG') || ($type eq 'RIDGE')) {
-		return 'RDG';
-	} elsif(($type eq 'CRK') || ($type eq 'CREEK')) {
-		return 'CRK';
-	} elsif(($type eq 'LANE') || ($type eq 'LN')) {
-		return 'LN';
-	} elsif(($type eq 'PLACE') || ($type eq 'PL')) {
-		return 'PL';
-	} elsif(($type eq 'GRDNS') || ($type eq 'GARDENS')) {
-		return 'GRDNS';
-	} elsif(($type eq 'HWY') || ($type eq 'HIGHWAY')) {
-		return 'HWY';
-	}
-
-	# Most likely failure of Geo::StreetAddress::US, but warn anyway, just in case
-	if($ENV{AUTHOR_TESTING}) {
-		warn $self->{'location'}, ": add type $type";
-	}
+	return;
 }
 
 # $data is a hashref to data such as returned by Geo::libpostal::parse_address
@@ -427,8 +380,7 @@ sub _search {
 	my $location;
 
 	# FIXME: linear search is slow
-	# ::diag(Data::Dumper->new([\@columns])->Dump());
-	# ::diag(Data::Dumper->new([$data])->Dump());
+	# ::diag(Data::Dumper->new([\@columns, $data])->Dump());
 	foreach my $row(@{$self->{'data'}}) {
 		my $match = 1;
 
@@ -478,8 +430,7 @@ sub reverse_geocode {
 		$param{'latlng'} = shift;
 	}
 
-	my $latlng = $param{'latlng'}
-		or Carp::croak('Usage: reverse_geocode(latlng => $location)');
+	my $latlng = $param{'latlng'};
 
 	my $latitude;
 	my $longitude;
@@ -490,6 +441,10 @@ sub reverse_geocode {
 		$latitude //= $param{'lat'};
 		$longitude //= $param{'lon'};
 		$longitude //= $param{'long'};
+	}
+
+	if((!defined($latitude)) || !defined($longitude)) {
+		Carp::croak('Usage: reverse_geocode(latlng => $location)');
 	}
 
 	my @rc;
@@ -551,27 +506,32 @@ must apply in writing for a licence for use from Nigel Horne at `<njh at nigelho
 1;
 
 __DATA__
-"name","house_number","road","city","state_district","state","country","latitude","longitude"
+"name","number","road","city","state_district","state","country","latitude","longitude"
 "ST ANDREWS CHURCH",,"CHURCH HILL","EARLS COLNE",,"ESSEX","GB",51.926793,0.70408
+"WESTWOOD CROSS",23,"MARGATE ROAD","BROADSTAIRS",,"KENT","GB",51.358967,1.391367
 "RECULVER ABBEY",,"RECULVER","HERNE BAY",,"KENT","GB",51.37875,1.1955
+"NEW INN",2,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.334522,1.314417,
 "HOLIDAY INN EXPRESS",,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.34320725,1.31680853
 "",106,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.33995174,1.31570211
 "",114,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.34015944,1.31580976
 "MINSTER CEMETERY",116,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.34203083,1.31609075
 "ST MARY THE VIRGIN CHURCH",,"CHURCH ST","RAMSGATE",,"KENT","GB",51.33090893,1.31559716
 "",20,"MELBOURNE AVE","RAMSGATE",,"KENT","GB",51.34772374,1.39532565
+"TOBY CARVERY",,"NEW HAINE ROAD","RAMSGATE",,"KENT","GB",51.357510,1.388894
 "",,"WESTCLIFF PROMENADE","RAMSGATE",,"KENT","GB",51.32711,1.406806
 "TOWER OF LONDON",35,"TOWER HILL","LONDON",,"LONDON","GB",51.5082675,-0.0754225
 "",5350,"CHILLUM PLACE NE","WASHINGTON",,"DC","US",38.955403,-76.996241
 "NCBI",,"MEDLARS DR","BETHESDA","MONTGOMERY","MD","US",38.99516556,-77.09943963
 "",,"CENTER DR","BETHESDA","MONTGOMERY","MD","US",38.99698114,-77.10031119
 "",,"NORFOLK AVE","BETHESDA","MONTGOMERY","MD","US",38.98939358,-77.09819543
+"THE ATRIUM AT ROCK SPRING PARK",6555,"ROCKLEDGE DR","BETHESDA","MONTGOMERY","MD","US",39.028326,-77.136774
 "ALBERT EINSTEIN HIGH SCHOOL",11135,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.03869019,-77.0682871
 "POST OFFICE",10325,"KENSINGTON PKWY","KENSINGTON","MONTGOMERY","MD","US",39.02554455,-77.07178215
 "NEWPORT MILL MIDDLE SCHOOL",11311,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.0416107,-77.06884708
 "SAFEWAY",10541,"HOWARD AVE","KENSINGTON","MONTGOMERY","MD","US",39.02822438,-77.0755196
 "HAIR CUTTERY",3731,"CONNECTICUT AVE","KENSINGTON","MONTGOMERY","MD","US",39.03323865,-77.07368044
 "STROSNIDERS",10504,"CONNECTICUT AVE","KENSINGTON","MONTGOMERY","MD","US",39.02781493,-77.07740792
+"ARCOLA HEALTH AND REHABILITATION CENTER",901,"ARCOLA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.036439,-77.025502
 "FOREST GLEN MEDICAL CENTER",9801,"GEORGIA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.016042,-77.042148
 "LA CASITA PUPESERIA AND MARKET",8214,"PINEY BRANCH ROAD","SILVER SPRING","MONTGOMERY","MD","US",38.993369,-77.009501
 "SNIDERS",1936,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.0088797,-77.04162824
@@ -584,12 +544,17 @@ __DATA__
 "",1406,"LANGBROOK PLACE","ROCKVILLE","MONTGOMERY","MD","US",39.075583,-77.123833
 "BP",2601,"FOREST GLEN ROAD","SILVER SPRING","MONTGOMERY","MD","US",39.0147541,-77.05466857
 "OMEGA STUDIOS",12412,,"ROCKVILLE","MONTGOMERY","MD","US",39.06412645,-77.11252263
-"",7001,,"COLUMBIA","HOWARD","MD","US",39.190009,-76.841152
+"",7001,"CRADLEROCK FARM COURT","COLUMBIA","HOWARD","MD","US",39.190009,-76.841152
+"BANGOR AIRPORT",,"GODFREY BOULEVARD","BANGOR","PENOBSCOT","ME","US",44.406700,-68.597114,
 "",86,"ALLEN POINT LANE","BLUE HILLS","HANCOCK","ME","US",44.35378018,-68.57383976
 "TRADEWINDS",15,"SOUTH STREET","BLUE HILLS","HANCOCK","ME","US",44.40670019,-68.59711438
 "RITE AID",17,"SOUTH STREET","BLUE HILLS","HANCOCK","ME","US",44.40662476,-68.59610059
+"",,"DOUGLAS AVE","FORT WAYNE","ALLEN","IN","US",41.074247,-85.138531
 "JOHN GLENN AIRPORT",4600,,"COLUMBUS","FRANKLIN","OH","US",39.997959,-82.88132
+"MIDDLE RIDGE PLAZA",,,"AMHERST","LOHRAIN","OH","US,41.379695,-82.222877
 "RESIDENCE INN BY MARRIOTT",6364,"FRANTZ RD","DUBLIN",,"OH","US",40.097097,-83.123745
+"TOWPATH TRAVEL PLAZA",,,"BROADVIEW HEIGHTS","CUYAHOGA","OH","US",41.291654,-81.675815
 "NEW STANTON SERVICE PLAZA",,,"HEMPFIELD",,"PA","US",40.206267,-79.565682
+"SOUTH SOMERSET SERVICE PLAZA",,,"SOMERSET","SOMERSET","PA","US",39.999154,-79.046526
 "THE PURE PASTY COMPANY",128C,"MAPLE AVE W","VIENNA","FAIRFAX","VA","US",44.40662476,-68.59610059
 "THE CAPITAL GRILLE RESTAURANT",1861,,"MCLEAN","FAIRFAX","VA","US",38.915635,-77.22573

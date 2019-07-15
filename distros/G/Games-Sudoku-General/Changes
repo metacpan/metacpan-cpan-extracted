@@ -1,3 +1,6 @@
+0.023		2019-07-13	T. R. Wyant
+    Fix broken POD links, and add test to ensure they stay fixed.
+
 0.022		2019-02-23	T. R. Wyant
     Third argument to 'set brick' is now fatal.
 

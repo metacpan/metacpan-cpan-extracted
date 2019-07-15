@@ -29,11 +29,10 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98",
-    "YAML::PP" => "0.012",
-    "YAML::PP::Parser" => 0,
+    "YAML::PP" => "0.018",
     "blib" => "1.01"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,9 +47,8 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Test::More" => "0.98",
   "XSLoader" => 0,
-  "YAML::PP" => "0.012",
+  "YAML::PP" => "0.018",
   "YAML::PP::Common" => 0,
-  "YAML::PP::Parser" => 0,
   "blib" => "1.01",
   "strict" => 0,
   "warnings" => 0

@@ -5,14 +5,15 @@ package Fake::Encode;
 #
 # http://search.cpan.org/dist/Fake-Encode/
 #
-# Copyright (c) 2016, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2016, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 sub Encode::decode {
     my(undef, $human_readable_string) = @_;

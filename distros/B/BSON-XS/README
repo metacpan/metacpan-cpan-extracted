@@ -2,7 +2,7 @@ NAME
     BSON::XS - XS implementation of MongoDB's BSON serialization
 
 VERSION
-    version v0.6.0
+    version v0.8.0
 
 DESCRIPTION
     This module contains an XS implementation for BSON encoding and
@@ -26,8 +26,11 @@ SUPPORT
 AUTHOR
     David Golden <david@mongodb.com>
 
+CONTRIBUTOR
+    Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>
+
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2018 by MongoDB, Inc.
+    This software is Copyright (c) 2019 by MongoDB, Inc.
 
     This is free software, licensed under:
 

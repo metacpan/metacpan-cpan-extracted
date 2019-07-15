@@ -7,6 +7,7 @@ build_requires:
   File::Slurp: '0'
   FindBin: '0'
   IO::Dir: '0'
+  JSON::MaybeXS: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::Pod: '0'
@@ -31,6 +32,6 @@ requires:
 resources:
   bugtracker: https://github.com/pplu/cfn-perl/issues
   repository: https://github.com/pplu/cfn-perl.git
-version: '0.06'
+version: '0.07'
 x_generated_by_perl: v5.24.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

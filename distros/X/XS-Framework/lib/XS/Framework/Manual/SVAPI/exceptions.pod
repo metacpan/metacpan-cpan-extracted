@@ -1,0 +1,52 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::exceptions - XS::Framework exceptions reference
+
+=head1 C++ EXCEPTIONS
+
+It is wrong way to invoke C<Perl_croak()> in XS-adatper C++ code, as this is
+plain C functions, which knows nothing about C++ context and stack unwinding,
+so it potentially leads to memory leaks.
+
+When using L<XS::Framework>, it automatically wraps XS-adapter (and, hence C++)
+code into C<try/catch> via C<throw_guard>, which will do proper housekeeping
+and then C<croak()>.
+
+L<XS::Framework> is shipped with default handlers for C<std::exception&>,
+C<const std::string&>, C<const panda::string&>, C<char*>, C<SV*>, C<SV&>
+etc as well as catch-all C<...> hanlder, which will do conversion into
+Perl string and C<croak> with it.
+
+No additional efforts are needed here, as this is out of the box behaviour.
+
+However, if the underlying C++ library use custom/non-standard exceptions
+or there is need to do tricky exception to Perl SV* conversion, it is possible
+to use C<xs::add_catch_handler()> function:
+
+    using CatchHandlerSimple = std::function<Sv()>;
+    using CatchHandler       = std::function<Sv(const Sub&)>;   // context call function
+
+    void add_catch_handler (CatchHandlerSimple f);
+    void add_catch_handler (CatchHandler       f);
+
+example:
+    // let's assume that CustomException::description() returns const std::string&
+    xs::add_catch_handler([]() -> Sv {
+        try { throw; }
+        catch (CustomException& e) { return xs::out(e.description()); }
+        return nullptr;
+    });
+
+
+Please note, that the exception handlers are executed in FILO-order, i.e. the
+most recently added exception handler will be executed first; the shipped
+exception handlers are executed last.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+=cut
+

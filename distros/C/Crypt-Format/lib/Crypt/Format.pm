@@ -3,7 +3,7 @@ package Crypt::Format;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our $BASE64_MODULE = 'MIME::Base64';
 
@@ -21,6 +21,9 @@ Crypt::Format - Conversion utilities for encryption applications
     my $pem = Crypt::Format::der2pem($der, 'CERTIFICATE REQUEST');
 
     my $good_pem = Crypt::Format::normalize_pem($weird_pem);
+
+    # Split PEM chains such as application/pem-certificate-chain …
+    my @pems = Crypt::Format::split_pem_chain($pem_chain);
 
     {
         #If, for whatever reason, you don’t like MIME::Base64,
@@ -62,6 +65,10 @@ sub pem2der {
     $pem =~ s<[\x0d\x0a]+[^\x0d\x0a]+?\z><>s;
 
     return _do_base64('decode', $pem);
+}
+
+sub split_pem_chain {
+    return split m[(?<=-)[\x0d\x0a]+(?=-)], shift();
 }
 
 sub _do_base64 {

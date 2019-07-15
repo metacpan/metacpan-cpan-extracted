@@ -29,7 +29,9 @@ sub _option_popup {
     if (! @rv) { # no elements returned, while we expect one; create the popup
         # make sure the popup gets created by clicking twice (pop up+pop down)
         $self->click;
-        $self->click;
+        # wait until the popup has been created!
+        $page->find("//div[\@dijitpopupparent='$id']");
+        $self->click; # hide the popup again
 
         @rv = $page->find_all("//div[\@dijitpopupparent='$id']");
     }

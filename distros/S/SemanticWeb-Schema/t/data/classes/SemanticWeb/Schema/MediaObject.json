@@ -41,13 +41,13 @@
          "rdfs:label" : "duration",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:Movie",
             "schema:Event",
             "schema:MusicRelease",
-            "schema:Audiobook",
+            "schema:MediaObject",
+            "schema:Movie",
             "schema:QuantitativeValueDistribution",
             "schema:MusicRecording",
-            "schema:MediaObject"
+            "schema:Audiobook"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -71,8 +71,8 @@
          "rdfs:comment" : "Media type typically expressed using a MIME format (see <a href=\"http://www.iana.org/assignments/media-types/media-types.xhtml\">IANA site</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types\">MDN reference</a>) e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.).<br/><br/>\n\nIn cases where a <a class=\"localLink\" href=\"http://schema.org/CreativeWork\">CreativeWork</a> has several media type representations, <a class=\"localLink\" href=\"http://schema.org/encoding\">encoding</a> can be used to indicate each <a class=\"localLink\" href=\"http://schema.org/MediaObject\">MediaObject</a> alongside particular <a class=\"localLink\" href=\"http://schema.org/encodingFormat\">encodingFormat</a> information.<br/><br/>\n\nUnregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.",
          "rdfs:label" : "encodingFormat",
          "schema:domainIncludes" : [
-            "schema:MediaObject",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",
@@ -88,7 +88,10 @@
             "schema:FoodEstablishmentReservation",
             "schema:MediaObject"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
       },
       "schema:height" : {
          "rdf:type" : "rdf:Property",
@@ -97,12 +100,12 @@
          "schema:domainIncludes" : [
             "schema:VisualArtwork",
             "schema:Person",
-            "schema:Product",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Distance"
+            "schema:Distance",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:playerType" : {
@@ -117,14 +120,14 @@
          "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
          "rdfs:label" : "productionCompany",
          "schema:domainIncludes" : [
-            "schema:TVSeries",
-            "schema:RadioSeries",
+            "schema:MovieSeries",
             "schema:VideoGameSeries",
-            "schema:Movie",
-            "schema:CreativeWorkSeason",
             "schema:Episode",
+            "schema:RadioSeries",
+            "schema:TVSeries",
+            "schema:Movie",
             "schema:MediaObject",
-            "schema:MovieSeries"
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -146,8 +149,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:MediaSubscription",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:MediaSubscription"
          ]
       },
       "schema:startTime" : {
@@ -155,11 +158,14 @@
          "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December. For media, including audio and video, it's the time offset of the start of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
          "rdfs:label" : "startTime",
          "schema:domainIncludes" : [
-            "schema:FoodEstablishmentReservation",
             "schema:MediaObject",
-            "schema:Action"
+            "schema:Action",
+            "schema:FoodEstablishmentReservation"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
       },
       "schema:uploadDate" : {
          "rdf:type" : "rdf:Property",
@@ -174,12 +180,12 @@
          "rdfs:label" : "width",
          "schema:domainIncludes" : [
             "schema:MediaObject",
-            "schema:VisualArtwork",
-            "schema:Product"
+            "schema:Product",
+            "schema:VisualArtwork"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Distance"
+            "schema:Distance",
+            "schema:QuantitativeValue"
          ]
       }
    }

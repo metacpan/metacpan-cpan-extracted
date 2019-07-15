@@ -36,7 +36,7 @@ reflect my personal taste of humour.
 
 LICENSE
 
-Copyright (C) 2016,2018 Johan Vromans,
+Copyright (C) 2016,2019 Johan Vromans,
 
 This module is free software. You can redistribute it and/or modify it
 under the same terms as Perl.

@@ -18,6 +18,7 @@ requires 'App::Cmd';
 requires 'Config::Simple';
 requires 'Catmandu::LIDO';
 requires 'Catmandu::Store::Datahub';
+requires 'Catmandu::DBI';
 requires 'HTTP::Request::StreamingUpload';
 requires 'Log::Any';
 requires 'Log::Any::Adapter';

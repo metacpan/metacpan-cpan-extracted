@@ -154,7 +154,7 @@ use Net::ACME2::HTTP;
 use Net::ACME2::Order;
 use Net::ACME2::Authorization;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use constant {
     _HTTP_OK => 200,
@@ -204,6 +204,12 @@ sub new {
 
     _die_generic('Need “key”!') if !$opts{'key'};
 
+    return $class->_new_without_key_check(%opts);
+}
+
+sub _new_without_key_check {
+    my ( $class, %opts ) = @_;
+
     my $self = {
         _host => $class->HOST(%opts),
         _key  => $opts{'key'},
@@ -231,9 +237,10 @@ sub key_id {
     return $self->{'_key_id'};
 }
 
-=head2 $url = I<OBJ>->get_terms_of_service()
+=head2 $url = I<CLASS>->get_terms_of_service()
 
-Returns the URL for the terms of service.
+Returns the URL for the terms of service. Callable as either
+a class method or an instance method.
 
 B<NOTE:> For L<Let’s Encrypt|http://letsencrypt.org> you can
 unofficially resolve against
@@ -245,9 +252,9 @@ of service.
 sub get_terms_of_service {
     my ($self) = @_;
 
-    #We want to be able to call this as a class method.
+    # We want to be able to call this as a class method.
     if (!ref $self) {
-        $self = $self->new();
+        $self = $self->_new_without_key_check();
     }
 
     my $dir = $self->_get_directory();
@@ -524,7 +531,7 @@ sub _set_ua {
     my ($self) = @_;
 
     $self->{'_ua'} = Net::ACME2::HTTP->new(
-        key => $self->_key_obj(),
+        key => $self->{'_key'} && $self->_key_obj(),
         key_id => $self->{'_key_id'},
     );
 

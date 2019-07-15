@@ -1,0 +1,199 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+
+=cut
+
+=head1 DESCRIPTION
+
+Let's assume that C++ API offers the following interface:
+
+    struct PointRecipe12 {
+        double x;
+        double y;
+    };
+
+    struct StatisticsRecipe12 {
+        StatisticsRecipe12(const PointRecipe12& interest_, const std::vector<PointRecipe12>& points_);
+        const PointRecipe12& nearest() const;
+        const PointRecipe12& farest() const;
+    };
+
+The C<Statistics> interface is I<transient>, i.e. it's lifetime is linked to
+the lifetime of it's arguments.: if they are destructed, invoking C<Statistics>
+methods will probably lead to crash. The same can be told about returnted
+result types in the method. This happens when C++ constructor and return types
+are pointers.
+
+This is quite common C++ pattern of iterator, lazy evaluator etc. However,
+there is no perlish way to represent this approach as is. One way to handle
+that is to I<convert object to functions>, i.e. let there be two non-lazy static
+functions in xs-adapter, one for nearest point and another one for farest point.
+
+In some cases this may be good solution, but in the others it might be suboptimal,
+e.g. for the cases when all calculations are perfomed on object construction
+phase, and methods just return values to the precalculated results. Would it
+be implemented as object converted to functions, the calculation will occur
+on each method invocation.
+
+Another approach is: create a clone of constructor arguments on a heap, create
+an transient object instance on a heap and let the SV* wrapper for it holds
+all required C++ objects. For every returned transient C++ object, let's
+create another clone and return it to Perl. Having that makes it possible to
+detach xs-adapter lifetimes from lifetimes of arguments and behave
+independently; by the price of copying objects, of course. Let's show how to
+do that.
+
+    namespace xs {
+        template <>
+        struct Typemap<PointRecipe12*> : TypemapObject<PointRecipe12*, PointRecipe12*, ObjectTypePtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::PointRecipe12"; }
+        };
+
+
+        template <>
+        struct Typemap<StatisticsRecipe12*> : TypemapObject<StatisticsRecipe12*, StatisticsRecipe12*, ObjectTypePtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::StatisticsRecipe12"; }
+        };
+    }
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::PointRecipe12
+    PROTOTYPES: DISABLE
+
+    double PointRecipe12::x(SV* new_val = nullptr) : ALIAS(y = 1) {
+        double* val = nullptr;
+        switch(ix) {
+            case 1: val = &THIS->y; break;
+            default: val = &THIS->x; break;
+        }
+        if (new_val) {
+            *val = SvNV(new_val);
+        }
+        RETVAL = *val;
+    }
+
+    PointRecipe12* PointRecipe12::new(double x = 0, double y = 0) {
+        RETVAL = new PointRecipe12{x, y};
+    }
+
+    static xs::Sv::payload_marker_t payload_marker_12{}; // (1)
+
+The xs-adapter for C<Point> and typemaps are quite straighforward. As we are
+going to use Perl SV* wrapper for C<Statistics> to store pointers of clones,
+it is convenient to use magic payload for the purposes (1). For the case
+will use custom struct (2) to be stored as payload:
+
+
+    struct StatisticsRecipe12_payload { // (2)
+        PointRecipe12 interest;
+        std::vector<PointRecipe12> points;
+        ~StatisticsRecipe12_payload() { std::cout << "~StatisticsRecipe12_payload\n"; }
+    };
+
+    static int payload_marker_IntersectionFinderAdder_free(SV*, MAGIC* mg) {
+        if (mg->mg_virtual == &payload_marker_12) { // (3)
+            auto* payload = static_cast<StatisticsRecipe12_payload*>((void*)mg->mg_ptr); // (4)
+            delete payload; // (5)
+        }
+        return 0;
+    }
+
+and because it will be stored as C<void*> in payload, we need proper destructor
+for it, i.e. check that it really our payload (3), do convertion from C<void*>
+(4) and then finally delete object on a heap (5). Let's write the adapter
+for C<Statistics>:
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::StatisticsRecipe12
+    PROTOTYPES: DISABLE
+
+    PointRecipe12* StatisticsRecipe12::nearest() {
+        RETVAL = new PointRecipe12(THIS->nearest());    // (6)
+    }
+
+    PointRecipe12* StatisticsRecipe12::farest() {
+        RETVAL = new PointRecipe12(THIS->farest());     // (7)
+    }
+
+    Sv StatisticsRecipe12::new(PointRecipe12* interest, Array pts) {
+        using payload_ptr_t = std::unique_ptr<StatisticsRecipe12_payload>;
+        using stats_ptr_t = std::unique_ptr<StatisticsRecipe12>;
+
+        std::vector<PointRecipe12> points;  // (8)
+        for(auto it: pts) {
+            points.push_back(*(xs::in<PointRecipe12*>(it)));    // (9)
+        }
+
+        // better to use std::make_unique from C++ 14, if available. (10)
+        auto payload_holder = payload_ptr_t{new StatisticsRecipe12_payload{ *interest, std::move(points) }};
+        auto self_holder = stats_ptr_t{new StatisticsRecipe12{ payload_holder->interest, payload_holder->points }}; // (11)
+
+        Object self = xs::out(self_holder.get(), CLASS);    // (13)
+        self.payload_attach((void*)payload_holder.get(), &payload_marker_12);   // (14)
+
+        // (15)
+        payload_holder.release();
+        self_holder.release();
+
+        RETVAL = self.ref();    // (16)
+    }
+
+    BOOT {
+         payload_marker_12.svt_free = payload_marker_IntersectionFinderAdder_free; // (17)
+    }
+
+To detach found C<Point> object, we create a copy of th results (6), (7) and
+return them to Perl. The most complex here is C<Statistics> construtor. Firtst,
+the C<xs::Array> of arguments (probably points?), should be converted to
+C<std::vector> of Points (8), as required by C++ interface. The C<xs::in>
+method (9) is responsible for the conversion; in case of error (i.e. something
+non convertible to C<Point*> has been supplied in Perl), it will throw an
+exception. Please note, that on line (9) it not only extracts C<Point*> from
+Perl array, but also creates a copies of the original points.
+
+On the following lines (10) it acatually creates C<Startistics> and
+C<Statistics payload> objects on a heap. The C<std::unique_ptr> is used to
+let the code be exception-safe, e.g. would an exception be thrown at the
+line (11), the C<payload_holder> will automatically delete payload
+on stack unwinding. This is commonly known as RAII principle.
+
+The following code is pretty easy: the SV* wrapper is screated for the pointer
+held by C<self_holder> (13), and to the wrapper the payload is attaches as
+C<void*> using previously created C<payload_marker_12> at (1). A soon everything
+is constructed, the pointer guards are released (15) and the reference to the
+newly created object is retruned (16). To let Perl know how to delete
+custom C<void*> payload, the "deleter" for C<payload_marker_12> should be
+attached at XS-module BOOT section (17).
+
+The following code proves the correctness of the chosen approach:
+
+    my $stats;
+
+    {
+        $stats = MyTest::Cookbook::StatisticsRecipe12->new(
+            MyTest::Cookbook::PointRecipe12->new(0.5, 0.5),
+            [
+                MyTest::Cookbook::PointRecipe12->new(1, 1),
+                MyTest::Cookbook::PointRecipe12->new(2, 1),
+                MyTest::Cookbook::PointRecipe12->new(5, 3),
+            ],
+        );
+    };
+
+    subtest 'nearest point' => sub {
+        my $p = $stats->nearest;
+        is $p->x, 1;
+        is $p->y, 1;
+    };
+
+    subtest 'farest point' => sub {
+        my $p = $stats->farest;
+        is $p->x, 5;
+        is $p->y, 3;
+    };
+
+Short summary: for transient C++ objects, which depends on other C++ objects
+without owning them, sometimes it is possible to create a copy of them on
+a heap, and let Perl SV* wrapper holds them. That's way "safe" Perl interface
+might be designed.
+
+=cut

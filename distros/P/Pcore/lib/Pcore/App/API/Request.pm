@@ -1,7 +1,7 @@
 package Pcore::App::API::Request;
 
 use Pcore -class, -res;
-use Pcore::Util::Scalar qw[is_res];
+use Pcore::Lib::Scalar qw[is_res];
 
 use overload    #
   q[&{}] => sub ( $self, @ ) {
@@ -9,7 +9,7 @@ use overload    #
   },
   fallback => 1;
 
-has auth       => ( required => 1 );       # InstanceOf ['Pcore::App::Auth::Descriptor']
+has auth       => ( required => 1 );       # InstanceOf ['Pcore::App::API::Auth']
 has _cb        => ();                      # Maybe [CodeRef]
 has _responded => 0, init_arg => undef;    # Bool, already responded
 

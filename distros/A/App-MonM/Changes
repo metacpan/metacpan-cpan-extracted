@@ -1,0 +1,30 @@
+# $Id: Changes 68 2019-07-04 10:01:29Z abalama $
+# Version/Revision history.
+
+1.00 Wed Sep 10 10:42:03 2014 GMT
+    * Initial release
+
+1.01 Tue Sep 23 17:59:23 2014 MSK
+    * Documentation modified
+    * YAML output corrected
+
+1.02 Thu Oct  2 19:28:18 2014 MSK
+    * Documentation modified
+    * AlertGrid support added
+    * RRD support added
+
+1.03 Wed Dec 17 15:29:42 2014 MSK
+    * Documentation modified
+
+1.04 Wed Apr 29 15:38:26 2015 MSK
+    * Documentation modified
+    * Added alertgrid_nginx script
+    * Added checkitreport action (#470)
+
+1.05 Tue Jun 30 14:59:18 2015 MSK
+    * Documentation modified
+    * Added alertgrid_nginx script (to release)
+    * Added single, double, triple and quadruple graphs
+
+1.06 Thu  4 Jul 11:36:05 MSK 2019
+    * CTKlib v2.00 adapted

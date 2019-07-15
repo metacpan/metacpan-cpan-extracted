@@ -1,0 +1,53 @@
+{
+   "abstract" : "Framework for building C++ XS modules with shared code, typemaps and C++ perl API.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XS-Framework",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "CPP::panda::lib" : "v1.2.1",
+            "XS::Install" : "v1.2.3",
+            "next::XS" : "v1.0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPP::panda::lib" : "v1.2.1",
+            "XS::Install" : "v1.2.3",
+            "next::XS" : "v1.0.4",
+            "perl" : "5.018000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

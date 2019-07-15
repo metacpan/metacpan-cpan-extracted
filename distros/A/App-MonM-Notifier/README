@@ -1,5 +1,231 @@
-#
-# $Id: README 41 2017-11-30 11:26:30Z abalama $
-#
+NAME
 
-Coming soon...
+    App::MonM::Notifier - extension for the monm notifications
+
+VERSION
+
+    Version 1.02
+
+SYNOPSIS
+
+        # monotifier < /path/to/message/file.txt
+        # monotifier show
+        # monotifier show <ID>
+        # monotifier remove <ID>
+        # monotifier clean
+        # monotifier truncate
+
+DESCRIPTION
+
+    This is an extension for the monm notifications over different
+    communication channels
+
+CONFIGURATION
+
+      <Notifier>
+
+        #
+        # !!! WARNING !!!
+        #
+        # Before using the third-party database, please create the monotifier table
+        #
+
+        #-- For SQLite DB
+        #CREATE TABLE IF NOT EXISTS `monotifier` (
+        #  `id` int(11) NOT NULL COMMENT 'ID',
+        #  `to` char(255) DEFAULT NULL COMMENT 'Recipient name',
+        #  `channel` char(255) DEFAULT NULL COMMENT 'Recipient channel',
+        #  `subject` text COMMENT 'Message subject',
+        #  `message` text COMMENT 'Message content',
+        #  `pubdate` int(11) DEFAULT NULL COMMENT 'Date (unixtime) of the publication',
+        #  `expires` int(11) DEFAULT NULL COMMENT 'Date (unixtime) of the expire',
+        #  `status` char(32) DEFAULT NULL COMMENT 'Status of transaction',
+        #  `comment` char(255) DEFAULT NULL COMMENT 'Comment',
+        #  `errcode` int(11) DEFAULT NULL COMMENT 'Error code',
+        #  `errmsg` text COMMENT 'Error message',
+        #  PRIMARY KEY (`id`),
+        #  KEY `I_ID` (`id`)
+        #) ENGINE=MyISAM DEFAULT CHARSET=utf8
+
+        # SQLite example:
+        #<DBI>
+        #    DSN "dbi:SQLite:dbname=/tmp/monm/monotifier.db"
+        #    Set RaiseError     0
+        #    Set PrintError     0
+        #    Set sqlite_unicode 1
+        #</DBI>
+
+        # MySQL example:
+        #<DBI>
+        #    DSN "DBI:mysql:database=monotifier;host=mysql.example.com"
+        #    User username
+        #    Password password
+        #    Set RaiseError          0
+        #    Set PrintError          0
+        #    Set mysql_enable_utf8   1
+        #</DBI>
+
+        # Expires and timeout values
+        Expires +1M
+        Timeout 300
+
+      </Notifier>
+
+      # User configuration
+      <User "foo">
+        Period  7:00-23:00
+
+        <Channel MyEmail>
+            Type    Email
+            To      test@example.com
+        </Channel>
+
+        <Channel MySMS>
+            Type    Command
+            Period  8:00-22:00
+            To      +1 123 458 7789
+            Command monotifiersms.pl
+        </Channel>
+      </User>
+
+ EXAMPLE
+
+      <User "test">
+        # Global period (default for all channels)
+        Period  7:00-21:00
+
+        # Email via SMTP
+        <Channel MyEmail>
+            Type    Email
+
+            # Real To and From
+            To      test@example.com
+            From    root@example.com
+
+            # Options
+            #Encoding base64
+
+            # Headers
+            <Headers>
+                X-Foo foo
+                X-Bar bar
+            </Headers>
+
+            # SMTP options
+            # If there are requirements to the register of parameter
+            # names, use the Set directive, for example:
+            # By default will use <SendMail> section of general config file
+            Set host 192.168.0.1
+            #Set port 25
+            #Set sasl_username TeStUser
+            #Set sasl_password MyPassword
+
+            # Local period (default for this channel only)
+            Period  7:30-16:30
+
+            # Calendar settings for this channel
+            # Sun Mon Tue Wed Thu Fri Sat
+            #  ... or:
+            # Sunday Monday Tuesday Wednesday Thursday Friday Saturday
+            Sun - # disable!
+            Mon 7:35-17:45
+            Tue 15-19
+            Wed -
+            Thu 16-18:01
+            Fri 18:01-19
+            Sat -
+
+        </Channel>
+
+        # Simple Email example
+        <Channel TinyEmail>
+            # Using <SendMail> section
+            Type    Email
+            To      test@example.com
+        </Channel>
+
+        # Save to file by mask
+        <Channel MyFile>
+            Type    File
+
+            # Real To and From
+            To      testuser
+            From    root
+
+            # Options
+            #Encoding base64
+
+            # Headers
+            <Headers>
+                X-Mailer foo
+            </Headers>
+
+            #Dir      /path/to/messages/dir
+            #File     [TO]_[DATETIME]_[ID].[EXT]
+
+            Period  10:00-23:00
+            #Thu     7:45-14:25
+            #Sun -
+            #Fri     0:0-1:0
+
+        </Channel>
+
+        # Send serialized message to STDIN of external program
+        <Channel MyCommand>
+            Type    Command
+
+            # Real To and From
+            To      testuser
+            From    root
+
+            # Options
+            #Encoding base64
+
+            <Headers>
+                X-Foo foo
+                X-Bar bar
+            </Headers>
+
+            Command "grep MIME > t.msg"
+
+            Period  00:00-23:59
+
+        </Channel>
+
+    </User>
+
+HISTORY
+
+    See Changes file
+
+DEPENDENCIES
+
+    CTK, App::MonM
+
+TO DO
+
+    See TODO file
+
+BUGS
+
+    * none noted
+
+SEE ALSO
+
+    CTK
+
+AUTHOR
+
+    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
+
+COPYRIGHT
+
+    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+LICENSE
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See LICENSE file and https://dev.perl.org/licenses/
+

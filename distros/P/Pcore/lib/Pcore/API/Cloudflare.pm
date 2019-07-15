@@ -1,7 +1,7 @@
 package Pcore::API::Cloudflare;
 
 use Pcore -const, -class, -res;
-use Pcore::Util::Scalar qw[weaken];
+use Pcore::Lib::Scalar qw[weaken];
 
 has email => ( required => 1 );
 has key   => ( required => 1 );

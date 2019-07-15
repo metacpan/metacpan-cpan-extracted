@@ -15,15 +15,12 @@ RUN /bin/bash -c ' \
     # setup perl build env
     source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/tip/perl-build-env.sh || echo false ) setup \
     \
-    # deploy nginx
+    # deploy deps
     && yum -y install nginx-mainline \
     \
     # deploy non-CPAN deps
     # && mkdir "$PCORE_LIB/pcore-cdn-static-data" \
     # && curl -fsSL https://bitbucket.org/softvisio/pcore-cdn-static-data/get/tip.tar.gz | tar -C "$PCORE_LIB/pcore-cdn-static-data" --strip-components=1 -xzf - \
-    \
-    # deploy deps
-    # yum -y install ...
     \
     # deploy and test distribution
     && pcore deploy --recommends --suggests \

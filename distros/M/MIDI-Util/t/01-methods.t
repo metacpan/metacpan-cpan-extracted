@@ -29,4 +29,46 @@ lives_ok {
 } 'lives through new_track';
 isa_ok $track, 'MIDI::Track';
 
+my $x = MIDI::Util::dump('volume');
+is $x->[-1], 'fff => 127', 'volume';
+
+$x = MIDI::Util::dump('length');
+is $x->[-1], 'ddwn => 7', 'length';
+
+$x = MIDI::Util::dump('note');
+is $x->[-1], 'B => 11', 'note';
+
+$x = MIDI::Util::dump('note2number');
+is $x->[-1], 'G10 => 127', 'note2number';
+
+$x = MIDI::Util::dump('number2note');
+is $x->[-1], '127 => G10', 'number2note';
+
+$x = MIDI::Util::dump('patch2number');
+is $x->[-1], 'Gunshot => 127', 'patch2number';
+
+$x = MIDI::Util::dump('number2patch');
+is $x->[-1], '127 => Gunshot', 'number2patch';
+
+$x = MIDI::Util::dump('notenum2percussion');
+is $x->[-1], '81 => Open Triangle', 'notenum2percussion';
+
+$x = MIDI::Util::dump('percussion2notenum');
+is $x->[-1], 'Open Triangle => 81', 'percussion2notenum';
+
+$x = MIDI::Util::dump('all_events');
+is $x->[-1], 'raw_data', 'all_events';
+
+$x = MIDI::Util::dump('midi_events');
+is $x->[-1], 'set_sequence_number', 'midi_events';
+
+$x = MIDI::Util::dump('meta_events');
+is $x->[-1], 'raw_data', 'meta_events';
+
+$x = MIDI::Util::dump('text_events');
+is $x->[-1], 'text_event_0f', 'text_events';
+
+$x = MIDI::Util::dump('nontext_meta_events');
+is $x->[-1], 'raw_data', 'nontext_meta_events';
+
 done_testing();

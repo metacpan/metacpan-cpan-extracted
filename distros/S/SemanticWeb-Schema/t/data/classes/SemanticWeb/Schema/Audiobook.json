@@ -17,13 +17,13 @@
          "rdfs:label" : "duration",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:Movie",
             "schema:Event",
             "schema:MusicRelease",
-            "schema:Audiobook",
+            "schema:MediaObject",
+            "schema:Movie",
             "schema:QuantitativeValueDistribution",
             "schema:MusicRecording",
-            "schema:MediaObject"
+            "schema:Audiobook"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },

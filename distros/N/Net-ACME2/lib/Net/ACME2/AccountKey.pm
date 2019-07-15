@@ -6,7 +6,7 @@ use warnings;
 use Net::ACME2::X ();
 
 use constant {
-    _DEBUG => 1,
+    _DEBUG => 0,
     _JWK_THUMBPRINT_DIGEST => 'sha256',
 
     _JWA_ALG => {

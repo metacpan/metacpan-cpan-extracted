@@ -1,10 +1,10 @@
 # NAME
 
-Catalyst::Plugin::Statsd - log Catalyst stats to statsd
+Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 # VERSION
 
-version v0.6.1
+version v0.6.2
 
 # SYNOPSIS
 
@@ -13,6 +13,8 @@ use Catalyst qw/
    Statsd
    -Stats=1
  /;
+
+use Net::Statsd::Tiny;
 
 __PACKAGE__->config(
   'psgi_middleware', [
@@ -67,6 +69,8 @@ $c->statsd_client;
 ```
 
 Returns the statsd client.
+
+This is the statsd client used by [Plack::Middleware::Statsd](https://metacpan.org/pod/Plack::Middleware::Statsd).
 
 ## `statsd_metric_name_filter`
 
@@ -138,6 +142,8 @@ $stats->profile( begin => 'controller.here' );
 
 - [Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats)
 - [Plack::Middleware::Statsd](https://metacpan.org/pod/Plack::Middleware::Statsd)
+
+    [Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny)
 
 # SOURCE
 

@@ -3,10 +3,10 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Modern-Open
-version: 0.08
+version: 0.09
 abstract: Autovivification, Autodie, and 3-args open support
 author:
-  - INABA Hitoshi <ina@cpan.org>
+  - ina <ina@cpan.org>
 license: perl
 generated_by: pmake.bat
 requires:
@@ -20,12 +20,10 @@ requires:
   File::Path: 1.0401
   FindBin: 1.42
   Getopt::Std: 1.01
-  Symbol: 1.02
-  Test: 1.122
-  Test::Harness: 1.1602
   perl: 5.005_03
   strict: 1.01
 build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/Modern-Open

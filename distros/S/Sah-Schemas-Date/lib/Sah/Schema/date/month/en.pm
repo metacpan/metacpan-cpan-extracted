@@ -1,7 +1,7 @@
 package Sah::Schema::date::month::en;
 
-our $DATE = '2017-06-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-20'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Month number/name (abbreviated or full, in English)',
@@ -28,7 +28,7 @@ Sah::Schema::date::month::en - Month number/name (abbreviated or full, in Englis
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2017-06-17.
+This document describes version 0.003 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2019-06-20.
 
 =head1 HOMEPAGE
 
@@ -52,7 +52,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,12 @@
+# $Id: Changes 62 2019-07-14 12:10:44Z abalama $
+# Version/Revision history.
+
+1.00 Wed Oct 11 11:13:25 2017 GMT
+    * Initial release
+
+1.01 Tue Dec  5 14:50:08 2017 BT
+    * Added dependencies: IO::String
+
+1.02 Wed Jul 10 11:44:46 MSK 2019
+    * Adapted for actual versions of CTKlib and App-MonM
+    - All daemon and client/server subclasses was removed!

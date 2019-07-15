@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has broadcast_frequency_value => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::BroadcastFrequencySpecification - The frequency in MHz and 
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -61,9 +61,9 @@ A broadcast_frequency_value should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Num>
 
 =back
 

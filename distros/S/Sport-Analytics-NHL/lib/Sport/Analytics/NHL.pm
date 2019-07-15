@@ -36,7 +36,7 @@ Sport::Analytics::NHL - Crawl data from NHL.com and put it into a database
 
 =head1 VERSION
 
-Version 1.51
+Version 1.53
 
 =cut
 
@@ -44,7 +44,7 @@ our @EXPORT = qw(
 	hdb_version
 );
 
-our $VERSION = "1.51";
+our $VERSION = "1.53";
 
 =head1 SYNOPSIS
 

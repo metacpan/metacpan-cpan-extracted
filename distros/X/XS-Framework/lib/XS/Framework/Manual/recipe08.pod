@@ -1,0 +1,159 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+
+=cut
+
+=head1 Creating artificial hierarchy
+
+Let's assume there is a I<different> C++ libraries, offering similar
+capabilities, e.g. WAV-files playing library and multimedia-files
+(ogg, aac, mp3) playing library. Their interfaces are like:
+
+    /* is able to hold only files in WAV-format */
+    struct WAVFile {
+        WAVFile(const char* name): name_{name} {}
+        const char* name() const noexcept { return name_; }
+    private:
+        const char* name_;
+    };
+
+    /* is able to hold any files only in ogg, mp3 and aac formats */
+    struct MultimediaFile {
+        MultimediaFile(const char* name, const char* format): name_{name}, format_{format} {}
+        const char* name() const noexcept { return name_; }
+        const char* format() const noexcept { return format_; }
+    private:
+        const char* name_;
+        const char* format_;
+    };
+
+    struct WAVPlayer {
+      WAVPlayer(double preferred_bitrate): preferred_bitrate_{preferred_bitrate} {}
+      std::string play_wav(WAVFile* file) {
+        std::string result = "wav-player is playing ";
+        result += file->name();
+        result += " with bitrate ";
+        result += std::to_string(preferred_bitrate_);
+        return result;
+      }
+      double preferred_bitrate() const noexcept { return preferred_bitrate_; }
+      WAVPlayer* clone() const noexcept { return new WAVPlayer(preferred_bitrate_); }
+    private:
+      double preferred_bitrate_;
+    };
+
+    struct MultimediaPlayer {
+      MultimediaPlayer(int quality): quality_{quality} {}
+      std::string play_file(MultimediaFile* file) {
+        std::string result = "player is playing ";
+        result += file->name();
+        result += " (";
+        result += file->format();
+        result += ")";
+        result += " with quality ";
+        result += std::to_string(quality_);
+        return result;
+      }
+      int quality() const noexcept { return quality_; }
+      MultimediaPlayer* clone() const noexcept { return new MultimediaPlayer(quality_); }
+    private:
+      int quality_;
+    };
+
+Their typemaps are trivial without inheritance and are omitted here (see
+C<t/cookbook/recipe08.xsi> for full sources).
+
+What we would like to achive is to "fix" C++ hierarchy in Perl: as
+C<WAVPlayer> and C<MultimediaPlayer> almost the same interface, and as
+C<MultimediaPlayer> I<looks> as the most generic one, let's have xs-adapter
+for C<MultimediaPlayer> Perl, and let it inherits C<WAVPlayer> xs-adapter,
+i.e. offers capabilities of the both C++ classes. (The xs-adapters for
+C<WAVFile> and C<MultimediaFile> are omitted)
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::WAVPlayer
+    PROTOTYPES: DISABLE
+
+    std::string WAVPlayer::play_wav(WAVFile* file)
+
+    double WAVPlayer::preferred_bitrate()
+
+    WAVPlayer* WAVPlayer::new(double preferred_bitrate) # (1)
+
+    WAVPlayer* WAVPlayer::clone() { // (2)
+        Object self{ST(0)};
+        PROTO = self.stash();   // (3)
+        RETVAL = THIS->clone(); // (4)
+    }
+
+The auto-generated constructor (1) will forward all provided parameters to the
+underlying C++ class; it is also aware of 1st argument C<CLASS/PROTO>, i.e.
+SV* blessing will be performed into final class.
+
+The C<clone> (2) method performs acutally the same, hovewer we can't leave it as:
+
+    WAVPlayer* WAVPlayer::clone()
+
+because the PROTO hint will be empty, and by C<TypemapObject> rules it will
+be blessed into C<TypemapObject::package>, i.e. to C<MyTest::Cookbook::WAVPlayer>,
+in other words it is not inheritance-aware. To fix that we have to manually
+write the C<clone> method, which will forward to C<clone> method of underlying
+C++ object (4) and bless it it to the actual Perl object package (3).
+
+Let's write xs-adapter for C<MultimediaPlayer>, which fixes C++ class hierarchy:
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::MultimediaPlayer
+    PROTOTYPES: DISABLE
+
+    MultimediaPlayer* MultimediaPlayer::new(double preferred_bitrate, int quality) {
+        (void)preferred_bitrate;    // silence warning
+        PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), 1);   // (5)
+        if (!PROTO.defined()) XSRETURN_UNDEF;
+        RETVAL = new MultimediaPlayer(quality);                     // (6)
+    }
+
+    std::string MultimediaPlayer::play_file(MultimediaFile* file)
+
+    int MultimediaPlayer::quality()
+
+    MultimediaPlayer* MultimediaPlayer::clone() {
+        Object self{ST(0)};
+        PROTO = self.call_next(cv);         // (7)
+        RETVAL = THIS->clone();             // (8)
+    }
+
+    BOOT {
+        auto stash = Stash(__PACKAGE__, GV_ADD);
+        stash.inherit("MyTest::Cookbook::WAVPlayer");   // (9)
+    }
+
+First, in the constructor C<new> the base B<SV* wrapper> have to be created in
+(5). It actually forwards call to the C<new> method of C<WAVPlayer> xs-adapter
+(1). Then it creates C<MultimediaPlayer> C++ object in (6) and, as the C<PROTO>
+variable already contains SV* wrapper, by L<XS::Framework> rules the
+C<MultimediaPlayer> C++ object will attached to SV*. Please, note that SV*
+wrapper will be already blessed into the right package after (5).
+
+The C<clone> method (7)..(8) is similar to the C<new> constructor, i.e. it
+first clones (7) XS-adapter for C<WAVPlayer> (which clones C++ class C<WAVPlayer>),
+and after (8) the pointer to C++ C<MultimediaPlayer> object will be attached
+to it. Please, note, that C<THIS> variable is C++ C<MultimediaPlayer> at
+line (8), and it is C<WAVPlayer> at line (4).
+
+It should be noted, that in (5) and (7) the C<call_next> is used. It could be
+changed to C<call_SUPER>, but C<call_next> is somewhat more general.
+
+In the line (9) we should specify that  C<MultimediaPlayer> xs-adapter inherits
+from C<WAVPlayer> adapter. The following test proves correctness:
+
+    my $wav = MyTest::Cookbook::WAVFile->new('sample.wav');
+    my $ogg = MyTest::Cookbook::MultimediaFile->new('sample.ogg', 'ogg');
+    my $player = MyTest::Cookbook::MultimediaPlayer->new(44100, 6);
+    my $clone = $player->clone;
+    is $clone->quality, 6;
+    is $clone->preferred_bitrate, 44100;
+    is $clone->play_file($ogg), 'player is playing sample.ogg (ogg) with quality 6';
+    is $clone->play_wav($wav), 'wav-player is playing sample.wav with bitrate 44100.000000';
+
+The short summary: if needed it is possible to fix/enrich C++ class hierarchry
+in Perl classes (xs-adapters).

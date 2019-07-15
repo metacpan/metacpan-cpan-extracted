@@ -7,6 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README
+_config.yml
 dist.ini
 lib/Dist/Zilla/PluginBundle/WCS.pm
 perlcritic.rc

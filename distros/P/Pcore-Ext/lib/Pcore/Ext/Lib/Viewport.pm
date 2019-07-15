@@ -2,6 +2,7 @@ package Pcore::Ext::Lib::Viewport;
 
 use Pcore -l10n;
 use Pcore::CDN::Static::FA qw[:ALL];
+use Pcore::App::API qw[:PERMISSIONS];
 
 # VIEWPORT CONTROLLER
 sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
@@ -10,9 +11,8 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
 
         api => {
             signin          => $api{'Auth/signin'},
-            signout         => $api{'Auth/signout'},
-            setLocale       => $api{'Auth/set_locale'},
-            changePassword  => $api{'Auth/change_password'},
+            signout         => $api{'Profile/signout'},
+            setLocale       => $api{'Profile/set_locale'},
             recoverPassword => $api{'Auth/recover_password'},
         },
 
@@ -23,10 +23,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
             darkMode => \0
         },
 
-        defaultMask => {
-            transparent => \0,
-            html        => qq[<img src="@{[ $cdn->('/static/loader4.gif') ]}" width="100"/>],
-        },
+        defaultMask => { xtype => $type{'/pcore/Mask/loading'} },
 
         listen => {
             global => {
@@ -40,7 +37,6 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
                 signout         => 'onSignout',
                 setLocale       => 'onSetLocale',
                 setTheme        => 'setTheme',
-                changePassword  => 'onChangePassword',
                 recoverPassword => 'onRecoverPassword',
             },
         },
@@ -137,40 +133,55 @@ JS
             return;
 JS
 
-        checkSession => func ['session'], <<'JS',
+        checkSession => func ['session'], <<"JS",
             session.hasPermissions = function (permissions) {
+
+                // no permissions, authorization is not required
                 if (!permissions) return 1;
 
-                if (!this.is_authenticated) return 0;
-
                 if (Ext.isArray(permissions)) {
+
+                    // no permissions, authorization is not required
                     if (!permissions.length) return 1;
 
-                    for ( let permission of permissions ) {
-                        if (this.permissions[permission]) return 1;
-                    }
+                    // compare permissions for authenticated session only
+                    if (this.is_authenticated) {
 
-                    return 0;
+                        // compare permissions
+                        for ( let permission of permissions ) {
+                            if (permission == '$PERMISSION_ANY_AUTHENTICATED_USER') return 1;
+
+                            if (this.permissions[permission]) return 1;
+                        }
+                    }
                 }
                 else {
-                    return this.permissions[permissions] ? 1 : 0;
+                    if (permissions == '$PERMISSION_ANY_AUTHENTICATED_USER' && this.is_authenticated) return 1;
+
+                    if (this.permissions[permissions]) return 1;
                 }
+
+                return 0;
             };
 
-            if (!Ext.isObject(session.locales)) session.locales = {};
+            var settings = session.settings;
+            delete session.settings;
 
-            var locale = session.locale || localStorage.locale || session.default_locale;
+            if (!Ext.isObject(settings.locales)) settings.locales = {};
 
-            if (!session.locales[locale]) locale = session.default_locale;
+            var locale = session.locale || localStorage.locale || settings.default_locale;
+
+            if (!settings.locales[locale]) locale = settings.default_locale;
 
             session.locale = locale;
-            session.localeName = session.locales[locale];
+            session.localeName = settings.locales[locale];
 
             session.theme = this._getCurrentTheme();
 
             // update viewModel
             var viewModel = this.getViewModel();
             viewModel.set('session', session);
+            viewModel.set('settings', settings);
 
             return session;
 JS
@@ -204,12 +215,16 @@ JS
 JS
 
         # MASK
-        mask => func <<'JS',
-            this.getView().setMasked(this.defaultMask);
+        mask => func ['view'], <<'JS',
+            if (!view) view = this.getView();
+
+            view.setMasked(this.defaultMask);
 JS
 
-        unmask => func <<'JS',
-            this.getView().unmask();
+        unmask => func ['view'], <<'JS',
+            if (!view) view = this.getView();
+
+            view.unmask();
 JS
 
         # EVENTS
@@ -222,7 +237,7 @@ JS
         JS
 
         onRequestError => func ['res'], <<~'JS',
-            Ext.toast("Error: " + res.reason, 3000);
+            Ext.toast("Error: " + res, 3000);
         JS
 
         # TODO
@@ -258,10 +273,11 @@ JS
 
             var me = this,
                 viewModel = me.getViewModel(),
-                session = viewModel.get('session');
+                session = viewModel.get('session'),
+                settings = viewModel.get('settings');
 
             // locale is not allowed
-            if (!session.locales[locale]) return;
+            if (!settings.locales[locale]) return;
 
             // store user locale in profile, if user is authenticated
             if (session.is_authenticated) this.doSetLocale(locale);
@@ -280,17 +296,18 @@ JS
             else {
                 var me = this,
                     viewModel = me.getViewModel(),
-                    session = viewModel.get('session');
+                    session = viewModel.get('session'),
+                    settings = viewModel.get('settings');
 
                 // locale is not allowed
-                if (!session.locales[locale]) {
+                if (!settings.locales[locale]) {
                     cb();
 
                     return;
                 }
 
                 // update localeName
-                session.localeName = session.locales[locale];
+                session.localeName = settings.locales[locale];
 
                 // store locale in local storage
                 localStorage.locale = locale;
@@ -325,7 +342,9 @@ JS
             var view = this.getView();
 
             view.getItems().each(function(item) {
-                view.remove(item);
+
+                // remove item from the parent container and destroy it
+                item.destroy();
             });
 JS
 
@@ -333,11 +352,7 @@ JS
         onSignin => func [ 'username', 'password', 'persistent', 'cb' ], <<"JS",
             var me = this;
 
-            me.mask();
-
             me.doSignin(username, password, function (res) {
-                me.unmask();
-
                 if (res.isSuccess()) {
 
                     // get session
@@ -390,23 +405,6 @@ JS
             this.redirectTo(Ext.util.History.getToken(), {force: true});
 JS
 
-        onChangePassword => func [ 'password', 'token', 'cb' ], <<"JS",
-            var me = this;
-
-            me.doChangePassword(password, token, function (res) {
-                if (res.isSuccess()) {
-                    Ext.toast($l10n{'Password changed'}, 5000);
-
-                    if (cb) cb(true);
-                }
-                else {
-                    me.onRequestError(res);
-
-                    if (cb) cb(false);
-                }
-            });
-JS
-
         onRecoverPassword => func [ 'username', 'cb' ], <<"JS",
             var me = this;
 
@@ -438,13 +436,6 @@ JS
 
         doSetLocale => func ['locale'], <<"JS",
             this.api.setLocale(locale);
-JS
-
-        doChangePassword => func [ 'password', 'token', 'cb' ], <<"JS",
-            this.api.changePassword({
-                password: password,
-                token: token
-            }, cb);
 JS
 
         doRecoverPassword => func [ 'username', 'cb' ], <<"JS",

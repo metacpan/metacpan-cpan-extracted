@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /CPAN/Changes/Cwalitee/list_cpan_changes_cwalitee_indicators
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-07-06'; # DATE
+our $DATE = '2019-07-10'; # DATE
 our $DIST = 'App-CPANChangesCwaliteeUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-cpan-changes-cwalitee-indicators - list-cpan-changes-cwalitee-indicators
 
 =head1 VERSION
 
-This document describes version 0.002 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-06.
+This document describes version 0.003 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-07-10.
 
 =head1 SYNOPSIS
 

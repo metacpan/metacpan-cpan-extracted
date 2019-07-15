@@ -30,24 +30,24 @@ our $name    = "C-Section Comics";
 our $url     = "http://www.csectioncomics.com/";
 our @patterns =
   (   qr{ <a \s+
-           href="(?<url>https?://www.csectioncomics.com/archives)">
-          Comics</a>
+           href="?(?<url>https?://www.csectioncomics.com/archives)"?>
+          (?:<span>)?Comics(?:</span>)?</a>
         }six,
       qr{ <td \s+
-           class="archive-title"> \s*
+           class="?archive-title"?> \s*
           <a \s+
-	   href="(?<url>https?://www.csectioncomics.com/comics/.*?)" \s+
-           rel="bookmark"
+	   href="?(?<url>https?://www.csectioncomics.com/comics/.*?)"? \s+
+           rel="?bookmark"?
         }six,
-      qr{ <div \s+ id="comic"> \s*
-	  (?: <div \s+ id="bonus-comic" .*? </div> \s* )?
+      qr{ <div \s+ id="?comic"?> \s*
+	  (?: <div \s+ id="?bonus-comic"? .*? </div> \s* )?
 	  <img \s+
-	   src="(?<url>https?://.*?.csectioncomics.com/csectioncomics/
+	   src="?(?<url>https?://.*?.csectioncomics.com/csectioncomics/
 		       wp-content/uploads/\d+/\d+/
-		       (?<image>.*?\.\w+))" \s+
+		       (?<image>.*?\.\w+))"? \s+
 	   alt="(?<alt>.*?)" \s+
 	   title="(?<title>.*?)" \s*
-	  />
+	  /?>
       }six,
    );
 

@@ -1,0 +1,157 @@
+#!/usr/bin/perl -w
+use strict; # $Id: monm_pop3 78 2019-07-07 19:48:16Z abalama $
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+monm_pop3 - POP3 checker for App::MonM
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    monm_pop3 [ --user=USERNAME ] [ --password=PASSWORD ]
+              [ --port=PORTNUMBER ] [ -s ]  [-t SECS] HOST
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-p PASSWORD, --password=PASSWORD>
+
+Password for connection
+
+=item B<-P PORTNUMBER, --port=PORTNUMBER>
+
+Port number
+
+Default: 110
+
+=item B<-s, --ssl, --usessl>
+
+Use SSL (995 protocol)
+
+=item B<-t SECT, --timeout=SECS>
+
+Timeout value, secs
+
+Default: 60
+
+=item B<-u USERNAME, --user=USERNAME>
+
+Username for connection
+
+=back
+
+=head1 DESCRIPTION
+
+POP3 checker for App::MonM
+
+=head1 DEPENDENCES
+
+L<Mail::POP3Client>
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Mail::POP3Client;
+use Try::Tiny;
+
+use App::MonM::Const qw/
+        IS_TTY SCREENWIDTH
+        OK DONE ERROR SKIPPED PASSED FAILED UNKNOWN PROBLEM
+    /;
+
+use constant {
+    HOST        => "localhost",
+    PORT        => 110,
+    TIMEOUT     => 60,
+};
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # Information
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+
+    # General
+    "user|username|login|u=s",  # Username
+    "password|passwd|pass|p=s", # Password
+    "port|P=i",                 # Port
+    "timeout|time|t=i",         # Timeout
+    "ssl|usessl|s",             # Use SSL
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+
+my $host        = shift(@ARGV) || HOST;
+my $port        = $options->{port} || PORT;
+my $timeout     = $options->{timeout} || TIMEOUT;
+my $user        = $options->{user} // '';
+my $password    = $options->{password} // '';
+my $ssl         = $options->{ssl} ? 1 : 0;
+
+my $err = '';
+try {
+    my $pop = new Mail::POP3Client(
+        USER     => $user,
+        PASSWORD => $password,
+        HOST     => $host,
+        PORT     => $port,
+        TIMEOUT  => $timeout,
+        USESSL   => $ssl,
+    );
+    unless ($pop->Connect()) {
+        $err = $pop->Message() || sprintf("Can't connect to POP3 server: %s", $host);
+    }
+    $pop->Close();
+}
+catch {
+    $err = $_;
+};
+
+if ($err) { 
+    print STDERR $err, "\n";
+    print ERROR, "\n";
+    exit 1;
+}
+
+print OK, "\n";
+exit 0;
+
+__END__

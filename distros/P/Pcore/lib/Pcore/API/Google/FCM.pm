@@ -1,7 +1,7 @@
 package Pcore::API::Google::FCM;
 
 use Pcore -class, -res;
-use Pcore::Util::Data qw[to_json from_json];
+use Pcore::Lib::Data qw[to_json from_json];
 
 extends qw[Pcore::API::Google::OAuth];
 

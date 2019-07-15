@@ -6,15 +6,16 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Weasel-Widgets-Dojo
 requires:
-  Weasel: '0'
+  Weasel: '0.23'
 resources:
   bugtracker: https://github.com/perl-weasel/weasel-widgets-dojo/issues
   repository: https://github.com/perl-weasel/weasel-widgets-dojo.git
-version: '0.02'
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

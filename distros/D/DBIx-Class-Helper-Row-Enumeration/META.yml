@@ -30,7 +30,7 @@ name: DBIx-Class-Helper-Row-Enumeration
 provides:
   DBIx::Class::Helper::Row::Enumeration:
     file: lib/DBIx/Class/Helper/Row/Enumeration.pm
-    version: v0.1.7
+    version: v0.1.8
 recommends:
   Ref::Util::XS: '0'
 requires:
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/DBIx-Class-Helper-Row-Enumeration/issues
   repository: git://github.com/robrwo/DBIx-Class-Helper-Row-Enumeration.git
-version: v0.1.7
+version: v0.1.8
 x_authority: cpan:RRWO
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'

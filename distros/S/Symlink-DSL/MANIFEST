@@ -7,6 +7,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+bin/symlink-dsl
 dist.ini
 inc/Test/Run/Builder.pm
 lib/Symlink/DSL.pm

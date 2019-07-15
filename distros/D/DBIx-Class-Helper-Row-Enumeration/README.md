@@ -4,7 +4,7 @@ DBIx::Class::Helper::Row::Enumeration - Add methods for emum values
 
 # VERSION
 
-version v0.1.7
+version v0.1.8
 
 # SYNOPSIS
 
@@ -147,6 +147,9 @@ to override existing values.
 [DBIx::Class](https://metacpan.org/pod/DBIx::Class)
 
 [MooseX::Enumeration](https://metacpan.org/pod/MooseX::Enumeration)
+
+The module [DBIx::Class::Helper::ResultSet::EnumMethods](https://metacpan.org/pod/DBIx::Class::Helper::ResultSet::EnumMethods) adds
+similar methods to resultsets.
 
 # SOURCE
 

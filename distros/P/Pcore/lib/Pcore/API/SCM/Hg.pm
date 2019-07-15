@@ -2,8 +2,8 @@ package Pcore::API::SCM::Hg;
 
 use Pcore -class, -res;
 use Pcore::API::SCM::Const qw[:SCM_TYPE];
-use Pcore::Util::Text qw[decode_utf8];
-use Pcore::Util::Scalar qw[weaken is_plain_arrayref];
+use Pcore::Lib::Text qw[decode_utf8];
+use Pcore::Lib::Scalar qw[weaken is_plain_arrayref];
 
 with qw[Pcore::API::SCM];
 

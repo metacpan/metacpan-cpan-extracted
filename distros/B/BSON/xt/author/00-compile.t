@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 25;
+plan tests => 26;
 
 my @module_files = (
     'BSON.pm',
+    'BSON/Array.pm',
     'BSON/Binary.pm',
     'BSON/Bool.pm',
     'BSON/Bytes.pm',

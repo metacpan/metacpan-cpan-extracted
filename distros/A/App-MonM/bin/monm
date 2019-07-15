@@ -1,142 +1,68 @@
 #!/usr/bin/perl -w
-# $Id: monm 57 2016-10-04 12:46:30Z abalama $
-use strict;
+use strict; # $Id: monm 84 2019-07-10 15:13:28Z abalama $
 
 =head1 NAME
 
-monm - Easily interact with App::MonM from the command line
-
-=head1 VERSION
-
-Version 1.10
+monm - simple monitoring tool
 
 =head1 SYNOPSIS
 
-    monm [-dltUvI] [options] [commands [args]] 
+    monm [options] [commands [args]] 
 
-    monm [--debug] [--log] [--testmode] [--conf=CONFFILE] [--datadir=DATADIR]
-         [ void | test | config | dbi [name] | http [name] | 
-           checkit [countname] | alertgrid [type] | checkitreport |
-           rrd [subcommand] ]
-    
-    monm test -dv
-    
-    monm dbi -s SID -u USER -p PASSWORD --sql="select sysdate from dual"
-    
-    monm dbi -n DBI:mysql:database=MYBASE;host=www.example.com -u LOGIN -p PASSWORD
-    
-    monm http -q http://www.example.com
-    
-    monm checkit www.example.com
-    
-    monm checkitreport
-    
-    monm alertgrid agent
-    
-    monm rrd graph
+    monm [-dltUvI] 
+
+    monm [--debug] [--log] [--testmode] [--config=CONFIG_FILE] [--datadir=DATADIR]
+         [ configure | checkit [NAMEs] | report [NAMEs] ]
+
+    monm checkit www.example.com ftp.example.com
+
+    monm report www.example.com ftp.example.com
+
+    monm show
 
 =head1 OPTIONS
 
-=over 8
+=over 4
 
-=item B<--conf=CONFFILE, --config=CONFFILE>
+=item B<-c CONFIG_FILE, --config=CONFIG_FILE>
 
 Full path of the configuration file. The configuration file allows determine the 
 basic default settings, which will use the system if it fails to specify additional 
 configuration files in $CONFDIR directory. The default system 
 path /etc/monm/monm.conf
 
+=item B<-D DATADIR, --datadir=DATADIR, --dir=DATADIR>
+
+The directory of temporary files.
+
+Default: system temp directory
+
 =item B<-d, --debug>
 
 Enable debug mode. In this mode, debug messages are displayed on the screen
 
-=item B<-D DATADIR, --datadir=DATADIR, --dir=DATADIR>
-
-The directory of temporary files. Default: system temp directory
-
-=item B<-f FILE, --file=FILE>
-
-Defines work file
-
-=item B<-F FORMAT, --format=FORMAT>
-
-Defines output file format: yaml, xml, json, text, dump or none. 
-Default: text
-
 =item B<-h, --help>
 
-Show help information
+Show short help information and quit
 
-=item B<-H, -?, --longhelp>
+=item B<-H, --longhelp>
 
-Show long help information
-
-=item B<-i FILE, --input=FILE>
-
-Defines input file
+Show long help information and quit
 
 =item B<-l, --log>
 
-Enabling write debug information to the log file monm_debug.log.
+Enabling write debug information to syslog or user log file.
+
 Do not confuse the debug logging from regular logging to a file monm.log.
 Regular logging allows you to store information in monm.log on the progress of the processes 
 module, whereas debug logging for debugging of the internal components 
 of the module.
 
-To control the level of debugging monm.log see parameter LogEnable and LogLevel.
-
-=item B<-m METHOD, --method=METHOD>
-
-Defines METHOD for http command. Supported methods: GET, PUT, POST, HEAD, OPTIONS, TRACE, DELETE,
-PATCH and CONNECT
-
-=item B<-n DSN, --dsn=DSN>
-
-Defines DSN for dbi command
-
-=item B<-o FILE, --output=FILE>
-
-Defines output file
-
-=item B<-p PASSWORD, --password=PASSWORD>
-
-User's password for selected command
-
-=item B<-q URI, --uri=URI, --url=URI>
-
-Defines URI for http command
-
-=item B<-r QUERY_STRING, --request=QUERY_STRING>
-
-Defines QUERY_STRING or CONTENT for PUT/POST method http command
-
-=item B<-s SID, --sid=SID>
-
-Defines SID for dbi command
-
-=item B<-I, --stdin, --std>
-
-Uses STDIN for getting data for selected command
-
-=item B<--sql=SQL>
-
-Defines SQL for dbi command
+To control the level of debugging see parameter LogEnable and LogLevel.
 
 =item B<-t, --testmode>
 
-Enabling test mode. The use is not recommended
-
-=item B<-T SECS, --timeout=SECS>
-
-TimeOut in seconds for selected command
-
-=item B<-u USER, --user=USER>
-
-User name for selected command
-
-=item B<-U, --utf8>
-
-Enable UTF8 mode
+Enabling test mode. This key allows force sending notification while checking
 
 =item B<-v, --verbose>
 
@@ -144,436 +70,151 @@ Enabling at which displays information about the progress on the screen
 
 =item B<-V, --version>
 
-Show version number of App::MonM module
+Print the version number of the program and quit
 
 =back
 
 =head1 COMMANDS
 
-=over 8
+=over 4
 
-=item B<void>
+=item B<configure>
 
-The program starts and does nothing. Is used to test run
-
-=item B<test>
-
-Performing testing program components. That command is a superset of commands void
-
-=item B<config, configure>
-
-Command allows you to initialize the monm, prepare it for operation. This command should be 
-performed immediately after the first installation of the module App::MonM
-
-=item B<dbi>
-
-SQL query using the DBI
-
-=item B<http>
-
-Performance of HTTP/HTTPS requests using LWP
+Configure (initializing) of the App::MonM. This command should be performed
+after the first installation of the module App::MonM
 
 =item B<checkit>
 
 Checking the status of services with the possibility of informing about the change of these states
 
-=item B<alertgrid>
+=item B<report>
 
-Collection and storage of the latest statistical data from different sources
+Creating a report on the checks
 
-=item B<rrd>
+=item B<show>
 
-Charting mechanism according to collected via alertgrid. See alertgrid command
+Shows current table data of the checkit DB
+
+If -v flag is specified - shows table as dump
 
 =back
 
 =head1 DESCRIPTION
 
-Simple Monitoring Tools. See C<README> file
-
-=head1 HISTORY
-
-=over 8
-
-=item B<1.00 / Wed Sep 10 10:49:18 2014 GMT>
-
-Init version
-
-=back
-
-See C<CHANGES> file
-
-=head1 DEPENDENCIES
-
-L<CTK>
-
-=head1 TO DO
-
-See C<TODO> file
-
-=head1 BUGS
-
-Coming soon
-
-=head1 SEE ALSO
-
-C<perl>, L<CTK>, L<WWW::MLite>
+Simple monitoring tool
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+Serz Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is distributed under the GNU GPL v3.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See L<https://dev.perl.org/licenses/>
 
 =cut
 
 use Getopt::Long;
 use Pod::Usage;
-use Text::Unidecode;
 
-use CTK;
-use CTKx;
+use Cwd qw/getcwd/;
+use File::Spec;
+
 use CTK::FilePid;
-use CTK::ConfGenUtil;
+
 use App::MonM;
-use App::MonM::Helper;
+use App::MonM::Const;
 
 use constant {
-    PIDFILE   => 'monm.pid',
-    PREFIX    => 'monm',
-
-    # Команды и их параметры.
-    CMDDEFAULT => 'void',
-    CMD => {
-        void => {
-
-        },
-        test => { # Вывод тестовой информации
-            logfile => "monm_test.log",
-            pidfile => "monm_test.pid",
-        },
-        config => {}, # Конфигурация программы
-        configure => {}, # Конфигурация программы (alias)
-        dbi => { # Запрос DBI
-            logfile => "monm_dbi.log",
-            pidfile => "monm_dbi.pid",
-            sql     => "SELECT 'OK' FROM DUAL", # SQL запрос по умолчанию
-            timeout => 5, # TimeOut (default)
-            attr    => { PrintError => 0 }, # Атрибуты по умолчанию
-        },
-        http => { # Запрос HTTP
-            logfile => "monm_http.log",
-            pidfile => "monm_http.pid",
-            timeout => 180, # TimeOut (default)
-        },
-        checkit => { # Запрос CHECKIT
-            logfile => "monm_checkit.log",
-            pidfile => "monm_checkit.pid",
-            ymlfile => "checkit%s.yml", # Статистические данные
-        },
-        checkitreport => { # Запрос CHECKITREPORT
-            logfile => "monm_checkitreport.log",
-            pidfile => "monm_checkitreport.pid",
-            ymlfile => "checkit%s.yml", # Статистические данные
-        },
-        alertgrid => { # Запрос ALERTGRID
-            logfile => "monm_alertgrid.log",
-            pidfile => "monm_alertgrid.pid",
-            dbfile  => "alertgrid.db", # База данных AlertGrid
-        },
-        rrd => { # Запрос RRD
-            logfile => "monm_rrd.log",
-            pidfile => "monm_rrd.pid",
-        },
-    },
-
+    PIDMASK     => '%s.%s.pid',
+    PIDREQS     => [qw/checkit report/],
 };
-
-$SIG{INT} = sub { die "Interrupted\n"; };
 
 $| = 1;  # autoflush
 
-Getopt::Long::Configure ("bundling");
-GetOptions(\%OPT,
-    
-    # Справка и отладка
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # NoUsed keys map:
+    #
+    # a A b B   C     e E
+    # f F g G     i I j J
+    # k K   L m M n N o O
+    # p P q Q r R s S   T
+    # u U     w W x X y Y
+    # z Z
+
+    # Information and debug
     "help|usage|h",         # Show help page
     "longhelp|H|?",         # Show long help page
+    "version|vers|ver|V",   # Print VERSION of the App::MonM
     "debug|d",              # Debug mode
-    "log|l",                # Log mode (monm_debug.log)
-    "testmode|test|t",      # Test mode
     "verbose|v",            # Verbose mode
-    "version|vers|ver|V",   # Print VERSION of App::MonM
+    "log|l",                # Log mode
+    "test|testmode|t",      # Test mode
 
-    # CTK аргументы
-    "conf|config|c=s",      # $CONFFILE
-    "datadir|dir|D=s",      # $DATADIR
-    
-    # Общие параметры
-    "user|login|u=s",       # Login
-    "password|passwd|p=s",  # Password
-    "timeout|T=i",          # Таймаут операций (в секундах)
-   
-    # Ввод/Вывод
-    "stdin|std|I",          # Данные принимаем из стандартного входа
-    "input|in|i=s",         # Имя файла для ввода
-    "output|out|o=s",       # Имя файла для вывода
-    "file|filename|f=s",    # Имя файла для ввода или вывода
-    "format|type|F=s",      # Формат (тип) данных: yaml, xml, json, text, dump or none
-    "utf8|utf8on|U",        # Поддержка UTF8
+    # CTK Application
+    "config|conf|c=s",      # Config file
+    "datadir|dir|D=s",      # DataDir
 
-    # Параметры DBI
-    "dsn|n=s",              # DSN
-    "sid|tns|s=s",          # SID
-    "sql=s",                # SQL
-    
-    # Параметры HTTP
-    "url|uri|query|q=s",    # Сайт запроса
-    "method|meth|m=s",      # Метод HTTP: POST, GET, PUT, HEAD and etc (default GET)
-    "request|content|r=s",  # Данные для запроса
-    
-) || pod2usage(-exitval => 1, -verbose => 0);
-### 
-### NoUsed keys map:
-### 
-### a A b B - C - - e E
-### - - g G - - - - j J
-### k K - L - M - N - O
-### - P - Q - R - S - -
-### - - - - w W x X y Y
-### z Z
-### 
-pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
-pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
-say(App::MonM->VERSION) && exit(0) if $OPT{version};
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+printf("Version: %s\n", App::MonM->VERSION) && exit(0) if $options->{version};
 
-# Определяем команду
-my $command   = @ARGV ? shift @ARGV : CMDDEFAULT; # Команда
-my @arguments = @ARGV ? @ARGV : (); # Аргументы команд
-my @commands  = keys %{sub{CMD}->()}; # @{sub{COMMANDS}->()}
-pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS')
-    if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
+# VARS
+my $command = shift(@ARGV) || '';
+my @arguments = @ARGV;
 
+my ($pidfile, $pidstat);
+$SIG{INT} = sub {
+    print STDERR "Trying interrupt...\n";
+    $ENV{SIG_INT} = $ENV{SIG_INT} ? ($ENV{SIG_INT}+1) : 1;
+    $pidfile->remove if $pidfile;
+    die "Abnormally interrupted\n" if $ENV{SIG_INT} >= 2;
+};
 
-# CTK VARS
-my $SYSCONFDIR = CTK::sysconfdir(); # Системная конфигурация
-$DATADIR = $OPT{datadir} || CTK::catfile(CTK::tmpdir(),PREFIX); # Основная рабочая папка (DATADIR) на базе TEMP
-$LOGDIR  = CTK::syslogdir();
-$LOGFILE = CTK::catfile($LOGDIR,PREFIX."_debug.log");
-$CONFFILE= $OPT{conf} && (-d $OPT{conf}) ? CTK::catfile($OPT{conf}, PREFIX.'.conf') : ($OPT{conf} || CTK::catfile($SYSCONFDIR,PREFIX,PREFIX.'.conf'));
-$CONFDIR = $OPT{conf} ? (CTK::splitpath( $CONFFILE ))[1,2] : CTK::catfile($SYSCONFDIR,PREFIX);
+# App::MonM instance
+my $app = new App::MonM(
+        project => PROJECTNAME,
+        prefix  => PREFIX,
+        ($options->{config} && -e $options->{config} ? (configfile => $options->{config}) : ()),
+        ($options->{datadir} ? (datadir => $options->{datadir}) : ()),
+        options => $options,
+        debug   => $options->{debug},
+        verbose => $options->{verbose},
+        log     => $options->{log},
+        test    => $options->{test},
+    );
+pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
+    unless $command && grep {$_ eq $command} ($app->list_handlers());
 
-# checks
-CTK::preparedir( $DATADIR );
-exception( "You must have specify valid temp directory to store temporary files ($DATADIR)" ) unless ($DATADIR && -e $DATADIR);
-exception( "You must have specify valid log directory to store log files ($LOGDIR)" ) unless ($LOGDIR && -e $LOGDIR);
-
-my $c = new CTK ( 
-    cfgfile     => $CONFFILE || CTK::CFGFILE,
-    voidfile    => CTK::catfile($DATADIR,'[DEFAULT]'),
-);
-my $ctkx = CTKx->instance( c => $c );
-CTK::touch($c->voidfile()); # Создаем void файл функцией touch
-my $config = $c->config;
-
-START: debug "-"x16, " START ", (testmode() ? 'IN TEST MODE ' : ''), tms," ","-"x16;
-{
-    my %cmddata;
-    my $code = __PACKAGE__->can(uc($command));
-    if ($code && ref($code) eq 'CODE') {
-        %cmddata = %{CMD->{$command}};
-        $cmddata{args} = [@arguments];
-        exception("Configuration mismatch. Please run \"monm config\" command") 
-            unless ($command eq 'config' or $command eq 'configure') || $c->config->{loadstatus};
-        if (value($config => "logenable")) {
-            $c->loglevel(value($config => "loglevel"));
-            $c->logfile(CTK::catfile($LOGDIR, $cmddata{logfile} || sprintf("%s.log", PREFIX)));
-        }
-        $c->log_info("==== START COMMAND: ".uc($command)." ====");
-        my $pidfile = new CTK::FilePid({ file => CTK::catfile($c->tmpdir, $cmddata{pidfile} || PIDFILE) });
-        my $pidstat = $pidfile->running || 0;
-        exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
-        $pidfile->write;
-        &{$code}($c, %cmddata); # Передается в процедуру Хэш данных и параметров
-        $pidfile->remove;
-        $c->log_info("==== FINISH COMMAND: ".uc($command)." ====");
-    } else {
-        exception("Sub \"".uc($command)."\" undefined");
-    }
+if (grep {$_ eq $command} @{(PIDREQS())}) {
+    $pidfile = new CTK::FilePid({
+        file => File::Spec->catfile($app->tempdir(), sprintf(PIDMASK, PREFIX, $command))
+    });
+    $pidstat = $pidfile->running || 0;
 }
-FINISH: debug "-"x16, " FINISH ", (testmode() ? 'IN TEST MODE ' : '') ,tms," ","-"x16;
 
-exit(0);
+if ($pidfile) {
+    die(sprintf("Already running (%s, PID=%s)", $pidfile->file(), $pidstat)) if $pidstat;
+    $pidfile->write;
+}
+
+# Run
+my $exitval = $app->run($command, @arguments) ? 0 : 1;
+printf STDERR "%s\n", $app->error if $exitval && $app->error;
+
+$pidfile->remove if $pidfile;
+
+exit $exitval;
 
 1;
 
-sub VOID {
-    my $c = shift;
-    #my %cmd = @_;
-    
-    my $monm = new App::MonM(%OPT);
-    my $status = $monm->void;
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    
-    #debug(sprintf("LOGDIR   : %s",$LOGDIR));
-    #debug(sprintf("LOGFILE  : %s",$LOGFILE));
-    #debug(sprintf("CONFDIR  : %s",$CONFDIR));
-    #debug(sprintf("CONFFILE : %s",$CONFFILE));
-    #debug(sprintf("DATADIR  : %s",$DATADIR));
-    #debug(sprintf("VOIDFILE : %s",$c->voidfile));
-    
-    #debug("CMD "."*"x76);
-    #debug(Dumper(\%cmd));
-    #debug("C "."*"x78);
-    #debug(Dumper($c));
-    
-    1;
-}
-sub CONFIGURE { goto &CONFIG }
-sub CONFIG { # Конфигурирование (генерация новых файлов конфигурации)
-    my $c = shift;
-    my $overwrite = "yes";
-    my $file = $c->cfgfile;
-    say("Aborted. Configuration directory missing") && return unless $CONFDIR;
-    $overwrite = $c->cli_prompt("File \"$file\" already exists. Overwrite?:", "no") if -e $file;
-    say("Aborted") && return unless $overwrite =~ /^y/i;
-    
-    say("Creating configuration...");
-    debug(sprintf("Creating configuration to %s",$CONFDIR));
-    
-    my $sharedir = CTK::catdir(CTK::sharedir(), PREFIX);
-    my $h = new App::MonM::Helper (
-        -config => $CONFDIR,
-        -share  => $sharedir,
-    );
-    my $hstat = $h->build(
-            GENERATED => CTK::dtf("%w, %D %MON %YYYY %hh:%mm:%ss %G", time(), 1),
-        );
-
-    say($hstat ? "OK" : "ERROR");
-    if ($hstat) {
-        say("Your configuration located in \"$CONFDIR\" directory");
-        say("     shared files located in \"$sharedir\" directory");
-    }
-    1;
-}
-sub TEST {
-    my $c = shift;
-
-    my $monm = new App::MonM(%OPT, # %OPT's - Опции командной строки (глобальные флаги)
-            foo => 'one',
-            bar => 'two',
-        );
-    my $status = $monm->test(@_); # args - Аргументы командной строки (Локальные данные для команды)
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    1;
-}
-sub DBI {
-    my $c = shift;
-
-    my $monm = new App::MonM(%OPT);
-    my $status = $monm->dbi(@_);
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    1;
-}
-sub HTTP {
-    my $c = shift;
-
-    my $monm = new App::MonM(%OPT);
-    my $status = $monm->http(@_);
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    1;
-}
-sub CHECKIT {
-    my $c = shift;
-
-    my $monm = new App::MonM(%OPT);
-    my $status = $monm->checkit(@_);
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    1;
-}
-sub CHECKITREPORT {
-    my $c = shift;
-
-    my $monm = new App::MonM(%OPT);
-    my $status = $monm->checkitreport(@_);
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    1;
-}
-sub ALERTGRID {
-    my $c = shift;
-    my $monm = new App::MonM(%OPT);
-    my %data = @_;
-    my $ctx = $data{args} && $data{args}[0] ? $data{args}[0] : '';
-    
-    my $status;
-    
-    if ($ctx eq 'server') {
-        $status = $monm->alertgrid_server(@_);
-    } elsif ($ctx =~ /^(agent|client)$/) {
-        $status = $monm->alertgrid_client(@_);
-    } elsif ($ctx =~ /^(init|start|create)$/) {
-        $status = $monm->alertgrid_init(@_);
-    } elsif ($ctx =~ /^(clean|clear)$/) {
-        $status = $monm->alertgrid_clear(@_);
-    } elsif ($ctx =~ /^(cfg|conf|config|settings)$/) {
-        $status = $monm->alertgrid_config(@_);
-    } elsif ($ctx =~ /^(snapshot|snap|stamp|view)$/) {
-        $status = $monm->alertgrid_snapshot(@_);
-    } elsif ($ctx =~ /^(export)$/) {
-        $status = $monm->alertgrid_export(@_);
-    } elsif ($ctx =~ /^(normalize)$/) {
-        $status = $monm->alertgrid_normalize(@_);
-    } else { # error
-        #debug("Error. Context incorrect");
-        pod2usage(-exitval => 0, -verbose => 1);
-    }
-    
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    
-    1;
-}
-sub RRD {
-    my $c = shift;
-    my $monm = new App::MonM(%OPT);
-    my %data = @_;
-    my $ctx = $data{args} && $data{args}[0] ? $data{args}[0] : '';
-    
-    my $status;
-    
-    if ($ctx =~ /^(create|init|start)$/) {
-        $status = $monm->rrdtool_create(@_);
-    } elsif ($ctx =~ /^(update|renew)$/) {
-        $status = $monm->rrdtool_update(@_);
-    } elsif ($ctx =~ /^(graph|generate|graphic)$/) {
-        $status = $monm->rrdtool_graph(@_);
-    } elsif ($ctx =~ /^(index|build|result)$/) {
-        $status = $monm->rrdtool_index(@_);
-    } else { # error
-        pod2usage(-exitval => 0, -verbose => 1);
-    }
-    
-    say $monm->message if $OPT{output} && $OPT{verbose};
-    
-    1;
-}
 __END__
-debug("Coming soon...");

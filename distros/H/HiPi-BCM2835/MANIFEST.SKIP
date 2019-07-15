@@ -14,3 +14,6 @@ _build/
 \.bak$
 \.tar\.gz$
 ^svn-commit.tmp$
+^runtest$
+BCM2835.c$
+BCM2835.o$

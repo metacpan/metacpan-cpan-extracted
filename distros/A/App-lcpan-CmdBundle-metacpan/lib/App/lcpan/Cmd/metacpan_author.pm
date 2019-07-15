@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::metacpan_author;
 
-our $DATE = '2018-09-07'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-06-24'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,7 +71,7 @@ App::lcpan::Cmd::metacpan_author - Open author page on MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.005 of App::lcpan::Cmd::metacpan_author (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2018-09-07.
+This document describes version 0.006 of App::lcpan::Cmd::metacpan_author (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2019-06-24.
 
 =head1 DESCRIPTION
 
@@ -84,7 +84,7 @@ This module handles the L<lcpan> subcommand C<metacpan-author>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [status, msg, payload, meta]
 
 Open author page on MetaCPAN.
 
@@ -115,6 +115,13 @@ be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
 =back
 
 Returns an enveloped result (an array).
@@ -122,7 +129,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -150,7 +157,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,46 @@
+MODULE = MyTest::Typemap                PACKAGE = MyTest
+PROTOTYPES: DISABLE
+
+AV* av_out (bool not_null = false) {
+    RETVAL = not_null ? newAV() : NULL;
+}
+
+uint64_t av_in (AV* val) {
+    RETVAL = (uint64_t)val;
+}
+
+HV* hv_out (bool not_null = false) {
+    RETVAL = not_null ? newHV() : NULL;
+}
+
+uint64_t hv_in (HV* val) {
+    RETVAL = (uint64_t)val;
+}
+
+IO* io_out (bool not_null = false) {
+    if (not_null) {
+        GV* gv = gv_fetchpv("STDOUT", 0, SVt_PVIO);
+        RETVAL = GvIO(gv);
+    }
+    else RETVAL = NULL;
+}
+
+uint64_t io_in (IO* val) {
+    RETVAL = (uint64_t)val;
+}
+
+CV* cv_out (bool not_null = false) {
+    RETVAL = not_null ? cv : NULL;
+}
+
+uint64_t cv_in (CV* val) {
+    RETVAL = (uint64_t)val;
+}
+
+GV* gv_out (bool not_null = false) {
+    RETVAL = not_null ? CvGV(cv) : NULL;
+}
+
+uint64_t gv_in (GV* val) {
+    RETVAL = (uint64_t)val;
+}

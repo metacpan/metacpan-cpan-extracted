@@ -5,10 +5,10 @@ use DBI qw[];
 use Pcore::Handle::DBI::Const qw[:CONST];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
-use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
-use Pcore::Util::UUID qw[uuid_v1mc_str uuid_v4_str];
-use Pcore::Util::Data qw[to_json];
-use Pcore::Util::Text qw[encode_utf8];
+use Pcore::Lib::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
+use Pcore::Lib::UUID qw[uuid_v1mc_str uuid_v4_str];
+use Pcore::Lib::Data qw[to_json];
+use Pcore::Lib::Text qw[encode_utf8];
 use Time::HiRes qw[];
 
 # NOTE http://habrahabr.ru/post/149635/
@@ -545,11 +545,13 @@ sub selectall ( $self, @ ) {
                 $res = res [ 500, $DBI::errstr ];
             }
             else {
-                $res = res 200, $data, rows => $rows;
+                $res = res 200, $data->%* ? $data : undef, rows => $rows;
             }
         }
         else {
-            $res = res 200, $sth->fetchall_arrayref( {}, undef ), rows => $rows;
+            $data = $sth->fetchall_arrayref( {}, undef );
+
+            $res = res 200, $data->@* ? $data : undef, rows => $rows;
         }
     }
 
@@ -568,7 +570,9 @@ sub selectall_arrayref ( $self, @ ) {
         $res = res [ 500, $DBI::errstr ];
     }
     else {
-        $res = res 200, $sth->fetchall_arrayref( undef, undef ), rows => $rows;
+        my $data = $sth->fetchall_arrayref( undef, undef );
+
+        $res = res 200, $data->@* ? $data : undef, rows => $rows;
     }
 
     return $cb ? $cb->($res) : $res;
@@ -764,7 +768,7 @@ sub attach ( $self, $name, $path = undef ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 338                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 666                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 670                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

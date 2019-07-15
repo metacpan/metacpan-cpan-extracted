@@ -1,12 +1,12 @@
 package Pcore::Node;
 
 use Pcore -class, -res, -const;
-use Pcore::Util::Scalar qw[is_callback weaken refaddr is_ref is_blessed_hashref is_plain_coderef is_plain_hashref];
+use Pcore::Lib::Scalar qw[is_callback weaken refaddr is_ref is_blessed_hashref is_plain_coderef is_plain_hashref];
 use Pcore::HTTP::Server;
 use Pcore::Node::Server;
 use Pcore::Node::Proc;
 use Pcore::WebSocket::pcore;
-use Pcore::Util::UUID qw[uuid_v4_str];
+use Pcore::Lib::UUID qw[uuid_v4_str];
 
 has type     => ( required => 1 );
 has server   => ();                  # InstanceOf['Pcore::Node::Server'], $uri, HashRef, if not specified - local server will be created
@@ -93,7 +93,7 @@ sub BUILD ( $self, $args ) {
     $self->_run_http_server;
 
     # remote server
-    if ( defined $self->{server} && ( !is_ref $self->{server} || ( is_blessed_hashref $self->{server} && $self->{server}->isa('Pcore::Util::URI') ) ) ) {
+    if ( defined $self->{server} && ( !is_ref $self->{server} || ( is_blessed_hashref $self->{server} && $self->{server}->isa('Pcore::Lib::URI') ) ) ) {
         $self->{_server_is_remote} = 1;
         $self->{server_is_online}  = 0;
 

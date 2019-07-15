@@ -1,5 +1,12 @@
 Revision history for File-Serialize
 
+1.3.0 2019-07-12
+  [ ENHANCEMENTS ]
+    - Add JSON5 serializer.
+
+  [ STATISTICS ]
+    - code churn: 14 files changed, 184 insertions(+), 47 deletions(-)
+
 1.2.0 2017-10-10
   [ ENHANCEMENTS ]
     - Data::Dumper serializer added. (GH#5)

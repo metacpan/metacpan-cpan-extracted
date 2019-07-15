@@ -26,7 +26,7 @@ local $Data::Dumper::Indent     = 1; # for dumpering from !
 BEGIN {
     use vars        qw[ $VERSION @ISA ];
     @ISA        =   qw[ CPANPLUS::Shell::_Base::ReadLine ];
-    $VERSION = "0.9176";
+    $VERSION = "0.9178";
 }
 
 load CPANPLUS::Shell;
@@ -1205,7 +1205,7 @@ sub _print {
     my $old; my $fh;
     if( $file ) {
         $fh = FileHandle->new( ">$file" )
-                    or( warn loc("Could not open '%1': '%2'", $file, $!),
+                    or( warn(loc("Could not open '%1': '%2'", $file, $!)),
                         return
                     );
         $old = select $fh;

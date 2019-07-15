@@ -23,8 +23,8 @@
          "rdfs:label" : "competitor",
          "schema:domainIncludes" : "schema:SportsEvent",
          "schema:rangeIncludes" : [
-            "schema:SportsTeam",
-            "schema:Person"
+            "schema:Person",
+            "schema:SportsTeam"
          ]
       },
       "schema:homeTeam" : {
@@ -34,8 +34,8 @@
          "rdfs:subPropertyOf" : "schema:competitor",
          "schema:domainIncludes" : "schema:SportsEvent",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:SportsTeam"
+            "schema:SportsTeam",
+            "schema:Person"
          ]
       }
    }

@@ -3,7 +3,7 @@ use 5.012;
 use mro();
 use XS::Loader;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.6';
 
 {
     local $^W;

@@ -1,0 +1,620 @@
+=head1 NAME
+
+XS::Framework::Manual::Typemap - XS::Framework C++ typemap API reference
+
+=head1 C++ typemaps
+
+=head2 Generic typemaps
+
+Typemap is a I<concept>, i.e. C++ struct with certain expectations, described below.
+
+Typemaps are reponsible for transferring objects between perl scripts and C++ code.
+In the most general case typemap should be a full-specialization of C++ policy class,
+i.e. stateless class with group of static methods in the C<xs> namespace. The specialization
+should be for the target C++ class, which objects should be available in perl scripts,
+e.g.
+
+  namespace xs {
+
+  struct Typemap<MyClass> {
+    static [inline] MyClass in(pTHX_ SV* arg) { ... }
+    static [inline] Sv out(pTHX_ const MyClass& var, const Sv& proto = {}) { ... }
+    static [inline] void destroy (pTHX_ const MyClass&, SV*) { ... }
+  }
+
+  } // end of namespace xs
+
+First af all for C<MyClass> B<value> or B<pointer semantics> should be defined.
+Objects with B<value semantics> are allocated on C++ stack and their destructor
+is automatically called when object is goes out of scope; it is suitable for
+short-living transient objects like integer, string etc., and for
+C<std::shared_ptr> / C<panda::iptr>. A typemap specialization should start as
+
+  struct Typemap<MyClass> { ...
+
+For objects with B<pointer semantics>  the only possible option is to return
+I<pointer> to C<MyClass> and then later, I<may be>, clean it up in
+C<destroy> method (see below). A typemap specialization should start as:
+
+  struct Typemap<MyClass*> { ...
+
+As the objects with B<value semantics> is usually applicable for light-weight
+primitive objects structures with negligible construction and destruction
+costs (including B<std::shared_ptr>), the classes with B<pointer semantics>
+is the most general case.
+
+  static [inline] MyClass in(pTHX_ SV* arg) { ...
+  static [inline] MyClass* in(pTHX_ SV* arg) { ...
+
+C<in> method is responsible for returning C++ object from perl SV* arg. It's
+intention is to prepare C++ object to work with (external) C++ API, without
+being encumbered with Perl details. For object with B<value semantics> it
+usually return the (transient) object I<copy>, e.g. configuration object created
+from perl Hashes; but in the case of B<pointer> semantics the
+C<in> method should I<extract> previously constructed object from perl SV*,
+i.e. return I<pointer> MyClass*. Beware to B<do not construct> object
+on heap and return pointer to it in the C<in> method, as this leads to memory
+leak because the L<XS::framework> will not C<delete> the pointer.
+
+  static [inline] Sv out(pTHX_ const MyClass& var, const Sv& proto = {}) { ...
+  static [inline] Sv out(pTHX_ const MyClass* var, const Sv& proto = {}) { ...
+
+The C<out> method is responsible for returning Perl wrapper from C++ object to let
+it be useable from perl scripts. The wrapper should be returned in form of Sv
+(see L<XS::Framework::Sv>). Usually it should return reference to blessed perl
+object (newRV), however it might return any other suitable perl SV*, e.g. number,
+string, or reference to Array/Hash. The C<proto> argument serves as a hint
+without any restrictions on it's usage or interpretation. In future specializations
+(see C<TypemapObject> below) it is used as information which
+final class an object MyClass should be blessed into, i.e. C<MyPackage::MyClass>.
+
+   static [inline] void destroy (pTHX_ const MyClass&, SV*) { }
+
+The <destroy> method is responsible for cleaning up C++ object when Perl's SV* wrapper (returned in C<out> method), is about
+to be destroyed in Perl: it is not always enough to have MyClass destructor, as C<destoy> method is
+called the link between C++ and perl is going to be deleted. For
+transient objects like string, int, date, etc. which do not have some
+permanent connection with Perl's SV* it is OK to let the method be empty.
+For B<pointer-semantics> objects it depends: if your XS-code is responsible
+for object instantiation, then in the sake of resource leaks
+prevension it should delete it, i.e.
+
+   static [inline] void destroy (pTHX_ const MyClass* obj, SV*) { delete obj; }
+
+If MyClass object was somehow customly constructed and expect it to be
+customly destructed, that can be done as
+
+  static [inline] void destroy (pTHX_ const MyClass* obj, SV*) {
+    obj->dec_refcounter();
+    // or GlobalPool::release(obj)
+  }
+
+The perl scalar SV* might be used as place to store additional information,
+assosicated with the concrete C++ object instance, e.g. the used memory
+pool, then the memory pool can be extracted from SV* and object can be
+deleted with it.
+
+  static [inline] void destroy (pTHX_ const MyClass* obj, SV* sv) {
+    MyPool* pool = ...; // somehow get pool pointer from SV*
+    pool->release(obj);
+  }
+
+There might be other uses cases. The C<destroy> method is B<unconditionally>
+inserted for XS-classes in C<DESTROY> at I<pre-processing> step by Parse::XS
+if there is input typemap. So, the method C<destroy> have to be defined,
+but it can be empty. The C<destroy> method might be invoked a few times
+in case of inheritance of XS-adapters, this issues is already solved in
+L<TypemapObject>.
+
+Let's summarize the for pointer semantics case: C<in> -
+unwraps / extracs C++ object, C<out> wraps/packs C++ object in perl scalar,
+C<destroy> deletes Perl and C++ association. A reader might ask the question:
+where there my C++ object is created? The answer is: the object instantiation
+left out of typemap scope by design. C++ object instantiation should be
+done in user's XS-code (aka XS-adapter).
+
+Hovewer, writing typemap specialization for C<MyClass> from scratch is
+a bit cumbersome because devepoler still have to implement that wrap/unwrap
+code in using perl API. There are some ready-made and tested patterns,
+which will help you greatly with that. Go on reading the following sections.
+
+=head2 TypemapBase
+
+The C<TypemapBase> is basic implementation of concept TypeMap. It ships
+with empty C<destroy> method; it is expected that client typemap will
+inherit from C<TypemapBase> and provide required methods:
+
+  template<>
+  struct Typemap<MyClass*>: public TypemapBase<MyClass*> {
+    static inline MyClass* in (pTHX_ SV*) { ... }
+    static inline Sv out (pTHX_ const MyClass* var, const Sv& proto = {}) { ... }
+  };
+
+=head2 TypemapObject
+
+  struct Typemap<MyFinalClass>: TypemapObject<MyBaseClass, MyFinalClass, LifetimePolicy, StoragePolicy, CastingPolicy>;
+
+TypemapObject is helper class in creating typemaps, when there is a blessed
+Perl object and corresponding C++ object, i.e. one object to one object
+relationship. In the best case all behaviour can be specified via policies
+without need of additional code writing.
+
+It is expected that custom typemap will inherit C<TypemapObject>, i.e. in
+common cases it should be enough to have something like:
+
+  template <>
+  struct Typemap<geos::geom::Triangle*>: TypemapObject<geos::geom::Triangle*, geos::geom::Triangle*, ObjectTypePtr, ObjectStorageMG, StaticCast>{
+    static std::string_view package() {return "Geo::Geos::Triangle"; }
+  };
+
+=head3 Template parameters overview
+
+C<CastingPolicy> defines how C<void*> is casted to C<MyFinalClass>. In most of
+cases the C<StaticCast> should be used as it has zero-runtime costs;
+in rare cases, i.e. when C<MyFinalClass> participates in virtual inheritance,
+the C<DynamicCast> should be used. Under the hood the C<DynamicCast> uses
+C<panda::dyn_cast> which is faster implementation than standard C<dynamic_cast>.
+
+C<StoragePolicy> defines how C++ object B<pointers>
+can be stored in Perl SVs. It is available both for value-semantics object
+and pointer-semantic objects, however for value-semantics it might be
+a little bit tricky to do. Shipped implementations: C<ObjectStorageIV>,
+C<ObjectStorageMG>, C<ObjectStorageMGBackref>
+
+C<LifetimePolicy> defines how C++ defines convertion rules (between C<void*>
+and C<MyClass>), defines deletion (see C<destroy> method in generic typemap),
+upcast (from DerivedClass to BasicClass) and downcast (from BasicClass to
+DerivedClass) I<policies>. Shipped implementations: C<ObjectTypePtr>,
+C<ObjectTypeForeignPtr>, C<ObjectTypeRefcntPtr>, C<ObjectTypeSharedPtr>.
+
+C<MyBaseClass> and C<MyFinalClass> are needed to define the most specific
+and the most generic classes handled via typemap. If no class hierarchy
+have to be managed (i.e. in Perl only <MyFinalClass> should be visible),
+then C<MyBaseClass> can be the same as C<MyFinalClass>.
+
+=head3 methods
+
+    static [inline] MyClass in(pTHX_ SV* arg) { ... }
+    static [inline] Sv out(pTHX_ const MyClass& var, const Sv& proto = {}) { ... }
+    static [inline] Sv create (pTHX_ const MyClass& var, const Sv& proto = Sv()) { ... }
+    static [inline] void destroy (pTHX_ const MyClass&, SV*) { ... }
+    static [inline] void dispose (pTHX_ const MyClass&, SV*) { ... }
+    static [inline] MyClass dup (const MyClass& obj) { return obj; }
+
+
+C<in(pTHX_ SV* arg)> does the same as in typemap, i.e. returns C++ from Perl SV*. It
+is implemented as: 1) delegate to C<StoragePolicy> to get the C<void*>, and then
+to C<LifetimePolicy> to convert C<MyBasicType*> and then upcast it to C<MyFinalType*>.
+
+C<out(pTHX_ const TYPE& var, const Sv& proto = Sv())> does the same as in typemap,
+i.e. returns Perls SV* from C++ object. In implementation it asks C<StoragePolicy>
+to wrap/pack MyClass object in Perl SV* and ends up in C<create> method below for
+classes without BackRefs support.
+
+The C<create> method is similar to C<out> method described above: it is responsible
+for I<creating> Perl wrapper from C++ object. That distinguish is irrelevant
+unless C<MyClass> is supposed to support BackRefs; in the last case, i.e. if
+C<MyClass> is supports BackRefs, if it is possible C<out> returns previously
+created and cached SV* wrapper, otherwise it calls C<create> method. It is actually
+a bit more complex, see B<out> behaviour below.
+
+C<destroy(pTHX_ const TYPE& var, const Sv& proto = Sv())> - does the same as in
+typemap, i.e. cleans up C++ object when Perls SV* is about to be deleted. It is
+implemented in I<safe manner>, i.e. real object deletion (via C<dispose> if
+C<StoragePolicy>) is executed only once, despite the fact that it migth invoked
+many times from C<DESTROY> method in XS-adapter due to inheritance. If the class
+is I<auto-disposable> (defined in C<StoragePolicy>), it is actually destroyed
+via C<dispose> method. In other words, after the method invokation C++ object
+and Perls SV* might be destroyed.
+
+C<dispose(pTHX_ const TYPE& var, SV* arg)> - does the same as C<destroy> method
+in typemap; i.e. I<unconditionally> cleans up C++ object and Perl SV*. The actual
+job is delegated to C<LifetimePolicy::destroy>
+
+C<package()> it is expected to be overriden in user-defined typemap. It should
+return the string for perl class; it is invoked only when C<Sv hint> argument
+is not supplied in C<out> or C<create> methods. Unless overriden by user
+the C<package()> method will throw runtime exception.
+
+C<dup(const MyClass& obj> is called when perl starts another thread, otherwise
+it is never invoked. It should return MyClass* object pointer, which will be
+attached to SV* duplicate in the new perl thread. The default behaviour is
+B<retain> policy, i.e. it returns exatcly the same object as in main thread.
+This implies siginificant restriction on MyClass: it should be B<thread-safe>
+and B<ref-counted>; the restrictions cannot be checked at compile time, and if
+the conditions aren't met Perl interpreter will crash at runtime. Another
+possible policy is B<clone>, i.e. underlying C++ object should return copy
+of itself, and that copy will be attached to SV*. The last possible policy
+is B<skip>, i.e. when C<undef> will be attached to cloned SV*; to implement
+it <CLONE_SKIP> should be defined in XS-adapter and it should return C<true>.
+
+
+=head3 Wrapping C++ objects into Perl SV* aka storage policy
+
+  ObjectStorageIV
+  ObjectStorageMG
+  ObjectStorageMGBackref
+
+L<XS::Framework> ships three policies, defining how C++ object B<pointers>
+can be stored in Perl SVs. They are applicable for both for value
+semantics and pointer semantics, hovewer for value-semantics it might be
+a little bit tricky to do, i.e. value have to be stored over pointer.
+
+=head4 Storage policy concept
+
+Storage policy I<concept> has the following methods. They are needed only
+if custom (non-shipped with L<XS::Framework>) policy is supplied.
+
+    template <class TYPEMAP, class TYPE>
+    struct ObjectStorage {
+        static const bool auto_disposable = false;
+        static inline void* get (SV* arg) { ... }
+        static inline void set (SV* arg, void* ptr) { ... }
+        static Sv out (pTHX_ const TYPE& var, const Sv& proto) { ... }
+    };
+
+The C<auto_disposable> property defines, whether the C<destroy> method
+of C<TypemapObject> should be forwarded to C<LifetimePolicy::destroy>. If underlying
+perl SV* is able to do self-cleaning and invoke C<LifetimePolicy::destroy>,
+then this property should be set to C<true>. Otherwise, there is a
+need of assitance to do proper cleaning custom (i.e. C<ObjectStorageIV>),
+the property should be set to C<false>.
+
+The C<get> and C<set> methods are responsible for storing/retriving
+underlying object pointer (downcasted to C<void*>) in/from Perl SV*.
+
+C<out(pTHX_ const TYPE& var, const Sv& proto = Sv())> does the same as in typemap,
+i.e. returns Perls SV* from C++ object. If there is no BackRefs support, then
+it should forward call to C<TYPEMAP::create>, otherwise, if possible, it should extract
+Backref and return it. Backrefs support is non-trivial topic, see
+C<ObjectStorageMGBackref> source code to get the ideas.
+
+=head4 ObjectStorageIV
+
+C<ObjectStorageIV> relies on the equality C<sizeof(MyClass*) == sizeof(IV)>.
+So, it stores pointer as integer in Perls SV*. This is the most frequently
+used approach in CPAN, hovewer, in general it is not the best in terms on
+performance.
+
+This is non-autodisposable policy, i.e. you B<have> to insert C<DESTROY>
+method in XS-adapter to help it to be forwarded to C<LifetimePolicy::destoy>,
+otherwise, if there was memory allocations for C++ object, there will be
+memory leak, as there is no other way to delete underlying C++ object. The
+actual object deletion is performed in C<LifetimePolicy::destroy>.
+
+As the XS-adapter C<DESTROY> method conforms to general perl rules, it
+is executed in C<eval()>, which leads to significant slow down on object
+deletion. Other storage policies do not suffer from that.
+
+There is another restriction of this policy: inheritance. As there is no
+more free space in underlying perl SV*, the descedant Perl classes
+can only add methods, but no data, i.e. to store datat the SV* should
+be upgraded to HashRef or ArrayRef, but that's not possible. The only
+possible way to overcome that is use inheritance in C++. Due to space
+restriction there might be issues with multiple inheritance, as there
+is need to store additional pointer. Other storage policies do not
+suffer from constraint.
+
+This storage policy has smallest memory footprint and no additional
+memory allocations, i.e. Perl object creation is the fastest.
+
+=head4 ObjectStorageMG
+
+C<ObjectStorageMG> uses Perl Magic to store pointer. It have to allocate
+additional memory for Perl Magic, hence, object construction is a bit
+slower; also that Magic occupies some memory, in other words
+it has some non-zero costs to use that storage policy.
+
+The SV* itself remains free and it can be used in Child classes defined
+in Perl, i.e.
+
+  package MyPerlClass;
+
+  use base qw/MyCPPClass/;
+
+  sub new {
+    my ($class, $data) = @_;
+    # construct C++ object and XS-wrapper
+    my $obj = SUPER::new($class, $data);
+    # extend/upgrade UNDEF to Hash.
+    XS::Framework::obj2hv($obj);
+    $obj->{extended_field} = $data->{extended_field};
+    return $obj;
+  }
+
+This is autodisposable storage policy, i.e. custom destruction actions
+are guaranteed to be invoked via C<LifetimePolicy::destroy>. That's why
+it is B<NOT recommended> to have C<DESTOY> method in XS-adapter, as
+it has significant performance costs due to C<eval> context execution.
+
+=head4 ObjectStorageMGBackref
+
+Basically it is the same as <ObjectStorageMG> with the abilitity to
+cache BackRef and return it on demand via C<out> method by the cost
+of slightly increased memory footprint in perl descendant classes
+and slightly slower object construction.
+
+Under certain conditions, i.e. when perl object of descendant perl class
+has been created in perl and frequently accessed from other
+XS-adapter, the storage C<out> method returns cached object,
+which is much faster then allocating and initializing perl wrapper.
+
+=head4 Storage policy feature matrix
+
+=begin comment
+Formatted with https://ozh.github.io/ascii-tables/ . Source:
+
+
+Feature	ObjectStorageIV	ObjectStorageMG	ObjectStorageMGBackref
+memory footprint   	10	9	8
+allows multiple inheritance	-	+	+
+allows single inheritance	-[*1] 	+	+
+object creation speed	10	8	7.5
+object destruction speed [*2]	4	10	9
+overall object life cycle speed	7	10	9.5
+typemap<T>::out speed[*3]	5	5	10
+allows backrefs			-	-	+
+
+
+=end comment
+
+=begin text
+
++---------------------------------+-----------------+-----------------+------------------------+
+|             Feature             | ObjectStorageIV | ObjectStorageMG | ObjectStorageMGBackref |
++---------------------------------+-----------------+-----------------+------------------------+
+| memory footprint                | 10              | 9               | 8                      |
+| allows multiple inheritance     | -               | +               | +                      |
+| allows single inheritance       | -[*1]           | +               | +                      |
+| object creation speed           | 10              | 8               | 7.5                    |
+| object destruction speed [*2]   | 4               | 10              | 9                      |
+| overall object life cycle speed | 7               | 10              | 9.5                    |
+| typemap<T>::out speed[*3]       | 5               | 5               | 10                     |
+| allows backrefs                 | -               | -               | +                      |
++---------------------------------+-----------------+-----------------+------------------------+
+
+=end text
+
+[*1] It allows to use C++ inheritance, of course, and even perl single inheritance, but as it
+gives not hash, you cannot store additional properties in B<Perl inheritance>, which makes it
+almost useless.
+
+[*2] For C<ObjectStorageIV> you B<have to> write your own custom C<destroy> method, which is
+executed in Perl's eval closure, which is quite slow; for C<ObjectStorageMG*> you B<can> (but
+we do not recommend) write C<destroy> method, which will be the same speed slow too, instead
+the C<destroy> method can be written in liftetime object policy, which is executed in very
+fast way as usual C++ object destructror.
+
+[*3] It heavily depends on property access pattern in your program: when (a), the property
+XS-object or descendent XS-object class (i.e. with perl implementation) has been created from Perl,
+and (b) is is accessed frequently as property of some other XS-container, then for
+C<ObjectStorageMGBackref> the accessor gets significant boost, because it always returns cashed
+object instead of allocating Perl-wrapper for it on each invocation.
+
+=head3 LifetimePolicy for managing C++ objects
+
+  ObjectTypePtr
+  ObjectTypeForeignPtr
+  ObjectTypeRefcntPtr
+  ObjectTypeSharedPtr
+
+C<LifetimePolicy> defines how C++ defines convertion, deletion, upcasting and downcasting
+rules. As there is no need to write custom LifetimePolicy the concept is not described here.
+Let us know if we are wrong here.
+
+C<LifetimePolicy> is orthogonal to C<StoragePolicy>, i.e. they can be used in any combination
+independently.
+
+=head4 ObjectTypePtr
+
+It assumes that XS-adapter creates object pointer C<MyClass*> on heap and I<trasfers ownership>
+to Perl. The policy will invoke C<delete> on the object when it's SV* is about to be
+destroyed.
+
+=head4 ObjectTypeForeignPtr
+
+It assumes that XS-adapter returns object pointer C<MyClass*> I<without>
+transferring ownership to Perl. The deletion policy is empty. It might be useful
+when singleton object is returned from C++ to Perl.
+
+=head4 ObjectTypeRefcntPtr
+
+It assumes that XS-adapter returns <MyClass*> to Perl, i.e. object
+I<ownership is shared> between C++ and Perl. Another assumption is that
+C<MyClass> is ref-counted object, i.e. it should support the
+following operations via ADL (argument dependent lookup):
+
+    void refcnt_inc(MyClass*);
+    void refcnt_dec(MyClass*);
+    std::uint32_t refcnt_get(MyClass*);
+
+
+=head4 ObjectTypeSharedPtr
+
+It assumes that XS-adapter returns std::shared_ptr<MyClass> to Perl, i.e. object
+I<ownership is shared> between C++ and Perl.
+
+=head3 C++ typemap lifetime policy feature matrix
+
+=begin comment
+
+Feature	ObjectTypePtr	ObjectTypeForeignPtr	ObjectTypeRefcntPtr	ObjectTypeSharedPtr
+transfers ownership	+	-	-	-
+shares ownership    -	-	+	+
+foreign ownership	-	+	-	-
+
+=end comment
+
+=begin text
+
++-------------------------+---------------+----------------------+---------------------+---------------------+
+|         Feature         | ObjectTypePtr | ObjectTypeForeignPtr | ObjectTypeRefcntPtr | ObjectTypeSharedPtr |
++-------------------------+---------------+----------------------+---------------------+---------------------+
+| transfers ownership     | +             | -                    | -                   | -                   |
+| shares ownership        | -             | -                    | +                   | +                   |
+| foreign ownership       | -             | +                    | -                   | -                   |
++-------------------------+---------------+----------------------+---------------------+---------------------+
+
+=end text
+
+=head3 C<out> behaviour
+
+The C<out> method has optional C<const Sv& proto = {}> parameter, which instructs
+how make the C++ pointer accessible in Perl.
+
+=over 4
+
+=item it might be empty
+
+In that case SV* pointing to C<undef> is created, and it is blessed into C<package()>
+returned by the TypemapObject.
+
+This is automatically applied behaviour by ParseXS for the output parameters, i.e.
+C<ClassXXX> below:
+
+    ClassXXX* ClassYYY::create_xxx()
+
+This is also applied when there is a code in xs-adapters like:
+
+    ClassXXX* item = ... ; // get somehow pointer to ClassXXX
+    RETVAL = xs::out<>(item);
+
+=item it might contain Perl package name (in form of string or Stash)
+
+In that case SV* pointing to C<undef> is created, and it is blessed into the specified
+package name. This is needed to follow standart Perl inheritance model, i.e. respect
+when the current class might be derived in Perl or xs-adapter. In other words it
+works similar to:
+
+    package My::XXX;
+
+    sub new {
+        my $class = shift;
+        my $obj = {};
+        return bless $obj => $class;
+    }
+
+    package My::YYY;
+    use base qw/My::XXX;
+
+    my $obj_a = My::XXX->new;
+    my $obj_b = My::YYY->new;
+
+=item it might be already blessed Perl object
+
+In that case SV* the pointer to C++ object is attached to the existing SV*, the new
+SV* will not be created and the existing SV* will be returned as result of the
+operation.
+
+The typical use case is C3-mixin and C<next::method> awareness. It is similar
+to the perl code
+
+    sub new {
+        my $class = shift;
+        my $obj = $class->next::method(@_);
+        ...
+        return $obj;
+    }
+
+Ususally in xs-adapter the C<proto> is obtained via
+
+    ..::new(...)
+    PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), items-1);
+    RETVAL = new MyClass();
+    // ParseXS from XS::Framework will invoke xs::out automatically
+
+=item it might be something else (ArrayRef or HashRef)
+
+In that it behaves the same as with the empty C<proto>, but instead of
+using C<undef> as base value to bless the default typemap's package(),
+it uses the provided object as base to bless. This is similar to
+
+    return bless {} => 'MyClass';  # or:  return bless [] => 'MyClass'
+
+This might be useful when B<it is known> that the class will be extended I<from
+Perl>, i.e. to avoid L<XS::Framework::obj2hv> invocation in Perl descedant
+class.
+
+=back
+
+If the default behaviour is not desirable, i.e. there is need to return
+blessed hashref B<and> tolerate possible descendant classes, then the C<new>
+method should be like:
+
+    Myclass* Myclass::new(...) {
+        RETVAL = new Myclass(...)
+        PROTO = Stash::from_name(CLASS).bless(Hash::create());
+    }
+
+Beware of the orded above: the C++ class have to be created first, and only
+then Perl SV* wrapper should be created next. If the order is reversed
+and C++ class I<throws an exception> in constructor, the C++ object is not
+constructed, and there is nothing to attach to Perl SV*; but in the
+SV* desctruction it will be detected (invalid object reference), and the
+corresponding warning will be shown.
+
+=head2 const TypemapObject
+
+It is possible to have type map for some const class, e.g.
+
+  struct Typemap<const MyClass*>: TypemapObject<const MyClass*, const MyClass*, ... >
+
+It has the following sense: if C++ API returns const object, then corresponding
+Perl SV* wrapper will be marked as read only. Attempt to invoke non-const method
+on read-only SV* leads to runtime exception.
+
+const-methods in xs-adapters should be marked as C<const> in method attributes
+section.
+
+=head2 Auto-deduced typemaps
+
+Out of the box L<XS::Framework> is shipped with the patrial specializations,
+when there is no need to write dependend/deduceable typemaps, when there is
+some basic typemap. For example, typemap<T*> is deduced from typemap<const T*>.
+This is written as:
+
+    typemap<const T*> -> typemap<T*>
+
+Here are all rules:
+
+    typemap<const T*> -> typemap<T*>
+    typemap<T*> -> Typemap<iptr<T>>
+    typemap<T*> -> Typemap<iptr<T>&>
+    typemap<T*> -> Typemap<T&>
+
+List of predefined typemap:
+  
+  int8_t
+  int16_t
+  int32_t
+  int64_t
+  uint8_t
+  uint16_t
+  uint32_t
+  uint64_t
+  float
+  double
+  bool
+  Simple
+  Ref
+  Glob
+  Array
+  Hash
+  Stash
+  std::string
+  std::string_view
+  std::vector<T>
+  std::map<Key, T>
+
+=head2 GLOSSARY
+
+=head4 XS-adapter, XS-wrapper
+
+Perl class written in XS (file with .xs/xsi extension).
+
+=head4 BackRef
+
+The instance of Perl object (SV*), created from perl script, but stored outside
+of Perl (i.e. in C++/C/XS). The tricky part is to temporally "prolong" SV*
+lifetime in some C/C++ contrainer outside of Perl interpreter.
+

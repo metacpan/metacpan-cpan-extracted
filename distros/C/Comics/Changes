@@ -1,6 +1,12 @@
 Revision history for Comics
 
-1.13	019-04-19
+1.14	2019-07-12
+
+	Add BerkeleyMews, TheOtherEnd, SkeletonClaw.
+	Fix patterns for CSectionComics, JesusAndMo.
+	Disable TheWareHouse (seems defunct).
+
+1.13	2019-04-19
 
 	Fix patterns for Buttersafe.
 	Disable GoneIntoRapture, DoodleForFood. They changed their

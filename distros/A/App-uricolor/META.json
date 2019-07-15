@@ -35,7 +35,7 @@
             "Term::ANSIColor" : "0",
             "URI::Find" : "0",
             "URI::Find::Schemeless" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

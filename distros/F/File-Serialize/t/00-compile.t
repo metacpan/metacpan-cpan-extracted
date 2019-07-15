@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'File/Serialize.pm',
     'File/Serialize/Serializer.pm',
     'File/Serialize/Serializer/Data/Dumper.pm',
     'File/Serialize/Serializer/JSON/MaybeXS.pm',
+    'File/Serialize/Serializer/JSON5.pm',
     'File/Serialize/Serializer/JSONY.pm',
     'File/Serialize/Serializer/TOML.pm',
     'File/Serialize/Serializer/XML/Simple.pm',

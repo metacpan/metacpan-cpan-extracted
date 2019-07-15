@@ -20,7 +20,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,4 +45,6 @@ resources:
   bugtracker: https://github.com/davewood/catalystx-resource/issues
   homepage: https://github.com/davewood/catalystx-resource
   repository: https://github.com/davewood/catalystx-resource.git
-version: '0.02'
+version: '0.03'
+x_generated_by_perl: v5.22.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

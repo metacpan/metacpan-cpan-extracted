@@ -24,6 +24,6 @@ requires:
   Moo: '2.003004'
   MooX::LazierAttributes: '1.07008'
   MooX::ValidateSubs: '1.012004'
-  perl: '5.006'
-version: '0.03'
+  perl: '5.018'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,6 @@
 package Algorithm::CP::IZ::FindFreeVar;
+use strict;
+use warnings;
 
 use constant {
     Default => 0,

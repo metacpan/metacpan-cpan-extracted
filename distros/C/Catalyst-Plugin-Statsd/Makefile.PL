@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "log Catalyst stats to statsd",
+  "ABSTRACT" => "Log Catalyst stats to statsd",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.6.1",
+  "VERSION" => "v0.6.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

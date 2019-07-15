@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  XS::Install: v1.0.14
+  XS::Install: v1.2.4
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -20,7 +20,7 @@ no_index:
     - t
     - inc
 requires:
-  XS::Install: v1.0.14
+  XS::Install: v1.2.4
   perl: '5.018000'
-version: v1.0.4
+version: v1.0.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

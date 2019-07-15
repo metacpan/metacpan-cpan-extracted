@@ -6,6 +6,7 @@ use autodie;
 use feature qw(say);
 
 use List::AllUtils;
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 
 use Bio::MUST::Core;
@@ -14,12 +15,15 @@ use Bio::MUST::Drivers;
 my $class = 'Bio::MUST::Drivers::Exonerate';
 
 
-# skip all exonerate tests unless exonerate is available in the $PATH
-unless ( qx{which exonerate} ) {
+# Note: provisioning system is not enabled to help tests to pass on CPANTS
+my $app = use_module('Bio::MUST::Provision::Exonerate')->new;
+unless ( $app->condition ) {
     plan skip_all => <<"EOT";
-skipped all exonerate tests!
-If you want to use this module you need to install the exonerate executable:
+skipped all Exonerate tests!
+If you want to use this module you need to install the Exonerate executable:
 https://www.ebi.ac.uk/about/vertebrate-genomics/software/exonerate
+If you --force installation, I will eventually try to install Exonerate with brew:
+https://brew.sh/
 EOT
 }
 

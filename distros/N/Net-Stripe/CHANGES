@@ -1,10 +1,92 @@
 ==================================================
-Changes from 2017-07-14 00:00:00 +0000 to present.
+Changes from 2018-07-14 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.36 at 2018-07-14 07:17:26 +0000
+version 0.37 at 2019-07-14 12:30:46 +0000
 -----------------------------------------
+
+  Change: 6dfef08471a1bdfb0151cb46458a0e6049a94957
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-14 13:29:26 +0000
+
+    Update README.pod 
+
+  Change: f00893a56ddaf7084782affa14325a5c365be61c
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-14 13:16:30 +0000
+
+    Merge pull request #116 from andrewsolomon/master
+
+    Fix unit test and add warning re: Stripe API versioning 
+
+  Change: 440bd87e632424a30eb511b262ecde94dfb30a1c
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-14 13:12:33 +0000
+
+    update pod 
+
+  Change: 49f3b6c7499769c1602af354bd24080b6cc48316
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-14 13:07:00 +0000
+
+    add WARNING to pod 
+
+  Change: 8cf92ad14199eacad19053bd409cea9c6e065ff6
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-14 12:28:03 +0000
+
+    changed error message in unit test 
+
+  Change: 75a9019d5f704113f5e314766bb249212423437b
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-12-16 07:46:10 +0000
+
+    Merge pull request #113 from pscott-au/master
+
+    UTF8 Encoding POD 
+
+  Change: 79867259b4b4e72ca4729ac90b92452e5b3fece0
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-12-16 13:28:04 +0000
+
+    UTF8 Encoding POD
+
+    Attempt to fix POD errors rendered on Github 
+
+  Change: ee2f20df3df3479e716eb7843c7fc439e2013435
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-15 07:17:13 +0000
+
+    Merge pull request #111 from sherrardb/f_allow_auth_then_capture
+
+    allow auth-only charge with capture later 
+
+  Change: 0b7d9057cc025556e9c1888c0a8b585524babcb2
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-07-14 20:32:52 +0000
+
+    allow auth-only charge with capture later 
+
+  Change: 42c629b8d2c149aedfd876b08ea8b743834a52ca
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-14 22:10:28 +0000
+
+    Merge pull request #108 from sherrardb/add_charge_status
+
+    add status field for charge object 
+
+  Change: 29d1d4b8bfeea3a4e606759d003262375b357b64
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-07-14 09:45:36 +0000
+
+    add status field for charge object 
+
+  Change: 93bddc5e125ef3c7b6b08bef236d73d25fdf053e
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-14 09:22:41 +0000
+
+    Version 0.36 docs 
 
   Change: 96dd910d23d6b144b0cce9f64824c05fb62dbdb0
   Author: Andrew Solomon <andrew@geekuni.com>

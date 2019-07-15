@@ -8,7 +8,11 @@ use FindBin '$Bin';
 use Encode;
 use YAML::LibYAML::API;
 use YAML::LibYAML::API::XS;
-use YAML::PP::Parser;
+use YAML::PP::Common qw/
+    YAML_ANY_SCALAR_STYLE YAML_PLAIN_SCALAR_STYLE
+    YAML_SINGLE_QUOTED_SCALAR_STYLE YAML_DOUBLE_QUOTED_SCALAR_STYLE
+    YAML_LITERAL_SCALAR_STYLE YAML_FOLDED_SCALAR_STYLE
+/;
 
 my $yaml = <<'EOM';
 
@@ -38,7 +42,7 @@ subtest parse_string_events => sub {
     my $ev = [];
     YAML::LibYAML::API::parse_string_events($yaml, $ev);
 
-    my @ts = map { YAML::PP::Parser->event_to_test_suite([ $_->{name} => $_ ]) } @$ev;
+    my @ts = map { YAML::PP::Common::event_to_test_suite($_) } @$ev;
     @exp_events = (
         '+STR',
         '+DOC',
@@ -81,15 +85,15 @@ subtest parse_string_events => sub {
             end   => { line => 2, column => 0 },
             style => 'block',
         },
-        { name => 'scalar_event', style => ':', value => 'foo',
+        { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => 'foo',
             start => { line => 2, column => 0 },
             end   => { line => 2, column => 3 },
         },
-        { name => 'scalar_event', style => ':', value => 'bar', anchor => 'ALIAS',
+        { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => 'bar', anchor => 'ALIAS',
             start => { line => 2, column => 5 },
             end   => { line => 2, column => 15 },
         },
-        { name => 'scalar_event', style => "'", value => 'alias',
+        { name => 'scalar_event', style => YAML_SINGLE_QUOTED_SCALAR_STYLE, value => 'alias',
             start => { line => 3, column => 0 },
             end   => { line => 3, column => 7 },
         },
@@ -97,15 +101,15 @@ subtest parse_string_events => sub {
             start => { line => 3, column => 9 },
             end   => { line => 3, column => 15 },
         },
-        { name => 'scalar_event', style => ':', value => 'tag',
+        { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => 'tag',
             start => { line => 4, column => 0 },
             end   => { line => 4, column => 3 },
         },
-        { name => 'scalar_event', style => ':', value => '23', tag => 'tag:yaml.org,2002:int',
+        { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => '23', tag => 'tag:yaml.org,2002:int',
             start => { line => 4, column => 5 },
             end   => { line => 4, column => 13 },
         },
-        { name => 'scalar_event', style => ':', value => 'list',
+        { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => 'list',
             start => { line => 5, column => 0 },
             end   => { line => 5, column => 4 },
         },
@@ -114,15 +118,15 @@ subtest parse_string_events => sub {
             end   => { line => 6, column => 1 },
             style => 'block',
         },
-        { name => 'scalar_event', style => '"', value => 'doublequoted',
+        { name => 'scalar_event', style => YAML_DOUBLE_QUOTED_SCALAR_STYLE, value => 'doublequoted',
             start => { line => 6, column => 2 },
             end   => { line => 6, column => 16 },
         },
-        { name => 'scalar_event', style => '>', value => "folded\n",
+        { name => 'scalar_event', style => YAML_FOLDED_SCALAR_STYLE, value => "folded\n",
             start => { line => 7, column => 2 },
             end   => { line => 9, column => 0 },
         },
-        { name => 'scalar_event', style => '|', value => "literal",
+        { name => 'scalar_event', style => YAML_LITERAL_SCALAR_STYLE, value => "literal",
             start => { line => 9, column => 2 },
             end   => { line => 11, column => 0 },
         },
@@ -148,11 +152,11 @@ subtest parse_string_events => sub {
             end   => { line => 14, column => 0 },
             style => 'block',
         },
-        { name => 'scalar_event', style => ':', value => "a",
+        { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => "a",
             start => { line => 14, column => 0 },
             end   => { line => 14, column => 1 },
         },
-        { name => 'scalar_event', style => ':', value => "b",
+        { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => "b",
             start => { line => 14, column => 3 },
             end   => { line => 14, column => 4 },
         },
@@ -191,11 +195,11 @@ my @exp_file_events = (
         start => { line => 1, column => 0 },
         end   => { line => 1, column => 0 },
     },
-    { name => 'scalar_event', value => 'a', style => ':',
+    { name => 'scalar_event', value => 'a', style => YAML_PLAIN_SCALAR_STYLE,
         start => { line => 1, column => 0 },
         end   => { line => 1, column => 1 },
     },
-    { name => 'scalar_event', value => 'b', style => ':',
+    { name => 'scalar_event', value => 'b', style => YAML_PLAIN_SCALAR_STYLE,
         start => { line => 1, column => 3 },
         end   => { line => 1, column => 4 },
     },
@@ -280,10 +284,10 @@ subtest indent => sub {
         { name => 'stream_start_event' },
         { name => 'document_start_event' },
         { name => 'mapping_start_event', style => 'block' },
-        { name => 'scalar_event', value => 'a', style => ':' },
+        { name => 'scalar_event', value => 'a', style => YAML_PLAIN_SCALAR_STYLE },
         { name => 'mapping_start_event', style => 'block' },
-        { name => 'scalar_event', value => 'b', style => ':' },
-        { name => 'scalar_event', value => 'c', style => ':' },
+        { name => 'scalar_event', value => 'b', style => YAML_PLAIN_SCALAR_STYLE },
+        { name => 'scalar_event', value => 'c', style => YAML_PLAIN_SCALAR_STYLE },
         { name => 'mapping_end_event' },
         { name => 'mapping_end_event' },
         { name => 'document_end_event', implicit => 1 },

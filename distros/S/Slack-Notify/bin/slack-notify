@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use warnings;
+use strict;
+
+use Getopt::Long::Descriptive;
+use Slack::Notify;
+
+
+my ($opt, $usage) = describe_options(
+  '%c %o <text>',
+  [ 'hook_url|u=s', 'URL of Slack incoming webhook to post to', { required => 1 } ],
+  [ 'help', 'print usage and exit', { shortcircuit => 1 } ],
+);
+my $text = join ' ', @ARGV;
+
+print $usage->text and exit if $opt->help || !length($text);
+
+Slack::Notify->new(hook_url => $opt->hook_url)->post(text => $text);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+slack-nofity - Send Slack messages from the command line
+
+=head1 SYNOPSIS
+
+    slack-notify --hook_url=https://hooks.slack.com/services/... something happened
+
+=head1 DESCRIPTION
+
+A very simple command-line program to send text into a Slack channel.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Slack::Notify>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Rob N ★
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

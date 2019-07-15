@@ -28,6 +28,10 @@ t/1022_qr1_r2.t
 t/1023_qr2_r2.t
 t/1025_s.t
 t/1026_s_r2.t
+t/1027_qr3.t
+t/1028_qr3_r2.t
+t/1029_qr4.t
+t/1030_qr4_r2.t
 t/2001_podtest.t
 xt/1001_chop.t
 xt/1002_chr.t
@@ -50,3 +54,7 @@ xt/1022_qr1_r2.t
 xt/1023_qr2_r2.t
 xt/1025_s.t
 xt/1026_s_r2.t
+xt/1027_qr3.t
+xt/1028_qr3_r2.t
+xt/1029_qr4.t
+xt/1030_qr4_r2.t

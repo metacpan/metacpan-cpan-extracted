@@ -19,7 +19,7 @@ use namespace::autoclean;
 
 requires 'run_tests';
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 sub _build_data_files {
@@ -163,7 +163,7 @@ Test::Roo::DataDriven - simple data-driven tests with Test::Roo
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -472,7 +472,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2017-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

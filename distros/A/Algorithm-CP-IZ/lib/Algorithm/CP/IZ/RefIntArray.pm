@@ -3,6 +3,8 @@
 #####################################################
 
 package Algorithm::CP::IZ::RefIntArray;
+use strict;
+use warnings;
 
 sub new {
     my $class = shift;

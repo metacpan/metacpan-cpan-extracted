@@ -13,14 +13,15 @@
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
             "schema:Apartment",
+            "schema:Accommodation",
+            "schema:Suite",
             "schema:House",
             "schema:SingleFamilyResidence",
-            "schema:Suite",
-            "schema:Accommodation"
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:occupancy" : {
@@ -30,9 +31,9 @@
          "rdfs:label" : "occupancy",
          "schema:domainIncludes" : [
             "schema:SingleFamilyResidence",
+            "schema:HotelRoom",
             "schema:Suite",
-            "schema:Apartment",
-            "schema:HotelRoom"
+            "schema:Apartment"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       }

@@ -2,9 +2,9 @@ package Pcore::Handle;
 
 use Pcore -const, -class, -export;
 use Pcore::AE::DNS::Cache;
-use Pcore::Util::CA;
+use Pcore::Lib::CA;
 use HTTP::Parser::XS qw[];
-use Pcore::Util::Scalar qw[is_ref is_uri is_plain_scalarref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
+use Pcore::Lib::Scalar qw[is_ref is_uri is_plain_scalarref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
 use AnyEvent::Socket qw[];
 use Errno qw[];
 use IO::Socket::SSL qw[$SSL_ERROR SSL_WANT_READ SSL_WANT_WRITE SSL_VERIFY_NONE SSL_VERIFY_PEER];
@@ -24,14 +24,14 @@ const our $TLS_CTX_LOW  => 0;
 const our $TLS_CTX_HIGH => 1;
 const our $TLS_CTX      => {
     $TLS_CTX_LOW => {
-        $MSWIN ? ( SSL_ca_file => Pcore::Util::CA->ca_file ) : (),
+        $MSWIN ? ( SSL_ca_file => Pcore::Lib::CA->ca_file ) : (),
         SSL_verify_mode => SSL_VERIFY_NONE,
         SSL_dh_file     => undef,
         SSL_dh          => undef,
         SSL_ecdh_curve  => undef,             # if you don't want to have ECDH key exchange this could be set to undef
     },
     $TLS_CTX_HIGH => {
-        $MSWIN ? ( SSL_ca_file => Pcore::Util::CA->ca_file ) : (),
+        $MSWIN ? ( SSL_ca_file => Pcore::Lib::CA->ca_file ) : (),
         SSL_verify_mode => SSL_VERIFY_PEER,
         SSL_dh_file     => $ENV->{share}->get('data/dhparam-4096.pem'),
 

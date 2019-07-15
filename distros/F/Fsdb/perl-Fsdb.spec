@@ -1,13 +1,10 @@
 Summary: A set of commands for manipulating flat-text databases from the shell
 Name: perl-Fsdb
-Version: 2.64
+Version: 2.66
 Release: 1%{?dist}
 License: GPLv2
-Group: Development/Libraries
 URL: http://www.isi.edu/~johnh/SOFTWARE/FSDB/
 Source0: http://www.isi.edu/~johnh/SOFTWARE/FSDB/Fsdb-%{version}.tar.gz
-# buildroot deprecated before 2013-07-26, but left in for EPEL 5
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: noarch
 BuildRequires: perl
 BuildRequires: perl-generators
@@ -90,10 +87,6 @@ find $RPM_BUILD_ROOT -type d -exec chmod g-s {} ';'
 %check
 make test
 
-# %clean but left in for EPEL 5
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 
 %files
 # next line deprecated since rpm 4.4, I'm told.
@@ -108,5 +101,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Nov 20 2017 John Heidemann <johnh@isi.edu> 2.64-1
+* Thu Dec 20 2018 John Heidemann <johnh@isi.edu> 2.66-1
 - See http://www.isi.edu/~johnh/SOFTWARE/FSDB/

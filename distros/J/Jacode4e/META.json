@@ -1,0 +1,85 @@
+{
+    "name" : "Jacode4e",
+    "version" : "2.13.6.13",
+    "abstract" : "jacode.pl-like program for enterprise",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+       "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "repository" : {
+             "url" : "https://github.com/ina-cpan/Jacode4e"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Archive::Tar" : "0.072",
+                "Compress::Zlib" : "1.03",
+                "Config" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Getopt::Std" : "1.01",
+                "Test" : "1.122",
+                "Test::Harness" : "1.1602",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "Test" : "1.122"
+            }
+        }
+    }
+}

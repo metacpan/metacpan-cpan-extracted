@@ -1,5 +1,8 @@
-package App::MonM::Notifier::Store; # $Id: Store.pm 43 2017-12-01 16:30:32Z abalama $
+package App::MonM::Notifier::Store; # $Id: Store.pm 60 2019-07-14 09:57:26Z abalama $
 use strict;
+use utf8;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -7,36 +10,90 @@ App::MonM::Notifier::Store - monotifier store class
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use App::MonM::Notifier::Store;
 
-    my $store = new App::MonM::Notifier::Store;
+    my $store = new App::MonM::Notifier::Store(
+        dsn => "DBI:mysql:database=monotifier;host=mysql.example.com",
+        user => "username",
+        password => "password",
+        set => [
+            "RaiseError        0",
+            "PrintError        0",
+            "mysql_enable_utf8 1",
+        ],
+    );
+
+    die($store->error) unless $store->status;
 
 =head1 DESCRIPTION
 
 This module provides store methods.
 
-For internal use only
+    CREATE TABLE IF NOT EXISTS `monotifier` (
+      `id` int(11) NOT NULL COMMENT 'ID',
+      `to` char(255) DEFAULT NULL COMMENT 'Recipient name',
+      `channel` char(255) DEFAULT NULL COMMENT 'Recipient channel',
+      `subject` text COMMENT 'Message subject',
+      `message` text COMMENT 'Message content',
+      `pubdate` int(11) DEFAULT NULL COMMENT 'Date (unixtime) of the publication',
+      `expires` int(11) DEFAULT NULL COMMENT 'Date (unixtime) of the expire',
+      `status` char(32) DEFAULT NULL COMMENT 'Status of transaction',
+      `comment` char(255) DEFAULT NULL COMMENT 'Comment',
+      `errcode` int(11) DEFAULT NULL COMMENT 'Error code',
+      `errmsg` text COMMENT 'Error message',
+      PRIMARY KEY (`id`),
+      KEY `I_ID` (`id`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8
 
-=head2 METHODS
+=head2 new
 
-=over 8
+    my $store = new App::MonM::Notifier::Store(
+        dsn => "DBI:mysql:database=monotifier;host=mysql.example.com",
+        user => "username",
+        password => "password",
+        set => [
+            "RaiseError        0",
+            "PrintError        0",
+            "mysql_enable_utf8 1",
+        ],
+    );
 
-=item B<new>
+Creates DBI object
 
-Constructor
+=head2 add
 
-=item B<status>
+    $store->add(
+        to      => $user,
+        channel => $ch_name,
+        subject => $subject,
+        message => $message,
+    ) or die($store->error);
 
-    my $status = $store->status;
-    my $status = $store->status( 1 ); # Sets the status value and returns it
+Adds new recored
 
-Get/set BOOL status of the operation
+=head2 clean
 
-=item B<error>
+    $store->clean or die($store->error);
+
+Delete incorrect records (that are expired, skipped or failed)
+
+=head2 del
+
+    $store->del($id) or die($store->error);
+
+Delete record by id
+
+=head2 dsn
+
+    my $dsn = $store->dsn;
+
+Returns DSN string of current database connection
+
+=head2 error
 
     my $error = $store->error;
 
@@ -47,100 +104,67 @@ Returns error message
 Sets error message if argument is provided.
 This method in "set" context returns status of the operation as status() method.
 
-=item B<add>
+=head2 get
 
-    my $newid = $store->add(
-        ip      => LOCALHOSTIP,
-        host    => hostname,
-        ident   => "quux",
-        level   => getLevelByName("error"),
-        to      => "test",
-        from    => "test",
-        subject => "Test message",
-        message => "Content",
-        pubdate => time() + 60*5,
-        expires => 60*5 + 60*60*24,
-        status  => "NEW",
-    );
+    my %data = $store->get($id);
 
-This method adds new record into store. Returns ID created record
+Returns data from database by id
 
-=item B<get>
+=head2 getall
 
-    my %data = $store->get( $id );
+    my @table = $store->getall();
+    my @table_100 = $store->getall(100);
 
-This method gets record from store. Returns hash of this record
+Returns data from database with limit supporting
 
-=item B<getall>
+=head2 getByName
 
-    my @table = $store->getall( id => $id );
-    my @table = $store->getall(
-            id      => $id, # Integer value
-            ip      => $ip, # IPv4 value
-            host    => $host,
-            ident   => $ident,
-            level   => $level, # Integer value
-            to      => $to,
-            from    => $from,
-            status  => $status, # String value
-            errcode => $errcode, # Integer value
-        );
+    my %data = $store->getByName($username, $ch_name);
 
-This method returns all records from store by criteria. Returns array-ref
+Returns data from database by username and channel name
 
-=item B<getJob>
+=head2 is_sqlite
 
-    my %data = $store->getJob;
+    print $store->is_sqlite ? "Is SQLite" : "Is not SQLite"
 
-This method gets record as new job from store for processing. Returns hash of this record
+Returns true if type of current database is SQLite
 
-=item B<setJob>
-
-    $store->setJob(
-            id      => $id,
-            status  => $status,
-            errcode => $errcode,
-            errmsg  => $errmsg,
-            comment => "... comment ...",
-            # ... other fields ...
-        );
-
-This method sets the new data for the record by record id
-
-=item B<ping>
+=head2 ping
 
     $store->ping ? 'OK' : 'Database session is expired';
 
 Checks the connection to database
 
-=item B<del>
+=head2 setError
 
-    my $status = $store->del( $id );
+    $store->setError($id, 102, "Error string")
+        or die($store->error);
 
-This method removes record in store. Returns status
+Sets error code and error message by id. See L<App::MonM::Notifier::Const>
 
-=item B<set>
+=head2 setStatus
 
-    $store->set(
-            id      => $id,
-            status  => $status,
-            errcode => $errcode,
-            errmsg  => $errmsg,
-            comment => "... comment ...",
-            # ... other fields ...
-        );
+    $store->setStatus($id, JOB_EXPIRED, "Comment")
+        or die($store->error);
 
-This method sets the new data for the record by record id
+Sets new status by id. See L<App::MonM::Notifier::Const>
 
-=back
+=head2 status
+
+    my $status = $store->status;
+    my $status = $store->status( 1 ); # Sets the status value and returns it
+
+Get/set BOOL status of the operation
+
+=head2 truncate
+
+    $store->truncate or die($store->error);
+
+Delete all records
 
 =head1 HISTORY
 
-See C<CHANGES> file
-
-=head1 DEPENDENCIES
-
-L<CTK>, L<DBI>
+See C<Changes> file
 
 =head1 TO DO
 
@@ -152,223 +176,192 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-L<App::MonM::Notifier>, L<App::MonM::AlertGrid>
+L<CTK::DBI>, L<App::MonM>, L<App::MonM::Notifier>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use CTK qw/ :BASE /;
-use CTKx;
+use vars qw/$VERSION/;
+$VERSION = '1.01';
+
+use Carp;
 use CTK::DBI;
+use CTK::Util qw/ touch /;
 use CTK::ConfGenUtil;
 use CTK::TFVals qw/ :ALL /;
-use CTK::Util;
-use Try::Tiny;
-use Compress::Raw::Zlib qw//;
+use File::Spec;
 
-use App::MonM::Notifier::Const;
+use App::MonM::Const;
+use App::MonM::Util qw/ set2attr /;
+
+use App::MonM::Notifier::Const qw/ :jobs :functions EXPIRES /;
 use App::MonM::Notifier::Util;
 
 use constant {
-    LOCALHOSTIP => '127.0.0.1',
-    DBTYPE      => 'sqlite',
-    DBTABLE     => 'monotifier',
-    DBFILE      => 'monotifier.db',
-    EXPIRES     => "+1M", # 30 days max (Time waiting for hold requests)
-    LIFETIME    => "+1y", # 365 days max (Storage time of the request)
-    DBDDL       => [(<<DDL, 'CREATE INDEX I_ID ON [TABLE](id)')],
-        CREATE TABLE
-            IF NOT EXISTS [TABLE] (
-                `id` INT(11) NOT NULL PRIMARY KEY,
-                `ip` CHAR(15) NOT NULL, -- Client IP address
-                `host` CHAR(128) NOT NULL, -- Client Host Name
-                `ident` CHAR(64), -- Ident, name
-                `level` INT(8) NOT NULL, -- Level
-                `to` CHAR(255), -- Recipient address
-                `from` CHAR(255), -- Sender's address
-                `subject` TEXT, -- Subject of the message
-                `message` TEXT, -- Message content
-                `pubdate` BIGINT(20), -- Date (unixtime) of the publication
-                `expires` BIGINT(20), -- Date (unixtime) of the expire
-                `status` CHAR(32), -- Status of transaction
-                `comment` CHAR(255), -- Comment
-                `errcode` INT(11), -- Error code
-                `errmsg` TEXT -- Error message
-            )
-DDL
-    DBDML       => 'SELECT COUNT(`id`) AS `countid` FROM [TABLE]',
+    DB_FILENAME     => '.monotifier.db',
+    DEFAULT_DSN_MASK    => 'dbi:SQLite:dbname=%s',
+    DEFAULT_DBI_ATTR    => {
+            dsn         => '', # See DEFAULT_DSN_MASK
+            user        => '',
+            password    => '',
+            set         => [
+                    'RaiseError 0',
+                    'PrintError 0',
+                    'sqlite_unicode 1',
+                ],
+        },
 };
 
-use vars qw/$VERSION/;
-$VERSION = '1.00';
+use constant MONOTIFIER_DDL => <<'DDL';
+CREATE TABLE IF NOT EXISTS monotifier (
+        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        `to` CHAR(255), -- Recipient name
+        `channel` CHAR(255), -- Recipient channel
+        `subject` TEXT, -- Message subject
+        `message` TEXT, -- Message content
+        `pubdate` BIGINT(20), -- Date (unixtime) of the publication
+        `expires` BIGINT(20), -- Date (unixtime) of the expire
+        `status` CHAR(32), -- Status of transaction
+        `comment` CHAR(255), -- Comment
+        `errcode` INT(11), -- Error code
+        `errmsg` TEXT -- Error message
+    )
+DDL
+
+use constant MONOTIFIER_ADD => <<'DML';
+INSERT INTO monotifier
+    (`to`,`channel`,`subject`,`message`,`pubdate`,`expires`,`status`,`comment`,`errcode`,`errmsg`)
+VALUES
+    (?,?,?,?,?,?,?,?,?,?)
+DML
+
+use constant MONOTIFIER_GET_BY_NAME => <<'DML';
+SELECT `id`,`to`,`channel`,`subject`,`message`,`pubdate`,`expires`,`status`,`comment`,`errcode`,`errmsg`
+FROM monotifier
+WHERE `status` = ? AND `to` = ? AND `channel` = ?
+DML
+
+use constant MONOTIFIER_SET_STATUS => <<'DML';
+UPDATE monotifier
+SET `status` = ?, `comment` = ?
+WHERE `id` = ?
+DML
+
+use constant MONOTIFIER_SET_ERROR => <<'DML';
+UPDATE monotifier
+SET `status` = ?, `errcode` = ?, `errmsg` = ?
+WHERE `id` = ?
+DML
+
+use constant MONOTIFIER_DEL => <<'DML';
+DELETE FROM monotifier WHERE `id` = ?
+DML
+
+use constant MONOTIFIER_GET => <<'DML';
+SELECT `id`,`to`,`channel`,`subject`,`message`,`pubdate`,`expires`,`status`,`comment`,`errcode`,`errmsg`
+FROM monotifier
+WHERE `id` = ?
+DML
+
+use constant MONOTIFIER_GETALL => <<'DML';
+SELECT `id`,`to`,`channel`,`subject`,`pubdate`,`expires`,`status`,`comment`,`errcode`,`errmsg`
+FROM monotifier
+ORDER BY `id` DESC
+DML
+
+use constant MONOTIFIER_CLEAN => <<'DML';
+DELETE FROM monotifier WHERE `status` IN ('EXPIRED', 'SKIP', 'ERROR') OR `expires` <= ?
+DML
+
+use constant MONOTIFIER_TRUNCATE => <<'DML';
+DELETE FROM monotifier
+DML
 
 sub new {
     my $class = shift;
-    my $c = CTKx->instance->c();
-    my $config_store = node($c->config() => "store");
-    my %props = (
-            dbi     => undef,
-            dsn     => undef,
-            config  => $config_store,
-            error   => '',
-            file    => '',
-            status  => 1,
-            user    => '',
-            password=> '',
-        );
-
-    # Структуру берем из конфигурации
-    #<store>
-    #    Type    SQLite
-    #    File    test.db
-    #</store>
-    #<store>
-    #    Type    DBI
-    #
-    #    DSN     DBI:mysql:database=DATABASE;host=HOSTNAME
-    #
-    #    User    USER
-    #    Password PASSWORD
-    #
-    #    Connect_to    5     # Connect TimeOut
-    #    Request_to    60    # Request TimeOut
-    #
-    #    Set mysql_enable_utf8 1
-    #    Set PrintError 0
-    #
-    #    DDL CREATE TABLE IF NOT EXISTS `[TABLE]` ( \
-    #          `id` int(11) NOT NULL COMMENT 'ID', \
-    #          `ip` char(15) NOT NULL COMMENT 'Client IP address', \
-    #          `host` char(128) DEFAULT NULL COMMENT 'Client Host Name', \
-    #          `ident` char(64) DEFAULT NULL COMMENT 'Ident, name', \
-    #          `level` int(8) NOT NULL DEFAULT '0' COMMENT 'Level', \
-    #          `to` char(255) DEFAULT NULL COMMENT 'Recipient address', \
-    #          `from` char(255) DEFAULT NULL COMMENT 'Sender''s address', \
-    #          `subject` text COMMENT 'Subject of the message', \
-    #          `message` text COMMENT 'Message content ', \
-    #          `pubdate` int(11) DEFAULT NULL COMMENT 'Date (unixtime) of the publication', \
-    #          `expires` int(11) DEFAULT NULL COMMENT 'Date (unixtime) of the expire', \
-    #          `status` char(32) DEFAULT NULL COMMENT 'Status of transaction', \
-    #          `comment` char(255) DEFAULT NULL COMMENT 'Comment', \
-    #          `errcode` int(11) DEFAULT NULL COMMENT 'Error code', \
-    #          `errmsg` text COMMENT 'Error message', \
-    #          PRIMARY KEY (`id`), \
-    #          KEY `I_ID` (`id`) \
-    #        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
-    #</Store>
-
-    my $db_type = lc(value($config_store => "type") || DBTYPE);
-    $props{type} = $db_type;
-    my %db_attr = _set_attr(array($config_store => "set"));
-    my $ddl = array($config_store => "ddl"); $ddl = DBDDL unless @$ddl;
-    my $dml = value($config_store => "dml") || DBDML;
-    my $table = uv2null(value($config_store => "table")) || DBTABLE;
-    $props{table} = $table;
-
-    my ($dsn, $dbi);
-    my %cnct = ();
-    my $inited = 1;
-    if ($db_type eq 'dbi') {
-        $dsn = uv2null(value($config_store => "dsn"));
-        croak("DSN missing") unless $dsn;
-
-        # Defaults
-        unless (%db_attr) {
-            %db_attr = (
-                sqlite_unicode => 1,
-                PrintError => 0,
-            );
+    my %args = @_;
+    unless ($args{dsn}) {
+        my $dda = DEFAULT_DBI_ATTR;
+        foreach (%$dda) {
+            $args{$_} //= $dda->{$_}
         }
-
-        my $user = uv2null(value($config_store => "user"));
-        my $password = uv2null(value($config_store => "password"));
-        my $cto = value($config_store => "connect_to");
-        my $rto = value($config_store => "request_to");
-        $props{user}  = $user;
-        $props{password}  = $user;
-
-        # Connect
-        %cnct = (
-            -dsn        => $dsn,
-            -user       => $user,
-            -pass       => $password,
-            -connect_to => $cto,
-            -request_to => $rto,
-            -attr       => { %db_attr },
-            -debug      => debugmode && verbosemode,
-        );
-    } else { # DBTYPE
-        my $file = uv2null(value($config_store => "file")) || catfile($c->datadir(), DBFILE);
-        croak("Store file missing. Check your configuration file") unless $file;
-        $props{file} = $file;
-        $dsn = sprintf("dbi:SQLite:dbname=%s", $file);
-
-        # Defaults
-        unless (%db_attr) {
-            %db_attr = (
-                sqlite_unicode  => 1,
-                PrintError      => 0,
-            );
-        }
-
-        $inited = 0 unless $file && (-e $file) && !(-z _);
-
-        # Connect
-        %cnct = (
-            -dsn        => $dsn,
-            -attr       => { %db_attr },
-            -debug      => debugmode && verbosemode,
-        );
     }
-    $dbi = new CTK::DBI(%cnct);
-    $props{cnct} = {%cnct};
-    $props{dsn} = $dsn;
-    $props{dbi} = $dbi;
+    my $file = $args{file} || DB_FILENAME;
+    my $dsn = $args{dsn} || sprintf(DEFAULT_DSN_MASK, $file);
 
-    # Init
-    if ($dbi && $dbi->{dbh}) {
-        my $sql = dformat($dml, { TABLE => DBTABLE });
-        unless ($inited && $dbi->field($sql)) {
-            if ($DBI::errstr) {
-                $props{error} = sprintf("Can't select \"%s\" on \"%s\": %s", $sql, $dsn, uv2null($DBI::errstr));
-                $inited = 0;
-            }
+    # DB
+    my $db = new CTK::DBI(
+        -dsn    => $dsn,
+        -debug  => 0,
+        -username => $args{'user'},
+        -password => $args{'password'},
+        -attr     => set2attr($args{'set'}),
+        $args{timeout} ? (
+            -timeout_connect => $args{timeout},
+            -timeout_request => $args{timeout},
+        ) : (),
+    );
+    my $dbh = $db->connect if $db;
+
+    # SQLite
+    my $fnew = 0;
+    my $issqlite = 0;
+    if ($dbh && $dsn =~ /SQLite/i) {
+        $file = $dbh->sqlite_db_filename();
+        unless ($file && (-e $file) && !(-z $file)) {
+            touch($file);
+            chmod(0666, $file);
+            $fnew = 1;
         }
-        unless ($inited) {
-            foreach my $dl (@$ddl) {
-                $dbi->execute(dformat($dl, { TABLE => DBTABLE }));
-            }
-            if ($DBI::errstr) {
-                $props{error} = sprintf("Can't init table \"%s\" on \"%s\": %s", DBTABLE, $dsn, uv2null($DBI::errstr));
-            }
-        }
-    } else { # Connect error
-        $props{error} = sprintf("Can't connect to \"%s\": %s", $dsn, uv2null($DBI::errstr));
+        $issqlite = 1;
     }
 
-    $props{status} = 0 if $props{error};
-    return bless { %props }, $class;
+    my $status = 1;
+    my $error = "";
+    if (!$db) {
+        $error = sprintf("Can't init database \"%s\"", $dsn);
+        $status = 0;
+    } elsif (!$dbh) {
+        $error = sprintf("Can't connect to database \"%s\": %s", $dsn, $DBI::errstr || "unknown error");
+        $status = 0;
+    } elsif ($fnew) {
+        $db->execute(MONOTIFIER_DDL);
+        $error = $dbh->errstr();
+        $status = 0 if $dbh->err;
+    }
+    unless ($error) {
+        unless ($dbh->ping) {
+            $error = sprintf("Can't init database \"%s\". Ping failed: %s",
+                $dsn, $dbh->errstr() || "unknown error");
+            $status = 0;
+        }
+    }
+
+    my $self = bless {
+            file    => $file,
+            issqlite=> $issqlite,
+            dsn     => $dsn,
+            error   => $error,
+            dbi     => $db,
+            expires => $args{expires} || EXPIRES,
+            status  => $status,
+        }, $class;
+
+    return $self;
 }
 sub status {
     my $self = shift;
@@ -395,230 +388,164 @@ sub ping {
     return 1 unless $dbh->can('ping');
     return $dbh->ping();
 }
-sub _dbi {
+sub dsn {
     my $self = shift;
-    my $cnct = $self->{cnct};
-    if ($self->ping) {
-        return $self->{dbi};
-    } else {
-        $self->{dbi} = new CTK::DBI(%$cnct);
-    }
-    if ($self->ping) {
-        $self->error("");
-    } else {
-        $self->error(sprintf("Can't (re)connect to \"%s\": %s", $self->{dsn}, uv2null($DBI::errstr)));
-        return undef;
-    }
-    return $self->{dbi};
+    return $self->{dsn};
 }
-
+sub is_sqlite {
+    my $self = shift;
+    return $self->{issqlite} ? 1 : 0;
+}
 sub add {
     my $self = shift;
     my %data = @_;
-    my $dbi = $self->_dbi;
-    return undef unless ($dbi && $dbi->{dbh}); #croak("No connect to store") unless ($dbi && $dbi->{dbh});
-    my $c = CTKx->instance->c();
-    my $config = $c->config();
-    my $pubdate = $data{pubdate} || time();
-    my $expires_def = value($config => "expires") || EXPIRES;
-    my $expires = $pubdate + (getExpireOffset($data{expires} || $expires_def) || getExpireOffset($expires_def));
-    my $lifetime_def = value($config => "lifetime") || LIFETIME;
-    my $lifetime = time() - getExpireOffset($lifetime_def);
-    my $newid = _get_id(
-            $data{ip}       || LOCALHOSTIP,
-            $data{level}    || 0,
-            $data{pubdate}  || 0,
-            $data{to}       || 'anonymous',
-            $data{from}     || 'anonymous',
-        );
+    return unless $self->ping;
+    $self->error("");
+    my $dbi = $self->{dbi};
 
-    # Удаляем старые записи (LifeTime)
-    $dbi->execute(sprintf('DELETE FROM %s WHERE `pubdate` <= ?', DBTABLE), $lifetime);
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't delete old records from table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
-        return undef;
+    # Data
+    my $pubdate = $data{pubdate} || time();
+    my $expires = $pubdate + $self->{expires};
+
+    # Delete too old records
+    $dbi->execute('DELETE FROM monotifier WHERE `expires` <= ?', time());
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't delete old records: %s", uv2null($dbi->connect->errstr)));
+        return;
     }
 
     # Добавляем запись в БД
-    $dbi->execute(sprintf('
-        INSERT
-            INTO %s (`id`,`ip`,`host`,`ident`,`level`, `to`, `from`, `subject`, `message`, `pubdate`, `expires`, `status`, `comment`, `errcode`, `errmsg`)
-        VALUES
-            ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
-    ', DBTABLE),
-        $newid,
-        $data{ip} || LOCALHOSTIP,
-        $data{host},
-        $data{ident},
-        $data{level} || 0,
+    $dbi->execute(MONOTIFIER_ADD,
         $data{to},
-        $data{from},
-        $data{subject},
-        $data{message},
-        $pubdate,
-        $expires,
-        $data{status} || JBS_NEW,
+        $data{channel},
+        $data{subject}, $data{message},
+        $pubdate, $expires,
+        $data{status} || JOB_NEW,
         $data{comment},
-        0, "",
+        0, getErr(0),
     );
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't insert new record into table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
-        return undef;
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't insert new record: %s", uv2null($dbi->connect->errstr)));
+        return;
     }
 
-    return $newid;
+    return 1;
+}
+sub getByName {
+    my $self = shift;
+    my ($name, $channel) = @_;
+    $self->error("");
+    my $dbi = $self->{dbi};
+
+    # Get table
+    my %tbl = $dbi->tableh("id", MONOTIFIER_GET_BY_NAME, JOB_NEW, $name, $channel);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't select records: %s", uv2null($dbi->connect->errstr)));
+        return;
+    }
+
+    # Update to PROGRESS status
+    my $summary = 1;
+    foreach my $id (keys %tbl) {
+        $self->setStatus($id, JOB_PROGRESS) or do {$summary = 0};
+    }
+    return unless $summary;
+
+    return %tbl;
+}
+sub setStatus {
+    my $self = shift;
+    my $id = shift || 0;
+    my $status = shift || JOB_SKIP;
+    my $comment = shift || sprintf("Modified at %s", scalar(localtime(time())));
+    $self->error("");
+    my $dbi = $self->{dbi};
+    $dbi->execute(MONOTIFIER_SET_STATUS, $status, $comment, $id);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't change status: %s", uv2null($dbi->connect->errstr)));
+        return 0;
+    }
+    return 1;
+}
+sub setError {
+    my $self = shift;
+    my $id = shift || 0;
+    my $code = shift || 1;
+    my $error = sprintf(getErr($code), @_);
+    $self->error("");
+    my $dbi = $self->{dbi};
+
+    $dbi->execute(MONOTIFIER_SET_ERROR, JOB_ERROR, $code, $error, $id);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't set error: %s", uv2null($dbi->connect->errstr)));
+        return 0;
+    }
+    return 1;
 }
 sub del {
     my $self = shift;
     my $id = shift || 0;
-    my $dbi = $self->_dbi;
-    return 0 unless ($dbi && $dbi->{dbh});
+    my $dbi = $self->{dbi};
+    $self->error("");
 
-    $dbi->execute(sprintf('DELETE FROM %s WHERE `id` = ?', DBTABLE), $id);
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't delete record from table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
+    $dbi->execute(MONOTIFIER_DEL, $id);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't delete record: %s", uv2null($dbi->connect->errstr)));
         return 0;
     }
-
     return 1;
 }
 sub get {
     my $self = shift;
     my $id = shift || 0;
-    my $dbi = $self->_dbi;
-    return () unless ($dbi && $dbi->{dbh}); #croak("No connect to store") unless ($dbi && $dbi->{dbh});
+    my $dbi = $self->{dbi};
+    $self->error("");
 
-    # Получаем данные
-    my %rec = $dbi->recordh(sprintf('SELECT * FROM %s WHERE `id` = ?', DBTABLE), $id);
-
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't get record from table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
+    my %rec = $dbi->recordh(MONOTIFIER_GET, $id);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't get record: %s", uv2null($dbi->connect->errstr)));
         return ();
     }
-
     return %rec;
-}
-sub set {
-    my $self = shift;
-    my %data = @_;
-
-    if (exists($data{pubdate}) && defined($data{pubdate})) {
-        if (exists($data{expires}) && defined($data{expires})) {
-            $data{expires} = $data{pubdate} + uv2zero(getExpireOffset($data{expires}));
-        }
-    }
-
-    return $self->setJob(%data);
 }
 sub getall {
     my $self = shift;
-    my %opts = @_;
-    my $dbi = $self->_dbi;
-    return () unless ($dbi && $dbi->{dbh});
+    my $limit = shift || 0;
+    my $dbi = $self->{dbi};
+    $self->error("");
 
-    # Gets all data
-    my @wheres = ("1 = 1");
-    while (my ($k,$v) = each %opts) {
-        next unless defined $v;
-        if (grep {$k eq $_} (qw/id level errcode pubdate expires/)) {
-            my $ltg = "=";
-            if ($v =~ /^([+\-])/) {
-                $ltg = ">=" if $1 eq '+';
-                $ltg = "<=" if $1 eq '-';
-                $v =~ s/^[+\-]+//;
-            }
-            push @wheres, sprintf("`%s` %s %d", $k, $ltg, $v);
-        } else {
-            push @wheres, sprintf("`%s` = '%s'", $k, $v);
-        }
-    }
-    my $sql = sprintf('SELECT * FROM %s WHERE %s', DBTABLE, join(" AND ", @wheres));
-    my @tbl = $dbi->table($sql);
-
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't get fields from table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
+    my @tbl = $dbi->table(sprintf("%s%s", MONOTIFIER_GETALL,  $limit ? " LIMIT $limit" : "" ));
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't get records: %s", uv2null($dbi->connect->errstr)));
         return ();
     }
-
     return @tbl;
 }
-sub getJob {
+sub clean {
     my $self = shift;
-    my $ident = shift || 0;
-    my $dbi = $self->_dbi;
-    return () unless ($dbi && $dbi->{dbh}); #croak("No connect to store") unless ($dbi && $dbi->{dbh});
-    my %rec = ();
+    my $dbi = $self->{dbi};
+    $self->error("");
 
-    my $tmpstatus = sprintf("%s%s",JBS_PROGRESS, $ident);
-    my $comment = sprintf("Processing at worker server with ident %s",$ident);
-
-    # Получаем только актуальные данные
-    #my %rec = $dbi->recordh(sprintf('SELECT * FROM %s WHERE `id` = ?', DBTABLE), $id);
-    my @tbl = $dbi->table(sprintf('SELECT `id` FROM %s WHERE (`status` = ? OR `status` = ?) AND `pubdate` <= ?', DBTABLE), JBS_NEW, JBS_POSTPONED, time());
-    my @recs = sort {($a || 0) <=> ($b || 0)} map {shift @$_} @tbl if @tbl;
-
-    my $prgid = 0;
-    foreach my $id (@recs) {
-        $dbi->execute(sprintf('UPDATE %s SET `status` = ? WHERE `id` = ? AND (`status` = ? OR `status` = ?)', DBTABLE), $tmpstatus, $id, JBS_NEW, JBS_POSTPONED);
-        last if $DBI::errstr;
-        %rec = $dbi->recordh(sprintf('SELECT * FROM %s WHERE `id` = ? AND `status` = ?', DBTABLE), $id, $tmpstatus);
-        last if $DBI::errstr;
-        if (%rec) {
-            $prgid = $id;
-            last;
-        }
-    }
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't update record in table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
-        return ();
-    }
-    $dbi->execute(sprintf('UPDATE %s SET `status` = ?, `comment` = ?  WHERE `id` = ? AND `status` = ?', DBTABLE), JBS_PROGRESS, $comment, $prgid, $tmpstatus);
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't update record in table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
-        return ();
-    }
-
-    return %rec;
-}
-sub setJob {
-    my $self = shift;
-    my %rec = @_;
-    my $dbi = $self->_dbi;
-    return 0 unless $dbi && $dbi->{dbh};
-    my $id = $rec{id};
-    unless ($id) {
-        $self->error("Incorrect ID");
+    $dbi->execute(MONOTIFIER_CLEAN, time);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't cleaning up: %s", uv2null($dbi->connect->errstr)));
         return 0;
     }
-    my @ks = grep {$_ && $_ ne "id"} keys %rec;
-    return 1 unless @ks;
-    my @vs = (); push @vs, $rec{$_} for @ks;
-    my @inj = (); push @inj, sprintf('`%s` = ?', $_) for @ks;
-    $dbi->execute(sprintf('UPDATE %s SET %s WHERE `id` = ?', DBTABLE, join(", ", @inj)), @vs, $id);
-    if ($DBI::errstr) {
-        $self->error(sprintf("Can't update record in table \"%s\" on \"%s\": %s", DBTABLE, $self->{dsn}, uv2null($DBI::errstr)));
+    return 1;
+}
+sub truncate {
+    my $self = shift;
+    my $dbi = $self->{dbi};
+    $self->error("");
+
+    $dbi->execute(MONOTIFIER_TRUNCATE);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't truncate table: %s", uv2null($dbi->connect->errstr)));
         return 0;
     }
     return 1;
 }
 
-sub _set_attr {
-    my $attr = shift;
-    croak("Argument must be hash reference") unless is_array($attr);
-    my %ra = ();
-    foreach (@$attr) {
-        $ra{$1} = $2 if $_ =~ /^\s*(\S+)\s+(.+)$/;
-    }
-    return %ra;
-}
-sub _get_id {
-    my @arr = @_;
-    unshift @arr, $$;
-    my $text = join("|", @arr);
-    my $short = time & 0x7FFFFF;
-    my $crc8 = Compress::Raw::Zlib::crc32($text) & 0xFF;
-    return hex(sprintf("%x%x",$short, $crc8));
-}
-
 1;
+
 __END__

@@ -4,7 +4,7 @@
       "Przemysław Iskra <sparky at pld-linux.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -57,7 +57,7 @@
          "url" : "git://github.com/sparky/perl-Net-Curl.git"
       }
    },
-   "version" : 0.39,
+   "version" : 0.41,
    "x_contributors" : [
       "Bálint Szilakszi",
       "Fuji, Goro",
@@ -71,7 +71,8 @@
       "Daniel Ruoso",
       "H.Merijn Brand",
       "Yanick Champoux",
-      "Slaven Rezić"
+      "Slaven Rezić",
+      "Yuni Kim"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

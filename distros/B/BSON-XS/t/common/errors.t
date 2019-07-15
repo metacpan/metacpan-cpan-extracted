@@ -109,6 +109,13 @@ subtest nesting => sub {
         "Hit the specified max depth decoding documents at 101 levels of hash"
     ) or diag($err);
 
+    # encode many Raw objects
+    my $opt = {};
+    eval {
+        encode( { a => [ map { BSON::Raw->new(bson => encode({ b => 1 }, $opt)) } 1 .. 100 ] }, $opt );
+    };
+    $err = $@;
+    is( $err, '', "No error encoding 100 Raw docs with same options" );
 };
 
 
@@ -117,7 +124,7 @@ done_testing;
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2018 by MongoDB, Inc.
+# This software is Copyright (c) 2019 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

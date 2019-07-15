@@ -1,0 +1,103 @@
+MODE: INLINE
+#include <xs/function.h>
+
+template <typename T>
+using function = panda::function<T>;
+
+using vv_fn  = function<void()>;
+using vi_fn  = function<void(int)>;
+using iid_fn = function<int(int, double)>;
+
+MODULE = MyTest::Typemap                PACKAGE = MyTest::Function
+PROTOTYPES: DISABLE
+
+void s2f_vv (vv_fn fn) {
+    fn();
+}
+
+void s2f_vi (vi_fn fn, int val) {
+    fn(val);
+}
+
+void s2f_vi_custom (Sub sub, int val) {
+    auto fn = xs::sub2function<void(int)>(sub, [](int val) { return Simple(val + 100); });
+    fn(val);
+}
+
+int s2f_iid (Sv sub, int i, double d) {
+    auto fn = xs::sub2function<iid_fn>(sub);
+    RETVAL = fn(i, d);
+}
+
+int s2f_iid_custom (Sub sub, int i, double d) {
+    auto fn = xs::sub2function<int(int, double)>(
+        sub,
+        [=](const Sv& sv) { return SvIV(sv) + 10; },
+        [](int val)       { return Simple(val + 100); }
+    );
+    RETVAL = fn(i, d);
+}
+
+vi_fn s2f2s_vi (vi_fn fn) {
+    RETVAL = fn;
+}
+
+int s2f_notm (Sub sub, int i) {
+    struct Data {
+        Data (int i) : i(i) {}
+        int i;
+    };
+    auto fn = sub2function<function<Data(const Data&)>>(
+        sub,
+        [=](const Sv& sv)     { return Data((int)Simple(sv) + 1); },
+        [] (const Data& data) { return Simple(data.i + 2); }
+    );
+    Data arg(i);
+    auto ret = fn(arg);
+    RETVAL = ret.i;
+}
+
+uint64_t bench_vv (Sub sub, int cnt) {
+    RETVAL = 0;
+    for (int i = 0; i < cnt; ++i) {
+        RETVAL =+ (uint64_t)sub2function<vv_fn>(sub).func.get();
+    }
+}
+
+uint64_t bench_vi (Sub sub, int cnt) {
+    RETVAL = 0;
+    for (int i = 0; i < cnt; ++i) {
+        RETVAL += (uint64_t)sub2function<vi_fn>(sub).func.get();
+    }
+}
+
+uint64_t bench_iid (Sub sub, int cnt) {
+    RETVAL = 0;
+    for (int i = 0; i < cnt; ++i) {
+        RETVAL += (uint64_t)sub2function<iid_fn>(sub).func.get();
+    }
+}
+
+uint64_t bench_vvR (int cnt) {
+    RETVAL = 0;
+    vv_fn fn = [](){};
+    for (int i = 0; i < cnt; ++i) {
+        RETVAL =+ (uint64_t)function2sub(fn).get();
+    }
+}
+
+uint64_t bench_viR (int cnt) {
+    RETVAL = 0;
+    vi_fn fn = [](int){};
+    for (int i = 0; i < cnt; ++i) {
+        RETVAL =+ (uint64_t)function2sub(fn).get();
+    }
+}
+
+uint64_t bench_iidR (int cnt) {
+    RETVAL = 0;
+    iid_fn fn = [](int a, double d) -> int { return a + d; };
+    for (int i = 0; i < cnt; ++i) {
+        RETVAL =+ (uint64_t)function2sub(fn).get();
+    }
+}

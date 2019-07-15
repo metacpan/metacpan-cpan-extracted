@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "NAME" => "BSON::XS",
   "OBJECT" => "xs/XS\$(OBJ_EXT) bson/bson-atomic\$(OBJ_EXT) bson/bson-clock\$(OBJ_EXT) bson/bson-context\$(OBJ_EXT) bson/bson-decimal128\$(OBJ_EXT) bson/bson-error\$(OBJ_EXT) bson/bson-iso8601\$(OBJ_EXT) bson/bson-iter\$(OBJ_EXT) bson/bson-keys\$(OBJ_EXT) bson/bson-md5\$(OBJ_EXT) bson/bson-memory\$(OBJ_EXT) bson/bson-oid\$(OBJ_EXT) bson/bson-reader\$(OBJ_EXT) bson/bson-string\$(OBJ_EXT) bson/bson-timegm\$(OBJ_EXT) bson/bson-utf8\$(OBJ_EXT) bson/bson-value\$(OBJ_EXT) bson/bson-version\$(OBJ_EXT) bson/bson-writer\$(OBJ_EXT) bson/bson\$(OBJ_EXT)",
   "PREREQ_PM" => {
-    "BSON" => "1.010000",
+    "BSON" => "1.012000",
     "XSLoader" => 0,
     "boolean" => 0,
     "strict" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "B" => 0,
-    "BSON" => "1.010000",
+    "BSON" => "1.012000",
     "BSON::OID" => 0,
     "BSON::Types" => 0,
     "Carp" => 0,
@@ -56,7 +56,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.6.0",
+  "VERSION" => "v0.8.0",
   "XS" => {
     "xs/XS.xs" => "xs/XS.c"
   },
@@ -70,7 +70,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "B" => 0,
-  "BSON" => "1.010000",
+  "BSON" => "1.012000",
   "BSON::OID" => 0,
   "BSON::Types" => 0,
   "Carp" => 0,

@@ -2,7 +2,7 @@ package CPANPLUS::Configure::Setup;
 
 use strict;
 use vars    qw[@ISA $VERSION];
-$VERSION = "0.9176";
+$VERSION = "0.9178";
 
 use base    qw[CPANPLUS::Internals::Utils];
 use base    qw[Object::Accessor];
@@ -154,8 +154,6 @@ Quitting setup, changes are saved to '%1'
         ### otherwise, present choice again
         redo PICK_SECTION;
     }
-
-    return 1;
 }
 
 

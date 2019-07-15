@@ -6,6 +6,7 @@ use Test::Files;
 use autodie;
 use feature qw(say);
 
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 
 use Bio::FastParsers;
@@ -17,15 +18,17 @@ my $tmp_class = 'Bio::MUST::Drivers::Hmmer::Model::Temporary';
 my  $db_class = 'Bio::MUST::Drivers::Hmmer::Model::Database';
 
 
-# skip all HMMER tests unless hmmsearch is available in the $PATH
-unless ( qx{which hmmsearch} ) {
+# Note: provisioning system is not enabled to help tests to pass on CPANTS
+my $app = use_module('Bio::MUST::Provision::Hmmer')->new;
+unless ( $app->condition ) {
     plan skip_all => <<"EOT";
 skipped all HMMER tests!
 If you want to use this module you need to install HMMER executables:
 http://hmmer.org/download.html
+If you --force installation, I will eventually try to install HMMER with brew:
+https://brew.sh/
 EOT
 }
-
 
 { # Tests 1 and 3: Use of a pre-existing model
     my $hmmfile = file('test', 'aligned.hmm');
@@ -67,9 +70,9 @@ EOT
     ok $std_parser, 'got standard HMM parser on temporary model';
 
     my @target_reports = $std_parser->get_iteration(0)->all_targets;
-    my $got_targets = [
-        map { $target->long_id_for( $_->name ) } @target_reports
-    ];
+    my $got_targets = [ map { $_->name } @target_reports ];
+#   my $report = $std_parser->filename;
+#   qx{cp $report /Users/denis/Desktop/aligned_notextw.out};
     $std_parser->remove;
 
     my $std_exp_file_output = file('test', 'aligned_notextw.out');
@@ -92,8 +95,10 @@ EOT
 
     my @tbl_got_names;
     while ( my $hit = $tbl_parser->next_hit ) {
-        push @tbl_got_names, $target->long_id_for( $hit->target_name );
+        push @tbl_got_names, $hit->target_name;
     }
+#   my $report = $tbl_parser->filename;
+#   qx{cp $report /Users/denis/Desktop/aligned_table.out};
     $tbl_parser->remove;
 
     my $tbl_exp_file_output = file('test', 'aligned_table.out');
@@ -117,8 +122,10 @@ EOT
 
     my @domtbl_got_names;
     while ( my $hit = $domtbl_parser->next_hit ) {
-        push @domtbl_got_names, $target->long_id_for( $hit->target_name );
+        push @domtbl_got_names, $hit->target_name;
     }
+#   my $report = $domtbl_parser->filename;
+#   qx{cp $report /Users/denis/Desktop/aligned_domtable.out};
     $domtbl_parser->remove;
 
     my $domtbl_exp_file_output = file('test', 'aligned_domtable.out');
@@ -272,7 +279,7 @@ EOT
     ok my $consensus = $model->emit, 'got consensus from hmmemit';
     isa_ok $consensus, 'Bio::MUST::Core::Ali::Stash';
 
-    my $expected_consensus_seq = 'AARSIKSQKKDVNKIYPAHPSLFGRVPRPADKDKVNLVVKEIGKNAAEGAALARVAGLGEALARLPLATRVLNGGICANKYDTGLLGKLGFAERIRLPALNVKKLVSLCKKKASCYGTTTISRRKKPAGEKATAIELARRMRFKFHKRLKLPASPKKVKASSKKGP';
+    my $expected_consensus_seq = 'VVLAAEAEAARSIKSQKKDVNKIYPAHPSLFGRGVPRPADKLRAHDFAEDKVNLVVKEIGKNAAEGAALARVAGLGEALARLPLATRVLNGGICANKYDTGLLGKLGFAERIRLPALNVKKLVSLCKKKASCYGTTTISRRKKPAGEKATAIELARRARFKFHKRLKLPASPKGFKVKASSKKGPLKAANVAYLG';
     cmp_ok $consensus->get_seq(0)->seq, 'eq', $expected_consensus_seq,
         'got expected consensus seq from hmmemit';
 }

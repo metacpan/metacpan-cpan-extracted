@@ -1,0 +1,21 @@
+MODE: INLINE
+#include <vector>
+#include <map>
+
+using MapStringInt = std::map<std::string, int>;
+using MapIntBool   = std::map<int, bool>;
+
+MODULE = MyTest::Typemap                PACKAGE = MyTest::Container
+PROTOTYPES: DISABLE
+
+std::vector<int> std_vector_int(std::vector<int> val) {
+    RETVAL = val;
+}
+
+MapStringInt std_map_string_int(MapStringInt val) {
+    RETVAL = val;
+}
+
+MapIntBool std_map_int_bool(MapIntBool val){
+    RETVAL = val;
+}

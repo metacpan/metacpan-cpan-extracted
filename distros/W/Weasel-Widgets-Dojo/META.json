@@ -1,0 +1,42 @@
+{
+   "abstract" : "Weasel extension set testing Dojo-based web apps (tag matchers and widgets)",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Weasel-Widgets-Dojo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Weasel" : "0.23"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perl-weasel/weasel-widgets-dojo/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-weasel/weasel-widgets-dojo.git",
+         "web" : "https://github.com/perl-weasel/weasel-widgets-dojo"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

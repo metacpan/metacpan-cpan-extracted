@@ -1,11 +1,12 @@
 lib/Stable/Module.pm
 Changes
-Makefile.PL
-pmake.bat
-MANIFEST
-README
-META.yml
 LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+pmake.bat
 t/0101_Cwd_cwd.t
 t/0201_FindBin_Bin.t
 t/0301_FileBasename_fileparse.t
@@ -31,7 +32,7 @@ t/1003_ListMoreUtils_none.t
 t/1004_ListMoreUtils_notall.t
 t/1005_ListMoreUtils_uniq.t
 t/1101_feature_say.t
-xtest.bat
+t/2001_podtest.t
 xt/0304_FileBasename_fileparse_5C.t
 xt/0305_FileBasename_basename_5C.t
 xt/0306_FileBasename_dirname_5C.t
@@ -39,3 +40,4 @@ xt/0403_FilePath_mkpath_5C.t
 xt/0404_FilePath_rmtree_5C.t
 xt/0503_FileCopy_copy_5C.t
 xt/0504_FileCopy_move_5C.t
+xtest.bat

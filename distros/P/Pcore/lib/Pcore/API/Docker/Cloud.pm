@@ -1,7 +1,7 @@
 package Pcore::API::Docker::Cloud;
 
 use Pcore -const, -class, -res, -export;
-use Pcore::Util::Scalar qw[is_plain_coderef];
+use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 our $EXPORT = { DOCKERHUB_SOURCE_TYPE => [qw[$DOCKERHUB_SOURCE_TYPE_TAG $DOCKERHUB_SOURCE_TYPE_BRANCH]] };
 

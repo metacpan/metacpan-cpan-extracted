@@ -60,6 +60,12 @@ inline uint64_t h2le64 (uint64_t x) { return _am_i_little ? x : bswap64(x); }
 inline uint64_t be2h64 (uint64_t x) { return _am_i_little ? bswap64(x) : x; }
 inline uint64_t le2h64 (uint64_t x) { return _am_i_little ? x : bswap64(x); }
 
+// just to make templates simpler
+inline uint8_t h2be (uint8_t x) { return x; }
+inline uint8_t h2le (uint8_t x) { return x; }
+inline uint8_t be2h (uint8_t x) { return x; }
+inline uint8_t le2h (uint8_t x) { return x; }
+
 inline uint16_t h2be (uint16_t x) { return h2be16(x); }
 inline uint16_t h2le (uint16_t x) { return h2le16(x); }
 inline uint16_t be2h (uint16_t x) { return be2h16(x); }

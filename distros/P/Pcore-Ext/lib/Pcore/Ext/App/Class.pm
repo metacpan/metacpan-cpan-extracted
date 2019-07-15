@@ -1,7 +1,7 @@
 package Pcore::Ext::App::Class;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_plain_arrayref weaken];
+use Pcore::Lib::Scalar qw[is_plain_arrayref weaken];
 use Pcore::Ext::App::Class::TiedResolver;
 use Pcore::Ext::App::Class::Ctx::Raw;
 use Pcore::Ext::App::Class::Ctx::Func;

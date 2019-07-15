@@ -46,6 +46,7 @@ L<dbrowuniq> can also count how many unique, adjacent lines it finds
 with C<-c>, with the count going to a new column (defaulting to C<count>).
 Incremental counting, when the C<count> column already exists,
 is possible with C<-I>.
+With incremental counting, the existing count column is summed.
 
 =head1 OPTIONS
 
@@ -72,13 +73,13 @@ If the count column doesn't exist, it is created.
 
 =item B<-L> or B<--last>
 
-Output the last unique row. 
+Output the last unique row only.
 By default, it outputs the first unique row.
 
 =item B<-F> or B<--first>
 
-Output the first unique row. 
-(This is the default.)
+Output the first unique row only. 
+(This output is the default.)
 
 =item B<-B> or B<--both>
 

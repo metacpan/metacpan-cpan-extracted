@@ -1,0 +1,140 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Scalar - XS::Framework Scalar C++ class reference
+
+=head1 Scalar
+
+=head2 Overview
+
+The C<Scalar> class is the wrapper around Perls C<SV*> object, which helds
+either primitive value like number or string, or I<reference> to object,
+array or hash or C<Glob>.  So, is base class for C<Simple>, C<Ref> and
+C<Glob>.
+
+As with C<Sv>, it might hold an underlying Perl C<SV*> or might not.
+
+The notable difference from all other classes is that C<Scalar> might
+held C<undef> and it I<is not considered empty>.
+
+=head2 Construction
+
+    static const Scalar undef;
+    static const Scalar yes;
+    static const Scalar no;
+
+Out of the box C<Scalar> offers a few constants for Perl's C<undef> and
+C<true> and C<false> values.
+
+    static Scalar create()
+
+The C<create> method return new non-empty C<Scalar>, which holds zero-length
+string. It is opposite to the constructor with C<nullptr> below, which
+creates empty scalar:
+
+    Scalar (std::nullptr_t = nullptr) {}
+
+The other constructors and helper methods just wrap existing Perl scalar C<SV*>
+or C<GV*> into C<Scalar> object:
+
+    static Scalar noinc (SV* val)
+    static Scalar noinc (GV* val)
+
+    Scalar (SV* sv, bool policy = INCREMENT)
+    Scalar (GV* sv, bool policy = INCREMENT)
+
+If C<SV*> pointing to C<undef> is porovided, it will be held and C<Scalar>
+object will B<not> be considered empty.
+
+Copy and move-constructore are also available:
+
+    Scalar (const Scalar& oth)
+    Scalar (Scalar&&      oth)
+    Scalar (const Sv&     oth)
+    Scalar (Sv&&          oth)
+
+
+It it possible to create C<Scalar> object from C<CallProxy> invocation:
+
+    Scalar (const CallProxy& p)
+
+however, please note, that the C<CallProxy> will be called in B<scalar context>.
+
+=head2 assignment operators
+
+    Scalar& operator= (SV* val)
+    Scalar& operator= (GV* val)
+    Scalar& operator= (const Scalar& oth)
+    Scalar& operator= (Scalar&& oth)
+    Scalar& operator= (const Sv& oth)
+    Scalar& operator= (Sv&& oth)
+    Scalar& operator= (const CallProxy& p)
+
+
+The assignment operators are complementaty to the constructors above. They
+inherit behaviour from C<Sv>, including NULL-safety. The previously held
+C<SV*> will be C<dec>-remented.
+
+    void set (SV* val)
+    void set (GV* val)
+
+The C<set> method directly assigns the value to the underlying C<SV*>,
+I<bypassing all checks>. Use the method with caution.
+
+
+=head2 getters
+
+Theere are zero-cost NULL-safe getters:
+
+    template <class T = SV> one_of_t<T,SV,GV>* get () const
+
+This are NULL-safe methods.
+
+=head2 upgrade()
+
+    void upgrade (svtype type)
+
+Tries to upgrade C<SV*> into the specified type. Exception is thrown if the
+variable is already marked as readonly or upon attempt to upgrade defined
+scalar (non-undef) into more than C<SVt_PVMG>.
+
+This is NULL-unsafe method.
+
+=head2 as_string()
+
+    template <class T = panda::string> T as_string () const
+
+Stringizes the current S<Scalar> object. Valid if the held Scalar can
+be constructed as C<Simple> object, e.g. as number or string. Otherwise
+exception is thrown. The <T> parameter can be C<std::string>,
+C<std::string_view> or C<panda::string>.
+
+This is NULL-unsafe method.
+
+
+=head2 as_number()
+
+    template <class T = int> T as_number () const
+
+Numberifies the current S<Scalar> object. Valid if the held Scalar can
+be constructed as C<Simple> object, e.g. as number or string. Otherwise
+exception is thrown. The <T> parameter can be any arithmetic type, conforming
+
+    std::is_arithmetic<T>
+
+concept from C++ library.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Sv>
+
+L<XS::Framework::Manual::SVAPI::Simple>
+
+L<XS::Framework::Manual::SVAPI::Ref>
+
+L<XS::Framework::Manual::SVAPI::Glob>
+
+=cut

@@ -5,14 +5,15 @@ package Fake::Our;
 #
 # http://search.cpan.org/dist/Fake-Our/
 #
-# Copyright (c) 2014, 2015, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2015, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.14';
+$VERSION = '0.16';
+$VERSION = $VERSION;
 
 use 5.00503;
 use strict;
-local $^W = 1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 sub import {
 

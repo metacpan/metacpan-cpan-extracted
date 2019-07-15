@@ -4,6 +4,7 @@ lib/App/PerlShell.pm
 lib/App/PerlShell/Config.pm
 lib/App/PerlShell/LexPersist.pm
 lib/App/PerlShell/ModRefresh.pm
+lib/App/PerlShell/Plugin/File.pm
 lib/App/PerlShell/Plugin/Gnuplot.pm
 lib/App/PerlShell/Plugin/Macros.pm
 lib/App/PerlShell/Plugin/ShellCommands.pm

@@ -1,0 +1,12 @@
+^(inc|blib|Makefile(\.(old|test))?|(MY)?META\.(yml|json)|pm_to_blib|MANIFEST(\.bak)?|dll\.(base|exp))$
+\.xs\.cc$
+^[^/]+\.(bs|tar\.gz)$
+^.+\.(o|lo|a|la|so)$
+^const-c\.inc$
+^t/MyTest\.cc$
+^t/lib/MyTest\.cc$
+^.gdb_history$
+^lib\.cc$
+^CMakeCache.txt
+^CMakeFiles
+^cmake_install.cmake

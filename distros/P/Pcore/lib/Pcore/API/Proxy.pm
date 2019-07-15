@@ -1,11 +1,11 @@
 package Pcore::API::Proxy;
 
 use Pcore -const, -class, -res, -export;
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Lib::Scalar qw[is_ref];
 
 our $EXPORT = { PROXY_TYPE => [qw[$PROXY_TYPE_HTTP $PROXY_TYPE_CONNECT $PROXY_TYPE_SOCKS4 $PROXY_TYPE_SOCKS4A $PROXY_TYPE_SOCKS5]] };
 
-has uri        => ( required => 1 );    # InstanceOf['Pcore::Util::URI']
+has uri        => ( required => 1 );    # InstanceOf['Pcore::Lib::URI']
 has is_http    => ();
 has is_connect => ();
 has is_socks4  => ();

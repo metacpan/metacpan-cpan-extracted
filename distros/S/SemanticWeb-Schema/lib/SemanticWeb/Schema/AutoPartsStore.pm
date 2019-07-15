@@ -6,7 +6,7 @@ package SemanticWeb::Schema::AutoPartsStore;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::Store SemanticWeb::Schema::AutomotiveBusiness /;
+extends qw/ SemanticWeb::Schema::AutomotiveBusiness SemanticWeb::Schema::Store /;
 
 
 use MooX::JSON_LD 'AutoPartsStore';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::AutoPartsStore - An auto parts store.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ An auto parts store.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::AutomotiveBusiness>
+L<SemanticWeb::Schema::Store>
 
 =head1 SOURCE
 

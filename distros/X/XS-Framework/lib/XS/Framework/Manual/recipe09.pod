@@ -1,0 +1,244 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+
+=cut
+
+=head1 Extension via payload
+
+Let's assume that underlying geometry library offers the following interface:
+
+    struct Point {
+        double x;
+        double y;
+    };
+
+    struct ShapeA {
+        size_t point_count() const { return points.size(); }
+        Point& get_point(size_t idx) { return points.at(idx); }
+        void add_point(const Point& pt) { points.push_back(pt); }
+    private:
+        std::vector<Point> points;
+    };
+
+The typemap are trivial; the typemap for C<ShapeA> was made extensible for
+future derived classes.
+
+    template <>
+    struct Typemap<Point*> : TypemapObject<Point*, Point*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::Point"; }
+    };
+
+    template <typename D>
+    struct Typemap<ShapeA*, D> : TypemapObject<ShapeA*, D, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::ShapeA"; }
+    };
+
+The xs-adapter for C<Point> class is also easy to write:
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::Point
+    PROTOTYPES: DISABLE
+
+    double Point::x(SV* new_val = nullptr) : ALIAS(y = 1) {
+        double* val = nullptr;
+        switch(ix) {
+            case 1: val = &THIS->y; break;
+            default: val = &THIS->x; break;
+        }
+        if (new_val) {
+            *val = SvNV(new_val);
+        }
+        RETVAL = *val;
+    }
+
+    Point* Point::new(double x = 0, double y = 0) {
+        RETVAL = new Point{x, y};
+    }
+
+Let's assume that Perl-developers find it is a bit unconvenient to use those
+classes as is, and they like to have possibility to add arbitrary
+metainformation for any point of a shape. Let's extend xs-adapter for
+C<ShapeA> to store that association in payload (aka SV* magic). Before doing
+that we have to define application-unique marker for payload:
+
+    static xs::Sv::payload_marker_t payload_marker_09{};    // (1)
+
+It's common practice  just to have static variable like in (1), sinse the
+variable itself isn't used, but only it's address.
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::ShapeA
+    PROTOTYPES: DISABLE
+
+    size_t ShapeA::point_count()
+
+    Sv ShapeA::new() {      // (1)
+        auto shape = new ShapeA();
+        Object obj = xs::out<>(shape, CLASS);   // (2)
+        auto payload = Array::create();         // (3)
+        obj.payload_attach(payload, &payload_marker_09);   // (4)
+        RETVAL = obj.ref();     // (5)
+    }
+
+
+Usually the constructor is created for us by L<Parse::XS>, but as we need
+to extend the output Perl SV* with payload, it should be manually written (1).
+After C++ object instance creation, the Perl SV* container for it created
+at (2). As we know that points in a shaper are stored in zero-based C<vector>
+we can use C<Array> (3) from C<XS::Framework>, which offers just C++ interface
+for Perl's AV* array. Then, the array is attached to the object payload (4);
+after that operation the resulting object stores pointer to C++ C<ShapeA>
+class and perl array.
+
+Since we cannot return B<raw object> in Perl, it must be a reference to
+object (5).
+
+No need of special destructor for xs-adapter of C<ShapeA>. Sinse the attached
+payload is Perl SV* (AV* in tha context), it will be destroyed when the object
+wrapper SV* will be destroyed. If arbitrary C++ objects are attached as payload
+and need special clean-up it have to be written, then (see the following recipes).
+
+    void ShapeA::add_point(Point* pt, SV* maybe_label = nullptr) {
+        THIS->add_point(*pt);
+        Object self{ST(0)};     // (6)
+        Array payload(self.payload(&payload_marker_09).obj);    // (7)
+        Sv label = maybe_label ? Sv{maybe_label} : Sv::undef;
+        Sv ref = Ref::create(maybe_label);  // (8)
+        payload.push(ref);  // (9)
+    }
+
+The C<add_point> should be intercepted in xs-adapter. After proxying call to the
+C++ object itself, the possible label for the point should be handled. We have
+to get the SV* wrapper for C++ object via (6); here C<ST(0)> is the first scalar
+on the Perl stack and it is always wrapper for C<THIS>. Then it gets the payload
+via address of C<payload_marker_09> and converts the SV* to the array (7); the
+conversion is performed by C<XS::Framework>. Then it takes reference either to
+the supplied C<label> or to C<undef> (8) and records in the payload array (9).
+
+The C<get_point> implementation below uses list-context Perl feature: if the
+the method is called in list context, then the point metadata will be returned
+as 2nd result value.
+
+
+    void ShapeA::get_point(size_t idx) {
+        Object self{ST(0)};
+        Array payload(self.payload(&payload_marker_09).obj);
+
+        auto& pt = THIS->get_point(idx);        // (10)
+        auto pt_copy = new Point{pt.x, pt.y};   // (11)
+        auto wrapped_pt = xs::out<>(pt_copy);
+        mXPUSHs(wrapped_pt.detach());           // (12)
+
+        if (GIMME_V == G_ARRAY) {               // (13)
+            auto ref = payload.at(idx);
+            Sv value = SvRV(ref);               // (14)
+            mXPUSHs(value.detach());            // (15)
+        }
+    }
+
+Since the C++ interface of C<ShapeA> returns reference C<Point> (10) I<without
+transferring ownership on it> (it is always true for reference, and sometimes true
+for pointers), we make an detached clone(11) of it to have an exclusive ownership
+of a point in Perl. Without thats ownership transfer there would be a problem:
+assume that the returned Point is has longer lifetime then it's C<Shape>
+container, i.e.
+
+    my $point; { my $shape = ... ; $point = $shape->get_point(0); }
+    $point->x;  # Most likely SEGFAULT
+
+because shape deletes the points it owns, leaving so called I<dangling pointer>
+in perl. With the object cloning this issue is avoided.
+
+The clone is pushed on Perl stack (12); C<detach> is needed here to keep refcount
+of a point-clone to C<1> when the object in transferred to Perl. On line (13) it
+is checked whether the C<get_point> was invoked in list context. Since, in
+payload array the references to original metadata is stored (8), then it must
+be derefenced (14) before returning it to Perl at (15).
+
+The test below checks correctness of the implementation:
+
+    my $shape = MyTest::Cookbook::ShapeA->new;
+    $shape->add_point(MyTest::Cookbook::Point->new(10, 5), { direction => 'NORTH', power => 5 });
+    $shape->add_point(MyTest::Cookbook::Point->new(-10, 7), 'hello');
+    $shape->add_point(MyTest::Cookbook::Point->new(100, 1));
+
+    my $pt1 = $shape->get_point(0);
+    is $pt1->x, 10;
+    is $pt1->y, 5;
+
+    my ($pt11, $label1) = $shape->get_point(0);
+    is $pt11->x, 10;
+    is $pt11->y, 5;
+    is_deeply $label1, { direction => 'NORTH', power => 5 };
+
+
+    my ($pt2, $label2) = $shape->get_point(1);
+    is $pt2->x, -10;
+    is $pt2->y, 7;
+    is $label2, 'hello';
+
+    my $pt3 = $shape->get_point(2);
+    is $pt3->x, 100;
+    is $pt3->y, 1;
+
+=head1 Extension via inheritance
+
+There is a bit more convenient way to solve the original issue via inheritance.
+To do that the special class C<XSShapeA> should be created from original
+C<ShapeA> to store references to metadata. Since this class uses C++ API of
+L<XS::Framework> it is convenient to prefix it with C<XS>.
+
+    struct XSShapeA : public ShapeA {
+        void add_label(SV* maybe_label = nullptr) {
+            Sv label = maybe_label ? Sv{maybe_label} : Sv::undef;
+            labels.push_back(Ref::create(maybe_label));
+        }
+        Ref& get_ref(size_t idx) { return labels.at(idx); }
+    private:
+        std::vector<Ref> labels;    // (16)
+    };
+
+Basically methods from xs-adapter of C<ShapeA>; and instead of C<xs::Array>
+the C<std::vector> (16) is used as container for references of points metadata.
+
+Let's show how typemap for C<XSShapeA> looks like:
+
+    template <>
+    struct Typemap<XSShapeA*> : Typemap<ShapeA*, XSShapeA*> {
+        static std::string package () { return "MyTest::Cookbook::ShapeB"; }
+    };
+
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::ShapeB
+    PROTOTYPES: DISABLE
+
+    XSShapeA* XSShapeA::new()
+
+    void XSShapeA::add_point(Point* pt, SV* maybe_label = nullptr) {
+        THIS->add_point(*pt);
+        THIS->add_label(maybe_label);
+    }
+
+    void XSShapeA::get_point(size_t idx) {
+        auto& pt = THIS->get_point(idx);
+        auto pt_copy = new Point{pt.x, pt.y};
+        auto wrapped_pt = xs::out<>(pt_copy);
+        mXPUSHs(wrapped_pt.detach());
+        if (GIMME_V == G_ARRAY) {
+            Sv value = SvRV(THIS->get_ref(idx));
+            mXPUSHs(value.detach());
+        }
+    }
+
+    BOOT {
+        auto stash = Stash(__PACKAGE__, GV_ADD);
+        stash.inherit("MyTest::Cookbook::ShapeA");
+    }
+
+Basically, it is similar to xs-adapter of C<ShapeA>.
+
+Summary: in this recipe the inherirance solution looks a bit more convenient;
+however, the extension via inheritance is not always possible/desirable, so
+the extension via payload comes into play.
+
+
+=cut

@@ -1,5 +1,13 @@
 Revision history for BSON
 
+v1.12.0   2019-07-12 12:06:36-04:00 America/New_York
+
+    [Added]
+
+    - Added BSON::Array as a wrapper for edge cases in the MongoDB driver
+      where an array reference could be misinterpreted as a top-level document
+      container.
+
 v1.10.2   2018-12-07 12:26:15-05:00 America/New_York
 
     [Bugs fixed]

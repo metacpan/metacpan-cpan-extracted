@@ -34,6 +34,8 @@
       },
       "runtime" : {
          "requires" : {
+            "MIDI" : "0",
+            "MIDI::Event" : "0",
             "MIDI::Simple" : "0",
             "MIDI::Track" : "0",
             "Music::Tempo" : "0",
@@ -64,7 +66,7 @@
          "web" : "https://github.com/ology/MIDI-Util"
       }
    },
-   "version" : "0.0300",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -449,6 +451,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }
 

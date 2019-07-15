@@ -1,7 +1,7 @@
 package Pcore::Core::Exception::Object;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Lib::Scalar qw[blessed];
 use Time::HiRes qw[];
 
 use overload    #

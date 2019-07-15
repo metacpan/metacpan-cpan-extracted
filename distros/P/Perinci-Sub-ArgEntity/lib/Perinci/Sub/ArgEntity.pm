@@ -1,10 +1,10 @@
 package Perinci::Sub::ArgEntity;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2019-07-03'; # DATE
+our $VERSION = '0.021'; # VERSION
 
 1;
-# ABSTRACT: Convention for Perinci::Sub::ArgEntity::* modules
+# ABSTRACT: (DEPRECATED) Convention for Perinci::Sub::ArgEntity::* modules
 
 __END__
 
@@ -14,11 +14,11 @@ __END__
 
 =head1 NAME
 
-Perinci::Sub::ArgEntity - Convention for Perinci::Sub::ArgEntity::* modules
+Perinci::Sub::ArgEntity - (DEPRECATED) Convention for Perinci::Sub::ArgEntity::* modules
 
 =head1 VERSION
 
-This document describes version 0.020 of Perinci::Sub::ArgEntity (from Perl distribution Perinci-Sub-ArgEntity), released on 2019-06-24.
+This document describes version 0.021 of Perinci::Sub::ArgEntity (from Perl distribution Perinci-Sub-ArgEntity), released on 2019-07-03.
 
 =head1 SYNOPSIS
 

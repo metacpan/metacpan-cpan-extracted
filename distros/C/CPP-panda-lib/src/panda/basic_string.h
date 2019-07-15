@@ -2,11 +2,11 @@
 #include <string>
 #include <limits>
 #include <memory>
+#include <iosfwd>
 #include <cstdint>
 #include <utility>   // swap
 #include <assert.h>
 #include <iterator>
-#include <iostream>
 #include <stdexcept>
 #include <initializer_list>
 #include <panda/lib/hash.h>
@@ -271,12 +271,12 @@ public:
 
         difference_type operator-(const iterator& rhs) const { return static_cast<difference_type>(_pos - rhs._pos); }
 
-        bool operator==(const iterator& rhs) { return _pos == rhs._pos; }
-        bool operator!=(const iterator& rhs) { return _pos != rhs._pos; }
-        bool operator< (const iterator& rhs) { return rhs._pos - _pos > 0; }
-        bool operator> (const iterator& rhs) { return _pos - rhs._pos > 0; }
-        bool operator<=(const iterator& rhs) { return rhs._pos - _pos >= 0; }
-        bool operator>=(const iterator& rhs) { return _pos - rhs._pos >= 0; }
+        bool operator==(const iterator& rhs) const { return _pos == rhs._pos; }
+        bool operator!=(const iterator& rhs) const { return _pos != rhs._pos; }
+        bool operator< (const iterator& rhs) const { return rhs._pos - _pos > 0; }
+        bool operator> (const iterator& rhs) const { return _pos - rhs._pos > 0; }
+        bool operator<=(const iterator& rhs) const { return rhs._pos - _pos >= 0; }
+        bool operator>=(const iterator& rhs) const { return _pos - rhs._pos >= 0; }
 
         operator const_iterator() { return _string.data() + _pos; }
 
@@ -1103,10 +1103,10 @@ public:
     }
 
     template <typename V>
-    std::from_chars_result to_number (V& value, int base = 10) { return std::from_chars(_str, _str + _length, value, base); }
+    std::from_chars_result to_number (V& value, int base = 10) const { return std::from_chars(_str, _str + _length, value, base); }
 
     template <typename V>
-    std::from_chars_result to_number (V& value, size_type pos, size_type count = npos, int base = 10) {
+    std::from_chars_result to_number (V& value, size_type pos, size_type count = npos, int base = 10) const {
         if (pos > _length) throw std::out_of_range("basic_string::to_number");
         if (count > _length - pos) count = _length - pos;
         return std::from_chars(_str + pos, _str + pos + count, value, base);
@@ -1120,6 +1120,15 @@ public:
         assert(!res.ec);
         ret.length(res.ptr - ret.data());
         return ret;
+    }
+
+    const CharT* c_str () const {
+        if (_state == State::LITERAL) return _str; // LITERALs are NT
+        if (shared_capacity() > _length && _str[_length] == 0) return _str; // if we have r/o space after string, let's see if it's already NT
+        // string is not NT
+        if (capacity() <= _length) const_cast<basic_string*>(this)->_reserve_save(_length + 1); // we're in COW mode or don't have space
+        _str[_length] = 0;
+        return _str;
     }
 
     ~basic_string () { _release(); }
@@ -1629,8 +1638,8 @@ inline basic_string<C,T,A> operator+ (basic_string<C,T,A>&& lhs, C rhs) {
 }
 
 template <class C, class T, class A>
-inline std::ostream& operator<< (std::ostream& os, const basic_string<C,T,A>& str) {
-    return os.write((const char*)str.data(), str.length() * sizeof(C));
+inline std::basic_ostream<C,T>& operator<< (std::basic_ostream<C,T>& os, const basic_string<C,T,A>& str) {
+    return os.write(str.data(), str.length());
 }
 
 }

@@ -6,28 +6,6 @@ INSTALLATION INSTRUCTIONS
     make install
     make clean
 
-    * Foo
-    * Bar
-    * Baz
+UBUNTU 16.4
 
-DIAGNOSTIC EXAMPLES
-
-    use Data::Dumper; $Data::Dumper::Deparse = 1;
-
-    perl -Ilib bin\monotifier -d init
-    perl -Ilib bin\monotifier -d send -c src\monotifier.conf -D a --signature=quux -L error -X 60 username "Text with spaces" "Another text"
-
-    perl -Ilib bin/monotifier -d send -L error -X 60 anonymous "Text with spaces" "Another text"
-
-    perl -Ilib bin\monotifier -d -c src\monotifier.conf -D a check 2018992660
-
-    perl -Ilib bin/monotifierd -d -c src/monotifier.conf -k start
-    sudo perl -Ilib bin/monotifier -d send -L error test "My subject" "My text"
-    sudo perl -Ilib bin/monotifier -d send -L warning test "My subject 1" "My text"
-    tail -f /var/log/syslog
-    perl -Ilib bin/monotifierd -d -c src/monotifier.conf -k stop
-
-    perl -Ilib bin/monotifier -dv -c src/monotifier.conf test
-
-    perl -Ilib bin/monotifier -d -c src/monotifier.conf update 11392941 -F foo
-    perl -Ilib bin/monotifier -d -c src/monotifier.conf update 113929415 -F bar test "aaa" "Пример №3"
+libarchive-zip-perl, libclass-c3-adopt-next-perl, libdbd-sqlite3-perl, libemail-mime-perl, libemail-sender-perl, libfile-pid-perl, libtext-simpletable-perl, libtry-tiny-perl

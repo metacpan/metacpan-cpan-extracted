@@ -14,7 +14,7 @@ use Term::ANSIColor qw/colored/;
 use App::Git::Workflow::Brs;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = version->new(1.1.3);
+our $VERSION  = version->new(1.1.4);
 our $workflow = App::Git::Workflow::Brs->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -47,7 +47,7 @@ git-brs - Help brs many commits
 
 =head1 VERSION
 
-This documentation refers to git-brs version 1.1.3
+This documentation refers to git-brs version 1.1.4
 
 =head1 SYNOPSIS
 

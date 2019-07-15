@@ -1,0 +1,63 @@
+MODE: INLINE
+
+#include <cmath>
+#include <iostream>
+
+struct PointRecipe13: public panda::Refcnt {
+    double x;
+    double y;
+    PointRecipe13(double xx, double yy): x{xx}, y{yy}{}
+};
+
+using PointRecipe13SP = panda::iptr<PointRecipe13>;
+
+struct Shape13: public panda::Refcnt {
+    size_t point_count() const { return points.size(); }
+    PointRecipe13SP get_point(size_t idx) { return points.at(idx); }
+    void add_point(PointRecipe13SP pt) { points.push_back(pt); }
+private:
+    std::vector<PointRecipe13SP> points;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<PointRecipe13*> : TypemapObject<PointRecipe13*, PointRecipe13*, ObjectTypeRefcntPtr, ObjectStorageMGBackref> {
+        static std::string package () { return "MyTest::Cookbook::PointRecipe13"; }
+    };
+
+    template <>
+    struct Typemap<Shape13*> : TypemapObject<Shape13*, Shape13*, ObjectTypeRefcntPtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::Shape13"; }
+    };
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::PointRecipe13
+PROTOTYPES: DISABLE
+
+double PointRecipe13::x(SV* new_val = nullptr) : ALIAS(y = 1) {
+    double* val = nullptr;
+    switch(ix) {
+        case 1: val = &THIS->y; break;
+        default: val = &THIS->x; break;
+    }
+    if (new_val) {
+        *val = SvNV(new_val);
+    }
+    RETVAL = *val;
+}
+
+PointRecipe13* PointRecipe13::new(double x = 0, double y = 0) {
+    RETVAL = make_backref<PointRecipe13>(x, y);
+    //RETVAL = new PointRecipe13(x, y);
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Shape13
+PROTOTYPES: DISABLE
+
+size_t Shape13::point_count()
+
+void Shape13::add_point(PointRecipe13SP pt)
+
+PointRecipe13SP Shape13::get_point(size_t idx)
+
+Shape13* Shape13::new(...)

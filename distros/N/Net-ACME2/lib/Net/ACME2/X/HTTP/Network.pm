@@ -1,5 +1,33 @@
 package Net::ACME2::X::HTTP::Network;
 
+=encoding utf-8
+
+=head1 NAME
+
+Net::ACME2::X::HTTP::Network
+
+=head1 DESCRIPTION
+
+This exception class means that an error beneath the HTTP layer occurred:
+e.g., maybe the server refused the TCP connection, the TLS handshake failed,
+etc.
+
+Subclasses L<X::Tiny::Base>.
+
+=head1 PROPERTIES
+
+=over
+
+=item * C<method> - The request’s HTTP method.
+
+=item * C<url> - The URL for which the request was intended.
+
+=item * C<error> - A human-readable string that describes the failure.
+
+=back
+
+=cut
+
 use strict;
 use warnings;
 

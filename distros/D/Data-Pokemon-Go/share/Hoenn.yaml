@@ -2,1569 +2,1570 @@
     ID: 252
     Name:
         ja: キモリ
-        en:
+        en: Treecko
     Types:
         - くさ
     From:
     To:
-    Stamina: 80
+    Stamina: 120
     Attack: 124
-    Defense: 104
+    Defense: 94
     MAXCP:
-        Hatched: 527
-        Boosted: 659
+        Hatched: 601
+        Boosted: 752
 - # ジュプトル(253) --------------------------------------------------
     ID: 253
     Name:
         ja: ジュプトル
-        en:
+        en: Grovyle
     Types:
         - くさ
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 172
-    Defense: 130
+    Defense: 120
     MAXCP:
-        Hatched: 861
-        Boosted: 1077
+        Hatched: 956
+        Boosted: 1195
 - # ジュカイン(254) --------------------------------------------------
     ID: 254
     Name:
         ja: ジュカイン
-        en:
+        en: Sceptile
     Types:
         - くさ
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 223
-    Defense: 180
+    Defense: 169
     MAXCP:
-        Hatched: 1476
-        Boosted: 1845
+        Hatched: 1575
+        Boosted: 1969
 - # アチャモ(255) --------------------------------------------------
     ID: 255
     Name:
         ja: アチャモ
-        en:
+        en: Torchic
     Types:
     - ほのお
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 130
-    Defense: 92
+    Defense: 87
     MAXCP:
-        Hatched: 548
-        Boosted: 685
+        Hatched: 624
+        Boosted: 781
 - # ワカシャモ(256) --------------------------------------------------
     ID: 256
     Name:
         ja: ワカシャモ
-        en:
+        en: Combusken
     Types:
         - ほのお
         - かくとう
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 163
     Defense: 115
     MAXCP:
-        Hatched: 841
-        Boosted: 1052
+        Hatched: 944
+        Boosted: 1180
 - # バシャーモ(257) --------------------------------------------------
     ID: 257
     Name:
         ja: バシャーモ
-        en:
+        en: Blaziken
     Types:
         - ほのお
         - かくとう
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 240
     Defense: 141
     MAXCP:
-        Hatched: 1503
-        Boosted: 1879
+        Hatched: 1627
+        Boosted: 2034
 - # ミズゴロウ(258) --------------------------------------------------
     ID: 258
     Name:
         ja: ミズゴロウ
-        en:
+        en: Mudkip
     Types:
         - みず
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 126
     Defense: 93
     MAXCP:
-        Hatched: 560
-        Boosted: 701
+        Hatched: 644
+        Boosted: 805
 - # ヌマクロー(259) --------------------------------------------------
     ID: 259
     Name:
         ja: ヌマクロー
-        en:
+        en: Marshtomp
     Types:
         - みず
         - じめん
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 156
     Defense: 133
     MAXCP:
-        Hatched: 924
-        Boosted: 1155
+        Hatched: 1015
+        Boosted: 1269
 - # ラグラージ(260) --------------------------------------------------
     ID: 260
     Name:
         ja: ラグラージ
-        en:
+        en: Swampert
     Types:
         - みず
         - じめん
     From:
     To:
-    Stamina: 200
+    Stamina: 225
     Attack: 208
     Defense: 175
     MAXCP:
-        Hatched: 1608
-        Boosted: 2010
+        Hatched: 1699
+        Boosted: 2124
 - # ポチエナ(261) --------------------------------------------------
     ID: 261
     Name:
         ja: ポチエナ
-        en:
+        en: Poochyena
     Types:
         - あく
     From:
     To:
-    Stamina: 70
+    Stamina: 111
     Attack: 96
-    Defense: 63
+    Defense: 61
     MAXCP:
-        Hatched: 322
-        Boosted: 403
+        Hatched: 387
+        Boosted: 484
 - # グラエナ(262) --------------------------------------------------
     ID: 262
     Name:
         ja: グラエナ
-        en:
+        en: Mightyena
     Types:
         - あく
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 171
-    Defense: 137
+    Defense: 132
     MAXCP:
-        Hatched: 1018
-        Boosted: 1273
+        Hatched: 1100
+        Boosted: 1375
 - # ジグザグマ(263) --------------------------------------------------
     ID: 263
     Name:
         ja: ジグザグマ
-        en:
+        en: Zigzagoon
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 76
+    Stamina: 116
     Attack: 58
     Defense: 80
     MAXCP:
-        Hatched: 242
-        Boosted: 302
+        Hatched: 290
+        Boosted: 363
 - # マッスグマ(264) --------------------------------------------------
     ID: 264
     Name:
         ja: マッスグマ
-        en:
+        en: Linoone
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 156
+    Stamina: 186
     Attack: 142
     Defense: 128
     MAXCP:
-        Hatched: 876
-        Boosted: 1095
+        Hatched: 949
+        Boosted: 1187
 - # ケムッソ(265) --------------------------------------------------
     ID: 265
     Name:
         ja: ケムッソ
-        en:
+        en: Wurmple
     Types:
         - むし
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 75
-    Defense: 61
+    Defense: 59
     MAXCP:
-        Hatched: 286
-        Boosted: 358
+        Hatched: 330
+        Boosted: 413
 - # カラサリス(266) --------------------------------------------------
     ID: 266
     Name:
         ja: カラサリス
-        en:
+        en: Silcoon
     Types:
         - むし
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 60
-    Defense: 91
+    Defense: 77
     MAXCP:
-        Hatched: 295
-        Boosted: 369
+        Hatched: 316
+        Boosted: 395
 - # アゲハント(267) --------------------------------------------------
     ID: 267
     Name:
         ja: アゲハント
-        en:
+        en: Beautifly
     Types:
         - むし
         - ひこう
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 189
     Defense: 98
     MAXCP:
-        Hatched: 899
-        Boosted: 1124
+        Hatched: 1009
+        Boosted: 1261
 - # マユルド(268) --------------------------------------------------
     ID: 268
     Name:
         ja: マユルド
-        en:
+        en: Cascoon
     Types:
         - むし
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 60
-    Defense: 91
+    Defense: 77
     MAXCP:
-        Hatched: 295
-        Boosted: 369
+        Hatched: 316
+        Boosted: 395
 - # ドクケイル(269) --------------------------------------------------
     ID: 269
     Name:
         ja: ドクケイル
-        en:
+        en: Dustox
     Types:
         - むし
         - どく
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 98
-    Defense: 172
+    Defense: 162
     MAXCP:
-        Hatched: 640
-        Boosted: 801
+        Hatched: 699
+        Boosted: 874
 - # ハスボー(270) --------------------------------------------------
     ID: 270
     Name:
         ja: ハスボー
-        en:
-    Types:
-        - みず
-        - くさ
-    From:
-    To:
-    Stamina: 80
-    Attack: 71
-    Defense: 86
-    MAXCP:
-        Hatched: 300
-        Boosted: 375
-- # ハスブレロ(271) --------------------------------------------------
-    ID: 271
-    Name:
-        ja: ハスブレロ
-        en:
+        en: Lotad
     Types:
         - みず
         - くさ
     From:
     To:
     Stamina: 120
-    Attack: 112
-    Defense: 128
+    Attack: 71
+    Defense: 77
     MAXCP:
-        Hatched: 629
-        Boosted: 787
-- # ルンパッパ(272) --------------------------------------------------
-    ID: 272
+        Hatched: 342
+        Boosted: 427
+- # ハスブレロ(271) --------------------------------------------------
+    ID: 271
     Name:
-        ja: ルンパッパ
-        en:
+        ja: ハスブレロ
+        en: Lombre
     Types:
         - みず
         - くさ
     From:
     To:
-    Stamina: 160
-    Attack: 173
-    Defense: 191
+    Stamina: 155
+    Attack: 112
+    Defense: 119
     MAXCP:
-        Hatched: 1273
-        Boosted: 1592
+        Hatched: 684
+        Boosted: 855
+- # ルンパッパ(272) --------------------------------------------------
+    ID: 272
+    Name:
+        ja: ルンパッパ
+        en: Ludicolo
+    Types:
+        - みず
+        - くさ
+    From:
+    To:
+    Stamina: 190
+    Attack: 173
+    Defense: 176
+    MAXCP:
+        Hatched: 1327
+        Boosted: 1659
 - # タネボー(273) --------------------------------------------------
     ID: 273
     Name:
         ja: タネボー
-        en:
+        en: Seedot
     Types:
         - くさ
     From:
     To:
-    Stamina: 80
+    Stamina: 120
     Attack: 71
-    Defense: 86
+    Defense: 77
     MAXCP:
-        Hatched: 300
-        Boosted: 375
+        Hatched: 342
+        Boosted: 427
 - # コノハナ(274) --------------------------------------------------
     ID: 274
     Name:
         ja: コノハナ
-        en:
+        en: Nuzleaf
     Types:
         - くさ
         - あく
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 134
     Defense: 78
     MAXCP:
-        Hatched: 638
-        Boosted: 798
+        Hatched: 701
+        Boosted: 876
 - # ダーテング(275) --------------------------------------------------
     ID: 275
     Name:
         ja: ダーテング
-        en:
+        en: Shiftry
     Types:
         - くさ
         - あく
     From:
     To:
-    Stamina: 180
+    Stamina: 207
     Attack: 200
     Defense: 121
     MAXCP:
-        Hatched: 1249
-        Boosted: 1562
+        Hatched: 1333
+        Boosted: 1666
 - # スバメ(276) --------------------------------------------------
     ID: 276
     Name:
         ja: スバメ
-        en:
+        en: Taillow
     Types:
     - ノーマル
     - ひこう
     From:
     To:
-    Stamina: 80
+    Stamina: 120
     Attack: 106
     Defense: 61
     MAXCP:
-        Hatched: 366
-        Boosted: 458
+        Hatched: 437
+        Boosted: 546
 - # オオスバメ(277) --------------------------------------------------
     ID: 277
     Name:
         ja: オオスバメ
-        en:
+        en: Swellow
     Types:
         - ノーマル
         - ひこう
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 185
-    Defense: 130
+    Defense: 124
     MAXCP:
-        Hatched: 998
-        Boosted: 1248
+        Hatched: 1097
+        Boosted: 1371
 - # キャモメ(278) --------------------------------------------------
     ID: 278
     Name:
         ja: キャモメ
-        en:
+        en: Wingull
     Types:
         - みず
         - ひこう
     From:
     To:
-    Stamina: 80
+    Stamina: 120
     Attack: 106
     Defense: 61
     MAXCP:
-        Hatched: 366
-        Boosted: 458
+        Hatched: 437
+        Boosted: 546
 - # ペリッパー(279) --------------------------------------------------
     ID: 279
     Name:
         ja: ペリッパー
-        en:
+        en: Pelipper
     Types:
         - みず
         - ひこう
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 175
-    Defense: 189
+    Defense: 174
     MAXCP:
-        Hatched: 1125
-        Boosted: 1406
+        Hatched: 1215
+        Boosted: 1519
 - # ラルトス(280) --------------------------------------------------
     ID: 280
     Name:
         ja: ラルトス
-        en:
+        en: Ralts
     Types:
         - エスパー
         - フェアリー
     From:
     To:
-    Stamina: 56
+        - キルリア
+    Stamina: 99
     Attack: 79
-    Defense: 63
+    Defense: 59
     MAXCP:
-        Hatched: 249
-        Boosted: 312
+        Hatched: 308
+        Boosted: 385
 - # キルリア(281) --------------------------------------------------
     ID: 281
     Name:
         ja: キルリア
-        en:
+        en: Kirlia
     Types:
         - エスパー
         - フェアリー
     From:
     To:
-    Stamina: 76
+        - サーナイト
+        - エルレイド
+    Stamina: 116
     Attack: 117
-    Defense: 100
+    Defense: 90
     MAXCP:
-        Hatched: 481
-        Boosted: 602
+        Hatched: 552
+        Boosted: 690
 - # サーナイト(282) --------------------------------------------------
     ID: 282
     Name:
         ja: サーナイト
-        en:
+        en: Gardevoir
     Types:
         - エスパー
         - フェアリー
     From:
     To:
-    Stamina: 136
+    Stamina: 169
     Attack: 237
-    Defense: 220
+    Defense: 195
     MAXCP:
-        Hatched: 1694
-        Boosted: 2117
+        Hatched: 1767
+        Boosted: 2209
 - # アメタマ(283) --------------------------------------------------
     ID: 283
     Name:
         ja: アメタマ
-        en:
+        en: Surskit
     Types:
         - むし
         - みず
     From:
     To:
-    Stamina: 80
+    Stamina: 120
     Attack: 93
-    Defense: 97
+    Defense: 87
     MAXCP:
-        Hatched: 397
-        Boosted: 497
+        Hatched: 452
+        Boosted: 565
 - # アメモース(284) --------------------------------------------------
     ID: 284
     Name:
         ja: アメモース
-        en:
+        en: Masquerain
     Types:
         - むし
         - ひこう
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 192
-    Defense: 161
+    Defense: 150
     MAXCP:
-        Hatched: 1220
-        Boosted: 1525
+        Hatched: 1297
+        Boosted: 1622
 - # キノココ(285) --------------------------------------------------
     ID: 285
     Name:
         ja: キノココ
-        en:
+        en: Shroomish
     Types:
     - くさ
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 74
     Defense: 110
     MAXCP:
-        Hatched: 412
-        Boosted: 515
+        Hatched: 463
+        Boosted: 578
 - # キノガッサ(286) --------------------------------------------------
     ID: 286
     Name:
         ja: キノガッサ
-        en:
+        en: Breloom
     Types:
         - くさ
         - かくとう
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 241
-    Defense: 153
+    Defense: 144
     MAXCP:
-        Hatched: 1375
-        Boosted: 1720
+        Hatched: 1502
+        Boosted: 1877
 - # ナマケロ(287) --------------------------------------------------
     ID: 287
     Name:
         ja: ナマケロ
-        en:
+        en: Slakoth
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 104
-    Defense: 104
+    Defense: 92
     MAXCP:
-        Hatched: 538
-        Boosted: 672
+        Hatched: 572
+        Boosted: 716
 - # ヤルキモノ(288) --------------------------------------------------
     ID: 288
     Name:
         ja: ヤルキモノ
-        en:
+        en: Vigoroth
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 159
-    Defense: 159
+    Defense: 145
     MAXCP:
-        Hatched: 1083
-        Boosted: 1354
+        Hatched: 1124
+        Boosted: 1405
 - # ケッキング(289) --------------------------------------------------
     ID: 289
     Name:
         ja: ケッキング
-        en:
+        en: Slaking
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 273
+    Stamina: 284
     Attack: 290
-    Defense: 183
+    Defense: 166
     MAXCP:
-        Hatched: 2599
-        Boosted: 3249
+        Hatched: 2532
+        Boosted: 3165
 - # ツチニン(290) --------------------------------------------------
     ID: 290
     Name:
         ja: ツチニン
-        en:
+        en: Nincada
     Types:
         - むし
         - じめん
     From:
     To:
-    Stamina: 62
+    Stamina: 104
     Attack: 80
-    Defense: 153
-    isNotAvailable: 1
+    Defense: 126
     MAXCP:
-        Grown: 674
-        Hatched:
-        Boosted:
+        Hatched: 439
+        Boosted: 549
 - # テッカニン(291) --------------------------------------------------
     ID: 291
     Name:
         ja: テッカニン
-        en:
+        en: Ninjask
     Types:
         - むし
         - ひこう
     From:
     To:
-    Stamina: 122
-    Attack: 196
-    Defense: 114
-    isNotAvailable: 1
+    Stamina: 156
+    Attack: 199
+    Defense: 112
     MAXCP:
-        Grown: 1751
-        Hatched:
-        Boosted:
+        Hatched: 1125
+        Boosted: 1406
 - # ヌケニン(292) --------------------------------------------------
     ID: 292
     Name:
         ja: ヌケニン
-        en:
+        en: Shedinja
     Types:
         - むし
         - ゴースト
     From:
     To:
-    Stamina: 2
+    Stamina: 1
     Attack: 153
-    Defense: 80
-    isNotAvailable: 1
+    Defense: 73
     MAXCP:
-        Grown: 421
-        Hatched:
-        Boosted:
+        Hatched: 224
+        Boosted: 281
 - # ゴニョニョ(293) --------------------------------------------------
     ID: 293
     Name:
         ja: ゴニョニョ
-        en:
+        en: Whismur
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 128
+    Stamina: 162
     Attack: 92
     Defense: 42
     MAXCP:
-        Hatched: 344
-        Boosted: 430
+        Hatched: 383
+        Boosted: 479
 - # ドゴーム(294) --------------------------------------------------
     ID: 294
     Name:
         ja: ドゴーム
-        en:
+        en: Loudred
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 168
+    Stamina: 197
     Attack: 134
     Defense: 81
     MAXCP:
-        Hatched: 704
-        Boosted: 881
+        Hatched: 758
+        Boosted: 948
 - # バクオング(295) --------------------------------------------------
     ID: 295
     Name:
         ja: バクオング
-        en:
+        en: Exploud
     Types:
     - ノーマル
     From:
     To:
-    Stamina: 208
+    Stamina: 232
     Attack: 179
-    Defense: 142
+    Defense: 137
     MAXCP:
-        Hatched: 1295
-        Boosted: 1619
+        Hatched: 1341
+        Boosted: 1677
 - # マクノシタ(296) --------------------------------------------------
     ID: 296
     Name:
         ja: マクノシタ
-        en:
+        en: Makuhita
     Types:
         - かくとう
     From:
     To:
-    Stamina: 144
+    Stamina: 176
     Attack: 99
     Defense: 54
     MAXCP:
-        Hatched: 426
-        Boosted: 532
+        Hatched: 467
+        Boosted: 583
 - # ハリテヤマ(297) --------------------------------------------------
     ID: 297
     Name:
         ja: ハリテヤマ
-        en:
+        en: Hariyama
     Types:
         - かくとう
     From:
     To:
-    Stamina: 288
+    Stamina: 302
     Attack: 209
     Defense: 114
     MAXCP:
-        Hatched: 1580
-        Boosted: 1975
+        Hatched: 1616
+        Boosted: 2020
 - # ルリリ(298) --------------------------------------------------
     ID: 298
     Name:
         ja: ルリリ
-        en:
+        en: Azurill
     Types:
     - ノーマル
     - フェアリー
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 36
     Defense: 71
     isNotWild: 1
     MAXCP:
-        Hatched: 181
-        Boosted: 226
+        Hatched: 208
+        Boosted: 260
 - # ノズパス(299) --------------------------------------------------
     ID: 299
     Name:
         ja: ノズパス
-        en:
+        en: Nosepass
     Types:
         - いわ
     From:
     To:
-    Stamina: 60
+        - ダイノーズ
+    Stamina: 102
     Attack: 82
-    Defense: 236
+    Defense: 215
     MAXCP:
-        Hatched: 474
-        Boosted: 593
+        Hatched: 567
+        Boosted: 709
 - # エネコ(300) --------------------------------------------------
     ID: 300
     Name:
         ja: エネコ
-        en:
+        en: Skitty
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 84
-    Defense: 84
+    Defense: 79
     MAXCP:
-        Hatched: 376
-        Boosted: 471
+        Hatched: 422
+        Boosted: 527
 - # エネコロロ(301) --------------------------------------------------
     ID: 301
     Name:
         ja: エネコロロ
-        en:
+        en: Delcatty
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 132
-    Defense: 132
+    Defense: 127
     MAXCP:
-        Hatched: 791
-        Boosted: 989
+        Hatched: 854
+        Boosted: 1068
 - # ヤミラミ(302) --------------------------------------------------
     ID: 302
     Name:
         ja: ヤミラミ
-        en:
+        en: Sableye
     Types:
         - あく
         - ゴースト
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 141
-    Defense: 141
+    Defense: 136
     MAXCP:
-        Hatched: 745
-        Boosted: 932
+        Hatched: 843
+        Boosted: 1054
 - # クチート(303) --------------------------------------------------
     ID: 303
     Name:
         ja: クチート
-        en:
+        en: Mawile
     Types:
         - はがね
         - フェアリー
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 155
-    Defense: 155
+    Defense: 141
     MAXCP:
-        Hatched: 848
-        Boosted: 1060
+        Hatched: 934
+        Boosted: 1167
 - # ココドラ(304) --------------------------------------------------
     ID: 304
     Name:
         ja: ココドラ
-        en:
+        en: Aron
     Types:
         - はがね
         - いわ
     From:
     To:
-    Stamina: 100
+        - コドラ
+    Stamina: 137
     Attack: 121
-    Defense: 168
+    Defense: 141
     MAXCP:
-        Hatched: 704
-        Boosted: 880
+        Hatched: 747
+        Boosted: 934
 - # コドラ(305) --------------------------------------------------
     ID: 305
     Name:
         ja: コドラ
-        en:
+        en: Lairon
     Types:
         - はがね
         - いわ
     From:
     To:
-    Stamina: 120
+        - ボスゴドラ
+    Stamina: 155
     Attack: 158
-    Defense: 240
+    Defense: 198
     MAXCP:
-        Hatched: 1145
-        Boosted: 1432
+        Hatched: 1174
+        Boosted: 1468
 - # ボスゴドラ(306) --------------------------------------------------
     ID: 306
     Name:
         ja: ボスゴドラ
-        en:
+        en: Aggron
     Types:
         - はがね
         - いわ
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 198
-    Defense: 314
+    Defense: 257
     MAXCP:
-        Hatched: 1716
-        Boosted: 2145
+        Hatched: 1714
+        Boosted: 2143
 - # アサナン(307) --------------------------------------------------
     ID: 307
     Name:
         ja: アサナン
-        en:
+        en: Meditite
     Types:
         - かくとう
         - エスパー
     From:
     To:
-    Stamina: 60
+    Stamina: 102
     Attack: 78
     Defense: 107
     MAXCP:
-        Hatched: 317
-        Boosted: 396
+        Hatched: 396
+        Boosted: 495
 - # チャーレム(308) --------------------------------------------------
     ID: 308
     Name:
         ja: チャーレム
-        en:
+        en: Medicham
     Types:
         - かくとう
         - エスパー
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 121
     Defense: 152
     MAXCP:
-        Hatched: 728
-        Boosted: 911
+        Hatched: 817
+        Boosted: 1022
 - # ラクライ(309) --------------------------------------------------
     ID: 309
     Name:
         ja: ラクライ
-        en:
+        en: Electrike
     Types:
         - でんき
     From:
     To:
-    Stamina: 80
+    Stamina: 120
     Attack: 123
     Defense: 78
     MAXCP:
-        Hatched: 462
-        Boosted: 578
+        Hatched: 551
+        Boosted: 689
 - # ライボルト(310) --------------------------------------------------
     ID: 310
     Name:
         ja: ライボルト
-        en:
+        en: Manectric
     Types:
         - でんき
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 215
     Defense: 127
     MAXCP:
-        Hatched: 1217
-        Boosted: 1522
+        Hatched: 1337
+        Boosted: 1672
 - # プラスル(311) --------------------------------------------------
     ID: 311
     Name:
         ja: プラスル
-        en:
+        en: Plusle
     Types:
         - でんき
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 167
-    Defense: 147
+    Defense: 129
     MAXCP:
-        Hatched: 960
-        Boosted: 1200
+        Hatched: 1016
+        Boosted: 1270
 - # マイナン(312) --------------------------------------------------
     ID: 312
     Name:
         ja: マイナン
-        en:
+        en: Minun
     Types:
         - でんき
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 147
-    Defense: 167
+    Defense: 150
     MAXCP:
-        Hatched: 906
-        Boosted: 1132
+        Hatched: 968
+        Boosted: 1210
 - # バルビート(313) --------------------------------------------------
     ID: 313
     Name:
         ja: バルビート
-        en:
+        en: Volbeat
     Types:
         - むし
     From:
     To:
-    Stamina: 130
+    Stamina: 163
     Attack: 143
-    Defense: 171
+    Defense: 166
     MAXCP:
-        Hatched: 926
-        Boosted: 1157
+        Hatched: 1012
+        Boosted: 1265
 - # イルミーゼ(314) --------------------------------------------------
     ID: 314
     Name:
         ja: イルミーゼ
-        en:
+        en: Illumise
     Types:
         - むし
     From:
     To:
-    Stamina: 130
+    Stamina: 163
     Attack: 143
-    Defense: 171
+    Defense: 166
     MAXCP:
-        Hatched: 926
-        Boosted: 1157
+        Hatched: 1012
+        Boosted: 1265
 - # ロゼリア(315) --------------------------------------------------
     ID: 315
     Name:
         ja: ロゼリア
-        en:
+        en: Roselia
     Types:
         - くさ
         - どく
     From:
     To:
-    Stamina: 100
+        - ロズレイド
+    Stamina: 137
     Attack: 186
-    Defense: 148
+    Defense: 131
     MAXCP:
-        Hatched: 982
-        Boosted: 1227
+        Hatched: 1068
+        Boosted: 1335
 - # ゴクリン(316) --------------------------------------------------
     ID: 316
     Name:
         ja: ゴクリン
-        en:
+        en: Gulpin
     Types:
         - どく
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 80
     Defense: 99
     MAXCP:
-        Hatched: 450
-        Boosted: 563
+        Hatched: 495
+        Boosted: 618
 - # マルノーム(317) --------------------------------------------------
     ID: 317
     Name:
         ja: マルノーム
-        en:
+        en: Swalot
     Types:
         - どく
     From:
     To:
-    Stamina: 200
+    Stamina: 225
     Attack: 140
     Defense: 159
     MAXCP:
-        Hatched: 1069
-        Boosted: 1337
+        Hatched: 1130
+        Boosted: 1413
 - # キバニア(318) --------------------------------------------------
     ID: 318
     Name:
         ja: キバニア
-        en:
+        en: Carvanha
     Types:
         - みず
         - あく
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 171
     Defense: 39
     MAXCP:
-        Hatched: 499
-        Boosted: 624
+        Hatched: 583
+        Boosted: 729
 - # サメハダー(319) --------------------------------------------------
     ID: 319
     Name:
         ja: サメハダー
-        en:
+        en: Sharpedo
     Types:
         - みず
         - あく
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 243
     Defense: 83
     MAXCP:
-        Hatched: 1134
-        Boosted: 1418
+        Hatched: 1246
+        Boosted: 1558
 - # ホエルコ(320) --------------------------------------------------
     ID: 320
     Name:
         ja: ホエルコ
-        en:
+        en: Wailmer
     Types:
         - みず
     From:
     To:
-    Stamina: 260
+    Stamina: 277
     Attack: 136
     Defense: 68
     MAXCP:
-        Hatched: 814
-        Boosted: 1017
+        Hatched: 838
+        Boosted: 1048
 - # ホエルオー(321) --------------------------------------------------
     ID: 321
     Name:
         ja: ホエルオー
-        en:
+        en: Wailord
     Types:
         - みず
     From:
     To:
-    Stamina: 340
+    Stamina: 347
     Attack: 175
     Defense: 87
     MAXCP:
-        Hatched: 1290
-        Boosted: 1613
+        Hatched: 1302
+        Boosted: 1628
 - # ドンメル(322) --------------------------------------------------
     ID: 322
     Name:
         ja: ドンメル
-        en:
+        en: Numel
     Types:
         - ほのお
         - じめん
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 119
-    Defense: 82
+    Defense: 79
     MAXCP:
-        Hatched: 547
-        Boosted: 684
+        Hatched: 604
+        Boosted: 755
 - # バクーダ(323) --------------------------------------------------
     ID: 323
     Name:
         ja: バクーダ
-        en:
+        en: Camerupt
     Types:
         - ほのお
         - じめん
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 194
-    Defense: 139
+    Defense: 136
     MAXCP:
-        Hatched: 1152
-        Boosted: 1440
+        Hatched: 1253
+        Boosted: 1566
 - # コータス(324) --------------------------------------------------
     ID: 324
     Name:
         ja: コータス
-        en:
+        en: Torkoal
     Types:
         - ほのお
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 151
-    Defense: 234
+    Defense: 203
     MAXCP:
-        Hatched: 1163
-        Boosted: 1454
+        Hatched: 1196
+        Boosted: 1495
 - # バネブー(325) --------------------------------------------------
     ID: 325
     Name:
         ja: バネブー
-        en:
+        en: Spoink
     Types:
         - エスパー
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 125
-    Defense: 145
+    Defense: 122
     MAXCP:
-        Hatched: 734
-        Boosted: 917
+        Hatched: 762
+        Boosted: 953
 - # ブーピッグ(326) --------------------------------------------------
     ID: 326
     Name:
         ja: ブーピッグ
-        en:
+        en: Grumpig
     Types:
         - エスパー
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 171
-    Defense: 211
+    Defense: 188
     MAXCP:
-        Hatched: 1320
-        Boosted: 1650
+        Hatched: 1354
+        Boosted: 1692
 - # パッチール(327) --------------------------------------------------
     ID: 327
     Name:
         ja: パッチール
-        en:
+        en: Spinda
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 120
+    Stamina: 155
     Attack: 116
     Defense: 116
     isNotWild: 1
     MAXCP:
-        Hatched: 621
-        Boosted: 777
+        Hatched: 697
+        Boosted: 872
 - # ナックラー(328) --------------------------------------------------
     ID: 328
     Name:
         ja: ナックラー
-        en:
+        en: Trapinch
     Types:
         - じめん
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 162
     Defense: 78
     MAXCP:
-        Hatched: 624
-        Boosted: 780
+        Hatched: 728
+        Boosted: 910
 - # ビブラーバ(329) --------------------------------------------------
     ID: 329
     Name:
         ja: ビブラーバ
-        en:
+        en: Vibrava
     Types:
         - じめん
         - ドラゴン
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 134
     Defense: 99
     MAXCP:
-        Hatched: 608
-        Boosted: 761
+        Hatched: 699
+        Boosted: 875
 - # フライゴン(330) --------------------------------------------------
     ID: 330
     Name:
         ja: フライゴン
-        en:
+        en: Flygon
     Types:
         - じめん
         - ドラゴン
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 205
     Defense: 168
     MAXCP:
-        Hatched: 1405
-        Boosted: 1756
+        Hatched: 1520
+        Boosted: 1901
 - # サボネア(331) --------------------------------------------------
     ID: 331
     Name:
         ja: サボネア
-        en:
+        en: Cacnea
     Types:
         - くさ
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 156
     Defense: 74
     MAXCP:
-        Hatched: 617
-        Boosted: 771
+        Hatched: 709
+        Boosted: 887
 - # ノクタス(332) --------------------------------------------------
     ID: 332
     Name:
         ja: ノクタス
-        en:
+        en: Cacturne
     Types:
         - くさ
         - あく
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 221
     Defense: 115
     MAXCP:
-        Hatched: 1195
-        Boosted: 1494
+        Hatched: 1313
+        Boosted: 1641
 - # チルット(333) --------------------------------------------------
     ID: 333
     Name:
         ja: チルット
-        en:
+        en: Swablu
     Types:
         - ノーマル
         - ひこう
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 76
-    Defense: 139
+    Defense: 132
     MAXCP:
-        Hatched: 412
-        Boosted: 516
+        Hatched: 470
+        Boosted: 588
 - # チルタリス(334) --------------------------------------------------
     ID: 334
     Name:
         ja: チルタリス
-        en:
+        en: Altaria
     Types:
         - ドラゴン
         - ひこう
     From:
     To:
-    Stamina: 150
+    Stamina: 181
     Attack: 141
-    Defense: 208
+    Defense: 201
     MAXCP:
-        Hatched: 1067
-        Boosted: 1335
+        Hatched: 1145
+        Boosted: 1432
 - # ザングース(335) --------------------------------------------------
     ID: 335
     Name:
         ja: ザングース
-        en:
+        en: Zangoose
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 146
+    Stamina: 177
     Attack: 222
     Defense: 124
     MAXCP:
-        Hatched: 1265
-        Boosted: 1581
+        Hatched: 1381
+        Boosted: 1727
 - # ハブネーク(336) --------------------------------------------------
     ID: 336
     Name:
         ja: ハブネーク
-        en:
+        en: Seviper
     Types:
         - どく
     From:
     To:
-    Stamina: 146
+    Stamina: 177
     Attack: 196
     Defense: 118
     MAXCP:
-        Hatched: 1101
-        Boosted: 1377
+        Hatched: 1203
+        Boosted: 1504
 - # ルナトーン(337) --------------------------------------------------
     ID: 337
     Name:
         ja: ルナトーン
-        en:
+        en: Lunatone
     Types:
         - いわ
         - エスパー
     From:
     To:
-    Stamina: 180
+    Stamina: 207
     Attack: 178
-    Defense: 163
+    Defense: 153
     MAXCP:
-        Hatched: 1283
-        Boosted: 1604
+        Hatched: 1330
+        Boosted: 1662
 - # ソルロック(338) --------------------------------------------------
     ID: 338
     Name:
         ja: ソルロック
-        en:
+        en: Solrock
     Types:
         - いわ
         - エスパー
     From:
     To:
-    Stamina: 180
+    Stamina: 207
     Attack: 178
-    Defense: 163
+    Defense: 153
     MAXCP:
-        Hatched: 1283
-        Boosted: 1604
+        Hatched: 1330
+        Boosted: 1662
 - # ドジョッチ(339) --------------------------------------------------
     ID: 339
     Name:
         ja: ドジョッチ
-        en:
+        en: Barboach
     Types:
         - みず
         - じめん
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 93
-    Defense: 83
+    Defense: 82
     MAXCP:
-        Hatched: 409
-        Boosted: 511
+        Hatched: 468
+        Boosted: 585
 - # ナマズン(340) --------------------------------------------------
     ID: 340
     Name:
         ja: ナマズン
-        en:
+        en: Whiscash
     Types:
         - みず
         - じめん
     From:
     To:
-    Stamina: 220
+    Stamina: 242
     Attack: 151
-    Defense: 142
+    Defense: 141
     MAXCP:
-        Hatched: 1137
-        Boosted: 1422
+        Hatched: 1186
+        Boosted: 1482
 - # ヘイガニ(341) --------------------------------------------------
     ID: 341
     Name:
         ja: ヘイガニ
-        en:
+        en: Corphish
     Types:
         - みず
     From:
     To:
-    Stamina: 86
+    Stamina: 125
     Attack: 141
-    Defense: 113
+    Defense: 99
     MAXCP:
-        Hatched: 633
-        Boosted: 791
+        Hatched: 703
+        Boosted: 879
 - # シザリガー(342) --------------------------------------------------
     ID: 342
     Name:
         ja: シザリガー
-        en:
+        en: Crawdaunt
     Types:
         - みず
         - あく
     From:
     To:
-    Stamina: 126
+    Stamina: 160
     Attack: 224
-    Defense: 156
+    Defense: 142
     MAXCP:
-        Hatched: 1324
-        Boosted: 1655
+        Hatched: 1413
+        Boosted: 1767
 - # ヤジロン(343) --------------------------------------------------
     ID: 343
     Name:
         ja: ヤジロン
-        en:
-    Types:
-        - じめん
-        - エスパー
-    From:
-    To:
-    Stamina: 80
-    Attack: 77
-    Defense: 131
-    MAXCP:
-        Hatched: 386
-        Boosted: 483
-- # ネンドール(344) --------------------------------------------------
-    ID: 344
-    Name:
-        ja: ネンドール
-        en:
+        en: Baltoy
     Types:
         - じめん
         - エスパー
     From:
     To:
     Stamina: 120
-    Attack: 140
-    Defense: 236
+    Attack: 77
+    Defense: 124
     MAXCP:
-        Hatched: 1018
-        Boosted: 1272
+        Hatched: 449
+        Boosted: 562
+- # ネンドール(344) --------------------------------------------------
+    ID: 344
+    Name:
+        ja: ネンドール
+        en: Claydol
+    Types:
+        - じめん
+        - エスパー
+    From:
+    To:
+    Stamina: 155
+    Attack: 140
+    Defense: 229
+    MAXCP:
+        Hatched: 1126
+        Boosted: 1408
 - # リリーラ(345) --------------------------------------------------
     ID: 345
     Name:
         ja: リリーラ
-        en:
+        en: Lileep
     Types:
         - いわ
         - くさ
     From:
     To:
-    Stamina: 132
+    Stamina: 165
     Attack: 105
-    Defense: 154
+    Defense: 150
     MAXCP:
-        Hatched: 675
-        Boosted: 843
+        Hatched: 738
+        Boosted: 922
 - # ユレイドル(346) --------------------------------------------------
     ID: 346
     Name:
         ja: ユレイドル
-        en:
+        en: Cradily
     Types:
         - いわ
         - くさ
     From:
     To:
-    Stamina: 172
+    Stamina: 200
     Attack: 152
-    Defense: 198
+    Defense: 194
     MAXCP:
-        Hatched: 1189
-        Boosted: 1486
+        Hatched: 1263
+        Boosted: 1579
 - # アノプス(347) --------------------------------------------------
     ID: 347
     Name:
         ja: アノプス
-        en:
+        en: Anorith
     Types:
         - いわ
         - むし
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 176
     Defense: 100
     MAXCP:
-        Hatched: 749
-        Boosted: 936
+        Hatched: 874
+        Boosted: 1092
 - # アーマルド(348) --------------------------------------------------
     ID: 348
     Name:
         ja: アーマルド
-        en:
+        en: Armaldo
     Types:
         - いわ
         - むし
     From:
     To:
-    Stamina: 150
+    Stamina: 181
     Attack: 222
-    Defense: 183
+    Defense: 174
     MAXCP:
-        Hatched: 1528
-        Boosted: 1911
+        Hatched: 1627
+        Boosted: 2035
 - # ヒンバス(349) --------------------------------------------------
     ID: 349
     Name:
         ja: ヒンバス
-        en:
+        en: Feebas
     Types:
         - みず
     From:
     To:
-    Stamina: 40
+    Stamina: 85
     Attack: 29
-    Defense: 102
+    Defense: 85
     MAXCP:
-        Hatched: 125
-        Boosted: 157
+        Hatched: 157
+        Boosted: 196
 - # ミロカロス(350) --------------------------------------------------
     ID: 350
     Name:
         ja: ミロカロス
-        en:
+        en: Milotic
     Types:
         - みず
     From:
     To:
-    Stamina: 190
+    Stamina: 216
     Attack: 192
-    Defense: 242
+    Defense: 219
     isNotWild: 1
     MAXCP:
-        Hatched: 1695
-        Boosted: 2119
+        Hatched: 1717
+        Boosted: 2147
 - # ポワルン(351) --------------------------------------------------
     ID: 351
     Name:
         ja: ポワルン
-        en:
-    Types:  # TODO フォルム別に調べるようにする（アローラの応用）
+        en: Castform
+    Types: # ToDo: フォルムによって種族値は変化しないが、タイプは変わる
         - ノーマル
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 139
     Defense: 139
     MAXCP:
-        Hatched: 849
-        Boosted: 1061
+        Hatched: 932
+        Boosted: 1165
 - # カクレオン(352) --------------------------------------------------
     ID: 352
     Name:
         ja: カクレオン
-        en:
+        en: Kecleon
     Types:
         - ノーマル
     From:
@@ -1581,532 +1582,523 @@
     ID: 353
     Name:
         ja: カゲボウズ
-        en:
+        en: Shuppet
     Types:
         - ゴースト
     From:
     To:
-    Stamina: 88
+    Stamina: 127
     Attack: 138
-    Defense: 66
+    Defense: 65
     MAXCP:
-        Hatched: 498
-        Boosted: 623
+        Hatched: 581
+        Boosted: 727
 - # ジュペッタ(354) --------------------------------------------------
     ID: 354
     Name:
         ja: ジュペッタ
-        en:
+        en: Banette
     Types:
         - ゴースト
     From:
     To:
-    Stamina: 128
+    Stamina: 162
     Attack: 218
-    Defense: 127
+    Defense: 126
     MAXCP:
-        Hatched: 1184
-        Boosted: 1481
+        Hatched: 1313
+        Boosted: 1642
 - # ヨマワル(355) --------------------------------------------------
     ID: 355
     Name:
         ja: ヨマワル
-        en:
+        en: Duskull
     Types:
         - ゴースト
     From:
     To:
-    Stamina: 40
+    Stamina: 85
     Attack: 70
     Defense: 162
     MAXCP:
-        Hatched: 299
-        Boosted: 374
+        Hatched: 403
+        Boosted: 504
 - # サマヨール(356) --------------------------------------------------
     ID: 356
     Name:
         ja: サマヨール
-        en:
+        en: Dusclops
     Types:
         - ゴースト
     From:
     To:
-    Stamina: 80
+    Stamina: 120
     Attack: 124
     Defense: 234
     MAXCP:
-        Hatched: 762
-        Boosted: 953
+        Hatched: 909
+        Boosted: 1136
 - # トロピウス(357) --------------------------------------------------
     ID: 357
     Name:
         ja: トロピウス
-        en:
+        en: Tropius
     Types:
         - くさ
         - ひこう
     From:
     To:
-    Stamina: 198
+    Stamina: 223
     Attack: 136
-    Defense: 165
+    Defense: 163
     MAXCP:
-        Hatched: 1055
-        Boosted: 1319
+        Hatched: 1109
+        Boosted: 1386
 - # チーリン(358) --------------------------------------------------
     ID: 358
     Name:
         ja: チーリン
-        en:
+        en: Chimecho
     Types:
         - エスパー
     From:
     To:
-    Stamina: 150
+    Stamina: 181
     Attack: 175
-    Defense: 174
+    Defense: 170
     MAXCP:
-        Hatched: 1197
-        Boosted: 1496
+        Hatched: 1291
+        Boosted: 1614
 - # アブソル(359) --------------------------------------------------
     ID: 359
     Name:
         ja: アブソル
-        en:
+        en: Absol
     Types:
         - あく
     From:
     To:
-    Stamina: 130
+    Stamina: 163
     Attack: 246
     Defense: 120
     MAXCP:
-        Hatched: 1303
-        Boosted: 1629
+        Hatched: 1443
+        Boosted: 1805
 - # ソーナノ(360) --------------------------------------------------
     ID: 360
     Name:
         ja: ソーナノ
-        en:
+        en: Wynaut
     Types:
         - エスパー
     From:
     To:
-    Stamina: 190
+    Stamina: 216
     Attack: 41
     Defense: 86
     isNotWild: 1
     MAXCP:
-        Hatched: 287
-        Boosted: 359
+        Hatched: 305
+        Boosted: 381
 - # ユキワラシ(361) --------------------------------------------------
     ID: 361
     Name:
         ja: ユキワラシ
-        en:
+        en: Snorunt
     Types:
         - こおり
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 95
     Defense: 95
     MAXCP:
-        Hatched: 441
-        Boosted: 551
+        Hatched: 507
+        Boosted: 634
 - # オニゴーリ(362) --------------------------------------------------
     ID: 362
     Name:
         ja: オニゴーリ
-        en:
+        en: Glalie
     Types:
         - こおり
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 162
     Defense: 162
     MAXCP:
-        Hatched: 1111
-        Boosted: 1389
+        Hatched: 1203
+        Boosted: 1504
 - # タマザラシ(363) --------------------------------------------------
     ID: 363
     Name:
         ja: タマザラシ
-        en:
+        en: Spheal
     Types:
         - こおり
         - みず
     From:
     To:
-    Stamina: 140
+    Stamina: 172
     Attack: 95
     Defense: 90
     MAXCP:
-        Hatched: 500
-        Boosted: 626
+        Hatched: 550
+        Boosted: 687
 - # トドグラー(364) --------------------------------------------------
     ID: 364
     Name:
         ja: トドグラー
-        en:
+        en: Sealeo
     Types:
         - こおり
         - みず
     From:
     To:
-    Stamina: 180
+    Stamina: 207
     Attack: 137
     Defense: 132
     MAXCP:
-        Hatched: 918
-        Boosted: 1148
+        Hatched: 979
+        Boosted: 1225
 - # トドゼルガ(365) --------------------------------------------------
     ID: 365
     Name:
         ja: トドゼルガ
-        en:
+        en: Walrein
     Types:
         - こおり
         - みず
     From:
     To:
-    Stamina: 220
+    Stamina: 242
     Attack: 182
     Defense: 176
     MAXCP:
-        Hatched: 1489
-        Boosted: 1862
+        Hatched: 1557
+        Boosted: 1947
 - # パールル(366) --------------------------------------------------
     ID: 366
     Name:
         ja: パールル
-        en:
+        en: Clamperl
     Types:
         - みず
     From:
     To:
-    Stamina: 70
+    Stamina: 111
     Attack: 133
-    Defense: 149
-    isNotAvailable: 1
+    Defense: 135
     MAXCP:
-        Grown: 1091
-        Hatched:
-        Boosted:
+        Hatched: 726
+        Boosted: 907
 - # ハンテール(367) --------------------------------------------------
     ID: 367
     Name:
         ja: ハンテール
-        en:
+        en: Huntail
     Types:
         - みず
     From:
     To:
-    Stamina: 110
+    Stamina: 146
     Attack: 197
-    Defense: 194
-    isNotAvailable: 1
+    Defense: 179
     MAXCP:
-        Grown: 2140
-        Hatched:
-        Boosted:
+        Hatched: 1337
+        Boosted: 1671
 - # サクラビス(368) --------------------------------------------------
     ID: 368
     Name:
         ja: サクラビス
-        en:
+        en: Gorebyss
     Types:
         - みず
     From:
     To:
-    Stamina: 110
+    Stamina: 146
     Attack: 211
-    Defense: 194
-    isNotAvailable: 1
+    Defense: 179
     MAXCP:
-        Grown: 2281
-        Hatched:
-        Boosted:
+        Hatched: 1425
+        Boosted: 1781
 - # ジーランス(369) --------------------------------------------------
     ID: 369
     Name:
         ja: ジーランス
-        en:
+        en: Relicanth
     Types:
         - みず
         - いわ
     From:
     To:
-    Stamina: 200
+    Stamina: 225
     Attack: 162
-    Defense: 234
+    Defense: 203
     MAXCP:
-        Hatched: 1461
-        Boosted: 1827
+        Hatched: 1444
+        Boosted: 1806
 - # ラブカス(370) --------------------------------------------------
     ID: 370
     Name:
         ja: ラブカス
-        en:
+        en: Luvdisc
     Types:
         - みず
     From:
     To:
-    Stamina: 86
+    Stamina: 125
     Attack: 81
-    Defense: 134
+    Defense: 128
     MAXCP:
-        Hatched: 420
-        Boosted: 525
+        Hatched: 484
+        Boosted: 605
 - # タツベイ(371) --------------------------------------------------
     ID: 371
     Name:
         ja: タツベイ
-        en:
+        en: Bagon
     Types:
         - ドラゴン
     From:
     To:
-    Stamina: 90
+    Stamina: 128
     Attack: 134
-    Defense: 107
+    Defense: 93
     MAXCP:
-        Hatched: 601
-        Boosted: 752
+        Hatched: 660
+        Boosted: 826
 - # コモルー(372) --------------------------------------------------
     ID: 372
     Name:
         ja: コモルー
-        en:
+        en: Shelgon
     Types:
         - ドラゴン
     From:
     To:
-    Stamina: 130
+    Stamina: 163
     Attack: 172
-    Defense: 179
+    Defense: 155
     MAXCP:
-        Hatched: 1119
-        Boosted: 1399
+        Hatched: 1160
+        Boosted: 1451
 - # ボーマンダ(373) --------------------------------------------------
     ID: 373
     Name:
         ja: ボーマンダ
-        en:
+        en: Salamence
     Types:
         - ドラゴン
         - ひこう
     From:
     To:
-    Stamina: 190
+    Stamina: 216
     Attack: 277
     Defense: 168
     MAXCP:
-        Hatched: 2018
-        Boosted: 2523
+        Hatched: 2142
+        Boosted: 2678
 - # ダンバル(374) --------------------------------------------------
     ID: 374
     Name:
         ja: ダンバル
-        en:
-    Types:
-        - はがね
-        - エスパー
-    From:
-    To:
-    Stamina: 80
-    Attack: 96
-    Defense: 141
-    MAXCP:
-        Hatched: 482
-        Boosted: 602
-- # メタング(375) --------------------------------------------------
-    ID: 375
-    Name:
-        ja: メタング
-        en:
+        en: Beldum
     Types:
         - はがね
         - エスパー
     From:
     To:
     Stamina: 120
-    Attack: 138
-    Defense: 185
+    Attack: 96
+    Defense: 132
     MAXCP:
-        Hatched: 897
-        Boosted: 1121
+        Hatched: 558
+        Boosted: 697
+- # メタング(375) --------------------------------------------------
+    ID: 375
+    Name:
+        ja: メタング
+        en: Metang
+    Types:
+        - はがね
+        - エスパー
+    From:
+    To:
+    Stamina: 155
+    Attack: 138
+    Defense: 176
+    MAXCP:
+        Hatched: 983
+        Boosted: 1229
 - # メタグロス(376) --------------------------------------------------
     ID: 376
     Name:
         ja: メタグロス
-        en:
+        en: Metagross
     Types:
         - はがね
         - エスパー
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 257
-    Defense: 247
+    Defense: 228
     MAXCP:
-        Hatched: 2078
-        Boosted: 2598
+        Hatched: 2166
+        Boosted: 2708
 - # レジロック(377) --------------------------------------------------
     ID: 377
     Name:
         ja: レジロック
-        en:
+        en: Regirock
     Types:
         - いわ
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 179
-    Defense: 356
+    Defense: 309
     MAXCP:
-        Grown: 3087
-        Hatched: 1764
-        Boosted: 2205
+        Hatched: 1784
+        Boosted: 2230
 - # レジアイス(378) --------------------------------------------------
     ID: 378
     Name:
         ja: レジアイス
-        en:
+        en: Regice
     Types:
         - こおり
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 179
-    Defense: 356
+    Defense: 309
     MAXCP:
-        Hatched: 1764
-        Boosted: 2205
+        Hatched: 1784
+        Boosted: 2230
 - # レジスチル(379) --------------------------------------------------
     ID: 379
     Name:
         ja: レジスチル
-        en:
+        en: Registeel
     Types:
         - はがね
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 143
     Defense: 285
     MAXCP:
-        Hatched: 1292
-        Boosted: 1615
+        Hatched: 1398
+        Boosted: 1748
 - # ラティアス(380) --------------------------------------------------
     ID: 380
     Name:
         ja: ラティアス
-        en:
+        en: Latias
     Types:
         - ドラゴン
         - エスパー
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 228
-    Defense: 268
+    Defense: 246
     MAXCP:
-        Hatched: 1929
-        Boosted: 2412
+        Hatched: 2006
+        Boosted: 2507
 - # ラティオス(381) --------------------------------------------------
     ID: 381
     Name:
         ja: ラティオス
-        en:
+        en: Latios
     Types:
         - ドラゴン
         - エスパー
     From:
     To:
-    Stamina: 160
+    Stamina: 190
     Attack: 268
-    Defense: 228
+    Defense: 212
     MAXCP:
-        Hatched: 2082
-        Boosted: 2603
+        Hatched: 2178
+        Boosted: 2723
 - # カイオーガ(382) --------------------------------------------------
     ID: 382
     Name:
         ja: カイオーガ
-        en:
+        en: Kyogre
     Types:
         - みず
     From:
     To:
-    Stamina: 182
+    Stamina: 205
     Attack: 270
-    Defense: 251
+    Defense: 228
     MAXCP:
-        Hatched: 2328
-        Boosted: 2910
+        Hatched: 2351
+        Boosted: 2939
 - # グラードン(383) --------------------------------------------------
     ID: 383
     Name:
         ja: グラードン
-        en:
+        en: Groudon
     Types:
         - じめん
     From:
     To:
-    Stamina: 182
+    Stamina: 205
     Attack: 270
-    Defense: 251
+    Defense: 228
     MAXCP:
-        Hatched: 2328
-        Boosted: 2910
+        Hatched: 2351
+        Boosted: 2939
 - # レックウザ(384) --------------------------------------------------
     ID: 384
     Name:
         ja: レックウザ
-        en:
+        en: Rayquaza
     Types:
         - ドラゴン
         - ひこう
     From:
     To:
-    Stamina: 191
+    Stamina: 213
     Attack: 284
     Defense: 170
     MAXCP:
-        Hatched: 2083
-        Boosted: 2604
+        Hatched: 2191
+        Boosted: 2739
 - # ジラーチ(385) --------------------------------------------------
     ID: 385
     Name:
         ja: ジラーチ
-        en:
+        en: Jirachi
     Types:
         - はがね
         - エスパー
     From:
     To:
-    Stamina: 200
+    Stamina: 225
     Attack: 210
     Defense: 210
-    isNotAvailable: 1
     MAXCP:
-        Grown: 3090
-        Hatched:
-        Boosted:
+        Hatched: 1865
+        Boosted: 2332
 - # デオキシス(386) --------------------------------------------------
     ID: 386
     Name:
         ja: デオキシス
-        en:
+        en: Deoxys
     Types:
         - エスパー
     From:
     To:
-    Stamina: 100
+    Stamina: 137
     Attack: 345
     Defense: 115
     MAXCP:
-        Hatched: 1570
-        Boosted: 1963
+        Hatched: 1806
+        Boosted: 2257

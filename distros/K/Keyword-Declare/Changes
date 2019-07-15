@@ -136,3 +136,9 @@ Revision history for Keyword-Declare
       combination is not reliable.
 
     * Improved line number reporting for errors within keywords
+
+
+0.001014  Fri Jul 12 07:57:14 2019
+
+    * Further improved auto-insertion of __DATA__ keyword (thanks, Jeroen!)
+

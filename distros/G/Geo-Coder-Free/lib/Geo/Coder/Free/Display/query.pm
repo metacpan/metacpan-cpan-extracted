@@ -15,9 +15,11 @@ sub html {
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $info = $self->{_info};
+	die unless($info);
+
 	my $allowed = {
 		'page' => 'query',
-		'q' => /[a-z][A-Z]$/i,	# TODO: regex of allowable name formats
+		'q' => qr/[a-z][A-Z]$/i,	# TODO: regex of allowable name formats
 		'scantext' => undef,	# TODO: regex of allowable name formats
 		'lang' => qr/^[A-Z][A-Z]/i,
 	};

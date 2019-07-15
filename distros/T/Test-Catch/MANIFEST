@@ -3,6 +3,7 @@ Changes
 lib/Test/Catch.pm
 lib/Test/Catch.pod
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 t/run.t
 t/test.cc

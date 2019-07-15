@@ -4,7 +4,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 # VERSION
 
-version v3.5.1
+version v3.8.1
 
 # SYNOPSIS
 
@@ -25,17 +25,17 @@ print $person->json_ld;
 This is a base class for the `SemanticWeb::Schema` classes, which
 were generated automatically from the following sources:
 
-- [http://schema.org/version/3.5/ext-meta.rdf](http://schema.org/version/3.5/ext-meta.rdf)
-- [http://schema.org/version/3.5/ext-health-lifesci.rdf](http://schema.org/version/3.5/ext-health-lifesci.rdf)
-- [http://schema.org/version/3.5/ext-auto.rdf](http://schema.org/version/3.5/ext-auto.rdf)
-- [http://schema.org/version/3.5/ext-bib.rdf](http://schema.org/version/3.5/ext-bib.rdf)
-- [http://schema.org/version/3.5/schema.rdf](http://schema.org/version/3.5/schema.rdf)
+- [https://schema.org/version/3.8/ext-auto.rdf](https://schema.org/version/3.8/ext-auto.rdf)
+- [https://schema.org/version/3.8/ext-bib.rdf](https://schema.org/version/3.8/ext-bib.rdf)
+- [https://schema.org/version/3.8/ext-health-lifesci.rdf](https://schema.org/version/3.8/ext-health-lifesci.rdf)
+- [https://schema.org/version/3.8/ext-meta.rdf](https://schema.org/version/3.8/ext-meta.rdf)
+- [https://schema.org/version/3.8/schema.rdf](https://schema.org/version/3.8/schema.rdf)
 
 # ATTRIBUTES
 
 ## `id`
 
-If this is set, it adds a `@id` to the ["json\_ld" in MooX::JSON\_LD](https://metacpan.org/pod/MooX::JSON_LD#json_ld).
+If this is set, it adds a `@id` to the ["json\_ld\_data"](#json_ld_data).
 
 ## `context`
 

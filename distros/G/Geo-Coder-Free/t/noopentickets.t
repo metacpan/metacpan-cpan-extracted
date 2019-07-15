@@ -15,12 +15,16 @@ NOBUGS: {
 			} elsif(my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => 'Geo-Coder-Free')}) {
 				ok($rc[0] == 200);
 				ok($rc[1] eq 'OK');
-				my @tickets = @{$rc[2]};
+				if(defined($rc[2])) {
+					my @tickets = @{$rc[2]};
 
-				foreach my $ticket(@tickets) {
-					diag($ticket->{id}, ': ', $ticket->{title}, ', broken since ', $ticket->{'broken_in'}[0]);
+					foreach my $ticket(@tickets) {
+						diag($ticket->{id}, ': ', $ticket->{title}, ', broken since ', $ticket->{'broken_in'}[0]);
+					}
+					ok(scalar(@tickets) == 0);
+				} else {
+					skip('No tickets have been raised', 1);
 				}
-				ok(scalar(@tickets) == 0);
 			} else {
 				diag("Can't connect to rt.cpan.org");
 				skip("Can't connect to rt.cpan.org", 3);

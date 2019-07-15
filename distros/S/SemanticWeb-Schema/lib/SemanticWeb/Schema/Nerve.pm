@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has branch => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Nerve - A common pathway for the electrochemical nerve impu
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -113,9 +113,9 @@ A sensory_unit should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::SuperficialAnatomy']>
-
 =item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
+
+=item C<InstanceOf['SemanticWeb::Schema::SuperficialAnatomy']>
 
 =back
 

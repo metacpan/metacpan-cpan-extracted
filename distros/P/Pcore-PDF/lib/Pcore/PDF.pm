@@ -1,9 +1,9 @@
-package Pcore::PDF v0.5.12;
+package Pcore::PDF v0.6.0;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
-use Pcore::Util::Data qw[to_json from_json];
-use Pcore::Util::Scalar qw[weaken is_plain_scalarref];
+use Pcore::Lib::Data qw[to_json from_json];
+use Pcore::Lib::Scalar qw[weaken is_plain_scalarref];
 
 const our $PAGE_SIZE => {
     A0        => '841 x 1189 mm',
@@ -259,19 +259,6 @@ sub _run_task ( $self, $task, $proc ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 276                  | * Link L<Pcore::Util::Result> on line 333 does not specify text                                                |
-## |      | 276                  | * Link L<Pcore::Util::Result> on line 343 does not specify text                                                |
-## |      | 276                  | * Link L<Pcore> on line 341 does not specify text                                                              |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 
@@ -330,7 +317,7 @@ Maximum number of princexml processes. Default value is C<< 4 >>.
 
 =item generate_pdf( $self, $html, $cb = undef )
 
-Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API result object, see L<Pcore::Util::Result> documentation for details.
+Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API result object, see L<Pcore::Lib::Result> documentation for details.
 
 =back
 
@@ -340,7 +327,7 @@ Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API
 
 =item L<Pcore>
 
-=item L<Pcore::Util::Result>
+=item L<Pcore::Lib::Result>
 
 =item L<https://www.princexml.com/|https://www.princexml.com/>
 

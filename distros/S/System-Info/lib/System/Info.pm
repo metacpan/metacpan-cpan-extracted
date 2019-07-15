@@ -3,7 +3,7 @@ package System::Info;
 use strict;
 use warnings;
 
-our $VERSION = "0.058";
+our $VERSION = "0.059";
 
 use base "Exporter";
 our @EXPORT_OK = qw( &sysinfo &sysinfo_hash &si_uname );
@@ -150,9 +150,83 @@ sub si_uname {
 
 __END__
 
+=head1 SEE ALSO
+
+There are more modules that provide system and/or architectural information.
+
+Where System::Info aims at returning the information that is useful for
+bug reports, some other modules focus on a single aspect (possibly with
+way more variables and methods than System::Info does supports), or are
+limited to use on a specific architecture, like Windows or Linux.
+
+Here are some of the alternatives and how to replace that code with what
+System::Info offers. Not all returned values will be exactly the same.
+
+=head2 Sys::Hostname
+
+ use Sys::Hostname;
+ say "Hostname: ", hostname;
+
+ ->
+
+ use System::Info;
+ my $si = System::Info->new;
+ say "Hostname: ", $si->host;
+
+Sys::Hostname is a CORE module, and will always be available.
+
+=head2 Unix::Processors
+
+ use Unix::Processors;
+ my $up = Unix::Processors->new;
+ say "CPU type : ", $up->processors->[0]->type;
+ say "CPU count: ", $up->max_physical;
+ say "CPU cores: ", $up->max_online;
+ say "CPU speed: ", $up->max_clock;
+
+ ->
+
+ use System::Info;
+ my $si = System::Info->new;
+ say "CPU type : ", $si->cpu;
+ say "CPU count: ", $si->ncpu;
+ say "CPU cores: ", $si->ncore;
+ say "CPU speed: ", $si->cpu =~ s{^.*\b([0-9.]+)\s*[A-Z]Hz.*}{$1}r;
+
+The number reported by max_physical is inaccurate for modern CPU's
+
+=head2 Sys::Info
+
+Sys::Info has a somewhat rigid configuration, which causes it to fail
+installation on e.g. (modern versions of) CentOS and openSUSE Tumbleweed.
+
+It aims at returning a complete set of information, but as I cannot
+install it on openSUSE Tumbleweed, I cannot test it and show the analogies.
+
+=head2 Sys::CPU
+
+ use Sys::CPU;
+ say "CPU type : ", Sys::CPU::cpu_type  ();
+ say "CPU count: ", Sys::CPU::cpu_count ();
+ say "CPU speed: ", Sys::CPU::cpu_clock ();
+
+ ->
+
+ use System::Info;
+ my $si = System::Info->new;
+ say "CPU type : ", $si->get_cpu;         # or ->cpu
+ say "CPU count: ", $si->get_core_count;  # or ->ncore
+ say "CPU speed: ", $si->get_cpu =~ s{^.*\b([0-9.]+)\s*[A-Z]Hz.*}{$1}r;
+
+The speed reported by Sys::CPU is the I<current> speed, and it will change
+from call to call. YMMV.
+
+Sys::CPU is not available on CPAN anymore, but you can still get is from
+BackPAN.
+
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2018, Abe Timmerman & H.Merijn Brand All rights reserved.
+(c) 2016-2019, Abe Timmerman & H.Merijn Brand All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

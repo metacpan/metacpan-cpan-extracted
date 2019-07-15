@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has number_of_beds => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::BedDetails - An entity holding detailed information about t
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -88,9 +88,9 @@ A type_of_bed should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::BedType']>
+
+=item C<Str>
 
 =back
 

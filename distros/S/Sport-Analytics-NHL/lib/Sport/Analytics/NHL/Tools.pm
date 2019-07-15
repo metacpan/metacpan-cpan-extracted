@@ -14,7 +14,6 @@ use List::Util qw(reduce sum);
 use POSIX qw(strftime);
 use Storable qw(store retrieve dclone);
 
-use BSON::OID;
 use Date::Parse;
 use Date::Format qw(time2str);
 use JSON;
@@ -32,6 +31,7 @@ use Sport::Analytics::NHL::DB;
 #use Sport::Analytics::NHL::Elo;
 use Sport::Analytics::NHL::Util qw(:debug :utils :file); # qw(:all);
 #use Sport::Analytics::NHL::Magick;
+use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'BSON::OID';
 
 use Data::Dumper;
 

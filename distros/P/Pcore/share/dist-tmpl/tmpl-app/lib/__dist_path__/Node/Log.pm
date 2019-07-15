@@ -1,7 +1,7 @@
 package <: $module_name ~ "::Node::Log" :>;
 
 use Pcore -class, -const, -sql;
-use Pcore::Util::Data qw[to_json];
+use Pcore::Lib::Data qw[to_json];
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
 with qw[<: $module_name ~ "::Node" :>];

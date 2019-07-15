@@ -50,12 +50,12 @@ namespace panda {
 
 template <typename UT>
 constexpr typename std::enable_if<std::is_unsigned<UT>::value, size_t>::type to_chars_maxsize (int base = 10) {
-    return std::ceil(std::numeric_limits<UT>::digits * (log(2) / log(base)));
+    return std::ceil(std::numeric_limits<UT>::digits * (std::log(2) / std::log(base)));
 }
 
 template <typename T>
 constexpr typename std::enable_if<!std::is_unsigned<T>::value, size_t>::type to_chars_maxsize (int base = 10) {
-    return std::ceil(std::numeric_limits<T>::digits * (log(2) / log(base)) + 1);
+    return std::ceil(std::numeric_limits<T>::digits * (std::log(2) / std::log(base)) + 1);
 }
 
 }

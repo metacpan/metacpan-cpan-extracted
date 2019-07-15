@@ -1,0 +1,175 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+
+=cut
+
+=head1 DESCRIPTION
+
+Let's assume the following C++ API:
+
+    struct PointRecipe13: public panda::Refcnt {
+        double x;
+        double y;
+        PointRecipe13(double xx, double yy): x{xx}, y{yy}{}
+    };
+
+    using PointRecipe13SP = panda::iptr<PointRecipe13>;
+
+    struct Shape13: public panda::Refcnt {
+        size_t point_count() const { return points.size(); }
+        PointRecipe13SP get_point(size_t idx) { return points.at(idx); }
+        void add_point(PointRecipe13SP pt) { points.push_back(pt); }
+    private:
+        std::vector<PointRecipe13SP> points;
+    };
+
+i.e. there is a C<Shape> class, which stores points; they are stored as pointers
+(with shared ownership). The pointers are needed to allow further C<Point>
+class extension, i.e. potentially allowing to use some derived class. (In the
+classical OOP-books points are stored I<by pointer>, i.e. ownership is
+transferred to the C<Shape> class completely; as it was previously explained
+this is not possible to have, then, the same point in Perl and in some C++
+container, because ownership is not shared).
+
+Let's assume that the common typemaps and xs-adapters are written for the both
+classes, e.g.:
+
+    namespace xs {
+        template <>
+        struct Typemap<PointRecipe13*> : TypemapObject<PointRecipe13*, PointRecipe13*, ObjectTypeRefcntPtr, ObjectStorageMGBackref> {
+            //                                                                                                      (1)
+            static std::string package () { return "MyTest::Cookbook::PointRecipe13"; }
+        };
+
+        template <>
+        struct Typemap<Shape13*> : TypemapObject<Shape13*, Shape13*, ObjectTypeRefcntPtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::Shape13"; }
+        };
+    }
+
+Let's forget for a moment that C<ObjectStorageMGBackref> storage policy is used
+(1) and assume that common C<ObjectStorageMG> is used there. Let's execute the
+following Perl test:
+
+    my $shape = MyTest::Cookbook::Shape13->new;
+    my $pt1 = MyTest::Cookbook::PointRecipe13->new(5, 10);
+    $shape->add_point($pt1);
+    my $pt1_back = $shape->get_point(0);
+    is $pt1_back->x, $pt1->x;
+    is $pt1_back->y, $pt1->y;
+    is $pt1, $pt1_back;
+
+It will give us the results:
+
+    ok 1
+    ok 2
+    not ok 3
+    #   Failed test at t/cookbook/recipe13.t line 30.
+    #          got: 'MyTest::Cookbook::PointRecipe13=SCALAR(0xdc53f8)'
+    #     expected: 'MyTest::Cookbook::PointRecipe13=SCALAR(0xdc54a0)'
+
+What happened here? The two Perl objects are equal, i.e. they have the
+same value, and actually they refer the same C++ object, but B<not identical>.
+This happens as C<xs::out> uses C<TypemapObject> without backrefs-support and
+new perl SV* wrapper is created on each call.
+
+Seems not a big deal, huh? Let's try to extend the point to let it stores
+arbitrary metainformation:
+
+    package MyTest::Cookbook::CustomPointRecipe13 {
+    use base qw/MyTest::Cookbook::PointRecipe13/;
+
+    sub new {
+        my ($class, $x, $y, $meta) = @_;
+        my $obj = $class->SUPER::new($x, $y);
+        XS::Framework::obj2hv($obj);
+        $obj->{meta} = $meta;
+        return $obj;
+    }
+
+    sub meta { return shift->{meta}; }
+
+    }
+
+and a simple test for it:
+
+    my $pt2 = MyTest::Cookbook::CustomPointRecipe13->new(6, 11, { direction => 'north'});
+    $shape->add_point($pt2);
+    my $pt2_back = $shape->get_point(1);
+    is $pt2_back->x, $pt2->x;
+    is $pt2_back->y, $pt2->y;
+    isa_ok($pt2_back, 'MyTest::Cookbook::CustomPointRecipe13');
+    is $pt2, $shape->get_point(1);
+
+
+Let's run it:
+
+    ok 4
+    ok 5
+    not ok 6 - An object of class 'MyTest::Cookbook::PointRecipe13' isa 'MyTest::Cookbook::CustomPointRecipe13'
+    #   Failed test 'An object of class 'MyTest::Cookbook::PointRecipe13' isa 'MyTest::Cookbook::CustomPointRecipe13''
+    #   at t/cookbook/recipe13.t line 37.
+    #     The object of class 'MyTest::Cookbook::PointRecipe13' isn't a 'MyTest::Cookbook::CustomPointRecipe13'
+    not ok 7
+    #   Failed test at t/cookbook/recipe13.t line 38.
+    #          got: 'MyTest::Cookbook::CustomPointRecipe13=HASH(0x3607b98)'
+    #     expected: 'MyTest::Cookbook::PointRecipe13=SCALAR(0x3607ef8)'
+
+Ooops! What happened? It seems, as if our derived point class has been downgraded
+to base point class, and layer of additional information has been erased. Despite
+the fact that C++ C<Shape> class does supports derived classes, it does not
+supports B<Perl> derived classes.
+
+To fix that situation, i.e. B<to keep Perl object type and data identity> the
+C<Backref> notion comes into play: it makes it possible to keep in derived
+C++ class the original Perl SV* and return it back on demand.
+
+To let backrefs work, the following requirements have to be met:
+
+1) C++ container should support to store derived classes.
+
+2) Typemap's storage policy should be C<ObjectStorageMGBackref>.
+
+3) The special derived B<C++ class> should be stored in C++ container.
+It should either inerit C<xs::Backref>, or just the derived class instance
+can be created on fly via C<xs::make_backref> helper function.
+
+Let's show full code for C<Point> xs-adapter.
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::PointRecipe13
+    PROTOTYPES: DISABLE
+
+    double PointRecipe13::x(SV* new_val = nullptr) : ALIAS(y = 1) {
+        double* val = nullptr;
+        switch(ix) {
+            case 1: val = &THIS->y; break;
+            default: val = &THIS->x; break;
+        }
+        if (new_val) {
+            *val = SvNV(new_val);
+        }
+        RETVAL = *val;
+    }
+
+    PointRecipe13* PointRecipe13::new(double x = 0, double y = 0) {
+        RETVAL = make_backref<PointRecipe13>(x, y);     // (2)
+    }
+
+The key point is (2), where it returns the special child class instance
+for C<Point>, which supports backrefs. After fixing it, all failed
+tests above start to pass.
+
+Please note, that usage of C<xs::make_backref> is not always possible,
+e.g. in case of virtual inheritance, when virtual base class does not
+has I<default constructor>: the helper just does not know how and what
+of arguments forward to it. In that case the class have to inherit from
+C<xs::Backref> and in the class destructor the C<Backref::dtor> must
+be invoked to release SV* wrapper; generally this cannot be done in
+in Backref destructor, as this can be I<too late> as C<this> pointer
+is no longer points to the original value, stored in Perl SV* wrapper.
+
+Short summary: to keep Perl object data and class identity, when it
+is moved to C++ container and back, L<XS::Framework> backrefs support should
+be used ( C<ObjectStorageMGBackref> storage policy B<and> derived class
+should inherit C<xs::Backref>).

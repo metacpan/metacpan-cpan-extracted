@@ -1,13 +1,17 @@
-package App::MonM::Checkit; # $Id: Checkit.pm 12 2014-09-23 13:16:47Z abalama $
+package App::MonM::Checkit; # $Id: Checkit.pm 80 2019-07-08 10:41:47Z abalama $
+use warnings;
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
-App::MonM::Checkit - App::MonM checkit functions
+App::MonM::Checkit - App::MonM checkit class
 
 =head1 VIRSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -15,45 +19,94 @@ Version 1.01
 
 =head1 DESCRIPTION
 
-App::MonM checkit functions
+App::MonM checkit class
 
-See C<README> file
+=head2 new
 
-=head1 FUNCTIONS
+    my $checker = new App::MonM::Checkit;
 
-=over 8
+Returns checker object
 
-=item B<readcount>
+=head2 check
 
-    my ($res,$err) = readcount( $count_config_node );
+    my $ostat = $checker->check({ ... });
 
-Function returns two values: result and error.
-Result ($res) may be: OK, SKIP or ERROR. 
-Error ($err) contains reason of errors.
+Performs checking of checkit-sources by checkit rules (checkit config sections)
 
-=item B<checkcount>
+Returns status: 0 - PASS; 1 - FAIL
 
-    my $trueorfalse = checkcount( $old1, $old2, $old3, $current_value );
+=head2 cleanup
 
-Returns 0 or 1. 1 - need run trigger.
+    my $self = $checker->cleanup;
 
-=item B<trigger>
+Flushes all working variables to defaults
 
-    my @rslt = trigger( $config,  @sequence );
+=head2 code
 
-@sequence -- array of hashes: ( {count, countdata, message}, ... )
+    my $code = $checker->code;
+    my $newcode = $checker->code(200);
 
-@rslt -- array of arrays: ( [count, type, to, message, status], ... )
+Sets and returns response code (rc)
 
-=item B<reqsimple>
+=head2 config
 
-    my $content = reqsimple( $url, $method, \$code, \$message );
+    my $conf = $checker->config;
 
-Function returns content from URL ($url) and two values: HTTP status code and HTTP status message.
+Returns Checkit config structure
 
-NOTE: code and message is references to scalar variables!!
+=head2 content
 
-=back
+    my $content = $checker->content;
+    my $newcontent = $checker->content("Foo Bar Baz");
+
+Sets and returns the content value
+
+=head2 error
+
+    my $error = $checker->error;
+    my $newerror = $checker->error("Blah-Blah-Blah");
+
+Sets and returns the error value
+
+=head2 message
+
+    my $message = $checker->message;
+    my $newmessage = $checker->message("Foo Bar Baz");
+
+Sets and returns the message value
+
+=head2 source
+
+    my $source = $checker->source;
+    my $newsource = $checker->source("http://foo.example.com");
+
+Sets and returns the source value
+
+=head2 status
+
+    my $status = $checker->status;
+    my $newstatus = $checker->status(1);
+
+Sets and returns the status value
+
+=head2 type
+
+    my $type = $checker->type;
+    my $newtype = $checker->type(1);
+
+Sets and returns the type value
+
+=head1 HISTORY
+
+See C<Changes> file
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+* none noted
 
 =head1 SEE ALSO
 
@@ -61,38 +114,41 @@ L<App::MonM>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+SerЕј Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.01';
+$VERSION = '1.02';
+
+use Class::C3::Adopt::NEXT;
+use CTK::ConfGenUtil;
+use CTK::TFVals qw/ :ALL /;
+
+use base qw/
+        App::MonM::Checkit::HTTP
+        App::MonM::Checkit::Command
+        App::MonM::Checkit::DBI
+    /;
 
 use constant {
-    TRUERX  => qr/^\s*(ok|yes)/i, # Что такое хорошо
-    FALSERX => qr/^\s*(error|fault|no)/i, # Что такое плохо
-    SIDPFX  => 'DBI:Oracle:',
-    SIDDFLT => 'TEST',
-    SQLDFLT => 'SELECT \'OK\' AS OK FROM DUAL',
-    SMSSBJ  => 'MONM CHECKIT REPORT',
+    TRUERX      => qr/^\s*(1|ok|pass|yes|true)/i, # True regexp
+    FALSERX     => qr/^\s*(0|error|fail|no|false)/i, # False regext
+    ORDERBY     => "true,false",
+    TARGET      => "status",
+    FAIL        => 0,
+    PASS        => 1,
     QRTYPES => {
             ''  => sub { qr{$_[0]} },
             x   => sub { qr{$_[0]}x },
@@ -113,308 +169,142 @@ use constant {
     },
 };
 
-use base qw/Exporter/;
-our @EXPORT = qw(
-        readcount checkcount trigger reqsimple
-    );
-
-use CTK::DBI;
-use CTK::ConfGenUtil;
-use URI;
-use LWP::UserAgent();
-use HTTP::Request();
-use CTK::Util;
-
-sub readcount {
-    # Выполнение шага (чтение данных). 
-    # На вход - структура (нода) на выходе массив: результат и ошибка
-    my $cdata = shift || {};
-    my ($res,$err) = ('ERROR', 'Undefined error');
-    my $result = ''; # Значение которое сравнивается с "что такое хорошо, а что такое плохо"
-    my $type    = lc(value($cdata, 'type') || '');
-    my $enabled = value($cdata, 'enable') || 0;
-    my $truerx  = _qrreconstruct(value($cdata, 'istrue'));
-    my $falserx = _qrreconstruct(value($cdata, 'isfalse'));
-    my $orderby = value($cdata, 'orderby') || 'true,false';
-    return ('SKIP', 'Skipped because of "Enable" flag is off') unless $enabled;
-    
-    # Установка атрибутов
-    my $attr = hash($cdata, 'attr');
-    my $t_attr = _get_attr($cdata) || {};
-    foreach my $ak (keys %$t_attr) {
-        $attr->{$ak} = $t_attr->{$ak} if exists($t_attr->{$ak});
-    }
-    
-    # Выполнение задач
-    if ($type eq 'dbi' or $type eq 'oracle') {
-        my $dsn = value($cdata, 'dsn') || '';
-        my $sid = value($cdata, 'sid') || SIDDFLT;
-        $dsn = SIDPFX.$sid if $type eq 'oracle';
-        my $user = value($cdata, 'user') || '';
-        my $password = value($cdata, 'password') || '';
-        my $sql = value($cdata, 'sql') || SQLDFLT;
-        my $cto = value($cdata, 'connect_to');
-        my $rto = value($cdata, 'request_to');
-        
-        # Корректировка атрибутов для нужд DBI
-        $attr->{PrintError} = 0 unless exists($attr->{PrintError});
-        
-        # Коннект к БД
-        my $db = new CTK::DBI(
-            -dsn        => $dsn, 
-            -user       => $user, 
-            -pass       => $password, 
-            -connect_to => $cto, 
-            -request_to => $rto, 
-            -attr       => $attr,
-        );
-        return ('ERROR', "Can't connect to \"$dsn\": ".($DBI::errstr || '')) unless $db && $db->{dbh};
-        my $sth = $db->execute($sql);
-        return ('ERROR', "Can't Preparing/Executing \"$sql\": ".($DBI::errstr || '')) unless $sth;
-        my @resa = $sth->fetchrow_array;
-        #use Data::Dumper; ::debug('!!!',Dumper(@resa));
-        $result = join("", @resa);
-        $sth->finish;
-        return ('ERROR', "Can't fetching content from \"$dsn\"") unless (defined $result);
-    } elsif ($type eq 'command') {
-        my $command = value($cdata, 'command') || '';
-        if ($command) {
-            $result = execute($command) || '';
-            #::debug($result);
-        } else {
-            return ('ERROR', "Command not defined!");
-        }
-    } else {
-        my $url = value($cdata, 'url') || '';
-        return ('ERROR', "URL not defined!") unless $url;
-        my $errcode = '';
-        my $errstatus = '';
-        my $content = reqsimple( $url, uc(value($cdata, 'method') || 'GET'), \$errcode, \$errstatus );
-        my $ht = lc(value($cdata, 'target') || value($cdata, 'httptarget') || '');
-        if ($ht eq 'code') {
-            $result = $errcode;
-        } elsif ($ht eq 'status') {
-            $result = $errstatus;
-        } else {
-            return ('ERROR', "Can't get content from \"$url\": $errstatus") unless (defined $content);
-            $result = $content;
-        }
-    }
-
-    # Cекция проверки "что такое хорошо, а что такое плохо"
-    my $rtt = (defined($truerx) && ref($truerx)) ? ref($truerx) : 'String';
-    my $rtf = (defined($falserx) && ref($falserx)) ? ref($falserx) : 'String';
-    if (($orderby =~ /false\s*\,\s*true/i) || ($orderby =~ /desc/i)) {
-        # Обратный порядок
-        if (defined $falserx) {
-            $res = _cmp($result, $falserx, [qw/ERROR OK/]);
-            $err = "RESULT == FALSE (DEC ORDERED) [AS $rtf]" if $res eq 'ERROR';
-        } elsif (defined $truerx) {
-            $res = _cmp($result, $truerx, [qw/OK ERROR/]);
-            $err = "RESULT != TRUE (DEC ORDERED) [AS $rtt]" if $res eq 'ERROR';
-        } else {
-            $res = _cmp($result, FALSERX, [qw/ERROR OK/]);
-            $err = "RESULT == FALSE-DEFAULT (DEC ORDERED) [AS Regexp (DEFAULT)]" if $res eq 'ERROR';
-        }
-    } else {
-        # прямой порядок
-        if (defined $truerx) {
-            $res = _cmp($result, $truerx, [qw/OK ERROR/]);
-            $err = "RESULT != TRUE (ASC ORDERED) [AS $rtt]" if $res eq 'ERROR';
-        } elsif (defined $falserx) {
-            $res = _cmp($result, $falserx, [qw/ERROR OK/]);
-            $err = "RESULT == FALSE (ASC ORDERED) [AS $rtf]" if $res eq 'ERROR';
-        } else {
-            $res = _cmp($result, TRUERX, [qw/OK ERROR/]);
-            $err = "RESULT != TRUE-DEFAULT (ASC ORDERED) [AS Regexp (DEFAULT)]" if $res eq 'ERROR';
-        }
-    }
-    $err = '' if $res eq 'OK';
-    
-    return ($res,$err);
+sub new {
+    my $class = shift;
+    my %args = @_;
+    my $self = bless {%args}, $class;
+    return $self->cleanup;
 }
-sub checkcount {
-    # проверка данных (анализ). Нужно ли срабатывать триггеру?
-    my @inp = @_;
-    my $vcorr   = shift;
-    my $v0      = shift;
-    my $v1      = shift;
-    my $vok     = shift;
+sub cleanup {
+    my $self = shift;
+    $self->{config}  = {}; # Config
+    $self->{status}  = undef; # 1 - Ok; 0 - Error
+    $self->{error}   = ''; # Error message
+    $self->{code}    = undef; # 200
+    $self->{type}    = undef; # http/dbi/command
+    $self->{source}  = ''; # URL/DSN/Command
+    $self->{message} = ''; # Message string or error
+    $self->{content} = ''; # Content data or STDOUT data
+    return $self;
+}
+sub config {
+    my $self = shift;
+    return $self->{config};
+}
+sub status {
+    my $self = shift;
+    my $v = shift;
+    $self->{status} = $v if defined $v;
+    return $self->{status};
+}
+sub error {
+    my $self = shift;
+    my $v = shift;
+    $self->{error} = $v if defined $v;
+    return $self->{error};
+}
+sub code {
+    my $self = shift;
+    my $v = shift;
+    $self->{code} = $v if defined $v;
+    return $self->{code};
+}
+sub type {
+    my $self = shift;
+    my $v = shift;
+    $self->{type} = $v if defined $v;
+    return $self->{type};
+}
+sub source {
+    my $self = shift;
+    my $v = shift;
+    $self->{source} = $v if defined $v;
+    return $self->{source};
+}
+sub message {
+    my $self = shift;
+    my $v = shift;
+    $self->{message} = $v if defined $v;
+    return $self->{message};
+}
+sub content {
+    my $self = shift;
+    my $v = shift;
+    $self->{content} = $v if defined $v;
+    return $self->{content};
+}
+sub check {
+    my $self = shift;
+    my $conf = shift;
+    my $status = FAIL;
+    $self->cleanup;
+    $self->{config} = $conf if ref($conf) eq 'HASH';
+    $self->type(lc(value($conf, 'type') || 'http'));
+    $self->maybe::next::method();
 
-    # 0-0-0   -- PROBLEM
-    # 0-0-1   -- OK?
-    # 1-1-1   -- OK
-    # 1-1-0   -- PROBLEM?
-    # 0-1-0   -- CORR
-    # 0-0-1-1 -- ALARM
-    # 1-0-1-1 -- CORR
-    my $inps = " [".join("-",@inp)."]";
-    
-    my $stat = 0;
-    if ($v1 != $vok) {
-        # Ситуация: произошло изменение счетчика (0-0-1)
-        if (($v0 == $v1) || ($v0 == $vok)) {
-            # Ситуация: Было разовое "помешательство" (0-1-0)
-            #debug "   STATUS CORR: 0-1-0 / 1-0-1", $inps;
+    # Check response
+    my $true_regexp = _qrreconstruct(value($conf, 'istrue'));
+    my $false_regexp= _qrreconstruct(value($conf, 'isfalse'));
+    my $orderby     = value($conf, 'orderby') || ORDERBY;
+    my $target      = lc(value($conf, 'target') || TARGET);
+    my $result;
+    if ($target eq 'code') { $result = $self->code } # code
+    elsif ($target eq 'message') { $result = $self->message } # message
+    elsif ($target eq 'content') { $result = $self->content } # content
+    else { $result = $self->status } # status
+    $result //= '';
+
+    # Check result
+    my $rtt = (defined($true_regexp) && ref($true_regexp)) ? ref($true_regexp) : 'String';
+    my $rtf = (defined($false_regexp) && ref($false_regexp)) ? ref($false_regexp) : 'String';
+    if (($orderby =~ /false\s*\,\s*true/i) || ($orderby =~ /desc/i)) { # DESC
+        if (defined $false_regexp) {
+            $status = _cmp($result, $false_regexp, [FAIL, PASS]);
+            $self->error("RESULT == FALSE (DEC ORDERED) [AS $rtf]") if !$status && !$self->error;
+        } elsif (defined $true_regexp) {
+            $status = _cmp($result, $true_regexp, [PASS, FAIL]);
+            $self->error("RESULT != TRUE (DEC ORDERED) [AS $rtt]") if !$status && !$self->error;
         } else {
-            # Ситуация: Ситуация изменения счетчика подтверждается, аларм! (0-1-1)
-            #debug "   STATUS ALARM1: $v0 -> $vok: ", $vok ? 'OK' : 'ERROR', $inps;
-            $stat = 1;
+            $status = _cmp($result, FALSERX, [FAIL, PASS]);
+            $self->error("RESULT == FALSE-DEFAULT (DEC ORDERED) [AS Regexp (DEFAULT)]") if !$status && !$self->error;
         }
-    } else {
-        # Ситуация: произошло подтверждение изменения счетчика (0-1-1) или не произошло ничего
-        if (($v0 != $v1) && ($v1 == $vok) && ($vcorr != $vok)) {
-            # Ситуация: Ситуация изменения счетчика подтверждается, аларм! (0-0-1-1)
-            #debug "   STATUS ALARM2: $v0 -> $vok: ", $vok ? 'OK' : 'ERROR', $inps;
-            $stat = 1;
+    } else { # ASC
+        if (defined $true_regexp) {
+            $status = _cmp($result, $true_regexp, [PASS, FAIL]);
+            $self->error("RESULT != TRUE (ASC ORDERED) [AS $rtt]") if !$status && !$self->error;
+        } elsif (defined $false_regexp) {
+            $status = _cmp($result, $false_regexp, [FAIL, PASS]);
+            $self->error("RESULT == FALSE (ASC ORDERED) [AS $rtf]") if !$status && !$self->error;
         } else {
-            #debug "   STATUS OK: 1-1-1", $inps if $vok;
-            #debug "   STATUS PROBLEM: 0-0-0", $inps unless $vok;
+            $status = _cmp($result, TRUERX, [PASS, FAIL]);
+            $self->error("RESULT != TRUE-DEFAULT (ASC ORDERED) [AS Regexp (DEFAULT)]") if !$status && !$self->error;
         }
     }
-    
-    return $stat; # 0 - триггер срабатывать недолжен / 1 - триггер срабатывать должен !!! 
+    return $status;
 }
-sub trigger {
-    my $config   = shift || {}; # Конфигурация
-    my @sequence = @_; # ВХОД  ( {count, countdata, message}, ... )
-    my @rslt;          # ВЫХОД ( [count, type, to, message, status], ... )
 
-    foreach my $act (@sequence) {
-        my $name    = $act->{count} || '';     # Имя счетчика
-        my $data    = $act->{countdata} || {}; # Данные конфигурации, нода (структура)
-        my $message = $act->{message} || '';   # Сообщение для 
-        
-        # Принимаем секцию данных
-        my $smsgw = value($data, 'smsgw') || value($config, 'smsgw') || '';
-        my $emailalerts = array($data,'triggers/emailalert');
-        my $smsalerts = array($data,'triggers/smsalert');
-        my $commands = array($data,'triggers/command');
-        
-        # Отправляем сначала письма
-        foreach my $email (@$emailalerts) {
-            my $sent = sendmail(
-                -to          => $email,
-                -cc          => value($config, 'sendmail/cc'),
-                -from        => value($config, 'sendmail/from'),
-                -smtp        => value($config, 'sendmail/smtp'),
-                -sendmail    => value($config, 'sendmail/sendmail'),
-                -flags       => value($config, 'sendmail/flags'),
-                -subject     => $message,
-                -message     => sprintf(""
-                        ."Count name  : %s\n"
-                        ."Message     : %s\n"
-                        ."\n---\n"
-                        ."SMS GateWay : %s\n"
-                        ."SMS         : %s\n"
-                        ."E-Mail      : %s\n"
-                        ."commands    : \n%s\n",
-                        
-                        $name, $message, $smsgw,
-                        join(", ", @$smsalerts),
-                        join(", ", @$emailalerts),
-                        join("\n", @$commands),
-                    ),
-            );
-
-            push @rslt, [
-                    $name,
-                    'email',
-                    $email,
-                    $message,
-                    ($sent ? 'SENT' : 'ERROR'),
-                ];
-        }
-        
-        # Теперь отправляем SMS
-        foreach my $phone (@$smsalerts) {
-            my $smss = '';
-            if ($smsgw) {
-                my $cmd = dformat($smsgw, {
-                        PHONE       => $phone,
-                        NUM         => $phone,
-                        TEL         => $phone,
-                        PHONE       => $phone,
-                        NUM         => $phone,
-                        NUMBER      => $phone,
-                        SUBJECT     => SMSSBJ,
-                        SUBJ        => SMSSBJ,
-                        MSG         => $message,
-                        MESSAGE     => $message,
-                    });
-                my $sct = execute($cmd) || '';
-                $sct =~ s/\r*\n/ /;
-                $smss = $sct || 'SENT';
-            } else {
-                $smss = "ERROR: SMSGW UNDEFINED";
-            }
-            push @rslt, [
-                    $name,
-                    'sms',
-                    $phone,
-                    $message,
-                    $smss,
-                ];
-        }
-        
-        # Теперь выполняем команду
-        foreach my $acmd (grep {$_} @$commands) {
-            my $cmd = dformat($acmd, {
-                    SUBJECT     => SMSSBJ,
-                    SUBJ        => SMSSBJ,
-                    MSG         => $message,
-                    MESSAGE     => $message,
-                });
-            my $cct = execute($cmd) || '';
-            $cct =~ s/\r*\n/ /;
-            push @rslt, [
-                    $name,
-                    'command',
-                    $cmd,
-                    $message,
-                    ($cct || 'DONE'),
-                ];
-        }
-    }
-
-    return [@rslt];
-}
-sub reqsimple {
-    my $url = shift || '';
-    my $meth = shift || 'GET';
-    my $errref = shift; # Код
-    my $msgref = shift; # Сообщение
-    
-    my $ua = LWP::UserAgent->new;  # we create a global UserAgent object
-    $ua->agent(__PACKAGE__."/$VERSION");
-    $ua->env_proxy;
-    my $request = HTTP::Request->new(uc($meth) => new URI($url));
-    my $response = $ua->request($request);
-    my $sc = $response->code || 0;
-    my $sl = $response->status_line || '';
-    
-    $$errref = $sc if $errref && ref($errref) eq 'SCALAR';
-    $$msgref = $sl if $msgref && ref($msgref) eq 'SCALAR';
-        
-    return $response->decoded_content if $response->is_success;
-    return undef;
-}
-sub _get_attr {
-    my $in = shift;
-    my $attr = array($in => "set");
-    my %attrs;
-    foreach (@$attr) {
-        $attrs{$1} = $2 if $_ =~ /^\s*(\S+)\s+(.+)$/;
-    }
-    #if ($in && ref($in) eq 'HASH') { $in->{attr} = {%attrs} } 
-    return {%attrs};
+sub _qrreconstruct {
+    # Returns regular expression (QR)
+    # Gets from YAML::Type::regexp of YAML::Types
+    # To input:
+    #    !!perl/regexp (?i-xsm:^\s*(error|fault|no))
+    # Translate to:
+    #    qr/^\s*(error|fault|no)/i
+    my $v = shift;
+    return undef unless defined $v;
+    return $v unless $v =~ /^\s*\!\!perl\/regexp\s*/i;
+    $v =~ s/\s*\!\!perl\/regexp\s*//i;
+    return qr{$v} unless $v =~ /^\(\?([\^\-xism]*):(.*)\)\z/s;
+    my ($flags, $re) = ($1, $2);
+    $flags =~ s/-.*//;
+    $flags =~ s/^\^//;
+    my $sub = QRTYPES->{$flags} || sub { qr{$_[0]} };
+    return $sub->($re);
 }
 sub _cmp {
-    # Сравнивалка
-    my $s = shift || ''; # текст
-    my $x = shift || ''; # регулярка
-    my $r = shift || ['OK', 'ERROR']; # выбор [OK, ERROR]
-    
+    my $s = shift || ''; # Text
+    my $x = shift || ''; # Regext
+    my $r = shift || [PASS, FAIL]; # Select [OK, ERROR]
     if (ref($x) eq 'Regexp') {
         return $r->[0] if $s =~ $x;
     } else {
@@ -422,26 +312,7 @@ sub _cmp {
     }
     return $r->[1];
 }
-sub _qrreconstruct {
-    # Возвращает регулярное выражение (QR-строку)
-    # Функция позаимствованая из YAML::Type::regexp пакета YAML::Types, немного переделанная для 
-    # адаптации нужд!!
-    # На вход подается примерно следующее:
-    #    !!perl/regexp (?i-xsm:^\s*(error|fault|no))
-    # это является регуляркой вида:
-    #    qr/^\s*(error|fault|no)/i
-    my $node = shift;
-    return undef unless defined $node;
-    return $node unless $node =~ /^\s*\!\!perl\/regexp\s*/i;
-    $node =~ s/\s*\!\!perl\/regexp\s*//i;
-    return qr{$node} unless $node =~ /^\(\?([\^\-xism]*):(.*)\)\z/s;
-    my ($flags, $re) = ($1, $2);
-    $flags =~ s/-.*//;
-    $flags =~ s/^\^//;
-    my $sub = QRTYPES->{$flags} || sub { qr{$_[0]} };
-    return $sub->($re);
-}
+
 1;
+
 __END__
-
-

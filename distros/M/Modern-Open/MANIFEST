@@ -1,10 +1,12 @@
-Modern/Open.pm
+lib/Modern/Open.pm
 Changes
-Makefile.PL
-pmake.bat
+LICENSE
 MANIFEST
-README
+META.json
 META.yml
+Makefile.PL
+README
+pmake.bat
 t/001_open.t
 t/002_open.t
 t/003_open.t
@@ -14,3 +16,4 @@ t/006_sysopen.t
 t/007_pipe.t
 t/008_socket.t
 t/009_accept.t
+t/2001_podtest.t

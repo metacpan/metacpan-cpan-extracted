@@ -1,3 +1,22 @@
-0.001   2017-06-17 (PERLANCAR) (unreleased)
+0.003   2019-06-20 (PERLANCAR)
+
+	- [ux] Add schemas: date::dow_nums, date::month_nums.
+
+
+0.002   2019-06-20 (PERLANCAR)
+
+	- [bugfix] Derp, for coerce rule from day-of-week name to number,
+	  Monday=1 not Sunday=1 since we're following DateTime's definition.
+
+
+0.002   2019-06-20 (PERLANCAR)
+
+        - Add coerce rule for date::month_num: str_convert_en_month_name_to_num
+          (from English month name).
+
+        - Add schemas: date::dow_num, date::dow_name::en.
+
+
+0.001   2017-06-17 (PERLANCAR)
 
         - First release.

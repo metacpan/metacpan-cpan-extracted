@@ -1,0 +1,31 @@
+---
+abstract: 'Framework for building C++ XS modules with shared code, typemaps and C++ perl API.'
+author:
+  - unknown
+build_requires:
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Simple: '0.96'
+configure_requires:
+  CPP::panda::lib: v1.2.1
+  XS::Install: v1.2.3
+  next::XS: v1.0.4
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XS-Framework
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CPP::panda::lib: v1.2.1
+  XS::Install: v1.2.3
+  next::XS: v1.0.4
+  perl: '5.018000'
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

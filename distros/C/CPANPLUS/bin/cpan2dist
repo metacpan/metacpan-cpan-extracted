@@ -241,8 +241,8 @@ $cb->reload_indices() if $opts->{'flushcache'};
 
         for my $name ( keys %$href ) {
             my $obj = $cb->parse_module( module => $name ) or (
-                warn "Cannot make a module object out of ".
-                        "'$name' -- skipping\n",
+                warn("Cannot make a module object out of ".
+                        "'$name' -- skipping\n"),
                 next );
 
             if( my $pat = ignore_me( $obj ) ) {

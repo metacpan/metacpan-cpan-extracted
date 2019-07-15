@@ -1,8 +1,10 @@
 use strict;
 use warnings;
 
+use 5.014;
+
 package Dist::Zilla::PluginBundle::WCS;
-$Dist::Zilla::PluginBundle::WCS::VERSION = '0.002';
+$Dist::Zilla::PluginBundle::WCS::VERSION = '0.003';
 # ABSTRACT: WCS distribution build
 
 use Moose;
@@ -11,7 +13,6 @@ with
   'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover',
   'Dist::Zilla::Role::PluginBundle::Config::Slicer';
-
 
 
 use Dist::Zilla::PluginBundle::Basic;
@@ -25,7 +26,7 @@ sub configure {
         'Git::NextVersion',
         'License',
         [ CopyFilesFromBuild => { copy             => 'LICENSE', } ],
-        [ GatherDir          => { exclude_filename => 'LICENSE', } ],
+        [ 'Git::GatherDir'   => { exclude_filename => 'LICENSE', } ],
         [
             PkgVersion => {
                 die_on_existing_version => 1,
@@ -61,19 +62,28 @@ sub configure {
           GithubMeta
           MetaConfig
           MetaJSON
+          MinimumPerlFast
           PodWeaver
           /,
         [
             ReadmeAnyFromPod => {
-                type     => 'pod',
-                filename => 'README.pod',
+                type     => 'markdown',
+                filename => 'README.md',
                 location => 'root',
             }
         ],
         qw/
           TaskWeaver
           AutoPrereqs
+          /,
+        [
+            TravisYML => {
+                build_branch => '/^release\/.*/'
+            }
+        ],
+        qw/
           MetaTests
+          TravisCI::StatusBadge
           Test::ChangeHasContent
           Test::NoTabs
           /,
@@ -95,7 +105,7 @@ sub configure {
         [
             'Git::CommitBuild' => {
                 branch          => '',
-                release_branch  => 'release',
+                release_branch  => 'release/%b',
                 release_message => 'Build release of %v (on %b)'
             }
         ],
@@ -105,6 +115,7 @@ sub configure {
           /,
     );
 }
+
 
 __PACKAGE__->meta->make_immutable;
 no Moose;
@@ -123,7 +134,7 @@ Dist::Zilla::PluginBundle::WCS - WCS distribution build
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -134,7 +145,7 @@ This is the plugin bundle that WCS uses.  It is equivalent to:
   [CopyFilesFromBuild]
   copy = LICENSE
 
-  [GatherDir]
+  [Git::GatherDir]
   exclude_filename = LICENSE
 
   [PkgVersion]
@@ -147,8 +158,8 @@ This is the plugin bundle that WCS uses.  It is equivalent to:
 
   [@Git]
   remotes_must_exist = 0
-  push_to = 'origin :'
-  push_to = 'backup :'
+  push_to = 'origin'
+  push_to = 'backup'
 
   [@Filter]
   -bundle = @Basic
@@ -161,19 +172,24 @@ This is the plugin bundle that WCS uses.  It is equivalent to:
   [MetaConfig]
   [MetaYAML]
   [MetaJSON]
+  [MinimumPerlFast]
   [PodWeaver]
   [ReadmeAnyFromPod
-  type = pod
-  filename = README.pod
+  type = markdown
+  filename = README.md
   location = root
 
   [AutoPrereqs]
+  [TravisYML]
+  build_release = /^release\/.*/
+
   [MetaTests]
+  [TravisCI::StatusBadge]
   [Test::ChangesHasContent]
   [Test::NoTabs]
   [Test::EOL]
   trailing_whitespace = 1
-  all_resons = 1
+  all_reasons = 1
 
   [Test::Compile]
   [PodSyntaxTests]
@@ -184,15 +200,13 @@ This is the plugin bundle that WCS uses.  It is equivalent to:
   [Test::Kwalitee]
   [Git::CommitBuild]
   branch =
-  release_branch = release
+  release_branch = release/%b
   release_message = Build release of %v (on %b)
 
   [TestRelease]
   [ConfirmRelease]
 
-=head1 FUNCTIONS
-
-=head2 configure
+=for Pod::Coverage   configure
 
 =head1 AUTHOR
 
@@ -204,5 +218,11 @@ This software is copyright (c) 2019 by William C Scherz III.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mohammad S Anwar
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =cut

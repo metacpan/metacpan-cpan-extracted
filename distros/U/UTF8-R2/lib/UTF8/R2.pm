@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 $VERSION = $VERSION;
 
 use strict;
@@ -19,35 +19,35 @@ BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use Carp ();
 use Symbol ();
 
-my %utf8_codepoint = ();
-$utf8_codepoint{'RFC2279'} = q{(?>
-    [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
-    [\xC2-\xDF][\x80-\xBF]                       |
-    [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
-    [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
-    [\x00-\xFF]
-)};
-$utf8_codepoint{'RFC3629'} = q{(?>
-    [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
-    [\xC2-\xDF][\x80-\xBF]                       |
-    [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
-    [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
-    [\xED-\xED][\x80-\x9F][\x80-\xBF]            |
-    [\xEE-\xEF][\x80-\xBF][\x80-\xBF]            |
-    [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
-    [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
-    [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
-    [\x00-\xFF]
-)};
-for (sort keys %utf8_codepoint) {
-    $utf8_codepoint{$_} =~ s/[ \r\n]//g;
-}
+my %utf8_codepoint = (
+#
+    'RFC2279' => qr{(?>
+        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    )}x,
+#
+    'RFC3629' => qr{(?>
+        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
+        [\xED-\xED][\x80-\x9F][\x80-\xBF]            |
+        [\xEE-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    )}x,
+);
 
 # /./ [\b] \d \h \s \v \w
 my $x =
     ($^X =~ /jperl(\.exe)?\z/i) && (`$^X -v` =~ /SJIS version/) ?
     q{(?>[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC]|[\x00-\xFF])} : # debug tool using JPerl(SJIS version)
-    $utf8_codepoint{'RFC2279'};
+    $utf8_codepoint{'RFC3629'};
 my $bare_b = '\x08';
 my $bare_d = '0123456789';
 my $bare_h = '\x09\x20';
@@ -147,7 +147,7 @@ sub UTF8::R2::lc (;$) {
 }
 
 sub UTF8::R2::lcfirst (;$) {
-    if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/)) {
+    if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/s)) {
         return UTF8::R2::lc($1) . $2;
     }
     else {
@@ -180,8 +180,8 @@ sub UTF8::R2::qr ($) {
 #
     my @after_subregex = ();
     while ($before_regex =~ s{ \A
-        (?> \[ (?: (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\$x) | $x )+? \] ) |
-                   (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\$x) | $x
+        (?> \[ (?: (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\c[\x00-\xFF]) | (?>\\$x) | $x )+? \] ) |
+                   (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\c[\x00-\xFF]) | (?>\\$x) | $x
     }{}x) {
         my $before_subregex = $&;
 #
@@ -195,7 +195,7 @@ sub UTF8::R2::qr ($) {
                 # \x{unicode_hex}
                 if (($] =~ /\A5\.006/) and (my($unicode_by_hex) = $before_subclass =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
                     my $unicode = hex $unicode_by_hex;
-                    if (0) {}
+                    if (0) { }
                     elsif ($unicode <     0x80) { push @sbcs, pack('U0C*',                                                                   $unicode          ) }
                     elsif ($unicode <    0x800) { push @mbcs, pack('U0C*',                                            $unicode>>6     |0xC0, $unicode&0x3F|0x80) }
                     elsif ($unicode <  0x10000) { push @mbcs, pack('U0C*',                    $unicode>>12     |0xE0, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
@@ -243,7 +243,7 @@ sub UTF8::R2::qr ($) {
         # \x{unicode_hex}
         elsif (($] =~ /\A5\.006/) and (my($unicode_by_hex) = $before_subregex =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
             my $unicode = hex $unicode_by_hex;
-            if (0) {}
+            if (0) { }
             elsif ($unicode <     0x80) { push @after_subregex, pack('U0C*',                                                                   $unicode          ) }
             elsif ($unicode <    0x800) { push @after_subregex, pack('U0C*',                                            $unicode>>6     |0xC0, $unicode&0x3F|0x80) }
             elsif ($unicode <  0x10000) { push @after_subregex, pack('U0C*',                    $unicode>>12     |0xE0, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
@@ -251,7 +251,7 @@ sub UTF8::R2::qr ($) {
             else { Carp::confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
         }
 #
-        # \any or .
+        # \any or /./
         elsif ($before_subregex eq '.')  { push @after_subregex, ($modifiers =~ /s/) ? $x : "(?:(?!\\n)$x)"                    }
         elsif ($before_subregex eq '\B') { push @after_subregex, "(?:(?<![$bare_w])(?![$bare_w])|(?<=[$bare_w])(?=[$bare_w]))" }
         elsif ($before_subregex eq '\D') { push @after_subregex, "(?:(?![$bare_d])$x)"                                         }
@@ -267,7 +267,22 @@ sub UTF8::R2::qr ($) {
         elsif ($before_subregex eq '\s') { push @after_subregex, "[$bare_s]"                                                   }
         elsif ($before_subregex eq '\v') { push @after_subregex, "[$bare_v]"                                                   }
         elsif ($before_subregex eq '\w') { push @after_subregex, "[$bare_w]"                                                   }
-        else                             { push @after_subregex, $before_subregex                                              }
+
+        # quantifiers ? + * {n} {n,} {n,m}
+        elsif ($before_subregex =~ /\A[?+*{]\z/) {
+            if    (0)                                                      { }
+            elsif ($after_subregex[-1] =~ /\A \\c [\x00-\xFF]        \z/x) { } # \c) \c} \c] \cX
+            elsif ($after_subregex[-1] =~ /\A \\  [\x00-\xFF]        \z/x) { } # \) \} \] \" \0 \1 \D \E \F \G \H \K \L \N \Q \R \S \U \V \W \\ \a \d \e \f \h \l \n \r \s \t \u \v \w
+            elsif ($after_subregex[-1] =~ /\A     [\x00-\xFF]        \z/x) { } # (a) a{1} [a] a . \012 \x12 \o{12} \g{1}
+            elsif ($after_subregex[-1] =~ /       [\x00-\xFF] [)}\]] \z/x) { } # (any) any{1} [any]
+            else {                                                             # MBCS
+                $after_subregex[-1] = '(?:' . $after_subregex[-1] . ')';
+            }
+            push @after_subregex, $before_subregex;
+        }
+
+        # else
+        else { push @after_subregex, $before_subregex }
     }
 #
     my $after_regex = join '', @after_subregex;
@@ -393,8 +408,8 @@ sub UTF8::R2::tr ($$$;$) {
             }
 #
             # tr/ABC/12/ makes %tr = ('A'=>'1','B'=>'2','C'=>'2',);
-            elsif (defined $replacement[$#replacement] and ($replacement[$#replacement] ne '')) {
-                $tr{$search[$i]} = $replacement[$#replacement];
+            elsif (defined $replacement[-1] and ($replacement[-1] ne '')) {
+                $tr{$search[$i]} = $replacement[-1];
             }
 #
             # tr/ABC// makes %tr = ('A'=>'A','B'=>'B','C'=>'C',);
@@ -426,15 +441,15 @@ sub UTF8::R2::tr ($$$;$) {
                     if (exists $modifier{d}) {
                     }
 #
-                    elsif (defined $replacement[$#replacement]) {
+                    elsif (defined $replacement[-1]) {
 #
                         # /s modifier works here
-                        if (defined($last_transliterated) and ($replacement[$#replacement] eq $last_transliterated)) {
+                        if (defined($last_transliterated) and ($replacement[-1] eq $last_transliterated)) {
                         }
 #
                         # tr/// works here
                         else {
-                            $replaced .= ($last_transliterated = $replacement[$#replacement]);
+                            $replaced .= ($last_transliterated = $replacement[-1]);
                         }
                     }
                     $tr++;
@@ -457,8 +472,8 @@ sub UTF8::R2::tr ($$$;$) {
                     }
 #
                     # tr/// works here
-                    elsif (defined $replacement[$#replacement]) {
-                        $replaced .= $replacement[$#replacement];
+                    elsif (defined $replacement[-1]) {
+                        $replaced .= $replacement[-1];
                     }
                     $tr++;
                 }
@@ -529,7 +544,7 @@ sub UTF8::R2::uc (;$) {
 }
 
 sub UTF8::R2::ucfirst (;$) {
-    if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/)) {
+    if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/s)) {
         return UTF8::R2::uc($1) . $2;
     }
     else {
@@ -540,10 +555,10 @@ sub UTF8::R2::ucfirst (;$) {
 # syntax sugar for UTF-8 codepoint regex
 #
 # tie my %utf8r2, 'UTF8::R2';
-# $result = $_ =~ $utf8r2{qr/$utf8regex/}
-# $result = $_ =~ s<$utf8r2{qr/before/}><after>egr
+# $result = $_ =~ $utf8r2{qr/$utf8regex/imsxogc}
+# $result = $_ =~ s<$utf8r2{qr/before/imsxo}><after>egr
 
-sub TIEHASH  { bless {}, $_[0] }
+sub TIEHASH  { bless { }, $_[0] }
 sub FETCH    { UTF8::R2::qr $_[1] }
 sub STORE    { }
 sub FIRSTKEY { }
@@ -580,7 +595,7 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = UTF8::R2::lcfirst($_)
     $result = UTF8::R2::length($_)
     $result = UTF8::R2::ord($_)
-    $result = UTF8::R2::qr(qr/$utf8regex/)
+    $result = UTF8::R2::qr(qr/$utf8regex/imsxogc)
     $result = UTF8::R2::reverse(@_)
     $result = UTF8::R2::rindex($_, 'ABC', 5)
     @result = UTF8::R2::split(qr/$utf8regex/, $_, 3)
@@ -590,65 +605,67 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = UTF8::R2::ucfirst($_)
 
     tie my %utf8r2, 'UTF8::R2';
-    $result = $_ =~ $utf8r2{qr/$utf8regex/}
-    $result = $_ =~ s<$utf8r2{qr/before/}><after>egr
+    $result = $_ =~ $utf8r2{qr/$utf8regex/imsxogc}
+    $result = $_ =~ s<$utf8r2{qr/before/imsxo}><after>egr
 
-=head1 OCTET SEMANTICS SUBROUTINES VS. CODEPOINT SEMANTICS SUBROUTINES
+=head1 OCTET SEMANTICS FUNCTIONS VS. CODEPOINT SEMANTICS SUBROUTINES
 
 Because this module override nothing, the embedded functions provide octet semantics continue.
 UTF-8 codepoint semantics is provided by the new subroutine name.
 
   ------------------------------------------------------------------------------------------------------------------------------------------
-  Octet Semantics        UTF-8 Codepoint Semantics
-  by traditional name    by new name                                Note and Limitations
+  Octet Semantics         UTF-8 Codepoint Semantics
+  by traditional name     by new name                                Note and Limitations
   ------------------------------------------------------------------------------------------------------------------------------------------
-  chop                   UTF8::R2::chop(@_)                         usually chomp() is useful
+  chop                    UTF8::R2::chop(@_)                         usually chomp() is useful
   ------------------------------------------------------------------------------------------------------------------------------------------
-  chr                    UTF8::R2::chr($_)                          returns UTF-8 codepoint octets by UTF-8 number (not by Unicode number)
+  chr                     UTF8::R2::chr($_)                          returns UTF-8 codepoint octets by UTF-8 number (not by Unicode number)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  getc                   UTF8::R2::getc(FILE)                       get UTF-8 codepoint octets
+  getc                    UTF8::R2::getc(FILE)                       get UTF-8 codepoint octets
   ------------------------------------------------------------------------------------------------------------------------------------------
-  index                  UTF8::R2::index($_, 'ABC', 5)              index() is compatible and usually useful
+  index                   UTF8::R2::index($_, 'ABC', 5)              index() is compatible and usually useful
   ------------------------------------------------------------------------------------------------------------------------------------------
-  lc                     UTF8::R2::lc($_)                           works as tr/A-Z/a-z/, universally
+  lc                      UTF8::R2::lc($_)                           works as tr/A-Z/a-z/, universally
   ------------------------------------------------------------------------------------------------------------------------------------------
-  lcfirst                UTF8::R2::lcfirst($_)                      see UTF8::R2::lc()
+  lcfirst                 UTF8::R2::lcfirst($_)                      see UTF8::R2::lc()
   ------------------------------------------------------------------------------------------------------------------------------------------
-  length                 UTF8::R2::length($_)                       length() is compatible and usually useful
+  length                  UTF8::R2::length($_)                       length() is compatible and usually useful
   ------------------------------------------------------------------------------------------------------------------------------------------
-  m// or qr//            UTF8::R2::qr(qr/$utf8regex/)               not supports metasymbol \X that match grapheme
-                           or                                       not support range of codepoint(like a "[A-Z]")
-                         tie my %utf8r2, 'UTF8::R2';                not supports POSIX character class (like a [:alpha:])
-                         $utf8r2{qr/$utf8regex/}                    not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
-                                                                    not supports character properties (like \p{PROP} and \P{PROP})
+  // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxogc)        not supports metasymbol \X that match grapheme
+                            or                                       not support range of codepoint(like an "[A-Z]")
+                          tie my %utf8r2, 'UTF8::R2';                not supports POSIX character class (like an [:alpha:])
+                          $utf8r2{qr/$utf8regex/imsxogc}             not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
+                                                                     not supports character properties (like \p{PROP} and \P{PROP})
   ------------------------------------------------------------------------------------------------------------------------------------------
-  ord                    UTF8::R2::ord($_)                          returns UTF-8 number (not Unicode number) by UTF-8 codepoint octets
+  ?? or m??                 (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  pos                      (nothing)
+  ord                     UTF8::R2::ord($_)                          returns UTF-8 number (not Unicode number) by UTF-8 codepoint octets
   ------------------------------------------------------------------------------------------------------------------------------------------
-  reverse                UTF8::R2::reverse(@_)
+  pos                       (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  rindex                 UTF8::R2::rindex($_, 'ABC', 5)             rindex() is compatible and usually useful
+  reverse                 UTF8::R2::reverse(@_)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  s/before/after/egr     s<@{[UTF8::R2::qr(qr/before/)]}><after>egr
-                           or
-                         tie my %utf8r2, 'UTF8::R2';
-                         s<$utf8r2{qr/before/}><after>egr
+  rindex                  UTF8::R2::rindex($_, 'ABC', 5)             rindex() is compatible and usually useful
   ------------------------------------------------------------------------------------------------------------------------------------------
-  split//                UTF8::R2::split(qr/$utf8regex/, $_, 3)
+  s/before/after/imsxoegr s<@{[UTF8::R2::qr(qr/before/imsxo)]}><after>egr
+                            or
+                          tie my %utf8r2, 'UTF8::R2';
+                          s<$utf8r2{qr/before/imsxo}><after>egr
   ------------------------------------------------------------------------------------------------------------------------------------------
-  sprintf                  (nothing)
+  split//                 UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)  *CAUTION* UTF8::R2::split(/re/,$_,3) means UTF8::R2::split($_ =~ /re/,$_,3)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  substr                 UTF8::R2::substr($_, 0, 5)                 length() is compatible and usually useful
+  sprintf                   (nothing)
+  ------------------------------------------------------------------------------------------------------------------------------------------
+  substr                  UTF8::R2::substr($_, 0, 5)                 substr() is compatible and usually useful
                                                                     :lvalue feature needs perl 5.014 or later
   ------------------------------------------------------------------------------------------------------------------------------------------
-  tr/// or y///          UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')     not support range of codepoint(like a "tr/A-Z/a-z/")
+  tr/// or y///           UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')     not support range of codepoint(like a "tr/A-Z/a-z/")
   ------------------------------------------------------------------------------------------------------------------------------------------
-  uc                     UTF8::R2::uc($_)                           works as tr/a-z/A-Z/, universally
+  uc                      UTF8::R2::uc($_)                           works as tr/a-z/A-Z/, universally
   ------------------------------------------------------------------------------------------------------------------------------------------
-  ucfirst                UTF8::R2::ucfirst($_)                      see UTF8::R2::uc()
+  ucfirst                 UTF8::R2::ucfirst($_)                      see UTF8::R2::uc()
   ------------------------------------------------------------------------------------------------------------------------------------------
-  write                    (nothing)
+  write                     (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
 
 =head1 REGEX FEATURES
@@ -714,7 +731,7 @@ consideration of the UTF8 flag.
 There are people who don't agree to change in the character string
 processing model of Perl 5.8. It is impossible to get to agree it to
 majority of Perl user who hardly ever use Perl.
-How to solve it by returning to a original method, let's drag out
+How to solve it by returning to an original method, let's drag out
 page 402 of the Programming Perl, 3rd ed. again.
 
   Information processing model beginning with perl3 or this software
@@ -749,7 +766,8 @@ Ideally, We'd like to achieve these five Goals:
 Old byte-oriented programs should not spontaneously break on the old
 byte-oriented data they used to work on.
 
-This goal has been achieved by that UTF8::R2 module override nothing.
+This goal was achieved by new Perl language and new perl interpreter are keeping
+compatibility to their old versions.
 
 =item * Goal #2:
 
@@ -757,17 +775,17 @@ Old byte-oriented programs should magically start working on the new
 character-oriented data when appropriate.
 
 Not "magically."
-You must decide and write octet semantics or codepoint semantics yourself
-in case by case.
+You must decide and write octet semantics or UTF-8 codepoint semantics yourself
+in case by case. Perhaps almost all regular expressions should have UTF-8
+codepoint semantics. And other all should have octet semantics.
 
 =item * Goal #3:
 
 Programs should run just as fast in the new character-oriented mode
 as in the old byte-oriented mode.
 
-It is impossible.
-Because processing time of multibyte anchoring in regular expression is
-necessary.
+It is almost possible.
+Because UTF-8 encoding doesn't need multibyte anchoring in regular expression.
 
 =item * Goal #4:
 
@@ -779,7 +797,7 @@ codepoint semantics subroutines.
 
 =item * Goal #5:
 
-UTF8::R2 users will be able to maintain it by Perl.
+UTF8::R2 module users will be able to maintain it by Perl.
 
 May the UTF8::R2 be with you, always.
 

@@ -4,6 +4,7 @@ bin/git-branch-clean
 bin/git-branch-grep
 bin/git-branches
 bin/git-brs
+bin/git-changes
 bin/git-committers
 bin/git-cows
 bin/git-feature
@@ -32,6 +33,7 @@ lib/App/Git/Workflow/Command/BranchClean.pm
 lib/App/Git/Workflow/Command/Branches.pm
 lib/App/Git/Workflow/Command/BranchGrep.pm
 lib/App/Git/Workflow/Command/Brs.pm
+lib/App/Git/Workflow/Command/Changes.pm
 lib/App/Git/Workflow/Command/Committers.pm
 lib/App/Git/Workflow/Command/Cows.pm
 lib/App/Git/Workflow/Command/Feature.pm

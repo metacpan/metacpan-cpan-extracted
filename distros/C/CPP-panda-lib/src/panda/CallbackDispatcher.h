@@ -1,51 +1,59 @@
 #pragma once
-
 #include <panda/lib/owning_list.h>
 #include <panda/function.h>
 #include <panda/optional.h>
-#include <iostream>
 
 namespace panda {
+
+namespace {
+    template <typename T> struct optional_type {
+        using type = optional<T>;
+        static type default_value() { return type{}; }
+    };
+
+    template <>
+    struct optional_type<void> {
+        static void default_value(){}
+        using type = void;
+    };
+}
 
 template <typename Ret, typename... Args>
 class CallbackDispatcher {
 public:
     struct Event;
-    using RetType = typename optional_tools<Ret>::type;
-    using Callback = function<RetType (Event&, Args...)>;
-    using SimpleCallback = function<Ret (Args...)>;
+    using OptionalRet    = typename optional_type<Ret>::type;
+    using Callback       = function<OptionalRet(Event&, Args...)>;
+    using SimpleCallback = function<void(Args...)>;
 
     struct Wrapper {
-        Callback real;
+        Callback       real;
         SimpleCallback simple;
 
-        explicit Wrapper(Callback real, SimpleCallback simple = nullptr) : real(real), simple(simple) {}
+        explicit Wrapper (Callback real)         : real(real)     {}
+        explicit Wrapper (SimpleCallback simple) : simple(simple) {}
 
         template <typename... RealArgs>
-        auto operator()(RealArgs&&... args) -> decltype(real(args...)) {
-            return real(args...);
+        auto operator() (Event& e, RealArgs&&... args) -> decltype(real(e, args...)) {
+            if (real) return real(e, std::forward<RealArgs>(args)...);
+
+            simple(args...);
+            return e.next(std::forward<RealArgs>(args)...);
         }
 
-        bool equal(const Wrapper& oth) {
-            if (simple) {
-                return simple == oth.simple;
-            } else {
-                return real == oth.real;
-            }
+        bool equal (const Wrapper& oth) {
+            if (simple) return simple == oth.simple;
+            return real == oth.real;
         }
 
-        template <typename T, typename = decltype(simple == std::declval<const T&>())>
-        bool equal(const T& oth) {
-            if (simple) {
-                return simple == oth;
-            } else {
-               return false;
-            }
+        template <typename T>
+        decltype(simple == std::declval<const T&>()) equal (const T& oth) {
+            return simple && simple == oth;
         }
 
-        template <typename T, typename Check = decltype(real == std::declval<const T&>())>
-        bool equal(const T& oth, Check* = nullptr) {
-            return real == oth;
+        template <typename T>
+        decltype(real == std::declval<const T&>()) equal (const T& oth) {
+            return real && real == oth;
         }
     };
 
@@ -55,54 +63,51 @@ public:
         CallbackDispatcher& dispatcher;
         typename CallbackList::iterator state;
 
+        Event (const Event& oth) = delete;
+
         template <typename... RealArgs>
-        RetType next(RealArgs&&... args) {
+        OptionalRet next (RealArgs&&... args) {
             return dispatcher.next(*this, std::forward<RealArgs>(args)...);
         }
     };
 
-
-
-    void add(const Callback& callback) {
-        if (!callback) {
-            return;
-        }
-        listeners.push_back(Wrapper(callback));
+    void add_event_listener (const Callback& callback, bool back = false) {
+        if (!callback) return;
+        if (back) listeners.push_back(Wrapper(callback));
+        else      listeners.push_front(Wrapper(callback));
     }
 
-    void add(Callback&& callback) {
-        if (!callback) {
-            return;
-        }
-        listeners.push_back(Wrapper(std::forward<Callback>(callback)));
+    void add_event_listener (Callback&& callback, bool back = false) {
+        if (!callback) return;
+        if (back) listeners.push_back(Wrapper(std::forward<Callback>(callback)));
+        else      listeners.push_front(Wrapper(std::forward<Callback>(callback)));
     }
 
-    void add(const SimpleCallback& callback) {
-        if (!callback) {
-            return;
-        }
-        auto wrapper = [callback](Event& e, Args... args) -> RetType {
-            callback(std::forward<Args>(args)...);
-            return e.next(std::forward<Args>(args)...);
-        };
-
-        static_assert(panda::has_call_operator<decltype(wrapper), Event&, Args...>::value,
-                      "argument of CallbackDispatcher::add should be callable with Args..." );
-
-        listeners.push_back(Wrapper(wrapper, callback));
+    void add (const SimpleCallback& callback, bool back = false) {
+        if (!callback) return;
+        if (back) listeners.push_back(Wrapper(callback));
+        else      listeners.push_front(Wrapper(callback));
     }
+
+    void add (SimpleCallback&& callback, bool back = false) {
+        if (!callback) return;
+        if (back) listeners.push_back(Wrapper(std::forward<SimpleCallback>(callback)));
+        else      listeners.push_front(Wrapper(std::forward<SimpleCallback>(callback)));
+    }
+
+    template <class T> void add_back (T&& callback) { add(std::forward<T>(callback), true); }
 
     template <typename... RealArgs >
-    auto/*RetType*/ operator()(RealArgs&&... args) -> decltype(std::declval<Wrapper>()(std::declval<Event>(), std::forward<RealArgs>(args)...)) {
+    auto operator() (RealArgs&&... args) -> decltype(std::declval<Wrapper>()(std::declval<Event&>(), args...)) {
         auto iter = listeners.begin();
-        if (iter == listeners.end()) return optional_tools<Ret>::default_value();
+        if (iter == listeners.end()) return optional_type<Ret>::default_value();
 
         Event e{*this, iter};
         return (*iter)(e, std::forward<RealArgs>(args)...);
     }
 
     template <typename SmthComparable>
-    void remove(const SmthComparable& callback) {
+    void remove (const SmthComparable& callback) {
         for (auto iter = listeners.rbegin(); iter != listeners.rend(); ++iter) {
             if (iter->equal(callback)) {
                 listeners.erase(iter);
@@ -113,36 +118,36 @@ public:
 
     template <typename T>
     void remove_object(T&& makable,
-                       decltype(tmp_abstract_function<Ret, Args...>(std::forward<T>(std::declval<T>())))* = nullptr)
+                       decltype(function_details::tmp_abstract_function<void, Args...>(std::forward<T>(std::declval<T>())))* = nullptr)
     {
-        auto tmp = tmp_abstract_function<Ret, Args...>(std::forward<T>(makable));
+        auto tmp = function_details::tmp_abstract_function<void, Args...>(std::forward<T>(makable));
         remove(tmp);
     }
 
     template <typename T>
     void remove_object(T&& makable,
-                       decltype(tmp_abstract_function<RetType, Event&, Args...>(std::forward<T>(std::declval<T>())))* = nullptr)
+                       decltype(function_details::tmp_abstract_function<OptionalRet, Event&, Args...>(std::forward<T>(std::declval<T>())))* = nullptr)
     {
-        auto tmp = tmp_abstract_function<RetType, Event&, Args...>(std::forward<T>(makable));
+        auto tmp = function_details::tmp_abstract_function<OptionalRet, Event&, Args...>(std::forward<T>(makable));
         remove(tmp);
     }
 
-    void remove_all() {
+    void remove_all () {
         listeners.clear();
     }
 
-    bool has_listeners() const {
+    bool has_listeners () const {
         return listeners.size();
     }
 
 private:
     template <typename... RealArgs>
-    RetType next(Event& e, RealArgs&&... args) {
+    OptionalRet next (Event& e, RealArgs&&... args) {
         ++e.state;
         if (e.state != listeners.end()) {
             return (*e.state)(e, std::forward<RealArgs>(args)...);
         } else {
-            return optional_tools<Ret>::default_value();
+            return optional_type<Ret>::default_value();
         }
     }
 

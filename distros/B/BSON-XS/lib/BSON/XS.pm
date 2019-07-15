@@ -21,7 +21,7 @@ package BSON::XS;
 # ABSTRACT: XS implementation of MongoDB's BSON serialization
 
 use version;
-our $VERSION = 'v0.6.0';
+our $VERSION = 'v0.8.0';
 
 # cached for efficiency during decoding
 # XXX eventually move this into XS
@@ -51,7 +51,7 @@ BSON::XS - XS implementation of MongoDB's BSON serialization
 
 =head1 VERSION
 
-version v0.6.0
+version v0.8.0
 
 =head1 DESCRIPTION
 
@@ -82,9 +82,15 @@ L<https://github.com/mongodb/mongo-perl-bson-xs>
 
 David Golden <david@mongodb.com>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Paul "LeoNerd" Evans
+
+Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MongoDB, Inc.
+This software is Copyright (c) 2019 by MongoDB, Inc.
 
 This is free software, licensed under:
 

@@ -1,131 +1,108 @@
 #pragma once
-
 #include <string>
-#include <sstream>
-#include <iostream>
-#include <vector>
-#include <panda/function.h>
-#include <panda/string_view.h>
-#include <panda/CallbackDispatcher.h>
+#include <memory>
 #include <string.h>
-#include <chrono>
-#include <math.h>
+#include <type_traits>
+#include <panda/string_view.h>
 
-namespace panda {
+namespace panda { namespace log {
 
-namespace logger {
-    struct CodePoint;
-
-    template <typename S>
-    S& operator <<(S& stream, const CodePoint& cp);
-
-    struct CodePoint {
-        std::string_view file;
-        uint32_t line;
-
-        std::string to_string() const {
-            std::ostringstream os;
-            os << *this;
-            os.flush();
-            return os.str();
-        }
-    };
-
-    template <typename S>
-    S& operator <<(S& stream, const CodePoint& cp) {
-        size_t total = cp.file.size() + log10(cp.line) + 2;
-        const char* whitespaces = "                        "; // 24 spaces
-        if (total < 24) {
-            whitespaces += total;
-        } else {
-            whitespaces = "";
-        }
-        stream << cp.file << ":" << cp.line << whitespaces;
-        return stream;
-    }
-
-
-    enum Level {
-        EMERGENCY,
-        CRITICAL,
-        WARNING,
-        INFO,
-        VERBOSE,
-        DEBUG
-    };
-
-    struct ILogger {
-        virtual bool should_log(Level, CodePoint) {return true;}
-        virtual void log(Level, CodePoint, const std::string&) = 0;
-    };
-}
-
-class Log
-{
-public:
-
-    Log(logger::CodePoint cp, logger::Level log_level = logger::DEBUG)
-        : level(log_level),
-          cp(cp)
-    {}
-
-    Log(Log&& oth) = default;
-
-    explicit operator bool() const {
-        return should_log(level, cp);
-    }
-
-    template <typename T>
-    std::ostringstream& operator <<(T&& t)
-    {
-        os << t;
-        return os;
-    }
-
-    ~Log()
-    {
-        if (!logger()) {
-            return;
-        }
-        os.flush();
-        s = os.str();
-
-        logger()->log(level, cp, s);
-    }
-
-    static std::unique_ptr<logger::ILogger>& logger();
-
-    static bool should_log(logger::Level level, logger::CodePoint cp);
-
-    static void set_max_level(logger::Level val);
-
-private:
-    std::string s;
-    std::ostringstream os;
-    logger::Level level;
-    logger::CodePoint cp;
-};
-#ifdef WIN323
+#ifdef WIN32
 #  define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #else
 #  define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#endif // WIN32
+#endif
 
-#define _panda_code_point_ panda::logger::CodePoint{__FILENAME__, __LINE__}
-#define _panda_log_impl_(LEVEL, MSG) panda::Log::should_log(panda::logger::LEVEL, _panda_code_point_) \
-                                 && (panda::Log(_panda_code_point_, panda::logger::LEVEL) << MSG)
+#define _panda_log_code_point_ panda::log::CodePoint{__FILENAME__, __LINE__}
 
-#define panda_debug_v(VAR) _panda_log_impl_(DEBUG, #VAR << " = " << (VAR))
+#define panda_should_log(level) panda::log::should_log(level, _panda_log_code_point_)
 
-#define panda_log_debug(MSG) _panda_log_impl_(DEBUG, MSG)
-#define panda_log_verbose(MSG) _panda_log_impl_(VERBOSE, MSG)
-#define panda_log_info(MSG) _panda_log_impl_(INFO, MSG)
-#define panda_log_warn(MSG) _panda_log_impl_(WARNING, MSG)
+#define panda_elog(level, code) do {                                        \
+    if (panda::log::should_log(level, _panda_log_code_point_)) {            \
+        std::ostream& log = panda::log::details::_get_os();                 \
+        code;                                                               \
+        panda::log::details::_do_log(log, _panda_log_code_point_, level);   \
+    }                                                                       \
+} while (0);
 
-#define panda_log_critical(MSG) _panda_log_impl_(CRITICAL, MSG)
-#define panda_log_emergency(MSG) _panda_log_impl_(EMERGENCY, MSG)
+#define panda_log(level, msg) panda_elog(level, { log << msg; })
 
+#define panda_log_verbose_debug(msg)   panda_log(panda::log::VerboseDebug, msg)
+#define panda_log_debug(msg)           panda_log(panda::log::Debug, msg)
+#define panda_log_info(msg)            panda_log(panda::log::Info, msg)
+#define panda_log_notice(msg)          panda_log(panda::log::Notice, msg)
+#define panda_log_warn(msg)            panda_log(panda::log::Warning, msg)
+#define panda_log_error(msg)           panda_log(panda::log::Error, msg)
+#define panda_log_critical(msg)        panda_log(panda::log::Critical, msg)
+#define panda_log_alert(msg)           panda_log(panda::log::Alert, msg)
+#define panda_log_emergency(msg)       panda_log(panda::log::Emergency, msg)
+#define panda_elog_verbose_debug(code) panda_elog(panda::log::VerboseDebug, code)
+#define panda_elog_debug(code)         panda_elog(panda::log::Debug, code)
+#define panda_elog_info(code)          panda_elog(panda::log::Info, code)
+#define panda_elog_notice(code)        panda_elog(panda::log::Notice, code)
+#define panda_elog_warn(code)          panda_elog(panda::log::Warning, code)
+#define panda_elog_error(code)         panda_elog(panda::log::Error, code)
+#define panda_elog_critical(code)      panda_elog(panda::log::Critical, code)
+#define panda_elog_alert(code)         panda_elog(panda::log::Alert, code)
+#define panda_elog_emergency(code)     panda_elog(panda::log::Emergency, code)
 
-#define PANDA_ASSERT(VAR, MSG) if(!(auto assert_value = VAR)) {panda_log_emergency("assert failed: " << #VAR << " is " << assert_value << MSG)}
+#define panda_debug_v(var) panda_log(panda::log::Debug, #var << " = " << (var))
 
+#define PANDA_ASSERT(var, msg) if(!(auto assert_value = var)) { panda_log_emergency("assert failed: " << #var << " is " << assert_value << msg) }
+
+enum Level {
+    VerboseDebug = 0,
+    Debug,
+    Info,
+    Notice,
+    Warning,
+    Error,
+    Critical,
+    Alert,
+    Emergency
+};
+
+struct CodePoint {
+    std::string_view file;
+    uint32_t         line;
+
+    std::string to_string () const;
+};
+std::ostream& operator<< (std::ostream&, const CodePoint&);
+
+struct ILogger {
+    virtual bool should_log (Level, const CodePoint&) { return true; }
+    virtual void log        (Level, const CodePoint&, const std::string&) = 0;
+    virtual ~ILogger() {}
+};
+
+namespace details {
+    extern Level                    min_level;
+    extern std::unique_ptr<ILogger> ilogger;
+
+    std::ostream& _get_os ();
+    bool          _do_log (std::ostream&, const CodePoint&, Level);
+
+    template <class Func>
+    struct CallbackLogger : ILogger {
+        Func f;
+        CallbackLogger (const Func& f) : f(f) {}
+        void log (Level level, const CodePoint& cp, const std::string& s) override { f(level, cp, s); }
+    };
 }
+
+void set_level  (Level);
+void set_logger (ILogger*);
+
+template <class Func, typename = std::enable_if_t<!std::is_base_of<ILogger, std::remove_cv_t<std::remove_pointer_t<Func>>>::value>>
+void set_logger (const Func& f) { set_logger(new details::CallbackLogger<Func>(f)); }
+
+inline bool should_log (Level level, const CodePoint& cp) { return level >= details::min_level && details::ilogger && details::ilogger->should_log(level, cp); }
+
+struct escaped {
+    std::string_view src;
+};
+std::ostream& operator<< (std::ostream&, const escaped&);
+
+}}
+

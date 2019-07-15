@@ -6,7 +6,7 @@ package SemanticWeb::Schema::PoliceStation;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::EmergencyService SemanticWeb::Schema::CivicStructure /;
+extends qw/ SemanticWeb::Schema::CivicStructure SemanticWeb::Schema::EmergencyService /;
 
 
 use MooX::JSON_LD 'PoliceStation';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::PoliceStation - A police station.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ A police station.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CivicStructure>
+L<SemanticWeb::Schema::EmergencyService>
 
 =head1 SOURCE
 

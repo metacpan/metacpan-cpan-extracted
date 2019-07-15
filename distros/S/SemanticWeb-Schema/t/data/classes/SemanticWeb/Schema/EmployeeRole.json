@@ -11,13 +11,13 @@
          "rdfs:comment" : "The base salary of the job or of an employee in an EmployeeRole.",
          "rdfs:label" : "baseSalary",
          "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:EmployeeRole"
+            "schema:EmployeeRole",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
+            "schema:MonetaryAmount",
             "schema:PriceSpecification",
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:Number"
          ]
       },
       "schema:salaryCurrency" : {

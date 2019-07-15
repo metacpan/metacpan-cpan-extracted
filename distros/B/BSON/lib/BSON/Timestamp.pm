@@ -6,7 +6,7 @@ package BSON::Timestamp;
 # ABSTRACT: BSON type wrapper for timestamps
 
 use version;
-our $VERSION = 'v1.10.2';
+our $VERSION = 'v1.12.0';
 
 use Carp ();
 use Tie::IxHash;
@@ -133,7 +133,7 @@ BSON::Timestamp - BSON type wrapper for timestamps
 
 =head1 VERSION
 
-version v1.10.2
+version v1.12.0
 
 =head1 SYNOPSIS
 
@@ -192,7 +192,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

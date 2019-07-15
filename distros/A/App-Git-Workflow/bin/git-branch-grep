@@ -20,7 +20,7 @@ git-branch-grep - grep for branch names
 
 =head1 VERSION
 
-This documentation refers to git-branch-grep version 1.1.3
+This documentation refers to git-branch-grep version 1.1.4
 
 =head1 SYNOPSIS
 

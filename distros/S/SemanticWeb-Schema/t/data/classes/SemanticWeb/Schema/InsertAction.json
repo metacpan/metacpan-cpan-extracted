@@ -14,8 +14,8 @@
          "schema:domainIncludes" : [
             "schema:InsertAction",
             "schema:ExerciseAction",
-            "schema:TransferAction",
-            "schema:MoveAction"
+            "schema:MoveAction",
+            "schema:TransferAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       }

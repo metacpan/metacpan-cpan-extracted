@@ -45,7 +45,7 @@ EOF
         DynaLoader::bootstrap_inherit($module, $version);
         1;        
     };
-    DynaLoader::croak($@) if !$ok and !($noboot and $@ and $@ =~ /Can't find 'boot_/i);
+    die($@) if !$ok and !($noboot and $@ and $@ =~ /Can't find 'boot_/i);
     
     if ($flags) {
         no strict 'refs';

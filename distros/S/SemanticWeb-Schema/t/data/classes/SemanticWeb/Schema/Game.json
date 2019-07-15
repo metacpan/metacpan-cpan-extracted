@@ -35,9 +35,9 @@
             "schema:Game"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:PostalAddress",
-            "schema:Place"
+            "schema:Place",
+            "schema:URL"
          ]
       },
       "schema:numberOfPlayers" : {

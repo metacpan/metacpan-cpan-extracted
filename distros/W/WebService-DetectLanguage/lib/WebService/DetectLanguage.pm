@@ -1,5 +1,5 @@
 package WebService::DetectLanguage;
-$WebService::DetectLanguage::VERSION = '0.01';
+$WebService::DetectLanguage::VERSION = '0.02';
 use 5.006;
 use Moo;
 use JSON::MaybeXS;
@@ -131,6 +131,56 @@ at L<https://detectlanguage.com/plans>.
 There is a free level which lets you make 1,000 requests per day,
 and you don't have to provide a card to sign up for the free level.
 
+=head2 Example Usage
+
+Let's say you've got a sample of text in a file.
+You might read it into C<$text> using C<read_text()>
+from L<File::Slurper>.
+
+To identify the language, you call the C<detect()> method:
+
+ @results = $api->detect($text);
+
+Each result is an instance of L<WebService::DetectLanguage::Result>.
+If there's only one result,
+you should look at the C<is_reliable> flag to see whether they're
+confident of the identification
+The more text they're given, the more confident they are, in general.
+
+ if (@results == 1) {
+   $result = $results[0];
+   if ($result->is_reliable) {
+     printf "Language is %s!\n", $result->language->name;
+   }
+   else {
+     # Hmm, maybe check with the user?
+   }
+ }
+
+You might get more than one result though.
+This might happen if your sample contains
+words from more than one language,
+for example.
+
+In that case, the C<is_reliable> flag can be used to check
+if the first result is reliable enough to go with.
+
+ if (@results > 1 && $results[0]->is_reliable) {
+   # we'll go with that!
+ }
+
+Each result also includes a confidence value,
+which looks a bit like a percentage,
+but L<their FAQ|https://detectlanguage.com/faq#confidence>
+says that it can go higher than 100.
+
+ foreach my $result (@results) {
+   my $language = $result->language;
+   printf "language = %s (%s) with confidence %f\n",
+       $language->name,
+       $language->code,
+       $result->confidence;
+ }
 
 =head1 METHODS
 

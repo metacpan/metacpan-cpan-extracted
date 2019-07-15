@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/worthmine/Data-Pokemon-Go.svg?branch=master)](https://travis-ci.org/worthmine/Data-Pokemon-Go)
+[![Build Status](https://travis-ci.com/worthmine/Data-Pokemon-Go.svg?branch=master)](https://travis-ci.com/worthmine/Data-Pokemon-Go) [![MetaCPAN Release](https://badge.fury.io/pl/Data-Pokemon-Go.svg)](https://metacpan.org/release/Data-Pokemon-Go)
 # NAME
 
-Data::Pokemon::Go - Datas for every Pokemon in Pokemon Go
+Data::Pokemon::Go - Data for every Pokemon in Pokemon Go
 
 # SYNOPSIS
 
@@ -16,7 +16,7 @@ Data::Pokemon::Go - Datas for every Pokemon in Pokemon Go
     use Data::Pokemon::Go::IV;
     my $iv = Data::Pokemon::Go::IV->new();
     print $iv->_calculate_CP( name => $pg->name(), LV => 20, ST => 15, AT => 15, DF => 15 );
-    # 2046
+    # 2167
 
 # DESCRIPTION
 

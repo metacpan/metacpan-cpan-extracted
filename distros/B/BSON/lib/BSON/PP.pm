@@ -7,7 +7,7 @@ package BSON::PP;
 # ABSTRACT: Pure Perl BSON implementation
 
 use version;
-our $VERSION = 'v1.10.2';
+our $VERSION = 'v1.12.0';
 
 use B;
 use Carp;
@@ -273,7 +273,7 @@ sub _encode_bson {
         elsif ( length $type ) {
 
             # Array
-            if ( $type eq 'ARRAY' ) {
+            if ( $type eq 'ARRAY' || $type eq 'BSON::Array' ) {
                 my $i = 0;
                 tie( my %h, 'Tie::IxHash' );
                 %h = map { $i++ => $_ } @$value;
@@ -853,7 +853,7 @@ BSON::PP - Pure Perl BSON implementation
 
 =head1 VERSION
 
-version v1.10.2
+version v1.12.0
 
 =head1 DESCRIPTION
 
@@ -877,7 +877,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

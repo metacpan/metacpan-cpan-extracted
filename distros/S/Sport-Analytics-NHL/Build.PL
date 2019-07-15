@@ -32,6 +32,7 @@ my $builder = Module::Build->new(
 		'Getopt::Long'      => 0,
 		'HTML::TreeBuilder' => 5.03,
 		'JSON'              => '2.90',
+		if		    => 0.05,
 		'List::MoreUtils'   => 0.22,
 		'List::Util'        => 1,
 		'LWP::Simple'       => 5.837,
@@ -47,8 +48,8 @@ my $builder = Module::Build->new(
 		'Try::Tiny'         => 0.27,
 	},
 	recommends         => {
-		'MongoDB' => 'v1.6.0',
 		'BSON::OID' => 'v1.8.1',
+		'MongoDB' => 'v1.6.0',
 		'File::Touch' => 0,
 	},
 	add_to_cleanup     => [ 'Sport-Analytics-NHL-*' ],

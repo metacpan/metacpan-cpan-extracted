@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 my %curlopt;
 my $share;
@@ -146,7 +146,7 @@ sub _handle_method {
     if (defined $method_ref) {
         $method_ref->();
     } else {
-        ## no critic (RequireCarping)
+        ## no critic (RequireCarping RequireUseOfExceptions)
         die HTTP::Response->new(
             &HTTP::Status::RC_BAD_REQUEST,
             qq(Bad method '$method')
@@ -223,7 +223,7 @@ sub _perform_loop {
             if ($result == CURLE_TOO_MANY_REDIRECTS) {
                 # will return the last request
             } elsif ($result) {
-                ## no critic (RequireCarping)
+                ## no critic (RequireCarping RequireUseOfExceptions)
                 die HTTP::Response->new(
                     &HTTP::Status::RC_BAD_REQUEST,
                     qq($result),
@@ -382,7 +382,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -561,10 +561,20 @@ This software is copyright (c) 2014 by Stanislaw Pusep.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Peter Williams
+=for stopwords José Joaquín Atria Peter Williams
+
+=over 4
+
+=item *
+
+José Joaquín Atria <jjatria@gmail.com>
+
+=item *
 
 Peter Williams <pjwilliams@gmail.com>
+
+=back
 
 =cut

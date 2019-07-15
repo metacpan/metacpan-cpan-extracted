@@ -12,7 +12,7 @@ use warnings;
 
 use File::Spec;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot::Dist') }
@@ -31,6 +31,18 @@ my @expected = (
 );
 #>>>
 my @seen = $docknot->commands();
+is_deeply(\@seen, \@expected, 'Module::Build');
+
+# Test configuring an alternate path to Perl.
+$docknot = App::DocKnot::Dist->new({ distdir => q{.}, perl => '/a/perl' });
+#<<<
+@expected = (
+    ['/a/perl', 'Build.PL'],
+    ['./Build', 'disttest'],
+    ['./Build', 'dist'],
+);
+#>>>
+@seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'Module::Build');
 
 # ExtUtils::MakeMaker distribution.
@@ -62,13 +74,14 @@ $docknot
     ['make', 'warnings'],
     ['make', 'check'],
     ['make', 'clean'],
+    ['make', 'check-cppcheck'],
     ['make', 'distcheck'],
 );
 #>>>
 @seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'Autoconf');
 
-# Autoconf distribution with C++.
+# Autoconf distribution with C++ and valgrind.
 $metadata_path = File::Spec->catfile($dataroot, 'c-tap-harness', 'metadata');
 $docknot
   = App::DocKnot::Dist->new({ distdir => q{.}, metadata => $metadata_path });
@@ -86,7 +99,9 @@ $docknot
     ['./configure', 'CC=gcc'],
     ['make', 'warnings'],
     ['make', 'check'],
+    ['make', 'check-valgrind'],
     ['make', 'clean'],
+    ['make', 'check-cppcheck'],
     ['make', 'distcheck'],
 );
 #>>>

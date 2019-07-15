@@ -1,5 +1,9 @@
 Revision history for Struct-Path
 
+0.84    2019-07-10
+        - path() reworked: independent traverse implemented
+        - R keys in HASH definitions in no longer supported
+
 0.83    2018-12-15
         - throw correct error for nonrefs in refstack
         - ref() calls reduced a bit

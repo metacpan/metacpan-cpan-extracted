@@ -1,8 +1,8 @@
 package Pcore::Node::Server;
 
 use Pcore -class, -res;
-use Pcore::Util::Scalar qw[weaken];
-use Pcore::Util::UUID qw[uuid_v4_str];
+use Pcore::Lib::Scalar qw[weaken];
+use Pcore::Lib::UUID qw[uuid_v4_str];
 use Pcore::HTTP::Server;
 use Pcore::WebSocket::pcore;
 use Clone qw[clone];

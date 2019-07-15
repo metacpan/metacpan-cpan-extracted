@@ -2,20 +2,22 @@ NAME
     Task::Software::Catalog::SW - All Software::Catalog::SW::* modules
 
 VERSION
-    version 0.001
+    version 0.002
 
 TASK CONTENTS
   Included modules
    Software::Catalog::SW::bulwark::qt
    Software::Catalog::SW::dummy::undownloadable
+   Software::Catalog::SW::filezilla
    Software::Catalog::SW::firefox
+   Software::Catalog::SW::phpmyadmin
    Software::Catalog::SW::zcoin::qt
    Software::Catalog::SW::zotero
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

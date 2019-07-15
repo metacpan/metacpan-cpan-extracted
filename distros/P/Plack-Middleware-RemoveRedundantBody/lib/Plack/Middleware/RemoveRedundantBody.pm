@@ -4,7 +4,7 @@ use warnings;
 use parent qw( Plack::Middleware );
 use Plack::Util;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 # ABSTRACT: Plack::Middleware which removes body for HTTP response if it's not required
 
@@ -15,6 +15,7 @@ sub call {
 
     return $self->response_cb($res, sub {
         my $response = shift;
+        return unless @$response == 3;
         return if ( !Plack::Util::status_with_no_entity_body($response->[0]) );
         $response->[2] = [];
         Plack::Util::header_remove($response->[1], "Content-Length");
@@ -36,7 +37,7 @@ Plack::Middleware::RemoveRedundantBody - Plack::Middleware which removes body fo
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -64,13 +65,15 @@ Karen Etheridge <ether@cpan.org>
 
 Aristotle Pagaltzis <pagaltzis@gmx.de>
 
+Tomohiro Hosaka <hello@bokut.in>
+
 =head1 AUTHOR
 
 Upasana <me@upasana.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Upasana.
+This software is copyright (c) 2019 by Upasana.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

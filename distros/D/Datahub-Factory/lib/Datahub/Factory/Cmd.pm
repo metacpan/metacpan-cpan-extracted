@@ -2,7 +2,7 @@ package Datahub::Factory::Cmd;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use parent qw(App::Cmd::Command);
 use namespace::clean;

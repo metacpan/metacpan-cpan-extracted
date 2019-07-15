@@ -6,6 +6,7 @@ use autodie;
 use feature qw(say);
 
 use List::AllUtils;
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 use Tie::IxHash;
 
@@ -15,14 +16,19 @@ use Bio::MUST::Drivers::CdHit;
 my $class = 'Bio::MUST::Drivers::CdHit';
 
 
-# skip all CD-HIT tests unless cd-hit is available in the $PATH
-unless ( qx{which cd-hit} ) {
+# Note: provisioning system is not enabled to help tests to pass on CPANTS
+my $app = use_module('Bio::MUST::Provision::CdHit')->new;
+unless ( $app->condition ) {
     plan skip_all => <<"EOT";
 skipped all CD-HIT tests!
 If you want to use this module you need to install the CD-HIT executable:
 https://github.com/weizhongli/cdhit
+If you --force installation, I will eventually try to install CD-HIT with brew:
+https://brew.sh/
 EOT
 }
+# TODO: fix this as CD-HIT formula currently fails on OS X Mojave
+#       This can be done with a --build-from-source option of brew
 
 # expected members for
 my $exp_clstr_file = file('test', 'cdHit.out.groups');
@@ -98,5 +104,10 @@ for my $memb ( keys %exp_repr_for ) {
         "got expected representative id for member: $memb"
     ;
 }
+
+# cd-hit-est
+my $cdh_est = $class->new( seqs => file('test', 'seqs4cap3.fasta') );
+cmp_ok $cdh_est->all_cluster_seq_ids, '>', 0,
+    'correctly launched cd-hit-est for nt infile';
 
 done_testing;

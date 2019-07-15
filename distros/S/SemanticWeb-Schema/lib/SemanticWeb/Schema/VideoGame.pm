@@ -6,7 +6,7 @@ package SemanticWeb::Schema::VideoGame;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::SoftwareApplication SemanticWeb::Schema::Game /;
+extends qw/ SemanticWeb::Schema::Game SemanticWeb::Schema::SoftwareApplication /;
 
 
 use MooX::JSON_LD 'VideoGame';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has actor => (
@@ -122,7 +122,7 @@ SemanticWeb::Schema::VideoGame - A video game is an electronic game that involve
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -211,9 +211,9 @@ A game_platform should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
 
 =back
 
@@ -291,7 +291,7 @@ A trailer should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::Game>
+L<SemanticWeb::Schema::SoftwareApplication>
 
 =head1 SOURCE
 

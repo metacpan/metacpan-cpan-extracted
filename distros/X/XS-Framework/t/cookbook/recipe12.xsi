@@ -1,0 +1,134 @@
+MODE: INLINE
+
+#include <cmath>
+#include <iostream>
+
+struct PointRecipe12 {
+    double x;
+    double y;
+};
+
+double distance(const PointRecipe12& pt_a, const PointRecipe12& pt_b) {
+    auto dx = pt_a.x - pt_a.x;
+    auto dy = pt_a.y - pt_b.y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
+struct StatisticsRecipe12 {
+    StatisticsRecipe12(const PointRecipe12& interest_, const std::vector<PointRecipe12>& points_): interest{interest_}, points{points_} {
+        if(points.empty()) throw std::runtime_error("points cannot be empty");
+    }
+
+    const PointRecipe12& nearest() const {
+        return select([](const double& prev_dist, const double& new_dist) { return  new_dist < prev_dist; } );
+    }
+
+    const PointRecipe12& farest() const {
+        return select([](const double& prev_dist, const double& new_dist) { return  new_dist > prev_dist; } );
+    }
+
+private:
+    template<typename F>
+    const PointRecipe12& select(F&& fn) const {
+        const PointRecipe12* pt = &points.front();
+        auto best_distance = distance(interest, *pt);
+        for(auto it = points.cbegin() + 1; it != points.cend(); ++it) {
+            auto new_distance = distance(interest, *it);
+            if(fn(best_distance, new_distance)) {
+                pt = &*it;
+                best_distance = new_distance;
+            }
+        }
+        return *pt;
+    }
+
+    const PointRecipe12& interest;
+    const std::vector<PointRecipe12>& points;
+};
+
+
+namespace xs {
+    template <>
+    struct Typemap<PointRecipe12*> : TypemapObject<PointRecipe12*, PointRecipe12*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::PointRecipe12"; }
+    };
+
+
+    template <>
+    struct Typemap<StatisticsRecipe12*> : TypemapObject<StatisticsRecipe12*, StatisticsRecipe12*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::StatisticsRecipe12"; }
+    };
+}
+
+static xs::Sv::payload_marker_t payload_marker_12{};
+
+struct StatisticsRecipe12_payload {
+    PointRecipe12 interest;
+    std::vector<PointRecipe12> points;
+    ~StatisticsRecipe12_payload() { std::cout << "~StatisticsRecipe12_payload\n"; }
+};
+
+static int payload_marker_IntersectionFinderAdder_free(pTHX_ SV*, MAGIC* mg) {
+    if (mg->mg_virtual == &payload_marker_12) {
+        auto* payload = static_cast<StatisticsRecipe12_payload*>((void*)mg->mg_ptr);
+        delete payload;
+    }
+    return 0;
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::PointRecipe12
+PROTOTYPES: DISABLE
+
+double PointRecipe12::x(SV* new_val = nullptr) : ALIAS(y = 1) {
+    double* val = nullptr;
+    switch(ix) {
+        case 1: val = &THIS->y; break;
+        default: val = &THIS->x; break;
+    }
+    if (new_val) {
+        *val = SvNV(new_val);
+    }
+    RETVAL = *val;
+}
+
+PointRecipe12* PointRecipe12::new(double x = 0, double y = 0) {
+    RETVAL = new PointRecipe12{x, y};
+}
+
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::StatisticsRecipe12
+PROTOTYPES: DISABLE
+
+PointRecipe12* StatisticsRecipe12::nearest() {
+    RETVAL = new PointRecipe12(THIS->nearest());
+}
+
+PointRecipe12* StatisticsRecipe12::farest() {
+    RETVAL = new PointRecipe12(THIS->farest());
+}
+
+Sv StatisticsRecipe12::new(PointRecipe12* interest, Array pts) {
+    using payload_ptr_t = std::unique_ptr<StatisticsRecipe12_payload>;
+    using stats_ptr_t = std::unique_ptr<StatisticsRecipe12>;
+
+    std::vector<PointRecipe12> points;
+    for(auto it: pts) {
+        points.push_back(*(xs::in<PointRecipe12*>(it)));
+    }
+
+    // better to use std::make_unique from C++ 14, if available.
+    auto payload_holder = payload_ptr_t{new StatisticsRecipe12_payload{ *interest, std::move(points) }};
+    auto self_holder = stats_ptr_t{new StatisticsRecipe12{ payload_holder->interest, payload_holder->points }};
+
+    Object self = xs::out(self_holder.get(), CLASS);
+    self.payload_attach((void*)payload_holder.get(), &payload_marker_12);
+
+    payload_holder.release();
+    self_holder.release();
+
+    RETVAL = self.ref();
+}
+
+BOOT {
+     payload_marker_12.svt_free = payload_marker_IntersectionFinderAdder_free;
+}

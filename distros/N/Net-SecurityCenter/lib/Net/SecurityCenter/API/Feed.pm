@@ -9,7 +9,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 
 #-------------------------------------------------------------------------------
 # METHODS
@@ -107,19 +107,19 @@ __END__
 
 =head1 NAME
 
-Net::SecurityCenter::API::User - Perl interface to Tenable.sc (SecurityCenter) User REST API
+Net::SecurityCenter::API::Feed - Perl interface to Tenable.sc (SecurityCenter) Feed REST API
 
 
 =head1 SYNOPSIS
 
     use Net::SecurityCenter::REST;
-    use Net::SecurityCenter::API::User;
+    use Net::SecurityCenter::API::Feed;
 
     my $sc = Net::SecurityCenter::REST->new('sc.example.org');
 
     $sc->login('secman', 'password');
 
-    my $api = Net::SecurityCenter::API::User->new($sc);
+    my $api = Net::SecurityCenter::API::Feed->new($sc);
 
     $sc->logout();
 

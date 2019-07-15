@@ -6,7 +6,7 @@ package SemanticWeb::Schema::HealthClub;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::SportsActivityLocation SemanticWeb::Schema::HealthAndBeautyBusiness /;
+extends qw/ SemanticWeb::Schema::HealthAndBeautyBusiness SemanticWeb::Schema::SportsActivityLocation /;
 
 
 use MooX::JSON_LD 'HealthClub';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::HealthClub - A health club.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ A health club.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::HealthAndBeautyBusiness>
+L<SemanticWeb::Schema::SportsActivityLocation>
 
 =head1 SOURCE
 

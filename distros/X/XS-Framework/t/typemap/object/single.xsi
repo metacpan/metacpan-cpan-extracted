@@ -1,0 +1,71 @@
+MODE: INLINE
+
+template <int i>
+class _MyBase {
+public:
+    int val;
+    _MyBase (int arg) : val(arg) {}
+    virtual _MyBase* clone () const { return new _MyBase(val); }
+    virtual ~_MyBase () { dcnt.c++; }
+};
+
+using MyBase    = _MyBase<0>;
+using PTRMyBase = _MyBase<1>;
+
+namespace xs {
+    template <class TYPE> struct Typemap<PTRMyBase*,TYPE*> : TypemapObject<PTRMyBase*, TYPE*, ObjectTypePtr, ObjectStorageIV, DynamicCast> {
+        static std::string package () { return "MyTest::PTRMyBase"; }
+    };
+    template <class TYPE> struct Typemap<MyBase*,TYPE*> : TypemapObject<MyBase*, TYPE*, ObjectTypePtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MyBase"; }
+        static MyBase* dup (const MyBase* obj) { return obj->clone(); }
+    };
+}
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyBase
+PROTOTYPES: DISABLE
+
+PTRMyBase* PTRMyBase::new (int arg) {
+    if (!arg) XSRETURN_UNDEF;
+    RETVAL = new PTRMyBase(arg);
+}
+
+int PTRMyBase::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void PTRMyBase::set_from (PTRMyBase* other) {
+    if (other) THIS->val = other->val;
+}
+
+void PTRMyBase::DESTROY () {
+    dcnt.perl++;
+}
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyBase
+PROTOTYPES: DISABLE
+
+MyBase* MyBase::new (int arg) {
+    if (!arg) XSRETURN_UNDEF;
+    RETVAL = new MyBase(arg);
+}
+
+int MyBase::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+int MyBase::get_val () {
+    RETVAL = THIS->val;
+}
+
+void MyBase::set_from (MyBase* other) {
+    if (other) THIS->val = other->val;
+}
+
+void MyBase::DESTROY () {
+    dcnt.perl++;
+}

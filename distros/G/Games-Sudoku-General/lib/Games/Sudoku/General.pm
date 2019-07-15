@@ -40,7 +40,7 @@ Even on the standard 9 x 9 Sudoku topology there are variants in which
 unspecified cells are constrained in various ways (odd/even, high/low).
 Such variants are accommodated by defining named sets of allowed
 symbols, and then giving the set name for each unoccupied cell to which
-it applies. See L<allowed_symbols|/item_allowed_symbols> for more
+it applies. See the C<allowed_symbols> attribute for more
 information and an example.
 
 This module is able not only to solve a variety of Sudoku-like
@@ -135,7 +135,7 @@ across a symbol set change.
 
 Because symbol set names must be parsed like symbol names when a
 problem is defined, they also affect the need for whitespace on
-problem input. See the L<problem()|/item_problem> documentation for
+problem input. See the L<problem()|/problem> documentation for
 full details.
 
 =item autocopy (boolean)
@@ -199,7 +199,7 @@ to a puzzle.
 
 This "virtual" attribute is a convenience, which causes the object
 to be configured for "corresponding-cell" Sudoku. The topology is
-the same as 'set L<sudoku|/item_sudoku>', but in addition corresponding
+the same as C<set( sudoku => ... )>, but in addition corresponding
 cells in the small squares must have different values. The extra set
 names are "u0", "u1", and so on.
 
@@ -253,7 +253,7 @@ number, as given below.
                +-------------+
 
 The solution will be displayed in order by cell number, with line
-breaks controlled by the L<columns|/item_columns> attribute, just
+breaks controlled by the C<columns> attribute, just
 like any other solution presented by this package.
 
 I have seen such puzzles presented with the bottom square placed to the
@@ -286,15 +286,15 @@ is actually in order by cell number, as given below.
  +---------+---------+-------------------+
 
 The solution will be displayed in order by cell number, with line
-breaks controlled by the L<columns|/item_columns> attribute, just
+breaks controlled by the C<columns> attribute, just
 like any other solution presented by this package.
 
-For the 'full' and 'half' cube puzzles, the L</columns> attribute is
-set to 4, and the L<symbols|/item_symbols> attribute to the numbers 1
+For the 'full' and 'half' cube puzzles, the C<columns> attribute is
+set to 4, and the C<symbols> attribute to the numbers 1
 to the size of the largest set (16 for the full cube, 8 for the half
 or isometric cube). I have seen full cube puzzles done with hex digits
 0 to F; these are handled most easily by setting the
-L<symbols|/item_symbols> attribute appropriately:
+C<symbols> attribute appropriately:
 
  $su->set (cube => 'full', symbols => <<eod);
  . 0 1 2 3 4 5 6 7 8 9 A B C D E F
@@ -502,15 +502,16 @@ For example, the customary Sudoku topology is set by
 
  $su->set (sudoku => 3);
 
-This attribute is implemented in terms of 'set brick', and modifies the
-same "real" attributes. See L<brick|/item_brick> for the details.
+This attribute is implemented in terms of C<set( brick => ... )>,
+and modifies the same "real" attributes. See the C<brick> attribute for
+the details.
 
 =item sudokux (number, write-only)
 
 This attribute is a convenience. It is similar to the 'sudoku'
 attribute, but the topology includes both main diagonals (set names
-'d0' and 'd1') in addition to the standard sets. See
-L<brick|/item_brick> for the details, since that's ultimately how this
+'d0' and 'd1') in addition to the standard sets. See the
+C<brick> attribute for the details, since that's ultimately how this
 attribute is implemented.
 
 =item symbols (string)
@@ -520,7 +521,7 @@ printing characters may be used except ",". Multi-character symbols
 are supported. The value of the attribute is a whitespace-delimited
 list of the symbols, though the whitespace is optional if all symbols
 (and symbol constraints if any) are a single character. See the
-L<problem()|/item_problem> documentation for full details.
+L<problem()|/problem> documentation for full details.
 
 The first symbol in the list is the one that represents an empty cell.
 Except for this, the order of the symbols is immaterial.
@@ -564,8 +565,6 @@ Setting the topology invalidates any currently-set-up problem.
 
 This package provides the following public methods:
 
-=over
-
 =cut
 
 package Games::Sudoku::General;
@@ -577,7 +576,7 @@ use warnings;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 our @EXPORT_OK = qw{
     SUDOKU_SUCCESS
     SUDOKU_NO_SOLUTION
@@ -607,7 +606,9 @@ my @status_values = (
 
 use constant HASH_REF	=> ref {};
 
-=item $su = Games::Sudoku::General->new ()
+=head2 new
+
+ $su = Games::Sudoku::General->new ()
 
 This method instantiates a new Games::Sudoku::General object. Any
 arguments are passed to the set() method. If, after processing
@@ -651,7 +652,9 @@ sub new {
     return $self;
 }
 
-=item $su->add_set ($name => $cell ...)
+=head2 add_set
+
+ $su->add_set ($name => $cell ...)
 
 This method adds to the current topology a new set with the given name,
 and consisting of the given cells. The set name must not already
@@ -691,7 +694,9 @@ eod
 }
 
 
-=item %constraints_used = $su->constraints_used;
+=head2 constraints_used
+
+ %constraints_used = $su->constraints_used;
 
 This method returns a hash containing the constraints used in the most
 recent call to solution(), and the number of times each was used. The
@@ -716,7 +721,9 @@ sub constraints_used {
 }
 
 
-=item $su->copy ()
+=head2 copy
+
+ $su->copy ()
 
 This method copies the current problem to the clipboard. If solution()
 has been called, the current solution goes on the clipboard.
@@ -744,7 +751,9 @@ to work.
     }
 }
 
-=item $su->drop_set ($name)
+=head2 drop_set
+
+ $su->drop_set( $name )
 
 This method removes from the current topology the set with the given
 name. The set must exist, or an exception is raised.
@@ -784,7 +793,9 @@ eod
 }
 
 
-=item $problem = $su->generate ($min, $max, $const);
+=head2 generate
+
+ $problem = $su->generate( $min, $max, $const );
 
 This method generates a problem and returns it.
 
@@ -837,7 +848,7 @@ only the F constraint, or the F and N constraints.
 The algorithm used is to generate a puzzle with the minimum number of
 cells selected at random, and then solve it. If a solution does not
 exist, we try again until we have tried
-L<generation_limit|/item_generation_limit> times, then we return undef.
+C<generation_limit> times, then we return undef.
 B<This means generate() is not guaranteed to generate a puzzle.>
 
 If we get a solution, we remove allowed constraints. If we run into
@@ -935,7 +946,9 @@ my %accessor = (
     topology => \&_get_topology,
 );
 
-=item $value = $su->get ($name);
+=head2 get
+
+ $value = $su->get( $name );
 
 This method returns the value of the named attribute. An exception
 is thrown if the given name does not correspond to an attribute that
@@ -1007,7 +1020,9 @@ sub _get_topology {
 sub _get_value {return $_[0]->{$_[1]}}
 
 
-=item $su->paste ()
+=head2 paste
+
+ $su->paste()
 
 This method pastes a problem from the clipboard.
 
@@ -1038,7 +1053,9 @@ to work.
 
 }	#	End local symbol block
 
-=item $su->problem ($string);
+=head2 problem
+
+ $su->problem( $string );
 
 This method specifies the problem to be solved, and sets the object
 up to solve the problem.
@@ -1193,7 +1210,9 @@ my %mutator = (
     topology => \&_set_topology,
 );
 
-=item $su->set ($name => $value);
+=head2 set
+
+ $su->set( $name => $value );
 
 This method sets the value of the named attribute. An exception
 is thrown if the given name does not correspond to an attribute that
@@ -1586,7 +1605,9 @@ sub _set_topology {
 sub _set_value {$_[0]->{$_[1]} = $_[2]; return;}
 
 
-=item $string = $su->solution ();
+=head2 solution
+
+ $string = $su->solution();
 
 This method returns the next solution to the problem, or undef if there
 are no further solutions. The solution is a blank-delimited list of the
@@ -1619,7 +1640,9 @@ eod
 }
 
 
-=item $string = $su->steps ();
+=head2 steps
+
+ $string = $su->steps();
 
 =for comment help syntax-highlighting editor "
 
@@ -1671,7 +1694,9 @@ sub steps {
 	undef;
 }
 
-=item $string = $su->unload ();
+=head2 unload
+
+ $string = $su->unload();
 
 This method returns either the current puzzle or the current solution,
 depending on whether the solution() method has been called since the
@@ -2413,8 +2438,6 @@ sub _unload {
 
 __END__
 
-=back
-
 =head1 EXECUTABLES
 
 The distribution for this module also contains the script 'sudokug',
@@ -2451,8 +2474,8 @@ L<http://www.angusj.com/sudoku/hints.php> was a great help
 in understanding the mechanics of solving Sudoku puzzles.
 
 Ed Pegg, Jr, whose Mathematical Association of America C<Math Games>
-column for September 5 2005
-(L<http://www.maa.org/editorial/mathgames/mathgames_09_05_05.html>)
+column number 41 for September 5 2005 ("Sudoku Variations",
+L<http://mathpuzzle.com/MAA/41-Sudoku%20Variations/mathgames_09_05_05.html>)
 provided a treasure trove of 'non-standard' Sudoku puzzles.
 
 =head1 SEE ALSO
@@ -2464,8 +2487,9 @@ applying a user-supplied function to see whether it has a valid
 solution. The examples include a couple Sudoku puzzles.
 
 The C<Games-Sudoku> package by Eugene Kulesha (see
-L<http://metacpan.org/release/Games-Sudoku/>) solves the standard 9x9
-version of the puzzle.
+C<http://metacpan.org/release/Games-Sudoku/>) solves the standard 9x9
+version of the puzzle. As of June 15 2019 this appears to have been
+retracted.
 
 The C<Games-Sudoku-Component> package by Kenichi Ishigaki (see
 L<http://metacpan.org/release/Games-Sudoku-Component/>) both
@@ -2476,7 +2500,7 @@ L<http://metacpan.org/release/Games-Sudoku-Component-TkPlayer/>). Tk
 front end for his Games-Sudoku-Component.
 
 The C<Games-Sudoku-CPSearch> package by Martin-Louis Bright (see
-L<http://search.cpan.prg/dist/Games-Sudoku-CPSearch/>). Solves 9x9
+L<https://metacpan.org/release/Games-Sudoku-CPSearch>). Solves 9x9
 Sudoku by use of "F" and "N" constraints and backtracking.
 
 The C<Games-Sudoku-Lite package> by Bob O'Neill (see

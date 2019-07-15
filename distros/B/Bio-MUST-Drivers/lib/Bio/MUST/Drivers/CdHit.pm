@@ -1,19 +1,20 @@
 package Bio::MUST::Drivers::CdHit;
-# ABSTRACT: Bio::MUST driver for running the cd-hit program
+# ABSTRACT: Bio::MUST driver for running the CD-HIT program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::CdHit::VERSION = '0.181160';
+$Bio::MUST::Drivers::CdHit::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
+# use Smart::Comments;
+
 use Carp;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 use Tie::IxHash;
-
-use Smart::Comments '###';
 
 use Bio::MUST::Core;
 extends 'Bio::MUST::Core::Ali::Temporary';
@@ -89,6 +90,10 @@ sub _build_representative_for {
 sub BUILD {
     my $self = shift;
 
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::CdHit')->new;
+       $app->meet();
+
     # setup output files
     my $infile   = $self->filename;
     my $basename = $infile . '.cdhit';
@@ -99,14 +104,16 @@ sub BUILD {
     my $args = $self->cdhit_args;
     my $args_str = stringify_args($args);
 
-    # create cd-hit command
-    my $pgm = 'cd-hit';
+    # create cd-hit (or cd-hit-est) command
+    my $pgm = $self->type eq 'prot' ? 'cd-hit' : 'cd-hit-est';
     my $cmd = "$pgm -i $infile -o $outfile $args_str > /dev/null 2> /dev/null";
+    #### $cmd
 
     # try to robustly execute cd-hit
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Cannot execute $pgm command; returning without contigs!";
+        carp "[BMD] Warning: cannot execute $pgm command;"
+            . ' returning without contigs!';
         return;
     }
     # TODO: try to bypass shell (need for absolute path to executable then)
@@ -148,11 +155,11 @@ __END__
 
 =head1 NAME
 
-Bio::MUST::Drivers::CdHit - Bio::MUST driver for running the cd-hit program
+Bio::MUST::Drivers::CdHit - Bio::MUST driver for running the CD-HIT program
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

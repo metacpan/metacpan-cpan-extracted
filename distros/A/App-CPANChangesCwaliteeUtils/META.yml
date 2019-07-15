@@ -18,7 +18,7 @@ meta-spec:
 name: App-CPANChangesCwaliteeUtils
 requires:
   CPAN::Changes::Cwalitee: '0'
-  Cwalitee::Common: '0'
+  Cwalitee::Common: '0.002'
   Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
   Data::Sah::Coerce::perl::str::str_strip_trailing_slash: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANChangesCwaliteeUtils
   homepage: https://metacpan.org/release/App-CPANChangesCwaliteeUtils
   repository: git://github.com/perlancar/perl-App-CPANChangesCwaliteeUtils.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

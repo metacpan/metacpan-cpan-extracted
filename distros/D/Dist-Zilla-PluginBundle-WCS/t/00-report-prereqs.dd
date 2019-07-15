@@ -23,7 +23,7 @@ do { my $x = {
                                       'Dist::Zilla' => '6',
                                       'Dist::Zilla::PluginBundle::Basic' => '0',
                                       'Dist::Zilla::PluginBundle::Filter' => '0',
-                                      'Dist::Zilla::PluginBundle::Git' => '2',
+                                      'Dist::Zilla::PluginBundle::Git' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0',
@@ -32,6 +32,7 @@ do { my $x = {
                                       'Pod::Elemental::Transformer::List' => '0',
                                       'Pod::Weaver::Section::Contributors' => '0',
                                       'Test::CPAN::Meta' => '0',
+                                      'perl' => '5.014',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -46,8 +47,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '0',
-                                   'perl' => '5.006'
+                                   'blib' => '0'
                                  }
                  }
      };

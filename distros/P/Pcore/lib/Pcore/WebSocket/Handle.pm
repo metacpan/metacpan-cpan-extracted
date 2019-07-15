@@ -1,11 +1,11 @@
 package Pcore::WebSocket::Handle;
 
 use Pcore -const, -role, -res;
-use Pcore::Util::Scalar qw[is_ref weaken];
-use Pcore::Util::Text qw[decode_utf8 encode_utf8];
-use Pcore::Util::UUID qw[uuid_v4_str];
-use Pcore::Util::Data qw[to_b64 to_xor];
-use Pcore::Util::Digest qw[sha1];
+use Pcore::Lib::Scalar qw[is_ref weaken];
+use Pcore::Lib::Text qw[decode_utf8 encode_utf8];
+use Pcore::Lib::UUID qw[uuid_v4_str];
+use Pcore::Lib::Data qw[to_b64 to_xor];
+use Pcore::Lib::Digest qw[sha1];
 use Compress::Raw::Zlib;
 use overload    #
   'bool'   => sub { return $_[0]->{is_connected} },

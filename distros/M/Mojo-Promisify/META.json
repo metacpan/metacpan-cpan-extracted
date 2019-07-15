@@ -1,0 +1,59 @@
+{
+   "abstract" : "Convert callback code to promise based code",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-Promisify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.62"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/mojo-promisify/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/mojo-promisify",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojo-promisify.git",
+         "web" : "https://github.com/jhthorsen/mojo-promisify"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Jan Henning Thorsen"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

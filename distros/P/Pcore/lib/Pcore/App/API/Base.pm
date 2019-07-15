@@ -3,6 +3,8 @@ package Pcore::App::API::Base;
 use Pcore -class;
 
 has app => ( required => 1 );    # ConsumerOf ['Pcore::App']
+has api => ( required => 1 );    # ConsumerOf ['Pcore::App::API']
+has dbh => ( required => 1 );
 
 1;
 __END__

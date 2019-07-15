@@ -19,6 +19,7 @@
 
 #define GPIO_BASE     0x200000
 #define GPIO_LEN      0xB4
+#define GPIO_LEN_PI4  0xF4
 
 #define PI_INIT_FAILED -1
 
@@ -64,6 +65,7 @@
 #define PI_PUD_OFF  0
 #define PI_PUD_DOWN 1
 #define PI_PUD_UP   2
+#define PI_PUD_UNSET 0x08
 
 /* locations */
 
@@ -98,14 +100,77 @@
 #define GPPUDCLK0 38
 #define GPPUDCLK1 39
 
+#define GPPUPPDN0 57
+#define GPPUPPDN1 58
+#define GPPUPPDN2 59
+#define GPPUPPDN3 60
+
+#define RPI_1_BASE 0x20000000
+#define RPI_2_BASE 0x3F000000
+#define RPI_3_BASE 0x3F000000
+#define RPI_4_BASE 0xFE000000
+
 
 static int fdMem = -1;
 static volatile uint32_t * gpio_register = MAP_FAILED;
+static volatile uint32_t pi_is_2711    = 0;
+static volatile uint32_t alt_gpio_len  = GPIO_LEN;
+static volatile uint32_t base_address = 0;
 
 // pre-declares required
 static int  do_initialise(void);
 static void do_uninitialise(void);
 static void send_module_error( char * error );
+
+// init peripherals
+static int set_perhipherals(void)
+{
+    const char *ranges_file = "/proc/device-tree/soc/ranges";
+    uint8_t ranges[12];
+    FILE *fd;
+    
+    memset(ranges, 0, sizeof(ranges));
+
+    if ((fd = fopen(ranges_file, "rb")) == NULL)
+    {
+        return PI_INIT_FAILED;
+    }
+    else if (fread(ranges, 1, sizeof(ranges), fd) >= 8)
+    {
+        base_address = (ranges[4] << 24) |
+              (ranges[5] << 16) |
+              (ranges[6] << 8) |
+              (ranges[7] << 0);
+        if (!base_address)
+            base_address = (ranges[8] << 24) |
+                  (ranges[9] << 16) |
+                  (ranges[10] << 8) |
+                  (ranges[11] << 0);
+        if ((ranges[0] != 0x7e) ||
+                (ranges[1] != 0x00) ||
+                (ranges[2] != 0x00) ||
+                (ranges[3] != 0x00) ||
+                ((base_address != RPI_1_BASE) && (base_address != RPI_2_BASE) && (base_address != RPI_4_BASE)))
+        {
+             return PI_INIT_FAILED;
+        }
+    }
+    else
+    {
+	    return PI_INIT_FAILED;
+    }
+
+    fclose(fd);
+    
+    if( base_address == RPI_4_BASE )
+    {
+        pi_is_2711 = 1;
+        alt_gpio_len = GPIO_LEN_PI4;
+    }
+
+    return 0;
+}
+
 
 // map a memory block
 static uint32_t *  map_gpiomem(int fd, uint32_t addr, uint32_t len)
@@ -127,6 +192,12 @@ static int open_gpiomen(void)
 // initialise lib
 static int do_initialise(void)
 {
+    if(set_perhipherals() == PI_INIT_FAILED)
+    {
+        send_module_error("HiPi::GPIO failed to set peripherals");
+        return 0;
+    }
+    
     if(open_gpiomen() == PI_INIT_FAILED)
     {
         send_module_error("HiPi::GPIO failed to open memory device /dev/gpiomem");
@@ -134,7 +205,7 @@ static int do_initialise(void)
         return 0;
     }
     
-    gpio_register = map_gpiomem(fdMem, GPIO_BASE, GPIO_LEN);
+    gpio_register = map_gpiomem(fdMem, GPIO_BASE, alt_gpio_len);
 
     if (gpio_register == MAP_FAILED)
     {
@@ -149,7 +220,7 @@ static int do_initialise(void)
 // uninitialise lib
 static void do_uninitialise(void)
 {
-    if (gpio_register != MAP_FAILED) munmap((void *)gpio_register, GPIO_LEN);
+    if (gpio_register != MAP_FAILED) munmap((void *)gpio_register, alt_gpio_len);
     gpio_register == MAP_FAILED;
     
     if (fdMem != -1)
@@ -179,19 +250,58 @@ static void delay_microseconds(uint32_t inputmicros)
 
 static void do_gpio_set_pud(unsigned gpio, unsigned pud)
 {
+    
+    int shift = (gpio & 0xf) << 1;
+    uint32_t bits;
+    uint32_t pull;
+    
+    if( pi_is_2711 ) {
+        
+        switch (pud)
+        {
+           case PI_PUD_OFF:  pull = 0; break;
+           case PI_PUD_UP:   pull = 1; break;
+           case PI_PUD_DOWN: pull = 2; break;
+        }
+  
+        bits = *(gpio_register + GPPUPPDN0 + (gpio>>4));
+        bits &= ~(3 << shift);
+        bits |= (pull << shift);
+        *(gpio_register + GPPUPPDN0 + (gpio>>4)) = bits;
      
-    *(gpio_register + GPPUD) = pud;
+    } else {
+        *(gpio_register + GPPUD) = pud;
+       
+        delay_microseconds(20);
+     
+        *(gpio_register + GPPUDCLK0 + BANK) = BIT;
+     
+        delay_microseconds(20);
+     
+        *(gpio_register + GPPUD) = 0;
+     
+        *(gpio_register + GPPUDCLK0 + BANK) = 0;
+    }
    
-    delay_microseconds(20);
- 
-    *(gpio_register + GPPUDCLK0 + BANK) = BIT;
- 
-    delay_microseconds(20);
- 
-    *(gpio_register + GPPUD) = 0;
- 
-    *(gpio_register + GPPUDCLK0 + BANK) = 0;
-   
+}
+
+// get pud mode
+
+int do_gpio_get_pud(unsigned gpio)
+{
+    int retval = PI_PUD_UNSET;   
+    if( pi_is_2711 )
+    {
+        int pull_bits = (*(gpio_register + GPPUPPDN0 + (gpio >> 4)) >> ((gpio & 0xf)<<1)) & 0x3;
+        switch (pull_bits)
+        {
+            case 0: retval = PI_PUD_OFF; break;
+            case 1: retval = PI_PUD_UP; break;
+            case 2: retval = PI_PUD_DOWN; break;
+            default: retval = PI_PUD_UNSET; break;
+        } 
+    }
+    return retval;
 }
 
 // set pin mode
@@ -411,6 +521,30 @@ xs_gpio_set_pud( gpio, pud )
         RETVAL = (int)pud;
     }
     
+  OUTPUT: RETVAL
+
+
+int
+xs_gpio_get_pud( gpio )
+    unsigned gpio
+  CODE:
+  
+    if (gpio > PI_MAX_GPIO) {
+        send_module_error("bad gpio number specified");
+        RETVAL = PI_PIN_ERROR;
+    } else {
+        // get the pud
+        
+        RETVAL = do_gpio_get_pud( gpio );
+    }
+    
+  OUTPUT: RETVAL
+
+
+uint32_t xs_gpio_get_peripheral_base_address()
+  CODE:
+    RETVAL = base_address;
+  
   OUTPUT: RETVAL
 
 

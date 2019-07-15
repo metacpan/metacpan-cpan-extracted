@@ -1,0 +1,55 @@
+{
+   "abstract" : "a class to manage capabilies in linux written in C.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Linux-Capabilities",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "CPP::panda::lib" : "v1.2.1",
+            "Panda::Export" : "v2.2.8",
+            "XS::Framework" : "v1.0.0",
+            "XS::Install" : "v1.2.3",
+            "next::XS" : "v1.0.5"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPP::panda::lib" : "v1.2.1",
+            "Panda::Export" : "v2.2.8",
+            "XS::Framework" : "v1.0.0",
+            "XS::Install" : "v1.2.3",
+            "next::XS" : "v1.0.5"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -1,11 +1,13 @@
 lib/Fake/Our.pm
-README
 Changes
-MANIFEST
-META.yml
 LICENSE
+MANIFEST
+META.json
+META.yml
 Makefile.PL
+README
 pmake.bat
 t/001_our_scalar.t
 t/002_our_array.t
 t/003_our_hash.t
+t/2001_podtest.t

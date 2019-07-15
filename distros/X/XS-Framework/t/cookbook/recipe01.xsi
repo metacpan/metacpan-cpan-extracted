@@ -1,0 +1,67 @@
+MODE: INLINE
+
+#include <ctime>
+#include <iostream>
+
+struct DateRecipe01a {
+    DateRecipe01a()  { update(false) ; }
+    ~DateRecipe01a() { std::cout << "~DateRecipe01a()\n"; }
+    void update(bool trace = true)   {
+        if (trace) std::cout << "DateRecipe01a::update()\n";
+        epoch = std::time(nullptr);
+    }
+
+    int get_epoch() const { return epoch; }
+private:
+    std::time_t epoch;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe01a*> : TypemapObject<DateRecipe01a*, DateRecipe01a*, ObjectTypePtr, ObjectStorageIV, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe01a"; }
+    };
+}
+
+struct DateRecipe01b {
+    DateRecipe01b()  { update(false) ; }
+    ~DateRecipe01b() { std::cout << "~DateRecipe01b()\n"; }
+    void update(bool trace = true)   {
+        if (trace) std::cout << "DateRecipe01b::update()\n";
+        epoch = std::time(nullptr);
+    }
+
+    int get_epoch() const { return epoch; }
+private:
+    std::time_t epoch;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe01b*> : TypemapObject<DateRecipe01b*, DateRecipe01b*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe01b"; }
+    };
+}
+
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe01a
+PROTOTYPES: DISABLE
+
+DateRecipe01a* DateRecipe01a::new() { RETVAL = new DateRecipe01a(); }
+
+void DateRecipe01a::update()
+
+std::time_t DateRecipe01a::get_epoch()
+
+void DateRecipe01a::DESTROY() {
+    std::cout << "xs-adapter MyTest::Cookbook::DateRecipe01a::DESTROY\n";
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe01b
+PROTOTYPES: DISABLE
+
+DateRecipe01b* DateRecipe01a::new() { RETVAL = new DateRecipe01b(); }
+
+void DateRecipe01b::update()
+
+std::time_t DateRecipe01b::get_epoch()

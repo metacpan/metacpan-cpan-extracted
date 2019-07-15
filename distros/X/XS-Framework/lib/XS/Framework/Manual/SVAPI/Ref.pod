@@ -1,0 +1,122 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Ref - XS::Framework Ref C++ class reference
+
+=head1 Ref
+
+=head2 Overview
+
+The C<Ref> class purpose is to hold a I<reference> to any other Perl object.
+
+The C<Ref> class is the wrapper around Perls C<RV*> type, which is a variant
+of C<SV*>. As with C<Sv>, it might hold an underlying Perl C<SV*> or might
+not.
+
+
+The C<Ref> object does not holds C<undef>; if C<undef> is assigned or supplied
+in constructor, the object is considered I<empty>. In other words the
+C<undef> and C<NULL> have the same meaning for the class.
+
+=head2 Construction
+
+    Ref (std::nullptr_t = nullptr)
+    Ref (SV* sv, bool policy = INCREMENT)
+
+The new C<Ref> is created, and it either takes ownership on the underlying
+C<SV*> with corresponding refcounting policy, or just empty wrapper
+is created, which holds no value. It is expected that the supplied C<SV*>
+be C<RV*> type; otherwise an exception will be thrown.
+
+The C<create> methods below create an I<reference to> the supplied argument
+(in opposite to the constructor above):
+
+    static Ref create (SV* sv = nullptr, bool policy = INCREMENT)
+    static Ref create (AV* sv, bool policy = INCREMENT)
+    static Ref create (HV* sv, bool policy = INCREMENT)
+    static Ref create (CV* sv, bool policy = INCREMENT)
+    static Ref create (GV* sv, bool policy = INCREMENT)
+    static Ref create (const Sv& o)
+
+In the last case for C<const Sv&> the C<INCREMENT> policy is applied.
+
+Copy and move-constructore are also available:
+
+    Ref (const Ref&    oth)
+    Ref (Ref&&         oth)
+    Ref (const Scalar& oth)
+    Ref (Scalar&&      oth)
+    Ref (const Sv&     oth)
+    Ref (Sv&&          oth)
+
+
+It it possible to create C<Ref> object from C<CallProxy> invocation. In that
+case the C<Ref> instance will hold the I<reference to the result> (similar
+to C<create> above):
+
+    Ref (const CallProxy& p)
+
+however, please note, that the C<CallProxy> will be called in B<scalar context>.
+
+=head2 assignment operators
+
+    Ref& operator= (SV* val)
+    Ref& operator= (const Ref& oth)
+    Ref& operator= (Ref&& oth)
+    Ref& operator= (const Scalar& oth)
+    Ref& operator= (Scalar&& oth)
+    Ref& operator= (const Sv& oth)
+    Ref& operator= (Sv&& oth)
+    Ref& operator= (const CallProxy& p)
+
+The assignment operators are complementaty to the constructors above. They
+inherit behaviour from C<Scalar>, including NULL-safety. The previously held
+C<SV*> will be C<dec>-remented.
+
+The last operator performs proxy call in B<scalar> context, the same as in
+appropriate constructor above.
+
+    void set (SV* val)
+
+The C<set> method directly assigns the value to the underlying C<SV*>,
+I<bypassing all checks>. Use the method with caution.
+
+=head2 value()
+
+It is possble to deref the held C<SV*> via NULL-safe C<value()> method:
+
+    template <class T = Sv> one_of_t<T,Sv,Scalar,Simple,Array,Hash,Sub,Stash,Glob,Ref,Object> value () const
+
+for example:
+
+    Ref r = ...;
+    Simple s = r.value<Simple>();
+
+Please note, if the dereferenced value is incompatible with the destination,
+the exception will be thrown.
+
+To assing the new value, to which the current C<ref> object will point to,
+the following NULL-safe methods can be used:
+
+    void value (SV* val, bool policy = INCREMENT)
+    void value (AV* val, bool policy = INCREMENT)
+    void value (HV* val, bool policy = INCREMENT)
+    void value (CV* val, bool policy = INCREMENT)
+    void value (GV* val, bool policy = INCREMENT)
+    void value (const Sv& val)
+    void value (std::nullptr_t)
+
+Please note, this is different from the assignment operator above: the
+assignment operator expects that the suplied C<SV*> B<be already a reference>,
+while C<value()>  method expects B<referenced value> to be provided.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Sv>
+
+L<XS::Framework::Manual::SVAPI::Scalar>
+
+=cut

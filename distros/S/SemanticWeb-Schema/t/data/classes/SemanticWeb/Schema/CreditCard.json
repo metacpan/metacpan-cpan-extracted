@@ -8,8 +8,8 @@
       "rdfs:comment" : "A card payment method of a particular brand or name.  Used to mark up a particular payment method and/or the financial product/service that supplies the card account.<br/><br/>\n\nCommonly used values:<br/><br/>\n\n<ul>\n<li>http://purl.org/goodrelations/v1#AmericanExpress</li>\n<li>http://purl.org/goodrelations/v1#DinersClub</li>\n<li>http://purl.org/goodrelations/v1#Discover</li>\n<li>http://purl.org/goodrelations/v1#JCB</li>\n<li>http://purl.org/goodrelations/v1#MasterCard</li>\n<li>http://purl.org/goodrelations/v1#VISA</li>\n</ul>\n",
       "rdfs:label" : "CreditCard",
       "rdfs:subClassOf" : [
-         "schema:PaymentCard",
-         "schema:LoanOrCredit"
+         "schema:LoanOrCredit",
+         "schema:PaymentCard"
       ]
    },
    "properties" : {}

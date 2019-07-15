@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-Compile
 
+v2.2.2    2019-07-11
+    - Fix cpan-test failures on mswin32
+
 v2.2.1    2019-07-09
     - Ooops, the module still depends on UNIVERSAL::require
     - Oh, and the subprocess function now requires perl 5.10.0 

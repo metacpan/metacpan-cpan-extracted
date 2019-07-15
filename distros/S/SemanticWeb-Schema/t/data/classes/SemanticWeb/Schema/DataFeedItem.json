@@ -24,15 +24,18 @@
          "rdfs:comment" : "The datetime the item was removed from the DataFeed.",
          "rdfs:label" : "dateDeleted",
          "schema:domainIncludes" : "schema:DataFeedItem",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
       },
       "schema:dateModified" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date on which the CreativeWork was most recently modified or when the item's entry was modified within a DataFeed.",
          "rdfs:label" : "dateModified",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:DataFeedItem"
+            "schema:DataFeedItem",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -44,8 +47,8 @@
          "rdfs:comment" : "An entity represented by an entry in a list or data feed (e.g. an 'artist' in a list of 'artists')Ã¢ÂÂ.",
          "rdfs:label" : "item",
          "schema:domainIncludes" : [
-            "schema:DataFeedItem",
-            "schema:ListItem"
+            "schema:ListItem",
+            "schema:DataFeedItem"
          ],
          "schema:rangeIncludes" : "schema:Thing"
       }

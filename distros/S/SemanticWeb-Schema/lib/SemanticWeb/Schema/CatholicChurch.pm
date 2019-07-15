@@ -6,7 +6,7 @@ package SemanticWeb::Schema::CatholicChurch;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::PlaceOfWorship /;
+extends qw/ SemanticWeb::Schema::Church /;
 
 
 use MooX::JSON_LD 'CatholicChurch';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::CatholicChurch - A Catholic church.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ A Catholic church.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::PlaceOfWorship>
+L<SemanticWeb::Schema::Church>
 
 =head1 SOURCE
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has additional_property => (
@@ -314,7 +314,7 @@ SemanticWeb::Schema::Product - Any offered product or service
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -405,9 +405,9 @@ A brand should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Brand']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -420,11 +420,11 @@ A category should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PhysicalActivityCategory']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
 
 =back
 
@@ -525,9 +525,9 @@ A height should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 
@@ -571,9 +571,9 @@ A is_related_to should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Service']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
 
@@ -660,9 +660,9 @@ A model should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::ProductModel']>
+
+=item C<Str>
 
 =back
 
@@ -820,9 +820,9 @@ A width should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 

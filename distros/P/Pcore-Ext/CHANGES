@@ -1,3 +1,28 @@
+v0.35.0 2019-07-12T12:08:10Z
+ - menu component changed
+ - grid view options overrides
+ - get default route
+ - ext router refactored
+ - upload module refactored
+ - websocket upload
+ - telegram button
+ - bind telegram bot id
+ - telegram button centered
+ - ext session and settings splitted
+ - viewport clear interface fixed
+ - telegram button rendering
+ - telergam username renamed
+ - signin by email
+ - api permissions check updated
+ - fields validators added
+ - profile interface
+ - ext operation toString added
+ - api refactored
+ - dialog mask fixed
+ - masks
+ - list paging plugin for grid
+ - Pcore::Util -> Pcore::Lib
+
 v0.34.0 2019-06-30T19:05:54Z
  - l10n updated
  - media class created

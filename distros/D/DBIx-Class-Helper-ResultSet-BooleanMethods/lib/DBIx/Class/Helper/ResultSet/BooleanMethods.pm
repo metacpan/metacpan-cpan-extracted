@@ -4,7 +4,7 @@ use 5.008;
 use utf8;
 use strictures 2;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ DBIx::Class::Helper::ResultSet::BooleanMethods - Automatically create search met
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
@@ -89,7 +89,7 @@ Say your table has a boolean column named "paid", using this role will act as if
     
     	return $self->search(
     		{
-    			'not_paid' => 'false',
+    			'paid' => 'false',
     		}
     	);
     };
@@ -117,10 +117,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-Helper-ResultSet-BooleanMethods>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/DBIx-Class-Helper-ResultSet-BooleanMethods>
 
 =item * CPAN Ratings
 

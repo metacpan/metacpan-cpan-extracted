@@ -67,6 +67,8 @@ C<-file>, C<-header>.
 
 =item -file FILENAME
 Open and write the given filename.
+Special filename "-" is standard output,
+and files with hdfs: are written to Hadoop.
 
 =item -outputheader [now|delay|never|&format_sub]
 
@@ -95,7 +97,7 @@ sub new {
     #
     # setup:    
     if (! ($self->{_fh} || $self->{_queue})) {
-	$self->{_error} = "failed to set up output stream";
+	$self->{_error} //= "Fsdb::IO::Writer: failed to set up output stream";
 	return $self;
     };
     if ($self->{_fh} && ref($self->{_fh}) eq 'IO::Pipe') {
@@ -128,6 +130,9 @@ sub config_one {
 	if ($file eq '-') {
 	     $fh = new IO::Handle;
 	     $fh->fdopen(fileno(STDOUT),">");
+	     binmode $fh, $mode;
+        } elsif ($file =~ /^hdfs:/) {
+             my $hdfs_reader_pid = open($fh, '|-', "hdfs", "-put", "-", $file);
 	     binmode $fh, $mode;
 	} else {
 	     $fh = new IO::File $file, ">$mode";

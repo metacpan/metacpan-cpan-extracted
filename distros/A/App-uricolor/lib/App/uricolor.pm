@@ -1,6 +1,6 @@
 package App::uricolor;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 

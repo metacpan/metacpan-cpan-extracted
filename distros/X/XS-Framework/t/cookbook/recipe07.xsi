@@ -1,0 +1,116 @@
+MODE: INLINE
+
+#include <iostream>
+
+enum class Status07 { CONNECTED = 1, AUTHORIZED = 2, NOT_AUTHORIZED = 3, DISCONNECTED = 4 };
+
+struct Client07 {
+    int id;
+    Status07 status;
+
+    Client07 (int id_): id{id_}, status{Status07::CONNECTED } {}
+    void disconnect() {
+        std::cout << "disconnecting " << id << "\n";
+        status = Status07::DISCONNECTED;
+    }
+    void welcome() {
+        std::cout << "[sending] welcome dear client " << id << "\n";
+    }
+};
+
+struct ServerBase07 {
+    void on_client(Client07* c) {
+        if (c->status == Status07::AUTHORIZED) c->welcome();
+        if (c->status == Status07::NOT_AUTHORIZED) c->disconnect();
+    }
+};
+
+struct LoggerPlugin07 {
+    void on_client(Client07* c) { std::cout << "client " << c->id << ", status: "  << (int) c->status << "\n"; }
+};
+
+struct AuthorizerPlugin07 {
+    void on_client(Client07* c) {
+        c->status = (c->id < 0) ? Status07::NOT_AUTHORIZED : Status07::AUTHORIZED;
+    }
+};
+
+namespace xs {
+    template <>
+    struct Typemap<Client07*> : TypemapObject<Client07*, Client07*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::Client07"; }
+    };
+
+    template <>
+    struct Typemap<ServerBase07*> : TypemapObject<ServerBase07*, ServerBase07*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::ServerBase07"; }
+    };
+
+    template <>
+    struct Typemap<LoggerPlugin07*> : TypemapObject<LoggerPlugin07*, LoggerPlugin07*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::LoggerPlugin07"; }
+    };
+
+    template <>
+    struct Typemap<AuthorizerPlugin07*> : TypemapObject<AuthorizerPlugin07*, AuthorizerPlugin07*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::AuthorizerPlugin07"; }
+    };
+}
+
+
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Client07
+PROTOTYPES: DISABLE
+
+void Client07::disconnect()
+
+void Client07::welcome()
+
+Client07* Client07::new(int id)
+
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::ServerBase07
+PROTOTYPES: DISABLE
+
+void ServerBase07::on_client(Client07* c)
+
+ServerBase07* ServerBase07::new()
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::LoggerPlugin07
+PROTOTYPES: DISABLE
+
+void LoggerPlugin07::on_client(Client07* c) {
+    THIS->on_client(c);
+    Object(ST(0)).call_next(cv, &ST(1), items-1);
+    THIS->on_client(c);
+}
+
+LoggerPlugin07* LoggerPlugin07::new (...) {
+    PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), items-1);
+    if (!PROTO.defined()) XSRETURN_UNDEF;
+    RETVAL = new LoggerPlugin07();
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::AuthorizerPlugin07
+PROTOTYPES: DISABLE
+
+void AuthorizerPlugin07::on_client(Client07* c) {
+    THIS->on_client(c);
+    Object(ST(0)).call_next(cv, &ST(1), items-1);
+}
+
+AuthorizerPlugin07* AuthorizerPlugin07::new (...) {
+    PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), items-1);
+    if (!PROTO.defined()) XSRETURN_UNDEF;
+    RETVAL = new AuthorizerPlugin07();
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Server07
+PROTOTYPES: DISABLE
+
+BOOT {
+    auto stash = Stash(__PACKAGE__, GV_ADD);
+    stash.inherit("MyTest::Cookbook::LoggerPlugin07");
+    stash.inherit("MyTest::Cookbook::AuthorizerPlugin07");
+    stash.inherit("MyTest::Cookbook::ServerBase07");
+}

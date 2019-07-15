@@ -10,11 +10,11 @@ DBIx::Class::Helper::ResultSet::EnumMethods - Automatically create search method
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Le 'install' => 1 est pour Subroutines::ProhibitCallsToUndeclaredSubs.
 use Package::Variant 'install' => 1, 'importing' => ['Moo::Role'];

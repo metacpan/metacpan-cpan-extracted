@@ -1,7 +1,7 @@
 package Pcore::API::Facebook::User;
 
 use Pcore -role, -const;
-use Pcore::Util::Scalar qw[is_plain_coderef];
+use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 const our $API_VER => 3.3;
 

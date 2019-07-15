@@ -18,8 +18,8 @@
          ],
          "schema:rangeIncludes" : [
             "schema:BedDetails",
-            "schema:Text",
-            "schema:BedType"
+            "schema:BedType",
+            "schema:Text"
          ]
       },
       "schema:occupancy" : {
@@ -29,9 +29,9 @@
          "rdfs:label" : "occupancy",
          "schema:domainIncludes" : [
             "schema:SingleFamilyResidence",
+            "schema:HotelRoom",
             "schema:Suite",
-            "schema:Apartment",
-            "schema:HotelRoom"
+            "schema:Apartment"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       }

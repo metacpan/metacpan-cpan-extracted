@@ -1,19 +1,17 @@
 # TODO Wed Sep 10 09:21:07 2014 GMT
-# $Id: TODO 65 2016-10-05 14:53:02Z abalama $
+# $Id: TODO 88 2019-07-14 16:05:33Z abalama $
 
 # GENERAL
 
-    * LANstat -- прикрутить на базе готового сайта lanstat (программа называется LANstate.exe)
-      
+    * none
+
 # BUGS
 
     * none
 
 # REFACTORING
 
-    * AlertGrid::_replace -- поменять алгоритм инсерт-блока. Сначала генерируется фейковый ключик и 
-      инсертится пустая строка с этим фейковым ключем. Затем по ключу селектится ID этой записи,
-      а далее выполняется UPDATE а не INSERT
+    * none
 
 # DOCUMENTATION
 

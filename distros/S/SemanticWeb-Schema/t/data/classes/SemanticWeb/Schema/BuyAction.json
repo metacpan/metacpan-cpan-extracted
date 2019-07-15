@@ -15,8 +15,8 @@
             "schema:Order",
             "schema:Demand",
             "schema:Offer",
-            "schema:BuyAction",
-            "schema:Flight"
+            "schema:Flight",
+            "schema:BuyAction"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",

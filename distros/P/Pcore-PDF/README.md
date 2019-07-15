@@ -45,12 +45,12 @@ Generate PDF from HTML templates, using princexml.
 
 - generate\_pdf( $self, $html, $cb = undef )
 
-    Generates PDF from `$html` template. `$result` is a standard Pcore API result object, see [Pcore::Util::Result](https://metacpan.org/pod/Pcore::Util::Result) documentation for details.
+    Generates PDF from `$html` template. `$result` is a standard Pcore API result object, see [Pcore::Lib::Result](https://metacpan.org/pod/Pcore::Lib::Result) documentation for details.
 
 # SEE ALSO
 
 - [Pcore](https://metacpan.org/pod/Pcore)
-- [Pcore::Util::Result](https://metacpan.org/pod/Pcore::Util::Result)
+- [Pcore::Lib::Result](https://metacpan.org/pod/Pcore::Lib::Result)
 - [https://www.princexml.com/](https://www.princexml.com/)
 
 # AUTHOR

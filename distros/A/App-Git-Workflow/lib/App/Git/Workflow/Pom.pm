@@ -17,7 +17,7 @@ use App::Git::Workflow::Repository qw//;
 use App::Git::Workflow;
 use base qw/App::Git::Workflow/;
 
-our $VERSION = version->new(1.1.3);
+our $VERSION = version->new(1.1.4);
 
 sub new {
     my $class = shift;
@@ -46,7 +46,7 @@ sub _max_age {
 }
 
 sub get_pom_versions {
-    my ($self, $pom) = @_;
+    my ($self, $pom, $match, $skip) = @_;
     my @branches = $self->branches('both');
     my $settings = $self->settings();
     my %versions;
@@ -62,6 +62,8 @@ sub get_pom_versions {
 
             # skip branches marked as OLD
             next BRANCH if !$run && $saved->{old};
+            next BRANCH if $match && $branch !~ /$match/;
+            next BRANCH if $skip && $skip =~ /$skip/;
 
             my $current = eval { $self->commit_details($branch) } or next;
 
@@ -166,7 +168,7 @@ App::Git::Workflow::Pom - Tools for maven POM files with git
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Pom version 1.1.3
+This documentation refers to App::Git::Workflow::Pom version 1.1.4
 
 =head1 SYNOPSIS
 

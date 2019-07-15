@@ -1,7 +1,7 @@
 package Pcore::HTTP::Server;
 
 use Pcore -class, -const, -res;
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Lib::Scalar qw[is_ref];
 use AnyEvent::Socket qw[];
 use Pcore::HTTP::Server::Request;
 

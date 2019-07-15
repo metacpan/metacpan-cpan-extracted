@@ -1,0 +1,112 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe04 - XS::Framework basics
+
+=cut
+
+=head1 DESCRIPTION
+
+Let's assume that we have C<Timezone> object, which is available via C<std::shared_ptr>.
+
+    struct TimezoneRecipe04 {
+        const char* get_name() const { return name.c_str(); }
+        static std::shared_ptr<TimezoneRecipe04> create(const char* name) {
+            return std::make_shared<TimezoneRecipe04>(name);
+        }
+        TimezoneRecipe04(const char* name_): name{name_} { }
+        ~TimezoneRecipe04() { std::cerr << "~TimezoneRecipe04()\n"; }
+    private:
+        std::string name;
+    };
+
+    using TimezoneRecipe04SP = std::shared_ptr<TimezoneRecipe04>;
+    // (1)
+
+It is recommended to have an alias(1) for smart_pointes, as there will be less
+code below. Let's define typemap for the shared pointer of of Timezone:
+
+    namespace xs {
+        template <>
+        struct Typemap<TimezoneRecipe04SP> : TypemapObject<TimezoneRecipe04SP, TimezoneRecipe04SP, ObjectTypeSharedPtr, ObjectStorageMG, StaticCast> {
+            //              (1)                                     (2)             (3)                 (4)
+            static std::string package () { return "MyTest::Cookbook::TimezoneRecipe04"; }
+        };
+    }
+
+As usual, we have to do full specialization (1) for the smart pointer; we are using
+C<TypemapObject> helper and as there is no types hierarchy base class (2) and final
+class (3) point to the same type (timezone smart pointer). The shipped
+C<ObjectTypeSharedPtr> life time policy should be used, as it is aware of
+C<std::shared_ptr> and knows how to increase and decrease it's reference counter.
+
+The xs-adapter will be like:
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::TimezoneRecipe04
+    PROTOTYPES: DISABLE
+
+    const char* get_name(TimezoneRecipe04SP tz) { RETVAL = tz->get_name(); }
+    //              (5)
+
+    TimezoneRecipe04SP create(const char* name) { RETVAL = TimezoneRecipe04::create(name); }
+
+Pay attention to the XS-function definition (5). It would be error to write it as
+C<const char* TimezoneRecipe04::get_name>, because C<XS::Framework::ParseXS> will
+try to map C<THIS> variable to C<TimezoneRecipe04*>, i.e. timezone pointer; but
+there is no typemap exist for C<TimezoneRecipe04*>, there is only typemap for
+C<TimezoneRecipe04SP>, and C++ compiler will emit error.
+
+For the sake of completeness there is another mapped C++ class, which uses
+C<TimezoneRecipe04SP>. There is nothing new for a reader familiar with the
+previous recipes.
+
+    // C++ class
+    struct DateRecipe04 {
+        DateRecipe04()  { update() ; }
+        void update()   { epoch = std::time(nullptr); }
+
+        int get_epoch() const { return epoch; }
+        void set_timezone(TimezoneRecipe04SP tz_) { tz = tz_; }
+        TimezoneRecipe04SP get_timezone() { return tz; }
+    private:
+        std::time_t epoch;
+        TimezoneRecipe04SP tz;
+    };
+
+    // typemap
+    namespace xs {
+        template <>
+        struct Typemap<DateRecipe04*> : TypemapObject<DateRecipe04*, DateRecipe04*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+            static std::string package () { return "MyTest::Cookbook::DateRecipe04"; }
+        };
+    }
+
+    // XS-adapter
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::DateRecipe04
+    PROTOTYPES: DISABLE
+
+    DateRecipe04* DateRecipe04::new() { RETVAL = new DateRecipe04(); }
+
+    void DateRecipe04::update()
+
+    std::time_t DateRecipe04::get_epoch()
+
+    TimezoneRecipe04SP DateRecipe04::get_timezone()
+
+    void DateRecipe04::set_timezone(TimezoneRecipe04SP tz)
+
+If there will be test code like:
+
+    my $tz = MyTest::Cookbook::TimezoneRecipe04::create('Europe/Minsk');
+    my $date = MyTest::Cookbook::DateRecipe04->new;
+    $date->set_timezone($tz);
+    is $date->get_timezone->get_name, 'Europe/Minsk';   # (6)
+    is $date->get_timezone, $tz;                        # (7)
+
+the check code on line (6) will pass, and on the line (7) will fail. This is because
+every time new wrapper (SV*) is created by C<typemap::out> method. To handle that
+you can either a) overload C<eq> method to let it extracts actual pointers from
+C<shared_ptr> and does pointer comparison, or use typemaps with C<backrefs> support,
+which are covered in future recipes.
+
+
+=cut

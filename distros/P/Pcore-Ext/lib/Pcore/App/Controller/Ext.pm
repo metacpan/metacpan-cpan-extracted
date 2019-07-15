@@ -2,8 +2,8 @@ package Pcore::App::Controller::Ext;
 
 use Pcore -role, -const, -l10n;
 use Pcore::Ext;
-use Pcore::Util::Data qw[to_json];
-use Pcore::Util::Scalar qw[is_plain_arrayref];
+use Pcore::Lib::Data qw[to_json];
+use Pcore::Lib::Scalar qw[is_plain_arrayref];
 
 has ext_package => ( required => 1 );     # name of the linked application, required
 has ext_title   => 'ExtJS Application';

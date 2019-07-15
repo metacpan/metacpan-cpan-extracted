@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 use Test::Catch;
 use Test::Simple;
-XS::Loader::load_tests();
+
+XS::Loader::load('MyTest');
 
 subtest "no args" => sub {
     catch_run();

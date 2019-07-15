@@ -1,7 +1,7 @@
 package Pcore::Dist::Build;
 
 use Pcore -class;
-use Pcore::Util::File::Tree;
+use Pcore::Lib::File::Tree;
 
 has dist => ();    # InstanceOf ['Pcore::Dist']
 

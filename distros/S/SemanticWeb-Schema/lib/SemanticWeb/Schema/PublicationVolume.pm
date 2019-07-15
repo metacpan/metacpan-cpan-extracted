@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has page_end => (
@@ -66,15 +66,15 @@ SemanticWeb::Schema::PublicationVolume - A part of a successively published publ
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
 =for html A part of a successively published publication such as a periodical or
 multi-volume work, often numbered. It may represent a time span, such as a
-year.<br/><br/> <pre><code> &lt;br/&gt;&lt;br/&gt;See also &lt;a
+year.<br/><br/> See also <a
 href="http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.
-html"&gt;blog post&lt;/a&gt;. </code></pre> 
+html">blog post</a>.
 
 =head1 ATTRIBUTES
 
@@ -88,9 +88,9 @@ A page_end should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=item C<Str>
 
 =back
 

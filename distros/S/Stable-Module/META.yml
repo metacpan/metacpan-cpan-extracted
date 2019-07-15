@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Stable-Module
-version: 0.08
+version: 0.09
 abstract: frequently used modules on Perl5 application
 author:
   - ina <ina@cpan.org>
@@ -20,11 +20,10 @@ requires:
   File::Path: 1.0401
   FindBin: 1.42
   Getopt::Std: 1.01
-  Test: 1.122
-  Test::Harness: 1.1602
   perl: 5.005_03
   strict: 1.01
 build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/Stable-Module

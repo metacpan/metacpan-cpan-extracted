@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-Free
 
+0.20	Sun 14 Jul 22:52:42 EDT 2019
+	reverse_geocode starts locally then zooms out a bit
+	Fix copy and paste error into Local.pm from OpenAddresses.pm
+
 0.19	Wed 17 Apr 17:25:55 EDT 2019
 	Added reverse_geocode support to MaxMind and Local
 

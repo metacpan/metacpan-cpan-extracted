@@ -30,11 +30,12 @@ my %WriteMakefileArgs = (
     "File::Slurp" => 0,
     "FindBin" => 0,
     "IO::Dir" => 0,
+    "JSON::MaybeXS" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "IO::Dir" => 0,
   "JSON" => 0,
+  "JSON::MaybeXS" => 0,
   "Module::Find" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,

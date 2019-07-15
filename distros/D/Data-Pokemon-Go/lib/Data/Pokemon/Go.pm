@@ -3,7 +3,9 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
+
+use Moose;
 
 1;
 __END__
@@ -12,7 +14,7 @@ __END__
 
 =head1 NAME
 
-Data::Pokemon::Go - Datas for every Pokemon in Pokemon Go
+Data::Pokemon::Go - Data for every Pokemon in Pokemon Go
 
 =head1 SYNOPSIS
 
@@ -27,7 +29,7 @@ Data::Pokemon::Go - Datas for every Pokemon in Pokemon Go
  use Data::Pokemon::Go::IV;
  my $iv = Data::Pokemon::Go::IV->new();
  print $iv->_calculate_CP( name => $pg->name(), LV => 20, ST => 15, AT => 15, DF => 15 );
- # 2046
+ # 2167
 
 =head1 DESCRIPTION
 

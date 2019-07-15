@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has about => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::CommunicateAction - The act of conveying information to ano
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -128,9 +128,9 @@ A recipient should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Audience']>
+
+=item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 

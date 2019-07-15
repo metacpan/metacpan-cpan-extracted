@@ -144,10 +144,18 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        <http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 [1mWHAT'S NEW[0m
-   [1m2.65, date-tba desc-tba[0m
-       ENHANCEMENT
-           dbmultistats and dbmapreduce now both take a "-F x" option to set
-           the field separator.
+   [1m2.67, date tbd summary tdb[0m
+       IMPROVEMENT
+           dbformmail now has an "mh" mechanism that writes messages to
+           individual files (an mh-style mailbox).
+
+       BUG FIX
+           dbrow failed to include the Carp library, leading to fails on
+           croak.
+
+       BUG FIX
+           Fixed dbjoin error message for an unsorted right stream was
+           incorrect (it said left).
 
 [1mREADME CONTENTS[0m
        executive summary
@@ -168,7 +176,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
 [1mINSTALLATION[0m
        Fsdb now uses the standard Perl build and installation from
-       [4mExtUtil::MakeMaker[24m(3), so the quick answer to installation is to type:
+       [1mExtUtil::MakeMaker[22m(3), so the quick answer to installation is to type:
 
            perl Makefile.PL
            make
@@ -180,7 +188,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            perl Makefile.PL PREFIX=$HOME
 
        and it will go in your home directory's [4mbin[24m, etc.  (See
-       [4mExtUtil::MakeMaker[24m(3) for more details.)
+       [1mExtUtil::MakeMaker[22m(3) for more details.)
 
        Fsdb requires perl 5.8 or later.
 
@@ -226,7 +234,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        Since no-whitespace in columns was a problem for some applications,
        there's an option which relaxes this rule.  You can specify the field
        separator in the table header with "-F x" where "x" is a code for the
-       new field separator.  A full list of codes is at [4mdbfilealter[24m(1), but
+       new field separator.  A full list of codes is at [1mdbfilealter[22m(1), but
        two common special values are "-F t" which is a separator of a single
        tab character, and "-F S", a separator of two spaces.  Both allowing
        (single) spaces in fields.  An example:
@@ -237,7 +245,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
                root  *  0  0  Root  /root  /bin/bash
                # this is a simple database
 
-       See [4mdbfilealter[24m(1) for more details.  Regardless of what the column
+       See [1mdbfilealter[22m(1) for more details.  Regardless of what the column
        separator is for the body of the data, it's always whitespace in the
        header.
 
@@ -278,7 +286,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
                # this is a simple database
                #  | dblistize
 
-       See [4mdbfilealter[24m(1) for more details.
+       See [1mdbfilealter[22m(1) for more details.
 
 [1mBASIC DATA MANIPULATION[0m
        A number of programs exist to manipulate databases.  Complex functions
@@ -311,6 +319,11 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        converts "John_Heidemann" into "Heidemann,_John".  Not too much more
        work could split fullname into firstname and lastname fields.
 
+       (Or:
+
+               cat DATA/passwd | dbcolcreate sort | dbroweval -b 'use Fsdb::Support'
+                       '_sort = _fullname; _sort =~ s/_/ /g; _sort = fullname_to_sort(_sort);'
+
 [1mTALKING ABOUT COLUMNS[0m
        An advantage of Fsdb is that you can talk about columns by name
        (symbolically) rather than simply by their positions.  So in the above
@@ -328,7 +341,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        +o   In code, _last_columnname gets the value from columname's previous
            row.
 
-       See [4mdbroweval[24m(1) for more details about writing code.
+       See [1mdbroweval[22m(1) for more details about writing code.
 
 [1mLIST OF COMMANDS[0m
        Enough said.  I'll summarize the commands, and then you can experiment.
@@ -426,10 +439,10 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            run arbitrary Perl code on each row
 
        dbrowuniq
-           count/eliminate identical rows (like Unix [4muniq[24m(1))
+           count/eliminate identical rows (like Unix [1muniq[22m(1))
 
        dbfilediff
-           compare fields on rows of a file (something like Unix [4mdiff[24m(1))
+           compare fields on rows of a file (something like Unix [1mdiff[22m(1))
 
    [1mOUTPUT CONTROL[0m
        dbcolneaten
@@ -471,7 +484,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            spreadsheet tab-delimited files to db
 
        tcpdump_to_db
-           (see man [4mtcpdump[24m(8) on any reasonable system)
+           (see man [1mtcpdump[22m(8) on any reasonable system)
 
        xml_to_db
            XML input to fsdb, assuming they're very regular
@@ -538,7 +551,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            Skip logging the program in a trailing comment.
 
        When giving Perl code (in dbrow and dbroweval) column names can be
-       embedded if preceded by underscores.  Look at [4mdbrow[24m(1) or [4mdbroweval[24m(1)
+       embedded if preceded by underscores.  Look at [1mdbrow[22m(1) or [1mdbroweval[22m(1)
        for examples.)
 
        Most programs run in constant memory and use temporary files if
@@ -818,6 +831,14 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        and several at ISI.  In February 1998 it was announced to the Internet.
        Since then it has found a few users, some outside where I work.
 
+       Major changes:
+
+       1.0 1997-07-22: first public release.
+       2.0 2008-01-25: rewrite to use a common library, and starting to use
+       threads.
+       2.12 2008-10-16: completion of the rewrite, and first RPM package.
+       2.44 2013-10-02: abandoning threads for improved performance
+
    [1mFsdb 2.0 Rationale[0m
        I've thought about fsdb-2.0 for many years, but it was started in
        earnest in 2007.  Fsdb-2.0 has the following goals:
@@ -870,7 +891,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        Schwendt, Fabio Silva [4mfabio@isi.edu[24m, Jerry Zhao [4mzhaoy@isi.edu[24m, Ning Xu
        [4mnxu@aludra.usc.edu[24m, Martin Lukac [4mmlukac@lecs.cs.ucla.edu[24m, Xue Cai,
        Michael McQuaid, Christopher Meng, Calvin Ardi, H. Merijn Brand, Lan
-       Wei.
+       Wei, Hang Guo.
 
        Fsdb includes datasets contributed from NIST ([4mDATA/nist_zarr13.fsdb[24m),
        from
@@ -1051,7 +1072,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        BUG FIX fixed an autoconf problem where configure would fail to find a
        reasonable prefix (thanks to Fabio Silva for reporting the problem)
        NEW db_to_html_table: simple conversion to html tables (NO fancy stuff)
-       NEW dblib now has a function [4mdblib_text2html()[24m that will do simple
+       NEW dblib now has a function [1mdblib_text2html() [22mthat will do simple
        conversion of iso-8859-1 to HTML
 
    [1m1.13,  4-Feb-04[0m
@@ -1479,7 +1500,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            regression is now fixed.
 
        EXTENSION
-           [4mdbroweval[24m(1) can now handle direct references to the last row via
+           [1mdbroweval[22m(1) can now handle direct references to the last row via
            [4m$lfref[24m, a dubious but now documented feature.
 
        BUG FIXES
@@ -1652,7 +1673,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
    [1m2.26, 2011-12-12 Bug fixes, particularly for perl-5.14.2.[0m
        BUG FIX
-           Bugs fixed in [4mFsdb::IO::Reader[24m(3) manual page.
+           Bugs fixed in [1mFsdb::IO::Reader[22m(3) manual page.
 
        BUG FIX
            Fixed problems where dbcolstats was truncating floating point
@@ -1731,7 +1752,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
    [1m2.32, 2012-12-21 Test suites should now be more numerically robust.[0m
        NEW New dbfilediff does fsdb-aware file differencing.  It does not do
-           smart intuition of add/removes like Unix [4mdiff[24m(1), but it does know
+           smart intuition of add/removes like Unix [1mdiff[22m(1), but it does know
            about columns, and with "-E", it does numeric-aware differences.
 
        IMPROVEMENT
@@ -2295,6 +2316,30 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            of output.  The "--output-on-no-input" and
            "--no-output-on-no-input" options can control this behavior.
 
+   [1m2.65, 2018-02-16 Minor release, bug fix and -F option.[0m
+       ENHANCEMENT
+           dbmultistats and dbmapreduce now both take a "-F x" option to set
+           the field separator.
+
+       BUG FIX
+           Fixed missing "use Carp" in dbcolstats.  Also went back and cleaned
+           up all uses of "croak()".  Thanks to Zefram for the bug report.
+
+   [1m2.66, 2018-12-20 Critical bug fix in dbjoin.[0m
+       BUG FIX
+           Removed old tests from MANIFEST.  (Thanks to Hang Guo for reporting
+           this bug.)
+
+       IMPROVEMENT
+           Errors for non-existing input files now include the bad filename
+           (before: "cannot setup filehandle", now: "cannot open input: cannot
+           open TEST/bad_filename").
+
+       BUG FIX
+           Hash joins with three identical rows were failing with the
+           assertion failure "internal error: confused about overflow" due to
+           a now-fixed bug.
+
 [1mAUTHOR[0m
        John Heidemann, "johnh@isi.edu"
 
@@ -2326,4 +2371,4 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
 
 
-perl v5.26.1                      2017-11-20                           Fsdb(3)
+perl v5.28.2                      2019-01-30                           Fsdb(3)

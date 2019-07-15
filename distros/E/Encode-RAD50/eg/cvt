@@ -10,7 +10,7 @@ use Encode::Rad50;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 my %opt;
 
@@ -88,7 +88,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2007, 2011-2018 by Thomas R. Wyant, III
+Copyright (C) 2005-2007, 2011-2019 by Thomas R. Wyant, III
 (F<wyant at cpan dot org>). All rights reserved.
 
 PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are

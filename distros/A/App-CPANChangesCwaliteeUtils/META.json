@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "CPAN::Changes::Cwalitee" : "0",
-            "Cwalitee::Common" : "0",
+            "Cwalitee::Common" : "0.002",
             "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" : "0",
             "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-App-CPANChangesCwaliteeUtils"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

@@ -10,7 +10,7 @@ HTML::Packer - Another HTML code cleaner
 
 # VERSION
 
-Version 2.07
+Version 2.08
 
 # DESCRIPTION
 
@@ -80,6 +80,7 @@ Johnson (LEEJO) with contributions from:
         Alexander Krizhanovsky <ak@natsys-lab.com>
         Bas Bloemsaat <bas@bloemsaat.com>
         girst <girst@users.noreply.github.com>
+        Ankit Pati (ANKITPATI) <contact@ankitpati.in>
 
 # BUGS
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Firefox::Marionette::Exception::Response);
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 sub throw {
     my ( $class, $response, $parameters ) = @_;
@@ -25,7 +25,7 @@ Firefox::Marionette::Exception::NoSuchAlert - Represents a 'no such alert' excep
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ This module handles the implementation of a 'no such element' error thrown by Fi
 
 =head2 throw
  
-accepts a Marionette L<response|Firefox::Marionette::Response> and the original find parameters and calls Carp::croak.
+accepts a Marionette L<response|Firefox::Marionette::Response> and calls Carp::croak.
 
 =head1 DIAGNOSTICS
 

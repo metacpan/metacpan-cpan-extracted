@@ -6,7 +6,7 @@ package SemanticWeb::Schema::HowToSection;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::ListItem SemanticWeb::Schema::ItemList SemanticWeb::Schema::CreativeWork /;
+extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::ItemList SemanticWeb::Schema::ListItem /;
 
 
 use MooX::JSON_LD 'HowToSection';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has steps => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::HowToSection - A sub-grouping of steps in the instructions 
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -60,17 +60,17 @@ A steps should be one of the following types:
 
 =over
 
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =item C<InstanceOf['SemanticWeb::Schema::ItemList']>
 
-=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+=item C<Str>
 
 =back
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CreativeWork>
+L<SemanticWeb::Schema::ListItem>
 
 =head1 SOURCE
 

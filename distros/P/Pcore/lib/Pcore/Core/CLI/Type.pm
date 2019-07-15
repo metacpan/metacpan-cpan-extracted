@@ -1,7 +1,7 @@
 package Pcore::Core::CLI::Type;
 
 use Pcore -role, -const;
-use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref is_plain_coderef];
+use Pcore::Lib::Scalar qw[is_plain_arrayref is_plain_hashref is_plain_coderef];
 
 const our $TYPE => {
     Str => sub ($val) {

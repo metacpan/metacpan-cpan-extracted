@@ -23,7 +23,7 @@ no_index:
 provides:
   Comics:
     file: lib/Comics.pm
-    version: '1.13'
+    version: '1.14'
 requires:
   Digest::MD5: '0'
   ExtUtils::MakeMaker: '6.46'
@@ -34,5 +34,5 @@ requires:
   perl: '5.012000'
 resources:
   repository: https://github.com/sciurius/comics.git
-version: '1.13'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

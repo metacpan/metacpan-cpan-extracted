@@ -43,6 +43,9 @@ sub new {
     $self->{_cpu}      = $self->get_cpu;
     $self->{_ncpu}     = $self->get_cpu_count;
 
+    (my $bc = $class) =~ s/.*://;
+    $self->{_distro}   = $self->get_dist_name || ($bc eq "Base" ? "" : $bc);
+
     $self->{_ncore}    = $self->{_ncpu}
 	? (sort { $b <=> $a } ($self->{_ncpu} =~ m/(\d+)/g))[0]
 	: $self->{_ncpu};
@@ -163,6 +166,17 @@ sub get_core_count {
     return $self->{_ncore};
     } # get_core_count
 
+=head2 $si->get_dist_name
+
+Returns the name of the distribution.
+
+=cut
+
+sub get_dist_name {
+    my $self = shift;
+    return $self->{__distro};
+    } # get_dist_name
+
 =head2 si_uname (@args)
 
 This class gathers most of the C<uname(1)> info, make a comparable
@@ -237,7 +251,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2018, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2019, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

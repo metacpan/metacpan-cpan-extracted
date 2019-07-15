@@ -1,6 +1,7 @@
 package Bio::MUST::Drivers::Roles::Blastable;
 # ABSTRACT: BLAST database-related methods
-$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.181160';
+$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.191910';
+use 5.018;                      # to avoid a crash due to call to "can" below
 use Moose::Role;
 
 use autodie;
@@ -11,6 +12,7 @@ use feature qw(say);
 use Carp;
 use File::Temp;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class;
 
 use aliased 'Bio::MUST::Core::Ali::Stash';
@@ -55,8 +57,9 @@ sub blast {                                 ## no critic (RequireArgUnpacking)
 
     # abort if no Ali::Temporary-like object
     # this seems to work both with Path::Class::File and plain filenames
-    croak "Error: Cannot autoselect BLAST program for $query; aborting!\n"
-        . 'Use an Ali::Temporary for autodetecting query sequence type.'
+    # however, the can construct here requires perl-5.18 (cannot find why)
+    croak "[BMD] Error: Cannot autoselect BLAST program for $query; aborting!\n"
+        . 'Use Ali::Temporary to autodetect query sequence type.'
         unless $query->can('type') && $query->can('filename');
 
     # auto-select BLAST program based on query/database type
@@ -74,6 +77,10 @@ sub _blast {
     ### $pgm
     ### $args
 
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Blast')->new;
+       $app->meet();
+
     # setup output file and output format
     # Note: only tabular, XML and HTML outputs are allowed
     # if specified -html takes precedence on -outfmt
@@ -84,7 +91,8 @@ sub _blast {
     }
     else {
         unless (defined $args->{-outfmt} && $args->{-outfmt} =~ m/[567]/xms) {
-            carp 'Warning: no valid -outfmt specified; defaulting to tabular!';
+            carp '[BMD] Warning: no valid -outfmt specified;'
+                . ' defaulting to tabular!';
             $args->{-outfmt} = 6;
         }
     }
@@ -107,7 +115,8 @@ sub _blast {
     # try to robustly execute BLAST
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Warning: cannot execute $pgm command; returning without parser!";
+        carp "[BMD] Warning: cannot execute $pgm command;"
+            . ' returning without parser!';
         return;
     }
 
@@ -151,7 +160,8 @@ sub blastdbcmd {
     # try to robustly execute blastdbcmd
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Warning: cannot execute $pgm command; returning without seqs!";
+        carp "[BMD] Warning: cannot execute $pgm command;"
+            . ' returning without seqs!';
         return;
     }
 
@@ -171,7 +181,7 @@ Bio::MUST::Drivers::Roles::Blastable - BLAST database-related methods
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

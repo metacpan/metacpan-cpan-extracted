@@ -9,13 +9,13 @@ use LWP::UserAgent;
 use POSIX 'strftime';
 
 use Exporter 'import';
-our @EXPORT = qw(&getEstablishmentBySIRET &getEstablishmentsBySIREN &getEstablishmentsByName &getEstablishmentsByUsualName &getEstablishmentsByCriteria);
-our @EXPORT_OK = qw(&getLegalUnitBySIREN &getLegalUnitsByCriteria &getLegalUnitsByName &getLegalUnitsByUsualName &getUserAgentInitialized);
+our @EXPORT = qw(&getLegalUnitBySIREN &getEstablishmentBySIRET &getEstablishmentsBySIREN &getEstablishmentsByName &getEstablishmentsByUsualName);
+our @EXPORT_OK = qw(&getEstablishmentsByCriteria &getLegalUnitsByCriteria &getLegalUnitsByName &getLegalUnitsByUsualName &getUserAgentInitialized);
 
 my $API_VERSION = 3;
 my $API_REVISION = 5;
-my $PACKAGE_REVISION = '01';
-our $VERSION = 3.501;
+my $PACKAGE_REVISION = '02';
+our $VERSION = 3.502;
 
 my $EMPTY = q{};
 my $API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V$API_VERSION";
@@ -93,7 +93,7 @@ sub initUserAgent {
     croak "No credentials" if (not $CLIENT_AUTH);
     $user_agent = LWP::UserAgent->new();
 
-    $user_agent->agent("Perl API::INSEE::Sirene V$API_VERSION");
+    $user_agent->agent("Perl API::INSEE::Sirene V$VERSION");
     $user_agent->timeout($timeout);
     $proxy ? $user_agent->proxy(['https', 'http'], $proxy) : $user_agent->env_proxy;
 
@@ -119,13 +119,25 @@ sub getToken {
     my $request = HTTP::Request->new('POST', $url, $header);
     my $response = $user_agent->request($request);
 
-    if ($response->is_success) {
+    if ($response->is_success && $response->header('Content-Type') =~ qr{application/json}i) {
 
-        # TODO check $response->header('Content-Type') eq 'application/json'
-        my $json_obj;
-        eval {$json_obj = decode_json($response->content);};
+        my $json_obj = decode_json($response->content);
+        return $json_obj->{'access_token'};
+    }
 
-        return $@ ? (0, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $@) : $json_obj->{'access_token'};
+    return (0, sprintf "Sent Request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
+}
+
+sub checkResponse {
+
+    my ($endpoint, $parameters) = @_;
+
+    my $request = HTTP::Request->new('GET', "$API_BASE_URL/$endpoint?$parameters");
+    my $response = $user_agent->request($request);
+
+    if ($response->is_success && $response->header('Content-Type') =~ qr{application/json}i) {
+
+        return $response->content;
     }
 
     return (0, sprintf "Sent Request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
@@ -211,7 +223,7 @@ sub getLegalUnitBySIREN {
     my $parameters = buildParameters($usefull_fields_unite_legale, 0, $fields);
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siren/$siren?$parameters")->content;
+    return checkResponse("siren/$siren", $parameters);
 }
 
 sub getEstablishmentBySIRET {
@@ -223,7 +235,7 @@ sub getEstablishmentBySIRET {
     my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields);
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siret/$siret?$parameters")->content;
+    return checkResponse("siret/$siret", $parameters);
 }
 
 sub getEstablishmentsBySIREN {
@@ -235,7 +247,7 @@ sub getEstablishmentsBySIREN {
     my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, {siren => $siren});
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siret?$parameters")->content;
+    return checkResponse('siret', $parameters);
 }
 
 sub getLegalUnitsByCriteria {
@@ -245,7 +257,7 @@ sub getLegalUnitsByCriteria {
     my $parameters = buildParameters($usefull_fields_unite_legale, 1, $fields, $criteria);
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siren?$parameters")->content;
+    return checkResponse('siren', $parameters);
 }
 
 sub getEstablishmentsByCriteria {
@@ -255,7 +267,7 @@ sub getEstablishmentsByCriteria {
     my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, $criteria);
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siret?$parameters")->content;
+    return checkResponse('siret', $parameters);
 }
 
 sub getLegalUnitsByName {
@@ -265,7 +277,7 @@ sub getLegalUnitsByName {
     my $parameters = buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siren?$parameters")->content;
+    return checkResponse('siren', $parameters);
 }
 
 sub getEstablishmentsByName {
@@ -275,7 +287,7 @@ sub getEstablishmentsByName {
     my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siret?$parameters")->content;
+    return checkResponse('siret', $parameters);
 }
 
 sub getLegalUnitsByUsualName {
@@ -285,7 +297,7 @@ sub getLegalUnitsByUsualName {
     my $parameters = buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUsuelle1UniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siren?$parameters")->content;
+    return checkResponse('siren', $parameters);
 }
 
 sub getEstablishmentsByUsualName {
@@ -295,7 +307,7 @@ sub getEstablishmentsByUsualName {
     my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUsuelle1UniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return $user_agent->get("$API_BASE_URL/siret?$parameters")->content;
+    return checkResponse('siret', $parameters);
 }
 
 
@@ -323,15 +335,15 @@ API::INSEE::Sirene - An interface for the Sirene API of INSEE
   # Examples to get informations about an establishment with SIRET number '12345678987654'
   getEstablishmentBySIRET(12345678987654, 'all');
 
-  #or
+  # or
   my $fields_that_interest_me = ['numeroVoieEtablissement', 'typeVoieEtablissement', 'libelleVoieEtablissement', 
                                  'codePostalEtablissement', 'libelleCommuneEtablissement'];
   getEstablishmentBySIRET(12345678987654, $fields_that_interest_me);
 
-  #or
+  # or
   getEstablishmentBySIRET(12345678987654, 'denominationUniteLegale');
 
-  #or simply
+  # or simply
   getEstablishmentBySIRET(12345678987654);
 
 =head1 DESCRIPTION
@@ -370,7 +382,7 @@ Here is the documentation with among others all fields names:
 
 =item *
 
-L<< https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene&version=V3&provider=insee#tab2 >>
+L<< https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene&version=V3&provider=insee >>
 
 =back
 
@@ -406,15 +418,15 @@ These following functions are exported by default:
 
 =over 4
 
-=item * getEstablishmentBySIRET
+=item * getLegalUnitBySIREN
 
 =item * getEstablishmentsBySIREN
+
+=item * getEstablishmentBySIRET
 
 =item * getEstablishmentsByName
 
 =item * getEstablishmentsByUsualName
-
-=item * getEstablishmentsByCriteria
 
 =back
 
@@ -422,7 +434,7 @@ These folowing functions are available by manual import:
 
 =over 4
 
-=item * getLegalUnitBySIREN
+=item * getEstablishmentsByCriteria
 
 =item * getLegalUnitsByCriteria
 
@@ -519,7 +531,7 @@ Return the user agent initialized with the token. Allows advanced users to make 
 
 =back
 
-B<Note: All functions search and return values that are in the most recent legal unit period.>
+B<Note:> All functions search and return values that are in the most recent legal unit period.
 
 =head2 PARAMETERS
 
@@ -533,7 +545,7 @@ In the B<getEstablishmentBySIRET()>, B<getEstablishmentsBySIREN()> and B<getLega
   my $response_json = getEstablishmentBySIRET(12345678987654);
   my $response_json = getEstablishmentsBySIREN(123456789);
 
-Note: A SIREN number must be 9 digits long and a SIRET number must be 14 digits long.
+B<Note:> A SIREN number must be 9 digits long and a SIRET number must be 14 digits long.
 
 =item B<criteria>
 
@@ -548,7 +560,7 @@ In the B<getLegalUnitsByCriteria()> and B<getEstablishmentsByCriteria()> functio
 
   my $response_json = getLegalUnitsByCriteria(\%criteria);
 
-Note: Criteria are concatened with an AND in query search. A criteria is a couple of field:value, you can use aliases defined below.
+B<Note:> Criteria are concatened with an AND in query search. A criteria is a couple of field:value, you can use aliases defined below.
 
 =item B<name>
 
@@ -556,7 +568,7 @@ In the B<getLegalUnitsByName()>, B<getEstablishmentsByName()>, B<getLegalUnitsBy
 
     my $response_json = getLegalUnitsByName("EnterpriseName");
 
-Note: You can enter a part or the complete name of an enterprise.
+B<Note:> You can enter a part or the complete name of an enterprise.
 
 =item B<fields>
 
@@ -565,10 +577,10 @@ All functions are taking two parameters including an optional one. The second pa
   my $fields_that_interest_me = ['dateCreationUniteLegale', 'sigleUniteLegale'];
   my $result_json = getLegalUnitBySIREN(123456789, $fields_that_interest_me);
 
-  #or
+  # or
   my $result_json = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
 
-  #or
+  # or
   my $result_json = getLegalUnitBySIREN(123456789, 'all');
 
 You can specify an array of fields that interest you in order that the module returns to you only these fields. If you want to get only one field, you do not have to give it as an array.

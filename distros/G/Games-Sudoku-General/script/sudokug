@@ -26,7 +26,7 @@ where the only valid option at the moment is
 
 EOD
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 my $rdln = Term::ReadLine->new ('Solve Sudoku and other set-allocation puzzles');
 my $OUT = $rdln->OUT || \*STDOUT;
@@ -290,9 +290,9 @@ L<Games::Sudoku::General>, or (equivalently) use the command
 
 =head2 Commands
 
-=over
+=head3 add_set
 
-=item add_set
+ sudokug> add_set main_diag 0 10 20 30 40 50 60 70 80
 
 This command adds a set to an existing topology. The arguments are the
 name of the new set, and the numbers of the existing cells that are to
@@ -301,42 +301,57 @@ be members of it.
 Cells are numbered from 0 in the order in which they were defined by
 the topology. Typically this is row order.
 
-=item constraints_used
+=head3 constraints_used
+
+ sudokug> constraints_used
 
 This command lists the constraints used to provide the most recent
 solution.
 
-=item copy
+=head3 copy
+
+ sudokug> copy
 
 Copy the current puzzle or solution to the clipboard. See the CLIPBOARD
 SUPPORT section of the L<Games::Sudoku::General> documentation for what
 you need to make this work.
 
-=item drop_set
+=head3 drop_set
+
+ sudokug> drop_set main_diagonal
 
 This command drops a set from the existing topology. The argument is the
 name of the new set.
 
-=item exit
+=head3 exit
+
+ sudokug> exit
 
 This command does not correspond to a Games::Sudoku::General method.
 It causes this script to terminate. Entering end-of-file in response
 to a prompt by this script also works.
 
-=item generate min max constraints
+=head3 generate
 
-This command attempts to generate a puzzle in the current topology.
-All arguments may be defaulted, but the defaults may not be
-appropriate for all topologies. See 'help lib' for details.
+ sudokug> generate 6 20 'F N'
 
-=item get name ...
+This command attempts to generate a puzzle in the current topology. The
+arguments are minimum number of givens, maximum number of givens, and
+constraints to use.  All arguments may be defaulted, but the defaults
+may not be appropriate for all topologies. See 'help lib' for details.
+
+=head3 get
+
+ sudokug> get topology
 
 This command displays the values of the named attributes. You can
 specify the name of more than one attribute. See L</Attributes> below
 for a brief discussion of each, and L<Games::Sudoku::General> for more
 details.
 
-=item help
+=head3 help
+
+ sudokug> help
 
 This command does not correspond to a Games::Sudoku::General method.
 Without an argument, it gets you this documentation. If given with
@@ -346,20 +361,36 @@ the argument 'lib', that is, as
 
 it gets you the POD for Games::Sudoku::General.
 
-=item new
+=head3 new
+
+ sudokug> new
 
 This command instantiates a Games::Sudoku::General object. You get one
 for free when you launch this script; this command is for those cases
 when it is easier to start over with a new object than to reconfigure
 the one you already have. Any arguments get passed to the set() method.
 
-=item paste
+=head3 paste
+
+ sudokug> paste
 
 Paste a new puzzle from the clipboard. See the CLIPBOARD SUPPORT
 section of the L<Games::Sudoku::General> documentation for what you
 need to make this work.
 
-=item problem string
+=head3 problem
+
+ sudokug> problem <<EOD
+ EOD: . . . 4 . . 7 8 9
+ EOD: 4 . 6 . . . 1 . .
+ EOD: . 8 . . . . . 5 .
+ EOD: 2 . 4 . . 5 . . .
+ EOD: . 9 5 . . . . . .
+ EOD: . . . 9 . 2 3 4 5
+ EOD: . 3 . . 7 . 9 . 8
+ EOD: . 6 7 . . 1 . . .
+ EOD: 9 . . . . 8 . . 2
+ EOD: EOD
 
 This command specifies the problem to be solved, in the order they were
 defined by the topology (typically row order). The problem string must
@@ -371,7 +402,9 @@ taken to represent an unspecified cell.
 Line breaks may be given (as in the L</SYNOPSIS>), but are treated
 like any other whitespace.
 
-=item set name value ...
+=head3 set
+
+ sudokug> set sudoku 3
 
 This command sets each named attribute to its given value. You can
 specify more than one name/value pair. See L</Attributes> below
@@ -384,12 +417,16 @@ below:
 
 * webcmd - the name of the command to spawn to bring up a web browser.
 
-=item show name ...
+=head3 show
+
+ sudokug> show topology
 
 This command does not correspond to a Games::Sudoku::General method,
 but is just a synonym for 'get'.
 
-=item solution
+=head3 solution
+
+ sudokug> solution
 
 This command causes an attempt to solve the currently-set-up problem.
 If a solution is found, it will be displayed. Otherwise you will get
@@ -400,7 +437,9 @@ If you issue this command more than once without an intervening
 previous solution left off. If there are multiple solutions to a
 puzzle, each 'solution' command will get you one, until you run out.
 
-=item source filename
+=head3 source
+
+ sudokug> source sudoku_file.txt
 
 This command does not correspond to a Games::Sudoku::General method.
 It causes subsequent commands to be taken from the given file, until
@@ -411,7 +450,9 @@ the file is completely read, or until an 'exit' command is executed.
 the file name is still required.
 
 
-=item steps
+=head3 steps
+
+ sudokug> steps
 
 This command displays the steps taken to obtain the most recent
 solution. They will be displayed as follows:
@@ -450,12 +491,12 @@ such cell, the one with the smallest cell number is chosen. If at any
 point a solution becomes impossible, we backtrack to the point we
 took the guess, and try the next possible value.
 
-=item unload
+=head3 unload
+
+ sudokug> unload
 
 Display the current problem, or its current solution if it has been
 solved.
-
-=back
 
 =head2 Attributes
 
@@ -513,7 +554,7 @@ This pseudo-attribute sets the topology, symbols, and columns for a
 Sudoku puzzle having the additional restriction that corresponding
 cells in the small squares must contain different numbers. The value
 is the size of the small square (i.e. the same as the value for
-L</sudoku>. Also called "disjoint groups".
+C<sudoku>). Also called "disjoint groups".
 
 =item cube (string, write-only)
 
@@ -553,7 +594,7 @@ is 0.
 
 =item generation_limit (number)
 
-This attribute sets the number of times the L<generate|/item_generate>
+This attribute sets the number of times the L<generate|/generate>
 command tries to generate a puzzle before it gives up.
 
 =item iteration_limit (number)

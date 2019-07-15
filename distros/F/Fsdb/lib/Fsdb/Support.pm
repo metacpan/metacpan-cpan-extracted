@@ -38,6 +38,7 @@ use Exporter 'import';
     progname
     $is_numeric_regexp
     ddmmmyy_to_iso
+    int_to_metric
     );
 
 #
@@ -211,6 +212,27 @@ sub ddmmmyy_to_iso {
     $yyyy += 1900 if ($yyyy >= 70 && $yyyy < 100);
     $yyyy += 2000 if ($yyyy < 70);
     return sprintf("%04d-%02d-%02d", $yyyy, $mm, $dd);
+}
+
+=head2 int_to_metric
+
+    my $value_str = int_to_metric(1000000);
+
+Converts an integer into a string with its metric abbreviation.
+
+1000 => 1k
+1000000 => 1M
+
+=cut
+sub int_to_metric {
+    my($n) = @_;
+    my($prefix) = " kMGTEP";
+    while (length($prefix) > 1) {
+        last if ($n < 10000);
+        $n = int($n / 1000);
+        $prefix = substr($prefix, 1);
+    };
+    return "$n" . substr($prefix, 0, 1);
 }
 
 1;

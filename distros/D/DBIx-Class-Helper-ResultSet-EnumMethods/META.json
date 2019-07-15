@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "strictures" : "0"
          }
       },
       "runtime" : {
@@ -35,7 +36,8 @@
             "DBIx::Class::Helper::ResultSet::Me" : "2.033",
             "Package::Variant" : "1.003",
             "Role::Tiny" : "2.0",
-            "perl" : "5.008"
+            "perl" : "5.008",
+            "strictures" : "0"
          }
       },
       "test" : {
@@ -52,6 +54,6 @@
          "web" : "https://github.com/mat813/DBIx-Class-Helper-ResultSet-EnumMethods"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

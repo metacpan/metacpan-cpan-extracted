@@ -1,0 +1,167 @@
+#!/usr/bin/perl -w
+use strict; # $Id: monm_ftp 78 2019-07-07 19:48:16Z abalama $
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+monm_ftp - FTP checker for App::MonM
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    monm_ftp [ --user=USERNAME ] [ --password=PASSWORD ]
+             [ --port=PORTNUMBER ] [-t SECS] [-a] HOST
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-a, --active>
+
+Switch to ACTIVE mode
+
+Default: off (passive mode)
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-p PASSWORD, --password=PASSWORD>
+
+Password for connection
+
+=item B<-P PORTNUMBER, --port=PORTNUMBER>
+
+Port number
+
+Default: 21
+
+=item B<-t SECT, --timeout=SECS>
+
+Timeout value, secs
+
+Default: 120
+
+=item B<-u USERNAME, --user=USERNAME>
+
+Username for connection
+
+=back
+
+=head1 DESCRIPTION
+
+FTP checker for App::MonM
+
+=head1 DEPENDENCES
+
+L<Net::FTP>
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Net::FTP;
+
+use App::MonM::Const qw/
+        IS_TTY SCREENWIDTH
+        OK DONE ERROR SKIPPED PASSED FAILED UNKNOWN PROBLEM
+    /;
+
+use constant {
+    HOST        => "localhost",
+    PORT        => 21,
+    TIMEOUT     => 120,
+};
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # Information
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+
+    # General
+    "user|username|login|u=s",  # Username
+    "password|passwd|pass|p=s", # Password
+    "port|P=i",                 # Port
+    "timeout|time|t=i",         # Timeout
+    "active|act|a",             # Active mode
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+
+my $host        = shift(@ARGV) || HOST;
+my $port        = $options->{port} || PORT;
+my $timeout     = $options->{timeout} || TIMEOUT;
+my $user        = $options->{user} // "anonymous";
+my $password    = $options->{password} // "anonymous\@example.com";
+my $passive     = $options->{active} ? 0 : 1;
+
+my $err = '';
+my $ftp = new Net::FTP($host, (
+    Port    => $port,
+    Timeout => $timeout,
+    Passive => $passive,
+)) or do {
+    $err = sprintf("Can't connect to %s: %s", $host, $@);
+};
+
+# Login
+unless ($err) {
+    $ftp->login($user, $password) or do {
+        $err = sprintf("Can't login to %s: %s", $host, $ftp->message);
+    };
+}
+
+# Get list
+unless ($err) {
+    my @ls = $ftp->ls();
+    foreach my $l (@ls) {
+        next unless defined $l;
+        printf "# %s\n", $l if IS_TTY;
+    }
+}
+
+# Quit
+$ftp->quit if $ftp;
+
+if ($err) { 
+    print STDERR $err, "\n";
+    print ERROR, "\n";
+    exit 1;
+}
+
+print OK, "\n";
+exit 0;
+
+__END__

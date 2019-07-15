@@ -38,76 +38,79 @@ no_index:
 provides:
   BSON:
     file: lib/BSON.pm
-    version: v1.10.2
+    version: v1.12.0
+  BSON::Array:
+    file: lib/BSON/Array.pm
+    version: v1.12.0
   BSON::Binary:
     file: lib/BSON/Binary.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Bool:
     file: lib/BSON/Bool.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Bytes:
     file: lib/BSON/Bytes.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Code:
     file: lib/BSON/Code.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::DBPointer:
     file: lib/BSON/DBPointer.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::DBRef:
     file: lib/BSON/DBRef.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Decimal128:
     file: lib/BSON/Decimal128.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Doc:
     file: lib/BSON/Doc.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Double:
     file: lib/BSON/Double.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Int32:
     file: lib/BSON/Int32.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Int64:
     file: lib/BSON/Int64.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::MaxKey:
     file: lib/BSON/MaxKey.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::MinKey:
     file: lib/BSON/MinKey.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::OID:
     file: lib/BSON/OID.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::ObjectId:
     file: lib/BSON/ObjectId.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::PP:
     file: lib/BSON/PP.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Raw:
     file: lib/BSON/Raw.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Regex:
     file: lib/BSON/Regex.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::String:
     file: lib/BSON/String.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Symbol:
     file: lib/BSON/Symbol.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Time:
     file: lib/BSON/Time.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Timestamp:
     file: lib/BSON/Timestamp.pm
-    version: v1.10.2
+    version: v1.12.0
   BSON::Types:
     file: lib/BSON/Types.pm
-    version: v1.10.2
+    version: v1.12.0
 requires:
   B: '0'
   Carp: '0'
@@ -140,7 +143,7 @@ resources:
   bugtracker: https://jira.mongodb.org/browse/PERL
   homepage: https://github.com/mongodb/mongo-perl-bson
   repository: https://github.com/mongodb/mongo-perl-bson.git
-version: v1.10.2
+version: v1.12.0
 x_authority: cpan:MONGODB
 x_contributors:
   - 'Eric Daniels <eric.daniels@mongodb.com>'
@@ -154,5 +157,5 @@ x_contributors:
   - 'Wallace Reis <wallace@reis.me>'
   - 'Yury Zavarin <yury.zavarin@gmail.com>'
   - 'Oleg Kostyuk <cub@cpan.org>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -12,9 +12,13 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 BSON
 David
+Evans
 Golden
 Inc
+LeoNerd
 MongoDB
+Paul
 XS
 david
+leonerd
 lib

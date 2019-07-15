@@ -1,4 +1,4 @@
-package App::MonM::Notifier::Channel::Email; # $Id: Email.pm 31 2017-11-21 16:31:59Z abalama $
+package App::MonM::Notifier::Channel::Email; # $Id: Email.pm 60 2019-07-14 09:57:26Z abalama $
 use strict;
 use utf8;
 
@@ -10,168 +10,88 @@ App::MonM::Notifier::Channel::Email - monotifier email channel
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
-	use App::MonM::Notifier::Channel;
+    <Channel MyEmail>
+        Type    Email
 
-	# Create channel object
-	my $channel = new App::MonM::Notifier::Channel(
-	        timeout => 300, # Default: 300
-	    );
+        # Real To and From
+        To      test@example.com
+        From    root@example.com
 
-	# Send message via email channel
-	$channel->email(
-	    {
-	        id      => 1,
-	        to      => "anonymous\@example.com",
-	        from    => "root\@example.com",
-	        subject => "Test message",
-	        message => "Content of the message",
-	        headers => {
-	                   "X-Foo"	=> "Extended eXtra value",
-	            },
-	    },
-	    {
-	        encoding => 'base64', # Default: 8bit
-	        content_type => undef, # Default: text/plain
-	        charset => undef, # Default: utf-8
+        # Options
+        #Encoding base64
 
-	        # SMTP options
-	        host    => '127.0.0.1', # Default: localhost
-	        port    => 25, # Default: 25
+        # Headers
+        <Headers>
+            X-Foo foo
+            X-Bar bar
+        </Headers>
 
-	        # General options
-	        timeout => 120, # Default: 120
-	        helo    => 'host.example.com', # Default: undef
+        # SMTP options
+        # If there are requirements to the register of parameter
+        # names, use the Set directive, for example:
+        # By default will use <SendMail> section of general config file
+        Set host 192.168.0.1
+        Set port 25
+        #Set sasl_username TeStUser
+        #Set sasl_password MyPassword
 
-	        # SASL & SSL options
-	        #username    => '', # Default: undef
-	        #password    => '', # Default: undef
-	        ssl         => 0, # Default: undef
-	        ssl_options => {}, # Default: undef
-	    }) or warn( $channel->error );
-
-	# See error
-	print $channel->error unless $channel->status;
-
-	# Also see trace for error details
-	print $channel->trace unless $channel->status;
-
+    </Channel>
 
 =head1 DESCRIPTION
 
-This module provides "email" method.
+This module provides email method
 
-	my $status = $channel->email( $data, $options );
+=head2 DIRECTIVES
 
-The $data structure (hashref) describes body of message, the $options
-structure (hashref) describes parameters of the connection via external modules
+=over 4
 
-=head2 DATA
+=item B<From>
 
-It is a structure (hash), that can contain the following fields:
+Sender address or name
 
-=over 8
+=item B<Set>
 
-=item B<id>
+Sets SMTP options:
 
-Contains internal ID of the message. This ID is converted to an X-Id header
-
-=item B<to>
-
-EMail address of the recipient
-
-=item B<from>
-
-EMail address of the sender
-
-=item B<subject>
-
-Subject of the message
-
-=item B<message>
-
-Body of the message
-
-=item B<headers>
-
-Optional field. Contains eXtra headers (extension headers). For example:
-
-    headers => {
-            "bcc" => "bcc\@example.com",
-            "X-Mailer" => "My mailer",
-        }
-
-=back
-
-=head2 OPTIONS
-
-It is a structure (hash), that can contain the following fields:
-
-=over 8
-
-=item B<encoding>
-
-Encoding: 'quoted-printable', base64' or '8bit'
-
-Default: 8bit
-
-See L<Email::MIME>
-
-=item B<content_type>
-
-The content type
-
-Default: text/plain
-
-See L<Email::MIME>
-
-=item B<charset>
-
-Part of common Content-Type attribute. Defines charset
-
-Default: utf-8
-
-See L<Email::MIME>
-
-=item B<host>
+    Set host SMTPHOST
 
 SMTP option "host". Contains hostname or IP of remote SMTP server
 
 Default: localhost
 
-=item B<port>
+    Set port PORT
 
 SMTP option "port". Contains port to connect to
 
 Defaults to 25 for non-SSL, 465 for 'ssl', 587 for 'starttls'
 
-=item B<timeout>
+    Set timeout TIMEOUT
 
 Maximum time in secs to wait for server
 
 Default: 120
 
-=item B<helo>
+    Set helo HELOSTRING
 
-SMTP attribute. What to say when saying HELO
+SMTP attribute. What to say when saying HELO. Optional
 
 No default
 
-=item B<username>
+    Set sasl_username USERNAME
 
-This is sasl_username SMTP attribute, is optional field.
+This is sasl_username SMTP attribute. Optional
 
 Contains the username to use for auth
 
-=item B<password>
+    Set sasl_password PASSWORD
 
-This is sasl_password SMTP attribute, the password to use for auth;
-required if username is provided
+This is sasl_password SMTP attribute. Optional
 
-=item B<ssl>
+    Set ssl 1
 
 This is ssl SMTP attribute: if 'starttls', use STARTTLS;
 if 'ssl' (or 1), connect securely; otherwise, no security.
@@ -180,80 +100,64 @@ Default: undef
 
 See L<Email::Sender::Transport::SMTP>
 
-=item B<ssl_options>
+=item B<To>
 
-This is ssl_options SMTP attribute (hashref): passed to L<Net::SMTP>
-constructor for 'ssl' connections or to starttls for 'starttls'
-connections; should contain extra options for L<IO::Socket::SSL>
+Recipient address or name
 
-Default: undef
+=item B<Type>
 
-See L<Email::Sender::Transport::SMTP>
+Defines type of channel. MUST BE set to "Email" value
 
 =back
 
+About other options (base) see L<App::MonM::Notifier::Channel/DIRECTIVES>
+
 =head2 METHODS
 
-=over 8
+=over 4
 
-=item B<init>
-
-For internal use only!
-
-Called from base class. Returns initialize structure
-
-=item B<handler>
+=item B<process>
 
 For internal use only!
-
-Called from base class. Returns status of the operation
 
 =back
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
 
 =head1 DEPENDENCIES
 
-L<CTK>, L<Email::MIME>, L<Email::Sender>
+L<Email::MIME>, L<Email::Sender>, L<Net::SMTP>
 
 =head1 TO DO
 
 See C<TODO> file
 
-=head1 BUGS
-
-* none noted
-
 =head1 SEE ALSO
 
-L<App::MonM::Notifier>, L<Email::MIME>, L<Email::Sender>, L<Net::SMTP>,
-L<IO::Socket::SSL>, L<App::MonM::Notifier::Channel>
+L<App::MonM::Notifier>, L<App::MonM::Notifier::Channel>, L<Email::MIME>, L<Email::Sender>,
+L<Net::SMTP>
 
 =head1 AUTHOR
 
-Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
+
+use vars qw/$VERSION/;
+$VERSION = '1.01';
 
 use CTK::ConfGenUtil;
 use CTK::TFVals qw/ :ALL /;
@@ -261,139 +165,72 @@ use Email::Sender::Simple qw//;
 use Email::Sender::Transport::SMTP;
 use Try::Tiny;
 
-use vars qw/$VERSION $BANNER/;
-$VERSION = '1.00';
+use App::MonM::Util qw/ set2attr /;
 
-use constant {
-    PREFIX    => 'monotifier',
-};
-
-sub init {
-	$BANNER = sprintf("%s/%.2f", PREFIX, "$VERSION");
-    return (
-        type 	=> "Email",
-        banner 	=> $BANNER,
-        validation => {
-                data => {
-                        id  => {
-                                optional    => 1,
-                                regexp      => qr/^[0-9a-z]+$/i,
-                                minlength   => 0,
-                                maxlength   => 128,
-                                type        => "str",
-                                error       => "Field \"id\" incorrect",
-                            },
-                        to  => {
-                                optional    => 0,
-                                regexp      => qr/\@/,
-                                minlength   => 1,
-                                maxlength   => 255,
-                                type        => "str",
-                                error       => "Field \"to\" incorrect",
-                            },
-                    },
-                options => {
-                        host  => {
-                                optional    => 1,
-                                #regexp      => qr//,
-                                minlength   => 1,
-                                maxlength   => 255,
-                                type        => "str",
-                                error       => "SMTP option \"host\" incorrect",
-                            },
-                        port  => {
-                                optional    => 1,
-                                regexp      => qr/^[0-9]{1,5}$/,
-                                minlength   => 1,
-                                maxlength   => 5,
-                                type        => "int",
-                                error       => "SMTP option \"port\" incorrect",
-                            },
-                    },
-            },
-    )
-}
-
-sub handler {
+sub process {
     my $self = shift;
-    my $data = shift;
-    my $options = shift;
-    #print Dumper([$self, $data, $options]);
+    my $type = $self->type;
+    return $self->maybe::next::method() unless $type eq 'email';
+    my $message = $self->message;
+    unless ($message) {
+        $self->error("Incorrect Email::MIME object");
+        return;
+    }
+    my $message_id = $self->genId(
+            $self->data->{id} || 0,
+            $self->data->{pubdate} || 0,
+            $self->data->{to} || "anonymous",
+        );
 
     # eXtra headers (extension headers)
-    my %headers = ();
-    if ($data->{headers} && is_hash($data->{headers})) {
-    	my $inh = hash($data => "headers");
-    	%headers = %$inh;
+    $message->header_str_set("X-Id" => $message_id );
+    $message->header_str_set("X-Mailer" => sprintf("%s/%s", __PACKAGE__, $VERSION) );
+
+    # Options
+    my $configobj = $self->{configobj};
+    my $options = set2attr($self->config);
+    my $sendmail_def = $configobj->conf("sendmail") if $configobj;
+
+    # SMTP options
+    my %smtp_opts = %$options;
+    unless (%smtp_opts) {
+        $smtp_opts{host} = value($sendmail_def, "smtp") if value($sendmail_def, "smtp");
+        $smtp_opts{sasl_username} = value($sendmail_def, "smtpuser") if value($sendmail_def, "smtpuser");
+        $smtp_opts{sasl_password} = value($sendmail_def, "smtppass") if value($sendmail_def, "smtppass");
     }
-    $headers{"X-Id"} = $data->{id} if $data->{id} && is_int($data->{id});
-    $headers{"X-Mailer"} //= $BANNER;
-    $data->{headers} = {%headers};
 
-    # Get email object
-    unless ($self->default( $data, $options ) && $self->{email}) {
-        return $self->error("Can't get Email::MIME object");
-    }
-    my $email = $self->{email};
-    #print $email->as_string;
-
-	# Options
-	my $host = value($options => "host");
-	my $try_sendmail_first = $host && length($host) ? 0 : 1;
-	my %smtp_opts;
-	$smtp_opts{host} = $host if $host && length($host); # Default: localhost
-	my $port = value($options => "port");
-	$smtp_opts{port} = $port if $port && is_int($port); # Default: 25
-
-    # General options
-    my $timeout = fv2zero(value($options => "timeout"));
-	$smtp_opts{timeout} = $timeout if $timeout; # Default: 120
-	my $helo = fv2null(value($options => "helo"));
-	$smtp_opts{helo} = $helo if length($helo); # Default: hostname()
-
-    # SASL & SSL options
-	my $username = value($options => "username");
-	my $password = value($options => "password");
-	$smtp_opts{sasl_username} = $username if defined($username) && length($username);
-	$smtp_opts{sasl_password} = $password if defined($password) && length($password);
-    my $ssl = value($options => "ssl");
-    if ($ssl) {
-    	$smtp_opts{ssl} = $ssl; # Default: 0
-    	$smtp_opts{ssl_options} = hash($options => "ssl_options"); # Default: {}
-    }
-    #print Dumper(\%smtp_opts);
-
+    # General
+    my $try_sendmail_first = $smtp_opts{host} ? 0 : 1;
     my $sent_status = 1;
     my $sent_error = "";
 
-    # Via sendmail
-	if ($try_sendmail_first) {
-	    try {
-	        Email::Sender::Simple->send($email);
-	    } catch {
-	        $sent_status = 0;
-	        $sent_error = $_ || 'unknown error';
-	    };
-	    return 1 if $sent_status;
-	}
+    # Try via sendmail
+    if ($try_sendmail_first) {
+        try {
+            Email::Sender::Simple->send($message);
+        } catch {
+            $sent_status = 0;
+            $sent_error = $_ || 'unknown error';
+        };
+        return $self->status($sent_status) if $sent_status;
+    }
 
-	# Via SMTP
+    # Now send via SMTP
     $sent_status = 1;
-
     my $transport = Email::Sender::Transport::SMTP->new({%smtp_opts});
     try {
-        Email::Sender::Simple->send($email, { transport => $transport });
+        Email::Sender::Simple->send($message, { transport => $transport });
     } catch {
         $sent_status = 0;
         $sent_error = $_ || 'unknown error';
     };
-    return 1 if $sent_status;
+    return $self->status($sent_status) if $sent_status;
 
-	# $sent_status = 0
-	# $sent_error  = "...";
-
-	my $err =  $1 if $sent_error =~ /(.+)?$/m;
-	return $self->error(sprintf("Can't send message: %s", $err // "Unknown error"), $sent_error);
+    # Errors
+    $self->error(sprintf("Can't send message: %s", $sent_error // "unknown error"));
+    return;
 }
 
 1;
+
+__END__

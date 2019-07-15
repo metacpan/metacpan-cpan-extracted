@@ -35,8 +35,8 @@
          "rdfs:label" : "duringMedia",
          "schema:domainIncludes" : "schema:HowToDirection",
          "schema:rangeIncludes" : [
-            "schema:MediaObject",
-            "schema:URL"
+            "schema:URL",
+            "schema:MediaObject"
          ]
       },
       "schema:performTime" : {
@@ -44,8 +44,8 @@
          "rdfs:comment" : "The length of time it takes to perform instructions or a direction (not including time to prepare the supplies), in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 duration format</a>.",
          "rdfs:label" : "performTime",
          "schema:domainIncludes" : [
-            "schema:HowTo",
-            "schema:HowToDirection"
+            "schema:HowToDirection",
+            "schema:HowTo"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -69,8 +69,8 @@
             "schema:HowToDirection"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:HowToSupply"
+            "schema:HowToSupply",
+            "schema:Text"
          ]
       },
       "schema:tool" : {
@@ -79,8 +79,8 @@
          "rdfs:label" : "tool",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
-            "schema:HowToDirection",
-            "schema:HowTo"
+            "schema:HowTo",
+            "schema:HowToDirection"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -92,8 +92,8 @@
          "rdfs:comment" : "The total time required to perform instructions or a direction (including time to prepare the supplies), in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 duration format</a>.",
          "rdfs:label" : "totalTime",
          "schema:domainIncludes" : [
-            "schema:HowTo",
-            "schema:HowToDirection"
+            "schema:HowToDirection",
+            "schema:HowTo"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       }

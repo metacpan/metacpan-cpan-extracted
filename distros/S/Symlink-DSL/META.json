@@ -42,6 +42,8 @@
             "Cwd" : "0",
             "File::Basename" : "0",
             "File::Path" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
             "autodie" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -60,7 +62,7 @@
    "provides" : {
       "Symlink::DSL" : {
          "file" : "lib/Symlink/DSL.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
@@ -71,11 +73,11 @@
       "homepage" : "http://metacpan.org/release/Symlink-DSL",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/shlomif/perl-Symlink-DSL.git",
-         "web" : "https://github.com/shlomif/perl-Symlink-DSL"
+         "url" : "https://github.com/shlomif/Symlink-DSL.git",
+         "web" : "https://github.com/shlomif/Symlink-DSL"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.2.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -452,6 +454,11 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
             "version" : "6.012"
          },
          {

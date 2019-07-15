@@ -19,6 +19,10 @@
          "inc",
          "examples",
          "t"
+      ],
+      "package" : [
+         "Mojo::Exception::_Guard",
+         "Mojo::Server::PSGI::_IO"
       ]
    },
    "prereqs" : {
@@ -58,6 +62,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "8.19",
+   "version" : "8.21",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

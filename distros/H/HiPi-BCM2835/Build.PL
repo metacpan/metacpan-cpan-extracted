@@ -3,7 +3,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi::BCM2835;
 
-our $VERSION ='0.63';
+our $VERSION ='0.64';
 
 my $requires = {
         'HiPi'             => '0.66',

@@ -21,7 +21,7 @@ use Time::HiRes;
 __PACKAGE__->create_accessors( qw( device signal_d0_pin signal_d1_pin signal_d2_pin signal_d3_pin
                                    mode_select_pin mode_enable_pin ) );
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 sub new {
     my( $class, %userparams ) = @_;

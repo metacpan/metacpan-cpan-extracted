@@ -1,3 +1,7 @@
+0.07 2019-07-10
+  - Implements the resources in CloudFormation spec 4.1.0 (published as of 2019-07-02)
+  - Fix CPAN testers failures due to missing test dependency (reported by eserte)
+
 0.06 2019-06-19
   - Implements the resources in CloudFormation spec 3.4.0 (published as of 2019-06-19)
   - YAML CloudFormation support. Added from_yaml and as_yaml methods to Cfn.

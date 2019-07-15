@@ -15,33 +15,36 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 355902010d557d6f7ecd3ff513074c5717a44b36 AUTHOR_PLEDGE
+SHA1 dc51cae02a67955fe2ced58ef55493e147c48e84 CODE_OF_CONDUCT.md
 SHA1 b20d6a234a1ec5646f206bc27c5a5a0e4ab47e0f CONTRIBUTORS
-SHA1 5f717483816a8fa1e9d0c250b112daa402b1dfb9 Changes
+SHA1 b5dfa4c7ae3b3d8e9a10f097af14145ed2bfafa5 Changes
 SHA1 5f0a62949de55b6c1500348df769e5abab866e85 INSTALL
-SHA1 2038148b02a09f89e92968620c13b0ba7cdd0c49 LICENSE
-SHA1 b74dcbb57889f3b999942d5eaa4efc11295aba3d MANIFEST
-SHA1 6d9119fc5bbbe823f0f9585fcc836dcf5b3104dd META.json
-SHA1 63f987f7d5d45c868ee03cf436ab54893e8d3ae6 META.yml
-SHA1 c108cf77cfa9506bf9c93e578fc534aa1a602533 Makefile.PL
-SHA1 a5cfe809754e875a69f00915b91771b13de591dc README.mkdn
-SHA1 7bb2309ea9e21f93e95c7d44416f4d60dcd90d74 bin/transerialize
-SHA1 e623a91f11f921ea99510fa4356bd8774c0f31fd cpanfile
-SHA1 c2a6f36543742e3d9892d61cba233d8774922933 doap.xml
-SHA1 47b563980984cc0662303e9320407387d35d711d lib/File/Serialize.pm
-SHA1 accd7cbe2c05e8390ebf86f0ca9d7a1dad2f3f88 lib/File/Serialize/Serializer.pm
-SHA1 9ad34b193f8b3b433acfc10c4d69744de4364111 lib/File/Serialize/Serializer/Data/Dumper.pm
-SHA1 af06fc9f8cb37e2768e4e60716b70b90df4c0755 lib/File/Serialize/Serializer/JSON/MaybeXS.pm
-SHA1 4573a9cb5c75a6122d86d6d1416dfdd6300d25c3 lib/File/Serialize/Serializer/JSONY.pm
-SHA1 73086445729446ed49848097d7462380b43a6bbd lib/File/Serialize/Serializer/TOML.pm
-SHA1 87228342f8cd4a5123201028dd297170018da73d lib/File/Serialize/Serializer/XML/Simple.pm
-SHA1 93ecf141a5a726ed3e45528e74920d81ad40ecdb lib/File/Serialize/Serializer/YAML/Tiny.pm
-SHA1 dcb4880133f7bcd214f0f5219879de4bace1d0fa lib/File/Serialize/Serializer/YAML/XS.pm
-SHA1 e4b0f6d032960dc6aaaabe045a3d6298cf802902 t/00-compile.t
-SHA1 5439348701f8ad6af51ff3a99636aefbcd9f03b7 t/00-report-prereqs.dd
-SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 12924231df71a982c44a4bf2dd12a65bbe1e44f5 LICENSE
+SHA1 2aabc7c563e95457e33d16962e1368438d534c87 MANIFEST
+SHA1 a587eca28a4e051a8a97b4ddcbf0799fb44217d1 META.json
+SHA1 d2e46ff9248099cc892afe8948dda6e8dff2e91b META.yml
+SHA1 5f9cc57814346c0df18c886ba4d5572831041c64 Makefile.PL
+SHA1 9572d1507e339f782f9e99d02e5e5997df3c45b5 README.mkdn
+SHA1 107bd4f730a6f7a4d639545ccc0af06e2c50181c bin/transerialize
+SHA1 39bf0ed9f8704e2c867f15df227b53761fd95e00 cpanfile
+SHA1 36a208970741996f70115f19208570f86c255e35 doap.xml
+SHA1 8ac8fb5c3c33d578de5a40d82a28cf0826ace48b lib/File/Serialize.pm
+SHA1 2542329bfb80bd645aae8f53d15e1a2c2baafb68 lib/File/Serialize/Serializer.pm
+SHA1 b68787f45273300339f0507be364be9884534a9c lib/File/Serialize/Serializer/Data/Dumper.pm
+SHA1 82700cb047709742bd89df3fa45a26bf71c254d8 lib/File/Serialize/Serializer/JSON/MaybeXS.pm
+SHA1 ec9fa225156a9190fa2713a36d9bb149055ffc70 lib/File/Serialize/Serializer/JSON5.pm
+SHA1 244712634343b73c3842356735f4eea9c28bfd48 lib/File/Serialize/Serializer/JSONY.pm
+SHA1 e0a4b6bf7bc8f9602a10656c2dc2325f8631b172 lib/File/Serialize/Serializer/TOML.pm
+SHA1 b05cd7b0ff0c244e06e4bc13564cf5842e3a5ea1 lib/File/Serialize/Serializer/XML/Simple.pm
+SHA1 317f42d70fc80f9e4d84bdda508997a2223de65a lib/File/Serialize/Serializer/YAML/Tiny.pm
+SHA1 e0075caa88f5382dc1583c560b5a7d2bbbea8fe4 lib/File/Serialize/Serializer/YAML/XS.pm
+SHA1 f36c2e51de21547d71a618e5aa94b212327db7d7 t/00-compile.t
+SHA1 d5a7fb1a6ac73a4a60d1185736a7b286400d34f4 t/00-report-prereqs.dd
+SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
 SHA1 a6971022da7835c59e664443d12373e51c124aeb t/add_extension.t
-SHA1 ff95cd6dd3ba00d2c73dd0f8967d9f2062202e43 t/basic.t
+SHA1 8c51f1a609434abaf4b2377048ebae8cfe564dd8 t/basic.t
 SHA1 61ba339cfa991828f0599dfcbb4bbfbfc1daf5ab t/corpus/foo.json
+SHA1 83a8bd8cbcfe47410cac7a8df4259dc188e834de t/corpus/foo.json5
 SHA1 e8986665b9ddc2cd1f6c63b21eb9163084e25915 t/corpus/foo.jsony
 SHA1 4c3904a3c7b99fce8faa947165bce4121e38ca88 t/corpus/foo.pl
 SHA1 f8d9510f77aefe45cfc1fa640985b431d1aa5b88 t/corpus/foo.toml
@@ -49,6 +52,7 @@ SHA1 e36e3dd914bbf13a2412176fb5d7002dfa09e207 t/corpus/foo.xml
 SHA1 7e109797e472ae8cbd20d7a4d7e231a96324377c t/corpus/foo.yml
 SHA1 42c95e79cdcd6f9db072ebf620a36c09e8e1d34e t/corpus/mystery
 SHA1 b89eb6cd8aed92f879d9a8648c6500a71147e0f1 t/corpus/non-ref.json
+SHA1 67fea33fd981af3a2a1cb269958051f0f60507e0 t/corpus/time.json5
 SHA1 e8495961a3e7874ef5ab14ae6c0f896a31d950dd t/defaults.t
 SHA1 50de7b47e5a5918b51ebeadcfbfa60302b164a81 t/json-allow-non-ref.t
 SHA1 d3687e5baaf37b73f1037e77a5523fde0ddfdfcb t/precedence.t
@@ -58,7 +62,7 @@ SHA1 814eb6a8282c7cea6592f6041334311a8e68509d t/utf8.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlndQ1QACgkQ34Hwf+GwC4wj8wCglLhlRDXgF5FTKAOw6YrNenpi
-m7kAn2eLoty1TsA2eBLnMLd3kylYj5K8
-=UjsZ
+iEYEARECAAYFAl0otIQACgkQ34Hwf+GwC4xLIQCePPbc01xUhYGBvxqY00FwaSJS
+kewAn2KvCqiOteCA7KWOaCoo6UOaWR8G
+=rAZl
 -----END PGP SIGNATURE-----

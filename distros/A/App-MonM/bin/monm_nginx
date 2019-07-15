@@ -1,0 +1,213 @@
+#!/usr/bin/perl -w
+use strict; # $Id: monm_nginx 79 2019-07-08 07:17:07Z abalama $
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+monm_nginx - Nginx checker for App::MonM (http_stub_status_module)
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    monm_nginx [-t SECS] [--q URL] [NAME]
+
+    monm_nginx -q http://nginx.myserver.com/server-status handled
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-q URL, --query=URL>
+
+Request URL
+
+Default: http://localhost/server-status
+
+=item B<-t SECT, --timeout=SECS>
+
+Timeout value, secs
+
+Default: 60
+
+=back
+
+=head1 DESCRIPTION
+
+Nginx checker for App::MonM (http_stub_status_module)
+
+=head2 NAMES
+
+=over 4
+
+=item B<active>
+
+The current number of active connections
+
+Counter's group: clients
+
+=item B<accepted>
+
+The number of connection accepted by nginx (since server start)
+
+Counter's group: clients
+
+=item B<handled>
+
+The number of connections handled by nginx ( = accepts - rejected )
+
+Counter's group: clients
+
+=item B<rejected>
+
+The number of connection rejected by nginx (since server start)
+
+Counter's group: clients
+
+=item B<requests>
+
+The number of requests processed
+
+Counter's group: clients
+
+=item B<reading>
+
+The current number of connections reading request
+
+Counter's group: socket
+
+=item B<writing>
+
+The current number of connections writing response
+
+Counter's group: socket
+
+=item B<waiting>
+
+The current number of connections on waiting state
+
+Counter's group: socket
+
+=back
+
+=head1 DEPENDENCES
+
+L<LWP>
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use LWP::Simple;
+
+use App::MonM::Const qw/
+        IS_TTY SCREENWIDTH
+        OK DONE ERROR SKIPPED PASSED FAILED UNKNOWN PROBLEM
+    /;
+
+use constant {
+    URL         => "http://localhost/server-status",
+    TIMEOUT     => 60,
+};
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # Information
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+
+    # General
+    "url|query|q=s",        # URL
+    "timeout|time|t=i",     # Timeout
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+
+my $name        = shift(@ARGV);
+my $timeout     = $options->{timeout} || TIMEOUT;
+my $url         = $options->{url} // URL;
+
+# Check
+my @stub = qw/active accepted handled requests rejected reading writing waiting/;
+if ($name && !grep {$_ eq $name} @stub) {
+    printf STDERR "Incorrect stub counter name %s. Available: %s\n", $url, join(", ", @stub);
+    print ERROR, "\n";
+    exit 1;
+}
+
+my $err = '';
+
+# Getting
+$LWP::Simple::ua->timeout($timeout);
+my $content = get($url);
+unless ($content) {
+    printf STDERR "Connect failed to %s\n", $url;
+    print ERROR, "\n";
+    exit 1;
+}
+
+# Parsing
+my %stubstatus;
+if ($content =~ /(\d+).+?(\d+).+?(\d+).+?(\d+).+?(\d+).+?(\d+).+?(\d+)/s) {
+    %stubstatus = (
+        active      => $1,
+        accepted    => $2,
+        handled     => $3,
+        requests    => $4,
+        reading     => $5,
+        writing     => $6,
+        waiting     => $7,
+        rejected    => $3-$2,
+    );
+} else {
+    printf STDERR "Can't parse data from %s\n", $url;
+    print ERROR, "\n";
+    exit 1;
+}
+
+# Returns
+if ($name) {
+    print $stubstatus{$name} // '', "\n";
+} else {
+    foreach my $k (@stub) {
+        printf "%s = %s\n", $k, $stubstatus{$k} // '';
+    }
+}
+print OK, "\n";
+exit 0;
+
+__END__

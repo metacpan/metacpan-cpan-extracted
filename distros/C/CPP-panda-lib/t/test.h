@@ -1,7 +1,6 @@
 #pragma once
 #include <cstring>
 #include <catch.hpp>
-#include <panda/log.h>
 #include <panda/string.h>
 #include <panda/optional.h>
 #include <panda/lib/memory.h>
@@ -108,8 +107,8 @@ namespace test {
             free(mem);
         }
 
-        static void shared_buf_free (T* mem, size_t) {
-            panda::lib::StaticMemoryPool<100>::instance()->deallocate(mem);
+        static void shared_buf_free (T* mem, size_t size) {
+            panda::lib::DynamicMemoryPool::instance()->deallocate(mem, size * sizeof(T));
             allocs.ext_shbuf_deallocated++;
         }
     };

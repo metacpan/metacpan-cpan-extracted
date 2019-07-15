@@ -1,5 +1,11 @@
 Revision history for Perl extension Hash::Lazy
 
+0.04    2019-07-11T00:57:55+0900
+        - fix wrong META info in 0.03.
+
+0.03    2019-07-11T00:45:52+0900
+        - re-packaging with more meta-data in the package. No feature changes.
+
 0.02    2019-07-08T22:23:20+0900
         - re-packaging with a modern authoring tool. No feature changes.
 

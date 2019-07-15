@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has additional_name => (
@@ -282,14 +282,6 @@ has isic_v4 => (
 
 
 
-has job_title => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'jobTitle',
-);
-
-
-
 has knows => (
     is        => 'rw',
     predicate => 1,
@@ -490,7 +482,7 @@ SemanticWeb::Schema::Person - A person (alive
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -616,9 +608,9 @@ A brand should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Brand']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -642,9 +634,9 @@ A colleague should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<Str>
 
 =back
 
@@ -791,9 +783,9 @@ A funder should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -897,9 +889,9 @@ A height should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 
@@ -913,9 +905,9 @@ A home_location should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Place']>
-
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
 
@@ -956,20 +948,6 @@ Activities (ISIC), Revision 4 code for a particular organization, business
 person, or place.
 
 A isic_v4 should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<job_title>
-
-C<jobTitle>
-
-The job title of the person (for example, Financial Manager).
-
-A job_title should be one of the following types:
 
 =over
 
@@ -1070,9 +1048,9 @@ A owns should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Product']>
-
 =item C<InstanceOf['SemanticWeb::Schema::OwnershipInfo']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =back
 
@@ -1139,9 +1117,9 @@ A publishing_principles should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
 
 =back
 
@@ -1206,9 +1184,9 @@ A sponsor should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1287,9 +1265,9 @@ A work_location should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Place']>
-
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
 

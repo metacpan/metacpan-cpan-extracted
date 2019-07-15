@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -138,6 +138,7 @@ my $const = {
         RPI_PUD_OFF            => 0,
         RPI_PUD_DOWN           => 1,
         RPI_PUD_UP             => 2,
+        RPI_PUD_UNSET          => 0x08,
         
         RPI_BOARD_REVISION     => HiPi::RaspberryPi::board_type(),
         

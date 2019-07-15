@@ -3,8 +3,8 @@ package Pcore::Core::Event::Listener::smtp;
 use Pcore -class, -ansi;
 use Pcore::API::SMTP;
 use Pcore::Handle qw[:TLS_CTX];
-use Pcore::Util::Data qw[to_json];
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Lib::Data qw[to_json];
+use Pcore::Lib::Scalar qw[is_ref];
 use Time::HiRes qw[];
 
 with qw[Pcore::Core::Event::Listener];

@@ -3,8 +3,8 @@
 package main v0.1.0;
 
 use Pcore;
-use Pcore::Util::Data qw[from_json to_json];
-use Pcore::Util::Text qw[decode_utf8 encode_utf8];
+use Pcore::Lib::Data qw[from_json to_json];
+use Pcore::Lib::Text qw[decode_utf8 encode_utf8];
 
 my $cv = P->cv;
 

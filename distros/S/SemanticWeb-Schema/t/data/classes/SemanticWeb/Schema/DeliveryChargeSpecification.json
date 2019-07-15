@@ -13,8 +13,8 @@
          "rdfs:comment" : "The delivery method(s) to which the delivery charge or payment charge specification applies.",
          "rdfs:label" : "appliesToDeliveryMethod",
          "schema:domainIncludes" : [
-            "schema:DeliveryChargeSpecification",
-            "schema:PaymentChargeSpecification"
+            "schema:PaymentChargeSpecification",
+            "schema:DeliveryChargeSpecification"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -23,17 +23,17 @@
          "rdfs:comment" : "The geographic area where a service or offered item is provided.",
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:DeliveryChargeSpecification",
-            "schema:Demand",
             "schema:Organization",
             "schema:ContactPoint",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand",
+            "schema:Service",
+            "schema:DeliveryChargeSpecification"
          ],
          "schema:rangeIncludes" : [
+            "schema:AdministrativeArea",
             "schema:GeoShape",
             "schema:Place",
-            "schema:AdministrativeArea",
             "schema:Text"
          ]
       },
@@ -48,15 +48,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
+            "schema:Demand",
             "schema:DeliveryChargeSpecification",
             "schema:Offer",
-            "schema:ActionAccessSpecification",
-            "schema:Demand"
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:GeoShape",
             "schema:Place",
-            "schema:GeoShape"
+            "schema:Text"
          ]
       },
       "schema:ineligibleRegion" : {
@@ -65,13 +65,13 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:domainIncludes" : [
             "schema:DeliveryChargeSpecification",
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:GeoShape",
             "schema:Place",
-            "schema:GeoShape"
+            "schema:Text"
          ]
       }
    }

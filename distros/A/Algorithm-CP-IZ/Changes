@@ -1,5 +1,8 @@
 Revision history for Perl extension Algorithm::CP::IZ.
 
+0.05  Fri Jul 12 2019
+        - Support iZ-C 3.6 APIs
+
 0.03  Sun Aug 27 2017
 	- Now $iz->restore_context_until can restore values even if $iz->search is called.
 

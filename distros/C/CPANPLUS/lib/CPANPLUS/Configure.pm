@@ -20,7 +20,7 @@ local $Params::Check::VERBOSE = 1;
 
 ### require, avoid circular use ###
 require CPANPLUS::Internals;
-$VERSION = "0.9176";
+$VERSION = "0.9178";
 
 ### can't use O::A as we're using our own AUTOLOAD to get to
 ### the config options.
@@ -97,7 +97,7 @@ or not. Defaults to C<true>.
         };
 
         check( $tmpl, \%hash ) or (
-            warn Params::Check->last_error, return
+            warn(Params::Check->last_error), return
         );
 
         $Config     ||= CPANPLUS::Config->new;
@@ -150,7 +150,7 @@ Returns true on success, false on failure.
         };
 
         check( $tmpl, \%hash ) or (
-            warn Params::Check->last_error, return
+            warn(Params::Check->last_error), return
         );
 
         ### if the base dir is changed, we have to rescan it
@@ -449,7 +449,6 @@ sub options {
     return sort grep { !$seen{$_}++ }
                 map { $_->$type->ls_accessors if $_->can($type)  }
                 $self->conf;
-    return;
 }
 
 =pod

@@ -2,7 +2,7 @@ package Bio::MUST::Drivers::Hmmer;
 # ABSTRACT: Bio::MUST driver for running HMMER3
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
-$Bio::MUST::Drivers::Hmmer::VERSION = '0.181160';
+$Bio::MUST::Drivers::Hmmer::VERSION = '0.191910';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Bio::MUST::Drivers::Hmmer - Bio::MUST driver for running HMMER3
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

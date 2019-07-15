@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -28,6 +28,7 @@
             "Config::Auto" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
+            "File::Open::NoCache::ReadOnly" : "0",
             "File::Spec" : "0",
             "Geo::Location::Point" : "0.02",
             "IO::AIO" : "0",
@@ -95,6 +96,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

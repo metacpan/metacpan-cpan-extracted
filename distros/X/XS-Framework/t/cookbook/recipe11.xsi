@@ -1,0 +1,52 @@
+MODE: INLINE
+
+struct DateRecipe11;
+
+struct TimezoneRecipe11: public panda::Refcnt {
+    const char* get_name() const { return name.c_str(); }
+private:
+    TimezoneRecipe11(const char* name_): name{name_} { }
+    std::string name;
+    friend class DateRecipe11;
+};
+
+using TimezoneRecipe11SP = panda::iptr<TimezoneRecipe11>;
+
+struct DateRecipe11: public panda::Refcnt {
+    DateRecipe11(const char* tz_ = "Europe/Minsk"): tz(new TimezoneRecipe11(tz_)) { update(); }
+    void update()   { epoch = std::time(nullptr); }
+
+    int get_epoch() const { return epoch; }
+    TimezoneRecipe11SP get_timezone() { return tz; }
+private:
+    std::time_t epoch;
+    TimezoneRecipe11SP tz;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe11*> : TypemapObject<DateRecipe11*, DateRecipe11*, ObjectTypeRefcntPtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe11"; }
+    };
+
+    template <>
+    struct Typemap<TimezoneRecipe11*> : TypemapObject<TimezoneRecipe11*, TimezoneRecipe11*, ObjectTypeRefcntPtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::TimezoneRecipe11"; }
+    };
+};
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::TimezoneRecipe11
+PROTOTYPES: DISABLE
+
+const char* TimezoneRecipe11::get_name()
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe11
+PROTOTYPES: DISABLE
+
+DateRecipe11* DateRecipe11::new(const char* name)
+
+void DateRecipe11::update()
+
+std::time_t DateRecipe11::get_epoch()
+
+TimezoneRecipe11SP DateRecipe11::get_timezone()

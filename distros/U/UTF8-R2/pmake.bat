@@ -229,7 +229,7 @@ END
 
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
@@ -258,6 +258,7 @@ build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/%s
 END
         close(FH_METAYML);
         check_usascii('META.yml');
@@ -283,7 +284,7 @@ END
 
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
 {
     "name" : "%s",
     "version" : "%s",
@@ -304,7 +305,10 @@ END
     "resources" : {
         "license" : [
             "http://dev.perl.org/licenses/"
-        ]
+        ],
+        "repository" : {
+             "url" : "https://github.com/ina-cpan/%s"
+        }
     },
     "prereqs" : {
         "build" : {

@@ -1,0 +1,19 @@
+sudo: false
+language: perl
+perl:
+  - "5.28"
+  - "5.26"
+  - "5.24"
+  - "5.22"
+
+before_install:
+  - cpanm --notest App::ModuleBuildTiny Test2::Harness
+
+script:
+  yath test -T -j4 --verbose
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#chupei.pm"
+    use_notice: true

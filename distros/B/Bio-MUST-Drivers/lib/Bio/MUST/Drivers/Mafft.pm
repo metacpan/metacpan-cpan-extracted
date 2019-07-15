@@ -1,18 +1,19 @@
 package Bio::MUST::Drivers::Mafft;
 # ABSTRACT: Bio::MUST driver for running the MAFFT program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::Mafft::VERSION = '0.181160';
+$Bio::MUST::Drivers::Mafft::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
+# use Smart::Comments;
+
 use Carp;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
-
-use Smart::Comments '###';
 
 use Bio::MUST::Core;
 extends 'Bio::FastParsers::Base';
@@ -31,9 +32,9 @@ sub seqs2profile {                          ## no critic (RequireArgUnpacking)
 
 sub profile2profile {                       ## no critic (RequireArgUnpacking)
     my $out = shift->_mafft('profile2profile' , @_);
-    return $out if $out->count_seqs;
+    return $out if $out;
 
-    carp 'Warning: cannot align profiles; returning nothing!';
+    carp '[BMD] Warning: cannot align profiles; returning nothing!';
     return;
 }
 
@@ -45,6 +46,10 @@ sub _mafft {
     my $args    = shift // {};
 
     #### in _mafft
+
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Mafft')->new;
+       $app->meet();
 
     # setup input/output files
     my $infile  = $self->filename;
@@ -65,9 +70,14 @@ sub _mafft {
     #### $cmd
 
     # try to robustly execute mafft
-    my $ret_code = system( [ 0, 127 ], $cmd);
+    my $ret_code = system( [ 0, 1, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Cannot execute $pgm command";
+        carp "[BMD] Warning: cannot execute $pgm command; returning nothing!";
+        return;
+    }
+    if ($ret_code == 1) {
+        carp "[BMD] Warning: $pgm cannot align files; returning nothing!";
+        file($outfile)->remove;                 # ugly but needed
         return;
     }
     # TODO: try to bypass shell (need for absolute path to executable then)
@@ -96,7 +106,7 @@ Bio::MUST::Drivers::Mafft - Bio::MUST driver for running the MAFFT program
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

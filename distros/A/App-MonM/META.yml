@@ -1,56 +1,48 @@
 ---
-abstract: 'Simple Monitoring Tools'
+abstract: 'Simple monitoring tool'
 author:
-  - 'Lepenkov Sergey (Serz Minus) <minus@mail333.com>'
+  - 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.6
-  Test::More: 0.94
+  ExtUtils::MakeMaker: '6.6'
+  Test::More: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-MonM
 no_index:
   directory:
     - t
     - inc
-recommends:
-  Data::Dumper: 0
 requires:
-  CTK: 1.16
-  Class::C3::Adopt::NEXT: 0.13
-  DBD::SQLite: 1.4
-  DBI: 1.6
-  Data::Dumper: 0
-  File::Copy: 2.18
-  File::Find: 1.15
-  File::Path: 2
-  HTTP::Cookies: 6
-  HTTP::Message: 6.02
-  JSON: 2.53
-  LWP: 5.8
-  LWP::MediaTypes: 6
-  LWP::UserAgent: 5.8
-  Mail::POP3Client: 2.18
-  Module::Loaded: 0.04
-  Net::Ping: 2.36
-  Net::SMTP: 2.31
-  Net::Telnet: 3.03
-  TemplateM: 3.03
-  Text::SimpleTable: 2.03
-  Text::Unidecode: 0.04
-  Try::Tiny: 0.07
-  URI: 1.5
-  WWW::MLite: 1.05
-  XML::Simple: 2.2
-  YAML::Tiny: 1.5
-  perl: 5.008001
+  CTK: '2.01'
+  Class::C3::Adopt::NEXT: '0.13'
+  DBD::SQLite: '1.5'
+  DBI: '1.6'
+  File::Copy: '2.18'
+  File::Find: '1.15'
+  File::Path: '2'
+  HTTP::Message: '6.02'
+  LWP: '5.8'
+  LWP::MediaTypes: '6'
+  Mail::POP3Client: '2.18'
+  Module::Loaded: '0.04'
+  Net::Ping: '2.36'
+  Net::SMTP: '2.31'
+  Net::Telnet: '3.03'
+  Socket: '0'
+  Sys::Hostname: '0'
+  Term::ReadKey: '2.33'
+  Text::SimpleTable: '2.03'
+  Try::Tiny: '0.07'
+  URI: '1.5'
+  WWW::MLite: '2.01'
+  perl: '5.016001'
 resources:
   homepage: http://app-monm.sourceforge.net
-  license: http://opensource.org/licenses/gpl-license.php
-  repository: https://svn.code.sf.net/p/app-monm/code/trunk
-version: 1.05
+  license: https://dev.perl.org/licenses
+version: '1.06'

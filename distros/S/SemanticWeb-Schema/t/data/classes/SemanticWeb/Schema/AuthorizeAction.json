@@ -12,21 +12,21 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:AuthorizeAction",
-            "schema:SendAction",
             "schema:CommunicateAction",
-            "schema:PayAction",
-            "schema:TipAction",
-            "schema:DonateAction",
+            "schema:GiveAction",
             "schema:ReturnAction",
+            "schema:TipAction",
+            "schema:PayAction",
+            "schema:AuthorizeAction",
             "schema:Message",
-            "schema:GiveAction"
+            "schema:SendAction",
+            "schema:DonateAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:ContactPoint",
             "schema:Audience",
-            "schema:Organization",
-            "schema:Person"
+            "schema:ContactPoint",
+            "schema:Person",
+            "schema:Organization"
          ]
       }
    }

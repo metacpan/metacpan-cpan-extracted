@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+# Created on: 2014-06-11 10:00:36
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::Changes;
+
+App::Git::Workflow::Command::Changes->run();
+
+__DATA__
+
+=head1 NAME
+
+git-changes - Stats on the number of commits by committer
+
+=head1 VERSION
+
+This documentation refers to git-changes version 1.1.4
+
+=head1 SYNOPSIS
+
+   git-changes [option] path-or-file(s)
+
+ OPTIONS:
+  path-or-file  The paths or files you are looking for changes in.
+                If you want all directories you can use a * but don't
+                forget to quote it so that the shell wont process it
+                (eg dir/\*)
+  -r --remote   Changes to remote branches
+  -a --all      Changes to any branch (remote or local)
+  -s --since=YYYY-MM-DD
+                Commits since this date
+  -u --until=YYYY-MM-DD
+                Commits before this date
+  -p --period=[day|week|month|year]
+                If --date is not specified this works out the date for the
+                last day/week/month/year
+  -P --periods=int
+                If using --periond show this many periods of data
+  -f --files=file
+     --paths=path
+                Alternative way of specifying paths and files to check for
+                changes. This can be used more than once.
+  -m --merges   Count merge commits
+     --no-merges
+                Don't count merge commits
+ OUTPUT:
+  -c --changes  Show the number of lines etc changed by each person.
+  -C --commits=int
+                Show only people of have done more this number of commits
+  -f --format=[table|json|perl]
+                Return the results a the specified format (Default table)
+  -m --multi-user
+                Only display files/paths that more than one user has changed
+  -M --min-commits=int
+                Only show changes with this many commits
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for git-changes
+
+=head1 DESCRIPTION
+
+The C<git-changes> command allows to get statistics on who is committing
+to the git repository.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

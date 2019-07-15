@@ -7,7 +7,7 @@ configure_requires:
   Module::Build: '0'
   perl: v5.14.0
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,18 +21,18 @@ no_index:
 provides:
   HiPi::BCM2835:
     file: lib/HiPi/BCM2835.pm
-    version: '0.63'
+    version: '0.64'
   HiPi::BCM2835::I2C:
     file: lib/HiPi/BCM2835/I2C.pm
-    version: '0.63'
+    version: '0.64'
   HiPi::BCM2835::Pin:
     file: lib/HiPi/BCM2835/Pin.pm
-    version: '0.63'
+    version: '0.64'
 requires:
   HiPi: '0.66'
   threads::shared: '0'
 resources:
   homepage: http://raspberry.znix.com/
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.63'
+version: '0.64'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

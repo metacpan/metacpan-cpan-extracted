@@ -4,8 +4,8 @@
       "rdfs:comment" : "Fitness-related activity designed for a specific health-related purpose, including defined exercise routines as well as activity prescribed by a clinician.",
       "rdfs:label" : "ExercisePlan",
       "rdfs:subClassOf" : [
-         "schema:CreativeWork",
-         "schema:PhysicalActivity"
+         "schema:PhysicalActivity",
+         "schema:CreativeWork"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },
@@ -45,8 +45,8 @@
          "rdfs:comment" : "Type(s) of exercise or activity, such as strength training, flexibility training, aerobics, cardiac rehabilitation, etc.",
          "rdfs:label" : "exerciseType",
          "schema:domainIncludes" : [
-            "schema:ExerciseAction",
-            "schema:ExercisePlan"
+            "schema:ExercisePlan",
+            "schema:ExerciseAction"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -80,8 +80,8 @@
          "schema:domainIncludes" : "schema:ExercisePlan",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QualitativeValue"
          ]
       },
       "schema:workload" : {

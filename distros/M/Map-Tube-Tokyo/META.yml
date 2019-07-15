@@ -21,20 +21,20 @@ no_index:
 provides:
   Map::Tube::Tokyo:
     file: lib/Map/Tube/Tokyo.pm
-    version: '0.57'
+    version: '0.58'
   Map::Tube::Tokyo::Line::Asakusa:
     file: lib/Map/Tube/Tokyo/Line/Asakusa.pm
-    version: '0.57'
+    version: '0.58'
   Map::Tube::Tokyo::Line::Chiyoda:
     file: lib/Map/Tube/Tokyo/Line/Chiyoda.pm
-    version: '0.57'
+    version: '0.58'
 requires:
   File::ShareDir: '1.114'
-  Map::Tube: '3.63'
+  Map::Tube: '3.64'
   Moo: '2.000000'
   namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube-Tokyo.git
-version: '0.57'
+version: '0.58'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

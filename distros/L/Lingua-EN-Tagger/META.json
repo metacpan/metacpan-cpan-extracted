@@ -4,7 +4,7 @@
       "Maciej Ceglowski and Aaron Coburn <maciej@ceglowski.com>, <acoburn@apache.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "gpl_3"
    ],
@@ -44,5 +44,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.30"
+   "version" : "0.31"
 }

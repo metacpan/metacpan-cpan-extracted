@@ -1,0 +1,78 @@
+MODE: INLINE
+
+template <int i>
+class _MyChild : public _MyBase<i> {
+public:
+    int val2;
+    _MyChild (int arg1, int arg2) : _MyBase<i>(arg1), val2(arg2) {}
+    _MyBase<i>* clone () const { return new _MyChild(this->val, val2); }
+    virtual ~_MyChild () { dcnt.c++; }
+};
+
+using MyChild    = _MyChild<0>;
+using PTRMyChild = _MyChild<1>;
+
+namespace xs {
+    template <> struct Typemap<PTRMyChild*> : Typemap<PTRMyBase*, PTRMyChild*> {
+        static std::string package () { return "MyTest::PTRMyChild"; }
+    };
+    template <> struct Typemap<MyChild*> : Typemap<MyBase*, MyChild*> {
+        static std::string package () { return "MyTest::MyChild"; }
+    };
+}
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::PTRMyChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::PTRMyChild").inherit(Stash("MyTest::PTRMyBase"));
+}
+
+PTRMyChild* PTRMyChild::new (int arg1, int arg2)
+
+int PTRMyChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+void PTRMyChild::set_from (PTRMyChild* other) {
+    if (other) {
+        THIS->val = other->val;
+        THIS->val2 = other->val2;
+    }
+}
+
+void PTRMyChild::DESTROY () {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash("MyTest::MyChild").inherit(Stash("MyTest::MyBase"));
+}
+
+MyChild* MyChild::new (int arg1, int arg2) {
+    if (!arg1 && !arg2) XSRETURN_UNDEF;
+    RETVAL = new MyChild(arg1, arg2);
+}
+
+int MyChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+void MyChild::set_from (MyChild* other) {
+    if (other) {
+        THIS->val = other->val;
+        THIS->val2 = other->val2;
+    }
+}
+
+void MyChild::DESTROY () {
+    dcnt.perl++;
+    Sub(cv).SUPER().call(&ST(0), items);
+}

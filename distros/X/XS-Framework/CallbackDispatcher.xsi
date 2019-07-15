@@ -1,0 +1,23 @@
+MODULE = XS::Framework                PACKAGE = XS::Framework::CallbackDispatcher
+PROTOTYPES: DISABLE
+
+void XSCallbackDispatcher::add (Sub cv, bool back = false)
+
+void XSCallbackDispatcher::add_back (Sub cv)
+
+void XSCallbackDispatcher::add_event_listener (Sub cv, bool back = false)
+
+void XSCallbackDispatcher::add_event_listener_back (Sub cv)
+
+void XSCallbackDispatcher::remove (Sub cv)
+
+void XSCallbackDispatcher::remove_event_listener (Sub cv)
+
+void XSCallbackDispatcher::remove_all ()
+
+bool XSCallbackDispatcher::has_listeners ()
+
+Sv XSCallbackDispatcher::call (...) {
+    RETVAL = THIS->call(&ST(1), items - 1);
+    if (!RETVAL) XSRETURN_EMPTY;
+}

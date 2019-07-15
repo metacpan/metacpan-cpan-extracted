@@ -21,6 +21,7 @@ WriteMakefile(
         'HTTP::Tiny::UA::Response' => 0.004,
         'JSON'                     => 2.9,
         'MIME::Base64'             => 3.11,
+        'Module::Runtime'          => 0,
         'X::Tiny'                  => 0.12,
 
         # We need SSL to speak ACME. There is no pure Perl

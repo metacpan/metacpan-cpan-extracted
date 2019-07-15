@@ -1,64 +1,9 @@
 # TODO Wed Oct 11 11:13:25 2017 GMT
-# $Id: TODO 50 2017-12-06 08:53:29Z abalama $
+# $Id: TODO 64 2019-07-14 16:06:47Z abalama $
 
 # GENERAL
 
-    * Сборка deb
-      dh-make-perl
-      ... edit controls ...
-      dpkg-buildpackage -rfakeroot -us -uc -b
-
-    * См. программу logwatch! Она имеет пример как пакет deb!
-      - Пересчитать зависимости. Для этого проработать модуль CTK для начала!
-
-        'Archive::Extract'      => 0.58, # libarchive-extract-perl
-        'Archive::Tar'          => 1.80,
-        'Archive::Zip'          => 1.30, # libarchive-zip-perl
-        'Class::C3::Adopt::NEXT'=> 0.13, # libclass-c3-adopt-next-perl
-        'Class::Singleton'      => 1.40, # libclass-singleton-perl
-        'Config::General'       => 2.00, # libconfig-general-perl
-        'DateTime'              => 0,    # libdatetime-perl
-        'DateTime::Format::W3CDTF' => 0, # libdatetime-format-w3cdtf-perl
-        'DBD::SQLite'           => 1.40, # libdbd-sqlite3-perl
-        'DBI'                   => 1.60, # libdbi-perl
-        'Email::MIME'           => 1.90, # libemail-mime-perl
-        'Email::Sender'         => 1.30, # libemail-sender-perl
-        'ExtUtils::MakeMaker'   => 6.60, #
-        'File::Copy::Recursive' => 0.38, # libfile-copy-recursive-perl
-        'File::Path'            => 2.00,
-        'File::Pid'             => 1.00, # libfile-pid-perl
-        'HTTP::Cookies'         => 6.00, # libhttp-cookies-perl
-        'HTTP::Message'         => 6.02, # libhttp-message-perl
-        'IO::String'            => 1.08, # libio-string-perl
-        'JSON'                  => 2.53, # libjson-perl, libjson-xs-perl
-        'LWP'                   => 5.80, # libwww-perl, liblwp-protocol-https-perl
-        'LWP::MediaTypes'       => 6.00, # liblwp-mediatypes-perl
-        'MIME::Base64'          => 3.00,
-        'MIME::Lite'            => 3.00, # libmime-lite-perl
-        'Moose'                 => 2.00, # libmoose-perl
-        'MRO::Compat'           => 0.13, # libmro-compat-perl
-        'Net::FTP'              => 2.60,
-        'Net::SSLeay'           => 1.52, # libnet-ssleay-perl
-        'Perl::OSType'          => 1.00,
-        'Term::ReadKey'         => 2.10, # libterm-readkey-perl
-        'Term::ReadLine'        => 1.04,
-        'Test::More'            => 0.94, # libtest-simple-perl
-        'Text::ParseWords'      => 3.27,
-        'Text::SimpleTable'     => 2.03, # libtext-simpletable-perl
-        'Time::HiRes'           => 1.97,
-        'Time::Local'           => 1.20,
-        'Try::Tiny'             => 0.07, # libtry-tiny-perl
-        'URI'                   => 1.60, # liburi-perl
-        'XSLoader'              => 0.01,
-        'YAML'                  => 0.73, # libyaml-perl
-        'namespace::autoclean'  => 0.13, # libnamespace-autoclean-perl
-        'Sys::SigAction'        => 0,
-
-
-    * monotifier-server устанавливется отдельно, копированием файлов в папку apache
-      под mod_perl для linux это делаеется пакетом monotifier-server
-
-    * #555 SubProject: static-site
+    * none
 
 # BUGS
 
@@ -66,7 +11,7 @@
 
 # REFACTORING
 
-    * Логирование клиента переделать на Sys::SysLog
+    * none
 
 # DOCUMENTATION
 

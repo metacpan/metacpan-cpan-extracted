@@ -45,5 +45,5 @@ requires:
   base: '0'
   overload: '0'
   perl: '5.006'
-version: '0.77'
+version: '0.78'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

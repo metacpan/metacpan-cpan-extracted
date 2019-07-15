@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.10.2';
+our $VERSION = 'v1.12.0';
 
 use Carp;
 use Config;
@@ -300,7 +300,7 @@ sub encode_one {
     }
 
     $document = BSON::Doc->new(@$document)
-      if $type eq 'ARRAY';
+        if $type eq 'ARRAY';
 
     my $merged_opts = { %$self, ( $options ? %$options : () ) };
 
@@ -941,7 +941,7 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.10.2
+version v1.12.0
 
 =head1 SYNOPSIS
 
@@ -1552,7 +1552,7 @@ Oleg Kostyuk <cub@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

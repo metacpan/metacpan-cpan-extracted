@@ -11,17 +11,19 @@ sub EXT_controller : Extend('Ext.app.ViewController') {
             },
         },
 
-        init => func ['view'],
-        <<"JS",
-            view.insert(0, { xtype: '$type{'top'}' });
-            view.add({xtype: 'spacer'});
-            view.add({xtype: '$type{'profile'}'});
-            view.add({xtype: '$type{'bottom'}'});
-            view.add({xtype: '$type{'version'}'});
-
+        init => func ['view'], <<~"JS",
             var session = this.getViewModel().get('session'),
-                localeButton = this.lookup('change-locale-button'),
-                locales = this.getViewModel().get('session').locales;
+                items = this.getMenuItems(session);
+
+            view.add({ xtype: '$type{top}' });
+            view.add(items);
+            view.add({ xtype: 'spacer' });
+            view.add({ xtype: '$type{profile}' });
+            view.add({ xtype: '$type{bottom}' });
+            view.add({ xtype: '$type{version}' });
+
+            var localeButton = this.lookup('change-locale-button'),
+                locales = this.getViewModel().get('settings').locales;
 
             if (view.getShowLocalesButton() && !Ext.Object.isEmpty(locales)) {
                 var localeMenu = [];
@@ -39,8 +41,6 @@ sub EXT_controller : Extend('Ext.app.ViewController') {
             else {
                 localeButton.hide();
             }
-
-            this.configureMenu(session);
 JS
 
         defaultMenuItemHandler => func ['button'], <<'JS',
@@ -49,7 +49,7 @@ JS
             if (button.route) this.redirectTo(button.route);
 JS
 
-        configureMenu => func ['session'], <<'JS',
+        getMenuItems => func ['session'], <<'JS',
 JS
 
         showMenu => func <<'JS',
@@ -176,7 +176,7 @@ sub EXT_version : Extend('Ext.Panel') {
 
         items => [
             {   xtype => 'component',
-                bind  => '{session.version}',
+                bind  => '{settings.version}',
                 style => 'color:grey;text-align:right;',
             },
         ],

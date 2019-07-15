@@ -11,14 +11,14 @@
          "rdfs:comment" : "A goal towards an action is taken. Can be concrete or abstract.",
          "rdfs:label" : "purpose",
          "schema:domainIncludes" : [
+            "schema:PayAction",
             "schema:AllocateAction",
-            "schema:MedicalDevice",
-            "schema:PayAction"
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MedicalDevicePurpose",
-            "schema:Thing"
+            "schema:Thing",
+            "schema:MedicalDevicePurpose"
          ]
       },
       "schema:recipient" : {
@@ -27,21 +27,21 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:AuthorizeAction",
-            "schema:SendAction",
             "schema:CommunicateAction",
-            "schema:PayAction",
-            "schema:TipAction",
-            "schema:DonateAction",
+            "schema:GiveAction",
             "schema:ReturnAction",
+            "schema:TipAction",
+            "schema:PayAction",
+            "schema:AuthorizeAction",
             "schema:Message",
-            "schema:GiveAction"
+            "schema:SendAction",
+            "schema:DonateAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:ContactPoint",
             "schema:Audience",
-            "schema:Organization",
-            "schema:Person"
+            "schema:ContactPoint",
+            "schema:Person",
+            "schema:Organization"
          ]
       }
    }

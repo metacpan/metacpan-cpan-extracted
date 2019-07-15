@@ -4,9 +4,9 @@
       "rdfs:comment" : "A hospital.",
       "rdfs:label" : "Hospital",
       "rdfs:subClassOf" : [
-         "schema:EmergencyService",
          "schema:MedicalOrganization",
-         "schema:CivicStructure"
+         "schema:CivicStructure",
+         "schema:EmergencyService"
       ]
    },
    "properties" : {
@@ -15,15 +15,15 @@
          "rdfs:comment" : "A medical service available from this provider.",
          "rdfs:label" : "availableService",
          "schema:domainIncludes" : [
-            "schema:MedicalClinic",
             "schema:Hospital",
-            "schema:Physician"
+            "schema:Physician",
+            "schema:MedicalClinic"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MedicalTherapy",
+            "schema:MedicalProcedure",
             "schema:MedicalTest",
-            "schema:MedicalProcedure"
+            "schema:MedicalTherapy"
          ]
       },
       "schema:medicalSpecialty" : {

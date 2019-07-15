@@ -1,0 +1,160 @@
+#!/usr/bin/perl -w
+use strict; # $Id: monm_icmp 78 2019-07-07 19:48:16Z abalama $
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+monm_icmp - ICMP (Ping) checker for App::MonM
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    monm_icmp [-p tcp|udp|icmp|stream|syn|external] [-P PORTNUMBER]
+              [-t SECS] [-b BYTES] HOST
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-b BYTES, --bytes=BYTES>
+
+Specifies how many data bytes are included in the ping packet sent to the remote host
+
+=item B<-p PROTOCOL, --proto=PROTOCOL>
+
+Specifies the protocol to use when doing a ping.
+The current choices are "tcp", "udp", "icmp", "icmpv6", "stream", "syn", or "external"
+
+Default: tcp
+
+=item B<-P PORTNUMBER, --port=PORTNUMBER>
+
+The port option is only valid for a udp, tcp or stream ping, and will not do what
+you think it does. Ping returns true when we get a "Connection refused"!
+
+Default: echo port
+
+=item B<-t SECT, --timeout=SECS>
+
+Timeout value, secs
+
+Default: 5
+
+=back
+
+=head1 DESCRIPTION
+
+ICMP (Ping) checker for App::MonM (TCP/UDP/ICMP)
+
+=head1 DEPENDENCES
+
+L<Net::Ping>
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Net::Ping;
+use Try::Tiny;
+
+use App::MonM::Const qw/
+        OK DONE ERROR SKIPPED PASSED FAILED UNKNOWN PROBLEM
+    /;
+
+use constant {
+    HOST        => "localhost",
+    PROTO       => 'tcp',
+    TIMEOUT     => 5,
+    PROTOCOLS   => [qw/tcp udp icmp stream syn external/],
+};
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # Information
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+
+    # General
+    "protocol|proto|prot|p=s",  # Protocol
+    "timeout|time|t=i",         # Timeout
+    "port|P=i",                 # Port
+    "bytes|byte|b=i",           # Bytes
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+
+my $host        = shift(@ARGV) || HOST;
+my $port        = $options->{port} || 0;
+my $timeout     = $options->{timeout} || TIMEOUT;
+my $proto       = $options->{protocol} || PROTO;
+   $proto       = PROTO unless grep {$_ eq $proto} @{(PROTOCOLS)};
+my $bts         = $options->{bytes} || 0;
+
+my $err = '';
+try {
+    my $p;
+    if ($bts) {
+        $p = Net::Ping->new($proto, $timeout, $bts)
+    } else {
+        $p = Net::Ping->new($proto, $timeout)
+    }
+    if ($port) {
+        $p->port_number($port);
+        $err = sprintf("Host %s (%s) not reachable on port %s", $host, $proto, $port)
+            unless $p->ping($host, $timeout);
+    } else {
+        $err = sprintf("Host %s (%s) not reachable", $host, $proto)
+            unless $p->ping($host, $timeout);
+    }
+    $p->close();
+    undef($p);
+}
+catch {
+    $err = $_;
+};
+
+if ($err) { 
+    print STDERR $err, "\n";
+    print ERROR, "\n";
+    exit 1;
+}
+
+print OK, "\n";
+exit 0;
+
+__END__

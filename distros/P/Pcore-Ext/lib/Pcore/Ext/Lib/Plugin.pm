@@ -60,6 +60,42 @@ JS
     };
 }
 
+sub EXT_list_paging : Extend('Ext.dataview.plugin.ListPaging') : Type('plugin') {
+    return {
+        init => func ['view'],
+        <<'JS',
+            view.setScrollToTopOnRefresh(true);
+
+            this.callParent(arguments);
+JS
+
+        destroy => func <<'JS',
+            Ext.destroy(this._storeSortersListeners);
+
+            this.callParent();
+JS
+
+        bindStore => func ['store'], <<'JS',
+            this.callParent(arguments);
+
+            this._storeSortersListeners = Ext.destroy(this._storeSortersListeners);
+
+            if (store) {
+                var sorters = store.getSorters();
+
+                this._storeSortersListeners = sorters.on({
+                    beginUpdate: 'onSortersBeginUpdate',
+                    scope: this
+                });
+            }
+JS
+
+        onSortersBeginUpdate => func <<'JS',
+            this.cmp.store.currentPage = 1;
+JS
+    };
+}
+
 1;
 __END__
 =pod

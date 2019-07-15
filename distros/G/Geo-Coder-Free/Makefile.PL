@@ -38,6 +38,7 @@ my %urls = (
 	'http://download.geonames.org/export/dump/admin2Codes.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db',
 	# 'https://geocode.nigelhorne.com/lib/Geo/Coder/Free/MaxMind/databases/cities.sql' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql',
 	# 'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+	# This data are 7 years out of date, and are unconsistent with the Geonames database
 	'https://github.com/apache/commons-csv/blob/master/src/test/resources/perf/worldcitiespop.txt.gz?raw=true' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
 	'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
 );
@@ -104,6 +105,7 @@ WriteMakefile(
 		'Config::Auto' => 0,
 		'File::Basename' => 0,
 		'File::Copy' => 0,
+		'File::Open::NoCache::ReadOnly' => 0,
 		'File::Spec' => 0,
 		'autodie' => 0,
 		'Geo::Location::Point' => 0.02,

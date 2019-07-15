@@ -1,0 +1,13 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Mojo::Promisify	lib/Mojo/Promisify.pm	1;"	p
+Mojo::Promisify::promisify	lib/Mojo/Promisify.pm	11;"	s
+Mojo::Promisify::promisify_call	lib/Mojo/Promisify.pm	36;"	s
+Mojo::Promisify::promisify_patch	lib/Mojo/Promisify.pm	41;"	s
+promisify	lib/Mojo/Promisify.pm	11;"	s
+promisify_call	lib/Mojo/Promisify.pm	36;"	s
+promisify_patch	lib/Mojo/Promisify.pm	41;"	s

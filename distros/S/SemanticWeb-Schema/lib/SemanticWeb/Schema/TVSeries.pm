@@ -6,7 +6,7 @@ package SemanticWeb::Schema::TVSeries;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CreativeWorkSeries SemanticWeb::Schema::CreativeWork /;
+extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::CreativeWorkSeries /;
 
 
 use MooX::JSON_LD 'TVSeries';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has actor => (
@@ -154,7 +154,7 @@ SemanticWeb::Schema::TVSeries - CreativeWorkSeries dedicated to TV broadcast and
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -367,7 +367,7 @@ A trailer should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CreativeWork>
+L<SemanticWeb::Schema::CreativeWorkSeries>
 
 =head1 SOURCE
 

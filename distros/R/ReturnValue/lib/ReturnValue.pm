@@ -9,7 +9,7 @@ use parent qw(Hash::AsObject);
 
 use Carp;
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 =encoding utf8
 
@@ -20,7 +20,6 @@ ReturnValue - A structured return value for failure or success
 =head1 SYNOPSIS
 
 	use ReturnValue;
-
 
 	sub do_something {
 		...;
@@ -35,7 +34,7 @@ ReturnValue - A structured return value for failure or success
 			value       => $your_usual_return_value,
 			description => 'Some longer description',
 			tag         => 'short_value'
-			) if $failed;
+			) unless $failed;
 		}
 
 
@@ -179,7 +178,7 @@ package ReturnValue::Error {
 
 This source is in Github:
 
-	http://github.com/briandfoy/returnvalue/
+	http://github.com/perlreview/returnvalue/
 
 =head1 AUTHOR
 
@@ -187,7 +186,7 @@ brian d foy, <bdfoy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2013-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2013-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

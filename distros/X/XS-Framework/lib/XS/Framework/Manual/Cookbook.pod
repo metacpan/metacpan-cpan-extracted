@@ -1,0 +1,75 @@
+=head1 NAME
+
+XS::Framework::Manual::Cookbook - XS::Framework cookbook / tutorial
+
+=cut
+
+=head1 DESCRIPTION
+
+The cookbook consists of recipes, showing the L<XS::Framework> how mechanics
+works, and, most imporant part, the problems which might be encounted in
+adopting C++ into perl and how to overcome them.
+
+All sources are availalbe in C<t/cookbook>. Please, use the recipes with the
+reference ( L<XS::Framework::Manual::Typemap> ), where concepts are disclosed.
+
+=head2 BASICS
+
+L<XS::Framework::Manual::recipe01> demonstrates how to adopt the very
+simple C++ class; it expains C<TypemapObject> usage with C<LifetimePolicy> =
+C<ObjectTypePtr>, and C<StoragePolicy> = C<ObjectStorageIV>/C<ObjectStorageMG>.
+
+L<XS::Framework::Manual::recipe02> demonstrates another difference between
+C<ObjectStorageIV> and C<ObjectStorageMG> storage policies from I<Perl inheritance>
+and extendability point of view.
+
+L<XS::Framework::Manual::recipe03> demonstrates how to use C<ObjectTypeForeignPtr>
+lifetime policy for C++ objects which follows B<Singleton> pattern with
+C<ObjectStorageIV>, also it inroduces the notion of B<const typemap>.
+
+L<XS::Framework::Manual::recipe04> demonstrates how to use C<ObjectTypeSharedPtr>
+lifetime policy when C++ API returns std::shared_ptr.
+
+L<XS::Framework::Manual::recipe05> demonstrates how to use C<ObjectTypeRefcntPtr>
+lifetime policy for C++ API classes with ref-counter support.
+
+L<XS::Framework::Manual::recipe06> demonstrates how to map C++ classes hierarchy
+to hierarchy of typemaps and hierarhy of xs-adapters.
+
+=head2 ADVANCED TOPICS
+
+L<XS::Framework::Manual::recipe07> shows what is C3-inheritance in Perl, and
+how to achive the same in xs-adepters using L<XS::Framework>. The underlying
+B<unrelated> C++ classes are used to provide basic functions.
+
+L<XS::Framework::Manual::recipe08> demonstrates how to bind I<unrelated>, but
+similar C++ classes into single Perl class hierarchy.
+
+If underlying C++ class does not gives enough flexibility for Perl developer,
+the L<XS::Framework::Manual::recipe09> shows how to use I<payload magic> or
+inheritance to store additional runtime association between C++ objects
+and arbitrary perl data.
+
+There might be cases when C++ offers API for it's objects, where lifetime of
+one object is linked to the lifetime of the other, i.e. it is returned as
+I<reference>. In Perl script their lifetimes might be different, as it should
+be never assumed how Perl developer will use Perl objects.
+L<XS::Framework::Manual::recipe10> shows how to "decouple" xs-adapter
+lifetimes using magic payload.
+
+If you have control on C++ classes, the L<XS::Framework::Manual::recipe11>
+expains that providing shared ownership on the object is the most friendly
+way to integrate them into Perl, and probably other scripting languages.
+The C<std::shared_ptr> and intrusive refcounter approach are explained.
+
+It is not safe to directly port I<transient> C++ classes, i.e. very short
+living objects which exist only quant of time. The
+L<XS::Framework::Manual::recipe12> shows how to make them non-transient
+and, that way, safe by the cost of copying dependent C++ objects.
+
+In the L<XS::Framework::Manual::recipe13> it is shown how to maintain
+Perl objects data and class identity when they are moved into native
+C++ containers and returned back; the Backrefs capabilities of
+L<XS::Framework> should be used.
+
+=cut

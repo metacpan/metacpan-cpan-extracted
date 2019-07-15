@@ -3,7 +3,7 @@ package Pcore::API::SCM;
 use Pcore -const, -role, -res;
 use Pcore::API::SCM::Const qw[:ALL];
 use Pcore::API::SCM::Upstream;
-use Pcore::Util::Scalar qw[is_callback];
+use Pcore::Lib::Scalar qw[is_callback];
 
 requires qw[
   _build_upstream

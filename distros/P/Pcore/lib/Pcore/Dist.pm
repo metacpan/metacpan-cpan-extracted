@@ -2,13 +2,13 @@ package Pcore::Dist;
 
 use Pcore -class;
 use Config;
-use Pcore::Util::Scalar qw[is_path];
+use Pcore::Lib::Scalar qw[is_path];
 
 has root         => ( required => 1 );    # Maybe [Str], absolute path to the dist root
 has is_installed => ( required => 1 );    # dist is installed to @INC as CPAN module, root is undefined
 has share_dir    => ( required => 1 );    # absolute path to the dist share dir
 
-has module => ( is => 'lazy' );           # InstanceOf ['Pcore::Util::Perl::Module']
+has module => ( is => 'lazy' );           # InstanceOf ['Pcore::Lib::Perl::Module']
 
 has is_main     => ( init_arg => undef );                        # main process dist
 has cfg         => ( is       => 'lazy', init_arg => undef );    # dist cfg

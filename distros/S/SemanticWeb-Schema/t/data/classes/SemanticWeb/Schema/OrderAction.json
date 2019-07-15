@@ -13,9 +13,9 @@
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
             "schema:TrackAction",
-            "schema:SendAction",
+            "schema:ReceiveAction",
             "schema:OrderAction",
-            "schema:ReceiveAction"
+            "schema:SendAction"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       }

@@ -20,9 +20,9 @@
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
             "schema:Event",
+            "schema:Place",
             "schema:PublicationEvent",
-            "schema:CreativeWork",
-            "schema:Place"
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Boolean"
       },
@@ -33,8 +33,8 @@
          "schema:domainIncludes" : "schema:PublicationEvent",
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:publishedOn" : {

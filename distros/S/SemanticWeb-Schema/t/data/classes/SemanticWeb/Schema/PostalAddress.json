@@ -11,8 +11,8 @@
          "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
             "schema:GeoShape",
+            "schema:GeoCoordinates",
             "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
@@ -22,14 +22,14 @@
       },
       "schema:addressLocality" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The locality. For example, Mountain View.",
+         "rdfs:comment" : "The locality in which the street address is, and which is in the region. For example, Mountain View.",
          "rdfs:label" : "addressLocality",
          "schema:domainIncludes" : "schema:PostalAddress",
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:addressRegion" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The region. For example, CA.",
+         "rdfs:comment" : "The region in which the locality is, and which is in the country. For example, California or another appropriate first-level <a href=\"https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country\">Administrative division</a>",
          "rdfs:label" : "addressRegion",
          "schema:domainIncludes" : "schema:PostalAddress",
          "schema:rangeIncludes" : "schema:Text"
@@ -47,8 +47,8 @@
          "rdfs:label" : "postalCode",
          "schema:domainIncludes" : [
             "schema:PostalAddress",
-            "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

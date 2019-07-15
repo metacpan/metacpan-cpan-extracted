@@ -1,5 +1,15 @@
 Revision history for git-workflow-tools
 
+1.1.4   2019-07-13
+        Updating for release of version 1.1.4
+        Adding new files to manifest (Ivan Wills)
+        Adding perl 5.28 to travis (Ivan Wills)
+        Adding changes files to tests (Ivan Wills)
+        New changes command for looking at changes to files or directories (Ivan Wills)
+        Adding option to skip or only process some branches (Ivan Wills)
+        Added protection for branch name that match files (Ivan Wills)
+        Adding start for test (Ivan Wills)
+
 1.1.3   2019-04-21
         Updating for release of version 1.1.3
         Adding missing files to boilerplate test (Ivan Wills)

@@ -11,7 +11,10 @@
          "rdfs:comment" : "The date the ticket was issued.",
          "rdfs:label" : "dateIssued",
          "schema:domainIncludes" : "schema:Ticket",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
       },
       "schema:issuedBy" : {
          "rdf:type" : "rdf:Property",
@@ -29,10 +32,10 @@
          "rdfs:label" : "priceCurrency",
          "schema:domainIncludes" : [
             "schema:Reservation",
-            "schema:Offer",
             "schema:Ticket",
-            "schema:PriceSpecification",
-            "schema:TradeAction"
+            "schema:Offer",
+            "schema:TradeAction",
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -62,16 +65,16 @@
       },
       "schema:totalPrice" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The total price for the reservation or ticket, including applicable taxes, shipping, etc.",
+         "rdfs:comment" : "The total price for the reservation or ticket, including applicable taxes, shipping, etc.<br/><br/>\n\nUsage guidelines:<br/><br/>\n\n<ul>\n<li>Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.</li>\n<li>Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.</li>\n</ul>\n",
          "rdfs:label" : "totalPrice",
          "schema:domainIncludes" : [
-            "schema:Reservation",
-            "schema:Ticket"
+            "schema:Ticket",
+            "schema:Reservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:PriceSpecification",
+            "schema:Text",
             "schema:Number",
-            "schema:Text"
+            "schema:PriceSpecification"
          ]
       },
       "schema:underName" : {
@@ -79,12 +82,12 @@
          "rdfs:comment" : "The person or organization the reservation or ticket is for.",
          "rdfs:label" : "underName",
          "schema:domainIncludes" : [
-            "schema:Reservation",
-            "schema:Ticket"
+            "schema:Ticket",
+            "schema:Reservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       }
    }

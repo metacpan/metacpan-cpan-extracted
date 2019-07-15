@@ -42,9 +42,15 @@ Unlike most Fsdb programs, this program does I<not> output a FSDB file.
 
 =item B<-m MECHANISM>
 
-Select the mail-sending mechanism.
-Choose "Mail" or "sendmail".
+Select the mail-sending mechanism: Mail, sendmail, or mh.
 Defaults to "Mail".
+
+Mail uses a Berkeley-style /usr/bin/Mail.
+Sendmail invokes /usr/bin/sendmail.
+Mh writes messages into the current directory, treating it
+as an mh-style mailbox (one message per file, with filesnames as sequential
+integrates).
+
 
 =back
 
@@ -230,7 +236,7 @@ sub setup ($) {
     my($self) = @_;
 
     croak($self->{_prog} . ": unknown mail mechanism $self->{_mechanism}.\n")
-	if (!($self->{_mechanism} eq 'Mail' || $self->{_mechanism} eq 'sendmail'));
+	if (!($self->{_mechanism} eq 'Mail' || $self->{_mechanism} eq 'sendmail' || $self->{_mechanism} eq 'mh'));
     croak($self->{_prog} . ": no format file specified.\n")
 	if (!defined($self->{_format_file}));
 
@@ -285,8 +291,9 @@ sub run ($) {
     #
     my $fref;
     my $read_fastpath_sub = $self->{_in}->fastpath_sub();
-    print "#!/bin/sh\n";
-
+    print "#!/bin/sh\n" if ($self->{_mechanism} ne 'mh');
+    my $mh_seqno = 1;
+    
     while ($fref = &$read_fastpath_sub()) {
 	my $result = eval $code;
 	$@ && croak($self->{_prog} . ": internal eval error ``$@''.\n");
@@ -328,6 +335,16 @@ sub run ($) {
 	    my $cc_arg = (defined($fields{"cc"}) ? "-c '" . $fields{"cc"} . "' " : "");
 	    my $subject_arg = (defined($fields{"subject"}) ? "-s '" . $fields{"subject"} . "' " : "");
 	    print "Mail $subject_arg $cc_arg '" . $fields{"to"} . "' <<'$end_of_form_marker'\n$result_body\n$end_of_form_marker\n\n";
+	} elsif ($self->{_mechanism} eq 'mh') {
+            my ($mh_try_count) = 0;
+            while (-f $mh_seqno) {
+                $mh_seqno++;
+                croak $self->{_prog} . ": tried to create 1000 mh files but they already existed, giving up.\n" if (++$mh_try_count > 1000);
+            };
+            open(MH_FILE, ">$mh_seqno") || croak $self->{_prog} . ": could not create file $mh_seqno.\n";
+            print MH_FILE $result;
+            close MH_FILE;
+            $mh_seqno++;
 	} else {
 	    croak($self->{_prog} . ": unknown mechanism " . $self->{_mechanism} . ".\n");
 	};

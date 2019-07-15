@@ -12,7 +12,7 @@ use LWP::UserAgent;
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR

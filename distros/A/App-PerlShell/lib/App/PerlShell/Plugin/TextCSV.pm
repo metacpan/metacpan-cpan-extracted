@@ -66,7 +66,7 @@ sub textcsv {
 
     close $fh;
 
-    if ( !defined($retType) ) {
+    if ( not defined($retType) ) {
         for ( @rets ) {
             print join $csv->sep_char, @{$_};
             print "\n";

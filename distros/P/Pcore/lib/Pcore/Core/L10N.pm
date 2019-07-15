@@ -1,7 +1,7 @@
 package Pcore::Core::L10N;
 
 use Pcore -export;
-use Pcore::Util::Scalar qw[is_plain_hashref];
+use Pcore::Lib::Scalar qw[is_plain_hashref];
 
 our $EXPORT = {    #
     DEFAULT => [qw[l10n %l10n]],

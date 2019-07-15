@@ -11,8 +11,8 @@
          "rdfs:comment" : "The item that is being reviewed/rated.",
          "rdfs:label" : "itemReviewed",
          "schema:domainIncludes" : [
-            "schema:Review",
-            "schema:AggregateRating"
+            "schema:AggregateRating",
+            "schema:Review"
          ],
          "schema:rangeIncludes" : "schema:Thing"
       },
@@ -23,8 +23,8 @@
          "rdfs:label" : "reviewAspect",
          "schema:category" : "issue-1689",
          "schema:domainIncludes" : [
-            "schema:Review",
-            "schema:Rating"
+            "schema:Rating",
+            "schema:Review"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

@@ -1,8 +1,8 @@
 package Pcore::App::Controller::API;
 
 use Pcore -role, -const;
-use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor];
-use Pcore::Util::Scalar qw[is_plain_arrayref];
+use Pcore::Lib::Data qw[from_json to_json from_cbor to_cbor];
+use Pcore::Lib::Scalar qw[is_plain_arrayref];
 use Pcore::WebSocket::pcore;
 
 with qw[Pcore::App::Controller];
@@ -28,7 +28,7 @@ sub run ( $self, $req ) {
             max_message_size => $WS_MAX_MESSAGE_SIZE,
             compression      => $WS_COMPRESSION,
             on_auth          => sub ( $h, $token ) {
-                return $self->{app}->{auth}->authenticate($token);
+                return $self->{app}->{api}->authenticate($token);
             },
             on_bind => sub ( $h, $binding ) {
                 return $self->on_bind( $h, $binding );

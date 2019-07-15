@@ -5,7 +5,7 @@ author:
 build_requires:
   Test::More: '0.88'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ no_index:
 provides:
   Encode::RAD50:
     file: lib/Encode/RAD50.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   Carp: '0'
   Encode: '0'
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Encode-RAD50.git
-version: '0.013'
+version: '0.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

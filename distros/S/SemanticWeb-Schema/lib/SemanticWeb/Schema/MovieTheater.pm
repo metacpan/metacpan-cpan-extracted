@@ -6,7 +6,7 @@ package SemanticWeb::Schema::MovieTheater;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::EntertainmentBusiness SemanticWeb::Schema::CivicStructure /;
+extends qw/ SemanticWeb::Schema::CivicStructure SemanticWeb::Schema::EntertainmentBusiness /;
 
 
 use MooX::JSON_LD 'MovieTheater';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has screen_count => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::MovieTheater - A movie theater.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -66,7 +66,7 @@ A screen_count should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CivicStructure>
+L<SemanticWeb::Schema::EntertainmentBusiness>
 
 =head1 SOURCE
 

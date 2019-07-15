@@ -1,20 +1,25 @@
-Revision history for Media-Info
+0.130   2019-07-03  Released-By: PERLANCAR; Urgency: low
 
-0.12    2016-11-28 (PERLANCAR)
+	- No functional changes.
+
+	- [dist] Update release note style in Changes.
+
+
+0.12    2016-11-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add Media::Info::Mediainfo to list of known backends.
 
 
-0.11    2016-06-02 (PERLANCAR)
+0.11    2016-06-02  Released-By: PERLANCAR
 
 	- [ux] Add completion for --backend.
 
 	- Add note about only Mplayer supports URL.
 
 
-0.10    2016-04-06 (PERLANCAR)
+0.10    2016-04-06  Released-By: PERLANCAR
 
         - Split CLI to App-MediaInfo to reduce dependencies for Media-Info.
 
@@ -22,13 +27,13 @@ Revision history for Media-Info
           metadata (func.backend).
 
 
-0.09    2016-04-06 (PERLANCAR)
+0.09    2016-04-06  Released-By: PERLANCAR
 
 	- Try multiple backend, now that we also have another backend
 	  (Media::Info::Ffmpeg).
 
 
-0.08    2015-09-03 (PERLANCAR)
+0.08    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -37,14 +42,14 @@ Revision history for Media-Info
 	  requirement.
 
 
-0.07     2014-11-28 (SHARYANTO)
+0.07     2014-11-28  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Prefer Perinci::CmdLine::Lite in CLI script.
 
 
-0.06     2014-07-22 (SHARYANTO)
+0.06     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -52,27 +57,27 @@ Revision history for Media-Info
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.05    2014-03-15 (SHARYANTO)
+0.05    2014-03-15  Released-By: SHARYANTO
 
         - No functional changes. Rebuild to fix POD documentation (function
           argument documentation was broken in Perinci-To-POD < 0.42).
 
 
-0.04    2014-01-21 (SHARYANTO)
+0.04    2014-01-21  Released-By: SHARYANTO
 
         - bin/media-info: Allow multiple arguments.
 
 
-0.03    2013-10-31 (SHARYANTO)
+0.03    2013-10-31  Released-By: SHARYANTO
 
         - No functional changes. Add sample result in Synopsis.
 
 
-0.02    2013-09-21 (SHARYANTO)
+0.02    2013-09-21  Released-By: SHARYANTO
 
         - No functional changes. Tweak Abstract.
 
 
-0.01    2013-09-21 (SHARYANTO)
+0.01    2013-09-21  Released-By: SHARYANTO
 
         - First release.

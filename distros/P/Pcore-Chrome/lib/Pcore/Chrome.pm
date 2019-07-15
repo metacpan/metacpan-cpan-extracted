@@ -1,9 +1,9 @@
-package Pcore::Chrome v0.6.0;
+package Pcore::Chrome v0.7.0;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
-use Pcore::Util::Scalar qw[is_plain_coderef];
-use Pcore::Util::Data qw[from_json];
+use Pcore::Lib::Scalar qw[is_plain_coderef];
+use Pcore::Lib::Data qw[from_json];
 
 has bin           => ();
 has host          => '127.0.0.1';

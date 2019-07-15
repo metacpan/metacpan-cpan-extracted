@@ -2,8 +2,8 @@ package Pcore::API::AntiCaptcha;
 
 use Pcore -class, -const, -res;
 use Pcore::API::AntiCaptcha::Result;
-use Pcore::Util::Data qw[to_b64 to_json from_json];
-use Pcore::Util::Scalar qw[weaken is_plain_scalarref];
+use Pcore::Lib::Data qw[to_b64 to_json from_json];
+use Pcore::Lib::Scalar qw[weaken is_plain_scalarref];
 
 with qw[Pcore::API::AntiCaptcha::Role];
 

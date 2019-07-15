@@ -13,7 +13,7 @@ use Carp;
 use English qw/ -no_match_vars /;
 use base 'App::Git::Workflow';
 
-our $VERSION  = version->new(1.1.3);
+our $VERSION  = version->new(1.1.4);
 
 sub get_brs {
     my ($self) = @_;

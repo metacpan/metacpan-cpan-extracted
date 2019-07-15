@@ -6,7 +6,7 @@ package BSON::Symbol;
 
 # ABSTRACT: BSON type wrapper for symbol data (DEPRECATED)
 
-our $VERSION = 'v1.10.2';
+our $VERSION = 'v1.12.0';
 
 use Moo 2.002004;
 use namespace::clean -except => 'meta';
@@ -25,7 +25,7 @@ BSON::Symbol - BSON type wrapper for symbol data (DEPRECATED)
 
 =head1 VERSION
 
-version v1.10.2
+version v1.12.0
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

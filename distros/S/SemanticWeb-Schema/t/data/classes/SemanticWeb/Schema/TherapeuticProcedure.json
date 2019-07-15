@@ -35,10 +35,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
+            "schema:DrugClass",
             "schema:TherapeuticProcedure",
-            "schema:MedicalCondition",
             "schema:Patient",
-            "schema:DrugClass"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
@@ -48,9 +48,9 @@
          "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
          "rdfs:label" : "indication",
          "schema:domainIncludes" : [
+            "schema:TherapeuticProcedure",
             "schema:MedicalProcedure",
-            "schema:MedicalDevice",
-            "schema:TherapeuticProcedure"
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalIndication"

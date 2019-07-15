@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Exception: '0.4'
+  Test::FailWarnings: '0'
   Test::More: '1'
   Test::Simple: '0.44'
 configure_requires:
@@ -24,5 +25,5 @@ requires:
   MIME::Base64: '0.01'
 resources:
   repository: https://github.com/FGasper/p5-Crypt-Format.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

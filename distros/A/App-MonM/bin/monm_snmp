@@ -1,0 +1,368 @@
+#!/usr/bin/perl -w
+use strict; # $Id: monm_snmp 79 2019-07-08 07:17:07Z abalama $
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+monm_snmp - SNMP checker for App::MonM
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    monm_snmp [-ST] [-v VERSION-SNMP] [ --mibs=ALL ] [-t MICROSECS]
+              [-s HOST] [-c COMMUNITY] OBJECT
+
+    monm_snmp -s 192.168.1.1 -c test .1.3.6.1.2.1.1.1
+
+    monm_snmp -s 192.168.1.1 -c test -S .1.3.6.1.2.1.1.1.0
+
+    monm_snmp -s 192.168.1.1 -c test -M IF-MIB -T ifTable
+
+    monm_snmp -s 192.168.1.1 -c test -T IF-MIB::ifTable
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c COMMUNITY, --community=COMMUNITY>
+
+Community name
+
+Default: public
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-M MIBS, --mibs=MIBS>
+
+Set MIBS value
+
+=item B<-s HOST, --host=HOST>
+
+Host of SNMP
+
+Default: localhost
+
+=item B<-S, --strict>
+
+Enable strict mode. All OIDs must be only as is long-format strings
+
+    monm_snmp -S .1.3.6.1.2.1.1.1.0
+
+=item B<-t MICROSECS, --timeout=MICROSECS>
+
+Timeout of SNMP requests in microseconds
+
+Default: 1000000
+
+=item B<-T, --table>
+
+Enable table mode
+
+    monm_snmp -T ifTable
+    monm_snmp -T IF-MIB::ifTable
+
+=item B<-v VERSION-SNMP, --version=VERSION-SNMP>
+
+Version of SNMP (default = 2c)
+
+=back
+
+=head1 DESCRIPTION
+
+SNMP checker for App::MonM
+
+=head2 STANDARD COUNTERS
+
+=over 4
+
+=item B<UCD-SNMP-MIB::memTotalReal.0>
+
+Returns memory size
+
+=item B<UCD-SNMP-MIB::memAvailReal.0>
+
+Returns memory free
+
+=item B<UCD-SNMP-MIB::memTotalSwap.0>
+
+Returns swap size
+
+=item B<UCD-SNMP-MIB::memAvailSwap.0>
+
+Returns swap free
+
+=item B<UCD-SNMP-MIB::ssCpuUser.0>
+
+Returns cpu user usage
+
+=item B<UCD-SNMP-MIB::ssCpuSystem.0>
+
+Returns cpu system usage
+
+=back
+
+=head2 STANDARD TABLES
+
+=over 4
+
+=item B<IF-MIB::ifTable>
+
+    {
+      '1' => {
+        'ifAdminStatus' => 'up',
+        'ifDescr' => 'lo',
+        'ifInDiscards' => '0',
+        'ifInErrors' => '0',
+        'ifInNUcastPkts' => '0',
+        'ifInOctets' => '131152886',
+        'ifInUcastPkts' => '9442417',
+        'ifInUnknownProtos' => '0',
+        'ifIndex' => '1',
+        'ifLastChange' => '0:0:00:00.00',
+        'ifMtu' => '65536',
+        'ifOperStatus' => 'up',
+        'ifOutDiscards' => '0',
+        'ifOutErrors' => '0',
+        'ifOutNUcastPkts' => '0',
+        'ifOutOctets' => '131152886',
+        'ifOutQLen' => '0',
+        'ifOutUcastPkts' => '9442417',
+        'ifPhysAddress' => '',
+        'ifSpecific' => '.0.0',
+        'ifSpeed' => '10000000',
+        'ifType' => 'softwareLoopback'
+      },
+    }
+
+Returns interface list
+
+=item B<HOST-RESOURCES-MIB::hrStorageTable>
+
+    {
+      '1' => {
+        'hrStorageAllocationUnits' => '1024 Bytes',
+        'hrStorageDescr' => 'Physical memory',
+        'hrStorageIndex' => '1',
+        'hrStorageSize' => '1015016',
+        'hrStorageType' => '.1.3.6.1.2.1.25.2.1.2',
+        'hrStorageUsed' => '618296'
+      },
+    }
+
+Returns storage table
+
+=back
+
+=head1 DEPENDENCES
+
+L<SNMP> as Net-SNMP (see down)
+
+=head1 REQUIREMENTS
+
+=over
+
+=item Net-SNMP
+
+To use this module, you must have Net-SNMP installed on your system.
+More specifically you need the Perl modules that come with it.
+
+DO NOT INSTALL SNMP or Net::SNMP from CPAN!
+
+The SNMP module is matched to an install of net-snmp, and must be installed
+from the net-snmp source tree.
+
+The Perl module C<SNMP> is found inside the net-snmp distribution.  Go to the
+F<perl/> directory of the distribution to install it, or run
+C<./configure --with-perl-modules> from the top directory of the net-snmp
+distribution.
+
+Net-SNMP can be found at http://net-snmp.sourceforge.net
+
+Version 5.3.2 or greater is recommended.
+
+B<Redhat Users>: Some versions that come with certain versions of
+Redhat/Fedora don't have the Perl library installed.  Uninstall the RPM and
+install by hand.
+
+B<Ubuntu Users>: sudo apt-get install snmp snmp-mibs-downloader libsnmp-perl
+
+=back
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Module::Loaded;
+use Try::Tiny;
+
+use App::MonM::Util qw/explain/;
+use App::MonM::Const qw/
+        IS_TTY SCREENWIDTH
+        OK DONE ERROR SKIPPED PASSED FAILED UNKNOWN PROBLEM
+    /;
+
+use constant {
+    HOST        => 'localhost',
+    PORT        => 161,
+    TIMEOUT     => 1000000,
+    RETRIES     => 5,
+    COMMUNITY   => 'public',
+    VER         => '2c',
+    TESTOBJ     => '.1.3.6.1.2.1.1.3.0',
+    OBJ         => 'SNMPv2-MIB::sysDescr.0', # .1.3.6.1.2.1.1.1.0
+    TBL         => 'ifTable',
+};
+
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # Information
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+
+    # General
+    "host|server|s=s",      # Host SNMT (default = localhost)
+    "strict|S",             # Strict mode: 0/1
+    "community|comm|c=s",   # Community (default = public)
+    "timeout|time|t=i",     # Timeout (default = 1000000)
+    "version|v=s",          # Version (default = 2c)
+    "table|astable|tab|T",  # As table
+    "mibs|mib|M=s",         # MIBS
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+
+my $host        = $options->{host} || HOST;
+my $timeout     = $options->{timeout} || TIMEOUT;
+my $strictm     = $options->{strict} || 0;
+my $community   = $options->{community} || COMMUNITY;
+my $ver         = $options->{version} || VER;
+my $istable     = $options->{table} || 0;
+my $obj         = shift(@ARGV) // ($istable ? TBL : OBJ);
+
+# Load module Net-SNMP
+my $SNMPV = 0;
+try {
+    require SNMP;
+    $SNMPV = SNMP->VERSION;
+} catch {
+    print STDERR "Module SNMP 5.3.2 is not loaded. Please install Net-SNMP from official site of Net-SNMP project\n";
+    print STDERR $_, "\n";
+    print ERROR, "\n";
+    exit 1;
+};
+pod2usage(-exitval => 1, -verbose => 99, -sections => 'REQUIREMENTS') unless (is_loaded('SNMP'));
+if ($SNMPV < 5.0302) {
+    print STDERR "SNMP version need 5.3.2 or more\n";
+    print ERROR, "\n";
+    exit 1;
+}
+
+# Loading MIBs
+$ENV{'MIBS'} = $options->{mibs} if $options->{mibs};
+&SNMP::initMib();
+
+# Create SNMP::Session
+my $snmp = new SNMP::Session(
+        DestHost    => $host,
+        Version     => $ver,
+        Community   => $community,
+        Retries     => RETRIES,
+        Timeout     => $timeout,
+        UseSprintValue => 1,
+) or do {
+    print STDERR sprintf("Connect failed to %s (%s)\n", $host, $community);
+    print ERROR, "\n";
+    exit 1;
+};
+
+# Test request
+my $testval = '';
+try {
+    $testval = $snmp->get(TESTOBJ);
+} catch {
+    print STDERR $_, "\n";
+    print ERROR, "\n";
+    exit 1;
+};
+unless ($testval) {
+    printf STDERR "SNMP Error [%d]: %s. Can't get data of %s OID. Please check configuration of SNMPD on server %s (%s)\n",
+        $snmp->{ErrorNum} ? $snmp->{ErrorNum} : 0,
+        $snmp->{ErrorStr} ? $snmp->{ErrorStr} : 'Undefined error',
+        TESTOBJ, $host, $community;
+    print ERROR, "\n";
+    exit 1;
+}
+
+my $myobj = '';
+my $myval = '';
+if ($strictm) {
+    $myobj = [$obj];
+} elsif ($istable) {
+    $myobj = $obj;
+} elsif ($obj =~ /^\.?(\d+\.)*\d+$/) {
+    if ($obj =~ /\.0$/) {
+        $myobj = [$obj];
+    } else {
+        $myobj = new SNMP::Varbind([$obj,0]);
+    }
+} else {
+    $obj .= '.0' unless $obj =~ /\.0$/;
+    $myobj = [$obj];
+}
+
+try {
+    $myval = $istable ? $snmp->gettable($myobj) : $snmp->get($myobj);
+} catch {
+    print STDERR $_, "\n";
+    print ERROR, "\n";
+    exit 1;
+};
+$myval = '' unless defined $myval;
+if ($snmp->{ErrorNum}) {
+    printf STDERR "SNMP Error [%d]: %s. Can't get data of %s OID. Please check configuration of SNMPD on server %s (%s)\n",
+        $snmp->{ErrorNum} ? $snmp->{ErrorNum} : 0,
+        $snmp->{ErrorStr} ? $snmp->{ErrorStr} : 'Undefined error',
+        $myobj, $host, $community;
+    print ERROR, "\n";
+    exit 1;
+}
+
+printf "%s\n", ref($myval) ? explain($myval) : $myval;
+print OK, "\n";
+exit 0;
+
+__END__

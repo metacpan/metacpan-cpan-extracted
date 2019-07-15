@@ -1,0 +1,130 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::CallProxy - XS::Framework CallProxy C++ class reference
+
+=head1 CallProxy
+
+The C<CallProxy> is helper class which Perl method invocation. The need of
+this class is due to I<invocation context>, which can be list, scalar or void,
+and the lack of direct language equivalent in C/C++.
+
+Another notable feature is that actual method invocation is I<postponed>,
+until the relevant context is supplied (or void context will be supplied). So,
+for example the in the following code
+
+    Sub sub = ...;
+    CallProxy result = sub.call();
+    int a = 5;
+
+The variable C<a> will always be assigned first before a Perl method invocation.
+However, in the following code:
+
+    Sub sub = ...;
+    sub.call();
+    int a = 5;
+
+a Perl method will be invoked first, and only then the variable C<a> will be
+assigned. This happens, because C<CallProxy> destructor is invoked, and it is
+able to detect, the condition, that it was not invoked, so it performs Perl
+subroutine invocation in the destructor.
+
+Let's take another example:
+
+    Sub sub1 = ...;
+    Sub sub2 = ...;
+    CallProxy r1 = sub1.call();
+    CallProxy r2 = sub2.call();
+    Sv sv2 = r2.scalar();
+    Sv sv1 = r1.scalar();
+
+Here the actual order of calls is: C<sub2>, then C<sub1>, because the invocation
+is performed at the moment of context-sensitive result access.
+
+Due to that subtle compexities recording C<CallProxy> is discouraged. We advice
+to use it only as transient object, i.e. convert to the final class immediately,
+e.g.
+
+    Simple = sub1.call(...);
+
+=head2 Construction
+
+    CallProxy (CV* cv, SV* arg = NULL, SV*const* args = NULL, size_t items = 0)
+    CallProxy (CV* cv, SV* arg, const Scalar* args, size_t items)
+
+Creates new C<CallProxy>, "currying" the Perl sub (C<CV*>) and arguments. The
+Perl subrouite itself is not executed.
+
+The C<CV*> must be not NULL.
+
+=head2 Result access and actual invocation
+
+It is possible to invoke the C<CallProxy> in the I<list> context and do
+appropriate types unpacking in C++
+
+    template <class T, size_t N, typename = one_of_t<T,Sv,Scalar,Ref,Simple>>
+    operator std::array<T,N> ()
+
+    template <class... Types>
+    operator std::tuple<Types...> ()
+
+for example
+
+    using result_t = std::array<Sv, 2>;
+    Sub sub = ...;
+    result_t res = sub.call();
+
+This is mostly useful if Perl interface is known apriory from C++, and the list
+result will be no longer used in C<Perl>.
+
+To perform a call in list / scalar context, the following methods should be used:
+
+    Scalar scalar () const
+    Array  list   () const
+
+If it is known, that the result of a call is C<Simple>, it is possible to get
+the string or number via:
+
+    template <class T = panda::string> T as_string () const
+    template <class T = int> T as_number () const
+
+For example:
+
+    Sub sub = ...;
+    int count = sub.call(...).as_number();
+
+An perl subroutine is executed in B<scalar> context above. If the result is not
+conversible to C<Simple> runtime exception will be thrown.
+
+
+=head2 call()
+
+    CallProxy call (const std::string_view& name)
+    CallProxy call (const std::string_view& name, const Scalar& arg)
+    CallProxy call (const std::string_view& name, SV*const* args, size_t items)
+    CallProxy call (const std::string_view& name, std::initializer_list<Scalar> l)
+
+if it is known a priory, that the result of the invocation is C<Object>, then
+it is possible to have "chaned call" approach, i.e.
+
+    Object obj = ...;
+    obj.call("method1", ...).call("method2", ...).call("method3", ...)
+
+The corresponding Perl construct for this is:
+
+    $obj->method1->method2->method3;
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Sub>
+
+L<XS::Framework::Manual::SVAPI::Object>
+
+L<XS::Framework::Manual::SVAPI::Ref>
+
+L<XS::Framework::Manual::SVAPI::Stash>
+
+=cut

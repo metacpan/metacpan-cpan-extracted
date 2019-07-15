@@ -1,0 +1,30 @@
+MODE: INLINE
+
+class MyThreadSafe : public virtual panda::Refcnt {
+    public:
+    int val;
+    MyThreadSafe (int arg) : val(arg) {}
+    virtual ~MyThreadSafe () { dcnt.c++; }
+};
+
+namespace xs {
+    template <> struct Typemap<MyThreadSafe*> : TypemapObject<MyThreadSafe*, MyThreadSafe*, ObjectTypeRefcntPtr, ObjectStorageMG, DynamicCast> {
+        static std::string package () { return "MyTest::MyThreadSafe"; }
+        static MyThreadSafe* dup (MyThreadSafe* obj) { return obj; }
+    };
+}
+
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::MyThreadSafe
+PROTOTYPES: DISABLE
+
+MyThreadSafe* MyThreadSafe::new (int arg)
+
+int MyThreadSafe::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MyThreadSafe::DESTROY () {
+    dcnt.perl++;
+}

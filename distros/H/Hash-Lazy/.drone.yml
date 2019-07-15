@@ -1,0 +1,37 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: Test with perl 5.28
+    image: gugod/perl-testbox:5.28
+    commands:
+      - cpanm --quiet --installdeps .
+      - cpanm --quiet -n Test2::Harness
+      - yath --qvf
+
+  - name: Build the distribution
+    image: gugod/perl-testbox:5.28
+    commands:
+      - cpanm --quiet -n App::ModuleBuildTiny
+      - mbtiny dist
+      - ls -l
+
+  - name: Install (perl 5.30)
+    image: perl:5.30
+    commands:
+      - cpanm -q *.tar.gz
+
+  - name: Install (perl 5.28)
+    image: perl:5.28
+    commands:
+      - cpanm -q *.tar.gz
+
+  - name: Install (perl 5.26)
+    image: perl:5.26
+    commands:
+      - cpanm -q *.tar.gz
+
+  - name: Install (perl 5.24)
+    image: perl:5.24
+    commands:
+      - cpanm -q *.tar.gz

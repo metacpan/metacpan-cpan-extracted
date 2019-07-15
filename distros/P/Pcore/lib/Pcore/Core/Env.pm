@@ -7,7 +7,7 @@ use Cwd qw[];           ## no critic qw[Modules::ProhibitEvilModules]
 use Pcore::Dist;
 use Pcore::Core::Env::Share;
 use Fcntl qw[LOCK_EX SEEK_SET];
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Lib::Scalar qw[is_ref];
 
 has is_par        => ( init_arg => undef );                        # process run from PAR distribution
 has main_dist     => ( init_arg => undef );                        # Maybe [ InstanceOf ['Pcore::Dist'] ], main dist

@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Roles::Hmmerable;
 # ABSTRACT: HMMER model-related methods
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Drivers::Roles::Hmmerable::VERSION = '0.181160';
+$Bio::MUST::Drivers::Roles::Hmmerable::VERSION = '0.191910';
 use Moose::Role;
 
 use autodie;
@@ -12,6 +12,7 @@ use feature qw(say);
 use Carp;
 use File::Temp;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 
 use Bio::FastParsers;
 use aliased 'Bio::MUST::Core::Ali::Stash';
@@ -32,6 +33,10 @@ sub _search {
     my $pgm    = shift;
     my $target = shift;
     my $args   = shift // {};
+
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Hmmer')->new;
+       $app->meet();
 
     # setup input/output files
     # Note: we handle both single models and model database...
@@ -56,7 +61,8 @@ sub _search {
         $parser_class = 'Bio::FastParsers::Hmmer::Standard';
     }
     unless ($parser_class) {
-        carp "Warning: cannot set parser subclass; returning without parser!";
+        carp '[BMD] Warning: cannot set parser subclass;'
+            . ' returning without parser!';
         return;
     }
 
@@ -68,7 +74,8 @@ sub _search {
     # try to robustly execute HMMER
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Warning: cannot execute $pgm command; returning without parser!";
+        carp "[BMD] Warning: cannot execute $pgm command;"
+            . ' returning without parser!';
         return;
     }
 
@@ -95,7 +102,8 @@ sub emit {
     # try to robustly execute hmmemit
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Warning: cannot execute $pgm command; returning without seqs!";
+        carp "[BMD] Warning: cannot execute $pgm command;"
+            . ' returning without seqs!';
         return;
     }
 
@@ -115,7 +123,7 @@ Bio::MUST::Drivers::Roles::Hmmerable - HMMER model-related methods
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

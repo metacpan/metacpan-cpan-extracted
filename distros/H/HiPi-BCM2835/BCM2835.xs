@@ -3,7 +3,7 @@
 // Description:  XS module for HiPi::Device::BCM2385
 // Created       Fri Nov 23 12:13:43 2012
 // SVN Id        $Id:$
-// Copyright:    Copyright (c) 2012-2017 Mark Dootson
+// Copyright:    Copyright (c) 2012-2019 Mark Dootson
 // Licence:      This work is free software; you can redistribute it and/or modify it 
 //               under the terms of the GNU General Public License as published by the 
 //               Free Software Foundation; either version 2 of the License, or any later 
@@ -429,14 +429,14 @@ hipi_gpio_get_eds( pin )
   OUTPUT: RETVAL
 
 
-void
-bcm2835_hipi_i2c_setSlaveAddress(volatile uint32_t* baseaddress, uint8_t addr )
+#// void
+#// bcm2835_hipi_i2c_setSlaveAddress(volatile uint32_t* baseaddress, uint8_t addr )
 
-void
-bcm2835_hipi_i2c_setClockDivider( volatile uint32_t* baseaddress, uint16_t divider )
+#// void
+#// bcm2835_hipi_i2c_setClockDivider( volatile uint32_t* baseaddress, uint16_t divider )
 
-void
-bcm2835_hipi_i2c_set_baudrate( volatile uint32_t* baseaddress, uint32_t baudrate)
+#// void
+#// bcm2835_hipi_i2c_set_baudrate( volatile uint32_t* baseaddress, uint32_t baudrate)
 
 void
 _hipi_i2c_set_transfer_params( baseaddress, addr, divider )
@@ -635,6 +635,9 @@ bcm2835_gpio_write_mask(uint32_t value, uint32_t mask)
 
 void
 bcm2835_gpio_set_pud(uint8_t pin, uint8_t pud)
+
+uint8_t 
+bcm2835_gpio_get_pud(uint8_t pin)
 
 int 
 bcm2835_spi_begin()

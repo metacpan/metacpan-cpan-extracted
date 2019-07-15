@@ -1,0 +1,32 @@
+=head1 NAME
+
+XS::Framework - Framework for building C++ XS modules with shared code, typemaps and C++ perl API.
+
+=head1 DESCRIPTION
+
+XS::Framework consists of two major parts. First part, the I<C++ perl API> makes it convenient to
+write C++ code, which iterates with perl. For example, it invokes L<SvREFCNT_dec> in destructor
+upon perl variable (Sv) destruction; another example is safe type casting and perl functions
+calls.
+
+The second part is C++ typemaps mechanism; it serves as alternative to standard perl typemaps and
+is shipped with pre-made storage and lifetime policies, make it possible to write C++ XS code
+with zero overhead or easily adapt third-party C++ libraries into perl.
+
+The L<XS::Framework> assumes somewhat familiarity with common perl XS-code;
+please refer L<perlxstut> and L<perlapi>. The shipped manuals consists of XS
+typemap cookbook L<XS::Framework::Manual::Cookbook>, which has a variety of
+recipes from basic to advanced cases; and separate
+L<XS::Framework::Manual::Typemap> and L<XS::Framework::Manual::SVAPI> references.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+
+1;

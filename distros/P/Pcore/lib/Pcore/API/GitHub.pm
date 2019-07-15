@@ -1,7 +1,7 @@
 package Pcore::API::GitHub;
 
 use Pcore -class, -res;
-use Pcore::Util::Scalar qw[is_plain_coderef];
+use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 has username => ( required => 1 );
 has token    => ( required => 1 );

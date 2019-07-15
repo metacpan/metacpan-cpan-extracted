@@ -14,8 +14,8 @@
          "rdfs:subPropertyOf" : "schema:suggestedAnswer",
          "schema:domainIncludes" : "schema:Question",
          "schema:rangeIncludes" : [
-            "schema:ItemList",
-            "schema:Answer"
+            "schema:Answer",
+            "schema:ItemList"
          ]
       },
       "schema:answerCount" : {
@@ -41,8 +41,8 @@
          "rdfs:label" : "suggestedAnswer",
          "schema:domainIncludes" : "schema:Question",
          "schema:rangeIncludes" : [
-            "schema:Answer",
-            "schema:ItemList"
+            "schema:ItemList",
+            "schema:Answer"
          ]
       },
       "schema:upvoteCount" : {
@@ -50,8 +50,8 @@
          "rdfs:comment" : "The number of upvotes this question, answer or comment has received from the community.",
          "rdfs:label" : "upvoteCount",
          "schema:domainIncludes" : [
-            "schema:Comment",
-            "schema:Question"
+            "schema:Question",
+            "schema:Comment"
          ],
          "schema:rangeIncludes" : "schema:Integer"
       }

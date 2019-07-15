@@ -1,0 +1,26 @@
+MODE: INLINE
+
+struct TimezoneRecipe03 {
+    const char* get_name() const { return name; }
+    static const TimezoneRecipe03& get_instance() {
+        static TimezoneRecipe03* instance = new TimezoneRecipe03();
+        return *instance;
+    }
+private:
+    TimezoneRecipe03() { name = "Europe/Minsk"; }
+    const char* name;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<const TimezoneRecipe03*> : TypemapObject<const TimezoneRecipe03*, const TimezoneRecipe03*, ObjectTypeForeignPtr, ObjectStorageIV, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::TimezoneRecipe03"; }
+    };
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::TimezoneRecipe03
+PROTOTYPES: DISABLE
+
+const char* TimezoneRecipe03::get_name() : const;
+
+const TimezoneRecipe03* get_instance() { RETVAL = &TimezoneRecipe03::get_instance(); }

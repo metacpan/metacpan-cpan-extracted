@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast;
-# ABSTRACT: Bio::MUST driver for running the NCBIBLAST+ suite of programs
-$Bio::MUST::Drivers::Blast::VERSION = '0.181160';
+# ABSTRACT: Bio::MUST driver for running the NCBI-BLAST+ suite of programs
+$Bio::MUST::Drivers::Blast::VERSION = '0.191910';
 use strict;
 use warnings;
 
@@ -15,11 +15,11 @@ __END__
 
 =head1 NAME
 
-Bio::MUST::Drivers::Blast - Bio::MUST driver for running the NCBIBLAST+ suite of programs
+Bio::MUST::Drivers::Blast - Bio::MUST driver for running the NCBI-BLAST+ suite of programs
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

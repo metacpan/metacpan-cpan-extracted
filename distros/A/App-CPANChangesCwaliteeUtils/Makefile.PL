@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::CPANChangesCwaliteeUtils",
   "PREREQ_PM" => {
     "CPAN::Changes::Cwalitee" => 0,
-    "Cwalitee::Common" => 0,
+    "Cwalitee::Common" => "0.002",
     "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
     "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CPAN::Changes::Cwalitee" => 0,
-  "Cwalitee::Common" => 0,
+  "Cwalitee::Common" => "0.002",
   "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
   "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,

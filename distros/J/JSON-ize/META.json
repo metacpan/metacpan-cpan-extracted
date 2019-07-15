@@ -4,7 +4,7 @@
       "Mark A. Jensen"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "apache_2_0"
    ],
@@ -26,9 +26,15 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "3.0",
+            "YAML::XS" : "0.76"
+         },
          "requires" : {
-            "JSON" : "2",
+            "JSON::MaybeXS" : "1.0",
             "PerlIO::gzip" : "0",
+            "Try::Tiny" : "0",
+            "YAML::Any" : "1.29",
             "perl" : "v5.8.0"
          }
       }
@@ -36,7 +42,7 @@
    "provides" : {
       "JSON::ize" : {
          "file" : "lib/JSON/ize.pm",
-         "version" : "0.104"
+         "version" : "0.202"
       }
    },
    "release_status" : "stable",
@@ -51,6 +57,6 @@
          "url" : "https://github.com/majensen/jsonize"
       }
    },
-   "version" : "0.104",
+   "version" : "0.202",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

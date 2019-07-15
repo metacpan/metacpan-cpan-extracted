@@ -2,7 +2,7 @@ package Datahub::Factory::Pipeline::Exporter;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use Moo;
 use namespace::clean;

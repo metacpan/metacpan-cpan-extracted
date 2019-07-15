@@ -1,3 +1,11 @@
+1.2.4    15.07.2019
+           - fix Makefile for FreeBSD-make
+           - header and xsi dependencies are always enabled now (H_DEPS removed)
+1.2.3    12.07.2019
+           - pass $ENV{OPTIMIZE/TEST_OPTIMIZE} to params
+1.2.2    01.07.2019
+           - remove XS BOOT C-prototype
+           - -Wno-unused-parameter for Win32
 1.2.1    28.06.2019
            - fix csuffix (xsubpp)
 1.2.0    24.06.2019

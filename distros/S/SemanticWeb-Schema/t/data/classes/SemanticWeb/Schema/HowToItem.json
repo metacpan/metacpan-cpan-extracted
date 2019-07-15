@@ -12,8 +12,8 @@
          "rdfs:label" : "requiredQuantity",
          "schema:domainIncludes" : "schema:HowToItem",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
             "schema:Number",
+            "schema:QuantitativeValue",
             "schema:Text"
          ]
       }

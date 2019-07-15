@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,8 @@ requires:
   Hash::AsObject: '0'
   perl: '5.014'
 resources:
-  bugtracker: https://github.com/briandfoy/returnvalue/issues
-  homepage: https://github.com/briandfoy/returnvalue
-  repository: https://github.com/briandfoy/returnvalue.git
-version: '0.112'
+  bugtracker: https://github.com/perlreview/returnvalue/issues
+  homepage: https://github.com/perlreview/returnvalue
+  repository: https://github.com/perlreview/returnvalue.git
+version: '0.113'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

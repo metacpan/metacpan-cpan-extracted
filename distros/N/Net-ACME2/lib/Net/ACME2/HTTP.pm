@@ -37,8 +37,6 @@ our $verify_SSL = 1;
 sub new {
     my ( $class, %opts ) = @_;
 
-    die Net::ACME2::X->create('Generic', 'need “key”!') if !$opts{'key'};
-
     my $ua = Net::ACME2::HTTP_Tiny->new( verify_SSL => $verify_SSL );
 
     my $self = bless {
@@ -97,8 +95,8 @@ sub post_key_id {
 sub _post {
     my ( $self, $jwt_method, $url, $data, $opts_hr ) = @_;
 
-    # Shouldn’t be needed because the constructor requires “key”,
-    # but just in case.
+    # Needed now that the constructor allows instantiation
+    # without “key”.
     die "Constructor needed “key” to do POST! ($url)" if !$self->{'_acme_key'};
 
     my $jws = $self->_create_jwt( $jwt_method, $url, $data );
@@ -235,8 +233,8 @@ sub _create_jwt {
         }
 
         if (!$class->can('new')) {
-            require Module::Load;
-            Module::Load::load($class);
+            require Module::Runtime;
+            Module::Runtime::use_module($class);
         }
 
         $class->new(

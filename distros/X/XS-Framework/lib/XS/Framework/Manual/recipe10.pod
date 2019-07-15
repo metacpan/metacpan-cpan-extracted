@@ -1,0 +1,149 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+
+=cut
+
+=head1 DESCRIPTION
+
+Let's assume that there is external C++ library (out of our control), which
+offers the following API:
+
+    struct DateRecipe10;
+
+    struct TimezoneRecipe10 {
+        const char* get_name() const { return name.c_str(); }
+    private:
+        TimezoneRecipe10(const char* name_): name{name_} { }
+        std::string name;
+        friend class DateRecipe10;
+    };
+
+    struct DateRecipe10 {
+        DateRecipe10(const char* tz_ = "Europe/Minsk"): tz(tz_) { update(); }
+        ~DateRecipe10() { std::cout << "~DateRecipe10()\n"; }
+        void update()   { epoch = std::time(nullptr); }
+
+        int get_epoch() const { return epoch; }
+        TimezoneRecipe10& get_timezone() { return tz; }
+    private:
+        std::time_t epoch;
+        TimezoneRecipe10 tz;
+    };
+
+It allows to create C<Date> object, and offres the C<Timezone> object by
+reference. In other words, the I<lifetime of Timezone object is limited
+by lifetme of Date object>. Let's imagine to possible use-cases of the library
+from Perl perspecitve:
+
+    my $date = MyTest::Cookbook::DateRecipe10->new;
+    my $tz = $date->get_timezone;
+    print "now is ", $date->epoch, " at ", $tz->get_name, "\n";
+    undef $date;
+    print "mytimezone is ", $tz->get_name, "\n";    # SEGFAULT (1)
+
+The common Perl programmer expectations are: if there is a valid reference to
+an objcet (C<$tz>), the object is valid, and all it's allowed to invoke it's
+methods etc. May be some error might occur, but Perl interpreter core dump
+is not expected: it is hard to debug, it should be not allowed to have that
+code in production system. Let's reformulate: here there is a conflict
+between C++ API objects lifetimes and possible perl script lifetimes.
+
+Let's check what are the available options:
+
+1) In C<Date> xs-adapter do not expose the C<Timezone> object, but instead
+just return by value timezone name as string. That good solution, but it is
+rather limited for simple objects, which can be reduced to string names
+and do not expose any other methods.
+
+2) Let C<Date> xs-adapter return "detached" copy of C<Timezone> object.
+As the new clone has independent from C<Date> lifetime the problem would
+be solved. Hovewer, this is not always possible: the c++ object might
+do not have clone method or copy-constructor, or the cloning operation
+might be a bit heavy-weight.
+
+3) Let the C<Timezone> xs-adapter somehow "prolongs" lifetime of it's
+owner C<Date> as long as needed.
+
+        +-----------------+           +---------------------+
+  +---->|Date(C++ pointer)|---------->|TimeZone(C++ pointer)|<------------+
+  |     +-----------------+           +---------------------+             |
+  |                                                                       |
+  |                                                                       |
+  |                                                                       |
+  |    +-------------------+         +----------------------------+       |
+  |    |Date (xs-adapter)  |         |TimeZone(xs-adapter)        |       |
+  +----|* C++ date pointer |<---     |  * C++ TimeZone pointer    |-------+
+       +-------------------+    \----|  * XS adapter Date pointer |
+                                     +----------------------------+
+
+in other words, C<Timezone> xs-adapter will hold C++ C<Timezone> pointer
+B<and> D<Date> xs-adapter, which holds C++ C<Date> pointer. So, invoking
+methods on C<TimeZone> C++ object is guaranteed to be safe and match
+Perl developer expectations, i.e. s/he might store/enclose C<$timezone> object
+as long as needed and methods invocations will be safe.
+
+Let's show how this can be achived using magic payload, provided by SV-api
+of L<XS::Framework>:
+
+
+    namespace xs {
+        template <>
+        struct Typemap<DateRecipe10*> : TypemapObject<DateRecipe10*, DateRecipe10*, ObjectTypePtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::DateRecipe10"; }
+        };
+
+        template <>
+        struct Typemap<TimezoneRecipe10*> : TypemapObject<TimezoneRecipe10*, TimezoneRecipe10*, ObjectTypeForeignPtr, ObjectStorageMG> {
+            //                                                                                      (2)
+            static std::string package () { return "MyTest::Cookbook::TimezoneRecipe10"; }
+        };
+    };
+
+    static xs::Sv::payload_marker_t payload_marker_10{};
+
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::TimezoneRecipe10
+    PROTOTYPES: DISABLE
+
+    const char* TimezoneRecipe10::get_name()
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::DateRecipe10
+    PROTOTYPES: DISABLE
+
+    DateRecipe10* DateRecipe10::new(const char* name)
+
+    void DateRecipe05::update()
+
+    std::time_t DateRecipe10::get_epoch()
+
+    Sv DateRecipe10::get_timezone() {
+        Object self {ST(0)};
+        Object tz = xs::out<>(&THIS->get_timezone());                   // (3)
+        auto self_ref = Ref::create(self);                              // (4)
+        tz.payload_attach(self_ref, &payload_marker_10);  // (5)
+        RETVAL = tz.ref();  // (6)
+    }
+
+As the lifetime of C<Timezone> B<C++ object> isn't managed by Perl the
+C<ObjectTypeForeignPtr> (2) should be specified as lifetime policy, i.e.
+the C<delete> operation will never be invoked on C++ object.
+
+When a user asks C<Date> xs-wrapper for C<Timezone> object, xs-adapter for it
+is lazily created at (3). Than, reference to the original C<Date> object is
+taken (4) and stored in C<Timezone> Perl SV* wrapper (5) as payload.
+
+It is possible to achive the same without C<XS::Framework>, i.e. via inheritance,
+storing SV* wrapper to C<Date> in the Derived class; and doing C<inc> on the
+pointer in Constructor, and C<dec> in the destructor. Hovewer, using
+L<XS::Framework> magic payload seems a bit more easier and convenient in the
+case.
+
+As usual, we should return reference to the object (6) instead of object
+itself.
+
+Short summary: if C++ API offers two different objects, where lifetime of one
+is bounded to the lifetime of the other, it is possible to "decouple" them
+on XS-layer via using payload. However, if you have control on C++ API,
+it would be better to "share" objects lifetimes between C++ and Perl using
+refcounter mechanism as more generic one.

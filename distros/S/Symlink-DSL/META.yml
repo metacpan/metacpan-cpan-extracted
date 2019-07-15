@@ -21,19 +21,21 @@ name: Symlink-DSL
 provides:
   Symlink::DSL:
     file: lib/Symlink/DSL.pm
-    version: v0.0.1
+    version: v0.2.1
 requires:
   Cwd: '0'
   File::Basename: '0'
   File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
   autodie: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/shlomif/symlink-dsl/issues
   homepage: http://metacpan.org/release/Symlink-DSL
-  repository: https://github.com/shlomif/perl-Symlink-DSL.git
-version: 0.0.1
+  repository: https://github.com/shlomif/Symlink-DSL.git
+version: 0.2.1
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -326,6 +328,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::TidyAll

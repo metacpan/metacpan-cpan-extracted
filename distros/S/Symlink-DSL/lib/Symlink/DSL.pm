@@ -1,11 +1,12 @@
 package Symlink::DSL;
-$Symlink::DSL::VERSION = '0.0.1';
+$Symlink::DSL::VERSION = '0.2.1';
 use strict;
 use warnings;
 use autodie;
 use Cwd qw/ getcwd /;
 use File::Basename qw/ dirname /;
 use File::Path qw/ mkpath /;
+use File::Spec ();
 
 sub new
 {
@@ -23,21 +24,35 @@ sub _init
     my ( $self, $args ) = @_;
     $self->{dir} = $args->{dir};
     $self->skip_re( $args->{skip_re} );
-    $self->manifest( $self->dir . "/setup.symlinks.manifest.txt" );
+    $self->manifest_base( $args->{manifest_base}
+            // "setup.symlinks.manifest.txt" );
 
     return;
+}
+
+sub manifest_base
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        my $val = shift;
+
+        if ( $val !~ /\A[0-9A-Za-z][0-9A-Za-z\-_\.]*\z/ )
+        {
+            die "Invalid manifest_base basename - invalid chars.";
+        }
+        $self->{_manifest_base} = $val;
+    }
+
+    return $self->{_manifest_base};
 }
 
 sub manifest
 {
     my $self = shift;
 
-    if (@_)
-    {
-        $self->{manifest} = shift;
-    }
-
-    return $self->{manifest};
+    return File::Spec->catfile( $self->dir, $self->manifest_base );
 }
 
 sub skip_re
@@ -161,7 +176,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -196,6 +211,20 @@ Symlink::DSL - a domain-specific language for setting up symbolic links.
 
 Returns a new object.
 
+Accepts:
+
+=over 4
+
+=item * dir
+
+=item * skip_re
+
+=item * manifest_base
+
+The basename of the manifest file. Defaults to C<< setup.symlinks.manifest.txt >> . (Added in 0.2.0).
+
+=back
+
 =head2 dir()
 
 Returns the directory path.
@@ -203,6 +232,12 @@ Returns the directory path.
 =head2 $obj->handle_line({%args})
 
 Handles a single line.
+
+=head2 $obj->manifest_base()
+
+Returns the basename of the manifest files. Can be set in new() .
+
+Added in 0.2.0).
 
 =head2 $obj->manifest()
 
@@ -326,9 +361,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/perl-Symlink-DSL>
+L<https://github.com/shlomif/Symlink-DSL>
 
-  git clone https://github.com/shlomif/perl-Symlink-DSL.git
+  git clone https://github.com/shlomif/Symlink-DSL.git
 
 =head1 AUTHOR
 

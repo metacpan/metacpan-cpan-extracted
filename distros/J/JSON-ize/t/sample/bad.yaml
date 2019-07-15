@@ -1,0 +1,9 @@
+---
+this:  - is
+  - some
+  - bad
+  yaml
+it: 2
+is: |
+  not too bad.
+but: [ "it", "could", "be", "better" ]

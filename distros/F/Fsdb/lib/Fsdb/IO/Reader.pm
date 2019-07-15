@@ -61,7 +61,8 @@ Sample code reading an input stream:
     $fsdb = new Fsdb::IO::Reader(-header => "#fsdb -F t foo bar", -fh => $file_handle);
 
 Creates a new reader object from FILENAME.
-(FILENAME can also be a IO::Handle object.)
+(FILENAME can also be a IO::Handle object,
+or an hdfs: file.)
 Always succeeds, but 
 check the C<error> method to test for failure.
 
@@ -75,6 +76,8 @@ C<-file>, C<-header>.
 
 =item B<-file FILENAME>
 Open and read the given filename.
+Special filename "-" is standard input,
+and files with hdfs: are read from Hadoop (but not with directory aggregation).
 
 =item B<-comment_handler $ref>
 
@@ -126,7 +129,7 @@ sub new {
     #
     # setup:    
     if (! ($self->{_fh} || $self->{_queue})) {
-	$self->{_error} = "cannot setup filehandle";
+	$self->{_error} //= "Fsdb::IO::Reader: cannot setup filehandle";
 	return $self;
     };
     if ($self->{_fh} && ref($self->{_fh}) eq 'IO::Pipe') {
@@ -170,7 +173,10 @@ sub config_one {
 	     $fh = new IO::Handle;
 	     $fh->fdopen(fileno(STDIN),"<");
 	     binmode $fh, $mode;
-	} else {
+	} elsif ($file =~ /^hdfs:/) {
+             my $hdfs_reader_pid = open($fh, '-|', "hdfs", "-cat", $file);
+	     binmode $fh, $mode;
+        } else {
 	     $fh = new IO::File $file, "<$mode";
 	};
 	if ($fh) {

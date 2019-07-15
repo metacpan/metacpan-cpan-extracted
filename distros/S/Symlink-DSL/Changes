@@ -1,4 +1,11 @@
 Revision history for Symlink-DSL
 
+0.2.1       2019-07-13
+    - Resubmit to trigger CPAN indexing.
+
+0.2.0       2019-07-11
+    - Added manifest_base .
+    - Added bin/symlink-dsl .
+
 0.0.1       2019-07-04
     - First version, released on an unsuspecting world

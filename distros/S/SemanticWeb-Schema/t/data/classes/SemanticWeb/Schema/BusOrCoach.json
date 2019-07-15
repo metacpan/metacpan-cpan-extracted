@@ -14,8 +14,8 @@
          "rdfs:comment" : "The ACRISS Car Classification Code is a code used by many car rental companies, for classifying vehicles. ACRISS stands for Association of Car Rental Industry Systems and Standards.",
          "rdfs:label" : "acrissCode",
          "schema:domainIncludes" : [
-            "schema:BusOrCoach",
-            "schema:Car"
+            "schema:Car",
+            "schema:BusOrCoach"
          ],
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : "schema:Text"

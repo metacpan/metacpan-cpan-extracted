@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has date_issued => (
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Ticket - Used to describe a ticket to an event
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -205,8 +205,12 @@ A ticketed_seat should be one of the following types:
 
 C<totalPrice>
 
-The total price for the reservation or ticket, including applicable taxes,
-shipping, etc.
+=for html The total price for the reservation or ticket, including applicable taxes,
+shipping, etc.<br/><br/> Usage guidelines:<br/><br/> <ul> <li>Use values
+from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039))
+rather than superficially similiar Unicode symbols.</li> <li>Use '.'
+(Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point.
+Avoid using these symbols as a readability separator.</li> </ul> 
 
 A total_price should be one of the following types:
 

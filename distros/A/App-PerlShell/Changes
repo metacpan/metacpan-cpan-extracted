@@ -1,5 +1,8 @@
 Revision history for Perl Shell.
 
+1.05  Thu Jun  6 14:05:00 2019
+    - App::PerlShell::Plugin::File
+
 1.04  Thu May  3 14:05:00 2018
     - AddOn => Plugin
     - Fixed some POD mistakes and updated examples

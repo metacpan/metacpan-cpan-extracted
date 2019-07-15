@@ -12,7 +12,7 @@
 # add*asTree
 
 package Data::Edit::Xml;
-our $VERSION = 20190708;
+our $VERSION = 20190714;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -2800,7 +2800,7 @@ sub moveStartAfter($$@)                                                         
   elsif ($to->precedingSiblingOf($node))                                        # Target is outside and before node, so move start up to it
    {for my $p(reverse $node->contentBefore)                                     # Each node before the start node up to the target
      {last if $p == $to;                                                        # Reached target
-      $node->putFirstCut($p);                                                   # Move node  ####TEST####
+      $node->putFirstCut($p);                                                   # Move node
      }
     return $node;                                                               # Success
    }
@@ -5906,18 +5906,32 @@ sub ditaXrefs($)                                                                
 sub ditaSampleConcept(%)                                                        #S Sample concept
  {my (@options) = @_;                                                           # Options for concept
   shift @options while @options && ref $options[0];                             # Remove any leading references to find the actual string or file to be parsed
+
   my %options  = @options;
   checkKeys(\%options,                                                          # Check options
     {title     =>q(Title of the concept),
+     metadata  =>q(Metadata of the concept ),
+     body      =>q(Body of the concept ),
     });
 
-  my $title    = $options{title}  // "Title unknown";
+  my $title    = $options{title}  // "Title unknown - please provide one using the title keyword";
+  my $prolog   = $options{prolog} // q();
+  my $body     = $options{body}   // "<p>Please provide the body of this concept using the body keyword</p>";
+
+  my $metadata = sub
+   {my $m = $options{metadata};
+    return '' unless $m;
+    qq(<prolog><metadata>$m</metadata></prolog>\n)
+   }->();
+
   my $concept  = new(<<END);
 <concept>
   <title id="title">$title</title>
-  <conbody/>
+  $metadata
+  <conbody>$body</conbody>
 </concept>
 END
+
   $concept->createGuidId;
   $concept
  }
@@ -5954,6 +5968,7 @@ sub ditaSampleBookMap(%)                                                        
     {appendices=>q(Appendices),
      author    =>q(Author of the document),
      chapters  =>q(Chapter and  topicrefs),
+     metadata  =>q(Meta data),
      notices   =>q(Name of file containing notices),
      title     =>q(Title of the document),
      year      =>q(Copyright year),
@@ -5998,6 +6013,12 @@ sub ditaSampleBookMap(%)                                                        
     qq(<notices href="$n" navtitle="Notices"/>)
    }->();
 
+  my $metadata = sub
+   {my $m = $options{metadata};
+    return '' unless $m;
+    qq(<metadata>$m</metadata>\n)
+   }->();
+
   my $bookMap = new(<<END);                                                     # Sample bookmap
 <bookmap>
   <booktitle>
@@ -6007,6 +6028,7 @@ sub ditaSampleBookMap(%)                                                        
     <shortdesc/>
     $author
     <source/>
+    $metadata
     <category/>
     <keywords>
       <keyword/>
@@ -6986,7 +7008,7 @@ END
 Edit data held in the XML format.
 
 
-Version 20190708.
+Version 20190714.
 
 
 The following sections describe the methods in each functional area of this
@@ -7010,7 +7032,7 @@ Return the value of the specified B<$attribute> of the specified B<$node> or B<q
 
 L<by|/by>
 
-Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>. This is equivalent to the L<x=|/opBy> operator.
+Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. A reference to the current node is also made available via L<$_>. This is equivalent to the L<x=|/opBy> operator.
 
 L<change|/change>
 
@@ -7208,7 +7230,7 @@ B<Example:>
 
 =head3 replaceSpecialChars($)
 
-Replace < > " & with &lt; &gt; &quot; &amp; Larry Wall's excellent L<Xml parser|https://metacpan.org/pod/XML::Parser/> unfortunately replaces &lt; &gt; &quot; &amp; etc. with their expansions in text by default and does not seem to provide an obvious way to stop this behavior, so we have to put them back again using this method.
+Replace < > " & with &lt; &gt; &quot; &amp; Larry Wall's excellent L<Xml parser> unfortunately replaces &lt; &gt; &quot; &amp; etc. with their expansions in text by default and does not seem to provide an obvious way to stop this behavior, so we have to put them back again using this method.
 
      Parameter  Description
   1  $string    String to be edited.
@@ -8697,11 +8719,11 @@ B<Example:>
 
 =head1 Attributes
 
-Get or set the attributes of nodes in the L<parse|/parse> tree. L<Well Known Attributes|/Well Known Attributes>  can be set directly via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>s. To set or get the values of other attributes use L<Get or Set Attributes|/Get or Set Attributes>. To delete or rename attributes see: L<Other Operations on Attributes|/Other Operations on Attributes>.
+Get or set the attributes of nodes in the L<parse|/parse> tree. L<Well Known Attributes|/Well Known Attributes>  can be set directly via L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>s. To set or get the values of other attributes use L<Get or Set Attributes|/Get or Set Attributes>. To delete or rename attributes see: L<Other Operations on Attributes|/Other Operations on Attributes>.
 
 =head2 Well Known Attributes
 
-Get or set these node attributes via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>s as in:
+Get or set these node attributes via L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>s as in:
 
   $x->href = "#ref";
 
@@ -8711,7 +8733,7 @@ Get or set the attributes of nodes.
 
 =head3 attr($$)
 
-Return the value of an attribute of the current node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.
+Return the value of an attribute of the current node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.
 
      Parameter   Description
   1  $node       Node in parse tree
@@ -9158,7 +9180,7 @@ B<Example:>
 
 =head3 changeAttributeValue($$$@)
 
-Apply a sub to the value of an attribute of the specified B<$node>.  The value to be changed is supplied and returned in: L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Apply a sub to the value of an attribute of the specified B<$node>.  The value to be changed is supplied and returned in: L<$_>.
 
      Parameter   Description
   1  $node       Node
@@ -9439,7 +9461,7 @@ This order allows you to edit children before their parents.
 
 =head3 by($$)
 
-Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>. This is equivalent to the L<x=|/opBy> operator.
+Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. A reference to the current node is also made available via L<$_>. This is equivalent to the L<x=|/opBy> operator.
 
      Parameter  Description
   1  $node      Starting node
@@ -9470,7 +9492,7 @@ B<Example:>
 
 =head3 byX($$)
 
-Post-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted if the called sub does  L<die|http://perldoc.perl.org/functions/die.html> on any call with the reason in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables> The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Post-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted if the called sub does  L<die|http://perldoc.perl.org/functions/die.html> on any call with the reason in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables> The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.
 
 Returns the start node regardless of the outcome of calling B<sub>.
 
@@ -9561,7 +9583,7 @@ B<Example:>
 
 =head3 byReverse($$@)
 
-Reverse post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting B<$node>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Reverse post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting B<$node>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -9587,7 +9609,7 @@ B<Example:>
 
 =head3 byReverseX($$@)
 
-Reverse post-order traversal of a L<parse|/parse> tree or sub tree below the specified B<$node> calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting B<$node>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Reverse post-order traversal of a L<parse|/parse> tree or sub tree below the specified B<$node> calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting B<$node>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -9671,7 +9693,7 @@ This order allows you to edit children after their parents
 
 =head3 down($$@)
 
-Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -9686,7 +9708,7 @@ B<Example:>
 
 =head3 downX($$)
 
-Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted for the entire L<parse|/parse> tree if the called sub does L<die|http://perldoc.perl.org/functions/die.html> with the reason returned in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal is halted for the entire L<parse|/parse> tree if the called sub does L<die|http://perldoc.perl.org/functions/die.html> with the reason returned in L<?@|http://perldoc.perl.org/perlvar.html#Error-Variables>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.
 
 Returns the start node regardless of the outcome of calling B<sub>.
 
@@ -9708,7 +9730,7 @@ B<Example:>
 
 =head3 downToDie($$)
 
-Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die|http://perldoc.perl.org/functions/die.html>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die|http://perldoc.perl.org/functions/die.html>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.
 
 Returns the start node regardless of the outcome of calling B<sub>.
 
@@ -9791,7 +9813,7 @@ B<Example:>
 
 =head3 downReverse($$@)
 
-Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -9817,7 +9839,7 @@ B<Example:>
 
 =head3 downReverseX($$@)
 
-Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -9886,7 +9908,7 @@ Visit the parent first, then the children, then the parent again.
 
 =head3 through($$$@)
 
-Traverse L<parse|/parse> tree visiting each node twice calling the specified sub B<$before> as we go down past the node and sub B<$after> as we go up past the node, finally return the specified starting node. The subs B<$before, $after> are passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Traverse L<parse|/parse> tree visiting each node twice calling the specified sub B<$before> as we go down past the node and sub B<$after> as we go up past the node, finally return the specified starting node. The subs B<$before, $after> are passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -15456,7 +15478,7 @@ B<Example:>
 
 =head2 changeText($$@)
 
-If the specified  B<$node> is a text node in the specified context then the specified B<sub> is passed the text of the node in L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>, any changes to which are recorded in the text of the B<$node>.
+If the specified  B<$node> is a text node in the specified context then the specified B<sub> is passed the text of the node in L<$_>, any changes to which are recorded in the text of the B<$node>.
 
 Returns B<undef> if the specified B<$node> is not a text node in the specified optional context else it returns the result of executing the specified B<sub>.
 
@@ -26480,9 +26502,11 @@ B<Example:>
     ok Data::Edit::Xml::𝗱𝗶𝘁𝗮𝗦𝗮𝗺𝗽𝗹𝗲𝗖𝗼𝗻𝗰𝗲𝗽𝘁
      (title=>q(New Concept),
      )->prettyString eq <<END;
-  <concept id="GUID-42c09175-dfa9-c02e-d747-2f5e89ea80fc">
+  <concept id="GUID-a5405560-67e7-0cd1-9188-9a2546d13a37">
     <title id="title">New Concept</title>
-    <conbody/>
+    <conbody>
+      <p>Please provide the body of this concept using the body keyword</p>
+    </conbody>
   </concept>
   END
    }
@@ -26901,7 +26925,7 @@ B<Example:>
 
 =head2 htmlTableToDita($)
 
-Convert an L<html table|https://www.w3.org/TR/html52/tabular-data.html#the-table-element> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> table.
+Convert an L<html table> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> table.
 
      Parameter  Description
   1  $table     Html table node
@@ -27551,11 +27575,11 @@ Well known attributes useful in respect to xml that conforms to the L<Dita|http:
 =head3 Output fields
 
 
-B<attributes> - The attributes of the specified B<$node>, see also: L</Attributes>.  The frequently used attributes: class, id, href, outputclass can be accessed by an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method as in: $node->id = 'c1'.
+B<attributes> - The attributes of the specified B<$node>, see also: L</Attributes>.  The frequently used attributes: class, id, href, outputclass can be accessed by an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method as in: $node->id = 'c1'.
 
-B<audience> - Attribute B<audience> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<audienceX()> to return B<q()> rather than B<undef>.
+B<audience> - Attribute B<audience> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<audienceX()> to return B<q()> rather than B<undef>.
 
-B<class> - Attribute B<class> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<classX()> to return B<q()> rather than B<undef>.
+B<class> - Attribute B<class> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<classX()> to return B<q()> rather than B<undef>.
 
 B<conditions> - Conditional strings attached to a node, see L</Conditions>.
 
@@ -27569,11 +27593,11 @@ B<errorsFile> - Error listing file. Use this parameter to explicitly set the nam
 
 B<forestNumbers> - Index to node by forest number as set by L<numberForest|/numberForest>.
 
-B<guid> - Attribute B<guid> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<guidX()> to return B<q()> rather than B<undef>.
+B<guid> - Attribute B<guid> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<guidX()> to return B<q()> rather than B<undef>.
 
-B<href> - Attribute B<href> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<hrefX()> to return B<q()> rather than B<undef>.
+B<href> - Attribute B<href> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<hrefX()> to return B<q()> rather than B<undef>.
 
-B<id> - Attribute B<id> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.          Use B<idX()> to return B<q()> rather than B<undef>.
+B<id> - Attribute B<id> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.          Use B<idX()> to return B<q()> rather than B<undef>.
 
 B<indexes> - Indexes to sub commands by tag in the order in which they appeared in the source text.
 
@@ -27585,11 +27609,11 @@ B<inputString> - Source string of the L<parse|/parse> if this is the L<parser|/p
 
 B<labels> - The labels attached to a node to provide addressability from other nodes, see: L</Labels>.
 
-B<lang> - Attribute B<lang> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<langX()> to return B<q()> rather than B<undef>.
+B<lang> - Attribute B<lang> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<langX()> to return B<q()> rather than B<undef>.
 
 B<lineNumbers> - If true then save the line number.column number at which tag starts and ends on the xtrf attribute of each node.
 
-B<navtitle> - Attribute B<navtitle> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<navtitleX()> to return B<q()> rather than B<undef>.
+B<navtitle> - Attribute B<navtitle> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<navtitleX()> to return B<q()> rather than B<undef>.
 
 B<number> - Number of the specified B<$node>, see L<findByNumber|/findByNumber>.
 
@@ -27597,29 +27621,29 @@ B<numbering> - Last number used to number a node in this L<parse|/parse> tree.
 
 B<numbers> - Nodes by number.
 
-B<otherprops> - Attribute B<otherprops> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.  Use B<otherpropsX()> to return B<q()> rather than B<undef>.
+B<otherprops> - Attribute B<otherprops> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.  Use B<otherpropsX()> to return B<q()> rather than B<undef>.
 
-B<outputclass> - Attribute B<outputclass> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>. Use B<outputclassX()> to return B<q()> rather than B<undef>.
+B<outputclass> - Attribute B<outputclass> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>. Use B<outputclassX()> to return B<q()> rather than B<undef>.
 
 B<parent> - Parent node of the specified B<$node> or B<undef> if the L<parser|/parse> root node. See also L</Traversal> and L</Navigation>. Consider as read only.
 
 B<parser> - L<Parser|/parse> details: the root node of a tree is the L<parser|/parse> node for that tree. Consider as read only.
 
-B<props> - Attribute B<props> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<propsX()> to return B<q()> rather than B<undef>.
+B<props> - Attribute B<props> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<propsX()> to return B<q()> rather than B<undef>.
 
 B<representationLast> - The last representation set for this node by one of: L<setRepresentationAsTagsAndText|/setRepresentationAsTagsAndText>.
 
-B<style> - Attribute B<style> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<styleX()> to return B<q()> rather than B<undef>.
+B<style> - Attribute B<style> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<styleX()> to return B<q()> rather than B<undef>.
 
 B<tag> - Tag name for the specified B<$node>, see also L</Traversal> and L</Navigation>. Consider as read only.
 
 B<text> - Text of the specified B<$node> but only if it is a text node otherwise B<undef>, i.e. the tag is cdata() <=> L</isText> is true.
 
-B<type> - Attribute B<type> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<typeX()> to return B<q()> rather than B<undef>.
+B<type> - Attribute B<type> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<typeX()> to return B<q()> rather than B<undef>.
 
-B<xtrc> - Attribute B<xtrc> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
+B<xtrc> - Attribute B<xtrc> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
 
-B<xtrf> - Attribute B<xtrf> for a node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
+B<xtrf> - Attribute B<xtrf> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
 
 
 
@@ -27734,7 +27758,7 @@ Post-order traversal of a L<parse|/parse> tree
 
 =head2 byX2($$@)
 
-Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -27743,7 +27767,7 @@ Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified
 
 =head2 byX22($$@)
 
-Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -27752,7 +27776,7 @@ Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified
 
 =head2 downX2($$@)
 
-Pre-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Pre-order traversal of a L<parse|/parse> tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via L<$_>.
 
      Parameter  Description
   1  $node      Starting node
@@ -27761,7 +27785,7 @@ Pre-order traversal of a L<parse|/parse> tree or sub tree calling the specified 
 
 =head2 downToDie2($$@)
 
-Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die|http://perldoc.perl.org/functions/die.html>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>.
+Pre-order traversal of a L<parse|/parse> tree calling the specified B<sub> at each node as long as this sub does not L<die|http://perldoc.perl.org/functions/die.html>. The traversal of the current sub tree is halted and continue with the next sibling or parent if the called sub does L<die|http://perldoc.perl.org/functions/die.html>. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry> up to the node on which this sub was called. A reference to the current node is also made available via L<$_>.
 
 Returns the start node regardless of the outcome of calling B<sub>.
 
@@ -28099,7 +28123,7 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 28 L<atPositionMatch|/atPositionMatch> - Confirm that a string matches a match expression.
 
-29 L<attr|/attr> - Return the value of an attribute of the current node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.
+29 L<attr|/attr> - Return the value of an attribute of the current node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.
 
 30 L<attrCount|/attrCount> - Return the number of attributes in the specified B<$node>, optionally ignoring the specified names from the count.
 
@@ -28167,7 +28191,7 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 62 L<changeReasonCommentSelectionSpecification|/changeReasonCommentSelectionSpecification> - Provide a specification to select L<change reason comments|/crc> to be inserted as text into a L<parse|/parse> tree.
 
-63 L<changeText|/changeText> - If the specified  B<$node> is a text node in the specified context then the specified B<sub> is passed the text of the node in L<$_|http://perldoc.perl.org/perlvar.html#General-Variables>, any changes to which are recorded in the text of the B<$node>.
+63 L<changeText|/changeText> - If the specified  B<$node> is a text node in the specified context then the specified B<sub> is passed the text of the node in L<$_>, any changes to which are recorded in the text of the B<$node>.
 
 64 L<checkParentage|/checkParentage> - Check the parent pointers are correct in a L<parse|/parse> tree.
 
@@ -28505,7 +28529,7 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 231 L<htmlTables|/htmlTables> - Return a string of html representing a L<parse|/parse> tree.
 
-232 L<htmlTableToDita|/htmlTableToDita> - Convert an L<html table|https://www.w3.org/TR/html52/tabular-data.html#the-table-element> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> table.
+232 L<htmlTableToDita|/htmlTableToDita> - Convert an L<html table> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> table.
 
 233 L<index|/index> - Return the index of the specified B<$node> in its parent index.
 
@@ -28681,9 +28705,9 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 319 L<nextIn|/nextIn> - Return the nearest sibling after the specified B<$node> that matches one of the named tags or B<undef> if there is no such sibling node.
 
-320 L<nextN|/nextN> - Return B<$N> nodes as an array starting at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
+320 L<nextn|/nextn> - Return the B<$n>'th next node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
-321 L<nextn|/nextn> - Return the B<$n>'th next node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+321 L<nextN|/nextN> - Return B<$N> nodes as an array starting at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
 
 322 L<nextOn|/nextOn> - Step forwards as far as possible from the specified B<$node> while remaining on nodes with the specified tags.
 
@@ -28829,9 +28853,9 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 374 L<prevIn|/prevIn> - Return the nearest sibling node before the specified B<$node> which matches one of the named tags or B<undef> if there is no such sibling node.
 
-375 L<prevN|/prevN> - Return B<$N> nodes as an array ending at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
+375 L<prevn|/prevn> - Return the B<$n>'th previous node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
-376 L<prevn|/prevn> - Return the B<$n>'th previous node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+376 L<prevN|/prevN> - Return B<$N> nodes as an array ending at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
 
 377 L<prevOn|/prevOn> - Step backwards as far as possible while remaining on nodes with the specified tags.
 
@@ -28941,7 +28965,7 @@ B<olt> is a synonym for L<overLastTags|/overLastTags> - Return the specified b<$
 
 430 L<replaceContentWithText|/replaceContentWithText> - Replace the content of a node with the specified texts and return the replaced content
 
-431 L<replaceSpecialChars|/replaceSpecialChars> - Replace < > " & with &lt; &gt; &quot; &amp; Larry Wall's excellent L<Xml parser|https://metacpan.org/pod/XML::Parser/> unfortunately replaces &lt; &gt; &quot; &amp; etc.
+431 L<replaceSpecialChars|/replaceSpecialChars> - Replace < > " & with &lt; &gt; &quot; &amp; Larry Wall's excellent L<Xml parser> unfortunately replaces &lt; &gt; &quot; &amp; etc.
 
 432 L<replaceWith|/replaceWith> - Replace a node (and all its content) with a L<new node|/newTag> (and all its content) and return the new node.
 
@@ -29268,10 +29292,7 @@ use Data::Table::Text qw(:all);
 use Time::HiRes qw(time);
 use Carp qw(confess);
 
-if ($^O =~ m(bsd|linux)i)
- {plan tests => 1269;
- }
-else
+if ($^O !~ m(bsd|linux)i)
  {plan skip_all => 'Not supported';
  }
 
@@ -35447,9 +35468,11 @@ if (1) {                                                                        
   ok Data::Edit::Xml::ditaSampleConcept
    (title=>q(New Concept),
    )->prettyString eq <<END;
-<concept id="GUID-42c09175-dfa9-c02e-d747-2f5e89ea80fc">
+<concept id="GUID-a5405560-67e7-0cd1-9188-9a2546d13a37">
   <title id="title">New Concept</title>
-  <conbody/>
+  <conbody>
+    <p>Please provide the body of this concept using the body keyword</p>
+  </conbody>
 </concept>
 END
  }
@@ -38477,6 +38500,8 @@ END
 
   ok $a->equals($b);
  }
+
+done_testing;
 
 say STDERR "Took ", sprintf("%.3f",  time - $startTime), " seconds";
 

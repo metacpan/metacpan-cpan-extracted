@@ -1,0 +1,13 @@
+#pragma once
+#include <xs/basic.h>
+#include <xs/catch.h>
+#include <xs/Sv.h>
+#include <xs/Ref.h>
+#include <xs/Sub.h>
+#include <xs/Hash.h>
+#include <xs/Glob.h>
+#include <xs/Stash.h>
+#include <xs/Array.h>
+#include <xs/Scalar.h>
+#include <xs/Object.h>
+#include <xs/typemap.h>

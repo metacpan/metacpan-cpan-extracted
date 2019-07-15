@@ -7,6 +7,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  strictures: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -23,7 +24,8 @@ requires:
   Package::Variant: '1.003'
   Role::Tiny: '2.0'
   perl: '5.008'
+  strictures: '0'
 resources:
   repository: https://github.com/mat813/DBIx-Class-Helper-ResultSet-EnumMethods.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

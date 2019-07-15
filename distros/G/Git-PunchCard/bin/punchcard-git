@@ -1,0 +1,169 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Git::PunchCard;
+use Term::ANSIColor;
+use Text::Table;
+
+sub help{
+	&version;
+
+	print '
+punchcard-git [<dir>]
+
+--version  Display the version.
+--help     Display this help info.
+
+If no directory is specified, the current one is used.
+';
+
+	exit;
+}
+
+sub version{
+	print "punchcard-git v. 0.0.1\n";
+}
+
+my @colors=(
+			'WHITE',
+			'BRIGHT_WHITE',
+			'BLUE',
+			'BRIGHT_BLUE',
+			'GREEN',
+			'BRIGHT_GREEN',
+			'CYAN',
+			'BRIGHT_CYAN',
+			'YELLOW',
+			'BRIGHT_YELLOW',
+			'MAGENTA',
+			'BRIGHT_MAGENTA',
+			'RED',
+			'BRIGHT_RED'
+			);
+
+my @days=(
+		  'Sun',
+		  'Mon',
+		  'Tue',
+		  'Wed',
+		  'Thu',
+		  'Fri',
+		  'Sat',
+		  );
+
+my @hours=(
+		   '00',
+		   '01',
+		   '02',
+		   '03',
+		   '04',
+		   '05',
+		   '06',
+		   '07',
+		   '08',
+		   '09',
+		   '10',
+		   '11',
+		   '12',
+		   '13',
+		   '14',
+		   '15',
+		   '16',
+		   '17',
+		   '18',
+		   '19',
+		   '20',
+		   '21',
+		   '22',
+		   '23',
+		   );
+
+my $help;
+my $version;
+
+GetOptions(
+		   'help' => \$help,
+		   'version' => \$version,
+		   );
+
+if ($version){
+	&version;
+	exit;
+}
+
+if ($help){
+	&help;
+}
+
+my $gpc=Git::PunchCard->new;
+$gpc->dir( $ARGV[0] );
+if ( $gpc->error ){
+	exit $gpc->error;
+}
+
+my $table=Text::Table->new(
+						   '',
+						   '00',
+						   '01',
+						   '02',
+						   '03',
+						   '04',
+						   '05',
+						   '06',
+						   '07',
+						   '08',
+						   '09',
+						   '10',
+						   '11',
+						   '12',
+						   '13',
+						   '14',
+						   '15',
+						   '16',
+						   '17',
+						   '18',
+						   '19',
+						   '20',
+						   '21',
+						   '22',
+						   '23',
+						   'Total'
+);
+
+my $card=$gpc->get_card;
+my @data;
+
+foreach my $day ( @days ){
+	my @line;
+
+	push( @line, $day );
+
+	foreach my $hour ( @hours ){
+		my $color_to_use=13*($card->{$day}{$hour}/$card->{max});
+		push( @line, color($colors[$color_to_use]).$card->{$day}{$hour}.color('WHITE') );
+	}
+
+	push( @line, $card->{$day}{total}.color('WHITE') );
+
+	push( @data, \@line );
+}
+
+$table->load( @data );
+
+print $table."\nTotal: ".$card->{total}."\nHourly Max=".$card->{max}."\n";
+
+=head1 NAME
+
+punchard-git - Generate a punchard plot for git commits.
+
+=head1 SYNOPSIS
+
+punchard-git [<dir>]
+
+=head1 ARGUMENTS
+
+If <dir> is not specified, then the current directoy will be used.
+
+=cut

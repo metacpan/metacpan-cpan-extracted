@@ -15,7 +15,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use utf8;
 
-our $VERSION  = version->new(1.1.3);
+our $VERSION  = version->new(1.1.4);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -84,7 +84,7 @@ sub run {
         for my $branch ($workflow->git->branch(@options)) {
             next if $branch =~ / -> /;
             $branch =~ s/^[*]?\s*//;
-            for my $log ( $workflow->git->log( @log, @dates, $branch, ) ) {
+            for my $log ( $workflow->git->log( @log, @dates, $branch, '--' ) ) {
                 my ($hash, $name) = split /\s/, $log, 2;
                 $users{$name}{$hash} = 1;
                 $commits++;
@@ -229,7 +229,7 @@ git-committers - Stats on the number of commits by committer
 
 =head1 VERSION
 
-This documentation refers to git-committers version 1.1.3
+This documentation refers to git-committers version 1.1.4
 
 =head1 SYNOPSIS
 

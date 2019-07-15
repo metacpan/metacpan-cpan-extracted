@@ -37,8 +37,8 @@
          "rdfs:label" : "validFor",
          "schema:category" : "issue-1779",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalCredential",
-            "schema:Permit"
+            "schema:Permit",
+            "schema:EducationalOccupationalCredential"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -49,14 +49,17 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
-            "schema:MonetaryAmount",
+            "schema:OpeningHoursSpecification",
             "schema:Demand",
+            "schema:MonetaryAmount",
             "schema:PriceSpecification",
             "schema:Permit",
-            "schema:Offer",
-            "schema:OpeningHoursSpecification"
+            "schema:Offer"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
       },
       "schema:validIn" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1779",
@@ -65,8 +68,8 @@
          "rdfs:label" : "validIn",
          "schema:category" : "issue-1779",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalCredential",
-            "schema:Permit"
+            "schema:Permit",
+            "schema:EducationalOccupationalCredential"
          ],
          "schema:rangeIncludes" : "schema:AdministrativeArea"
       },

@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use Array::Merge::Unique qw/unique_array/;
 use base qw/Import::Export/;
-
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our (%helper, %cache);
 BEGIN {
 	%helper = (
@@ -148,10 +147,23 @@ sub number_range {
 	ref $_[0] eq 'Regex::Range::Number' and shift @_;
 	my ($start, $max, $options) = @_;
 
-	return $start if (not defined $max || $start == $max);
-	$options ||= {};
+	if (ref $start eq 'ARRAY') {
+		$max = {} unless ref $max eq 'HASH';
+		map { 
+			return $max->{capture} 
+				? sprintf('(%s)', $_) 
+				: $_ 
+		} join '|', 
+			map { number_range($_->[0], $_->[1], $max->{individual} ? {capture => 1, %{$max}} : ()) }
+			grep { ref $_ eq 'ARRAY' } 
+		@{$start};
+	}
 
+	return $start if (not defined $max || $start == $max);
+
+	$options ||= {};
 	my $capture = $options->{capture} || '';
+	
 	my $key = sprintf('%s:%s=%s', $start, $max, $capture);
 	return $cache{$key}->{result} if $cache{$key};
 
@@ -182,7 +194,6 @@ sub number_range {
 	}
 
 	$tok->{positives} = $helper{split}($a, $b, $tok, $options) if ($b >= 0);
-
 	$tok->{result} = $helper{sift}($tok, $options);
 	$tok->{result} = $helper{capture}($tok->{result}) if $capture;
 
@@ -196,7 +207,7 @@ Regex::Range::Number - Generate number matching regexes
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -213,6 +224,8 @@ Version 0.03
 	use Regex::Range::Number qw/number_range/;
 	my $reg = number_range(100, 1999, { capture => 1 }); # (10[0-9]|1[1-9][0-9]|[2-9][0-9]{2}|1[0-9]{3})
 	1234 =~ m?$reg?; 
+
+	my $range = number_range([[55, 56], [75, 89], [92, 100]], {capture => 1}); # (55|56|7[5-9]|8[0-9]|9[2-9]|100)'
 
 =cut
 

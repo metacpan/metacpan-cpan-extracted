@@ -1,0 +1,65 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::threads - XS::Framework THREADED Perl support
+
+=head1 THREADED Perl support
+
+Perl has 2 options for XS when working on threaded perls:
+
+1) Not defining C<PERL_NO_GET_CONTEXT>. Advantage is that there is no need to
+put C<pTHX >to every function signature and no need to pass it to every
+function which works with perl variables. Disadvatage is decreased performance
+on threaded perls, i.e. you I<trade off the convenience for performance>.
+
+2) Defining C<PERL_NO_GET_CONTEXT>.
+
+Unfortunatelly, as L<XS::Framework> concept is all about sharing C code, modules
+that use L<XS::Framework> cannot have different C<PERL_NO_GET_CONTEXT> state.
+Because in that case, binary incompability between function signatures would occur.
+
+L<XS::Framework> strictly sets C<PERL_NO_GET_CONTEXT> option, so that you have
+generally to accept C<pTHX> and pass C<aTHX> to all functions that work with perl
+variables. In this case you'll achieve maximum performance on threaded perls.
+
+
+However, no need to write C<pTHX>/<aTHX> every time, it is possible to have:
+
+    dTHX;
+
+at the top of those functions and actually saying revert to behaviour without
+C<PERL_NO_GET_CONTEXT> (but you still need to pass aTHX to functions which are
+defined with pTHX, unless called via macros - like perl's API).
+
+For example, you can't receive C<pTHX> in C++ objects destructors, so the it
+is possible either write C<dTHX;> on the top of destructor or save Perl
+interpreter object in constructor of your object to property named 'my_perl',
+or use C<using xs::my_perl> global interpreter.
+
+=head4 xs::my_perl
+
+This variable holds correct perl interpreter for each thread. Via
+
+    using xs::my_perl;
+    auto perl_clone = perl_clone(*my_perl, 0);
+
+the C<my_perl> is porxy object, which holds pointer to perl interperpreter.
+
+Keep in mind that this C<my_perl> variable is get from thread-local storage,
+like C<dTHX>, so this is actually a convenience tool, reverting to performance
+as C<PERL_NO_GET_CONTEXT> has not been defined. To maximize performance on
+threaded perls, the C<pTHX>/C<aTHX> should be used everywhere. It is possible to
+have mixed style, i.e. having C<using xs::my_perl> and passing C<pTHX> only
+for performance-critical sections.
+
+This variable should not be used on non-threaded perls (this is not a problem
+as aTHX is empty in that case). However it still exists on non-threaded perls,
+so it is safe to have C<using xs::my_perl> without wrapping it into
+C<#ifdef PERL_IMPLICIT_CONTEXT>.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+=cut

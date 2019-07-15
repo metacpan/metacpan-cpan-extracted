@@ -1,34 +1,21 @@
 use 5.012;
 use Config;
-use Panda::Install;
+use XS::Install;
 
 my %params = (
-    NAME          => 'CPP::panda::lib',
-    VERSION_FROM  => 'lib/CPP/panda/lib.pm',
-    ABSTRACT_FROM => 'lib/CPP/panda/lib.pod',
-    CPLUS         => 11,
-    SRC           => ['src'],
-    INC           => '-Isrc',
-    BIN_SHARE     => {
-        CPLUS    => 11,
-        INCLUDE  => {'src' => '/'},
-    },
-    BIN_DEPS         => ['CPP::catch::test'],
+    NAME             => 'CPP::panda::lib',
+    CPLUS            => 14,
+    SRC              => ['src'],
+    INC              => '-Isrc',
+    BIN_SHARE        => { INCLUDE => {'src' => '/'} },
     CCFLAGS          => '-Wall -Wextra',
-    OPTIMIZE         => '-g0 -O2',
     MIN_PERL_VERSION => '5.12.0',
-    #OPTIMIZE  => '-g0',
-    XS => {},
-    #CC => 'clang++',
+    test             => { SRC => 't', BIN_DEPS => 'Test::Catch' },
 );
 
 if ($ENV{TEST_FULL}) {
-    ($params{DEFINE}||='') .= ' -DTEST_FULL';
-    push @{$params{SRC}||=[]}, 't';
-    $params{XS}{'t/xs.xs'} = 't/xs.cc';
     ($params{CCFLAGS}||='') .= ' -fsanitize=undefined';
     push @{$params{LIBS}||=[]}, '-lubsan'; #sanitizer
 }
 
 write_makefile(%params);
-

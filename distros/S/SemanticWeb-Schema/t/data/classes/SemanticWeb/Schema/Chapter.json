@@ -31,14 +31,14 @@
          "rdfs:comment" : "The page on which the work starts; for example \"135\" or \"xiii\".",
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
-            "schema:PublicationVolume",
             "schema:PublicationIssue",
-            "schema:Chapter",
-            "schema:Article"
+            "schema:Article",
+            "schema:PublicationVolume",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pagination" : {
@@ -50,8 +50,8 @@
          "schema:domainIncludes" : [
             "schema:PublicationVolume",
             "schema:Article",
-            "schema:Chapter",
-            "schema:PublicationIssue"
+            "schema:PublicationIssue",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

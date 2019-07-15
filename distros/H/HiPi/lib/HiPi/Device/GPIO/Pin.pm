@@ -17,7 +17,7 @@ use Carp;
 use Fcntl;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.78';
+our $VERSION ='0.79';
 
 __PACKAGE__->create_accessors();
 
@@ -75,6 +75,11 @@ sub _do_get_function_name {
 sub _do_setpud {
     my($self, $pudval) = @_;
     return HiPi::Device::GPIO->set_pin_pud($self->pinid, $pudval);
+}
+
+sub _do_getpud {
+    my($self) = @_;
+    return HiPi::Device::GPIO->get_pin_pud($self->pinid);
 }
 
 sub _do_activelow {

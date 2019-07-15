@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Hmmer::Model;
 # ABSTRACT: Internal class for HMMER3 driver
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Drivers::Hmmer::Model::VERSION = '0.181160';
+$Bio::MUST::Drivers::Hmmer::Model::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
@@ -21,8 +21,8 @@ sub model {
 }
 
 sub remove {            # overload Bio::FastParsers method
-    carp 'Warning: ' . shift->meta->name . ' forbids model file removal; '
-        . 'Ignoring request!';
+    carp '[BMD] Warning: ' . shift->meta->name . ' forbids model file removal;'
+        . ' ignoring request!';
     return;
 }
 
@@ -39,7 +39,7 @@ Bio::MUST::Drivers::Hmmer::Model - Internal class for HMMER3 driver
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

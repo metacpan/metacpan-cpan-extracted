@@ -1,10 +1,19 @@
 Revision history for this software.
 
-0.11 2018-09-09 00:00:00
+0.12 2019-07-14 00:00:00
+  - fix Kwalitee Issues: no_pod_errors
+  - fix Kwalitee Issues: use_strict
+  - fix Extra Issues: consistent_version
+  - fix Extra Issues: has_meta_json
+  - fix Extra Issues: use_warnings
+  - fix Experimental Issues: meta_yml_has_repository_resource
+  - created by INABA Hitoshi
+
+0.11  2018-09-09 00:00:00
   - add lib/App/japerl.pm
   - created by INABA Hitoshi
 
-0.10 2018-09-08 00:00:00
+0.10  2018-09-08 00:00:00
   - fix exit system() to exit system() >> 8
   - change META.yml version 1.3 to 1.4
   - remove japerl.bat.conf

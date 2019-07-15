@@ -4,7 +4,6 @@ use Pcore -role, -const;
 use Pcore::Service::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
-use Pcore::App::Auth;
 use Pcore::App::API;
 use Pcore::CDN;
 
@@ -13,13 +12,14 @@ has devel => 0;                    # Bool
 
 has server => ( init_arg => undef );    # InstanceOf ['Pcore::HTTP::Server']
 has router => ( init_arg => undef );    # InstanceOf ['Pcore::App::Router']
-has auth   => ( init_arg => undef );    # Maybe [ ConsumerOf ['Pcore::App::Auth'] ]
 has api    => ( init_arg => undef );    # Maybe [ InstanceOf ['Pcore::App::API'] ]
 has node   => ( init_arg => undef );    # InstanceOf ['Pcore::Node']
 has cdn    => ( init_arg => undef );    # InstanceOf['Pcore::CDN']
 has ext    => ( init_arg => undef );    # InstanceOf['Pcore::Ext']
 
-const our $PERMISSIONS => [ 'admin', 'user' ];
+const our $PERMISSION_ADMIN => 'admin';
+const our $PERMISSION_USER  => 'user';
+const our $PERMISSIONS      => [ $PERMISSION_ADMIN, $PERMISSION_USER ];
 
 const our $LOCALES => {
     en => 'English',
@@ -40,11 +40,8 @@ sub BUILD ( $self, $args ) {
     # create CDN object
     $self->{cdn} = Pcore::CDN->new( $self->{cfg}->{cdn} ) if $self->{cfg}->{cdn};
 
-    # create Auth object
-    $self->{auth} = Pcore::App::Auth->new($self);
-
     # create API object
-    $self->{api} = Pcore::App::API->new( app => $self );
+    $self->{api} = Pcore::App::API->new($self);
 
     return;
 }
@@ -75,7 +72,7 @@ around run => sub ( $orig, $self ) {
 
         my $requires = defined $node_req ? { $node_req->%* } : {};
 
-        $requires->{'Pcore::App::Auth::Node'} = undef if $self->{cfg}->{auth}->{backend};
+        $requires->{'Pcore::App::API::Node'} = undef if $self->{cfg}->{api}->{backend};
 
         $self->{node} = Pcore::Node->new( {
             type     => ref $self,
@@ -103,13 +100,8 @@ around run => sub ( $orig, $self ) {
         } );
     }
 
-    # init auth
-    my $res = $self->{auth}->init;
-    say 'Auth initialization ... ' . $res;
-    exit 3 if !$res;
-
     # init api
-    $res = $self->{api}->init;
+    my $res = $self->{api}->init;
     say 'API initialization ... ' . $res;
     exit 3 if !$res;
 
@@ -190,12 +182,6 @@ sub start_nginx ($self) {
     $self->{nginx}->run;
 
     return;
-}
-
-sub api_call ( $self, @args ) {
-    my $auth = bless { app => $self }, 'Pcore::App::Auth::Descriptor';
-
-    return $auth->api_call(@args);
 }
 
 1;

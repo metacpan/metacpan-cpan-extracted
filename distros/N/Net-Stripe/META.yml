@@ -25,55 +25,55 @@ name: Net-Stripe
 provides:
   Net::Stripe:
     file: lib/Net/Stripe.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::BalanceTransaction:
     file: lib/Net/Stripe/BalanceTransaction.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Card:
     file: lib/Net/Stripe/Card.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Charge:
     file: lib/Net/Stripe/Charge.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Coupon:
     file: lib/Net/Stripe/Coupon.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Customer:
     file: lib/Net/Stripe/Customer.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Discount:
     file: lib/Net/Stripe/Discount.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Error:
     file: lib/Net/Stripe/Error.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Invoice:
     file: lib/Net/Stripe/Invoice.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Invoiceitem:
     file: lib/Net/Stripe/Invoiceitem.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::LineItem:
     file: lib/Net/Stripe/LineItem.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::List:
     file: lib/Net/Stripe/List.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Plan:
     file: lib/Net/Stripe/Plan.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Refund:
     file: lib/Net/Stripe/Refund.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Resource:
     file: lib/Net/Stripe/Resource.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Subscription:
     file: lib/Net/Stripe/Subscription.pm
-    version: '0.36'
+    version: '0.37'
   Net::Stripe::Token:
     file: lib/Net/Stripe/Token.pm
-    version: '0.36'
+    version: '0.37'
 requires:
   Class::Load: '0'
   HTTP::Request::Common: '0'
@@ -93,7 +93,7 @@ resources:
   bugtracker: https://github.com/lukec/stripe-perl/issues
   homepage: https://stripe.com/docs
   repository: git://github.com/lukec/stripe-perl.git
-version: '0.36'
+version: '0.37'
 x_contributors:
   - 'Andrew Solomon <andrew@geekuni.com>'
   - 'Andrew Solomon <andrew@illywhacker.net>'
@@ -109,6 +109,7 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Paul Cochrane <paul@liekut.de>'
+  - 'Peter Scott <peter@shotgundriver.com>'
   - 'Rusty Conover <rusty@luckydinosaur.com>'
   - 'Sachin Sebastian <sachinjsk@users.noreply.github.com>'
   - 'Sherrard Burton <32931314+sherrardb@users.noreply.github.com>'

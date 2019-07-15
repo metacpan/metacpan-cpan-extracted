@@ -2,7 +2,7 @@ package Pcore::API::SCM::Git;
 
 use Pcore -class, -res;
 use Pcore::API::SCM::Const qw[:SCM_TYPE];
-use Pcore::Util::Scalar qw[is_plain_arrayref];
+use Pcore::Lib::Scalar qw[is_plain_arrayref];
 
 with qw[Pcore::API::SCM];
 

@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: UTF8-R2
-version: 0.02
+version: 0.03
 abstract: makes UTF-8 scripting easy for enterprise use or LTS
 author:
   - ina <ina@cpan.org>
@@ -26,3 +26,4 @@ build_requires:
   Test: 1.122
 resources:
   license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/UTF8-R2

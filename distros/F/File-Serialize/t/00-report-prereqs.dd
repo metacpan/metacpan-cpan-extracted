@@ -12,9 +12,10 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'JSON::MaybeXS' => '0',
-                                        'YAML::Tiny' => '0'
-                                      },
+                                      'JSON5' => '0',
+                                      'JSON::MaybeXS' => '0',
+                                      'YAML::Tiny' => '0'
+                                    },
                       'requires' => {
                                       'Class::Load' => '0',
                                       'Exporter::Tiny' => '0',

@@ -5,7 +5,7 @@ use Pcore::API::SMTP;
 use Pcore::API::ReCaptcha;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
-has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
+has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Lib::Tmpl']
 has dbh      => ( init_arg => undef );    # ConsumerOf ['Pcore::Handle::DBI']
 has settings => ( init_arg => undef );    # HashRef
 
@@ -19,7 +19,7 @@ sub BUILD ( $self, $args ) {
 
     # set settings listener
     P->bind_events(
-        'app.settings-updated',
+        'app.settings.updated',
         sub ($ev) {
             $self->{settings} = $ev->{data};
 
@@ -102,15 +102,15 @@ SQL
 }
 
 # SETTINGS
-sub load_settings ( $self ) {
+sub settings_load ( $self ) {
     my $settings = $self->{dbh}->selectrow(q[SELECT * FROM "settings" WHERE "id" = 1]);
 
-    P->fire_event( 'app.settings-updated', $settings->{data} ) if $settings;
+    P->fire_event( 'app.settings.updated', $settings->{data} ) if $settings;
 
     return $settings;
 }
 
-sub update_settings ( $self, $settings, $cb ) {
+sub settings_update ( $self, $settings, $cb ) {
 
     # check SMTP port
     if ( exists $settings->{smtp_port} && $settings->{smtp_port} !~ /\A\d+\z/sm ) {
@@ -121,7 +121,7 @@ sub update_settings ( $self, $settings, $cb ) {
 
     return $res if !$res;
 
-    return $self->load_settings;
+    return $self->settings_load;
 }
 
 # SMTP

@@ -1,5 +1,5 @@
 package Net::Stripe::Coupon;
-$Net::Stripe::Coupon::VERSION = '0.36';
+$Net::Stripe::Coupon::VERSION = '0.37';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -35,7 +35,7 @@ Net::Stripe::Coupon - represent a Coupon object from Stripe
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 AUTHORS
 

@@ -1,8 +1,8 @@
 package Pcore::CDN;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[weaken is_ref is_plain_arrayref is_plain_coderef];
-use Pcore::Util::File::Tree;
+use Pcore::Lib::Scalar qw[weaken is_ref is_plain_arrayref is_plain_coderef];
+use Pcore::Lib::File::Tree;
 use overload '&{}' => sub ( $self, @ ) {
     sub { $self->get_url(@_) }
   },
@@ -136,7 +136,7 @@ sub sync ( $self, $local, $remote, @locations ) {
 
     die qq[Location is not local] if !$local->{is_local};
 
-    my $tree = Pcore::Util::File::Tree->new;
+    my $tree = Pcore::Lib::File::Tree->new;
 
     # create tree
     for my $root ( $local->{locations}->@* ) {

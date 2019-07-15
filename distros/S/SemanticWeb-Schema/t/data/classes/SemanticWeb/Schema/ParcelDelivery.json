@@ -36,22 +36,28 @@
          "rdfs:comment" : "The earliest date the package may arrive.",
          "rdfs:label" : "expectedArrivalFrom",
          "schema:domainIncludes" : "schema:ParcelDelivery",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
       },
       "schema:expectedArrivalUntil" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The latest date the package may arrive.",
          "rdfs:label" : "expectedArrivalUntil",
          "schema:domainIncludes" : "schema:ParcelDelivery",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
       },
       "schema:hasDeliveryMethod" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Method used for delivery or shipping.",
          "rdfs:label" : "hasDeliveryMethod",
          "schema:domainIncludes" : [
-            "schema:ParcelDelivery",
-            "schema:DeliveryEvent"
+            "schema:DeliveryEvent",
+            "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -81,16 +87,16 @@
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Trip",
-            "schema:Reservation",
             "schema:Service",
+            "schema:Reservation",
             "schema:ParcelDelivery",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Trip",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:trackingNumber" : {

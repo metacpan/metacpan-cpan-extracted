@@ -3,9 +3,9 @@ NAME
     cwalitee
 
 VERSION
-    This document describes version 0.002 of App::CPANChangesCwaliteeUtils
+    This document describes version 0.003 of App::CPANChangesCwaliteeUtils
     (from Perl distribution App-CPANChangesCwaliteeUtils), released on
-    2019-07-06.
+    2019-07-10.
 
 DESCRIPTION
     This distribution includes the following utilities:

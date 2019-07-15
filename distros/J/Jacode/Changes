@@ -1,18 +1,24 @@
 Revision history for this software.
 
-2.13.4.20 2018/12/10 00:00:00
+2.13.4.21 2019-07-13 00:00:00
+  - fix Extra Issues: has_meta_json
+  - fix Extra Issues: use_warnings
+  - fix Experimental Issues: meta_yml_has_repository_resource
+  - created by INABA Hitoshi
+
+2.13.4.20 2018-12-10 00:00:00
   - add known license
   - add some documents
   - created by INABA Hitoshi
 
-2.13.4.19 2018/03/05 00:00:00
+2.13.4.19 2018-03-05 00:00:00
   - change system(...) to `...` in t/001_test.t
   - add lib/Jacode.pm
   - add xt/*
   - add README2ND
   - created by INABA Hitoshi
 
-2.13.4.18 2018/02/26 00:00:00
+2.13.4.18 2018-02-26 00:00:00
   - change package name 'jcode' to 'jacode' and introduce $support_jcode_package_too
   - change META.yml version 1.3 to 1.4
   - remove pMakefile.PL
@@ -20,31 +26,31 @@ Revision history for this software.
   - add LICENSE
   - created by INABA Hitoshi
 
-2.13.4.17 2018/02/14 00:00:00
+2.13.4.17 2018-02-14 00:00:00
   - try Removal of the current directory (".") from @INC
   - try Kwalitee Indicator: buildtool_not_executable
   - try Kwalitee Indicator: has_abstract_in_pod
   - try Kwalitee Indicator: meta_yml_conforms_to_known_spec
   - created by INABA Hitoshi
 
-2.13.4.16 2017/01/22 00:00:00
+2.13.4.16 2017-01-22 00:00:00
   - fix odd kana logic of &getcode()
   - improve &getcode()
   - created by INABA Hitoshi
 
-2.13.4.15 2016/07/14 00:00:00
+2.13.4.15 2016-07-14 00:00:00
   - fix version only
   - created by INABA Hitoshi
 
-2.13.4.14 2016/06/05 00:00:00
+2.13.4.14 2016-06-05 00:00:00
   - add 004_cinquecent_2012-10-21_OKWave.t
   - created by INABA Hitoshi
 
-2.13.4.13 2016/05/08 00:00:00
+2.13.4.13 2016-05-08 00:00:00
   - support Modern::Open 0.08
   - created by INABA Hitoshi
 
-2.13.4.12 2016/02/01 00:00:00
+2.13.4.12 2016-02-01 00:00:00
   - support 'jacode' package
   - support JIS X 0213:2000 plane 1
   - support JIS X 0213:2004 plane 1
@@ -57,59 +63,59 @@ Revision history for this software.
   - support 'EXE_FILES' of Makefile.PL
   - created by INABA Hitoshi
 
-2.13.4.11 2014/08/31 00:00:00
+2.13.4.11 2014-08-31 00:00:00
   - support make test
   - created by INABA Hitoshi
 
-2.13.4.10 2011/12/10 00:00:00
+2.13.4.10 2011-12-10 00:00:00
   - rewrite octal escapes to hexadecimal
   - check scalar(keys %associative_array)
   - improve &jcode'getcode by Improvement proposal from Hanada Masaaki in 2011/12/06
   - created by INABA Hitoshi
 
-2.13.4.9 2010/07/13 00:00:00
+2.13.4.9 2010-07-13 00:00:00
   - optimize utf82sjis
   - created by INABA Hitoshi
 
-2.13.4.8 2010/06/30 00:00:00
+2.13.4.8 2010-06-30 00:00:00
   - change some documents
   - fix _utf82sjis and add Katakana test
   - created by INABA Hitoshi
 
-2.13.4.7 2010/04/18 00:00:00
+2.13.4.7 2010-04-18 00:00:00
   - avoid perl5.12 warning "defined(%hash) is deprecated at ..."
   - created by INABA Hitoshi
 
-2.13.4.6 rc1 2010/04/06 00:00:00
+2.13.4.6 rc1 2010-04-06 00:00:00
   - fix comment
   - release candidate 1
   - created by INABA Hitoshi
 
-2.13.4.5 beta 2010/03/06 00:00:00
+2.13.4.5 beta 2010-03-06 00:00:00
   - minor document corrections
   - &jcode'flush() support
   - turn off utf8 flag by Encode::encode_utf8
   - created by INABA Hitoshi
 
-2.13.4.4 beta 2010/02/10 00:00:00
+2.13.4.4 beta 2010-02-10 00:00:00
   - fix comment
   - beta version
   - created by INABA Hitoshi
 
-2.13.4.3 alpha 2010/02/04 00:00:00
+2.13.4.3 alpha 2010-02-04 00:00:00
   - acts as a wrapper to Encode::from_to for perl 5.8.1 and later when $ocode or $icode is neither "jis", "sjis", "euc" nor "utf8"
   - created by INABA Hitoshi
 
-2.13.4.2 alpha 2010/01/25 00:00:00
+2.13.4.2 alpha 2010-01-25 00:00:00
   - add comment
   - created by INABA Hitoshi
 
-2.13.4.1 alpha 2010/01/21 00:00:00
+2.13.4.1 alpha 2010-01-21 00:00:00
   - support jperl4
   - POD document
   - rewrite test.pl in Perl4
   - created by INABA Hitoshi
 
-2.13.4.0 alpha 2010/01/19 00:00:00
+2.13.4.0 alpha 2010-01-19 00:00:00
   - branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp
   - created by INABA Hitoshi

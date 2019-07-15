@@ -19,7 +19,7 @@ sub API_signin : Permissions('*') ( $self, $req, $data ) {
     return $req->(401) if !$auth;
 
     # create user session
-    my $session = $self->{app}->{auth}->create_session( $auth->{user_id} );
+    my $session = $self->{app}->{auth}->user_session_create( $auth->{user_id} );
 
     # user session creation error
     return $req->(500) if !$session;

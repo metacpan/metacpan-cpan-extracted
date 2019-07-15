@@ -1,8 +1,8 @@
 package File::Serialize;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: DWIM file serialization/deserialization
-$File::Serialize::VERSION = '1.2.0';
-use 5.16.0;
+$File::Serialize::VERSION = '1.3.0';
+use v5.16.0;
 
 use feature 'current_sub';
 
@@ -14,7 +14,7 @@ use List::AllUtils qw/ uniq /;
 use List::Util 1.41 qw/ pairgrep first none any pairmap /;
 use Path::Tiny;
 
-use Module::Pluggable 
+use Module::Pluggable
    require => 1,
    sub_name => '_all_serializers',
    search_path => __PACKAGE__ . '::Serializer'
@@ -39,7 +39,7 @@ sub _generate_serialize_file {
         $options->{pretty} //= 1;
         $options->{canonical} //= 1;
 
-        $file = path($file) unless $file eq '-' or ref $file eq 'SCALAR';
+        $file = path($file) unless $file =~ /^-/ or ref $file eq 'SCALAR';
 
         my $serializer = _serializer($file, $options);
 
@@ -82,9 +82,9 @@ sub _generate_deserialize_file {
             if $options->{add_extension} and $file ne '-' and ref $file ne 'SCALAR';
 
         return $serializer->deserialize(
-            $file eq '-' ? do { local $/ = <STDIN> } 
+            $file =~ /^-/ ? do { local $/ = <STDIN> }
           : ref $file eq 'SCALAR' ? $$file
-          : $file->$method, 
+          : $file->$method,
             $options
         );
     }
@@ -158,7 +158,7 @@ sub _serializer {
     my $serializers = $options->{serializers} || [ __PACKAGE__->_all_operative_serializers ];
     s/^\+/File::Serialize::Serializer::/ for @$serializers;
 
-    my $format = $options->{format} || ( $self->basename =~ /\.(\w+)$/ )[0];
+    my $format = $options->{format} || ( ( ref $self ? $self->basename : $self ) =~ /\.(\w+)$/ )[0];
 
     return( first { $_->does_extension($format) } @$serializers
             or die "no serializer found for $format"
@@ -179,7 +179,7 @@ File::Serialize - DWIM file serialization/deserialization
 
 =head1 VERSION
 
-version 1.2.0
+version 1.3.0
 
 =head1 SYNOPSIS
 
@@ -421,7 +421,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
+This software is copyright (c) 2019, 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

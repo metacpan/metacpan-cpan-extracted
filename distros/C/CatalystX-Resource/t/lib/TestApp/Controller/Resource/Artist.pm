@@ -10,6 +10,7 @@ __PACKAGE__->config(
     form_class             => 'TestApp::Form::Resource::Artist',
     model                  => 'DB::Resource::Artist',
     redirect_mode          => 'list',
+    form_template          => 'resource/artist/form.tt',
     traits                 => [qw/ Create Show Edit Delete List Form Sortable MergeUploadParams /],
     activate_fields_create => [qw/ password password_repeat /],
     actions                => { base => { PathPart => 'artists', }, },

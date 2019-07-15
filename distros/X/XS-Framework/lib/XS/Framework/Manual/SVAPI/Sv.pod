@@ -1,0 +1,411 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Sv - XS::Framework Sv C++ class reference
+
+=head1 Sv
+
+=head2 Overview
+
+The Perl C<SV*> is variadic type, which actually can be Hash (HV*), Array(AV*)
+etc.
+
+The Sv object I<may> own the underlying Perl <SV*> or I<may not>, i.e. the
+held SV* is C<NULL>. That way some methods are NULL-safe, i.e. they can be
+invoked when C<SV*> is C<NULL>; the other methods are NULL-unsafe, and inoking
+them leads to B<undefined behaviour>, most likely the program will crash.
+
+C<Sv> class tried to follow I<DWIM-principle> whenever it is possible and
+zero- or minimal costs. For example:
+
+    SV* arg;
+    // arg may be NULL or may be not
+    Sv1 sv1(arg)
+    Sv2 sv2 = sv1;
+
+If the C<arg> wasn't NULL, then it's refcounter will be increased twice (on
+C<sv1> and C<sv2> construction), and decreased twice (on C<sv1> and C<sv2>
+destruction). if C<arg> was NULL, then both variables C<sv1> and C<sv2> will
+held NULL C<SV*>. The code above is NULL-safe. However, the following
+code is NULL-unsafe, i.e. may lead to crashes:
+
+    SV* arg;
+    // arg may be NULL or may be not
+    Sv1 sv1(arg)
+    sv1.payload_attach(&some_payload, &some_marker);
+
+The non-null existance of C<arg> have to checked i.e.
+
+    if (sv1) {
+        sv1.payload_attach(&some_payload, &some_marker);
+    }
+
+Now this piece of code is safe from crashes at runtime.
+
+=head2 Construction
+
+When the empty constructor is invoked the C<Sv> variable will be empty, i.e.
+hold no any perl C<SV*>:
+
+    Sv item;
+
+To let it hold new Perl variable (empty string), it should be constructed
+via static method C<create>, i.e.:
+
+    auto item = Sv::create();
+
+It is quite common to just I<wrap> underlying Perl C type, the overloaded
+constructor can be invoked
+
+    Sv (SV* sv, bool policy = INCREMENT)
+    Sv (AV* sv, bool policy = INCREMENT)
+    Sv (HV* sv, bool policy = INCREMENT)
+    Sv (CV* sv, bool policy = INCREMENT)
+    Sv (GV* sv, bool policy = INCREMENT)
+
+    AV* av = ...;
+    Sv my(av);
+
+The ref-couning C<policy> defines, whether the underlying C<SV*> should be
+incremented upon Sv object construction; it is C<true> by default. When
+the Sv goes out of scope, it's destructor will be invoked and the refcounter
+of the underlying C<SV*> will always be C<dec>-remented.
+
+The construtor does never throws, as all valid C<SV*> values are accepted.
+
+The rule of thumb is following: if Sv wrapper is intended to B<share> ownership
+with the C<SV*>, it should use C<INCREMENT> policy (this is default, and mostly
+used case); if the wrapper should own the variable, then the policy should be
+C<NONE>.
+
+There are convenient static methods to create an C<Sv> wrapper without
+incrementing the refcounter:
+
+    static Sv noinc (SV* val)
+    static Sv noinc (AV* val)
+    static Sv noinc (HV* val)
+    static Sv noinc (CV* val)
+    static Sv noinc (GV* val)
+
+    AV* av = ...;
+    auto my = Sv::noinc(av);
+
+The copy and move constructors are provided; the refcounter is not touched:
+
+    Sv (const Sv& oth)
+    Sv (Sv&&      oth)
+
+To extract the scalar result of call, it is possible to consturct C<Sv> as:
+
+    Sv (const CallProxy& p)
+
+=head2 undef, yes, no
+
+There are a few Sv-constants, which represent common values, e.g. :
+
+    static const Sv undef;
+    static const Sv yes;
+    static const Sv no;
+
+=head2 assignment operators
+
+    Sv& operator= (SV* val)
+    Sv& operator= (AV* val)
+    Sv& operator= (HV* val)
+    Sv& operator= (CV* val)
+    Sv& operator= (GV* val)
+    Sv& operator= (const CallProxy& p)
+
+    Sv& operator= (const Sv& oth)
+
+The assignment operators are complementaty to the constructors above. As the
+possible underlying C<SV*> will be thrown away after assignemnt, it's refcounter
+is C<dec>-remented and the ref-counter of the new value is incremented.
+
+    Sv& operator= (Sv&& oth)
+
+Move-assignment operator is implemented simply by swapping underlying C<SV*>
+without touching ref-counter.
+
+All assignment operators are NULL-safe
+
+=head2 getters
+
+The get the underlying C<SV*> it is possible either to use related coersion
+operator or dereference operator:
+
+    operator SV*   () const
+    SV* operator-> () const
+
+Please note, the result might be C<nullptr> if the underlyging C<SV*> was
+C<nullptr>.
+
+It is possible to unwrap the underlying C<SV*> either via operator coercion;
+it is B<safe and somewhat slower>, as in the case of coercion failure the
+C<nullptr> is returned:
+
+    operator AV*   () const
+    operator HV*   () const
+    operator CV*   () const
+    operator GV*   () const
+
+Or it is possible to do zero-cost typecasting, but without any warranty on
+type safety or non-nullity:
+
+    template <typename T = SV> one_of_t<T,SV,AV,HV,CV,GV>* get ()
+
+For example:
+
+    AV* av_src = ...;
+    Sv sv(av_src);
+
+    AV* av_src = sv;
+    if (!av_src) {
+        // do something!
+    }
+
+    AV* av_src_unsafe = sv.get<AV*>();
+
+To resolve ambiguities in using C<Sv> with Perl macros it the C<void*> coercion
+operator is supplied:
+
+    operator void* () const
+
+
+=head2 bool operator()
+
+    explicit operator bool () const
+
+Returns true if the C<Sv> wraps any Perl C<SV*>. It is convenient to
+use in XS-adapters to check whether any value has been supplied in Perl
+script, e.g.
+
+    void MyClass::my_method(SV* optional1 = nullptr, Sv opt2 = Sv{}) {
+        Sv opt1(optional1);
+        if (opt1) { ... }
+        // a bit more convenient, right?
+        if (opt2) { ... }
+    }
+
+Please note, that C<undef> is valid perl C<SV*> and it returns C<true>
+for the operator.
+
+=head2 defined()
+
+    bool   defined() const
+
+Null-safe method which returns C<true> the object holds any C<SV*> and
+later is defined.
+
+=head2 is_true()
+
+    bool   is_true        () const
+
+Checks whether the object holds Perl value which evaluates to C<true>. This is NULL-safe method.
+
+=head2 type-inspecting methods
+
+    bool   is_scalar      () const
+    bool   is_ref         () const
+    bool   is_simple      () const
+    bool   is_string      () const
+    bool   is_like_number () const
+    bool   is_array       () const
+    bool   is_array_ref   () const
+    bool   is_hash        () const
+    bool   is_hash_ref    () const
+    bool   is_sub         () const
+    bool   is_sub_ref     () const
+    bool   is_glob        () const
+    bool   is_object      () const
+    bool   is_object_ref  () const
+    bool   is_stash       () const
+
+All the methods above try to guess corresponding C<SV*> type and return
+C<true> upon successful guess. All the methods are NULL-safe.
+
+    svtype type           () const
+
+This is NULL-unsafe type extraction from from C<SV*>.
+
+=head2 readonly()
+
+=head2 readonly(bool val)
+
+    bool   readonly       () const
+    void readonly (bool val)
+
+This NULL-unsafe methods examine Perl C<SV*> for read-only flag or
+set/unset it.
+
+
+=head2 use_count()
+
+    U32    use_count      () const
+
+Returns refcounter value. If C<SV*> is NULL, then C<0> is returned.
+
+
+=head2 upgrade (svtype type)
+
+    void upgrade (svtype type)
+
+Tries to upgrade C<SV*> into the specified type. Exception is thrown if the
+variable is already marked as readonly or upon attempt to upgrade defined
+scalar (non-undef) into more than C<SVt_PVMG>.
+
+This is NULL-unsafe method.
+
+
+=head2 dump ()
+
+    void dump () const
+
+Dumps the underlyign C<SV*> to C<stderr>.
+
+=head2 reset ()
+
+    void reset ()
+
+Decrements refcounter in the undrerlying C<SV*> and sets it to C<NULL>.
+
+This is NULL-safe method.
+
+=head2 detach()
+
+    SV* detach ()
+
+Releases ownership on the underlying C<SV*> (which might be C<NULL>) and
+returns it. The refcounter is not touched.
+
+This is NULL-safe method.
+
+This method is useful when manually returning SV* on perl stack in xs-adapter,
+e.g.
+
+    void MyClass::method() {
+        ...
+        auto item = new MyClass();
+        auto wrapper = xs::out<>(item);
+        mXPUSHs(wrapped_pt.detach());
+        ...
+    }
+
+
+=head2 operators ==() and !=()
+
+    operator== (const Sv& lh, const Sv& rh)
+    operator!= (const Sv& lh, const Sv& rh)
+    operator== (const Sv& lh, SV* rh)
+    operator!= (const Sv& lh, SV* rh)
+    operator== (SV* lh, const Sv& rh)
+    operator!= (SV* lh, const Sv& rh)
+    operator== (const Sv& lh, AV* rh)
+    operator!= (const Sv& lh, AV* rh)
+    operator== (AV* lh, const Sv& rh)
+    operator!= (AV* lh, const Sv& rh)
+    operator== (const Sv& lh, HV* rh)
+    operator!= (const Sv& lh, HV* rh)
+    operator== (HV* lh, const Sv& rh)
+    operator!= (HV* lh, const Sv& rh)
+    operator== (const Sv& lh, CV* rh)
+    operator!= (const Sv& lh, CV* rh)
+    operator== (CV* lh, const Sv& rh)
+    operator!= (CV* lh, const Sv& rh)
+    operator== (const Sv& lh, GV* rh)
+    operator!= (const Sv& lh, GV* rh)
+    operator== (GV* lh, const Sv& rh)
+    operator!= (GV* lh, const Sv& rh)
+
+
+This is group of identity checks operators, i.e. determine whether the underlyging
+C<SV*> points to the same address as the other argument. As only addresses are
+compared, all the operations are NULL-safe.
+
+
+=head2 magic payload
+
+Perl gives possibility to attach arbitrary data to C<SV*> via magic slots. The
+L<XS::Framework> exposes that facility too. To distinguish between different
+payloads, it is required to supply the per-type unique marker. L<XS::Framework>
+assumes that it is enough to have just I<unique address> to identiy unique
+marker. The easiest way to accomplish that is to have:
+
+    static xs::Sv::payload_marker_t my_payload_marker{};
+
+To attach payload the following NULL-unsafe methods can be used:
+
+    MAGIC* payload_attach (void* ptr, Sv obj, const payload_marker_t* marker)
+    MAGIC* payload_attach (void* ptr, const payload_marker_t* marker)
+    MAGIC* payload_attach (Sv    obj, const payload_marker_t* marker)
+
+The result is perl C<MAGIC*> pointer, which can be safely ignored. To remove
+magic payload from <SV*> the C<payload_detach> method can be used:
+
+    int payload_detach (payload_marker_t* marker)
+
+To check payload existance via it's market the C<payload_exists> can be used:
+
+    bool payload_exists (const payload_marker_t* marker)
+
+Finally, to get the payload the C<payload> method should be used:
+
+    Payload payload (const payload_marker_t* marker) const
+
+    struct Payload {
+        void* ptr;
+        SV*   obj;
+    };
+
+In the returned C<Payload> struct you should access the C<ptr> or C<obj>,
+depending on what kind of payload was attached. Both C<ptr> and C<obj>
+can be used, if both of them were set.
+
+A few words should be told about payload cleanup. If the attached payload
+type was C<SV*>, then underlying refcounter will be increased, and once
+magic payload goes of of live, the refcounter will be decremented. However,
+if arbitrary data was attached as C<void*>, then user-supplied cleanup
+function will invoked, once it was attached ot the payload marker. The
+usual place to initialize that custom payload function is C<BOOT> XS-adapter
+section, for example:
+
+    static xs::Sv::payload_marker_t my_payload_marker{};
+
+    static int my_payload_marker_free(pTHX_ SV*, MAGIC* mg) {
+        void* payload = (void*)mg->mg_ptr;
+        // place custom clean-up code here.
+        return 0;
+    }
+
+    BOOT {
+        my_payload_marker.svt_free = my_payload_marker_free;
+    }
+
+All methods, which work with magic are NULL-unsafe.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Sub>
+
+L<XS::Framework::Manual::SVAPI::Array>
+
+L<XS::Framework::Manual::SVAPI::Glob>
+
+L<XS::Framework::Manual::SVAPI::Hash>
+
+L<XS::Framework::Manual::SVAPI::List>
+
+L<XS::Framework::Manual::SVAPI::Object>
+
+L<XS::Framework::Manual::SVAPI::Ref>
+
+L<XS::Framework::Manual::SVAPI::Scalar>
+
+L<XS::Framework::Manual::SVAPI::Simple>
+
+L<XS::Framework::Manual::SVAPI::Stash>
+
+=cut

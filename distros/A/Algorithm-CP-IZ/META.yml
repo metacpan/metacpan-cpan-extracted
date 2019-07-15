@@ -20,4 +20,4 @@ no_index:
 requires:
   Scalar::Util: '0'
   UNIVERSAL: '0'
-version: '0.04'
+version: '0.05'

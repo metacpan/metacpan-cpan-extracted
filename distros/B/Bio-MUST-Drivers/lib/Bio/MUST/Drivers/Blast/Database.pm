@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database;
 # ABSTRACT: Internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::VERSION = '0.181160';
+$Bio::MUST::Drivers::Blast::Database::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
@@ -52,7 +52,7 @@ sub BUILD {
         $self->_set_type('nucl');
     }
     else {
-        croak "Error: BLAST database not found at $basename; aborting!";
+        croak "[BMD] Error: BLAST database not found at $basename; aborting!";
     }
 
     return;
@@ -71,7 +71,7 @@ Bio::MUST::Drivers::Blast::Database - Internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

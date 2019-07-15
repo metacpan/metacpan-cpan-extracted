@@ -1,0 +1,291 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Simple - XS::Framework Simple C++ class reference
+
+=head1 Simple
+
+=head2 Overview
+
+The C<Simple> class is the wrapper around Perls C<SV*> object, which helds
+primitive value like number (float, double, integer etc.) or string.
+
+As with C<Scalar>, it might held an underlying Perl C<SV*> or might not.
+
+As with C<Scalar>, C<Simple> might held the <undef> the the object is not
+considered empty.
+
+=head2 Construction
+
+    static const Simple undef;
+    static const Simple yes;
+    static const Simple no;
+
+
+Out of the box C<Simple> offers a few constants for Perl's C<undef> and
+C<true> and C<false> values.
+
+    static Simple create (size_t capacity)
+
+The C<create> method return new non-empty C<Simple>, which reserves
+C<capacity> bytes for the binary string.
+
+To create C<Simple> object with C<sprintf>-like formatter, the C<format>
+helper method can be used:
+
+    static Simple format (const char*const pat, ...)
+
+For example,
+
+    Simple obj = Simple::format("pi = %0.2f", 3.14157);
+
+The empty wrapper can be created if C<nullptr> is passed as argument:
+
+    Simple (std::nullptr_t = nullptr) {}
+
+The most generic C<Simple> constructor is
+
+    static Simple noinc (SV* val)
+    Simple (SV* sv, bool policy = INCREMENT)
+
+it wraps the underlyging Perl C<SV*> if it helds primitive value, including
+C<undef>.
+
+It is possible to construct C<Simple> instance from number or string via:
+
+    template <class T, typename = arithmetic_t<T>> explicit Simple (T val)
+    Simple (const std::string_view& s)
+
+Copy and move-constructore are also available:
+
+    Simple (const Simple& oth)
+    Simple (Simple&&      oth)
+    Simple (const Scalar& oth)
+    Simple (Scalar&&      oth)
+    Simple (const Sv&     oth)
+    Simple (Sv&&          oth)
+
+It it possible to create C<Simple> object from C<CallProxy> invocation:
+
+    Simple (const CallProxy& p)
+
+however, please note, that the C<CallProxy> will be called in B<scalar context>.
+
+There is a special method that creates an C<Simple> object from C<HEK*>.
+Basically it is the string with precomputed hash number. It is useful for fast
+value lookup in the C<Hash> class.
+
+    static Simple shared (HEK* k)
+    static Simple shared (const std::string_view& s, U32 hash = 0)
+
+
+=head2 assignment operators
+
+    Simple& operator= (SV* val)
+    Simple& operator= (const Simple& oth)
+    Simple& operator= (Simple&& oth)
+    Simple& operator= (const Scalar& oth)
+    Simple& operator= (Scalar&& oth)
+    Simple& operator= (const Sv& oth)
+    Simple& operator= (Sv&& oth)
+    Simple& operator= (const CallProxy& p)
+
+    template <typename T, typename = arithmetic_t<T>>
+    Simple& operator= (T val)
+
+    Simple& operator= (const std::string_view& s)
+
+The assignment operators are complementaty to the constructors above. They
+inherit behaviour from C<Sv>, including NULL-safety. The previously held
+C<SV*> will be C<dec>-remented.
+
+    template <typename T, typename = arithmetic_t<T>>
+    void set (T val)
+
+    void set (std::string_view s)
+    void set (SV* val)
+
+The C<set> method directly assigns the value to the underlying C<SV*>,
+I<bypassing all checks>. Use the method with caution.
+
+=head2 getters
+
+The C<Simple> object provides type-coersion operators for C<bool> and
+number contexts, i.e.:
+
+    using Sv::operator bool;
+    template <class T, typename = arithmetic_t<T>> operator T () const
+
+The C<bool> operator returns C<true> if C<Simple> object is non-empty,
+i.e. it helds any value, including C<undef>.
+
+In number context it C<Simple> tries to extract number from the underlying
+C<SV*>. If the C<Simple> instance is empty zero of appropriate type is
+returned. So, this are NULL-safe methods.
+
+    operator std::string_view () const
+    const char* c_str () const
+    template <class T = panda::string> T as_string () const
+
+The C<Simple> instance can be coersed to <string> too; in case of empty
+object, the empty string is returned. So, this are NULL-safe methods.
+
+There are a few NULL-unsafe but fast getters:
+
+    template <typename T>      arithmetic_t<T>               get () const
+    template <typename T>      one_of_t<T,char*,const char*> get () const
+    template <typename T>      one_of_t<T, std::string_view> get () const
+    template <typename T = SV> one_of_t<T,SV>*               get () const
+
+
+=head2 operator[]
+
+    char  operator[] (size_t i) const
+    char& operator[] (size_t i)
+
+This operator provides char level access for a string of the underlying
+C<SV*>. The boundary-check is not performed, so use the method with caution
+
+This is null-unsafe method.
+
+=head2 at()
+
+    char at (size_t i)
+
+This method returns copy of a char. This method checks string boundary, and
+if C<i> is out of bound, then exception is thrown.
+
+This is null-safe method.
+
+=head2 is_string()
+
+    bool   is_string () const
+
+Returns C<true> if the underlying C<SV*> contains character string.
+
+This is null-safe method.
+
+=head2 is_shared ()
+
+    bool   is_shared () const
+
+Returns a boolean indicating whether the underlying C<SV*>
+is Copy-On-Write shared hash key scalar.
+
+This is null-safe method.
+
+=head2 length()
+
+=head2 length(STRLEN newlen)
+
+    STRLEN length    () const
+    void   length    (STRLEN newlen)
+
+Gets or sets the length of the string of the underlying C<SV*>.
+
+This are null-unsafe methods.
+
+=head2 capacity()
+
+    STRLEN capacity  () const
+
+Returns the size of the string buffer in the underlying C<SV*>.
+
+This is null-unsafe method.
+
+=head2 utf8()
+
+    bool   utf8      () const
+    void   utf8      (bool val)
+
+Sets or gets the UTF-8 flag on the underlying C<SV*>.
+
+This is null-unsafe method.
+
+=head2 hash()
+
+    U32 hash () const;
+
+Returns hash number for the underlying C<SV*>.
+
+This is null-unsafe method.
+
+=head2 hek()
+
+    HEK* hek () const
+
+Returns C<HEK*>, i.e. string with precomputed hash number. It is useful
+for fast value lookup in C<Hash> classes.
+
+This is null-unsafe method.
+
+=head2 operators ==(), !=(), >, >=, <, <=
+
+    template <typename T, typename = arithmetic_t<T>> inline bool operator== (const Simple& lhs, T rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator== (T lhs, const Simple& rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator!= (const Simple& lhs, T rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator!= (T lhs, const Simple& rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator>  (const Simple& lhs, T rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator>  (T lhs, const Simple& rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator>= (const Simple& lhs, T rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator>= (T lhs, const Simple& rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator<  (const Simple& lhs, T rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator<  (T lhs, const Simple& rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator<= (const Simple& lhs, T rhs)
+    template <typename T, typename = arithmetic_t<T>> inline bool operator<= (T lhs, const Simple& rhs)
+
+    inline bool operator== (const Simple& lhs, const std::string_view& rhs)
+    inline bool operator== (const std::string_view& lhs, const Simple& rhs)
+    inline bool operator!= (const Simple& lhs, const std::string_view& rhs)
+    inline bool operator!= (const std::string_view& lhs, const Simple& rhs)
+    inline bool operator>  (const Simple& lhs, const std::string_view& rhs)
+    inline bool operator>  (const std::string_view& lhs, const Simple& rhs)
+    inline bool operator>= (const Simple& lhs, const std::string_view& rhs)
+    inline bool operator>= (const std::string_view& lhs, const Simple& rhs)
+    inline bool operator<  (const Simple& lhs, const std::string_view& rhs)
+    inline bool operator<  (const std::string_view& lhs, const Simple& rhs)
+    inline bool operator<= (const Simple& lhs, const std::string_view& rhs)
+    inline bool operator<= (const std::string_view& lhs, const Simple& rhs)
+
+    inline bool operator== (const Simple& lhs, const char* rhs)
+    inline bool operator== (const char* lhs, const Simple& rhs)
+    inline bool operator!= (const Simple& lhs, const char* rhs)
+    inline bool operator!= (const char* lhs, const Simple& rhs)
+    inline bool operator>  (const Simple& lhs, const char* rhs)
+    inline bool operator>  (const char* lhs, const Simple& rhs)
+    inline bool operator>= (const Simple& lhs, const char* rhs)
+    inline bool operator>= (const char* lhs, const Simple& rhs)
+    inline bool operator<  (const Simple& lhs, const char* rhs)
+    inline bool operator<  (const char* lhs, const Simple& rhs)
+    inline bool operator<= (const Simple& lhs, const char* rhs)
+    inline bool operator<= (const char* lhs, const Simple& rhs)
+
+    inline bool operator== (const Simple& lhs, char* rhs)
+    inline bool operator== (char* lhs, const Simple& rhs)
+    inline bool operator!= (const Simple& lhs, char* rhs)
+    inline bool operator!= (char* lhs, const Simple& rhs)
+    inline bool operator>  (const Simple& lhs, char* rhs)
+    inline bool operator>  (char* lhs, const Simple& rhs)
+    inline bool operator>= (const Simple& lhs, char* rhs)
+    inline bool operator>= (char* lhs, const Simple& rhs)
+    inline bool operator<  (const Simple& lhs, char* rhs)
+    inline bool operator<  (char* lhs, const Simple& rhs)
+    inline bool operator<= (const Simple& lhs, char* rhs)
+    inline bool operator<= (char* lhs, const Simple& rhs)
+
+
+This is group of comparison operators. C++ does not has C<cmp> operator, but
+there is operator overloading, so there are multiple overloads for string
+and number variants. All the operations are NULL-safe.
+
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+L<XS::Framework::Manual::SVAPI::Sv>
+
+L<XS::Framework::Manual::SVAPI::Scalar>
+
+=cut

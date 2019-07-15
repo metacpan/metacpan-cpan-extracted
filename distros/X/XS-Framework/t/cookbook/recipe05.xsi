@@ -1,0 +1,61 @@
+MODE: INLINE
+
+#include <iostream>
+
+struct TimezoneRecipe05: public panda::Refcnt {
+    const char* get_name() const { return name.c_str(); }
+    TimezoneRecipe05(const char* name_): name{name_} { }
+    ~TimezoneRecipe05() { std::cout << "~TimezoneRecipe05()\n"; }
+private:
+    std::string name;
+};
+
+using TimezoneRecipe05SP = panda::iptr<TimezoneRecipe05>;
+
+struct DateRecipe05 {
+    DateRecipe05()  { update() ; }
+    void update()   { epoch = std::time(nullptr); }
+
+    int get_epoch() const { return epoch; }
+    void set_timezone(TimezoneRecipe05SP tz_) { tz = tz_; }
+    TimezoneRecipe05SP get_timezone() { return tz; }
+private:
+    std::time_t epoch;
+    TimezoneRecipe05SP tz;
+};
+
+
+namespace xs {
+    template <>
+    struct Typemap<TimezoneRecipe05*> : TypemapObject<TimezoneRecipe05*, TimezoneRecipe05*, ObjectTypeRefcntPtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::TimezoneRecipe05"; }
+    };
+}
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe05*> : TypemapObject<DateRecipe05*, DateRecipe05*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe05"; }
+    };
+}
+
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::TimezoneRecipe05
+PROTOTYPES: DISABLE
+
+const char* TimezoneRecipe05::get_name() { RETVAL = THIS->get_name(); }
+
+TimezoneRecipe05SP create(const char* name) { RETVAL = TimezoneRecipe05SP(new TimezoneRecipe05(name)); }
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe05
+PROTOTYPES: DISABLE
+
+DateRecipe05* DateRecipe05::new() { RETVAL = new DateRecipe05(); }
+
+void DateRecipe05::update()
+
+std::time_t DateRecipe05::get_epoch()
+
+TimezoneRecipe05SP DateRecipe05::get_timezone()
+
+void DateRecipe05::set_timezone(TimezoneRecipe05SP tz)

@@ -1,0 +1,167 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe02 - XS::Framework basics
+
+=cut
+
+=head1 DESCRIPTION
+
+This recipe expains difference between C<ObjectStorageIV> and C<ObjectStorageMG>
+storage policies. The C++ classes, typemaps and XS-adapters are almost the same
+as in L<recipe01>, i.e.
+
+
+    struct DateRecipe02a {
+        DateRecipe02a()  { update() ; }
+        void update()    { epoch = std::time(nullptr); }
+
+        int get_epoch() const { return epoch; }
+    private:
+        std::time_t epoch;
+    };
+
+    namespace xs {
+        template <>
+        struct Typemap<DateRecipe02a*> : TypemapObject<DateRecipe02a*, DateRecipe02a*, ObjectTypePtr, ObjectStorageIV, StaticCast> {
+            static std::string package () { return "MyTest::Cookbook::DateRecipe02a"; }
+        };
+    }
+
+    struct DateRecipe02b {
+        DateRecipe02b()  { update() ; }
+        void update()    { epoch = std::time(nullptr); }
+
+        int get_epoch() const { return epoch; }
+    private:
+        std::time_t epoch;
+    };
+
+    namespace xs {
+        template <>
+        struct Typemap<DateRecipe02b*> : TypemapObject<DateRecipe02b*, DateRecipe02b*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+            static std::string package () { return "MyTest::Cookbook::DateRecipe02b"; }
+        };
+    }
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::DateRecipe02a
+    PROTOTYPES: DISABLE
+
+    DateRecipe02a* DateRecipe02a::new() { RETVAL = new DateRecipe02a(); }
+
+    void DateRecipe02a::update()
+
+    std::time_t DateRecipe02a::get_epoch()
+
+    BOOT {
+        Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+        // (1)
+    }
+
+    void DateRecipe02a::DESTROY() {
+    }
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::DateRecipe02b
+    PROTOTYPES: DISABLE
+
+    DateRecipe02b* DateRecipe02a::new() { RETVAL = new DateRecipe02b(); }
+
+    void DateRecipe02b::update()
+
+    std::time_t DateRecipe02b::get_epoch()
+
+    BOOT {
+        Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+        // (2)
+    }
+
+The only difference is added C<BOOT> sections (1), and (2). This BOOT sections
+are added into module C<BOOT> section, i.e. the code will be executed
+upon xs-module (C<.so> or C<.dll>) being loaded. L<XS::Framework> parser
+injects special keywords C<__PACKAGE__> and C<__MODULE__>, which are substituted
+to I<string literals> of the most recently parsed package and module declarations,
+i.e. to "MyTest" and "MyTest::Cookbook::DateRecipe02a" of (1).
+
+The need of use L<XS::Framework::Manual::SVAPI::Stash> method C<mark_as_loaded> is
+the following: to let Perl think that corresponding perl modules are already
+loaded, i.e. do not die on C<use parent qw/MyTest::Cookbook::DateRecipe02b/>
+below.
+
+Let's create actual instances and see what do they point
+
+    my $date_a = MyTest::Cookbook::DateRecipe02a->new();
+    my $date_b = MyTest::Cookbook::DateRecipe02b->new();
+
+      DB<1> x $date_a
+    0  MyTest::Cookbook::DateRecipe02a=SCALAR(0x25b93a0)
+       -> 13317136
+      DB<2> x $date_b
+    0  MyTest::Cookbook::DateRecipe02b=SCALAR(0xcb7ca0)
+       -> undef
+
+The C<$date_a> object uses C<ObjectStorageIV>, i.e. the pointer to C++
+DateRecipe02a object is stored in integer field of Perl SV*. So, the number
+C<13317136> is actually pointer to C++ somewhere on a heap.
+
+The C<$date_b> object uses C<ObjectStorageMG>, i.e. pointer to C++
+DateRecipe02a object is stored in magic; the Perl SV* itself remains
+free/C<undef> and it is possible to upgrade it in future.
+
+Let's extend class I<behaviour> in Perl, i.e. let's created child class with
+additional method C<to_string>, which will print human-readable date. That's
+possible to do for both C<DateRecipe02a> and C<DateRecipe02b>, but we'll do
+that only for former.
+
+    package MyPerlDateA {
+        use MyTest;
+        use parent qw/MyTest::Cookbook::DateRecipe02a/;
+
+        sub to_string {
+            return scalar(localtime(shift->get_epoch));
+        }
+    };
+
+    my $date_A = MyPerlDateA->new;
+    my $s_date_A = $date_A->to_string;
+    note "date a = ", $s_date_A, ", ref = ", ref($date_A);
+    # date a = Thu Dec 20 18:45:17 2018, ref = MyPerlDateA
+
+That's works perfectly fine. Let's try something different: let's assume
+that our date objects are immutable, and create string description in
+intercepted constructor, then cache that property and always return
+in C<to_string> method. So, we need to store the cached property
+I<somewhere in object>.
+
+Now we have a problem with C<ObjectStorageIV>: in Perl SV* there is no space
+left to store hash or any other data. The storage policy C<ObjectStorageMG>
+does not suffers that constraint:
+
+    package MyPerlDateB {
+        use MyTest;
+        use parent qw/MyTest::Cookbook::DateRecipe02b/;
+
+        sub new {
+            my $class = shift;
+            my $obj = $class->SUPER::new();  # (3)
+            XS::Framework::obj2hv($obj);     # (4)
+            $obj->{_date} = localtime($obj->get_epoch);
+            return $obj;
+        }
+
+        sub to_string {
+            return shift->{_date}
+        }
+    };
+
+    my $date_B = MyPerlDateB->new;
+    my $s_date_B = $date_B->to_string;
+    note "date b = ", $s_date_B, ", ref = ", ref($date_B);
+    # date b = Thu Dec 20 18:45:17 2018, ref = MyPerlDateB
+
+To do that, we should override C<new> method, create the Perl wrapper for
+parent class via (3), and then upgrade the Perl SV* wrapper to hash reference.
+Once we have blessed hash reference, we have enough space to store additional
+data in object. So, the issue is solved.
+
+Take away: use C<ObjectStorageMG> storage policy by default, as it allows
+users of your XS-classes to extend them with additional data they need.
+C<ObjectStorageIV> does not allow you to do that.

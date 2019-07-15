@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::LIMIT;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref];
+use Pcore::Lib::Scalar qw[is_ref is_plain_scalarref];
 
 has _buf => ( required => 1 );    # ArrayRef
 

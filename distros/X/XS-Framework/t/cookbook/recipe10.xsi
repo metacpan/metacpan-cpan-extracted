@@ -1,0 +1,62 @@
+MODE: INLINE
+
+#include <iostream>
+
+struct DateRecipe10;
+
+struct TimezoneRecipe10 {
+    const char* get_name() const { return name.c_str(); }
+private:
+    TimezoneRecipe10(const char* name_): name{name_} { }
+    std::string name;
+    friend class DateRecipe10;
+};
+
+struct DateRecipe10 {
+    DateRecipe10(const char* tz_ = "Europe/Minsk"): tz(tz_) { update(); }
+    ~DateRecipe10() { std::cout << "~DateRecipe10()\n"; }
+    void update()   { epoch = std::time(nullptr); }
+
+    int get_epoch() const { return epoch; }
+    TimezoneRecipe10& get_timezone() { return tz; }
+private:
+    std::time_t epoch;
+    TimezoneRecipe10 tz;
+};
+
+namespace xs {
+    template <>
+    struct Typemap<DateRecipe10*> : TypemapObject<DateRecipe10*, DateRecipe10*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::DateRecipe10"; }
+    };
+
+    template <>
+    struct Typemap<TimezoneRecipe10*> : TypemapObject<TimezoneRecipe10*, TimezoneRecipe10*, ObjectTypeForeignPtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::TimezoneRecipe10"; }
+    };
+};
+
+static xs::Sv::payload_marker_t payload_marker_10{};
+
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::TimezoneRecipe10
+PROTOTYPES: DISABLE
+
+const char* TimezoneRecipe10::get_name()
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::DateRecipe10
+PROTOTYPES: DISABLE
+
+DateRecipe10* DateRecipe10::new(const char* name)
+
+void DateRecipe10::update()
+
+std::time_t DateRecipe10::get_epoch()
+
+Sv DateRecipe10::get_timezone() {
+    Object self {ST(0)};
+    Object tz = xs::out<>(&THIS->get_timezone());
+    auto self_ref = Ref::create(self);
+    tz.payload_attach(self_ref, &payload_marker_10);
+    RETVAL = tz.ref();
+}

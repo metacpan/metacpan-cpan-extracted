@@ -43,9 +43,14 @@ ok( $@, "Non-zero return code indicates the expected failure");
 seek $new_error, 0, 0;
 my $line = <$new_error>;
 like( $line, qr/^\*\s+(?:
-    Protocol \s badprotocol \s not \s supported \s or \s disabled \s in \s libcurl |
+    Protocol \s "? badprotocol "? \s not \s supported \s or \s disabled \s in \s libcurl |
     Unsupported \s protocol: \s badprotocol |
-    Rebuilt \s URL \s to: \s badprotocol:\/\/.+
-)$/x, "Reading redirected STDERR" );
+    Rebuilt \s URL \s to: \s badprotocol:\/\/.+ |
+    Closing \s connection \s -1 |
+    Could \s not \s resolve \s host: \s badprotocol |
+    Could \s not \s resolve: \s badprotocol \(Domain \s name \s not \s found\) |
+    Expire \s in \s 0 \s ms \s for \s 6 \s \(transfer \s 0x[0-9a-f]+\) |
+    Uses \s proxy \s env \s variable \s https?_proxy \s == \s '[^']+'
+)$/ix, "Reading redirected STDERR" );
 
 unlink $tempname;

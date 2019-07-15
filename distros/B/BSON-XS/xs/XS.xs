@@ -792,6 +792,13 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         iter_elem_to_bson(&child, sv, opts, stack, depth);
         bson_append_document_end(bson, &child);
       }
+      else if (strEQ(obj_type, "BSON::Array")) {
+        bson_t child;
+
+        bson_append_array_begin(bson, key, -1, &child);
+        av_to_bson (&child, (AV *)SvRV (sv), opts, stack, depth);
+        bson_append_array_end(bson, &child);
+      }
       else if (strEQ(obj_type, "BSON::Raw")) {
         STRLEN str_len;
         SV *encoded;

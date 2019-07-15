@@ -1,5 +1,5 @@
 package Net::Stripe;
-$Net::Stripe::VERSION = '0.36';
+$Net::Stripe::VERSION = '0.37';
 use Moose;
 use Class::Load;
 use Kavorka;
@@ -90,6 +90,14 @@ Charges: {
                                 limit => $limit,
                                 starting_after => $starting_after
                             );
+    }
+
+    method capture_charge(Net::Stripe::Charge|Str :$charge) {
+        if (ref($charge)) {
+            $charge = $charge->id;
+        }
+
+        return $self->_post("charges/$charge/capture");
     }
 
 }
@@ -758,7 +766,7 @@ Net::Stripe - API client for Stripe.com
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -1613,6 +1621,17 @@ Returns a L<Net::Stripe::List> object containing L<Net::Stripe::Invoiceitem> obj
 
   $stripe->get_invoiceitems(customer => 'test', limit => 30);
 
+=head1 WARNING
+
+This SDK is "version agnostic" of the Stripe API
+L<https://github.com/lukec/stripe-perl/issues/80>
+and at the time of this release Stripe has some major changes afoot
+L<https://github.com/lukec/stripe-perl/issues/115>
+
+If you're considering using this please click "Watch" on this github project
+L<https://github.com/lukec/stripe-perl/>
+where discussion on these topics takes place.
+
 =discount_method delete_customer_discount
 
 Deletes a customer-wide discount.
@@ -1653,7 +1672,7 @@ Rusty Conover
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold E. Choroba Florian Heyer Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Rusty Conover Sachin Sebastian Sherrard Burton Slobodan Mišković Tom Eliaz
+=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold E. Choroba Florian Heyer Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Peter Scott Rusty Conover Sachin Sebastian Sherrard Burton Slobodan Mišković Tom Eliaz
 
 =over 4
 
@@ -1712,6 +1731,10 @@ Olaf Alders <olaf@wundersolutions.com>
 =item *
 
 Paul Cochrane <paul@liekut.de>
+
+=item *
+
+Peter Scott <peter@shotgundriver.com>
 
 =item *
 

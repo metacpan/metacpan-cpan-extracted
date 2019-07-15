@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has caption => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::ImageObject - An image file.
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -85,9 +85,9 @@ A caption should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::MediaObject']>
+
+=item C<Str>
 
 =back
 
@@ -101,9 +101,9 @@ A exif_data should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PropertyValue']>
+
+=item C<Str>
 
 =back
 

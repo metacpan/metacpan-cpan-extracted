@@ -1,5 +1,27 @@
                        User-Visible DocKnot Changes
 
+DocKnot 3.01 (2019-07-14)
+
+    docknot dist now also runs make check-cppcheck for Autoconf build
+    systems.
+
+    If the valgrind key is set to true in the package build metadata,
+    docknot dist now also runs make check-valgrind for Autoconf build
+    systems.
+
+    Allow the path to Perl to be configured in App::DocKnot::Dist.  This
+    is used primarily for testing so that we can try building a
+    distribution using Module::Build with the same Perl used to run the
+    test suite.  This is exposed by the module API but (intentially) not
+    exposed on the docknot command line.  Thanks, Slaven Rezic.  (#129958)
+
+    Set user.name and user.email for Git in dist/basic.t test.
+
+    Hopefully fix tests on Windows via more correct use of File::Temp
+    objects: be clear about using the file name instead of the file
+    descriptor, and delete the file by letting the File::Temp object go
+    out of scope.
+
 DocKnot 3.00 (2019-06-29)
 
     Separate configuration parsing into a new App::DocKnot::Config module,

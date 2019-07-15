@@ -13,7 +13,7 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Class::XSAccessor 1.18
@@ -46,7 +46,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 SYNOPSIS
 
@@ -67,15 +67,15 @@ were generated automatically from the following sources:
 
 =over
 
-=item L<http://schema.org/version/3.5/ext-meta.rdf>
+=item L<https://schema.org/version/3.8/ext-auto.rdf>
 
-=item L<http://schema.org/version/3.5/ext-health-lifesci.rdf>
+=item L<https://schema.org/version/3.8/ext-bib.rdf>
 
-=item L<http://schema.org/version/3.5/ext-auto.rdf>
+=item L<https://schema.org/version/3.8/ext-health-lifesci.rdf>
 
-=item L<http://schema.org/version/3.5/ext-bib.rdf>
+=item L<https://schema.org/version/3.8/ext-meta.rdf>
 
-=item L<http://schema.org/version/3.5/schema.rdf>
+=item L<https://schema.org/version/3.8/schema.rdf>
 
 =back
 
@@ -83,7 +83,7 @@ were generated automatically from the following sources:
 
 =head2 C<id>
 
-If this is set, it adds a C<@id> to the L<MooX::JSON_LD/"json_ld">.
+If this is set, it adds a C<@id> to the L</json_ld_data>.
 
 =head2 C<context>
 

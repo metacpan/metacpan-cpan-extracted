@@ -3,6 +3,7 @@ BCM2835/hipiapplied.patch
 BCM2835/src/aclocal.m4
 BCM2835/src/AUTHORS
 BCM2835/src/ChangeLog
+BCM2835/src/compile
 BCM2835/src/config.guess
 BCM2835/src/config.h.in
 BCM2835/src/config.sub
@@ -21,6 +22,9 @@ BCM2835/src/examples/input/input.c
 BCM2835/src/examples/pwm/pwm.c
 BCM2835/src/examples/spi/spi.c
 BCM2835/src/examples/spin/spin.c
+BCM2835/src/examples/spiram/spiram.c
+BCM2835/src/examples/spiram/spiram.h
+BCM2835/src/examples/spiram/spiram_test.c
 BCM2835/src/INSTALL
 BCM2835/src/install-sh
 BCM2835/src/ltmain.sh
@@ -44,8 +48,6 @@ lib/HiPi/BCM2835/I2C.pm
 lib/HiPi/BCM2835/Pin.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-META.yml
 mylib/include/compat.h
 mylib/include/local-i2c-dev.h
 mylib/include/ppport.h
@@ -54,3 +56,5 @@ t/000-load.t
 t/001-gpio.t
 t/003-i2c.t
 typemap
+META.yml
+META.json

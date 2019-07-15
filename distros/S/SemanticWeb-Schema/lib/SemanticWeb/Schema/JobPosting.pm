@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has base_salary => (
@@ -46,6 +46,14 @@ has employment_type => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'employmentType',
+);
+
+
+
+has estimated_salary => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'estimatedSalary',
 );
 
 
@@ -194,7 +202,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -212,11 +220,11 @@ A base_salary should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =item C<Num>
-
-=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
 
 =back
 
@@ -258,6 +266,27 @@ A employment_type should be one of the following types:
 =over
 
 =item C<Str>
+
+=back
+
+=head2 C<estimated_salary>
+
+C<estimatedSalary>
+
+An estimated salary for a job posting or occupation, based on a variety of
+variables including, but not limited to industry, job title, and location.
+Estimated salaries are often computed by outside organizations rather than
+the hiring organization, who may not have committed to the estimated value.
+
+A estimated_salary should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmountDistribution']>
+
+=item C<Num>
 
 =back
 
@@ -359,13 +388,20 @@ A job_location should be one of the following types:
 
 C<occupationalCategory>
 
-Category or categories describing the job. Use BLS O*NET-SOC taxonomy:
-http://www.onetcenter.org/taxonomy.html. Ideally includes textual label and
-formal code, with the property repeated for each applicable value.
+=for html A category describing the job, preferably using a term from a taxonomy such
+as <a href="http://www.onetcenter.org/taxonomy.html">BLS O*NET-SOC</a>, <a
+href="https://www.ilo.org/public/english/bureau/stat/isco/isco08/">ISCO-08<
+/a> or similar, with the property repeated for each applicable value.
+Ideally the taxonomy should be identified, and both the textual label and
+formal code for the category should be provided.<br/><br/> Note: for
+historical reasons, any textual label and formal code provided as a literal
+may be assumed to be from O*NET-SOC.
 
 A occupational_category should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::CategoryCode']>
 
 =item C<Str>
 

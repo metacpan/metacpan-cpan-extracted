@@ -64,6 +64,31 @@ use constant _TYPE_DESCRIPTION => {
     incorrectResponse     => 'Response received didn’t match the challenge’s requirements',
 };
 
+=head1 ACCESSORS
+
+=over
+
+=item * C<detail>
+
+=item * C<instance>
+
+=item * C<status>
+
+=item * C<title>
+
+=item * C<type> - defaults to C<about:blank>
+
+=item * C<description> - text description of the C<type>
+
+=item * C<subproblems> - list of subproblem objects
+
+=item * C<to_string> - human-readable description of the error
+(including subproblems)
+
+=back
+
+=cut
+
 sub type {
     my ($self) = @_;
 

@@ -1,0 +1,25 @@
+Capabilities.xs
+Changes
+lib/Linux/Capabilities.pm
+lib/Linux/Capabilities.pod
+Makefile.PL
+MANIFEST			This list of files
+src/Capabilities.cc
+src/Capabilities.h
+src/CapErrors.cc
+src/CapErrors.h
+src/CapFlags.cc
+src/CapFlags.h
+src/util.cc
+src/util.h
+t/00-use.t
+t/01-constants.t
+t/02-constructor.t
+t/03-is_supported.t
+t/04-get_text.t
+t/05-get_value(_flag).t
+t/06-raise.t
+t/07-drop.t
+t/08-get_all.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -53,8 +53,8 @@
             "schema:MusicPlaylist"
          ],
          "schema:rangeIncludes" : [
-            "schema:MusicRecording",
-            "schema:ItemList"
+            "schema:ItemList",
+            "schema:MusicRecording"
          ]
       },
       "schema:tracks" : {
@@ -62,8 +62,8 @@
          "rdfs:comment" : "A music recording (track)&#x2014;usually a single song.",
          "rdfs:label" : "tracks",
          "schema:domainIncludes" : [
-            "schema:MusicPlaylist",
-            "schema:MusicGroup"
+            "schema:MusicGroup",
+            "schema:MusicPlaylist"
          ],
          "schema:rangeIncludes" : "schema:MusicRecording",
          "schema:supersededBy" : "schema:track"

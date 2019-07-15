@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -73,8 +73,9 @@ my %translation = (
 	64 => 'Weichenstörung',
 	65 => 'Erdrutsch',
 	66 => 'Hochwasser',
-	70 => 'Kein WLAN',
+	70 => 'WLAN nicht verfügbar',
 	71 => 'WLAN in einzelnen Wagen nicht verfügbar',
+	72 => 'Info/Entertainment nicht verfügbar',
 	73 => 'Mehrzweckabteil vorne',
 	74 => 'Mehrzweckabteil hinten',
 	75 => '1. Klasse vorne',
@@ -83,16 +84,16 @@ my %translation = (
 	79 => 'Ohne Mehrzweckabteil',
 	80 => 'Abweichende Wagenreihung',
 	82 => 'Mehrere Wagen fehlen',
-	83 => 'Fehlender Zugteil',
-	84 => 'Zug verkehrt richtig gereiht',                       # r 80 82 83 85
+	83 => 'Störung der fahrzeuggebundenen Einstiegshilfe',
+	84 => 'Zug verkehrt richtig gereiht',                       # r 80 82 85
 	85 => 'Ein Wagen fehlt',
 	86 => 'Keine Reservierungsanzeige',
 	87 => 'Einzelne Wagen ohne Reservierungsanzeige',
 	88 => 'Keine Qualitätsmängel',  # r 80 82 83 85 86 87 90 91 92 93 96 97 98
 	89 => 'Reservierungen sind wieder vorhanden',                     # -> 86 87
-	90 => 'Kein Bordrestaurant/Bordbistro',
-	91 => 'Eingeschränkte Fahrradmitnahme',
-	92 => 'Klimaanlage in einzelnen Wagen ausgefallen',
+	90 => 'Kein gastronomisches Angebot',
+	91 => 'Keine Fahrradbeförderung',
+	92 => 'Eingeschränkte Fahrradbeförderung',
 	93 => 'Fehlende oder gestörte behindertengerechte Einrichtung',
 	94 => 'Ersatzbewirtschaftung',
 	95 => 'Ohne behindertengerechtes WC',
@@ -762,7 +763,7 @@ sub superseded_messages {
 	my ( $self, $msg ) = @_;
 
 	my %superseded = (
-		84 => [ 80, 82, 83, 85 ],
+		84 => [ 80, 82, 85 ],
 		88 => [ 80, 82, 83, 85, 86, 87, 90, 91, 92, 93, 96, 97, 98 ],
 		89 => [ 86, 87 ],
 		96 => [97],
@@ -813,7 +814,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 DESCRIPTION
 
@@ -1312,11 +1313,13 @@ Source: correlation between IRIS and DB RIS (bahn.de).
 
 Source: correlation between IRIS and DB RIS (bahn.de).
 
-=item q 70 : "Kein WLAN"
+=item q 70 : "WLAN nicht verfE<uuml>gbar"
 
 Source: correlation between IRIS and DB RIS (bahn.de).
 
 =item q 71 : "WLAN in einzelnen Wagen nicht verfE<uuml>gbar"
+
+=item q 72 : "Info/Entertainment nicht verfE<uuml>gbar"
 
 =item q 73 : "Mehrzweckabteil vorne"
 
@@ -1350,13 +1353,11 @@ Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
 
 Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
 
-=item q 83 : "Fehlender Zugteil"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
+=item q 83 : "StE<ouml>rung der fahrzeuggebundenen Einstiegshilfe"
 
 =item q 84 : "Zug verkehrt richtig gereiht"
 
-Obsoletes messages 80, 82, 83, 85.
+Obsoletes messages 80, 82, 85.
 Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
 
 =item q 85 : "Ein Wagen fehlt"
@@ -1381,22 +1382,13 @@ Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
 Obsoletes messages 86, 87.
 Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
 
-=item q 90 : "Kein Bordrestaurant/Bordbistro"
+=item q 90 : "Kein gastronomisches Angebot"
 
 Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
 
-=item q 91 : "EingeschrE<auml>nkte Fahrradmitnahme"
+=item q 91 : "EingeschrE<auml>nkte FahrradbefE<ouml>rderung"
 
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-Might also mean "Keine Fahrradmitnahme" (source: frubi).
-
-=item q 92 : "Klimaanlage in einzelnen Wagen ausgefallen"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-Might also mean "Rollstuhlgerechtes WC in einem Wagen ausgefallen"
-(source: frubi).
+=item q 92 : "Keine FahrradbefE<ouml>rderung"
 
 =item q 93 : "Fehlende oder gestE<ouml>rte behindertengerechte Einrichtung"
 

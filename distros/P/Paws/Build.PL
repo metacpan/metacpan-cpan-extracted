@@ -84,7 +84,7 @@ EOW
         "Jose Luis Martinez <jlmartinez\@capside.com>"
       ],
       "dist_name" => "Paws",
-      "dist_version" => "0.40",
+      "dist_version" => "0.41",
       "license" => "apache",
       "module_name" => "Paws",
       "recommends" => {
@@ -108,7 +108,6 @@ EOW
         "Moose" => 0,
         "MooseX::ClassAttribute" => 0,
         "MooseX::Getopt" => 0,
-        "Net::Amazon::Signature::V3" => 0,
         "Net::Amazon::Signature::V4" => 0,
         "Path::Tiny" => "0.017",
         "String::CRC32" => 0,

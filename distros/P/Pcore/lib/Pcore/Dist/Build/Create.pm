@@ -2,7 +2,7 @@ package Pcore::Dist::Build::Create;
 
 use Pcore -class, -res;
 use Pcore::Dist;
-use Pcore::Util::File::Tree;
+use Pcore::Lib::File::Tree;
 use Pcore::API::SCM::Const qw[:ALL];
 use Pcore::API::SCM;
 use Pcore::API::SCM::Upstream;
@@ -65,7 +65,7 @@ sub run ($self) {
     }
 
     # copy files
-    my $files = Pcore::Util::File::Tree->new;
+    my $files = Pcore::Lib::File::Tree->new;
 
     my $tmpl_cfg = $ENV->{share}->read_cfg('/Pcore/dist-tmpl/cfg.ini');
 

@@ -2,7 +2,7 @@ NAME
     BSON - BSON serialization and deserialization
 
 VERSION
-    version v1.10.2
+    version v1.12.0
 
 SYNOPSIS
         use BSON;
@@ -483,7 +483,7 @@ CONTRIBUTORS
     *   Oleg Kostyuk <cub@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
+    This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
 
     This is free software, licensed under:
 

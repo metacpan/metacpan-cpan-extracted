@@ -15,20 +15,21 @@ goto endofperl
 undef @rem;
 ######################################################################
 #
-# japerl - JPerl-again Perl (glocalization scripting environment)
+# App::japerl - JPerl-again Perl glocalization scripting environment
 #
-# http://search.cpan.org/dist/japerl/
+# https://metacpan.org/release/App-japerl
 #
-# Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 $VERSION = $VERSION;
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use FindBin;
+
 use 5.00503;
 use strict;
-$^W = 1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 # configuration of this software
 %_ = (
@@ -200,7 +201,7 @@ __END__
 
 =head1 NAME
 
-japerl - JPerl-again Perl glocalization scripting environment
+App::japerl - JPerl-again Perl glocalization scripting environment
 
 =head1 SYNOPSIS
 

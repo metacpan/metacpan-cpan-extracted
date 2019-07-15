@@ -1,12 +1,13 @@
 package DBD::PgPPSjis;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 use DBI;
 use Carp ();
 use IO::Socket ();
 
 use vars qw($VERSION);
-$VERSION = '0.0801004';
+$VERSION = '0.0801006';
 $VERSION = $VERSION;
 my $BUFFER_LEN = 1500;
 my $DEBUG;

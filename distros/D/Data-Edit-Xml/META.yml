@@ -15,7 +15,7 @@ name: Data-Edit-Xml
 provides:
   Data::Edit::Xml:
     file: lib/Data/Edit/Xml.pm
-    version: '20190708'
+    version: '20190714'
   ditaSyntaxDiagramFromDocBookCmdSynopsis:
     file: lib/Data/Edit/Xml.pm
 requires:
@@ -29,5 +29,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190708'
+version: '20190714'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

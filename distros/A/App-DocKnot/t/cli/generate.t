@@ -27,27 +27,30 @@ BEGIN { use_ok('App::DocKnot::Command') }
 my $docknot = App::DocKnot::Command->new();
 isa_ok($docknot, 'App::DocKnot::Command');
 
+# Create a temporary directory for test output.
+my $tempdir = File::Temp->newdir();
+
 # Generate the package README file to a temporary file, read it into memory,
 # and compare it to the actual README file.  This duplicates part of the
-# generate/self.t test, but via the command-line parser.
-#
-# Always apply a CRLF conversion layer (which should be harmless on UNIX) to
-# ensure correct behavior on Windows, where we should have automatically
-# converted newlines to CRLF when writing.
-my $tempdir     = File::Temp->newdir();
-my $output_path = File::Temp->new(DIR => $tempdir);
-$docknot->run('generate', 'readme', $output_path);
-my $output = slurp('<:crlf', $output_path);
-is_file_contents($output, 'README', 'Generated README from argument list');
-unlink($output_path);
+# generate/self.t test, but via the command-line parser.  Do this in a
+# separate block so that $tempfile goes out of scope and will be cleaned up.
+{
+    my $tempfile    = File::Temp->new(DIR => $tempdir);
+    my $output_path = $tempfile->filename;
+    $docknot->run('generate', 'readme', $output_path);
+    my $output = slurp($output_path);
+    is_file_contents($output, 'README', 'Generated README from argument list');
+}
 
-# Do the same thing again, but using arguments from @ARGV.  Be sure to
-# stringify $output_path, or slurp() will try to read from the file descriptor
-# instead of the path and just get end of file.
-local @ARGV = ('generate', 'readme-md', $output_path);
-$docknot->run();
-$output = slurp('<:crlf', "$output_path");
-is_file_contents($output, 'README.md', 'Generated README.md from ARGV');
+# Do the same thing again, but using arguments from @ARGV.
+{
+    my $tempfile    = File::Temp->new(DIR => $tempdir);
+    my $output_path = $tempfile->filename;
+    local @ARGV = ('generate', 'readme-md', "$output_path");
+    $docknot->run();
+    my $output = slurp($output_path);
+    is_file_contents($output, 'README.md', 'Generated README.md from ARGV');
+}
 
 # Save the paths to various files in the source directory.
 my $readme_path    = File::Spec->catfile(getcwd(), 'README');
@@ -58,14 +61,14 @@ my $metadata_path  = File::Spec->catfile(getcwd(), 'docs', 'metadata');
 my $tmpdir = File::Temp->newdir();
 chdir($tmpdir);
 $docknot->run('generate-all', '-m', $metadata_path);
-$output = slurp('<:crlf', 'README');
+my $output = slurp('README');
 is_file_contents($output, $readme_path, 'README from generate_all');
-$output = slurp('<:crlf', 'README.md');
+$output = slurp('README.md');
 is_file_contents($output, $readme_md_path, 'README.md from generate_all');
 
 # Ensure that generate works with a default argument.
 $docknot->run('generate', '-m', $metadata_path, 'readme');
-$output = slurp('<:crlf', 'README');
+$output = slurp('README');
 is_file_contents($output, $readme_path, 'README from generate default args');
 
 # Allow cleanup to delete our temporary directory.

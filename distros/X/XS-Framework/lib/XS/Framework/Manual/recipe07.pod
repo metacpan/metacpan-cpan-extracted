@@ -1,0 +1,290 @@
+=head1 NAME
+
+XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+
+=cut
+
+=head1 C3 mixin introduction
+
+Let's assume there is a Server with core functions defined in basic class.
+
+    package MyBase {
+        sub new {
+            my $class = shift;
+            return bless {} => $class;
+        };
+        sub on_client {
+            my ($self, $client) = @_;
+            print "MyBase::on_client\n";
+            if ($client->{status} eq 'authorized'){ $client->{send} = '[welcome]' }
+            elsif ($client->{status} eq 'not_authorized') { $client->{send} = '[disconnect]' };
+        }
+    }
+
+The package is responsible for constructing object and send to client either
+C<[welcome]> string upon successful login and C<[disconnect]> upon login falure.
+It is desirable to have dedicated logging and authorizing components.
+
+    package MyLogger {
+        use base qw/MyBase/;    # (1)
+
+        sub new {
+            my $class = shift;
+            my $obj = $class->next::method(@_) // {};   # (2)
+            return bless $obj => $class;
+        }
+        sub on_client {
+            my ($self, $client) = @_;
+            print "MyLogger::on_client\n";  # (3)
+            print "client ", $client->{id}, ", status = ", $client->{status}, "\n";
+            $self->next::method($client);   # (4)
+            print "client ", $client->{id}, ", status = ", $client->{status}, "\n";
+        }
+    }
+
+    package MyAuth {
+        use base qw/MyBase/;    # (5)
+
+        sub new {
+            my $class = shift;
+            my $obj = $class->next::method(@_) // {};   # (6)
+            return bless $obj => $class;
+        }
+        sub on_client {
+            my ($self, $client) = @_;
+            print "MyAuth::on_client\n";    # (7)
+            if ($client->{id} < 0) { $client->{status} = 'not_authorized'; }
+            else { $client->{status} = 'authorized'; }
+            $self->next::method($client);   # (8)
+        }
+    };
+
+C<MyBase> class is used as interface; I B<have to define> it's interface method
+(C<on_client> in our case), which might be empty. The C<MyLogger> and C<MyAuth>
+are designed as plugins, which might intercept/proxy method of base class. To
+be sure that some basic implementation is still exist I<beyond> them, they
+do inrerit from C<MyBase> (1), (5).
+
+As with classical inheritance in Perl, the code should be aware of derived
+classes in (2) and (6), but as the subroutines do nothing here they can be
+omitted. The lines (3), (4), (7) are inserted for trace purposes.
+
+There might be different policies how to forward to next method: in C<MyLogger>
+it mimics C<around> like in L<Class::Method::Modifiers>, but it is possible
+to have C<before> and C<after>.
+
+The real magic happens in C<next::method> (4) and (8): the plugins forwards
+call either to base class C<MyBase> or to next plugin. This is not known
+at the place of invocation and it is defined at place, where plug-ins are
+inherited, i.e. in the I<gather point>:
+
+    package MyXServer {
+        use base qw/MyLogger MyAuth MyBase/;    # (9)
+        sub new {
+            my $class = shift;
+            my $obj = $class->next::method(@_) // {};
+            return bless $obj => $class;
+        }
+    };
+
+In (9) it is said that C<MyLogger> plugin's interceptors are executed first,
+then C<MyAuth> interceptors are executed, and only then the generic (may be
+empty) methods of C<MyBase> will be executed. C3/mro resolves multiple
+inheritance problem, i.e. linearizes inheritance tree from most specific
+(child) to the most generic (parent) classes.
+
+The sample code
+
+    my $client = {status => 'connected', id => 10};
+    my $server = MyXServer->new;
+    $server->on_client($client);
+
+will output
+
+    MyLogger::on_client
+    client 10, status = connected
+    MyAuth::on_client
+    MyBase::on_client
+    client 10, status = authorized
+
+i.e. it works as expected.
+
+=head1 C3 mixin using XS::Framework
+
+Let's have this mixin logic in XS. The underlying idea is to have independent
+C++ classes, which have very fast implementation, which will be bound into
+XS-hierarchy. It is important to note, that C++ classes do not form hierarchy
+- it is created only on XS level.
+
+Let's suppose that there are the following C++ classes:
+
+    enum class Status07 { CONNECTED = 1, AUTHORIZED = 2, NOT_AUTHORIZED = 3, DISCONNECTED = 4 };
+
+    struct Client07 {
+        int id;
+        Status07 status;
+
+        Client07 (int id_): id{id_}, status{Status07::CONNECTED } {}
+        void disconnect() {
+            std::cout << "disconnecting " << id << "\n";
+            status = Status07::DISCONNECTED;
+        }
+        void welcome() {
+            std::cout << "[sending] welcome dear client " << id << "\n";
+        }
+    };
+
+    struct ServerBase07 {
+        void on_client(Client07* c) {
+            if (c->status == Status07::AUTHORIZED) c->welcome();
+            if (c->status == Status07::NOT_AUTHORIZED) c->disconnect();
+        }
+    };
+
+    struct LoggerPlugin07 {
+        void on_client(Client07* c) { std::cout << "client " << c->id << ", status: "  << (int) c->status << "\n"; }
+    };
+
+    struct AuthorizerPlugin07 {
+        void on_client(Client07* c) {
+            c->status = (c->id < 0) ? Status07::NOT_AUTHORIZED : Status07::AUTHORIZED;
+        }
+    };
+
+The typemaps for them will be rather trivial:
+
+    namespace xs {
+        template <>
+        struct Typemap<Client07*> : TypemapObject<Client07*, Client07*, ObjectTypePtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::Client07"; }
+        };
+
+        template <>
+        struct Typemap<ServerBase07*> : TypemapObject<ServerBase07*, ServerBase07*, ObjectTypePtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::ServerBase07"; }
+        };
+
+        template <>
+        struct Typemap<LoggerPlugin07*> : TypemapObject<LoggerPlugin07*, LoggerPlugin07*, ObjectTypePtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::LoggerPlugin07"; }
+        };
+
+        template <>
+        struct Typemap<AuthorizerPlugin07*> : TypemapObject<AuthorizerPlugin07*, AuthorizerPlugin07*, ObjectTypePtr, ObjectStorageMG> {
+            static std::string package () { return "MyTest::Cookbook::AuthorizerPlugin07"; }
+        };
+    }
+
+The only moment worth noting is that storage policy should be C<ObjectStorageMG>.
+This is needed for the XS-adapters, described below, to allow I<more than one
+pointer> for C++ class be stored (associated) with the same Perl SV*.
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::Client07
+    PROTOTYPES: DISABLE
+
+    void Client07::disconnect()
+
+    void Client07::welcome()
+
+    Client07* Client07::new(int id)
+
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::ServerBase07
+    PROTOTYPES: DISABLE
+
+    void ServerBase07::on_client(Client07* c)
+
+    ServerBase07* ServerBase07::new()
+
+The xs-adapter for C<Client07> is shown here only for completeness; the
+C<ServerBase07> xs-adapter just proxies C<on_client> call to C++ class,
+so no any special handling is needed here.
+
+With the mixins/plugins the xs-adapter code is slightly different:
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::LoggerPlugin07
+    PROTOTYPES: DISABLE
+
+    void LoggerPlugin07::on_client(Client07* c) {
+        THIS->on_client(c);         // (10)
+        Object(ST(0)).call_next(cv, &ST(1), items-1);   // (11)
+        THIS->on_client(c);     // (12)
+    }
+
+    LoggerPlugin07* LoggerPlugin07::new (...) {
+        PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), items-1); // (13)
+        if (!PROTO.defined()) XSRETURN_UNDEF;   // (14)
+        RETVAL = new LoggerPlugin07();  // (15)
+    }
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::AuthorizerPlugin07
+    PROTOTYPES: DISABLE
+
+    void AuthorizerPlugin07::on_client(Client07* c) {
+        THIS->on_client(c); // (16)
+        Object(ST(0)).call_next(cv, &ST(1), items-1);   // (17)
+    }
+
+    AuthorizerPlugin07* AuthorizerPlugin07::new (...) {
+        PROTO = Stash::from_name(CLASS).call_next(cv, &ST(1), items-1); // (18)
+        if (!PROTO.defined()) XSRETURN_UNDEF;   // (19)
+        RETVAL = new AuthorizerPlugin07();      // (20)
+    }
+
+As with C<ServerBase07> the C<LoggerPlugin07> and C<AuthorizerPlugin07> should
+forward call (10), (16) to underlying C++ class to actual job. Then C<on_client>
+call should be forwarded to the next implementation (11), (17); this is similar
+to the C<next::method> calls in (4) and (8) in pure Perl implementation above.
+It actually forwards all arguments with which the xs-adapter was invoked. The
+line (12) is needed as we know, that client object might be changed after
+processing in further pipeline.
+
+Let's explain constructor: the lines (13)..(15) and (18)..(19) are similar to
+the pure Perl plugins constructor (2) and (6). Do not be confused with variable
+name C<PROTO>. Actually it is equal not to class name; instead it already
+contains blessed Perl SV* with pointer to C<ServerBase07> C++ class. According
+to C<TypemapObject::out> mechanics, if the C<hint> ( = C<PROTO> in the context)
+parameter is blessed Perl SV*, it will return the same SV* with the additional
+pointer (C<LoggerPlugin07> or C<AuthorizerPlugin07> in the context) attached
+to it.
+
+    MODULE = MyTest                PACKAGE = MyTest::Cookbook::Server07
+    PROTOTYPES: DISABLE
+
+    BOOT {
+        auto stash = Stash(__PACKAGE__, GV_ADD);    // (21)
+        stash.inherit("MyTest::Cookbook::LoggerPlugin07");
+        stash.inherit("MyTest::Cookbook::AuthorizerPlugin07");
+        stash.inherit("MyTest::Cookbook::ServerBase07");
+    }
+
+As in corresponding pure Perl code (9) the resulting final class just
+enumerates the ancestor classes in the correct order. The C<GV_ADD> (21)
+is needed to register the xs-adapter class in perl interpreter to let
+it be known.
+
+For the sample test code
+
+    my $client2 = MyTest::Cookbook::Client07->new(10);
+    my $server2 = MyTest::Cookbook::Server07->new;
+    $server2->on_client($client2);
+
+the output is
+
+    client 10, status: 1
+    [sending] welcome dear client 10
+    client 10, status: 2
+
+i.e. it works as expected.
+
+The short summary: Perl offers powerful C3 inheritance mechanism, which is not
+available in C++. It is still possible to use the best from the two worlds:
+the flexibilty of Perl's mro-dispatching and fast C++ implementation.
+
+
+=head2 SEE ALSO
+
+L<Class::C3>
+
+L<mro>
+

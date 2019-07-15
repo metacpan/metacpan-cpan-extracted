@@ -2,7 +2,7 @@
    "class" : {
       "dc:source" : "schemadotorgsources:source_bibex",
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A part of a successively published publication such as a periodical or multi-volume work, often numbered. It may represent a time span, such as a year.<br/><br/>\n\n<pre><code>  &lt;br/&gt;&lt;br/&gt;See also &lt;a href=\"http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.html\"&gt;blog post&lt;/a&gt;.\n</code></pre>\n",
+      "rdfs:comment" : "A part of a successively published publication such as a periodical or multi-volume work, often numbered. It may represent a time span, such as a year.<br/><br/>\n\nSee also <a href=\"http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.html\">blog post</a>.",
       "rdfs:label" : "PublicationVolume",
       "rdfs:subClassOf" : "schema:CreativeWork"
    },
@@ -31,14 +31,14 @@
          "rdfs:comment" : "The page on which the work starts; for example \"135\" or \"xiii\".",
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
-            "schema:PublicationVolume",
             "schema:PublicationIssue",
-            "schema:Chapter",
-            "schema:Article"
+            "schema:Article",
+            "schema:PublicationVolume",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pagination" : {
@@ -50,8 +50,8 @@
          "schema:domainIncludes" : [
             "schema:PublicationVolume",
             "schema:Article",
-            "schema:Chapter",
-            "schema:PublicationIssue"
+            "schema:PublicationIssue",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -64,8 +64,8 @@
          "rdfs:subPropertyOf" : "schema:position",
          "schema:domainIncludes" : "schema:PublicationVolume",
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       }
    }

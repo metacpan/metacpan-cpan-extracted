@@ -24,7 +24,7 @@ __PACKAGE__->create_accessors( qw(
     _hipi_baseaddr peripheral address _function_mode _clock_divider _baud_reference readmode
 ));
 
-our $VERSION ='0.63';
+our $VERSION ='0.64';
 
 our @EXPORT = ();
 our @EXPORT_OK = ();

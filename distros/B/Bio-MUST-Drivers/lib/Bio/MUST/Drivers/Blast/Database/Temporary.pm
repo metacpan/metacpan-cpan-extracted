@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database::Temporary;
 # ABSTRACT: Internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.181160';
+$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
@@ -9,6 +9,7 @@ use feature qw(say);
 
 use Carp;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 
 extends 'Bio::MUST::Core::Ali::Temporary';
@@ -24,6 +25,10 @@ sub remote {
 sub BUILD {
     my $self = shift;
 
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Blast')->new;
+       $app->meet();
+
     my $in = $self->filename;
     my $dbtype = $self->type;
 
@@ -35,7 +40,7 @@ sub BUILD {
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
         # TODO: do something to abort construction
-        carp "Warning: cannot execute $pgm command; returning!";
+        carp "[BMD] Warning: cannot execute $pgm command; returning!";
         return;
     }
 
@@ -66,7 +71,7 @@ Bio::MUST::Drivers::Blast::Database::Temporary - Internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

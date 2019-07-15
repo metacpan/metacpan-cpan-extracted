@@ -48,9 +48,9 @@
             "schema:Vehicle"
          ],
          "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
             "schema:URL",
-            "schema:Text",
-            "schema:QualitativeValue"
+            "schema:Text"
          ]
       },
       "schema:torque" : {

@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Exonerate::Aligned;
 # ABSTRACT: Bio::MUST driver for running the exonerate alignment program
-$Bio::MUST::Drivers::Exonerate::Aligned::VERSION = '0.181160';
+$Bio::MUST::Drivers::Exonerate::Aligned::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
@@ -8,11 +8,12 @@ use autodie;
 use feature qw(say switch);
 use experimental qw(smartmatch);        # to suppress warnings about 'when'
 
-use Smart::Comments '###';
+# use Smart::Comments '###';
 
 use Carp;
 use Const::Fast;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 
 use Bio::MUST::Core;
@@ -72,6 +73,10 @@ has $_ . '_seq' => (
 sub BUILD {
     my $self = shift;
 
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Exonerate')->new;
+       $app->meet();
+
     # build temp Ali file for input DNA seq
     my $dna = Ali->new(
         seqs => [ $self->dna_seq ],
@@ -94,17 +99,18 @@ sub BUILD {
 
     # check that everything ran fine
     unless ( $self->query_seq->seq_len ) {
-        carp 'Warning: exonerate could not align seqs; returning empty seqs!';
+        carp '[BMD] Warning: exonerate could not align seqs;'
+            . ' returning empty seqs!';
         ### dnafile: join q{}, "\n", file($dnafile)->slurp
         ### pepfile: join q{}, "\n", file($pepfile)->slurp
     }
     elsif  ( $self->query_seq->seq_len != $self->target_seq->seq_len ) {
-        carp 'Warning: query and target seqs not of same length!';
+        carp '[BMD] Warning: query and target seqs not of same length!';
         ### dnafile: join q{}, "\n", file($dnafile)->slurp
         ### pepfile: join q{}, "\n", file($pepfile)->slurp
     }
     elsif  ( $self->spliced_seq->seq_len != 3 * $self->target_seq->seq_len ) {
-        carp 'Warning: DNA and protein target seqs not of same length!';
+        carp '[BMD] Warning: DNA and protein target seqs not of same length!';
         ### dnafile: join q{}, "\n", file($dnafile)->slurp
         ### pepfile: join q{}, "\n", file($pepfile)->slurp
     }
@@ -163,15 +169,16 @@ sub _exonerate {
         # try to robustly execute exonerate
         my $ret_code = system( [ 0, 1, 127, 139 ], $cmd);
         if ($ret_code == 127) {
-            carp "Warning: cannot execute $pgm command; returning nothing!";
+            carp "[BMD] Warning: cannot execute $pgm command;"
+                . ' returning nothing!';
             return;     # This will likely crash calling code but that's OK.
         }
         if ($ret_code == 139) {
-            carp "Warning: $pgm crashed; skipping model: $model!";
+            carp "[BMD] Warning: $pgm crashed; skipping model: $model!";
             # do nothing more to leave loop with accurate $hsp_n
         }
         if ($ret_code == 1) {
-            carp "Warning: $pgm crashed because of a bad nt seq!";
+            carp "[BMD] Warning: $pgm crashed because of a bad nt seq!";
             return $outfile_for{$model};
         }
         # TODO: try to bypass shell (need for absolute path to executable then)
@@ -187,7 +194,8 @@ sub _exonerate {
     # if no HSP then better model was tried and finally failed
     # thus switch back to lesser model (with > 1 HSPs)
     if ($hsp_n == 0) {
-        carp "Warning: cannot get only one HSP from $pgm; returning first one!";
+        carp "[BMD] Warning: cannot get only one HSP from $pgm;"
+            . ' returning first one!';
         ($return, $remove) = ($remove, $return);
     }
 
@@ -462,7 +470,7 @@ Bio::MUST::Drivers::Exonerate::Aligned - Bio::MUST driver for running the exoner
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

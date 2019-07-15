@@ -12,8 +12,8 @@
          "rdfs:comment" : "If applicable, a description of the pathophysiology associated with the anatomical system, including potential abnormal changes in the mechanical, physical, and biochemical functions of the system.",
          "rdfs:label" : "associatedPathophysiology",
          "schema:domainIncludes" : [
-            "schema:SuperficialAnatomy",
             "schema:AnatomicalStructure",
+            "schema:SuperficialAnatomy",
             "schema:AnatomicalSystem"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
@@ -26,8 +26,8 @@
          "schema:domainIncludes" : "schema:AnatomicalSystem",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AnatomicalSystem",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
          ]
       },
       "schema:relatedCondition" : {
@@ -35,8 +35,8 @@
          "rdfs:comment" : "A medical condition associated with this anatomy.",
          "rdfs:label" : "relatedCondition",
          "schema:domainIncludes" : [
-            "schema:AnatomicalSystem",
             "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem",
             "schema:SuperficialAnatomy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
@@ -55,9 +55,9 @@
          "rdfs:comment" : "A medical therapy related to this anatomy.",
          "rdfs:label" : "relatedTherapy",
          "schema:domainIncludes" : [
-            "schema:AnatomicalSystem",
             "schema:SuperficialAnatomy",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalTherapy"

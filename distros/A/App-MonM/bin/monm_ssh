@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+use strict; # $Id: monm_ssh 80 2019-07-08 10:41:47Z abalama $
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+monm_ssh - SSH checker for App::MonM
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    monm_ssh [ --port=PORTNUMBER ] [-t SECS] HOST
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-P PORTNUMBER, --port=PORTNUMBER>
+
+Port number
+
+Default: 22
+
+=item B<-t SECT, --timeout=SECS>
+
+Timeout value, secs
+
+Default: 60
+
+=back
+
+=head1 DESCRIPTION
+
+SSH checker for App::MonM
+
+=head1 DEPENDENCES
+
+L<Net::Telnet>
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Net::Telnet;
+use Try::Tiny;
+
+use App::MonM::Const qw/
+        IS_TTY SCREENWIDTH
+        OK DONE ERROR SKIPPED PASSED FAILED UNKNOWN PROBLEM
+    /;
+
+use constant {
+    HOST        => "localhost",
+    PORT        => 22,
+    TIMEOUT     => 60,
+};
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+my $options = {};
+Getopt::Long::Configure("bundling");
+GetOptions($options,
+    # Information
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+
+    # General
+    "port|P=i",                 # Port
+    "timeout|time|t=i",         # Timeout
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+
+my $host        = shift(@ARGV) || HOST;
+my $port        = $options->{port} || PORT;
+my $timeout     = $options->{timeout} || TIMEOUT;
+
+my $err = '';
+try {
+    my $t = new Net::Telnet(
+        Timeout => $timeout,
+        Host    => $host,
+        Port    => $port,
+    );
+    my $banner = $t->getline;
+    if ($banner && $banner =~ /SSH/i) {
+        # OK
+    } else {
+        $err = $banner || sprintf("Host %s not reachable on port %s", $host, $port);
+    }
+}
+catch {
+    $err = $_;
+};
+
+if ($err) { 
+    print STDERR $err, "\n";
+    print ERROR, "\n";
+    exit 1;
+}
+
+print OK, "\n";
+exit 0;
+
+__END__

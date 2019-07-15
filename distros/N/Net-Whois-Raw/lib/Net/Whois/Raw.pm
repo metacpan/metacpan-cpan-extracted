@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99021';
+$Net::Whois::Raw::VERSION = '2.99022';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -73,7 +73,9 @@ sub whois {
         } elsif ($which_whois eq 'QRY_LAST' || !defined($which_whois)) {
             $res_text = $res->[-1]->{text};
             $res_srv  = $res->[-1]->{srv};
-        }
+        } elsif ($which_whois eq 'QRY_ALL') {
+            return $res;
+        }  
     }
     else {
         ($res_text, $res_srv) = get_whois($dom, $server, $which_whois);
@@ -479,7 +481,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99021
+version 2.99022
 
 =head1 SYNOPSIS
 
@@ -717,7 +719,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2018 by Alexander Nalobin.
+This software is copyright (c) 2002-2019 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

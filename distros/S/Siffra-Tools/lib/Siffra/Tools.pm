@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.13';
+    $VERSION = '0.14';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -475,7 +475,7 @@ sub parseCSV()
             after_parse => sub {
 
                 # Limpar os espaços em branco no começo e no final de cada campo.
-                map { $_ ? ( s/^\s+|\s+$//g ) : $_ } @{ $_[ 1 ] };
+                map { defined $_ ? ( ( $_ =~ /^\s+$/ ) ? ( $_ = undef ) : ( s/^\s+|\s+$//g ) ) : undef } @{ $_[ 1 ] };
             },
 
             #error => sub {

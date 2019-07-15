@@ -7,6 +7,11 @@ sub EXT_view_router : Extend('Ext.Mixin') {
     return {
         config => { routerConfig => undef, },
 
+        # routerConfig => {
+        #     items => [],
+        #     lazyItems => \0,
+        # },
+
         mixinConfig => {
             configs => \1,
             after   => { initialize => 'initialize', },
@@ -16,6 +21,25 @@ sub EXT_view_router : Extend('Ext.Mixin') {
 
             // init config
             if (!this.getRouterConfig()) this.setRouterConfig({});
+
+            var me = this,
+                routerConfig = this.getRouterConfig();
+
+            if (routerConfig.items) {
+                let session = this.getViewModel().get('session');
+
+                routerConfig.itemsIdx = {};
+
+                routerConfig.items.forEach(function (item) {
+                    if (session.hasPermissions(item.permissions)) {
+                        if (!routerConfig.defaultRoute) routerConfig.defaultRoute = item.reference;
+
+                        routerConfig.itemsIdx[item.reference] = item;
+
+                        if (!routerConfig.lazyItems) me.add(item);
+                    }
+                });
+            }
 
             this.on({
                 scope: this,
@@ -42,14 +66,20 @@ JS
         redirectToDefaultRoute => func <<~'JS',
             var routerConfig = this.getRouterConfig();
 
-            this.redirectTo(routerConfig.routePath + routerConfig.defaultRoute, {replace: true});
+            this.redirectTo(routerConfig.routePath + this.getDefaultRoute(), {replace: true});
 JS
 
         redirectToLastRoute => func <<~'JS',
             var routerConfig = this.getRouterConfig();
 
-            this.redirectTo(routerConfig.routePath + (routerConfig.lastRoute || routerConfig.defaultRoute), {replace: true});
-        JS
+            this.redirectTo(routerConfig.routePath + (routerConfig.lastRoute || this.getDefaultRoute()), {replace: true});
+JS
+
+        getDefaultRoute => func <<~'JS',
+            var routerConfig = this.getRouterConfig();
+
+            return routerConfig.defaultRoute || this.getAt(0).getReference();
+JS
 
         processRoute => func [ 'routes', 'path' ], <<~'JS',
             var routerConfig = this.getRouterConfig(),
@@ -66,33 +96,13 @@ JS
             }
 
             // has routers config specified
-            else if (routerConfig.routes) {
+            else if (routerConfig.itemsIdx) {
 
                 // route is known
-                if (routerConfig.routes[route]) {
-                    var xtype,
-                        permissions,
-                        routeConfig = routerConfig.routes[route],
-                        session = this.getViewModel().get('session');
+                if (routerConfig.itemsIdx[route]) {
 
-                    // find route permissions
-                    if (Ext.isObject(routeConfig)) {
-                        xtype = routeConfig.xtype;
-                        permissions = routeConfig.permissions;
-                    }
-                    else {
-                        xtype = routeConfig;
-                    }
-
-                    // permissions is OK
-                    if (session.hasPermissions(permissions)) {
-
-                        // find or create view
-                        routeView = this.lookup(route) || this.add({
-                            xtype: xtype,
-                            reference: route
-                        });
-                    }
+                    // find or create view
+                    routeView = this.lookup(route) || this.add(routerConfig.itemsIdx[route]);
                 }
             }
 
@@ -183,6 +193,39 @@ JS
             this.setLazyItems(lazyItems);
 
             this.removeAll(false, true);
+JS
+    };
+}
+
+sub EXT_upload : Extend('Ext.Mixin') {
+    return {
+        uploadStatusText => {
+            new       => l10n('New'),
+            starting  => l10n('Starting'),
+            hash      => l10n('Calculating checksum'),
+            uploading => l10n('Uploading'),
+            cancelled => l10n('Cancelled'),
+            error     => l10n('Error'),
+            done      => l10n('Done'),
+        },
+
+        getUploadStatusText => func [ 'status', 'reason' ], <<~'JS',
+            var text = this.uploadStatusText[status];
+
+            if (reason) text += ': ' + reason;
+
+            return text;
+JS
+
+        getUploadStatusTextProgress => func [ 'status', 'reason', 'progress' ], <<~'JS',
+            var text = this.getUploadStatusText(status, reason);
+
+            if (progress !== undefined) {
+                return text + ' ' + Math.round(progress * 100) + '%';
+            }
+            else {
+                return text;
+            }
 JS
     };
 }

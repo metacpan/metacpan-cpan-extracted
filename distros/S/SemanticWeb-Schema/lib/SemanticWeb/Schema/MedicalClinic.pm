@@ -6,7 +6,7 @@ package SemanticWeb::Schema::MedicalClinic;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::MedicalOrganization SemanticWeb::Schema::MedicalBusiness /;
+extends qw/ SemanticWeb::Schema::MedicalBusiness SemanticWeb::Schema::MedicalOrganization /;
 
 
 use MooX::JSON_LD 'MedicalClinic';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.1';
+our $VERSION = 'v3.8.1';
 
 
 has available_service => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MedicalClinic - A facility
 
 =head1 VERSION
 
-version v3.5.1
+version v3.8.1
 
 =head1 DESCRIPTION
 
@@ -70,11 +70,11 @@ A available_service should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::MedicalTherapy']>
+=item C<InstanceOf['SemanticWeb::Schema::MedicalProcedure']>
 
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTest']>
 
-=item C<InstanceOf['SemanticWeb::Schema::MedicalProcedure']>
+=item C<InstanceOf['SemanticWeb::Schema::MedicalTherapy']>
 
 =back
 
@@ -94,7 +94,7 @@ A medical_specialty should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::MedicalBusiness>
+L<SemanticWeb::Schema::MedicalOrganization>
 
 =head1 SOURCE
 

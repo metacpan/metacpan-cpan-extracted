@@ -33,14 +33,17 @@ subclass of L<Net::ACME2::Challenge>.
 
 =head1 METHODS
 
-=head2 I<OBJ>->create_handler( KEY_AUTHZ, DOCROOT )
+=head2 I<OBJ>->create_handler( $ACME_OR_AUTHZ, $DOCROOT )
 
 Creates a file in the given DOCROOT that will, if served up normally,
 satisfy ACME’s requirements for this challenge. The return value is
 an object that, when DESTROYed, will remove that file.
 
-(KEY_AUTHZ is the return of the L<Net::ACME2> instance’s
-C<make_key_authorization()> method.)
+$ACME_OR_AUTHZ is normally a L<Net::ACME2> instance that will be used to
+compute I<OBJ>’s key authorization. If you already have this authorization
+(i.e., via I<OBJ>’s C<make_key_authorization()> method) you may submit
+that instead. (Only that key authorization was accepted prior to version
+0.28 of this distribution.)
 
 This can simplify the authorization process
 if you’re on the same server as all of the authorization object’s
@@ -49,18 +52,28 @@ identifiers’ HTTP document roots.
 =cut
 
 sub create_handler {
-    my ($self, $key_authorization, $docroot) = @_;
+    my ($self, $acme_or_key_authz, $docroot) = @_;
 
-    die 'need key authz!' if !$key_authorization;
+    die 'need Net::ACME2 object or key authz!' if !$acme_or_key_authz;
+
     die 'need docroot!' if !length $docroot;
 
-    my $class = (ref $self) . '::Handler';
+    my $class = __PACKAGE__ . '::Handler';
 
-    require Module::Load;
-    Module::Load::load($class);
+    require Module::Runtime;
+    Module::Runtime::use_module($class);
+
+    my $key_authz;
+
+    if (ref $acme_or_key_authz) {
+        $key_authz = $acme_or_key_authz->make_key_authorization($self);
+    }
+    else {
+        $key_authz = $acme_or_key_authz;
+    }
 
     return $class->new(
-        key_authorization => $key_authorization,
+        key_authorization => $key_authz,
         challenge => $self,
         document_root => $docroot,
     );

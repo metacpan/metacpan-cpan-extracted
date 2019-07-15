@@ -26,7 +26,7 @@ sub EXT_L10N : Name('Ext.L10N') {
             },
         },
 
-        getCurrentLocale => func [], <<'JS',
+        getCurrentLocale => func <<'JS',
             return this.currentLocale;
 JS
 
@@ -238,8 +238,7 @@ JS
 # override sorter serializer
 sub EXT_override_util_Sorter : Override('Ext.util.Sorter') {
     return {
-        serialize => func [],
-        <<'JS',
+        serialize => func <<'JS',
             return [this.getProperty(), this.getDirection()];
 JS
     };
@@ -264,12 +263,15 @@ sub EXT_override_data_proxy_Direct : Override('Ext.data.proxy.Direct') {
 # add methods for work with pcore response object
 sub EXT_override_data_operation_Operation : Override('Ext.data.operation.Operation') {
     return {
-        toRes => func [],
-        <<'JS',
+        toString => func <<'JS',
+            return this.getStatus() + ' ' + this.getReason();
+JS
+
+        toRes => func <<'JS',
             return APP.getApplication().api.res([this.getStatus(), this.getReason()]);
 JS
 
-        getStatus => func [], <<'JS',
+        getStatus => func <<'JS',
             if (this.hasException()) {
                 var error = this.getError();
 
@@ -285,7 +287,7 @@ JS
             }
 JS
 
-        getReason => func [], <<'JS',
+        getReason => func <<'JS',
             if (this.hasException()) {
                 return this.getErrorReason();
             } else {
@@ -293,7 +295,7 @@ JS
             }
 JS
 
-        getErrorReason => func [], <<'JS',
+        getErrorReason => func <<'JS',
             var error = this.getError();
 
             if (Ext.typeOf(error) == 'object') {
@@ -303,7 +305,7 @@ JS
             }
 JS
 
-        getFormErrors => func [], <<'JS',
+        getFormErrors => func <<'JS',
             var error = this.getError();
 
             if (Ext.typeOf(error) == 'object' && Ext.typeOf(error.error) == 'object') {
@@ -318,8 +320,11 @@ JS
 # add methods for work with pcore response object
 sub EXT_override_direct_Event : Override('Ext.direct.Event') {
     return {
-        getStatus => func [],
-        <<'JS',
+        toString => func <<'JS',
+            return this.getStatus() + ' ' + this.getReason();
+JS
+
+        getStatus => func <<'JS',
             var error = this.message;
 
             if (error) {
@@ -335,7 +340,7 @@ sub EXT_override_direct_Event : Override('Ext.direct.Event') {
             }
 JS
 
-        getReason => func [], <<'JS',
+        getReason => func <<'JS',
             if (this.message) {
                 return this.getErrorReason();
             } else {
@@ -343,7 +348,7 @@ JS
             }
 JS
 
-        getErrorReason => func [], <<'JS',
+        getErrorReason => func <<'JS',
             var error = this.message;
 
             if (Ext.typeOf(error) == 'object') {
@@ -353,7 +358,7 @@ JS
             }
 JS
 
-        getFormErrors => func [], <<'JS',
+        getFormErrors => func <<'JS',
             var error = this.message;
 
             if (Ext.typeOf(error) == 'object' && Ext.typeOf(error.error) == 'object') {

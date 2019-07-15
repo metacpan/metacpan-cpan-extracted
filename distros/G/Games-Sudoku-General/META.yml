@@ -4,8 +4,10 @@ author:
   - 'Tom Wyant (wyant at cpan dot org)'
 build_requires:
   Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +21,7 @@ no_index:
 provides:
   Games::Sudoku::General:
     file: lib/Games/Sudoku/General.pm
-    version: '0.022'
+    version: '0.023'
 requires:
   Carp: '0'
   constant: '0'
@@ -30,5 +32,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Games-Sudoku-General.git
-version: '0.022'
+version: '0.023'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

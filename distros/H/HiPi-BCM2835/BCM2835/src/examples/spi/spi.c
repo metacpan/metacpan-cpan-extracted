@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
     if (!bcm2835_spi_begin())
     {
-      printf("bcm2835_spi_begin failedg. Are you running as root??\n");
+      printf("bcm2835_spi_begin failed. Are you running as root??\n");
       return 1;
     }
     bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);      // The default

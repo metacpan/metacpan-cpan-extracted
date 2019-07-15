@@ -104,7 +104,11 @@ for my $t (@alg_key) {
 
                 my $tos = $acme->get_terms_of_service();
 
-                is( $tos, $SERVER_OBJ->TOS_URL(), 'get_terms_of_service' );
+                is( $tos, $SERVER_OBJ->TOS_URL(), 'get_terms_of_service() as instance method' );
+
+                $tos = (ref $acme)->get_terms_of_service();
+
+                is( $tos, $SERVER_OBJ->TOS_URL(), 'get_terms_of_service() as class method' );
 
                 #----------------------------------------------------------------------
 

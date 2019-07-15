@@ -4,7 +4,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -26,6 +26,11 @@
             "Test::More" : "0.88"
          }
       },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -39,7 +44,7 @@
    "provides" : {
       "Games::Sudoku::General" : {
          "file" : "lib/Games/Sudoku/General.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -57,6 +62,6 @@
          "web" : "https://github.com/trwyant/perl-Games-Sudoku-General"
       }
    },
-   "version" : "0.022",
-   "x_serialization_backend" : "JSON::PP version 4.01"
+   "version" : "0.023",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

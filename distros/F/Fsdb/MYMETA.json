@@ -47,6 +47,6 @@
    "release_status" : "stable",
    "version" : "1.14",
    "x_installdirs" : "site",
-   "x_serialization_backend" : "JSON::PP version 2.94",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_version_from" : "lib/Fsdb.pm"
 }

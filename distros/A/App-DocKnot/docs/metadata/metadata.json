@@ -1,6 +1,6 @@
 {
     "name": "DocKnot",
-    "version": "3.00",
+    "version": "3.01",
     "synopsis": "package documentation generator",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [

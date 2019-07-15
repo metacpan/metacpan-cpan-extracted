@@ -303,7 +303,7 @@ when getting capabilities set by get_all, every flag can be either CAP_SET(1) or
 
 =head1 AUTHOR
 
-Nichiporenko Vasily <v.nichiporenko@crazypanda.ru>, Crazy Panda
+Nichiporenko Vasily <v.nichiporenko@crazypanda.ru>
 
 =head1 LICENSE
 

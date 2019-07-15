@@ -1,14 +1,17 @@
 package Bio::MUST::Drivers::Cap3;
 # ABSTRACT: Bio::MUST driver for running the CAP3 assembly program
-$Bio::MUST::Drivers::Cap3::VERSION = '0.181160';
+$Bio::MUST::Drivers::Cap3::VERSION = '0.191910';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
+# use Smart::Comments;
+
 use Carp;
 use IPC::System::Simple qw(system);
+use Module::Runtime qw(use_module);
 use Path::Class qw(file);
 use Tie::IxHash;
 
@@ -19,6 +22,14 @@ use Bio::MUST::Core::Constants qw(:files);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::SeqId';
 
+use Bio::MUST::Drivers::Utils qw(stringify_args);
+
+
+has 'cap3_args' => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    default  => sub { {} },
+);
 
 has '_contig_seq_ids' => (
     traits   => ['Hash'],
@@ -59,6 +70,10 @@ has '_singlets' => (
 sub BUILD {
     my $self = shift;
 
+    # provision executable
+    my $app = use_module('Bio::MUST::Provision::Cap3')->new;
+       $app->meet();
+
     # setup output files
     my $infile   = $self->filename;
     my $basename = $infile . '.cap';
@@ -66,14 +81,20 @@ sub BUILD {
     my $outfile_contigs  = $basename . '.contigs';
     my $outfile_singlets = $basename . '.singlets';
 
+    # format CAP3 (optional) arguments
+    my $args = $self->cap3_args;
+    my $args_str = stringify_args($args);
+
     # create CAP3 command
     my $pgm = 'cap3';
-    my $cmd = "$pgm $infile > $outfile 2> /dev/null";
+    my $cmd = "$pgm $infile $args_str > $outfile 2> /dev/null";
+    #### $cmd
 
     # try to robustly execute CAP3
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp "Cannot execute $pgm command; returning without contigs!";
+        carp "[BMD] Warning: cannot execute $pgm command;"
+            . ' returning without contigs!';
         return;
     }
     # TODO: try to bypass shell (need for absolute path to executable then)
@@ -126,7 +147,7 @@ sub BUILD {
 
         # capture next contig id
         if ($line =~ m{\A \*+ \s+ (Contig\s+\d+) \s+ \*+}xms) {
-            $contig_id = $1;
+            ($contig_id = $1) =~ tr/ //d;
         }
 
         # capture fragment ids for current contig...
@@ -175,7 +196,7 @@ Bio::MUST::Drivers::Cap3 - Bio::MUST driver for running the CAP3 assembly progra
 
 =head1 VERSION
 
-version 0.181160
+version 0.191910
 
 =head1 SYNOPSIS
 

@@ -18,6 +18,7 @@ share/Hoenn.yaml
 share/Johto.yaml
 share/Kanto.yaml
 share/LV.yaml
+share/MeCab.sh
 share/Relations.yaml
 share/Sinnoh.yaml
 share/Skill.yaml
@@ -26,5 +27,6 @@ t/01_relations.t
 t/02_skills.t
 t/03_pokemon.t
 t/04_IV.t
+t/05_mecab.t
 META.yml
 MANIFEST

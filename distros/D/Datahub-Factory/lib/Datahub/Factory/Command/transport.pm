@@ -2,7 +2,7 @@ package Datahub::Factory::Command::transport;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use parent 'Datahub::Factory::Cmd';
 
@@ -112,14 +112,14 @@ sub execute {
 
         $counter++;
 
+        $item_id = data_at($options->{'id_path'}, $item);
+        $item_id //= 'Undefined ID';
+
         # We use an extra try/catch block here to catch non-fatal errors. If we
         # didn't, errors thrown by the Catmandu modules would be caught by the
         # catch block in CLI.pm and break the processing. Errors caused by
         # dirty data should skip the processing of a particular record.
         if (try {
-            $item_id = data_at($options->{'id_path'}, $item);
-            $item_id //= 'Undefined ID';
-
             $fix_module = $condition->fix_module($fixers, $item);
             $fix_module->fixer->fix($item);
             $export_module->add($item);
@@ -133,13 +133,13 @@ sub execute {
             # Determine if we should skip, or halt the processing entirely.
             # Depends on the type of Exception which bubbles up.
             if (is_instance $_, 'Catmandu::BadVal') {
-                $msg = sprintf('Item #%d (counted): could not execute fix: %s', $counter, $error);
+                $msg = sprintf('Item #%d (counted): %s (id): could not execute fix: %s', $counter, $item_id, $error);
                 $self->error($msg);
                 $logger->error($msg);
                 return 1;
             }
             elsif (is_instance $_, 'Datahub::Factory::InvalidCondition') {
-                $msg = sprintf('Item #%d (counted): %s', $counter, $error);
+                $msg = sprintf('Item #%d (counted): %s (id): %s', $counter, $item_id, $error);
                 $self->error($msg);
                 $logger->error($msg);
                 return 1;
@@ -166,7 +166,7 @@ sub execute {
                 if (!defined($error)) {
                     $error = $_->response_body;
                 }
-                $msg = sprintf('Item %d (counted): %s', $counter, $error);
+                $msg = sprintf('Item %d (counted): %s (id): %s', $counter, $item_id, $error);
                 $self->error($msg);
                 $logger->fatal($error);
                 return 1;
@@ -174,7 +174,8 @@ sub execute {
             else {
                 # Catmandu modules produce a wide variety of exceptions. This
                 # block catches them, but doesn't halt the processing entirely.
-                $logger->error($error);
+                $msg = sprintf('Item %d (counted): %s (id): %s', $counter, $item_id, $error);
+                $logger->error($msg);
                 $self->error($error);
                 return 1;
             }

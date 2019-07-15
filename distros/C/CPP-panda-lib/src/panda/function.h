@@ -1,13 +1,10 @@
 #pragma once
-
 #include <utility>
 #include <panda/refcnt.h>
 #include "function_utils.h"
 
 namespace panda {
 
-using panda::shared_ptr;
-using panda::make_shared;
 using std::remove_reference;
 
 template <typename Ret, typename... Args>
@@ -16,7 +13,7 @@ class function;
 template <typename Ret, typename... Args>
 class function {
 public:
-    using Func = shared_ptr<Ifunction<Ret, Args...>>;
+    using Func = iptr<Ifunction<Ret, Args...>>;
     Func func;
 
 public:
@@ -24,16 +21,14 @@ public:
     function(std::nullptr_t){}
 
     template <typename Derr>
-    function(const shared_ptr<Derr>& f) : func(f) {}
+    function(const iptr<Derr>& f) : func(f) {}
 
     template<typename... F,
-             typename = decltype(make_abstract_function<Ret, Args...>(std::declval<F>()...)),
+             typename = decltype(function_details::make_abstract_function<Ret, Args...>(std::declval<F>()...)),
              typename = typename std::enable_if<!std::is_constructible<function, F...>::value>::type>
     function(F&&... f)
-        : func(make_abstract_function<Ret, Args...>(std::forward<F>(f)...))
+        : func(function_details::make_abstract_function<Ret, Args...>(std::forward<F>(f)...))
     {}
-
-
 
     function(Func func) : func(func) {};
 
@@ -44,10 +39,16 @@ public:
     function& operator=(function&& oth) = default;
 
     Ret operator ()(Args... args) const {return func->operator ()(std::forward<Args>(args)...);}
-    bool operator ==(const function& oth) const {
+
+    template <typename ORet, typename... OArgs,
+              typename = typename std::enable_if<std::is_convertible<function<ORet, OArgs...>, function>::value>::type>
+    bool operator ==(const function<ORet, OArgs...>& oth) const {
         return (func && func->equals(oth.func.get())) || (!func && !oth.func);
     }
-    bool operator !=(const function& oth) const {return !operator ==(oth);}
+
+    template <typename ORet, typename... OArgs,
+              typename = typename std::enable_if<std::is_convertible<function<ORet, OArgs...>, function>::value>::type>
+    bool operator !=(const function<ORet, OArgs...>& oth) const {return !operator ==(oth);}
 
     bool operator ==(const Ifunction<Ret, Args...>& oth) const {
         return func && func->equals(&oth);
@@ -68,7 +69,7 @@ public:
 };
 
 template <class Class, typename Ret, typename... Args>
-inline function<Ret( Args...)> make_function(Ret (Class::*meth)(Args...), shared_ptr<Class> thiz = nullptr) {
+inline function<Ret( Args...)> make_function(Ret (Class::*meth)(Args...), iptr<Class> thiz = nullptr) {
     return function<Ret(Args...)>(meth, thiz);
 }
 

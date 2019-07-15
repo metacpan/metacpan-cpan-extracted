@@ -1,7 +1,19 @@
 package App::japerl;
+######################################################################
+#
+# App::japerl - JPerl-again Perl glocalization scripting environment
+#
+# https://metacpan.org/release/App-japerl
+#
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+######################################################################
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 $VERSION = $VERSION;
+
+use 5.00503;
+use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 1;
 
@@ -11,7 +23,7 @@ __END__
 
 =head1 NAME
 
-japerl - JPerl-again Perl glocalization scripting environment
+App::japerl - JPerl-again Perl glocalization scripting environment
 
 =head1 SYNOPSIS
 

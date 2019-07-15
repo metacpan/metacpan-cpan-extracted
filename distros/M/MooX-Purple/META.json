@@ -38,11 +38,11 @@
             "Moo" : "2.003004",
             "MooX::LazierAttributes" : "1.07008",
             "MooX::ValidateSubs" : "1.012004",
-            "perl" : "5.006"
+            "perl" : "5.018"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

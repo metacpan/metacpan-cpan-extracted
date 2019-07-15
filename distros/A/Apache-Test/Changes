@@ -6,6 +6,32 @@ Changes - Apache::Test change logfile
 
 =over 3
 
+=item 1.41 Jul 11 2019
+
+Set DefaultStateDir for > 2.5.1 and add -t_state to override. [jorton]
+
+Inherit config via IncludeOptional as well as Include. [jorton]
+
+Increase size of MinSpare, MaxSpare and MaxClients to improve httpd test
+framework runs with worker and preform MPMs. [rjung]
+
+Changed the openssl version detection to work with other *SSL libraries.
+[icing]
+
+Switch test framework from using Net::SSL for
+raw TLS sockets to IO::Socket::SSL. [rjung]
+
+Fix mod_ssl tests under OpenSSL 1.1.1 / TLSv1.3. [jorton]
+
+Add cwd to generated lib path in TEST script since Perl >=5.26 don't
+do that any more. [jorton]
+
+Override loglevel to trace8 if running in 2.4. [covener]
+
+Allow an empty PREFIX. [sf]
+
+Add need_min_apache_fix(). [covener]
+
 =item 1.40 Sep 6 2016
 
 Specify licence (Apache 2.0) in META.yml. [Steve Hay, CPAN RT#111359]

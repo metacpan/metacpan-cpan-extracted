@@ -5,10 +5,11 @@ use Config;
 use Cwd qw/getcwd abs_path/;
 use Exporter 'import';
 use ExtUtils::MakeMaker;
+use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.2.4';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -20,11 +21,12 @@ if ($0 =~ /Makefile.PL$/) {
 }
 
 my $xs_mask  = '*.xs';
-my $xsi_mask = '*.xsi';
 my $c_mask   = '*.c *.cc *.cpp *.cxx';
 my $h_mask   = '*.h *.hh *.hpp *.hxx';
 my $map_mask = '*.map';
 my $win32    = $^O eq 'MSWin32';
+my $linux    = $^O eq 'linux';
+my $freebsd  = $^O eq 'freebsd';
 
 sub write_makefile {
     _require_makemaker();
@@ -50,7 +52,7 @@ sub makemaker_args {
     process_REQUIRES($params);    
     process_BIN_DEPS($params);
     process_PARSE_XS($params);
-    process_module_binary($params);
+    process_binary($params);
     process_PM($params);
     process_PAYLOAD($params);
     process_CLIB($params);
@@ -95,6 +97,10 @@ sub pre_process {
         $params->{CC} = $comp;
     }
     
+    if (my $opt = $ENV{OPTIMIZE}) {
+        $params->{OPTIMIZE} = $opt;
+    }
+    
     canonize_array_split($params->{TYPEMAPS});
     canonize_array_split($params->{PARSE_XS});
     
@@ -103,13 +109,7 @@ sub pre_process {
         BIN_DEPENDENT => $module_info->{BIN_DEPENDENT},
         SHARED_LIBS   => [],
         SELF_INC      => $params->{INC} || '',
-        ALL_C         => [],
     };
-
-    if (!defined $params->{H_DEPS} or $params->{H_DEPS}) {
-        my $make = $ENV{MAKE} || $Config{make};
-        $params->{H_DEPS} = ($make eq 'gmake') || ($^O eq 'freebsd' or $^O eq 'linux');
-    }
 }
 
 sub process_FROM {
@@ -276,27 +276,13 @@ sub process_PARSE_XS { # inject ParseXS plugins into xsubpp
     push @{$params->{postamble}}, "XSUBPPRUN = \$(PERLRUN) -Ilib $inc \$(XSUBPP)";
 }
 
-sub process_module_binary {
+sub process_binary {
     my $params = shift;
 
     $params->{XS}  ||= $params->{_XSTEST} ? [] : [_scan_files($xs_mask)];
-    $params->{H}   ||= $params->{_XSTEST} ? [] : [_scan_files($h_mask)];
     $params->{C}   ||= $params->{_XSTEST} ? [] : [_scan_files($c_mask)];
-    $params->{XSI} ||= $params->{_XSTEST} ? [] : [_scan_files($xsi_mask)];
     
-    process_binary($params);
-    
-    _string_merge($params->{XSOPT}, '-C++') if $params->{CPLUS};
-    
-    $params->{clean}{FILES} .= ' $(O_FILES)';
-    
-    push @{$params->{MODULE_INFO}{ALL_C}}, @{$params->{C}};
-}
-
-sub process_binary {
-    my $params = shift;
     canonize_array_split($params->{SRC});
-    my $cext = $params->{CPLUS} ? 'cc' : 'c';
     
     if (ref($params->{XS}) ne 'HASH') {
         canonize_array_files($params->{XS});
@@ -305,34 +291,47 @@ sub process_binary {
 
     foreach my $xsfile (keys %{$params->{XS}}, map { _scan_files($xs_mask, $_) } @{$params->{SRC}}) {
         next if $params->{XS}{$xsfile};
+        my $cext = $params->{CPLUS} ? 'cc' : 'c';
         my $cfile = $xsfile;
         $cfile =~ s/\.xs$/.xs.$cext/ or next;
         $params->{XS}{$xsfile} = $cfile;
 
         my $suffix = $cfile;
         $suffix =~ s/^[^.]+//;
+        
+        my $xsi_deps = XS::Install::Deps::find_xsi_deps([$xsfile])->{$xsfile} || [];
 
-        push @{$params->{postamble}}, "$cfile : $xsfile \$(FIRST_MAKEFILE)\n".
+        push @{$params->{postamble}}, "$cfile : $xsfile @$xsi_deps \$(FIRST_MAKEFILE)\n".
             "\t\$(XSUBPPRUN) \$(XSPROTOARG) \$(XSUBPPARGS) -csuffix $suffix \$(XSUBPP_EXTRA_ARGS) $xsfile > ${xsfile}c\n".
             "\t\$(MV) ${xsfile}c $cfile";
     }
-
-    canonize_array_files($params->{XSI});
-    push @{$params->{XSI}}, _scan_files($xsi_mask, $_) for @{$params->{SRC}};
-    _uniq_list($params->{XSI});
-    
-    canonize_array_files($params->{H});
-    push @{$params->{H}}, _scan_files($h_mask, $_) for @{$params->{SRC}};
-    _uniq_list($params->{H});
 
     canonize_array_files($params->{C});
     push @{$params->{C}}, values %{$params->{XS}};
     push @{$params->{C}}, _scan_files($c_mask, $_) for @{$params->{SRC}};
     _uniq_list($params->{C});
     
+    my $cdeps = XS::Install::Deps::find_header_deps({
+        files   => $params->{C},
+        headers => ['./'],
+        inc     => [map { s/^-I//; $_ } split(' ', $params->{MODULE_INFO}{SELF_INC})],
+    });
+    
     canonize_array_files($params->{OBJECT});
-    push @{$params->{OBJECT}}, c2obj_file($_) for @{$params->{C}};
+    foreach my $cfile (@{$params->{C}}) {
+        my $ofile = c2obj_file($cfile);
+        push @{$params->{OBJECT}}, $ofile;
+        
+        my $deps = $cdeps->{$cfile};
+        if ($deps && @$deps) {
+            push @{$params->{postamble}},
+                "$ofile : @$deps";
+        }
+    }
     _uniq_list($params->{OBJECT});
+    delete $params->{H}; # prevent MM from making O_FILES depend on all H_FILES
+    
+    $params->{clean}{FILES} .= ' $(O_FILES)';
 }
 
 sub process_CLIB {
@@ -452,7 +451,8 @@ sub process_CPLUS {
         
     $params->{CC} = _get_cplusplus($params->{CC}, $cppv);
     $params->{LD} ||= '$(CC)';
-        
+    _string_merge($params->{XSOPT}, '-C++');
+    
     # prevent C++ from compile errors on perls <= 5.18, as perl had buggy <perl.h> prior to 5.20
     _string_merge($params->{CCFLAGS}, "-Wno-reserved-user-defined-literal -Wno-literal-suffix -Wno-unknown-warning-option") if $^V < v5.20;
 }
@@ -461,6 +461,7 @@ sub process_CCFLAGS {
     my $params = shift;
     _string_merge($params->{CCFLAGS}, '-o $@');
     $params->{CCFLAGS} = "$Config{ccflags} $params->{CCFLAGS}" if $params->{CCFLAGS};
+    _string_merge($params->{CCFLAGS}, '-Wno-unused-parameter') if $win32; # on Strawberry's mingw PERL_UNUSED_DECL doesn't work
 }
 
 sub process_LD {
@@ -508,14 +509,16 @@ sub process_test {
         XSOPT     => string_merge($params->{XSOPT}, $tp->{XSOPT}),
         LIBS      => $params->{LIBS},
         MAKEFILE  => 'Makefile.test',
-        OPTIMIZE  => merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE}),
+        OPTIMIZE  => merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE}, $ENV{TEST_OPTIMIZE}),
         PARSE_XS  => $tp->{PARSE_XS} || $params->{PARSE_XS},
         XS        => {},
         NO_MYMETA => 1,
         _XSTEST   => 1,
     );
     
-    my $cmd = '@$(MAKE) --no-print-directory -f Makefile.test';
+    my $make_params = '';
+    $make_params .= ' --no-print-directory' if $linux;
+    my $cmd = "\@\$(MAKE)$make_params -f Makefile.test";
     
     push @{$params->{postamble}},
         '# --- XS::Install tests compilation section',
@@ -540,19 +543,8 @@ sub post_process {
     my $postamble = $params->{postamble};
     my $mi = $params->{MODULE_INFO};
     
-    if (@{$mi->{ALL_C}} and $params->{H_DEPS}) {
-        my $cmd = "\$(PERL) -M${THIS_MODULE}::Util -e '${THIS_MODULE}::Util::cmd_check_dependencies()' \$(OBJ_EXT) $mi->{SELF_INC} \$(C_FILES) -xs \$(XS_FILES)";
-        # for GNU make
-        push @$postamble, "CHECK_DEPS := \$(shell $cmd)";
-        # for BSD make
-        push @$postamble, ".BEGIN : \n".
-            "\t$cmd";
-            
-        delete $params->{H}; # prevent MM from making O_FILES depend on all H_FILES
-    }
-    
     delete @$params{qw/C H OBJECT XS CCFLAGS LDFROM OPTIMIZE XSOPT/} unless has_binary($params);
-    delete @$params{qw/CPLUS PARSE_XS SRC XSI MODULE_INFO H_DEPS _XSTEST/};
+    delete @$params{qw/CPLUS PARSE_XS SRC MODULE_INFO _XSTEST/};
     
     # convert array to hash for postamble
     $params->{postamble} = {};
@@ -728,7 +720,7 @@ sub c2obj_file {
     use Config;
 
     my $gcc_compliant = $Config{cc} =~ /\b(gcc|clang)\b/i ? 1 : 0;
-        
+    
     sub init_methods {
         no warnings 'redefine';
         
@@ -746,6 +738,15 @@ sub c2obj_file {
             
             return join("\n\n", @list);
         };
+        
+        if ($freebsd) { # freebsd's make has a bug: wrong value of $* when building in parallel, we use $< instead
+            *c_o = sub {
+                my $self = shift;
+                my $ret = $self->SUPER::c_o(@_);
+                $ret =~ s/\$\*\.c(c|pp|xx)?[ \t]*$/\$</gism;
+                return $ret;
+            };
+        }
         
         if ($win32) {
             *dynamic_lib = sub {

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::EOLTests 0.19
+# this test was generated with Dist::Zilla::Plugin::EOLTests 0.18
 
 use Test::More 0.88;
 use Test::EOL;

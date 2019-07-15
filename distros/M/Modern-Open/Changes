@@ -1,5 +1,13 @@
 Revision history for this software.
 
+0.09 2019-07-14 00:00:00
+  - fix Extra Issues: has_meta_json
+  - fix Extra Issues: proper_libs
+  - fix Extra Issues: use_warnings
+  - fix Experimental Issues: has_separate_license_file
+  - fix Experimental Issues: meta_yml_has_repository_resource
+  - created by INABA Hitoshi
+
 0.08 2018-08-30 00:00:00
   - support Perl 5.6 or later too
   - support autodie always, without Strict::Perl

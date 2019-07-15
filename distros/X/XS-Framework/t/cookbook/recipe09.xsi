@@ -1,0 +1,130 @@
+MODE: INLINE
+
+#include <vector>
+
+struct Point {
+    double x;
+    double y;
+};
+
+struct ShapeA {
+    size_t point_count() const { return points.size(); }
+    Point& get_point(size_t idx) { return points.at(idx); }
+    void add_point(const Point& pt) { points.push_back(pt); }
+private:
+    std::vector<Point> points;
+};
+
+struct XSShapeA : public ShapeA {
+    void add_label(SV* maybe_label = nullptr) {
+        Sv label = maybe_label ? Sv{maybe_label} : Sv::undef;
+        labels.push_back(Ref::create(maybe_label));
+    }
+    Ref& get_ref(size_t idx) { return labels.at(idx); }
+private:
+    std::vector<Ref> labels;
+};
+
+
+namespace xs {
+    template <>
+    struct Typemap<Point*> : TypemapObject<Point*, Point*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::Point"; }
+    };
+
+    template <typename D>
+    struct Typemap<ShapeA*, D> : TypemapObject<ShapeA*, D, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::Cookbook::ShapeA"; }
+    };
+
+    template <>
+    struct Typemap<XSShapeA*> : Typemap<ShapeA*, XSShapeA*> {
+        static std::string package () { return "MyTest::Cookbook::ShapeB"; }
+    };
+
+}
+
+static xs::Sv::payload_marker_t payload_marker_09{};
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::Point
+PROTOTYPES: DISABLE
+
+double Point::x(SV* new_val = nullptr) : ALIAS(y = 1) {
+    double* val = nullptr;
+    switch(ix) {
+        case 1: val = &THIS->y; break;
+        default: val = &THIS->x; break;
+    }
+    if (new_val) {
+        *val = SvNV(new_val);
+    }
+    RETVAL = *val;
+}
+
+Point* Point::new(double x = 0, double y = 0) {
+    RETVAL = new Point{x, y};
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::ShapeA
+PROTOTYPES: DISABLE
+
+size_t ShapeA::point_count()
+
+void ShapeA::get_point(size_t idx) {
+    Object self{ST(0)};
+    Array payload(self.payload(&payload_marker_09).obj);
+
+    auto& pt = THIS->get_point(idx);
+    auto pt_copy = new Point{pt.x, pt.y};
+    auto wrapped_pt = xs::out<>(pt_copy);
+    mXPUSHs(wrapped_pt.detach());
+
+    if (GIMME_V == G_ARRAY) {
+        auto ref = payload.at(idx);
+        Sv value = SvRV(ref);
+        mXPUSHs(value.detach());
+    }
+}
+
+void ShapeA::add_point(Point* pt, SV* maybe_label = nullptr) {
+    THIS->add_point(*pt);
+    Object self{ST(0)};
+    Array payload(self.payload(&payload_marker_09).obj);
+    Sv label = maybe_label ? Sv{maybe_label} : Sv::undef;
+    Sv ref = Ref::create(maybe_label);
+    payload.push(ref);
+}
+
+Sv ShapeA::new() {
+    auto shape = new ShapeA();
+    Object obj = xs::out<>(shape, CLASS);
+    auto payload = Array::create();
+    obj.payload_attach(payload, &payload_marker_09);
+    RETVAL = obj.ref();
+}
+
+MODULE = MyTest::Cookbook                PACKAGE = MyTest::Cookbook::ShapeB
+PROTOTYPES: DISABLE
+
+XSShapeA* XSShapeA::new()
+
+void XSShapeA::add_point(Point* pt, SV* maybe_label = nullptr) {
+    THIS->add_point(*pt);
+    THIS->add_label(maybe_label);
+}
+
+void XSShapeA::get_point(size_t idx) {
+    auto& pt = THIS->get_point(idx);
+    auto pt_copy = new Point{pt.x, pt.y};
+    auto wrapped_pt = xs::out<>(pt_copy);
+    mXPUSHs(wrapped_pt.detach());
+    if (GIMME_V == G_ARRAY) {
+        Sv value = SvRV(THIS->get_ref(idx));
+        mXPUSHs(value.detach());
+    }
+}
+
+BOOT {
+    auto stash = Stash(__PACKAGE__, GV_ADD);
+    stash.inherit("MyTest::Cookbook::ShapeA");
+}

@@ -1,31 +1,51 @@
+1.2.2    15.07.2019
+           - fix compiler warnings
+1.2.1    12.07.2019
+           - add get_global_[tls_]ptr
+           - add PANDA_GLOBAL/TLS_MEMBER[_PTR] macros helpers for creating static members
+             (global or tls) which has the same address across any shared library.
+           - change log level names to camel case (fuck the fucking macros)
+           - fix intrusive_chain size(): now O(1)
+           - CallbackDispatcher: extended callback is now accepted only in add_event_listener
+             to resolve ambiguity with template lambdas when dispatcher.add([](auto...) { });
+1.2.0    25.06.2019
+           - add panda::excepted (expected with strict error checking and exception propagation)
+           - add panda::expected (P0323R7)
+           - add string_view compare operators with const C*
+           - removed panda::shared_ptr, panda::Refcounted (use panda::Refcnt instead)
+           - iptr now uses refcnt_inc/dec/get proxies
+           - dyn_cast is now no-op if classes match
+           - moved to XS::Install
+1.1.4    14.06.2018
+           - fix dll loading for Windows
 1.1.3    18.05.2018
-    - fix tests on older versions of Test::More
-    - allow build back to v5.12.0
+           - fix tests on older versions of Test::More
+           - allow build back to v5.12.0
 1.1.2    08.04.2018
-    - add empty test when building without TEST_FULL
+           - add empty test when building without TEST_FULL
 1.1.1    08.02.2018
-    - std::integer_sequence for old C++ lower than 14
-    - panda::function optimizations
+           - std::integer_sequence for old C++ lower than 14
+           - panda::function optimizations
 1.1.0    06.02.2018
-    - bugfixes and warn fixes in panda::string
-    - move all tests from perl to c++
-    - iptr<> added
+           - bugfixes and warn fixes in panda::string
+           - move all tests from perl to c++
+           - iptr<> added
 1.0.7    17.01.2018
-    - C++14 requirements lowered to C++11
-    - new overloads for endian conversions
+           - C++14 requirements lowered to C++11
+           - new overloads for endian conversions
 1.0.6    12.01.2018
-    - class panda::function - compareble version of std::function
-    - class CallbackDispatcher - implementation of observer pattern
-    - simple logger tools
+           - class panda::function - compareble version of std::function
+           - class CallbackDispatcher - implementation of observer pattern
+           - simple logger tools
 1.0.5    08.09.2017
-    - string::append now can use COW in case of empty string
+           - string::append now can use COW in case of empty string
 1.0.4    07.05.2017
-    - shared_ptr::operator bool is explicit now
+           - shared_ptr::operator bool is explicit now
 1.0.3    16.05.2017
-    - fix default pos value for find_last_of, find_last_not_of
+           - fix default pos value for find_last_of, find_last_not_of
 1.0.2    16.05.2017
-    - bugfix for stoX group of functions in case of no pos argument
+           - bugfix for stoX group of functions in case of no pos argument
 1.0.1    15.05.2017
-    - do not bootstrap so library (no XS code inside), it will be loaded automatically because of "-l" linker flag
+           - do not bootstrap so library (no XS code inside), it will be loaded automatically because of "-l" linker flag
 1.0.0    11.05.2017
-    - C++ code moved from Panda::Lib
+           - C++ code moved from Panda::Lib

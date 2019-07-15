@@ -1,5 +1,11 @@
 Revision history for Datahub-Factory
 
+1.75  2019-07-15 17:09:34 CEST
+
+    - Fixed: Error output for Solr indexer without Perl errors.
+    - Added: missing Catmandu::DBI dependency
+    - Fixed: all errors now prefixed with item_id for improved logging. 
+
 1.74  2018-09-03 14:11:03 CEST
 
     - Added: Datahub::Factory::FixFileNotFound error.

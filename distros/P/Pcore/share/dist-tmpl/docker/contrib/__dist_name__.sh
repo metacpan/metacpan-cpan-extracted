@@ -25,6 +25,7 @@ DOCKER_CONTAINER_ARGS="
     -v $SCRIPT_DIR:/var/local/$NAME/data \
     -p 80:80/tcp \
     -p 443:443/tcp \
+    --shm-size=1g \
 "
 
 source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/tip/docker.sh || echo false ) "$@"

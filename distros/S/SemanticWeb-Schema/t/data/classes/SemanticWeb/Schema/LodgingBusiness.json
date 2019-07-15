@@ -13,8 +13,8 @@
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
             "schema:Place",
-            "schema:Accommodation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
       },
@@ -25,8 +25,8 @@
          "schema:domainIncludes" : [
             "schema:Product",
             "schema:CreativeWork",
-            "schema:PlayAction",
             "schema:LodgingBusiness",
+            "schema:PlayAction",
             "schema:Event",
             "schema:Service"
          ],
@@ -39,8 +39,8 @@
          "schema:domainIncludes" : [
             "schema:TouristAttraction",
             "schema:ContactPoint",
-            "schema:ServiceChannel",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:ServiceChannel"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -55,17 +55,41 @@
             "schema:LodgingReservation",
             "schema:LodgingBusiness"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
       },
       "schema:checkoutTime" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:LodgingReservation"
+            "schema:LodgingReservation",
+            "schema:LodgingBusiness"
          ],
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : [
+            "schema:Time",
+            "schema:DateTime"
+         ]
+      },
+      "schema:numberOfRooms" : {
+         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
+         "rdfs:label" : "numberOfRooms",
+         "schema:domainIncludes" : [
+            "schema:Apartment",
+            "schema:Accommodation",
+            "schema:Suite",
+            "schema:House",
+            "schema:SingleFamilyResidence",
+            "schema:LodgingBusiness"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:QuantitativeValue"
+         ]
       },
       "schema:petsAllowed" : {
          "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
@@ -77,8 +101,8 @@
             "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:Text"
          ]
       },
       "schema:starRating" : {

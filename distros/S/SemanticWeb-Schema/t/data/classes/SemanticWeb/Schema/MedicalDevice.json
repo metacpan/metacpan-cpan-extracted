@@ -24,8 +24,8 @@
          "rdfs:comment" : "A contraindication for this therapy.",
          "rdfs:label" : "contraindication",
          "schema:domainIncludes" : [
-            "schema:MedicalDevice",
-            "schema:MedicalTherapy"
+            "schema:MedicalTherapy",
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
@@ -38,9 +38,9 @@
          "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
          "rdfs:label" : "indication",
          "schema:domainIncludes" : [
+            "schema:TherapeuticProcedure",
             "schema:MedicalProcedure",
-            "schema:MedicalDevice",
-            "schema:TherapeuticProcedure"
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalIndication"
@@ -74,14 +74,14 @@
          "rdfs:comment" : "A goal towards an action is taken. Can be concrete or abstract.",
          "rdfs:label" : "purpose",
          "schema:domainIncludes" : [
+            "schema:PayAction",
             "schema:AllocateAction",
-            "schema:MedicalDevice",
-            "schema:PayAction"
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MedicalDevicePurpose",
-            "schema:Thing"
+            "schema:Thing",
+            "schema:MedicalDevicePurpose"
          ]
       },
       "schema:seriousAdverseOutcome" : {

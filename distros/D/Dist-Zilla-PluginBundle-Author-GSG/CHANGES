@@ -1,9 +1,53 @@
 ==================================================
-Changes from 2018-06-28 00:00:00 +0000 to present.
+Changes from 2018-07-11 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 0.0.11 at 2019-06-28 19:33:29 +0000
+version 0.0.12 at 2019-07-11 21:58:53 +0000
+-------------------------------------------
+
+  Change: 87e1b2f819bbbe8e09fe03ec8ff1c1c7abb7f8ef
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-07-11 17:47:49 +0000
+
+    Merge pull request #8 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from harden-test-suite
+    to master
+
+    * commit 'a671b1db684a83110346137dd20db07b266fd5e0':
+
+    Remove a V from the environment
+
+    Set a default $ENV{EMAIL} in tests
+
+    Diag the git version to make debugging easier 
+
+  Change: a671b1db684a83110346137dd20db07b266fd5e0
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-07-11 17:07:23 +0000
+
+    Remove a V from the environment
+
+    It's used by Git::NextVersion and if it exists but is undef it will
+    break the tests. 
+
+  Change: e3be6b1c19121e7d118b5dc980ba6707f1e570aa
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-07-11 17:07:23 +0000
+
+    Set a default $ENV{EMAIL} in tests
+
+    git complains if it can't figure out an email to use before we've
+    configured anything. This lets tests pass in that situation. 
+
+  Change: ab3642c7005ebbb787679d234b7d1755cbc3ff8f
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-07-11 17:07:23 +0000
+
+    Diag the git version to make debugging easier 
+
+-------------------------------------------
+version 0.0.11 at 2019-06-28 16:42:30 +0000
 -------------------------------------------
 
   Change: 4f804dd70de177ca4f28ef890bfe2842e6621834

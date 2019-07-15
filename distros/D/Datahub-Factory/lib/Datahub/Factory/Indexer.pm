@@ -2,7 +2,7 @@ package Datahub::Factory::Indexer;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use Catmandu;
 use Moose::Role;
@@ -14,7 +14,6 @@ has logger    => (is => 'lazy');
 has file_name => (is => 'ro', required => 1);
 
 requires 'index';
-requires 'commit';
 
 sub _build_logger {
     my $self = shift;

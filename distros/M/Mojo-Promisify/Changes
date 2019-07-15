@@ -1,0 +1,7 @@
+Revision history for perl distribution Mojo-Promisify
+
+0.01 2019-07-14T10:03:18+0200
+ - Add promisify()
+ - Add promisify_call()
+ - Add promisify_patch()
+ - Marked module as EXPERIMENTAL
