@@ -1,5 +1,5 @@
 package Test::DBIC::ExpectedQueries::Query;
-$Test::DBIC::ExpectedQueries::Query::VERSION = '1.011';
+$Test::DBIC::ExpectedQueries::Query::VERSION = '2.000';
 use Moo;
 
 

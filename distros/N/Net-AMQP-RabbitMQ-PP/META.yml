@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::ShareDir::Install: '0.13'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ resources:
   homepage: https://metacpan.org/module/Net::AMQP::RabbitMQ::PP
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/net-amqp-rabbitmq
-version: '0.08'
+version: '0.09'
 x_repository:
   type: git
   url: https://github.com/Humanstate/net-amqp-rabbitmq.git

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.36 {
+package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.37 {
 
   use 5.014;
   use Path::Tiny qw( path );
@@ -81,7 +81,7 @@ Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup - add a travis status but
 
 =head1 VERSION
 
-version 2.36
+version 2.37
 
 =head1 SYNOPSIS
 

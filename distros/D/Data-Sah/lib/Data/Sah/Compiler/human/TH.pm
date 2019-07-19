@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human::TH;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.896'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.897'; # VERSION
 
 use 5.010;
 use strict;
@@ -33,6 +33,8 @@ sub clause_summary {}
 sub clause_description {}
 sub clause_comment {}
 sub clause_tags {}
+sub clause_examples {}
+sub clause_invalid_examples {}
 
 sub clause_prefilters {}
 sub clause_postfilters {}
@@ -81,7 +83,7 @@ Data::Sah::Compiler::human::TH - Base class for human type handlers
 
 =head1 VERSION
 
-This document describes version 0.896 of Data::Sah::Compiler::human::TH (from Perl distribution Data-Sah), released on 2019-07-04.
+This document describes version 0.897 of Data::Sah::Compiler::human::TH (from Perl distribution Data-Sah), released on 2019-07-19.
 
 =for Pod::Coverage ^(name|compiler|clause_.+|handle_.+|before_.+|after_.+)$
 

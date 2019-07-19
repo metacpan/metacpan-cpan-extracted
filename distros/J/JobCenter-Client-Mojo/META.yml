@@ -22,5 +22,5 @@ resources:
   bugtracker: https://github.com/a6502/JobCenter-Client-Mojo/issues
   homepage: https://github.com/a6502/JobCenter-Client-Mojo
   repository: https://github.com/a6502/JobCenter-Client-Mojo.git
-version: '0.36'
+version: '0.38'
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -45,7 +45,7 @@
    "provides" : {
       "Calendar::Bahai" : {
          "file" : "lib/Calendar/Bahai.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Bahai"
       }
    },
-   "version" : "0.52",
+   "version" : "0.53",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

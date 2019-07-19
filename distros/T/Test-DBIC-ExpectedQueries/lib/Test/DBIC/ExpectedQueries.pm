@@ -2,6 +2,12 @@
 
 Test::DBIC::ExpectedQueries - Test that only expected DBIx::Class queries are run
 
+=head1 VERSION 2.000
+
+Version 2.000 is out with a breaking change. If you're having issues
+with your test suite, please see the L<Changes> file for details.
+
+
 =head1 DESCRIPTION
 
 Ensure that only the DBIx::Class SQL queries you expect are executed
@@ -324,7 +330,7 @@ queries until after they have been run.
 =cut
 
 package Test::DBIC::ExpectedQueries;
-$Test::DBIC::ExpectedQueries::VERSION = '1.011';
+$Test::DBIC::ExpectedQueries::VERSION = '2.000';
 use Moo;
 use Exporter::Tiny;
 BEGIN {extends "Exporter::Tiny"};
@@ -517,6 +523,7 @@ sub check_table_operation_counts {
 
     my $table_operation_count = $self->table_operation_count();
 
+    # Check actual events against test spec
     my $expected_all_operation = $expected_table_count->{_all_} || {};
     my $table_test_result = {};
     for my $table (sort keys %{$table_operation_count}) {
@@ -545,8 +552,34 @@ sub check_table_operation_counts {
         }
     }
 
-    ###JPL: also look at remaining in $expected, to make sure those
-    ###queries are run
+    # Check test spec against actual events to catch
+    ###JPL: extend this to validate test operations
+    my $operation_to_test = {
+        select => 1,
+        insert => 1,
+        update => 1,
+        delete => 1,
+    };
+    for my $table (sort keys %$expected_table_count) {
+        my $expected_operation_count = $expected_table_count->{$table};
+        for my $operation (sort keys %$expected_operation_count) {
+            next if ! $operation_to_test->{$operation};
+            # Already tested?
+            next if exists $table_operation_count->{$table}->{$operation};
+
+            my $expected_outcome = $expected_operation_count->{$operation};
+            defined $expected_outcome or next; # undef = ignore
+
+            my $actual_count = $table_operation_count->{$table}->{$operation} || 0;
+            my $test_result = $self->test_count(
+                $table,
+                $operation,
+                $expected_outcome,
+                $actual_count,
+            );
+            $test_result and push(@{ $table_test_result->{$table} }, $test_result);
+        }
+    }
 
     if(scalar keys %$table_test_result) {
         my $message = "";

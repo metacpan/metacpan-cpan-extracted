@@ -31,7 +31,7 @@ sub enter {
 };
 
 enter(
-    PFT::Header->new(title => 'A page¹'),
+    PFT::Header->new(title => 'A page!'),
     <<'    EOF' =~ s/^    //rgms
     This is a page, referring [the blog page](:blog:back) will fail.
     I can however refer to [this page](:page:a-page).

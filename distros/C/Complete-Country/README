@@ -1,0 +1,54 @@
+NAME
+    Complete::Country - Complete from list of ISO-3166 country codes
+
+VERSION
+    This document describes version 0.001 of Complete::Country (from Perl
+    distribution Complete-Country), released on 2019-07-18.
+
+SYNOPSIS
+     use Complete::Country qw(complete_country_code);
+     my $res = complete_country_code(word => 'V');
+     # -> [qw/va vc ve vg vi vn vu/]
+
+FUNCTIONS
+  complete_country_code
+    Usage:
+
+     complete_country_code(%args) -> any
+
+    Complete from list of ISO-3166 country codes.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   variant => *str* (default: "alpha-2")
+
+    *   word* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Country>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Country>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Country>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

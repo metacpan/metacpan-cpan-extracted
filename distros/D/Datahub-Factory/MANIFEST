@@ -33,8 +33,6 @@ lib/Datahub/Factory/Importer/CollectiveAccess.pm
 lib/Datahub/Factory/Importer/Datahub.pm
 lib/Datahub/Factory/Importer/JSON.pm
 lib/Datahub/Factory/Importer/OAI.pm
-lib/Datahub/Factory/Importer/TMS.pm
-lib/Datahub/Factory/Importer/TMS/Index.pm
 lib/Datahub/Factory/Importer/YAML.pm
 lib/Datahub/Factory/Indexer.pm
 lib/Datahub/Factory/Indexer/Solr.pm

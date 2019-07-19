@@ -7,7 +7,6 @@
 ^Build.bat$
 ^_build/
 ^Time-Format-[\d.]+/
-^Time-Format\.ppd
 \bCVS\b
 ^.git
 project-readme

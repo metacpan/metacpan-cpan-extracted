@@ -30,7 +30,7 @@ name: Test-Roo-DataDriven
 provides:
   Test::Roo::DataDriven:
     file: lib/Test/Roo/DataDriven.pm
-    version: v0.4.1
+    version: v0.4.2
 recommends:
   App::Prove: '0'
   Ref::Util::XS: '0'
@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Test-Roo-DataDriven/issues
   repository: git://github.com/robrwo/Test-Roo-DataDriven.git
-version: v0.4.1
+version: v0.4.2
 x_authority: cpan:RRWO
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'

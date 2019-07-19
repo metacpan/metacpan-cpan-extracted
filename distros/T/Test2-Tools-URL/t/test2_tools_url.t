@@ -279,4 +279,23 @@ subtest 'windows absolute' => sub {
 
 };
 
+subtest 'query as hash with repeated keys' => sub {
+
+  is(
+    "http://example.com/page?foo=bar&lorem=ipsum",
+    url {
+      url_component query => { foo => "bar", lorem => "ipsum" };
+    },
+    "expected query for hashref without repeated keys"
+  );
+
+  is(
+    "http://example.com/page?foo=bar&foo=baz&lorem=ipsum",
+    url {
+      url_component query => { foo => [qw( bar baz )], lorem => "ipsum" };
+    },
+    "expected query for hashref with repeated keys"
+  );
+};
+
 done_testing

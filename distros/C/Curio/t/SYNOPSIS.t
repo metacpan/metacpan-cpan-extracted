@@ -3,8 +3,7 @@ BEGIN { $ENV{PERL_STRICTURES_EXTRA} = 0 }
 use strictures 2;
 use Test2::V0;
 
-use Test2::Require::Module 'CHI' => '0.60';
-use Test2::Require::Module 'MooX::BuildArgs' => '0.08';
+use Test2::Require::Module qw( CHI );
 
 open( my $fh, '<', 'lib/Curio.pm' );
 my $content = do { local $/; <$fh> };
@@ -21,7 +20,8 @@ if ($content =~ m{=head1 SYNOPSIS\n\n\S.+?:\n\n(.+?)\n\S.+?:\n\n(.+?)\n=head1}s)
     }
 }
 
-my $chi = myapp_cache('geo_ip');
+my $chi = myapp_cache('geo_ip')->chi();
+
 $chi->set('foo' => 62);
 
 is(

@@ -18,12 +18,13 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       },
       "develop" : {
          "requires" : {
             "FindBin" : "0",
+            "Test2::Tools::PerlCritic" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
             "Test::More" : "0.98",
@@ -38,24 +39,25 @@
       "runtime" : {
          "requires" : {
             "File::Spec" : "0.80",
-            "perl" : "5.006"
+            "base" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
             "Test::More" : "0.98",
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "Class::Inspector" : {
          "file" : "lib/Class/Inspector.pm",
-         "version" : "1.34"
+         "version" : "1.36"
       },
       "Class::Inspector::Functions" : {
          "file" : "lib/Class/Inspector/Functions.pm",
-         "version" : "1.34"
+         "version" : "1.36"
       }
    },
    "release_status" : "stable",
@@ -70,7 +72,7 @@
          "web" : "https://github.com/plicease/Class-Inspector"
       }
    },
-   "version" : "1.34",
+   "version" : "1.36",
    "x_contributors" : [
       "Adam Kennedy <adamk@cpan.org>",
       "Graham Ollis <plicease@cpan.org>",
@@ -78,8 +80,8 @@
       "Steffen M\u00fcller",
       "Kivanc Yazan (KYZN)"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0
 }
 

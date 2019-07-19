@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_normalize_perl_modprefix;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2019-07-05'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ Data::Sah::Coerce::perl::str::str_normalize_perl_modprefix - Coerce perl::modpre
 
 =head1 VERSION
 
-This document describes version 0.019 of Data::Sah::Coerce::perl::str::str_normalize_perl_modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
+This document describes version 0.020 of Data::Sah::Coerce::perl::str::str_normalize_perl_modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-07-05.
 
 =head1 DESCRIPTION
 

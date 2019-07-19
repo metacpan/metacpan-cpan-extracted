@@ -1,4 +1,4 @@
-# Copyright (c) 2017 Martin Becker.  All rights reserved.
+# Copyright (c) 2017-2019 Martin Becker.  All rights reserved.
 # This script is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
@@ -76,9 +76,9 @@ foreach my $mod (@mod_missing) {
 ok(0 == @mod_missing, 'all modules documented');
 
 foreach my $mod (@mod_wrong) {
-    diag("not installed: $mod");
+    diag("not listed: $mod");
 }
-ok(0 == @mod_wrong, 'all documented modules installed');
+ok(0 == @mod_wrong, 'all documented modules listed as prerequisites');
 
 foreach my $mod (@duplicates) {
     diag("documented more than once: $mod");

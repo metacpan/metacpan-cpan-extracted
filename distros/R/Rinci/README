@@ -2,8 +2,8 @@ NAME
     Rinci - Language-neutral metadata for your code
 
 VERSION
-    This document describes version 1.1.91 of Rinci (from Perl distribution
-    Rinci), released on 2019-05-25.
+    This document describes version 1.1.93 of Rinci (from Perl distribution
+    Rinci), released on 2019-07-19.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -23,8 +23,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012
-    by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013,
+    2012 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

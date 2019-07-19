@@ -5,7 +5,7 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: An FFI function object
-our $VERSION = '0.90'; # VERSION
+our $VERSION = '0.92'; # VERSION
 
 
 use overload '&{}' => sub {
@@ -128,7 +128,7 @@ FFI::Platypus::Function - An FFI function object
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 

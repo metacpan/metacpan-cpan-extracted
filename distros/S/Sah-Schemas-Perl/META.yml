@@ -21,7 +21,7 @@ name: Sah-Schemas-Perl
 requires:
   Complete::File: '0'
   Complete::Module: '0'
-  Complete::Util: '0.57'
+  Complete::Util: '0.601'
   Perinci::Sub::XCompletion::perl_distname: '0'
   Perinci::Sub::XCompletion::perl_modname: '0'
   Perinci::Sub::XCompletion::perl_modname_or_prefix: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl
   homepage: https://metacpan.org/release/Sah-Schemas-Perl
   repository: git://github.com/perlancar/perl-Sah-Schemas-Perl.git
-version: '0.019'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

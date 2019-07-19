@@ -38,7 +38,7 @@ OPENADDR: {
 						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.16, 1e-2)));
 				} else {
 					cmp_deeply($location,
-						methods('lat' => num(39.81, 1e-2), 'long' => num(-86.10, 1e-2)));
+						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.16, 1e-2)));
 				}
 
 				# $location = $geo_coder->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
@@ -103,7 +103,7 @@ OPENADDR: {
 						methods('lat' => num(53.55, 1e-2), 'long' => num(-113.47, 1e-2)));
 				} else {
 					cmp_deeply($location,
-						methods('lat' => num(53.55, 1e-2), 'long' => num(-113.53, 1e-2)));
+						methods('lat' => num(53.55, 1e-2), 'long' => num(-113.47, 1e-2)));
 				}
 
 				$location = $geo_coder->geocode('London, England');

@@ -15,15 +15,16 @@ Carp::Assert::More - convenience wrappers around Carp::Assert
 
 =head1 VERSION
 
-Version 1.16
+Version 1.18
 
 =cut
 
 BEGIN {
-    $VERSION = '1.16';
+    $VERSION = '1.18';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
+        assert_aoh
         assert_arrayref
         assert_coderef
         assert_defined
@@ -640,6 +641,32 @@ sub assert_arrayref($;$) {
 }
 *assert_listref = *assert_arrayref;
 
+
+=head2 assert_aoh( $ref [, $name ] )
+
+Verifies that C<$array> is an arrayref, and that every element is a hashref.
+
+The array C<$array> can be an empty arraref and the assertion will pass.
+
+=cut
+
+sub assert_aoh {
+    my $array = shift;
+    my $msg   = shift;
+
+    $msg = 'Is an array of hashes' unless defined($msg);
+
+    assert_arrayref( $array, "$msg: Is an array" );
+    my $i = 0;
+    for my $val ( @{$array} ) {
+        assert_hashref( $val, "$msg: Element $i is a hash" );
+        ++$i;
+    }
+
+    return;
+}
+
+
 =head2 assert_coderef( $ref [,$name] )
 
 Asserts that I<$ref> is defined, and is a reference to a closure.
@@ -792,7 +819,7 @@ sub _any(&;@) {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2017 Andy Lester.
+Copyright 2005-2019 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License version 2.0.

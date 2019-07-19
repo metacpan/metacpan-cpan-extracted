@@ -2,7 +2,7 @@ NAME
     Complete::Bash - Completion routines for bash shell
 
 VERSION
-    This document describes version 0.324 of Complete::Bash (from Perl
+    This document describes version 0.325 of Complete::Bash (from Perl
     distribution Complete-Bash), released on 2019-06-28.
 
 DESCRIPTION

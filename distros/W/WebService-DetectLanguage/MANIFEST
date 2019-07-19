@@ -12,3 +12,6 @@ lib/WebService/DetectLanguage/AccountStatus.pm
 lib/WebService/DetectLanguage/Language.pm
 lib/WebService/DetectLanguage/Result.pm
 t/01-require.t
+t/02-mock-tests.t
+t/03-language.t
+t/lib/Mock/HTTP/Tiny.pm

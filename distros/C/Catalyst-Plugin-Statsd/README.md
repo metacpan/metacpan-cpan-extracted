@@ -4,7 +4,7 @@ Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 # VERSION
 
-version v0.6.2
+version v0.6.3
 
 # SYNOPSIS
 
@@ -142,8 +142,7 @@ $stats->profile( begin => 'controller.here' );
 
 - [Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats)
 - [Plack::Middleware::Statsd](https://metacpan.org/pod/Plack::Middleware::Statsd)
-
-    [Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny)
+- [Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny)
 
 # SOURCE
 

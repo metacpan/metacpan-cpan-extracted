@@ -2,7 +2,7 @@ package Datahub::Factory::Env;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.75';
+our $VERSION = '1.77';
 
 use Config::Simple;
 use Config::Onion;

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Exposing sendfile() for OS X",
+   "author" : [
+      "Luke Triantafyllidis <ltriant@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sys-Sendfile-OSX",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Fcntl" : "0",
+            "IO::Socket" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ltriant/Sys-Sendfile-OSX",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ltriant/Sys-Sendfile-OSX.git",
+         "web" : "https://github.com/ltriant/Sys-Sendfile-OSX"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+}
+

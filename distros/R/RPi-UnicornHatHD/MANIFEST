@@ -7,6 +7,7 @@ cpanfile
 ex/rave.pl
 ex/reddit_scroll.pl
 ex/tardis.pl
+ex/tetris.pl
 lib/RPi/UnicornHatHD.pm
 minil.toml
 t/00_compile.t

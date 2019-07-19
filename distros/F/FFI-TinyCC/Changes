@@ -1,5 +1,8 @@
 Revision history for FFI-TinyCC
 
+0.29      2019-07-16 11:05:49 -0400
+  - Fix tests on systems with /tmp mounted noexec (gh#8)
+
 0.28      2018-06-07 07:52:11 -0400
   - Production release identical to 0.27_01
 

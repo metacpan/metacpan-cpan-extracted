@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/sanko/RPi-UnicornHatHD.svg?branch=master)](https://travis-ci.org/sanko/RPi-UnicornHatHD) [![MetaCPAN Release](https://badge.fury.io/pl/RPi-UnicornHatHD.svg)](https://metacpan.org/release/RPi-UnicornHatHD)
 # NAME
 
 RPi::UnicornHatHD - Use Pimoroni's Awesome Unicorn HAT HD in Perl

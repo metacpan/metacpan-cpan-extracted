@@ -51,12 +51,16 @@ my %WriteMakefileArgs = (
     "lib/FFI/Platypus/Lang/Win32.pm"             => "\$(INST_LIB)/FFI/Platypus/Lang/Win32.pm",
     "lib/FFI/Platypus/Memory.pm"                 => "\$(INST_LIB)/FFI/Platypus/Memory.pm",
     "lib/FFI/Platypus/Record.pm"                 => "\$(INST_LIB)/FFI/Platypus/Record.pm",
+    "lib/FFI/Platypus/Record/Meta.pm"            => "\$(INST_LIB)/FFI/Platypus/Record/Meta.pm",
     "lib/FFI/Platypus/Record/TieArray.pm"        => "\$(INST_LIB)/FFI/Platypus/Record/TieArray.pm",
     "lib/FFI/Platypus/ShareConfig.pm"            => "\$(INST_LIB)/FFI/Platypus/ShareConfig.pm",
-    "lib/FFI/Platypus/Type.pod"                  => "\$(INST_LIB)/FFI/Platypus/Type.pod",
+    "lib/FFI/Platypus/Type.pm"                   => "\$(INST_LIB)/FFI/Platypus/Type.pm",
     "lib/FFI/Platypus/Type/PointerSizeBuffer.pm" => "\$(INST_LIB)/FFI/Platypus/Type/PointerSizeBuffer.pm",
     "lib/FFI/Platypus/Type/StringArray.pm"       => "\$(INST_LIB)/FFI/Platypus/Type/StringArray.pm",
     "lib/FFI/Platypus/Type/StringPointer.pm"     => "\$(INST_LIB)/FFI/Platypus/Type/StringPointer.pm",
+    "lib/FFI/Platypus/TypeParser.pm"             => "\$(INST_LIB)/FFI/Platypus/TypeParser.pm",
+    "lib/FFI/Platypus/TypeParser/Version0.pm"    => "\$(INST_LIB)/FFI/Platypus/TypeParser/Version0.pm",
+    "lib/FFI/Platypus/TypeParser/Version1.pm"    => "\$(INST_LIB)/FFI/Platypus/TypeParser/Version1.pm",
     "lib/FFI/Probe.pm"                           => "\$(INST_LIB)/FFI/Probe.pm",
     "lib/FFI/Probe/Runner.pm"                    => "\$(INST_LIB)/FFI/Probe/Runner.pm",
     "lib/FFI/Probe/Runner/Builder.pm"            => "\$(INST_LIB)/FFI/Probe/Runner/Builder.pm",
@@ -75,7 +79,7 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Test::More"    => "0.98"
   },
-  "VERSION" => "0.90",
+  "VERSION" => "0.92",
   "test"    => {
     "TESTS" => "t/*.t"
   }

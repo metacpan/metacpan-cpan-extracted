@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::pod_filename;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2019-07-05'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 our $rschema = ["str",[{description=>"\nString containing filename of a Perl .pod file. For convenience, when value is\nin the form of:\n\n    Foo\n    Foo.pod\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pod\n\nand a matching .pod file is found in `\@INC`, then it will be coerced (converted)\ninto the filesystem path of that .pod file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pod\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\n",summary=>"Filename (.pod files)","x.completion"=>sub{package Sah::Schema::perl::pod_filename;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word, 'find_pod', 1, 'find_pm', 0, 'find_pmc', 0);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["str_convert_perl_pod_to_path"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::pod_filename - Filename (.pod files)
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::SchemaR::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
+This document describes version 0.020 of Sah::SchemaR::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2019-07-05.
 
 =head1 DESCRIPTION
 

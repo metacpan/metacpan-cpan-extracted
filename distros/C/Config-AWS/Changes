@@ -1,5 +1,10 @@
 Revision history for Config::AWS
 
+0.05      2019-07-16 20:04:10+01:00 Europe/London
+
+  Fixes:
+    * Profiles with hyphens in their names are supported.
+
 0.04      2018-04-21 17:04:18+01:00 Europe/London
 
   Fixes:

@@ -165,14 +165,6 @@ error_string_dup:
     return NULL;
 }
 
-static int clear_nonblock(int fd) {
-    int flags;
-
-    if ((flags = fcntl(fd, F_GETFL) < 0))
-        return -1;
-    return fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
-}
-
 /*
  * callback() should return a 0 or 1; 0 to indicate that traversal at the current
  * level should halt, or 1 that it should continue.
@@ -211,15 +203,16 @@ int b_find(b_builder *builder, b_string *path, b_string *member_name, b_find_cal
     }
 
     /*
-     * If the item we're dealing with is not a directory, or is not wanted by the
-     * callback, then do not bother with traversal code.  Otherwise, all code after
-     * these guard clauses pertains to the case of 'path' being a directory.
+     * If the item we're dealing with is not a directory, or is not wanted by
+     * the callback, then do not bother with traversal code.  Otherwise, all
+     * code after these guard clauses pertains to the case of 'path' being a
+     * directory.
      */
     if ((st.st_mode & S_IFMT) == S_IFREG) {
         if ((fd = open(clean_path->str, oflags)) < 0) {
             goto error_open;
         }
-        if (clear_nonblock(fd))
+        if (fcntl(fd, F_SETFL, oflags & ~O_NONBLOCK))  // previously clear_nonblock, however we know oflags so we can do it outselves
             goto error_open;
     }
 
@@ -310,14 +303,28 @@ int b_find(b_builder *builder, b_string *path, b_string *member_name, b_find_cal
                     goto cleanup_item;
                 }
             } else {
-                if (err) {
-                    b_error_set(err, B_ERROR_WARN, errno, "Cannot open file", item->path);
+                if( flags & B_FIND_IGNORE_SOCKETS ) {
+                    if (stat(item->path->str, &item_st) < 0) {
+                        if (err) {
+                            b_error_set(err, B_ERROR_WARN, errno, "Cannot stat() file", item->path);
+                        }
+                    }
+                    else {
+                        if( err && (item_st.st_mode & S_IFMT) != S_IFSOCK ) {
+                            b_error_set(err, B_ERROR_WARN, errno, "Cannot open file", item->path);
+                        }
+                    }
+                }
+                else {
+                    if (err) {
+                        b_error_set(err, B_ERROR_WARN, errno, "Cannot open file", item->path);
+                    }
                 }
 
                 goto cleanup_item;
             }
         } else {
-            if (clear_nonblock(fd))
+            if (fcntl(fd, F_SETFL, oflags & ~O_NONBLOCK)) // previously clear_nonblock, however we know oflags so we can do it outselves
                 goto cleanup_item;
             if (fstat(item_fd, &item_st) < 0) {
                 if (err) {

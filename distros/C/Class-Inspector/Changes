@@ -1,5 +1,11 @@
 Revision history for Perl extension Class-Inspector
 
+1.36      2019-07-19 08:35:53 -0400
+  - Producton release identical to 1.35_01
+
+1.35_01   2019-07-18 12:00:22 -0400
+  - Fix bug in methods method that could cause it to modify @ISA (gh#11)
+
 1.34      2019-03-28 12:13:40 -0400
   - Producton release identical to 1.33_01
 

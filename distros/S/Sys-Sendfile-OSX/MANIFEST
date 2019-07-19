@@ -2,7 +2,7 @@
 Build.PL
 LICENSE
 MANIFEST
-META.yml
+META.json
 README.md
 dist.ini
 lib/Sys/Sendfile/OSX.pm

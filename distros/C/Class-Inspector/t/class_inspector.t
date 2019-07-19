@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 54;
+use Test::More tests => 56;
 use Class::Inspector ();
 
 # To make maintaining this a little faster,
@@ -313,10 +313,25 @@ PACKAGES: {
   our $VERSION = '0.01';
   package My::Bar;
   our $VERSION = '0.01';
-  our @ISA     = 'My::Foo';
+  use base qw( My::Foo );
 }
 TESTS: {
   my $rv = Class::Inspector->subclasses( 'My::Foo' );
   is_deeply( $rv, [ 'My::Bar' ],
     '->subclasses in the presence of an evil ->isa does not crash' );
+}
+
+
+{
+  {
+    package Baz;
+
+    our @ISA = qw( ::foo bar'baz );  ##  no critic
+  }
+
+  is_deeply \@Baz::ISA, [qw( ::foo bar'baz )];
+
+  Class::Inspector->methods('Baz');
+
+  is_deeply \@Baz::ISA, [qw( ::foo bar'baz )];
 }

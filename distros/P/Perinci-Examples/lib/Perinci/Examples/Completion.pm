@@ -1,7 +1,7 @@
 package Perinci::Examples::Completion;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.812'; # VERSION
+our $DATE = '2019-06-29'; # DATE
+our $VERSION = '0.814'; # VERSION
 
 use 5.010;
 use strict;
@@ -38,7 +38,7 @@ $SPEC{fruits} = {
                 my $res = [];
                 for (keys %allfruits) {
                     next unless /\A\Q$word\E/i;
-                    push @$res, {word=>$_, description=>$allfruits{$_}}
+                    push @$res, {word=>$_, summary=>$allfruits{$_}}
                         unless $_ ~~ @$ary;
                 }
                 $res;
@@ -46,6 +46,19 @@ $SPEC{fruits} = {
             #req => 1,
             pos => 0,
             slurpy => 1,
+        },
+        category => {
+            summary => 'This argument contains valid values and '.
+                'their summaries in the schema',
+            schema => ['str*' => {
+                in => [qw/citrus tropical melon stone/],
+                'x.in.summaries' => [
+                    "Oranges, grapefruits, pomelos",
+                    "Bananas, mangoes",
+                    "Watermelons, honeydews",
+                    "Apricots, nectarines, peaches",
+                ],
+            }],
         },
     },
     description => <<'_',
@@ -73,7 +86,7 @@ Perinci::Examples::Completion - More completion examples
 
 =head1 VERSION
 
-This document describes version 0.812 of Perinci::Examples::Completion (from Perl distribution Perinci-Examples), released on 2019-04-15.
+This document describes version 0.814 of Perinci::Examples::Completion (from Perl distribution Perinci-Examples), released on 2019-06-29.
 
 =for Pod::Coverage .*
 
@@ -93,6 +106,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<category> => I<str>
+
+This argument contains valid values and their summaries in the schema.
 
 =item * B<fruits> => I<array[str]>
 

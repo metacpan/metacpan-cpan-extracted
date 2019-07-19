@@ -1,7 +1,7 @@
 package Complete::Bash;
 
 our $DATE = '2019-06-28'; # DATE
-our $VERSION = '0.324'; # VERSION
+our $VERSION = '0.325'; # VERSION
 
 use 5.010001;
 use strict;
@@ -723,7 +723,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.324 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-06-28.
+This document describes version 0.325 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-06-28.
 
 =head1 DESCRIPTION
 

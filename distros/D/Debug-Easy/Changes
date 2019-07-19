@@ -295,3 +295,8 @@ Revision history for Debug-Easy
 
         Fixed the DateTime error on object destroy.  It wasn't catestrophic for
         your code, but it made logs messy.
+
+2.03    July 15, 2019
+
+        Apparently the procedure field is blank on some main calls.  This fix
+        should take care of that.

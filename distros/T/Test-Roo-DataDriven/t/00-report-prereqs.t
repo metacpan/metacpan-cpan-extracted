@@ -60,7 +60,8 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  IPC::Open3
+  IO::Selectq
 );
 
 my @exclude = qw(

@@ -1,8 +1,8 @@
-package MooseX::Role::Parameterized; # git description: v1.09-8-g721b0f1
+package MooseX::Role::Parameterized; # git description: v1.10-8-g9de4ac3
 # ABSTRACT: Moose roles with composition parameters
 # KEYWORDS: moose extension parameter role arguments dynamic parameterised parameterizable parameterisable
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use 5.008001;
 use Moose 2.0300 ();
@@ -95,7 +95,7 @@ MooseX::Role::Parameterized - Moose roles with composition parameters
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,17 @@
 Revision history for Perl module Clone
 
+0.42 2019-07-19 23:06:04  garu
+  - make handling of mg_ptr safer (ATOOMIC, Harald Jörg)
+  - change license wording on some test files to
+    make the entire dist released under the same
+    terms as Perl itself (fixes GH#20) (GARU)
+
 0.41 2018-10-25 10:20:03  garu
   - Check the CowREFCNT of a COWed PV (ATOOMIC)
     this should fix some issues people have been
     having with 0.40 on DBD drives and DBIx::Class
   - Make buildtools files not executable (Mohammad S Anwar)
+  - Move bugtracker to Github (GARU)
 
 0.40 2018-10-23 20:001:49  garu
   - reuse COWed PV when cloning (fixes RT97535) (ATOOMIC)

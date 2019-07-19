@@ -1,35 +1,5 @@
 MODULE = FFI::Platypus PACKAGE = FFI::Platypus::Internal
 
-BOOT:
-{
-  HV *stash;
-  stash = gv_stashpv("FFI::Platypus::Internal", TRUE);
-#ifdef RTLD_LAZY
-  newCONSTSUB(stash, "RTLD_PLATYPUS_DEFAULT", newSViv(RTLD_LAZY));
-  newCONSTSUB(stash, "RTLD_LAZY", newSViv(RTLD_LAZY));
-#else
-  newCONSTSUB(stash, "RTLD_PLATYPUS_DEFAULT", newSViv(0));
-#endif
-#ifdef RTLD_NOW
-  newCONSTSUB(stash, "RTLD_NOW", newSViv(RTLD_NOW));
-#endif
-#ifdef RTLD_GLOBAL
-  newCONSTSUB(stash, "RTLD_GLOBAL", newSViv(RTLD_GLOBAL));
-#endif
-#ifdef RTLD_LOCAL
-  newCONSTSUB(stash, "RTLD_LOCAL", newSViv(RTLD_LOCAL));
-#endif
-#ifdef RTLD_NODELETE
-  newCONSTSUB(stash, "RTLD_NODELETE", newSViv(RTLD_NODELETE));
-#endif
-#ifdef RTLD_NOLOAD
-  newCONSTSUB(stash, "RTLD_NOLOAD", newSViv(RTLD_NOLOAD));
-#endif
-#ifdef RTLD_DEEPBIND
-  newCONSTSUB(stash, "RTLD_DEEPBIND", newSViv(RTLD_DEEPBIND));
-#endif
-}
-
 void
 _init()
   INIT:
@@ -63,7 +33,7 @@ _init()
     newCONSTSUB(stash, "FFI_PL_SHAPE_ARRAY",         newSViv(FFI_PL_SHAPE_ARRAY));
     newCONSTSUB(stash, "FFI_PL_SHAPE_CUSTOM_PERL",   newSViv(FFI_PL_SHAPE_CUSTOM_PERL));
     newCONSTSUB(stash, "FFI_PL_SHAPE_CUSTOM_MASK",   newSViv(FFI_PL_SHAPE_MASK));
-    
+
     newCONSTSUB(stash, "FFI_PL_TYPE_VOID",             newSViv(FFI_PL_TYPE_VOID));
     newCONSTSUB(stash, "FFI_PL_TYPE_SINT8",            newSViv(FFI_PL_TYPE_SINT8));
     newCONSTSUB(stash, "FFI_PL_TYPE_SINT16",           newSViv(FFI_PL_TYPE_SINT16));
@@ -83,3 +53,4 @@ _init()
     newCONSTSUB(stash, "FFI_PL_TYPE_STRING",           newSViv(FFI_PL_TYPE_STRING));
     newCONSTSUB(stash, "FFI_PL_TYPE_CLOSURE",          newSViv(FFI_PL_TYPE_CLOSURE));
     newCONSTSUB(stash, "FFI_PL_TYPE_RECORD",           newSViv(FFI_PL_TYPE_RECORD));
+    newCONSTSUB(stash, "FFI_PL_TYPE_RECORD_VALUE",     newSViv(FFI_PL_TYPE_RECORD_VALUE));

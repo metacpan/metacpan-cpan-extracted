@@ -8,13 +8,16 @@ use Config;
 skip_all "unsupported on $^O" if $^O =~ /^(darwin|MSWin32|gnukfreebsd)$/;
 skip_all "unsupported on $^O $Config{archname}" if $^O eq 'linux' && $Config{archname} =~ /^arm/;
 
+mkdir "$CWD/.tmp"
+  unless -d "$CWD/.tmp";
+
 subtest 'dll' => sub {
 
   # TODO: on windows can we create a .a that points to
   # the dll and use that to indirectly add the dll?
   skip_all 'unsupported on windows' if $^O eq 'MSWin32';
   
-  local $CWD = tempdir( CLEANUP => 1 );
+  local $CWD = tempdir( CLEANUP => 1, DIR => "$CWD/.tmp" );
   
   my $dll = "$CWD/bar." . FFI::TinyCC::_dlext();
 

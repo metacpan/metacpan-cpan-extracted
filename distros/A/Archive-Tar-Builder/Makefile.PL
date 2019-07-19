@@ -1,3 +1,5 @@
+use lib '.';
+
 require 'mk/MY.pm';
 require 'mk/MY/Makefile.pm';
 
@@ -9,7 +11,7 @@ my $makefile = MY::Makefile->new(
 $makefile->write(
     'NAME'         => 'Archive::Tar::Builder',
     'VERSION_FROM' => 'lib/Archive/Tar/Builder.pm',
-    'AUTHOR'       => 'Erin Schoenhals <erin@cpanel.net>',
+    'AUTHOR'       => 'Alexandra Hrefna Maheu <xan@cpanel.net>',
     'LICENSE'      => 'perl',
     'ABSTRACT'     => 'Provides a braindead tarball builder thingie',
     'PMLIBDIRS'    => ['lib'],

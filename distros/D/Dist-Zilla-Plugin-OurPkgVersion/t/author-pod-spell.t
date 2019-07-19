@@ -55,6 +55,7 @@ alexchorny
 arfreitas
 dagolden
 de
+dev
 dzil
 executables
 git

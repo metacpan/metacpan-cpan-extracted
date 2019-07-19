@@ -2,7 +2,7 @@ package Datahub::Factory::Fixer::Condition;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.75';
+our $VERSION = '1.77';
 
 use Datahub::Factory;
 use Moo;

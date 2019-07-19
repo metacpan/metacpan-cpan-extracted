@@ -4,7 +4,7 @@ package MooseX::Role::Parameterised;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Moose roles with composition parameters
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 __END__
 
@@ -18,7 +18,7 @@ MooseX::Role::Parameterised - Moose roles with composition parameters
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 

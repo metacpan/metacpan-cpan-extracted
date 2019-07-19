@@ -52,6 +52,6 @@
          "url" : "https://github.com/petdance/carp-assert-more/tree/master"
       }
    },
-   "version" : "1.16",
+   "version" : "1.18",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

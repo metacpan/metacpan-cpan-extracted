@@ -14,7 +14,7 @@ WriteMakefile(
   PREREQ_PM    => {
     'Mojolicious' => '8.0',
     'Mojolicious::Plugin::Qooxdoo' => '1.0.5',
-    'Config::Grammar' => '1.12',
+    'Config::Grammar' => '1.13',
     'Locale::PO' => '0.27',
   },
   BUILD_REQUIRES => {

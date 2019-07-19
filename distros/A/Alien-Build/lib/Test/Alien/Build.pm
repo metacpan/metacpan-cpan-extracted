@@ -10,6 +10,7 @@ use File::Temp qw( tempdir );
 use Test2::API qw( context run_subtest );
 use Capture::Tiny qw( capture_merged );
 use Alien::Build::Util qw( _mirror );
+use File::chdir;
 
 our @EXPORT = qw(
   alienfile
@@ -28,7 +29,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '1.78'; # VERSION
+our $VERSION = '1.79'; # VERSION
 
 
 my $build;
@@ -54,7 +55,7 @@ sub alienfile
   my $get_temp_root = do{
     my $root; # may be undef;
     sub {
-      $root ||= Path::Tiny->new(tempdir( CLEANUP => 1 ));
+      $root ||= Path::Tiny->new(tempdir( CLEANUP => 1, DIR => $CWD ));
 
       if(@_)
       {
@@ -616,7 +617,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 

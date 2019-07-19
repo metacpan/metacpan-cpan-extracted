@@ -1,5 +1,5 @@
 package Net::Stripe::LineItem;
-$Net::Stripe::LineItem::VERSION = '0.37';
+$Net::Stripe::LineItem::VERSION = '0.39';
 use Moose;
 
 # ABSTRACT: represent an Line Item object from Stripe
@@ -29,7 +29,7 @@ Net::Stripe::LineItem - represent an Line Item object from Stripe
 
 =head1 VERSION
 
-version 0.37
+version 0.39
 
 =head1 AUTHORS
 

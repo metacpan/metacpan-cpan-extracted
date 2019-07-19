@@ -19,7 +19,7 @@ use namespace::autoclean;
 
 requires 'run_tests';
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 
 sub _build_data_files {
@@ -163,7 +163,7 @@ Test::Roo::DataDriven - simple data-driven tests with Test::Roo
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 

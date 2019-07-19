@@ -3,11 +3,9 @@
 use strict;
 use warnings;
 
-use Games::Solitaire::Verify::App::CmdLine;
+use Games::Solitaire::Verify::App::CmdLine ();
 
-my $app = Games::Solitaire::Verify::App::CmdLine->new({argv => \@ARGV});
-
-$app->run();
+Games::Solitaire::Verify::App::CmdLine->new({argv => \@ARGV})->run;
 
 __END__
 
@@ -22,7 +20,7 @@ solutions.
 
 =head1 VERSION
 
-version 0.2201
+version 0.2202
 
 =head1 SYNOPSIS
 
@@ -35,15 +33,11 @@ version 0.2201
 F<verify-solitaire-solution> is a command-line interface to
 L<Games::Solitaire::Verify>.
 
-=head1 VERSION
-
-version 0.2201
-
 =head1 COMMAND LINE OPTIONS
 
 =head2 -g [variant]
 
-Picks up a variant.
+Selects a solitaire variant.
 
 =head2 --decks-num [1|2]
 
@@ -109,7 +103,7 @@ L<http://cpanratings.perl.org/d/Games-Solitaire-Verify>
 
 =head1 AUTHORS
 
-Shlomi Fish, L<http://www.shlomifish.org/> .
+Shlomi Fish, L<https://www.shlomifish.org/> .
 
 =head1 COPYRIGHT & LICENSE
 

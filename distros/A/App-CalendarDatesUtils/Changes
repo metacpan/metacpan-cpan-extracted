@@ -1,4 +1,11 @@
-0.009   2019-06-28 (PERLANCAR)
+0.010   2019-06-28  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Tweak Changes, try out new release note style.
+
+
+0.009   2019-06-28  Released-By: PERLANCAR
 
         [Script: list-calendar-dates]
 
@@ -6,10 +13,10 @@
 
 	- [ux] Add short aliases -Y for --year, -M for --month, -D for --day.
 
-	- [ux] [incompatible change] By default, --all-years only show dates at
-	  most 10 years to the back and future, to avoid showing many years
-	  (-9999) for anniversaries. User will need to specify --all-entries
-	  (-A) to show dates beyond that range.
+	- [ux] [incompatible change] By default, --all-years only shows dates at
+	  most 10 years to the back and future, to avoid showing too many years
+	  (e.g. up to year 9999) for anniversaries. User will need to specify
+	  --all-entries (-A) to show dates beyond that range.
 
 	- [ux] Add -L option to list all Calendar::Dates::* modules. This is
 	  mostly a convenience so we don't have to use the separate script
@@ -19,47 +26,47 @@
 	  clause).
 
 
-0.008   2019-06-26 (PERLANCAR)
+0.008   2019-06-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Udpate Changes.
 
 
-0.007   2019-06-26 (PERLANCAR)
+0.007   2019-06-26  Released-By: PERLANCAR
 
         - Fix clash (two releases with version 0.003 were done).
 
 
-0.006   2019-06-26 (PERLANCAR)
+0.006   2019-06-26  Released-By: PERLANCAR
 
 	- UPDATE 2019-06-26: this release should not be used.
 
         - Tweak Rinci metadata.
 
 
-0.005   2019-05-28 (PERLANCAR)
+0.005   2019-05-28  Released-By: PERLANCAR
 
 	- UPDATE 2019-06-26: this release should not be used.
 
 	- list-calendar-dates: Add option: --(no-)past.
 
 
-0.004   2019-05-25 (PERLANCAR)
+0.004   2019-05-25  Released-By: PERLANCAR
 
 	- UPDATE 2019-06-26: this release should not be used.
 
 	- list-calendar-dates: Add --param option.
 
 
-0.003   2019-06-20 (PERLANCAR)
+0.003   2019-06-20  Released-By: PERLANCAR
 
 	- list-calendar-dates: Rename --all (-a) to --all-modules (-a), add
 	  --all-entries (-A), add --include-tags (-t) & --exclude-tags
 	  (-T).
 
 
-0.002   2019-02-14 (PERLANCAR)
+0.002   2019-02-14  Released-By: PERLANCAR
 
 	- list-calendar-dates: allow listing from multiple modules, add
 	  --all (-a) to use all installed modules.
@@ -68,6 +75,6 @@
 	  nice tables instead of JSON.
 
 
-0.001   2019-02-13 (PERLANCAR)
+0.001   2019-02-13  Released-By: PERLANCAR
 
         - First release.

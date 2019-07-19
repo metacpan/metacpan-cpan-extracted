@@ -3,13 +3,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
-use Path::Tiny qw/ cwd path /;
+use Test::More tests => 5;
+use Path::Tiny qw/ cwd /;
 use Dir::Manifest                  ();
 use Games::Solitaire::Verify::Golf ();
 
-my $data_dir  = cwd()->child( 't', 'data' );
-my $texts_dir = $data_dir->child('texts');
+my $texts_dir = cwd()->child( 't', 'data', 'texts' );
 
 my $mani = Dir::Manifest->new(
     {
@@ -83,4 +82,22 @@ sub _sol_iter
 
     # TEST
     pass("No error on verifying golf wrap ranks pysol fc 4 sol");
+}
+
+{
+    my $verifier = Games::Solitaire::Verify::Golf->new(
+        {
+            variant         => "golf",
+            board_string    => $mani->text("4.golf.board"),
+            queens_on_kings => 0,
+            wrap_ranks      => 0,
+        }
+    );
+
+    eval { $verifier->process_solution( _sol_iter("4.golf-wrap-ranks.sol") ); };
+
+    my $err = $@;
+
+    # TEST
+    like( $err, qr#\ACannot put \S{2} in the foundations#, "error thrown" );
 }

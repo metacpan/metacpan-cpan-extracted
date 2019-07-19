@@ -14,7 +14,7 @@ Alien::Build::Manual::PluginAuthor - Alien::Build plugin author documentation
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 

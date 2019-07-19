@@ -22,7 +22,7 @@ requires:
   Dist::Zilla: '6.00'
   Dist::Zilla::App::Command::aliendeps: '0.01'
   Dist::Zilla::Plugin::Alien: '0.023'
-  Dist::Zilla::Plugin::Author::Plicease: '2.36'
+  Dist::Zilla::Plugin::Author::Plicease: '2.37'
   Dist::Zilla::Plugin::AutoMetaResources: '1.20'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0.150250'
   Dist::Zilla::Plugin::InsertExample: '0.04'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::Plicease
   repository: git://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease.git
-version: '2.36'
-x_generated_by_perl: v5.26.2
+version: '2.37'
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

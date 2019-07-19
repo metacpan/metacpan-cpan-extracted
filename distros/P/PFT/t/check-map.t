@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 use v5.16;
+use utf8;
 
 use strict;
 use warnings;
@@ -19,16 +20,14 @@ use Encode::Locale;
 use Encode;
 
 my $root = File::Temp->newdir();
-my $unicode_dir = File::Spec->catdir($root, '☺');
-mkdir encode(locale => $unicode_dir);
-my $tree = PFT::Content->new($unicode_dir);
+my $tree = PFT::Content->new($root);
 
 # Populating
 
-$tree->pic('baz', 'foo←bar.png')->touch;
-$tree->attachment('foo', 'bar♥.txt')->touch;
+$tree->pic('baz', 'foo_bar.png')->touch;
+$tree->attachment('foo', 'bar.txt')->touch;
 do {
-    my $page = $tree->new_entry(PFT::Header->new(title => 'A page¹'));
+    my $page = $tree->new_entry(PFT::Header->new(title => 'A page!'));
     my $f = $page->open('a+');
     binmode $f, 'utf8';
     print $f <<'    EOF' =~ s/^    //rgms;
@@ -36,17 +35,17 @@ do {
 
     This is a picture of me:
 
-    ![my ugly face](:pic:baz/foo←bar.png)
-    ![my ugly cat](:pic:baz/bar→foo.png)
+    ![my ugly face](:pic:baz/foo_bar.png)
+    ![my ugly cat](:pic:baz/bar_foo.png)
 
     Follows my horrible poetry: [click here][1]
 
-    [1]: :attach:foo/bar♥.txt
+    [1]: :attach:foo/bar.txt
     EOF
     close $f;
 };
 $tree->new_entry(PFT::Header->new(
-    title => 'Another page²',
+    title => 'Another page?',
     tags => ['foo', 'bar'],
 ));
 $tree->new_entry(PFT::Header->new(
@@ -82,13 +81,13 @@ foreach ($map->nodes) {
 }
 
 is_deeply([sort @ids], [qw<
-    a:foo/bar♥.txt
+    a:foo/bar.txt
     b:2014-01-01:blog-post-nr-1
     b:2014-01-02:blog-post-nr-11
     b:2014-01-03:blog-post-nr-3
     b:2014-02-04:blog-post-nr-2
     b:2014-02-05:blog-post-nr-12
-    i:baz/foo←bar.png
+    i:baz/foo_bar.png
     m:2014-01-*
     m:2014-02-*
     p:a-page
@@ -106,7 +105,7 @@ is_deeply([
             diag('    missing ', $s->keyword, ', reason ', $_->[1]);
             join '|', $s->keyword, $s->args
         } @all_unres
-    ], ["pic|baz|bar→foo.png"],
+    ], ["pic|baz|bar_foo.png"],
     "Missing symbols differ"
 );
 

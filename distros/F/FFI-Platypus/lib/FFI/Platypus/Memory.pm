@@ -6,12 +6,12 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '0.90'; # VERSION
+our $VERSION = '0.92'; # VERSION
 
 
 our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup strndup );
 
-my $ffi = FFI::Platypus->new;
+my $ffi = FFI::Platypus->new( api => 1, experimental => 1);
 $ffi->lib(undef);
 $ffi->package;
 sub _ffi { $ffi }
@@ -65,7 +65,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,8 @@ version 0.90
 
 This module provides an interface to common memory functions provided by 
 the standard C library.  They may be useful when constructing interfaces 
-to C libraries with FFI.
+to C libraries with FFI.  It works mostly with the C<opaque> type and it
+is worth reviewing the section on opaque pointers in L<FFI::Platypus::Type>.
 
 =head1 FUNCTIONS
 

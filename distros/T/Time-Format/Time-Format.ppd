@@ -1,0 +1,8 @@
+<SOFTPKG NAME="Time-Format" VERSION="1.13">
+    <ABSTRACT>Easy-to-use date/time formatting.</ABSTRACT>
+    <AUTHOR>Eric J. Roode &lt;roode@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <REQUIRE NAME="Time::Local" VERSION="1.07" />
+        <CODEBASE HREF="PPM-Time-Format-1.13.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

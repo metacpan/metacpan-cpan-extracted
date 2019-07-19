@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -95,13 +95,13 @@ sub new {
 sub connect {
 	my $self = shift;
 
-	delete $self->{_exit};
+	delete $self->ioloop->{__exit__};
 	delete $self->{auth};
 	$self->{actions} = {};
 
 	$self->on(disconnect => sub {
 		my ($self, $code) = @_;
-		$self->{_exit} = $code;
+		#$self->{_exit} = $code;
 		$self->ioloop->stop;
 	});
 
@@ -131,7 +131,7 @@ sub connect {
 		my ($loop, $err, $stream) = @_;
 		if ($err) {
 			$err =~ s/\n$//s;
-			$self->log->info('connection to API failed: ' . $err);
+			$self->log->error('connection to API failed: ' . $err);
 			$self->{auth} = 0;
 			return;
 		}
@@ -155,7 +155,7 @@ sub connect {
 			# Mojo::Util::_global_destruction() won't work
 			return unless $conn;
 			$conn->close;
-			$self->log->info('connection to rpcswitch closed');
+			$self->log->warn('connection to rpcswitch closed');
 			$self->emit(disconnect => WORK_CONNECTION_CLOSED); # todo: doc
 		});
 	});
@@ -186,7 +186,7 @@ sub connect {
 
 sub is_connected {
 	my $self = shift;
-	return $self->{auth} && !$self->{_exit};
+	return $self->{auth} && !$self->ioloop->{__exit__};
 }
 
 sub rpc_greetings {
@@ -441,27 +441,27 @@ sub work {
 		return if ($self->lastping // 0) > time - $pt;
 		$self->log->error('ping timeout');
 		$ioloop->remove($self->clientid);
-		$self->{_exit} = WORK_PING_TIMEOUT; # todo: doc
-		$ioloop->stop;
 		$ioloop->remove($tmr);
+		$ioloop->{__exit__} = WORK_PING_TIMEOUT; # todo: doc
+		$ioloop->stop;
 	}) if $pt > 0;
 	$self->on(disconnect => sub {
 		my ($self, $code) = @_;
-		$self->{_exit} = $code;
+		$self->ioloop->{__exit__} = $code;
 		$self->ioloop->stop;
 	});
-	$self->{_exit} = WORK_OK;
+	$self->ioloop->{__exit__} = WORK_OK;
 	$self->log->debug(blessed($self) . ' starting work');
 	$self->ioloop->start unless $self->ioloop->is_running;
 	$self->log->debug(blessed($self) . ' done?');
 	$self->ioloop->remove($tmr) if $tmr;
 
-	return $self->{_exit};
+	return $self->ioloop->{__exit__};
 }
 
 sub stop {
 	my ($self, $exit) = @_;
-	$self->{_exit} = $exit;
+	$self->ioloop->{__exit__} = $exit;
 	$self->ioloop->stop;
 }
 
@@ -928,8 +928,10 @@ Valid arguments are:
 
 (required)
 
-=item - cb: callback to be called for the method, default arguments are
-the request_id and the contents of the JSON-RPC 2.0 params field.
+=item - cb: callback to be called for the method
+
+Default arguments are the request_id and the contents of the JSON-RPC 2.0
+params field.
 
 (required)
 
@@ -959,12 +961,17 @@ some Mojo-callbacks.
 
 (optional, default false)
 
-=item - meta: pass RPC-Switch meta information to the callback as an extra
+=item - meta: pass RPC-Switch meta information
+
+The RPC-Switch meta information is passed to the callback as an extra
 argument after the JSON-RPC 2.0 params field.
 
-=item - undocb: a callback that gets called when the original callback
-returns an error object or throws an error.  Called with the same arguments
-as the original callback.
+=item - undocb: undo on error
+
+A callback that gets called when the original callback
+returns an error object or throws an error.
+
+Called with the same arguments as the original callback.
 
 (optional, only valid for mode 'subproc')
 

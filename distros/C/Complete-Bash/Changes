@@ -1,10 +1,17 @@
-0.324   2019-06-28 (PERLANCAR)
+0.325   2019-06-28  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Try out new release note style.
+
+
+0.324   2019-06-28  Released-By: PERLANCAR
 
 	- [ux] Tweak summary display to make it look nicer (use vertical
 	  bar | instead of space).
 
 
-0.323   2019-06-27 (PERLANCAR)
+0.323   2019-06-27  Released-By: PERLANCAR
 
 	- [ux] By default don't limit entries+summaries to a single-column
 	  display, but observe COMPLETE_BASH_MAX_COLUMNS.
@@ -14,25 +21,25 @@
           COMPLETE_BASH_SUMMARY_LINE_EVERY).
 
 
-0.322   2019-06-26 (PERLANCAR)
+0.322   2019-06-26  Released-By: PERLANCAR
 
 	- Support showing message (Complete 0.201).
 
 
-0.321   2019-06-25 (PERLANCAR)
+0.321   2019-06-25  Released-By: PERLANCAR
 
 	- format_completion() now by default shows item summaries if
 	  available (can be turned off by setting 'show_summaries' option
 	  or COMPLETE_BASH_SHOW_SUMMARIES to 0).
 
 
-0.320   2018-10-10 (PERLANCAR)
+0.320   2018-10-10  Released-By: PERLANCAR
 
 	- Observe COMPLETE_BASH_TRACE to produce more log statements for
 	  debugging.
 
 
-0.31    2016-12-28 (PERLANCAR)
+0.31    2016-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -40,7 +47,7 @@
 	  x_spec.
 
 
-0.30    2016-12-27 (PERLANCAR)
+0.30    2016-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -48,24 +55,24 @@
 	  DevelopSuggests with _SPEC:: prefix.
 
 
-0.29    2016-12-25 (PERLANCAR)
+0.29    2016-12-25  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to remove extraneous dependencies.
 
 
-0.28    2016-09-27 (PERLANCAR)
+0.28    2016-09-27  Released-By: PERLANCAR
 
         - [Bugfix] Fix join_wordbreak_words() [GH#3]. Thanks Mary Ehlers.
 
 
-0.27    2016-02-03 (PERLANCAR)
+0.27    2016-02-03  Released-By: PERLANCAR
 
 	- Add join_wordbreak_words().
 
 
-0.26    2016-02-02 (PERLANCAR)
+0.26    2016-02-02  Released-By: PERLANCAR
 
         - [Incompatible change] Split the rest of the word-breaking characters
           like bash.
@@ -74,7 +81,7 @@
           not generic enough to be in Complete::Bash.
 
 
-0.25    2016-01-21 (PERLANCAR)
+0.25    2016-01-21  Released-By: PERLANCAR
 
 	- [Bugfix] Off-by-one error was still present when current word is not
           the last word.
@@ -82,19 +89,19 @@
         - Add utility routine: point().
 
 
-0.24    2015-12-30 (PERLANCAR)
+0.24    2015-12-30  Released-By: PERLANCAR
 
 	- [Bugfix] Fix off-by-one error when truncate_current_word=1.
 
 
-0.23    2015-12-30 (PERLANCAR)
+0.23    2015-12-30  Released-By: PERLANCAR
 
 	- To prevent unnecessary breakages, make the previous change
 	  (truncating current word) into a non-default behavior, activated
 	  by passing truncate_current_word=>1 option to parse_cmdline().
 
 
-0.22    2015-12-30 (PERLANCAR)
+0.22    2015-12-30  Released-By: PERLANCAR
 
 	- [ux][experimental] Truncate current word to the position of
 	  cursor, so completing something like (^ marks the position of
@@ -102,7 +109,7 @@
 	  more convenient.
 
 
-0.21    2015-09-09 (PERLANCAR)
+0.21    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -111,7 +118,7 @@
 	  requirement.
 
 
-0.20    2015-09-03 (PERLANCAR)
+0.20    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -120,14 +127,14 @@
 	  requirement.
 
 
-0.19    2015-04-02 (PERLANCAR)
+0.19    2015-04-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Skip tests on platforms that do not implement getpwuid [CT].
 
 
-0.18    2015-03-31 (PERLANCAR)
+0.18    2015-03-31  Released-By: PERLANCAR
 
         - [Internal] Reimplement parse_cmdline() using regex instead of C-like
           char-by-char parsing.
@@ -148,20 +155,20 @@
           to parse it themselves).
 
 
-0.17    2015-03-04 (PERLANCAR)
+0.17    2015-03-04  Released-By: PERLANCAR
 
 	- Change escmode to esc_mode (Complete 0.12), but old key is still
 	  supported (though undocumented).
 
 
-0.16    2015-01-03 (PERLANCAR)
+0.16    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.15    2014-12-29 (PERLANCAR)
+0.15    2014-12-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -170,19 +177,19 @@
 	  it?).
 
 
-0.14    2014-12-29 (PERLANCAR)
+0.14    2014-12-29  Released-By: PERLANCAR
 
         - Add workaround for annoyance when completing word that contains ':'
           (like Perl package/module names) in bash, due ':' being a
           word-breaking character in bash.
 
 
-0.13    2014-11-30 (PERLANCAR)
+0.13    2014-11-30  Released-By: PERLANCAR
 
         - Add function: parse_options().
 
 
-0.12    2014-11-28 (PERLANCAR)
+0.12    2014-11-28  Released-By: PERLANCAR
 
         [INCOMPATIBLE CHANGES]
 
@@ -192,12 +199,12 @@
           'description' instead of just 'word' for each entry).
 
 
-0.11    2014-07-26 (SHARYANTO)
+0.11    2014-07-26  Released-By: SHARYANTO
 
         - [tweak] format_completion(): Don't escape '~'.
 
 
-0.10    2014-07-25 (SHARYANTO)
+0.10    2014-07-25  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -205,7 +212,7 @@
           and thus some client code will need to shift @$words + $cword--.
 
 
-0.09    2014-07-25 (SHARYANTO)
+0.09    2014-07-25  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -221,7 +228,7 @@
           is not enabled by default.
 
 
-0.08    2014-07-23 (SHARYANTO)
+0.08    2014-07-23  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -231,14 +238,14 @@
           [qw/--foo 1 --bar = 2/].
 
 
-0.07    2014-07-22 (SHARYANTO)
+0.07    2014-07-22  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Rebuild to fix rendering examples.
 
 
-0.06    2014-07-19 (SHARYANTO)
+0.06    2014-07-19  Released-By: SHARYANTO
 
         [REMOVED FEATURES]
 
@@ -261,14 +268,14 @@
         - Explain more about path mode.
 
 
-0.05    2014-07-18 (SHARYANTO)
+0.05    2014-07-18  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Update Rinci metadata, rebuild POD.
 
 
-0.04    2014-07-18 (SHARYANTO)
+0.04    2014-07-18  Released-By: SHARYANTO
 
         - Add examples for parse_cmdline().
 
@@ -278,12 +285,12 @@
           want to avoid returning list for better interop with Rinci).
 
 
-0.03    2014-07-18 (SHARYANTO)
+0.03    2014-07-18  Released-By: SHARYANTO
 
         - Forgot to add 'word_breaks' argument to parse_cmdline().
 
 
-0.02    2014-07-17 (SHARYANTO)
+0.02    2014-07-17  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -293,7 +300,7 @@
           bash's COMP_WORDBREAKS.
 
 
-0.01    2014-07-02 (SHARYANTO)
+0.01    2014-07-02  Released-By: SHARYANTO
 
         - First release, extracted from Complete-Util. format_completion() is
           from Complete::Util's format_shell_completion() but can also accept

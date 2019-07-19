@@ -12,7 +12,7 @@ use base qw( Exporter );
 our @EXPORT = qw( url url_base url_component );
 
 # ABSTRACT: Compare a URL in your Test2 test
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub url (&)
@@ -48,6 +48,7 @@ package Test2::Tools::URL::Check;
 
 use overload ();
 use URI 1.61;
+use URI::QueryParam;
 use Scalar::Util qw( blessed );
 use base qw( Test2::Compare::Base );
 
@@ -125,15 +126,13 @@ sub deltas
 
     if($method eq 'query' && !$check->isa('Test2::Compare::String'))
     {
-      my @query = $uri->query_form;
       if($check->isa('Test2::Compare::Hash'))
       {
-        my %query = @query;
-        $value = \%query;
+        $value = $uri->query_form_hash;
       }
       elsif($check->isa('Test2::Compare::Array'))
       {
-        $value = \@query;
+        $value = [ $uri->query_form ];
       }
     }
 
@@ -164,7 +163,7 @@ Test2::Tools::URL - Compare a URL in your Test2 test
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -250,7 +249,11 @@ L<Test2::Suite>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Paul Durden (alabamapaul, PDURDEN)
 
 =head1 COPYRIGHT AND LICENSE
 

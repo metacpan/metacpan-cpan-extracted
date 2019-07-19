@@ -1,5 +1,11 @@
 Revision history for Perl extension BackupPlan.
 
+0.08 July 2019
+  - refactored into modules
+  - fixed bug when collecting old backup-file. Potential confusion with directory names
+  - using the ISO representation of the date tag instead of the modification timestamp of the files 
+    to roll history
+
 0.01  Mon Jul 23 17:52:38 2012
 	- original version; created by h2xs 1.23 with options
 		-X -n BackupPlan

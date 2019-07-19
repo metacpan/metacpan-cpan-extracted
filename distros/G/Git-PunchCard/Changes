@@ -1,5 +1,9 @@
 Revision history for Git-PunchCard
 
+0.1.0	 2019-07-16/01:15
+		 - Display max.
+		 - Add avagerage/min.
+
 0.0.1	 2019-07-15/06:20
 		 - Set LC_ALL=C when calling git.
 		 - Properly set hourly max for the day.

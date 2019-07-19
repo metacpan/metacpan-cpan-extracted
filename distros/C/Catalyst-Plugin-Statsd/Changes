@@ -1,5 +1,9 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.6.3    2019-07-17 17:43:18+01:00 Europe/London
+  [Documentation]
+  - Fixed minor POD typo.
+
 v0.6.2    2019-07-14 14:37:43+01:00 Europe/London
   [Documentation]
   - Adjusted case of ABSTRACT.

@@ -10,17 +10,17 @@ Time::Format - Easy-to-use date/time formatting.
 
 =head1 VERSION
 
-This is version 1.12 of Time::Format, September 27, 2012.
+This is version 1.13 of Time::Format, July 18, 2019.
 
 =cut
 
 use strict;
 package Time::Format;
-$Time::Format::VERSION  = '1.12';
+$Time::Format::VERSION  = '1.13';
 
 # This module claims to be compatible with the following versions
 # of Time::Format_XS.
-%Time::Format::XSCOMPAT = map {$_ => 1} qw(1.01 1.02);
+%Time::Format::XSCOMPAT = map {$_ => 1} qw(1.01 1.02 1.03);
 
 sub _croak
 {
@@ -1141,7 +1141,7 @@ limitation.
 
 =head1 AUTHOR / COPYRIGHT
 
-Copyright © 2003-2012 by Eric J. Roode, ROODE I<-at-> cpan I<-dot-> org
+Copyright (c) 2003-2019 by Eric J. Roode, ROODE I<-at-> cpan I<-dot-> org
 
 All rights reserved.
 
@@ -1169,11 +1169,10 @@ endeavor to improve the software.
 =begin gpg
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (Cygwin)
 
-iEYEARECAAYFAlBkW30ACgkQwoSYc5qQVqqrEQCfbTBXPht5+eHBMYZwO+nfbbWM
-1BsAniYB6BwNCwmTOyawYbV7qQFGBbYt
-=/RZp
+iF0EARECAB0WIQTSmjxiQX/QfjsCVJLChJhzmpBWqgUCXTDGigAKCRDChJhzmpBW
+qh3uAKCCMrRX1Au01PU8UkdqA82bnKj7MgCgrjVQPbJYHYGmwyUeXAicd91uvYQ=
+=o00S
 -----END PGP SIGNATURE-----
 
 =end gpg

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,15 +26,16 @@ no_index:
 provides:
   RPi::UnicornHatHD:
     file: lib/RPi/UnicornHatHD.pm
-    version: '0.05'
+    version: '0.07'
 requires:
   Moo: '0'
-  RPi::WiringPi: '0'
+  WiringPi::API: '0'
   namespace::clean: '0'
   strictures: '0'
 resources:
   bugtracker: https://github.com/sanko/RPi-UnicornHatHD/issues
   homepage: https://github.com/sanko/RPi-UnicornHatHD
   repository: git://github.com/sanko/RPi-UnicornHatHD.git
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

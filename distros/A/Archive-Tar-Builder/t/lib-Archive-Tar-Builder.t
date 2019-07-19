@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2014, cPanel, Inc.
+# Copyright (c) 2019 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -21,7 +21,7 @@ use Errno;
 
 use Archive::Tar::Builder ();
 
-use Test::More tests => 67;
+use Test::More tests => 73;
 use Test::Exception;
 
 sub find_tar {
@@ -151,6 +151,8 @@ SKIP: {
     eval { $builder->finish(); };
 
     ok( !$@, '$builder->finish() does not die() if "ignore_errors" is set for non-fatals' );
+
+    chmod( 0600, $dir );
 }
 
 #
@@ -448,6 +450,8 @@ SKIP: {
     eval { $builder->finish(); };
 
     like( $@ => qr/^Delayed nonzero exit/, '$builder->finish() dies if any errors were encountered' );
+
+    chmod( 0600, $path );
 }
 
 # Test long filenames, symlinks
@@ -681,7 +685,7 @@ for my $test_mode (
 
     TRUNCATED, # File is written before being archived but then is truncated as it is being archived.
                # Expectation: Archive::Tar::Builder will die, rather than silently produce a corrupt tarball.
-  ) {
+) {
     my $tmp = File::Temp::tempdir( 'CLEANUP' => 1 );
 
     my ( $child, $child2 );
@@ -824,4 +828,58 @@ for my $test_mode (
     }
 
     close $fh;
+}
+
+#
+# Test hardlink preservation support
+#
+{
+    my $src  = File::Temp::tempdir( 'CLEANUP' => 1 );
+    my $dest = File::Temp::tempdir( 'CLEANUP' => 1 );
+
+    open my $fh, '>', "$src/foo" or die "Unable to open $src/foo for writing: $!";
+    print {$fh} "test\n";
+    close $fh;
+
+    link "$src/foo" => "$src/bar" or die "Unable to link $src/foo to $src/bar: $!";
+
+    my @FLAG_SETS = (
+        [ 'ustar' => [ 'preserve_hardlinks' => 1 ] ],
+        [ 'PAX'   => [ 'preserve_hardlinks' => 1, 'posix_extensions' => 1 ] ],
+        [ 'GNU'   => [ 'preserve_hardlinks' => 1, 'gnu_extensions' => 1 ] ]
+    );
+
+    foreach my $flag_set (@FLAG_SETS) {
+        my ( $format, $flags ) = @{$flag_set};
+
+        note("Testing 'preserve_hardlinks' flag with $format output");
+
+        my $builder = Archive::Tar::Builder->new( @{$flags} );
+
+        my $reader_pid = IPC::Open3::open3( my $in, undef, undef, $tar, '-C', $dest, '-xf', '-' );
+        my $writer_pid = fork;
+
+        die "Unable to fork(): $!" unless defined $writer_pid;
+
+        if ( $writer_pid == 0 ) {
+            chdir $src or die "Unable to chdir() to $src: $!";
+
+            $builder->set_handle($in);
+            $builder->archive('.');
+            $builder->finish;
+
+            exit 0;
+        }
+
+        close $in;
+
+        waitpid $writer_pid, 0 or die "Unable to waitpid() on $writer_pid: $!";
+        waitpid $reader_pid, 0 or die "Unable to waitpid() on $reader_pid: $!";
+
+        my @st1 = stat "$dest/foo" or die "Unable to stat() $dest/foo: $!";
+        my @st2 = stat "$dest/bar" or die "Unable to stat() $dest/bar: $!";
+
+        is( $st1[0] => $st2[0], "st_dev of $dest/foo matches $dest/bar" );
+        is( $st1[1] => $st2[1], "st_ino of $dest/foo matches $dest/bar" );
+    }
 }

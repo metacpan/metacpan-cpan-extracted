@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -111,11 +111,13 @@ Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	qw(arrival arrival_delay arrival_is_additional arrival_is_cancelled
 	  date datetime delay
 	  departure departure_delay departure_is_additional departure_is_cancelled
-	  is_transfer is_unscheduled is_wing
+	  ds100 is_transfer is_unscheduled is_wing
 	  line_no old_train_id old_train_no platform raw_id
 	  realtime_xml route_start route_end
 	  sched_arrival sched_departure sched_platform sched_route_start
-	  sched_route_end start stop_no time train_id train_no transfer type
+	  sched_route_end start
+	  station station_uic
+	  stop_no time train_id train_no transfer type
 	  unknown_t unknown_o wing_id)
 );
 
@@ -814,7 +816,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 DESCRIPTION
 
@@ -1128,6 +1130,14 @@ Name of the first station served by this train according to its schedule.
 
 DateTime(3pm) object for the scheduled start of the train on its route
 (i.e. the departure time at its first station).
+
+=item $result->station
+
+Name of the station this train result belongs to.
+
+=item $result->station_uic
+
+UIC number of the station this train result belongs to.
 
 =item $result->stop_no
 

@@ -4,24 +4,26 @@
 
 use strict;
 use Test::More tests => 26;
+use FindBin;
+use lib $FindBin::Bin;
+use TimeFormat_MC;
 
+## ----------------------------------------------------------------------------------
+## Test for availability of certain modules.
+my $tl_ok;
+BEGIN { $tl_ok = eval('use Time::Local; 1') }
+my ($dm_ok, $dmtz_ok) = tf_module_check('Date::Manip');
+my $posix_ok = tf_module_check('POSIX');
+
+
+## ----------------------------------------------------------------------------------
+## Load our module.
 BEGIN { $Time::Format::NOXS = 1 }
 BEGIN { use_ok 'Time::Format', qw(:all) }
-my $tl_notok;
-BEGIN { $tl_notok = eval('use Time::Local; 1')? 0 : 1 }
-my $dm_notok;
-my $dm_notz;
-BEGIN
-{
-    $dm_notok = eval('use Date::Manip (); 1')? 0 : 1;
-    unless ($dm_notok)
-    {
-        # If Date::Manip can't determine the time zone, it'll bomb out of the tests.
-        $dm_notz = eval('Date::Manip::Date_TimeZone (); 1')? 0 : 1;
-    }
-    delete $INC{'Date/Manip.pm'};
-    %Date::Manip:: = ();
-}
+
+
+## ----------------------------------------------------------------------------------
+## Begin tests.
 
 # Were all variables imported? (3)
 is ref tied %time,     'Time::Format'   =>  '%time imported';
@@ -41,8 +43,8 @@ unless (eval
     ($Tuesday, $December, $Thursday, $Thu, $June, $Jun) = qw(Tuesday December Thursday Thu June Jun);
 }
 
-my $t;
-unless ($tl_notok)
+my $t = 0;
+if ($tl_ok)
 {
     $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
     $t .= '.987654321';
@@ -50,17 +52,22 @@ unless ($tl_notok)
 
 SKIP:
 {
-    skip 'Time::Local not available', 22 if $tl_notok;
+    skip 'Time::Local not available', 18  unless $tl_ok;
 
-    # Synopsis tests (7)
+    # Synopsis tests (5)
     is "Today is $time{'yyyy/mm/dd',$t}", 'Today is 2003/06/05'   => 'Today';
     is "Yesterday was $time{'yyyy/mm/dd', $t-24*60*60}", 'Yesterday was 2003/06/04'  => 'Yesterday';
     is "The time is $time{'hh:mm:ss',$t}", 'The time is 13:58:09'    => 'time';
     is "Another time is $time{'H:mm am', $t}", 'Another time is 1:58 pm'             => 'Another time';
     is "Timestamp: $time{'yyyymmdd.hhmmss.mmm',$t}", 'Timestamp: 20030605.135809.987'   => 'Timestamp';
 
-    is "POSIXish: $strftime{'%A, %B %d, %Y', 0,0,0,12,11,95,2}", "POSIXish: $Tuesday, $December 12, 1995"   => 'POSIX 1';
-    is "POSIXish: $strftime{'%A, %B %d, %Y', int $t}",       "POSIXish: $Thursday, $June 05, 2003"   => 'POSIX 2';
+    SKIP:
+    {
+        skip 'Date::Manip is not available',           1  unless $dm_ok;
+        skip 'Date::Manip cannot determine time zone', 1  unless $dmtz_ok;
+
+        is qq[$time{'yyyymmdd',$manip{'%s',"epoch $t"}}],       '20030605'      => 'Example 15';
+    }
 
     # Examples section (12)
     is $time{'Weekday Month d, yyyy',$t},   "$Thursday $June 5, 2003"       => 'Example 1';
@@ -79,14 +86,36 @@ SKIP:
     is $time{"It'\\s H:mm.",$t},            "It's 1:58."                    => 'Example 11';
 
     is $strftime{'%A %B %d, %Y',$t},        "$Thursday $June 05, 2003"      => 'Example 12';
+}
 
-    # manip tests (3)
+# POSIX synopsis tests (2)
+if ($posix_ok)
+{
     SKIP:
     {
-        skip 'Date::Manip not available',             3  if $dm_notok;
-        skip 'Date::Manip cannot determine timezone', 3  if $dm_notz;
+        skip 'Time::Local not available', 2  unless $tl_ok;
+        is "POSIXish: $strftime{'%A, %B %d, %Y', 0,0,0,12,11,95,2}", "POSIXish: $Tuesday, $December 12, 1995"   => 'POSIX 1';
+        is "POSIXish: $strftime{'%A, %B %d, %Y', int $t}",           "POSIXish: $Thursday, $June 05, 2003"      => 'POSIX 2';
+    }
+}
+else
+{
+        is "POSIXish: $strftime{'%A, %B %d, %Y', 0,0,0,12,11,95,2}", "POSIXish: NO_POSIX"   => 'POSIX 1 (dummy)';
+        is "POSIXish: $strftime{'%A, %B %d, %Y', int $t}",           "POSIXish: NO_POSIX"   => 'POSIX 2 (dummy)';
+}
+
+# manip tests (3)
+if ($dm_ok  &&  $dmtz_ok)
+{
+    SKIP:
+    {
+        skip 'Time::Local not available', 2  unless $tl_ok;
         is $manip{'%m/%d/%Y',"epoch $t"},                       '06/05/2003'    => 'Example 13';
         is $manip{'%m/%d/%Y','first monday in November 2000'},  '11/06/2000'    => 'Example 14';
-        is qq[$time{'yyyymmdd',$manip{'%s',"epoch $t"}}],       '20030605'      => 'Example 15';
     }
+}
+else
+{
+        is $manip{'%m/%d/%Y',"epoch $t"},                       'NO_DATEMANIP'    => 'Example 13 (dummy)';
+        is $manip{'%m/%d/%Y','first monday in November 2000'},  'NO_DATEMANIP'    => 'Example 14 (dummy)';
 }

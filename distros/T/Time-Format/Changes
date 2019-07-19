@@ -1,120 +1,15 @@
 >Revision history for Perl extension Time::Format.
 
-0.01  2003 June 8
-	- First version
+1.13  2019 July 18
+        - Fix CPAN RT bug 85001.
+          This was a problem in the test suite only; no code changes were made
+          in the main module lib/Time/Format.pm.
+          The problem existed in how the test suite checked for whether certain
+          CPAN modules were installed, and especially in how it attempted to
+          unload them from memory afterward.
+          Thanks to Sendu Bala for reporting this -- and to Jim Keenan for
+          pushing me to fix this.
 
-0.02  2003 June 10
-        - Change the %time formatting codes.
-        - Speed up the code somewhat.
-        - Add many tests
-
-0.03  2003 June 11
-        - Fix the tests to work in other time zones than my own!
-
-0.04  2003 June 13
-        - Add internationalization support (Month/weekday names).
-        - Expose underlying function interface to all hashes.
-        - Export %time and time_format by default.
-
-0.05  2003 June 17
-        - Add "tz" timezone format code to %time.
-        - Change unambiguous month/minute format codes.
-        - Some minor speed improvements.
-
-0.06  2003 June 20
-        - Fix handling of "yyyy/mon".
-        - Minor documentation fixes (Thanks to Will Coleda!).
-        - Add th/TH formatting codes.
-        - Allow backslash escaping in format strings.
-
-0.07  2003 June 21
-        - Fix some bugs in the test suite -- NO changes to Format.pm
-          (Thanks to CPAN tester Jeroen Latour!)
-
-0.08  2003 June 22
-        - Distribute correct SIGNATURE file; a bad one was distributed
-          with v0.07.  (Thanks to Jeroen Latour again).
-
-0.09  2003 June 23
-        - Add more checking on the Date::Manip module, which dies messily
-          if it gets upset about not finding things like Time Zone.  This
-          affects the test suite only -- No changes to Time::Format.
-
-0.10  2003 July 5
-        - Some speed improvements.  Removed need for Exporter, Carp.
-        - Add support for optional Time::Format_XS module.
-        - More test suite changes, due to strftime not being nearly as
-          standard as you'd think it would be.
-        - Removed support for deprecated month/minute codes.
-
-0.11  2003 July 7
-        - Some changes for ActiveState Perl.  Thanks again to Will Coleda.
-
-0.12  2003 July 20
-        - Add \Q, \U, \L, \u, \l, \E handling in format strings.
-        - Change "Month" (etc) to be defined as "locale-preferred
-          capitalization" rather than "always ucfirst".  Thanks to
-          Mark Jason Dominus for his thoughts on this topic.
-        - Don't bother compiling the Perl routines until we know that
-          the XS routines (in Time::Format_XS) are not available.
-
-0.13  2003 August 1
-        - Check that the version of Time::Format_XS matches our version.
-        - Test suite now tests perl-only routines separately from
-          XS-enabled routines.
-        - Further delay compilation of time_format until needed.
-
-1.00  2004 September 24
-	- Increase version to 1.00.
-	- More flexible version-compatibility checking with
-	  Time::Format_XS
-        - Fix some warning messages (and some typos) in tests.
-
-1.01  2005 December 1
-        - Support for DateTime, Date::Manip, and ISO 8601 strings.
-
-1.02  2005 December 1
-        - No changes. Had to increment the number because of a PAUSE
-          upload problem.
-
-1.03  2008 March 24
-        - Fixed a broken test case.
-        - Added Module::Build support.
-
-1.04  2008 March 26
-        - Worked around a POSIX bug which would cause hangs under
-          cygwin.
-        - Fixed a couple test cases.
-
-1.05  2008 March 27
-        - Fix a typo bug in Makefile.PL
-
-1.06  2008 March 28
-        - Fix a broken test case in time.t; failed for non-English
-          locales.
-
-1.07  2008 March 31
-        - More test-case changes, to work with older perls.  Many
-          thanks to Slaven Rezic and the rest of the tireless CPAN
-          testers!
-
-1.08  2008 May 27
-        - Reset $@ at certain places, so as to work with older
-          (broken) perls.  Again, thanks to Slaven Rezic.
-
-1.09  2008 May 27
-        - Bug fix: generated error if second argument to time_format
-          was a string and was in December.  Thanks to Bokor Béla for
-          spotting this one.
-
-1.10  2009 June 17
-        - Bug fix: Did not trim leading zero off the am/pm hour (H
-          code) if the argument was a DateTime.  Thanks to Coke Coleda
-          for spotting this.
-
-1.11  2009 June 18
-        - Fix error in the new test (past.t) for v1.10!
-        - Rearrange eval's throughout test code to rely on $@ less.
 
 1.12  2012 September 27
         - Fix CPAN RT bug 44167/54990: Negative milliseconds/microseconds.
@@ -132,3 +27,144 @@
         - Fix CPAN RT bug 76705/76707 (maybe): month out of range.
           I can't reproduce this bug, but I made a change to the time parsing
           that might fix it.  Thanks to Todd Bezenek for reporting the problem.
+
+
+1.11  2009 June 18
+        - Fix error in the new test (past.t) for v1.10!
+        - Rearrange eval's throughout test code to rely on $@ less.
+
+
+1.10  2009 June 17
+        - Bug fix: Did not trim leading zero off the am/pm hour (H
+          code) if the argument was a DateTime.  Thanks to Coke Coleda
+          for spotting this.
+
+
+1.09  2008 May 27
+        - Bug fix: generated error if second argument to time_format
+          was a string and was in December.  Thanks to Bokor Béla for
+          spotting this one.
+
+
+1.08  2008 May 27
+        - Reset $@ at certain places, so as to work with older
+          (broken) perls.  Again, thanks to Slaven Rezic.
+
+
+1.07  2008 March 31
+        - More test-case changes, to work with older perls.  Many
+          thanks to Slaven Rezic and the rest of the tireless CPAN
+          testers!
+
+
+1.06  2008 March 28
+        - Fix a broken test case in time.t; failed for non-English
+          locales.
+
+
+1.05  2008 March 27
+        - Fix a typo bug in Makefile.PL
+
+
+1.04  2008 March 26
+        - Worked around a POSIX bug which would cause hangs under
+          cygwin.
+        - Fixed a couple test cases.
+
+
+1.03  2008 March 24
+        - Fixed a broken test case.
+        - Added Module::Build support.
+
+
+1.02  2005 December 1
+        - No changes. Had to increment the number because of a PAUSE
+          upload problem.
+
+
+1.01  2005 December 1
+        - Support for DateTime, Date::Manip, and ISO 8601 strings.
+
+
+1.00  2004 September 24
+	- Increase version to 1.00.
+	- More flexible version-compatibility checking with
+	  Time::Format_XS
+        - Fix some warning messages (and some typos) in tests.
+
+
+0.13  2003 August 1
+        - Check that the version of Time::Format_XS matches our version.
+        - Test suite now tests perl-only routines separately from
+          XS-enabled routines.
+        - Further delay compilation of time_format until needed.
+
+
+0.12  2003 July 20
+        - Add \Q, \U, \L, \u, \l, \E handling in format strings.
+        - Change "Month" (etc) to be defined as "locale-preferred
+          capitalization" rather than "always ucfirst".  Thanks to
+          Mark Jason Dominus for his thoughts on this topic.
+        - Don't bother compiling the Perl routines until we know that
+          the XS routines (in Time::Format_XS) are not available.
+
+
+0.11  2003 July 7
+        - Some changes for ActiveState Perl.  Thanks again to Will Coleda.
+
+
+0.10  2003 July 5
+        - Some speed improvements.  Removed need for Exporter, Carp.
+        - Add support for optional Time::Format_XS module.
+        - More test suite changes, due to strftime not being nearly as
+          standard as you'd think it would be.
+        - Removed support for deprecated month/minute codes.
+
+
+0.09  2003 June 23
+        - Add more checking on the Date::Manip module, which dies messily
+          if it gets upset about not finding things like Time Zone.  This
+          affects the test suite only -- No changes to Time::Format.
+
+
+0.08  2003 June 22
+        - Distribute correct SIGNATURE file; a bad one was distributed
+          with v0.07.  (Thanks to Jeroen Latour again).
+
+
+0.07  2003 June 21
+        - Fix some bugs in the test suite -- NO changes to Format.pm
+          (Thanks to CPAN tester Jeroen Latour!)
+
+
+0.06  2003 June 20
+        - Fix handling of "yyyy/mon".
+        - Minor documentation fixes (Thanks to Will Coleda!).
+        - Add th/TH formatting codes.
+        - Allow backslash escaping in format strings.
+
+
+0.05  2003 June 17
+        - Add "tz" timezone format code to %time.
+        - Change unambiguous month/minute format codes.
+        - Some minor speed improvements.
+
+
+0.04  2003 June 13
+        - Add internationalization support (Month/weekday names).
+        - Expose underlying function interface to all hashes.
+        - Export %time and time_format by default.
+
+
+0.03  2003 June 11
+        - Fix the tests to work in other time zones than my own!
+
+
+0.02  2003 June 10
+        - Change the %time formatting codes.
+        - Speed up the code somewhat.
+        - Add many tests
+
+
+0.01  2003 June 8
+	- First version

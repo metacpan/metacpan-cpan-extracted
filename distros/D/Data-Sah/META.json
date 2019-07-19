@@ -27,7 +27,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_spec" : {
-            "Sah" : "v0.9.41"
+            "Sah" : "v0.9.46"
          }
       },
       "runtime" : {
@@ -104,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah"
       }
    },
-   "version" : "0.896",
+   "version" : "0.897",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

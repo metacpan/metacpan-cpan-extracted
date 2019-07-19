@@ -1,26 +1,36 @@
-0.07
-    * Removed redundant object allocations & some minor fixes
+Change history for Plack-Middleware-RemoveRedundantBody:
 
-0.06
-    * Made version number consistent
+0.09      2019-07-15 20:06:43+02:00 Europe/Amsterdam
+    [Documentation]
+    - Added dates to Changes (Robert Rothenberg)
+    - Reformatted Changes to conform to contemporary specs.
 
-0.05
+    [Toolchain]
+    - Update Changes through Dist::Zilla.
 
-    * Added repository and bugtracker information to metadata
-    * Removed unneeded dependency on Carp::Always
+0.08      2019-07-14
+    - Fixed response for 304 HTTP status code
+    - Some tests for the 304 HTTP status code
+    - Fixed versions
 
-0.04
+0.07      2018-02-26
+    - Removed redundant object allocations & some minor fixes
 
-    * Added this Changes file & fixed POD (RT 94942, reported by Florian)
+0.06      2018-02-26
+    - Made version number consistent
 
-0.03
+0.05      2014-05-09
+    - Added repository and bugtracker information to metadata
+    - Removed unneeded dependency on Carp::Always
 
-    * Added John Napiorkowski to the contributors
+0.04      2014-04-24
+    - Added this Changes file & fixed POD (RT 94942, reported by Florian)
 
-0.02
+0.03      2014-01-28
+    - Added John Napiorkowski to the contributors
 
-    * Remove pointless return of $response (John Napiorkowski)
+0.02      2014-01-25
+    - Remove pointless return of $response (John Napiorkowski)
 
-0.01
-
-    * First release
+0.01      2014-01-11
+    - First release

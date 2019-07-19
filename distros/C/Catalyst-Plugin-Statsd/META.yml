@@ -33,7 +33,7 @@ name: Catalyst-Plugin-Statsd
 provides:
   Catalyst::Plugin::Statsd:
     file: lib/Catalyst/Plugin/Statsd.pm
-    version: v0.6.2
+    version: v0.6.3
 recommends:
   Ref::Util::XS: '0'
 requires:
@@ -46,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/CatalystX-Statsd/issues
   repository: git://github.com/robrwo/CatalystX-Statsd.git
-version: v0.6.2
+version: v0.6.3
 x_authority: cpan:RRWO
 x_contributors:
   - 'Slaven Rezić <slaven@rezic.de>'

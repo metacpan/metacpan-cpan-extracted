@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Conf v1.2.1;
+package PFT::Conf v1.3.0;
 
 =encoding utf8
 
@@ -120,7 +120,10 @@ configuration file.
 =cut
 
 use Exporter 'import';
-our @EXPORT_OK = qw/pod_autogen/;
+our @EXPORT_OK = qw(
+    pod_autogen
+    bash_completion_autogen
+);
 our $CONF_NAME = 'pft.yaml';
 
 # %CONF_RECIPE maps configuration names to an array.
@@ -167,6 +170,9 @@ my %CONF_RECIPE = do {
         ],
         'site-encoding'   => [1, '=s', $Encode::Locale::ENCODING_LOCALE,
             'Charset of the generated web pages'
+        ],
+        'site-feedfile'  => [0, '=s', 'feed.rss',
+            'File name of the RSS XML to be published by "pft gen-rss"',
         ],
         'publish-method'  => [1, '=s', 'rsync+ssh',
             'Method used for publishing'
@@ -255,7 +261,11 @@ sub pod_autogen {
             "Defaults to C<$info->[$IDX_DEFAULT]>", ''
     }
 
-    return join "\n", @out, '=back';# '', '=cut';
+    join "\n", @out, '=back';# '', '=cut';
+}
+
+sub bash_completion_autogen {
+    '--' . join "\n--", keys %CONF_RECIPE;
 }
 
 sub new_default {

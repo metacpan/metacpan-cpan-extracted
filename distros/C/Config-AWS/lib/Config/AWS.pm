@@ -21,7 +21,7 @@ use Exporter::Shiny qw(
     default_profile
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our %EXPORT_TAGS = (
     ini  => [qw( read_file read_string read_handle )],
     aws  => [qw( config_file default_profile credentials_file )],
@@ -45,8 +45,9 @@ sub list_profiles {
     my $lines = _prepare( shift );
 
     my @profiles;
-    foreach (@{$lines}) {
-        push @profiles, $1 if /^\[(?:profile )?([\w]+)\]/;
+
+    for (@{$lines}) {
+        push @profiles, $1 if /^\[(?:profile )?([\w-]+)\]/;
     }
 
     return @profiles;
@@ -135,16 +136,16 @@ sub _read {
     my $nested = {};
 
     my $profile = q{};
-    foreach my $i (0 .. $#{$lines}) {
+    for my $i (0 .. $#{$lines}) {
         my $line = $lines->[$i];
         chomp $line;
 
-        if ($line =~ /^\[(?:profile )?([\w]+)\]/) {
+        if ($line =~ /^\[(?:profile )?([\w-]+)\]/) {
             $profile = $1;
             next;
         }
 
-        next if $target_profile and $profile ne $target_profile;
+        next if $target_profile && $profile ne $target_profile;
 
         my ($indent, $key, $value) = $line =~ /^(\s*)([\w]+)\s*=\s*(.*)/;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, cPanel, Inc.
+ * Copyright (c) 2019, cPanel, L.L.C.
  * All rights reserved.
  * http://cpanel.net/
  *
@@ -22,7 +22,7 @@
 
 typedef b_builder * Archive__Tar__Builder;
 
-static int builder_lookup(SV *cache, uid_t uid, gid_t gid, b_string **user, b_string **group) {
+static int user_lookup(SV *cache, uid_t uid, gid_t gid, b_string **user, b_string **group) {
     dSP;
     I32 retc;
 
@@ -87,6 +87,52 @@ error_lookup:
     return -1;
 }
 
+static b_string *hardlink_lookup(SV *cache, dev_t dev, ino_t ino, b_string *path) {
+    dSP;
+    I32 retc;
+
+    size_t len = 0;
+    SV *item;
+    char *tmp;
+
+    ENTER;
+    SAVETMPS;
+
+    /*
+     * Prepare the stack for $cache->lookup()
+     */
+    PUSHMARK(SP);
+    XPUSHs(cache);
+    XPUSHs(sv_2mortal(newSViv(dev)));
+    XPUSHs(sv_2mortal(newSViv(ino)));
+    XPUSHs(sv_2mortal(newSVpv(path->str, path->len)));
+    PUTBACK;
+
+    path = NULL;
+
+    if ((retc = call_method("lookup", G_ARRAY)) != 1) {
+        goto leave;
+    }
+
+    SPAGAIN;
+
+    if ((item = POPs) != NULL && SvOK(item)) {
+        tmp = SvPV(item, len);
+
+        if ((path = b_string_new_len(tmp, len)) == NULL) {
+            goto leave;
+        }
+    }
+
+leave:
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+
+    return path;
+}
+
 static void builder_warn(b_error *err) {
     if (err == NULL) return;
 
@@ -98,6 +144,10 @@ static int find_flags(enum b_builder_options options) {
 
     if (options & B_BUILDER_FOLLOW_SYMLINKS) {
         flags |= B_FIND_FOLLOW_SYMLINKS;
+    }
+
+    if (options & B_BUILDER_IGNORE_SOCKETS) {
+        flags |= B_FIND_IGNORE_SOCKETS;
     }
 
     return flags;
@@ -125,12 +175,14 @@ builder_new(klass, ...)
             char *key = SvPV_nolen(ST(i));
             SV *value = ST(i+1);
 
-            if (strcmp(key, "quiet")            == 0 && SvIV(value)) options |= B_BUILDER_QUIET;
-            if (strcmp(key, "ignore_errors")    == 0 && SvIV(value)) options |= B_BUILDER_IGNORE_ERRORS;
-            if (strcmp(key, "follow_symlinks")  == 0 && SvIV(value)) options |= B_BUILDER_FOLLOW_SYMLINKS;
-            if (strcmp(key, "gnu_extensions")   == 0 && SvIV(value)) options |= B_BUILDER_GNU_EXTENSIONS;
-            if (strcmp(key, "posix_extensions") == 0 && SvIV(value)) options |= B_BUILDER_PAX_EXTENSIONS;
-            if (strcmp(key, "block_factor")     == 0 && SvIV(value)) block_factor = SvIV(value);
+            if (strcmp(key, "quiet")              == 0 && SvIV(value)) options |= B_BUILDER_QUIET;
+            if (strcmp(key, "ignore_errors")      == 0 && SvIV(value)) options |= B_BUILDER_IGNORE_ERRORS;
+            if (strcmp(key, "follow_symlinks")    == 0 && SvIV(value)) options |= B_BUILDER_FOLLOW_SYMLINKS;
+            if (strcmp(key, "preserve_hardlinks") == 0 && SvIV(value)) options |= B_BUILDER_PRESERVE_HARDLINKS;
+            if (strcmp(key, "gnu_extensions")     == 0 && SvIV(value)) options |= B_BUILDER_GNU_EXTENSIONS;
+            if (strcmp(key, "posix_extensions")   == 0 && SvIV(value)) options |= B_BUILDER_PAX_EXTENSIONS;
+            if (strcmp(key, "ignore_sockets")     == 0 && SvIV(value)) options |= B_BUILDER_IGNORE_SOCKETS;
+            if (strcmp(key, "block_factor")       == 0 && SvIV(value)) block_factor = SvIV(value);
         }
 
         if ((builder = b_builder_new(block_factor)) == NULL) {
@@ -159,7 +211,25 @@ builder_new(klass, ...)
 
         PUTBACK;
 
-        b_builder_set_lookup_service(builder, B_LOOKUP_SERVICE(builder_lookup), cache); 
+        b_builder_set_user_lookup(builder, B_USER_LOOKUP(user_lookup), cache); 
+
+        if (builder->options & B_BUILDER_PRESERVE_HARDLINKS) {
+            /*
+             * Call Archive::Tar::Builder::HardlinkCache->new()
+             */
+            PUSHMARK(SP);
+            XPUSHs(sv_2mortal(newSVpvf("Archive::Tar::Builder::HardlinkCache")));
+            PUTBACK;
+
+            if ((retc = call_method("new", G_SCALAR)) == 1) {
+                cache = POPs;
+                SvREFCNT_inc(cache);
+            }
+
+            PUTBACK;
+
+            b_builder_set_hardlink_cache(builder, B_HARDLINK_LOOKUP(hardlink_lookup), cache);
+        }
 
         RETVAL = builder;
 

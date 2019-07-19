@@ -1,4 +1,10 @@
-0.110   2017-09-08 (PERLANCAR)
+0.111   2019-06-28  Released-By: PERLANCAR
+
+        - Update data (new releases: 17.10/artful, 18.04 LTS/bionic,
+          18.10/cosmic, 19.04/disco).
+
+
+0.110   2017-09-08  Released-By: PERLANCAR
 
 	- [Incompatible change] Switch data source from gudangdata
 	  repository to gudangdata-distrowatch (some fields are changed).
@@ -6,40 +12,40 @@
         - Update data (latest release is 17.04/zesty).
 
 
-0.10    2016-10-26 (PERLANCAR)
+0.10    2016-10-26  Released-By: PERLANCAR
 
 	- Update data (new release 16.10).
 
 
-0.09    2016-05-27 (PERLANCAR)
+0.09    2016-05-27  Released-By: PERLANCAR
 
         - Update data: perl version for xenial.
 
 
-0.08    2015-11-14 (PERLANCAR)
+0.08    2015-11-14  Released-By: PERLANCAR
 
 	- Update data (xenial, minus perl version [assumed to be still at
 	  5.20.2]).
 
 
-0.07    2015-10-01 (PERLANCAR)
+0.07    2015-10-01  Released-By: PERLANCAR
 
 	- Update data (perl version for older releases).
 
 
-0.06    2015-09-22 (PERLANCAR)
+0.06    2015-09-22  Released-By: PERLANCAR
 
 	- Update data (add column perlver).
 
 
-0.05    2015-09-22 (PERLANCAR)
+0.05    2015-09-22  Released-By: PERLANCAR
 
 	- Split CLI to its own dist to keep our deps small.
 
 	- Update data.
 
 
-0.04    2015-09-06 (PERLANCAR)
+0.04    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -48,7 +54,7 @@
 	  requirement.
 
 
-0.03    2014-12-29 (PERLANCAR)
+0.03    2014-12-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -62,6 +68,6 @@
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.01    2014-05-28 (SHARYANTO)
+0.01    2014-05-28  Released-By: SHARYANTO
 
         - First version.

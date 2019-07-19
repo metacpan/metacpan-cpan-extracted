@@ -8,7 +8,7 @@ use base qw( Exporter );
 our @EXPORT = grep /^arguments_/, keys %FFI::Platypus::API::;
 
 # ABSTRACT: Platypus arguments and return value API for custom types
-our $VERSION = '0.90'; # VERSION
+our $VERSION = '0.92'; # VERSION
 
 
 1;
@@ -25,7 +25,7 @@ FFI::Platypus::API - Platypus arguments and return value API for custom types
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,12 @@ version 0.90
  }
 
 =head1 DESCRIPTION
+
+B<NOTE>: I added this interface early on to L<FFI::Platypus>, but haven't
+used it much, generally finding function wrappers to be a more powerful
+(although possibly not as fast) interface.  It has thus not been
+tested as much as the rest of Platypus.  If you feel the need to use
+this interface please coordinate with the Platypus developers.
 
 The custom types API for L<FFI::Platypus> allows you to set multiple C 
 arguments from a single Perl argument as a common type.  This is 

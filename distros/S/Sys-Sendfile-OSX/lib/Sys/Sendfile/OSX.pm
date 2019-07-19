@@ -1,11 +1,11 @@
 package Sys::Sendfile::OSX;
-$Sys::Sendfile::OSX::VERSION = '0.01';
+$Sys::Sendfile::OSX::VERSION = '0.02';
 # ABSTRACT: Exposing sendfile() for OS X
 
 use strict;
 use warnings;
 
-use Exporter;
+use Exporter qw(import);
 our @EXPORT_OK = qw(sendfile);
 
 require XSLoader;
@@ -62,10 +62,6 @@ Also optionally, C<$offset> can be specified to set a specific-sized chunk from
 a specific offset.
 
 =back
-
-=head1 REPOSITORY
-
-L<https://github.com/ltriant/Sys-Sendfile-OSX>
 
 =head1 AUTHOR
 

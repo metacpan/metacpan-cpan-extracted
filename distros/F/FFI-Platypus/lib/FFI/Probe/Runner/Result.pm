@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: The results from a probe run.
-our $VERSION = '0.90'; # VERSION
+our $VERSION = '0.92'; # VERSION
 
 
 sub new
@@ -41,7 +41,7 @@ FFI::Probe::Runner::Result - The results from a probe run.
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 

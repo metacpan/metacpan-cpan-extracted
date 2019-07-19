@@ -1,5 +1,9 @@
 Revision history for Perl module Net::ACME2
 
+0.30 18 July 2019
+- Fix (internal?) error when newNonce is not called.
+- Fix MANIFEST.
+
 0.29 13 July 2019
 - Fix Net::ACME2::Challenge::error() breakage from 0.28.
 

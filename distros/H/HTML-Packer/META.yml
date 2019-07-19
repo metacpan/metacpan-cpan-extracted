@@ -19,6 +19,7 @@ no_index:
     - inc
 requires:
   CSS::Packer: '2.01'
+  Digest::SHA: '0'
   JavaScript::Packer: '2.01'
   Regexp::RegGrp: 1.001_001
 resources:
@@ -26,5 +27,5 @@ resources:
   homepage: https://metacpan.org/module/HTML::Packer
   license: http://dev.perl.org/licenses/
   repository: https://github.com/leejo/html-packer-perl
-version: '2.08'
+version: '2.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

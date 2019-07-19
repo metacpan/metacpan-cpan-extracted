@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Config::AWS" : {
          "file" : "lib/Config/AWS.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,8 @@
          "web" : "https://gitlab.com/jjatria/Config-AWS"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

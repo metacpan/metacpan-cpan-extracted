@@ -1,5 +1,5 @@
 package Net::Stomp::MooseHelpers;
-$Net::Stomp::MooseHelpers::VERSION = '2.9';
+$Net::Stomp::MooseHelpers::VERSION = '3.0';
 {
   $Net::Stomp::MooseHelpers::DIST = 'Net-Stomp-MooseHelpers';
 }
@@ -21,7 +21,7 @@ Net::Stomp::MooseHelpers - set of helper roles and types to deal with Net::Stomp
 
 =head1 VERSION
 
-version 2.9
+version 3.0
 
 =head1 DESCRIPTION
 

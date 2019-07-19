@@ -1,22 +1,23 @@
 ---
 abstract: 'Provides a braindead tarball builder thingie'
 author:
-  - 'Erin Schoenhals <erin@cpanel.net>'
+  - 'Alexandra Hrefna Maheu <xan@cpanel.net>'
 build_requires:
-  Test::Exception: 0
-  Test::Simple: 0.44
+  Test::Exception: '0'
+  Test::Simple: '0.44'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Archive-Tar-Builder
 no_index:
   directory:
     - t
     - inc
 requires: {}
-version: 2.5002
+version: '2.5003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

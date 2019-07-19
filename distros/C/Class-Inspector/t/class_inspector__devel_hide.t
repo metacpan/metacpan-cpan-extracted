@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Class::Inspector;
 
-eval q{ use Devel::Hide };
+eval { require Devel::Hide };
 plan skip_all => 'test requires Devel::Hide' if $@;
 plan tests => 2;
 

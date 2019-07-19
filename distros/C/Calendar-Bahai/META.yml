@@ -22,7 +22,7 @@ no_index:
 provides:
   Calendar::Bahai:
     file: lib/Calendar/Bahai.pm
-    version: '0.52'
+    version: '0.53'
 requires:
   Calendar::Plugin::Renderer: '0.15'
   Date::Bahai::Simple: '0.25'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Calendar-Bahai.git
-version: '0.52'
+version: '0.53'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

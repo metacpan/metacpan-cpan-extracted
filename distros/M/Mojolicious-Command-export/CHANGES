@@ -1,5 +1,12 @@
 Changelog for Mojolicious-Plugin-Export
 
+0.006     2019-07-18 20:51:05-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed 'mailto:' links being followed (and, most likely, a spurious
+      404 error being thrown)
+
 0.005     2019-07-06 18:41:58-05:00 America/Chicago
 
     [Added]

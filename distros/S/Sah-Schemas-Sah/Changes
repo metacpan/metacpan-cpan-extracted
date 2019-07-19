@@ -1,5 +1,8 @@
-Revision history for Sah-Schemas-Sah
+0.9.46.0  2019-07-19  Released-By: PERLANCAR; Urgency: medium
 
-0.9.43.1  2016-07-25 (PERLANCAR)
+          - Update to Sah 0.9.46 (new clauses: examples & invalid_examples).
+
+
+0.9.43.1  2016-07-25  Released-By: PERLANCAR
 
           - First release, split from Sah.

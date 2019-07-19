@@ -17,13 +17,18 @@ BEGIN {
 use Curio::Factory;
 
 my %possibles = (
+    does_registry          => [undef, 1],
     resource_method_name   => [undef, 'chi'],
-    registers_resources    => [undef, 1],
+    installs_curio_method  => [undef, 1],
     does_caching           => [undef, 1],
     cache_per_process      => [undef, 1],
+    export_function_name   => [undef, 'myapp_cache'],
+    always_export          => [undef, 1],
+    export_resource        => [undef, 1],
     allow_undeclared_keys  => [undef, 1],
     default_key            => [undef, 'random'],
     key_argument           => [undef, 'connection_key'],
+    default_arguments      => [undef, {foo=>1} ],
     add_key                => [0, 1],
     alias_key              => [0, 1],
 );

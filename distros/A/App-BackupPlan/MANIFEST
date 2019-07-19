@@ -4,7 +4,11 @@ MANIFEST
 README
 TODO
 t/BackupPlan.t
+t/Policy.t
+t/Utils.t
 lib/App/BackupPlan.pm
+lib/App/BackupPlan/Policy.pm
+lib/App/BackupPlan/Utils.pm
 bin/backup.pl
 bin/log4perl.conf
 TestData/log4perl.conf
@@ -14,4 +18,8 @@ TestData/source/tst2.txt
 TestData/source/tst3.txt
 TestData/source/tst4.txt
 TestData/target/dummy
+TestData/target/tst_20190630.tar.gz
+TestData/target/tst_20190707.tar.gz
+TestData/target/tst_20190714.tar.gz
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

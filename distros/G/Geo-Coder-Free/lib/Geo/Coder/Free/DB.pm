@@ -339,7 +339,6 @@ sub fetchrow_hashref {
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	$self->{'logger'}->debug(Data::Dumper->new([\%params])->Dump());
 	my $table = $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 

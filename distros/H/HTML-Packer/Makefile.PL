@@ -15,6 +15,7 @@ WriteMakefile(
     'Regexp::RegGrp'        => '1.001_001',
     'CSS::Packer'           => "2.01",
     'JavaScript::Packer'    => "2.01",
+	'Digest::SHA'           => 0, # core module
   },
   BUILD_REQUIRES => {
     'Test::More'               => 0,

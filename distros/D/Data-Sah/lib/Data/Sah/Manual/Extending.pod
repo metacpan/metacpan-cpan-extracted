@@ -13,7 +13,7 @@ Data::Sah::Manual::Extending - Extending Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.896 of Data::Sah::Manual::Extending (from Perl distribution Data-Sah), released on 2019-07-04.
+This document describes version 0.897 of Data::Sah::Manual::Extending (from Perl distribution Data-Sah), released on 2019-07-19.
 
 =head1 DESCRIPTION
 

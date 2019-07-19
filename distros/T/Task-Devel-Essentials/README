@@ -1,4 +1,4 @@
-Task-Devel-Essentials version 0.012
+Task-Devel-Essentials version 0.013
 ===================================
 
 Task::Devel::Essentials is a bundle of modules useful for developers.
@@ -22,7 +22,7 @@ are still present.
 
 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013-2018 Martin Becker
+Copyright (c) 2013-2019 Martin Becker
 
 This bundle is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

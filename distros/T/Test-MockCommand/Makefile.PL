@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'Test::MockCommand',
-    AUTHOR              => 'Stuart Caie <kyzer@4u.net>',
+    AUTHOR              => 'Stuart Caie <kyzer@kyzer.me.uk>',
     VERSION_FROM        => 'lib/Test/MockCommand.pm',
     ABSTRACT_FROM       => 'lib/Test/MockCommand.pm',
     PREREQ_PM => {

@@ -140,9 +140,17 @@ sub record_exec {
 sub record_readpipe {
     my $self = shift;
     my %args = @_;
+
+    # readpipe() in perl >= 5.27.7 breaks when passed a dereferenced array,
+    # it essentially calls scalar() on its arguments. @{["command"]} becomes
+    # "1" rather than "command". We have to pass a single scalar value.
+    # https://rt.perl.org/Public/Bug/Display.html?id=132810
+    # https://rt.perl.org/Public/Bug/Display.html?id=4574
+    my @out = CORE::readpipe($args{arguments}->[0]);
+
     # handle() will automatically split this according to $/
     # if needed, but we always return it as a scalar
-    return join '', CORE::readpipe(@{$args{arguments}});
+    return join '', @out;
 }
 
 1;

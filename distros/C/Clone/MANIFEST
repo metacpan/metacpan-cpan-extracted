@@ -4,7 +4,7 @@ Clone.xs
 Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)
-README
+README.md
 t/01array.t
 t/02hash.t
 t/03scalar.t

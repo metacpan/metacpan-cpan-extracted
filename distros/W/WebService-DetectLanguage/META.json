@@ -25,12 +25,14 @@
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "Moo" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "Ref::Util" : "0.202",
             "Test::More" : "0.88",
+            "lib" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -45,7 +47,7 @@
          "web" : "https://github.com/neilb/WebService-DetectLanguage"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.28.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

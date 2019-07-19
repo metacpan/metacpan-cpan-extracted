@@ -1,0 +1,8 @@
+name = "Web-NewsAPI"
+badges = ["travis-ci.com"]
+authority="cpan:JMAC"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+readme_from="README.pod"

@@ -79,7 +79,7 @@
    "provides" : {
       "Test::Roo::DataDriven" : {
          "file" : "lib/Test/Roo/DataDriven.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.4.2"
       }
    },
    "release_status" : "stable",
@@ -93,7 +93,7 @@
          "web" : "https://github.com/robrwo/Test-Roo-DataDriven"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.4.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",

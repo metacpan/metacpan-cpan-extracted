@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::JSON;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.75';
+our $VERSION = '1.77';
 
 use Moo;
 use Catmandu;

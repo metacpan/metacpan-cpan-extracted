@@ -22,7 +22,7 @@ expanding multi-card moves.
 
 =head1 VERSION
 
-version 0.2201
+version 0.2202
 
 =head1 SYNOPSIS
 
@@ -34,10 +34,6 @@ version 0.2201
 
 F<expand-solitaire-multi-cards-moves> is a command-line interface to
 L<Games::Solitaire::Verify::Solution::ExpandMultiCardsMoves>.
-
-=head1 VERSION
-
-version 0.2201
 
 =head1 COMMAND LINE OPTIONS
 

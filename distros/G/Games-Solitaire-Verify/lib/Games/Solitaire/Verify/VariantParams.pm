@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::VariantParams;
-$Games::Solitaire::Verify::VariantParams::VERSION = '0.2201';
+$Games::Solitaire::Verify::VariantParams::VERSION = '0.2202';
 use warnings;
 use strict;
 
@@ -173,7 +173,7 @@ the parameters of the variant.
 
 =head1 VERSION
 
-version 0.2201
+version 0.2202
 
 =head1 SYNOPSIS
 
@@ -185,10 +185,6 @@ version 0.2201
                 seq_build_by => "alt_color",
             },
         );
-
-=head1 VERSION
-
-version 0.2201
 
 =head1 METHODS
 

@@ -10,11 +10,11 @@ Task::Devel::Essentials - Bundle of modules useful for developers
 
 =head1 VERSION
 
-Version 0.012
+Version 0.013
 
 =cut
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 =head1 SYNOPSIS
 
@@ -129,6 +129,10 @@ our $VERSION = '0.012';
 
 =item L<Perl::Critic>
 
+=item L<Perl6::Form>
+
+=item L<Perl6::Slurp>
+
 =item L<Readonly>
 
 =item L<Regexp::Common>
@@ -152,6 +156,10 @@ our $VERSION = '0.012';
 =item L<Test::Fatal>
 
 =item L<Test::Harness>
+
+=item L<Test::MinimumVersion>
+
+=item L<Test::MinimumVersion::Fast> (optional)
 
 =item L<Test::MockModule>
 
@@ -177,6 +185,8 @@ our $VERSION = '0.012';
 
 =item L<Test::Simple>
 
+=item L<Test::Strict>
+
 =item L<Test::Warn>
 
 =item L<Test2::Suite>
@@ -199,7 +209,7 @@ Martin Becker C<< <mhasch at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2018 Martin Becker.
+Copyright 2013-2019 Martin Becker.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

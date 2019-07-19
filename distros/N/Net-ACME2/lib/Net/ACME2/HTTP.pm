@@ -200,7 +200,7 @@ sub _get_first_nonce {
     my $url = $self->{'_nonce_url'} or do {
 
         # Shouldn’t happen unless there’s an errant refactor.
-        die Net::ACME2::X->create('Set newNonce URL first!');
+        die Net::ACME2::X->create('Generic', 'Set newNonce URL first!');
     };
 
     $self->_request_and_set_last_nonce( 'HEAD', $url );

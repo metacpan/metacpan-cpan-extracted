@@ -1,5 +1,5 @@
 package Net::Stripe;
-$Net::Stripe::VERSION = '0.37';
+$Net::Stripe::VERSION = '0.39';
 use Moose;
 use Class::Load;
 use Kavorka;
@@ -766,7 +766,7 @@ Net::Stripe - API client for Stripe.com
 
 =head1 VERSION
 
-version 0.37
+version 0.39
 
 =head1 SYNOPSIS
 
@@ -794,6 +794,17 @@ This module is a wrapper around the Stripe.com HTTP API.  Methods are
 generally named after the HTTP method and the object name.
 
 This method returns Moose objects for responses from the API.
+
+=head2 WARNING
+
+This SDK is "version agnostic" of the Stripe API
+L<https://github.com/lukec/stripe-perl/issues/80>
+and at the time of this release Stripe has some major changes afoot
+L<https://github.com/lukec/stripe-perl/issues/115>
+
+If you're considering using this please click "Watch" on this github project
+L<https://github.com/lukec/stripe-perl/>
+where discussion on these topics takes place.
 
 =head1 METHODS
 
@@ -1620,17 +1631,6 @@ Returns a L<Net::Stripe::Invoiceitem>.
 Returns a L<Net::Stripe::List> object containing L<Net::Stripe::Invoiceitem> objects.
 
   $stripe->get_invoiceitems(customer => 'test', limit => 30);
-
-=head1 WARNING
-
-This SDK is "version agnostic" of the Stripe API
-L<https://github.com/lukec/stripe-perl/issues/80>
-and at the time of this release Stripe has some major changes afoot
-L<https://github.com/lukec/stripe-perl/issues/115>
-
-If you're considering using this please click "Watch" on this github project
-L<https://github.com/lukec/stripe-perl/>
-where discussion on these topics takes place.
 
 =discount_method delete_customer_discount
 

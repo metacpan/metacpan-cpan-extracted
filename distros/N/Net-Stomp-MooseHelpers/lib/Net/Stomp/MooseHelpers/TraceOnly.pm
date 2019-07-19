@@ -1,5 +1,5 @@
 package Net::Stomp::MooseHelpers::TraceOnly;
-$Net::Stomp::MooseHelpers::TraceOnly::VERSION = '2.9';
+$Net::Stomp::MooseHelpers::TraceOnly::VERSION = '3.0';
 {
   $Net::Stomp::MooseHelpers::TraceOnly::DIST = 'Net-Stomp-MooseHelpers';
 }
@@ -28,13 +28,18 @@ around '_build_connection' => sub {
 };
 
 package Net::Stomp::MooseHelpers::TraceOnly::Connection;
-$Net::Stomp::MooseHelpers::TraceOnly::Connection::VERSION = '2.9';
+$Net::Stomp::MooseHelpers::TraceOnly::Connection::VERSION = '3.0';
 {
   $Net::Stomp::MooseHelpers::TraceOnly::Connection::DIST = 'Net-Stomp-MooseHelpers';
 }{
 use Moose;
 use Carp;
+use Log::Any;
 require Net::Stomp;
+
+# newer Net::Stomp have a logger, so we need one too
+has logger => ( is => 'ro', lazy_build => 1 );
+sub _build_logger { Log::Any->get_logger() }
 
 has _tracing_object => ( is => 'rw' );
 
@@ -119,7 +124,7 @@ Net::Stomp::MooseHelpers::TraceOnly - role to replace the Net::Stomp connection 
 
 =head1 VERSION
 
-version 2.9
+version 3.0
 
 =head1 SYNOPSIS
 

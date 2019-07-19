@@ -13,7 +13,7 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.90'; # VERSION
+our $VERSION = '0.92'; # VERSION
 
 
 sub new
@@ -284,7 +284,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 

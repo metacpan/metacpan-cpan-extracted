@@ -1,5 +1,7 @@
 # PFT
 
+[![Build Status](https://travis-ci.org/dacav/PFT.svg?branch=master)](https://travis-ci.org/dacav/PFT)
+
 PFT stands for *Plain F. Text*, where the meaning of *F.* is up to
 personal interpretation. Like *Fancy* or *Fantastic*.
 

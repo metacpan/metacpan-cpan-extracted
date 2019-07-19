@@ -1,5 +1,4 @@
 package Test::NiceDump;
-
 use strict;
 use warnings;
 
@@ -13,6 +12,7 @@ use Data::Dump::Filtered;
 
 our @EXPORT_OK = ("nice_explain", "nice_dump");
 
+our $VERSION = '1.0.1'; # VERSION
 # ABSTRACT: let's have a nice and human readable dump of our objects!
 
 
@@ -120,7 +120,7 @@ Test::NiceDump - let's have a nice and human readable dump of our objects!
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

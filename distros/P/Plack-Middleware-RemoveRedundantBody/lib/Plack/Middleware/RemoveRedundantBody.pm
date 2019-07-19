@@ -4,7 +4,7 @@ use warnings;
 use parent qw( Plack::Middleware );
 use Plack::Util;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 # ABSTRACT: Plack::Middleware which removes body for HTTP response if it's not required
 
@@ -37,7 +37,7 @@ Plack::Middleware::RemoveRedundantBody - Plack::Middleware which removes body fo
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -66,6 +66,8 @@ Karen Etheridge <ether@cpan.org>
 Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 Tomohiro Hosaka <hello@bokut.in>
+
+Robert Rothenberg <rrwo@cpan.org>
 
 =head1 AUTHOR
 

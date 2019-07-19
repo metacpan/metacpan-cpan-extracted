@@ -1,5 +1,5 @@
 package Curio::Factory;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =encoding utf8
 
@@ -23,11 +23,12 @@ object" it is referring to instances of L</class>.
 
 =cut
 
+use Curio::Guard;
 use Curio::Util;
 use Package::Stash;
 use Scalar::Util qw( blessed refaddr );
 use Types::Common::String qw( NonEmptySimpleStr );
-use Types::Standard qw( Bool Map HashRef );
+use Types::Standard qw( Bool Map HashRef Undef );
 
 use Moo;
 use strictures 2;
@@ -41,7 +42,8 @@ sub BUILD {
     my ($self) = @_;
 
     $self->_store_class_to_factory();
-    $self->_install_fast_fetch_method();
+    $self->_install_fetch_method();
+    $self->_install_factory_method();
 
     return;
 }
@@ -59,22 +61,32 @@ sub _store_class_to_factory {
     return;
 }
 
-sub _install_fast_fetch_method {
+sub _install_fetch_method {
     my ($self) = @_;
 
-    my $stash = Package::Stash->new( $self->class() );
-
-    my $sub = subname(
-        'fetch',
-        sub{
-            shift;
-            return $self->fetch_curio( @_ );
-        },
+    Package::Stash->new( $self->class() )->add_symbol(
+        '&fetch',
+        subname(
+            'fetch',
+            sub{
+                shift;
+                return $self->fetch_curio( @_ );
+            },
+        ),
     );
 
-    $stash->add_symbol(
-        '&fetch',
-        $sub,
+    return;
+}
+
+sub _install_factory_method {
+    my ($self) = @_;
+
+    Package::Stash->new( $self->class() )->add_symbol(
+        '&factory',
+        subname(
+            'factory',
+            sub{ $self },
+        ),
     );
 
     return;
@@ -190,9 +202,28 @@ has class => (
 
 =head1 OPTIONAL ARGUMENTS
 
+=head2 does_registry
+
+    does_registry => 1,
+    resource_method_name => 'chi',
+
+Causes the resource of all Curio objects to be automatically
+registered so that L</find_curio> may function.
+
+Defaults off (C<0>), meaning L</find_curio> will always return
+C<undef>.
+
+=cut
+
+has does_registry => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
 =head2 resource_method_name
 
-    resource_method_name 'chi';
+    resource_method_name => 'chi',
 
 The method name in the Curio class to retrieve the resource that
 it holds.  A resource is whatever "thing" the Curio class
@@ -206,31 +237,34 @@ this argument refers to, such as:
     has chi => ( is=>'lazy', ... );
 
 This argument must be defined in order for L<fetch_resource> and
-L</registers_resources> to work, otherwise they will have no way
+L</does_registry> to work, otherwise they will have no way
 to know how to get at the resource object.
 
-There is no default for this argument.
+This defaults to the string C<resource>.
 
 =cut
 
 has resource_method_name => (
-  is  => 'rw',
-  isa => NonEmptySimpleStr,
+  is      => 'rw',
+  isa     => NonEmptySimpleStr,
+  default => 'resource',
 );
 
-=head2 registers_resources
+=head2 installs_curio_method
 
-    registers_resources => 1,
+    does_registry => 1,
+    resource_method_name => 'chi',
+    installs_curio_method => 1,
 
-Causes the resource of all Curio objects to be automatically
-registered so that L</find_curio> may function.
+This causes a C<curio()> method to be installed in all resource
+object classes.  The method calls L</find_curio> and returns it,
+allowing for reverse lookups from resource objects to curio objects.
 
-Defaults off (C<0>), meaning L</find_curio> will always return
-C<undef>.
+L</does_registry> must be set for this to function.
 
 =cut
 
-has registers_resources => (
+has installs_curio_method => (
     is      => 'rw',
     isa     => Bool,
     default => 0,
@@ -276,6 +310,62 @@ this turned on.
 =cut
 
 has cache_per_process => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
+=head2 export_function_name
+
+    export_function_name => 'myapp_cache',
+
+The export function is exported when the the Curio class is
+imported, as in:
+
+    use MyApp::Service::Cache;
+    my $chi = myapp_cache( $key );
+
+See also L</always_export> and L</export_resource>.
+
+=cut
+
+has export_function_name => (
+    is  => 'rw',
+    isa => NonEmptySimpleStr | Undef,
+);
+
+=head2 always_export
+
+    always_export => 1,
+
+When enabled this causes the export function to be always exported.
+
+    use MyApp::Service::Cache;
+
+When this option is not set you must explicitly request that the
+export function be exported.
+
+    use MyApp::Service::Cache qw( myapp_cache );
+
+=cut
+
+has always_export => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
+=head2 export_resource
+
+    export_resource => 1,
+
+Rather than returning the curio object this will cause the resource
+object to be returned by the export function.  Requires that
+L</resource_method_name> be set.
+
+=cut
+
+has export_resource => (
     is      => 'rw',
     isa     => Bool,
     default => 0,
@@ -340,7 +430,7 @@ Defaults to no default key.
 
 has default_key => (
     is  => 'rw',
-    isa => NonEmptySimpleStr,
+    isa => NonEmptySimpleStr | Undef,
 );
 
 =head2 key_argument
@@ -363,7 +453,7 @@ Defaults to no key argument.
 
 has key_argument => (
     is  => 'rw',
-    isa => NonEmptySimpleStr,
+    isa => NonEmptySimpleStr | Undef,
 );
 
 =head2 default_arguments
@@ -446,8 +536,7 @@ sub _fetch_curio {
     my $resource = $factory->fetch_resource();
     my $resource = $factory->fetch_resource( $key );
 
-Like L</fetch_curio>, but always returns a resource.  Will only work
-if L</resource_method_name> is set.
+Like L</fetch_curio>, but always returns a resource.
 
 =cut
 
@@ -464,10 +553,10 @@ sub _fetch_resource {
 
     my $method = $self->resource_method_name();
 
-    croak 'Cannot call fetch_resource() without first setting resource_method_name'
-        if !defined $method;
+    my $curio = $self->_fetch_curio( $key );
+    return undef if !$curio->can( $method );
 
-    return $self->_fetch_curio( $key )->$method();
+    return $curio->$method();
 }
 
 # I see no need for a public create() method at this time.
@@ -487,15 +576,45 @@ sub _create {
 
     my $curio = $self->class->new( $args );
 
-    if ($self->registers_resources()) {
-        my $method = $self->resource_method_name();
-        if (defined($method) and $curio->can($method)) {
-            my $resource = $curio->$method();
-            $self->_registry->{ refaddr $resource } = $curio if ref $resource;
-        }
+    my $method = $self->resource_method_name();
+    if ($curio->can($method)) {
+        my $resource = $curio->$method();
+        $self->_register_resource( $curio, $resource );
+
+        my $resource_class = blessed $resource;
+        $self->_install_curio_method( $resource_class ) if $resource_class;
+
     }
 
     return $curio;
+}
+
+sub _register_resource {
+    my ($self, $curio, $resource) = @_;
+
+    return if !$self->does_registry();
+    return if !ref $resource;
+
+    $self->_registry->{ refaddr $resource } = $curio;
+
+    return;
+}
+
+sub _install_curio_method {
+    my ($self, $resource_class) = @_;
+
+    return if !$self->installs_curio_method();
+    return if $resource_class->can('curio');
+
+    no strict 'refs';
+
+    *{"$resource_class\::curio"} = sub{
+        my ($resource) = @_;
+        return undef if !blessed $resource;
+        return $self->find_curio( $resource );
+    };
+
+    return;
 }
 
 =head2 arguments
@@ -604,6 +723,35 @@ sub alias_key {
     return;
 }
 
+=head2 find_curio
+
+    my $curio_object = $factory->find_curio( $resource );
+
+Given a Curio object's resource this will return that Curio
+object for it.
+
+This does a reverse lookup of sorts and can be useful in
+specialized situations where you have the resource, and you
+need to introspect back into the Curio object.
+
+    # I have my $chi and nothing else.
+    my $factory = MyApp::Service::Cache->factory();
+    my $curio = $factory->find_curio( $chi );
+
+This only works if you've enabled L</does_registry>, otherwise
+C<undef> is always returned by this method.
+
+=cut
+
+sub find_curio {
+    my ($self, $resource) = @_;
+
+    croak 'Non-reference resource passed to find_curio()'
+        if !ref $resource;
+
+    return $self->_registry->{ refaddr $resource };
+}
+
 =head2 inject
 
     $factory->inject( $curio_object );
@@ -638,6 +786,32 @@ sub inject {
     return;
 }
 
+=head2 inject_with_guard
+
+    my $guard = $factory->inject_with_guard(
+        $curio_object,
+    );
+    
+    my $guard = $factory->inject_with_guard(
+        $key, $curio_object,
+    );
+
+This is just like L</inject> except it returns an guard object which,
+when it leaves scope and is destroyed, will automatically L</uninject>.
+
+=cut
+
+sub inject_with_guard {
+    my $class = shift;
+
+    $class->factory->inject( @_ );
+    my $key = (@_==1) ? undef : shift( @_ );
+
+    return Curio::Guard->new(sub{
+        $class->factory->uninject( $key ? $key : () );
+    });
+}
+
 =head2 uninject
 
     my $curio_object = $factory->uninject();
@@ -662,36 +836,6 @@ sub uninject {
     my $object = delete $self->_injections->{$key};
 
     return $object;
-}
-
-=head2 find_curio
-
-    my $curio_object = $factory->find_curio( $resource );
-
-Given a Curio object's resource this will return that Curio
-object for it.
-
-This does a reverse lookup of sorts and can be useful in
-specialized situations where you have the resource, and you
-need to introspect back into the Curio object.
-
-    # I have my $chi and nothing else.
-    my $factory = MyApp::Service::Cache->factory();
-    my $curio = $factory->find_curio( $chi );
-
-This only works if you've enabled both L</resource_method_name>
-and L</registers_resources>, otherwise C<undef> is always
-returned by this method.
-
-=cut
-
-sub find_curio {
-    my ($self, $resource) = @_;
-
-    croak 'Non-reference resource passed to find_curio()'
-        if !ref $resource;
-
-    return $self->_registry->{ refaddr $resource };
 }
 
 =head1 CLASS METHODS

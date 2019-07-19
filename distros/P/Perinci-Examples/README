@@ -2,8 +2,8 @@ NAME
     Perinci::Examples - Various examples of Rinci metadata
 
 VERSION
-    This document describes version 0.812 of Perinci::Examples (from Perl
-    distribution Perinci-Examples), released on 2019-04-15.
+    This document describes version 0.814 of Perinci::Examples (from Perl
+    distribution Perinci-Examples), released on 2019-06-29.
 
 DESCRIPTION
     This distribution contains an odd mix of various functions, variables,

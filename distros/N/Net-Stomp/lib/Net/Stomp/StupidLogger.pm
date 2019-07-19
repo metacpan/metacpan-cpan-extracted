@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.57';
+our $VERSION = '0.60';
 
 sub new {
     my ($class,$levels) = @_;
@@ -41,8 +41,8 @@ delegates to L<carp|Carp/carp>.
 
 By default, it logs at C<warn> and above.
 
-You should pass a real logger object to L<Net::Stomp> if you want any
-other behaviour.
+L<Net::Stomp> used to use this, but now it just uses L<Log::Any>, so
+this package is here just in case someone else was using it.
 
 =head1 METHODS
 

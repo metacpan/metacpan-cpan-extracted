@@ -1,0 +1,59 @@
+---
+abstract: 'Fetch and search news headlines and sources from News API'
+author:
+  - 'Jason McIntosh (jmac@jmac.org)'
+build_requires:
+  Test::LWP::UserAgent: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-NewsAPI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Web::NewsAPI:
+    file: lib/Web/NewsAPI.pm
+    version: '0.001'
+  Web::NewsAPI::Article:
+    file: lib/Web/NewsAPI/Article.pm
+  Web::NewsAPI::Source:
+    file: lib/Web/NewsAPI/Source.pm
+  Web::NewsAPI::Types:
+    file: lib/Web/NewsAPI/Types.pm
+requires:
+  Carp: '0'
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  DateTime::Format::ISO8601::Format: '0'
+  JSON: '0'
+  LWP: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  URI: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/jmacdotorg/newsapi-perl/issues
+  homepage: https://github.com/jmacdotorg/newsapi-perl
+  repository: git://github.com/jmacdotorg/newsapi-perl.git
+version: '0.001'
+x_authority: cpan:JMAC
+x_contributors:
+  - 'Jason McIntosh <jmac@jmac.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

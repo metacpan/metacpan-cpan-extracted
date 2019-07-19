@@ -1,6 +1,6 @@
 package WebService::DetectLanguage;
-$WebService::DetectLanguage::VERSION = '0.02';
-use 5.006;
+$WebService::DetectLanguage::VERSION = '0.04';
+use 5.010;
 use Moo;
 use JSON::MaybeXS;
 
@@ -33,6 +33,7 @@ sub _get
     if (not $response->{success}) {
         die "failed $response->{status} $response->{reason}\n";
     }
+
     return decode_json($response->{content});
 }
 
@@ -49,7 +50,7 @@ sub multi_detect
     my ($self, @strings) = @_;
     my $url              = $self->base_url."/detect";
     my $headers          = { "Authorization" => "Bearer ".$self->key };
-    my $form_data        = { 'q[]' => \@strings };
+    my $form_data        = [ 'q[]' => \@strings ];
     my $response         = $self->ua->post_form($url, $form_data, { headers => $headers });
 
     if (not $response->{success}) {
@@ -91,7 +92,6 @@ sub languages
 sub account_status
 {
     my $self   = shift;
-    # my $result = $self->_request("user/status");
     my $result = $self->_get("user/status");
 
     require WebService::DetectLanguage::AccountStatus;
@@ -168,6 +168,11 @@ if the first result is reliable enough to go with.
  if (@results > 1 && $results[0]->is_reliable) {
    # we'll go with that!
  }
+
+There will only ever be at most one result with C<is_reliable>
+set to a true value.
+If you get multiple results, they're always in decreasing order
+of reliability.
 
 Each result also includes a confidence value,
 which looks a bit like a percentage,

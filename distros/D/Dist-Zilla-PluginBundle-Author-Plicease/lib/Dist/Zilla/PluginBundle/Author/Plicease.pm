@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.36 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.37 {
 
   use 5.014;
   use Moose;
@@ -31,8 +31,8 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.36 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.36
-    OurPkgVersion        0.12
+    Author::Plicease.*   2.37
+    OurPkgVersion        0.21
     MinimumPerl          1.006
     InstallGuide         1.200006
     Run::.*              0.035
@@ -150,6 +150,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.36 {
     $self->_my_add_plugin([$self->payload->{version_plugin} || (
       'OurPkgVersion', {
         underscore_eval_version => $self->{payload}->{underscore_eval_version} // 1,
+        no_critic => 1,
       }
     )]);
     $self->_my_add_plugin(['MetaJSON']);
@@ -333,7 +334,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.36
+version 2.37
 
 =head1 SYNOPSIS
 
@@ -413,6 +414,7 @@ This plugin bundle is mostly equivalent to
  [AutoPrereqs]
  
  [OurPkgVersion]
+ no_critic = 1
  underscore_eval_version = 1
  
  [MetaJSON]

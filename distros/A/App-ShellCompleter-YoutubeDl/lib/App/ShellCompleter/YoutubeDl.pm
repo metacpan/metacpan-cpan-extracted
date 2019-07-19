@@ -1,7 +1,7 @@
 package App::ShellCompleter::YoutubeDl;
 
-our $DATE = '2019-03-14'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2019-07-18'; # DATE
+our $VERSION = '0.121'; # VERSION
 
 1;
 # ABSTRACT: Shell completion for youtube-dl
@@ -18,7 +18,7 @@ App::ShellCompleter::YoutubeDl - Shell completion for youtube-dl
 
 =head1 VERSION
 
-This document describes version 0.120 of App::ShellCompleter::YoutubeDl (from Perl distribution App-ShellCompleter-YoutubeDl), released on 2019-03-14.
+This document describes version 0.121 of App::ShellCompleter::YoutubeDl (from Perl distribution App-ShellCompleter-YoutubeDl), released on 2019-07-18.
 
 =head1 SYNOPSIS
 

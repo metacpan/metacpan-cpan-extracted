@@ -1,0 +1,24 @@
+Changes
+lib/Net/Connection/Match.pm
+lib/Net/Connection/Match/CIDR.pm
+lib/Net/Connection/Match/Ports.pm
+lib/Net/Connection/Match/Protos.p
+lib/Net/Connection/Match/PTR.pmm
+lib/Net/Connection/Match/States.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-load.t
+t/02-load.t
+t/03-load.t
+t/04-load.t
+t/05-load.t
+t/CIDR.t
+t/PTR.t
+t/Protos.t
+t/Ports.t
+t/States.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

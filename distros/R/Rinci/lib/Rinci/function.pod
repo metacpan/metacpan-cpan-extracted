@@ -22,7 +22,7 @@ Rinci::function - Metadata for your functions/methods
 
 =head1 VERSION
 
-This document describes version 1.1.91 of Rinci::function (from Perl distribution Rinci), released on 2019-05-25.
+This document describes version 1.1.93 of Rinci::function (from Perl distribution Rinci), released on 2019-07-19.
 
 =head1 INTRODUCTION
 
@@ -562,7 +562,13 @@ converted from text and validated.
 =head3 examples (argument property)
 
 Array. Each element is sample argument values. But if it is a hash, will be
-assumed as a DefHash.
+assumed as a DefHash with the actual value put in the C<value> property (so if
+your sample argument is a hash like C<{}> (in JSON), you have to specify it as
+C<< {"value":{}, "summary":"Optional summary..."} >> (in JSON).
+
+Note that a Sah schema can also have an L<examples|Sah::Type/"examples"> clause
+which you can use to put examples in. And Rinci function metadata also has
+L<examples|/"examples (function property)"> property too.
 
 Example function metadata and its implementation in Perl:
 
@@ -573,7 +579,9 @@ Example function metadata and its implementation in Perl:
          a => {
              summary => 'The first operand',
              description => '... a longer description ...',
-             schema=>'float*',
+             schema=>['float*', {
+                 examples => [1, -10, 0, 3.333],
+             }],
              pos => 0,
              tags => ['category:operand'],
          },
@@ -583,6 +591,10 @@ Example function metadata and its implementation in Perl:
              schema => 'float*',
              pos => 1,
              tags => ['category:operand'],
+             examples => [
+                 1, -10, 0, 3.333,
+                 {value => 1e-10, summary => 'Blah blah'},
+             ],
          },
          round => {
              summary => 'Whether to round result',
@@ -1539,7 +1551,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

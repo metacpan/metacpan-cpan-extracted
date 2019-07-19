@@ -3,11 +3,19 @@
 use strict;
 use Test::More tests => 78;
 
-BEGIN { use_ok 'Time::Format', qw(%time) }
-my $tl_notok;
-BEGIN {$tl_notok = eval ('use Time::Local; 1')? 0 : 1}
+## ----------------------------------------------------------------------------------
+## Test for availability of certain modules.
+my $tl_ok;
+BEGIN {$tl_ok = eval ('use Time::Local; 1')}
 
-# Get day/month names in current locale
+
+## ----------------------------------------------------------------------------------
+## Load our module.
+BEGIN { use_ok 'Time::Format', qw(%time) }
+
+
+## ----------------------------------------------------------------------------------
+## Get day/month names in current locale; fallback to English (sorry!).
 my ($Weekday, $Day, $Month, $Mon);
 unless (eval
     {
@@ -21,10 +29,13 @@ unless (eval
 }
 
 
+## ----------------------------------------------------------------------------------
+## Begin tests.
+
 SKIP:
 {
-    skip 'Time::Local not available', 77  if $tl_notok;
-    skip 'XS version not available',  77  if !defined $Time::Format_XS::VERSION;
+    skip 'Time::Local not available', 77  unless $tl_ok;
+    skip 'XS version not available',  77  unless defined $Time::Format_XS::VERSION;
     my $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
     $t .= '.987654321';
 

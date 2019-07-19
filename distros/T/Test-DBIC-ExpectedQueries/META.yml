@@ -3,13 +3,15 @@ abstract: 'Test that only expected DBIx::Class queries are run'
 author:
   - 'Johan Lindstrom <johanl@cpan.org>'
 build_requires:
+  Test::Deep: '0'
+  Test::Warnings: '0'
   lib: '0'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,4 +27,6 @@ requires:
   Try::Tiny: '0'
 resources:
   bugtracker: https://github.com/jplindstrom/p5-Test-DBIC-ExpectedQueries/issues
-version: '1.011'
+version: '2.000'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, cPanel, Inc.
+ * Copyright (c) 2019, cPanel, L.L.C.
  * All rights reserved.
  * http://cpanel.net/
  *
@@ -18,25 +18,35 @@
 #include "b_buffer.h"
 #include "b_error.h"
 
-#define B_LOOKUP_SERVICE(s) ((b_lookup_service)s)
+#define B_USER_LOOKUP(s) ((b_user_lookup)s)
+#define B_HARDLINK_LOOKUP(s) ((b_hardlink_lookup)s)
 
 enum b_builder_options {
-    B_BUILDER_NONE            = 0,
-    B_BUILDER_QUIET           = 1 << 0,
-    B_BUILDER_IGNORE_ERRORS   = 1 << 1,
-    B_BUILDER_FOLLOW_SYMLINKS = 1 << 2,
-    B_BUILDER_GNU_EXTENSIONS  = 1 << 3,
-    B_BUILDER_PAX_EXTENSIONS  = 1 << 4,
-    B_BUILDER_EXTENSIONS_MASK = (B_BUILDER_GNU_EXTENSIONS |
-                                 B_BUILDER_PAX_EXTENSIONS)
+    B_BUILDER_NONE               = 0,
+    B_BUILDER_QUIET              = 1 << 0,
+    B_BUILDER_IGNORE_ERRORS      = 1 << 1,
+    B_BUILDER_FOLLOW_SYMLINKS    = 1 << 2,
+    B_BUILDER_PRESERVE_HARDLINKS = 1 << 3,
+    B_BUILDER_GNU_EXTENSIONS     = 1 << 4,
+    B_BUILDER_PAX_EXTENSIONS     = 1 << 5,
+    B_BUILDER_IGNORE_SOCKETS     = 1 << 6,
+    B_BUILDER_EXTENSIONS_MASK    = (B_BUILDER_GNU_EXTENSIONS |
+                                    B_BUILDER_PAX_EXTENSIONS)
 };
 
-typedef int (*b_lookup_service)(
+typedef int (*b_user_lookup)(
     void *      ctx,
     uid_t       uid,
     gid_t       gid,
     b_string ** user,
     b_string ** group
+);
+
+typedef b_string * (*b_hardlink_lookup)(
+    void *     ctx,
+    dev_t      dev,
+    ino_t      ino,
+    b_string * path
 );
 
 typedef struct _b_builder {
@@ -45,8 +55,10 @@ typedef struct _b_builder {
     size_t                 total;
     struct lafe_matching * match;
     enum b_builder_options options;
-    b_lookup_service       lookup_service;
-    void *                 lookup_ctx;
+    b_user_lookup          user_lookup;
+    void *                 user_cache;
+    b_hardlink_lookup      hardlink_lookup;
+    void *                 hardlink_cache;
     void *                 data;
 } b_builder;
 
@@ -68,10 +80,16 @@ void b_builder_set_data(
     void *      data
 );
 
-void b_builder_set_lookup_service(
+void b_builder_set_user_lookup(
     b_builder *      builder,
-    b_lookup_service service,
+    b_user_lookup service,
     void *           ctx
+);
+
+void b_builder_set_hardlink_cache(
+    b_builder *       builder,
+    b_hardlink_lookup lookup,
+    void *            cache
 );
 
 int b_builder_is_excluded(

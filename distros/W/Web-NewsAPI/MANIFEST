@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+README.pod
+cpanfile
+lib/Web/NewsAPI.pm
+lib/Web/NewsAPI/Article.pm
+lib/Web/NewsAPI/Source.pm
+lib/Web/NewsAPI/Types.pm
+minil.toml
+t/basic.t
+t/lib/NewsAPITestUserAgent.pm
+META.yml
+MANIFEST

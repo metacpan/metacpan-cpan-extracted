@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.78'; # VERSION
+our $VERSION = '1.79'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1161,7 +1161,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 

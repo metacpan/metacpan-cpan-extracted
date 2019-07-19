@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::HorneAutomovePrune;
-$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2201';
+$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2202';
 use strict;
 use warnings;
 
@@ -137,15 +137,11 @@ on a Freecell layout
 
 =head1 VERSION
 
-version 0.2201
+version 0.2202
 
 =head1 DESCRIPTION
 
 See L<https://groups.yahoo.com/neo/groups/fc-solve-discuss/search/messages?query=horne%20autoplay> .
-
-=head1 VERSION
-
-version 0.2201
 
 =head1 SUBROUTINES
 

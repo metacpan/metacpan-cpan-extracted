@@ -128,7 +128,7 @@ take lower precedence to [exclusions](https://metacpan.org/pod/FILE&#x20;PATH&#x
 
 # AUTHOR
 
-Written by Xan Tronix <xan@cpan.org>
+Written by Alexandra Hrefna Maheu <xan@cpan.org>
 
 # CONTRIBUTORS
 

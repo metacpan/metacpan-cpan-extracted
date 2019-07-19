@@ -2,8 +2,15 @@
 use lib 't/lib';
 use TestHelp;
 use Test::Fatal;
+use Log::Any::Adapter::Test;
 
 subtest 'default reconnect attempts' => sub {
+    Log::Any::Adapter->set(
+        { lexically => \(my $guard) },
+        'Test',
+    );
+    Log::Any::Adapter::Test->clear;
+
     my ($s,$fh) = mkstomp_testsocket(
         hosts => [
             {hostname=>'one',port=>1},
@@ -40,9 +47,36 @@ subtest 'default reconnect attempts' => sub {
         [1,2,0,1,2],
         'tried all hosts, round-robin, re-starting',
     );
+
+    cmp_deeply(
+        Log::Any::Adapter::Test->msgs,
+        [
+            superhashof({ message => re(qr{sending}) }),
+            superhashof({ message => re(qr{closing}) }),
+            superhashof({ message => re(qr{reconnecting}) }),
+            superhashof({ message => re(qr{error connecting to two}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to three}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to one}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to two}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{connecting}i) }),
+            superhashof({ message => re(qr{waiting}i) }),
+            superhashof({ message => re(qr{connected}i) }),
+        ],
+        'reconnecting should be logged',
+    );
 };
 
-subtest 'limiteh reconnect attempts' => sub {
+subtest 'limited reconnect attempts' => sub {
+    Log::Any::Adapter->set(
+        { lexically => \(my $guard) },
+        'Test',
+    );
+    Log::Any::Adapter::Test->clear;
+
     my ($s,$fh) = mkstomp_testsocket(
         hosts => [
             {hostname=>'one',port=>1},
@@ -75,6 +109,28 @@ subtest 'limiteh reconnect attempts' => sub {
         \@connected_hosts,
         [1,2,0,1,2,0],
         'tried all hosts, round-robin, re-starting, then stopped',
+    );
+
+    cmp_deeply(
+        Log::Any::Adapter::Test->msgs,
+        [
+            superhashof({ message => re(qr{sending}) }),
+            superhashof({ message => re(qr{closing}) }),
+            superhashof({ message => re(qr{reconnecting}) }),
+            superhashof({ message => re(qr{error connecting to two}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to three}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to one}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to two}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to three}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+            superhashof({ message => re(qr{error connecting to one}i) }),
+            superhashof({ message => re(qr{failed to connect}i) }),
+        ],
+        'reconnecting should be logged',
     );
 };
 

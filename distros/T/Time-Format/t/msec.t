@@ -8,11 +8,11 @@ use Test::More tests => 41;
 BEGIN { $Time::Format::NOXS = 1 }
 BEGIN { use_ok 'Time::Format', qw(:all) }
 my $hr_ok;
-BEGIN { $hr_ok = eval('use Time::HiRes qw(usleep); 1')? 1 : 0 }
+BEGIN { $hr_ok = eval('use Time::HiRes qw(usleep); 1') }
 
-#SKIP:
+SKIP:
 {
-#    skip 'Time::HiRes not available', 40 if $hr_notok;
+    skip 'Time::HiRes not available', 40  unless $hr_ok;
 
     my @vals;
     for (1..20)

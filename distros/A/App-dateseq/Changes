@@ -1,28 +1,43 @@
-0.094   2019-06-24 (PERLANCAR)
+0.096   2019-07-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] When --to is specified, the date specified in --to was
+	  not included.
+
+	- Replace broken str_alami_en coercion with str_natural.
+
+
+0.095   2019-07-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [doc] Mention durseq, seq, seq-pl.
+
+
+0.094   2019-06-24  Released-By: PERLANCAR
 
 	- Add options: --include-month, --exclude-month.
 
 
-0.093   2019-06-20 (PERLANCAR)
+0.093   2019-06-20  Released-By: PERLANCAR
 
 	- Add options: --include-dow, --exclude-dow.
 
 
-0.092   2019-05-26 (PERLANCAR)
+0.092   2019-05-26  Released-By: PERLANCAR
 
 	- [ux] Make 'from' argument optional, defaults to today.
 
 	- [doc] Add/tweak examples.
 
 
-0.091   2019-05-24 (PERLANCAR)
+0.091   2019-05-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add more example on date specification.
 
 
-0.090   2019-05-24 (PERLANCAR)
+0.090   2019-05-24  Released-By: PERLANCAR
 
 	- Add option --reverse (-r).
 
@@ -32,7 +47,7 @@
 	- [doc] Add more examples (infinite, -n, r, --business & --no-business).
 
 
-0.08    2019-05-24 (PERLANCAR)
+0.08    2019-05-24  Released-By: PERLANCAR
 
 	- [ux] [bugfix] Set schema for result (in stream case) to avoid
 	  JSON quotes being printed on each line.
@@ -40,7 +55,7 @@
 	- [ux] No need for CLI to read config/env.
 
 
-0.07    2016-09-28 (PERLANCAR)
+0.07    2016-09-28  Released-By: PERLANCAR
 
         - Update to Data::Sah 0.76+ (add x.perl.coerce_to) since Data::Sah now
           by default converts to Unix epoch.
@@ -49,13 +64,13 @@
           e.g. 'today' or 'in 3 days' for date.
 
 
-0.06    2015-09-26 (PERLANCAR)
+0.06    2015-09-26  Released-By: PERLANCAR
 
 	- [ux] Switch default format from '%Y-%m-%d' to '%Y-%m-%dT%H:%M:%S'
 	  if there is hour/minute/second mentioned.
 
 
-0.05    2015-09-25 (PERLANCAR)
+0.05    2015-09-25  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -63,13 +78,13 @@
           examples in function documentation.
 
 
-0.04    2015-09-25 (PERLANCAR)
+0.04    2015-09-25  Released-By: PERLANCAR
 
 	- Adjust to Perinci::Sub::CoerceArgs 0.10+ (change coercion hint
 	  attribute).
 
 
-0.03    2015-08-18 (PERLANCAR)
+0.03    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -78,13 +93,13 @@
 	  requirement.
 
 
-0.02    2015-05-13 (PERLANCAR)
+0.02    2015-05-13  Released-By: PERLANCAR
 
         - No functional changes.
 
         - POD tweaks.
 
 
-0.01    2015-05-13 (PERLANCAR)
+0.01    2015-05-13  Released-By: PERLANCAR
 
         - First release.

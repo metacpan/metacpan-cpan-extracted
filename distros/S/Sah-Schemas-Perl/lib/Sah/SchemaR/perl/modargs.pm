@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::modargs;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2019-07-05'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 our $rschema = ["str",[{description=>"\nPerl module name with optional arguments which will be used as import arguments,\njust like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:\n\n    Foo\n    Foo::Bar\n    Foo::Bar=arg1,arg2\n\nSee also: `perl::modname`.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?\\z",summary=>"Perl module name with optional arguments","x.completion"=>"perl_modname"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modargs - Perl module name with optional arguments
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::SchemaR::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
+This document describes version 0.020 of Sah::SchemaR::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2019-07-05.
 
 =head1 DESCRIPTION
 

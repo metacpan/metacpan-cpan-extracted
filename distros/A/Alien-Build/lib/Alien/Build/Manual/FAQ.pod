@@ -14,7 +14,7 @@ Alien::Build::Manual::FAQ - Frequently Asked Questions about Alien::Build
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 

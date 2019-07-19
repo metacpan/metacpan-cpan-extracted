@@ -9,7 +9,7 @@
  *    some of the more esoteric types.
  *  - one way we avoid making function calls is by putting the FFI dispatch
  *    in this header file so that it can be "called" twice without an
- *    extra function call.  (`$ffi->function(...)->call(...)` and 
+ *    extra function call.  (`$ffi->function(...)->call(...)` and
  *    `$ffi->attach(foo => ...); foo(...)`).  This is obviously absurd.
  *
  * Maybe all each of these weird trade offs each save only a few ms on
@@ -143,6 +143,21 @@
             if(ptr != NULL && expected != 0 && size != expected)
               warn("record argument %d has wrong size (is %d, expected %d)", i, (int)size, expected);
             ffi_pl_arguments_set_pointer(arguments, i, ptr);
+          }
+          break;
+        case FFI_PL_TYPE_RECORD_VALUE:
+          {
+            const char *record_class = self->argument_types[i]->extra[0].record_value.class;
+            /* TODO if object is read-onyl ? */
+            if(sv_isobject(arg) && sv_derived_from(arg, record_class))
+            {
+              argument_pointers[i] = SvPV_nolen(SvRV(arg));
+            }
+            else
+            {
+              ffi_pl_heap_free();
+              croak("argument %d is not an instance of %s", i, record_class);
+            }
           }
           break;
         case FFI_PL_TYPE_CLOSURE:
@@ -1021,7 +1036,8 @@
 #ifdef FFI_PL_PROBE_LONGDOUBLE
         case FFI_PL_TYPE_LONG_DOUBLE:
         {
-          if(MY_CXT.have_math_longdouble)
+#if !(defined(USE_LONG_DOUBLE) && defined(HAS_LONG_DOUBLE))
+          if(MY_CXT.loaded_math_longdouble == 1)
           {
             SV *sv;
             long double *ptr;
@@ -1034,8 +1050,11 @@
           }
           else
           {
+#endif
             XSRETURN_NV((NV) result.longdouble);
+#if !(defined(USE_LONG_DOUBLE) && defined(HAS_LONG_DOUBLE))
           }
+#endif
         }
 #endif
 #ifdef FFI_PL_PROBE_COMPLEX
@@ -1077,6 +1096,8 @@
             XSRETURN(1);
           }
           break;
+        case FFI_PL_TYPE_RECORD_VALUE:
+          /* TODO */
         default:
 
           switch(type_code & FFI_PL_SHAPE_MASK)

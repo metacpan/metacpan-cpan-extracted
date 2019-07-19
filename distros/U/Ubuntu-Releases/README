@@ -2,8 +2,8 @@ NAME
     Ubuntu::Releases - List Ubuntu releases
 
 VERSION
-    This document describes version 0.110 of Ubuntu::Releases (from Perl
-    distribution Ubuntu-Releases), released on 2017-09-08.
+    This document describes version 0.111 of Ubuntu::Releases (from Perl
+    distribution Ubuntu-Releases), released on 2019-06-28.
 
 SYNOPSIS
      use Ubuntu::Releases;
@@ -20,7 +20,7 @@ FUNCTIONS
   list_ubuntu_releases
     Usage:
 
-     list_ubuntu_releases(%args) -> [status, msg, result, meta]
+     list_ubuntu_releases(%args) -> [status, msg, payload, meta]
 
     Ubuntu releases.
 
@@ -882,7 +882,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -910,7 +910,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

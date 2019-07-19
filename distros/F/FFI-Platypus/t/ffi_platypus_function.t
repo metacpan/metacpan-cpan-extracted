@@ -4,6 +4,7 @@ use Test::More;
 use FFI::Platypus::Function;
 use FFI::Platypus;
 use FFI::CheckLib;
+use FFI::Platypus::TypeParser::Version0;
 
 my $libtest = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
 
@@ -35,9 +36,9 @@ subtest 'private' => sub {
   $ffi->lib($libtest);
 
   my $address = $ffi->find_symbol('f0');
-  my $uint8   = FFI::Platypus::Type->new('uint8');
+  my $uint8   = FFI::Platypus::TypeParser::Version0->new->parse('uint8');
 
-  my $function = eval { FFI::Platypus::Function::Function->new($ffi, $address, -1, $uint8, $uint8) };
+  my $function = eval { FFI::Platypus::Function::Function->new($ffi, $address, -1, -1, $uint8, $uint8) };
   is $@, '', 'FFI::Platypus::Function->new';
   isa_ok $function, 'FFI::Platypus::Function';
   isa_ok $function, 'FFI::Platypus::Function::Function';
@@ -126,4 +127,65 @@ subtest 'prototype' => sub {
 
 };
 
+subtest 'variadic' => sub {
+
+  my $ffi = FFI::Platypus->new;
+  $ffi->lib($libtest);
+
+  plan skip_all => 'test requires variadic function support'
+    unless eval { $ffi->function('variadic_return_arg' => ['int'] => ['int'] => 'int') };
+
+
+  my $wrapper = sub {
+    my($xsub, @args) = @_;
+    my $ret = $xsub->(@args);
+    $ret*2;
+  };
+
+  subtest 'unattached' => sub {
+
+    is(
+      $ffi->function(variadic_return_arg => ['int'] => ['int','int','int','int','int','int','int'] => 'int')->call(4,10,20,30,40,50,60,70),
+      40,
+      'sans wrapper'
+    );
+
+    is(
+      $ffi->function(variadic_return_arg => ['int'] => ['int','int','int','int','int','int','int'] => 'int', $wrapper)->call(4,10,20,30,40,50,60,70),
+      80,
+      'with wrapper'
+    );
+  };
+
+  subtest 'attached' => sub {
+
+    $ffi->attach([variadic_return_arg => 'y1'] => ['int'] => ['int','int','int','int','int','int','int'] => 'int');
+    is(y1(4,10,20,30,40,50,60,70), 40, 'sans wrapper');
+
+    $ffi->attach([variadic_return_arg => 'y2'] => ['int'] => ['int','int','int','int','int','int','int'] => 'int', $wrapper);
+    is(y2(4,10,20,30,40,50,60,70), 80, 'with wrapper');
+
+  };
+
+};
+
+subtest 'void as arg should fail is arg count > 1' => sub {
+
+  my $ffi = FFI::Platypus->new;
+
+  eval { $ffi->function( 0 => ['int','void'] => 'void' ) };
+  like "$@", qr/^void not allowed as argument type/;
+
+};
+
+subtest 'single void arg treated as no args' => sub {
+
+  my $ffi = FFI::Platypus->new;
+
+  eval { $ffi->function( 0 => ['void'] => 'void' ) };
+  is "$@", "";
+
+};
+
 done_testing;
+

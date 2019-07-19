@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.051';
+our $VERSION = '1.052';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -1333,8 +1333,7 @@ sub _translate_separated_list {
 sub _translate_subrule_call {
     my ($source_line, $source_file, $rulename, $grammar_name, $construct, $alias,
         $subrule, $args, $savemode, $postmodifier,
-        $debug_build, $debug_runtime, $timeout, $valid_subrule_names_ref, $nocontext)
-            = @_;
+        $debug_build, $debug_runtime, $timeout, $valid_subrule_names_ref) = @_;
 
     # Translate arg list, if provided...
     my $arg_desc;
@@ -1444,8 +1443,6 @@ sub _translate_subrule_call {
     # Translate to standard regex code...
     return qq{(?:$timeout_test(?{;
             local \@Regexp::Grammars::RESULT_STACK = (\@Regexp::Grammars::RESULT_STACK, {'\@'=>{$args}});
-            \$Regexp::Grammars::RESULT_STACK[-2]{'~'} = $nocontext
-                if \@Regexp::Grammars::RESULT_STACK >= 2;
             $debug_pre})((?&$internal_subrule))(?{;
                 local \@Regexp::Grammars::RESULT_STACK = (
                     $save_code
@@ -1454,7 +1451,8 @@ sub _translate_subrule_call {
 }
 
 sub _translate_rule_def {
-    my ($type, $qualifier, $name, $callname, $qualname, $body, $objectify, $local_ws) = @_;
+    my ($type, $qualifier, $name, $callname, $qualname, $body, $objectify, $local_ws, $nocontext)
+        = @_;
     $qualname =~ s{::}{_88_}gxms;
 
     # Return object if requested...
@@ -1476,7 +1474,7 @@ sub _translate_rule_def {
         (?(DEFINE) $local_ws
             (?<$qualname>
             (?<$callname>
-                (?{\$Regexp::Grammars::RESULT_STACK[-1]{'!'}=\$#{!};})
+                (?{\@{\$Regexp::Grammars::RESULT_STACK[-1]}{'!','~'}=(\$#{!}, $nocontext);})
                 (?:$body) $objectification
                 (?{;\$#{!}=delete(\$Regexp::Grammars::RESULT_STACK[-1]{'!'})//0;
                            delete(\$Regexp::Grammars::RESULT_STACK[-1]{'\@'});
@@ -1501,7 +1499,6 @@ sub _translate_subrule_calls {
         $rule_name,
         $subrule_names_ref,
         $magic_ws,
-        $nocontext,
     ) = @_;
 
     my $pretty_rule_name = $rule_name ? ($magic_ws ? '<rule' : '<token') . ": $rule_name>"
@@ -1755,7 +1752,6 @@ sub _translate_subrule_calls {
                     $runtime_debugging_requested,
                     $timeout_requested,
                     $subrule_names_ref,
-                    $nocontext,
                 );
             }
             elsif (defined $+{alias_subrule_list}) {
@@ -1768,7 +1764,6 @@ sub _translate_subrule_calls {
                     $runtime_debugging_requested,
                     $timeout_requested,
                     $subrule_names_ref,
-                    $nocontext,
                 );
             }
 
@@ -1792,7 +1787,6 @@ sub _translate_subrule_calls {
                     $runtime_debugging_requested,
                     $timeout_requested,
                     $subrule_names_ref,
-                    $nocontext,
                   )
                 . $post;
             }
@@ -1806,7 +1800,6 @@ sub _translate_subrule_calls {
                     $runtime_debugging_requested,
                     $timeout_requested,
                     $subrule_names_ref,
-                    $nocontext,
                 );
             }
             elsif (defined $+{self_subrule_scalar}) {
@@ -1819,7 +1812,6 @@ sub _translate_subrule_calls {
                     $runtime_debugging_requested,
                     $timeout_requested,
                     $subrule_names_ref,
-                    $nocontext,
                 );
             }
             elsif (defined $+{self_subrule_list}) {
@@ -1832,7 +1824,6 @@ sub _translate_subrule_calls {
                     $runtime_debugging_requested,
                     $timeout_requested,
                     $subrule_names_ref,
-                    $nocontext,
                 );
             }
 
@@ -1945,7 +1936,6 @@ sub _translate_subrule_calls {
                 );
             }
             elsif (defined $+{context_directive}) {
-                $nocontext = 0;
                 if ($compiletime_debugging_requested) {
                     _debug_notify( info => "   |",
                                            "   |...Treating $curr_construct as:",
@@ -1955,7 +1945,6 @@ sub _translate_subrule_calls {
                 q{};  # Remove the directive
             }
             elsif (defined $+{nocontext_directive}) {
-                $nocontext = 1;
                 if ($compiletime_debugging_requested) {
                     _debug_notify( info => "   |",
                                            "   |...Treating $curr_construct as:",
@@ -2492,7 +2481,6 @@ sub _build_grammar {
             q{},                        # Expected...what?
             \%subrule_names,
             0,                          # Whitespace isn't magical
-            $nocontext,
         );
 
         # Wrap the main regex (to ensure |'s don't segment pre and # post commands)...
@@ -2526,6 +2514,11 @@ sub _build_grammar {
             );
         }
 
+        my $local_nocontext
+            = ($body =~ s{ < nocontext \s* : \s* > }{}gxms) ? 1
+            : ($body =~ s{ <   context \s* : \s* > }{}gxms) ? 0
+            :                                                 $nocontext;
+
         # Translate any nested <...> constructs...
         my $trans_body = _translate_subrule_calls(
             $source_file, $source_line,
@@ -2539,7 +2532,6 @@ sub _build_grammar {
             $callname,                # Expected...what?
             \%subrule_names,
             $type eq 'rule',          # Is whitespace magical?
-            $nocontext,               # Start with the global nocontextuality
         );
 
         # Report how construct was interpreted, if requested to...
@@ -2626,7 +2618,8 @@ sub _build_grammar {
         $regex
             .= "\n###############[ $source_file line $source_line ]###############\n"
             .  _translate_rule_def(
-                 $type, $qualifier, $name, $callname, $qualified_name, $trans_body, $objectify, $local_ws_defn
+                 $type, $qualifier, $name, $callname, $qualified_name, $trans_body, $objectify,
+                 $local_ws_defn, $local_nocontext,
                );
 
         # Update line number...
@@ -2672,7 +2665,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.051
+This document describes Regexp::Grammars version 1.052
 
 
 =head1 SYNOPSIS

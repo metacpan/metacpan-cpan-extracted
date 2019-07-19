@@ -9,6 +9,7 @@ t/02-io.t
 t/03-leaks.t
 t/04-leaks_full.t
 t/gh-6_exempt_some_script_tags.t
+t/gh-16_content_security_policy_hashes.t
 t/html/s1-expected.html
 t/html/s1.html
 t/html/s2-expected.html

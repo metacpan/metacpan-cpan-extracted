@@ -5,17 +5,17 @@ use Test2::V0;
 subtest resource_method_name => sub{
     package CC::rmn;
         use Curio;
-        sub resource { {5=>7} }
+        sub foo { {5=>7} }
     package main;
 
-    isnt(
-        dies{ CC::rmn->factory->fetch_resource() },
+    is(
+        CC::rmn->factory->fetch_resource(),
         undef,
         'cannot fetch resource',
     );
 
     package CC::rmn;
-        resource_method_name 'resource';
+        resource_method_name 'foo';
     package main;
 
     is(
@@ -25,12 +25,12 @@ subtest resource_method_name => sub{
     );
 };
 
-subtest registers_resources => sub{
+subtest does_registry => sub{
     package CC::rr;
         use Curio;
-        resource_method_name 'resource';
+        resource_method_name 'foo';
         our $RESOURCE = [2,5];
-        sub resource { $RESOURCE }
+        sub foo { $RESOURCE }
     package main;
 
     my $curio = CC::rr->fetch();
@@ -42,7 +42,7 @@ subtest registers_resources => sub{
     );
 
     package CC::rr;
-        registers_resources;
+        does_registry;
     package main;
 
     $curio = CC::rr->fetch();

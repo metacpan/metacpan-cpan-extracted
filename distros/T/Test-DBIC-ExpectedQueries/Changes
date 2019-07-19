@@ -2,6 +2,47 @@
 Feature oriented Revision history for Test-DBIC-ExpectedQueries
 ===============================================================
 
+2.000 -- 2019-07-17 21:14:39 UTC
+
+* BREAKING CHANGE -- This release includes a bug fix to the
+  library. It now tests queries more comprehensively (i.e. all
+  queries).
+
+  You may find your tests now breaking when previously they didn't. If
+  this happens, you always had inaccurate tests but
+  Test::DBIC::ExpectedQueries didn't flag this up correctly.
+
+  This is the fault of this library, not your code. Sorry about that!
+
+  It is however your problem, and now you need to fix your tests.
+
+  If you need to make your tests pass immediately, pin the version to
+  pre 2.000, e.g. if you have a "cpanfile" in your project:
+
+    requires "Test::DBIC::ExpectedQueries", "< 2.0";
+
+  The fix you need to make is that the library will now report queries
+  that were supposed to run n times, but didn't run at all. Let's say
+  you have the check:
+
+    { book_lender => { select => 1 } }
+
+  You might see failures for queries that were supposed to run n times, but
+  didn't run at all, e.g.
+
+    Expected '1' inserts for table 'book_lender', got '0
+
+  Whether this is a problem or not depends on the situation. Either
+  you're happy that you're not making any redundant queries because
+  the information is cached or prefetched. Or this indicates a
+  problem, because something that you thought happened isn't.
+
+  In the former case, a useful fix is to either remove the line or to
+  relax the test:
+
+    { book_lender => { select => "<= 1" } }
+
+
 1.011 -- 2015-11-05 15:18:09 UTC
 
 * Bug fix: Avoid wantarray being masked inside try-catch block

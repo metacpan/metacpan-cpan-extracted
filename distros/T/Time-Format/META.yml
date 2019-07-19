@@ -3,27 +3,30 @@ abstract: 'Easy-to-use date/time formatting.'
 author:
   - 'Eric J. Roode <roode@cpan.org>'
 build_requires:
-  Test::Simple: 0.40
+  FindBin: '0'
+  Symbol: '0'
+  Test::Simple: '0.40'
 configure_requires:
-  Module::Build: 0.4
+  Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.110440'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Time-Format
 provides:
   Time::Format:
     file: lib/Time/Format.pm
-    version: 1.12
+    version: '1.13'
 recommends:
-  Date::Manip: 0
-  DateTime: 0
-  I18N::Langinfo: 0
-  Module::Signature: 0
-  POSIX: 0
-  Time::HiRes: 0
+  Date::Manip: '0'
+  DateTime: '0'
+  I18N::Langinfo: '0'
+  Module::Signature: '0'
+  POSIX: '0'
+  Time::HiRes: '0'
 requires:
-  Time::Local: 1.07
-version: 1.12
+  Time::Local: '1.07'
+version: '1.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

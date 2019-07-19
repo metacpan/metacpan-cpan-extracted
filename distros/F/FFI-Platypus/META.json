@@ -35,6 +35,7 @@
       },
       "develop" : {
          "requires" : {
+            "Devel::Hide" : "0",
             "Devel::PPPort" : "3.28",
             "FindBin" : "0",
             "Test::CPAN::Changes" : "0",
@@ -44,7 +45,6 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
-            "Test::Pod::Spelling::CommonMistakes" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0",
             "YAML" : "0"
@@ -83,7 +83,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.90",
+   "version" : "0.92",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",

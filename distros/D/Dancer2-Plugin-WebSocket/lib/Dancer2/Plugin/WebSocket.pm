@@ -1,7 +1,9 @@
 package Dancer2::Plugin::WebSocket;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: add a websocket interface to your Dancers app
-$Dancer2::Plugin::WebSocket::VERSION = '0.1.3';
+$Dancer2::Plugin::WebSocket::VERSION = '0.2.0';
+
+use v5.12.0;
 
 use Plack::App::WebSocket;
 
@@ -51,6 +53,12 @@ has connections => (
 );
 
 
+sub websocket_connections :PluginKeyword {
+    my $self = shift;
+    return values %{ $self->connections };
+}
+
+
 sub websocket_url :PluginKeyword {
     my $self = shift;
     my $request = $self->app->request;
@@ -64,7 +72,7 @@ sub websocket_url :PluginKeyword {
 sub websocket_mount :PluginKeyword {
     my $self = shift;
 
-    return 
+    return
         $self->mount_path => Plack::App::WebSocket->new(
         on_error => sub { $self->on_error->(@_) },
         on_establish => sub {
@@ -123,7 +131,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 =head1 VERSION
 
-version 0.1.3
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -191,6 +199,10 @@ F<MyApp.pm>:
   END
   };
 
+  get '/say_hi' => sub {
+    $_->send([ "Hello!" ]) for websocket_connections;
+  };
+
   true;
 
 =head1 DESCRIPTION
@@ -199,8 +211,8 @@ C<Dancer2::Plugin::WebSocket> provides an interface to L<Plack::App::WebSocket>
 and allows to interact with the webSocket connections within the Dancer app.
 
 L<Plack::App::WebSocket>, and thus this plugin, requires a plack server that
-supports the psgi I<streaming>, I<nonblocking> and I<io>. L<Twiggy> 
-is the most popular server that fits the bill.
+supports the psgi I<streaming>, I<nonblocking> and I<io>. L<Twiggy>
+is the most popular server fitting the bill.
 
 =head1 CONFIGURATION
 
@@ -215,7 +227,7 @@ arguments to the L<JSON::MaybeXS> constructor.
 
     plugins:
         WebSocket:
-            serializer: 
+            serializer:
                 utf8:         1
                 allow_nonref: 1
 
@@ -223,8 +235,8 @@ By the way, if you want the connection to automatically serialize data
 structures to JSON on the client side, you can do something like
 
     var mySocket = new WebSocket(urlMySocket);
-    mySocket.sendJSON = function(message) { 
-        return this.send(JSON.stringify(message)) 
+    mySocket.sendJSON = function(message) {
+        return this.send(JSON.stringify(message))
     };
 
     // then later...
@@ -238,8 +250,8 @@ Path for the websocket mountpoint. Defaults to C</ws>.
 
 =head1 PLUGIN KEYWORDS
 
-In the various callbacks, the connection object that is
-passed is a L<Plack::App::WebSocket::Connection> object 
+In the various callbacks, the connection object C<$conn>
+is a L<Plack::App::WebSocket::Connection> object
 augmented with the L<Dancer2::Plugin::WebSocket::Connection> role.
 
 =head2 websocket_on_open sub { ... }
@@ -249,10 +261,10 @@ augmented with the L<Dancer2::Plugin::WebSocket::Connection> role.
         ...;
     };
 
-Code invoked when a new socket is opened. Gets the new 
+Code invoked when a new socket is opened. Gets the new
 connection
 object and the Plack
-C<$env> hash as arguments. 
+C<$env> hash as arguments.
 
 =head2 websocket_on_close sub { ... }
 
@@ -261,7 +273,7 @@ C<$env> hash as arguments.
         ...;
     };
 
-Code invoked when a new socket is opened. Gets the 
+Code invoked when a new socket is opened. Gets the
 connection object as argument.
 
 =head2 websocket_on_error sub { ... }
@@ -272,14 +284,14 @@ connection object as argument.
     };
 
 Code invoked when an error  is detected. Gets the Plack
-C<$env> hash as argument and is expected to return a 
+C<$env> hash as argument and is expected to return a
 Plack triplet.
 
 If not explicitly set, defaults to
 
     websocket_on_error sub {
         my $env = shift;
-        return [ 
+        return [
             500,
             ["Content-Type" => "text/plain"],
             ["Error: " . $env->{"plack.app.websocket.error"}]
@@ -308,6 +320,10 @@ object, can have its own (multiple) handlers. So you can do things like
     });
   };
 
+=head2 websocket_connections
+
+Returns the list of currently open websocket connections.
+
 =head2 websocket_url
 
 Returns the full url of the websocket mountpoint.
@@ -316,7 +332,7 @@ Returns the full url of the websocket mountpoint.
     # and the mountpoint is '/ws'
     print websocket_url;  # => ws://localhost:5000/ws
 
-=head2 websocket_mount 
+=head2 websocket_mount
 
 Returns the mountpoint and the Plack app coderef to be
 used for C<mount> in F<app.psgi>. See the SYNOPSIS.
@@ -334,13 +350,13 @@ not overly worried about it.
 
 =head1 SEE ALSO
 
-This plugin is nothing much than a sugar topping atop 
+This plugin is nothing much than a sugar topping atop
 L<Plack::App::WebSocket>, which is itself L<AnyEvent::WebSocket::Server>
 wrapped in Plackstic.
 
 Mojolicious also has nice WebSocket-related offerings. See
 L<Mojolicious::Plugin::MountPSGI> or
-L<http://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Web-server-embedding>. 
+L<http://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Web-server-embedding>.
 (hi Joel!)
 
 =head1 AUTHOR

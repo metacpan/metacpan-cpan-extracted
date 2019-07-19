@@ -35,6 +35,7 @@
             "Scalar::Util" : "0",
             "Set::Tiny" : "0",
             "Try::Tiny" : "0",
+            "perl" : "v5.12.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -53,23 +54,22 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "Test::Requires" : "0",
-            "perl" : "5.006"
+            "Test::Requires" : "0"
          }
       }
    },
    "provides" : {
       "Dancer2::Plugin::WebSocket" : {
          "file" : "lib/Dancer2/Plugin/WebSocket.pm",
-         "version" : "v0.1.3"
+         "version" : "v0.2.0"
       },
       "Dancer2::Plugin::WebSocket::Connection" : {
          "file" : "lib/Dancer2/Plugin/WebSocket/Connection.pm",
-         "version" : "v0.1.3"
+         "version" : "v0.2.0"
       },
       "Dancer2::Plugin::WebSocket::Group" : {
          "file" : "lib/Dancer2/Plugin/WebSocket/Group.pm",
-         "version" : "v0.1.3"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -84,19 +84,20 @@
          "web" : "https://github.com/yanick/Dancer2-Plugin-WebSocket"
       }
    },
-   "version" : "0.1.3",
+   "version" : "0.2.0",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
    "x_contributor_covenant" : {
-      "version" : 0.02
+      "version" : 0.01
    },
    "x_contributors" : [
       "Frank Schreiner <schreiner@suse.de>",
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Yanick Champoux <yanick@babyl.ca>"
    ],
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

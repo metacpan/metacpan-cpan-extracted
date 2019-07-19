@@ -4,6 +4,7 @@ use warnings;
 use strict;
 
 use v5.16;
+use utf8;
 
 use feature qw/say/;
 use Test::More;
@@ -14,13 +15,13 @@ use File::Temp qw/tempfile tempdir/;
 use PFT::Header;
 use PFT::Date;
 
+my $use_utf8 = $Encode::Locale::ENCODING_LOCALE =~ /UTF-8/i;
+my $title = $use_utf8 ? 'Rådmansgatan' : 'Radmansgatan';
+
 my $dir = tempdir(CLEANUP => 1);
 
 for my $date (undef, PFT::Date->from_string('2014-12-16')) {
-    my $h = PFT::Header->new(
-        title => 'Rådmansgatan',
-        date => $date,
-    );
+    my $h = PFT::Header->new(title => $title, date => $date);
 
     my $fh = tempfile(DIR => $dir);
 
@@ -59,9 +60,7 @@ isnt(undef, $@, 'date missing year or month');
 diag($@);
 
 do {
-    my $h = PFT::Header->new(
-        title => 'Rådmansgatan',
-    );
+    my $h = PFT::Header->new(title => $title);
 
     my($fh, $filename) = tempfile(DIR => $dir);
     $h->dump($fh);

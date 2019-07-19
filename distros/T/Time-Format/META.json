@@ -4,13 +4,13 @@
       "Eric J. Roode <roode@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Time-Format",
    "prereqs" : {
@@ -26,24 +26,31 @@
       },
       "runtime" : {
          "recommends" : {
-            "Date::Manip" : 0,
-            "DateTime" : 0,
-            "I18N::Langinfo" : 0,
-            "Module::Signature" : 0,
-            "POSIX" : 0,
-            "Time::HiRes" : 0
+            "Date::Manip" : "0",
+            "DateTime" : "0",
+            "I18N::Langinfo" : "0",
+            "Module::Signature" : "0",
+            "POSIX" : "0",
+            "Time::HiRes" : "0"
          },
          "requires" : {
             "Time::Local" : "1.07"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Symbol" : "0"
          }
       }
    },
    "provides" : {
       "Time::Format" : {
          "file" : "lib/Time/Format.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
-   "version" : "1.12"
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

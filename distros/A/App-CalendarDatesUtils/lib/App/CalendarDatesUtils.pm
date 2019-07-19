@@ -1,7 +1,7 @@
 package App::CalendarDatesUtils;
 
 our $DATE = '2019-06-28'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -269,7 +269,7 @@ App::CalendarDatesUtils - Utilities related to Calendar::Dates
 
 =head1 VERSION
 
-This document describes version 0.009 of App::CalendarDatesUtils (from Perl distribution App-CalendarDatesUtils), released on 2019-06-28.
+This document describes version 0.010 of App::CalendarDatesUtils (from Perl distribution App-CalendarDatesUtils), released on 2019-06-28.
 
 =head1 DESCRIPTION
 

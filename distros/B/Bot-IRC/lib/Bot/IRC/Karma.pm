@@ -5,7 +5,7 @@ use 5.012;
 use strict;
 use warnings;
 
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -74,7 +74,15 @@ sub init {
         },
     );
 
-    $bot->helps( seen => 'Tracks when and where people were last seen. Usage: seen <nick>.' );
+    $bot->helps(
+        karma => join(
+            'Adjust the karma of a word.',
+            'Usage: "word++" or "word--" to increment or decrement the karma of "word".',
+            '"karma word" to see what the karma of "word" is.',
+            '"explain word" to receive one positive and one negative comment (at random)',
+            'about the word if there are comments to share.',
+        ),
+    );
 }
 
 1;
@@ -91,7 +99,7 @@ Bot::IRC::Karma - Bot::IRC track karma for things
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 

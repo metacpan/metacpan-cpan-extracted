@@ -2,9 +2,9 @@ NAME
     App::ShellCompleter::YoutubeDl - Shell completion for youtube-dl
 
 VERSION
-    This document describes version 0.120 of App::ShellCompleter::YoutubeDl
+    This document describes version 0.121 of App::ShellCompleter::YoutubeDl
     (from Perl distribution App-ShellCompleter-YoutubeDl), released on
-    2019-03-14.
+    2019-07-18.
 
 SYNOPSIS
     See _youtube-dl included in this distribution.

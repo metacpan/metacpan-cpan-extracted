@@ -7,11 +7,11 @@ README
 lib/Calendar/Bahai.pm
 t/00-load.t
 t/calendar-bahai.t
-t/manifest.t
-t/pod.t
 t/bahai.xml
 t/fake-bahai.xml
-t/meta-json.t
-t/meta-yml.t
+xt/manifest.t
+xt/pod.t
+xt/meta-json.t
+xt/meta-yml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

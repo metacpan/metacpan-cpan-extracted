@@ -114,5 +114,5 @@ sub MyHook::INC {
     open my $fh, '<', __FILE__;
     return $fh;
   }
-  return;
+  return ();
 }

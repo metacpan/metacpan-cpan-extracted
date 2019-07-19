@@ -1,7 +1,7 @@
 package Sah::Schema::sah::clause_set;
 
-our $DATE = '2016-07-25'; # DATE
-our $VERSION = '0.9.43.1'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.9.46.0'; # VERSION
 
 # incomplete
 
@@ -16,6 +16,10 @@ our $schema = [defhash => {
         tags => {},
         default_lang => {},
         x => {},
+
+        # common to all types
+        examples => {},
+        invalid_examples => {},
 
         # incomplete
         clause => {
@@ -40,7 +44,7 @@ Sah::Schema::sah::clause_set - Sah clause set
 
 =head1 VERSION
 
-This document describes version 0.9.43.1 of Sah::Schema::sah::clause_set (from Perl distribution Sah-Schemas-Sah), released on 2016-07-25.
+This document describes version 0.9.46.0 of Sah::Schema::sah::clause_set (from Perl distribution Sah-Schemas-Sah), released on 2019-07-19.
 
 =head1 HOMEPAGE
 
@@ -64,7 +68,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,8 +4,8 @@
 #
 #  Copyright (c) 1995-1998, Raphael Manfredi
 #  
-#  You may redistribute only under the terms of the Artistic License,
-#  as specified in the README file that comes with the distribution.
+# You may redistribute and/or modify this file
+# under the same terms as Perl itself.
 #
 # $Log: tied.pl,v $
 # Revision 0.18  2006/10/08 03:37:29  ray

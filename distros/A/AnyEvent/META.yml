@@ -26,5 +26,5 @@ recommends:
   JSON::XS: '2.2'
   Net::SSLeay: '1.33'
   Task::Weaken: '0'
-version: 7.15
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: 7.16
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

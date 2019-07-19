@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.36 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.37 {
   
   use 5.014;
   use Moose;
@@ -268,7 +268,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.36 {
         q{  - cip script},
         q{jobs:},
         q{  include:},
-        q{    - env: CIP_TAG=5.29},
+        q{    - env: CIP_TAG=5.31},
+        q{    - env: CIP_TAG=5.30},
         q{    - env: CIP_TAG=5.28},
         q{    - env: CIP_TAG=5.26},
         q{    - env: CIP_TAG=5.24},
@@ -505,8 +506,9 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.36 {
     
     my $git = Git::Wrapper->new($opts->{mint_root});
     $git->init;
+    $git->commit({ 'allow-empty' => 1, message => "Start with a blank" });
     $git->add($opts->{mint_root});
-    $git->commit({ message => "Initial commit" });
+    $git->commit({ message => "Initial structure" });
     
     unless(eval q{ use LWP::UserAgent; use HTTP::Request; 1; })
     {
@@ -560,7 +562,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.36
+version 2.37
 
 =head1 DESCRIPTION
 

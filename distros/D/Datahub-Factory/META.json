@@ -61,6 +61,8 @@
             "HTTP::Request::Common" : "0",
             "HTTP::Request::StreamingUpload" : "0",
             "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::Log4perl" : "0",
@@ -73,6 +75,7 @@
             "Ref::Util" : "0",
             "Sub::Exporter" : "0",
             "Term::ANSIColor" : "0",
+            "Throwable::Error" : "0",
             "Try::Tiny" : "0",
             "Try::Tiny::ByClass" : "0",
             "URI::URL" : "0",
@@ -86,6 +89,7 @@
             "Log::Any::Adapter::Log4perl" : "0",
             "Log::Any::Test" : "1.03",
             "Log::Log4perl" : "0",
+            "Module::Build" : "0.28",
             "Test::Deep" : "0.112",
             "Test::Exception" : "0.43",
             "Test::LWP::UserAgent" : "0",
@@ -106,7 +110,7 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.75",
+   "version" : "1.77",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

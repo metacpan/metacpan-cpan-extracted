@@ -4,7 +4,7 @@
       "Sanko Robinson <sanko@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "artistic_2"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Moo" : "0",
-            "RPi::WiringPi" : "0",
+            "WiringPi::API" : "0",
             "namespace::clean" : "0",
             "strictures" : "0"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "RPi::UnicornHatHD" : {
          "file" : "lib/RPi/UnicornHatHD.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,7 @@
          "web" : "https://github.com/sanko/RPi-UnicornHatHD"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

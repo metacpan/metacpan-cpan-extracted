@@ -1,3 +1,21 @@
+Version 2.5003
+
+    * Implement 'preserve_hardlinks' flag in Archive::Tar::Builder->new() to
+      trigger this new behavior
+
+    * Implement Archive::Tar::Builder::HardlinkCache to keep track of device
+      and inode numbers and the path which was originally seen when
+      producing the tarball; only regular files with a link count greater
+      than 1 are stored and looked up in the cache
+
+    * In unit tests, change permissions of subdirectories of directories
+      created by File::Temp created with 0000 permissions to 0600 to allow
+      File::Temp to successfully delete them at the end of execution
+
+    * Add missing POD for posix_extensions flag
+
+    * Implement support for saving device inode major and minor numbers
+
 Version 2.0000
 
     * Change to a versioning scheme more friendly to the mysterious

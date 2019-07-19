@@ -19,6 +19,7 @@ $modules{$_} = $_ for qw(
   Test2::Compare::String
   Test2::V0
   URI
+  URI::QueryParam
 );
 
 

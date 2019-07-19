@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.90
+    version 0.92
 
 SYNOPSIS
 
@@ -107,6 +107,21 @@ CONSTRUCTORS
 
   options
 
+    api
+
+      Sets the API level. Legal values are
+
+      0
+
+	Original API level. See FFI::Platypus::TypeParser::Version0 for
+	details on the differences.
+
+      1
+
+	Enable the next generation type parser which allows pass-by-value
+	records and type decoration on basic types. Using API level 1 prior
+	to Platypus version 1.00 will trigger a (noisy) warning.
+
     lib
 
       Either a pathname (string) or a list of pathnames (array ref of
@@ -143,7 +158,7 @@ ATTRIBUTES
     using FFI::CheckLib, like this:
 
      use FFI::CheckLib 0.06;
-     $ffi->lib(find_lib_or_die lib => 'archive'); 
+     $ffi->lib(find_lib_or_die lib => 'archive');
        # finds libarchive.so on Linux
        #       libarchive.bundle on OS X
        #       libarchive.dll (or archive.dll) on Windows
@@ -285,11 +300,11 @@ METHODS
        my($symbol) = @_;
        return "foo_$symbol";
      });
-     
+    
      $ffi->function( get_bar => [] => 'int' );  # attaches foo_get_bar
-     
+    
      my $f = $ffi->function( set_baz => ['int'] => 'void' );
-     $f->call(22); # calls foo_set_baz 
+     $f->call(22); # calls foo_set_baz
 
  function
 
@@ -334,6 +349,29 @@ METHODS
 
      my $function = $ffi->function('my_function_name', ['int', 'string'] => 'string');
      my $return_string = $function->(1, "hi there");
+
+    [version 0.91]
+
+     my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => $return_type);
+     my $function = $ffi->function( $name => \@fixed_argument_types => \@var_argument_types => $return_type, \&wrapper);
+
+    Version 0.91 and later allows you to creat functions for c variadic
+    functions (such as printf, scanf, etc) which can take a variable number
+    of arguments. The first set of arguments are the fixed set, the second
+    set are the variable arguments to bind with. The variable argument
+    types must be specified in order to create a function object, so if you
+    need to call variadic function with different set of arguments then you
+    will need to create a new function object each time:
+
+     # int printf(const char *fmt, ...);
+     $ffi->function( printf => ['string'] => ['int'] => 'int' )
+         ->call("print integer %d\n", 42);
+     $ffi->function( printf => ['string'] => ['string'] => 'int' )
+         ->call("print string %s\n", 'platypus');
+
+    Some older versions of libffi and possibly some platforms may not
+    support variadic functions. If you try to create a one, then an
+    exception will be thrown.
 
  attach
 
@@ -380,6 +418,16 @@ METHODS
        $return_string =~ s/Belgium//; # HHGG remove profanity
        $return_string;
      });
+
+    [version 0.91]
+
+     $ffi->attach($name => \@fixed_argument_types => \@var_argument_types, $return_type);
+     $ffi->attach($name => \@fixed_argument_types => \@var_argument_types, $return_type, \&wrapper);
+
+    As of version 0.91 you can attach a variadic functions, if it is
+    supported by the platform / libffi that you are using. For details see
+    the function documentation. If not supported by the implementation then
+    an exception will be thrown.
 
  closure
 
@@ -470,10 +518,10 @@ METHODS
      $ffi->package($package, $file); # usually __PACKAGE__ and __FILE__ can be used
      $ffi->package;                  # autodetect
 
-    If you have used Module::Build::FFI to bundle C code with your
-    distribution, you can use this method to tell the FFI::Platypus
-    instance to look for symbols that came with the dynamic library that
-    was built when your distribution was installed.
+    If you use FFI::Build (or the older deprecated Module::Build::FFI to
+    bundle C code with your distribution, you can use this method to tell
+    the FFI::Platypus instance to look for symbols that came with the
+    dynamic library that was built when your distribution was installed.
 
  abis
 
@@ -1006,7 +1054,7 @@ EXAMPLES
     Rather than this:
 
      $ffi->attach(
-       [ archive_read_support_filter_all => 'support_read_filter_all' ] => 
+       [ archive_read_support_filter_all => 'support_read_filter_all' ] =>
        ['archive'] => 'int' );
      );
 
@@ -1275,7 +1323,7 @@ CONTRIBUTING
       despite these precautions, then you can turn its use off by setting
       this environment variable when you run Makefile.PL:
 
-       helix% env FFI_PLATYPUS_NO_ALLOCA=1 perl Makefile.PL 
+       helix% env FFI_PLATYPUS_NO_ALLOCA=1 perl Makefile.PL
        NO_ALLOCA:
          + alloca() will not be used, even if your platform supports it.
        Generating a Unix-style Makefile

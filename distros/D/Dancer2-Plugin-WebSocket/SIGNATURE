@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,35 +14,35 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA256 a03f6c61a49a7ef1cf30b5c4ba5eab282e1cff7a1ba214b6533dd3295988e175 AUTHOR_PLEDGE
-SHA256 ce0736394bf7b9bdf342fc8856b96efbde75e2a9c2b8ed91868daf5410688e4e CODE_OF_CONDUCT.md
-SHA256 6652eec09637022520ce1177c4d052d564d7a1e334f6b91d964cd52a1f3c86bb CONTRIBUTORS
-SHA256 65aa6566355193135e3d76b4bcdfb684de450d17e5251942afdbba171d104d12 Changes
-SHA256 4e8e7785fc5915baed9a18de78249afe7874ee64efe7a98bf7a07715e73ef5c1 INSTALL
-SHA256 0fadc1205a762fef7cdf42c7691f632bbe4a17cf8de0ea2fe10a5ce84e78bbed LICENSE
-SHA256 95431796beec39bb1a96d1cd38cac0c12718bd05fc73ca9de1cea1134e8a121a MANIFEST
-SHA256 8fdba02ac60a282c3c6fff6e48e05f9fba6ae92e370d900f927026571cb214aa MANIFEST.SKIP
-SHA256 6f7dc911237d80ba44eeb171c2f4cca897ff695beb4cae0d3e3ffdfc1f93c178 META.json
-SHA256 4523a1268d60a839cf52877784d4b6506a3b9b524aaa849be09f4ae5029b601d META.yml
-SHA256 8bf394adc0de009caa8684ae905a8cfbc4aff1800a129ca39c8e2c6d4524cd44 Makefile.PL
-SHA256 c4fec52da9e3ec1b56c08095e71226e477bbd088522aa4b9afcd3e06422bb381 README.mkdn
-SHA256 f715de8525b017207f5a536df6c4f6e965027bb8087fd91d3d320b9f8ebad1ba cpanfile
-SHA256 d72a0a5aff9d7359db3df1bc8820c68b5b6efc0917c3654dd75e3fa81fda69a3 dist.ini
-SHA256 2104c0dca4aef2aaf44c6b02f188c246b41751b7cda759a121ccd2b7cff8f2c2 doap.xml
-SHA256 241010ec7d91aba873e3305124978b8e71005d4d0fdc7574aad65bfb43a545fd example/bin/app.psgi
-SHA256 ae191b2357f89112b50513d41cc820c54d089716fa75fc4f272356c0848b49fa example/config.yml
-SHA256 4e881bf5057ed24bdd7b8767dba5077105c971792b4a7c4eea968dfebcc4315e example/lib/MyApp.pm
-SHA256 b721557b9c63d069b3871ff975c4f68462b436e251d87a8f7625c6b1b335eff4 lib/Dancer2/Plugin/WebSocket.pm
-SHA256 6f138ffe87b19a91686d59ba88a552d7c0d7c5a584088c2b583b33b1cfd9f05f lib/Dancer2/Plugin/WebSocket/Connection.pm
-SHA256 5725eaea09e70cee7799dfb66b9d920ebf972bcecb37f2fe0e19e1b387a5ef8d lib/Dancer2/Plugin/WebSocket/Group.pm
-SHA256 81b8f349f0de6b73d61335880fb6ffdae1bac3891255735e2e2fa3bc8dbf97a5 t/00-compile.t
-SHA256 d5304a67d7a887078b67a37a33a1721777df62ceb4f35bb387290dddee7ad3c6 t/00-report-prereqs.dd
-SHA256 32862ed3cdb28367324e2dd1f20af158acc637de8e0487bb296157634e12e08c t/00-report-prereqs.t
-SHA256 2112bcec82edd71cede6908d8a9391fafb962b50b25a6bd3d5d9783a5cd64bbb t/example.t
-SHA256 63d9827f7014ae7145a2f3dde173b115b0f529a713aad5f747933bd381a6bd05 xt/release/unused-vars.t
+SHA1 7a922e2f49d5f7ec6969bda8e0716f0c50c0cb64 AUTHOR_PLEDGE
+SHA1 dc51cae02a67955fe2ced58ef55493e147c48e84 CODE_OF_CONDUCT.md
+SHA1 1a07b44d0b4ee5258a2ae552f29a90c33ffdc1be CONTRIBUTORS
+SHA1 d9b1bfab958c6a3e7ba68825b2139038430702a1 Changes
+SHA1 d90805f0c95a92d1e14e824ced50a6eab7084c34 INSTALL
+SHA1 e4c10ea4d0ff6755d3f87ab3f5b113d625978ba3 LICENSE
+SHA1 c06f60770b94aa5c17a90b9aaccd72538b7cdbdb MANIFEST
+SHA1 2477645950ead421b63d2643f8efaed2cfa47cfd MANIFEST.SKIP
+SHA1 99e1ab19b25892f553f7a628bc0e4ff8d3a97faa META.json
+SHA1 16005d64a8eeb3cd1985770349ee62c5039cf292 META.yml
+SHA1 f9156b3add3bd2e39279c87a71f77f8573cba0b7 Makefile.PL
+SHA1 5ee372aa2092323cb33dc864ff832430236f9e88 README.mkdn
+SHA1 2fea80cbe81b8047be64f28b7e7d90227eec8e3a cpanfile
+SHA1 0ad7cb4ec6532864596767231e028973a6428df6 dist.ini
+SHA1 8052875544715c444105405059bd7bac0912e79f doap.xml
+SHA1 8f0ce66fbc8d9cbb18ab58814347efc1bd2f15c7 example/bin/app.psgi
+SHA1 f42d717595f98ac2d0ddd446cf3b8d4078b574ba example/config.yml
+SHA1 5d217a3e30fbba896dbb043c73afbae33e453b9e example/lib/MyApp.pm
+SHA1 b175b2becc4640e46f9d75ebf7f1fa053ea9b236 lib/Dancer2/Plugin/WebSocket.pm
+SHA1 f2588ad76b9930e7a1eb63340be06e33270ea08e lib/Dancer2/Plugin/WebSocket/Connection.pm
+SHA1 deb4eea73dd974c6db7fee9e868990f89cfb5cfd lib/Dancer2/Plugin/WebSocket/Group.pm
+SHA1 6cbf295cbd81783ccd7831621c12fe5d61485b1a t/00-compile.t
+SHA1 481fe4c3e4b18d2a10c73d8abef3dbbef26f4d6b t/00-report-prereqs.dd
+SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
+SHA1 d544a10f1356825a8a314723b1da1ff4d886719a t/example.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlxN9UEACgkQ34Hwf+GwC4zQpwCfeFJ4YwRzQFWcIdKdxDCgPeuc
-5akAn3BnlyeksfQihzSkbORWEAEln2BE
-=dONV
+iEYEARECAAYFAl0uT5wACgkQ34Hwf+GwC4zocQCgjpJMWoilvd1kl2PiXvwOOSVI
+S9wAn2z7b3zNvq//WGkjr/wtAfxVFBLT
+=5a+i
 -----END PGP SIGNATURE-----

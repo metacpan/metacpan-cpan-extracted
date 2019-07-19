@@ -1,4 +1,9 @@
 Revision history for Perl module Net::Stomp:
+0.60 2019-07-17
+ - switch to Log::Any
+ - add trace / debug logging
+ - work sponsored by Broadbean Technology
+
 0.57 2016-04-17
  - fix reconnection problems when server dies (thanks dhnukem)
  - add NACK command (thanks Doug Henderson)

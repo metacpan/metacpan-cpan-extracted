@@ -22,12 +22,18 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "B::COW" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -43,6 +49,6 @@
          "url" : "http://github.com/garu/Clone"
       }
    },
-   "version" : "0.41",
+   "version" : "0.42",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

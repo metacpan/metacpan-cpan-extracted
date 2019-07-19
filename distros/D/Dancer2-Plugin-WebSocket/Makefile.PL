@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dancer2-Plugin-WebSocket",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Dancer2::Plugin::WebSocket",
   "PREREQ_PM" => {
     "Dancer2::Plugin" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Requires" => 0
   },
-  "VERSION" => "0.1.3",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

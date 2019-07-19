@@ -4,30 +4,40 @@
 
 use strict;
 use Test::More tests => 9;
+use FindBin;
+use lib $FindBin::Bin;
 
-BEGIN { use_ok 'Time::Format', '%time' }
 
-my $posix_bad;
+## ----------------------------------------------------------------------------------
+## Test for availability of certain modules.
+my $posix_ok;
 my $lc_time;
 BEGIN
 {
-    $posix_bad = eval ('require POSIX; 1')? 0 : 1;
-    unless ($posix_bad)
+    $posix_ok = eval ('require POSIX; 1');
+    if ($posix_ok)
     {
         $lc_time = POSIX::LC_TIME();
         *setlocale = \&POSIX::setlocale;
     }
-    delete $INC{'POSIX.pm'};
-    %POSIX:: = ();
 }
-my $tl_notok;
-BEGIN {$tl_notok = eval ('use Time::Local; 1')? 0 : 1}
+my $tl_ok;
+BEGIN { $tl_ok = eval ('use Time::Local; 1') }
+
+
+## ----------------------------------------------------------------------------------
+## Load our module.
+BEGIN { use_ok 'Time::Format', '%time' }
+
+
+## ----------------------------------------------------------------------------------
+## Begin tests.
 
 SKIP:
 {
-    skip 'POSIX not available', 8        if $posix_bad;
-    skip 'Time::Local not available', 8  if $tl_notok;
-    skip 'XS version not available', 8   if !defined $Time::Format_XS::VERSION;
+    skip 'POSIX not available', 8        unless $posix_ok;
+    skip 'Time::Local not available', 8  unless $tl_ok;
+    skip 'XS version not available', 8   unless defined $Time::Format_XS::VERSION;
 
     my $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
 

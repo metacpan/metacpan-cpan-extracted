@@ -1,5 +1,5 @@
 package WebService::DetectLanguage::Language;
-$WebService::DetectLanguage::Language::VERSION = '0.02';
+$WebService::DetectLanguage::Language::VERSION = '0.04';
 use 5.006;
 use Moo;
 
@@ -182,4 +182,58 @@ sub _build_name
 }
 
 1;
+
+=head1 NAME
+
+WebService::DetectLanguage::Language - a data object holding language code and name
+
+=head1 SYNOPSIS
+
+ my @languages = $api->languages();
+ foreach my $lang (@languages) {
+     printf "code=%s  name=%s\n", $lang->code, $lang->name;
+ }
+
+=head1 DESCRIPTION
+
+This module is a class for language information returned
+by the C<detect()>, C<multi_detect()>, or C<languages()> methods
+of L<WebService::DetectLanguage>.
+
+See the documentation of that module for more details.
+
+
+=head1 ATTRIBUTES
+
+=head2 code
+
+A short code identifying the language.
+Most of these are two letters (for example "tl" for Tagalog),
+but some are three letters (for example "chr" for Cherokee),
+and at the time of writing there is one other: "zh-Hant" is the code for Traditional Chinese.
+
+=head2 name
+
+The name of the language.
+Names are all in upper case, and have underscores rather than spaces.
+
+
+=head1 SEE ALSO
+
+L<WebService::DetectLanguage> the main module for talking
+to the language detection API at detectlanguage.com.
+
+L<https://detectlanguage.com/languages> is a list of all the
+languages supported by the API, giving both code and name.
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2019 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

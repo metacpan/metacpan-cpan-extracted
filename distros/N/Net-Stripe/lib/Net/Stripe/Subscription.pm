@@ -1,5 +1,5 @@
 package Net::Stripe::Subscription;
-$Net::Stripe::Subscription::VERSION = '0.37';
+$Net::Stripe::Subscription::VERSION = '0.39';
 use Moose;
 use Kavorka;
 use Net::Stripe::Token;
@@ -54,7 +54,7 @@ Net::Stripe::Subscription - represent a Subscription object from Stripe
 
 =head1 VERSION
 
-version 0.37
+version 0.39
 
 =head1 AUTHORS
 

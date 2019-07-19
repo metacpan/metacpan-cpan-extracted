@@ -3,3 +3,10 @@
 set -ex
 
 cip exec cpanm Devel::Hide
+cip sudo dzil-cpanm Dist::Zilla::Plugin::OurPkgVersion
+
+if [ ! -z "$PERL_CRITIC" ]; then
+    cip exec cpanm -n Perl::Critic Perl::Critic::Freenode https://dist.wdlabs.com/Test2-Tools-PerlCritic-0.01.tar.gz
+    cip exec cpanm -n Test::EOL Test::Pod Test::Pod::Coverage Test::Pod::Spelling::CommonMistakes Test::Strict Test::Version Test::Fixme \
+                      Test::NoTabs YAML
+fi

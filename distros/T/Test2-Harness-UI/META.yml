@@ -68,6 +68,6 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Harness-UI/issues
   repository: http://github.com/Test-More/Test2-Harness-UI/
-version: '0.000002'
+version: '0.000003'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

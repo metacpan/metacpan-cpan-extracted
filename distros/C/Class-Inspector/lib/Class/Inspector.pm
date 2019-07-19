@@ -8,7 +8,7 @@ use warnings;
 use File::Spec ();
 
 # ABSTRACT: Get information about a class and its structure
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 # If Unicode is available, enable it so that the
@@ -16,7 +16,10 @@ our $VERSION = '1.34'; # VERSION
 # We can safely ignore any failure here.
 BEGIN {
   local $@;
-  eval "require utf8; utf8->import";
+  eval {
+    require utf8;
+    utf8->import;
+  };
 }
 
 # Predefine some regexs
@@ -223,7 +226,8 @@ sub methods {
   while ( my $cl = shift @queue ) {
     push @path, $cl;
     unshift @queue, grep { ! $seen{$_}++ }
-      map { s/^::/main::/; s/\'/::/g; $_ }
+      map { s/^::/main::/; s/\'/::/g; $_ } ##  no critic
+      map { "$_" }
       ( @{"${cl}::ISA"} );
   }
 
@@ -299,7 +303,7 @@ sub subclasses {
 sub _subnames {
   my ($class, $name) = @_;
   return sort
-    grep {
+    grep {  ## no critic
       substr($_, -2, 2, '') eq '::'
       and
       /$RE_IDENTIFIER/o
@@ -325,7 +329,7 @@ sub children {
 
   # Find all the Foo:: elements in our symbol table
   no strict 'refs';
-  map { "${name}::$_" } sort grep { s/::$// } keys %{"${name}::"};
+  map { "${name}::$_" } sort grep { s/::$// } keys %{"${name}::"};  ## no critic
 }
 
 # As above, but recursively
@@ -341,7 +345,7 @@ sub recursive_children {
   while ( my $namespace = $children[$i++] ) {
     push @children, map { "${namespace}::$_" }
       grep { ! /^::/ } # Ignore things like ::ISA::CACHE::
-      grep { s/::$// }
+      grep { s/::$// }  ## no critic
       keys %{"${namespace}::"};
   }
 
@@ -406,7 +410,7 @@ Class::Inspector - Get information about a class and its structure
 
 =head1 VERSION
 
-version 1.34
+version 1.36
 
 =head1 SYNOPSIS
 

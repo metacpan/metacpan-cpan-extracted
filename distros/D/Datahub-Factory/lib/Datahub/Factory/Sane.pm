@@ -2,7 +2,7 @@ package Datahub::Factory::Sane;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.75';
+our $VERSION = '1.77';
 
 use feature ();
 use utf8;

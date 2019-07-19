@@ -7,8 +7,6 @@ lib/Net/Stomp/Frame.pm
 lib/Net/Stomp/StupidLogger.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-META.yml
 README
 t/connect-disconnect.t
 t/constructor.t
@@ -26,3 +24,5 @@ t/send-with-receipt.t
 t/sending-frames.t
 xt/consume_buffering.t
 Makefile.PL
+META.yml
+META.json

@@ -1,5 +1,32 @@
 Revision history for FFI-Platypus
 
+0.92      2019-07-17 18:16:40 -0400
+  - Production release identical to 0.91_02
+
+0.91_02   2019-07-16 19:31:40 -0400
+  - Documentation improvements. (gh#139, gh#145, et. al)
+  - Fixed minor testing error introduced in 0.91_01 (gh#143, gh#144)
+
+0.91_01   2019-07-14 09:32:13 -0400
+  - Add support for variadic functions (gh#136, gh#141)
+  - Include Type Parser version 1.  This can be activated using
+    the api => 1 when creating a FFI::Platypus instance (gh#135)
+  - Usage of Type Parser version 1 is experimental and will
+    issue a warning until FFI::Platypus 1.00 is released (gh#135)
+  - Added support for pass-by-value records (gh#57,gh#92,gh#135)
+    this requires Type Parser version 1
+  - Allow decoration of aliases of basic types (gh#135, gh#135)
+    this requires Type Parser version 1
+  - Fix bug where Math::LongDouble and Math::Complex detection
+    wasn't being made for array and pointers of longdouble,
+    complex_float and complex_double types. (gh#135)
+  - For functions: allow a single 'void' argument type to indicate
+    an empty list of arguments (a la old C style).  The 'void'
+    type is otherwise now illegal as an argument type (ie when
+    there is more than one argument) and will throw an exception
+    when the function is created.  Previously a warning would
+    be issued when the funtion was called. (gh#140, gh#142)
+
 0.90      2019-07-01 09:47:31 -0400
   - Documentation improvements (gh#137, et. al.)
 
@@ -51,7 +78,7 @@ Revision history for FFI-Platypus
   - Diagnostic release
 
 0.80      2019-02-01 15:36:50 -0500
-  - Fix incompatability with parallel bsd make
+  - Fix incompatibility with parallel bsd make
 
 0.79      2019-01-31 20:58:07 -0500
   - Fix probe runner builder bug (gh#112, gh#113)
@@ -276,7 +303,7 @@ Revision history for FFI-Platypus
   - Avoid unnecessary downgrade on when Perl is compiled to use longdouble
 
 0.40      2015-08-29 08:45:19 -0400
-  - Closure declerations ignore white space between () and ->
+  - Closure declarations ignore white space between () and ->
 
 0.39      2015-08-24 03:23:10 -0400
   - Fixed spurious warning: auto loading of record class (via FFI::Platypus::Record)
@@ -299,7 +326,7 @@ Revision history for FFI-Platypus
     please let me know!
 
 0.37      2015-05-29 14:28:21 -0400
-  - Added compatability back in for older version of constant
+  - Added compatibility back in for older version of constant
     (newer one is not available on CPAN yet)
 
 0.36      2015-05-29 13:40:32 -0400

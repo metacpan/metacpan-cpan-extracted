@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.78'; # VERSION
+our $VERSION = '1.79'; # VERSION
 
 
 sub new
@@ -406,7 +406,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 

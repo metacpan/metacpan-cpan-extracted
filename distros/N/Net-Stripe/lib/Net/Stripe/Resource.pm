@@ -1,5 +1,5 @@
 package Net::Stripe::Resource;
-$Net::Stripe::Resource::VERSION = '0.37';
+$Net::Stripe::Resource::VERSION = '0.39';
 # ABSTRACT: represent a Resource object from Stripe
 
 use Moose;
@@ -77,7 +77,7 @@ Net::Stripe::Resource - represent a Resource object from Stripe
 
 =head1 VERSION
 
-version 0.37
+version 0.39
 
 =head1 AUTHORS
 

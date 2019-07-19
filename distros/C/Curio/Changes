@@ -1,5 +1,16 @@
 Revision history for Perl extension Curio.
 
+0.04 2019-07-15T19:46:01Z
+
+ - The exported function may now be overriden with a custom function.
+ - Added export_resource.
+ - Restored export_function_name and always_export.
+ - Added inject_with_guard.
+ - Made the Curio::Role::factory method much faster.
+ - Renamed registers_resources to does_registry.
+ - More documentation work.
+ - Added installs_curio_method.
+
 0.03 2019-05-31T02:59:12Z
 
  - Started the Curio::Manual.

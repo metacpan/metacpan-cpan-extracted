@@ -12,6 +12,7 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Alien::Base
   Capture::Tiny
+  Devel::Hide
   ExtUtils::CBuilder
   ExtUtils::MakeMaker
   ExtUtils::ParseXS
@@ -19,6 +20,7 @@ $modules{$_} = $_ for qw(
   IPC::Cmd
   JSON::PP
   List::Util
+  Math::LongDouble
   PkgConfig
   Test::More
   constant

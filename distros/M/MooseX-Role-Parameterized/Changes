@@ -1,5 +1,8 @@
 Revision history for MooseX-Role-Parameterized
 
+1.11      2019-07-16 01:33:16Z
+   - remove MooseX::Role::WithOverloading from test dependencies (RT#130075)
+
 1.10      2017-04-20 17:50:53Z
    - add MooseX::Role::Parameterised as stub documentation, for
      discoverability

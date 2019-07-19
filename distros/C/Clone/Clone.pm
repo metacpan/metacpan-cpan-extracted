@@ -11,7 +11,7 @@ require AutoLoader;
 @EXPORT    = qw();
 @EXPORT_OK = qw( clone );
 
-$VERSION = '0.41';
+$VERSION = '0.42';
 
 bootstrap Clone $VERSION;
 
@@ -81,7 +81,7 @@ with 3 or fewer levels, while C<dclone()> can be faster for structures
 
 =head1 COPYRIGHT
 
-Copyright 2001-2018 Ray Finch. All Rights Reserved.
+Copyright 2001-2019 Ray Finch. All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

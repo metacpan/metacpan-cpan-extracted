@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify;
-$Games::Solitaire::Verify::VERSION = '0.2201';
+$Games::Solitaire::Verify::VERSION = '0.2202';
 use warnings;
 use strict;
 
@@ -21,7 +21,7 @@ Games::Solitaire::Verify - verify solutions for solitaire games.
 
 =head1 VERSION
 
-version 0.2201
+version 0.2202
 
 =head1 SYNOPSIS
 
@@ -50,10 +50,6 @@ Instead, what Games-Solitaire-Verify does is verify the solutions
 and makes sure they are correct.
 
 See L<http://pysolfc.sourceforge.net/> for more about card solitaire.
-
-=head1 VERSION
-
-version 0.2201
 
 =head1 SEE ALSO
 

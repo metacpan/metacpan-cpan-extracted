@@ -1,7 +1,7 @@
 package App::dateseq;
 
-our $DATE = '2019-06-24'; # DATE
-our $VERSION = '0.094'; # VERSION
+our $DATE = '2019-07-16'; # DATE
+our $VERSION = '0.096'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,7 +28,7 @@ _
             summary => 'Starting date',
             schema => ['date*', {
                 'x.perl.coerce_to' => 'DateTime',
-                'x.perl.coerce_rules' => ['str_alami_en'],
+                'x.perl.coerce_rules' => ['str_natural'],
             }],
             pos => 0,
         },
@@ -36,7 +36,7 @@ _
             summary => 'End date, if not specified will generate an infinite* stream of dates',
             schema => ['date*', {
                 'x.perl.coerce_to' => 'DateTime',
-                'x.perl.coerce_rules' => ['str_alami_en'],
+                'x.perl.coerce_rules' => ['str_natural'],
             }],
             pos => 1,
         },
@@ -208,6 +208,11 @@ _
             'x.doc.show_result' => 0,
         },
     ],
+    links => [
+        {url=>'prog:durseq', summary=>'Produce sequence of date durations'},
+        {url=>'prog:seq'},
+        {url=>'prog:seq-pl', summary=>'Perl variant of seq'},
+    ],
 };
 sub dateseq {
     require DateTime::Duration;
@@ -281,9 +286,10 @@ sub dateseq {
         push @res, $args{header} if $args{header};
         my $dt = $args{from}->clone;
         while (1) {
+            #say "D:$dt vs $args{to}? ", DateTime->compare($dt, $args{to});
             if (defined $args{to}) {
-                last if  $reverse && DateTime->compare($dt, $args{to}) <  0;
-                last if !$reverse && DateTime->compare($dt, $args{to}) >= 0;
+                last if !$reverse && DateTime->compare($dt, $args{to}) > 0;
+                last if  $reverse && DateTime->compare($dt, $args{to}) < 0;
             }
             push @res, $strp->format_datetime($dt) if $code_filter->($dt);
             last if defined($args{limit}) && @res >= $args{limit};
@@ -332,7 +338,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.094 of App::dateseq (from Perl distribution App-dateseq), released on 2019-06-24.
+This document describes version 0.096 of App::dateseq (from Perl distribution App-dateseq), released on 2019-07-16.
 
 =head1 FUNCTIONS
 
@@ -435,6 +441,15 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+
+L<durseq>. Produce sequence of date durations.
+
+L<seq>.
+
+L<seq-pl>. Perl variant of seq.
 
 =head1 AUTHOR
 

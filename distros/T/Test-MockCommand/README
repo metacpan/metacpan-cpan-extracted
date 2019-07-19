@@ -1,4 +1,4 @@
-Test-MockCommand version 0.03
+Test-MockCommand version 0.05
 =============================
 
 INSTALLATION
@@ -17,7 +17,7 @@ DEPENDENCIES
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2012 by Stuart Caie
+Copyright (C) 2008-2019 by Stuart Caie
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

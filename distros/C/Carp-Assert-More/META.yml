@@ -27,5 +27,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Assert-More
   license: http://www.opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/petdance/carp-assert-more/tree/master
-version: '1.16'
+version: '1.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

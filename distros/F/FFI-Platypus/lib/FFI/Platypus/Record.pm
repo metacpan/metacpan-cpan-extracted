@@ -10,7 +10,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.90'; # VERSION
+our $VERSION = '0.92'; # VERSION
 
 
 sub record_layout
@@ -18,9 +18,9 @@ sub record_layout
   my $ffi = ref($_[0]) ? shift : FFI::Platypus->new;
   my $offset = 0;
   my $record_align = 0;
-  
+
   croak "uneven number of arguments!" if scalar(@_) % 2;
-  
+
   my($caller, $filename, $line) = caller;
 
   if($caller->can("_ffi_record_size")
@@ -28,26 +28,46 @@ sub record_layout
   {
     croak "record already defined for the class $caller";
   }
-  
+
   my @destroy;
-  
+  my @ffi_types;
+
   while(@_)
   {
-    my $type = shift;
+    my $spec = shift;
     my $name = shift;
-    
+    my $type = $ffi->{tp}->parse( $spec, { member => 1 } );
+
     croak "illegal name $name"
       unless $name =~ /^[A-Za-z_][A-Za-z_0-9]*$/
       ||     $name eq ':';
     croak "accessor/method $name already exists"
       if $caller->can($name);
-    
-    my $size  = $ffi->sizeof($type);
-    my $align = $ffi->alignof($type);
-    $record_align = $align if $align > $record_align;
-    my $meta  = $ffi->type_meta($type);
 
-    $offset++ while $offset % $align;    
+    my $size  = $type->sizeof;
+    my $align = $type->alignof;
+    $record_align = $align if $align > $record_align;
+    my $meta  = $type->meta;
+
+    $offset++ while $offset % $align;
+
+    {
+      my $count;
+      my $ffi_type;
+
+      if($meta->{type} eq 'record') # this means fixed string atm
+      {
+        $ffi_type = 'sint8';
+        $count = $size;
+      }
+      else
+      {
+        $ffi_type = $meta->{ffi_type};
+        $count    = $meta->{element_count};
+        $count    = 1 unless defined $count;
+      }
+      push @ffi_types, $ffi_type for 1..$count;
+    }
 
     if($name ne ':')
     {
@@ -67,16 +87,16 @@ sub record_layout
       my $error_str = _accessor
         $full_name,
         "$filename:$line",
-        $ffi->_type_lookup($type),
+        $type,
         $offset;
-      croak("$error_str ($type $name)") if $error_str;
+      croak("$error_str ($spec $name)") if $error_str;
     };
-    
+
     $offset += $size;
   }
-  
+
   my $size = $offset;
-  
+
   no strict 'refs';
   constant->import("${caller}::_ffi_record_size", $size);
   constant->import("${caller}::_ffi_record_align", $record_align);
@@ -88,19 +108,27 @@ sub record_layout
       if @$args % 2;
     my $record = "\0" x $class->_ffi_record_size;
     my $self = bless \$record, $class;
-    
+
     while(@$args)
     {
       my $key = shift @$args;
       my $value = shift @$args;
       $self->$key($value);
     }
-    
+
     $self;
   };
-  
+
+  {
+    require FFI::Platypus::Record::Meta;
+    my $ffi_meta = FFI::Platypus::Record::Meta->new(
+      \@ffi_types,
+    );
+    *{join '::', $caller, '_ffi_meta'} = sub { $ffi_meta };
+  }
+
   my $destroy_sub = sub {};
-  
+
   if(@destroy)
   {
     $destroy_sub = sub {
@@ -129,7 +157,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.90
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -184,11 +212,11 @@ Perl:
 
 [version 0.21]
 
-This module provides a mechanism for building classes that can be used 
-to mange structured data records (known as C as "structs" and in some 
-languages as "records").  A structured record is a series of bytes that 
-have structure understood by the C or other foreign language library 
-that you are interfacing with.  It is designed for use with FFI and 
+This module provides a mechanism for building classes that can be used
+to mange structured data records (known as C as "structs" and in some
+languages as "records").  A structured record is a series of bytes that
+have structure understood by the C or other foreign language library
+that you are interfacing with.  It is designed for use with FFI and
 L<FFI::Platypus>, though it may have other applications.
 
 =head1 FUNCTIONS
@@ -198,12 +226,12 @@ L<FFI::Platypus>, though it may have other applications.
  record_layout($ffi, $type => $name, ... );
  record_layout($type => $name, ... );
 
-Define the layout of the record.  You may optionally provide an instance 
-of L<FFI::Platypus> as the first argument in order to use its type 
+Define the layout of the record.  You may optionally provide an instance
+of L<FFI::Platypus> as the first argument in order to use its type
 aliases.  Then you provide members as type/name pairs.
 
-For each member you declare, C<record_layout> will create an accessor 
-which can be used to read and write its value. For example imagine a 
+For each member you declare, C<record_layout> will create an accessor
+which can be used to read and write its value. For example imagine a
 class C<Foo>:
 
  package Foo;
@@ -215,7 +243,7 @@ class C<Foo>:
    'string(10)' => 'baz',  #  char baz[10];
  );
 
-You can get and set its fields with like named C<bar> and C<baz> 
+You can get and set its fields with like named C<bar> and C<baz>
 accessors:
 
  my $foo = Foo->new;
@@ -226,7 +254,7 @@ accessors:
  $foo->baz("grimlock\0\0"); # should be 10 characters long
  my $string_value = $foo->baz; # includes the trailing \0\0
 
-You can also pass initial values in to the constructor, either passing 
+You can also pass initial values in to the constructor, either passing
 as a list of key value pairs or by passing a hash reference:
 
  $foo = Foo->new(
@@ -241,8 +269,8 @@ as a list of key value pairs or by passing a hash reference:
    baz => "grimlock\0\0",
  } );
 
-If there are members of a record that you need to account for in terms 
-of size and alignment, but do not want to have an accessor for, you can 
+If there are members of a record that you need to account for in terms
+of size and alignment, but do not want to have an accessor for, you can
 use C<:> as a place holder for its name:
 
  record_layout(
@@ -252,14 +280,14 @@ use C<:> as a place holder for its name:
 
 =head3 strings
 
-So far I've shown fixed length strings.  These are declared with the 
-word C<string> followed by the length of the string in parentheticals.  
-Fixed length strings are included inside the record itself and do not 
-need to be allocated or deallocated separately from the record.  
-Variable length strings must be allocated on the heap, and thus require 
-a sense of "ownership", that is whomever allocates variable length 
-strings should be responsible for also free'ing them.  To handle this, 
-you can add a C<ro> or C<rw> trait to a string field.  The default is 
+So far I've shown fixed length strings.  These are declared with the
+word C<string> followed by the length of the string in parentheticals.
+Fixed length strings are included inside the record itself and do not
+need to be allocated or deallocated separately from the record.
+Variable length strings must be allocated on the heap, and thus require
+a sense of "ownership", that is whomever allocates variable length
+strings should be responsible for also free'ing them.  To handle this,
+you can add a C<ro> or C<rw> trait to a string field.  The default is
 C<ro>, means that you can get, but not set its value:
 
  package Foo;
@@ -290,10 +318,10 @@ If you specify a field is C<rw>, then you can set its value:
  my $string = $foo->bar;  # GOOD
  $foo->bar("starscream"); # GOOD
 
-Any string value that is pointed to by the record will be free'd when it 
-falls out of scope, so you must be very careful that any C<string rw> 
-fields are not set or modified by C code.  You should also take care not 
-to copy any record that has a C<rw> string in it because its values will 
+Any string value that is pointed to by the record will be free'd when it
+falls out of scope, so you must be very careful that any C<string rw>
+fields are not set or modified by C code.  You should also take care not
+to copy any record that has a C<rw> string in it because its values will
 be free'd twice!
 
  use Clone qw( clone );
@@ -348,7 +376,7 @@ Another method for constructing and dissecting structured data records.
 
 =item L<pack and unpack|perlpacktut>
 
-Built-in Perl functions for constructing and dissecting structured data 
+Built-in Perl functions for constructing and dissecting structured data
 records.
 
 =back

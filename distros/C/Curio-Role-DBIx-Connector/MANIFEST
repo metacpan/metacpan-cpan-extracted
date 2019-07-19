@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Curio/Role/DBIx/Connector.pm
+minil.toml
+t/SYNOPSIS.t
+t/basic.t
+t/lib/MyApp/Config.pm
+t/lib/MyApp/Secrets.pm
+t/lib/MyApp/Service/DB.pm
+t/real.t
+META.yml
+MANIFEST

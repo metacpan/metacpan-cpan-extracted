@@ -8,9 +8,12 @@ use FFI::Platypus;
 skip_all 'may be unsupported';
 skip_all "unsupported on $^O" if $^O =~ /bsd$/i || $^O eq 'darwin';
 
+mkdir "$CWD/.tmp"
+  unless -d "$CWD/.tmp";
+
 subtest exe => sub
 {
-  local $CWD = tempdir( CLEANUP => 1 );
+  local $CWD = tempdir( CLEANUP => 1, DIR => "$CWD/.tmp" );
 
   my $tcc = FFI::TinyCC->new;
 

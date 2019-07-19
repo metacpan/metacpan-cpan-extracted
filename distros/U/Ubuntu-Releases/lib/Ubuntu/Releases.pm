@@ -1,7 +1,7 @@
 package Ubuntu::Releases;
 
-our $DATE = '2017-09-08'; # DATE
-our $VERSION = '0.110'; # VERSION
+our $DATE = '2019-06-28'; # DATE
+our $VERSION = '0.111'; # VERSION
 
 use 5.010001;
 use strict;
@@ -488,6 +488,74 @@ our $data = do {
      ruby_version         => undef,
      version              => 17.04,
    },
+   {
+     apache_httpd_version => "2.4.27",
+     bash_version         => 4.4,
+     code_name            => "artful",
+     eoldate              => "2018-07",
+     linux_version        => 4.13,
+     mariadb_version      => "--",
+     mysql_version        => "5.7.19",
+     nginx_version        => undef,
+     perl_version         => "5.26.0",
+     php_version          => "7.1.8",
+     postgresql_version   => "9.6.5",
+     python_version       => "2.7.14",
+     reldate              => "2017-10-19",
+     ruby_version         => undef,
+     version              => "17.10",
+   },
+   {
+     apache_httpd_version => "2.4.29",
+     bash_version         => "4.4.18",
+     code_name            => "bionic",
+     eoldate              => "2023-04",
+     linux_version        => 4.15,
+     mariadb_version      => "--",
+     mysql_version        => "5.7.21",
+     nginx_version        => undef,
+     perl_version         => "5.26.1",
+     php_version          => "7.2.3",
+     postgresql_version   => 10.3,
+     python_version       => "2.7.15rc1",
+     reldate              => "2018-04-26",
+     ruby_version         => undef,
+     version              => "18.04 LTS",
+   },
+   {
+     apache_httpd_version => "2.4.34",
+     bash_version         => "4.4.18",
+     code_name            => "cosmic",
+     eoldate              => "2019-07",
+     linux_version        => 4.18,
+     mariadb_version      => "--",
+     mysql_version        => "5.7.23",
+     nginx_version        => undef,
+     perl_version         => "5.26.2",
+     php_version          => "7.2.10",
+     postgresql_version   => 10.5,
+     python_version       => "3.6.6",
+     reldate              => "2018-10-18",
+     ruby_version         => undef,
+     version              => "18.10",
+   },
+   {
+     apache_httpd_version => "--",
+     bash_version         => "5.0",
+     code_name            => "disco",
+     eoldate              => "2020-01",
+     linux_version        => "5.0.0",
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.28.1",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.7.3",
+     reldate              => "2019-04-18",
+     ruby_version         => undef,
+     version              => 19.04,
+   },
  ]
 
 };
@@ -515,7 +583,7 @@ Ubuntu::Releases - List Ubuntu releases
 
 =head1 VERSION
 
-This document describes version 0.110 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2017-09-08.
+This document describes version 0.111 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2019-06-28.
 
 =head1 SYNOPSIS
 
@@ -537,7 +605,7 @@ L<http://distrowatch.com>.
 
 Usage:
 
- list_ubuntu_releases(%args) -> [status, msg, result, meta]
+ list_ubuntu_releases(%args) -> [status, msg, payload, meta]
 
 Ubuntu releases.
 
@@ -1241,7 +1309,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1273,7 +1341,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

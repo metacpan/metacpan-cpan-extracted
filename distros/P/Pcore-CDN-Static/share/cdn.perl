@@ -2,7 +2,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.5.5 );
+        my $ver = version->parse( $args->{ver} // v4.5.8 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 
@@ -76,7 +76,7 @@
 
     # froala, https://www.froala.com/wysiwyg-editor
     froala3 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v3.0.2 );
+        my $ver = version->parse( $args->{ver} // v3.0.3 );
 
         if (wantarray) {
             my @res;

@@ -19,7 +19,7 @@ use Test::MockCommand::Recorder;
 use Test::MockCommand::Result;
 use Test::MockCommand::ScalarReadline qw(scalar_readline);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 our $CLASS = __PACKAGE__;
 our $OPEN_HANDLER = undef; # this gets set to _default_open_handler
 our $RECORDING = 0;        # are we recording commands or playing them back?
@@ -332,7 +332,7 @@ Test::MockCommand - provide mock results for external commands
  ok $cmd->return_value() eq $list;
 
  # go into playback mode
- Test::MockCommand->record(0);
+ Test::MockCommand->recording(0);
 
  # run 'ls -l' again while extra file is in the directory
  # should pull result from store, not real life,
@@ -576,7 +576,7 @@ replicated.
 
 =head1 AUTHOR
 
-Stuart Caie, E<lt>kyzer@4u.netE<gt>
+Stuart Caie, E<lt>kyzer@kyzer.me.ukE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

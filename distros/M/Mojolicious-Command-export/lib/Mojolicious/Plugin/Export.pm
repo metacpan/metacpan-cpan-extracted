@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Export;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 # ABSTRACT: Export a Mojolicious website to static files
 
 #pod =head1 SYNOPSIS
@@ -187,7 +187,7 @@ sub export {
                     my $url = $el->attr( $attr );
 
                     # Don't analyze full URLs
-                    next if $url =~ m{^(?:[a-zA-Z]+:)?//};
+                    next if $url =~ m{^(?:[a-zA-Z]+:|//)};
                     # Don't analyze in-page fragments
                     next if $url =~ m{^#};
 
@@ -286,7 +286,7 @@ Mojolicious::Plugin::Export - Export a Mojolicious website to static files
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

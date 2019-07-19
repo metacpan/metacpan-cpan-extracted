@@ -483,3 +483,8 @@ Revision history for Regexp-Grammars
     * Documented %% operator
 
     * Numerous POD nits fixed (thanks, Ruud and Alex!)
+
+
+1.052  Wed Jul 17 08:17:29 2019
+
+    * Fixed bug in <nocontext:> handling (thanks, Alex!)

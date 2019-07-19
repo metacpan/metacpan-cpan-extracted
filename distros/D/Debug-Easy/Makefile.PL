@@ -23,7 +23,6 @@ if (WriteMakefile(
     AUTHOR             => q{Richard Kelsch <rich@rk-internet.com>},
     VERSION_FROM       => 'lib/Debug/Easy.pm',
     ABSTRACT_FROM      => 'lib/Debug/Easy.pm',
-    LICENSE            => 'Artistic_2_0',
     PL_FILES           => {},
     MIN_PERL_VERSION   => 5.006001,
     CONFIGURE_REQUIRES => {
@@ -40,7 +39,7 @@ if (WriteMakefile(
         'Data::Dumper'    => 0,
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
-    clean => {FILES    => 'Debug-Easy-*'},
+    clean => {FILES    => 'Debug-Easy-* _build*'},
 )) {
     exit(0);
 }

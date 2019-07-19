@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-URL
 
+0.05      2019-07-15 13:03:09 -0400
+  - Better handling of duplicate keys in query parameters (alabamapaul++ gh#4)
+
 0.04      2019-05-15 06:09:39 -0600
   - Bump requirement on Test2::Suite to latest (gh#2, gh#3)
 

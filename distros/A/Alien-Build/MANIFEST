@@ -264,6 +264,7 @@ t/alien_build_plugin_prefer_badversion.t
 t/alien_build_plugin_prefer_goodversion.t
 t/alien_build_plugin_prefer_sortversions.t
 t/alien_build_plugin_probe_cbuilder.t
+t/alien_build_plugin_probe_cbuilder__live.t
 t/alien_build_plugin_probe_commandline.t
 t/alien_build_plugin_test_mock.t
 t/alien_build_rc.t

@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog::TH;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.896'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.897'; # VERSION
 
 use 5.010;
 use strict;
@@ -55,6 +55,16 @@ sub clause_defhash_v {
 }
 
 sub clause_v {
+    my ($self, $cd) = @_;
+    $self->compiler->_ignore_clause($cd);
+}
+
+sub clause_examples {
+    my ($self, $cd) = @_;
+    $self->compiler->_ignore_clause($cd);
+}
+
+sub clause_invalid_examples {
     my ($self, $cd) = @_;
     $self->compiler->_ignore_clause($cd);
 }
@@ -144,7 +154,7 @@ Data::Sah::Compiler::Prog::TH - Base class for programming-language emiting comp
 
 =head1 VERSION
 
-This document describes version 0.896 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2019-07-04.
+This document describes version 0.897 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2019-07-19.
 
 =for Pod::Coverage ^(compiler|clause_.+|handle_.+|gen_.+|set_tmp_data_term|restore_data_term)$
 

@@ -1,16 +1,14 @@
 Revision history for Perl extension AnyEvent.
 
-TODO: document TCP_*** constants
-TODO: add debug/trace logging to some modules
-TODO: use the eval-with-cb-call trick also to speed up JSON?
-TODO: FAQ: common pitfalls? invoke-before-return
-TODO: FAQ: scope-ids? hosts file order?
-TODO: AnyEvent::Handle with AnyEvent::IO?
-TODO: invalid. and localhost. specialcasing inside AEDNS and not AESocket (rfc6761)
-TODO: maybe implement env variable to give hosts precedence
-TODO: more formats for parse_ipv6 (single ipv6 address without port, ...p80, ...#80)
-TODO: inet_aton maybe pack C4? no, add a comment why not
-TODO: socket prepare callbacks, can they easily signal failure as well?
+7.16 Fri Jul 19 18:00:21 CEST 2019
+	- add ffdhe group dh parameters from RFC 7919, and use ffdhe3072
+          as new default, instead of schmorp1539.
+        - AnyEvent::Log did not reassess logging status of
+          AnyEvent::Log::logger's when contexts were changed with
+          ->attach/detach/slaves, causing them to not log even though a
+          recent attach should have caused them to log.
+	- added some more logging configuration examples.
+        - mention RFC 8482 in AnyEvent::DNS.
 
 7.15 Tue Feb 26 03:07:42 CET 2019
         - INCOMPATIBLE CHANGE: AnyEvent::Handle's tls_detect documentation gave

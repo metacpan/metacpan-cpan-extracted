@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.25      2019-07-17 09:43:58-07:00 America/Los_Angeles
+        - Fix Karma plugin's help text
+
 1.24      2019-07-12 07:06:31-07:00 America/Los_Angeles
         - Send USER and NICK lines to IRC server based on an optional parameter
 

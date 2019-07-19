@@ -1,4 +1,5 @@
 lib/Archive/Tar/Builder.pm
+lib/Archive/Tar/Builder/HardlinkCache.pm
 lib/Archive/Tar/Builder/UserCache.pm
 Makefile.PL
 Changes
@@ -38,6 +39,7 @@ src/match_path.c
 src/match_path.h
 src/ppport.h
 t/lib-Archive-Tar-Builder.t
+t/lib-Archive-Tar-Builder-HardlinkCache.t
 t/lib-Archive-Tar-Builder-UserCache.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

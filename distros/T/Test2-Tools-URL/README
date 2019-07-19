@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -85,7 +85,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Paul Durden (alabamapaul, PDURDEN)
 
 COPYRIGHT AND LICENSE
 

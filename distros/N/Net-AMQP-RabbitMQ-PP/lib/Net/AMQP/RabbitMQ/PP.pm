@@ -3,7 +3,7 @@ package Net::AMQP::RabbitMQ::PP;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Carp;
 use Cwd;
@@ -50,11 +50,14 @@ sub connect {
 		}
 
 		my $connection_class = "IO::Socket::INET";
+		my %connection_args;
 
 		if ( $args{secure} ) {
 			die "IO::Socket::SSL is required for secure connections"
 				if ! HAS_TLS;
 			$connection_class = "IO::Socket::SSL";
+			my @ssl_args = grep { /^SSL_/ } sort keys %args;
+			@connection_args{ @ssl_args } = @args{ @ssl_args };
 		}
 
 		$self->_set_handle(
@@ -63,6 +66,7 @@ sub connect {
 				PeerPort => $args{port} || ( $args{secure} ? 5671 : 5672 ),
 				( ! $args{secure} ? ( Proto => 'tcp' ) : () ),
 				( $args{socket_timeout} ? ( Timeout => $args{socket_timeout} ) : () ),
+				%connection_args,
 			) or Carp::croak "Could not connect: $EVAL_ERROR"
 		);
 
@@ -927,7 +931,7 @@ Like L<Net::RabbitMQ> but pure perl rather than a wrapper around librabbitmq.
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 SUBROUTINES/METHODS
 
@@ -956,11 +960,13 @@ Connect to the server. Default arguments are shown below:
 	);
 
 connect can also take a secure flag for SSL connections, this will only work if
-L<IO::Socket::SSL> is available
+L<IO::Socket::SSL> is available. You can also pass SSL specific arguments through
+in the connect method and these will be passed through
 
 	$mq->connect(
 		...
 		secure => 1,
+		SSL_blah_blah => 1,
 	);
 
 =head2 disconnect
@@ -1212,6 +1218,7 @@ Contributors:
 
 	Ben Kaufman
 	Jonathan Briggs
+	Piotr Malek
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,138 +1,3 @@
-package App::BackupPlan::Policy;
-
-use Archive::Tar;
-use File::Find;
-
-sub new {
-	my $class = shift;
-	my $self = {
-		maxFiles  => shift,
-		prefix    => shift,
-		frequency => shift,
-		targetDir => shift,
-		sourceDir => shift}; 
-
-	bless $self,$class;						
-	return $self;				
-}
-
-sub setMaxFiles {
-    my ( $self, $maxFiles ) = @_;
-    $self->{maxFiles} = $maxFiles if defined($maxFiles);
-    return $self->{maxFiles};
-}
-
-sub getMaxFiles {
-    my( $self ) = @_;
-    return $self->{maxFiles};
-}
-
-sub setPrefix {
-    my ( $self, $prefix ) = @_;
-    $self->{prefix} = $prefix if defined($prefix);
-    return $self->{prefix};
-}
-
-sub getPrefix {
-    my( $self ) = @_;
-    return $self->{prefix};
-}
-
-sub setFrequency {
-    my ( $self, $frequency ) = @_;
-    $self->{frequency} = $frequency if defined($frequency);
-    return $self->{frequency};
-}
-
-sub getFrequency {
-    my( $self ) = @_;
-    return $self->{frequency};
-}
-
-sub setTargetDir {
-    my ( $self, $targetDir ) = @_;
-    $self->{targetDir} = $targetDir if defined($targetDir);
-    return $self->{targetDir};
-}
-
-sub getTargetDir {
-    my( $self ) = @_;
-    return $self->{targetDir};
-}
-
-sub setSourceDir {
-    my ( $self, $sourceDir ) = @_;
-    $self->{sourceDir} = $sourceDir if defined($sourceDir);
-    return $self->{sourceDir};
-}
-
-sub getSourceDir {
-    my( $self ) = @_;
-    return $self->{sourceDir};
-}
-
-sub set {
-	my ($self, $name, $value) = @_;
-	$self->{$name} = $value if defined($value) && defined($name);
-}
-
-sub print {
-	my( $self ) = @_;
-	$self->{maxFiles} = "n/a" unless defined($self->{maxFiles});
-	$self->{prefix} = "n/a" unless defined($self->{prefix});
-	$self->{frequency} = "n/a" unless defined($self->{frequency});
-	$self->{targetDir} = "n/a" unless defined($self->{targetDir});
-	$self->{sourceDir} = "n/a" unless defined($self->{sourceDir});
-	print "Policy: maxFiles=$self->{maxFiles},
-	prefix=$self->{prefix},
-	frequency=$self->{frequency},
-	targetDir=$self->{targetDir},
-	sourceDir=$self->{sourceDir}\n"; 
-}
-
-sub info {
-	my( $self ) = @_;
-	$self->{maxFiles} = "n/a" unless defined($self->{maxFiles});
-	$self->{prefix} = "n/a" unless defined($self->{prefix});
-	$self->{frequency} = "n/a" unless defined($self->{frequency});
-	$self->{targetDir} = "n/a" unless defined($self->{targetDir});
-	$self->{sourceDir} = "n/a" unless defined($self->{sourceDir});
-	return "Policy: maxFiles=$self->{maxFiles},
-	prefix=$self->{prefix},
-	frequency=$self->{frequency},
-	targetDir=$self->{targetDir},
-	sourceDir=$self->{sourceDir}"; 
-}
-
-sub tar {
-	my( $self, $ts, $hasExcludeTag ) = @_;
-	my $filename = sprintf("%s/%s_%s.tar.gz",$self->{targetDir},$self->{prefix},$ts);
-	my $option = '';
-	$option = '--exclude-tag-all=NOTAR' if $hasExcludeTag;
-	my $output = `tar cvzf $filename $option $self->{sourceDir} 2>&1 1>/dev/null`;
-	if (-e $filename) {
-		my $stat = `ls -lh $filename`;
-		return "system tar: $stat";	
-	}	
-	return "Error: tar failed to produce $filename\n$output\n";
-}
-
-sub perlTar {
-	my( $self, $ts ) = @_;
-	my $filename = sprintf("%s/%s_%s.tar.gz",$self->{targetDir},$self->{prefix},$ts);	
-	my $tar = new Archive::Tar;
-	our @files=();
-	find(sub {push(@files,$File::Find::name);},$self->{sourceDir});
-	$tar->add_files(@files);
-	$tar->write($filename,COMPRESS_GZIP);
-	if (-e $filename) {
-		my $stat = `ls -lh $filename`;
-		return "perl tar: $stat";	
-	}	
-	my $err = $tar->error();
-	return "Error: tar failed to produce $filename\n$err\n";		
-}
-
 
 package App::BackupPlan;
 
@@ -144,6 +9,8 @@ use DateTime;
 use Time::Local;
 use XML::DOM;
 use Log::Log4perl qw(:easy);
+use App::BackupPlan::Policy;
+use App::BackupPlan::Utils qw(fromISO2TS fromTS2ISO addSpan subSpan);
 
 require XML::DOM;
 require Log::Log4perl;
@@ -170,7 +37,7 @@ our @EXPORT = qw();
 
 
 BEGIN {
-	our $VERSION = '0.0.7';
+	our $VERSION = '0.0.9';
 	print "App::BackupPlan by Gualtiero Chiaia, version $VERSION\n";	
 }
 
@@ -187,11 +54,53 @@ sub new {
 	};
 	
 	bless $self,$class;						
-	return $self;				
+	return $self;
+}
+
+sub run_policy {
+    my ($policy,$now, $logger) = @_;
+    $policy->print;
+    $logger->debug($policy->info) if defined $logger;
+    my $ts = &fromTS2ISO($now);
+    my %files = &getFiles($policy->getTargetDir,$policy->getPrefix);
+    #get last
+    my $lastts = &getLastTs(keys %files);
+    my $threshold = &fromTS2ISO(&subSpan($now,$policy->getFrequency));
+    if (!defined($lastts) || $lastts < $threshold ) { #needs a new tar file
+        if (defined $lastts) {
+            $logger->info("Need a new tar file, last tar was on $lastts") if defined $logger;
+        }
+        else {
+            $logger->info("Need a tar file") if defined $logger;
+        }
+        my $tarout;
+        if (lc $TAR eq 'perl') {$tarout= $policy->perlTar($ts);}
+        else {$tarout = $policy->tar($ts,$HAS_EXCLUDE_TAG);}
+        if ($tarout =~ /Error/i) {
+            $logger->error($tarout) if defined $logger;	
+        } else {
+            $logger->debug($tarout) if defined $logger;
+        }
+        
+        #now delete old
+        %files = &getFiles($policy->getTargetDir,$policy->getPrefix);
+        my $maxFiles = $policy->getMaxFiles;
+        my $cnt = scalar(keys %files); 
+        while ($cnt > $maxFiles && $cnt >0) { 
+            my $oldts = &getFirstTs(keys %files);
+            if (defined $oldts) {
+                $logger->info("Deleting old tar file, with time stamp $oldts") if defined $logger;
+                unlink $files{$oldts};
+            }
+            %files = &getFiles($policy->getTargetDir,$policy->getPrefix);
+            $cnt--;
+        } #end while
+    } #end if    
 }
 
 sub run {
-	my ($self) = @_;
+	my ($self,$now) = @_;
+	$now = time unless defined $now;
 	
 	#validate the config file
 	die "App::BackupPlan configuration file is required, but was not given!" unless defined $self->{config};
@@ -218,44 +127,9 @@ sub run {
 	foreach my $k (keys %policies) {
 		#policy info			
 		print "**$k policy**\n";
-		$logger->info("**$k policy**");
-				
+		$logger->info("**$k policy**");				
 		my $policy = $policies{$k};
-		$policy->print;
-		$logger->debug($policy->info);
-		my $now = time;
-		my $ts = &formatTimeSpan(time);
-		my %files = &getFiles($policy->getTargetDir,$policy->getPrefix);
-		#get last
-		my $lastts = &getLastTs(keys %files);
-		my $threshold = &subTimeSpan($now,$policy->getFrequency);
-		if (!defined($lastts) || $lastts < $threshold ) { #needs a new tar file
-			my $lastTS = '<missing>';
-			$lastTS = &formatTimeSpan($lastts) if defined $lastts;				
-			$logger->info("Need a new tar file, last tar was on $lastTS");				
-			my $tarout;
-			if (lc $TAR eq 'perl') {$tarout= $policy->perlTar($ts);}
-			else {$tarout = $policy->tar($ts,$HAS_EXCLUDE_TAG);}
-			if ($tarout =~ /Error/i) {
-				$logger->error($tarout);	
-			} else {
-				$logger->debug($tarout);
-			}
-			
-			#now delete old
-			%files = &getFiles($policy->getTargetDir,$policy->getPrefix);
-			my $maxFiles = $policy->getMaxFiles;
-			my $cnt = scalar(keys %files); 
-			while ($cnt > $maxFiles && $cnt >0) { 
-				my $oldts = &getFirstTs(keys %files);
-				my $oldTS = '<missing>';
-				$oldTS = &formatTimeSpan($oldts) if defined $oldts;
-				unlink $files{$oldts};
-				$logger->info("Deleted old tar file, with time stamp $oldTS");
-				%files = &getFiles($policy->getTargetDir,$policy->getPrefix);
-				$cnt--;
-			} #end while
-		} #end if
+		&run_policy($policy,$now,$logger);
 	} #end foreach	
 } #end sub
 
@@ -317,69 +191,16 @@ sub injectDefaultPolicy {
 	return %raw_pcs;
 }
 
-sub addTimeSpan{
-	my ($timestamp,$span) = @_;
-	my @ts = localtime $timestamp;
-	my $year = $ts[5]+1900;
-	my $month = $ts[4]+1;
-	my $day = $ts[3];
-	my $dt = DateTime->new(year	=> $year, month	=> $month, day	=> $day);
-	if ($span=~/(\d+)d/) {
-		$dt->add_duration(DateTime::Duration->new(days => $1));
-		return timelocal(0,0,0,$dt->day(),$dt->month()-1,$dt->year());
-	}
-	if ($span=~/(\d+)m/) {
-		$dt->add_duration(DateTime::Duration->new(months => $1));
-		return timelocal(0,0,0,$dt->day(),$dt->month()-1,$dt->year());
-	}
-	if ($span=~/(\d+)y/) {
-		$dt->add_duration(DateTime::Duration->new(years => $1));
-		return timelocal(0,0,0,$dt->day(),$dt->month()-1,$dt->year());
-	}
-}
-
-sub subTimeSpan{
-	my ($timestamp,$span) = @_;
-	my @ts = localtime $timestamp;
-	my $year = $ts[5]+1900;
-	my $month = $ts[4]+1;
-	my $day = $ts[3];
-	my $dt = DateTime->new(year	=> $year, month	=> $month, day	=> $day,);
-	if ($span=~/(\d+)d/) {
-		$dt->subtract_duration(DateTime::Duration->new(days => $1));
-		return timelocal(0,0,0,$dt->day(),$dt->month()-1,$dt->year());
-	}
-	if ($span=~/(\d+)m/) {
-		$dt->subtract_duration(DateTime::Duration->new(months => $1));
-		return timelocal(0,0,0,$dt->day(),$dt->month()-1,$dt->year());
-	}
-	if ($span=~/(\d+)y/) {
-		$dt->subtract_duration(DateTime::Duration->new(years => $1));
-		return timelocal(0,0,0,$dt->day(),$dt->month()-1,$dt->year());
-	}
-	return $timestamp;		
-}
-
-sub formatTimeSpan {
-	my $ts = $_[0];
-	my @ts = localtime $ts;
-	my $year = $ts[5]+1900;
-	my $month = $ts[4]+1;
-	my $day = $ts[3];
-	return sprintf("%4d%02d%02d",$year,$month,$day); 
-}
 
 sub getFiles {
 	my %fileMap;
 	my ($sourceDir, $pattern) = @_;
 	opendir DH, $sourceDir or die "Cannot open directory $sourceDir: $!\n";
 	foreach my $f (readdir DH) {
-		if ($f=~/$pattern.*/) {
+		if ($f=~m/$pattern\_(\d{4}\d{2}\d{2}).*/) {
 			my $fname = $sourceDir."/".$f;
 			#print "$fname\n";
-			my @s = stat $fname;
-			my $mtime = $s[9];
-			$fileMap{$mtime}= $fname;			
+			$fileMap{$1}= $fname;			
 		}
 	} 
 	closedir DH;

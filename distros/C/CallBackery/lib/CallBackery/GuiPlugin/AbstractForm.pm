@@ -148,7 +148,7 @@ sub processData {
     # this is only to be sure ... data should be pre-validated
     for my $key (keys %$form){
         if (my $error = $self->validateData($key,$formData)){
-            die mkerror(7492,"Value for $key: $error");
+            die mkerror(7492,$error);
         }
     }
     if ($args->{key}){

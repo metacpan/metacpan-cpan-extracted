@@ -1,7 +1,7 @@
 package Complete::Util;
 
-our $DATE = '2019-06-25'; # DATE
-our $VERSION = '0.601'; # VERSION
+our $DATE = '2019-07-18'; # DATE
+our $VERSION = '0.602'; # VERSION
 
 use 5.010001;
 use strict;
@@ -504,10 +504,14 @@ $SPEC{complete_hash_key} = {
         %arg_word,
         hash      => { schema=>['hash*'=>{}], req=>1 },
         summaries => { schema=>['hash*'=>{}] },
+        summaries_from_hash_values => { schema=>'true*' },
     },
     result_naked => 1,
     result => {
         schema => 'array',
+    },
+    args_rels => {
+        choose_one => ['summaries', 'summaries_from_hash_values'],
     },
 };
 sub complete_hash_key {
@@ -515,14 +519,22 @@ sub complete_hash_key {
     my $hash      = $args{hash} or die "Please specify hash";
     my $word      = $args{word} // "";
     my $summaries = $args{summaries};
+    my $summaries_from_hash_values = $args{summaries_from_hash_values};
 
     my @keys = keys %$hash;
     my @summaries;
-    if ($summaries) { for (@keys) { push @summaries, $summaries->{$_} } }
+    my $has_summary;
+    if ($summaries) {
+        $has_summary++;
+        for (@keys) { push @summaries, $summaries->{$_} }
+    } elsif ($summaries_from_hash_values) {
+        $has_summary++;
+        for (@keys) { push @summaries, $hash->{$_} }
+    }
 
     complete_array_elem(
         word=>$word, array=>\@keys,
-        (summaries=>\@summaries) x !!$summaries,
+        (summaries=>\@summaries) x !!$has_summary,
     );
 }
 
@@ -848,7 +860,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.601 of Complete::Util (from Perl distribution Complete-Util), released on 2019-06-25.
+This document describes version 0.602 of Complete::Util (from Perl distribution Complete-Util), released on 2019-07-18.
 
 =head1 DESCRIPTION
 
@@ -1124,6 +1136,8 @@ Arguments ('*' denotes required arguments):
 =item * B<hash>* => I<hash>
 
 =item * B<summaries> => I<hash>
+
+=item * B<summaries_from_hash_values> => I<true>
 
 =item * B<word>* => I<str> (default: "")
 

@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket::Connection;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Role tying Plack::App::WebSocket::Connection with the Dancer serializer
-$Dancer2::Plugin::WebSocket::Connection::VERSION = '0.1.3';
+$Dancer2::Plugin::WebSocket::Connection::VERSION = '0.2.0';
 
 
 use Scalar::Util qw/ refaddr /;
@@ -89,7 +89,7 @@ Dancer2::Plugin::WebSocket::Connection - Role tying Plack::App::WebSocket::Conne
 
 =head1 VERSION
 
-version 0.1.3
+version 0.2.0
 
 =head1 DESCRIPTION
 

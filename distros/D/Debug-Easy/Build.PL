@@ -9,13 +9,11 @@ my $build = Module::Build->new(
         'Module::Build' => '>= 0'
     },
     'requires'       => {
-        'perl'            => '5.6.1',
-        'Log::Fast'       => '>= 1.00',
+        'perl'            => '5.008',
         'Time::HiRes'     => '>= 1.9715',
         'Term::ANSIColor' => '>= 4.00',
         'DateTime'        => '>= 1.18',
         'File::Basename'  => '>= 0',
-#        'Best'            => '>= 0',
         'Data::Dumper'    => '>= 0',
     },
     'build_requires' => {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, cPanel, Inc.
+ * Copyright (c) 2019, cPanel, L.L.C.
  * All rights reserved.
  * http://cpanel.net/
  *
@@ -60,6 +60,14 @@
 #ifndef S_IPERM
 #define S_IPERM 0777
 #endif /* S_IPERM */
+
+#define S_IF_HARDLINK 1
+
+#define B_HEADER_IS_HARDLINK(header) \
+    (header->linktype == '0' + S_IF_HARDLINK)
+
+#define B_HEADER_IS_IFREG(header) \
+    (header->linktype == '0')
 
 typedef struct _b_header {
     b_string * suffix;

@@ -114,5 +114,6 @@ t/seplist_trailing__plushash.t
 t/seplist_trailing__questionmark.t
 t/seplist_trailing__rawhash.t
 t/seplist_trailing__starhash.t
+t/no_context_named_capture.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.20
+    version 0.21
 
 SYNOPSIS
 
@@ -186,6 +186,13 @@ PROPERTIES
 
       Currently, the value must be a single Perl token such as a string or
       number.
+
+    no_critic
+
+      When underscore_eval_version is used the generated code for dev
+      versions may not technically be Perl::Critic compliant due to string
+      eval, but is nevertheless pretty safe. This option will add the
+      appropriate no critic directive to save you the hassle.
 
 BUGS
 

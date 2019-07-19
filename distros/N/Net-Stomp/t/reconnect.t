@@ -2,6 +2,11 @@
 use lib 't/lib';
 use TestHelp;
 use Net::Stomp::Frame;
+use Log::Any::Adapter::Test;
+Log::Any::Adapter->set(
+    { lexically => \(my $guard) },
+    'Test',
+);
 
 my ($s,$fh) = mkstomp_testsocket;
 

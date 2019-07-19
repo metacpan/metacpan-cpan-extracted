@@ -5,7 +5,8 @@ ffi_type *
 ffi_pl_type_to_libffi_type(ffi_pl_type *type)
 {
   int type_code = type->type_code;
-  type_code = type_code & ~(FFI_PL_SHAPE_CUSTOM_PERL);
+  if((type_code & FFI_PL_SHAPE_MASK) == FFI_PL_SHAPE_CUSTOM_PERL)
+    type_code = type_code & ~(FFI_PL_SHAPE_MASK);
   switch(type_code)
   {
     case FFI_PL_TYPE_VOID:
@@ -45,6 +46,8 @@ ffi_pl_type_to_libffi_type(ffi_pl_type *type)
     case FFI_PL_TYPE_CLOSURE:
     case FFI_PL_TYPE_RECORD:
       return &ffi_type_pointer;
+    case FFI_PL_TYPE_RECORD_VALUE:
+      return type->extra[0].record_value.ffi_type;
   }
   switch(type_code & (FFI_PL_SHAPE_MASK))
   {
@@ -56,47 +59,4 @@ ffi_pl_type_to_libffi_type(ffi_pl_type *type)
       fflush(stderr);
       return NULL;
   }
-}
-
-int
-ffi_pl_name_to_code(const char *name)
-{
-  if(!strcmp(name, "void"))
-  { return FFI_PL_TYPE_VOID; }
-  else if(!strcmp(name, "uint8"))
-  { return FFI_PL_TYPE_UINT8; }
-  else if(!strcmp(name, "sint8"))
-  { return FFI_PL_TYPE_SINT8; }
-  else if(!strcmp(name, "uint16"))
-  { return FFI_PL_TYPE_UINT16; }
-  else if(!strcmp(name, "sint16"))
-  { return FFI_PL_TYPE_SINT16; }
-  else if(!strcmp(name, "uint32"))
-  { return FFI_PL_TYPE_UINT32; }
-  else if(!strcmp(name, "sint32"))
-  { return FFI_PL_TYPE_SINT32; }
-  else if(!strcmp(name, "uint64"))
-  { return FFI_PL_TYPE_UINT64; }
-  else if(!strcmp(name, "sint64"))
-  { return FFI_PL_TYPE_SINT64; }
-  else if(!strcmp(name, "float"))
-  { return FFI_PL_TYPE_FLOAT; }
-  else if(!strcmp(name, "double"))
-  { return FFI_PL_TYPE_DOUBLE; }
-  else if(!strcmp(name, "opaque") || !strcmp(name, "pointer"))
-  { return FFI_PL_TYPE_OPAQUE; }
-#ifdef FFI_PL_PROBE_LONGDOUBLE
-  else if(!strcmp(name, "longdouble"))
-  { return FFI_PL_TYPE_LONG_DOUBLE; }
-#endif
-#if FFI_PL_PROBE_COMPLEX
-  else if(!strcmp(name, "complex_float"))
-  { return FFI_PL_TYPE_COMPLEX_FLOAT; }
-  else if(!strcmp(name, "complex_double"))
-  { return FFI_PL_TYPE_COMPLEX_DOUBLE; }
-#endif
-  else if(!strcmp(name, "string"))
-  { return FFI_PL_TYPE_STRING; }
-  else
-  { return -1; }
 }

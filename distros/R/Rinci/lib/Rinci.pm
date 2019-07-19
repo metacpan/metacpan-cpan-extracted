@@ -1,6 +1,6 @@
 package Rinci;
 
-our $VERSION = '1.1.91'; # VERSION
+our $VERSION = '1.1.93'; # VERSION
 
 1;
 # ABSTRACT: Language-neutral metadata for your code
@@ -17,7 +17,7 @@ Rinci - Language-neutral metadata for your code
 
 =head1 VERSION
 
-This document describes version 1.1.91 of Rinci (from Perl distribution Rinci), released on 2019-05-25.
+This document describes version 1.1.93 of Rinci (from Perl distribution Rinci), released on 2019-07-19.
 
 =head1 HOMEPAGE
 
@@ -41,7 +41,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

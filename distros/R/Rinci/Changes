@@ -1,47 +1,62 @@
-1.1.91  2019-05-25 (PERLANCAR)
+1.1.93  2019-07-19  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- [pod] Fix link to Sah's 'examples' clause.
+
+
+1.1.92  2019-07-19  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Expand on function argument's 'examples' property, and mention Sah's
+          'examples' clause.
+
+
+1.1.91  2019-05-25  Released-By: PERLANCAR
 
 	- Declare the priority of result schema from result metadata to be
 	  *lower* than schema from function metadata's result property.
 
 
-1.1.90  2019-05-24 (PERLANCAR)
+1.1.90  2019-05-24  Released-By: PERLANCAR
 
 	- Introduce result metadata property: schema.
 
 
-1.1.89  2019-04-15 (PERLANCAR)
+1.1.89  2019-04-15  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- Replace greedy with slurpy in examples.
 
 
-1.1.88  2019-04-15 (PERLANCAR)
+1.1.88  2019-04-15  Released-By: PERLANCAR
 
 	- Introduce argument property 'slurpy' as replacement for 'greedy',
 	  note that 'greedy' will be removed in Rinci 1.2.
 
 
-1.1.87  2018-11-29 (PERLANCAR)
+1.1.87  2018-11-29  Released-By: PERLANCAR
 
 	- Specify function argument 'examples'.
 
 
-1.1.86  2017-12-09 (PERLANCAR)
+1.1.86  2017-12-09  Released-By: PERLANCAR
 
 	- [Incompatible change] Revert 1.1.85's change: "Specify that example's
 	  result must always be in enveloped form, to remove ambiguity and to
 	  have the ability to specify status."
 
 
-1.1.85  2017-10-26 (PERLANCAR)
+1.1.85  2017-10-26  Released-By: PERLANCAR
 
 	- Specify that example's result must always be in enveloped form, to
 	  remove ambiguity and to have the ability to specify status. [UPDATE
 	  2017-12-09: reverted in 1.1.86].
 
 
-1.1.84  2016-12-28 (PERLANCAR)
+1.1.84  2016-12-28  Released-By: PERLANCAR
 
         - No spec changes.
 
@@ -51,20 +66,20 @@
         - [dist] Fix expressing spec prereq relationship with x_spec.
 
 
-1.1.83  2016-12-15 (PERLANCAR)
+1.1.83  2016-12-15  Released-By: PERLANCAR
 
 	- Specify that dry_run feature can also be a hash, to be able to
 	  set default dry_run mode.
 
 
-1.1.82  2016-12-10 (PERLANCAR)
+1.1.82  2016-12-10  Released-By: PERLANCAR
 
 	- Introduce argument spec property 'index_completion'.
 
 	- Typo [RT#118381].
 
 
-1.1.81  2016-07-28 (PERLANCAR)
+1.1.81  2016-07-28  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -72,7 +87,7 @@
 	  don't require releasing a new spec release.
 
 
-1.1.80  2016-05-10 (PERLANCAR)
+1.1.80  2016-05-10  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -81,13 +96,13 @@
           now replaced with Sah::Schema::rinci::* packages.
 
 
-1.1.79  2016-02-25 (PERLANCAR)
+1.1.79  2016-02-25  Released-By: PERLANCAR
 
 	- Define new command-line source for function argument
 	  (cmdline_src): stdin_or_args.
 
 
-1.1.78  2015-09-03 (PERLANCAR)
+1.1.78  2015-09-03  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -96,14 +111,14 @@
 	  requirement.
 
 
-1.1.77  2015-05-01 (PERLANCAR)
+1.1.77  2015-05-01  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- Typos (args_rels, not args_schema) & wording.
 
 
-1.1.76  2015-04-30 (PERLANCAR)
+1.1.76  2015-04-30  Released-By: PERLANCAR
 
 	- Replace function property 'args_groups' with 'args_rels'. This
           allows us to reuse the Sah 0.9.34+ specification, since the hash type
@@ -112,12 +127,12 @@
           dep_all, req_dep_one, req_dep_all.
 
 
-1.1.75  2015-03-28 (PERLANCAR)
+1.1.75  2015-03-28  Released-By: PERLANCAR
 
 	- Add (experimental) argument specification: filters.
 
 
-1.1.74  2015-03-18 (PERLANCAR)
+1.1.74  2015-03-18  Released-By: PERLANCAR
 
         - [Incompatible change] Use DefHash's 'caption' property for link title,
           instead of using another ('title').
@@ -126,14 +141,14 @@
           'stdin_or_file' (in addition to 'stdin_or_files').
 
 
-1.1.73  2015-02-07 (PERLANCAR)
+1.1.73  2015-02-07  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- Forgot to update schema.
 
 
-1.1.72  2015-02-07 (PERLANCAR)
+1.1.72  2015-02-07  Released-By: PERLANCAR
 
 	- Introduce function property 'args_groups' to allow things like
 	  requiring {only one,all} members of a group of args must be specified
@@ -144,7 +159,7 @@
 	  to depend on others.
 
 
-1.1.71  2015-01-17 (PERLANCAR)
+1.1.71  2015-01-17  Released-By: PERLANCAR
 
 	- Specify that streaming input and output now uses coderef instead of
 	  filehandle/etc. This is simpler and has the side-effects of easier to
@@ -152,24 +167,24 @@
 	  the coderef to do per-record validation of streaming input/output.
 
 
-1.1.70  2014-11-19 (PERLANCAR)
+1.1.70  2014-11-19  Released-By: PERLANCAR
 
 	- Add 'links' property to arg spec.
 
 
-1.1.69  2014-10-30 (PERLANCAR)
+1.1.69  2014-10-30  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- [Bugfix] forgot to update Sah schema.
 
 
-1.1.68  2014-10-30 (PERLANCAR)
+1.1.68  2014-10-30  Released-By: PERLANCAR
 
 	- Forgot to mention 'stream' argument spec property.
 
 
-1.1.67  2014-10-30 (PERLANCAR)
+1.1.67  2014-10-30  Released-By: PERLANCAR
 
         [INCOMPATIBLE CHANGES]
 
@@ -201,21 +216,21 @@
           actually already in Unixish for some time.
 
 
-1.1.66  2014-10-29 (PERLANCAR)
+1.1.66  2014-10-29  Released-By: PERLANCAR
 
         - Currently limit that there should at most be one argument with
           partial=1. The special arguments become just '-arg_part_start' and
           '-arg_part_len'.
 
 
-1.1.65  2014-10-29 (PERLANCAR)
+1.1.65  2014-10-29  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- [Bugfix] Forgot to update Sah schema.
 
 
-1.1.64  2014-10-29 (PERLANCAR)
+1.1.64  2014-10-29  Released-By: PERLANCAR
 
         [ENHANCEMENTS]
 
@@ -229,7 +244,7 @@
           part_len'.
 
 
-1.1.63  2014-10-28 (PERLANCAR)
+1.1.63  2014-10-28  Released-By: PERLANCAR
 
         [ENHANCEMENTS]
 
@@ -242,7 +257,7 @@
           per-item/detailed statuses.
 
 
-1.1.62  2014-10-23 (PERLANCAR)
+1.1.62  2014-10-23  Released-By: PERLANCAR
 
         [REMOVED FEATURES]
 
@@ -253,7 +268,7 @@
           containing binary data, use the schema type 'buf'.
 
 
-1.1.61  2014-10-22 (PERLANCAR)
+1.1.61  2014-10-22  Released-By: PERLANCAR
 
         - Introduce 'encoding' property in result specification, to give hints
           to tools that function wants to encode its result by default. Said
@@ -261,14 +276,14 @@
           result metadata. UPDATE in 1.1.62: removed.
 
 
-1.1.60  2014-10-22 (PERLANCAR)
+1.1.60  2014-10-22  Released-By: PERLANCAR
 
         - No spec changes.
 
         - Forgot to update Sah schemas.
 
 
-1.1.59  2014-10-22 (PERLANCAR)
+1.1.59  2014-10-22  Released-By: PERLANCAR
 
         - Update to DefHash 1.0.6 (introduced 'caption' property, which actually
           doesn't affect us much).
@@ -298,46 +313,46 @@
           do validation as user types.
 
 
-1.1.58  2014-10-16 (PERLANCAR)
+1.1.58  2014-10-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rename Rinci::result -> Rinci::resmeta.
 
 
-1.1.57  2014-10-11 (PERLANCAR)
+1.1.57  2014-10-11  Released-By: PERLANCAR
 
 	- Introduce is_flag bool property on command-line alias. This is just a
           convenience so you don't have to write: schema => [bool => {is=>1}].
 
 
-1.1.56  2014-10-10 (PERLANCAR)
+1.1.56  2014-10-10  Released-By: PERLANCAR
 
 	- Introduce argument element submetadata (element_meta property in
 	  argument specification, experimental). This is to support forms.
 
 
-1.1.55  2014-10-09 (PERLANCAR)
+1.1.55  2014-10-09  Released-By: PERLANCAR
 
 	- Introduce argument submetadata (experimental). This is to support
           forms where one submits form (including subforms) to a function.
 
 
-1.1.54  2014-09-12 (PERLANCAR)
+1.1.54  2014-09-12  Released-By: PERLANCAR
 
 	- Add result metadata property: perm_err.
 
         - Add FAQ and other POD tweaks.
 
 
-1.1.53  2014-09-11 (PERLANCAR)
+1.1.53  2014-09-11  Released-By: PERLANCAR
 
 	- Introduce function argument spec properties: cmdline_prompt,
 	  is_password. This is to enable CLI programs to prompt password
 	  interactively.
 
 
-1.1.52   2014-06-29 (SHARYANTO)
+1.1.52   2014-06-29  Released-By: SHARYANTO
 
          - Allow completion routine to return hash (completion reply + metadata)
            instead of just array (completion reply), as already implemented in
@@ -347,14 +362,14 @@
            variables where we don't want to escape '$', and so on).
 
 
-1.1.51   2014-06-25 (SHARYANTO)
+1.1.51   2014-06-25  Released-By: SHARYANTO
 
          - No spec changes.
 
          - Tweak/fix Sah schema.
 
 
-1.1.50   2014-06-13 (SHARYANTO)
+1.1.50   2014-06-13  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -364,7 +379,7 @@
            steven-- thinking?
 
 
-1.1.49   2014-06-13 (SHARYANTO)
+1.1.49   2014-06-13  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -378,33 +393,33 @@
           meta.
 
 
-1.1.48   2014-05-28 (SHARYANTO)
+1.1.48   2014-05-28  Released-By: SHARYANTO
 
          - function: Specify two new function dependency: pkg & func.
 
 
-1.1.47   2014-05-01 (SHARYANTO)
+1.1.47   2014-05-01  Released-By: SHARYANTO
 
          - No spec changes.
 
          - Tweak/fix schema.
 
 
-1.1.46   2014-04-30 (SHARYANTO)
+1.1.46   2014-04-30  Released-By: SHARYANTO
 
          - No spec changes.
 
          - Tweak/fix schema.
 
 
-1.1.45   2014-04-28 (SHARYANTO)
+1.1.45   2014-04-28  Released-By: SHARYANTO
 
          - No spec changes.
 
          - Tweak schema.
 
 
-1.1.44   2014-04-27 (SHARYANTO)
+1.1.44   2014-04-27  Released-By: SHARYANTO
 
          - Add Sah::Schema::Rinci (replaces Rinci::Schema).
 
@@ -422,13 +437,13 @@
            'cmdline_on_getarg'. UPDATE in 1.1.44: 'cmdline_on_getarg' removed.
 
 
-1.1.42   2013-11-14 (SHARYANTO)
+1.1.42   2013-11-14  Released-By: SHARYANTO
 
          - function: Add argument spec's 'delete' and 'element_completion'
            properties.
 
 
-1.1.41   2013-11-08 (SHARYANTO)
+1.1.41   2013-11-08  Released-By: SHARYANTO
 
          - function: Introduce value 'file' for argument spec property
            'cmdline_src', to allow function to get file content in its
@@ -438,7 +453,7 @@
            module to skip testing a certain examples.
 
 
-1.1.40   2013-10-28 (SHARYANTO)
+1.1.40   2013-10-28  Released-By: SHARYANTO
 
          - result: Add properties 'func.*'.
 
@@ -452,60 +467,60 @@
            just (\%args).
 
 
-1.1.38   2013-09-15 (SHARYANTO)
+1.1.38   2013-09-15  Released-By: SHARYANTO
 
          - result: Add property 'logs'.
 
 
-1.1.37   2013-09-13 (SHARYANTO)
+1.1.37   2013-09-13  Released-By: SHARYANTO
 
          - result: Replace property 'error_stack' with 'prev'.
 
 
-1.1.36   2013-09-07 (SHARYANTO)
+1.1.36   2013-09-07  Released-By: SHARYANTO
 
          - Rename property 'entity_version' to 'entity_v' to be more consistent
            with DefHash ('defhash_v').
 
 
-1.1.35   2013-04-11 (SHARYANTO)
+1.1.35   2013-04-11  Released-By: SHARYANTO
 
          - Introduce property 'x' (from DefHash 1.0.3).
 
 
-1.1.34   2012-11-07 (SHARYANTO)
+1.1.34   2012-11-07  Released-By: SHARYANTO
 
          - function: Introduce status 44x and 54x (experimental).
 
 
-1.1.33   2012-11-07 (SHARYANTO)
+1.1.33   2012-11-07  Released-By: SHARYANTO
 
          - No spec changes. (Temporarily?) split Rinci::Schema to its own dist
            so I can release them often separately. UPDATE in 1.1.44:
            Rinci::Schema replaced with Sah::Schema::Rinci.
 
 
-1.1.32   2012-11-01 (SHARYANTO)
+1.1.32   2012-11-01  Released-By: SHARYANTO
 
          - result: Add property 'error_stack'.
 
          - function: property 'result': Add key 'statuses'.
 
 
-1.1.31   2012-09-19 (SHARYANTO)
+1.1.31   2012-09-19  Released-By: SHARYANTO
 
          - Base specification on DefHash.
 
          - Remove 'text_markup' property. Will depend on DefHash for this.
 
 
-1.1.30   2012-09-07 (SHARYANTO)
+1.1.30   2012-09-07  Released-By: SHARYANTO
 
          - No spec changes. Rename back a file (Rinci/Schema.pm) that I thought
            was not used (me--). [CT]
 
 
-1.1.29   2012-09-04 (SHARYANTO)
+1.1.29   2012-09-04  Released-By: SHARYANTO
 
          - Transaction: In 'check_state' phase, specify that result message
            should contain a description of what needs to be fixed, or how it is
@@ -513,7 +528,7 @@
            by TM to be displayed to user.
 
 
-1.1.28   2012-08-29 (SHARYANTO)
+1.1.28   2012-08-29  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGE]
 
@@ -527,19 +542,19 @@
            Perinci::Tx::Manager will just implement '-tx_action_id'.
 
 
-1.1.27   2012-08-28 (SHARYANTO)
+1.1.27   2012-08-28  Released-By: SHARYANTO
 
          - Introduce status code 331.
 
          - Mark which status codes are in HTTP spec, which are introduced by us.
 
 
-1.1.26   2012-08-22 (SHARYANTO)
+1.1.26   2012-08-22  Released-By: SHARYANTO
 
          - Term change: call -> action.
 
 
-1.1.25   2012-08-22 (SHARYANTO)
+1.1.25   2012-08-22  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -551,7 +566,7 @@
            execute those actions without transaction, if wanted.
 
 
-1.1.24   2012-08-21 (SHARYANTO)
+1.1.24   2012-08-21  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -576,7 +591,7 @@
            details, with example.
 
 
-1.1.23   2012-08-14 (SHARYANTO)
+1.1.23   2012-08-14  Released-By: SHARYANTO
 
          - Major rewrite of transaction specification. The main motivation is to
            remove the concept of 'steps' as this is a false dichotomy. Steps are
@@ -601,7 +616,7 @@
            respectively.
 
 
-1.1.22   2012-08-09 (SHARYANTO)
+1.1.22   2012-08-09  Released-By: SHARYANTO
 
          - tx: Describe the ordering of calls during undo/rollback/redo when
            there is nested call. The same function may be called twice or more
@@ -612,7 +627,7 @@
            Txm's API get_undo_steps() and get_redo_steps() are now removed.
 
 
-1.1.21   2012-07-23 (SHARYANTO)
+1.1.21   2012-07-23  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -620,13 +635,13 @@
            instead. I think 'src' is too general.
 
 
-1.1.20   2012-07-21 (SHARYANTO)
+1.1.20   2012-07-21  Released-By: SHARYANTO
 
          - function: Add argument specification keys 'src' and 'cmdline_src'.
            UPDATE in 1.1.21: 'src' removed.
 
 
-1.1.19   2012-06-22 (SHARYANTO)
+1.1.19   2012-06-22  Released-By: SHARYANTO
 
          - Adjust transaction status labels. Final statuses are now in
            uppercase: C, R, U, X; while transient statuses are in lowercase: i,
@@ -635,7 +650,7 @@
          - Add response status 429 (too many requests).
 
 
-1.1.18   2012-06-06 (SHARYANTO)
+1.1.18   2012-06-06  Released-By: SHARYANTO
 
          - Refinements to transaction details.
 
@@ -643,7 +658,7 @@
            'tmp_dir', 'trash_dir', 'undo_trash_dir'.
 
 
-1.1.17   2012-05-31 (SHARYANTO)
+1.1.17   2012-05-31  Released-By: SHARYANTO
 
          - Specify transactional system (Rinci::function::Transaction). Split
            specification for undo to Rinci::function::Undo and specify undo/redo
@@ -651,7 +666,7 @@
            deprecated.
 
 
-1.1.16   2012-05-03 (SHARYANTO)
+1.1.16   2012-05-03  Released-By: SHARYANTO
 
          - Refine undo protocol documentation. Specify interaction with
            undo/transaction manager. '-undo_hint' is now replaced by
@@ -659,7 +674,7 @@
            in 1.1.24: Undo protocol deprecated in favor of transaction.
 
 
-1.1.15   2012-05-02 (SHARYANTO)
+1.1.15   2012-05-02  Released-By: SHARYANTO
 
          - No spec changes.
 
@@ -668,7 +683,7 @@
          - Update Sah schema syntax (pre-0.03, [merge:X] -> [mergeX])
 
 
-1.1.14   2012-05-02 (SHARYANTO)
+1.1.14   2012-05-02  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGE]
 
@@ -677,7 +692,7 @@
            can be other future dep clause for that).
 
 
-1.1.13   2012-03-23 (SHARYANTO)
+1.1.13   2012-03-23  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -685,14 +700,14 @@
            translatable message, etc).
 
 
-1.1.12   2012-03-13 (SHARYANTO)
+1.1.12   2012-03-13  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Add 'Rinci::result'.
 
 
-1.1.11   2012-03-13 (SHARYANTO)
+1.1.11   2012-03-13  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -705,12 +720,12 @@
            'entity_v'.
 
 
-1.1.10   2012-02-28 (SHARYANTO)
+1.1.10   2012-02-28  Released-By: SHARYANTO
 
          - function: arg spec 'aliases': Add alias spec 'schema'
 
 
-1.1.9    2012-02-28 (SHARYANTO)
+1.1.9    2012-02-28  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGE]
 
@@ -718,7 +733,7 @@
            'aliases' (for backward compatibility with 1.0)
 
 
-1.1.8    2012-02-28 (SHARYANTO)
+1.1.8    2012-02-28  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -736,26 +751,26 @@
            command-line aliases to become full/first-class argument.
 
 
-1.1.7    2012-02-23 (SHARYANTO)
+1.1.7    2012-02-23  Released-By: SHARYANTO
 
          - package: Add property 'pkg_version'. UPDATE in 1.1.11 & 1.1.36:
            replaced by 'entity_v'.
 
 
-1.1.6    2012-02-21 (SHARYANTO)
+1.1.6    2012-02-21  Released-By: SHARYANTO
 
          - function: Add 'alias_for' argument specification. UPDATE 1.1.8:
            removed.
 
 
-1.1.5    2012-02-10 (SHARYANTO)
+1.1.5    2012-02-10  Released-By: SHARYANTO
 
          - No spec changes.
 
          - Add Rinci::Schema.
 
 
-1.1.4    2012-02-01 (SHARYANTO)
+1.1.4    2012-02-01  Released-By: SHARYANTO
 
          - Declare that 1.1 series might introduce minor backward compatibility
            problems between revisions.
@@ -770,7 +785,7 @@
          - Some minor revisions.
 
 
-1.1.3    2012-01-27 (SHARYANTO)
+1.1.3    2012-01-27  Released-By: SHARYANTO
 
          - Change syntax of code entity URI, from 'Pkg.SubPkg.func' to
            'pm:/Pkg/SubPkg/func' (or 'py:', 'php:', and so on).
@@ -778,7 +793,7 @@
          - Some minor revisions like wording and paragraph reorganization.
 
 
-1.1.2    2012-01-19 (SHARYANTO)
+1.1.2    2012-01-19  Released-By: SHARYANTO
 
          - Add 'default_lang' property. Add guidelines on what to put in 'summary'
            and 'description'.
@@ -786,13 +801,13 @@
          - variable: Add 'schema' property.
 
 
-1.1.1    2012-01-18 (SHARYANTO)
+1.1.1    2012-01-18  Released-By: SHARYANTO
 
          - No spec changes. Update module names (Rinci::HTTP -> Riap, Rias ->
            Perinci). Add documents Rinci::Upgrading and Rinci::Tutorial (stub).
 
 
-1.1.0    2012-01-15 (SHARYANTO)
+1.1.0    2012-01-15  Released-By: SHARYANTO
 
          - First release. Spun off from Sub::Spec.
 

@@ -1,3 +1,7 @@
+3.0       2019-07-18 16:16:50+01:00 Europe/London
+ - documentation improvements
+ - compatibility fix for Net::Stomp 0.60
+
 2.9       2015-02-19 11:12:30+00:00 Europe/London
  - add receipt_timeout to TraceOnly, to support Net::Stomp 0.53
 

@@ -88,7 +88,7 @@
          "web" : "https://github.com/plicease/dist-zilla-plugin-ourpkgversion"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
       "Alceu Rodrigues de Freitas Junior <alceu.junior@quintoandar.com.br>",
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>",
@@ -105,7 +105,7 @@
       "Michael Jemmeson <mjemmeson@cpan.org>",
       "Stephan Loyd <stephanloyd9@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

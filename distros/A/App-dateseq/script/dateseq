@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-06-24'; # DATE
+our $DATE = '2019-07-16'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.094'; # VERSION
+our $VERSION = '0.096'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.094 of dateseq (from Perl distribution App-dateseq), released on 2019-06-24.
+This document describes version 0.096 of dateseq (from Perl distribution App-dateseq), released on 2019-07-16.
 
 =head1 SYNOPSIS
 
@@ -56,15 +56,18 @@ Generate dates from 2015-01-01 to 2015-01-31:
  % dateseq 2015-01-01 2015-01-31
  2015-01-01
  2015-01-02
- ... 26 more lines ...
- 2015-01-29
+ ... 27 more lines ...
  2015-01-30
+ 2015-01-31
 
 Generate dates from yesterday to 2 weeks from now:
 
  % dateseq yesterday "2 weeks from now"
- 2019-06-23T00:00:00
- 2019-06-24T00:00:00
+ 2019-07-15T00:00:00
+ 2019-07-16T00:00:00
+ ... 12 more lines ...
+ 2019-07-29T00:00:00
+ 2019-07-30T00:00:00
 
 Generate dates from 2015-01-31 to 2015-01-01 (reverse):
 
@@ -93,9 +96,9 @@ Generate dates with increment of 3 days:
  % dateseq 2015-01-01 2015-01-31 -i P3D
  2015-01-01
  2015-01-04
- ... 6 more lines ...
- 2015-01-25
+ ... 7 more lines ...
  2015-01-28
+ 2015-01-31
 
 Generate first 20 business days (Mon-Fri) after 2015-01-01:
 
@@ -134,18 +137,18 @@ Show dates (except Mondays) after 2015-01-01 and 2015-02-28:
  % dateseq 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"
  2015-01-01(Thu)
  2015-01-02(Fri)
- ... 46 more lines ...
- 2015-02-26(Thu)
+ ... 47 more lines ...
  2015-02-27(Fri)
+ 2015-02-28(Sat)
 
 Generate a CSV data:
 
  % dateseq 2010-01-01 2015-01-31 -f "%Y,%m,%d" --header "year,month,day"
  year,month,day
  2010,01,01
- ... 1853 more lines ...
- 2015,01,29
+ ... 1854 more lines ...
  2015,01,30
+ 2015,01,31
 
 Generate periods (YYYY-MM):
 
@@ -164,11 +167,11 @@ List non-holidays in 2015 (using Indonesian holidays):
  2015-01-03
  2015-01-04
  2015-01-05
- ... 355 more lines ...
- 2015-12-27
+ ... 356 more lines ...
  2015-12-28
  2015-12-29
  2015-12-30
+ 2015-12-31
 
 List non-holidays business days in 2015 (using Indonesian holidays):
 
@@ -178,11 +181,11 @@ List non-holidays business days in 2015 (using Indonesian holidays):
  2015-01-05
  2015-01-06
  2015-01-07
- ... 251 more lines ...
- 2015-12-25
+ ... 252 more lines ...
  2015-12-28
  2015-12-29
  2015-12-30
+ 2015-12-31
 
 Use with fsql:
 
@@ -365,6 +368,14 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<durseq>. Produce sequence of date durations.
+
+L<seq>.
+
+L<seq-pl>. Perl variant of seq.
 
 =head1 AUTHOR
 

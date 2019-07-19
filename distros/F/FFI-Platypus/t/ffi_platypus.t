@@ -5,6 +5,7 @@ use FFI::Platypus;
 use FFI::CheckLib;
 use Data::Dumper;
 use File::Spec;
+use FFI::Platypus::TypeParser;
 
 my $libtest = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
 
@@ -337,8 +338,6 @@ subtest 'type' => sub {
     my $ffi = FFI::Platypus->new;
     eval { $ffi->type('sint8') };
     is $@, '', 'ffi.type(sint8)';
-
-    isa_ok $ffi->{types}->{sint8}, 'FFI::Platypus::Type';
   };
 
   subtest 'aliased type' => sub {
@@ -346,13 +345,12 @@ subtest 'type' => sub {
     eval { $ffi->type('sint8', 'my_integer_8') };
     is $@, '', 'ffi.type(sint8 => my_integer_8)';
 
-    isa_ok $ffi->{types}->{my_integer_8}, 'FFI::Platypus::Type';
-    isa_ok $ffi->{types}->{sint8}, 'FFI::Platypus::Type';
+    isa_ok $ffi->{tp}->types->{my_integer_8}, 'FFI::Platypus::Type';
 
     ok scalar(grep { $_ eq 'my_integer_8' } $ffi->types), 'ffi.types returns my_integer_8';
   };
 
-  my @list = grep { FFI::Platypus::_have_type($_) } qw( sint8 uint8 sint16 uint16 sint32 uint32 sint64 uint64 float double opaque string longdouble complex_float complex_double );
+  my @list = grep { FFI::Platypus::TypeParser->new->have_type($_) } qw( sint8 uint8 sint16 uint16 sint32 uint32 sint64 uint64 float double opaque string longdouble complex_float complex_double );
 
   subtest 'ffi basic types' => sub {
     foreach my $name (@list)
@@ -361,7 +359,6 @@ subtest 'type' => sub {
         my $ffi = FFI::Platypus->new;
         eval { $ffi->type($name) };
         is $@, '', "ffi.type($name)";
-        isa_ok $ffi->{types}->{$name}, 'FFI::Platypus::Type';
         my $meta = $ffi->type_meta($name);
         note xdump( $meta);
         cmp_ok $meta->{size}, '>', 0, "size = " . $meta->{size};
@@ -378,7 +375,6 @@ subtest 'type' => sub {
         my $ffi = FFI::Platypus->new;
         eval { $ffi->type($name) };
         is $@, '', "ffi.type($name)";
-        isa_ok $ffi->{types}->{$name}, 'FFI::Platypus::Type';
         my $meta = $ffi->type_meta($name);
         note xdump( $meta);
         cmp_ok $meta->{size}, '>', 0, "size = " . $meta->{size};
@@ -399,7 +395,6 @@ subtest 'type' => sub {
         my $ffi = FFI::Platypus->new;
         eval { $ffi->type($name) };
         is $@, '', "ffi.type($name)";
-        isa_ok $ffi->{types}->{$name}, 'FFI::Platypus::Type';
         my $meta = $ffi->type_meta($name);
         note xdump( $meta);
         cmp_ok $meta->{size}, '>', 0, "size = " . $meta->{size};
@@ -442,7 +437,6 @@ subtest 'type' => sub {
     $ffi->type('(int,int,int,char,string,opaque)->void' => 'baz');
     is $ffi->type_meta('baz')->{type}, 'closure', 'a more complicated closure';
     note xdump($ffi->type_meta('baz'));
-
   };
 
   subtest 'record' => sub {
@@ -528,9 +522,9 @@ subtest 'type' => sub {
     {
       subtest $name => sub {
         plan skip_all => 'test requires longdouble support'
-          unless FFI::Platypus::_have_type($name);
-        my $type = eval { FFI::Platypus::Type->new($name) };
-        is $@, '', "type = FFI::Platypus::Type->new($name)";
+          unless FFI::Platypus::TypeParser->new->have_type($name);
+        my $type = eval { FFI::Platypus::TypeParser::Version0->new->parse($name) };
+        is $@, '', "type = FFI::Platypus::TypeParser::Version0->new->parse($name)";
         isa_ok $type, 'FFI::Platypus::Type';
         my $expected = $name eq 'opaque' ? 'pointer' : $name;
         is eval { $type->meta->{ffi_type} }, $expected, "type.meta.ffi_type = $expected";
@@ -538,8 +532,8 @@ subtest 'type' => sub {
     }
 
     subtest string => sub {
-      my $type = eval { FFI::Platypus::Type->new('string') };
-      is $@, '', "type = FFI::Platypus::Type->new(string)";
+      my $type = eval { FFI::Platypus::TypeParser::Version0->new->parse('string') };
+      is $@, '', "type = FFI::Platypus::TypeParser::Version0->new->parse(string)";
       isa_ok $type, 'FFI::Platypus::Type';
       is eval { $type->meta->{ffi_type} }, 'pointer', 'type.meta.ffi_type = pointer';
     };
@@ -779,6 +773,21 @@ subtest 'customer mangler' => sub {
   $ffi->lib($libtest);
   $ffi->mangler( sub { "mystrangeprefix_$_[0]" });
   is($ffi->function(bar => [] => 'int')->call, 42 );
+};
+
+subtest 'api 1 warning' => sub {
+
+  my @warnings;
+  local $SIG{__WARN__} = sub {
+    note "[warning]\n", $_[0];
+    push @warnings, $_[0];
+  };
+
+  my $ffi = FFI::Platypus->new( api => 1 );
+  is $ffi->{api}, 1;
+
+  my $api_warning = grep /^Enabling development API version 1 prior to FFI::Platypus 1.00/, @warnings;
+  ok $api_warning;
 };
 
 done_testing;

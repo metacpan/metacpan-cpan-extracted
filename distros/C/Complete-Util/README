@@ -2,8 +2,8 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.601 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2019-06-25.
+    This document describes version 0.602 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2019-07-18.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
@@ -254,6 +254,8 @@ FUNCTIONS
     *   hash* => *hash*
 
     *   summaries => *hash*
+
+    *   summaries_from_hash_values => *true*
 
     *   word* => *str* (default: "")
 

@@ -1,5 +1,5 @@
 package WebService::DetectLanguage::Result;
-$WebService::DetectLanguage::Result::VERSION = '0.02';
+$WebService::DetectLanguage::Result::VERSION = '0.04';
 use 5.006;
 use Moo;
 

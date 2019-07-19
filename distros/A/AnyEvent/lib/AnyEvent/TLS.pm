@@ -119,6 +119,14 @@ our %DH_PARAMS = (
    schmorp2048 => "MIIBCAKCAQEAhR5Fn9h3Tgnc+q4o3CMkZtre3lLUyDT+1bf3aiVOt22JdDQndZLc|FeKz8AqliB3UIgNExc6oDtuG4znKPgklfOnHv/a9tl1AYQbV+QFM/E0jYl6oG8tF|Epgxezt1GCivvtu64ql0s213wr64QffNMt3hva8lNqK1PXfqp13PzzLzAVsfghrv|fMAX7/bYm1T5fAJdcah6FeZkKof+mqbs8HtRjfvrUF2npEM2WdupFu190vcwABnN|TTJheXCWv2BF2f9EEr61q3OUhSNWIThtZP+NKe2bACm1PebT0drAcaxKoMz9LjKr|y5onGs0TOuQ7JmhtZL45Zr4LwBcyTucLUwIBAg==",
    schmorp4096 => "MIICCAKCAgEA5WwA5lQg09YRYqc/JILCd2AfBmYBkF19wmCEJB8G3JhTxv8EGvYk|xyP2ecKVUvHTG8Xw/qpW8nRqzPIyV8QRf6YFYSf33Qnx2xYhcnqOumU3nfC0SNOL|/w2q1BA9BbHtW4574P+6hOQx9ftRtbtZ2HPKBMRcAKGjpYZiKopv0+UAM4NpEC2p|bfajp7pyVLeb/Aqm/oWP3L63wPlY1SDp+XRzrOAKB+/uLGqEwV0bBaxxGL29BpOp|O2z1ALGXiDCcLs9WTn9WqUhWDzUN6fahm53rd7zxwpFCb6K2YhaK0peG95jzSUJ8|aoL0KgWuC6v5+gPJHRu0HrQIdfAdN4VchqYOKE46uNNkQl8VJGu4RjYB7lFBpRwO|g2HCsGMo2X7BRmA1st66fh+JOd1smXMZG/2ozTOooL+ixcx4spNneg4aQerWl5cb|nWXKtPCp8yPzt/zoNzL3Fon2Ses3sNgMos0M/ZbnigScDxz84Ms6V/X8Z0L4m/qX|mL42dP40tgvmgqi6BdsBzcIWeHlEcIhmGcsEBxxKEg7gjb0OjjvatpUCJhmRrGjJ|LtMkBR68qr42OBMN/PBB4KPOWNUqTauXZajfCwYdbpvV24ZhtkcRdw1zisyARBSh|aTKW/GV8iLsUzlYN27LgVEwMwnWQaoecW6eOTNKGUURC3In6XZSvVzsCAQI=",
    schmorp8192 => "MIIECAKCBAEA/SAEbRSSLenVxoInHiltm/ztSwehGOhOiUKfzDcKlRBZHlCC9jBl|S/aeklM6Ucg8E6J2bnfoh6CAdnE/glQOn6CifhZr8X/rnlL9/eP+r9m+aiAw4l0D|MBd8BondbEqwTZthMmLtx0SslnevsFAZ1Cj8WgmUNaSPOukvJ1N7aQ98U+E99Pw3|VG8ANBydXqLqW2sogS8FtZoMbVywcQuaGmC7M6i3Akxe3CCSIpR/JkEZIytREBSC|CH+x3oW/w+wHzq3w8DGB9hqz1iMXqDMiPIMSdXC0DaIPokLnd7X8u6N14yCAco2h|P0gspD3J8pS2FpUY8ZTVjzbVCjhNNmTryBZAxHSWBuX4xYcCHUtfGlUe/IGLSVE1|xIdFpZUfvlvAJjVq0/TtDMg3r2JSXrhQVlr8MPJwSApDVr5kOBHT/uABio4z+5yR|PAvundznfyo9GGAWhIA36GQqsxSQfoRTjWssFoR/cu+9aomRwwOLkvObu8nCVVLH|nLdKDk5cIR0TvNs9HZ6ZmkzL7ah7cPzEKl7U6eE6yZLVYMNecnPLS6PSAIG4gxcq|CVQrrZjQLfTDrJn0OGgpShX85RaDsuiRtp2bpDZ23YDqdwr4wRjvIargjqc2zcF+|jIb7dUS6ci7bVG/CGOQUuiMWAiXZ3a1f343SMf9A05/sf1xwnMeco6STBLZ3X+PA|4urU+grtpWaFtS/fPD2ILn8nrJ3WuSKKUeSnVM46mmJQsOkyn7z8l3jNLB17GYKo|qc+0UuU/2PM9qtZdZElSM/ACLV2vdCuaibop4B9UIP9z3F8kfZ72+zKxpGiE+Bo1|x8SfG8FQw90mYIx+qZzJ8MCvc2wh+l4wDX5KxrhwvcouE2tHQlwfDgv/DiIXp173|hAmUCV0+bPRW8IIJvBODdAWtJe9hNwxj1FFYmPA7l4wa3gXV4I6tb+iO1MbwVjZ/|116tD5MdCo3JuSisgPYCHfkQccwEO0FHEuBbmfN+fQimQ8H0dePP8XctwbkplsB+|aLT5hYKmva/j9smEswgyHglPwc3WvZ+2DgKk7A7DHi7a2gDwCRQlHaXtNWx3992R|dfNgkSeB1CvGSQoo95WpC9ZoqGmcSlVqdetDU8iglPmfYTKO8aIPA6TuTQ/lQ0IW|90LQmqP23FwnNFiyqX8+rztLq4KVkTyeHIQwig6vFxgD8N+SbZCW2PPiB72TVF2U|WePU8MRTv1OIGBUBajF49k28HnZPSGlILHtFEkYkbPvomcE5ENnoejwzjktOTS5d|/R3SIOvCauOzadtzwTYOXT78ORaR1KI1cm8DzkkwJTd/Rrk07Q5vnvnSJQMwFUeH|PwJIgWBQf/GZ/OsDHmkbYR2ZWDClbKw2mwIBAg==",
+
+   # firefox dh parameters, from RFC 7919
+   ffdhe2048 => "MIIBCAKCAQEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD ssbzSibBsu/6iGtCOGEoXJf//////////wIBAg==",
+   ffdhe3072 => "MIIBiAKCAYEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaDssbzSibBsu/6iGtCOGEfz9zeNVs7ZRkDW7w09N75nAI4YbRvydbmyQd62R0mkff37lmMsPrBhtkcrv4TCYUTknC0EwyTvEN5RPT9RFLi103TZPLiHnH1S/9croKrnJ32nuhtK8UiNjoNq8Uhl5sN6todv5pC1cRITgq80Gv6U93vPBsg7j/VnXwl5B0rZsYuN///////////AgEC",
+   ffdhe4096 => "MIICCAKCAgEA///////////JD9qiIWjCNMTGYouA3BzRKQJOCIpnzHQCC76mOxObIlFKCHmONATd75UZs806QxswKwpt8l8UN0/hNW1tUcJF5IW1dmJefsb0TELppjftawv/XLb0Brft7jhr+1qJn6WunyQRfEsf5kkoZlHs5Fs9wgB8uKFjvwWY2kg2HFXTmmkWP6j9JM9fg2VdI9yjrZYcYvNWIIVSu57VKQdwlpZtZww1Tkq8mATxdGwIyhghfDKQXkYuNs474553LBgOhgObJ4Oi7Aeij7XFXfBvTFLJ3ivL9pVYFxg5lUl86pVq5RXSJhiY+gUQFXKOWoqqxC2tMxcNBFB6M6hVIavfHLpk7PuFBFjb7wqK6nFXXQYMfbOXD4Wm4eTHq/WujNsJM9cejJTgSiVhnc7j0iYa0u5r8S/6BtmKCGTYdgJzPshqZFIfKxgXeyAMu+EXV3phXWx3CYjAutlG4gjiT6B05asxQ9tb/OD9EI5LgtEgqSEIARpyPBKnh+bXiHGaEL26WyaZwycYavTiPBqUaDS2FQvaJYPpyirUTOjbu8LbBN6O+S6O/BQfvsqmKHxZR05rwF2ZspZPoJDDoiM7oYZRW+ftH2EpcM7i16+4G912IXBIHNAGkSfVsFqpk7TqmI2P3cGG/7fckKbAj030Nck0BjGZ//////////8CAQI=",
+   ffdhe6144 =>
+   "MIIDCAKCAwEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaDssbzSibBsu/6iGtCOGEfz9zeNVs7ZRkDW7w09N75nAI4YbRvydbmyQd62R0mkff37lmMsPrBhtkcrv4TCYUTknC0EwyTvEN5RPT9RFLi103TZPLiHnH1S/9croKrnJ32nuhtK8UiNjoNq8Uhl5sN6todv5pC1cRITgq80Gv6U93vPBsg7j/VnXwl5B0rZp4e8W5vUsMWTfT7eTDp5OWIV7asfV9C1p9tGHdjzx1VA0AEh/VbpX4xzHpxNciG77Qxiu1qHgEtnmgyqQdgCpGBMMRtx3j5ca0AOAkpmaMzy4t6Gh25PXFAADwqTs6p+Y0KzAqCkc3OyX3Pjsm1Wn+IpGtNtahR9EGC4caKAH5eDdkCC/1ktkUDbHpOZ30sOFMqOiO6RELK9T6mO7RUMpt2JMiRe91kscD9TLOOjDNMcBw6za0GV/zP7HGbH1w+TkYEHziBR/tM/bR3pSRx96mpaRC4VTIu22NA2KAO8JI1BRHjCr7B//njom5/sp+MGDAjw1h+ONoAd9m0dj5OS5Syu8GUxmUed8r5ku6qwCMqKBv2s6c5wSJhFoIK6NtYR6Z8vvnJCRtGLVOM1ysDdGrnf15iKSwxFWKoRlBdyC24VDOK5J9SNclbkReMzy3Vys70A+ydGBDGJysEWztx+dxrgNY/3UqOmtseaWKmlSbUMWHBpB1XDXk42tSkDjKc0OQOZf//////////AgEC",
+   ffdhe8192 => "MIIECAKCBAEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaDssbzSibBsu/6iGtCOGEfz9zeNVs7ZRkDW7w09N75nAI4YbRvydbmyQd62R0mkff37lmMsPrBhtkcrv4TCYUTknC0EwyTvEN5RPT9RFLi103TZPLiHnH1S/9croKrnJ32nuhtK8UiNjoNq8Uhl5sN6todv5pC1cRITgq80Gv6U93vPBsg7j/VnXwl5B0rZp4e8W5vUsMWTfT7eTDp5OWIV7asfV9C1p9tGHdjzx1VA0AEh/VbpX4xzHpxNciG77Qxiu1qHgEtnmgyqQdgCpGBMMRtx3j5ca0AOAkpmaMzy4t6Gh25PXFAADwqTs6p+Y0KzAqCkc3OyX3Pjsm1Wn+IpGtNtahR9EGC4caKAH5eDdkCC/1ktkUDbHpOZ30sOFMqOiO6RELK9T6mO7RUMpt2JMiRe91kscD9TLOOjDNMcBw6za0GV/zP7HGbH1w+TkYEHziBR/tM/bR3pSRx96mpaRC4VTIu22NA2KAO8JI1BRHjCr7B//njom5/sp+MGDAjw1h+ONoAd9m0dj5OS5Syu8GUxmUed8r5ku6qwCMqKBv2s6c5wSJhFoIK6NtYR6Z8vvnJCRtGLVOM1ysDdGrnf15iKSwxFWKoRlBdyC24VDOK5J9SNclbkReMzy3Vys70A+ydGBDGJysEWztx+dxrgNY/3UqOmtseaWKmlSbUMWHBpB1XDXk42tSkDjKcz/RqqjatAEz2AMg4HkJaMdlRrmT9sj/OyVCdQ2h/62nt0cxeC4zDvfZLEO+GtjFCo6uIKVVbL3R8kyZlyywPHMAb1wIpOIg50q8F5FRQSseLdYKCKEbAujXDX1xZFgzARv2CUVQfxoychrAiu3CZh2pGDnRRqKkxCXA/7hwhfmw4JuUsUappHg5CPPyZ6eMWUMEhe2JIFs2tmpX51bgBlIjZwKCh/jB1pXfiMYP4HUo/L6RXHvyM4LqKT+i2hV3+crCmbt7S+6v75Yow+vq+HF1xqH4vdB74wf6G/qa7/eUwZ38Nl9EdSfeoRD0IIuUGqfRhTgEeKpSDj/iM1oyLt8XGQkz//////////wIBAg==",
 );
 
 =item $tls = new AnyEvent::TLS key => value...
@@ -472,11 +480,14 @@ of course.
 =item dh => $string
 
 Specify the Diffie-Hellman parameters in PEM format directly as a string
-(see C<dh_file>), the default is C<schmorp1539> unless C<dh_file> was
+(see C<dh_file>), the default is C<ffdhe3072> unless C<dh_file> was
 specified.
 
 AnyEvent::TLS supports supports a number of precomputed DH parameters,
 since computing them is expensive. They are:
+
+   # from RFC 7919 - recommended
+   ffdhe2048, ffdhe3072, ffdhe4096, ffdhe6144, ffdhe8192
 
    # from "Assigned Number for SKIP Protocols"
    skip512, skip1024, skip2048, skip4096
@@ -484,10 +495,8 @@ since computing them is expensive. They are:
    # from schmorp
    schmorp1024, schmorp1539, schmorp2048, schmorp4096, schmorp8192
 
-The default was chosen as a trade-off between security and speed, and
-should be secure for a few years. It is said that 2048 bit DH parameters
-are safe till 2030, and DH parameters shorter than 900 bits are totally
-insecure.
+It is said that 2048 bit DH parameters are safe till 2030, and DH
+parameters shorter than 900 bits are totally insecure.
 
 To disable DH protocols completely, specify C<undef> as C<dh> parameter.
 
@@ -641,7 +650,7 @@ sub new {
       $dh_bio = Net::SSLeay::BIO_new_file ($dh_file, "r")
          or croak "$dh_file: failed to open DH parameter file: $!";
    } else {
-      $arg{dh} = "schmorp1539" unless exists $arg{dh};
+      $arg{dh} = "ffdhe3072" unless exists $arg{dh};
 
       if (defined $arg{dh}) {
          $dh_file = "dh string";

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Content::Tag v1.2.1;
+package PFT::Content::Tag v1.3.0;
 
 =encoding utf8
 

@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::VariantsMap;
-$Games::Solitaire::Verify::VariantsMap::VERSION = '0.2201';
+$Games::Solitaire::Verify::VariantsMap::VERSION = '0.2202';
 use strict;
 use warnings;
 
@@ -219,11 +219,7 @@ their parameters.
 
 =head1 VERSION
 
-version 0.2201
-
-=head1 VERSION
-
-version 0.2201
+version 0.2202
 
 =head1 FUNCTIONS
 

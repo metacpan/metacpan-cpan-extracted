@@ -1,7 +1,7 @@
 package Sah::Schema::sah::extras;
 
-our $DATE = '2016-07-25'; # DATE
-our $VERSION = '0.9.43.1'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.9.46.0'; # VERSION
 
 our $schema = ['defhash' => {
 }, {}];
@@ -21,7 +21,7 @@ Sah::Schema::sah::extras - Sah extras (third element in array schema)
 
 =head1 VERSION
 
-This document describes version 0.9.43.1 of Sah::Schema::sah::extras (from Perl distribution Sah-Schemas-Sah), released on 2016-07-25.
+This document describes version 0.9.46.0 of Sah::Schema::sah::extras (from Perl distribution Sah-Schemas-Sah), released on 2019-07-19.
 
 =head1 HOMEPAGE
 
@@ -45,7 +45,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

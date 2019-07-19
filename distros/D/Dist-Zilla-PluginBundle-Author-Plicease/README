@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.36
+    version 2.37
 
 SYNOPSIS
 
@@ -81,6 +81,7 @@ DESCRIPTION
      [AutoPrereqs]
      
      [OurPkgVersion]
+     no_critic = 1
      underscore_eval_version = 1
      
      [MetaJSON]

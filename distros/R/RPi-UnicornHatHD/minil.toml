@@ -1,8 +1,11 @@
 name = "RPi-UnicornHatHD"
-# badges = ["travis"]
+badges = ['travis', 'metacpan']
 module_maker="ModuleBuildTiny"
 license="artistic_2"
 markdown_maker = "Pod::Markdown::Github"
 
 [release]
-pause_config = "C:/Strawberry/pause.upload"
+hook=[
+    'tidyall -a'
+]
+

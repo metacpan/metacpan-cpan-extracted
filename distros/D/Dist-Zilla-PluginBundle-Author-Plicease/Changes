@@ -1,7 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.37      2019-07-18 11:59:10 -0400
+  - Require plicease plugin 2.37
+  - [OurPkgVersion] uses no_critic option
+
 2.36      2019-03-10 19:40:18 -0400
-  - Require plicease plugin 2.35
+  - Require plicease plugin 2.37
   - overrides for [MetaResources] now available:
      * homepage
      * bugtracker.web

@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2018-07-14 00:00:00 +0000 to present.
+Changes from 2018-07-15 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.37 at 2019-07-14 12:30:46 +0000
+version 0.39 at 2019-07-15 21:38:26 +0000
 -----------------------------------------
+
+  Change: cfe23170652ee8738e5cfcace84a1882836eff35
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-15 22:32:47 +0000
+
+    Update README.pod 
+
+  Change: afebdb66f181c51f872452d8b951ff08c23e0a1a
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-15 11:55:10 +0000
+
+    fix pod 
 
   Change: 6dfef08471a1bdfb0151cb46458a0e6049a94957
   Author: Andrew Solomon <andrew@geekuni.com>

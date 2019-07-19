@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph;
 
-$Map::Tube::Plugin::Graph::VERSION   = '0.40';
+$Map::Tube::Plugin::Graph::VERSION   = '0.41';
 $Map::Tube::Plugin::Graph::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 

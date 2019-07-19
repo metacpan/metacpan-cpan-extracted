@@ -1,7 +1,7 @@
 package Perinci::Examples::Coercion;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.812'; # VERSION
+our $DATE = '2019-06-29'; # DATE
+our $VERSION = '0.814'; # VERSION
 
 use 5.010;
 use strict;
@@ -60,7 +60,7 @@ Perinci::Examples::Coercion - Coercion examples
 
 =head1 VERSION
 
-This document describes version 0.812 of Perinci::Examples::Coercion (from Perl distribution Perinci-Examples), released on 2019-04-15.
+This document describes version 0.814 of Perinci::Examples::Coercion (from Perl distribution Perinci-Examples), released on 2019-06-29.
 
 =head1 DESCRIPTION
 

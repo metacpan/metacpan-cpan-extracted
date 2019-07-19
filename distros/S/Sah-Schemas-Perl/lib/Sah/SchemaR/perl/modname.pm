@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::modname;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2019-07-05'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 our $rschema = ["str",[{description=>"\nPerl module name, e.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, or\n`Foo/Bar.pm` and it will be normalized into `Foo::Bar`.\n\nSee also: `perl::modargs`.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl module name","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["str_normalize_perl_modname"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modname - Perl module name
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::SchemaR::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
+This document describes version 0.020 of Sah::SchemaR::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2019-07-05.
 
 =head1 DESCRIPTION
 

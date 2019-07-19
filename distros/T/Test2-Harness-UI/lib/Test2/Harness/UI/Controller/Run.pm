@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000003';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -45,6 +45,10 @@ sub handle {
     $self->{+TITLE} = 'Run: ' . $run->project . ' - ' . $run->run_id;
 
     my $ct = lc($req->parameters->{'Content-Type'} || $req->parameters->{'content-type'} || 'text/html');
+
+    if ($route->{action} eq 'pin_toggle') {
+        $run->update({pinned => $run->pinned ? 0 : 1});
+    }
 
     if ($ct eq 'application/json') {
         $res->content_type($ct);

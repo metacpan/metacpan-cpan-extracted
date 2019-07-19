@@ -21,25 +21,25 @@ describe 'Config::AWS list_profiles tests' => sub {
         my ($input, $result);
         my $dir = path dist_dir('Config-AWS');
 
-        after_case 'Clear input' => sub { $input = undef };
+        after_case 'Clear input' => sub { undef $input };
 
         case 'Credentials from ENV' => sub {
             $ENV{AWS_SHARED_CREDENTIALS_FILE} = $dir->child('credentials/.aws/credentials');
             $ENV{AWS_CONFIG_FILE} = {}; # Not a file that exists
-            $input = undef;
-            $result = ['default'];
+            undef $input;
+            $result = [qw( default with-hyphens  )];
         };
 
         case 'Config from ENV' => sub {
             $ENV{AWS_SHARED_CREDENTIALS_FILE} = {}; # Not a file that exists
             $ENV{AWS_CONFIG_FILE} = $dir->child('config/.aws/config');
-            $input = undef;
+            undef $input;
             $result = [qw( alternate bad default )];
         };
 
         case 'Credentials as argument' => sub {
             $input = $dir->child('credentials/.aws/credentials');
-            $result = [qw( default )];
+            $result = [qw( default with-hyphens  )];
         };
 
         case 'Config as argument' => sub {

@@ -1,47 +1,52 @@
-0.120   2019-03-14 (PERLANCAR)
+0.121   2019-07-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to youtube-dl 2019.07.16.
+
+
+0.120   2019-03-14  Released-By: PERLANCAR
 
 	- Add binmode(STDOUT,utf8) to avoid perl's wide character output
 	  warning.
 
 
-0.11    2017-07-10 (PERLANCAR)
+0.11    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.10    2016-10-21 (PERLANCAR)
+0.10    2016-10-21  Released-By: PERLANCAR
 
 	- Allow script to be detected by Getopt::Long::Util as Getopt::Long
 	  script.
 
 
-0.09    2016-06-01 (PERLANCAR)
+0.09    2016-06-01  Released-By: PERLANCAR
 
 	- Update to youtube-dl 2016.05.30.2 (add --(no-)mark-watched,
 	  --fragment-retries, --hls-prefer-ffmpeg).
 
 
-0.08    2016-02-16 (PERLANCAR)
+0.08    2016-02-16  Released-By: PERLANCAR
 
 	- Update to youtube-dl 2016.02.13 (add --hls-use-mpegts).
 
 
-0.07    2016-01-19 (PERLANCAR)
+0.07    2016-01-19  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Remove outdated information in Synopsis.
 
 
-0.06    2016-01-19 (PERLANCAR)
+0.06    2016-01-19  Released-By: PERLANCAR
 
 	- Update to youtube-dl 2016.01.15 (--convert-subtitle renamed to
 	  --convert-subs).
 
 
-0.05    2015-09-17 (PERLANCAR)
+0.05    2015-09-17  Released-By: PERLANCAR
 
 	- Adjust to Complete::Util 0.36 (complete_file() split to
 	  Complete-File).
@@ -49,7 +54,7 @@
 	- Add help output for 2015.08.16.1 (no change).
 
 
-0.04    2015-08-11 (PERLANCAR)
+0.04    2015-08-11  Released-By: PERLANCAR
 
 	- Update from youtube-dl 2015.07.28 to 2015.08.09.
 
@@ -57,7 +62,7 @@
 	  reduce startup overhead.
 
 
-0.03    2015-08-06 (PERLANCAR)
+0.03    2015-08-06  Released-By: PERLANCAR
 
 	- Update from youtube-dl 2015.05.20 to 2015.07-28 (new options:
 	  --force-generic-extractor & --postprocessor-args).
@@ -65,11 +70,11 @@
 	- [doc] Mention version of youtube-dl supported.
 
 
-0.02    2015-06-04 (PERLANCAR)
+0.02    2015-06-04  Released-By: PERLANCAR
 
 	- Update to youtube-dl 2015.05.20.
 
 
-0.01    2015-06-04 (PERLANCAR)
+0.01    2015-06-04  Released-By: PERLANCAR
 
         - First release.

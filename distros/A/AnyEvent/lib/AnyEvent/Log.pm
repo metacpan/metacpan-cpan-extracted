@@ -42,11 +42,20 @@ Log level overview:
 
 Configuration (also look at the EXAMPLES section):
 
+   # set default logging level to suppress anything below "notice"
+   # i.e. enable logging at "notice" or above - the default is to
+   # to not log anything at all.
+   $AnyEvent::Log::FILTER->level ("notice");
+
    # set logging for the current package to errors and higher only
    AnyEvent::Log::ctx->level ("error");
 
-   # set logging level to suppress anything below "notice"
-   $AnyEvent::Log::FILTER->level ("notice");
+   # enable logging for the current package, regardless of global logging level
+   AnyEvent::Log::ctx->attach ($AnyEvent::Log::LOG);
+
+   # enable debug logging for module some::mod and enable logging by default
+   (AnyEvent::Log::ctx "some::mod")->level ("debug");
+   (AnyEvent::Log::ctx "some::mod")->attach ($AnyEvent::Log::LOG);
 
    # send all critical and higher priority messages to syslog,
    # regardless of (most) other settings
@@ -480,7 +489,7 @@ In your main program (as opposed to in your module) you can override the
 default message format by loading this module and then redefining this
 function.
 
-=item AnyEvent::Log::fatal_exit
+=item AnyEvent::Log::fatal_exit()
 
 This is the function that is called after logging a C<fatal> log
 message. It must not return.
@@ -587,7 +596,7 @@ something that logs to a file, or to attach additional logging targets
 
 This function creates or returns a logging context (which is an object).
 
-If a package name is given, then the context for that packlage is
+If a package name is given, then the context for that package is
 returned. If it is called without any arguments, then the context for the
 callers package is returned (i.e. the same context as a C<AE::log> call
 would use).
@@ -877,6 +886,7 @@ sub attach {
 
    $ctx->[2]{$_+0} = $_
       for map { AnyEvent::Log::ctx $_ } @_;
+   AnyEvent::Log::_reassess;
 }
 
 sub detach {
@@ -884,11 +894,13 @@ sub detach {
 
    delete $ctx->[2]{$_+0}
       for map { AnyEvent::Log::ctx $_ } @_;
+   AnyEvent::Log::_reassess;
 }
 
 sub slaves {
    undef $_[0][2];
    &attach;
+   AnyEvent::Log::_reassess;
 }
 
 =back

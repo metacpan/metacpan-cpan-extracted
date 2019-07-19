@@ -96,6 +96,7 @@ lib/Test2/Harness/UI/Schema/Result/User.pm
 lib/Test2/Harness/UI/Util.pm
 lib/Test2/Harness/UI/Util/Errors.pm
 lib/Test2/Harness/UI/Util/HashBase.pm
+scripts/yath-ui-importer.pl
 share/css/dashboard.css
 share/css/job.css
 share/css/jquery.json-view.min.css

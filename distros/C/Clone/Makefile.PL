@@ -7,8 +7,9 @@ WriteMakefile(
     'ABSTRACT_FROM' => 'Clone.pm',
     'LICENSE'       => 'perl',
     'PL_FILES'      => {},
-    'BUILD_REQUIRES' => {
+    'TEST_REQUIRES' => {
       'Test::More' => 0,
+      'B::COW'     => 0,
     },
     'LIBS'          => [''],     # e.g., '-lm'
     'DEFINE'        => '',       # e.g., '-DHAVE_SOMETHING'

@@ -1,0 +1,47 @@
+---
+abstract: 'Build Curio classes around DBIx::Connector.'
+author:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+build_requires:
+  Curio: '0.04'
+  DBD::SQLite: '1.44'
+  Test2::V0: '0.000094'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Curio-Role-DBIx-Connector
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Curio::Role::DBIx::Connector:
+    file: lib/Curio/Role/DBIx/Connector.pm
+    version: '0.01'
+requires:
+  Curio::Role: '0.04'
+  DBIx::Connector: '0.53'
+  Moo::Role: '2.003000'
+  Types::Standard: '1.002001'
+  namespace::clean: '0.27'
+  perl: '5.008001'
+  strictures: '2.000001'
+resources:
+  bugtracker: https://github.com/bluefeet/Curio-Role-DBIx-Connector/issues
+  homepage: https://github.com/bluefeet/Curio-Role-DBIx-Connector
+  repository: git://github.com/bluefeet/Curio-Role-DBIx-Connector.git
+version: '0.01'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -12,11 +12,11 @@ Git::PunchCard - Gathers info for making punchcard style graphs for git.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -98,9 +98,13 @@ sub new {
 			  card=>{
 					 total=>0,
 					 max=>0,
+					 average=>0,
+					 min=>9999999999999999999999999999999999,
 					 Sun=>{
 						   total=>0,
 						   max=>0,
+						   average=>0,
+						   min=>9999999999999999999999999999999999,
 						   '00'=>0,
 						   '01'=>0,
 						   '02'=>0,
@@ -129,6 +133,8 @@ sub new {
 					 Mon=>{
 						   total=>0,
 						   max=>0,
+						   average=>0,
+						   min=>9999999999999999999999999999999999,
 						   '00'=>0,
 						   '01'=>0,
 						   '02'=>0,
@@ -157,6 +163,8 @@ sub new {
 					 Tue=>{
 						   total=>0,
 						   max=>0,
+						   average=>0,
+						   min=>9999999999999999999999999999999999,
 						   '00'=>0,
 						   '01'=>0,
 						   '02'=>0,
@@ -185,6 +193,8 @@ sub new {
 					 Wed=>{
 						   total=>0,
 						   max=>0,
+						   average=>0,
+						   min=>9999999999999999999999999999999999,
 						   '00'=>0,
 						   '01'=>0,
 						   '02'=>0,
@@ -213,6 +223,8 @@ sub new {
 					 Thu=>{
 						   total=>0,
 						   max=>0,
+						   average=>0,
+						   min=>9999999999999999999999999999999999,
 						   '00'=>0,
 						   '01'=>0,
 						   '02'=>0,
@@ -241,6 +253,8 @@ sub new {
 					 Fri=>{
 						   total=>0,
 						   max=>0,
+						   average=>0,
+						   min=>9999999999999999999999999999999999,
 						   '00'=>0,
 						   '01'=>0,
 						   '02'=>0,
@@ -269,6 +283,8 @@ sub new {
 					 Sat=>{
 						   total=>0,
 						   max=>0,
+						   average=>0,
+						   min=>9999999999999999999999999999999999,
 						   '00'=>0,
 						   '01'=>0,
 						   '02'=>0,
@@ -361,8 +377,24 @@ sub dir {
 				$self->{card}{$day}{max}=$self->{card}{$day}{$hour};
 			}
 		}
+
+		$self->{card}{$day}{average}= $self->{card}{$day}{total} / 24;
 	}
 
+	$self->{card}{average}= $self->{card}{total} / 168 ;
+
+	foreach my $day ( 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ){
+		for my $hour ( '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ){
+			if ( $self->{card}{$day}{$hour} < $self->{card}{$day}{min} ){
+				$self->{card}{$day}{min}=$self->{card}{$day}{$hour};
+			}
+			if ( $self->{card}{$day}{$hour} < $self->{card}{min} ){
+				$self->{card}{min}=$self->{card}{$day}{$hour};
+			}
+		}
+	}
+
+	
 	return 1;
 }
 
@@ -376,7 +408,8 @@ The first level keys are the three letter
 day names the the second level keys are the
 two digit hour.
 
-There are two special keys 'total' and 'max'.
+There are two special keys 'total', 'max', min, and
+avagerage.
 
 'total' represents the total level of commits. So
 at the primary level it is all the commits made to that
@@ -386,6 +419,9 @@ made to that repo on that day of the week.
 'max' is the largest number of commits made. At the primary
 level it is any hour on any day of the week while at the secondary
 level it is the max made during any given hour that day.
+
+'min' and 'average' is similar as max, but representing the min
+and average instead.
 
 For examples of making use of this, see the SYNOPSIS or check
 out the script punchard-git.

@@ -1,4 +1,4 @@
-Time::Format version 1.12
+Time::Format version 1.13
 =========================
 
 Time::Format provides a very easy way to format dates and times.  The
@@ -65,8 +65,9 @@ If you do not have Module::Build, use the old-style commands:
    make test
    make install
 
-If you're using Strawberry Perl, you may need to use 'dmake' instead of
-'make.  If you're using ActiveState Perl, you may need to use 'nmake'.
+If you're using Strawberry Perl, you may need to use 'gmake' instead
+of 'make' (or 'dmake' for older Strawberry versions).  If you're using
+ActiveState Perl, you may need to use 'nmake'.
 
 
 DEPENDENCIES
@@ -74,20 +75,21 @@ DEPENDENCIES
 This module can use these other modules and libraries:
 
   Time::Local
-  I18N::Langinfo  (optional)
-  POSIX           (optional)
-  Time::HiRes     (optional)
-  Date::Manip     (optional)
-  Time::Format_XS (optional)
-  Test::More      (used by the test suite only)
-  Module::Signature  (optional) (used by test suite only)
+  I18N::Langinfo    (optional)
+  POSIX             (optional)
+  Time::HiRes       (optional)
+  Date::Manip       (optional)
+  Time::Format_XS   (optional)
+  FindBin                       (used by the test suite only)
+  Test::More                    (used by the test suite only)
+  Module::Signature (optional)  (used by the test suite only)
 
 
 COPYRIGHT AND LICENSE
 
 Eric J. Roode, roode @ cpan . org
 
-Copyright © 2003-2012 by Eric J. Roode. All Rights Reserved.
+Copyright (c) 2003-2019 by Eric J. Roode. All Rights Reserved.
 This module is free software; See the copyright notice in the
 module source code for full details.
 

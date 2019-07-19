@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::Base;
-$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2201';
+$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2202';
 use strict;
 use warnings;
 
@@ -100,11 +100,7 @@ all Games::Solitaire::Verify::Solution::* classes.
 
 =head1 VERSION
 
-version 0.2201
-
-=head1 VERSION
-
-version 0.2201
+version 0.2202
 
 =head1 AUTHOR
 

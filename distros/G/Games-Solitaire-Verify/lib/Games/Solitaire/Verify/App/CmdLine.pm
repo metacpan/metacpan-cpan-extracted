@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine;
-$Games::Solitaire::Verify::App::CmdLine::VERSION = '0.2201';
+$Games::Solitaire::Verify::App::CmdLine::VERSION = '0.2202';
 use strict;
 use warnings;
 
@@ -8,9 +8,10 @@ use parent 'Games::Solitaire::Verify::Base';
 use Data::Dumper qw(Dumper);
 
 use Getopt::Long qw(GetOptionsFromArray);
+use Pod::Usage qw/ pod2usage /;
 
-use Games::Solitaire::Verify::VariantsMap;
-use Games::Solitaire::Verify::Solution;
+use Games::Solitaire::Verify::VariantsMap ();
+use Games::Solitaire::Verify::Solution    ();
 
 __PACKAGE__->mk_acc_ref(
     [
@@ -35,6 +36,9 @@ sub _init
 
     GetOptionsFromArray(
         $argv,
+        'help|h' => sub {
+            pod2usage(1);
+        },
         'g|game|variant=s' => sub {
             my ( undef, $game ) = @_;
 
@@ -185,7 +189,7 @@ command line app for verifying the solutions of Solitaire games.
 
 =head1 VERSION
 
-version 0.2201
+version 0.2202
 
 =head1 SYNOPSIS
 
@@ -195,10 +199,6 @@ version 0.2201
 
 This is a module implementing a standalone command line app for verifying the
 solutions of Solitaire games.
-
-=head1 VERSION
-
-version 0.2201
 
 =head1 EXPORTS
 

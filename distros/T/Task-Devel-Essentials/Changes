@@ -1,5 +1,9 @@
 Revision history for Task-Devel-Essentials
 
+0.013   Thu, 18 Jul 2019 10:32:34 +0200
+        upgraded versions
+        added more modules
+
 0.012   Fri, 21 Sep 2018 10:42:19 +0200
         migrated from Module::Install to ExtUtils::MakeMaker
 

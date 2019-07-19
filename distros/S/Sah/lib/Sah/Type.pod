@@ -18,7 +18,7 @@ Sah::Type - Standard types
 
 =head1 VERSION
 
-This document describes version 0.9.45 of Sah::Type (from Perl distribution Sah), released on 2017-03-09.
+This document describes version 0.9.46 of Sah::Type (from Perl distribution Sah), released on 2019-07-19.
 
 =head1 DESCRIPTION
 
@@ -38,15 +38,19 @@ role.
 
 The list below is ordered by priority, from highest to lowest.
 
-=head3 defhash_v : FLOAT
+=head3 defhash_v
+
+Value: L<float|/"TYPE: float">.
 
 Priority: 0 (checked first before everything else).
 
 Category: metadata.
 
-From DefHash. Normally there is no need to set this.
+From L<DefHash>. Normally there is no need to set this.
 
-=head3 v : FLOAT (default: 1)
+=head3 v
+
+Value: float, default: 1.
 
 Priority: 0 (checked first before everything else).
 
@@ -54,7 +58,9 @@ Category: metadata.
 
 From DefHash. Specify Sah version. Should be C<1> at the moment.
 
-=head3 schema_v : FLOAT (default: 1)
+=head3 schema_v
+
+Value: float, default 1.
 
 Priority: 0 (checked first before everything else).
 
@@ -62,7 +68,9 @@ Category: metadata.
 
 Specify schema version. By default assumed to be 1 if not set.
 
-=head3 base_v : FLOAT (default: 1)
+=head3 base_v
+
+Value: float, default 1.
 
 Priority: 0 (checked first before everything else).
 
@@ -91,17 +99,19 @@ should the authors of C<vocal> and C<consonant> are two different persons):
  ["str", {"schema_v": 2, "match": "\\A[aeiou]\\z"}]
 
 Since C<vocal>'s C<schema_v> is now 2, it is not the same as 1 (which is implied
-by C<consonant>, having the default value of C<base_v>). C<consonant>'s author
-might then update its own implementation to match C<vocal>:
+by C<consonant>, having the default value of that of L</base_v>). C<consonant>'s
+author might then update its own implementation to match C<vocal>:
 
  // the adjusted consonant
  ["vocal", {"base_v":2, "clset":{"match":"\\A[a-z]\\z"}, "match.op":"not"}]
 
-Notice the matching of C<consonant>'s C<base_v> against C<vocal>'s C<schema_v>.
-C<consonant> might also add its own C<< "schema_v":2 >> so other schemas
-depending on it are forced to adjust, if needed.
+Notice the matching of C<consonant>'s L</base_v> against C<vocal>'s
+L</schema_v>. C<consonant> might also add its own C<< "schema_v":2 >> so other
+schemas depending on it are forced to adjust, if needed.
 
-=head3 c : ANY
+=head3 c
+
+Value: any.
 
 Priority: 0 (checked first before anything else).
 
@@ -111,30 +121,34 @@ Used to store compiler-specific options in its attributes. Example:
 
  "c.perl.use_defined_or": 0
 
-=head3 ok : ANY -> true
+=head3 ok
 
-Priority: 1 (very high). This is processed before all other clauses.
+Value: true.
 
 Return value: true (always succeeds).
+
+Priority: 1 (very high). This is processed before all other clauses.
 
 Category: constraint.
 
 Will do nothing. This clause is just a convenience if you want to do nothing (or
 perhaps just use the attributes of this clause to do things). It is the default
-in the C<else> section of the C<if_clause> clause.
+in the C<else> section of the L</if> clause.
 
 To force failure, you can use C<< "!ok": true >>.
 
-=head3 default : ANY
+=head3 default
 
-Attributes specific to this clause: C<temp> (bool, default 0, if set to true
-then default value will only be used during validation and at the end data will
-not use this value).
+Value: any.
 
 Priority: 1 (very high). This is processed before all other clauses except
-C<ok>.
+L</ok>.
 
 Category: default.
+
+Attributes specific to this clause: C<temp> (bool, default 0, if set to
+true then default value will only be used during validation and at the end data
+will not use this value).
 
 Supply a default value.
 
@@ -142,19 +156,23 @@ Example: Given schema C<< ["int", {"req": 1}] >> an undef data is invalid, but
 given schema C<< ["int", {"req": 1, "default": 3}] >> an undef data is valid
 because it will be given default value first.
 
-=head3 default_lang : LOCALE_CODE (defaut: en_US)
+=head3 default_lang
 
-Priority: 2 (very high), after C<default>.
+Value: str (locale code)d default C<en_US>.
+
+Priority: 2 (very high), after L</default>.
 
 Category: metadata.
 
 From DefHash. Set default language for this schema. Language-dependant attribute
-values (e.g. C<summary>, C<description>) will be assumed to be in the default
+values (e.g. L</summary>, L</description>) will be assumed to be in the default
 language.
 
-=head3 name : STR or [STR, STR]
+=head3 name
 
-Priority: 2 (very high), after C<default>.
+Value: str or C<[str, str]>.
+
+Priority: 2 (very high), after L</default>.
 
 Category: metadata.
 
@@ -165,8 +183,8 @@ description text.
 Aside from string, it can also be a two-element string to set the singular and
 plural form of the noun.
 
-To store translations, you can use the C<alt.lang.*> clause attributes (or its
-shortcut form using C<(LANG)> suffix).
+To store translations, you can use DefHash's C<alt.lang.*> clause attributes (or
+its shortcut form using C<(LANG)> suffix).
 
 Example:
 
@@ -176,17 +194,21 @@ Example:
      "name(id_ID)": "bilangan positif"
  }]
 
-See also: C<summary>, C<description>, C<tags>.
+See also: L</summary>, L</description>, L</tags>.
 
-=head3 caption : STR
+=head3 caption
 
-Priority: 2 (very high), after C<default>.
+Value: str.
+
+Priority: 2 (very high), after L</default>.
 
 From DefHash.
 
-=head3 summary : STR
+=head3 summary
 
-Priority: 2 (very high), after C<default>.
+Value: str.
+
+Priority: 2 (very high), after L</default>.
 
 Category: metadata.
 
@@ -195,8 +217,8 @@ formatting) to describe the schema. This is useful, e.g. for manually describing
 a schema instead of using the human compiler. It can also be used in form field
 labels.
 
-To store translations, you can use the C<alt.lang.*> clause attributes (or its
-shortcut form using C<(LANG)> suffix).
+To store translations, you can use DefHash's C<alt.lang.*> clause attributes (or
+its shortcut form using C<(LANG)> suffix).
 
 Example:
 
@@ -213,19 +235,21 @@ Example:
 Without the summary, using a compiler to human text the above schema might be
 output as the standard, more boring "Integer, value between 1 and 6".
 
-See also: C<name>, C<description>, C<tags>.
+See also: L</name>, L</description>, L</tags>.
 
-=head3 description : STR
+=head3 description
 
-Priority: 2 (very high), after C<default>.
+Value: str.
+
+Priority: 2 (very high), after L</default>.
 
 Category: metadata.
 
 From DefHash. A longer text (a paragraph or more) to describe the schema, useful
 e.g. for help/usage text. Text should be in Markdown format.
 
-To store translations, you can use the C<alt.lang.*> clause attributes (or its
-shortcut form using C<(LANG)> suffix).
+To store translations, you can use DefHash's C<alt.lang.*> clause attributes (or
+its shortcut form using C<(LANG)> suffix).
 
 Example (using Perl syntax because it supports heredoc):
 
@@ -250,21 +274,25 @@ Example (using Perl syntax because it supports heredoc):
       },
  }]
 
-See also: C<name>, C<summary>, C<tags>.
+See also: L</name>, L</summary>, L</tags>.
 
-=head3 tags : ARRAY OF STR
+=head3 tags
 
-Priority: 2 (very high), after C<default>.
+Value: array of str.
+
+Priority: 2 (very high), after L</default>.
 
 Category: metadata.
 
 From DefHash. A list of tags, can be used to categorize schemas.
 
-See also: C<name>, C<summary>, C<description>.
+See also: L</name>, L</summary>, L</description>.
 
-=head3 req : BOOL
+=head3 req
 
-Priority: 3 (very high), executed after C<default>.
+Value: bool.
+
+Priority: 3 (very high), executed after L</default>.
 
 Category: constraint.
 
@@ -278,25 +306,30 @@ pass C<< ["int": {"req": 1}] >>.
 This behaviour is much like NULLs in SQL: we *can't* (in)validate something that
 is unknown/unset.
 
-See also: C<forbidden>
+See also: L</forbidden>
 
-=head3 forbidden : BOOL
+=head3 forbidden
 
-Priority: 3 (very high), executed after C<default>.
+Value: bool.
+
+Priority: 3 (very high), executed after L</default>.
 
 Category: constraint.
 
-This is the opposite of C<req>, requiring that data be not defined (i.e. undef).
+This is the opposite of L</req>, requiring that data be not defined (i.e.
+undef).
 
 Given schema C<< ["int", {"forbidden": 1}] >>, a non-undef value will fail.
 Another example: the schema C<< ["int", {"req": 1, "forbidden": 1}] >> will
 always fail due to conflicting clauses.
 
-See also: C<req>
+See also: L</req>
 
-=head3 prefilters : [EXPR, ...]
+=head3 prefilters
 
-Priority: 10 (high). Run after C<default> and C<req>/C<forbidden>.
+Value: array of expression string.
+
+Priority: 10 (high). Run after L</default> and L</req>/L</forbidden>.
 
 Category: filter.
 
@@ -309,11 +342,13 @@ referred to in expression by variable C<$_>. Prefiltered value should persist
 until the end of all other clauses (until the end of clause set), after which
 the old value can be restored.
 
-=head3 clause : [CLNAME, CLVAL] -> ANY
+=head3 clause
 
-Priority: 50 (normal)
+Value: 2-element array C<[CLNAME, CLVAL]>.
 
 Return value: clause return value.
+
+Priority: 50 (normal)
 
 Category: constraint.
 
@@ -330,11 +365,14 @@ This clause is useful when combined with the C<.op> attribute. Example:
 The above schema says that the integer needs to be divisible by 2 or larger than
 10.
 
-=head3 clset : HASH -> INT
+=head3 clset
+
+Value: hash.
+
+Return value: int (number of successful clauses + 1) on success, false on
+failure.
 
 Priority: 50 (normal)
-
-Return value: (number of successful clauses + 1) on success, false on failure.
 
 Category: constraint.
 
@@ -349,13 +387,15 @@ if clause is successful. Otherwise false (0) will be returned. Example:
  // require that either data is between 1 and 10, or 90 and 100
  ["int", "clset|", [{"min": 1, "max": 10}, {"min": 90, "max": 100}]]
 
-See also: C<clause>.
+See also: L</clause>.
 
-=head3 check : EXPR -> ANY
+=head3 check
 
-Priority: 50 (normal)
+Value: expression string.
 
 Return value: result of evaluated expression
+
+Priority: 50 (normal)
 
 Category: constraint.
 
@@ -368,11 +408,13 @@ succeed. Examples:
  // require that the *length of* string is a prime number
  ["str", "check", "is_prime(len($_))"]
 
-=head3 prop : [PROP, SCHEMA] -> bool
+=head3 prop
 
-Priority: 50 (normal)
+Value: 2-element str C<[PROP, SCHEMA]>.
 
 Return value: bool
+
+Priority: 50 (normal)
 
 Category: constraint
 
@@ -381,18 +423,20 @@ Validate property against a schema. Example:
  // require that the *length of* string is divisible by 2
  ["str", "prop", ["len", ["int", "div_by", 2]]]
 
-See also: C<check_prop>
+See also: L</check_prop>
 
-=head3 check_prop : [PROP, EXPR] -> ANY
+=head3 check_prop
 
-Priority: 50 (normal)
+Value: 2-element str C<[PROP, SCHEMA]>.
 
 Return value: result of evaluated expression
 
+Priority: 50 (normal)
+
 Category: constraint
 
-Just like C<check>, but instead of checking data itself, check property C<PROP>.
-Example:
+Just like L</check>, but instead of checking data itself, check property
+C<PROP>. Example:
 
  // require that the *length of* string is a prime number
  ["str", "check_prop", ["len", "is_prime($_)"]]
@@ -400,14 +444,19 @@ Example:
  // check that the email's Subject header is a palindrome
  ["email", "check_prop", [["headers", "subject"], "is_palindrome($_)"]]
 
-See also: C<prop>
+See also: L</prop>
 
-=head3 if : ([COND, THEN] -> ANY) or ([COND, THEN, ELSE] -> ANY)
+=head3 if
 
-Priority: 50 (normal)
+Value:
+
+ [COND, THEN] -> any
+ [COND, THEN, ELSE] -> any
 
 Return value: if condition is true, then the C<THEN> result, otherwise the
 C<ELSE> result.
+
+Priority: 50 (normal)
 
 Category: constraint.
 
@@ -443,7 +492,9 @@ avoid ambiguity with expression:
  // correct
  "if": [["int"], true]
 
-=head3 postfilters : [EXPR, ...]
+=head3 postfilters
+
+Value: array of expression strings.
 
 Priority: 90 (very low). Run after all other clauses.
 
@@ -453,15 +504,48 @@ Run expression(s), usually to postprocess data. Data is referred to in
 expression by variable C<$_>. From here on, the data will be permanently set to
 the postfiltered value.
 
+=head3 examples
+
+Value: array of (non-hash values|defhash)
+
+Priority: 99 (informational)
+
+Category: metadata.
+
+A list of sample valid values. Can be used, e.g. for documentation, testing, or
+completion. Each element is sample value, except when value is a hash then it is
+assumed as a defhash (with the actual value in the C<value> property). So if
+your sample value happens to be a hash like C<{}>, it has to be specified as C<<
+{"value":{}} >>.
+
+Note that this clause is informational only and does not require the value to be
+in one of the specified examples (use L</in> clause for this purpose).
+
+See also: L</invalid_examples>, L</in>.
+
+=head3 invalid_examples
+
+Value: array of (non-hash values|defhash)
+
+Priority: 99 (informational)
+
+Category: metadata.
+
+This is the counterpart of L</examples>, containing examples of invalid values.
+
+See also: L</examples>.
+
 =head1 ROLE: Comparable
 
 This is the comparable type role. All types which have comparable values must
-implement this role. Most types implement this role, including C<str>, all
-number types, etc.
+implement this role. Most types implement this role, including L<str|/"TYPE:
+str">, all number types, etc.
 
 =head2 Clauses
 
-=head3 in : [ANY, ...]
+=head3 in
+
+Value: array of any values.
 
 Priority: 50 (normal)
 
@@ -469,14 +553,20 @@ Category: constraint
 
 Require that the data be one of the specified choices.
 
-See also: C<match> (for type 'str'), C<has> (for 'HasElems' types)
-
 Examples:
 
  ["int", {"in": [1, 2, 3, 4, 5, 6]}] // single dice throw value
  ["str", {"!in": ["root", "admin", "administrator"]}] // forbidden usernames
 
-=head3 is : ANY
+To provide sample valid values that are not binding, use the L</examples>
+clause.
+
+See also: L</examples>, L</match> (for type L<str|/"TYPE: str">), L</has> (for
+L<HasElems|/"ROLE: HasElems"> types).
+
+=head3 is
+
+Value: any.
 
 Priority: 50 (normal)
 
@@ -494,57 +584,72 @@ Examples:
 =head1 ROLE: HasElems
 
 This is the role for types that have the notion of elements/length. It provides
-clauses like C<max_len>, C<len>, C<len_between>, C<each_elem>, etc. It is used
-by C<array>, C<hash>, and also C<str>.
+clauses like L</max_len>, L</len>, L</len_between>, L</each_elem>, etc. It is
+used by L<array|/"TYPE: array">, L<hash|/"TYPE: hash">, and also L<str|/"TYPE:
+str">.
 
 =head2 Properties
 
-=head3 len : NUM
+=head3 len (HasElems property)
 
-=head3 elems : ARRAY
+Number.
 
-=head3 indices : ARRAY
+=head3 elems (HasElems property)
+
+Array.
+
+=head3 indices (HasElems property)
+
+Array.
 
 =head2 Clauses
 
-=head3 max_len : NUM
+=head3 max_len
+
+Value: uint.
 
 Priority: 50 (normal)
 
 Category: constraint
 
-Requires that the data have at most NUM elements.
+Requires that the data have at most the specified number of elements.
 
 Example:
 
  ["str", {"req": 1, "max_len": 10}] // string with at most 10 characters
 
-=head3 min_len : NUM
+=head3 min_len
+
+Value: uint.
 
 Priority: 50 (normal)
 
 Category: constraint
 
-Requires that the data have at least NUM elements.
+Requires that the data have at least the specified number of elements.
 
 Example:
 
  ["array", {"min_len": 1}] // define an array with at least one element
 
-=head3 len_between : [NUM_MIN, NUM_MAX]
+=head3 len_between
+
+Value: 2-element array (C<[NUM_MIN, NUM_MAX]>)
 
 Priority: 50 (normal)
 
 Category: constraint
 
-A convenience clause that combines C<min_len> and C<max_len>.
+A convenience clause that combines L</min_len> and L</max_len>.
 
 Example, the two schemas below are equivalent:
 
  ["str", {"len_between": [1, 10]}]
  ["str", {"min_len": 1, "max_len": 10}]
 
-=head3 len : NUM
+=head3 len
+
+Value: uint.
 
 Priority: 50 (normal)
 
@@ -552,14 +657,16 @@ Category: constraint
 
 Requires that the data have exactly NUM elements.
 
-=head3 has : ANY
+=head3 has
+
+Value: any.
 
 Priority: 50 (normal)
 
 Category: constraint
 
 Requires that the data contains the element. This is the counterpart of the
-C<in> clause.
+L</in> clause.
 
 Examples:
 
@@ -572,7 +679,9 @@ Examples:
  // requires that string does not have character 'x'
  ["str", {"!has": "x"}]
 
-=head3 uniq : BOOL
+=head3 uniq
+
+Value: bool.
 
 If set to 1, require that the element values be unique (like in a set). If set
 to 0, require that there are duplicates in the elements. For example, given this
@@ -582,7 +691,9 @@ schema:
 
 this data passes: C<< [1, 2, 3] >> but this one does not: C<< [1, 2, 1] >>.
 
-=head3 each_elem : SCHEMA
+=head3 each_elem
+
+Value: schema.
 
 Priority: 50 (normal)
 
@@ -602,34 +713,43 @@ The above specifies an array of integers.
 
 The above specifies hash with alphanumeric-only values.
 
-=head3 check_each_elem : EXPR
+=head3 check_each_elem
+
+Value: expression string.
 
 Priority: 50 (normal)
 
 Category: constraint, looping
 
-Just like C<each_elem> but instead of using schema, each element is tested using
+Just like L</each_elem> but instead of using schema, each element is tested
+using expression.
+
+=head3 each_index
+
+Value: schema.
+
+Priority: 50 (normal)
+
+Category: constraint, looping
+
+Like L</each_elem> but iterates over the indices. For type like L<array|/"TYPE:
+array">, this is 0, 1, ... N. For L<hash|/"TYPE: hash">, this is the keys of
+hash.
+
+=head3 check_each_index
+
+Value: expression string.
+
+Priority: 50 (normal)
+
+Category: constraint, looping
+
+Like L</each_index> but instead of using schema, each index is tested using
 expression.
 
-=head3 each_index : SCHEMA
+=head3 exists
 
-Priority: 50 (normal)
-
-Category: constraint, looping
-
-Like C<each_elem> but iterate over the indices. For type like C<array>, this is
-0, 1, ... N. For C<hash>, this is the keys of hash.
-
-=head3 check_each_index : EXPR
-
-Priority: 50 (normal)
-
-Category: constraint, looping
-
-Like C<each_index> but instead of using schema, each index is tested using
-expression.
-
-=head3 exists : SCHEMA
+Value: schema.
 
 Priority: 50 (normal)
 
@@ -639,24 +759,28 @@ Test that there is at least one element of data that validates to the schema.
 That element is returned. Be careful to not return element which has the value
 which evaluates to false.
 
-=head3 check_exists : EXPR
+=head3 check_exists
+
+Value: expression string.
 
 Priority: 50 (normal)
 
 Category: constraint, looping
 
-Just like C<exists> but instead of using schema, each element is tested using
+Just like L</exists> but instead of using schema, each element is tested using
 expression.
 
 =head1 ROLE: Sortable
 
-This is the type role for sortable types. It provides clauses like C<min>,
-C<max>, and C<between>. It is used by many types, for example C<str>, all
-numeric types, etc.
+This is the type role for sortable types. It provides clauses like L</min>,
+L</max>, and L</between>. It is used by many types, for example L<str|/"TYPE:
+str">, all numeric types, etc.
 
 =head2 Clauses
 
-=head3 min : ANY
+=head3 min
+
+Value: any.
 
 Require that the value is not less than some specified minimum (equivalent in
 intention to the Perl string C<ge> operator, or the numeric C<< >= >> operator).
@@ -665,101 +789,136 @@ Example:
 
  ["int", "min", 0] // specify positive numbers
 
-=head3 xmin : ANY
+=head3 xmin
+
+Value: any.
 
 Require that the value is not less nor equal than some specified minimum
 (equivalent in intention to the Perl string C<gt> operator, or the numeric C<< >
 >> operator). The C<x> prefix is for "exclusive".
 
-=head3 max : ANY
+=head3 max
+
+Value: any.
 
 Require that the value is less or equal than some specified maximum (equivalent
 in intention to the Perl string C<le> operator, or the numeric C<< <= >>
 operator).
 
-=head3 xmax : ANY
+=head3 xmax
+
+Value: any.
 
 Require that the value is less than some specified maximum (equivalent in
 intention to the Perl string C<lt> operator, or the numeric C<< < >> operator).
 The C<x> prefix is for "exclusive".
 
-=head3 between : [ANY_MIN, ANY_MAX]
+=head3 between
 
-A convenient clause to combine C<min> and C<max>.
+Value: 2-element string (C<[ANY_MIN, ANY_MAX]>)
+
+A convenient clause to combine L</min> and L</max>.
 
 Example, the following schemas are equivalent:
 
  ["float", {"between": [0.0, 1.5]}]
  ["float", {"min": 0.0, "max": 1.5}]
 
-=head3 xbetween => [ANY_MIN, ANY_MAX]
+=head3 xbetween
 
-A convenient clause to combine C<xmin> and C<xmax>.
+Value: 2-element string (C<[ANY_MIN, ANY_MAX]>)
+
+A convenient clause to combine L</xmin> and L</xmax>.
 
 =head1 TYPE: buf
 
 C<buf> stores binary data. Elements of buf data are bytes. It is derived from
-C<str>.
+L<str|/"TYPE: str">.
 
 =head1 TYPE: num
 
-C<num> stores numbers. This type assumes the Comparable and Sortable roles.
+C<num> stores numbers. This type assumes the L<Comparable|/"ROLE: Comparable">
+and L<Sortable|/"ROLE: Sortable"> roles.
 
 =head1 TYPE: float
 
-C<int> stores real (floating-point) numbers. This type is derived from C<num>.
+C<float> stores real (floating-point) numbers. This type is derived from
+L<num|/"TYPE: num">.
 
 =head2 Clauses
 
-=head3 is_nan : BOOL
+=head3 is_nan
 
-Require that number is a NaN (e.g. "NaN" or "-NaN" in Perl).
+Value: bool.
 
-=head3 is_inf : BOOL
+If true, require that number is a NaN (e.g. "NaN" or "-NaN" in Perl). If false,
+forbid that the number is a NaN.
 
-Require that number is a positive or negative infinity (e.g. "Inf" or
-"-Infinity" in Perl).
+=head3 is_inf
 
-=head3 is_pos_inf : BOOL
+Value: bool.
 
-Require that number is a positive infinity (e.g. "Inf" or "+Infinity" in Perl).
+If true, require that number is a positive or negative infinity (e.g. "Inf" or
+"-Infinity" in Perl). If false, forbid that the number is an infinity (which can
+mean a finite number or a NaN).
 
-=head3 is_neg_inf : BOOL
+=head3 is_pos_inf
 
-Require that number is a negative infinity (e.g. "-Inf" or "-Infinity" in Perl).
+Value: bool.
+
+If true, require that number is a positive infinity (e.g. "Inf" or "+Infinity"
+in Perl). If false, forbid that number is a positive infinity (which can mean a
+finite number, negative infinity, or a NaN).
+
+=head3 is_neg_inf
+
+Value: bool.
+
+If true, require that number is a negative infinity (e.g. "-Inf" or "-Infinity"
+in Perl). If false, forbid that number is a negative infinity (which can mean a
+finite number, positive infinity, or a NaN).
 
 =head1 TYPE: int
 
-C<int> stores integers. This type is derived from C<num>.
+C<int> stores integers. This type is derived from L<num|/"TYPE: num">.
 
 =head2 Clauses
 
-=head3 mod : [INT1, INT2]
+=head3 mod
 
-Require that (data mod INT1) equals INT2. For example, C<< mod => [2, 1] >>
-effectively specifies odd numbers.
+Value: 2-element array of ints (C<[INT1, INT2]>).
 
-=head3 div_by : INT
+Require that (data mod C<INT1>) equals C<INT2>. For example, C<< "mod": [2, 1]
+>> effectively specifies odd numbers.
 
-Require that data is divisible by a number. This is effectively just a shortcut
-for C<< "mod": [INT, 0] >>.
+=head3 div_by
+
+Value: int.
+
+Require that data is divisible by the specified number. This is effectively just
+a shortcut for C<< "mod": [INT, 0] >>.
 
 Example: Given schema C<< ["int", {"div_by": 2}] >>, null, 0, 2, 4, and 6 are
 valid but 1, 3, 5 are not.
 
 =head1 TYPE: str
 
-C<str> stores strings (text). This type assumes the Comparable, Sortable, and
-HasElems roles (the elements are individual characters, the indices are integers
-from 0 to (length of string)-1). Default encoding is utf8.
+C<str> stores strings (text). This type assumes the L<Comparable|/"ROLE:
+Comparable">, L<Sortable|/"ROLE: Sortable">, and L<HasElems|/"ROLE: HasElems">
+roles (the elements are individual characters, the indices are integers from 0
+to (length of string)-1). Default encoding is utf8.
 
 =head2 Clauses
 
-=head3 encoding : str
+=head3 encoding
+
+Value: str, default C<utf8>.
 
 Specify encoding. Currently the only supported value is C<utf8>.
 
-=head3 match : REGEX|{COMPILER=>REGEX, ...}
+=head3 match
+
+Value: string (regex) or hash of regexes (C<< REGEX|{COMPILER=>REGEX, ...} >>)
 
 Require that string match the specified regular expression.
 
@@ -787,7 +946,9 @@ To match against multiple regexes:
  // string must NOT match a nor b nor c (i.e. must match none of those)
  ["str", {"match": [a, b, c], "match.op": "none"}]
 
-=head3 is_re : BOOL
+=head3 is_re
+
+Value: bool.
 
 If value is true, require that the string be a valid regular expression string.
 If value is false, require that the string not be a valid regular expression
@@ -795,26 +956,35 @@ string.
 
 =head1 TYPE: cistr
 
+Just like L<str|/"TYPE: str">, but comparison between values will be done
+case-insensitively.
+
 =head1 TYPE: bool
 
-Boolean type. This type assumes the Comparable and Sortable roles.
+Boolean type. This type assumes the L<Comparable|/"ROLE: Comparable"> and
+L<Sortable|/"ROLE: Sortable"> roles.
 
 =head2 Clauses
 
-=head3 is_true => BOOL
+=head3 is_true
 
-Check that value is true. This is a more portable way than comparing to a value
-using C<is>. To check that value is false, set this clause to a false value.
-Alternatively you can also use C<< "!is_true": 1 >>.
+Value: bool.
+
+Require that value is true. This is a more portable way than comparing to a
+value using L</is>. To require that value is false, set this clause to a false
+value. Alternatively you can also use C<< "!is_true": 1 >>.
 
 =head1 TYPE: array
 
-Array type. This type assumes the Comparable and HasElems roles (the elements
-are indexed by integers starting from 0).
+Array type. This type assumes the L<Comparable|/"ROLE: Comparable"> and
+L<HasElems|/"ROLE: HasElems"> roles (the elements are indexed by integers
+starting from 0).
 
 =head2 Clauses
 
-=head3 elems => ARRAY_OF_SCHEMA
+=head3 elems
+
+Value: array of schema.
 
 Attributes: C<create_default> (bool, default: 1).
 
@@ -844,28 +1014,37 @@ with:
 C<[1]> will still become C<[1]> after validation. In both cases, C<[1, undef]>
 will become C<[1, 2]>.
 
-=head3 of : SCHEMA
+=head3 of
 
-This is just an alias to C<each_elem>.
+Value: schema.
+
+This is just an alias to L</each_elem>.
 
 =head1 TYPE: hash
 
-Hash (a.k.a. dictionary) type. This type assumes the Comparable and HasElems
-roles (the elements are hash values, the indices are hash keys).
+Hash (a.k.a. dictionary) type. This type assumes the L<Comparable/"ROLE:
+Comparable"> and L<HasElems|/"ROLE: HasElems"> roles (the elements are hash
+values, the indices are hash keys).
 
 =head2 Properties
 
-=head3 keys : ARRAY
+=head3 keys (hash property)
 
-Alias for C<HasElems>' C<indices>.
+Value: array.
 
-=head3 values : ARRAY
+Alias for L<HasElems|/"ROLE: HasElems">'s L</indices>.
 
-Alias for C<HasElems>' C<elems>.
+=head3 values (hash property)
+
+Value: array.
+
+Alias for L<HasElems|/"ROLE: HasElems">'s L</elems>.
 
 =head2 Clauses
 
-=head3 keys : HASH
+=head3 keys
+
+Value: hash.
 
 Attributes: C<restrict> (bool, default: 1), C<create_default> (bool, default:
 1).
@@ -883,7 +1062,7 @@ set to false. Example:
  ]
 
 The above schema requires data to be a hash with keys C<name>, C<address>,
-C<email>. None of the keys are required to be present (use C<req_keys> for
+C<email>. None of the keys are required to be present (use L</req_keys> for
 that), but other keys are not allowed.
 
 Another example:
@@ -894,7 +1073,7 @@ Another example:
  ]
 
 The above schema specifies a hash with definition for the value of its C<a>,
-C<b>, and C<c> keys. But other keys like C<d> are allowed since the C<keys>
+C<b>, and C<c> keys. But other keys like C<d> are allowed since the L</keys>
 clause is set to not restrict keys.
 
 The C<.create_default> attribute regulates whether keys should be created with
@@ -914,7 +1093,9 @@ C<.create_default> is set to false:
 then C<{}> will still become C<{}> after validation. In both cases, C<{"b":
 null}> will still become C<{"b": 2}>.
 
-=head3 re_keys : HASH
+=head3 re_keys
+
+Value: hash
 
 Attributes: C<restrict> (bool, default: 1)
 
@@ -926,12 +1107,14 @@ The above schema specifies that for keys which begin with a letter the values
 must be strings, and for keys which begin with a digit the values must be
 integers. These hashes validate: C<< {} >>, C<< {"a": "x", "b": 1, "1": 1} >>.
 These hashes do not validate: C<< {"1": "x"} >>, C<< {"#": "x"} >> (key does not
-match any keys in C<re_keys>).
+match any keys in L</re_keys>).
 
-=head3 req_keys : ARRAY
+=head3 req_keys
 
-Specify which keys are required to be exist. Note that the values for those
-keys are not required to be defined (use C<keys> for that). Example:
+Value: array
+
+Specify which keys are required to be exist. Note that the values for those keys
+are not required to be defined (use L</keys> for that). Example:
 
  ["hash", "req_keys", ["a", "b"]]
 
@@ -943,16 +1126,18 @@ this schema:
 
 the previous hash will not validate since the value for C<b> is required.
 
-Note: you can also use the C<keys> property to express the same thing, but
-C<req_keys> is more convenient:
+Note: you can also use the L</keys> property to express the same thing, but
+L</req_keys> is more convenient:
 
  ["hash", "prop", ["keys", ["array", "has&", ["a", "b"]]]]
 
-See also: C<allowed_keys>, C<forbidden_keys>.
+See also: L</allowed_keys>, L</forbidden_keys>.
 
-=head3 allowed_keys : ARRAY
+=head3 allowed_keys
 
-Specify which keys are allowed (can exist). Unlike C<req_keys>, keys specified
+Value: array
+
+Specify which keys are allowed (can exist). Unlike L</req_keys>, keys specified
 in the value need not exist. Example:
 
  ["hash", "allowed_keys", ["a", "b"]]
@@ -960,18 +1145,22 @@ in the value need not exist. Example:
 Then hashes C<{}>, C<{"a":1}>, C<{"a":1,"b":2}> all pass, but C<{"a":1,"c":3}>
 fails because it contains keys outside the allowed list.
 
-Note: you can also use the C<keys> property to express the same thing, but
-C<allowed_keys> is more convenient:
+Note: you can also use the L</keys> property to express the same thing, but
+L</allowed_keys> is more convenient:
 
  ["hash", "prop", ["keys", ["array", "each_elem", ["str", "in", ["a", "b"]]]]]
 
-See also: C<req_keys>, C<forbidden_keys>.
+See also: L</req_keys>, L</forbidden_keys>.
 
-=head3 allowed_keys_re : RE
+=head3 allowed_keys_re
 
-Like C<allowed_keys> but using regular expression.
+Value: regex
 
-=head3 forbidden_keys : ARRAY
+Like L</allowed_keys> but using regular expression.
+
+=head3 forbidden_keys
+
+Value: array
 
 Specify which keys are forbidden (must not exist). Example:
 
@@ -981,33 +1170,37 @@ Then hashes C<{}>, C<{"c":1}> all pass, but C<{"a":1,"c":3}> fails because it
 contains keys in the forbidden list.
 
 Note: you can also use the C<keys> property to express the same thing, but
-C<forbidden_keys> is more convenient:
+L</forbidden_keys> is more convenient:
 
  ["hash", "prop", ["keys", ["array", "each_elem", ["str", "!in", ["a", "b"]]]]]
 
-See also: C<req_keys>, C<allowed_keys>.
+See also: L</req_keys>, L</allowed_keys>.
 
-=head3 forbidden_keys_re : RE
+=head3 forbidden_keys_re
 
-Like C<forbidden_keys> but using regular expression.
+Value: regex
+
+Like L</forbidden_keys> but using regular expression.
 
 =head3 each_key
 
-Alias to C<each_index>.
+Alias for L</each_index>.
 
 =head3 each_value
 
-Alias to C<each_elem>.
+Alias for L</each_elem>.
 
 =head3 check_each_key
 
-Alias to C<check_each_index>.
+Alias for L</check_each_index>.
 
 =head3 check_each_value
 
-Alias to C<check_each_elem>.
+Alias for L</check_each_elem>.
 
-=head3 choose_one_key : ARRAY[STR]
+=head3 choose_one_key
+
+Value: array of str.
 
 Specify that hash contains at most one out of a list of key names. Example:
 
@@ -1017,9 +1210,11 @@ Hash can contain either "exclude" or "exclude_from" but not both.
 
 =head3 choose_one
 
-Alias to C<choose_one_key>.
+Alias for L</choose_one_key>.
 
-=head3 choose_all_keys : ARRAY[STR]
+=head3 choose_all_keys
+
+Value: array of str.
 
 Specify that if hash contains any one of keys in a given list of key names, then
 hash must contain all of those keys. Example:
@@ -1031,11 +1226,17 @@ versa.
 
 =head3 choose_all
 
-Alias to C<choose_all_keys>.
+Alias for L</choose_all_keys>.
 
-=head3 (TODO: choose_some_keys : [ min, max, ARRAY[STR] ])
+=head3 choose_some_keys
 
-=head3 req_one_key : ARRAY[STR]
+Value: 3-element array (C<[MIN, MAX, KEYS]>).
+
+Require that hash has between C<MIN> and C<MAX> of keys in C<KEYS>.
+
+=head3 req_one_key
+
+Value: array of str.
 
 Specify that only exactly one key is required to exist. Example:
 
@@ -1045,23 +1246,29 @@ When the two keys both exist, the clause fails.
 
 =head3 req_one
 
-Alias to C<req_one_key>.
+Alias for L</req_one_key>.
 
 =head3 req_all_keys
 
-Alias to C<req_keys>.
+Alias for L</req_keys>.
 
 =head3 req_all
 
-Alias to C<req_keys>.
+Alias for L</req_keys>.
 
-=head3 req_some_keys : [ min, max, ARRAY[STR] ]
+=head3 req_some_keys
+
+Value: 3-element array (C<[MIN, MAX, KEYS]>)
+
+Specify that between C<MIN> and C<MAX> of keys in C<KEYS> are required.
 
 =head3 req_some
 
-Alias to C<req_some_keys>.
+Alias for L</req_some_keys>.
 
-=head3 dep_any : [ STR|ARRAY[STR], ARRAY[STR] ]
+=head3 dep_any
+
+Value: 2-element array (C<[ STR|ARRAY[STR], ARRAY[STR] ]>)
 
 Specify that the first argument (either a string containing a key name, or a
 list of key names) can only exist when one of the keys given in the second
@@ -1085,7 +1292,9 @@ Yet another example:
 If either "input_value" or "input_file" exists, then one of "input_format",
 "input_is_yaml", "input_is_json" is allowed to be specified.
 
-=head3 dep_all : [ STR|ARRAY[STR], ARRAY[STR] ]
+=head3 dep_all
+
+Value: 2-element array (C<[ STR|ARRAY[STR], ARRAY[STR] ]>)
 
 Specify that the first argument (either a string containing a key name, or a
 list of key names) can only exist when all of the keys given in the second
@@ -1093,7 +1302,7 @@ argument exist. Example:
 
  ["hash", "dep_all", ["postcode", ["address"]]]
 
-In the above example, you can also use "dep_any" clause for the same effect
+In the above example, you can also use L</dep_any> clause for the same effect
 since there is only one key to depend on. Another example:
 
  ["hash", "dep_all", ["postcode", ["address", "city"]]
@@ -1101,13 +1310,17 @@ since there is only one key to depend on. Another example:
 In the above example, "postcode" can only be specified when both "address" and
 "city" exist. Yet another example:
 
-=head3 req_dep_any : [ STR|ARRAY[STR], ARRAY[STR] ]
+=head3 req_dep_any
+
+Value: 2-element array (C<[ STR|ARRAY[STR], ARRAY[STR] ]>)
 
 Specify that the first argument (either a string containing a key name, or a
 list of key names) is required when one of the keys given in the second argument
 exist.
 
-=head3 req_dep_all : [ STR|ARRAY[STR], ARRAY[STR] ]
+=head3 req_dep_all
+
+Value: 2-element array (C<[ STR|ARRAY[STR], ARRAY[STR] ]>)
 
 Specify that the first argument (either a string containing a key name, or a
 list of key names) is required when all of the keys given in the second argument
@@ -1115,11 +1328,13 @@ exist.
 
 =head1 TYPE: any
 
-A type to specify alternate schemas.
+A type to specify alternate schemas, or a type that allows any value.
 
 =head2 Clauses
 
-=head3 of : [SCHEMA, ...]
+=head3 of (any)
+
+Value: array of schemas
 
 Specify the schema(s) where the value will need to be valid to at least one of
 them.
@@ -1130,7 +1345,9 @@ A type to specify co-schemas (all schemas that must be validated to value).
 
 =head2 Clauses
 
-=head3 of : [SCHEMA, ...]
+=head3 of (all)
+
+Value: array of schemas
 
 Specify the schema(s) where the value will need to be valid to all of them.
 
@@ -1140,17 +1357,29 @@ Object.
 
 =head2 Properties
 
-=head3 meths : ARRAY
+=head3 meths (obj property)
 
-=head3 attrs : ARRAY
+=head3 attrs (obj property)
 
 =head2 Clauses
 
-=head3 can : STR
+=head3 can
 
-=head3 isa : STR
+Value: str.
+
+=head3 isa
+
+Value: str.
 
 =head1 TYPE: date (not yet specified)
+
+=head1 TYPE: datenotime (not yet specified)
+
+=head1 TYPE: datetime (not yet specified)
+
+=head1 TYPE: duration (not yet specified)
+
+=head1 TYPE: timeofday (not yet specified)
 
 =head1 HOMEPAGE
 
@@ -1170,6 +1399,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<DefHash>
+
 L<Sah>
 
 =head1 AUTHOR
@@ -1178,7 +1409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

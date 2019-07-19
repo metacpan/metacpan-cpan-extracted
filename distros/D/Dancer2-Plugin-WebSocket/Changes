@@ -1,38 +1,45 @@
 Revision history for Dancer2-Plugin-WebSocket
 
+0.2.0 2019-07-16
+  [ ENHANCEMENTS ]
+    - add keyword 'websocket_connections' (GH#6)
+
+  [ STATISTICS ]
+    - code churn: 9 files changed, 160 insertions(+), 51 deletions(-)
+
 0.1.3 2019-01-27
- [DOCUMENTATION]
- - Fixed minor typo in the pod. (GH#4, Mohammad S Anwar)
+  [ DOCUMENTATION ]
+    - Fixed minor typo in the pod. (GH#4, Mohammad S Anwar)
 
- [MISC]
- - TravisCI now installs recommended modules as well.
+  [ MISC ]
+    - TravisCI now installs recommended modules as well.
 
- [STATISTICS]
- - code churn: 4 files changed, 13 insertions(+), 6 deletions(-)
+  [ STATISTICS ]
+    - code churn: 4 files changed, 13 insertions(+), 6 deletions(-)
 
 0.1.2 2019-01-20
- [MISC]
- - Adds tests via Mojolicious and the awesome Joel Berger. (GH#2) see
-   https://github.com/MojoliciousDotIO/mojolicious.io/blob/master/blog/2018/12/20/testing-dancer/websocket.t
+  [ MISC ]
+    - Adds tests via Mojolicious and the awesome Joel Berger. (GH#2) see
+      https://github.com/MojoliciousDotIO/mojolicious.io/blob/master/blog/2018/12/20/testing-dancer/websocket.t
 
- [STATISTICS]
- - code churn: 7 files changed, 62 insertions(+), 7 deletions(-)
+  [ STATISTICS ]
+    - code churn: 7 files changed, 62 insertions(+), 7 deletions(-)
 
 0.1.1 2017-11-20
- [BUG FIXES]
- - change protocol to 'wss://' if request is secure. (Frank Schreiner,
-   GH#1)
+  [ BUG FIXES ]
+    - change protocol to 'wss://' if request is secure. (Frank Schreiner,
+      GH#1)
 
- [STATISTICS]
- - code churn: 3 files changed, 12 insertions(+), 3 deletions(-)
+  [ STATISTICS ]
+    - code churn: 3 files changed, 12 insertions(+), 3 deletions(-)
 
 0.1.0 2017-10-14
- [ENHANCEMENTS]
- - Use Moo::Role instead of Role::Tiny.
- - Add channels for connection grouping.
+  [ ENHANCEMENTS ]
+    - Use Moo::Role instead of Role::Tiny.
+    - Add channels for connection grouping.
 
- [STATISTICS]
- - code churn: 8 files changed, 297 insertions(+), 19 deletions(-)
+  [ STATISTICS ]
+    - code churn: 8 files changed, 297 insertions(+), 19 deletions(-)
 
 0.0.1 2017-10-06
- - First release.
+  - First release.

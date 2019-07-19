@@ -60,11 +60,11 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://bitbucket.org/broadbean/p5-test-nicedump",
+         "url" : "git://bitbucket.org/broadbean/p5-test-nicedump.git",
          "web" : "https://bitbucket.org/broadbean/p5-test-nicedump"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

@@ -10,7 +10,7 @@ HTML::Packer - Another HTML code cleaner
 
 # VERSION
 
-Version 2.08
+Version 2.09
 
 # DESCRIPTION
 
@@ -60,6 +60,16 @@ Second argument must be a hashref of options. Possible options are
     Default is no compression for CSS.
     This option only takes effect if [CSS::Packer](https://metacpan.org/pod/CSS::Packer) is installed.
 
+- do\_csp
+
+    Defines hash algorithm for `Content-Security-Policy`, or CSP, hashes of
+    embedded `<script>` and `<style>` tags.
+
+    Allowed values are `'sha256'`, `'sha384'`, `'sha512'`.
+
+    It may be left blank or set to a Perl false value to indicate that hashes
+    should not be calculated, if performance is a concern.
+
 - no\_compress\_comment
 
     If not set to a true value it is allowed to set a HTML comment that prevents the input being packed.
@@ -71,6 +81,18 @@ Second argument must be a hashref of options. Possible options are
 - html5
 
     If set to a true value closing slashes will be removed from void elements.
+
+- csp
+
+    If `do_csp` is set to `'sha256'`, returns a hash that looks like this:
+
+        (
+            'script-src' => [qw( sha256-...= sha256-...= )],
+            'style-src'  => [qw( sha256-...= sha256-...= )],
+        )
+
+    with each element of the `ARRAY`refs containing a CSP-friendly hash for a
+    `<script>` or `<style>` tag.
 
 # AUTHOR
 

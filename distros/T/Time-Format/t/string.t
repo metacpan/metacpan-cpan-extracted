@@ -1,15 +1,20 @@
 #!/perl -I..
 
+# time-as-string tests
+
 use strict;
 use Test::More tests => 61;
 use lib 'blib/lib', 'blib/arch';
 
-# time-as-string tests
 
+## ----------------------------------------------------------------------------------
+## Load our module.
 BEGIN { $Time::Format::NOXS = 1 }
 BEGIN { use_ok 'Time::Format', qw(time_format %time) }
 
-# Get day/month names in current locale
+
+## ----------------------------------------------------------------------------------
+## Get day/month names in current locale; fallback to English (sorry!).
 my ($Thursday, $Thu, $June, $Jun);
 unless (eval
     {
@@ -21,6 +26,10 @@ unless (eval
 {
     ($Thursday, $Thu, $June, $Jun) = qw(Thursday Thu June Jun);
 }
+
+
+## ----------------------------------------------------------------------------------
+## Begin tests.
 
 # June 5, 2003 at 1:58:09 pm
 my $d  = '2003-06-05';

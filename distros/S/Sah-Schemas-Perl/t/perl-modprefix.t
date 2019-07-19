@@ -16,6 +16,7 @@ subtest "coercion" => sub {
     is_deeply($c->([]), [], "uncoerced");
     is($c->("*"), "*", "uncoerced 2");
 
+    is($c->(""), "");
     is($c->("Foo"), "Foo::");
 
     is($c->("Foo-Bar")   , "Foo::Bar::");

@@ -1,27 +1,32 @@
-0.019   2019-06-03 (PERLANCAR)
+0.020   2019-07-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow empty string '' as a valid perl::modprefix.
+
+
+0.019   2019-06-03  Released-By: PERLANCAR
 
 	- Add schema: perl::podname.
 
 
-0.018   2019-02-24 (PERLANCAR)
+0.018   2019-02-24  Released-By: PERLANCAR
 
 	- Add schemas: perl::modprefix, perl::modname_or_prefix.
 
 
-0.017   2018-12-09 (PERLANCAR)
+0.017   2018-12-09  Released-By: PERLANCAR
 
 	- Argh, previous commit still didn't delete all tests for
 	  strict.pm.
 
 
-0.016   2018-12-07 (PERLANCAR)
+0.016   2018-12-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Previous commit didn't delete all tests for strict.pm.
 
 
-0.015   2018-12-03 (PERLANCAR)
+0.015   2018-12-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -29,42 +34,42 @@
 	  to strict.POD [RT#127839].
 
 
-0.014   2018-09-11 (PERLANCAR)
+0.014   2018-09-11  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [doc] Fix notes about prioritization of .pm vs .pod.
 
 
-0.013   2018-09-11 (PERLANCAR)
+0.013   2018-09-11  Released-By: PERLANCAR
 
 	- Supply module core/pp information for compiling Sah schemas.
 
 
-0.012   2018-06-04 (PERLANCAR)
+0.012   2018-06-04  Released-By: PERLANCAR
 
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
 	  version 3).
 
 
-0.011   2018-04-03 (PERLANCAR)
+0.011   2018-04-03  Released-By: PERLANCAR
 
 	- Add schema: perl::modargs.
 
 
-0.010   2018-01-14 (PERLANCAR)
+0.010   2018-01-14  Released-By: PERLANCAR
 
         - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
           Perinci::Sub::XCompletion::* modules.
 
 
-0.009   2017-02-08 (PERLANCAR)
+0.009   2017-02-08  Released-By: PERLANCAR
 
 	- Fix tests for perl < 5.12 where invalid version only results in
 	  warning [CT].
 
 
-0.008   2017-02-06 (PERLANCAR)
+0.008   2017-02-06  Released-By: PERLANCAR
 
         - [Removed] Remove schema: perl_modname_or_filename.
 
@@ -72,39 +77,39 @@
           perl::pod_or_pm_filename.
 
 
-0.007   2017-01-31 (PERLANCAR)
+0.007   2017-01-31  Released-By: PERLANCAR
 
 	- Add schema: perl_modname_or_filename.
 
 
-0.006   2016-08-03 (PERLANCAR)
+0.006   2016-08-03  Released-By: PERLANCAR
 
 	- [Bugfix] perl::modname: Missed normalizing Foo-Bar -> Foo::Bar.
 
 	- Add tests.
 
 
-0.005   2016-08-03 (PERLANCAR)
+0.005   2016-08-03  Released-By: PERLANCAR
 
 	- [Bugfix] Normalize Foo/Bar.pm into Foo::Bar (or Foo-Bar for dist)
 	  instead of Foo::Bar::pm (or Foo-Bar-pm).
 
 
-0.004   2016-07-25 (PERLANCAR)
+0.004   2016-07-25  Released-By: PERLANCAR
 
 	- Add schema: perl::version.
 
 
-0.003   2016-07-22 (PERLANCAR)
+0.003   2016-07-22  Released-By: PERLANCAR
 
 	- [build] Rebuild to generate Sah::SchemaR::* modules.
 
 
-0.002   2016-07-20 (PERLANCAR)
+0.002   2016-07-20  Released-By: PERLANCAR
 
 	- Fix coerce rule names.
 
 
-0.001   2016-07-16 (PERLANCAR)
+0.001   2016-07-16  Released-By: PERLANCAR
 
         - First release.

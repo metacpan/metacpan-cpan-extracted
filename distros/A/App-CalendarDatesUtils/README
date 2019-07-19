@@ -2,7 +2,7 @@ NAME
     App::CalendarDatesUtils - Utilities related to Calendar::Dates
 
 VERSION
-    This document describes version 0.009 of App::CalendarDatesUtils (from
+    This document describes version 0.010 of App::CalendarDatesUtils (from
     Perl distribution App-CalendarDatesUtils), released on 2019-06-28.
 
 DESCRIPTION

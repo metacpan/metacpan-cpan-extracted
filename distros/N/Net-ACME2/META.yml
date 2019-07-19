@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-Net-ACME2/issues
   repository: https://github.com/FGasper/p5-Net-ACME2.git
-version: '0.29'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

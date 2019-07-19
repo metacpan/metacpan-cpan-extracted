@@ -1,13 +1,21 @@
+0.17.5 2019-07-18 09:16:37 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - upgrade to latest config grammar to make utf8 work
+
+0.17.4 2019-07-16 15:48:07 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - directly return the error message without mentioning the key that cause it as this is complicating ui translations
+
 0.17.3 2019-06-04 09:18:24 +0200 Tobias Oetiker <tobi@oetiker.ch>
-
+ 
  - textfields CAN be 'null' ...
-
+ 
 0.17.2 2019-06-04 09:14:58 +0200 Tobias Oetiker <tobi@oetiker.ch>
-
+ 
  - fix handling of null and undefined field values for textfields
-
+ 
 0.17.1 2019-06-04 08:50:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
-
+ 
  - do not loop if two fields are reconfigure triggers modifying their own content in the process
  - reload read-only fields after reconfig.
 

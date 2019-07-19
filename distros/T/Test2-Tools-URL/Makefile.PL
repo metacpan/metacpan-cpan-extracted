@@ -30,12 +30,13 @@ my %WriteMakefileArgs = (
     "Test2::Compare::Base"   => "0.000060",
     "Test2::Compare::Hash"   => "0.000060",
     "Test2::Compare::String" => "0.000060",
-    "URI"                    => "1.61"
+    "URI"                    => "1.61",
+    "URI::QueryParam"        => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000121"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +49,8 @@ my %FallbackPrereqs = (
   "Test2::Compare::Hash"   => "0.000060",
   "Test2::Compare::String" => "0.000060",
   "Test2::V0"              => "0.000121",
-  "URI"                    => "1.61"
+  "URI"                    => "1.61",
+  "URI::QueryParam"        => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

@@ -1,5 +1,5 @@
 package Net::Stripe::BalanceTransaction;
-$Net::Stripe::BalanceTransaction::VERSION = '0.37';
+$Net::Stripe::BalanceTransaction::VERSION = '0.39';
 use Moose;
 use Moose::Util::TypeConstraints qw(subtype as where message);
 extends 'Net::Stripe::Resource';
@@ -42,7 +42,7 @@ Net::Stripe::BalanceTransaction - represent a BalanceTransaction object from Str
 
 =head1 VERSION
 
-version 0.37
+version 0.39
 
 =head1 AUTHORS
 

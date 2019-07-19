@@ -1,5 +1,8 @@
 Revision history for Calendar::Bahai
 
+0.53  Thu Jul 18 16:40:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.52  Wed Jun 05 16:30:00 2019
       - Updated dependency on Date::Bahai::Simple v0.25.
 

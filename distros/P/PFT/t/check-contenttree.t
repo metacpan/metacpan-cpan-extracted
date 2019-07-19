@@ -18,22 +18,25 @@ use Encode::Locale;
 
 use Test::More;
 
+my $use_utf8 = $Encode::Locale::ENCODING_LOCALE =~ /UTF-8/i;
+
 my $dir = tempdir(CLEANUP => 1);
-my $inner_unicode = File::Spec->catfile($dir, 'öéåñ');
-mkdir encode(locale => $inner_unicode);
-my $tree = PFT::Content->new($inner_unicode);
+my $path = $use_utf8 ? File::Spec->catfile($dir, 'öéåñ') : ''.$dir;
+
+mkdir encode(locale => $path);
+my $tree = PFT::Content->new($path);
 
 do {
     my $date = PFT::Date->new(0, 12, 25);
     my $p = $tree->new_entry(PFT::Header->new(
-        title => 'foo-♥-baz',
+        title => ($use_utf8 ? 'foo-♥-baz' : 'foo-baz'),
         date => $date,
     ));
     is_deeply($tree->detect_date($p), $date, 'Path-to-date')
 };
 do {
     my $p = $tree->new_entry(PFT::Header->new(
-        title => 'foo-bar-☺az',
+        title => ($use_utf8 ? 'foo-bar-☺az' : 'foo-bar-baz'),
     ));
     is($tree->detect_date($p), undef, 'Path-to-date, no date')
 };
@@ -92,14 +95,16 @@ do {
 
 # Testing slug detection
 do {
+    my $title = $use_utf8 ? 'foo-öar-baz' : 'foo-plah-baz';
     my $p = $tree->new_entry(PFT::Header->new(
-        title => 'foo-öar-baz',
+        title => $title
     ));
-    is($tree->detect_slug($p), 'foo-öar-baz', 'Path-to-slug 1')
+    diag($tree->detect_slug($p));
+    is($tree->detect_slug($p), $title, 'Path-to-slug 1');
 };
 do {
     my $p = $tree->new_entry(PFT::Header->new(
-        title => 'foo²bar☺baz',
+        title => $use_utf8 ? 'foo²bar☺baz' : 'foo/bar\baz',
         date => PFT::Date->new(0, 12, 25),
     ));
     is($tree->detect_slug($p), 'foo-bar-baz', 'Path-to-slug 2')

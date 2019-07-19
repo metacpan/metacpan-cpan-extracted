@@ -8,9 +8,12 @@ use FFI::Platypus;
 skip_all "unsupported on $^O" if $^O =~ /^(darwin|gnukfreebsd)$/;
 skip_all "unsupported on $^O $Config{archname}" if $^O eq 'linux' && $Config{archname} =~ /^arm/;
 
+mkdir "$CWD/.tmp"
+  unless -d "$CWD/.tmp";
+
 subtest dll => sub {
 
-  local $CWD = tempdir( CLEANUP => 1 );
+  local $CWD = tempdir( CLEANUP => 1, DIR => "$CWD/.tmp" );
 
   my $tcc = FFI::TinyCC->new;
   

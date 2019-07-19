@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Delhi
 
+0.94  Tue Jul 16 18:55:00 2019
+      - Updated dependency on Dist::Zilla::Plugin::Test::Map::Tube v0.43.
+
 0.93  Mon Jul 08 12:55:00 2019
       - Updated dependency on Map::Tube v3.64.
 

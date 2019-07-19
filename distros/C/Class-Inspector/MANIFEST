@@ -12,12 +12,15 @@ dist.ini
 lib/Class/Inspector.pm
 lib/Class/Inspector/Functions.pm
 maint/cip-before-install
+maint/cip-test
+perlcriticrc
 t/00_diag.t
 t/01_use.t
 t/class_inspector.t
 t/class_inspector__devel_hide.t
 t/class_inspector__inc_to_local.t
 t/class_inspector_functions.t
+xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

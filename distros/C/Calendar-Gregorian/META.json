@@ -45,7 +45,7 @@
    "provides" : {
       "Calendar::Gregorian" : {
          "file" : "lib/Calendar/Gregorian.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Gregorian"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

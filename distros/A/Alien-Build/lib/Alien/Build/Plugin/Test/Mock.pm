@@ -8,7 +8,7 @@ use Path::Tiny ();
 use File::chdir;
 
 # ABSTRACT: Mock plugin for testing
-our $VERSION = '1.78'; # VERSION
+our $VERSION = '1.79'; # VERSION
 
 
 has 'probe';
@@ -258,7 +258,7 @@ Alien::Build::Plugin::Test::Mock - Mock plugin for testing
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 

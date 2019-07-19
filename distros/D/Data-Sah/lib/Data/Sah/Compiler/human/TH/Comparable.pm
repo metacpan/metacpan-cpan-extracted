@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human::TH::Comparable;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.896'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.897'; # VERSION
 
 use 5.010;
 use strict;
@@ -42,7 +42,7 @@ Data::Sah::Compiler::human::TH::Comparable - human's type handler for role "Comp
 
 =head1 VERSION
 
-This document describes version 0.896 of Data::Sah::Compiler::human::TH::Comparable (from Perl distribution Data-Sah), released on 2019-07-04.
+This document describes version 0.897 of Data::Sah::Compiler::human::TH::Comparable (from Perl distribution Data-Sah), released on 2019-07-19.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

@@ -1,13 +1,13 @@
 package Sah::Schema::perl::modprefix;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2019-07-05'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module prefix',
     description => <<'_',
 
-Perl module prefix, e.g. `Foo::Bar::`.
+Perl module prefix, e.g. `Foo::Bar::`. An empty prefix ('') is also allowed.
 
 Contains coercion rule so you can also input:
 
@@ -23,7 +23,7 @@ and it will be normalized into `Foo::Bar::`.
 See also: `perl::modprefix`.
 
 _
-    match => '\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::\z',
+    match => '\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)?\z',
 
     'x.perl.coerce_rules' => [
         'str_normalize_perl_modprefix',
@@ -49,11 +49,11 @@ Sah::Schema::perl::modprefix - Perl module prefix
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::Schema::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-06-03.
+This document describes version 0.020 of Sah::Schema::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-07-05.
 
 =head1 DESCRIPTION
 
-Perl module prefix, e.g. C<Foo::Bar::>.
+Perl module prefix, e.g. C<Foo::Bar::>. An empty prefix ('') is also allowed.
 
 Contains coercion rule so you can also input:
 

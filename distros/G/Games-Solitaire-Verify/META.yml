@@ -23,73 +23,73 @@ name: Games-Solitaire-Verify
 provides:
   Games::Solitaire::Verify:
     file: lib/Games/Solitaire/Verify.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::App::CmdLine:
     file: lib/Games/Solitaire/Verify/App/CmdLine.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::App::CmdLine::Expand:
     file: lib/Games/Solitaire/Verify/App/CmdLine/Expand.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::App::CmdLine::From_Patsolve:
     file: lib/Games/Solitaire/Verify/App/CmdLine/From_Patsolve.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::App::Golf:
     file: lib/Games/Solitaire/Verify/App/Golf.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Base:
     file: lib/Games/Solitaire/Verify/Base.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Card:
     file: lib/Games/Solitaire/Verify/Card.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Column:
     file: lib/Games/Solitaire/Verify/Column.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Exception:
     file: lib/Games/Solitaire/Verify/Exception.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Foundations:
     file: lib/Games/Solitaire/Verify/Foundations.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Freecells:
     file: lib/Games/Solitaire/Verify/Freecells.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Golf:
     file: lib/Games/Solitaire/Verify/Golf.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::HorneAutomovePrune:
     file: lib/Games/Solitaire/Verify/HorneAutomovePrune.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::KlondikeTalon:
     file: lib/Games/Solitaire/Verify/KlondikeTalon.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Move:
     file: lib/Games/Solitaire/Verify/Move.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Solution:
     file: lib/Games/Solitaire/Verify/Solution.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Solution::Base:
     file: lib/Games/Solitaire/Verify/Solution/Base.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Solution::ExpandMultiCardMoves:
     file: lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax:
     file: lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves/Lax.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::State:
     file: lib/Games/Solitaire/Verify/State.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::State::LaxParser:
     file: lib/Games/Solitaire/Verify/State/LaxParser.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::VariantParams:
     file: lib/Games/Solitaire/Verify/VariantParams.pm
-    version: '0.2201'
+    version: '0.2202'
   Games::Solitaire::Verify::VariantsMap:
     file: lib/Games/Solitaire/Verify/VariantsMap.pm
-    version: '0.2201'
+    version: '0.2202'
 requires:
   Carp: '0'
   Class::XSAccessor: '0'
@@ -100,6 +100,7 @@ requires:
   List::Util: '0'
   POSIX: '0'
   Path::Tiny: '0'
+  Pod::Usage: '0'
   autodie: '0'
   parent: '0'
   perl: '5.014'
@@ -109,7 +110,7 @@ resources:
   bugtracker: https://github.com/shlomif/fc-solve/issues
   homepage: http://metacpan.org/release/Games-Solitaire-Verify
   repository: git://github.com/shlomif/fc-solve.git
-version: '0.2201'
+version: '0.2202'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -236,10 +237,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile

@@ -1,5 +1,5 @@
 package Net::Stomp::Producer;
-$Net::Stomp::Producer::VERSION = '2.004';
+$Net::Stomp::Producer::VERSION = '2.005';
 {
   $Net::Stomp::Producer::DIST = 'Net-Stomp-Producer';
 }
@@ -244,14 +244,22 @@ Net::Stomp::Producer - helper object to send messages via Net::Stomp
 
 =head1 VERSION
 
-version 2.004
+version 2.005
 
 =head1 SYNOPSIS
 
   my $ser = JSON::XS->new->utf8;
 
   my $p = Net::Stomp::Producer->new({
-    servers => [ { hostname => 'localhost', port => 61613 } ],
+    connect_headers => { login => 'some-login', passcode => 's3cr3t' },
+    servers => [
+      { hostname => 'broker1.local', port => 61613 },
+      { hostname => 'broker2.local', port => 61613, ssl => 1 },
+      { hostname => 'broker3.local', port => 61613, ssl => 1,
+        connect_headers => { login => 'some-different-login',
+                             passcode => 'an0th3r-s3cr3t' },
+      },
+    ],
     serializer => sub { $ser->encode($_[0]) },
     default_headers => { 'content-type' => 'json' },
   });
@@ -399,6 +407,19 @@ of the method is derived from the value of this attribute by
 prepending C<send_> to it (so you can't abuse this to call arbitrary
 methods), unless this attribute's value is C<''> or C<'default'>, in
 which case the simple C<send> method will be used.
+
+For example, C<< sending_method => 'with_receipt' >> will block
+sending until the broker sends back a receipt for the message (or it
+times out).
+
+C<< sending_method => 'transactional' >> will send a C<COMMIT> frame
+when the receipt is received, or a C<ROLLBACK> frame if something
+breaks.
+
+I<NOTE>: these methods work when the connection is used only to send
+messages, and not to receive them! The current implementation will
+very probably deadlock or throw exceptions at random moments if
+messages arrive while you're sending.
 
 =head2 C<transformer_args>
 

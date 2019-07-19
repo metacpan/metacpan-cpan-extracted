@@ -26,4 +26,4 @@ resources:
   bugtracker: https://github.com/upasana-me/Plack-Middleware-RemoveRedundantBody/issues
   homepage: https://github.com/upasana-me/Plack-Middleware-RemoveRedundantBody
   repository: https://github.com/upasana-me/Plack-Middleware-RemoveRedundantBody.git
-version: '0.08'
+version: '0.09'

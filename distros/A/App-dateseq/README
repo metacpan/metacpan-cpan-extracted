@@ -2,8 +2,8 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.094 of App::dateseq (from Perl
-    distribution App-dateseq), released on 2019-06-24.
+    This document describes version 0.096 of App::dateseq (from Perl
+    distribution App-dateseq), released on 2019-07-16.
 
 FUNCTIONS
   dateseq
@@ -98,6 +98,13 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    durseq. Produce sequence of date durations.
+
+    seq.
+
+    seq-pl. Perl variant of seq.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

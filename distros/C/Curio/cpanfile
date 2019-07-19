@@ -6,6 +6,7 @@ requires 'Import::Into' => '1.002005';
 requires 'Moo' => '2.003000';
 requires 'Moo::Role' => '2.003000';
 requires 'Package::Stash' => '0.36';
+requires 'Type::Utils' => '1.002001';
 requires 'Types::Common::String' => '1.002001';
 requires 'Types::Standard' => '1.002001';
 
@@ -21,5 +22,4 @@ on test => sub {
     suggests 'Algorithm::Loops' => '1.032';
     suggests 'CHI' => '0.60';
     suggests 'List::MoreUtils' => '0.428';
-    suggests 'MooX::BuildArgs' => '0.08';
 };

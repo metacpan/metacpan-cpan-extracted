@@ -1,5 +1,5 @@
 package Net::Stomp::MooseHelpers::Exceptions;
-$Net::Stomp::MooseHelpers::Exceptions::VERSION = '2.9';
+$Net::Stomp::MooseHelpers::Exceptions::VERSION = '3.0';
 {
   $Net::Stomp::MooseHelpers::Exceptions::DIST = 'Net-Stomp-MooseHelpers';
 }
@@ -8,7 +8,7 @@ $Net::Stomp::MooseHelpers::Exceptions::VERSION = '2.9';
 
 {
 package Net::Stomp::MooseHelpers::Exceptions::Stringy;
-$Net::Stomp::MooseHelpers::Exceptions::Stringy::VERSION = '2.9';
+$Net::Stomp::MooseHelpers::Exceptions::Stringy::VERSION = '3.0';
 {
   $Net::Stomp::MooseHelpers::Exceptions::Stringy::DIST = 'Net-Stomp-MooseHelpers';
 }
@@ -21,7 +21,7 @@ requires 'as_string';
 }
 {
 package Net::Stomp::MooseHelpers::Exceptions::Stomp;
-$Net::Stomp::MooseHelpers::Exceptions::Stomp::VERSION = '2.9';
+$Net::Stomp::MooseHelpers::Exceptions::Stomp::VERSION = '3.0';
 {
   $Net::Stomp::MooseHelpers::Exceptions::Stomp::DIST = 'Net-Stomp-MooseHelpers';
 }
@@ -50,7 +50,7 @@ Net::Stomp::MooseHelpers::Exceptions - exception classes for Net::Stomp::MooseHe
 
 =head1 VERSION
 
-version 2.9
+version 3.0
 
 =head1 DESCRIPTION
 

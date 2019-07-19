@@ -31,7 +31,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.06';
+    $VERSION = '0.08';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -84,6 +84,7 @@ sub _initialize()
         identity_file  => undef,
         debug          => undef,
         localDirectory => undef,
+        ssh_options    => undef,
         directories    => {},
     };
 
@@ -171,6 +172,10 @@ my $setSsl = sub {
     my ( $self, $value ) = @_;
     return $self->{ config }->{ ssl } = $value;
 };
+my $setSshOptions = sub {
+    my ( $self, $value ) = @_;
+    return $self->{ config }->{ ssh_options } = $value;
+};
 my $setIdentityFile = sub {
     my ( $self, $value ) = @_;
     return $self->{ config }->{ identity_file } = $value;
@@ -244,6 +249,7 @@ sub setConfig()
     $self->$setDebug( $parameters{ debug } );
     $self->$setPassive( $parameters{ passive } );
     $self->$setSsl( $parameters{ ssl } );
+    $self->$setSshOptions( $parameters{ ssh_options } );
     $self->$setIdentityFile( $parameters{ identity_file } );
     $self->$setLocalDirectory( $parameters{ localDirectory } );
     $self->$setDirectories( $parameters{ directories } );
@@ -355,9 +361,15 @@ sub connectSFTP ()
             -o => 'HostKeyAlgorithms +ssh-dss',
         ],
     );
+    push @{ $args{ more } }, '-v' if $self->{ config }->{ debug };
 
     push @{ $args{ key_path } }, $self->{ config }->{ identity_file } if $self->{ config }->{ identity_file };
-    push @{ $args{ more } }, '-v' if ( $self->{ config }->{ debug } );
+
+    if ( $self->{ config }->{ ssh_options } )
+    {
+        my @ssh_options = split( '\|', $self->{ config }->{ ssh_options } );
+        push @{ $args{ more } }, map { -o => $_ } @ssh_options;
+    }
 
     $log->info( "Conectando no SFTP [ $args{host}\:$args{port} ]" );
     $self->{ connection } = eval { Net::SFTP::Foreign->new( %args ); };
@@ -497,6 +509,7 @@ sub getFilesFTP()
 
     if ( ( !defined $remoteFiles ) && ( $self->{ connection }->message() =~ /No files found/ ) )
     {
+        $log->warn( $self->{ connection }->message() );
         return {
             error   => 0,
             message => $self->{ connection }->message(),
@@ -552,6 +565,10 @@ sub getFilesFTP()
         } ## end foreach my $remoteFile ( @{...})
     } ## end else [ if ( ( !defined $remoteFiles...))]
 
+    if ( scalar @{ $retorno->{ downloadedFiles } } == 0 )
+    {
+        $log->warn( 'Nenhum arquivo para ser baixado...' );
+    }
     return $retorno;
 } ## end sub getFilesFTP
 
@@ -613,7 +630,7 @@ sub getFilesSFTP()
         }
     );
 
-    if ( $ls )
+    if ( scalar @{ $ls } > 0 )
     {
         my $callback = sub {
             my ( $sftp, $data, $offset, $size, $progress ) = @_;
@@ -629,6 +646,7 @@ sub getFilesSFTP()
                     count  => $remoteFile->{ a }->{ size },
                     ETA    => 'linear',
                     remove => 1,
+                    silent => !DEBUG,
                 }
             );
             $progress->minor( 0 );
@@ -664,11 +682,17 @@ sub getFilesSFTP()
 
             push( @{ $retorno->{ downloadedFiles } }, $downloadedFile );
         } ## end foreach my $remoteFile ( @{...})
-    } ## end if ( $ls )
+    } ## end if ( scalar @{ $ls } >...)
     else
     {
-        $log->warn( 'Nenhuma arquivo para ser baixado...' );
-    }
+        my $msg = "Nenhum arquivo para ser baixado...";
+        $log->warn( $msg );
+        return {
+            error   => 0,
+            message => $msg,
+            files   => []
+        };
+    } ## end else [ if ( scalar @{ $ls } >...)]
 
     return $retorno;
 } ## end sub getFilesSFTP

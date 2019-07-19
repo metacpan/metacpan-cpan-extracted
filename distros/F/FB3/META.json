@@ -40,7 +40,7 @@
    "provides" : {
       "FB3" : {
          "file" : "lib/FB3.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "FB3::Validator" : {
          "file" : "lib/FB3/Validator.pm"
@@ -55,5 +55,5 @@
          "url" : "https://github.com/gribuser/FB3"
       }
    },
-   "version" : "0.15"
+   "version" : "0.16"
 }

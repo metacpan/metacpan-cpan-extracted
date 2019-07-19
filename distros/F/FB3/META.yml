@@ -16,7 +16,7 @@ name: FB3
 provides:
   FB3:
     file: lib/FB3.pm
-    version: '0.15'
+    version: '0.16'
   FB3::Validator:
     file: lib/FB3/Validator.pm
 requires:
@@ -31,4 +31,4 @@ requires:
 resources:
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
   repository: https://github.com/gribuser/FB3
-version: '0.15'
+version: '0.16'

@@ -2,7 +2,7 @@ package Test2::Harness::UI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000003';
 
 use Router::Simple;
 use Text::Xslate(qw/mark_raw/);
@@ -52,6 +52,7 @@ sub init {
     $router->connect('/query/:name/:arg' => {controller => 'Test2::Harness::UI::Controller::Query'});
 
     $router->connect('/run/:id'          => {controller => 'Test2::Harness::UI::Controller::Run'});
+    $router->connect('/run/:id/pin'      => {controller => 'Test2::Harness::UI::Controller::Run', action => 'pin_toggle'});
     $router->connect('/job/:id'          => {controller => 'Test2::Harness::UI::Controller::Job'});
     $router->connect('/run/:id/jobs'     => {controller => 'Test2::Harness::UI::Controller::Jobs',   from => 'run'});
     $router->connect('/job/:id/events'   => {controller => 'Test2::Harness::UI::Controller::Events', from => 'job'});

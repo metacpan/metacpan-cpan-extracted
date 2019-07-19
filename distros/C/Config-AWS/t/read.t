@@ -69,8 +69,18 @@ describe 'Config::AWS read tests' => sub {
 
         local $ENV{AWS_SHARED_CREDENTIALS_FILE}
             = $dir->child('credentials/.aws/credentials');
+
         like Config::AWS::read( undef, 'default' ),
             { parent => { child => 'value for credentials child' } },
+            'Read default credentials file from ENV';
+    };
+
+    it 'Reads profile with hyphens' => sub {
+        my $dir = path dist_dir('Config-AWS');
+
+        my $file = $dir->child('credentials/.aws/credentials');
+        like Config::AWS::read( $file, 'with-hyphens' ),
+            { key => 'key-with-hyphens' },
             'Read default credentials file from ENV';
     };
 

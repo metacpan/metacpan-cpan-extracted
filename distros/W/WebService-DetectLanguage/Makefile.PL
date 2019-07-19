@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-DetectLanguage",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "WebService::DetectLanguage",
   "PREREQ_PM" => {
     "HTTP::Tiny" => 0,
@@ -23,11 +23,13 @@ my %WriteMakefileArgs = (
     "Moo" => 0
   },
   "TEST_REQUIRES" => {
+    "Ref::Util" => "0.202",
     "Test::More" => "0.88",
+    "lib" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +41,9 @@ my %FallbackPrereqs = (
   "IO::Socket::SSL" => 0,
   "JSON::MaybeXS" => 0,
   "Moo" => 0,
+  "Ref::Util" => "0.202",
   "Test::More" => "0.88",
+  "lib" => 0,
   "strict" => 0,
   "warnings" => 0
 );

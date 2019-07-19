@@ -2,14 +2,14 @@ use strict;
 use warnings;
 use Test::More 0.88;
 
-use Test::Requires {
+use Test::Needs {
     'MooseX::Role::WithOverloading' => '0.14',
 };
 
 do {
     package MyParameterizedRole;
 
-    use MooseX::Role::WithOverloading;
+    BEGIN { MooseX::Role::WithOverloading->import }
     use MooseX::Role::Parameterized;
 
     use overload q{""} => '_stringify';

@@ -5,13 +5,12 @@ use strict;
 use warnings;
 use Exporter         ();
 use Class::Inspector ();
+use base qw( Exporter );
 
 # ABSTRACT: Get information about a class and its structure
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 BEGIN {
-  our @ISA     = 'Exporter';
-
 
   our @EXPORT = qw(
     installed
@@ -58,7 +57,7 @@ Class::Inspector::Functions - Get information about a class and its structure
 
 =head1 VERSION
 
-version 1.34
+version 1.36
 
 =head1 SYNOPSIS
 

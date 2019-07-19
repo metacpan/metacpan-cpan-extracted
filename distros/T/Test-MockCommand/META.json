@@ -1,0 +1,47 @@
+{
+   "abstract" : "provide mock results for external commands",
+   "author" : [
+      "Stuart Caie <kyzer@kyzer.me.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-MockCommand",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Errno" : "0",
+            "POSIX" : "0",
+            "Symbol" : "0",
+            "Tie::Handle" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

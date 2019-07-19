@@ -42,10 +42,6 @@ Use [Sys::Sendfile](https://metacpan.org/pod/Sys::Sendfile).
     Also optionally, `$offset` can be specified to set a specific-sized chunk from
     a specific offset.
 
-# REPOSITORY
-
-[https://github.com/ltriant/Sys-Sendfile-OSX](https://github.com/ltriant/Sys-Sendfile-OSX)
-
 # AUTHOR
 
 Luke Triantafyllidis <ltriant@cpan.org>

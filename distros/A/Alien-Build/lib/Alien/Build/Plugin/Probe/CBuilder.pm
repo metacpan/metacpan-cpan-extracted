@@ -8,7 +8,7 @@ use File::Temp ();
 use Capture::Tiny qw( capture_merged capture );
 
 # ABSTRACT: Probe for system libraries by guessing with ExtUtils::CBuilder
-our $VERSION = '1.78'; # VERSION
+our $VERSION = '1.79'; # VERSION
 
 
 has options => sub { {} };
@@ -68,7 +68,7 @@ sub init
   $meta->register_hook(
     probe => sub {
       my($build) = @_;
-      local $CWD = File::Temp::tempdir( CLEANUP => 1 );
+      local $CWD = File::Temp::tempdir( CLEANUP => 1, DIR => $CWD );
       
       open my $fh, '>', 'mytest.c';
       print $fh $self->program;
@@ -161,7 +161,7 @@ Alien::Build::Plugin::Probe::CBuilder - Probe for system libraries by guessing w
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 

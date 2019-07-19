@@ -21,8 +21,8 @@ requires:
   Data::Sah::Coerce::perl::date::float_epoch: '0.025'
   Data::Sah::Coerce::perl::date::obj_DateTime: '0.025'
   Data::Sah::Coerce::perl::date::obj_TimeMoment: '0.025'
-  Data::Sah::Coerce::perl::date::str_alami_en: '0.008'
   Data::Sah::Coerce::perl::date::str_iso8601: '0.025'
+  Data::Sah::Coerce::perl::date::str_natural: '0.006'
   Data::Sah::Coerce::perl::duration::float_secs: '0.025'
   Data::Sah::Coerce::perl::duration::obj_DateTimeDuration: '0.025'
   Data::Sah::Coerce::perl::duration::str_human: '0.025'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq
   homepage: https://metacpan.org/release/App-dateseq
   repository: git://github.com/perlancar/perl-App-dateseq.git
-version: '0.094'
+version: '0.096'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -328,7 +328,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'

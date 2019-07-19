@@ -1,5 +1,12 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+0.008     2019-07-16 20:40:17+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - when creating a table, the primary key(s) were not quoted
+
 0.007     2019-06-30 01:52:53+08:00 Asia/Kuala_Lumpur
     No new features.
 

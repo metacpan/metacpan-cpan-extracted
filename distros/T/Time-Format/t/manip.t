@@ -2,31 +2,31 @@
 
 use strict;
 use Test::More tests => 6;
+use FindBin;
+use lib $FindBin::Bin;
+use TimeFormat_MC;
 
+
+## ----------------------------------------------------------------------------------
+## Test for availability of certain modules.
+my ($dm_ok, $dmtz_ok) = tf_module_check('Date::Manip');
+
+
+## ----------------------------------------------------------------------------------
+## Load our module.
 BEGIN { $Time::Format::NOXS = 1 }
 BEGIN { use_ok 'Time::Format', qw(%manip) }
-my $manip_bad;
-BEGIN
-{
-    unless (eval 'use Date::Manip (); 1')
-    {
-        $manip_bad = 'Date::Manip is not available';
-    }
-    else
-    {
-        # If Date::Manip can't determine the time zone, it'll bomb out of the tests.
-        $manip_bad = 'Date::Manip cannot determine time zone'
-            unless eval 'Date::Manip::Date_TimeZone(); 1';
-    }
-    delete $INC{'Date/Manip.pm'};
-    %Date::Manip:: = ();
-}
+
+
+## ----------------------------------------------------------------------------------
+## Begin tests.
 
 my $t = 'first thursday in june 2003';
 
 SKIP:
 {
-    skip $manip_bad, 5 if $manip_bad;
+    skip 'Date::Manip is not available',           5  unless $dm_ok;
+    skip 'Date::Manip cannot determine time zone', 5  unless $dmtz_ok;
     is $manip{'%Y',$t},      '2003'      => 'year';
     is $manip{'%d',$t},      '05'        => 'day of month';
     is $manip{'%D',$t},      '06/05/03'  => '%D';

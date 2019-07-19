@@ -2,26 +2,23 @@
 
 use strict;
 use Test::More tests => 12;
+use FindBin;
+use lib $FindBin::Bin;
+use TimeFormat_MC;
 
+## ----------------------------------------------------------------------------------
+## Test for availability of certain modules.
+my ($dm_ok, $dmtz_ok) = tf_module_check('Date::Manip');
+
+
+## ----------------------------------------------------------------------------------
+## Load our module.
 BEGIN { $Time::Format::NOXS = 1 }
 BEGIN { use_ok 'Time::Format', qw(time_format %time) }
 
-my $manip_bad;
-BEGIN
-{
-    if (eval 'use Date::Manip (); 1')
-    {
-        # If Date::Manip can't determine the time zone, it'll bomb out of the tests.
-        $manip_bad = 'Date::Manip cannot determine time zone'
-            unless eval 'Date::Manip::Date_TimeZone(); 1';
-    }
-    else
-    {
-        $manip_bad = 'Date::Manip is not available';
-    }
-}
 
-# Get day/month names in current locale
+## ----------------------------------------------------------------------------------
+## Get day/month names in current locale; fallback to English (sorry!).
 my ($Thursday, $Thu, $June, $Jun);
 unless (eval
     {
@@ -34,10 +31,16 @@ unless (eval
     ($Thursday, $Thu, $June, $Jun) = qw(Thursday Thu June Jun);
 }
 
+
+## ----------------------------------------------------------------------------------
+## Begin tests.
+
 SKIP:
 {
-    skip $manip_bad, 11  if $manip_bad;
+    skip 'Date::Manip is not available',           11  unless $dm_ok;
+    skip 'Date::Manip cannot determine time zone', 11  unless $dmtz_ok;
 
+    require Date::Manip;
     my $t = Date::Manip::ParseDate('June 5, 2003 at 1:58:09 pm');
 
     # time_format tests (5)

@@ -22,12 +22,16 @@ requires:
   Test2::Compare::Hash: '0.000060'
   Test2::Compare::String: '0.000060'
   URI: '1.61'
+  URI::QueryParam: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/plicease/Test2-Tools-URL/issues
   homepage: https://metacpan.org/pod/Test2::Tools::URL
   repository: git://github.com/plicease/Test2-Tools-URL.git
-version: '0.04'
-x_generated_by_perl: v5.30.0
+version: '0.05'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Paul Durden (alabamapaul, PDURDEN)'
+x_generated_by_perl: v5.31.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

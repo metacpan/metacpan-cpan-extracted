@@ -2,8 +2,8 @@
 
 package Test::Data::Sah;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.896'; # VERSION
+our $DATE = '2019-07-19'; # DATE
+our $VERSION = '0.897'; # VERSION
 
 use 5.010;
 use strict;
@@ -329,7 +329,7 @@ Test::Data::Sah - Test routines for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.896 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2019-07-04.
+This document describes version 0.897 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2019-07-19.
 
 =head1 FUNCTIONS
 

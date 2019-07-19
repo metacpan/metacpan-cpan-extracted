@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.37      2019-07-18 11:56:47 -0400
+  - Fix some Perl::Critic violations in generated code.
+
 2.36      2019-03-10 19:37:45 -0400
   - Bump version for bundle
 

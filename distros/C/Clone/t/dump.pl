@@ -2,8 +2,8 @@
 ;#
 ;#  Copyright (c) 1995-2000, Raphael Manfredi
 ;#  
-;#  You may redistribute only under the terms of the Artistic License,
-;#  as specified in the README file that comes with the distribution.
+;# You may redistribute and/or modify this file
+;# under the same terms as Perl itself.
 ;#
 ;# Log: dump.pl,v 
 ;# Revision 0.7  2000/08/03 22:04:45  ram

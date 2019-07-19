@@ -23,7 +23,7 @@ If no directory is specified, the current one is used.
 }
 
 sub version{
-	print "punchcard-git v. 0.0.1\n";
+	print "punchcard-git v. 0.1.0\n";
 }
 
 my @colors=(
@@ -129,7 +129,10 @@ my $table=Text::Table->new(
 						   '21',
 						   '22',
 						   '23',
-						   'Total'
+						   'Total',
+						   'Max',
+						   'Avg',
+						   'Min'
 );
 
 my $card=$gpc->get_card;
@@ -145,14 +148,28 @@ foreach my $day ( @days ){
 		push( @line, color($colors[$color_to_use]).$card->{$day}{$hour}.color('WHITE') );
 	}
 
+	my $min_color=13*($card->{$day}{min}/$card->{max});
+	my $average_color=13*($card->{$day}{average}/$card->{max});
+	my $max_color=13*($card->{$day}{max}/$card->{max});
+	
 	push( @line, $card->{$day}{total}.color('WHITE') );
+	push( @line, color($colors[$max_color]).$card->{$day}{max}.color('WHITE') );
+	push( @line, color($colors[$average_color]).sprintf('%.1f',$card->{$day}{average}).color('WHITE') );
+	push( @line, color($colors[$min_color]).$card->{$day}{min}.color('WHITE') );
 
 	push( @data, \@line );
 }
 
 $table->load( @data );
 
-print $table."\nTotal: ".$card->{total}."\nHourly Max=".$card->{max}."\n";
+my $min_color=13*($card->{min}/$card->{max});
+my $average_color=13*($card->{average}/$card->{max});
+
+print $table.
+"\nTotal: ".$card->{total}.
+"\nMax=".color($colors[13]).$card->{max}.color('WHITE').
+"\nAverage=".color($colors[$average_color]).sprintf("%.1f",$card->{average}).color('WHITE').
+"\nMin=".color($colors[$min_color]).$card->{min}.color('WHITE')."\n";
 
 =head1 NAME
 

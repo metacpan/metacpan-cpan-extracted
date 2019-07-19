@@ -31,3 +31,4 @@ t/recording-v595.t
 t/recording.t
 t/scalar-readline.t
 t/status-funcs.t
+META.json                                Module JSON meta-data (added by MakeMaker)

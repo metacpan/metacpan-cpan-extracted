@@ -22,7 +22,7 @@ Sah - Schema for data structures (specification)
 
 =head1 VERSION
 
-This document describes version 0.9.45 of Sah (from Perl distribution Sah), released on 2017-03-09.
+This document describes version 0.9.46 of Sah (from Perl distribution Sah), released on 2019-07-19.
 
 =head1 STATUS
 
@@ -221,7 +221,7 @@ clause attributes.
 
 For convenience, there are also some shortcuts:
 
-=over 4
+=over
 
 =item * C<&> suffix (multiple clause values, all must succeed)
 
@@ -317,12 +317,12 @@ e.g. C<alt.lang.id_ID>. As with clauses, clause attributes which begin with C<_>
 
 Currently known general attributes:
 
-=over 4
+=over
 
-=item * prio : INT
+=item * prio
 
-Change the clause's priority for this clause set. Note that this only works for
-clauses which have equal priorities. Otherwise, priority value from clause
+Int. Change the clause's priority for this clause set. Note that this only works
+for clauses which have equal priorities. Otherwise, priority value from clause
 definition takes precedence.
 
 Example:
@@ -331,9 +331,9 @@ Example:
  // that "min" is evaluated first
  ["int*", {"min=": "some expr", "min.prio": 1, "max": 10}]
 
-=item * op : STR
+=item * op
 
-Specify operator for (multiple) clause values. Possible values for this
+Str. Specify operator for (multiple) clause values. Possible values for this
 attribute include: C<and>, C<or>, C<none>, C<not>. Except for C<not>, the
 presence of C<op> signifies that clause contains multiple values instead of a
 single one.
@@ -374,9 +374,9 @@ clause must fail for validation to succeed). Example:
 
 The above schema specifies not string must not match regex RE.
 
-=item * is_expr : BOOL
+=item * is_expr
 
-Signify that clause contains expression (see L</"EXPRESSION">) instead of
+Bool. Signify that clause contains expression (see L</"EXPRESSION">) instead of
 literal value. Example:
 
  // a string, minimum 4 characters
@@ -413,12 +413,12 @@ return an array of values. Otherwise, the clause will fail. Example:
      "contains": "get_blacklist()"
  }]
 
-=item * err_level : STR (default: error)
+=item * err_level
 
-Valid value: C<fatal>, C<error>, C<warn>. Normally, when clause checking fails,
-an error is generated and it causes validation of the whole schema to fail. If
-C<err_level> is set to C<warn>, however, this only generates a warning and does
-not cause the validation to fail.
+Str, default C<error>. Valid value: C<fatal>, C<error>, C<warn>. Normally, when
+clause checking fails, an error is generated and it causes validation of the
+whole schema to fail. If C<err_level> is set to C<warn>, however, this only
+generates a warning and does not cause the validation to fail.
 
  // password
  ["str*", {"clset&": [
@@ -441,9 +441,9 @@ errors instead of just stopping after the first error is found.
 
 =item * err_msg[.alt.lang.LANGCODE]
 
-This tells the compiler that instead of the default error message from the type
-handler, a custom error message is supplied. You can add translations by adding
-more attributes with language code suffixes. For example:
+From DefHash. This tells the compiler that instead of the default error message
+from the type handler, a custom error message is supplied. You can add
+translations by adding more attributes with language code suffixes. For example:
 
  ["str", {"match":                "[^A-Za-z0-9_-]",
           "match.err_msg":                "Must not contain naughty characters",
@@ -459,8 +459,8 @@ Another example:
 
 =item * human[.alt.lang.LANGCODE]
 
-This is also ignored when validating data, but will be used by the human
-compiler to supply description. You can add translations by adding more
+From DefHash. This is also ignored when validating data, but will be used by the
+human compiler to supply description. You can add translations by adding more
 attributes.
 
  ["str", {"match":             "[^A-Za-z0-9_-]",
@@ -473,9 +473,9 @@ attributes.
 This comes from DefHash, mainly used to store translations for C<name>,
 C<summary>, C<description>.
 
-=item * result_var : VARNAME (EXPERIMENTAL)
+=item * result_var
 
-Specify variable name to store results in.
+EXPERIMENTAL. Str. Specify variable name to store results in.
 
 Aside from pass/failure, a clause or clause set can also produce some value.
 This attribute specifies where to put the results in. The value can then be
@@ -678,7 +678,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

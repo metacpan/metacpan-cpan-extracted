@@ -1,0 +1,83 @@
+{
+   "abstract" : "Build Curio classes around DBIx::Connector.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Curio-Role-DBIx-Connector",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Curio::Role" : "0.04",
+            "DBIx::Connector" : "0.53",
+            "Moo::Role" : "2.003000",
+            "Types::Standard" : "1.002001",
+            "namespace::clean" : "0.27",
+            "perl" : "5.008001",
+            "strictures" : "2.000001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Curio" : "0.04",
+            "DBD::SQLite" : "1.44",
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "Curio::Role::DBIx::Connector" : {
+         "file" : "lib/Curio/Role/DBIx/Connector.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Curio-Role-DBIx-Connector/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Curio-Role-DBIx-Connector",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/Curio-Role-DBIx-Connector.git",
+         "web" : "https://github.com/bluefeet/Curio-Role-DBIx-Connector"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

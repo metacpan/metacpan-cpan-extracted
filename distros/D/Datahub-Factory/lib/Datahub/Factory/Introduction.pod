@@ -74,7 +74,7 @@ All commands share the following switches:
 
 =over
 
-=item --log_level
+=item --log_level --L [int]
 
 Set the log_level. Takes a numeric parameter. Supported levels are: 1 (WARN), 
 2 (INFO), 3 (DEBUG). WARN (1) is the default.
@@ -84,10 +84,14 @@ Set the log_level. Takes a numeric parameter. Supported levels are: 1 (WARN),
 Selects an output for the log messages. By default, it will send them to STDERR 
 (pass STDERR as parameter), but STDOUT (STDOUT) and a log file.
 
-=item --verbose
+=item --verbose -v
 
 Set verbosity. Invoking the command with the --verbose, -v flag will render 
 verbose output to the terminal.
+
+=item --number -n [int]
+
+Set number of records to process. Invoking the transport command with the --number, -n flag will process the first [int] records instead of all records available at the data source.
 
 =back
 

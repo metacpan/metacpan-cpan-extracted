@@ -3,13 +3,20 @@
 use strict;
 use Test::More tests => 23;
 
+## ----------------------------------------------------------------------------------
+## Test for availability of certain modules.
+my $tl_ok;
+BEGIN {$tl_ok = eval ('use Time::Local; 1')}
+
+
+## ----------------------------------------------------------------------------------
+## Load our module.
 BEGIN { $Time::Format::NOXS = 1 }
 BEGIN { use_ok 'Time::Format' }
 
-my $tl_notok;
-BEGIN {$tl_notok = eval ('use Time::Local; 1')? 0 : 1}
 
-# Get day/month names in current locale
+## ----------------------------------------------------------------------------------
+## Get day/month names in current locale; fallback to English (sorry!).
 my ($Thursday, $Thu, $June, $Jun);
 unless (eval
     {
@@ -24,9 +31,13 @@ unless (eval
 my $june = lc $June;
 my $JUNE = uc $June;
 
+
+## ----------------------------------------------------------------------------------
+## Begin tests.
+
 SKIP:
 {
-    skip 'Time::Local not available', 22  if $tl_notok;
+    skip 'Time::Local not available', 22  unless $tl_ok;
     my $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
     $t .= '.987654321';
 

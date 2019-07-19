@@ -2,6 +2,7 @@
 use lib 't/lib';
 use TestHelp;
 use Test::Fatal;
+use Log::Any::Adapter::Test;
 
 {no warnings 'redefine';
  sub Net::Stomp::_get_connection {}
@@ -49,6 +50,12 @@ subtest 'failover' => sub {
 };
 
 subtest 'bad failover' => sub {
+    Log::Any::Adapter->set(
+        { lexically => \(my $guard) },
+        'Test',
+    );
+    Log::Any::Adapter::Test->clear;
+
     like(
         exception { mkstomp(failover=>'bad') },
         qr{Unable to parse failover uri}i,
@@ -60,6 +67,11 @@ subtest 'bad failover' => sub {
         'bad component correct exception',
     );
 
+    Log::Any::Adapter::Test->category_contains_ok(
+        'Net::Stomp',
+        qr{Unable to parse failover uri},
+        'the problem should be logged',
+    );
 };
 
 done_testing;

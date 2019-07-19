@@ -18,6 +18,7 @@
 #include "b_string.h"
 
 #define B_FIND_FOLLOW_SYMLINKS (1 << 0)
+#define B_FIND_IGNORE_SOCKETS  (1 << 1)
 #define B_FIND_CALLBACK(c)     ((b_find_callback)c)
 
 typedef int (*b_find_callback)(b_builder *builder, b_string *path, b_string *member_name, struct stat *st, int fd);

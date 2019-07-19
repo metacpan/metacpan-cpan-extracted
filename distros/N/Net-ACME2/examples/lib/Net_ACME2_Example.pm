@@ -39,7 +39,7 @@ sub run {
         print "… by hitting ENTER now.$/";
         <>;
 
-        my $created = $acme->create_new_account(
+        my $created = $acme->create_account(
             termsOfServiceAgreed => 1,
         );
     }

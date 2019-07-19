@@ -1,19 +1,24 @@
 #!/perl -I..
 
 # Test examples in the docs, so we know we're not misleading anyone.
-# XS TEST: Only need to test the %time and time_format bits.
+# XS TEST: Only need to test the %time and time_format parts.
 
 use strict;
 use Test::More tests => 18;
 
+## ----------------------------------------------------------------------------------
+## Test for availability of certain modules.
+my $tl_ok;
+BEGIN {$tl_ok = eval ('use Time::Local; 1')}
+
+
+## ----------------------------------------------------------------------------------
+## Load our module.
 BEGIN { use_ok 'Time::Format', qw(:all) }
-my $tl_notok;
-BEGIN {$tl_notok = eval ('use Time::Local; 1')? 0 : 1}
 
-# Were all variables imported? (1)
-is ref tied %time,     'Time::Format'   =>  '%time imported';
 
-# Get day/month names in current locale
+## ----------------------------------------------------------------------------------
+## Get day/month names in current locale; fallback to English (sorry!).
 my ($Tuesday, $December, $Thursday, $Thu, $June, $Jun);
 unless (eval
     {
@@ -26,8 +31,15 @@ unless (eval
     ($Tuesday, $December, $Thursday, $Thu, $June, $Jun) = qw(Tuesday December Thursday Thu June Jun);
 }
 
+
+## ----------------------------------------------------------------------------------
+## Begin tests.
+
+# Were all variables imported? (1)
+is ref tied %time,     'Time::Format'   =>  '%time imported';
+
 my $t;
-unless ($tl_notok)
+unless ($tl_ok)
 {
     $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
     $t .= '.987654321';
@@ -35,8 +47,8 @@ unless ($tl_notok)
 
 SKIP:
 {
-    skip 'Time::Local not available', 16  if $tl_notok;
-    skip 'XS version not available',  16  if !defined $Time::Format_XS::VERSION;
+    skip 'Time::Local not available', 16  unless $tl_ok;
+    skip 'XS version not available',  16  unless defined $Time::Format_XS::VERSION;
 
     # Synopsis tests (5)
     is "Today is $time{'yyyy/mm/dd',$t}", 'Today is 2003/06/05'   => 'Today';

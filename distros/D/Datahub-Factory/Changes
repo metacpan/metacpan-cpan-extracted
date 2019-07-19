@@ -1,5 +1,16 @@
 Revision history for Datahub-Factory
 
+1.77  2019-07-19 15:53:48 CEST
+
+    - Fixed: Add missing LWP::Protocol::https.
+
+1.76  2019-07-18 12:27:09 CEST
+
+    - Removed: stale TMS importer module.
+    - Fixed: missing --number documentation in README.
+    - Fixed: Add missing Module::Build to make Travis happy.
+    - Fixed: Added missing prereq as suggested by CPANTS.
+
 1.75  2019-07-15 17:09:34 CEST
 
     - Fixed: Error output for Solr indexer without Perl errors.

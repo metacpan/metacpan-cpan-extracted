@@ -31,7 +31,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Bahai' => { file => 'lib/Calendar/Bahai.pm', version => '0.52' },
+            'Calendar::Bahai' => { file => 'lib/Calendar/Bahai.pm', version => '0.53' },
         },
         resources => {
             repository => {

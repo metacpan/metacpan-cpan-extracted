@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Column;
-$Games::Solitaire::Verify::Column::VERSION = '0.2201';
+$Games::Solitaire::Verify::Column::VERSION = '0.2202';
 use warnings;
 use strict;
 
@@ -190,7 +190,7 @@ columns that are composed of a sequence of cards.
 
 =head1 VERSION
 
-version 0.2201
+version 0.2202
 
 =head1 SYNOPSIS
 
@@ -207,10 +207,6 @@ version 0.2201
     print $column->len();
 
     my $queen_card = $column->pos(1);
-
-=head1 VERSION
-
-version 0.2201
 
 =head1 METHODS
 

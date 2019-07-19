@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '1.78'; # VERSION
+our $VERSION = '1.79'; # VERSION
 
 
 has '+url' => undef;
@@ -181,7 +181,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 
@@ -189,7 +189,7 @@ version 1.78
  share {
    start_url 'http://ftp.gnu.org/gnu/make';
    plugin 'Download' => (
-     filter => qr/^make-.*\.tar.\gz$/,
+     filter => qr/^make-.*\.tar\.gz$/,
      version => qr/([0-9\.]+)/,
    );
  };

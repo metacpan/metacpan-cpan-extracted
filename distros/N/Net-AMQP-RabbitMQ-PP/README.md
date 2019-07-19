@@ -26,7 +26,7 @@ Like [Net::RabbitMQ](https://metacpan.org/pod/Net::RabbitMQ) but pure perl rathe
 
 # VERSION
 
-0.08
+0.09
 
 # SUBROUTINES/METHODS
 
@@ -55,11 +55,13 @@ Connect to the server. Default arguments are shown below:
         );
 
 connect can also take a secure flag for SSL connections, this will only work if
-[IO::Socket::SSL](https://metacpan.org/pod/IO::Socket::SSL) is available
+[IO::Socket::SSL](https://metacpan.org/pod/IO::Socket::SSL) is available. You can also pass SSL specific arguments through
+in the connect method and these will be passed through
 
         $mq->connect(
                 ...
                 secure => 1,
+                SSL_blah_blah => 1,
         );
 
 ## disconnect

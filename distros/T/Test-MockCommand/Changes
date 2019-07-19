@@ -16,3 +16,10 @@ Revision history for Perl extension Test::MockCommand.
 	- for perl 5.6, skipped 6 tests of open() that it can't handle
 	- define WIFEXITED and WEXITSTATUS macros if not implemented
 	- macros defined and tests now pass on Win32, thanks to William Orr
+
+0.04
+	- fix docmentation error
+	- support changes to readpipe() in perl >= 5.27.7
+
+0.05
+	- fix email address

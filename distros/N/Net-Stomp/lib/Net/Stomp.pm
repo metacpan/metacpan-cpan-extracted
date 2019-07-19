@@ -5,8 +5,8 @@ use IO::Select;
 use Net::Stomp::Frame;
 use Carp qw(longmess);
 use base 'Class::Accessor::Fast';
-use Net::Stomp::StupidLogger;
-our $VERSION = '0.57';
+use Log::Any;
+our $VERSION = '0.60';
 
 __PACKAGE__->mk_accessors( qw(
     current_host failover hostname hosts port select serial session_id socket ssl
@@ -38,8 +38,7 @@ sub new {
     $self->initial_reconnect_attempts(1) unless defined $self->initial_reconnect_attempts;
     $self->socket_options({}) unless defined $self->socket_options;
 
-    $self->logger(Net::Stomp::StupidLogger->new())
-        unless $self->logger;
+    $self->logger(Log::Any->get_logger) unless $self->logger;
 
     $self->{_framebuf} = "";
 
@@ -155,10 +154,12 @@ sub _get_socket {
             "You should install the IO::Socket::SSL module for SSL support in Net::Stomp"
         ) if $@;
         %sockopts = ( %sockopts, %{ $self->ssl_options || {} } );
+        $self->logger->trace('opening IO::Socket::SSL',\%sockopts);
         $socket = IO::Socket::SSL->new(%sockopts);
     } else {
         $socket_class ||= eval { require IO::Socket::IP; IO::Socket::IP->VERSION('0.20'); "IO::Socket::IP" }
             || do { require IO::Socket::INET; "IO::Socket::INET" };
+        $self->logger->trace("opening $socket_class",\%sockopts);
         $socket = $socket_class->new(%sockopts);
         binmode($socket) if $socket;
     }
@@ -178,16 +179,21 @@ sub _get_socket {
 sub connect {
     my ( $self, $conf ) = @_;
 
+    $self->logger->trace('connecting');
     my $frame = Net::Stomp::Frame->new(
         { command => 'CONNECT', headers => $conf } );
     $self->send_frame($frame);
     $frame = $self->receive_frame;
 
     if ($frame && $frame->command eq 'CONNECTED') {
+        $self->logger->trace('connected');
         # Setting initial values for session id, as given from
         # the stomp server
         $self->session_id( $frame->headers->{session} );
         $self->_connect_headers( $conf );
+    }
+    else {
+        $self->logger->warn('failed to connect',{ %{$frame} });
     }
 
     return $frame;
@@ -196,12 +202,14 @@ sub connect {
 sub _close_socket {
     my ($self) = @_;
     return unless $self->socket;
+    $self->logger->trace('closing socket');
     $self->socket->close;
     $self->select->remove($self->socket);
 }
 
 sub disconnect {
     my $self = shift;
+    $self->logger->trace('disconnecting');
     my $frame = Net::Stomp::Frame->new( { command => 'DISCONNECT' } );
     $self->send_frame($frame);
     $self->_close_socket;
@@ -243,6 +251,7 @@ sub can_read {
 sub send {
     my ( $self, $conf ) = @_;
     $conf = { %$conf };
+    $self->logger->trace('sending',$conf);
     my $body = $conf->{body};
     delete $conf->{body};
     my $frame = Net::Stomp::Frame->new(
@@ -257,10 +266,12 @@ sub send_with_receipt {
 
     # send the message
     my $receipt_id = $self->_get_next_transaction;
+    $self->logger->debug('sending with receipt',{ receipt => $receipt_id });
     $conf->{receipt} = $receipt_id;
     my $receipt_timeout = exists $conf->{timeout} ? delete $conf->{timeout} : $self->receipt_timeout;
     $self->send($conf);
 
+    $self->logger->trace('waiting for receipt',$conf);
     # check the receipt
     my $receipt_frame = $self->receive_frame({
         ( defined $receipt_timeout ?
@@ -276,8 +287,10 @@ sub send_with_receipt {
         && $receipt_frame->command eq 'RECEIPT'
         && $receipt_frame->headers->{'receipt-id'} eq $receipt_id )
     {
+        $self->logger->debug('got good receipt',{ %{$receipt_frame} });
         return 1;
     } else {
+        $self->logger->debug('got bad receipt',{ %{$receipt_frame || {} } });
         return 0;
     }
 }
@@ -288,6 +301,7 @@ sub send_transactional {
     $conf = { %$conf };
     # begin the transaction
     my $transaction_id = $self->_get_next_transaction;
+    $self->logger->debug('starting transaction',{ transaction => $transaction_id });
     my $begin_frame
         = Net::Stomp::Frame->new(
         { command => 'BEGIN', headers => { transaction => $transaction_id } }
@@ -304,6 +318,7 @@ sub send_transactional {
 
     if ( $ret ) {
         # success, commit the transaction
+        $self->logger->debug('committing transaction',{ transaction => $transaction_id });
         my $frame_commit = Net::Stomp::Frame->new(
             {   command => 'COMMIT',
                 headers => { transaction => $transaction_id }
@@ -311,6 +326,7 @@ sub send_transactional {
         );
         $self->send_frame($frame_commit);
     } else {
+        $self->logger->debug('rolling back transaction',{ transaction => $transaction_id });
         # some failure, abort transaction
         my $frame_abort = Net::Stomp::Frame->new(
             {   command => 'ABORT',
@@ -331,6 +347,7 @@ sub _sub_key {
 
 sub subscribe {
     my ( $self, $conf ) = @_;
+    $self->logger->trace('subscribing',$conf);
     my $frame = Net::Stomp::Frame->new(
         { command => 'SUBSCRIBE', headers => $conf } );
     $self->send_frame($frame);
@@ -341,6 +358,7 @@ sub subscribe {
 
 sub unsubscribe {
     my ( $self, $conf ) = @_;
+    $self->logger->trace('unsubscribing',$conf);
     my $frame = Net::Stomp::Frame->new(
         { command => 'UNSUBSCRIBE', headers => $conf } );
     $self->send_frame($frame);
@@ -354,6 +372,7 @@ sub ack {
     $conf = { %$conf };
     my $id    = $conf->{frame}->headers->{'message-id'};
     delete $conf->{frame};
+    $self->logger->trace('acking',{ 'message-id' => $id, %$conf });
     my $frame = Net::Stomp::Frame->new(
         { command => 'ACK', headers => { 'message-id' => $id, %$conf } } );
     $self->send_frame($frame);
@@ -364,6 +383,7 @@ sub nack {
     my ( $self, $conf ) = @_;
     $conf = { %$conf };
     my $id    = $conf->{frame}->headers->{'message-id'};
+    $self->logger->trace('nacking',{ 'message-id' => $id, %$conf });
     delete $conf->{frame};
     my $frame = Net::Stomp::Frame->new(
         { command => 'NACK', headers => { 'message-id' => $id, %$conf } } );
@@ -503,6 +523,7 @@ sub _connected {
 sub receive_frame {
     my ($self, $conf) = @_;
 
+    $self->logger->trace('waiting to receive frame',$conf);
     my $timeout = exists $conf->{timeout} ? $conf->{timeout} :  $self->timeout;
 
     unless ($self->_connected) {
@@ -646,16 +667,6 @@ If you want to pass in L<IO::Socket::SSL> options:
     ssl_options => { SSL_cipher_list => 'ALL:!EXPORT' },
   } );
 
-You can pass a logger object, for example a L<Log::Log4perl> logger:
-
-  my $stomp = Net::Stomp->new({
-    hostname => 'localhost',
-    port     => '61613',
-    logger   => Log::Log4perl->get_logger('stomp'),
-  });
-
-Warnings and errors will be logged instead of written to C<STDERR>.
-
 =head3 Failover
 
 There is some failover support in C<Net::Stomp>. You can specify
@@ -758,10 +769,10 @@ If using multiple hosts, this is the index (inside the L<< /C<hosts>
 
 =head2 C<logger>
 
-Optional logger object, the default one just logs to C<STDERR> (see
-L<Net::Stomp::StupidLogger>). You can pass in any object that
-implements (at least) the C<warn> and C<fatal> methods. They will be
-passed a string to log.
+Optional logger object, the default one is a L<Log::Any> logger. You
+can pass in any object with the same API, or configure
+L<Log::Any::Adapter> to route the messages to whatever logging system
+you need.
 
 =head2 C<reconnect_on_fork>
 

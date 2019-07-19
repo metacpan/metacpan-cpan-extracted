@@ -5,10 +5,11 @@ use strict;
 use warnings;
 use Carp;
 use Regexp::RegGrp;
+use Digest::SHA qw(sha256_base64 sha384_base64 sha512_base64);
 
 # -----------------------------------------------------------------------------
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 our @BOOLEAN_ACCESSORS = (
     'remove_comments',
@@ -20,6 +21,7 @@ our @BOOLEAN_ACCESSORS = (
 
 our @JAVASCRIPT_OPTS    = ( 'clean', 'obfuscate', 'shrink', 'best' );
 our @CSS_OPTS           = ( 'minify', 'pretty' );
+our @CSP_OPTS           = ( 'sha256', 'sha384', 'sha512' );
 
 our $REQUIRED_JAVASCRIPT_PACKER = '1.002001';
 our $REQUIRED_CSS_PACKER        = '1.000001';
@@ -187,6 +189,21 @@ sub do_stylesheet {
     return $self->{_do_stylesheet};
 }
 
+sub do_csp {
+    my ( $self, $value ) = @_;
+
+    if ( defined( $value ) ) {
+        if ( grep( $value eq $_, @CSP_OPTS ) ) {
+            $self->{_do_csp} = $value;
+        }
+        elsif ( ! $value ) {
+            $self->{_do_csp} = undef;
+        }
+    }
+
+    return $self->{_do_csp};
+}
+
 # these variables are used in the closures defined in the init function
 # below - we have to use globals as using $self within the closures leads
 # to a reference cycle and thus memory leak, and we can't scope them to
@@ -197,8 +214,10 @@ our $remove_newlines;
 our $html5;
 our $do_javascript;
 our $do_stylesheet;
+our $do_csp;
 our $js_packer;
 our $css_packer;
+our %csp;
 our $reggrp_ws;
 
 sub init {
@@ -271,6 +290,11 @@ sub init {
                                 $content = '/*<![CDATA[*/' . $content . '/*]]>*/';
                             }
                         }
+
+                        if ( $do_csp ) {
+                            no strict 'refs';
+                            push @{ $csp{'script-src'} }, &{ "${do_csp}_base64" } ( $content );
+                        }
                     }
                     elsif ( $opening =~ /$opening_style_re/i ) {
                         $opening =~ s/ type="text\/css"//i if ( $html5 );
@@ -278,6 +302,11 @@ sub init {
                         if ( $css_packer and $do_stylesheet ) {
                             $css_packer->minify( \$content, { compress => $do_stylesheet } );
                             $content = "\n" . $content if ( $do_stylesheet eq 'pretty' );
+                        }
+
+                        if ( $do_csp ) {
+                            no strict 'refs';
+                            push @{ $csp{'style-src'} }, &{ "${do_csp}_base64" } ( $content );
                         }
                     }
                 }
@@ -360,6 +389,7 @@ sub minify {
 
         $self->do_javascript( $opts->{do_javascript} ) if ( defined( $opts->{do_javascript} ) );
         $self->do_stylesheet( $opts->{do_stylesheet} ) if ( defined( $opts->{do_stylesheet} ) );
+        $self->do_csp( $opts->{do_csp} ) if ( defined( $opts->{do_csp} ) );
     }
 
     if ( not $self->no_compress_comment() and ${$html} =~ /$PACKER_COMMENT/s ) {
@@ -376,9 +406,13 @@ sub minify {
 	$html5           = $self->html5;
 	$do_javascript   = $self->do_javascript;
 	$do_stylesheet   = $self->do_stylesheet;
+	$do_csp          = $self->do_csp;
 	$js_packer       = $self->javascript_packer;
 	$css_packer      = $self->css_packer;
 	$reggrp_ws       = $self->reggrp_whitespaces;
+
+    # blank out the CSP hash before populating it again
+    %csp = ();
 
 	# FIXME: hacky way to get around ->init being called before ->minify
 	$self = ref( $self )->init if $remove_comments_aggressive;
@@ -434,6 +468,17 @@ sub css_packer {
     return $self->{_css_packer};
 }
 
+sub csp {
+    my $self = shift;
+
+    return 'script-src' => [ ], 'style-src' => [ ] unless $do_csp and %csp;
+
+    return
+        'script-src' => [ map "'$do_csp-$_='", @{ $csp{'script-src'} } ],
+        'style-src' => [ map "'$do_csp-$_='", @{ $csp{'style-src'} } ],
+    ;
+}
+
 1;
 
 __END__
@@ -448,7 +493,7 @@ HTML::Packer - Another HTML code cleaner
 
 =head1 VERSION
 
-Version 2.08
+Version 2.09
 
 =head1 DESCRIPTION
 
@@ -500,6 +545,16 @@ Defines compression level for CSS. Possible values are 'minify' and 'pretty'.
 Default is no compression for CSS.
 This option only takes effect if L<CSS::Packer> is installed.
 
+=item do_csp
+
+Defines hash algorithm for C<Content-Security-Policy>, or CSP, hashes of
+embedded C<E<lt>scriptE<gt>> and C<E<lt>styleE<gt>> tags.
+
+Allowed values are C<'sha256'>, C<'sha384'>, C<'sha512'>.
+
+It may be left blank or set to a Perl false value to indicate that hashes
+should not be calculated, if performance is a concern.
+
 =item no_compress_comment
 
 If not set to a true value it is allowed to set a HTML comment that prevents the input being packed.
@@ -511,6 +566,18 @@ Is not set by default.
 =item html5
 
 If set to a true value closing slashes will be removed from void elements.
+
+=item csp
+
+If C<do_csp> is set to C<'sha256'>, returns a hash that looks like this:
+
+    (
+        'script-src' => [qw( sha256-...= sha256-...= )],
+        'style-src'  => [qw( sha256-...= sha256-...= )],
+    )
+
+with each element of the C<ARRAY>refs containing a CSP-friendly hash for a
+C<E<lt>scriptE<gt>> or C<E<lt>styleE<gt>> tag.
 
 =back
 

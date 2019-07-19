@@ -17,20 +17,24 @@ my $builder = Module::Build->new(
     configure_requires => {
                            'Module::Build'    => '0.4',
                           },
-    build_requires     => {
-                          'Test::Simple'      => '0.40',
-                         },
     requires           => {
-                          'Time::Local'       => '1.07',
-                         },
+                           'Time::Local'       => '1.07',
+                          },
+    build_requires     => {
+                           'Test::Simple'      => '0.40',
+                          },
+    test_requires      => {
+                           'Symbol'            => 0,
+                           'FindBin'           => 0,
+                          },
     recommends         => {
-                          'I18N::Langinfo'    => 0,
-                          'POSIX'             => 0,
-                          'Time::HiRes'       => 0,
-                          'DateTime'          => 0,
-                          'Date::Manip'       => 0,
-                          'Module::Signature' => 0,
-                         },
+                           'I18N::Langinfo'    => 0,
+                           'POSIX'             => 0,
+                           'Time::HiRes'       => 0,
+                           'DateTime'          => 0,
+                           'Date::Manip'       => 0,
+                           'Module::Signature' => 0,
+                          },
     sign               => 1,
     add_to_cleanup     => [ 'Time-Format-*' ],
 );

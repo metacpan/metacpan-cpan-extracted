@@ -6,13 +6,15 @@ author:
   - 'Michael S. Fischer <michael@dynamine.net>,'
   - 'Ash Berlin <ash_github@firemirror.com>'
 build_requires:
+  Log::Any::Adapter::TAP: '0.003003'
   Test::Deep: '0'
   Test::Fatal: '0'
   Test::More: '0'
+  Test::NiceDump: v1.0.0
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,13 +23,13 @@ name: Net-Stomp
 provides:
   Net::Stomp:
     file: lib/Net/Stomp.pm
-    version: '0.57'
+    version: '0.60'
   Net::Stomp::Frame:
     file: lib/Net/Stomp/Frame.pm
-    version: '0.57'
+    version: '0.60'
   Net::Stomp::StupidLogger:
     file: lib/Net/Stomp/StupidLogger.pm
-    version: '0.57'
+    version: '0.60'
 recommends:
   IO::Socket::IP: '0.20'
   IO::Socket::SSL: '1.75'
@@ -35,6 +37,8 @@ requires:
   Class::Accessor::Fast: '0'
   IO::Select: '0'
   IO::Socket::INET: '0'
+  Log::Any: '1.707'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.57'
+version: '0.60'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

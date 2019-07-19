@@ -28,7 +28,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.02';
+    our $VERSION = '2.03';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -494,7 +494,7 @@ sub debug {
             $sline = $cline;
             $short = $sname;
         } ## end else [ if ($package ne '') ]
-        $subroutine = $sname;
+        $subroutine = ($sname ne '') ? $sname : 'main';
         $self->{'PADDING'}            = 0 - length($subroutine) if (length($subroutine) > abs($self->{'PADDING'}));
         $self->{'LINES-PADDING'}      = 0 - length($cline)      if (length($cline) > abs($self->{'LINES-PADDING'}));
         $self->{'SUBROUTINE-PADDING'} = 0 - length($short)      if (length($short) > abs($self->{'SUBROUTINE-PADDING'}));

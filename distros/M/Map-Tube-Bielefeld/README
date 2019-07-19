@@ -1,0 +1,45 @@
+NAME
+
+    Map::Tube::Bielefeld - interface to the Bielefeld Stadtbahn
+
+DESCRIPTION
+
+    It currently provides functionality to find the shortest route between
+    the two given stations. The map contains both U-Bahn and S-Bahn
+    stations.
+
+CONSTRUCTOR
+
+        use Map::Tube::Berlin;
+        my $tube = Map::Tube::Berlin->new;
+
+METHODS
+
+ get_shortest_route(START, END)
+
+    This method expects two parameters START and END station name. Station
+    names are case insensitive. The station sequence from START to END is
+    returned.
+
+        use Map::Tube::Bielefeld;
+        my $tube = Map::Tube::Bielefeld->new;
+        my $route = $tube->get_shortest_route('', '');
+        print "Route: $route\n";
+
+AUTHOR
+
+    Vitali Peil <vitali.peil@uni-bielefeld.de>
+
+COPYRIGHT
+
+    Copyright 2019- Vitali Peil
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Map::Tube.
+

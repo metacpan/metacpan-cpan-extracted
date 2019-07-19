@@ -26,7 +26,7 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  repository: git://bitbucket.org/broadbean/p5-test-nicedump
-version: 1.0.0
+  repository: git://bitbucket.org/broadbean/p5-test-nicedump.git
+version: 1.0.1
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
