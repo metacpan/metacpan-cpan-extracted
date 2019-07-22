@@ -27,7 +27,7 @@ __PACKAGE__->create_ro_accessors( qw(
 
 __PACKAGE__->create_accessors( qw( context gpio ) );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 use constant {
     CONTROL_CONTINUE        => 0x80,

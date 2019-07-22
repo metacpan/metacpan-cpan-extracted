@@ -2,14 +2,14 @@
 
 namespace xs {
 
-Hash::Hash (std::initializer_list<std::tuple<std::string_view, Scalar>> l) {
+Hash::Hash (const std::initializer_list<std::tuple<panda::string_view, Scalar>>& l) {
     sv = (SV*)newHV();
     reserve(l.size());
     auto end = l.end();
     for (auto ptr = l.begin(); ptr != end; ++ptr) store(std::get<0>(*ptr), std::get<1>(*ptr));
 }
 
-void Hash::store (const std::string_view& key, const Scalar& v, U32 hash) {
+void Hash::store (const panda::string_view& key, const Scalar& v, U32 hash) {
     if (!sv) throw std::logic_error("store: empty object");
     SV* val = v;
     if (val) SvREFCNT_inc_simple_void_NN(val);

@@ -1,4 +1,7 @@
 #pragma once
+#include "hash.h"
+#include "from_chars.h"
+#include "string_view.h"
 #include <string>
 #include <limits>
 #include <memory>
@@ -9,9 +12,6 @@
 #include <iterator>
 #include <stdexcept>
 #include <initializer_list>
-#include <panda/lib/hash.h>
-#include <panda/string_view.h>
-#include <panda/lib/from_chars.h>
 
 namespace panda {
 
@@ -236,7 +236,7 @@ public:
     basic_string (std::initializer_list<CharT> ilist) : basic_string(ilist.begin(), ilist.size()) {}
 
     explicit
-    basic_string (std::basic_string_view<CharT, Traits> sv) : basic_string(sv.data(), sv.length()) {}
+    basic_string (basic_string_view<CharT, Traits> sv) : basic_string(sv.data(), sv.length()) {}
 
     template <size_type SIZE>
     basic_string& assign (const CharT (&str)[SIZE]) {
@@ -357,7 +357,7 @@ public:
         return assign(ilist.begin(), ilist.size());
     }
 
-    basic_string& assign (std::basic_string_view<CharT, Traits> sv) {
+    basic_string& assign (basic_string_view<CharT, Traits> sv) {
         return assign(sv.data(), sv.length());
     }
 
@@ -373,7 +373,7 @@ public:
     template <class Alloc2>
     basic_string& operator= (basic_string<CharT, Traits, Alloc2>&& source)      { return assign(std::move(source)); }
     basic_string& operator= (std::initializer_list<CharT> ilist)                { return assign(ilist); }
-    basic_string& operator= (std::basic_string_view<CharT, Traits> sv)          { return assign(sv); }
+    basic_string& operator= (basic_string_view<CharT, Traits> sv)               { return assign(sv); }
 
     constexpr size_type    length   () const { return _length; }
     constexpr size_type    size     () const { return _length; }
@@ -406,8 +406,8 @@ public:
     explicit
     constexpr operator bool () const { return _length; }
 
-    operator std::basic_string<CharT,Traits>      () const { return std::basic_string<CharT,Traits>(_str, _length); }
-    operator std::basic_string_view<CharT,Traits> () const { return std::basic_string_view<CharT,Traits>(_str, _length); }
+    operator std::basic_string<CharT,Traits> () const { return std::basic_string<CharT,Traits>(_str, _length); }
+    operator basic_string_view<CharT,Traits> () const { return basic_string_view<CharT,Traits>(_str, _length); }
 
     const CharT& at (size_type pos) const {
         if (pos >= _length) throw std::out_of_range("basic_string::at");
@@ -629,11 +629,11 @@ public:
         return _compare(_str + pos1, count1, ptr, count2);
     }
 
-    int compare (std::basic_string_view<CharT, Traits> sv) const {
+    int compare (basic_string_view<CharT, Traits> sv) const {
         return _compare(_str, _length, sv.data(), sv.length());
     }
 
-    int compare (size_type pos1, size_type count1, std::basic_string_view<CharT, Traits> sv) const {
+    int compare (size_type pos1, size_type count1, basic_string_view<CharT, Traits> sv) const {
         return compare(pos1, count1, sv.data(), sv.length());
     }
 
@@ -673,7 +673,7 @@ public:
         return npos;
     }
 
-    size_type find (std::basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
+    size_type find (basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
         return find(sv.data(), pos, sv.length());
     }
 
@@ -704,7 +704,7 @@ public:
         return npos;
     }
 
-    size_type rfind (std::basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
+    size_type rfind (basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
         return rfind(sv.data(), pos, sv.length());
     }
 
@@ -734,7 +734,7 @@ public:
         return find(ch, pos);
     }
 
-    size_type find_first_of (std::basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
+    size_type find_first_of (basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
         return find_first_of(sv.data(), pos, sv.length());
     }
 
@@ -766,7 +766,7 @@ public:
         return npos;
     }
 
-    size_type find_first_not_of (std::basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
+    size_type find_first_not_of (basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
         return find_first_not_of(sv.data(), pos, sv.length());
     }
 
@@ -796,7 +796,7 @@ public:
         return rfind(ch, pos);
     }
 
-    size_type find_last_of (std::basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
+    size_type find_last_of (basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
         return find_last_of(sv.data(), pos, sv.length());
     }
 
@@ -828,7 +828,7 @@ public:
         return npos;
     }
 
-    size_type find_last_not_of (std::basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
+    size_type find_last_not_of (basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
         return find_last_not_of(sv.data(), pos, sv.length());
     }
 
@@ -888,7 +888,7 @@ public:
         return append(ilist.begin(), ilist.size());
     }
 
-    basic_string& append (std::basic_string_view<CharT, Traits> sv) {
+    basic_string& append (basic_string_view<CharT, Traits> sv) {
         return append(sv.data(), sv.length());
     }
 
@@ -904,7 +904,7 @@ public:
     basic_string& operator+= (const basic_string<CharT, Traits, Alloc2>& str) { return append(str); }
     basic_string& operator+= (CharT ch)                                       { return append(1, ch); }
     basic_string& operator+= (std::initializer_list<CharT> ilist)             { return append(ilist); }
-    basic_string& operator+= (std::basic_string_view<CharT, Traits> sv)       { return append(sv); }
+    basic_string& operator+= (basic_string_view<CharT, Traits> sv)            { return append(sv); }
 
     basic_string& insert (size_type pos, const basic_string& str) {
         if (this == &str) {
@@ -984,7 +984,7 @@ public:
         return insert(it - cbegin(), ilist.begin(), ilist.size());
     }
 
-    basic_string& insert (size_type pos, std::basic_string_view<CharT, Traits> sv) {
+    basic_string& insert (size_type pos, basic_string_view<CharT, Traits> sv) {
         return insert(pos, sv.data(), sv.length());
     }
 
@@ -1094,29 +1094,29 @@ public:
         return replace(first, last, ilist.begin(), ilist.size());
     }
 
-    basic_string& replace (size_type pos, size_type remove_count, std::basic_string_view<CharT, Traits> sv) {
+    basic_string& replace (size_type pos, size_type remove_count, basic_string_view<CharT, Traits> sv) {
         return replace(pos, remove_count, sv.data(), sv.length());
     }
 
-    basic_string& replace (const_iterator first, const_iterator last, std::basic_string_view<CharT, Traits> sv) {
+    basic_string& replace (const_iterator first, const_iterator last, basic_string_view<CharT, Traits> sv) {
         return replace(first - cbegin(), last - first, sv);
     }
 
     template <typename V>
-    std::from_chars_result to_number (V& value, int base = 10) const { return std::from_chars(_str, _str + _length, value, base); }
+    from_chars_result to_number (V& value, int base = 10) const { return from_chars(_str, _str + _length, value, base); }
 
     template <typename V>
-    std::from_chars_result to_number (V& value, size_type pos, size_type count = npos, int base = 10) const {
+    from_chars_result to_number (V& value, size_type pos, size_type count = npos, int base = 10) const {
         if (pos > _length) throw std::out_of_range("basic_string::to_number");
         if (count > _length - pos) count = _length - pos;
-        return std::from_chars(_str + pos, _str + pos + count, value, base);
+        return from_chars(_str + pos, _str + pos + count, value, base);
     }
 
     template <typename V>
     static basic_string from_number (V value, int base = 10) {
-        auto maxsz = panda::to_chars_maxsize<V>(base);
+        auto maxsz = to_chars_maxsize<V>(base);
         basic_string ret(maxsz);
-        auto res = std::to_chars(ret._str, ret._str + maxsz, value, base);
+        auto res = to_chars(ret._str, ret._str + maxsz, value, base);
         assert(!res.ec);
         ret.length(res.ptr - ret.data());
         return ret;
@@ -1498,38 +1498,38 @@ const C basic_string<C,T,A>::TERMINAL = C();
 template <class C, class T, class A1, class A2> inline bool operator== (const basic_string<C,T,A1>& lhs, const basic_string<C,T,A2>& rhs) { return lhs.compare(rhs) == 0; }
 template <class C, class T, class A>            inline bool operator== (const C* lhs, const basic_string<C,T,A>& rhs)                     { return rhs.compare(lhs) == 0; }
 template <class C, class T, class A>            inline bool operator== (const basic_string<C,T,A>& lhs, const C* rhs)                     { return lhs.compare(rhs) == 0; }
-template <class C, class T, class A>            inline bool operator== (std::basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)  { return rhs.compare(lhs) == 0; }
-template <class C, class T, class A>            inline bool operator== (const basic_string<C,T,A>& lhs, std::basic_string_view<C,T> rhs)  { return lhs.compare(rhs) == 0; }
+template <class C, class T, class A>            inline bool operator== (basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)       { return rhs.compare(lhs) == 0; }
+template <class C, class T, class A>            inline bool operator== (const basic_string<C,T,A>& lhs, basic_string_view<C,T> rhs)       { return lhs.compare(rhs) == 0; }
 
 template <class C, class T, class A1, class A2> inline bool operator!= (const basic_string<C,T,A1>& lhs, const basic_string<C,T,A2>& rhs) { return lhs.compare(rhs) != 0; }
 template <class C, class T, class A>            inline bool operator!= (const C* lhs, const basic_string<C,T,A>& rhs)                     { return rhs.compare(lhs) != 0; }
 template <class C, class T, class A>            inline bool operator!= (const basic_string<C,T,A>& lhs, const C* rhs)                     { return lhs.compare(rhs) != 0; }
-template <class C, class T, class A>            inline bool operator!= (std::basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)  { return rhs.compare(lhs) != 0; }
-template <class C, class T, class A>            inline bool operator!= (const basic_string<C,T,A>& lhs, std::basic_string_view<C,T> rhs)  { return lhs.compare(rhs) != 0; }
+template <class C, class T, class A>            inline bool operator!= (basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)       { return rhs.compare(lhs) != 0; }
+template <class C, class T, class A>            inline bool operator!= (const basic_string<C,T,A>& lhs, basic_string_view<C,T> rhs)       { return lhs.compare(rhs) != 0; }
 
 template <class C, class T, class A1, class A2> inline bool operator<  (const basic_string<C,T,A1>& lhs, const basic_string<C,T,A2>& rhs) { return lhs.compare(rhs) < 0; }
 template <class C, class T, class A>            inline bool operator<  (const C* lhs, const basic_string<C,T,A>& rhs)                     { return rhs.compare(lhs) > 0; }
 template <class C, class T, class A>            inline bool operator<  (const basic_string<C,T,A>& lhs, const C* rhs)                     { return lhs.compare(rhs) < 0; }
-template <class C, class T, class A>            inline bool operator<  (std::basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)  { return rhs.compare(lhs) > 0; }
-template <class C, class T, class A>            inline bool operator<  (const basic_string<C,T,A>& lhs, std::basic_string_view<C,T> rhs)  { return lhs.compare(rhs) < 0; }
+template <class C, class T, class A>            inline bool operator<  (basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)       { return rhs.compare(lhs) > 0; }
+template <class C, class T, class A>            inline bool operator<  (const basic_string<C,T,A>& lhs, basic_string_view<C,T> rhs)       { return lhs.compare(rhs) < 0; }
 
 template <class C, class T, class A1, class A2> inline bool operator<= (const basic_string<C,T,A1>& lhs, const basic_string<C,T,A2>& rhs) { return lhs.compare(rhs) <= 0; }
 template <class C, class T, class A>            inline bool operator<= (const C* lhs, const basic_string<C,T,A>& rhs)                     { return rhs.compare(lhs) >= 0; }
 template <class C, class T, class A>            inline bool operator<= (const basic_string<C,T,A>& lhs, const C* rhs)                     { return lhs.compare(rhs) <= 0; }
-template <class C, class T, class A>            inline bool operator<= (std::basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)  { return rhs.compare(lhs) >= 0; }
-template <class C, class T, class A>            inline bool operator<= (const basic_string<C,T,A>& lhs, std::basic_string_view<C,T> rhs)  { return lhs.compare(rhs) <= 0; }
+template <class C, class T, class A>            inline bool operator<= (basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)       { return rhs.compare(lhs) >= 0; }
+template <class C, class T, class A>            inline bool operator<= (const basic_string<C,T,A>& lhs, basic_string_view<C,T> rhs)       { return lhs.compare(rhs) <= 0; }
 
 template <class C, class T, class A1, class A2> inline bool operator>  (const basic_string<C,T,A1>& lhs, const basic_string<C,T,A2>& rhs) { return lhs.compare(rhs) > 0; }
 template <class C, class T, class A>            inline bool operator>  (const C* lhs, const basic_string<C,T,A>& rhs)                     { return rhs.compare(lhs) < 0; }
 template <class C, class T, class A>            inline bool operator>  (const basic_string<C,T,A>& lhs, const C* rhs)                     { return lhs.compare(rhs) > 0; }
-template <class C, class T, class A>            inline bool operator>  (std::basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)  { return rhs.compare(lhs) < 0; }
-template <class C, class T, class A>            inline bool operator>  (const basic_string<C,T,A>& lhs, std::basic_string_view<C,T> rhs)  { return lhs.compare(rhs) > 0; }
+template <class C, class T, class A>            inline bool operator>  (basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)       { return rhs.compare(lhs) < 0; }
+template <class C, class T, class A>            inline bool operator>  (const basic_string<C,T,A>& lhs, basic_string_view<C,T> rhs)       { return lhs.compare(rhs) > 0; }
 
 template <class C, class T, class A1, class A2> inline bool operator>= (const basic_string<C,T,A1>& lhs, const basic_string<C,T,A2>& rhs) { return lhs.compare(rhs) >= 0; }
 template <class C, class T, class A>            inline bool operator>= (const C* lhs, const basic_string<C,T,A>& rhs)                     { return rhs.compare(lhs) <= 0; }
 template <class C, class T, class A>            inline bool operator>= (const basic_string<C,T,A>& lhs, const C* rhs)                     { return lhs.compare(rhs) >= 0; }
-template <class C, class T, class A>            inline bool operator>= (std::basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)  { return rhs.compare(lhs) <= 0; }
-template <class C, class T, class A>            inline bool operator>= (const basic_string<C,T,A>& lhs, std::basic_string_view<C,T> rhs)  { return lhs.compare(rhs) >= 0; }
+template <class C, class T, class A>            inline bool operator>= (basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs)       { return rhs.compare(lhs) <= 0; }
+template <class C, class T, class A>            inline bool operator>= (const basic_string<C,T,A>& lhs, basic_string_view<C,T> rhs)       { return lhs.compare(rhs) >= 0; }
 
 namespace {
     template <class C, class T, class A>
@@ -1559,7 +1559,7 @@ inline basic_string<C,T,A> operator+ (const C* lhs, const basic_string<C,T,A>& r
 }
 
 template <class C, class T, class A>
-inline basic_string<C,T,A> operator+ (std::basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs) {
+inline basic_string<C,T,A> operator+ (basic_string_view<C,T> lhs, const basic_string<C,T,A>& rhs) {
     if (lhs.length() == 0) return rhs;
     if (rhs.length() == 0) return basic_string<C,T,A>(lhs);
     return _operator_plus<C,T,A>(lhs.data(), lhs.length(), rhs.data(), rhs.length());
@@ -1580,7 +1580,7 @@ inline basic_string<C,T,A> operator+ (const basic_string<C,T,A>& lhs, const C* r
 }
 
 template <class C, class T, class A>
-inline basic_string<C,T,A> operator+ (const basic_string<C,T,A>& lhs, std::basic_string_view<C,T> rhs) {
+inline basic_string<C,T,A> operator+ (const basic_string<C,T,A>& lhs, basic_string_view<C,T> rhs) {
     if (rhs.length() == 0) return lhs;
     if (lhs.length() == 0) return basic_string<C,T,A>(rhs);
     return _operator_plus<C,T,A>(lhs.data(), lhs.length(), rhs.data(), rhs.length());
@@ -1613,7 +1613,7 @@ inline basic_string<C,T,A> operator+ (const C* lhs, basic_string<C,T,A>&& rhs) {
 }
 
 template <class C, class T, class A>
-inline basic_string<C,T,A> operator+ (std::basic_string_view<C,T> lhs, basic_string<C,T,A>&& rhs) {
+inline basic_string<C,T,A> operator+ (basic_string_view<C,T> lhs, basic_string<C,T,A>&& rhs) {
     return std::move(rhs.insert(0, lhs));
 }
 
@@ -1628,7 +1628,7 @@ inline basic_string<C,T,A> operator+ (basic_string<C,T,A>&& lhs, const C* rhs) {
 }
 
 template <class C, class T, class A>
-inline basic_string<C,T,A> operator+ (basic_string<C,T,A>&& lhs, std::basic_string_view<C,T> rhs) {
+inline basic_string<C,T,A> operator+ (basic_string<C,T,A>&& lhs, basic_string_view<C,T> rhs) {
     return std::move(lhs.append(rhs));
 }
 
@@ -1642,29 +1642,25 @@ inline std::basic_ostream<C,T>& operator<< (std::basic_ostream<C,T>& os, const b
     return os.write(str.data(), str.length());
 }
 
+template <class C, class T, class A>
+inline void swap (basic_string<C,T,A>& lhs, basic_string<C,T,A>& rhs) {
+    lhs.swap(rhs);
+}
+
 }
 
 namespace std {
-
-    template <class C, class T, class A>
-    inline void swap (panda::basic_string<C,T,A>& lhs, panda::basic_string<C,T,A>& rhs) {
-        lhs.swap(rhs);
-    }
-
-    //template<>
     template<class C, class T, class A>
     struct hash<panda::basic_string<C,T,A>> {
         size_t operator() (const panda::basic_string<C,T,A>& s) const {
-            return panda::lib::hashXX<size_t>((const char*)s.data(), s.length() * sizeof(C));
+            return panda::hash::hashXX<size_t>((const char*)s.data(), s.length() * sizeof(C));
         }
     };
 
-    //template<>
     template<class C, class T, class A>
     struct hash<const panda::basic_string<C,T,A>> {
         size_t operator() (const panda::basic_string<C,T,A>& s) const {
-            return panda::lib::hashXX<size_t>((const char*)s.data(), s.length() * sizeof(C));
+            return panda::hash::hashXX<size_t>((const char*)s.data(), s.length() * sizeof(C));
         }
     };
-
 }

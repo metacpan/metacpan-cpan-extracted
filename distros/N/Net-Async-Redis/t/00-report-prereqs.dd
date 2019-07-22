@@ -1,22 +1,27 @@
 do { my $x = {
-       'build' => {
-                    'requires' => {
-                                    'perl' => '5.014000'
-                                  }
-                  },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.48'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::PluginBundle::Author::TEAM' => '0',
                                       'HTML::TreeBuilder' => '0',
                                       'Net::Async::HTTP' => '0',
+                                      'Software::License::Perl_5' => '0',
                                       'Template' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
+                                      'Test::Pod::No404s' => '0',
+                                      'Test::Portability::Files' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -26,16 +31,24 @@ do { my $x = {
                                       'Future' => '0.40',
                                       'Future::AsyncAwait' => '0.27',
                                       'IO::Async' => '0',
+                                      'IO::Async::Notifier' => '0',
+                                      'IO::Async::Stream' => '0',
                                       'List::Util' => '1.29',
                                       'Log::Any' => '1.050',
                                       'Math::Random::Secure' => '0',
+                                      'Mixin::Event::Dispatch::Bus' => '2.000',
                                       'OpenTracing' => '0.003',
                                       'Ryu::Async' => '0.006',
+                                      'Scalar::Util' => '0',
                                       'Syntax::Keyword::Try' => '0.08',
                                       'URI' => '0',
                                       'URI::redis' => '0',
                                       'curry' => '0',
-                                      'parent' => '0'
+                                      'curry::weak' => '0',
+                                      'mro' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -45,13 +58,19 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'IO::Async::Loop' => '0',
+                                   'IO::Async::Test' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Log::Any::Adapter' => '0',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Deep' => '0',
+                                   'Test::Fatal' => '0',
                                    'Test::HexString' => '0',
                                    'Test::More' => '0.98',
-                                   'Variable::Disposition' => '0.004'
+                                   'Variable::Disposition' => '0.004',
+                                   'perl' => '5.006',
+                                   'utf8' => '0'
                                  }
                  }
      };

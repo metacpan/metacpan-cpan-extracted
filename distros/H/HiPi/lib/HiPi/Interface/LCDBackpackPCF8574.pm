@@ -18,7 +18,7 @@ use HiPi qw( :rpi :lcd :i2c );
 use HiPi::RaspberryPi;
 use HiPi::Interface::PCF8574;
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 __PACKAGE__->create_accessors( qw( address devicename backend _backlight ) );
 

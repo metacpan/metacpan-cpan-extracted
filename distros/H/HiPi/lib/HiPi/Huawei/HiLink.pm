@@ -25,7 +25,7 @@ my @_package_accessors = qw(
 
 __PACKAGE__->create_accessors( @_package_accessors );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 my $arrayelements = {
     'Messages' => 'Message',

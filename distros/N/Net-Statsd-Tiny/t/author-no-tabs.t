@@ -22,6 +22,7 @@ my @files = (
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
+    't/author-minimum-version.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
@@ -38,7 +39,6 @@ my @files = (
     't/release-check-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
-    't/release-minimum-version.t',
     't/release-trailing-space.t'
 );
 

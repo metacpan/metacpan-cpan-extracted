@@ -23,8 +23,8 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Edit::Xml" : "20190708",
-            "Data::Table::Text" : "20190708",
+            "Data::Edit::Xml" : "20190721",
+            "Data::Table::Text" : "20190721",
             "Digest::SHA" : "0",
             "Encode" : "0",
             "Test::More" : "0",
@@ -35,7 +35,7 @@
    "provides" : {
       "Data::Edit::Xml::Lint" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm",
-         "version" : "20190708"
+         "version" : "20190721"
       },
       "Data::Edit::Xml::Lint::Report" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm"
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20190708",
+   "version" : "20190721",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

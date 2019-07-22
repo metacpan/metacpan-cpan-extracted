@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Symbol::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.12'; # VERSION
+our $VERSION = '3.0.14'; # VERSION
 
 
 #
@@ -41,7 +41,9 @@ sub new {
         'priority'                   => $args{priority},
         'nullableAction'             => $args{nullableAction},
         'propertyBitSet'             => $args{propertyBitSet},
-        'eventBitSet'                => $args{eventBitSet}
+        'eventBitSet'                => $args{eventBitSet},
+        'symbolAction'               => $args{symbolAction},
+        'ifAction'                   => $args{ifAction}
     };
 
     return bless $self, $pkg
@@ -277,6 +279,20 @@ sub getEventBitSet {
     return $self->{eventBitSet}
 }
 
+
+sub getSymbolAction {
+    my ($self) = @_;
+
+    return $self->{symbolAction}
+}
+
+
+sub getIfAction {
+    my ($self) = @_;
+
+    return $self->{ifAction}
+}
+
 __END__
 
 =pod
@@ -289,7 +305,7 @@ MarpaX::ESLIF::Grammar::Symbol::Properties - ESLIF Grammar Symbol Properties
 
 =head1 VERSION
 
-version 3.0.12
+version 3.0.14
 
 =head1 SYNOPSIS
 
@@ -503,6 +519,14 @@ Returns the low-level properties (combination of MarpaX::ESLIF::Symbol::Property
 =head2 $self->getEventBitSet
 
 Returns the low-level events (combination of MarpaX::ESLIF::Symbol::EventBitSet values)
+
+=head2 $self->getSymbolAction
+
+Returns the symbol specific action, null if there is none
+
+=head2 $self->getIfAction
+
+Returns the symbol if action, null if there is none
 
 =head1 DESCRIPTION
 

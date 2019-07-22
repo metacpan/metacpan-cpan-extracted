@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-bwk-mn
 requires:
+  DateTime: '0'
   IPC::System::Options: '0.331'
   Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-bwk-mn
   homepage: https://metacpan.org/release/App-bwk-mn
   repository: git://github.com/perlancar/perl-App-bwk-mn.git
-version: '0.000'
+version: '0.001'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

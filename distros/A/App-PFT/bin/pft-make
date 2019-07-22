@@ -119,8 +119,9 @@ use v5.16;
 use feature qw/say state/;
 
 use Carp;
-use Encode;
+use Digest::MD5;
 use Encode::Locale;
+use Encode;
 use Template::Alloy;
 
 use File::Spec;
@@ -270,7 +271,6 @@ sub site_links {
     },
 }
 
-
 my $home_node_slug = PFT::Header::slugify($conf->{site}{home});
 my $home_node;
 
@@ -286,28 +286,41 @@ for my $node ($map->nodes) {
 }
 
 sub write_file {
-
     my($data, $path) = @_;
 
     my $dirname = dirname $path;
-    my $basename = basename $path;
+    my $enc = $conf->{site}{encoding};
+    my $fh;
 
     make_path $dirname;
 
-    # TODO:
-    # This function writes the content on a temporary file. If the content is
-    # the same we keep the old one, otherwise we replace it. This will maintain
-    # the same timestamp for unchanged files, improving the deployment speed
-    # (e.g. via rsync).
-    # TODO: use this tempname
-    #my $temp = File::Spec->catfile($dirname, ".$basename");
-    my $temp = File::Spec->catfile($dirname, $basename);
-    open(my $fh, ">:encoding($conf->{site}{encoding})", $temp)
-        or croak "Opening $temp $!";
+    my $temp = File::Spec->catfile($dirname, "." . basename $path);
+
+    open($fh, ">:encoding($enc)", $temp) or croak "Opening $temp: $!";
     print $fh $data;
     close $fh;
 
-    # TODO: if different then rename over it, otherwise unlink tempname
+    if (-e "$path") {
+        # This branch enables an upload-time optimization: if the file
+        # created file is exactly the same as the previous compilation (same
+        # checksum) we keep the old one.  Rsync will not upload it again.
+        my $md5 = Digest::MD5->new;
+        $md5->add(encode($enc, $data));
+        my $digest_new = $md5->hexdigest;
+
+        open($fh, "<:raw", $path)
+            or croak "Opening $path: $!";
+        $md5->addfile($fh);
+        close $fh;
+
+        if ($digest_new eq $md5->hexdigest) {
+            # Unchanged! Leave the old one.
+            unlink $temp;
+            return;
+        }
+    }
+
+    rename $temp => $path;
 }
 
 sub compile_entry {
@@ -345,20 +358,20 @@ sub compile_entry {
             %{$conf->{site}},
         },
         content => {
-            title => $node->title,
-            html  => $node->html(sub { node_to_href($node, shift) }),
-            tags  => nodes_to_anchors($node, $node->tags),
-            date  => sub { node_to_date($node, @_) },
-            is_home => $is_home,
-            author => $node->author,
-            is_virtual => $node->virtual,
+            title       => $node->title,
+            html        => $node->html(sub { node_to_href($node, shift) }),
+            tags        => nodes_to_anchors($node, $node->tags),
+            date        => sub { node_to_date($node, @_) },
+            is_home     => $is_home,
+            author      => $node->author,
+            is_virtual  => $node->virtual,
         },
         links => {
             site_links($node),
-            prev     => node_to_anchor($node, $node->prev),
-            next     => node_to_anchor($node, $node->next),
-            parent   => node_to_anchor($node, $node->month),
-            children => nodes_to_anchors($node, $node->children),
+            prev        => node_to_anchor($node, $node->prev),
+            next        => node_to_anchor($node, $node->next),
+            parent      => node_to_anchor($node, $node->month),
+            children    => nodes_to_anchors($node, $node->children),
         }
     );
 

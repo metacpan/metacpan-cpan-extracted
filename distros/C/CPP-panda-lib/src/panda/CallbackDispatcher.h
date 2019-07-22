@@ -1,7 +1,7 @@
 #pragma once
-#include <panda/lib/owning_list.h>
-#include <panda/function.h>
-#include <panda/optional.h>
+#include "function.h"
+#include "optional.h"
+#include "owning_list.h"
 
 namespace panda {
 
@@ -57,7 +57,7 @@ public:
         }
     };
 
-    using CallbackList = lib::owning_list<Wrapper>;
+    using CallbackList = owning_list<Wrapper>;
 
     struct Event {
         CallbackDispatcher& dispatcher;

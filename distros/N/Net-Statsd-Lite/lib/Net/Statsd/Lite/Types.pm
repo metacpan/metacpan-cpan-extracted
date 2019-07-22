@@ -12,7 +12,7 @@ use Type::Utils -all;
 
 BEGIN { extends "Types::Standard" }
 
-our $VERSION = 'v0.4.6';
+our $VERSION = 'v0.4.8';
 
 
 # See also Types::Common::Numeric PositiveOrZeroInt
@@ -54,7 +54,7 @@ Net::Statsd::Lite::Types - A type library for Net::Statsd::Lite
 
 =head1 VERSION
 
-version v0.4.6
+version v0.4.8
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

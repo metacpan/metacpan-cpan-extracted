@@ -159,7 +159,7 @@ for my $test_info (@tests) {
     }
 }
 
-END { eval { drop_table($dbh,$table); $dbh->disconnect if $dbh }; }
+END { eval { drop_table($dbh,$table); } }
 
 
 __END__

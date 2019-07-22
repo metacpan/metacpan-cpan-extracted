@@ -11,7 +11,7 @@ my $ORACLE_ENV  = ($^O eq 'VMS') ? 'ORA_ROOT' : 'ORACLE_HOME';
 
 {
 package DBD::Oracle;
-    our $VERSION = '1.76'; # VERSION
+    our $VERSION = '1.791'; # VERSION
 # ABSTRACT: Oracle database driver for the DBI module
 
     use DBI ();
@@ -322,7 +322,7 @@ package DBD::Oracle;
                SELECT SYS_CONTEXT('userenv','session_user') FROM DUAL
             })||'';
             # Now we'll reinstate the earlier warning.  We're just
-            # appending it, so in the extremeley unlikely case that the
+            # appending it, so in the extremely unlikely case that the
             # selectrow_array we just issued also issued a warning, the
             # 2 warnings will appear out of order.
             $dbh->set_err($err, $errstr, $state) if defined $err;
@@ -1249,7 +1249,7 @@ DBD::Oracle - Oracle database driver for the DBI module
 
 =head1 VERSION
 
-version 1.76
+version 1.791
 
 =head1 SYNOPSIS
 
@@ -2834,7 +2834,7 @@ In the above example 10 rows will be prefetched up to a maximum of 10000 bytes o
 suggests a good row cache value for a scrollable cursor is about 20% of expected size of the record set.
 
 The prefetch settings tell the DBD::Oracle to grab x rows (or x-bytes) when it needs to get new rows. This happens on the first
-fetch that sets the current_positon to any value other than 0. In the above example if we do a OCI_FETCH_FIRST the first 10 rows are
+fetch that sets the current position to any value other than 0. In the above example if we do a OCI_FETCH_FIRST the first 10 rows are
 loaded into the buffer and DBD::Oracle will not have to go back to the server for more rows. When record 11 is fetched DBD::Oracle
 fetches and returns this row and the next 9 rows are loaded into the buffer. In this case if you fetch backwards from 10 to 1
 no server round trips are made.
@@ -3691,26 +3691,26 @@ The valid orientation constant and fetch offset values combination are detailed 
   OCI_FETCH_RELATIVE, and a fetch offset value of 1 is equivalent to a OCI_FETCH_NEXT.
   OCI_FETCH_RELATIVE, and a fetch offset value of -1 is equivalent to a OCI_FETCH_PRIOR.
 
-The effect that a ora_fetch_scroll method call has on the current_positon attribute is detailed below.
+The effect that a ora_fetch_scroll method call has on the current position attribute is detailed below.
 
-  OCI_FETCH_CURRENT, has no effect on the current_positon attribute.
-  OCI_FETCH_NEXT,    increments current_positon attribute by 1
-  OCI_FETCH_NEXT,    when at the last row in the record set does not change current_positon
+  OCI_FETCH_CURRENT, has no effect on the current position attribute.
+  OCI_FETCH_NEXT,    increments current position attribute by 1
+  OCI_FETCH_NEXT,    when at the last row in the record set does not change current position
                      attribute, it is equivalent to a OCI_FETCH_CURRENT
-  OCI_FETCH_FIRST,   sets the current_positon attribute to 1.
-  OCI_FETCH_LAST,    sets the current_positon attribute to the total number of rows in the
+  OCI_FETCH_FIRST,   sets the current position attribute to 1.
+  OCI_FETCH_LAST,    sets the current position attribute to the total number of rows in the
                      record set.
-  OCI_FETCH_PRIOR,   decrements current_positon attribute by 1.
-  OCI_FETCH_PRIOR,   when at the first row in the record set does not change current_positon
+  OCI_FETCH_PRIOR,   decrements current position attribute by 1.
+  OCI_FETCH_PRIOR,   when at the first row in the record set does not change current position
                      attribute, it is equivalent to a OCI_FETCH_CURRENT.
 
-  OCI_FETCH_ABSOLUTE, sets the current_positon attribute to the fetch offset value.
+  OCI_FETCH_ABSOLUTE, sets the current position attribute to the fetch offset value.
   OCI_FETCH_ABSOLUTE, and a fetch offset value that is less than 1 does not change
-                      current_positon attribute, it is equivalent to a OCI_FETCH_CURRENT.
+                      current position attribute, it is equivalent to a OCI_FETCH_CURRENT.
   OCI_FETCH_ABSOLUTE, and a fetch offset value that is greater than the number of records in
-                      the record set, does not change current_positon attribute, it is
+                      the record set, does not change current position attribute, it is
                       equivalent to a OCI_FETCH_CURRENT.
-  OCI_FETCH_RELATIVE, sets the current_positon attribute to (current_positon attribute +
+  OCI_FETCH_RELATIVE, sets the current position attribute to (current position attribute +
                       fetch offset value).
   OCI_FETCH_RELATIVE, and a fetch offset value that makes the current position less than 1,
                       does not change fetch offset value so it is equivalent to a OCI_FETCH_CURRENT.
@@ -3718,11 +3718,11 @@ The effect that a ora_fetch_scroll method call has on the current_positon attrib
                       in the record set, does not change fetch offset value so it is equivalent
                       to a OCI_FETCH_CURRENT.
 
-The effects of the differing orientation constants on the first fetch (current_postion attribute at 0) are as follows.
+The effects of the differing orientation constants on the first fetch (current position attribute at 0) are as follows.
 
-  OCI_FETCH_CURRENT, dose not fetch a row or change the current_positon attribute.
-  OCI_FETCH_FIRST,   fetches row 1 and sets the current_positon attribute to 1.
-  OCI_FETCH_LAST,    fetches the last row in the record set and sets the current_positon
+  OCI_FETCH_CURRENT, dose not fetch a row or change the current position attribute.
+  OCI_FETCH_FIRST,   fetches row 1 and sets the current position attribute to 1.
+  OCI_FETCH_LAST,    fetches the last row in the record set and sets the current position
                      attribute to the total number of rows in the record set.
   OCI_FETCH_NEXT,    equivalent to a OCI_FETCH_FIRST.
   OCI_FETCH_PRIOR,   equivalent to a OCI_FETCH_CURRENT.
@@ -3764,7 +3764,7 @@ method;
   print "id=".$value->[0].", First Name=".$value->[1].", Last Name=".$value->[2]."\n";
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute to will be 20 after this snippet.  This is also a way to get the number of rows in the record set, however,
+The current position attribute to will be 20 after this snippet.  This is also a way to get the number of rows in the record set, however,
 if the record set is large this could take some time.
 
 =item Fetching the Current Row
@@ -3773,7 +3773,7 @@ if the record set is large this could take some time.
   print "id=".$value->[0].", First Name=".$value->[1].", Last Name=".$value->[2]."\n";
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will still be 20 after this snippet.
+The current position attribute will still be 20 after this snippet.
 
 =item Fetching the First Row
 
@@ -3781,7 +3781,7 @@ The current_positon attribute will still be 20 after this snippet.
   print "id=".$value->[0].", First Name=".$value->[1].", Last Name=".$value->[2]."\n";
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 1 after this snippet.
+The current position attribute will be 1 after this snippet.
 
 =item Fetching the Next Row
 
@@ -3791,7 +3791,7 @@ The current_positon attribute will be 1 after this snippet.
   }
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 5 after this snippet.
+The current position attribute will be 5 after this snippet.
 
 =item Fetching the Prior Row
 
@@ -3801,7 +3801,7 @@ The current_positon attribute will be 5 after this snippet.
   }
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 1 after this snippet.
+The current position attribute will be 1 after this snippet.
 
 =item Fetching the 10th Row
 
@@ -3809,7 +3809,7 @@ The current_positon attribute will be 1 after this snippet.
   print "id=".$value->[0].", First Name=".$value->[1].", Last Name=".$value->[2]."\n";
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 10 after this snippet.
+The current position attribute will be 10 after this snippet.
 
 =item Fetching the 10th to 14th Row
 
@@ -3819,7 +3819,7 @@ The current_positon attribute will be 10 after this snippet.
   }
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 14 after this snippet.
+The current position attribute will be 14 after this snippet.
 
 =item Fetching the 14th to 10th Row
 
@@ -3829,7 +3829,7 @@ The current_positon attribute will be 14 after this snippet.
   }
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 10 after this snippet.
+The current position attribute will be 10 after this snippet.
 
 =item Fetching the 5th Row From the Present Position.
 
@@ -3837,7 +3837,7 @@ The current_positon attribute will be 10 after this snippet.
   print "id=".$value->[0].", First Name=".$value->[1].", Last Name=".$value->[2]."\n";
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 15 after this snippet.
+The current position attribute will be 15 after this snippet.
 
 =item Fetching the 9th Row Prior From the Present Position
 
@@ -3845,7 +3845,7 @@ The current_positon attribute will be 15 after this snippet.
   print "id=".$value->[0].", First Name=".$value->[1].", Last Name=".$value->[2]."\n";
   print "current scroll position=".$sth->ora_scroll_position()."\n";
 
-The current_positon attribute will be 6 after this snippet.
+The current position attribute will be 6 after this snippet.
 
 =item Use Finish
 
@@ -3876,7 +3876,7 @@ BLOBs and CLOBs treating them exactly as if they were the same as the legacy LON
 
 With this interface DBD::Oracle handles your data utilizing LOB Locator OCI calls so it only works with CLOB and BLOB datatypes. With this interface DBD::Oracle takes care of the LOB Locator operations for you.
 
-=item L</LOB Locator Method Interface>
+=item LOB Locator Method Interface
 
 This allows the user direct access to the LOB Locator methods, so you have to take care of the LOB Locator operations yourself.
 
@@ -5613,7 +5613,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
+This software is copyright (c) 2019, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

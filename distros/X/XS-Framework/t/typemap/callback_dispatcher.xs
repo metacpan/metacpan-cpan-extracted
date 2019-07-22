@@ -4,7 +4,7 @@
 using namespace xs;
 
 using panda::string;
-using std::string_view;
+using panda::string_view;
 using panda::CallbackDispatcher;
 template <class T> using iptr = panda::iptr<T>;
 

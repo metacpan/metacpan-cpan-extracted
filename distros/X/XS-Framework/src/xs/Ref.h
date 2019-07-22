@@ -16,8 +16,6 @@ struct Ref : Scalar {
     Ref (const Sv&     oth) : Ref(oth.get())         {}
     Ref (Sv&&          oth) : Scalar(std::move(oth)) { _validate(); }
 
-    Ref (const CallProxy& p) : Ref(p.scalar()) {}
-
     Ref (const Simple&) = delete;
     Ref (const Glob&)   = delete;
     Ref (const Array&) = delete;
@@ -73,8 +71,6 @@ struct Ref : Scalar {
         return *this;
     }
 
-    Ref& operator= (const CallProxy& p) { return operator=(p.scalar()); }
-
     Ref& operator= (const Simple&) = delete;
     Ref& operator= (const Glob&)   = delete;
     Ref& operator= (const Array&)  = delete;
@@ -83,7 +79,7 @@ struct Ref : Scalar {
 
     void set (SV* val) { Scalar::set(val); }
 
-    template <class T = Sv> one_of_t<T,Sv,Scalar,Simple,Array,Hash,Sub,Stash,Glob,Ref,Object> value () const { return T(sv ? SvRV(sv) : NULL); }
+    template <class T = Sv> enable_if_sv_t<T,T> value () const { return T(sv ? SvRV(sv) : NULL); }
 
     void value (SV* val, bool policy = INCREMENT) {
         if (!val) val = &PL_sv_undef;

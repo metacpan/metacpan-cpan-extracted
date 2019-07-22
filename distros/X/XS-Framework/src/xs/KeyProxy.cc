@@ -12,7 +12,7 @@ KeyProxy KeyProxy::operator[] (size_t key) {
     throw std::invalid_argument("element is not an array reference");
 }
 
-KeyProxy KeyProxy::operator[] (const std::string_view& key) {
+KeyProxy KeyProxy::operator[] (const panda::string_view& key) {
     if (SvROK(sv)) {
         Hash h(SvRV(sv));
         if (h) return h[key];

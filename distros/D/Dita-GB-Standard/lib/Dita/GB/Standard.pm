@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Dita::GB::Standard;
-our $VERSION = 20190710;
+our $VERSION = 20190722;
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -364,6 +364,15 @@ scale effectively.
 Files are automatically flattened by the L<GBStandard> as files with the same
 content have the same name and so can safely share one global folder without
 fear of name collisions or having multiple names for identical content.
+
+`head3 Mixed Multiple Conversions
+
+When converting documents to L<Dita> it is a standard practice to perform the
+conversion in batches by source document type, perhaps B<html> files first, then
+B<docbook> files, then <AuthorIT> files. Thus leaves the problem of merging the
+results into one corpus after each individual conversion.  The L<GBStandard>
+resolves this problem by guaranteeing the uniqueness of the converted
+files allowing them to be merged into one results folder without collisions.
 
 `head3 No Relative Paths in References
 
@@ -1600,10 +1609,7 @@ use Data::Table::Text qw(:all);
 
 makeDieConfess;
 
-if ($^O =~ m(bsd|linux)i)
- {plan tests => 48;
- }
-else
+if ($^O !~ m(bsd|linux)i)
  {plan skip_all => 'Not supported';
  }
 
@@ -1733,3 +1739,5 @@ if (1) {                                                                        
 
   clearFolder($_, 10) for $d, $D;
  }
+
+done_testing;

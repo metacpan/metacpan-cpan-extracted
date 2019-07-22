@@ -5,7 +5,7 @@ use Pcore::Lib::Scalar qw[is_ref weaken];
 use Pcore::Lib::Text qw[decode_utf8 encode_utf8];
 use Pcore::Lib::UUID qw[uuid_v4_str];
 use Pcore::Lib::Data qw[to_b64 to_xor];
-use Pcore::Lib::Digest qw[sha1];
+use Pcore::Lib::Digest qw[sha1_bin];
 use Compress::Raw::Zlib;
 use overload    #
   'bool'   => sub { return $_[0]->{is_connected} },
@@ -307,7 +307,7 @@ sub _set_status ( $self, $status, $reason = undef ) {
 
 # UTILS
 sub _get_challenge ( $self, $key ) {
-    return to_b64( sha1( ($key) . $WEBSOCKET_GUID ), $EMPTY );
+    return to_b64 sha1_bin( $key . $WEBSOCKET_GUID ), $EMPTY;
 }
 
 sub _build_frame ( $self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload_ref ) {

@@ -1309,7 +1309,7 @@ $frame->pack(-fill => "x");
 
 ### SQL selection
 $frame = $GrabMain->Frame(-borderwidth => 3, -relief => "raised");
-$frame->Label(-text => "SQL Selection Criterea")->pack(-anchor => "w");
+$frame->Label(-text => "SQL Selection Criteria")->pack(-anchor => "w");
 $frame1 = $frame->Frame(-highlightthickness => 1);
 
 ## SQL sort frame
@@ -1584,7 +1584,7 @@ query.  The Oracle query optimiser is responsible for deciding on the optimal
 path to use.  Needless to say, understanding such plans requires a fairly
 sophisticated knowledge of Oracle architecture and internals.
 
-Explain allows a user to interactively edit a SQL statemant and view the
+Explain allows a user to interactively edit a SQL statement and view the
 resulting query plan with the click of a single button.  The effects of
 modifying the SQL or of adding hints can be rapidly established.
 
@@ -1698,7 +1698,7 @@ its definition in a dialog box.
 The explain window has an option on the "File" menu labelled "SQL Cache ...",
 as well as a button with the same function.  Selecting this will popup a new
 top-level window containing a menu bar and three frames, labelled "SQL Cache",
-"SQL Statement Statistics" and "SQL Selection Criterea".  At the bottom of the
+"SQL Statement Statistics" and "SQL Selection Criteria".  At the bottom of the
 window are three buttons labelled "Capture SQL", "Explain" and "Close".
 
 The menu bar has two pulldown menus "File" and "Help".  "File" allows you to
@@ -1708,16 +1708,16 @@ statement to the Explain window and Close the Grab window.
 The "SQL Cache" frame shows the statements currently in the Oracle SQL cache.
 As you move the cursor over this window, each SQL statement will be highlighted
 with an outline box.  Single-clicking on a statement in the SQL Cache pane will
-highlight the stamement in green and display more detailed information on that
+highlight the statement in green and display more detailed information on that
 statement in the SQL Statement Statistics frame.
 
 If you want to save the entire contents of the SQL Cache pane, you can do this
 from the "File" menu.
 
-The "SQL Selection Criterea" frame allows you to specify which SQL statements
+The "SQL Selection Criteria" frame allows you to specify which SQL statements
 you are interested in, and how you want them sorted.  The pattern used to select
 statements is a normal perl regexp.  Once you have defined the selection
-criterea, clicking the "Capture SQL" button will read all the matching
+criteria, clicking the "Capture SQL" button will read all the matching
 statements from the SQL cache and display them in the top frame.
 
 Double-clicking on a statement in the "SQL Cache" pane, selecting "Explain"

@@ -5,7 +5,7 @@
 #include <cxxabi.h>
 #include <exception>
 
-using std::string_view;
+using panda::string_view;
 
 namespace xs {
 

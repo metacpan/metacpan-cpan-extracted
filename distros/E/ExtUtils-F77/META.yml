@@ -16,5 +16,6 @@ no_index:
     - inc
 resources:
   IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/PDLPorters/extutils-f77/issues
   repository: git://github.com/PDLPorters/extutils-f77.git
-version: 1.23
+version: 1.24

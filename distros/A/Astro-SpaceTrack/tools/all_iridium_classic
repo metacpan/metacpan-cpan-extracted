@@ -11,7 +11,7 @@ use JSON;
 use List::Util qw{ max };
 use Pod::Usage;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 my %opt;
 

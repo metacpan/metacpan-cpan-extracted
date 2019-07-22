@@ -8,7 +8,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 02-client.t 75 2019-06-19 15:23:53Z minus $
+# $Id: 02-client.t 76 2019-07-20 07:48:18Z minus $
 #
 #########################################################################
 use Test::More;
@@ -46,7 +46,6 @@ my $first;
     };
     $first = shift @list;
 }
-#note(explain($first));
 my $filename = ($first && ref($first) eq 'HASH') ? $first->{filename} : "";
 
 # Get list
@@ -71,4 +70,3 @@ EXAMPLE:
 
     cd altair
     perl ../t/02-client.t
-

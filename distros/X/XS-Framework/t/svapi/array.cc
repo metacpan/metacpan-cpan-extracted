@@ -126,7 +126,7 @@ TEST_CASE("Array", "[Sv]") {
     SECTION("[]const") { // unsafe getter
         const Array& o = arr;
         REQUIRE(Simple(o[0]) == 777);
-        REQUIRE(Simple(o[1]) == std::string_view("fuckit"));
+        REQUIRE(Simple(o[1]) == "fuckit");
         REQUIRE(!o[2]);
         REQUIRE(!o[90]);
     }
@@ -166,7 +166,7 @@ TEST_CASE("Array", "[Sv]") {
     SECTION("[]") { // unsafe getter
         Array o = arr;
         REQUIRE(Simple(o[0]) == 777);
-        REQUIRE(Simple(o[1]) == std::string_view("fuckit"));
+        REQUIRE(Simple(o[1]) == "fuckit");
         REQUIRE(!o[2]);
         REQUIRE(!o[90]);
     }
@@ -327,7 +327,7 @@ TEST_CASE("Array", "[Sv]") {
             REQUIRE(SvREFCNT(vars.pv) == pcnt);
             REQUIRE(SvREFCNT(vars.rv) == rcnt);
             REQUIRE(Simple(o[0]) == SvIVX(vars.iv));
-            REQUIRE(Simple(o[1]).get<std::string_view>() == std::string_view(SvPVX(vars.pv)));
+            REQUIRE(Simple(o[1]).get<panda::string_view>() == SvPVX(vars.pv));
             REQUIRE(Ref(o[2]).value().get() == SvRV(vars.rv));
         }
 

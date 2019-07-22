@@ -2,48 +2,61 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.006;
 
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Redis support for IO::Async",
   "AUTHOR" => "Tom Molesworth <TEAM\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Net-Async-Redis",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Net::Async::Redis",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
     "Future" => "0.40",
     "Future::AsyncAwait" => "0.27",
     "IO::Async" => 0,
+    "IO::Async::Notifier" => 0,
+    "IO::Async::Stream" => 0,
     "List::Util" => "1.29",
     "Log::Any" => "1.050",
     "Math::Random::Secure" => 0,
+    "Mixin::Event::Dispatch::Bus" => "2.000",
     "OpenTracing" => "0.003",
     "Ryu::Async" => "0.006",
+    "Scalar::Util" => 0,
     "Syntax::Keyword::Try" => "0.08",
     "URI" => 0,
     "URI::redis" => 0,
     "curry" => 0,
-    "parent" => 0
+    "curry::weak" => 0,
+    "mro" => 0,
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "IO::Async::Loop" => 0,
+    "IO::Async::Test" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Log::Any::Adapter" => 0,
     "Test::CheckDeps" => "0.010",
     "Test::Deep" => 0,
+    "Test::Fatal" => 0,
     "Test::HexString" => 0,
     "Test::More" => "0.98",
-    "Variable::Disposition" => "0.004"
+    "Variable::Disposition" => "0.004",
+    "utf8" => 0
   },
-  "VERSION" => "2.000",
+  "VERSION" => "2.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,23 +70,36 @@ my %FallbackPrereqs = (
   "Future" => "0.40",
   "Future::AsyncAwait" => "0.27",
   "IO::Async" => 0,
+  "IO::Async::Loop" => 0,
+  "IO::Async::Notifier" => 0,
+  "IO::Async::Stream" => 0,
+  "IO::Async::Test" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.29",
   "Log::Any" => "1.050",
+  "Log::Any::Adapter" => 0,
   "Math::Random::Secure" => 0,
+  "Mixin::Event::Dispatch::Bus" => "2.000",
   "OpenTracing" => "0.003",
   "Ryu::Async" => "0.006",
+  "Scalar::Util" => 0,
   "Syntax::Keyword::Try" => "0.08",
   "Test::CheckDeps" => "0.010",
   "Test::Deep" => 0,
+  "Test::Fatal" => 0,
   "Test::HexString" => 0,
   "Test::More" => "0.98",
   "URI" => 0,
   "URI::redis" => 0,
   "Variable::Disposition" => "0.004",
   "curry" => 0,
-  "parent" => 0
+  "curry::weak" => 0,
+  "mro" => 0,
+  "parent" => 0,
+  "strict" => 0,
+  "utf8" => 0,
+  "warnings" => 0
 );
 
 

@@ -24,7 +24,6 @@ requires:
   DBD::SQLite: '1.5'
   DBI: '1.6'
   File::Copy: '2.18'
-  File::Find: '1.15'
   File::Path: '2'
   HTTP::Message: '6.02'
   LWP: '5.8'
@@ -37,12 +36,12 @@ requires:
   Socket: '0'
   Sys::Hostname: '0'
   Term::ReadKey: '2.33'
+  Text::ParseWords: '0'
   Text::SimpleTable: '2.03'
   Try::Tiny: '0.07'
   URI: '1.5'
-  WWW::MLite: '2.01'
   perl: '5.016001'
 resources:
   homepage: http://app-monm.sourceforge.net
   license: https://dev.perl.org/licenses
-version: '1.06'
+version: '1.07'

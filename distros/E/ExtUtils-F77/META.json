@@ -21,6 +21,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/extutils-f77/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/PDLPorters/extutils-f77.git",
@@ -28,5 +31,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "1.23"
+   "version" : "1.24"
 }

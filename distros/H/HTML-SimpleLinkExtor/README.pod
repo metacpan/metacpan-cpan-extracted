@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/html-simplelinkextor/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/HTML-SimpleLinkExtor.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/HTML::SimpleLinkExtor"><img src="https://img.shields.io/cpan/v/HTML-SimpleLinkExtor.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/HTML::SimpleLinkExtor"><img src="https://img.shields.io/cpan/v/HTML-SimpleLinkExtor.svg" /></A>
 
 =head1 The HTML::SimpleLinkExtor module
 
@@ -23,7 +23,7 @@ for any Perl module.
 
 To read about L<HTML::SimpleLinkExtor>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/HTML/SimpleLinkExtor.pm
 
@@ -33,7 +33,7 @@ name instead of the file location:
 	% perldoc HTML::SimpleLinkExtor
 
 You can read the documentation and inspect the meta data on
-L<MetaCPAN|https://www.metacpan.org/module/HTML::SimpleLinkExtor>.
+L<MetaCPAN|https://metacpan.org/pod/HTML::SimpleLinkExtor>.
 
 
 The standard module documentation has example uses in the SYNOPSIS

@@ -38,4 +38,4 @@ resources:
   homepage: https://sourceforge.net/projects/app-monm-notifier/
   license: https://dev.perl.org/licenses
   repository: https://svn.code.sf.net/p/app-monm-notifier/code/trunk
-version: '1.02'
+version: '1.03'

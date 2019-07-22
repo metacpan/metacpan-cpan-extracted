@@ -7,7 +7,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi;
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 my $requires = {
         'Try::Tiny'             => '0',

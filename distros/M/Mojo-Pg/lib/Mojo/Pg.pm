@@ -32,9 +32,9 @@ has options         => sub {
   };
 };
 has [qw(password username)] => '';
-has pubsub => sub { Mojo::Pg::PubSub->new(pg => shift) };
+has pubsub                  => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.13';
+our $VERSION = '4.14';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -61,7 +61,7 @@ sub from_string {
   # Service and search_path
   my $hash = $url->query->to_hash;
   if (my $service = delete $hash->{service}) { $dsn .= "service=$service" }
-  if (my $path = delete $hash->{search_path}) {
+  if (my $path    = delete $hash->{search_path}) {
     $self->search_path(ref $path ? $path : [$path]);
   }
 
@@ -79,7 +79,9 @@ sub _dequeue {
   # Fork-safety
   delete @$self{qw(pid queue)} unless ($self->{pid} //= $$) eq $$;
 
-  while (my $dbh = shift @{$self->{queue} || []}) { return $dbh if $dbh->ping }
+  while (my $dbh = shift @{$self->{queue} || []}) {
+    return $dbh if $dbh->{Active};
+  }
   my $dbh = DBI->connect(map { $self->$_ } qw(dsn username password options));
 
   # Search path
@@ -98,8 +100,10 @@ sub _enqueue {
 
   if (my $parent = $self->parent) { return $parent->_enqueue($dbh) }
 
+  # Async connections need to be checked more carefully
   my $queue = $self->{queue} ||= [];
-  push @$queue, $dbh if $dbh->{Active};
+  push @$queue, $dbh
+    if $dbh->{Active} && (delete $dbh->{private_mojo_async} ? $dbh->ping : 1);
   shift @$queue while @$queue > $self->max_connections;
 }
 

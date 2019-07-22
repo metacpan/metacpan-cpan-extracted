@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::BCM2835::I2C
 # Description:   I2C Connection
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2019 Mark Dootson
 # License      : This work is free software; you can redistribute it and/or modify it 
 #                under the terms of the GNU General Public License as published by the 
 #                Free Software Foundation; either version 3 of the License, or any later 
@@ -15,6 +15,7 @@ package HiPi::BCM2835::I2C;
 use strict;
 use warnings;
 use parent qw( HiPi::Class );
+use HiPi 0.80;
 use HiPi qw( :rpi :i2c );
 use HiPi::BCM2835 qw( :registers :i2c :clock );
 
@@ -24,7 +25,7 @@ __PACKAGE__->create_accessors( qw(
     _hipi_baseaddr peripheral address _function_mode _clock_divider _baud_reference readmode
 ));
 
-our $VERSION ='0.64';
+our $VERSION ='0.65';
 
 our @EXPORT = ();
 our @EXPORT_OK = ();

@@ -1,5 +1,15 @@
 Revision history for Net-Statsd-Lite
 
+v0.4.8    2019-07-21 11:37:59+01:00 Europe/London
+  [Tests]
+  - Specify a minimum version of Test::TCP for Net::EmptyPort.
+
+v0.4.7    2019-07-20 11:00:08+01:00 Europe/London
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  - Bumped copyright year.
+
 v0.4.6    2018-09-11 23:36:11+01:00 Europe/London
   [Tests]
   - Updated tests to be more Windows-friendly.

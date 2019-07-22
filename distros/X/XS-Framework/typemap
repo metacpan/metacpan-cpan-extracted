@@ -25,7 +25,8 @@ xs::Object T_xs_Object
 List       T_xs_List
 xs::List   T_xs_List
 
-panda::string  T_STRING
+panda::string      T_STRING
+panda::string_view T_STRING_VIEW
 
 ######################################################################
 OUTPUT

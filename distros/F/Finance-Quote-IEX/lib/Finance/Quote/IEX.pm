@@ -1,6 +1,6 @@
 package Finance::Quote::IEX;
 
-# ABSTRACT: Retrieve stock quotes using the IEX API
+# ABSTRACT: (DEPRECATED) Retrieve stock quotes using the IEX API
 
 use strict;
 use warnings;
@@ -8,7 +8,10 @@ use DateTime;
 use JSON qw(decode_json);
 use HTTP::Status qw(status_message);
 
-our $VERSION = '0.001001'; # VERSION
+warnings::warnif( 'deprecated',
+    'Finance::Quote::IEX is deprecated and should no longer be used' );
+
+our $VERSION = '0.002000'; # VERSION
 
 sub methods {
     return (
@@ -139,11 +142,11 @@ __END__
 
 =head1 NAME
 
-Finance::Quote::IEX - Retrieve stock quotes using the IEX API
+Finance::Quote::IEX - (DEPRECATED) Retrieve stock quotes using the IEX API
 
 =head1 VERSION
 
-version 0.001001
+version 0.002000
 
 =head1 SYNOPSIS
 
@@ -160,6 +163,12 @@ must be loaded explicitly by placing C<'IEX'> in the argument list to
 C<< Finance::Quote->new() >>.
 
 This module provides the C<iex> fetch method.
+
+=head1 DEPRECATED
+
+B<This module is deprecated. Use L<Finance::Quote::IEXCloud> instead.>
+
+B<The IEX API removed all non-IEX data in June 2019.>
 
 =head1 ATTRIBUTION
 
@@ -194,6 +203,8 @@ and price.
 
 =item * L<Finance::Quote>
 
+=item * L<Finance::Quote::IEXCloud>
+
 =item * L<https://iextrading.com/developer/docs/>
 
 =back
@@ -204,7 +215,7 @@ Jeffrey T. Palmer <jtpalmer@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Jeffrey T. Palmer.
+This software is Copyright (c) 2019 by Jeffrey T. Palmer.
 
 This is free software, licensed under:
 

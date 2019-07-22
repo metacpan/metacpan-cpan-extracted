@@ -19,6 +19,7 @@ my $builder = Module::Build->new(
                           },
     requires           => {
                            'Time::Local'       => '1.07',
+                           'perl'              => '5.6.1',
                           },
     build_requires     => {
                            'Test::Simple'      => '0.40',

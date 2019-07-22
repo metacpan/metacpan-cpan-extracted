@@ -1,7 +1,7 @@
 package NetPacket::TCP;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble TCP (Transmission Control Protocol) packets.
-$NetPacket::TCP::VERSION = '1.7.1';
+$NetPacket::TCP::VERSION = '1.7.2';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ our @EXPORT_OK = qw(tcp_strip );
 
 our %EXPORT_TAGS = (
     ALL         => [@EXPORT, @EXPORT_OK],
-    strip       => [qw(tcp_strip)],  
+    strip       => [qw(tcp_strip)],
 );
 
 #
@@ -40,7 +40,7 @@ sub strip {
 
     my $tcp_obj = NetPacket::TCP->decode($pkt);
     return $tcp_obj->{data};
-}   
+}
 
 #
 # Decode the packet
@@ -61,17 +61,17 @@ sub decode {
     if (defined($pkt)) {
 	my $tmp;
 
-	($self->{src_port}, $self->{dest_port}, $self->{seqnum}, 
-	 $self->{acknum}, $tmp, $self->{winsize}, $self->{cksum}, 
+	($self->{src_port}, $self->{dest_port}, $self->{seqnum},
+	 $self->{acknum}, $tmp, $self->{winsize}, $self->{cksum},
 	 $self->{urg}, $self->{options}) =
 	     unpack("nnNNnnnna*", $pkt);
 
 	# Extract flags
-	
+
 	$self->{hlen}     = ($tmp & 0xf000) >> 12;
 	$self->{reserved} = ($tmp & 0x0f00) >> 8;
 	$self->{flags}    =  $tmp & 0x00ff;
-	
+
 	# Decode variable length header and remaining data
 
 	my $olen = $self->{hlen} - 5;
@@ -81,7 +81,7 @@ sub decode {
 
     $olen *= 4;
 
-	( $self->{options}, $self->{data} ) 
+	( $self->{options}, $self->{data} )
         = unpack( 'a' . $olen .  'a*', $self->{options});
     }
 
@@ -246,8 +246,8 @@ sub parse_tcp_options {
       # timestamp
       # next byte is length, set to 10
       # next 4 byte is timestamp, 32 bit unsigned int
-      # next 4 byte is timestamp echo reply, 32 bit unsigned int 
-      $options{ts} = unpack('N', join '', @bytes[2..5]); 
+      # next 4 byte is timestamp echo reply, 32 bit unsigned int
+      $options{ts} = unpack('N', join '', @bytes[2..5]);
       $options{er} = unpack('N', join '', @bytes[6,7,8,9]);
       shift @bytes;
       shift @bytes;
@@ -282,7 +282,7 @@ NetPacket::TCP - Assemble and disassemble TCP (Transmission Control Protocol) pa
 
 =head1 VERSION
 
-version 1.7.1
+version 1.7.2
 
 =head1 SYNOPSIS
 
@@ -295,7 +295,7 @@ version 1.7.1
 =head1 DESCRIPTION
 
 C<NetPacket::TCP> provides a set of routines for assembling and
-disassembling packets using TCP (Transmission Control Protocol).  
+disassembling packets using TCP (Transmission Control Protocol).
 
 =head2 Methods
 
@@ -310,13 +310,13 @@ is passed to this method.
 
 =item C<NetPacket::TCP-E<gt>encode($ip_obj)>
 
-Return a TCP packet encoded with the instance data specified. 
+Return a TCP packet encoded with the instance data specified.
 Needs parts of the ip header contained in $ip_obj in order to calculate
-the TCP checksum. 
+the TCP checksum.
 
 =item C<$packet-E<gt>parse_tcp_options>
 
-Returns a hash (or a hash ref in scalar context) contaning the packet's options.
+Returns a hash (or a hash ref in scalar context) containing the packet's options.
 
 For now the method only recognizes well-known and widely
 used options (MSS, noop, windows scale factor, SACK permitted, SACK,
@@ -507,7 +507,7 @@ flag to all TCP packets passing through:
 
 Copyright (c) 2001 Tim Potter and Stephanie Wehner.
 
-Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of 
+Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of
 the participants in the CRC for Advanced Computational Systems
 ('ACSys').
 

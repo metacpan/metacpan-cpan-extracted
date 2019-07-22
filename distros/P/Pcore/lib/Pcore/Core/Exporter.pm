@@ -196,7 +196,14 @@ sub _export_tags ( $from, $to, $import ) {
     if ( $symbols->%* ) {
         my $export_all = $export->{ALL};
 
+        my $on_export = do {
+            no warnings qw[once];
+
+            *{"$from\::ON_EXPORT"}{CODE};
+        };
+
         for my $sym ( keys $symbols->%* ) {
+            $on_export->($sym) if $on_export;
 
             # skip symbol if it is not exists in symbol table
             next if !defined *{"$from\::$export_all->{$sym}->[0]"};
@@ -206,12 +213,12 @@ sub _export_tags ( $from, $to, $import ) {
             my $alias = $symbols->{$sym} // $export_all->{$sym}->[0];
 
             *{"$to\::$alias"}
-              = $type eq q[]  ? \&{"$from\::$export_all->{$sym}->[0]"}
-              : $type eq q[$] ? \${"$from\::$export_all->{$sym}->[0]"}
-              : $type eq q[@] ? \@{"$from\::$export_all->{$sym}->[0]"}
-              : $type eq q[%] ? \%{"$from\::$export_all->{$sym}->[0]"}
-              : $type eq q[*] ? *{"$from\::$export_all->{$sym}->[0]"}
-              :                 die;
+              = $type eq q[] ? \&{"$from\::$export_all->{$sym}->[0]"}
+              : $type eq '$' ? \${"$from\::$export_all->{$sym}->[0]"}
+              : $type eq '@' ? \@{"$from\::$export_all->{$sym}->[0]"}
+              : $type eq '%' ? \%{"$from\::$export_all->{$sym}->[0]"}
+              : $type eq '*' ? *{"$from\::$export_all->{$sym}->[0]"}
+              :                die;
         }
     }
 
@@ -226,9 +233,9 @@ sub _export_tags ( $from, $to, $import ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 35, 47, 93, 110,     | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 143, 166, 184, 214   |                                                                                                                |
+## |      | 143, 166, 184, 221   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 131                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (28)              |
+## |    3 | 131                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (29)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 1                    | Modules::RequireVersionVar - No package-scoped "$VERSION" variable found                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

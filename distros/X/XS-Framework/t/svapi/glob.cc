@@ -137,8 +137,8 @@ TEST_CASE("Glob", "[Sv]") {
     }
 
     SECTION("name/effective_name") {
-        REQUIRE(my.name() == std::string_view("class_method"));
-        REQUIRE(my.effective_name() == std::string_view("class_method"));
+        REQUIRE(my.name() == "class_method");
+        REQUIRE(my.effective_name() == "class_method");
     }
 
     SECTION("stash/effective_stash") {
@@ -149,13 +149,13 @@ TEST_CASE("Glob", "[Sv]") {
     SECTION("get slot") {
         Glob o = Stash(vars.stash)["allgv"];
         REQUIRE(o.slot<Scalar>());
-        REQUIRE(Simple(o.slot<Scalar>()) == string_view("scalar"));
+        REQUIRE(Simple(o.slot<Scalar>()) == "scalar");
 
         REQUIRE(o.slot<Array>());
-        REQUIRE(Simple(o.slot<Array>()[0]) == string_view("array"));
+        REQUIRE(Simple(o.slot<Array>()[0]) == "array");
 
         REQUIRE(o.slot<Hash>());
-        REQUIRE(Simple(o.slot<Hash>()["key"]) == string_view("hash"));
+        REQUIRE(Simple(o.slot<Hash>()["key"]) == "hash");
 
         REQUIRE(o.slot<Sub>());
         REQUIRE(o.slot<Sub>() == get_cv("M1::allgv", 0));
@@ -207,7 +207,7 @@ TEST_CASE("Glob", "[Sv]") {
         auto glob = Glob::create(stash, "autogen");
         REQUIRE(glob);
         REQUIRE(glob.stash() == vars.stash);
-        REQUIRE(glob.name() == string_view("autogen"));
+        REQUIRE(glob.name() == "autogen");
         glob.slot(Sub("M1::dummy"));
         stash["aliased"] = glob;
         REQUIRE(get_cv("M1::dummy", 0) == get_cv("M1::aliased", 0));

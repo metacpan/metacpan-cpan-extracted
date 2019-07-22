@@ -1,3 +1,8 @@
+Version 0.80  - 22 July 2019
+                Updated for Raspberry Pi 4 alternate function settings.
+                MFRC522 interface updated for default speed compatible
+                with RPI 4.
+                
 Version 0.79  - 14 July 2019
                 Updated for Raspberry Pi 4 pull up/down handling and peripheral addresses
                 add methods to read pin pud settings on Raspberry Pi 4

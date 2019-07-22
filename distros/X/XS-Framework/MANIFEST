@@ -40,7 +40,6 @@ lib/XS/Framework/Manual/uml.dot
 lib/XS/Framework/Manual/uml.png
 lib/XS/Framework/ParseXS.pm
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 misc/mytest.plx
 misc/trun.plx
@@ -51,8 +50,6 @@ src/xs/Backref.h
 src/xs/basic.cc
 src/xs/basic.h
 src/xs/CallbackDispatcher.h
-src/xs/CallProxy.cc
-src/xs/CallProxy.h
 src/xs/catch.cc
 src/xs/catch.h
 src/xs/function.cc
@@ -121,8 +118,6 @@ t/MyTest.xs
 t/payload.t
 t/svapi/array.cc
 t/svapi/array.t
-t/svapi/call_proxy.cc
-t/svapi/call_proxy.t
 t/svapi/glob.cc
 t/svapi/glob.t
 t/svapi/hash.cc
@@ -189,6 +184,5 @@ t/upgrade.t
 typemap
 typemap32
 typemap64
-XS-Framework.pro
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

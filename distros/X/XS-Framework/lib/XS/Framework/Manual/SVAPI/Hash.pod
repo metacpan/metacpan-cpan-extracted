@@ -37,8 +37,8 @@ reserving space for C<cap> items (SV*).
 It is possible to create Hash object in-place via itializer list, which should
 contain name (C<string>) / value (C<Scalar>) pairs, i.e.:
 
-    static Hash create (std::initializer_list<std::tuple<std::string_view, Scalar>> l)
-    Hash (std::initializer_list<std::tuple<std::string_view, Scalar>>)
+    static Hash create (std::initializer_list<std::tuple<panda::string_view, Scalar>> l)
+    Hash (std::initializer_list<std::tuple<panda::string_view, Scalar>>)
 
 For example,
 
@@ -54,12 +54,6 @@ The copy and move constructors are also available:
     Hash (const Sv&   oth)
     Hash (Sv&&        oth)
 
-It it possible to create C<Hash> object from C<CallProxy> invocation:
-
-    Hash (const CallProxy& p)
-
-however, please note, that the C<CallProxy> will be called in B<scalar context>.
-
 =head2 assignment operators
 
     Hash& operator= (SV* val)
@@ -68,7 +62,6 @@ however, please note, that the C<CallProxy> will be called in B<scalar context>.
     Hash& operator= (Hash&& oth)
     Hash& operator= (const Sv& oth)
     Hash& operator= (Sv&& oth)
-    Hash& operator= (const CallProxy& p)
 
 The assignment operators are complementaty to the constructors above. They
 inherit behaviour from C<Sv>, including NULL-safety. The previously held
@@ -97,10 +90,10 @@ For example,
 
 =head2 element access
 
-    Scalar fetch (const std::string_view& key) const
-    Scalar at (const std::string_view& key) const
-    Scalar operator[] (const std::string_view& key) const
-    KeyProxy operator[] (const std::string_view& key)
+    Scalar fetch (const panda::string_view& key) const
+    Scalar at (const panda::string_view& key) const
+    Scalar operator[] (const panda::string_view& key) const
+    KeyProxy operator[] (const panda::string_view& key)
 
 The first three methods return C<Scalar> type. C<fetch> provides bounary-safe
 access to the elements, if the index is out of bounds, then empty C<Scalar>
@@ -116,29 +109,27 @@ in-place fast modification and lazy creation of underlying element, i.e.
 C<fetch>, C<at> and C<operator[] const> are NULL-safe; while mofifying
 C<operator[]> is NULL-unsafe.
 
-    void store (const std::string_view& key, const Scalar& val,  U32 hash = 0)
-    void store (const std::string_view& key, std::nullptr_t,     U32 hash = 0)
-    void store (const std::string_view& key, SV* v,              U32 hash = 0)
-    void store (const std::string_view& key, const Sv& v,        U32 hash = 0)
-    void store (const std::string_view& key, const CallProxy& p, U32 hash = 0)
+    void store (const panda::string_view& key, const Scalar& val, U32 hash = 0)
+    void store (const panda::string_view& key, std::nullptr_t,    U32 hash = 0)
+    void store (const panda::string_view& key, SV* v,             U32 hash = 0)
+    void store (const panda::string_view& key, const Sv& v,       U32 hash = 0)
 
 The C<store> method is used store item in the hash. If underlyging Perl
-array HV* is NULL, then C<store> will throw exception. The last method
-invokes C<CallProxy> in B<scalar context>, as the hash elements are
-always scalars. The C<hash> parameter is the precomputed hash value; if it is
+array HV* is NULL, then C<store> will throw exception.
+The C<hash> parameter is the precomputed hash value; if it is
 zero then Perl will compute it.
 
 To check element existance, the NULL-safe C<exist> method (or it's alias
 C<contains>) can be used:
 
-    bool exists   (const std::string_view& key) const
-    bool contains (const std::string_view& key) const
+    bool exists   (const panda::string_view& key) const
+    bool contains (const panda::string_view& key) const
 
 To delete arbitrary element by key the NULL-unsafe C<erase> method can be
 used (the previous value, if existed, is returned; empty C<Scalar> is
 returned otherwise).
 
-    Scalar erase (const std::string_view& key)
+    Scalar erase (const panda::string_view& key)
 
 =head2 clear()
 
@@ -203,7 +194,7 @@ Usage example:
 
     Hash hash = ...;
     for (auto it = hash.begin(); it != hash.end(); ++it) {
-        std::string_view key = it->key();
+        panda::string_view key = it->key();
         Scalar value = it->value();
         U32 key_hash = it->hash();
     }

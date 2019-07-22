@@ -30,9 +30,9 @@ requires:
   LWP: '5.8'
   LWP::Protocol::https: '6'
   Try::Tiny: '0.2'
-  URI: '1.6'
+  URI: '1.7'
   perl: '5.016001'
 resources:
   homepage: https://www.serzik.com
   license: https://dev.perl.org/licenses
-version: '1.02'
+version: '1.03'

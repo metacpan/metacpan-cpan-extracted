@@ -84,5 +84,3 @@ $sth->bind_param_inout( ':ret', \$val, 1 );
 $sth->execute;
 
 is Encode::is_utf8($val) => 1, 'truncated, yet utf8 encoded';
-
-$dbh->disconnect if $dbh;

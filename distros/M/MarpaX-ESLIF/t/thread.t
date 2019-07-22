@@ -1,32 +1,3 @@
-package MyRecognizerInterface;
-use strict;
-use diagnostics;
-
-sub new                    { my ($pkg, $string) = @_; bless { string => $string }, $pkg }
-sub read                   { 1 }
-sub isEof                  { 1 }
-sub isCharacterStream      { 1 }
-sub encoding               { }
-sub data                   { $_[0]->{string} }
-sub isWithDisableThreshold { 0 }
-sub isWithExhaustion       { 0 }
-sub isWithNewline          { 1 }
-sub isWithTrack            { 1 }
-
-package MyValueInterface;
-use strict;
-use diagnostics;
-
-sub new                { my ($pkg) = @_; bless { result => undef }, $pkg }
-sub isWithHighRankOnly { 1 }
-sub isWithOrderByRank  { 1 }
-sub isWithAmbiguous    { 0 }
-sub isWithNull         { 0 }
-sub maxParses          { 0 }
-sub getResult          { $_[0]->{result} }
-sub setResult          { $_[0]->{result} = $_[1] }
-
-package main;
 use strict;
 use warnings FATAL => 'all';
 
@@ -42,12 +13,13 @@ use Log::Log4perl qw/:easy/;
 use Log::Any::Adapter;
 use Log::Any qw/$log/;
 use threads;
-my $NTHREAD;
+use constant { NTHREAD => 3 };
+use Test::More tests => 3 + NTHREAD * 5;
+
 BEGIN {
-    $NTHREAD = 3;
+    diag("Using " . NTHREAD . " threads");
+    require_ok('MarpaX::ESLIF');
 }
-use Test::More tests => 3 + $NTHREAD * 5;
-BEGIN { require_ok('MarpaX::ESLIF') }
 
 #
 # Init log
@@ -136,7 +108,7 @@ my $input = '(1+2)*3';
 my $expected = '(1+2)*3';
 my @t = grep { defined } map {
   threads->create(\&thr_sub, $input, $expected)
-} (1..$NTHREAD);
+} (1..NTHREAD);
 
 my $remains = scalar(@t);
 while ($remains) {
@@ -148,5 +120,33 @@ while ($remains) {
 }
 
 done_testing();
+
+package MyRecognizerInterface;
+use strict;
+use diagnostics;
+
+sub new                    { my ($pkg, $string) = @_; bless { string => $string }, $pkg }
+sub read                   { 1 }
+sub isEof                  { 1 }
+sub isCharacterStream      { 1 }
+sub encoding               { }
+sub data                   { $_[0]->{string} }
+sub isWithDisableThreshold { 0 }
+sub isWithExhaustion       { 0 }
+sub isWithNewline          { 1 }
+sub isWithTrack            { 1 }
+
+package MyValueInterface;
+use strict;
+use diagnostics;
+
+sub new                { my ($pkg) = @_; bless { result => undef }, $pkg }
+sub isWithHighRankOnly { 1 }
+sub isWithOrderByRank  { 1 }
+sub isWithAmbiguous    { 0 }
+sub isWithNull         { 0 }
+sub maxParses          { 0 }
+sub getResult          { $_[0]->{result} }
+sub setResult          { $_[0]->{result} = $_[1] }
 
 1;

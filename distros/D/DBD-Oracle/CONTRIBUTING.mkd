@@ -34,7 +34,7 @@ $ prove -lv t/some_test_file.t
 $ prove -lvr t/
 ```
 
-In most cases, 'prove' is entirely sufficent for you to test any
+In most cases, 'prove' is entirely sufficient for you to test any
 patches you have.
 
 You may need to satisfy some dependencies. The easiest way to satisfy
@@ -106,6 +106,6 @@ instructions for doing that is available here:
 * https://help.github.com/articles/creating-a-pull-request
 
 [distzilla]:  http://dzil.org/.
-[repository]: https://github.com/pythian/DBD-Oracle/
-[bugtracker]: https://github.com/pythian/DBD-Oracle/issues
+[repository]: https://github.com/perl5-dbi/DBD-Oracle/
+[bugtracker]: https://github.com/perl5-dbi/DBD-Oracle/issues
 

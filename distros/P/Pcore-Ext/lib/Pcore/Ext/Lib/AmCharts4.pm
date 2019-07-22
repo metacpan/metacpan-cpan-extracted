@@ -5,14 +5,26 @@ use Pcore -l10n;
 sub EXT_panel : Extend('Ext.Component') : Type('widget') {
     return {
         config => {
-            store              => undef,
-            useCharts          => \1,
-            useMaps            => \0,
-            chartTheme         => 'material',
-            chartThemeAnimated => \0,
+            store => undef,    # bindable
+
+            useCharts => \1,
+            useMaps   => \0,
+
+            chartTheme      => 'material',
+            chartDarkMode   => undef,            # bindable
+            chartLightTheme => 'dataviz',
+            chartDarkTheme  => 'amchartsdark',
+
+            chartThemeAnimated => \1,
             chartConfig        => undef,
-            chartInit          => undef,        # this.chartInit(chart)
-            chartDataHandler   => undef,        # this.chartDataHandler(chart, data)
+
+            onChartInit      => undef,           # onChartInit(view)
+            chartInitialized => undef,
+
+            onChartCreate    => undef,           # onChartCreate(view, chart)
+            chartDataHandler => undef,           # chartDataHandler(view, chart, data)
+
+            scope => undef,
         },
 
         layout              => 'fit',
@@ -49,15 +61,15 @@ JS
 
         getStoreListeners => func ['store'], <<'JS',
             return {
-                load: this._onReady
-                // prefetch: this.updateInfo,
-                // exception: this.onTotalCountChange
+                dataChanged: this._onReady,
             };
 JS
 
         _loadCharts => func <<"JS",
             var urls = [],
                 chartTheme = this.getChartTheme(),
+                chartLightTheme = this.getChartLightTheme(),
+                chartDarkTheme = this.getChartDarkTheme(),
                 chartThemeAnimated = this.getChartThemeAnimated(),
                 chartsBaseUrl = "@{[ $cdn->get_resource_root('amcharts4') ]}",
                 geoDataBaseUrl = "@{[ $cdn->get_resource_root('amcharts4_geodata') ]}";
@@ -68,6 +80,8 @@ JS
 
             if (chartThemeAnimated && !window.am4themes_animated) urls.push( chartsBaseUrl + '/themes/animated.js');
             if (chartTheme && !window["am4themes_" + chartTheme]) urls.push( chartsBaseUrl + '/themes/' + chartTheme + '.js');
+            if (chartLightTheme && !window["am4themes_" + chartLightTheme]) urls.push( chartsBaseUrl + '/themes/' + chartLightTheme + '.js');
+            if (chartDarkTheme && !window["am4themes_" + chartDarkTheme]) urls.push( chartsBaseUrl + '/themes/' + chartDarkTheme + '.js');
 
             if (urls.length) {
                 var me = this;
@@ -96,6 +110,20 @@ JS
             this.chart.data = data;
 JS
 
+        updateChartTheme => func [ 'newTheme', 'oldTheme' ], <<'JS',
+            if (!this.chart) return;
+
+            this.chart.dispose();
+
+            this.chart = null;
+
+            this._loadCharts();
+JS
+
+        updateChartDarkMode => func [ 'newVal', 'oldVal' ], <<'JS',
+            this.setChartTheme(newVal ? this.getChartDarkTheme() : this.getChartLightTheme());
+JS
+
         _onReady => func <<'JS',
             if (!this.chartsLoaded) return;
             if (!this.rendered) return;
@@ -103,28 +131,40 @@ JS
             if (!this.chart) {
                 am4core.options.commercialLicense = true;
 
+                var onChartInit = this.getOnChartInit();
+
+                if (onChartInit && !this.getChartInitialized()) {
+                    this.setChartInitialized(1);
+
+                    Ext.callback(onChartInit, this.getScope(), [this], 0, this);
+                }
+
                 var config = this.getChartConfig(),
                     chartTheme = this.getChartTheme(),
                     chartThemeAnimated = this.getChartThemeAnimated(),
-                    chartInit = this.getChartInit();
+                    onChartCreate = this.getOnChartCreate();
+
+
 
                 // apply themes
                 am4core.unuseAllThemes();
                 if (chartThemeAnimated) am4core.useTheme(am4themes_animated);
                 if (chartTheme) am4core.useTheme(window["am4themes_" + chartTheme]);
 
-                this.chart = am4core.createFromConfig(config, this.innerElement.dom);
+                this.chart = am4core.createFromConfig(JSON.parse(JSON.stringify(config)), this.innerElement.dom);
 
-                if (chartInit) chartInit.bind(this)(this.chart);
+                if (onChartCreate) {
+                    Ext.callback(onChartCreate, this.getScope(), [this, this.chart], 0, this);
+                }
             }
 
             if (this.getStore()) {
-                var data = Ext.Array.pluck(this.getStore().data.items, 'data');
+                let data = Ext.Array.pluck(this.getStore().data.items, 'data');
 
-                var chartDataHandler = this.getChartDataHandler();
+                let chartDataHandler = this.getChartDataHandler();
 
                 if (chartDataHandler) {
-                    this.chart.data = chartDataHandler.bind(this)(this.chart, data);
+                    this.chart.data = Ext.callback(chartDataHandler, this.getScope(), [this, this.chart, data], 0, this);
                 }
                 else {
                     this.chart.data = data;

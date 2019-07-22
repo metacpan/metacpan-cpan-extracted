@@ -75,7 +75,6 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Data::Dumper' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'File::Temp' => '0',
@@ -92,6 +91,7 @@ do { my $x = {
                                    'Test::More' => '1.3',
                                    'Test::More::UTF8' => '0',
                                    'Try::Tiny' => '0',
+                                   'constant' => '0',
                                    'diagnostics' => '0',
                                    'open' => '0',
                                    'perl' => '5.010',

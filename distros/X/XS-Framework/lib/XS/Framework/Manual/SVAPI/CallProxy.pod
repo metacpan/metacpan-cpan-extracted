@@ -98,10 +98,10 @@ conversible to C<Simple> runtime exception will be thrown.
 
 =head2 call()
 
-    CallProxy call (const std::string_view& name)
-    CallProxy call (const std::string_view& name, const Scalar& arg)
-    CallProxy call (const std::string_view& name, SV*const* args, size_t items)
-    CallProxy call (const std::string_view& name, std::initializer_list<Scalar> l)
+    CallProxy call (const panda::string_view& name)
+    CallProxy call (const panda::string_view& name, const Scalar& arg)
+    CallProxy call (const panda::string_view& name, SV*const* args, size_t items)
+    CallProxy call (const panda::string_view& name, std::initializer_list<Scalar> l)
 
 if it is known a priory, that the result of the invocation is C<Object>, then
 it is possible to have "chaned call" approach, i.e.

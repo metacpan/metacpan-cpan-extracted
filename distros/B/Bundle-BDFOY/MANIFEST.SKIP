@@ -61,3 +61,11 @@
 \.?appveyor.yml
 \.releaserc
 \.lwpcookies
+
+# odd artifacts in macOS
+MANIFEST\s+
+CHANGES\s+
+
+# I only need these to make the files I ship
+module_list.txt
+tools/*

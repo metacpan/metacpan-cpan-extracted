@@ -1,7 +1,7 @@
 package Perinci::Access::Schemeless;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.890'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.891'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1037,7 +1037,7 @@ Perinci::Access::Schemeless - Base class for Perinci::Access::Perl
 
 =head1 VERSION
 
-This document describes version 0.890 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2019-01-06.
+This document describes version 0.891 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2019-07-21.
 
 =head1 DESCRIPTION
 

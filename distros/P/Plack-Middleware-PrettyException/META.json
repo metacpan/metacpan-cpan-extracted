@@ -4,13 +4,13 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-PrettyException",
    "prereqs" : {
@@ -60,7 +60,8 @@
          "web" : "https://github.com/domm/Plack-Middleware-PrettyException"
       }
    },
-   "version" : "1.007",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0104"
+   "version" : "1.008",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

@@ -3,7 +3,7 @@ package Net::MQTT::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -59,6 +59,7 @@ sub import {
 
     $global = $class->new($server);
 
+    no strict 'refs';
     *{ (caller)[0] . "::publish" } = \&publish;
     *{ (caller)[0] . "::retain"  } = \&retain;
 }
@@ -230,9 +231,8 @@ sub _send_subscribe {
 
     utf8::encode($_) for @topics;
 
-    # Hardcoded "packet identifier" \0\x01 for now (was \0\0, but mosquitto
-    # 1.6.1 doesn't allow that anymore, even though the MQTT 3.1.1 spec says
-    # the id only has to be non-zero when the QoS is also non-zero.)
+    # Hardcoded "packet identifier" \0\x01 for now (was \0\0 but the spec
+    # disallows it for subscribe packets and mosquitto started enforcing that.)
     $self->_send("\x82" . _prepend_variable_length("\0\x01" .
         pack("(n/a* x)*", @topics)  # x = QoS 0
     ));
@@ -245,8 +245,8 @@ sub _send_unsubscribe {
 
     utf8::encode($_) for @topics;
 
-    # Hardcoded "packet identifier" \0\0 for now.
-    $self->_send("\xa2" . _prepend_variable_length("\0\0" .
+    # Hardcoded "packet identifier" \0\0x01 for now; see above.
+    $self->_send("\xa2" . _prepend_variable_length("\0\x01" .
         pack("(n/a*)*", @topics)
     ));
 }

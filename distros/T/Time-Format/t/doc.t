@@ -1,4 +1,4 @@
-#!/perl -I..
+#!/perl
 
 # Test examples in the docs, so we know we're not misleading anyone.
 

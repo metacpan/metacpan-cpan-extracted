@@ -3,6 +3,8 @@
 
 namespace xs {
 
+struct Sub; struct Hash; struct Array;
+
 struct KeyProxy : Scalar {
     KeyProxy (SV** ptr, bool nullok) : Scalar(), ptr(ptr), nullok(nullok) { set(*ptr); }
 
@@ -18,15 +20,14 @@ struct KeyProxy : Scalar {
         SvREFCNT_dec(old);
         return *this;
     }
-    KeyProxy& operator= (SV* v)              { return operator=(Scalar(v)); }
-    KeyProxy& operator= (const Sv& v)        { return operator=(Scalar(v)); }
-    KeyProxy& operator= (const CallProxy& p) { return operator=(p.scalar()); }
+    KeyProxy& operator= (SV* v)        { return operator=(Scalar(v)); }
+    KeyProxy& operator= (const Sv& v)  { return operator=(Scalar(v)); }
     KeyProxy& operator= (const Array&) = delete;
     KeyProxy& operator= (const Hash&)  = delete;
     KeyProxy& operator= (const Sub&)   = delete;
 
     KeyProxy operator[] (size_t key);
-    KeyProxy operator[] (const std::string_view& key);
+    KeyProxy operator[] (const panda::string_view& key);
 
 private:
     SV** ptr;

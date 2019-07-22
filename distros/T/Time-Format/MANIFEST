@@ -10,7 +10,6 @@ quickref.ps
 quickref.txt
 README
 SIGNATURE
-Time-Format.ppd
 t/0-signature.t
 t/1-load.t
 t/DateManip.t
@@ -32,6 +31,7 @@ t/string.t
 t/tf_modcheck.pl
 t/time.t
 t/TimeFormat_MC.pm
+t/verysmall.t
 t/xs_DateTime.t
 t/xs_doc.t
 t/xs_funcs.t

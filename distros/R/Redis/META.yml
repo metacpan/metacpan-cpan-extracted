@@ -4,35 +4,37 @@ author:
   - 'Pedro Melo <melo@cpan.org>'
   - 'Damien Krotkine <dams@cpan.org>'
 build_requires:
-  Digest::SHA: 0
-  File::Spec: 0
-  IO::Handle: 0
-  IO::String: 0
-  IPC::Cmd: 0
-  IPC::Open3: 0
-  Pod::Coverage::TrustPod: 0
-  Test::CPAN::Meta: 0
-  Test::Deep: 0
-  Test::Fatal: 0
-  Test::More: 0.98
-  Test::SharedFork: 0
-  Test::TCP: 1.19
+  Digest::SHA: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IO::String: '0'
+  IPC::Cmd: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  Test::SharedFork: '0'
+  Test::TCP: '1.19'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: 6.63_03
-  Module::Build::Tiny: 0.039
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Redis
 requires:
-  IO::Socket::Timeout: 0.29
-  Try::Tiny: 0
-  perl: 5.006
+  IO::Socket::Timeout: '0.29'
+  Try::Tiny: '0'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/PerlRedis/perl-redis/issues
   homepage: https://github.com/PerlRedis/perl-redis
   repository: https://github.com/PerlRedis/perl-redis.git
-version: 1.991
+version: '1.995'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

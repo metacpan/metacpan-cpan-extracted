@@ -1,3 +1,20 @@
+v0.97.0 2019-07-21T06:21:24Z
+ - typo
+ - code cleanup
+ - resources updated
+ - use timstamptz
+ - api read role
+ - app api avatar db updated
+ - user avatar code updated
+ - b64_url -> b64u
+ - exporter ON_EXPORT method
+ - digest lasy export interface
+ - digest functions follow common notation
+ - sqlite custom functions can returns BLOB
+ - dbh in_transaction() method
+ - digest deep recursion on unknown method fixed
+ - create_proc - do not inherit @INC
+
 v0.96.0 2019-07-12T12:29:41Z
  - net check_port method
  - local auth backend code optimized

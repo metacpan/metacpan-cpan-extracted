@@ -1,3 +1,9 @@
+0.040		2019-07-20	T. R. Wyant
+    Fix broken POD links and add test to ensure they stay fixed.
+
+    Remove Astro::App::Satpass2::Format::Classic refs. This module was
+    retired quite a while back.
+
 0.039		2019-03-29	T. R. Wyant
     Fix test failures when local zone not determined. This was a single
     test in t/format_template.t that attempted to use

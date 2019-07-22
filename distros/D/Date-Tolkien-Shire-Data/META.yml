@@ -5,7 +5,7 @@ author:
 build_requires:
   Test::More: '0.88'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ no_index:
 provides:
   Date::Tolkien::Shire::Data:
     file: lib/Date/Tolkien/Shire/Data.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data
   license: http://dev.perl.org/licenses/
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

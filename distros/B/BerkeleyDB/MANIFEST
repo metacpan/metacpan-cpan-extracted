@@ -18,6 +18,7 @@ mkconsts.pl
 mkpod
 ppport.h
 README
+t/000prereq.t
 t/blob.t
 t/btree.t
 t/cds.t

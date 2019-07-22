@@ -15,7 +15,7 @@ use warnings;
 use parent qw( HiPi::Class );
 use HiPi qw( :rpi );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 __PACKAGE__->create_ro_accessors( qw( pinid ) );
 

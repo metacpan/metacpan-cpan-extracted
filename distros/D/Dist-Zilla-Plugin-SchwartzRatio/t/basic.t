@@ -19,8 +19,7 @@ package FakeRelease {
 
 my $fake_client = Test::MockObject->new;
 my $releases = Test::MockObject->new;
-$releases->set_series( next
-    => map {
+$releases->set_series( 'next' => map {
         FakeRelease->new( version => '1.1.'.$_, date => '2017-01-0'.$_,
         status => $_ % 2 ? 'cpan' : 'backpan' )
     } 1..3

@@ -1,4 +1,4 @@
-package App::MBUtiny::ConfigSkel; # $Id: ConfigSkel.pm 120 2019-07-01 11:57:45Z abalama $
+package App::MBUtiny::ConfigSkel; # $Id: ConfigSkel.pm 131 2019-07-16 18:45:44Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MBUtiny::ConfigSkel - Configuration skeleton for App::MBUtiny
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 use constant SIGNATURE => "config";
 
 use vars qw/ $VERSION /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub build { # Building
     my $self = shift;
@@ -462,6 +462,7 @@ Mode: 644
     #    FixUP       on
     #    URL         sftp://user@example.com:22/path/to/backup/dir1
     #    URL         sftp://user@example.com:22/path/to/backup/dir2
+    #    Set         timeout  180
     #    Set         key_path  /path/to/private/file.key
     #    Comment     SFTP storage said blah-blah-blah # Optional for collector
     #</SFTP>

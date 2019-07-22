@@ -144,7 +144,7 @@ common cases it should be enough to have something like:
 
   template <>
   struct Typemap<geos::geom::Triangle*>: TypemapObject<geos::geom::Triangle*, geos::geom::Triangle*, ObjectTypePtr, ObjectStorageMG, StaticCast>{
-    static std::string_view package() {return "Geo::Geos::Triangle"; }
+    static panda::string_view package() {return "Geo::Geos::Triangle"; }
   };
 
 =head3 Template parameters overview
@@ -602,7 +602,7 @@ List of predefined typemap:
   Hash
   Stash
   std::string
-  std::string_view
+  panda::string_view
   std::vector<T>
   std::map<Key, T>
 

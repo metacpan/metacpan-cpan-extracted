@@ -12,7 +12,7 @@ t/basic.t
 t/shire.t
 t/strftime.t
 t/time.t
-tools/lib/Date/Tolkien/Shire.pm
+tools/Date-Tolkien-Shire-old.par
 tools/make-regression
 xt/author/changes.t
 xt/author/critic.t
@@ -23,5 +23,5 @@ xt/author/minimum_perl.t
 xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t
+xt/author/pod_links.t
 xt/author/pod_spelling.t
-xt/author/regression.t

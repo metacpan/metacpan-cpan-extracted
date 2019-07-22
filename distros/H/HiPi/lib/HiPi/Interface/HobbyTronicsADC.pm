@@ -19,7 +19,7 @@ use Carp;
 
 # Chip based on a PIC 18F14K22
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 __PACKAGE__->create_accessors( qw( devicename address res fil1 fil0 backend ) );
 

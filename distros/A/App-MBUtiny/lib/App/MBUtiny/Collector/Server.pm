@@ -1,4 +1,4 @@
-package App::MBUtiny::Collector::Server; # $Id: Server.pm 121 2019-07-01 19:51:50Z abalama $
+package App::MBUtiny::Collector::Server; # $Id: Server.pm 131 2019-07-16 18:45:44Z abalama $
 use strict;
 use warnings;
 use utf8;
@@ -11,7 +11,7 @@ App::MBUtiny::Collector::Server - MBUtiny collector server
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ See C<collector.cgi.sample> file for example
 =cut
 
 use vars qw/ $VERSION $BASE_URL_PATH_PREFIX /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use base qw/WWW::MLite/;
 
@@ -254,7 +254,7 @@ __PACKAGE__->register_method( # GET /mbutiny/list
     return HTTP_OK; # HTTP RC
 });
 
-=head2 GET /mbutiny/list
+=head2 GET /mbutiny/report
 
     curl -v --raw http://localhost/mbutiny/report?start=1561799700
 

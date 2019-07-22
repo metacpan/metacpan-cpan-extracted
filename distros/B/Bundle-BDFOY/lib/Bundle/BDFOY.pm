@@ -1,6 +1,6 @@
 package Bundle::BDFOY;
 
-our $VERSION   = '20180323';
+our $VERSION   = '20190721';
 
 1;
 
@@ -36,8 +36,6 @@ Business::ISSN
 
 Business::xISBN
 
-Business::US::USPS::WebTools
-
 CACertOrg::CA
 
 Chemistry::Elements
@@ -62,21 +60,13 @@ File::Fingerprint
 
 Geo::GeoNames
 
-Git::Github::Creator
-
 HTML::SimpleLinkExtor
 
 HTTP::Cookies::Chrome
 
-HTTP::Cookies::iCab
-
 HTTP::Cookies::Mozilla
 
-HTTP::Cookies::Omniweb
-
 HTTP::Cookies::Safari
-
-HTTP::SimpleLinkChecker
 
 HTTP::Size
 
@@ -86,13 +76,7 @@ Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors
 
 Mac::Errors
 
-Mac::iPhoto::Shell
-
-Mac::iTerm::LaunchPad
-
 Mac::OSVersion
-
-Mac::Path::Util
 
 Mac::PropertyList
 
@@ -126,8 +110,6 @@ Net::SSH::Perl::ProxiedIPC
 
 Net::SSH::Perl::WithSocks
 
-Netscape::Bookmarks
-
 Object::Iterate
 
 PeGS::PDF
@@ -146,15 +128,11 @@ Pod::PseudoPod::DocBook
 
 Pod::PseudoPod::PerlTricks
 
-Pod::SpeakIt::MacSpeech
-
 Pod::WordML
 
 Polyglot
 
 PPI::App::ppi_version::BDFOY
-
-Psychic::Ninja
 
 ReturnValue
 
@@ -182,8 +160,6 @@ Test::Env
 
 Test::File
 
-Test::HTTPStatus
-
 Test::ISBN
 
 Test::Manifest
@@ -193,8 +169,6 @@ Test::Output
 Test::Prereq
 
 Test::URI
-
-Test::WWW::Accessibility
 
 Tie::BoundedInteger
 
@@ -220,7 +194,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2006-2018, brian d foy.
+Copyright © 2006-2019, brian d foy.
 
 This code is licensed under the Artisitic License 2.0
 

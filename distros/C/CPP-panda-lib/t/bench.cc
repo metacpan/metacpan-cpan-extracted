@@ -1,7 +1,6 @@
 #include "test.h"
 
 using namespace panda;
-using namespace panda::lib;
 
 struct Base {
     int x;

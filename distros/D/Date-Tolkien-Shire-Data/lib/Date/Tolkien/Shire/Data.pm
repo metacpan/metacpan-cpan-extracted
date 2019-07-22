@@ -17,7 +17,7 @@ use Text::Abbrev();
 use Exporter ();
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 our @EXPORT_OK = qw{
     __am_or_pm
@@ -1757,7 +1757,7 @@ illustrations appear to be movie tie-ins.
  say __on_date_accented( $month, $day ) // '';
  say __on_date( $holiday ) // '';
 
-This wrapper for L<__on_date()|/__on_date()> accents those names and
+This wrapper for L<__on_date()|/__on_date> accents those names and
 words that are accented in the text of the Lord Of The Rings. How these
 display depends on how your Perl is configured. Note that the example
 above assumes Perl 5.10 (for C<say()> and C<//>). Even without those,
@@ -1853,7 +1853,7 @@ exception is thrown naming the missing methods; otherwise it returns its
 argument.
 
 If you intend to use a class that autoloads requisite methods, that
-class will need to properly override L<can()|UNIVERSAL/can>, or provide
+class will need to properly override C<< UNIVERSAL->can() >>, or provide
 forward references to autoloaded methods.
 
 This subroutine is used internally to validate the date argument to
@@ -1999,7 +1999,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2018 by Thomas R. Wyant, III
+Copyright (C) 2017-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

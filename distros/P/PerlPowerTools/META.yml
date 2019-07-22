@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/PerlPowerTools/issues
   homepage: https://www.perlpowertools.com/
   repository: https://github.com/briandfoy/PerlPowerTools.git
-version: '1.013'
+version: '1.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

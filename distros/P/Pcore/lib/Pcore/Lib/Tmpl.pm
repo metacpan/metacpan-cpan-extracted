@@ -101,7 +101,7 @@ VARIABLES    => {
 },
 FILTERS => {
     b64                     => sub { return P->data->to_b64(@_) },
-    b64_url                 => sub { return P->data->to_b64_url(@_) },
+    b64_url                 => sub { return P->data->to_b64u(@_) },
     hex                        => sub { return P->text->encode_hex(@_) },
     html                       => sub { return P->text->encode_html(@_) },
     html_attr                  => sub { return P->text->encode_html_attr(@_) },

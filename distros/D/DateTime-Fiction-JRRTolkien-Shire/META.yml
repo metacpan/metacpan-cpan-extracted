@@ -7,7 +7,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,13 +23,13 @@ no_index:
 provides:
   DateTime::Fiction::JRRTolkien::Shire:
     file: lib/DateTime/Fiction/JRRTolkien/Shire.pm
-    version: '0.902'
+    version: '0.903'
   DateTime::Fiction::JRRTolkien::Shire::Duration:
     file: lib/DateTime/Fiction/JRRTolkien/Shire/Duration.pm
-    version: '0.902'
+    version: '0.903'
   DateTime::Fiction::JRRTolkien::Shire::Types:
     file: lib/DateTime/Fiction/JRRTolkien/Shire/Types.pm
-    version: '0.902'
+    version: '0.903'
 requires:
   Carp: '0'
   Date::Tolkien::Shire::Data: '0.001'
@@ -52,5 +52,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Fiction-JRRTolkien-Shire
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire.git
-version: '0.902'
+version: '0.903'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

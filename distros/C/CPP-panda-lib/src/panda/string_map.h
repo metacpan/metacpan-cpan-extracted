@@ -1,9 +1,9 @@
 #pragma once
+#include "string.h"
+#include "string_view.h"
 #include <map>
 #include <memory>
 #include <functional>
-#include <panda/string.h>
-#include <panda/string_view.h>
 
 /*
  * panda::string_map and panda::string_multimap are wrappers around STL's versions in case if keys are panda::string.
@@ -21,8 +21,8 @@ namespace panda {
 
         static_assert(decltype(_is_base_string(Key()))::value, "Key must be based on panda::basic_string");
 
-        typedef std::map<Key, T, Compare, Allocator> Base;
-        typedef std::basic_string_view<typename Key::value_type, typename Key::traits_type> SVKey;
+        using Base  = std::map<Key, T, Compare, Allocator>;
+        using SVKey = basic_string_view<typename Key::value_type, typename Key::traits_type>;
 
         static Key _key_from_sv (const SVKey& key) {
             typedef typename Key::value_type FakeCharLiteral[1];
@@ -103,8 +103,8 @@ namespace panda {
 
         static_assert(decltype(_is_base_string(Key()))::value, "Key must be based on panda::basic_string");
 
-        typedef std::multimap<Key, T, Compare, Allocator> Base;
-        typedef std::basic_string_view<typename Key::value_type, typename Key::traits_type> SVKey;
+        using Base  = std::multimap<Key, T, Compare, Allocator>;
+        using SVKey = basic_string_view<typename Key::value_type, typename Key::traits_type>;
 
         static Key _key_from_sv (const SVKey& key) {
             typedef typename Key::value_type FakeCharLiteral[1];

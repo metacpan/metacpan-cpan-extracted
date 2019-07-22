@@ -20,6 +20,9 @@ Netscape::Bookmarks::Alias - object for an Alias in a Netscape Bookmarks file
 
 =head1 DESCRIPTION
 
+THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
+IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
+
 This module provides an abstraction for an Alias object in a Netscape
 Bookmarks file. An alias is simply a reference to another link in the
 Bookmarks file, henceforth called the target. If you change the alias,
@@ -35,7 +38,7 @@ use base qw( Netscape::Bookmarks::AcceptVisitor Netscape::Bookmarks::Isa );
 use subs qw();
 use vars qw($VERSION $ERROR %aliases);
 
-$VERSION = "2.303";
+$VERSION = "2.304";
 
 =item $obj = Netscape::Bookmarks::Alias->new( ALIASID )
 
@@ -172,7 +175,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

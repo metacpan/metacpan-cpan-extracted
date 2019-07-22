@@ -22,11 +22,6 @@ When the new non-empty Object is created, it checks whether underlying C<sv> arg
 points to already blessed Perl object or not. If it not, then exception will be thrown.
 If the C<sv> already points to C<undef>, then empty object will be returned.
 
-    Object (const CallProxy& p)
-
-The C<Object> instance can be created from function call result C<CallProxy>.Please note,
-that the C<CallProxy> will be called in B<scalar context>.
-
 The copy and move constructors are also available:
 
     Object (const Object& oth)
@@ -42,7 +37,6 @@ The copy and move constructors are also available:
     Object& operator= (Object&& oth)
     Object& operator= (const Sv& oth)
     Object& operator= (Sv&& oth)
-    Object& operator= (const CallProxy& p)
 
 The assignment operators are complementaty to the constructors above. They
 inherit behaviour from C<Sv>, including NULL-safety. The previously held
@@ -74,7 +68,7 @@ This is null-unsafe method.
 
 =head2 isa()
 
-    bool isa (const std::string_view& parent)
+    bool isa (const panda::string_view& parent)
     bool isa (const Stash& parent)
 
 works similar to C<isa> Perl method, i.e.
@@ -109,25 +103,25 @@ This is NULL-unsafe method.
 =head2 method access
 
     Sub method        (const Sv& name) const
-    Sub method        (const std::string_view& name) const
+    Sub method        (const panda::string_view& name) const
     Sub method_strict (const Sv& name) const
-    Sub method_strict (const std::string_view& name) const
+    Sub method_strict (const panda::string_view& name) const
 
-    Sub next_method        (const Sub& current) const
-    Sub next_method_strict (const Sub& current) const
+    Sub next_method        (const Sub& context) const
+    Sub next_method_strict (const Sub& context) const
 
-    Sub super_method        (const Sub& current) const
-    Sub super_method_strict (const Sub& current) const
+    Sub super_method        (const Sub& context) const
+    Sub super_method_strict (const Sub& context) const
 
-The method resolving can be performed either via C<std::string_view> or C<Sv>
+The method resolving can be performed either via C<panda::string_view> or C<Sv>
 name. If a method name cannot be found, the empty C<Sub> is returned. To avoid
 that the C<method_strict> should be invoked; if the method C<name> cannot be
 found, then exception will be thrown.
 
 The C<super_method> takes the existing C<Sub> and tries to find the corresponding
 method in the B<parent> package of the current C<Stash>. It uses the resolution
-order specified in the class (i.e. C<use mro 'c3'>). The C<next_method>
-tries to find the next method using method resolution order, see L<mro>. The
+order specified in the class (i.e. C3 if 'use mro c3' or DFS otherwise). The C<next_method>
+tries to find the next method using C3, see L<mro>. The
 C<_strict> version throw exception if nothing is found.
 
 This are null-unsafe methods.
@@ -143,40 +137,13 @@ Usage example:
 
 =head2 method invocation
 
-    CallProxy call (const Sv& name)                                                const
-    CallProxy call (const std::string_view& name)                                  const
-    CallProxy call (const Sv& name,               const Scalar& arg)               const
-    CallProxy call (const std::string_view& name, const Scalar& arg)               const
-    CallProxy call (const Sv& name,               SV*const* args, size_t items)    const
-    CallProxy call (const std::string_view& name, SV*const* args, size_t items)    const
-    CallProxy call (const Sv& name,               std::initializer_list<Scalar> l) const
-    CallProxy call (const std::string_view& name, std::initializer_list<Scalar> l) const
-
-    CallProxy call_SUPER (const Sub& current)                                  const
-    CallProxy call_SUPER (const Sub& current, const Scalar& arg)               const
-    CallProxy call_SUPER (const Sub& current, SV*const* args, size_t items)    const
-    CallProxy call_SUPER (const Sub& current, std::initializer_list<Scalar> l) const
-
-    CallProxy call_next (const Sub& current)                                  const
-    CallProxy call_next (const Sub& current, const Scalar& arg)               const
-    CallProxy call_next (const Sub& current, SV*const* args, size_t items)    const
-    CallProxy call_next (const Sub& current, std::initializer_list<Scalar> l) const
-
-    CallProxy call_next_maybe (const Sub& current)                                  const
-    CallProxy call_next_maybe (const Sub& current, const Scalar& arg)               const
-    CallProxy call_next_maybe (const Sub& current, SV*const* args, size_t items)    const
-    CallProxy call_next_maybe (const Sub& current, std::initializer_list<Scalar> l) const
-
-    CallProxy call_super (const Sub& current)                                  const
-    CallProxy call_super (const Sub& current, const Scalar& arg)               const
-    CallProxy call_super (const Sub& current, SV*const* args, size_t items)    const
-    CallProxy call_super (const Sub& current, std::initializer_list<Scalar> l) const
-
-    CallProxy call_super_maybe (const Sub& current)                                  const
-    CallProxy call_super_maybe (const Sub& current, const Scalar& arg)               const
-    CallProxy call_super_maybe (const Sub& current, SV*const* args, size_t items)    const
-    CallProxy call_super_maybe (const Sub& current, std::initializer_list<Scalar> l) const
-
+    *depends* call             (const Sv& name, Args&&...args)                 const
+    *depends* call             (const panda::string_view& name, Args&&...args) const
+    *depends* call_SUPER       (const Sub& context, Args&&...args)             const
+    *depends* call_next        (const Sub& context, Args&&...args)             const
+    *depends* call_next_maybe  (const Sub& context, Args&&...args)             const
+    *depends* call_super       (const Sub& context, Args&&...args)             const
+    *depends* call_super_maybe (const Sub& context, Args&&...args)             const
 
 It is possible to invoke arbitrary method with arbitrary arguments if method
 C<name> is known in a C<Stash>; if method is not found, then an exception will
@@ -185,13 +152,11 @@ corresponding method in the parent or next class in the hierachy (see L<mro>).
 
 The diffence between  C<call_SUPER> / C<call_super> is how the parent method
 is looked-up: either via classical DFS MRO resolution or via class-defined
-resolution (i.e. C<use mro 'c3'> for using C3-resolution).
+resolution (i.e. C3 if class said 'use mro c3' or DFS otherwise).
 
 The same methods with C<_maybe> prefix do exist: if the corresponding metthod
 is not found, then empty result will be returned, i.e. no exception will be
-thrown. (Actually we discourage using of them, as this is leads do pefromance
-penalities without any actual job to be done. Why you use L<XS::Framework>
-at all, then?).
+thrown.
 
 A reference to the current C<Object> is curried for all invocations as the
 first argument, i.e. C<object.call("method")> is the same as
@@ -199,8 +164,6 @@ first argument, i.e. C<object.call("method")> is the same as
     $object->method();
 
 in Perl.
-
-The C<CallProxy> object is returned to peform actuall method call.
 
 This are null-unsafe methods.
 

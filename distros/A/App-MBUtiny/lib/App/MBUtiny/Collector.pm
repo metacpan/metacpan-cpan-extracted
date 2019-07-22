@@ -1,4 +1,4 @@
-package App::MBUtiny::Collector; # $Id: Collector.pm 121 2019-07-01 19:51:50Z abalama $
+package App::MBUtiny::Collector; # $Id: Collector.pm 132 2019-07-19 14:28:28Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MBUtiny::Collector - Collector class
 
 =head1 VIRSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -260,7 +260,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION @EXPORT @EXPORT_OK /;
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 use Carp;
 use CTK::ConfGenUtil;
@@ -502,10 +502,11 @@ sub info {
             %info = $client->get(
                 name    => $args{name},
                 file    => $args{file},
-            ) or do {
+            );
+            if ($client->error) {
                 $self->error(join("\n", $client->transaction, $client->error));
                 next;
-            };
+            }
         }
         last if $info{id} && $info{status};
     }

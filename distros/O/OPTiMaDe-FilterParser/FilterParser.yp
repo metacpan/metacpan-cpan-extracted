@@ -1,0 +1,458 @@
+# Header section
+
+%{
+
+use warnings;
+
+use OPTiMaDe::FilterParser::Comparison;
+use OPTiMaDe::FilterParser::ListComparison;
+use OPTiMaDe::FilterParser::Property;
+use OPTiMaDe::FilterParser::Zip;
+
+our $VERSION = '0.1.0';
+our $OPTiMaDe_VERSION = '0.10.0';
+
+our $allow_LIKE_operator = 0;
+
+%}
+
+%%
+
+# Rules section
+
+# The top-level 'filter' rule
+
+filter: expression ;
+
+# Values
+
+constant: string | number ;
+
+value: string | number | property ;
+
+value_list: value
+            {
+                return [ [ '=', $_[1] ] ];
+            }
+          | operator value
+            {
+                return [ [ @_[1..$#_] ] ];
+            }
+          | value_list comma value
+            {
+                push @{$_[1]}, [ '=', $_[3] ];
+                return $_[1];
+            }
+          | value_list comma operator value
+            {
+                push @{$_[1]}, [ $_[3], $_[4] ];
+                return $_[1];
+            }
+          ;
+
+value_zip: value value_zip_part
+            {
+                return [ @_[1..$#_] ];
+            }
+         | operator value value_zip_part
+            {
+                return [ @_[1..$#_] ];
+            }
+         | value_zip value_zip_part
+            {
+                return [ @_[1..$#_] ];
+            }
+         ;
+
+value_zip_part: colon value
+                {
+                    return [ undef, $_[2] ];
+                }
+              | colon operator value
+                {
+                    return [ $_[2], $_[3] ];
+                }
+              ;
+
+value_zip_list: value_zip
+              | value_zip_list comma value_zip
+                {
+                    return [ $_[1], $_[3] ];
+                }
+              ;
+
+# Expressions
+
+expression: expression_clause
+          | expression_clause OR expression
+            {
+                return [ @_[1..$#_] ];
+            }
+          ;
+
+expression_clause: expression_phrase
+                 | expression_phrase AND expression_clause
+                    {
+                        return [ @_[1..$#_] ];
+                    }
+                 ;
+
+expression_phrase: comparison
+                 | predicate_comparison
+                 | openingbrace expression closingbrace
+                    {
+                        return $_[2];
+                    }
+                 | NOT comparison
+                    {
+                        return [ @_[1..$#_] ];
+                    }
+                 | NOT predicate_comparison
+                    {
+                        return [ @_[1..$#_] ];
+                    }
+                 | NOT openingbrace expression closingbrace
+                    {
+                        return [ $_[1], $_[3] ];
+                    }
+                 ;
+
+comparison: constant_first_comparison | property_first_comparison ;
+
+property_first_comparison: property value_op_rhs
+                                {
+                                    $_[2]->unshift_operand( $_[1] );
+                                    return $_[2];
+                                }
+                           | property known_op_rhs
+                                {
+                                    return [ $_[1], @{$_[2]} ];
+                                }
+                           | property fuzzy_string_op_rhs
+                                {
+                                    $_[2]->unshift_operand( $_[1] );
+                                    return $_[2];
+                                }
+                           | property set_op_rhs
+                                {
+                                    $_[2]->set_property( $_[1] );
+                                    return $_[2];
+                                }
+                           | property set_zip_op_rhs
+                                {
+                                    $_[2]->unshift_property( $_[1] );
+                                    return $_[2];
+                                }
+                           ;
+
+constant_first_comparison: constant value_op_rhs
+                            {
+                                $_[2]->unshift_operand( $_[1] );
+                                return $_[2];
+                            }
+                         ;
+
+predicate_comparison: length_comparison ;
+
+value_op_rhs: operator value
+                {
+                    my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
+                    $cmp->push_operand( $_[2] );
+                    return $cmp;
+                }
+            ;
+
+known_op_rhs: IS KNOWN
+                {
+                    return [ @_[1..$#_] ];
+                }
+            | IS UNKNOWN
+                {
+                    return [ @_[1..$#_] ];
+                }
+            ;
+
+fuzzy_string_op_rhs: CONTAINS string
+                        {
+                            my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
+                            $cmp->push_operand( $_[2] );
+                            return $cmp;
+                        }
+                   | STARTS string
+                        {
+                            my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
+                            $cmp->push_operand( $_[2] );
+                            return $cmp;
+                        }
+                   | STARTS WITH string
+                        {
+                            my $cmp = OPTiMaDe::FilterParser::Comparison->new( "$_[1] $_[2]" );
+                            $cmp->push_operand( $_[3] );
+                            return $cmp;
+                        }
+                   | ENDS string
+                        {
+                            my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
+                            $cmp->push_operand( $_[2] );
+                            return $cmp;
+                        }
+                   | ENDS WITH string
+                        {
+                            my $cmp = OPTiMaDe::FilterParser::Comparison->new( "$_[1] $_[2]" );
+                            $cmp->push_operand( $_[3] );
+                            return $cmp;
+                        }
+                   | LIKE string
+                        {
+                            my $cmp = OPTiMaDe::FilterParser::Comparison->new( $_[1] );
+                            $cmp->push_operand( $_[2] );
+                            return $cmp;
+                        }
+                   ;
+
+set_op_rhs: HAS value
+            {
+                my $lc = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
+                $lc->set_values( [ '=', $_[2] ] );
+                return $lc;
+            }
+          | HAS operator value
+            {
+                my $lc = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
+                $lc->set_values( [ $_[2], $_[3] ] );
+                return $lc;
+            }
+          | HAS ALL value_list
+            {
+                my $lc = OPTiMaDe::FilterParser::ListComparison->new( "$_[1] $_[2]" );
+                $lc->set_values( $_[3] );
+                return $lc;
+            }
+          | HAS ANY value_list
+            {
+                my $lc = OPTiMaDe::FilterParser::ListComparison->new( "$_[1] $_[2]" );
+                $lc->set_values( $_[3] );
+                return $lc;
+            }
+          | HAS ONLY value_list
+            {
+                my $lc = OPTiMaDe::FilterParser::ListComparison->new( "$_[1] $_[2]" );
+                $lc->set_values( $_[3] );
+                return $lc;
+            }
+          ;
+
+set_zip_op_rhs: property_zip_addon HAS value_zip
+                {
+                    $_[1]->set_operator( $_[2] );
+                    $_[1]->set_values( $_[3] );
+                    return $_[1];
+                }
+              | property_zip_addon HAS ONLY value_zip_list
+                {
+                    $_[1]->set_operator( "$_[2] $_[3]" );
+                    $_[1]->set_values( $_[4] );
+                    return $_[1];
+                }
+              | property_zip_addon HAS ALL value_zip_list
+                {
+                    $_[1]->set_operator( "$_[2] $_[3]" );
+                    $_[1]->set_values( $_[4] );
+                    return $_[1];
+                }
+              | property_zip_addon HAS ANY value_zip_list
+                {
+                    $_[1]->set_operator( "$_[2] $_[3]" );
+                    $_[1]->set_values( $_[4] );
+                    return $_[1];
+                }
+              ;
+
+length_comparison: LENGTH property operator value
+                    {
+                        my $cmp = OPTiMaDe::FilterParser::ListComparison->new( $_[1] );
+                        $cmp->set_property( $_[2] );
+                        $cmp->set_values( [ $_[3], $_[4] ] );
+                        return $cmp;
+                    }
+                 ;
+
+property_zip_addon: colon property
+                        {
+                            my $zip = OPTiMaDe::FilterParser::Zip->new;
+                            $zip->push_property( $_[2] );
+                            return $zip;
+                        }
+                    | property_zip_addon colon property
+                        {
+                            $_[1]->push_property( $_[3] );
+                            return $_[1];
+                        }
+                    ;
+
+# Property
+
+property: identifier
+            {
+                my $id = OPTiMaDe::FilterParser::Property->new;
+                $id->push_identifier( $_[1] );
+                return $id;
+            }
+        | property dot identifier
+            {
+                $_[1]->push_identifier( $_[3] );
+                return $_[1];
+            }
+        ;
+
+# Separators
+
+openingbrace: '(' ;
+
+closingbrace: ')' ;
+
+dot: '.' ;
+
+comma: ',' ;
+
+colon: ':' ;
+
+# OperatorComparison operator tokens
+
+operator: '<'
+        | '<' '='
+            {
+                return join( '', @_[1..$#_] );
+            }
+        | '>'
+        | '>' '='
+            {
+                return join( '', @_[1..$#_] );
+            }
+        | '='
+        | '!' '='
+            {
+                return join( '', @_[1..$#_] );
+            }
+    ;
+
+%%
+
+# Footer section
+
+sub _Error
+{
+    my( $self ) = @_;
+    close $self->{USER}{FILEIN} if $self->{USER}{FILEIN};
+    my $msg = "$0: syntax error at line $self->{USER}{LINENO}, " .
+              "position $self->{USER}{CHARNO}";
+    if( $self->YYData->{INPUT} ) {
+        $self->YYData->{INPUT} =~ s/\n$//;
+        die "$msg: '" . $self->YYData->{INPUT} . "'.\n";
+    } else {
+        die "$msg.\n";
+    }
+}
+
+sub _Lexer
+{
+    my( $self ) = @_;
+
+    # If the line is empty and the input is originating from the file,
+    # another line is read.
+    if( !$self->YYData->{INPUT} && $self->{USER}{FILEIN} ) {
+        my $filein = $self->{USER}{FILEIN};
+        $self->YYData->{INPUT} = <$filein>;
+        $self->{USER}{LINENO} = -1 unless exists $self->{USER}{LINENO};
+        $self->{USER}{LINENO}++;
+        $self->{USER}{CHARNO} = 0;
+    }
+
+    $self->YYData->{INPUT} =~ s/^(\s+)//;
+    $self->{USER}{CHARNO} += length( $1 ) if defined $1;
+
+    # Escaped double quote or backslash are detected here and returned
+    # as is to the caller in order to be detected as syntax errors.
+    if( $self->YYData->{INPUT} =~ s/^(\\"|\\\\)// ) {
+        $self->{USER}{CHARNO} += length( $1 );
+        return( $1, $1 );
+    }
+
+    # Handling strings
+    if( $self->YYData->{INPUT} =~ s/^"// ) {
+        $self->{USER}{CHARNO} ++;
+        my $string = '';
+        while( 1 ) {
+            if( $self->YYData->{INPUT} =~
+                    s/^([A-Za-z_0-9 \t!#\$\%&\'\(\)\*\+,\-\.\/\:;<=>\?@\[\]\^`\{\|\}\~\P{ASCII}]+)// ) {
+                $self->{USER}{CHARNO} += length( $1 );
+                $string .= $1;
+            } elsif( $self->YYData->{INPUT} =~ s/^\\([\\"])// ) {
+                $self->{USER}{CHARNO} ++;
+                $string .= $1;
+                next;
+            } elsif( $self->YYData->{INPUT} =~ s/^"// ) {
+                $self->{USER}{CHARNO} ++;
+                return( 'string', $string );
+            } else {
+                return( undef, undef );
+            }
+        }
+    }
+
+    # Handling identifiers
+    if( $self->YYData->{INPUT} =~ s/^([a-z_][a-z0-9_]*)// ) {
+        $self->{USER}{CHARNO} += length( $1 );
+        return( 'identifier', $1 );
+    }
+
+    # Handling boolean relations
+    if( $self->YYData->{INPUT} =~ s/^(AND|NOT|OR|
+                                      IS|UNKNOWN|KNOWN|
+                                      CONTAINS|STARTS|ENDS|WITH|
+                                      LENGTH|HAS|ALL|ONLY|ANY)//x ) {
+        $self->{USER}{CHARNO} += length( $1 );
+        return( $1, $1 );
+    }
+
+    # Handling LIKE operator if allowed
+    if( $allow_LIKE_operator && $self->YYData->{INPUT} =~ s/^(LIKE)// ) {
+        $self->{USER}{CHARNO} += length( $1 );
+        return( $1, $1 );
+    }
+
+    # Handling numbers
+    if( $self->YYData->{INPUT} =~ s/^([+-]?
+                                     (\d+\.?\d*|\.\d+)
+                                     ([eE][+-]?\d+)?)//x ) {
+        $self->{USER}{CHARNO} += length( $1 );
+        return( 'number', $1 );
+    }
+
+    my $char = substr( $self->YYData->{INPUT}, 0, 1 );
+    if( $char ne '' ) {
+        $self->YYData->{INPUT} = substr( $self->YYData->{INPUT}, 1 );
+    }
+    $self->{USER}{CHARNO}++;
+    return( $char, $char );
+}
+
+sub Run
+{
+    my( $self, $filename ) = @_;
+    open $self->{USER}{FILEIN}, $filename;
+    my $result = $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error );
+    close $self->{USER}{FILEIN};
+    return $result;
+}
+
+sub parse_string
+{
+    my( $self, $string ) = @_;
+    $self->YYData->{INPUT} = $string;
+    $self->{USER}{LINENO} = 0;
+    $self->{USER}{CHARNO} = 0;
+    return $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error );
+}
+
+1;

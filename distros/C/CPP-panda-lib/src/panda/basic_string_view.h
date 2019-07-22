@@ -5,7 +5,7 @@
 #include <utility>   // swap
 #include <stdexcept>
 
-namespace std {
+namespace panda {
 
 template <class CharT, class Traits = std::char_traits<CharT>>
 class basic_string_view {
@@ -323,29 +323,29 @@ private:
 
 template <class C, class T> const C basic_string_view<C,T>::TERMINAL = C();
 
-template <class C, class T> inline bool operator== (basic_string_view <C,T> lhs, basic_string_view <C,T> rhs) { return lhs.compare(rhs) == 0; }
-template <class C, class T> inline bool operator== (const C* lhs, basic_string_view <C,T> rhs)                { return rhs.compare(lhs) == 0; }
-template <class C, class T> inline bool operator== (basic_string_view <C,T> lhs, const C* rhs)                { return lhs.compare(rhs) == 0; }
+template <class C, class T> inline bool operator== (basic_string_view<C,T> lhs, basic_string_view<C,T> rhs) { return lhs.compare(rhs) == 0; }
+template <class C, class T> inline bool operator== (const C* lhs, basic_string_view<C,T> rhs)               { return rhs.compare(lhs) == 0; }
+template <class C, class T> inline bool operator== (basic_string_view<C,T> lhs, const C* rhs)               { return lhs.compare(rhs) == 0; }
 
-template <class C, class T> inline bool operator!= (basic_string_view <C,T> lhs, basic_string_view <C,T> rhs) { return lhs.compare(rhs) != 0; }
-template <class C, class T> inline bool operator!= (const C* lhs, basic_string_view <C,T> rhs)                { return rhs.compare(lhs) != 0; }
-template <class C, class T> inline bool operator!= (basic_string_view <C,T> lhs, const C* rhs)                { return lhs.compare(rhs) != 0; }
+template <class C, class T> inline bool operator!= (basic_string_view<C,T> lhs, basic_string_view<C,T> rhs) { return lhs.compare(rhs) != 0; }
+template <class C, class T> inline bool operator!= (const C* lhs, basic_string_view<C,T> rhs)               { return rhs.compare(lhs) != 0; }
+template <class C, class T> inline bool operator!= (basic_string_view<C,T> lhs, const C* rhs)               { return lhs.compare(rhs) != 0; }
 
-template <class C, class T> inline bool operator<  (basic_string_view <C,T> lhs, basic_string_view <C,T> rhs) { return lhs.compare(rhs) < 0; }
-template <class C, class T> inline bool operator<  (const C* lhs, basic_string_view <C,T> rhs)                { return rhs.compare(lhs) > 0; }
-template <class C, class T> inline bool operator<  (basic_string_view <C,T> lhs, const C* rhs)                { return lhs.compare(rhs) < 0; }
+template <class C, class T> inline bool operator<  (basic_string_view<C,T> lhs, basic_string_view<C,T> rhs) { return lhs.compare(rhs) < 0; }
+template <class C, class T> inline bool operator<  (const C* lhs, basic_string_view<C,T> rhs)               { return rhs.compare(lhs) > 0; }
+template <class C, class T> inline bool operator<  (basic_string_view<C,T> lhs, const C* rhs)               { return lhs.compare(rhs) < 0; }
 
-template <class C, class T> inline bool operator<= (basic_string_view <C,T> lhs, basic_string_view <C,T> rhs) { return lhs.compare(rhs) <= 0; }
-template <class C, class T> inline bool operator<= (const C* lhs, basic_string_view <C,T> rhs)                { return rhs.compare(lhs) >= 0; }
-template <class C, class T> inline bool operator<= (basic_string_view <C,T> lhs, const C* rhs)                { return lhs.compare(rhs) <= 0; }
+template <class C, class T> inline bool operator<= (basic_string_view<C,T> lhs, basic_string_view<C,T> rhs) { return lhs.compare(rhs) <= 0; }
+template <class C, class T> inline bool operator<= (const C* lhs, basic_string_view<C,T> rhs)               { return rhs.compare(lhs) >= 0; }
+template <class C, class T> inline bool operator<= (basic_string_view<C,T> lhs, const C* rhs)               { return lhs.compare(rhs) <= 0; }
 
-template <class C, class T> inline bool operator>  (basic_string_view <C,T> lhs, basic_string_view <C,T> rhs) { return lhs.compare(rhs) > 0; }
-template <class C, class T> inline bool operator>  (const C* lhs, basic_string_view <C,T> rhs)                { return rhs.compare(lhs) < 0; }
-template <class C, class T> inline bool operator>  (basic_string_view <C,T> lhs, const C* rhs)                { return lhs.compare(rhs) > 0; }
+template <class C, class T> inline bool operator>  (basic_string_view<C,T> lhs, basic_string_view<C,T> rhs) { return lhs.compare(rhs) > 0; }
+template <class C, class T> inline bool operator>  (const C* lhs, basic_string_view<C,T> rhs)               { return rhs.compare(lhs) < 0; }
+template <class C, class T> inline bool operator>  (basic_string_view<C,T> lhs, const C* rhs)               { return lhs.compare(rhs) > 0; }
 
-template <class C, class T> inline bool operator>= (basic_string_view <C,T> lhs, basic_string_view <C,T> rhs) { return lhs.compare(rhs) >= 0; }
-template <class C, class T> inline bool operator>= (const C* lhs, basic_string_view <C,T> rhs)                { return rhs.compare(lhs) <= 0; }
-template <class C, class T> inline bool operator>= (basic_string_view <C,T> lhs, const C* rhs)                { return lhs.compare(rhs) >= 0; }
+template <class C, class T> inline bool operator>= (basic_string_view<C,T> lhs, basic_string_view<C,T> rhs) { return lhs.compare(rhs) >= 0; }
+template <class C, class T> inline bool operator>= (const C* lhs, basic_string_view<C,T> rhs)               { return rhs.compare(lhs) <= 0; }
+template <class C, class T> inline bool operator>= (basic_string_view<C,T> lhs, const C* rhs)               { return lhs.compare(rhs) >= 0; }
 
 template <class C, class T>
 inline std::basic_ostream<C,T>& operator<< (std::basic_ostream<C,T>& os, basic_string_view<C,T> v) {

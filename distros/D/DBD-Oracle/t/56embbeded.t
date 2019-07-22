@@ -16,7 +16,7 @@ $| = 1;
 ## 56embbeded.t
 ## By John Scoles, The Pythian Group
 ## ----------------------------------------------------------------------------
-##  Just a few checks to see if I can select embedded objectes with Oracle::DBD
+##  Just a few checks to see if I can select embedded objects with Oracle::DBD
 ##  Nothing fancy.
 ## ----------------------------------------------------------------------------
 

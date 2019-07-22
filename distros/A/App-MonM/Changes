@@ -1,4 +1,4 @@
-# $Id: Changes 68 2019-07-04 10:01:29Z abalama $
+# $Id: Changes 90 2019-07-18 09:47:29Z abalama $
 # Version/Revision history.
 
 1.00 Wed Sep 10 10:42:03 2014 GMT
@@ -28,3 +28,7 @@
 
 1.06 Thu  4 Jul 11:36:05 MSK 2019
     * CTKlib v2.00 adapted
+
+1.07 Mon 15 Jul 08:17:00 MSK 2019
+    * Documentation modified
+    * Configuration skeleton modified

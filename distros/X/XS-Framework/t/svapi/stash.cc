@@ -1,6 +1,7 @@
 #include "test.h"
 
 using Test = TestSv<Stash>;
+using panda::string_view;
 
 TEST_CASE("Stash", "[Sv]") {
     perlvars vars;
@@ -109,8 +110,8 @@ TEST_CASE("Stash", "[Sv]") {
     }
 
     SECTION("name/effective_name") {
-        REQUIRE(my.name() == std::string_view("M1"));
-        REQUIRE(my.effective_name() == std::string_view("M1"));
+        REQUIRE(my.name() == "M1");
+        REQUIRE(my.effective_name() == "M1");
     }
 
     SECTION("fetch") {
@@ -402,9 +403,10 @@ TEST_CASE("Stash", "[Sv]") {
         Simple ret = my.call("class_method");
         REQUIRE(ret);
         REQUIRE(ret == string_view("M1-hi"));
-        my.call("class_method", (SV**)NULL, 0);
-        my.call("class_method", (SV*)NULL);
-        my.call("class_method", {Sv()});
+        my.call<void>("class_method", (SV**)NULL, 0);
+        my.call<void>("class_method", (SV*)NULL);
+        my.call<void>("class_method", Sv());
+        my.call<Sv>("class_method");
     }
 
     SECTION("call_next/super/SUPER") {
@@ -425,7 +427,7 @@ TEST_CASE("Stash", "[Sv]") {
 
             REQUIRE(!sub.SUPER());
             REQUIRE_THROWS(sub.SUPER_strict());
-            REQUIRE_THROWS(s.call_SUPER(sub));
+            REQUIRE_THROWS(s.call_SUPER<void>(sub));
         }
 
         SECTION("next") {
@@ -446,7 +448,7 @@ TEST_CASE("Stash", "[Sv]") {
 
             REQUIRE(!s.next_method(sub));
             REQUIRE_THROWS(s.next_method_strict(sub));
-            REQUIRE_THROWS(s.call_next(sub));
+            REQUIRE_THROWS(s.call_next<void>(sub));
         }
 
         SECTION("next_maybe") {
@@ -479,11 +481,11 @@ TEST_CASE("Stash", "[Sv]") {
 
             REQUIRE(!s.super_method(sub));
             REQUIRE_THROWS(s.super_method_strict(sub));
-            REQUIRE_THROWS(s.call_super(sub));
+            REQUIRE_THROWS(s.call_super<void>(sub));
         }
 
         SECTION("super/c3") {
-            s.call("enable_c3");
+            s.call<void>("enable_c3");
 
             res = s.call_super(sub);
             REQUIRE(res == "M4-2");
@@ -502,9 +504,9 @@ TEST_CASE("Stash", "[Sv]") {
 
             REQUIRE(!s.super_method(sub));
             REQUIRE_THROWS(s.super_method_strict(sub));
-            REQUIRE_THROWS(s.call_super(sub));
+            REQUIRE_THROWS(s.call_super<void>(sub));
 
-            s.call("disable_c3");
+            s.call<void>("disable_c3");
         }
 
         SECTION("super_maybe") {
@@ -539,7 +541,7 @@ TEST_CASE("Stash", "[Sv]") {
             Array v({ Simple(1), Simple(2), Simple(3) });
             st.add_const_sub("MYCONST", v);
             REQUIRE(v.use_count() == 2);
-            List res = st["MYCONST"].sub().call();
+            auto res = st["MYCONST"].sub().call<List>();
             REQUIRE(res.size() == v.size());
             REQUIRE(res != v);
             REQUIRE(res[0] == v[0]);

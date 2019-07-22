@@ -3,7 +3,7 @@
 #include <catch.hpp>
 #include <panda/string.h>
 #include <panda/optional.h>
-#include <panda/lib/memory.h>
+#include <panda/memory.h>
 #include <panda/CallbackDispatcher.h>
 
 namespace test {
@@ -108,7 +108,7 @@ namespace test {
         }
 
         static void shared_buf_free (T* mem, size_t size) {
-            panda::lib::DynamicMemoryPool::instance()->deallocate(mem, size * sizeof(T));
+            panda::DynamicMemoryPool::instance()->deallocate(mem, size * sizeof(T));
             allocs.ext_shbuf_deallocated++;
         }
     };

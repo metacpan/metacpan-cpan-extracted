@@ -1,5 +1,8 @@
 Revision history for Calendar::Hebrew
 
+0.12  Sat Jul 20 20:10:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.11  Fri Jun 07 17:20:00 2019
       - Updated dependency on Date::Hebrew::Simple v0.12.
 

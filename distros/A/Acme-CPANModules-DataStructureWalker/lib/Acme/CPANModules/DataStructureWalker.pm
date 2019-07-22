@@ -1,7 +1,7 @@
 package Acme::CPANModules::DataStructureWalker;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-06-30'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => "Modules that traverse your data structure",
@@ -12,10 +12,11 @@ each node/item: each element of an array, each key/value pair of a hash,
 recursively. Sort of like <pm:File::Find> for your data instead of filesystem.
 These modules can be used for searching or modifying your data.
 
-Many modules in this mimic Perl's `map` interface, for example: <pm:Data::Rmap>,
-<pm:Data::Dmap>, <pm:Data::Traverse>. These modules differ in the details: in
-how you specify option to skip unsupported types of references, whether some let
-you control the recursion (e.g. Data::Rmap's and Data::Dmap's `cut`),
+Many modules in this list mimic Perl's `map` interface, for example:
+<pm:Data::Rmap>, <pm:Data::Dmap>, <pm:Data::Traverse>. The difference among
+these modules lies in the details: in how you specify option to skip unsupported
+types of references, or whether some let you control the recursion (e.g.
+Data::Rmap's and Data::Dmap's `cut`),
 
 <pm:Data::Walk> models its interface on File::Find. It lets you choose whether
 you want to go depth-first or breadth-first.
@@ -57,7 +58,7 @@ Acme::CPANModules::DataStructureWalker - Modules that traverse your data structu
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::DataStructureWalker (from Perl distribution Acme-CPANModules-DataStructureWalker), released on 2019-06-19.
+This document describes version 0.002 of Acme::CPANModules::DataStructureWalker (from Perl distribution Acme-CPANModules-DataStructureWalker), released on 2019-06-30.
 
 =head1 DESCRIPTION
 
@@ -68,10 +69,11 @@ each node/item: each element of an array, each key/value pair of a hash,
 recursively. Sort of like L<File::Find> for your data instead of filesystem.
 These modules can be used for searching or modifying your data.
 
-Many modules in this mimic Perl's C<map> interface, for example: L<Data::Rmap>,
-L<Data::Dmap>, L<Data::Traverse>. These modules differ in the details: in
-how you specify option to skip unsupported types of references, whether some let
-you control the recursion (e.g. Data::Rmap's and Data::Dmap's C<cut>),
+Many modules in this list mimic Perl's C<map> interface, for example:
+L<Data::Rmap>, L<Data::Dmap>, L<Data::Traverse>. The difference among
+these modules lies in the details: in how you specify option to skip unsupported
+types of references, or whether some let you control the recursion (e.g.
+Data::Rmap's and Data::Dmap's C<cut>),
 
 L<Data::Walk> models its interface on File::Find. It lets you choose whether
 you want to go depth-first or breadth-first.

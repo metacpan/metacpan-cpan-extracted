@@ -9,7 +9,7 @@ struct TimezoneRecipe10 {
 private:
     TimezoneRecipe10(const char* name_): name{name_} { }
     std::string name;
-    friend class DateRecipe10;
+    friend struct DateRecipe10;
 };
 
 struct DateRecipe10 {

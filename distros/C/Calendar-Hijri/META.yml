@@ -22,7 +22,7 @@ no_index:
 provides:
   Calendar::Hijri:
     file: lib/Calendar/Hijri.pm
-    version: '0.39'
+    version: '0.40'
 requires:
   Calendar::Plugin::Renderer: '0.15'
   Date::Hijri::Simple: '0.22'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Calendar-Hijri.git
-version: '0.39'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

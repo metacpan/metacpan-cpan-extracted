@@ -1,10 +1,9 @@
 #include "test.h"
 #include <panda/refcnt.h>
 #include <panda/function.h>
-#include <panda/lib/intrusive_chain.h>
+#include <panda/intrusive_chain.h>
 
 using namespace panda;
-using namespace panda::lib;
 using std::shared_ptr;
 using test::Tracer;
 

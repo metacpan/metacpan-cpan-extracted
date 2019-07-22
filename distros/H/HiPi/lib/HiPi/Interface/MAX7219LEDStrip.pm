@@ -19,7 +19,7 @@ use HiPi::Graphics::Font5x7 qw( :font );
 use Try::Tiny;
 use Carp;
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 __PACKAGE__->create_ro_accessors( qw( segments pixel_width pixel_height reverse_map ) );
 
@@ -44,7 +44,7 @@ sub new {
         _clear_on_exit => 1,
         # SPI
         devicename   => '/dev/spidev0.0',
-        speed        => 2000000,  # 9.6 mhz
+        speed        => 2000000,
         delay        => 0,
         reverse_map  => 0,
     );

@@ -45,12 +45,13 @@ typedef struct marpaESLIFOption {
   genericLogger_t *genericLoggerp;  /* Logger. Default: NULL */
 } marpaESLIFOption_t;
 
-typedef struct marpaESLIF            marpaESLIF_t;
-typedef struct marpaESLIFGrammar     marpaESLIFGrammar_t;
-typedef struct marpaESLIFRecognizer  marpaESLIFRecognizer_t;
-typedef struct marpaESLIFValue       marpaESLIFValue_t;
-typedef struct marpaESLIFSymbol      marpaESLIFSymbol_t;
-typedef struct marpaESLIFValueResult marpaESLIFValueResult_t;
+typedef struct marpaESLIF                marpaESLIF_t;
+typedef struct marpaESLIFGrammar         marpaESLIFGrammar_t;
+typedef struct marpaESLIFRecognizer      marpaESLIFRecognizer_t;
+typedef struct marpaESLIFValue           marpaESLIFValue_t;
+typedef struct marpaESLIFSymbol          marpaESLIFSymbol_t;
+typedef struct marpaESLIFValueResult     marpaESLIFValueResult_t;
+typedef enum   marpaESLIFValueResultBool marpaESLIFValueResultBool_t;
 
 /* General free callback */
 typedef void  (*marpaESLIFFreeCallback_t)(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
@@ -78,16 +79,21 @@ typedef struct marpaESLIFGrammarOption {
 /* The reader can return encoding information, giving eventual encoding in *encodingsp, spreaded over *encodinglp bytes. Encoding of encoding is free. */
 typedef short (*marpaESLIFReader_t)(void *userDatavp, char **inputcpp, size_t *inputlp, short *eofbp, short *characterStreambp, char **encodingsp, size_t *encodinglp);
 
+/* Recognizer callback definitions */
+typedef short (*marpaESLIFRecognizerIfCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultLexemep, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp);
+typedef marpaESLIFRecognizerIfCallback_t (*marpaESLIFRecognizerIfActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
+
 typedef struct marpaESLIFRecognizerOption {
-  void               *userDatavp;          /* User specific context */
-  marpaESLIFReader_t  readerCallbackp;     /* Reader */
-  short               disableThresholdb;   /* Default: 0 */
-  short               exhaustedb;          /* Exhaustion event. Default: 0 */
-  short               newlineb;            /* Count line/column numbers. Default: 0 */
-  short               trackb;              /* Track absolute position. Default: 0 */
-  size_t              bufsizl;             /* Minimum stream buffer size: Recommended: 0 (internally, a system default will apply) */
-  unsigned int        buftriggerperci;     /* Excess number of bytes, in percentage of bufsizl, where stream buffer size is reduced. Recommended: 50 */
-  unsigned int        bufaddperci;         /* Policy of minimum of bytes for increase, in percentage of current allocated size, when stream buffer size need to augment. Recommended: 50 */
+  void                                  *userDatavp;          /* User specific context */
+  marpaESLIFReader_t                     readerCallbackp;     /* Reader */
+  short                                  disableThresholdb;   /* Default: 0 */
+  short                                  exhaustedb;          /* Exhaustion event. Default: 0 */
+  short                                  newlineb;            /* Count line/column numbers. Default: 0 */
+  short                                  trackb;              /* Track absolute position. Default: 0 */
+  size_t                                 bufsizl;             /* Minimum stream buffer size: Recommended: 0 (internally, a system default will apply) */
+  unsigned int                           buftriggerperci;     /* Excess number of bytes, in percentage of bufsizl, where stream buffer size is reduced. Recommended: 50 */
+  unsigned int                           bufaddperci;         /* Policy of minimum of bytes for increase, in percentage of current allocated size, when stream buffer size need to augment. Recommended: 50 */
+  marpaESLIFRecognizerIfActionResolver_t ifActionResolverp;   /* Will return the function doing the wanted if action */
 } marpaESLIFRecognizerOption_t;
 
 typedef enum marpaESLIFEventType {
@@ -128,11 +134,11 @@ typedef enum marpaESLIFValueType {
 #endif
 } marpaESLIFValueType_t;
 
-/* Callback definitions */
+/* Value callback definitions */
 typedef short (*marpaESLIFValueRuleCallback_t)(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 typedef short (*marpaESLIFValueSymbolCallback_t)(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResult, int resulti);
 
-typedef marpaESLIFValueRuleCallback_t   (*marpaESLIFValueRuleActionResolver_t)(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, char *actions);
+typedef marpaESLIFValueRuleCallback_t (*marpaESLIFValueRuleActionResolver_t)(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, char *actions);
 typedef marpaESLIFValueSymbolCallback_t (*marpaESLIFValueSymbolActionResolver_t)(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, char *actions);
 
 /* Valuation result */
@@ -161,10 +167,10 @@ typedef struct marpaESLIFValueResultArray {
   short                     shallowb;
   size_t                    sizel;
 } marpaESLIFValueResultArray_t;
-typedef enum marpaESLIFValueResultBool {
+enum marpaESLIFValueResultBool {
   MARPAESLIFVALUERESULTBOOL_FALSE = 0,
   MARPAESLIFVALUERESULTBOOL_TRUE = 1
-} marpaESLIFValueResultBool_t;
+};
 typedef struct marpaESLIFValueResultString {
   unsigned char            *p;
   void                     *freeUserDatavp;
@@ -366,6 +372,8 @@ typedef struct marpaESLIFSymbolProperty {
   marpaESLIFAction_t          *nullableActionp;        /* Nullable semantic */
   int                          propertyBitSet;
   int                          eventBitSet;
+  marpaESLIFAction_t          *symbolActionp;          /* Symbol specific action */
+  marpaESLIFAction_t          *ifActionp;              /* Symbol if action */
 } marpaESLIFSymbolProperty_t;
 
 #ifdef __cplusplus

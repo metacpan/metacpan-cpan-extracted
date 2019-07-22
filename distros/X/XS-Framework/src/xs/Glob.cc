@@ -5,7 +5,7 @@
 
 namespace xs {
 
-Glob Glob::create (const Stash& stash, std::string_view name, U32 flags) {
+Glob Glob::create (const Stash& stash, panda::string_view name, U32 flags) {
     GV* gv = (GV*)newSV(0);
     gv_init_pvn(gv, stash, name.data(), name.length(), flags);
     return gv;

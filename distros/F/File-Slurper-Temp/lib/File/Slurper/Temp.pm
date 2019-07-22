@@ -1,7 +1,7 @@
 package File::Slurper::Temp;
 
-our $DATE = '2019-07-16'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-07-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -73,11 +73,11 @@ File::Slurper::Temp - File::Slurper + File::Temp
 
 =head1 VERSION
 
-This document describes version 0.005 of File::Slurper::Temp (from Perl distribution File-Slurper-Temp), released on 2019-07-16.
+This document describes version 0.006 of File::Slurper::Temp (from Perl distribution File-Slurper-Temp), released on 2019-07-21.
 
 =head1 SYNOPSIS
 
-Use like you would use L<File::Slurper>'s C<write_text> or C<write_binary>:
+Use like you would use L<File::Slurper>'s C<write_text> and C<write_binary>:
 
  use File::Slurper::Temp qw(write_text write_binary);
  write_text("/tmp/foo.txt", "some text");
@@ -92,16 +92,19 @@ Use C<write_text_to_tempfile> and C<write_binary_to_tempfile>:
 =head1 DESCRIPTION
 
 This module is a simple combination of L<File::Slurper> and L<File::Temp>. It
-provides L</write_text> and L</write_binary> (as well as a couple of functions
-of its own). The two functions are the same as their original in File::Slurper
-but they will first write to a temporary file created by L<File::Temp>'s
-C<tempfile>, then C<rename()> the temporary file to the originally specified
-name. If the filename is originally a symlink, it will be replaced with a
+provides its version of L</write_text> and L</write_binary>, as well as a couple
+of functions of its own.
+
+This module's version of C<write_text> and C<write_binary> write to temporary
+file first using L<File::Temp>'s L<tempfile()|File::Temp/tempfile> before
+renaming to the final destination path using Perl's L<rename()|perlfunc/rename>.
+If the destination path is originally a symlink, it will be replaced with a
 regular file by C<rename()>. This can avoid symlink attack.
 
-In addition to that, this module also provides L/<write_text_to_tempfile> and
-L<write_binary_to_tempfile>. You don't have to specify filename but just content
-to write and the functions will return the temporay filename created.
+In addition the above two functions, this module also provides
+L</write_text_to_tempfile> and L</write_binary_to_tempfile>. You don't have to
+specify destination path but just content to write, and the functions will
+return the temporary filename created.
 
 =head1 FUNCTIONS
 
@@ -113,13 +116,13 @@ Usage:
 
 Just like the original L<File::Slurper>'s version, except will write to
 temporary file created by L<File::Temp>'s C<tempfile> first, then rename the
-temporary file using C<rename()>. The function will croak if C<rename()> fails.
+temporary file using Perl's C<rename()>. The function will croak if C<rename()>
+fails.
 
-To make sure that C<rename()> doesn't fail when the default temporary directory
-(e.g. C</tmp>) is on a different filesystem (because C<rename()> does not work
-across filesystem boundary), the temporary file is created with option C<< DIR
-=> dirname($filename) >> . If you want to set a specific temporary directory,
-set C<$FILE_TEMP_DIR> (see source code).
+By default, the temporary file is created in the same directory as C<$filename>,
+using C<tempfile()>'s option C<< DIR => dirname($filename) >>. If you want to
+set a specific temporary directory, set C<$FILE_TEMP_DIR> (see source code). But
+keep in mind that C<rename()> doesn't work cross-device.
 
 =head2 write_binary
 

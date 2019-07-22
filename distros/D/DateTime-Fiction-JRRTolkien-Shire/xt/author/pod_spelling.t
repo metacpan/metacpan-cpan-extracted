@@ -42,6 +42,7 @@ Specio
 Sterday
 th
 Trewsday
+TRW
 wday
 Wedmath
 Wyant

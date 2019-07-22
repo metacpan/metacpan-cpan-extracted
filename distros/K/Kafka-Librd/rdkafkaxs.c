@@ -1,4 +1,5 @@
 #include "rdkafkaxs.h"
+#include "ppport.h"
 
 #define ERRSTR_SIZE 1024
 
@@ -40,7 +41,7 @@ krd_parse_topic_partition_list(pTHX_ AV* tplist) {
             char* key = HePV(he, len);
             SV* val = HeVAL(he);
             if (strncmp(key, "topic", 6) == 0 || strncmp(key, "partition", 10) == 0) {
-                // this we already handled
+                /* this we already handled */
                 ;
             } else if (strncmp(key, "offset", 7) == 0) {
                 tp->offset = SvIV(val);
@@ -105,7 +106,7 @@ rd_kafka_conf_t* krd_parse_config(pTHX_ rdkafka_t *krd, HV* params) {
             if (topconf == NULL) goto CROAK;
             rd_kafka_conf_set_default_topic_conf(krdconf, topconf);
         } else {
-            // set named configuration property
+            /* set named configuration property */
             char *strval = SvPV(val, len);
             res = rd_kafka_conf_set(
                     krdconf,

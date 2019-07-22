@@ -3,7 +3,7 @@ package Pcore::API::Google::OAuth;
 use Pcore -class, -const, -res;
 use Crypt::OpenSSL::RSA qw[];
 use Pcore::Lib::Scalar qw[is_ref];
-use Pcore::Lib::Data qw[to_b64_url to_json from_json to_uri];
+use Pcore::Lib::Data qw[to_b64u to_json from_json to_uri];
 
 has key   => ( required => 1 );
 has scope => ( required => 1 );
@@ -11,7 +11,7 @@ has scope => ( required => 1 );
 has _token       => ( init_arg => undef );
 has _openssl_rsa => ( init_arg => undef );
 
-const our $JWT_HEADER => to_b64_url to_json {
+const our $JWT_HEADER => to_b64u to_json {
     alg => 'RS256',
     typ => 'JWT',
 };
@@ -35,7 +35,7 @@ sub get_token ( $self ) {
 
         my $issue_time = time;
 
-        my $jwt_claim_set = to_b64_url to_json {
+        my $jwt_claim_set = to_b64u to_json {
             aud   => 'https://www.googleapis.com/oauth2/v4/token',
             iss   => $key->{client_email},
             scope => $self->{scope},
@@ -43,7 +43,7 @@ sub get_token ( $self ) {
             exp   => $issue_time + 3600,
         };
 
-        my $jwt_signature = to_b64_url $self->{_openssl_rsa}->sign( $JWT_HEADER . '.' . $jwt_claim_set );
+        my $jwt_signature = to_b64u $self->{_openssl_rsa}->sign( $JWT_HEADER . '.' . $jwt_claim_set );
 
         my $jwt = $JWT_HEADER . '.' . $jwt_claim_set . '.' . $jwt_signature;
 

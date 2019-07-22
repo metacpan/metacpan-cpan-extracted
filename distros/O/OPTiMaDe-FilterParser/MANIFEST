@@ -1,0 +1,12 @@
+COPYING
+FilterParser.yp
+lib/OPTiMaDe/FilterParser.pm
+lib/OPTiMaDe/FilterParser/Comparison.pm
+lib/OPTiMaDe/FilterParser/ListComparison.pm
+lib/OPTiMaDe/FilterParser/Property.pm
+lib/OPTiMaDe/FilterParser/Zip.pm
+Makefile.PL
+MANIFEST			This list of files
+parse
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

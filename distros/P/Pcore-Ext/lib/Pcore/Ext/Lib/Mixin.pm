@@ -17,7 +17,7 @@ sub EXT_view_router : Extend('Ext.Mixin') {
             after   => { initialize => 'initialize', },
         },
 
-        initialize => func <<~'JS',
+        initialize => func <<'JS',
 
             // init config
             if (!this.getRouterConfig()) this.setRouterConfig({});
@@ -47,7 +47,7 @@ sub EXT_view_router : Extend('Ext.Mixin') {
             });
 JS
 
-        routeToItem => func [ 'view', 'newItem', 'oldItem', 'eOpts' ], <<~'JS',
+        routeToItem => func [ 'view', 'newItem', 'oldItem', 'eOpts' ], <<'JS',
 
             // it is not a redirect if ld item is not specified
             if (!oldItem) return;
@@ -59,29 +59,29 @@ JS
             return false;
 JS
 
-        redirectTo => func [ 'hash', 'args' ], <<~'JS',
+        redirectTo => func [ 'hash', 'args' ], <<'JS',
             Ext.fireEvent('redirectTo', hash, args);
 JS
 
-        redirectToDefaultRoute => func <<~'JS',
+        redirectToDefaultRoute => func <<'JS',
             var routerConfig = this.getRouterConfig();
 
             this.redirectTo(routerConfig.routePath + this.getDefaultRoute(), {replace: true});
 JS
 
-        redirectToLastRoute => func <<~'JS',
+        redirectToLastRoute => func <<'JS',
             var routerConfig = this.getRouterConfig();
 
             this.redirectTo(routerConfig.routePath + (routerConfig.lastRoute || this.getDefaultRoute()), {replace: true});
 JS
 
-        getDefaultRoute => func <<~'JS',
+        getDefaultRoute => func <<'JS',
             var routerConfig = this.getRouterConfig();
 
             return routerConfig.defaultRoute || this.getAt(0).getReference();
 JS
 
-        processRoute => func [ 'routes', 'path' ], <<~'JS',
+        processRoute => func [ 'routes', 'path' ], <<'JS',
             var routerConfig = this.getRouterConfig(),
                 route = routes.shift(),
                 routeView;
@@ -154,13 +154,13 @@ sub EXT_lazy_items : Extend('Ext.Mixin') {
             after  => { constructor => 'afterConstructor', },
         },
 
-        beforeConstructor => func ['config'], <<~'JS',
+        beforeConstructor => func ['config'], <<'JS',
             config.lazyItems = config.items || this.config.items;
 
             config.items = null;
 JS
 
-        afterConstructor => func ['config'], <<~'JS',
+        afterConstructor => func ['config'], <<'JS',
             this.on({
                 scope      : this,
                 activate   : 'onLazyItemsActivate',
@@ -168,7 +168,7 @@ JS
             });
 JS
 
-        onLazyItemsActivate => func <<~'JS',
+        onLazyItemsActivate => func <<'JS',
             var items = this.getLazyItems();
 
             this.setLazyItems(null);
@@ -178,7 +178,7 @@ JS
              this.add(items);
 JS
 
-        onLazyItemsDeactivate => func <<~'JS',
+        onLazyItemsDeactivate => func <<'JS',
             if(!this.getRemoveItemsOnDeactivate()) return;
 
             var items = this.getItems().items,
@@ -209,7 +209,7 @@ sub EXT_upload : Extend('Ext.Mixin') {
             done      => l10n('Done'),
         },
 
-        getUploadStatusText => func [ 'status', 'reason' ], <<~'JS',
+        getUploadStatusText => func [ 'status', 'reason' ], <<'JS',
             var text = this.uploadStatusText[status];
 
             if (reason) text += ': ' + reason;
@@ -217,7 +217,7 @@ sub EXT_upload : Extend('Ext.Mixin') {
             return text;
 JS
 
-        getUploadStatusTextProgress => func [ 'status', 'reason', 'progress' ], <<~'JS',
+        getUploadStatusTextProgress => func [ 'status', 'reason', 'progress' ], <<'JS',
             var text = this.getUploadStatusText(status, reason);
 
             if (progress !== undefined) {

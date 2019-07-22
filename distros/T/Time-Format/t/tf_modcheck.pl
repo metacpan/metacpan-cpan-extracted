@@ -35,7 +35,7 @@ sub output
     my ($code) = @_;
 
     print "$code\n";
-    my $rv = $RV{$code} // $RV{$ERR};
+    my $rv = exists $RV{$code}?  $RV{$code}  :  $RV{$ERR};
     exit($rv);
 }
 
@@ -47,7 +47,7 @@ sub output2
     my $rv;
     $rv = $RV{$GOOD}  if $code1 eq $GOOD  ||  $code2 eq $GOOD;
     $rv = $RV{$ERR}   if $code1 eq $ERR   ||  $code2 eq $ERR;
-    $rv //= $RV{$BAD};
+    $rv = $RV{$BAD}   if !defined $rv;
     exit($rv);
 }
 

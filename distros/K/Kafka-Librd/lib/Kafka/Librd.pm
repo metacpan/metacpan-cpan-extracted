@@ -1,12 +1,12 @@
 package Kafka::Librd;
+
 use strict;
 use warnings;
-our $VERSION = "0.10";
-my $XS_VERSION = $VERSION;
-$VERSION = eval $VERSION;
+
+our $VERSION = '0.11';
 
 require XSLoader;
-XSLoader::load('Kafka::Librd', $XS_VERSION);
+XSLoader::load('Kafka::Librd', $VERSION);
 
 use Exporter::Lite;
 our @EXPORT_OK;
@@ -14,15 +14,6 @@ our @EXPORT_OK;
 =head1 NAME
 
 Kafka::Librd - bindings for librdkafka
-
-=head1 VERSION
-
-This document describes Kafka::Librd version 0.10
-
-=head1 SUPPORT
-
-Please note that this module is not actively developed and maintained, if you
-are interested in taking it over, please contact the author
 
 =head1 SYNOPSIS
 
@@ -244,6 +235,11 @@ return message payload
 
 =cut
 
+package Kafka::Librd;
+package Kafka::Librd::Topic;
+package Kafka::Librd::Message;
+package Kafka::Librd::Error;
+
 1;
 
 __END__
@@ -259,11 +255,13 @@ L<https://github.com/edenhill/librdkafka>
 =head1 BUGS
 
 Please report any bugs or feature requests via GitHub bug tracker at
-L<http://github.com/trinitum/perl-Kafka-Librd/issues>.
+L<http://github.com/plicease/Kafka-Librd/issues>.
 
 =head1 AUTHOR
 
-Pavel Shaydo C<< <zwon at cpan.org> >>
+Original author Pavel Shaydo C<< <zwon at cpan.org> >>
+
+Current maintainer Graham Ollis C<< <plicease@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 

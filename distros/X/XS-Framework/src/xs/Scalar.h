@@ -1,5 +1,6 @@
 #pragma once
 #include <xs/Sv.h>
+#include <panda/string.h>
 
 namespace xs {
 
@@ -24,8 +25,6 @@ struct Scalar : Sv {
     Scalar (Scalar&&      oth) : Sv(std::move(oth)) {}
     Scalar (const Sv&     oth) : Scalar(oth.get())  {}
     Scalar (Sv&&          oth) : Sv(std::move(oth)) { _validate(); }
-
-    Scalar (const CallProxy& p) : Scalar(p.scalar()) {}
 
     Scalar (const Array&) = delete;
     Scalar (const Hash&)  = delete;
@@ -60,8 +59,6 @@ struct Scalar : Sv {
         return *this;
     }
 
-    Scalar& operator= (const CallProxy& p) { return operator=(p.scalar()); }
-
     Scalar& operator= (const Array&) = delete;
     Scalar& operator= (const Hash&)  = delete;
     Scalar& operator= (const Sub&)   = delete;
@@ -73,7 +70,7 @@ struct Scalar : Sv {
     operator HV* () const = delete;
     operator CV* () const = delete;
 
-    template <class T = SV> one_of_t<T,SV,GV>* get () const { return (T*)sv; }
+    template <class T = SV> panda::enable_if_one_of_t<T,SV,GV>* get () const { return (T*)sv; }
 
     void upgrade (svtype type) {
         if (type > SVt_PVMG && type != SVt_PVGV) throw std::logic_error("can't upgrade Scalar to something bigger than PVMG (and != PVGV)");

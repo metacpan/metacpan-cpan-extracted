@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20190620';
+our $VERSION = '5.20190720';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -351,6 +351,7 @@ sub changes_between {
     5.030000 => '2019-05-22',
     5.031000 => '2019-05-24',
     5.031001 => '2019-06-20',
+    5.031002 => '2019-07-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -16544,6 +16545,53 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Pod::Select'           => 1,
         }
     },
+    5.031002 => {
+        delta_from => 5.031001,
+        changed => {
+            'B::Op_private'         => '5.031002',
+            'Config'                => '5.031002',
+            'Devel::PPPort'         => '3.54',
+            'Exporter'              => '5.74',
+            'Exporter::Heavy'       => '5.74',
+            'IPC::Cmd'              => '1.04',
+            'JSON::PP'              => '4.04',
+            'JSON::PP::Boolean'     => '4.04',
+            'Module::CoreList'      => '5.20190720',
+            'Module::CoreList::Utils'=> '5.20190720',
+            'Opcode'                => '1.44',
+            'PerlIO::encoding'      => '0.28',
+            'Pod::Simple'           => '3.39',
+            'Pod::Simple::BlackBox' => '3.39',
+            'Pod::Simple::Checker'  => '3.39',
+            'Pod::Simple::Debug'    => '3.39',
+            'Pod::Simple::DumpAsText'=> '3.39',
+            'Pod::Simple::DumpAsXML'=> '3.39',
+            'Pod::Simple::HTML'     => '3.39',
+            'Pod::Simple::HTMLBatch'=> '3.39',
+            'Pod::Simple::LinkSection'=> '3.39',
+            'Pod::Simple::Methody'  => '3.39',
+            'Pod::Simple::Progress' => '3.39',
+            'Pod::Simple::PullParser'=> '3.39',
+            'Pod::Simple::PullParserEndToken'=> '3.39',
+            'Pod::Simple::PullParserStartToken'=> '3.39',
+            'Pod::Simple::PullParserTextToken'=> '3.39',
+            'Pod::Simple::PullParserToken'=> '3.39',
+            'Pod::Simple::RTF'      => '3.39',
+            'Pod::Simple::Search'   => '3.39',
+            'Pod::Simple::SimpleTree'=> '3.39',
+            'Pod::Simple::Text'     => '3.39',
+            'Pod::Simple::TextContent'=> '3.39',
+            'Pod::Simple::TiedOutFH'=> '3.39',
+            'Pod::Simple::Transcode'=> '3.39',
+            'Pod::Simple::TranscodeDumb'=> '3.39',
+            'Pod::Simple::TranscodeSmart'=> '3.39',
+            'Pod::Simple::XHTML'    => '3.39',
+            'Pod::Simple::XMLOutStream'=> '3.39',
+            'threads::shared'       => '1.61',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -17555,6 +17603,13 @@ sub is_core
     },
     5.031001 => {
         delta_from => 5.031000,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031002 => {
+        delta_from => 5.031001,
         changed => {
         },
         removed => {

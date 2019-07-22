@@ -1,5 +1,13 @@
 Revision history for Perl extension DBD::PgPPSjis.
 
+0.0801008  2019-07-22 00:00:00
+  - fix Status: Decreasing version number
+  - created by INABA Hitoshi
+
+0.0801007  2019-07-22 00:00:00
+  - fix Bug #130132 for DBD-PgPPSjis: Undeclared dependency DBI
+  - created by INABA Hitoshi
+
 0.0801006  2019-07-15 00:00:00
   - fix Kwalitee Issues: meta_json_is_parsable
   - created by INABA Hitoshi

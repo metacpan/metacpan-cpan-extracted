@@ -28,21 +28,21 @@
          },
          "x_spec" : {
             "Riap" : "v1.2.0",
-            "Rinci" : "v1.1.87"
+            "Rinci" : "v1.1.90"
          }
       },
       "runtime" : {
          "requires" : {
             "Class::Inspector" : "0",
             "List::Util" : "1.45",
-            "Log::ger" : "0.023",
+            "Log::ger" : "0.027",
             "Module::List" : "0",
             "Module::Path::More" : "0.32",
             "Package::Util::Lite" : "0",
             "Perinci::Access::Base" : "0.31",
             "Perinci::Object" : "0.310",
-            "Perinci::Sub::Complete" : "0.89",
-            "Perinci::Sub::GetArgs::Argv" : "0.83",
+            "Perinci::Sub::Complete" : "0.935",
+            "Perinci::Sub::GetArgs::Argv" : "0.842",
             "Perinci::Sub::Normalize" : "0.19",
             "Perinci::Sub::Util" : "0.46",
             "Perinci::Sub::Wrapper" : "0.83",
@@ -67,7 +67,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Monkey::Patch::Action" : "0.060",
-            "Perinci::Examples" : "0.811",
+            "Perinci::Examples" : "0.818",
             "Test::Exception" : "0",
             "Test::More" : "0.98",
             "lib" : "0"
@@ -86,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Access-Perl"
       }
    },
-   "version" : "0.890",
+   "version" : "0.891",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -181,7 +181,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.593"
+            "version" : "0.597"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -265,9 +265,9 @@
             "version" : "0.02"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion",
-            "name" : "@Author::PERLANCAR/PERLANCAR::OurPkgVersion",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@Author::PERLANCAR/OurPkgVersion",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -386,7 +386,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -432,12 +432,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Author::PERLANCAR/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Rinci::Validate",
-            "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.24"
+            "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
+            "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
+            "version" : "0.250"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

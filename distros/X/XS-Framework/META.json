@@ -25,29 +25,33 @@
       },
       "configure" : {
          "requires" : {
-            "CPP::panda::lib" : "v1.2.1",
-            "XS::Install" : "v1.2.3",
-            "next::XS" : "v1.0.4"
+            "CPP::panda::lib" : "v1.2.3",
+            "XS::Install" : "v1.2.6",
+            "next::XS" : "v1.0.6"
          }
       },
       "runtime" : {
          "requires" : {
-            "CPP::panda::lib" : "v1.2.1",
-            "XS::Install" : "v1.2.3",
-            "next::XS" : "v1.0.4",
+            "CPP::panda::lib" : "v1.2.3",
+            "XS::Install" : "v1.2.6",
+            "next::XS" : "v1.0.6",
             "perl" : "5.018000"
          }
       },
       "test" : {
          "requires" : {
+            "CPP::catch" : "v1.0.8",
+            "CPP::panda::lib" : "v1.2.3",
+            "Test::Catch" : "v1.0.7",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Simple" : "0.96"
+            "Test::Simple" : "0.96",
+            "next::XS" : "v1.0.6"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,14 +1,15 @@
 #include "test.h"
 
 using Test = TestSv<Simple>;
+using panda::string_view;
 
-template <typename T> typename enable_if<is_integral<T>::value && is_signed<T>::value,   T>::type getnum (const SV* sv) { return SvIVX(sv); }
-template <typename T> typename enable_if<is_integral<T>::value && is_unsigned<T>::value, T>::type getnum (const SV* sv) { return SvUVX(sv); }
-template <typename T> typename enable_if<is_floating_point<T>::value,                    T>::type getnum (const SV* sv) { return SvNVX(sv); }
+template <typename T> typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,   T>::type getnum (const SV* sv) { return SvIVX(sv); }
+template <typename T> typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, T>::type getnum (const SV* sv) { return SvUVX(sv); }
+template <typename T> typename std::enable_if<std::is_floating_point<T>::value,                         T>::type getnum (const SV* sv) { return SvNVX(sv); }
 
-template <typename T> typename enable_if<is_integral<T>::value && is_signed<T>::value,   T>::type oknumtype (const SV* sv) { return (bool)SvIOK(sv); }
-template <typename T> typename enable_if<is_integral<T>::value && is_unsigned<T>::value, T>::type oknumtype (const SV* sv) { return SvUOK(sv) || SvIOK(sv); }
-template <typename T> typename enable_if<is_floating_point<T>::value,                    T>::type oknumtype (const SV* sv) { return (bool)SvNOK(sv); }
+template <typename T> typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,   T>::type oknumtype (const SV* sv) { return (bool)SvIOK(sv); }
+template <typename T> typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, T>::type oknumtype (const SV* sv) { return SvUOK(sv) || SvIOK(sv); }
+template <typename T> typename std::enable_if<std::is_floating_point<T>::value,                         T>::type oknumtype (const SV* sv) { return (bool)SvNOK(sv); }
 
 // when policy = INCREMENT, and SV* declined, do nothing (+1 -1)
 // when policy = NONE and SV* declined, it MUST be decremented
@@ -122,7 +123,7 @@ TEST_CASE("Simple", "[Sv]") {
         }
         SECTION("from string_view") {
             Simple obj(string_view("suka"));
-            REQUIRE(string_view("suka") == string_view(SvPVX(obj), 4));
+            REQUIRE(string_view(SvPVX(obj), 4) == "suka");
             REQUIRE(SvCUR(obj) == 4);
             REQUIRE(obj.is_string());
         }
@@ -176,16 +177,16 @@ TEST_CASE("Simple", "[Sv]") {
         SECTION("char*") {
             Simple obj(vars.iv);
             obj = "abcd";
-            REQUIRE(string_view("abcd") == string_view(SvPVX(obj), 4));
-            REQUIRE(string_view("abcd") == string_view(SvPVX(vars.iv), 4));
+            REQUIRE(string_view(SvPVX(obj), 4) == "abcd");
+            REQUIRE(string_view(SvPVX(vars.iv), 4) == "abcd");
             REQUIRE(SvCUR(obj) == 4);
             REQUIRE(obj.is_string());
         }
         SECTION("string_view") {
             Simple obj(vars.iv);
             obj = string_view("abcd");
-            REQUIRE(string_view("abcd") == string_view(SvPVX(obj), 4));
-            REQUIRE(string_view("abcd") == string_view(SvPVX(vars.iv), 4));
+            REQUIRE(string_view(SvPVX(obj), 4) == "abcd");
+            REQUIRE(string_view(SvPVX(vars.iv), 4) == "abcd");
             REQUIRE(SvCUR(obj) == 4);
             REQUIRE(obj.is_string());
         }
@@ -208,12 +209,12 @@ TEST_CASE("Simple", "[Sv]") {
             Simple o("xxxx");
             o.set("abcd");
             REQUIRE(o.is_string());
-            REQUIRE(string_view("abcd") == string_view(SvPVX(o), 4));
+            REQUIRE(string_view(SvPVX(o), 4) == "abcd");
             REQUIRE(SvCUR(o) == 4);
 
             o.set(string_view("suka blya"));
             REQUIRE(o.is_string());
-            REQUIRE(string_view("suka blya") == string_view(SvPVX(o), 9));
+            REQUIRE(string_view(SvPVX(o), 9) == "suka blya");
             REQUIRE(SvCUR(o) == 9);
         }
     }
@@ -261,7 +262,7 @@ TEST_CASE("Simple", "[Sv]") {
     }
 
     SECTION("as_string") {
-        SECTION("string_view")   { test_as_string<std::string_view>(); }
+        SECTION("string_view")   { test_as_string<string_view>(); }
         SECTION("std::string")   { test_as_string<std::string>(); }
         SECTION("panda::string") { test_as_string<panda::string>(); }
     }
@@ -298,7 +299,7 @@ TEST_CASE("Simple", "[Sv]") {
         REQUIRE(o.length() == 5);
         o.length(3);
         REQUIRE(o.length() == 3);
-        REQUIRE((std::string_view)o == std::string_view("hel"));
+        REQUIRE((string_view)o == "hel");
     }
 
     SECTION("upgrade") {
@@ -345,7 +346,7 @@ TEST_CASE("Simple", "[Sv]") {
     SECTION("hek") {
         auto o = Simple::shared("world");
         auto hek = o.hek();
-        REQUIRE(std::string_view(HEK_KEY(hek), HEK_LEN(hek)) == string_view("world"));
+        REQUIRE(string_view(HEK_KEY(hek), HEK_LEN(hek)) == "world");
     }
 
     SECTION("hash") {

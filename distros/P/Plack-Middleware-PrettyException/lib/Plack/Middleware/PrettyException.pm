@@ -2,7 +2,7 @@ package Plack::Middleware::PrettyException;
 
 # ABSTRACT: Capture exceptions and present them as HTML or JSON
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 use 5.010;
 use strict;
@@ -80,7 +80,7 @@ sub call {
             }
 
             my $location = join( '',
-                map { $env->{$_} } qw(HTTP_HOST SCRIPT_NAME REQUEST_URI) );
+                map { $env->{$_} } qw(HTTP_HOST SCRIPT_NAME PATH_INFO) );
             $log->error( $location . ': ' . $error );
 
             my $orig_headers = HTTP::Headers->new( @{ $r->[1] } );
@@ -173,7 +173,7 @@ Plack::Middleware::PrettyException - Capture exceptions and present them as HTML
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 

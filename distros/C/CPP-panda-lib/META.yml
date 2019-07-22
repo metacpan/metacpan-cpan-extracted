@@ -3,11 +3,13 @@ abstract: 'Collection of useful functions and classes for C++.'
 author:
   - unknown
 build_requires:
+  CPP::catch: v1.0.8
+  Test::Catch: v1.0.7
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  XS::Install: v1.2.4
+  XS::Install: v1.2.6
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -20,7 +22,7 @@ no_index:
     - t
     - inc
 requires:
-  XS::Install: v1.2.4
+  XS::Install: v1.2.6
   perl: '5.012000'
-version: v1.2.2
+version: v1.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

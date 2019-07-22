@@ -19,7 +19,7 @@ use constant hipi_export_constants();
 use Scalar::Util qw( weaken isweak refaddr );
 use Carp;
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
@@ -35,6 +35,8 @@ $SIG{PIPE} = \&_call_registered_and_exit;
 $SIG{HUP}  = \&_call_registered_and_exit;
 
 sub is_raspberry_pi { return HiPi::RaspberryPi::is_raspberry() ; }
+
+sub alt_func_version { return HiPi::RaspberryPi::alt_func_version() ; }
 
 sub twos_compliment {
     my( $class, $value, $numbytes) = @_;
@@ -115,7 +117,7 @@ peripherals.
 
 Documentation and details are available at
 
-http://raspberry.znix.com
+L<https://raspberry.znix.com>
 
 =head1 AUTHOR
 
@@ -123,7 +125,7 @@ Mark Dootson, C<< mdootson@cpan.org >>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 - 2018 Mark Dootson
+Copyright (c) 2013 - 2019 Mark Dootson
 
 =cut
 

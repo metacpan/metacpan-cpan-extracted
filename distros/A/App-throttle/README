@@ -2,8 +2,8 @@ NAME
     App::throttle - Bandwidth limiting pipe
 
 VERSION
-    This document describes version 0.002 of App::throttle (from Perl
-    distribution App-throttle), released on 2018-02-05.
+    This document describes version 0.003 of App::throttle (from Perl
+    distribution App-throttle), released on 2019-07-22.
 
 SYNOPSIS
     See the included script throttle.
@@ -16,8 +16,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com///u1@198.58.100.202:/home/u1/repos/perl-App-throttle
-    >.
+    <https://github.com/perlancar/perl-App-throttle>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -30,7 +29,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

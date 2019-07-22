@@ -1,6 +1,10 @@
 ExtUtils::F77 Changes list 
 --------------------------
 
+v1.24 released Jul 21st 2019
+--------------------------- 
+* Fix of library order of -lgfortran and -lquadmath which effected MS Windows
+
 v1.23 released Jan 5th 2019
 ---------------------------
 

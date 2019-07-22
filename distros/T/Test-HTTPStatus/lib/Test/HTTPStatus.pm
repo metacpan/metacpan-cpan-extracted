@@ -21,12 +21,15 @@ Test::HTTPStatus - check an HTTP status
 
 =head1 DESCRIPTION
 
+THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
+IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
+
 Check the HTTP status for a resource.
 
 =cut
 
 use v5.10.1;  # Mojolicious is v5.10.1 and later
-our $VERSION = '2.003';
+our $VERSION = '2.004';
 
 use parent 'Test::Builder::Module';
 
@@ -77,13 +80,13 @@ sub http_ok {
 	my $status = $hash->{status};
 
 	if( defined $expected and $expected eq $status ) {
-		$Test->ok( 1, "Expected [$expected], got [$status] for [$url]");
+		$Test->ok( 1, "Expected [$expected], got [$status] for [$url]" );
 		}
 	elsif( $status == NO_URL ) {
-		$Test->ok( 0, "[$url] does not appear to be anything");
+		$Test->ok( 0, "[$url] does not appear to be anything" );
 		}
 	elsif( $status == INVALID_URL ) {
-		$Test->ok( 0, "[$url] does not appear to be a valid URL");
+		$Test->ok( 0, "[$url] does not appear to be a valid URL" );
 		}
 	else {
 		$Test->ok( 0, "Mysterious failure for [$url] with status [$status]" );
@@ -113,7 +116,7 @@ Apache::Constants, HTTP::SimpleLinkChecker
 
 This project is in GitHub:
 
-	https://github.com/briandfoy/test-httpstatus
+	https://github.com/CPAN-Adoptable-Modules/test-httpstatus
 
 =head1 AUTHOR
 
@@ -121,7 +124,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

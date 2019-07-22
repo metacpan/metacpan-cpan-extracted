@@ -1,3 +1,13 @@
+0.131		2019-07-20	T. R. Wyant
+    Fix broken POD links, and add test to ensure they stay fixed.
+    
+    Further deprecate McCants' Iridium status. This is really moot,
+    since as of July 10 2019 his Iridium status page is 404. It was last
+    seen by me June 9 2019.
+
+    Correct the test suite's check for whether Mike McCants' web site is
+    live.
+
 0.130		2019-06-05	T. R. Wyant
     Add Celestrak Starlink catalog.
 

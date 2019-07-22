@@ -1,4 +1,4 @@
-# $Id: Changes 130 2019-07-08 16:28:27Z abalama $
+# $Id: Changes 132 2019-07-19 14:28:28Z abalama $
 # Version/Revision history.
 
 1.00 Sun Aug 17 11:10:13 2014 GMT
@@ -52,3 +52,8 @@
 1.12 Mon  8 Jul 19:27:54 MSK 2019
     * Bug fixed: DBI attributes now works
     * Bug fixed: DB timeout attributes corrected
+
+1.13 Fri 19 Jul 17:27:03 MSK 2019
+    * Documentation modified
+    * Was incremented the required version of URI module
+    * Bug fixed in Collector module

@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use OPTiMaDe::FilterParser;
+use Scalar::Util qw(blessed);
+
+$Data::Dumper::Sortkeys = 1;
+
+my %options = map { $_ => 1 } grep { /^--/ } @ARGV;
+@ARGV = grep { !/^--/ } @ARGV;
+
+if( $options{'--allow-LIKE-operator'} ) {
+    $OPTiMaDe::FilterParser::allow_LIKE_operator = 1;
+}
+
+@ARGV = ( '-' ) unless @ARGV;
+
+for (@ARGV) {
+    my $parser = new OPTiMaDe::FilterParser;
+    my $tree = $parser->Run( $_ );
+    print Dumper $tree;
+    print "== SQL ==\n";
+    print traverse( $tree ) . "\n";
+}
+
+sub traverse
+{
+    my( $node ) = @_;
+    if( blessed $node && $node->can( 'to_SQL' ) ) {
+        return $node->to_SQL;
+    } elsif( blessed $node ) {
+        return '<no SQL representation>';
+    } elsif( ref $node && ref $node eq 'ARRAY' ) {
+        my @parts = map { traverse( $_ ) } @{$node};
+        return '(' . join( ' ', @parts ) . ')';
+    } else {
+        return $node;
+    }
+}

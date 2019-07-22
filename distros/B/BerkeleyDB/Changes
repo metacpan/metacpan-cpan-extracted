@@ -1,11 +1,54 @@
 Revision history for Perl extension BerkeleyDB.
 
+0.63  21 July 2019
+
+        * added 000preret.t 
+          Dump version info in "make test"
+          9e17580d74662b6a3186990dd3b1469df2829503
+
+0.62  20 July 2019
+
+        * default to /usr/local/BerkeleyDB
+          fcc0ad8adf310f7c8cc65788806439f2f8c39f90
+
+        * __heap_exist prototype needed for db 5.2 or better
+          7fe4ad8d74190d7f41a816c79e5ccf044c02c7c9
+
+        * t/joint.: Silence Valgrinf
+          https://rt.cpan.org/Ticket/Display.html?id=125605
+          40d03924570f8516efe4a05982f402e8ce569637
+
+        * db_remove missing txn code
+          https://rt.cpan.org/Ticket/Display.html?id=124979
+          b91875a9f3f55bb779ad7a448c9fff0645d8a527
+
+        * Fix test failure when TRACE is enabled
+          bb80b7d0fb83643ccddd8243d4c6b6ab637428df
+
+        * Added BERKELEYDB_DEFINE_TRACE variable to allow TRACE to be enabled
+          from .travis file.
+          bd9ebf5aa149172afab55d6ba6f27d77cf08d91a
+
+        * Add test with BERKELEYDB_DEFINE_TRACE set to .travis
+          000b1d8dffe542d6476fe78f218cc95534f1c1c3
+
+        * my_db_strerror: Add missing dTHX declaration 
+          Merge pull request https://github.com/pmqs/BerkeleyDB/pull/2
+          4273345d8eff5f521788b3c5e71fb291bf46a646
+          80ca9b77968ab84aaf8b546f2933d135202e16e0
+
+        * create .appveyor.yml 
+          4e7b034ddbe76a7c2dcd189e1e0c935c1559aa2c
+
+        * sync dbinfo from DB_File
+          27b499fa9dbfca78adcc7a12ada43f0b05b6ece6
+
 0.61  30 March 2019
 
         * Fix a couple of typos  
           One's a copyright date out by 20 years.
           The other one breaks builds with 5.2 ≤ BDB < 6.2.
-          Merge pull request #1 https://github.com/pmqs/BerkeleyDB/pull/1
+          Merge pull request https://github.com/pmqs/BerkeleyDB/pull/1
 
 0.60  30 March 2019
         * Moved source to github https://github.com/pmqs/BerkeleyDB

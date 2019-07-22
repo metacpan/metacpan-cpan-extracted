@@ -1,6 +1,6 @@
 #pragma once
 #include "cast.h"
-#include "lib/traits.h"
+#include "traits.h"
 #include <memory>
 #include <stdint.h>
 #include <stddef.h>
@@ -17,7 +17,7 @@ struct iptr {
     iptr (T* pointer)      : ptr(pointer) { if (ptr) refcnt_inc(ptr); }
     iptr (const iptr& oth) : ptr(oth.ptr) { if (ptr) refcnt_inc(ptr); }
 
-    template<class U, typename=lib::traits::convertible_t<U*, T*>>
+    template <class U, typename = enable_if_convertible_t<U*, T*>>
     iptr (const iptr<U>& oth) : ptr(oth.ptr) { if (ptr) refcnt_inc(ptr); }
 
     iptr (iptr&& oth) {
@@ -25,7 +25,7 @@ struct iptr {
         oth.ptr = NULL;
     }
 
-    template<class U, typename=lib::traits::convertible_t<U*, T*>>
+    template <class U, typename = enable_if_convertible_t<U*, T*>>
     iptr (iptr<U>&& oth) {
         ptr = oth.ptr;
         oth.ptr = NULL;
@@ -42,7 +42,7 @@ struct iptr {
 
     iptr& operator= (const iptr& oth) { return operator=(oth.ptr); }
 
-    template<class U, typename=lib::traits::convertible_t<U*, T*>>
+    template <class U, typename = enable_if_convertible_t<U*, T*>>
     iptr& operator= (const iptr<U>& oth) { return operator=(oth.ptr); }
 
     iptr& operator= (iptr&& oth) {
@@ -50,7 +50,7 @@ struct iptr {
         return *this;
     }
 
-    template<class U, typename=lib::traits::convertible_t<U*, T*>>
+    template <class U, typename = enable_if_convertible_t<U*, T*>>
     iptr& operator= (iptr<U>&& oth) {
         if (ptr) {
             if (ptr == oth.ptr) return *this;
@@ -165,10 +165,10 @@ struct weak_iptr {
     weak_iptr(weak_iptr&&) = default;
     weak_iptr& operator=(weak_iptr&& o) = default;
 
-    template <typename U, typename=lib::traits::convertible_t<U*, T*>>
+    template <typename U, typename = enable_if_convertible_t<U*, T*>>
     weak_iptr(const iptr<U>& src) : storage(src ? refcnt_weak(src.get()) : nullptr), object(src ? src.get() : nullptr) {}
 
-    template <typename U, typename=lib::traits::convertible_t<U*, T*>>
+    template <typename U, typename = enable_if_convertible_t<U*, T*>>
     weak_iptr(const weak_iptr<U>& src) : storage(src.storage), object(src.object) {}
 
     template <class U>

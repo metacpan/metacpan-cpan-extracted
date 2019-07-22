@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,15 +48,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/briandfoy/html-simplelinkextor/issues"
+         "web" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor/issues"
       },
-      "homepage" : "https://github.com/briandfoy/html-simplelinkextor",
+      "homepage" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/html-simplelinkextor.git",
-         "web" : "https://github.com/briandfoy/html-simplelinkextor"
+         "url" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor.git",
+         "web" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor"
       }
    },
-   "version" : "1.271",
+   "version" : "1.272",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

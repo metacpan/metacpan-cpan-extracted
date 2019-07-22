@@ -16,22 +16,19 @@ use Test::More;
 use feature qw(say current_sub);
 use utf8;
 
-if ($^O =~ m(bsd|linux)i)
- {plan tests => 8;
- }
-else
+if ($^O !~ m(bsd|linux)i)
  {plan skip_all => 'Not supported';
  }
 
 sub home           {fpd(currentDirectory, q(test))}
 sub develop        {0}
 sub download       {0}
+sub makeXml        {1}
 sub exchange       {0}
 sub upload         {0}
 sub notify         {0}
 sub fixBadRefs     {0}
 sub fixDitaRefs    {0}
-sub singleTopicBM  {1}
 
 my $conceptHeader = <<END =~ s(\s*\Z) ()gsr;                                    # Header for a concept
 <?xml version="1.0" encoding="UTF-8"?>
@@ -39,7 +36,7 @@ my $conceptHeader = <<END =~ s(\s*\Z) ()gsr;                                    
 END
 
 sub createTest1                                                                 # Collapse a topic referenced from a bookmap
- {owf(fpe(&in, qw(a dita)), <<END);
+ {owf(fpe(&downloads, qw(a dita)), <<END);
 $conceptHeader
 <concept id="ca">
   <title>aaaa</title>
@@ -49,7 +46,7 @@ $conceptHeader
 </concept>
 END
 
-  owf(fpe(&in, qw(b dita)), <<END);
+  owf(fpe(&downloads, qw(b dita)), <<END);
 $conceptHeader
 <concept id="cb">
   <title>aaaa</title>
@@ -59,7 +56,7 @@ $conceptHeader
 </concept>
 END
 
-  owf(fpe(&in, qw(ab ditamap)), <<END);
+  owf(fpe(&downloads, qw(ab ditamap)), <<END);
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "bookmap.dtd" []>
 <bookmap id="b1">
@@ -70,8 +67,8 @@ END
 END
  }
 
-sub createTest2($)                                                              # Conref resolution
- {owf(fpe(&in, qw(a dita)), <<END);
+sub createTest2                                                                 # Conref resolution
+ {owf(fpe(&downloads, qw(a dita)), <<END);
 $conceptHeader
 <concept id="ca">
   <title>aaaa</title>
@@ -81,7 +78,7 @@ $conceptHeader
 </concept>
 END
 
-  owf(fpe(&in, qw(b dita)), <<END);
+  owf(fpe(&downloads, qw(b dita)), <<END);
 $conceptHeader
 <concept id="cb">
   <title>bbbb</title>
@@ -92,8 +89,8 @@ $conceptHeader
 END
  }
 
-sub createTest3($)                                                              # Bookmap reference to topic with multiple cut outs
- {owf(fpe(&in, qw(a ditamap)), <<END);
+sub createTest3                                                                 # Bookmap reference to topic with multiple cut outs
+ {owf(fpe(&downloads, qw(a ditamap)), <<END);
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "bookmap.dtd" []>
 <bookmap id="bm">
@@ -101,7 +98,7 @@ sub createTest3($)                                                              
 </bookmap>
 END
 
-  owf(fpe(&in, qw(a dita)), <<END);
+  owf(fpe(&downloads, qw(a dita)), <<END);
 $conceptHeader
 <concept id="ca">
   <title>aaaa</title>
@@ -118,8 +115,8 @@ $conceptHeader
 END
  }
 
-sub createTest4($)                                                              # Bookmap reference to topic with no cut outs
- {owf(fpe(&in, qw(a ditamap)), <<END);
+sub createTest4                                                                 # Bookmap reference to topic with no cut outs
+ {owf(fpe(&downloads, qw(a ditamap)), <<END);
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "bookmap.dtd" []>
 <bookmap id="bm">
@@ -127,7 +124,7 @@ sub createTest4($)                                                              
 </bookmap>
 END
 
-  owf(fpe(&in, qw(a dita)), <<END);
+  owf(fpe(&downloads, qw(a dita)), <<END);
 $conceptHeader
 <concept id="ca">
   <title>aaaa</title>
@@ -138,9 +135,8 @@ $conceptHeader
 END
  }
 
-sub createSampleImageTest($$)                                                   #P Test image file resolution
- {my ($in, $downloads) = @_;                                                    # Folder to create the files in
-  my $f = owf(fpe($in, qw(concepts c dita)), <<END);
+sub createSampleImageTest                                                       #P Test image file resolution
+ {my $f = owf(fpe(&downloads, qw(concepts c dita)), <<END);
 $conceptHeader
 <concept id="c1">
   <title>concept 1</title>
@@ -151,15 +147,14 @@ $conceptHeader
 </concept>
 END
 
-  owf(fpe($downloads, qw(images a png)), <<END);
+  owf(fpe(&downloads, qw(images a png)), <<END);
 png image a
 END
  }
 
-sub createTestTopicFlattening($)                                                #P Topic flattening
- {my ($in) = @_;                                                                # Folder to create the files in
-  for(1..3)
-   {owf(fpe($in, q(c).$_, q(dita)), <<END);
+sub createTestTopicFlattening                                                   #P Topic flattening
+ {for(1..3)
+   {owf(fpe(&downloads, q(c).$_, q(dita)), <<END);
 $conceptHeader
 <concept id="c">
   <title/>
@@ -170,7 +165,7 @@ END
  }
 
 sub createTestReferenceToFlattenedTopic                                         # Reference to a topic that has been flattened
- {owf(fpe(&in, qw(a dita)), <<END);
+ {owf(fpe(&downloads, qw(a dita)), <<END);
 $conceptHeader
 <concept id="c">
   <title>aaaa</title>
@@ -180,7 +175,7 @@ $conceptHeader
 </concept>
 END
 
-  owf(fpe(&in, qw(b dita)), <<END);
+  owf(fpe(&downloads, qw(b dita)), <<END);
 $conceptHeader
 <concept id="c">
   <title>aaaa</title>
@@ -190,7 +185,7 @@ $conceptHeader
 </concept>
 END
 
-  owf(fpe(&in, qw(c ditamap)), <<END);
+  owf(fpe(&downloads, qw(c ditamap)), <<END);
 $conceptHeader
 <concept id="c">
   <title>aaaa</title>
@@ -202,7 +197,7 @@ END
  }
 
 sub createTestReferenceToCutOutTopic                                            # References from a topic that has been cut out to a topic that has been cut out
- {owf(fpe(&in, qw(a xml)), <<END);
+ {owf(fpe(&downloads, qw(a xml)), <<END);
 $conceptHeader
 <concept id="a">
   <title>aaaa</title>
@@ -231,7 +226,7 @@ $conceptHeader
 </concept>
 END
 
-  owf(fpe(&in, qw(b xml)), <<END);
+  owf(fpe(&downloads, qw(b xml)), <<END);
 $conceptHeader
 <concept id="b">
   <title>bbbb</title>
@@ -260,6 +255,53 @@ $conceptHeader
 END
  }
 
+sub createHtml                                                                  # Html Topics
+ {owf(fpe(&downloads, qw(a html)), <<END);
+<html>
+  <p>aaaa
+  <h2>Chapter 1</h2>
+  <p>Chapter 1 at heading 2
+  <h4>Chapter 1.1</h4>
+  <p>Chapter 1.1 at heading 4
+  <h4>Chapter 1.2</h4>
+  <p>Chapter 1.2 at heading 2
+  <h3>Chapter 1.3</h3>
+  <p>Chapter 1.3 at heading 3
+
+  <h1>Chapter 1</h1>
+  <p>Chapter 1 at heading 1
+  <h4>Chapter 1.1</h4>
+  <p>Chapter 1.1 at heading 4
+  <h4>Chapter 1.2</h4>
+  <p>Chapter 1.2 at heading 2
+  <h3>Chapter 1.3</h3>
+  <p>Chapter 1.3 at heading 3
+</html>
+END
+ }
+
+sub createDocBook                                                               # DocBook topics
+ {owf(fpe(&downloads, qw(docBook xml)), <<END);
+<article>
+<articleinfo>
+<title>Sample DocBook</title>
+</articleinfo>
+<para>This is a sample DocBook article that illustrates some simple DocBook XML tags.
+</para>
+<sect1>
+  <title>Section 1</title>   <para>Paragraph 1 of section 1</para>
+  <sect2>
+    <title>Section 1.1</title>
+    <para>Paragraph 1 of section 1.1</para>
+    <para>Paragraph 2 of section 1.1</para> </sect2> <sect2>
+  <title>Section 1.2</title> <para>Paragraph 1 of section 1.2</para> </sect2> </sect1> <sect1>
+  <title>Section 2</title>
+  <para>Second high-level section in this article </para>
+</sect1>
+</article>
+END
+ }
+
 sub convertDocument($$)                                                         #r Convert one document.
  {my ($project, $x) = @_;                                                       # Project == document to convert, parse tree.
   $x                                                                            # Return parse tree
@@ -267,9 +309,11 @@ sub convertDocument($$)                                                         
 
 sub createTest($$)                                                              # Create one test
  {my ($title, $testCreationSub) = @_;                                           # Title for test, sub to create test scenario
-  clearFolder(&in, 63);                                                         # Create the test scenario
-  &$testCreationSub(&in, &downloads);
+  clearFolder($_, 1e2) for &in, &downloads;                                     # Clear folders
+  &$testCreationSub;                                                            # Create the test scenario
+
   my $r = &convertXmlToDita;                                                    # Convert creating targets/ and out/ in the process
+
   ok $r->totalErrors == 0;
 
   my $f = readFiles(&out, &targets);                                            # Pack files to use as tests in Xref
@@ -286,3 +330,7 @@ createTest(q(eeee), \&createSampleImageTest);
 createTest(q(ffff), \&createTestTopicFlattening);
 createTest(q(gggg), \&createTestReferenceToFlattenedTopic);
 createTest(q(hhhh), \&createTestReferenceToCutOutTopic);
+createTest(q(iiii),  \&createHtml);
+createTest(q(jjjj),  \&createDocBook);
+
+done_testing;

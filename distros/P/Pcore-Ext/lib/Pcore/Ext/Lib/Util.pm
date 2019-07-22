@@ -86,7 +86,7 @@ sub EXT_theme : Extend('Ext.Panel') {
             },
             {   xtype    => 'togglefield',
                 boxLabel => l10n('DARK MODE'),
-                bind     => '{session.theme.darkMode}',
+                bind     => '{settings.theme.darkMode}',
             },
         ],
     };

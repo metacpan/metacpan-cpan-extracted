@@ -163,8 +163,8 @@ around new => sub ( $orig, $self, $cmd, %args ) {
 sub _create_process ( $self, $cmd, $args, $restore ) {
 
     # prepare environment
-    local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
-    local $ENV{PATH}     = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
+    # local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
+    local $ENV{PATH} = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
 
     # run process
     if ($MSWIN) {

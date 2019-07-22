@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -ex
+
+cip sudo bash -c 'set -ex; mkdir -p ~cip/dzil/lib/perl5/inc; cp inc/TrimPod.pm ~cip/dzil/lib/perl5/inc/TrimPod.pm'

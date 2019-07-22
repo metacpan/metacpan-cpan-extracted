@@ -14,7 +14,7 @@ MarpaX::ESLIF::Value - MarpaX::ESLIF's value
 
 =head1 VERSION
 
-version 3.0.12
+version 3.0.14
 
 =head1 SYNOPSIS
 

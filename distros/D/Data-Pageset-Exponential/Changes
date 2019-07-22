@@ -1,0 +1,20 @@
+Revision history for Data-Pageset-Exponential:
+
+v0.2.1    2019-07-21 11:16:26+01:00 Europe/London
+  [Bug Fixes]
+  - Specified a minimum version for the prereq List::Util.
+
+v0.2.0    2019-07-20 14:46:54+01:00 Europe/London
+  [Enhancements]
+  - Add previous_set and next_set methods.
+
+  [Documentation]
+  - Add Pod::Weaver configuration to properly build POD.
+
+  - Added acknowledgement for test code.
+
+  [Other Changes]
+  - Removed integer from prereqs list, since it is core.
+
+v0.1.0    2019-07-20 14:10:11+01:00 Europe/London
+ - Initial release.

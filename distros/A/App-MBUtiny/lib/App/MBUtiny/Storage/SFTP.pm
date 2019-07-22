@@ -1,4 +1,4 @@
-package App::MBUtiny::Storage::SFTP; # $Id: SFTP.pm 121 2019-07-01 19:51:50Z abalama $
+package App::MBUtiny::Storage::SFTP; # $Id: SFTP.pm 131 2019-07-16 18:45:44Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MBUtiny::Storage::SFTP - App::MBUtiny::Storage subclass for SFTP storage su
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -19,6 +19,7 @@ Version 1.00
         FixUP       on
         URL         sftp://user@example.com:22/path/to/backup/dir1
         URL         sftp://user@example.com:22/path/to/backup/dir2
+        Set         timeout  180
         Set         key_path  /path/to/private/file.key
         Comment     SFTP storage said blah-blah-blah # Optional for collector
     </SFTP>
@@ -106,7 +107,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Storable qw/dclone/;
 use Fcntl ':mode';

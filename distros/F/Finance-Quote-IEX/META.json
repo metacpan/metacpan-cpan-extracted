@@ -1,10 +1,10 @@
 {
-   "abstract" : "Retrieve stock quotes using the IEX API",
+   "abstract" : "(DEPRECATED) Retrieve stock quotes using the IEX API",
    "author" : [
       "Jeffrey T. Palmer <jtpalmer@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -58,7 +58,9 @@
          "web" : "https://github.com/jtpalmer/Finance-Quote-IEX"
       }
    },
-   "version" : "0.001001",
+   "version" : "0.002000",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

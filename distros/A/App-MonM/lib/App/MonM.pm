@@ -1,4 +1,4 @@
-package App::MonM; # $Id: MonM.pm 85 2019-07-14 12:03:14Z abalama $
+package App::MonM; # $Id: MonM.pm 89 2019-07-15 05:19:11Z abalama $
 use warnings;
 use strict;
 use utf8;
@@ -11,7 +11,7 @@ App::MonM - Simple monitoring tool
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =head1 SYNOPSIS
 
@@ -177,7 +177,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use feature qw/ say /;
 

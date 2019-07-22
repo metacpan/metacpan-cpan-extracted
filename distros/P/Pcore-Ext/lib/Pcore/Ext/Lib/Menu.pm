@@ -11,7 +11,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') {
             },
         },
 
-        init => func ['view'], <<~"JS",
+        init => func ['view'], <<"JS",
             var session = this.getViewModel().get('session'),
                 items = this.getMenuItems(session);
 
@@ -157,7 +157,7 @@ sub EXT_bottom : Extend('Ext.Panel') {
         items => [
             {   xtype    => 'togglefield',
                 boxLabel => l10n('DARK MODE'),
-                bind     => '{session.theme.darkMode}',
+                bind     => '{settings.theme.darkMode}',
             },
             { xtype => 'spacer' },
             {   reference => 'change-locale-button',

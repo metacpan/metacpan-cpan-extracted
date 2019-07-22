@@ -24,7 +24,7 @@ use HiPi::Device::SPI;
 use HiPi::GPIO;
 use Carp;
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 __PACKAGE__->create_accessors( qw( reset_pin gpio scanwait scaniter _allow_write_st _allow_write_block0 debug ) );
 
@@ -33,7 +33,7 @@ sub new {
     
     my %params = (
         devicename   => '/dev/spidev0.0',
-        speed        => SPI_SPEED_MHZ_8,  # 8mhz = 8Mbits/s
+        speed        => SPI_SPEED_MHZ_2,
         delay        => 0,
         reset_pin    => undef,
         scanwait     => 10000,
@@ -66,6 +66,7 @@ sub _check_reset_pin_status {
     my $self = shift;
     return unless $self->reset_pin;
     my $mode = $self->gpio->get_pin_mode( $self->reset_pin );
+    $self->gpio->set_pin_pud( $self->reset_pin, RPI_PUD_OFF );
     if( $mode == RPI_MODE_OUTPUT ) {
         my $level = $self->gpio->get_pin_level( $self->reset_pin );
         $self->gpio->set_pin_level( $self->reset_pin, RPI_HIGH ) if $level == RPI_LOW;

@@ -1,14 +1,17 @@
 #pragma once
-#include <xs/basic.h>
+#include "basic.h"
 #include <string>
-#include <xs/CallProxy.h>
-#include <panda/lib/memory.h>
+#include <panda/memory.h>
+#include <panda/traits.h>
 #include <panda/string_view.h>
 
 namespace xs {
 
-struct Scalar; struct Array; struct Hash; struct List; struct Sub; struct Stash; struct Glob; struct Object; struct Ref;
+struct Sv; struct Scalar; struct Simple; struct Ref; struct Array; struct Hash; struct List; struct Sub; struct Stash; struct Glob; struct Object;
 using xs::my_perl;
+
+template <class T, class R = T> using enable_if_sv_t    = std::enable_if_t<panda::is_one_of<T,Sv,Scalar,Ref,Simple,Object,Sub,Hash,Array,Glob,Stash,List>::value, R>;
+template <class T, class R = T> using enable_if_rawsv_t = std::enable_if_t<panda::is_one_of<T,SV,AV,HV,CV,GV>::value, R>;
 
 struct Sv {
     static const bool INCREMENT = true;
@@ -32,42 +35,29 @@ struct Sv {
 
     static payload_marker_t* default_marker();
 
-    static Sv noinc (SV* val) { return Sv(val, NONE); }
-    static Sv noinc (AV* val) { return Sv(val, NONE); }
-    static Sv noinc (HV* val) { return Sv(val, NONE); }
-    static Sv noinc (CV* val) { return Sv(val, NONE); }
-    static Sv noinc (GV* val) { return Sv(val, NONE); }
+    template <class T, typename = enable_if_rawsv_t<T>>
+    static Sv noinc (T* val) { return Sv((SV*)val, NONE); }
 
     static Sv create () { return Sv(newSV(0), NONE); }
 
     Sv (std::nullptr_t = nullptr) : sv(nullptr) {}
 
-    Sv (SV* sv, bool policy = INCREMENT) : sv(sv)                { if (policy == INCREMENT) SvREFCNT_inc_simple_void(sv); }
-    Sv (AV* sv, bool policy = INCREMENT) : Sv((SV*)sv, policy)   {}
-    Sv (HV* sv, bool policy = INCREMENT) : Sv((SV*)sv, policy)   {}
-    Sv (CV* sv, bool policy = INCREMENT) : Sv((SV*)sv, policy)   {}
-    Sv (GV* sv, bool policy = INCREMENT) : Sv((SV*)sv, policy)   {}
+    template <class T, typename = enable_if_rawsv_t<T>>
+    Sv (T* sv, bool policy = INCREMENT) : sv((SV*)sv) { if (policy == INCREMENT) SvREFCNT_inc_simple_void(sv); }
 
     Sv (const Sv& oth) : Sv(oth.sv) {}
     Sv (Sv&&      oth) : sv(oth.sv) { oth.sv = nullptr; }
 
-    Sv (const CallProxy& p) : Sv(p.sv()) {}
-
     ~Sv () { SvREFCNT_dec(sv); }
 
-    Sv& operator= (SV* val) {
+    template <class T, typename = enable_if_rawsv_t<T>>
+    Sv& operator= (T* val) {
         SvREFCNT_inc_simple_void(val);
         auto old = sv;
-        sv = val;
+        sv = (SV*)val;
         SvREFCNT_dec(old);
         return *this;
     }
-
-    Sv& operator= (AV* val)            { operator=((SV*)val); return *this; }
-    Sv& operator= (HV* val)            { operator=((SV*)val); return *this; }
-    Sv& operator= (CV* val)            { operator=((SV*)val); return *this; }
-    Sv& operator= (GV* val)            { operator=((SV*)val); return *this; }
-    Sv& operator= (const CallProxy& p) { operator=(p.sv()); return *this; }
 
     Sv& operator= (const Sv& oth) { return operator=(oth.sv); }
 
@@ -85,7 +75,7 @@ struct Sv {
     operator void* () const { return sv; } // resolves ambiguity for passing to perl-macros-api
 
     // unsafe getters (faster)
-    template <typename T = SV> one_of_t<T,SV,AV,HV,CV,GV>* get () const { return (T*)sv; }
+    template <typename T = SV> enable_if_rawsv_t<T>* get () const { return (T*)sv; }
 
     explicit operator bool () const { return sv; }
     explicit operator bool ()       { return sv; }
@@ -172,26 +162,11 @@ protected:
 
 inline bool operator== (const Sv& lh, const Sv& rh) { return lh.get<SV>() == rh.get<SV>(); }
 inline bool operator!= (const Sv& lh, const Sv& rh) { return !(lh == rh); }
-inline bool operator== (const Sv& lh, SV* rh)       { return lh.get<SV>() == rh; }
-inline bool operator!= (const Sv& lh, SV* rh)       { return !(lh == rh); }
-inline bool operator== (SV* lh, const Sv& rh)       { return rh.get<SV>() == lh; }
-inline bool operator!= (SV* lh, const Sv& rh)       { return !(lh == rh); }
-inline bool operator== (const Sv& lh, AV* rh)       { return lh.get<AV>() == rh; }
-inline bool operator!= (const Sv& lh, AV* rh)       { return !(lh == rh); }
-inline bool operator== (AV* lh, const Sv& rh)       { return rh.get<AV>() == lh; }
-inline bool operator!= (AV* lh, const Sv& rh)       { return !(lh == rh); }
-inline bool operator== (const Sv& lh, HV* rh)       { return lh.get<HV>() == rh; }
-inline bool operator!= (const Sv& lh, HV* rh)       { return !(lh == rh); }
-inline bool operator== (HV* lh, const Sv& rh)       { return rh.get<HV>() == lh; }
-inline bool operator!= (HV* lh, const Sv& rh)       { return !(lh == rh); }
-inline bool operator== (const Sv& lh, CV* rh)       { return lh.get<CV>() == rh; }
-inline bool operator!= (const Sv& lh, CV* rh)       { return !(lh == rh); }
-inline bool operator== (CV* lh, const Sv& rh)       { return rh.get<CV>() == lh; }
-inline bool operator!= (CV* lh, const Sv& rh)       { return !(lh == rh); }
-inline bool operator== (const Sv& lh, GV* rh)       { return lh.get<GV>() == rh; }
-inline bool operator!= (const Sv& lh, GV* rh)       { return !(lh == rh); }
-inline bool operator== (GV* lh, const Sv& rh)       { return rh.get<GV>() == lh; }
-inline bool operator!= (GV* lh, const Sv& rh)       { return !(lh == rh); }
+
+template <class T, typename = enable_if_rawsv_t<T>> inline bool operator== (const Sv& lh, T* rh) { return lh.get() == (SV*)rh; }
+template <class T, typename = enable_if_rawsv_t<T>> inline bool operator!= (const Sv& lh, T* rh) { return lh.get() != (SV*)rh; }
+template <class T, typename = enable_if_rawsv_t<T>> inline bool operator== (T* lh, const Sv& rh) { return rh.get() == (SV*)lh; }
+template <class T, typename = enable_if_rawsv_t<T>> inline bool operator!= (T* lh, const Sv& rh) { return rh.get() != (SV*)lh; }
 
 std::ostream& operator<< (std::ostream& os, const Sv& sv);
 

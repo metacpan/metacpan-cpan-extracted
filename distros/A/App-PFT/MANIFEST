@@ -5,6 +5,7 @@ Makefile.PL
 MANIFEST			This list of files
 README
 README.md
+bash_completion.d/pft
 bin/pft
 bin/pft-clean
 bin/pft-edit
@@ -19,5 +20,8 @@ lib/App/PFT/Util.pm
 share/templates/default.html
 share/templates/dump_page.html
 share/templates/minimal.html
+share/templates/terminal.html
+t/base_site.t
+t/editing_cases.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

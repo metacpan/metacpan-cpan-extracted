@@ -1,6 +1,10 @@
 Revision history for Plack::Middleware::PrettyException
 all changes by Thomas Klausner unless noted otherwise
 
+1.008   2019-07-22T23:32:27
+    - fix bad url reported when using --path (#2)
+
+
 1.007   2018-09-24T13:39:17
     - pass env to render_html_error
 

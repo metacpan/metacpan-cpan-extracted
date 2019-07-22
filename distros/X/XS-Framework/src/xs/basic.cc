@@ -40,7 +40,7 @@ void __boot_module (const char* rawmod, void (*bootfunc)(pTHX_ CV*), const char*
     auto xsname = module + bs;
 
     Sub sub = newXS(xsname.c_str(), bootfunc, file);
-    sub.call({Simple(module), Simple(version)});
+    sub.call<void>(Simple(module), Simple(version));
 }
 
 }

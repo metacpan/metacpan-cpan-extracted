@@ -8,7 +8,7 @@
 #   The Artistic License 2.0 (GPL Compatible)
 #
 package Redis::List;
-$Redis::List::VERSION = '1.991';
+$Redis::List::VERSION = '1.995';
 # ABSTRACT: tie Perl arrays to Redis lists
 # VERSION
 # AUTHORITY
@@ -106,7 +106,7 @@ Redis::List - tie Perl arrays to Redis lists
 
 =head1 VERSION
 
-version 1.991
+version 1.995
 
 =head1 SYNOPSYS
 

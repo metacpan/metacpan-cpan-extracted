@@ -8,7 +8,7 @@ use warnings;
 use utf8;
 
 use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';

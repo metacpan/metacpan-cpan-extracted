@@ -1,5 +1,8 @@
 Revision history for Calendar::Julian
 
+0.13  Mon Jul 22 03:30:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.12  Sun Jun 09 06:20:00 2019
       - Added dependency on Date::Julian::Simple v0.08.
 

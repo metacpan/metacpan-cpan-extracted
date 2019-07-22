@@ -11,7 +11,7 @@ use Astro::App::Satpass2::FormatTime::Strftime;
 use Astro::App::Satpass2::Utils qw{ ARRAY_REF @CARP_NOT };
 use POSIX ();
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 sub format_datetime {
     my ( $self, $tplt, $time, $gmt ) = @_;
@@ -79,7 +79,8 @@ notice.
 This subclass of
 L<Astro::App::Satpass2::FormatTime|Astro::App::Satpass2::FormatTime>
 formats times using C<POSIX::strftime>. Time zones other than the
-default local zone are handled by setting $ENV{TZ} from the L<tz|/tz>
+default local zone are handled by setting C<$ENV{TZ}> from the
+L<tz|Astro::App::Satpass2::FormatTime/tz>
 attribute before calling C<localtime()>, but this is unsupported by the
 C<localtime()> built-in. It may work, but if it does not there is
 nothing I can do about it.

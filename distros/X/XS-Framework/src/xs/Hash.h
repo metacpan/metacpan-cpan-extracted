@@ -18,7 +18,7 @@ struct Hash : Sv {
         return ret;
     }
 
-    static Hash create (std::initializer_list<std::tuple<std::string_view, Scalar>> l) { return Hash(l); }
+    static Hash create (const std::initializer_list<std::tuple<panda::string_view, Scalar>>& l) { return Hash(l); }
 
     static Hash noinc  (SV* val) { return Hash(val, NONE); }
     static Hash noinc  (HV* val) { return Hash(val, NONE); }
@@ -32,26 +32,23 @@ struct Hash : Sv {
     Hash (const Sv&   oth) : Hash(oth.get())    {}
     Hash (Sv&&        oth) : Sv(std::move(oth)) { _validate(); }
 
-    Hash (const CallProxy& p) : Hash(p.sv()) {}
-
     Hash (const Simple&) = delete;
     Hash (const Array&)  = delete;
     Hash (const Sub&)    = delete;
     Hash (const Glob&)   = delete;
 
-    Hash (std::initializer_list<std::tuple<std::string_view, Scalar>>);
+    Hash (const std::initializer_list<std::tuple<panda::string_view, Scalar>>&);
 
-    Hash& operator= (SV* val)            { Sv::operator=(val); _validate(); return *this; }
-    Hash& operator= (HV* val)            { Sv::operator=(val); return *this; }
-    Hash& operator= (const Hash& oth)    { Sv::operator=(oth); return *this; }
-    Hash& operator= (Hash&& oth)         { Sv::operator=(std::move(oth)); return *this; }
-    Hash& operator= (const Sv& oth)      { return operator=(oth.get()); }
-    Hash& operator= (Sv&& oth)           { Sv::operator=(std::move(oth)); _validate(); return *this; }
-    Hash& operator= (const CallProxy& p) { return operator=(p.sv()); }
-    Hash& operator= (const Simple&) = delete;
-    Hash& operator= (const Array&)  = delete;
-    Hash& operator= (const Sub&)    = delete;
-    Hash& operator= (const Glob&)   = delete;
+    Hash& operator= (SV* val)         { Sv::operator=(val); _validate(); return *this; }
+    Hash& operator= (HV* val)         { Sv::operator=(val); return *this; }
+    Hash& operator= (const Hash& oth) { Sv::operator=(oth); return *this; }
+    Hash& operator= (Hash&& oth)      { Sv::operator=(std::move(oth)); return *this; }
+    Hash& operator= (const Sv& oth)   { return operator=(oth.get()); }
+    Hash& operator= (Sv&& oth)        { Sv::operator=(std::move(oth)); _validate(); return *this; }
+    Hash& operator= (const Simple&)   = delete;
+    Hash& operator= (const Array&)    = delete;
+    Hash& operator= (const Sub&)      = delete;
+    Hash& operator= (const Glob&)     = delete;
 
     void set (SV* val) { Sv::operator=(val); }
 
@@ -62,9 +59,9 @@ struct Hash : Sv {
 
     HV* operator-> () const { return (HV*)sv; }
 
-    template <typename T = SV> one_of_t<T,SV,HV>* get () const { return (T*)sv; }
+    template <typename T = SV> panda::enable_if_one_of_t<T,SV,HV>* get () const { return (T*)sv; }
 
-    Scalar fetch (const std::string_view& key) const {
+    Scalar fetch (const panda::string_view& key) const {
         if (!sv) return Scalar();
         SV** ref = hv_fetch((HV*)sv, key.data(), key.length(), 0);
         Scalar ret;
@@ -72,33 +69,32 @@ struct Hash : Sv {
         return ret;
     }
 
-    Scalar at (const std::string_view& key) const {
+    Scalar at (const panda::string_view& key) const {
         Scalar ret = fetch(key);
         if (!ret) throw std::out_of_range("at: no key");
         return ret;
     }
 
-    Scalar operator[] (const std::string_view& key) const { return fetch(key); }
+    Scalar operator[] (const panda::string_view& key) const { return fetch(key); }
 
-    void store (const std::string_view& key, const Scalar& val,  U32 hash = 0);
-    void store (const std::string_view& key, std::nullptr_t,     U32 hash = 0) { store(key, Scalar(), hash); }
-    void store (const std::string_view& key, SV* v,              U32 hash = 0) { store(key, Scalar(v), hash); }
-    void store (const std::string_view& key, const Sv& v,        U32 hash = 0) { store(key, Scalar(v), hash); }
-    void store (const std::string_view& key, const CallProxy& p, U32 hash = 0) { store(key, p.scalar(), hash); }
-    void store (const std::string_view& key, const Array&,       U32 hash = 0) = delete;
-    void store (const std::string_view& key, const Hash&,        U32 hash = 0) = delete;
-    void store (const std::string_view& key, const Sub&,         U32 hash = 0) = delete;
+    void store (const panda::string_view& key, const Scalar& val, U32 hash = 0);
+    void store (const panda::string_view& key, std::nullptr_t,    U32 hash = 0) { store(key, Scalar(), hash); }
+    void store (const panda::string_view& key, SV* v,             U32 hash = 0) { store(key, Scalar(v), hash); }
+    void store (const panda::string_view& key, const Sv& v,       U32 hash = 0) { store(key, Scalar(v), hash); }
+    void store (const panda::string_view& key, const Array&,      U32 hash = 0) = delete;
+    void store (const panda::string_view& key, const Hash&,       U32 hash = 0) = delete;
+    void store (const panda::string_view& key, const Sub&,        U32 hash = 0) = delete;
 
-    KeyProxy operator[] (const std::string_view& key) { return KeyProxy(hv_fetch((HV*)sv, key.data(), key.length(), 1), false); }
+    KeyProxy operator[] (const panda::string_view& key) { return KeyProxy(hv_fetch((HV*)sv, key.data(), key.length(), 1), false); }
 
-    Scalar erase (const std::string_view& key) {
+    Scalar erase (const panda::string_view& key) {
         Scalar ret;
         ret.set(hv_delete((HV*)sv, key.data(), key.length(), 0));
         return ret;
     }
 
-    bool contains (const std::string_view& key) const { return exists(key); }
-    bool exists   (const std::string_view& key) const {
+    bool contains (const panda::string_view& key) const { return exists(key); }
+    bool exists   (const panda::string_view& key) const {
         if (!sv) return false;
         return hv_exists((HV*)sv, key.data(), key.length());
     }

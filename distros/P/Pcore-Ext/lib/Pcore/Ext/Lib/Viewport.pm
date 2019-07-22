@@ -56,10 +56,12 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
                 me.api[method] = Ext.direct.Manager.parseMethod(me.api[method]);
             }
 
+            Ext.state.Provider.register(new Ext.state.LocalStorage());
+
             // set material theme
             me._applyTheme(me._getCurrentTheme());
 
-            this.getViewModel().bind('{session.theme.darkMode}', function (newVal, oldVal, eOpt) {
+            this.getViewModel().bind('{settings.theme.darkMode}', function (newVal, oldVal, eOpt) {
                 if (newVal == null) return;
 
                 this.setTheme({ darkMode: newVal });
@@ -176,7 +178,7 @@ JS
             session.locale = locale;
             session.localeName = settings.locales[locale];
 
-            session.theme = this._getCurrentTheme();
+            settings.theme = this._getCurrentTheme();
 
             // update viewModel
             var viewModel = this.getViewModel();
@@ -194,8 +196,8 @@ JS
 
             localStorage.theme = JSON.stringify(theme);
 
-            var session = this.getViewModel().get('session');
-            if (session) session.theme = theme;
+            var settings = this.getViewModel().get('settings');
+            if (settings) settings.theme = theme;
 
             this._applyTheme(theme);
 JS
@@ -228,24 +230,24 @@ JS
 JS
 
         # EVENTS
-        onUnmatchedRoute => func ['hash'], <<~'JS',
+        onUnmatchedRoute => func ['hash'], <<'JS',
             this.redirectTo('', {replace: true});
-        JS
+JS
 
-        onRedirectTo => func [ 'hash', 'args' ], <<~'JS',
+        onRedirectTo => func [ 'hash', 'args' ], <<'JS',
             this.redirectTo( hash, args );
-        JS
+JS
 
-        onRequestError => func ['res'], <<~'JS',
+        onRequestError => func ['res'], <<'JS',
             Ext.toast("Error: " + res, 3000);
-        JS
+JS
 
         # TODO
-        onRemoteEvent => func ['ev'], <<~'JS',
-        JS
+        onRemoteEvent => func ['ev'], <<'JS',
+JS
 
         # TOKEN
-        setToken => func [ 'token', 'persistent' ], <<~'JS',
+        setToken => func [ 'token', 'persistent' ], <<'JS',
             this.removeToken();
 
             if (persistent) {
@@ -254,7 +256,7 @@ JS
             else {
                 sessionStorage.token = token;
             }
-        JS
+JS
 
         getToken => func <<'JS',
             return sessionStorage.token || localStorage.token;

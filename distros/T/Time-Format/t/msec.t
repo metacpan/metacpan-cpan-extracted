@@ -1,4 +1,4 @@
-#!/perl -I..
+#!/perl
 
 # Replicate the bug where microseconds and  milliseconds show up as negative numbers.
 

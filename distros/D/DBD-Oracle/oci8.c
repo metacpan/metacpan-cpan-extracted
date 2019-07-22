@@ -164,7 +164,7 @@ sql_typecode_name(int dbtype) {
 		case 116:	return "SQLT_RSET	OCI 8 cursor variable";
 		case ORA_VARCHAR2_TABLE:return "ORA_VARCHAR2_TABLE";
 		case ORA_NUMBER_TABLE: 	return "ORA_NUMBER_TABLE";
-		case ORA_XMLTYPE:		return "ORA_XMLTYPE or SQLT_NTY";/* SQLT_NTY	must be carefull here as its value (108) is the same for an embedded object Well realy only XML clobs not embedded objects  */
+		case ORA_XMLTYPE:		return "ORA_XMLTYPE or SQLT_NTY";/* SQLT_NTY	must be careful here as its value (108) is the same for an embedded object Well really only XML clobs not embedded objects  */
 
 	}
 	 sv = sv_2mortal(newSVpv("",0));
@@ -326,10 +326,10 @@ oci_mode(ub4  mode)
 /*case OCI_LOGON2_SPOOL:		return "LOGON2_SPOOL";	  Use session pool */
 		case OCI_LOGON2_CPOOL:		return "LOGON2_CPOOL"; /* Use connection pool */
 /*case OCI_LOGON2_STMTCACHE:	return "LOGON2_STMTCACHE";	  Use Stmt Caching */
-		case OCI_LOGON2_PROXY:		return "LOGON2_PROXY";	 /* Proxy authentiaction */
+		case OCI_LOGON2_PROXY:		return "LOGON2_PROXY";	 /* Proxy authentication */
 		/*------------------------- OCISessionPoolCreate Modes ----------------------*/
 /*case OCI_SPC_REINITIALIZE:		return "SPC_REINITIALIZE";	Reinitialize the session pool */
-/*case OCI_SPC_HOMOGENEOUS: 		return "SPC_HOMOGENEOUS"; "";	Session pool is homogeneneous */
+/*case OCI_SPC_HOMOGENEOUS: 		return "SPC_HOMOGENEOUS"; "";	Session pool is homogeneous */
 /*case OCI_SPC_STMTCACHE:			return "SPC_STMTCACHE";	Session pool has stmt cache */
 /*case OCI_SPC_NO_RLB:			return "SPC_NO_RLB ";  Do not enable Runtime load balancing. */
 		/*--------------------------- OCISessionGet Modes ---------------------------*/
@@ -545,7 +545,7 @@ oci_attr_name(ub4 attr)
 	case OCI_ATTR_TRANS_NAME:			return "OCI_ATTR_TRANS_NAME";		/* string to identify a global transaction */
 	case OCI_ATTR_HEAPALLOC:			return "OCI_ATTR_HEAPALLOC";		/* memory allocated on the heap */
 	case OCI_ATTR_CHARSET_FORM:			return "OCI_ATTR_CHARSET_FORM";		/* Character Set Form */
-	case OCI_ATTR_MAXDATA_SIZE:			return "OCI_ATTR_MAXDATA_SIZE";		/* Maximumsize of data on the server  */
+	case OCI_ATTR_MAXDATA_SIZE:			return "OCI_ATTR_MAXDATA_SIZE";		/* Maximum size of data on the server  */
 	case OCI_ATTR_CACHE_OPT_SIZE:		return "OCI_ATTR_CACHE_OPT_SIZE";	/* object cache optimal size */
 	case OCI_ATTR_CACHE_MAX_SIZE:		return "OCI_ATTR_CACHE_MAX_SIZE";	/* object cache maximum size percentage */
 	case OCI_ATTR_PINOPTION:			return "OCI_ATTR_PINOPTION";		/* object cache default pin option */
@@ -684,8 +684,8 @@ oci_attr_name(ub4 attr)
 	case OCI_ATTR_RESERVED_2:			return "OCI_ATTR_RESERVED_2";		/* reserved */
 
 
-	case OCI_ATTR_SUBSCR_RECPT:			return "OCI_ATTR_SUBSCR_RECPT";		/* recepient of subscription */
-	case OCI_ATTR_SUBSCR_RECPTPROTO:	return "OCI_ATTR_SUBSCR_RECPTPROTO";/* protocol for recepient */
+	case OCI_ATTR_SUBSCR_RECPT:			return "OCI_ATTR_SUBSCR_RECPT";		/* recipient of subscription */
+	case OCI_ATTR_SUBSCR_RECPTPROTO:	return "OCI_ATTR_SUBSCR_RECPTPROTO";/* protocol for recipient */
 
 	/* 8.2 dpapi support of ADTs */
 	case OCI_ATTR_DIRPATH_EXPR_TYPE:	return "OCI_ATTR_DIRPATH_EXPR_TYPE";	/* expr type of OCI_ATTR_NAME */
@@ -700,7 +700,7 @@ oci_attr_name(ub4 attr)
 	case OCI_ATTR_LDAP_CRED:			return "OCI_ATTR_LDAP_CRED";		/* credentials to connect to LDAP */
 	case OCI_ATTR_WALL_LOC:				return "OCI_ATTR_WALL_LOC";			/* client wallet location */
 	case OCI_ATTR_LDAP_AUTH:			return "OCI_ATTR_LDAP_AUTH";		/* LDAP authentication method */
-	case OCI_ATTR_LDAP_CTX:				return "OCI_ATTR_LDAP_CTX";			/* LDAP adminstration context DN */
+	case OCI_ATTR_LDAP_CTX:				return "OCI_ATTR_LDAP_CTX";			/* LDAP administration context DN */
 	case OCI_ATTR_SERVER_DNS:			return "OCI_ATTR_SERVER_DNS";		/* list of registration server DNs */
 
 	case OCI_ATTR_DN_COUNT:				return "OCI_ATTR_DN_COUNT";			/* the number of server DNs */
@@ -743,7 +743,7 @@ oci_attr_name(ub4 attr)
 
 	case OCI_ATTR_BIND_COUNT:			return "OCI_ATTR_BIND_COUNT";		/* number of bind postions */
 	case OCI_ATTR_HANDLE_POSITION:		return "OCI_ATTR_HANDLE_POSITION";	/* pos of bind/define handle */
-	case OCI_ATTR_RESERVED_5:			return "OCI_ATTR_RESERVED_5";		/* reserverd */
+	case OCI_ATTR_RESERVED_5:			return "OCI_ATTR_RESERVED_5";		/* reserved */
 	case OCI_ATTR_SERVER_BUSY:			return "OCI_ATTR_SERVER_BUSY";		/* call in progress on server*/
 
 	case OCI_ATTR_DIRPATH_SID:			return "OCI_ATTR_DIRPATH_SID";		/* loading into an SID col */
@@ -757,7 +757,7 @@ oci_attr_name(ub4 attr)
 	case OCI_ATTR_SCN_BASE:				return "OCI_ATTR_SCN_BASE";			/* snapshot base */
 	case OCI_ATTR_SCN_WRAP:				return "OCI_ATTR_SCN_WRAP";			/* snapshot wrap */
 
-	/* --------------------------- Miscellanous attributes --------------------- */
+	/* --------------------------- Miscellaneous attributes --------------------- */
 	case OCI_ATTR_RESERVED_6:			return "OCI_ATTR_RESERVED_6";		/* reserved */
 	case OCI_ATTR_READONLY_TXN:			return "OCI_ATTR_READONLY_TXN";		/* txn is readonly */
 	case OCI_ATTR_RESERVED_7:			return "OCI_ATTR_RESERVED_7";		/* reserved */

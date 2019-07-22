@@ -14,18 +14,21 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use Time::Local;
 
-our $VERSION = '0.902';
+our $VERSION = '0.903';
 
 my %opt = (
     output	=> 'xt/author/regression.t',
 );
 
 GetOptions( \%opt,
-    qw{ output=s },
+    qw{ idempotent! output=s },
     help => sub { pod2usage( { -verbose => 2 } ) },
 ) or pod2usage( { -verbose => 0 } );
 
 unless ( '-' eq $opt{output} ) {
+    $opt{idempotent}
+	and -f $opt{output}
+	and exit;
     open my $fh, '>', $opt{output}
 	or die "Unable to open $opt{output}: $!\n";
     select $fh;
@@ -226,6 +229,13 @@ make-regression - Generate a regression test
 This option displays the documentation for this script. The script then
 exits.
 
+=head2 -idempotent
+
+If this Boolean option is asserted and the output file exists, it is not
+overwritten. This option is ignored if the output is F<->.
+
+The default is C<-noidempotent>.
+
 =head2 -output
 
  -output xt/author/regression.t
@@ -254,7 +264,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Thomas R. Wyant, III
+Copyright (C) 2017-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

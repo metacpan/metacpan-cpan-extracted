@@ -23,7 +23,7 @@ Array Array::create (size_t size, SV** content, create_type_t type) {
     return ret;
 }
 
-Array::Array (std::initializer_list<Scalar> l, create_type_t type) {
+Array::Array (const std::initializer_list<Scalar>& l, create_type_t type) {
     SV* svs[l.size()];
     const Scalar* from = l.begin();
     for (size_t i = 0; i < l.size(); ++i) svs[i] = (*from++).get();

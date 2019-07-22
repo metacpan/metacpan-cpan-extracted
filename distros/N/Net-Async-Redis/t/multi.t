@@ -18,7 +18,7 @@ eval {
 my $loop = IO::Async::Loop->new;
 $loop->add(my $redis = Net::Async::Redis->new);
 $redis->connect(
-	host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+    host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
 )->get;
 
 subtest 'basic MULTI' => sub {

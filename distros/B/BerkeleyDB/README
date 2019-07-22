@@ -1,8 +1,8 @@
                                 BerkeleyDB
 
-                               Version 0.61
+                               Version 0.63
 
-                              30th March 2019
+                              21sth July 2019
                               
 
      Copyright (c) 1997-2019 Paul Marquess. All rights reserved. This
@@ -599,10 +599,11 @@ via the config.in file. Make sure both values point to the same version:
 FEEDBACK
 --------
 
-General feedback/questions/bug reports can be sent to me at pmqs@cpan.org.
+General feedback/questions/bug reports can be sent to 
+https://github.com/pmqs/BerkeleyDB/issues (preferred) or
+https://rt.cpan.org/Public/Dist/Display.html?Name=BerkeleyDB
 
-Alternatively, if you have Usenet access, you can try the
-comp.databases.berkeley-db or comp.lang.perl.modules groups.
+Alternatively, email me at pmqs@cpan.org.
 
 
 How to report a problem with BerkeleyDB.

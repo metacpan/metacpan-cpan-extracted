@@ -1,7 +1,7 @@
 package NetPacket::ICMPv6;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble ICMPv6 (Internet Control Message Protocol for IPv6) packets. 
-$NetPacket::ICMPv6::VERSION = '1.7.1';
+$NetPacket::ICMPv6::VERSION = '1.7.2';
 use strict;
 use warnings;
 
@@ -294,7 +294,7 @@ NetPacket::ICMPv6 - Assemble and disassemble ICMPv6 (Internet Control Message Pr
 
 =head1 VERSION
 
-version 1.7.1
+version 1.7.2
 
 =head1 SYNOPSIS
 

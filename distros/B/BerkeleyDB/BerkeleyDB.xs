@@ -477,7 +477,7 @@ static void
 hash_delete(char * hash, char * key);
 
 #ifdef TRACE
-#  define Trace(x)	(printf("# "), printf x)
+#  define Trace(x)	do { printf("# "); printf x; fflush(stdout); } while (0) ;
 #else
 #  define Trace(x)
 #endif
@@ -511,15 +511,12 @@ typedef	int db_timeout_t ;
 #endif
 
 #ifdef AT_LEAST_DB_5_2
-
 #  define isHeapDb(db) ((db)->type == DB_HEAP)
+/* __heap_exists is not exported by db.h, so include prototype here */
+int __heap_exist __P((void));
 #else
 #  define isHeapDb(db) (0)
-
-   int __heap_exist __P((void));
 #  define DB_HEAP_RID_SZ 1
-
-
 #endif
 
 #ifndef AT_LEAST_DB_6_0
@@ -838,6 +835,9 @@ db_strerror(int err)
 static char *
 my_db_strerror(int err)
 {
+#ifdef dTHX
+    dTHX;
+#endif
     static char buffer[1000] ;
     SV * sv = perl_get_sv(ERR_BUFF, FALSE) ;
     sprintf(buffer, "%d: %s", err, db_strerror(err)) ;
@@ -2094,7 +2094,7 @@ my_db_open(
 
     if (info->db_cachesize) {
         Status = dbp->set_cachesize(dbp, 0, info->db_cachesize, 0) ;
-	Trace(("set_cachesize [%d] returned %s\n",
+	Trace(("set_cachesize [%lu] returned %s\n",
 		info->db_cachesize, my_db_strerror(Status)));
         if (Status)
             return RETVAL ;
@@ -2110,7 +2110,7 @@ my_db_open(
 
     if (info->db_pagesize) {
         Status = dbp->set_pagesize(dbp, info->db_pagesize) ;
-	Trace(("set_pagesize [%d] returned %s\n",
+	Trace(("set_pagesize [%lu] returned %s\n",
 		info->db_pagesize, my_db_strerror(Status)));
         if (Status)
             return RETVAL ;
@@ -2379,6 +2379,8 @@ _db_remove(ref)
 	    SetValue_pv(subdb, "Subname", char *) ;
 	    SetValue_iv(flags, "Flags") ;
 	    SetValue_ov(env, "Env", BerkeleyDB__Env) ;
+		SetValue_ov(txn, "Txn", BerkeleyDB__Txn) ;
+
             if (txn) {
 #ifdef AT_LEAST_DB_4_1
                 if (!env)

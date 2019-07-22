@@ -13,7 +13,7 @@ use HTML::LinkExtor;
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = '1.271';
+our $VERSION = '1.272';
 
 use parent qw(HTML::LinkExtor);
 
@@ -195,6 +195,9 @@ HTML::SimpleLinkExtor - Extract links from HTML
 	@links       = $extor->schemes( 'http' );
 
 =head1 DESCRIPTION
+
+THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
+IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
 
 This is a simple HTML link extractor designed for the person who does
 not want to deal with the intricacies of C<HTML::Parser> or the
@@ -562,7 +565,7 @@ a USEMAP attribute.
 
 This module is in Github
 
-	https://github.com/briandfoy/html-simplelinkextor
+	https://github.com:CPAN-Adoptable-Modules/html-simplelinkextor.git
 
 =head1 AUTHORS
 
@@ -570,7 +573,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -46,6 +46,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Carsten Grohmann</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mail@carstengrohmann.de" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>cjardine</foaf:name>
       <foaf:mbox rdf:resource="mailto:cjardine@50811bd7-b8ce-0310-adc1-d9db26280581" />
     </foaf:Person>
@@ -77,12 +83,6 @@
   <helper>
     <foaf:Person>
       <foaf:name>Dean Hamstead</foaf:name>
-      <foaf:mbox rdf:resource="mailto:dean.hamstead@winc.com.au" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Dean Hamstead</foaf:name>
       <foaf:mbox rdf:resource="mailto:djzort@cpan.org" />
     </foaf:Person>
   </helper>
@@ -90,12 +90,6 @@
     <foaf:Person>
       <foaf:name>Dean Pearce</foaf:name>
       <foaf:mbox rdf:resource="mailto:deanpearce@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Dean Pearce</foaf:name>
-      <foaf:mbox rdf:resource="mailto:pearce@pythian.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -142,26 +136,8 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Martin J. Evans</foaf:name>
-      <foaf:mbox rdf:resource="mailto:github@virginmedia.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Martin J. Evans</foaf:name>
-      <foaf:mbox rdf:resource="mailto:mjegh@virginmedia.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Michael Portnoy</foaf:name>
       <foaf:mbox rdf:resource="mailto:portnoy@pythian.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Mike O'Regan</foaf:name>
-      <foaf:mbox rdf:resource="mailto:moregan@football.flr.follett.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -184,6 +160,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Tony Cook</foaf:name>
+      <foaf:mbox rdf:resource="mailto:tony@develop-help.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Wesley Hinds</foaf:name>
       <foaf:mbox rdf:resource="mailto:wesley.hinds@swri.org" />
     </foaf:Person>
@@ -191,7 +173,7 @@
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <release>
     <Version>
-      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">19th</revision>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">12th</revision>
     </Version>
   </release>
   <release>
@@ -201,7 +183,7 @@
   </release>
   <release>
     <Version>
-      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">12th</revision>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">19th</revision>
     </Version>
   </release>
   <release>
@@ -442,6 +424,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.75_42</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-08-22</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.76</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-11-22</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

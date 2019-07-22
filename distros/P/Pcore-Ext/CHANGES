@@ -1,3 +1,19 @@
+v0.36.0 2019-07-21T06:31:24Z
+ - amcharts improvements
+ - amcharts change theme
+ - amcharts dark mode
+ - theme moved from session to the settings
+ - Ext.util.Format.label(text, color) added
+ - amcharts improved
+ - default label padding decreased
+ - viewport init stateful provider
+ - typo
+ - build error message added
+ - code cleanup
+ - amcharts animated by default
+ - amcharts clone config
+ - amcharts listen dataChange event"
+
 v0.35.0 2019-07-12T12:08:10Z
  - menu component changed
  - grid view options overrides

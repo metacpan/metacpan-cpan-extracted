@@ -9,7 +9,7 @@ use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.4';
+our $VERSION = '1.2.6';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -27,6 +27,7 @@ my $map_mask = '*.map';
 my $win32    = $^O eq 'MSWin32';
 my $linux    = $^O eq 'linux';
 my $freebsd  = $^O eq 'freebsd';
+my $mac      = $^O eq 'darwin';
 
 sub write_makefile {
     _require_makemaker();
@@ -107,6 +108,7 @@ sub pre_process {
     my $module_info = XS::Install::Payload::binary_module_info($params->{NAME}) || {};
     $params->{MODULE_INFO} = {
         BIN_DEPENDENT => $module_info->{BIN_DEPENDENT},
+        STATIC_LIBS   => [],
         SHARED_LIBS   => [],
         SELF_INC      => $params->{INC} || '',
     };
@@ -340,6 +342,9 @@ sub process_CLIB {
     my $clib = delete $params->{CLIB} or return;
     $clib = [$clib] unless ref($clib) eq 'ARRAY';
     return unless @$clib;
+
+    my $wa_open  = $mac ? '-force_load' : '-Wl,--whole-archive';
+    my $wa_close = $mac ? ''            : '-Wl,--no-whole-archive';
     
     foreach my $info (@$clib) {
         my $build_cmd = $info->{BUILD_CMD};
@@ -354,14 +359,19 @@ sub process_CLIB {
             $clean_cmd = "$make clean";
         }
         
+        my $static = $info->{FILE} =~ /\.l?a$/ ? 1 : 0;
         my $path = $info->{DIR}.'/'.$info->{FILE};
         $clibs .= "$path ";
         
         push @{$params->{postamble}}, "$path : ; cd $info->{DIR} && $build_cmd\n";
         push @{$params->{postamble}}, "clean :: ; cd $info->{DIR} && $clean_cmd\n" if $clean_cmd;
-        push @{$params->{OBJECT}}, $path;
+        if ($info->{FILE} =~ /\.l?a$/) {
+            push @{$params->{MODULE_INFO}{STATIC_LIBS}}, "$wa_open $path $wa_close";
+        } else {
+            push @{$params->{MODULE_INFO}{SHARED_LIBS}}, $path;
+        }
     }
-    push @{$params->{postamble}}, "linkext:: $clibs";
+    push @{$params->{postamble}}, "\$(INST_DYNAMIC) : $clibs";
 }
 
 sub process_BIN_SHARE {
@@ -468,8 +478,13 @@ sub process_LD {
     my $params = shift;
 
     $params->{LDFROM} ||= '$(OBJECT)';
+
+    {
+        my $str = join(' ', @{$params->{MODULE_INFO}{STATIC_LIBS}});
+        $params->{LDFROM} .= ' '.$str if $str;
+    }
     
-    if ($^O ne 'darwin') { # MacOSX doesn't allow for linking with bundles :(
+    unless ($mac) { # MacOSX doesn't allow for linking with bundles :(
         my %seen;
         my @shared_libs = grep {!$seen{$_}++} reverse @{$params->{MODULE_INFO}{SHARED_LIBS}};
         my $str = join(' ', @shared_libs);
@@ -490,6 +505,9 @@ sub process_test {
         my $a2 = shift || [];
         return [@$a1, @$a2];
     };
+
+    my $ldfrom = '$(OBJECT)';
+    $ldfrom .= ' '.module_so($params) unless $mac; # MacOSX doesn't allow for linking with bundles :(
     
     my %args = (
         NAME      => $tp->{NAME} || 'MyTest',
@@ -502,7 +520,7 @@ sub process_test {
         CPLUS     => $tp->{CPLUS} // $params->{CPLUS},
         CC        => $tp->{CC} || $params->{CC},
         LD        => $tp->{LD} || $params->{LD},
-        LDFROM    => '$(OBJECT) '.module_so($params),
+        LDFROM    => $ldfrom,
         INC       => string_merge($params->{MODULE_INFO}{SELF_INC}, $tp->{INC}),
         CCFLAGS   => string_merge($params->{CCFLAGS}, $tp->{CCFLAGS}),
         DEFINE    => string_merge($params->{DEFINE}, $tp->{DEFINE}),
@@ -530,7 +548,14 @@ sub process_test {
     ;
     
     my $mm_args = makemaker_args(%args);
-    return has_binary($mm_args) ? $mm_args : undef;
+    return undef unless has_binary($mm_args);
+    
+    if (my $prereq = $mm_args->{PREREQ_PM}) {
+        my $testrq = $params->{TEST_REQUIRES};
+        $testrq->{$_} //= $prereq->{$_} for grep {$_ ne $THIS_MODULE} keys %$prereq;
+    }
+    
+    return $mm_args;
 }
 
 sub process_test_makefile {

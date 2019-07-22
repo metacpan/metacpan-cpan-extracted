@@ -8,13 +8,13 @@
 #define PERL_DECIMAL_VERSION PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
 #endif
 
-using std::string_view;
+using panda::string_view;
 using panda::string;
 
 namespace xs {
 
 Stash::op_proxy& Stash::op_proxy::operator= (SV* val) {
-    _assert();
+    _throw();
 
     if (!val) {
         slot(Scalar());
@@ -28,7 +28,7 @@ Stash::op_proxy& Stash::op_proxy::operator= (SV* val) {
 }
 
 Stash::op_proxy& Stash::op_proxy::operator= (GV* val) {
-    _assert();
+    _throw();
     if (val) {
         SvREFCNT_inc_simple_void_NN(val);
         SvREFCNT_dec_NN(*ptr);
@@ -43,7 +43,7 @@ Stash::op_proxy& Stash::op_proxy::operator= (GV* val) {
     return *this;
 }
 
-void Stash::_promote (GV* gv, const std::string_view& key) const {
+void Stash::_promote (GV* gv, const panda::string_view& key) const {
     if (!gv || SvTYPE(gv) == SVt_PVGV) return;
 #if PERL_DECIMAL_VERSION < PERL_VERSION_DECIMAL(5,26,1) && PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(5,22,0)
     if (SvROK(gv)) {
@@ -99,11 +99,11 @@ void Stash::inherit (const Stash& parent) {
     av_push(ISA, Simple::shared(parent.name())); // can't use ISA.push() syntax, because @ISA is a magical array, otherwise MRO cache won't be cleared
 }
 
-void Stash::_throw_nomethod (const std::string_view& name) const {
+void Stash::_throw_nomethod (const panda::string_view& name) const {
     throw std::invalid_argument(panda::string("can't locate method '") + name + "' via package '" + this->name() + "'");
 }
 
-bool Stash::isa (const std::string_view& parent, U32 hash, int flags) const {
+bool Stash::isa (const panda::string_view& parent, U32 hash, int flags) const {
     if (name() == parent) return TRUE;
 
     const struct mro_meta*const meta = HvMROMETA((HV*)sv);
@@ -128,7 +128,7 @@ Object Stash::bless (const Sv& what) const {
     else return Object(sv_bless(newRV(what), (HV*)sv), NONE);
 }
 
-void Stash::add_const_sub (const std::string_view& name, const Sv& _val) {
+void Stash::add_const_sub (const panda::string_view& name, const Sv& _val) {
     auto val = _val;
     val.readonly(true);
     newCONSTSUB_flags((HV*)sv, name.data(), name.length(), 0, val.detach()); // detach because newCONSTSUB doesn't increment refcnt

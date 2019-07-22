@@ -81,7 +81,11 @@ sub _load_module ( $self, $module ) {
         *{"$package\::type"}  = {};
 
         # load module
-        do P->class->find($module);
+        my $module_path = P->class->find($module);
+
+        die qq[Unable to find module "$module"] if !$module_path;
+
+        do $module_path;
 
         # package compilation error
         die qq[Unable to load module "$module": $@] if $@;
@@ -536,9 +540,9 @@ sub _prepare_js ( $self, $js ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 76, 77               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 184                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
+## |    3 | 188                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 453                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 457                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -57,15 +57,7 @@ The copy and move constructors are also available:
     Array (Array&& oth)
     Array (const Sv& oth)
     Array (Sv&& oth)
-
-It it possible to create C<Array> object from C<CallProxy> invocation:
-
-    Array (const CallProxy& p)
-
-however, please note, that the C<CallProxy> will be called in B<scalar context>.
-If the B<list context> is needed, then instead of C<Array> class it's descendant
-class C<List> should be used.
-
+    
 =head2 assignment operators
 
     Array& operator= (SV* val)
@@ -74,7 +66,6 @@ class C<List> should be used.
     Array& operator= (Array&& oth)
     Array& operator= (const Sv& oth)
     Array& operator= (Sv&& oth)
-    Array& operator= (const CallProxy& p)
 
 The assignment operators are complementaty to the constructors above. They
 inherit behaviour from C<Sv>, including NULL-safety. The previously held
@@ -133,12 +124,9 @@ C<fetch> is NULL-safe method, while C<at> and C<operator[]> are NULL-unsafe.
     void store (size_t key, std::nullptr_t)
     void store (size_t key, SV* v)
     void store (size_t key, const Sv& v)
-    void store (size_t key, const CallProxy& p)
 
 The C<store> method is used store item in the array. If underlyging Perl
-array AV* is NULL, then C<store> will throw exception. The last method
-invokes C<CallProxy> in B<scalar context>, as the array elements are
-always scalars.
+array AV* is NULL, then C<store> will throw exception.
 
 To check element existance, the NULL-safe C<exist> method can be used:
 
@@ -163,17 +151,14 @@ The opposite operations, i.e. C<push> and C<unshift>
     void push (const Scalar& v)
     void push (SV* v)
     void push (const Sv& v)
-    void push (const CallProxy& p)
 
     void unshift (const std::initializer_list<Scalar>& l);
     void unshift (const List& l);
     void unshift (const Scalar& v);
     void unshift (SV* v)
     void unshift (const Sv& v)
-    void unshift (const CallProxy& p)
 
-Please note, that C<push> and C<unshift> are NULL-unsafe methods. The
-C<CallProxy> is invoked in B<scalar context>.
+Please note, that C<push> and C<unshift> are NULL-unsafe methods.
 
 =head2 clear()
 

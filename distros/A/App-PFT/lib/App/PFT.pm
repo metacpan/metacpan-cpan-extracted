@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 
-package App::PFT v1.2.2; # Remember to fix version in $VersionString
+package App::PFT v1.3.0; # Remember to fix version in $VersionString
 
 use strict;
 use warnings;
+use PFT;
 
 use Exporter 'import';
 our @EXPORT_OK = qw/$Name $ConfName $VersionString/;
@@ -27,7 +28,8 @@ our $Name = 'pft';
 our $ConfName = 'pft.yaml';
 our $NoInitMsg = "Not a $Name site. Try running: $Name init";
 our $VersionString = <<"EOF";
-PFT $App::PFT::VERSION Copyright (C) 2016  Giovanni Simoni
+App-PFT $App::PFT::VERSION Copyright (C) 2015-*  Giovanni Simoni
+    PFT $PFT::VERSION Copyright (C) 2015-*  Giovanni Simoni
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions; see the source code for details.

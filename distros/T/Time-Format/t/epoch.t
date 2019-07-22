@@ -1,4 +1,4 @@
-#!/perl -I..
+#!/perl
 
 # Test epoch-time formatting.
 # Based on a bug report by Adam Schneider, 11 June 2009

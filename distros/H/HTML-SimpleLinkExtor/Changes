@@ -1,5 +1,8 @@
 Revision history for Perl module HTML::SimpleLinkExtor
 
+1.272 2019-07-21T23:15:47Z
+	* Abandon the module
+
 1.271 2018-06-05T14:17:30Z
 	* Change to the Artistic License 2.0.
 

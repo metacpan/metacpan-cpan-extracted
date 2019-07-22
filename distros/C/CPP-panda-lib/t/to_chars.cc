@@ -1,6 +1,6 @@
 #include "test.h"
 #include <panda/string.h>
-#include <panda/lib/from_chars.h>
+#include <panda/from_chars.h>
 
 using panda::string;
 
@@ -45,7 +45,7 @@ string tci (Int val, int base = 10, size_t buflen = 100) {
     string s;
     char* buf = s.reserve(buflen);
     char* bufend = buf + buflen;
-    auto res = std::to_chars(buf, bufend, val, base);
+    auto res = panda::to_chars(buf, bufend, val, base);
     s.length(res.ptr - buf);
     if (res.ec) throw Exc();
     return s;

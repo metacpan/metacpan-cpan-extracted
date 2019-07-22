@@ -1,16 +1,16 @@
 {
-   "abstract" : "Stripe bindings for Perl",
+   "abstract" : "unknown",
    "author" : [
       "Paul Pham <pham@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621, CPAN::Meta::Converter version 2.142690",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-Stripe",
    "no_index" : {
@@ -42,9 +42,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aquaron/Business-Stripe/issues/"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
-         "url" : "http://github.com/aquaron/Business-Stripe"
+         "url" : "https://github.com/aquaron/Business-Stripe"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

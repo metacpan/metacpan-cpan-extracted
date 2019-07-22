@@ -200,7 +200,7 @@ TEST_CASE("Object", "[Sv]") {
 
             REQUIRE(!sub.SUPER());
             REQUIRE_THROWS(sub.SUPER_strict());
-            REQUIRE_THROWS(o.call_SUPER(sub));
+            REQUIRE_THROWS(o.call_SUPER<void>(sub));
         }
 
         SECTION("next") {
@@ -221,7 +221,7 @@ TEST_CASE("Object", "[Sv]") {
 
             REQUIRE(!o.next_method(sub));
             REQUIRE_THROWS(o.next_method_strict(sub));
-            REQUIRE_THROWS(o.call_next(sub));
+            REQUIRE_THROWS(o.call_next<void>(sub));
         }
 
         SECTION("next_maybe") {
@@ -254,11 +254,11 @@ TEST_CASE("Object", "[Sv]") {
 
             REQUIRE(!o.super_method(sub));
             REQUIRE_THROWS(o.super_method_strict(sub));
-            REQUIRE_THROWS(o.call_super(sub));
+            REQUIRE_THROWS(o.call_super<void>(sub));
         }
 
         SECTION("super/c3") {
-            o.call("enable_c3");
+            o.call<void>("enable_c3");
 
             res = o.call_super(sub);
             REQUIRE(res == "M4(OBJ)-2");
@@ -277,9 +277,9 @@ TEST_CASE("Object", "[Sv]") {
 
             REQUIRE(!o.super_method(sub));
             REQUIRE_THROWS(o.super_method_strict(sub));
-            REQUIRE_THROWS(o.call_super(sub));
+            REQUIRE_THROWS(o.call_super<void>(sub));
 
-            o.call("disable_c3");
+            o.call<void>("disable_c3");
         }
 
         SECTION("super_maybe") {

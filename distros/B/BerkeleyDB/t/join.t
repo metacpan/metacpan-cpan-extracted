@@ -219,17 +219,17 @@ umask(0) ;
     eval { $cursor1 = $db1->db_join([$cursor1]) } ;
     ok $@ =~ /BerkeleyDB Aborting: attempted to do a self-join at/;
 
-    undef $cursor1a;
-    #undef $cursor1;
-    #undef $cursor2;
-    #undef $cursor3;
-    undef $db1 ;
-    undef $db2 ;
-    undef $db3 ;
-    undef $env ;
-    untie %hash1 ;
-    untie %hash2 ;
-    untie %hash3 ;
+    # undef $cursor1a;
+    # #undef $cursor1;
+    # #undef $cursor2;
+    # #undef $cursor3;
+    # undef $db1 ;
+    # undef $db2 ;
+    # undef $db3 ;
+    # undef $env ;
+    # untie %hash1 ;
+    # untie %hash2 ;
+    # untie %hash3 ;
 }
 
 print "# at the end\n";

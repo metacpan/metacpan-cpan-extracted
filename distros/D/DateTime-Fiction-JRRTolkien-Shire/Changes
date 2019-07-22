@@ -1,3 +1,13 @@
+0.903		2019-07-21	T. R. Wyant
+    Fix broken POD links and add test to ensure they stay fixed.
+
+    Add -idempotent to tools/make-regression
+
+    clone() was not cloning the DateTime object
+    
+    Also tightened up STORABLE_thaw(), and added clone() tests to
+    t/06storable.t
+
 0.902		2017-04-22	T. R. Wyant
     Bump requirement for Params::ValidationCompiler. DateTime needs
     0.13, but we need 0.19 for some reason. Also made explicit

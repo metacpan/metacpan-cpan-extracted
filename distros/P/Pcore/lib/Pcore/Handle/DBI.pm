@@ -15,6 +15,17 @@ const our $SCHEMA_PATCH_TABLE_NAME => '__schema_patch';
 const our $DEFAULT_MODULE          => 'main';
 
 # SCHEMA PATCH
+sub _get_schema_patch_table_query ( $self, $table_name ) {
+    return <<"SQL";
+        CREATE TABLE IF NOT EXISTS "$table_name" (
+            "module" TEXT NOT NULL,
+            "id" INT4 NOT NULL,
+            "timestamp" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY ("module", "id")
+        )
+SQL
+}
+
 sub add_schema_patch ( $self, $id, $module, $query = undef ) {
     if ( !defined $query ) {
         $query = $module;

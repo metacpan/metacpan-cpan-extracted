@@ -1,0 +1,42 @@
+---
+abstract: 'Page numbering for very large page numbers'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Data::Page
+  - Data::Pageset
+  - paging
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Pageset-Exponential
+provides:
+  Data::Pageset::Exponential:
+    file: lib/Data/Pageset/Exponential.pm
+    version: v0.2.1
+requires:
+  List::Util: '1.33'
+  Moo: '1.006000'
+  MooX::TypeTiny: '0'
+  PerlX::Maybe: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/robrwo/Data-Pageset-Exponential/issues
+  repository: git://github.com/robrwo/Data-Pageset-Exponential.git
+version: v0.2.1
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

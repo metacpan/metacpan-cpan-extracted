@@ -50,7 +50,7 @@ TEST_CASE("function->sub", "[function]") {
         ecnt = 1;
         vv_fn fn = [&](){ cnt++; };
         auto sub = function2sub(fn);
-        sub.call();
+        sub.call<void>();
     }
     SECTION("void(int)") {
         ecnt = 1;
@@ -59,7 +59,7 @@ TEST_CASE("function->sub", "[function]") {
             cnt++;
         };
         auto sub = function2sub(fn);
-        sub.call(Simple(42));
+        sub.call<void>(Simple(42));
     }
     SECTION("void(int) custom") {
         ecnt = 1;
@@ -68,7 +68,7 @@ TEST_CASE("function->sub", "[function]") {
             cnt++;
         };
         auto sub = function2sub(fn, [](const Sv& sv){ return (int)Simple(sv) + 900; });
-        sub.call(Simple(42));
+        sub.call<void>(Simple(42));
     }
     SECTION("int(int, double)") {
         ecnt = 1;
@@ -79,7 +79,7 @@ TEST_CASE("function->sub", "[function]") {
             return 255;
         };
         Sub sub = xs::out(fn);
-        Scalar ret = sub.call({Simple(42), Simple(3.14)});
+        Scalar ret = sub.call(Simple(42), Simple(3.14));
         CHECK(Simple(ret) == 255);
     }
     SECTION("int(int, double) custom") {
@@ -94,7 +94,7 @@ TEST_CASE("function->sub", "[function]") {
             [](int r) { return Simple(r - 200); },
             [](const Sv& sv) { return (int)Simple(sv) + 800; }
         );
-        Scalar ret = sub.call({Simple(42), Simple(3.14)});
+        Scalar ret = sub.call(Simple(42), Simple(3.14));
         CHECK(Simple(ret) == 55);
     }
     SECTION("function->sub->function") {
@@ -104,7 +104,7 @@ TEST_CASE("function->sub", "[function]") {
             cnt++;
         };
         auto sub = function2sub(fn);
-        sub.call(Simple(42));
+        sub.call<void>(Simple(42));
         auto fn2 = xs::in<vi_fn>(sub);
         fn2(42);
         CHECK(fn == fn2);
@@ -116,7 +116,7 @@ TEST_CASE("function->sub", "[function]") {
             cnt++;
         };
         auto sub = function2sub(fn);
-        sub.call(Simple(42));
+        sub.call<void>(Simple(42));
     }
     SECTION("custom when no typemap") {
         struct Data {

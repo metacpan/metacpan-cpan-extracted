@@ -126,7 +126,7 @@ SKIP: {
     cmp_ok( $log3, 'eq', $in_blob, 'clob1 = in_clob' );
     cmp_ok( $log4, 'eq', $in_blob, 'clob2 = in_clob' );
 
-    #no neeed to look at the data is should be ok
+    #no need to look at the data is should be ok
 
     $sth->finish();
     drop_table($dbh);

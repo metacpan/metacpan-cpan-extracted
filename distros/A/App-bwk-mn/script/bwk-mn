@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.000'; # VERSION
+our $DATE = '2019-07-22'; # DATE
+our $VERSION = '0.001'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +19,8 @@ my $cli = Perinci::CmdLine::Any->new(
     pass_cmdline_object => 1,
     subcommands => {
         'status'    => { url => "${prefix}status", },
+        'restore-from-zfs-snapshot' => { url => "${prefix}restore_from_zfs_snapshot", },
+        'new-zfs-snapshot'          => { url => "${prefix}new_zfs_snapshot", },
     },
 );
 Perinci::CmdLineX::CommonOptions::SelfUpgrade->apply_to_object($cli);
@@ -39,23 +41,89 @@ bwk-mn - Some commands to manage Bulwark masternode
 
 =head1 VERSION
 
-This document describes version 0.000 of bwk-mn (from Perl distribution App-bwk-mn), released on 2019-07-08.
+This document describes version 0.001 of bwk-mn (from Perl distribution App-bwk-mn), released on 2019-07-22.
 
 =head1 SYNOPSIS
+
+To upgrade to the latest version:
+
+ % bwk-mn -U
 
 To see masternode status:
 
  % bwk-mn status
 
-To upgrade to the latest version:
+To restore from a ZFS snapshot:
 
- % bwk-mn -U
+ % bwk-mn restore-from-zfs-snapshot
+
+To create a new ZFS snapshot:
+
+ % bwk-mn new-zfs-snapshot
 
 =head1 DESCRIPTION
 
 Early release. More functionality will be added in the future.
 
 =head1 SUBCOMMANDS
+
+=head2 B<new-zfs-snapshot>
+
+Create a new ZFS snapshot.
+
+This subcommand will:
+
+=over
+
+=item 1. stop bulwarkd
+
+=item 2. create a new ZFS snapshot
+
+=item 3. restart bulwarkd again
+
+=back
+
+See C<restore_from_zfs_snapshot> for more details.
+
+
+=head2 B<restore-from-zfs-snapshot>
+
+Restore broken installation from ZFS snapshot.
+
+This subcommand will:
+
+=over
+
+=item 1. stop bulwarkd
+
+=item 2. rollback to a specific ZFS snapshot
+
+=item 3. restart bulwarkd again
+
+=item 4. wait until node is fully sync-ed (not yet implemented)
+
+=back
+
+For this to work, a specific setup is required. First, at least the C<blocks/>
+and C<chainstate> directory are put in a ZFS filesystem (this part is assumed and
+not checked) and a snapshot of that filesytem has been made. The ZFS filesystem
+needs to have "bulwark" or "bwk" as part of its name, and the snapshot must be
+named using YYYY-MM-DD. The most recent snapshot will be selected.
+
+Rationale: as of this writing (2019-07-22, Bulwark version 2.2.0.0) a Bulwark
+masternode still from time to time gets corrupted with this message in the
+C<debug.log>:
+
+ 2019-07-22 02:30:17 ERROR: VerifyDB() : *** irrecoverable inconsistency in block data at xxxxxx, hash=xxxxxxxx
+
+(It used to happen more often prior to 2.1.0 release, and less but still happens
+from time to time since 2.1.0.)
+
+Resync-ing from scratch will take at least 1-2 hours, and if this happens on
+each masternode every few days then resync-ing will waste a lot of time. Thus
+the ZFS snapshot. Snapshots will of course need to be created regularly for this
+setup to benefit.
+
 
 =head2 B<status>
 
@@ -218,6 +286,12 @@ List of available configuration parameters:
  format (see --format)
  log_level (see --log-level)
  naked_res (see --naked-res)
+
+=head2 Configuration for subcommand new-zfs-snapshot
+
+
+=head2 Configuration for subcommand restore-from-zfs-snapshot
+
 
 =head2 Configuration for subcommand status
 

@@ -1,8 +1,7 @@
 #pragma once
-#include <panda/basic_string.h>
+#include "basic_string.h"
 
 namespace panda {
-
     typedef basic_string<char>     string;
     typedef basic_string<wchar_t>  wstring;
     typedef basic_string<char16_t> u16string;
@@ -12,7 +11,7 @@ namespace panda {
         template <typename T>
         inline T _stox (const string& str, std::size_t* pos = 0, int base = 10) {
             T val;
-            auto res = std::from_chars(str.data(), str.data() + str.length(), val, base);
+            auto res = from_chars(str.data(), str.data() + str.length(), val, base);
             if (pos) {
                 *pos = res.ptr - str.data();
             }

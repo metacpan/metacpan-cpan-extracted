@@ -10,13 +10,13 @@ namespace xs {
 
 namespace typemap { namespace containers {
     inline const panda::string& to_key (const panda::string& value) { return value; }
-    inline std::string_view     to_key (const std::string& value)   { return std::string_view(value.data(), value.size()); }
+    inline panda::string_view   to_key (const std::string& value)   { return panda::string_view(value.data(), value.size()); }
 
     template <typename T>
     panda::string to_key (T&& value) { return panda::to_string(std::forward<T>(value)); }
 }}
 
-template <typename T> struct Typemap<std::vector<T>, std::vector<T>> : TypemapBase<std::vector<T>> {
+template <typename T> struct VectorTypemap : TypemapBase<std::vector<T>> {
     static Sv out(pTHX_ const std::vector<T>& data, const Sv& = {}){
         auto out = Array::create(data.size());
         for(const auto& i : data){
@@ -34,6 +34,8 @@ template <typename T> struct Typemap<std::vector<T>, std::vector<T>> : TypemapBa
         return out;
     }
 };
+
+template <typename T> struct Typemap<std::vector<T>> : VectorTypemap<T> {};
 
 template <typename K, typename V> struct Typemap<std::map<K,V>, std::map<K,V>> : TypemapBase<std::map<K,V>> {
     static Sv out (pTHX_ const std::map<K,V>& data, const Sv& = {}) {

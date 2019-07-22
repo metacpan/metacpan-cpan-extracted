@@ -1,3 +1,13 @@
+1.902		2019-07-21	T. R. Wyant
+    Test POD links.
+
+    PAR-pack old module used by tools/make-regression in an attempt to
+    hide POD errors from CPANTS. PAR is only loaded if actually needed.
+
+    Back-port 'Party Field' for regression test.
+
+    Add -idempotent to tools/make-regression
+
 1.901		2017-04-01	T. R. Wyant
     Require Date::Tolkien::Shire::Data 0.001.
 

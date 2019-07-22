@@ -10,7 +10,7 @@ has password => ( required => 1 );
 has _auth_header => ( is => 'lazy', init_arg => undef );
 
 sub _build__auth_header ($self) {
-    return 'Basic ' . P->data->to_b64_url( encode_utf8( $self->{username} ) . q[:] . encode_utf8( $self->{password} ) ) . q[==];
+    return 'Basic ' . P->data->to_b64u( encode_utf8( $self->{username} ) . q[:] . encode_utf8( $self->{password} ) ) . q[==];
 }
 
 sub upload ( $self, $path, $cb = undef ) {

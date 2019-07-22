@@ -53,12 +53,6 @@ Copy and move-constructore are also available:
     Scalar (Sv&&          oth)
 
 
-It it possible to create C<Scalar> object from C<CallProxy> invocation:
-
-    Scalar (const CallProxy& p)
-
-however, please note, that the C<CallProxy> will be called in B<scalar context>.
-
 =head2 assignment operators
 
     Scalar& operator= (SV* val)
@@ -67,8 +61,6 @@ however, please note, that the C<CallProxy> will be called in B<scalar context>.
     Scalar& operator= (Scalar&& oth)
     Scalar& operator= (const Sv& oth)
     Scalar& operator= (Sv&& oth)
-    Scalar& operator= (const CallProxy& p)
-
 
 The assignment operators are complementaty to the constructors above. They
 inherit behaviour from C<Sv>, including NULL-safety. The previously held
@@ -106,7 +98,7 @@ This is NULL-unsafe method.
 Stringizes the current S<Scalar> object. Valid if the held Scalar can
 be constructed as C<Simple> object, e.g. as number or string. Otherwise
 exception is thrown. The <T> parameter can be C<std::string>,
-C<std::string_view> or C<panda::string>.
+C<panda::string_view> or C<panda::string>.
 
 This is NULL-unsafe method.
 

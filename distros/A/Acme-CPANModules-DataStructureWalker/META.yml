@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-DataStructureWalker
   homepage: https://metacpan.org/release/Acme-CPANModules-DataStructureWalker
   repository: git://github.com/perlancar/perl-Acme-CPANModules-DataStructureWalker.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -1,16 +1,16 @@
 {
    "abstract" : "bindings for librdkafka",
    "author" : [
-      "Pavel Shaydo <zwon@cpan.org>"
+      "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Kafka-Librd",
    "no_index" : {
@@ -22,39 +22,45 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.94"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
+            "Alien::Base::Wrapper" : "0",
             "Alien::Librdkafka" : "v0.9.3",
             "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Librdkafka" : "v0.9.3",
             "Exporter::Lite" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/trinitum/perl-Kafka-Librd/issues"
+         "web" : "https://github.com/plicease/perl-Kafka-Librd/issues"
       },
-      "homepage" : "https://github.com/trinitum/perl-Kafka-Librd",
+      "homepage" : "https://github.com/plicease/Kafka-Librd",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "git://github.com/trinitum/perl-Kafka-Librd"
+         "type" : "git",
+         "url" : "git://github.com/plicease/perl-Kafka-Librd"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
-      "Pavel Shaydo <zwon@cpan.org>"
+      "Pavel Shaydo <zwon@cpan.org>",
+      "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

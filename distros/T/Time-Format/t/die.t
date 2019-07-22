@@ -1,4 +1,4 @@
-#!/perl -I..
+#!/perl
 
 # Test some error cases
 

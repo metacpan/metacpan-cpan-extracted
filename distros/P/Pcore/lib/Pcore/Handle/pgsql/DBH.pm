@@ -1013,6 +1013,10 @@ sub selectcol ( $self, $query, @args ) {
 }
 
 # TRANSACTIONS
+sub in_transaction ($self) {
+    return $self->{tx_status} ne $TX_STATUS_IDLE;
+}
+
 sub begin_work ( $self, $cb = undef ) {
     my $on_finish = sub ( $sth, $res ) {
         return $cb ? $cb->($res) : $res;

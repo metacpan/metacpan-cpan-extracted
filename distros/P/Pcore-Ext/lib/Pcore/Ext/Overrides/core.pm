@@ -374,7 +374,7 @@ JS
 # https://www.sencha.com/forum/showthread.php?343467-6-5-0-redirectTo-force-is-ignored
 sub EXT_override_app_BaseController : Override('Ext.app.BaseController') {
     return {
-        redirectTo => func ['hash, opt'],
+        redirectTo => func [ 'hash', 'opt' ],
         <<'JS',
             var me = this,
                 currentHash = Ext.util.History.getToken(),
@@ -482,6 +482,15 @@ JS
         // apply method on the BaseController that uses the Ext.route.Mixin
         Ext.app.BaseController.prototype.redirectTo = Class.prototype.redirectTo;
 JS
+}
+
+sub EXT_override_util_Format : Override('Ext.util.Format') {
+    return {
+        label => func [ 'text', 'color' ],
+        <<'JS',
+            return '<span style="padding:2px 10px;background-color:' + color + ';">' + text + '</span>';
+JS
+    };
 }
 
 1;

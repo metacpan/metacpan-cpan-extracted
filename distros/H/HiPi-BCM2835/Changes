@@ -1,3 +1,7 @@
+Version 0.65  - 22 July 2019
+              - updated for RPI 4 function naming
+              - added gpio_get_pud() method for RPI 4
+
 Version 0.64  - 14 July 2019
               - updated for RPI 4
               - added gpio_set_pud() method for RPI 4

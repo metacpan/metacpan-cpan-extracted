@@ -20,7 +20,7 @@ __PACKAGE__->create_ro_accessors( qw( name char_height space_width gap_width
                                       symbols kerning class cols rows bytes
                                       line_spacing) );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 use constant {
     MONO_OLED_DEFAULT_FONT => 'Mono10',

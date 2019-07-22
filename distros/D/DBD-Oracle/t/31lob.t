@@ -219,6 +219,6 @@ END_SQL
 
 undef $sth;
 
-END { eval { drop_table($dbh); $dbh->disconnect if $dbh } }
+END { eval { drop_table($dbh); } }
 
 1;

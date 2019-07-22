@@ -1,4 +1,4 @@
-#!/perl -I..
+#!/perl
 
 use strict;
 use Test::More tests => 12;
@@ -20,7 +20,9 @@ BEGIN { use_ok 'Time::Format', qw(time_format %time) }
 ## ----------------------------------------------------------------------------------
 ## Get day/month names in current locale; fallback to English (sorry!).
 my ($Thursday, $Thu, $June, $Jun);
-unless (eval
+my $lc_supported = 1;
+$lc_supported = 0  if $^O eq 'openbsd';
+if (!$lc_supported  ||  !eval
     {
         require I18N::Langinfo;
         I18N::Langinfo->import(qw(langinfo DAY_3 MON_12 DAY_5 ABDAY_5 MON_6 ABMON_6));
@@ -28,6 +30,7 @@ unless (eval
         1;
     })
 {
+    diag 'Cannot determine locale; falling back to English.';
     ($Thursday, $Thu, $June, $Jun) = qw(Thursday Thu June Jun);
 }
 

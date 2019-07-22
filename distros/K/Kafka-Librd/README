@@ -1,22 +1,204 @@
 NAME
+    Kafka::Librd - bindings for librdkafka
 
-Kafka::Librd
+SYNOPSIS
+        use Kafka::Librd;
 
-INSTALLATION
+        my $kafka = Kafka::Librd->new(
+            Kafka::Librd::RD_KAFKA_CONSUMER,
+            {
+                "group.id" => 'consumer_id',
+            },
+        );
+        $kafka->brokers_add('server1:9092,server2:9092');
+        $kafka->subscribe( \@topics );
+        while (1) {
+            my $msg = $kafka->consumer_poll(1000);
+            if ($msg) {
+                if ( $msg->err ) {
+                    say "Error: ", Kafka::Librd::Error::to_string($err);
+                }
+                else {
+                    say $msg->payload;
+                }
+            }
+        }
 
-To install this module, run the following commands:
+DESCRIPTION
+    This module provides perl bindings for librdkafka.
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+METHODS
+  new
+        $kafka = $class->new($type, \%config)
+
+    Create a new instance. $type can be either "RD_KAFKA_CONSUMER" or
+    "RD_KAFKA_PRODUCER". Config is a hash with configuration parameters as
+    described in
+    <https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md>,
+    additionally it may include "default_topic_config" key, with a hash
+    containing default topic configuration properties.
+
+  brokers_add
+        $cnt = $kafka->brokers_add($brokers)
+
+    add one or more brokers to the list of initial bootstrap brokers.
+    *$brokers* is a comma separated list of brokers in the format
+    "[proto://]host[:port]".
+
+  subscribe
+        $err = $kafka->subscribe(\@topics)
+
+    subscribe to the list of topics using balanced consumer groups.
+
+  unsubscribe
+        $err = $kafka->unsubscribe
+
+    unsubscribe from the current subsctiption set
+
+  subscription
+        $tplist = $kafka->subscription
+
+    return current subscription. Subscription returned as a reference to
+    array of hashes with the following fields: "topic", "partition",
+    "offset", "metadata".
+
+  assign
+        $err = $kafka->assign(\@tplist)
+
+    assign partitions to consume. @tplist is an array of hashes with "topic"
+    and "partition" fields set.
+
+  assignment
+        $tplist = $kafka->assignment
+
+    return current assignment. Result returned in the same way as for
+    "subscription".
+
+  consumer_poll
+        $msg = $kafka->consumer_poll($timeout_ms)
+
+    poll for messages or events. If any message or event received, returns
+    "Kafka::Librd::Message" object. If "<$msg-"err>> for returned object is
+    zero (RD_KAFKA_RESP_ERR_NO_ERROR), then it is a proper message,
+    otherwise it is an event or an error.
+
+  commit
+        $err = $kafka->commit(\@tplist, $async)
+
+    commit offsets to the broker. @tplist is an array of hashes with the
+    following keys: "topic", "partition", "offset", "metadata". If
+    @topic_partition_list is missing or undef, then current partition
+    assignment is used instead. If $async is 1, then method returns
+    immediately, if it is 0 or missing then method blocks until offsets are
+    commited.
+
+  commit_message
+        $err = $kafka->commit_message($msg, $async)
+
+    commit message's offset for the message's partition. $async same as for
+    "commit".
+
+  committed
+        $tplist = $kafka->committed(\@tplist, $timeout_ms)
+
+    retrieve commited offsets for topics and partitions specified in
+    @tplist, which is an array of hashes with "topic" and "partition"
+    fields. Returned $tplist contains a copy of the input list with added
+    "offset" fields.
+
+  position
+        $tplist = $kafka->position(\@tplist)
+
+    retrieve current offsets for topics and partitions specified in @tplist,
+    which is an array of hashes with "topic" and "partition" fields.
+    Returned $tplist contains a copy of the input list with added "offset"
+    fields.
+
+  consumer_close
+        $err = $kafka->consumer_close
+
+    close down the consumer
+
+  topic
+        $topic = $kafka->topic($name, \%config)
+
+    return a "Kafka::Librd::Topic"topic object, that can be used to produce
+    messages
+
+  outq_len
+        $len = $kafka->outq_len
+
+    return the current out queue length.
+
+  destroy
+        $kafka->destroy
+
+    destroy kafka handle
+
+  dump
+        $kafka->dump
+
+    dump internal state of kafka handle to stdout, only useful for debugging
+
+Kafka::Librd::Topic
+    This class maps to "rd_kafka_topic_t" structure from librdkafka and
+    represents topic. It should be created with "topic" method of
+    Kafka::Librd object. It provides the following method:
+
+  produce
+        $err = $topic->produce($partition, $msgflags, $payload, $key)
+
+    produce a message for the topic. *$msgflags* can be RD_KAFKA_MSG_F_BLOCK
+    in the future, but currently it should be set to 0, RD_KAFKA_MSG_F_COPY
+    and RD_KAFKA_MSG_F_FREE must not be used, internally RD_KAFKA_MSG_F_COPY
+    is always set.
+
+Kafka::Librd::Message
+    This class maps to "rd_kafka_message_t" structure from librdkafka and
+    represents message or event. Objects of this class have the following
+    methods:
+
+  err
+    return error code from the message
+
+  topic
+    return topic name
+
+  partition
+    return partition number
+
+  offset
+    return offset. Note, that the value is truncated to 32 bit if your perl
+    doesn't support 64 bit integers.
+
+  key
+    return message key
+
+  payload
+    return message payload
+
+CAVEATS
+    Message offset is truncated to 32 bit if perl compiled without support
+    for 64 bit integers.
+
+SEE ALSO
+    <https://github.com/edenhill/librdkafka>
+
+BUGS
+    Please report any bugs or feature requests via GitHub bug tracker at
+    <http://github.com/plicease/Kafka-Librd/issues>.
+
+AUTHOR
+    Original author Pavel Shaydo "<zwon at cpan.org>"
+
+    Current maintainer Graham Ollis "<plicease@cpan.org>"
 
 LICENSE AND COPYRIGHT
+    Copyright (C) 2016, 2017 Pavel Shaydo
 
-Copyright (C) 2016, 2017 Pavel Shaydo
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+    See http://dev.perl.org/licenses/ for more information.
 
-See http://dev.perl.org/licenses/ for more information.

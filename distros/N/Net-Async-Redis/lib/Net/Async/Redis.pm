@@ -6,7 +6,7 @@ use warnings;
 
 use parent qw(Net::Async::Redis::Commands IO::Async::Notifier);
 
-our $VERSION = '2.000';
+our $VERSION = '2.001';
 
 =head1 NAME
 
@@ -63,7 +63,7 @@ use URI::redis;
 use Log::Any qw($log);
 
 use List::Util qw(pairmap);
-use Scalar::Util qw(reftype);
+use Scalar::Util qw(reftype blessed);
 
 use Net::Async::Redis::Multi;
 use Net::Async::Redis::Subscription;
@@ -172,7 +172,7 @@ async sub multi {
     );
     my @pending = @{$self->{pending_multi}};
 
-    $log->tracef('Have %d pending MULTI transactions', 
+    $log->tracef('Have %d pending MULTI transactions',
         0 + @pending
     );
     push @{$self->{pending_multi}}, $self->loop->new_future->set_label($self->command_label('multi'));
@@ -219,6 +219,8 @@ event.
 Note that this will switch the connection into pubsub mode, so it will
 no longer be available for any other activity.
 
+Resolves to a L<Ryu::Source> instance.
+
 =cut
 
 async sub watch_keyspace {
@@ -229,14 +231,16 @@ async sub watch_keyspace {
         'notify-keyspace-events', 'Kg$xe'
     );
     my $sub = await $self->psubscribe($sub_name);
-    $sub->events
-        ->each(sub {
-            my $data = $_;
-            return unless $data eq $sub;
-            my ($k, $op) = map $_->{data}, @{$data->{data}}[2, 3];
-            $k =~ s/^[^:]+://;
-            $code->($op => $k);
-        })
+    my $ev = $sub->events;
+    $ev->each(sub {
+        my $message = $_;
+        $log->tracef('Keyspace notification for channel %s, type %s, payload %s', map $message->$_, qw(channel type payload));
+        my $k = $message->channel;
+        $k =~ s/^[^:]+://;
+        my $f = $code->($message->payload, $k);
+        $f->retain if blessed($f) and $f->isa('Future');
+    }) if $code;
+    return $ev;
 }
 
 =head2 endpoint
@@ -512,12 +516,14 @@ sub execute_command {
         $log->tracef('Outgoing [%s]', $cmd);
         push @{$self->{pending}}, [ $cmd, $f ];
         $log->tracef("Pipeline depth now %d", 0 + @{$self->{pending}});
-        $self->stream->write(
-            $self->protocol->encode_from_client(@cmd)
-        )->then(sub {
-            $f->done if $is_sub_command;
-            $f
-        })
+        my $data = $self->protocol->encode_from_client(@cmd);
+        if($is_sub_command) {
+            return $self->stream->write($data)->on_ready($f);
+        } else {
+            # Void-context write allows IaStream to combine multiple writes on the same connection.
+            $self->stream->write($data);
+            return $f
+        }
     };
     return $code->() if $self->{stream} and ($self->{is_multi} or 0 == @{$self->{pending_multi}});
     return (

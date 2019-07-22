@@ -18,9 +18,10 @@
 # Concepts can be nested inside concepts and so each sub concept can establish its own address range.  If there is duplication of referenced ids in teh sub ranges then we have to account for the topic id to help disambiguate references -at the moment the ids are assumed to be unique and so no effort is made to use this extra information
 # Reports after fix references can be done in parallel as can reports before reportReferencesFromBookMaps
 # ADD xref expansion from id in file as it is a pain to code up the full details by hand
+# Find topics that have no text in them per: PS2-617
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20190714;
+our $VERSION = 20190721;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -29,6 +30,7 @@ use Data::Dump qw(dump);
 use Data::Edit::Xml;
 use Data::Table::Text qw(:all);
 use Dita::GB::Standard;
+use feature q(postderef);
 use Time::HiRes qw(time);
 use utf8;
 
@@ -1020,6 +1022,30 @@ sub fixReferences($)                                                            
        }
      }
     $xref->titleToFile = \%titleToFile;                                         # Record titles to files
+
+    if (1)                                                                      # Report titles with duplicated titles
+     {my @r;
+
+      for my $t(sort keys %titleToFile)
+       {my %f = %{$titleToFile{$t}};
+        if (my @f = sort keys %f)
+         {if (@f > 1)
+           {push @r, map {[$t, $_]} @f;
+           }
+         }
+       }
+
+      formatTable(\@r, <<END,
+Title   Topic title
+File    Topic file
+END
+        title => qq(Topics with duplicate titles),
+        head  => <<END,
+Xref noted NNNN topics have duplicated titles on DDDD
+END
+        clearUpLeft=>1,
+        file=>(fpe($xref->reports, qw(bad topics_with_duplicated_titles txt))));
+     }
    }
 
   if (my $d = $xref->fixDitaRefs)                                               # Map where the input files went and where the target files came from
@@ -2712,7 +2738,7 @@ Content  Othermeta content
 END
     title=>q(Duplicate othermeta data in bookmaps and topics considered separately),
     head =>q(Found NNNN duplicate othermeta items on DDDD),
-    clearUpLeft => -1,
+    clearUpLeft => -1, summarize=>1,
     file =>fpe($xref->reports, qw(other_meta duplicates_separately txt)));
    }
 
@@ -2738,7 +2764,7 @@ Content  Othermeta content
 END
       title=>q(Duplicate othermeta in bookmaps with called topic othermeta included),
       head =>q(Found NNNN duplicate othermeta items on DDDD),
-      clearUpLeft => -1,
+      clearUpLeft => -1, summarize=>1,
       file =>fpe($xref->reports, qw(other_meta duplicates txt)));
    }
 
@@ -2773,7 +2799,7 @@ Content  Othermeta name content to be retained
 Bookmaps One or more bookmaps that prevented the migration of this othermeta to the calling bookmaps
 END
     title=>q(Othermeta kept in topics because calling bookmaps disagree),
-    zero => 1, clearUpLeft => -1,
+    clearUpLeft => -1, summarize=>1,
     head =>qq(Found NNNN othermeta items that must remain in topic on DDDD),
     file =>fpe($xref->reports, qw(other_meta must_remain_in_topic txt)));
    }
@@ -2798,7 +2824,7 @@ Content  Othermeta name content to be retained
 Bookmap  The bookmap data othermeta can be migrated to
 END
     title=>q(Othermeta data that can be pushed to the calling bookmaps),
-    zero => 1, clearUpLeft => -1,
+    clearUpLeft => -1, summarize=>1,
     head =>qq(Found NNNN othermeta items that can be pushed to the calling bookmaps on DDDD),
     file =>fpe($xref->reports, qw(other_meta push_to_book_maps txt)));
    }
@@ -2822,7 +2848,7 @@ Count   Number of distinct values for this othermeta name in this bookmap
 Content Othermeta content for this name
 END
     title=> q(Bookmap othermeta before topic othermeta has been included),
-    zero => 1, clearUpLeft => -1,
+    clearUpLeft => -1, summarize=>1,
     head => qq(Xref found NNNN Bookmap othermeta tags before topic othermeta was included),
     file => fpe($xref->reports, qw(other_meta book_maps_before_topics_included txt)));
    }
@@ -2845,7 +2871,7 @@ Count   Number of distinct values for this othermeta name
 Content Othermeta content for this name
 END
     title=> q(Bookmap othermeta data after topic othermeta has been included),
-    zero => 1, clearUpLeft => -1,
+    clearUpLeft => -1, summarize=>1,
     head => qq(Xref found NNNN Bookmap othermeta tags after topic othermeta was included on DDDD),
     file =>fpe($xref->reports, qw(other_meta book_maps_after_topics_included txt)));
    }
@@ -2902,8 +2928,8 @@ END
     head  => <<END,
 Xref found NNNN topics that might be similar on DDDD
 END
-    file  => fpe($xref->reports, qw(lists similar byTitle txt)),
-    zero  =>1, summarize=>1);
+    clearUpLeft => -1, summarize=>1,
+    file  => fpe($xref->reports, qw(lists similar byTitle txt)));
   {}                                                                            # From multiverse to universe
  } # reportSimilarTopicsByTitle
 
@@ -2928,6 +2954,7 @@ END
     head=><<END,
 Xref found NNNN topics that have similar vocabulary on DDDD
 END
+    clearUpLeft => -1, summarize=>1,
     file=>(my $f = fpe($xref->reports, qw(lists similar byVocabulary txt))));
   {}                                                                            # From multiverse to universe
  } # reportSimilarTopicsByVocabulary
@@ -4452,10 +4479,7 @@ use Test::More;
 use warnings FATAL=>qw(all);
 use strict;
 
-if ($^O =~ m(bsd|linux)i)
- {plan tests => 73;
- }
-else
+if ($^O !~ m(bsd|linux)i)
  {plan skip_all => 'Not supported';
  }
 
@@ -5564,6 +5588,9 @@ if (1)                                                                          
 latestTest:;
 
 clearFolder($_, 1e3) for in, out, outFixed, reports, tests, targets, q(zzzParseErrors);
+
+done_testing;
+
 
 1
 

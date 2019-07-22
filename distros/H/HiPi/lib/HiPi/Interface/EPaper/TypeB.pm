@@ -26,7 +26,7 @@ __PACKAGE__->create_accessors( qw(
     vcom_and_data_shutdown
 ) );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 use constant {
     PANEL_SETTING                              => 0x00,

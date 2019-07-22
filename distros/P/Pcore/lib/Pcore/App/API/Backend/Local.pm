@@ -3,9 +3,9 @@ package Pcore::App::API::Backend::Local;
 use Pcore -role, -sql, -res;
 use Pcore::App::API qw[:ALL];
 use Pcore::Lib::Text qw[encode_utf8];
-use Pcore::Lib::Digest qw[sha3_512];
+use Pcore::Lib::Digest qw[sha3_512_bin];
 use Pcore::Lib::UUID qw[uuid_v4];
-use Pcore::Lib::Data qw[to_b64_url];
+use Pcore::Lib::Data qw[to_b64u];
 
 with qw[
   Pcore::App::API
@@ -132,7 +132,7 @@ sub _verify_private_token ( $self, $private_token, $hash ) {
         }
     }
     else {
-        return sha3_512( $private_token->[$PRIVATE_TOKEN_TYPE] . $private_token->[$PRIVATE_TOKEN_HASH] . $private_token->[$PRIVATE_TOKEN_ID] ) eq $hash;
+        return sha3_512_bin( $private_token->[$PRIVATE_TOKEN_TYPE] . $private_token->[$PRIVATE_TOKEN_HASH] . $private_token->[$PRIVATE_TOKEN_ID] ) eq $hash;
     }
 }
 
@@ -141,7 +141,7 @@ sub _generate_password_hash ( $self, $user_name_utf8, $user_password_utf8 ) {
 
     my $user_password_bin = encode_utf8 $user_password_utf8;
 
-    my $private_token_hash = sha3_512 $user_password_bin . $user_name_bin;
+    my $private_token_hash = sha3_512_bin $user_password_bin . $user_name_bin;
 
     my $res = $self->{app}->{node}->rpc_call( 'Pcore::App::API::Node', 'create_hash', $private_token_hash );
 
@@ -157,13 +157,13 @@ sub _generate_token ( $self, $token_type ) {
 
     my $token_bin = $token_id->bin . pack( 'C', $token_type ) . $rand;
 
-    my $private_token_hash = sha3_512 $rand;
+    my $private_token_hash = sha3_512_bin $rand;
 
     return res 200,
       { id         => $token_id->str,
-        token      => to_b64_url $token_bin,
+        token      => to_b64u $token_bin,
         token_type => $token_type,
-        hash       => sha3_512 $token_type . $private_token_hash . $token_id->str,
+        hash       => sha3_512_bin $token_type . $private_token_hash . $token_id->str,
       };
 }
 

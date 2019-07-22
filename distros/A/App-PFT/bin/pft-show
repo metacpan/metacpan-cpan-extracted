@@ -39,7 +39,7 @@ The browser can be specified by name (e.g. C<firefox>) or as a shell
 command, where C<%s> is replaced with the file name
 (e.g. C<firefox [options] %s>).
 
-This flag overrides the C<system.editor> setting in the main configuration
+This flag overrides the C<system.browser> setting in the main configuration
 file. If neither the flag nor the setting are specified, the C<$BROWSER>
 environment variable will be honored.
 

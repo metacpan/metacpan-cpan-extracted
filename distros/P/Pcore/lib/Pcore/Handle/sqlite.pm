@@ -7,6 +7,7 @@ use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
 use Pcore::Lib::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
 use Pcore::Lib::UUID qw[uuid_v1mc_str uuid_v4_str];
+use Pcore::Lib::Digest qw[md5_hex];
 use Pcore::Lib::Data qw[to_json];
 use Pcore::Lib::Text qw[encode_utf8];
 use Time::HiRes qw[];
@@ -129,28 +130,17 @@ sub BUILD ( $self, $args ) {
     $dbh->sqlite_busy_timeout( $self->{busy_timeout} );
 
     # create custom functions
-    $dbh->sqlite_create_function( 'uuid_generate_v1mc', 0, sub { return uuid_v1mc_str } );
-    $dbh->sqlite_create_function( 'uuid_generate_v4',   0, sub { return uuid_v4_str } );
-    $dbh->sqlite_create_function( 'gen_random_uuid',    0, sub { return uuid_v4_str } );
+    $dbh->sqlite_create_function( 'uuid_generate_v1mc', 0, sub { return [ uuid_v1mc_str, $SQLITE_BLOB ] } );
+    $dbh->sqlite_create_function( 'uuid_generate_v4',   0, sub { return [ uuid_v4_str,   $SQLITE_BLOB ] } );
+    $dbh->sqlite_create_function( 'gen_random_uuid',    0, sub { return [ uuid_v4_str,   $SQLITE_BLOB ] } );
     $dbh->sqlite_create_function( 'time_hires',         0, sub { return Time::HiRes::time() } );
+    $dbh->sqlite_create_function( 'md5', 1, sub { return defined $_[0] ? [ md5_hex( encode_utf8 $_[0] ), $SQLITE_BLOB ] : undef } );
 
     $self->{on_connect}->($self) if $self->{on_connect};
 
     $self->{h} = $dbh;
 
     return;
-}
-
-# SCHEMA PATCH
-sub _get_schema_patch_table_query ( $self, $table_name ) {
-    return <<"SQL";
-        CREATE TABLE IF NOT EXISTS "$table_name" (
-            "module" TEXT NOT NULL,
-            "id" INTEGER NOT NULL,
-            "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY ("module", "id")
-        )
-SQL
 }
 
 # QUOTE
@@ -677,6 +667,10 @@ sub selectcol ( $self, @ ) {
 }
 
 # TRANSACTIONS
+sub in_transaction ($self) {
+    return !$self->{h}->{AutoCommit} || !$self->{h}->sqlite_get_autocommit;
+}
+
 sub begin_work ( $self, $cb = undef ) {
     $self->{h}->begin_work;
 
@@ -759,16 +753,13 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 145                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
-## |      |                      | declared but not used                                                                                          |
+## |    3 | 366                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 376                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
+## |    3 | 449                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 459                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    2 | 328                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 338                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 670                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 660                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -7,7 +7,8 @@ use File::Temp qw( tempdir );
 
 chdir 'xs';
 
-my $dir = tempdir( CLEANUP => 1 );
+mkdir '.tmp' unless -d '.tmp';
+my $dir = tempdir( CLEANUP => 1, DIR => '.tmp' );
 
 my @types = ("short", "int", "long ", "unsigned short", "unsigned int", 
 "unsigned long", "long long", "unsigned long long");

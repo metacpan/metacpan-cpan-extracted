@@ -24,7 +24,7 @@ __PACKAGE__->create_accessors( qw( device devicename led_green led_red
                               led_on _green_pin _red_pin ook_repeat
                               backend default_config ook_config gpiodev) );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 sub new {
     my( $class, %userparams ) = @_;

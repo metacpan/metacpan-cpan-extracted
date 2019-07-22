@@ -12,6 +12,7 @@ build_requires:
   Test::Roo: '0'
   Test::Roo::DataDriven: '0'
   Test::Roo::Role: '0'
+  Test::TCP: '2.19'
   curry: '0'
   if: '0'
   lib: '0'
@@ -19,7 +20,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 keywords:
   - client
   - StatsD
@@ -33,10 +34,10 @@ name: Net-Statsd-Lite
 provides:
   Net::Statsd::Lite:
     file: lib/Net/Statsd/Lite.pm
-    version: v0.4.6
+    version: v0.4.8
   Net::Statsd::Lite::Types:
     file: lib/Net/Statsd/Lite/Types.pm
-    version: v0.4.6
+    version: v0.4.8
 recommends:
   Type::Tiny::XS: '0'
 requires:
@@ -51,9 +52,11 @@ requires:
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Lite/issues
+  homepage: https://metacpan.org/release/Net-Statsd-Lite
   repository: git://github.com/robrwo/Net-Statsd-Lite.git
-version: v0.4.6
+version: v0.4.8
 x_authority: cpan:RRWO
 x_contributors:
   - 'Toby Inkster <tobyink@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

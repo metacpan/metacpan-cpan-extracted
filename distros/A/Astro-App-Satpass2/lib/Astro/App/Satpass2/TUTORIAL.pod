@@ -481,7 +481,7 @@ the date itself.
 
 What you have to do, in general, is use date parser
 L<Astro::App::Satpass2::ParseTime::ISO8601>, and set its
-L<back_end|Astro::App::Satpass2::ParseTime::ISO8601/back_end> attribute
+L<back_end|Astro::App::Satpass2::Utils/back_end> attribute
 to C<'DateTime::Calendar::Christian'>. You must, of course have this
 module installed, and you can shorten the setting to just
 C<'Christian'>.  You should see the documentation for full details, but

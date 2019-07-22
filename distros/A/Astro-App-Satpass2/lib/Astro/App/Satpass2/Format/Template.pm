@@ -27,7 +27,7 @@ use Template::Provider;
 use Text::Abbrev;
 use Text::Wrap qw{ wrap };
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 sub new {
     my ($class, @args) = @_;
@@ -535,9 +535,7 @@ objects to provide formatting at the field level.
 
 The names and contents of the templates used by each formatter are
 described with each formatter. The templates may be retrieved or
-modified using the L<template()|/template> method, or may be exported to
-a working L<Template-Toolkit|Template> file using the
-L<export()|/export> method.
+modified using the L<template()|/template> method.
 
 =head1 METHODS
 
@@ -683,7 +681,8 @@ the main template being used, and C<$string> is the string to localize.
 
 =item provider
 
-This is simply the value returned by L<provider()|/provider>.
+This is simply the value returned by
+L<provider()|Astro::App::Satpass2::Format/provider>.
 
 =item time
 
@@ -779,7 +778,7 @@ The required values of the C<template> argument are supported by
 same-named L<Template-Toolkit|Template> templates, as follows. The
 C<data> provided should be as described in the documentation for the
 L<Astro::App::Satpass2|Astro::App::Satpass2>
-L<format()|Astro::App::Satpass2/format> method. If the C<data> value is
+L<formatter()|Astro::App::Satpass2/formatter> method. If the C<data> value is
 not provided, each of the default templates will call an appropriate
 L<Astro::App::Satpass2|Astro::App::Satpass2> method on the C<sp> value,
 passing it the C<arg> value as arguments.
@@ -882,7 +881,7 @@ the decoding itself, or delegate to C<SUPER::decode>.
  $fmt->format( template => $template, ... );
 
 This method represents the interface to L<Template-Toolkit|Template>,
-and all the L</Formatter> methods come through here eventually.
+and all the formatter methods come through here eventually.
 
 The arguments to this method are name/value pairs. The C<template>
 argument is required, and is either the name of a template file, or a

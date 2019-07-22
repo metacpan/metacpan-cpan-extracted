@@ -34,7 +34,7 @@ use Params::ValidationCompiler 0.13 ();
 # namespace::autoclean.
 *__t = \&DateTime::Fiction::JRRTolkien::Shire::Types::t;
 
-our $VERSION = '0.902';
+our $VERSION = '0.903';
 
 use constant DAY_NUMBER_MIDYEARS_DAY	=> 183;
 
@@ -355,7 +355,12 @@ sub calendar_name {
     return 'Shire';
 }
 
-sub clone { return bless { %{ $_[0] } }, ref $_[0] } # Stolen from DateTime.pm
+sub clone {
+    my ( $self ) = @_;
+    my $clone = { %{ $self } };
+    $clone->{dt} = $self->{dt}->clone();
+    return bless $clone, ref $self;
+}
 
 # Get methods
 sub year {
@@ -1175,8 +1180,7 @@ sub STORABLE_freeze {
 
 sub STORABLE_thaw {
     my ( $self, undef, $serialized, $dt ) = @_;
-    my $info = Storable::thaw( $serialized );
-    @{ $self }{ keys %{ $info } } = values %{ $info };
+    %{ $self } = %{ Storable::thaw( $serialized ) };
     $self->{dt} = $dt;
     $self->{recalc} = 1;
     return $self;
@@ -1853,11 +1857,12 @@ duration object is
 L<DateTime::Fiction::JRRTolkien::Shire::Duration|DateTime::Fiction::JRRTolkien::Shire::Duration>,
 which is B<not> a subclass of L<DateTime::Duration|DateTime::Duration>.
 
-The date portion of the math is done in the order L<month>, L<week>,
-L<year>, L<day>. Before adding (or subtracting) months or weeks from a
-date that is not part of any month (or week), that date will be adjusted
-forward or backward to the nearest date that is part of a month (or
-week). The direction of adjustment is specified by the
+The date portion of the math is done in the order L<month|/month>,
+L<week|/week>, L<year|/year>, L<day|/day>. Before adding (or
+subtracting) months or weeks from a date that is not part of any month
+(or week), that date will be adjusted forward or backward to the nearest
+date that is part of a month (or week). The direction of adjustment is
+specified by the
 L<DateTime::Fiction::JRRTolkien::Shire::Duration|DateTime::Fiction::JRRTolkien::Shire::Duration>
 object; see its documentation for the details. The order of operation
 was chosen to ensure that only one such adjustment would be necessary
@@ -1939,6 +1944,8 @@ times in the two calendars, so there is not a one to one correspondence
 of days regardless of years.  However, the variations follow a 400 year
 cycle.
 
+I<The "I" in the above is Tom Braun -- TRW>
+
 =head1 AUTHOR
 
 Tom Braun <tbraun@pobox.com>
@@ -1949,7 +1956,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2003 Tom Braun. All rights reserved.
 
-Copyright (C) 2017 Thomas R. Wyant, III
+Copyright (C) 2017-2019 Thomas R. Wyant, III
 
 The calendar implemented on this module was created by J.R.R. Tolkien,
 and the copyright is still held by his estate.  The license and

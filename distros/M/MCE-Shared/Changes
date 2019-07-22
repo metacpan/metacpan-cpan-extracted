@@ -1,10 +1,19 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.842 Sun Jul 21 19:00:00 EST 2019
+
+  * The Windows hack introduced in 1.841 is 2x slower for one edge case.
+    Therefore, reverted the Windows hack in MCE::Shared::Server.
+
+  * Fixed race condition abnormalities in MCE::Hobo.
+  * Added Parallel::ForkManager-like demonstration to MCE::Hobo.
+  * Bumped MCE dependency to 1.842.
+
 1.841 Sun Jul 07 04:30:00 EST 2019
 
   * IPC update; raising reliability across multiple platforms.
-  * Improved the hack for the Windows platform to MCE::Shared::Server.
+  * Improved the hack for the Windows platform in MCE::Shared::Server.
 
   * Support reading a shared <DATA> handle residing in the main script
     without involving the IO::FDPass module.

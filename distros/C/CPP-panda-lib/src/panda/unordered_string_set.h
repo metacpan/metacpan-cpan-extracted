@@ -1,9 +1,9 @@
 #pragma once
+#include "string.h"
+#include "string_view.h"
 #include <memory>
 #include <functional>
 #include <unordered_set>
-#include <panda/string.h>
-#include <panda/string_view.h>
 
 /*
  * panda::unordered_string_set and panda::unordered_string_multiset are wrappers around STL's versions in case if keys are panda::string.
@@ -21,8 +21,8 @@ namespace panda {
 
         static_assert(decltype(_is_base_string(Key()))::value, "Key must be based on panda::basic_string");
 
-        typedef std::unordered_set<Key, Hash, KeyEqual, Allocator> Base;
-        typedef std::basic_string_view<typename Key::value_type, typename Key::traits_type> SVKey;
+        using Base  = std::unordered_set<Key, Hash, KeyEqual, Allocator>;
+        using SVKey = basic_string_view<typename Key::value_type, typename Key::traits_type>;
 
         static Key _key_from_sv (const SVKey& key) {
             typedef typename Key::value_type FakeCharLiteral[1];
@@ -82,8 +82,8 @@ namespace panda {
 
         static_assert(decltype(_is_base_string(Key()))::value, "Key must be based on panda::basic_string");
 
-        typedef std::unordered_multiset<Key, Hash, KeyEqual, Allocator> Base;
-        typedef std::basic_string_view<typename Key::value_type, typename Key::traits_type> SVKey;
+        using Base  = std::unordered_multiset<Key, Hash, KeyEqual, Allocator>;
+        using SVKey = basic_string_view<typename Key::value_type, typename Key::traits_type>;
 
         static Key _key_from_sv (const SVKey& key) {
             typedef typename Key::value_type FakeCharLiteral[1];

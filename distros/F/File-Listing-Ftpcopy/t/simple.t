@@ -12,8 +12,6 @@ subtest 'unixy file' => sub {
   note 'mtimetype: ' . $h->{mtimetype};
   note 'mtime:     ' . $h->{mtime};
   note 'as string: ' . strftime( "%T %A, %B %d, %Y", gmtime($h->{mtime}));
-  #use YAML ();
-  #diag YAML::Dump($h);
 };
 
 subtest 'VMS' => sub {

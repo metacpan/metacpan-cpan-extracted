@@ -26,7 +26,7 @@ sub EXT_button : Extend('Ext.Container') : Type('widget') {
             }
 JS
 
-        initTelegram => func <<~'JS',
+        initTelegram => func <<'JS',
             var me = this;
 
             window.onTelegramAuth = function (user) {

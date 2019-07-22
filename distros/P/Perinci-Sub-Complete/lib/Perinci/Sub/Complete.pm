@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2019-06-28'; # DATE
-our $VERSION = '0.936'; # VERSION
+our $DATE = '2019-06-29'; # DATE
+our $VERSION = '0.937'; # VERSION
 
 use 5.010001;
 use strict;
@@ -123,6 +123,7 @@ sub complete_from_schema {
 
     my $static;
     my $words;
+    my $summaries;
     eval {
         if (my $xcomp = $cs->{'x.completion'}) {
             require Module::Installed::Tiny;
@@ -162,12 +163,17 @@ sub complete_from_schema {
         if ($cs->{is} && !ref($cs->{is})) {
             log_trace("[comp][periscomp] adding completion from schema's 'is' clause");
             push @$words, $cs->{is};
+            push @$summaries, undef;
             $static++;
             return; # from eval. there should not be any other value
         }
         if ($cs->{in}) {
             log_trace("[comp][periscomp] adding completion from schema's 'in' clause");
-            push @$words, grep {!ref($_)} @{ $cs->{in} };
+            for my $i (0..$#{ $cs->{in} }) {
+                next if ref $cs->{in}[$i];
+                push @$words    , $cs->{in}[$i];
+                push @$summaries, $cs->{'x.in.summaries'} ? $cs->{'x.in.summaries'}[$i] : undef;
+            }
             $static++;
             return; # from eval. there should not be any other value
         }
@@ -176,6 +182,7 @@ sub complete_from_schema {
             # normalize schemas in 'of' clauses, etc.
             require Data::Sah::Normalize;
             if ($cs->{of} && @{ $cs->{of} }) {
+
                 $fres = combine_answers(
                     grep { defined } map {
                         complete_from_schema(
@@ -190,6 +197,7 @@ sub complete_from_schema {
         if ($type eq 'bool') {
             log_trace("[comp][periscomp] adding completion from possible values of bool");
             push @$words, 0, 1;
+            push @$summaries, undef, undef;
             $static++;
             return; # from eval
         }
@@ -198,39 +206,59 @@ sub complete_from_schema {
             if ($cs->{between} &&
                     $cs->{between}[0] - $cs->{between}[0] <= $limit) {
                 log_trace("[comp][periscomp] adding completion from schema's 'between' clause");
-                push @$words, $cs->{between}[0] .. $cs->{between}[1];
+                for ($cs->{between}[0] .. $cs->{between}[1]) {
+                    push @$words, $_;
+                    push @$summaries, undef;
+                }
                 $static++;
             } elsif ($cs->{xbetween} &&
                          $cs->{xbetween}[0] - $cs->{xbetween}[0] <= $limit) {
                 log_trace("[comp][periscomp] adding completion from schema's 'xbetween' clause");
-                push @$words, $cs->{xbetween}[0]+1 .. $cs->{xbetween}[1]-1;
+                for ($cs->{xbetween}[0]+1 .. $cs->{xbetween}[1]-1) {
+                    push @$words, $_;
+                    push @$summaries, undef;
+                }
                 $static++;
             } elsif (defined($cs->{min}) && defined($cs->{max}) &&
                          $cs->{max}-$cs->{min} <= $limit) {
                 log_trace("[comp][periscomp] adding completion from schema's 'min' & 'max' clauses");
-                push @$words, $cs->{min} .. $cs->{max};
+                for ($cs->{min} .. $cs->{max}) {
+                    push @$words, $_;
+                    push @$summaries, undef;
+                }
                 $static++;
             } elsif (defined($cs->{min}) && defined($cs->{xmax}) &&
                          $cs->{xmax}-$cs->{min} <= $limit) {
                 log_trace("[comp][periscomp] adding completion from schema's 'min' & 'xmax' clauses");
-                push @$words, $cs->{min} .. $cs->{xmax}-1;
+                for ($cs->{min} .. $cs->{xmax}-1) {
+                    push @$words, $_;
+                    push @$summaries, undef;
+                }
                 $static++;
             } elsif (defined($cs->{xmin}) && defined($cs->{max}) &&
                          $cs->{max}-$cs->{xmin} <= $limit) {
                 log_trace("[comp][periscomp] adding completion from schema's 'xmin' & 'max' clauses");
-                push @$words, $cs->{xmin}+1 .. $cs->{max};
+                for ($cs->{xmin}+1 .. $cs->{max}) {
+                    push @$words, $_;
+                    push @$summaries, undef;
+                }
                 $static++;
             } elsif (defined($cs->{xmin}) && defined($cs->{xmax}) &&
                          $cs->{xmax}-$cs->{xmin} <= $limit) {
                 log_trace("[comp][periscomp] adding completion from schema's 'xmin' & 'xmax' clauses");
-                push @$words, $cs->{xmin}+1 .. $cs->{xmax}-1;
+                for ($cs->{xmin}+1 .. $cs->{xmax}-1) {
+                    push @$words, $_;
+                    push @$summaries, undef;
+                }
                 $static++;
             } elsif (length($word) && $word !~ /\A-?\d*\z/) {
                 log_trace("[comp][periscomp] word not an int");
                 $words = [];
+                $summaries = [];
             } else {
                 # do a digit by digit completion
                 $words = [];
+                $summaries = [];
                 for my $sign ("", "-") {
                     for ("", 0..9) {
                         my $i = $sign . $word . $_;
@@ -249,9 +277,9 @@ sub complete_from_schema {
                         next if defined($cs->{max} ) && $i >  $cs->{max};
                         next if defined($cs->{xmin}) && $i >= $cs->{xmax};
                         push @$words, $i;
+                        push @$summaries, undef;
                     }
                 }
-                $words = [sort @$words];
             }
             return; # from eval
         }
@@ -259,8 +287,10 @@ sub complete_from_schema {
             if (length($word) && $word !~ /\A-?\d*(\.\d*)?\z/) {
                 log_trace("[comp][periscomp] word not a float");
                 $words = [];
+                $summaries = [];
             } else {
                 $words = [];
+                $summaries = [];
                 for my $sig ("", "-") {
                     for ("", 0..9,
                          ".0",".1",".2",".3",".4",".5",".6",".7",".8",".9") {
@@ -280,8 +310,13 @@ sub complete_from_schema {
                         next if defined($cs->{max} ) && $f >  $cs->{max};
                         next if defined($cs->{xmin}) && $f >= $cs->{xmax};
                         push @$words, $f;
+                        push @$summaries, undef;
                     }
                 }
+                my @orders = sort { $words->[$a] cmp $words->[$b] }
+                    0..$#{$words};
+                my $words     = [map {$words->[$_]    } @orders];
+                my $summaries = [map {$summaries->[$_]} @orders];
             }
             return; # from eval
         }
@@ -291,7 +326,7 @@ sub complete_from_schema {
 
     goto RETURN_RES unless $words;
     $fres = hashify_answer(
-        complete_array_elem(array=>$words, word=>$word),
+        complete_array_elem(array=>$words, summaries=>$summaries, word=>$word),
         {static=>$static && $word eq '' ? 1:0},
     );
 
@@ -1283,7 +1318,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.936 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-06-28.
+This document describes version 0.937 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-06-29.
 
 =head1 SYNOPSIS
 

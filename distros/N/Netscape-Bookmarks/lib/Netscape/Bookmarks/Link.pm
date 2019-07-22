@@ -4,7 +4,7 @@ package Netscape::Bookmarks::Link;
 
 =head1 NAME
 
-Netscape::Bookmarks::Link	- manipulate, or create Netscape Bookmarks links
+Netscape::Bookmarks::Link - manipulate, or create Netscape Bookmarks links
 
 =head1 SYNOPSIS
 
@@ -28,6 +28,9 @@ Netscape::Bookmarks::Link	- manipulate, or create Netscape Bookmarks links
   print $link->as_string;
 
 =head1 DESCRIPTION
+
+THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
+IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
 
 The Netscape bookmarks file has several basic components:
 
@@ -78,7 +81,7 @@ use vars qw( $DEBUG $VERSION $ERROR );
 
 use URI;
 
-$VERSION = "2.303";
+$VERSION = "2.304";
 
 =item Netscape::Bookmarks::Link-E<gt>new( \%hash )
 
@@ -478,7 +481,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -78,8 +78,8 @@ struct test_string {
     }
 
     // temporary return value, only immediate use, no assigments!
-    static std::basic_string_view<T> svstr (const char* data, size_t count = 1) {
-        return std::basic_string_view<T>(cstr(data, count));
+    static basic_string_view<T> svstr (const char* data, size_t count = 1) {
+        return basic_string_view<T>(cstr(data, count));
     }
 
     static T* extstr (StdString src, size_t cap = 0) {
@@ -90,7 +90,7 @@ struct test_string {
     }
 
     static ExternalShared* shared_buf_alloc () {
-        return (ExternalShared*)panda::lib::DynamicMemoryPool::instance()->allocate(sizeof(ExternalShared));
+        return (ExternalShared*)panda::DynamicMemoryPool::instance()->allocate(sizeof(ExternalShared));
     }
 
     template <class U = String> static U create_external      (StdString exp, size_t cap) { return U(extstr(exp), exp.size(), cap, &Allocator::ext_free); }

@@ -18,7 +18,7 @@ name: Time-Format
 provides:
   Time::Format:
     file: lib/Time/Format.pm
-    version: '1.13'
+    version: '1.14'
 recommends:
   Date::Manip: '0'
   DateTime: '0'
@@ -28,5 +28,6 @@ recommends:
   Time::HiRes: '0'
 requires:
   Time::Local: '1.07'
-version: '1.13'
+  perl: v5.6.1
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

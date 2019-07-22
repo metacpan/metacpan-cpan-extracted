@@ -3,7 +3,6 @@
 #include <catch.hpp>
 
 using namespace xs;
-using namespace std;
 
 enum class behaviour_t { VALID, EMPTY, THROWS };
 

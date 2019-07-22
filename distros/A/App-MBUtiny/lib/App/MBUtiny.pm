@@ -1,4 +1,4 @@
-package App::MBUtiny; # $Id: MBUtiny.pm 129 2019-07-07 11:21:56Z abalama $
+package App::MBUtiny; # $Id: MBUtiny.pm 131 2019-07-16 18:45:44Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MBUtiny - Websites and any file system elements backup tool
 
 =head1 VERSION
 
-Version 1.12
+Version 1.13
 
 =head1 SYNOPSIS
 
@@ -206,7 +206,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION @EXPORT /;
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 use feature qw/say/;
 use Carp;

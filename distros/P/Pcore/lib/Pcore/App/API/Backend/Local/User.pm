@@ -251,7 +251,7 @@ sub user_set_permissions ( $self, $user_id, $permissions, $dbh = undef ) {
         $enabled = 0+ !!$enabled;
 
         state $q1 = $dbh->prepare(
-            <<~'SQL'
+            <<'SQL'
             INSERT INTO "user_permission" (
                 "user_id",
                 "permission_id",
@@ -279,7 +279,7 @@ SQL
         # permission is already exists
         else {
             state $q2 = $dbh->prepare(
-                <<~'SQL'
+                <<'SQL'
                 UPDATE
                     "user_permission"
                 SET

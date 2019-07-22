@@ -27,23 +27,24 @@ sub _db_add_schema_patch ( $self, $dbh ) {
             CREATE TABLE "user" (
                 "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "guid" UUID UNIQUE NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
-                "created" INT8 NOT NULL DEFAULT(STRFTIME('%s', 'NOW')),
+                "created" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 "name" TEXT NOT NULL UNIQUE,
                 "enabled" BOOL NOT NULL DEFAULT TRUE,
                 "email" TEXT UNIQUE,
                 "email_confirmed" BOOL NOT NULL DEFAULT FALSE,
-                "avatar" TEXT,
+                "has_avatar" BOOL NOT NULL DEFAULT FALSE,
+                "gravatar" TEXT,
                 "locale" TEXT,
                 "telegram_name" TEXT UNIQUE
             );
 
             INSERT INTO "sqlite_sequence" ("name", "seq") VALUES ("user", 99);
 
-            CREATE TRIGGER "on_uer_email_update_trigger" AFTER UPDATE ON "user"
-            WHEN OLD."email" != NEW."email" OR NEW."email" IS NULL
+            CREATE TRIGGER "on_user_email_update_trigger" AFTER UPDATE ON "user"
+            WHEN COALESCE(OLD."email", '') != COALESCE(NEW."email", '')
             BEGIN
                 DELETE FROM "user_action_token" WHERE "email" = OLD."email";
-                UPDATE "user" SET "email_confirmed" = FALSE WHERE "id" = NEW."id";
+                UPDATE "user" SET "email_confirmed" = FALSE, "gravatar" = MD5(LOWER(NEW."email")) WHERE "id" = NEW."id";
             END;
 
             -- USER PERMISSIONS
@@ -57,7 +58,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
             -- USER TOKEN
             CREATE TABLE "user_token" (
                 "id" UUID PRIMARY KEY NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
-                "created" INT8 NOT NULL DEFAULT(STRFTIME('%s', 'NOW')),
+                "created" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 "name" TEXT,
                 "user_id" INT4 NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
                 "enabled" BOOL NOT NULL DEFAULT TRUE
@@ -82,7 +83,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
             -- USER SESSION
             CREATE TABLE "user_session" (
                 "id" UUID PRIMARY KEY NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
-                "created" INT8 NOT NULL DEFAULT(STRFTIME('%s', 'NOW')),
+                "created" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 "user_id" INT4 NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE
             );
 
@@ -97,7 +98,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
                 "user_id" INT4 NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
                 "type" INT2 NOT NULL,
                 "email" TEXT NOT NULL,
-                "created" INT8 NOT NULL DEFAULT(STRFTIME('%s', 'NOW'))
+                "created" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TRIGGER "user_action_token_after_delete_trigger" AFTER DELETE ON "user_action_token"
@@ -169,7 +170,7 @@ sub _db_insert_user ( $self, $dbh, $user_name ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
 ## |      | 9                    | * Private subroutine/method '_db_add_schema_patch' declared but not used                                       |
-## |      | 136                  | * Private subroutine/method '_db_insert_user' declared but not used                                            |
+## |      | 137                  | * Private subroutine/method '_db_insert_user' declared but not used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

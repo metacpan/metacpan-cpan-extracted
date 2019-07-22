@@ -8,14 +8,20 @@
 #if PERL_API_REVISION != 5
 #error This module is only for Perl 5
 #else
-#if PERL_API_VERSION == 24
-/* nothing special */
-#else
 #if PERL_API_VERSION == 26
 /* nothing special */
 #else
 #if PERL_API_VERSION == 28
 #define RC_ANYOFM
+#else
+#if PERL_API_VERSION == 30
+#define RC_ANYOFM
+#define RC_NANYOFM
+#define RC_EXACT_ONLY8
+#define RC_UNCOND_CHARCLASS
+#define RC_ANYOF_OFFSET
+#define RC_SHORT_BITMAP
+#define RC_UNSIGNED_COUNT
 #else
 #error Unsupported PERL_API_VERSION
 #endif
@@ -29,7 +35,11 @@
 
 #define LETTER_COUNT ('z' - 'a' + 1)
 
+#ifndef RC_UNSIGNED_COUNT
 #define INFINITE_COUNT 32767
+#else
+#define INFINITE_COUNT 0xffff
+#endif
 
 #define ALNUM_BLOCK 0x0001
 #define SPACE_BLOCK 0x0002
@@ -72,7 +82,14 @@ typedef struct
 } Arrow;
 
 #define GET_LITERAL(a) (((char *)((a)->rn + 1)) + (a)->spent)
+
 #define GET_OFFSET(rn) ((rn)->next_off ? (rn)->next_off : get_synth_offset(rn))
+
+#ifndef RC_UNSIGNED_COUNT
+typedef I16 CurlyCount;
+#else
+typedef U16 CurlyCount;
+#endif
 
 /* Most functions below have this signature. The first parameter is a
    flag set after the comparison actually matched something, second
@@ -105,8 +122,10 @@ char *rc_error = 0;
 
 unsigned char forced_byte[ANYOF_BITMAP_SIZE];
 
-/* matching \s i.e. not including \v - see perlre */
-static char whitespace_expl[] = { ' ', '\f', '\n', '\r', '\t' };
+/* since Perl 5.18, \s matches vertical tab - see
+ * https://www.effectiveperlprogramming.com/2013/06/the-vertical-tab-is-part-of-s-in-perl-5-18/
+ * , or "Pattern White Space" in perlre */
+static char whitespace_expl[] = { ' ', '\f', '\n', '\r', '\t', '\v' };
 
 static ByteClass whitespace;
 
@@ -164,39 +183,39 @@ static unsigned char newline_posix_regclasses[_CC_VERTSPACE + 1];
    between classes (i.e. IsAlnum & IsWord), which we probably
    shouldn't - it is a documented bug, though... */
 static char *regclass_names[] = { "Digit", "IsAlnum", "IsSpacePerl",
-				  "IsHorizSpace", "IsVertSpace",
-				  "IsWord", "IsXPosixAlnum", "IsXPosixXDigit",
-				  "IsAlpha", "IsXPosixAlpha",
-				  "IsDigit", "IsLower", "IsUpper",
-				  "IsXDigit", "SpacePerl", "VertSpace",
-				  "Word", "XPosixDigit",
-				  "XPosixWord", "XPosixAlpha", "XPosixAlnum",
-				  "XPosixXDigit" };
+                                  "IsHorizSpace", "IsVertSpace",
+                                  "IsWord", "IsXPosixAlnum", "IsXPosixXDigit",
+                                  "IsAlpha", "IsXPosixAlpha",
+                                  "IsDigit", "IsLower", "IsUpper",
+                                  "IsXDigit", "SpacePerl", "VertSpace",
+                                  "Word", "XPosixDigit",
+                                  "XPosixWord", "XPosixAlpha", "XPosixAlnum",
+                                  "XPosixXDigit" };
 
-static U32 regclass_blocks[] = { NUMBER_BLOCK, ALNUM_BLOCK, SPACE_BLOCK, 
-				 HORIZONTAL_SPACE_BLOCK, 
-				 VERTICAL_SPACE_BLOCK, ALNUM_BLOCK,
-				 ALNUM_BLOCK, HEX_DIGIT_BLOCK, ALPHA_BLOCK,
-				 ALPHA_BLOCK, NUMBER_BLOCK, LOWER_BLOCK,
-				 UPPER_BLOCK, HEX_DIGIT_BLOCK, SPACE_BLOCK,
-				 VERTICAL_SPACE_BLOCK, ALNUM_BLOCK,
-				 NUMBER_BLOCK, ALNUM_BLOCK, ALPHA_BLOCK,
-				 ALNUM_BLOCK, HEX_DIGIT_BLOCK};
+static U32 regclass_blocks[] = { NUMBER_BLOCK, ALNUM_BLOCK, SPACE_BLOCK,
+                                 HORIZONTAL_SPACE_BLOCK,
+                                 VERTICAL_SPACE_BLOCK, ALNUM_BLOCK,
+                                 ALNUM_BLOCK, HEX_DIGIT_BLOCK, ALPHA_BLOCK,
+                                 ALPHA_BLOCK, NUMBER_BLOCK, LOWER_BLOCK,
+                                 UPPER_BLOCK, HEX_DIGIT_BLOCK, SPACE_BLOCK,
+                                 VERTICAL_SPACE_BLOCK, ALNUM_BLOCK,
+                                 NUMBER_BLOCK, ALNUM_BLOCK, ALPHA_BLOCK,
+                                 ALNUM_BLOCK, HEX_DIGIT_BLOCK};
 
 static U32 regclass_superset[] = { NOT_SPACE_BLOCK,
-				   NOT_ALPHA_BLOCK, NOT_NUMBER_BLOCK,
-				   ALNUM_BLOCK, ALNUM_BLOCK,
-				   ALPHA_BLOCK, ALPHA_BLOCK, HEX_DIGIT_BLOCK,
-				   SPACE_BLOCK, NOT_NUMBER_BLOCK,
-				   NOT_HEX_DIGIT_BLOCK };
+                                   NOT_ALPHA_BLOCK, NOT_NUMBER_BLOCK,
+                                   ALNUM_BLOCK, ALNUM_BLOCK,
+                                   ALPHA_BLOCK, ALPHA_BLOCK, HEX_DIGIT_BLOCK,
+                                   SPACE_BLOCK, NOT_NUMBER_BLOCK,
+                                   NOT_HEX_DIGIT_BLOCK };
 static U32 regclass_subset[] = { ALNUM_BLOCK,
-				 NOT_ALNUM_BLOCK, NOT_ALNUM_BLOCK,
-				 ALPHA_BLOCK, NUMBER_BLOCK,
-				 UPPER_BLOCK, LOWER_BLOCK, NUMBER_BLOCK,
-				 HORIZONTAL_SPACE_BLOCK, 
-				 VERTICAL_SPACE_BLOCK, VERTICAL_SPACE_BLOCK };
+                                 NOT_ALNUM_BLOCK, NOT_ALNUM_BLOCK,
+                                 ALPHA_BLOCK, NUMBER_BLOCK,
+                                 UPPER_BLOCK, LOWER_BLOCK, NUMBER_BLOCK,
+                                 HORIZONTAL_SPACE_BLOCK,
+                                 VERTICAL_SPACE_BLOCK, VERTICAL_SPACE_BLOCK };
 
-static U32 posix_regclass_blocks[_CC_VERTSPACE + 1] = { 
+static U32 posix_regclass_blocks[_CC_VERTSPACE + 1] = {
     ALNUM_BLOCK /* _CC_WORDCHAR == 0 */,
     NUMBER_BLOCK /* _CC_DIGIT == 1 */,
     ALPHA_BLOCK /* _CC_ALPHA == 2 */,
@@ -270,14 +289,14 @@ static void init_forced_byte()
 
     for (i = 0; i < sizeof(forced_byte_expl); ++i)
     {
-	init_bit_flag(&bf, (unsigned char)forced_byte_expl[i]);
-	forced_byte[bf.offs] |= bf.mask;
+        init_bit_flag(&bf, (unsigned char)forced_byte_expl[i]);
+        forced_byte[bf.offs] |= bf.mask;
     }
 
     for (i = 0; i < 8; ++i)
     {
-	init_bit_flag(&bf, (unsigned char)('0' + i));
-	forced_byte[bf.offs] |= bf.mask;
+        init_bit_flag(&bf, (unsigned char)('0' + i));
+        forced_byte[bf.offs] |= bf.mask;
     }
 }
 
@@ -299,9 +318,9 @@ static void init_byte_class(ByteClass *bc, char *expl, int expl_size)
         bc->lookup[(unsigned char)expl[i]] = 1;
         bc->nlookup[(unsigned char)expl[i]] = 0;
 
-	init_bit_flag(&bf, (unsigned char)expl[i]);
-	bc->bitmap[bf.offs] |= bf.mask;
-	bc->nbitmap[bf.offs] &= ~bf.mask;
+        init_bit_flag(&bf, (unsigned char)expl[i]);
+        bc->bitmap[bf.offs] |= bf.mask;
+        bc->nbitmap[bf.offs] &= ~bf.mask;
     }
 }
 
@@ -322,27 +341,27 @@ static U32 extend_mask(U32 mask)
     while (mask != prev_mask)
     {
         prev_mask = mask;
-	for (i = 0; i < 2; ++i)
-	{
-	    for (j = 0; j < SIZEOF_ARRAY(regclass_superset); ++j)
-	    {
-		U32 b = regclass_superset[j];
-		U32 s = regclass_subset[j];
-		if (i)
-		{
-		    U32 t;
+        for (i = 0; i < 2; ++i)
+        {
+            for (j = 0; j < SIZEOF_ARRAY(regclass_superset); ++j)
+            {
+                U32 b = regclass_superset[j];
+                U32 s = regclass_subset[j];
+                if (i)
+                {
+                    U32 t;
 
-		    t = MIRROR_BLOCK(b);
-		    b = MIRROR_BLOCK(s);
-		    s = t;
-		}
+                    t = MIRROR_BLOCK(b);
+                    b = MIRROR_BLOCK(s);
+                    s = t;
+                }
 
-		if (mask & b)
-		{
-		    mask |= s;
-		}
-	    }
-	}
+                if (mask & b)
+                {
+                    mask |= s;
+                }
+            }
+        }
     }
 
     return mask;
@@ -361,62 +380,62 @@ static int convert_desc_to_map(char *desc, int invert, U32 *map)
     if (p == desc)
     {
         rc_error = "no inversion flag before character class description";
-	return -1;
+        return -1;
     }
 
     while (p)
     {
         char sign = *(p - 1);
-	for (i = 0; i < SIZEOF_ARRAY(regclass_names); ++i)
-	{
-	    if (!strncmp(p + 6, regclass_names[i], strlen(regclass_names[i])))
-	    {
-		if (sign == '+')
-		{
-		    if (mask & (regclass_blocks[i] << MIRROR_SHIFT))
-		    {
-		        *map = invert ? 0 : EVERY_BLOCK;
-			return 1;
-		    }
+        for (i = 0; i < SIZEOF_ARRAY(regclass_names); ++i)
+        {
+            if (!strncmp(p + 6, regclass_names[i], strlen(regclass_names[i])))
+            {
+                if (sign == '+')
+                {
+                    if (mask & (regclass_blocks[i] << MIRROR_SHIFT))
+                    {
+                        *map = invert ? 0 : EVERY_BLOCK;
+                        return 1;
+                    }
 
-		    mask |= regclass_blocks[i];
-		}
-		else if (sign == '!')
-		{
-		    if (mask & regclass_blocks[i])
-		    {
-		        *map = invert ? 0 : EVERY_BLOCK;
-			return 1;
-		    }
+                    mask |= regclass_blocks[i];
+                }
+                else if (sign == '!')
+                {
+                    if (mask & regclass_blocks[i])
+                    {
+                        *map = invert ? 0 : EVERY_BLOCK;
+                        return 1;
+                    }
 
-		    mask |= (regclass_blocks[i] << MIRROR_SHIFT);
-		}
-		else
-		{
-		    rc_error = "unknown inversion flag before character class description";
-		    return -1;
-		}
-	    }
-	}
+                    mask |= (regclass_blocks[i] << MIRROR_SHIFT);
+                }
+                else
+                {
+                    rc_error = "unknown inversion flag before character class description";
+                    return -1;
+                }
+            }
+        }
 
-	p = strstr(p + 6, "utf8::");
+        p = strstr(p + 6, "utf8::");
     }
 
     /* fprintf(stderr, "parsed 0x%x\n", (unsigned)mask); */
 
     if ((mask & ALPHA_BLOCK) && (mask & NUMBER_BLOCK))
     {
-	mask |= ALNUM_BLOCK;
+        mask |= ALNUM_BLOCK;
     }
 
     if (invert)
     {
-	mask = MIRROR_BLOCK(mask);
+        mask = MIRROR_BLOCK(mask);
     }
 
     if ((mask & ALPHA_BLOCK) && (mask & NUMBER_BLOCK))
     {
-	mask |= ALNUM_BLOCK;
+        mask |= ALNUM_BLOCK;
     }
 
     *map = extend_mask(mask);
@@ -445,34 +464,52 @@ static UV *invlist_array(SV *invlist)
 
 static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
 {
-    /* 
+    /*
        Not quite what's in charclass_invlists.h - we skip the header
        as well as all ASCII values.
        Note that changes to the arrays may require changing the switch
        below.
     */
-    static UV perl_space_invlist[] = { 128, 133, 134, 160, 161, 5760,
-        5761, 6158, 6159, 8192, 8203, 8232, 8234, 8239, 8240, 8287,
-        8288, 12288, 12289 };
+    static UV perl_space_invlist[] = { 128,
+#if PERL_API_VERSION == 26
+#include "XPerlSpace.26"
+#else
+#if PERL_API_VERSION == 28
+#include "XPerlSpace.26"
+#else
+#if PERL_API_VERSION == 30
+#include "XPerlSpace.30"
+#else
+#error unexpected PERL_API_VERSION
+#endif
+#endif
+#endif
+    };
+
+#ifdef RC_UNCOND_CHARCLASS
+    static UV perl_space_short_invlist[] = { 256,
+#include "XPerlSpace.30a"
+    };
+#endif
 
     static UV horizontal_space_invlist[] = { 128, 160, 161, 5760, 5761,
         6158, 6159, 8192, 8203, 8239, 8240, 8287, 8288, 12288, 12289 };
 
     static UV vertical_space_invlist[] = { 128, 133, 134, 8232, 8234 };
 
-    static UV xposix_digit_invlist[] = { 128, 
+    static UV xposix_digit_invlist[] = { 128,
 #include "XPosixDigit.22"
     };
 
     static UV xposix_alnum_invlist[] = { 128,
-#if PERL_API_VERSION == 24
-#include "XPosixAlnum.24"
-#else
 #if PERL_API_VERSION == 26
 #include "XPosixAlnum.26"
 #else
 #if PERL_API_VERSION == 28
 #include "XPosixAlnum.28"
+#else
+#if PERL_API_VERSION == 30
+#include "XPosixAlnum.30"
 #else
 #error unexpected PERL_API_VERSION
 #endif
@@ -481,13 +518,13 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     };
 
     static UV xposix_alpha_invlist[] = { 128,
-#if PERL_API_VERSION == 24
-#include "XPosixAlpha.24"
-#else
 #if PERL_API_VERSION == 26
 #include "XPosixAlpha.26"
 #else
 #if PERL_API_VERSION == 28
+#include "XPosixAlpha.28"
+#else
+#if PERL_API_VERSION == 30
 #include "XPosixAlpha.28"
 #else
 #error unexpected PERL_API_VERSION
@@ -517,191 +554,207 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
 #endif
 
     ill = get_invlist_len(invlist);
+#ifdef DEBUG_dump_invlist
+    fprintf(stderr, "ill = %lu\n", ill);
+#endif
     ila = ill ? invlist_array(invlist) : 0;
 
     switch (ill)
     {
     case SIZEOF_ARRAY(perl_space_invlist):
         if (!memcmp(ila, perl_space_invlist, sizeof(perl_space_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_SPACE_BLOCK\n");
+            fprintf(stderr, "NOT_SPACE_BLOCK\n");
 #endif
-	    mask = NOT_SPACE_BLOCK;
-	}
+            mask = NOT_SPACE_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(perl_space_invlist) - 1:
         if (!memcmp(ila, perl_space_invlist + 1,
             sizeof(perl_space_invlist) - sizeof(perl_space_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "SPACE_BLOCK\n");
+            fprintf(stderr, "SPACE_BLOCK\n");
 #endif
-	    mask = SPACE_BLOCK;
-	}
+            mask = SPACE_BLOCK;
+        }
 
         break;
 
+#ifdef RC_UNCOND_CHARCLASS
+    case SIZEOF_ARRAY(perl_space_short_invlist):
+        if (!memcmp(ila, perl_space_short_invlist, sizeof(perl_space_short_invlist)))
+        {
+#ifdef DEBUG_dump_invlist
+            fprintf(stderr, "NOT_SPACE_BLOCK\n");
+#endif
+            mask = NOT_SPACE_BLOCK;
+        }
+
+        break;
+#endif
+
     case SIZEOF_ARRAY(horizontal_space_invlist):
         if (!memcmp(ila, horizontal_space_invlist, sizeof(horizontal_space_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_HORIZONTAL_SPACE_BLOCK\n");
+            fprintf(stderr, "NOT_HORIZONTAL_SPACE_BLOCK\n");
 #endif
-	    mask = NOT_HORIZONTAL_SPACE_BLOCK;
-	}
+            mask = NOT_HORIZONTAL_SPACE_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(horizontal_space_invlist) - 1:
         if (!memcmp(ila, horizontal_space_invlist + 1,
             sizeof(horizontal_space_invlist) - sizeof(horizontal_space_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "HORIZONTAL_SPACE_BLOCK\n");
+            fprintf(stderr, "HORIZONTAL_SPACE_BLOCK\n");
 #endif
-	    mask = HORIZONTAL_SPACE_BLOCK;
-	}
+            mask = HORIZONTAL_SPACE_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(vertical_space_invlist):
         if (!memcmp(ila, vertical_space_invlist, sizeof(vertical_space_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_VERTICAL_SPACE_BLOCK\n");
+            fprintf(stderr, "NOT_VERTICAL_SPACE_BLOCK\n");
 #endif
-	    mask = NOT_VERTICAL_SPACE_BLOCK;
-	}
+            mask = NOT_VERTICAL_SPACE_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(vertical_space_invlist) - 1:
         if (!memcmp(ila, vertical_space_invlist + 1,
             sizeof(vertical_space_invlist) - sizeof(vertical_space_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "VERTICAL_SPACE_BLOCK\n");
+            fprintf(stderr, "VERTICAL_SPACE_BLOCK\n");
 #endif
-	    mask = VERTICAL_SPACE_BLOCK;
-	}
+            mask = VERTICAL_SPACE_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_digit_invlist):
         if (!memcmp(ila, xposix_digit_invlist, sizeof(xposix_digit_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_NUMBER_BLOCK\n");
+            fprintf(stderr, "NOT_NUMBER_BLOCK\n");
 #endif
-	    mask = NOT_NUMBER_BLOCK;
-	}
+            mask = NOT_NUMBER_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_digit_invlist) - 1:
         if (!memcmp(ila, xposix_digit_invlist + 1,
             sizeof(xposix_digit_invlist) - sizeof(xposix_digit_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NUMBER_BLOCK\n");
+            fprintf(stderr, "NUMBER_BLOCK\n");
 #endif
-	    mask = NUMBER_BLOCK;
-	}
+            mask = NUMBER_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_alnum_invlist):
         if (!memcmp(ila, xposix_alnum_invlist, sizeof(xposix_alnum_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_ALNUM_BLOCK\n");
+            fprintf(stderr, "NOT_ALNUM_BLOCK\n");
 #endif
-	    mask = NOT_ALNUM_BLOCK;
-	}
+            mask = NOT_ALNUM_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_alnum_invlist) - 1:
         if (!memcmp(ila, xposix_alnum_invlist + 1,
             sizeof(xposix_alnum_invlist) - sizeof(xposix_alnum_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "ALNUM_BLOCK\n");
+            fprintf(stderr, "ALNUM_BLOCK\n");
 #endif
-	    mask = ALNUM_BLOCK;
-	}
+            mask = ALNUM_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_alpha_invlist):
         if (!memcmp(ila, xposix_alpha_invlist, sizeof(xposix_alpha_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_ALPHA_BLOCK\n");
+            fprintf(stderr, "NOT_ALPHA_BLOCK\n");
 #endif
-	    mask = NOT_ALPHA_BLOCK;
-	}
+            mask = NOT_ALPHA_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_alpha_invlist) - 1:
         if (!memcmp(ila, xposix_alpha_invlist + 1,
             sizeof(xposix_alpha_invlist) - sizeof(xposix_alpha_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "ALPHA_BLOCK\n");
+            fprintf(stderr, "ALPHA_BLOCK\n");
 #endif
-	    mask = ALPHA_BLOCK;
-	}
+            mask = ALPHA_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_word_invlist):
         if (!memcmp(ila, xposix_word_invlist, sizeof(xposix_word_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_ALPHA_BLOCK\n");
+            fprintf(stderr, "NOT_ALPHA_BLOCK\n");
 #endif
-	    mask = NOT_ALPHA_BLOCK;
-	}
+            mask = NOT_ALPHA_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_word_invlist) - 1:
         if (!memcmp(ila, xposix_word_invlist + 1,
             sizeof(xposix_word_invlist) - sizeof(xposix_word_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "ALPHA_BLOCK\n");
+            fprintf(stderr, "ALPHA_BLOCK\n");
 #endif
-	    mask = ALPHA_BLOCK;
-	}
+            mask = ALPHA_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_xdigit_invlist):
         if (!memcmp(ila, xposix_xdigit_invlist, sizeof(xposix_xdigit_invlist)))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NOT_NUMBER_BLOCK\n");
+            fprintf(stderr, "NOT_NUMBER_BLOCK\n");
 #endif
-	    mask = NOT_NUMBER_BLOCK;
-	}
+            mask = NOT_NUMBER_BLOCK;
+        }
 
         break;
 
     case SIZEOF_ARRAY(xposix_xdigit_invlist) - 1:
         if (!memcmp(ila, xposix_xdigit_invlist + 1,
             sizeof(xposix_xdigit_invlist) - sizeof(xposix_xdigit_invlist[0])))
-	{
+        {
 #ifdef DEBUG_dump_invlist
-	    fprintf(stderr, "NUMBER_BLOCK\n");
+            fprintf(stderr, "NUMBER_BLOCK\n");
 #endif
-	    mask = NUMBER_BLOCK;
-	}
+            mask = NUMBER_BLOCK;
+        }
 
         break;
     }
@@ -709,12 +762,12 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     if (mask)
     {
         if (invert)
-	{
-	    mask = MIRROR_BLOCK(mask);
-	}
+        {
+            mask = MIRROR_BLOCK(mask);
+        }
 
-	*map = extend_mask(mask);
-	return 1;
+        *map = extend_mask(mask);
+        return 1;
     }
 
 #ifdef DEBUG_dump_invlist
@@ -722,9 +775,9 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     div[2] = 0;
     for (i = 0; i < ill; ++i)
     {
-        fprintf(stderr, "%s%d", div, (int)(ila[i]));
-	div[0] = ',';
-	div[1] = '\n';
+        fprintf(stderr, "%s0x%x", div, (int)(ila[i]));
+        div[0] = ',';
+        div[1] = '\n';
     }
 
     fprintf(stderr, "\n");
@@ -747,53 +800,61 @@ static int convert_regclass_map(Arrow *a, U32 *map)
     n = ARG_LOC(a->rn);
     pr = RXi_GET(a->origin);
     if (!pr) /* this should have been tested by find_internal during
-		initialization, but just in case... */
+                initialization, but just in case... */
     {
         rc_error = "regexp_internal not found";
-	return -1;
+        return -1;
     }
 
     rdata = pr->data;
 
     if ((n < rdata->count) &&
-	(rdata->what[n] == 's')) {
+        (rdata->what[n] == 's')) {
         SV *rv = (SV *)(rdata->data[n]);
-	AV *av = (AV *)SvRV(rv);
-	SV **ary = AvARRAY(av);
-	SV *si = *ary;
+        AV *av = (AV *)SvRV(rv);
+        SV **ary = AvARRAY(av);
+        SV *si = *ary;
 
-	if (si && (si != &PL_sv_undef))
-        {
-	    /* From regcomp.c:regclass: the 0th element stores the
-	       character class description in its textual form. It isn't
-	       very clear what exactly the textual form is, but we hope
-	       it's 0-terminated. */
-	  return convert_desc_to_map(SvPV_nolen(*ary),
-	      !!(a->rn->flags & ANYOF_INVERT),
-	      map);
-	}
-/* FIXME: in perl 5.18, crashes for inverted classes */
-	else
-	{
-	    /* in perl 5.16, the textual form doesn't necessarily exist... */
-	    if (av_len(av) >= 3)
-	    {
-	        SV *invlist = ary[3];
-
-		if (SvUV(ary[4])) /* invlist_has_user_defined_property */
-		{
-		    /* fprintf(stderr, "invlist has user defined property\n"); */
-		    return 0;
-		}
-
-		return convert_invlist_to_map(invlist,
-		    !!(a->rn->flags & ANYOF_INVERT),
+#ifdef RC_UNCOND_CHARCLASS
+        /* from get_regclass_nonbitmap_data of perl 5.30.0: invlist is
+           in ary[0] */
+        return convert_invlist_to_map(si,
+                    !!(a->rn->flags & ANYOF_INVERT),
                     map);
-	    }
+#else
+        if (si && (si != &PL_sv_undef))
+        {
+            /* From regcomp.c:regclass: the 0th element stores the
+               character class description in its textual form. It isn't
+               very clear what exactly the textual form is, but we hope
+               it's 0-terminated. */
+          return convert_desc_to_map(SvPV_nolen(*ary),
+              !!(a->rn->flags & ANYOF_INVERT),
+              map);
+        }
+/* FIXME: in perl 5.18, crashes for inverted classes */
+        else
+        {
+            /* in perl 5.16, the textual form doesn't necessarily exist... */
+            if (av_len(av) >= 3)
+            {
+                SV *invlist = ary[3];
 
-	    /* fprintf(stderr, "regclass invlist not found\n"); */
-	    return 0;
-	}
+                if (SvUV(ary[4])) /* invlist_has_user_defined_property */
+                {
+                    /* fprintf(stderr, "invlist has user defined property\n"); */
+                    return 0;
+                }
+
+                return convert_invlist_to_map(invlist,
+                    !!(a->rn->flags & ANYOF_INVERT),
+                    map);
+            }
+
+            /* fprintf(stderr, "regclass invlist not found\n"); */
+            return 0;
+        }
+#endif
     }
 
     rc_error = "regclass not found";
@@ -810,19 +871,23 @@ static SV *get_invlist_sv(Arrow *a)
 
     if (data && data->count)
     {
-	const U32 n = ARG(a->rn);
+        const U32 n = ARG(a->rn);
 
-	if (data->what[n] == 's')
-	{
-	    SV * const rv = MUTABLE_SV(data->data[n]);
-	    AV * const av = MUTABLE_AV(SvRV(rv));
-	    SV **const ary = AvARRAY(av);
+        if (data->what[n] == 's')
+        {
+            SV * const rv = MUTABLE_SV(data->data[n]);
+            AV * const av = MUTABLE_AV(SvRV(rv));
+            SV **const ary = AvARRAY(av);
 
-	    if (av_tindex(av) >= 3)
-	    {
-		return ary[3];
-	    }
-	}
+#ifdef RC_UNCOND_CHARCLASS
+            return *ary;
+#else
+            if (av_tindex(av) >= 3)
+            {
+                return ary[3];
+            }
+#endif
+        }
     }
 
     return 0;
@@ -837,15 +902,19 @@ static int convert_map(Arrow *a, U32 *map)
     assert((a->rn->type == ANYOF) || (a->rn->type == ANYOFD));
     assert(map);
 
-    if (ANYOF_FLAGS(a->rn) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
+    if (ANYOF_FLAGS(a->rn) & (ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
+#ifdef RC_UNCOND_CHARCLASS
+            | ANYOF_INVERT
+#endif
+            ))
     {
         return convert_regclass_map(a, map);
     }
     else
     {
         /* fprintf(stderr, "zero map\n"); */
-	*map = 0;
-	return 1;
+        *map = 0;
+        return 1;
     }
 }
 
@@ -866,7 +935,7 @@ static int convert_class_narrow(Arrow *a, U32 *map)
     if (!mask)
     {
         /* fprintf(stderr, "class %d ignored\n", a->rn->flags); */
-	return 0;
+        return 0;
     }
 
     *map = mask;
@@ -885,7 +954,7 @@ static int convert_anyofm_to_bitmap(Arrow *a, unsigned char *b)
     unsigned needed = 1U << PL_bitcount[(U8)~FLAGS(n)];
     unsigned i;
     BitFlag bf;
-    
+
     memset(b, 0, ANYOF_BITMAP_SIZE);
     for (i = lowest; i <= 0xFF; i++)
     {
@@ -893,14 +962,14 @@ static int convert_anyofm_to_bitmap(Arrow *a, unsigned char *b)
         {
             init_bit_flag(&bf, i);
             b[bf.offs] |= bf.mask;
-            
+
             if (++count >= needed)
             {
                 return 1;
             }
         }
     }
-    
+
     return 0;
 }
 #endif
@@ -938,7 +1007,7 @@ static int get_assertion_offset(regnode *p)
     if (offs <= 2)
     {
         rc_error = "Assertion offset too small";
-	return -1;
+        return -1;
     }
 
     return offs;
@@ -949,34 +1018,39 @@ static int get_synth_offset(regnode *p)
     assert(!p->next_off);
 
     if (((p->type == EXACT) || (p->type == EXACTF) || (p->type == EXACTFU)) &&
-	(p->flags == 1))
+        (p->flags == 1))
     {
-	return 2;
+        return 2;
     }
     else if (trivial_nodes[p->type] ||
-	     (p->type == REG_ANY) || (p->type == SANY) ||
-	     (p->type == POSIXD) || (p->type == NPOSIXD) ||
-	     (p->type == POSIXU) || (p->type == NPOSIXU) ||
-	     (p->type == POSIXA) || (p->type == NPOSIXA))
+             (p->type == REG_ANY) || (p->type == SANY) ||
+             (p->type == POSIXD) || (p->type == NPOSIXD) ||
+             (p->type == POSIXU) || (p->type == NPOSIXU) ||
+             (p->type == POSIXA) || (p->type == NPOSIXA) ||
+             (p->type == LNBREAK))
     {
-	return 1;  
+        return 1;
     }
     else if ((p->type == ANYOF) || (p->type == ANYOFD))
     {
         /* other flags obviously exist, but they haven't been seen yet
-	   and it isn't clear what they mean */
+           and it isn't clear what they mean */
         unsigned int unknown = p->flags & ~(ANYOF_INVERT |
-	    ANYOF_MATCHES_ALL_ABOVE_BITMAP | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP);
+            ANYOF_MATCHES_ALL_ABOVE_BITMAP | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP);
         if (unknown)
-	{
-	    /* p[10] seems always 0 on Linux, but 0xfbfaf9f8 seen on
-	       Windows; for '[\\w\\-_.]+\\.', both 0 and 0x20202020
-	       observed in p[11] - wonder what those are... */
-	    rc_error = "Unknown bitmap format";
-	    return -1;
-	}
+        {
+            /* p[10] seems always 0 on Linux, but 0xfbfaf9f8 seen on
+               Windows; for '[\\w\\-_.]+\\.', both 0 and 0x20202020
+               observed in p[11] - wonder what those are... */
+            rc_error = "Unknown bitmap format";
+            return -1;
+        }
 
-	return 11;
+#ifndef RC_ANYOF_OFFSET
+        return 11;
+#else
+        return 10;
+#endif
     }
 #ifdef RC_ANYOFM
     else if (p->type == ANYOFM)
@@ -984,10 +1058,16 @@ static int get_synth_offset(regnode *p)
         return 2;
     }
 #endif
-    else if ((p->type == IFMATCH) || (p->type == UNLESSM) || 
-	(p->type == SUSPEND))
+#ifdef RC_NANYOFM
+    else if (p->type == NANYOFM)
     {
-	return get_assertion_offset(p);
+        return 2;
+    }
+#endif
+    else if ((p->type == IFMATCH) || (p->type == UNLESSM) ||
+        (p->type == SUSPEND))
+    {
+        return get_assertion_offset(p);
     }
 
     /* fprintf(stderr, "type %d\n", p->type); */
@@ -1003,10 +1083,10 @@ static int get_size(regnode *rn)
     while (e->type != END)
     {
         offs = GET_OFFSET(e);
-	if (offs <= 0)
-	{
-	    return -1;
-	}
+        if (offs <= 0)
+        {
+            return -1;
+        }
 
         e += offs;
     }
@@ -1033,7 +1113,7 @@ static regnode *find_internal(regexp *pt)
     if (pt->engine && (pt->engine != &PL_core_reg_engine))
     {
         rc_error = "Alternative regexp engine not supported";
-	return 0;
+        return 0;
     }
 #endif
 
@@ -1041,22 +1121,22 @@ static regnode *find_internal(regexp *pt)
     if (!pr)
     {
         rc_error = "Internal regexp not set";
-	return 0;
+        return 0;
     }
 
     p = pr->program;
     if (!p)
     {
         rc_error = "Compiled regexp not set";
-	return 0;
+        return 0;
     }
 
     if (!((p->flags == REG_MAGIC) &&
-	(p->next_off == 0)))
+        (p->next_off == 0)))
     {
         /* fprintf(stderr, "%d %d %d\n", p->flags, p->type, p->next_off); */
         rc_error = "Invalid regexp signature";
-	return 0;
+        return 0;
     }
 
 #ifdef DEBUG_dump_data
@@ -1064,14 +1144,14 @@ static regnode *find_internal(regexp *pt)
     if (rdata)
     {
         fprintf(stderr, "regexp data count = %d\n", (int)(rdata->count));
-	for (n = 0; n < rdata->count; ++n)
-	{
-	    fprintf(stderr, "\twhat[%d] = %c\n", n, rdata->what[n]);
-	}
+        for (n = 0; n < rdata->count; ++n)
+        {
+            fprintf(stderr, "\twhat[%d] = %c\n", n, rdata->what[n]);
+        }
     }
     else
     {
-	fprintf(stderr, "no regexp data\n");
+        fprintf(stderr, "no regexp data\n");
     }
 #endif
 
@@ -1090,7 +1170,7 @@ static unsigned char parse_hex_digit(char d)
     }
     else
     {
-	rv = 10 + (d - 'a');
+        rv = 10 + (d - 'a');
     }
 
     return rv;
@@ -1117,86 +1197,86 @@ static unsigned get_forced_semantics(REGEXP *pt)
 
     for (i = 0; i < prelen; ++i)
     {
-	c = precomp[i];
-	
-	if (c == '.')
-	{
-	    /* a dot does match Unicode character - the problem is
-	       that character might take up multiple bytes, and we
-	       don't want to match just one of them... */
-	    forced |= FORCED_BYTE;
-	}
-    
-	if (!quoted)
-	{
-	    /* technically, the backslash might be in a comment, but
-	       parsing that is too much hassle */
-	    if (c == '\\')
-	    {
-		quoted = 1;
-	    }
-	}
-	else
-	{
-	    matched = 0;
+        c = precomp[i];
 
-	    if (c == 'N')
-	    {
-	        /* we have special cases only for \r & \n... */
-	        if ((i + 8 < prelen) &&
-		    !memcmp(precomp + i + 1, "{U+00", 5) &&
-		    isxdigit(precomp[i + 6]) && isxdigit(precomp[i + 7]) &&
-		    (precomp[i + 8] == '}'))
-		{
-		    unsigned char x = parse_hex_byte(precomp + i + 6);
-		    if ((x != '\r') && (x != '\n'))
-		    {
-			forced |= FORCED_CHAR;
-		    }
+        if (c == '.')
+        {
+            /* a dot does match Unicode character - the problem is
+               that character might take up multiple bytes, and we
+               don't want to match just one of them... */
+            forced |= FORCED_BYTE;
+        }
 
-		    i += 8;
-		}
-		else if ((i + 1 < prelen) &&
-		    (precomp[i + 1] == '{'))
-		{
-		    forced |= FORCED_CHAR;
-		}
+        if (!quoted)
+        {
+            /* technically, the backslash might be in a comment, but
+               parsing that is too much hassle */
+            if (c == '\\')
+            {
+                quoted = 1;
+            }
+        }
+        else
+        {
+            matched = 0;
 
-		/* otherwise it's not an escape, but the inverse of \n
-		   - we aren't interested in that */
+            if (c == 'N')
+            {
+                /* we have special cases only for \r & \n... */
+                if ((i + 8 < prelen) &&
+                    !memcmp(precomp + i + 1, "{U+00", 5) &&
+                    isxdigit(precomp[i + 6]) && isxdigit(precomp[i + 7]) &&
+                    (precomp[i + 8] == '}'))
+                {
+                    unsigned char x = parse_hex_byte(precomp + i + 6);
+                    if ((x != '\r') && (x != '\n'))
+                    {
+                        forced |= FORCED_CHAR;
+                    }
 
-		matched = 1;
-	    }
-	    else if (c == 'x')
-	    {
-	        if ((i + 2 < prelen) &&
-		    isxdigit(precomp[i + 1]) && isxdigit(precomp[i + 2]))
-		{
-		    unsigned char x = parse_hex_byte(precomp + i + 1);
-		    if ((x != '\r') && (x != '\n'))
-		    {
-			forced |= FORCED_BYTE;
-		    }
+                    i += 8;
+                }
+                else if ((i + 1 < prelen) &&
+                    (precomp[i + 1] == '{'))
+                {
+                    forced |= FORCED_CHAR;
+                }
 
-		    matched = 1;
-		    i += 2;
-		}
-	    }
+                /* otherwise it's not an escape, but the inverse of \n
+                   - we aren't interested in that */
 
-	    /* ...and we aren't bothering to parse octal numbers
-	       and \x{n+} at all... */
+                matched = 1;
+            }
+            else if (c == 'x')
+            {
+                if ((i + 2 < prelen) &&
+                    isxdigit(precomp[i + 1]) && isxdigit(precomp[i + 2]))
+                {
+                    unsigned char x = parse_hex_byte(precomp + i + 1);
+                    if ((x != '\r') && (x != '\n'))
+                    {
+                        forced |= FORCED_BYTE;
+                    }
 
-	    if (!matched)
-	    {
-		init_bit_flag(&bf, (unsigned char)c);
-		if (forced_byte[bf.offs] & bf.mask)
-		{
-		    forced |= FORCED_BYTE;
-		}
-	    }
+                    matched = 1;
+                    i += 2;
+                }
+            }
 
-	    quoted = 0;
-	}
+            /* ...and we aren't bothering to parse octal numbers
+               and \x{n+} at all... */
+
+            if (!matched)
+            {
+                init_bit_flag(&bf, (unsigned char)c);
+                if (forced_byte[bf.offs] & bf.mask)
+                {
+                    forced |= FORCED_BYTE;
+                }
+            }
+
+            quoted = 0;
+        }
     }
 
     return forced;
@@ -1209,8 +1289,8 @@ static regnode *alloc_alt(regnode *p, int sz)
     alt = (regnode *)malloc(sizeof(regnode) * sz);
     if (!alt)
     {
-	rc_error = "Could not allocate memory for regexp copy";
-	return 0;
+        rc_error = "Could not allocate memory for regexp copy";
+        return 0;
     }
 
     memcpy(alt, p, sizeof(regnode) * sz);
@@ -1229,15 +1309,15 @@ static regnode *alloc_terminated(regnode *p, int sz)
     alt = alloc_alt(p, sz);
     if (!alt)
     {
-	return 0;
+        return 0;
     }
 
     last = alt[sz - 1].type;
     /* fprintf(stderr, "type: %d\n", last); */
     if ((last >= REGNODE_MAX) || !trivial_nodes[last])
     {
-	rc_error = "Alternative doesn't end like subexpression";
-	return 0;
+        rc_error = "Alternative doesn't end like subexpression";
+        return 0;
     }
 
     alt[sz - 1].type = END;
@@ -1248,18 +1328,32 @@ static int bump_exact(Arrow *a)
 {
     int offs;
 
-    assert((a->rn->type == EXACT) || (a->rn->type == EXACTF) || (a->rn->type == EXACTFU));
+    assert((a->rn->type == EXACT) || (a->rn->type == EXACTF) || (a->rn->type == EXACTFU)
+#ifdef RC_EXACT_ONLY8
+           || (a->rn->type == EXACT_ONLY8)
+#endif
+        );
 
-    offs = GET_OFFSET(a->rn); 
+    offs = GET_OFFSET(a->rn);
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
+
+#ifdef RC_EXACT_ONLY8
+    if (a->rn->type == EXACT_ONLY8)
+    {
+        while (*(((unsigned char *)((a)->rn + 1)) + (a)->spent) & 0x80)
+        {
+            ++(a->spent);
+        }
+    }
+#endif
 
     if (++(a->spent) >= a->rn->flags)
     {
-	a->spent = 0;
-	a->rn += offs;
+        a->spent = 0;
+        a->rn += offs;
     }
 
     return 1;
@@ -1274,10 +1368,10 @@ static int bump_regular(Arrow *a)
     assert(a->rn->type != EXACTF);
     assert(!a->spent);
 
-    offs = GET_OFFSET(a->rn); 
+    offs = GET_OFFSET(a->rn);
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
 
     a->rn += offs;
@@ -1288,9 +1382,13 @@ static int bump_with_check(Arrow *a)
 {
     if (a->rn->type == END)
     {
-	return 0;
+        return 0;
     }
-    else if ((a->rn->type == EXACT) || (a->rn->type == EXACTF) || (a->rn->type == EXACTFU))
+    else if ((a->rn->type == EXACT) || (a->rn->type == EXACTF) || (a->rn->type == EXACTFU)
+#ifdef RC_EXACT_ONLY8
+             || (a->rn->type == EXACT_ONLY8)
+#endif
+        )
     {
         return bump_exact(a);
     }
@@ -1310,19 +1408,19 @@ static int get_jump_offset(regnode *p)
     offs = GET_OFFSET(p);
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
 
     q = p + offs;
     while (trivial_nodes[q->type])
     {
         offs = GET_OFFSET(q);
-	if (offs <= 0)
-	{
-	    return -1;
-	}
+        if (offs <= 0)
+        {
+            return -1;
+        }
 
-	q += offs;
+        q += offs;
     }
 
     return q - p;
@@ -1334,13 +1432,13 @@ REGEXP *rc_regcomp(SV *rs)
 
     if (!rs)
     {
-	croak("No regexp to compare");
+        croak("No regexp to compare");
     }
 
     rx = pregcomp(rs, 0);
     if (!rx)
     {
-	croak("Cannot compile regexp");
+        croak("Cannot compile regexp");
     }
 
     return rx;
@@ -1367,12 +1465,12 @@ static int compare_mismatch(int anchored, Arrow *a1, Arrow *a2)
     else
     {
         rv = bump_with_check(a1);
-	if (rv <= 0)
-	{
-	    return rv;
-	}
+        if (rv <= 0)
+        {
+            return rv;
+        }
 
-	return compare(0, a1, a2);
+        return compare(0, a1, a2);
     }
 }
 
@@ -1404,12 +1502,12 @@ static int compare_tails(int anchored, Arrow *a1, Arrow *a2)
 
     if (!rv)
     {
-	rv = compare_mismatch(anchored, a1, a2);
+        rv = compare_mismatch(anchored, a1, a2);
     }
     else
     {
-	*a1 = tail1;
-	*a2 = tail2;
+        *a1 = tail1;
+        *a2 = tail2;
     }
 
     return rv;
@@ -1440,7 +1538,7 @@ static int compare_after_assertion(int anchored, Arrow *a1, Arrow *a2)
     offs = get_assertion_offset(a1->rn);
     if (offs < 0)
     {
-	return offs;
+        return offs;
     }
 
     tail1.origin = a1->origin;
@@ -1463,26 +1561,26 @@ static int compare_positive_assertions(int anchored, Arrow *a1, Arrow *a2)
     sz1 = get_assertion_offset(p1);
     if (sz1 < 0)
     {
-	return -1;
+        return -1;
     }
 
     sz2 = get_assertion_offset(p2);
     if (sz2 < 0)
     {
-	return -1;
+        return -1;
     }
 
     alt1 = alloc_terminated(p1 + 2, sz1 - 2);
     if (!alt1)
     {
-	return -1;
+        return -1;
     }
 
     alt2 = alloc_terminated(p2 + 2, sz2 - 2);
     if (!alt2)
     {
         free(alt1);
-	return -1;
+        return -1;
     }
 
     left.origin = a1->origin;
@@ -1498,7 +1596,7 @@ static int compare_positive_assertions(int anchored, Arrow *a1, Arrow *a2)
 
     if (rv <= 0)
     {
-	return rv;
+        return rv;
     }
 
     /* left & right.origin stays a1 & a2->origin, respectively */
@@ -1523,26 +1621,26 @@ static int compare_negative_assertions(int anchored, Arrow *a1, Arrow *a2)
     sz1 = get_assertion_offset(p1);
     if (sz1 < 0)
     {
-	return -1;
+        return -1;
     }
 
     sz2 = get_assertion_offset(p2);
     if (sz2 < 0)
     {
-	return -1;
+        return -1;
     }
 
     alt1 = alloc_terminated(p1 + 2, sz1 - 2);
     if (!alt1)
     {
-	return -1;
+        return -1;
     }
 
     alt2 = alloc_terminated(p2 + 2, sz2 - 2);
     if (!alt2)
     {
         free(alt1);
-	return -1;
+        return -1;
     }
 
     left.origin = a1->origin;
@@ -1558,7 +1656,7 @@ static int compare_negative_assertions(int anchored, Arrow *a1, Arrow *a2)
 
     if (rv <= 0)
     {
-	return rv;
+        return rv;
     }
 
     /* left & right.origin stays a1 & a2->origin, respectively */
@@ -1583,26 +1681,26 @@ static int compare_subexpressions(int anchored, Arrow *a1, Arrow *a2)
     sz1 = get_assertion_offset(p1);
     if (sz1 < 0)
     {
-	return -1;
+        return -1;
     }
 
     sz2 = get_assertion_offset(p2);
     if (sz2 < 0)
     {
-	return -1;
+        return -1;
     }
 
     alt1 = alloc_terminated(p1 + 2, sz1 - 2);
     if (!alt1)
     {
-	return -1;
+        return -1;
     }
 
     alt2 = alloc_terminated(p2 + 2, sz2 - 2);
     if (!alt2)
     {
         free(alt1);
-	return -1;
+        return -1;
     }
 
     left.origin = a1->origin;
@@ -1618,7 +1716,7 @@ static int compare_subexpressions(int anchored, Arrow *a1, Arrow *a2)
 
     if (rv <= 0)
     {
-	return rv;
+        return rv;
     }
 
     /* left & right.origin stays a1 & a2->origin, respectively */
@@ -1648,7 +1746,7 @@ static int compare_bol(int anchored, Arrow *a1, Arrow *a2)
     rv = compare(1, a1, a2);
     if (!rv)
     {
-	rv = compare_mismatch(0, a1, a2);
+        rv = compare_mismatch(0, a1, a2);
     }
 
     return rv;
@@ -1662,10 +1760,22 @@ static unsigned char get_bitmap_byte(regnode *p, int i)
     assert((p->type == ANYOF) || (p->type == ANYOFD));
 
     bitmap = (unsigned char *)(p + 2);
+#ifdef RC_SHORT_BITMAP
+    if ((i >= 16) && (p->type == ANYOFD) &&
+        (p->flags & ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER))
+    {
+        loc = 0xff;
+    }
+    else
+    {
+        loc = bitmap[i];
+    }
+#else
     loc = bitmap[i];
+#endif
     if (p->flags & ANYOF_INVERT)
     {
-	loc = ~loc;
+        loc = ~loc;
     }
 
     return loc;
@@ -1686,17 +1796,39 @@ static int compare_bitmaps(int anchored, Arrow *a1, Arrow *a2,
     for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
     {
         loc1 = b1 ? b1[i] : get_bitmap_byte(a1->rn, i);
-        loc2 = b2 ? b2[i] : get_bitmap_byte(a2->rn, i); 
-	if (loc1 & ~loc2)
-	{
-  	    /* fprintf(stderr, "compare_bitmaps fails at %d: %d does not imply %d\n",
-	        i, loc1, loc2); */
-	    return compare_mismatch(anchored, a1, a2);
+        loc2 = b2 ? b2[i] : get_bitmap_byte(a2->rn, i);
+        if (loc1 & ~loc2)
+        {
+            /* fprintf(stderr, "compare_bitmaps fails at %d: %d does not imply %d\n",
+                i, loc1, loc2); */
+            return compare_mismatch(anchored, a1, a2);
         }
     }
 
     return compare_tails(anchored, a1, a2);
 }
+
+#ifdef RC_NANYOFM
+static int compare_negative_bitmaps(int anchored, Arrow *a1, Arrow *a2,
+    unsigned char *b1, unsigned char *b2)
+{
+    unsigned char loc1, loc2;
+    int i;
+
+    assert(b1 && b2);
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        loc1 = b1[i];
+        loc2 = b2[i];
+        if (~loc1 & loc2)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
+    }
+
+    return compare_tails(anchored, a1, a2);
+}
+#endif
 
 static int compare_anyof_multiline(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -1712,29 +1844,29 @@ static int compare_anyof_multiline(int anchored, Arrow *a1, Arrow *a2)
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     init_bit_flag(&bf, '\n');
     for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
     {
         req = (i != bf.offs) ? 0 : bf.mask;
-	if (get_bitmap_byte(a1->rn, i) != req)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (get_bitmap_byte(a1->rn, i) != req)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     tail1 = *a1;
     if (bump_regular(&tail1) <= 0)
     {
-	return -1;
+        return -1;
     }
 
     tail2 = *a2;
     if (bump_regular(&tail2) <= 0)
     {
-	return -1;
+        return -1;
     }
 
     return compare(1, &tail1, &tail2);
@@ -1754,29 +1886,77 @@ static int compare_anyofm_multiline(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     init_bit_flag(&bf, '\n');
     for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
     {
         req = (i != bf.offs) ? 0 : bf.mask;
-	if (left[i] != req)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (left[i] != req)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     tail1 = *a1;
     if (bump_regular(&tail1) <= 0)
     {
-	return -1;
+        return -1;
     }
 
     tail2 = *a2;
     if (bump_regular(&tail2) <= 0)
     {
-	return -1;
+        return -1;
+    }
+
+    return compare(1, &tail1, &tail2);
+}
+#endif
+
+#ifdef RC_NANYOFM
+static int compare_nanyofm_multiline(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char req;
+    int i;
+    BitFlag bf;
+    Arrow tail1, tail2;
+    unsigned char left[ANYOF_BITMAP_SIZE];
+
+    assert(a1->rn->type == NANYOFM);
+    assert((a2->rn->type == MBOL) || (a2->rn->type == MEOL));
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        left[i] = ~left[i];
+    }
+
+    init_bit_flag(&bf, '\n');
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        req = (i != bf.offs) ? 0 : bf.mask;
+        if (left[i] != req)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
+    }
+
+    tail1 = *a1;
+    if (bump_regular(&tail1) <= 0)
+    {
+        return -1;
+    }
+
+    tail2 = *a2;
+    if (bump_regular(&tail2) <= 0)
+    {
+        return -1;
     }
 
     return compare(1, &tail1, &tail2);
@@ -1795,63 +1975,63 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
     extra_left = ANYOF_FLAGS(a1->rn) &
         ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP;
     if ((extra_left || (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)) &&
-	!(a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP))
+        !(a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP))
     {
         U32 m1, m2;
-	int cr1, cr2;
+        int cr1, cr2;
 
-	/* fprintf(stderr, "comparing invlists: left flags = 0x%x, right flags = 0x%x\n", (int)(a1->rn->flags), (int)(a2->rn->flags)); */
-	/* before recognizing standard invlists, check whether they
-	   aren't the same - this duplicates the code to get to the
-	   invlist, but works even for non-standard ones,
-	   e.g. [\da] */
-	if ((a1->rn->flags & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP) &&
-	    (a2->rn->flags & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP))
-	{
-	    SV *invlist1 = get_invlist_sv(a1);
-	    SV *invlist2 = get_invlist_sv(a2);
-	    if (invlist1 && invlist2)
-	    {
-	        UV ill1 = get_invlist_len(invlist1);
-	        UV ill2 = get_invlist_len(invlist2);
-		if (ill1 && (ill1 == ill2))
-		{
-		    UV *ila1 = invlist_array(invlist1);
-		    UV *ila2 = invlist_array(invlist2);
-		    if (!memcmp(ila1, ila2, ill1 * sizeof(UV)))
-		    {
-			return compare_bitmaps(anchored, a1, a2, 0, 0);
-		    }
-		}
-	    }
-	}
+        /* fprintf(stderr, "comparing invlists: left flags = 0x%x, right flags = 0x%x\n", (int)(a1->rn->flags), (int)(a2->rn->flags)); */
+        /* before recognizing standard invlists, check whether they
+           aren't the same - this duplicates the code to get to the
+           invlist, but works even for non-standard ones,
+           e.g. [\da] */
+        if ((a1->rn->flags & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP) &&
+            (a2->rn->flags & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP))
+        {
+            SV *invlist1 = get_invlist_sv(a1);
+            SV *invlist2 = get_invlist_sv(a2);
+            if (invlist1 && invlist2)
+            {
+                UV ill1 = get_invlist_len(invlist1);
+                UV ill2 = get_invlist_len(invlist2);
+                if (ill1 && (ill1 == ill2))
+                {
+                    UV *ila1 = invlist_array(invlist1);
+                    UV *ila2 = invlist_array(invlist2);
+                    if (!memcmp(ila1, ila2, ill1 * sizeof(UV)))
+                    {
+                        return compare_bitmaps(anchored, a1, a2, 0, 0);
+                    }
+                }
+            }
+        }
 
-	cr1 = convert_map(a1, &m1);
-	if (cr1 == -1)
-	{
-	    return -1;
-	}
+        cr1 = convert_map(a1, &m1);
+        if (cr1 == -1)
+        {
+            return -1;
+        }
 
-	cr2 = convert_map(a2, &m2);
-	if (cr2 == -1)
-	{
-	    return -1;
-	}
+        cr2 = convert_map(a2, &m2);
+        if (cr2 == -1)
+        {
+            return -1;
+        }
 
-	/* clearly this hould happen at a lower level, but there it
-	   breaks other paths... */
-	if (m2 & NOT_ALNUM_BLOCK)
-	{
-	    m2 |= NOT_ALPHA_BLOCK | NOT_NUMBER_BLOCK;
-	    m2 = extend_mask(m2);
-	}
+        /* clearly this hould happen at a lower level, but there it
+           breaks other paths... */
+        if (m2 & NOT_ALNUM_BLOCK)
+        {
+            m2 |= NOT_ALPHA_BLOCK | NOT_NUMBER_BLOCK;
+            m2 = extend_mask(m2);
+        }
 
-	if (!cr1 || !cr2 || (m1 & ~m2))
-	{
+        if (!cr1 || !cr2 || (m1 & ~m2))
+        {
             /* fprintf(stderr, "cr1 = %d, cr2 = %d, m1 = 0x%x, m2 = 0x%x\n",
                 cr1, cr2, (unsigned)m1, (unsigned)m2); */
             return compare_mismatch(anchored, a1, a2);
-	}
+        }
     }
 
     return compare_bitmaps(anchored, a1, a2, 0, 0);
@@ -1861,7 +2041,7 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
 static int compare_anyof_anyofm(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char right[ANYOF_BITMAP_SIZE];
-    
+
     /* fprintf(stderr, "enter compare_anyof_anyofm(%d\n", anchored); */
 
     assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
@@ -1869,12 +2049,12 @@ static int compare_anyof_anyofm(int anchored, Arrow *a1, Arrow *a2)
 
     if (ANYOF_FLAGS(a1->rn) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     if (!convert_anyofm_to_bitmap(a2, right))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, 0, right);
@@ -1883,7 +2063,7 @@ static int compare_anyof_anyofm(int anchored, Arrow *a1, Arrow *a2)
 static int compare_anyofm_anyof(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char left[ANYOF_BITMAP_SIZE];
-    
+
     /* fprintf(stderr, "enter compare_anyofm_anyof(%d\n", anchored); */
 
     assert(a1->rn->type == ANYOFM);
@@ -1891,7 +2071,7 @@ static int compare_anyofm_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, left, 0);
@@ -1901,21 +2081,103 @@ static int compare_anyofm_anyofm(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char left[ANYOF_BITMAP_SIZE];
     unsigned char right[ANYOF_BITMAP_SIZE];
-    
+
     assert(a1->rn->type == ANYOFM);
     assert(a2->rn->type == ANYOFM);
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
-      
+
     if (!convert_anyofm_to_bitmap(a2, right))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
-      
+
     return compare_bitmaps(anchored, a1, a2, left, right);
+}
+#endif
+
+#ifdef RC_NANYOFM
+static int compare_anyof_nanyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    int i;
+    unsigned char right[ANYOF_BITMAP_SIZE];
+
+    /* fprintf(stderr, "enter compare_anyof_nanyofn(%d\n", anchored); */
+
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
+    assert(a2->rn->type == NANYOFM);
+
+    /* fprintf(stderr, "left flags = 0x%x\n", a1->rn->flags); */
+
+    if ((a1->rn->flags & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP) ||
+        ((a1->rn->flags & ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER) &&
+         !(a1->rn->flags & ANYOF_INVERT)))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        right[i] = ~right[i];
+    }
+
+    return compare_bitmaps(anchored, a1, a2, 0, right);
+}
+
+static int compare_anyofm_nanyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    int i;
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    unsigned char right[ANYOF_BITMAP_SIZE];
+
+    assert(a1->rn->type == ANYOFM);
+    assert(a2->rn->type == NANYOFM);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        right[i] = ~right[i];
+    }
+
+    return compare_bitmaps(anchored, a1, a2, left, right);
+}
+
+static int compare_nanyofm_nanyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    unsigned char right[ANYOF_BITMAP_SIZE];
+
+    assert(a1->rn->type == NANYOFM);
+    assert(a2->rn->type == NANYOFM);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_negative_bitmaps(anchored, a1, a2, left, right);
 }
 #endif
 
@@ -1931,10 +2193,10 @@ static int compare_short_byte_class(int anchored, Arrow *a1, Arrow *a2,
     for (i = 0; i < left->expl_size; ++i)
     {
         init_bit_flag(&bf, (unsigned char)left->expl[i]);
-	if (!(get_bitmap_byte(a2->rn, bf.offs) & bf.mask))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!(get_bitmap_byte(a2->rn, bf.offs) & bf.mask))
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     return compare_tails(anchored, a1, a2);
@@ -1947,9 +2209,9 @@ static int compare_right_full(int anchored, Arrow *a1, Arrow *a2)
     for (i = 0; i < 16; ++i)
     {
         if (!(get_bitmap_byte(a2->rn, i) & 0xff))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     return compare_tails(anchored, a1, a2);
@@ -1966,7 +2228,7 @@ static int compare_posix_posix(int anchored, Arrow *a1, Arrow *a2)
     cr2 = convert_class(a2, &m2);
     if (!cr1 || !cr2 || (m1 & ~m2))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_tails(anchored, a1, a2);
@@ -1983,19 +2245,19 @@ static int compare_posix_negative_posix(int anchored, Arrow *a1, Arrow *a2)
     cr2 = convert_class(a2, &m2);
     if (!cr1 || !cr2)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     /* vertical space is not a strict subset of space, but it does
        have space elements, so we have to require space on the right */
     if ((m1 & VERTICAL_SPACE_BLOCK) && !(m2 & VERTICAL_SPACE_BLOCK))
     {
-	m1 |= SPACE_BLOCK;
+        m1 |= SPACE_BLOCK;
     }
 
     if (m1 & m2)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2007,9 +2269,9 @@ static int compare_negative_posix_negative_posix(int anchored, Arrow *a1, Arrow 
     int cr1, cr2;
 
     assert((a1->rn->type == NPOSIXD) || (a1->rn->type == NPOSIXU) ||
-	(a1->rn->type == NPOSIXA));
+        (a1->rn->type == NPOSIXA));
     assert((a2->rn->type == NPOSIXD) || (a2->rn->type == NPOSIXU) ||
-	(a2->rn->type == NPOSIXA));
+        (a2->rn->type == NPOSIXA));
 
     /* fprintf(stderr, "enter compare_negative_posix_negative_posix\n"); */
 
@@ -2017,7 +2279,7 @@ static int compare_negative_posix_negative_posix(int anchored, Arrow *a1, Arrow 
     cr2 = convert_negative_class(a2, &m2);
     if (!cr2 || !cr2 || (m1 & ~m2))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2028,15 +2290,15 @@ static int compare_exact_posix(int anchored, Arrow *a1, Arrow *a2)
     char *seq;
 
     assert((a1->rn->type == EXACT) || (a1->rn->type == EXACTF) ||
-	(a1->rn->type == EXACTFU));
+        (a1->rn->type == EXACTFU));
     assert((a2->rn->type == POSIXD) || (a2->rn->type == POSIXU) ||
-	(a2->rn->type == POSIXA));
+        (a2->rn->type == POSIXA));
 
     seq = GET_LITERAL(a1);
 
     if (!_generic_isCC_A(*seq, a2->rn->flags))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2056,10 +2318,10 @@ static int compare_exactf_posix(int anchored, Arrow *a1, Arrow *a2)
 
     for (i = 0; i < 2; ++i)
     {
-	if (!_generic_isCC_A(unf[i], a2->rn->flags))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!_generic_isCC_A(unf[i], a2->rn->flags))
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2071,13 +2333,13 @@ static int compare_exact_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     assert(a1->rn->type == EXACT);
     assert((a2->rn->type == NPOSIXD) || (a2->rn->type == NPOSIXU) ||
-	(a2->rn->type == NPOSIXA));
+        (a2->rn->type == NPOSIXA));
 
     seq = GET_LITERAL(a1);
 
     if (_generic_isCC_A(*seq, a2->rn->flags))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2091,17 +2353,17 @@ static int compare_exactf_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     assert((a1->rn->type == EXACTF) || (a1->rn->type == EXACTFU));
     assert((a2->rn->type == NPOSIXD) || (a2->rn->type == NPOSIXU) ||
-	(a2->rn->type == NPOSIXA));
+        (a2->rn->type == NPOSIXA));
 
     seq = GET_LITERAL(a1);
     init_unfolded(unf, *seq);
 
     for (i = 0; i < 2; ++i)
     {
-	if (_generic_isCC_A(unf[i], a2->rn->flags))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (_generic_isCC_A(unf[i], a2->rn->flags))
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2123,12 +2385,12 @@ static int compare_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
     /* fprintf(stderr, "enter compare_posix_anyof\n"); */
 
     assert((a1->rn->type == POSIXD) || (a1->rn->type == POSIXU) ||
-	(a1->rn->type == POSIXA));
+        (a1->rn->type == POSIXA));
     assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
     if (!convert_class_narrow(a1, &left_block))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     /* fprintf(stderr, "right flags = %d\n", a2->rn->flags); */
@@ -2137,35 +2399,37 @@ static int compare_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
     {
         U32 right_map;
 
-	/* apparently a special case... */
-	if (a2->rn->flags & ANYOF_INVERT)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+#ifndef RC_UNCOND_CHARCLASS
+        /* apparently a special case... */
+        if (a2->rn->flags & ANYOF_INVERT)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
+#endif
 
-	int cr = convert_map(a2, &right_map);
-	if (cr == -1)
-	{
-	    return -1;
-	}
+        int cr = convert_map(a2, &right_map);
+        if (cr == -1)
+        {
+            return -1;
+        }
 
-	if (!cr || !(right_map & left_block))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!cr || !(right_map & left_block))
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     /* fprintf(stderr, "left flags = %d\n", a1->rn->flags); */
 
     if (a1->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     b = posix_regclass_bitmaps[a1->rn->flags];
     if (!b)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, b, 0);
@@ -2184,8 +2448,10 @@ static int compare_negative_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_class_narrow(a1, &left_block))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
+
+    /* fprintf(stderr, "right flags = 0x%x\n", a2->rn->flags); */
 
     left_block = EVERY_BLOCK & ~left_block;
 
@@ -2195,35 +2461,44 @@ static int compare_negative_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
     {
         U32 right_map;
 
-	/* analogically with compare_posix_anyof but untested */
-	if (a2->rn->flags & ANYOF_INVERT)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+#ifndef RC_UNCOND_CHARCLASS
+        /* analogically with compare_posix_anyof but untested */
+        if (a2->rn->flags & ANYOF_INVERT)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
+#endif
 
-	int cr = convert_map(a2, &right_map);
-	if (cr == -1)
-	{
-	    return -1;
-	}
+        int cr = convert_map(a2, &right_map);
+        if (cr == -1)
+        {
+            return -1;
+        }
 
-	/* fprintf(stderr, "right map = 0x%x\n", (unsigned)right_map); */
+#ifdef RC_UNCOND_CHARCLASS
+        if (a2->rn->flags & ANYOF_INVERT)
+        {
+            right_map = EVERY_BLOCK & ~right_map;
+        }
+#endif
 
-	if (!cr || !(right_map & left_block))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        /* fprintf(stderr, "right map = 0x%x\n", (unsigned)right_map); */
+
+        if (!cr || !(right_map & left_block))
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     if (a1->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     b = posix_regclass_nbitmaps[a1->rn->flags];
     if (!b)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, b, 0);
@@ -2268,10 +2543,10 @@ static int compare_exactf_anyof(int anchored, Arrow *a1, Arrow *a2)
     for (i = 0; i < 2; ++i)
     {
         init_bit_flag(&bf, (unsigned char)unf[i]);
-	if (!(get_bitmap_byte(a2->rn, bf.offs) & bf.mask))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!(get_bitmap_byte(a2->rn, bf.offs) & bf.mask))
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2294,14 +2569,14 @@ static int compare_exact_anyofm(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a2, right))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     if (right[bf.offs] & bf.mask)
     {
         return compare_tails(anchored, a1, a2);
     }
-    
+
     return compare_mismatch(anchored, a1, a2);
 }
 
@@ -2323,21 +2598,181 @@ static int compare_exactf_anyofm(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a2, right))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     for (i = 0; i < 2; ++i)
     {
         init_bit_flag(&bf, left[i]);
         if (!(right[bf.offs] & bf.mask))
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
-    
+
     return compare_tails(anchored, a1, a2);
 }
 #endif
+
+#ifdef RC_NANYOFM
+static int compare_exact_nanyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    char *seq;
+    unsigned char right[ANYOF_BITMAP_SIZE];
+    BitFlag bf;
+
+    assert(a1->rn->type == EXACT);
+    assert(a2->rn->type == NANYOFM);
+
+    seq = GET_LITERAL(a1);
+    init_bit_flag(&bf, *seq);
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (right[bf.offs] & bf.mask)
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_tails(anchored, a1, a2);
+}
+
+static int compare_exactf_nanyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    char *seq;
+    int i;
+    char left[2];
+    unsigned char right[ANYOF_BITMAP_SIZE];
+    BitFlag bf;
+
+    assert((a1->rn->type == EXACTF) || (a1->rn->type == EXACTFU));
+    assert(a2->rn->type == NANYOFM);
+
+    seq = GET_LITERAL(a1);
+    init_unfolded(left, *seq);
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        right[i] = ~right[i];
+    }
+
+    for (i = 0; i < 2; ++i)
+    {
+        init_bit_flag(&bf, left[i]);
+        if (!(right[bf.offs] & bf.mask))
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
+    }
+
+    return compare_tails(anchored, a1, a2);
+}
+
+static int compare_posix_nanyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    int i;
+    unsigned char *b;
+    unsigned char right[ANYOF_BITMAP_SIZE];
+
+    assert((a1->rn->type == POSIXD) || (a1->rn->type == POSIXU) ||
+        (a1->rn->type == POSIXA));
+    assert(a2->rn->type == NANYOFM);
+
+    if (a1->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    b = posix_regclass_bitmaps[a1->rn->flags];
+    if (!b)
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        right[i] = ~right[i];
+    }
+
+    return compare_bitmaps(anchored, a1, a2, b, right);
+}
+
+static int compare_negative_posix_nanyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    int i;
+    unsigned char *b;
+    unsigned char right[ANYOF_BITMAP_SIZE];
+
+    assert((a1->rn->type == NPOSIXD) || (a1->rn->type == NPOSIXU) ||
+        (a1->rn->type == NPOSIXA));
+    assert(a2->rn->type == NANYOFM);
+
+    if (a1->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    /* positive, because negative bitmaps are compared below */
+    b = posix_regclass_bitmaps[a1->rn->flags];
+    if (!b)
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_negative_bitmaps(anchored, a1, a2, b, right);
+}
+#endif
+
+static int compare_exact_lnbreak(int anchored, Arrow *a1, Arrow *a2)
+{
+    char *cur;
+    char *next;
+
+    assert((a1->rn->type == EXACT) || (a1->rn->type == EXACTF) ||
+        (a1->rn->type == EXACTFU));
+    assert(a2->rn->type == LNBREAK);
+
+    cur = GET_LITERAL(a1);
+
+    /* first, check 2-character newline */
+    if ((*cur == '\r') && ((a1->spent + 1) < a1->rn->flags))
+    {
+        /* we're ignoring the possibility the \n is in a different
+           node, but that probably doesn't happen */
+        next = (((char *)(a1->rn + 1)) + a1->spent + 1);
+        if (*next == '\n')
+        {
+            ++(a1->spent);
+            return compare_tails(anchored, a1, a2);
+        }
+    }
+
+    /* otherwise, check vertical space */
+    if (!_generic_isCC_A(*cur, _CC_VERTSPACE))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_tails(anchored, a1, a2);
+}
 
 static int compare_exact_byte_class(int anchored, Arrow *a1, Arrow *a2,
     char *lookup)
@@ -2359,7 +2794,7 @@ static int compare_exact_byte_class(int anchored, Arrow *a1, Arrow *a2,
 static int compare_exact_multiline(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == EXACT) || (a1->rn->type == EXACTF) ||
-	(a1->rn->type == EXACTFU));
+        (a1->rn->type == EXACTFU));
     assert((a2->rn->type == MBOL) || (a2->rn->type == MEOL));
 
     return compare_exact_byte_class(anchored, a1, a2,
@@ -2373,12 +2808,12 @@ static int compare_sany_anyof(int anchored, Arrow *a1, Arrow *a2)
     assert(a1->rn->type == SANY);
     assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
-    /* fprintf(stderr, "left flags = 0x%x, right flags = 0x%x\n", 
+    /* fprintf(stderr, "left flags = 0x%x, right flags = 0x%x\n",
        a1->rn->flags, a2->rn->flags); */
 
     if (a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
-	return compare_right_full(anchored, a1, a2);
+        return compare_right_full(anchored, a1, a2);
     }
 
     return compare_mismatch(anchored, a1, a2);
@@ -2396,19 +2831,44 @@ static int compare_anyof_reg_any(int anchored, Arrow *a1, Arrow *a2)
 static int compare_anyofm_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char left[ANYOF_BITMAP_SIZE];
-    
+
     assert(a1->rn->type == ANYOFM);
     assert(a2->rn->type == REG_ANY);
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, left, ndot.nbitmap);
 }
 #endif
-	
+
+#ifdef RC_NANYOFM
+static int compare_nanyofm_reg_any(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+
+    assert(a1->rn->type == NANYOFM);
+    assert(a2->rn->type == REG_ANY);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_negative_bitmaps(anchored, a1, a2, left, ndot.bitmap);
+}
+#endif
+
+static int compare_anyof_lnbreak(int anchored, Arrow *a1, Arrow *a2)
+{
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
+    assert(a2->rn->type == LNBREAK);
+
+    return compare_bitmaps(anchored, a1, a2, 0, vertical_whitespace.bitmap);
+}
+
 static int compare_exact_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == EXACT) || (a1->rn->type == EXACTF) || (a1->rn->type == EXACTFU));
@@ -2429,14 +2889,14 @@ static int compare_anyof_posix(int anchored, Arrow *a1, Arrow *a2)
     if (a2->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
     {
         /* fprintf(stderr, "flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     b = posix_regclass_bitmaps[a2->rn->flags];
     if (!b)
     {
         /* fprintf(stderr, "no bitmap for flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, 0, b);
@@ -2447,7 +2907,7 @@ static int compare_anyofm_posix(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char *b;
     unsigned char left[ANYOF_BITMAP_SIZE];
-    
+
     /* fprintf(stderr, "enter compare_anyofm_posix\n"); */
 
     assert(a1->rn->type == ANYOFM);
@@ -2455,16 +2915,40 @@ static int compare_anyofm_posix(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
-    
+
     b = posix_regclass_bitmaps[a2->rn->flags];
     if (!b)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
-    
+
     return compare_bitmaps(anchored, a1, a2, left, b);
+}
+#endif
+
+#ifdef RC_NANYOFM
+static int compare_nanyofm_posix(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char *b;
+    unsigned char left[ANYOF_BITMAP_SIZE];
+
+    assert(a1->rn->type == NANYOFM);
+    assert((a2->rn->type == POSIXD) || (a2->rn->type == POSIXU) || (a2->rn->type == POSIXA));
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    b = posix_regclass_nbitmaps[a2->rn->flags];
+    if (!b)
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_negative_bitmaps(anchored, a1, a2, left, b);
 }
 #endif
 
@@ -2479,20 +2963,20 @@ static int compare_anyof_posixa(int anchored, Arrow *a1, Arrow *a2)
 
     if (ANYOF_FLAGS(a1->rn) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     if (a2->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
     {
         /* fprintf(stderr, "flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     b = posix_regclass_bitmaps[a2->rn->flags];
     if (!b)
     {
         /* fprintf(stderr, "no bitmap for flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, 0, b);
@@ -2511,14 +2995,14 @@ static int compare_anyof_negative_posix(int anchored, Arrow *a1, Arrow *a2)
     if (a2->rn->flags >= SIZEOF_ARRAY(posix_regclass_nbitmaps))
     {
         /* fprintf(stderr, "flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     b = posix_regclass_nbitmaps[a2->rn->flags];
     if (!b)
     {
         /* fprintf(stderr, "no negative bitmap for flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, 0, b);
@@ -2538,30 +3022,60 @@ static int compare_anyofm_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a1, anyof_bitmap))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     if (a2->rn->flags >= SIZEOF_ARRAY(posix_regclass_nbitmaps))
     {
         /* fprintf(stderr, "flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     posix_bitmap = posix_regclass_nbitmaps[a2->rn->flags];
     if (!posix_bitmap)
     {
         /* fprintf(stderr, "no negative bitmap for flags = %d\n", a2->rn->flags); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_bitmaps(anchored, a1, a2, anyof_bitmap, posix_bitmap);
 }
 #endif
 
+#ifdef RC_NANYOFM
+static int compare_nanyofm_negative_posix(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char *posix_bitmap;
+    unsigned char anyof_bitmap[ANYOF_BITMAP_SIZE];
+
+    assert(a1->rn->type == NANYOFM);
+    assert((a2->rn->type == NPOSIXD) || (a2->rn->type == NPOSIXU) ||
+        (a2->rn->type == NPOSIXA));
+
+    if (!convert_anyofm_to_bitmap(a1, anyof_bitmap))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (a2->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    posix_bitmap = posix_regclass_bitmaps[a2->rn->flags];
+    if (!posix_bitmap)
+    {
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_negative_bitmaps(anchored, a1, a2, anyof_bitmap, posix_bitmap);
+}
+#endif
+
 static int compare_posix_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == POSIXD) || (a1->rn->type == POSIXU) ||
-	(a1->rn->type == POSIXA));
+        (a1->rn->type == POSIXA));
     assert(a2->rn->type == REG_ANY);
 
     U8 flags = a1->rn->flags;
@@ -2574,7 +3088,7 @@ static int compare_posix_reg_any(int anchored, Arrow *a1, Arrow *a2)
 
     if (newline_posix_regclasses[flags])
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2595,7 +3109,21 @@ static int compare_negative_posix_reg_any(int anchored, Arrow *a1, Arrow *a2)
 
     if (!newline_posix_regclasses[flags])
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_tails(anchored, a1, a2);
+}
+
+static int compare_posix_lnbreak(int anchored, Arrow *a1, Arrow *a2)
+{
+    assert((a1->rn->type == POSIXD) || (a1->rn->type == POSIXU) ||
+        (a1->rn->type == POSIXA));
+    assert(a2->rn->type == LNBREAK);
+
+    if (a1->rn->flags != _CC_VERTSPACE)
+    {
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2613,7 +3141,7 @@ static int compare_anyof_exact(int anchored, Arrow *a1, Arrow *a2)
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     seq = GET_LITERAL(a2);
@@ -2622,10 +3150,10 @@ static int compare_anyof_exact(int anchored, Arrow *a1, Arrow *a2)
     for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
     {
         req = (i != bf.offs) ? 0 : bf.mask;
-	if (get_bitmap_byte(a1->rn, i) != req)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (get_bitmap_byte(a1->rn, i) != req)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2645,19 +3173,19 @@ static int compare_anyofm_exact(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
-    
+
     seq = GET_LITERAL(a2);
     init_bit_flag(&bf, *((unsigned char *)seq));
 
     for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
     {
         req = (i != bf.offs) ? 0 : bf.mask;
-	if (left[i] != req)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (left[i] != req)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     return compare_tails(anchored, a1, a2);
@@ -2677,7 +3205,7 @@ static int compare_anyof_exactf(int anchored, Arrow *a1, Arrow *a2)
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     seq = GET_LITERAL(a2);
@@ -2690,7 +3218,7 @@ static int compare_anyof_exactf(int anchored, Arrow *a1, Arrow *a2)
 
     if (bf[0].offs == bf[1].offs)
     {
-	bf[0].mask = bf[1].mask = bf[0].mask | bf[1].mask;
+        bf[0].mask = bf[1].mask = bf[0].mask | bf[1].mask;
     }
 
     memset(right, 0, ANYOF_BITMAP_SIZE);
@@ -2719,7 +3247,7 @@ static int compare_anyofm_exactf(int anchored, Arrow *a1, Arrow *a2)
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     seq = GET_LITERAL(a2);
@@ -2731,23 +3259,25 @@ static int compare_anyofm_exactf(int anchored, Arrow *a1, Arrow *a2)
         init_bit_flag(&bf, unf[i]);
         right[bf.offs] = bf.mask;
     }
-    
+
     return compare_bitmaps(anchored, a1, a2, left, right);
 }
 #endif
-    
+
 static int compare_exact_exact(int anchored, Arrow *a1, Arrow *a2)
 {
     char *q1, *q2;
 
+#ifndef RC_EXACT_ONLY8
     assert(a1->rn->type == EXACT);
     assert(a2->rn->type == EXACT);
+#endif
 
     q1 = GET_LITERAL(a1);
     q2 = GET_LITERAL(a2);
 
-    /* fprintf(stderr, "compare_exact_exact(%d, '%c', '%c')\n", anchored,
-     *q1, *q2); */
+    /* fprintf(stderr, "enter compare_exact_exact(%d, '%c', '%c')\n", anchored,
+        *q1, *q2); */
 
     if (*q1 != *q2)
     {
@@ -2836,32 +3366,32 @@ static int compare_left_branch(int anchored, Arrow *a1, Arrow *a2)
     while (p1->type == BRANCH)
     {
         if (p1->next_off == 0)
-	{
-	    rc_error = "Branch with zero offset";
-	    return -1;
-	}
+        {
+            rc_error = "Branch with zero offset";
+            return -1;
+        }
 
-	left.rn = p1 + 1;
-	left.spent = 0;
+        left.rn = p1 + 1;
+        left.spent = 0;
 
-	right.rn = a2->rn;
-	right.spent = a2->spent;
+        right.rn = a2->rn;
+        right.spent = a2->spent;
 
-	rv = compare(anchored, &left, &right);
-	/* fprintf(stderr, "rv = %d\n", rv); */
+        rv = compare(anchored, &left, &right);
+        /* fprintf(stderr, "rv = %d\n", rv); */
 
-	if (rv < 0)
-	{
-	    return rv;
-	}
+        if (rv < 0)
+        {
+            return rv;
+        }
 
-	if (!rv)
-	{
-  	    /* fprintf(stderr, "compare_left_branch doesn't match\n"); */
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!rv)
+        {
+            /* fprintf(stderr, "compare_left_branch doesn't match\n"); */
+            return compare_mismatch(anchored, a1, a2);
+        }
 
-	p1 += p1->next_off;
+        p1 += p1->next_off;
     }
 
     a1->rn = p1;
@@ -2870,7 +3400,7 @@ static int compare_left_branch(int anchored, Arrow *a1, Arrow *a2)
     tsz = get_size(a2->rn);
     if (tsz <= 0)
     {
-	return -1;
+        return -1;
     }
 
     a2->rn += tsz - 1;
@@ -2889,21 +3419,21 @@ static int compare_set(int anchored, Arrow *a1, Arrow *a2, unsigned char *b1)
     offs = GET_OFFSET(a1->rn);
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
 
     t1 = a1->rn + offs;
     sz = get_size(t1);
     if (sz < 0)
     {
-	return sz;
+        return sz;
     }
 
     alt = (regnode *)malloc(sizeof(regnode) * (2 + sz));
     if (!alt)
     {
         rc_error = "Couldn't allocate memory for alternative copy";
-	return -1;
+        return -1;
     }
 
     alt[0].flags = 1;
@@ -2917,43 +3447,49 @@ static int compare_set(int anchored, Arrow *a1, Arrow *a2, unsigned char *b1)
 
     for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
     {
+        loc = b1 ? b1[i] : get_bitmap_byte(a1->rn, i);
+        if ((i >= 16) && loc)
+        {
+            free(alt);
+            return compare_mismatch(anchored, a1, a2);
+        }
+
         power = 1;
-	for (j = 0; j < 8; ++j)
-	{
-            loc = b1 ? b1[i] : get_bitmap_byte(a1->rn, i);
-	    if (loc & power)
-	    {
-	        alt[1].flags = 8 * i + j;
-		left.rn = alt;
-		left.spent = 0;
+        for (j = 0; j < 8; ++j)
+        {
+            if (loc & power)
+            {
+                alt[1].flags = 8 * i + j;
+                left.rn = alt;
+                left.spent = 0;
 
-		right.rn = a2->rn;
-		right.spent = a2->spent;
+                right.rn = a2->rn;
+                right.spent = a2->spent;
 
-		rv = compare_right_branch(anchored, &left, &right);
-		if (rv < 0)
-		{
-		    free(alt);
-		    return rv;
-		}
+                rv = compare_right_branch(anchored, &left, &right);
+                if (rv < 0)
+                {
+                    free(alt);
+                    return rv;
+                }
 
-		if (!rv)
-		{
-		    free(alt);
-		    return compare_mismatch(anchored, a1, a2);
-		}
-	    }
+                if (!rv)
+                {
+                    free(alt);
+                    return compare_mismatch(anchored, a1, a2);
+                }
+            }
 
-	    power *= 2;
-	}
+            power *= 2;
+        }
     }
 
     free(alt);
 
     if (!right.rn)
     {
-	rc_error = "Empty mask not supported";
-	return -1;
+        rc_error = "Empty mask not supported";
+        return -1;
     }
 
     a1->rn = t1 + sz - 1;
@@ -2970,7 +3506,7 @@ static int compare_anyof_branch(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert(a2->rn->type == BRANCH);
-    
+
     return compare_set(anchored, a1, a2, 0);
 }
 
@@ -2978,15 +3514,15 @@ static int compare_anyof_branch(int anchored, Arrow *a1, Arrow *a2)
 static int compare_anyofm_branch(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char left[ANYOF_BITMAP_SIZE];
-    
+
     assert(a1->rn->type == ANYOFM);
     assert(a2->rn->type == BRANCH);
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
-    
+
     return compare_set(anchored, a1, a2, left);
 }
 #endif
@@ -3010,27 +3546,27 @@ static int compare_right_branch(int anchored, Arrow *a1, Arrow *a2)
     {
       /* fprintf(stderr, "p2->type = %d\n", p2->type); */
 
-	left.rn = a1->rn;
-	left.spent = a1->spent;
+        left.rn = a1->rn;
+        left.spent = a1->spent;
 
         if (p2->next_off == 0)
-	{
-	    rc_error = "Branch with offset zero";
-	    return -1;
-	}
+        {
+            rc_error = "Branch with offset zero";
+            return -1;
+        }
 
-	right.rn = p2 + 1;
-	right.spent = 0;
+        right.rn = p2 + 1;
+        right.spent = 0;
 
-	rv = compare(anchored, &left, &right);
-	/* fprintf(stderr, "got %d\n", rv); */
+        rv = compare(anchored, &left, &right);
+        /* fprintf(stderr, "got %d\n", rv); */
 
-	p2 += p2->next_off;
+        p2 += p2->next_off;
     }
 
     if (rv < 0)
     {
-	return rv;
+        return rv;
     }
 
     if (!rv)
@@ -3061,7 +3597,7 @@ static int compare_right_star(int anchored, Arrow *a1, Arrow *a2)
     sz = get_size(p2);
     if (sz < 0)
     {
-	return sz;
+        return sz;
     }
 
     left.origin = a1->origin;
@@ -3071,7 +3607,7 @@ static int compare_right_star(int anchored, Arrow *a1, Arrow *a2)
     offs = GET_OFFSET(p2);
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
 
     right.origin = a2->origin;
@@ -3081,32 +3617,32 @@ static int compare_right_star(int anchored, Arrow *a1, Arrow *a2)
     rv = compare(anchored, &left, &right);
     if (rv < 0)
     {
-	return rv;
+        return rv;
     }
 
     if (rv == 0)
     {
-	right.rn = p2 + 1;
-	right.spent = 0;
+        right.rn = p2 + 1;
+        right.spent = 0;
 
-	rv = compare(anchored, a1, &right);
-	if (rv < 0)
-	{
-	    return rv;
-	}
+        rv = compare(anchored, a1, &right);
+        if (rv < 0)
+        {
+            return rv;
+        }
 
-	if (!rv)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!rv)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
 
-	right.rn = p2;
-	right.spent = 0;
+        right.rn = p2;
+        right.spent = 0;
 
-	if (!anchored)
-	{
-	    rv = compare_right_star(1, a1, &right);
-	}
+        if (!anchored)
+        {
+            rv = compare_right_star(1, a1, &right);
+        }
     }
 
     if (rv <= 0)
@@ -3143,14 +3679,14 @@ static int compare_plus_plus(int anchored, Arrow *a1, Arrow *a2)
     rv = compare(1, &left, &right);
     if (rv)
     {
-	return rv;
+        return rv;
     }
 
     offs = GET_OFFSET(p1);
     /* fprintf(stderr, "offs = %d\n", offs); */
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
 
     left.origin = a1->origin;
@@ -3184,14 +3720,14 @@ static int compare_repeat_star(int anchored, Arrow *a1, Arrow *a2)
     /* fprintf(stderr, "inclusive compare returned %d\n", rv); */
     if (rv)
     {
-	return rv;
+        return rv;
     }
 
     offs = GET_OFFSET(p2);
     /* fprintf(stderr, "offs = %d\n", offs); */
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
 
     right.origin = a2->origin;
@@ -3203,23 +3739,28 @@ static int compare_repeat_star(int anchored, Arrow *a1, Arrow *a2)
 static int compare_right_curly_from_zero(int anchored, Arrow *a1, Arrow *a2)
 {
     regnode *p2, *alt;
-    short n, *cnt;
+    CurlyCount *cnt;
+#ifndef RC_UNSIGNED_COUNT
+    CurlyCount n;
+#endif
     Arrow left, right;
     int sz, rv, offs;
 
     p2 = a2->rn;
 
-    n = ((short *)(p2 + 1))[1];
+#ifndef RC_UNSIGNED_COUNT
+    n = ((CurlyCount *)(p2 + 1))[1];
     if (n <= 0)
     {
-	rc_error = "Curly must have positive maximum";
-	return -1;
+        rc_error = "Curly must have positive maximum";
+        return -1;
     }
+#endif
 
     sz = get_size(p2);
     if (sz < 0)
     {
-	return sz;
+        return sz;
     }
 
     left.origin = a1->origin;
@@ -3229,7 +3770,7 @@ static int compare_right_curly_from_zero(int anchored, Arrow *a1, Arrow *a2)
     offs = GET_OFFSET(p2);
     if (offs <= 0)
     {
-	return -1;
+        return -1;
     }
 
     right.origin = a2->origin;
@@ -3239,52 +3780,52 @@ static int compare_right_curly_from_zero(int anchored, Arrow *a1, Arrow *a2)
     rv = compare(anchored, &left, &right);
     if (rv < 0)
     {
-	return rv;
+        return rv;
     }
 
     if (rv == 0)
     {
         alt = alloc_alt(p2, sz);
-	if (!alt)
-	{
-	    return -1;
-	}
+        if (!alt)
+        {
+            return -1;
+        }
 
-	right.rn = alt + 2;
-	right.spent = 0;
+        right.rn = alt + 2;
+        right.spent = 0;
 
-	rv = compare(anchored, a1, &right);
-	if (rv < 0)
-	{
-	    free(alt);
-	    return rv;
-	}
+        rv = compare(anchored, a1, &right);
+        if (rv < 0)
+        {
+            free(alt);
+            return rv;
+        }
 
-	if (!rv)
-	{
-	    free(alt);
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!rv)
+        {
+            free(alt);
+            return compare_mismatch(anchored, a1, a2);
+        }
 
-	cnt = (short *)(alt + 1);
-	if (cnt[1] < INFINITE_COUNT)
-	{
-	    --cnt[1];
-	}
+        cnt = (CurlyCount *)(alt + 1);
+        if (cnt[1] < INFINITE_COUNT)
+        {
+            --cnt[1];
+        }
 
-	if ((cnt[1] > 0) && !anchored)
-	{
-	    right.rn = alt;
-	    right.spent = 0;
+        if ((cnt[1] > 0) && !anchored)
+        {
+            right.rn = alt;
+            right.spent = 0;
 
-	    rv = compare_right_curly_from_zero(1, a1, &right);
-	}
-	else
-	{
-  	    rv = 1;
-	}
+            rv = compare_right_curly_from_zero(1, a1, &right);
+        }
+        else
+        {
+            rv = 1;
+        }
 
-	free(alt);
+        free(alt);
     }
 
     if (rv <= 0)
@@ -3312,59 +3853,59 @@ static int compare_left_plus(int anchored, Arrow *a1, Arrow *a2)
     sz = get_size(p1);
     if (sz < 0)
     {
-	return -1;
+        return -1;
     }
 
     if (sz < 2)
     {
-	rc_error = "Left plus offset too small";
-	return -1;
+        rc_error = "Left plus offset too small";
+        return -1;
     }
 
     alt = alloc_alt(p1 + 1, sz - 1);
     if (!alt)
     {
-	return -1;
+        return -1;
     }
 
     if (anchored)
     {
-	offs = get_jump_offset(p1);
-	if (offs <= 0)
-	{
-	    return -1;
-	}
+        offs = get_jump_offset(p1);
+        if (offs <= 0)
+        {
+            return -1;
+        }
 
-	q = p1 + offs;
-	if (q->type != END)
-	{
-	    /* repeat with a tail after it can be more strict than a
-	       fixed-length match only if the tail is at least as
-	       strict as the repeated regexp */
-	    left.origin = a1->origin;
-	    left.rn = q;
-	    left.spent = 0;
+        q = p1 + offs;
+        if (q->type != END)
+        {
+            /* repeat with a tail after it can be more strict than a
+               fixed-length match only if the tail is at least as
+               strict as the repeated regexp */
+            left.origin = a1->origin;
+            left.rn = q;
+            left.spent = 0;
 
-	    end_offs = offs - 1;
-	    orig_type = alt[end_offs].type;
-	    alt[end_offs].type = END;
+            end_offs = offs - 1;
+            orig_type = alt[end_offs].type;
+            alt[end_offs].type = END;
 
-	    right.origin = a2->origin;
-	    right.rn = alt;
-	    right.spent = 0;
+            right.origin = a2->origin;
+            right.rn = alt;
+            right.spent = 0;
 
-	    /* fprintf(stderr, "comparing %d to %d\n", left.rn->type,
-	       right.rn->type); */
-	    rv = compare(1, &left, &right);
-	    /* fprintf(stderr, "compare returned %d\n", rv); */
-	    if (rv <= 0)
-	    {
-		free(alt);
-		return rv;
-	    }
+            /* fprintf(stderr, "comparing %d to %d\n", left.rn->type,
+               right.rn->type); */
+            rv = compare(1, &left, &right);
+            /* fprintf(stderr, "compare returned %d\n", rv); */
+            if (rv <= 0)
+            {
+                free(alt);
+                return rv;
+            }
 
-	    alt[end_offs].type = orig_type;
-	}
+            alt[end_offs].type = orig_type;
+        }
     }
 
     left.origin = a1->origin;
@@ -3389,13 +3930,13 @@ static int compare_right_plus(int anchored, Arrow *a1, Arrow *a2)
     sz = get_size(p2);
     if (sz < 0)
     {
-	return -1;
+        return -1;
     }
 
     if (sz < 2)
     {
-	rc_error = "Plus offset too small";
-	return -1;
+        rc_error = "Plus offset too small";
+        return -1;
     }
 
     /* fprintf(stderr, "sz = %d\n", sz); */
@@ -3408,7 +3949,7 @@ static int compare_right_plus(int anchored, Arrow *a1, Arrow *a2)
 
     if (rv < 0)
     {
-	return rv;
+        return rv;
     }
 
     if (!rv)
@@ -3437,20 +3978,22 @@ static int compare_curly_plus(int anchored, Arrow *a1, Arrow *a2)
 {
     regnode *p1, *p2;
     Arrow left, right;
-    short *cnt;
+    CurlyCount *cnt;
 
     p1 = a1->rn;
     assert((p1->type == CURLY) || (p1->type == CURLYM) ||
-	   (p1->type == CURLYX));
+           (p1->type == CURLYX));
     p2 = a2->rn;
     assert(p2->type == PLUS);
 
-    cnt = (short *)(p1 + 1);
+    cnt = (CurlyCount *)(p1 + 1);
+#ifndef RC_UNSIGNED_COUNT
     if (cnt[0] < 0)
     {
-	rc_error = "Left curly has negative minimum";
-	return -1;
+        rc_error = "Left curly has negative minimum";
+        return -1;
     }
+#endif
 
     if (!cnt[0])
     {
@@ -3467,7 +4010,7 @@ static int compare_curly_plus(int anchored, Arrow *a1, Arrow *a2)
 
     if (cnt[0] > 1)
     {
-	anchored = 1;
+        anchored = 1;
     }
 
     return compare(anchored, &left, &right);
@@ -3481,7 +4024,7 @@ static int compare_curly_star(int anchored, Arrow *a1, Arrow *a2)
 
     p1 = a1->rn;
     assert((p1->type == CURLY) || (p1->type == CURLYM) ||
-	   (p1->type == CURLYX));
+           (p1->type == CURLYX));
     p2 = a2->rn;
     assert(p2->type == STAR);
 
@@ -3496,7 +4039,7 @@ static int compare_curly_star(int anchored, Arrow *a1, Arrow *a2)
     rv = compare(1, &left, &right);
     if (!rv)
     {
-	rv = compare_next(anchored, a1, a2);
+        rv = compare_next(anchored, a1, a2);
     }
 
     return rv;
@@ -3506,21 +4049,23 @@ static int compare_plus_curly(int anchored, Arrow *a1, Arrow *a2)
 {
     regnode *p1, *p2, *e2;
     Arrow left, right;
-    short *cnt;
+    CurlyCount *cnt;
     int rv, offs;
 
     p1 = a1->rn;
     assert(p1->type == PLUS);
     p2 = a2->rn;
     assert((p2->type == CURLY) || (p2->type == CURLYM) ||
-	   (p2->type == CURLYX));
+           (p2->type == CURLYX));
 
-    cnt = (short *)(p2 + 1);
+    cnt = (CurlyCount *)(p2 + 1);
+#ifndef RC_UNSIGNED_COUNT
     if (cnt[0] < 0)
     {
-	rc_error = "Negative minimum for curly";
-	return -1;
+        rc_error = "Negative minimum for curly";
+        return -1;
     }
+#endif
 
     if (cnt[0] > 1) /* FIXME: fails '(?:aa)+' => 'a{2,}' */
     {
@@ -3534,16 +4079,16 @@ static int compare_plus_curly(int anchored, Arrow *a1, Arrow *a2)
     if (cnt[1] != INFINITE_COUNT)
     {
         offs = get_jump_offset(p2);
-	if (offs <= 0)
-	{
-	    return -1;
-	}
+        if (offs <= 0)
+        {
+            return -1;
+        }
 
-	e2 = p2 + offs;
-	if (e2->type != END)
-	{
-	    return compare_mismatch(anchored, a1, a2);	    
-	}
+        e2 = p2 + offs;
+        if (e2->type != END)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     right.origin = a2->origin;
@@ -3564,12 +4109,12 @@ static int compare_suspend_curly(int anchored, Arrow *a1, Arrow *a2)
     return compare(1, a1, a2);
 }
 
-static void dec_curly_counts(short *altcnt)
+static void dec_curly_counts(CurlyCount *altcnt)
 {
     --altcnt[0];
     if (altcnt[1] < INFINITE_COUNT)
     {
-	--altcnt[1];
+        --altcnt[1];
     }
 }
 
@@ -3578,113 +4123,113 @@ static int compare_left_curly(int anchored, Arrow *a1, Arrow *a2)
     regnode *p1, *alt, *q;
     Arrow left, right;
     int sz, rv, offs, end_offs;
-    short *cnt;
+    CurlyCount *cnt;
 
     /* fprintf(stderr, "enter compare_left_curly(%d, %d, %d)\n", anchored,
        a1->rn->type, a2->rn->type); */
 
     p1 = a1->rn;
     assert((p1->type == CURLY) || (p1->type == CURLYM) ||
-	   (p1->type == CURLYX));
+           (p1->type == CURLYX));
 
-    cnt = (short *)(p1 + 1);
+    cnt = (CurlyCount *)(p1 + 1);
     if (!cnt[0])
     {
         /* fprintf(stderr, "curly from 0\n"); */
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     sz = get_size(p1);
     if (sz < 0)
     {
-	return -1;
+        return -1;
     }
 
     if (sz < 3)
     {
-	rc_error = "Left curly offset too small";
-	return -1;
+        rc_error = "Left curly offset too small";
+        return -1;
     }
 
     if (cnt[0] > 1)
     {
         /* fprintf(stderr, "curly with non-trivial repeat count\n"); */
 
-	offs = GET_OFFSET(p1);
-	if (offs < 0)
-	{
-	    return -1;
-	}
-	
-	if (offs < 3)
-	{
-	    rc_error = "Left curly offset is too small";
-	    return -1;
-	}
+        offs = GET_OFFSET(p1);
+        if (offs < 0)
+        {
+            return -1;
+        }
+
+        if (offs < 3)
+        {
+            rc_error = "Left curly offset is too small";
+            return -1;
+        }
 
         alt = (regnode *)malloc(sizeof(regnode) * (offs - 2 + sz));
-	if (!alt)
-	{
-	    rc_error = "Could not allocate memory for unrolled curly";
-	    return -1;
-	}
+        if (!alt)
+        {
+            rc_error = "Could not allocate memory for unrolled curly";
+            return -1;
+        }
 
-	memcpy(alt, p1 + 2, (offs - 2) * sizeof(regnode));
-	memcpy(alt + offs - 2, p1, sz * sizeof(regnode));
+        memcpy(alt, p1 + 2, (offs - 2) * sizeof(regnode));
+        memcpy(alt + offs - 2, p1, sz * sizeof(regnode));
 
-	dec_curly_counts((short *)(alt + offs - 1));
+        dec_curly_counts((CurlyCount *)(alt + offs - 1));
 
-	left.origin = a1->origin;
-	left.rn = alt;
-	left.spent = 0;
-	rv = compare(1, &left, a2);
-	free(alt);
-	return rv;
+        left.origin = a1->origin;
+        left.rn = alt;
+        left.spent = 0;
+        rv = compare(1, &left, a2);
+        free(alt);
+        return rv;
     }
 
     if (anchored && !((cnt[0] == 1) && (cnt[1] == 1)))
     {
         /* fprintf(stderr, "anchored curly with variable length\n"); */
 
-	alt = alloc_alt(p1 + 2, sz - 2);
-	if (!alt)
-	{
-	    return -1;
-	}
+        alt = alloc_alt(p1 + 2, sz - 2);
+        if (!alt)
+        {
+            return -1;
+        }
 
-	offs = get_jump_offset(p1);
-	if (offs <= 0)
-	{
-	    return -1;
-	}
+        offs = get_jump_offset(p1);
+        if (offs <= 0)
+        {
+            return -1;
+        }
 
-	q = p1 + offs;
-	if (q->type != END)
-	{
-	    /* repeat with a tail after it can be more strict than a
-	       fixed-length match only if the tail is at least as
-	       strict as the repeated regexp */
-	    left.origin = a1->origin;
-	    left.rn = q;
-	    left.spent = 0;
+        q = p1 + offs;
+        if (q->type != END)
+        {
+            /* repeat with a tail after it can be more strict than a
+               fixed-length match only if the tail is at least as
+               strict as the repeated regexp */
+            left.origin = a1->origin;
+            left.rn = q;
+            left.spent = 0;
 
-	    end_offs = offs - 1;
-	    alt[end_offs].type = END;
+            end_offs = offs - 1;
+            alt[end_offs].type = END;
 
-	    right.origin = a2->origin;
-	    right.rn = alt;
-	    right.spent = 0;
+            right.origin = a2->origin;
+            right.rn = alt;
+            right.spent = 0;
 
-	    /* fprintf(stderr, "comparing %d to %d\n", left.rn->type,
-	       right.rn->type); */
-	    rv = compare(1, &left, &right);
-	    free(alt);
-	    /* fprintf(stderr, "compare returned %d\n", rv); */
-	    if (rv <= 0)
-	    {
-		return rv;
-	    }
-	}
+            /* fprintf(stderr, "comparing %d to %d\n", left.rn->type,
+               right.rn->type); */
+            rv = compare(1, &left, &right);
+            free(alt);
+            /* fprintf(stderr, "compare returned %d\n", rv); */
+            if (rv <= 0)
+            {
+                return rv;
+            }
+        }
     }
 
     left.origin = a1->origin;
@@ -3697,19 +4242,21 @@ static int compare_right_curly(int anchored, Arrow *a1, Arrow *a2)
 {
     regnode *p2, *alt;
     Arrow right;
-    short *cnt, *altcnt;
+    CurlyCount *cnt, *altcnt;
     int sz, rv, offs, nanch;
 
     /* fprintf(stderr, "enter compare_right_curly(%d...: a1->spent = %d, a2->spent = %d\n", anchored, a1->spent, a2->spent); */
 
     p2 = a2->rn;
 
-    cnt = (short *)(p2 + 1);
+    cnt = (CurlyCount *)(p2 + 1);
+#ifndef RC_UNSIGNED_COUNT
     if (cnt[0] < 0)
     {
-	rc_error = "Curly has negative minimum";
-	return -1;
+        rc_error = "Curly has negative minimum";
+        return -1;
     }
+#endif
 
     /* fprintf(stderr, "compare_right_curly: minimal repeat count = %d\n", cnt[0]); */
 
@@ -3719,126 +4266,126 @@ static int compare_right_curly(int anchored, Arrow *a1, Arrow *a2)
     {
         /* the repeated expression is mandatory: */
         sz = get_size(p2);
-	if (sz < 0)
-	{
-	    return sz;
-	}
+        if (sz < 0)
+        {
+            return sz;
+        }
 
-	if (sz < 3)
-	{
-	    rc_error = "Right curly offset too small";
-	    return -1;
-	}
+        if (sz < 3)
+        {
+            rc_error = "Right curly offset too small";
+            return -1;
+        }
 
-	right.origin = a2->origin;
-	right.rn = p2 + 2;
-	right.spent = 0;
+        right.origin = a2->origin;
+        right.rn = p2 + 2;
+        right.spent = 0;
 
-	rv = compare(anchored, a1, &right);
-	/* fprintf(stderr, "compare_right_curly: compare returned %d\n", rv); */
-	if (rv < 0)
-	{
-	    return rv;
-	}
+        rv = compare(anchored, a1, &right);
+        /* fprintf(stderr, "compare_right_curly: compare returned %d\n", rv); */
+        if (rv < 0)
+        {
+            return rv;
+        }
 
-	if (!rv)
-	{
-	    /* ...or (if we aren't anchored yet) just do the left tail... */
-	    rv = compare_mismatch(anchored, a1, a2);
-	    if (rv)
-	    {
-		return rv;
-	    }
+        if (!rv)
+        {
+            /* ...or (if we aren't anchored yet) just do the left tail... */
+            rv = compare_mismatch(anchored, a1, a2);
+            if (rv)
+            {
+                return rv;
+            }
 
-	    /* ...or (last try) unroll the repeat (works for e.g.
-	       'abbc' vs. 'ab{2}c' */
-	    if (cnt[0] > 1)
-	    {
-		offs = GET_OFFSET(p2);
-		if (offs < 0)
-		{
-		    return -1;
-		}
+            /* ...or (last try) unroll the repeat (works for e.g.
+               'abbc' vs. 'ab{2}c' */
+            if (cnt[0] > 1)
+            {
+                offs = GET_OFFSET(p2);
+                if (offs < 0)
+                {
+                    return -1;
+                }
 
-		if (offs < 3)
-		{
-		    rc_error = "Left curly offset is too small";
-		    return -1;
-		}
+                if (offs < 3)
+                {
+                    rc_error = "Left curly offset is too small";
+                    return -1;
+                }
 
-		alt = (regnode *)malloc(sizeof(regnode) * (offs - 2 + sz));
-		if (!alt)
-		{
-		    rc_error = "Couldn't allocate memory for unrolled curly";
-		    return -1;
-		}
+                alt = (regnode *)malloc(sizeof(regnode) * (offs - 2 + sz));
+                if (!alt)
+                {
+                    rc_error = "Couldn't allocate memory for unrolled curly";
+                    return -1;
+                }
 
-		memcpy(alt, p2 + 2, (offs - 2) * sizeof(regnode));
-		memcpy(alt + offs - 2, p2, sz * sizeof(regnode));
+                memcpy(alt, p2 + 2, (offs - 2) * sizeof(regnode));
+                memcpy(alt + offs - 2, p2, sz * sizeof(regnode));
 
-		dec_curly_counts((short *)(alt + offs - 1));
+                dec_curly_counts((CurlyCount *)(alt + offs - 1));
 
-		right.origin = a2->origin;
-		right.rn = alt;
-		right.spent = 0;
+                right.origin = a2->origin;
+                right.rn = alt;
+                right.spent = 0;
 
-		rv = compare(anchored, a1, &right);
-		free(alt);
-		return rv;
-	    }
+                rv = compare(anchored, a1, &right);
+                free(alt);
+                return rv;
+            }
 
-	    return 0;
-	}
+            return 0;
+        }
 
-	if (cnt[0] == 1)
-	{
-	    return 1;
-	}
+        if (cnt[0] == 1)
+        {
+            return 1;
+        }
 
-	if (a1->rn->type == END)
-	{
-	    /* we presume the repeated argument matches something, which
-	       isn't guaranteed, but it is conservative */
-	    return 0;
-	}
+        if (a1->rn->type == END)
+        {
+            /* we presume the repeated argument matches something, which
+               isn't guaranteed, but it is conservative */
+            return 0;
+        }
 
-	/* strictly speaking, matching one repeat didn't *necessarily*
-	   anchor the match, but we'll ignore such cases as
-	   pathological */
-	nanch = 1;
+        /* strictly speaking, matching one repeat didn't *necessarily*
+           anchor the match, but we'll ignore such cases as
+           pathological */
+        nanch = 1;
 
-	alt = alloc_alt(p2, sz);
-	if (!alt)
-	{
-	    return -1;
-	}
+        alt = alloc_alt(p2, sz);
+        if (!alt)
+        {
+            return -1;
+        }
 
-	altcnt = (short *)(alt + 1);
-	dec_curly_counts(altcnt);
-	if (altcnt[1] > 0)
-	{
-	    right.origin = a2->origin;
-	    right.rn = alt;
-	    right.spent = 0;
+        altcnt = (CurlyCount *)(alt + 1);
+        dec_curly_counts(altcnt);
+        if (altcnt[1] > 0)
+        {
+            right.origin = a2->origin;
+            right.rn = alt;
+            right.spent = 0;
 
-	    rv = compare_right_curly(nanch, a1, &right);
-	}
-	else
-	{
-	    rv = 1;
-	}
+            rv = compare_right_curly(nanch, a1, &right);
+        }
+        else
+        {
+            rv = 1;
+        }
 
-	free(alt);
+        free(alt);
 
-	if (rv <= 0)
-	{
-	    return rv;
-	}
+        if (rv <= 0)
+        {
+            return rv;
+        }
 
-	a2->rn += sz - 1;
-	assert(a2->rn->type == END);
-	a2->spent = 0;
-	return rv;
+        a2->rn += sz - 1;
+        assert(a2->rn->type == END);
+        a2->spent = 0;
+        return rv;
     }
 
     return compare_right_curly_from_zero(nanch, a1, a2);
@@ -3848,33 +4395,37 @@ static int compare_curly_curly(int anchored, Arrow *a1, Arrow *a2)
 {
     regnode *p1, *p2, *e2;
     Arrow left, right;
-    short *cnt1, *cnt2;
+    CurlyCount *cnt1, *cnt2;
     int rv, offs;
 
     /* fprintf(stderr, "enter compare_curly_curly(%d...)\n", anchored); */
 
     p1 = a1->rn;
     assert((p1->type == CURLY) || (p1->type == CURLYM) ||
-	   (p1->type == CURLYX));
+           (p1->type == CURLYX));
     p2 = a2->rn;
     assert((p2->type == CURLY) || (p2->type == CURLYM) ||
-	   (p2->type == CURLYX));
+           (p2->type == CURLYX));
 
-    cnt1 = (short *)(p1 + 1);
+    cnt1 = (CurlyCount *)(p1 + 1);
+#ifndef RC_UNSIGNED_COUNT
     /* fprintf(stderr, "*cnt1 = %d\n", cnt1[0]); */
     if (cnt1[0] < 0)
     {
-	rc_error = "Negative minimum for left curly";
-	return -1;
+        rc_error = "Negative minimum for left curly";
+        return -1;
     }
+#endif
 
-    cnt2 = (short *)(p2 + 1);
+    cnt2 = (CurlyCount *)(p2 + 1);
+#ifndef RC_UNSIGNED_COUNT
     /* fprintf(stderr, "*cnt2 = %d\n", cnt2[0]); */
     if (cnt2[0] < 0)
     {
-	rc_error = "Negative minimum for right curly";
-	return -1;
+        rc_error = "Negative minimum for right curly";
+        return -1;
     }
+#endif
 
     if (cnt2[0] > cnt1[0]) /* FIXME: fails '(?:aa){1,}' => 'a{2,}' */
     {
@@ -3888,19 +4439,19 @@ static int compare_curly_curly(int anchored, Arrow *a1, Arrow *a2)
 
     if (cnt1[1] > cnt2[1])
     {
-	offs = get_jump_offset(p2);
+        offs = get_jump_offset(p2);
         /* fprintf(stderr, "offs = %d\n", offs); */
-	if (offs <= 0)
-	{
-	    return -1;
-	}
+        if (offs <= 0)
+        {
+            return -1;
+        }
 
-	e2 = p2 + offs;
+        e2 = p2 + offs;
         /* fprintf(stderr, "e2->type = %d\n", e2->type); */
-	if (e2->type != END)
-	{
-	    return compare_mismatch(anchored, a1, a2);	    
-	}
+        if (e2->type != END)
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
 
     right.origin = a2->origin;
@@ -3930,7 +4481,7 @@ static int compare_bound(int anchored, Arrow *a1, Arrow *a2,
 
     if (bump_with_check(&left) <= 0)
     {
-	return -1;
+        return -1;
     }
 
     t = left.rn->type;
@@ -3944,46 +4495,46 @@ static int compare_bound(int anchored, Arrow *a1, Arrow *a2,
         /* fprintf(stderr, "next is bitmap; flags = 0x%x\n", left.rn->flags); */
 
         if (left.rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
 
-	for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
-	{
-	    if (get_bitmap_byte(left.rn, i) & ~bitmap[i])
-	    {
-		return compare_mismatch(anchored, a1, a2);
-	    }
-	}
+        for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+        {
+            if (get_bitmap_byte(left.rn, i) & ~bitmap[i])
+            {
+                return compare_mismatch(anchored, a1, a2);
+            }
+        }
     }
     else if ((t == EXACT) || (t == EXACTF) || (t == EXACTFU))
     {
         seq = GET_LITERAL(&left);
-	if (!lookup[(unsigned char)(*seq)])
-	{
-	    return compare_mismatch(anchored, a1, a2);
-	}
+        if (!lookup[(unsigned char)(*seq)])
+        {
+            return compare_mismatch(anchored, a1, a2);
+        }
     }
     else if ((t == POSIXD) || (t == NPOSIXD) || (t == POSIXU) || (t == NPOSIXU))
     {
       U8 flags = left.rn->flags;
       if ((flags >= regclasses_size) || !regclasses[flags])
       {
-	  return compare_mismatch(anchored, a1, a2);
+          return compare_mismatch(anchored, a1, a2);
       }
     }
     else if (!oktypes[t])
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     right = *a2;
     if (bump_with_check(&right) <= 0)
     {
-	return -1;
+        return -1;
     }
 
-    return move_left ? compare(1, &left, &right) : 
+    return move_left ? compare(1, &left, &right) :
         compare(anchored, a1, &right);
 }
 
@@ -3991,28 +4542,28 @@ static int compare_bol_word(int anchored, Arrow *a1, Arrow *a2)
 {
     return compare_bound(anchored, a1, a2, 1, word_bc.bitmap,
         word_bc.lookup, alphanumeric_classes,
-	word_posix_regclasses, SIZEOF_ARRAY(word_posix_regclasses));
+        word_posix_regclasses, SIZEOF_ARRAY(word_posix_regclasses));
 }
 
 static int compare_bol_nword(int anchored, Arrow *a1, Arrow *a2)
 {
     return compare_bound(anchored, a1, a2, 1, word_bc.nbitmap,
         word_bc.nlookup, non_alphanumeric_classes,
-	non_word_posix_regclasses, SIZEOF_ARRAY(non_word_posix_regclasses));
+        non_word_posix_regclasses, SIZEOF_ARRAY(non_word_posix_regclasses));
 }
 
 static int compare_next_word(int anchored, Arrow *a1, Arrow *a2)
 {
     return compare_bound(anchored, a1, a2, 0, word_bc.bitmap,
         word_bc.lookup, alphanumeric_classes,
-	word_posix_regclasses, SIZEOF_ARRAY(word_posix_regclasses));
+        word_posix_regclasses, SIZEOF_ARRAY(word_posix_regclasses));
 }
 
 static int compare_next_nword(int anchored, Arrow *a1, Arrow *a2)
 {
     return compare_bound(anchored, a1, a2, 0, word_bc.nbitmap,
         word_bc.nlookup, non_alphanumeric_classes,
-	non_word_posix_regclasses, SIZEOF_ARRAY(non_word_posix_regclasses));
+        non_word_posix_regclasses, SIZEOF_ARRAY(non_word_posix_regclasses));
 }
 
 static int compare_anyof_bounds(int anchored, Arrow *a1, Arrow *a2,
@@ -4029,28 +4580,28 @@ static int compare_anyof_bounds(int anchored, Arrow *a1, Arrow *a2,
         loc = bitmap1 ? bitmap1[i] : get_bitmap_byte(a1->rn, i);
 
         if (loc & ~bitmap2[i])
-	{
-	     cmp[0] = 0;
-	}
+        {
+             cmp[0] = 0;
+        }
 
         if (loc & bitmap2[i])
-	{
-	     cmp[1] = 0;
-	}
+        {
+             cmp[1] = 0;
+        }
     }
 
     if (cmp[0] && cmp[1])
     {
-	rc_error = "Zero bitmap";
-	return -1;
+        rc_error = "Zero bitmap";
+        return -1;
     }
 
     for (i = 0; i < SIZEOF_ARRAY(cmp); ++i)
     {
         if (cmp[i])
-	{
-	    return (cmp[i])(anchored, a1, a2);
-	}
+        {
+            return (cmp[i])(anchored, a1, a2);
+        }
     }
 
     /* if would be more elegant to use compare_mismatch as a sentinel
@@ -4066,7 +4617,7 @@ static int compare_anyof_bound(int anchored, Arrow *a1, Arrow *a2)
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_anyof_bounds(anchored, a1, a2, 0, word_bc.nbitmap);
@@ -4079,7 +4630,7 @@ static int compare_anyof_nbound(int anchored, Arrow *a1, Arrow *a2)
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_anyof_bounds(anchored, a1, a2, 0, word_bc.bitmap);
@@ -4089,13 +4640,13 @@ static int compare_anyof_nbound(int anchored, Arrow *a1, Arrow *a2)
 static int compare_anyofm_bound(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char left[ANYOF_BITMAP_SIZE];
-    
+
     assert(a1->rn->type == ANYOFM);
     assert(a2->rn->type == BOUND);
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_anyof_bounds(anchored, a1, a2, left, word_bc.nbitmap);
@@ -4104,13 +4655,13 @@ static int compare_anyofm_bound(int anchored, Arrow *a1, Arrow *a2)
 static int compare_anyofm_nbound(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char left[ANYOF_BITMAP_SIZE];
-    
+
     assert(a1->rn->type == ANYOFM);
-    assert(a2->rn->type == BOUND);
+    assert(a2->rn->type == NBOUND);
 
     if (!convert_anyofm_to_bitmap(a1, left))
     {
-	return compare_mismatch(anchored, a1, a2);
+        return compare_mismatch(anchored, a1, a2);
     }
 
     return compare_anyof_bounds(anchored, a1, a2, left, word_bc.bitmap);
@@ -4123,7 +4674,7 @@ static int compare_exact_bound(int anchored, Arrow *a1, Arrow *a2)
     FCompare cmp;
 
     assert((a1->rn->type == EXACT) || (a1->rn->type == EXACTF) ||
-	(a1->rn->type == EXACTFU));
+        (a1->rn->type == EXACTFU));
     assert(a2->rn->type == BOUND);
 
     seq = GET_LITERAL(a1);
@@ -4139,7 +4690,7 @@ static int compare_exact_nbound(int anchored, Arrow *a1, Arrow *a2)
     FCompare cmp;
 
     assert((a1->rn->type == EXACT) || (a1->rn->type == EXACTF) ||
-	(a1->rn->type == EXACTFU));
+        (a1->rn->type == EXACTFU));
     assert(a2->rn->type == NBOUND);
 
     seq = GET_LITERAL(a1);
@@ -4152,20 +4703,20 @@ static int compare_exact_nbound(int anchored, Arrow *a1, Arrow *a2)
 static int compare_posix_bound(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == POSIXD) || (a1->rn->type == POSIXU) ||
-	(a1->rn->type == POSIXA));
+        (a1->rn->type == POSIXA));
     assert(a2->rn->type == BOUND);
 
     U8 flags = a1->rn->flags;
     if ((flags >= SIZEOF_ARRAY(word_posix_regclasses)) ||
-	(flags >= SIZEOF_ARRAY(non_word_posix_regclasses)) ||
-	(!word_posix_regclasses[flags] && !non_word_posix_regclasses[flags]))
+        (flags >= SIZEOF_ARRAY(non_word_posix_regclasses)) ||
+        (!word_posix_regclasses[flags] && !non_word_posix_regclasses[flags]))
     {
         return compare_mismatch(anchored, a1, a2);
     }
 
     assert(!word_posix_regclasses[flags] || !non_word_posix_regclasses[flags]);
 
-    FCompare cmp = word_posix_regclasses[flags] ? 
+    FCompare cmp = word_posix_regclasses[flags] ?
         compare_next_nword : compare_next_word;
     return cmp(anchored, a1, a2);
 }
@@ -4173,20 +4724,20 @@ static int compare_posix_bound(int anchored, Arrow *a1, Arrow *a2)
 static int compare_posix_nbound(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == POSIXD) || (a1->rn->type == POSIXU) ||
-	(a1->rn->type == POSIXA));
+        (a1->rn->type == POSIXA));
     assert(a2->rn->type == NBOUND);
 
     U8 flags = a1->rn->flags;
     if ((flags >= SIZEOF_ARRAY(word_posix_regclasses)) ||
-	(flags >= SIZEOF_ARRAY(non_word_posix_regclasses)) ||
-	(!word_posix_regclasses[flags] && !non_word_posix_regclasses[flags]))
+        (flags >= SIZEOF_ARRAY(non_word_posix_regclasses)) ||
+        (!word_posix_regclasses[flags] && !non_word_posix_regclasses[flags]))
     {
         return compare_mismatch(anchored, a1, a2);
     }
 
     assert(!word_posix_regclasses[flags] || !non_word_posix_regclasses[flags]);
 
-    FCompare cmp = word_posix_regclasses[flags] ? 
+    FCompare cmp = word_posix_regclasses[flags] ?
         compare_next_word : compare_next_nword;
     return cmp(anchored, a1, a2);
 }
@@ -4194,7 +4745,7 @@ static int compare_posix_nbound(int anchored, Arrow *a1, Arrow *a2)
 static int compare_negative_posix_word_bound(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == NPOSIXD) || (a1->rn->type == NPOSIXU) ||
-	(a1->rn->type == NPOSIXA));
+        (a1->rn->type == NPOSIXA));
     assert(a2->rn->type == BOUND);
 
     /* we could accept _CC_ALPHANUMERIC as well but let's postpone it
@@ -4210,7 +4761,7 @@ static int compare_negative_posix_word_bound(int anchored, Arrow *a1, Arrow *a2)
 static int compare_negative_posix_word_nbound(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == NPOSIXD) || (a1->rn->type == NPOSIXU) ||
-	(a1->rn->type == NPOSIXA));
+        (a1->rn->type == NPOSIXA));
     assert(a2->rn->type == NBOUND);
 
     /* we could accept _CC_ALPHANUMERIC as well but let's postpone it
@@ -4251,7 +4802,7 @@ int rc_compare(REGEXP *pt1, REGEXP *pt2)
     regnode *p1, *p2;
 #ifdef DEBUG_dump
     unsigned char *p;
-    int i;    
+    int i;
 #endif
 
     a1.origin = SvANY(pt1);
@@ -4259,30 +4810,30 @@ int rc_compare(REGEXP *pt1, REGEXP *pt2)
 
     if ((get_forced_semantics(pt1) | get_forced_semantics(pt2)) == FORCED_MISMATCH)
     {
-	return 0;
+        return 0;
     }
 
     p1 = find_internal(a1.origin);
     if (!p1)
     {
-	return -1;
+        return -1;
     }
 
     p2 = find_internal(a2.origin);
     if (!p2)
     {
-	return -1;
+        return -1;
     }
 
 #ifdef DEBUG_dump
     p = (unsigned char *)p1;
     for (i = 1; i <= 64; ++i)
     {
-	fprintf(stderr, " %02x", (int)p[i - 1]);
-	if (!(i % 4))
-	{
-	    fprintf(stderr, "\n");
-	}
+        fprintf(stderr, " %02x", (int)p[i - 1]);
+        if (!(i % 4))
+        {
+            fprintf(stderr, "\n");
+        }
     }
 
     fprintf(stderr, "\n\n");
@@ -4290,11 +4841,11 @@ int rc_compare(REGEXP *pt1, REGEXP *pt2)
     p = (unsigned char *)p2;
     for (i = 1; i <= 64; ++i)
     {
-	fprintf(stderr, " %02x", (int)p[i - 1]);
-	if (!(i % 4))
-	{
-	    fprintf(stderr, "\n");
-	}
+        fprintf(stderr, " %02x", (int)p[i - 1]);
+        if (!(i % 4))
+        {
+            fprintf(stderr, "\n");
+        }
     }
 
     fprintf(stderr, "\n\n");
@@ -4325,7 +4876,7 @@ static int compare(int anchored, Arrow *a1, Arrow *a2)
     if (!cmp)
     {
         /* fprintf(stderr, "no comparator\n"); */
-	return 0;
+        return 0;
     }
 
     return cmp(anchored, a1, a2);
@@ -4350,7 +4901,7 @@ void rc_init()
 
     for (i = 0; i < SIZEOF_ARRAY(digit_expl); ++i)
     {
-	digit_expl[i] = '0' + i;
+        digit_expl[i] = '0' + i;
     }
 
     init_byte_class(&digit, digit_expl, SIZEOF_ARRAY(digit_expl));
@@ -4381,13 +4932,13 @@ void rc_init()
     wstart += 10;
     for (i = 0; i < LETTER_COUNT; ++i)
     {
-	alphanumeric_expl[wstart + i] = 'a' + i;
+        alphanumeric_expl[wstart + i] = 'a' + i;
     }
 
     wstart += LETTER_COUNT;
     for (i = 0; i < LETTER_COUNT; ++i)
     {
-	alphanumeric_expl[wstart + i] = 'A' + i;
+        alphanumeric_expl[wstart + i] = 'A' + i;
     }
 
     init_byte_class(&word_bc, alphanumeric_expl,
@@ -4397,13 +4948,13 @@ void rc_init()
 
     for (i = 0; i < LETTER_COUNT; ++i)
     {
-	alpha_expl[i] = lower_expl[i] = 'a' + i;
+        alpha_expl[i] = lower_expl[i] = 'a' + i;
     }
 
     wstart = LETTER_COUNT;
     for (i = 0; i < LETTER_COUNT; ++i)
     {
-	alpha_expl[wstart + i] = upper_expl[i] = 'A' + i;
+        alpha_expl[wstart + i] = upper_expl[i] = 'A' + i;
     }
 
     init_byte_class(&alpha_bc, alpha_expl,
@@ -4416,8 +4967,8 @@ void rc_init()
     memset(alphanumeric_classes, 0, SIZEOF_ARRAY(alphanumeric_classes));
 
     memset(non_alphanumeric_classes, 0,
-	SIZEOF_ARRAY(non_alphanumeric_classes));
-    non_alphanumeric_classes[EOS] = non_alphanumeric_classes[EOL] = 
+        SIZEOF_ARRAY(non_alphanumeric_classes));
+    non_alphanumeric_classes[EOS] = non_alphanumeric_classes[EOL] =
         non_alphanumeric_classes[SEOL] = 1;
 
     posix_regclass_blocks[_CC_VERTSPACE] = VERTICAL_SPACE_BLOCK;
@@ -4426,12 +4977,12 @@ void rc_init()
 
     memset(word_posix_regclasses, 0,
         SIZEOF_ARRAY(word_posix_regclasses));
-    word_posix_regclasses[_CC_WORDCHAR] = 
-        word_posix_regclasses[_CC_DIGIT] = 
-        word_posix_regclasses[_CC_ALPHA] = 
-        word_posix_regclasses[_CC_LOWER] = 
-        word_posix_regclasses[_CC_UPPER] = 
-        word_posix_regclasses[_CC_UPPER] = 
+    word_posix_regclasses[_CC_WORDCHAR] =
+        word_posix_regclasses[_CC_DIGIT] =
+        word_posix_regclasses[_CC_ALPHA] =
+        word_posix_regclasses[_CC_LOWER] =
+        word_posix_regclasses[_CC_UPPER] =
+        word_posix_regclasses[_CC_UPPER] =
         word_posix_regclasses[_CC_ALPHANUMERIC] =
         word_posix_regclasses[_CC_CASED] =
         word_posix_regclasses[_CC_XDIGIT] = 1;
@@ -4445,7 +4996,7 @@ void rc_init()
 
     memset(newline_posix_regclasses, 0,
         SIZEOF_ARRAY(newline_posix_regclasses));
-    newline_posix_regclasses[_CC_SPACE] = 
+    newline_posix_regclasses[_CC_SPACE] =
         newline_posix_regclasses[_CC_CNTRL] =
         newline_posix_regclasses[_CC_ASCII] =
         newline_posix_regclasses[_CC_VERTSPACE] = 1;
@@ -4458,12 +5009,12 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][END] = success;
+        dispatch[i][END] = success;
     }
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][SUCCEED] = compare_next;
+        dispatch[i][SUCCEED] = compare_next;
     }
 
     dispatch[SUCCEED][SUCCEED] = compare_tails;
@@ -4477,6 +5028,9 @@ void rc_init()
     dispatch[ANYOFD][MBOL] = compare_anyof_multiline;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][MBOL] = compare_anyofm_multiline;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][MBOL] = compare_nanyofm_multiline;
 #endif
     dispatch[POSIXD][MBOL] = compare_mismatch;
     dispatch[POSIXU][MBOL] = compare_mismatch;
@@ -4501,6 +5055,7 @@ void rc_init()
     dispatch[IFMATCH][MBOL] = compare_after_assertion;
     dispatch[UNLESSM][MBOL] = compare_after_assertion;
     dispatch[MINMOD][MBOL] = compare_left_tail;
+    dispatch[LNBREAK][MBOL] = compare_tails;
     dispatch[OPTIMIZED][MBOL] = compare_left_tail;
 
     dispatch[SUCCEED][SBOL] = compare_left_tail;
@@ -4592,6 +5147,7 @@ void rc_init()
     dispatch[IFMATCH][MEOL] = compare_after_assertion;
     dispatch[UNLESSM][MEOL] = compare_after_assertion;
     dispatch[MINMOD][MEOL] = compare_left_tail;
+    dispatch[LNBREAK][MEOL] = compare_mismatch;
     dispatch[OPTIMIZED][MEOL] = compare_left_tail;
 
     dispatch[SUCCEED][SEOL] = compare_left_tail;
@@ -4618,6 +5174,7 @@ void rc_init()
     dispatch[IFMATCH][SEOL] = compare_after_assertion;
     dispatch[UNLESSM][SEOL] = compare_after_assertion;
     dispatch[MINMOD][SEOL] = compare_left_tail;
+    dispatch[LNBREAK][SEOL] = compare_mismatch;
     dispatch[OPTIMIZED][SEOL] = compare_left_tail;
 
     dispatch[SUCCEED][BOUND] = compare_left_tail;
@@ -4631,6 +5188,9 @@ void rc_init()
     dispatch[ANYOFD][BOUND] = compare_anyof_bound;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][BOUND] = compare_anyofm_bound;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][BOUND] = compare_mismatch;
 #endif
     dispatch[POSIXD][BOUND] = compare_posix_bound;
     dispatch[POSIXU][BOUND] = compare_posix_bound;
@@ -4653,6 +5213,7 @@ void rc_init()
     dispatch[IFMATCH][BOUND] = compare_after_assertion;
     dispatch[UNLESSM][BOUND] = compare_after_assertion;
     dispatch[MINMOD][BOUND] = compare_left_tail;
+    dispatch[LNBREAK][BOUND] = compare_mismatch;
     dispatch[OPTIMIZED][BOUND] = compare_left_tail;
 
     dispatch[SUCCEED][NBOUND] = compare_left_tail;
@@ -4666,6 +5227,9 @@ void rc_init()
     dispatch[ANYOFD][NBOUND] = compare_anyof_nbound;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][NBOUND] = compare_anyofm_nbound;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][NBOUND] = compare_mismatch;
 #endif
     dispatch[POSIXD][NBOUND] = compare_posix_nbound;
     dispatch[POSIXU][NBOUND] = compare_posix_nbound;
@@ -4688,6 +5252,7 @@ void rc_init()
     dispatch[IFMATCH][NBOUND] = compare_after_assertion;
     dispatch[UNLESSM][NBOUND] = compare_after_assertion;
     dispatch[MINMOD][NBOUND] = compare_left_tail;
+    dispatch[LNBREAK][NBOUND] = compare_mismatch;
     dispatch[OPTIMIZED][NBOUND] = compare_left_tail;
 
     dispatch[SUCCEED][REG_ANY] = compare_left_tail;
@@ -4701,6 +5266,9 @@ void rc_init()
     dispatch[ANYOFD][REG_ANY] = compare_anyof_reg_any;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][REG_ANY] = compare_anyofm_reg_any;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][REG_ANY] = compare_nanyofm_reg_any;
 #endif
     dispatch[POSIXD][REG_ANY] = compare_posix_reg_any;
     dispatch[POSIXU][REG_ANY] = compare_posix_reg_any;
@@ -4725,6 +5293,7 @@ void rc_init()
     dispatch[IFMATCH][REG_ANY] = compare_after_assertion;
     dispatch[UNLESSM][REG_ANY] = compare_after_assertion;
     dispatch[MINMOD][REG_ANY] = compare_left_tail;
+    dispatch[LNBREAK][REG_ANY] = compare_mismatch;
     dispatch[OPTIMIZED][REG_ANY] = compare_left_tail;
 
     dispatch[SUCCEED][SANY] = compare_left_tail;
@@ -4738,6 +5307,9 @@ void rc_init()
     dispatch[ANYOFD][SANY] = compare_tails;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][SANY] = compare_tails;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][SANY] = compare_tails;
 #endif
     dispatch[POSIXD][SANY] = compare_tails;
     dispatch[POSIXU][SANY] = compare_tails;
@@ -4762,6 +5334,7 @@ void rc_init()
     dispatch[IFMATCH][SANY] = compare_after_assertion;
     dispatch[UNLESSM][SANY] = compare_after_assertion;
     dispatch[MINMOD][SANY] = compare_left_tail;
+    dispatch[LNBREAK][SANY] = compare_mismatch;
     dispatch[OPTIMIZED][SANY] = compare_left_tail;
 
     dispatch[SUCCEED][ANYOF] = compare_left_tail;
@@ -4775,6 +5348,9 @@ void rc_init()
     dispatch[ANYOFD][ANYOF] = compare_anyof_anyof;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][ANYOF] = compare_anyofm_anyof;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][ANYOF] = compare_mismatch;
 #endif
     dispatch[POSIXD][ANYOF] = compare_posix_anyof;
     dispatch[POSIXU][ANYOF] = compare_posix_anyof;
@@ -4799,6 +5375,7 @@ void rc_init()
     dispatch[IFMATCH][ANYOF] = compare_after_assertion;
     dispatch[UNLESSM][ANYOF] = compare_after_assertion;
     dispatch[MINMOD][ANYOF] = compare_left_tail;
+    dispatch[LNBREAK][ANYOF] = compare_mismatch;
     dispatch[OPTIMIZED][ANYOF] = compare_left_tail;
 
     dispatch[SUCCEED][ANYOFD] = compare_left_tail;
@@ -4812,6 +5389,9 @@ void rc_init()
     dispatch[ANYOFD][ANYOFD] = compare_anyof_anyof;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][ANYOFD] = compare_anyofm_anyof;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][ANYOFD] = compare_mismatch;
 #endif
     dispatch[POSIXD][ANYOFD] = compare_posix_anyof;
     dispatch[POSIXU][ANYOFD] = compare_posix_anyof;
@@ -4834,6 +5414,7 @@ void rc_init()
     dispatch[IFMATCH][ANYOFD] = compare_after_assertion;
     dispatch[UNLESSM][ANYOFD] = compare_after_assertion;
     dispatch[MINMOD][ANYOFD] = compare_left_tail;
+    dispatch[LNBREAK][ANYOFD] = compare_mismatch;
     dispatch[OPTIMIZED][ANYOFD] = compare_left_tail;
 
 #ifdef RC_ANYOFM
@@ -4847,6 +5428,9 @@ void rc_init()
     dispatch[ANYOF][ANYOFM] = compare_anyof_anyofm;
     dispatch[ANYOFD][ANYOFM] = compare_anyof_anyofm;
     dispatch[ANYOFM][ANYOFM] = compare_anyofm_anyofm;
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][ANYOFM] = compare_mismatch;
+#endif
     dispatch[POSIXD][ANYOFM] = compare_mismatch;
     dispatch[POSIXU][ANYOFM] = compare_mismatch;
     dispatch[POSIXA][ANYOFM] = compare_mismatch;
@@ -4869,9 +5453,48 @@ void rc_init()
     dispatch[IFMATCH][ANYOFM] = compare_after_assertion;
     dispatch[UNLESSM][ANYOFM] = compare_after_assertion;
     dispatch[MINMOD][ANYOFM] = compare_left_tail;
+    dispatch[LNBREAK][ANYOFM] = compare_mismatch;
     dispatch[OPTIMIZED][ANYOFM] = compare_left_tail;
 #endif
-    
+
+#ifdef RC_NANYOFM
+    dispatch[SUCCEED][NANYOFM] = compare_left_tail;
+    dispatch[MBOL][NANYOFM] = compare_bol;
+    dispatch[SBOL][NANYOFM] = compare_bol;
+    dispatch[BOUND][NANYOFM] = compare_mismatch;
+    dispatch[NBOUND][NANYOFM] = compare_mismatch;
+    dispatch[REG_ANY][NANYOFM] = compare_mismatch;
+    dispatch[SANY][NANYOFM] = compare_mismatch;
+    dispatch[ANYOF][NANYOFM] = compare_anyof_nanyofm;
+    dispatch[ANYOFD][NANYOFM] = compare_anyof_nanyofm;
+    dispatch[ANYOFM][NANYOFM] = compare_anyofm_nanyofm;
+    dispatch[NANYOFM][NANYOFM] = compare_nanyofm_nanyofm;
+    dispatch[POSIXD][NANYOFM] = compare_posix_nanyofm;
+    dispatch[POSIXU][NANYOFM] = compare_posix_nanyofm;
+    dispatch[POSIXA][NANYOFM] = compare_posix_nanyofm;
+    dispatch[NPOSIXD][NANYOFM] = compare_negative_posix_nanyofm;
+    dispatch[NPOSIXU][NANYOFM] = compare_negative_posix_nanyofm;
+    dispatch[NPOSIXA][NANYOFM] = compare_negative_posix_nanyofm;
+    dispatch[BRANCH][NANYOFM] = compare_left_branch;
+    dispatch[EXACT][NANYOFM] = compare_exact_nanyofm;
+    dispatch[EXACTF][NANYOFM] = compare_exactf_nanyofm;
+    dispatch[EXACTFU][NANYOFM] = compare_exactf_nanyofm;
+    dispatch[NOTHING][NANYOFM] = compare_left_tail;
+    dispatch[TAIL][NANYOFM] = compare_left_tail;
+    dispatch[STAR][NANYOFM] = compare_mismatch;
+    dispatch[PLUS][NANYOFM] = compare_left_plus;
+    dispatch[CURLY][NANYOFM] = compare_left_curly;
+    dispatch[CURLYM][NANYOFM] = compare_left_curly;
+    dispatch[CURLYX][NANYOFM] = compare_left_curly;
+    dispatch[OPEN][NANYOFM] = compare_left_open;
+    dispatch[CLOSE][NANYOFM] = compare_left_tail;
+    dispatch[IFMATCH][NANYOFM] = compare_after_assertion;
+    dispatch[UNLESSM][NANYOFM] = compare_after_assertion;
+    dispatch[MINMOD][NANYOFM] = compare_left_tail;
+    dispatch[LNBREAK][NANYOFM] = compare_mismatch;
+    dispatch[OPTIMIZED][NANYOFM] = compare_left_tail;
+#endif
+
     dispatch[SUCCEED][POSIXD] = compare_left_tail;
     dispatch[MBOL][POSIXD] = compare_bol;
     dispatch[SBOL][POSIXD] = compare_bol;
@@ -4883,6 +5506,9 @@ void rc_init()
     dispatch[ANYOFD][POSIXD] = compare_anyof_posix;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][POSIXD] = compare_anyofm_posix;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][POSIXD] = compare_nanyofm_posix;
 #endif
     dispatch[POSIXD][POSIXD] = compare_posix_posix;
     dispatch[POSIXU][POSIXD] = compare_posix_posix;
@@ -4905,6 +5531,7 @@ void rc_init()
     dispatch[IFMATCH][POSIXD] = compare_after_assertion;
     dispatch[UNLESSM][POSIXD] = compare_after_assertion;
     dispatch[MINMOD][POSIXD] = compare_left_tail;
+    dispatch[LNBREAK][POSIXD] = compare_mismatch;
     dispatch[OPTIMIZED][POSIXD] = compare_left_tail;
 
     dispatch[SUCCEED][POSIXU] = compare_left_tail;
@@ -4918,6 +5545,9 @@ void rc_init()
     dispatch[ANYOFD][POSIXU] = compare_anyof_posix;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][POSIXU] = compare_anyofm_posix;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][POSIXU] = compare_nanyofm_posix;
 #endif
     dispatch[POSIXD][POSIXU] = compare_posix_posix;
     dispatch[POSIXA][POSIXU] = compare_posix_posix;
@@ -4941,6 +5571,7 @@ void rc_init()
     dispatch[IFMATCH][POSIXU] = compare_after_assertion;
     dispatch[UNLESSM][POSIXU] = compare_after_assertion;
     dispatch[MINMOD][POSIXU] = compare_left_tail;
+    dispatch[LNBREAK][POSIXU] = compare_mismatch;
     dispatch[OPTIMIZED][POSIXU] = compare_left_tail;
 
     dispatch[SUCCEED][POSIXA] = compare_left_tail;
@@ -4954,6 +5585,9 @@ void rc_init()
     dispatch[ANYOFD][POSIXA] = compare_anyof_posixa;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][POSIXA] = compare_anyofm_posix;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][POSIXA] = compare_nanyofm_posix;
 #endif
     dispatch[POSIXD][POSIXA] = compare_mismatch;
     dispatch[POSIXU][POSIXA] = compare_mismatch;
@@ -4976,6 +5610,7 @@ void rc_init()
     dispatch[IFMATCH][POSIXA] = compare_after_assertion;
     dispatch[UNLESSM][POSIXA] = compare_after_assertion;
     dispatch[MINMOD][POSIXA] = compare_left_tail;
+    dispatch[LNBREAK][POSIXA] = compare_mismatch;
     dispatch[OPTIMIZED][POSIXA] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXD] = compare_left_tail;
@@ -4989,6 +5624,9 @@ void rc_init()
     dispatch[ANYOFD][NPOSIXD] = compare_anyof_negative_posix;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][NPOSIXD] = compare_anyofm_negative_posix;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][NPOSIXD] = compare_nanyofm_negative_posix;
 #endif
     dispatch[POSIXD][NPOSIXD] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXD] = compare_posix_negative_posix;
@@ -5011,6 +5649,7 @@ void rc_init()
     dispatch[IFMATCH][NPOSIXD] = compare_after_assertion;
     dispatch[UNLESSM][NPOSIXD] = compare_after_assertion;
     dispatch[MINMOD][NPOSIXD] = compare_left_tail;
+    dispatch[LNBREAK][NPOSIXD] = compare_mismatch;
     dispatch[OPTIMIZED][NPOSIXD] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXU] = compare_left_tail;
@@ -5024,6 +5663,9 @@ void rc_init()
     dispatch[ANYOFD][NPOSIXU] = compare_anyof_negative_posix;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][NPOSIXU] = compare_anyofm_negative_posix;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][NPOSIXU] = compare_nanyofm_negative_posix;
 #endif
     dispatch[POSIXD][NPOSIXU] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXU] = compare_posix_negative_posix;
@@ -5046,6 +5688,7 @@ void rc_init()
     dispatch[IFMATCH][NPOSIXU] = compare_after_assertion;
     dispatch[UNLESSM][NPOSIXU] = compare_after_assertion;
     dispatch[MINMOD][NPOSIXU] = compare_left_tail;
+    dispatch[LNBREAK][NPOSIXU] = compare_mismatch;
     dispatch[OPTIMIZED][NPOSIXU] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXA] = compare_left_tail;
@@ -5059,6 +5702,9 @@ void rc_init()
     dispatch[ANYOFD][NPOSIXA] = compare_anyof_negative_posix;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][NPOSIXA] = compare_anyofm_negative_posix;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][NPOSIXA] = compare_nanyofm_negative_posix;
 #endif
     dispatch[POSIXD][NPOSIXA] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXA] = compare_posix_negative_posix;
@@ -5081,11 +5727,12 @@ void rc_init()
     dispatch[IFMATCH][NPOSIXA] = compare_after_assertion;
     dispatch[UNLESSM][NPOSIXA] = compare_after_assertion;
     dispatch[MINMOD][NPOSIXA] = compare_left_tail;
+    dispatch[LNBREAK][NPOSIXA] = compare_mismatch;
     dispatch[OPTIMIZED][NPOSIXA] = compare_left_tail;
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][BRANCH] = compare_right_branch;
+        dispatch[i][BRANCH] = compare_right_branch;
     }
 
     dispatch[SUCCEED][BRANCH] = compare_left_tail;
@@ -5116,7 +5763,10 @@ void rc_init()
     dispatch[ANYOFD][EXACT] = compare_anyof_exact;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][EXACT] = compare_anyofm_exact;
-#endif    
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][EXACT] = compare_mismatch;
+#endif
     dispatch[POSIXD][EXACT] = compare_mismatch;
     dispatch[POSIXU][EXACT] = compare_mismatch;
     dispatch[POSIXA][EXACT] = compare_mismatch;
@@ -5140,6 +5790,7 @@ void rc_init()
     dispatch[IFMATCH][EXACT] = compare_after_assertion;
     dispatch[UNLESSM][EXACT] = compare_after_assertion;
     dispatch[MINMOD][EXACT] = compare_left_tail;
+    dispatch[LNBREAK][EXACT] = compare_mismatch;
     dispatch[OPTIMIZED][EXACT] = compare_left_tail;
 
     dispatch[SUCCEED][EXACTF] = compare_left_tail;
@@ -5153,6 +5804,9 @@ void rc_init()
     dispatch[ANYOFD][EXACTF] = compare_anyof_exactf;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][EXACTF] = compare_anyofm_exactf;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][EXACTF] = compare_mismatch;
 #endif
     dispatch[POSIXD][EXACTF] = compare_mismatch;
     dispatch[POSIXU][EXACTF] = compare_mismatch;
@@ -5176,6 +5830,7 @@ void rc_init()
     dispatch[IFMATCH][EXACTF] = compare_after_assertion;
     dispatch[UNLESSM][EXACTF] = compare_after_assertion;
     dispatch[MINMOD][EXACTF] = compare_left_tail;
+    dispatch[LNBREAK][EXACTF] = compare_mismatch;
     dispatch[OPTIMIZED][EXACTF] = compare_left_tail;
 
     dispatch[SUCCEED][EXACTFU] = compare_left_tail;
@@ -5190,6 +5845,9 @@ void rc_init()
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][EXACTFU] = compare_anyofm_exactf;
 #endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][EXACTFU] = compare_mismatch;
+#endif
     dispatch[POSIXD][EXACTFU] = compare_mismatch;
     dispatch[POSIXU][EXACTFU] = compare_mismatch;
     dispatch[POSIXA][EXACTFU] = compare_mismatch;
@@ -5198,6 +5856,7 @@ void rc_init()
     dispatch[NPOSIXA][EXACTFU] = compare_mismatch;
     dispatch[BRANCH][EXACTFU] = compare_left_branch;
     dispatch[EXACT][EXACTFU] = compare_exact_exactf;
+    dispatch[EXACTF][EXACTFU] = compare_exactf_exactf;
     dispatch[EXACTFU][EXACTFU] = compare_exactf_exactf;
     dispatch[NOTHING][EXACTFU] = compare_left_tail;
     dispatch[STAR][EXACTFU] = compare_mismatch;
@@ -5210,7 +5869,12 @@ void rc_init()
     dispatch[IFMATCH][EXACTFU] = compare_after_assertion;
     dispatch[UNLESSM][EXACTFU] = compare_after_assertion;
     dispatch[MINMOD][EXACTFU] = compare_left_tail;
+    dispatch[LNBREAK][EXACTFU] = compare_mismatch;
     dispatch[OPTIMIZED][EXACTFU] = compare_left_tail;
+
+#ifdef RC_EXACT_ONLY8
+    dispatch[EXACT_ONLY8][EXACT_ONLY8] = compare_exact_exact;
+#endif
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
@@ -5240,7 +5904,7 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][STAR] = compare_right_star;
+        dispatch[i][STAR] = compare_right_star;
     }
 
     dispatch[SUCCEED][STAR] = compare_left_tail;
@@ -5265,7 +5929,7 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][PLUS] = compare_right_plus;
+        dispatch[i][PLUS] = compare_right_plus;
     }
 
     dispatch[SUCCEED][PLUS] = compare_left_tail;
@@ -5285,7 +5949,7 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][CURLY] = compare_right_curly;
+        dispatch[i][CURLY] = compare_right_curly;
     }
 
     dispatch[SUCCEED][CURLY] = compare_left_tail;
@@ -5306,7 +5970,7 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][CURLYM] = compare_right_curly;
+        dispatch[i][CURLYM] = compare_right_curly;
     }
 
     dispatch[SUCCEED][CURLYM] = compare_left_tail;
@@ -5327,7 +5991,7 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][CURLYX] = compare_right_curly;
+        dispatch[i][CURLYX] = compare_right_curly;
     }
 
     dispatch[SUCCEED][CURLYX] = compare_left_tail;
@@ -5348,7 +6012,7 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][WHILEM] = compare_next;
+        dispatch[i][WHILEM] = compare_next;
     }
 
     dispatch[SUCCEED][WHILEM] = compare_tails;
@@ -5361,14 +6025,14 @@ void rc_init()
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][OPEN] = compare_right_open;
+        dispatch[i][OPEN] = compare_right_open;
     }
 
     dispatch[OPEN][OPEN] = compare_open_open;
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][CLOSE] = compare_next;
+        dispatch[i][CLOSE] = compare_next;
     }
 
     dispatch[SUCCEED][CLOSE] = compare_tails;
@@ -5390,6 +6054,9 @@ void rc_init()
     dispatch[ANYOFD][IFMATCH] = compare_mismatch;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][IFMATCH] = compare_mismatch;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][IFMATCH] = compare_mismatch;
 #endif
     dispatch[POSIXD][IFMATCH] = compare_mismatch;
     dispatch[POSIXU][IFMATCH] = compare_mismatch;
@@ -5414,6 +6081,7 @@ void rc_init()
     dispatch[IFMATCH][IFMATCH] = compare_positive_assertions;
     dispatch[UNLESSM][IFMATCH] = compare_mismatch;
     dispatch[MINMOD][IFMATCH] = compare_left_tail;
+    dispatch[LNBREAK][IFMATCH] = compare_mismatch;
     dispatch[OPTIMIZED][IFMATCH] = compare_left_tail;
 
     dispatch[SUCCEED][UNLESSM] = compare_left_tail;
@@ -5427,6 +6095,9 @@ void rc_init()
     dispatch[ANYOFD][UNLESSM] = compare_mismatch;
 #ifdef RC_ANYOFM
     dispatch[ANYOFM][UNLESSM] = compare_mismatch;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][UNLESSM] = compare_mismatch;
 #endif
     dispatch[POSIXD][UNLESSM] = compare_mismatch;
     dispatch[POSIXU][UNLESSM] = compare_mismatch;
@@ -5451,13 +6122,14 @@ void rc_init()
     dispatch[IFMATCH][UNLESSM] = compare_mismatch;
     dispatch[UNLESSM][UNLESSM] = compare_negative_assertions;
     dispatch[MINMOD][UNLESSM] = compare_left_tail;
+    dispatch[LNBREAK][UNLESSM] = compare_mismatch;
     dispatch[OPTIMIZED][UNLESSM] = compare_left_tail;
 
     dispatch[SUSPEND][SUSPEND] = compare_subexpressions;
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][MINMOD] = compare_next;
+        dispatch[i][MINMOD] = compare_next;
     }
 
     dispatch[SUCCEED][MINMOD] = compare_tails;
@@ -5468,9 +6140,48 @@ void rc_init()
     dispatch[MINMOD][MINMOD] = compare_tails;
     dispatch[OPTIMIZED][MINMOD] = compare_tails;
 
+    dispatch[SUCCEED][LNBREAK] = compare_left_tail;
+    dispatch[SBOL][LNBREAK] = compare_bol;
+    dispatch[MBOL][LNBREAK] = compare_bol;
+    dispatch[BOUND][LNBREAK] = compare_mismatch;
+    dispatch[NBOUND][LNBREAK] = compare_mismatch;
+    dispatch[REG_ANY][LNBREAK] = compare_mismatch;
+    dispatch[SANY][LNBREAK] = compare_mismatch;
+    dispatch[ANYOF][LNBREAK] = compare_anyof_lnbreak;
+    dispatch[ANYOFD][LNBREAK] = compare_anyof_lnbreak;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][LNBREAK] = compare_mismatch;
+#endif
+#ifdef RC_NANYOFM
+    dispatch[NANYOFM][LNBREAK] = compare_mismatch;
+#endif
+    dispatch[POSIXD][LNBREAK] = compare_posix_lnbreak;
+    dispatch[POSIXU][LNBREAK] = compare_posix_lnbreak;
+    dispatch[POSIXA][LNBREAK] = compare_posix_lnbreak;
+    dispatch[NPOSIXD][LNBREAK] = compare_mismatch;
+    dispatch[NPOSIXU][LNBREAK] = compare_mismatch;
+    dispatch[NPOSIXA][LNBREAK] = compare_mismatch;
+    dispatch[BRANCH][LNBREAK] = compare_left_branch;
+    dispatch[EXACT][LNBREAK] = compare_exact_lnbreak;
+    dispatch[EXACTFU][LNBREAK] = compare_exact_lnbreak;
+    dispatch[NOTHING][LNBREAK] = compare_left_tail;
+    dispatch[TAIL][LNBREAK] = compare_left_tail;
+    dispatch[STAR][LNBREAK] = compare_mismatch;
+    dispatch[PLUS][LNBREAK] = compare_left_plus;
+    dispatch[CURLY][LNBREAK] = compare_left_curly;
+    dispatch[CURLYM][LNBREAK] = compare_left_curly;
+    dispatch[CURLYX][LNBREAK] = compare_left_curly;
+    dispatch[WHILEM][LNBREAK] = compare_left_tail;
+    dispatch[OPEN][LNBREAK] = compare_left_open;
+    dispatch[CLOSE][LNBREAK] = compare_left_tail;
+    dispatch[IFMATCH][LNBREAK] = compare_after_assertion;
+    dispatch[UNLESSM][LNBREAK] = compare_after_assertion;
+    dispatch[MINMOD][LNBREAK] = compare_left_tail;
+    dispatch[LNBREAK][LNBREAK] = compare_tails;
+
     for (i = 0; i < REGNODE_MAX; ++i)
     {
-	dispatch[i][OPTIMIZED] = compare_next;
+        dispatch[i][OPTIMIZED] = compare_next;
     }
 
     dispatch[SUCCEED][OPTIMIZED] = compare_tails;

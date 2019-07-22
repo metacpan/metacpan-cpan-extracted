@@ -10,7 +10,7 @@ struct HashEntry {
 
     U32 hash () const { return HeHASH(he); }
 
-    std::string_view key () const { return std::string_view(HeKEY(he), HeKLEN(he)); }
+    panda::string_view key () const { return panda::string_view(HeKEY(he), HeKLEN(he)); }
 
     HEK* hek () const { return HeKEY_hek(he); }
 
@@ -26,9 +26,8 @@ struct HashEntry {
         HeVAL(he) = val.get();
         SvREFCNT_dec(old);
     }
-    void value (SV* v)              { value(Scalar(v)); }
-    void value (const Sv& v)        { value(Scalar(v)); }
-    void value (const CallProxy& p) { value(p.scalar()); }
+    void value (SV* v)        { value(Scalar(v)); }
+    void value (const Sv& v)  { value(Scalar(v)); }
     void value (const Array&) = delete;
     void value (const Hash&)  = delete;
     void value (const Sub&)   = delete;

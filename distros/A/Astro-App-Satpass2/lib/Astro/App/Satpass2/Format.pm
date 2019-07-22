@@ -13,7 +13,7 @@ use Astro::App::Satpass2::Utils qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 use constant DEFAULT_LOCAL_COORD => 'azel_rng';
 
@@ -751,11 +751,6 @@ functionality.
 
 L<Astro::Coord::ECI|Astro::Coord::ECI> and associated modules, which are
 the intended providers of data for this functionality.
-
-L<Astro::App::Satpass2::Format::Classic|Astro::App::Satpass2::Format::Classic>, which
-is a subclass of this module. It is a templating system producing text
-output which, by default, resembles the output of the original satpass
-script.
 
 L<Astro::App::Satpass2::Format::Dump|Astro::App::Satpass2::Format::Dump>, which is a
 subclass of this module. It is intended for debugging, and simply dumps

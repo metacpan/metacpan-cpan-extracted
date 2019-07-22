@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::BCM2835::Pin
 # Description:   Pin
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2019 Mark Dootson
 # License      : This work is free software; you can redistribute it and/or modify it 
 #                under the terms of the GNU General Public License as published by the 
 #                Free Software Foundation; either version 3 of the License, or any later 
@@ -16,9 +16,10 @@ use strict;
 use warnings;
 use parent qw( HiPi::Pin );
 use Carp;
+use HiPi 0.80;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.64';
+our $VERSION ='0.65';
 
 sub _open {
     my ($class, %params) = @_;

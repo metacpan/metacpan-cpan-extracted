@@ -2,7 +2,7 @@
 # Package        HiPi::BCM2835
 # Description  : Wrapper for bcm2835 C library - Access to /dev/mem
 # Created        Fri Nov 23 13:55:49 2012
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2019 Mark Dootson
 # License      : This work is free software; you can redistribute it and/or modify it 
 #                under the terms of the GNU General Public License as published by the 
 #                Free Software Foundation; either version 3 of the License, or any later 
@@ -20,8 +20,9 @@ use parent qw( HiPi::Device );
 use XSLoader;
 use Carp;
 use HiPi qw( :rpi :i2c );
+use HiPi::RaspberryPi;
 
-our $VERSION ='0.64';
+our $VERSION ='0.65';
 
 XSLoader::load('HiPi::BCM2835', $VERSION) if HiPi::is_raspberry_pi();
 
@@ -31,6 +32,8 @@ our $_memmapped : shared;
     lock $_memmapped;
     $_memmapped = 0;
 }
+
+my $altnames = HiPi::RaspberryPi::get_alt_function_names();
 
 sub bcm2835_init {
     lock $_memmapped;
@@ -868,58 +871,13 @@ sub i2c_read {
     return $buffer;
 }
 
-our @_altnames = (
-    
-    [qw( I2C0_SDA      SA5          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 0
-    [qw( I2C0_SCL      SA4          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 1
-    [qw( I2C1_SDA      SA3          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 2
-    [qw( I2C1_SCL      SA2          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 3
-    
-    [qw( GPCLK0        SA1          ALT2   ALT3   ALT4        ARM_TDI ) ], # GPIO 4
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 5
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 6
-    [qw( SPI0_CE1_N    SWE_N/SRW_N  ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 7
-    
-    [qw( SPI0_CE0_N    SD0          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 8
-    [qw( SPI0_MISO     SD1          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 9
-    [qw( SPI0_MOSI     SD2          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 10
-    [qw( SPI0_SCLK     SD3          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 11
-    
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 12
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 13
-    [qw( UART0_TXD     SD6          ALT2   ALT3   ALT4   UART1_TXD ) ], # GPIO 14
-    [qw( UART0_RXD     SD7          ALT2   ALT3   ALT4   UART1_RXD ) ], # GPIO 15
-    
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_CE2_N        ALT5 ) ], # GPIO 16
-    [qw( ALT0          SD9          ALT2   UART0_RTS   SPI1_CE1_N  UART1_RTS ) ], # GPIO 17
-    [qw( PCM_CLK       SD10         ALT2   BSCSL_SDA/MOSI   SPI1_CE0_N   PWM0 ) ], # GPIO 18
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MISO        ALT5 ) ], # GPIO 19
-    
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MOSI        ALT5 ) ], # GPIO 20
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_SCLK        GPCLK1 ) ], # GPIO 21
-    [qw( ALT0          SD14         ALT2   SD1_CLK   ARM_TRST ALT5 ) ], # GPIO 22
-    [qw( ALT0          SD15         ALT2   SD1_CMD   ARM_RTCK ALT5 ) ], # GPIO 23
-    
-    [qw( ALT0          SD16         ALT2   SD1_DAT0  ARM_TDO  ALT5 ) ], # GPIO 24
-    [qw( ALT0          SD17         ALT2   SD1_DAT1  ARM_TCK  ALT5 ) ], # GPIO 25
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 26
-    [qw( ALT0          ALT1         ALT2   SD1_DAT3  ARM_TMS  GPCLK1 ) ], # GPIO 27
-    
-    [qw( I2C0_SDA      SA5          PCM_CLK  ALT3   ALT4      ALT5 ) ], # GPIO 28
-    [qw( I2C0_SCL      SA4          PCM_FS   ALT3   ALT4      ALT5 ) ], # GPIO 29
-    [qw( ALT0          SA3          PCM_DIN  UART0_CTS   ALT4 UART1_CTS ) ], # GPIO 30
-    [qw( ALT0          SA2          PCM_DOUT UART0_RTS   ALT4 UART1_RTS ) ], # GPIO 31
-    
-);
-
-
 sub hipi_get_pin {
     HiPi::BCM2835::Pin->_open( pinid => $_[0] );
 }
 
 sub hipi_gpio_fget_name {
     my($pinid) = @_;
-    return 'UNKNOWN' if $pinid < 0 || $pinid > 31;
+    return 'UNKNOWN' if $pinid < 0 || $pinid > 53;
     
     my $checkval = hipi_gpio_fget( $pinid );
     
@@ -928,17 +886,19 @@ sub hipi_gpio_fget_name {
     } elsif ( $checkval == BCM2835_GPIO_FSEL_OUTP()) {
         return 'OUTPUT';
     } elsif ( $checkval == BCM2835_GPIO_FSEL_ALT0()) {
-        return $_altnames[$pinid]->[0];
+        return $altnames->[$pinid]->[0];
     } elsif ( $checkval == BCM2835_GPIO_FSEL_ALT1()) {
-        return $_altnames[$pinid]->[1];
+        return $altnames->[$pinid]->[1];
     } elsif ( $checkval == BCM2835_GPIO_FSEL_ALT2()) {
-        return $_altnames[$pinid]->[2];
+        return $altnames->[$pinid]->[2];
     } elsif ( $checkval == BCM2835_GPIO_FSEL_ALT3()) {
-        return $_altnames[$pinid]->[3];
+        return $altnames->[$pinid]->[3];
     } elsif ( $checkval == BCM2835_GPIO_FSEL_ALT4()) {
-        return $_altnames[$pinid]->[4];
+        return $altnames->[$pinid]->[4];
     } elsif ( $checkval == BCM2835_GPIO_FSEL_ALT5()) {
-        return $_altnames[$pinid]->[5];
+        return $altnames->[$pinid]->[5];
+    } else {
+        return 'UNKNOWN';
     }
 }
 
@@ -1096,11 +1056,11 @@ HiPi::BCM2835 - Modules for Raspberry Pi GPIO
 
 =head1 DESCRIPTION
 
-This is a deprecated module providing access to the bcm2835 library for HiPi Perl modules.
+This module provides access to the gpio and I2C functions of the bcm2835 library for HiPi Perl modules.
 
 Documentation and details are available at
 
-http://raspberry.znix.com
+L<http://hipi.znix.com/archive/bcm2835.html>
 
 =head1 AUTHOR
 
@@ -1108,7 +1068,7 @@ Mark Dootson, C<< mdootson@cpan.org >>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 - 2017 Mark Dootson
+Copyright (c) 2013 - 2019 Mark Dootson
 
 =cut
 

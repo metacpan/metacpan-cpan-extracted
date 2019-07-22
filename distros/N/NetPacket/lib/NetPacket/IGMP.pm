@@ -1,7 +1,7 @@
 package NetPacket::IGMP;
 our $AUTHORITY = 'cpan:YANICK';
-# ABSTRACT: Assemble and disassemble IGMP (Internet Group Mangement Protocol) packets. 
-$NetPacket::IGMP::VERSION = '1.7.1';
+# ABSTRACT: Assemble and disassemble IGMP (Internet Group Management Protocol) packets.
+$NetPacket::IGMP::VERSION = '1.7.2';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ our %EXPORT_TAGS = (
 		       IGMP_MSG_HOST_MREPORTv2 IGMP_MSG_HOST_LEAVE
 		       IGMP_MSG_HOST_MREPORTv3)],
     group_addrs => [qw(IGMP_IP_NO_HOSTS IGMP_IP_ALL_HOSTS
-		      IGMP_IP_ALL_ROUTERS)]  
+		      IGMP_IP_ALL_ROUTERS)]
 );
 
 #
@@ -95,16 +95,16 @@ sub decode {
     if (defined($pkt)) {
 	my $tmp;
 
-	($tmp, $self->{subtype}, $self->{cksum}, $self->{group_addr}, 
+	($tmp, $self->{subtype}, $self->{cksum}, $self->{group_addr},
 	 $self->{data}) = unpack('CCnNa*', $pkt);
-    
+
 	# Extract bit fields
-	
+
 	$self->{version} = ($tmp & 0xf0) >> 4;
 	$self->{type} = $tmp & 0x0f;
-	
+
 	# Convert to dq notation
-	
+
 	$self->{group_addr} = to_dotquad($self->{group_addr});
     }
 
@@ -115,7 +115,7 @@ sub decode {
 }
 
 #
-# Strip header from packet and return the data contained in it.  IGMP 
+# Strip header from packet and return the data contained in it.  IGMP
 # packets contain no encapsulated data.
 #
 
@@ -145,11 +145,11 @@ sub encode {
 
 =head1 NAME
 
-NetPacket::IGMP - Assemble and disassemble IGMP (Internet Group Mangement Protocol) packets. 
+NetPacket::IGMP - Assemble and disassemble IGMP (Internet Group Management Protocol) packets.
 
 =head1 VERSION
 
-version 1.7.1
+version 1.7.2
 
 =head1 SYNOPSIS
 
@@ -162,7 +162,7 @@ version 1.7.1
 =head1 DESCRIPTION
 
 C<NetPacket::IGMP> provides a set of routines for assembling and
-disassembling packets using IGMP (Internet Group Mangement Protocol). 
+disassembling packets using IGMP (Internet Group Management Protocol).
 
 =head2 Methods
 
@@ -243,7 +243,7 @@ none
 
 IGMP_VERSION_RFC998 IGMP_VERSION_RFC1112 IGMP_HOST_MQUERY
 IGMP_HOST_MREPORT IGMP_IP_NO_HOSTS IGMP_IP_ALL_HOSTS
-IGMP_IP_ALL_ROUTERS 
+IGMP_IP_ALL_ROUTERS
 
 =item tags
 
@@ -313,7 +313,7 @@ to standard output.
 
 Copyright (c) 2001 Tim Potter.
 
-Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of 
+Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of
 the participants in the CRC for Advanced Computational Systems
 ('ACSys').
 

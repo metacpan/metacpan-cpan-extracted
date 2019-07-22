@@ -28,7 +28,7 @@ my $prereq_pm = {
         'Sys::Hostname'         => 0,
         'Text::SimpleTable'     => 2.03,
         'WWW::MLite'            => 2.01,
-        'URI'                   => 1.50,
+        'URI'                   => 1.71,
     };
 my $exefiles = [qw[
         bin/mbutiny

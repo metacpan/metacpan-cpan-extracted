@@ -1,0 +1,46 @@
+part - split up a single input file into multiple files according to a column value
+
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+REPOSITORY
+
+The public repository of this program is
+L<https://github.com/Corion/app-part>.
+
+SUPPORT
+
+The public support forum of this program is
+L<https://perlmonks.org/>. The homepage is
+L<https://perlmonks.org/?node_id=598718> .
+
+
+
+BUG TRACKER
+
+Please report bugs via L<https://perlmonks.org>.
+
+
+
+AUTHOR
+
+Copyright (c) 2007-2019 Max Maischein (C<< corion@cpan.org >>)
+
+

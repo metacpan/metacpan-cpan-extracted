@@ -48,6 +48,8 @@ $OS2 = "-DOS2" if $^O eq 'os2' ;
 my $WALL = '';
 #$WALL = ' -Wall ' if $Config{'cc'} =~ /gcc/ ;
 
+my $TRACE = "";
+$TRACE = "-DTRACE" if $ENV{BERKELEYDB_DEFINE_TRACE} ;
 
 WriteMakefile(
 	NAME 		=> 'BerkeleyDB',
@@ -56,7 +58,7 @@ WriteMakefile(
 	INC		=> "-I$INC_DIR",
 	VERSION_FROM	=> 'BerkeleyDB.pm',
 	XSPROTOARG	=> '-noprototypes',
-	DEFINE		=> "$OS2 $WALL",
+	DEFINE		=> "$OS2 $WALL $TRACE",
 	#'macro'		=> { INSTALLDIRS => 'perl' },
         'dist'          => {COMPRESS=>'gzip', SUFFIX=>'gz'},    
 	($] >= 5.005

@@ -58,6 +58,15 @@ sub require_threads {
     sub meth { return "$_[0]-1"; }
     use overload '""' => sub { return ref(shift).'(OBJ)' };
     
+    sub check_args { $call_cnt++; return [@_] }
+    
+    sub check_context {
+        $call_cnt++;
+        return @_ if wantarray();
+        return $_[0] if defined wantarray();
+        $call_ret = $_[0];
+    }
+    
     sub dummy  {
         $call_cnt++;
         if (wantarray()) {

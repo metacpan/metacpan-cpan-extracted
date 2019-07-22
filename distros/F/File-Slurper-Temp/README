@@ -2,11 +2,11 @@ NAME
     File::Slurper::Temp - File::Slurper + File::Temp
 
 VERSION
-    This document describes version 0.005 of File::Slurper::Temp (from Perl
-    distribution File-Slurper-Temp), released on 2019-07-16.
+    This document describes version 0.006 of File::Slurper::Temp (from Perl
+    distribution File-Slurper-Temp), released on 2019-07-21.
 
 SYNOPSIS
-    Use like you would use File::Slurper's "write_text" or "write_binary":
+    Use like you would use File::Slurper's "write_text" and "write_binary":
 
      use File::Slurper::Temp qw(write_text write_binary);
      write_text("/tmp/foo.txt", "some text");
@@ -20,18 +20,19 @@ SYNOPSIS
 
 DESCRIPTION
     This module is a simple combination of File::Slurper and File::Temp. It
-    provides "write_text" and "write_binary" (as well as a couple of
-    functions of its own). The two functions are the same as their original
-    in File::Slurper but they will first write to a temporary file created
-    by File::Temp's "tempfile", then "rename()" the temporary file to the
-    originally specified name. If the filename is originally a symlink, it
-    will be replaced with a regular file by "rename()". This can avoid
-    symlink attack.
+    provides its version of "write_text" and "write_binary", as well as a
+    couple of functions of its own.
 
-    In addition to that, this module also provides
-    L/<write_text_to_tempfile> and write_binary_to_tempfile. You don't have
-    to specify filename but just content to write and the functions will
-    return the temporay filename created.
+    This module's version of "write_text" and "write_binary" write to
+    temporary file first using File::Temp's tempfile() before renaming to
+    the final destination path using Perl's rename(). If the destination
+    path is originally a symlink, it will be replaced with a regular file by
+    "rename()". This can avoid symlink attack.
+
+    In addition the above two functions, this module also provides
+    "write_text_to_tempfile" and "write_binary_to_tempfile". You don't have
+    to specify destination path but just content to write, and the functions
+    will return the temporary filename created.
 
 FUNCTIONS
   write_text
@@ -41,14 +42,14 @@ FUNCTIONS
 
     Just like the original File::Slurper's version, except will write to
     temporary file created by File::Temp's "tempfile" first, then rename the
-    temporary file using "rename()". The function will croak if "rename()"
-    fails.
+    temporary file using Perl's "rename()". The function will croak if
+    "rename()" fails.
 
-    To make sure that "rename()" doesn't fail when the default temporary
-    directory (e.g. "/tmp") is on a different filesystem (because "rename()"
-    does not work across filesystem boundary), the temporary file is created
-    with option "DIR => dirname($filename)" . If you want to set a specific
-    temporary directory, set $FILE_TEMP_DIR (see source code).
+    By default, the temporary file is created in the same directory as
+    $filename, using "tempfile()"'s option "DIR => dirname($filename)". If
+    you want to set a specific temporary directory, set $FILE_TEMP_DIR (see
+    source code). But keep in mind that "rename()" doesn't work
+    cross-device.
 
   write_binary
     Usage:

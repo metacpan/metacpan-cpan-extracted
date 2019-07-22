@@ -1,4 +1,4 @@
-package App::MonM::ConfigSkel; # $Id: ConfigSkel.pm 85 2019-07-14 12:03:14Z abalama $
+package App::MonM::ConfigSkel; # $Id: ConfigSkel.pm 90 2019-07-18 09:47:29Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MonM::ConfigSkel - Configuration skeleton for App::MonM
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 use constant SIGNATURE => "config";
 
 use vars qw/ $VERSION /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub build { # Building
     my $self = shift;
@@ -295,7 +295,6 @@ Mode: 644
     #
     #Type      http
     #Type      dbi
-    #Type      oracle
     #Type      command
 
     ###################################

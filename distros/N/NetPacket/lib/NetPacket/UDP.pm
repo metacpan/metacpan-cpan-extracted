@@ -1,7 +1,7 @@
 package NetPacket::UDP;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble UDP (User Datagram Protocol) packets.
-$NetPacket::UDP::VERSION = '1.7.1';
+$NetPacket::UDP::VERSION = '1.7.2';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ sub udp_strip {
 
 sub strip {
     return decode(__PACKAGE__,shift)->{data};
-}   
+}
 
 #
 # Encode a packet
@@ -61,7 +61,7 @@ sub strip {
 
 sub encode {
     my ($self, $ip) = @_;
- 
+
     # Adjust the length accordingly
     $self->{len} = 8 + length($self->{data});
 
@@ -74,7 +74,7 @@ sub encode {
 
 }
 
-# 
+#
 # UDP Checksum
 #
 
@@ -108,7 +108,7 @@ sub checksum {
 
     $packet .= "\x00" if length($packet) % 2;
 
-    $self->{cksum} = NetPacket::htons(NetPacket::in_cksum($packet)); 
+    $self->{cksum} = NetPacket::htons(NetPacket::in_cksum($packet));
 
 }
 
@@ -124,7 +124,7 @@ NetPacket::UDP - Assemble and disassemble UDP (User Datagram Protocol) packets.
 
 =head1 VERSION
 
-version 1.7.1
+version 1.7.2
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ version 1.7.1
 =head1 DESCRIPTION
 
 C<NetPacket::UDP> provides a set of routines for assembling and
-disassembling packets using UDP (User Datagram Protocol).  
+disassembling packets using UDP (User Datagram Protocol).
 
 =head2 Methods
 
@@ -153,8 +153,8 @@ is passed to this method.
 =item C<$udp_packet-<gt>encode($l3_obj)>
 
 Return the encoded version of the UDP packet object. Needs
-part of the IP header contained (src_ip and dest_ip specifically) in $l3_obj, 
-in order to calculate the UDP checksum. The length field will also be set 
+part of the IP header contained (src_ip and dest_ip specifically) in $l3_obj,
+in order to calculate the UDP checksum. The length field will also be set
 automatically based on values provided.
 
 =back
@@ -278,9 +278,9 @@ destination IP address and port, and the UDP packet length:
 
   Net::PcapUtils::loop(\&process_pkt, FILTER => 'udp');
 
-The following is an example use in combination with Net::Divert 
-to alter the payload of packets that pass through. All occurences
-of foo will be replaced with bar. This example is easy to test with 
+The following is an example use in combination with Net::Divert
+to alter the payload of packets that pass through. All occurrences
+of foo will be replaced with bar. This example is easy to test with
 netcat, but otherwise makes little sense. :) Adapt to your needs:
 
     use Net::Divert;
@@ -318,7 +318,7 @@ netcat, but otherwise makes little sense. :) Adapt to your needs:
 
 Copyright (c) 2001 Tim Potter.
 
-Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of 
+Copyright (c) 1995,1996,1997,1998,1999 ANU and CSIRO on behalf of
 the participants in the CRC for Advanced Computational Systems
 ('ACSys').
 

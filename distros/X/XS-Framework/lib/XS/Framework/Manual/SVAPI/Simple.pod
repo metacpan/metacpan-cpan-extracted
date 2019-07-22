@@ -53,7 +53,7 @@ C<undef>.
 It is possible to construct C<Simple> instance from number or string via:
 
     template <class T, typename = arithmetic_t<T>> explicit Simple (T val)
-    Simple (const std::string_view& s)
+    Simple (const panda::string_view& s)
 
 Copy and move-constructore are also available:
 
@@ -64,18 +64,12 @@ Copy and move-constructore are also available:
     Simple (const Sv&     oth)
     Simple (Sv&&          oth)
 
-It it possible to create C<Simple> object from C<CallProxy> invocation:
-
-    Simple (const CallProxy& p)
-
-however, please note, that the C<CallProxy> will be called in B<scalar context>.
-
 There is a special method that creates an C<Simple> object from C<HEK*>.
 Basically it is the string with precomputed hash number. It is useful for fast
 value lookup in the C<Hash> class.
 
     static Simple shared (HEK* k)
-    static Simple shared (const std::string_view& s, U32 hash = 0)
+    static Simple shared (const panda::string_view& s, U32 hash = 0)
 
 
 =head2 assignment operators
@@ -87,12 +81,11 @@ value lookup in the C<Hash> class.
     Simple& operator= (Scalar&& oth)
     Simple& operator= (const Sv& oth)
     Simple& operator= (Sv&& oth)
-    Simple& operator= (const CallProxy& p)
 
     template <typename T, typename = arithmetic_t<T>>
     Simple& operator= (T val)
 
-    Simple& operator= (const std::string_view& s)
+    Simple& operator= (const panda::string_view& s)
 
 The assignment operators are complementaty to the constructors above. They
 inherit behaviour from C<Sv>, including NULL-safety. The previously held
@@ -101,7 +94,7 @@ C<SV*> will be C<dec>-remented.
     template <typename T, typename = arithmetic_t<T>>
     void set (T val)
 
-    void set (std::string_view s)
+    void set (panda::string_view s)
     void set (SV* val)
 
 The C<set> method directly assigns the value to the underlying C<SV*>,
@@ -122,7 +115,7 @@ In number context it C<Simple> tries to extract number from the underlying
 C<SV*>. If the C<Simple> instance is empty zero of appropriate type is
 returned. So, this are NULL-safe methods.
 
-    operator std::string_view () const
+    operator panda::string_view () const
     const char* c_str () const
     template <class T = panda::string> T as_string () const
 
@@ -131,10 +124,10 @@ object, the empty string is returned. So, this are NULL-safe methods.
 
 There are a few NULL-unsafe but fast getters:
 
-    template <typename T>      arithmetic_t<T>               get () const
-    template <typename T>      one_of_t<T,char*,const char*> get () const
-    template <typename T>      one_of_t<T, std::string_view> get () const
-    template <typename T = SV> one_of_t<T,SV>*               get () const
+    template <typename T>      arithmetic_t<T>                 get () const
+    template <typename T>      one_of_t<T,char*,const char*>   get () const
+    template <typename T>      one_of_t<T, panda::string_view> get () const
+    template <typename T = SV> one_of_t<T,SV>*                 get () const
 
 
 =head2 operator[]
@@ -233,18 +226,18 @@ This is null-unsafe method.
     template <typename T, typename = arithmetic_t<T>> inline bool operator<= (const Simple& lhs, T rhs)
     template <typename T, typename = arithmetic_t<T>> inline bool operator<= (T lhs, const Simple& rhs)
 
-    inline bool operator== (const Simple& lhs, const std::string_view& rhs)
-    inline bool operator== (const std::string_view& lhs, const Simple& rhs)
-    inline bool operator!= (const Simple& lhs, const std::string_view& rhs)
-    inline bool operator!= (const std::string_view& lhs, const Simple& rhs)
-    inline bool operator>  (const Simple& lhs, const std::string_view& rhs)
-    inline bool operator>  (const std::string_view& lhs, const Simple& rhs)
-    inline bool operator>= (const Simple& lhs, const std::string_view& rhs)
-    inline bool operator>= (const std::string_view& lhs, const Simple& rhs)
-    inline bool operator<  (const Simple& lhs, const std::string_view& rhs)
-    inline bool operator<  (const std::string_view& lhs, const Simple& rhs)
-    inline bool operator<= (const Simple& lhs, const std::string_view& rhs)
-    inline bool operator<= (const std::string_view& lhs, const Simple& rhs)
+    inline bool operator== (const Simple& lhs, const panda::string_view& rhs)
+    inline bool operator== (const panda::string_view& lhs, const Simple& rhs)
+    inline bool operator!= (const Simple& lhs, const panda::string_view& rhs)
+    inline bool operator!= (const panda::string_view& lhs, const Simple& rhs)
+    inline bool operator>  (const Simple& lhs, const panda::string_view& rhs)
+    inline bool operator>  (const panda::string_view& lhs, const Simple& rhs)
+    inline bool operator>= (const Simple& lhs, const panda::string_view& rhs)
+    inline bool operator>= (const panda::string_view& lhs, const Simple& rhs)
+    inline bool operator<  (const Simple& lhs, const panda::string_view& rhs)
+    inline bool operator<  (const panda::string_view& lhs, const Simple& rhs)
+    inline bool operator<= (const Simple& lhs, const panda::string_view& rhs)
+    inline bool operator<= (const panda::string_view& lhs, const Simple& rhs)
 
     inline bool operator== (const Simple& lhs, const char* rhs)
     inline bool operator== (const char* lhs, const Simple& rhs)

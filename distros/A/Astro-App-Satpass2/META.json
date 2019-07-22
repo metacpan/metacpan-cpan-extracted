@@ -4,7 +4,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -75,123 +75,123 @@
    "provides" : {
       "Astro::App::Satpass2" : {
          "file" : "lib/Astro/App/Satpass2.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Copier" : {
          "file" : "lib/Astro/App/Satpass2/Copier.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Format" : {
          "file" : "lib/Astro/App/Satpass2/Format.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Format::Dump" : {
          "file" : "lib/Astro/App/Satpass2/Format/Dump.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Format::Template" : {
          "file" : "lib/Astro/App/Satpass2/Format/Template.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatTime" : {
          "file" : "lib/Astro/App/Satpass2/FormatTime.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatTime::Cldr" : {
          "file" : "lib/Astro/App/Satpass2/FormatTime/Cldr.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatTime::DateTime" : {
          "file" : "lib/Astro/App/Satpass2/FormatTime/DateTime.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatTime::DateTime::Cldr" : {
          "file" : "lib/Astro/App/Satpass2/FormatTime/DateTime/Cldr.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatTime::DateTime::Strftime" : {
          "file" : "lib/Astro/App/Satpass2/FormatTime/DateTime/Strftime.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatTime::POSIX::Strftime" : {
          "file" : "lib/Astro/App/Satpass2/FormatTime/POSIX/Strftime.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatTime::Strftime" : {
          "file" : "lib/Astro/App/Satpass2/FormatTime/Strftime.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatValue" : {
          "file" : "lib/Astro/App/Satpass2/FormatValue.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::FormatValue::Formatter" : {
          "file" : "lib/Astro/App/Satpass2/FormatValue/Formatter.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Geocode" : {
          "file" : "lib/Astro/App/Satpass2/Geocode.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Geocode::OSM" : {
          "file" : "lib/Astro/App/Satpass2/Geocode/OSM.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Locale" : {
          "file" : "lib/Astro/App/Satpass2/Locale.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Locale::C" : {
          "file" : "lib/Astro/App/Satpass2/Locale/C.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Macro" : {
          "file" : "lib/Astro/App/Satpass2/Macro.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Macro::Code" : {
          "file" : "lib/Astro/App/Satpass2/Macro/Code.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Macro::Command" : {
          "file" : "lib/Astro/App/Satpass2/Macro/Command.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::ParseTime" : {
          "file" : "lib/Astro/App/Satpass2/ParseTime.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::ParseTime::Code" : {
          "file" : "lib/Astro/App/Satpass2/ParseTime/Code.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::ParseTime::Date::Manip" : {
          "file" : "lib/Astro/App/Satpass2/ParseTime/Date/Manip.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::ParseTime::Date::Manip::v5" : {
          "file" : "lib/Astro/App/Satpass2/ParseTime/Date/Manip/v5.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::ParseTime::Date::Manip::v6" : {
          "file" : "lib/Astro/App/Satpass2/ParseTime/Date/Manip/v6.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::ParseTime::ISO8601" : {
          "file" : "lib/Astro/App/Satpass2/ParseTime/ISO8601.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Utils" : {
          "file" : "lib/Astro/App/Satpass2/Utils.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Warner" : {
          "file" : "lib/Astro/App/Satpass2/Warner.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Astro::App::Satpass2::Wrap::Array" : {
          "file" : "lib/Astro/App/Satpass2/Wrap/Array.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       }
    },
    "release_status" : "stable",
@@ -208,6 +208,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-App-Satpass2"
       }
    },
-   "version" : "0.039",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.040",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

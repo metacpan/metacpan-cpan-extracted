@@ -476,7 +476,7 @@ sub update
     # NOTE, this also checks you can pass a scalar to bind_param_array
     $sth->bind_param_array(1, 'dave');
     my @pe1 = @p1;
-    $pe1[-1] = 10;              # non-existant row
+    $pe1[-1] = 10;              # non-existent row
     $sth->bind_param_array(2, \@pe1);
     $self->insert($dbh, $sth,
                   {commit => 0, error => 0, sts => 5, affected => 4,

@@ -19,7 +19,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw(  manufacturer_id product_id sensor_id is_switch )  );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 sub new {
     my( $class, %userparams ) = @_;

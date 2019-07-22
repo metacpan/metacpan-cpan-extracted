@@ -135,8 +135,16 @@ sub unlisten {
 
 sub _notifications {
   my $self = shift;
-  my $dbh  = $self->dbh;
-  while (my $n = $dbh->pg_notifies) { $self->emit(notification => @$n) }
+
+  my $dbh = $self->dbh;
+  my $n;
+  return undef unless $n = $dbh->pg_notifies;
+  while ($n) {
+    $self->emit(notification => @$n);
+    $n = $dbh->pg_notifies;
+  }
+
+  return 1;
 }
 
 sub _unwatch {
@@ -152,6 +160,7 @@ sub _watch {
   return if $self->{watching} || $self->{watching}++;
 
   my $dbh = $self->dbh;
+  $dbh->{private_mojo_async} = 1;
   unless ($self->{handle}) {
     open $self->{handle}, '<&', $dbh->{pg_socket} or die "Can't dup: $!";
   }
@@ -159,13 +168,14 @@ sub _watch {
     $self->{handle} => sub {
       my $reactor = shift;
 
-      $self->_unwatch if !eval { $self->_notifications; 1 };
-      return unless $self->{waiting} && $dbh->pg_ready;
+      return $self->_unwatch if !$self->_notifications && !$self->{waiting};
+
+      return if !$self->{waiting} || !$dbh->pg_ready;
       my ($sth, $cb) = @{delete $self->{waiting}}{qw(sth cb)};
 
       # Do not raise exceptions inside the event loop
       my $result = do { local $dbh->{RaiseError} = 0; $dbh->pg_result };
-      my $err = defined $result ? undef : $dbh->errstr;
+      my $err    = defined $result ? undef : $dbh->errstr;
 
       $self->$cb($err, $self->results_class->new(db => $self, sth => $sth));
       $self->_unwatch unless $self->{waiting} || $self->is_listening;

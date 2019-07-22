@@ -21,18 +21,18 @@ no_index:
 provides:
   HiPi::BCM2835:
     file: lib/HiPi/BCM2835.pm
-    version: '0.64'
+    version: '0.65'
   HiPi::BCM2835::I2C:
     file: lib/HiPi/BCM2835/I2C.pm
-    version: '0.64'
+    version: '0.65'
   HiPi::BCM2835::Pin:
     file: lib/HiPi/BCM2835/Pin.pm
-    version: '0.64'
+    version: '0.65'
 requires:
-  HiPi: '0.66'
+  HiPi: '0.80'
   threads::shared: '0'
 resources:
   homepage: http://raspberry.znix.com/
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.64'
+version: '0.65'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

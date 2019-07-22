@@ -68,6 +68,7 @@
 *.triton.zone;*.triton.zone
 *.uberspace.de;*.uberspace.de
 *.vps.myjino.ru;*.vps.myjino.ru
+*.webhare.dev;*.webhare.dev
 *.ye;*.ye
 *.yokohama.jp;*.yokohama.jp
 0.bg;0.bg
@@ -495,6 +496,7 @@ asaminami.hiroshima.jp;asaminami.hiroshima.jp
 ascoli-piceno.it;ascoli-piceno.it
 ascolipiceno.it;ascolipiceno.it
 asda;asda
+aseinet.ne.jp;aseinet.ne.jp
 aseral.no;aseral.no
 ashgabad.su;ashgabad.su
 ashibetsu.hokkaido.jp;ashibetsu.hokkaido.jp
@@ -1745,6 +1747,7 @@ cz.it;cz.it
 czeladz.pl;czeladz.pl
 czest.pl;czest.pl
 d.bg;d.bg
+d.gv.vc;d.gv.vc
 d.se;d.se
 dabur;dabur
 dad;dad
@@ -2400,6 +2403,7 @@ firm.dk;firm.dk
 firm.ht;firm.ht
 firm.in;firm.in
 firm.nf;firm.nf
+firm.ng;firm.ng
 firm.ro;firm.ro
 firm.ve;firm.ve
 firmdale;firmdale
@@ -3065,6 +3069,7 @@ guru;guru
 gushikami.okinawa.jp;gushikami.okinawa.jp
 gv.ao;gv.ao
 gv.at;gv.at
+gv.vc;gv.vc
 gw;gw
 gwangju.kr;gwangju.kr
 gwiddle.co.uk;gwiddle.co.uk
@@ -5553,6 +5558,7 @@ ng;ng
 ng.city;ng.city
 ng.eu.org;ng.eu.org
 ng.ink;ng.ink
+ng.school;ng.school
 ngo;ngo
 ngo.lk;ngo.lk
 ngo.ph;ngo.ph
@@ -7422,6 +7428,7 @@ stokke.no;stokke.no
 stolos.io;stolos.io
 stor-elvdal.no;stor-elvdal.no
 storage;storage
+storage.yandexcloud.net;storage.yandexcloud.net
 stord.no;stord.no
 stordal.no;stordal.no
 store;store
@@ -8128,6 +8135,7 @@ usarts.museum;usarts.museum
 uscountryestate.museum;uscountryestate.museum
 usculture.museum;usculture.museum
 usdecorativearts.museum;usdecorativearts.museum
+user.aseinet.ne.jp;user.aseinet.ne.jp
 user.party.eus;user.party.eus
 user.srcf.net;user.srcf.net
 usercontent.jp;usercontent.jp
@@ -8393,6 +8401,7 @@ web.ve;web.ve
 web.za;web.za
 webcam;webcam
 weber;weber
+webhare.dev;webhare.dev
 webhop.biz;webhop.biz
 webhop.info;webhop.info
 webhop.me;webhop.me
@@ -8401,6 +8410,7 @@ webhop.org;webhop.org
 webhosting.be;webhosting.be
 webredirect.org;webredirect.org
 website;website
+website.yandexcloud.net;website.yandexcloud.net
 webspace.rocks;webspace.rocks
 wed;wed
 wedding;wedding
@@ -8538,6 +8548,7 @@ yame.fukuoka.jp;yame.fukuoka.jp
 yanagawa.fukuoka.jp;yanagawa.fukuoka.jp
 yanaizu.fukushima.jp;yanaizu.fukushima.jp
 yandex;yandex
+yandexcloud.net;yandexcloud.net
 yao.osaka.jp;yao.osaka.jp
 yaotsu.gifu.jp;yaotsu.gifu.jp
 yasaka.nagano.jp;yasaka.nagano.jp

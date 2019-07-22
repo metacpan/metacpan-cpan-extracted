@@ -32,5 +32,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190708'
+version: '20190721'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

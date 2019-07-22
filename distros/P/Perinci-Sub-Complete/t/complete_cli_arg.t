@@ -63,13 +63,13 @@ test_complete(
     name        => 'arg value (schema)',
     args        => {meta=>$meta},
     comp_line0  => 'CMD --s1 ^',
-    result      => {words=>['apple','apricot','banana','grape','grapefruit','green grape','red date','red grape'], static=>1},
+    result      => {words=>[map {+{word=>$_, summary=>undef}} 'apple','apricot','banana','grape','grapefruit','green grape','red date','red grape'], static=>1},
 );
 test_complete(
     name        => 'arg value (schema) #2',
     args        => {meta=>$meta},
     comp_line0  => 'CMD --s1 ap^',
-    result      => {words=>[qw(apple apricot)], static=>0}, # static is 0 here because word is not zero-length
+    result      => {words=>[map {+{word=>$_, summary=>undef}} qw(apple apricot)], static=>0}, # static is 0 here because word is not zero-length
 );
 test_complete(
     name        => 'arg value (spec "completion")',
@@ -81,10 +81,13 @@ test_complete(
     name        => 'arg value, pos',
     args        => {meta=>$meta},
     comp_line0  => 'CMD ^',
-    result      => {static=>1, words=>[sort(
-        qw(--a1 --a2 --a3 --arg0 --f0 --f1 --h1 --h2 --help --i0 --i1
-           --i2 --s1 --s1b --s2 --s3 -? -h),
-        1..99)]},
+    result      => {static=>1, words=>[
+        sort(
+            qw(--a1 --a2 --a3 --arg0 --f0 --f1 --h1 --h2 --help --i0 --i1
+               --i2 --s1 --s1b --s2 --s3 -? -h),
+        ),
+        (map {+{word=>$_, summary=>undef}} sort 1..99),
+    ]},
 );
 test_complete(
     name        => 'arg value, pos + greedy',
@@ -93,8 +96,8 @@ test_complete(
     result      => {static=>1, words=>[
         qw(--a1 --a2 --a3 --arg0 --f0 --f1 --h1 --h2 --help --i0 --i1
            --i2 --s1 --s1b --s2 --s3 -? -h),
-        'apple', 'apricot', 'banana', 'grape', 'grapefruit', 'green grape',
-        'red date', 'red grape']},
+        (map {+{word=>$_, summary=>undef}} 'apple', 'apricot', 'banana', 'grape', 'grapefruit', 'green grape', 'red date', 'red grape'),
+    ]},
 );
 
 test_complete(

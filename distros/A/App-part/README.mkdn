@@ -1,0 +1,100 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/App-part.svg?branch=master)](https://travis-ci.org/Corion/App-part)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/App-part?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/App-part)
+
+# NAME
+
+part - split up a single input file into multiple files according to a column value
+
+# SYNOPSIS
+
+    # Split a comma separated file according to the third column
+    # keeping and reproducing one line of headers
+    perl -w part.pl example.csv --header-line=1 --column=3 "--separator=,"
+
+    # Split a tab separated file according to the second column
+    perl -w part.pl example.tsv --column=2 --separator=009
+
+# OPTIONS
+
+- **--out** - set the output template
+
+    If the output template is not given it is guessed from
+    the name of the first input file or set to `part-%s.txt`.
+    The `%s` will be replaced by the column value.
+
+- **--column** - set the column to part on
+
+    This is the zero-based number of the column.
+    Multiple columns may be given.
+
+- **--separator** - set the column separator
+
+    This is the separator for the columns. It defaults
+    to a tab character ("\\t").
+
+- **--header-line** - output the first line into every file
+
+    This defines the line as header line which is output
+    into every file. If it is given an argument that string
+    is output as header, otherwise the first line read
+    will be repeated as the header.
+
+    If the value is a number, that many lines will be read from
+    the file and used as the header. This makes it impossible
+    to use just a number as the header.
+
+- **--verbose** - output the generated filenames
+
+    In normal operation, the program will be silent. If you
+    need to know the generated filenames, the `--verbose`
+    option will output them.
+
+- **--filename-sep** - set the separator for the filenames
+
+    If you prefer a different separator for the filenames
+    than a newline, this option allows you to set it. If
+    the separator looks like an octal number (three digits)
+    it is interpreted as such. Otherwise it will
+    be taken literally. A common
+    use is to set the separator to `000` to separate the
+    files by the zero character if you suspect that your
+    filenames might contain newlines.
+
+    It defaults to `012`, a newline.
+
+- **--version** - output version information
+
+# CAVEAT
+
+The program loads the whole input into RAM
+before writing the output. A future enhancement
+might be a `uniq`-like option that tells the
+program to assume that the input will be grouped
+according to the parted column so it does not
+need to allocate memory.
+
+If your memory is not large enough, the following
+`awk` one-liner might help you:
+
+    # Example of parting on column 3
+    awk -F '{ print $0 > $3 }' FILE
+
+# REPOSITORY
+
+The public repository of this program is
+[https://github.com/Corion/app-part](https://github.com/Corion/app-part).
+
+# SUPPORT
+
+The public support forum of this program is
+[https://perlmonks.org/](https://perlmonks.org/). The homepage is
+[https://perlmonks.org/?node\_id=598718](https://perlmonks.org/?node_id=598718) .
+
+# BUG TRACKER
+
+Please report bugs via [https://perlmonks.org](https://perlmonks.org).
+
+# AUTHOR
+
+Copyright (c) 2007-2019 Max Maischein (`corion@cpan.org`)

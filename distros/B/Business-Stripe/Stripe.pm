@@ -6,11 +6,13 @@ use warnings;
 use JSON;
 use LWP::UserAgent;
 use HTTP::Request::Common qw/DELETE GET POST/;
-use MIME::Base64;
+use MIME::Base64 qw(encode_base64);
 
-our $VERSION         = '0.06';
+our $VERSION         = '0.07';
 
 use constant URL     => 'https://api.stripe.com/v1/';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -18,32 +20,80 @@ Business::Stripe - Interface for Stripe payment system.
 
 =head1 SYNOPSIS
 
- my $stripe     = Business::Stripe->new(
-    -api_key         => 'c6EiNIusHip8x5hkdIjtur7KNUA3TTpE'
+ my $stripe = Business::Stripe->new(
+    -api_key => 'your-api-key-here',
  );
 
+ ## get the payment token from Stripe.js, then:
  $stripe->charges_create(
      amount         => 400,
-     card           => 'tok_5EuIyKyCTc0f2V',
+     source         => 'tok_5EuIyKyCTc0f2V',
      description    => 'Ice cream'
  ) and return $stripe->success;
 
- print $stripe->error->{message}, "\n";
+ say $stripe->error->{message};
 
 =head1 DESCRIPTION
 
-Provides common bindings for Stripe payment system.
-Any API calls that do not have bindings can be access through the
+This module provides common bindings for the Stripe payment system.
+Any API calls that do not have bindings can be accessed through the
 generic C<api> method.
 
-=head2 Methods
+=head2 General Methods
 
-=head3 new (I<{options}>)
+=head3 new (I<%options>)
 
-Requires C<-api_key> given to you as part of your Stripe account.
-Optional C<-url> can override default:
+Creates a new Business::Stripe object for you to use. The only
+B<< required argument >> is C<-api_key>, which was given to you
+as part of your Stripe account to access the API.
 
- https://api.stripe.com/v1/
+Other (optional) arguments are:
+
+=over 4
+
+=item C<-version> Sets a Stripe API version to use, overriding your
+account's default. You can use this to test if new versions of
+the API work with your code. To support marketplaces, for instance, you
+should use at least C<'2014-11-05'>.
+
+=item C<-ua_args> Hashref of options that will be passed directly as
+arguments to LWP::UserAgent. Example:
+
+    my $stripe = Business::Stripe->new(
+        -api_key => 'xxxxxxxxx',
+        -ua_args => {
+            timeout   => 10,
+            env_proxy => 1,
+            agent     => 'myApp',
+            ssl_opts  => { verify_hostname => 0 },
+        },
+    );
+
+=item C<-ua> Completely overrides the default user agent object (L<LWP::UserAgent>).
+Note that your object I<must> accept HTTPS, and provide a C<request()> method
+accepting L<HTTP::Request> objects and returning L<HTTP::Response>-compatible
+objects. You can use this to have a common user agent make all requests in
+your code. The example above works exactly like:
+
+    my $ua = LWP::UserAgent->new(
+        timeout   => 10,
+        env_proxy => 1,
+        agent     => 'myApp',
+        ssl_opts  => { verify_hostname => 0 },
+    );
+
+    my $stripe = Business::Stripe->new(
+        -api_key => 'xxxxxxxx',
+        -ua      => $ua,
+    );
+
+=item C<-url> Overrides the default API endpoint (C<https://api.stripe.com/v1/>)
+
+=item C<-stripe_account> If you use the
+L<< OAauth authentication flow for managed accounts|https://stripe.com/docs/connect/authentication >>
+You can use this argument to make operations on behalf of a managed account.
+
+=back
 
 =cut
 
@@ -56,69 +106,79 @@ sub new {
     return $self;
 }
 
-=head3 api (I<method>, I<path>, I<params,...>)
+=head3 api (I<$method>, I<$path>, I<%params>)
 
 Generic function that sends requests to Stripe.
-Check Stripe API Reference L<https://stripe.com/docs/api> for specific calls.
+Check the L<< Stripe API Reference|https://stripe.com/docs/api >>
+for specific calls.
 
-Assuming you're not using Stripe.js to generate a token given the card
-information, you can do that using this call:
+The first argument is the HTTP method: C<"post">, C<"get"> or C<"delete">.
 
- my $token = $stripe->api('post', 'tokens', 
-     'card[number]'    => '4242424242424242',
-     'card[exp_month]' => 12,
-     'card[exp_year]'  => 2012,
-     'card[cvc]'       => 123
- );
+The second is the target path, like "tokens", "plans", "customers"
+or even complex paths like "customers/$id/subscriptions". Check the
+Stripe API Reference for a list of all available paths.
 
-Let's create a new plan to subscribe the customer to:
+Use the optional third argument to send a hash of data with your API call.
+This is usually required on all C<"post"> calls to the API.
 
- $stripe->api('post', 'plans',
-     amount           => 500,
-     id               => 'cone',
-     currency         => 'usd',
-     interval         => 'month',
-     name             => 'The cone plan'
- );
+On success, it returns a true value. If the returned data structure contains
+an C<id> field, this is the value returned. Otherwise, "1" is returned and
+you should check L<< $stripe->success() | /success >> for the actual data
+structure.
 
-Now, let's create a C<customer> object with the above token and
-subscribe the customer to our monthly $5 ice cream C<cone> plan:
+In case of failures, it returns false (0) and you should then check
+L<< $stripe->error() | /error >> for the appropriate data structure.
 
- my $customer = $stripe->api('post', 'customers',
-     card            => $token,
-     email           => 'paul@example.com',
-     description     => 'Ice creamer',
-     plan            => 'cone'
- );
-
-Customer wants to cancel the subscription:
-
- $stripe->api('delete', "customers/$customer/subscription");
-    
-=head4 parameters
+Examples:
 
 =over 4
 
-=item method
+=item get a credit card source token on the server side (without using Stripe.js)
 
-One of C<post>, C<get>, or C<delete>.
+    my $token_id = $stripe->api('post', 'tokens',
+        'card[number]'    => '4242424242424242',
+        'card[exp_month]' => 12,
+        'card[exp_year]'  => 2022,
+        'card[cvc]'       => 123
+    ) or die $stripe->error->{message};
 
-=item path
+=item create a new customer (with the $token_id from above)
 
-Either C<charges>, C<events>, C<invoices>, C<events/{ID}>, etc. 
-Check API doc for complete list.
+    my $customer = $stripe->api('post', 'customers',
+        email       => 'myuser@example.com',
+        name        => 'Jane S. Customer',
+        description => 'Displayed alongside the customer on your dashboard',
+        source      => $token_id,
+    ) and $stripe->success;
+    die $stripe->error unless $customer;
 
-=item params
+=item create a new plan to subscribe your customers
 
-This optional set of parameters can be a single element or a list
-of key/value pairs.
+    my $plan_id = $stripe->api('post', 'plans',
+        'amount'        => 999,       # *IN CENTS* (999 = 9.99). Use 0 for a free plan!
+        'id'            => 'my-plan', # Optional. Must be unique in your account
+        'currency'      => 'usd',     # See https://stripe.com/docs/currencies
+        'interval'      => 'month',   # Also: 'day', 'week', 'year'
+        'product[name]' => 'My Plan',
+    ) or die $stripe->error->{message};
+
+=item subscribe the customer to a plan (using examples above)
+
+    my $subscription = $stripe->api('post', 'subscriptions',
+        'customer'       => $customer->{id},
+        'items[0][plan]' => $plan_id,
+    ) ? $stripe->success : $stripe_error;
+
+=item cancel a subscription immediately
+
+ $stripe->api('delete', "subscriptions/" . $subscription->{id})
+    or die "error canceling subscription: " . $stripe->error->{message};
 
 =back
 
-All actions can be performed by using only this method.
-The two set of functions C<charges> and C<customers> provided
-in this package are made available for functions that are used frequently
-in common implementations.
+As you can see, all actions can be performed by using only this method.
+The other methods provided by this class are just helper wrappers around this,
+for frequently made calls.
 
 =cut
 
@@ -126,36 +186,37 @@ sub api {
     my $self        = shift;
     my $method      = shift;
     my $path        = shift;
-    my %params      = (@_);
 
     if ($method eq 'post') {
-        return $self->_compose($path, %params);
-    } 
+        return $self->_compose($path, @_);
+    }
 
     $method eq 'delete' or undef $method;
 
     if (scalar @_ >= 2) {
-        my $qs     = join '&', map { 
-            $_ . '=' . ($params{$_}||'') 
-        } keys %params;
+        my %params      = (@_);
+        my $qs     = join '&', map {
+            $_ . '=' . ($params{$_}||'')
+        } sort keys %params;
 
         return $self->_compose($path.'?'.$qs, $method);
     } elsif (scalar @_) {
         ### allowing api('delete','plans','gold')
         ### for readability api('delete','plans/gold');
-
         return $self->_compose($path.'/'.$_[0], $method);
     }
 
     $self->_compose($path, $method);
 }
 
-=head3 error (I<void>)
+=head3 error
 
-Method returns C<0> when encounter error conditions.
+All API and helper methods return C<0> when they encounter error conditions.
 The JSON object returned by Stripe can be retrieved via this method.
 
- print $stripe->error->{message}, "\n";
+ say $stripe->error->{message};
+
+Most error messages include C<message>, C<code>, C<type> and C<doc_url>.
 
 =cut
 
@@ -163,13 +224,14 @@ sub error {
     return shift->{-error}->{error};
 }
 
-=head3 success (I<void>)
+=head3 success
 
-When calls are successful a positive value is returned
-or if possible, the ID. Stripe's JSON object can be retrieved via
-this method. Specific values are defined in the Stripe API Documentation.
+All API and helper methods return either C<1> or the object's ID on success.
+Use this method to get access to the complete JSON object returned on the
+last call made by your object. See Stripe's API Documentation for details
+on what is returned on each call.
 
- print $stripe->success->{data}->[0]->{description}, "\n";
+ say $stripe->success->{data}->[0]->{description};
 
 =cut
 
@@ -177,57 +239,39 @@ sub success {
     return shift->{-success};
 }
 
-
-
 =head2 Charges
 
 Set of methods that handle credit/debit card such as charging a card,
-refund, retrieve specifc charge and list charges.
+refund, retrieve specific charge and list charges.
 
-=head3 charges_create (I<{params}>)
+=head3 charges_create (I<%params>)
 
-Charge the credit card.
+    my $success = $stripe->charges_create(
+        amount      => 100,  # <-- amount in cents
+        source      => 'tok_Wzm6ewTBrkVvC3',
+        description => 'customer@example.com'
+    );
 
-=head4 parameters
+Charges a credit card or other payment sources. This is exactly
+the same as C<< $stripe->api('post', 'charges', %params) >>,
+except that it defaults to 'usd' if you don't provide a currency.
 
-Assumes currency in C<usd>. Uses token from Stripe.js.
+It returns the C<id> of the charge on success, or 0 on error.
+You may also check L<< $stripe->success | /success >> or
+L<< $stripe->error | /error >> for the complete JSON.
 
- $stripe->charges_create(
-    amount         => 10,
-    card         => 'tok_Wzm6ewTBrkVvC3',
-    description => 'customer@example.com'
- );
+Please see Stripe's API Documentation for which parameters are
+accepted by your current API version.
 
-=over 4
+B<Note:> The C<amount> field is in the I<< currency's smallest unit >>.
+For currencies that allow cents (like USD), an amount of 100 means $1.00,
+1000 mean $10.00 and so on. For zero-decimal currencies (like JPY) you don't
+have to multiply, as an amount of 100 mean ¥100.
 
-=item amount
-
-Positive integer larger than C<50> (amount is specified in cents).
-
-=item currency
-
-3-letter ISO code. Defaults to C<usd> (it's the only one supported).
-
-=item customer
-
-Required if not using C<card> below.
-The C<ID> of an exisiting customer.
-
-=item card
-
-Required if not using C<customer> above.
-Uses Token acquired from Stripe.js or give it the card details.
-
-=item description (optional)
-
-Descriptive text identifying the charge (recommend using customer's email).
-
-=back
-
-=head4 returns
-
-Returns the C<id> if success (check C<success> for JSON object).
-If error (use C<error> for JSON object) returns C<0>.
+B<Note:> Older (2015-ish) versions of Stripe's API support the C<card>
+parameter containing the source token from Stripe.js. This has since
+been deprecated in favour of the C<source> parameter, shown in the
+example above.
 
 =cut
 
@@ -239,11 +283,15 @@ sub charges_create {
     return $self->_compose('charges', %param);
 }
 
-=head3 charges_retrieve (I<id>)
+=head3 charges_retrieve (I<$id>)
 
-Takes the charge C<id> value and yields data about the charge.
+    my $charge_data = $stripe->charges_retrieve('ch_uxLBSIZB8azrSr')
+        and $stripe->success;
 
- $stripe->charges_retrieve('ch_uxLBSIZB8azrSr');
+Takes the charge C<id> value and yields data about the charge, available
+on L<< $stripe->success | /success >>.
+
+This is exactly the same as C<< $stripe->api('get', "charges/$charge_id") >>.
 
 =cut
 
@@ -253,255 +301,240 @@ sub charges_retrieve {
     return $self->_compose('charges/'.$id);
 }
 
-=head3 charges_refund (I<id>, [I<amount>])
+=head3 charges_refund (I<$id>, [I<$amount>])
 
-Refund a specific C<amount> (or if omitted, full refund) to the charge C<id>.
-C<amount> is in cents.
+Refunds a specific C<amount> (or if omitted, issues a full refund)
+to the charge C<id>. Remember: the C<amount> parameter is I<in cents>
+whenever the currency supports cents.
 
  ### refunds full amount
- $stripe->charges_refund('ch_uxLBSIZB8azrSr');
+ $stripe->charges_refund('ch_uxLBSIZB8azrSr')
+    or die $stripe->error->{message};
 
- ### refunds $5 over charge
- $stripe->charges_refund('ch_uxLBSIZB8azrSr', 500);
+ ### refunds $5 over a bigger charge
+ $stripe->charges_refund('ch_uxLBSIZB8azrSr', 500)
+    or die $stripe->error->{message};
 
 =cut
 
 sub charges_refund {
-    my $self        = shift;
-    my $id          = shift;
-    my $amount      = shift;
+	my ($self,$id,$amount) = (@_);
 
-    return $self->_compose(
-        'charges/'.$id.'/refund',
-        $amount ? (amount => $amount) : []
-    );
+	return $self->_compose(
+		'charges/'.$id.'/refunds',
+		$amount ? (amount => $amount) : []
+	);
 }
 
-=head3 charges_list (I<{params}>)
+=head3 charges_list (I<%params>)
 
-List all the charges for a particular C<customer> or list everything.
+List all the charges, with pagination.
 
- ### lists next 5 charges
- $stripe->charges_list(count => 5, offset => 1);
+    ### lists next 5 charges
+    my $charges = $stripe->charges_list(limit => 5)
+        ? $stripe->success : die $stripe->error->{message};
 
-=head4 parameters
+    foreach my $charge (@{$charges->{data}}) {
+        say $charge->{amount} . $charge->{currency};
+    }
 
-=over 4
+    if ($charges->{has_more}) {
+        say "there are more charges to show if you raise the limit"
+          . " or change the 'starting_after' argument.";
+    }
 
-=item count
+Pass on the customer's ID to only get charges made to that customer:
 
-Optional number of records to return.  Defaults to C<10>.
+    $stripe->charges_list(customer => 'cus_gpj0mzwbQKBI7c')
+        or die "error fetching customer charges: " . $stripe->error;
 
-=item offset
-
-Optional paging marker. Defaults to C<0>.
-
-=item customer
-
-Optional customer's ID for filtering.
-
- ### list top 10 charges for this customer
- $stripe->charges_list(customer => 'cus_gpj0mzwbQKBI7c');
-
-=back
+    my $charges = $stripe->success;
 
 =cut
 
 sub charges_list {
     my $self        = shift;
     my %params      = (@_);
-    my $qs          = join '&', map { 
-        $_ . '=' . ($params{$_}||'') 
-    } keys %params;
+    my $qs          = join '&', map {
+        $_ . '=' . ($params{$_}||'')
+    } sort keys %params;
 
-    return $self->_compose('charges?'.$qs);
+    return $self->_compose('charges' . ($qs ? "?$qs" : ''));
 }
-
-
 
 
 =head2 Customers
 
-Multiple charges associated to a customer. By creating a customer,
-you don't have to ask for credit card information every charge.
+Some operations require you create a customer. Also, by creating a customer,
+you don't have to ask for credit card information on every charge.
 
-=head3 customers_create (I<{params}>)
+=head3 customers_create (I<%params>)
 
 Creates a new customer according to the credit card information or token given.
 Use this method to create a customer-ID for the given C<card>
 (token when used in conjunction with Stripe.js).
 The customer-ID can be passed to C<charges_create>'s C<customer> parameter
-instead of C<card> so that you don't have to ask for credit card info again.
+instead of C<source> so that you don't have to ask for credit card info again.
 
- ### creates the customer
- my $cid    = $stripe->customers_create(
-    card        => 'tok_Wzm6ewTBrkVvC3',
-    email       => 'customer@example.com',
-    description => 'userid-123456'
- );
+    my $customer_id = $stripe->customers_create(
+        source      => 'tok_Wzm6ewTBrkVvC3',
+        email       => 'customer@example.com',
+        description => 'userid-123456'
+    ) or die $stripe->error;
 
- ### charges the customer $5
- $cid and $stripe->charges_create(
-    customer    => $cid,
-    amount      => 500,
-    description => 'userid-123456 paid $5'
- );
+    ### charges the customer $5
+    $stripe->charges_create(
+        customer    => $customer_id,
+        amount      => 500,
+        description => 'userid-123456 paid $5'
+    );
 
-=head4 options
-
-=over 4
-
-=item card
-
-Can either be a token or credit card info.
-
-=item coupon
-
-Optional discount coupon code discount.
-
-=item email
-
-Optional customer's email.
-
-=item description
-
-Optional description.
-
-=back
-
-=head4 returns
-
-Returns customer's ID if successful.
+Returns the customer's ID if successful. As usual, you may check the
+full JSON object returned on L<< $stripe->success | /success >>.
 
 =cut
 
 sub customers_create {
-    my $self        = shift;
+    my $self = shift;
     return $self->_compose('customers', @_);
 }
 
-=head3 customers_retrieve (I<id>)
+=head3 customers_retrieve (I<$id>)
 
-Gets the customer's object.
+Gets the customer's object. Returns the id (which you already have) so
+make sure to fetch the actual object using L<< $stripe->success | /success >>.
 
- $stripe->customers_retrieve('cus_gpj0mzwbQKBI7c');
+    my $customer = $stripe->customers_retrieve('cus_gpj0mzwbQKBI7c')
+        and $stripe->success;
+    die $stripe->error unless $customer;
 
 =cut
 
 sub customers_retrieve {
-    my $self        = shift;
-    my $id          = shift;
+    my $self = shift;
+    my $id   = shift;
     return $self->_compose('customers/'.$id);
 }
 
-=head3 customers_update (I<id>, [I<{params}>])
+=head3 customers_update (I<$id>, [I<%params>])
 
 Updates customer's information.
 
- $stripe->customers_update('cus_gpj0mzwbQKBI7c',
-    card        => 'tok_Wzm6ewTBrkVvC3',
-    description => 'new card'
- );
+    $stripe->customers_update('cus_gpj0mzwbQKBI7c',
+        email => 'newemail@example.com',
+    );
+
+B<Note:> If you update the C<source> of a customer, Stripe will create
+a source object with the new value, make it the default source, and
+I<delete the old customer default> if it exists. If you just want to
+add extra sources for that customer, refer to Stripe's
+L<< card creation API | https://stripe.com/docs/api#create_card >>.
 
 =cut
 
 sub customers_update {
-    my $self        = shift;
+    my $self = shift;
     return $self->_compose('customers/'.(shift), @_);
 }
 
-=head3 customers_delete (I<id>)
+=head3 customers_delete (I<$id>)
 
 Deletes the customer.
 
- $stripe->customers_delete('cus_gpj0mzwbQKBI7c');
+ $stripe->customers_delete('cus_gpj0mzwbQKBI7c')
+    or die $stripe->error;
 
 =cut
 
 sub customers_delete {
-    my $self        = shift;
+    my $self = shift;
     return $self->_compose('customers/'.(shift), 'delete');
 }
 
-=head3 customers_list (I<{params}>)
+=head3 customers_list (I<%params>)
 
 List all customers.
 
- $stripe->customers_list(count => 20);
-
-=head4 parameters
-
-=over 4
-
-=item count
-
-Optional number of records to return. Defaults to C<10>.
-
-=item offset
-
-Optional paging marker. Defaults to C<0>.
-
-=back
+ $stripe->customers_list(limit => 20);
 
 =cut
 
 sub customers_list {
     my $self        = shift;
     my %params      = (@_);
-    my $qs          = join '&', map { 
-        $_ . '=' . ($params{$_}||'') 
-    } keys %params;
+    my $qs          = join '&', map {
+        $_ . '=' . ($params{$_}||'')
+    } sort keys %params;
 
-    return $self->_compose('customers?'.$qs);
+    return $self->_compose('customers' . ($qs ? "?$qs" : ''));
 }
 
 
-=head3 customers_subscribe (I<id>, I<{params}>)
+=head3 customers_subscribe (I<$id>, I<%params>)
 
 Subscribes a customer to a specified plan:
 
- $stripe->customers_subscribe('cus_YrUZejr9oojQjs',
-     plan       => 'basic',
-     prorate    => 'false'
- );
+    $stripe->customers_subscribe('cus_YrUZejr9oojQjs',
+        'items[0][plan]' => $some_plan_id,
+        'prorate'        => 'false'
+    );
 
-Assuming C<basic> is a plan already created in your Stripe account.
-If the customer already subscribed to a plan, this will change the
-plan to this new one.
+Assuming C<$some_plan_id> is the id of a plan already created in your
+Stripe account.
+
+B<Note:> pass C<'items[0][quantity]'> with a value of 2 or more to subscribe
+the same user to 2 or more of the same plan. It defaults to 1.
+
+B<Note:> This method will I<< replace all your user's subscriptions >> with
+the new data provided. To subscribe the user to more than one plan, write:
+
+    $stripe->api('post', 'subscriptions',
+        'customer'       => $customer_id,
+        'items[0][plan]' => $plan_id_to_add,
+    );
+
+Note that this will keep all previous billing cycles (and associated fees)
+for any other subscription already present and add a new billing cycle (and fee)
+for this new one. If you want to subscribe the customer to more than one plan
+I<< with a single billing cycle >>, pass each plan as a separate item:
+
+    $stripe->customers_subscribe('cus_YrUZejr9oojQjs',
+        'items[0][plan]' => $some_plan_id,
+        'items[1][plan]' => $other_plan_id,
+    ) or die "error subscribing customer: " . $stripe->error->{message};
 
 =cut
 
 sub customers_subscribe {
     my $self        = shift;
     my $id          = shift;
-    return $self->_compose("customers/$id/subscription", @_);
+    return $self->_compose("customers/$id/subscriptions", @_);
 }
 
 
-=head3 customers_unsubscribe (I<id>, [I<{param}>])
+=head3 customers_unsubscribe (I<$id>)
 
-Unsubscribe the customer from the plan that customer is subscribing to.
+Immediately unsubscribe the customer from all currently subscribed plans.
+Useful for terminating accounts (or paid subscriptions).
 
- $stripe->customers_unsubscribe('cus_YrUZejr9oojQjs',
-    at_period_end   => 'true'
- );
+NOTE: As per Stripe's documentation, any pending invoice items that you’ve
+created will still be charged for at the end of the period, unless manually
+deleted. If you’ve set the subscription to cancel at the end of the period,
+any pending prorations will also be left in place and collected at the end
+of the period. But if the subscription is set to cancel immediately, pending
+prorations will be removed.
+
+ $stripe->customers_unsubscribe('cus_YrUZejr9oojQjs')
+    or die "error unsubscribing customer: " . $stripe->error->{message};
 
 =cut
 
 sub customers_unsubscribe {
     my $self        = shift;
     my $id          = shift;
-    return $self->_compose("customers/$id/subscription", 
-        'delete', @_
-    );
+    return $self->_compose("customers/$id/subscriptions", 'delete');
 }
 
-
-
-
-=head2 Helper Methods
-
-=cut
 
 sub _init {
     my $self = shift;
@@ -509,61 +542,67 @@ sub _init {
     $self->{-url}     ||= URL;
     $self->{-api_key} and
     $self->{-auth}      = 'Basic ' . encode_base64($self->{-api_key}) . ':';
+    if (!$self->{-ua}) {
+        $self->{-ua} = LWP::UserAgent->new(
+            (ref $self->{-ua_args} eq 'HASH' ? %{$self->{-ua_args}} : ())
+        );
+    }
+    return;
 }
 
-=head3 _compose (I<resource>, [I<{params}>])
-
-Helper function takes in a resource, defined by the Stripe API doc.
-Current resources:
-
- charges
- coupons
- customers
- invoices
- invoiceitems
- plans
- tokens
- events
-
-=cut
-
 sub _compose {
-    my $self        = shift;
-    my $resource    = shift;
+    my $self = shift;
+    my $resource = shift;
 
     return undef unless $self->{-auth};
-    
+
     # reset
     undef $self->{-success};
     undef $self->{-error};
 
-    my $ua      = LWP::UserAgent->new;
     my $res     = undef;
     my $url     = $self->{-url} . $resource;
 
+    my @headers = $self->_fetch_headers;
+
     if ($_[0] and $_[0] eq 'delete') {
-        $res = $ua->request(
-            DELETE $url, Authorization => $self->{-auth}
+        $res = $self->{-ua}->request(
+            DELETE $url, @headers
         );
-    } elsif (scalar @_ >= 2) {
-        $res    = $ua->request(
-            POST $url, Authorization => $self->{-auth},
-                Content => [ @_ ]
+    } elsif (scalar @_ > 1 || (@_ == 1 && ref $_[0] eq 'ARRAY')) {
+        $res = $self->{-ua}->request(
+            POST $url, @headers, Content => [ @_ == 1 ? @{$_[0]} : @_ ]
         );
     } else {
-        $res    = $ua->request(
-            GET $url, Authorization => $self->{-auth}
+        $res = $self->{-ua}->request(
+            GET $url, @headers
         );
     }
 
     if ($res->is_success) {
-        $self->{-success}   = decode_json($res->content);
+        $self->{-success} = decode_json($res->content);
         return $self->{-success}->{id} || 1;
     }
 
     $self->{-error} = decode_json($res->content);
     return 0;
 }
+
+sub _fetch_headers {
+    my $self = shift;
+    my %headers = ( Authorization => $self->{-auth} );
+
+    if ($self->{-version}) {
+        $headers{'Stripe-Version'} = $self->{-version};
+    }
+    if ($self->{-stripe_account}) {
+        # for managed 'oauth' accounts.
+        # https://stripe.com/docs/connect/authentication
+        $headers{'Stripe-Account'} = $self->{-stripe_account};
+    }
+    return %headers;
+}
+
 
 =head1 REPOSITORY
 
@@ -594,41 +633,10 @@ Include the file in your program:
 
  use BusinessStripe;
  my $stripe = BusinessStripe->new(
-     -api_key => 'c6EiNIusHip8x5hkdIjtur7KNUA3TTpE'
+     -api_key => 'c6EiNIusHip8x5hkdIjtur7KNUA3TTpE',
+     -env_proxy => 1,
  );
  $stripe->charges_list;
-
-=head1 HISTORY
-
-=over 3
-
-=item 2012-03-27
-
-v0.01 Initial release
-
-=item 2012-03-28
-
-v0.02 Revised documentations, add README so tests won't fail.
-
-=item 2012-04-01
-
-v0.03 Update docs with better examples.
-Added C<customers_subscribe> and C<customers_unsubscribe>.
-
-=item 2012-10-18
-
-v0.04 Add dependencies to META.json and Makefile.PL.
-
-=item 2015-11-16
-
-v0.05 Fix POD errors.
-Removed errneous C<currency> from create tokens example.
-
-=item 2016-11-14
-
-v0.06 Fix documentation, change tabs to spaces instead.
-
-=back
 
 =head1 AUTHOR
 
@@ -636,9 +644,9 @@ Paul Pham (@phamnp)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 Aquaron. All Rights Reserved.
+Copyright (C) 2012-2019 Aquaron. All Rights Reserved.
 
-This program and library is free software; 
+This program and library is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

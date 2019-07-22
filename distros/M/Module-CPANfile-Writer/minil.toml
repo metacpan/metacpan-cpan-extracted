@@ -1,0 +1,7 @@
+name = "Module-CPANfile-Writer"
+# badges = ["travis-ci.com"]
+authority="cpan:AKIYM"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

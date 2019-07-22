@@ -1,4 +1,4 @@
-package Pcore v0.96.0;
+package Pcore v0.97.0;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -309,8 +309,6 @@ PERL
             sub AUTOLOAD {
                 my \$method = our \$AUTOLOAD =~ s/\\A.*:://smr;
 
-                die qq[Sub "$class\::\$method" is not defined] if !defined &{"$class\::\$method"};
-
                 # install method wrapper
                 eval <<"EVAL";
                     *{"$self\::Lib::_$lib\::\$method"} = sub {
@@ -420,7 +418,7 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 158, 187, 190, 194,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
 ## |      | 226, 229, 234, 237,  |                                                                                                                |
-## |      | 262, 393             |                                                                                                                |
+## |      | 262, 391             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 244                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|

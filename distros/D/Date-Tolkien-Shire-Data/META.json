@@ -4,7 +4,7 @@
       "Thomas R. Wyant, III F<wyant at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
    "provides" : {
       "Date::Tolkien::Shire::Data" : {
          "file" : "lib/Date/Tolkien/Shire/Data.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

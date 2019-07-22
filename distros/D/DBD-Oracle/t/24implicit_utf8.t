@@ -65,7 +65,7 @@ SKIP: {
 }
 
 END {
-    eval { drop_table($dbh); $dbh->disconnect if $dbh };
+    eval { drop_table($dbh); };
 }
 
 __END__

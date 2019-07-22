@@ -123,18 +123,6 @@ sub _create_dbh ($self) {
     return;
 }
 
-# SCHEMA PATCH
-sub _get_schema_patch_table_query ( $self, $table_name ) {
-    return <<"SQL";
-        CREATE TABLE IF NOT EXISTS "$table_name" (
-            "module" TEXT NOT NULL,
-            "id" INT4 NOT NULL,
-            "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY ("module", "id")
-        )
-SQL
-}
-
 # QUOTE
 sub quote ( $self, $var ) {
     return 'NULL' if !defined $var;
@@ -273,18 +261,11 @@ for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref 
 PERL
 }
 
+sub in_transaction ($self) {
+    return 0;
+}
+
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 127                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
-## |      |                      | declared but not used                                                                                          |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

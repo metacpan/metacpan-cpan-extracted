@@ -335,7 +335,7 @@ use strict;
 use warnings;
 use parent qw( HiPi::Graphics::BitmapFont);
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 REPLACEFONTCONTENT
 

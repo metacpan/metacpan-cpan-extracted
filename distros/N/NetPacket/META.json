@@ -59,51 +59,51 @@
    "provides" : {
       "NetPacket" : {
          "file" : "lib/NetPacket.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::ARP" : {
          "file" : "lib/NetPacket/ARP.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::Ethernet" : {
          "file" : "lib/NetPacket/Ethernet.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::ICMP" : {
          "file" : "lib/NetPacket/ICMP.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::ICMPv6" : {
          "file" : "lib/NetPacket/ICMPv6.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::IGMP" : {
          "file" : "lib/NetPacket/IGMP.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::IP" : {
          "file" : "lib/NetPacket/IP.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::IPX" : {
          "file" : "lib/NetPacket/IPX.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::IPv6" : {
          "file" : "lib/NetPacket/IPv6.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::TCP" : {
          "file" : "lib/NetPacket/TCP.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::UDP" : {
          "file" : "lib/NetPacket/UDP.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "NetPacket::USBMon" : {
          "file" : "lib/NetPacket/USBMon.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       }
    },
    "release_status" : "stable",
@@ -118,7 +118,7 @@
          "web" : "https://github.com/yanick/netpacket"
       }
    },
-   "version" : "1.7.1",
+   "version" : "1.7.2",
    "x_authority" : "cpan:YANICK",
    "x_contributor_covenant" : {
       "version" : 0.01

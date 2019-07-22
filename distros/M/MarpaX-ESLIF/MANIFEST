@@ -428,6 +428,7 @@ t/thread.t
 typemap
 xt/author/critic.t
 xt/author/eol.t
+xt/author/minimum-version.t
 xt/author/mojibake.t
 xt/author/no-tabs.t
 xt/author/pod-coverage.t
@@ -442,4 +443,3 @@ xt/release/dist-manifest.t
 xt/release/distmeta.t
 xt/release/kwalitee.t
 xt/release/meta-json.t
-xt/release/minimum-version.t

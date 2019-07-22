@@ -192,17 +192,17 @@ struct fbh_obj_st {  /* embedded object or table will work recursively*/
 	OCIParam		*parmdp;			/*Describe attributes of the object OCI_DTYPE_PARAM*/
 	OCIParam		*parmap;			/*Describe attributes of the object OCI_ATTR_COLLECTION_ELEMENT OCI_ATTR_PARAM*/
  	OCIType	 		*tdo;				/*object's TDO handle */
-	OCITypeCode 	typecode;			/*object's OOCI_ATTR_TYPECODE */
+	OCITypeCode 	typecode;			/*object's OCI_ATTR_TYPECODE */
 	OCITypeCode 	col_typecode;		/*if collection this is its OCI_ATTR_COLLECTION_TYPECODE */
 	OCITypeCode 	element_typecode;	/*if collection this is its element's OCI_ATTR_TYPECODE*/
-	OCIRef			*obj_ref;			/*if an embeded object this is ref handle to its TDO*/
-	OCIInd			*obj_ind;			/*Null indictator for object */
+	OCIRef			*obj_ref;			/*if an embedded object this is ref handle to its TDO*/
+	OCIInd			*obj_ind;			/*Null indicator for object */
 	OCIComplexObject *obj_value;		/*the actual value from the DB*/
 	OCIType			*obj_type;		 	/*if an embeded object this is the  OCIType returned by a OCIObjectPin*/
 	ub1				is_final_type;		/*object's OCI_ATTR_IS_FINAL_TYPE*/
 	fbh_obj_t		*fields;			/*one object for each field/property*/
 	ub2				field_count;		/*The number of fields Not really needed but nice to have*/
-	fbh_obj_t		*next_subtype;		/*There is strored information about subtypes for inteherited objects*/
+	fbh_obj_t		*next_subtype;		/*There is stored information about subtypes for inherited objects*/
 	AV				*value;				/*The value to send back to Perl This way there are no memory leaks*/
 	SV				*full_type_name;	/*Perl value of full type name = schema_name "." type_name*/
 

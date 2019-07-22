@@ -38,10 +38,10 @@ requires:
   Socket: '0'
   Sys::Hostname: '0'
   Text::SimpleTable: '2.03'
-  URI: '1.5'
+  URI: '1.71'
   WWW::MLite: '2.01'
   perl: '5.016001'
 resources:
   homepage: http://app-mbutiny.sourceforge.net
   license: https://dev.perl.org/licenses
-version: '1.12'
+version: '1.13'

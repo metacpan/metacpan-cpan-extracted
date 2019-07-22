@@ -1,8 +1,11 @@
-#!/perl -I..
+#!/perl
+# -*- coding: utf-8; -*-     (for Emacs)
 
 # Test locale changing
 
+use 5.006;
 use strict;
+use utf8;
 use Test::More tests => 9;
 use FindBin;
 use lib $FindBin::Bin;
@@ -11,7 +14,7 @@ use lib $FindBin::Bin;
 ## ----------------------------------------------------------------------------------
 ## Test for availability of certain modules.
 my $tl_ok;
-BEGIN {$tl_ok = eval ('use Time::Local; 1')}
+BEGIN { $tl_ok = eval ('use Time::Local; 1') }
 my $posix_ok;
 my $lc_time;
 BEGIN
@@ -32,12 +35,20 @@ BEGIN { use_ok 'Time::Format', '%time' }
 
 
 ## ----------------------------------------------------------------------------------
+## Locale setting is not supported under openbsd
+my $lc_supported = 1;
+$lc_supported = 0  if $^O eq 'openbsd';
+
+
+## ----------------------------------------------------------------------------------
 ## Begin tests.
 
 SKIP:
 {
-    skip 'POSIX not available', 8        unless $posix_ok;
+    skip 'POSIX not available',       8  unless $posix_ok;
     skip 'Time::Local not available', 8  unless $tl_ok;
+    skip 'Locale not supported',      8  unless $lc_supported;
+
 
     my $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
 

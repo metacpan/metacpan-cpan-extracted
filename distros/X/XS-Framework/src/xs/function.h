@@ -91,9 +91,7 @@ struct SubCaller : SubHolder<typename RetConv::type, typename Convs::type...> {
         constexpr size_t ARGS_COUNT = sizeof...(Convs);
         SV* sv_args[ARGS_COUNT];
         push(sv_args, args...);
-        Scalar ret = this->sub.call(sv_args, ARGS_COUNT);
-        for (size_t i = 0; i < ARGS_COUNT; ++i) SvREFCNT_dec(sv_args[i]);
-        return ret_conv.in(ret ? ret : Scalar::undef);
+        return call_impl(sv_args, ARGS_COUNT, typename std::is_void<Ret>::type());
     }
 
 private:
@@ -107,6 +105,17 @@ private:
     void push (SV** dest, First&& f, Others&&...oths) {
         dest[pos] = std::get<pos>(arg_convs).out(std::forward<First>(f)).detach();
         push<pos+1>(dest, std::forward<Others>(oths)...);
+    }
+
+    Ret call_impl (SV** args, size_t items, std::false_type) {
+        Scalar ret = this->sub.call(args, items);
+        for (size_t i = 0; i < items; ++i) SvREFCNT_dec(args[i]);
+        return ret_conv.in(ret ? ret : Scalar::undef);
+    }
+
+    Ret call_impl (SV** args, size_t items, std::true_type) {
+        this->sub.template call<void>(args, items);
+        for (size_t i = 0; i < items; ++i) SvREFCNT_dec(args[i]);
     }
 };
 
@@ -162,15 +171,15 @@ private:
 };
 
 template <int N, class R, class F, class...Args>
-std::enable_if_t<(sizeof...(Args) < N), R>
-fill_default_args (const F& f, Args&&... args) {
-    return fill_default_args<N, R>(f, std::forward<Args>(args)..., nullptr);
-}
-
-template <int N, class R, class F, class...Args>
 std::enable_if_t<(sizeof...(Args) == N), R>
 fill_default_args (const F& f, Args&&... args) {
     return f(std::forward<Args>(args)...);
+}
+
+template <int N, class R, class F, class...Args>
+std::enable_if_t<(sizeof...(Args) < N), R>
+fill_default_args (const F& f, Args&&... args) {
+    return fill_default_args<N, R>(f, std::forward<Args>(args)..., nullptr);
 }
 
 template <typename Ret, typename...Args, typename...ConvArgs>

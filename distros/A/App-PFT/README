@@ -14,12 +14,26 @@ the file system access.
 
 # INSTALLATION
 
-To install this module, run the following commands:
+The canonical way of installing this module would be by means of the
+following commands:
 
 	perl Makefile.PL
 	make
 	make test
 	make install
+
+In reality you probably want to install `cpanminus` and just run `cpanm .`
+in the directory obtained by extracting the tarball.
+
+This module installs executable scripts for the command line, and it comes
+with an extension of the bash completion system.  Such system is not
+installed automatically in order to avoid collisions with the native
+packaging system.
+
+The file can be manually installed by copying the `bash_completion.d/pft`
+file in the proper directory, whose path can be retrieved by running
+`pkg-config --variable=completionsdir bash-completion`.  Usually this gets
+expanded as `/usr/share/bash-completion/completions`.
 
 # SUPPORT AND DOCUMENTATION
 
@@ -27,6 +41,10 @@ After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc App::PFT
+
+This project however comes with a number of individually documented
+executable scripts.  Each script comes with a manual page (e.g. `man pft
+init`).
 
 You can also look for information at:
 

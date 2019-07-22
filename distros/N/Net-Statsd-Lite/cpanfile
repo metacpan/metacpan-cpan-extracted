@@ -19,6 +19,7 @@ on 'test' => sub {
   requires "Test::Roo" => "0";
   requires "Test::Roo::DataDriven" => "0";
   requires "Test::Roo::Role" => "0";
+  requires "Test::TCP" => "2.19";
   requires "curry" => "0";
   requires "if" => "0";
   requires "lib" => "0";

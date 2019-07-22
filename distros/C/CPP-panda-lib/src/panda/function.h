@@ -1,11 +1,9 @@
 #pragma once
-#include <utility>
-#include <panda/refcnt.h>
+#include "refcnt.h"
 #include "function_utils.h"
+#include <utility>
 
 namespace panda {
-
-using std::remove_reference;
 
 template <typename Ret, typename... Args>
 class function;

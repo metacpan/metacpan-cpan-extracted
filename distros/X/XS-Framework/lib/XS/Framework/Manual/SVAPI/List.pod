@@ -6,37 +6,15 @@ XS::Framework::Manual::SVAPI::List - XS::Framework List C++ class reference
 
 =head2 Overview
 
-The purpose of C<List> class is to properly call C<CallProxy> in B<list context>,
+The purpose of C<List> class is to call subroutines in B<list context>,
 as well as return into perl list instead of array (this is provided by shipped
 typemap specialization).
 
 List is child-class of C<Array>, so it basically inherits all Array's methods.
 
-The List-specific methods, which provide B<list context> for C<CallProxy> are:
+List context is applied by:
 
-    List (const CallProxy& p)
-    List& operator= (const CallProxy& p)
-
-All other methods are quite trivial, and only their signature is provided here:
-
-    List () {}
-    List (SV* sv, bool policy = INCREMENT)
-    List (AV* sv, bool policy = INCREMENT)
-
-    List (const Array& oth)
-    List (Array&&      oth)
-    List (const Sv&    oth)
-    List (Sv&&         oth)
-
-    List& operator= (SV* val)
-    List& operator= (AV* val)
-    List& operator= (const Array& oth)
-    List& operator= (Array&& oth)
-    List& operator= (const Sv& oth)
-    List& operator= (Sv&& oth)
-    List& operator= (const CallProxy& p)
-
-Assignment operrators are NULL-safe.
+    auto list = sub.call<List>(params...);
 
 =head1 SEE ALSO
 

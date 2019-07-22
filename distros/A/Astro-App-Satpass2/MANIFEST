@@ -98,5 +98,6 @@ xt/author/parse_time_date_manip_5_really.t
 xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t
+xt/author/pod_links.t
 xt/author/pod_spelling.t
 xt/author/rt80435.t

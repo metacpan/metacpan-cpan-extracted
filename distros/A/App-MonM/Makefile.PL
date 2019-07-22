@@ -13,7 +13,6 @@ my $prereq_pm = {
         'DBI'                   => 1.60,
         'DBD::SQLite'           => 1.50,
         'File::Copy'            => 2.18,
-        'File::Find'            => 1.15,
         'File::Path'            => 2.00,
         'HTTP::Message'         => 6.02,
         'LWP'                   => 5.80,
@@ -26,9 +25,9 @@ my $prereq_pm = {
         'Socket'                => 0,
         'Sys::Hostname'         => 0,
         'Term::ReadKey'         => 2.33,
+        'Text::ParseWords'      => 0,
         'Text::SimpleTable'     => 2.03,
         'Try::Tiny'             => 0.07,
-        'WWW::MLite'            => 2.01,
         'URI'                   => 1.50,
     };
 

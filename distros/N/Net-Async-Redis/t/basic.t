@@ -18,7 +18,7 @@ eval {
 my $loop = IO::Async::Loop->new;
 $loop->add(my $redis = Net::Async::Redis->new);
 ok(my $f = $redis->connect(
-	host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+    host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
 ), 'connect');
 isa_ok($f, 'Future');
 $loop->await($f);

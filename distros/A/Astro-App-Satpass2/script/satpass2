@@ -84,7 +84,7 @@ Besides the restructuring of the code into an object, the largest change
 from F<satpass> is the extremely flexible templating system used to
 produce output. This should allow broad customization of output to meet
 personal needs. See
-L<Astro::App::Satpass2::Format::Classic|Astro::App::Satpass2::Format::Classic> for the
+L<Astro::App::Satpass2::Format::Template|Astro::App::Satpass2::Format::Template> for the
 (unfortunately) gory details.
 
 =head1 AUTHOR

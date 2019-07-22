@@ -1,4 +1,6 @@
 #pragma once
+#include <utility>
+#include <exception>
 
 namespace panda {
 
@@ -237,7 +239,7 @@ struct expected {
     }
 
 private:
-    template <class T2, class E2> friend class expected;
+    template <class T2, class E2> friend struct expected;
 
     template <class T2>
     void construct_val (T2&& v) {
@@ -417,7 +419,7 @@ struct expected<void, E> {
     }
 
 private:
-    template <class T2, class E2> friend class expected;
+    template <class T2, class E2> friend struct expected;
 
     template <class E2>
     void construct_err (E2&& e) {

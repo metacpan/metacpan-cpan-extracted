@@ -26,7 +26,7 @@ Perl stores its global variables.
 To create a new C<GV*> in Perl, the C<Stash> object and the name should be
 provided:
 
-    static Glob create (const Stash& stash, std::string_view name, U32 flags = 0);
+    static Glob create (const Stash& stash, panda::string_view name, U32 flags = 0);
 
 For the C<flags> description please refer C<gv_init_pvn> in L<perlapi>.
 
@@ -50,13 +50,6 @@ Copy and move-constructore are also available:
     Glob (const Sv&     oth)
     Glob (Sv&&          oth)
 
-It it possible to create C<Glbo> object from C<CallProxy> invocation:
-
-    Glob (const CallProxy& p) : Glob(p.sv()) {}
-
-however, please note, that the C<CallProxy> will be called in B<scalar context>.
-If the C<CallProxy> returns unacceptable C<SV*> the execption will be thrown.
-
 =head2 assignment operators
 
     Glob& operator= (SV* val)
@@ -67,7 +60,6 @@ If the C<CallProxy> returns unacceptable C<SV*> the execption will be thrown.
     Glob& operator= (Scalar&& oth)
     Glob& operator= (const Sv& oth)
     Glob& operator= (Sv&& oth)
-    Glob& operator= (const CallProxy& p)
 
 The assignment operators are complementaty to the constructors above. They
 inherit behaviour from C<Scalar>, including NULL-safety. The previously held
@@ -104,7 +96,6 @@ This are NULL-safe methods. The returned value, however, might be C<NULL>.
     void slot (const Array&  v)
     void slot (const Hash&   v)
     void slot (const Sub&    v)
-    void slot (const CallProxy& p)
 
 This are read/write accessors for appropriate slot type in the C<Glob> instance.
 For example:
@@ -161,8 +152,8 @@ This are NULL-unsafe methods.
 
 =head2 effective_name ()
 
-    std::string_view name           () const
-    std::string_view effective_name () const
+    panda::string_view name           () const
+    panda::string_view effective_name () const
 
 Returns the name of the current or effective C<Stash> associated with the
 C<Glob> instance.

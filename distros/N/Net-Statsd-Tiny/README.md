@@ -4,7 +4,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 # VERSION
 
-version v0.3.2
+version v0.3.4
 
 # SYNOPSIS
 
@@ -206,7 +206,7 @@ is any data in the buffer.
 # SEE ALSO
 
 [Net::Statsd::Lite](https://metacpan.org/pod/Net::Statsd::Lite) which has a similar API but uses [Moo](https://metacpan.org/pod/Moo) and
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny) for data validation.
+[Type::Tiny](https://metacpan.org/pod/Type::Tiny) for data validation. It's also faster.
 
 [https://github.com/b/statsd\_spec](https://github.com/b/statsd_spec)
 
@@ -233,7 +233,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

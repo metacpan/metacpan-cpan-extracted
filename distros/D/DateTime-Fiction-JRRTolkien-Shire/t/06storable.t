@@ -12,7 +12,7 @@ eval {
     1;
 } or plan skip_all => q<Module 'Storable' not available>;
 
-plan( tests => 4 );
+plan( tests => 8 );
 
 my $u_circ	= "\N{LATIN SMALL LETTER U WITH CIRCUMFLEX}";
 
@@ -30,6 +30,12 @@ Sunday 8 Afteryule 7463
 The Company of the Ring reaches Hollin, 1419.
 EOD
 
+is( $shire->clone()->on_date, <<'EOD' );
+Sunday 8 Afteryule 7463
+
+The Company of the Ring reaches Hollin, 1419.
+EOD
+
 $shire = DateTime::Fiction::JRRTolkien::Shire->new(
     year	=> 1419,
     month	=> 1,
@@ -37,6 +43,12 @@ $shire = DateTime::Fiction::JRRTolkien::Shire->new(
 );
 
 is( Storable::dclone( $shire )->on_date, <<'EOD' );
+Sunday 15 Afteryule 1419
+
+The Bridge of Khazad-dum, and the fall of Gandalf, 1419.
+EOD
+
+is( $shire->clone()->on_date, <<'EOD' );
 Sunday 15 Afteryule 1419
 
 The Bridge of Khazad-dum, and the fall of Gandalf, 1419.
@@ -55,6 +67,12 @@ Sunnendei 15 Afteryule 1419
 The Bridge of Khazad-dum, and the fall of Gandalf, 1419.
 EOD
 
+is( $shire->clone()->on_date, <<'EOD' );
+Sunnendei 15 Afteryule 1419
+
+The Bridge of Khazad-dum, and the fall of Gandalf, 1419.
+EOD
+
 $shire = DateTime::Fiction::JRRTolkien::Shire->new(
     year	=> 1419,
     month	=> 1,
@@ -63,6 +81,12 @@ $shire = DateTime::Fiction::JRRTolkien::Shire->new(
 );
 
 is( Storable::dclone( $shire )->on_date, <<"EOD" );
+Sunday 15 Afteryule 1419
+
+The Bridge of Khazad-d${u_circ}m, and the fall of Gandalf, 1419.
+EOD
+
+is( $shire->clone()->on_date, <<"EOD" );
 Sunday 15 Afteryule 1419
 
 The Bridge of Khazad-d${u_circ}m, and the fall of Gandalf, 1419.

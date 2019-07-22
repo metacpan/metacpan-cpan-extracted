@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.841';
+our $VERSION = '1.842';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -1036,11 +1036,18 @@ sub _loop {
          chomp($_id  = <$_DAU_R_SOCK>),
          chomp($_key = <$_DAU_R_SOCK>);
 
-         my $result = delete $_obj{ $_id }{ 'R'.$_key } // '';
-         my $error  = delete $_obj{ $_id }{ 'S'.$_key } // '';
+         my $attempt = chop $_key;
 
-         print {$_DAU_R_SOCK} length($result).$LF . length($error).$LF,
-               $result, $error;
+         if ($attempt > 1 || exists $_obj{ $_id }{ 'R'.$_key }) {
+            my $result = delete $_obj{ $_id }{ 'R'.$_key } // '';
+            my $error  = delete $_obj{ $_id }{ 'S'.$_key } // '';
+
+            print {$_DAU_R_SOCK} length($result).$LF . length($error).$LF,
+                  $result, $error;
+         }
+         else {
+            print {$_DAU_R_SOCK} '0'.$LF . '2'.$LF . '' . '-1';
+         }
 
          return;
       },
@@ -1132,14 +1139,37 @@ sub _loop {
    # Call on hash function.
 
    if ($_is_MSWin32) {
-      MCE::Util::_nonblocking($_DAT_R_SOCK, 1);
+      # The normal loop hangs on Windows when processes/threads start/exit.
+      # Using ioctl() properly, http://www.perlmonks.org/?node_id=780083
+
+      my $_val_bytes = "\x00\x00\x00\x00";
+      my $_ptr_bytes = unpack( 'I', pack('P', $_val_bytes) );
+      my ($_count, $_nbytes, $_start);
 
       while (!$_done) {
-         MCE::Util::_sysread($_DAT_R_SOCK, $_func, 8);
-         last() unless length($_func) == 8;
-         $_DAU_R_SOCK = $_channels->[ substr($_func, -2, 2, '') ];
+         $_start = time, $_count = 1;
 
-         $_output_function{$_func}();
+         # MSWin32 FIONREAD
+         IOCTL: ioctl($_DAT_R_SOCK, 0x4004667f, $_ptr_bytes);
+
+         unless ($_nbytes = unpack('I', $_val_bytes)) {
+            if ($_count) {
+                # delay after a while to not consume a CPU core
+                $_count = 0 if ++$_count % 50 == 0 && time - $_start > 0.030;
+            } else {
+                sleep 0.030;
+            }
+            goto IOCTL;
+         }
+
+         do {
+            sysread($_DAT_R_SOCK, $_func, 8);
+            $_done = 1, last() unless length($_func) == 8;
+            $_DAU_R_SOCK = $_channels->[ substr($_func, -2, 2, '') ];
+
+            $_output_function{$_func}();
+
+         } while (($_nbytes -= 8) >= 8);
       }
    }
    else {
@@ -1870,7 +1900,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.841
+This document describes MCE::Shared::Server version 1.842
 
 =head1 DESCRIPTION
 

@@ -15,9 +15,11 @@ use warnings;
 use parent qw( HiPi::Class );
 use XSLoader;
 use Carp;
+use HiPi 0.80;
 use HiPi qw( :rpi );
+use HiPi::RaspberryPi;
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 __PACKAGE__->create_accessors( );
 
@@ -35,50 +37,6 @@ use constant {
     GPAREN0  => 31,
     GPAFEN0  => 34,
 };
-
-
-my @_alt_function_names = (
-    [qw( I2C0_SDA      SA5          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 0
-    [qw( I2C0_SCL      SA4          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 1
-    [qw( I2C1_SDA      SA3          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 2
-    [qw( I2C1_SCL      SA2          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 3
-    
-    [qw( GPCLK0        SA1          ALT2   ALT3   ALT4        ARM_TDI ) ], # GPIO 4
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 5
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 6
-    [qw( SPI0_CE1_N    SWE_N/SRW_N  ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 7
-    
-    [qw( SPI0_CE0_N    SD0          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 8
-    [qw( SPI0_MISO     SD1          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 9
-    [qw( SPI0_MOSI     SD2          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 10
-    [qw( SPI0_SCLK     SD3          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 11
-    
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 12
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 13
-    [qw( UART0_TXD     SD6          ALT2   ALT3   ALT4   UART1_TXD ) ], # GPIO 14
-    [qw( UART0_RXD     SD7          ALT2   ALT3   ALT4   UART1_RXD ) ], # GPIO 15
-    
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_CE2_N        ALT5 ) ], # GPIO 16
-    [qw( ALT0          SD9          ALT2   UART0_RTS   SPI1_CE1_N  UART1_RTS ) ], # GPIO 17
-    [qw( PCM_CLK       SD10         ALT2   BSCSL_SDA/MOSI   SPI1_CE0_N   PWM0 ) ], # GPIO 18
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MISO        ALT5 ) ], # GPIO 19
-    
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MOSI        ALT5 ) ], # GPIO 20
-    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_SCLK        GPCLK1 ) ], # GPIO 21
-    [qw( ALT0          SD14         ALT2   SD1_CLK   ARM_TRST ALT5 ) ], # GPIO 22
-    [qw( ALT0          SD15         ALT2   SD1_CMD   ARM_RTCK ALT5 ) ], # GPIO 23
-    
-    [qw( ALT0          SD16         ALT2   SD1_DAT0  ARM_TDO  ALT5 ) ], # GPIO 24
-    [qw( ALT0          SD17         ALT2   SD1_DAT1  ARM_TCK  ALT5 ) ], # GPIO 25
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 26
-    [qw( ALT0          ALT1         ALT2   SD1_DAT3  ARM_TMS  GPCLK1 ) ], # GPIO 27
-    
-    [qw( I2C0_SDA      SA5          PCM_CLK  ALT3   ALT4      ALT5 ) ], # GPIO 28
-    [qw( I2C0_SCL      SA4          PCM_FS   ALT3   ALT4      ALT5 ) ], # GPIO 29
-    [qw( ALT0          SA3          PCM_DIN  UART0_CTS   ALT4 UART1_CTS ) ], # GPIO 30
-    [qw( ALT0          SA2          PCM_DOUT UART0_RTS   ALT4 UART1_RTS ) ], # GPIO 31
-    
-);
 
 sub error_report {
     my ( $error ) = @_;
@@ -172,6 +130,9 @@ sub get_pin_function {
     my $mode = $class->get_pin_mode( $gpio );
     my $funcname = 'UNKNOWN';
     my $altnum = undef;
+    
+    my $alt_function_names = HiPi::RaspberryPi::get_alt_function_names();
+    
     if( $mode == -1 ) {
         $funcname = 'ERROR';
     } elsif( $mode == RPI_MODE_INPUT ) {
@@ -179,22 +140,22 @@ sub get_pin_function {
     } elsif( $mode == RPI_MODE_OUTPUT ) {
         $funcname = 'OUTPUT';
     } elsif( $mode == RPI_MODE_ALT0 ) {
-        $funcname = $_alt_function_names[$gpio]->[0];
+        $funcname = $alt_function_names->[$gpio]->[0];
         $altnum = 0;
     } elsif( $mode == RPI_MODE_ALT1 ) {
-        $funcname = $_alt_function_names[$gpio]->[1];
+        $funcname = $alt_function_names->[$gpio]->[1];
         $altnum = 1;
     } elsif( $mode == RPI_MODE_ALT2 ) {
-        $funcname = $_alt_function_names[$gpio]->[2];
+        $funcname = $alt_function_names->[$gpio]->[2];
         $altnum = 2;
     } elsif( $mode == RPI_MODE_ALT3 ) {
-        $funcname = $_alt_function_names[$gpio]->[3];
+        $funcname = $alt_function_names->[$gpio]->[3];
         $altnum = 3;
     } elsif( $mode == RPI_MODE_ALT4 ) {
-        $funcname = $_alt_function_names[$gpio]->[4];
+        $funcname = $alt_function_names->[$gpio]->[4];
         $altnum = 4;
     } elsif( $mode == RPI_MODE_ALT5 ) {
-        $funcname = $_alt_function_names[$gpio]->[5];
+        $funcname = $alt_function_names->[$gpio]->[5];
         $altnum = 5;
     } else {
         $funcname = 'ERROR';

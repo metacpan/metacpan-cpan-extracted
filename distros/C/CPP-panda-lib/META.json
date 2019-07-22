@@ -25,17 +25,19 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Install" : "v1.2.4"
+            "XS::Install" : "v1.2.6"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.4",
+            "XS::Install" : "v1.2.6",
             "perl" : "5.012000"
          }
       },
       "test" : {
          "requires" : {
+            "CPP::catch" : "v1.0.8",
+            "Test::Catch" : "v1.0.7",
             "Test::Deep" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96"
@@ -43,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.2",
+   "version" : "v1.2.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

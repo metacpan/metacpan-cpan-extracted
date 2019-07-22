@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::ParseTime::Date::Manip };
 
 use Astro::App::Satpass2::Utils qw{ load_package @CARP_NOT };
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 my $invalid;
 
@@ -136,7 +136,7 @@ L<Astro::App::Satpass2::ParseTime|Astro::App::Satpass2::ParseTime>.
  my $error_string = $pt->dmd_err();
 
 This method wraps the L<Date::Manip::Date|Date::Manip::Date> object's
-L<err()|Date::Manip::Date/err> method, and returns whatever that method
+C<err()> method, and returns whatever that method
 returns.
 
 =head2 dmd_zone
@@ -144,7 +144,7 @@ returns.
  my $zone_name = $pt->dmd_zone();
 
 This method wraps the L<Date::Manip::TZ|Date::Manip::TZ> object's
-L<zone()|Date::Manip::TZ/zone> method, calling it in scalar context to
+C<zone()> method, calling it in scalar context to
 get the default zone name, and returning the result.
 
 Note that unlike the inherited C<tz()> method, this is an accessor

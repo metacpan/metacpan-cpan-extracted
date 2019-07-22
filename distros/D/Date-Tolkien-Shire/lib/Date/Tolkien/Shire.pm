@@ -21,7 +21,7 @@ use Date::Tolkien::Shire::Data qw{
 use Time::Local;
 
 our $ERROR;
-our $VERSION = '1.901';
+our $VERSION = '1.902';
 
 sub new {
     my ( $class, $date, %arg ) = @_;
@@ -776,7 +776,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2001-2003, 2006 Tom Braun. All rights reserved.
 
-Copyright (C) 2017 Thomas R. Wyant, III
+Copyright (C) 2017-2019 Thomas R. Wyant, III
 
 The calendar implemented on this module was created by J.R.R. Tolkien,
 and the copyright is still held by his estate.  The license and

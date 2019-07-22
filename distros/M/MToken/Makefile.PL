@@ -19,7 +19,7 @@ my $prereq_pm = {
         'LWP'                   => 5.80,
         'LWP::Protocol::https'  => 6.00,
         'Try::Tiny'             => 0.20,
-        'URI'                   => 1.60,
+        'URI'                   => 1.70,
     };
 
 my $exefiles = [qw(

@@ -14,7 +14,7 @@ our $EXPORT = {
     YAML  => [qw[to_yaml from_yaml]],
     XML   => [qw[to_xml from_xml]],
     INI   => [qw[to_ini from_ini]],
-    B64   => [qw[to_b64 to_b64_url from_b64 from_b64_url]],
+    B64   => [qw[to_b64 to_b64u from_b64 from_b64u]],
     URI   => [qw[to_uri to_uri_component to_uri_scheme to_uri_path to_uri_query to_uri_query_frag from_uri from_uri_utf8 from_uri_query from_uri_query_utf8]],
     XOR   => [qw[to_xor from_xor]],
     CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
@@ -136,7 +136,7 @@ sub encode_data ( $type, $data, @args ) {
     # encode
     if ( $args{encode} ) {
         if ( $args{encode} == $DATA_ENC_B64 ) {
-            $res = to_b64_url($res);
+            $res = to_b64u($res);
         }
         elsif ( $args{encode} == $DATA_ENC_HEX ) {
             $res = unpack 'H*', $res;
@@ -191,7 +191,7 @@ sub decode_data ( $type, $data_ref, @args ) {
     # decode
     if ( $args{encode} ) {
         if ( $args{encode} == $DATA_ENC_B64 ) {
-            $data_ref = \from_b64_url( $data_ref->$* );
+            $data_ref = \from_b64u( $data_ref->$* );
         }
         elsif ( $args{encode} == $DATA_ENC_HEX ) {
             $data_ref = \pack 'H*', $data_ref->$*;
@@ -580,7 +580,7 @@ sub to_b64 : prototype($;$) {
     return &MIME::Base64::encode_base64;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
-sub to_b64_url : prototype($) {
+sub to_b64u : prototype($) {
     state $init = !!require MIME::Base64::URLSafe;
 
     return &MIME::Base64::URLSafe::urlsafe_b64encode;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
@@ -592,7 +592,7 @@ sub from_b64 : prototype($) {
     return &MIME::Base64::decode_base64;                 ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
-sub from_b64_url : prototype($) {
+sub from_b64u : prototype($) {
     state $init = !!require MIME::Base64::URLSafe;
 
     return &MIME::Base64::URLSafe::urlsafe_b64decode;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]

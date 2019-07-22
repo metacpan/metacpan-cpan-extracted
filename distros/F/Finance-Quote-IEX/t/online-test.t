@@ -6,6 +6,8 @@ if ( not $ENV{ONLINE_TEST} ) {
     plan skip_all => 'Set $ENV{ONLINE_TEST} to run this test';
 }
 
+plan skip_all => 'The IEX API removed all non-IEX data in June 2019.';
+
 my $q = Finance::Quote->new('IEX');
 
 # Stocks from NYSE, NASDAQ and AMEX.

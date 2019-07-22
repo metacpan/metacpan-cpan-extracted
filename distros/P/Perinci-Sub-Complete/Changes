@@ -1,3 +1,12 @@
+0.937   2019-06-29  Released-By: PERLANCAR; Urgency: low
+
+	- Get summaries from schema's x.in.summaries attribute. To try this out,
+          update Perinci::Examples::Completion to 0.813+ then install
+          peri-eg-complete-fruits-any from Perinci-Examples-Bin-Any-Completion
+          distribution. Then try to complete --category. The 'category' argument
+          has a schema of 'str' with 'in' clause and 'in.x.summaries' attribute.
+
+
 0.936   2019-06-28  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

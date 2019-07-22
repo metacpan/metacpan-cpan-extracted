@@ -9,48 +9,44 @@ namespace xs {
 
 using xs::my_perl;
 
-template <class T> using arithmetic_t = typename std::enable_if<std::is_arithmetic<T>::value, T>::type;
+namespace detail {
+    template <typename T> inline SV* _newnum (T val, panda::enable_if_signed_integral_t<T>*   = nullptr) { return newSViv(val); }
+    template <typename T> inline SV* _newnum (T val, panda::enable_if_unsigned_integral_t<T>* = nullptr) { return newSVuv(val); }
+    template <typename T> inline SV* _newnum (T val, panda::enable_if_floatp_t<T>*            = nullptr) { return newSVnv(val); }
 
-template <class T> using signed_t   = typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type;
-template <class T> using unsigned_t = typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, T>::type;
-template <class T> using floatp_t   = typename std::enable_if<std::is_floating_point<T>::value, T>::type;
+    template <typename T> inline panda::enable_if_signed_integral_t<T>   _getrawnum (const SV* sv) { return SvIVX(sv); }
+    template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getrawnum (const SV* sv) { return SvUVX(sv); }
+    template <typename T> inline panda::enable_if_floatp_t<T>            _getrawnum (const SV* sv) { return SvNVX(sv); }
 
-template <typename T> inline SV* _newnum (T val, signed_t<T>*   = NULL) { return newSViv(val); }
-template <typename T> inline SV* _newnum (T val, unsigned_t<T>* = NULL) { return newSVuv(val); }
-template <typename T> inline SV* _newnum (T val, floatp_t<T>*   = NULL) { return newSVnv(val); }
+    template <typename T> inline panda::enable_if_signed_integral_t<T>   _getnum (SV* sv) { return SvIV_nomg(sv); }
+    template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getnum (SV* sv) { return SvUV_nomg(sv); }
+    template <typename T> inline panda::enable_if_floatp_t<T>            _getnum (SV* sv) { return SvNV_nomg(sv); }
 
-template <typename T> inline signed_t<T>   _getrawnum (const SV* sv) { return SvIVX(sv); }
-template <typename T> inline unsigned_t<T> _getrawnum (const SV* sv) { return SvUVX(sv); }
-template <typename T> inline floatp_t<T>   _getrawnum (const SV* sv) { return SvNVX(sv); }
+    template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_signed_integral_t<T>*   = nullptr) { SvIV_set(sv, val); }
+    template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_unsigned_integral_t<T>* = nullptr) { SvUV_set(sv, val); }
+    template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_floatp_t<T>*            = nullptr) { SvNV_set(sv, val); }
 
-template <typename T> inline signed_t<T>   _getnum (SV* sv) { return SvIV_nomg(sv); }
-template <typename T> inline unsigned_t<T> _getnum (SV* sv) { return SvUV_nomg(sv); }
-template <typename T> inline floatp_t<T>   _getnum (SV* sv) { return SvNV_nomg(sv); }
+    template <typename T> inline void _setnum (SV* sv, T val, panda::enable_if_signed_integral_t<T>*   = nullptr) { sv_setiv(sv, val); }
+    template <typename T> inline void _setnum (SV* sv, T val, panda::enable_if_unsigned_integral_t<T>* = nullptr) { sv_setuv(sv, val); }
+    template <typename T> inline void _setnum (SV* sv, T val, panda::enable_if_floatp_t<T>*            = nullptr) { sv_setnv(sv, val); }
 
-template <typename T> inline void _setrawnum (SV* sv, T val, signed_t<T>*   = NULL) { SvIV_set(sv, val); }
-template <typename T> inline void _setrawnum (SV* sv, T val, unsigned_t<T>* = NULL) { SvUV_set(sv, val); }
-template <typename T> inline void _setrawnum (SV* sv, T val, floatp_t<T>*   = NULL) { SvNV_set(sv, val); }
+    #if IVSIZE < 8 // use NV(double) as storage for 64bit integer on 32-bit perls (much more range available)
+        template <> inline SV* _newnum<int64_t>  (int64_t  val) { return newSVnv(val); }
+        template <> inline SV* _newnum<uint64_t> (uint64_t val) { return newSVnv(val); }
 
-template <typename T> inline void _setnum (SV* sv, T val, signed_t<T>*   = NULL) { sv_setiv(sv, val); }
-template <typename T> inline void _setnum (SV* sv, T val, unsigned_t<T>* = NULL) { sv_setuv(sv, val); }
-template <typename T> inline void _setnum (SV* sv, T val, floatp_t<T>*   = NULL) { sv_setnv(sv, val); }
+        template <> inline int64_t  _getrawnum<int64_t>  (const SV* sv) { return SvNVX(sv); }
+        template <> inline uint64_t _getrawnum<uint64_t> (const SV* sv) { return SvNVX(sv); }
 
-#if IVSIZE < 8 // use NV(double) as storage for 64bit integer on 32-bit perls (much more range available)
-    template <> inline SV* _newnum<int64_t>  (int64_t  val) { return newSVnv(val); }
-    template <> inline SV* _newnum<uint64_t> (uint64_t val) { return newSVnv(val); }
+        template <> inline int64_t  _getnum<int64_t>  (SV* sv) { return SvNV_nomg(sv); }
+        template <> inline uint64_t _getnum<uint64_t> (SV* sv) { return SvNV_nomg(sv); }
 
-    template <> inline int64_t  _getrawnum<int64_t>  (const SV* sv) { return SvNVX(sv); }
-    template <> inline uint64_t _getrawnum<uint64_t> (const SV* sv) { return SvNVX(sv); }
+        template <> inline void _setrawnum<int64_t>  (SV* sv, int64_t  val) { SvNV_set(sv, val); }
+        template <> inline void _setrawnum<uint64_t> (SV* sv, uint64_t val) { SvNV_set(sv, val); }
 
-    template <> inline int64_t  _getnum<int64_t>  (SV* sv) { return SvNV_nomg(sv); }
-    template <> inline uint64_t _getnum<uint64_t> (SV* sv) { return SvNV_nomg(sv); }
-
-    template <> inline void _setrawnum<int64_t>  (SV* sv, int64_t  val) { SvNV_set(sv, val); }
-    template <> inline void _setrawnum<uint64_t> (SV* sv, uint64_t val) { SvNV_set(sv, val); }
-
-    template <> inline void _setnum<int64_t>  (SV* sv, int64_t  val) { sv_setnv(sv, val); }
-    template <> inline void _setnum<uint64_t> (SV* sv, uint64_t val) { sv_setnv(sv, val); }
-#endif
+        template <> inline void _setnum<int64_t>  (SV* sv, int64_t  val) { sv_setnv(sv, val); }
+        template <> inline void _setnum<uint64_t> (SV* sv, uint64_t val) { sv_setnv(sv, val); }
+    #endif
+}
 
 struct Simple : Scalar {
     static const Simple undef;
@@ -64,8 +60,8 @@ struct Simple : Scalar {
         return Simple(sv, NONE);
     }
 
-    static Simple shared (HEK* k)                                  { return newSVhek(k); }
-    static Simple shared (const std::string_view& s, U32 hash = 0) { return newSVpvn_share(s.data(), s.length(), hash); }
+    static Simple shared (HEK* k)                                    { return newSVhek(k); }
+    static Simple shared (const panda::string_view& s, U32 hash = 0) { return newSVpvn_share(s.data(), s.length(), hash); }
 
     static Simple format (const char*const pat, ...);
 
@@ -80,19 +76,18 @@ struct Simple : Scalar {
     Simple (const Sv&     oth) : Simple(oth.get())      {}
     Simple (Sv&&          oth) : Scalar(std::move(oth)) { _validate(); }
 
-    Simple (const CallProxy& p) : Simple(p.scalar()) {}
-
     Simple (const Ref&)   = delete;
     Simple (const Glob&)  = delete;
     Simple (const Array&) = delete;
     Simple (const Hash&)  = delete;
     Simple (const Sub&)   = delete;
 
-    template <class T, typename = arithmetic_t<T>>
+    template <class T, typename = panda::enable_if_arithmetic_t<T>>
     explicit
-    Simple (T val) { sv = _newnum<T>(val); }
+    Simple (T val) { sv = detail::_newnum<T>(val); }
 
-    Simple (const std::string_view& s) { sv = newSVpvn(s.data(), s.length()); }
+    explicit
+    Simple (const panda::string_view& s) { sv = newSVpvn(s.data(), s.length()); }
 
     static Simple noinc (SV* val) { return Simple(val, NONE); }
 
@@ -132,8 +127,6 @@ struct Simple : Scalar {
         return *this;
     }
 
-    Simple& operator= (const CallProxy& p) { return operator=(p.scalar()); }
-
     Simple& operator= (const Ref&)   = delete;
     Simple& operator= (const Glob&)  = delete;
     Simple& operator= (const Array&) = delete;
@@ -141,38 +134,38 @@ struct Simple : Scalar {
     Simple& operator= (const Sub&)   = delete;
 
     // safe setters (slower)
-    template <typename T, typename = arithmetic_t<T>>
+    template <typename T, typename = panda::enable_if_arithmetic_t<T>>
     Simple& operator= (T val) {
-        if (sv) _setnum(sv, val);
-        else sv = _newnum(val);
+        if (sv) detail::_setnum(sv, val);
+        else sv = detail::_newnum(val);
         return *this;
     }
 
-    Simple& operator= (const std::string_view& s) {
+    Simple& operator= (const panda::string_view& s) {
         if (sv) sv_setpvn(sv, s.data(), s.length());
         else sv = newSVpvn(s.data(), s.length());
         return *this;
     }
 
-    template <typename T, typename = arithmetic_t<T>>
-    void set (T val)              { _setrawnum<T>(sv, val); }
-    void set (std::string_view s) { sv_setpvn(sv, s.data(), s.length()); }
-    void set (SV* val)            { Scalar::set(val); }
+    template <typename T, typename = panda::enable_if_arithmetic_t<T>>
+    void set (T val)                { detail::_setrawnum<T>(sv, val); }
+    void set (panda::string_view s) { sv_setpvn(sv, s.data(), s.length()); }
+    void set (SV* val)              { Scalar::set(val); }
 
     using Sv::operator bool; // otherwise, operator arithmetic_t<T> will be in priority
 
-    template <class T, typename = arithmetic_t<T>>
-    operator T () const { return sv ? _getnum<T>(sv) : T(); }
+    template <class T, typename = panda::enable_if_arithmetic_t<T>>
+    operator T () const { return sv ? detail::_getnum<T>(sv) : T(); }
 
     const char* c_str () const { return sv ? SvPV_nomg_const_nolen(sv) : NULL; }
 
-    operator std::string_view () const { return as_string<std::string_view>(); }
+    operator panda::string_view () const { return as_string<panda::string_view>(); }
 
     // unsafe getters (faster)
-    template <typename T>      arithmetic_t<T>               get () const { return _getrawnum<T>(sv); }
-    template <typename T>      one_of_t<T,char*,const char*> get () const { return SvPVX(sv); }
-    template <typename T>      one_of_t<T, std::string_view> get () const { return std::string_view(SvPVX(sv), SvCUR(sv)); }
-    template <typename T = SV> one_of_t<T,SV>*               get () const { return sv; }
+    template <typename T>      panda::enable_if_arithmetic_t<T>                 get () const { return detail::_getrawnum<T>(sv); }
+    template <typename T>      panda::enable_if_one_of_t<T,char*,const char*>   get () const { return SvPVX(sv); }
+    template <typename T>      panda::enable_if_one_of_t<T, panda::string_view> get () const { return panda::string_view(SvPVX(sv), SvCUR(sv)); }
+    template <typename T = SV> panda::enable_if_one_of_t<T,SV>*                 get () const { return sv; }
 
     template <class T = panda::string>
     T as_string () const {
@@ -217,60 +210,58 @@ private:
     }
 };
 
-template <class T> T CallProxy::as_string () const { return Simple(scalar()).as_string<T>(); }
-template <class T> T CallProxy::as_number () const { return Simple(scalar()); }
-template <class T> T Scalar::as_string    () const { return Simple(sv).as_string<T>(); }
-template <class T> T Scalar::as_number    () const { return Simple(sv); }
+template <class T> T Scalar::as_string () const { return Simple(sv).as_string<T>(); }
+template <class T> T Scalar::as_number () const { return Simple(sv); }
 
-template <typename T, typename = arithmetic_t<T>> inline bool operator== (const Simple& lhs, T rhs) { return (T)lhs == rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator== (T lhs, const Simple& rhs) { return lhs == (T)rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator!= (const Simple& lhs, T rhs) { return (T)lhs != rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator!= (T lhs, const Simple& rhs) { return lhs != (T)rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator>  (const Simple& lhs, T rhs) { return (T)lhs > rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator>  (T lhs, const Simple& rhs) { return lhs > (T)rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator>= (const Simple& lhs, T rhs) { return (T)lhs >= rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator>= (T lhs, const Simple& rhs) { return lhs >= (T)rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator<  (const Simple& lhs, T rhs) { return (T)lhs < rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator<  (T lhs, const Simple& rhs) { return lhs < (T)rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator<= (const Simple& lhs, T rhs) { return (T)lhs <= rhs; }
-template <typename T, typename = arithmetic_t<T>> inline bool operator<= (T lhs, const Simple& rhs) { return lhs <= (T)rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator== (const Simple& lhs, T rhs) { return (T)lhs == rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator== (T lhs, const Simple& rhs) { return lhs == (T)rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator!= (const Simple& lhs, T rhs) { return (T)lhs != rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator!= (T lhs, const Simple& rhs) { return lhs != (T)rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator>  (const Simple& lhs, T rhs) { return (T)lhs > rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator>  (T lhs, const Simple& rhs) { return lhs > (T)rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator>= (const Simple& lhs, T rhs) { return (T)lhs >= rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator>= (T lhs, const Simple& rhs) { return lhs >= (T)rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator<  (const Simple& lhs, T rhs) { return (T)lhs < rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator<  (T lhs, const Simple& rhs) { return lhs < (T)rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator<= (const Simple& lhs, T rhs) { return (T)lhs <= rhs; }
+template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator<= (T lhs, const Simple& rhs) { return lhs <= (T)rhs; }
 
-inline bool operator== (const Simple& lhs, const std::string_view& rhs) { return (std::string_view)lhs == rhs; }
-inline bool operator== (const std::string_view& lhs, const Simple& rhs) { return lhs == (std::string_view)rhs; }
-inline bool operator!= (const Simple& lhs, const std::string_view& rhs) { return (std::string_view)lhs != rhs; }
-inline bool operator!= (const std::string_view& lhs, const Simple& rhs) { return lhs != (std::string_view)rhs; }
-inline bool operator>  (const Simple& lhs, const std::string_view& rhs) { return (std::string_view)lhs > rhs; }
-inline bool operator>  (const std::string_view& lhs, const Simple& rhs) { return lhs > (std::string_view)rhs; }
-inline bool operator>= (const Simple& lhs, const std::string_view& rhs) { return (std::string_view)lhs >= rhs; }
-inline bool operator>= (const std::string_view& lhs, const Simple& rhs) { return lhs >= (std::string_view)rhs; }
-inline bool operator<  (const Simple& lhs, const std::string_view& rhs) { return (std::string_view)lhs < rhs; }
-inline bool operator<  (const std::string_view& lhs, const Simple& rhs) { return lhs < (std::string_view)rhs; }
-inline bool operator<= (const Simple& lhs, const std::string_view& rhs) { return (std::string_view)lhs <= rhs; }
-inline bool operator<= (const std::string_view& lhs, const Simple& rhs) { return lhs <= (std::string_view)rhs; }
+inline bool operator== (const Simple& lhs, const panda::string_view& rhs) { return (panda::string_view)lhs == rhs; }
+inline bool operator== (const panda::string_view& lhs, const Simple& rhs) { return lhs == (panda::string_view)rhs; }
+inline bool operator!= (const Simple& lhs, const panda::string_view& rhs) { return (panda::string_view)lhs != rhs; }
+inline bool operator!= (const panda::string_view& lhs, const Simple& rhs) { return lhs != (panda::string_view)rhs; }
+inline bool operator>  (const Simple& lhs, const panda::string_view& rhs) { return (panda::string_view)lhs > rhs; }
+inline bool operator>  (const panda::string_view& lhs, const Simple& rhs) { return lhs > (panda::string_view)rhs; }
+inline bool operator>= (const Simple& lhs, const panda::string_view& rhs) { return (panda::string_view)lhs >= rhs; }
+inline bool operator>= (const panda::string_view& lhs, const Simple& rhs) { return lhs >= (panda::string_view)rhs; }
+inline bool operator<  (const Simple& lhs, const panda::string_view& rhs) { return (panda::string_view)lhs < rhs; }
+inline bool operator<  (const panda::string_view& lhs, const Simple& rhs) { return lhs < (panda::string_view)rhs; }
+inline bool operator<= (const Simple& lhs, const panda::string_view& rhs) { return (panda::string_view)lhs <= rhs; }
+inline bool operator<= (const panda::string_view& lhs, const Simple& rhs) { return lhs <= (panda::string_view)rhs; }
 
-inline bool operator== (const Simple& lhs, const char* rhs) { return (std::string_view)lhs == std::string_view(rhs); }
-inline bool operator== (const char* lhs, const Simple& rhs) { return std::string_view(lhs) == (std::string_view)rhs; }
-inline bool operator!= (const Simple& lhs, const char* rhs) { return (std::string_view)lhs != std::string_view(rhs); }
-inline bool operator!= (const char* lhs, const Simple& rhs) { return std::string_view(lhs) != (std::string_view)rhs; }
-inline bool operator>  (const Simple& lhs, const char* rhs) { return (std::string_view)lhs > std::string_view(rhs); }
-inline bool operator>  (const char* lhs, const Simple& rhs) { return std::string_view(lhs) > (std::string_view)rhs; }
-inline bool operator>= (const Simple& lhs, const char* rhs) { return (std::string_view)lhs >= std::string_view(rhs); }
-inline bool operator>= (const char* lhs, const Simple& rhs) { return std::string_view(lhs) >= (std::string_view)rhs; }
-inline bool operator<  (const Simple& lhs, const char* rhs) { return (std::string_view)lhs < std::string_view(rhs); }
-inline bool operator<  (const char* lhs, const Simple& rhs) { return std::string_view(lhs) < (std::string_view)rhs; }
-inline bool operator<= (const Simple& lhs, const char* rhs) { return (std::string_view)lhs <= std::string_view(rhs); }
-inline bool operator<= (const char* lhs, const Simple& rhs) { return std::string_view(lhs) <= (std::string_view)rhs; }
+inline bool operator== (const Simple& lhs, const char* rhs) { return (panda::string_view)lhs == panda::string_view(rhs); }
+inline bool operator== (const char* lhs, const Simple& rhs) { return panda::string_view(lhs) == (panda::string_view)rhs; }
+inline bool operator!= (const Simple& lhs, const char* rhs) { return (panda::string_view)lhs != panda::string_view(rhs); }
+inline bool operator!= (const char* lhs, const Simple& rhs) { return panda::string_view(lhs) != (panda::string_view)rhs; }
+inline bool operator>  (const Simple& lhs, const char* rhs) { return (panda::string_view)lhs > panda::string_view(rhs); }
+inline bool operator>  (const char* lhs, const Simple& rhs) { return panda::string_view(lhs) > (panda::string_view)rhs; }
+inline bool operator>= (const Simple& lhs, const char* rhs) { return (panda::string_view)lhs >= panda::string_view(rhs); }
+inline bool operator>= (const char* lhs, const Simple& rhs) { return panda::string_view(lhs) >= (panda::string_view)rhs; }
+inline bool operator<  (const Simple& lhs, const char* rhs) { return (panda::string_view)lhs < panda::string_view(rhs); }
+inline bool operator<  (const char* lhs, const Simple& rhs) { return panda::string_view(lhs) < (panda::string_view)rhs; }
+inline bool operator<= (const Simple& lhs, const char* rhs) { return (panda::string_view)lhs <= panda::string_view(rhs); }
+inline bool operator<= (const char* lhs, const Simple& rhs) { return panda::string_view(lhs) <= (panda::string_view)rhs; }
 
-inline bool operator== (const Simple& lhs, char* rhs) { return (std::string_view)lhs == std::string_view(rhs); }
-inline bool operator== (char* lhs, const Simple& rhs) { return std::string_view(lhs) == (std::string_view)rhs; }
-inline bool operator!= (const Simple& lhs, char* rhs) { return (std::string_view)lhs != std::string_view(rhs); }
-inline bool operator!= (char* lhs, const Simple& rhs) { return std::string_view(lhs) != (std::string_view)rhs; }
-inline bool operator>  (const Simple& lhs, char* rhs) { return (std::string_view)lhs > std::string_view(rhs); }
-inline bool operator>  (char* lhs, const Simple& rhs) { return std::string_view(lhs) > (std::string_view)rhs; }
-inline bool operator>= (const Simple& lhs, char* rhs) { return (std::string_view)lhs >= std::string_view(rhs); }
-inline bool operator>= (char* lhs, const Simple& rhs) { return std::string_view(lhs) >= (std::string_view)rhs; }
-inline bool operator<  (const Simple& lhs, char* rhs) { return (std::string_view)lhs < std::string_view(rhs); }
-inline bool operator<  (char* lhs, const Simple& rhs) { return std::string_view(lhs) < (std::string_view)rhs; }
-inline bool operator<= (const Simple& lhs, char* rhs) { return (std::string_view)lhs <= std::string_view(rhs); }
-inline bool operator<= (char* lhs, const Simple& rhs) { return std::string_view(lhs) <= (std::string_view)rhs; }
+inline bool operator== (const Simple& lhs, char* rhs) { return (panda::string_view)lhs == panda::string_view(rhs); }
+inline bool operator== (char* lhs, const Simple& rhs) { return panda::string_view(lhs) == (panda::string_view)rhs; }
+inline bool operator!= (const Simple& lhs, char* rhs) { return (panda::string_view)lhs != panda::string_view(rhs); }
+inline bool operator!= (char* lhs, const Simple& rhs) { return panda::string_view(lhs) != (panda::string_view)rhs; }
+inline bool operator>  (const Simple& lhs, char* rhs) { return (panda::string_view)lhs > panda::string_view(rhs); }
+inline bool operator>  (char* lhs, const Simple& rhs) { return panda::string_view(lhs) > (panda::string_view)rhs; }
+inline bool operator>= (const Simple& lhs, char* rhs) { return (panda::string_view)lhs >= panda::string_view(rhs); }
+inline bool operator>= (char* lhs, const Simple& rhs) { return panda::string_view(lhs) >= (panda::string_view)rhs; }
+inline bool operator<  (const Simple& lhs, char* rhs) { return (panda::string_view)lhs < panda::string_view(rhs); }
+inline bool operator<  (char* lhs, const Simple& rhs) { return panda::string_view(lhs) < (panda::string_view)rhs; }
+inline bool operator<= (const Simple& lhs, char* rhs) { return (panda::string_view)lhs <= panda::string_view(rhs); }
+inline bool operator<= (char* lhs, const Simple& rhs) { return panda::string_view(lhs) <= (panda::string_view)rhs; }
 }

@@ -2,7 +2,7 @@ package Test2::Harness::UI::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 use Test2::Util qw/get_tid/;
 
@@ -11,7 +11,7 @@ use Carp qw/croak/;
 use Test2::Harness::UI::Util::HashBase qw{
     -_schema
     -dbi_dsn -dbi_user -dbi_pass
-    -single_user -single_run
+    -single_user -single_run -no_upload
     -email
 };
 

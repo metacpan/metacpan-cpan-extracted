@@ -51,6 +51,7 @@ do { my $x = {
                                    'Test::Roo' => '0',
                                    'Test::Roo::DataDriven' => '0',
                                    'Test::Roo::Role' => '0',
+                                   'Test::TCP' => '2.19',
                                    'curry' => '0',
                                    'if' => '0',
                                    'lib' => '0',

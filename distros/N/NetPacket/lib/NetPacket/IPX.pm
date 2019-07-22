@@ -1,7 +1,7 @@
 package NetPacket::IPX;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble IPX packets
-$NetPacket::IPX::VERSION = '1.7.1';
+$NetPacket::IPX::VERSION = '1.7.2';
 use strict;
 use warnings;
 
@@ -137,7 +137,7 @@ NetPacket::IPX - Assemble and disassemble IPX packets
 
 =head1 VERSION
 
-version 1.7.1
+version 1.7.2
 
 =head1 SYNOPSIS
 

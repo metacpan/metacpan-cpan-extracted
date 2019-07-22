@@ -4,7 +4,7 @@
       "Giovanni Simoni (dacav at openmailbox)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -35,6 +35,7 @@
          "requires" : {
             "Carp" : "0",
             "Cwd" : "0",
+            "Digest::MD5" : "0",
             "Encode" : "0",
             "Encode::Locale" : "0",
             "Exporter" : "0",
@@ -47,6 +48,7 @@
             "File::Spec::Functions" : "0",
             "FindBin" : "0",
             "Getopt::Long" : "0",
+            "HTML::Escape" : "0",
             "LWP::Simple" : "0",
             "PFT" : "v1.2.1",
             "Pod::Find" : "0",
@@ -58,11 +60,15 @@
       },
       "test" : {
          "requires" : {
+            "Cwd" : "0",
+            "File::Temp" : "0",
+            "IPC::Run" : "0",
+            "PFT" : "v1.2.1",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.2",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "v1.3.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,7 +1,21 @@
 #include "test.h"
+#include <array>
 #include <utility>
 
 using Test = TestSv<Sub>;
+
+void cmp_array (const Array& a, const std::initializer_list<int>& l) {
+    REQUIRE(a.size() == l.size());
+    auto chk = l.begin();
+    for (size_t i = 0; i < l.size(); ++i) CHECK(a[i] == chk[i]);
+}
+
+template <class T, size_t N>
+void cmp_array (const std::array<T,N>& a, const std::initializer_list<int>& l) {
+    REQUIRE(a.size() == l.size());
+    auto chk = l.begin();
+    for (size_t i = 0; i < l.size(); ++i) CHECK(a[i] == chk[i]);
+}
 
 TEST_CASE("Sub", "[Sv]") {
     perlvars vars;
@@ -111,7 +125,7 @@ TEST_CASE("Sub", "[Sv]") {
 
     SECTION("name") {
         Sub o("M1::dummy");
-        REQUIRE(o.name() == string_view("dummy"));
+        REQUIRE(o.name() == "dummy");
     }
 
     SECTION("named") {
@@ -121,78 +135,137 @@ TEST_CASE("Sub", "[Sv]") {
 
     SECTION("call") {
         Stash s("M1");
-        Sub sub = s.sub("dummy");
         Simple call_cnt = s.scalar("call_cnt");
         Simple call_ret = s.scalar("call_ret");
-        int initial_cnt = call_cnt;
+        call_cnt = 0;
 
-        SECTION("void") {
-            SECTION("no args") {
-                sub.call();
-                REQUIRE(call_cnt == initial_cnt+1);
-                sub.call();
-                sub();
-                REQUIRE(call_cnt == initial_cnt+3);
+        SECTION("args") {
+            auto sub = s.sub("check_args");
+            SECTION("empty") {
+                cmp_array(sub.call(), {});
+                CHECK(call_cnt == 1);
+                cmp_array(sub(), {});
+                CHECK(call_cnt == 2);
             }
             SECTION("SV*") {
-                sub.call(Simple(111));
-                REQUIRE(call_cnt == initial_cnt+1);
-                REQUIRE(call_ret == 111);
-                sub(Scalar());
-                REQUIRE(call_cnt == initial_cnt+2);
-                REQUIRE(call_ret == 0);
+                cmp_array(sub.call(Simple(999).get()), {999});
             }
-            SECTION("SV**/items") {
-                Simple arg1(10), arg2(2), arg3(3);
-                SV* args[] = {arg1, arg2, arg3};
-                sub(args, 3);
-                REQUIRE(call_cnt == initial_cnt+1);
-                REQUIRE(call_ret == 60);
+            SECTION("SV**") {
+                Simple arg1(100), arg2(200);
+                SV* args[] = {arg1, arg2};
+                cmp_array(sub.call(args, 2), {100, 200});
+            }
+            SECTION("SV* + SV**") {
+                Simple arg1(100), arg2(200), arg3(300);
+                SV* args[] = {arg2, arg3};
+                cmp_array(sub.call(Simple(100).get(), args, 2), {100, 200, 300});
+            }
+            SECTION("const Scalar*") {
+                Scalar args[] = {Simple(111), Simple(222)};
+                cmp_array(sub.call(args, 2), {111, 222});
+            }
+            SECTION("SV* + const Scalar*") {
+                Scalar args[] = {Simple(111), Simple(222)};
+                cmp_array(sub.call(Simple(666).get(), args, 2), {666, 111, 222});
             }
             SECTION("ilist") {
-                sub({Simple(2), Scalar(Simple(3)), Sv(Simple(4))});
-                REQUIRE(call_cnt == initial_cnt+1);
-                REQUIRE(call_ret == 24);
+                std::initializer_list<Scalar> l = {Simple(123), Simple(321)};
+                cmp_array(sub.call(l), {123, 321});
+            }
+            SECTION("SV* + ilist") {
+                std::initializer_list<Scalar> l = {Simple(300), Simple(400)};
+                cmp_array(sub.call(Simple(7).get(), l), {7, 300, 400});
+            }
+            SECTION("variadic-1") {
+                Simple arg(10);
+                cmp_array(sub.call(arg), {10});
+                CHECK(arg.use_count() == 1); // check for argument leaks
+            }
+            SECTION("variadic-2") {
+                cmp_array(sub.call(Simple(10), Simple(20)), {10, 20});
+            }
+            SECTION("variadic-3") {
+                cmp_array(sub.call(Simple(10), Simple(20), Scalar(Simple(100))), {10, 20, 100});
+            }
+            SECTION("variadic-4") {
+                cmp_array(sub.call(Simple(10), Simple(20), Scalar(Simple(100)), Sv(Simple(200))), {10, 20, 100, 200});
+            }
+            SECTION("empty/nullptr -> undef") {
+                Array ret = sub.call(Simple(10), nullptr, Simple());
+                CHECK(ret.use_count() == 1); // check for retval leaks
+                REQUIRE(ret.size() == 3);
+                CHECK(ret[0] == 10);
+                CHECK(!ret[1].defined());
+                CHECK(!ret[2].defined());
             }
         }
-        SECTION("scalar") {
-            SECTION("no args") {
-                Sv res = sub.call();
-                REQUIRE(call_cnt == initial_cnt+1);
-                REQUIRE(res.defined());
-                REQUIRE(Simple(res).get<int>() == 0);
-                REQUIRE(res.use_count() == 1);
+
+        SECTION("context") {
+            auto sub = s.sub("check_context");
+            SECTION("void") {
+                static_assert(std::is_same<decltype(sub.call<void>()),void>::value, "wrong signature");
+                sub.call<void>(Simple(333));
+                CHECK(call_cnt == 1);
+                CHECK(call_ret == 333);
             }
-            SECTION("args") {
-                Simple res = sub.call({Simple(2), Simple(3), Simple(4)});
-                REQUIRE(call_cnt == initial_cnt+1);
-                REQUIRE(Simple(res).get<int>() == 9);
-                REQUIRE(res.use_count() == 1);
+            SECTION("scalar") {
+                static_assert(std::is_same<decltype(sub.call()),Scalar>::value, "wrong signature");
+                static_assert(std::is_same<decltype(sub.call<Scalar>()),Scalar>::value, "wrong signature");
+                static_assert(std::is_same<decltype(sub.call<Simple>()),Simple>::value, "wrong signature");
+                CHECK(sub.call(Simple(999)) == 999);
+                CHECK(sub.call(Simple(999), Simple(111)) == 999);
+                CHECK(!sub.call().defined());
+            }
+            SECTION("fixed-list array") {
+                static_assert(std::is_same<decltype(sub.call<std::array<Simple,3>>()),std::array<Simple,3>>::value, "wrong signature");
+                cmp_array(sub.call<std::array<Simple,3>>(Simple(1), Simple(2), Simple(3)), {1,2,3});
+                cmp_array(sub.call<std::array<Simple,2>>(Simple(4), Simple(5), Simple(6)), {4,5});
+                cmp_array(sub.call<std::array<Simple,4>>(Simple(7), Simple(8), Simple(9)), {7,8,9,0});
+            }
+            SECTION("fixed-list tuple") {
+                using Tuple = std::tuple<Sv,Simple,Simple,Ref>;
+                static_assert(std::is_same<decltype(sub.call<Tuple>()),Tuple>::value, "wrong signature");
+                static_assert(std::is_same<decltype(sub.call<Sv,Simple,Simple,Ref>()),Tuple>::value, "wrong signature");
+                SECTION("explicit") {
+                    Tuple res = sub.call<Tuple>(Simple(10), Simple(20), Simple(30));
+                    CHECK(Simple(std::get<0>(res)) == 10);
+                    CHECK(std::get<1>(res) == 20);
+                    CHECK(std::get<2>(res) == 30);
+                    CHECK(!std::get<3>(res));
+                }
+                SECTION("implicit") {
+                    Tuple res = sub.call<Sv,Simple,Simple,Ref>(Simple(50), Simple(60), Simple(70), Ref::create(Simple(111)), Simple(999));
+                    CHECK(Simple(std::get<0>(res)) == 50);
+                    CHECK(std::get<1>(res) == 60);
+                    CHECK(std::get<2>(res) == 70);
+                    auto ref = std::get<3>(res);
+                    CHECK(ref);
+                    CHECK(ref.value<Scalar>() == 111);
+                }
+            }
+            SECTION("unlimited-list") {
+                static_assert(std::is_same<decltype(sub.call<List>()),List>::value, "wrong signature");
+                cmp_array(sub.call<List>(Simple(10), Simple(20), Simple(30)), {10, 20, 30});
+            }
+            SECTION("panda::string") {
+                static_assert(std::is_same<decltype(sub.call<panda::string>()),panda::string>::value, "wrong signature");
+                auto str = sub.call<panda::string>(Simple("suka"));
+                CHECK(str == "suka");
+            }
+            SECTION("numeric") {
+                static_assert(std::is_same<decltype(sub.call<int>()),int>::value, "wrong signature");
+                static_assert(std::is_same<decltype(sub.call<double>()),double>::value, "wrong signature");
+                CHECK(sub.call<int>(Simple(200)) == 200);
+                CHECK(sub.call<double>(Simple(1.234)) == 1.234);
+                CHECK(sub.call<long long>(Simple(1.234)) == 1);
             }
         }
-        SECTION("fixed-list array") {
-            std::array<Simple,4> res = sub.call({Simple(2), Simple(3), Simple(4)});
-            REQUIRE(call_cnt == initial_cnt+1);
-            REQUIRE(res[0] == 10);
-            REQUIRE(res[1] == 15);
-            REQUIRE(res[2] == 20);
-            REQUIRE(!res[3]);
-        }
-        SECTION("fixed-list tuple") {
-            std::tuple<Sv,Simple,Simple,Ref> res = sub.call({Simple(5), Simple(6), Simple(7)});
-            REQUIRE(call_cnt == initial_cnt+1);
-            REQUIRE(Simple(get<0>(res)) == 25);
-            REQUIRE(get<1>(res) == 30);
-            REQUIRE(get<2>(res) == 35);
-            REQUIRE(!get<3>(res));
-        }
-        SECTION("unlimited-list") {
-            List res = sub.call({Simple(10), Simple(20), Simple(30)});
-            REQUIRE(call_cnt == initial_cnt+1);
-            REQUIRE(res.size() == 3);
-            REQUIRE(Simple(res[0]) == 50);
-            REQUIRE(Simple(res[1]) == 100);
-            REQUIRE(Simple(res[2]) == 150);
+
+        SECTION("call result as argument") {
+            auto sub = s.sub("check_args");
+            Array ret = sub.call( sub.call(Simple(999)), sub.call(Simple(888), Simple(777)) );
+            cmp_array(ret[0], {999});
+            cmp_array(ret[1], {888, 777});
         }
     }
 

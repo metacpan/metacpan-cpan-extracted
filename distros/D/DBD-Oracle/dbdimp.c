@@ -215,11 +215,6 @@ dbd_dr_destroy(SV *drh, imp_drh_t *imp_drh)
 		return;
 	}
 
-	if (imp_drh->envhp) {
-		/* Free cached environment handle. */
-		OCIHandleFree_log_stat(imp_drh, imp_drh->envhp, OCI_HTYPE_ENV, status);
-	}
-
 #ifdef ORA_OCI_112
 	/* Free session pool resources. */
 	if (imp_drh->pool_hv) {
@@ -316,7 +311,7 @@ oratype_bind_ok(int dbtype) /* It's a type we support for placeholders */
 	case 116:	/* SQLT_RSET	OCI 8 cursor variable	*/
  	case ORA_VARCHAR2_TABLE: /* 201 */
 	case ORA_NUMBER_TABLE:	/* 202 */
-	case ORA_XMLTYPE:		/* SQLT_NTY   must be carefull here as its value (108) is the same for an embedded object Well realy only XML clobs not embedded objects  */
+	case ORA_XMLTYPE:		/* SQLT_NTY   must be careful here as its value (108) is the same for an embedded object Well really only XML clobs not embedded objects  */
 	return 1;
 	}
 	return 0;
@@ -709,7 +704,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 
 			if (status != OCI_SUCCESS) {
 				oci_error(dbh, NULL, status,
-					"OCIEnvNlsCreate. Check ORACLE_HOME (Linux) env var  or PATH (Windows) and or NLS settings, permissions, etc.");
+					"OCIEnvNlsCreate. Check ORACLE_HOME (Linux) env var or PATH (Windows) and or NLS settings, permissions, etc.");
 				return 0;
 			}
 
@@ -761,7 +756,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 							charsetid, ncharsetid, status );
 				if (status != OCI_SUCCESS) {
 					oci_error(dbh, NULL, status,
-						"OCIEnvNlsCreate. Check ORACLE_HOME (Linux) env var  or PATH (Windows) and or NLS settings, permissions, etc");
+						"OCIEnvNlsCreate. Check ORACLE_HOME (Linux) env var or PATH (Windows) and or NLS settings, permissions, etc");
 					return 0;
 				}
 			}
@@ -860,7 +855,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 				/* Create and cache new session pool struct. */
 				SV *key_sv = pool_key(imp_dbh, dbname, uid, pwd, charsetid, ncharsetid);
 
-				session_pool_t pool_data = { };
+				session_pool_t pool_data = {0};
 				SV *pool_sv = newSVpvn((char*)&pool_data, sizeof(pool_data));
 				HE *pool_he = hv_store_ent(imp_drh->pool_hv, key_sv, pool_sv, 0);
 				imp_dbh->pool = pool = (session_pool_t*)SvPVX(HeVAL(pool_he));
@@ -1256,8 +1251,19 @@ dbd_db_destroy(SV *dbh, imp_dbh_t *imp_dbh)
 			OCIHandleFree_log_stat(imp_dbh, imp_dbh->svchp, OCI_HTYPE_SVCCTX, status);
 			OCIHandleFree_log_stat(imp_dbh, imp_dbh->srvhp, OCI_HTYPE_SERVER, status);
 			OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
+			/* free session environment handle */
 			if (imp_dbh->envhp != imp_drh->envhp) {
 				OCIHandleFree_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, status);
+				if ( status == OCI_SUCCESS ) {
+					imp_dbh->envhp = NULL;
+				}
+			/* free global environment handle during destruction of last connection */
+			} else if ( (imp_dbh->envhp == imp_drh->envhp) && (SvTRUE(perl_get_sv("DBI::PERL_ENDING",0))) ) {
+				OCIHandleFree_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, status);
+				if ( status == OCI_SUCCESS ) {
+					imp_dbh->envhp = NULL;
+					imp_drh->envhp = NULL;
+				}
 			}
 #ifdef ORA_OCI_112
 		}
@@ -3736,7 +3742,7 @@ dbd_st_execute(SV *sth, imp_sth_t *imp_sth) /* <= -2:error, >=0:ok row count, (-
 		DBIc_ROW_COUNT(imp_sth) = 0; /* reset (possibly re-exec'ing) */
 		row_count = 0;
 		/*reinit the rs_array as well
-		  as we may have more thatn one exe on a prepare*/
+		  as we may have more than one exe on a prepare*/
 		rs_array_init(imp_sth);
 	}
 	else {
@@ -4776,7 +4782,7 @@ static int enable_taf(
     SV *dbh,
     imp_dbh_t *imp_dbh) {
 
-    bool can_taf = 0;
+    boolean can_taf = 0;
     sword status;
 
 #ifdef OCI_ATTR_TAF_ENABLED

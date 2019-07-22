@@ -17,7 +17,7 @@
 # Lots more tests needed
 
 package Data::Edit::Xml::Lint;
-our $VERSION = 20190708;
+our $VERSION = 20190721;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -296,7 +296,8 @@ sub read($)                                                                     
     errorText           => [@U],
    };
 
-  $lint->errors //= 0;
+  $lint->project          //= q();                                              # Supply a default bank project
+  $lint->errors           //= 0;
   $lint->compressedErrors //= 0;
   $lint                                                                         # Return a matching linter
  } # read
@@ -396,7 +397,7 @@ sub relint($$$@)                                                                
       $ps->start(sub                                                            # Process in parallel
        {my $lint = Data::Edit::Xml::Lint::read($file);                          # Reconstructed linter
         confess "Unable to read lint data for file: $file\n"
-          unless $lint and $lint->project;                                      # Confirm that we read a file in the expected format
+          unless $lint;# and $lint->project;                                      # Confirm that we read a file in the expected format
         confess "No source for file: $file\n"
           unless $lint->source;                                                 # Files without source are assumed to have been written to store some attributes
 
@@ -747,9 +748,9 @@ END2
     my @e;
     for(@ce)
      {my ($count, $message) = @$_;
-      $message =~ s(\A<!--) ()gs;
-      $message =~ s(-->\Z)  ()gs;
-      $message =~ s(\s*\))  (\))gs;
+      $message =~ s(\A<!--)  ()gs;
+      $message =~ s(-->\Z)   ()gs;
+      $message =~ s(\s*\x29) (\x29)gs;
       my   @m = split /:/, $message;
       push @m, reverse(split /, got /, pop @m) if @m and $m[-1] =~ m(, got )s;  # Reverse got to make the table more usable
       push @e, [$count, @m];
@@ -1189,7 +1190,7 @@ Reread a linted xml L<file|/file> and extract the L<attributes|/Attributes> asso
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $x = Data::Edit::Xml::new(<<END);
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd" []>
@@ -1199,11 +1200,11 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     $x->addLabels_c2_c3_c4;
     $x->createGuidId;
     is_deeply [$x->getLabels], [qw(c1 c2 c3 c4)];
-  
+
     my $l = new;                                                                  # Linter
        $l->catalog   = $catalog;                                                  # Catalog
        $l->ditaType  = -t $x;                                                     # Topic type
@@ -1215,7 +1216,7 @@ B<Example:>
        $l->title     = q(test lint);                                              # Title
        $l->source    = $x->ditaPrettyPrintWithHeaders;                            # Source from parse tree
     $l->lint;
-  
+
     my $m = &𝗿𝗲𝗮𝗱($l->file);
     my $y = &reload($l->file);
     ok $l->source eq $m->source;
@@ -1223,7 +1224,7 @@ B<Example:>
     is_deeply [$x->getLabels], [$y->getLabels];
     clearFolder($outDir, 1e2);
    }
-  
+
 
 This is a static method and so should be invoked as:
 
@@ -1247,11 +1248,11 @@ Get all the attributes minus the source of all the linted files in the specified
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my @a = 𝗹𝗶𝗻𝘁𝗔𝘁𝘁𝗿𝗶𝗯𝘂𝘁𝗲𝘀($outDir);
     ok $_->project eq q(aaa) for @a;
    }
-  
+
 
 This is a static method and so should be invoked as:
 
@@ -1415,8 +1416,8 @@ Fix the dita xref href attributes in the corpus determined by B<foldersAndExtens
 B<Example:>
 
 
-  𝗳𝗶𝘅𝗗𝗶𝘁𝗮𝗫𝗿𝗲𝗳𝗛𝗿𝗲𝗳𝘀(1, $outDir, "xml");                                            
-  
+  𝗳𝗶𝘅𝗗𝗶𝘁𝗮𝗫𝗿𝗲𝗳𝗛𝗿𝗲𝗳𝘀(1, $outDir, "xml");
+
 
 =head2 Attributes
 
@@ -1756,10 +1757,7 @@ use Data::Edit::Xml;
 Test::More->builder->output("/dev/null")                                        # Show only errors during testing
   if ((caller(1))[0]//'Data::Edit::Xml::Lint') eq "Data::Edit::Xml::Lint";
 
-if ($^O =~ m(bsd|linux)i)
- {plan tests => 111;
- }
-else
+if ($^O !~ m(bsd|linux)i)
  {plan skip_all => 'Not supported';
  }
 
@@ -2174,3 +2172,4 @@ END
   clearFolder($outDir, $N+1);
  }
 
+done_testing;

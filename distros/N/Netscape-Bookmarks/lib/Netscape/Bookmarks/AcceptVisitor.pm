@@ -4,7 +4,7 @@ use strict;
 use subs qw();
 use vars qw($VERSION);
 
-$VERSION = "2.303";
+$VERSION = "2.304";
 
 sub visitor {
 	my( $self, $visitor ) = @_;
@@ -27,6 +27,9 @@ __END__
 Netscape::Bookmarks::AcceptVisitor - a base class to accept Visitor object
 
 =head1 SYNOPSIS
+
+THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
+IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
 
 Any Netscape bookmarks object can accept a visitor object.  Call
 the visitor() method on the object with the Vistor object as the
@@ -96,7 +99,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

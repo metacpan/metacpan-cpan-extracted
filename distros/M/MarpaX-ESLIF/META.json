@@ -104,7 +104,6 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -121,6 +120,7 @@
             "Test::More" : "1.3",
             "Test::More::UTF8" : "0",
             "Try::Tiny" : "0",
+            "constant" : "0",
             "diagnostics" : "0",
             "open" : "0",
             "perl" : "5.010",
@@ -132,51 +132,51 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Grammar" : {
          "file" : "lib/MarpaX/ESLIF/Grammar.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Grammar::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Properties.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Grammar::Rule::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Grammar::Symbol::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Rule::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::String" : {
          "file" : "lib/MarpaX/ESLIF/String.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Symbol::EventBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/EventBitSet.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Symbol::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       },
       "MarpaX::ESLIF::Symbol::Type" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/Type.pm",
-         "version" : "v3.0.12"
+         "version" : "v3.0.14"
       }
    },
    "release_status" : "stable",
@@ -192,7 +192,7 @@
          "web" : "https://github.com/jddurand/c-marpaeslif"
       }
    },
-   "version" : "3.0.12",
+   "version" : "3.0.14",
    "x_authority" : "cpan:JDDPAUSE",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"

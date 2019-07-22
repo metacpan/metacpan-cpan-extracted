@@ -45,7 +45,7 @@
    "provides" : {
       "Calendar::Hijri" : {
          "file" : "lib/Calendar/Hijri.pm",
-         "version" : "0.39"
+         "version" : "0.40"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Hijri"
       }
    },
-   "version" : "0.39",
+   "version" : "0.40",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -1,18 +1,24 @@
-0.890   2019-01-06 (PERLANCAR)
+0.891   2019-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Update tests to latest Perinci::Sub::Complete &
+	  Perinci::Examples [RT#130121].
+
+
+0.890   2019-01-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace the use of Package::MoreUtil with Package::Util::Lite.
 
 
-0.88    2017-07-10 (PERLANCAR)
+0.88    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.87    2016-06-10 (PERLANCAR)
+0.87    2016-06-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -22,13 +28,13 @@
 	  Perinci::Sub::Wrapper -> 0.83.
 
 
-0.86    2016-02-04 (PERLANCAR)
+0.86    2016-02-04  Released-By: PERLANCAR
 
 	- Fix regex for Perl package name (0-9 is allowed for subpackage
 	  prefix).
 
 
-0.85    2015-12-17 (PERLANCAR)
+0.85    2015-12-17  Released-By: PERLANCAR
 
 	- Return original value of args_as and result_naked in
 	  _orig_args_as and _orig_result_naked respectively, for client
@@ -37,7 +43,7 @@
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.84    2015-09-03 (PERLANCAR)
+0.84    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -46,28 +52,28 @@
 	  requirement.
 
 
-0.83    2015-08-18 (PERLANCAR)
+0.83    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.82    2015-03-06 (PERLANCAR)
+0.82    2015-03-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add test for avoiding double wrapping.
 
 
-0.81    2015-03-06 (PERLANCAR)
+0.81    2015-03-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] Fix key name, d'oh.
 
 
-0.80    2015-03-06 (PERLANCAR)
+0.80    2015-03-06  Released-By: PERLANCAR
 
 	- Fix/tweak criteria of whether we should wrap (don't wrap if
 	  argument is already validated).
@@ -79,14 +85,14 @@
 	  subroutines.
 
 
-0.79    2014-12-31 (PERLANCAR)
+0.79    2014-12-31  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add more helpful error message for 'No metadata for ...'.
 
 
-0.78    2014-12-11 (PERLANCAR)
+0.78    2014-12-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -94,7 +100,7 @@
 	  returns completion answer in hashform) [CT].
 
 
-0.77    2014-12-05 (PERLANCAR)
+0.77    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -102,14 +108,14 @@
 	  Package::MoreUtil.
 
 
-0.76    2014-12-03 (PERLANCAR)
+0.76    2014-12-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch {SHARYANTO::Module::Path,Module::Path::More}.
 
 
-0.75    2014-12-02 (PERLANCAR)
+0.75    2014-12-02  Released-By: PERLANCAR
 
 	- [Bugfix] Module prefix like Foo was not found if Foo.pm does not
 	  also exist, because we used Foo.pm.
@@ -117,19 +123,19 @@
 	- Document about x.hint.result_binary.
 
 
-0.74    2014-10-24 (PERLANCAR)
+0.74    2014-10-24  Released-By: PERLANCAR
 
 	- Give hint in result metadata when result is binary (buf).
 
 
-0.73    2014-10-23 (PERLANCAR)
+0.73    2014-10-23  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Bump dependency version.
 
 
-0.72     2014-10-23 (PERLANCAR)
+0.72     2014-10-23  Released-By: PERLANCAR
 
          - Bump Riap support to 1.2 (no longer produces v=>1.1 keys on info
            response). Note that we don't check riap.* keys on result metadata
@@ -139,7 +145,7 @@
          - Fix typo: unimplemented status is 501, not 502.
 
 
-0.71     2014-09-06 (PERLANCAR)
+0.71     2014-09-06  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -147,7 +153,7 @@
            x.perinci.wrapper.* metadata attributes).
 
 
-0.70     2014-08-24 (SHARYANTO)
+0.70     2014-08-24  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -155,7 +161,7 @@
            return 404 status, not empty meta.
 
 
-0.69     2014-06-25 (SHARYANTO)
+0.69     2014-06-25  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -164,19 +170,19 @@
            former is removed from CPAN).
 
 
-0.68     2014-06-18 (SHARYANTO)
+0.68     2014-06-18  Released-By: SHARYANTO
 
          - Add action: complete_arg_elem (Riap 1.1.23).
 
 
-0.67     2014-05-17 (SHARYANTO)
+0.67     2014-05-17  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.66     2014-04-30 (SHARYANTO)
+0.66     2014-04-30  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -203,12 +209,12 @@
            (the new name is more abstract and less low-level).
 
 
-0.65     2014-04-16 (SHARYANTO)
+0.65     2014-04-16  Released-By: SHARYANTO
 
          - Set 'entity_date' property from $DATE package variable.
 
 
-0.64     2014-04-15 (SHARYANTO)
+0.64     2014-04-15  Released-By: SHARYANTO
 
          - call action: accept 'argv' Riap request key. This is actually not
            defined yet in specification, but useful in cases where an argument
@@ -216,7 +222,7 @@
            the client-side because JSON doesn't transport the coderef.
 
 
-0.63     2014-03-30 (SHARYANTO)
+0.63     2014-03-30  Released-By: SHARYANTO
 
          [INTERNAL]
 
@@ -226,21 +232,21 @@
            are microoptimization anyway.
 
 
-0.62     2014-03-27 (SHARYANTO)
+0.62     2014-03-27  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Adjust to Perinci::Sub::Wrapper 0.56.
 
 
-0.61     2014-03-26 (SHARYANTO)
+0.61     2014-03-26  Released-By: SHARYANTO
 
          [BUG FIXES]
 
          - Die message from function got hidden.
 
 
-0.60     2014-03-20 (SHARYANTO)
+0.60     2014-03-20  Released-By: SHARYANTO
 
          [INTERNAL]
 
@@ -249,18 +255,18 @@
            Perinci::Access::Schemeless::DBI).
 
 
-0.59     2014-03-07 (SHARYANTO)
+0.59     2014-03-07  Released-By: SHARYANTO
 
          - Skip wrapping function if already metadata tells that wrapped in
            embed mode (see Dist::Zilla::Plugin::Rinci::Wrap).
 
 
-0.58     2014-03-06 (SHARYANTO)
+0.58     2014-03-06  Released-By: SHARYANTO
 
          - No functional changes. Adjust to Perinci::Sub::Wrapper 0.51.
 
 
-0.57     2013-12-21 (SHARYANTO)
+0.57     2013-12-21  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -268,14 +274,14 @@
            that things like list => /Existing/Sub_That_Doesnt_Exist/ can fail).
 
 
-0.56     2013-12-20 (SHARYANTO)
+0.56     2013-12-20  Released-By: SHARYANTO
 
          - Allow list action on parent of allowed paths (e.g. allow_paths=/a/b
            then we allow list on / and /a but it will still show only the
            allowed paths).
 
 
-0.55     2013-11-27 (SHARYANTO)
+0.55     2013-11-27  Released-By: SHARYANTO
 
          - Allow scheme '/' in Perinci::Access::Perl (for App::riap's
            convenience).
@@ -284,7 +290,7 @@
            {allow,deny}_schemes.
 
 
-0.54     2013-11-27 (SHARYANTO)
+0.54     2013-11-27  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -292,7 +298,7 @@
            tree-like (preferred by App::riap).
 
 
-0.53     2013-11-04 (SHARYANTO)
+0.53     2013-11-04  Released-By: SHARYANTO
 
          [REMOVED FEATURES]
 
@@ -307,12 +313,12 @@
            so it is reusable outside the context of Riap.
 
 
-0.52     2013-10-03 (SHARYANTO)
+0.52     2013-10-03  Released-By: SHARYANTO
 
          - No functional changes. Avoid perl undef warning.
 
 
-0.51     2013-10-03 (SHARYANTO)
+0.51     2013-10-03  Released-By: SHARYANTO
 
          - wrap cache file: check for staleness.
 
@@ -322,21 +328,21 @@
            currently undocumented).
 
 
-0.50     2013-10-02 (SHARYANTO)
+0.50     2013-10-02  Released-By: SHARYANTO
 
          - use err().
 
          - Add option: disk_cache (default: 0) to cache wrap result to disk.
 
 
-0.49     2013-09-08 (SHARYANTO)
+0.49     2013-09-08  Released-By: SHARYANTO
 
          [BUG FIXES]
 
          - 'meta' action returned empty orig_meta.
 
 
-0.48     2013-09-08 (SHARYANTO)
+0.48     2013-09-08  Released-By: SHARYANTO
 
          - Rename distribution from Perinci-Access-InProcess to
            Perinci-Access-Perl, split Perinci::Access::InProcess to ::Perl and
@@ -345,7 +351,7 @@
            package_prefix are moved to Schemeless.
 
 
-0.47     2013-09-07 (SHARYANTO)
+0.47     2013-09-07  Released-By: SHARYANTO
 
          - Update to Rinci 1.1.36 (entity_version becomes entity_v).
 
@@ -358,7 +364,7 @@
            now correctly reported as error.
 
 
-0.46     2013-09-07 (SHARYANTO)
+0.46     2013-09-07  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -371,7 +377,7 @@
          - Add PackagePrefix subclass (proof of concept).
 
 
-0.45     2013-09-05 (SHARYANTO)
+0.45     2013-09-05  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -379,7 +385,7 @@
            the module loading. This broke a lot of scripts yesterday.
 
 
-0.44     2013-09-04 (SHARYANTO)
+0.44     2013-09-04  Released-By: SHARYANTO
 
          - 'meta' action on '/' now works.
 
@@ -390,7 +396,7 @@
          - Observe {allow,deny}_paths in 'list' action.
 
 
-0.43     2013-08-22 (SHARYANTO)
+0.43     2013-08-22  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -414,19 +420,19 @@
          - Adjust to Perinci::Access::Base 0.29.
 
 
-0.42     2013-08-13 (SHARYANTO)
+0.42     2013-08-13  Released-By: SHARYANTO
 
          - Bug fix for parse_url().
 
 
-0.41     2013-08-13 (SHARYANTO)
+0.41     2013-08-13  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Add parse_url() support.
 
 
-0.40     2013-08-13 (SHARYANTO)
+0.40     2013-08-13  Released-By: SHARYANTO
 
          [REMOVED FEATURES]
 
@@ -440,7 +446,7 @@
            .pm files. Thus we will rework this class to allow that.
 
 
-0.39     2012-11-02 (SHARYANTO)
+0.39     2012-11-02  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -448,7 +454,7 @@
            module does not exist.
 
 
-0.38     2012-11-02 (SHARYANTO)
+0.38     2012-11-02  Released-By: SHARYANTO
 
          - Add option: use_wrapped_sub (to make it possible to use call original
            sub instead of wrapped version). Can also be set using
@@ -456,7 +462,7 @@
            don't have a need for this yet.
 
 
-0.37     2012-10-31 (SHARYANTO)
+0.37     2012-10-31  Released-By: SHARYANTO
 
          - Add option: cache_size (to make it possible to disable caching).
            Currently used for testing/benchmarking overhead.
@@ -464,56 +470,56 @@
          - Update to Perinci::Sub::Wrapper 0.33.
 
 
-0.36     2012-10-24 (SHARYANTO)
+0.36     2012-10-24  Released-By: SHARYANTO
 
          - Pass -progress special argument containing Progress::Any object to
            functions which set 'progress' feature to true.
 
 
-0.35     2012-08-29 (SHARYANTO)
+0.35     2012-08-29  Released-By: SHARYANTO
 
          - Pass -dry_run => 1 to tx function in dry run mode, so the function
            can detect dry run mode (and, say, display messages).
 
 
-0.34     2012-08-29 (SHARYANTO)
+0.34     2012-08-29  Released-By: SHARYANTO
 
          - Support '-tx_action_id' to tx function in dry run mode (Rinci
            1.1.28).
 
 
-0.33     2012-08-29 (SHARYANTO)
+0.33     2012-08-29  Released-By: SHARYANTO
 
          - Support 'dry_run' in call action (Riap 1.1.19).
 
 
-0.32     2012-08-28 (SHARYANTO)
+0.32     2012-08-28  Released-By: SHARYANTO
 
          - Pass confirmation for actions 'undo' and 'redo' too (actually those
            are the important ones).
 
 
-0.31     2012-08-28 (SHARYANTO)
+0.31     2012-08-28  Released-By: SHARYANTO
 
          - Implement confirmation (Rinci 1.1.27). Pass Riap request key
            'confirm' => 1 to pass '-confirm' to function (via TM).
 
 
-0.30     2012-08-22 (SHARYANTO)
+0.30     2012-08-22  Released-By: SHARYANTO
 
          - Adjust to Rinci 1.1.25. No longer check transaction support of
            functions (we'll just let TM do that). No longer provide
            -undo_trash_dir to function to simplify things.
 
 
-0.29     2012-08-16 (SHARYANTO)
+0.29     2012-08-16  Released-By: SHARYANTO
 
          - Adjust to Rinci 1.1.23 and Perinci::Tx::Manager 0.22. No longer list
            Perinci::Tx::Manager as dependency. Move transaction tests to
            Perinci-Tx-Manager distribution.
 
 
-0.28     2012-08-10 (SHARYANTO)
+0.28     2012-08-10  Released-By: SHARYANTO
 
          - First release, split to make Perinci dist empty (that dist was a
            growing mixed bag and caused headache in dependencies).

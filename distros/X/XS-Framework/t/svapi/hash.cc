@@ -138,8 +138,8 @@ TEST_CASE("Hash", "[Sv]") {
         REQUIRE(o.at("key"));
         REQUIRE(Simple(o.fetch("key")).get<int>() == 10);
         REQUIRE(Simple(o.at("key")).get<int>() == 10);
-        REQUIRE(Simple(co["name"]) == std::string_view("vasya"));
-        REQUIRE(Simple(o["name"]) == std::string_view("vasya"));
+        REQUIRE(Simple(co["name"]) == "vasya");
+        REQUIRE(Simple(o["name"]) == "vasya");
         REQUIRE(!o.fetch("nokey"));
         REQUIRE(!co["nokey"]);
         REQUIRE_THROWS(o.at("nokey"));
@@ -156,7 +156,7 @@ TEST_CASE("Hash", "[Sv]") {
         o = Hash::create();
         auto pcnt = SvREFCNT(vars.pv);
         o.store("key", vars.pv);
-        REQUIRE(Simple(o.fetch("key")) == std::string_view("hello"));
+        REQUIRE(Simple(o.fetch("key")) == "hello");
         REQUIRE(SvREFCNT(vars.pv) == pcnt+1);
 
         auto icnt = SvREFCNT(vars.iv);

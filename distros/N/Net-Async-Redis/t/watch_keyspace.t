@@ -12,21 +12,21 @@ my $loop = IO::Async::Loop->new;
 $loop->add(my $redis = Net::Async::Redis->new);
 $loop->add(my $sub = Net::Async::Redis->new);
 Future->needs_all(
-	$redis->connect(
-		host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
-	),
-	$sub->connect(
-		host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
-	)
+    $redis->connect(
+        host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+    ),
+    $sub->connect(
+        host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+    )
 )->get;
 
 note 'keyspace notifications';
 my @notifications;
 $sub->watch_keyspace(
-	'testprefix-*',
-	sub {
-		push @notifications, { op => $_[0], key => $_[1] }
-	}
+    'testprefix-*',
+    sub {
+        push @notifications, { op => $_[0], key => $_[1] }
+    }
 )->get;
 
 note "Set key";

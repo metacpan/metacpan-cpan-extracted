@@ -3,9 +3,9 @@ NAME
     structure
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::DataStructureWalker (from Perl distribution
-    Acme-CPANModules-DataStructureWalker), released on 2019-06-19.
+    Acme-CPANModules-DataStructureWalker), released on 2019-06-30.
 
 DESCRIPTION
     Modules that traverse your data structure.
@@ -16,11 +16,11 @@ DESCRIPTION
     filesystem. These modules can be used for searching or modifying your
     data.
 
-    Many modules in this mimic Perl's "map" interface, for example:
-    Data::Rmap, Data::Dmap, Data::Traverse. These modules differ in the
-    details: in how you specify option to skip unsupported types of
-    references, whether some let you control the recursion (e.g.
-    Data::Rmap's and Data::Dmap's "cut"),
+    Many modules in this list mimic Perl's "map" interface, for example:
+    Data::Rmap, Data::Dmap, Data::Traverse. The difference among these
+    modules lies in the details: in how you specify option to skip
+    unsupported types of references, or whether some let you control the
+    recursion (e.g. Data::Rmap's and Data::Dmap's "cut"),
 
     Data::Walk models its interface on File::Find. It lets you choose
     whether you want to go depth-first or breadth-first.

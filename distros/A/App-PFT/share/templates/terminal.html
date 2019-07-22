@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=[% site.encoding %]">
+        <title>[% site.title %]: [% content.title %]</title>
+        <style type="text/css">
+            [%
+                IF site.theme == "dark"
+                    color.bg        = "#0A0B11"
+                    color.bg_alt    = "#0f111A"
+                    color.border    = "#001c19"
+                    color.fg        = "#D3D3D3"
+                    color.link      = "#009687"
+                    color.link_hov  = "#00BAA8"
+                ELSE
+                    color.bg        = "#F5F4EE"
+                    color.bg_alt    = "#F0EEE5"
+                    color.border    = "#FFE3E6"
+                    color.fg        = "#2C2C2C"
+                    color.link      = "#FF6978"
+                    color.link_hov  = "#FF4557"
+                END
+            %]
+
+            body {
+                margin              : 0 auto 0;
+                max-width           : 50em;
+                background-color    : [% color.bg %];
+                color               : [% color.fg %];
+                font-family         : monospace;
+            }
+
+            div#header h1 {
+                width               : 100%;
+                font-family         : sans;
+                text-align          : center;
+            }
+
+            div#info {
+                width               : 100%;
+            }
+
+            div#info h1 {
+                font-family         : sans;
+            }
+
+            div#info h5 {
+                text-align          : right;
+            }
+
+            div#text img {
+                max-width           : 100%;
+            }
+
+            a {
+                color               : [% color.link %];
+            }
+
+            a:hover {
+                color               : [% color.link_hov %];
+            }
+
+            a:visited {
+                color               : [% color.link %];
+            }
+
+            table {
+                width               : 100%;
+            }
+
+            table tr:first-child {
+                font-weight         : bold;
+                text-indent         : 1em;
+            }
+
+            table tr:nth-child(even) {
+                background-color    : [% color.bg_alt %];
+            }
+
+            div#text blockquote {
+                margin-left         : 2em;
+                font-style          : italic;
+                border-left         : 1em [% color.border %];
+            }
+
+            div#text pre {
+                background-color    : [% color.bg_alt %];
+                padding             : 0.5em;
+                font-family         : monospace;
+                border              : 1px solid [% color.border %];
+                border-radius       : 3px;
+            }
+
+            div#text pre code {
+                border              : 0px;
+            }
+
+            code {
+                background-color    : [% color.bg_alt %];
+                border              : 1px solid [% color.border %];
+                font-family         : monospace;
+                border-radius       : 3px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="header">
+            <h1>[% site.title %]</h1>
+        </div>
+        <div id="all_pages">
+            [% FOREACH p = links.pages %]
+                [% IF loop.first %]
+                <b>Pages:</b>
+                [% END %]
+                [% IF p.is_self %]
+                [% p.slug %]
+                [% ELSE %]
+                <a href="[% p.href %]">[% p.slug %]</a>
+                [% END %]
+                [% IF NOT loop.last %]|[% END %]
+            [% END %]
+        </div>
+
+        <div id="content">
+
+            <div id="nav">
+                <b>Parent:</b>
+                [% IF links.parent %]
+                <a href="[% links.parent.href %]">[% links.parent.slug %]</a>
+                [% ELSE %]
+                -
+                [% END %]
+                </br>
+                <b>Prev:</b>
+                [% IF links.prev %]
+                <a href="[% links.prev.href %]">[% links.prev.slug %]</a>
+                [% ELSE %]
+                -
+                [% END %]
+                </br>
+                <b>Next:</b>
+                [% IF links.next %]
+                <a href="[% links.next.href %]">[% links.next.slug %]</a>
+                [% ELSE %]
+                -
+                [% END %]
+                </br>
+            </div>
+
+            <div id="info">
+                <h1>
+                    [% content.title %]
+                </h1>
+                <h5>
+                    [% IF content.author %]
+                    [% content.author %]
+                    [% END %]
+                    [% IF content.date AND NOT content.is_virtual %]-
+                    [% content.date.y %]-[% content.date.m %]-[% content.date.d %]
+                    [% END %]
+                </h5>
+                [% FOREACH t = content.tags %]
+                    [% IF loop.first %]
+                    <b>Tags:</b>
+                    [% END %]
+                    [
+                    <a class="tag" href="[% t.href %]">[% t.slug %]</a>
+                    ]
+                [% END %]
+            </div>
+
+            <div id="text">
+                [% content.html %]
+            </div>
+
+            [% IF content.is_home %]
+            <div id="menu">
+                [% IF links.backlog %]
+                <h2>Latest News</h2>
+                <table>
+                    <tr>
+                        <td>Date</td>
+                        <td>Title</td>
+                    </tr>
+                    [% FOREACH p = links.backlog(20) %]
+                    <tr>
+                        <td>[% p.date('-') %]</td>
+                        <td><a href="[% p.href %]">[% p.slug %]</a></td>
+                    </tr>
+                    [% END %]
+                </table>
+                [% END %]
+            </div>
+            <div id="menu">
+                <h2>Tags</h2>
+                [% FOREACH t = links.tags %]
+                [<a href="[% t.href %]">[% t.slug %]</a>]
+                [% END %]
+            </div>
+            [% END %]
+        </div>
+
+        [% IF links.children %]
+        <div id="children">
+            <table>
+                <tr>
+                    <td>Date</td><td>Title</td>
+                </tr>
+                [% FOREACH l = links.children %]
+                <tr>
+                    <td>
+                    [% IF l.date %]
+                    [% l.date.y %]-[% l.date.m %]-[% l.date.d %]:
+                    [% END %]
+                    </td>
+                    <td>
+                    <a href="[% l.href %]">[% l.slug %]</a>
+                    </td>
+                </tr>
+                [% END %]
+            </table>
+        </id>
+        [% END %]
+
+    </body>
+</html>

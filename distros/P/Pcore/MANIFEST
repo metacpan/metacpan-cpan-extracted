@@ -51,7 +51,8 @@ lib/Pcore/App/API/Backend/Remote.pm
 lib/Pcore/App/API/Base.pm
 lib/Pcore/App/API/Node.pm
 lib/Pcore/App/API/Request.pm
-lib/Pcore/App/API/Upload.pm
+lib/Pcore/App/API/Role/Read.pm
+lib/Pcore/App/API/Role/Upload.pm
 lib/Pcore/App/Controller.pm
 lib/Pcore/App/Controller/API.pm
 lib/Pcore/App/Controller/Index.pm

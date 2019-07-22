@@ -13,7 +13,7 @@ DBD::Oracle::Troubleshooting::Hpux - Tips and Hints to Troubleshoot DBD::Oracle 
 
 =head1 VERSION
 
-version 1.76
+version 1.791
 
 =head1 INTRODUCTION
 
@@ -102,9 +102,6 @@ start with a Perl that as been built with the correct compiler flags and
 shared libraries.  This means that you must build your own version of
 Perl from source.
 
-See L<EXAMPLE FILES> for a copy of a makefile used by me to build Perl on
-HP-UX and all other platforms on which he works (Sun and Red Hat).
-
 The instructions below have been used for building a dynamically linked
 working DBD-Oracle driver that works with mod_perl and Apache.  These
 instructions are based on Perl 5.6.0 and 5.6.1, and 5.8.0.  To this
@@ -181,11 +178,6 @@ described in L<Appendix C>.
 While I have not reproduced either of these configurations, I believe
 the information is complete enough (particularly in the aggregate) to
 be helpful to others who might wish to replicate it.
-
-If someone would be willing to submit a makefile equivalent to the
-makefile in any of the examples from L<EXAMPLE FILES>, which uses gcc
-to build Perl and the DBI/DBD-Oracle interfaces, I will be happy to
-include it in the next README.
 
 =head2 The "default" built in compiler 64bit build (/usr/bin/cc)
 
@@ -954,7 +946,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
+This software is copyright (c) 2019, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

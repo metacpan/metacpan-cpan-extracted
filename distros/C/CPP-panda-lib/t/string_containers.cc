@@ -6,7 +6,6 @@
 
 using namespace panda;
 using namespace test;
-using std::string_view;
 using test::Allocator;
 
 using String = panda::basic_string<char, std::char_traits<char>, Allocator<char>>;

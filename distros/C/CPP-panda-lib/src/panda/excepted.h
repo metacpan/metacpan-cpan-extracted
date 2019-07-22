@@ -1,6 +1,5 @@
 #pragma once
 #include "expected.h"
-#include <utility>
 
 namespace panda {
 
@@ -241,7 +240,7 @@ struct excepted {
     void nevermind () const { _checked = true; }
 
 private:
-    template <class T2, class E2> friend class excepted;
+    template <class T2, class E2> friend struct excepted;
 
     template <class T2>
     void construct_val (T2&& v) {
@@ -459,7 +458,7 @@ struct excepted<void, E> {
     void nevermind () const { _checked = true; }
 
 private:
-    template <class T2, class E2> friend class excepted;
+    template <class T2, class E2> friend struct excepted;
 
     template <class E2>
     void construct_err (E2&& e) {

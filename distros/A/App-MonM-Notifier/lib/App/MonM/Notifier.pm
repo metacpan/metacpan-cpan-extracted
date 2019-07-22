@@ -1,4 +1,4 @@
-package App::MonM::Notifier; # $Id: Notifier.pm 64 2019-07-14 16:06:47Z abalama $
+package App::MonM::Notifier; # $Id: Notifier.pm 66 2019-07-16 04:27:38Z abalama $
 use warnings;
 use strict;
 use utf8;
@@ -11,7 +11,7 @@ App::MonM::Notifier - extension for the monm notifications
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ communication channels
 
     </Channel>
 
-</User>
+  </User>
 
 =head1 HISTORY
 
@@ -239,7 +239,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 use feature qw/say/;
 

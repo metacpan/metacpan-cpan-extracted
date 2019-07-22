@@ -1,5 +1,14 @@
 >Revision history for Perl extension Time::Format.
 
+1.14  2019 July 22
+        - Fix CPAN RT bug 87484 (https://rt.cpan.org/Ticket/Display.html?id=87484),
+          concerning very small floating-point values (e.g. "2.1458e-06").
+        - Fix CPAN RT Bug 95447, concerning floating-point numerical time values.
+        - Fix CPAN RT Bug 121367, concerning loading perl-only routines after forking.
+          This might (?) also fix bug 74880, but I can't reproduce that.
+        - Skip locale tests on openbsd platform.
+        - Fix accented strings in locale.t
+
 1.13  2019 July 18
         - Fix CPAN RT bug 85001.
           This was a problem in the test suite only; no code changes were made

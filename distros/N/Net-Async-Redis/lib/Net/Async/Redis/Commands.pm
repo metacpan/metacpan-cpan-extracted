@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '2.000'; # VERSION
+our $VERSION = '2.001'; # VERSION
 
 =head1 NAME
 
@@ -847,6 +847,12 @@ Create a key using the provided serialized value, previously obtained using DUMP
 
 =item * [REPLACE]
 
+=item * [ABSTTL]
+
+=item * [IDLETIME seconds]
+
+=item * [FREQ frequency]
+
 =back
 
 L<https://redis.io/commands/restore>
@@ -997,6 +1003,8 @@ Incrementally iterate the keys space.
 =item * [MATCH pattern]
 
 =item * [COUNT count]
+
+=item * [TYPE type]
 
 =back
 

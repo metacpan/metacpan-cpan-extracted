@@ -23,7 +23,7 @@ name: Dist-Zilla-Plugin-SchwartzRatio
 provides:
   Dist::Zilla::Plugin::SchwartzRatio:
     file: lib/Dist/Zilla/Plugin/SchwartzRatio.pm
-    version: v0.3.3
+    version: v0.3.4
 requires:
   Dist::Zilla::Role::AfterRelease: '0'
   Dist::Zilla::Role::Plugin: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio/issues
   homepage: https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio
   repository: https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio.git
-version: 0.3.3
+version: 0.3.4
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK

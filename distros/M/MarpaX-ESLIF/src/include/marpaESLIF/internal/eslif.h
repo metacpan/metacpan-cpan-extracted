@@ -70,6 +70,7 @@
 #define G1_RULE_ADVERB_ITEM_15                   "G1_rule_adverb_item_15"
 #define G1_RULE_ADVERB_ITEM_16                   "G1_rule_adverb_item_16"
 #define G1_RULE_ADVERB_ITEM_17                   "G1_rule_adverb_item_17"
+#define G1_RULE_ADVERB_ITEM_18                   "G1_rule_adverb_item_18"
 #define G1_RULE_ACTION_1                         "G1_rule_action_1"
 #define G1_RULE_ACTION_2                         "G1_rule_action_2"
 #define G1_RULE_SYMBOL_ACTION_1                  "G1_rule_symbol_action_1"
@@ -172,6 +173,8 @@
 #define G1_RULE_DISCARD_OFF                      "G1_rule_discard_off"
 #define G1_RULE_LUASCRIPT_STATEMENT              "G1_rule_luascript_statement"
 #define G1_RULE_LUASCRIPT_SOURCE                 "G1_rule_luascript_source"
+#define G1_RULE_IF_ACTION                        "G1_rule_if_action"
+#define G1_RULE_IFACTION_NAME                    "G1_rule_ifaction_name"
 
 #define G1_ACTION_STATEMENTS                       "::undef"
 #define G1_ACTION_STATEMENT_01                     "::undef"
@@ -238,9 +241,10 @@
 #define G1_ACTION_ADVERB_ITEM_11                   "::shift" /* <adverb item> ::= <latm specification> */
 #define G1_ACTION_ADVERB_ITEM_12                   "::shift" /* <adverb item> ::= naming */
 #define G1_ACTION_ADVERB_ITEM_13                   "::shift" /* <adverb item> ::= <null adverb> */
-#define G1_ACTION_ADVERB_ITEM_14                   "::shift" /* <adverb item> ::= symbolaction */
+#define G1_ACTION_ADVERB_ITEM_14                   "::shift" /* <adverb item> ::= <symbol action> */
 #define G1_ACTION_ADVERB_ITEM_16                   "::shift" /* <adverb item> ::= <event specification> */
 #define G1_ACTION_ADVERB_ITEM_17                   "::shift" /* <adverb item> ::= <hide separator specification> */
+#define G1_ACTION_ADVERB_ITEM_18                   "::shift" /* <adverb item> ::= <if action> */
 #define G1_ACTION_ACTION_1                         "G1_action_action_1"                         /* done */
 #define G1_ACTION_ACTION_2                         "G1_action_action_2"                         /* done */
 #define G1_ACTION_SYMBOLACTION_1                   "G1_action_symbolaction_1"                   /* done */
@@ -340,6 +344,8 @@
 #define G1_ACTION_DISCARD_OFF                      "::undef"
 #define G1_ACTION_LUASCRIPT_STATEMENT              "G1_action_luascript_statement"
 #define G1_ACTION_LUASCRIPT_SOURCE                 "::concat"
+#define G1_ACTION_IFACTION_NAME                    "::ascii" /* <if action name> ::= <ascii graph name> */
+#define G1_ACTION_IFACTION                         "G1_action_ifaction"                         /* done */
 
 typedef struct bootstrap_grammar_terminal {
   int                        idi;                 /* Identifier */

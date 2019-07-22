@@ -5,20 +5,34 @@ use 5.006002;
 use strict;
 use warnings;
 
-use lib qw{ tools/lib };
-
 use Date::Tolkien::Shire;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use Time::Local;
 
-our $VERSION = '1.901';
+our $VERSION = '1.902';
 
-my %opt;
+my %opt = (
+    output	=> 'xt/author/regression.t',
+    replace	=> 1,
+);
 
 GetOptions( \%opt,
-    help => sub { pod2usage( { -verbose => 2 } ) },
+    qw{ idempotent! output=s },
+    help	=> sub { pod2usage( { -verbose => 2 } ) },
 ) or pod2usage( { -verbose => 0 } );
+
+if ( '-' eq $opt{output} ) {
+    load_par();
+} else {
+    $opt{idempotent}
+	and -f $opt{output}
+	and exit;
+    load_par();
+    open my $fh, '>', $opt{output}
+	or die "Unable to open $opt{output}: $!\n";
+    select $fh;
+}
 
 my @test_years = (	# [ start, finish ] with interval open on right
     [ 1999, 2003 ],	# January 1 1999 through December 31 2002
@@ -64,6 +78,12 @@ print <<'EOD';
 
 # ex: set textwidth=72 :
 EOD
+
+sub load_par {
+    require PAR;
+    PAR->import( qw{ tools/Date-Tolkien-Shire-old.par } );
+    return;
+}
 
 sub test_years {
     my ( $start_year, $finish_year, $emit ) = @_;
@@ -134,7 +154,8 @@ make-regression - Generate a regression test
 
 =head1 SYNOPSIS
 
- make-regression >xt/author/regression.t
+ make-regression
+ make-regression -output xt/author/regression.new
  make-regression -help
  make-regression -version
 
@@ -144,6 +165,22 @@ make-regression - Generate a regression test
 
 This option displays the documentation for this script. The script then
 exits.
+
+=head2 -idempotent
+
+If this Boolean option is asserted and the output file exists, it is not
+overwritten. This option is ignored if the output is F<->.
+
+The default is C<-noidempotent>.
+
+=head2 -output
+
+ -output xt/author/regression.t
+
+This option specifies the output file. A single dash (F<->) is
+understood as specifying standard output.
+
+The default is F<xt/author/regression.t>.
 
 =head2 -version
 
@@ -158,7 +195,10 @@ This test consists of calling each method for each day in the intervals
 inclusive, and verifying that all calls produce the same results as when
 the regression test was generated.
 
-The test is written to standard out.
+The test is written to the file specified by the C<-output> argument.
+
+B<Note> that unless L<-idempotent> is specified and the output file
+exists, the L<PAR|/PAR> module is required.
 
 =head1 AUTHOR
 
@@ -166,7 +206,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Thomas R. Wyant, III
+Copyright (C) 2017-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

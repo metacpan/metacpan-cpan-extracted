@@ -18,6 +18,9 @@ Netscape::Bookmarks::Category	- manipulate, or create Netscape Bookmarks files
 
 =head1 DESCRIPTION
 
+THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
+IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
+
 The Netscape bookmarks file has several basic components:
 
 	title
@@ -66,7 +69,7 @@ use constant FOLDED_TRUE     => 1;
 use constant FOLDED_FALSE    => 0;
 use constant TRUE            => 'true';
 
-$VERSION = "2.303";
+$VERSION = "2.304";
 
 %IDS     = ();
 $LAST_ID = -1;
@@ -633,7 +636,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

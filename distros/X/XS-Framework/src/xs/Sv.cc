@@ -1,6 +1,7 @@
 #include "Sv.h"
 #include "Sub.h"
 #include "Simple.h"
+#include <ostream>
 
 namespace xs {
 
@@ -57,14 +58,6 @@ std::ostream& operator<< (std::ostream& os, const Sv& sv) {
             auto s = SvPV(v, len);
             return os.write(s, len);
     }
-    //eval_pv("require Data::Dumper", 1);
-    //Simple terse = get_sv("Data::Dumper::Terse", 0);
-    //sv_setiv(terse, 1);
-    //Scalar arg = sv;
-    //if (!arg)
-    //Simple result = Sub("Data::Dumper::Dumper").call(sv);
-    //std::string_view s = result;
-    //return os.write(s.data(), s.length());
 }
 
 }

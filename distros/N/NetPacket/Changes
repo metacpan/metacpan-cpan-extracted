@@ -1,5 +1,12 @@
 revision history for NetPacket
 
+1.7.2 2019-07-20
+  [ DOCUMENTATION ]
+    - fix typos. (GH#14)
+
+  [ STATISTICS ]
+    - code churn: 7 files changed, 121 insertions(+), 42 deletions(-)
+
 1.7.1 2019-06-08
   [ BUG FIXES ]
     - fixes inverted ethernet ports (reported by sanyacomua)

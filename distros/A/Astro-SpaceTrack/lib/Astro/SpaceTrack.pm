@@ -27,7 +27,7 @@ or
 In either of the above, username and password entry can be omitted if
 you have installed L<Config::Identity|Config::Identity>, created an
 L<IDENTITY FILE|/IDENTITY FILE> (see below) containing these values, and
-set the L<identity|/identity> attribute to a true value.  You probably
+set the C<identity> attribute to a true value.  You probably
 want to encrypt the identity file, if you have C<gpg2> and C<gpg-agent>.
 
 In practice, it is probably not useful to retrieve data from any source
@@ -45,7 +45,7 @@ data on this site.
 
 By logging in to the site, you accept and agree to the terms of the
 User Agreement specified in
-L<http://www.space-track.org/perl/user_agreement.pl>.
+L<https://www.space-track.org/documentation#/user_agree>.
 
 You should consult the above link for the full text of the user
 agreement before using this software to retrieve content from the Space
@@ -57,12 +57,10 @@ Mike McCants appears to get his Iridium status from Rod Sladen, and not
 to have updated it since late 2013. Therefore support of C<'mccants'> as
 a source of Iridium status is deprecated effective immediately.
 
-As previously documented, as of 0.100_02 the default status
-is C<'kelso'>, and the first use of status C<'mccants'> will result in a
-warning.  This will become a warning with every use in another 6 months,
-and fatal 6 months after that.
-
-Also, in 6 months' time the default status source will become C<'kelso'>.
+Unfortunately I did not pursue deprecating McCants' status, but this is
+being resumed with all attempts to use it producing a warning. This
+warning is redundant, since as of July 10 2019 his Iridium status is
+404.
 
 Of course, with the Iridium satellites being replaced by the non-flaring
 Iridium Next, the quality of McCants' status becomes moot. When the last
@@ -100,7 +98,7 @@ been added to access other repositories of orbital data, and in general
 these do not require a Space Track username and password.
 
 Nothing is exported by default, but the shell method/subroutine
-and the BODY_STATUS constants (see L<iridium_status()|/iridium_status>)
+and the BODY_STATUS constants (see C<iridium_status()>)
 can be exported if you so desire.
 
 Most methods return an HTTP::Response object. See the individual
@@ -128,7 +126,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 our @EXPORT_OK = qw{
     shell
 
@@ -1069,7 +1067,7 @@ Track web site was accessible. Otherwise, the latter will be the case.
 These can be accessed by C<< $st->content_type( $resp ) >> and
 C<< $st->content_source( $resp ) >> respectively.
 
-You can specify the L</retrieve> options on this method as well, but
+You can specify the C<retrieve()> options on this method as well, but
 they will have no effect if the 'direct' attribute is true.
 
 =cut
@@ -1605,7 +1603,7 @@ If this method succeeds, the response will contain headers
 These can be accessed by C<< $st->content_type( $resp ) >> and
 C<< $st->content_source( $resp ) >> respectively.
 
-You can specify the L</retrieve> options on this method as well.
+You can specify the C<retrieve()> options on this method as well.
 
 =cut
 
@@ -1691,7 +1689,7 @@ This method exists for the convenience of the shell () method. It
 always returns success, with the content being whatever it's
 convenient (to the author) to include.
 
-If the L<webcmd|/webcmd> attribute is set, the L<https://metacpan.org/>
+If the C<webcmd> attribute is set, the L<https://metacpan.org/>
 web page for Astro::Satpass is launched.
 
 If this method succeeds B<and> the webcmd attribute is not set, the
@@ -1814,7 +1812,7 @@ the content is a series of lines formatted by "%6d   %-15s%-8s %s\n",
 with NORAD ID, name, status, and comment substituted in.
 
 If no format is specified, the format specified in the
-L<iridium_status_format|/iridium_status_format> attribute is used.
+C<iridium_status_format> attribute is used.
 
 There is one option, C<'raw'>, which can be specified either
 command-line style (i.e. C<-raw>) or as a leading hash reference.
@@ -1844,7 +1842,7 @@ C<< $st->content_source( $resp ) >> respectively.
 
 The source of the data and, to a certain extent, the format of the
 results is determined by the optional $format argument, which defaults
-to the value of the L</iridium_status_format> attribute.
+to the value of the C<iridium_status_format> attribute.
 
 If the format is 'kelso', only Dr. Kelso's Celestrak web site
 (L<http://celestrak.com/SpaceTrack/query/iridium.txt>) is queried for
@@ -1863,15 +1861,15 @@ convenience:
 
 The comment will be 'Spare', 'Tumbling', or '' depending on the status.
 
-If the format is 'mccants', the primary source of information will be
-Mike McCants' "Status of Iridium Payloads" web page,
-L<http://www.io.com/~mmccants/tles/iridium.html> (which gives status on
-non-functional Iridium satellites).
+Historically, if the format was 'mccants', the primary source of
+information would be Mike McCants' "Status of Iridium Payloads" web
+page, C<https://www.prismnet.com/~mmccants/tles/iridium.html> (which ave
+status on non-functional Iridium satellites). As of July 10 2019 this is
+404.
 
 B<This format is deprecated,> since Mike no longer maintains this page.
-As of version 0.100_02 the first use of this format will
-generate a warning. See
-L<DEPRECATION NOTICE: IRIDIUM STATUS|/ DEPRECATION NOTICE: IRIDIUM STATUS>
+See
+L<DEPRECATION NOTICE: IRIDIUM STATUS|/DEPRECATION NOTICE: IRIDIUM STATUS>
 for the deprecation schedule.
 
 The Celestrak list will be used to fill in the functioning satellites so
@@ -3214,7 +3212,7 @@ If you specify command-type options, they may be abbreviated, as long as
 the abbreviation is unique. Errors in either sort of specification
 result in an exception being thrown.
 
-In addition to the options available for L</retrieve>, the following
+In addition to the options available for C<retrieve()>, the following
 options may be specified:
 
  -exclude
@@ -3334,7 +3332,7 @@ non-digit being legal as the separator. You can omit -day or specify it
 as 0 to get all decays for the given month. You can omit -month (or
 specify it as 0) as well to get all decays for the given year.
 
-The options are the same as for L</search_date>.
+The options are the same as for C<search_date()>.
 
 A Space Track username and password are required to use this method.
 
@@ -3390,7 +3388,7 @@ omit both the piece and the launch number and get all launches for the
 year. There is no mechanism to restrict the search to a given on-orbit
 status, or to filter out debris or rocket bodies.
 
-The options are the same as for L</search_date>.
+The options are the same as for C<search_date()>.
 
 A Space Track username and password are required to use this method.
 
@@ -3443,7 +3441,7 @@ sub search_id {	## no critic (RequireArgUnpacking)
 This method searches the Space Track database for the named objects.
 Matches are case-insensitive and all matches are returned.
 
-The options are the same as for L</search_date>. The C<-status> option
+The options are the same as for C<search_date()>. The C<-status> option
 is known to work, but I am not sure about the efficacy the C<-exclude>
 option.
 
@@ -3499,12 +3497,12 @@ This method searches the Space Track database for the given Space Track
 IDs (also known as OIDs, hence the method name).
 
 B<Note> that in effect this is just a stupid, inefficient version of
-L<retrieve()|/retrieve>, which does not understand ranges. Unless you
+C<retrieve()>, which does not understand ranges. Unless you
 assert C<-notle> or call it in list context to get the
 search data, you should simply call
-L<retrieve()|/retrieve> instead.
+C<retrieve()> instead.
 
-In addition to the options available for L</retrieve>, the following
+In addition to the options available for C<retrieve()>, the following
 option may be specified:
 
  rcs
@@ -3976,7 +3974,7 @@ C<{all => 1}>). The options specific to this method are:
  effective
   causes the effective date to be added to the data.
 
-In addition, any of the L</retrieve> options is valid for this method as
+In addition, any of the C<retrieve()> options is valid for this method as
 well.
 
 The -all option is recommended, but is not the default for historical
@@ -4996,10 +4994,10 @@ sub _check_cookie_generic {
 #	    shuttle	=> 3,
 #	},
 	iridium_status	=> {
-	    mccants	=> 1,
+	    mccants	=> 2,
 	},
 	iridium_status_format	=> {
-	    mccants	=> 1,
+	    mccants	=> 2,
 	},
     );
 
@@ -6419,7 +6417,7 @@ file, if any, even if the C<identity> attribute is explicitly set true.
 =item iridium_status_format (string)
 
 This attribute specifies the default format of the data returned by the
-L<iridium_status()|/iridium_status> method. Valid values are 'kelso',
+C<iridium_status()> method. Valid values are 'kelso',
 'mccants', 'sladen' or 'spacetrack'.  See that method for more
 information.
 
@@ -6427,7 +6425,7 @@ As of version 0.100_02, the default is C<'kelso'>. It used
 to be C<'mccants'>, but Mike McCants no longer maintains his Iridium
 status web page, format C<'mccants'> is deprecated, and will generate a
 warning the first time it is set. See
-L<DEPRECATION NOTICE: IRIDIUM STATUS|/ DEPRECATION NOTICE: IRIDIUM STATUS>
+L<DEPRECATION NOTICE: IRIDIUM STATUS|/DEPRECATION NOTICE: IRIDIUM STATUS>
 for the deprecation schedule.
 
 =item max_range (number)
@@ -6614,7 +6612,7 @@ Note that this file is normally read only once during the life of the
 Perl process, and the result cached. The username and password that are
 set when C<identity> becomes true come from the cache. If you want a
 running script to see new identity file information you must call static
-method L<flush_identity_cache()|/flush_identity_cache>.
+method C<flush_identity_cache()>.
 
 =head1 GLOBALS
 
@@ -6798,7 +6796,7 @@ without any warranty; without even the implied warranty of
 merchantability or fitness for a particular purpose.
 
 The data obtained by this module may be subject to the Space Track user
-agreement (L<http://www.space-track.org/perl/user_agreement.pl>).
+agreement (L<https://www.space-track.org/documentation#/user_agree>).
 
 =cut
 

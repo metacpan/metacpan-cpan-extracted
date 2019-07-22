@@ -1,3 +1,9 @@
+0.001   2019-07-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommands: new-zfs-snapshot, restore-from-zfs-snapshot
+          (incomplete).
+
+
 0.000   2019-04-03  Released-By: PERLANCAR
 
         - First, early release.

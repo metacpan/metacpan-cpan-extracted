@@ -65,7 +65,7 @@
    "provides" : {
       "Astro::SpaceTrack" : {
          "file" : "lib/Astro/SpaceTrack.pm",
-         "version" : "0.130"
+         "version" : "0.131"
       }
    },
    "release_status" : "stable",
@@ -82,6 +82,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack"
       }
    },
-   "version" : "0.130",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.131",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

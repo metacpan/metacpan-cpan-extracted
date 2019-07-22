@@ -7,7 +7,7 @@ struct TimezoneRecipe11: public panda::Refcnt {
 private:
     TimezoneRecipe11(const char* name_): name{name_} { }
     std::string name;
-    friend class DateRecipe11;
+    friend struct DateRecipe11;
 };
 
 using TimezoneRecipe11SP = panda::iptr<TimezoneRecipe11>;

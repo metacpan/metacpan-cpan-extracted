@@ -35,12 +35,22 @@ Perl.
 
 =cut
 
+print <<"HERE";
+====================================================================
+Test::HTTPStatus is an abandoned module. You can still use it but
+there is no support and it might not stay on CPAN. If you want to
+use it, take over the module or fork it.
+https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
+====================================================================
+
+HERE
+
 use File::Spec::Functions qw(catfile);
 
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/briandfoy/html-simplelinkextor';
+my $github    = 'https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (

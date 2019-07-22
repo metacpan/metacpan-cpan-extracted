@@ -6,7 +6,7 @@ use Pcore::CDN::Static::FA qw[:ALL];
 sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
     return {
         init => func ['view'],
-        <<~'JS',
+        <<'JS',
             this.callParent(arguments);
 
             if (view.getShowSignup() && view.getCanSignup()) {
@@ -17,7 +17,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
             }
 JS
 
-        showSignin => func <<~"JS",
+        showSignin => func <<"JS",
             var me = this,
                 view = this.getView();
 

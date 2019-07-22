@@ -1,11 +1,12 @@
 #pragma once
-#include <xs/Sv.h>
 #include <xs/Scalar.h>
 #include <xs/KeyProxy.h>
 
 namespace xs {
 
 using xs::my_perl;
+
+struct Simple;
 
 struct Array : Sv {
     enum create_type_t { ALIAS, COPY };
@@ -19,7 +20,7 @@ struct Array : Sv {
     }
 
     static Array create (size_t size, SV** content, create_type_t type = ALIAS);
-    static Array create (std::initializer_list<Scalar> l, create_type_t type = ALIAS) { return Array(l, type); }
+    static Array create (const std::initializer_list<Scalar>& l, create_type_t type = ALIAS) { return Array(l, type); }
     static Array create (const Array& from, create_type_t type = ALIAS) { return create(from.size(), from._svlist(), type); }
 
     static Array noinc  (SV* val) { return Array(val, NONE); }
@@ -29,29 +30,27 @@ struct Array : Sv {
     Array (SV* sv, bool policy = INCREMENT) : Sv(sv, policy) { _validate(); }
     Array (AV* sv, bool policy = INCREMENT) : Sv(sv, policy) {}
 
-    Array (const Array& oth)   : Sv(oth)            {}
-    Array (Array&& oth)        : Sv(std::move(oth)) {}
-    Array (const Sv& oth)      : Sv(oth)            { _validate(); }
-    Array (Sv&& oth)           : Sv(std::move(oth)) { _validate(); }
-    Array (const CallProxy& p) : Array(p.sv())      {}
-    Array (const Simple&) = delete;
-    Array (const Hash&)   = delete;
-    Array (const Sub&)    = delete;
-    Array (const Glob&)   = delete;
+    Array (const Array& oth) : Sv(oth)            {}
+    Array (Array&& oth)      : Sv(std::move(oth)) {}
+    Array (const Sv& oth)    : Sv(oth)            { _validate(); }
+    Array (Sv&& oth)         : Sv(std::move(oth)) { _validate(); }
+    Array (const Simple&)    = delete;
+    Array (const Hash&)      = delete;
+    Array (const Sub&)       = delete;
+    Array (const Glob&)      = delete;
 
-    Array (std::initializer_list<Scalar> l, create_type_t type = ALIAS);
+    Array (const std::initializer_list<Scalar>& l, create_type_t type = ALIAS);
 
-    Array& operator= (SV* val)            { Sv::operator=(val); _validate(); return *this; }
-    Array& operator= (AV* val)            { Sv::operator=(val); return *this; }
-    Array& operator= (const Array& oth)   { Sv::operator=(oth); return *this; }
-    Array& operator= (Array&& oth)        { Sv::operator=(std::move(oth)); return *this; }
-    Array& operator= (const Sv& oth)      { return operator=(oth.get()); }
-    Array& operator= (Sv&& oth)           { Sv::operator=(std::move(oth)); _validate(); return *this; }
-    Array& operator= (const CallProxy& p) { return operator=(p.sv()); }
-    Array& operator= (const Simple&)      = delete;
-    Array& operator= (const Hash&)        = delete;
-    Array& operator= (const Sub&)         = delete;
-    Array& operator= (const Glob&)        = delete;
+    Array& operator= (SV* val)          { Sv::operator=(val); _validate(); return *this; }
+    Array& operator= (AV* val)          { Sv::operator=(val); return *this; }
+    Array& operator= (const Array& oth) { Sv::operator=(oth); return *this; }
+    Array& operator= (Array&& oth)      { Sv::operator=(std::move(oth)); return *this; }
+    Array& operator= (const Sv& oth)    { return operator=(oth.get()); }
+    Array& operator= (Sv&& oth)         { Sv::operator=(std::move(oth)); _validate(); return *this; }
+    Array& operator= (const Simple&)    = delete;
+    Array& operator= (const Hash&)      = delete;
+    Array& operator= (const Sub&)       = delete;
+    Array& operator= (const Glob&)      = delete;
 
     void set (SV* val) { Sv::operator=(val); }
 
@@ -62,7 +61,7 @@ struct Array : Sv {
 
     AV* operator-> () const { return (AV*)sv; }
 
-    template <typename T = SV> one_of_t<T,SV,AV>* get () const { return (T*)sv; }
+    template <typename T = SV> panda::enable_if_one_of_t<T,SV,AV>* get () const { return (T*)sv; }
 
     Scalar fetch (size_t key) const {
         if (!sv) return Scalar();
@@ -88,13 +87,12 @@ struct Array : Sv {
     }
 
     void store (size_t key, const Scalar& val);
-    void store (size_t key, std::nullptr_t)     { store(key, Scalar()); }
-    void store (size_t key, SV* v)              { store(key, Scalar(v)); }
-    void store (size_t key, const Sv& v)        { store(key, Scalar(v)); }
-    void store (size_t key, const CallProxy& p) { store(key, p.scalar()); }
-    void store (size_t key, const Array&)       = delete;
-    void store (size_t key, const Hash&)        = delete;
-    void store (size_t key, const Sub&)         = delete;
+    void store (size_t key, std::nullptr_t) { store(key, Scalar()); }
+    void store (size_t key, SV* v)          { store(key, Scalar(v)); }
+    void store (size_t key, const Sv& v)    { store(key, Scalar(v)); }
+    void store (size_t key, const Array&)   = delete;
+    void store (size_t key, const Hash&)    = delete;
+    void store (size_t key, const Sub&)     = delete;
 
     KeyProxy operator[] (size_t key) { return KeyProxy(_svlist() + key, true); }
 
@@ -142,9 +140,8 @@ struct Array : Sv {
     void push (const Array&) = delete;
     void push (const Hash&)  = delete;
     void push (const Sub&)   = delete;
-    void push (SV* v)              { push(Scalar(v)); }
-    void push (const Sv& v)        { push(Scalar(v)); }
-    void push (const CallProxy& p) { push(p.scalar()); }
+    void push (SV* v)        { push(Scalar(v)); }
+    void push (const Sv& v)  { push(Scalar(v)); }
 
     void unshift (const std::initializer_list<Scalar>& l);
     void unshift (const List& l);
@@ -152,9 +149,8 @@ struct Array : Sv {
     void unshift (const Array&) = delete;
     void unshift (const Hash&)  = delete;
     void unshift (const Sub&)   = delete;
-    void unshift (SV* v)              { unshift(Scalar(v)); }
-    void unshift (const Sv& v)        { unshift(Scalar(v)); }
-    void unshift (const CallProxy& p) { unshift(p.scalar()); }
+    void unshift (SV* v)        { unshift(Scalar(v)); }
+    void unshift (const Sv& v)  { unshift(Scalar(v)); }
 
     void undef () { if (sv) av_undef((AV*)sv); }
     void clear () { if (sv) av_clear((AV*)sv); }
@@ -259,20 +255,17 @@ struct List : public Array {
     List (const Sv&    oth) : Array(oth)            {}
     List (Sv&&         oth) : Array(std::move(oth)) {}
 
-    List (const CallProxy& p) : Array(p.list()) {}
-
     List (const Simple&) = delete;
     List (const Hash&)   = delete;
     List (const Sub&)    = delete;
     List (const Glob&)   = delete;
 
-    List& operator= (SV* val)            { Array::operator=(val); return *this; }
-    List& operator= (AV* val)            { Array::operator=(val); return *this; }
-    List& operator= (const Array& oth)   { Array::operator=(oth); return *this; }
-    List& operator= (Array&& oth)        { Array::operator=(std::move(oth)); return *this; }
-    List& operator= (const Sv& oth)      { Array::operator=(oth); return *this; }
-    List& operator= (Sv&& oth)           { Array::operator=(std::move(oth)); return *this; }
-    List& operator= (const CallProxy& p) { Array::operator=(p.list()); return *this; }
+    List& operator= (SV* val)          { Array::operator=(val); return *this; }
+    List& operator= (AV* val)          { Array::operator=(val); return *this; }
+    List& operator= (const Array& oth) { Array::operator=(oth); return *this; }
+    List& operator= (Array&& oth)      { Array::operator=(std::move(oth)); return *this; }
+    List& operator= (const Sv& oth)    { Array::operator=(oth); return *this; }
+    List& operator= (Sv&& oth)         { Array::operator=(std::move(oth)); return *this; }
 
     List& operator= (const Simple&) = delete;
     List& operator= (const Hash&)   = delete;

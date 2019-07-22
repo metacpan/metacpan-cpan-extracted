@@ -1,7 +1,7 @@
 package NetPacket::USBMon;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Assemble and disassemble USB packets captured via Linux USBMon interface.
-$NetPacket::USBMon::VERSION = '1.7.1';
+$NetPacket::USBMon::VERSION = '1.7.2';
 use 5.10.0;
 use strict;
 use warnings;
@@ -145,7 +145,7 @@ NetPacket::USBMon - Assemble and disassemble USB packets captured via Linux USBM
 
 =head1 VERSION
 
-version 1.7.1
+version 1.7.2
 
 =head1 SYNOPSIS
 

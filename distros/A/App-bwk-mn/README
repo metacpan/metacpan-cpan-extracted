@@ -2,13 +2,93 @@ NAME
     App::bwk::mn - Some commands to manage Bulwark masternode
 
 VERSION
-    This document describes version 0.000 of App::bwk::mn (from Perl
-    distribution App-bwk-mn), released on 2019-07-08.
+    This document describes version 0.001 of App::bwk::mn (from Perl
+    distribution App-bwk-mn), released on 2019-07-22.
 
 SYNOPSIS
     Please see included script bwk-mn.
 
 FUNCTIONS
+  new_zfs_snapshot
+    Usage:
+
+     new_zfs_snapshot() -> [status, msg, payload, meta]
+
+    Create a new ZFS snapshot.
+
+    This subcommand will:
+
+    1. stop bulwarkd
+    2. create a new ZFS snapshot
+    3. restart bulwarkd again
+
+    See "restore_from_zfs_snapshot" for more details.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  restore_from_zfs_snapshot
+    Usage:
+
+     restore_from_zfs_snapshot() -> [status, msg, payload, meta]
+
+    Restore broken installation from ZFS snapshot.
+
+    This subcommand will:
+
+    1. stop bulwarkd
+    2. rollback to a specific ZFS snapshot
+    3. restart bulwarkd again
+    4. wait until node is fully sync-ed (not yet implemented)
+
+    For this to work, a specific setup is required. First, at least the
+    "blocks/" and "chainstate" directory are put in a ZFS filesystem (this
+    part is assumed and not checked) and a snapshot of that filesytem has
+    been made. The ZFS filesystem needs to have "bulwark" or "bwk" as part
+    of its name, and the snapshot must be named using YYYY-MM-DD. The most
+    recent snapshot will be selected.
+
+    Rationale: as of this writing (2019-07-22, Bulwark version 2.2.0.0) a
+    Bulwark masternode still from time to time gets corrupted with this
+    message in the "debug.log":
+
+     2019-07-22 02:30:17 ERROR: VerifyDB() : *** irrecoverable inconsistency in block data at xxxxxx, hash=xxxxxxxx
+
+    (It used to happen more often prior to 2.1.0 release, and less but still
+    happens from time to time since 2.1.0.)
+
+    Resync-ing from scratch will take at least 1-2 hours, and if this
+    happens on each masternode every few days then resync-ing will waste a
+    lot of time. Thus the ZFS snapshot. Snapshots will of course need to be
+    created regularly for this setup to benefit.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   status
     Usage:
 

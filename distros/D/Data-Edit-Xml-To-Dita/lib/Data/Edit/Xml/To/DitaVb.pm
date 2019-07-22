@@ -121,6 +121,7 @@ our $projects    = {};                                                          
 our $project;                                                                   # Visible, thus loggable.
 our $lintResults = q(No lint results yet!);                                     # Lint results.
 our $lintReport;                                                                # Lint report if available.
+our $xrefResults;                                                               # Xref results if xref has been run
 
 my $home;                                                                       # Cached value of home
 
@@ -290,9 +291,8 @@ sub getFromAws                                                                  
   lll "Done!";
  }
 
-sub pleaseSee($$)                                                               #P AWS command to see results
- {my ($lint, $xref) = @_;                                                       # Lint results, xref results
-  my $success = $lintReport && $lintReport->totalErrors == 0;
+sub pleaseSee                                                                   #P AWS command to see results
+ {my $success = $lintReport && $lintReport->totalErrors == 0;
   my $p = qq(Please see:);
   my @p;
   push @p, fpe(q(http://).awsIp, q(publications), client, qw(index html))
@@ -499,7 +499,7 @@ sub convertImageToSvg($)                                                        
 sub downloadFromS3                                                              #P Download documents from S3 to the L<downloads|/downloads> folder.
  {if (&download)                                                                # Download if requested
    {lll "Download from S3";
-    clearFolder(downloads, clearCount);                        # Clear last run
+    clearFolder(downloads, clearCount);                                         # Clear last run
     makePath(downloads);                                                        # Make folder as aws cli will not
 
     my $s = s3InputFolder;                                                      # Download from S3
@@ -831,7 +831,7 @@ sub loadProjects                                                                
        }
      }
 
-    clearFolder($_, 1e3) for out, parseFailed, reports, targets, testResults;   # Clear results folders
+    clearFolder($_, 1e3) for out, parseFailed, reports, targets, topicTrees, testResults;   # Clear results folders
    }
   elsif (testMode eq q(2))                                                      # Standalone tests
    {if (my @files = searchDirectoryTreesForMatchingFiles(testStandAlone, inputExt))
@@ -933,6 +933,7 @@ sub lintTopic($$;$)                                                             
 
   $x->createGuidId;                                                             # Create an id for the topic saving any existing one as a label
 # $x->set(xtrf=>$project->source);  # PS2-474                                   # Show source file on xtrf attribute so that it can be retrieved by xref - we do this after the creation of the guid for the topic to avoid affecting it with information that is about the content but not of the content
+say STDERR "AAAA source ", $project->source if $x->at_dlentry;;
   my $source = spellingOut formatXml $x;                                        # Pretty print topic
   my $extension = $x->tag =~ m(map\Z)s ? &outExtMap : &outExtTopic;             # Choose output extension
 
@@ -1112,14 +1113,20 @@ sub standardDitaCleanUpDefault($$)                                              
 
     if ($o->at_image)                                                           # Copy images across
      {if (my $h = $o->href)                                                     # Image name
-       {my $i = index($h, &in) == 0 ? $h :                                      # Href is fully qualified
-                absFromAbsPlusRel($project->source, $h);                        # Relative image source in input
-        my $d = swapFilePrefix($i, &in, &downloads);                            # Image source in downloads
-           $d = findImage($d) unless -e $d;                                     # The right image often gets delivered in the wrong place
-        if (-e $d)                                                              # Copy file across if it exists - Xref will report if it is missing
-         {my $t = gbBinaryStandardCopyFile($d, &out);                           # Copy image into position - this might happen multiple times but so what - to compute is cheap!
+       {my $i = sub
+         {return $h if fullyQualifiedFile($h, &downloads);                      # Href is fully qualified to downloads/
+          return swapFilePrefix($h, &in, &downloads)                            # Href is fully qualified to in/
+            if fullyQualifiedFile($h, &in);
+          return $h if fullyQualifiedFile($h);                                  # Href is fully qualified to somewhere else
+
+          my $f = absFromAbsPlusRel($project->source, $h);                      # Relative image source in input
+          return  swapFilePrefix($f, &in, &downloads);                          # Image source in downloads
+         }->();
+        $i = findImage($i) unless -e $i;                                        # The right image often gets delivered in the wrong place
+        if (-e $i)                                                              # Copy file across if it exists - Xref will report if it is missing
+         {my $t = gbBinaryStandardCopyFile($i, &out);                           # Copy image into position - this might happen multiple times but so what - to compute is cheap!
           $o->href = fne($t);                                                   # Xref will take care of the path
-          createTarget($d, $t, q(image), q(image));                             # Image to image mapping
+          createTarget($i, $t, q(image), q(image));                             # Image to image mapping
          }
        }
      }
@@ -1196,9 +1203,9 @@ END
         fne($l->file)                                                           # File containing notices concept
        }->();
 
-      my $bookMap = isAMap($x) ? $x : $x->ditaSampleBookMap                     # Create a bookmap unless we have been left with a bookmap
-       (chapters=>$topicRef, title=>$title, notices=>$notices);
-
+      my $bookMap = isAMap($x) && !$x->isAllBlankText ? $x :                    # Create a bookmap unless we have been left with a convincing bookmap
+        $x->ditaSampleBookMap
+         (chapters=>$topicRef, title=>$title, notices=>$notices);
 
       cleanUpBookMap($project, $bookMap);                                       # Clean up book map
       lintBookMap($project, $x, $bookMap, $title);                              # Lint bookmap
@@ -1248,7 +1255,7 @@ sub convertProject($)                                                           
 
 sub xrefResults                                                                 #P Run Xref to fix check results
  {if (xref)
-   {Data::Edit::Xml::Xref::xref                                                 # Check and perhaps fix any cross references
+   {$xrefResults = Data::Edit::Xml::Xref::xref                                  # Check and perhaps fix any cross references
      (addNavTitles              => xrefAddNavTitles,
       allowUniquePartialMatches => xrefAllowUniquePartialMatches,
       changeBadXrefToPh         => changeBadXrefToPh,
@@ -1266,6 +1273,7 @@ sub xrefResults                                                                 
   else
    {ddd "Xref not requested";
    }
+
   undef
  }
 
@@ -1274,14 +1282,15 @@ sub lintResultsDefault                                                          
    {lll "Lint conversion results";
     if (my $report = $lintReport = Data::Edit::Xml::Lint::report                # Lint report
      (out, qr(\.(dita|ditamap|xml)\Z)))
-     {my $xref = $report->failingFiles ? xrefResults : undef;                   # Xref results if we are at 100% lint
+     {xrefResults;                                                              # Xref results  - xref relies on lint results
       my $d = dateTimeStamp;
-      my $p = pleaseSee($report, $xref);
+      my $p = pleaseSee;
       my $r = $report->print;
 
       my $x = sub                                                               # Include xref results
-       {return q() unless $xref;
-        $xref->statusLine. " Tags To Text: ".$xref->tagsTextsRatio // q();
+       {return q() unless $xrefResults;
+        $xrefResults->statusLine. " Tags To Text: ".
+          $xrefResults->tagsTextsRatio // q();
        }->();
 
       if (my $n = &numberOfFiles)                                               # Check number of files if a count has been supplied
@@ -1650,12 +1659,12 @@ sub uploadToExchange                                                            
       my $e = exchangeItems||'';
       push @d, downloads    if $e =~ m(d)i;
       push @d, in           if $e =~ m(i)i;
-      push @d, perl         if $e =~ m(p)i;
       push @d, out          if $e =~ m(o)i;
-      push @d, reports
-      push @d, topicTrees   if $e =~ m(t)i;
       push @d, parseFailed;
+      push @d, perl         if $e =~ m(p)i;
+      push @d, reports
       push @d, targets;
+      push @d, topicTrees;
 
       for my $dir(@d)                                                           # Upload requested folders
        {next unless -e $dir;
@@ -2114,6 +2123,10 @@ sub restructureOneDocument($$$)                                                 
  {my ($phase, $lint, $x) = @_;                                                  # Phase, lint results, parse tree
  }
 
+sub restructureCleanUp($@)                                                      #r Cleanup after each restructuring phase
+ {my ($phase, @cleanUps) = @_;                                                  # Phase, cleanup requests
+ }
+
 sub restructureOneFile($$)                                                      #P Restructure one output file
  {my ($phase, $file) = @_;                                                      # Phase, file to restructure
 
@@ -2132,10 +2145,6 @@ sub restructureOneFile($$)                                                      
    }
 
   $result
- }
-
-sub restructureCleanUp($@)                                                      #r Cleanup after each restructuring phase
- {my ($phase, @cleanUps) = @_;                                                  # Phase, cleanup requests
  }
 
 sub restructureResultsFiles                                                     #P Restructure output folders based on results from Lint and Xre
@@ -2180,6 +2189,23 @@ sub restructureResults                                                          
    {ddd "Restructure results not requested";
    }
  }
+sub editOneOutputFile($)                                                        #r Edit one output file
+ {my ($s) = @_;
+  $s
+ } # editOneOutputFile
+
+sub editOutputFiles                                                             # Edit output files
+ {my @files = searchDirectoryTreesForMatchingFiles
+   (&out, &outExtMap, &outExtTopic);
+
+  for my $file(@files)
+   {my $S = readFile($file);
+    my $s = editOneOutputFile($S);
+    if ($s ne $S)
+     {owf($file, $s);
+     }
+   }
+ } # editOutputFiles
 
 sub notifyUsers                                                                 #P Notify users of results
  {if (&notify)                                                                  # Convert the documents if requested.
@@ -2237,6 +2263,7 @@ copyLogFiles
 copyToAws
 cutOutTopics
 downloadFromS3
+editOneOutputFile
 fileFromString
 findImage
 findProjectFromSource
@@ -2417,10 +2444,10 @@ sub convertXmlToDita                                                            
                 q(lintResults),
                 q(restructureOutputFiles),                                      # Deprecated in favor of: restructureResults
                 q(restructureResults),
+                q(editOutputFiles),
                 q(runTests),
                 q(copyLogFiles),
                 q(copyFilesToWeb),
-#               q(uploadToS3),
 #               q(uploadToExchange),
                 q(uploadResults),
                 q(convertDitaToHtml),
@@ -2460,6 +2487,7 @@ isAMap
 lll
 overrideMethods
 topicIsEssentiallyEmpty
+$xrefResults
 );
 
 %EXPORT_TAGS = (all=>[@EXPORT, @EXPORT_OK]);

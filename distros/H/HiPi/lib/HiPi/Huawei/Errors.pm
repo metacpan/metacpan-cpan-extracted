@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use parent qw( HiPi::Class );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 our $errors = {
     '101'       => 'unable to get session tokens',

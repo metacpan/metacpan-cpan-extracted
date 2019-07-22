@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Hebrew' => { file => 'lib/Calendar/Hebrew.pm', version => '0.11' },
+            'Calendar::Hebrew' => { file => 'lib/Calendar/Hebrew.pm', version => '0.12' },
         },
         resources => {
             repository => {

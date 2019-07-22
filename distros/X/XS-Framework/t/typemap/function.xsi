@@ -60,7 +60,7 @@ int s2f_notm (Sub sub, int i) {
 uint64_t bench_vv (Sub sub, int cnt) {
     RETVAL = 0;
     for (int i = 0; i < cnt; ++i) {
-        RETVAL =+ (uint64_t)sub2function<vv_fn>(sub).func.get();
+        RETVAL += (uint64_t)sub2function<vv_fn>(sub).func.get();
     }
 }
 
@@ -82,7 +82,7 @@ uint64_t bench_vvR (int cnt) {
     RETVAL = 0;
     vv_fn fn = [](){};
     for (int i = 0; i < cnt; ++i) {
-        RETVAL =+ (uint64_t)function2sub(fn).get();
+        RETVAL += (uint64_t)function2sub(fn).get();
     }
 }
 
@@ -90,7 +90,7 @@ uint64_t bench_viR (int cnt) {
     RETVAL = 0;
     vi_fn fn = [](int){};
     for (int i = 0; i < cnt; ++i) {
-        RETVAL =+ (uint64_t)function2sub(fn).get();
+        RETVAL += (uint64_t)function2sub(fn).get();
     }
 }
 
@@ -98,6 +98,6 @@ uint64_t bench_iidR (int cnt) {
     RETVAL = 0;
     iid_fn fn = [](int a, double d) -> int { return a + d; };
     for (int i = 0; i < cnt; ++i) {
-        RETVAL =+ (uint64_t)function2sub(fn).get();
+        RETVAL += (uint64_t)function2sub(fn).get();
     }
 }

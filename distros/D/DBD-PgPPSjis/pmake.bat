@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.10';
+$VERSIONE = '0.15';
 $VERSIONE = $VERSIONE;
 use strict;
 use FindBin;
@@ -42,7 +42,6 @@ C:\> pmake test
 C:\> pmake xtest
 C:\> pmake install
 C:\> pmake dist
-C:\> pmake tar.gz
 C:\> pmake ptar
 C:\> pmake pwget
 END
@@ -57,7 +56,6 @@ $ ./pmake.bat test
 $ ./pmake.bat xtest
 $ ./pmake.bat install
 $ ./pmake.bat dist
-$ ./pmake.bat tar.gz
 $ ./pmake.bat ptar
 $ ./pmake.bat pwget
 
@@ -211,6 +209,52 @@ END
         close(FH_MAKEFILEPL);
         check_usascii('Makefile.PL');
 
+        my %requires = (qw(
+            Archive::Tar         0.072
+            Compress::Zlib       1.03
+            Config               0
+            ExtUtils::MakeMaker  5.4302
+            Fcntl                1.03
+            File::Basename       2.6
+            File::Copy           2.02
+            File::Path           1.0401
+            FindBin              1.42
+            perl                 5.005_03
+            strict               1.01
+        ));
+        my %provides = ();
+        for my $file (grep /\.(pl|pm|t|bat)\z/i, @file) {
+            if (open FILE, $file) {
+                while (<FILE>) {
+                    chomp;
+                    if (/^use\s+([A-Za-z][^;\s]*).*;/) {
+                        $requires{$1} ||= '0';
+                    }
+                    elsif (/^package\s+([A-Za-z][^;\s]*).*;/) {
+                        $provides{$1} = $file;
+                    }
+                }
+                close(FILE);
+            }
+        }
+        delete @requires{keys %provides};
+        if ($package eq 'Char') {
+            delete @requires{qw(
+                Ebig5hkscs
+                Ebig5plus
+                Egb18030
+                Egbk 
+                Ehp15
+                Einformixv6als
+                Ekps9566
+                Euhc
+            )};
+            delete @provides{qw(
+                Esjis
+                Sjis
+            )};
+        }
+
         # write META.yml
         #
         # CPANTS Kwalitee shows us following message, but never believe it.
@@ -229,9 +273,14 @@ END
         #     version: 1.4
         #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
 
+        #                                      12     1234
+        my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}"} sort keys %provides;
+        my $requires_as_yml = join "\n", map {"  $_: $requires{$_}"}            sort keys %requires;
+        #                                      12
+
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $requires_as_yml, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
@@ -244,18 +293,7 @@ author:
 license: perl
 generated_by: pmake.bat
 requires:
-  Archive::Tar: 0.072
-  Compress::Zlib: 1.03
-  Config: 0
-  ExtUtils::MakeMaker: 5.4302
-  Fcntl: 1.03
-  File::Basename: 2.6
-  File::Copy: 2.02
-  File::Path: 1.0401
-  FindBin: 1.42
-  Getopt::Std: 1.01
-  perl: 5.005_03
-  strict: 1.01
+%s
 build_requires:
   Test: 1.122
 resources:
@@ -284,9 +322,14 @@ END
         #       "version" : 2
         #   },
 
+        #                                          1234567890123456
+        my $requires_as_json = join ",\n", map {qq{                "$_" : "$requires{$_}"}}                            sort keys %requires;
+        my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}"\n        }}} sort keys %provides;
+        #                                          12345678          123456789012                          12345678
+
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json);
 {
     "name" : "%s",
     "version" : "%s",
@@ -300,8 +343,8 @@ END
         "perl_5"
     ],
     "meta-spec" : {
-       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-       "version" : 2
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
     },
     "release_status" : "stable",
     "resources" : {
@@ -309,65 +352,23 @@ END
             "http://dev.perl.org/licenses/"
         ],
         "repository" : {
-             "url" : "https://github.com/ina-cpan/%s"
+            "url" : "https://github.com/ina-cpan/%s"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+%s
             }
         },
         "configure" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+%s
             }
         },
         "runtime" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+%s
             }
         }
     }
@@ -779,195 +780,6 @@ The End
 LICENSING
         close FH_LICENSE;
         check_usascii('LICENSE');
-
-        # make work directory
-        my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
-        $dirname =~ tr#/#-#;
-        my $basename = basename($file[0], '.pm','.pl','.bat');
-        my $tardir = "$dirname-$basename-$version";
-        $tardir =~ s#^lib-##;
-        rmtree($tardir,0,0);
-
-        if ($^O =~ /(?:solaris|linux)/i) {
-            for my $file (@file) {
-                if (-e $file) {
-                    mkpath(dirname("$tardir/$file"), 0, 0777);
-                    print STDERR "copy $file $tardir/$file\n";
-                    copy($file, "$tardir/$file");
-                    if ($file =~ m/ (?: Build\.PL | Makefile\.PL ) \z/oxmsi) {
-                        chmod(0664, "$tardir/$file");
-                    }
-                    elsif ($file =~ m/\. (?: pl | bat | exe | com ) \z/oxmsi) {
-                        chmod(0775, "$tardir/$file");
-                    }
-                    elsif ($file =~ m{^bin/}oxmsi) {
-                        chmod(0775, "$tardir/$file");
-                    }
-                    else {
-                        chmod(0664, "$tardir/$file");
-                    }
-                }
-            }
-            system(qq{tar -cvf $tardir.tar $tardir});
-            system(qq{gzip $tardir.tar});
-        }
-        else {
-
-#-----------------------------------------------------------------------------
-# https://metacpan.org/search?q=Archive%3A%3ATar%3A%3AConstant
-# https://metacpan.org/release/Archive-Tar-Streamed
-#-----------------------------------------------------------------------------
-            eval q{
-                use Compress::Zlib;
-                use Archive::Tar;
-            };
-            my $BLOCK_SIZE = 512;
-            my $ZERO_BLOCK = "\0" x $BLOCK_SIZE;
-
-            # make *.tar file
-            open(FH_TAR, ">$tardir.tar") || die "Can't open file: $tardir.tar\n"; #'
-            binmode FH_TAR;
-            for my $file (@file) {
-                if (-e $file) {
-                    mkpath(dirname("$tardir/$file"), 0, 0777);
-                    print STDERR "copy $file $tardir/$file\n";
-                    copy($file, "$tardir/$file");
-
-#-----------------------------------------------------------------------------
-# Sunday December 21, 2008 07:38 PM 
-# Fixing world writable files in tarball before upload to CPAN [ #38127 ]
-# http://use.perl.org/~bart/journal/38127 (dead link)
-# Fix CPAN uploads for world writable files
-# http://perlmonks.org/index.pl?node_id=731935
-#-----------------------------------------------------------------------------
-#                   $tar->add_files("$tardir/$file");
-#-----------------------------------------------------------------------------
-                    open(FH, $file) || die "Can't open file: $file\n"; #'
-                    binmode FH;
-                    local $/ = undef; # slurp mode
-                    my $data = <FH>;
-                    close FH;
-
-#-----------------------------------------------------------------------------
-# Kwalitee Indicator: buildtool_not_executable core
-# The build tool (Build.PL/Makefile.PL) is executable. This is bad because
-# you should specify which perl you want to use while installing.
-#
-# How to fix
-# Change the permissions of Build.PL/Makefile.PL to not-executable.
-#-----------------------------------------------------------------------------
-
-                    my $tar = Archive::Tar->new;
-                    if ($file =~ m/ (?: Build\.PL | Makefile\.PL ) \z/oxmsi) {
-                        $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
-                    }
-                    elsif ($file =~ m/\. (?: pl | bat | exe | com ) \z/oxmsi) {
-                        $tar->add_data("$tardir/$file", $data, {'mode' => 0775});
-                    }
-                    else {
-                        $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
-                    }
-                    my $format_tar_file = $tar->write;
-                    syswrite FH_TAR, $format_tar_file, length($format_tar_file) - length($ZERO_BLOCK . $ZERO_BLOCK);
-                    undef $tar;
-
-#-----------------------------------------------------------------------------
-                }
-                else {
-                    die "file: $file is not exists.\n";
-                }
-            }
-
-            # syswrite FH_TAR, $ZERO_BLOCK; makes "tar: A lone zero block at %s"
-            syswrite FH_TAR, ($ZERO_BLOCK . $ZERO_BLOCK);
-
-            close FH_TAR;
-            rmtree($tardir,0,0);
-
-            # make *.tar.gz file
-            my $gz = gzopen("$tardir.tar.gz", 'wb');
-            open(FH_TAR, "$tardir.tar") || die "Can't open file: $tardir.tar\n";
-            binmode FH_TAR;
-            while (sysread(FH_TAR, $_, 1024*1024)) {
-                $gz->gzwrite($_);
-            }
-            close FH_TAR;
-            $gz->gzclose;
-            unlink "$tardir.tar";
-        }
-
-        # P.565 Cleaning Up Your Environment
-        # in Chapter 23: Security
-        # of ISBN 0-596-00027-8 Programming Perl Third Edition.
-
-        # local $ENV{'PATH'} = '.';
-        local @ENV{qw(IFS CDPATH ENV BASH_ENV)};
-
-        # untar test
-        if ($^O =~ /\A (?: MSWin32 | NetWare | symbian | dos ) \z/oxms) {
-            system(qq{pmake.bat ptar.bat});
-            system(qq{ptar.bat xzvf $tardir.tar.gz});
-        }
-        else {
-            system(qq{./pmake.bat ptar});
-            system(qq{./ptar xzvf $tardir.tar.gz});
-        }
-    }
-
-    # make tar.gz
-    elsif ($target eq 'tar.gz') {
-
-        # get $name_as_filesystem
-        open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
-        chomp(my $name_as_filesystem = <FH_MANIFEST>);
-        close(FH_MANIFEST);
-        die "'NAME_AS_FILESYSTEM' not found.\n" unless $name_as_filesystem;
-        check_usascii('MANIFEST');
-
-        # get $name_as_dist_on_url
-        my $name_as_dist_on_url = $name_as_filesystem;
-        $name_as_dist_on_url =~ s#^lib/##;
-        $name_as_dist_on_url =~ s#\.(pl|pm)$##i;
-        $name_as_dist_on_url =~ s#/#-#g;
-        die "'NAME_AS_DIST_ON_URL' not found.\n" unless $name_as_dist_on_url;
-
-        # get $name_as_perlsyntax
-        my $name_as_perlsyntax = $name_as_filesystem;
-        $name_as_perlsyntax =~ s#^lib/(Char/)?##;
-        $name_as_perlsyntax =~ s#\.(pl|pm)$##i;
-        $name_as_perlsyntax =~ s#/#::#g;
-        die "'NAME_AS_PERLSYNTAX' not found.\n" unless $name_as_perlsyntax;
-
-        # get $package, $version, and $abstract
-        my $package  = '';
-        my $version  = '';
-        my $abstract = '';
-        open(FH_NAME,$name_as_filesystem) || die "Can't open file: $name_as_filesystem.\n";
-        while (<FH_NAME>) {
-            if ($package eq '') {
-                if (/^#/) {
-                }
-                elsif (/^package\s+([^;]+);/) {
-                    $package = $1;
-                }
-            }
-            if ($version eq '') {
-                if (/^#/) {
-                }
-                elsif (/\$VERSION\s*=\s*([^;]+);/) {
-                    $version = eval "$1";
-                }
-            }
-            if ($abstract eq '') {
-                if (/\b$name_as_perlsyntax\s+-\s+(.+)/) {
-                    $abstract = $1;
-                }
-            }
-        }
-        close(FH_NAME);
-        die "'PACKAGE' not found.\n"  unless $package;
-        die "'VERSION' not found.\n"  unless $version;
-        die "'ABSTRACT' not found.\n" unless $abstract;
 
         # make work directory
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);

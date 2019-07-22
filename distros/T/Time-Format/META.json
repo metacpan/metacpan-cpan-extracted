@@ -34,7 +34,8 @@
             "Time::HiRes" : "0"
          },
          "requires" : {
-            "Time::Local" : "1.07"
+            "Time::Local" : "1.07",
+            "perl" : "v5.6.1"
          }
       },
       "test" : {
@@ -47,10 +48,10 @@
    "provides" : {
       "Time::Format" : {
          "file" : "lib/Time/Format.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       }
    },
    "release_status" : "stable",
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

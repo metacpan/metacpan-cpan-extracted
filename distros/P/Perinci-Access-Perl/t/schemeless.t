@@ -378,7 +378,7 @@ subtest "opt: {allow,deny}_paths" => sub {
         status => 200,
         posttest => sub {
             my ($res) = @_;
-            ok(@{$res->[2]} == 1, "number of results"); # fruits
+            ok(@{$res->[2]} == 2, "number of results"); # fruits, animals
         },
     );
     test_request(
@@ -694,14 +694,14 @@ subtest "action: complete_arg_val" => sub {
         req => [complete_arg_val => "/Perinci/Examples/test_completion",
                 {arg=>"s1", word=>"r"}],
         status => 200,
-        result => {static=>0, words=>["red date", "red grape"]},
+        result => {static=>0, words=>[{word=>"red date",summary=>undef}, {word=>"red grape",summary=>undef}]},
     );
     test_request(
         name => 'complete: int\'s min+max',
         req => [complete_arg_val => "/Perinci/Examples/test_completion",
                 {arg=>"i1", word=>"1"}],
         status => 200,
-        result => {static=>0, words=>[1, 10..19]},
+        result => {static=>0, words=>[map {+{word=>$_, summary=>undef}} 1, 10..19]},
     );
     test_request(
         name => 'complete: sub',

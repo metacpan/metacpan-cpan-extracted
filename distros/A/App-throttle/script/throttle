@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-02-05'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-22'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -116,7 +116,7 @@ throttle - Bandwidth limiting pipe
 
 =head1 VERSION
 
-This document describes version 0.002 of throttle (from Perl distribution App-throttle), released on 2018-02-05.
+This document describes version 0.003 of throttle (from Perl distribution App-throttle), released on 2019-07-22.
 
 =head1 SYNOPSIS
 
@@ -181,7 +181,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-thrott
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com///u1@198.58.100.202:/home/u1/repos/perl-App-throttle>.
+Source repository is at L<https://github.com/perlancar/perl-App-throttle>.
 
 =head1 BUGS
 
@@ -221,7 +221,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

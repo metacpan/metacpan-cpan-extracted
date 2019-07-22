@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 3.0.12
+version 3.0.14
 
 =head1 DESCRIPTION
 
@@ -345,7 +345,7 @@ Meta symbols that are lexemes can have pause events, C<before> mean that the sca
   :lexeme ::= symbolname1 pause => before event => ^symbolname1
   :lexeme ::= symbolname2 pause => after  event =>  symbolname2$
 
-It is not allowed to set a lexeme event on a symbol that is not a lexeme.
+It is not allowed to set a lexeme event on a symbol that is not a lexeme. You cannot declare two pause events in the same line.
 
 =item Terminal events
 
@@ -355,6 +355,20 @@ Explicit terminals can have pause events, C<before> mean that the scanning recog
   :terminal ::= "'" pause => after  event =>  afterSquote$
 
 Only an explicit terminal can be set using the :terminal keyword.
+
+=item Lexeme and terminal specific actions
+
+The grammar's C<symbol-action> can be overwritten by setting such entry in C<:lexeme> and C<:terminal> settings, e.g.:
+
+  :lexeme   ::= symbolname1 symbol-action => ::u8"Custom String"
+  :lexeme   ::= symbolname2 symbol-action => Custom_action
+  :terminal ::= 'ThisTerminal' symbol-action => ::lua->lua_custom_action
+
+A lexeme or a terminal can have a C<if-action> setting, that applies I<only> when the lexeme or a terminal is discovered via the automatic scan. The C<if-action> must refers to a callback in user-land's recognizer interface, and must return a boolean:
+
+  :lexeme   ::= symbolname if-action => Custom_action
+
+Please note that the C<if-action> will always be called with an argument of type ARRAY (i.e. up to the implementation to convert that to a multibyte string, if any).
 
 =item Non-lexeme events
 
@@ -677,6 +691,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <free action>
                                    | <event specification>
                                    | <hide separator specification>
+                                   | <if action>
   <action>                       ::= 'action' '=>' <action name>
                                    | 'action' '=>' <string literal>
   <left association>             ::= 'assoc' '=>' 'left'
@@ -707,6 +722,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <null adverb>                  ::= ','
   <symbol action>                ::= 'symbol-action' '=>' <symbol action name>
                                    | 'symbol-action' '=>' <string literal>
+  <if action>                    ::= 'if-action' '=>' <if action name>
   <alternative name>             ::= <standard name>
                                    | <quoted name>
   <event name>                   ::= <restricted ascii graph name>
@@ -754,6 +770,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <lua action name>
                                    | '::true'
                                    | '::false'
+  <if action name>               ::= <restricted ascii graph name>
   <quantifier>                   ::= '*'
                                    | '+'
   <signed integer>               ::= /[+-]?\d+/

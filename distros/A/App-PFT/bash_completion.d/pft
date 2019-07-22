@@ -1,0 +1,151 @@
+_pft_init()
+{
+    local alt="$(
+        perl -CO -MPFT::Conf=bash_completion_autogen -wE 'say bash_completion_autogen'
+    )"
+    COMPREPLY=($(compgen -W "$alt" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+
+_pft_edit()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local common_opts='-t --author --select --back --resume
+                       --year --month --day --help'
+    local alt
+
+    case "${COMP_WORDS[COMP_CWORD - 1]}" in
+        '--editor')
+            alt="$EDITOR vim emacs"
+            ;;
+        '-t'|'--tag'|'-T')
+            alt="$(pft ls tags --pretty='%s')"
+            ;;
+        '-P')
+            alt="$(pft ls pages --pretty='%s')"
+            ;;
+        '-B'|'-M')
+            alt="$common_opts"
+            ;;
+        '--back'|'--year'|'-y'|'--month'|'-m'|'--day'|'-d')
+            # Supposed to be numeric, no suggestion
+            ;;
+        *)
+            alt="-B -M -T -P $common_opts"
+            ;;
+    esac
+
+    COMPREPLY=($(compgen -W "$alt" -- "$cur"))
+}
+
+_pft_grab()
+{
+    local alt
+
+    case "${COMP_WORDS[COMP_CWORD - 1]}" in
+        '--rename'|'--year'|'-y'|'--month'|'-m'|'--day'|'-d')
+            # No suggestion for name or numerics.
+            ;;
+        *)
+            alt='--today --picture --rename --year --month --day --help'
+            ;;
+    esac
+
+    COMPREPLY=($(compgen -W "$alt" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+
+_pft_show()
+{
+    case "${COMP_WORDS[COMP_CWORD - 1]}" in
+        '--browser')
+            local browsers="firefox chromium chrome lynx elinks"
+            COMPREPLY=($(compgen -W "$browsers" -- "${COMP_WORDS[COMP_CWORD]}"))
+            ;;
+        *)
+            local opts='--browser --help'
+            COMPREPLY=($(compgen -W "$opts" -- "${COMP_WORDS[COMP_CWORD]}"))
+    esac
+}
+
+_pft_ls()
+{
+    local alt
+    case "${COMP_WORDS[COMP_CWORD - 1]}" in
+        'ls')
+            alt="pages blog tags tagpages --help"
+            ;;
+        *)
+            alt='--locate --pretty'
+            ;;
+    esac
+
+    COMPREPLY=($(compgen -W "$alt" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+
+_pft_make()
+{
+    alt='--help'
+    COMPREPLY=($(compgen -W "$alt" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+
+_pft_pub()
+{
+    alt='--help --list-required-conf'
+    COMPREPLY=($(compgen -W "$alt" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+
+_pft_clean()
+{
+    alt='--verbose --help'
+    COMPREPLY=($(compgen -W "$alt" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+
+_pft_subcommand()
+{
+    case "${COMP_WORDS[1]}" in
+        init)
+            _pft_init
+            ;;
+        clean)
+            _pft_clean
+            ;;
+        edit)
+            _pft_edit
+            ;;
+        grab)
+            _pft_grab
+            ;;
+        ls)
+            _pft_ls
+            ;;
+        make)
+            _pft_make
+            ;;
+        pub)
+            _pft_pub
+            ;;
+        show)
+            _pft_show
+            ;;
+    esac
+}
+
+_pft()
+{
+    case "$COMP_CWORD" in
+        0)
+            # This should never be the case.
+            ;;
+        1)
+            # Completion of basic commands
+            local commands=(clean edit grab init ls make pub show)
+            COMPREPLY=(
+                $(compgen -W "${commands[*]}" -- "${COMP_WORDS[COMP_CWORD]}")
+            )
+            ;;
+        *)
+            _pft_subcommand
+            ;;
+    esac
+}
+
+complete -F _pft pft

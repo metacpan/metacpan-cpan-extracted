@@ -387,7 +387,7 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
 
     template <class TO, class FROM> static inline TO cast (FROM v) { return _cast<TO, FROM>(v, CastType()); }
 
-    static std::string_view package () { typemap::object::_throw_no_package(typeid(TYPE)); return ""; }
+    static panda::string_view package () { typemap::object::_throw_no_package(typeid(TYPE)); return ""; }
 
     static Stash default_stash () {
         static PERL_THREAD_LOCAL Stash stash = gv_stashpvn(Typemap<TYPE>::package().data(), Typemap<TYPE>::package().length(), GV_ADD);

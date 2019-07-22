@@ -5,16 +5,21 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Test: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Log::Any::Adapter: '0'
   Test::CheckDeps: '0.010'
   Test::Deep: '0'
+  Test::Fatal: '0'
   Test::HexString: '0'
   Test::More: '0.98'
   Variable::Disposition: '0.004'
-  perl: '5.014000'
+  perl: '5.006'
+  utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -22,25 +27,75 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Async-Redis
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Net::Async::Redis:
+    file: lib/Net/Async/Redis.pm
+    version: '2.001'
+  Net::Async::Redis::Commands:
+    file: lib/Net/Async/Redis/Commands.pm
+    version: '2.001'
+  Net::Async::Redis::Multi:
+    file: lib/Net/Async/Redis/Multi.pm
+    version: '2.001'
+  Net::Async::Redis::Protocol:
+    file: lib/Net/Async/Redis/Protocol.pm
+    version: '2.001'
+  Net::Async::Redis::Server:
+    file: lib/Net/Async/Redis/Server.pm
+    version: '2.001'
+  Net::Async::Redis::Server::Connection:
+    file: lib/Net/Async/Redis/Server/Connection.pm
+    version: '2.001'
+  Net::Async::Redis::Server::Database:
+    file: lib/Net/Async/Redis/Server/Database.pm
+    version: '2.001'
+  Net::Async::Redis::Subscription:
+    file: lib/Net/Async/Redis/Subscription.pm
+    version: '2.001'
+  Net::Async::Redis::Subscription::Message:
+    file: lib/Net/Async/Redis/Subscription/Message.pm
+    version: '2.001'
 requires:
   Class::Method::Modifiers: '0'
   Future: '0.40'
   Future::AsyncAwait: '0.27'
   IO::Async: '0'
+  IO::Async::Notifier: '0'
+  IO::Async::Stream: '0'
   List::Util: '1.29'
   Log::Any: '1.050'
   Math::Random::Secure: '0'
+  Mixin::Event::Dispatch::Bus: '2.000'
   OpenTracing: '0.003'
   Ryu::Async: '0.006'
+  Scalar::Util: '0'
   Syntax::Keyword::Try: '0.08'
   URI: '0'
   URI::redis: '0'
   curry: '0'
+  curry::weak: '0'
+  mro: '0'
   parent: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
-  homepage: http://search.cpan.org/perldoc?Net-Async-Redis
-  repository: git://github.com/team-at-cpan/Net-Async-Redis.git
-version: '2.000'
+  homepage: https://github.com/team-at-cpan/Net-Async-Redis
+  repository: https://github.com/team-at-cpan/Net-Async-Redis.git
+version: '2.001'
+x_authority: cpan:TEAM
+x_contributors:
+  - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'
+  - 'tm604 <tom@perlsite.co.uk>'
+  - 'Eyad Arnabeh <eyadof@gmail.com>'
+  - 'Michael Mueller <michael.mueller@binary.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

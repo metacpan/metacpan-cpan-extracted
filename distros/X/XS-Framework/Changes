@@ -1,3 +1,10 @@
+1.1.0  22.07.2019
+           - fix compilation errors on clang
+           - fix compilation warnings (withc lambda cv capture)
+           - std::string_view -> panda::string_view related changes
+           - remove call proxy, change sub/stash/object API call to more convenient
+             (variadic args, context return type, etc)
+           - fix numeric C++ typemaps
 1.0.0  12.07.2019
            - rewritten and refactored from Panda::XS
            - add std::map, std::vector and bool typemap's

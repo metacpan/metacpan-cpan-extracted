@@ -2,7 +2,6 @@ package Pcore::App::API::Backend::Local::UserToken;
 
 use Pcore -role, -sql, -res;
 use Pcore::App::API qw[:ROOT_USER :PRIVATE_TOKEN :INVALIDATE_TYPE :TOKEN_TYPE];
-use Pcore::Lib::Digest qw[sha3_512];
 
 sub _user_token_authenticate ( $self, $private_token ) {
 
@@ -385,12 +384,12 @@ sub user_token_set_permissions ( $self, $token_id, $permissions, $dbh = undef ) 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 7                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_user_token_authenticate' declared  |
+## |    3 | 6                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_user_token_authenticate' declared  |
 ## |      |                      | but not used                                                                                                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 46                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 45                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 261                  | Subroutines::ProhibitExcessComplexity - Subroutine "user_token_set_permissions" with high complexity score     |
+## |    3 | 260                  | Subroutines::ProhibitExcessComplexity - Subroutine "user_token_set_permissions" with high complexity score     |
 ## |      |                      | (29)                                                                                                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

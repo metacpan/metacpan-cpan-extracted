@@ -1,3 +1,10 @@
+0.006   2019-07-21  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [doc] Some wording and formatting tweaks.
+
+
 0.005   2019-07-16  Released-By: PERLANCAR; Urgency: medium
 
 	- By default now creates temporary file in the same directory as

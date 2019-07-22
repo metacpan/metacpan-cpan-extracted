@@ -94,7 +94,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness-UI/"
       }
    },
-   "version" : "0.000003",
+   "version" : "0.000004",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

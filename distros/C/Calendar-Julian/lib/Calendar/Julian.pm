@@ -1,6 +1,6 @@
 package Calendar::Julian;
 
-$Calendar::Julian::VERSION   = '0.12';
+$Calendar::Julian::VERSION   = '0.13';
 $Calendar::Julian::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Julian - Interface to Julian Calendar.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

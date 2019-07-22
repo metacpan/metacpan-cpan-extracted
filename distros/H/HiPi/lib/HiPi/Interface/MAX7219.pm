@@ -16,7 +16,7 @@ use parent qw( HiPi::Interface );
 use HiPi qw( :max7219 );
 use HiPi::Device::SPI;
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 __PACKAGE__->create_accessors( qw( ) );
 

@@ -121,7 +121,7 @@ END;
 $sth->bind_param( ":test_num", $test_num );
 $sth->bind_param_inout( ":is_odd", \$is_odd, 1 );
 
-# The execute will automagically update the value of $is_odd
+# The execute will automatically update the value of $is_odd
 $sth->execute;
 print "$test_num is ", $is_odd ? "odd - ok" : "even - error!", "\n";
 

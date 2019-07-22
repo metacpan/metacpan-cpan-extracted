@@ -74,7 +74,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -5737,7 +5737,7 @@ The invocant is returned.
  satpass2> alias
 
 This interactive method just wraps the
-L<Astro::Coord::ECI::TLE alias()|Astro::Coord::ECI::TLE/alias> method,
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<alias()> method,
 which returns the known class name aliases. The output is zero or more
 lines of text, each line giving an alias and its equivalent class.
 
@@ -6074,7 +6074,7 @@ This method takes the following options:
 =item -changes
 
 This option is only useful with the formatter's
-L<config()|Astro::App::Satpass2::Formatter/config> method. It causes
+L<config()|Astro::App::Satpass2::Format/config> method. It causes
 this method to return only changes from the default. It can be negated
 by prefixing C<no>.
 
@@ -6255,7 +6255,7 @@ module. If it is not installed we can not determine which attributes are
 valid, so the results of trying to access any spacetrack attribute
 result in an exception. If you wish to share the same configuration
 among installations that may or may not have
-L<Astro::SpaceTrack|Astro::Spacetracl> installed, you can guard against
+L<Astro::SpaceTrack|Astro::SpaceTrack> installed, you can guard against
 the exception by using something like
 
  if attr spacetrack and attr spacetrack.username ...
@@ -6428,7 +6428,7 @@ will only list C<'hst'>.
 
 This interactive method does glob and bracket expansion on its arguments
 (which have already been tilde-expanded by the tokenizer) by running
-them through L<File::Glob::bsd_glob()|File::Glob/bsd_glob>. The
+them through L<File::Glob::bsd_glob()|File::Glob>. The
 resultant files are assumed to contain orbital elements which are loaded
 into the observing list. An exception is thrown if no files remain after
 the glob operation, or if any file can not be opened.
@@ -6568,9 +6568,8 @@ C<show> - displays the magnitude table, formatted as a series of
 C<'magnitude_table add'> commands.
 
 This method is really just a front-end for the
-L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
-L<magnitude_table()|Astro::Coord::ECI::TLE/magnitude_table> method. See
-the documentation for that for more details.
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<magnitude_table()>
+method. See the documentation for that for more details.
 
 =head2 pass
 
@@ -7166,9 +7165,8 @@ There are two options:
 order by name. It is allowed but ignored on any other subcommand.
 
 This method is really just a front-end for the
-L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
-L<status()|Astro::Coord::ECI::TLE/status> method. See the documentation
-for that for more details.
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<status()> method. See
+the documentation for that for more details.
 
 =head2 station
 
@@ -7188,7 +7186,7 @@ not defined.
 
 This interactive method does glob and bracket expansion on its arguments
 (which have already been tilde-expanded by the tokenizer) by running
-them through L<File::Glob::bsd_glob()|File::Glob/bsd_glob>, and executes
+them through L<File::Glob::bsd_glob()|File::Glob>, and executes
 them as a command on the system. Since tokenizing is done by
 Astro::App::Satpass2, there is no shell processing, and the quoting rules are
 those of Astro::App::Satpass2, not those of the underlying operating system.
@@ -7241,7 +7239,7 @@ This method takes the following options:
 =item -changes
 
 This option is only useful with the time_parser's
-L<config()|Astro::App::Satpass2::Formatter/config> method. It causes
+L<config()|Astro::App::Satpass2::Format/config> method. It causes
 this method to return only changes from the default. It can be negated
 by prefixing C<no>.
 
@@ -7617,7 +7615,7 @@ and L</height> methods. The intent is that it be an ISO 3166
 two-character country code. At the moment it does nothing useful since
 there is currently only one source for L</geocode> and L</height> data.
 
-See L<http://www.iso.org/iso/en/prods-services/iso3166ma/index.html>
+See L<https://www.iso.org/iso-3166-country-codes.html>
 for the current list of country codes. Note that these are B<not>
 always the same as the corresponding top-level geographic domain names
 (e.g. Great Britain is 'GB' in ISO 3166 but for historical reasons has
@@ -7811,7 +7809,7 @@ L<Astro::App::Satpass2::Format|Astro::App::Satpass2::Format>, it B<must>
 conform to that class' interface.
 
 The default is
-L<Astro::App::Satpass::Format::Template|Astro::App::Satpass::Format::Template>.
+L<Astro::App::Satpass2::Format::Template|Astro::App::Satpass2::Format::Template>.
 
 =head2 geocoder
 
@@ -8456,7 +8454,7 @@ interpolated, which may be one of the following things.
 
 =item An argument, specified by its number, starting from 1.
 
-=item An L<attribute|/ATTRIBUTE> name.
+=item An L<attribute|/ATTRIBUTES> name.
 
 If the attribute is C<'formatter'>, C<'spacetrack'>, or C<'time_parser'>
 the attribute name can be followed by a dot (C<'.'>) and the name of an

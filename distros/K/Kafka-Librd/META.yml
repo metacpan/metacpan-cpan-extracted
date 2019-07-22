@@ -1,15 +1,16 @@
 ---
 abstract: 'bindings for librdkafka'
 author:
-  - 'Pavel Shaydo <zwon@cpan.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.94'
 configure_requires:
+  Alien::Base::Wrapper: '0'
   Alien::Librdkafka: v0.9.3
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,14 +21,14 @@ no_index:
     - t
     - inc
 requires:
-  Alien::Librdkafka: v0.9.3
   Exporter::Lite: '0'
 resources:
-  bugtracker: https://github.com/trinitum/perl-Kafka-Librd/issues
-  homepage: https://github.com/trinitum/perl-Kafka-Librd
+  bugtracker: https://github.com/plicease/perl-Kafka-Librd/issues
+  homepage: https://github.com/plicease/Kafka-Librd
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/trinitum/perl-Kafka-Librd
-version: '0.10'
+  repository: git://github.com/plicease/perl-Kafka-Librd
+version: '0.11'
 x_contributors:
   - 'Pavel Shaydo <zwon@cpan.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

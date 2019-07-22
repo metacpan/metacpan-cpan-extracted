@@ -10,13 +10,13 @@ Time::Format - Easy-to-use date/time formatting.
 
 =head1 VERSION
 
-This is version 1.13 of Time::Format, July 18, 2019.
+This is version 1.14 of Time::Format, July 22, 2019.
 
 =cut
 
 use strict;
 package Time::Format;
-$Time::Format::VERSION  = '1.13';
+$Time::Format::VERSION  = '1.14';
 
 # This module claims to be compatible with the following versions
 # of Time::Format_XS.
@@ -71,12 +71,20 @@ if ($load_perlonly)
     # But defer this until someone actually calls time_format().
     *time_format = sub
     {
-        local $^W = 0;    # disable warning about subroutine redefined
+        goto &time_format_perlonly  if defined &time_format_perlonly;
+
+        local $^W = 0;    # disable warning about subroutines redefined
         local $/ = undef;
-        eval <DATA>;
+        my $top = tell DATA;
+        my $d = <DATA>;
+
+        # Why rewind?  Because if the program forks, a second process may need to read DATA.
+        # See CPAN RT bug 121367 (and maybe 74880 too).
+        seek DATA, $top, 0;
+
+        eval $d;
         die if $@;
-        *time_format = \&time_format_perlonly;
-        goto &time_format;
+        goto &time_format_perlonly;
     };
     undef $Time::Format_XS::VERSION;    # Indicate that XS version is not available.
 }
@@ -236,6 +244,7 @@ sub time_manip
 1;
 __DATA__
 # The following is only compiled if Time::Format_XS is not available.
+#line 248 "Time/Format.pm"
 
 use Time::Local;
 
@@ -336,7 +345,16 @@ sub _classify_time
         $frac        = $timeval->nanosecond() / 1e9;
         $time_type   = $DATETIME_OBJECT;
     }
-    # Stringified DateTime object
+    # Numeric time?
+    # 1 to 11 digits--  Epoch time should be <= 10 digits, and 12 digits might be YYYYMMDDHHMM.
+    elsif ($timeval =~ /^\s* (  (\d{1,11}) (?:[.,](\d+))?  )  $/x)
+    {
+        $timeval     = $1;
+        $cache_value = $2;
+        $frac        = $3? '0.' . $3 : 0;
+        $time_type   = $NUMERIC_TIME;
+    }
+    # Stringified DateTime object?
     # Except we make it more flexible by allowing the date OR the time to be specfied
     # This will also match Date::Manip strings, and many ISO-8601 strings.
     elsif ($timeval =~ m{\A(   (?!\d{6,8}\z)                 # string must not consist of only 6 or 8 digits.
@@ -363,19 +381,20 @@ sub _classify_time
         $frac        = $3? '0.' . $3 : 0;
         $time_type   = $DATETIME_STRING;
     }
-    # Numeric time?
-    elsif ($timeval =~ /^\s* (  (\d+) (?:[.,](\d+))?  )  $/x)
-    {
-        $timeval     = $1;
-        $cache_value = $2;
-        $frac        = $3? '0.' . $3 : 0;
-        $time_type   = $NUMERIC_TIME;
-    }
-    # Not set, or set to 'time' string
+    # Not set, or set to 'time' string?
     elsif ($timeval eq 'time'  ||  $timeval eq q{})
     {
         # Get numeric time
         $timeval     = _have('Time::HiRes')? Time::HiRes::time() : time;
+        $cache_value = int $timeval;
+        $frac        = $timeval - $cache_value;
+        $time_type   = $NUMERIC_TIME;
+    }
+    # *Tiny* numeric time (very close to zero; exponential notation)?
+    # (See bug 87484, https://rt.cpan.org/Ticket/Display.html?id=87484)
+    elsif ($timeval =~ /^\s* -? \d\.\d+ e-\d+  \s*$/x)
+    {
+        $timeval     = sprintf '%8.6f', abs($timeval);
         $cache_value = int $timeval;
         $frac        = $timeval - $cache_value;
         $time_type   = $NUMERIC_TIME;
@@ -1170,9 +1189,9 @@ endeavor to improve the software.
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQTSmjxiQX/QfjsCVJLChJhzmpBWqgUCXTDGigAKCRDChJhzmpBW
-qh3uAKCCMrRX1Au01PU8UkdqA82bnKj7MgCgrjVQPbJYHYGmwyUeXAicd91uvYQ=
-=o00S
+iF0EARECAB0WIQTSmjxiQX/QfjsCVJLChJhzmpBWqgUCXTYSngAKCRDChJhzmpBW
+qsFsAJ9KgMFSmNmfX0g9DtHvJJjmAz9jygCgkUYdpA4g/pgCo0ejISRR+2qpTwk=
+=Ppwj
 -----END PGP SIGNATURE-----
 
 =end gpg

@@ -10,21 +10,21 @@ DBD::Oracle  --  an Oracle interface for Perl 5.
 
    AND THEN READ ANY README.* FILES RELEVANT TO YOUR PLATFORM:
 
-	README.aix.txt - AIX
-	README.hpux.txt - HP-UX
-	README.java.txt - Java/thread problem on Solaris
-	README.macosx.txt - Mac OS/X
-	README.win32.txt - MS Windows
-	README.wingcc.txt - MS Windows using GCC
-	README.* - see if there's a file for your platform
+        README.aix.txt - AIX
+        README.hpux.txt - HP-UX
+        README.java.txt - Java/thread problem on Solaris
+        README.macosx.txt - Mac OS/X
+        README.win32.txt - MS Windows
+        README.wingcc.txt - MS Windows using GCC
+        README.* - see if there's a file for your platform
 
    You may find these useful
 
-	README.help.txt - Help and hints on build problems
-	README.sec.txt - Oracle security issues to be aware of
-	README.login.txt - Help on how to connect to Oracle
-	README.longs.txt - Help on handling LONGs
-	README.clients.txt - What Oracle client files you need installed
+        README.help.txt - Help and hints on build problems
+        README.sec.txt - Oracle security issues to be aware of
+        README.login.txt - Help on how to connect to Oracle
+        README.longs.txt - Help on handling LONGs
+        README.clients.txt - What Oracle client files you need installed
 
 
 *** QUICK START GUIDE:
@@ -57,12 +57,14 @@ DBD::Oracle  --  an Oracle interface for Perl 5.
           your configuration and DBD::Oracle determine your Oracle version.
 
     For full Oracle installs: that usually includes Pro*C and SQL*Net.
-    (That's not very specific because it varies between Oracle releases.).  
+    (That's not very specific because it varies between Oracle releases.).
     As of release 1.22 support of Oracle clients before 9 was dropped.
-    The main reason for this is that next few versions of DBD::Oracle will introduce a number of new features
-    whicht will required a great deal of extra coding to make the OCI 8 work. 
-    As well it is getting harder to find an Oracle client 8 to test against as well
-    Oracle no longer supports clients before 9.
+    The main reason for this is that next few versions of DBD::Oracle will
+    introduce a number of new features which will required a great deal of extra
+    coding to make the OCI 8 work.
+
+    As well it is getting harder to find an Oracle client 8 to test against as
+    well Oracle no longer supports clients before 9.
 
     The ORACLE_HOME environment variable must point to the Oracle Home
     used to create DBD::Oracle. (Not essential under MS Windows).
@@ -109,10 +111,10 @@ See the oracle_test_dsn() sub in t/nchar_test_lib.pl
 The supplied tests will connect to the database using the value of the
 ORACLE_USERID environment variable to supply the username/password.
 So you should set that to a valid user (e.g. 'scott/tiger') and ensure that
-this user has sufficient privileges to create, insert into, select from and 
-drop a table,  is also able to create, call and drop a procedure  and is able to select from 
-systemtables like 'v$sessions'. Using 'system/manager' might work but is not
-recommended! See also
+this user has sufficient privileges to create, insert into, select from and
+drop a table,  is also able to create, call and drop a procedure  and is able
+to select from systemtables like 'v$sessions'. Using 'system/manager' might
+work but is not recommended! See also
 
 README.login.txt.
 
@@ -136,9 +138,9 @@ It's also important to use the same compiler that was used to build the
 Perl you are using.
 
 If you have build/link or core dump problems try:
-	perl Makefile.PL -p
+        perl Makefile.PL -p
 or
-	perl Makefile.PL -nob
+        perl Makefile.PL -nob
 If it helps then please let me know (and please include a copy
 of the log from the failed default build, the log from the build that
 worked, plus the output of the "perl -V" command).
@@ -178,7 +180,7 @@ Please do NOT post problems to comp.lang.perl.*, perl5-porters@perl.org,
 http://www.cpanforum.com/dist/DBD-Oracle, or google groups etc.
 
 If you're *sure* the problem is a bug then you can post a bug report
-to http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-Oracle
+to https://github.com/perl5-dbi/DBD-Oracle/issues
 Problem reports that don't include sufficient detail (including the
 information listed below and how to reproduce the problem)
 are unlikely to get resolved.
@@ -224,7 +226,7 @@ dbi-users@perl.org.
 
 5. If you get a core dump, rebuild DBD::Oracle with debugging
    enabled by executing: perl Makefile.PL -g  (note the -g option)
-   then rerun the code to get a new core dump file, finally use a 
+   then rerun the code to get a new core dump file, finally use a
    debugger (gdb, sdb, dbx, adb etc) to get a stack trace from it.
    NOTE: I may not be able to help you much without a stack trace!
    It is worth fetching and building the GNU GDB debugger (>=4.15) if
@@ -252,14 +254,14 @@ directly - use the dbi-users mailing list.
 Regards,
 Tim.
 
-===============================================================================
+================================================================================
 Examples and other info:
 
 README.help.txt     -- READ IT FIRST IF YOU HAVE ANY PROBLEMS
 README.win32.txt    -- building DBD::Oracle under MS Windows
 README.wingcc.txt   -- building DBD::Oracle under MS Windows with gcc
 README.macosx.txt   -- building DBD::Oracle under MacOS X
-README.clients.txt  -- building/using DBD::Oracle on minimally configured systems
+README.clients.txt  -- building/using DBD::Oracle on minimally configured system
 README.login.txt    -- help for login problems
 README.longs.txt    -- examples dealing with LONG types (blobs)
 
@@ -272,16 +274,16 @@ Perl 4 Oraperl (v2.4)                /perl4/oraperl/
 
 Jeff Stander's stuff stands out for Oraperl:
 Directories of interest might be
-	/pub/Oracle/sources
-	/pub/Oracle/sources/jstander
-	/pub/Oracle/sources/jstander/distrib
-	/pub/Oracle/sources/jstander/tsmlib
-	/pub/Oracle/sources/jstander/wdbex
-	/pub/Oracle/sources/web/scripts
-	/pub/Oracle/sources/dba
-	/pub/Oracle/sources/dba/imp2sql7
-	/pub/Oracle/sources/Lonnroth
-	/pub/Oracle/sources/harrison
+        /pub/Oracle/sources
+        /pub/Oracle/sources/jstander
+        /pub/Oracle/sources/jstander/distrib
+        /pub/Oracle/sources/jstander/tsmlib
+        /pub/Oracle/sources/jstander/wdbex
+        /pub/Oracle/sources/web/scripts
+        /pub/Oracle/sources/dba
+        /pub/Oracle/sources/dba/imp2sql7
+        /pub/Oracle/sources/Lonnroth
+        /pub/Oracle/sources/harrison
 
 http://www.bf.rmit.edu.au/~orafaq/perlish.html
 ftp://ftp.bf.rmit.edu.au/pub/perl/db
@@ -292,7 +294,7 @@ ftp://ftp.bf.rmit.edu.au/pub/Oracle/OS/MS/NT/ntoraperl.zip
 DBI and DBD::Oracle are very portable. If Perl and Oracle run on a platform
 then the chances are that DBD::Oracle will as well.
 
-===============================================================================
+================================================================================
 
 See the large README.help.txt file for lots of hints and advice
 about building and runtime issues.

@@ -1,6 +1,6 @@
 #include "test.h"
 #include <panda/string.h>
-#include <panda/lib/from_chars.h>
+#include <panda/from_chars.h>
 
 using panda::string;
 
@@ -59,7 +59,7 @@ template <> struct nstr<uint64_t> {
 template<typename Int>
 Int fci (string str, unsigned& pos, int base = 10) {
     Int val;
-    auto res = std::from_chars(str.data() + pos, str.data() + str.size() - pos, val, base);
+    auto res = panda::from_chars(str.data() + pos, str.data() + str.size() - pos, val, base);
     pos = res.ptr - str.data();
     if (res.ec) throw Exc();
     return val;

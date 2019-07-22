@@ -126,7 +126,7 @@ JS
             upload.start(data);
 JS
 
-        _createUploadComponent => func [ 'file', 'uploadId' ], <<~"JS",
+        _createUploadComponent => func [ 'file', 'uploadId' ], <<"JS",
             this.lookup('uploads').add({
                 layout: 'vbox',
                 items: [
@@ -163,11 +163,11 @@ JS
             });
 JS
 
-        cancelUpload => func ['button'], <<~'JS',
+        cancelUpload => func ['button'], <<'JS',
             this.uploads[button.getValue()].cancel();
 JS
 
-        cancellAll => func <<~'JS',
+        cancellAll => func <<'JS',
             for (let uploadId in this.uploads) {
                 let upload = this.uploads[uploadId];
 

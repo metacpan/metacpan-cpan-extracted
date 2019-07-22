@@ -1,4 +1,4 @@
-# $Id: Changes 75 2019-06-19 15:23:53Z minus $
+# $Id: Changes 76 2019-07-20 07:48:18Z minus $
 # Version/Revision history.
 
 1.00 Fri Jun 23 08:46:53 MSK 2017
@@ -9,3 +9,7 @@
 
 1.02 Wed Jun 19 18:20:56 MSK 2019
     * Bug fixed: removed test URL
+
+1.03 Sat 20 Jul 10:46:53 MSK 2019
+    * Documentation modified
+

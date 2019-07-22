@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::SchwartzRatio - display the Schwartz ratio of the distribut
 
 # VERSION
 
-version 0.3.3
+version 0.3.4
 
 # SYNOPSIS
 

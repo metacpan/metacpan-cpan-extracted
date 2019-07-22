@@ -14,7 +14,7 @@ WriteMakefile(
     "meta-spec" => { version => 2 },
     dynamic_config => 0,
     resources => {
-      bugtracker  => 'https://github.com/PDLPorters/extutils-f77/issues',
+      bugtracker  => {web=>'https://github.com/PDLPorters/extutils-f77/issues'},
       repository => {
         type => 'git',
         url => 'git://github.com/PDLPorters/extutils-f77.git',

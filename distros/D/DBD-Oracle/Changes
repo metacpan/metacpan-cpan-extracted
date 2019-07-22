@@ -1,5 +1,14 @@
 Revision history for DBD::Oracle
 
+1.791     2019-07-22
+
+  [BUG FIXES]
+
+  Fix Avoid GCC-ism so that HP-UX can compile (GH#92, Dean Hamstead)
+
+  Destroy envhp with last dbh (GH#93, GH#89, Dean Hamstead, CarstenGrohmann)
+
+
 1.76      2018-11-22
 
   No Changes from 1.75, we just botched up publishing to CPAN
@@ -736,7 +745,7 @@ Changes in DBD-Oracle 1.29_1
 * Changes in DBD-Oracle 1.22(svn rev 11618)  1st Aug 2008
 
   Patch to remove compiler warnings from H.Merijn Brand
-  Patch to Makfile for 64bit boxes from Alex Laslavic
+  Patch to Makefile for 64bit boxes from Alex Laslavic
   Added OCILobGetLength to lob functions from Milo van der Leij
   Updated readmes to state the test user has to have create, call and drop a procedure privileges by John Scoles suggested by Gisle Aas
   Patch to Makfile to prevent the installation of the lib/DBD/mkta.pl fil from Gisle Aas
@@ -915,7 +924,7 @@ please enjoy.
   Changed ORA_OCI constant from being just 7 or 8 to being a dualvar:
     in numeric context returns the major.minor version number (8.1, 9.2 etc)
     in string context it returns the full "major.minor.foo.bar" version string.
-  Changed some SUCCESS_WITH_INFO situtions to be treated as a "warning"
+  Changed some SUCCESS_WITH_INFO situations to be treated as a "warning"
     by setting $DBI::err to "0" (and so trigger PrintWarn in DBI >= 1.43)
     eg "ORA-28011: the account will expire soon; change your password now"
     and package compilation errors.

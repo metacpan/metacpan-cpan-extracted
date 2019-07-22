@@ -2,7 +2,6 @@ package Pcore::App::API::Backend::Local::UserSession;
 
 use Pcore -role, -sql, -res;
 use Pcore::App::API qw[:ROOT_USER :PRIVATE_TOKEN :INVALIDATE_TYPE :TOKEN_TYPE];
-use Pcore::Lib::Digest qw[sha3_512];
 
 sub _user_session_authenticate ( $self, $private_token ) {
 
@@ -137,7 +136,7 @@ sub user_session_remove ( $self, $token_id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 7                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_user_session_authenticate'         |
+## |    3 | 6                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_user_session_authenticate'         |
 ## |      |                      | declared but not used                                                                                          |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

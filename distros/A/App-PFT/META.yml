@@ -3,13 +3,17 @@ abstract: 'Hacker friendly static blog generator'
 author:
   - 'Giovanni Simoni (dacav at openmailbox)'
 build_requires:
+  Cwd: '0'
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  IPC::Run: '0'
+  PFT: v1.2.1
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +26,7 @@ no_index:
 requires:
   Carp: '0'
   Cwd: '0'
+  Digest::MD5: '0'
   Encode: '0'
   Encode::Locale: '0'
   Exporter: '0'
@@ -34,6 +39,7 @@ requires:
   File::Spec::Functions: '0'
   FindBin: '0'
   Getopt::Long: '0'
+  HTML::Escape: '0'
   LWP::Simple: '0'
   PFT: v1.2.1
   Pod::Find: '0'
@@ -41,5 +47,5 @@ requires:
   Template::Alloy: '0'
   URI: '0'
   perl: '5.006'
-version: v1.2.2
+version: v1.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

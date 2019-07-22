@@ -5,52 +5,59 @@ $MMV =~ s/_.*$//;
 $MMV += 0.0;
 
 my @wm_args =      (
-                    NAME            => 'Time::Format',
-                    VERSION_FROM    => 'lib/Time/Format.pm', # finds $VERSION
-                    PREREQ_PM       => {
-                                        'Test::Simple'   => '0.40',
-                                        'Time::Local'    => '1.07',
-                                       },
-                    PL_FILES        => {},
+                    NAME             => 'Time::Format',
+                    VERSION_FROM     => 'lib/Time/Format.pm', # finds $VERSION
+                    PREREQ_PM        => {
+                                         'Test::Simple'   => '0.40',
+                                         'Time::Local'    => '1.07',
+                                        },
+                    PL_FILES         => {},
                    );
 
 if ($] >= 5.005)
 {
     push @wm_args, (
-                    ABSTRACT_FROM   => 'lib/Time/Format.pm', # retrieve abstract from module
-                    AUTHOR          => 'Eric Roode <roode@cpan.org>',
+                    ABSTRACT_FROM    => 'lib/Time/Format.pm', # retrieve abstract from module
+                    AUTHOR           => 'Eric Roode <roode@cpan.org>',
                    );
 }
 
 if ($WWV >= 6.18  &&  MM->can('signature_target'))
 {
     push @wm_args, (
-                    SIGN            => 1,
+                    SIGN             => 1,
                    );
 }
 
 if ($WWV >= 6.31)
 {
     push @wm_args, (
-                    LICENSE         => 'unrestricted',
+                    LICENSE          => 'unrestricted',
+                   );
+}
+
+if ($WWV >= 6.48)
+{
+    push @wm_args, (
+                    MIN_PERL_VERSION => '5.6.1',
                    );
 }
 
 if ($WWV > 6.55)
 {
     push @wm_args, (
-                    BUILD_REQUIRES  => {
-                                        'Test::Simple'   => '0.40',
-                                       },
+                    BUILD_REQUIRES   => {
+                                         'Test::Simple'   => '0.40',
+                                        },
                    );
 }
 
 if ($WWV >= 6.64)
 {
     push @wm_args, (
-                    TEST_REQUIRES   => {
-                                        'FindBin'        => 0,
-                                       },
+                    TEST_REQUIRES    => {
+                                         'FindBin'        => 0,
+                                        },
                    );
 }
 

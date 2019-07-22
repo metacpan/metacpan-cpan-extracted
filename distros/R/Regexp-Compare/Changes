@@ -103,3 +103,9 @@ Revision history for Perl extension Regexp::Compare.
 
 0.29  Mon Aug 6 17:15:33 UTC 2018
 	- requiring at least perl 5.24, supporting perl 5.28.x
+
+0.30  Sat Jul 20 05:42:34 UTC 2019
+	- requiring at least perl 5.26, supporting perl 5.30.x
+
+0.31  Sat Jul 20 08:23:54 UTC 2019
+	- fixed asserts

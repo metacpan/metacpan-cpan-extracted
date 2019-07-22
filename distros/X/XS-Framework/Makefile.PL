@@ -3,6 +3,7 @@ use Config;
 use XS::Install;
 
 my $ccflags = $^O eq 'MSWin32' ? '-Wno-unused-parameter' : '';
+$ccflags .= ' -fmax-errors=5' if $ENV{DEV};
 my $ivbits = $Config{ivsize}*8;
 
 my %params = (

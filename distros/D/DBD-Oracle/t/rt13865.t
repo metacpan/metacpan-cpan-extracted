@@ -141,6 +141,4 @@ sub get_privs {
     return map { $_->[0] } @{ $sth->fetchall_arrayref };
 }
 
-$dbh->disconnect if $dbh;
-
 done_testing();

@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.841';
+our $VERSION = '1.842';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -682,7 +682,12 @@ sub _quit {
 
 sub _reap_hobo {
    my ( $hobo ) = @_;
-   local @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID} );
+   local @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}.'1' );
+
+   if ( $_[1] eq '-1' ) {
+      sleep 0.015; # retry
+      @_ = $_DATA->{ $hobo->{PKG} }->_get_hobo_data( $hobo->{WRK_ID}.'2' );
+   }
 
    ( $hobo->{ERROR}, $hobo->{RESULT}, $hobo->{JOINED} ) =
       ( pop || '', length $_[0] ? $_thaw->(pop) : [], 1 );
@@ -867,7 +872,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.841
+This document describes MCE::Hobo version 1.842
 
 =head1 SYNOPSIS
 
@@ -1466,6 +1471,88 @@ A demonstration is provided in the next section for fetching URLs in parallel.
 
  MCE::Hobo->create( sub { MCE::Hobo->yield(0.25) } ) for 1 .. 4;
  MCE::Hobo->wait_all();
+
+=back
+
+=head1 PARALLEL::FORKMANAGER-like DEMONSTRATION
+
+MCE::Hobo behaves similarly to threads for the most part. It also provides
+L<Parallel::ForkManager>-like capabilities. The C<Parallel::ForkManager>
+example is shown first followed by a version using C<MCE::Hobo>.
+
+=over 3
+
+=item Parallel::ForkManager
+
+ use strict;
+ use warnings;
+
+ use Parallel::ForkManager;
+ use Time::HiRes 'time';
+
+ my $start = time;
+
+ my $pm = Parallel::ForkManager->new(10);
+ $pm->set_waitpid_blocking_sleep(0);
+
+ $pm->run_on_finish( sub {
+     my ($pid, $exit_code, $ident, $exit_signal, $core_dumped, $resp) = @_;
+     print "child $pid completed: $ident => ", $resp->[0], "\n";
+ });
+
+ DATA_LOOP:
+ foreach my $data ( 1..2000 ) {
+     # forks and returns the pid for the child
+     my $pid = $pm->start($data) and next DATA_LOOP;
+     my $ret = [ $data * 2 ];
+
+     $pm->finish(0, $ret);
+ }
+
+ $pm->wait_all_children;
+
+ printf STDERR "duration: %0.03f seconds\n", time - $start;
+
+=item MCE::Hobo
+
+ use strict;
+ use warnings;
+
+ use MCE::Hobo 1.842;
+ use Time::HiRes 'time';
+
+ my $start = time;
+
+ MCE::Hobo->init(
+     max_workers => 10,
+     on_finish   => sub {
+         my ($pid, $exit_code, $ident, $exit_signal, $error, $resp) = @_;
+         print "child $pid completed: $ident => ", $resp->[0], "\n";
+     }
+ );
+
+ foreach my $data ( 1..2000 ) {
+     MCE::Hobo->create( $data, sub {
+         [ $data * 2 ];
+     });
+ }
+
+ MCE::Hobo->wait_all;
+
+ printf STDERR "duration: %0.03f seconds\n", time - $start;
+
+=item Time to run (in seconds)
+
+Results were obtained on a Macbook Pro (2.6 GHz ~ 3.6 GHz with Turbo Boost).
+
+ MCE::Hobo  uses MCE::Shared to retrieve data during reaping.
+ MCE::Child uses MCE::Channel, no shared-manager.
+
+          Version   Cygwin   Windows  Linux   macOS  FreeBSD
+
+ MCE::Child 1.842   26.093s  21.638s  1.356s  2.223s  1.723s
+ MCE::Hobo  1.842   28.080s  25.990s  1.784s  2.371s  2.259s
+ P::FM      1.20    26.692s  24.024s  1.228s  2.109s  2.027s
 
 =back
 

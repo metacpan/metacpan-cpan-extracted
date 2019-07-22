@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: DBD-PgPPSjis
-version: 0.0801006
+version: 0.0801008
 abstract: Pure Perl PostgreSQL driver for (not raw) ShiftJIS
 author:
   - ina <ina@cpan.org>
@@ -11,17 +11,25 @@ license: perl
 generated_by: pmake.bat
 requires:
   Archive::Tar: 0.072
+  Carp: 0
   Compress::Zlib: 1.03
   Config: 0
+  DBI: 0
   ExtUtils::MakeMaker: 5.4302
   Fcntl: 1.03
   File::Basename: 2.6
   File::Copy: 2.02
   File::Path: 1.0401
   FindBin: 1.42
-  Getopt::Std: 1.01
+  Getopt::Std: 0
+  IO::Socket: 0
+  Socket: 0
+  base: 0
+  constant: 0
+  lib: 0
   perl: 5.005_03
   strict: 1.01
+  vars: 0
 build_requires:
   Test: 1.122
 resources:

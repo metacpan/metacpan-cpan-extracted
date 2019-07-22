@@ -23,10 +23,15 @@ WriteMakefile1(
     },
     TEST_REQUIRES => {
         'Test::More'                => 0,
+        'File::Temp'                => 0,
+        'Cwd'                       => 0,
+        'IPC::Run'                  => 0,
+        'PFT'                       => '1.2.1',
     },
     PREREQ_PM => {
         'Carp'                  => 0,
         'Cwd'                   => 0,
+        'Digest::MD5'           => 0,
         'Encode'                => 0,
         'Encode::Locale'        => 0,
         'Exporter'              => 0,
@@ -39,6 +44,7 @@ WriteMakefile1(
         'File::Spec::Functions' => 0,
         'FindBin'               => 0,
         'Getopt::Long'          => 0,
+        'HTML::Escape'          => 0,
         'LWP::Simple'           => 0,
         'Pod::Find'             => 0,
         'Pod::Usage'            => 0,

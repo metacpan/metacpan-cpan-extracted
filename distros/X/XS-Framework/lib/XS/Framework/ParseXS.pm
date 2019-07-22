@@ -61,9 +61,9 @@ XS::Install::ParseXS::add_post_callback(sub {
     my $outref = shift;
     if ($XS::Install::ParseXS::cplus) {
         #wrap content of XSUBs into try-catch blocks
-        $$outref =~ s/$XS::Install::ParseXS::re_xsub/$1 { xs::throw_guard(aTHX_ cv, [aTHX_ cv]() \n$2); }/g;
+        $$outref =~ s/$XS::Install::ParseXS::re_xsub/$1 { xs::throw_guard(aTHX_ cv, [=]() \n$2); }/g;
         #wrap content of BOOT into try-catch blocks
-        $$outref =~ s/$XS::Install::ParseXS::re_boot/$1 { xs::throw_guard(aTHX_ cv, [aTHX_ cv]() mutable\n$2); }/g;
+        $$outref =~ s/$XS::Install::ParseXS::re_boot/$1 { xs::throw_guard(aTHX_ cv, [=]() mutable\n$2); }/g;
     }
 });
 

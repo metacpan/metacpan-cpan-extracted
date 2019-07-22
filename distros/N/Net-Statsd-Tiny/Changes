@@ -1,5 +1,15 @@
 Revision history for Net-Statsd-Tiny
 
+v0.3.4    2019-07-21 11:31:26+01:00 Europe/London
+  [Documentation]
+  - Fixed copyright year.
+
+v0.3.3    2019-07-20 10:55:49+01:00 Europe/London
+  [Documentation]
+  - Amended note in SEE ALSO about Net-Statsd-Lite.
+
+  - Added INSTALL file to the distribution.
+
 v0.3.2    2018-09-13 18:24:59+01:00 Europe/London
   [Incompatable Changes]
   - Removed deprecated add_set method.

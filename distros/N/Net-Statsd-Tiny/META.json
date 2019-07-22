@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -69,7 +69,7 @@
    "provides" : {
       "Net::Statsd::Tiny" : {
          "file" : "lib/Net/Statsd/Tiny.pm",
-         "version" : "v0.3.2"
+         "version" : "v0.3.4"
       }
    },
    "release_status" : "stable",
@@ -83,8 +83,9 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Tiny"
       }
    },
-   "version" : "v0.3.2",
+   "version" : "v0.3.4",
    "x_authority" : "cpan:RRWO",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

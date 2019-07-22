@@ -11,7 +11,7 @@ use base qw/ Class::Accessor::Fast /;
 
 use IO::Socket 1.18 ();
 
-our $VERSION = 'v0.3.2';
+our $VERSION = 'v0.3.4';
 
 
 __PACKAGE__->mk_ro_accessors(
@@ -161,7 +161,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.3.2
+version v0.3.4
 
 =head1 SYNOPSIS
 
@@ -346,7 +346,7 @@ is any data in the buffer.
 =head1 SEE ALSO
 
 L<Net::Statsd::Lite> which has a similar API but uses L<Moo> and
-L<Type::Tiny> for data validation.
+L<Type::Tiny> for data validation. It's also faster.
 
 L<https://github.com/b/statsd_spec>
 
@@ -373,7 +373,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

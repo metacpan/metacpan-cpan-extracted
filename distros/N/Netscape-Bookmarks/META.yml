@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,8 +31,8 @@ requires:
   URI: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/briandfoy/netscape-bookmarks/issues
-  homepage: https://github.com/briandfoy/netscape-bookmarks
-  repository: https://github.com/briandfoy/netscape-bookmarks.git
-version: '2.303'
+  bugtracker: https://github.com/CPAN-Adoptable-Modules/netscape-bookmarks/issues
+  homepage: https://github.com/CPAN-Adoptable-Modules/netscape-bookmarks
+  repository: https://github.com/CPAN-Adoptable-Modules/netscape-bookmarks.git
+version: '2.304'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

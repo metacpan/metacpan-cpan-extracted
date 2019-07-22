@@ -1,5 +1,8 @@
 Revision history for Perl module Netscape::Bookmarks
 
+2.304 2019-07-21T23:00:54Z
+	* Abandon the module
+
 2.303 2018-04-30T15:02:03Z
 	* Now requires v5.10 because some prereqs require that.
 

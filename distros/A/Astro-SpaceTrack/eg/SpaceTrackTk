@@ -10,7 +10,7 @@ use IO::File;
 use Tk;
 use Tk::Pane;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 my @pad = qw{ -padx 5 -pady 5 };	# Standard cell padding
 

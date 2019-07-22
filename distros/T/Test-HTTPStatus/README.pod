@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/test-httpstatus/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Test-HTTPStatus.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/Test::HTTPStatus"><img src="https://img.shields.io/cpan/v/Test-HTTPStatus.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/Test::HTTPStatus"><img src="https://img.shields.io/cpan/v/Test-HTTPStatus.svg" /></A>
 
 =head1 The Test::HTTPStatus module
 
@@ -23,7 +23,7 @@ for any Perl module.
 
 To read about L<Test::HTTPStatus>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/Test/HTTPStatus.pm
 
@@ -32,17 +32,8 @@ name instead of the file location:
 
 	% perldoc Test::HTTPStatus
 
-You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/Test-HTTPStatus> or
-L<MetaCPAN|http://www.metacpan.org/module/Test::HTTPStatus>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/Test-HTTPStatus>
-
-=item *	L<http://www.metacpan.org/module/Test::HTTPStatus>
-
-=back
+You can read the documentation and inspect the meta data at
+L<MetaCPAN|https://metacpan.org/pod/Test::HTTPStatus>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

@@ -29,7 +29,7 @@ my %args = (
     ],
     ABSTRACT	=> 'Convert dates into the Shire Calendar.',
     realclean	=> {
-	FILES	=> 'cover_db',
+	FILES	=> 'cover_db xt/author/regression.t',
     },
 );
 
@@ -92,8 +92,11 @@ sub MY::postamble {
 
 AUTHORTEST_FILES = t/*.t xt/author/*.t
 
-authortest :: pure_all
+authortest :: pure_all xt/author/regression.t
 	AUTHOR_TESTING=1 $authortest
+
+xt/author/regression.t :: tools/make-regression
+	\$(FULLPERLRUN) tools/make-regression
 
 testcover :: pure_all
 	cover -test

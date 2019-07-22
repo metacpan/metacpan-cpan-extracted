@@ -11,7 +11,6 @@ Astro::App::Satpass2::ParseTime::Date::Manip::v5 - Date::Manip v5 parser;
 Astro::App::Satpass2::ParseTime::Date::Manip::v6 - Date::Manip v6 parser;
 Astro::App::Satpass2::Copier - Base class for the helper classes;
 Astro::App::Satpass2::Format - Base class for the output formatters;
-Astro::App::Satpass2::Format::Classic - Template-based output formatter;
 Astro::App::Satpass2::Format::Dump - Output dumper (for debugging);
 Astro::App::Satpass2::FormatTime - Base class for formatting times;
 Astro::App::Satpass2::FormatTime::Cldr - Manifest constants for cldr formatting;
@@ -43,10 +42,6 @@ There were several motivations for this package:
   The Astro::App::Satpass2 documentation describes the differences.
 
 * The output formatting of the 'satpass' script is not very flexable.
-  Astro::App::Satpass2::Format::Classic provides a huge amount of
-  freedom to custom-format output, though it turns out that you need to
-  learn your way around a fairly complex format specification mechanism
-  to take advantage of this flexability.
 
 * The dependencies of the 'satpass' script are significantly different
   than those of the Astro::Coord::ECI classes. Separating the two (with

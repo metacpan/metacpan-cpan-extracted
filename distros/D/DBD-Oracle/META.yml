@@ -43,13 +43,13 @@ name: DBD-Oracle
 provides:
   DBD::Oracle:
     file: lib/DBD/Oracle.pm
-    version: '1.76'
+    version: '1.791'
   DBD::Oracle::GetInfo:
     file: lib/DBD/Oracle/GetInfo.pm
-    version: '1.76'
+    version: '1.791'
   DBD::Oracle::Object:
     file: lib/DBD/Oracle/Object.pm
-    version: '1.76'
+    version: '1.791'
 requires:
   DBI: '0'
   DynaLoader: '0'
@@ -57,19 +57,18 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '1.76'
+version: '1.791'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Alice Maz <alice@alicemaz.com>'
+  - 'Carsten Grohmann <mail@carstengrohmann.de>'
   - 'cjardine <cjardine@50811bd7-b8ce-0310-adc1-d9db26280581>'
   - 'Dag Lem <dag@nimrod.no>'
   - 'David E. Wheeler <david@justatheory.com>'
   - 'David Perry <perry@pythian.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
-  - 'Dean Hamstead <dean.hamstead@winc.com.au>'
   - 'Dean Hamstead <djzort@cpan.org>'
   - 'Dean Pearce <deanpearce@gmail.com>'
-  - 'Dean Pearce <pearce@pythian.com>'
   - 'gregor herrmann <gregoa@debian.org>'
   - 'Gwen Shapira <shapira@pythian.com>'
   - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
@@ -77,17 +76,15 @@ x_contributors:
   - 'Joe Crotty <joe.crotty@returnpath.net>'
   - 'jurl <jurl@50811bd7-b8ce-0310-adc1-d9db26280581>'
   - 'lbaxter <lbaxter@50811bd7-b8ce-0310-adc1-d9db26280581>'
-  - 'Martin J. Evans <github@virginmedia.com>'
-  - 'Martin J. Evans <mjegh@virginmedia.com>'
   - 'Michael Portnoy <portnoy@pythian.com>'
-  - "Mike O'Regan <moregan@football.flr.follett.com>"
   - "Mike O'Regan <moregan@stresscafe.com>"
   - 'robert <robert@50811bd7-b8ce-0310-adc1-d9db26280581>'
   - 'StephenCIQG <StephenCIQG@50811bd7-b8ce-0310-adc1-d9db26280581>'
+  - 'Tony Cook <tony@develop-help.com>'
   - 'Wesley Hinds <wesley.hinds@swri.org>'
-x_generated_by_perl: v5.26.1
+x_generated_by_perl: v5.22.0
 x_help_wanted:
   - developer
   - documenter
   - tester
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,8 +1,8 @@
 #include "test.h"
-#include <panda/lib/owning_list.h>
 #include <panda/log.h>
+#include <panda/owning_list.h>
 
-using panda::lib::owning_list;
+using panda::owning_list;
 using test::Tracer;
 
 TEST_CASE("empty owning_list" , "[owning_list]") {

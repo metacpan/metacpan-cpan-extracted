@@ -1,8 +1,7 @@
 #include <catch.hpp>
-#include <panda/lib/traits.h>
 #include <panda/string.h>
+#include <panda/traits.h>
 
-using namespace panda::lib::traits;
 using namespace panda;
 
 TEST_CASE("bool_or", "[traits]") {

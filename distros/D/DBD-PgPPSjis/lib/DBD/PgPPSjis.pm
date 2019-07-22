@@ -7,7 +7,7 @@ use Carp ();
 use IO::Socket ();
 
 use vars qw($VERSION);
-$VERSION = '0.0801006';
+$VERSION = '0.0801008';
 $VERSION = $VERSION;
 my $BUFFER_LEN = 1500;
 my $DEBUG;

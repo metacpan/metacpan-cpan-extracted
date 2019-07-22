@@ -22,16 +22,16 @@ template <> struct Typemap<std::string> : TypemapBase<std::string> {
         const char* data = SvPV_nomg(arg, len);
         return std::string(data, len);
     }
-    static inline Sv out (pTHX_ const std::string& str, const Sv& = Sv()) { return Simple(std::string_view(str.data(), str.length())); }
+    static inline Sv out (pTHX_ const std::string& str, const Sv& = Sv()) { return Simple(panda::string_view(str.data(), str.length())); }
 };
 
-template <> struct Typemap<std::string_view> : TypemapBase<std::string_view> {
-    static inline std::string_view in (pTHX_ SV* arg) {
+template <> struct Typemap<panda::string_view> : TypemapBase<panda::string_view> {
+    static inline panda::string_view in (pTHX_ SV* arg) {
         STRLEN len;
         const char* data = SvPV_nomg(arg, len);
-        return std::string_view(data, len);
+        return panda::string_view(data, len);
     }
-    static inline Sv out (pTHX_ const std::string_view& str, const Sv& = Sv()) { return Simple(str); }
+    static inline Sv out (pTHX_ const panda::string_view& str, const Sv& = Sv()) { return Simple(str); }
 };
 
 }

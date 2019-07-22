@@ -4,6 +4,7 @@
 package MyRecognizerInterface;
 use strict;
 use diagnostics;
+use Log::Any qw/$log/;
 
 sub new                    { my ($pkg, $string) = @_; bless { string => $string }, $pkg }
 sub read                   { 1 }
@@ -15,6 +16,8 @@ sub isWithDisableThreshold { 0 }
 sub isWithExhaustion       { 0 }
 sub isWithNewline          { 1 }
 sub isWithTrack            { 1 }
+sub if_number              { 1 }
+sub if_char                { 1 }
 
 package MyValueInterface;
 use strict;
@@ -42,7 +45,7 @@ use Log::Any qw/$log/;
 # Init log
 #
 our $defaultLog4perlConf = '
-log4perl.rootLogger              = INFO, Screen
+log4perl.rootLogger              = DEBUG, Screen
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr  = 0
 log4perl.appender.Screen.layout  = PatternLayout
@@ -144,18 +147,18 @@ $log->info('Creating JSON grammar');
 my $GRAMMAR = MarpaX::ESLIF::Grammar->new($eslif, $DATA);
 
 foreach (0..$#inputs) {
-    my $recognizerInterface = MyRecognizerInterface->new($inputs[$_]);
-    my $marpaESLIFRecognizerJson = MarpaX::ESLIF::Recognizer->new($GRAMMAR, $recognizerInterface);
-    if (! doparse($marpaESLIFRecognizerJson, $inputs[$_], 0)) {
+    if (! doparse($GRAMMAR, $inputs[$_], 0)) {
         BAIL_OUT("Failure when parsing:\n$inputs[$_]\n");
     }
 }
 
 my $newFromOrshared = 0;
 sub doparse {
-    my ($marpaESLIFRecognizer, $inputs, $recursionLevel) = @_;
+    my ($grammar, $inputs, $recursionLevel) = @_;
     my $rc;
 
+    my $recognizerInterface = MyRecognizerInterface->new($inputs);
+    my $valueInterface = MyValueInterface->new();
     if (defined($inputs)) {
         $log->infof('[%d] Scanning JSON', $recursionLevel);
         $log->info ('-------------');
@@ -164,23 +167,15 @@ sub doparse {
     } else {
         $log->infof("[%d] Scanning JSON's object", $recursionLevel);
     }
-    my $ok = $marpaESLIFRecognizer->scan(1); # Initial events
-    while ($ok && $marpaESLIFRecognizer->isCanContinue()) {
-        #
-        # Resume
-        #
-        $ok = $marpaESLIFRecognizer->resume();
-    }
-    if (! $ok) {
+    if (! $grammar->parse($recognizerInterface, $valueInterface)) {
         BAIL_OUT("Failure when parsing:\n$inputs\n");
     }
-    my $valueInterface = MyValueInterface->new();
-    my $status = MarpaX::ESLIF::Value->new($marpaESLIFRecognizer, $valueInterface)->value();
-    if (! $status) {
-        BAIL_OUT("Failure when valuating:\n$inputs\n");
-    }
 
-    my $value = $valueInterface->getResult(); use Data::Dumper; print "RESULT: " . Dumper($value);
+    my $value = $valueInterface->getResult();
+    if (! defined($value)) {
+        BAIL_OUT("Failure with valuation:\n$inputs\n");
+    }
+    $log->infof('Result: %s', $value);
 
     $rc = 1;
     goto done;
@@ -252,6 +247,7 @@ elements ::= value*                               action => ::row             # 
 # JSON Numbers
 # ------------
 number ::= NUMBER                                 action => ::lua->lua_number # Prepare for eventual bignum extension
+:lexeme ::= NUMBER if-action => if_number
 
 NUMBER   ~ _INT
          | _INT _FRAC
@@ -281,17 +277,18 @@ event :discard[off] = nulled discardOff                                         
 chars   ::= filled                                  action => ::lua->lua_chars
 filled  ::= char+                                   action => ::concat                # Returns join('', char1, ..., charn)
 chars   ::=                                         action => ::lua->lua_empty_string # Prefering empty string instead of undef
-char    ::= /[^"\\\x00-\x1F]+/                                                   # ::shift (default action) - take care PCRE2 [:cntrl:] includes DEL character
-          | '\\' '"'                             action => ::copy[1]               # Returns double quote, already ok in data
-          | '\\' '\\'                           action => ::copy[1]               # Returns backslash, already ok in data
-          | '\\' '/'                              action => ::copy[1]               # Returns slash, already ok in data
-          | '\\' 'b'                              action => ::u8"\x{08}"
-          | '\\' 'f'                              action => ::u8"\x{0C}"
-          | '\\' 'n'                              action => ::u8"\x{0A}"
-          | '\\' 'r'                              action => ::u8"\x{0D}"
-          | '\\' 't'                              action => ::u8"\x{09}"
-          | /(?:\\u[[:xdigit:]]{4})+/             action => ::lua->lua_unicode
+char    ::= /[^"\\\x00-\x1F]+/                                                        # ::shift (default action) - take care PCRE2 [:cntrl:] includes DEL character
+          | '\\' '"'                                action => ::copy[1]               # Returns double quote, already ok in data
+          | '\\' '\\'                               action => ::copy[1]               # Returns backslash, already ok in data
+          | '\\' '/'                                action => ::copy[1]               # Returns slash, already ok in data
+          | '\\' 'b'                                action => ::u8"\x{08}"
+          | '\\' 'f'                                action => ::u8"\x{0C}"
+          | '\\' 'n'                                action => ::u8"\x{0A}"
+          | '\\' 'r'                                action => ::u8"\x{0D}"
+          | '\\' 't'                                action => ::u8"\x{09}"
+          | /(?:\\u[[:xdigit:]]{4})+/               action => ::lua->lua_unicode
 
+:terminal ::= /[^"\\\x00-\x1F]+/ if-action => if_char
 
 # -------------------------
 # Unsignificant whitespaces

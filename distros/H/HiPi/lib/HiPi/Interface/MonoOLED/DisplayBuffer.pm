@@ -17,7 +17,7 @@ use Carp;
 
 __PACKAGE__->create_ro_accessors( qw( rows cols bytes_per_col buffer ) );
 
-our $VERSION ='0.79';
+our $VERSION ='0.80';
 
 sub new {
     my( $class, %params) = @_;

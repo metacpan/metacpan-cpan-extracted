@@ -1,0 +1,19 @@
+lib/DataLoader.pm
+lib/DataLoader/Error.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/abuse.t
+t/all.t
+t/basic.t
+t/cache-clear-all.t
+t/error-class.t
+t/errors.t
+t/job-queue-ordering.t
+t/lib/DataLoader/Test.pm
+t/options.t
+t/test-libs.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

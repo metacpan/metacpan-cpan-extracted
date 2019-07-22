@@ -64,7 +64,7 @@ from within it as follows:
 
 =over
 
-=item --today | -d
+=item --today | -t
 
 Store the file inside a content directory named after the current day. This
 is meant to avoid name conflict with previously stored attachments or

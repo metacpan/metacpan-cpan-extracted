@@ -29,28 +29,29 @@ sub _db_add_schema_patch ( $self, $dbh ) {
             CREATE TABLE "user" (
                 "id" INT4 PRIMARY KEY NOT NULL DEFAULT NEXTVAL('user_id_seq'),
                 "guid" UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
-                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP),
+                "created" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 "name" TEXT NOT NULL UNIQUE,
                 "enabled" BOOLEAN NOT NULL DEFAULT TRUE,
                 "email" TEXT UNIQUE,
                 "email_confirmed" BOOL NOT NULL DEFAULT FALSE,
-                "avatar" TEXT,
+                "has_avatar" BOOL NOT NULL DEFAULT FALSE,
+                "gravatar" TEXT,
                 "locale" TEXT,
                 "telegram_name" TEXT UNIQUE
             );
 
             CREATE OR REPLACE FUNCTION on_user_email_update() RETURNS TRIGGER AS $$
             BEGIN
-                IF OLD."email" != NEW."email" OR NEW."email" IS NULL THEN
+                IF COALESCE(OLD."email", '') != COALESCE(NEW."email", '') THEN
                     DELETE FROM "user_action_token" WHERE "email" = OLD."email";
-                    UPDATE "user" SET "email_confirmed" = FALSE WHERE "id" = NEW."id";
+                    UPDATE "user" SET "email_confirmed" = FALSE, "gravatar" = MD5(LOWER(NEW."email")) WHERE "id" = NEW."id";
                 END IF;
 
                 RETURN NULL;
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER "on_uer_email_update_trigger" AFTER UPDATE OF "email" ON "user" FOR EACH ROW EXECUTE PROCEDURE on_user_email_update();
+            CREATE TRIGGER "on_user_email_update_trigger" AFTER UPDATE OF "email" ON "user" FOR EACH ROW EXECUTE PROCEDURE on_user_email_update();
 
             -- USER PERMISSIONS
             CREATE TABLE "user_permission" (
@@ -63,7 +64,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
             -- USER TOKEN
             CREATE TABLE "user_token" (
                 "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP),
+                "created" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 "name" TEXT,
                 "user_id" INT4 NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
                 "enabled" BOOL NOT NULL DEFAULT TRUE
@@ -93,7 +94,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
             -- USER SESSION
             CREATE TABLE "user_session" (
                 "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP),
+                "created" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 "user_id" INT4 NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE
             );
 
@@ -105,7 +106,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
                 "user_id" INT4 NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
                 "type" INT2 NOT NULL,
                 "email" TEXT NOT NULL,
-                "created" INT8 NOT NULL DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
+                "created" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TRIGGER "user_action_token_after_delete_trigger" AFTER DELETE ON "user_action_token" FOR EACH ROW EXECUTE PROCEDURE api_delete_hash();
@@ -172,7 +173,7 @@ sub _db_insert_user ( $self, $dbh, $user_name ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
 ## |      | 8                    | * Private subroutine/method '_db_add_schema_patch' declared but not used                                       |
-## |      | 141                  | * Private subroutine/method '_db_insert_user' declared but not used                                            |
+## |      | 142                  | * Private subroutine/method '_db_insert_user' declared but not used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

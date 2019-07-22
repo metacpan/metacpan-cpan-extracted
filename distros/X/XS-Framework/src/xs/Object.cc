@@ -9,10 +9,10 @@ void Object::stash (const Stash& stash) {
     SvREFCNT_dec(old);
 }
 
-Sub Object::method        (const Sv& name)               const { return stash().method(name); }
-Sub Object::method        (const std::string_view& name) const { return stash().method(name); }
-Sub Object::method_strict (const Sv& name)               const { return stash().method_strict(name); }
-Sub Object::method_strict (const std::string_view& name) const { return stash().method_strict(name); }
+Sub Object::method        (const Sv& name)                 const { return stash().method(name); }
+Sub Object::method        (const panda::string_view& name) const { return stash().method(name); }
+Sub Object::method_strict (const Sv& name)                 const { return stash().method_strict(name); }
+Sub Object::method_strict (const panda::string_view& name) const { return stash().method_strict(name); }
 
 void Object::rebless (const Stash& stash) {
     _check_ref();
