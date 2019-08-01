@@ -1,4 +1,14 @@
-0.005   2018-11-08 (PERLANCAR)
+0.007   2019-07-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Implement delete-repo.
+
+
+0.006   2019-07-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommand: rename-repo.
+
+
+0.005   2018-11-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,25 +17,25 @@
 	- Wording.
 
 
-0.004   2018-10-10 (PERLANCAR)
+0.004   2018-10-10  Released-By: PERLANCAR
 
 	- repo-exists: set exit code.
 
 
-0.003   2018-10-09 (PERLANCAR)
+0.003   2018-10-09  Released-By: PERLANCAR
 
 	- [bugfix] Fix passing arguments to repos->create().
 
 	- [doc] Add more examples in Synopsis.
 
 
-0.002   2018-10-09 (PERLANCAR)
+0.002   2018-10-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add more examples in Synopsis.
 
 
-0.001   2018-10-09 (PERLANCAR)
+0.001   2018-10-09  Released-By: PERLANCAR
 
         - First release.

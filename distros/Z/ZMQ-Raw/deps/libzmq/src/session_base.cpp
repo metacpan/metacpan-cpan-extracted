@@ -35,6 +35,7 @@
 #include "pipe.hpp"
 #include "likely.hpp"
 #include "tcp_connecter.hpp"
+#include "ws_connecter.hpp"
 #include "ipc_connecter.hpp"
 #include "tipc_connecter.hpp"
 #include "socks_connecter.hpp"
@@ -424,8 +425,7 @@ void zmq::session_base_t::process_attach (i_engine *engine_)
     _engine->plug (_io_thread, this);
 }
 
-void zmq::session_base_t::engine_error (
-  zmq::stream_engine_t::error_reason_t reason_)
+void zmq::session_base_t::engine_error (zmq::i_engine::error_reason_t reason_)
 {
     //  Engine is dead. Let's forget about it.
     _engine = NULL;
@@ -434,20 +434,20 @@ void zmq::session_base_t::engine_error (
     if (_pipe)
         clean_pipes ();
 
-    zmq_assert (reason_ == stream_engine_t::connection_error
-                || reason_ == stream_engine_t::timeout_error
-                || reason_ == stream_engine_t::protocol_error);
+    zmq_assert (reason_ == i_engine::connection_error
+                || reason_ == i_engine::timeout_error
+                || reason_ == i_engine::protocol_error);
 
     switch (reason_) {
-        case stream_engine_t::timeout_error:
+        case i_engine::timeout_error:
             /* FALLTHROUGH */
-        case stream_engine_t::connection_error:
+        case i_engine::connection_error:
             if (_active) {
                 reconnect ();
                 break;
             }
             /* FALLTHROUGH */
-        case stream_engine_t::protocol_error:
+        case i_engine::protocol_error:
             if (_pending) {
                 if (_pipe)
                     _pipe->terminate (false);
@@ -559,6 +559,8 @@ zmq::session_base_t::connecter_factory_entry_t
   zmq::session_base_t::_connecter_factories[] = {
     connecter_factory_entry_t (protocol_name::tcp,
                                &zmq::session_base_t::create_connecter_tcp),
+    connecter_factory_entry_t (protocol_name::ws,
+                               &zmq::session_base_t::create_connecter_ws),
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
     connecter_factory_entry_t (protocol_name::ipc,
@@ -668,11 +670,24 @@ zmq::own_t *zmq::session_base_t::create_connecter_tcp (io_thread_t *io_thread_,
         address_t *proxy_address = new (std::nothrow) address_t (
           protocol_name::tcp, options.socks_proxy_address, this->get_ctx ());
         alloc_assert (proxy_address);
-        return new (std::nothrow) socks_connecter_t (
+        socks_connecter_t *connecter = new (std::nothrow) socks_connecter_t (
           io_thread_, this, options, _addr, proxy_address, wait_);
+        alloc_assert (connecter);
+        if (!options.socks_proxy_username.empty ()) {
+            connecter->set_auth_method_basic (options.socks_proxy_username,
+                                              options.socks_proxy_password);
+        }
+        return connecter;
     }
     return new (std::nothrow)
       tcp_connecter_t (io_thread_, this, options, _addr, wait_);
+}
+
+zmq::own_t *zmq::session_base_t::create_connecter_ws (io_thread_t *io_thread_,
+                                                      bool wait_)
+{
+    return new (std::nothrow)
+      ws_connecter_t (io_thread_, this, options, _addr, wait_);
 }
 
 #ifdef ZMQ_HAVE_OPENPGM

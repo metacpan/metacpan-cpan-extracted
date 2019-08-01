@@ -1,3 +1,13 @@
+v0.98.1 2019-07-27T22:31:44Z
+ - api schema moved to files
+ - dist docker support for multistage build
+
+v0.98.0 2019-07-26T14:37:13Z
+ - pgsql dbh improvements
+ - permissions constants renamed
+ - dbi read schema from files
+ - api read role support query builder
+
 v0.97.0 2019-07-21T06:21:24Z
  - typo
  - code cleanup

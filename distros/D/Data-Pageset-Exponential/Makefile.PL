@@ -19,10 +19,12 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "List::Util" => "1.33",
     "Moo" => "1.006000",
+    "MooX::Aliases" => 0,
     "MooX::TypeTiny" => 0,
     "PerlX::Maybe" => 0,
     "Types::Common::Numeric" => 0,
     "Types::Standard" => 0,
+    "asa" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.2.1",
+  "VERSION" => "v0.3.1",
   "test" => {
     "TESTS" => "t/*.t t/Data-Page/*.t"
   }
@@ -43,12 +45,14 @@ my %FallbackPrereqs = (
   "List::Util" => "1.33",
   "Module::Metadata" => 0,
   "Moo" => "1.006000",
+  "MooX::Aliases" => 0,
   "MooX::TypeTiny" => 0,
   "PerlX::Maybe" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Types::Common::Numeric" => 0,
   "Types::Standard" => 0,
+  "asa" => 0,
   "namespace::autoclean" => 0
 );
 

@@ -1,11 +1,11 @@
 package Data::CSel::WrapStruct::Hash;
 
-our $DATE = '2016-09-01'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 sub new {
     my ($class, $data, $parent) = @_;
-    bless [$data, $parent]; # $keys, $children
+    bless [$data, $parent], $class;
 }
 
 sub value {
@@ -38,7 +38,7 @@ sub has_key {
     exists $_[0][0]{$_[1]};
 }
 
-sub pair_value {
+sub key {
     $_[0][0]{$_[1]};
 }
 
@@ -57,7 +57,7 @@ Data::CSel::WrapStruct::Hash - Wrap a hashref
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::CSel::WrapStruct::Hash (from Perl distribution Data-CSel-WrapStruct), released on 2016-09-01.
+This document describes version 0.004 of Data::CSel::WrapStruct::Hash (from Perl distribution Data-CSel-WrapStruct), released on 2019-07-29.
 
 =head1 DESCRIPTION
 
@@ -89,9 +89,9 @@ Return true if hash has a key with value of C<$key>. Equivalent to:
 
  exists($hash->{$key})
 
-=head2 pair_value($key) => any
+=head2 key($key) => any
 
-Retrieve a hash pair value. Equivalent to:
+Retrieve the value of a hash key. Equivalent to:
 
  $hash->{$key}
 
@@ -119,7 +119,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

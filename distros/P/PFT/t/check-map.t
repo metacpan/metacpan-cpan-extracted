@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 21;
+use Test::More tests => 28;
 
 use PFT::Content;
 use PFT::Header;
@@ -97,6 +97,27 @@ is_deeply([sort @ids], [qw<
     >],
     "All content is present"
 );
+
+diag('Verifying interface of "_recent" inner method');
+do {
+    my @entries;
+
+    @entries = $map->blog_recent(6);
+    is scalar(@entries), 5, "Below (or above?) number of entries";
+
+    @entries = $map->blog_recent(3);
+    is scalar(@entries), 3, "Wrong number of items";
+
+    my $i = 0;
+    for my $id (qw<b:2014-02-05:blog-post-nr-12
+                   b:2014-02-04:blog-post-nr-2
+                   b:2014-01-03:blog-post-nr-3
+                   b:2014-01-02:blog-post-nr-11
+                   b:2014-01-01:blog-post-nr-1>) {
+        my $entry = $map->blog_recent(++$i);
+        is $entry->id(), $id, "Verifying recent $i"
+    }
+};
 
 diag('Listing missing symbols:');
 is_deeply([

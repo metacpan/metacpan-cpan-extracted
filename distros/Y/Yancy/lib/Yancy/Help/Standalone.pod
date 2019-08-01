@@ -11,7 +11,7 @@ Yancy::Help::Standalone - How to run Yancy without writing Perl code
 
 =head1 VERSION
 
-version 1.036
+version 1.038
 
 =head1 SYNOPSIS
 

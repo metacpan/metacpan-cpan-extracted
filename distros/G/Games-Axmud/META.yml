@@ -42,9 +42,9 @@ requires:
   HTTP::Tiny: '0'
   IO::Socket::INET: '0'
   IO::Socket::INET6: '0'
-  IO::Socket::SSL: '0'
   IPC::Run: '0'
   JSON: '0'
+  Math::Round: '0'
   Math::Trig: '0'
   Module::Load: '0'
   Net::OpenSSH: '0'
@@ -62,5 +62,5 @@ resources:
   bugtracker: https://github.com/axcore/axmud/issues
   homepage: https://axmud.sourceforge.io/
   repository: https://github.com/axcore/axmud.git
-version: v1.2.0
+version: v1.2.041
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,6 +18,8 @@ meta-spec:
   version: '1.4'
 name: Complete-Bash
 recommends:
+  File::Which: '0'
+  IPC::Open2: '0'
   Term::Size: '0'
 requires:
   Exporter: '5.57'
@@ -29,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Bash
   homepage: https://metacpan.org/release/Complete-Bash
   repository: git://github.com/perlancar/perl-Complete-Bash.git
-version: '0.325'
+version: '0.328'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -105,7 +107,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -302,11 +304,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

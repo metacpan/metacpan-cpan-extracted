@@ -19,7 +19,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "IO::File" => 0,
     "IO::Handle" => 0,
-    "autodie" => "2.22",
     "feature" => 0,
     "mro" => 0,
     "strict" => 0,
@@ -28,7 +27,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "1.20190601",
+  "VERSION" => "1.20190727",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +38,6 @@ my %FallbackPrereqs = (
   "IO::File" => 0,
   "IO::Handle" => 0,
   "Test::More" => "0.98",
-  "autodie" => "2.22",
   "feature" => 0,
   "mro" => 0,
   "strict" => 0,

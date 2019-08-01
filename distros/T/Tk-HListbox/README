@@ -129,6 +129,16 @@ WIDGET-SPECIFIC OPTIONS
         Subroutine reference to be invoked when an indicator image is
         clicked.
 
+    Name: -ipadx => *number*
+        Specify horizontal padding style in pixels around the image for the
+        rows in the listbox which are type *image* or *imagetext*. Default:
+        0
+
+    Name: -ipady => *number*
+        Specify vertical padding style in pixels around the image for the
+        rows in the listbox which are type *image* or *imagetext*. NOTE:
+        This changes the height of the affected rows. Default: 0
+
     Name: itemType
     Class: ItemType
     Switch: -itemtype
@@ -179,6 +189,15 @@ WIDGET-SPECIFIC OPTIONS
         items are drawn in the -disabledforeground color, and selection
         cannot be modified and is not shown (though selection information is
         retained).
+
+    Name: -tpadx => *number*
+        Specify horizontal padding style in pixels around the text for the
+        rows in the listbox which are type *text*. Default: 2
+
+    Name: -tpady => *number*
+        Specify vertical padding style in pixels around the text for the
+        rows in the listbox which are type *text*. NOTE: This changes the
+        height of the affected rows. Default: 2
 
     Name: width
     Class: Width

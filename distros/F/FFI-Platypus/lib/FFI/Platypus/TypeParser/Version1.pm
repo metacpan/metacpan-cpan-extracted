@@ -6,13 +6,16 @@ use Carp qw( croak );
 use base qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version One
-our $VERSION = '0.92'; # VERSION
+our $VERSION = '0.94'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
 
 my %reserved = map { $_ => 1 } qw(
   struct
+  record
+  string
+  senum
   enum
 );
 
@@ -248,7 +251,7 @@ FFI::Platypus::TypeParser::Version1 - FFI Type Parser Version One
 
 =head1 VERSION
 
-version 0.92
+version 0.94
 
 =head1 SYNOPSIS
 

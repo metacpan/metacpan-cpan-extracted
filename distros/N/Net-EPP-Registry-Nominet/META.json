@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.41",
-            "Test::Warn" : "0.09"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,8 +36,25 @@
             "Net::EPP" : "0.19",
             "perl" : "5.008000"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.41",
+            "Test::Warn" : "0.09",
+            "Time::Piece" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://gitlab.com/openstrike/nominet-epp.git",
+         "web" : "https://gitlab.com/openstrike/nominet-epp"
+      }
+   },
+   "version" : "0.04"
 }

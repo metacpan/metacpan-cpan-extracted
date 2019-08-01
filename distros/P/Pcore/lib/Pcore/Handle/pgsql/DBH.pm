@@ -106,6 +106,7 @@ const our $MESSAGE_METHOD => {
     $PG_MSG_ERROR_RESPONSE        => \&_ON_ERROR_RESPONSE,
     $PG_MSG_NOTICE_RESPONSE       => \&_ON_NOTICE_RESPONSE,
     $PG_MSG_NOTIFICATION_RESPONSE => \&_ON_NOTIFICATION_RESPONSE,
+    $PG_MSG_EMPTY_QUERY_RESPONSE  => \&_ON_COMMAND_COMPLETE,        # Identifies the message as a response to an empty query string. (This substitutes for CommandComplete.)
 
     # STH RELATED MESSAGES
     $PG_MSG_PARSE_COMPLETE   => \&_ON_PARSE_COMPLETE,
@@ -181,13 +182,9 @@ sub _connect ($self) {
             # read error
             return $self->_on_fatal_error if !$h;
 
+            # dies on unsupported message type, because accessed to not exists key in the restricted hash
             if ( my $method = $MESSAGE_METHOD->{$type} ) {
                 $method->( $self, $data );
-            }
-
-            # UNSUPPORTED MESSAGE EXCEPTION
-            else {
-                return $self->_on_fatal_error(qq[Unknown message "$type"]);
             }
         }
 
@@ -1096,13 +1093,13 @@ sub encode_json ( $self, $var ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 539                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (31)                  |
+## |    3 | 536                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (31)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 640, 973             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 637, 970             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 782, 973             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 779, 970             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 821                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 818                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

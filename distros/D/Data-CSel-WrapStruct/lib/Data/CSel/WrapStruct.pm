@@ -1,7 +1,7 @@
 package Data::CSel::WrapStruct;
 
-our $DATE = '2016-09-01'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,6 +36,8 @@ sub _wrap {
         return $node;
     } elsif ($ref eq 'SCALAR') {
         return Data::CSel::WrapStruct::ScalarRef->new($data, $parent);
+    } elsif ($ref eq 'JSON::PP::Boolean') {
+        return Data::CSel::WrapStruct::Scalar->new($$data, $parent);
     } else {
         die "Sorry, currently can't handle ref=$ref";
     }
@@ -61,7 +63,7 @@ Data::CSel::WrapStruct - Wrap data structure into a tree of objects suitable for
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::CSel::WrapStruct (from Perl distribution Data-CSel-WrapStruct), released on 2016-09-01.
+This document describes version 0.004 of Data::CSel::WrapStruct (from Perl distribution Data-CSel-WrapStruct), released on 2019-07-29.
 
 =head1 SYNOPSIS
 
@@ -145,7 +147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

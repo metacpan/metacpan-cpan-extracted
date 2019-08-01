@@ -1,7 +1,7 @@
 package App::ruler;
 
-our $DATE = '2016-03-11'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2019-07-30'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use feature 'say';
 use strict 'subs', 'vars';
@@ -17,7 +17,7 @@ our %SPEC;
 
 my $term_width;
 if (eval { require Term::Size; 1 }) {
-    ($term_width, undef) = Term::Size::chars();
+    ($term_width, undef) = Term::Size::chars(*STDOUT{IO});
 } else {
     $term_width = 80;
 }
@@ -221,7 +221,7 @@ App::ruler - Print horizontal ruler on the terminal
 
 =head1 VERSION
 
-This document describes version 0.05 of App::ruler (from Perl distribution App-ruler), released on 2016-03-11.
+This document describes version 0.060 of App::ruler (from Perl distribution App-ruler), released on 2019-07-30.
 
 =head1 TIPS
 
@@ -233,7 +233,11 @@ To disable numbering, set number format to an empty string: C<< -f '' >> or C<<
 =head1 FUNCTIONS
 
 
-=head2 ruler(%args) -> [status, msg, result, meta]
+=head2 ruler
+
+Usage:
+
+ ruler(%args) -> [status, msg, payload, meta]
 
 Print horizontal ruler on the terminal.
 
@@ -247,12 +251,7 @@ Examples:
 
 Result:
 
- [
-   200,
-   "OK",
-   ".........|10.......|20.......|30.......|40.......|50.......|60.......|70.......|80.......|90.......|100......|110......|120......|130......|140......|150......|160......|170......|180......|1",
-   {},
- ]
+ ".........|10.......|20.......|30.......|40.......|50.......|60.......|70.......|80.......|90.......|100......|110......|120......|130......|140......|150......|160......|170......|180......|19"
 
 =item * White ruler with red marks and numbers:
 
@@ -265,12 +264,7 @@ Result:
 
 Result:
 
- [
-   200,
-   "OK",
-   "\e[30;47m---------\e[0m\e[31;47m|\e[0m\e[1;31;47m10\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m20\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m30\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m40\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m50\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m60\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m70\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m80\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m90\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m100\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m110\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m120\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m130\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m140\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m150\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m160\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m170\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m180\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m1\e[0m",
-   {},
- ]
+ "\e[30;47m---------\e[0m\e[31;47m|\e[0m\e[1;31;47m10\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m20\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m30\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m40\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m50\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m60\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m70\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m80\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m90\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m100\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m110\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m120\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m130\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m140\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m150\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m160\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m170\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m180\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m19\e[0m"
 
 =back
 
@@ -313,7 +307,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -345,7 +339,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

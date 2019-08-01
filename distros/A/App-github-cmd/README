@@ -2,8 +2,8 @@ NAME
     App::github::cmd - Yet another github CLI
 
 VERSION
-    This document describes version 0.005 of App::github::cmd (from Perl
-    distribution App-github-cmd), released on 2018-11-08.
+    This document describes version 0.007 of App::github::cmd (from Perl
+    distribution App-github-cmd), released on 2019-07-27.
 
 SYNOPSIS
     Please see included script github-cmd.
@@ -46,11 +46,21 @@ FUNCTIONS
   delete_repo
     Usage:
 
-     delete_repo() -> [status, msg, payload, meta]
+     delete_repo(%args) -> [status, msg, payload, meta]
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   access_token => *str*
+
+    *   login => *str*
+
+    *   pass => *str*
+
+    *   repo* => *str*
+
+    *   user => *str*
 
     Returns an enveloped result (an array).
 
@@ -157,6 +167,40 @@ FUNCTIONS
 
     Return value: (any)
 
+  rename_repo
+    Usage:
+
+     rename_repo(%args) -> [status, msg, payload, meta]
+
+    Rename a repository.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   access_token => *str*
+
+    *   login => *str*
+
+    *   new_name* => *str*
+
+    *   pass => *str*
+
+    *   repo* => *str*
+
+    *   user => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   repo_exists
     Usage:
 
@@ -209,7 +253,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -5,11 +5,26 @@ use File::Spec;
 use Module::Build;
 
 my $file = File::Spec->catfile( "lib", "Astro", "PAL.pm" );
-my $build = Module::Build->new
+
+my $class = Module::Build->subclass(code => << 'EOF');
+    sub compile_c {
+        my $self = shift;
+        my %exclude = map {$_ => 1} qw[
+            erfasrc/src/t_erfa_c.c
+            erfasrc/src/erfaversion.c
+            palsrc/palVers.c
+            palsrc/palTest.c
+        ];
+        return () if exists $exclude{$_[0]};
+        return $self->SUPER::compile_c(@_);
+    }
+EOF
+
+my $build = $class->new
   (
    module_name => "Astro::PAL",
    abstract_from => $file,
-   license => "gpl",
+   license => "gpl3",
    author => [
               'Tim Jenness <tjenness@cpan.org>',
              ],
@@ -34,7 +49,7 @@ my $build = Module::Build->new
    configure_requires => {
                           "Module::Build" => 0.3604, # c_source as array ref
                          },
-   c_source => ["src","erfasrc","palsrc"],
+   c_source => ["src", File::Spec->catdir("erfasrc", "src"), "palsrc"],
    extra_compiler_flags => "-DNOSTARUTIL=1",
   );
 

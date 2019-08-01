@@ -44,7 +44,7 @@ this module just processes the templates
 
 ### COPYRIGHT AND LICENCE
 
-Copyright 2014-2019 Opencage Data Ltd <cpan@opencagedata.com>
+Copyright 2014-2019 OpenCage GmbH <cpan@opencagedata.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10 or,

@@ -1,7 +1,7 @@
 package Sah::Schema::filesize;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $schema = ['float' => {
     summary => 'File size',
@@ -37,7 +37,7 @@ Sah::Schema::filesize - File size
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-01-16.
+This document describes version 0.002 of Sah::Schema::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-07-25.
 
 =head1 DESCRIPTION
 

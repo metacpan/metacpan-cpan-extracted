@@ -90,12 +90,12 @@ sub set_from_tag ( $self, $tag ) {
     my $dockerfile = P->file->read_bin("$self->{dist}->{root}/Dockerfile");
 
     if ( !defined $tag ) {
-        $dockerfile =~ /^FROM\s+([^:]+)(.*?)$/sm;
+        $dockerfile =~ /^FROM\s+([[:alnum:]\/_-]+)(?::([[:alnum:]._-]+))?\s*$/sm;
 
-        say qq[Docker base image is "$1$2"];
+        say qq[Docker base image is "$1:@{[ $2 // $EMPTY ]}"];
     }
-    elsif ( $dockerfile =~ s/^FROM\s+([^:]+)(.*?)$/FROM $1:$tag/sm ) {
-        if ( "$1$2" eq "$1:$tag" ) {
+    elsif ( $dockerfile =~ s/^FROM\s+([[:alnum:]\/_-]+)(?::([[:alnum:]._-]+))?\s*$/FROM $1:$tag\n/sm ) {
+        if ( "$1:$2" eq "$1:$tag" ) {
             say q[Docker base image wasn't changed];
         }
         else {
@@ -105,14 +105,14 @@ sub set_from_tag ( $self, $tag ) {
                 # cd to repo root
                 my $chdir_guard = P->file->chdir( $self->{dist}->{root} );
 
-                my $res = $self->{dist}->scm->scm_commit( qq[Docker base image changed from "$1$2" to "$1:$tag"], ['Dockerfile'] );
+                my $res = $self->{dist}->scm->scm_commit( qq[Docker base image changed from "$1:$2" to "$1:$tag"], ['Dockerfile'] );
 
                 die "$res" if !$res;
             }
 
             delete $self->{dist}->{docker};
 
-            say qq[Docker base image changed from "$1$2" to "$1:$tag"];
+            say qq[Docker base image changed from "$1:$2" to "$1:$tag"];
         }
     }
     else {

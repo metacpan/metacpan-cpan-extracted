@@ -1,9 +1,11 @@
 package Mail::SimpleList;
 
 use strict;
+use warnings;
+
 my $pod = do { local $/; <DATA> };
 
-use base 'Mail::Action';
+use parent 'Mail::Action';
 use Carp 'croak';
 
 use Mail::Mailer;
@@ -11,7 +13,7 @@ use Email::Address;
 use Email::MIME;
 
 use vars '$VERSION';
-$VERSION = '0.94';
+$VERSION = '0.95';
 
 use Mail::SimpleList::Aliases;
 
@@ -337,7 +339,7 @@ subscribed them to the alias.  Each message will include the alias-specific
 posting address.  In this case, it might be C<alias+3abfeec@example.com>.
 
 You can specify additional directives when creating a list.  Please see
-L<Directives> for more information.
+L</DIRECTIVES> for more information.
 
 =head2 POSTING TO A LIST
 
@@ -580,6 +582,6 @@ sending)
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016 chromatic.  All rights reserved.  This module is distributed
-under the same terms as Perl 5.24, in the hope that it is useful but under no
-warranty.
+Copyright (c) 2003 - 2016 chromatic. All rights reserved. This module is
+distributed under the same terms as Perl 5.30, in the hope that it is useful
+but under no warranty.

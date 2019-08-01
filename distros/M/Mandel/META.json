@@ -53,6 +53,12 @@
          "web" : "https://github.com/jhthorsen/mandel"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
+   "x_contributors" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>",
+      "Joel Berger <joel.a.berger@gmail.com>",
+      "Holger Rupprecht <Holger.Rupprecht@Itelligence.de>",
+      "Huo Linhe <zitsen@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

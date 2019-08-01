@@ -1,7 +1,10 @@
+Changes
+gpl.txt
 lib/Net/EPP/Registry/Nominet.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+t/0-ote-check.t
 t/ca.crt
 t/check.t
 t/connect.t
@@ -12,7 +15,5 @@ t/query.t
 t/register.t
 t/release.t
 t/renew.t
-gpl.txt
-Changes
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

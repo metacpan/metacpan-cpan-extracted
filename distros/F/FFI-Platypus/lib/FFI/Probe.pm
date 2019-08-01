@@ -11,7 +11,7 @@ use Capture::Tiny qw( capture_merged capture );
 use File::Temp qw( tempdir );
 
 # ABSTRACT: System detection and probing for FFI extensions.
-our $VERSION = '0.92'; # VERSION
+our $VERSION = '0.94'; # VERSION
 
 
 sub new
@@ -77,7 +77,7 @@ sub check_header
   $code .= "#include <$_>\n" for @{ $self->{headers} }, $header;
 
   my $build = FFI::Build->new("hcheck@{[ ++$self->{counter} ]}",
-    verbose => 1,
+    verbose => 2,
     dir     => $self->{dir},
     alien   => $self->{alien},
     cflags  => $self->{cflags},
@@ -112,7 +112,7 @@ sub check_cpp
   my($self, $code) = @_;
 
   my $build = FFI::Build->new("hcheck@{[ ++$self->{counter} ]}",
-    verbose => 1,
+    verbose => 2,
     dir     => $self->{dir},
     alien   => $self->{alien},
     cflags  => $self->{cflags},
@@ -169,7 +169,7 @@ sub check_eval
   $code =~ s/##EVAL##/$eval/;
 
   my $build = FFI::Build->new("eval@{[ ++$self->{counter} ]}",
-    verbose => 1,
+    verbose => 2,
     dir     => $self->{dir},
     alien   => $self->{alien},
     cflags  => $self->{cflags},
@@ -265,9 +265,9 @@ sub check_type_int
       "struct align { char a; $type b; };",
     ],
     eval => {
-      "type.$type.size"  => [ '%d' => "(int)sizeof($type)" ],
-      "type.$type.sign"  => [ '%s' => "signed($type)" ],
-      "type.$type.align" => [ '%d' => "(int)offsetof(struct align, b)" ],
+      "type.$type.size"  => [ '%d' => "(int)sizeof($type)"             ],
+      "type.$type.sign"  => [ '%s' => "signed($type)"                  ],
+      "type.$type.align" => [ '%d' => '(int)offsetof(struct align, b)' ],
     },
   );
 
@@ -275,6 +275,62 @@ sub check_type_int
 
   my $size = $self->data->{type}->{$type}->{size};
   my $sign = $self->data->{type}->{$type}->{sign};
+
+  sprintf("%sint%d", $sign eq 'signed' ? 's' : 'u', $size*8);
+}
+
+
+sub check_type_enum
+{
+  my($self) = @_;
+
+  $self->check_header('stddef.h');
+
+  my $ret = $self->check_eval(
+    decl => [
+      '#define signed(type)  (((type)-1) < 0) ? "signed" : "unsigned"',
+      "typedef enum { ONE, TWO } myenum;",
+      "struct align { char a; myenum b; };",
+    ],
+    eval => {
+      "type.enum.size"  => [ '%d' => '(int)sizeof(myenum)'            ],
+      "type.enum.sign"  => [ '%s' => 'signed(myenum)'                 ],
+      "type.enum.align" => [ '%d' => '(int)offsetof(struct align, b)' ],
+    },
+  );
+
+  return unless $ret;
+
+  my $size = $self->data->{type}->{enum}->{size};
+  my $sign = $self->data->{type}->{enum}->{sign};
+
+  sprintf("%sint%d", $sign eq 'signed' ? 's' : 'u', $size*8);
+}
+
+
+sub check_type_signed_enum
+{
+  my($self) = @_;
+
+  $self->check_header('stddef.h');
+
+  my $ret = $self->check_eval(
+    decl => [
+      '#define signed(type)  (((type)-1) < 0) ? "signed" : "unsigned"',
+      "typedef enum { NEG = -1, ONE = 1, TWO = 2 } myenum;",
+      "struct align { char a; myenum b; };",
+    ],
+    eval => {
+      "type.senum.size"  => [ '%d' => '(int)sizeof(myenum)'            ],
+      "type.senum.sign"  => [ '%s' => 'signed(myenum)'                 ],
+      "type.senum.align" => [ '%d' => '(int)offsetof(struct align, b)' ],
+    },
+  );
+
+  return unless $ret;
+
+  my $size = $self->data->{type}->{senum}->{size};
+  my $sign = $self->data->{type}->{senum}->{sign};
 
   sprintf("%sint%d", $sign eq 'signed' ? 's' : 'u', $size*8);
 }
@@ -291,8 +347,8 @@ sub check_type_float
       "struct align { char a; $type b; };",
     ],
     eval => {
-      "type.$type.size"  => [ '%d' => "(int)sizeof($type)" ],
-      "type.$type.align" => [ '%d' => "(int)offsetof(struct align, b)" ],
+      "type.$type.size"  => [ '%d' => "(int)sizeof($type)"             ],
+      "type.$type.align" => [ '%d' => '(int)offsetof(struct align, b)' ],
     },
   );
 
@@ -330,8 +386,8 @@ sub check_type_pointer
       "struct align { char a; void* b; };",
     ],
     eval => {
-      "type.pointer.size"  => [ '%d' => "(int)sizeof(void *)" ],
-      "type.pointer.align" => [ '%d' => "(int)offsetof(struct align, b)" ],
+      "type.pointer.size"  => [ '%d' => '(int)sizeof(void *)'            ],
+      "type.pointer.align" => [ '%d' => '(int)offsetof(struct align, b)' ],
     },
   );
 
@@ -455,7 +511,7 @@ FFI::Probe - System detection and probing for FFI extensions.
 
 =head1 VERSION
 
-version 0.92
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -532,6 +588,14 @@ Any evaluations that should be returned.
 =head2 check_type_int
 
  my $type = $probe->check_type_int($type);
+
+=head2 check_type_enum
+
+ my $type = $probe->check_type_enum;
+
+=head2 check_type_enum
+
+ my $type = $probe->check_type_enum;
 
 =head2 check_type_float
 

@@ -18,13 +18,14 @@ my %module_build_args = (
     "Artur Khabibullin - rtkh\@cpan.org"
   ],
   "dist_name" => "Raisin",
-  "dist_version" => "0.83",
+  "dist_version" => "0.86",
   "license" => "perl",
   "module_name" => "Raisin",
   "recursive_test_files" => 1,
   "requires" => {
+    "HTTP::Request::Common" => 0,
     "HTTP::Status" => 0,
-    "JSON" => "2.90",
+    "JSON::MaybeXS" => "1.004000",
     "Plack" => "1.0030",
     "Plack::Middleware::CrossOrigin" => "0.009",
     "Scalar::Util" => "1.38",
@@ -37,7 +38,9 @@ my %module_build_args = (
   ],
   "test_requires" => {
     "List::Util" => "1.29",
-    "Test::More" => "0.88"
+    "Test::Exception" => 0,
+    "Test::Pod" => 0,
+    "Test::Simple" => "1.001014"
   }
 );
 
@@ -45,7 +48,9 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "List::Util" => "1.29",
   "Module::Build" => "0.28",
-  "Test::More" => "0.88"
+  "Test::Exception" => 0,
+  "Test::Pod" => 0,
+  "Test::Simple" => "1.001014"
 );
 
 

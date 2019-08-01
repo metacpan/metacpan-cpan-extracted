@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -17,16 +17,26 @@
 # You should have received a copy of the GNU General Public License along
 # with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# Do a some big Math::OEIS::Grep searches for sequences which match NumSeq
+# sequences, including PlanePathN etc add-ons which come from paths.
+#
+# Very rough.  The want_module() etc code limits the search from huge down
+# to just selected modules or paths.
+#
+
+
 use 5.004;
 use strict;
-use HTML::Entities::Interpolate;
 use List::Util;
 use URI::Escape;
 use Module::Load;
+use Module::Util;
 use Math::OEIS::Grep;
 
 use lib 'xt';
 use MyOEIS;
+$| = 1;
 
 use Math::NumSeq::LeastPrimitiveRoot;
 *gcd = \&Math::NumSeq::LeastPrimitiveRoot::_gcd;
@@ -34,15 +44,17 @@ use Math::NumSeq::LeastPrimitiveRoot;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-$| = 1;
 
 sub want_module {
   my ($module) = @_;
   # return 0 unless $module =~ /Collatz/;
   # return 0 unless $module =~ /DigitExtract/;
   # return 0 unless $module =~ /PlanePathN/;
-  return 0 unless $module =~ /PlanePath/;
+   return 0 unless $module =~ /PlanePathTurn/;
   # return 0 unless $module =~ /HafermanCarpet/;
+  # return 0 unless $module =~ /Aronson/;
+
+  return 0 if (Module::Util::find_installed($module) // 'none') =~ /devel/;
   return 1;
 }
 sub want_planepath {
@@ -62,14 +74,18 @@ sub want_planepath {
   # return 0 unless $planepath =~ /Gray/;
   # return 0 unless $planepath =~ /SierpinskiArrowhead/;
   # return 0 unless $planepath =~ /R5DragonCurve/;
+  # return 0 unless $planepath =~ /AlternateTerdragon/;
 
+  return 0 if $planepath =~ /SquaRecurve/; # exclude
+  return 0 if $planepath =~ /Cellular/; # exclude
   return 0 if $planepath =~ /ByCells/; # exclude
   return 1;
 }
 sub want_coordinate {
   my ($type) = @_;
+  # return 0 unless $type =~ /ExperimentalPairsYX/;
   # return 0 unless $type =~ /VisitNum/;
-   return 0 unless $type =~ /Neigh/;
+  # return 0 unless $type =~ /Neigh/;
   # return 0 unless $type =~ /SRL|SLR/;
   # return 0 unless $type =~ /MinAbsTri|MaxAbsTri/;
   # return 0 unless $type =~ /NumSiblings/;
@@ -77,6 +93,7 @@ sub want_coordinate {
   # return 0 unless $type =~ m{Turn};
   # return 0 unless $type =~ m{DiffXY/2};
   # return 0 if $type =~ /SubHeight|NumChildren|NumSibling/;
+  return 0 unless $type =~ /NotStraight/;
   return 1;
 }
 

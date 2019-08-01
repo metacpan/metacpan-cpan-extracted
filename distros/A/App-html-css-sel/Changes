@@ -1,0 +1,17 @@
+0.003   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename utility from htmlsel to html-css-sel to be more
+	  consistent; as other *sel utilities (jsonsel, ddsel, yamlsel,
+	  orgsel) select using CSel syntax instead of CSS Selector syntax.
+
+
+0.002   2016-08-27  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [doc] Mention {json,yaml,dd,org}sel.
+
+
+0.001   2016-04-01  Released-By: PERLANCAR
+
+        - First early release.

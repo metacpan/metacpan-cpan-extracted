@@ -183,7 +183,7 @@ use Pod::POM::View::Text;
 use PPI::Transform::Doxygen::POD;
 use Params::Util qw{_INSTANCE};
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 my %vtype = qw(% hash @ array $ scalar & func * glob);
 
@@ -336,9 +336,17 @@ sub _get_used_modules {
 
     my %used;
     for my $chld ( $root->schildren() ) {
-        next unless $chld->isa('PPI::Statement::Include');
-        next if $chld->pragma();
-        $used{$chld->module()} = 1
+        if ( $chld->isa('PPI::Statement::Include') ) {
+            next if $chld->pragma();
+            $used{$chld->module()} = 1
+        } elsif ( $chld->isa('PPI::Statement') and $chld->content =~ /^\s*with/ ) {
+            my @tokens = $chld->children;
+            for my $tok ( @tokens ) {
+                if ( $tok->isa('PPI::Token::Quote') or $tok->isa('PPI::Token::QuoteLike::Words') ) {
+                    $used{$_} = 1 for $tok->literal;
+                }
+            }
+        }
     }
     return \%used;
 }
@@ -510,24 +518,36 @@ sub _out_class_end {
 }
 
 
+sub get_pom {
+    my($txt) = @_;
+    ( my $quoted = $txt ) =~ s/(\@|\\|\%|#)/\\$1/g;
+    my $parser = Pod::POM->new();
+    my $pom    = $parser->parse_text($quoted);
+    return $pom;
+}
+
+
 sub _parse_pod {
     my($self, $doc, $fname) = @_;
 
-    my $parser = Pod::POM->new();
-
     my $txt = '';
+    $PPI::Transform::Doxygen::POD::PREFIX = $fname;
+
+    my $parts = $doc->find('PPI::Statement::Data') || [];
+    my $ptxt  = join('',  @$parts);
+    $txt .= PPI::Transform::Doxygen::POD->print(get_pom($ptxt))
+        if $ptxt =~ /\w/;
+
     my %subs;
-
     my $pod_tokens = $doc->find('PPI::Token::Pod');
-
     return '', \%subs unless $pod_tokens;
 
     no warnings qw(once);
-    $PPI::Transform::Doxygen::POD::PREFIX = $fname;
     for my $tok ( @$pod_tokens ) {
-        ( my $quoted = $tok->content() ) =~ s/(\@|\\|\%|#)/\\$1/g;
-        my $pom = $parser->parse_text($quoted);
+        my $pom = get_pom($tok->content);
         _filter_head2( $pom, \%subs );
+        my $for = $pom->for->[0];
+        next if $for and $for->format =~ /(?:function|method|class_method)/;
         $txt .= PPI::Transform::Doxygen::POD->print($pom);
     }
 
@@ -602,7 +622,7 @@ sub _add_type {
         if ( $sig[0] eq '\\' ) { shift @sig }
         my $ref;
         if ( $sig[1] eq '$' ) { $ref = 1; splice(@sig, 1, 1) }
-        my $typ = $vtype{ $sig[0] };
+        my $typ = $vtype{ $sig[0] } || '';
         $typ .= '_ref' if $ref;
         s/^\W*//;
         $_ = "$typ $_";

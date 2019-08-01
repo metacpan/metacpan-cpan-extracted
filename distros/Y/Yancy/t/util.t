@@ -227,6 +227,10 @@ subtest 'match' => sub {
         access => 'admin',
         email => 'preaction@cpan.org',
         null => undef,
+        roles => [qw( admin moderator user )],
+        address => {
+            street => '123 Fake St.',
+        },
     );
 
     ok match( { }, \%item ),
@@ -254,6 +258,49 @@ subtest 'match' => sub {
         '!= undef (not null) match -- true';
     ok !match( { null => { '!=' => undef } }, \%item ),
         '!= undef (not null) match -- false';
+
+    ok match( { roles => { -has => 'admin' } }, \%item ),
+        '-has matches scalar against array -- true';
+    ok !match( { roles => { -has => 'banned' } }, \%item ),
+        '-has matches scalar against array -- false';
+    ok match( { roles => { -not_has => 'banned' } }, \%item ),
+        '-not_has matches scalar against array -- true';
+    ok !match( { roles => { -not_has => 'admin' } }, \%item ),
+        '-not_has matches scalar against array -- false';
+
+    ok match( { roles => { -has => [ 'admin', 'moderator' ] } }, \%item ),
+        '-has matches array against array -- true';
+    ok !match( { roles => { -has => [ 'moderator', 'banned' ] } }, \%item ),
+        '-has matches array against array -- true';
+    ok match( { roles => { -not_has => [ 'banned', 'missing' ] } }, \%item ),
+        '-not_has matches array against array -- true';
+    ok !match( { roles => { -not_has => [ 'admin', 'banned' ] } }, \%item ),
+        '-not_has matches scalar against array -- false';
+
+    ok match( { address => { -has => { street => '123 Fake St.' } } }, \%item ),
+        '-has matches hash against hash -- true';
+    ok !match( { address => { -has => { street => '10 Sesame St.' } } }, \%item ),
+        '-has matches hash against hash -- false';
+    ok match( { address => { -not_has => { street => '10 Sesame St.' } } }, \%item ),
+        '-not_has matches hash against hash -- true';
+    ok !match( { address => { -not_has => { street => '123 Fake St.' } } }, \%item ),
+        '-not_has matches hash against hash -- false';
+
+    ok match( { address => { -has => { street => { -like => '%Fake St.' } } } }, \%item ),
+        '-has matches hash containing query against hash -- true';
+    ok !match( { address => { -has => { street => { -like => '%Sesame St.' } } } }, \%item ),
+        '-has matches hash containing query against hash -- false';
+    ok match( { address => { -not_has => { street => { -like => '%Sesame St.' } } } }, \%item ),
+        '-not_has matches hash containing query against hash -- true';
+    ok !match( { address => { -not_has => { street => { -like => '%Fake St.' } } } }, \%item ),
+        '-not_has matches hash containing query against hash -- false';
+
+    ok !eval { match( { null => { -has => [ 'foo' ] } }, \%item ) },
+        '-has returns false when value is undef';
+    ok !$@, '-has does not die when value is undef';
+    ok eval { match( { null => { -not_has => [ 'foo' ] } }, \%item ) },
+        '-not_has returns true when value is undef';
+    ok !$@, '-not_has does not die when value is undef';
 };
 
 subtest 'order_by' => sub {

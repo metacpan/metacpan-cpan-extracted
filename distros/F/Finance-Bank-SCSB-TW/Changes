@@ -1,9 +1,15 @@
-0.12:
-  - currency_exchange_rate function returns an object
+0.14
+        Documentation updates.
 
-0.11:
-  - Implement check_balance. Returns the balance of your NTD account.
+0.13
+        Re-package with Module::Build::Tiny -- no feature changes.
 
-0.10:
-  - check_balance function isn't working anymore. (Has been broken for a while since they updated their website)
-  - Add currency_exchange_rate function
+0.12
+	currency_exchange_rate function returns an object
+
+0.11
+        Implement check_balance. Returns the balance of your NTD account.
+
+0.10
+        - check_balance function isn't working anymore. (Has been broken for a while since they updated their website)
+        - Add currency_exchange_rate function

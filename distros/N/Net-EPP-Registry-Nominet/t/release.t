@@ -5,14 +5,9 @@
 #
 #  DESCRIPTION:  Test of EPP release operation
 #
-#        FILES:  ---
-#         BUGS:  ---
-#        NOTES:  ---
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: release.t,v 1.2 2015/08/17 15:40:21 pete Exp $
 #      CREATED:  04/04/13 17:30:19
-#     REVISION:  $Revision: 1.2 $
 #===============================================================================
 
 use strict;
@@ -26,10 +21,9 @@ if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
 
-use lib './lib';
 use Net::EPP::Registry::Nominet;
 
-my $epp = new_ok ('Net::EPP::Registry::Nominet', [ test => 1,
+my $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS}, debug =>
 	$ENV{DEBUG_TEST} || 0 ] );
 
@@ -63,7 +57,6 @@ my $registrant = {
 		'trad-name'	=>	'Domsplosion',
 		'type'		=>	'LTD',
 		'co-no'		=>	'12345678',
-		'opt-out'	=>	'n',
 		'postalInfo'=>	{ loc => {
 			'name'		=>	'Big Red Hippopotamus',
 			'org'		=>	'Acme Domain Company',
@@ -83,12 +76,12 @@ my $domain = {
 	period	=>	"2",
 	registrant	=>	$registrant,
 	nameservers	=>	{
-		'nsname0'	=>	"ns1.demetrius-$tag.co.uk",
-		'nsname1'	=>	"ns1.ariel-$tag.co.uk"
+		'nsname0'	=>	"ns1.demetrius-$tag.co.uk"
 	}
 };
-my ($expiry, $reason, $regid) = $epp->register ($domain);
-is ($epp->release_domain($domtogo, $newtag), 1, "Release to $newtag");
+my ($expiry) = $epp->register ($domain);
+is ($epp->release_domain($domtogo, $newtag), 1, "Release to $newtag") or
+	diag ($epp->get_message, $epp->get_code, $epp->get_error);
 
 ok ($epp->logout(), 'Logout successful');
 

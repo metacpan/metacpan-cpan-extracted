@@ -1,7 +1,7 @@
 package Perinci::Sub::To::CLIDocData;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.290'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.291'; # VERSION
 
 use 5.010001;
 use strict;
@@ -262,6 +262,8 @@ sub gen_cli_doc_data_from_meta {
                 if ($ospec->{is_alias}) {
                     # non-groupable alias
 
+                    my $real_opt_ospec = $ospecs->{ $ospec->{alias_for} };
+
                     $arg_spec = $args_prop->{ $ospec->{arg} };
                     $alias_spec = $arg_spec->{cmdline_aliases}{$ospec->{alias}};
                     my $rimeta = rimeta($alias_spec);
@@ -272,7 +274,7 @@ sub gen_cli_doc_data_from_meta {
                         is_alias => 1,
                         alias_for => $ospec->{alias_for},
                         summary => $rimeta->langprop({lang=>$lang}, 'summary') //
-                            "Alias for "._dash_prefix($ospec->{parsed}{opts}[0]),
+                            "Alias for "._dash_prefix($real_opt_ospec->{parsed}{opts}[0]),
                         description =>
                             $rimeta->langprop({lang=>$lang}, 'description'),
                     };
@@ -494,7 +496,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.290 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2019-04-15.
+This document describes version 0.291 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2019-07-26.
 
 =head1 SYNOPSIS
 

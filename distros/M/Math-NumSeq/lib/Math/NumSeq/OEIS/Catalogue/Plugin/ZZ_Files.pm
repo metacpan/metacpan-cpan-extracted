@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -30,7 +30,7 @@ use Math::NumSeq::OEIS::Catalogue::Plugin::FractionDigits;
   = \&Math::NumSeq::OEIS::Catalogue::Plugin::FractionDigits::_anum_to_num;
 
 use vars '$VERSION';
-$VERSION = 72;
+$VERSION = 73;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;

@@ -1,5 +1,5 @@
 package Shipment::UPS;
-$Shipment::UPS::VERSION = '3.01';
+$Shipment::UPS::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -283,7 +283,7 @@ sub _build_services {
         my @pieces;
         foreach (@{$self->packages}) {
             $options->{DeclaredValue}->{MonetaryValue} =
-              $_->insured_value->value;
+              $self->insured_value->value;
 
             push @pieces,
               { PackagingType => {
@@ -515,7 +515,8 @@ sub rate {
 
     my @pieces;
     foreach (@{$self->packages}) {
-        $options->{DeclaredValue}->{MonetaryValue} = $_->insured_value->value;
+        $options->{DeclaredValue}->{MonetaryValue} =
+          $self->insured_value->value;
 
         ## SurePost doesn't accept service options
         $options = undef if $self->surepost && $service_id =~ /9[2-5]/;
@@ -709,7 +710,7 @@ sub ship {
     my $reference_index = 1;
     foreach (@{$self->packages}) {
         $package_options->{DeclaredValue}->{MonetaryValue} =
-          $_->insured_value->value;
+          $self->insured_value->value;
 
         ## SurePost doesn't accept service options
         $package_options = undef if $self->surepost && $service_id =~ /9[2-5]/;
@@ -927,27 +928,31 @@ sub ship {
             $package_index++;
         }
 
-        if ($response->get_ShipmentResults()->get_ControlLogReceipt) {
+        if (ref $response->get_ShipmentResults()->get_ControlLogReceipt eq
+            'ARRAY')
+        {
+            my $receipt_index = 0;
+            foreach (
+                @{$response->get_ShipmentResults()->get_ControlLogReceipt})
+            {
+                ## For EPL labels, force Top Orientation by inserting the ZT command at the beginning of the file.
+                ## This is needed for cases when the printer defaults to the incorrect orientation.
+                my $data = "ZT\n"
+                  if $self->printer_type_map->{$self->printer_type} eq 'EPL';
+                $data .= decode_base64($_->get_GraphicImage->get_value);
 
-            ## For EPL labels, force Top Orientation by inserting the ZT command at the beginning of the file.
-            ## This is needed for cases when the printer defaults to the incorrect orientation.
-            my $data = "ZT\n"
-              if $self->printer_type_map->{$self->printer_type} eq 'EPL';
-            $data
-              .= decode_base64(
-                $response->get_ShipmentResults()->get_ControlLogReceipt()
-                  ->get_GraphicImage->get_value);
-
-            $self->control_log_receipt(
-                Shipment::Label->new(
+                push @{$self->control_log_receipt},
+                  Shipment::Label->new(
                     {   content_type =>
                           $self->label_content_type_map->{$self->printer_type},
                         data      => $data,
-                        file_name => 'control_log_receipt.'
+                        file_name => 'control_log_receipt_'
+                          . $receipt_index . '.'
                           . lc $self->printer_type_map->{$self->printer_type},
                     }
-                )
-            );
+                  );
+                $receipt_index++;
+            }
         }
 
         $self->notice('');
@@ -1003,7 +1008,7 @@ sub return {
     my $reference_index = 1;
     foreach (@{$self->packages}) {
         $package_options->{DeclaredValue}->{MonetaryValue} =
-          $_->insured_value->value;
+          $self->insured_value->value;
         my @references;
         if (   $self->references
             && $self->from_address->country_code =~ /(US|PR)/
@@ -1224,29 +1229,36 @@ sub return {
                 $package_index++;
             }
 
-            if ($response->get_ShipmentResults()->get_ControlLogReceipt) {
+            if (ref $response->get_ShipmentResults()->get_ControlLogReceipt eq
+                'ARRAY')
+            {
+                my $receipt_index = 0;
+                foreach (
+                    @{$response->get_ShipmentResults()->get_ControlLogReceipt})
+                {
 
-                ## For EPL labels, force Top Orientation by inserting the ZT command at the beginning of the file.
-                ## This is needed for cases when the printer defaults to the incorrect orientation.
-                my $data = "ZT\n"
-                  if $self->printer_type_map->{$self->printer_type} eq 'EPL';
-                $data
-                  .= decode_base64(
-                    $response->get_ShipmentResults()->get_ControlLogReceipt()
-                      ->get_GraphicImage->get_value);
+                    ## For EPL labels, force Top Orientation by inserting the ZT command at the beginning of the file.
+                    ## This is needed for cases when the printer defaults to the incorrect orientation.
+                    my $data = "ZT\n"
+                      if $self->printer_type_map->{$self->printer_type} eq
+                      'EPL';
+                    $data .= decode_base64($_->get_GraphicImage->get_value);
 
-                $self->control_log_receipt(
-                    Shipment::Label->new(
+                    push @{$self->control_log_receipt},
+                      Shipment::Label->new(
                         {   content_type => $self->label_content_type_map
                               ->{$self->printer_type},
                             data      => $data,
-                            file_name => 'control_log_receipt.'
+                            file_name => 'control_log_receipt_'
+                              . $receipt_index . '.'
                               . lc
                               $self->printer_type_map->{$self->printer_type},
                         }
-                    )
-                );
+                      );
+                    $receipt_index++;
+                }
             }
+
         }
         elsif ($return_code == 8) {
             use Shipment::Label;
@@ -1545,7 +1557,7 @@ Shipment::UPS
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 

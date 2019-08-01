@@ -156,6 +156,19 @@ the indicator image will appear to the left of the entry.
 
 Subroutine reference to be invoked when an indicator image is clicked.
 
+=item Name: B<-ipadx> => I<number>
+
+Specify horizontal padding style in pixels around the image 
+for the rows in the listbox which are type I<image> or I<imagetext>.
+Default:  B<0>
+
+=item Name: B<-ipady> => I<number>
+
+Specify vertical padding style in pixels around the image 
+for the rows in the listbox which are type I<image> or I<imagetext>.
+NOTE:  This changes the height of the affected rows.
+Default:  B<0>
+
 =item Name:	B<itemType>
 
 =item Class:	B<ItemType>
@@ -221,6 +234,19 @@ If the listbox is disabled then items may not be inserted or deleted,
 items are drawn in the B<-disabledforeground> color, and selection
 cannot be modified and is not shown (though selection information is
 retained).
+
+=item Name: B<-tpadx> => I<number>
+
+Specify horizontal padding style in pixels around the text 
+for the rows in the listbox which are type I<text>.  
+Default:  B<2>
+
+=item Name: B<-tpady> => I<number>
+
+Specify vertical padding style in pixels around the text 
+for the rows in the listbox which are type I<text>.  
+NOTE:  This changes the height of the affected rows.
+Default:  B<2>
 
 =item Name:	B<width>
 
@@ -1143,7 +1169,7 @@ use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
 use vars qw($VERSION @Selection $Prev $tixIndicatorArmed);
-$VERSION = '2.2';
+$VERSION = '2.3';
 
 Tk::Widget->Construct('HListbox');
 
@@ -1227,6 +1253,10 @@ sub Populate {
 			-xscancommand  => ['CALLBACK'],
 			-parent        => [qw/SELF parent parent/, undef],
 			-itemtype      => [qw/PASSIVE itemType ItemType text/],
+			-ipadx         => [qw/PASSIVE/],
+			-ipady         => [qw/PASSIVE/],
+			-tpadx         => [qw/PASSIVE/],
+			-tpady         => [qw/PASSIVE/],
 			-indicatorcmd  => ['CALLBACK'],
 			-activestyle   => [qw/PASSIVE activeStyle ActiveStyle underline/],  #CURRENTLY IGNORED.
 			-listvariable  => [qw/PASSIVE listVariable Variable undef/],
@@ -1243,7 +1273,15 @@ sub Populate {
 	foreach my $tp (qw/text image imagetext/) {   #CREATE "DEFAULT" STYLES FOR EACH itemtype:
 		$w->{"_style$tp"} = $w->ItemStyle($tp);
 		$w->{"_style$tp"}->configure('-activebackground' => $Palette->{'background'})  if ($Palette->{'background'});
-		$w->{"_style$tp"}->configure('-font' => $w->{Configure}{'-font'})  if ($tp ne 'image');
+		if ($tp eq 'text') {
+			$w->{"_style$tp"}->configure('-pady' => $args->{'-tpady'})  if ($args->{'-tpady'});
+			$w->{"_style$tp"}->configure('-padx' => $args->{'-tpadx'})  if ($args->{'-tpadx'});
+		} else {
+			$w->{"_style$tp"}->configure('-font' => $w->{Configure}{'-font'})  if ($tp ne 'image');
+			$w->{"_style$tp"}->configure('-pady' => $args->{'-ipady'})  if ($args->{'-ipady'});
+			$w->{"_style$tp"}->configure('-padx' => $args->{'-ipadx'})  if ($args->{'-ipadx'});
+
+		}
 	}
 	$w->configure('-activeforeground' => $args->{'-activeforeground'})  if ($args->{'-activeforeground'});
 	$w->configure('-selectforeground' => $args->{'-selectforeground'})  if ($args->{'-selectforeground'});
@@ -1648,7 +1686,7 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 				@addArgs = ('-itemtype', 'text', '-text', $data[$i]);
 				push @childData, '-data', $data[$i];
 				$dataAlreadyPushed = 1;
-				$data[$i]->{'-itemtype'} = 'text';
+				eval { $data[$i]->{'-itemtype'} = 'text'; }; #CAN'T HANDLE SOME STRINGS, LIKE "-"!
 			}
 			push @childData, '-data', $data[$i]  unless ($dataAlreadyPushed);
 		} else {      #WE HAVE NOTHING, ADD A SPACE SO IT'LL DISPLAY PROPERLY!

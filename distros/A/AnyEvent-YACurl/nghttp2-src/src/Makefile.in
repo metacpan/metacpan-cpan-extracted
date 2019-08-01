@@ -293,7 +293,8 @@ libnghttpx_a_OBJECTS = $(am_libnghttpx_a_OBJECTS)
 am__DEPENDENCIES_1 =
 @ENABLE_ASIO_LIB_TRUE@libnghttp2_asio_la_DEPENDENCIES =  \
 @ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/lib/libnghttp2.la \
-@ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/third-party/libhttp-parser.la \
+@ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/third-party/liburl-parser.la \
+@ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/third-party/libllhttp.la \
 @ENABLE_ASIO_LIB_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_ASIO_LIB_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_ASIO_LIB_TRUE@	$(am__DEPENDENCIES_1) \
@@ -366,7 +367,8 @@ am__deflatehd_SOURCES_DIST = deflatehd.cc comp_helper.c comp_helper.h
 deflatehd_OBJECTS = $(am_deflatehd_OBJECTS)
 deflatehd_LDADD = $(LDADD)
 deflatehd_DEPENDENCIES = $(top_builddir)/lib/libnghttp2.la \
-	$(top_builddir)/third-party/libhttp-parser.la
+	$(top_builddir)/third-party/liburl-parser.la \
+	$(top_builddir)/third-party/libllhttp.la
 am__h2load_SOURCES_DIST = util.cc util.h http2.cc http2.h h2load.cc \
 	h2load.h timegm.c timegm.h tls.cc tls.h h2load_session.h \
 	h2load_http2_session.cc h2load_http2_session.h \
@@ -378,14 +380,16 @@ am__h2load_SOURCES_DIST = util.cc util.h http2.cc http2.h h2load.cc \
 h2load_OBJECTS = $(am_h2load_OBJECTS)
 h2load_LDADD = $(LDADD)
 h2load_DEPENDENCIES = $(top_builddir)/lib/libnghttp2.la \
-	$(top_builddir)/third-party/libhttp-parser.la
+	$(top_builddir)/third-party/liburl-parser.la \
+	$(top_builddir)/third-party/libllhttp.la
 am__inflatehd_SOURCES_DIST = inflatehd.cc comp_helper.c comp_helper.h
 @ENABLE_HPACK_TOOLS_TRUE@am_inflatehd_OBJECTS = inflatehd.$(OBJEXT) \
 @ENABLE_HPACK_TOOLS_TRUE@	$(am__objects_3)
 inflatehd_OBJECTS = $(am_inflatehd_OBJECTS)
 inflatehd_LDADD = $(LDADD)
 inflatehd_DEPENDENCIES = $(top_builddir)/lib/libnghttp2.la \
-	$(top_builddir)/third-party/libhttp-parser.la
+	$(top_builddir)/third-party/liburl-parser.la \
+	$(top_builddir)/third-party/libllhttp.la
 am__nghttp_SOURCES_DIST = util.cc http2.cc timegm.c app_helper.cc \
 	nghttp2_gzip.c util.h http2.h timegm.h app_helper.h \
 	nghttp2_config.h nghttp2_gzip.h network.h nghttp.cc nghttp.h \
@@ -403,7 +407,8 @@ am__objects_5 =
 nghttp_OBJECTS = $(am_nghttp_OBJECTS)
 nghttp_LDADD = $(LDADD)
 nghttp_DEPENDENCIES = $(top_builddir)/lib/libnghttp2.la \
-	$(top_builddir)/third-party/libhttp-parser.la
+	$(top_builddir)/third-party/liburl-parser.la \
+	$(top_builddir)/third-party/libllhttp.la
 am__nghttpd_SOURCES_DIST = util.cc http2.cc timegm.c app_helper.cc \
 	nghttp2_gzip.c util.h http2.h timegm.h app_helper.h \
 	nghttp2_config.h nghttp2_gzip.h network.h nghttpd.cc tls.cc \
@@ -414,12 +419,14 @@ am__nghttpd_SOURCES_DIST = util.cc http2.cc timegm.c app_helper.cc \
 nghttpd_OBJECTS = $(am_nghttpd_OBJECTS)
 nghttpd_LDADD = $(LDADD)
 nghttpd_DEPENDENCIES = $(top_builddir)/lib/libnghttp2.la \
-	$(top_builddir)/third-party/libhttp-parser.la
+	$(top_builddir)/third-party/liburl-parser.la \
+	$(top_builddir)/third-party/libllhttp.la
 am__nghttpx_SOURCES_DIST = shrpx.cc shrpx.h
 @ENABLE_APP_TRUE@am_nghttpx_OBJECTS = nghttpx-shrpx.$(OBJEXT)
 nghttpx_OBJECTS = $(am_nghttpx_OBJECTS)
 am__DEPENDENCIES_2 = $(top_builddir)/lib/libnghttp2.la \
-	$(top_builddir)/third-party/libhttp-parser.la
+	$(top_builddir)/third-party/liburl-parser.la \
+	$(top_builddir)/third-party/libllhttp.la
 @ENABLE_APP_TRUE@nghttpx_DEPENDENCIES = libnghttpx.a \
 @ENABLE_APP_TRUE@	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
 @ENABLE_APP_TRUE@	$(am__append_7)
@@ -1063,6 +1070,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib \
 	-I$(top_srcdir)/src/includes \
 	-I$(top_srcdir)/third-party \
+	-I$(top_srcdir)/third-party/llhttp/include \
 	@LIBXML2_CFLAGS@ \
 	@LIBEV_CFLAGS@ \
 	@OPENSSL_CFLAGS@ \
@@ -1072,7 +1080,8 @@ AM_CPPFLAGS = \
 	@DEFS@
 
 LDADD = $(top_builddir)/lib/libnghttp2.la \
-	$(top_builddir)/third-party/libhttp-parser.la \
+	$(top_builddir)/third-party/liburl-parser.la \
+	$(top_builddir)/third-party/libllhttp.la \
 	@JEMALLOC_LIBS@ \
 	@LIBXML2_LIBS@ \
 	@LIBEV_LIBS@ \
@@ -1240,7 +1249,8 @@ LDADD = $(top_builddir)/lib/libnghttp2.la \
 @ENABLE_ASIO_LIB_TRUE@libnghttp2_asio_la_LDFLAGS = -no-undefined -version-info 1:0:0
 @ENABLE_ASIO_LIB_TRUE@libnghttp2_asio_la_LIBADD = \
 @ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/lib/libnghttp2.la \
-@ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/third-party/libhttp-parser.la \
+@ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/third-party/liburl-parser.la \
+@ENABLE_ASIO_LIB_TRUE@	$(top_builddir)/third-party/libllhttp.la \
 @ENABLE_ASIO_LIB_TRUE@	@OPENSSL_LIBS@ \
 @ENABLE_ASIO_LIB_TRUE@	${BOOST_LDFLAGS} \
 @ENABLE_ASIO_LIB_TRUE@	${BOOST_ASIO_LIB} \

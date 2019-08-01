@@ -15,7 +15,7 @@ Sah::Schemas::DataSizeSpeed - Sah schemas related to data sizes & speeds (filesi
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::DataSizeSpeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-01-16.
+This document describes version 0.002 of Sah::Schemas::DataSizeSpeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-07-25.
 
 =head1 SAH SCHEMAS
 

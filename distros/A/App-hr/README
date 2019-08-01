@@ -2,8 +2,8 @@ NAME
     App::hr - Print horizontal bar on the terminal
 
 VERSION
-    This document describes version 0.260 of App::hr (from Perl distribution
-    App-hr), released on 2018-12-22.
+    This document describes version 0.261 of App::hr (from Perl distribution
+    App-hr), released on 2019-07-30.
 
 SYNOPSIS
      use App::hr qw(hr hr_r);
@@ -158,7 +158,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2018, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

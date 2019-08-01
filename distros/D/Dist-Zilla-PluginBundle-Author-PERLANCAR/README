@@ -3,9 +3,9 @@ NAME
     PERLANCAR when you build your dists
 
 VERSION
-    This document describes version 0.596 of
+    This document describes version 0.597 of
     Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution
-    Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-04-17.
+    Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-07-04.
 
 SYNOPSIS
      # dist.ini

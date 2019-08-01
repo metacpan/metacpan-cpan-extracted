@@ -82,12 +82,14 @@ inc/mm-config-set.pl
 inc/mm-config.pl
 inc/mm-test.pl
 inc/mymm.pl
+inc/pdb
 inc/probe/abi.c
 inc/probe/alloca.c
 inc/probe/bigendian.c
 inc/probe/bigendian64.c
 inc/probe/complex.c
 inc/probe/longdouble.c
+inc/probe/recordvalue.c
 inc/probe/variadic.c
 include/ffi_platypus.h
 include/ffi_platypus_call.h

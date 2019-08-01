@@ -1,0 +1,11 @@
+{
+    "name": "Finance-Bank-SCSB-TW",
+    "x_static_install": true,
+    "resources": {
+        "repository": {
+            "web": "https://github.com/gugod/Finance-Bank-SCSB-TW",
+            "url": "https://github.com/gugod/Finance-Bank-SCSB-TW.git",
+            "type": "git"
+        }
+    }
+}

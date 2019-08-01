@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.724'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.726'; # VERSION
 
 use 5.010;
 use strict;
@@ -124,7 +124,7 @@ podlist - List Perl .pod files
 
 =head1 VERSION
 
-This document describes version 0.724 of podlist (from Perl distribution App-PMUtils), released on 2019-06-20.
+This document describes version 0.726 of podlist (from Perl distribution App-PMUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Return detailed records instead of just module names.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

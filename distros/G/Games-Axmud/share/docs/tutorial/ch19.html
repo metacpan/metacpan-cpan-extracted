@@ -11,20 +11,28 @@
 <h1>19 - Execution options</h1>
 <h4>Table of Contents</h4>
 <ul>
-<li><a href="#19.1">19.1 OPTION NOLET</a></li>
-<li><a href="#19.2">19.2 OPTION NEEDTASK</a></li>
-<li><a href="#19.3">19.3 OPTION REQUIRE</a></li>
-<li><a href="#19.4">19.4 OPTION TYPO</a></li>
-<li><a href="#19.5">19.5 OPTION PSEUDO</a></li>
-<li><a href="#19.6">19.6 OPTION REDIRECT</a></li>
-<li><a href="#19.7">19.7 OPTION PERSIST</a></li>
-<li><a href="#19.8">19.8 OPTION ANGLE</a></li>
-<li><a href="#19.9">19.9 Advanced client commands</a></li>
+<li><a href="#19.1">19.1 OPTION SILENT</a></li>
+<li><a href="#19.2">19.2 OPTION NOLET</a></li>
+<li><a href="#19.3">19.3 OPTION NEEDTASK</a></li>
+<li><a href="#19.4">19.4 OPTION REQUIRE</a></li>
+<li><a href="#19.5">19.5 OPTION TYPO</a></li>
+<li><a href="#19.6">19.6 OPTION PSEUDO</a></li>
+<li><a href="#19.7">19.7 OPTION REDIRECT</a></li>
+<li><a href="#19.8">19.8 OPTION PERSIST</a></li>
+<li><a href="#19.9">19.9 OPTION ANGLE</a></li>
+<li><a href="#19.10">19.10 Advanced client commands</a></li>
 </ul>
 <hr>
 <p>An OPTION statement changes the way Axbasic executes a script. OPTION can be followed by several different keywords, a few of which you've seen already. We'll list all of them here.</p>
 <p>Before executing a script, Axbasic checks for any OPTION statements. An OPTION statement applies to the whole script, even if it actually occurs right at the end of the script. However, there is no good reason not to put all your OPTIONs right at the top, because that is where human readers are expecting to find them.</p>
-<h2><a name="19.1">19.1 OPTION NOLET</a></h2>
+<h2><a name="19.1">19.1 OPTION SILENT</a></h2>
+<p>You'll see these messages when Axbasic starts and finishes executing a script:</p>
+<pre><code>    AXBASIC: Executing 'test'
+    AXBASIC: Execution of 'test' complete
+</code></pre>
+<p>You can hide these messages by using OPTION SILENT. </p>
+<p>Any error or debug messages will still be displayed. The only way to turn them off is to fix your script.</p>
+<h2><a name="19.2">19.2 OPTION NOLET</a></h2>
 <p>Every statement must start with a keyword, so if you want to set a variable's value, you must do it using a LET statement.</p>
 <pre><code>    LET a$ = "hello"
 </code></pre>
@@ -33,7 +41,7 @@
     a$ = "hello"
 </code></pre>
 <p>LET is always optional in Axbasic scripts with line numbers (see <a href="ch18.html">Section 18</a>).</p>
-<h2><a name="19.2">19.2 OPTION NEEDTASK</a></h2>
+<h2><a name="19.3">19.3 OPTION NEEDTASK</a></h2>
 <p>As you know, keywords like PAUSE won't work unless the script is run as a task. You can avoid any unexpected surprises by telling Axbasic that the script must <em>only</em> be run as a task.</p>
 <pre><code>    OPTION NEEDTASK
     PRINT "Hello..."
@@ -41,7 +49,7 @@
     PRINT "...world!"
     END
 </code></pre>
-<h2><a name="19.3">19.3 OPTION REQUIRE</a></h2>
+<h2><a name="19.4">19.4 OPTION REQUIRE</a></h2>
 <p>From time to time, Axbasic undergoes small changes and improvements. If you're making use of some exciting new feature, you can tell Axbasic not to run the script on an older version of Axmud.</p>
 <p>The current version of Axbasic, at the time of writing, is 1.002:</p>
 <pre><code>    ! Don't run on older versions of Axmud
@@ -54,7 +62,7 @@
 <p>By the way, the <strong>Version ()</strong> function returns the current Axbasic version.</p>
 <pre><code>    PRINT Version ()
 </code></pre>
-<h2><a name="19.4">19.4 OPTION TYPO</a></h2>
+<h2><a name="19.5">19.5 OPTION TYPO</a></h2>
 <p>It's just too easy to mis-type a variable like <strong>string$</strong>, in which case your script won't work as intended. Mistakes of this kind are notoriously difficult to diagnose.</p>
 <p>The solution is to use OPTION TYPO, which tells Axbasic that all variables will be <em>declared</em> (in a GLOBAL or LOCAL statement) before they are used.</p>
 <pre><code>    OPTION TYPO
@@ -64,7 +72,7 @@
 <pre><code>    PRINT adress$
 </code></pre>
 <p>OPTION TYPO is strongly recommended for all of your Axbasic scripts.</p>
-<h2><a name="19.5">19.5 OPTION PSEUDO</a></h2>
+<h2><a name="19.6">19.6 OPTION PSEUDO</a></h2>
 <p>Client commands are normally typed in Axmud's main window, but any part of the code can execute a client command. (Internally, this is known as a <em>pseudo command</em>.)</p>
 <p>In Axbasic, we use a CLIENT statement.</p>
 <pre><code>    CLIENT "starttask compass"
@@ -85,23 +93,23 @@
 <pre><code>    OPTION PSEUDO "win_only"
 </code></pre>
 <p>This displays both confirmation and error messages in a dialogue (popup) window.</p>
-<h2><a name="19.6">19.6 OPTION REDIRECT</a></h2>
+<h2><a name="19.7">19.7 OPTION REDIRECT</a></h2>
 <pre><code>    OPTION REDIRECT
 </code></pre>
 <p>Axbasic scripts can create their own task window. A WRITEWIN statement display text in that task window. However, if the task window isn't open, nothing is displayed.</p>
 <p>OPTION REDIRECT redirects text into the main window, if the task window has been closed for some reason.</p>
-<h2><a name="19.7">19.7 OPTION PERSIST</a></h2>
+<h2><a name="19.8">19.8 OPTION PERSIST</a></h2>
 <pre><code>    OPTION PERSIST
 </code></pre>
 <p>Interfaces can be created with an ADDTRIG, ADDALIAS, ADDMACRO, ADDTIMER or ADDHOOK statement. Normally, those interfaces are destroyed as soon as the script stops running, but OPTION PERSIST prevents that destruction.</p>
-<h2><a name="19.8">19.8 OPTION ANGLE</a></h2>
+<h2><a name="19.9">19.9 OPTION ANGLE</a></h2>
 <pre><code>    OPTION ANGLE DEGREES
 </code></pre>
 <p>Axbasic's trignometric functions like <strong>Sin ()</strong> and <strong>Cos ()</strong> expect angles measured in radians. If you'd prefer them to expect angles measured in degrees, you can use OPTION ANGLE DEGREES.</p>
 <pre><code>    OPTION ANGLE RADIANS
 </code></pre>
 <p>This statement is useful for clarifying to any humans reading your code that you'll be using radians, not degrees.</p>
-<h2><a name="19.9">19.9 Advanced client commands</a></h2>
+<h2><a name="19.10">19.10 Advanced client commands</a></h2>
 <p>An Axbasic script can be run using a client command. <strong>;runscript</strong> runs the <strong>test.bas</strong> script, and <strong>;runscript wumpus</strong> runs the <strong>wumpus.bas</strong> script.</p>
 <p>When you try to run a script, Axbasic looks for a file in the default directory (folder), as we described in <a href="ch02.html">Section 2</a>.</p>
 <p>You can find the location of this directory using the <strong>;listdirectory</strong> command. On a Linux system, the output will look something like this:</p>

@@ -1,0 +1,324 @@
+See - IO::FDPass
+
+https://keithp.com/cgit/fdpassing.git/tree/README.md
+
+## FD passing for DRI.Next
+
+Using the DMA-BUF interfaces to pass DRI objects between the client
+and server, as discussed in my previous blog posting on [[DRI-Next]],
+requires that we successfully pass file descriptors over the X
+protocol socket.
+
+Rumor has it that this has been tried and found to be difficult, and
+so I decided to do a bit of experimentation to see how this could be
+made to work within the existing X implementation.
+
+(All of the examples shown here are licensed under the GPL, version 2
+and are available from git://keithp.com/git/fdpassing)
+
+### Basics of FD passing
+
+The kernel internals that support FD passing are actually quite simple
+-- POSIX already require that two processes be able to share the same
+underlying reference to a file because of the semantics of the fork(2)
+call. Adding some ability to share arbitrary file descriptors between
+two processes then is far more about how you ask the kernel than the
+actual file descriptor sharing operation.
+
+In Linux, file descriptors can be passed through local network
+sockets. The sender constructs a mystic-looking sendmsg(2) call,
+placing the file descriptor in the control field of that
+operation. The kernel pulls the file descriptor out of the control
+field, allocates a file descriptor in the target process which
+references the same file object and then sticks the file descriptor in
+a queue for the receiving process to fetch.
+
+The receiver then constructs a matching call to recvmsg that provides
+a place for the kernel to stick the new file descriptor.
+
+### A helper API for testing
+
+I first write a stand-alone program that created a socketpair, forked
+and then passed an fd from the parent to the child. Once that was
+working, I decided that some short helper functions would make further
+testing a whole lot easier.
+
+Here's a function that writes some data and an optional file
+descriptor:
+
+	ssize_t
+	sock_fd_write(int sock, void *buf, ssize_t buflen, int fd)
+	{
+		ssize_t		size;
+		struct msghdr	msg;
+		struct iovec	iov;
+		union {
+			struct cmsghdr	cmsghdr;
+			char		control[CMSG_SPACE(sizeof (int))];
+		} cmsgu;
+		struct cmsghdr	*cmsg;
+
+		iov.iov_base = buf;
+		iov.iov_len = buflen;
+
+		msg.msg_name = NULL;
+		msg.msg_namelen = 0;
+		msg.msg_iov = &iov;
+		msg.msg_iovlen = 1;
+
+		if (fd != -1) {
+			msg.msg_control = cmsgu.control;
+			msg.msg_controllen = sizeof(cmsgu.control);
+
+			cmsg = CMSG_FIRSTHDR(&msg);
+			cmsg->cmsg_len = CMSG_LEN(sizeof (int));
+			cmsg->cmsg_level = SOL_SOCKET;
+			cmsg->cmsg_type = SCM_RIGHTS;
+
+			printf ("passing fd %d\n", fd);
+			*((int *) CMSG_DATA(cmsg)) = fd;
+		} else {
+			msg.msg_control = NULL;
+			msg.msg_controllen = 0;
+			printf ("not passing fd\n");
+		}
+
+		size = sendmsg(sock, &msg, 0);
+
+		if (size < 0)
+			perror ("sendmsg");
+		return size;
+	}
+
+And here's the matching receiver function:
+
+	ssize_t
+	sock_fd_read(int sock, void *buf, ssize_t bufsize, int *fd)
+	{
+		ssize_t		size;
+
+		if (fd) {
+			struct msghdr	msg;
+			struct iovec	iov;
+			union {
+				struct cmsghdr	cmsghdr;
+				char		control[CMSG_SPACE(sizeof (int))];
+			} cmsgu;
+			struct cmsghdr	*cmsg;
+
+			iov.iov_base = buf;
+			iov.iov_len = bufsize;
+
+			msg.msg_name = NULL;
+			msg.msg_namelen = 0;
+			msg.msg_iov = &iov;
+			msg.msg_iovlen = 1;
+			msg.msg_control = cmsgu.control;
+			msg.msg_controllen = sizeof(cmsgu.control);
+			size = recvmsg (sock, &msg, 0);
+			if (size < 0) {
+				perror ("recvmsg");
+				exit(1);
+			}
+			cmsg = CMSG_FIRSTHDR(&msg);
+			if (cmsg && cmsg->cmsg_len == CMSG_LEN(sizeof(int))) {
+				if (cmsg->cmsg_level != SOL_SOCKET) {
+					fprintf (stderr, "invalid cmsg_level %d\n",
+						 cmsg->cmsg_level);
+					exit(1);
+				}
+				if (cmsg->cmsg_type != SCM_RIGHTS) {
+					fprintf (stderr, "invalid cmsg_type %d\n",
+						 cmsg->cmsg_type);
+					exit(1);
+				}
+
+				*fd = *((int *) CMSG_DATA(cmsg));
+				printf ("received fd %d\n", *fd);
+			} else
+				*fd = -1;
+		} else {
+			size = read (sock, buf, bufsize);
+			if (size < 0) {
+				perror("read");
+				exit(1);
+			}
+		}
+		return size;
+	}
+
+With these two functions, I rewrote the simple example as follows:
+
+	void
+	child(int sock)
+	{
+		int	fd;
+		char	buf[16];
+		ssize_t	size;
+
+		sleep(1);
+		for (;;) {
+			size = sock_fd_read(sock, buf, sizeof(buf), &fd);
+			if (size <= 0)
+				break;
+			printf ("read %d\n", size);
+			if (fd != -1) {
+				write(fd, "hello, world\n", 13);
+				close(fd);
+			}
+		}
+	}
+
+	void
+	parent(int sock)
+	{
+		ssize_t	size;
+		int	i;
+		int	fd;
+
+		fd = 1;
+		size = sock_fd_write(sock, "1", 1, 1);
+		printf ("wrote %d\n", size);
+	}
+
+	int
+	main(int argc, char **argv)
+	{
+		int	sv[2];
+		int	pid;
+
+		if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) < 0) {
+			perror("socketpair");
+			exit(1);
+		}
+		switch ((pid = fork())) {
+		case 0:
+			close(sv[0]);
+			child(sv[1]);
+			break;
+		case -1:
+			perror("fork");
+			exit(1);
+		default:
+			close(sv[1]);
+			parent(sv[0]);
+			break;
+		}
+		return 0;
+	}
+
+### Experimenting with multiple writes
+
+I wanted to know what would happen if multiple writes were made, some
+with file descriptors and some without. So I changed the simple example
+parent function to look like:
+
+	void
+	parent(int sock)
+	{
+		ssize_t	size;
+		int	i;
+		int	fd;
+
+		fd = 1;
+		size = sock_fd_write(sock, "1", 1, -1);
+		printf ("wrote %d without fd\n", size);
+		size = sock_fd_write(sock, "1", 1, 1);
+		printf ("wrote %d with fd\n", size);
+		size = sock_fd_write(sock, "1", 1, -1);
+		printf ("wrote %d without fd\n", size);
+	}
+
+When run, this demonstrates that the reader gets two bytes in the
+first read along with a file descriptor followed by one byte in a
+second read, without a file descriptor. This demonstrates that
+a file descriptor message forms a barrier within the socket; multiple
+messages will be merged together, but not past a message containing a
+file descriptor.
+
+### Reading without accepting a file descriptor
+
+What happens when the reader isn't expecting a file descriptor? Does
+it just get lost? Does the reader not get the message until it asks
+for the file descriptor? What about the boundary issue described above?
+
+Here's my test case:
+
+	void
+	child(int sock)
+	{
+		int	fd;
+		char	buf[16];
+		ssize_t	size;
+
+		sleep(1);
+		size = sock_fd_read(sock, buf, sizeof(buf), NULL);
+		if (size <= 0)
+			return;
+		printf ("read %d\n", size);
+		size = sock_fd_read(sock, buf, sizeof(buf), &fd);
+		if (size <= 0)
+			return;
+		printf ("read %d\n", size);
+		if (fd != -1) {
+			write(fd, "hello, world\n", 13);
+			close(fd);
+		}
+	}
+
+	void
+	parent(int sock)
+	{
+		ssize_t	size;
+		int	i;
+		int	fd;
+
+		fd = 1;
+		size = sock_fd_write(sock, "1", 1, 1);
+		printf ("wrote %d without fd\n", size);
+		size = sock_fd_write(sock, "1", 1, 2);
+		printf ("wrote %d with fd\n", size);
+	}
+
+This shows that the first passed file descriptor is picked up by the
+first sock_fd_read call, but the file descriptor is closed. The second
+file descriptor passed is picked up by the second sock_fd_read call.
+
+### Zero-length writes
+
+Can a file descriptor be passed without sending any data?
+
+	void
+	parent(int sock)
+	{
+		ssize_t	size;
+		int	i;
+		int	fd;
+
+		fd = 1;
+		size = sock_fd_write(sock, "1", 1, -1);
+		printf ("wrote %d without fd\n", size);
+		size = sock_fd_write(sock, NULL, 0, 1);
+		printf ("wrote %d with fd\n", size);
+		size = sock_fd_write(sock, "1", 1, -1);
+		printf ("wrote %d without fd\n", size);
+	}
+
+And the answer is clearly "no" -- the file descriptor is not passed
+when no data are included in the write.
+
+(update, 2019-5-8 from Yicholas Rishel)
+
+This is true for SOCK_STREAM sockets, but for SOCK_SEQPACKET sockets,
+you *can* do zero-length writes and pass an fd.
+
+### A summary of results
+
+
+ 1. read and recvmsg don't merge data across a file descriptor message boundary.
+
+ 2. failing to accept an fd in the receiver results in the fd being
+    closed by the kernel.
+
+ 3. a file descriptor must be accompanied by some data.
+

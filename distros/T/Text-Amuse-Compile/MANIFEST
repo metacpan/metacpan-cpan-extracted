@@ -50,6 +50,7 @@ t/fonts/italic.otf
 t/fonts/regular.otf
 t/fontsizes.t
 t/fontspec-file-paths.t
+t/format-ids-templates.t
 t/header.t
 t/headings.t
 t/html-title.t

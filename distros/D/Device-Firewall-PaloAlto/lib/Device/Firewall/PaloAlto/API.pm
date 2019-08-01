@@ -1,17 +1,18 @@
 package Device::Firewall::PaloAlto::API;
-$Device::Firewall::PaloAlto::API::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::API::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
 
 use URI;
+use URI::Encode;
 use Carp;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use XML::Twig;
 use Class::Error;
 
-use Device::Firewall::PaloAlto::Errors qw(ERROR);
+use Device::Firewall::PaloAlto::Errors qw(fatal_error);
 
 # VERSION
 # PODNAME
@@ -53,15 +54,15 @@ sub _parse_and_check_response {
     return _check_api_response($r);
 }
   
-# Checks whether the HTTP response is an error. Carps and returns undef if it is.
+# Checks whether the HTTP response is an error.
+# Returns an error object if there's an HTTP error.
 # Returns the decoded HTTP content on success.
-# On failure returns 'false'.
 sub _check_http_response {
     my ($http_response) = @_;
 
     if ($http_response->is_error) {
         my $err = "HTTP Error: @{[$http_response->status_line]} - @{[$http_response->code]}";
-        return ERROR($err, 0);
+        return fatal_error($err, 0);
     }
 
     return $http_response->decoded_content;
@@ -76,14 +77,14 @@ sub _check_api_response {
     return $http_content unless $http_content;
 
     my $api_response = XML::Twig->new->safe_parse( $http_content );
-    return ERROR('Invalid XML returned in PA response') unless $api_response;
+    return fatal_error('Invalid XML returned in PA response') unless $api_response;
 
     $api_response = $api_response->simplify( forcearray => ['entry'] );
 
     if ($api_response->{status} eq 'error') {
         my $error_string = _clean_error_message($api_response);
         my $err = "API Error: $error_string  (Code: $api_response->{code})";
-        return ERROR($err);
+        return fatal_error($err);
     }
 
     return $api_response;
@@ -105,7 +106,6 @@ sub _clean_error_message {
     if (!$error_structure) {
         return $response->{msg}{line};
     } elsif ($error_structure eq 'ARRAY') {
-        say 'ere';
         return join(', ', @{$response->{msg}{line}});
     } else {
         return '';
@@ -120,8 +120,11 @@ use Data::Dumper;
 sub _debug_pre_wrap {
     my $self = shift;
     my ($http_request) = @_;
-    say "REQUEST:";
+    say "Request:";
     say $http_request->as_string;
+
+    say "Decoded Request:";
+    say URI::Encode->new->decode( $http_request->as_string );
 }
 
 sub _debug_post_wrap {
@@ -147,7 +150,7 @@ Device::Firewall::PaloAlto::API - Palo Alto firewall API module
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 DESCRIPTION
 

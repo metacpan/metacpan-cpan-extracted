@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -51,6 +51,7 @@ sub numeq_array {
 
 #------------------------------------------------------------------------------
 # A096235 to A096245
+# number of deletable primes of n digits
 
 foreach my $num (96235 .. 96245) {
   my $anum = sprintf 'A%06d', $num;

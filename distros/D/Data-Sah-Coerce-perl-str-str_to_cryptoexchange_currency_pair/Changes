@@ -1,3 +1,13 @@
-0.001   2018-06-06 (PERLANCAR)
+0.003   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.002   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.001   2018-06-06  Released-By: PERLANCAR
 
         - First release.

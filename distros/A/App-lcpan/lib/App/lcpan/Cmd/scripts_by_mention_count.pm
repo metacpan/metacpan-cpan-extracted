@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::scripts_by_mention_count;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.035'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '1.037'; # VERSION
 
 use 5.010;
 use strict;
@@ -100,7 +100,7 @@ App::lcpan::Cmd::scripts_by_mention_count - List scripts ranked by number of men
 
 =head1 VERSION
 
-This document describes version 1.035 of App::lcpan::Cmd::scripts_by_mention_count (from Perl distribution App-lcpan), released on 2019-06-26.
+This document describes version 1.037 of App::lcpan::Cmd::scripts_by_mention_count (from Perl distribution App-lcpan), released on 2019-07-23.
 
 =head1 FUNCTIONS
 

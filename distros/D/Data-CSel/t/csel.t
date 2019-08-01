@@ -503,6 +503,13 @@ subtest "option: class_prefixes" => sub {
         nodes  => [$n{root}],
         result => [@n{qw/a2/}],
     );
+    test_csel(
+        name   => "with prefix",
+        expr   => ".TN2",
+        opts   => {class_prefixes=>['Local']},
+        nodes  => [$n{root}],
+        result => [@n{qw/a2/}],
+    );
 };
 
 DONE_TESTING:

@@ -1,5 +1,5 @@
 package Pod::PseudoPod::LaTeX;
-$Pod::PseudoPod::LaTeX::VERSION = '1.20160626';
+$Pod::PseudoPod::LaTeX::VERSION = '1.20190729';
 use Pod::PseudoPod 0.16;
 
 use base 'Pod::PseudoPod';
@@ -874,9 +874,9 @@ work under free software guidelines.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2006, 2009 - 2011, chromatic.
+Copyright (c) 2006, 2009 - 2019, chromatic.
 
 This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl 5.14
+the same terms as Perl 5.30.
 
 =cut

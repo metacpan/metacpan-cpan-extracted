@@ -1,0 +1,58 @@
+Net-Connection-lsof
+
+Uses lsof to generate a array of Net::Connection objects.
+
+    use Net::Connection::lsof;
+
+    my @objects;
+    eval{ @objects = &lsof_to_nc_objects; };
+
+    # this time don't resolve ports, ptrs, or usernames
+    my $args={
+             ports=>0,
+             ptrs=>0,
+             uid_resolve=>0,
+             };
+    eval{ @objects = &lsof_to_nc_objects($args); };
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Connection::lsof
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Connection-lsof
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Connection-lsof
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Net-Connection-lsof
+
+    Search CPAN
+        https://metacpan.org/release/Net-Connection-lsof
+
+    Git Repo
+        https://gitea.eesdp.org/vvelox/Net-Connection-lsof
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

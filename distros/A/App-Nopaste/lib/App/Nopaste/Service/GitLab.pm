@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::GitLab;
 # ABSTRACT: Service provider for GitLab snippets
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use parent 'App::Nopaste::Service';
 
@@ -101,7 +101,7 @@ App::Nopaste::Service::GitLab - Service provider for GitLab snippets
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =head1 NAME
 

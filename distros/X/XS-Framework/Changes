@@ -1,3 +1,16 @@
+1.1.5  31.07.2019
+           - fix very specific bug with creating globs (only perl 5.22.0-5.26.0)
+1.1.4  30.07.2019
+           - add swap(Sv, Sv)
+           - fix 32bit system + 64bit perl test
+           - fix building and tests on perls < 5.24
+1.1.3  25.07.2019
+           - require newer XS::Install
+1.1.2  24.07.2019
+           - test (function.t) bug fix, require newer XS::Install
+           - fix glob.t warnings 'once'
+1.1.1  23.07.2019
+           - test bug fix
 1.1.0  22.07.2019
            - fix compilation errors on clang
            - fix compilation warnings (withc lambda cv capture)

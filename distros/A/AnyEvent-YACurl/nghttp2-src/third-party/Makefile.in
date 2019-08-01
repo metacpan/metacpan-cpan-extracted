@@ -134,24 +134,33 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libhttp_parser_la_LIBADD =
-am__libhttp_parser_la_SOURCES_DIST = http-parser/http_parser.c \
-	http-parser/http_parser.h
+libllhttp_la_LIBADD =
+am__libllhttp_la_SOURCES_DIST = llhttp/src/api.c llhttp/src/http.c \
+	llhttp/src/llhttp.c llhttp/include/llhttp.h
 am__dirstamp = $(am__leading_dot)dirstamp
-@ENABLE_THIRD_PARTY_TRUE@am_libhttp_parser_la_OBJECTS =  \
-@ENABLE_THIRD_PARTY_TRUE@	http-parser/http_parser.lo
-libhttp_parser_la_OBJECTS = $(am_libhttp_parser_la_OBJECTS)
+@ENABLE_THIRD_PARTY_TRUE@am_libllhttp_la_OBJECTS =  \
+@ENABLE_THIRD_PARTY_TRUE@	llhttp/src/libllhttp_la-api.lo \
+@ENABLE_THIRD_PARTY_TRUE@	llhttp/src/libllhttp_la-http.lo \
+@ENABLE_THIRD_PARTY_TRUE@	llhttp/src/libllhttp_la-llhttp.lo
+libllhttp_la_OBJECTS = $(am_libllhttp_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-@ENABLE_THIRD_PARTY_TRUE@am_libhttp_parser_la_rpath =
+@ENABLE_THIRD_PARTY_TRUE@am_libllhttp_la_rpath =
 libneverbleed_la_DEPENDENCIES =
 am__libneverbleed_la_SOURCES_DIST = neverbleed/neverbleed.c \
 	neverbleed/neverbleed.h
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_NEVERBLEED_TRUE@am_libneverbleed_la_OBJECTS = neverbleed/libneverbleed_la-neverbleed.lo
 libneverbleed_la_OBJECTS = $(am_libneverbleed_la_OBJECTS)
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_NEVERBLEED_TRUE@am_libneverbleed_la_rpath =
+liburl_parser_la_LIBADD =
+am__liburl_parser_la_SOURCES_DIST = url-parser/url_parser.c \
+	url-parser/url_parser.h
+@ENABLE_THIRD_PARTY_TRUE@am_liburl_parser_la_OBJECTS =  \
+@ENABLE_THIRD_PARTY_TRUE@	url-parser/url_parser.lo
+liburl_parser_la_OBJECTS = $(am_liburl_parser_la_OBJECTS)
+@ENABLE_THIRD_PARTY_TRUE@am_liburl_parser_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -167,8 +176,11 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = http-parser/$(DEPDIR)/http_parser.Plo \
-	neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Plo
+am__depfiles_remade = llhttp/src/$(DEPDIR)/libllhttp_la-api.Plo \
+	llhttp/src/$(DEPDIR)/libllhttp_la-http.Plo \
+	llhttp/src/$(DEPDIR)/libllhttp_la-llhttp.Plo \
+	neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Plo \
+	url-parser/$(DEPDIR)/url_parser.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -188,9 +200,11 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libhttp_parser_la_SOURCES) $(libneverbleed_la_SOURCES)
-DIST_SOURCES = $(am__libhttp_parser_la_SOURCES_DIST) \
-	$(am__libneverbleed_la_SOURCES_DIST)
+SOURCES = $(libllhttp_la_SOURCES) $(libneverbleed_la_SOURCES) \
+	$(liburl_parser_la_SOURCES)
+DIST_SOURCES = $(am__libllhttp_la_SOURCES_DIST) \
+	$(am__libneverbleed_la_SOURCES_DIST) \
+	$(am__liburl_parser_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -399,12 +413,19 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = @DEFS@
 EXTRA_DIST = CMakeLists.txt $(am__append_2)
-@ENABLE_THIRD_PARTY_TRUE@noinst_LTLIBRARIES = libhttp-parser.la \
-@ENABLE_THIRD_PARTY_TRUE@	$(am__append_1)
-@ENABLE_THIRD_PARTY_TRUE@libhttp_parser_la_SOURCES = \
-@ENABLE_THIRD_PARTY_TRUE@	http-parser/http_parser.c \
-@ENABLE_THIRD_PARTY_TRUE@	http-parser/http_parser.h
+@ENABLE_THIRD_PARTY_TRUE@noinst_LTLIBRARIES = liburl-parser.la \
+@ENABLE_THIRD_PARTY_TRUE@	libllhttp.la $(am__append_1)
+@ENABLE_THIRD_PARTY_TRUE@liburl_parser_la_SOURCES = \
+@ENABLE_THIRD_PARTY_TRUE@	url-parser/url_parser.c \
+@ENABLE_THIRD_PARTY_TRUE@	url-parser/url_parser.h
 
+@ENABLE_THIRD_PARTY_TRUE@libllhttp_la_SOURCES = \
+@ENABLE_THIRD_PARTY_TRUE@	llhttp/src/api.c \
+@ENABLE_THIRD_PARTY_TRUE@	llhttp/src/http.c \
+@ENABLE_THIRD_PARTY_TRUE@	llhttp/src/llhttp.c \
+@ENABLE_THIRD_PARTY_TRUE@	llhttp/include/llhttp.h
+
+@ENABLE_THIRD_PARTY_TRUE@libllhttp_la_CPPFLAGS = -I${srcdir}/llhttp/include
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_NEVERBLEED_TRUE@libneverbleed_la_CPPFLAGS = @OPENSSL_CFLAGS@
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_NEVERBLEED_TRUE@libneverbleed_la_LIBADD = @OPENSSL_LIBS@
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_NEVERBLEED_TRUE@libneverbleed_la_SOURCES = neverbleed/neverbleed.c neverbleed/neverbleed.h
@@ -452,17 +473,21 @@ clean-noinstLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-http-parser/$(am__dirstamp):
-	@$(MKDIR_P) http-parser
-	@: > http-parser/$(am__dirstamp)
-http-parser/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) http-parser/$(DEPDIR)
-	@: > http-parser/$(DEPDIR)/$(am__dirstamp)
-http-parser/http_parser.lo: http-parser/$(am__dirstamp) \
-	http-parser/$(DEPDIR)/$(am__dirstamp)
+llhttp/src/$(am__dirstamp):
+	@$(MKDIR_P) llhttp/src
+	@: > llhttp/src/$(am__dirstamp)
+llhttp/src/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) llhttp/src/$(DEPDIR)
+	@: > llhttp/src/$(DEPDIR)/$(am__dirstamp)
+llhttp/src/libllhttp_la-api.lo: llhttp/src/$(am__dirstamp) \
+	llhttp/src/$(DEPDIR)/$(am__dirstamp)
+llhttp/src/libllhttp_la-http.lo: llhttp/src/$(am__dirstamp) \
+	llhttp/src/$(DEPDIR)/$(am__dirstamp)
+llhttp/src/libllhttp_la-llhttp.lo: llhttp/src/$(am__dirstamp) \
+	llhttp/src/$(DEPDIR)/$(am__dirstamp)
 
-libhttp-parser.la: $(libhttp_parser_la_OBJECTS) $(libhttp_parser_la_DEPENDENCIES) $(EXTRA_libhttp_parser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) $(am_libhttp_parser_la_rpath) $(libhttp_parser_la_OBJECTS) $(libhttp_parser_la_LIBADD) $(LIBS)
+libllhttp.la: $(libllhttp_la_OBJECTS) $(libllhttp_la_DEPENDENCIES) $(EXTRA_libllhttp_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) $(am_libllhttp_la_rpath) $(libllhttp_la_OBJECTS) $(libllhttp_la_LIBADD) $(LIBS)
 neverbleed/$(am__dirstamp):
 	@$(MKDIR_P) neverbleed
 	@: > neverbleed/$(am__dirstamp)
@@ -474,19 +499,35 @@ neverbleed/libneverbleed_la-neverbleed.lo: neverbleed/$(am__dirstamp) \
 
 libneverbleed.la: $(libneverbleed_la_OBJECTS) $(libneverbleed_la_DEPENDENCIES) $(EXTRA_libneverbleed_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) $(am_libneverbleed_la_rpath) $(libneverbleed_la_OBJECTS) $(libneverbleed_la_LIBADD) $(LIBS)
+url-parser/$(am__dirstamp):
+	@$(MKDIR_P) url-parser
+	@: > url-parser/$(am__dirstamp)
+url-parser/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) url-parser/$(DEPDIR)
+	@: > url-parser/$(DEPDIR)/$(am__dirstamp)
+url-parser/url_parser.lo: url-parser/$(am__dirstamp) \
+	url-parser/$(DEPDIR)/$(am__dirstamp)
+
+liburl-parser.la: $(liburl_parser_la_OBJECTS) $(liburl_parser_la_DEPENDENCIES) $(EXTRA_liburl_parser_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) $(am_liburl_parser_la_rpath) $(liburl_parser_la_OBJECTS) $(liburl_parser_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f http-parser/*.$(OBJEXT)
-	-rm -f http-parser/*.lo
+	-rm -f llhttp/src/*.$(OBJEXT)
+	-rm -f llhttp/src/*.lo
 	-rm -f neverbleed/*.$(OBJEXT)
 	-rm -f neverbleed/*.lo
+	-rm -f url-parser/*.$(OBJEXT)
+	-rm -f url-parser/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@http-parser/$(DEPDIR)/http_parser.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@llhttp/src/$(DEPDIR)/libllhttp_la-api.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@llhttp/src/$(DEPDIR)/libllhttp_la-http.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@llhttp/src/$(DEPDIR)/libllhttp_la-llhttp.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@url-parser/$(DEPDIR)/url_parser.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -518,6 +559,27 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
+llhttp/src/libllhttp_la-api.lo: llhttp/src/api.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libllhttp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT llhttp/src/libllhttp_la-api.lo -MD -MP -MF llhttp/src/$(DEPDIR)/libllhttp_la-api.Tpo -c -o llhttp/src/libllhttp_la-api.lo `test -f 'llhttp/src/api.c' || echo '$(srcdir)/'`llhttp/src/api.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) llhttp/src/$(DEPDIR)/libllhttp_la-api.Tpo llhttp/src/$(DEPDIR)/libllhttp_la-api.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='llhttp/src/api.c' object='llhttp/src/libllhttp_la-api.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libllhttp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o llhttp/src/libllhttp_la-api.lo `test -f 'llhttp/src/api.c' || echo '$(srcdir)/'`llhttp/src/api.c
+
+llhttp/src/libllhttp_la-http.lo: llhttp/src/http.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libllhttp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT llhttp/src/libllhttp_la-http.lo -MD -MP -MF llhttp/src/$(DEPDIR)/libllhttp_la-http.Tpo -c -o llhttp/src/libllhttp_la-http.lo `test -f 'llhttp/src/http.c' || echo '$(srcdir)/'`llhttp/src/http.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) llhttp/src/$(DEPDIR)/libllhttp_la-http.Tpo llhttp/src/$(DEPDIR)/libllhttp_la-http.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='llhttp/src/http.c' object='llhttp/src/libllhttp_la-http.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libllhttp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o llhttp/src/libllhttp_la-http.lo `test -f 'llhttp/src/http.c' || echo '$(srcdir)/'`llhttp/src/http.c
+
+llhttp/src/libllhttp_la-llhttp.lo: llhttp/src/llhttp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libllhttp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT llhttp/src/libllhttp_la-llhttp.lo -MD -MP -MF llhttp/src/$(DEPDIR)/libllhttp_la-llhttp.Tpo -c -o llhttp/src/libllhttp_la-llhttp.lo `test -f 'llhttp/src/llhttp.c' || echo '$(srcdir)/'`llhttp/src/llhttp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) llhttp/src/$(DEPDIR)/libllhttp_la-llhttp.Tpo llhttp/src/$(DEPDIR)/libllhttp_la-llhttp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='llhttp/src/llhttp.c' object='llhttp/src/libllhttp_la-llhttp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libllhttp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o llhttp/src/libllhttp_la-llhttp.lo `test -f 'llhttp/src/llhttp.c' || echo '$(srcdir)/'`llhttp/src/llhttp.c
+
 neverbleed/libneverbleed_la-neverbleed.lo: neverbleed/neverbleed.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libneverbleed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT neverbleed/libneverbleed_la-neverbleed.lo -MD -MP -MF neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Tpo -c -o neverbleed/libneverbleed_la-neverbleed.lo `test -f 'neverbleed/neverbleed.c' || echo '$(srcdir)/'`neverbleed/neverbleed.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Tpo neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Plo
@@ -530,8 +592,9 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf http-parser/.libs http-parser/_libs
+	-rm -rf llhttp/src/.libs llhttp/src/_libs
 	-rm -rf neverbleed/.libs neverbleed/_libs
+	-rm -rf url-parser/.libs url-parser/_libs
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -650,10 +713,12 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f http-parser/$(DEPDIR)/$(am__dirstamp)
-	-rm -f http-parser/$(am__dirstamp)
+	-rm -f llhttp/src/$(DEPDIR)/$(am__dirstamp)
+	-rm -f llhttp/src/$(am__dirstamp)
 	-rm -f neverbleed/$(DEPDIR)/$(am__dirstamp)
 	-rm -f neverbleed/$(am__dirstamp)
+	-rm -f url-parser/$(DEPDIR)/$(am__dirstamp)
+	-rm -f url-parser/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -666,8 +731,11 @@ clean-am: clean-generic clean-libtool clean-local \
 	clean-noinstLTLIBRARIES mostlyclean-am
 
 distclean: distclean-am
-		-rm -f http-parser/$(DEPDIR)/http_parser.Plo
+		-rm -f llhttp/src/$(DEPDIR)/libllhttp_la-api.Plo
+	-rm -f llhttp/src/$(DEPDIR)/libllhttp_la-http.Plo
+	-rm -f llhttp/src/$(DEPDIR)/libllhttp_la-llhttp.Plo
 	-rm -f neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Plo
+	-rm -f url-parser/$(DEPDIR)/url_parser.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -713,8 +781,11 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f http-parser/$(DEPDIR)/http_parser.Plo
+		-rm -f llhttp/src/$(DEPDIR)/libllhttp_la-api.Plo
+	-rm -f llhttp/src/$(DEPDIR)/libllhttp_la-http.Plo
+	-rm -f llhttp/src/$(DEPDIR)/libllhttp_la-llhttp.Plo
 	-rm -f neverbleed/$(DEPDIR)/libneverbleed_la-neverbleed.Plo
+	-rm -f url-parser/$(DEPDIR)/url_parser.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -758,8 +829,9 @@ uninstall-am:
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	MRUBY_CONFIG="${srcdir}/build_config.rb" \
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	BUILD_DIR="${abs_builddir}/mruby/build" \
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	INSTALL_DIR="${abs_builddir}/mruby/build/install/bin" \
-@ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	CC="${CC}" CXX="${CXX}" LD="${LD}" \
-@ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	CFLAGS="${CPPFLAGS} ${CFLAGS}" CXXFLAGS="${CPPFLAGS} ${CXXFLAGS}" \
+@ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	CC="${CC}" CXX="$(firstword $(CXX))" LD="${LD}" \
+@ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	CFLAGS="${CPPFLAGS} ${CFLAGS}" \
+@ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	CXXFLAGS="$(wordlist 2, $(words $(CXX)), $(CXX)) ${CPPFLAGS} ${CXXFLAGS}" \
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	LDFLAGS="${LDFLAGS}" \
 @ENABLE_THIRD_PARTY_TRUE@@HAVE_MRUBY_TRUE@	"${srcdir}/mruby/minirake" -f "${srcdir}/mruby/Rakefile"
 

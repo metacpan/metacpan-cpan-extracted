@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.724'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.726'; # VERSION
 
 use 5.010;
 use strict;
@@ -73,7 +73,7 @@ pmlines - Count number of {code,POD} lines in a Perl module
 
 =head1 VERSION
 
-This document describes version 0.724 of pmlines (from Perl distribution App-PMUtils), released on 2019-06-20.
+This document describes version 0.726 of pmlines (from Perl distribution App-PMUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 
@@ -97,13 +97,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--module-json>=I<s>
-
-See C<--module>.
-
-=item B<--module>=I<s@>*
-
-Can be specified multiple times.
+=item B<--module>=I<s>*
 
 =back
 
@@ -111,7 +105,7 @@ Can be specified multiple times.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

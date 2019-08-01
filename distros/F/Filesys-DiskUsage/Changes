@@ -1,5 +1,8 @@
 Revision history for Filesys::DiskUsage
 
+0.13  2019-07-28 MANWAR
+      - Added 'count-dir' as patch supplied by Adam Osuchowski.
+
 0.12  2018-10-22 MANWAR
       - Added key 'provides' as suggested by CPANTS.
 

@@ -21,22 +21,22 @@ subtest 'sub->function' => sub {
             is $arg, 142;
         }, 42);
     };
-    subtest 'int(int,double)' => sub {
-        my $res = F::s2f_iid(sub {
+    subtest 'int(int,string_view)' => sub {
+        my $res = F::s2f_iis(sub {
             my ($i, $d) = @_;
             is $i, 42;
-            is $d, 3.14;
+            is $d, "the string";
             return 10;
-        }, 42, 3.14);
+        }, 42, "the string");
         is $res, 10;
     };
-    subtest 'int(int,double) custom' => sub {
-        my $res = F::s2f_iid_custom(sub {
+    subtest 'int(int,string_view) custom' => sub {
+        my $res = F::s2f_iis_custom(sub {
             my ($i, $d) = @_;
             is $i, 142;
-            is $d, 3.14;
+            is $d, "a string";
             return 10;
-        }, 42, 3.14);
+        }, 42, "a string");
         is $res, 20;
     };
     subtest 'sub->function->sub' => sub {

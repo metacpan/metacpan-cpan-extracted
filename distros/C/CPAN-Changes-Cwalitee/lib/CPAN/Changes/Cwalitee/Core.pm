@@ -1,7 +1,7 @@
 package CPAN::Changes::Cwalitee::Core;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -394,15 +394,116 @@ sub indicator_english {
     [200, "OK", ''];
 }
 
+$SPEC{indicator_no_duplicate_version} = {
+    v => 1.1,
+    summary => 'Versions are unique',
+    args => {
+    },
+};
+sub indicator_no_duplicate_version {
+    require Data::Cmp;
+    require List::Util;
+
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+    my @vers = sort map { $_->{version} } @{ $p->{_releases_array} // [] };
+    my @uniq_vers = List::Util::uniq(@vers);
+    if (Data::Cmp::cmp_data(\@vers, \@uniq_vers) == 0) {
+        return [200, "OK", ''];
+    } else {
+        return [200, "OK", "There are some duplicate versions"];
+    }
+}
+
+$SPEC{indicator_has_releases} = {
+    v => 1.1,
+    summary => 'There is at least one release',
+    description => <<'_',
+
+The lack of releases could mean the releases are misparsed as preamble due to
+inappropriate format.
+
+_
+    args => {
+    },
+};
+sub indicator_has_releases {
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+    if (keys %{ $p->{releases} }) {
+        return [200, "OK", ''];
+    } else {
+        return [200, "OK", "There are no releases"];
+    }
+}
+
+$SPEC{indicator_preamble_has_no_releases} = {
+    v => 1.1,
+    summary => 'There does not look like releases in the preamble',
+    description => <<'_',
+
+This might mean the releases are misparsed as preamble due to inappropriate
+format.
+
+_
+    args => {
+    },
+};
+sub indicator_preamble_has_no_releases {
+    my %args = @_;
+    my $r = $args{r};
+
+    my $p = $r->{parsed};
+    defined $p or return [412];
+
+    my $score = 0;
+    my @notes;
+
+    my @lines = split /^/m, $p->{preamble};
+
+    if (@lines > 10) {
+        $score += 1;
+        push @notes, "too long (>10 lines)";
+    }
+    {
+        my $num_ver_line = 0;
+        my $num_change_line = 0;
+        for (@lines) {
+            $num_ver_line++ if /^\s*(v|ver|version|rel|release)\s*\d/i;
+            $num_change_line++ if /^\s*(-|\*|\+)/;
+        }
+        if ($num_ver_line >= 2) {
+            $score += 1 + $num_ver_line/3;
+            push @notes, "many lines look like version lines";
+        }
+        if ($num_change_line >= 2) {
+            $score += 1 + $num_change_line/6;
+            push @notes, "many lines look like change lines";
+        }
+    }
+
+    if ($score < 2) {
+        return [200, "OK", ''];
+    } else {
+        return [200, "OK", "Preamble looks like it contains releases (".join(", ", @notes).")"];
+    }
+}
+
 # TODO: indicator_sufficient_entries_length
 # TODO: indicator_version_correct_format
 # TODO: indicator_not_commit_logs
 # TODO: indicator_name_preferred (e.g. Changes and not ChangeLog.txt)
-# TODO: indicator_no_duplicate_version
 # TODO: indicator_preamble_not_template
 # TODO: indicator_entries_not_template
 # TODO: indicator_entries_english_tense_consistent (all past tense, or all present tense)
-# TODO: indicator_preamble_not_too_long (this could indicate misparsing releases as preamble, e.g. when each version is prefixed by a non-number, e.g. in XML-Compile)
 # TODO: indicator_indentation_consistent
 
 1;
@@ -420,7 +521,7 @@ CPAN::Changes::Cwalitee::Core - A collection of core indicators for CPAN Changes
 
 =head1 VERSION
 
-This document describes version 0.004 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-08.
+This document describes version 0.007 of CPAN::Changes::Cwalitee::Core (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-26.
 
 =head1 FUNCTIONS
 
@@ -496,6 +597,59 @@ Usage:
  indicator_english() -> [status, msg, payload, meta]
 
 Preamble and change entries are in English.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_has_releases
+
+Usage:
+
+ indicator_has_releases() -> [status, msg, payload, meta]
+
+There is at least one release.
+
+The lack of releases could mean the releases are misparsed as preamble due to
+inappropriate format.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_no_duplicate_version
+
+Usage:
+
+ indicator_no_duplicate_version() -> [status, msg, payload, meta]
+
+Versions are unique.
 
 This function is not exported.
 
@@ -652,6 +806,34 @@ Usage:
  indicator_parsable() -> [status, msg, payload, meta]
 
 Parseable by CPAN::Changes.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 indicator_preamble_has_no_releases
+
+Usage:
+
+ indicator_preamble_has_no_releases() -> [status, msg, payload, meta]
+
+There does not look like releases in the preamble.
+
+This might mean the releases are misparsed as preamble due to inappropriate
+format.
 
 This function is not exported.
 

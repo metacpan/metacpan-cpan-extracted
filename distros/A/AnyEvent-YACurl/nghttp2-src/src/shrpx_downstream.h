@@ -38,6 +38,8 @@
 
 #include <nghttp2/nghttp2.h>
 
+#include "llhttp.h"
+
 #include "shrpx_io_control.h"
 #include "shrpx_log_config.h"
 #include "http2.h"
@@ -116,6 +118,10 @@ public:
   void append_last_trailer_value(const char *data, size_t len);
 
   bool trailer_key_prev() const { return trailer_key_prev_; }
+
+  // erase_content_length_and_transfer_encoding erases content-length
+  // and transfer-encoding header fields.
+  void erase_content_length_and_transfer_encoding();
 
   // content-length, -1 if it is unknown.
   int64_t content_length;

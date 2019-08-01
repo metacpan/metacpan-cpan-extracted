@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
         'Tie::IxHash'        => '1.22',
         'JSON'               => 0,
     },
-    add_to_cleanup           => ['Config-Neat-*', 'Makefile.PL', 'MYMETA.*', 'META.*'],
+    add_to_cleanup           => ['Config-Neat-*', 'Makefile.PL', 'MYMETA.*', 'META.*', 'MANIFEST.bak', 'MANIFEST'],
     create_makefile_pl       => 'traditional',
     meta_merge               => {
         resources            => {

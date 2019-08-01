@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -109,12 +109,14 @@ $oeis_anum{'both'}->[5]   = 'A001318';
 # OEIS-Catalogue: A005449 polygonal=5  pairs=second
 # OEIS-Catalogue: A001318 polygonal=5  pairs=both
 
-$oeis_anum{'first'}->[6]  = 'A000384';   # 6 hexagonal
-$oeis_anum{'second'}->[6] = 'A014105';
-$oeis_anum{'both'}->[6]   = 'A000217';   # together triangular numbers
+$oeis_anum{'first'}->[6]   = 'A000384';  # 6 hexagonal
+$oeis_anum{'second'}->[6]  = 'A014105';
+$oeis_anum{'both'}->[6]    = 'A000217';  # together triangular numbers
+$oeis_anum{'average'}->[6] = 'A001105';  # (k-2)/2==2 is 2*n^2
 # OEIS-Catalogue: A000384 polygonal=6  pairs=first
 # OEIS-Catalogue: A014105 polygonal=6  pairs=second
 # OEIS-Other:     A000217 polygonal=6  pairs=both
+# OEIS-Catalogue: A001105 polygonal=6  pairs=average
 
 $oeis_anum{'first'}->[7]  = 'A000566'; # 7 heptagonal n(5n-3)/2
 $oeis_anum{'both'}->[7]   = 'A085787';
@@ -126,10 +128,12 @@ $oeis_anum{'both'}->[7]   = 'A085787';
 # # $oeis_anum{'second'}->[7] = 'A147875'; # (5n-2)(n-1)/2
 # # # OEIS-Catalogue: A147875 polygonal=7 pairs=second
 
-$oeis_anum{'first'}->[8]  = 'A000567'; # 8 octagonal
-$oeis_anum{'second'}->[8] = 'A045944'; # Rhombic matchstick n*(3*n+2)
+$oeis_anum{'first'}->[8]   = 'A000567'; # 8 octagonal
+$oeis_anum{'second'}->[8]  = 'A045944'; # Rhombic matchstick n*(3*n+2)
+$oeis_anum{'average'}->[8] = 'A033428'; # (k-2)/2==3 is 3*squares
 # OEIS-Catalogue: A000567 polygonal=8
 # OEIS-Catalogue: A045944 polygonal=8 pairs=second
+# OEIS-Catalogue: A033428 polygonal=8 pairs=average
 #
 # A001082 n(3n-4)/4 if n even, (n-1)(3n+1)/4 if n odd
 # is not quite generalized octagonals
@@ -144,12 +148,14 @@ $oeis_anum{'both'}->[9]   = 'A118277'; # 9 nonagonal "generalized"
 # OEIS-Catalogue: A179986 polygonal=9 pairs=second
 # OEIS-Catalogue: A118277 polygonal=9 pairs=both
 
-$oeis_anum{'first'}->[10]  = 'A001107'; # 10 decogaonal
-$oeis_anum{'second'}->[10] = 'A033954'; # 10 second n*(4*n+3)
-$oeis_anum{'both'}->[10]   = 'A074377'; # 10 both "generalized"
+$oeis_anum{'first'}->[10]   = 'A001107'; # 10 decogaonal
+$oeis_anum{'second'}->[10]  = 'A033954'; # 10 second n*(4*n+3)
+$oeis_anum{'both'}->[10]    = 'A074377'; # 10 both "generalized"
+$oeis_anum{'average'}->[10] = 'A016742'; # (k-2)/2==4 is 4*squares
 # OEIS-Catalogue: A001107 polygonal=10
 # OEIS-Catalogue: A033954 polygonal=10 pairs=second
 # OEIS-Catalogue: A074377 polygonal=10 pairs=both
+# OEIS-Catalogue: A016742 polygonal=10 pairs=average
 
 $oeis_anum{'first'}->[11]  = 'A051682'; # 11 hendecagonal
 $oeis_anum{'second'}->[11] = 'A062728'; # 11 second n*(9n+7)/2
@@ -158,12 +164,14 @@ $oeis_anum{'both'}->[11]   = 'A195160'; # 11 generalized
 # OEIS-Catalogue: A062728 polygonal=11 pairs=second
 # OEIS-Catalogue: A195160 polygonal=11 pairs=both
 
-$oeis_anum{'first'}->[12]  = 'A051624'; # 12-gonal
-$oeis_anum{'second'}->[12] = 'A135705'; # 12-gonal second
-$oeis_anum{'both'}->[12]   = 'A195162'; # 12-gonal generalized
+$oeis_anum{'first'}->[12]   = 'A051624'; # 12-gonal
+$oeis_anum{'second'}->[12]  = 'A135705'; # 12-gonal second
+$oeis_anum{'both'}->[12]    = 'A195162'; # 12-gonal generalized
+$oeis_anum{'average'}->[12] = 'A033429'; # (k-2)/2==5 is 5*squares
 # OEIS-Catalogue: A051624 polygonal=12
 # OEIS-Catalogue: A135705 polygonal=12 pairs=second
 # OEIS-Catalogue: A195162 polygonal=12 pairs=both
+# OEIS-Catalogue: A033429 polygonal=12 pairs=average
 
 $oeis_anum{'second'}->[13] = 'A211013'; # 13-gonal second
 $oeis_anum{'both'}->[13]   = 'A195313'; # 13-gonal generalized
@@ -174,6 +182,13 @@ $oeis_anum{'second'}->[14] = 'A211014'; # 14-gonal second
 $oeis_anum{'both'}->[14]   = 'A195818'; # 14-gonal generalized
 # OEIS-Catalogue: A211014 polygonal=14 pairs=second
 # OEIS-Catalogue: A195818 polygonal=14 pairs=both
+
+$oeis_anum{'both'}->[15]   = 'A277082'; # 15-gonal generalized
+# OEIS-Catalogue: A277082 polygonal=15 pairs=both
+
+$oeis_anum{'both'}->[16]    = 'A274978'; # 16-gonal generalized
+$oeis_anum{'average'}->[16] = 'A033582'; # (k-2)/2==7 is 7*squares
+# OEIS-Catalogue: A033582 polygonal=16 pairs=average
 
 # these in sequence ...
 $oeis_anum{'first'}->[13]  =  'A051865'; # 13 tridecagonal
@@ -207,23 +222,8 @@ $oeis_anum{'first'}->[24]  =  'A051876'; # 24
 $oeis_anum{'second'}->[30] = 'A195028';
 # OEIS-Catalogue: A195028 polygonal=30 pairs=second   # 30 second
 
-$oeis_anum{'average'}->[6] = 'A001105'; # (k-2)/2==2 is 2*n^2
-# OEIS-Catalogue: A001105 polygonal=6 pairs=average
-
-$oeis_anum{'average'}->[8] = 'A033428'; # (k-2)/2==3 is 3*squares
-# OEIS-Catalogue: A033428 polygonal=8 pairs=average
-
-$oeis_anum{'average'}->[10] = 'A016742'; # (k-2)/2==4 is 4*squares
-# OEIS-Catalogue: A016742 polygonal=10 pairs=average
-
-$oeis_anum{'average'}->[12] = 'A033429'; # (k-2)/2==5 is 5*squares
-# OEIS-Catalogue: A033429 polygonal=12 pairs=average
-
 $oeis_anum{'average'}->[14] = 'A033581'; # (k-2)/2==6 is 6*squares
 # OEIS-Catalogue: A033581 polygonal=14 pairs=average
-
-$oeis_anum{'average'}->[16] = 'A033582'; # (k-2)/2==7 is 7*squares
-# OEIS-Catalogue: A033582 polygonal=16 pairs=average
 
 $oeis_anum{'second'}->[18] = 'A139278';
 $oeis_anum{'average'}->[18] = 'A139098'; # (k-2)/2==8 is 8*squares
@@ -544,7 +544,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

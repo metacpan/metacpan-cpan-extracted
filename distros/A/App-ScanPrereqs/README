@@ -1,4 +1,113 @@
-SYNOPSIS
+NAME
+    App::ScanPrereqs - Scan files/directories for prerequisites
 
+VERSION
+    This document describes version 0.005 of App::ScanPrereqs (from Perl
+    distribution App-ScanPrereqs), released on 2019-07-31.
+
+SYNOPSIS
      # Use via lint-prereqs CLI script
+
+FUNCTIONS
+  scan_prereqs
+    Usage:
+
+     scan_prereqs(%args) -> [status, msg, payload, meta]
+
+    Scan files/directories for prerequisites.
+
+    Examples:
+
+    *   By default scan current directory:
+
+         scan_prereqs();
+
+    This is an alternative CLI to scan_prereqs, with the following features:
+
+    *   merged output
+
+    scan_prereqs by default reports prereqs per source file, which may or
+    may not be what you want. This CLI outputs a single list of
+    prerequisites found from all input.
+
+    Aside from that, you can use "--json" to get a JSON output.
+
+    *   option to pick backend
+
+    Aside from Perl::PrereqScanner you can also use
+    Perl::PrereqScanner::Lite and Perl::PrereqScanner::NotQuiteLite.
+
+    *   filter only core or non-core prerequisites.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files => *array[pathname]* (default: ["."])
+
+    *   perlver => *str*
+
+        Perl version to use when determining core/non-core.
+
+        The default is the current perl version.
+
+    *   scanner => *str* (default: "regular")
+
+        Which scanner to use.
+
+        "regular" means Perl::PrereqScanner which is PPI-based and is the
+        slowest but has the most complete support for Perl syntax.
+
+        "lite" means Perl::PrereqScanner::Lite uses an XS-based lexer and is
+        the fastest but might miss some Perl syntax (i.e. miss some prereqs)
+        or crash if given some weird code.
+
+        "nqlite" means Perl::PrereqScanner::NotQuiteLite which is faster
+        than "regular" but not as fast as "lite".
+
+        Read respective scanner's documentation for more details about the
+        pro's and con's for each scanner.
+
+    *   show_core => *bool* (default: 1)
+
+        Whether or not to show core prerequisites.
+
+    *   show_noncore => *bool* (default: 1)
+
+        Whether or not to show non-core prerequisites.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ScanPrereqs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ScanPrereqs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ScanPrereqs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

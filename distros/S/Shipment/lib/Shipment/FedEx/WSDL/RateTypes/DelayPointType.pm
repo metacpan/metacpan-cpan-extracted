@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::DelayPointType;
-$Shipment::FedEx::WSDL::RateTypes::DelayPointType::VERSION = '3.01';
+$Shipment::FedEx::WSDL::RateTypes::DelayPointType::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::FedEx::WSDL::RateTypes::DelayPointType
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

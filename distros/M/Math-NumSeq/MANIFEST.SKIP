@@ -2,7 +2,7 @@
 
 # MANIFEST.SKIP -- Kevin's various excluded files
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2015 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2015, 2019 Kevin Ryde
 
 # This file is shared among several distributions.
 #
@@ -36,6 +36,8 @@
 \.tar$
 \.tar\.gz$
 \.deb$
+\.dsc$
+\.diff.gz$
 
 # ExtUtils::MakeMaker leaving Makefile.old
 # and "myman" leaving MANIFEST.old

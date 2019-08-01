@@ -1,17 +1,30 @@
-0.003   2017-07-03 (PERLANCAR)
+0.005   2019-07-31  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Tweak Description.
+
+
+0.004   2019-07-31  Released-By: PERLANCAR; Urgency: high
+
+        - [build] Rebuild to remove dependency to Sah coerce rule module that is
+          now renamed.
+
+
+0.003   2017-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::ger.
 
 
-0.002   2017-03-08 (PERLANCAR)
+0.002   2017-03-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix Rinci metadata: don't test or render result of example.
 
 
-0.001   2017-01-13 (PERLANCAR)
+0.001   2017-01-13  Released-By: PERLANCAR
 
         - First release.

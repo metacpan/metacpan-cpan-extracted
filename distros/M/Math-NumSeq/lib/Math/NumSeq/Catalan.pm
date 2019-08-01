@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION','@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -405,7 +405,7 @@ The Catalan numbers
     C(n) = binomial(2n,n) / (n+1)
          = (2n)! / (n!*(n+1)!)
 
-    1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796, ...
+    1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796, ...  (A000108)
     starting i=0
 
 From the factorial expression it can be seen the values grow roughly as a
@@ -422,7 +422,7 @@ number, ie. with factors of 2 divided out,
 
     values_type => "odd"
 
-    1, 1, 1, 5, 7, 21, 33, 429, 715, 2431, 4199, ...
+    1, 1, 1, 5, 7, 21, 33, 429, 715, 2431, 4199, ...  (A098597)
     starting i=0
 
 The number of 2s in C(i) is
@@ -500,7 +500,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

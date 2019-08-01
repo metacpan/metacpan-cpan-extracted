@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use v5.16;
+use strict;
+use warnings;
+use utf8;
+
+use lib qw(../lib);
+
+use Carp;
+use Test::More;
+use Data::Dumper;
+
+use SqlBatch::PlanTagFilter;
+require_ok('SqlBatch::PlanTagFilter');
+
+my $app = SqlBatch::Engine->new("-directory=testrun1");
+$app->run();

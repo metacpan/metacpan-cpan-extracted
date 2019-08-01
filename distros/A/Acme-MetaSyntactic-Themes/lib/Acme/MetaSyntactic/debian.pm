@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::debian;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 __PACKAGE__->init();
 1;
 
@@ -24,6 +24,13 @@ Philippe Bruhat (Book).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-07-29 - v1.004
+
+Added C<bullseye> and C<bookworm> to the list of Debiam codenames.
+Published in Acme-MetaSyntactic-Themes version 1.053.
 
 =item *
 
@@ -74,4 +81,5 @@ hamm slink potato
 woody sarge etch
 lenny squeeze wheezy
 jessie stretch buster
+bullseye bookworm
 sid

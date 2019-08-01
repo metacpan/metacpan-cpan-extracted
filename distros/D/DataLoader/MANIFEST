@@ -1,5 +1,6 @@
-lib/DataLoader.pm
+Changes
 lib/DataLoader/Error.pm
+lib/DataLoader.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -14,6 +15,11 @@ t/errors.t
 t/job-queue-ordering.t
 t/lib/DataLoader/Test.pm
 t/options.t
+t/poll-backend.t
 t/test-libs.t
+xt/criticrc
+xt/pod-coverage.t
+xt/pod.t
+xt/zz-critic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

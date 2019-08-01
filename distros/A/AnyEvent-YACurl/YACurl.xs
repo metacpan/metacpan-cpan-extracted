@@ -29,6 +29,7 @@ typedef struct {
     curl_mime *mimepost;
 
     AV *held_references;
+    FILE *redirected_stderr;
     int slists_count;
     struct curl_slist **slists;
     char errbuf[CURL_ERROR_SIZE];
@@ -187,6 +188,36 @@ size_t mcurl_read_callback(char *buffer,
     return result;
 }
 
+int mcurl_debug_callback(CURL *handle,
+                         curl_infotype type,
+                         char *data,
+                         size_t size,
+                         void *userdata)
+{
+    dTHX;
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(type)));
+    PUSHs(sv_2mortal(newSVpvn(data, size)));
+    PUTBACK;
+
+    call_sv((SV*)userdata, G_DISCARD | G_VOID | G_EVAL);
+
+    SPAGAIN;
+    maybe_warn_eval(aTHX);
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+
+    return 0;
+}
+
 int finish_request(pTHX_ AnyEvent__YACurl* client, CURL* easy, CURLcode code)
 {
     AnyEvent__YACurl__Response *response;
@@ -261,23 +292,17 @@ int do_post_work(pTHX_ AnyEvent__YACurl* client)
         }
 
         {
-            struct CURLMsg *m = NULL;
+            int msgq;
+            struct CURLMsg *m = curl_multi_info_read(client->multi, &msgq);
 
-            client->needs_read_info = 0;
-            do {
-                int msgq;
-                m = curl_multi_info_read(client->multi, &msgq);
-                if (m && (m->msg == CURLMSG_DONE)) {
-                    CURL *e = m->easy_handle;
+            if (m && (m->msg == CURLMSG_DONE)) {
+                CURL *e = m->easy_handle;
 
-                    finish_request(aTHX_ client, e, m->data.result);
-                    curl_multi_remove_handle(client->multi, e);
+                curl_multi_remove_handle(client->multi, e);
+                finish_request(aTHX_ client, e, m->data.result);
+            }
 
-                    /* XXX: finish_request can invoke callbacks which could call us again and then call do_post_work
-                     * while we're still running, thus calling curl_multi_info_read again which can clear previous events.
-                     * Not good. */
-                }
-            } while(m);
+            client->needs_read_info = m ? 1 : 0;
         }
     }
 
@@ -393,16 +418,7 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
         }
 
         /* string lists */
-        case CURLOPT_HTTPHEADER:
-        case CURLOPT_PROXYHEADER:
-        case CURLOPT_HTTP200ALIASES:
-        case CURLOPT_MAIL_RCPT:
-        case CURLOPT_POSTQUOTE:
-        case CURLOPT_PREQUOTE:
-        case CURLOPT_QUOTE:
-        case CURLOPT_RESOLVE:
-        case CURLOPT_TELNETOPTIONS:
-        case CURLOPT_CONNECT_TO:
+#include "curlopt-slist.inc"
         {
             if (!SvROK(parameter) || SvTYPE(SvRV(parameter)) != SVt_PVAV) {
                 croak("Cannot convert %s to ARRAY reference", SvPV_nolen(parameter));
@@ -418,10 +434,26 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
             break;
         }
 
+        /* File handles */
+        case CURLOPT_STDERR:
+        {
+            if (request->redirected_stderr) {
+                fclose(request->redirected_stderr);
+            }
+            request->redirected_stderr = fdopen(dup(SvIV(parameter)), "a");
+            if (!request->redirected_stderr) {
+                croak("Cannot set CURLOPT_STDERR: fdopen failed");
+            }
+
+            result = curl_easy_setopt(request->easy, option, request->redirected_stderr);
+            break;
+        }
+
         /* Special functions */
         case CURLOPT_WRITEFUNCTION:
         case CURLOPT_HEADERFUNCTION:
         case CURLOPT_READFUNCTION:
+        case CURLOPT_DEBUGFUNCTION:
         {
             SV* fn_copy = newSVsv(parameter);
             av_push(request->held_references, fn_copy);
@@ -440,6 +472,11 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
                 case CURLOPT_READFUNCTION: {
                     result = curl_easy_setopt(request->easy, CURLOPT_READFUNCTION, mcurl_read_callback);
                     result = curl_easy_setopt(request->easy, CURLOPT_READDATA, fn_copy);
+                    break;
+                }
+                case CURLOPT_DEBUGFUNCTION: {
+                    result = curl_easy_setopt(request->easy, CURLOPT_DEBUGFUNCTION, mcurl_debug_callback);
+                    result = curl_easy_setopt(request->easy, CURLOPT_DEBUGDATA, fn_copy);
                     break;
                 }
                 default: { result = CURLE_OK; } /* To keep compilers quiet */
@@ -853,6 +890,9 @@ DESTROY(self)
         }
         if (response->held_references) {
             SvREFCNT_dec(response->held_references);
+        }
+        if (response->redirected_stderr) {
+            fclose(response->redirected_stderr);
         }
         if (response->slists) {
             int i;

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -25,7 +25,7 @@ use strict;
 use List::Util 'min', 'max';
 
 use vars '$VERSION','@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -150,6 +150,7 @@ my %oeis_anum = (repeated => { all    => 'A001222',
                                odd    => 'A005087',
                                '4k+1' => 'A005089',
                                '4k+3' => 'A005091',
+                               twin   => 'A284203',
                                SG     => 'A156542',
                              },
                 );
@@ -162,6 +163,7 @@ my %oeis_anum = (repeated => { all    => 'A001222',
 # OEIS-Catalogue: A005087 multiplicity=distinct prime_type=odd
 # OEIS-Catalogue: A005089 multiplicity=distinct prime_type=4k+1
 # OEIS-Catalogue: A005091 multiplicity=distinct prime_type=4k+3
+# OEIS-Catalogue: A284203 multiplicity=distinct prime_type=twin
 # OEIS-Catalogue: A156542 multiplicity=distinct prime_type=SG
 
 sub oeis_anum {
@@ -576,7 +578,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

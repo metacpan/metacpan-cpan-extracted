@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.036';
+our $VERSION = '1.038';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -33,7 +33,7 @@ our $VERSION = '1.036';
 
 use Mojo::Base '-strict';
 use Exporter 'import';
-use List::Util qw( any first );
+use List::Util qw( all any none first );
 use Mojo::Loader qw( load_class );
 use Scalar::Util qw( blessed );
 use Mojo::JSON::Pointer;
@@ -223,6 +223,61 @@ sub match {
                 $value =~ s/(?<!\\)\\%/.*/g;
                 $test{ $key } = qr{^$value$};
             }
+            elsif ( $value = $match->{ $key }{ -has } ) {
+                my $expect = $value;
+                $test{ $key } = sub {
+                    my ( $value, $key ) = @_;
+                    return 0 if !defined $value;
+                    if ( ref $value eq 'ARRAY' ) {
+                        if ( ref $expect eq 'ARRAY' ) {
+                            return all { my $e = $_; any { $_ eq $e } @$value } @$expect;
+                        }
+                        elsif ( !ref $expect ) {
+                            return any { $_ eq $expect } @$value;
+                        }
+                    }
+                    elsif ( ref $value eq 'HASH' ) {
+                        if ( ref $expect eq 'HASH' ) {
+                            return match( $expect, $value );
+                        }
+                        else {
+                            die 'Bad query in -has on hash value: ' . ref $expect;
+                        }
+                    }
+                    else {
+                        die '-has query does not work on non-ref fields';
+                    }
+                };
+            }
+            elsif ( $value = $match->{ $key }{ -not_has } ) {
+                $test{ $key } = sub {
+                    my $expect = $value;
+                    my ( $value, $key ) = @_;
+                    return 1 if !defined $value;
+                    if ( ref $value eq 'ARRAY' ) {
+                        if ( ref $expect eq 'ARRAY' ) {
+                            return all { my $e = $_; none { $_ eq $e } @$value } @$expect;
+                        }
+                        elsif ( !ref $expect ) {
+                            return none { $_ eq $expect } @$value;
+                        }
+                        else {
+                            die 'Bad query in -has on array value: ' . ref $expect;
+                        }
+                    }
+                    elsif ( ref $value eq 'HASH' ) {
+                        if ( ref $expect eq 'HASH' ) {
+                            return !match( $expect, $value );
+                        }
+                        else {
+                            die 'Bad query in -has on hash value: ' . ref $expect;
+                        }
+                    }
+                    else {
+                        die '-has query does not work on non-ref fields';
+                    }
+                };
+            }
             elsif ( exists $match->{ $key }{ '!=' } ) {
                 my $expect = $match->{ $key }{ '!=' };
                 $test{ $key } = sub {
@@ -392,7 +447,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.036
+version 1.038
 
 =head1 SYNOPSIS
 

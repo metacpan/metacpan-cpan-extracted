@@ -1,0 +1,78 @@
+{
+   "abstract" : "- download and extract news articles from Internet.",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.026",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "NewsExtractor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.026"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "HTML::ExtractContent" : "0",
+            "IO::Socket::SSL" : "2.009",
+            "Importer" : "0",
+            "JSON" : "0",
+            "Module::Functions" : "0",
+            "Mojolicious" : "0",
+            "Moo" : "0",
+            "SemanticWeb::Schema" : "0",
+            "Test2::V0" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "Types::URI" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "NewsExtractor" : {
+         "file" : "lib/NewsExtractor.pm",
+         "version" : "v0.0.2"
+      },
+      "NewsExtractor::Article" : {
+         "file" : "lib/NewsExtractor/Article.pm"
+      },
+      "NewsExtractor::Constants" : {
+         "file" : "lib/NewsExtractor/Constants.pm"
+      },
+      "NewsExtractor::Download" : {
+         "file" : "lib/NewsExtractor/Download.pm"
+      },
+      "NewsExtractor::Error" : {
+         "file" : "lib/NewsExtractor/Error.pm"
+      },
+      "NewsExtractor::GenericExtractor" : {
+         "file" : "lib/NewsExtractor/GenericExtractor.pm"
+      },
+      "NewsExtractor::TextUtil" : {
+         "file" : "lib/NewsExtractor/TextUtil.pm"
+      },
+      "NewsExtractor::Types" : {
+         "file" : "lib/NewsExtractor/Types.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_spdx_expression" : "CC0-1.0",
+   "x_static_install" : "1"
+}

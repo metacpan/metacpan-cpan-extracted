@@ -32,6 +32,10 @@
 #include "thread.hpp"
 #include "err.hpp"
 
+#ifdef ZMQ_HAVE_WINDOWS
+#include <winnt.h>
+#endif
+
 bool zmq::thread_t::get_started () const
 {
     return _started;
@@ -47,6 +51,7 @@ static unsigned int __stdcall thread_routine (void *arg_)
 #endif
 {
     zmq::thread_t *self = (zmq::thread_t *) arg_;
+    self->applyThreadName ();
     self->_tfn (self->_arg);
     return 0;
 }
@@ -54,9 +59,10 @@ static unsigned int __stdcall thread_routine (void *arg_)
 
 void zmq::thread_t::start (thread_fn *tfn_, void *arg_, const char *name_)
 {
-    LIBZMQ_UNUSED (name_);
     _tfn = tfn_;
     _arg = arg_;
+    if (name_)
+        strncpy (_name, name_, sizeof (_name) - 1);
 #if defined _WIN32_WCE
     _descriptor =
       (HANDLE) CreateThread (NULL, 0, &::thread_routine, this, 0, NULL);
@@ -92,10 +98,62 @@ void zmq::thread_t::setSchedulingParameters (
     LIBZMQ_UNUSED (affinity_cpus_);
 }
 
-void zmq::thread_t::setThreadName (const char *name_)
+void zmq::thread_t::
+  applySchedulingParameters () // to be called in secondary thread context
 {
     // not implemented
-    LIBZMQ_UNUSED (name_);
+}
+
+namespace
+{
+#pragma pack(push, 8)
+struct thread_info_t
+{
+    DWORD _type;
+    LPCSTR _name;
+    DWORD _thread_id;
+    DWORD _flags;
+};
+#pragma pack(pop)
+}
+
+typedef struct _MY_EXCEPTION_REGISTRATION_RECORD
+{
+    struct _MY_EXCEPTION_REGISTRATION_RECORD *Next;
+    void *Handler;
+} MY_EXCEPTION_REGISTRATION_RECORD;
+
+static EXCEPTION_DISPOSITION NTAPI continue_execution (EXCEPTION_RECORD *rec,
+	void *frame, CONTEXT *ctx, void *disp)
+{
+	return ExceptionContinueExecution;
+}
+
+void zmq::thread_t::
+  applyThreadName () // to be called in secondary thread context
+{
+    if (!_name[0] || !IsDebuggerPresent())
+        return;
+
+    thread_info_t thread_info;
+    thread_info._type = 0x1000;
+    thread_info._name = _name;
+    thread_info._thread_id = -1;
+    thread_info._flags = 0;
+
+    NT_TIB *tib = ((NT_TIB*)NtCurrentTeb());
+
+    MY_EXCEPTION_REGISTRATION_RECORD rec;
+    rec.Next = (MY_EXCEPTION_REGISTRATION_RECORD *)tib->ExceptionList;
+    rec.Handler = (void *)continue_execution;
+
+    // push our handler, raise, and finally pop our handler
+    tib->ExceptionList = (_EXCEPTION_REGISTRATION_RECORD *)&rec;
+    DWORD MS_VC_EXCEPTION = 0x406D1388;
+        RaiseException (MS_VC_EXCEPTION, 0,
+            sizeof (thread_info) / sizeof (ULONG_PTR),
+            (ULONG_PTR *) &thread_info);
+    tib->ExceptionList = (_EXCEPTION_REGISTRATION_RECORD *)(((MY_EXCEPTION_REGISTRATION_RECORD *)tib->ExceptionList)->Next);
 }
 
 #elif defined ZMQ_HAVE_VXWORKS
@@ -154,10 +212,10 @@ void zmq::thread_t::
     }
 }
 
-void zmq::thread_t::setThreadName (const char *name_)
+void zmq::thread_t::
+  applyThreadName () // to be called in secondary thread context
 {
     // not implemented
-    LIBZMQ_UNUSED (name_);
 }
 
 #else
@@ -181,7 +239,7 @@ static void *thread_routine (void *arg_)
 #endif
     zmq::thread_t *self = (zmq::thread_t *) arg_;
     self->applySchedulingParameters ();
-    self->setThreadName (self->_name.c_str ());
+    self->applyThreadName ();
     self->_tfn (self->_arg);
     return NULL;
 }
@@ -191,7 +249,8 @@ void zmq::thread_t::start (thread_fn *tfn_, void *arg_, const char *name_)
 {
     _tfn = tfn_;
     _arg = arg_;
-    _name = name_;
+    if (name_)
+        strncpy (_name, name_, sizeof (_name) - 1);
     int rc = pthread_create (&_descriptor, NULL, thread_routine, this);
     posix_assert (rc);
     _started = true;
@@ -207,7 +266,7 @@ void zmq::thread_t::stop ()
 
 bool zmq::thread_t::is_current_thread () const
 {
-    return pthread_self () == _descriptor;
+    return bool(pthread_equal (pthread_self (), _descriptor));
 }
 
 void zmq::thread_t::setSchedulingParameters (
@@ -301,7 +360,8 @@ void zmq::thread_t::
 #endif
 }
 
-void zmq::thread_t::setThreadName (const char *name_)
+void zmq::thread_t::
+  applyThreadName () // to be called in secondary thread context
 {
     /* The thread name is a cosmetic string, added to ease debugging of
  * multi-threaded applications. It is not a big issue if this value
@@ -310,7 +370,7 @@ void zmq::thread_t::setThreadName (const char *name_)
  * "int rc" is retained where available, to help debuggers stepping
  * through code to see its value - but otherwise it is ignored.
  */
-    if (!name_)
+    if (!_name[0])
         return;
 
         /* Fails with permission denied on Android 5/6 */
@@ -319,19 +379,19 @@ void zmq::thread_t::setThreadName (const char *name_)
 #endif
 
 #if defined(ZMQ_HAVE_PTHREAD_SETNAME_1)
-    int rc = pthread_setname_np (name_);
+    int rc = pthread_setname_np (_name);
     if (rc)
         return;
 #elif defined(ZMQ_HAVE_PTHREAD_SETNAME_2)
-    int rc = pthread_setname_np (pthread_self (), name_);
+    int rc = pthread_setname_np (pthread_self (), _name);
     if (rc)
         return;
 #elif defined(ZMQ_HAVE_PTHREAD_SETNAME_3)
-    int rc = pthread_setname_np (pthread_self (), name_, NULL);
+    int rc = pthread_setname_np (pthread_self (), _name, NULL);
     if (rc)
         return;
 #elif defined(ZMQ_HAVE_PTHREAD_SET_NAME)
-    pthread_set_name_np (pthread_self (), name_);
+    pthread_set_name_np (pthread_self (), _name);
 #endif
 }
 

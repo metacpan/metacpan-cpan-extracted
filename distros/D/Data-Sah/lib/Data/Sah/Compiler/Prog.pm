@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.897'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.899'; # VERSION
 
 use 5.010;
 use strict;
@@ -639,7 +639,7 @@ sub before_all_clauses {
         if (defined $def) {
             local $cd->{_debug_ccl_note} = "default #$i";
             my $ct = $defie ?
-                $self->expr($def) : $self->literal($def);
+                $self->expr($cd, $def) : $self->literal($def);
             $self->add_ccl(
                 $cd,
                 $self->expr_list(
@@ -672,7 +672,7 @@ sub before_all_clauses {
             );
         } elsif ($reqie) {
             $has_req++;
-            my $ct = $self->expr($req);
+            my $ct = $self->expr($cd, $req);
             $self->add_ccl(
                 $cd, "!($ct) || ".$self->expr_defined($dt),
                 {
@@ -704,7 +704,7 @@ sub before_all_clauses {
             );
         } elsif ($fbdie) {
             $has_fbd++;
-            my $ct = $self->expr($fbd);
+            my $ct = $self->expr($cd, $fbd);
             $self->add_ccl(
                 $cd, "!($ct) || !".$self->expr_defined($dt),
                 {
@@ -983,7 +983,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.897 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2019-07-19.
+This document describes version 0.899 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2019-07-25.
 
 =head1 SYNOPSIS
 

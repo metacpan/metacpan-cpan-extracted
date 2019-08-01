@@ -1,32 +1,5 @@
 package Data::ObjectStore;
 
-#
-# just attached a meta data block that includes
-#   created updated root_connected backconnections
-#
-# Going to change up how the object value marker in the
-#  hashes, arrays and classes is stored.
-#
-# currently, it has :
-#
-#  u -> undefined
-#  v(.*) -> a scalar value
-#  [0-9]+ -> a reference obj id
-#
-# going to change that to
-#
-#  u -> undefined
-#  v(.*) -> a scalar value
-#  r[0-9]+meta -> a reference obj id and meta data about it
-#                 not yet sure what sort of meta data but the purpose
-#                 (so far) is to give a clue to the load mode of
-#                 big arrays and hashes. This will complement work
-#                 being made to Data::RecordStore that will allow
-#                 partial reads and writes from record numbers.
-#
-#                 I think this is pretty big
-#
-
 use strict;
 use warnings;
 
@@ -34,85 +7,219 @@ no warnings 'numeric';
 no warnings 'uninitialized';
 no warnings 'recursion';
 
-use Data::RecordStore;
-
 use File::Path qw( make_path );
 use Scalar::Util qw(weaken);
 use vars qw($VERSION);
 
-$VERSION = '2.03';
+use Data::RecordStore;
+use Data::ObjectStore::Cache;
+
+$VERSION = '2.09';
 
 our $DEBUG = 0;
 our $UPGRADING;
 
 use constant {
-    RECORD_STORE => 0,
-    DIRTY        => 1,
-    WEAK         => 2,
-    PATH         => 3,
-    STOREINFO    => 4,
-    LOCKS        => 5,
-
-    ID           => 0,
-    DATA         => 1,
-    METADATA     => 3,
-    LEVEL        => 4,
-
+    DATA_PROVIDER => 0,
+    DIRTY         => 1,
+    WEAK          => 2,
+    STOREINFO     => 3,
+    OPTIONS       => 4,
+    CACHE         => 5,
+    
+    ID       => 0,
+    DATA     => 1,
+    METADATA => 3,
+    LEVEL    => 4,
+    DIRTY_BIT => 5,  #for objs
 };
-my( @METAFIELDS ) = qw( created updated root_connected backconnections );
+my( @METAFIELDS ) = qw( created updated );
 
 sub open_store {
-  my( $base_path ) = grep { ! ref($_) } reverse @_;
-  my $cls = 'Data::ObjectStore';
-  
-  make_path( "$base_path/LOCKS" );
-  
-  my $store = bless [
-        Data::RecordStore->open_store( "$base_path/RECORDSTORE" ),
+    my( $cls, @options ) = @_;
+
+    die "Data::ObjectStore->open_store requires at least one argument" if 0 == @options;
+    
+    if( 1 == @options ) {
+        unshift @options, 'DATA_PROVIDER';
+    }
+    my( %options ) = @options;
+
+    my $data_provider = $options{DATA_PROVIDER};
+    if( ! ref( $data_provider ) ) {
+        # TODO - is it necessary to subclass this?
+        #        maybe it is necessary for this to have a path as well.
+        $options{BASE_PATH} = "$data_provider/RECORDSTORE";
+        $data_provider = Data::RecordStore->open_store( %options );
+    }
+    my $cache = $options{CACHE} ? ref( $options{CACHE} ) ? $options{CACHE} : Data::ObjectStore::Cache->new( $options{CACHE} ) : undef;
+    my $store = bless [
+        $data_provider,
         {}, #DIRTY CACHE
         {}, #WEAK CACHE
-        $base_path,
+        undef,
+        \%options,
+        $cache,
       ], $cls;
 
-  $store->[LOCKS] = [];
-
-  if( ! $UPGRADING ) {
-      $store->[STOREINFO] = $store->_fetch_store_info_node;
-      
-      $store->load_root_container;
-      $store->save;
-      if( $store->get_store_version < 1.2  ) {
-          die "Unable to open store $base_path of version ".$store->get_store_version.". Please run upgrade_store";
-      }
-  }
-  
-  $store;
-  
+    if( ! $UPGRADING ) {
+        $store->[STOREINFO] = $store->_fetch_store_info_node;
+        $store->load_root_container;
+        if( $store->get_store_version < 1.2  ) {
+            die "Unable to open store of version ".$store->get_store_version.". Please run upgrade_store.";
+        }
+        $store->save;
+    }
+    return $store;
 } #open_store
+
+# warning, this cleans out the whole store
+sub empty {
+    shift->[DATA_PROVIDER]->empty;
+}
+
+
+sub size {
+    return shift->[DATA_PROVIDER]->size;
+}
+
+sub pending {
+    return shift->[DATA_PROVIDER]->pending;
+}
+
+sub sync {
+    shift->[DATA_PROVIDER]->sync;
+}
 
 # locks the given lock names
 sub lock {
     my( $self, @locknames ) = @_;
-    my @fhs;
-    my %seen;
-    for my $name (@locknames) {
-        next if $seen{$name}++;
-        open my $fh, '>', "$self->[PATH]/LOCKS/$name";
-        flock( $fh, 2 ); #WRITE LOCK
-        push @fhs, $fh;
-    }
-    push @{$self->[LOCKS]}, @fhs;
+    $self->[DATA_PROVIDER]->lock( @locknames );
 }
 
 # unlocks all locks
 sub unlock {
     my $self = shift;
-    my $fhs = $self->[LOCKS];
-    for my $fh (@$fhs) {
-        flock( $fh, 8 );
-    }
-    splice @$fhs;
+    $self->[DATA_PROVIDER]->unlock;
 }
+
+# quick purge is not careful with memory.
+sub quick_purge {
+    my $self = shift;
+    my( %keep );
+    my( @working ) = ( 1 );
+
+    my $data_provider = $self->[DATA_PROVIDER];
+    my $highest = $data_provider->highest_entry_id;
+
+    while( @working ) {
+        my $try = shift @working;
+        next if $keep{$try}++;
+
+        my $obj = $self->_knot( $try );
+        my $d = $obj->[DATA];
+        my %placed;
+        push @working, (
+            grep { ! $keep{$_} && 0 == $placed{$_}++ }
+            map { substr( $_, 1 ) }
+            grep { /^r/ }
+            (ref( $d ) eq 'ARRAY' ? @$d : values( %$d )  ));
+    }
+
+    my $pcount;
+    for( my $i=1; $i<=$highest; $i++ ) {
+        if( ! $keep{$i} ) {
+            $data_provider->delete_record( $i );
+            ++$pcount;
+        }
+    }
+    print "Purged $pcount records\n";
+} #quick_purge
+
+#
+# Have to make this multi-'user'
+#
+sub compact_store {
+    my( $self ) = shift;
+
+    # TODO CHECK IF THIS IS IN READ-ONLY MODE
+    my $prov = $self->[DATA_PROVIDER];
+    my $dir = $prov->[0]; #TODO - shouldn't be from the data provider. This should have its own
+    my $working_silo = Data::RecordStore::Silo->open_silo( "CC", $dir );
+    my $highest_id = $prov->highest_entry_id;
+    $working_silo->_ensure_entry_count( $highest_id );
+    
+    my $check_next = 1;
+    my $lowest = 1;
+
+    # init with zeros
+    for my $id (2..$highest_id) {
+        $working_silo->put_record( $id, [ 0, 0 ] );
+    }
+    
+    while( 1 ) {
+        # check phase.
+        $working_silo->put_record( $check_next, [ 1, 1 ] );
+
+        my $stowed = $prov->fetch( $check_next );
+        my $pos = index( $stowed, ' ' );
+        my $metastr = substr $stowed, 0, $pos;
+        my( $class ) = split /\|/, $metastr;
+
+        my $dryfroze = substr $stowed, $pos + 1;
+        my $pieces = _thaw( $dryfroze );
+
+        my( @cands );
+        if( $class->isa( 'Data::ObjectStore::Array' ) ) {
+            ( undef, undef, undef, undef, @cands ) = @$pieces;
+        }
+        elsif( $class->isa( 'Data::ObjectStore::Hash' ) ) {
+            my( $level, $buckets, $size, @fetch_buckets ) = @$pieces;
+            if( $level ) {
+                @cands = @fetch_buckets;
+            } else {
+                @cands = values %{@fetch_buckets};
+            }
+        }
+        else {
+            @cands = values {@$pieces};
+        }
+        for my $ref_id (map { substr($_,1) } grep { /^r/ } @cands) {
+            my( $is_preserved, $is_checked ) = @{ $working_silo->get_record( $ref_id ) };
+            if( ! $is_preserved ) {
+                $working_silo->put_record( $ref_id, [ 1, 0 ] );
+            }
+        }
+
+        # now find the next thing that needs to be checked
+        undef $check_next;
+
+        for my $id ((1+$lowest)..$highest_id ) {
+            my( $is_preserved, $is_checked ) = @{ $working_silo->get_record( $id ) };
+            if( $is_preserved && ! $is_checked ) {
+                if( $id == (1+$lowest) ) {
+                    $lowest++;
+                }
+                $check_next = $id;
+                last;
+            }
+        }
+
+        last unless $check_next;
+    }
+
+    # now delete those that can't trace back to the root
+    for my $id ((1+$lowest)..$highest_id ) {
+        my( $is_preserved, $is_checked ) = @{ $working_silo->get_record( $id ) };
+        if( ! $is_preserved ) {
+            $prov->delete( $id );
+        }
+    }
+
+#    my( $preserve, $checked ) = @{ $working_silo->get_record( $id ) };
+#    $working_silo->put_record( $id, [ 1, 1 ] );
+    
+} #compact_store
 
 sub upgrade_store {
     my( $source_path, $dest_path ) = @_;
@@ -126,17 +233,15 @@ sub upgrade_store {
 
     my $info = $from_recstore->fetch( 1 );
     my( $vers ) = ( $info =~ /[ \`]ObjectStore_version\`v([^\`]*)/ );
-    _log( "GOT version $vers from '$info'" );
 
-    if( $vers >= 1.2 ) {
-        die "Store already at version 1.2 or above. No upgrade needed\n";
+    if( $vers >= 2 ) {
+        die "Store already at version 2 or above. No upgrade needed\n";
     }
 
-    _log( "Found version $vers. Upgrading to $VERSION" );
 
     # allows store to open old versions
     # prevents store from creating root objects when created
-    $UPGRADING = 1; 
+    $UPGRADING = 1;
 
     my $dest_store = Data::ObjectStore->open_store( "$dest_path" );
     my $source_store = Data::ObjectStore->open_store( "$source_path" );
@@ -161,13 +266,15 @@ sub upgrade_store {
       my $clone = ref( $source_thing )->_reconstitute( $dest_store,
                                                        $id,
                                                        _thaw( $source_thing->_freezedry ),
-                                                    {} );
+                                                       {} );
+      
       my $clone_thing = $dest_store->_knot( $clone );
-
+      if( ref($clone_thing) !~ /^(ARRAY|HASH|Data::ObjectStore::Hash|Data::ObjectStore::Array)$/ ) {
+          $clone_thing->[DIRTY_BIT] = 1;
+      }
       my $odata = $clone_thing->[DATA];
 
       my $meta = $clone_thing->[METADATA];
-      $meta->{root_connected} = 1;
       $meta->{created} = time;
       $meta->{updated} = time;
 
@@ -184,7 +291,7 @@ sub upgrade_store {
                   }
               }
           }
-      } 
+      }
       else {
           for my $key (keys %$odata) {
               if ( $odata->{$key} > 0 ) {
@@ -201,7 +308,6 @@ sub upgrade_store {
       for my $oid (@connections) {
           my $connect_obj = _transfer_obj( $source_store, $dest_store, $oid, 1 + $i );
           my $connect_thing = $dest_store->_knot( $connect_obj );
-          $connect_thing->[METADATA]{backconnections}{$id}++;
           $dest_store->save( $connect_obj );
       }
 
@@ -272,9 +378,6 @@ sub create_container {
 
     my $id = $self->_new_id;
 
-    _log( "creating container of class $class with id 'r$id'" );
-
-
     my $obj = bless [ $id,
                       undef,
                       $self,
@@ -287,35 +390,66 @@ sub create_container {
     for my $fld (keys %$data) {
         $obj->set( $fld, $data->{$fld} );
     }
+
     $obj->_init(); #called the first time the object is created.
+    $obj->[DIRTY_BIT] = 1;
     $obj;
 } #create_container
 
-sub save {
-    my( $self, $ref ) = @_;
-    if( ref( $ref ) ) {
-        return $self->_save( $ref );
+sub clean_store {
+    my $self = shift;
+
+    my( @to_process, %keep ) = ( 1 );
+    while( @to_process ) {
+        my $processing = shift @to_process;
+        next if $keep{$processing}++;
+        my $thingy = $self->_knot( $processing );
+        my $data = $thingy->[DATA];
+        my( @refs ) = map { substr($_,1) }
+            grep { /^r/ }
+            ref( $data ) eq 'ARRAY' ? @$data : values %$data;
+        for my $refid (@refs) {
+            unless( $keep{$refid} ) {
+                push @to_process, $refid;
+            }
+        }
     }
-    _log( "--- SAVE START ---" );    
+    my $provider = $self->[DATA_PROVIDER];
+    my $entries = $provider->entry_count;
+    for( my $i=1; $i<$entries; $i++ ) {
+        unless( $keep{$i} ) {
+            $provider->delete_record( $i );
+        }
+    }
+    $provider->sync;
+    
+} #clean_store
+
+
+sub save {
+    my( $self, $ref, $class_override ) = @_;
+    if( ref( $ref ) ) {
+        return $self->_save( $ref, $class_override );
+    }
     my $node = $self->_fetch_store_info_node;
     my $now = time;
-    $self->[RECORD_STORE]->use_transaction;
+    $self->[DATA_PROVIDER]->use_transaction;
 
     my( @dirty ) = keys %{$self->[DIRTY]};
-    for my $id ( @dirty ) {
+    
+    for my $id ( @dirty ) { 
         my $obj = $self->[DIRTY]{$id};
         next unless $obj;
 
+        # assings id if none were given
         my $thingy = $self->_knot( $obj );
-        if( $thingy->[METADATA]{root_connected} == 0 && $id > 2 ) {
-          # upgrading case is irrelevant here, as nothing is marked dirty
-          $self->_check_connections($thingy);
-        }
 
     } #each dirty
 
     #
     # all of the dirty have had their connections tested.
+    # anything marked dirty at this point will have been flagged by
+    # a connection check as not having connections.
     # nothing will be in dirty for the upgrade at this point as it
     # saves each item individually befor calling this save method.
     #
@@ -323,54 +457,49 @@ sub save {
     for my $id ( @dirty ) {
         my $obj = delete $self->[DIRTY]{$id};
         next unless $obj;
-        $self->_save( $obj, 'nocheck' );
+        $self->_save( $obj );
     } #each dirty
 
-    
     $node->set_last_update_time( $now );
-    $self->_save( $node, 'nocheck' );
+    $self->_save( $node );
 
-    $self->[RECORD_STORE]->commit_transaction;
+    $self->[DATA_PROVIDER]->commit_transaction;
     $self->[DIRTY] = {};
-    _log( "--- SAVE END ---" );
+    return 1;
 } #save
 
 sub _save {
-    my( $self, $obj, $nocheck ) = @_;
+    my( $self, $obj, $class_override ) = @_;
     my $thingy = $self->_knot( $obj );
+    if( ref($thingy) !~ /^(ARRAY|HASH|Data::ObjectStore::Hash|Data::ObjectStore::Array)$/ ) {
+        if( !$thingy->[DIRTY_BIT] ) {
+            return;
+        }
+        $thingy->[DIRTY_BIT] = 0;
+    }
     my $id = $thingy->[ID];
-    _log( " save obj 'r$id'" );
     delete $self->[DIRTY]{$id};   # need the upgrading cas?
 
     #
-    # Delete from the recordstore if this is not root connected and not being saved by the upgrade
-    # before if it knows if it is root connected or not. The only time it may call check_connections
-    # is when save is called directly with an item that would be deleted.
-    #
-    if( $thingy->[METADATA]{root_connected} == 0 && $id > 2 && ( $nocheck || ! $self->_check_connections($thingy) ) ) {
-        _log( " SAVE ..delete 'r$id' " );
-        $self->[RECORD_STORE]->delete_record( $id );
-    }
-
-    # 
     # Save to the record store.
     #
-    else {
-        my $text_rep = $thingy->_freezedry;
-        my( @meta ) = ref( $thingy );
-        for my $fld (@METAFIELDS) {
-            my $val = $thingy->[METADATA]{$fld};
-            if( $fld eq 'backconnections' ) {
-                push @meta, $val ? join( ',', %$val ) : '';
-            } else {
-                push @meta, $val;
-            }
-        }
-        my $meta_string = join('|', @meta );
-        _log( " SAVE ..stow 'r$id' '$meta_string $text_rep'" );
-        $self->[RECORD_STORE]->stow( "$meta_string $text_rep", $id );
+    my $text_rep = $thingy->_freezedry;
+    my( @meta ) = $class_override || ref( $thingy );
+    for my $fld (@METAFIELDS) {
+        my $val = $thingy->[METADATA]{$fld};
+        push @meta, $val;
     }
+    my $meta_string = join('|', @meta );
+    $self->[DATA_PROVIDER]->stow( "$meta_string $text_rep", $id );
+    
 } #_save
+
+sub existing_id {
+    my( $self, $obj ) = @_;
+    return undef unless ref($obj);
+    my $tied = $self->_knot( $obj );
+    return $tied ? $tied->[ID] : undef;
+}
 
 sub _has_dirty {
     my $self = shift;
@@ -387,15 +516,15 @@ sub _knot {
       elsif( $r eq 'HASH' ) {
         return tied %$item;
       }
-      elsif( $r eq 'Data::ObjectStore::Array' || 
-                 $r eq 'Data::ObjectStore::Hash' || 
+      elsif( $r eq 'Data::ObjectStore::Array' ||
+                 $r eq 'Data::ObjectStore::Hash' ||
                      $r->isa( 'Data::ObjectStore::Container' ) ) {
-          if( $item->store->[PATH] ne $self->[PATH] ) {
+          if( $item->store->[DATA_PROVIDER]->provider_id ne $self->[DATA_PROVIDER]->provider_id ) {
               die "Error: Data::ObjectStore::Container from an other store encountered";
           }
           return $item;
       }
-      die "Error: non Data::ObjectStore::Container encountered : $r";
+      return undef;
     }
     if( $item > 0 ) {
       my $xout = $self->_xform_out( $item );
@@ -422,6 +551,7 @@ sub _fetch_store_info_node {
         $node = bless [ 1, {}, $self, { created => $now, updated => $now } ], 'Data::ObjectStore::Container';
         $self->_store_weak( 1, $node );
         $self->_dirty( 1 );
+        $node->[DIRTY_BIT] = 1;
         $node->set_db_version( $Data::RecordStore::VERSION );
         $node->set_ObjectStore_version( $Data::ObjectStore::VERSION );
         $node->set_created_time( $now );
@@ -432,16 +562,16 @@ sub _fetch_store_info_node {
 
 sub _thaw {
     my( $dryfroze ) = @_;
-    
+
     # so foo` or foo\\` but not foo\\\`
     # also this will never start with a `
     my $pieces = [ split /\`/, $dryfroze, -1 ];
 
-    
+
     # check to see if any of the parts were split on escapes
     # like  mypart`foo`oo (should be translated to mypart\`foo\`oo
     if ( 0 < grep { /\\$/ } @$pieces ) {
-        
+
         my $newparts = [];
 
         my $is_hanging = 0;
@@ -477,12 +607,17 @@ sub _thaw {
 
 
 sub _fetch {
-    my( $self, $id ) = @_;
+    my( $self, $id, $force ) = @_;
 
     my $ref = $self->[DIRTY]{$id} // $self->[WEAK]{$id};
     return $ref if $ref;
 
-    my $stowed = $self->[RECORD_STORE]->fetch( $id );
+    if( $self->[CACHE] ) {
+        $ref = $self->[CACHE]->fetch( $id );
+        return $ref if $ref;
+    }
+
+    my $stowed = $self->[DATA_PROVIDER]->fetch( $id );
     return undef unless $stowed;
 
     my $pos = index( $stowed, ' ' );
@@ -490,19 +625,12 @@ sub _fetch {
 
     my $metastr = substr $stowed, 0, $pos;
     my( $class, @meta ) = split /\|/, $metastr;
-    
-    _log( " Fetched id 'r$id' -> '$metastr'" );
-    _log( "     ($stowed)" );
 
     my $meta = {};
     for my $fldi (0..$#METAFIELDS) {
         my $fld = $METAFIELDS[$fldi];
         my $val = $meta[$fldi];
-        if( $fld eq 'backconnections' ) {
-            $meta->{$fld} = { split( /,/, $val ) };
-        } else {
-            $meta->{$fld} = $val;
-        }
+        $meta->{$fld} = $val;
     }
 
     my $dryfroze = substr $stowed, $pos + 1;
@@ -510,8 +638,22 @@ sub _fetch {
     if( $class !~ /^Data::ObjectStore::/ ) {
       my $clname = $class;
       $clname =~ s/::/\//g;
-      
-      require "$clname.pm";
+
+      eval {
+          require "$clname.pm";
+          if( $force && ! $class->can( '_reconstitute' ) ) {
+              warn "Forcing '$class' to be 'Data::ObjectStore::Container'";
+              $class = 'Data::ObjectStore::Container';
+          }
+      };
+      if( $@ ) {
+          if( $force ) {
+              warn "warn '$class' to be 'Data::ObjectStore::Container'";
+              $class = 'Data::ObjectStore::Container';
+          } else {
+              die $@;
+          }
+      }
     }
 
     my $pieces = _thaw( $dryfroze );
@@ -553,111 +695,15 @@ sub _xform_out {
 sub _store_weak {
     my( $self, $id, $ref ) = @_;
 
+    if( $self->[CACHE] ) {
+        $self->[CACHE]->stow( $id, $ref );
+    }
+    
     $self->[WEAK]{$id} = $ref;
 
     weaken( $self->[WEAK]{$id} );
 
 } #_store_weak
-
-sub _log {
-    return unless $DEBUG;
-    my $txt = shift;
-    print STDERR "$txt\n";
-} #_log
-
-sub _check_connections {
-    # returns true if this item can connect to the root
-    my( $self, $plug_thing, $seen ) = @_;
-
-    $seen //= { $plug_thing->[ID] => 1 };
-
-    _log( "check connections for 'r$plug_thing->[ID]' " . Data::Dumper->Dump([$plug_thing->[METADATA]]) );
-    
-    my $has_connection;
-    for my $id ( keys %{$plug_thing->[METADATA]{backconnections}} ) {
-        my $socket_thing = $self->_knot( $id );
-        if( $seen->{$id}++ ) {
-            return 1 if $socket_thing->[METADATA]{root_connected};
-            next;
-        }
-        _log( "  checking back connection 'r$id'" );
-        if ( $id < 3 ) {        # the socket is the root
-            _log( "  found direct root connection" );
-            $plug_thing->[METADATA]{root_connected} = 1;
-            $self->_dirty( $plug_thing->[ID] );
-            return 1;
-        }
-
-        if ( $self->_check_connections( $socket_thing, $seen ) ) {
-            _log( "  found connection for $plug_thing->[ID]" );
-            $plug_thing->[METADATA]{root_connected} = 1;
-            $self->_dirty( $plug_thing->[ID] );
-            return 1;
-        }
-    }                           #each thing the plug is connected into
-
-    # okey, this has no connection. Make sure things connected to it
-    # are connected
-    _log( "  did not find root connection for 'r$plug_thing->[ID]'" );
-    $plug_thing->[METADATA]{root_connected} = 0;
-    $self->_dirty( $plug_thing->[ID] );
-    $seen->{$plug_thing->[ID]}++;
-
-    my $d = $plug_thing->[DATA];
-    my @plug_things = map { $self->_knot($_) } grep { /^r(\d+)/ && ! $seen->{$1} } (ref( $d ) eq 'ARRAY' ? @$d : (values %$d) );
-    for my $pt (@plug_things) {
-        $self->_check_connections( $pt, $seen );
-    }
-    return 0;
-    
-} #_check_connections
-
-# records the connection of one thing into an other
-# if an item gets connected to the root, then that
-# item gains a root_connected
-sub _connect {
-    my( $self, $socket, $plug ) = @_;
-    my $socket_thing = $self->_knot( $socket );
-    my $sid = $socket_thing->[ID];
-    my $plug_thing = $self->_knot( $plug );    
-    my $pid = $plug_thing->[ID];
-    return if $pid == $sid;
-
-    _log( "Connect 'r$pid'  -------> 'r$sid'" );
-    
-    $plug_thing->[METADATA]{backconnections}{$sid}++;
-
-    if( $sid < 3 || $socket_thing->[METADATA]{root_connected} ) {
-        _log( " $pid is now root connected" );
-        $plug_thing->[METADATA]{root_connected} = 1;
-    }
-    $self->_dirty( $pid );
-
-} #_connect
-
-# decrements the connection of the item to the target.
-# if the target is no longer root connected, it is marked dirty
-# and things that connect to it are checked and potentially marked
-sub _unconnect {
-    my( $self, $socket, $plug, $started ) = @_;
-
-    my $sid = $socket->[ID];
-    
-    my $plug_thing = $self->_knot( $plug );    
-    my $pid = $plug_thing->[ID];
-
-    return if $pid == $sid;
-
-    _log( "UNconnect 'r$pid'  ---x---> 'r$sid'" );
-    
-    if( 0 == --$plug_thing->[METADATA]{backconnections}{$sid} ) {
-        delete $plug_thing->[METADATA]{backconnections}{$sid};
-        $plug_thing->[METADATA]{root_connected} = 0; #force a check
-        _log( "   unconnected 'r$pid' from root" );
-    }
-    $self->_dirty( $pid );
-
-} #_unconnect
 
 sub _dirty {
     my( $self, $id ) = @_;
@@ -672,7 +718,7 @@ sub _dirty {
 
 sub _new_id {
     my( $self ) = @_;
-    my $newid = $self->[RECORD_STORE]->next_id;
+    my $newid = $self->[DATA_PROVIDER]->next_id;
     $newid;
 } #_new_id
 
@@ -701,7 +747,7 @@ sub created {
 # returns the id of the refernce, injesting it if
 # necessary.
 # used by tests
-sub _get_id { 
+sub _get_id {
   my( $self, $ref ) = @_;
 
   my $class = ref( $ref );
@@ -717,7 +763,6 @@ sub _get_id {
       $self->_store_weak( $id, $ref );
       $self->_dirty( $id );
       push @$ref, @items;
-      _log( "Assinging id 'r$id' to class $class" );
       return $id;
     }
     $ref = $thingy;
@@ -736,13 +781,11 @@ sub _get_id {
       for my $key (keys( %items) ) {
         $ref->{$key} = $items{$key};
       }
-      _log( "Assinging id 'r$id' to class $class" );
-
       return $id;
     }
     $ref = $thingy;
     $class = ref( $ref );
-  } 
+  }
   else {
     $thingy = $ref;
   }
@@ -828,6 +871,7 @@ sub TIEARRAY {
 
     # once the array is tied, an additional data field will be added
     # so obj will be [ $id, $storage, $obj_store ]
+#    die if $id == 1;
     my $obj = bless [
         $id,
         $blocks,
@@ -851,7 +895,6 @@ sub FETCH {
     }
 
     if( $self->[LEVEL] == 0 ) {
-        Data::ObjectStore::_log( " fetch from array 'r$self->[ID]' index $idx value '".($self->[DATA][$idx]?$self->[DATA][$idx] : 'undef')."'" );
         return $self->[DSTORE]->_xform_out( $self->[DATA][$idx] );
     }
 
@@ -895,8 +938,6 @@ sub _embiggen {
 
         $tied->[DATA] = [@{$self->[DATA]}];
 
-        Data::ObjectStore::_log( " embiggen array. adding subarray 'r$newid' to 'r$self->[ID]'" );
-        $store->_connect( $self, $newid );
         $self->[DATA] = [ "r$newid" ];
 
         $self->[BLOCK_SIZE] *= $self->[BLOCK_COUNT];
@@ -940,7 +981,6 @@ sub _getblock {
     $store->_dirty( $block_id );
     $store->_dirty( $self->[ID] );
     $self->[DATA][$block_idx] = "r$block_id";
-    $store->_connect( $self, $block_id );
     return $tied;
 
 } #_getblock
@@ -968,12 +1008,6 @@ sub STORE {
         my $store = $self->[DSTORE];
         my $xold = $self->[DATA][$idx] // 0;
         if( $xold ne $xin ) {
-            if( $xold && $xold =~ /^r/ ) {
-                $store->_unconnect( $self, $xold );
-            }
-            if( $xid ) {
-                $store->_connect( $self, $xid );
-            }
             $self->[DATA][$idx] = $xin;
             $store->_dirty( $self->[ID] );
         }
@@ -1019,13 +1053,8 @@ sub EXISTS {
 sub DELETE {
     my( $self, $idx ) = @_;
 
-    Data::ObjectStore::_log("DELETE index '$idx'");
-
     my $store = $self->[DSTORE];
     my $del = $self->FETCH( $idx );
-    if( ref( $del ) ) {
-        $store->_unconnect( $self, $del );
-    }
     $self->STORE( $idx, undef );
     if( $idx == $self->[ITEM_COUNT] - 1 ) {
         $self->[ITEM_COUNT]--;
@@ -1046,9 +1075,6 @@ sub CLEAR {
         my $store = $self->[DSTORE];
         for( 0..$self->[ITEM_COUNT] ) {
             my $del = $self->FETCH( $_ );
-            if( ref( $del ) ) {
-                $store->_unconnect( $self, $del );
-            }
         }
         $self->[ITEM_COUNT] = 0;
         $self->[DATA] = [];
@@ -1064,9 +1090,6 @@ sub POP {
     my $self = shift;
     my $idx = $self->[ITEM_COUNT] - 1;
     my $pop = $self->FETCH( $idx );
-    if( ref( $pop ) ) {
-        $self->[DSTORE]->_unconnect( $self, $pop );
-    }
     $self->STORE( $idx, undef );
     $self->[ITEM_COUNT]--;
     return $pop;
@@ -1087,6 +1110,12 @@ sub UNSHIFT {
 sub SPLICE {
     my( $self, $offset, $remove_length, @vals ) = @_;
 
+    # if no arguments given, clear the array
+    if( ! defined( $offset ) ) {
+        $offset = 0;
+        $remove_length = $self->[ITEM_COUNT];
+    }
+    
     # if negative, the offset is from the end
     if( $offset < 0 ) {
         $offset = $self->[ITEM_COUNT] + $offset;
@@ -1132,19 +1161,13 @@ sub SPLICE {
         for my $inval (@invals) {
             my( $inid ) = ( $inval =~ /^r(\d+)/ );
 
-            if( $inid ) {
-                if( $inid < 3 ) {
-                    die "cannot store a root node in a list";
-                }
-                $store->_connect( $self, $inid );
+            if( $inid && $inid < 3 ) {
+                die "cannot store a root node in a list";
             }
         }
         my @raw_return = splice @$blocks, $offset, $remove_length, @invals;
         my @ret;
         for my $rr (@raw_return) {
-            if( $rr && $rr =~ /^r/ ) {
-                $store->_unconnect( $self, $rr );
-            }
             push @ret, $store->_xform_out($rr);
         }
         $self->_storesize( $new_size );
@@ -1215,10 +1238,6 @@ sub SPLICE {
 
     $self->_storesize( $new_size );
 
-    for my $rem (grep { ref($_) } @removed) {
-        $store->_unconnect( $self, $rem );
-    }
-
     return @removed;
 
 } #SPLICE
@@ -1251,7 +1270,8 @@ no warnings 'recursion';
 
 use Tie::Hash;
 
-$Data::ObjectStore::Hash::SIZE = 13337;
+$Data::ObjectStore::Hash::BUCKET_SIZE = 29;
+$Data::ObjectStore::Hash::MAX_SIZE = 1_062_599;
 
 use constant {
     ID          => 0,
@@ -1275,7 +1295,7 @@ sub _freezedry {
           $self->[LEVEL],
           $self->[BUCKETS],
           $self->[SIZE],
-          map { if( $_=~ /[\\\`]/ ) { s/[\\]/\\\\/gs; s/`/\\`/gs; } $_ } 
+          map { if( $_=~ /[\\\`]/ ) { s/[\\]/\\\\/gs; s/`/\\`/gs; } $_ }
               $self->[LEVEL] ? @$r : %$r
         );
 }
@@ -1292,8 +1312,9 @@ sub TIEHASH {
     my( $class, $obj_store, $id, $meta, $level, $buckets, $size, @fetch_buckets ) = @_;
     $level ||= 0;
     $size  ||= 0;
+#    print STDERR " xx tie xx\n";
     unless( $buckets ) {
-      $buckets = $Data::ObjectStore::Hash::SIZE;
+      $buckets = $Data::ObjectStore::Hash::BUCKET_SIZE;
     }
     bless [ $id,
             $level ? [@fetch_buckets] : {@fetch_buckets},
@@ -1330,12 +1351,9 @@ sub DELETE {
     my $data = $self->[DATA];
     my $store = $self->[DSTORE];
 
-    Data::ObjectStore::_log("DELETE '$key' $self->[LEVEL]");
-
     if( $self->[LEVEL] == 0 ) {
         $store->_dirty( $self->[ID] );
         my $delin = delete $data->{$key};
-        $store->_unconnect( $self, $delin ) if $delin =~ /^r/;
         return $store->_xform_out( $delin );
     } else {
         my $hval = 0;
@@ -1376,16 +1394,13 @@ sub FETCH {
     my( $self, $key ) = @_;
     my $data = $self->[DATA];
 
-    Data::ObjectStore::_log( "FETCH '$key' LVL $self->[LEVEL]" );
     if( $self->[LEVEL] == 0 ) {
-        Data::ObjectStore::_log( " fetching from hash $self->[ID] '$key' with value '$data->{$key}'" );
         return $self->[DSTORE]->_xform_out( $data->{$key} );
     } else {
         my $hval = 0;
         foreach (split //,$key) {
             $hval = $hval*33 - ord($_);
         }
-        Data::ObjectStore::_log( join(",", map { "$_:$data->[$_]" }  0..$#$data));
         $hval = $hval % $self->[BUCKETS];
         my $hash = $self->[DSTORE]->_knot(substr($data->[$hval],1));
         if( $hash ) {
@@ -1418,19 +1433,20 @@ sub STORE {
             }
         }
         my $oldin = $data->{$key};
-        Data::ObjectStore::_log( " Storing hash $self->[ID] '$key' with value '$xin' which was '$oldin'" );	
         if( $xin ne $oldin ) {
-            $store->_unconnect( $self, $oldin ) if $oldin =~ /^r/;
-            $store->_connect( $self, $xid ) if $xid > 0;
             $data->{$key} = $xin;
             $store->_dirty( $self->[ID] );
         }
 
-        if( $self->[SIZE] > $self->[BUCKETS] ) {
+        if( $self->[SIZE] > $Data::ObjectStore::Hash::MAX_SIZE ) {
+#            print STDERR "**BONK**\n";
+
             # do the thing converting this to a deeper level
             $self->[LEVEL] = 1;
             my( @newhash );
-            my( @newids ) = ( 0 ) x $self->[BUCKETS];
+
+            my( @newids ) = ( 0 ) x $Data::ObjectStore::Hash::BUCKET_SIZE;
+            $self->[BUCKETS] = $Data::ObjectStore::Hash::BUCKET_SIZE;
 
             for my $key (keys %$data) {
                 my $hval = 0;
@@ -1446,13 +1462,12 @@ sub STORE {
                 } else {
                     $hash = {};
                     my $hash_id = $store->_new_id;
-                    tie %$hash, 'Data::ObjectStore::Hash', $store, $hash_id, {%{$self->[METADATA]}}, 0, $self->[BUCKETS]+1, 1, $key, $data->{$key};
+                    tie %$hash, 'Data::ObjectStore::Hash', $store, $hash_id, {%{$self->[METADATA]}}, 0, 0, 1, $key, $data->{$key};
                     $store->_store_weak( $hash_id, $hash );
                     $store->_dirty( $hash_id );
 
                     $newhash[$hval] = $hash;
                     $newids[$hval] = "r$hash_id";
-                    $store->_connect( $self, $hash_id );
                 }
 
             }
@@ -1467,7 +1482,7 @@ sub STORE {
 
         } # EMBIGGEN CHECK
     }
-    else {
+    else { #
         my $store = $self->[DSTORE];
         my $hval = 0;
         foreach (split //,$key) {
@@ -1477,11 +1492,14 @@ sub STORE {
         my $hash_id = substr($data->[$hval],1);
         my $hash;
 
+        # check if there is a subhash created here
         if( $hash_id > 0 ) {
+            # subhash was already created, so store the new val in it
             $hash = $store->_fetch( $hash_id );
             my $tied = tied %$hash;
             $tied->STORE( $key, $val );
         } else {
+            # subhash not already created, so create then store the new val in it
             $hash = {};
             $hash_id = $store->_new_id;
             my( $xid, $xin ) = $store->_xform_in( $val );
@@ -1489,12 +1507,11 @@ sub STORE {
                 die "cannot store a root node in a hash";
             }
 
-            tie %$hash, 'Data::ObjectStore::Hash', $store, $hash_id, {%{$self->[METADATA]}}, 0, $self->[BUCKETS]+1, 1, $key, $xin;
+            tie %$hash, 'Data::ObjectStore::Hash', $store, $hash_id, {%{$self->[METADATA]}}, 0, 0, 1, $key, $xin;
 
             $store->_store_weak( $hash_id, $hash );
             $store->_dirty( $hash_id );
             $data->[$hval] = "r$hash_id";
-            $store->_connect( $self, $hash_id );
         }
     }
 
@@ -1587,6 +1604,7 @@ use constant {
     DSTORE      => 2,
     METADATA    => 3,
     VOLATILE    => 4,
+    DIRTY_BIT   => 5,
 };
 
 #
@@ -1594,7 +1612,7 @@ use constant {
 # object ids to easily be stored as hash keys.
 #
 use overload
-    '""' => sub { my $self = shift; ref($self).":".$self->[ID] },
+    '""' => sub { my $self = shift; $self->[ID] },
     eq   => sub { ref($_[1]) && $_[1]->[ID] == $_[0]->[ID] },
     ne   => sub { ! ref($_[1]) || $_[1]->[ID] != $_[0]->[ID] },
     '=='   => sub { ref($_[1]) && $_[1]->[ID] == $_[0]->[ID] },
@@ -1614,17 +1632,10 @@ sub set {
 
     my $oldval = $self->[DATA]{$fld};
 
-    Data::ObjectStore::_log( "set $self 'r$self->[ID]' field '$fld' from '$oldval' to '$inval'" );
-
     if( $oldval ne $inval ) {
         $store->_dirty( $self->[ID] );
-        if( index( $oldval, 'r' ) == 0 ) {
-            $store->_unconnect( $self, $oldval );
-        }
-        if( ref( $val ) ) {
-            $store->_connect( $self, $inval );
-        }
-        elsif( ! defined $val ) {
+        $self->[DIRTY_BIT] = 1;
+        if( ! defined $val ) {
             $self->[DATA]{$fld} = undef;
             return;
         }
@@ -1634,28 +1645,34 @@ sub set {
     return $store->_xform_out( $self->[DATA]{$fld} );
 } #set
 
+sub remove_field {
+    my( $self, $fld ) = @_;
+    $self->[DSTORE]->_dirty( $self->[ID] );
+    $self->[DIRTY_BIT] = 1;
+    delete $self->[DATA]{$fld};
+}
+
+sub fields {
+    my $self = shift;
+    return [keys %{$self->[DATA]}];
+} #fields
 
 sub get {
     my( $self, $fld, $default ) = @_;
-
-    Data::ObjectStore::_log( "get from 'r$self->[ID]' field '$fld' from $self with value '$self->[DATA]{$fld}' default '$default'" );
 
     my $cur = $self->[DATA]{$fld};
     my $store = $self->[DSTORE];
     if( ( ! defined( $cur ) || $cur eq 'u' ) && defined( $default ) ) {
         my( $xid, $xin ) = $store->_xform_in( $default );
-        if( ref( $default ) ) {
-#            if( $self->[ID] > 2 && $xid > 0 && $xid < 3 ) {
-            if( $self->[ID] > 2 && $xid < 3 ) {
-                die "cannot store a root node in a container";
-            }
-            $store->_connect( $self, $xid );
+        if( ref( $default ) && $self->[ID] > 2 && $xid < 3 ) {
+            die "cannot store a root node in a container";
         }
         $store->_dirty( $self->[ID] );
+        $self->[DIRTY_BIT] = 1;
         $self->[DATA]{$fld} = $xin;
     }
     return $store->_xform_out( $self->[DATA]{$fld} );
-    
+
 } #get
 
 sub clearvol {
@@ -1663,12 +1680,24 @@ sub clearvol {
     delete $self->[VOLATILE]{$key};
 }
 
+sub clearvols {
+    my( $self, @keys ) = @_;
+    for my $key (@keys) {
+        delete $self->[VOLATILE]{$key};
+    }
+}
+
 sub vol {
     my( $self, $key, $val ) = @_;
     if( defined( $val ) ) {
         $self->[VOLATILE]{$key} = $val;
+        $self->store->_dirty( $self->[ID] );
     }
-    $self->[VOLATILE]{$key};
+    return $self->[VOLATILE]{$key};
+}
+
+sub vol_fields {
+    return [keys %{shift->[VOLATILE]}];
 }
 
 sub lock {
@@ -1818,7 +1847,7 @@ sub _reconstitute {
     if( $cls ne 'Data::ObjectStore::Container' ) {
       my $clname = $cls;
       $clname =~ s/::/\//g;
-      
+
       require "$clname.pm";
     }
 
@@ -1910,7 +1939,7 @@ permissions group id for the data store on disc.
 
 =back
 
-=head2 load_root_container
+=head2 load_root_container()
 
 Fetches the root node of the store,
 a Data::ObjectStore::Container object.
@@ -1928,7 +1957,7 @@ save is called.
 
 =head2 save(optional_obj)
 
-When called, this stores the optional_obj or all objects 
+When called, this stores the optional_obj or all objects
 that have been changed since the last time save was
 called. Note that this deletes the objects that are not
 connected to root.
@@ -1938,7 +1967,7 @@ connected to root.
 This updagrades the object store to the current version. Back up the store
 before applying.
 
-=head2 info
+=head2 info()
 
 Returns a hash of info about this opened data store.
 Updating the hash has no effect.
@@ -1976,9 +2005,13 @@ Returns the last time this store was updated.
 
 Adds an advisory (flock) lock for each of the unique names given.
 
-=head2 unlock
+=head2 unlock()
 
 Unlocks all names locked by this thread
+
+=head2 sync()
+
+Asks the data provider to sync to persistance.
 
 =head1 SUBCLASSING
 
@@ -2120,6 +2153,7 @@ Returns the Data::ObjectStore that created this object.
 =head2 lock( @names )
 
 Adds an advisory (flock) lock for each of the unique names given.
+This may not be called twice in a row without an unlock in between.
 
 =head2 unlock
 
@@ -2144,10 +2178,10 @@ Unlocks all names locked by this thread
 
 =head1 COPYRIGHT AND LICENSE
 
-       Copyright (c) 2018 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
+       Copyright (c) 2012 - 2018 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.03  (October, 2018))
+       Version 2.07  (May, 2019))
 
 =cut

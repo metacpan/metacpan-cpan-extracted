@@ -19,6 +19,7 @@ meta-spec:
   version: '1.4'
 name: Sah-Schemas-Date
 requires:
+  Complete::Util: '0.57'
   Data::Sah::Coerce::perl::array::str_comma_sep: '0.007'
   strict: '0'
   warnings: '0'
@@ -26,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date
   homepage: https://metacpan.org/release/Sah-Schemas-Date
   repository: git://github.com/perlancar/perl-Sah-Schemas-Date.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -393,6 +394,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

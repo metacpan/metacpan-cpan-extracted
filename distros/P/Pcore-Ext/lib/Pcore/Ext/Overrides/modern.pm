@@ -65,6 +65,34 @@ JS
     };
 }
 
+# ExtJS-6.7.0 - fix for overflow scroller for tab panel, thrown error, when last tab was chosen "can't get property isAnimating of undefined" for scrollable.translatable.isAnimating
+sub EXT_override_layout_Box : Override('Ext.layout.Box') {
+    return {
+        ensureVisible => func [ 'item', 'options' ],
+        <<'JS',
+            var container = this.getContainer(),
+                scrollable = container.getScrollable(),
+                item1 = item,
+                options1 = options;
+
+            if (!item1.isWidget) {
+                options1 = item1;
+                item1 = options1.item1;
+            }
+
+            if ( options1 && !isNaN(options1.offset) ) {
+                item1 = this.getItemByOffset(options1.offset);
+            }
+
+            if ( this._currentEnsureVisibleItem === item1 && ( !scrollable.translatable || scrollable.translatable.isAnimating ) ) {
+                return;
+            }
+
+            this.callParent(arguments);
+JS
+    };
+}
+
 1;
 __END__
 =pod

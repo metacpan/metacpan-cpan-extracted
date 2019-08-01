@@ -1,64 +1,88 @@
 package App::htmlsel;
 
-our $DATE = '2016-08-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+use App::CSelUtils;
+use Scalar::Util qw(blessed);
+
 our %SPEC;
 
 $SPEC{htmlsel} = {
     v => 1.1,
-    summary => 'Select HTML elements using CSS selector syntax',
+    summary => 'Select HTML::Element nodes using CSel syntax',
     args => {
-        expr => {
-            schema => 'str*',
-            req => 1,
-            pos => 0,
-        },
-        file => {
-            schema => 'str*',
-            'x.schema.entity' => 'filename',
-            pos => 1,
-            default => '-',
-        },
-        match_action => {
-            schema => 'str*',
-            default => 'print-as-string',
-            cmdline_aliases => {
-                count => { is_flag => 1, code => sub { $_[0]{match_action} = 'count' } },
-                # dump
-            },
-        },
+        %App::CSelUtils::foosel_args_common,
     },
 };
 sub htmlsel {
-    my %args = @_;
+    App::CSelUtils::foosel(
+        @_,
+        code_read_tree => sub {
+            my $args = shift;
 
-    my $expr = $args{expr};
+            require HTML::TreeBuilder;
+            my $tree;
+            if ($args->{file} eq '-') {
+                binmode STDIN, ":encoding(utf8)";
+                $tree = HTML::TreeBuilder->new->parse_content(join "", <>);
+            } else {
+                #require File::Slurper;
+                $tree = HTML::TreeBuilder->new->parse_file($args->{file});
+            }
 
-    require Mojo::DOM;
-    my $dom;
-    if ($args{file} eq '-') {
-        binmode STDIN, ":utf8";
-        $dom = Mojo::DOM->new(join "", <>);
-    } else {
-        # XXX use cached parse result when possible
-        require File::Slurper;
-        $dom = Mojo::DOM->new(File::Slurper::read_text($args{file}));
-    }
+          PATCH: {
+                last if $App::htmlsel::patch_handle;
+                require Module::Patch;
+                $App::htmlsel::patch_handle = Module::Patch::patch_package(
+                    'HTML::Element', [
+                        {
+                            action   => 'add',
+                            sub_name => 'children',
+                            code     => sub {
+                                my @children =
+                                    grep { blessed($_) && $_->isa('HTML::Element') }
+                                    @{ $_[0]{_content} };
+                                #use DD; dd \@children;
+                                @children;
+                            },
+                        },
+                        {
+                            action   => 'add',
+                            sub_name => 'class',
+                            code     => sub {
+                                $_[0]{class};
+                            },
+                        },
+                    ], # patch actions
+                ); # patch_package()
+            } # PATCH
+            $tree;
+        }, # code_read_tree
 
-    if ($args{match_action} eq 'count') {
-        [200, "OK", $dom->find($expr)->size];
-    } else {
-        [200, "OK", [$dom->find($expr)->map('to_string')->each]];
-    }
+        csel_opts => {class_prefixes=>['HTML']},
+
+        code_transform_node_actions => sub {
+            my $args = shift;
+
+            for my $action (@{$args->{node_actions}}) {
+                if ($action eq 'print' || $action eq 'print_as_string') {
+                    $action = 'print_method:as_HTML';
+                } elsif ($action eq 'dump') {
+                    #$action = 'dump:tag.class.id';
+                    $action = 'dump:as_HTML';
+                }
+            }
+        }, # code_transform_actions
+    );
 }
 
 1;
-# ABSTRACT: Select HTML elements using CSS selector syntax
+# ABSTRACT: Select HTML::Element nodes using CSel syntax
 
 __END__
 
@@ -68,20 +92,24 @@ __END__
 
 =head1 NAME
 
-App::htmlsel - Select HTML elements using CSS selector syntax
+App::htmlsel - Select HTML::Element nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.002 of App::htmlsel (from Perl distribution App-htmlsel), released on 2016-08-27.
+This document describes version 0.006 of App::htmlsel (from Perl distribution App-htmlsel), released on 2019-07-29.
 
 =head1 SYNOPSIS
 
 =head1 FUNCTIONS
 
 
-=head2 htmlsel(%args) -> [status, msg, result, meta]
+=head2 htmlsel
 
-Select HTML elements using CSS selector syntax.
+Usage:
+
+ htmlsel(%args) -> [status, msg, payload, meta]
+
+Select HTML::Element nodes using CSel syntax.
 
 This function is not exported.
 
@@ -89,11 +117,51 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<expr>* => I<str>
+=item * B<expr> => I<str>
 
 =item * B<file> => I<str> (default: "-")
 
-=item * B<match_action> => I<str> (default: "print-as-string")
+=item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
+
+Specify action(s) to perform on matching nodes.
+
+Each action can be one of the following:
+
+=over
+
+=item * C<count> will print the number of matching nodes.
+
+=item * C<print_method> will call on or more of the node object's methods and print the
+result. Example:
+
+print_method:as_string
+
+=item * C<dump> will show a indented text representation of the node and its
+descendants. Each line will print information about a single node: its class,
+followed by the value of one or more attributes. You can specify which
+attributes to use in a dot-separated syntax, e.g.:
+
+dump:tag.id.class
+
+=back
+
+which will result in a node printed like this:
+
+ HTML::Element tag=p id=undef class=undef
+
+By default, if no attributes are specified, C<id> is used. If the node class does
+not support the attribute, or if the value of the attribute is undef, then
+C<undef> is shown.
+
+=item * B<select_action> => I<str> (default: "csel")
+
+Specify how we should select nodes.
+
+The default is C<csel>, which will select nodes from the tree using the CSel
+expression. Note that the root node itself is not included. For more details on
+CSel expression, refer to L<Data::CSel>.
+
+C<root> will return a single node which is the root node.
 
 =back
 
@@ -102,7 +170,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -124,13 +192,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

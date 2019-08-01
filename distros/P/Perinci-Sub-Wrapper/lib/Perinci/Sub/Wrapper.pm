@@ -1,7 +1,7 @@
 package Perinci::Sub::Wrapper;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.850'; # VERSION
+our $DATE = '2019-07-04'; # DATE
+our $VERSION = '0.851'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1070,6 +1070,10 @@ sub wrap {
     $args{compile}                     //= 1;
     $args{log}                         //= 1;
     $args{validate_args}               //= 0
+        # function states that it can validate args, so by default we don't have
+        # to do validation for it.
+        if $meta->{features} && $meta->{features}{validate_args};
+    $args{validate_args}               //= 0
         # function might want to disable validate_args by default, e.g. if
         # source code has been processed with
         # Dist::Zilla::Plugin::Rinci::Validate
@@ -1474,7 +1478,7 @@ Perinci::Sub::Wrapper - A multi-purpose subroutine wrapping framework
 
 =head1 VERSION
 
-This document describes version 0.850 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2019-04-15.
+This document describes version 0.851 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2019-07-04.
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,3 @@
-#    $Id: Nominet.pm,v 1.14 2015/11/06 14:39:18 pete Exp $
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,12 +28,15 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 }
 
 # file-scoped lexicals
-my $Host      = 'epp.nominet.org.uk';
-my $Hosttest  = 'testbed-epp.nominet.org.uk';
+my %Host      = (
+	prod => 'epp.nominet.org.uk',
+	test => 'testbed-epp.nominet.org.uk',
+	ote  => 'ote-epp.nominet.org.uk',
+);
 my $EPPVer    = '1.0';
 my $EPPLang   = 'en';
 my $NSVer     = '2.0';
@@ -78,7 +80,7 @@ service
 
 =head1 Description
 
-L<Nominet|http://www.nominet.org.uk/> is the organisation in charge of
+L<Nominet|https://www.nominet.uk/> is the organisation in charge of
 domain names under the .uk TLD.  Historically it used cryptographically
 signed email communications with registrars to provision domains.
 More recently (since 2010) it has instituted an EPP system
@@ -110,9 +112,12 @@ exceptions:
 
 =over
 
-=item * If C<test> is set but C<testssl> is not, C<port> defaults to 8700
+=item * If C<test> or C<ote> is set but C<testssl> is not, C<port>
+defaults to 8700
 
-=item * if C<test> is set, C<host> defaults to 'testbed-epp.nominet.org.uk'. Otherwise C<host> defaults to 'epp.nominet.org.uk'.
+=item * C<host> will be set to the appropriate endpoint. Specify C<ote>
+with value 1 to connect to the OT&E endpoint, C<test> with value 1 for
+the testbed endpoint and none of these for the standard live endpoint.
 
 =item * C<timeout> defaults to 5 (seconds).
 
@@ -126,6 +131,9 @@ used if no explicit number of years is given in each registration or
 renewal command. It must be an integer between 1 and 10 inclusive (but
 note that renewing for 10 years pre-expiry will always fail because
 Nominet prohibits it).
+
+=item * C<login_opt> is a hashref of options to be passed directly
+through as the third optional argument to L<login()|/Login>.
 
 =item * There is no facility for a config file but this may be added in
 future versions.
@@ -155,18 +163,33 @@ sub new {
 			$params{port} = 8700;
 			$params{ssl}  = undef;
 		}
-		$params{host} = $Hosttest;
+		$params{host} = $Host{test};
+	} elsif ($params{ote} and $params{ote} == 1) {
+		# Use OT&E server
+		if ($params{testssl} and $params{testssl} == 1) {
+			$params{port} = 700;
+			$params{ssl}  =   1;
+		} else {
+			$params{port} = 8700;
+			$params{ssl}  = undef;
+		}
+		$params{host} = $Host{ote};
 	} else {
 		# Use live server
 		$params{port} = 700;
 		$params{ssl}  =   1;
-		$params{host} = $Host;
+		$params{host} = $Host{prod};
 	}
+	warn "Connecting to $params{host}:$params{port}\n" if $Debug;
 	$params{timeout}	= (int($params{timeout} || 0) > 0 ? $params{timeout} : 5);
-	if ($params{ssl} and $params{verify}) {
-		$params{SSL_ca_file}      ||= $params{ca_file};
-		$params{SSL_ca_path}      ||= $params{ca_path};
-		$params{SSL_verify_mode}  =   0x01;
+	if ($params{ssl}) {
+		if ($params{verify}) {
+			$params{SSL_ca_file}      ||= $params{ca_file};
+			$params{SSL_ca_path}      ||= $params{ca_path};
+			$params{SSL_verify_mode}  =   0x01;
+		} else {
+			$params{SSL_verify_mode}  =   0x00;
+		}
 	}
 	if ($params{ssl} and $params{ciphers}) {
 		$params{SSL_cipher_list} = $params{ciphers};
@@ -207,7 +230,7 @@ sub new {
 
 	# Login
 	unless (defined $params{login} and $params{login} == 0) {
-		$self->login ($params{user}, $params{pass});
+		$self->login ($params{user}, $params{pass}, $params{login_opt});
 	}
 
 	# If there was an error in the constructor, there's no point
@@ -225,15 +248,30 @@ The client can perform a standalone EPP Login if required.
 		or die ("Could not login: ", $epp->get_reason);
 
 The optional third argument, C<$opt_ref>, is a hash ref of login
-options. Currently the only supported option is 'nominet_schemas' which
-should be set to a true value if the user requires the old, deprecated
-Nominet EPP schemas. These were removed from the Live systems before
-August 2013, so should not be retained in production code.
+options. Currently the only supported option is 'tag_list' which
+should be set to a true value if the user needs to use the
+L<list_tags|/List Tags>
+method. Nominet operates a number of
+L<mutually exclusive schemas|https://registrars.nominet.uk/uk-namespace/registration-and-domain-management/schemas-and-namespaces/>
+so that the user needs to login again to perform different tasks. At present
+this module only supports two sets: the standard tasks and the tag list.
 
 =cut
 
 sub login {
 	my ($self, $user, $pass, $options) = @_;
+
+	unless (defined $user) {
+		$Error = 'No username (tagname) supplied';
+		carp ($Error);
+		return;
+	}
+
+	unless (defined $pass) {
+		$Error = 'No password supplied';
+		carp ($Error);
+		return;
+	}
 
 	# Set login frame
 	my $login = Net::EPP::Frame::Command::Login->new;
@@ -243,39 +281,35 @@ sub login {
 	$login->version->appendText($EPPVer);
 	$login->lang->appendText($EPPLang);
 
-	my $objects = $self->{greeting}->getElementsByTagNameNS(EPP_XMLNS, 'objURI');
-	#while (my $object = $objects->shift) {
-	#for my $ns ('nom-account', 'nom-contact', 'nom-domain',
+	my @ns   = ();
+	my @svcs = ();
+	my $baseuri = 'http://www.nominet.org.uk/epp/xml';
 
-
-	if ($options->{'nominet_schemas'}) {
-		# Deprecated
-		for my $ns ('nom-domain', 'nom-notifications') {
-			my $el = $login->createElement('objURI');
-			$el->appendText("http://www.nominet.org.uk/epp/xml/$ns-$NSVer");
-			$login->svcs->appendChild($el);
-		}
-		my $foo = $login->createElement('objURI');
-		$foo->appendText("urn:ietf:params:xml:ns:host-1.0");
-		$login->svcs->appendChild($foo);
+	if ($options->{'tag_list'}) {
+		push @ns, 'nom-tag';
 	} else {
-		# Standard schemas and extensions
-		for my $ns ('epp', 'eppcom', 'domain', 'host', 'contact', 'secDNS') {
-			my $el = $login->createElement('objURI');
-			my $ver = $EPPVer;
-			$ver = 1.1 if $ns eq 'secDNS';
-			$el->appendText("urn:ietf:params:xml:ns:$ns-$ver");
-			$login->svcs->appendChild($el);
-		}
-		# Extensions go here
+		push @ns, qw/epp eppcom domain host contact secDNS/;
+		push @svcs, qw/domain-nom-ext-1.2 contact-nom-ext-1.0
+			std-notifications-1.2 std-warning-1.1 std-contact-id-1.0
+			std-release-1.0 std-handshake-1.0 nom-abuse-feed-1.0
+			std-fork-1.0 std-list-1.0 std-locks-1.0 std-unrenew-1.0/;
+	}
+	# Standard schemas and extensions
+	for my $ns (@ns) {
+		my $el = $login->createElement('objURI');
+		my $ver = $EPPVer;
+		$ver = 1.1 if $ns eq 'secDNS';
+		my $text = "urn:ietf:params:xml:ns:$ns-$ver";
+		$text = "$baseuri/$ns-$ver" if $ns =~ /-/;
+		$el->appendText($text);
+		$login->svcs->appendChild($el);
+	}
+	# Extensions go here
+	if (scalar @svcs) {
 		my $ext = $login->createElement('svcExtension');
-		for my $ns (qw/domain-nom-ext-1.2 contact-nom-ext-1.0
-		std-notifications-1.2 std-warning-1.1 std-contact-id-1.0
-		std-release-1.0 std-handshake-1.0 nom-abuse-feed-1.0
-		std-fork-1.0 std-list-1.0 std-locks-1.0 std-unrenew-1.0
-		nom-direct-rights-1.0/) {
+		for my $ns (@svcs) {
 			my $el = $login->createElement('extURI');
-			$el->appendText("http://www.nominet.org.uk/epp/xml/$ns");
+			$el->appendText("$baseuri/$ns");
 			$ext->appendChild($el);
 		}
 		$login->svcs->appendChild($ext);
@@ -295,17 +329,20 @@ sub login {
 =head1 Availability checks
 
 The availability checks work similarly to L<Net::EPP::Simple> except
-that they return an array with three elements. The first element is the
+that in list context they return an array with two elements.
+The first element is the
 availability indicator as before (0 if provisioned, 1 if available,
 undef on error) and the second element is the abuse counter which shows
 how many more such checks you may run. This counter is only relevant
 for check_domain and will always be undef for the other check methods.
-The third element is an indicator of the rights to register the domain.
-This is only relevant for check_domain and if the domain being checked
-is a second-level domain in which case the value will be the domain with
-the rights and undef if there are no rights.
 
-	my ($avail, $left, $rights) = $epp->check_domain ("foo.uk");
+	# List context
+	my ($avail, $left) = $epp->check_domain ("foo.uk");
+	($avail) = $epp->check_contact ("ABC123");
+	($avail) = $epp->check_host ("ns0.foo.co.uk");
+
+	# Scalar context
+	$avail = $epp->check_domain ("foo.uk");
 	$avail = $epp->check_contact ("ABC123");
 	$avail = $epp->check_host ("ns0.foo.co.uk");
 
@@ -338,19 +375,15 @@ sub _check {
 	}
 
 	my $response = $self->_send_frame ($frame) or return undef;
+	my $avail = $response->getNode($spec[1], $key)->getAttribute('avail');
+	return $avail unless wantarray;
 
 	my $extra = $response->getNode("$type-nom-ext:chkData");
 	my $count = undef;
 	$count = $extra->getAttribute('abuse-limit') if defined $extra;
 	warn "Remaining checks = $count\n" if ($Debug and defined $count);
 
-	my $rights = undef;
-	if ($type eq 'domain' and $identifier !~ /\..*\./) {
-		$extra  = $response->getNode("nom-direct-rights:ror")->firstChild;
-		$rights = $extra->toString if defined $extra;
-	}
-
-	return ($response->getNode($spec[1], $key)->getAttribute('avail'), $count, $rights);
+	return ($avail, $count);
 }
 
 =head1 Domain Renewal
@@ -380,6 +413,18 @@ be post-expiry.
 
 sub renew {
 	my ($self, $renew) = @_;
+	unless (defined $renew) {
+		carp "No argument provided";
+		return undef;
+	}
+	unless (ref $renew and ref $renew eq 'HASH') {
+		carp "Argument to renew is not a hash reference";
+		return undef;
+	}
+	unless ($renew->{name}) {
+		carp "Argument to renew has no 'name' field";
+		return undef;
+	}
 	my $domain = $renew->{name};
 	my $expiry = $renew->{cur_exp_date};
 	my $years  = $renew->{period};
@@ -532,7 +577,7 @@ registration.
 			'nsname0'  => "ns1.bar.co.uk",
 			'nsname1'  => "ns2.bar.co.uk"
 		},
-		sedDNS       => [
+		secDNS       => [
 			{
 				keyTag     => 123,
 				alg        => 5,
@@ -666,7 +711,10 @@ account like this to perform the registration.
 		'trad-name'   => 'Examples4u',
 		'type'        => 'LTD',
 		'co-no'	      => '12345678',
-		'opt-out'     => 'n',
+		'disclose'    => {
+			'org'  => 1,
+			'addr' => 0
+		},
 		'postalInfo'  => { loc => {
 			'name'  => 'Arnold N Other',
 			'org'   => 'Example Company',
@@ -711,7 +759,7 @@ sub create_contact {
 	# Extensions
 	my @spec = $self->spec ('contact-nom-ext');
 	my $obj  = $frame->addObject (@spec);
-	for my $field (qw/ trad-name type co-no opt-out /) {
+	for my $field (qw/ trad-name type co-no /) {
 		next unless ($contact->{$field});
 		my $name = $frame->createElement("contact-nom-ext:$field");
 		$name->appendText ($contact->{$field});
@@ -720,6 +768,19 @@ sub create_contact {
 	my $extension = $frame->command->new ('extension');
 	$extension->appendChild ($obj);
 	$frame->command->insertAfter ($extension, $frame->getCommandNode);
+
+	if (defined $contact->{disclose}) {
+		my $add = $frame->createElement ('contact:disclose');
+		$add->setAttribute('flag', '1');
+		for my $field (qw/org addr/) {
+			next unless $contact->{disclose}->{$field};
+			my $disc = $frame->createElement ("contact:$field");
+			$disc->setAttribute('type', 'loc');
+			$add->appendChild ($disc);
+		}
+		$frame->getNode('create')->getChildNodes->shift->appendChild ($add)
+			if $add->hasChildNodes;
+	}
 
 	my $response = $self->_send_frame ($frame);
 	return $Code == 1000 ? 1 : undef;
@@ -816,7 +877,7 @@ eg:
 				digestType => 1,
 				digest     => '8A9CEBB665B78E0142F1CEF47CC9F4205F600685'
 			}]
-		}
+		},
 		'rem'          => {}
 	};
 
@@ -915,7 +976,7 @@ sub modify_domain {
 =head2 Modify contacts
 
 To modify a contact, which includes aspects of the registrant such as
-the WHOIS opt-out etc., you will again need to create a hashref of the
+the disclose flags etc., you will again need to create a hashref of the
 changes like this:
 
 	my $changes = {
@@ -923,7 +984,6 @@ changes like this:
 		'type'        =>  'FCORP',
 		'trad-name'   =>  'American Industries',
 		'co-no'       =>  '99998888',
-		'opt-out'     =>  'N',
 		'postalInfo'  => {
 			'loc' => {
 				'name' => 'James Johnston',
@@ -937,7 +997,10 @@ changes like this:
 			}
 		},
 		'voice'	=>	'+1.77777776666',
-		'email'	=>	'jj@example.com'
+		'email'	=>	'jj@example.com',
+		'disclose' => {
+			'addr' => 1
+		}
 	};
 	my $res = $epp->update_contact ($changes) or die $epp->get_reason;
 
@@ -949,6 +1012,10 @@ It returns undef on failure, 1 on success.
 There is also a convenience method C<modify_contact()> which takes the
 contact id as the first argument and the hashref of changes as the
 second argument.
+
+Note that due to an undocumented restriction in Nominet's EPP servers
+it is not possible to modify the disclose flags for both addr and org
+to different values in one request.
 
 =cut
 
@@ -1026,12 +1093,37 @@ sub modify_contact {
 		$elem->appendText ($data->{$field});
 		$chg->appendChild ($elem);
 	}
+	if (defined $data->{disclose}) {
+		# Return an error if there's a mix of flags
+		my @flags = values (%{$data->{disclose}});
+		if ($#flags > 0 && $flags[0] != $flags[1]) {
+			$Error = "Nominet prohibits adding and removing disclosures " .
+				"in one action";
+			return;
+		}
+		# This doesn't need to be so complicated but it's staying this
+		# way in case Nominet decide to allow a mix of actions in the
+		# future.
+		my $add = $frame->createElement ('contact:disclose');
+		$add->setAttribute('flag', '1');
+		my $del = $frame->createElement ('contact:disclose');
+		$del->setAttribute('flag', '0');
+		for my $field (qw/org addr/) {
+			next unless defined $data->{disclose}->{$field};
+			my $disc = $frame->createElement ("contact:$field");
+			$disc->setAttribute('type', 'loc');
+			($data->{disclose}->{$field} ? $add : $del)->appendChild ($disc);
+		}
+		for my $child ($add, $del) {
+			$chg->appendChild ($child) if $child->hasChildNodes;
+		}
+	}
 	if ($chg->hasChildNodes) { $obj->appendChild($chg); }
 
 	# Extensions
 	@spec = $self->spec ('contact-nom-ext');
 	$obj  = $frame->addObject (@spec);
-	for my $field (qw/ trad-name type co-no opt-out /) {
+	for my $field (qw/ trad-name type co-no /) {
 		next unless ($data->{$field});
 		my $name = $frame->createElement("contact-nom-ext:$field");
 		$name->appendText ($data->{$field});
@@ -1155,21 +1247,23 @@ sub _info {
 
 	if ($type eq 'domain') {
 		my $extra = $response->getNode('domain-nom-ext:infData');
-		my $extra2 = $response->getNode('secDNS:infData');
-		return $self->_domain_infData_to_hash($infData, $extra);
+		my $secdns = $response->getNode('secDNS:infData');
+		return $self->_domain_infData_to_hash($infData, $extra, $secdns);
 	} elsif ($type eq 'contact') {
+		# Grab disclose infdata before Net::EPP::Simple deletes it
+		my $disclose = $self->_disclose_infData_to_hash ($infData);
 		$self->_clean_addr($infData);
 		my $this = $self->_contact_infData_to_hash($infData);
 		# Add in the Nominet extras (reg, rather than contact)
 		my $extra = $response->getNode('contact-nom-ext:infData');
-		return $self->_merge_contact_infData ($this, $extra);
+		return $self->_merge_contact_infData ($this, $extra, $disclose);
 	} elsif ($type eq 'host') {
 		return $self->_host_infData_to_hash($infData);
 	}
 }
 
 sub _domain_infData_to_hash {
-	my ($self, $infData, $extra) = @_;
+	my ($self, $infData, $extra, $secdns) = @_;
 
 	my $hash = $self->_node_to_hash ($infData, ['registrant',
 		'clID', 'crID', 'crDate', 'exDate', 'name', 'roid']);
@@ -1182,12 +1276,37 @@ sub _domain_infData_to_hash {
 		$hash->{$_} = $extrahash->{$_};
 	}
 
+	if ($secdns) {
+		my $dsObjs = $secdns->nonBlankChildNodes;
+		while (my $dsObj = $dsObjs->shift) {
+			push @{$hash->{secDNS}}, $self->_node_to_hash ($dsObj);
+		}
+	}
+
 	my $hostObjs = $infData->getElementsByLocalName('hostObj');
 	while (my $hostObj = $hostObjs->shift) {
 		push(@{$hash->{ns}}, $hostObj->textContent);
 	}
 
 	return $hash;
+}
+
+sub _disclose_infData_to_hash {
+	my ($self, $infData) = @_;
+	my $disc = $infData->getElementsByLocalName('disclose')->shift;
+	return unless $disc;
+	my $flag = $disc->getAttribute('flag');
+	my $hash;
+	for my $child ($disc->getChildrenByTagName('*')) {
+		$hash->{$child->localname} = $flag;
+	}
+	return $hash;
+}
+
+sub _tag_infData_to_hash {
+	my ($self, $infData) = @_;
+	return $self->_node_to_hash ($infData, ['registrar-tag',
+		'name', 'handshake', 'trad-name']);
 }
 
 sub _clean_addr {
@@ -1203,14 +1322,15 @@ sub _clean_addr {
 }
 
 sub _merge_contact_infData {
-	my ($self, $old, $extra) = @_;
+	my ($self, $old, $extra, $disclose) = @_;
 
 	my $extrahash = $self->_node_to_hash ($extra, ['type',
-	'co-no', 'opt-out', 'trad-name']);
+	'co-no', 'trad-name']);
 
 	for (keys %$extrahash) {
 		$old->{$_} = $extrahash->{$_};
 	}
+	$old->{disclose} = $disclose;
 	return $old;
 
 }
@@ -1278,6 +1398,55 @@ sub list_domains {
 	}
 
 	return $domlist;
+}
+
+=head2 List Tags
+
+When transferring domains it may be useful to have a list of possible
+tag names. This method returns the full list of tags as an array ref.
+Each entry in the arrayref is itself a hashref with these keys:
+
+=over
+
+=item C<registrar-tag> is the tag name to use in release actions, etc.
+
+=item C<name> is the name of the registrar for display purposes
+
+=item C<trad-name> is the trading name of the registrar (may be empty
+string)
+
+=item C<handshake> is "Y" if they require handshakes on transfer
+or "N" otherwise
+
+=back
+
+	my $taglist = $epp->list_tags;
+
+It accepts no arguments and returns undef on error.
+
+Note that you must have passed the C<tag_list> option to L<login()|/Login>
+in order to use this method.
+
+=cut
+
+sub list_tags {
+	my $self = shift;
+	my $type = 'tag';
+	my @spec = $self->spec ($type);
+	my $frame = Net::EPP::Frame::Command::Info->new;
+	my $name = $frame->createElement ('tag:list');
+	$name->setAttribute ("xmlns:$type", $spec[1]);
+	$frame->getCommandNode->appendChild ($name);
+
+	my $response = $self->_send_frame($frame) or return undef;
+	if ($Code != 1000) { return undef; }
+
+	my $infData = $response->getNode($spec[1], 'listData');
+	my $taglist = [];
+	for my $node ($infData->childNodes) {
+		push @$taglist, $self->_tag_infData_to_hash ($node);
+	}
+	return $taglist;
 }
 
 =head1 Hello
@@ -1389,6 +1558,11 @@ sub spec {
 			"http://www.nominet.org.uk/epp/xml/std-release-1.0",
 			"http://www.nominet.org.uk/epp/xml/std-release-1.0 std-release-1.0.xsd");
 	}
+	if ($type eq 'tag') {
+		return ($type,
+			"http://www.nominet.org.uk/epp/xml/nom-tag-$EPPVer",
+			"http://www.nominet.org.uk/epp/xml/nom-tag-$EPPVer nom-tag-$EPPVer.xsd");
+	}
 }
 
 =head2 valid_voice
@@ -1489,6 +1663,19 @@ sub set_reason {
 	return $self->{'_reason'};
 }
 
+sub get_debug {
+	my $self = shift;
+	return $self->{debug};
+}
+
+sub set_debug {
+	my ($self, $debug) = @_;
+	croak "Debug must be whole number" unless $debug =~ /^\d+$/;
+	$Debug = $debug;
+	$self->{debug} = $Debug > 1 ? 1 : 0; # for parent
+	return $Debug;
+}
+
 sub _send_frame {
 	my ($self, $frame) = @_;
 
@@ -1523,9 +1710,11 @@ sub _send_frame {
 
 =head1 TODO
 
+=encoding utf8
+
 =over
 
-=item * The poll, fork, handshake, lock, tag list and reseller operations
+=item * The poll, fork, handshake, lock and reseller operations
 are not yet supported.
 
 =item * Much more extensive tests should be performed.
@@ -1539,12 +1728,12 @@ are not yet supported.
 =item * L<Net::EPP::Simple>
 
 =item * Nominet's L<EPP
-Documentation|http://registrars.nominet.org.uk/registration-and-domain-management/registrar-systems/epp>
+Documentation|https://registrars.nominet.uk/uk-namespace/registration-and-domain-management/registration-systems/epp/>
 
-=item * The EPP RFCs: L<RFC 5730|http://tools.ietf.org/html/rfc5730>, 
-L<RFC 5731|http://tools.ietf.org/html/rfc5731>,
-L<RFC 5732|http://tools.ietf.org/html/rfc5732> and
-L<RFC 5733|http://tools.ietf.org/html/rfc5733>.
+=item * The EPP RFCs: L<RFC 5730|https://tools.ietf.org/html/rfc5730>, 
+L<RFC 5731|https://tools.ietf.org/html/rfc5731>,
+L<RFC 5732|https://tools.ietf.org/html/rfc5732> and
+L<RFC 5733|https://tools.ietf.org/html/rfc5733>.
 
 =back
 
@@ -1554,7 +1743,7 @@ Pete Houston <cpan@openstrike.co.uk>
 
 =head1 Licence
 
-This software is copyright (c) 2013-2015 by Pete Houston. It is released
+This software is copyright © 2013-2019 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the
 GNU General Public Licence (version 2).
 

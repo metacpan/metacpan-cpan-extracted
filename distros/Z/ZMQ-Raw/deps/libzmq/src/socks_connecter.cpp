@@ -33,7 +33,6 @@
 
 #include "macros.hpp"
 #include "socks_connecter.hpp"
-#include "stream_engine.hpp"
 #include "random.hpp"
 #include "err.hpp"
 #include "ip.hpp"
@@ -61,6 +60,7 @@ zmq::socks_connecter_t::socks_connecter_t (class io_thread_t *io_thread_,
     stream_connecter_base_t (
       io_thread_, session_, options_, addr_, delayed_start_),
     _proxy_addr (proxy_addr_),
+    _auth_method (socks_no_auth_required),
     _status (unplugged)
 {
     zmq_assert (_addr->protocol == protocol_name::tcp);
@@ -72,8 +72,24 @@ zmq::socks_connecter_t::~socks_connecter_t ()
     LIBZMQ_DELETE (_proxy_addr);
 }
 
+void zmq::socks_connecter_t::set_auth_method_none ()
+{
+    _auth_method = socks_no_auth_required;
+    _auth_username.clear ();
+    _auth_password.clear ();
+}
+
+void zmq::socks_connecter_t::set_auth_method_basic (const std::string username,
+                                                    const std::string password)
+{
+    _auth_method = socks_basic_auth;
+    _auth_username = username;
+    _auth_password = password;
+}
+
 void zmq::socks_connecter_t::in_event ()
 {
+    int expected_status = -1;
     zmq_assert (_status != unplugged);
 
     if (_status == waiting_for_choice) {
@@ -86,17 +102,24 @@ void zmq::socks_connecter_t::in_event ()
             if (rc == -1)
                 error ();
             else {
-                std::string hostname;
-                uint16_t port = 0;
-                if (parse_address (_addr->address, hostname, port) == -1)
-                    error ();
-                else {
-                    _request_encoder.encode (
-                      socks_request_t (1, hostname, port));
-                    reset_pollin (_handle);
-                    set_pollout (_handle);
-                    _status = sending_request;
-                }
+                if (choice.method == socks_basic_auth)
+                    expected_status = sending_basic_auth_request;
+                else
+                    expected_status = sending_request;
+            }
+        }
+    } else if (_status == waiting_for_auth_response) {
+        int rc = _auth_response_decoder.input (_s);
+        if (rc == 0 || rc == -1)
+            error ();
+        else if (_auth_response_decoder.message_ready ()) {
+            const socks_auth_response_t auth_response =
+              _auth_response_decoder.decode ();
+            rc = process_server_response (auth_response);
+            if (rc == -1)
+                error ();
+            else {
+                expected_status = sending_request;
             }
         }
     } else if (_status == waiting_for_response) {
@@ -118,20 +141,39 @@ void zmq::socks_connecter_t::in_event ()
         }
     } else
         error ();
+
+    if (expected_status == sending_basic_auth_request) {
+        _basic_auth_request_encoder.encode (
+          socks_basic_auth_request_t (_auth_username, _auth_password));
+        reset_pollin (_handle);
+        set_pollout (_handle);
+        _status = sending_basic_auth_request;
+    } else if (expected_status == sending_request) {
+        std::string hostname;
+        uint16_t port = 0;
+        if (parse_address (_addr->address, hostname, port) == -1)
+            error ();
+        else {
+            _request_encoder.encode (socks_request_t (1, hostname, port));
+            reset_pollin (_handle);
+            set_pollout (_handle);
+            _status = sending_request;
+        }
+    }
 }
 
 void zmq::socks_connecter_t::out_event ()
 {
-    zmq_assert (_status == waiting_for_proxy_connection
-                || _status == sending_greeting || _status == sending_request);
+    zmq_assert (
+      _status == waiting_for_proxy_connection || _status == sending_greeting
+      || _status == sending_basic_auth_request || _status == sending_request);
 
     if (_status == waiting_for_proxy_connection) {
         const int rc = static_cast<int> (check_proxy_connection ());
         if (rc == -1)
             error ();
         else {
-            _greeting_encoder.encode (
-              socks_greeting_t (socks_no_auth_required));
+            _greeting_encoder.encode (socks_greeting_t (_auth_method));
             _status = sending_greeting;
         }
     } else if (_status == sending_greeting) {
@@ -143,6 +185,16 @@ void zmq::socks_connecter_t::out_event ()
             reset_pollout (_handle);
             set_pollin (_handle);
             _status = waiting_for_choice;
+        }
+    } else if (_status == sending_basic_auth_request) {
+        zmq_assert (_basic_auth_request_encoder.has_pending_data ());
+        const int rc = _basic_auth_request_encoder.output (_s);
+        if (rc == -1 || rc == 0)
+            error ();
+        else if (!_basic_auth_request_encoder.has_pending_data ()) {
+            reset_pollout (_handle);
+            set_pollin (_handle);
+            _status = waiting_for_auth_response;
         }
     } else {
         zmq_assert (_request_encoder.has_pending_data ());
@@ -189,12 +241,20 @@ void zmq::socks_connecter_t::start_connecting ()
 int zmq::socks_connecter_t::process_server_response (
   const socks_choice_t &response_)
 {
-    //  We do not support any authentication method for now.
-    return response_.method == 0 ? 0 : -1;
+    return response_.method == socks_no_auth_required
+               || response_.method == socks_basic_auth
+             ? 0
+             : -1;
 }
 
 int zmq::socks_connecter_t::process_server_response (
   const socks_response_t &response_)
+{
+    return response_.response_code == 0 ? 0 : -1;
+}
+
+int zmq::socks_connecter_t::process_server_response (
+  const socks_auth_response_t &response_)
 {
     return response_.response_code == 0 ? 0 : -1;
 }
@@ -205,8 +265,11 @@ void zmq::socks_connecter_t::error ()
     close ();
     _greeting_encoder.reset ();
     _choice_decoder.reset ();
+    _basic_auth_request_encoder.reset ();
+    _auth_response_decoder.reset ();
     _request_encoder.reset ();
     _response_decoder.reset ();
+    _status = unplugged;
     add_reconnect_timer ();
 }
 
@@ -215,29 +278,28 @@ int zmq::socks_connecter_t::connect_to_proxy ()
     zmq_assert (_s == retired_fd);
 
     //  Resolve the address
-    if (_addr->resolved.tcp_addr != NULL) {
-        LIBZMQ_DELETE (_addr->resolved.tcp_addr);
+    if (_proxy_addr->resolved.tcp_addr != NULL) {
+        LIBZMQ_DELETE (_proxy_addr->resolved.tcp_addr);
     }
 
-    _addr->resolved.tcp_addr = new (std::nothrow) tcp_address_t ();
-    alloc_assert (_addr->resolved.tcp_addr);
+    _proxy_addr->resolved.tcp_addr = new (std::nothrow) tcp_address_t ();
+    alloc_assert (_proxy_addr->resolved.tcp_addr);
     //  Automatic fallback to ipv4 is disabled here since this was the existing
     //  behaviour, however I don't see a real reason for this. Maybe this can
     //  be changed to true (and then the parameter can be removed entirely).
-    _s = tcp_open_socket (_addr->address.c_str (), options, false, false,
-                          _addr->resolved.tcp_addr);
+    _s = tcp_open_socket (_proxy_addr->address.c_str (), options, false, false,
+                          _proxy_addr->resolved.tcp_addr);
     if (_s == retired_fd) {
         //  TODO we should emit some event in this case!
-
-        LIBZMQ_DELETE (_addr->resolved.tcp_addr);
+        LIBZMQ_DELETE (_proxy_addr->resolved.tcp_addr);
         return -1;
     }
-    zmq_assert (_addr->resolved.tcp_addr != NULL);
+    zmq_assert (_proxy_addr->resolved.tcp_addr != NULL);
 
     // Set the socket to non-blocking mode so that we get async connect().
     unblock_socket (_s);
 
-    const tcp_address_t *const tcp_addr = _addr->resolved.tcp_addr;
+    const tcp_address_t *const tcp_addr = _proxy_addr->resolved.tcp_addr;
 
     int rc;
 
@@ -255,7 +317,7 @@ int zmq::socks_connecter_t::connect_to_proxy ()
         }
     }
 
-        //  Connect to the remote peer.
+    //  Connect to the remote peer.
 #if defined ZMQ_HAVE_VXWORKS
     rc = ::connect (_s, (sockaddr *) tcp_addr->addr (), tcp_addr->addrlen ());
 #else

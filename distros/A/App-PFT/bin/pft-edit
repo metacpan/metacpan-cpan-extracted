@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014-2016 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -23,23 +23,23 @@
 
 pft edit - Edit an entry
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
-    pft edit -P [options] title of your page
-    pft edit -B [options] title of your blog page
-    pft edit -M [options] title of your month page
-    pft edit -T [options] title of your tag page
+    B<pft edit -P> [options] title of your page
+    B<pft edit -B> [options] title of your blog page
+    B<pft edit -M> [options] title of your month page
+    B<pft edit -T> [options] title of your tag page
 
 =head1 DESCRIPTION
 
-The C<pft edit> command allows to conveniently edit a text entry in a
-I<PFT> site. It takes care of creating a skeleton for the new entries, to
-position them correctly within your I<PFT> site, and to maintain their
-position consistent with the type of content.
+The L<pft-edit(1)> command allows to conveniently edit a text entry in a
+I<PFT> site. It takes care of creating a header for the new entries, to
+position files correctly within your I<PFT> filesystem tree, and to maintain
+the filesystem location consistent depending on the type of content.
 
 All entries are stored under the C<ROOT/content> directory, where C<ROOT>
 is the base path of your I<PFT> site. Each entry has the same format:
-a text file encoded as by locale, composed by a YAML header concatenated
+a text file encoded as by locale, composed by a I<YAML> header concatenated
 with Markdown text (more details later in this document).
 
 There can be different kind of entries:
@@ -49,52 +49,53 @@ There can be different kind of entries:
 =item Regular Pages
 
 Regular pages do not declare a date in their header. They get positioned
-in C<ROOT/content/pages>. Their file name depends on their title.
+in C<ROOT/content/pages>. Their file name depends on the page title.
 
-Example: a page entitled I<Hello World> gets
+For example, a page entitled I<Hello World> is stored as:
 
     ROOT/content/pages/hello-world
 
 =item Blog pages
 
 Blog pages declare a full date (year, month and day) in their header. They
-get positioned in the C<ROOT/content/blog/YYYY-MM> directory (where
-C<YYYY> and C<MM> correspond to the declared year and month respectively).
-Their file name starts with a C<DD-> prefix, where C<DD> corresponds to
-the declared day. The remaining part of the file name depends on their
-title.
+are positioned in the C<ROOT/content/blog/YYYY-MM> directory (where
+C<YYYY> and C<MM> correspond to the declared year and month, respectively).
+The file name of a blog page starts with a C<DD-> prefix, where C<DD>
+corresponds to the declared day. The remaining part of the file name depends
+on the entry title.
 
-Example: an entry entitled I<Hello World> edited the 12th of September 2015
-gets
+For example, an entry entitled I<Hello World> edited the 12th of September 2015
+is stored as:
 
     ROOT/content/blog/2015-09/12-hello-world
 
 =item Month pages
 
-Month pages are meant as C<entries summarizing a whole month>. They are
+Month pages are meant as I<entries summarizing a whole month>. They are
 like blog pages, but the date defined in their headers lack of the day
-part (it is replaced by C<*>). They are stored as
+part (it is replaced by C<*> character). They are stored as
 C<ROOT/content/blog/YYYY-MM.month> (where C<YYYY> and C<MM> represent the
 declared year and month).
 
-Example: the month page for September 2015 gets
+For example, the month page for September 2015 is stored as:
 
     ROOT/content/blog/2016-09.month
 
 =item Tag pages
 
-All pages can optionally declare one or more tags. A tag can optionally be
-associated to a tag page.
+All pages can optionally declare one or more tags. A tag in turn can be
+optionally associated to a tag page.
 
 For example, if your site has have a number of entries about cuisine, some
-of them might be tagged with the C<chicken> tag. You may want to have a
-tag page entitled C<chicken>, where you give a description of what
-I<chicken> is (just in case someone does not know).
+of them might be tagged with the C<chicken> tag. You may want to have a tag
+page entitled C<chicken>, where you give a description of what I<chicken> is
+(just in case someone does not know).
 
 Tag pages are stored in C<ROOT/content/tags>, and their file name depends
 on the tag title.
 
-Example: a page containing a description of the tag I<chicken> gets
+For example, a page containing a description of the tag I<chicken> is stored
+as:
 
     ROOT/content/tags/chicken
 
@@ -104,89 +105,89 @@ Example: a page containing a description of the tag I<chicken> gets
 
 =over
 
-=item -P
+=item B<-P>
 
 Edit a page
 
 A title is mandatory.
 
-=item -B
+=item B<-B>
 
 Edit a blog page
 
 If no title is specified, it defaults to C<today>.
 
-=item -M
+=item B<-M>
 
 Edit a month page
 
 The title is optional.
 
-=item -T
+=item B<-T>
 
 Edit a tag page
 
 A title is mandatory.
 
-=item --year=<y> | -y <y>
+=item B<--year>=I<y> | B<-y> I<y>
 
-Defines a year for the edited entry. Implies -B unless -M is set.
+Defines a year for the edited entry. Implies B<-B> unless B<-M> is set.
 
-This flag cannot be used if -P or -T are specified. It gets honored only
-when generating a header for the entry, that is if the file does not exist
-yet.
+This flag cannot be used if B<-P> or B<-T> are specified. It gets honored
+only when generating a header for the entry, that is if the file does not
+exist yet.
 
-=item --month=<m> | -m <m>
+=item B<--month>=I<m> | B<-m> I<m>
 
-Defines a month for the edited entry. Implies -B unless -M is set.
+Defines a month for the edited entry. Implies B<-B> unless B<-M> is set.
 
-This flag cannot be used if -P or -T are specified. It gets honored only
-when generating a header for the entry, that is if the file does not exist
-yet.
+This flag cannot be used if B<-P> or B<-T> are specified. It gets honored
+only when generating a header for the entry, that is if the file does not
+exist yet.
 
-=item --day=<d> | -d <d>
+=item B<--day>=I<d> | B<-d> I<d>
 
-Defines a day for the edited entry. Implies -B unless -M is set.
+Defines a day for the edited entry. Implies B<-B> unless B<-M> is set.
 
-This flag cannot be used if -P or -T are specified. It gets honored only
-when generating a header for the entry, that is if the file does not exist
-yet.
+This flag cannot be used if B<-P> or B<-T> are specified. It gets honored
+only when generating a header for the entry, that is if the file does not
+exist yet.
 
-=item --author=<name> | -a <name>
+=item B<--author>=I<name> | B<-a> I<name>
 
 Defines the author for the entry.
 
 This flag gets honored only when generating a header for the entry, that
 is if the file does not exist yet.
 
-=item --tag=<tag> | -t <tag>
+=item B<--tag>=I<tag> | B<-t> I<tag>
 
 This flag gets honored only when generating a header for the entry, that
 is if the file does not exist yet.
 
-=item --resume | -r
+=item B<--resume> | B<-r>
 
 Resume editing of a blog entry.
 
-This option implies C<-B>. The blog entry resumed for editing corresponds by
+This option implies B<-B>. The blog entry resumed for editing corresponds by
 default to the latest in chronological order.
 
-A date can be specified via the C<-y>, C<-m> and C<-d> options. If the date
-is only partially specified, that is not all of C<-y>, C<-m> and C<-d> are
+A date can be specified via the B<-y>, B<-m> and B<-d> options. If the date
+is only partially specified, that is not all of B<-y>, B<-m> and B<-d> are
 provided, the missing bits get completed with the current date.  If no date
-is specified, C<-r> is equivalent to C<--back 0>.
+is specified, B<-r> is equivalent to B<--back 0>.
 
 If more then one entry exists for the specified date, the command fails and
-the user is explicitly required to specify a selection via the C<--select>
+the user is explicitly required to specify a selection via the B<--select>
 option.
 
-=item --back=<count> | -b <count>
+=item B<--back>=I<count> | B<-b> I<count>
 
 Resume editing an old entry. The supplied parameter defines how many days
 we should go back in history since the last day we have an entry for (0
 means the most recent day, 1 means the second to last).
 
-=item --editor <command>
+=item B<--editor> I<command>
 
 Specify an editor to use.
 
@@ -196,7 +197,9 @@ where C<%s> is replaced with the file name (e.g. C<vim [options] %s>).
 This flag overrides the C<$EDITOR> environment variable and the
 C<system.editor> setting in the main configuration file.
 
-=item --stdin
+This option is ignored if B<--stdin> is used.
+
+=item B<--stdin>
 
 Retrieve content from stdin.
 
@@ -207,38 +210,41 @@ file gets replaced.  If the file exists and the header is well formed, the
 header is maintained and the remaining part of the file is replaced with content
 retrieved from standard input.
 
-If this option is in use the C<--editor> gets ignored.
+If this option is in use the B<--editor> is ignored.
 
-This mode handles input and output encoding according to the current locale,
-under the assumption that your content is B<plain text>.
+This editing mode handles input and output encoding according to the current
+locale, under the assumption that your content is text data.
 
-=item --append
+=item B<--append>
 
-As for C<--stdin>, but append content instead of replacing it.
+As for B<--stdin>, but append content instead of replacing it.
 
-If the content file does not exist or is empty it will be created with a
-reasonable header. Otherwise the content will be appended to it. If the header
-is corrupted the command will issue a warning, but no further action will be
-taken.
+If the content file does not exist or is empty, and header will be
+automatically defined depending on the given command options.
 
-=item --select=<id>
+If the header exists but is corrupted, the command will issue a warning.
+No corrective action will be taken.
+
+=item B<--select>=I<id>
 
 Select a certain entry by index, in case of ambiguity.
 
 This option applies when multiple files are matching the parameters for file
-selection, and a choice is required.  In these situations, if C<--select> is
-not provided the C<pft edit> command will fail, and the use of C<--select>
-will be explicitly requested by an error message.
+selection, and a choice is required.  In these situations, if B<--select> is
+not provided the L<pft-edit(1)> command will fail, and the use of
+B<--select> will be explicitly requested by an error message.
 
-=item --raw
+=item B<--raw>
 
-This option is useful only if C<--stdin> or C<--append> are specified.
+This option is useful only if B<--stdin> or B<--append> are specified.
 
-If the C<--raw> option is used the header is not maintained: C<--stdin> will
-behave like the C<cat E<gt> $content_file> unix command line, and C<--append>
-will behave like C<cat E<gt>E<gt> $content_file>.
+If the B<--raw> option is used the header is not maintained: C<pft edit
+--stdin --raw> command will behave like C<cat E<gt> $content_file>, while
+C<pft edit --append --raw> will behave like C<cat E<gt>E<gt> $content_file>.
+The path of C<$content_file> is determined by the previously described file
+naming rules.
 
-=item --help | -h
+=item B<--help> | B<-h>
 
 Shows this help.
 
@@ -248,31 +254,31 @@ Shows this help.
 
 Content entries are in encoded text format.
 
-The expected encoding for the file corresponds to the C<locale> encoding.
-On most modern Unix systems this is I<UTF-8>, but you can use the
-C<locale> command in order to figure it out.
+The expected encoding for the file corresponds to the C<locale>.  On modern
+systems I<UTF-8> is the more popular encoding, but you can use the
+L<locale(1)> command to figure out.
 
 Each file starts with a header in I<YAML> format. The header is followed
 by a line with three dashes (C<--->) which marks the beginning of the
 actual content. The content will be parsed as I<Markdown> when the site is
 compiled.
 
-The header of a content entry is created automatically by C<pft edit> when
-the accessed entry does not exist. The file gets then opened with a text
-editor. The C<$EDITOR> environment variable will be honored unless an
-editor is defined in the C<pft.yaml> configuration file (see the manual of
-C<pft init> for further information). You may also specify a different
-editor using the C<--editor> command line option.
+The header of a content entry is created automatically by L<pft-edit(1)>
+when the accessed entry does not exist. The file gets then opened with a
+text editor. The C<$EDITOR> environment variable will be honored unless an
+editor is defined in the C<pft.yaml> configuration file (see
+L<pft-init(1)>). You may also specify a different editor using the
+B<--editor> command line option.
 
-After the editor is closed a warning will be issued if the header is
-invalid. If the file completely empty (as in I<zero bytes>) it will be
-removed from the filesystem. If the header is valid but it is not
-consistent with the position in the filesystem (e.g. the date was manually
-changed) the file position is updated to be consistent.
+When the editor is terminated the file content is evaluated.  A warning will
+be issued if the header is invalid.  If the file completely empty (zero
+bytes) it will be removed from the filesystem.  If the header is valid but
+not consistent with the position in the filesystem (e.g. the date was
+manually changed) the file position is updated according to the header.
 
 =head2 The content header
 
-Each entry starts with a header in YAML format. The header defines the
+Each entry starts with a header in I<YAML> format. The header defines the
 properties of the entries. Valid properties with their descriptions follow
 in this section.
 
@@ -286,7 +292,7 @@ value of it is taken from the C<pft.yaml> configuration file.
 =item I<Date>
 
 The date associated with the entry. This field is required only for blog
-entries. Changing the value while editing with C<pft edit> will result to
+entries. Changing the value while editing with L<pft-edit(1)> will result to
 the position in the filesystem to be adapted consistently.
 
 =item I<Options>
@@ -297,28 +303,31 @@ Some optional properties of the entry:
 
 =item I<hide>
 
-If set to 1 the entry is going to be hidden.
+I<This feature is currently broken>.
 
-This option is meant as a way to temporarily hide an entry. Currently it is
-somewhat broken, so its use is not recommended.
+If set to 1 the entry is not going to be built by L<pft-make(1)>.
+
+The intention is to temporarily hide an entry (e.g. if it is incomplete).
 
 =item I<template>
 
 Each page can specify a different template to use by means of this field.
-It is by default defined as C<~> (in YAML that is I<null>) meaning that the
-page will use the global template as defined in the C<pft.yaml>
+It is by default defined as C<~> (in I<YAML> that is I<null>) meaning that
+the page will use the global template as defined in the C<pft.yaml>
 configuration file.
 
 =back
 
 =item I<Slug>
 
-The slug determines how the file will be named.
+The slug determines how the published file will be named.
 
-By default it is derived by removing non-word characters from the I<Title>
-field. The purpose is having a reasonable file name, which is both
-convenient and I<healty> to handle with command line programs (escape
-sequences get removed, etc).
+The default slug value is derived by removing non-word characters from the
+I<Title> field. The purpose is to have a mnemonic file name, which is both
+readable and convenient to handle.
+
+The field can be manually changed in the header, and this will result in the
+file name to be modified when the editor is terminated.
 
 =item I<Tags>
 
@@ -336,39 +345,41 @@ The title of the entry, in human readable form.
 
 =back
 
-=head2 The content text
+=head2 Links in content
 
-Upon compilation the content text is parsed as Markdown and gets
-translated into HTML (see the manual of C<pft make> for additional
-details). In this phase some special symbols are recognized:  HTML tags
-such as C<E<lt>aE<gt>> and C<E<lt>imgE<gt>> are analyzed in search of
-links to internal resources, like pictures or other pages within your
-I<PFT> site.
+Besides regular URLs, internal resources such as pages, blog entries and
+imported images can be referenced by means of a special link syntax.
 
-This section contains a reference manual for the recognized special links.
-Since Markdown is a super-set of HTML, direct HTML can be supplied in the
-text too, so both Markdown and HTML syntaxes will be mentioned in the
-following description.
+Upon compilation by L<pft-make(1)> the content is translated from Markdown
+to HTML.  After this phase HTML elements such as C<E<lt>aE<gt>> and
+C<E<lt>imgE<gt>> are scanned, and those links matching the special syntax
+are resolved according to the rules described in this manual.
 
-The recognized syntax for special links is:
+Links in the special syntax are in the form
 
     :kind:param/param/...
 
-Follows a list of valid C<kind> keywords. The meaning of each C<param>
-depends on the specified C<kind>. Separation is done with the C</> symbol.
+There is a number of accepted C<kind> keywords. The number and meaning of
+each parameter C<param> depends on the specified C<kind>.  The slash (C</>)
+symbol separates syntactically the various parameters.
 
 =head3 Pictures with C<:pic:path/to/picture.jpg>
 
-Picture reference accept special links in the form
+Picture references accept special links in the Markdown form
 
     ![alttext](:pic:filename)
+
+or in the HTML form
+
     <img alt="alttext" src=":pic:filename"/>
 
-This form will be resolved to an HTML link towards a file named named
-I<filename> under the C<I<ROOT>/content/pics> directory.  The name
-provided is used directly for lookup, so it must be complete of file
-extension, if any.  The C</> symbol will work as path separator regardless
-of the operating system.
+A link like this will be resolved to a file named named I<filename> under
+the C<I<ROOT>/content/pics> directory.  The name provided is used directly
+for lookup, so it must be complete of file extension, if any.
+
+The C<img> keyword allows for an arbitrary number of parameter, each of
+which concurs to define the path of the picture.  In other words, the C</>
+symbol will work as path separator regardless of the operating system.
 
 HTML Example:
 
@@ -418,7 +429,7 @@ Examples:
 =item :web:I<service>/I<param>/I<param>/...
 
 Generate an URL which points to a web site or service (e.g. search
-In all other cases the C<--select> flag is silently ignored.
+In all other cases the B<--select> flag is silently ignored.
 
 engines, or specialized website) and passes data on the query. A number of
 valid values are supported for the  I<service> argument. The list of
@@ -433,8 +444,8 @@ Supported services:
 C<:web:ddg/I<bang>/I<param>/I<param>/...>
 
 Search query on the I<Duck Duck Go> search engine. The first parameter is
-used for Duck Duck Go's Bang syntax, and can be empty in order not to
-use any Bang.
+used for Duck Duck Go's I<Bang> syntax, and can be empty in order not to use
+any Bang.
 
 Example: search C<linux howto> on Duck Duck Go:
 
@@ -486,6 +497,10 @@ Examples:
 =head3 Resume the blog entry of the 27th of August 2014
 
     pft edit -B -r -y2014 -d27 -m Aug
+
+=head1 SEE ALSO
+
+L<pft-init(1)>, L<pft-make(1)>
 
 =cut
 

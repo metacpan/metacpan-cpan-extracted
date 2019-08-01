@@ -1,5 +1,13 @@
 Changelog for Mojolicious-Plugin-Export
 
+0.007     2019-07-22 22:20:46-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed documentation using "paths" key instead of "pages". Using
+      invalid configuration keys now throws a friendlier error message
+      (instead of a "Can't locate object method" error...)
+
 0.006     2019-07-18 20:51:05-05:00 America/Chicago
 
     [Fixed]

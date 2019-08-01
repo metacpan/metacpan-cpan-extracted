@@ -1,0 +1,9 @@
+Revision history for Net-Connection-Sort
+
+0.0.1	 2019-07-30/02:30
+		 - Remove a bit of unused code that prevented one
+		   method from running.
+
+0.0.0	 2019-07-27/22:00
+		 - Initial release.
+

@@ -3,8 +3,8 @@ use 5.012;
 use lib 't';
 use MyTest;
 
-my $tname = shift(@ARGV) or die "usage: $0 <test name>";
+die "usage: $0 <test name>" unless @ARGV;
 
-Test::Catch::run($tname);
+Test::Catch::run(@ARGV);
 
 done_testing();

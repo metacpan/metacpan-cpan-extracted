@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ActivityLocationType;
-$Shipment::UPS::WSDL::TrackTypes::ActivityLocationType::VERSION = '3.01';
+$Shipment::UPS::WSDL::TrackTypes::ActivityLocationType::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -77,7 +77,7 @@ Shipment::UPS::WSDL::TrackTypes::ActivityLocationType
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,25 @@
+sudo: false
+
+language: perl
+perl:
+  - "5.30"
+  - "5.28"
+
+before_install:
+  - perlbrew lib create @build
+  - perlbrew use @build
+  - cpanm -n -q Test2::Harness
+
+script:
+  - yath --qvf
+  - cpanm -n -q App::ModuleBuildTiny
+  - mbtiny dist
+  - perlbrew lib create @installation
+  - perlbrew use @installation
+  - cpanm -n -q *.tar.gz
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#chupei.pm"
+    use_notice: true

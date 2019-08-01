@@ -10,7 +10,7 @@ configure_requires:
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: ShellQuote-Any
 provides:
   ShellQuote::Any:
     file: lib/ShellQuote/Any.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   String::ShellQuote: '0'
   Win32::ShellQuote: '0'
@@ -33,5 +33,5 @@ resources:
   bugtracker: http://github.com/bayashi/ShellQuote-Any/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/ShellQuote-Any
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

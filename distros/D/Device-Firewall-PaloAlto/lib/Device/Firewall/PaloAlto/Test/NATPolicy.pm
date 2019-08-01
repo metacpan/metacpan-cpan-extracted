@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Test::NATPolicy;
-$Device::Firewall::PaloAlto::Test::NATPolicy::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::Test::NATPolicy::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
@@ -57,7 +57,7 @@ Device::Firewall::PaloAlto::Test::NATPolicy - A Palo Alto NAT policy test result
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 

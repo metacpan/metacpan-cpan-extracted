@@ -1,14 +1,13 @@
-use strict;
-
 package Finance::Bank::SCSB::TW;
-
-use Carp;
 use 5.008;
-our $VERSION = '0.12';
+our $VERSION = '0.14';
+
+use strict;
+use utf8;
+use Carp;
 use WWW::Mechanize;
 use HTML::Selector::XPath qw(selector_to_xpath);
 use HTML::TreeBuilder::XPath;
-use utf8;
 use List::MoreUtils qw(mesh);
 use Finance::Bank::SCSB::TW::CurrencyExchangeRateCollection;
 
@@ -21,7 +20,7 @@ use Finance::Bank::SCSB::TW::CurrencyExchangeRateCollection;
             keep_alive => 1,
             timeout => 60,
         );
-        $ua->agent_alias("Windows IE 6");
+        $ua->agent_alias("Mac Mozilla");
         return $ua;
     }
 }
@@ -186,8 +185,6 @@ to me, but is provided under B<NO GUARANTEE>, explicit or implied.
 Kang-min Liu E<lt>gugod@gugod.orgE<gt>
 
 =head1 COPYRIGHT
-
-Copyright 2003,2004,2005,2006,2007,2008,2009 by Kang-min Liu E<lt>gugod@gugod.orgE<gt>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

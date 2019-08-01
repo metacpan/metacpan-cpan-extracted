@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,7 +26,7 @@ use strict;
 use List::Util 'max';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -73,13 +73,13 @@ sub new {
 }
 
 #------------------------------------------------------------------------------
-# A063171 same in binary
+# A063171 in binary
 # A080116 predicate 0,1
 # A080300 inverse, ranking value->i or 0
 # A080237 num trailing zeros
 # A085192 first diffs
 # A000108 Catalan numbers, count of values in 4^k blocks
-# A071152 balanced/2, Lukasiewicz words for the rooted plane binary trees
+# A071152 balanced 2*binary, Lukasiewicz words for the rooted plane binary trees
 # A075171 trees by binary runs in integers, coded to Dyck words
 # A071153 Lukasiewicz coded digits
 #
@@ -465,6 +465,7 @@ sub _pred_on_bits {
   ### _pred_on_bits(): $bits
 
   if (scalar(@$bits) & 1) {
+    ### odd length ...
     return 0;
   }
 
@@ -473,15 +474,15 @@ sub _pred_on_bits {
     ### reversed bits: @$bits
   }
 
-  my @count = (0,0);
+  my $count = 0;
   foreach my $bit (@$bits) {
-    $count[$bit]++;
-    if ($count[0] > $count[1]) {
+    ### at: "bit=$bit count=$count"
+    if (($count += ($bit<<1)-1) < 0) {
       return 0;
     }
   }
-  ### @count
-  return ($count[0] == $count[1]);
+  ### final count: $count
+  return ! $count;
 }
 
 # w = log2(value) / 2
@@ -550,7 +551,7 @@ closing parentheses.
     2, 10, 12, 42, 44, 50, 52, 56, 170, 172, 178, ...
     starting i=1
 
-Written in binary a 1-bit is an opening "(" and a 0-bit is a closing ")".
+Written in binary, a 1-bit is an opening "(" and a 0-bit is a closing ")".
 
            value     
      i   in binary   as parens
@@ -570,11 +571,11 @@ Balanced means the total number of 1s and 0s are the same and when reading
 from high to low has count(1s) E<gt>= count(0s) at all times, which is to
 say any closing ")" must have a preceding matching open "(".
 
-Because the number of 1s and 0s are equal the width is always an even 2*w.
-The number of values with a given width is the Catalan number C(w) =
-(2w)!/(w!*(w+1)!).  For example 6-bit values w=6/2=3 gives C(3) =
-(2*3)!/(3!*4!) = 5 many such values, being i=4 through i=8 inclusive as
-shown above.  (See L<Math::NumSeq::Catalan>.)
+Because the number of 1s and 0s are equal, the width is always an even 2*w.
+The number of values with a given width 2*w is the Catalan number per
+(L<Math::NumSeq::Catalan>).  For example 6-bit values w=6/2=3 is C(3) =
+(2*3)!/(3!*4!) = 5 many such values, being i=4 through i=8 inclusive shown
+above.
 
 =head2 Binary Trees
 
@@ -589,11 +590,11 @@ node written out recursively.  If those legs are both empty (ie. the node is
 a leaf) then they're empty trees and are "0" giving node "100".  Otherwise
 the node is 1 followed by various more 1s and 0s.  For example,
 
+    a (root)  
+   / \        
+  b   c      =>  11001010 [0]
+       \         ab  c d   ^-final zero of encoding omitted
         d  
-       /
-  b   c   =>   11001010 [0]
-   \ /         ab  c d   ^-final zero of encoding omitted
-    a  
 
 At "a" write 1 and recurse to write its left then right legs.  The left leg
 is "b" so write 1 and the two legs of "b" are empty so write 0,0.  That
@@ -618,8 +619,9 @@ are probably better handled as a string or list of bits.
 
 =head2 Mountain Ranges
 
-A cute interpretation of the opens and closes is as up and down slopes of a
-mountain range.  1-bit for up, 0-bit for down.  For example,
+A further usual and attractive interpretation of the opens and closes is as
+up and down slopes of a mountain range.  1-bit for up, 0-bit for down.  For
+example,
 
         /\
        /  \  /\
@@ -677,16 +679,18 @@ integer then return the i of the next higher or lower value, respectively.
 
 =head2 Next
 
-When stepping to the next value the number of 1s and 0s does not change.
-The 1s move to make a numerically higher value.  The simplest case is an
-isolated low 1-bit.  It must move up one place.  For example,
+When stepping to the next value, of same bit length, the number of 1s and 0s
+does not change.  The 1s move to make a numerically higher value.  The
+simplest case is an isolated low 1-bit.  It must move up one place.  For
+example,
 
     11100100             isolated low 1-bit
     ->                   shifts up
     11101000
 
 If the low 1 has a 1 above it then that bit must move up and the lower one
-goes to the low end of the value.  For example
+goes to the low end of the value so as to be the smallest increase.  For
+example
 
     1110011000           pair of bits
     ->                   one shifts up, other drops to low end
@@ -708,6 +712,10 @@ next bigger block of values is an alternating 1010..10.  For example
       111000    last 6-bit value, all 1-bits at high end
     ->
     10101010    first 8-bit value
+
+This incrementing is fairly straightforward.  Some pseudocode can be found
+in M.C. Er, "Enumerating Ordered Trees Lexicographically", The Computer
+Journal, volume 28, number 5, 1985, procedure GenSuc (and Rank and Unrank).
 
 =head2 Ith
 
@@ -754,6 +762,24 @@ extending a table each time then stop the table at that point.
 Catalan(w) grows as a little less than a power 4^w so the table has a little
 more than log4(i) many rows.
 
+=head1 OEIS
+
+Entries in Sloane's Online Encyclopedia of Integer Sequences related to
+this sequence include
+
+    A063171     binary
+    A071152     binary, digits 0,2
+    A085185     base 4
+    A080116     predicate
+    A072643     width
+    A085192     differences
+    A080237     number of low 0 bits
+    A085223     i where single low 0 bit
+    A002054     number of 01 bit pairs in length 2n
+    A057520     value/2, so sans low 0 bit
+    A085183     value sans high 1 and low 0 bits
+    A085184        in base 4
+
 =head1 SEE ALSO
 
 L<Math::NumSeq>,
@@ -766,7 +792,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

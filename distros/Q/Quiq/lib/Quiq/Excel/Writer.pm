@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.151';
+our $VERSION = '1.152';
 
 use Quiq::Path;
 
@@ -57,7 +57,7 @@ Dokumentation siehe Basisklasse.
 
 =item $file
 
-Name der .xslx Datei.
+Pfad der .xslx Datei, auf die geschrieben wird.
 
 =item $fh
 
@@ -100,7 +100,7 @@ sub new {
 
 =head1 VERSION
 
-1.151
+1.152
 
 =head1 AUTHOR
 

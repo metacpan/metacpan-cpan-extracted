@@ -1,5 +1,9 @@
-package App::DistSync::Lock; # $Id: Lock.pm 5 2014-10-08 16:24:59Z abalama $
+package App::DistSync::Lock; # $Id: Lock.pm 27 2019-07-23 11:26:37Z abalama $
+use warnings;
 use strict;
+use utf8;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -7,18 +11,18 @@ App::DistSync::Lock - Lock File Manipulation
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
   use File::Pid;
-  
+
   my $lock = new App::DistSync::Lock(
           file => '/some/file.lock',
           hold => 3600,
           pid  => $$,
       );
-  
+
   if ( my $pid = $lock->running ) {
       die "Already running: $num\n";
   }
@@ -75,7 +79,11 @@ Returns current error message
 
 =head1 HISTORY
 
-See C<CHANGES> file
+See C<Changes> file
+
+=head1 DEPENDENCIES
+
+L<CTK>
 
 =head1 TO DO
 
@@ -87,34 +95,27 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-C<perl>, L<File::Pid>, L<LockFile::Simple>
+L<CTK>
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use File::Basename qw/basename/;
 use Carp;
@@ -123,7 +124,7 @@ sub new {
     my $class = shift;
     my $stamp = time;
     my ($name) = basename($0);
-    
+
     my $self = bless({@_,
             status  => 0,
             error   => "",
@@ -148,10 +149,10 @@ sub new {
         $self->{hold} = 3600;
     }
     my $hold = $self->{hold};
-    
+
     # Current string
     my $str = sprintf("%d#%d#%s", $pid, $stamp, $name);
-    
+
     # Check existing file
     local *RD_LOCK_FILE;
     if ($file && -e $file) {
@@ -187,7 +188,7 @@ sub new {
             }
         }
     }
-    
+
     # Create new file
     local *MY_LOCK_FILE;
     unless (open(MY_LOCK_FILE, ">", $file)) {
@@ -202,23 +203,23 @@ sub new {
         $self->{error} = sprintf("Can't close file %s: %s", $file, $!);
         return $self;
     }
-    
+
     $self->{status} = 1;
     return $self;
 }
-sub error { 
+sub error {
     my $self = shift;
     #my $s = shift;
     #$self->{error} = $s if defined $s;
     return $self->{error};
 }
-sub status { 
+sub status {
     my $self = shift;
     #my $s = shift;
     #$self->{status} = $s if defined $s;
     return $self->{status};
 }
-sub running { 
+sub running {
     my $self = shift;
     my $pid = shift;
     $pid = $self->{run} unless defined $pid;

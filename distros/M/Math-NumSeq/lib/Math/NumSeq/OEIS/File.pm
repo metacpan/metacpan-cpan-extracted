@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -29,14 +29,14 @@ use File::Spec;
 use Symbol 'gensym';
 
 use vars '$VERSION','@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_to_bigint = \&Math::NumSeq::_to_bigint;
 
 use vars '$VERSION';
-$VERSION = 72;
+$VERSION = 73;
 
 eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
@@ -589,6 +589,7 @@ sub _read_internal_txt {
     # Or for digit expansions it's the number of terms before the decimal
     # point, per http://oeis.org/eishelp2.html#RO
     #
+    ### digits: $self->{'characteristic'}->{'digits'}
     unless ($self->{'characteristic'}->{'digits'}) {
       $self->{'i'} = $self->{'i_start'} = $offset;
     }
@@ -687,7 +688,7 @@ sub _read_html {
     $contents = _decode_html_charset($contents);
 
     if ($contents =~
-        m{$anum[ \t]*\n.*?       # target anum
+        m{$anum[ \t]*\r?\n.*?       # target anum
           <td[^>]*>\s*(?:</td>)? # <td ...></td> empty
           <td[^>]*>              # <td ...>
           \s*
@@ -706,8 +707,8 @@ sub _read_html {
     # fragile grep out of the html ...
     my $keywords;
     if ($contents =~ m{KEYWORD.*?<[tT][tT][^>]*>(.*?)</[tT][tT]>}s) {
-      ### html keywords match: $1
       $keywords = $1;
+      ### html keywords match: $keywords
     } else {
       # die "Oops, KEYWORD not matched: $anum";
     }
@@ -805,7 +806,8 @@ sub _set_characteristics {
   # "base" means non-decimal, it seems, maybe
   if ($self->{'characteristic'}->{'OEIS_cons'}
       && ! $self->{'characteristic'}->{'OEIS_base'}
-      && $self->{'anum'} ne 'A000012') {
+      && $self->{'anum'} ne 'A000012'
+      && $self->{'anum'} ne 'A000035') {  # 0,1 rep = mod 2
     $self->{'values_min'} = 0;
     $self->{'values_max'} = 9;
     $self->{'characteristic'}->{'digits'} = 10;

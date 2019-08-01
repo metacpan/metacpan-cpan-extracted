@@ -13,7 +13,7 @@ WriteMakefile1(
     AUTHOR           => q{Giovanni Simoni (dacav at openmailbox)},
     VERSION_FROM     => 'lib/App/PFT.pm',
     ABSTRACT         => 'Hacker friendly static blog generator',
-    LICENSE          => 'GNU GPL v3',
+    LICENSE          => 'gpl_3',
     PL_FILES         => {},
     EXE_FILES        => [grep { -x } glob 'bin/*'],
     MIN_PERL_VERSION => 5.006,
@@ -26,7 +26,7 @@ WriteMakefile1(
         'File::Temp'                => 0,
         'Cwd'                       => 0,
         'IPC::Run'                  => 0,
-        'PFT'                       => '1.2.1',
+        'PFT'                       => '1.4.1',
     },
     PREREQ_PM => {
         'Carp'                  => 0,
@@ -51,7 +51,7 @@ WriteMakefile1(
         'Template::Alloy'       => 0,
         'URI'                   => 0,
 
-        'PFT'                   => v1.2.1,
+        'PFT'                   => v1.4.1,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-PFT-*' },

@@ -9,6 +9,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(pseudo_api_call);
 
 use Device::Firewall::PaloAlto::API;
+use Test::More;
 
 # VERSION
 # PODNAME
@@ -39,7 +40,7 @@ sub pseudo_api_call {
 
     my @api_responses;
     for my $xml_file (@xml_files) {
-        open(my $fh, '<:encoding(UTF8)', $xml_file) or return;
+        open(my $fh, '<:encoding(UTF8)', $xml_file) or BAIL_OUT("Cannot open file $xml_file");
         my $xml = do { local $/ = undef, <$fh> };
         my $api = Device::Firewall::PaloAlto::API::_check_api_response($xml);
         push @api_responses, $api;

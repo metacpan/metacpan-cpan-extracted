@@ -45,7 +45,7 @@
    "provides" : {
       "Calendar::Persian" : {
          "file" : "lib/Calendar/Persian.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Persian"
       }
    },
-   "version" : "0.41",
+   "version" : "0.42",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -9,7 +9,7 @@ BEGIN {
     $DTRACE = Test2::Harness::Util::DepTracer->new;
 }
 
-our $VERSION = '0.001079';
+our $VERSION = '0.001080';
 
 use File::Spec();
 
@@ -60,7 +60,7 @@ sub run {
     }
 
     my $settings = $self->{+SETTINGS};
-    my $pfile = File::Spec->rel2abs(PFILE_NAME());
+    my $pfile = File::Spec->rel2abs(PFILE_NAME(),$ENV{YATH_PERSISTENCE_DIR}||'./');
 
     my ($exit, $runner, $pid, $stat);
     my $ok = eval {

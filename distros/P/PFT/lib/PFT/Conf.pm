@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Conf v1.3.0;
+package PFT::Conf v1.4.1;
 
 =encoding utf8
 
@@ -137,67 +137,161 @@ our $CONF_NAME = 'pft.yaml';
 #
 # The semantics of each array item is defined by the following $IDX_* variables:
 my(
-    $IDX_MANDATORY,     # true if the configuration is mandatory
-    $IDX_GETOPT_SUFFIX, # the corresponding suffix in getopt (see Getopt::Long)
-    $IDX_DEFAULT,       # The default value when generating a configuration
-    $IDX_HELP           # A human readable text descrbing the option
-) = 0 .. 3;
+    $IDX_MANDATORY,             # 1 if the configuration is mandatory
+    $IDX_GETOPT_SUFFIX,         # Corresponding suffix in getopt (see Getopt::Long)
+    $IDX_DEFAULT,               # The default value when generating a configuration
+    $IDX_HELP,                  # A human readable text descrbing the option
+    $IDX_HELP_OPTARG_NAME,      # Option argument placeholder, undef if the
+                                # option doesn't take arguments.
+    $IDX_HELP_DEFAULT,          # Optional human readable text explaining
+                                # the default value. A representation of the
+                                # actual default is used if this is missing.
+) = 0 .. 5;
 my %CONF_RECIPE = do {
     my $user = $ENV{USER} || 'anon';
-    my $editor = $ENV{EDITOR} || 'vim';
-    my $browser = $ENV{BROWSER} || 'firefox';
     (
-        'site-author'     => [1, '=s', $user || 'Anonymous',
-            'Default author of entries'
+        'site-author' => [
+            1,
+            '=s',
+            $user,
+            'Global Author, can be overriden by individual entries',
+            'USER',
+            'C<$USER> (environment variable)',
         ],
-        'site-template'   => [1, '=s', 'default.html',
-            'Default template for compilation, can be overriden by single '.
-            'entries'
+        'site-template' => [
+            1,
+            '=s',
+            'default.html',
+            'Global HTML template, can be overriden by individual entires',
+            'TEMPLATE',
+            undef,
         ],
-        'site-theme'      => [0, '=s', 'light',
-            'Global theme (e.g. "light" or "dark") optionally honored by '.
-            'templates. Specific accepted values depend on the template '.
-            'implementation'
+        'site-theme' => [
+            0,
+            '=s',
+            'light',
+            'Global theme (e.g. C<light> or C<dark>) optionally honored by'.
+            ' templates. Specific accepted values depend on the template'.
+            ' implementation',
+            'THEME',
+            undef,
         ],
-        'site-title'      => [1, '=s', 'My PFT website',
+        'site-title' => [
+            1,
+            '=s',
+            'My PFT website',
             'Title of the website',
+            'TITLE',
+            undef,
         ],
-        'site-url'        => [0, '=s', 'http://example.org',
+        'site-url' => [
+            0,
+            '=s',
+            'http://example.org',
             'Base url for the website',
+            'URL',
+            undef,
         ],
-        'site-home'       => [1, '=s', 'Welcome',
-            'First page, where index.html redirects the browsers',
+        'site-home' => [
+            1,
+            '=s',
+            'Welcome',
+            'First page, where C<index.html> will redirect the browsers',
+            'PAGE_NAME',
+            undef,
         ],
-        'site-encoding'   => [1, '=s', $Encode::Locale::ENCODING_LOCALE,
-            'Charset of the generated web pages'
+        'site-encoding' => [
+            1,
+            '=s',
+            $Encode::Locale::ENCODING_LOCALE,
+            'Charset of the generated web pages',
+            'ENC',
+            'what is defined by L<locale(1)>',
         ],
-        'site-feedfile'  => [0, '=s', 'feed.rss',
-            'File name of the RSS XML to be published by "pft gen-rss"',
+        'site-feed-path' => [
+            0,
+            '=s',
+            'feed.rss',
+            'File name of the RSS XML to be published by L<pft-gen-rss(1)>',
+            'PATH',
+            undef,
         ],
-        'publish-method'  => [1, '=s', 'rsync+ssh',
-            'Method used for publishing'
+        'site-feed-length' => [
+            0,
+            '=i',
+            10,
+            'Number of most recent blog entries to list in the RSS feed',
+            'N',
+            undef,
         ],
-        'publish-host'    => [0, '=s', 'example.org',
-            'Remote host where to publish'
+        'site-feed-description' => [
+            0,
+            '=s',
+            'News from a PFT website',
+            'Description of the channel (C<E<lt>descriptionE<gt>> in the XML)',
+            'DESC',
+            undef,
         ],
-        'publish-user'    => [0, '=s', $user,
-            'User login on publishing host'
+        'publish-method' => [
+            1,
+            '=s',
+            'rsync+ssh',
+            'Method used for publishing (see L<pft-pub(1)>)',
+            'NAME',
+            undef,
         ],
-        'publish-port'    => [0, '=i', 22,
-            'Port for connection on publishing host'
+        'publish-host' => [
+            0,
+            '=s',
+            'example.org',
+            'Remote host where to publish (see L<pft-pub(1)>)',
+            'HOST',
+            undef,
         ],
-        'publish-path'    => [0, '=s', "/home/$user/public_html",
-            'Directory on publishing host'
+        'publish-user' => [
+            0,
+            '=s',
+            $user,
+            'User login on publishing host (see L<pft-pub(1)>)',
+            'USER',
+            '$USER (environment variable)',
         ],
-        'system-editor'   => [0, '=s', "$editor %s",
-            'Editor to be invoked by C<pft edit>. You may specify an '.
-            'executable, or a shell command where "%s" gets replaced '.
-            'with the file name'
+        'publish-port' => [
+            0,
+            '=i',
+            22,
+            'Port for connection on publishing host (see L<pft-pub(1)>)',
+            'PORT',
+            undef,
         ],
-        'system-browser'  => [0, '=s', "$browser %s",
-            'Browser to be invoked by C<pft show>. You may specify an '.
-            'executable, or a shell command where "%s" gets replaced '.
-            'with the file name'
+        'publish-path' => [
+            0,
+            '=s',
+            "/home/$user/public_html",
+            'Remote path on publishing host (see L<pft-pub(1)>)',
+            'PATH',
+            'C</home/$USER/public_html>, as by tradition',
+        ],
+        'system-editor' => [
+            0,
+            '=s',
+            $ENV{EDITOR} || 'vi',
+            'Editor to be invoked by L<pft-edit(1)>. You may specify an'.
+            ' executable, or a L<sh(1)> command where "%s" gets replaced'.
+            ' with the file name (e.g.'.
+            ' "vim +\'set filetype=markdown spell\' %s")',
+            'EDITOR',
+            'C<$EDITOR> (environment variable), or C<vi> if not defined'
+        ],
+        'system-browser'  => [
+            0,
+            '=s',
+            $ENV{BROWSER} || 'firefox',
+            'Browser to be invoked by B<pft-show(1)>. You may specify an'.
+            ' executable, or a L<sh(1)> command where "%s" gets replaced'.
+            ' with the file name (e.g. "firefox -profile x \'%s\'")',
+            'BROWSER',
+            'C<$BROWSER> (environment variable), or C<firefox> if not defined'
         ],
     )
 };
@@ -240,7 +334,7 @@ sub _read_recipe {
     if (my $filter = shift) {
         while (my($k, $vs) = each %CONF_RECIPE) {
             my $v = $vs->[$select] or next;
-            push @out, $k => $vs->[$select];
+            push @out, $k => $v;
         }
     } else {
         while (my($k, $vs) = each %CONF_RECIPE) {
@@ -255,10 +349,23 @@ sub pod_autogen {
 
     for my $key (sort keys %CONF_RECIPE) {
         my $info = $CONF_RECIPE{$key};
+
+        my $optitem = "=item B<--${key}>";
+        if (my $optarg_name = $info->[$IDX_HELP_OPTARG_NAME]) {
+            $optitem .= "=I<${optarg_name}>"
+        }
+
+        my $default = $info->[$IDX_HELP_DEFAULT];
+        unless (defined $default) {
+            # The semantic explanation on the default is missing, using the
+            # textual representation of the actual default.
+            $default = "C<$info->[$IDX_DEFAULT]>"
+        }
+
         push @out,
-            "=item --$key", '',
-            $info->[$IDX_HELP], '',
-            "Defaults to C<$info->[$IDX_DEFAULT]>", ''
+            "$optitem\n",
+            "$info->[$IDX_HELP].",
+            "Defaults to $default.", '',
     }
 
     join "\n", @out, '=back';# '', '=cut';

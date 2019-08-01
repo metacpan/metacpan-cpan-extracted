@@ -1,6 +1,6 @@
 package Web::NewsAPI;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use v5.10;
 use Moose;
@@ -12,7 +12,7 @@ use Carp;
 use DateTime::Format::ISO8601::Format;
 use Scalar::Util qw(blessed);
 
-use Web::NewsAPI::Article;
+use Web::NewsAPI::Result;
 use Web::NewsAPI::Source;
 
 Readonly my $API_BASE_URL => 'https://newsapi.org/v2/';
@@ -29,18 +29,14 @@ has 'api_key' => (
     isa => 'Str',
 );
 
-has 'total_results' => (
-    is => 'rw',
-    isa => 'Maybe[Int]',
-    default => undef,
-);
-
 sub top_headlines {
     my ($self, %args) = @_;
 
-    return $self->_make_articles(
-        $self->_request( 'top-headlines', 'articles', %args)
-    );
+    # Collapse the source-param into a comma-separated string,
+    # if it's an array.
+    $self->_collapse_list( 'source', \%args );
+
+    return $self->_make_article_set( 'top-headlines', \%args );
 }
 
 sub everything {
@@ -49,9 +45,7 @@ sub everything {
     # Collapse each source/domain-param into a comma-separated string,
     # if it's an array.
     for my $param (qw(source domains excludeDomains) ) {
-        if ( $args{$param} && ( ref $args{$param} eq 'ARRAY' ) ) {
-            $args{$param} = join q{,}, @{$args{$param}};
-        }
+        $self->_collapse_list( $param, \%args );
     }
 
     # Convert time-params into ISO 8601 strings, if they are DateTime
@@ -73,35 +67,46 @@ sub everything {
         }
     }
 
-    return $self->_make_articles(
-        $self->_request( 'everything', 'articles', %args )
+    return $self->_make_article_set( 'everything', \%args );
+
+}
+
+sub _make_article_set {
+    my ($self, $endpoint, $args) = @_;
+
+    my $article_set = Web::NewsAPI::Result->new(
+        newsapi => $self,
+        api_endpoint => $endpoint,
+        api_args => $args,
+        page => $args->{page} || 1,
+        page_size => $args->{pageSize} || 20,
     );
+
+    if (wantarray) {
+        return $article_set->articles;
+    }
+    else {
+        return $article_set;
+    }
+}
+
+sub _collapse_list {
+    my ($self, $param, $args) = @_;
+    if ( $args->{$param} && ( ref $args->{$param} eq 'ARRAY' ) ) {
+        $args->{$param} = join q{,}, @{$args->{$param}};
+    }
 }
 
 sub sources {
     my ($self, %args) = @_;
 
     my @sources;
-    for my $source_data ( $self->_request( 'sources', 'sources', %args ) ) {
+    my ($source_data_list) = $self->_request( 'sources', 'sources', %args );
+    for my $source_data ( @$source_data_list ) {
         push @sources, Web::NewsAPI::Source->new( $source_data );
     }
 
     return @sources;
-}
-
-sub _make_articles {
-    my ($self, @article_data) = @_;
-    my @articles;
-    for my $article_data (@article_data) {
-        push @articles, Web::NewsAPI::Article->new(
-            %$article_data,
-            source => Web::NewsAPI::Source->new(
-                id => $article_data->{source}->{id},
-                name => $article_data->{source}->{name},
-            ),
-        );
-    }
-    return @articles;
 }
 
 sub _build_ua {
@@ -125,10 +130,7 @@ sub _request {
     my $response = $self->ua->get( $uri );
     if ($response->is_success) {
         my $data_ref = decode_json( $response->content );
-        if ( exists $data_ref->{totalResults} ) {
-            $self->total_results( $data_ref->{totalResults} );
-        }
-        return @{ $data_ref->{$container} };
+        return ($data_ref->{$container}, $data_ref->{totalResults});
     }
     else {
         my $code = $response->code;
@@ -157,21 +159,28 @@ Web::NewsAPI - Fetch and search news headlines and sources from News API
  );
 
  say "Here are the top ten headlines from American news sources...";
- my @headlines = $newsapi->top_headlines( country => 'us', pageSize => 10 );
- for my $article ( @headlines ) {
+ # This will be a Web::NewsAPI::Results object.
+ my $result = $newsapi->top_headlines( country => 'us', pageSize => 10 );
+ for my $article ( $result->articles ) {
     # Each is a Web::NewsAPI::Article object.
     say $article->title;
  }
 
  say "Here are the top ten headlines worldwide containing 'chicken'...";
- my @chicken_heds = $newsapi->everything( q => 'chicken', pageSize => 10 );
- for my $article ( @chicken_heds ) {
+ my $chicken_heds = $newsapi->everything( q => 'chicken', pageSize => 10 );
+ for my $article ( $chicken_heds->articles ) {
     # Each is a Web::NewsAPI::Article object.
     say $article->title;
  }
+ say "The total number of chicken-flavor articles returned: "
+     . $chicken_heds->total_results;
+
 
  say "Here are some sources for English-language technology news...";
- my @sources = $newsapi->sources( category => 'technology', language => 'en' );
+ my @sources = $newsapi->sources(
+    category => 'technology',
+    language => 'en'
+ );
  for my $source ( @sources ) {
     # Each is a Web::NewsAPI::Source object.
     say $source->name;
@@ -198,7 +207,8 @@ fetch a key for yourself by registering a free account with News API
 L<at its website|https://newsapi.org>.
 
 Note that the validity of the API key you provide isn't checked until
-you try calling one of this module's object methods.
+this object (or one of its derivative objects) tries to send a query to
+News API.
 
 =head2 Object Methods
 
@@ -209,11 +219,20 @@ from News API.
 
 =head3 everything
 
- my @articles_about_chickens = $newsapi->everything( q => 'chickens' );
+ # Call in scalar context to get a result object.
+ my $chicken_result-> = $newsapi->everything( q => 'chickens' );
 
-Returns a number of L<Web::NewsAPI::Article> objects representing all
-news articles matching the query parameters you provide. The
-hash must contain I<at least one> of the following keys:
+ # Or call in array context to just get one page of articles.
+ my @chicken_stories = $newsapi->everything( q => 'chickens' );
+
+In scalar context, returns a L<Web::NewsAPI::Result> object representing
+news articles matching the query parameters you provide. In array
+context, it returns one page-worth of L<Web::NewsAPI::Article> objects
+(equivalent to calling L<Web::NewsAPI::Result/"articles"> on the result
+object, and then discarding it).
+
+In either case, the argument hash must contain I<at least one> of the
+following keys:
 
 =over
 
@@ -277,17 +296,30 @@ maximum.
 
 =item page
 
-Use this to page through the results.
+Which page of results to return. The default is 1.
 
 =back
 
 =head3 top_headlines
 
- my @articles = $newsapi->top_headlines( country => 'us' );
+ # Call in scalar context to get a result object.
+ my $top_us_headlines = $newsapi->top_headlines( country => 'us' );
 
-Returns a number of L<Web::NewsAPI::Article> objects representing
-current top news headlines, narrowed by the supplied argument hash. The
-hash must contain I<at least one> of the following keys:
+ # Or call in array context to just get one page of articles.
+ my @top_us_headlines = $newsapi->top_headlines( country => 'us' );
+
+Like L<"everything">, but limits results only to the latest articles,
+sorted by recency. (Note that this arguments are a little different, as
+well.)
+
+In scalar context, returns a L<Web::NewsAPI::Result> object representing
+news articles matching the query parameters you provide. In array
+context, it returns one page-worth of L<Web::NewsAPI::Article> objects
+(equivalent to calling L<Web::NewsAPI::Result/"articles"> on the result
+object, and then discarding it).
+
+In either case, the argument hash must contain I<at least one> of the
+following keys:
 
 =over
 
@@ -310,7 +342,11 @@ News API will return an error if you mix this with C<sources>.
 
 =item sources
 
-A list of News API source IDs, rendered as a comma-separated string.
+I<Either> a comma-separated string I<or> an array reference of News API
+news source ID strings to limit results from.
+
+See L<the News API sources index|https://newsapi.org/sources> for a list
+of valid source IDs.
 
 News API will return an error if you mix this with C<country> or
 C<category>.
@@ -336,16 +372,6 @@ Use this to page through the results if the total results found is
 greater than the page size.
 
 =back
-
-=head3 total_results
-
- my @articles = $newsapi->top_headlines( country => 'us' );
- my $number_of_articles = $newsapi->total_results;
-
-Returns the I<total> number of articles that News API claims for the
-most recent L<"top_headlines"> or L<"source"> query. This will often be
-larger than the single "page" of results actually returned by either
-method.
 
 =head3 sources
 

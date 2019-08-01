@@ -16,6 +16,7 @@
 #
 # Packaged along with Axmud, renamed and reduced to alleviate various problems
 # List of changes (besides cosmetic ones):
+#   - Added 'use warnings' as the lack of it causes Kwalitee errors
 #   - Commented out $VERSION as it causes Kwalitee errors
 #   - Removed POD stuff
 #   - Modified ->new so it returns 'undef', rather than doing a Perl die(), if wmctrl is not
@@ -29,6 +30,7 @@ package Games::Axmud::Obj::WMCtrl;
 
 use vars qw($VERSION);
 use strict;
+use warnings;
 
 #our $VERSION = '0.03';
 

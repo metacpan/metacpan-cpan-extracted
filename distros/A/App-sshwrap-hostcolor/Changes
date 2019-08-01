@@ -1,29 +1,36 @@
-0.008   2019-03-12 (PERLANCAR)
+0.009   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Disable feature that change terminal background color during
+	  completion because it currently changes background color
+	  permanently; we want temporary change just for preview.
+
+
+0.008   2019-03-12  Released-By: PERLANCAR
 
 	- [Bugfix] [regression] Re-add removed function read_history_file()
 	  because it is used by completer script.
 
 
-0.007   2019-03-12 (PERLANCAR)
+0.007   2019-03-12  Released-By: PERLANCAR
 
 	- [Bugfix] Fix history recording which caused missing entries.
 
 
-0.006   2018-10-10 (PERLANCAR)
+0.006   2018-10-10  Released-By: PERLANCAR
 
 	- [bugfix] completion: when argv[0] doesn't match any host in
 	  .sshwrap-hostcolor.history, return undef so completion can try
 	  other things.
 
 
-0.005   2018-09-26 (PERLANCAR)
+0.005   2018-09-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc][bugfix] Misplaced the video links.
 
 
-0.004   2018-09-26 (PERLANCAR)
+0.004   2018-09-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -32,16 +39,16 @@
 	- [doc] Mention SSHWRAP_HOSTCOLOR_AUTO in Synopsis.
 
 
-0.003   2018-09-26 (PERLANCAR)
+0.003   2018-09-26  Released-By: PERLANCAR
 
 	- [Bugfix] Fix completion to set terminal background color.
 
 
-0.002   2018-09-26 (PERLANCAR)
+0.002   2018-09-26  Released-By: PERLANCAR
 
 	- Observe SSHWRAP_HOSTCOLOR_AUTO.
 
 
-0.001   2018-09-25 (PERLANCAR)
+0.001   2018-09-25  Released-By: PERLANCAR
 
         - First release.

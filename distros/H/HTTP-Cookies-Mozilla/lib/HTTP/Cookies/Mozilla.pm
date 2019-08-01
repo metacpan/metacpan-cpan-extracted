@@ -14,31 +14,33 @@ HTTP::Cookies::Mozilla - Cookie storage and management for Mozilla
 
 	use HTTP::Cookies::Mozilla;
 
-	$cookie_jar = HTTP::Cookies::Mozilla->new;
+	my $file = ...; # Firefox profile dir / cookies.sqlite
+	my $cookie_jar = HTTP::Cookies::Mozilla->new( file => $file );
 
 	# otherwise same as HTTP::Cookies
 
 =head1 DESCRIPTION
 
-This package overrides the C<load()> and C<save()> methods of HTTP::Cookies
-so it can work with Mozilla cookie files.
+This package overrides the C<load()> and C<save()> methods of
+HTTP::Cookies so it can work with Mozilla cookie files. These might
+be stored in the user profile directory as F<cookies>. On macOS,for
+instance, that's F<~/Application Support/Firefox/*/cookies.sqlite>.
 
 This module should be able to work with all Mozilla derived browsers
 (FireBird, Camino, et alia).
 
-Note that as of FireFox, version 3, the
-cookie file format changed from plain text files to SQLite databases,
-so you will need to have either L<DBI>/L<DBD::SQLite>, or the
-B<sqlite3> executable somewhere in the path. Neither one has been
-put as explicit dependency, anyway, so you'll get an exception if
-you try to use this module with a new style file but without having
-any of them:
+Note that as of FireFox, version 3, the cookie file format changed
+from plain text files to SQLite databases, so you will need to have
+either L<DBI>/L<DBD::SQLite>, or the B<sqlite3> executable somewhere
+in the path. Neither one has been put as explicit dependency, anyway,
+so you'll get an exception if you try to use this module with a new
+style file but without having any of them:
 
    neither DBI nor pipe to sqlite3 worked (%s), install either one
 
-If your command-line B<sqlite3> is not in the C<$ENV{PATH}>,
-you can set C<$HTTP::Cookies::Mozilla::SQLITE> to point to the actual
-program to be used, e.g.:
+If your command-line B<sqlite3> is not in the C<$ENV{PATH}>, you can
+set C<$HTTP::Cookies::Mozilla::SQLITE> to point to the actual program
+to be used, e.g.:
 
    use HTTP::Cookies::Mozilla;
    $HTTP::Cookies::Mozilla::SQLITE = '/path/to/sqlite3';
@@ -70,10 +72,10 @@ Maintained by brian d foy, C<< <bdfoy@cpan.org> >>
 
 Parts Copyright 1997-1999 Gisle Aas.
 
-Other parts Copyright 2018 by brian d foy, <bdfoy@cpan.org>
+Other parts Copyright 2018-2019 by brian d foy, C<< <bdfoy@cpan.org> >>
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the Artistic License 2.0.
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Artistic License 2.0.
 
 =cut
 
@@ -85,7 +87,7 @@ use Carp qw(carp);
 use constant TRUE  => 'TRUE';
 use constant FALSE => 'FALSE';
 
-$VERSION = '2.034';
+$VERSION = '2.036';
 $SQLITE = 'sqlite3';
 
 

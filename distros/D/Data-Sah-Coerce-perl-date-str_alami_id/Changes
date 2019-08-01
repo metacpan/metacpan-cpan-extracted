@@ -1,9 +1,19 @@
-0.008   2018-06-04 (PERLANCAR)
+0.010   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.009   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.008   2018-06-04  Released-By: PERLANCAR
 
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
 	  version 3).
 
 
-0.007   2016-06-30 (PERLANCAR)
+0.007   2016-06-30  Released-By: PERLANCAR
 
         - First release, split from Data-Sah-Coerce-perl-date-str_alami.

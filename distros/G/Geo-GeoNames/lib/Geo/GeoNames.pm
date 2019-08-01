@@ -10,7 +10,7 @@ use Scalar::Util qw/blessed/;
 
 use vars qw($DEBUG $CACHE);
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 our %searches = (
 	cities                              => 'cities?',
@@ -32,6 +32,7 @@ our %searches = (
 	wikipedia_search                    => 'wikipediaSearch?',
 	get                                 => 'get?',
 	hierarchy                           => 'hierarchy?',
+	children                            => 'children?',
 	);
 
 #   r   = required
@@ -193,6 +194,11 @@ our %valid_parameters = (
 		username  => 'r',
 		},
 	hierarchy => {
+		geonameId => 'r',
+		username  => 'r',
+		style     => 'o',
+		},
+	children => {
 		geonameId => 'r',
 		username  => 'r',
 		style     => 'o',
@@ -383,7 +389,11 @@ sub _do_search {
 			}
 		}
 
-	carp "Invalid mime type [$mime_type]. Maybe you aren't connected.";
+	if($mime_type eq 'text/plain') {
+		carp 'Invalid mime type [text/plain]. ', $response->content();
+	} else {
+		carp "Invalid mime type [$mime_type]. Maybe you aren't connected.";
+	}
 
 	return [];
 	}
@@ -815,6 +825,18 @@ B<geonamesId> must be supplied to this method. B<style> is optional.
 
 For a thorough description of the arguments, see
 L<http://www.geonames.org/export/place-hierarchy.html#hierarchy>
+
+=item children(arg => $arg)
+
+Returns the children (admin divisions and populated places) for a given geonameId.
+
+    geonameId => $geonameId
+    style     => $style (Not documented, but seems to be respected)
+
+B<geonamesId> must be supplied to this method. B<style> is optional.
+
+For a thorough description of the arguments, see
+L<https://www.geonames.org/export/place-hierarchy.html>
 
 =back
 

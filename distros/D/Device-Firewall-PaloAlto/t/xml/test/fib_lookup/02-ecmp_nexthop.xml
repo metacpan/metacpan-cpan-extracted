@@ -1,0 +1,1 @@
+<response status="success"><result><nh>ip</nh><src>192.168.122.21</src><mpath><entry><nh>ip</nh><interface>ethernet1/1</interface><metric>10</metric><src>192.168.122.21</src><ip>192.168.122.1</ip></entry></mpath><ip>192.168.122.2</ip><metric>10</metric><interface>ethernet1/1</interface><dp>dp0</dp></result></response>

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -38,6 +38,7 @@ use Math::NumSeq::WoodallNumbers;
 
 MyOEIS::compare_values
   (anum => 'A050918',
+   max_value => 65535,
    func => sub {
      my ($count) = @_;
      require Math::NumSeq::Primes;
@@ -64,6 +65,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A002234',
+   max_value => 3,
    func => sub {
      my ($count) = @_;
      require Math::NumSeq::Primes;

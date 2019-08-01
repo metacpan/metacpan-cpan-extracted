@@ -1,3 +1,170 @@
+Sun Jul 28 13:15:11 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Make sure release process starts from a clean slate
+
+      M doc/HOWTO-RELEASE
+
+Sun Jul 28 13:10:49 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Prepare NEWS for 2.3.1 release
+
+      M NEWS
+
+Sun Jul 28 12:57:27 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * fix cross-references under --no-folding section of manual Under emacs,
+    this was previously rendered as
+
+        '--no-folding'
+
+             This disables any further *note tree folding:: or *note
+    tree
+            refolding::.  If a new subdirectory is encountered whilst
+    stowing a
+
+    which looks awkward.  Similarly under info(1):
+
+        '--no-folding'
+
+             This disables any further *note tree folding:: or *note
+    tree
+            refolding::.  If a new subdirectory is encountered whilst
+    stowing a
+
+    The new way is undesirably repetitive, but at least grammatically 
+    correct.  I don't think there's a better solution with texinfo :-/
+
+
+      M doc/stow.texi
+
+Sun Jul 28 12:55:22 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: add suggested commands for updating home page
+
+      M doc/HOWTO-RELEASE
+
+Sun Jul 28 13:03:54 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * cli.t: test with the right Perl executable (#62) cli.t: test with the
+    right Perl executable
+
+Tue Jul 16 19:24:19 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: update news section of online home page
+
+      M doc/HOWTO-RELEASE
+
+Tue Jul 16 19:21:04 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: update online docs *after* uploading release It doesn't
+    make sense to have docs online relating to a release which isn't
+    yet available; it's less confusing to have a small time window in
+    which the online docs are out of date.
+
+
+      M doc/HOWTO-RELEASE
+
+Mon Jul 15 16:10:21 2019 -0400  Adam Spiers <stow@adamspiers.org>
+
+    * cli.t: test with the right Perl executable t/cli.t calls scripts which
+    run with the first perl found in the user's PATH (usually the
+    system perl), not with the perl used for the build, as reported
+    here:
+
+        https://rt.cpan.org/Ticket/Display.html?id=129944
+
+    Thanks to Slaven Rezic for spotting this and reporting it!
+
+
+      M THANKS
+      M t/cli.t
+
+Sat Jun 29 13:48:59 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Remove dependencies on Hash::Merge and Clone::Choose (#60) Remove
+    dependencies on Hash::Merge and Clone::Choose
+
+Sat Jun 29 13:04:30 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Remove dependencies on Hash::Merge and Clone::Choose stow 2.3.0 added
+    external runtime dependencies on Hash::Merge and Clone::Choose.
+    Historically stow hasn't had runtime dependencies other than Perl
+    itself, which is a useful property if you're managing the 
+    installation of Perl using stow; the bootstrapping instructions in 
+    stow's manual would need updating to describe how to install these
+    two modules (and any dependencies they have now or in the future)
+    as well.
+
+    However, Hash::Merge is much more general than stow actually
+    needs, so replace the merge() call with a few lines of equivalent
+    code -- this avoids the external dependencies, and is clearer than
+    the merge() call.
+
+    Many thanks to Adam Sampson for this patch:
+
+    https://lists.gnu.org/archive/html/bug-stow/2019-06/msg00001.html
+
+
+      M Build.PL
+      M META.json
+      M META.yml
+      M NEWS
+      M bin/stow.in
+      M t/rc_options.t
+
+Sat Jun 29 13:40:45 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Bump version to 2.3.1 for development of next release
+
+      M META.json
+      M META.yml
+      M NEWS
+      M configure.ac
+      M doc/HOWTO-RELEASE
+
+Sat Jun 29 13:03:11 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Maintainer tweaks (#59) Maintainer tweaks
+
+Sat Jun 29 01:30:36 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Add GPL v3 upgrade to NEWS for 2.3.0 release Forgot to do this prior
+    to the release :-(  But at least it will be mentioned in the
+    announcement on the mailing lists.
+
+
+      M NEWS
+
+Sat Jun 29 01:12:36 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Make NEWS export to text better Run org-convert-to-odd-levels on NEWS
+    and set local variables so that sections can easily be exported
+    for release announcements.
+
+
+      M NEWS
+      M doc/HOWTO-RELEASE
+
+Fri Jun 28 23:48:37 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * Set DISTCLEANFILES to clean up more Docker generates a whole bunch of
+    files as root.
+
+
+      M Makefile.am
+
+Sat Jun 29 00:55:51 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: Fix cvs commit command for docs
+
+      M doc/HOWTO-RELEASE
+
+Sat Jun 29 00:36:00 2019 +0100  Adam Spiers <stow@adamspiers.org>
+
+    * HOWTO-RELEASE: Fix git tag command
+
+      M doc/HOWTO-RELEASE
+
 Fri Jun 28 23:54:30 2019 +0100  Adam Spiers <stow@adamspiers.org>
 
     * Split perlbrew install-multiple into separate RUN cmd This allows
@@ -1309,7 +1476,8 @@ Mon Nov 16 22:12:02 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
     * convert README to Markdown
 
-R076	README	README.md
+      D README
+      A README.md
 
 Mon Nov 16 21:56:45 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -1464,7 +1632,8 @@ Mon Nov 9 11:36:11 2015 +0000  Adam Spiers <stow@adamspiers.org>
       M META.yml
       M Makefile.am
       M NEWS
-R099	lib/Stow/Util.pm	lib/Stow/Util.pm.in
+      D lib/Stow/Util.pm
+      A lib/Stow/Util.pm.in
 
 Mon Nov 9 11:05:00 2015 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -1966,16 +2135,20 @@ Mon Jan 9 21:32:31 2012 +0000  Adam Spiers <stow@adamspiers.org>
     * Rename test files to reflect their purpose.
 
       M MANIFEST
-R099	t/stow_contents.t	t/stow.t
-R099	t/unstow_contents.t	t/unstow.t
-R099	t/unstow_contents_orig.t	t/unstow_orig.t
+      A t/stow.t
+      D t/stow_contents.t
+      A t/unstow.t
+      D t/unstow_contents.t
+      D t/unstow_contents_orig.t
+      A t/unstow_orig.t
 
 Mon Jan 9 21:31:46 2012 +0000  Adam Spiers <stow@adamspiers.org>
 
     * Rename stow.t to be more consistent with its purpose.
 
       M MANIFEST
-R098	t/stow.t	t/cli_options.t
+      A t/cli_options.t
+      D t/stow.t
 
 Mon Jan 9 22:10:19 2012 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -2504,8 +2677,9 @@ Thu Nov 24 17:00:33 2011 +0000  Adam Spiers <stow@adamspiers.org>
     * Auto-generate ChangeLog from git
 
       M .gitignore
+      D ChangeLog
       M Makefile.am
-R099	ChangeLog	doc/ChangeLog.OLD
+      A doc/ChangeLog.OLD
 
 Thu Nov 24 16:59:45 2011 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -2719,15 +2893,23 @@ Mon Nov 21 13:59:36 2011 +0000  Adam Spiers <stow@adamspiers.org>
       A META.json
       A META.yml
       M Makefile.am
-R100	install-sh	automake/install-sh
-R100	mdate-sh	automake/mdate-sh
-R100	missing	automake/missing
-R091	chkstow.in	bin/chkstow.in
-R096	stow.in	bin/stow.in
+      A automake/install-sh
+      A automake/mdate-sh
+      A automake/missing
+      A bin/chkstow.in
+      A bin/stow.in
+      D chkstow.in
       M configure.ac
-R099	stow.8	doc/stow.8
-R099	stow.texi	doc/stow.texi
-R099	texinfo.tex	doc/texinfo.tex
+      A doc/stow.8
+      A doc/stow.texi
+      A doc/texinfo.tex
+      D install-sh
+      D mdate-sh
+      D missing
+      D stow.8
+      D stow.in
+      D stow.texi
+      D texinfo.tex
 
 Mon Nov 21 14:07:39 2011 +0000  Adam Spiers <stow@adamspiers.org>
 
@@ -2758,9 +2940,10 @@ Thu Nov 24 16:28:09 2011 +0000  Adam Spiers <stow@adamspiers.org>
       M t/parent.t
       M t/stow.t
       M t/stow_contents.t
-R083	t/util.pm	t/testutil.pm
+      A t/testutil.pm
       M t/unstow_contents.t
       M t/unstow_contents_orig.t
+      D t/util.pm
 
 Fri Nov 18 15:09:39 2011 +0000  Adam Spiers <stow@adamspiers.org>
 

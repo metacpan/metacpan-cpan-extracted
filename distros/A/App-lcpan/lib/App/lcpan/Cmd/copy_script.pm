@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::copy_script;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.035'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '1.037'; # VERSION
 
 use 5.010;
 use strict;
@@ -109,7 +109,7 @@ App::lcpan::Cmd::copy_script - Copy a script's latest release file to current di
 
 =head1 VERSION
 
-This document describes version 1.035 of App::lcpan::Cmd::copy_script (from Perl distribution App-lcpan), released on 2019-06-26.
+This document describes version 1.037 of App::lcpan::Cmd::copy_script (from Perl distribution App-lcpan), released on 2019-07-23.
 
 =head1 FUNCTIONS
 
@@ -149,7 +149,7 @@ using the C<index_name>.
 
 Whether to overwrite existing file.
 
-=item * B<script>* => I<str>
+=item * B<script>* => I<filename::unix>
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

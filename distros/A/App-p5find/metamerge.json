@@ -1,0 +1,14 @@
+{
+    "name": "App-p5find",
+    "x_static_install": true,
+    "resources": {
+        "bugtracker": {
+            "web": "https://github.com/gugod/App-p5find/issues"
+        },
+        "repository": {
+            "web": "https://github.com/gugod/App-p5find",
+            "url": "https://github.com/gugod/App-p5find.git",
+            "type": "git"
+        }
+    }
+}

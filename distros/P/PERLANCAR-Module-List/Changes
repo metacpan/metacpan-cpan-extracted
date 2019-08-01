@@ -1,13 +1,41 @@
-Revision history for PERLANCAR-Module-List
+0.004004  2019-07-27  Released-By: PERLANCAR; Urgency: medium
 
-0.003005 2016-03-17 (PERLANCAR)
+	  - [bugfix] Fix wildcard matching which cut digging down early in
+	    the case of patterns like '*::Foo'.
+
+          - [test] Add test suite.
+
+
+0.004003  2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	  - [dist] Make String::Wildcard::Bash an optional
+	    (runtime-recommends) dependency.
+
+
+0.004002  2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	  - Support wildcard option.
+
+
+0.004001  2019-07-25  Released-By: PERLANCAR; Urgency: low
+
+          - No functional changes.
+
+	  - [doc] Module::List 0.004 now also has return_path option, so we no
+            longer list it as a difference between us and Module::List.
+
+          - [fmt] Reformat with 4-space indent, just like Module::List 0.004
+            now.
+
+
+0.003005 2016-03-17  Released-By: PERLANCAR
 
 	- [Bugfix] Make module work under perl < 5.10.
 
 
-0.003004 2016-03-15 (PERLANCAR)
+0.003004 2016-03-15  Released-By: PERLANCAR
 
-	- Add option: all.
+	- Introduce 'all' option.
 
 	- [Bugfix] Didn't return path when return_path=>1 and list_pod=>1 &
 	  use_pod_dir=>1.
@@ -15,19 +43,20 @@ Revision history for PERLANCAR-Module-List
 	- Support 5.006 back.
 
 
-0.003003 2016-01-21 (PERLANCAR)
+0.003003 2016-01-21  Released-By: PERLANCAR
 
          - [Bugfix] Don't assign to result multiple times, overriding the first
            path found (when 'return_path' is true).
 
-         - Bump minimum perl version to 5.10.1 because defined-or is easy.
+         - Bump minimum perl version to 5.10.1 because defined-or is so
+           convenient. UPDATE: has been reverted in 0.003004.
 
 
-0.003002 2016-01-20 (PERLANCAR)
+0.003002 2016-01-20  Released-By: PERLANCAR
 
-         - First release.
+         - Introduce 'return_path' option.
 
 
-0.003001 2015-08-11 (PERLANCAR)
+0.003001 2015-08-11  Released-By: PERLANCAR
 
          - First release.

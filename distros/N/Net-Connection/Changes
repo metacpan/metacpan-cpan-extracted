@@ -1,5 +1,9 @@
 Revision history for Net-Connection
 
+0.1.0	 2019-07-28/21:45
+		 - Add the pid method.
+		 - Resolve ports when the port is numeric.
+
 0.0,0    2019-07-06/23:00
 		 -Initial release.
 

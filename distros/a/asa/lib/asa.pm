@@ -1,10 +1,42 @@
-package asa;
+package asa; # git description: ad0fc97
+# ABSTRACT: Lets your class/object say it works like something else
+
+use 5.005;
+use strict;
+use Carp ();
+
+our $VERSION = '1.04';
+
+sub import {
+	my $class = shift;
+	my $have  = caller(0);
+	my $code  = join '',
+		"package $have;\n",
+		"\n",
+		"sub isa {\n",
+		( map { "\treturn 1 if \$_[1] eq '$_';\n" } @_ ),
+		"\tshift->SUPER::isa(\@_);\n",
+		"}\n";
+	eval( $code );
+	Carp::croak( "Failed to create isa method: $@" ) if $@;
+	return 1;
+}
+
+1;
+
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 asa - Lets your class/object say it works like something else
+
+=head1 VERSION
+
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -90,7 +122,7 @@ parent class and setting C<@ISA>, this pragma will provide convenient
 syntactic sugar for creating your own custom overloaded isa functions.
 
 Beyond just the idiom above, it implements various workarounds for some
-edge cases, so you don't have to, and allows clear seperation of concerns.
+edge cases, so you don't have to, and allows clear separation of concerns.
 
 You should just be able to use it, and if something ever goes wrong, then
 it's my fault, and I'll fix it.
@@ -126,60 +158,40 @@ For more information on implementing the Adapter pattern in Perl, see
 L<Class::Adapter>, which provides a veritable toolkit for creating
 an implementation of the Adapter pattern which can solve your problem.
 
-=cut
-
-use 5.005;
-use strict;
-use Carp ();
-
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.03';
-}
-
-sub import {
-	my $class = shift;
-	my $have  = caller(0);
-	my $code  = join '',
-		"package $have;\n",
-		"\n",
-		"sub isa {\n",
-		( map { "\treturn 1 if \$_[1] eq '$_';\n" } @_ ),
-		"\tshift->SUPER::isa(\@_);\n",
-		"}\n";
-	eval( $code );
-	Carp::croak( "Failed to create isa method: $@" ) if $@;
-	return 1;
-}
-
-1;
-
-=pod
-
-=head1 SUPPORT
-
-Bugs should be always be reported via the CPAN bug tracker at
-
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=asa>
-
-For other issues, or commercial enhancement or support, contact the author.
-
-=head1 AUTHORS
-
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
-
 =head1 SEE ALSO
 
 L<http://ali.as/>
 
-=head1 COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2006 - 2011 Adam Kennedy.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=asa>
+(or L<bug-asa@rt.cpan.org|mailto:bug-asa@rt.cpan.org>).
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=head1 AUTHOR
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+Adam Kennedy, <adamk@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Adam Kennedy Karen Etheridge
+
+=over 4
+
+=item *
+
+Adam Kennedy <adam@ali.as>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

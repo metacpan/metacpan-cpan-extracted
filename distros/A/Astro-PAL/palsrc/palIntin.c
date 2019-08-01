@@ -53,10 +53,12 @@
 *        Initial version
 *        Matches the SLALIB interface but brand new implementation using
 *        C library calls and not a direct port of the Fortran.
+*     2014-08-07 (TIMJ):
+*        Check for isblank availability.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2012 Science and Technology Facilities Council.
+*     Copyright (C) 2012,2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -80,12 +82,29 @@
 *-
 */
 
-/* Shenanigans for isblank() which is C99 only */
-#define _POSIX_C_SOURCE 200112L
-#define _ISOC99_SOURCE
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #include <stdlib.h>
 #include <errno.h>
+
+/* isblank() is a C99 feature so we just reimplement it if it is missing */
+#if HAVE_ISBLANK
+#ifndef _ISOC99_SOURCE
+#define _ISOC99_SOURCE
+#endif
+#include <ctype.h>
+# define ISBLANK isblank
+#else
+
+static int ISBLANK( int c ) {
+  return ( c == ' ' || c == '\t' );
+}
+
+#endif
+
+/* Still need ctype for isalpha and isdigit */
 #include <ctype.h>
 
 #include "pal.h"
@@ -131,7 +150,7 @@ void palIntin( const char * string, int *nstrt,
        through alphabetic characters since they can never
        be numbers. Skip past a "+" since it doesn't gain
        us anything and matches slalib. */
-    while (isblank(*endptr) || isalpha(*endptr) || *endptr == '+' ) {
+    while (ISBLANK(*endptr) || isalpha(*endptr) || *endptr == '+' ) {
       endptr++;
     }
 
@@ -154,7 +173,7 @@ void palIntin( const char * string, int *nstrt,
   } else {
     /* jump past any leading spaces for the next part of the string */
     ctemp = endptr;
-    while ( isblank(*ctemp) ) {
+    while ( ISBLANK(*ctemp) ) {
       (*nstrt)++;
       ctemp++;
     }

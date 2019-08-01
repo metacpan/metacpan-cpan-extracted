@@ -1,7 +1,7 @@
 package App::yamlsel;
 
-our $DATE = '2016-09-01'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,49 +26,42 @@ $SPEC{yamlsel} = {
     v => 1.1,
     summary => 'Select YAML elements using CSel (CSS-selector-like) syntax',
     args => {
-        %App::CSelUtils::foosel_common_args,
-        %App::CSelUtils::foosel_struct_action_args,
+        %App::CSelUtils::foosel_args_common,
     },
 };
 sub yamlsel {
-    my %args = @_;
+    App::CSelUtils::foosel(
+        @_,
 
-    my $expr = $args{expr};
-    my $actions = $args{actions};
+        code_read_tree => sub {
+            my $args = shift;
+            my $data;
+            if ($args->{file} eq '-') {
+                binmode STDIN, ":encoding(utf8)";
+                $data = _decode_yaml(join "", <>);
+            } else {
+                require File::Slurper;
+                $data = _decode_yaml(File::Slurper::read_text($args->{file}));
+            }
 
-    # parse first so we can bail early on error without having to read the input
-    require Data::CSel;
-    Data::CSel::parse_csel($expr)
-          or return [400, "Invalid CSel expression '$expr'"];
+            require Data::CSel::WrapStruct;
+            my $tree = Data::CSel::WrapStruct::wrap_struct($data);
+            $tree;
+        },
 
-    my $data;
-    if ($args{file} eq '-') {
-        binmode STDIN, ":utf8";
-        $data = _decode_yaml(join "", <>);
-    } else {
-        require File::Slurper;
-        $data = _decode_yaml(File::Slurper::read_text($args{file}));
-    }
+        csel_opts => {class_prefixes=>['Data::CSel::WrapStruct']},
 
-    require Data::CSel::WrapStruct;
-    my $tree = Data::CSel::WrapStruct::wrap_struct($data);
+        code_transform_node_actions => sub {
+            my $args = shift;
 
-    my @matches = Data::CSel::csel(
-        {class_prefixes=>['Data::CSel::WrapStruct']}, $expr, $tree);
-
-    # skip root node itself to avoid duplication
-    @matches = grep { refaddr($_) ne refaddr($tree) } @matches
-        unless @matches <= 1;
-
-    for my $action (@$actions) {
-        if ($action eq 'print') {
-            $action = 'print_func_or_meth:meth:value.func:App::yamlsel::_encode_yaml',
-        }
-    }
-
-    App::CSelUtils::do_actions_on_nodes(
-        nodes   => \@matches,
-        actions => $args{actions},
+            for my $action (@{ $args->{node_actions} }) {
+                if ($action eq 'print' || $action eq 'print_as_string') {
+                    $action = 'print_func_or_meth:meth:value.func:App::yamlsel::_encode_yaml';
+                } elsif ($action eq 'dump') {
+                    $action = 'dump:value';
+                }
+            }
+        },
     );
 }
 
@@ -87,14 +80,18 @@ App::yamlsel - Select YAML elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.003 of App::yamlsel (from Perl distribution App-yamlsel), released on 2016-09-01.
+This document describes version 0.004 of App::yamlsel (from Perl distribution App-yamlsel), released on 2019-07-29.
 
 =head1 SYNOPSIS
 
 =head1 FUNCTIONS
 
 
-=head2 yamlsel(%args) -> [status, msg, result, meta]
+=head2 yamlsel
+
+Usage:
+
+ yamlsel(%args) -> [status, msg, payload, meta]
 
 Select YAML elements using CSel (CSS-selector-like) syntax.
 
@@ -104,13 +101,51 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<actions> => I<array[str]> (default: ["print"])
+=item * B<expr> => I<str>
+
+=item * B<file> => I<str> (default: "-")
+
+=item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
 
 Specify action(s) to perform on matching nodes.
 
-=item * B<expr>* => I<str>
+Each action can be one of the following:
 
-=item * B<file> => I<str> (default: "-")
+=over
+
+=item * C<count> will print the number of matching nodes.
+
+=item * C<print_method> will call on or more of the node object's methods and print the
+result. Example:
+
+print_method:as_string
+
+=item * C<dump> will show a indented text representation of the node and its
+descendants. Each line will print information about a single node: its class,
+followed by the value of one or more attributes. You can specify which
+attributes to use in a dot-separated syntax, e.g.:
+
+dump:tag.id.class
+
+=back
+
+which will result in a node printed like this:
+
+ HTML::Element tag=p id=undef class=undef
+
+By default, if no attributes are specified, C<id> is used. If the node class does
+not support the attribute, or if the value of the attribute is undef, then
+C<undef> is shown.
+
+=item * B<select_action> => I<str> (default: "csel")
+
+Specify how we should select nodes.
+
+The default is C<csel>, which will select nodes from the tree using the CSel
+expression. Note that the root node itself is not included. For more details on
+CSel expression, refer to L<Data::CSel>.
+
+C<root> will return a single node which is the root node.
 
 =back
 
@@ -119,7 +154,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -147,7 +182,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

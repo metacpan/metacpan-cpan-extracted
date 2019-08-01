@@ -26,7 +26,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 require XSLoader;
 XSLoader::load('MPV::Simple', $VERSION);

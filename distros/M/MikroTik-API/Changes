@@ -1,5 +1,14 @@
 Revision history for MikroTik-API
 
+1.1.0 20190725
+    - use return values instead of die() at some places (CAUTION: could break old scripts)
+    - new MikroTik Login method as default with auto fallback to old method (pre 6.43)
+    - possibility to disable SSL verify (ssl_verify)
+    - fixed some typo
+    - added the ability to do !setting by providing { setting=>undef } as an argument to the command function
+    - some more examples
+    - added the ability to use the query function more directly including operators by sending an arrayref rather than a hashref. The arrayref strings are sent directly to the MT as lines beginning with '?'
+
 1.0.5 20180717
     - allow empty password string (as default RouterOS setting)
     - added some more files to .gitignore

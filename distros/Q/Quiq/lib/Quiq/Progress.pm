@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.151';
+our $VERSION = '1.152';
 
 use Quiq::Option;
 use Time::HiRes ();
@@ -737,7 +737,7 @@ sub warn {
 
 =head1 VERSION
 
-1.151
+1.152
 
 =head1 AUTHOR
 

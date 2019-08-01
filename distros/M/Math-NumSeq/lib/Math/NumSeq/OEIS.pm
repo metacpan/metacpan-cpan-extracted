@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,7 @@ use strict;
 use Carp;
 
 use vars '$VERSION','@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -105,7 +105,7 @@ L<Math::NumSeq::OEIS::Catalogue> for querying available A-numbers.
 =head2 Files
 
 Local files should be in a F<~/OEIS> direectory, ie. an F<OEIS> directory in
-the user's home directory (see L<File::HomeDir>).  Files can be HTML, OEIS
+the user's home directory (L<File::HomeDir>).  Files can be HTML, OEIS
 internal, b-file, and/or a-file.
 
     ~/OEIS/A000032.html
@@ -123,14 +123,14 @@ As downloaded from for example
     http://oeis.org/A000032/a000032.txt
 
 The "internal" text format is the most reliable for parsing.  This is the
-"text" link in the main sequence pages.  The "internal" link is the same
-wrapped in HTML.  It can be used here as F<.internal.html>.
+"text" link in each sequence web page (filename F<.internal.txt>).  The
+"internal" link is the same wrapped in HTML (filename F<.internal.html>).
 
 b-files F<b000000.txt> are long lists of values.  a-files F<a000000.txt>
 similarly and even longer, but sometimes they are auxiliary info instead
-(and in that case not used).  Some sequences don't have these, only the 30
-or 40 sample values from the HTML or internal page.  Those samples might be
-enough for fast growing sequences.
+(and in that case not used).  All sequences have a b-file, but sometimes
+they are merely the web page samples put into a separate file.  (The web
+page samples might be enough for fast growing sequences.)
 
 b-file or a-file can be used alone by this module, without the text or HTML
 parts.  In that case there's no C<$seq-E<gt>description()> and it may limit
@@ -139,7 +139,7 @@ the C<$seq-E<gt>characteristic()> attributes.
 =head2 Other Notes
 
 Sometimes more than one NumSeq module generates an OEIS sequence.  For
-example A000290 is Squares but also Polygonal k=4.  The catalogue is
+example A000290 is Squares, and also Polygonal k=4.  The catalogue is
 arranged so C<Math::NumSeq::OEIS> selects the better, faster, or more
 specific one.
 
@@ -150,11 +150,10 @@ C<$seq-E<gt>oeis_anum()> method generally only returns whichever is the
 
 Presently NumSeq code is catalogued with A-numbers only when it is the same
 as the OEIS sequence.  In particular this means "offset" in the OEIS
-matching the C<i_start> of the NumSeq, so i here corresponds to n there.
+matching C<i_start> of the NumSeq, so i here corresponds to n there.
 Sometimes an C<i_start> parameter here can alter numbering suitably (and in
 C<PlanePathCoord> etc tie-ins the similar C<n_start>), but some NumSeq may
-be uncatalogued because numbering or perhaps first few values are not the
-same.
+be uncatalogued because numbering or first few values are not the same.
 
 =head1 FUNCTIONS
 
@@ -176,18 +175,19 @@ Create and return a new sequence object.
 
 Return the next index and value in the sequence.
 
-In the current code when reading from a file, any values bigger than a usual
-Perl int or float are returned as C<Math::BigInt> objects in order to
-preserve precision.  Is that a good idea?
+In the current code, when reading from a file, any values bigger than a
+usual Perl int or float are returned as C<Math::BigInt> objects in order to
+preserve precision for numeric operations.  An application can pre-load
+C<Math::BigInt> to choose its back-end or other global options.
 
-An F<a000000.txt> or F<b000000.txt> file is read line by line.  For Perl 5.8
-ithreads there's a C<CLONE> setup which re-opens the file in a new thread so
-C<$seq> in each thread has its own position.  (See L<perlthrtut> and
-L<perlmod/Making your module threadsafe>.)
+An F<a000000.txt> or F<b000000.txt> file is read line by line.  For ithreads
+of Perl 5.8 up there's a C<CLONE> setup which re-opens the file in the new
+thread so C<$seq> in each thread has its own position.  (See L<perlthrtut>
+and L<perlmod/Making your module threadsafe>.)
 
 But a process C<fork()> will have both parent and child with the same open
 file so care should be taken that only one of them uses C<$seq> in that
-case.  The same is true of all open file handling across a C<fork()>.
+case.  This is the same as for all open files across a C<fork()>.
 
 =back
 
@@ -205,9 +205,8 @@ the target C<$i>.  This is reasonably efficient and avoids loading or
 processing an entire file if just a few values are wanted.
 
 If C<$i> happens to be the next line or just a short distance ahead of what
-was last read then no search is necessary.  This means that C<ith()> called
-sequentially i=1,2,3,4,etc simply reads successive lines the same as
-C<next()> would do.
+was last read then no search is necessary.  So C<ith()> called sequentially
+i=1,2,3,4,etc simply reads successive lines the same as C<next()> would do.
 
 =back
 
@@ -217,14 +216,12 @@ C<next()> would do.
 
 =item C<$str = $seq-E<gt>description()>
 
-Return a human-readable description of the sequence.  For the downloaded
-files this is the name part ("%N") which is a short description of the
-sequence.
+Return a human-readable description of the sequence.  For downloaded files,
+this is the name part ("%N") which is a short description of the sequence.
 
-A few sequences may have non-ASCII characters in the description.  For Perl
-5.8 and up they're decoded to wide-chars.  Not sure what to do for earlier
-Perl, currently they're left as the bytes from the download, which may be
-utf-8.
+Some sequences may have non-ASCII characters in the description, usually in
+names of people.  For Perl 5.8 and up they're decoded to wide-chars.  For
+earlier Perl they're left as the bytes from the download, which is UTF-8.
 
 =item C<$value = $seq-E<gt>values_min()>
 
@@ -235,13 +232,13 @@ or infinity.
 
 For files, C<values_min()> is guessed from the first few values if
 non-negative, and C<values_max()> is normally considered to be infinite.
-For keyword "full" the samples are the entire sequence and gives the
-range. If a range seems to be limited (eg. sequences of -1,0,1) then min and
-max are obtained from those.
+For keyword "full", the samples are the entire sequence and they give the
+range.  If a range seems to be limited (eg. sequences of -1,0,1) then min
+and max are obtained from those.
 
 (Would like the OEIS data to have range information like this in
-machine-readable form.  It's usually in sequence comments or description for
-human readers.)
+machine-readable form.  It's usually in sequence comments or implicit in the
+definition for human readers.)
 
 =item C<$ret = $seq-E<gt>characteristic($key)>
 
@@ -269,7 +266,8 @@ sequences are recognised by their name part though this may be unreliable.
 
 =item * 
 
-"count" is from a name with "number of".  This is probably unreliable.
+"count" is from a name with "number of".  This is unreliable but often close
+enough.
 
 =back
 
@@ -293,7 +291,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

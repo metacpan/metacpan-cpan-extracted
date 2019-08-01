@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -18,7 +18,7 @@
 # with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Check that all downloaded files can be parsed.
+# Check that all downloaded files in ~/OEIS can be parsed.
 #
 
 use 5.004;
@@ -46,7 +46,9 @@ unless ($skip) {
   chdir $dir or die;
   my $count_files = 0;
 
-  foreach my $filename (<A*.html>) {
+  foreach my $filename (glob('A*.html')) {
+    # next unless $filename eq 'A000295.html';
+
     $filename =~ /(A\d+)/;
     my $anum = $1;
     my $is_internal = ($filename =~ /internal/);

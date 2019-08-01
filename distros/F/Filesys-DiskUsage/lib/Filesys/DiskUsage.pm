@@ -28,7 +28,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -188,6 +188,7 @@ sub du {
   # options
   my %config = (
     'blocks'            => 0,
+    'count-dirs'        => 0,
     'dereference'       => 0,
     'exclude'           => undef,
     'human-readable'    => 0,
@@ -249,12 +250,14 @@ sub du {
           my $dir = $_;
           my @files = readdir $dh;
           closedir($dh);
+          $sizes{$_} += (stat $dir)[7] if $config{'count-dirs'};
 
           $sizes{$_} += du( { 'recursive'     => $config{'recursive'},
                               'max-depth'     => $config{'max-depth'} -1,
                               'exclude'       => $config{'exclude'},
                               'sector-size'   => $config{'sector-size'},
                               'blocks'        => $config{'blocks'},
+                              'count-dirs'    => $config{'count-dirs'},
                               'show-warnings' => $config{'show-warnings'},
                               'dereference' => $config{'dereference'},
                             }, map {"$dir/$_"} grep {! /^\.\.?$/} @files);

@@ -24,6 +24,7 @@ ok($r, '$r is defined');
 my $data = {
     'word' => 'Hello',
     'string_with_spaces' => 'Hello, world!',
+    'key with spaces' => 'should work',
     'simple_array' => [1, '2 3', '4 5', 6, 7],
     'wrappable_string' => 'Vestibulum ullamcorper leo quam, vel adipiscing tellus. '.
                           'Phasellus placerat dolor sit amet lorem mattis dictum. '.
@@ -58,15 +59,16 @@ my $data = {
     ],
 };
 
-my @order = qw(
-    word string_with_spaces simple_array wrappable_string
-    wrappable_array subsection_1 subsection_2 array_of_hashes
+my @order = (
+    'word', 'string_with_spaces', 'key with spaces', 'simple_array',
+    'wrappable_string', 'wrappable_array',
+    'subsection_1', 'subsection_2', 'array_of_hashes',
 
-    etc pwd
+    'etc', 'pwd',
 
-    true_parameter false_parameter subtree
+    'true_parameter', 'false_parameter', 'subtree',
 
-    empty_string array_of_empty_strings
+    'empty_string', 'array_of_empty_strings',
 );
 
 #my $sort = undef; # unsorted

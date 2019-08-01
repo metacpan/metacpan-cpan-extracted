@@ -1,7 +1,5 @@
 package Mojo::Role;
 
-# ABSTRACT: Mojo::Role - Tiny and simple role system for Mojo
-
 # imports
 use Mojo::Base -strict;
 use Role::Tiny       ();
@@ -9,7 +7,7 @@ use Role::Tiny::With ();
 use Mojo::Util       ();
 
 # version
-our $VERSION = 0.022;
+our $VERSION = '0.999';
 
 sub import {
   # caller is a consumer, import with
@@ -35,69 +33,20 @@ __END__
 
 =head1 NAME
 
-Mojo::Role - Tiny and simple role system for Mojo
-
-=head1 SYNOPSIS
-
-  # role class
-  package MojoCoreMantainer;
-  use Mojo::Role;
-
-  sub mantaining_mojo {
-    say "I'm making improvements for Mojolicious..."
-  }
-
-
-  # base class
-  package Developer;
-  use Mojo::Base -base;
-
-  sub make_code {
-    say "I'm making code for Mojolicious ecosystem..."
-  }
-
-
-  # class
-  package People;
-  use Mojo::Base 'Developer';
-
-  # using roles
-  use Mojo::Role -with;
-  with 'MojoCoreMantainer';
-
-  # method
-  sub what_can_i_do {
-    my $self = shift;
-    say "I can do people things...";
-    $self->make_code;
-    $self->mantaining_mojo;
-  }
-
+Mojo::Role - Tiny and simple role system for Mojo (DEPRECATED)
 
 =head1 DESCRIPTION
 
-This module provide a simple and light dependence way to use roles in
-L<Mojolicious|http://mojolicious.org/> classes.
+This module has been renamed to L<Mojo::RoleTiny> and the namespace may be
+repurposed in the future. Instead of using it, you can now create roles using
+L<Mojo::Base> directly.
 
   # For a role class
-  use Mojo::Role;
+  use Mojo::Base -role;
 
   # To use/consume a role
-  use Mojo::Role -with;
+  use Role::Tiny::With;
   with 'Role::SomeRoleClass';
-
-
-=head1 FUNCTIONS
-
-Mojo::Role optionally exports a C<with> function, that can be imported with the C<-with> flag.
-When exported the caller is not implementing a role but rather consuming them.
-
-=head2 with
-
-  with 'SomeRoleClass';
-
-Import a role or a list of roles to use.
-
 
 =head1 AUTHOR
 
@@ -119,5 +68,3 @@ This program is free software; you can redistribute it and/or modify it under th
 =head1 SEE ALSO
 
 L<https://github.com/kraih/mojo>, L<Mojo::Base>, L<Role::Tiny>, L<http://mojolicious.org>.
-
-

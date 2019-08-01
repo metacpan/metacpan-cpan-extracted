@@ -1,30 +1,102 @@
+NAME
+    PERLANCAR::Module::List - A fork of Module::List
+
+VERSION
+    This document describes version 0.004004 of PERLANCAR::Module::List
+    (from Perl distribution PERLANCAR-Module-List), released on 2019-07-27.
+
 DESCRIPTION
+    This module is a fork of Module::List. It's exactly like Module::List,
+    except for the following differences:
 
-    This module is a fork of Module::List 0.003. It's exactly like
-    Module::List, except for the following differences:
+    *   lower startup overhead (with some caveats)
 
-      * lower startup overhead (with some caveats)
+        It strips the usage of Exporter (so you cannot import
+        "list_modules()" and need to invoke it using fully qualified name),
+        IO::Dir, Carp, File::Spec, with the goal of saving a few
+        milliseconds (a casual test on my PC results in 11ms vs 39ms).
 
-      It strips the usage of Exporter, IO::Dir, Carp, File::Spec, with the
-      goal of saving a few milliseconds (a casual test on my PC results in
-      11ms vs 39ms).
+        Path separator is hard-coded as "/".
 
-      Path separator is hard-coded as /.
+    *   Recognize "all" option
 
-      * Recognize return_path option
+        If set to true and "return_path" is also set to true, will return
+        all found paths for each module instead of just the first found one.
+        The values of result will be an arrayref containing all found paths.
 
-      Normally the returned hash has undef as the values. With this option
-      set to true, the values will contain the path instead. Useful if you
-      want to collect all the paths, instead of having to use Module::Path
-      or Module::Path::More for each module again.
+    *   Recognize "wildcard" option
 
-      * Recognize all option
+        This boolean option can be set to true to recognize wildcard pattern
+        in prefix. Wildcard patterns such as jokers ("?", "*", "**"),
+        classes ("[a-z]"), as well as braces ("{One,Two}") are supported.
+        "**" implies recursive listing.
 
-      If set to true and return_path is also set to true, will return all
-      found paths for each module instead of just the first found one. The
-      values of result will be an arrayref containing all found paths.
+        Examples:
+
+         list_modules("Module::P*", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Patch"             => undef,
+             "Module::Path"              => undef,
+             "Module::Pluggable"         => undef,
+         }
+
+        while:
+
+         list_modules("Module::P**", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Patch"             => undef,
+             "Module::Path"              => undef,
+             "Module::Path::More"        => undef,
+             "Module::Pluggable"         => undef,
+             "Module::Pluggable::Object" => undef,
+         }
+
+        while:
+
+         list_modules("Module::**le", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Depakable"                => undef,
+             "Module::Install::Admin::Bundle"   => undef,
+             "Module::Install::Admin::Makefile" => undef,
+             "Module::Install::Bundle"          => undef,
+             "Module::Install::Makefile"        => undef,
+             "Module::Pluggable"                => undef,
+         }
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/PERLANCAR-Module-List>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-PERLANCAR-Module-List>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=PERLANCAR-Module-List
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Module::List
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

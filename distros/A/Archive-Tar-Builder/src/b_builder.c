@@ -339,7 +339,7 @@ static b_header *header_for_file(b_builder *builder, b_string *path, b_string *m
     } else if (is_hardlink(st) && builder->hardlink_lookup) {
         b_string *linkdest;
 
-        if (linkdest = builder->hardlink_lookup(builder->hardlink_cache, st->st_dev, st->st_ino, path)) {
+        if (linkdest = builder->hardlink_lookup(builder->hardlink_cache, st->st_dev, st->st_ino, member_name)) {
             ret->linktype = '0' + S_IF_HARDLINK;
             ret->linkdest = linkdest;
         }

@@ -1,5 +1,5 @@
 package Shipment::Address;
-$Shipment::Address::VERSION = '3.01';
+$Shipment::Address::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -84,7 +84,7 @@ sub _build_province_code {
     return ($country->code($self->province) eq 'unknown')
       ? $self->province
       : $country->code($self->province)
-      if $country;
+      if $country && $country->code($self->province);
     return $self->province;
 }
 
@@ -114,7 +114,7 @@ sub _build_country_code {
     use Locale::SubCountry;
     my $country = Locale::SubCountry->new($self->country);
 
-    return $country->country_code if $country;
+    return $country->country_code if $country && $country->country_code;
     return $self->country;
 }
 
@@ -196,7 +196,7 @@ Shipment::Address
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 

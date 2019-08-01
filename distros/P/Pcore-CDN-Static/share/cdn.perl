@@ -2,7 +2,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.5.8 );
+        my $ver = version->parse( $args->{ver} // v4.5.10 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 
@@ -133,7 +133,7 @@
 
     # pdfjs
     pdfjs => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v2.1.266 );
+        my $ver = version->parse( $args->{ver} // v2.2.228 );
 
         state $native_prefix = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js';
 
@@ -149,39 +149,6 @@
         }
     },
 
-    # tinycolor, https://github.com/bgrins/TinyColor
-    tinycolor1 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v1.4.1 );
-
-        if (wantarray) {
-            return $cdn->get_script_tag( $cdn->("/static/tinycolor/$ver/tinycolor.js") );
-        }
-        else {
-            return $cdn->("/static/tinycolor/$ver");
-        }
-    },
-
-    # unitegallery, https://unitegallery.net
-    unitegallery1 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v1.7.45 );
-
-        if (wantarray) {
-            my @res;
-
-            push @res, $cdn->get_css_tag( $cdn->("/static/unitegallery/$ver/css/unite-gallery.css") );
-            push @res, $cdn->get_script_tag( $cdn->("/static/unitegallery/$ver/js/unitegallery.min.js") );
-
-            # theme
-            # push @res, $cdn->get_css_tag( $cdn->("/static/unitegallery/$ver/themes/default/ug-theme-default.css") );
-            # push @res, $cdn->get_script_tag( $cdn->("/static/unitegallery/$ver/themes/default/ug-theme-default.js") );
-
-            return @res;
-        }
-        else {
-            return $cdn->("/static/unitegallery/$ver");
-        }
-    },
-
 }
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -189,7 +156,7 @@
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (37)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (33)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

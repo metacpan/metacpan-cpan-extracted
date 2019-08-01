@@ -1,0 +1,31 @@
+NAME
+    Mojo::Path::Role::Relative - Relative operations on a Mojo::Path
+
+SYNOPSIS
+      $path = Mojo::Path->with_roles('+Relative')->new('/foo/bar/baz/data.json');
+      $base = Mojo::Path->new('/foo/bar');
+      # 1
+      $path->is_subpath_of($base);
+      # "baz/data.json"
+      $path->to_subpath_of($base);
+      # "baz/data.json"
+      $path->to_rel($base);
+
+DESCRIPTION
+    "to_rel" in Mojo::URL was deprecated sometime ago. A suggestion was made
+    to move the functionality to Mojo::Path. This is an implementation of
+    that suggestion as a role <Role:Riny>.
+
+METHODS
+    This role adds the following methods to Mojo::Path when composed.
+
+  is_subpath_of
+  to_rel
+  to_subpath_of
+AUTHOR
+    kiwiroy - Roy Storey <kiwiroy@cpan.org>
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

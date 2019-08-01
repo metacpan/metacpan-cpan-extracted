@@ -1,3 +1,42 @@
+0.04 2019-07-30
+
+    - Move repo to gitlab
+
+0.03_05 2019-07-19
+
+    - Deploy and document "disclose" fields for contacts
+    - Make tests compatible with pre-5.10 again
+    - Skip deletion validation test if AUP limit exceed
+    - Remove all opt-out references from the code and tests
+
+0.03_04 2019-07-13
+
+    - Return DS records in secDNS element from domain_info (RT 129917)
+    - Remove all RoR code and tests
+    - Test against OT&E instead of testbed
+    - Allow check_* to return scalars on demand
+    - More clean-up of tests
+
+0.03_03 2019-06-21
+
+    - Fix tests for RoR testbed server problems.
+    - Allow client to specify RoR and OT&E endpoints.
+    - COMPAT: Explicitly disable ssl verification if verify param not set.
+
+0.03_02 2019-03-18
+
+    - Fix tests for more testbed server problems.
+    - Add disclosure of owner/address info.
+    - Add get_debug and set_debug as methods.
+
+0.03_01 2017-09-05
+
+    - Add support for listing tags.
+    - Skip tests which fail due to testbed server problems.
+    - Some more argument checks.
+    - Minor documentation fixes.
+    - Excise obsolete code.
+
 0.03 2015-11-06
 
     - Documentation updates.

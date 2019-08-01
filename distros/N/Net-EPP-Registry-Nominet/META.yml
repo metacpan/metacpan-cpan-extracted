@@ -3,8 +3,10 @@ abstract: 'EPP client code for Nominet'
 author:
   - 'Pete Houston (cpan@openstrike.co.uk)'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.41'
   Test::Warn: '0.09'
+  Time::Piece: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -22,4 +24,7 @@ requires:
   Carp: '0'
   Net::EPP: '0.19'
   perl: '5.008000'
-version: '0.03'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet
+  repository: git://gitlab.com/openstrike/nominet-epp.git
+version: '0.04'

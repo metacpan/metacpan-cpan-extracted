@@ -1,5 +1,8 @@
 Revision history for Symlink-DSL
 
+0.2.2       2019-07-25
+    - Fix a bug that disallowed single letter and non-"." basenames.
+
 0.2.1       2019-07-13
     - Resubmit to trigger CPAN indexing.
 

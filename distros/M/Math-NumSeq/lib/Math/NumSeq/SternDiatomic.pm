@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -24,7 +24,7 @@
 # its Relation to the Eisenstein-Stern's Diatomic Sequence
 # I. Urhiba, Math. Comm. 6 2001 181-198
 
-# Lind stern summary 
+# Lind stern summary
 # An extension of Stern's diatomic sequence Duke Math J 36
 # 1969 55-60
 
@@ -34,7 +34,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_is_infinite = \&Math::NumSeq::_is_infinite;
@@ -225,7 +225,7 @@ Return the C<$i>'th value of the sequence.
 =item C<($v0, $v1) = $seq-E<gt>ith_pair($i)>
 
 Return two values C<ith($i)> and C<ith($i+1)> from the sequence.  As
-described below (L</Ith Pair>) two values can be calculated with the same
+described in L</Ith Pair> below, two values can be calculated with the same
 work as one.
 
 =item C<$bool = $seq-E<gt>pred($value)>
@@ -239,13 +239,16 @@ C<$valueE<gt>=0>.
 
 =head2 Next
 
-X<Newman, Moshe>The sequence is iterated using a method by Moshe Newman in
+X<Newman, Moshe>The sequence is iterated using a step given by Mike Stay
+in OEIS A002487 November 2006, and which follows from iterating across what
+is the Calkin-Wilf tree of pairs of diatomic sequence values.
 
 =over
 
-"Recounting the Rationals, Continued", answers to problem 10906 posed by
-Donald E. Knuth, C. P. Rupert, Alex Smith and Richard Stong, American
-Mathematical Monthly, volume 110, number 7, Aug-Sep 2003, pages 642-643,
+"Recounting the Rationals, Continued", problem 10906, posed by Donald
+E. Knuth, answered variously by C. P. Rupert, Alex Smith, Eau Claire,
+Richard Stong, Moshe Newman, American Mathematical Monthly, volume 110,
+number 7, Aug-Sep 2003, pages 642-643,
 L<http://www.jstor.org/stable/3647762>
 
 =back
@@ -253,38 +256,36 @@ L<http://www.jstor.org/stable/3647762>
 Two successive sequence values are maintained and are advanced by a simple
 operation.
 
-    maintaining p = seq[i], q = seq[i+1]  
-    initial p = seq[0] = 0
-            q = seq[1] = 1
+    maintain p = seq[i], q = seq[i+1]
+    start p = seq[0] = 0
+          q = seq[1] = 1
 
     p_next = seq[i+1] = q
     q_next = seq[i+2] = p+q - 2*(p mod q)
-      where the mod operation rounds towards zero
+      where remainder rounds towards zero
       0 <= (p mod q) <= q-1
 
-The form by Newman uses a floor operation.  That suits expressing the
+Newman gives a form using a floor operation.  That suits expressing the
 iteration in terms of a rational x[i]=p/q.
 
     p_next              1
     ------  =  ----------------------
     q_next     1 + 2*floor(p/q) - p/q
 
-For separate p,q a little rearrangement gives it in terms of the remainder p
-mod q, as per formula a(n)=a(n-2)+a(n-1)-2*(a(n-2) mod a(n-1)) by Mike
-Stay OEIS A002487, November 2006.
+A little rearrangement gives the separate p,q above
 
     division p = q*floor(p/q) + rem      where rem = (p mod q)
     then
     p_next/q_next = 1 / (1 + 2*floor(p/q) - p/q)    per Newman
                   = q / (2*q*floor(p/q) + q - p)
-                  = q / (2*(p - rem) + q - p)  
-                  = q / (p+q - 2*rem)               using p,q
+                  = q / (2*(p - rem) + q - p)
+                  = q / (p+q - 2*rem)
 
-In terms of the Calkin-Wilf tree this method works because the number of
-trailing right leg steps can be found by m=floor(p/q), then take a step
-across, then back down again by m many left leg steps.  When at the
-right-most edge of the tree the step across goes down by one extra left,
-thereby automatically wrapping around at the end of each row.
+In terms of the Calkin-Wilf tree this works because the number of trailing
+right leg steps is found by m=floor(p/q), then take a step across, then back
+down again by m many left leg steps.  When at the right-most edge of the
+tree the step across goes down by one extra left, thereby automatically
+wrapping around at the end of each row.
 
 C<seek_to_i()> is implemented by calculating a pair of new p,q values with
 an C<ith_pair()> per below.
@@ -319,9 +320,9 @@ For example i=6 is binary "110" so
 
                          p,q
                          ---
-   initial               0,1 
-   high bit=1 so p+=q    1,1   
-   next bit=1 so p+=q    2,1    
+   initial               0,1
+   high bit=1 so p+=q    1,1
+   next bit=1 so p+=q    2,1
    low  bit=0 so q+=p    2,3   is ith(6),ith(7)
 
 This is the same as the Calkin-Wilf tree descent, per
@@ -348,7 +349,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

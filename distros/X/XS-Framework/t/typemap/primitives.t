@@ -35,13 +35,12 @@ is(MyTest::u64(18446744073709551615), 18446744073709551615);
 is(MyTest::u64(-10), 18446744073709551606);
 
 # time_t
-if ($Config{ivsize} == 8) {
+if ($Config{ivsize} == 8 && $Config{ptrsize} == 8) {
     is(MyTest::time_t(9223372036854775807), 9223372036854775807);
     is(MyTest::time_t(9223372036854775808), -9223372036854775808);
 } else {
     is(MyTest::time_t(2000000000), 2000000000);
     is(MyTest::time_t(-100000000), -100000000);
-    is(MyTest::time_t(3000000000), -1294967296);
 }
 
 done_testing();

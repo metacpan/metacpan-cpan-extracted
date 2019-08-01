@@ -15,6 +15,7 @@ lib/App/PDF/Link/Icons/PNG.pm
 lib/App/PDF/Link/Icons/iRealPro.pm
 lib/App/PDF/Link/Icons/Sibelius.pm
 lib/App/PDF/Link/Icons/XML.pm
+lib/App/PDF/Link/Icons/MXL.pm
 res/pod/pdflink.pod
 pp/common/pdflink.pp
 pp/linux/GNUmakefile

@@ -1,7 +1,7 @@
 package Sah::Schema::urls;
 
-our $DATE = '2019-05-28'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $schema = ['array', {
     of => 'url*',
@@ -22,7 +22,7 @@ Sah::Schema::urls -
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::urls (from Perl distribution Sah-Schemas-URL), released on 2019-05-28.
+This document describes version 0.010 of Sah::Schema::urls (from Perl distribution Sah-Schemas-URL), released on 2019-07-25.
 
 =head1 HOMEPAGE
 

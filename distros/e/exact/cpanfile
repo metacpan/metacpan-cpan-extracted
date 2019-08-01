@@ -1,11 +1,13 @@
 requires "Carp" => "0";
 requires "IO::File" => "0";
 requires "IO::Handle" => "0";
+requires "TryCatch" => "0";
 requires "feature" => "0";
 requires "mro" => "0";
 requires "namespace::autoclean" => "0";
 requires "perl" => "5.010";
 requires "strict" => "0";
+requires "utf8" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {

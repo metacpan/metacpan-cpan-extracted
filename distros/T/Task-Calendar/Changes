@@ -1,5 +1,17 @@
 Revision history for Task::Calendar
 
+0.43  2019-07-26
+      - Moved author test scripts to xt/ subfolder.
+
+0.42  2019-07-25
+      - Updated dependency on Calendar::Bahai v0.53.
+      - Updated dependency on Calendar::Gregorian v0.22.
+      - Updated dependency on Calendar::Hebrew v0.12.
+      - Updated dependency on Calendar::Hijri v0.40.
+      - Updated dependency on Calendar::Julian v0.13.
+      - Updated dependency on Calendar::Persian v0.42.
+      - Updated dependency on Calendar::Saka v1.41.
+
 0.41  2019-06-12
       - Updated dependency on Calendar::Bahai v0.52.
       - Updated dependency on Calendar::Gregorian v0.21.

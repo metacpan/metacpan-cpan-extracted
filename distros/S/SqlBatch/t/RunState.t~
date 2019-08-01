@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use v5.16;
+use strict;
+use warnings;
+use utf8;
+
+use lib qw(../lib);
+
+use Carp;
+use Test::More;
+
+use SqlBatch::RunState;
+require_ok('SqlBatch::RunState');
+

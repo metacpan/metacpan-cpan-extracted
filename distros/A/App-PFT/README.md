@@ -63,7 +63,7 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Giovanni Simoni
+Copyright (C) 2019 Giovanni Simoni
 
 PFT is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free

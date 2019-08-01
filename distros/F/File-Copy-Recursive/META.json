@@ -4,9 +4,9 @@
       "Daniel Muey <http://drmuey.com/cpan_contact.pl>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -53,8 +53,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-File-Copy-Recursive@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=File-Copy-Recursive"
+         "web" : "https://github.com/drmuey/p5-File-Copy-Recursive/issues"
       },
       "repository" : {
          "type" : "git",
@@ -62,5 +61,5 @@
          "web" : "https://github.com/drmuey/p5-File-Copy-Recursive"
       }
    },
-   "version" : "0.44"
+   "version" : "0.45"
 }

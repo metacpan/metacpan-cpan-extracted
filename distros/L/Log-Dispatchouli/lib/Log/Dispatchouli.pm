@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Log::Dispatchouli;
 # ABSTRACT: a simple wrapper around Log::Dispatch
-$Log::Dispatchouli::VERSION = '2.017';
+$Log::Dispatchouli::VERSION = '2.019';
 use Carp ();
 use File::Spec ();
 use Log::Dispatch;
@@ -224,33 +224,47 @@ sub new {
     );
   }
 
-  DEST: for my $dest (qw(err out)) {
-    next DEST unless $arg->{"to_std$dest"};
-    require Log::Dispatch::Screen;
-    $log->add(
-      Log::Dispatch::Screen->new(
-        name      => "std$dest",
-        min_level => 'debug',
-        stderr    => ($dest eq 'err' ? 1 : 0),
-        callbacks => sub { +{@_}->{message} . "\n" },
-        ($quiet_fatal{"std$dest"} ? (max_level => 'info') : ()),
-      ),
-    );
-  }
-
   $self->{dispatcher} = $log;
   $self->{prefix}     = $arg->{prefix};
   $self->{ident}      = $ident;
   $self->{config_id}  = $config_id;
+
+  DEST: for my $dest (qw(err out)) {
+    next DEST unless $arg->{"to_std$dest"};
+    my $method = "enable_std$dest";
+
+    $self->$method;
+  }
 
   $self->{debug}  = exists $arg->{debug}
                   ? ($arg->{debug} ? 1 : 0)
                   : ($self->env_value('DEBUG') ? 1 : 0);
   $self->{muted}  = $arg->{muted};
 
-  $self->{fail_fatal} = exists $arg->{fail_fatal} ? $arg->{fail_fatal} : 1;
+  $self->{quiet_fatal} = \%quiet_fatal;
+  $self->{fail_fatal}  = exists $arg->{fail_fatal} ? $arg->{fail_fatal} : 1;
 
   return $self;
+}
+
+for my $dest (qw(out err)) {
+  my $name = "std$dest";
+  my $code = sub {
+    return if $_[0]->dispatcher->output($name);
+    require Log::Dispatch::Screen;
+    $_[0]->dispatcher->add(
+      Log::Dispatch::Screen->new(
+        name      => "std$dest",
+        min_level => 'debug',
+        stderr    => ($dest eq 'err' ? 1 : 0),
+        callbacks => sub { +{@_}->{message} . "\n" },
+        ($_[0]{quiet_fatal}{"std$dest"} ? (max_level => 'info') : ()),
+      ),
+    );
+  };
+
+  no strict 'refs';
+  *{"enable_std$dest"} = $code;
 }
 
 #pod =method log
@@ -698,7 +712,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 2.017
+version 2.019
 
 =head1 SYNOPSIS
 

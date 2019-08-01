@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual describes GNU Stow version 2.3.0
-(28 June 2019), a program for managing farms of symbolic links.
+<!-- This manual describes GNU Stow version 2.3.1
+(28 July 2019), a program for managing farms of symbolic links.
 
 Software and documentation is copyrighted by the following:
 
@@ -78,14 +78,14 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<h1>Stow 2.3.0</h1>
+<h1>Stow 2.3.1</h1>
 <h3 align="right">Managing the installation of software packages</h3>
 <strong>Bob Glickstein, Zanshin Software, Inc.</strong><br>
 <strong>Kahlil Hodgson, RMIT University, Australia.</strong><br>
 <strong>Guillaume Morin</strong><br>
 <strong>Adam Spiers</strong><br>
-<p>This manual describes GNU Stow version 2.3.0
-(28 June 2019), a program for managing farms of symbolic links.
+<p>This manual describes GNU Stow version 2.3.1
+(28 July 2019), a program for managing farms of symbolic links.
 </p>
 <p>Software and documentation is copyrighted by the following:
 </p>
@@ -181,7 +181,7 @@ Next: <a href="#Introduction" accesskey="n" rel="next">Introduction</a>, Up: <a 
 </div>
 <a name="SEC_Top"></a>
 
-<p>This manual describes GNU Stow 2.3.0 (28 June 2019), a
+<p>This manual describes GNU Stow 2.3.1 (28 July 2019), a
 symlink farm manager which takes distinct sets of software and/or data
 located in separate directories on the filesystem, and makes them
 appear to be installed in a single directory tree.
@@ -494,13 +494,14 @@ the target directory, because this is what you will want to do most of the time.
 </dd>
 <dt>&lsquo;<samp>--no-folding</samp>&rsquo;</dt>
 <dd>
-<p>This disables any further <a href="#tree-folding">tree folding</a> or <a href="#tree-refolding">tree refolding</a>.
-If a new subdirectory is encountered whilst stowing a new package, the
-subdirectory is created within the target, and its contents are
-symlinked, rather than just creating a symlink for the directory.  If
-removal of symlinks whilst unstowing a package causes a subtree to be
-foldable (i.e. only containing symlinks to a single package), that
-subtree will not be removed and replaced with a symlink.
+<p>This disables any further tree folding (see <a href="#tree-folding">tree folding</a>) or
+refolding (see <a href="#tree-refolding">tree refolding</a>).  If a new subdirectory is
+encountered whilst stowing a new package, the subdirectory is created
+within the target, and its contents are symlinked, rather than just
+creating a symlink for the directory.  If removal of symlinks whilst
+unstowing a package causes a subtree to be foldable (i.e. only
+containing symlinks to a single package), that subtree will not be
+removed and replaced with a symlink.
 </p>
 <a name="index-adopting-existing-files"></a>
 </dd>
@@ -1525,7 +1526,7 @@ Next: <a href="#GNU-General-Public-License" accesskey="n" rel="next">GNU General
 <a name="Known-Bugs-1"></a>
 <h2 class="chapter">15 Known Bugs</h2>
 
-<p>There are no known bugs in Stow version 2.3.0!
+<p>There are no known bugs in Stow version 2.3.1!
 If you think you have found one, please see <a href="#Reporting-Bugs">Reporting Bugs</a>.
 </p>
 

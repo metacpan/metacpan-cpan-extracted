@@ -23,8 +23,6 @@ struct test_string {
     static const T      LITERAL[38];
     static const size_t LITERAL_LEN   = sizeof(LITERAL)/sizeof(T)-1;
     static const T      EMPTY[1];
-    static StdString    defexp;
-    static size_t       defsz;
 
     static size_t slen (const T* src) {
         size_t cnt = 0;
@@ -34,9 +32,9 @@ struct test_string {
 
     template <class A> static void REQUIRE_STR (const AnyString<A>& str, const T* src, size_t len, size_t cap, size_t shcap) {
         REQUIRE(str.length() == len);
-        REQUIRE(std::basic_string<T>(str.data(), len) == std::basic_string<T>(src, len));
-        REQUIRE(str.capacity() == cap);
-        REQUIRE(str.shared_capacity() == shcap);
+        CHECK(std::basic_string<T>(str.data(), len) == std::basic_string<T>(src, len));
+        CHECK(str.capacity() == cap);
+        CHECK(str.shared_capacity() == shcap);
     }
     template <class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src, size_t len, size_t cap)    { REQUIRE_STR(str, src, len, cap, cap); }
     template <class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src, size_t len)                { REQUIRE_STR(str, src, len, len); }
@@ -46,17 +44,17 @@ struct test_string {
     template <class A> static void REQUIRE_STR  (const AnyString<A>& str, StdString src)                           { REQUIRE_STR(str, src, src.size()); }
     template <class A> static void REQUIRE_STRM (const AnyString<A>& str, StdString src)                           { REQUIRE_STR(str, src, str.capacity(), str.shared_capacity()); }
 
-    static void REQUIRE_ALLOCS (int allocated_cnt = 0, int allocated = 0, int deallocated_cnt = 0, int deallocated = 0, int reallocated_cnt = 0, int reallocated = 0, int ext_deallocated_cnt = 0, int ext_deallocated = 0, int ext_shbuf_deallocated = 0) {
+    static void CHECK_ALLOCS (int allocated_cnt = 0, int allocated = 0, int deallocated_cnt = 0, int deallocated = 0, int reallocated_cnt = 0, int reallocated = 0, int ext_deallocated_cnt = 0, int ext_deallocated = 0, int ext_shbuf_deallocated = 0) {
         auto stat = get_allocs();
-        REQUIRE(stat.allocated_cnt         == allocated_cnt);
-        REQUIRE(stat.allocated             == allocated);
-        REQUIRE(stat.deallocated_cnt       == deallocated_cnt);
-        REQUIRE(stat.deallocated           == deallocated);
-        REQUIRE(stat.reallocated_cnt       == reallocated_cnt);
-        REQUIRE(stat.reallocated           == reallocated);
-        REQUIRE(stat.ext_deallocated_cnt   == ext_deallocated_cnt);
-        REQUIRE(stat.ext_deallocated       == ext_deallocated);
-        REQUIRE(stat.ext_shbuf_deallocated == ext_shbuf_deallocated);
+        CHECK(stat.allocated_cnt         == allocated_cnt);
+        CHECK(stat.allocated             == allocated);
+        CHECK(stat.deallocated_cnt       == deallocated_cnt);
+        CHECK(stat.deallocated           == deallocated);
+        CHECK(stat.reallocated_cnt       == reallocated_cnt);
+        CHECK(stat.reallocated           == reallocated);
+        CHECK(stat.ext_deallocated_cnt   == ext_deallocated_cnt);
+        CHECK(stat.ext_deallocated       == ext_deallocated);
+        CHECK(stat.ext_shbuf_deallocated == ext_shbuf_deallocated);
     }
 
     static StdString mstr (const char* data, size_t count = 1) {
@@ -104,12 +102,15 @@ struct test_string {
     static void   assign_external_cbuf (String& s, StdString exp)             { assign_external_cbuf(s, exp, exp.size()); }
 
     static void test_ctor () {
+        auto defexp = mstr("this string is definitely longer than max sso chars");
+        auto defsz  = BUF_CHARS + defexp.size();
+
         SECTION("empty") {
             {
                 String s;
                 REQUIRE_STR(s, EMPTY);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         };
 
         SECTION("literal") {
@@ -117,7 +118,7 @@ struct test_string {
                 String s(LITERAL);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         };
 
 
@@ -130,15 +131,15 @@ struct test_string {
                 if (cur.size() == defexp.size()) throw "should not happen";
                 cur += defexp[cur.size()];
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
 
             auto sz = BUF_CHARS + cur.size();
             {
                 String s(cur.data(), cur.size());
                 REQUIRE_STR(s, cur);
-                REQUIRE_ALLOCS(1, sz);
+                CHECK_ALLOCS(1, sz);
             }
-            REQUIRE_ALLOCS(0, 0, 1, sz);
+            CHECK_ALLOCS(0, 0, 1, sz);
         }
 
 
@@ -147,7 +148,7 @@ struct test_string {
                 String s(defexp.data(), defexp.size());
                 REQUIRE_STR(s, defexp);
             }
-            REQUIRE_ALLOCS(1, defsz, 1, defsz);
+            CHECK_ALLOCS(1, defsz, 1, defsz);
         }
 
         SECTION("internal without len") {
@@ -155,7 +156,7 @@ struct test_string {
                 String s(defexp.c_str());
                 REQUIRE_STR(s, defexp);
             }
-            REQUIRE_ALLOCS(1, defsz, 1, defsz);
+            CHECK_ALLOCS(1, defsz, 1, defsz);
         }
 
         SECTION("external") {
@@ -163,16 +164,16 @@ struct test_string {
                 String s(extstr(defexp), defexp.size(), defexp.size(), &Allocator::ext_free);
                 REQUIRE_STR(s, defexp);
             }
-            REQUIRE_ALLOCS(1, EBUF_CHARS, 1, EBUF_CHARS, 0, 0, 1, defexp.size());
+            CHECK_ALLOCS(1, EBUF_CHARS, 1, EBUF_CHARS, 0, 0, 1, defexp.size());
         }
 
         SECTION("external with custom buf") {
             {
                 String s(extstr(defexp), defexp.size(), defexp.size(), &Allocator::ext_free, shared_buf_alloc(), &Allocator::shared_buf_free);
                 REQUIRE_STR(s, defexp);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
-            REQUIRE_ALLOCS(0, 0, 0, 0, 0, 0, 1, defexp.size(), 1);
+            CHECK_ALLOCS(0, 0, 0, 0, 0, 0, 1, defexp.size(), 1);
         }
 
         SECTION("fill") {
@@ -182,7 +183,7 @@ struct test_string {
                     String s(exp.size(), (T)'a');
                     REQUIRE_STR(s, exp, MAX_SSO_CHARS);
                 }
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             };
             SECTION("internal") {
                 auto exp = mstr("B", 50);
@@ -191,7 +192,7 @@ struct test_string {
                     REQUIRE_STR(s, exp);
                 }
                 auto sz = BUF_CHARS + exp.size();
-                REQUIRE_ALLOCS(1, sz, 1, sz);
+                CHECK_ALLOCS(1, sz, 1, sz);
             };
         };
 
@@ -201,7 +202,7 @@ struct test_string {
                     String s(2);
                     REQUIRE_STR(s, EMPTY, 0, MAX_SSO_CHARS);
                 }
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             };
             SECTION("internal") {
                 {
@@ -209,7 +210,7 @@ struct test_string {
                     REQUIRE_STR(s, EMPTY, 0, 50);
                 }
                 auto sz = BUF_CHARS + 50;
-                REQUIRE_ALLOCS(1, sz, 1, sz);
+                CHECK_ALLOCS(1, sz, 1, sz);
             };
         };
     }
@@ -224,7 +225,7 @@ struct test_string {
                 REQUIRE_STR(s, EMPTY);
                 REQUIRE(src.use_count() == 1);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from literal") {
             {
@@ -234,7 +235,7 @@ struct test_string {
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
                 REQUIRE(src.use_count() == 1);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from sso") {
             {
@@ -245,40 +246,40 @@ struct test_string {
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS);
                 REQUIRE(src.use_count() == 1);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from internal") {
             auto exp = mstr("bu", 50);
             auto sz = BUF_CHARS + exp.size();
             {
                 FString src(exp.c_str());
-                REQUIRE_ALLOCS(1, sz);
+                CHECK_ALLOCS(1, sz);
                 {
                     String s(src);
                     REQUIRE_STR(src, exp, 0, exp.size());
                     REQUIRE_STR(s, exp, 0, exp.size());
-                    REQUIRE_ALLOCS();
+                    CHECK_ALLOCS();
                     REQUIRE(src.use_count() == 2);
                 }
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
-            REQUIRE_ALLOCS(0, 0, 1, sz);
+            CHECK_ALLOCS(0, 0, 1, sz);
         }
         SECTION("from external") {
             auto exp = mstr("c", 50);
             {
                 FString src(extstr(exp), exp.size(), exp.size(), &Allocator::ext_free);
-                REQUIRE_ALLOCS(1, EBUF_CHARS);
+                CHECK_ALLOCS(1, EBUF_CHARS);
                 {
                     String s(src);
                     REQUIRE_STR(src, exp, 0, exp.size());
                     REQUIRE_STR(s, exp, 0, exp.size());
-                    REQUIRE_ALLOCS();
+                    CHECK_ALLOCS();
                     REQUIRE(src.use_count() == 2);
                 }
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
-            REQUIRE_ALLOCS(0, 0, 1, EBUF_CHARS, 0, 0, 1, exp.size());
+            CHECK_ALLOCS(0, 0, 1, EBUF_CHARS, 0, 0, 1, exp.size());
         }
     }
 
@@ -291,7 +292,7 @@ struct test_string {
                 REQUIRE_STR(src, EMPTY);
                 REQUIRE_STR(s, EMPTY);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from literal") {
             {
@@ -300,7 +301,7 @@ struct test_string {
                 REQUIRE_STR(src, EMPTY);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from sso") {
             {
@@ -310,32 +311,32 @@ struct test_string {
                 REQUIRE_STR(src, EMPTY);
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from internal") {
             auto exp = mstr("bu", 50);
             auto sz = BUF_CHARS + exp.size();
             {
                 FString src(exp.data(), exp.size());
-                REQUIRE_ALLOCS(1,sz);
+                CHECK_ALLOCS(1,sz);
                 String s(std::move(src));
                 REQUIRE_STR(src, EMPTY);
                 REQUIRE_STR(s, exp);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
-            REQUIRE_ALLOCS(0,0,1,sz);
+            CHECK_ALLOCS(0,0,1,sz);
         }
         SECTION("from external") {
             auto exp = mstr("c", 50);
             {
                 FString src(extstr(exp), exp.size(), exp.size(), &Allocator::ext_free);
-                REQUIRE_ALLOCS(1,EBUF_CHARS);
+                CHECK_ALLOCS(1,EBUF_CHARS);
                 String s(std::move(src));
                 REQUIRE_STR(src, EMPTY);
                 REQUIRE_STR(s, exp);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
         }
     }
 
@@ -349,7 +350,7 @@ struct test_string {
                 REQUIRE_STR(src, LITERAL, LITERAL_LEN, 0);
                 REQUIRE_STR(s, exp, 0);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from sso") {
             {
@@ -359,32 +360,32 @@ struct test_string {
                 REQUIRE_STR(src, exp, MAX_SSO_CHARS);
                 REQUIRE_STR(s, mstr("u"), MAX_SSO_CHARS-1);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from internal") {
             auto exp = mstr("bu", 50);
             auto sz = BUF_CHARS + exp.size();
             {
                 FString src(exp.c_str());
-                REQUIRE_ALLOCS(1, sz);
+                CHECK_ALLOCS(1, sz);
                 String s(src, 9, 5);
                 REQUIRE_STR(src, exp, 0, exp.size());
                 REQUIRE_STR(s, mstr("ububu"), 0, exp.size()-9);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
-            REQUIRE_ALLOCS(0,0,1,sz);
+            CHECK_ALLOCS(0,0,1,sz);
         }
         SECTION("from external") {
             auto exp = mstr("c", 50);
             {
                 FString src(extstr(exp), exp.size(), exp.size(), &Allocator::ext_free);
-                REQUIRE_ALLOCS(1, EBUF_CHARS);
+                CHECK_ALLOCS(1, EBUF_CHARS);
                 String s(src, 10, 30);
                 REQUIRE_STR(src, exp, 0, exp.size());
                 REQUIRE_STR(s, mstr("c", 30), 0, exp.size()-10);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
         }
         SECTION("out of bounds") {
             auto exp = mstr("hello");
@@ -418,7 +419,7 @@ struct test_string {
                 s.clear();
                 REQUIRE_STR(s, EMPTY);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("sso") {
             {
@@ -427,7 +428,7 @@ struct test_string {
                 s.clear();
                 REQUIRE_STR(s, EMPTY, 0, MAX_SSO_CHARS);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("internal") {
             auto exp = mstr("bu", 50);
@@ -437,7 +438,7 @@ struct test_string {
                 s.clear();
                 REQUIRE_STR(s, EMPTY, 0, exp.size());
             }
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp.size());
         }
         SECTION("external") {
             auto exp = mstr("c", 50);
@@ -445,10 +446,10 @@ struct test_string {
                 String s(extstr(exp), exp.size(), exp.size(), &Allocator::ext_free);
                 get_allocs();
                 s.clear();
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
                 REQUIRE_STR(s, EMPTY, 0, exp.size());
             }
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
         };
     }
 
@@ -481,7 +482,7 @@ struct test_string {
                 U::op(s, LITERAL);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from literal") {
             {
@@ -492,7 +493,7 @@ struct test_string {
                 U::op(s, LITERAL);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from sso") {
             {
@@ -501,30 +502,30 @@ struct test_string {
                 U::op(s, LITERAL);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from internal") {
             {
                 auto exp = mstr("a", 50);
                 auto sz = BUF_CHARS + exp.size();
                 String s(exp.c_str());
-                REQUIRE_ALLOCS(1,sz);
+                CHECK_ALLOCS(1,sz);
                 U::op(s, LITERAL);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
-                REQUIRE_ALLOCS(0,0,1,sz);
+                CHECK_ALLOCS(0,0,1,sz);
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from external") {
             {
                 auto exp = mstr("c", 50);
                 String s(extstr(exp), exp.size(), exp.size(), &Allocator::ext_free);
-                REQUIRE_ALLOCS(1, EBUF_CHARS);
+                CHECK_ALLOCS(1, EBUF_CHARS);
                 U::op(s, LITERAL);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
-                REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
+                CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
             }
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
     }
 
@@ -536,16 +537,16 @@ struct test_string {
             SECTION("no len") {
                 U::op(s, exp.c_str());
                 REQUIRE_STR(s, exp);
-                REQUIRE_ALLOCS(1,BUF_CHARS+exp.size());
+                CHECK_ALLOCS(1,BUF_CHARS+exp.size());
                 s = EMPTY;
-                REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp.size());
+                CHECK_ALLOCS(0,0,1,BUF_CHARS+exp.size());
             }
             SECTION("with len") {
                 s.assign(exp.data(), 40);
-                REQUIRE_ALLOCS(1,BUF_CHARS+40);
+                CHECK_ALLOCS(1,BUF_CHARS+40);
                 REQUIRE_STR(s, exp.data(), 40, 40);
                 s = EMPTY;
-                REQUIRE_ALLOCS(0,0,1,BUF_CHARS+40);
+                CHECK_ALLOCS(0,0,1,BUF_CHARS+40);
             }
 
         }
@@ -554,9 +555,9 @@ struct test_string {
             String s(cstr("yt"));
             U::op(s, exp.c_str());
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(1,BUF_CHARS+exp.size());
+            CHECK_ALLOCS(1,BUF_CHARS+exp.size());
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp.size());
         }
         SECTION("from internal") {
             auto exp = mstr("1", 50);
@@ -564,16 +565,16 @@ struct test_string {
             get_allocs();
             U::op(s, exp.c_str());
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(); //no allocs for sufficient capacity
+            CHECK_ALLOCS(); //no allocs for sufficient capacity
             U::op(s, cstr("so"));
             REQUIRE_STR(s, mstr("so"), 50); // didnt become sso
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             exp = mstr("3", 60);
             U::op(s, exp.c_str());
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(1, BUF_CHARS+60, 1, BUF_CHARS+50); //extended storage
+            CHECK_ALLOCS(1, BUF_CHARS+60, 1, BUF_CHARS+50); //extended storage
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+60);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+60);
         }
         SECTION("from external") {
             auto exp = mstr("4", 50);
@@ -581,16 +582,16 @@ struct test_string {
             get_allocs();
             U::op(s, exp.c_str());
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(); //no allocs for sufficient capacity
+            CHECK_ALLOCS(); //no allocs for sufficient capacity
             exp = mstr("bt");
             U::op(s, exp.c_str());
             REQUIRE_STR(s, exp, 50); // didnt become sso
             exp = mstr("6", 70);
             U::op(s, exp.c_str());
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(1, BUF_CHARS+70, 1, EBUF_CHARS, 0, 0, 1, 50); //extended storage moved to internal
+            CHECK_ALLOCS(1, BUF_CHARS+70, 1, EBUF_CHARS, 0, 0, 1, 50); //extended storage moved to internal
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+70);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+70);
         }
         SECTION("from cow") {
             auto exp = mstr("1", 40);
@@ -600,7 +601,7 @@ struct test_string {
                 get_allocs();
                 U::op(s, exp.c_str());
                 REQUIRE_STR(s, exp); //string detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+40); //string detached
+                CHECK_ALLOCS(1, BUF_CHARS+40); //string detached
 
                 s = tmp;
                 get_allocs();
@@ -613,7 +614,7 @@ struct test_string {
                 get_allocs();
                 U::op(s, exp.c_str());
                 REQUIRE_STR(s, exp); //string detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+40); //string detached
+                CHECK_ALLOCS(1, BUF_CHARS+40); //string detached
 
                 s = tmp;
                 get_allocs();
@@ -630,18 +631,18 @@ struct test_string {
             String s(LITERAL);
             assign_external(s, exp);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(1, EBUF_CHARS);
+            CHECK_ALLOCS(1, EBUF_CHARS);
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
         }
         SECTION("from sso") {
             auto exp = mstr("1", 50);
             String s(cstr("yt"));
             assign_external(s, exp);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(1, EBUF_CHARS);
+            CHECK_ALLOCS(1, EBUF_CHARS);
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
         }
         SECTION("from internal") {
             auto exp = mstr("1", 50);
@@ -649,9 +650,9 @@ struct test_string {
             get_allocs();
             assign_external(s, exp);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(1, EBUF_CHARS, 1, BUF_CHARS + 60);
+            CHECK_ALLOCS(1, EBUF_CHARS, 1, BUF_CHARS + 60);
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
         }
         SECTION("from external") {
             auto exp = mstr("4", 50);
@@ -660,9 +661,9 @@ struct test_string {
             get_allocs();
             assign_external(s, exp);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(0,0,0,0,0,0,1,4); //this case is optimized to reuse ExternalBuffer instead of dropping and creating a new one
+            CHECK_ALLOCS(0,0,0,0,0,0,1,4); //this case is optimized to reuse ExternalBuffer instead of dropping and creating a new one
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
 
             // refcnt = 2
             s = create_external<>(mstr("abcd"));
@@ -670,11 +671,11 @@ struct test_string {
             get_allocs();
             assign_external(s, exp);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(1,EBUF_CHARS);
+            CHECK_ALLOCS(1,EBUF_CHARS);
             tmp = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,4);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,4);
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
         }
         SECTION("with custom buf") {
             auto exp = mstr("4", 50);
@@ -682,9 +683,9 @@ struct test_string {
             get_allocs();
             assign_external_cbuf(s, exp);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,4);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,4);
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,0,0,0,0,1,50,1);
+            CHECK_ALLOCS(0,0,0,0,0,0,1,50,1);
         }
     }
 
@@ -692,12 +693,12 @@ struct test_string {
         String s;
         s.assign(2, (T)'a');
         REQUIRE_STR(s, mstr("aa"), MAX_SSO_CHARS);
-        REQUIRE_ALLOCS();
+        CHECK_ALLOCS();
         s = String(cstr("a", 50));
         get_allocs();
         s.assign(10, (T)'b');
         REQUIRE_STR(s, mstr("bbbbbbbbbb"), 50);
-        REQUIRE_ALLOCS();
+        CHECK_ALLOCS();
 
         s = EMPTY;
         get_allocs();
@@ -720,20 +721,20 @@ struct test_string {
             REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             REQUIRE_STR(src, LITERAL, LITERAL_LEN, 0);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("sso<->sso") {
             auto exp = mstr("bu");
             FString src(exp.c_str());
             String s(cstr("du"));
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             U::op(s, src);
             REQUIRE_STR(s, exp, MAX_SSO_CHARS);
             REQUIRE_STR(src, exp, MAX_SSO_CHARS);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
             src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("internal<->internal") {
             auto exp = mstr("q", 50);
@@ -743,11 +744,11 @@ struct test_string {
             U::op(s, src);
             REQUIRE_STR(s, exp, 0, exp.size());
             REQUIRE_STR(src, exp, 0, exp.size());
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+30);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+30);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             src = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+50);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+50);
         }
         SECTION("external<->external") {
             auto exp = mstr("q", 50);
@@ -757,11 +758,11 @@ struct test_string {
             U::op(s, src);
             REQUIRE_STR(s, exp, 0, exp.size());
             REQUIRE_STR(src, exp, 0, exp.size());
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,30);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,30);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             src = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
         }
         SECTION("same object") {
             auto exp = mstr("q", 50);
@@ -769,9 +770,9 @@ struct test_string {
             get_allocs();
             U::op(s, s);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+50);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+50);
         }
     }
 
@@ -784,11 +785,11 @@ struct test_string {
             get_allocs();
             s.assign(src, 10, 30);
             REQUIRE_STR(s, mstr("q", 30), 0, 40);
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+30);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+30);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             src = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+50);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+50);
         }
         SECTION("same object") {
             auto exp = mstr("x", 50);
@@ -796,9 +797,9 @@ struct test_string {
             get_allocs();
             s.assign(s, 10, 30);
             REQUIRE_STR(s, mstr("x", 30), 40);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
         }
     }
 
@@ -811,20 +812,20 @@ struct test_string {
             REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             REQUIRE_STR(src, EMPTY);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("sso<->sso") {
             auto exp = mstr("bu");
             FString src(exp.c_str());
             String s(cstr("du"));
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             U::op(s, src);
             REQUIRE_STR(s, exp, MAX_SSO_CHARS);
             REQUIRE_STR(src, EMPTY);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
             src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("internal<->internal") {
             auto exp = mstr("q", 50);
@@ -834,11 +835,11 @@ struct test_string {
             U::op(s, src);
             REQUIRE_STR(s, exp);
             REQUIRE_STR(src, EMPTY);
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+30);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+30);
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+50);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+50);
             src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("external<->external") {
             auto exp = mstr("q", 50);
@@ -848,11 +849,11 @@ struct test_string {
             U::op(s, src);
             REQUIRE_STR(s, exp);
             REQUIRE_STR(src, EMPTY);
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,30);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,30);
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
             src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("same object") {
             auto exp = mstr("q", 50);
@@ -860,9 +861,9 @@ struct test_string {
             get_allocs();
             U::op(s, s);
             REQUIRE_STR(s, exp);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+50);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+50);
         }
     }
 
@@ -897,7 +898,7 @@ struct test_string {
             s.offset(2, 25);
             REQUIRE_STR(s, exp, 0);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from sso") {
             auto exp = mstr("bu");
@@ -905,7 +906,7 @@ struct test_string {
             s.offset(1, 1);
             REQUIRE_STR(s, mstr("u"), MAX_SSO_CHARS-1);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("from internal") {
             auto exp = mstr("bu", 50);
@@ -914,7 +915,7 @@ struct test_string {
             REQUIRE_STR(s, mstr("ububu"), 100-9);
             s = EMPTY;
             auto sz = BUF_CHARS + 100;
-            REQUIRE_ALLOCS(1,sz,1,sz);
+            CHECK_ALLOCS(1,sz,1,sz);
         }
         SECTION("from external") {
             auto exp = mstr("c", 50);
@@ -922,7 +923,7 @@ struct test_string {
             s.offset(10, 30);
             REQUIRE_STR(s, mstr("c", 30), exp.size()-10);
             s = EMPTY;
-            REQUIRE_ALLOCS(1, EBUF_CHARS, 1, EBUF_CHARS, 0, 0, 1, exp.size());
+            CHECK_ALLOCS(1, EBUF_CHARS, 1, EBUF_CHARS, 0, 0, 1, exp.size());
         }
         SECTION("out of bounds") {
             auto exp = mstr("hello");
@@ -946,7 +947,7 @@ struct test_string {
             REQUIRE_STR(s1, LITERAL, LITERAL_LEN, 0);
             REQUIRE_STR(s2, EMPTY);
             s1 = EMPTY; s2 = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("literal<->sso") {
             auto exp = mstr("eb");
@@ -956,7 +957,7 @@ struct test_string {
             REQUIRE_STR(s1, exp, MAX_SSO_CHARS);
             REQUIRE_STR(s2, LITERAL, LITERAL_LEN, 0);
             s1 = EMPTY; s2 = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("literal<->internal") {
             auto exp = mstr("eb", 50);
@@ -967,9 +968,9 @@ struct test_string {
             REQUIRE_STR(s1, exp);
             REQUIRE_STR(s2, LITERAL, LITERAL_LEN, 0);
             s2 = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s1 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp.size());
         }
         SECTION("literal<->external") {
             auto exp = mstr("be", 50);
@@ -980,9 +981,9 @@ struct test_string {
             REQUIRE_STR(s1, exp);
             REQUIRE_STR(s2, LITERAL, LITERAL_LEN, 0);
             s2 = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s1 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
         }
         SECTION("sso<->sso") {
             auto exp1 = mstr("eb");
@@ -993,7 +994,7 @@ struct test_string {
             REQUIRE_STR(s1, exp2, MAX_SSO_CHARS);
             REQUIRE_STR(s2, exp1, MAX_SSO_CHARS);
             s1 = EMPTY; s2 = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("sso<->internal") {
             auto exp1 = mstr("eb");
@@ -1005,9 +1006,9 @@ struct test_string {
             REQUIRE_STR(s1, exp2);
             REQUIRE_STR(s2, exp1, MAX_SSO_CHARS);
             s2 = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s1 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp2.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp2.size());
         }
         SECTION("sso<->external") {
             auto exp1 = mstr("eb");
@@ -1019,52 +1020,52 @@ struct test_string {
             REQUIRE_STR(s1, exp2);
             REQUIRE_STR(s2, exp1, MAX_SSO_CHARS);
             s2 = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s1 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp2.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp2.size());
         }
         SECTION("internal<->internal") {
             auto exp1 = mstr("eb", 100);
             auto exp2 = mstr("ta", 50);
             String s1(exp1.c_str());
             FString s2(exp2.c_str());
-            REQUIRE_ALLOCS(2, BUF_CHARS*2 + exp1.size() + exp2.size());
+            CHECK_ALLOCS(2, BUF_CHARS*2 + exp1.size() + exp2.size());
             s1.swap(s2);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE_STR(s1, exp2);
             REQUIRE_STR(s2, exp1);
             s1 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp2.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp2.size());
             s2 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp1.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp1.size());
         }
         SECTION("internal<->external") {
             auto exp1 = mstr("eb", 100);
             auto exp2 = mstr("ta", 50);
             String s1(exp1.c_str());
             FString s2 = create_external<FString>(exp2);
-            REQUIRE_ALLOCS(2, EBUF_CHARS + BUF_CHARS + exp1.size());
+            CHECK_ALLOCS(2, EBUF_CHARS + BUF_CHARS + exp1.size());
             s1.swap(s2);
             REQUIRE_STR(s1, exp2);
             REQUIRE_STR(s2, exp1);
             s1 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp2.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp2.size());
             s2 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp1.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp1.size());
         }
         SECTION("external<->external") {
             auto exp1 = mstr("eb", 100);
             auto exp2 = mstr("ta", 50);
             String s1 = create_external<>(exp1);
             FString s2 = create_external<FString>(exp2);
-            REQUIRE_ALLOCS(2, EBUF_CHARS*2);
+            CHECK_ALLOCS(2, EBUF_CHARS*2);
             s1.swap(s2);
             REQUIRE_STR(s1, exp2);
             REQUIRE_STR(s2, exp1);
             s1 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp2.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp2.size());
             s2 = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp1.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp1.size());
         }
     }
 
@@ -1134,12 +1135,12 @@ struct test_string {
             String s(LITERAL);
             s.buf();
             REQUIRE_STR(s, LITERAL, LITERAL_LEN, LITERAL_LEN);
-            REQUIRE_ALLOCS(1, BUF_CHARS + LITERAL_LEN);
+            CHECK_ALLOCS(1, BUF_CHARS + LITERAL_LEN);
         };
         SECTION("sso") {
             String s(cstr("ab"));
             s.buf();
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE_STR(s, mstr("ab"), MAX_SSO_CHARS);
         };
         SECTION("internal") {
@@ -1147,12 +1148,12 @@ struct test_string {
             String s(exp.c_str());
             get_allocs();
             s.buf();
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             String s2(s);
             REQUIRE(s.use_count() == 2);
             REQUIRE(s2.use_count() == 2);
             s.buf();
-            REQUIRE_ALLOCS(1, BUF_CHARS + exp.size()); //cow - detached
+            CHECK_ALLOCS(1, BUF_CHARS + exp.size()); //cow - detached
             REQUIRE_STR(s, exp);
             REQUIRE(s.use_count() == 1);
             REQUIRE(s2.use_count() == 1);
@@ -1162,12 +1163,12 @@ struct test_string {
             String s = create_external<>(exp);
             get_allocs();
             s.buf();
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             String s2(s);
             REQUIRE(s.use_count() == 2);
             REQUIRE(s2.use_count() == 2);
             s.buf();
-            REQUIRE_ALLOCS(1, BUF_CHARS + exp.size()); //cow - detached
+            CHECK_ALLOCS(1, BUF_CHARS + exp.size()); //cow - detached
             REQUIRE_STR(s, exp);
             REQUIRE(s.use_count() == 1);
             REQUIRE(s2.use_count() == 1);
@@ -1221,7 +1222,7 @@ struct test_string {
             s.pop_back();
             REQUIRE_STR(s, exp, 0);
             s = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
     }
 
@@ -1302,13 +1303,13 @@ struct test_string {
             String s(LITERAL);
             s.erase(11);
             REQUIRE_STR(s, mstr("hello world"), 0);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s.erase(0, 6);
             REQUIRE_STR(s, mstr("world"), 0);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s.erase(1, 3);
             REQUIRE_STR(s, mstr("wd"), MAX_SSO_CHARS);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         if (CHAR_SIZE == 1) {
             SECTION("sso") {
@@ -1320,7 +1321,7 @@ struct test_string {
                 s.erase(1, 2);
                 REQUIRE_STR(s, mstr("trfu"), MAX_SSO_CHARS-4);
                 s = EMPTY;
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
         }
         SECTION("internal") {
@@ -1335,19 +1336,19 @@ struct test_string {
             REQUIRE_STR(s, mstr("5678956789012345678901234567890123456789012345678901234"), 60); //head moved
             s.erase(45, 5);
             REQUIRE_STR(s, mstr("56789567890123456789012345678901234567890123401234"), 60); //tail moved
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             String s2(s);
             REQUIRE_STR(s2, mstr("56789567890123456789012345678901234567890123401234"), 0, 60);
             s.erase(45);
             REQUIRE_STR(s, mstr("567895678901234567890123456789012345678901234"), 0, 60); // still cow
             s.erase(0, 5);
             REQUIRE_STR(s, mstr("5678901234567890123456789012345678901234"), 0, 55); // still cow
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE(s.use_count() == 2); // cow
             s.erase(5, 5);
             REQUIRE_STR(s, mstr("56789567890123456789012345678901234")); // detached
             REQUIRE(s.use_count() == 1);
-            REQUIRE_ALLOCS(1,BUF_CHARS+35);
+            CHECK_ALLOCS(1,BUF_CHARS+35);
         }
         SECTION("external") {
             auto exp = mstr("0123456789", 5);
@@ -1361,14 +1362,14 @@ struct test_string {
             REQUIRE_STR(s, mstr("56789567890123456789012345678901234"), 40); //head moved
             s.erase(25, 5);
             REQUIRE_STR(s, mstr("567895678901234567890123401234"), 40); //tail moved
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             String s2(s);
             REQUIRE_STR(s2, mstr("567895678901234567890123401234"), 0, 40);
             s.erase(25);
             REQUIRE_STR(s, mstr("5678956789012345678901234"), 0, 40); // still cow
             s.erase(0, 5);
             REQUIRE_STR(s, mstr("56789012345678901234"), 0, 35); // still cow
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE(s.use_count() == 2);
             s.erase(1, 18);
             REQUIRE_STR(s, mstr("54"), MAX_SSO_CHARS); // detached
@@ -1425,7 +1426,7 @@ struct test_string {
         REQUIRE(s1 <= s3);
         REQUIRE(s1 <= s4);
 
-        REQUIRE_ALLOCS();
+        CHECK_ALLOCS();
     }
 
     template <class FString>
@@ -1521,17 +1522,17 @@ struct test_string {
             SECTION(">len") {
                 s.reserve(100);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, 100);
-                REQUIRE_ALLOCS(1, BUF_CHARS+100);
+                CHECK_ALLOCS(1, BUF_CHARS+100);
             }
             SECTION("<len") {
                 s.reserve(LITERAL_LEN-1);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, LITERAL_LEN);
-                REQUIRE_ALLOCS(1, BUF_CHARS+LITERAL_LEN);
+                CHECK_ALLOCS(1, BUF_CHARS+LITERAL_LEN);
             }
             SECTION("=0") {
                 s.reserve(0);
                 REQUIRE_STR(s, LITERAL, LITERAL_LEN, LITERAL_LEN);
-                REQUIRE_ALLOCS(1, BUF_CHARS+LITERAL_LEN);
+                CHECK_ALLOCS(1, BUF_CHARS+LITERAL_LEN);
             }
         }
         if (CHAR_SIZE == 1) {
@@ -1542,16 +1543,16 @@ struct test_string {
                 String s(exp.c_str());
                 s.reserve(0);
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
                 s.reserve(MAX_SSO_CHARS);
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("> max sso") {
                 String s(exp.c_str());
                 s.reserve(MAX_SSO_CHARS+1);
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS+1);
-                REQUIRE_ALLOCS(1, BUF_CHARS+MAX_SSO_CHARS+1);
+                CHECK_ALLOCS(1, BUF_CHARS+MAX_SSO_CHARS+1);
             }
             SECTION("offset, <= capacity") {
                 String s((mstr("hi")+exp).c_str());
@@ -1559,7 +1560,7 @@ struct test_string {
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS-2);
                 s.reserve(MAX_SSO_CHARS-2);
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS-2);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("offset, > capacity, <= max sso") {
                 String s((mstr("hi")+exp).c_str());
@@ -1567,7 +1568,7 @@ struct test_string {
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS-2);
                 s.reserve(MAX_SSO_CHARS);
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS);
-                REQUIRE_ALLOCS(); // string should has been moved to the beginning, no allocs
+                CHECK_ALLOCS(); // string should has been moved to the beginning, no allocs
             }
         }
         }
@@ -1580,7 +1581,7 @@ struct test_string {
                 s.reserve(exp.size()-1);
                 REQUIRE_STR(s, exp);
                 REQUIRE(s.use_count() == 1); // detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS+exp.size());
                 s = s2;
                 get_allocs();
                 s.offset(10, 30);
@@ -1588,50 +1589,50 @@ struct test_string {
                 s.reserve(0);
                 REQUIRE_STR(s, tmp);
                 REQUIRE(s.use_count() == 1); // detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+tmp.size()); // detached with minimum required capacity
+                CHECK_ALLOCS(1, BUF_CHARS+tmp.size()); // detached with minimum required capacity
                 s = s2;
                 get_allocs();
                 s.offset(10, 30);
                 s.reserve(100);
                 REQUIRE_STR(s, tmp, 100);
                 REQUIRE(s.use_count() == 1); // detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+100);
+                CHECK_ALLOCS(1, BUF_CHARS+100);
             }
             SECTION("<= max capacity") {
                 s.reserve(0);
                 s.reserve(exp.size());
                 REQUIRE_STR(s, exp);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("> max capacity") {
                 s.reserve(exp.size()*2);
                 REQUIRE_STR(s, exp, exp.size()*2);
-                REQUIRE_ALLOCS(0,0,0,0,1,exp.size());
+                CHECK_ALLOCS(0,0,0,0,1,exp.size());
             }
             SECTION("offset, <= capacity") {
                 s.offset(10);
                 s.reserve(40);
                 REQUIRE_STR(s, exp.substr(10));
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("offset, > capacity, <= max capacity") {
                 s.offset(10);
                 s.reserve(50);
                 REQUIRE_STR(s, exp.substr(10), 50);
-                REQUIRE_ALLOCS(); // str has been moved to the beginning
+                CHECK_ALLOCS(); // str has been moved to the beginning
             }
             SECTION("offset, > max capacity") {
                 s.offset(20);
                 s.reserve(70);
                 REQUIRE_STR(s, exp.substr(20), 70);
-                REQUIRE_ALLOCS(1, BUF_CHARS+70, 1, BUF_CHARS+50);
+                CHECK_ALLOCS(1, BUF_CHARS+70, 1, BUF_CHARS+50);
             }
             SECTION("reserve to sso") {
                 String s2(s);
                 s.offset(0, 2);
                 s.reserve(2);
                 REQUIRE_STR(s, exp.substr(0,2), MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
         }
         SECTION("external") {
@@ -1643,7 +1644,7 @@ struct test_string {
                 s.reserve(exp.size()-1);
                 REQUIRE_STR(s, exp);
                 REQUIRE(s.use_count() == 1); // detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS+exp.size());
                 s = s2;
                 get_allocs();
                 s.offset(10, 30);
@@ -1651,50 +1652,50 @@ struct test_string {
                 auto tmp = exp.substr(10,30);
                 REQUIRE_STR(s, tmp);
                 REQUIRE(s.use_count() == 1); // detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+30); // detached with minimum required capacity
+                CHECK_ALLOCS(1, BUF_CHARS+30); // detached with minimum required capacity
                 s = s2;
                 get_allocs();
                 s.offset(10, 30);
                 s.reserve(100);
                 REQUIRE_STR(s, tmp, 100);
                 REQUIRE(s.use_count() == 1); // detached
-                REQUIRE_ALLOCS(1, BUF_CHARS+100);
+                CHECK_ALLOCS(1, BUF_CHARS+100);
             }
             SECTION("<= max capacity") {
                 s.reserve(0);
                 s.reserve(exp.size());
                 REQUIRE_STR(s, exp);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("> max capacity") {
                 s.reserve(exp.size()*2);
                 REQUIRE_STR(s, exp, exp.size()*2);
-                REQUIRE_ALLOCS(1, BUF_CHARS+exp.size()*2, 1, EBUF_CHARS, 0, 0, 1, exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS+exp.size()*2, 1, EBUF_CHARS, 0, 0, 1, exp.size());
             }
             SECTION("offset, <= capacity") {
                 s.offset(10);
                 s.reserve(40);
                 REQUIRE_STR(s, exp.substr(10));
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("offset, > capacity, <= max capacity") {
                 s.offset(10);
                 s.reserve(50);
                 REQUIRE_STR(s, exp.substr(10), 50);
-                REQUIRE_ALLOCS(); // str has been moved to the beginning
+                CHECK_ALLOCS(); // str has been moved to the beginning
             }
             SECTION("offset, > max capacity") {
                 s.offset(20);
                 s.reserve(70);
                 REQUIRE_STR(s, exp.substr(20), 70);
-                REQUIRE_ALLOCS(1, BUF_CHARS+70, 1, EBUF_CHARS, 0,0, 1, exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS+70, 1, EBUF_CHARS, 0,0, 1, exp.size());
             }
             SECTION("reserve to sso") {
                 String s2(s);
                 s.offset(0, 2);
                 s.reserve(2);
                 REQUIRE_STR(s, exp.substr(0, 2), MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
         }
     }
@@ -1706,12 +1707,12 @@ struct test_string {
             SECTION("less") {
                 s.resize(1);
                 REQUIRE_STR(s, StdString(LITERAL, 1), 0);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("more") {
                 s.resize(LITERAL_LEN+10);
                 REQUIRE_STR(s, StdString(LITERAL) + StdString(10, (T)'\0'));
-                REQUIRE_ALLOCS(1, BUF_CHARS + LITERAL_LEN + 10);
+                CHECK_ALLOCS(1, BUF_CHARS + LITERAL_LEN + 10);
             }
         }
         if (CHAR_SIZE == 1) {
@@ -1721,12 +1722,12 @@ struct test_string {
             SECTION("less") {
                 s.resize(2);
                 REQUIRE_STR(s, mstr("wo"), MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("more") {
                 s.resize(7, (T)'!');
                 REQUIRE_STR(s, mstr("world!!"), MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
         }
         }
@@ -1737,12 +1738,12 @@ struct test_string {
             SECTION("less") {
                 s.resize(10);
                 REQUIRE_STR(s, mstr("a", 10), exp.size());
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("more") {
                 s.resize(70, (T)'b');
                 REQUIRE_STR(s, exp + mstr("b", 20));
-                REQUIRE_ALLOCS(0,0,0,0,1,20);
+                CHECK_ALLOCS(0,0,0,0,1,20);
             }
         }
         SECTION("external") {
@@ -1752,13 +1753,13 @@ struct test_string {
             SECTION("less") {
                 s.resize(10);
                 REQUIRE_STR(s, mstr("a", 10), exp.size());
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("more") {
                 s.offset(40);
                 s.resize(20, (T)'b');
                 REQUIRE_STR(s, mstr("a", 10) + mstr("b", 10), 50);
-                REQUIRE_ALLOCS(); // because offset has been eliminated
+                CHECK_ALLOCS(); // because offset has been eliminated
             }
         }
     }
@@ -1769,33 +1770,33 @@ struct test_string {
             auto s = String(LITERAL).substr(2,5);
             s.shrink_to_fit();
             REQUIRE(s.capacity() == 0); // noop
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("sso") {
             String s(cstr("ab"));
             s.pop_back();
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a"), MAX_SSO_CHARS);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("internal owner") {
             String s(cstr("a", 50));
             get_allocs();
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a", 50));
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s.offset(0, 40);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a", 40));
-            REQUIRE_ALLOCS(0,0,0,0,1,-10); //realloced
+            CHECK_ALLOCS(0,0,0,0,1,-10); //realloced
             s.offset(10);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a", 30));
-            REQUIRE_ALLOCS(1,BUF_CHARS+30,1,BUF_CHARS+40); // dealloc+alloc
+            CHECK_ALLOCS(1,BUF_CHARS+30,1,BUF_CHARS+40); // dealloc+alloc
             s.offset(0,2);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("aa"), MAX_SSO_CHARS); // shrinked to sso
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+30);
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+30);
         }
         SECTION("internal cow") {
             String s(cstr("a", 50));
@@ -1804,28 +1805,28 @@ struct test_string {
             s.offset(10, 30);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a", 30), 0, 40);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s.offset(0, 2);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("aa"), MAX_SSO_CHARS); // shrinked to sso
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("external owner") {
             String s = create_external<>(mstr("a", 50));
             get_allocs();
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a", 50));
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s.offset(0, 40);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a", 40)); // shrinked
-            REQUIRE_ALLOCS(1, BUF_CHARS+40, 1, EBUF_CHARS, 0, 0, 1, 50); // moved to internal
+            CHECK_ALLOCS(1, BUF_CHARS+40, 1, EBUF_CHARS, 0, 0, 1, 50); // moved to internal
             s = create_external<>(mstr("a", 50));
             get_allocs();
             s.offset(0,2);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("aa"), MAX_SSO_CHARS); // shrinked to sso
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,50);
         }
         SECTION("external cow") {
             String s = create_external<>(mstr("a", 50));
@@ -1834,14 +1835,14 @@ struct test_string {
             s.offset(10, 30);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("a", 30), 0, 40);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = create_external<>(mstr("a", 50));
             tmp = s;
             get_allocs();
             s.offset(0, 2);
             s.shrink_to_fit();
             REQUIRE_STR(s, mstr("aa"), MAX_SSO_CHARS); // shrinked to sso
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
     }
 
@@ -1898,11 +1899,11 @@ struct test_string {
             String s3(cstr("b", 10));
             get_allocs();
             s.reserve(100);
-            REQUIRE_ALLOCS(1, BUF_CHARS+100);
+            CHECK_ALLOCS(1, BUF_CHARS+100);
             s.append(s2);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s.append(s3);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE_STR(s, mstr("a",50)+mstr("b",10), 100);
         }
         SECTION("use_cow_when_empty_without_reserve") {
@@ -1911,10 +1912,10 @@ struct test_string {
             String s3(cstr("b", 10));
             get_allocs();
             s.append(s2);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE(s2.use_count() == 2);
             s.append(s3);
-            REQUIRE_ALLOCS(1, BUF_CHARS+60);
+            CHECK_ALLOCS(1, BUF_CHARS+60);
             REQUIRE_STR(s, mstr("a",50)+mstr("b",10));
         }
         SECTION("operator +=") {
@@ -1945,17 +1946,17 @@ struct test_string {
             String s = lhs + rhs;
             REQUIRE_STR(s, lexp+rexp);
             REQUIRE(lhs.use_count() == 1); REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1); // no cows
-            REQUIRE_ALLOCS(1, BUF_CHARS+70);
+            CHECK_ALLOCS(1, BUF_CHARS+70);
             s = EMPTY; get_allocs();
             s = lhs + empty;
             REQUIRE(lhs.use_count() == 2); REQUIRE(s.use_count() == 2); // cow
             REQUIRE_STR(s, lexp, 0, lexp.size());
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
             s = empty + rhs;
             REQUIRE(rhs.use_count() == 2); REQUIRE(s.use_count() == 2); // cow
             REQUIRE_STR(s, rexp, 0, rexp.size());
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("ptr-str") {
             auto lhs = lexp.c_str();
@@ -1964,17 +1965,17 @@ struct test_string {
             String s = lhs + rhs;
             REQUIRE_STR(s, lexp+rexp);
             REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1);
-            REQUIRE_ALLOCS(1, BUF_CHARS+lexp.size()+rexp.size());
+            CHECK_ALLOCS(1, BUF_CHARS+lexp.size()+rexp.size());
             s = EMPTY; get_allocs();
             s = lhs + empty;
             REQUIRE_STR(s, lexp);
-            REQUIRE_ALLOCS(1, BUF_CHARS+lexp.size());
+            CHECK_ALLOCS(1, BUF_CHARS+lexp.size());
             REQUIRE(s.use_count() == 1);
             s = EMPTY; get_allocs();
             s = cstr("") + rhs;
             REQUIRE_STR(s, rexp, 0, rexp.size());
             REQUIRE(rhs.use_count() == 2); REQUIRE(s.use_count() == 2);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("char-str") {
             T lhs = (T)'x';
@@ -1983,11 +1984,11 @@ struct test_string {
             String s = lhs + rhs;
             REQUIRE_STR(s, lhs+rexp);
             REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1);
-            REQUIRE_ALLOCS(1, BUF_CHARS + rexp.size() + 1);
+            CHECK_ALLOCS(1, BUF_CHARS + rexp.size() + 1);
             s = EMPTY; get_allocs();
             s = lhs + empty;
             REQUIRE_STR(s, mstr("x"), MAX_SSO_CHARS);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("str-ptr") {
             String lhs(lexp.c_str());
@@ -1996,7 +1997,7 @@ struct test_string {
             String s = lhs + rhs;
             REQUIRE_STR(s, lexp+rexp);
             REQUIRE(lhs.use_count() == 1); REQUIRE(s.use_count() == 1);
-            REQUIRE_ALLOCS(1, BUF_CHARS + lexp.size() + rexp.size());
+            CHECK_ALLOCS(1, BUF_CHARS + lexp.size() + rexp.size());
             s = EMPTY; get_allocs();
             s = empty + rhs;
             REQUIRE_STR(s, rexp);
@@ -2005,7 +2006,7 @@ struct test_string {
             s = lhs + cstr("");
             REQUIRE_STR(s, lexp, 0, lexp.size());
             REQUIRE(lhs.use_count() == 2); REQUIRE(s.use_count() == 2);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("str-char") {
             String lhs(lexp.c_str());
@@ -2014,11 +2015,11 @@ struct test_string {
             String s = lhs + rhs;
             REQUIRE_STR(s, lexp+rhs);
             REQUIRE(lhs.use_count() == 1); REQUIRE(s.use_count() == 1);
-            REQUIRE_ALLOCS(1, BUF_CHARS + lhs.size() + 1);
+            CHECK_ALLOCS(1, BUF_CHARS + lhs.size() + 1);
             s = EMPTY; get_allocs();
             s = empty + rhs;
             REQUIRE_STR(s, mstr("y"), MAX_SSO_CHARS);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("mstr-str") {
             String  lhs(lexp.c_str());
@@ -2030,7 +2031,7 @@ struct test_string {
             REQUIRE(lhs.use_count() == 1); REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1); // no cows
             REQUIRE(!lhs); // lhs moved
             REQUIRE_STR(rhs, rexp);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("str-mstr") {
             String  lhs(lexp.c_str());
@@ -2042,7 +2043,7 @@ struct test_string {
             REQUIRE(lhs.use_count() == 1); REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1); // no cows
             REQUIRE_STR(lhs, lexp);
             REQUIRE(!rhs);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("mstr-mstr") { // for now it's just lhs.append(rhs), i.e. the same as mstr-str
             String  lhs(lexp.c_str());
@@ -2054,7 +2055,7 @@ struct test_string {
             REQUIRE(lhs.use_count() == 1); REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1); // no cows
             REQUIRE(!lhs); // lhs moved
             REQUIRE_STR(rhs, rexp);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("ptr-mstr") {
             auto lhs = lexp.c_str();
@@ -2065,7 +2066,7 @@ struct test_string {
             REQUIRE_STR(s, lexp+rexp, 100);
             REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1);
             REQUIRE(!rhs);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("char-mstr") {
             T lhs = (T)'x';
@@ -2076,7 +2077,7 @@ struct test_string {
             REQUIRE_STR(s, lhs+rexp, 120);
             REQUIRE(rhs.use_count() == 1); REQUIRE(s.use_count() == 1);
             REQUIRE(!rhs);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("mstr-ptr") {
             String lhs(lexp.c_str());
@@ -2087,7 +2088,7 @@ struct test_string {
             REQUIRE_STR(s, lexp+rexp, 300);
             REQUIRE(lhs.use_count() == 1); REQUIRE(s.use_count() == 1);
             REQUIRE(!lhs);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("mstr-char") {
             String lhs(lexp.c_str());
@@ -2098,7 +2099,7 @@ struct test_string {
             REQUIRE_STR(s, lexp+rhs, 400);
             REQUIRE(lhs.use_count() == 1); REQUIRE(s.use_count() == 1);
             REQUIRE(!lhs);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
     }
 
@@ -2111,26 +2112,26 @@ struct test_string {
                 s.length(s.length() - 6);
                 s.insert(s.length(), cstr(" world"));
                 REQUIRE_STR(s, mstr("a", cnt-6)+mstr(" world"), cnt);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has head space") {
                 s.offset(cnt - 3);
                 s.insert(s.length(), cstr(" world"));
                 REQUIRE_STR(s, mstr("aaa world"), cnt);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has both space") {
-                s.offset(8, 5);
+                s.offset(4, 3);
                 REQUIRE(s.capacity() >= 7);
-                s.insert(s.length(), cstr(" world"));
-                REQUIRE_STR(s, mstr("aaaaa world"), cnt-8);
-                REQUIRE_ALLOCS();
+                s.insert(s.length(), cstr(" XX"));
+                REQUIRE_STR(s, mstr("aaa XX"), cnt-4);
+                CHECK_ALLOCS();
             }
             SECTION("has summary space") {
                 s.offset(4, cnt-8); // 4 free from head and tail
                 s.insert(s.length(), cstr("world")); // 5 inserted
                 REQUIRE_STR(s, mstr("a", cnt-8)+mstr("world"), cnt); // moved to the beginning
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has no space") {
                 s.offset(2, cnt-4); // 2 free from head and tail
@@ -2146,26 +2147,26 @@ struct test_string {
                 s.length(s.length() - 6);
                 s.insert(0, cstr("world "));
                 REQUIRE_STR(s, mstr("world ")+mstr("a",cnt-6), cnt);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has head space") {
                 s.offset(cnt - 3);
                 s.insert(0, cstr("world "));
                 REQUIRE_STR(s, mstr("world aaa"), 9);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has both space") {
-                s.offset(8, 5);
-                REQUIRE(s.capacity() >= 7);
-                s.insert(0, cstr("world "));
-                REQUIRE_STR(s, mstr("world aaaaa"), cnt-2);
-                REQUIRE_ALLOCS();
+                s.offset(3, 4);
+                REQUIRE(s.capacity() >= 8);
+                s.insert(0, cstr("X "));
+                REQUIRE_STR(s, mstr("X aaaa"), cnt-1);
+                CHECK_ALLOCS();
             }
             SECTION("has summary space") {
                 s.offset(4, cnt-8); // 4 free from head and tail
                 s.insert(0, cstr("world")); // 5 insterted
                 REQUIRE_STR(s, mstr("world")+mstr("a",cnt-8), cnt); // moved to the beginning
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has no space") {
                 s.offset(2, cnt-4); // 2 free from head and tail
@@ -2181,32 +2182,32 @@ struct test_string {
                 s.length(s.length() - 6);
                 s.insert(2, cstr("world "));
                 REQUIRE_STR(s, mstr("aaworld ")+mstr("a",cnt-8), cnt);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has head space") {
                 s.offset(cnt - 3);
                 s.insert(2, cstr("world "));
                 REQUIRE_STR(s, mstr("aaworld a"), 9);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has both space, head is shorter") {
-                s.offset(8, 5);
+                s.offset(4, 3);
                 REQUIRE(s.capacity() >= 7);
-                s.insert(2, cstr(" world ")); // head is moved (7 bytes left)
-                REQUIRE_STR(s, mstr("aa world aaa"), cnt-1);
-                REQUIRE_ALLOCS();
+                s.insert(1, cstr(" X ")); // head is moved (3 bytes left)
+                REQUIRE_STR(s, mstr("a X aa"), cnt-1);
+                CHECK_ALLOCS();
             }
             SECTION("has both space, tail is shorter") {
-                s.offset(8, 5);
-                s.insert(3, cstr(" world ")); // tail is moved (7 bytes right)
-                REQUIRE_STR(s, mstr("aaa world aa"), cnt-8);
-                REQUIRE_ALLOCS();
+                s.offset(4, 3);
+                s.insert(2, cstr(" X ")); // tail is moved (3 bytes right)
+                REQUIRE_STR(s, mstr("aa X a"), cnt-4);
+                CHECK_ALLOCS();
             }
             SECTION("has summary space") {
                 s.offset(4, cnt-8); // 4 free from head and tail
                 s.insert(2, cstr("world")); // 5 insterted
                 REQUIRE_STR(s, mstr("aaworld")+mstr("a",cnt-10), cnt); // moved to the beginning
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("has no space") {
                 s.offset(2, cnt-4); // 2 free from head and tail
@@ -2229,19 +2230,19 @@ struct test_string {
             s.length(s.length() - 10);
             s.insert(s.length(), cstr("hello"));
             REQUIRE_STR(s, mstr("a", 40)+mstr("hello"), 45);
-            REQUIRE_ALLOCS(1, BUF_CHARS+45);
+            CHECK_ALLOCS(1, BUF_CHARS+45);
         };
         SECTION("begin") {
             s.offset(10, 30);
             s.insert(0, cstr("hello"));
             REQUIRE_STR(s, mstr("hello")+mstr("a",30), 35);
-            REQUIRE_ALLOCS(1, BUF_CHARS+35);
+            CHECK_ALLOCS(1, BUF_CHARS+35);
         };
         SECTION("middle") {
             s.offset(10, 30);
             s.insert(5, cstr("hello"));
             REQUIRE_STR(s, mstr("aaaaahello")+mstr("a",25), 35);
-            REQUIRE_ALLOCS(1, BUF_CHARS+35);
+            CHECK_ALLOCS(1, BUF_CHARS+35);
         };
     }
 
@@ -2255,14 +2256,14 @@ struct test_string {
                 String s(LITERAL);
                 s.insert(s.length(), exp.c_str());
                 REQUIRE_STR(s, StdString(LITERAL)+exp);
-                REQUIRE_ALLOCS(1, BUF_CHARS + LITERAL_LEN + exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS + LITERAL_LEN + exp.size());
             }
             SECTION("begin") {
                 auto exp = mstr("hello ");
                 String s(LITERAL);
                 s.insert(0, exp.c_str());
                 REQUIRE_STR(s, exp + StdString(LITERAL));
-                REQUIRE_ALLOCS(1, BUF_CHARS + LITERAL_LEN + exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS + LITERAL_LEN + exp.size());
             }
             SECTION("middle") {
                 auto exp = mstr("epta");
@@ -2271,7 +2272,7 @@ struct test_string {
                 auto tmp = StdString(LITERAL);
                 tmp.insert(5, exp);
                 REQUIRE_STR(s, tmp);
-                REQUIRE_ALLOCS(1, BUF_CHARS+tmp.size());
+                CHECK_ALLOCS(1, BUF_CHARS+tmp.size());
             }
         }
 
@@ -2356,18 +2357,19 @@ struct test_string {
         }
     }
 
+    // all tests should keep in mind that cnt could be 11 bytes on 32bit
     static void test_replace_impl (int cnt, bool is_external) {
         auto exp = mstr("a", cnt);
         String s = is_external ? create_external<>(exp) : String(exp.c_str());
         get_allocs();
 
         SECTION("shrink") {
-            s.replace(5, 10, cstr("hello"));
-            REQUIRE_STR(s, mstr("a",5)+mstr("hello")+mstr("a",cnt-15), cnt);
-            REQUIRE_ALLOCS();
-            s.replace(0, 5, EMPTY);
-            REQUIRE_STR(s, mstr("hello")+mstr("a",cnt-15), cnt-5);
-            REQUIRE_ALLOCS();
+            s.replace(3, 4, cstr("hi"));
+            REQUIRE_STR(s, mstr("a",3)+mstr("hi")+mstr("a",cnt-7), cnt);
+            CHECK_ALLOCS();
+            s.replace(0, 4, EMPTY);
+            REQUIRE_STR(s, mstr("i")+mstr("a",cnt-7), cnt-4);
+            CHECK_ALLOCS();
         }
 
         SECTION("grow") {
@@ -2375,37 +2377,37 @@ struct test_string {
                 s.length(s.length() - 3);
                 s.replace(3, 3, cstr("world "));
                 REQUIRE_STR(s, mstr("aaaworld ")+mstr("a",cnt-9), cnt);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             };
             SECTION("has head space") {
-                s.offset(cnt - 10);
-                s.replace(2, 2, cstr("world "));
-                REQUIRE_STR(s, mstr("aaworld aaaaaa"), 14);
-                REQUIRE_ALLOCS();
+                s.offset(4);
+                s.replace(2, 2, cstr(" XX "));
+                REQUIRE_STR(s, mstr("aa XX ")+mstr("a",cnt-8), cnt-2);
+                CHECK_ALLOCS();
             };
             SECTION("has both space, head is shorter") {
-                s.offset(8, 5);
+                s.offset(3, 4);
                 REQUIRE(s.capacity() >= 7);
-                s.replace(1,2, cstr(" world ")); // head is moved (5 bytes to left)
-                REQUIRE_STR(s, mstr("a world aa"), cnt-3);
-                REQUIRE_ALLOCS();
+                s.replace(1,2, cstr(" XX ")); // head is moved
+                REQUIRE_STR(s, mstr("a XX a"), cnt-1);
+                CHECK_ALLOCS();
             };
             SECTION("has both space, tail is shorter") {
-                s.offset(8, 5);
-                s.replace(2,2, cstr(" world ")); // tail is moved (5 bytes to right)
-                REQUIRE_STR(s, mstr("aa world a"), cnt-8);
-                REQUIRE_ALLOCS();
+                s.offset(3, 4);
+                s.replace(2,1, cstr(" XX ")); // tail is moved
+                REQUIRE_STR(s, mstr("aa XX a"), cnt-3);
+                CHECK_ALLOCS();
             };
             SECTION("has summary space") {
-                s.offset(4, cnt-8); // 4 free from head and tail
-                s.replace(4,6, cstr("hello world")); // 5 inserted
-                REQUIRE_STR(s, mstr("aaaahello world")+mstr("a",cnt-18), cnt); // moved to the beginning
-                REQUIRE_ALLOCS();
+                s.offset(3, cnt-6); // 3 free from head and tail
+                s.replace(2,2, cstr("XXXXXXX")); // 5 inserted
+                REQUIRE_STR(s, mstr("aaXXXXXXX")+mstr("a",cnt-10), cnt); // moved to the beginning
+                CHECK_ALLOCS();
             };
             SECTION("has no space") {
                 s.offset(2, cnt-4); // 2 free from head and tail
-                s.replace(4,6, cstr("hello world")); // 5 insterted
-                REQUIRE_STR(s, mstr("aaaahello world")+mstr("a",cnt-14), cnt+1); // moved to the beginning
+                s.replace(3,2, cstr("XXXXXXX")); // 5 insterted
+                REQUIRE_STR(s, mstr("aaaXXXXXXX")+mstr("a",cnt-9), cnt+1); // moved to the beginning
                 auto stat = get_allocs();
                 REQUIRE(stat.allocated_cnt == 1);
                 REQUIRE(stat.allocated == (int)BUF_CHARS+cnt+1);
@@ -2421,13 +2423,13 @@ struct test_string {
                 exp.replace(5, 5, cstr("hi"));
                 s.replace(5, 5, cstr("hi"));
                 REQUIRE_STR(s, exp);
-                REQUIRE_ALLOCS(1, BUF_CHARS + exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS + exp.size());
             }
             SECTION("grow") {
                 exp.replace(5, 10, cstr("epta"));
                 s.replace(5, 10, cstr("epta"));
                 REQUIRE_STR(s, exp);
-                REQUIRE_ALLOCS(1, BUF_CHARS + exp.size());
+                CHECK_ALLOCS(1, BUF_CHARS + exp.size());
             }
         }
 
@@ -2543,14 +2545,14 @@ struct test_string {
             String s(LITERAL);
             s.shared_buf();
             REQUIRE(s.capacity() == llen); // detached
-            REQUIRE_ALLOCS(1, BUF_CHARS + LITERAL_LEN);
+            CHECK_ALLOCS(1, BUF_CHARS + LITERAL_LEN);
         }
         SECTION("sso") {
             auto msc = MAX_SSO_CHARS;
             String s(cstr("ab"));
             s.shared_buf();
             REQUIRE(s.capacity() == msc); // noop
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("internal") {
             String s(cstr("a", 50));
@@ -2558,11 +2560,11 @@ struct test_string {
             s.offset(0, 10);
             s.shared_buf();
             REQUIRE(s.capacity() == 50); // noop
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             String tmp(s);
             s.shared_buf();
             REQUIRE(s.shared_capacity() == 50); // noop
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("external") {
             String s = create_external(mstr("a",50));
@@ -2570,11 +2572,11 @@ struct test_string {
             s.offset(0, 10);
             s.shared_buf();
             REQUIRE(s.capacity() == 50); // noop
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             String tmp(s);
             s.shared_buf();
             REQUIRE(s.shared_capacity() == 50); // noop
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
     }
 
@@ -2617,7 +2619,7 @@ struct test_string {
             REQUIRE(string::from_number(10) == "10");
             REQUIRE(string::from_number(10,8) == "12");
             REQUIRE(string::from_number(10, 16) == "a");
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         };
     }
 
@@ -2627,7 +2629,7 @@ struct test_string {
             String s(src);
             REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
             s = EMPTY; src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         };
         SECTION("from sso") {
             auto exp = mstr("ab");
@@ -2635,42 +2637,42 @@ struct test_string {
             String s(src);
             REQUIRE_STR(s, exp, MAX_SSO_CHARS);
             s = EMPTY; src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         };
         SECTION("from internal") {
             auto exp = mstr("a", 50);
             String2 src(exp.c_str());
-            REQUIRE_ALLOCS(1, BUF_CHARS+exp.size());
+            CHECK_ALLOCS(1, BUF_CHARS+exp.size());
             String s(src);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE_STR(s, exp, 0, exp.size());
             src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,BUF_CHARS+exp.size());
+            CHECK_ALLOCS(0,0,1,BUF_CHARS+exp.size());
         };
         SECTION("from external") {
             auto exp = mstr("b", 50);
             String2 src = create_external<String2>(exp);
-            REQUIRE_ALLOCS(1, EBUF_CHARS);
+            CHECK_ALLOCS(1, EBUF_CHARS);
             String s(src);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE_STR(s, exp, 0, exp.size());
             src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
+            CHECK_ALLOCS(0,0,1,EBUF_CHARS,0,0,1,exp.size());
         };
         SECTION("from external with custom buf") {
             auto exp = mstr("b", 50);
             String2 src = create_external_cbuf<String2>(exp);
             String s(src);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             REQUIRE_STR(s, exp, 0, exp.size());
             src = EMPTY;
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
             s = EMPTY;
-            REQUIRE_ALLOCS(0,0,0,0,0,0,1,exp.size(),1);
+            CHECK_ALLOCS(0,0,0,0,0,0,1,exp.size(),1);
         };
     }
 
@@ -2679,30 +2681,30 @@ struct test_string {
             String s;
             REQUIRE(s.c_str()[0] == 0);
             REQUIRE_STR(s, EMPTY);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("literal") {
             String s(LITERAL);
             REQUIRE(s.c_str()[LITERAL_LEN] == 0);
             REQUIRE_STR(s, LITERAL, LITERAL_LEN, 0);
-            REQUIRE_ALLOCS();
+            CHECK_ALLOCS();
         }
         SECTION("sso") {
             SECTION("self") {
-                auto exp = mstr("ab");
+                auto exp = mstr("a", MAX_SSO_CHARS-1);
                 String s(exp.c_str());
                 REQUIRE(s.c_str()[exp.length()] == 0);
                 REQUIRE_STR(s, exp, MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("detach") {
                 auto exp = mstr("a", 50);
                 String src(exp.c_str());
                 get_allocs();
-                String s = src.substr(0, 2);
-                REQUIRE(s.c_str()[2] == 0);
-                REQUIRE_STR(s, mstr("aa"), MAX_SSO_CHARS);
-                REQUIRE_ALLOCS();
+                String s = src.substr(0, MAX_SSO_CHARS-1);
+                CHECK(s.c_str()[MAX_SSO_CHARS-1] == 0);
+                REQUIRE_STR(s, mstr("a", MAX_SSO_CHARS-1), MAX_SSO_CHARS);
+                CHECK_ALLOCS();
             }
         }
         SECTION("internal") {
@@ -2712,9 +2714,9 @@ struct test_string {
                 get_allocs();
                 REQUIRE(s.c_str()[exp.length()] == 0);
                 REQUIRE_STR(s, exp, exp.length() + 1);
-                REQUIRE_ALLOCS(0,0,0,0,1,1);
+                CHECK_ALLOCS(0,0,0,0,1,1);
                 s.c_str();
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
             SECTION("detach") {
                 auto exp = mstr("ab", 50);
@@ -2723,9 +2725,9 @@ struct test_string {
                 String s2(s);
                 REQUIRE(s.c_str()[exp.length()] == 0);
                 REQUIRE_STR(s, exp, exp.length() + 1);
-                REQUIRE_ALLOCS(1,BUF_CHARS+exp.size()+1,0,0,0,0);
+                CHECK_ALLOCS(1,BUF_CHARS+exp.size()+1,0,0,0,0);
                 s.c_str();
-                REQUIRE_ALLOCS();
+                CHECK_ALLOCS();
             }
         }
     }
@@ -2793,7 +2795,5 @@ struct test_string {
 
 template <class T> const T                            test_string<T>::LITERAL[38] = {'h','e','l','l','o',' ','w','o','r','l','d',',',' ','t','h','i','s',' ','i','s',' ','a',' ','l','i','t','e','r','a','l',' ','s','t','r','i','n','g',0};
 template <class T> const T                            test_string<T>::EMPTY[1]    = {0};
-template <class T> typename test_string<T>::StdString test_string<T>::defexp      = test_string<T>::mstr("this string is definitely longer than max sso chars");
-template <class T> size_t                             test_string<T>::defsz       = test_string<T>::BUF_CHARS + test_string<T>::defexp.size();
 
 }

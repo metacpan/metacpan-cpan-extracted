@@ -1,50 +1,48 @@
 #!/usr/bin/perl -w
-# $Id: distsync 25 2017-08-29 09:21:01Z abalama $
+# $Id: distsync 27 2019-07-23 11:26:37Z abalama $
 use strict;
 
 =head1 NAME
 
-distsync - Launcher of synchronization via App::DistSync
-
-=head1 VERSION
-
-Version 1.05
+distsync - launcher of synchronization via App::DistSync
 
 =head1 SYNOPSIS
 
     distsync [options] [commands]
 
     distsync -D /var/www/dist init
-    
+
     distsync [-d] -D /var/www/dist [-T TIMEOUT] [sync]
-    
-    Type distsync -h or distsync -? for more information
 
 =head1 OPTIONS
 
-=over 8
+=over 4
 
 =item B<-d, --debug>
 
 Enable debug mode
 
+=item B<-D /path/to/directory, --dir=/path/to/directory>
+
+Sets working directory
+
 =item B<-h, --help>
 
-Show help information
+Show short help information and quit
 
-=item B<-?, --man, --longhelp>
+=item B<-H, --longhelp>
 
-Show long help information
+Show long help information and quit
 
 =item B<-T secs, --timeout=secs>
 
 Set timeout for HTTP requests
 
-=item B<-v, --ver, --version>
+=item B<-V, --version>
 
-Show version number of program
+Print the version number of the program and quit
 
-=item B<-H secs, --hold=secs>
+=item B<-k secs, --keep=secs>
 
 Max amount of seconds before breaking lock (0 for never, default is 3600)
 
@@ -52,7 +50,7 @@ Max amount of seconds before breaking lock (0 for never, default is 3600)
 
 =head1 COMMANDS
 
-=over 8
+=over 4
 
 =item B<init>
 
@@ -68,81 +66,39 @@ Synchronization of the specified directory with the remote resources (mirrors)
 
 Launcher of synchronization via App::DistSync
 
-See C<README> file
-
-=head1 HISTORY
-
-=over 8
-
-=item B<1.00 / Sat Oct  4 10:52:42 2014 GMT>
-
-Init version
-
-=back
-
-See C<CHANGES> file
-
-=head1 DEPENDENCIES
-
-L<LWP>
-
-=head1 TO DO
-
-See C<TODO> file
-
-=head1 BUGS
-
-Coming soon
-
-=head1 SEE ALSO
-
-C<perl>, L<LWP>
-
-=head1 DIAGNOSTICS
-
-The usual warnings if it can't read or write the files involved.
+See L<App::DistSync> for details
 
 =head1 AUTHOR
 
-Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+Serz Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
-This program is distributed under the GNU GPL v3.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-See C<LICENSE> file
+See L<https://dev.perl.org/licenses/>
 
 =cut
 
-#use Data::Dumper; $Data::Dumper::Deparse = 1;
+use Getopt::Long;
+use Pod::Usage;
+
+use Cwd;
+use File::Spec;
+
+use App::DistSync;
+use App::DistSync::Lock;
 
 use constant {
     PIDFILE     => 'distsync.pid',
     CMDDEFAULT  => 'sync',
     COMMANDS    => [qw/ init sync /],
 };
-
-use App::DistSync;
-use App::DistSync::Lock;
-
-use Getopt::Long;
-use Pod::Usage;
-use Cwd;
-use File::Spec;
 
 $SIG{INT} = sub { die "Aborted\n"; };
 
@@ -151,51 +107,48 @@ $| = 1;  # autoflush
 our %OPT;
 
 BEGIN {
-    sub say { return unless $OPT{debug} || -t; print STDOUT @_ ? @_ : '',"\n" }
-    sub err { print STDERR @_ ? @_ : '',"\n" }
-    sub tms { sprintf "[%s GMT]", scalar(gmtime(time())) }
-    #sub exception { say "FAILED"; err tms, " ", @_ }
+    sub _say { return unless $OPT{debug} || -t; print STDOUT @_ ? @_ : '',"\n" }
+    sub _err { print STDERR @_ ? @_ : '',"\n" }
+    sub _tms { sprintf "[%s GMT]", scalar(gmtime(time())) }
 }
 
 Getopt::Long::Configure ("bundling");
 GetOptions(\%OPT,
-    "help|usage|h",
-    "longhelp|man|m|?",
-    "version|ver|v",
-    "debug|d",
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+    "version|vers|ver|V",   # Print VERSION of the App::MBUtiny
+    "debug|d",              # Debug mode
 
-    "directory|dir|D=s",  # Directory
-    "timeout|T=s",        # Timeout
-    "hold|H=i",           # Hold value. 0 - off, 1-n - secs, default - 3600
-    "baz|z=s",            # BAZ
-    
-) || pod2usage(-exitval => 1, -verbose => 0);
+    "directory|dir|D=s",    # Directory
+    "timeout|T=s",          # Timeout
+    "hold|keep|k=i",        # Hold value. 0 - off, 1-n - secs, default - 3600
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
 pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
 pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
-pod2usage(-exitval => 0, -verbose => 99, -sections => 'NAME|VERSION') if $OPT{version};
+printf("Version: %s\n", App::DistSync->VERSION) && exit(0) if $OPT{version};
 
 # VARS
 my %cmddata;
 my $command   = @ARGV ? shift @ARGV : CMDDEFAULT;
 my @argss = @ARGV ? @ARGV : ();
 my @commands  = @{(COMMANDS)};
-pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS')
+pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
     if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
 
 # Directory
 my $root_dir = $OPT{directory} || cwd();
 unless ($root_dir && (-e $root_dir) && (-d $root_dir or -l $root_dir)) {
-    err(sprintf "Directory \"%s\" not exists", $root_dir || '.');
+    _err(sprintf "Directory \"%s\" not exists", $root_dir || '.');
     exit(1);
 }
 
 # Debugging
 $App::DistSync::DEBUG = 1 if $OPT{debug};
 
-say sprintf("App::DistSync/%s", App::DistSync->VERSION);
-say;
-my $start_tms = tms;
-START: debug("START ", tms);
+_say sprintf("App::DistSync/%s", App::DistSync->VERSION);
+_say;
+my $start_tms = _tms;
+START: debug("START ", _tms);
 #########################
 ### START
 #########################
@@ -207,7 +160,7 @@ my $lock = new App::DistSync::Lock(
         pid  => $$,
     );
 if (!$lock->status || $lock->running) {
-    err($lock->error);
+    _err($lock->error);
     goto FINISH;
 }
 
@@ -220,28 +173,27 @@ my $ds = new App::DistSync(
 
 if ($command eq 'init') {
     goto FINISH unless $ds->init;
-    say sprintf "Initialization has been completed. Your files located in %s", $root_dir;
+    _say sprintf "Initialization has been completed. Your files located in %s", $root_dir;
 } else {
     my $status = $ds->sync;
     if ($status) {
-        say(sprintf("Sync completed successfully\n\tURI:\t\t%s\n\tDirectory:\t%s\n\tStarted at:\t%s\n\tFinished at:\t%s", 
+        _say(sprintf("Sync completed successfully\n\tURI:\t\t%s\n\tDirectory:\t%s\n\tStarted at:\t%s\n\tFinished at:\t%s",
             (defined($ds->{uri}) ? $ds->{uri} : 'none'),
             $root_dir,
             $start_tms,
-            tms
+            _tms
         ));
     } else {
-        say(sprintf("Sync completed with errors\n\tDirectory:\t%s", $root_dir));
+        _say(sprintf("Sync completed with errors\n\tDirectory:\t%s", $root_dir));
     }
 }
-
-# say "Comming soon...";
 
 #########################
 ### FINISH
 #########################
-FINISH: debug("FINISH ", tms);
+FINISH: debug("FINISH ", _tms);
 exit(0);
 
 1;
+
 __END__

@@ -1,8 +1,13 @@
-0.002   2018-09-26 (PERLANCAR)
+0.003   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version of coerce rule module(s) 3->4.
+
+
+0.002   2018-09-26  Released-By: PERLANCAR
 
 	- [ux] color::rgb24: Coerce and complete from color names.
 
 
-0.001   2017-12-03 (PERLANCAR)
+0.001   2017-12-03  Released-By: PERLANCAR
 
         - First release.

@@ -1,16 +1,26 @@
-0.005   2018-06-06 (PERLANCAR)
+0.007   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.006   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.005   2018-06-06  Released-By: PERLANCAR
 
 	- Add restriction that account must not exceed 64 characters in
 	  length.
 
 
-0.004   2018-06-04 (PERLANCAR)
+0.004   2018-06-04  Released-By: PERLANCAR
 
         - [release] Re-release to resolve commit conflict between 0.002 and
           0.003.
 
 
-0.003   2018-06-04 (PERLANCAR)
+0.003   2018-06-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -20,7 +30,7 @@
 	  version 3).
 
 
-0.002   2018-05-31 (PERLANCAR)
+0.002   2018-05-31  Released-By: PERLANCAR
 
 	- [dist] Require minimum version of CryptoExchange::Catalog that
 	  has introduced codes [RT#125424].
@@ -28,6 +38,6 @@
 	- Forgot to add lib/Data/Sah/CoerceBundle/App/cryp.pm.
 
 
-0.001   2018-05-29 (PERLANCAR)
+0.001   2018-05-29  Released-By: PERLANCAR
 
         - First release.

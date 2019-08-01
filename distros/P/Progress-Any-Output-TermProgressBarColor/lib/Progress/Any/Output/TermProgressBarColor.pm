@@ -1,7 +1,7 @@
 package Progress::Any::Output::TermProgressBarColor;
 
-our $DATE = '2018-03-27'; # DATE
-our $VERSION = '0.245'; # VERSION
+our $DATE = '2019-07-30'; # DATE
+our $VERSION = '0.246'; # VERSION
 
 use 5.010001;
 use strict;
@@ -133,7 +133,7 @@ sub new {
         if ($ENV{COLUMNS}) {
             $cols = $ENV{COLUMNS};
         } elsif (eval { require Term::Size; 1 }) {
-            ($cols, $rows) = Term::Size::chars();
+            ($cols, $rows) = Term::Size::chars(*STDOUT{IO});
         } else {
             $cols = 80;
         }
@@ -315,7 +315,7 @@ Progress::Any::Output::TermProgressBarColor - Output progress to terminal as col
 
 =head1 VERSION
 
-This document describes version 0.245 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2018-03-27.
+This document describes version 0.246 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2019-07-30.
 
 =head1 SYNOPSIS
 
@@ -453,6 +453,11 @@ which means to update output at most once every 0.5 second.
 
 =head1 ENVIRONMENT
 
+=head2 NO_COLOR
+
+Bool. Can be used to disable color. Consulted before L<NO_COLOR>. See
+L<Color::ANSI::Util>.
+
 =head2 COLOR
 
 Bool. Can be used to force or disable color. See L<Color::ANSI::Util>.
@@ -507,7 +512,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

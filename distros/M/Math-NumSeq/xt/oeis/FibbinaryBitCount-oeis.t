@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,9 +19,9 @@
 
 use 5.004;
 use strict;
-
+use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 35;
+plan tests => 40;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,9 +29,6 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::NumSeq::FibbinaryBitCount;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------
@@ -303,7 +300,7 @@ foreach my $elem ([ 2, 'A020908'],
          require Math::BigInt;
          my $seq  = Math::NumSeq::FibbinaryBitCount->new;
          my @got;
-         my $i = Math::NumSeq::_to_bigint(1);
+         my $i = Math::BigInt->new(1);
          while (@got < $count) {
            push @got, $seq->ith($i);
            $i *= $base;

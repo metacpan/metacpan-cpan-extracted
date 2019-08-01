@@ -12,7 +12,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp' => '0',
         'Data::Dump' => '0',
-        'Mojolicious' => '0',
+        'Mojolicious' => '8.0',
         'Scalar::Util' => '0',
         # For testing
         'FindBin' => '0',

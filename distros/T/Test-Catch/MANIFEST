@@ -3,10 +3,8 @@ Changes
 lib/Test/Catch.pm
 lib/Test/Catch.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 t/run.t
 t/test.cc
-Test-Catch.pro
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

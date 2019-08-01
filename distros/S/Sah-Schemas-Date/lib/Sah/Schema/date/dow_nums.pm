@@ -1,12 +1,13 @@
 package Sah::Schema::date::dow_nums;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-24'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $schema = ['array' => {
     summary => 'Array of day-of-week numbers (1-7, 1=Monday)',
     of => ['date::dow_num', {}, {}],
     'x.perl.coerce_rules' => ['str_comma_sep'],
+    'x.completion' => ['date_dow_nums'],
 }, {}];
 
 1;
@@ -25,7 +26,7 @@ Sah::Schema::date::dow_nums - Array of day-of-week numbers (1-7, 1=Monday)
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::date::dow_nums (from Perl distribution Sah-Schemas-Date), released on 2019-06-20.
+This document describes version 0.004 of Sah::Schema::date::dow_nums (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
 
 =head1 HOMEPAGE
 

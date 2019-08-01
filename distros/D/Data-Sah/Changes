@@ -1,3 +1,16 @@
+0.899   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Update module name
+	  (Language::Expr::Interpreter::var_enumer).
+
+
+0.898   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [experimental] Add basic support for 'if' clause. Currently only
+          handles the case where 'cond'=str (schema), 'then'=array (schema), and
+          no 'else'. The human text rendering is very basic.
+
+
 0.897   2019-07-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to Sah 0.9.46 (new clauses examples & invalid_examples).

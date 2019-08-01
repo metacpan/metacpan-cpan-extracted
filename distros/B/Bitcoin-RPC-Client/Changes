@@ -1,5 +1,9 @@
 Revision history for Bitcoin::RPC::Client 
 
+0.10    2019-7-29/16
+        - 'die' on error rather than 'exit' (GH#1) (regcostajr)
+        - Remove HTTP response error handler (GH#2) (regcostajr)
+
 0.09    2019-4-16/14
         - Updated documentation
         - Updated META

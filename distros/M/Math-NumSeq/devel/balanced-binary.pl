@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -23,23 +23,31 @@ use warnings;
 use POSIX;
 use List::Util 'max','min';
 
+use Math::NumSeq::BalancedBinary;
+
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
 
 
-
+{
+  require Math::BigInt;
+  my $seq = Math::NumSeq::BalancedBinary->new;
+  my $b = Math::BigInt->new('0b1111000110101001001100');
+  print $seq->pred($b),"\n";
+  print $seq->value_to_i($b),"\n";
+  exit 0;
+}
 
 {
   # value_to_i_floor()
-  require Math::NumSeq::BalancedBinary;
   my $seq = Math::NumSeq::BalancedBinary->new;
   # {
   #   my $i = $seq->value_to_i(3);
   #   print "$i\n";
   # }
   my $input = 0xFFFF_FFFF;
-   $input = 0xFFFF_FFFF_FFFF_FFFF;  # 75_254_198_337_177_847
+  # $input = 0xFFFF_FFFF_FFFF_FFFF;  # 75_254_198_337_177_847
   {
     my $i = $seq->value_to_i_floor($input);
     # $i = $seq->value_to_i_ceil($input);

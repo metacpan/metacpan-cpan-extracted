@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.724'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.726'; # VERSION
 
 use 5.010;
 use strict;
@@ -16,7 +16,8 @@ $SPEC{pmlist} = {
     summary => 'List Perl modules (and PODs, and module prefixes)',
     description => <<'_',
 
-This is basically a CLI interface to <pm:Module::List>, with tab completion.
+This is basically a CLI interface to <pm:PERLANCAR::Module::List>, with tab
+completion.
 
 _
     args => {
@@ -97,7 +98,9 @@ _
     },
 };
 sub pmlist {
-    require Module::List;
+    require PERLANCAR::Module::List;
+    require String::Wildcard::Bash;
+
     my %args = @_;
 
     require Module::CoreList::More if defined($args{core}) || $args{detail};
@@ -107,7 +110,7 @@ sub pmlist {
     $query =~ s!/!::!g; # convenience
 
     # i wonder why Module::List is not more forgiving
-    $query .= "::" unless !length($query) || $query =~ /::\z/;
+    $query .= "::" unless !length($query) || $query =~ /::\z/ || String::Wildcard::Bash::contains_wildcard($query);
 
     local @INC = @INC;
     @INC = do {
@@ -117,9 +120,10 @@ sub pmlist {
     } if $args{core_dirs};
     @INC = grep { $_ ne '.' } @INC if $args{exclude_curdir};
 
-    my $mods = Module::List::list_modules(
+    my $mods = PERLANCAR::Module::List::list_modules(
         $query,
         {
+            wildcard      => 1,
             list_prefixes => $args{prefix},
             list_modules  => $args{pm},
             list_pod      => $args{pod},
@@ -177,7 +181,7 @@ pmlist - List Perl modules (and PODs, and module prefixes)
 
 =head1 VERSION
 
-This document describes version 0.724 of pmlist (from Perl distribution App-PMUtils), released on 2019-06-20.
+This document describes version 0.726 of pmlist (from Perl distribution App-PMUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 
@@ -185,9 +189,16 @@ Basic usage:
 
  % pmlist Text::
 
+Wildcard:
+
+ % pmlist Module::P*
+ % pmlist Module/P**
+ % pmlist **::Tiny
+
 =head1 DESCRIPTION
 
-This is basically a CLI interface to L<Module::List>, with tab completion.
+This is basically a CLI interface to L<PERLANCAR::Module::List>, with tab
+completion.
 
 =head1 OPTIONS
 
@@ -209,7 +220,7 @@ Return detailed records instead of just module names.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

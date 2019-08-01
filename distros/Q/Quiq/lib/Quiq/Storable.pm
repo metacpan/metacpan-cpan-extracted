@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.151';
+our $VERSION = '1.152';
 
 use Storable ();
 use Quiq::Path;
@@ -90,12 +90,33 @@ sub thaw {
 =head4 Synopsis
 
     $ref = Quiq::Storable->memoize($file,$sub);
+    $ref = Quiq::Storable->memoize($file,$duration,$sub);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Cachedatei.
+
+=item $duration
+
+Dauer in Sekunden, die die Cachdatei gültig ist. Falls nicht angegeben
+oder C<undef>, ist die Cachdatei unbegrenzt lange gültig.
+
+=item $sub
+
+Subroutine, die die Datenstruktur aufbaut und eine Referenz auf
+diese zurückliefert.
+
+=back
 
 =head4 Description
 
 Existiert Datei $file, deserialisiere die enthaltene Datenstruktur.
 Andernfalls erzeuge die Datenstruktur durch Aufruf der Subroutine $sub
-und speichere sie in Datei $file. In beiden Fällen liefere eine
+und speichere das Resultat in Datei $file. In beiden Fällen liefere eine
 Referenz auf die Datenstuktur zurück.
 
 Soll die Datenstuktur erneut generiert werden, genügt es, die Datei
@@ -103,7 +124,7 @@ zuvor zu löschen.
 
 =head4 Example
 
-Cache Hash mit zyklischer Struktur:
+Cache Hash (hier mit zyklischer Struktur):
 
     my $cacheFile = '~/tmp/test5674';
     my $objectH = Quiq::Storable->memoize($cacheFile,sub {
@@ -120,12 +141,16 @@ Cache Hash mit zyklischer Struktur:
 # -----------------------------------------------------------------------------
 
 sub memoize {
-    my ($class,$file,$sub) = @_;
+    my $class = shift;
+    my $file = shift;
+    my $duration = ref $_[0]? undef: shift;
+    my $sub = shift;
 
     my $p = Quiq::Path->new;
 
     my $ref;
-    if ($p->exists($file)) {
+    if ($p->exists($file) && (!defined($duration) ||
+            Quiq::Path->age($file) <= $duration)) {
         $ref = $class->thaw($p->read($file));
     }
     else {
@@ -140,7 +165,7 @@ sub memoize {
 
 =head1 VERSION
 
-1.151
+1.152
 
 =head1 AUTHOR
 

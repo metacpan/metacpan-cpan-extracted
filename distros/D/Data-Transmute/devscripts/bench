@@ -3,7 +3,8 @@
 use 5.010;
 use strict;
 use warnings;
-use lib 'lib';
+use FindBin '$Bin';
+use lib "$Bin/../lib";
 
 use Benchmark::Dumb qw(timethese);
 use Data::Transmute qw(transmute_hash);

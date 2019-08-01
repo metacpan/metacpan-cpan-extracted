@@ -11,6 +11,7 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/header.t',
     't/init.t',
     't/libs.t'
 );

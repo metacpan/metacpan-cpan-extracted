@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Date v1.3.0;
+package PFT::Date v1.4.1;
 
 =pod
 

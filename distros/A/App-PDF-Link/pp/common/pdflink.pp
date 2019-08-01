@@ -1,4 +1,16 @@
 --lib=../../CPAN
 --lib=../../lib
+--module=App::PDF::Link::Icons::ABC
+--module=App::PDF::Link::Icons::BandInABox
+--module=App::PDF::Link::Icons::Border
+--module=App::PDF::Link::Icons::Document
+--module=App::PDF::Link::Icons::iRealPro
+--module=App::PDF::Link::Icons::JPG
+--module=App::PDF::Link::Icons::MuseScore
+--module=App::PDF::Link::Icons::PDF
+--module=App::PDF::Link::Icons::PNG
+--module=App::PDF::Link::Icons::Sibelius
+--module=App::PDF::Link::Icons::XML
+--module=App::PDF::Link::Icons::MXL
 --addfile=../../res;res
 --cachedeps=pdflink.pp.deps

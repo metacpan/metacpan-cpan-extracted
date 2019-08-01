@@ -180,7 +180,7 @@ subtest 'some bad tokens' => sub {
                     Authorization => "Bearer " . $jwt_bad_secret
                 );
                 is( $res->code, 401, 'status 401' );
-                like( $res->content, qr/decode failed/, 'cannot decode' );
+                like( $res->content, qr/(?:decode failed|cannot decode)/i, 'cannot decode' );
             };
 
             subtest 'expired token' => sub {

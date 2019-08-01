@@ -1,0 +1,14 @@
+#!perl
+use Progressive::Web::Application::Command;
+Progressive::Web::Application::Command::interface();
+__END__
+
+=head1 NAME
+
+pwa - CLA for Progressive::Web::Application
+
+=head1 USAGE
+
+	lnation:High lnation$ pwa
+
+=cut

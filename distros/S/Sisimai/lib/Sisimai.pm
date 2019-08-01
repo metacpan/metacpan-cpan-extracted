@@ -2,11 +2,9 @@ package Sisimai;
 use feature ':5.10';
 use strict;
 use warnings;
-use version;
+use version; our $VERSION = version->declare('v4.25.1'); our $PATCHLV = 0;
 
-our $VERSION = version->declare('v4.25.0');
-our $PATCHLV = 0;
-sub version { return $VERSION.($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
+sub version { return substr($VERSION->stringify, 1).($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
 sub sysname { 'bouncehammer' }
 sub libname { 'Sisimai'      }
 
@@ -325,6 +323,23 @@ C<reason> method provides table including all the reasons Sisimai can detect
         print $e;           # Blocked
         print $v->{ $e };   # 'Email rejected due to client IP address or a hostname'
     }
+
+=head2 C<B<match()>>
+
+C<match> method receives an error message as a string and returns a reason name
+like the following:
+
+    use Sisimai;
+    my $v = '550 5.1.1 User unknown';
+    my $r = Sisimai->match($v);
+    print $r;   # "userunknown"
+
+=head2 C<B<version()>>
+
+C<version> method returns the version number of Sisimai.
+
+    use Sisimai;
+    print Sisimai->version; # 4.25.0p5
 
 =head1 SEE ALSO
 

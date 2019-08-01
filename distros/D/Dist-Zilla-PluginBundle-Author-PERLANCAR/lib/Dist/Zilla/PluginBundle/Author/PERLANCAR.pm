@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2019-04-17'; # DATE
-our $VERSION = '0.596'; # VERSION
+our $DATE = '2019-07-04'; # DATE
+our $VERSION = '0.597'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -41,7 +41,7 @@ sub configure {
         'Pod2Readme',
         'Rinci::AddPrereqs',
         'Rinci::AddToDb',
-        'Rinci::Validate',
+        'Rinci::EmbedValidator',
         'SetScriptShebang',
         'Test::Compile',
         'Test::Perl::Critic',
@@ -72,7 +72,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.596 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-04-17.
+This document describes version 0.597 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-07-04.
 
 =head1 SYNOPSIS
 

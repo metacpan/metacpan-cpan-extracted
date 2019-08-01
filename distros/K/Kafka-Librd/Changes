@@ -1,5 +1,8 @@
 Revision history for Kafka-Librd
 
+0.12 2019-07-26 15:25:57 -0400
+  - Added timestamp method (gh#10, gh#14, eserte++)
+
 0.11 2019-07-22 09:31:39 -0400
  - Fix memory leak (eserte++ gh#13, gh#16)
 

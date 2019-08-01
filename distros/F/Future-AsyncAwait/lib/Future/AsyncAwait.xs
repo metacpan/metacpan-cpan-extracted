@@ -15,6 +15,13 @@
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
+#if HAVE_PERL_VERSION(5, 31, 3)
+#  define HAVE_PARSE_SUBSIGNATURE
+#elif HAVE_PERL_VERSION(5, 26, 0)
+#  include "parse_subsignature.c.inc"
+#  define HAVE_PARSE_SUBSIGNATURE
+#endif
+
 #if !HAVE_PERL_VERSION(5, 24, 0)
   /* On perls before 5.24 we have to do some extra work to save the itervar
    * from being thrown away */
@@ -2088,6 +2095,24 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
     }
   }
 
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  OP *sigop = NULL;
+  if(lex_peek_unichar(0) == '(') {
+    lex_read_unichar(0);
+
+    sigop = parse_subsignature(0);
+    lex_read_space(0);
+
+    if(PL_parser->error_count)
+      return 0;
+
+    if(lex_peek_unichar(0) != ')')
+      croak("Expected ')'");
+    lex_read_unichar(0);
+    lex_read_space(0);
+  }
+#endif
+
   if(lex_peek_unichar(0) != '{')
     croak("Expected async sub %sto be followed by '{'", name ? "NAME " : "");
 
@@ -2108,6 +2133,11 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
 
   SvREFCNT_inc(PL_compcv);
   body = block_end(save_ix, body);
+
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  if(sigop)
+    body = op_append_list(OP_LINESEQ, sigop, body);
+#endif
 
   /* turn block into
    *    NEXTSTATE; PUSHMARK; eval { BLOCK }; LEAVEASYNC

@@ -31,6 +31,7 @@
             "I18N::Langinfo" : "0",
             "Module::Signature" : "0",
             "POSIX" : "0",
+            "Socket" : "0",
             "Time::HiRes" : "0"
          },
          "requires" : {
@@ -48,10 +49,10 @@
    "provides" : {
       "Time::Format" : {
          "file" : "lib/Time/Format.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       }
    },
    "release_status" : "stable",
-   "version" : "1.14",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

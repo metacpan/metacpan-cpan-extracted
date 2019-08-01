@@ -1,7 +1,7 @@
 package App::github::cmd;
 
-our $DATE = '2018-11-08'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-07-27'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -194,11 +194,46 @@ sub create_repo {
 
 $SPEC{delete_repo} = {
     v => 1.1,
+    args => {
+        %args_common,
+        %argopt_user,
+        %arg0_repo,
+    },
 };
 sub delete_repo {
-    [501, "Not yet implemented"];
+    my %args = @_;
+    my $state = _init(\%args);
+    my $github = $state->{github};
+
+    $github->repos->delete($args{user} // $args{login}, $args{repo});
+    [200, "OK"];
 }
 
+$SPEC{rename_repo} = {
+    v => 1.1,
+    summary => 'Rename a repository',
+    args => {
+        %args_common,
+        %argopt_user,
+        %arg0_repo,
+        new_name => {
+            schema => 'str*',
+            req => 1,
+            pos => 1,
+        },
+    },
+};
+sub rename_repo {
+    my %args = @_;
+    my $state = _init(\%args);
+    my $github = $state->{github};
+
+    my $rp;
+
+    $rp = $github->repos->set_default_user_repo($args{user} // $args{login}, $args{repo});
+    $rp = $github->repos->update({ name => $args{new_name} });
+    [200, "OK", $rp];
+}
 
 1;
 # ABSTRACT: Yet another github CLI
@@ -215,7 +250,7 @@ App::github::cmd - Yet another github CLI
 
 =head1 VERSION
 
-This document describes version 0.005 of App::github::cmd (from Perl distribution App-github-cmd), released on 2018-11-08.
+This document describes version 0.007 of App::github::cmd (from Perl distribution App-github-cmd), released on 2019-07-27.
 
 =head1 SYNOPSIS
 
@@ -264,15 +299,30 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 delete_repo
 
 Usage:
 
- delete_repo() -> [status, msg, payload, meta]
+ delete_repo(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<access_token> => I<str>
+
+=item * B<login> => I<str>
+
+=item * B<pass> => I<str>
+
+=item * B<repo>* => I<str>
+
+=item * B<user> => I<str>
+
+=back
 
 Returns an enveloped result (an array).
 
@@ -284,6 +334,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 get_repo
@@ -324,6 +375,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 get_user
 
 Usage:
@@ -358,6 +410,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_repos
@@ -396,6 +449,48 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
+
+
+=head2 rename_repo
+
+Usage:
+
+ rename_repo(%args) -> [status, msg, payload, meta]
+
+Rename a repository.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<access_token> => I<str>
+
+=item * B<login> => I<str>
+
+=item * B<new_name>* => I<str>
+
+=item * B<pass> => I<str>
+
+=item * B<repo>* => I<str>
+
+=item * B<user> => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 repo_exists
@@ -459,7 +554,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

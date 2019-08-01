@@ -1,0 +1,10 @@
+language: perl
+
+perl:
+  - "5.22"
+  - "5.26"
+  - "5.30"
+
+cache:
+  directories:
+    - $HOME/perl5

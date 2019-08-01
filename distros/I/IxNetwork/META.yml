@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,16 +15,17 @@ name: IxNetwork
 provides:
   IxNetwork:
     file: lib/IxNetwork/IxNetwork.pm
-    version: '8.50'
+    version: '9.00'
   IxNetworkLegacy:
     file: lib/IxNetwork/IxNetworkLegacy.pm
   IxNetworkSecure:
     file: lib/IxNetwork/IxNetworkSecure.pm
   checkDependencies:
     file: lib/IxNetwork/checkDependencies.pm
+  validate:
+    file: lib/IxNetwork/dependencies/validate.pm
 requires:
   perl: v5.18.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '8.50'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '9.00'

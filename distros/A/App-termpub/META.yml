@@ -29,7 +29,7 @@ no_index:
 provides:
   App::termpub:
     file: lib/App/termpub.pm
-    version: '1.05'
+    version: '1.06'
   App::termpub::Epub:
     file: lib/App/termpub/Epub.pm
   App::termpub::Epub::Chapter:
@@ -38,6 +38,8 @@ provides:
     file: lib/App/termpub/Hyphen.pm
   App::termpub::InfoBox:
     file: lib/App/termpub/InfoBox.pm
+  App::termpub::NavDoc:
+    file: lib/App/termpub/NavDoc.pm
   App::termpub::Pager:
     file: lib/App/termpub/Pager.pm
   App::termpub::Pager::HTML:
@@ -48,7 +50,7 @@ resources:
   bugtracker: https://github.com/mdom/termpub/issues
   homepage: https://github.com/mdom/termpub
   repository: git://github.com/mdom/termpub.git
-version: '1.05'
+version: '1.06'
 x_contributors:
   - 'Adrian Petrescu <apetresc@gmail.com>'
   - 'Mario Domgoergen <mario@domgoergen.com>'

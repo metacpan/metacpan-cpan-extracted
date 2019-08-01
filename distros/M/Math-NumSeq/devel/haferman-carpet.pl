@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2014 Kevin Ryde
+# Copyright 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -295,11 +295,6 @@ use Math::NumSeq::HafermanCarpet;
   exit 0;
 }
 
-
-
-
-
-
 {
   my $str;
   sub haferman_by_morphism {
@@ -312,7 +307,6 @@ use Math::NumSeq::HafermanCarpet;
     return substr($str,$i,1) + 0;
   }
 }
-
 
 {
   # Haferman carpet values by paths

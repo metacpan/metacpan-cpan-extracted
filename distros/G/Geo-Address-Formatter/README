@@ -1,9 +1,9 @@
 This archive contains the distribution Geo-Address-Formatter,
-version 1.76:
+version 1.79:
 
   take structured address data and format it according to the various global/country rules
 
-This software is copyright (c) 2019 by Opencage Data Limited.
+This software is copyright (c) 2019 by Opencage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

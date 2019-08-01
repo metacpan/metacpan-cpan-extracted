@@ -1,12 +1,25 @@
-Revision history for Data-CSel
+0.121   2019-07-26 (PERLANCAR)
 
-0.11    2016-11-23 (PERLANCAR)
+	- [bugfix] class selector didn't observe class_prefixes.
+
+
+0.120   2019-07-26  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Organize See Also section. Mention ddsel, html-css-sel, htmlsel,
+	  jsonsel, orgsel, podsel, ppisel, yamlsel.
+
+	- [doc] Pod formatting to make functions/variables more easily linkable.
+
+
+0.11    2016-11-23  Released-By: PERLANCAR
 
 	- csel(): Add options {get,set}_{parent,children}_method to allow
 	  customizing method names.
 
 
-0.10    2016-09-10 (PERLANCAR)
+0.10    2016-09-10  Released-By: PERLANCAR
 
 	- [Bugfix] Workaround the problem of backtracking in the case of
 	  attribute selector [foo() eq 1] or [foo.bar.baz() ne 2] (a
@@ -17,7 +30,7 @@ Revision history for Data-CSel
 	  [foobar(,)=1] to fooba, foob, ...
 
 
-0.09    2016-09-01 (PERLANCAR)
+0.09    2016-09-01  Released-By: PERLANCAR
 
 	- Support method call e.g. T[attr("arg1",2)] as well as chained
 	  attribute/method calls e.g. T[attr1.attr2().attr3(1,2) = 42].
@@ -25,19 +38,19 @@ Revision history for Data-CSel
 	- [doc] Mention Data::CSel::WrapStruct & CSel::Examples.
 
 
-0.08    2016-05-31 (PERLANCAR)
+0.08    2016-05-31  Released-By: PERLANCAR
 
 	- Temporarily set minimum perl version to 5.20.0 because of failing
 	  test reports for 5.18.4 and earlier perls [CT].
 
 
-0.07    2016-04-03 (PERLANCAR)
+0.07    2016-04-03  Released-By: PERLANCAR
 
 	- [Experimental] Allow chained attribute in attribute selector,
 	  e.g. [date.month = 12].
 
 
-0.06    2016-04-02 (PERLANCAR)
+0.06    2016-04-02  Released-By: PERLANCAR
 
 	- [Bugfix] Bump prereq version Code::Includable::Tree::NodeMethods
 	  to 0.09 where ancestors() starts to appear.
@@ -45,14 +58,14 @@ Revision history for Data-CSel
 	- [Bugfix] Parser fix: regex literal was too eager.
 
 
-0.05    2016-04-01 (PERLANCAR)
+0.05    2016-04-01  Released-By: PERLANCAR
 
 	- [Optimization] Make :has and :not more efficient/less stupid.
 
 	- [Optimization] Don't repeatedly recompile main regex pattern.
 
 
-0.04    2016-03-23 (PERLANCAR)
+0.04    2016-03-23  Released-By: PERLANCAR
 
 	- Introduce option: class_prefixes.
 
@@ -62,16 +75,16 @@ Revision history for Data-CSel
 	  rendered in metacpan.org.
 
 
-0.03    2016-03-23 (PERLANCAR)
+0.03    2016-03-23  Released-By: PERLANCAR
 
 	- [ux] Word string value in attribute selector, and selector
 	  argument for pseudo-classes :has & :not can be unquoted, for
 	  convenience (like in CSS selector).
 
 
-0.02     2016-03-22 (PERLANCAR)
+0.02     2016-03-22  Released-By: PERLANCAR
 
-         This release improves "compatibility" with CSS selector.
+         - This release improves "compatibility" with CSS selector.
 
          - [Incompatible change] Type selector no longer uses isa() but string
            comparison of class name. This means the expression 'T' only matches
@@ -92,6 +105,6 @@ Revision history for Data-CSel
            avoid code duplication.
 
 
-0.01     2016-03-20 (PERLANCAR)
+0.01     2016-03-20  Released-By: PERLANCAR
 
          - First release.

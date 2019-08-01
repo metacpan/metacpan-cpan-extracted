@@ -1,7 +1,7 @@
 package Sah::SchemaR::isbn13;
 
-our $DATE = '2018-09-12'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $rschema = ["str",[{description=>"\nNondigits [^0-9] will be removed during coercion.\n\nChecksum digit must be valid.\n\nBasically EAN-13, except with additional coercion rule to coerce it from\nISBN 10.\n\n",match=>"\\A[0-9]{13}\\z",summary=>"ISBN 13 number","x.perl.coerce_rules"=>["str_to_isbn13"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::isbn13 - ISBN 13 number
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::isbn13 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-12.
+This document describes version 0.006 of Sah::SchemaR::isbn13 (from Perl distribution Sah-Schemas-ISBN), released on 2019-07-25.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014-2016 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -23,10 +23,9 @@
 
 pft ls - List objects in your PFT site
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
-pft ls <class> [options]
-pft ls --help
+B<pft ls> I<class> [I<options>]
 
 =head1 DESCRIPTION
 
@@ -40,9 +39,8 @@ Will list all the tags from all pages and entries.
 
 =head1 CLASSES
 
-A number of possible classes can be specified. Here follows a list with a
-short description, while better details can be found in the main C<pft>
-manpage (C<man pft>).
+Many classes are supported. Here follows a list with a short description.
+For better details see L<pft(1)>.
 
 =over
 
@@ -50,14 +48,14 @@ manpage (C<man pft>).
 
 List all regular pages in C<ROOT/content/pages>.
 
-This class supports the C<--pretty> argument.
+This class supports the B<--pretty> argument.
 
 =item blog
 
 List all blog pages in C<ROOT/content/blog>. This includes daily entries
 and monthly entries
 
-This class supports the C<--pretty> argument.
+This class supports the B<--pretty> argument.
 
 =item tags
 
@@ -67,7 +65,7 @@ Scan through all entries and list all used tags.
 
 List all tag pages, that is pages describing tags.
 
-This class supports the C<--pretty> argument.
+This class supports the B<--pretty> argument.
 
 =back
 
@@ -75,50 +73,77 @@ This class supports the C<--pretty> argument.
 
 =over
 
-=item --help | -h
+=item B<--help> | B<-h>
 
 Show this help.
 
-=item --locate
+=item B<--locate>
 
 Show paths and titles, namely quick alias for:
 
     --pretty='%t:%p'
 
-=item --pretty=<fmt>
+=item B<--pretty>=I<fmt>
 
 Print properties of the listed nodes according to the specified format. The
-format uses the same I<percent notation> as printf. Note that some of those
-values can be void (for example, pages don't have a date). If this is the case
-the placeholder gets expanded with an empty string.
+format supports a custom percent notation similar in spirit to L<printf(2)>.
+
+Note that some of placeholders will be expanded with empty strings when the
+corresponding object property is void. For example, pages don't have a
+date). If this is the case the placeholder gets expanded with an empty
+string.
 
 The output is encoding depending on the locale.
 
 =over
 
-=item %t → Title
+=item %t
 
-=item %p → Path (might be void if the node is virtual)
+Title
 
-=item %g → Comma separated list of tags (possibly void)
+=item %p
 
-=item %a → Author (possibly void)
+Path (might be void if the node is virtual)
 
-=item %s → Slug (or name, if the node is virtual)
+=item %g
 
-=item %D → Date in yyyy-mm-dd format (possibly void)
+Comma separated list of tags (possibly void)
 
-=item %y → Year (possibly void)
+=item %a
 
-=item %m → Month (possibly void)
+Author (possibly void)
 
-=item %d → Day (possibly void)
+=item %s
 
-=item %o → Comma separated value of option=value pairs (possibly void)
+Slug (or name, if the node is virtual)
+
+=item %D
+
+Date in yyyy-mm-dd format (possibly void)
+
+=item %y
+
+Year (possibly void)
+
+=item %m
+
+Month (possibly void)
+
+=item %d
+
+Day (possibly void)
+
+=item %o
+
+Comma separated value of option=value pairs (possibly void)
 
 =back
 
 =back
+
+=head1 SEE ALSO
+
+L<pft(1)>
 
 =cut
 

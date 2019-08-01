@@ -3,39 +3,40 @@ abstract: 'Parse/render human-readable configuration files with inheritance and 
 author:
   - 'Igor Afanasyev <igor.afanasyev@gmail.com>'
 build_requires:
-  Test::More: 0.94
+  Test::More: '0.94'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Config-Neat
 provides:
   Config::Neat:
     file: lib/Config/Neat.pm
-    version: 1.302
+    version: '1.401'
   Config::Neat::Array:
     file: lib/Config/Neat/Array.pm
-    version: 1.302
+    version: '1.401'
   Config::Neat::Inheritable:
     file: lib/Config/Neat/Inheritable.pm
-    version: 1.302
+    version: '1.401'
   Config::Neat::Render:
     file: lib/Config/Neat/Render.pm
-    version: 1.302
+    version: '1.401'
   Config::Neat::Schema:
     file: lib/Config/Neat/Schema.pm
-    version: 1.302
+    version: '1.401'
   Config::Neat::Util:
     file: lib/Config/Neat/Util.pm
-    version: 1.302
+    version: '1.401'
 requires:
-  JSON: 0
-  Tie::IxHash: 1.22
+  JSON: '0'
+  Tie::IxHash: '1.22'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/iafan/Config-Neat
-version: 1.302
+version: '1.401'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

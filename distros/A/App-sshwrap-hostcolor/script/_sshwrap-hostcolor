@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-03-12'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=ssh
@@ -32,9 +32,15 @@ $optspec->{'{arg}'} = {
                 if (!@$ans) {
                     return undef;
                 } elsif (@$ans == 1 && $history->{$ans->[0]}) {
-                    require XTerm::Util;
-                    log_trace "Setting background color for $ans->[0] ($history->{$ans->[0]}) ...";
-                    XTerm::Util::set_term_bgcolor($history->{$ans->[0]}, 1);
+                    # currently commented because it changes background color
+                    # permanently, even after sshwrap executes and exits. this
+                    # should be changed to: launching a background process that
+                    # sets terminal color for a couple of seconds just for demo,
+                    # then change back to original color.
+
+                    #require XTerm::Util;
+                    #log_trace "Setting background color for $ans->[0] ($history->{$ans->[0]}) ...";
+                    #XTerm::Util::set_term_bgcolor($history->{$ans->[0]}, 1);
                 }
             }
             $ans;
@@ -61,7 +67,7 @@ _sshwrap-hostcolor - Shell completer for ssh (sshwrap-hostcolor)
 
 =head1 VERSION
 
-This document describes version 0.008 of _sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2019-03-12.
+This document describes version 0.009 of _sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2019-07-26.
 
 =head1 SYNOPSIS
 

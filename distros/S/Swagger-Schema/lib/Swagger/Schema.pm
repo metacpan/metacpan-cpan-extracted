@@ -13,7 +13,7 @@ coerce 'Swagger::Schema::Parameter',
    };
 
 package Swagger::Schema {
-  our $VERSION = '1.03';
+  our $VERSION = '1.04';
   #ABSTRACT: Object model for Swagger schema files
   use MooseX::DataModel;
   use Moose::Util::TypeConstraints;
@@ -337,7 +337,9 @@ Swagger::Schema - Object access to Swagger / OpenAPI schema files
 
 =head1 DESCRIPTION
 
-Get programmatic access to a Swagger / OpenAPI file.
+Get programmatic access to a Swagger / OpenAPI file (version 2).
+
+If you're looking for OpenAPI 3 support, take a look at: L<Swagger::Schema::V3>
 
 =head1 OBJECT MODEL
 
@@ -357,6 +359,10 @@ L<http://swagger.io>
     Jose Luis Martinez
     CAPSiDE
     jlmartinez@capside.com
+
+=head1 THANKS
+
+Andrew Solomon for contributions to the V3 Swagger code
 
 =head1 BUGS and SOURCE
 

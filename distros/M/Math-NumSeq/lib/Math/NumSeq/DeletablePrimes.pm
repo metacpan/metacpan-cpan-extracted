@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,7 +26,7 @@ use strict;
 use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Primes;
@@ -63,8 +63,13 @@ use Math::NumSeq::Base::Digits
 my @oeis_anum;
 
 $oeis_anum[2] = 'A096246';
+# $oeis_anum[3] = 'A319596';   # PENDING exclude 3 maybe
+$oeis_anum[4] = 'A321657';
+$oeis_anum[5] = 'A321700';
 $oeis_anum[10] = 'A080608';
 # OEIS-Catalogue: A096246 radix=2
+# OEIS-Catalogue: A321657 radix=4
+# OEIS-Catalogue: A321700 radix=5
 # OEIS-Catalogue: A080608
 
 sub oeis_anum {
@@ -72,8 +77,16 @@ sub oeis_anum {
   return $oeis_anum[$self->{'radix'}];
 }
 
-#------------------------------------------------------------------------------
+# base=3
+# 3 = 10 from 100 = 9
+#             101 = 10
+#             102 = 11 prime, but delete 0 to 12 = 5 then del 1 to 2
+#             110 = 12
+#             120 = 15
+# fromdigits([1,2,0],3)
 
+
+#------------------------------------------------------------------------------
 
 sub rewind {
   my ($self) = @_;
@@ -152,7 +165,7 @@ __END__
 
 =head1 NAME
 
-Math::NumSeq::DeletablePrimes -- primes deleting a digit repeatedly
+Math::NumSeq::DeletablePrimes -- primes on deleting a digit repeatedly
 
 =head1 SYNOPSIS
 
@@ -165,7 +178,7 @@ Math::NumSeq::DeletablePrimes -- primes deleting a digit repeatedly
 The deletable primes, being primes which can have a digit removed to give
 another prime which in turn is deletable.
 
-    2, 3, 5, 7, 13, 17, 23, 29, 31, 37, 43, ...
+    2, 3, 5, 7, 13, 17, 23, 29, 31, 37, 43, ...     (A080608)
     starting i=0
 
 For example 367 is a deletable prime because it's possible to delete the 6
@@ -182,9 +195,10 @@ deletes to 203 or 200 are not primes.
 
 =head2 Radix
 
-The optional C<radix> parameter selects a base other than decimal.  In
-binary C<radix=E<gt>2> primes 2 and 3 which are 10 and 11 are reckoned as
-endpoints, since there are no single-digit primes.
+Optional parameter C<radix> selects a base other than decimal.  For binary
+C<radix=E<gt>2>, primes 2 and 3 which are two bits "10" and "11" are
+reckoned as endpoints in the manner of OEIS A096246, since there are no
+one-bit primes.
 
 =head1 FUNCTIONS
 

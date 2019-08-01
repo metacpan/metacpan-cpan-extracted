@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto;
-$Device::Firewall::PaloAlto::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
@@ -62,8 +62,11 @@ sub new {
 
     $uri->path('/api/');
 
+    my $ua = LWP::UserAgent->new(ssl_opts => $ssl_opts);
+    $ua->env_proxy();
+
     $object{uri} = $uri;
-    $object{user_agent} = LWP::UserAgent->new(ssl_opts => $ssl_opts);
+    $object{user_agent} = $ua;
     $object{api_key} = '';
     $object{active_vsys_id} = 1;
 
@@ -145,7 +148,7 @@ Device::Firewall::PaloAlto - Interact with the Palo Alto firewall API
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 
@@ -174,7 +177,7 @@ version 0.1.8
     
     my $flow = $fw->test->secpolicy(
        from => 'Trust', to => 'Untrust',
-       src => '192.0.2.1', dst => '203.0.113.1',
+       src_ip => '192.0.2.1', dst_ip => '203.0.113.1',
        protocol => 6, port => 443
     );
 
@@ -192,16 +195,16 @@ version 0.1.8
 
 This module provides an interface to the Palo Alto firewall API.
 
-=head1 DETAILS
-
-=head1 METHODS
+=head1 FUNCTIONS 
 
 =head2 fw()
 
-This sub (not a class method) is exported automatically into the main:: namespace if the module is
-called from a one-liner - i.e. the calling script name is '-e'.
+This is exported automatically into the main:: namespace if the module is
+loaded within a one-liner - i.e. the calling script name is '-e'. If the module is
+loaded within a normal script, this sub is not exported into main (though is of course accessible
+using C<Device::Firewall::PaloAlto::fw()>.)
 
-This shortens the amount of code needed in one liners. As an example
+The purpose of this sub is to reduce the amount of code needed in one liners. As an example
 
     # Long way
     % perl -MDevice::Firewall::PaloAlto -E 'Device::Firewall::PaloAlto::new(vefify_hostname => 0)->auth->op->system_info->to_json'
@@ -215,6 +218,8 @@ to 'admin'.
 
 If C<$verify> is not specified, C<new()> is called with C<verify_hostname => 0>, and thus the TLS certificate is
 not verified. This is opposite to the default behaviour of C<new()> where the verification is performed.
+
+=head1 METHODS
 
 =head2 new
 
@@ -282,11 +287,11 @@ Provides access to the L<Device::Firewall::PaloAlto::Test> module. This module a
     $test = $fw->test;
     ok( $test->interfaces('ethernet1/1', 'ethernet1/2'), 'Interfaces up' );
 
-=head2 Errors
+=head1 ERRORS
 
 Errors are handled differently depending on whether the script is running from a file, or from a 'one-liner'.
 
-=head3 File Errors
+=head2 File Errors
 
 In the event of an error, a L<Class::Error> object is returned. The module's documentation provides the best information, but essentially it slurps up any method calls, evaluates to false in a boolean context, and contains an error string and code.
 
@@ -294,27 +299,28 @@ This allows you to chain together method calls and the error is propagated all t
 
     my $state = $fw->auth->op->interfaces->interface('ethernet1/1')->state or die $state->error();
 
-=head3 One-liner Errors
+=head2 One-liner Errors
 
 If the code is being run from a one-liner, the error is immeidately croaked rather than being returned as a L<Class::Error> object. This saves the user from having to add the explicit croak at the end of the call on what it likely an already crowded shell line. An example:
 
     bash% perl -MDevice::Firewall::PaloAlto -E 'fw()->op->system_info->to_json'         
     HTTP Error: 500 Can't connect to pa.localdomain:443 (certificate verify failed) - 500 at -e line 1.
 
-=head2 Environment Variables
+=head1 ENVIRONMENT VARIABLES
 
 The module uses the environment variables C<PA_FW_URI>, C<PA_FW_USERNAME> and C<PA_FW_PASSWORD>. These map to the C<uri>, C<username> and C<password> arguments to the new constructor. If any of these arguments are not present, the environment variable (if defined) is used.
 
 The purpose of these is to reduce the clutter when using the module in a one-liner:
 
-    bash# export PA_FW_URI=https://pa.localdomain
-    bash# export PA_FW_USERNAME=greg.foletta
-    bash# export PA_FW_PASSWORD=a_complex_password
-    bash# perl -MDevice::Firewall::PaloAlto -E 'say fw()->op->interfaces->to_json'
+    bash% export PA_FW_URI=https://pa.localdomain
+    bash% export PA_FW_USERNAME=greg.foletta
+    bash% export PA_FW_PASSWORD=a_complex_password
+    bash% perl -MDevice::Firewall::PaloAlto -E 'say fw()->op->interfaces->to_json'
 
-=head2 JSON
+=head1 JSON
 
-Most of the objects have a C<to_json> method which returns a JSON representation of the object. There are two ways to use this method:
+Most objects inherit the C<to_json> method which returns a JSON representation of the object. By default the JSON is printed to STDOUT, however
+a filename can be pased instead.
 
     # Outputs the json to STDOUT
     $fw->op->system_info->to_json;

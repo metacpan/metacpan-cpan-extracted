@@ -87,37 +87,33 @@ These are all read-only attributes, based on information provided by
 News API. They are all strings, except for C<url>, which is a L<URI>
 object. Any of them might be undefined, except for C<name>.
 
-=over
+=head3 id
 
-=item *
+ my $id = $source->id;
 
-id
+=head3 name
 
-=item *
+ my $name = $source->name;
 
-name
+=head3 description
 
-=item *
+ my $desc = $source->description;
 
-description
+=head3 url
 
-=item *
+ my $url = $source->url;
 
-url
+=head3 category
 
-=item *
+ my $category = $source->category;
 
-category
+=head3 language
 
-=item *
+ my $language_code = $source->language;
 
-language
+=head3 country
 
-=item *
-
-country
-
-=back
+ my $country_code = $source_country;
 
 =head1 AUTHOR
 

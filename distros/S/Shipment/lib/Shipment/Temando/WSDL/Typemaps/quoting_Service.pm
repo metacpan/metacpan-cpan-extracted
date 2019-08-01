@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Typemaps::quoting_Service;
-$Shipment::Temando::WSDL::Typemaps::quoting_Service::VERSION = '3.01';
+$Shipment::Temando::WSDL::Typemaps::quoting_Service::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -3591,7 +3591,7 @@ Shipment::Temando::WSDL::Typemaps::quoting_Service
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

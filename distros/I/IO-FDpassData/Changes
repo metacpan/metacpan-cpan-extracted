@@ -1,0 +1,10 @@
+Revision history for Perl extension IO::FDpassData
+
+0.03  Tue Jul 30 21:00:43 PDT 2019
+	delete conditional XSLoader code
+
+0.02  Tue Jul 30 20:16:05 PDT 2019
+	add DynaLoader to support older versions of perl
+
+0.01  Mon Jul 29 15:35:57 PDT 2019
+	preliminary release

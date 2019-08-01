@@ -57,3 +57,9 @@ Revision history for Perl extension Tk::HListbox.
 	  properly, we now create a "default ItemStyle" for each of the three valid 
 	  "type"s and style options are applied to those (unless a 
 	  "-style => $customItemStyle" is specified for the entry).
+2.3    Tue Jul 30, 2018
+	- Added options:  -ipadx, -ipady, -tpadx, -tpady
+	  See updated docs.  These provide padding values for image/imagetext 
+	  and text fields respectively, primarily to assist users of 
+	  Tk::HMListbox in adjusting to keep icon and text columns' vertical 
+	  allignment synced.

@@ -1,19 +1,13 @@
 Mail::SimpleList README
 -----------------------
 
-History:
-
-	Version 0.93, around Mon Nov 27 06:06:49 UTC 2006
-	Version 0.92, around Thu Nov 25 20:22:57 UTC 2004
-	Version 0.91, not really released sorta kinda
-
 Mail::SimpleList is a set of modules for creating and using small, simple
-mailing lists.  They're intended to be temporary and very easy to use.  They're
+mailing lists. They're intended to be temporary and very easy to use. They're
 not tremendously featureful, but they work pretty well.
 
 The idea came about one afternoon when we were debating what to do after work
-on Friday.  We'd sent several mails back and forth and the Cc line had grown
-unwieldy.  One person said, "Take me off the list; I'll be out of town", but
+on Friday. We'd sent several mails back and forth and the Cc line had grown
+unwieldy. One person said, "Take me off the list; I'll be out of town", but
 not everyone had received that message yet and the replies grew unwieldy.
 
 We needed a simple way to start a small mailing list that would only be active
@@ -21,56 +15,57 @@ for a few days, where everyone could subscribe or unsubscribe at will.
 
 That's what Mail::SimpleList does.
 
-For more information, feel free to consult the talk I gave to the Portland Perl Mongers (http://pdx.pm.org/) on 11 June 2003.  The slides are available at:
+For more information, feel free to consult the talk I gave to the Portland Perl
+Mongers (http://pdx.pm.org/) on 11 June 2003. The slides are available at:
 
-	http://wgz.org/chromatic/talks/MailSimpleList/
+    http://wgz.org/chromatic/talks/MailSimpleList/
 
 INSTALLATION
 ------------
 
-First, run the Build.PL file to create the Build program.  Then install as
+First, run the Build.PL file to create the Build program. Then install as
 normal:
 
-	$ ./Build
-	$ ./Build test
-	$ sudo ./Build install
+    $ ./Build
+    $ ./Build test
+    $ sudo ./Build install
 
-All of the tests should pass.  If not, please send the complete diagnostic
-output to the author and we'll try to fix the bugs.  This should work on any
+All of the tests should pass. If not, please send the complete diagnostic
+output to the author and we'll try to fix the bugs. This should work on any
 Unix system and probably elsewhere, but that'll depend on several other
 components.
 
-To use this program, you need to create a new account on your mail server.  I
-use 'alias'.  This user also needs a writeable directory.  I use
-/home/alias/aliases/.  Make sure this directory exists and is writeable by this
+To use this program, you need to create a new account on your mail server. I
+use 'alias'. This user also needs a writeable directory. I use
+/home/alias/aliases/. Make sure this directory exists and is writeable by this
 user.
 
 This user must also be able to receive e-mail and execute a procmail-style
 .forward or .qmail file.
 
-This user must also receive mail with an optional delimiter.  For example, the
-user 'alias' must be able to receive mail to 'alias+somelistsname'.  The
+This user must also receive mail with an optional delimiter. For example, the
+user 'alias' must be able to receive mail to 'alias+somelistsname'. The
 extended name must be passed through to the program for mail to reach any
 lists.
 
 See the examplefilter.pl file for the recommended way to execute the mailing
-list manager.  The $alias_dir variable must contain the absolute path to the
-aliases directory -- if this path is incomplete, the program will fail.  Put
-this file in the alias user's path and make sure it is executable.  I like
+list manager. The $alias_dir variable must contain the absolute path to the
+aliases directory -- if this path is incomplete, the program will fail. Put
+this file in the alias user's path and make sure it is executable. I like
 /home/alias/bin/simplelist.pl.
 
 Your .forward or .qmail file should contain something like the following:
 
-	# .forward style
-	| "/home/alias/bin/simplelist.pl 2>> simplelist.log"
+    # .forward style
+    | "/home/alias/bin/simplelist.pl 2>> simplelist.log"
 
 or
 
-	# .qmail style
-	preline /home/alias/bin/simplelist.pl 2>> simplelist.log
+    # .qmail style
+    preline /home/alias/bin/simplelist.pl 2>> simplelist.log
 
 Please consult the documentation for your mail delivery program if neither of
-these work.  The log file can be handy for determining path and permissions
+these work. The log file can be handy for determining path and permissions
 problems.
 
 USAGE
@@ -78,24 +73,24 @@ USAGE
 
 This information is also contained within the POD of Mail::SimpleList:
 
-	$ perldoc Mail::SimpleList
+    $ perldoc Mail::SimpleList
 
-Creating a list is simple.  Just send an e-mail to the alias user on your host.
-To create a list, the mail subject must start with *new*.  The body of the list
-should contain a list of e-mail addresses to subscribe to the list.  As the
+Creating a list is simple. Just send an e-mail to the alias user on your host.
+To create a list, the mail subject must start with *new*. The body of the list
+should contain a list of e-mail addresses to subscribe to the list. As the
 sender, you will be marked as the list owner and you will be subscribed
 automatically.
 
 The list creator will receive an e-mail if the list is created successfully.
-It will include the posting address of the list.  All other users will be
+It will include the posting address of the list. All other users will be
 notified that they have been subscribed to the list.
 
-Posting to the list is simple; just send a message to the list alias.  Anyone
+Posting to the list is simple; just send a message to the list alias. Anyone
 included in the To: or Cc: lines of the e-mail will automatically be subscribed
 to the list.
 
-Unsubscribing from a list is also simple.  Send a message to the list alias
-with a subject starting with *UNSUBSCRIBE*.  You should receive a success
+Unsubscribing from a list is also simple. Send a message to the list alias
+with a subject starting with *UNSUBSCRIBE*. You should receive a success
 message.
 
 
@@ -103,67 +98,67 @@ DIRECTIVES
 ----------
 
 As of version 0.60, you can also specify additional directives in the body of
-the creation message.  The useful directives right now are 'Expires',
-'Auto_add', 'Closed', and 'Description'.  Directives precede any subscribable
-addresses.  They take the form:
+the creation message. The useful directives right now are 'Expires',
+'Auto_add', 'Closed', and 'Description'. Directives precede any subscribable
+addresses. They take the form:
 
-	Directive: argument string
+    Directive: argument string
 
-Aliases can be closed to non-members.  This directive:
+Aliases can be closed to non-members. This directive:
 
-	Closed: yes
+    Closed: yes
 
 will create a list that does not allow messages to be posted from
-non-subscribers.  They can receive mail also sent to the alias, however.
+non-subscribers. They can receive mail also sent to the alias, however.
 
 You can create an alias that will accept messages for a limited period of time.
 The Expires directive takes a time string when to expire the alias in the form
-of Months, weeks, days, hours, and minutes.  Thus this directive:
+of Months, weeks, days, hours, and minutes. Thus this directive:
 
-	Expires: 1M2w3d4h
+    Expires: 1M2w3d4h
 
-will make the alias expire in 1 Month, 2 weeks, 3 days, and 4 hours.  For the
+will make the alias expire in 1 Month, 2 weeks, 3 days, and 4 hours. For the
 purpose of simplicity, one Month is equal to thirty days.
 
 Messages sent to the alias after the expiration period is over will not be
-delivered.  The sender will receive a message to this effect.
+delivered. The sender will receive a message to this effect.
 
 Aliases automatically subscribe addresses found in the Cc header by default.
-The Auto_add directive controls this.  Saying:
+The Auto_add directive controls this. Saying:
 
-	Auto_add: no
+    Auto_add: no
 
 will disable this feature.
 
 Added addresses will receive the standard subscription notice and they will be
 removed from the headers of the message, so as not to receive duplicate
-messages.  For now, these addresses must appear in the Cc header, not the To
+messages. For now, these addresses must appear in the Cc header, not the To
 header.
 
-Description is a simple, one-line description of the purpose of the alias.  It
+Description is a simple, one-line description of the purpose of the alias. It
 will be sent to everyone who is added to the alias.
 
-	Description: Let's have a cupcake party on 8 September.
+    Description: Let's have a cupcake party on 8 September.
 
-Name is an optional name for the alias.  If specified, it will be used instead
+Name is an optional name for the alias. If specified, it will be used instead
 of the randomly generated alias.
 
-	Name: jacobs-birthday
+    Name: jacobs-birthday
 
 ADVANCED USAGE
 --------------
 
 If cloning, creating, editing, subscribing, and unsubscribing are too
-difficult, you can edit the files manually, if you can handle raw YAML.  It's
+difficult, you can edit the files manually, if you can handle raw YAML. It's
 really easy, so it shouldn't be much trouble.
 
 ENHANCEMENTS
 -------------
 
-This is a simple program with a simple purpose.  It does just about everything
+This is a simple program with a simple purpose. It does just about everything
 I could ever want right now, but there are a few improvements up my sleeve.
 
-There's not much security on lists; address spoofing is possible.  I'd like to
+There's not much security on lists; address spoofing is possible. I'd like to
 add optional cryptographic signing.
 
 There's no archiving yet, but it should be fairly easy to add.
@@ -173,10 +168,10 @@ There might be room for a few more tests.
 LICENSE, COPYRIGHT, and CREDITS
 -------------------------------
 
-Copyright 2003 - 2006, chromatic < chromatic at wgz dot org >
+Copyright 2003 - 2019, chromatic < chromatic at wgz dot org >
 
 This software is made available under the same license as Perl.
 
 This software would not have been possible without the inspiration of Simon
-Cozens' Mail::Audit.  The Portland Perl Mongers specified many improvements.
+Cozens' Mail::Audit. The Portland Perl Mongers specified many improvements.
 Allison Randal had a neat idea for giving aliases better names.

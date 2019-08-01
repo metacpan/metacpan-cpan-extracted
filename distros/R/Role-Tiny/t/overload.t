@@ -62,7 +62,7 @@ BEGIN {
   for my $o ($orig, $copy) {
     my $copied = \$o == \$copy ? ' copy' : '';
     local $TODO = 'magic not applied to all ref copies on perl < 5.8.9'
-      if $copied && $] < 5.008009;
+      if $copied && "$]" < 5.008009;
     is "$o", 'welp', 'subref overload applied to instance'.$copied;
     is sprintf('%d', $o), 219, 'method name overload applied to instance'.$copied;
     ok !$o, 'anon subref overload applied to instance'.$copied;
@@ -73,7 +73,7 @@ BEGIN {
   my $o = MyClass3->new;
   Role::Tiny->apply_roles_to_package('MyClass3', 'MyRole');
   local $TODO = 'magic not applied to existing objects on perl < 5.18'
-    if $] < 5.018;
+    if "$]" < 5.018;
   is "$o", 'welp', 'subref overload applied to class with instance';
   is sprintf('%d', $o), 219, 'method name overload applied to class with instance';
   ok !$o, 'anon subref overload applied to class with instance';

@@ -1,4 +1,6 @@
 Changes
+fallback/const-c.inc
+fallback/const-xs.inc
 lib/MPV/Simple.pm
 lib/MPV/Simple/JSON.pm
 lib/MPV/Simple/Pipe.pm

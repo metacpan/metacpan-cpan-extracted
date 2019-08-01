@@ -5,32 +5,26 @@
 #
 #  DESCRIPTION:  Test of updates/modifications
 #
-#        FILES:  ---
-#         BUGS:  ---
-#        NOTES:  ---
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: modify.t,v 1.7 2015/08/21 16:10:01 pete Exp $
 #      CREATED:  28/03/13 14:58:33
-#     REVISION:  $Revision: 1.7 $
 #===============================================================================
 
 use strict;
 use warnings;
+use utf8;
 
-use Data::Dumper;
 use Test::More;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 17;
+	plan tests => 35;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
 
-use lib './lib';
 use Net::EPP::Registry::Nominet;
 
-my $epp = new_ok ('Net::EPP::Registry::Nominet', [ test => 1,
+my $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS}, debug =>
 	$ENV{DEBUG_TEST} || 0 ] );
 
@@ -47,7 +41,7 @@ my $tag = lc $ENV{NOMTAG};
 # change nameservers on a domain
 
 my $okdomainname  = "ganymede-$tag.net.uk"; # valid
-my $baddomainname = "nominet.org.uk";    # not valid
+my $baddomainname = "nominet.org.uk";       # not valid
 
 my $changes = {
 	'add' => { 'ns' => ["ns1.caliban-$tag.lea.sch.uk", "ns1.macduff-$tag.co.uk"] },
@@ -57,6 +51,9 @@ my $changes = {
 
 ok ($epp->modify_domain ($okdomainname, $changes),
 	"Change nameservers on domain");
+my $info = $epp->domain_info ($okdomainname);
+is ($info->{ns}->[0], "ns1.caliban-$tag.lea.sch.uk.", "Nameserver 0 changed");
+is ($info->{ns}->[1], "ns1.macduff-$tag.co.uk.",      "Nameserver 1 changed");
 
 $changes = {
 	'add' => {},
@@ -70,6 +67,10 @@ $changes = {
 ok ($epp->modify_domain ($okdomainname, $changes),
 	"Change extension fields on domain") or
 	warn $epp->get_code . ' ' . $epp->get_reason;
+$info = $epp->domain_info ($okdomainname);
+is ($info->{'auto-bill'}, 7, "auto-bill changed");
+is ($info->{'auto-period'}, 5, "auto-period changed");
+is ($info->{notes}, join ("\n", @{$changes->{notes}}), "notes changed");
 
 $epp->modify_domain ($baddomainname, $changes);
 isnt ($epp->get_code, 1000, "Change extension fields on invalid domain");
@@ -82,7 +83,7 @@ $changes->{'renew-not-required'} = 'y';
 ok ($epp->modify_domain ($okdomainname, $changes),
 	"Set renew-not-required") or
 	warn $epp->get_code . ' ' . $epp->get_reason;
-my $info = $epp->domain_info ($okdomainname);
+$info = $epp->domain_info ($okdomainname);
 is ($info->{'renew-not-required'}, 'Y', 'Validated renew-not-required set');
 $changes->{'renew-not-required'} = 'n';
 ok ($epp->modify_domain ($okdomainname, $changes),
@@ -157,8 +158,7 @@ ok ($epp->modify_domain ($okdomainname, $changes),
 my $cont = {
 	'type'		=>	'FCORP',
 	'trad-name'	=>	'American Industries',
-	'co-no'		=>	'99998888',
-	'opt-out'	=>	'N'
+	'co-no'		=>	'99998888'
 };
 
 my $dominfo = $epp->domain_info ("duncan-$tag.co.uk");
@@ -197,11 +197,58 @@ $cont->{postalInfo}->{loc}->{addr} = {
 ok ($epp->modify_contact ($dominfo->{registrant}, $cont),
 	"Modify utf8 contact");
 
+# Change disclosure levels for a contact
+# Create a new contact for this first
+$cont = {
+	type    => 'IND',
+	postalInfo => { loc => {
+		name    =>  'Zaphod Beeblebox',
+		org     =>  'Zaphod Beeblebox',
+		addr    =>  {
+			street  =>  ['Presidential Plaza'],
+			city    =>  'London',
+			sp      =>  '',
+			pc      =>  'ZB1 1XL',
+			cc      =>  'GB'
+		},
+	}},
+	voice   =>  '+44.1717778888',
+	email   =>  '2heads@example.com'
+};
+$epp->create_contact ($cont);
+my $cid = $cont->{id};
+$cont = {disclose => {addr => 1}};
+ok ($epp->modify_contact ($cid, $cont),
+	"Modify address disclosure for contact");
+my $res = $epp->contact_info ($cid);
+ok ($res->{disclose}->{addr}, 'Address disclosed');
+ok (!$res->{disclose}->{org}, 'Org not disclosed');
+$cont->{disclose} = {addr => 0, org => 1};
+is ($epp->modify_contact ($cid, $cont), undef,
+	"Error modifying both disclosures to different values");
+$cont->{disclose} = {org => 1};
+ok ($epp->modify_contact ($cid, $cont),
+	"Modify org disclosure for contact");
+$res = $epp->contact_info ($cid);
+ok ($res->{disclose}->{addr}, 'Address disclosed');
+ok ($res->{disclose}->{org}, 'Org disclosed');
+$cont->{disclose} = {addr => 1, org => 1};
+ok ($epp->modify_contact ($cid, $cont),
+	"Modify both disclosures to true for contact");
+$res = $epp->contact_info ($cid);
+ok ($res->{disclose}->{addr}, 'Address disclosed');
+ok ($res->{disclose}->{org}, 'Org disclosed');
+$cont->{disclose} = {addr => 0, org => 0};
+ok ($epp->modify_contact ($cid, $cont),
+	"Modify both disclosures to false for contact");
+$res = $epp->contact_info ($cid);
+ok (!$res->{disclose}->{addr}, 'Address not disclosed');
+ok (!$res->{disclose}->{org}, 'Org not disclosed');
+
 # change details of a nameserver
 # Get the current IPv6 address first
 my $ns = "ns1.benedick-$tag.co.uk";
 $info = $epp->host_info ($ns);
-#print Dumper ($info);
 my $oldv6 = '';
 for my $addr (@{$info->{addrs}}) {
 	if ($addr->{version} and $addr->{version} eq 'v6') { $oldv6 = $addr->{addr}; last; }

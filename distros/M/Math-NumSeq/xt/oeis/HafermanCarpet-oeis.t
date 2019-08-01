@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -22,7 +22,7 @@ use 5.004;
 use strict;
 
 use Test;
-plan tests => 15;
+plan tests => 1;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -30,9 +30,6 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::NumSeq::HafermanCarpet;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------
@@ -81,14 +78,16 @@ use Math::NumSeq::HafermanCarpet;
 # all even digits 0,2,4,6,8
 # so 1,5,25,... = 5^n
 
-
 MyOEIS::compare_values
   (anum => 'A118005',
-   max_value => 1_000_000,
+   max_value => 500_000,
    func => sub {
      my ($count) = @_;
-     my $seq0 = Math::NumSeq::HafermanCarpet->new (haferman_type => 'start0');
-     my $seq1 = Math::NumSeq::HafermanCarpet->new (haferman_type => 'start1');
+     # seq is with a fixed initial 0 or 1
+     # A118005 is with middle 1, so alternates initial 0 or 1
+     # count both initial 0 or 1 and put the relevant into the return
+     my $seq0 = Math::NumSeq::HafermanCarpet->new (initial_value => 0);
+     my $seq1 = Math::NumSeq::HafermanCarpet->new (initial_value => 1);
      my @got;
      my $pow = 1;
      my $start0 = 0;
@@ -100,15 +99,11 @@ MyOEIS::compare_values
            push @got, (scalar(@got) & 1 ? $start0 : $start1);
            $pow *= 9;
          }
-         if ($value) {
-           $start0++;
-         }
+         $start0 += $value;
        }
        {
          my ($i, $value) = $seq1->next;
-         if ($value) {
-           $start1++;
-         }
+         $start1 += $value;
        }
      }
      return \@got;

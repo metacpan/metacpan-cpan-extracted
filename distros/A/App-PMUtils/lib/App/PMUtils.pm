@@ -1,14 +1,14 @@
 package App::PMUtils;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.724'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.726'; # VERSION
 
 use 5.010001;
 
 our %SPEC;
 
 our $arg_module_multiple = {
-    schema => ['array*' => of=>'perl::modname*', min_len=>1],
+    schema => ['perl::modnames*', min_len=>1],
     req    => 1,
     pos    => 0,
     greedy => 1,
@@ -188,7 +188,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.724 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-06-20.
+This document describes version 0.726 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 
@@ -283,7 +283,7 @@ Arguments ('*' denotes required arguments):
 
 Absolutify each path.
 
-=item * B<module>* => I<array[perl::modname]>
+=item * B<module>* => I<perl::modnames>
 
 =item * B<pm> => I<int> (default: 1)
 
@@ -339,7 +339,7 @@ shell:
 
 and it won't change directory if the module doesn't exist.
 
-=item * B<module>* => I<array[perl::modname]>
+=item * B<module>* => I<perl::modnames>
 
 =item * B<pm> => I<int> (default: 1)
 

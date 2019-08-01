@@ -6,7 +6,7 @@ use Capture::Tiny qw( capture );
 use FFI::Probe::Runner::Result;
 
 # ABSTRACT: Probe runner for FFI
-our $VERSION = '0.92'; # VERSION
+our $VERSION = '0.94'; # VERSION
 
 
 sub new
@@ -41,6 +41,7 @@ sub verify
   my($self) = @_;
   my $exe = $self->exe;
   my($out, $err, $ret) = capture {
+    $! = 0;
     system $exe, 'verify', 'self';
   };
   return 1 if $ret == 0 && $out =~ /dlrun verify self ok/;
@@ -57,6 +58,7 @@ sub run
   my $flags = $self->flags;
   my($out, $err, $ret) = capture {
     my @cmd = ($exe, $dll, $flags, @args);
+    $! = 0;
     system @cmd;
     $?;
   };
@@ -82,7 +84,7 @@ FFI::Probe::Runner - Probe runner for FFI
 
 =head1 VERSION
 
-version 0.92
+version 0.94
 
 =head1 SYNOPSIS
 

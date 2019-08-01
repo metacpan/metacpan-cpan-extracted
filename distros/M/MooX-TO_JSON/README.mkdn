@@ -1,0 +1,93 @@
+# NAME
+
+MooX::TO\_JSON - Generate a TO\_JSON method from attributes.
+
+# SYNOPSIS
+
+    package Local::User;
+
+    use Moo;
+    use MooX::TO_JSON;
+
+    has name => (is=>'ro', json=>1);
+    has age => (is=>'ro', json=>'age-years,num');
+    has alive => (is=>'ro', json=>',bool');
+    has possibly_empty => (is=>'ro', json=>',omit_if_empty');
+    has not_encoded => (is=>'ro');
+
+    # Optional method to shove in some extra keys
+    sub modify_json {
+      my ($self, %data) = @_;
+      return (%data, extra_stuff => 1);
+    }
+
+    use JSON::MaybeXS;
+
+    my $json = JSON::MaybeXS->new(convert_blessed=>1);
+    my $user = Local::User->new(
+      name=>'John',
+      age=>25,
+      alive=>'yes',
+      not_encoded=>'internal');
+
+    my $encoded = $json->encode($user);
+
+The value of `$encoded` is:
+
+     {
+        "alive" : true,
+        "name" : "John",
+        "age-years" : 25,
+        "extra_stuff": 1
+     }
+    
+
+Please note that the JSON spec does not preserve hash order, so the keys above
+could be arranged differently.
+
+# DESCRIPTION
+
+Make it easier to correctly encode your [Moo](https://metacpan.org/pod/Moo) object into JSON.  It does this
+by inspecting your attributes and injection a `TO_JSON` method into your class.
+You can tag how the attribute will serialize to JSON (forcing it into string or
+number / boolean).  
+
+    has name => (is=>'ro', json=>1);
+
+Setting the `json` argument to 1 will serialize the attribute value to JSON use
+the defaults (that is the field name is the same as the attribute name, value is
+serialized even if `undef` and no value coercions (to number or boolean for example)
+are forced).
+
+    has age => (is=>'ro', json=>'age-years,num');
+
+Here `age` will be mapped to 'age-years' and the value forced into number context so
+that when the JSON encoder touches it the serialized value will be a number not a string.
+
+    has alive => (is=>'ro', json=>',bool');
+
+In this case the value is forced to boolean JSON context.
+
+    has possibly_empty => (is=>'ro', json=>',omit_if_empty');
+
+Lastly if the final tag in the 'json' string is 'omit\_if\_empty' we will omit including
+the field in the JSON output IF the attribute is not present (please note `undef` is
+considered 'present/existing'.)  In order to do this we need to set a `predicate` arg
+for the attribute (or use one if you define it).  This will slighly pollute the object
+namespace with the predicate method for each attribute you mark such.
+
+Your class can also contain a method `modify_json` which
+takes the serialized attributes and allows you to add to them or modify them.
+
+# AUTHOR
+
+John Napiorkowski (cpan:JJNAPIORK) <jjnapiork@cpan.org>
+
+# COPYRIGHT
+
+Copyright (c) 2019 by &lt;/AUTHOR> as listed above.
+
+# LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself.

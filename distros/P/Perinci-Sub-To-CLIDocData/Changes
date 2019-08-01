@@ -1,9 +1,15 @@
-0.290   2019-04-15 (PERLANCAR)
+0.291   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix autosummary for alisa option, it should be 'Alias
+	  for --REAL-OPT' not 'Alias for --ALIAS-OPT-ITSELF'.
+
+
+0.290   2019-04-15  Released-By: PERLANCAR
 
 	- Update to Rinci 1.1.88 (slurpy).
 
 
-0.28    2016-10-27 (PERLANCAR)
+0.28    2016-10-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -11,36 +17,36 @@
 	  grok 'hidden' & 'hidden-cli' argument spec tags.
 
 
-0.27    2016-10-25 (PERLANCAR)
+0.27    2016-10-25  Released-By: PERLANCAR
 
 	- [ux] Show main options first before the other categories.
 
 
-0.26    2016-10-25 (PERLANCAR)
+0.26    2016-10-25  Released-By: PERLANCAR
 
 	- [ux] Don't put argument options to 'Other options' category
 	  because they are less prominent, put them instead in 'Main
 	  options'.
 
 
-0.25    2016-09-26 (PERLANCAR)
+0.25    2016-09-26  Released-By: PERLANCAR
 
 	- [ux] Use singular form when showing greedy argument in usage.
 
 
-0.24    2015-12-17 (PERLANCAR)
+0.24    2015-12-17  Released-By: PERLANCAR
 
 	- Use use_pos=>1 option when converting args to argv of examples to
 	  get a nicer command line.
 
 
-0.23    2015-09-23 (PERLANCAR)
+0.23    2015-09-23  Released-By: PERLANCAR
 
 	- [Bugfix] Don't modify (quote) the original argv in Rinci
 	  metadata.
 
 
-0.22    2015-09-04 (PERLANCAR)
+0.22    2015-09-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -49,39 +55,39 @@
 	  requirement.
 
 
-0.21    2015-07-04 (PERLANCAR)
+0.21    2015-07-04  Released-By: PERLANCAR
 
 	- Replace option category with categories to allow putting an
 	  option to multiple categories (multiple 'category:Foo' tags), the
 	  old 'category' key is still supported for sometime.
 
 
-0.20    2015-04-07 (PERLANCAR)
+0.20    2015-04-07  Released-By: PERLANCAR
 
 	- Forgot to include common_opt in each common option.
 
 
-0.19    2015-04-07 (PERLANCAR)
+0.19    2015-04-07  Released-By: PERLANCAR
 
 	- Include common_opt_spec in common option for more detailed
 	  information about (e.g. for building Configuration POD section).
 
 
-0.18    2015-04-07 (PERLANCAR)
+0.18    2015-04-07  Released-By: PERLANCAR
 
 	- Tweak categories: also categorize common option according to its tag,
           add 'option_categories' and 'example_categories' key which currently
           contain the ordering of each category.
 
 
-0.17    2015-04-02 (PERLANCAR)
+0.17    2015-04-02  Released-By: PERLANCAR
 
 	- For bool option which we show the positive, use
 	  summary.alt.bool.yes if available (otherwise fallback to
 	  summary).
 
 
-0.16    2015-04-02 (PERLANCAR)
+0.16    2015-04-02  Released-By: PERLANCAR
 
 	- Adjust to DefHash 1.0.9 (rename alt.numnoun.* ->
 	  alt.plurality.*).
@@ -90,33 +96,33 @@
 	  option's spec.
 
 
-0.15    2015-03-19 (PERLANCAR)
+0.15    2015-03-19  Released-By: PERLANCAR
 
         - [ux] Make common option nicer: 1) also show --no-OPT instead of --OPT
           for boolean common option which has a true default; 2) put default
           value.
 
 
-0.14    2014-12-09 (PERLANCAR)
+0.14    2014-12-09  Released-By: PERLANCAR
 
 	- Add key 'schema' (currently only for common opt).
 
 	- Add 'alias_spec' key for aliases.
 
 
-0.13    2014-12-04 (PERLANCAR)
+0.13    2014-12-04  Released-By: PERLANCAR
 
         - [Bugfix] Fix endless loop problem when producing usage line.
 
 
-0.12    2014-12-03 (PERLANCAR)
+0.12    2014-12-03  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [pod] Insert sample metadata and result in Synopsis.
 
 
-0.11    2014-12-02 (PERLANCAR)
+0.11    2014-12-02  Released-By: PERLANCAR
 
         - Rename dist from Perinci-Sub-To-CLIOptSpec to the more descriptive and
           extensive Perinci-Sub-To-CLIDocData.
@@ -124,7 +130,7 @@
         - Select and format examples.
 
 
-0.10    2014-12-02 (PERLANCAR)
+0.10    2014-12-02  Released-By: PERLANCAR
 
 	- [ux] For --array-of-str option, show singular summary
           (summary.alt.numnoun.singular) if available.
@@ -135,35 +141,35 @@
           'summary.alt.bool.not' to comply to DefHash 1.0.8.
 
 
-0.09    2014-12-02 (PERLANCAR)
+0.09    2014-12-02  Released-By: PERLANCAR
 
 	- Add 'opt_parsed' key for each opt.
 
 
-0.08    2014-11-30 (PERLANCAR)
+0.08    2014-11-30  Released-By: PERLANCAR
 
 	- Add key 'orig_opt' for each option.
 
 
-0.07    2014-11-21 (PERLANCAR)
+0.07    2014-11-21  Released-By: PERLANCAR
 
 	- Handle case when each tag is a defhahs.
 
 
-0.06    2014-11-21 (PERLANCAR)
+0.06    2014-11-21  Released-By: PERLANCAR
 
         - Add 'main_opt' in alias/base64/json/yaml options to be able to link
           back to its main/canonical option.
 
 
-0.05    2014-11-21 (PERLANCAR)
+0.05    2014-11-21  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [Bugfix] Fix stupid bug/typo.
 
 
-0.04    2014-11-21 (PERLANCAR)
+0.04    2014-11-21  Released-By: PERLANCAR
 
         - Add more information to CLI option spec: each option now include
           arg/fqarg/arg_spec/links/tags/raw_category.
@@ -171,7 +177,7 @@
         - A couple of minor fixes.
 
 
-0.03    2014-11-20 (PERLANCAR)
+0.03    2014-11-20  Released-By: PERLANCAR
 
         - Accept and pass per_arg_json & per_arg_yaml arguments to
           Perinci::Sub::Args::Argv.
@@ -181,7 +187,7 @@
         - [ux] Don't add required mark '*' for base64/json/yaml version.
 
 
-0.02    2014-11-20 (PERLANCAR)
+0.02    2014-11-20  Released-By: PERLANCAR
 
 	- Add arg_spec for each opt (to show e.g. values of 'in' clause
 	  from schema, etc).
@@ -189,7 +195,7 @@
 	- Add 'default' for each opt.
 
 
-0.01     2014-11-20 (PERLANCAR)
+0.01     2014-11-20  Released-By: PERLANCAR
 
          - First release. This is part of an effort to refactor Perinci-To-Doc.
            This distribution is separated so it can have minimal dependencies

@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::tld;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -10,7 +10,7 @@ our %Remote = (
     extract => sub {
         ( my $type = $_[1]) =~ y/_/-/;
         local $/;
-        my %type = $_[0] =~ m{<td><span class="domain tld"><a href="/domains/root/db/(\w+).html">.\w+</a></span></td>\s+<td>([^<]+)</td>\s+<!-- <td>(?:[^<\n]*)}g;
+        my %type = $_[0] =~ m{<td>\s*<span class="domain tld"><a href="/domains/root/db/(\w+).html">.\w+</a></span></td>\s+<td>([^<]+)</td>}g;
         return grep $type{$_} eq $type, keys %type;
     },
 );
@@ -38,6 +38,12 @@ Scott Lanning, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-07-29 - v1.010
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.053.
 
 =item *
 
@@ -136,85 +142,129 @@ sz tc td tf tg th tj tk tl tm tn to tp tr tt tv tw tz ua ug uk um us uy
 uz va vc ve vg vi vn vu wf ws ye yt za zm zw
 # names generic
 com info net org
-abb abbott abogado academy accenture accountant accountants active actor
-ads adult aeg afl agency aig airforce airtel allfinanz alsace amsterdam
-android apartments app aquarelle archi army associates attorney auction
-audio auto autos axa azure
-band bank bar barcelona barclaycard barclays bargains bauhaus bayern bbc
-bbva bcn beer bentley berlin best bet bharti bible bid bike bing bingo
-bio black blackfriday bloomberg blue bmw bnl bnpparibas boats bond boo
-boots boutique bradesco bridgestone broker brother brussels budapest
-build builders business buzz bzh
-cab cafe cal camera camp cancerresearch canon capetown capital caravan
-cards care career careers cars cartier casa cash casino catering cba cbn
-ceb center ceo cern cfa cfd chanel channel chat cheap chloe christmas
-chrome church cisco citic city claims cleaning click clinic clothing
-cloud club coach codes coffee college cologne commbank community company
-computer condos construction consulting contractors cooking cool corsica
-country coupons courses credit creditcard cricket crown crs cruises
-cuisinella cymru cyou
-dabur dad dance date dating datsun day dclk deals degree delivery delta
-democrat dental dentist desi design dev diamonds diet digital direct
-directory discount dnp docs dog doha domains doosan download drive
-durban dvag
-earth eat education email emerck energy engineer engineering enterprises
-epson equipment erni esq estate eurovision eus events everbank exchange
-expert exposed express
-fage fail faith family fan fans farm fashion feedback film finance
-financial firmdale fish fishing fit fitness flights florist flowers
-flsmidth fly foo football forex forsale forum foundation frl frogans
-fund furniture futbol fyi
-gal gallery game garden gbiz gdn gent genting ggee gift gifts gives giving
-glass gle global globo gmail gmo gmx gold goldpoint golf goo goog google
-gop graphics gratis green gripe group guge guide guitars guru
-hamburg hangout haus healthcare help here hermes hiphop hitachi hiv
-hockey holdings holiday homedepot homes honda horse host hosting hoteles
-hotmail house how hsbc
-ibm icbc ice icu ifm iinet immo immobilien industries infiniti ing ink
-institute insure international investments ipiranga irish ist istanbul
-itau iwc
-java jcb jetzt jewelry jlc jll joburg jprs juegos
-kaufen kddi kim kitchen kiwi koeln komatsu krd kred kyoto
-lacaixa lancaster land lasalle lat latrobe law lawyer lds lease leclerc
-legal lexus lgbt liaison lidl life lighting limited limo link live lixil
-loan loans lol london lotte lotto love ltda lupin luxe luxury
-madrid maif maison man management mango market marketing markets marriott
-mba media meet melbourne meme memorial men menu miami microsoft mini
-mma moda moe monash money montblanc mormon mortgage moscow motorcycles
-mov movie movistar mtn mtpc
-nadex nagoya navy nec netbank network neustar new news nexus ngo nhk
-nico ninja nissan nokia nra nrw ntt nyc
-office okinawa omega one ong onl online ooo oracle orange organic osaka
-otsuka ovh
-page panerai paris partners parts party pet pharmacy philips photo
-photography photos physio piaget pics pictet pictures pink pizza place
-play plumbing plus pohl poker porn praxi press prod productions prof
-properties property pub
-qpon quebec
-racing realtor realty recipes red redstone rehab reise reisen reit ren
-rent rentals repair report republican rest restaurant review reviews
-rich ricoh rio rip rocks rodeo rsvp ruhr run ryukyu
-saarland sakura sale samsung sandvik sandvikcoromant sanofi sap sarl saxo
-sca scb schmidt scholarships school schule schwarz science scor scot seat
-seek sener services sew sex sexy shiksha shoes show shriram singles site
-ski sky skype sncf soccer social software sohu solar solutions sony soy
-space spiegel spreadbetting srl starhub statoil studio study style sucks
-supplies supply support surf surgery suzuki swatch swiss sydney systems
-taipei tatamotors tatar tattoo tax taxi team tech technology telefonica
-temasek tennis thd theater tickets tienda tips tires tirol today tokyo
-tools top toray toshiba tours town toyota toys trade trading training
-trust tui
-ubs university uno uol
-vacations vegas ventures versicherung vet viajes video villas vin vision
-vista vistaprint vlaanderen vodka vote voting voto voyage
-wales walter wang watch webcam website wed wedding weir whoswho wien
-wiki williamhill win windows wine wme work works world wtc wtf
-xbox xerox xin xperia xyz
-yachts yandex yodobashi yoga yokohama youtube
-zip zone zuerich
+aaa aarp abarth abb abbott abbvie abc able abogado abudhabi academy
+accenture accountant accountants aco active actor adac ads adult aeg aetna
+afamilycompany afl africa agakhan agency aig aigo airbus airforce airtel
+akdn alfaromeo alibaba alipay allfinanz allstate ally alsace alstom
+americanexpress americanfamily amex amfam amica amsterdam analytics
+android anquan anz aol apartments app apple aquarelle arab aramco archi
+army art arte asda associates athleta attorney auction audi audible
+audio auspost author auto autos avianca aws axa azure
+baby baidu banamex bananarepublic band bank bar barcelona barclaycard
+barclays barefoot bargains baseball basketball bauhaus bayern bbc bbt
+bbva bcg bcn beats beauty beer bentley berlin best bestbuy bet bharti
+bible bid bike bing bingo bio black blackfriday blanco blockbuster blog
+bloomberg blue bms bmw bnl bnpparibas boats boehringer bofa bom bond
+boo book booking boots bosch bostik boston bot boutique box bradesco
+bridgestone broadway broker brother brussels budapest bugatti build
+builders business buy buzz bzh
+cab cafe cal call calvinklein cam camera camp cancerresearch canon
+capetown capital capitalone car caravan cards care career careers
+cars cartier casa case caseih cash casino catering catholic cba cbn
+cbre cbs ceb center ceo cern cfa cfd chanel channel charity chase chat
+cheap chintai chloe christmas chrome chrysler church cipriani circle
+cisco citadel citi citic city cityeats claims cleaning click clinic
+clinique clothing cloud club clubmed coach codes coffee college cologne
+comcast commbank community company compare computer comsec condos
+construction consulting contact contractors cooking cookingchannel cool
+corsica country coupon coupons courses credit creditcard creditunion
+cricket crown crs cruise cruises csc cuisinella cymru cyou
+dabur dad dance data date dating datsun day dclk dds deal dealer deals
+degree delivery dell deloitte delta democrat dental dentist desi design
+dev dhl diamonds diet digital direct directory discount discover dish
+diy dnp docs doctor dodge dog doha domains doosan dot download drive
+dtv dubai duck dunlop duns dupont durban dvag dvr
+earth eat eco edeka education email emerck energy engineer engineering
+enterprises epost epson equipment ericsson erni esq estate esurance
+etisalat eurovision eus events everbank exchange expert exposed express
+extraspace
+fage fail fairwinds faith family fan fans farm farmers fashion fast fedex
+feedback ferrari ferrero fiat fidelity fido film final finance financial
+fire firestone firmdale fish fishing fit fitness flickr flights flir
+florist flowers flsmidth fly foo food foodnetwork football ford forex
+forsale forum foundation fox free fresenius frl frogans frontdoor frontier
+ftr fujitsu fujixerox fun fund furniture futbol fyi
+gal gallery gallo gallup game games gap garden gbiz gdn gea gent genting
+george ggee gift gifts gives giving glade glass gle global globo gmail
+gmbh gmo gmx godaddy gold goldpoint golf goo goodhands goodyear goog
+google gop got grainger graphics gratis green gripe grocery group guardian
+gucci guge guide guitars guru
+hair hamburg hangout haus hbo hdfc hdfcbank health healthcare help
+helsinki here hermes hgtv hiphop hisamitsu hitachi hiv hkt hockey
+holdings holiday homedepot homegoods homes homesense honda honeywell
+horse hospital host hosting hot hoteles hotels hotmail house how hsbc
+htc hughes hyatt hyundai
+ibm icbc ice icu ieee ifm iinet ikano imamat imdb immo immobilien
+inc industries infiniti info ing ink institute insurance insure intel
+international intuit investments ipiranga irish iselect ismaili ist
+istanbul itau itv iveco iwc
+jaguar java jcb jcp jeep jetzt jewelry jio jlc jll jmp jnj joburg jot
+joy jpmorgan jprs juegos juniper
+kaufen kddi kerryhotels kerrylogistics kerryproperties kfh kia kim kinder
+kindle kitchen kiwi koeln komatsu kosher kpmg kpn krd kred kuokgroup kyoto
+lacaixa ladbrokes lamborghini lamer lancaster lancia lancome land
+landrover lanxess lasalle lat latino latrobe law lawyer lds lease leclerc
+lefrak legal lego lexus lgbt liaison lidl life lifeinsurance lifestyle
+lighting like lilly limited limo lincoln linde link lipsy live living
+lixil llc loan loans locker locus loft lol london lotte lotto love lpl
+lplfinancial ltd ltda lundbeck lupin luxe luxury
+macys madrid maif maison makeup man management mango map market marketing
+markets marriott marshalls maserati mattel mba mcd mcdonalds mckinsey med
+media meet melbourne meme memorial men menu meo merckmsd metlife miami
+microsoft mini mint mit mitsubishi mlb mls mma mobi mobile mobily moda
+moe moi mom monash money monster montblanc mopar mormon mortgage moscow
+moto motorcycles mov movie movistar msd mtn mtpc mtr mutual mutuelle
+nab nadex nagoya nationwide natura navy nba nec netbank netflix
+network neustar new newholland news next nextdirect nexus nfl ngo nhk
+nico nike nikon ninja nissan nissay nokia northwesternmutual norton now
+nowruz nowtv nra nrw ntt nyc
+obi observer off office okinawa olayan olayangroup oldnavy ollo omega one
+ong onl online onyourside ooo open oracle orange organic orientexpress
+origins osaka otsuka ott ovh
+page pamperedchef panasonic panerai paris pars partners parts party
+passagens pay pccw pet pfizer pharmacy phd philips phone photo photography
+photos physio piaget pics pictet pictures pid pin ping pink pioneer
+pizza place play playstation plumbing plus pnc pohl poker politie porn
+pramerica praxi press prime prod productions prof progressive promo
+properties property protection pru prudential pub pwc
+qpon quebec quest qvc
+racing radio raid read realestate realtor realty recipes red redstone
+redumbrella rehab reise reisen reit reliance ren rent rentals repair
+report republican rest restaurant review reviews rexroth rich richardli
+ricoh rightathome ril rio rip rmit rocher rocks rodeo rogers room rsvp
+rugby ruhr run rwe ryukyu
+saarland safe safety sakura sale salon samsclub samsung sandvik
+sandvikcoromant sanofi sap sapo sarl sas save saxo sbi sbs sca scb
+schaeffler schmidt scholarships school schule schwarz science scjohnson
+scor scot search seat secure security seek select sener services ses
+seven sew sex sexy sfr shangrila sharp shaw shell shia shiksha shoes shop
+shopping shouji show showtime shriram silk sina singles site ski skin
+sky skype sling smart smile sncf soccer social softbank software sohu
+solar solutions song sony soy space spiegel sport spot spreadbetting srl
+srt stada staples star starhub statebank statefarm statoil stc stcgroup
+stockholm storage store stream studio study style sucks supplies supply
+support surf surgery suzuki swatch swiftcover swiss sydney symantec
+systems
+tab taipei talk taobao target tatamotors tatar tattoo tax taxi tci tdk
+team tech technology telecity telefonica temasek tennis teva thd theater
+theatre tiaa tickets tienda tiffany tips tires tirol tjmaxx tjx tkmaxx
+tmall today tokyo tools top toray toshiba total tours town toyota toys
+trade trading training travelchannel travelers travelersinsurance trust
+trv tube tui tunes tushu tvs
+ubank ubs uconnect unicom university uno uol ups
+vacations vana vanguard vegas ventures verisign versicherung vet viajes
+video vig viking villas vin vip virgin visa vision vista vistaprint viva
+vivo vlaanderen vodka volkswagen volvo vote voting voto voyage vuelos
+wales walmart walter wang wanggou warman watch watches weather
+weatherchannel webcam weber website wed wedding weibo weir whoswho wien
+wiki williamhill win windows wine winners wme wolterskluwer woodside
+work works world wow wtc wtf
+xbox xerox xfinity xihuan xin xperia xyz
+yachts yahoo yamaxun yandex yodobashi yoga yokohama you youtube yun
+zappos zara zero zip zippo zone zuerich
 # names generic_restricted
 biz name pro
 # names infrastructure
 arpa
 # names sponsored
-aero asia cat coop edu gov int jobs mil mobi museum post tel travel xxx
+aero asia cat coop edu gov int jobs mil museum post tel travel xxx

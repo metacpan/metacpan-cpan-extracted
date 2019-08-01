@@ -1,5 +1,10 @@
 Revision history for Future-AsyncAwait
 
+0.31    2019-07-25 15:09:04
+        [CHANGES]
+         * Use `parse_subsignature()` on bleadperl and backport it to
+           perl 5.26, allowing parsing of subroutine signatures (RT123465)
+
 0.30    2019-07-05 16:09:02
         [CHANGES]
          * Parse attribute lists on `async sub`s (RT129985)

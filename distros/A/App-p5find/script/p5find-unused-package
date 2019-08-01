@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+use v5.18;
+use Getopt::Long qw(GetOptions);
+use App::p5find qw(p5_doc_iterator);
+
+sub print_usage {
+    print <<USAGE;
+p5find-unused-package [switches] -- [path1] [path2]...
+
+  -h    show help message
+USAGE
+}
+
+my %opts;
+GetOptions(
+    \%opts,
+    "h",
+);
+
+if ($opts{h}) {
+    print_usage();
+    exit(0);
+}
+
+my @paths = @ARGV;
+@paths = (".") if !@paths;
+
+my %idx;
+
+my $iter = p5_doc_iterator(@paths);
+while( my $doc = $iter->() ) {
+    my $file = $doc->filename;
+
+    say "... $file";
+    my $o;
+
+    $o = $doc->find(sub { $_[1]->isa("PPI::Statement::Package") }) ||[];
+    for my $el (@$o) {
+        my $n = $el->namespace;
+        $idx{$n}{stated}{frequency}++;
+        push @{ $idx{$n}{stated}{WHERE} }, [ $file, $el->line_number ];
+    }
+
+    $o = $doc->find(sub { $_[1]->isa("PPI::Statement::Include") }) ||[];
+    for my $el (@$o) {
+        my $n = $el->module;
+        $idx{$n}{used}{frequency}++;
+        push @{ $idx{$n}{used}{WHERE} }, [ $file, $el->line_number ];
+    }
+};
+
+for my $tok (keys %idx) {
+    next unless $idx{$tok}{stated}{frequency} && ! $idx{$tok}{used}{frequency};
+    for my $where (@{$idx{$tok}{stated}{WHERE}}) {
+        say join ":", @$where, $tok;
+    }
+}

@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+use v5.18;
+use Getopt::Long qw(GetOptions);
+use App::p5find qw(p5_doc_iterator);
+
+
+sub print_usage {
+    print <<USAGE;
+p5find-variable-methods [switches] -- [path1] [path2]...
+
+  -h    show help message
+USAGE
+}
+
+my %opts;
+GetOptions(
+    \%opts,
+    "h",
+);
+
+if ($opts{h}) {
+    print_usage();
+    exit(0);
+}
+
+my @paths = @ARGV;
+@paths = ('.') unless @paths;
+
+my $iter = p5_doc_iterator(@paths);
+while( my $doc = $iter->() ) {
+    my $file = $doc->filename;
+
+    my $arrows = $doc->find(
+        sub {
+            my $op = $_[1];
+            return ($op->isa("PPI::Token::Operator") &&
+                    $op->content eq '->')
+        }
+    ) or next;
+
+    my %hits;
+    for (my $i = 0; $i < @$arrows; $i++) {
+        my $op = $arrows->[$i];
+        my $op_next = $op->snext_sibling;
+        next if $op_next->isa("PPI::Token::Word") || $op_next->isa("PPI::Structure::Subscript") || $op_next->isa("PPI::Structure::List");
+
+        # Weird case from PPI. Consider this code:
+        #     $a = $b ? $o->foo : 1;
+        # The "foo :" part is parsed as one token. Which is wrong.
+        # Luckly it does not remove positive responoses if we exclude those here.
+        next if $op_next->isa("PPI::Token::Label");
+
+        my $ln = $op->line_number;
+        $hits{$ln} = 1;
+    }
+
+    if (%hits) {
+        my $line_number = 0;
+        open my $fh, "<", $file;
+        while (my $line = <$fh>) {
+            $line_number++;
+            if ($hits{$line_number}) {
+                print "${file}:${line_number}:${line}";
+            }
+        }
+        close($fh);
+    }
+};

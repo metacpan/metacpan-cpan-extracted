@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -28,9 +28,6 @@ use Math::NumSeq;
 
 use Math::NumSeq::Fibonacci;
 *_blog2_estimate = \&Math::NumSeq::Fibonacci::_blog2_estimate;
-
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 
 use constant name => Math::NumSeq::__('Self Length Cumulative');
@@ -207,7 +204,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -1,5 +1,34 @@
 Revision history for Data-Pageset-Exponential:
 
+v0.3.1    2019-07-31 18:19:04+01:00 Europe/London
+  [Enhancements]
+  - @ISA spoofing done through asa module.
+
+  [Tests]
+  - Added more tests.
+
+v0.3.0    2019-07-25 17:26:00+01:00 Europe/London
+  [Enhancements]
+  - Renamed `max_pages_per_set` to `pages_per_set`, and made the former
+    a deprecated alias for the latter.
+
+  [Documentation]
+  - Added documentation on notable differences between this model and
+    Data::Page and Data::Pageset.
+
+  [Other Changes]
+  - Updated POD markup to use Pod::Weaver.
+
+v0.2.2    2019-07-23 14:50:43+01:00 Europe/London
+  [Bug Fixes]
+  - Support hashref in the constructor.
+
+  [Tests]
+  - Removed unnecessary module from prereqs report.
+
+  [Other Changes]
+  - Added recommended prerequisites.
+
 v0.2.1    2019-07-21 11:16:26+01:00 Europe/London
   [Bug Fixes]
   - Specified a minimum version for the prereq List::Util.

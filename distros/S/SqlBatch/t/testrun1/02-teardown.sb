@@ -1,0 +1,8 @@
+--DELETE-- -table=t1 --id=delete1 -tags=setup1,!production -quote="
+a;b
+"1";"hello"
+--END--
+--DELETE-- -table=t2 --id=delete1 -tags=setup1,!production -quote='
+'a'
+'3'
+--END--

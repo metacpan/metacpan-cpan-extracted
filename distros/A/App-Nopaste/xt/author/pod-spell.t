@@ -29,6 +29,7 @@ Debian
 Eckankar
 Etheridge
 Falcone
+Fish
 François
 Gannaz
 Gass
@@ -70,6 +71,7 @@ Sergey
 Service
 Shadowcat
 Shawn
+Shlomi
 Shultz
 Sibley
 Signes
@@ -116,6 +118,7 @@ rjbs
 rkitover
 sartak
 script
+shlomif
 sromanov
 ssh
 tsibley

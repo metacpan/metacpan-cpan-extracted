@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013 Kevin Ryde
+# Copyright 2013, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 29;
+plan tests => 1;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,9 +29,6 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::NumSeq::Factorials;
-
-# uncomment this to run the ### lines
-# use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------

@@ -328,6 +328,7 @@
         hv_stores(the_hv, "CURLOPTTYPE_LONG", newSViv(CURLOPTTYPE_LONG));
         hv_stores(the_hv, "CURLOPTTYPE_OBJECTPOINT", newSViv(CURLOPTTYPE_OBJECTPOINT));
         hv_stores(the_hv, "CURLOPTTYPE_OFF_T", newSViv(CURLOPTTYPE_OFF_T));
+        hv_stores(the_hv, "CURLOPTTYPE_SLISTPOINT", newSViv(CURLOPTTYPE_SLISTPOINT));
         hv_stores(the_hv, "CURLOPTTYPE_STRINGPOINT", newSViv(CURLOPTTYPE_STRINGPOINT));
         hv_stores(the_hv, "CURLOPT_ABSTRACT_UNIX_SOCKET", newSViv(CURLOPT_ABSTRACT_UNIX_SOCKET));
         hv_stores(the_hv, "CURLOPT_ACCEPTTIMEOUT_MS", newSViv(CURLOPT_ACCEPTTIMEOUT_MS));

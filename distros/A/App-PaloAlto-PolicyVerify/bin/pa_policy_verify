@@ -1,0 +1,131 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+use Pod::Usage;
+use Getopt::Long;
+use App::PaloAlto::PolicyVerify;
+
+# PODNAME: pa_policy_verify
+
+my %args;
+GetOptions( \%args, 'uri=s', 'username=s', 'password=s', 'vr=s', 'vsys=i',
+    'insecure', 'logfile=s', 'sepchar=s', 'fields=s',
+    'help' => sub { pod2usage(1) } )
+  or pod2usage(2);
+
+# --logfile is the only mandatory field.
+die "No --logfile specified" unless $args{logfile};
+
+my $app = App::PaloAlto::PolicyVerify->new(%args);
+$app->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pa_policy_verify
+
+=head1 VERSION
+
+version 0.0.2
+
+=head1 SYNOPSIS
+
+Usage: pa_policy_verify [options]
+
+=head2 Palo Alto arguments
+
+--uri <fw uri>
+
+--username <username>
+
+--password <password>
+
+--insecure
+
+--vr <vr name>
+
+--vsys <vsys number>
+
+=head2 Logfile Arguments
+
+--logfile <path>
+
+--sepchar <character>
+
+--fields <sip,dip,sport,dport,proto>
+
+=head1 DESCRIPTION
+
+B<pa_policy_verify> will do something.
+
+=head1 NAME
+
+pa_policy_verify - verify a Palo Alto firewall ruleset using logs.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c|--uri>
+
+The URI for the Palo Alto firewall (e.g. https://pa.localdomain). Accepts either http or https. The module uses the L<Device::Firewall::PaloAlto> module under the hood which will use the B<PA_FW_URI> environment variable if no URI is specified.
+
+=item B<-u|--username>
+
+A username to authenticate to the firewall. If no username is specified, uses the B<PA_FW_USERNAME> environment variable. If no environment variable is present, defaults to 'admin'.
+
+=item B<-p|--password>
+
+A password to authenticate to the firewall. If not password is specified, uses the B<PA_FW_PASSWORD> environment variable. If no environment variable is present, defaults to 'admin'.
+
+=item B<-i|--insecure>
+
+Ignore the validity of the certificate presented by the Palo Alto firewall. By default the script checks whether a valid certificate is presented.
+
+=item B<-r|--vr>
+
+The script needs to determine the ingress and egress zones that the source and destination IPs would come from/go to. This argument specifies the virtual router which will be used to determine the zones. If not provided the 'default' virtual router will be used.
+
+=item B<-v|--vsys>
+
+The virtual system ID on which the policy that is to be tested exists. If not provided a value of 1 (i.e. vsys1) will be used.
+
+=item B<-l|--logfile>
+
+A path to a file containing logs you wish to run against the firewall's rulebase. This is the only B<mandatory> field and has no default value.
+
+=item B<-s|--sepchar>
+
+The character which separates the fields in the logfile. If not provided a comma (',') will be used. Remember to escape any characters which may be first interpreted by the shell. For example if the logfile is separated by semicolons, you will need to use --sepchar \; on the command line.
+
+=item B<-f|--fields>
+
+The columns of the logfile where the pertinent fields are, indexed at 0. The pertinent fields are source IP, destination IP, source port, destination port, protocol. The fields are specified as comma separated values.
+
+As an example, if the source IP, destination IP, source port and destination port are at columns 3, 4, 5, 6, but the protocol is at column 11, you would use the following command line:
+
+    pa_policy_verify --fields 3,4,5,6,11
+
+If not specified, '0,1,2,3,4' is used.
+
+=back
+
+=head1 AUTHOR
+
+Greg Foletta <greg@foletta.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Greg Foletta.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

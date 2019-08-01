@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -29,15 +29,12 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use List::Util 'min','max';
 use Math::NumSeq::SqrtContinued;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
-
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 72;
+  my $want_version = 73;
   ok ($Math::NumSeq::SqrtContinued::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::SqrtContinued->VERSION,  $want_version,

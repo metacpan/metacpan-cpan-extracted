@@ -9,7 +9,7 @@ use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.6';
+our $VERSION = '1.2.9';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -291,17 +291,24 @@ sub process_binary {
         $params->{XS} = { map {$_ => undef} @{$params->{XS}} };
     }
 
+    my %xsi;
     foreach my $xsfile (keys %{$params->{XS}}, map { _scan_files($xs_mask, $_) } @{$params->{SRC}}) {
-        next if $params->{XS}{$xsfile};
-        my $cext = $params->{CPLUS} ? 'cc' : 'c';
-        my $cfile = $xsfile;
-        $cfile =~ s/\.xs$/.xs.$cext/ or next;
-        $params->{XS}{$xsfile} = $cfile;
-
+        my $cfile = $params->{XS}{$xsfile};
+        unless ($cfile) {
+            my $cext = $params->{CPLUS} ? 'cc' : 'c';
+            if ($xsfile =~ /\.xs$/) {
+                $cfile = $xsfile;
+                $cfile =~ s/\.xs$/.xs.$cext/;
+            } else {
+                $cfile = "$xsfile.$cext";
+            }
+            $params->{XS}{$xsfile} = $cfile;
+        }
         my $suffix = $cfile;
         $suffix =~ s/^[^.]+//;
         
         my $xsi_deps = XS::Install::Deps::find_xsi_deps([$xsfile])->{$xsfile} || [];
+        map { $xsi{$_} = $xsfile } @$xsi_deps;
 
         push @{$params->{postamble}}, "$cfile : $xsfile @$xsi_deps \$(FIRST_MAKEFILE)\n".
             "\t\$(XSUBPPRUN) \$(XSPROTOARG) \$(XSUBPPARGS) -csuffix $suffix \$(XSUBPP_EXTRA_ARGS) $xsfile > ${xsfile}c\n".
@@ -309,28 +316,44 @@ sub process_binary {
     }
 
     canonize_array_files($params->{C});
-    push @{$params->{C}}, values %{$params->{XS}};
     push @{$params->{C}}, _scan_files($c_mask, $_) for @{$params->{SRC}};
+    my @cdeps_list = (@{$params->{C}}, keys(%{$params->{XS}}), keys(%xsi));
+    push @{$params->{C}}, values %{$params->{XS}};
     _uniq_list($params->{C});
+    _uniq_list(\@cdeps_list);
     
     my $cdeps = XS::Install::Deps::find_header_deps({
-        files   => $params->{C},
+        files   => \@cdeps_list,
         headers => ['./'],
         inc     => [map { s/^-I//; $_ } split(' ', $params->{MODULE_INFO}{SELF_INC})],
     });
-    
+
+    # push C to OBJECT and process C files header deps
     canonize_array_files($params->{OBJECT});
     foreach my $cfile (@{$params->{C}}) {
         my $ofile = c2obj_file($cfile);
         push @{$params->{OBJECT}}, $ofile;
         
-        my $deps = $cdeps->{$cfile};
-        if ($deps && @$deps) {
-            push @{$params->{postamble}},
-                "$ofile : @$deps";
-        }
+        my $deps = delete $cdeps->{$cfile};
+        push @{$params->{postamble}}, "$ofile : @$deps" if $deps && @$deps;
     }
     _uniq_list($params->{OBJECT});
+
+    # process XS & XSI header deps
+    foreach my $f (keys %xsi) {
+        my $deps = delete $cdeps->{$f};
+        next unless $deps && @$deps;
+        push @{$cdeps->{$xsi{$f}} ||= []}, @$deps;
+    }
+    foreach my $xsfile (keys %{$params->{XS}}) {
+        my $deps = delete $cdeps->{$xsfile};
+        next unless $deps && @$deps;
+        _uniq_list($deps);
+        my $cfile = $params->{XS}{$xsfile};
+        my $ofile = c2obj_file($cfile);
+        push @{$params->{postamble}}, "$ofile : @$deps";
+    }
+        
     delete $params->{H}; # prevent MM from making O_FILES depend on all H_FILES
     
     $params->{clean}{FILES} .= ' $(O_FILES)';
@@ -533,7 +556,11 @@ sub process_test {
         NO_MYMETA => 1,
         _XSTEST   => 1,
     );
+
     
+    my $mm_args = makemaker_args(%args);
+    return undef unless has_binary($mm_args);
+
     my $make_params = '';
     $make_params .= ' --no-print-directory' if $linux;
     my $cmd = "\@\$(MAKE)$make_params -f Makefile.test";
@@ -546,13 +573,17 @@ sub process_test {
         'ctest :: ctest_object ctest_ld',
         "clean :: ; $cmd veryclean",
     ;
-    
-    my $mm_args = makemaker_args(%args);
-    return undef unless has_binary($mm_args);
-    
+        
+    # can't transfer requirements to only TEST_REQUIRES because on target machine "perl Makefile.PL" will run before they get installed,
+    # and thus test's makemaker_args() will fail without binary dependency installed. We need to install it before Makefile.PL runs.
     if (my $prereq = $mm_args->{PREREQ_PM}) {
-        my $testrq = $params->{TEST_REQUIRES};
-        $testrq->{$_} //= $prereq->{$_} for grep {$_ ne $THIS_MODULE} keys %$prereq;
+        my $creq = $params->{CONFIGURE_REQUIRES};
+        my $treq = $params->{TEST_REQUIRES};
+        foreach my $k (keys %$prereq) {
+            next if $k eq $THIS_MODULE;
+            $creq->{$k} //= $prereq->{$k};
+            $treq->{$k} //= $prereq->{$k};
+        }
     }
     
     return $mm_args;

@@ -36,7 +36,7 @@ use constant CLIGHT => 2.99792458e5;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.61";
+$VERSION = "1.62";
 
 # Cache UTC definition
 our $UTC = DateTime::TimeZone->new( name => 'UTC' );
@@ -166,7 +166,7 @@ sub to_DR_RECIPE {
     }
   }
 
-  my $is_sci = ( $obstype =~ /science|raster|scan|grid|chop/ );
+  my $is_sci = ( $obstype =~ /science|raster|scan|grid|jiggle/ );
 
   if ( $standard && $is_sci ) {
     $dr = "REDUCE_STANDARD";

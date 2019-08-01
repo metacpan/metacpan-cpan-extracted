@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
-package Config::Model::Describe 2.135;
+package Config::Model::Describe 2.136;
 
 use Carp;
 use strict;
@@ -131,7 +131,7 @@ sub describe {
         my $type = $obj->element_type($element);
 
         my $class_name = $next->config_class_name;
-        push @$data_r, [ $element, 'node', "<$class_name>", '' ];
+        push @$data_r, [ $element, 'node', "<$class_name>", $obj->gist ];
 
         #$ret .= ":$key" if $type eq 'list' or $type eq 'hash';
 
@@ -214,7 +214,7 @@ Config::Model::Describe - Provide a description of a node element
 
 =head1 VERSION
 
-version 2.135
+version 2.136
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+1.2.9    30.07.2019
+           - improve header deps for XS & XSI
+1.2.8    25.07.2019
+           - fix test requirements
+1.2.7    22.07.2019
+           - a module's Makefile.PL died when binary TEST_REQUIRES were not met (now fixed, will die on "make test", not on perl Makefile.PL)
 1.2.6    22.07.2019
            - fix TEST_REQUIRES (pass from test submodule)
 1.2.5    22.07.2019

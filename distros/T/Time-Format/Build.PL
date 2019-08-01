@@ -35,6 +35,7 @@ my $builder = Module::Build->new(
                            'DateTime'          => 0,
                            'Date::Manip'       => 0,
                            'Module::Signature' => 0,
+                           'Socket'            => 0,
                           },
     sign               => 1,
     add_to_cleanup     => [ 'Time-Format-*' ],

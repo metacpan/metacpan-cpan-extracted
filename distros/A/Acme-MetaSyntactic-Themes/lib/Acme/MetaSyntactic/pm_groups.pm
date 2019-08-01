@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::pm_groups;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.029';
+our $VERSION = '1.030';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -35,6 +35,12 @@ Philippe Bruhat (BooK)
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-07-29 - v1.030
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.053.
 
 =item *
 
@@ -529,3 +535,5 @@ Niceville_pm
 Okinawa_pm
 Ryazan_pm
 BlairCountyPA_pm
+Charlotte_pm
+Madison_pm

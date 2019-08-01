@@ -38,12 +38,13 @@ use vars qw($VERSION %EXPORT_TAGS);
 use Exporter 'import';
 use base qw/ DynaLoader /;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 %EXPORT_TAGS = (
                 'pal'=>[qw/
                             palAddet
                             palAirmas
+                            palAltaz
                             palAmp
                             palAmpqk
                             palAop
@@ -59,6 +60,7 @@ $VERSION = '1.07';
                             palDav2m
                             palDbear
                             palDcc2s
+                            palDcmpf
                             palDcs2c
                             palDd2tf
                             palDe2h
@@ -90,6 +92,7 @@ $VERSION = '1.07';
                             palDvn
                             palDvxv
                             palEcmat
+                            palEcleq
                             palEpb
                             palEpb2d
                             palEpco
@@ -104,6 +107,7 @@ $VERSION = '1.07';
                             palFk45z
                             palFk524
                             palFk54z
+                            palFitxy
                             palGaleq
                             palGalsup
                             palGeoc
@@ -111,6 +115,7 @@ $VERSION = '1.07';
                             palGmsta
                             palHfk5z
                             palIntin
+                            palInvf
                             palMap
                             palMappa
                             palMapqk
@@ -121,17 +126,20 @@ $VERSION = '1.07';
                             palOapqk
                             palObs
                             palPa
+                            palPcd
                             palPertel
                             palPertue
                             palPlanel
                             palPlanet
                             palPlante
                             palPm
+                            palPolmo
                             palPrebn
                             palPrec
                             palPreces
                             palPrenut
                             palPvobs
+                            palPxy
                             palRdplan
                             palRefco
                             palRefcoq
@@ -145,6 +153,8 @@ $VERSION = '1.07';
                             palRvlsrk
                             palSubet
                             palSupgal
+                            palUnpcd
+                            palXy2xy
                           /],
                 'constants'=>[qw/
                                   DPI D2PI D1B2PI D4PI D1B4PI DPISQ DSQRPI DPIBY2

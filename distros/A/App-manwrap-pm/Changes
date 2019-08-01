@@ -1,23 +1,28 @@
-0.004   2017-07-29 (PERLANCAR)
+0.005   2019-07-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Show message when completing an empty word.
+
+
+0.004   2017-07-29  Released-By: PERLANCAR
 
 	- Skip using mandb to complete manpage because sometimes mandb is
 	  incomplete/not up-to-date.
 
 
-0.003   2017-07-27 (PERLANCAR)
+0.003   2017-07-27  Released-By: PERLANCAR
 
 	- [ux] Avoid completing with list of manpage when there is already
 	  a previous argument (non-option), because currently
 	  complete_manpage() is slow.
 
 
-0.002   2017-07-10 (PERLANCAR)
+0.002   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.001   2016-10-20 (PERLANCAR)
+0.001   2016-10-20  Released-By: PERLANCAR
 
         - First release.

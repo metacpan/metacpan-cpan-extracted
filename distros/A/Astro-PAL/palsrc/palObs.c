@@ -65,7 +65,7 @@
 *     contain embedded spaces. "c" must not have leading spaces.
 *
 *     IMPORTANT -- BEWARE OF THE LONGITUDE SIGN CONVENTION.  The
-*     longitude returned by sla_OBS is west-positive in accordance
+*     longitude returned by palOBS (and SLA_OBS) is west-positive in accordance
 *     with astronomical usage.  However, this sign convention is
 *     left-handed and is the opposite of the one used by geographers;
 *     elsewhere in PAL the preferable east-positive convention is
@@ -132,6 +132,10 @@
 #  include <config.h>
 #endif
 
+#ifdef HAVE_BSD_STRING_H
+#include <bsd/string.h>
+#endif
+
 #include <string.h>
 
 /* We prefer to use the starutil package. */
@@ -149,6 +153,10 @@ static void star__strellcpy( char * dest, const char * src, size_t size ) {
 }
 
 #define star_strellcpy(dest, src, size) star__strellcpy(dest, src, size)
+#endif
+
+#if HAVE__STRICMP || defined(_WIN32) || defined(_WIN64)
+#define strcasecmp _stricmp
 #endif
 
 #include "pal.h"

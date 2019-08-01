@@ -1,4 +1,4 @@
-# Copyright 2013, 2014 Kevin Ryde
+# Copyright 2013, 2014, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -403,8 +403,7 @@ It's much faster to follow the array expansions described above and block
 copy areas of "0" or "1".  An initial single pixel 0 expands to 3x3 then
 9x9, etc.  Two images representing a "0" or a "1" can be maintained, though
 with care some copying of sub-parts allows just one image to be built up.
-See F<examples/other/haferman-carpet-x11.pl> in the Math-NumSeq sources for
-some code doing that.
+See F<examples/other/haferman-carpet-x11.pl> for some code doing that.
 
 =cut
 
@@ -571,8 +570,8 @@ L<Math::PlanePath::KochelCurve>,
 L<Math::PlanePath::GrayCode>,
 L<Math::PlanePath::SquareReplicate>
 
-F<examples/other/haferman-carpet-x11.pl> in the Math-NumSeq sources draws
-the carpet interactively with C<X11::Protocol>.
+F<examples/other/haferman-carpet-x11.pl> draws the carpet interactively with
+C<X11::Protocol>.
 
 =head1 HOME PAGE
 
@@ -580,7 +579,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2013, 2014 Kevin Ryde
+Copyright 2013, 2014, 2016, 2017 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

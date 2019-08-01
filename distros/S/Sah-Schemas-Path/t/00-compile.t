@@ -6,16 +6,22 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/str/str_strip_trailing_slash.pm',
+    'Data/Sah/Coerce/perl/str/str_strip_slashes.pm',
     'Sah/Schema/dirname.pm',
+    'Sah/Schema/dirname/unix.pm',
     'Sah/Schema/filename.pm',
+    'Sah/Schema/filename/unix.pm',
     'Sah/Schema/pathname.pm',
+    'Sah/Schema/pathname/unix.pm',
     'Sah/SchemaR/dirname.pm',
+    'Sah/SchemaR/dirname/unix.pm',
     'Sah/SchemaR/filename.pm',
+    'Sah/SchemaR/filename/unix.pm',
     'Sah/SchemaR/pathname.pm',
+    'Sah/SchemaR/pathname/unix.pm',
     'Sah/Schemas/Path.pm'
 );
 

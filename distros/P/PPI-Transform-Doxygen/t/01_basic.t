@@ -31,6 +31,7 @@ $tr->file($0 => $out);
 my $fhead = quotemeta('/** @file 01_basic.t');
 my($fcontent) = $buf =~ m!$fhead\n(.+?)\*/!s;
 
+#diag $fcontent;
 like($fcontent, qr!\@section 01_basic_DESCRIPTION DESCRIPTION\n<p>txt1</p>!, 'head1');
 
 my $chead = quotemeta('class 01_basic_main: public {');

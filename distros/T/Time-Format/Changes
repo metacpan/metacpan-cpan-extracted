@@ -1,5 +1,11 @@
 >Revision history for Perl extension Time::Format.
 
+1.15  2019 July 26
+        - Fix a bug in the test suite due to floating-point rounding.  Thanks to
+          Slaven Rezic (see CPAN RT bug 130150:
+                              https://rt.cpan.org/Ticket/Display.html?id=130150)
+        - Also improved __DATA__ handling, so as not to hold a lock on the library.
+
 1.14  2019 July 22
         - Fix CPAN RT bug 87484 (https://rt.cpan.org/Ticket/Display.html?id=87484),
           concerning very small floating-point values (e.g. "2.1458e-06").

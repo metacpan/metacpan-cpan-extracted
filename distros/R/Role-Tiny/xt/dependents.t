@@ -9,6 +9,15 @@ use File::Spec;
 use Cwd qw(abs_path);
 use Config;
 
+delete $ENV{AUTHOR_TESTING};
+delete $ENV{EXTENDED_TESTING};
+delete $ENV{RELEASE_TESTING};
+
+# tests in Moo-0.009002 are sensitive to hash key order.  force one that
+# works, since we still want to run the rest of the tests.
+$ENV{PERL_HASH_SEED} = 0;
+$ENV{PERL_PERTURB_KEYS} = 0;
+
 my @extra_libs = do {
   my @libs = `"$^X" -le"print for \@INC"`;
   chomp @libs;

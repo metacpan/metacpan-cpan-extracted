@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op;
-$Device::Firewall::PaloAlto::Op::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::Op::VERSION = '0.1.9';
 
 use strict;
 use warnings;
@@ -7,6 +7,7 @@ use 5.010;
 
 use Device::Firewall::PaloAlto::Op::SysInfo;
 use Device::Firewall::PaloAlto::Op::Interfaces;
+use Device::Firewall::PaloAlto::Op::InterfaceStats;
 use Device::Firewall::PaloAlto::Op::ARPTable;
 use Device::Firewall::PaloAlto::Op::VirtualRouter;
 use Device::Firewall::PaloAlto::Op::Tunnels;
@@ -14,6 +15,7 @@ use Device::Firewall::PaloAlto::Op::GlobalCounters;
 use Device::Firewall::PaloAlto::Op::IPUserMaps;
 use Device::Firewall::PaloAlto::Op::HA;
 use Device::Firewall::PaloAlto::Op::NTP;
+use Device::Firewall::PaloAlto::Op::LogStatus;
 
 use XML::LibXML;
 
@@ -59,6 +61,15 @@ sub interfaces {
     my $self = shift;
 
     return Device::Firewall::PaloAlto::Op::Interfaces->_new( $self->_send_op_cmd('show interface', 'all') );
+}
+
+
+sub interface_stats {
+    my $self = shift;
+    my ($interface) = @_;
+    $interface //= 'ethernet1/1';
+
+    return Device::Firewall::PaloAlto::Op::InterfaceStats->_new( $self->_send_op_cmd('show interface', $interface) );
 }
 
 
@@ -124,6 +135,13 @@ sub ntp {
     my $self = shift;
 
     return Device::Firewall::PaloAlto::Op::NTP->_new( $self->_send_op_cmd('show ntp') );
+}
+
+
+sub logging_status {
+    my $self = shift;
+
+    return Device::Firewall::PaloAlto::Op::LogStatus->_new( $self->_send_op_cmd('show logging-status') );
 }
 
 
@@ -193,7 +211,7 @@ Device::Firewall::PaloAlto::Op - Operations module for Palo Alto firewalls
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 
@@ -227,6 +245,14 @@ Returns a L<Device::Firewall::PaloAlto::Op::SysInfo> object containing system in
     my $interfaces = $fw->op->interfaces();
 
 Returns a L<Device::Firewall::PaloAlto::Op::Interfaces> object containing all of the interfaces, both physical and logical, on the device.
+
+=head2 interface_stats
+
+    my $int_stats = $fw->op->interface_stats('ethernet1/1');
+
+Returns an L<Device::Firewall::PaloAlto::Op::InterfaceStats> objects containing specific interface statistics.
+
+If no interface is specified, 'ethernet1/1' is used.
 
 =head2 arp_table
 
@@ -275,6 +301,12 @@ Returns a L<Device::Firewall::PaloAlto::Op::HA> object representing the current 
 =head2 ntp
 
 Returns a L<Device::Firewall::PaloAlto::Op::NTP> object reresenting the current NTP synchronisation status of the firewall.
+
+=head2 logging_status
+
+    my $log_status = $fw->op->logging_status
+
+Returns a L<Device::Firewall::PaloAlto::Op::LogStatus> objects represent the current logging status of the firewall
 
 =head1 AUTHOR
 

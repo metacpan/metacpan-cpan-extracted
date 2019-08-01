@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -408,7 +408,7 @@ count 4 becomes
 
 For multiplicity "distinct" the first value in the sequence is a primorial
 (see L<Math::NumSeq::Primorials>), being the first C<factor_count> many
-primes multipled together.  For example 210 above is primorial 2*3*5*7.
+primes multiplied together.  For example 210 above is primorial 2*3*5*7.
 
 =head1 FUNCTIONS
 
@@ -451,7 +451,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

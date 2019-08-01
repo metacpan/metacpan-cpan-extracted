@@ -1,0 +1,194 @@
+{
+   "info" : {
+      "license" : {
+         "name" : "MIT"
+      },
+      "version" : "1.0.0",
+      "title" : "Swagger Petstore"
+   },
+   "servers" : [
+      {
+         "url" : "http://petstore.swagger.io/v1"
+      }
+   ],
+   "paths" : {
+      "/pets/{petId}" : {
+         "get" : {
+            "responses" : {
+               "default" : {
+                  "description" : "unexpected error",
+                  "content" : {
+                     "application/json" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/Error"
+                        }
+                     }
+                  }
+               },
+               "200" : {
+                  "content" : {
+                     "application/json" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/Pet"
+                        }
+                     }
+                  },
+                  "description" : "Expected response to a valid request"
+               }
+            },
+            "tags" : [
+               "pets"
+            ],
+            "operationId" : "showPetById",
+            "parameters" : [
+               {
+                  "name" : "petId",
+                  "schema" : {
+                     "type" : "string"
+                  },
+                  "description" : "The id of the pet to retrieve",
+                  "required" : "1",
+                  "in" : "path"
+               }
+            ],
+            "summary" : "Info for a specific pet"
+         }
+      },
+      "/pets" : {
+         "get" : {
+            "parameters" : [
+               {
+                  "schema" : {
+                     "type" : "integer",
+                     "format" : "int32"
+                  },
+                  "description" : "How many items to return at one time (max 100)",
+                  "name" : "limit",
+                  "in" : "query",
+                  "required" : ""
+               }
+            ],
+            "summary" : "List all pets",
+            "tags" : [
+               "pets"
+            ],
+            "operationId" : "listPets",
+            "responses" : {
+               "200" : {
+                  "description" : "A paged array of pets",
+                  "content" : {
+                     "application/json" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/Pets"
+                        }
+                     }
+                  },
+                  "headers" : {
+                     "x-next" : {
+                        "schema" : {
+                           "type" : "string"
+                        },
+                        "description" : "A link to the next page of responses"
+                     }
+                  }
+               },
+               "default" : {
+                  "content" : {
+                     "application/json" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/Error"
+                        }
+                     }
+                  },
+                  "description" : "unexpected error"
+               }
+            }
+         },
+         "post" : {
+            "responses" : {
+               "201" : {
+                  "description" : "Null response"
+               },
+               "default" : {
+                  "description" : "unexpected error",
+                  "content" : {
+                     "application/json" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/Error"
+                        }
+                     }
+                  }
+               }
+            },
+            "operationId" : "createPets",
+            "tags" : [
+               "pets"
+            ],
+            "summary" : "Create a pet"
+         }
+      }
+   },
+   "openapi" : "3.0.0",
+   "components" : {
+      "schemas" : {
+         "Error" : {
+            "required" : [
+               "code",
+               "message"
+            ],
+            "properties" : {
+               "code" : {
+                  "format" : "int32",
+                  "type" : "integer"
+               },
+               "message" : {
+                  "type" : "string"
+               }
+            }
+         },
+         "Pet" : {
+            "required" : [
+               "id",
+               "name"
+            ],
+            "properties" : {
+               "id" : {
+                  "format" : "int64",
+                  "type" : "integer"
+               },
+               "name" : {
+                  "type" : "string"
+               },
+               "tag" : {
+                  "type" : "string"
+               }
+            }
+         },
+         "Pets" : {
+            "type" : "array",
+            "items" : {
+               "$ref" : "#/components/schemas/Pet"
+            }
+         }
+      },
+      "securitySchemes": {
+        "basicAuth": {
+          "description": "Basic HTTP authentication. Allowed headers-- Authorization: Basic <api_key> | Authorization: Basic <base64 hash of `api_key:`>",
+          "scheme": "basic",
+          "type": "http"
+        },
+        "bearerAuth": {
+          "bearerFormat": "auth-scheme",
+          "description": "Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>",
+          "scheme": "bearer",
+          "type": "http"
+        }
+      }
+   },
+   "security": [
+      {
+        "basicAuth": ["Authorization: Basic ZGVtbzpwQDU1dzByZA=="]
+      }
+   ]
+}
+

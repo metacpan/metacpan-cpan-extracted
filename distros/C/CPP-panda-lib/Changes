@@ -1,3 +1,11 @@
+1.2.6    30.07.2019
+           - fix compilation warnings for some compilers
+           - fix panda::string tests for 32bit systems 
+           - fix panda::string tests for clang4-6
+1.2.5    25.07.2019
+           - require newer XS::Install
+1.2.4    24.07.2019
+           - require newer XS::Install
 1.2.3    22.07.2019
            - move fake std::string_view to panda::string_view + related changes
            - fix endian.h for C++17 clang (fuck macros)

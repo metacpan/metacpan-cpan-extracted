@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human::TH;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.897'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.899'; # VERSION
 
 use 5.010;
 use strict;
@@ -68,6 +68,30 @@ sub before_clause_clset {
     $cd->{CLAUSE_DO_MULTI} = 0;
 }
 
+sub before_clause_if {
+    my ($self, $cd) = @_;
+    $cd->{CLAUSE_DO_MULTI} = 0;
+}
+
+sub clause_if {
+    my ($self, $cd) = @_;
+    my $c  = $self->compiler;
+    my $cv = $cd->{cl_value};
+
+    my ($cond, $then, $else) = @$cv;
+
+    unless (!ref($cond) && ref($then) eq 'ARRAY' && !$else) {
+        $c->_die($cd, "Sorry, for 'if' clause, I currently can only handle COND=str (expr), THEN=array (schema), and no ELSE");
+    }
+
+    # temporary. currently it sucks because it plasters schema and expr directly
+    $c->add_ccl($cd, {
+        expr => 0,
+        vals => [$cond, $then],
+        fmt => 'if the expression %s is true then the schema %s must be followed',
+    });
+}
+
 1;
 # ABSTRACT: Base class for human type handlers
 
@@ -83,7 +107,7 @@ Data::Sah::Compiler::human::TH - Base class for human type handlers
 
 =head1 VERSION
 
-This document describes version 0.897 of Data::Sah::Compiler::human::TH (from Perl distribution Data-Sah), released on 2019-07-19.
+This document describes version 0.899 of Data::Sah::Compiler::human::TH (from Perl distribution Data-Sah), released on 2019-07-25.
 
 =for Pod::Coverage ^(name|compiler|clause_.+|handle_.+|before_.+|after_.+)$
 

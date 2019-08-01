@@ -1,11 +1,111 @@
+NAME
+    App::ruler - Print horizontal ruler on the terminal
+
+VERSION
+    This document describes version 0.060 of App::ruler (from Perl
+    distribution App-ruler), released on 2019-07-30.
+
 TIPS
+    To see background pattern, disable minor ticking by using "-m ''".
 
-    To see background pattern, disable minor ticking by using -m ''.
+    To disable numbering, set number format to an empty string: "-f ''" or
+    "--number-every 0".
 
-    To disable numbering, set number format to an empty string: -f '' or
-    --number-every 0.
+FUNCTIONS
+  ruler
+    Usage:
+
+     ruler(%args) -> [status, msg, payload, meta]
+
+    Print horizontal ruler on the terminal.
+
+    Examples:
+
+    *   Default ruler (dash + number every 10 characters):
+
+         ruler();
+
+        Result:
+
+         ".........|10.......|20.......|30.......|40.......|50.......|60.......|70.......|80.......|90.......|100......|110......|120......|130......|140......|150......|160......|170......|180......|19"
+
+    *   White ruler with red marks and numbers:
+
+         ruler(
+         background_color     => "black on_white",
+           major_tick_color     => "red on_white",
+           minor_tick_character => "",
+           number_color         => "bold red on_white"
+         );
+
+        Result:
+
+         "\e[30;47m---------\e[0m\e[31;47m|\e[0m\e[1;31;47m10\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m20\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m30\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m40\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m50\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m60\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m70\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m80\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m90\e[0m\e[30;47m-------\e[0m\e[31;47m|\e[0m\e[1;31;47m100\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m110\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m120\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m130\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m140\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m150\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m160\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m170\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m180\e[0m\e[30;47m------\e[0m\e[31;47m|\e[0m\e[1;31;47m19\e[0m"
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   background_color => *str*
+
+    *   background_pattern => *str* (default: "-")
+
+    *   length => *int*
+
+    *   major_tick_character => *str* (default: "|")
+
+    *   major_tick_color => *str*
+
+    *   major_tick_every => *int* (default: 10)
+
+    *   minor_tick_character => *str* (default: ".")
+
+    *   minor_tick_color => *str*
+
+    *   minor_tick_every => *int* (default: 1)
+
+    *   number_color => *str*
+
+    *   number_every => *int* (default: 10)
+
+    *   number_format => *str* (default: "%d")
+
+    *   number_start => *int* (default: 10)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ruler>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-ruler>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ruler>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     hr (App::hr)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

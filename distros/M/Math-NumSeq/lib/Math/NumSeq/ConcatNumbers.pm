@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -84,6 +84,12 @@ $oeis_anum[1]->[10]->[2] = 'A001704'; # decimal i,i+1 starting i=1
 
 $oeis_anum[1]->[10]->[3] = 'A001703'; # decimal i,i+1,i+2 starting i=1
 # OEIS-Catalogue: A001703 i_start=1 concat_count=3
+
+$oeis_anum[1]->[10]->[4] = 'A279204'; # decimal i,i+1,i+2,i+3 starting i=1
+# OEIS-Catalogue: A279204 i_start=1 concat_count=4
+
+$oeis_anum[1]->[10]->[10] = 'A287747'; # decimal i,i+1,... 10 values starting i=1
+# OEIS-Catalogue: A287747 i_start=1 concat_count=10
 
 sub oeis_anum {
   my ($self) = @_;
@@ -304,7 +310,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

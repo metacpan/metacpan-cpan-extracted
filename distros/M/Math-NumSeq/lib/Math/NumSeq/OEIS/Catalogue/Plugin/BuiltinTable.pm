@@ -22,13 +22,13 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 use Math::NumSeq::OEIS::Catalogue::Plugin;
 @ISA = ('Math::NumSeq::OEIS::Catalogue::Plugin');
 
 ## no critic (CodeLayout::RequireTrailingCommaAtNewline)
 
-# total 923 A-numbers in 117 modules
+# total 931 A-numbers in 117 modules
 
 use constant info_arrayref =>
 [
@@ -1551,6 +1551,26 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A279204',
+    'class' => 'Math::NumSeq::ConcatNumbers',
+    'parameters' => [
+      'i_start',
+      1,
+      'concat_count',
+      4
+    ]
+  },
+  {
+    'anum' => 'A287747',
+    'class' => 'Math::NumSeq::ConcatNumbers',
+    'parameters' => [
+      'i_start',
+      1,
+      'concat_count',
+      10
+    ]
+  },
+  {
     'anum' => 'A000578',
     'class' => 'Math::NumSeq::Cubes'
   },
@@ -1572,6 +1592,22 @@ use constant info_arrayref =>
     'parameters' => [
       'radix',
       2
+    ]
+  },
+  {
+    'anum' => 'A321657',
+    'class' => 'Math::NumSeq::DeletablePrimes',
+    'parameters' => [
+      'radix',
+      4
+    ]
+  },
+  {
+    'anum' => 'A321700',
+    'class' => 'Math::NumSeq::DeletablePrimes',
+    'parameters' => [
+      'radix',
+      5
     ]
   },
   {
@@ -2741,6 +2777,22 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A070696',
+    'class' => 'Math::NumSeq::Modulo',
+    'parameters' => [
+      'modulus',
+      14
+    ]
+  },
+  {
+    'anum' => 'A167463',
+    'class' => 'Math::NumSeq::Modulo',
+    'parameters' => [
+      'modulus',
+      15
+    ]
+  },
+  {
     'anum' => 'A130909',
     'class' => 'Math::NumSeq::Modulo',
     'parameters' => [
@@ -3037,6 +3089,16 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A001105',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      6,
+      'pairs',
+      'average'
+    ]
+  },
+  {
     'anum' => 'A000566',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
@@ -3070,6 +3132,16 @@ use constant info_arrayref =>
       8,
       'pairs',
       'second'
+    ]
+  },
+  {
+    'anum' => 'A033428',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      8,
+      'pairs',
+      'average'
     ]
   },
   {
@@ -3129,6 +3201,16 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A016742',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      10,
+      'pairs',
+      'average'
+    ]
+  },
+  {
     'anum' => 'A051682',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
@@ -3185,6 +3267,16 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A033429',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      12,
+      'pairs',
+      'average'
+    ]
+  },
+  {
     'anum' => 'A211013',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
@@ -3222,6 +3314,26 @@ use constant info_arrayref =>
       14,
       'pairs',
       'both'
+    ]
+  },
+  {
+    'anum' => 'A277082',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      15,
+      'pairs',
+      'both'
+    ]
+  },
+  {
+    'anum' => 'A033582',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      16,
+      'pairs',
+      'average'
     ]
   },
   {
@@ -3331,61 +3443,11 @@ use constant info_arrayref =>
     ]
   },
   {
-    'anum' => 'A001105',
-    'class' => 'Math::NumSeq::Polygonal',
-    'parameters' => [
-      'polygonal',
-      6,
-      'pairs',
-      'average'
-    ]
-  },
-  {
-    'anum' => 'A033428',
-    'class' => 'Math::NumSeq::Polygonal',
-    'parameters' => [
-      'polygonal',
-      8,
-      'pairs',
-      'average'
-    ]
-  },
-  {
-    'anum' => 'A016742',
-    'class' => 'Math::NumSeq::Polygonal',
-    'parameters' => [
-      'polygonal',
-      10,
-      'pairs',
-      'average'
-    ]
-  },
-  {
-    'anum' => 'A033429',
-    'class' => 'Math::NumSeq::Polygonal',
-    'parameters' => [
-      'polygonal',
-      12,
-      'pairs',
-      'average'
-    ]
-  },
-  {
     'anum' => 'A033581',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
       'polygonal',
       14,
-      'pairs',
-      'average'
-    ]
-  },
-  {
-    'anum' => 'A033582',
-    'class' => 'Math::NumSeq::Polygonal',
-    'parameters' => [
-      'polygonal',
-      16,
       'pairs',
       'average'
     ]
@@ -3656,6 +3718,16 @@ use constant info_arrayref =>
       'distinct',
       'prime_type',
       '4k+3'
+    ]
+  },
+  {
+    'anum' => 'A284203',
+    'class' => 'Math::NumSeq::PrimeFactorCount',
+    'parameters' => [
+      'multiplicity',
+      'distinct',
+      'prime_type',
+      'twin'
     ]
   },
   {

@@ -7,8 +7,7 @@
 
 namespace panda {
 
-namespace cast {
-namespace helper {
+namespace detail { namespace cast {
     typedef std::map<intptr_t, ptrdiff_t> DynCastCacheMap;
 
     template <class DERIVED, class BASE>
@@ -21,13 +20,12 @@ namespace helper {
         return *map;
     }
 
-    const ptrdiff_t INCORRECT_PTRDIFF = sizeof(ptrdiff_t) == 4 ? 2147483647 : 9223372036854775807LL;
-}
-}
+    constexpr const ptrdiff_t INCORRECT_PTRDIFF = PTRDIFF_MAX;
+}}
 
 template <class DERIVED_PTR, class BASE>
 DERIVED_PTR dyn_cast (BASE* obj) {
-    using namespace cast::helper;
+    using namespace detail::cast;
     using DERIVED = typename std::remove_pointer<DERIVED_PTR>::type;
 
     if (std::is_same<BASE,DERIVED>::value) return (DERIVED_PTR)((void*)obj);
@@ -47,7 +45,7 @@ DERIVED_PTR dyn_cast (BASE* obj) {
 
 template <class DERIVED_REF, class BASE>
 DERIVED_REF dyn_cast (BASE& obj) {
-    using namespace cast::helper;
+    using namespace detail::cast;
     using DERIVED = typename std::remove_reference<DERIVED_REF>::type;
 
     if (std::is_same<BASE,DERIVED>::value) return reinterpret_cast<DERIVED_REF>(obj);

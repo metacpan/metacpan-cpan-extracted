@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package App::Nopaste; # git description: 1.011-7-gc9be2f6
+package App::Nopaste; # git description: 1.012-12-g5acc073
 # ABSTRACT: Easy access to any pastebin
 # KEYWORDS: application executable paste output pastebin debugging
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use 5.008003;
 use Module::Pluggable search_path => 'App::Nopaste::Service', sub_name => '_plugins';
@@ -101,7 +101,7 @@ App::Nopaste - Easy access to any pastebin
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ Shawn M Moore, <sartak@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Shawn M Moore Karen Etheridge Thomas Sibley Ricardo Signes François Gannaz Justin Hunter Kevin Falcone Zoffix Znet David Golden Sergey Romanov Jesse Luehrs Rafael Kitover Dean Hamstead gregor herrmann vti Ævar Arnfjörð Bjarmason Сергей Романов Andrew Rodland יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Dan Book Darian Anthony Patrick Bremner J. Shultz Graham Knop Jason Mills John Goulah Maximilian Gass Sebastian Paaske Tørholm Tatsuhiko Miyagawa Zakariyya Mughal
+=for stopwords Shawn M Moore Karen Etheridge Thomas Sibley Ricardo Signes François Gannaz Justin Hunter Kevin Falcone Zoffix Znet Jesse Luehrs Dean Hamstead David Golden Rafael Kitover Sergey Romanov Zakariyya Mughal gregor herrmann vti Ævar Arnfjörð Bjarmason Сергей Романов Andrew Rodland יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Dan Book Darian Anthony Patrick Bremner J. Shultz Graham Knop Jason Mills John Goulah Maximilian Gass Sebastian Paaske Tørholm Shlomi Fish Tatsuhiko Miyagawa
 
 =over 4
 
@@ -237,15 +237,15 @@ Zoffix Znet <cpan@zoffix.com>
 
 =item *
 
-David Golden <dagolden@cpan.org>
-
-=item *
-
-Sergey Romanov <complefor@rambler.ru>
-
-=item *
-
 Jesse Luehrs <doy@tozt.net>
+
+=item *
+
+Dean Hamstead <dean@fragfest.com.au>
+
+=item *
+
+David Golden <dagolden@cpan.org>
 
 =item *
 
@@ -253,7 +253,11 @@ Rafael Kitover <rkitover@cpan.org>
 
 =item *
 
-Dean Hamstead <dean@fragfest.com.au>
+Sergey Romanov <complefor@rambler.ru>
+
+=item *
+
+Zakariyya Mughal <zaki.mughal@gmail.com>
 
 =item *
 
@@ -321,11 +325,11 @@ Sebastian Paaske Tørholm <Eckankar+github@gmail.com>
 
 =item *
 
-Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+Shlomi Fish <shlomif@shlomifish.org>
 
 =item *
 
-Zakariyya Mughal <zaki.mughal@gmail.com>
+Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
 =back
 

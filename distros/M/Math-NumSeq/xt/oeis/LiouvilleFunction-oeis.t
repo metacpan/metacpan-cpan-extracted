@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -29,9 +29,6 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::NumSeq::LiouvilleFunction;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 sub diff_nums {

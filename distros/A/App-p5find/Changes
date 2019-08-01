@@ -1,0 +1,14 @@
+0.02    2019-07-24T07:49:06+0900
+    Let all programs accept "-h" switch for showing usage.
+
+0.01    2019-07-24T07:30:22+0900
+
+    Initial release. :hooray:, with the following programs
+
+    - p5find-regex
+    - p5find-str
+    - p5find-sub
+    - p5find-token-word
+    - p5find-unused-package
+    - p5find-variable-methods
+    - p5find-words-used-only-once

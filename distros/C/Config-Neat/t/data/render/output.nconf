@@ -1,5 +1,6 @@
 word                              Hello
 string_with_spaces                Hello, world!
+`key with spaces`                 should work
 simple_array                      1 `2 3` `4 5` 6 7
 wrappable_string                  Vestibulum ullamcorper leo quam, vel adipiscing tellus.
                                   Phasellus placerat dolor sit amet lorem mattis dictum.

@@ -17,9 +17,9 @@ has node   => ( init_arg => undef );    # InstanceOf ['Pcore::Node']
 has cdn    => ( init_arg => undef );    # InstanceOf['Pcore::CDN']
 has ext    => ( init_arg => undef );    # InstanceOf['Pcore::Ext']
 
-const our $PERMISSION_ADMIN => 'admin';
-const our $PERMISSION_USER  => 'user';
-const our $PERMISSIONS      => [ $PERMISSION_ADMIN, $PERMISSION_USER ];
+const our $PERMISSIONS_ADMIN => 'admin';
+const our $PERMISSIONS_USER  => 'user';
+const our $PERMISSIONS       => [ $PERMISSIONS_ADMIN, $PERMISSIONS_USER ];
 
 const our $LOCALES => {
     en => 'English',

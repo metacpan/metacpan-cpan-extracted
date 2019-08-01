@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::obj::str_url;
 
-our $DATE = '2019-05-28'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,8 +9,7 @@ use warnings;
 
 sub meta {
     +{
-        v => 3,
-        enable_by_default => 0,
+        v => 4,
         might_fail => 1,
         prio => 50,
     };
@@ -52,7 +51,7 @@ Data::Sah::Coerce::perl::obj::str_url - Coerce URL object (URI) from string
 
 =head1 VERSION
 
-This document describes version 0.009 of Data::Sah::Coerce::perl::obj::str_url (from Perl distribution Sah-Schemas-URL), released on 2019-05-28.
+This document describes version 0.010 of Data::Sah::Coerce::perl::obj::str_url (from Perl distribution Sah-Schemas-URL), released on 2019-07-25.
 
 =head1 DESCRIPTION
 

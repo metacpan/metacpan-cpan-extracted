@@ -177,6 +177,16 @@ Kafka::Librd::Message
   payload
     return message payload
 
+  timestamp(\$tstype)
+    return message timestamp (milliseconds since UNIX epoch)
+
+    The $tstype argument is optional, and if present, it should be a scalar
+    reference. It will be filled with one of the following values:
+
+    Kafka::Librd::RD_KAFKA_TIMESTAMP_NOT_AVAILABLE
+    Kafka::Librd::RD_KAFKA_TIMESTAMP_CREATE_TIME
+    Kafka::Librd::RD_KAFKA_TIMESTAMP_LOG_APPEND_TIME
+
 CAVEATS
     Message offset is truncated to 32 bit if perl compiled without support
     for 64 bit integers.

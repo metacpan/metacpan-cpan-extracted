@@ -30,7 +30,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Bahai::Simple' => { file => 'lib/Date/Bahai/Simple.pm', version => '0.25' },
+            'Date::Bahai::Simple' => { file => 'lib/Date/Bahai/Simple.pm', version => '0.26' },
         },
         resources => {
             repository => {

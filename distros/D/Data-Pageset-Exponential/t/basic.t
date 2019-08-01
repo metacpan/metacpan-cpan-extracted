@@ -65,4 +65,10 @@ is_deeply $pager->pages_in_set, [
 is $pager->next_set, 55, 'next_set';
 is $pager->previous_set, 43, 'previous_set';
 
+is $pager->current_page(-100), $pager->first_page, 'current_page < first_page';
+is $pager->current_page, $pager->first_page, 'current_page';
+
+is $pager->current_page(999999), $pager->last_page, 'current_page > last_page';
+is $pager->current_page, $pager->last_page, 'current_page';
+
 done_testing;

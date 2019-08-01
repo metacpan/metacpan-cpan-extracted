@@ -1,0 +1,93 @@
+NAME
+    Complete::Acme::MetaSyntactic - Completion routines for
+    Acme::MetaSyntactic
+
+VERSION
+    This document describes version 0.002 of Complete::Acme::MetaSyntactic
+    (from Perl distribution Complete-Acme-MetaSyntactic), released on
+    2019-07-05.
+
+FUNCTIONS
+  complete_meta_category
+    Usage:
+
+     complete_meta_category(%args) -> any
+
+    Complete from list of categories for a particular theme.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   theme* => *str*
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (any)
+
+  complete_meta_theme
+    Usage:
+
+     complete_meta_theme(%args) -> any
+
+    Complete from list of available themes.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (any)
+
+  complete_meta_theme_and_category
+    Usage:
+
+     complete_meta_theme_and_category(%args) -> any
+
+    Complete from list of available themes (or "theme/category").
+
+    This routine can complete from a list of themes, like
+    "complete_meta_theme()". Additionally, if the word is in the form of
+    "word/" or "word/rest" then the "rest" will be completed from list of
+    categories of theme "word".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Acme-MetaSyntactic>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Acme-MetaSyntactic>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Acme-MetaSyn
+    tactic>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

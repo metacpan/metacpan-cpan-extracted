@@ -1,99 +1,143 @@
-SYNOPSIS
+NAME
+    Data::Transmute - Transmute (transform) data structure using rules data
 
-     use Data::Transmute qw(transmute_array transmute_hash);
-    
-     transmute_hash(
-         data => \%hash,
+VERSION
+    This document describes version 0.030 of Data::Transmute (from Perl
+    distribution Data-Transmute), released on 2019-07-24.
+
+SYNOPSIS
+     use Data::Transmute qw(
+         transmute_data
+         reverse_rules
+     );
+
+     transmute_data(
+         data => \@data,
          rules => [
-    
-             # create a new key, error if key already exists
-             [create_key => {name=>'foo', value=>1}],
-    
-             # create another key, but this time ignore/noop if key already exists
-             # (ignore=1). this is like INSERT IGNORE in SQL.
-             [create_key => {name=>'bar', value=>2, ignore=>1}],
-    
+
+
+             # this rule only applies when data is a hash, when data is not a hash
+             # this will will do nothing. create a single new hash key, error if key
+             # already exists.
+             [create_hash_key => {name=>'foo', value=>1}],
+
+             # create another hash key, but this time ignore/noop if key already
+             # exists (ignore=1). this is like INSERT IGNORE in SQL.
+             [create_hash_key => {name=>'bar', value=>2, ignore=>1}],
+
              # create yet another key, this time replace existing keys (replace=1).
              # this is like REPLACE INTO in SQL.
-             [create_key => {name=>'baz', value=>3, replace=>1}],
-    
-             # rename a single key, error if old name doesn't exist or new name
-             # exists
-             [rename_key => {from=>'qux', to=>'quux'}],
-    
+             [create_hash_key => {name=>'baz', value=>3, replace=>1}],
+
+
+             # this rule only applies when data is a hash, when data is not a hash
+             # this will will do nothing. rename a single key, error if old name
+             # doesn't exist or new name exists.
+             [rename_hash_key => {from=>'qux', to=>'quux'}],
+
              # rename another key, but this time ignore if old name doesn't exist
              # (ignore=1) or if new name already exists (replace=1)
-             [rename_key => {from=>'corge', to=>'grault', ignore_missing_from=>1, replace=>1}],
-    
-             # delete a key, will noop if key already doesn't exist
-             [delete_key => {name=>'garply'}],
-    
+             [rename_hash_key => {from=>'corge', to=>'grault', ignore_missing_from=>1, replace=>1}],
+
+
+             # this rule only applies when data is a hash, when data is not a hash
+             # this will will do nothing. delete a single key, will noop if key
+             # already doesn't exist.
+             [delete_hash_key => {name=>'garply'}],
+
+
+             # this rule only applies when data is an arrayref, when data is not a
+             # array this will will do nothing. for each array element, apply
+             # transmute rules to it.
+             [transmute_array_elems => {rules => [...]}],
+
+
+             # this rule only applies when data is a hashref, when data is not a
+             # hash this will will do nothing. for each hash value, apply transmute
+             # rules to it.
+             [transmute_hash_values => {rules => [...]}],
+
+
          ],
      );
 
 DESCRIPTION
-
-    STATUS: EARLY DEVELOPMENT, SOME FEATURES MIGHT BE MISSING
-
     This module provides routines to transmute (transform) a data structure
     in-place using rules which is another data structure (an arrayref of
-    rule specifications). It is similar to Hash::Transform except the
-    recipe offers ability for more complex transformations.
+    rule specifications).
 
     One use-case for this module is to convert/upgrade configuration files.
 
 RULES
-
     Rules is an array of rule specifications.
 
     Each rule specification: [$funcname, \%args]
 
-    $funcname is the name of an actual function in Data::Transmute
-    namespace, with transmute_array_ or transmute_hash_ prefix removed.
-
-    \%args: a special arg will be inserted: data.
+    \%args: a special arg will be inserted: "data".
 
 FUNCTIONS
+  transmute_data
+    Usage:
 
- transmute_array(%args)
+     $data = transmute_data(%args)
 
-    Transmute an array, die on failure. Input data is specified in the data
-    argument, which will be modified in-place (so you'll need to clone it
-    first if you don't want to modify the original data). Rules is
-    specified in rules argument.
+    Transmute data structure, die on failure. Input data is specified in the
+    "data" argument, which will be modified in-place (so you'll need to
+    clone it first if you don't want to modify the original data). Rules is
+    specified in "rules" argument.
 
- transmute_hash(%args)
+  reverse_rules
+    Usage:
 
-    Transmute a hash, die on failure. Input data is specified in the data
-    argument, which will be modified in-place (so you'll need to clone it
-    first if you don't want to modify the original data). Rules is
-    specified in rules argument.
+     my $reverse_rules = reverse_rules(rules => [...]);
+
+    Create a reverse rules, die on failure.
 
 TODOS
-
     Check arguments (DZP:Rinci::Wrap?).
 
     Undo?
 
-    Function to mass rename keys (by regex substitution, prefix, custom
-    Perl code, ...).
+    Function to mass rename keys (by regex substitution, prefix, custom Perl
+    code, ...).
 
     Function to mass delete keys (by regex, prefix, ...).
 
-    Specify subrules.
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Transmute>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Transmute>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Transmute>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Hash::Transform is similar in concept. It allows transforming a hash
-    using rules encoded in a hash. However, the rules only allow for
-    simpler transformations: rename a key, create a key with a specified
-    value, create a key that from a string-based join of other
-    keys/strings. For more complex needs, you'll have to supply a coderef
-    to do the transformation yourself manually. Another thing I find
-    limiting is that the rules is a hash, which means there is no way to
-    specify order of processing.
+    using rules encoded in a hash. However, the rules only allow for simpler
+    transformations: rename a key, create a key with a specified value,
+    create a key that from a string-based join of other keys/strings. For
+    more complex needs, you'll have to supply a coderef to do the
+    transformation yourself manually. Another thing I find limiting is that
+    the rules is a hash, which means there is no way to specify order of
+    processing. And of course, you cannot transform non-hash data.
 
     Config::Model, which you can also use to convert/upgrade configuration
     files. But I find this module slightly too heavyweight for the simpler
     needs that I have, hence I created Data::Transmute.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

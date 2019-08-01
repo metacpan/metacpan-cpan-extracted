@@ -1,30 +1,34 @@
 ---
 abstract: 'Check Taiawn SCSB bank info'
 author:
-  - 'Kang-min Liu <gugod@gugod.org>'
-build_requires:
-  ExtUtils::MakeMaker: 6.42
+  - 'Kang-min Liu E<lt>gugod@gugod.orgE<gt>'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.86'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.026, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Finance-Bank-SCSB-TW
-no_index:
-  directory:
-    - examples
-    - inc
-    - t
+provides:
+  Finance::Bank::SCSB::TW:
+    file: lib/Finance/Bank/SCSB/TW.pm
+    version: '0.14'
+  Finance::Bank::SCSB::TW::CurrencyExchangeRateCollection:
+    file: lib/Finance/Bank/SCSB/TW/CurrencyExchangeRateCollection.pm
 requires:
-  HTML::Selector::XPath: 0
-  HTML::TreeBuilder::XPath: 0
-  List::MoreUtils: 0
-  WWW::Mechanize: 1.50
-  WWW::Mechanize::Sleepy: 0
-  perl: 5.8.0
+  HTML::Selector::XPath: '0'
+  HTML::TreeBuilder::XPath: '0'
+  List::MoreUtils: '0'
+  Module::Build::Tiny: '0'
+  UNIVERSAL::isa: '0'
+  WWW::Mechanize: '0'
+  WWW::Mechanize::Sleepy: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.12
+  repository: https://github.com/gugod/Finance-Bank-SCSB-TW.git
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: '1'

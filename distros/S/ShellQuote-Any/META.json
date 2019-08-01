@@ -4,13 +4,13 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "ShellQuote-Any",
    "prereqs" : {
@@ -44,7 +44,7 @@
    "provides" : {
       "ShellQuote::Any" : {
          "file" : "lib/ShellQuote/Any.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "http://webchat.freenode.net/?channels=%23bayadev"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

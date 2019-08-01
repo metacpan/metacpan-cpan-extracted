@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2014 Kevin Ryde
+# Copyright 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,8 @@
 
 # Usage: perl haferman-carpet-x11.pl
 #
-# See POD at the end of the file for usage etc.
+# Draw Haferman carpet image in X using X11::Protocol and some of
+# X11::Protocol::Other.  See POD at the end of the file for usage etc.
 
 
 BEGIN { require 5.0004 }
@@ -31,12 +32,13 @@ use IO::Select;
 use List::Util 'min', 'max';
 use POSIX 'ceil';
 use X11::Protocol;
-use X11::Protocol::WM 27; # version 27 for change_net_wm_state()
+use X11::Protocol::Other 31; # version 31 for get_property_atoms()
+use X11::Protocol::WM 27;    # version 27 for change_net_wm_state()
 use vars '%Keysyms';
 use X11::Keysyms '%Keysyms', qw(MISCELLANY LATIN1);
 
 use vars '$VERSION';
-$VERSION = 72;
+$VERSION = 73;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -184,8 +186,8 @@ sub divrem_negaternary {
 
 my $display = $ENV{'DISPLAY'};
 
-# Initially the desired window size and thereafter the actual window size as
-# reported by ConfigureNotify.
+# Initially the desired window size, and thereafter the actual window size
+# as reported by ConfigureNotify.
 my $window_width;
 my $window_height;
 
@@ -216,9 +218,8 @@ if (! Getopt::Long::GetOptions
      'scale=i'     => \$scale,
      'geometry=s'  => sub {
        my ($opt, $str) = @_;
-       $str =~ /^(\d+)x(\d+)$/ or die "Unrecognised --geometry \"$str\"";
-       $window_width = $1;
-       $window_height = $2;
+       ($window_width,$window_height) = ($str =~ /^(\d+)x(\d+)$/)
+         or die "Unrecognised --geometry \"$str\"";
      },
      'fullscreen'  => \$window_initial_fullscreen,
      'initial=i'   => \$initial,
@@ -241,18 +242,10 @@ if (! defined $window_height || $window_height < 1) {
 $window_height = max($window_height, 1);
 
 # True if window manager supports the NetWM "fullscreen" state.
-my $have_netwm_fullscreen;
-{
-  my ($value, $type, $format, $bytes_after)
-    = $X->GetProperty ($X->root, $X->atom('_NET_SUPPORTED'),
-                       0,    # AnyPropertyType
-                       0,    # offset
-                       999,  # length
-                       0);   # delete;
-  my $_NET_WM_STATE_FULLSCREEN = $X->atom('_NET_WM_STATE_FULLSCREEN');
-  $have_netwm_fullscreen = (grep {$_ == $_NET_WM_STATE_FULLSCREEN}
-                            unpack('L*', $value));
-}
+my $have_netwm_fullscreen =
+  grep {$_ == $X->atom('_NET_WM_STATE_FULLSCREEN')}
+  X11::Protocol::Other::get_property_atoms($X, $X->root,
+                                           $X->atom('_NET_SUPPORTED'));
 ### $have_netwm_fullscreen
 
 if ($window_initial_fullscreen && ! $have_netwm_fullscreen) {
@@ -273,7 +266,7 @@ $X->CreateWindow ($window,
                   $window_width,$window_height,
                   0,                # border
 
-                  # Desired bit-gravity for a window resize would be a kind
+                  # Desired bit-gravity for window resize would be a kind
                   # of "Centred" but there's no such type.  The default
                   # "Forget" will clear to background until Expose redraws.
                   background_pixel => $background_pixel,
@@ -431,7 +424,7 @@ sub make_bitmaps {
 my $redraw_bitmaps = 1;
 my $redraw;
 
-my $scroll_step = 50;
+my $scroll_step = 20;
 my $scroll_x = 0;
 my $scroll_y = 0;
 
@@ -615,10 +608,10 @@ for (;;) {
   # Then if $redraw is not wanted go into handle_input() to wait for events.
   # (The redraw code includes at least one round-trip and that might read
   # events which turns on $redraw again.)
-  # 
+  #
   while (fh_readable($fh) || ! $redraw) {
     $X->handle_input;
-  } 
+  }
 
   if ($redraw) {
     ### main loop redraw ...
@@ -668,7 +661,9 @@ for (;;) {
 }
 exit 0;
 
-=for stopwords X11
+__END__
+
+=for stopwords Haferman haferman scrollable fullscreen negaternary Math NumSeq X11 Ryde
 
 =head1 NAME
 
@@ -681,7 +676,8 @@ haferman-carpet-x11.pl -- display the Haferman carpet
 =head1 DESCRIPTION
 
 C<haferman-carpet-x11.pl> displays the Haferman carpet in a scrollable X11
-window.
+window.  A relatively simple drawing rule produces an repeating pattern of
+interlocking rings.
 
       *     *     *   * * *   *   * * *   *     *     *
     *   * *   * *   * * * * *   * * * * *   * *   * *   *
@@ -740,27 +736,27 @@ The key and button controls are
 
 =over
 
-=item C
+=item c
 
 Centre the carpet in the window (its initial position).
 
-=item F
+=item f
 
 Toggle fullscreen (requires a Net-WM window manager).
 
-=item I
+=item i
 
 Invert black/white colours.
 
-=item Q
+=item q
 
 Quit.
 
-=item Arrow keys, Page up, Page down
+=item arrow keys, page up, page down
 
 Scroll the carpet in the window.
 
-=item Space
+=item space
 
 Toggle initial cell value 0 E<lt>-E<gt> 1.
 
@@ -768,7 +764,7 @@ Toggle initial cell value 0 E<lt>-E<gt> 1.
 
 Increase or decrease the scale (zoom in or out).
 
-=item Button 1
+=item button 1
 
 Drag the carpet in the window.
 
@@ -801,8 +797,8 @@ is at an odd position (the low end is position 0 and the next is position 1,
 etc).  So in the table look under "odd position" for carpet value 1.
 
 If there are no "odd" digit pairs at all in X,Y then the carpet cell is the
-initial cell value which is the cell at the very centre of the carpet.  As
-described above the default in the program is 0.
+initial cell value which is the cell at the very centre of the carpet.  Per
+the C<--initial> option, the default is 0.
 
 =head2 Drawing
 
@@ -818,7 +814,7 @@ or "1" expanded down according to the Haferman carpet rule.
     +---+---+---+         +---+---+---+
 
 The bitmap size is scale*3^exp with exp chosen so this size is less than the
-window size (the bigger of width and height).  With such a size at most
+window size (the bigger of width and height).  With such a size, at most
 three blocks across and down suffice to cover the window,
 
            block    block    block
@@ -865,6 +861,7 @@ The X display to use.
 =head1 SEE ALSO
 
 L<X11::Protocol>,
+L<X11::Protocol::Other>,
 L<Math::NumSeq::HafermanCarpet>
 
 L<http://mathworld.wolfram.com/HafermanCarpet.html>
@@ -875,7 +872,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Math-NumSeq is Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Math-NumSeq is Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -44,7 +44,7 @@ $thr = threads->create(sub {
 });
 $thr->join;
 undef $thr;
-cmp_deeply(dcnt(), [2, 2], "thread not leaked (storage and cloned unit have been destroyed)");
+cmp_deeply(dcnt(), [2, ignv(2)], "thread not leaked (storage and cloned unit have been destroyed)");
 
 # inside-C (deeply) cloned objects don't preserve backrefs (impossible)
 $s = MyTest::BRStorage->new;
@@ -63,7 +63,7 @@ cmp_deeply([@thres[0,1,3,4]], ["MyTest::MyBRUnit", 411, "MyTest::BRUnit", 400]);
 isnt($thres[2], $thres[5]);
 isnt($thres[2], $br_addr);
 isnt($thres[5], $br_addr);
-cmp_deeply(dcnt(), [3, 3], "thread not leaked (obj + storage + storage's unit)");
+cmp_deeply(dcnt(), [3, ignv(3)], "thread not leaked (obj + storage + storage's unit)");
 
 # create thread when obj is in zombie mode
 $s = MyTest::BRStorage->new;
@@ -76,3 +76,10 @@ $thr->join;
 undef $thr;
 
 done_testing();
+
+# ignore value if perl version < 5.24
+# that's because on older perls we can't supress perl DESTROY() call in sv resurrection
+sub ignv {
+    return $_[0] if $^V >= '5.24';
+    return ignore(); 
+}

@@ -4,9 +4,9 @@ use lib 't';
 use MyTest;
 use Test::More;
 
-my $tname = $ARGV[0] or die "usage: $0 <test name>";
+die "usage: $0 <test name>" unless @ARGV;
 
-Test::Catch::run($tname);
+Test::Catch::run(@ARGV);
 
 done_testing();
 

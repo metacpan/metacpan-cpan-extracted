@@ -1,5 +1,6 @@
 package odern::Perl;
-$odern::Perl::VERSION = '1.20190601';
+#ABSTRACT: Module for enabling all of the features of Modern Perl
+$odern::Perl::VERSION = '1.20190727';
 use Modern::Perl;
 
 *import = \&Modern::Perl::import;
@@ -14,11 +15,11 @@ __END__
 
 =head1 NAME
 
-odern::Perl
+odern::Perl - Module for enabling all of the features of Modern Perl
 
 =head1 VERSION
 
-version 1.20190601
+version 1.20190727
 
 =head1 AUTHOR
 

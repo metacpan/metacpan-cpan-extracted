@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::stats;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.035'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '1.037'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::stats - Statistics of your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.035 of App::lcpan::Cmd::stats (from Perl distribution App-lcpan), released on 2019-06-26.
+This document describes version 1.037 of App::lcpan::Cmd::stats (from Perl distribution App-lcpan), released on 2019-07-23.
 
 =head1 FUNCTIONS
 

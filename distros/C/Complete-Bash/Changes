@@ -1,3 +1,26 @@
+0.328   2019-07-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix the use of Term::Size::chars().
+
+
+0.327   2019-07-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [removed] format_completion(): Remove drawing summary lines every N
+	  rows, because bash sorting will mess it up, and I think it looks ugly
+	  anyway.
+
+	- format_completion(): No longer sort entries.
+
+	- format_completion(): Close fzf process' input so fzf does not show
+          rotating cursor.
+
+
+0.326   2019-07-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Implement another feature stolen from Ingy's complete-shell: use
+	  fzf for filters.
+
+
 0.325   2019-06-28  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

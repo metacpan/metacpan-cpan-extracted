@@ -1,5 +1,5 @@
 package Shipment::Base;
-$Shipment::Base::VERSION = '3.01';
+$Shipment::Base::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -119,6 +119,36 @@ has 'currency' => (
     is      => 'rw',
     isa     => Str,
     default => 'USD',
+);
+
+
+has 'insured_value' => (
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    lazy    => 1,
+    default => sub {
+        my $self          = shift;
+        my $insured_value = 0;
+        foreach (@{$self->packages}) {
+            $insured_value += $_->insured_value->value;
+        }
+        Data::Currency->new($insured_value);
+    },
+);
+
+
+has 'goods_value' => (
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    lazy    => 1,
+    default => sub {
+        my $self        = shift;
+        my $goods_value = 0;
+        foreach (@{$self->packages}) {
+            $goods_value += $_->goods_value->value;
+        }
+        Data::Currency->new($goods_value);
+    },
 );
 
 
@@ -357,7 +387,7 @@ Shipment::Base
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 
@@ -489,6 +519,18 @@ default: lb, in (pounds and inches)
 What currency we're dealing with (USD,CAD, etc)
 
 default: USD
+
+=head2 insured_value
+
+The total value of the shipment to be insured
+
+type: Data::Currency
+
+=head2 goods_value
+
+The total value of the shipment
+
+type: Data::Currency
 
 =head2 pickup_date
 

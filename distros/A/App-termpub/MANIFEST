@@ -9,6 +9,7 @@ lib/App/termpub.pm
 lib/App/termpub/Epub.pm
 lib/App/termpub/Epub/Chapter.pm
 lib/App/termpub/Hyphen.pm
+lib/App/termpub/NavDoc.pm
 lib/App/termpub/Pager.pm
 lib/App/termpub/Pager/HTML.pm
 lib/App/termpub/Pager/Text.pm

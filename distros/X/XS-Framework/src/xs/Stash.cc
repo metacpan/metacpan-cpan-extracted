@@ -45,18 +45,24 @@ Stash::op_proxy& Stash::op_proxy::operator= (GV* val) {
 
 void Stash::_promote (GV* gv, const panda::string_view& key) const {
     if (!gv || SvTYPE(gv) == SVt_PVGV) return;
-#if PERL_DECIMAL_VERSION < PERL_VERSION_DECIMAL(5,26,1) && PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(5,22,0)
-    if (SvROK(gv)) {
-        SV* val = SvRV(gv);
-        if (SvTYPE(val) == SVt_PVCV && !CvNAMED((CV*)val)) { // core-dump in gv_init_pvn with non-named CV
-            U32 hash;
-            PERL_HASH(hash, key.data(), key.length());
-            HEK* hek = share_hek(key.data(), key.length(), hash);
-            CvNAME_HEK_set((CV*)val, hek);
+
+    // perl [5.22.0 - 5.26.0] had a bug: core dump while promoting !CvNAMED subs. workaround it by adding name by hand
+    #if PERL_DECIMAL_VERSION < PERL_VERSION_DECIMAL(5,26,1) && PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(5,22,0)
+        if (SvROK(gv)) {
+            SV* val = SvRV(gv);
+            if (SvTYPE(val) == SVt_PVCV && !CvNAMED((CV*)val)) { // core-dump in gv_init_pvn with non-named CV
+                U32 hash;
+                PERL_HASH(hash, key.data(), key.length());
+                HEK* hek = share_hek(key.data(), key.length(), hash);
+                ((XPVCV*)MUTABLE_PTR(SvANY(val)))->xcv_gv_u.xcv_hek = hek;
+                CvNAMED_on((CV*)val);
+                CvCVGV_RC_off((CV*)val);
+            }
         }
-    }
-#endif
-    gv_init_pvn(gv, (HV*)sv, key.data(), key.length(), 0);
+    #endif
+
+    // promote SV to GV. Note that prior to perl 5.22, not any SV could be promoted, otherwise gv_init_pvn croaks()
+    gv_init_pvn(gv, (HV*)sv, key.data(), key.length(), GV_ADDMULTI);  // GV_ADDMULTI suppresses 'used only once' warning
 }
 
 string Stash::path () const {

@@ -1,7 +1,7 @@
 package Sah::Schema::date::year;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-24'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [int => {
     summary => 'Year number',
@@ -23,7 +23,7 @@ Sah::Schema::date::year - Year number
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::date::year (from Perl distribution Sah-Schemas-Date), released on 2019-06-20.
+This document describes version 0.004 of Sah::Schema::date::year (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
 
 =head1 HOMEPAGE
 

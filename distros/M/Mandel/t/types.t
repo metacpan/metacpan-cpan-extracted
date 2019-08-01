@@ -1,5 +1,6 @@
 package   MyDocument;
 use Mandel::Document;
+use Mandel::Collection;
 use Types::Standard ':all';
 
 field any => (isa => Any);
@@ -40,4 +41,11 @@ subtest 'types by model' => sub {
     is $doc->model->field($fields[$_])->type_constraint, $expected[$_], "type $fields[$_]";
   }
 };
+
+my $collection = Mandel::Collection->new;
+my $model = Mandel::Model->new(document_class => 'MyDocument');
+$collection->model($model);
+eval { my $doc2 = $collection->create({ int => "Bruce" }) };
+like $@, qr{"Int"}, 'Bruce is not Int';
+
 done_testing;

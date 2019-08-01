@@ -23,13 +23,19 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'Ref::Util::XS' => '0',
+                                        'Type::Tiny::XS' => '0'
+                                      },
                       'requires' => {
                                       'List::Util' => '1.33',
                                       'Moo' => '1.006000',
+                                      'MooX::Aliases' => '0',
                                       'MooX::TypeTiny' => '0',
                                       'PerlX::Maybe' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '0',
+                                      'asa' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.10.1'
                                     }

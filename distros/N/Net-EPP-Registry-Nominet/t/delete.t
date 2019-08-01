@@ -5,14 +5,9 @@
 #
 #  DESCRIPTION:  Test of EPP delete operation
 #
-#        FILES:  ---
-#         BUGS:  ---
-#        NOTES:  ---
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: delete.t,v 1.4 2015/11/06 14:39:37 pete Exp $
 #      CREATED:  04/04/13 18:09:48
-#     REVISION:  $Revision: 1.4 $
 #===============================================================================
 
 use strict;
@@ -21,15 +16,14 @@ use warnings;
 use Test::More;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 5;
+	plan tests => 7;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
 
-use lib './lib';
 use Net::EPP::Registry::Nominet;
 
-my $epp = new_ok ('Net::EPP::Registry::Nominet', [ test => 1,
+my $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS}, debug =>
 	$ENV{DEBUG_TEST} || 0 ] );
 
@@ -50,7 +44,6 @@ my $registrant = {
 		'trad-name'	=>	'Domsplosion',
 		'type'		=>	'LTD',
 		'co-no'		=>	'12345678',
-		'opt-out'	=>	'n',
 		'postalInfo'=>	{ loc => {
 			'name'		=>	'Big Red Hippopotamus',
 			'org'		=>	'Acme Domain Company',
@@ -70,11 +63,12 @@ my $domain = {
 	period	=>	"2",
 	registrant	=>	$registrant,
 	nameservers	=>	{
-		'nsname0'	=>	"ns1.demetrius-$tag.co.uk",
-		'nsname1'	=>	"ns1.ariel-$tag.co.uk"
+		'nsname0'	=>	"ns1.demetrius-$tag.co.uk"
 	}
 };
 my ($expiry, $reason, $regid) = $epp->register ($domain);
+ok $expiry, "$domtogo registered for deletion test" or
+	diag ($epp->get_code, $reason);
 
 is ($epp->delete_domain('foo.bar.uk'), undef, "Delete non-existent domain");
 my $res = $epp->delete_domain($domtogo);
@@ -86,6 +80,13 @@ if (defined $res) {
 	is ($res, 1, "Delete success");
 } else {
 	is ($Net::EPP::Simple::Code, 2201, "Delete unauthorised");
+	#diag "Msg: " . $Net::EPP::Simple::Message;
+}
+
+SKIP: {
+	skip "Deletion AUP Exceeded", 1 unless defined $res;
+	($res) = $epp->check_domain ($domtogo);
+	is ($res, 1, "Non-existent domain check: $domtogo");
 }
 
 ok ($epp->logout(), 'Logout successful');

@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Saka' => { file => 'lib/Calendar/Saka.pm', version => '1.40' },
+            'Calendar::Saka' => { file => 'lib/Calendar/Saka.pm', version => '1.41' },
         },
         resources => {
             repository => {

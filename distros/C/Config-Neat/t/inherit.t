@@ -101,8 +101,13 @@ done_testing();
 
 sub rectify_error_string {
     my $s = shift;
+    print "\t::rectify_error_string($s)\n";
+
+    # remove the trailing source file reference added by Perl
     $s =~ s/ at \S+? line \d+\.$//;
-    $s =~ s/(at `\@inherit ).+?((\d+\.nconf)?#)/$1<...>$2/;
+
+    # replace paths to nconf files to stabilize the output
+    $s =~ s/[\S]+[\\\/]([\w\d]+\.nconf)/<\/path\/to\/>$1/sg;
     return $s;
 }
 

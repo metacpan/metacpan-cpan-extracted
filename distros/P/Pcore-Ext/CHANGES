@@ -1,3 +1,7 @@
+v0.37.0 2019-07-26T14:38:13Z
+ - permissions constants renamed
+ - ext overflow scrollable fix
+
 v0.36.0 2019-07-21T06:31:24Z
  - amcharts improvements
  - amcharts change theme

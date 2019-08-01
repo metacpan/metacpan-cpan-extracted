@@ -9,6 +9,9 @@ cpanfile
 dist.ini
 lib/Swagger/Generator/DumpSchema.pm
 lib/Swagger/Schema.pm
+lib/Swagger/Schema/V3.pm
 t/02_parse.t
+t/03_parse_v3.t
+t/swagger-examples-v3/petstore.json
 t/swagger-examples/petstore-simple.json
 t/swagger-examples/petstore.json

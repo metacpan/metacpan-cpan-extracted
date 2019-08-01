@@ -70,3 +70,7 @@
 \.?appveyor.yml
 \.releaserc
 \.lwpcookies
+
+# Weird artifact files
+Changes\s\d
+MANIFEST\s\d

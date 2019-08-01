@@ -1,0 +1,22 @@
+---
+abstract: 'The SqlBatch distribution'
+author:
+  - 'Sascha Dibbern <sascha@dibbern.info>'
+build_requires:
+  DBD::RAM: 0.072
+  DBI: 1.642
+  SQL::Statement: 1.412
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SqlBatch
+requires:
+  JSON::Parse: 0.55
+  Text::CSV_XS: 0
+version: 1.001
+x_serialization_backend: 'YAML::Tiny version 1.51'

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3604
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +18,12 @@ name: Astro-PAL
 provides:
   Astro::PAL:
     file: lib/Astro/PAL.pm
-    version: 1.07
+    version: 1.08
 requires:
   Getopt::Long: 0
   Pod::Usage: 0
 resources:
   homepage: http://github.com/timj/perl-Astro-PAL/tree/master
-  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: git://github.com/timj/perl-Astro-PAL.git
-version: 1.07
+version: 1.08

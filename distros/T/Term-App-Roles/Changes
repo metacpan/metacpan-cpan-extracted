@@ -1,9 +1,14 @@
-0.02    2018-12-02 (PERLANCAR)
+0.030   2019-07-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix the use of Term::Size::chars().
+
+
+0.02    2018-12-02  Released-By: PERLANCAR
 
 	- Observe NO_COLOR (see https://no-color.org).
 
 
-0.01    2014-12-10 (PERLANCAR)
+0.01    2014-12-10  Released-By: PERLANCAR
 
         - First release, split from dist SHARYANTO-Roles and renamed module from
           SHARYANTO::Role::TermAttrs to Term::App::Role.

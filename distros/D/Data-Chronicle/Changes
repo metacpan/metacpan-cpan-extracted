@@ -1,5 +1,9 @@
 Revision history for Data-Chronicle
 
+0.20      2019-07-23 17:18:31+08:00 Asia/Manila
+        - Fix possible connection errors on mset() by pinging cache writer
+        - Enable testing via CircleCI
+
 0.19      2018-07-25 05:26:29+00:00 UTC
         Bug fix: Fixed compatibility for RedisDB API
 

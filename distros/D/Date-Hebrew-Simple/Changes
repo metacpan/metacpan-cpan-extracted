@@ -1,5 +1,8 @@
 Revision history for Date::Hebrew::Simple
 
+0.13  Tue Jul 30 15:15:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.12  Fri May 31 03:30:00 2019
       - Updated dependency on Date::Utils v0.26.
 

@@ -1,4 +1,21 @@
-1.150 2019-07-08
+1.152 2019-07-25
+================
+[Quiq::Digest]
+* Methode md5() erweitert
+
+[Quiq::Excel::Writer]
+* Doku bearbeitet
+
+[Quiq::GD::Font]
+* Test der Methode charWidth() erweitert
+
+[Quiq::Path]
+* Methode age() hinzugefügt
+
+[Quiq::Storable]
+* Methode memoize() um Parameter $duration erweitert
+
+1.151 2019-07-08
 ================
 [Quiq::Assert]
 * Option -sloppy mit Returnwert eingeführt

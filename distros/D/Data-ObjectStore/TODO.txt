@@ -1,3 +1,50 @@
+Write a program that examines the class instances and
+provides a map of class -> fields used for that class.
+
+
+garbage collecting previously used space in the database
+
+ - recycle or not to recycle
+ 
+     simpler is to never recycle ids.
+
+     people may use the IDs as keys.
+
+     this means that the ids keep going up at 96 bytes
+     per record.
+     The index occupies 96,000,000 bytes per million records.
+     Billion records? 100GB in indexing.
+
+     if recycling is not done, then that constrains
+     how database copying/compacting is done.
+
+ - to compact in place -
+      create a working index that has 2 fields per id
+           ( the id is the index offset by one so that the first entry
+            is id 1 )
+      the fields are 'must save' and 'has been checked'
+
+      the compacting has the following steps :
+
+        * the info node, object 1, is checked, then the first entry in
+            the working index is set to 1, 1. 
+
+        * the working index is scanned from top to bottom until it
+            finds an entry that is 1,0. It then checks that entry.
+            if it gets to the end and there is no 1,0, it is complete.
+
+ - to copy to slimmer database -
+      
+ 
+__________________________________________________________________
+
+upgrade store is a mess. 
+ - it should probably have a test to see if it is needed
+ - it probably should call recordstore's convert / upgrade
+    which should also have a needed test and maybe some
+    renaming. both should work together and have 
+    similar directory requirements.
+
 test for upgrade store
 cli to run upgrade store
 more tests for connect and unconnect

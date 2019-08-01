@@ -1,15 +1,20 @@
-0.006   2018-06-05 (PERLANCAR)
+0.007   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.006   2018-06-05  Released-By: PERLANCAR
 
 	- [Bugfix] Add missing prereq NetAddr::IP for testing [RT#125481].
 
 
-0.005   2018-06-05 (PERLANCAR)
+0.005   2018-06-05  Released-By: PERLANCAR
 
 	- [Bugfix] Depend on newer version of Data::Sah (0.891)
 	  [RT#125476].
 
 
-0.004   2018-06-04 (PERLANCAR)
+0.004   2018-06-04  Released-By: PERLANCAR
 
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
 	  version 3).
@@ -17,17 +22,17 @@
         - [test] Add some tests.
 
 
-0.003   2018-01-17 (PERLANCAR)
+0.003   2018-01-17  Released-By: PERLANCAR
 
         - Add schemas: net::hostname, net::port.
 
 
-0.002   2018-01-14 (PERLANCAR)
+0.002   2018-01-14  Released-By: PERLANCAR
 
         - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
           Perinci::Sub::XCompletion::* modules.
 
 
-0.001   2016-08-13 (PERLANCAR)
+0.001   2016-08-13  Released-By: PERLANCAR
 
 	- First, early release.

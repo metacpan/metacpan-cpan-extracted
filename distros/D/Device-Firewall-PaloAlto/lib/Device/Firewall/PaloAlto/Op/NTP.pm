@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::NTP;
-$Device::Firewall::PaloAlto::Op::NTP::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::Op::NTP::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
@@ -50,7 +50,7 @@ Device::Firewall::PaloAlto::Op::NTP - NTP synchronisation status of a Palo Alto 
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 

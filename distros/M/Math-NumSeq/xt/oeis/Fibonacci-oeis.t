@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,8 +19,9 @@
 
 use 5.004;
 use strict;
+use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 5;
+plan tests => 11;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -44,7 +45,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my @got;
      my $seq  = Math::NumSeq::Fibonacci->new;
-     for (my $n = Math::NumSeq::_to_bigint(0); @got < $count; $n++) {
+     for (my $n = Math::BigInt->new(0); @got < $count; $n++) {
        push @got, $seq->ith(3*$n-1);
      }
      return \@got;
@@ -56,7 +57,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my @got;
      my $seq  = Math::NumSeq::Fibonacci->new;
-     for (my $n = Math::NumSeq::_to_bigint(0); @got < $count; $n++) {
+     for (my $n = Math::BigInt->new(0); @got < $count; $n++) {
        push @got, $seq->ith(3*$n+1);
      }
      return \@got;
@@ -68,7 +69,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my @got;
      my $seq  = Math::NumSeq::Fibonacci->new;
-     for (my $n = Math::NumSeq::_to_bigint(0); @got < $count; $n++) {
+     for (my $n = Math::BigInt->new(0); @got < $count; $n++) {
        push @got, $seq->ith(3*$n);
      }
      return \@got;
@@ -83,15 +84,12 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $seq  = Math::NumSeq::Fibonacci->new;
      my @got;
-     for (my $i = 0; @got < $count; $i--) {
+     for (my $i = Math::BigInt->new(0); @got < $count; $i--) {
        push @got, $seq->ith($i);
      }
      return \@got;
    });
 
-# Test 1 got: "different pos=93 numbers
-#  got=12200160415121876738
-# want=12200160415121876738, and more diff" (xt/oeis/Fibonacci-oeis.t at line 49)
 
 #------------------------------------------------------------------------------
 # A087172 - next lower Fibonacci <= n
@@ -124,7 +122,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my @got;
      my $seq  = Math::NumSeq::Fibonacci->new;
-     for (my $n = Math::NumSeq::_to_bigint(1); @got < $count; $n++) {
+     for (my $n = Math::BigInt->new(1); @got < $count; $n++) {
        push @got, $seq->ith(2*$n+1) + $seq->ith(2*$n-1) - 1;
      }
      return \@got;
@@ -161,7 +159,7 @@ MyOEIS::compare_values
      my @got;
      my $seq  = Math::NumSeq::Fibonacci->new;
      $seq->next; # skip 0
-     my $lcm = Math::NumSeq::_to_bigint(1);
+     my $lcm = Math::BigInt->new(1);
      while (@got < $count) {
        my ($i, $value) = $seq->next;
        $lcm = lcm($lcm,$value);
@@ -205,6 +203,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A060384',
+   max_count => 200,     # full b-file a bit slow
    func => sub {
      my ($count) = @_;
      require Math::NumSeq::DigitLength;

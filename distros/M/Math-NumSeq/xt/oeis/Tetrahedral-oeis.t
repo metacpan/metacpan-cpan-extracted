@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,8 +19,9 @@
 
 use 5.004;
 use strict;
+use Math::BigInt;
 use Test;
-plan tests => 2;
+plan tests => 8;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -28,9 +29,6 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::NumSeq::Tetrahedral;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------
@@ -78,11 +76,11 @@ MyOEIS::compare_values
   (anum => 'A004161',
    func => sub {
      my ($count) = @_;
-     my $seq = Math::NumSeq::Tetrahedral->new (i_start => 1);
+     my $seq = Math::NumSeq::Tetrahedral->new;
      my @got;
      while (@got < $count) {
        my ($i,$value) = $seq->next;
-       push @got, reverse($value)+0;
+       push @got, scalar(reverse $value);
      }
      return \@got;
    });
@@ -167,7 +165,8 @@ MyOEIS::compare_values
   (anum => 'A140236',
    func => sub {
      my ($count) = @_;
-     my $seq = Math::NumSeq::Tetrahedral->new;
+     my $seq = Math::NumSeq::Tetrahedral->new
+       (i_start => Math::BigInt->new(0));
      my @got;
      while (@got < $count) {
        my ($i,$value) = $seq->next;

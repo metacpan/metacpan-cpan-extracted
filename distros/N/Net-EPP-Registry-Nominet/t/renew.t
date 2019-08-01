@@ -5,31 +5,27 @@
 #
 #  DESCRIPTION:  Test of renewals
 #
-#        FILES:  ---
-#         BUGS:  ---
-#        NOTES:  ---
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: renew.t,v 1.6 2015/08/21 16:11:42 pete Exp $
 #      CREATED:  04/02/13 17:15:33
-#     REVISION:  $Revision: 1.6 $
 #===============================================================================
 
 use strict;
 use warnings;
 
 use Test::More;
+use Test::Warn;
+use Time::Piece;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 10;
+	plan tests => 16;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
 
-use lib './lib';
 use Net::EPP::Registry::Nominet;
 
-my $epp = new_ok ('Net::EPP::Registry::Nominet', [ test => 1,
+my $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS}, debug =>
 	$ENV{DEBUG_TEST} || 0 ] );
 
@@ -42,6 +38,28 @@ BAIL_OUT ("Cannot login to EPP server") if
 		$Net::EPP::Registry::Nominet::Error;
 
 my $tag = lc $ENV{NOMTAG};
+my $newexpiry;
+
+# No/bad args
+warning_like {$epp->renew ()}
+	{carped => qr/^No argument provided/},
+	'No argument to renew';
+warning_like {$epp->renew (1)}
+	{carped => qr/^Argument to renew is not a hash reference/},
+	'Non-hashref argument to renew';
+warning_like {$epp->renew ({})}
+	{carped => qr/^Argument to renew has no 'name' field/},
+	'No name field in argument to renew';
+
+# Use a duff domain
+
+warnings_exist {$newexpiry = $epp->renew ({name => 'notarealdomain.uk'}) || $epp->get_reason}
+	[qr/Unable to get expiry date from registry for /], 'Bad domain warnings';
+is ($newexpiry, 'V096 Domain name is not registered to your tag', 'Non-existent domain not renewed');
+
+# Duff domain with feasible expiry
+$newexpiry = $epp->renew ({name => 'notarealdomain.uk', cur_exp_date => '2027-09-01'}) || $epp->get_reason;
+is ($newexpiry, 'V096 Domain name is not registered to your tag', 'Non-existent domain with plausible expiry not renewed');
 
 # Register unique dom just to renew and unrenew.
 
@@ -53,7 +71,6 @@ my $registrant = {
 		'trad-name'	=>	'Domsplosion',
 		'type'		=>	'LTD',
 		'co-no'		=>	'12345678',
-		'opt-out'	=>	'n',
 		'postalInfo'=>	{ loc => {
 			'name'		=>	'Big Red Hippopotamus',
 			'org'		=>	'Acme Domain Company',
@@ -73,18 +90,35 @@ my $domain = {
 	period	=>	"2",
 	registrant	=>	$registrant,
 	nameservers	=>	{
-		'nsname0'	=>	"ns1.demetrius-$tag.co.uk",
-		'nsname1'	=>	"ns1.ariel-$tag.co.uk"
+		'nsname0'	=>	"ns1.demetrius-$tag.co.uk"
 	}
 };
 my ($expiry, $reason, $regid) = $epp->register ($domain);
 unless ($expiry) { diag $reason; }
-#else { diag $newdom; }
 
-my $renewit = {name => "duncan-$tag.co.uk"};
-my $newexpiry = $epp->renew ($renewit) || $epp->get_reason;
-
-like ($newexpiry, qr/^\d\d\d\d-|^V128 /, 'Plain renewal');
+my $renewit = {name => "ganymede-$tag.co.uk"};
+SKIP: {
+	#skip 'Do not renew ganymede', 1;
+	$newexpiry = $epp->renew ($renewit) || $epp->get_reason;
+	# The testbed intermittently explodes on this, returns 2500 and closes
+	# the connection. This is a server-side bug so we just work around it.
+	# Nominet were informed on 10-DEC-2018.
+	BAIL_OUT ("undef renewing $renewit->{name}")
+		unless (defined ($newexpiry) || $epp->hello);
+	if ($newexpiry =~ /^V120 Invalid date '([0-9-]+)'/) {
+		# DST Bug at Nominet's end. So, grab the date and increment it.
+		if ($Test::More::VERSION < 0.81_01) {
+			diag "Encountered Nominet's DST problem on ote";
+		} else {
+			note "Encountered Nominet's DST problem on ote";
+		}
+		my $exp = Time::Piece->strptime ($1, '%Y-%m-%d') + 86400;
+		$renewit->{cur_exp_date} = $exp->date;
+		$newexpiry = $epp->renew ($renewit) || $epp->get_reason; 
+	}
+	
+	like ($newexpiry, qr/^\d\d\d\d-|^V128 /, 'Plain renewal');
+}
 
 $renewit = {name => "horatio-$tag.co.uk", period => 10};
 $newexpiry = $epp->renew ($renewit) ||
@@ -96,29 +130,37 @@ $renewit = {name => $newdom, period => 5};
 $newexpiry = $epp->renew ($renewit);
 like ($newexpiry, qr/^\d\d\d\d-\d\d-\d\d/, 'Renewal success');
 
-# Unrenew here
-my $datesref = undef;
-my $dom = "lysander-$tag.co.uk";
+SKIP: {
+	#skip 'unrenew is last to go', 4;
+	# Unrenew here
+	my $datesref = undef;
+	my $dom = "lysander-$tag.co.uk";
 
-$datesref = $epp->unrenew ($dom, "duncan-$tag.co.uk");
-$reason = $epp->get_reason;
-like ($datesref->{$dom} || $reason, qr/^\d\d\d\d-|V270 /, 'Multiple domain unrenewal') or warn "Reason: ". $epp->get_reason . "\n";
+	# Since December 2018 there has been a bug with the Nominet testbed
+	# whereby unrenewal failures all seem to return V209 regardless.
+	# If/when this is fixed, reset $nombug to '';
+	my $nombug = '|^V209 ';
 
-$datesref = $epp->unrenew ("macbeth-$tag.plc.uk");
-$reason = $epp->get_reason;
-like ($datesref->{$dom} || $reason, qr/^V265 /, 'Single domain unrenewal') or warn "Reason: ". $epp->get_reason . "\n";
+	$datesref = $epp->unrenew ($dom, "ganymede-$tag.co.uk");
+	$reason = $epp->get_reason;
+	like ($datesref->{$dom} || $reason, qr/^\d\d\d\d-|V270 $nombug/, 'Multiple domain unrenewal') or diag "Reason: ". $epp->get_reason . "\n";
 
-$datesref = $epp->unrenew ("wotnodomain-$tag.me.uk");
-$reason = $epp->get_reason;
-like ($datesref->{$dom} || $reason, qr/^V208 /, 'Non-existent domain unrenewal') or warn "Reason: ". $epp->get_reason . "\n";
+	$datesref = $epp->unrenew ("macbeth-$tag.plc.uk");
+	$reason = $epp->get_reason;
+	like ($datesref->{$dom} || $reason, qr/^V265 $nombug/, 'Single domain unrenewal') or diag "Reason: ". $epp->get_reason . "\n";
 
-# Even though we've registered and renewed this successfully, it cannot
-# be unrenewed. Nominet's systems merge the registration and renewal
-# behind the scenes so that as far as they are concerned it hasn't been
-# renewed at all.
-$datesref = $epp->unrenew ($newdom);
-$reason = $epp->get_reason;
-like ($reason, qr/^V265 /, 'Cannot unrenew a non-renewed domain');
+	$datesref = $epp->unrenew ("wotnodomain-$tag.me.uk");
+	$reason = $epp->get_reason;
+	like ($datesref->{$dom} || $reason, qr/^V208 /, 'Non-existent domain unrenewal') or diag "Reason: ". $epp->get_reason . "\n";
+
+	# Even though we've registered and renewed this successfully, it cannot
+	# be unrenewed. Nominet's systems merge the registration and renewal
+	# behind the scenes so that as far as they are concerned it hasn't been
+	# renewed at all.
+	$datesref = $epp->unrenew ($newdom);
+	$reason = $epp->get_reason;
+	like ($reason, qr/^V265 $nombug/, 'Cannot unrenew a non-renewed domain');
+}
 
 ok ($epp->logout(), 'Logout successful');
 

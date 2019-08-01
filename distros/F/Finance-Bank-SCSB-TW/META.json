@@ -1,0 +1,60 @@
+{
+   "abstract" : "Check Taiawn SCSB bank info",
+   "author" : [
+      "Kang-min Liu E<lt>gugod@gugod.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.026",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Finance-Bank-SCSB-TW",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.026"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Selector::XPath" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "List::MoreUtils" : "0",
+            "Module::Build::Tiny" : "0",
+            "UNIVERSAL::isa" : "0",
+            "WWW::Mechanize" : "0",
+            "WWW::Mechanize::Sleepy" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Finance::Bank::SCSB::TW" : {
+         "file" : "lib/Finance/Bank/SCSB/TW.pm",
+         "version" : "0.14"
+      },
+      "Finance::Bank::SCSB::TW::CurrencyExchangeRateCollection" : {
+         "file" : "lib/Finance/Bank/SCSB/TW/CurrencyExchangeRateCollection.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gugod/Finance-Bank-SCSB-TW.git",
+         "web" : "https://github.com/gugod/Finance-Bank-SCSB-TW"
+      }
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : "1"
+}

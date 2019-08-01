@@ -5,14 +5,9 @@
 #
 #  DESCRIPTION:  Test of domain registration
 #
-#        FILES:  ---
-#         BUGS:  ---
-#        NOTES:  ---
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: register.t,v 1.4 2014/10/31 17:20:51 pete Exp $
 #      CREATED:  06/02/13 16:30:11
-#     REVISION:  $Revision: 1.4 $
 #===============================================================================
 
 use strict;
@@ -21,15 +16,14 @@ use warnings;
 use Test::More;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 25;
+	plan tests => 33;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
 
-use lib './lib';
 use Net::EPP::Registry::Nominet;
 
-my $epp = new_ok ('Net::EPP::Registry::Nominet', [ test => 1,
+my $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS}, debug =>
 	$ENV{DEBUG_TEST} || 0 ] );
 
@@ -44,13 +38,35 @@ BAIL_OUT ("Cannot login to EPP server") if
 my $tag = lc $ENV{NOMTAG};
 my $now = time ();
 warn "stamp = $now" if $ENV{DEBUG_TEST};
+
+# We need to create our nameservers in the OTE before we can use them to
+# register other domains.
+#
+# Tests to register nameservers #####
+my $nameserver = {
+	name	=>	"ns$now-$tag.foo.com",
+	addrs	=>	[
+		{ ip	=>	'99.199.99.199', version	=>	'v4' },
+	],
+};
+$epp->create_host ($nameserver);
+is ($epp->get_code, 1000, 'Nameserver registration under .com');
+
+$epp->create_host ($nameserver);
+is ($epp->get_code, 2302, 'Duplicate nameserver registration under .com');
+
+$nameserver->{name} = "ns$now-$tag.foo.org";
+$epp->create_host ($nameserver);
+is ($epp->get_code, 1000, 'Nameserver registration under .org');
+
+
+
 my $registrant = {
 		id			=>	"reg-$now",
 		name		=>	'Acme Domain Company',
 		'trad-name'	=>	'Domsplosion',
 		'type'		=>	'LTD',
 		'co-no'		=>	'12345678',
-		'opt-out'	=>	'n',
 		'postalInfo'=>	{ loc => {
 			'name'		=>	'Quasi Modoe',
 			'org'		=>	'Acme Domain Company',
@@ -70,8 +86,8 @@ my $domain = {
 	period	=>	"5",
 	registrant	=>	$registrant,
 	nameservers	=>	{
-		'nsname0'	=>	"ns1.demetrius-$tag.co.uk",
-		'nsname1'	=>	"ns1.ariel-$tag.co.uk"
+		'nsname0'	=>	"ns$now-$tag.foo.com",
+		'nsname1'	=>	"ns$now-$tag.foo.org"
 	},
 	secDNS	=>	[
 		{
@@ -125,12 +141,6 @@ for my $sld (qw/net.uk ltd.uk plc.uk/) {
 		or warn $epp->get_reason ();
 }
 
-$domain->{name} = "duncan-$tag.uk";
-($res) = $epp->register ($domain);
-is ($epp->get_code, 2201, ".uk domain registration attempt without rights")
-	or warn $epp->get_reason ();
-
-
 # Tests to register contacts #####
 # Probably not really needed, but here for completeness ...
 $registrant->{id} = "reg-b-$now";
@@ -143,8 +153,6 @@ is ($epp->get_code, 1000,
 	'Standalone contact creation with system-generated ID');
 
 $registrant->{id} = "reg-c-$now";
-#$registrant->{postalInfo}->{int} = $registrant->{postalInfo}->{loc};
-#$registrant->{postalInfo}->{int}->{addr}->{city} = "Gondor";
 $registrant->{'postalInfo'}->{int} = {
 			'name'		=>	'Testy McTest',
 			'org'		=>	'Acme Domain Company',
@@ -158,29 +166,37 @@ $registrant->{'postalInfo'}->{int} = {
 		},
 delete $registrant->{'postalInfo'}->{loc};
 $res = $epp->create_contact ($registrant);
-is ($epp->get_code, 1000, 'Standalone contact creation with int and loc info');
+is ($epp->get_code, 1000, 'Standalone contact creation with int info');
 
-# Tests to register nameservers #####
-my $nameserver = {
-	name	=>	"ns$now.foo.com",
-	addrs	=>	[
-		{ ip	=>	'99.199.99.199', version	=>	'v4' },
-	],
-};
-$epp->create_host ($nameserver);
-is ($epp->get_code, 1000, 'Nameserver registration under .com');
+delete $registrant->{id};
+$registrant->{disclose}->{addr} = 1;
+$res = $epp->create_contact ($registrant);
+is ($epp->get_code, 1000, 'Contact creation with address disclosure');
+$res = $epp->contact_info ($registrant->{id});
+is ($res->{disclose}->{addr}, 1, 'Address disclosure flag set');
+is ($res->{disclose}->{org}, undef, 'Org disclosure flag not set');
 
-$epp->create_host ($nameserver);
-is ($epp->get_code, 2302, 'Duplicate nameserver registration under .com');
+delete $registrant->{id};
+$registrant->{disclose}->{org} = 1;
+$registrant->{disclose}->{addr} = 0;
+$res = $epp->create_contact ($registrant);
+is ($epp->get_code, 1000, 'Contact creation with org disclosure');
+$res = $epp->contact_info ($registrant->{id});
+is ($res->{disclose}->{addr}, undef, 'Address disclosure flag not set');
+is ($res->{disclose}->{org}, 1, 'Org disclosure flag set');
 
-$nameserver->{name} = "ns$now.banquo-$tag.co.uk";
-$epp->create_host ($nameserver);
-is ($epp->get_code, 1000, 'Nameserver registration under .uk');
+delete $registrant->{id};
+$registrant->{disclose}->{addr} = 1;
+$res = $epp->create_contact ($registrant);
+is ($epp->get_code, 1000, 'Contact creation with org and address disclosure');
+$res = $epp->contact_info ($registrant->{id});
+is ($res->{disclose}->{addr}, 1, 'Address disclosure flag set');
+is ($res->{disclose}->{org}, 1, 'Org disclosure flag set');
 
 $domain->{name} = "$now-c-$tag.co.uk";
 $domain->{nameservers} = {
-	nsname0	=>	"ns$now.foo.com",
-	nsname1 =>	"ns$now.banquo-$tag.co.uk"
+	nsname0	=>	"ns$now-$tag.foo.com",
+	nsname1 =>	"ns$now-$tag.foo.org"
 };
 ($res) = $epp->register ($domain);
 is ($epp->get_code, 1000, 'Domain registration with just-created nameservers');
@@ -195,8 +211,8 @@ isnt ($epp->get_code, 1000, 'Domain registration with non-existent nameservers')
 
 $domain->{nameservers} = {};
 ($res) = $epp->register ($domain);
-is ($epp->get_code, 1000, 'Domain registration with no nameservers') or
-warn $epp->get_reason;
+is ($epp->get_code, 1000, 'Domain registration with no nameservers');
+
 
 ok ($epp->logout(), 'Logout successful');
 

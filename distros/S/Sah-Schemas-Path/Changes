@@ -1,25 +1,52 @@
-0.005   2018-06-04 (PERLANCAR)
+0.008   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version of coerce rule module(s) 3->4.
+
+
+0.007   2019-07-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Base {file,dir,path}name::unix on str instead of on
+	  {file,dir,path}name because otherwise we have to provide
+	  {file,dir,path}name::str_strip_slashes coercion rule names.
+
+
+0.006   2019-07-12  Released-By: PERLANCAR; Urgency: high
+
+        - UPDATE: this release is broken due to non-existing coercion rules. See
+          0.007.
+
+	- Coerce rule: rename str_strip_trailing_slash to
+	  str_strip_slashes, also strip extra slashes like foo//bar ->
+	  foo/bar. And (bugfix) do not strip '/' to ''.
+
+	- Add schemas: {file,dir,path}name::unix, move strip_slashes coercion
+	  rule to these schemas.
+
+	- Add some tests.
+
+
+0.005   2018-06-04  Released-By: PERLANCAR
 
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
 	  version 3).
 
 
-0.004   2018-01-14 (PERLANCAR)
+0.004   2018-01-14  Released-By: PERLANCAR
 
         - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
           Perinci::Sub::XCompletion::* modules.
 
 
-0.003   2016-07-22 (PERLANCAR)
+0.003   2016-07-22  Released-By: PERLANCAR
 
 	- Add x.completion attribute.
 
 
-0.002   2016-07-22 (PERLANCAR)
+0.002   2016-07-22  Released-By: PERLANCAR
 
 	- [build] Rebuild to generate Sah::SchemaR::* modules.
 
 
-0.001   2016-07-20 (PERLANCAR)
+0.001   2016-07-20  Released-By: PERLANCAR
 
 	- First release.

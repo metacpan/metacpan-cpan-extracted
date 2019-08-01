@@ -5,7 +5,7 @@ use Types::Standard qw(Bool Int Object Str);
 
 use WebService::Mattermost::V4::API;
 
-our $VERSION = 0.006;
+our $VERSION = 0.100;
 
 with 'WebService::Mattermost::Role::Logger';
 

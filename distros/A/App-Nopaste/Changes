@@ -1,5 +1,10 @@
 Revision history for App-Nopaste
 
+1.013   2019-07-23 02:00:06Z
+        - amended instructions in App::Nopaste::Service::Gist regarding
+          creating a gist authorization token
+        - --copy now works with Control-V on X windows (PR#17, Shlomi Fish)
+
 1.012   2018-07-08 03:56:39Z
         - add GitLab service
 

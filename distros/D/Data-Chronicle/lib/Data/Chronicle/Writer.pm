@@ -14,7 +14,7 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =cut
 
-our $VERSION = '0.19';    ## VERSION
+our $VERSION = '0.20';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -177,6 +177,9 @@ sub mset {
     $self->_validate_rec_date($rec_date);
 
     my $writer = $self->cache_writer;
+
+    # ping the writter to make sure the connection is on
+    $writer->ping();
 
     # publish & set in transaction
     $writer->multi;

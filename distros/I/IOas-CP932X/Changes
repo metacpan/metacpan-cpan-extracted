@@ -1,0 +1,9 @@
+Revision history for this software.
+
+0.02  2019-08-01 00:00:00
+  - add PREREQ_PM of Makefile.PL
+  - created by INABA Hitoshi
+
+0.01  2019-07-31 00:00:00
+  - original version
+  - created by INABA Hitoshi

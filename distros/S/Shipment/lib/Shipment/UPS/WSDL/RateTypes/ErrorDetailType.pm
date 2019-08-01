@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::ErrorDetailType;
-$Shipment::UPS::WSDL::RateTypes::ErrorDetailType::VERSION = '3.01';
+$Shipment::UPS::WSDL::RateTypes::ErrorDetailType::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -83,7 +83,7 @@ Shipment::UPS::WSDL::RateTypes::ErrorDetailType
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

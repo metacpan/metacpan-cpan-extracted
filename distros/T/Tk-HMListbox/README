@@ -5,8 +5,8 @@ NAME
 AUTHOR
     Jim Turner
 
-    (c) 2015, Jim Turner under the same license that Perl 5 itself is. All
-    rights reserved.
+    (c) 2015-2019, Jim Turner under the same license that Perl 5 itself is.
+    All rights reserved.
 
     Tk::SMListbox author: me
 
@@ -141,6 +141,19 @@ WIDGET SPECIFIC OPTIONS
         Specify a different foreground color for the top ("header") row.
         Default: -foreground or parent window's foreground.
 
+    -ipadx => *number*
+        Specify horizontal padding style in pixels around the image for the
+        rows in the listbox which are type *image* or *imagetext*. Default:
+        0
+
+    -ipady => *number*
+        Specify vertical padding style in pixels around the image for the
+        rows in the listbox which are type *image* or *imagetext*. This can
+        be useful in correcting vertical misallignment between the columns
+        when some columns contain images and others are text only! NOTE:
+        This changes the height of the affected rows. Default: 1 (and
+        setting to 0 is the same as 1).
+
     -moveable => *boolean*
         A value of 1 indicates that it is okay for the user to move the
         columns by dragging the column headers. 0 disables this function.
@@ -191,6 +204,18 @@ WIDGET SPECIFIC OPTIONS
 
         Note that you can also specify -sortable on a column by column
         basis. See *COLUMNS* below.
+
+    -tpadx => *number*
+        Specify horizontal padding style in pixels around the text for the
+        rows in the listbox which are type *text*. Default: 0
+
+    -tpady => *number*
+        Specify vertical padding style in pixels around the text for the
+        rows in the listbox which are type *text*. This can be useful in
+        correcting vertical misallignment between the columns when some
+        columns contain images and others are text only! NOTE: This changes
+        the height of the affected rows. Default (seems to be): 2 (and
+        setting to 0 is the same as 2).
 
 WIDGET SPECIFIC, COLUMN-SPECIFIC OPTIONS
     -comparecmd => *callback*

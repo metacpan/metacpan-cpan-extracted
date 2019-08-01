@@ -1,7 +1,7 @@
 package Complete::Bash;
 
-our $DATE = '2019-06-28'; # DATE
-our $VERSION = '0.325'; # VERSION
+our $DATE = '2019-07-30'; # DATE
+our $VERSION = '0.328'; # VERSION
 
 use 5.010001;
 use strict;
@@ -400,7 +400,7 @@ sub join_wordbreak_words {
 sub _terminal_width {
     # XXX need to cache?
     if (eval { require Term::Size; 1 }) {
-        my ($cols, undef) = Term::Size::chars();
+        my ($cols, undef) = Term::Size::chars(*STDOUT{IO});
         $cols;
     } else {
         $ENV{COLUMNS} // 80;
@@ -547,9 +547,25 @@ sub format_completion {
     my $esc_mode = $hcomp->{esc_mode} // $hcomp->{escmode} // 'default';
     my $path_sep = $hcomp->{path_sep};
 
-    my @res;
+    # we keep the original words (before formatted with summaries) when we want
+    # to use fzf instead of passing to bash directly
+    my @words;
     my @summaries;
+    my @res;
     my $has_summary;
+
+    my $code_return_message = sub {
+        # display a message instead of list of words. we send " " (ASCII space)
+        # which bash does not display, so we can display a line of message while
+        # the user does not get the message as the completion. I've also tried
+        # \000 to \037 instead of space (\040) but nothing works better.
+        my $msg = shift;
+        if ($msg =~ /\A /) {
+            $msg =~ s/\A +//;
+            $msg = " (empty message)" unless length $msg;
+        }
+        return (sprintf("%-"._terminal_width()."s", $msg), " ");
+    };
 
   FORMAT_MESSAGE:
     # display a message instead of list of words. we send " " (ASCII space)
@@ -557,12 +573,7 @@ sub format_completion {
     # user does not get the message as the completion. I've also tried \000 to
     # \037 instead of space (\040) but nothing works better.
     if (defined $hcomp->{message}) {
-        my $msg = $hcomp->{message};
-        if ($msg =~ /\A /) {
-            $msg =~ s/\A +//;
-            $msg = " (empty message)" unless length $msg;
-        }
-        @res = (sprintf("%-"._terminal_width()."s", $msg), " ");
+        @res = $code_return_message->($hcomp->{message});
         goto RETURN_RES;
     }
 
@@ -617,7 +628,7 @@ sub format_completion {
             # default
             $word =~ s!([^A-Za-z0-9,+._/:~-])!\\$1!g;
         }
-        push @res, $word;
+        push @words, $word;
         push @summaries, $summary;
         $has_summary = 1 if length $summary;
     }
@@ -629,30 +640,17 @@ sub format_completion {
 
     #warn "terminal_width=$terminal_width, column_width=".($column_width // 'undef')."\n";
 
-  SORT: {
-        # we pre-sort because we want to draw summary lines every N row
-        last unless $summary_align eq 'right';
-        my @orders = sort {
-            # XXX how does bash sort completion entries, exactly? this is still
-            # not right. bash puts -\? between --debug and --format.
-            my $e1 = lc $res[$a]; $e1 =~ s/[^A-Za-z0-9]+//;
-            my $e2 = lc $res[$b]; $e2 =~ s/[^A-Za-z0-9]+//;
-            $e1 cmp $e2;
-        } 0..$#res;
-        @res = map { $res[$_] } @orders;
-        @summaries = map { $summaries[$_] } @orders;
-    }
-
-  INSERT_SUMMARIES: {
-        last if @res <= 1;
+  FORMAT_SUMMARIES: {
+        @res = @words;
+        last if @words <= 1;
         last unless $has_summary;
         last unless $opts->{show_summaries} //
             $ENV{COMPLETE_BASH_SHOW_SUMMARIES} // 1;
         my $max_entry_width   = 8;
         my $max_summ_width = 0;
-        for (0..$#res) {
-            $max_entry_width = length $res[$_]
-                if $max_entry_width < length $res[$_];
+        for (0..$#words) {
+            $max_entry_width = length $words[$_]
+                if $max_entry_width < length $words[$_];
             $max_summ_width = length $summaries[$_]
                 if $max_summ_width < length $summaries[$_];
         }
@@ -671,22 +669,16 @@ sub format_completion {
             #warn "max_columns=$max_columns, column_width=$column_width, max_summ_width=$max_summ_width\n";
         }
 
-        my $line_every = $ENV{COMPLETE_BASH_SUMMARY_LINE_EVERY} // 4;
-        for (0..$#res) {
+        for (0..$#words) {
             my $summary = $summaries[$_];
-            if ($max_columns == 1 &&
-                    $summary_align eq 'right' && ($_+1) % $line_every == 0) {
-                $summary = ("_" x ($max_summ_width - length $summary)) .
-                    $summary;
-            }
             if (length $summary) {
                 $res[$_] = sprintf(
                     "%-${max_entry_width}s |%".
                         ($summary_align eq 'right' ? $max_summ_width : '')."s",
-                    $res[$_], $summary);
+                    $words[$_], $summary);
             }
         }
-    } # INSERT_SUMMARIES
+    } # FORMAT_SUMMARIES
 
   MAX_COLUMNS: {
         last unless $max_columns > 0;
@@ -700,7 +692,47 @@ sub format_completion {
         }
     }
 
+  PASS_TO_FZF: {
+        last unless $ENV{COMPLETE_BASH_FZF};
+        my $items = $ENV{COMPLETE_BASH_FZF_ITEMS} // 100;
+        last unless @words >= $items;
+
+        require File::Which;
+        unless (File::Which::which("fzf")) {
+            @res = $code_return_message->("Cannot find fzf to filter ".
+                                              scalar(@words)." items");
+            goto RETURN_RES;
+        }
+
+        require IPC::Open2;
+        local *CHLD_OUT;
+        local *CHLD_IN;
+        my $pid = IPC::Open2::open2(
+            \*CHLD_OUT, \*CHLD_IN, "fzf", "-m", "-d:", "--with-nth=2..")
+            or do {
+                @res = $code_return_message->("Cannot open fzf to filter ".
+                                                  scalar(@words)." items");
+                goto RETURN_RES;
+            };
+
+        print CHLD_IN map { "$_:$res[$_]\n" } 0..$#res;
+        close CHLD_IN;
+
+        my @res_words;
+        while (<CHLD_OUT>) {
+            my ($index) = /\A([0-9]+)\:/ or next;
+            push @res_words, $words[$index];
+        }
+        if (@res_words) {
+            @res = join(" ", @res_words);
+        } else {
+            @res = ();
+        }
+        waitpid($pid, 0);
+    }
+
   RETURN_RES:
+    #use Data::Dump; warn Data::Dump::dump(\@res);
     if ($as eq 'array') {
         return \@res;
     } else {
@@ -723,7 +755,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.325 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-06-28.
+This document describes version 0.328 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-07-30.
 
 =head1 DESCRIPTION
 
@@ -1120,6 +1152,19 @@ Return value:  (any)
 
 =head1 ENVIRONMENT
 
+=head2 COMPLETE_BASH_FZF
+
+Bool. Whether to pass large completion answer to fzf instead of directly passing
+it to bash and letting bash page it with a simpler more-like internal pager. By
+default, large is defined as having at least 100 items (same bash's
+C<completion-query-items> setting). This can be configured via
+L</COMPLETE_BASH_FZF_ITEMS>.
+
+=head2 COMPLETE_BASH_FZF_ITEMS
+
+Uint. Default 100. The minimum number of items to trigger passing completion
+answer to fzf. See also: L</COMPLETE_BASH_FZF>.
+
 =head2 COMPLETE_BASH_MAX_COLUMNS
 
 Uint.
@@ -1155,26 +1200,6 @@ B<fish> shell:
  --baz                        Summary about the baz option
  --foo                        Summary about the foo option
  --schapen                Summary about the schapen option
-
-To help match the option and its corresponding summary visually, by default a
-line of underscores is drawn for every 5 lines (configurable via
-L</COMPLETE_BASH_SUMMARY_LINE_EVERY>.
-
- --bar                        Summary about the bar option
- --baz                        Summary about the baz option
- --foo                        Summary about the foo option
- --foobar   _______________Summary about the foobar option
- --lam                        Summary about the lam option
- --qux
- --quux                                    Alias for --qux
- --schapen  ______________Summary about the schapen option
-
-=head2 COMPLETE_BASH_SUMMARY_LINE_EVERY
-
-Uint. Default: 4.
-
-Relevant only when L</COMPLETE_BASH_SUMMARY_ALIGN> is set to C<right> (see its
-documentation for more detail).
 
 =head2 COMPLETE_BASH_TRACE
 

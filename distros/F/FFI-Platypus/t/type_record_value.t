@@ -4,8 +4,11 @@ use Test::More;
 use FFI::Platypus;
 use FFI::CheckLib qw( find_lib );
 use FFI::Platypus::Memory qw( malloc free );
+use FFI::Platypus::ShareConfig;
 
 my $libtest = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
+
+my $return_ok = FFI::Platypus::ShareConfig->get('probe')->{recordvalue};
 
 {
   package
@@ -24,7 +27,6 @@ subtest 'is a reference' => sub {
   $ffi->type("record(FooRecord)" => 'foo_record_t');
   my $get_name  = $ffi->function( foo_value_get_name    => [ 'foo_record_t' ] => 'string' );
   my $get_value = $ffi->function( foo_value_get_value   => [ 'foo_record_t' ] => 'sint32' );
-  #my $create    = $ffi->function( foo_value_create      => [ 'string', 'sint32' ] => 'foo_record_t' ); # todo
 
   subtest 'argument' => sub {
 
@@ -54,6 +56,43 @@ subtest 'is a reference' => sub {
       is $get_value->call($rv), 42;
 
     };
+
+  };
+
+  subtest 'return value' => sub {
+
+    plan skip_all => 'test requires working return records-by-value'
+      unless $return_ok;
+
+    subtest 'function object' => sub {
+
+      my $create    = $ffi->function( foo_value_create      => [ 'string', 'sint32' ] => 'foo_record_t' );
+
+      my $rv = $create->call("laters", 47);
+      is $rv->name,  "laters\0\0\0\0\0\0\0\0\0\0";
+      is $rv->value, 47;
+    };
+
+    subtest 'attach' => sub {
+
+      my $create = $ffi->function( foo_value_create      => [ 'string', 'sint32' ] => 'foo_record_t' )->sub_ref;
+
+      my $rv = $create->("laters", 47);
+      is $rv->name,  "laters\0\0\0\0\0\0\0\0\0\0";
+      is $rv->value, 47;
+
+    };
+
+    subtest 'attach' => sub {
+
+      $ffi->attach( foo_value_create      => [ 'string', 'sint32' ] => 'foo_record_t' );
+
+      my $rv = foo_value_create("laters", 47);
+      is $rv->name,  "laters\0\0\0\0\0\0\0\0\0\0";
+      is $rv->value, 47;
+
+    };
+
   };
 
 };

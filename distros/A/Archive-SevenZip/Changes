@@ -1,3 +1,17 @@
+0.11 2019-07-30
+    * Properly respect $ENV{PERL_ARCHIVE_SEVENZIP_BIN} and do not search
+      the path anymore if it is set.
+
+0.10 2019-07-29
+    * Fix "undefined" warning, caused by using a match in list context in a
+      hash
+    * Add Archive::7zip as alias to Archive::SevenZip. This closes RT #113549
+
+0.09 2019-07-28
+    * Don't add quotes to our parameters to system() unless the OS
+      really needs them.
+      This should fix invocations with whitespace on unixish OSes.
+
 0.08 2018-10-28
     * Introduce PERL_ARCHIVE_SEVENZIP_BIN environment variable
 

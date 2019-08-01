@@ -1,5 +1,12 @@
 Revision history for Log-Dispatchouli
 
+2.019     2019-07-27 16:13:30-04:00 America/New_York
+        - fix an initialization ordering bug for loggers using stdio
+
+2.018     2019-07-26 18:36:56-04:00 America/New_York
+        - add enable_stdout and enable_stderr to, uh, enable stdout and enable
+          stderr (after initial construction)
+
 2.017     2019-03-12 21:10:26-04:00 America/New_York
         - syslog_socket can now be supplied to replace the native socket for
           Sys::Syslog (thanks, Jon Stuart!)

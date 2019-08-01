@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-11-08'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-07-27'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,6 +24,7 @@ Perinci::CmdLine::github::cmd->new(
         'list-repos'  => {url => "${prefix}list_repos"},
         'create-repo' => {url => "${prefix}create_repo"},
         'delete-repo' => {url => "${prefix}delete_repo"},
+        'rename-repo' => {url => "${prefix}rename_repo"},
     },
 )->run;
 
@@ -42,7 +43,7 @@ github-cmd - Yet another github CLI
 
 =head1 VERSION
 
-This document describes version 0.005 of github-cmd (from Perl distribution App-github-cmd), released on 2018-11-08.
+This document describes version 0.007 of github-cmd (from Perl distribution App-github-cmd), released on 2019-07-27.
 
 =head1 SYNOPSIS
 
@@ -81,6 +82,10 @@ configuration.
 
  % github-cmd create-repo foo
 
+ % github-cmd delete-repo foo
+
+ % github-cmd rename-repo foo bar
+
 =head1 DESCRIPTION
 
 B<EARLY RELEASE. More subcommands coming soon.>
@@ -108,6 +113,10 @@ Get information about a user.
 
 List user's repositories.
 
+=head2 B<rename-repo>
+
+Rename a repository.
+
 =head2 B<repo-exists>
 
 Check whether a repository exists.
@@ -122,7 +131,7 @@ C<*> marks required options.
 
 =item B<--access-token>=I<s>
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>
 
 Set path to configuration file.
 
@@ -223,6 +232,16 @@ Display program's version and exit.
 
 =back
 
+=head2 Options for subcommand delete-repo
+
+=over
+
+=item B<--repo>=I<s>*
+
+=item B<--user>=I<s>
+
+=back
+
 =head2 Options for subcommand get-repo
 
 =over
@@ -252,6 +271,18 @@ Display program's version and exit.
 Default value:
 
  0
+
+=back
+
+=head2 Options for subcommand rename-repo
+
+=over
+
+=item B<--new-name>=I<s>*
+
+=item B<--repo>=I<s>*
+
+=item B<--user>=I<s>
 
 =back
 
@@ -336,6 +367,8 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand delete-repo
 
+ repo (see --repo)
+ user (see --user)
 
 =head2 Configuration for subcommand get-repo
 
@@ -351,6 +384,12 @@ List of available configuration parameters:
  detail (see --detail)
  start (see --start)
 
+=head2 Configuration for subcommand rename-repo
+
+ new_name (see --new-name)
+ repo (see --repo)
+ user (see --user)
+
 =head2 Configuration for subcommand repo-exists
 
  repo (see --repo)
@@ -358,7 +397,7 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 JSWNCCFYPZ_OPT => str
+=head2 A1F9JCEH02_OPT => str
 
 Specify additional command-line options.
 
@@ -397,7 +436,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

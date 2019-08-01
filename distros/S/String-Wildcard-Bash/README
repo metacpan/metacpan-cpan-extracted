@@ -1,59 +1,132 @@
-SYNOPSIS
+NAME
+    String::Wildcard::Bash - Bash wildcard string routines
 
+VERSION
+    This document describes version 0.040 of String::Wildcard::Bash (from
+    Perl distribution String-Wildcard-Bash), released on 2019-07-25.
+
+SYNOPSIS
         use String::Wildcard::Bash qw(
             $RE_WILDCARD_BASH
             contains_wildcard
             convert_wildcard_to_sql
+            convert_wildcard_to_re
         );
-    
+
         say 1 if contains_wildcard(""));      # -> 0
         say 1 if contains_wildcard("ab*"));   # -> 1
         say 1 if contains_wildcard("ab\\*")); # -> 0
-    
+
         say convert_wildcard_to_sql("foo*");  # -> "foo%"
 
+        say convert_wildcard_to_re("foo*");   # -> "foo.*"
+
 DESCRIPTION
-
+VARIABLES
+  $RE_WILDCARD_BASH
 FUNCTIONS
-
- contains_wildcard($str) => bool
-
-    Return true if $str contains wildcard pattern. Wildcard patterns
-    include * (meaning zero or more characters), ? (exactly one character),
-    [...] (character class), {...,} (brace expansion). Can handle
-    escaped/backslash (e.g. foo\* does not contain wildcard, it's foo
-    followed by a literal asterisk *).
+  contains_wildcard($str) => bool
+    Return true if $str contains wildcard pattern. Wildcard patterns include
+    "*" (meaning zero or more characters), "?" (exactly one character),
+    "[...]" (character class), "{...,}" (brace expansion). Can handle
+    escaped/backslash (e.g. "foo\*" does not contain wildcard, it's "foo"
+    followed by a literal asterisk "*").
 
     Aside from wildcard, bash does other types of expansions/substitutions
     too, but these are not considered wildcard. These include tilde
-    expansion (e.g. ~ becomes /home/alice), parameter and variable
-    expansion (e.g. $0 and $HOME), arithmetic expression (e.g. $[1+2]),
-    history (!), and so on.
+    expansion (e.g. "~" becomes "/home/alice"), parameter and variable
+    expansion (e.g. $0 and $HOME), arithmetic expression (e.g. "$[1+2]"),
+    history ("!"), and so on.
 
     Although this module has 'Bash' in its name, this set of wildcards
     should be applicable to other Unix shells. Haven't checked completely
     though.
 
- convert_wildcard_to_sql($str) => str
+    For more specific needs, e.g. you want to check if a string just
+    contains joker and not other types of wildcard patterns, use
+    "$RE_WILDCARD_BASH" directly.
 
-    Convert bash wildcard to SQL. This includes:
+  convert_wildcard_to_sql
+    Usage:
 
-      * converting unescaped * to %
+     $sql_str = convert_wildcard_to_sql($wildcard_str);
 
-      * converting unescaped ? to _
+    Convert bash wildcard to SQL pattern. This includes:
 
-      * escaping unescaped <%>
+    *   converting unescaped "*" to "%"
 
-      * escaping unescaped _
+    *   converting unescaped "?" to "_"
+
+    *   escaping unescaped "%"
+
+    *   escaping unescaped "_"
 
     Unsupported constructs currently will be passed as-is.
 
+  convert_wildcard_to_re
+    Usage:
+
+     $re_str = convert_wildcard_to_re([ \%opts, ] $wildcard_str);
+
+    Convert bash wildcard to regular expression string.
+
+    Known options:
+
+    *   brace
+
+        Bool. Default is true. Whether to expand braces or not. If set to
+        false, will simply treat brace as literals.
+
+        Examples:
+
+         convert_wildcard_to_re(            "{a,b}"); # => "(?:a|b)"
+         convert_wildcard_to_re({brace=>0}, "{a,b}"); # => "\\{a\\,b\\}"
+
+    *   dotglob
+
+        Bool. Default is false. Whether joker "*" (asterisk) will match a
+        dot file. The default behavior follows bash; that is, dot file must
+        be matched explicitly with ".*".
+
+        This setting is similar to shell behavior (shopt) setting "dotglob".
+
+        Examples:
+
+         convert_wildcard_to_re({}          , '*a*'); # => "[^.].*a.*"
+         convert_wildcard_to_re({dotglob=>1}, '*a*'); # => ".*a.*"
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Wildcard-Bash>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Wildcard-Bash>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-Bash>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
+    Regexp::Wildcards can also convert a string with wildcard pattern to
+    equivalent regexp pattern, like "convert_wildcard_to_re". Can handle
+    Unix wildcards as well as SQL and DOS/Win32. As of this writing (v1.05),
+    it does not handle character class ("[...]") and interprets brace
+    expansion differently than bash. String::Wildcard::Bash's
+    "convert_wildcard_to_re" follows bash behavior more closely and also
+    provides more options.
 
-    Regexp::Wildcards to convert a string with wildcard pattern to
-    equivalent regexp pattern. Can handle Unix wildcards as well as SQL and
-    DOS/Win32. As of this writing (v1.05), it does not handle character
-    class ([...]) and interprets brace expansion differently than bash.
+    Other "String::Wildcard::*" modules.
 
-    Other String::Wildcard::* modules.
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

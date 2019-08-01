@@ -151,14 +151,14 @@ JS
 
                         // compare permissions
                         for ( let permission of permissions ) {
-                            if (permission == '$PERMISSION_ANY_AUTHENTICATED_USER') return 1;
+                            if (permission == '$PERMISSIONS_ANY_AUTHENTICATED_USER') return 1;
 
                             if (this.permissions[permission]) return 1;
                         }
                     }
                 }
                 else {
-                    if (permissions == '$PERMISSION_ANY_AUTHENTICATED_USER' && this.is_authenticated) return 1;
+                    if (permissions == '$PERMISSIONS_ANY_AUTHENTICATED_USER' && this.is_authenticated) return 1;
 
                     if (this.permissions[permissions]) return 1;
                 }

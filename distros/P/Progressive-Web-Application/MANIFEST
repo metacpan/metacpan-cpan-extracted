@@ -1,0 +1,32 @@
+Changes
+lib/Progressive/Web/Application.pm
+lib/Progressive/Web/Application/Command.pm
+lib/Progressive/Web/Application/Template/Base.pm
+lib/Progressive/Web/Application/Template/General.pm
+lib/Progressive/Web/Application/Template/OfflineOnly.pm
+lib/Progressive/Web/Application/Template/PreCacheEndpoint.pm
+Makefile.PL
+MANIFEST			This list of files
+pwa
+README
+t/00-load.t
+t/01-tools.t
+t/02-manifest_schema.t
+t/03-application-manifest.t
+t/04-template-base.t
+t/05-application-params.t
+t/06-application-templates.t
+t/07-application-compile.t
+t/08-path.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/resources/320x320-icon.png
+t/resources/36x36-icon.png
+t/resources/pwa.js
+t/resources/service-worker.js
+t/resources/things/one.js
+t/resources/things/two.js
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Ubuntu;
 # ABSTRACT: Service provider for Ubuntu - https://paste.ubuntu.com/
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use parent 'App::Nopaste::Service';
 
@@ -248,9 +248,9 @@ App::Nopaste::Service::Ubuntu - Service provider for Ubuntu - https://paste.ubun
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
-=for stopwords Niebur
+=for stopwords Niebur gregor herrmann
 
 =head1 SUPPORT
 

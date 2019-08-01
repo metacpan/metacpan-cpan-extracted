@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::float::str_suffix_filesize;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,8 +12,7 @@ use Data::Dmp;
 
 sub meta {
     +{
-        v => 3,
-        enable_by_default => 0,
+        v => 4,
         prio => 50,
         precludes => [qr/\Astr_suffix_(\w+)\z/],
     };
@@ -53,7 +52,7 @@ Data::Sah::Coerce::perl::float::str_suffix_filesize - Parse number from string c
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Coerce::perl::float::str_suffix_filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-01-16.
+This document describes version 0.002 of Data::Sah::Coerce::perl::float::str_suffix_filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-07-25.
 
 =head1 DESCRIPTION
 

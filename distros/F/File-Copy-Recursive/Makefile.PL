@@ -7,6 +7,7 @@ WriteMakefile(
     VERSION_FROM  => 'lib/File/Copy/Recursive.pm',
     ABSTRACT_FROM => 'lib/File/Copy/Recursive.pm',
     AUTHOR        => 'Daniel Muey <http://drmuey.com/cpan_contact.pl>',
+    LICENSE       => 'perl_5',
     PREREQ_PM     => {
         'File::Copy' => 0,
         'File::Spec' => 0,
@@ -32,8 +33,7 @@ WriteMakefile(
                 type => 'git',
             },
             bugtracker => {
-                mailto => 'bug-File-Copy-Recursive@rt.cpan.org',
-                web    => 'https://rt.cpan.org/Public/Dist/Display.html?Name=File-Copy-Recursive',
+                web    => 'https://github.com/drmuey/p5-File-Copy-Recursive/issues',
             },
         },
     },

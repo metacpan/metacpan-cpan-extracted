@@ -11,11 +11,11 @@ Net::Connection - Represents a network connection as a object.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -299,6 +299,8 @@ sub new{
 			if (defined( $service )){
 				$self->{'local_port'}=$service;
 			}
+		}elsif( $self->{'local_port'} =~ /^[0-9]+$/ ){
+			$self->{'local_port_name'}=getservbyport( $self->{'local_port'}, 'tcp' );
 		}
 		if ( $self->{'foreign_port'} =~ /[A-Za-z]/	){
 			$self->{'foreign_port_name'}=$self->{'foreign_port'};
@@ -306,6 +308,8 @@ sub new{
 			if (defined( $service )){
 				$self->{'foreign_port'}=$service;
 			}
+		}elsif( $self->{'foreign_port'} =~ /^[0-9]+$/ ){
+			$self->{'foreign_port_name'}=getservbyport( $self->{'foreign_port'}, 'tcp' );
 		}
 	}else{
 		# If the port is non-numeric, set it as the port name
@@ -449,7 +453,7 @@ This returns the PTR for the foreign host.
 If one was not supplied or if it could not be found
 if resolving was enabled then undef will be returned.
 
-    my $f_ptr=$conn-<foreign_ptr;
+    my $f_ptr=$conn->foreign_ptr;
 
 =cut
 
@@ -509,6 +513,20 @@ if resolving was enabled then undef will be returned.
 
 sub local_ptr{
 	return $_[0]->{'local_ptr'};
+}
+
+=head2 pid
+
+This returns the pid of a connection.
+
+This may return undef.
+
+    my $pid=$conn->pid;
+
+=cut
+
+sub pid{
+	return $_[0]->{'pid'};
 }
 
 =head2 proto

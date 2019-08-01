@@ -1,0 +1,8 @@
+[lib]
+lib = xt/lib
+
+[=Local::Test]
+:nk1 = nv1
+:n k 2 = n v 2
+k1 = v1
+k 2 = hello world

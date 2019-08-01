@@ -1,7 +1,7 @@
 package Sah::SchemaR::negfloat;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $rschema = ["float",[{summary=>"Negative float",xmax=>0}],["float"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::negfloat - Negative float
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::negfloat (from Perl distribution Sah-Schemas-Float), released on 2019-04-08.
+This document describes version 0.005 of Sah::SchemaR::negfloat (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
 
 =head1 DESCRIPTION
 

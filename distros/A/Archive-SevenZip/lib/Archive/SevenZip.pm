@@ -31,7 +31,7 @@ Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
 
 =cut
 
-our $VERSION= '0.08';
+our $VERSION= '0.11';
 
 # Archive::Zip API
 # Error codes
@@ -72,7 +72,7 @@ our %sevenzip_stdin_support = (
     'bzip2' => 1,
 );
 
-if( $^O !~ /MSWin/ ) {
+if( $^O !~ /MSWin/i ) {
     # Wipe all filesystem encodings because my Debian 7z 9.20 doesn't understand them
     $sevenzip_charsetname{ $_ } = ''
         for keys %sevenzip_charsetname;
@@ -83,6 +83,7 @@ our %class_defaults = (
     fs_encoding => 'UTF-8',
     default_options => [ "-y", "-bd" ],
     type => 'zip',
+    system_needs_quotes => scalar ($^O =~ /MSWin/i),
 );
 
 =head2 C<< Archive::SevenZip->find_7z_executable >>
@@ -108,7 +109,7 @@ sub find_7z_executable {
     my $found;
     if( $ENV{PERL_ARCHIVE_SEVENZIP_BIN}) {
         $class_defaults{'7zip'} = $ENV{PERL_ARCHIVE_SEVENZIP_BIN};
-        $found = $class->version;
+        $found = $class_defaults{'7zip'};
     } else {
         my @search;
         push @search, split /$envsep/, $ENV{PATH};
@@ -186,15 +187,15 @@ sub version {
     my $fh = eval { $self->run($cmd, binmode => ':raw') };
 
     if( ! $@ ) {
-    local $/ = "\n";
-    my @output = <$fh>;
-    if( @output >= 3) {
-        $output[1] =~ /^7-Zip\s+.*?(\d+\.\d+)\s+(?:\s*:\s*)?Copyright/
-            or return undef;
-        return $1;
-    } else {
-        return undef
-    }
+        local $/ = "\n";
+        my @output = <$fh>;
+        if( @output >= 3) {
+            $output[1] =~ /^7-Zip\s+.*?(\d+\.\d+)\s+(?:\s*:\s*)?Copyright/
+                or return undef;
+            return $1;
+        } else {
+            return undef
+        }
     }
 }
 
@@ -410,9 +411,13 @@ sub removeMember {
 };
 
 sub add_quotes {
-    map {
-        defined $_ && /\s/ ? qq{"$_"} : $_
-    } @_
+    my $quote = shift;
+
+    $quote ?
+        map {
+            defined $_ && /\s/ ? qq{"$_"} : $_
+        } @_
+    : @_
 };
 
 sub get_command {
@@ -443,15 +448,16 @@ sub get_command {
     for( @{ $options{ options }}, @{ $options{ members }}, $options{ archivename }, "$self->{ '7zip' }") {
     };
 
+    my $add_quote = $self->{system_needs_quotes};
     return [grep {defined $_}
-        add_quotes($self->{ '7zip' }),
+        add_quotes($add_quote, $self->{ '7zip' }),
         @{ $options{ default_options }},
         $options{ command },
         @charset,
-        add_quotes( @{ $options{ options }} ),
+        add_quotes($add_quote, @{ $options{ options }} ),
         "--",
-        add_quotes( $options{ archivename } ),
-        add_quotes( @{ $options{ members }} ),
+        add_quotes($add_quote, $options{ archivename } ),
+        add_quotes($add_quote, @{ $options{ members }} ),
     ];
 }
 

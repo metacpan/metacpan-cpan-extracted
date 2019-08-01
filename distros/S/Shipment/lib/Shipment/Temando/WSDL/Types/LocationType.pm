@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::LocationType;
-$Shipment::Temando::WSDL::Types::LocationType::VERSION = '3.01';
+$Shipment::Temando::WSDL::Types::LocationType::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Shipment::Temando::WSDL::Types::LocationType
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

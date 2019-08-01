@@ -44,7 +44,7 @@
    "provides" : {
       "Date::Bahai::Simple" : {
          "file" : "lib/Date/Bahai/Simple.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/manwar/Date-Bahai-Simple"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

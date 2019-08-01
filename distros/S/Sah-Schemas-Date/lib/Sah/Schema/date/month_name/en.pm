@@ -1,7 +1,7 @@
 package Sah::Schema::date::month_name::en;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-06-24'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Month name (abbreviated or full, in English)',
@@ -27,7 +27,7 @@ Sah::Schema::date::month_name::en - Month name (abbreviated or full, in English)
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::date::month_name::en (from Perl distribution Sah-Schemas-Date), released on 2019-06-20.
+This document describes version 0.004 of Sah::Schema::date::month_name::en (from Perl distribution Sah-Schemas-Date), released on 2019-06-24.
 
 =head1 HOMEPAGE
 

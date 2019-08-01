@@ -1,3 +1,17 @@
+ 2.05 - moved locking to Data::RecordStore.
+
+        open_store must now be called by
+        Data::ObjectStore->open_store
+        _not_ Data::ObjectStore::open_store
+
+        open_store now take an arguments hash or a single base path
+        argument.
+
+        Arguments (so far)
+          DATA_PROVIDER_CLASS (defaults to Data::RecordStore)
+
+ 2.04 - added clearvols method to Data::ObjectStore::Container
+
  2.03 - fix typo in bin/objectstore_upgrade
         timing test update
         added clearvol method
@@ -5,7 +19,7 @@
 
  2.02 - updated datastore version requirements
 
- 2.01 - updated bug in test
+ 2.01 - fixed bug in test
 
  2   -
    requires store update

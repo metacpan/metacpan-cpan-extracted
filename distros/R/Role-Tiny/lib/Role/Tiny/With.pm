@@ -3,8 +3,8 @@ package Role::Tiny::With;
 use strict;
 use warnings;
 
-our $VERSION = '2.000006';
-$VERSION = eval $VERSION;
+our $VERSION = '2.000007';
+$VERSION =~ tr/_//d;
 
 use Role::Tiny ();
 

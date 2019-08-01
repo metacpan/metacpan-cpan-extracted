@@ -51,6 +51,8 @@
             "File::Slurper" : "0",
             "File::chdir" : "0",
             "JSON" : "0",
+            "Language::Expr" : "0.29",
+            "Language::Expr::Interpreter::var_enumer" : "0",
             "Lingua::EN::Numbers::Ordinate" : "1.02",
             "Log::ger" : "0.027",
             "Mo" : "0",
@@ -104,7 +106,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah"
       }
    },
-   "version" : "0.897",
+   "version" : "0.899",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -579,11 +581,6 @@
             },
             "name" : "RuntimeRecommends",
             "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Extras",
-            "name" : "lint-prereqs / assume-provided",
-            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",

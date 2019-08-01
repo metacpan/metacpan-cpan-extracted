@@ -1,0 +1,297 @@
+#!/usr/bin/perl
+
+# ABSTRACT: sqlbatch - Application code
+
+use v5.16;
+use strict;
+use warnings;
+use utf8;
+
+use Carp;
+use DBI;
+use Getopt::Long qw(GetOptionsFromArray);
+    use Pod::Usage;
+
+use SqlBatch::Engine;
+
+pod2usage(1) if scalar(@ARGV) == 0;
+
+my $man = 0;
+my $help = 0;
+
+GetOptionsFromArray (
+    \@ARGV,
+    'help|?' => \$help, 
+    'man'    => \$man
+) or pod2usage(2);
+
+
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+my $app = SqlBatch::Engine->new(@ARGV);
+$app->run();
+
+__END__
+    
+=head1 NAME
+
+sqlbatch - run a sequence of SQL-database SQL-scripts and client-code
+
+=head1 SYNOPSIS
+
+sqlbatch [-help|-man]
+sqlbatch [-directory=...]
+sqlbatch [-directory=...] [-configfile=...] 
+sqlbatch [-directory=...] [-datasource=...] [-username=...] [-password=...] [-tags=...] [-from_file=...] [-to_file=...] [-exclude_files=...] [-verbosity=...]
+
+=head1 DESCRIPTION
+
+B<This program> will read the given SQL-batch file(s) and execute the logic against an SQL database.
+
+SQL-batch file(s) reside within a certain directory and have the extension ".sb".
+
+=head1 OPTIONS
+
+Options have precedens above their counterpart in the configuration. Option though have precedence over their counterparts in a configuration file.
+
+=head2 GENERIC OPTIONS
+
+=over
+
+=item B<-configfile>=path
+
+Path to configuration file. 
+If option is set to '-' then ./sb.conf or sb.conf in SQL-batch directory (-directory) will be used.
+
+=item B<-datasource>=connectionstring
+
+DBI-datasource connectionstring
+
+=item B<-directory>=path
+
+Path to directory for SQL-batch-files and default configuration file
+
+=item B<-fileextension>=ext
+
+Change the fileextension of SQL-batch-files. Default is "sb".
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-password>=pw
+
+Database-connection password
+
+=item B<-username>=user
+
+Database-connection username
+
+=item B<-verbosity>=value
+
+Level of verbosity. Default is 1.
+
+=back
+
+=head2 FILTER OPTIONS
+
+=over
+
+=item B<-exclude_files>=...
+
+Comma separated list of file to exclude in execution
+
+=item B<-from_file>=startfile.sb
+
+Name of the file to start execution from
+
+=item B<-tags>=tag1,tag2,tag3
+
+Comma separated list of tags that specifies running the tagged instructions or not
+
+=item B<-to_file>=endfile.sb
+
+Name of the file where the execution finishes
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The configuration file is a JSON-file. Most program options can also be defined via the configuration file.
+
+Example:
+
+    {
+        "datasource" : "DBI:RAM:",
+        "username" : "user",
+        "password" : "pw",
+        "force_autocommit" : 1
+        "tags" : [ "tag1,"tag2" ]
+    }
+
+=head2 Extra configuration items
+
+The configuration file though can contain additional other configuration items. 
+
+Some of them are predefined as in following list:
+
+=over
+
+=item B<force_commit>
+
+Enforce transaction committing in Perl DBI.
+
+=back
+
+Other configuration items can be free choosen. They will then be available for initializing any dynamic loaded Perl classes in sql-batch file.
+
+=head1 SQL-BATCH FILES
+
+A SQL-batch-file is an UTF-8 encoded textfile. The file contains a sequence of instruction blocks.
+
+=head2 Section setup
+
+A instruction indentifier line starts with instruction string and is followed by the instruction arguments
+
+C<--SQL-- -id=creation tags=setup,!production>
+
+The instruction block ends with special ending instruction C<--END-->.
+
+Text between the instruction indentifier line and the instruction block end is called B<instruction content>.
+
+Instruction content can contain various data and information for the instruction to be executed.
+
+Text between the dedicated instruction blocks is not used.
+
+=head2 Common section identifier arguments
+
+=over
+
+=item B<-end>=...
+
+Defines an alternative naming of the section end. 
+
+Example: 
+
+Instead of --END-- a --MYEND-- can be defined by B<-end=MYEND>
+
+=item B<-id>=...
+
+An optional specific identifier for the section.
+
+=item B<-tags>=...
+
+Comma separated list for matching tags to execute the instruction og non-matching tags ("!tag")
+
+=back
+ 
+=head2 SQL-BATCH file example
+
+    # Comment
+    --SQL-- -id=sql1
+    create table t (a int,b varchar)
+    --END--
+    an undefined line outside a section
+    --INSERT-- -id=fill_table_t -table=t
+    'a';'b'
+    '1';'2'
+    '3';'4'
+    --END--
+    # Next section runs a delete when the "usertest"-tag is not defined
+    --DELETE-- -table=t --id=delete1 -tags=!usertest
+    'a';'b'
+    '1';'2'
+    --END--
+    # Next section runs in when "setup"-tag is defined and NOT "production" tag
+    --SQL-- -id=sql2 -tags=setup,!production
+    create table x (a int)
+    --END--
+
+=head2 SQL-BATCH instructions
+
+=over
+
+=item B<--BEGIN-->
+
+Begin a transaction, if autocommit-mode is not enabled
+
+=item B<--COMMIT-->
+
+Commit a transaction, if autocommit-mode is not enabled
+
+=item B<--DELETE-->
+
+Deleting table rows that match the instruction content data which is CSV-formattet (with a header column)
+
+Example
+
+    --DELETE-- -table=x
+    'a';'b'
+    '1';'2'
+    ...
+
+Would create a SQL-statement C<delete from table where a=1 and b=2>.
+
+B<Arguments>
+
+=over
+
+=item B<--table-->
+
+Name of the table where to delete.
+
+=back
+
+=item B<--INSERT-->
+
+Insert into table rows that match the instruction content data which is CSV-formattet (with a header column)
+
+Example
+
+    --INSERT-- -table=x
+    'a';'b'
+    '1';'2'
+    ...
+
+Would create a SQL-statement C<insert into x (a,b) values (1,2)>.
+
+B<Arguments>
+
+=over
+
+=item B<--table-->
+
+Name of the table where to insert.
+
+=back
+
+=item B<--PERL-->
+
+Execute Perl code in a Perl-class derived from L<SqlBatch::InstructionBase>
+
+=item B<--ROLLBACK-->
+
+Rollback a transaction, if autocommit-mode is not enabled
+
+=item B<--SQL-->
+
+Execute the SQL-statement written into the instruction content.
+
+=back
+
+=head1 AUTHOR
+
+Sascha Dibbern (sascha at dibbern.info)
+
+=head1 LICENCE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+ 
+=cut
+

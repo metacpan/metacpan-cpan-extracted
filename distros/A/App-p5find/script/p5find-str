@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+use v5.18;
+
+use App::p5find qw<p5_doc_iterator>;
+
+use Getopt::Long;
+
+use constant {
+    F_INTERPOLATION    => 0b00000001,
+    F_CONCATENATION    => 0b00000010,
+};
+
+sub print_usage {
+    print <<USAGE;
+Usage: p5find-str [switches] [--] [dir...]
+  -h    show this help message.
+
+  --with-interpolation     Find Str with interpolations
+  --without-interpolation  Find Str without interpolation
+  --with-concatenation     Find Str with concatenation
+  --without-concatenation  Find Str without concatenation
+
+USAGE
+}
+
+my %opts;
+GetOptions(
+    \%opts,
+    "h",
+    "with-interpolation",
+    "without-interpolation",
+    "with-concatenation",
+    "without-concatenation",
+);
+
+if ($opts{h}) {
+    print_usage();
+    exit(0);
+}
+
+my @paths = @ARGV;
+@paths = ('.') unless @paths;
+
+my $iter = p5_doc_iterator(@paths);
+while ( defined ( my $doc = $iter->() ) ) {
+    my %feature;
+    my %matched;
+    for (@{ $doc->find(sub { $_[1]->isa("PPI::Token::Quote::Single") || $_[1]->isa("PPI::Token::HereDoc") }) ||[]}) {
+        my $ln = $_->line_number;
+        $matched{$ln} = 1;
+    }
+
+    for (@{ $doc->find(sub { $_[1]->isa("PPI::Token::Quote::Double") }) ||[]}) {
+        my $ln = $_->line_number;
+        if (/[\$&@%]/) {
+            $feature{$ln} |= F_INTERPOLATION;
+        }
+        $matched{$ln} = 1;
+    }
+
+    for (@{ $doc->find(sub{ $_[1]->isa('PPI::Token::Operator') && ($_[1]->content =~ /\A \. =? \z/x) }) ||[]}) {
+        my $ln = $_->line_number;
+        $feature{$ln} |= F_CONCATENATION;
+        $matched{$ln} = 1;
+    }
+
+    if (%matched) {
+        my $file = $doc->filename;
+
+        my $line_number = 0;
+        open my $fh, "<", $file;
+        while (my $line = <$fh>) {
+            $line_number++;
+            my $to_print;
+            if ($matched{$line_number}) {
+                my $print_it = 1;
+                if ($opts{'with-interpolation'} && !($feature{$line_number} & F_INTERPOLATION) ) {
+                    $print_it = 0;
+                }
+                if ($opts{'without-interpolation'} && ($feature{$line_number} & F_INTERPOLATION) ) {
+                    $print_it = 0;
+                }
+                if ($opts{'with-concatenation'} && !($feature{$line_number} & F_CONCATENATION) ) {
+                    $print_it = 0;
+                }
+                if ($opts{'without-concatenation'} && ($feature{$line_number} & F_CONCATENATION)) {
+                    $print_it = 0;
+                }
+                if ($print_it) {
+                    print "${file}:${line_number}:${line}";
+                }
+            }
+        }
+        close($fh);
+    }
+}
+
+
+__END__
+
+=head1 Usage
+
+This program parse perl code and find the lines with strings. It is
+similar to "grep", but specialized for findding string literals or
+espressions that produce strings.
+
+Here's a list of parameters to constraint to results:
+
+=over 4
+
+=item --with-interpolation
+
+=item --without-interpolation
+
+=item --with-concatenation
+
+=item --without-concatenation
+
+=back
+
+=cut

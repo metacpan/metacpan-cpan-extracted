@@ -42,7 +42,7 @@
    "provides" : {
       "Date::Gregorian::Simple" : {
          "file" : "lib/Date/Gregorian/Simple.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/manwar/Date-Gregorian-Simple"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

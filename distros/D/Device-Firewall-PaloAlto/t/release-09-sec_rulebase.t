@@ -51,5 +51,15 @@ for my $test (@rulebase_tests) {
     
 }
 
+# Try some tests with string protocols
+
+ok( $test_obj->sec_policy( 
+        from => 'TUNNEL', 
+        to => 'TUNNEL', 
+        src_ip => q(1.1.1.1), 
+        dst_ip => q(2.2.2.2), 
+        protocol => 'tcp' 
+    ), 'Policy test with a string protocol' );
+
 
 done_testing();

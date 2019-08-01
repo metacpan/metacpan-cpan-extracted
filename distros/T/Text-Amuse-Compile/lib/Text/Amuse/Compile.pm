@@ -13,7 +13,6 @@ use File::Find;
 use File::Spec;
 
 use Text::Amuse::Functions qw/muse_fast_scan_header/;
-use Text::Amuse::Compile::Templates;
 use Text::Amuse::Compile::Webfonts;
 use Text::Amuse::Compile::File;
 use Text::Amuse::Compile::Merged;
@@ -33,11 +32,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 1.30
+Version 1.31
 
 =cut
 
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 
 =head1 SYNOPSIS
 
@@ -343,11 +342,6 @@ sub _build_standalone {
     }
 }
 
-sub _build_templates {
-    my $self = shift;
-    return Text::Amuse::Compile::Templates->new(ttdir => $self->ttdir);
-}
-
 sub _build_webfonts {
     my $self = shift;
     return Text::Amuse::Compile::Webfonts->new(webfontsdir => $self->webfontsdir);
@@ -376,11 +370,6 @@ true.
 =cut
 
 =head2 METHODS
-
-=head3 templates
-
-The L<Text::Amuse::Compile::Templates> object, which will provide the
-templates string references.
 
 =head3 webfonts
 
@@ -600,7 +589,7 @@ sub _compile_virtual_file {
                                                name => $name,
                                                suffix => $suffix,
                                                luatex => $self->luatex,
-                                               templates => $self->templates,
+                                               ttdir => $self->ttdir,
                                                options => { $self->extra },
                                                document => $doc,
                                                logger => $self->logger,
@@ -629,7 +618,7 @@ sub _compile_file {
     my %args = (
                 name => $fileobj->name,
                 suffix => $fileobj->suffix,
-                templates => $self->templates,
+                ttdir => $self->ttdir,
                 options => { $self->extra },
                 logger => $self->logger,
                 standalone => $self->standalone,

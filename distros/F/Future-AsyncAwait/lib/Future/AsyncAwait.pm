@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Carp;
 
@@ -216,6 +216,17 @@ Plain lexical variables are preserved across an C<await> deferral:
       print $message;
    }
 
+On perl versions 5.26 and later C<async sub> syntax supports the C<signatures>
+feature if it is enabled:
+
+   use 5.026;
+   use feature 'signatures';
+
+   async sub quart($x, $y)
+   {
+      ...
+   }
+
 =head2 Cancellation
 
 Cancelled futures cause a suspended C<async sub> to simply stop running.
@@ -362,12 +373,6 @@ threaded builds of perl earlier than 5.22 are not supported.
 L<https://rt.cpan.org/Ticket/Display.html?id=122252>
 
 L<https://rt.cpan.org/Ticket/Display.html?id=124351>
-
-=item *
-
-Support sub signatures in recent perls.
-
-L<https://rt.cpan.org/Ticket/Display.html?id=123465>
 
 =item *
 

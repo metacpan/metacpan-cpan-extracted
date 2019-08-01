@@ -1,6 +1,11 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.843 Tue Jul 23 22:30:00 EST 2019
+
+  * Updated results in MCE::Hobo (Parallel::ForkManager-like demonstration).
+  * Bumped MCE dependency to 1.843.
+
 1.842 Sun Jul 21 19:00:00 EST 2019
 
   * The Windows hack introduced in 1.841 is 2x slower for one edge case.

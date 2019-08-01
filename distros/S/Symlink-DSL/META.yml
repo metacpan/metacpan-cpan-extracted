@@ -21,7 +21,7 @@ name: Symlink-DSL
 provides:
   Symlink::DSL:
     file: lib/Symlink/DSL.pm
-    version: v0.2.1
+    version: v0.2.2
 requires:
   Cwd: '0'
   File::Basename: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/shlomif/symlink-dsl/issues
   homepage: http://metacpan.org/release/Symlink-DSL
   repository: https://github.com/shlomif/Symlink-DSL.git
-version: 0.2.1
+version: 0.2.2
 x_Dist_Zilla:
   perl:
     version: '5.028002'

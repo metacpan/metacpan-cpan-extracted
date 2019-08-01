@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -24,6 +24,8 @@
 
 use 5.004;
 use strict;
+use Module::Util;
+use Math::BigInt try => 'GMP';
 use Test;
 plan tests => 1;
 
@@ -34,9 +36,13 @@ use MyOEIS;
 
 use Math::NumSeq::OEIS::Catalogue;
 
-eval "use Math::BigInt try => 'GMP'; 1"  # pure perl too slow for big sqrts
-  || eval "use Math::BigInt; 1"
-  || die;
+if (eval "use Math::BigInt try => 'GMP'; 1") {  # pure perl too slow for big sqrts
+  print "# Math::BigInt by GMP\n";
+} elsif (eval "use Math::BigInt; 1") {
+  print "# Math::BigInt by pure Perl\n";
+} else {
+  die "cannot load Math::BigInt ",$@;
+}
 
 use POSIX ();
 POSIX::setlocale(POSIX::LC_ALL(), 'C'); # no message translations
@@ -50,14 +56,18 @@ sub want_anum {
   # return 0 unless $anum =~ /A000119/;
   # return 0 unless $anum =~ /A005228|A030124/;
   # return 0 unless $anum =~ /A177702|A102283|A131756/;
+  # return 0 unless $anum =~ /A004/;
   return 1;
 }
 sub want_module {
   my ($module) = @_;
   # return 0 unless $module =~ /Almost/;
   # return 0 unless $module =~ /Lucas|Fibonacci/;
-#   return 0 unless $module =~ /Collatz/;
-   return 0 unless $module =~ /SqrtDigits/;
+  # return 0 unless $module =~ /Collatz/;
+  # return 0 unless $module =~ /Aronson/;
+  # return 0 unless $module =~ /FractionDigits/;
+
+  return 0 if Module::Util::find_installed($module) =~ /devel/;
   return 1;
 }
 
@@ -141,8 +151,8 @@ sub check_class {
 
   return if $class eq 'Math::NumSeq::PlanePathCoord' # tested in its own dist
     || $class eq 'Math::NumSeq::PlanePathDelta'
-      || $class eq 'Math::NumSeq::PlanePathTurn'
-        || $class eq 'Math::NumSeq::PlanePathN';
+    || $class eq 'Math::NumSeq::PlanePathTurn'
+    || $class eq 'Math::NumSeq::PlanePathN';
 
 
   # skip all except ...
@@ -179,7 +189,7 @@ sub check_class {
       || $class eq 'Math::NumSeq::RadixConversion'
       || $name eq 'Repdigiits,radix=2'
      ) {
-    $max_value = 'unlimited';
+    # $max_value = 'unlimited';
 
   } elsif ($anum eq 'A001477' || $anum eq 'A000027') {
     # integers and naturals
@@ -191,9 +201,13 @@ sub check_class {
   } elsif ($anum eq 'A003434') { # Math::NumSeq::TotientSteps slow
     $max_count = 250;
 
-  } elsif ($anum eq 'A007770') {
-    # Math::NumSeq::Happy bit slow, not B-file 140,000 ...
-    $max_count = 20000;
+  } elsif ($anum eq 'A007700' || $anum eq 'A023272' || $anum eq 'A023302'
+           || $anum eq 'A023330') {
+    # CunninghamPrimes bit slow
+    $max_value = 200000;
+
+  } elsif ($anum eq 'A006886') {  # KaprekarNumbers
+    $max_value = 200000;
 
     # } elsif ($anum eq 'A002945'   # CbrtContinued
     #          || $anum eq 'A002946'
@@ -269,45 +283,6 @@ sub check_class {
     # shorten for now
     $max_value = 30_000;
 
-  } elsif (
-           $anum eq 'A004543'     # sqrt(2) in base 6
-           || $anum eq 'A004544'  # sqrt(2) in base 7
-           || $anum eq 'A070197'  # sqrt(2) in base 60
-           || $anum eq 'A004550'  # sqrt(3) in base 5
-           || $anum eq 'A004551'  # sqrt(3) in base 6
-           || $anum eq 'A004554'  # sqrt(3) in base 9
-           || $anum eq 'A004582'  # sqrt(3) in base 7
-           || $anum eq 'A004588'  # sqrt(10) in base 5
-          ) {
-    MyTestHelpers::diag ("trim doubtful end $anum $name");
-    $max_count = 50;
-
-    # still bad
-  # } elsif ($anum eq 'A070197') {
-  #   # final 12 of sqrt(2) base 60 seems bad, trim
-  #   $max_count = 72;
-  #   MyTestHelpers::diag ("trim doubtful end $anum $name");
-  # } elsif ($anum eq 'A004582') {
-  #   # last few of sample values sqrt(8) base 7 seem bad, trim
-  #   $max_count = 50;
-  #   MyTestHelpers::diag ("trim doubtful end $anum $name");
-  # } elsif ($anum eq 'A004588') {
-  #   # last 3,3,0,2,3,4,2,4,1,2,4,4,1 sample values sqrt(10) base 5 seem bad,
-  #   # trim
-  #   $max_count = 50;
-  #   MyTestHelpers::diag ("trim doubtful end $anum $name");
-
-
-
-  # } elsif ($anum eq 'A004583') {
-  #   # last digit of sample values octal sqrt(8) seems is 4 think should be 5,
-  #   # trim it off for now
-  #   $max_count = 50;
-  #   MyTestHelpers::diag ("trim doubtful end $anum $name");
-  # } elsif ($anum eq 'A004584') {
-  #   # last few of sample values sqrt(8) base 9 seem bad, trim
-  #   $max_count = 50;
-  #   MyTestHelpers::diag ("trim doubtful end $anum $name");
   } elsif ($class =~ /SqrtDigits/) {
     unless (Math::BigInt::GMP->VERSION) { # plain Calc sqrt a bit slow
       $max_count = 1000;
@@ -318,10 +293,10 @@ sub check_class {
     ($anum,
      max_value => $max_value,
      max_count => $max_count)
-      or do {
-        MyTestHelpers::diag("skip $anum $name, no file data");
-        return;
-      };
+    or do {
+      MyTestHelpers::diag("skip $anum $name, no file data");
+      return;
+    };
   ### read_values len: scalar(@$want)
   ### $want_i_start
 
@@ -371,6 +346,11 @@ sub check_class {
     if (! defined $want_i_start) {
       MyTestHelpers::diag ("skip i_start check: \"stripped\" values only");
 
+    } elsif ($class =~ /FractionDigits|SqrtDigits/) {
+      # OEIS OFFSET is places before the decimal for "digits" sequences like
+      # fraction digits, so 
+      MyTestHelpers::diag ("skip i_start check of digits $class");
+
     } elsif ($got_i_start != $want_i_start
              && $anum ne 'A000004' # offset=0, but allow other i_start here
              && $anum ne 'A000012' # offset=0, but allow other i_start here
@@ -381,15 +361,14 @@ sub check_class {
              && $anum ne 'A010175' # SqrtContinued 109
             ) {
       if ($class =~ /RadixWithout/  # FIXME
-          || $class =~ /SqrtDigits/ # FIXME
           || $anum eq 'A064150'    # harshad base 3
          ) {
         MyTestHelpers::diag ("todo i_start: got $got_i_start want $want_i_start  $name");
       } else {
         $good = 0;
         MyTestHelpers::diag ("bad: $name");
-        MyTestHelpers::diag ("got  i_start  $got_i_start");
-        MyTestHelpers::diag ("want i_start  $want_i_start");
+        MyTestHelpers::diag ("seq got   i_start  $got_i_start");
+        MyTestHelpers::diag ("OEIS want i_start  $want_i_start");
       }
     }
   }
@@ -639,8 +618,8 @@ sub check_class {
 {
   system("cd devel && perl ../tools/make-oeis-catalogue.pl --module=TempOther") == 0
     or die;
-  require 'devel/lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm';
-  unlink  'devel/lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm' or die;
+  require './devel/lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm';
+  unlink  './devel/lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm' or die;
 
   MyTestHelpers::diag ("\"Other\" uncatalogued sequences:");
   my $aref = Math::NumSeq::OEIS::Catalogue::Plugin::TempOther::info_arrayref();

@@ -1,7 +1,7 @@
 package Data::Sah;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.897'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.899'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,8 +32,8 @@ has _var_enumer  => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
-        require Language::Expr::Interpreter::VarEnumer;
-        Language::Expr::Interpreter::VarEnumer->new;
+        require Language::Expr::Interpreter::var_enumer;
+        Language::Expr::Interpreter::var_enumer->new;
     },
 );
 
@@ -124,7 +124,7 @@ Data::Sah - Fast and featureful data structure validation
 
 =head1 VERSION
 
-This document describes version 0.897 of Data::Sah (from Perl distribution Data-Sah), released on 2019-07-19.
+This document describes version 0.899 of Data::Sah (from Perl distribution Data-Sah), released on 2019-07-25.
 
 =head1 SYNOPSIS
 

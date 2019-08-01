@@ -1,0 +1,155 @@
+#!perl
+
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+
+use Complete::Util qw(complete_array_elem hashify_answer);
+use Cwd qw(getcwd);
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+my $cwd = getcwd();
+my ($curname) = $cwd =~ m!/([^/]*)$!;
+
+GetOptionsWithCompletion(
+    sub {
+        my %args = @_;
+        my $type = $args{type};
+        my $word = $args{word};
+
+        if ($word eq '') {
+            my $res = hashify_answer(
+                complete_array_elem(
+                    word=>$word, array=>[$curname, "$curname "]),
+            );
+            $res->{final} = 1;
+            return $res;
+        } elsif ($type eq 'arg') {
+            my @dirs;
+            opendir my $dh, "..";
+            for my $e (readdir $dh) {
+                next if $e eq '.' || $e eq '..';
+                next unless -d "../$e";
+                push @dirs, $e;
+            }
+            return complete_array_elem(
+                word=>$word, array=>\@dirs);
+        }
+        undef;
+    },
+    'help|h' => sub {
+        print <<USAGE;
+Usage:
+  % renwd <newname>
+Options:
+  --help, -h
+  --version, -v
+USAGE
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "renwd version ", ($main::VERSION || "dev"), "\n";
+        exit 0;
+    },
+);
+die "Usage: renwd <newname>\n" unless @ARGV == 1;
+
+-e "../$ARGV[0]" and die "renwd: Can't rename: ../$ARGV[0] already exists\n";
+rename "../$curname", "../$ARGV[0]" or die "renwd: Can't rename: $!\n";
+
+1;
+# ABSTRACT: REName current (Working Directory)
+# PODNAME: renwd
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+renwd - REName current (Working Directory)
+
+=head1 VERSION
+
+This document describes version 0.002 of renwd (from Perl distribution App-renwd), released on 2019-07-23.
+
+=head1 SYNOPSIS
+
+This is a script to do the simple:
+
+ % mv ../curdirname ../newname
+
+except with one convenience: tab completion. If you activate tab completion for
+this script (e.g. via C<complete -C renwd renwd>), then you can do:
+
+ % renwd <Tab>
+
+and the current directory name is completed for you to edit/modify/
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C renwd renwd
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete renwd 'p/*/`renwd`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-renwd>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-renwd>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-renwd>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

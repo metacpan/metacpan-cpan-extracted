@@ -2,7 +2,7 @@ package App::termpub::Pager;
 use Mojo::Base -base;
 use Curses;
 
-has line => 0;
+has line      => 0;
 has positions => sub { {} };
 
 has rows => sub {
@@ -10,14 +10,14 @@ has rows => sub {
     my ( $rows, $columns );
     getmaxyx( $rows, $columns );
     $self->columns($columns);
-    $rows - 1;
+    $rows - 2;
 };
 
 has columns => sub {
     my $self = shift;
     my ( $rows, $columns );
     getmaxyx( $rows, $columns );
-    $self->rows( $rows - 1 );
+    $self->rows( $rows - 2 );
     $columns;
 };
 
@@ -35,6 +35,7 @@ has key_bindings => sub {
         Curses::KEY_UP        => 'prev_line',
         'k'                   => 'prev_line',
         'j'                   => 'next_line',
+        "\n"                  => 'next_line',
         ' '                   => 'next_page',
         Curses::KEY_NPAGE     => 'next_page',
         Curses::KEY_PPAGE     => 'prev_page',
@@ -118,20 +119,50 @@ sub run {
 
     while (1) {
         my $c = getch;
+
+        ## Clear message line
+        $self->display_msg;
+
         if ( $c eq '' ) {
             $self->prefix('');
             next;
         }
+
         if ( $c =~ /^[0-9]$/ ) {
             $self->prefix( $self->prefix . $c );
             next;
         }
+
         my $method = $self->key_bindings->{$c};
-        next           if !$method;
-        last           if $method eq 'quit';
-        $self->$method if $method;
+
+        if ( !$method ) {
+            $self->display_msg("Key is not bound. Press 'h' for help.");
+            next;
+        }
+
+        if ( !$self->can($method) ) {
+            $self->display_msg("Unknown function $method called.");
+            next;
+        }
+
+        if ( ( $self->$method || '' ) eq 'quit' ) {
+            last;
+        }
+
         $self->prefix('');
     }
+    return;
+}
+
+sub quit {
+    return 'quit';
+}
+
+sub display_msg {
+    my ( $self, $msg ) = @_;
+    move( $self->rows + 1, 0 );
+    clrtoeol;
+    addstr($msg) if defined $msg;
     return;
 }
 
@@ -235,19 +266,23 @@ sub update_screen {
     my $self = shift;
     clear;
     refresh;
-    prefresh( $self->pad, $self->line, 0, 0, 0, $self->rows - 1, $self->pad_columns );
+    prefresh( $self->pad, $self->line, 0, 0, 0, $self->rows - 1,
+        $self->pad_columns );
 
-    move( $self->rows, 0 );
-    addstring( $self->title );
+    my $status = '-' x $self->columns;
+
+    substr( $status, 0, length( $self->title ) ) = $self->title;
 
     my $pos = $self->get_percent . '%';
     if ( $self->line + $self->rows - 1 >= $self->pad_rows ) {
         $pos = "end";
     }
     $pos = "($pos)";
-    addstring( '-' x $self->columns );
-    move( $self->rows, $self->columns - length($pos) - 2 );
-    addstring($pos);
+
+    substr( $status, -length($pos) - 2, length($pos) ) = $pos;
+
+    move( $self->rows, 0 );
+    addstring($status);
 
     move( $self->rows, 0 );
     chgat( -1, A_STANDOUT, 0, 0 );

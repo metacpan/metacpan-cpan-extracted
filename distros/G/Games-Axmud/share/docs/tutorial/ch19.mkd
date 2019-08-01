@@ -6,15 +6,16 @@
 
 ####Table of Contents
 
-* [19.1 OPTION NOLET](#19.1)
-* [19.2 OPTION NEEDTASK](#19.2)
-* [19.3 OPTION REQUIRE](#19.3)
-* [19.4 OPTION TYPO](#19.4)
-* [19.5 OPTION PSEUDO](#19.5)
-* [19.6 OPTION REDIRECT](#19.6)
-* [19.7 OPTION PERSIST](#19.7)
-* [19.8 OPTION ANGLE](#19.8)
-* [19.9 Advanced client commands](#19.9)
+* [19.1 OPTION SILENT](#19.1)
+* [19.2 OPTION NOLET](#19.2)
+* [19.3 OPTION NEEDTASK](#19.3)
+* [19.4 OPTION REQUIRE](#19.4)
+* [19.5 OPTION TYPO](#19.5)
+* [19.6 OPTION PSEUDO](#19.6)
+* [19.7 OPTION REDIRECT](#19.7)
+* [19.8 OPTION PERSIST](#19.8)
+* [19.9 OPTION ANGLE](#19.9)
+* [19.10 Advanced client commands](#19.10)
 
 ---
 
@@ -22,7 +23,18 @@ An OPTION statement changes the way Axbasic executes a script. OPTION can be fol
 
 Before executing a script, Axbasic checks for any OPTION statements. An OPTION statement applies to the whole script, even if it actually occurs right at the end of the script. However, there is no good reason not to put all your OPTIONs right at the top, because that is where human readers are expecting to find them.
 
-##<a name="19.1">19.1 OPTION NOLET</a>
+##<a name="19.1">19.1 OPTION SILENT</a>
+
+You'll see these messages when Axbasic starts and finishes executing a script:
+
+        AXBASIC: Executing 'test'
+        AXBASIC: Execution of 'test' complete
+
+You can hide these messages by using OPTION SILENT. 
+
+Any error or debug messages will still be displayed. The only way to turn them off is to fix your script.
+
+##<a name="19.2">19.2 OPTION NOLET</a>
 
 Every statement must start with a keyword, so if you want to set a variable's value, you must do it using a LET statement.
 
@@ -35,7 +47,7 @@ Typing LET is rather a lot of work, though, and in any case most programmers are
 
 LET is always optional in Axbasic scripts with line numbers (see [Section 18](ch18.html)).
 
-##<a name="19.2">19.2 OPTION NEEDTASK</a>
+##<a name="19.3">19.3 OPTION NEEDTASK</a>
 
 As you know, keywords like PAUSE won't work unless the script is run as a task. You can avoid any unexpected surprises by telling Axbasic that the script must *only* be run as a task.
 
@@ -45,7 +57,7 @@ As you know, keywords like PAUSE won't work unless the script is run as a task. 
         PRINT "...world!"
         END
 
-##<a name="19.3">19.3 OPTION REQUIRE</a>
+##<a name="19.4">19.4 OPTION REQUIRE</a>
 
 From time to time, Axbasic undergoes small changes and improvements. If you're making use of some exciting new feature, you can tell Axbasic not to run the script on an older version of Axmud.
 
@@ -63,7 +75,7 @@ By the way, the **Version ()** function returns the current Axbasic version.
 
         PRINT Version ()
 
-##<a name="19.4">19.4 OPTION TYPO</a>
+##<a name="19.5">19.5 OPTION TYPO</a>
 
 It's just too easy to mis-type a variable like **string$**, in which case your script won't work as intended. Mistakes of this kind are notoriously difficult to diagnose.
 
@@ -78,7 +90,7 @@ Now, if you type the following line (in which **address$** has been misspelled),
 
 OPTION TYPO is strongly recommended for all of your Axbasic scripts.
 
-##<a name="19.5">19.5 OPTION PSEUDO</a>
+##<a name="19.6">19.6 OPTION PSEUDO</a>
 
 Client commands are normally typed in Axmud's main window, but any part of the code can execute a client command. (Internally, this is known as a *pseudo command*.)
 
@@ -108,7 +120,7 @@ This displays a confirmation message in the main window, but any error messages 
 
 This displays both confirmation and error messages in a dialogue (popup) window.
 
-##<a name="19.6">19.6 OPTION REDIRECT</a>
+##<a name="19.7">19.7 OPTION REDIRECT</a>
 
         OPTION REDIRECT
 
@@ -116,13 +128,13 @@ Axbasic scripts can create their own task window. A WRITEWIN statement display t
 
 OPTION REDIRECT redirects text into the main window, if the task window has been closed for some reason.
 
-##<a name="19.7">19.7 OPTION PERSIST</a>
+##<a name="19.8">19.8 OPTION PERSIST</a>
 
         OPTION PERSIST
 
 Interfaces can be created with an ADDTRIG, ADDALIAS, ADDMACRO, ADDTIMER or ADDHOOK statement. Normally, those interfaces are destroyed as soon as the script stops running, but OPTION PERSIST prevents that destruction.
 
-##<a name="19.8">19.8 OPTION ANGLE</a>
+##<a name="19.9">19.9 OPTION ANGLE</a>
 
         OPTION ANGLE DEGREES
 
@@ -132,7 +144,7 @@ Axbasic's trignometric functions like **Sin ()** and **Cos ()** expect angles me
 
 This statement is useful for clarifying to any humans reading your code that you'll be using radians, not degrees.
 
-##<a name="19.9">19.9 Advanced client commands</a>
+##<a name="19.10">19.10 Advanced client commands</a>
 
 An Axbasic script can be run using a client command. **;runscript** runs the **test.bas** script, and **;runscript wumpus** runs the **wumpus.bas** script.
 

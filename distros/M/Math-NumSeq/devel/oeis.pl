@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -28,10 +28,14 @@ use Smart::Comments;
 {
   require Math::NumSeq::OEIS::File;
   my $seq = Math::NumSeq::OEIS::File->new(
-                                          anum => 'A000033',
-                                          # anum=>'A000002',
+                                          # anum => 'A007450',
                                           # anum=>'A088218',
                                           # anum=>'A000290',
+
+                                          anum=>'A191372',
+                                          _dont_use_afile=>1,
+                                          _dont_use_bfile=>1,
+                                          _dont_use_internal=>1,
                                          );
   ### $seq
   ### description: $seq->description
@@ -39,6 +43,7 @@ use Smart::Comments;
   ### characteristic(smaller): $seq->characteristic('smaller')
   ### values_min: $seq->values_min
   ### values_max: $seq->values_max
+  ### tell: $seq->tell_i
   exit 0;
 }
 {

@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+README
+Makefile.PL
+FDpassData.pm
+FDpassData.xs
+docs/passFD.txt
+t/fdonly_hw.t
+t/fdonly_zlen.t
+t/fdonly_undef.t
+t/msg_only.t
+t/msg_only2args.t
+MYMETA.yml                                 Module YAML meta-data (added by MakeMaker)
+MYMETA.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

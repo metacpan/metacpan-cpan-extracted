@@ -89,7 +89,7 @@ libhyphen are installed.
 
     Cancel numeric prefix _num_ argument.
 
-- KEY\_DOWN, j
+- KEY\_DOWN, j, RETURN
 
     Scroll one line down.
 
@@ -120,6 +120,10 @@ libhyphen are installed.
 - q
 
     Quit.
+
+- Q
+
+    Quit without saving the current reading position.
 
 # CONFIGURATION FILE
 

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -15,13 +15,17 @@
 # You should have received a copy of the GNU General Public License along
 # with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# ENHANCE-ME: "alternate" parameter for (-1)^i factor ...
+
+
 package Math::NumSeq::GolayRudinShapiro;
 use 5.004;
 use strict;
 use List::Util 'max','min';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -43,12 +47,12 @@ use constant parameter_info_array =>
   [ {
      name    => 'values_type',
      share_key => 'values_type_1-101',
-     type    => 'enum',
+     type    => 'enum',  # but the code takes any pair with , between
      default => '1,-1',
      choices => ['1,-1',
                  '0,1',
                 ],
-     # TRANSLATORS: "1,-1" offered for translation of the "," if that might look like a decimal point, otherwise can be left unchanged
+     # TRANSLATORS: "1,-1" is here for translation in case the "," might look like a decimal point, otherwise can be left unchanged
      choices_display => [Math::NumSeq::__('1,-1'),
                          Math::NumSeq::__('0,1'),
                         ],
@@ -66,20 +70,22 @@ sub description {
 
 sub characteristic_integer {
   my ($self) = @_;
-  return (_is_integer($self->{'values_min'})
+  return (_is_integer($self->{'values_min'})  # the two values
           && _is_integer($self->{'values_max'}));
 }
 sub characteristic_pn1 {
   my ($self) = @_;
   return ($self->{'values_min'} == -1 && $self->{'values_max'} == 1);
 }
+sub _is_integer {
+  my ($n) = @_;
+  return ($n == int($n));
+}
 
 #------------------------------------------------------------------------------
 # cf A022155 - positions of -1
 #    A203463 - positions of +1
 #    A014081 - count of 11 bit pairs
-#    A020986 - cumulative 1,-1, always positive
-#    A020990 - cumulative GRS(2n+1), flips sign at odd i
 #    A020991 - position of last occurrence of n in the partial sums
 #    A005943 - number of subwords length n
 #
@@ -90,6 +96,7 @@ my %oeis_anum = ('1,-1' => 'A020985',  # 1 and -1
                 );
 sub oeis_anum {
   my ($self) = @_;
+  if ($self->{'alternate'}) { return undef; }
   return $oeis_anum{$self->{'values_type'}};
 }
 
@@ -106,8 +113,6 @@ sub new {
   return $self;
 }
 
-# ENHANCE-ME: use as_bin() on BigInt when available
-#
 # ENHANCE-ME: use unpack() checksum 1-bit count as described by
 # perlfunc.pod, if fit a UV or C "int" or whatever
 #
@@ -125,7 +130,7 @@ sub ith {
   }
 
   my $prev = 0;
-  my $xor = 0;
+  my $xor = ($self->{'alternate'} && ($i&1) ? 1 : 0);
   foreach my $bit (_digit_split_lowtohigh($i,2)) {
     $xor ^= ($prev & $bit);
     $prev = $bit;
@@ -147,10 +152,6 @@ sub pred {
 
 
 #------------------------------------------------------------------------------
-sub _is_integer {
-  my ($n) = @_;
-  return ($n == int($n));
-}
 
 1;
 __END__
@@ -170,8 +171,8 @@ Math::NumSeq::GolayRudinShapiro -- parity of adjacent 11 bit pairs
 
 =head1 DESCRIPTION
 
-This is the Golay/Rudin/Shapiro sequence of +1 or -1 according to there
-being an even or odd number of adjacent 11 bit pairs in i.
+This is the Golay/Rudin/Shapiro sequence of +1 or -1 according as an even or
+odd number of adjacent 11 bit pairs in i.
 
     GRS(i) = (-1) ^ (count 11 bit pairs)
 
@@ -185,7 +186,7 @@ two adjacent 11 pairs (overlapping pairs count), so value=1.
 The value is also the parity of the number of even-length runs of 1-bits
 in i.  An even length run has an odd number of 11 pairs, so each of them is
 a -1 in the product.  An odd-length run of 1-bits is an even number of 11
-pairs and so is +1 and has no effect on the result.
+pairs so is +1 and has no effect on the result.
 
 Such a parity of even-length 1-bit runs and hence the GRS sequence arises as
 the "dX,dY" change for each segment of the alternate paper folding curve.
@@ -248,7 +249,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

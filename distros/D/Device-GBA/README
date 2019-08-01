@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.001
+    version 0.004
 
 SYNOPSIS
 
@@ -18,12 +18,12 @@ DESCRIPTION
     The Nintendo Gameboy Advance can either boot from cartridge or over
     link cable. The latter is caled multiboot mode and is basically SPI and
     a homebrew encoding scheme. Unfortunately, the Bus Pirate doesn't have
-    a 100k SPI mode, so we are using 125k instead. If you encounter
-    problems with booting, use the next lower speed (30k) as bitrate. This
-    utility allows uploading multiboot GBA images with the BusPirate. Don't
-    forget to pass -specs=gba_mb.specs to devkitARM GCC if you want to link
-    a multiboot image. The package's share/ subdirectory contains an
-    example Makefile
+    a 100k SPI mode, so we are using 125000 instead. If you encounter
+    problems with booting, use the next lower speed (30000) as bitrate.
+    This utility allows uploading multiboot GBA images via
+    Device::Chip::Adapters. Don't forget to pass -specs=gba_mb.specs to
+    devkitARM GCC if you want to link a multiboot image. The package's
+    share/ subdirectory contains an example Makefile
     <https://github.com/athreef/Device-GBA/blob/master/share/testimg/Makefile>
     for cross-compilation. The wiring is as follows:
 
@@ -31,6 +31,20 @@ DESCRIPTION
         SO  --> MISO
         SI  <-- MOSI
         CLK <-- CLK
+        GND --- GND
+
+    (Note to myself:) The cable I made looks like this:
+
+                                 ___________________
+        .--------GND (white)----/      .-------._  |
+        |  .-----SD (black)------------|SD (B) |_  |
+        |  |  .--SO (yellow)---,      -|SC (R) |_--+-.
+       _|__|__|_                \     -|GND (W)|_--' |
+      / 6  4  2 \                \____-|SO (Y) |_    |
+      \_5_ 3 _1_/                  ___-|SI (O) |_    |
+        | \_/ '-- VDD (n/a)       /    '-------'     |
+        |  '----- SI (orange) ---/                   |
+        '-------- SC (red) --------------------------'
 
     Note: This is still work in progress!
 
@@ -42,10 +56,9 @@ METHODS AND ARGUMENTS
       reference. Returns undef if an attempt to open the device has failed.
       Accepts following parameters:
 
-      buspirate
+      adapter
 
-	COM port or handle of the BusPirate connected to the Gameboy
-	Advance.
+	An instance of Device::Chip::Adapter capable of SPI communication.
 
       verbose
 
@@ -58,9 +71,9 @@ METHODS AND ARGUMENTS
 
       Reads in $firmware_file and uploads it to the Gameboy Advance.
 
-    spi_writeread
+    spi_readwrite
 
-          $miso = $gba->spi_writeread($mosi)
+          $miso = $gba->spi_readwrite($mosi)
 
       reads and writes 32 bit from the SPI bus.
 

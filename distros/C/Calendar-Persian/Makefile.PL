@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Persian' => { file => 'lib/Calendar/Persian.pm', version => '0.41' },
+            'Calendar::Persian' => { file => 'lib/Calendar/Persian.pm', version => '0.42' },
         },
         resources => {
             repository => {

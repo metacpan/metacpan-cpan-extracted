@@ -1,156 +1,167 @@
+0.95
+    Sun Jul 28 2013
+    - fixed documentation link (Mike Flannagin)
+    - updated copyright text
+    - updated pragmas (use warnings and prefer parent to base)
+
+0.94
+    Tue Jul 05 19:17:00 PDT 2013
+    - fixed tests for Perl 5.24 and, more importantly, Email::MIME
+    - added to Github
+
 0.93
-	Mon Nov 27 06:05:35 UTC 2006 ($Rev: 60 $, $Author: chromatic $)
-	- fix a test that failed with a newer Test::MockObject
-	- make all tests run under taint mode
-	- add POD tests to run under developer mode
+    Mon Nov 27 06:05:35 UTC 2006 ($Rev: 60 $, $Author: chromatic $)
+    - fix a test that failed with a newer Test::MockObject
+    - make all tests run under taint mode
+    - add POD tests to run under developer mode
 
 0.92
-	Fri Nov 26 20:35:33 UTC 2004 (Rev: 55, Author: chromatic)
-	- update Build.PL requirement on Mail::Action 0.42
+    Fri Nov 26 20:35:33 UTC 2004 (Rev: 55, Author: chromatic)
+    - update Build.PL requirement on Mail::Action 0.42
 
-	Thu Nov 25 20:21:53 UTC 2004 (Rev: 52, Author: chromatic)
-	- respect the Name: directive when cloning an alias (Brett Warden)
-	- more M::A::R changes (consistify Email::Address use)
-	- improve FakeMail for M::A::R changes
-	- added expansion_pattern() for overriders (Andy Lester)
-	- bumped up submodule version numbers
+    Thu Nov 25 20:21:53 UTC 2004 (Rev: 52, Author: chromatic)
+    - respect the Name: directive when cloning an alias (Brett Warden)
+    - more M::A::R changes (consistify Email::Address use)
+    - improve FakeMail for M::A::R changes
+    - added expansion_pattern() for overriders (Andy Lester)
+    - bumped up submodule version numbers
 
 0.91
-	Tue Sep 28 23:29:45 UTC 2004 (Rev: 47, Author: chromatic)
-	- change Mail::SimpleList to use Mail::Action::Request
-	- be more aggressive to find correct delivery alias
-	- simplify tests
+    Tue Sep 28 23:29:45 UTC 2004 (Rev: 47, Author: chromatic)
+    - change Mail::SimpleList to use Mail::Action::Request
+    - be more aggressive to find correct delivery alias
+    - simplify tests
 
 0.90
-	Sun Jul 11 03:32:51 UTC 2004 (Rev: 40, Author: chromatic)
-	- added raw_message() to t/lib/FakeMail.pm
-	- ported to Mail::Action 0.40 (Email::Simple, Email::MIME)
-	- added Mail::SimpleList::remove_alias_from()
-	- marked build requirements in Build.PL separately
+    Sun Jul 11 03:32:51 UTC 2004 (Rev: 40, Author: chromatic)
+    - added raw_message() to t/lib/FakeMail.pm
+    - ported to Mail::Action 0.40 (Email::Simple, Email::MIME)
+    - added Mail::SimpleList::remove_alias_from()
+    - marked build requirements in Build.PL separately
 
 0.88
-	Fri Mar 26 04:28:34 UTC 2004 (Rev: 37, Author: chromatic)
-	- update version number for release
+    Fri Mar 26 04:28:34 UTC 2004 (Rev: 37, Author: chromatic)
+    - update version number for release
 
-	Fri Mar 26 04:26:31 UTC 2004 (Rev: 36, Author: chromatic)
-	- delete Delivered-To header in Mail::SimpleList::deliver() (bounce bug fix)
-	- delineate unsubscribe message better
+    Fri Mar 26 04:26:31 UTC 2004 (Rev: 36, Author: chromatic)
+    - delete Delivered-To header in Mail::SimpleList::deliver() (bounce bug fix)
+    - delineate unsubscribe message better
 
 0.87
-	Mon Mar 15 20:27:25 UTC 2004 (Rev: 33, Author: chromatic)
-	- fix a documentation typo (Brett Warden)
+    Mon Mar 15 20:27:25 UTC 2004 (Rev: 33, Author: chromatic)
+    - fix a documentation typo (Brett Warden)
 
-	Mon Mar 15 06:10:52 UTC 2004 (Rev: 32, Author: chromatic)
-	- mark dependency on Mail::Action 0.30 in Build.PL
+    Mon Mar 15 06:10:52 UTC 2004 (Rev: 32, Author: chromatic)
+    - mark dependency on Mail::Action 0.30 in Build.PL
 
-	Mon Mar 15 05:57:26 UTC 2004 (Rev: 31, Author: chromatic)
-	- fix spelling of Simon's name in README (sorry)
+    Mon Mar 15 05:57:26 UTC 2004 (Rev: 31, Author: chromatic)
+    - fix spelling of Simon's name in README (sorry)
 
-	Mon Mar 15 02:35:51 UTC 2004 (Rev: 31, Author: chromatic)
-	- improve multi-part message handling, especially with sigs
-	- bump version number
-	- update examplefilter.pl to show procmail workaround
+    Mon Mar 15 02:35:51 UTC 2004 (Rev: 31, Author: chromatic)
+    - improve multi-part message handling, especially with sigs
+    - bump version number
+    - update examplefilter.pl to show procmail workaround
 
-	Thu Mar 11 01:23:35 UTC 2004 (Rev: 31, Author: chromatic)
-	- ported to new Mail::Action (using Mail::Message, not Mail::Internet)
-	- set author keyword expansion on Changes
+    Thu Mar 11 01:23:35 UTC 2004 (Rev: 31, Author: chromatic)
+    - ported to new Mail::Action (using Mail::Message, not Mail::Internet)
+    - set author keyword expansion on Changes
 
 0.86 
-	Tue Dec 30 00:21:35 UTC 2003 (Rev: 27)
-	- fix portability of t/aliases.t
-	- should pass tests on non-Unix platforms now
+    Tue Dec 30 00:21:35 UTC 2003 (Rev: 27)
+    - fix portability of t/aliases.t
+    - should pass tests on non-Unix platforms now
 
 0.85
-	Sun Dec 14 01:00:13 UTC 2003 (Rev: 26)
-	- update dependency on Mail::Action
+    Sun Dec 14 01:00:13 UTC 2003 (Rev: 26)
+    - update dependency on Mail::Action
 
-	Sat Dec 13 22:37:22 UTC 2003 (Rev: 25)
-	- use Mail::Action::Address roles in Mail::SimpleList::Alias
-	- add dependency on Class::Roles
+    Sat Dec 13 22:37:22 UTC 2003 (Rev: 25)
+    - use Mail::Action::Address roles in Mail::SimpleList::Alias
+    - add dependency on Class::Roles
 
-	Thu Dec 11 05:40:30 UTC 2003 (Rev: 24)
-	- factored out Mail::Action::Address
-	- update files for 0.85 release
+    Thu Dec 11 05:40:30 UTC 2003 (Rev: 24)
+    - factored out Mail::Action::Address
+    - update files for 0.85 release
 
 0.82
-	Sun Nov  2 04:06:50 UTC 2003 (Rev: 23)
-	- factored out Mail::Action::Storage
-	- made Mail::SimpleList::Aliases extend Mail::Action::Storage
-	- fixed typo in previous Changes version
+    Sun Nov  2 04:06:50 UTC 2003 (Rev: 23)
+    - factored out Mail::Action::Storage
+    - made Mail::SimpleList::Aliases extend Mail::Action::Storage
+    - fixed typo in previous Changes version
 
-	Sun Nov  2 03:29:02 UTC 2003 (Rev: 22)
-	- factored out Mail::Action
-	- made Mail::SimpleList extend Mail::Action
+    Sun Nov  2 03:29:02 UTC 2003 (Rev: 22)
+    - factored out Mail::Action
+    - made Mail::SimpleList extend Mail::Action
 
 0.81 Tue Oct 14 23:05:08 UTC 2003
-	- ignore signatures when creating new lists (Brett Warden)
-	- update files for 0.81 release
+    - ignore signatures when creating new lists (Brett Warden)
+    - update files for 0.81 release
 
 0.80 Sun Sep 21 20:42:34 UTC 2003
-	- added lib/Mail/SimpleList/PodToHelp and t/podtohelp.t
-	- fill in command_help() in Mail::SimpleList
-	- update files for 0.80 release
+    - added lib/Mail/SimpleList/PodToHelp and t/podtohelp.t
+    - fill in command_help() in Mail::SimpleList
+    - update files for 0.80 release
 
      Sun Sep 21 07:29:01 UTC 2003
-	- set Reply-To list address for normal responses
-	- fix caplitalization of CC header (docs and tests)
+    - set Reply-To list address for normal responses
+    - fix caplitalization of CC header (docs and tests)
 
 0.79 Sun Sep 21 07:07:35 UTC 2003
-	- fix POD error in Mail::SimpleList::Alias
+    - fix POD error in Mail::SimpleList::Alias
 
-	 Fri Jul  4 19:14:54 GMT 2003
-	- be sure to save list after auto_add
-	- remove Cc: headers appropriately after auto_add
+     Fri Jul  4 19:14:54 GMT 2003
+    - be sure to save list after auto_add
+    - remove Cc: headers appropriately after auto_add
 
      Thu Jul  3 06:18:04 GMT 2003
-	- add List-Id and X-MSL-Seen headers
-	- disallow sending the same message to the alias twice
-	- allow the To header to remain
-	- allow the Date header to remain (Tim Maher and Allison Randal suggestion)
-	- disallow the 'From ' mbox heading (Tim Maher helped debug this one)
+    - add List-Id and X-MSL-Seen headers
+    - disallow sending the same message to the alias twice
+    - allow the To header to remain
+    - allow the Date header to remain (Tim Maher and Allison Randal suggestion)
+    - disallow the 'From ' mbox heading (Tim Maher helped debug this one)
 
 0.78 Mon Jun 30 04:54:27 GMT 2003
-	- added Name directive to specify alias name (Allison Randal suggestion)
-	- updated docs to reflect this
-	- minor code shakeup to make it possible
-		- Mail::SimpleList::generate_alias()
-		- Mail::SimpleList::post_address()
-		- Mail::SimpleList::process_body()
-		- Mail::SimpleList::Aliases::create() -- no longer saves
+    - added Name directive to specify alias name (Allison Randal suggestion)
+    - updated docs to reflect this
+    - minor code shakeup to make it possible
+        - Mail::SimpleList::generate_alias()
+        - Mail::SimpleList::post_address()
+        - Mail::SimpleList::process_body()
+        - Mail::SimpleList::Aliases::create() -- no longer saves
 
 0.75 Sat Jun 28 20:12:54 GMT 2003
-	- added Description directive and documentation
-	- removed unused code from t/aliases.t
-	- copy all headers except the ones that need changing
+    - added Description directive and documentation
+    - removed unused code from t/aliases.t
+    - copy all headers except the ones that need changing
 
 0.71 Sat Sep 20 23:47:10 UTC 2003
-	- fix hash order dependent test #57 in t/base.t
-	- fix t/lib/FakeIn.pm to generate better glob refs
+    - fix hash order dependent test #57 in t/base.t
+    - fix t/lib/FakeIn.pm to generate better glob refs
 
 0.70 Sun Jun 15 19:14:08 GMT 2003
-	- added documentation
-	- added link to Portland Perl Mongers talk in README
-	- added support for list cloning
-	- miscellaneous improvements to acceptance/customer tests
+    - added documentation
+    - added link to Portland Perl Mongers talk in README
+    - added support for list cloning
+    - miscellaneous improvements to acceptance/customer tests
 
 0.65 4 June 2003 (or thereabouts)
-	- improved tests with t/lib/FakeMail
-	- clean up after tests (remove t/alias)
-	- ensure that generated aliases never overlap (as much as possible)
-	- add alias cloning
+    - improved tests with t/lib/FakeMail
+    - clean up after tests (remove t/alias)
+    - ensure that generated aliases never overlap (as much as possible)
+    - add alias cloning
 
 0.60 Fri May 30 01:35:20 GMT 2003
-	- added option for closed aliases
-	- added option for no auto add
+    - added option for closed aliases
+    - added option for no auto add
 
-	 Thu May 29 06:56:08 GMT 2003
-	- added support for alias expiration
-	- fixed the bug that ate message bodies
+     Thu May 29 06:56:08 GMT 2003
+    - added support for alias expiration
+    - fixed the bug that ate message bodies
 
 0.50 Mon May 26 01:36:43 GMT 2003
-	- initial release
-	- handles creating, replying, and unsubscribing
+    - initial release
+    - handles creating, replying, and unsubscribing
 
 pre-release
-	- was called something else
-	- wasn't quite as nice
+    - was called something else
+    - wasn't quite as nice

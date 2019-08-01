@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.023",
+  "VERSION" => "0.025",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,8 +70,16 @@ WriteMakefile(%WriteMakefileArgs);
 
 
 # BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
-sub MY::postamble {
-  $abmm->mm_postamble;
+{ package
+    MY;
+  sub postamble {
+    $abmm->mm_postamble(@_);
+  }
+  sub install {
+    $abmm->can('mm_install')
+      ? $abmm->mm_install(@_)
+      : shift->SUPER::install(@_);
+  }
 }
 # END code inserted by Dist::Zilla::Plugin::AlienBuild
 

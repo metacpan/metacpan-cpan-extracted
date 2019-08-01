@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Gist;
 # ABSTRACT: Service provider for GitHub gist - http://gist.github.com/
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use parent 'App::Nopaste::Service';
 
@@ -172,7 +172,7 @@ App::Nopaste::Service::Gist - Service provider for GitHub gist - http://gist.git
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =for stopwords SIGNES gists oauth plaintext
 
@@ -188,9 +188,13 @@ or you can use this module to do the same:
 
     perl -MApp::Nopaste::Service::Gist -e 'App::Nopaste::Service::Gist->create_token'
 
-This will grant gist rights to the L<App::Nopaste>. Don't worry, you can revoke
-access rights anytime from the GitHub profile settings. Search for C<token> in
-response and export it as the C<GITHUB_OAUTH_TOKEN> environment variable.
+You can also generate a token by navigating to L<https://github.com/settings/tokens>
+and generate a new token with the 'Create gists' ability.
+
+Then, export the resulting token as the the C<GITHUB_OAUTH_TOKEN> environment
+variable.  This will grant gist rights to L<App::Nopaste> (or anything else
+that Don't worry, you can revoke access rights anytime from the GitHub profile
+settings.
 
 Alternatively, you can export the C<GITHUB_USER> and C<GITHUB_PASSWORD>
 environment variables, just like for the

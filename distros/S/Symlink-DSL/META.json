@@ -62,7 +62,7 @@
    "provides" : {
       "Symlink::DSL" : {
          "file" : "lib/Symlink/DSL.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/shlomif/Symlink-DSL"
       }
    },
-   "version" : "0.2.1",
+   "version" : "0.2.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

@@ -10,8 +10,8 @@ configuration using one of Mojolicious's configuration plugins.
     # myapp.conf
     {
         export => {
-            # Configure the default paths to export
-            paths => [ '/', '/hidden' ],
+            # Configure the default pages to export
+            pages => [ '/', '/hidden' ],
             # The directory to export to
             to => '/var/www/html',
             # Rewrite URLs to include base directory

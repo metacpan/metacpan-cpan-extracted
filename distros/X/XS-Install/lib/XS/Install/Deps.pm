@@ -14,7 +14,7 @@ sub find_header_deps {
     
     my %ret;
     foreach my $file (@{$p->{files}}) {
-        my $absfile = abs_path($file) or next;
+        my $absfile = eval { abs_path($file) } or next;
         next unless -f $absfile;
         my $deps = _find_header_deps($absfile, $cache, $inc, $headers) or next;
         $ret{$file} = [keys %$deps];

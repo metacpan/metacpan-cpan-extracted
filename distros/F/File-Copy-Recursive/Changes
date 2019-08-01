@@ -1,11 +1,16 @@
 Revision history for Perl extension File::Copy::Recursive.
 
 0.45 UNRELEASED
+    - PR #21: fix version 0.43 in Changes file (thanks karenetheridge)
+    - PR #19: Added missing license meta name. (thanks manwar and karenetheridge)
+    - PR #24: allow for dev = 0 on NetBSD (thanks plicease)
+    - PR #25: Remove warning when copying a dir without write perm on the original. (thanks ehickeycp)
+    - Issue #26: change issues from rt to github
 
 0.44 Tue Apr 24 08:18:19 2018
     - Issue #18: fix t/05.legacy-pathmk_unc.t for recent updates (thanks zdm)
 
-0.44 Sat Apr 21 15:39:09 2018
+0.43 Sat Apr 21 15:39:09 2018
     - pull request #16 - strip down list of prerequisites to modules that are safe to use high on
       the CPAN river (thanks karenetheridge)
 

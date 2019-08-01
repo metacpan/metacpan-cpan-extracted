@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Mojopaste;
 # ABSTRACT: Service provider for mojopaste
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use parent 'App::Nopaste::Service';
 
@@ -49,7 +49,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords mojopaste
+=for stopwords mojopaste Dean Hamstead
 
 =head1 NAME
 
@@ -57,7 +57,7 @@ App::Nopaste::Service::Mojopaste - Service provider for mojopaste
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =head1 USAGE
 

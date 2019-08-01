@@ -322,7 +322,7 @@ CONFIGURE_OPTIONS = " '--with-zlib' '--with-nghttp2=/usr/local/git_tree/perl-Any
 CPP = gcc -E
 CPPFLAGS = -I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/include -I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/include -I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/include
 CPPFLAG_CURL_STATICLIB = -DCURL_STATICLIB
-CURLVERSION = 7.65.0
+CURLVERSION = 7.65.3
 CURL_CA_BUNDLE = "/etc/pki/tls/certs/ca-bundle.crt"
 CURL_CFLAG_EXTRAS = 
 CURL_DISABLE_DICT = 
@@ -428,7 +428,6 @@ STRIP = strip
 SUPPORT_FEATURES = SSL IPv6 UnixSockets libz brotli AsynchDNS NTLM NTLM_WB HTTP2 HTTPS-proxy
 SUPPORT_PROTOCOLS = DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS POP3 POP3S RTSP SMB SMBS SMTP SMTPS TELNET TFTP
 USE_ARES = 1
-USE_CYASSL = 
 USE_GNUTLS = 
 USE_GNUTLS_NETTLE = 
 USE_LIBRTMP = 
@@ -439,13 +438,13 @@ USE_MESALINK =
 USE_NGHTTP2 = 1
 USE_NSS = 
 USE_OPENLDAP = 
-USE_POLARSSL = 
 USE_SCHANNEL = 
 USE_SECTRANSP = 
 USE_UNIX_SOCKETS = 1
 USE_WINDOWS_SSPI = 
+USE_WOLFSSL = 
 VERSION = -
-VERSIONNUM = 074100
+VERSIONNUM = 074103
 ZLIB_LIBS = -lz
 ZSH_FUNCTIONS_DIR = ${prefix}/share/zsh/site-functions
 abs_builddir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
@@ -649,12 +648,12 @@ LIB_VAUTH_CFILES = vauth/vauth.c vauth/cleartext.c vauth/cram.c         \
 LIB_VAUTH_HFILES = vauth/vauth.h vauth/digest.h vauth/ntlm.h
 LIB_VTLS_CFILES = vtls/openssl.c vtls/gtls.c vtls/vtls.c vtls/nss.c     \
   vtls/polarssl.c vtls/polarssl_threadlock.c                            \
-  vtls/cyassl.c vtls/schannel.c vtls/schannel_verify.c                  \
+  vtls/wolfssl.c vtls/schannel.c vtls/schannel_verify.c                 \
   vtls/sectransp.c vtls/gskit.c vtls/mbedtls.c vtls/mesalink.c
 
 LIB_VTLS_HFILES = vtls/openssl.h vtls/vtls.h vtls/gtls.h                \
   vtls/nssg.h vtls/polarssl.h vtls/polarssl_threadlock.h                \
-  vtls/cyassl.h vtls/schannel.h vtls/sectransp.h vtls/gskit.h           \
+  vtls/wolfssl.h vtls/schannel.h vtls/sectransp.h vtls/gskit.h          \
   vtls/mbedtls.h vtls/mesalink.h
 
 LIB_CFILES = file.c timeval.c base64.c hostip.c progress.c formdata.c   \

@@ -1,4 +1,144 @@
-SYNOPSIS
+NAME
+    App::metasyn - Alternative front-end to Acme::MetaSyntactic
 
+VERSION
+    This document describes version 0.005 of App::metasyn (from Perl
+    distribution App-metasyn), released on 2019-07-05.
+
+SYNOPSIS
     Use the included script metasyn.
+
+FUNCTIONS
+  metasyn
+    Usage:
+
+     metasyn(%args) -> [status, msg, payload, meta]
+
+    Alternative front-end to Acme::MetaSyntactic.
+
+    Examples:
+
+    *   List all installed themes:
+
+         metasyn( action => "list-themes"); # -> ["any", "christmas", "contributors", "foo"]
+
+    *   List all installed themes, along with all their categories:
+
+         metasyn( action => "list-themes", categories => 1);
+
+        Result:
+
+         [
+           "any",
+           "christmas/elf",
+           "christmas/reindeer",
+           "christmas/santa",
+           "christmas/snowman",
+           "contributors",
+           "foo/en",
+           "foo/fr",
+           "foo/nl",
+         ]
+
+    *   List all names from a theme:
+
+         metasyn( theme => "foo");
+
+        Result:
+
+         [
+           "foo",
+           "bar",
+           "baz",
+           "foobar",
+           "fubar",
+           "qux",
+           "quux",
+         # ...snipped 32 lines for brevity...
+           "kees",
+           "bok",
+           "weide",
+           "does",
+           "hok",
+           "duif",
+           "schapen",
+         ]
+
+    *   List all names from a theme in random order:
+
+         metasyn( theme => "christmas/elf", shuffle => 1);
+
+        Result:
+
+         [
+           "shinny",
+           "wunorse",
+           "mary",
+           "pepper",
+           "evergreen",
+           "bushy",
+           "snowball",
+           "minstix",
+           "alabaster",
+           "opneslae",
+           "upatree",
+           "sugarplum",
+         ]
+
+    *   List all categories from a theme:
+
+         metasyn( theme => "christmas", categories => 1); # -> ["elf", "reindeer", "santa", "snowman"]
+
+    This script is an alternative front-end to Acme::MetaSyntactic. Compared
+    to the official CLI meta, this CLI is more oriented towards listing
+    names instead of giving you one or several random names.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "list-names")
+
+    *   categories => *bool*
+
+    *   shuffle => *bool*
+
+    *   theme => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-metasyn>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-metasyn>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-metasyn>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    meta.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

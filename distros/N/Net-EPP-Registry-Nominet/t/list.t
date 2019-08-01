@@ -3,33 +3,29 @@
 #
 #         FILE:  list.t
 #
-#  DESCRIPTION:  Test the list operation
+#  DESCRIPTION:  Test the list and list_tags operations
 #
-#        FILES:  ---
-#         BUGS:  ---
 #        NOTES:  Must have set $NOMTAG and $NOMPASS env vars first
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: list.t,v 1.1.1.1 2013/10/21 14:04:54 pete Exp $
 #      CREATED:  04/02/13 13:22:06
-#     REVISION:  $Revision: 1.1.1.1 $
 #===============================================================================
 
 use strict;
 use warnings;
 
 use Test::More;
+use Time::Piece;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 5;
+	plan tests => 15;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
 
-use lib './lib';
 use Net::EPP::Registry::Nominet;
 
-my $epp = new_ok ('Net::EPP::Registry::Nominet', [ test => 1,
+my $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS}, debug =>
 	$ENV{DEBUG_TEST} || 0 ] );
 
@@ -38,15 +34,71 @@ my $domlist = $epp->list_domains ($range);
 
 is (@$domlist, 0, 'Correct empty domain expiry list');
 
-my @lt = localtime (time ());
-$range = sprintf ('%4.4i-%2.2i', $lt[5] + 1900, $lt[4] + 1);
-$domlist = $epp->list_domains ($range);
-isnt (@$domlist, 0, "Correct domain list for $range");
+my $lt         = localtime (time ());
+my $tag        = lc $ENV{NOMTAG};
+$range         = substr ($lt->ymd, 0, 7);
+my $domforlist = "list-$range-$tag.co.uk";
+my ($avail)    = $epp->check_domain ($domforlist);
+if ($avail) {
+	my $domain = {
+		name       => $domforlist,
+		period     => "2",
+		registrant => {
 
-# Now try with registration date
-$range = sprintf ('%4.4i-%2.2i', $lt[5] + 1898, $lt[4] + 1);
+			# Minimum
+			name       => 'Foo Bar',
+			type       => 'IND',
+			postalInfo => {
+				loc => {
+					name => 'Foo Bar',
+					addr => {
+						street => ['1 Bar St'],
+						city   => 'Bazville',
+						pc     => 'QU7 7UX',
+						cc     => 'GB'
+					}
+				}
+			},
+			voice   => '+44.1234567890',
+			email   => 'a.n.other@example.com'
+		},
+		nameservers => {}
+	};
+
+	my ($res) = $epp->create_domain ($domain);
+	diag $epp->get_reason || $epp->get_error unless $res;
+}
+
+# First try with registration date
 $domlist = $epp->list_domains ($range, 'month');
-isnt (@$domlist, 0, "Correct domain list for $range");
+isnt (@$domlist, 0, "Correct domain registration list for $range");
+
+# Now try with expiry date
+$range = substr ($lt->add_years(2)->ymd, 0, 7);
+
+$domlist = $epp->list_domains ($range);
+isnt (@$domlist, 0, "Correct domain expiry list for $range");
+
+# Tags
+$epp->logout;
+$epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
+	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS}, debug =>
+	$ENV{DEBUG_TEST} || 0, login_opt => {tag_list => 1} ] );
+
+my $taglist = $epp->list_tags;
+ok ($taglist, 'Tag list defined');
+is (ref $taglist, 'ARRAY', 'Tag list is an arrayref');
+cmp_ok ($#$taglist, '>', 100,
+	'Tag list has many entries (' . ($#$taglist + 1) . ')');
+
+# Check one entry for attributes
+my $onetag = $taglist->[0];
+for my $key (qw/registrar-tag name handshake trad-name/) {
+	ok (exists $onetag->{$key}, "Tag in list has $key key");
+}
+my $res = grep { $_->{'trad-name'} } @$taglist;
+cmp_ok ($res, '>', 0, 'At least one has a trad_name');
+cmp_ok ($res, '<', scalar (@$taglist), 'At least one has no trad_name');
 
 ok ($epp->logout(), 'Logout successful');
 

@@ -129,7 +129,7 @@ sub _new {
     return bless [ $string, \%attrs ], $class;
 }
 
-=head2 I<OBJ>->get_messaage()
+=head2 I<OBJ>->get_message()
 
 Return the exception’s main MESSAGE.
 This is useful for contexts where you want to encapsulate the error

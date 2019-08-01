@@ -1,14 +1,15 @@
 package Mail::SimpleList::Aliases;
 
 use strict;
-use base 'Mail::Action::Storage';
+use warnings;
+
+use parent 'Mail::Action::Storage';
 
 use File::Spec;
-
 use Mail::SimpleList::Alias;
 
 use vars qw( $VERSION );
-$VERSION = '0.94';
+$VERSION = '0.95';
 
 sub new
 {
@@ -116,5 +117,6 @@ L<Mail::Action::Storage>, the parent class.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016, chromatic.  All rights reserved.  This module is
-distributed under the same terms as Perl itself.  Convenient for you!
+Copyright (c) 2003 - 2016 chromatic. All rights reserved. This module is
+distributed under the same terms as Perl 5.30, in the hope that it is useful
+but under no warranty.

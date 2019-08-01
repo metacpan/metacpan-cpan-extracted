@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014-2016 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -21,33 +21,46 @@
 
 pft show - Show the built site
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
-pft show [-v]
+B<pft show> [B<-v>]
 
 =head1 DESCRIPTION
 
-Show the built site
+Once the site is built with L<pft-make(1)>, it can be visualized locally by
+invoking B<pft show>.
+
+This command is really just syntactic sugar for:
+
+    $BROWSER ROOT/build/index.html
+
+Where C<$BROWSER> depends on the C<pft.yaml> configuration file (see
+L<pft-init(1)>) or by the C<$BROWSER> environment variable if no browser is
+defined by the configuration.
 
 =head1 OPTIONS
 
 =over
 
-=item --browser <command>
+=item B<--browser>=I<command>
 
-The browser can be specified by name (e.g. C<firefox>) or as a shell
-command, where C<%s> is replaced with the file name
-(e.g. C<firefox [options] %s>).
+The browser can be specified by name (e.g. C<firefox>) or as a L<sh(1)>
+command line, where C<%s> is replaced with the file name
+(e.g. C<firefox '%s'>).
 
-This flag overrides the C<system.browser> setting in the main configuration
+This flag overrides the C<system.browser> setting in the C<pft.yaml>
 file. If neither the flag nor the setting are specified, the C<$BROWSER>
 environment variable will be honored.
 
-=item --help | -h
+=item B<--help> | B<-h>
 
 Show this help.
 
 =back
+
+=head1 SEE ALSO
+
+L<pft-init(1)>, L<pft-make(1)>
 
 =cut
 

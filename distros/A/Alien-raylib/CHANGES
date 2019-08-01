@@ -1,9 +1,52 @@
 ==================================================
-Changes from 2018-01-19 00:00:00 +0000 to present.
+Changes from 2018-07-30 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.023 at 2019-01-19 17:56:01 +0000
+version 0.025 at 2019-07-30 06:59:55 +0000
+------------------------------------------
+
+  Change: 4c0eab058ea237b48a342359f8421a92c11c977e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-07-30 08:59:47 +0000
+
+    v0.025 
+
+  Change: 034920fae75a0c41a3f73a9c79079babb727cf2c
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-07-30 08:54:43 +0000
+
+    tests: add (untested) Win32-workaround for duplicate symbols 
+
+------------------------------------------
+version 0.024 at 2019-07-30 06:47:30 +0000
+------------------------------------------
+
+  Change: 37137f2e85782636fc0572750ff79765c12e66a9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-07-30 08:47:30 +0000
+
+    v0.024 
+
+  Change: 21e3c6287f0bb0425332f5b72f857d13025463f3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-07-30 08:43:33 +0000
+
+    tests: split header check into non-Windows check
+
+    Including both the raylib header and windows.h (via perl.h) is
+    problematic because they define the same symbols. We might be able
+    get around this by defining NOUSER and friends to have the WinAPI not
+    use these symbols:
+    https://github.com/raysan5/raylib/issues/857#issuecomment-498020922
+
+    But for now, just open code the prototype we need for our test and
+    have the header be used in a separate test that's skipped on Windows.
+
+    Fixes #4. 
+
+------------------------------------------
+version 0.023 at 2019-01-19 17:55:45 +0000
 ------------------------------------------
 
   Change: d5b7a954df68d2ec0e1b83c101458219b8534245
@@ -45,185 +88,6 @@ version 0.022 at 2018-10-07 08:50:36 +0000
     32-bit libraries are no longer included by default and would fail the
     build. 
 
-------------------------------------------
-version 0.021 at 2018-07-29 11:38:58 +0000
-------------------------------------------
-
-  Change: 516f486f19376fe306ce11c784b95ecb3dfba4a1
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-07-29 13:38:58 +0000
-
-    Point at newest raylib
-
-    to get some extra test coverage for the new CMake changes 
-
-------------------------------------------
-version 0.020 at 2018-07-21 22:49:28 +0000
-------------------------------------------
-
-  Change: 0bc97d0aa6220ba39f692e4cca37cdf8e59617cc
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-07-22 00:49:28 +0000
-
-    Bump version to raylib v2.0.0 
-
-------------------------------------------
-version 0.019 at 2018-07-03 20:16:36 +0000
-------------------------------------------
-
-  Change: fad7f6afd515559ee10e3c6ac7aba99624785e42
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-07-03 22:16:36 +0000
-
-    Bump version 
-
-------------------------------------------
-version 0.018 at 2018-05-24 21:03:26 +0000
-------------------------------------------
-
-  Change: 4a2cbcd6bccb6d257c555e019d95af5a12e724d8
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-05-24 23:03:26 +0000
-
-    Bump to newest raylib 
-
-------------------------------------------
-version 0.017 at 2018-05-12 17:07:59 +0000
-------------------------------------------
-
-  Change: 35805dfd4c78e87ec148e9b74c360a892f584ce3
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-05-12 19:07:59 +0000
-
-    Point to newest and greatest raylib
-
-    Fixes build errors in 0.015. 
-
-------------------------------------------
-version 0.016 at 2018-05-12 05:59:27 +0000
-------------------------------------------
-
-  Change: 651ab7afe7b66417afdc46a8b62f78e797676751
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-05-12 07:59:27 +0000
-
-    Revert to last non-breaking upstream commit 
-
-------------------------------------------
-version 0.015 at 2018-05-11 00:02:12 +0000
-------------------------------------------
-
-  Change: 1645af72104dfa4e9824fc70cd0d22d178bcddd0
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-05-11 02:02:12 +0000
-
-    Bump to newest raylib 
-
-------------------------------------------
-version 0.014 at 2018-03-21 21:55:04 +0000
-------------------------------------------
-
-  Change: 9c5424e113ef12f3e4df63ad231669f4246759f2
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-03-21 22:55:04 +0000
-
-    Bump to newest raylib 
-
-------------------------------------------
-version 0.013 at 2018-02-20 21:30:37 +0000
-------------------------------------------
-
-  Change: 7f0358d7a986c48da1b74e67e1c5f94a80120ff7
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-02-20 22:30:37 +0000
-
-    Repoint at newest upstream raylib 
-
-------------------------------------------
-version 0.012 at 2018-02-09 22:03:45 +0000
-------------------------------------------
-
-  Change: 29b24f1bb8123224447cc1b110a758862f731442
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-02-09 23:03:45 +0000
-
-    Pull in change in upstream
-
-    "Early-exit InitWindow if InitGraphicsDevice fails" 
-
-------------------------------------------
-version 0.011 at 2018-02-09 21:13:57 +0000
-------------------------------------------
-
-  Change: e39364b8f09df38b54b30713731037e76ffaae8e
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-02-09 22:13:57 +0000
-
-    Point at newest upstream
-
-    * No assertion failure in glfwSetVideoMode 
-
-------------------------------------------
-version 0.010 at 2018-02-03 14:07:45 +0000
-------------------------------------------
-
-  Change: 0cdc3b7a191ff08d80c4718ee9beef27876491f3
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-02-03 15:07:45 +0000
-
-    InitWindow should return an error code instead of exiting
-
-    Needed to allow skipping graphical tests easily. 
-
-------------------------------------------
-version 0.009 at 2018-02-03 12:36:31 +0000
-------------------------------------------
-
-  Change: f84e34daeb8146d8b84f2cdcf88c47d950f6884d
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-02-03 13:36:31 +0000
-
-    Pull in upstream fixes
-
-    - Support for Linux v2.6.30-v2.6.39 - Allow probing if graphic device
-    is unavailable (InitWindow fails) - Verbose Build process 
-
-------------------------------------------
-version 0.008 at 2018-01-27 01:04:40 +0000
-------------------------------------------
-
-  Change: 893dc44c48b5479409f210753cc60be72db1fd66
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-01-27 02:04:40 +0000
-
-    Point at most recent raylib upstream commit
-
-    This one correctly populates the .pc file on FreeBSD. 
-
-  Change: 57691396fae261696e73a565638198d88be5017e
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-01-26 22:18:04 +0000
-
-    Drop libglew-dev as dependency
-
-    Isn't required. See #2. 
-
-------------------------------------------
-version 0.007 at 2018-01-25 21:00:52 +0000
-------------------------------------------
-
-  Change: b046be3eb0471765d6404215259d1c228a231e0b
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-01-25 22:00:52 +0000
-
-    Note System requirements as requested in #2 
-
-  Change: b5af5e04d84da1b55d43ec2b15c932378d6549f5
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-01-25 21:58:23 +0000
-
-    Point at newest raylib develop snapshot 
-
-================================================
-Plus 6 releases after 2018-01-19 00:00:00 +0000.
-================================================
+=================================================
+Plus 21 releases after 2018-07-30 00:00:00 +0000.
+=================================================

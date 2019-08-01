@@ -3,18 +3,18 @@ require 5.016000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'INSTALLDIRS' => 'site',
   'NAME' => 'Data::ObjectStore',
+  'VERSION_FROM' => 'lib/Data/ObjectStore.pm',
+  'PREREQ_PM' => {
+                   'Data::RecordStore' => '5.03',
+                   'Module::Build' => '0.4',
+                   'Test::More' => 0
+                 },
+  'INSTALLDIRS' => 'site',
   'EXE_FILES' => [
                    'bin/objectstore_explorer',
                    'bin/objectstore_upgrade'
                  ],
-  'VERSION_FROM' => 'lib/Data/ObjectStore.pm',
-  'PREREQ_PM' => {
-                   'Test::More' => 0,
-                   'Module::Build' => '0.4',
-                   'Data::RecordStore' => '4.05'
-                 }
+  'PL_FILES' => {}
 )
 ;

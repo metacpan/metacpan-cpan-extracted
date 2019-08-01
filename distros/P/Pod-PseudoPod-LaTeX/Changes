@@ -1,5 +1,8 @@
 Revision history for Pod-PseudoPod-LaTeX
 
+1.20190729 2019-07-29 15:03:34-07:00 America/Los_Angeles
+    - generate META.json (Mohammad S Anwar, GH PR #21)
+
 1.20160626 2016-06-26 19:32:03+02:00 Europe/Amsterdam
 
     - add support to 'captions_below' to make captions below the

@@ -47,7 +47,7 @@
 #include <map>
 #include <random>
 
-#include "http-parser/http_parser.h"
+#include "url-parser/url_parser.h"
 
 #include "template.h"
 #include "network.h"
@@ -771,6 +771,10 @@ StringRef extract_host(const StringRef &hostport);
 
 // Returns new std::mt19937 object.
 std::mt19937 make_mt19937();
+
+// daemonize calls daemon(3).  If __APPLE__ is defined, it implements
+// daemon() using fork().
+int daemonize(int nochdir, int noclose);
 
 } // namespace util
 

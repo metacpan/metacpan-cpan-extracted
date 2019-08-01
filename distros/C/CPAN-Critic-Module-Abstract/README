@@ -1,8 +1,9 @@
 NAME
-    CPAN::Critic::Module::Abstract - Critic CPAN module abstract
+    CPAN::Critic::Module::Abstract - (DEPRECATED) Critic CPAN module
+    abstract
 
 VERSION
-    This document describes version 0.091 of CPAN::Critic::Module::Abstract
+    This document describes version 0.092 of CPAN::Critic::Module::Abstract
     (from Perl distribution CPAN-Critic-Module-Abstract), released on
     2019-07-03.
 

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::script2author;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.035'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '1.037'; # VERSION
 
 use 5.010;
 use strict;
@@ -77,7 +77,7 @@ App::lcpan::Cmd::script2author - Get author name of script(s)
 
 =head1 VERSION
 
-This document describes version 1.035 of App::lcpan::Cmd::script2author (from Perl distribution App-lcpan), released on 2019-06-26.
+This document describes version 1.037 of App::lcpan::Cmd::script2author (from Perl distribution App-lcpan), released on 2019-07-23.
 
 =head1 FUNCTIONS
 
@@ -113,7 +113,7 @@ be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
 
-=item * B<scripts>* => I<array[str]>
+=item * B<scripts>* => I<array[filename::unix]>
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

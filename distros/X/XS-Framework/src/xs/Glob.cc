@@ -7,6 +7,7 @@ namespace xs {
 
 Glob Glob::create (const Stash& stash, panda::string_view name, U32 flags) {
     GV* gv = (GV*)newSV(0);
+    flags |= GV_ADDMULTI; // suppress 'used only once' warning
     gv_init_pvn(gv, stash, name.data(), name.length(), flags);
     return gv;
 }

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.135;
+package Config::Model::Instance 2.136;
 
 #use Scalar::Util qw(weaken) ;
 use strict;
@@ -661,7 +661,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.135
+version 2.136
 
 =head1 SYNOPSIS
 
@@ -822,7 +822,9 @@ Returns <$self>.
 =head2 save
 
 Save the content of the configuration tree to
-configuration files. (alias to C<write_back>)
+configuration files. (See L</write_back> for more details)
+
+Use C<< force => 1 >> option to force saving configuration data.
 
 =head2 config_root
 
@@ -1067,6 +1069,10 @@ data back with C<config_dir> parameter. This overrides the model
 specifications.
 
 C<write_back> croaks if no write call-back are known.
+
+Use C<< force => 1 >> option to force saving configuration data. This
+is useful to write back a file even no change are done at semantic
+level, i.e. to reformat a file or remove unnecessary data.
 
 =head1 AUTHOR
 

@@ -5,14 +5,14 @@ use warnings;
 
 package App::gba;
 # ABSTRACT: Command-line code uploader for the Gameboy Advance
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use File::ShareDir 'dist_file';
 
 use base 'App::Cmd::Simple';
 use charnames qw();
 use open qw( :encoding(UTF-8) :std );
-use Module::Load qw(load);
+
 use Getopt::Long::Descriptive;
 use Device::GBA;
 use Scalar::Util 'looks_like_number';
@@ -29,29 +29,27 @@ gba - Command-line code uploader for the Gameboy Advance
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
     $ gba --verbose code.gba
     .....Opening GBA file readonly
     .....GBA file length 0x000003a0
-
     BusPirate(mstr) GBA(slave)
-
     Looking for GBA 0x72026202
     0x72026202 0x00006202  ; Found GBA
     0x72026202 0x00006102  ; Recognition OK
     0x00020000 0x00006200  ; Transfer of header data complete
     0x72026200 0x00006202  ; Exchange master/slave info again
     0x72026202 0x000063d1  ; Send palette data
-    0x73c863d1 0x000063d1  ; Send palette data, receive 0x73hh****
-    0x73fa63d1 0x000064d7  ; Send handshake data
-    0x737564d7 0x00000084  ; Send length info, receive seed 0x**cc****
-    Upload:  99% [=====================================*======== ]0m00s Left
+    0x739163d1 0x000063d1  ; Send palette data, receive 0x73hh****
+    0x739863d1 0x000064a0  ; Send handshake data
+    0x736464a0 0x00000084  ; Send length info, receive seed 0x**cc****
+    Upload: 100% [=========================================]D 0h00m14s
     Wait for GBA to respond with CRC 0x00750065
     0x00750065 0x00000066  ; GBA ready with CRC
-    0x35ec0066 0x000035ec  ; Let's exchange CRC!
+    0x8caa0066 0x00008caa  ; Let's exchange CRC!
     CRC ...hope they match!
     MultiBoot done
 
@@ -61,7 +59,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-The Nintendo Gameboy Advance can either boot from cartridge or over link cable. The latter is caled multiboot mode and is basically SPI and a homebrew encoding scheme. Unfortunately, the Bus Pirate doesn't have a 100k SPI mode, so we are using 125k instead. If you encounter problems with booting, use the next lower speed (30k) as bitrate.
+The Nintendo Gameboy Advance can either boot from cartridge or over link cable. The latter is caled multiboot mode and is basically SPI and a homebrew encoding scheme. Unfortunately, the Bus Pirate doesn't have a 100k SPI mode, so we are using 125000 instead. If you encounter problems with booting, use the next lower speed (30000) as bitrate.
 This utility allows uploading multiboot GBA images with the L<BusPirate|Device::BusPirate>. Don't forget to pass C<-specs=gba_mb.specs> to devkitARM GCC if you want to link a multiboot image. The package's C<share/> subdirectory contains an L<example Makefile|https://github.com/athreef/Device-GBA/blob/master/share/testimg/Makefile> for cross-compilation. The wiring is as follows:
 
     GBA     Bus Pirate
@@ -73,7 +71,7 @@ Note: This is still work in progress!
 
 =head1 OPTIONS
 
-=head2 pirate
+=head2 pirate / p
 
 Buspirate COM port/device file
 
@@ -124,8 +122,8 @@ sub opt_spec {
                 [ 'spi'  => "Communicate over 32-bit SPI" ],
             ] },
         ],
-        [ 'cat|c'       => "Cat", { default => '125k' } ],
-        [ 'bitrate|b=s' => "BusPirate SPI speed", { default => '125k' } ],
+        [ 'cat|c'       => "Cat" ],
+        [ 'bitrate|b=s' => "BusPirate SPI speed", { default => '125000' } ],
        #[ 'spi|s=s'     => "Linux SPI device file"   ],
         [ 'version|v'   => "show version number"     ],
         [ 'help|h'      => "display a usage message" ],
@@ -190,7 +188,10 @@ sub validate_args {
 sub execute {
     my ($self, $opt, $args) = @_;
 
-    my $gba = Device::GBA->new(buspirate => $opt->{pirate}, verbose => $self->{verbose}, bitrate => $opt->{bitrate});
+    my $adapter = Device::Chip::Adapter::BusPirate->new(serial => $opt->{pirate})
+           or die "Can't open Bus Pirate\n";
+
+    my $gba = Device::GBA->new(adapter => $adapter, verbose => $self->{verbose}, bitrate => $opt->{bitrate});
     if ($self->{multiboot}) {
         $gba->upload($args->[0]);
     } else {
@@ -198,7 +199,7 @@ sub execute {
         my $num = 0xFFFF_FFFF;
         while (<>) {
             my $num = looks_like_number($_) ? $_ : $num;
-            printf "%08x\n", $gba->spi_writeread($num);
+            printf "%08x\n", $gba->spi_readwrite($num);
         }
     }
 

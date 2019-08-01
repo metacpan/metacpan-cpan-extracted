@@ -7,7 +7,7 @@ use Mandel::Model;
 use Mango;
 use Carp 'confess';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 has model_class => sub { shift->_build_model_class };
 has namespaces  => sub { shift->_build_namespaces };
@@ -111,7 +111,7 @@ Mandel - Async model layer for MongoDB objects using Mango
 
 =head1 VERSION
 
-0.30
+0.31
 
 =head1 SYNOPSIS
 

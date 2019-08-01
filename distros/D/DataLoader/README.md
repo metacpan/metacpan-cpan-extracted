@@ -162,6 +162,46 @@ $user_loader->load(1)->catch(fun ($error) {
 });
 ```
 
+#### Priming the Cache
+
+It is also possible to prime the cache with data. For example if you fetch a user by ID,
+you could also prime a username-based cache:
+
+```
+$user_by_id->load(1)->then(fun ($user) {
+   $user_by_name->prime($user->name, $user);
+   ...
+});
+```
+
+If your backend query includes additional data, you could cache that too:
+
+```perl
+for my $tag (@{$user->tags}) {
+   $tag_loader->prime($tag->id, $tag->name);
+}
+```
+
+If you update a value in the backend, you can update the cache to save queries later:
+
+```perl
+$user = $user->update(favourite_color => 'red');
+$user_cache->clear($user->id)->prime($user->id, $user);
+```
+
+### Using Outside of GraphQL
+
+[DataLoader](https://metacpan.org/pod/DataLoader) assumes the use of [Mojolicious](https://metacpan.org/pod/Mojolicious), specifically its promise implementation
+[Mojo::Promise](https://metacpan.org/pod/Mojo::Promise). The [Mojo::Reactor::EV](https://metacpan.org/pod/Mojo::Reactor::EV) backend is recommended (and is automatically
+used provided you have [EV](https://metacpan.org/pod/EV) installed) for optimal batching, although other backends will
+also work.
+
+With the EV backend, DataLoader will work fine with any [AnyEvent](https://metacpan.org/pod/AnyEvent)-based code. See the
+unit tests of this module for examples.
+
+It would be possible to write a version of DataLoader that depends only on AnyEvent/EV
+and does not depend on Mojolicious. Let me know if there is interest.
+
 ## Methods
 
 - new ( batch\_load\_function, %options )
@@ -186,10 +226,12 @@ $user_loader->load(1)->catch(fun ($error) {
 
         If set, limit the maximum number of items to pass to the batch load function at once.
 
+        If unset (undef or missing), there will be no limit.
+
     - cache (true)
 
         Set to false to disable caching, which will create a new Promise and new key in the
-        batch load function for every load of the same key. (This means the batch loda function
+        batch load function for every load of the same key. (This means the batch loader function
         may be called with duplicate keys).
 
     - cache\_key\_func (identity function)

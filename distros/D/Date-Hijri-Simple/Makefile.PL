@@ -31,7 +31,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Hijri::Simple' => { file => 'lib/Date/Hijri/Simple.pm', version => '0.22' },
+            'Date::Hijri::Simple' => { file => 'lib/Date/Hijri/Simple.pm', version => '0.23' },
         },
         resources => {
             repository => {

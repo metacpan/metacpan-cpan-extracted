@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -22,9 +22,8 @@
 use 5.004;
 use strict;
 use List::Util 'min','max';
-
 use Test;
-plan tests => 7;
+plan tests => 4;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -129,7 +128,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A013583',
-   # max_value => 2000000,
+   max_value => 200000,
    func => sub {
      my ($count) = @_;
      my @got;

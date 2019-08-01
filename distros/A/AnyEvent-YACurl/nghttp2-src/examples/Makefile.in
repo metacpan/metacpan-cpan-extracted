@@ -148,7 +148,7 @@ asio_cl_OBJECTS = $(am_asio_cl_OBJECTS)
 am__DEPENDENCIES_1 =
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@am__DEPENDENCIES_2 = $(top_builddir)/lib/libnghttp2.la \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/src/libnghttp2_asio.la \
-@ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/libhttp-parser.la \
+@ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/liburl-parser.la \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(am__DEPENDENCIES_1) \
@@ -176,14 +176,14 @@ client_OBJECTS = $(am_client_OBJECTS)
 client_LDADD = $(LDADD)
 @ENABLE_EXAMPLES_TRUE@client_DEPENDENCIES =  \
 @ENABLE_EXAMPLES_TRUE@	$(top_builddir)/lib/libnghttp2.la \
-@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/libhttp-parser.la
+@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/liburl-parser.la
 am__deflate_SOURCES_DIST = deflate.c
 @ENABLE_EXAMPLES_TRUE@am_deflate_OBJECTS = deflate.$(OBJEXT)
 deflate_OBJECTS = $(am_deflate_OBJECTS)
 deflate_LDADD = $(LDADD)
 @ENABLE_EXAMPLES_TRUE@deflate_DEPENDENCIES =  \
 @ENABLE_EXAMPLES_TRUE@	$(top_builddir)/lib/libnghttp2.la \
-@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/libhttp-parser.la
+@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/liburl-parser.la
 am__libevent_client_SOURCES_DIST = libevent-client.c
 @ENABLE_EXAMPLES_TRUE@am_libevent_client_OBJECTS =  \
 @ENABLE_EXAMPLES_TRUE@	libevent-client.$(OBJEXT)
@@ -191,7 +191,7 @@ libevent_client_OBJECTS = $(am_libevent_client_OBJECTS)
 libevent_client_LDADD = $(LDADD)
 @ENABLE_EXAMPLES_TRUE@libevent_client_DEPENDENCIES =  \
 @ENABLE_EXAMPLES_TRUE@	$(top_builddir)/lib/libnghttp2.la \
-@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/libhttp-parser.la
+@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/liburl-parser.la
 am__libevent_server_SOURCES_DIST = libevent-server.c
 @ENABLE_EXAMPLES_TRUE@am_libevent_server_OBJECTS =  \
 @ENABLE_EXAMPLES_TRUE@	libevent-server.$(OBJEXT)
@@ -199,7 +199,7 @@ libevent_server_OBJECTS = $(am_libevent_server_OBJECTS)
 libevent_server_LDADD = $(LDADD)
 @ENABLE_EXAMPLES_TRUE@libevent_server_DEPENDENCIES =  \
 @ENABLE_EXAMPLES_TRUE@	$(top_builddir)/lib/libnghttp2.la \
-@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/libhttp-parser.la
+@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/liburl-parser.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -486,7 +486,7 @@ EXTRA_DIST = CMakeLists.txt
 @ENABLE_EXAMPLES_TRUE@	@DEFS@
 
 @ENABLE_EXAMPLES_TRUE@LDADD = $(top_builddir)/lib/libnghttp2.la \
-@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/libhttp-parser.la \
+@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/liburl-parser.la \
 @ENABLE_EXAMPLES_TRUE@	@LIBEVENT_OPENSSL_LIBS@ \
 @ENABLE_EXAMPLES_TRUE@	@OPENSSL_LIBS@ \
 @ENABLE_EXAMPLES_TRUE@	@APPLDFLAGS@
@@ -502,7 +502,7 @@ EXTRA_DIST = CMakeLists.txt
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@ASIOCPPFLAGS = ${AM_CPPFLAGS} ${BOOST_CPPFLAGS}
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@ASIOLDADD = $(top_builddir)/lib/libnghttp2.la \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/src/libnghttp2_asio.la @JEMALLOC_LIBS@ \
-@ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/libhttp-parser.la \
+@ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	$(top_builddir)/third-party/liburl-parser.la \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	@OPENSSL_LIBS@ \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	${BOOST_LDFLAGS} \
 @ENABLE_ASIO_LIB_TRUE@@ENABLE_EXAMPLES_TRUE@	${BOOST_ASIO_LIB} \

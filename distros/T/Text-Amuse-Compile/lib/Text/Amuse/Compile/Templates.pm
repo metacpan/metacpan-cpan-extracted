@@ -26,6 +26,12 @@ B<Disclaimer>: some things are needed for a correct
 layout/compilation. It's strongly reccomended to use the existing one
 (known to work as expected) as starting point for a custom template.
 
+=item format_id
+
+If passed, a template named C<${format_id}-${name}.tt> will be loaded
+if exists in the C<ttdir> directory. This gives you as much
+flexibility as you need for output.
+
 =back
 
 =head2 TEMPLATES
@@ -111,7 +117,7 @@ sub new {
     my $self = {};
 
     # argument parsing
-    foreach my $k (qw/ttdir/) {
+    foreach my $k (qw/ttdir format_id/) {
         if (exists $params{$k}) {
             $self->{$k} = delete $params{$k};
         }
@@ -126,7 +132,9 @@ sub new {
             opendir (my $dh, $dir) or die "Couldn't open $dir $!";
             my @templates = grep { -f catfile($dir, $_) 
                                     and
-                                       /^(((bare|minimal)[_.-])?html|
+                                       /^
+                                        ([a-zA-Z][a-zA-Z0-9_]+-)?
+                                        (((bare|minimal)[_.-])?html|
                                             (bare[_.-])?latex     |
                                             css)
                                         (\.tt2?)?/x
@@ -165,6 +173,10 @@ sub ttdir {
     return shift->{ttdir};
 }
 
+sub format_id {
+    return shift->{format_id};
+}
+
 sub names {
     return (qw/html minimal_html bare_html
                css latex bare_latex
@@ -174,8 +186,15 @@ sub names {
 sub ttref {
     my ($self, $name) = @_;
     return unless $name;
-    if (exists $self->{tt_subrefs}->{$name}) {
-        return $self->{tt_subrefs}->{$name}->();
+    my $tts = $self->{tt_subrefs};
+    if (my $format_id = $self->format_id) {
+        my $try = $format_id . '_' . $name;
+        if (my $sub = $tts->{$try}) {
+            return $sub->();
+        }
+    }
+    if (my $sub = $tts->{$name}) {
+        return $sub->();
     }
     return;
 }

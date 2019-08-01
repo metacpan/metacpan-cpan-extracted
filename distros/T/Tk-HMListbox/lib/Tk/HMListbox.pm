@@ -6,7 +6,7 @@ Tk::HMListbox - Sortable Multicolumn HListbox (allowing icons, along with text) 
 
 Jim Turner
 
-(c) 2015, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
+(c) 2015-2019, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
 
 Tk::SMListbox author:  me
 
@@ -152,7 +152,22 @@ Default:  B<-background> or parent window's background.
 
 Specify a different foreground color for the top ("header") row.
 Default:  B<-foreground> or parent window's foreground.
- 
+
+=item B<-ipadx> => I<number>
+
+Specify horizontal padding style in pixels around the image 
+for the rows in the listbox which are type I<image> or I<imagetext>.
+Default:  B<0>
+
+=item B<-ipady> => I<number>
+
+Specify vertical padding style in pixels around the image 
+for the rows in the listbox which are type I<image> or I<imagetext>.
+This can be useful in correcting vertical misallignment between the 
+columns when some columns contain images and others are text only!
+NOTE:  This changes the height of the affected rows.
+Default:  B<1> (and setting to B<0> is the same as B<1>).
+
 =item B<-moveable> => I<boolean>
 
 A value of B<1> indicates that it is okay for the user to move
@@ -214,6 +229,21 @@ Default:  B<1>.
 
 Note that you can also specify B<-sortable> on a column
 by column basis. See I<COLUMNS> below.
+
+=item B<-tpadx> => I<number>
+
+Specify horizontal padding style in pixels around the text 
+for the rows in the listbox which are type I<text>.  
+Default:  B<0>
+
+=item B<-tpady> => I<number>
+
+Specify vertical padding style in pixels around the text 
+for the rows in the listbox which are type I<text>.  
+This can be useful in correcting vertical misallignment between the 
+columns when some columns contain images and others are text only!
+NOTE:  This changes the height of the affected rows.
+Default (seems to be):  B<2> (and setting to B<0> is the same as B<2>).
 
 =back
 
@@ -871,7 +901,8 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 				Frame => "frame"
 		)->pack(qw/-side left -anchor n -fill both -expand 1/);
 
-		my $hdr;		if (defined $undln) { 
+		my $hdr;
+		if (defined $undln) { 
 		
 			$hdr = $f->HMButton(
 					-takefocus=>0,
@@ -892,15 +923,29 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 		}
 		$w->Advertise("heading" => $hdr);
 
-		my $lb = $f->HMCListbox(
-				-highlightthickness=>0,
-				-relief=>'flat',
-				-bd=>0,
-				-exportselection=>0,
-				-takefocus=>0,
-		)->pack(qw/-side top -anchor n -expand 1 -fill both/);
-		$w->Advertise("listbox" => $lb);
+		my $lb;
+		my $dynamic = <<'END_STR';
+			$lb = $f->HMCListbox(
+					-highlightthickness=>0,
+					-relief=>'flat',
+					-bd=>0,
+					-exportselection=>0,
+					-takefocus=>0,
+END_STR
 
+		if ($Tk::HListbox::VERSION >= 2.3) {
+			foreach my $padarg (qw/-tpady -tpadx -ipady -ipadx/) {
+				$dynamic .= " $padarg => $args->{$padarg},"  if (defined($args->{$padarg}) && $args->{$padarg} =~ /\d/o);
+			}
+		} else {
+			foreach my $padarg (qw/-tpady -tpadx -ipady -ipadx/) {
+				delete $args->{$padarg}  if (defined $args->{$padarg});
+			}
+		}
+		$dynamic =~ s/\,$/\)\;/;
+		eval $dynamic;
+		$lb->pack(qw/-side top -anchor n -expand 1 -fill both/);
+		$w->Advertise("listbox" => $lb);
 		$w->Delegates (DEFAULT => $lb);
 
 		my $bgWidgets = $hdrBG ? [$f, $lb] : [$f, $hdr, $lb];
@@ -930,6 +975,10 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 				-updatecommand  => [$lb],
 				-textwidth      => [{-width => [$lb, $hdr]}],
 				-reversearrow   => [qw/PASSIVE reversearrow reversearrow 0/],
+				-ipadx          => [qw/PASSIVE/],
+				-ipady          => [qw/PASSIVE/],
+				-tpadx          => [qw/PASSIVE/],
+				-tpady          => [qw/PASSIVE/],
 				DEFAULT         => [$lb]
 		);
 		$w->ConfigAlias(
@@ -1003,7 +1052,7 @@ package Tk::HMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '3.10';
+$VERSION = '3.12';
 
 use Tk;
 
@@ -1025,6 +1074,7 @@ sub Tk::Widget::Scrolled {
 	my $name = delete $args{'Name'};
 	push(@args,'Name' => $name) if (defined $name);
 	my $cw = $parent->Frame(@args);
+	$cw->bind('<FocusIn>', sub { $cw->focusNext; Tk->break;});
 	@args = ();
 
 	## Now remove any args that Frame can handle
@@ -1200,6 +1250,10 @@ sub Populate {
 			-width             => [qw/METHOD width Width/, undef],
 			-xscrollcommand    => [$pane],
 			-yscrollcommand    => ['CALLBACK'],  
+			-ipadx             => [qw/PASSIVE/],
+			-ipady             => [qw/PASSIVE/],
+			-tpadx             => [qw/PASSIVE/],
+			-tpady             => [qw/PASSIVE/],
 	);
 
 	$w->ConfigAlias(
@@ -1657,16 +1711,26 @@ sub focus
 	my $w = shift;
 
 	if (!$w->cget('-takefocus')) { 
-		$w->focusNext->focus(@_)  if (defined $w->focusNext);
+		$w->focusNext;
 	} else {
 		my $c = (defined($w->{Configure}{'-focuscolumn'}) && $w->{Configure}{'-focuscolumn'} >= 0)
 				? $w->columnGet($w->{Configure}{'-focuscolumn'})  #User specified which one to get focus.
 				: $w->_firstVisible; 
                   #Default to 1st one visible if user did not pick one.
 		if (defined($c) && $w->cget('-nocolumnfocus') != 1) {
-			$c->Subwidget("listbox")->focus(@_)  if (defined $c);
+			$c->Subwidget("listbox")->focus(@_);
+			$c->Subwidget("listbox")->bind('<<LeftTab>>', sub {
+				$w->focusPrev;
+				$w->focusCurrent->focusPrev;
+				Tk->break;
+			});
 		} else {
 			$w->Tk::focus(@_);
+			$w->bind('<<LeftTab>>', sub {
+				$w->focusPrev;
+				$w->focusCurrent->focusPrev;
+				Tk->break;
+			});
 		}
 	}
 }
@@ -1778,6 +1842,11 @@ sub columnInsert {
 			-separatorwidth -sortable -itemtype -textwidth -reversearrow/) 
 	{
 		$opts{$_} = $w->cget($_) if defined $w->cget($_);
+	}
+	if ($Tk::HListbox::VERSION >= 2.3) {
+		foreach (qw/-tpady -tpadx -ipady -ipadx/) {
+			$opts{$_} = $w->cget($_) if defined $w->cget($_);
+		}
 	}
 	## All options (and more) might be overridden by %args.
 	map {$opts{$_} = $args{$_}} keys %args;

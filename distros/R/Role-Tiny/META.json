@@ -1,10 +1,10 @@
 {
-   "abstract" : "Roles. Like a nouvelle cuisine portion size slice of Moose.",
+   "abstract" : "Roles: a nouvelle cuisine portion size slice of Moose",
    "author" : [
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3702, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -60,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#moose"
    },
-   "version" : "2.000006",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "2.000007",
+   "x_serialization_backend" : "JSON::MaybeXS version 1.004"
 }

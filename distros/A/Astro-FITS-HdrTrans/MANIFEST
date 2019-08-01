@@ -34,6 +34,7 @@ lib/Astro/FITS/HdrTrans/LCOSPECTRAL.pm
 lib/Astro/FITS/HdrTrans/MICHELLE.pm
 lib/Astro/FITS/HdrTrans/NACO.pm
 lib/Astro/FITS/HdrTrans/NIRI.pm
+lib/Astro/FITS/HdrTrans/RxH3.pm
 lib/Astro/FITS/HdrTrans/SCUBA.pm
 lib/Astro/FITS/HdrTrans/SCUBA2.pm
 lib/Astro/FITS/HdrTrans/SOFI.pm

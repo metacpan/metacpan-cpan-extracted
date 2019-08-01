@@ -1,0 +1,95 @@
+{
+   "abstract" : "Perl interface to log via Log4cplus",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lib-Log4cplus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "recommends" : {
+            "Config::AutoConf" : "0.315",
+            "inc::latest" : "0.500"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0.06",
+            "Carp" : "0",
+            "Config::AutoConf" : "0.308",
+            "ExtUtils::CBuilder" : "0.27",
+            "ExtUtils::Constant" : "0.21",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "IPC::Cmd" : "0",
+            "parent" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "0",
+            "Module::CPANTS::Analyse" : "0.96",
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::PerlTidy" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0.22"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::LeakTrace" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0.06",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Lib-Log4cplus@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Lib-Log4cplus"
+      },
+      "homepage" : "https://metacpan.org/release/Lib-Log4cplus",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rehsack/Lib-Log4cplus.git",
+         "web" : "https://github.com/rehsack/Lib-Log4cplus"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

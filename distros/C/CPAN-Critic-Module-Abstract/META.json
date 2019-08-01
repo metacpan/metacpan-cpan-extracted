@@ -1,5 +1,5 @@
 {
-   "abstract" : "Critic CPAN module abstract",
+   "abstract" : "(DEPRECATED) Critic CPAN module abstract",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-CPAN-Critic-Module-Abstract"
       }
    },
-   "version" : "0.091",
+   "version" : "0.092",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

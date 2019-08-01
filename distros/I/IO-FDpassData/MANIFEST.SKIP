@@ -1,0 +1,13 @@
+blib
+work
+Makefile$
+FDpassData.c
+\.bs$
+\.o$
+\.sav$
+\.yml$
+\.old$
+tmp
+DEADJOE
+~$
+N*\.\d+\.tar\.gz$

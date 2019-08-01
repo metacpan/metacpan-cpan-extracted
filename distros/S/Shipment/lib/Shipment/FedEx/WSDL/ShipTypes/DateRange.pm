@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::DateRange;
-$Shipment::FedEx::WSDL::ShipTypes::DateRange::VERSION = '3.01';
+$Shipment::FedEx::WSDL::ShipTypes::DateRange::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::DateRange
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

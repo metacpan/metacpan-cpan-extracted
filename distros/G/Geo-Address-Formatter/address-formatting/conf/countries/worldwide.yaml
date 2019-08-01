@@ -238,9 +238,16 @@ AD:
 
 # United Arab Emirates
 AE:
-    address_template: *generic5
+    address_template: |
+        {{{attention}}}
+        {{{house}}}
+        {{{house_number}}} {{{road}}}
+        {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} {{/first}} 
+        {{#first}} {{{state_district}}} || {{{state}}} {{/first}}
+        {{{country}}}
 
-# Angola
+# Afghanistan 
 AF:
     address_template: *generic21
 
@@ -662,8 +669,6 @@ DO:
     postformat_replace:
         - [", Distrito Nacional",", DN"]
 
-
-
 # Algeria
 DZ:
     address_template: *generic3
@@ -946,11 +951,12 @@ IE:
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
         {{#first}} {{{city}}} || {{{town}}} || {{{village}}} {{/first}}
         {{{county}}}
-        {{{postcode}}}
         {{{country}}}
     replace:
         - [" City$",""]
-
+        - ["The Municipal District of ",""]
+        - ["The Metropolitan District of ",""]
+        
 # Israel
 IL: 
     address_template: *generic1
@@ -1026,7 +1032,10 @@ IT:
     address_template: *generic8
     replace:
         - ["Città metropolitana di ",""]
-        - ["Metropolitan City of ",""]        
+        - ["Metropolitan City of ",""]
+    postformat_replace:
+        - ["Vatican City\nVatican City$","\nVatican City"]
+        - ["Città del Vaticano\nCittà del Vaticano$","Città del Vaticano\n"]
 
 # Jersey - same format as UK, but not part of UK
 JE:

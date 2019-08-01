@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -177,7 +177,6 @@ $|=1;
   $values_class = 'Math::NumSeq::SumPowSub1';
   $values_class = 'Math::NumSeq::LuckyNumbers';
   $values_class = 'Math::NumSeq::ProthNumbers';
-  $values_class = 'Math::NumSeq::HafermanCarpet';
   $values_class = 'Math::NumSeq::PlanePathTurn';
   $values_class = 'Math::NumSeq::DivisorCount';
   $values_class = 'Math::NumSeq::PowerPart';
@@ -193,13 +192,14 @@ $|=1;
   $values_class = 'Math::NumSeq::LucasNumbers';
   $values_class = 'Math::NumSeq::PlanePathDelta';
   $values_class = 'Math::NumSeq::AlmostPrimes';
-  $values_class = 'Math::NumSeq::PlanePathCoord';
   $values_class = 'Math::NumSeq::PlanePathN';
   $values_class = 'Math::NumSeq::Pell';
   $values_class = 'Math::NumSeq::Powerful';
   $values_class = 'Math::NumSeq::FibonacciRepresentations';
   $values_class = 'Math::NumSeq::Palindromes';
   $values_class = 'Math::NumSeq::Xenodromes';
+  $values_class = 'Math::NumSeq::PlanePathCoord';
+  $values_class = 'Math::NumSeq::HafermanCarpet';
   
   eval "require $values_class; 1" or die $@;
   my $seq = $values_class->new
@@ -291,7 +291,7 @@ $|=1;
      # planepath => 'Corner',
      # planepath => 'SierpinskiTriangle,align=diagonal',
      # planepath => 'DivisibleColumns,divisor_type=proper,n_start=2',
-     # planepath => 'CellularRule,rule=2,n_start=0',
+      planepath => 'CellularRule,rule=16,n_start=0',
      # planepath => 'DiagonalRationals,direction=up',
      # planepath => 'SierpinskiTriangle,align=diagonal',
      # planepath => 'RationalsTree,tree_type=L',
@@ -300,13 +300,14 @@ $|=1;
      # planepath => 'UlamWarburton,parts=4',
      # planepath => 'DragonCurve',
      # planepath => 'Godfrey',
-     planepath => 'AlternatePaper',
-     #planepath => 'CCurve',
+     # planepath => 'AlternatePaper',
+     # planepath => 'CCurve',
      # coordinate_type => 'Revisit',
      # coordinate_type => 'NumOverlap',
      # coordinate_type => 'TRSquared',
      # coordinate_type => 'NumSiblings',
      # coordinate_type => 'AbsDiff',
+     coordinate_type => 'ExperimentalPairsXY',
      
      # planepath => 'PythagoreanTree,coordinates=AC',
      # planepath => 'RationalsTree,tree_type=L',
@@ -384,6 +385,7 @@ $|=1;
      # lo => 0,
      # hi => 10, # 200*$rep,
      # where => 'low',
+     start
     );
   my $hi = 103;
   

@@ -4,7 +4,9 @@
 
 #16 Axmud for visually-impaired users
 
-Axmud can be run with settings optimised for users with a visual impairment. These settings don't require JAWS, NVDA or any other screenreader, but they do require a text-to-speech engine of some kind.
+Axmud can be run with settings optimised for users with a visual impairment.
+
+The rest of this Section assumes that you're using optimised settings. These settings don't require JAWS, NVDA or any other screenreader, but they do require a text-to-speech engine of some kind.
 
 On Microsoft Windows, the Axmud installer includes a copy of the eSpeak engine. No further configuration is required. Simply run the installer, find Axmud in your system's Start menu, and open the menu item that's marked for visually-impaired users.
 
@@ -15,8 +17,6 @@ Most modern Linux systems have the eSpeak engine installed 'out-of-the-box'. If 
 Axmud supports other speech engines, too. (Not all of them are free.)
 
 On Microsoft Windows, Axmud also supports espeak-ng and Swift (which is a part of Cepstral). On Linux, Axmud supports espeak-ng, Flite, Festival and Swift.
-
-The rest of this Section assumes that you're using optimised settings.
 
 ##16.2 Connecting to a world
 
@@ -179,6 +179,12 @@ The text-to-speech configuration called **receive** is used for text received fr
 The **system** configuration changes the sound of the speech used to read system messages. You might change this configuration's word speed by typing **;config system speed 200**.
 
 The **error** configuration is used to read system error messages. The **command** configuration is used to read out commands sent to the world.  The **dialogue** configuration is used to read out text from dialogue windows.
+
+###16.5.4 Updating all configurations
+
+There's an easy way to change the speech engine used by all configurations. This is really useful if, for example, you find that eSpeak is not working on your system, and you want to use espeak-ng instead.
+
+Just type **;config all engine esng**. This will change all the configurations that you're allowed to modify. (By the way, you can only use the word **all** in this situation.)
 
 ##16.6 Configuring text-to-speech for tasks
 

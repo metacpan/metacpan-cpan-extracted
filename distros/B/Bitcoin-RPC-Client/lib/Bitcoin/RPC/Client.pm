@@ -8,7 +8,7 @@ use warnings;
 use Moo;
 use JSON::RPC::Legacy::Client;
 
-our $VERSION  = '0.09';
+our $VERSION  = '0.10';
 
 has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Legacy::Client"->new });
 has user     => (is => 'ro');
@@ -52,7 +52,7 @@ sub AUTOLOAD {
    } elsif ($self->user) {
       $url = $uri . $self->user . ":" . $self->password . "\@" . $self->host . ":" . $self->port;
    } else {
-      die "An RPC user or RPC cookie file must be defined";
+      die "An RPC user or RPC cookie file must be defined\n";
    }
 
    # Tack on a specific wallet name if given
@@ -75,28 +75,6 @@ sub AUTOLOAD {
          $client->ua->add_handler("response_done", sub { shift->dump; return });
          $DEBUG_DUMPED = 1;
       }
-   } else {# Don't print error message when debug is on.
-      # We want to handle broken responses ourself
-      $client->ua->add_handler("response_data",
-         sub {
-            my ($response, $ua, $h, $data) = @_;
-
-            if ($response->is_error) {
-               my $content = JSON->new->utf8->decode($data);
-               print STDERR "error code: ";
-               print STDERR $content->{error}->{code};
-               print STDERR ", error message: ";
-               print STDERR $content->{error}->{message} . " ($method)\n";
-               exit(1);
-            } else {
-               # If no error then ditch the handler
-               # otherwise things that did not error will get handled too
-               $ua->remove_handler();
-            }
-
-            return;
-         }
-      );
    }
 
    # For self signed certs
@@ -113,7 +91,8 @@ sub AUTOLOAD {
    my $res = $client->call( $url, $obj );
    if($res) {
       if ($res->is_error) {
-         return $res->error_message;
+          my $content = $res->content;
+          die sprintf("error code: %d, error message: %s (%s)\n", $content->{error}->{code}, $content->{error}->{message}, $method);
       }
 
       return $res->result;
@@ -131,16 +110,13 @@ sub isa_cookie {
    open COOKIE, $_[0] or $failed = 1;
 
    if ($failed) {
-      print STDERR "Could not open RPC cookie file: " . $_[0];
-      print STDERR "\n";
-      exit(1);
+      die sprintf("Could not open RPC cookie file: %s\n", $_[0]);
    }
 
    my $cookie = <COOKIE>;
    close COOKIE;
    if (!defined($cookie) or $cookie !~ /:/) {
-      print STDERR "Invalid RPC cookie file format\n";
-      exit(1);
+      die "Invalid RPC cookie file format\n";
    }
    $cookie =~ s/\s+//g;
    $_[0] = $cookie;
@@ -187,7 +163,7 @@ Bitcoin::RPC::Client - Bitcoin Core JSON RPC Client
 
    # Send to an address
    #     https://bitcoin.org/en/developer-reference#sendtoaddress
-   $transid = $btc->sendtoaddress("18uqrhFDnbkemSG1bCfRCh5G5D9jaaQUVb","0.01");
+   $transid = $btc->sendtoaddress("1DopyzQi9mX3huvGacfjpzCKFug2Dtvykp","0.01");
 
    # See ex/example.pl for more in depth JSON handling:
    #     https://github.com/whindsx/Bitcoin-RPC-Client/tree/master/ex
@@ -254,7 +230,7 @@ https://github.com/whindsx/Bitcoin-RPC-Client.git
 
 =head1 DONATE
 
-18uqrhFDnbkemSG1bCfRCh5G5D9jaaQUVb
+1DopyzQi9mX3huvGacfjpzCKFug2Dtvykp
 
 =head1 LICENSE AND COPYRIGHT
 

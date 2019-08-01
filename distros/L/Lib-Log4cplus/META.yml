@@ -1,0 +1,43 @@
+---
+abstract: 'Perl interface to log via Log4cplus'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.06'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0.96'
+configure_requires:
+  Capture::Tiny: '0.06'
+  Carp: '0'
+  Config::AutoConf: '0.308'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::Constant: '0.21'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  IPC::Cmd: '0'
+  parent: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lib-Log4cplus
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0.22'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Lib-Log4cplus
+  homepage: https://metacpan.org/release/Lib-Log4cplus
+  repository: https://github.com/rehsack/Lib-Log4cplus.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

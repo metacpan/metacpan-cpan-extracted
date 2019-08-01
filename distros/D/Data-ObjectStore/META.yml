@@ -17,17 +17,19 @@ name: Data-ObjectStore
 provides:
   Data::ObjectStore:
     file: lib/Data/ObjectStore.pm
-    version: '2.03'
+    version: '2.09'
   Data::ObjectStore::Array:
     file: lib/Data/ObjectStore.pm
+  Data::ObjectStore::Cache:
+    file: lib/Data/ObjectStore/Cache.pm
   Data::ObjectStore::Container:
     file: lib/Data/ObjectStore.pm
   Data::ObjectStore::Hash:
     file: lib/Data/ObjectStore.pm
 requires:
-  Data::RecordStore: '4.05'
+  Data::RecordStore: '5.03'
   perl: v5.16.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.03'
+version: '2.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,12 @@
+char *			T_PV
+const char *		T_PV
+void *			O_OBJECT
+int			T_IV
+
+INPUT
+T_IV
+	$var = (((SvIOK($arg)) || (SvNOK($arg)) || ((SvFLAGS($arg) & (SVf_OK & ~SVf_ROK)) && looks_like_number($arg))) ? ($type)SvIV($arg) : -1)
+T_PV
+	$var = ((SvFLAGS($arg) & (SVf_OK & ~SVf_ROK)) ? ($type)SvPV_nolen($arg) : NULL)
+O_OBJECT
+	$var = (sv_isobject($arg) ? ($type)SvIV((SV*)SvRV( $arg )) : NULL);

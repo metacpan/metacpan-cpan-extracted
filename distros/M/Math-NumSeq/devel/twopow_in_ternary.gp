@@ -1,4 +1,4 @@
-\\ Copyright 2015 Kevin Ryde
+\\ Copyright 2015, 2018 Kevin Ryde
 \\
 \\ This file is part of Math-NumSeq.
 \\
@@ -115,7 +115,7 @@ vector(50,n,n+=10; digits_below_lowest_2(n)+1)
 \\ \\v = vector(5000,n, digits_below_lowest_2(n));
 \\ ploth(i=1,#v, v[floor(i)])
 
-\\ select(n->!any_2(n), vector(5000,n,n))
+\\ select(n->!any_2(n), [1..5000])
 
 length(digits(2^5000,3))
 

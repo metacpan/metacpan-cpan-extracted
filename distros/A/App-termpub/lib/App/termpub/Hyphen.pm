@@ -2,33 +2,6 @@ package App::termpub::Hyphen;
 use Mojo::Base -base;
 use Mojo::File 'path';
 
-=head1 NAME
-
-App::termpub::Hyphen - determine positions for hyphens inside words
-
-=head1 SYNOPSIS
-
-This module implements Knuth-Liang algorithm to find positions inside
-words where it is possible to insert hyphens to break a line.
-
-    use Text::Hyphen;
-
-    my $hyphenator = new Text::Hyphen;
-
-    print $hyphenator->hyphenate('representation');
-    # prints rep-re-sen-ta-tion
-
-This is a fork of L<Text::Hyphen> to use hunspell dictionaries.
-
-=head1 EXPORT
-
-This version does not export anything and uses OOP interface. This
-will probably change.
-
-=head1 FUNCTIONS
-
-=cut
-
 has lang       => 'en_US';
 has min_word   => 5;
 has min_prefix => 2;
@@ -78,37 +51,12 @@ sub installed {
     return 1;
 }
 
-=head2 new(%options)
-
-Creates the hyphenator object.
-
-You can pass several options:
-
-=over
-
-=item min_word
-
-Minimum length of word to be hyphenated. Shorter words are returned
-right away. Defaults to 5.
-
-=item min_prefix
-
-Minimal prefix to leave without any hyphens. Defaults to 2.
-
-=item min_suffix
-
-Minimal suffix to leave wothout any hyphens. Defaults to 2.
-
-=back
-
-=cut
-
 sub _add_pattern {
     my ( $self, $trie, $pattern ) = @_;
 
     # Convert the a pattern like 'a1bc3d4' into a string of chars 'abcd'
     # and a list of points [ 1, 0, 3, 4 ].
-    my @chars = grep { /\D/ } split //, $pattern;
+    my @chars  = grep { /\D/ } split //, $pattern;
     my @points = map { $_ || 0 } split /\D/, $pattern, -1;
 
     # Insert the pattern into the tree.  Each character finds a dict
@@ -139,13 +87,6 @@ sub _load_patterns {
     return $trie;
 }
 
-=head2 hyphenate($word, [$delim])
-
-Hyphenates the C<$word> by inserting C<$delim> into hyphen positions.
-C<$delim> defaults to dash ("-").
-
-=cut
-
 sub hyphenate {
     my ( $self, $word, $delim ) = @_;
     $delim ||= '-';
@@ -156,7 +97,7 @@ sub hyphenate {
 
     my @word = split //, $word;
 
-    my @work = ( '.', map { lc } @word, '.' );
+    my @work   = ( '.', map { lc } @word, '.' );
     my $points = [ (0) x ( @work + 1 ) ];
     foreach my $i ( 0 .. $#work ) {
         my $t = $self->trie;
@@ -190,6 +131,65 @@ sub hyphenate {
     return wantarray ? @pieces : join( $delim, @pieces );
 }
 
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+App::termpub::Hyphen - determine positions for hyphens inside words
+
+=head1 SYNOPSIS
+
+This module implements Knuth-Liang algorithm to find positions inside
+words where it is possible to insert hyphens to break a line.
+
+    use Text::Hyphen;
+
+    my $hyphenator = new Text::Hyphen;
+
+    print $hyphenator->hyphenate('representation');
+    # prints rep-re-sen-ta-tion
+
+This is a fork of L<Text::Hyphen> to use hunspell dictionaries.
+
+=head1 EXPORT
+
+This version does not export anything and uses OOP interface. This
+will probably change.
+
+=head1 FUNCTIONS
+
+=head2 new(%options)
+
+Creates the hyphenator object.
+
+You can pass several options:
+
+=over
+
+=item min_word
+
+Minimum length of word to be hyphenated. Shorter words are returned
+right away. Defaults to 5.
+
+=item min_prefix
+
+Minimal prefix to leave without any hyphens. Defaults to 2.
+
+=item min_suffix
+
+Minimal suffix to leave wothout any hyphens. Defaults to 2.
+
+=back
+
+=head2 hyphenate($word, [$delim])
+
+Hyphenates the C<$word> by inserting C<$delim> into hyphen positions.
+C<$delim> defaults to dash ("-").
+
 =head1 AUTHOR
 
 Alex Kapranoff, C<< <kappa at cpan.org> >>
@@ -206,5 +206,3 @@ Copyright 2019 Mario Domgörgen.
 This program is released under the following license: BSD.
 
 =cut
-
-1;

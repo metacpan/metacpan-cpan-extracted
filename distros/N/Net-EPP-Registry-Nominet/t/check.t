@@ -5,14 +5,9 @@
 #
 #  DESCRIPTION:  Test of EPP Check command
 #
-#        FILES:  ---
-#         BUGS:  ---
-#        NOTES:  ---
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: check.t,v 1.4 2015/10/02 10:22:45 pete Exp $
 #      CREATED:  04/02/13 17:15:33
-#     REVISION:  $Revision: 1.4 $
 #===============================================================================
 
 use strict;
@@ -21,15 +16,14 @@ use warnings;
 use Test::More;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 17;
+	plan tests => 11;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
 
-use lib './lib';
 use Net::EPP::Registry::Nominet;
 
-my $epp = new_ok ('Net::EPP::Registry::Nominet', [ test => 1,
+my $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 	user => $ENV{NOMTAG}, pass => $ENV{NOMPASS},
 	debug => $ENV{DEBUG_TEST} || 0] );
 
@@ -56,17 +50,6 @@ diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
 is ($res, 1, 'Non-existent domain check');
 is ($abuse, --$abuseval, 'Non-existent domain check abuse counter');
 diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
-($res, $abuse, $rights) = $epp->check_domain ("dlfkgshklghsld-$tag.uk");
-is ($res, 1, 'Non-existent .uk domain check');
-is ($abuse, --$abuseval, 'Non-existent .uk domain check abuse counter');
-is ($rights, undef, 'Non-existent .uk domain rights check without rights');
-diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
-($res, $abuse, $rights) = $epp->check_domain ("duncan-$tag.uk");
-is ($res, 1, 'Non-existent .uk domain check with rights');
-is ($abuse, --$abuseval, 'Non-existent .uk domain check with rights abuse counter');
-is ($rights, "duncan-$tag.co.uk", 'Non-existent .uk domain rights check with rights');
-diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
-
 
 # Check contacts
 # First get a valid contact ID, since they change in the testbed between
@@ -75,6 +58,12 @@ diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
 is ($res, 0, 'Existent contact check');
 ($res, $abuse) = $epp->check_contact ("thiswillfail");
 is ($res, 1, 'Non-existent contact check');
+
+# Here would go validity checks once the draft at
+# https://www.ietf.org/archive/id/draft-ietf-regext-validate-03.txt
+# has made it to full RFC.
+#($res, $abuse) = $epp->check_valid_contact ($contact);
+#is_deeply ($res, [1], 'Valid contact');
 
 # Check hosts
 ($res, $abuse) = $epp->check_host ("ns1.oberon-$tag.co.uk");

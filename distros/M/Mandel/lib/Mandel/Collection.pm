@@ -33,7 +33,7 @@ sub create {
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   my $self = shift;
 
-  $self->_new_document(shift || undef, 0);
+  $self->_new_document(shift || undef, 0)->validate_fields;
 }
 
 sub count {

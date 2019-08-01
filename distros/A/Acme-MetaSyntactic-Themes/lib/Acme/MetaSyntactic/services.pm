@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::services;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -55,6 +55,12 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-07-29 - v1.007
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.053.
 
 =item *
 
@@ -234,6 +240,7 @@ adobeserver_5
 adrep
 ads
 ads_c
+ads_s
 adtech_test
 adtempusclient
 advant_lm
@@ -467,6 +474,7 @@ apw_registry
 apx500api_1
 apx500api_2
 arbortext_lm
+arca_api
 arcisdms
 arcp
 arcpd
@@ -502,6 +510,7 @@ array_manager
 ars_master
 ars_vista
 artifact_msg
+aruba_papi
 aruba_server
 asa
 asam
@@ -995,6 +1004,7 @@ cesdcdtrn
 cesdinv
 cfdptkt
 cfengine
+cfg_cloud
 cfs
 cft_0
 cft_1
@@ -1631,6 +1641,7 @@ dssiapi
 ds_slp
 ds_srv
 ds_srvr
+d_star
 ds_user
 dsx_agent
 dsx_monitor
@@ -1676,6 +1687,7 @@ dyniplookup
 dyn_site
 dzdaemon
 dzoglserver
+e1_interface
 e3consultants
 ea
 ea1
@@ -1855,6 +1867,7 @@ esmagent
 esmmanager
 esnm_zoning
 esp
+espeasy_p2p
 espeech
 espeech_rtp
 esp_encap
@@ -2033,8 +2046,8 @@ flamenco_proxy
 flashfiler
 flashmsg
 flcrs
-flexlm
 flex_lm
+flexlm
 flexlm0
 flexlm1
 flexlm10
@@ -2174,6 +2187,7 @@ geognosis
 geognosisman
 geolocate
 gerhcs
+getty_focus
 gf
 ggf_ncp
 ggz
@@ -2201,6 +2215,7 @@ glogger
 glrpc
 gmmp
 gmrupdateserv
+gnmi_gnoi
 gntp
 gnunet
 gnutella
@@ -2323,6 +2338,7 @@ here_lm
 heretic2
 hermes
 herodotus_net
+hes_clip
 hexarc
 hexen2
 hfcs
@@ -2346,6 +2362,7 @@ hks_lm
 hl7
 hlibmgr
 hlserver
+hmip_routing
 hmmp_ind
 hmmp_op
 hncp_dtls_port
@@ -2460,6 +2477,7 @@ ias_session
 iatp_highpri
 iatp_normalpri
 iax
+iba_cfg
 ibar
 iberiagames
 ibm3494
@@ -2903,6 +2921,7 @@ jt400_ssl
 jtag_server
 jtnetd_server
 jtnetd_status
+juka
 jute
 juxml_port
 jvclient
@@ -3117,6 +3136,7 @@ lontalk_norm
 lontalk_urgnt
 lonworks
 lonworks2
+loreji_panel
 lorica_in
 lorica_in_sec
 lorica_out
@@ -3754,8 +3774,8 @@ netspeak_cps
 netspeak_cs
 netspeak_is
 netstat
-netsteward
 net_steward
+netsteward
 netsupport
 netsupport2
 nettest
@@ -5088,8 +5108,8 @@ servserv
 servstat
 sesi_lm
 set
-sflm
 sf_lm
+sflm
 sflow
 sfm_db_server
 sfmsso
@@ -5391,8 +5411,8 @@ spw_dnspreload
 sqdr
 sqlexec
 sqlexec_ssl
-sqlnet
 sql_net
+sqlnet
 sqlserv
 sqlsrv
 squid_htcp
@@ -5735,6 +5755,7 @@ thingkit
 thrp
 thrtx
 tht_treasure
+tibsd
 ticf_1
 ticf_2
 tick_port
@@ -6133,6 +6154,7 @@ vpvd
 vqp
 vrace
 vrcommerce
+vrmg_ip
 vrml_multi_use
 vrpn
 vrt
@@ -6364,6 +6386,8 @@ xaudio
 x_bone_api
 x_bone_ctl
 xbox
+xcap_control
+xcap_portal
 xdas
 xdmcp
 xds

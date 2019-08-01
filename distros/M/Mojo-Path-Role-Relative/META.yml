@@ -1,0 +1,29 @@
+---
+abstract: 'Relative operations on a Mojo::Path'
+author:
+  - 'Roy Storey <kiwiroy@users.noreply.github.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Path-Role-Relative
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '8.10'
+  Role::Tiny: '2.000001'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/hrards/mojo-path-role-relative/issues
+  homepage: https://github.com/hrards/mojo-path-role-relative
+  repository: https://github.com/kiwiroy/mojo-path-role-relative.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -33,61 +33,21 @@ use Math::NumSeq::TotientCumulative;
 #use Smart::Comments '###';
 
 
-sub diff_nums {
-  my ($gotaref, $wantaref) = @_;
-  for (my $i = 0; $i < @$gotaref; $i++) {
-    if ($i > @$wantaref) {
-      return "want ends prematurely pos=$i";
-    }
-    my $got = $gotaref->[$i];
-    my $want = $wantaref->[$i];
-    if (! defined $got && ! defined $want) {
-      next;
-    }
-    if (! defined $got || ! defined $want) {
-      return ("different pos=$i def/undef"
-              . "\n  got=".(defined $got ? $got : '[undef]')
-              . "\n want=".(defined $want ? $want : '[undef]'));
-    }
-    $got =~ /^[0-9.-]+$/
-      or return "not a number pos=$i got='$got'";
-    $want =~ /^[0-9.-]+$/
-      or return "not a number pos=$i want='$want'";
-    if ($got ne $want) {
-      ### $got
-      ### $want
-      return ("different pos=$i numbers"
-              . "\n  got=".(defined $got ? $got : '[undef]')
-              . "\n want=".(defined $want ? $want : '[undef]'));
-    }
-  }
-  return undef;
-}
-
 #------------------------------------------------------------------------------
-# A015614 - totientcumulative+1
+# A015614 - totientcumulative - 1
 
-{
-  my $anum = 'A015614';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my $diff;
-  if ($bvalues) {
-    my @got = (0);  # zero too
-    my $seq  = Math::NumSeq::TotientCumulative->new;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next or last;
-      push @got, $value+1;
-    }
-    $diff = diff_nums(\@got, $bvalues);
-    if ($diff) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..60]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..60]));
-    }
-  }
-  skip (! $bvalues,
-        $diff, undef,
-        "$anum");
-}
+MyOEIS::compare_values
+  (anum => 'A015614',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::TotientCumulative->new (i_start => 1);
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next or last;
+       push @got, $value - 1;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 exit 0;

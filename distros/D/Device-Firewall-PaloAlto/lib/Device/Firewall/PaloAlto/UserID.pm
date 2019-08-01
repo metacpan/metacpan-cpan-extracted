@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::UserID;
-$Device::Firewall::PaloAlto::UserID::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::UserID::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
@@ -107,7 +107,7 @@ Device::Firewall::PaloAlto::UserID - Palo Alto User-ID dynamic mapping operation
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 

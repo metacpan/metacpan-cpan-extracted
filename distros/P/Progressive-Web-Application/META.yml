@@ -1,0 +1,30 @@
+---
+abstract: "Utility for making an application 'progressive'"
+author:
+  - 'lnation <thisusedtobeanemail@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Progressive-Web-Application
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Colouring::In: '0'
+  Cwd: '0'
+  Image::Scale: '0'
+  JSON: '0'
+  Module::Find: '0'
+  Text::Wrap: '0'
+  perl: '5.006'
+version: '0.02'

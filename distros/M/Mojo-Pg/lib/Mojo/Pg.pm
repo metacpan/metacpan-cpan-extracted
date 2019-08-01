@@ -34,7 +34,7 @@ has options         => sub {
 has [qw(password username)] => '';
 has pubsub                  => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.14';
+our $VERSION = '4.15';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -102,8 +102,8 @@ sub _enqueue {
 
   # Async connections need to be checked more carefully
   my $queue = $self->{queue} ||= [];
-  push @$queue, $dbh
-    if $dbh->{Active} && (delete $dbh->{private_mojo_async} ? $dbh->ping : 1);
+  $dbh->{private_mojo_async} = undef if my $async = $dbh->{private_mojo_async};
+  push @$queue, $dbh if $dbh->{Active} && ($async ? $dbh->ping : 1);
   shift @$queue while @$queue > $self->max_connections;
 }
 

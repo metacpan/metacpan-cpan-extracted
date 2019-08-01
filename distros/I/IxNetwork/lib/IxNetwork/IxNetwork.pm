@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 1997 - 2018 by IXIA Keysight
+# Copyright 1997 - 2019 by IXIA Keysight
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"),
@@ -25,22 +25,20 @@ use lib ".";
 use checkDependencies;
 use IxNetworkLegacy;
 use IO::Socket;
+use validate;
 
 package IxNetwork;
 
-our $VERSION = '8.50';
+our $VERSION = '9.00';
 
 =head1 SYNOPSIS
 IxNetwork is the Perl package for the IxNetwork Low Level API that allows you to configure and run IxNetwork tests.
-
 =head1 IMPORTANT LINKS
-
 =over 4
-
 =item * L<https://github.com/ixiacom/ixnetwork-api-pl>
 
+=head1 new
 =cut
-
 use constant NL => "\r\n";
 
 my $gobalSecureTransport = undef;
@@ -48,7 +46,7 @@ my $gobalSecureTransport = undef;
 sub new {
     my $class = shift;
     my $self = {
-        _version => '8.50.1501.9',
+        _version => '9.00.1915.16',
         _OK => '::ixNet::OK',
         _ERROR => '::ixNet::ERROR',
         _transportType => undef,
@@ -135,12 +133,30 @@ sub _detectTransport {
     }
 
     my $ret = eval {      
-        my $protocol = getprotobyname('tcp');
-        socket($_socket, Socket::AF_INET, Socket::SOCK_STREAM, $protocol);
-        my $inetAddress = gethostbyname($hostname);
-        my $sockAddress = Socket::sockaddr_in($port, $inetAddress);
-        $_socket->blocking(0);
-        CORE::connect($_socket, $sockAddress);
+        my $inetAddress = undef;
+        my $sockAddress = undef;
+        if (validate::isIpv6($hostname) == 0) {
+            # connect to IPv4 address (or a host name).
+            my $protocol = getprotobyname('tcp');
+            socket($_socket, Socket::AF_INET, Socket::SOCK_STREAM, $protocol);
+            my $inetAddress = gethostbyname($hostname);
+            my $sockAddress = Socket::sockaddr_in($port, $inetAddress);
+            $_socket->blocking(0);
+            CORE::connect($_socket, $sockAddress);
+        } else {
+            # connect to a IPv6 address.
+            if (!$checkDependencies::ipv6LoadError) {
+                require LWP::Protocol::INET6;
+                $_socket = LWP::Protocol::INET6->new(
+                        PeerAddr => $hostname,
+                        PeerPort => $port,
+                        Proto    => 'tcp',
+                )
+                or die("Unknown Ipv6 address $hostname\n");
+            } else {
+                die("Unable to load perl IPv6 module\n");
+            }
+        }
 
         my $sock = $_socket;
         my $rin = '';

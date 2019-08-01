@@ -1,0 +1,24 @@
+---
+abstract: 'get country code for an ipv6 or ipv4 address '
+author:
+  - 'GCORE <cpan@gcore.de>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Geo-IP6
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LMDB_File: 0.12
+  perl: 5.006
+version: 1.0

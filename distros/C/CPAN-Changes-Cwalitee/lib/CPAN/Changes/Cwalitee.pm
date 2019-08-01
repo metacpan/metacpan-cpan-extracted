@@ -1,7 +1,7 @@
 package CPAN::Changes::Cwalitee;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -23,6 +23,18 @@ $SPEC{list_cpan_changes_cwalitee_indicators} = {
     args => {
         Cwalitee::Common::args_list('CPAN::Changes::'),
     },
+    examples => [
+        {
+            summary => 'List all installed indicators from all modules',
+            args => {},
+            test => 0,
+        },
+        {
+            summary => 'List only certain names, show details',
+            args => {include=>[qw/parsable date_parsable date_correct_format/], detail=>1},
+            test => 0,
+        },
+    ],
 };
 sub list_cpan_changes_cwalitee_indicators {
     my %args = @_;
@@ -90,7 +102,7 @@ CPAN::Changes::Cwalitee - Calculate the cwalitee of your CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.004 of CPAN::Changes::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-08.
+This document describes version 0.007 of CPAN::Changes::Cwalitee (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-26.
 
 =head1 SYNOPSIS
 
@@ -184,6 +196,70 @@ Return value:  (any)
 Usage:
 
  list_cpan_changes_cwalitee_indicators(%args) -> [status, msg, payload, meta]
+
+Examples:
+
+=over
+
+=item * List all installed indicators from all modules:
+
+ list_cpan_changes_cwalitee_indicators();
+
+Result:
+
+ [
+   "date_correct_format",
+   "date_parsable",
+   "english",
+   "has_releases",
+   "no_duplicate_version",
+   "no_empty_group",
+   "no_shouting",
+   "no_useless_text",
+   "not_too_wide",
+   "parsable",
+   "preamble_has_no_releases",
+   "release_dates_not_future",
+   "releases_in_descending_date_order",
+ ]
+
+=item * List only certain names, show details:
+
+ list_cpan_changes_cwalitee_indicators(
+ detail  => 1,
+   include => ["parsable", "date_parsable", "date_correct_format"]
+ );
+
+Result:
+
+ [
+   {
+     module   => "CPAN::Changes::Cwalitee::Core",
+     name     => "date_correct_format",
+     priority => 50,
+     severity => 3,
+     status   => "stable",
+     summary  => "Dates are specified in the correct specified format, e.g. YYYY-MM-DD",
+   },
+   {
+     module   => "CPAN::Changes::Cwalitee::Core",
+     name     => "date_parsable",
+     priority => 50,
+     severity => 3,
+     status   => "stable",
+     summary  => "Dates are parsable by CPAN::Changes",
+   },
+   {
+     module   => "CPAN::Changes::Cwalitee::Core",
+     name     => "parsable",
+     priority => 10,
+     severity => 3,
+     status   => "stable",
+     summary  => "Parseable by CPAN::Changes",
+   },
+ ]
+
+=back
 
 This function is not exported by default, but exportable.
 

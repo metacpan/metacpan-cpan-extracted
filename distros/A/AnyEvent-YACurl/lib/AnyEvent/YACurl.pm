@@ -6,10 +6,10 @@ use warnings;
 
 use AnyEvent;
 
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 
 require XSLoader;
-XSLoader::load('AnyEvent::YACurl', '0.09');
+XSLoader::load('AnyEvent::YACurl', '0.12');
 
 require constant;
 my %constants= %{_get_known_constants()};
@@ -167,7 +167,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Tom van der Woerdt.
+This software is copyright (c) 2019 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDL::Elements::InternationalInformation;
-$Shipment::Purolator::WSDL::Elements::InternationalInformation::VERSION = '3.01';
+$Shipment::Purolator::WSDL::Elements::InternationalInformation::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::InternationalInformation
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

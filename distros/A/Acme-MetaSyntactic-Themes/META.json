@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Acme-MetaSyntactic-Themes",
    "prereqs" : {
@@ -68,7 +68,7 @@
          "web" : "http://github.com/book/Acme-MetaSyntactic-Themes"
       }
    },
-   "version" : "1.052",
+   "version" : "1.053",
    "x_contributors" : [
       "\u00c9ric Guirbal <eguirbal@cpan.org>",
       "Brian Gottreu <gottreu@cpan.org>",
@@ -118,7 +118,7 @@
       "David Landgren <dland@cpan.org>",
       "Vahe Sarkissian <vsarkiss@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

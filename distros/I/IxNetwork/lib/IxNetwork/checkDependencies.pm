@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 1997 - 2018 by IXIA Keysight
+# Copyright 1997 - 2019 by IXIA Keysight
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"),
@@ -21,13 +21,33 @@
 # THE SOFTWARE.
 
 use File::Spec;
-my $dependenciespath;
+my $dependenciespath = undef;
+my $ipv6Path         = undef;
+my $ipv6ModuleExists = undef;
 BEGIN {
+    #----------------------------------------------------------------------------
+    # Since we are trying to load  Socket6.dll Socket6.so there may be a
+    # segmentation handle that gracefully
+    #----------------------------------------------------------------------------
+    our $ipv6LoadError = undef;
+    $SIG{SEGV} = \&handler;
+    sub handler {
+        $SIG{SEGV} = 0;
+        $checkDependencies::ipv6LoadError = 1;
+        die "unable to load IPv6 Module";
+    }
+
     my ($volume, $directory, $file) = File::Spec->splitpath(__FILE__);
-    $directory = File::Spec->catdir( (File::Spec->rel2abs($directory), 'dependencies') );
-    $dependenciespath = $directory;
+    $dependenciespath = File::Spec->catdir((File::Spec->rel2abs($directory), 'dependencies'));
+    $ipv6Path         = File::Spec->catdir((File::Spec->rel2abs($dependenciespath), 'IPv6Sock'));
+    $ipv6ModuleExists = eval {require Socket6; 1;};
 }
 use lib $dependenciespath;
+if ($ipv6ModuleExists != 1) {
+    print "WARNING Default IPv6 Module Does not exist ";
+    print "Loading IXIA specific IPv6 Module\n";
+    use lib $ipv6Path;
+};
 
 package checkDependencies;
 
@@ -97,15 +117,21 @@ sub checkDeps {
     if (!$ret and $@) {
         push(@missingDependencies, "Time::Seconds");
     }
+    my $ret = eval {
+        require Socket6;
+        Socket6->import();
+        1; 
+    };
+    if (!$ret and $@) {
+        push(@missingDependencies, "Socket6");
+    }
 
     if (scalar(@missingDependencies) > 0) {
         my $enumeratedDependencies = join(', ', @missingDependencies);
         die 'Cannot load required dependencies: '.$enumeratedDependencies.". \nPlease consult documentation for installing required dependencies.\n";
     }
-
-}
+};
 
 1;
-
 
 

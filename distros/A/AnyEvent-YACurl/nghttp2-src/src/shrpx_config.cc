@@ -51,7 +51,7 @@
 
 #include <nghttp2/nghttp2.h>
 
-#include "http-parser/http_parser.h"
+#include "url-parser/url_parser.h"
 
 #include "shrpx_log.h"
 #include "shrpx_tls.h"
@@ -2682,13 +2682,16 @@ int parse_config(Config *config, int optid, const StringRef &opt,
 
     return 0;
   }
-  case SHRPX_OPTID_LOG_LEVEL:
-    if (Log::set_severity_level_by_name(optarg) == -1) {
+  case SHRPX_OPTID_LOG_LEVEL: {
+    auto level = Log::get_severity_level_by_name(optarg);
+    if (level == -1) {
       LOG(ERROR) << opt << ": Invalid severity level: " << optarg;
       return -1;
     }
+    config->logging.severity = level;
 
     return 0;
+  }
   case SHRPX_OPTID_DAEMON:
     config->daemon = util::strieq_l("yes", optarg);
 
@@ -3991,6 +3994,8 @@ int configure_downstream_group(Config *config, bool http2_proxy,
     addr.host = StringRef::from_lit(DEFAULT_DOWNSTREAM_HOST);
     addr.port = DEFAULT_DOWNSTREAM_PORT;
     addr.proto = Proto::HTTP1;
+    addr.weight = 1;
+    addr.group_weight = 1;
 
     DownstreamAddrGroupConfig g(StringRef::from_lit("/"));
     g.addrs.push_back(std::move(addr));

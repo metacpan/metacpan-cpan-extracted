@@ -1,5 +1,9 @@
 Revision history for perl distribution Mandel
 
+0.31 2019-07-31T21:18:45+0200
+ - Enable type checking in create() method
+ - Add Document->validate_fields
+
 0.30 2018-09-30T10:25:12+0900
  - Deleted too much from pause
 

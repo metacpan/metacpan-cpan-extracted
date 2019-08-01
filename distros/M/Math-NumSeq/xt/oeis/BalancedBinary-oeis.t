@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -18,19 +18,19 @@
 # with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# cf A057163 tree reflection
+# cf A057163 tree reflection left-right mirror image
+#            ordered forest diagonal flip
 #    A075166 A106456 tree by prime powers
-# A070041  df->bf
 # A079214 catalan digit changes
-
-
 
 
 use 5.004;
 use strict;
+use Math::BigInt;
+use Math::BaseCnv 'cnv';
 
 use Test;
-plan tests => 15;
+plan tests => 24;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -46,7 +46,122 @@ use Math::NumSeq::RadixConversion;
 *_digit_join_lowtohigh = \&Math::NumSeq::RadixConversion::_digit_join_lowtohigh;
 
 # uncomment this to run the ### lines
-#use Smart::Comments '###';
+# use Smart::Comments '###';
+
+
+#------------------------------------------------------------------------------
+# A085192 first diffs
+
+# differences xor
+# not in OEIS: 2,8,6,38,6,30,6,12,146,6,30,6,12,114,6,30
+# not in OEIS: 10,1000,110,100110,110,11110,110,1100,10010010,110,11110,110,1100
+
+MyOEIS::compare_values
+  (anum => 'A085192',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::BalancedBinary->new;
+     my @got;
+     my $prev = 0;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       push @got, $value - $prev;
+       $prev = $value;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A014138 - cumulative Catalan
+# total 0s in highest 0s run of 2n bits
+
+# Return the length of the highest run of 0 bits in $n.
+sub highest_0s_run_length {
+  my ($n) = @_;
+  my $ret = 0;
+  for (;;) {
+    while ($n & 1) { $n >>= 1; }   # strip low 1s
+    $n || last;
+    $ret = 0;
+    until ($n & 1) { $n >>= 1; $ret++; }   # count and strip low 0s
+  }
+  return $ret;
+}
+ok (highest_0s_run_length(cnv(0, 2,10)), 0);
+ok (highest_0s_run_length(cnv(1, 2,10)), 0);
+ok (highest_0s_run_length(cnv(10, 2,10)), 1);
+ok (highest_0s_run_length(cnv(100, 2,10)), 2);
+ok (highest_0s_run_length(cnv(10001, 2,10)), 3);
+ok (highest_0s_run_length(cnv(111000111, 2,10)), 3);
+ok (highest_0s_run_length(cnv(1100101011, 2,10)), 2);
+
+MyOEIS::compare_values
+  (anum => 'A014138',
+   max_count => 10,
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::BalancedBinary->new;
+     require Math::NumSeq::DigitLength;
+     my $dlen = Math::NumSeq::DigitLength->new (radix => 2);
+     my @got;
+     my $total = 0;
+     my $prev_len = 4;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       my $len = $dlen->ith($value);
+       if ($len != $prev_len) {
+         ### $len
+         ### $total
+         push @got, $total;
+         $total = 0;
+         $prev_len = $len;
+       }
+       $total += highest_0s_run_length($value);
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A002054 - number of 01 bit pairs
+
+MyOEIS::compare_values
+  (anum => 'A002054',
+   max_count => 10,
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::BalancedBinary->new;
+     $seq->next;  # skip value=10
+     require Math::NumSeq::DigitLength;
+     my $dlen = Math::NumSeq::DigitLength->new (radix => 2);
+     my @got;
+     my $prev_len = 4;
+     my $total = 0;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       my $len = $dlen->ith($value);
+       if ($len != $prev_len) {
+         ### $len
+         ### $total
+         push @got, $total;
+         $total = 0;
+         $prev_len = $len;
+       }
+       $total += count_01($value);
+     }
+     return \@got;
+   });
+
+# Return the number of 01 bit pairs in $n.
+sub count_01 {
+  my ($n) = @_;
+  my $ret = 0;
+  while ($n > 1) {
+    $ret += (($n & 3) == 1);
+    $n >>= 1;
+  }
+  return $ret;
+}
 
 
 #------------------------------------------------------------------------------
@@ -66,6 +181,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
+
 #------------------------------------------------------------------------------
 # A057520 - without low 0-bit, including 0
 
@@ -73,9 +189,7 @@ MyOEIS::compare_values
   (anum => 'A057520',
    func => sub {
      my ($count) = @_;
-     require Math::BigInt;
      require Math::NumSeq::DigitLength;
-     my $dlen = Math::NumSeq::DigitLength->new (radix => 2);
      my $seq = Math::NumSeq::BalancedBinary->new;
      my @got = (0);
      while (@got < $count) {
@@ -88,7 +202,7 @@ MyOEIS::compare_values
 
 
 #------------------------------------------------------------------------------
-# A085183,A085184 - without high,low 1,0 bits
+# A085183 - without high,low 1,0 bits
 
 MyOEIS::compare_values
   (anum => 'A085183',
@@ -109,7 +223,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
-# same in base4
+# A085184 - without high,low 1,0 bits, in base 4
 MyOEIS::compare_values
   (anum => 'A085184',
    func => sub {
@@ -155,7 +269,6 @@ sub to_base4_str {
   }
   return join('',reverse @digits);
 }
-
 
 
 #------------------------------------------------------------------------------
@@ -460,24 +573,6 @@ MyOEIS::compare_values
 # }
 
 #------------------------------------------------------------------------------
-# A085192 first diffs
-
-MyOEIS::compare_values
-  (anum => 'A085192',
-   func => sub {
-     my ($count) = @_;
-     my $seq = Math::NumSeq::BalancedBinary->new;
-     my @got;
-     my $prev = 0;
-     while (@got < $count) {
-       my ($i, $value) = $seq->next;
-       push @got, $value - $prev;
-       $prev = $value;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
 # A085223 - positions of single trailing zero
 
 MyOEIS::compare_values
@@ -486,7 +581,6 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $seq = Math::NumSeq::BalancedBinary->new;
      my @got;
-     my $prev = 0;
      while (@got < $count) {
        my ($i, $value) = $seq->next;
        if (($value % 4) == 2) {
@@ -497,7 +591,7 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A080237 - num trailing zeros
+# A080237 = num trailing zeros
 
 MyOEIS::compare_values
   (anum => 'A080237',
@@ -522,7 +616,7 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my $seq = Math::NumSeq::BalancedBinary->new;
-     my @got = (1);
+     my @got = (1);  # A080116 starts OFFSET=0 and reckons 0 as balanced
      for (my $value = 1; @got < $count; $value++) {
        push @got, ($seq->pred($value) ? 1 : 0);
      }

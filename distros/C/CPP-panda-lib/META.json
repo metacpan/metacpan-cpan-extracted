@@ -25,12 +25,14 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Install" : "v1.2.6"
+            "CPP::catch" : "v1.0.8",
+            "Test::Catch" : "v1.0.7",
+            "XS::Install" : "v1.2.8"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.6",
+            "XS::Install" : "v1.2.8",
             "perl" : "5.012000"
          }
       },
@@ -45,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.3",
+   "version" : "v1.2.6",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

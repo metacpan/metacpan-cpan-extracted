@@ -1,5 +1,8 @@
 Revision history for Perl extension ShellQuote::Any
 
+0.04    Wed Jul 31 12:59:51 JST 2019
+        - fix POD, thanks @akarelas-pt
+
 0.03    Tue Aug 30 06:34:26 JST 2016
         - fix test for Windows
 

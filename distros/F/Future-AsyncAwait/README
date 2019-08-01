@@ -203,6 +203,17 @@ SUPPORTED USES
           print $message;
        }
 
+    On perl versions 5.26 and later async sub syntax supports the
+    signatures feature if it is enabled:
+
+       use 5.026;
+       use feature 'signatures';
+    
+       async sub quart($x, $y)
+       {
+          ...
+       }
+
  Cancellation
 
     Cancelled futures cause a suspended async sub to simply stop running.
@@ -310,10 +321,6 @@ TODO
       https://rt.cpan.org/Ticket/Display.html?id=122252
 
       https://rt.cpan.org/Ticket/Display.html?id=124351
-
-      * Support sub signatures in recent perls.
-
-      https://rt.cpan.org/Ticket/Display.html?id=123465
 
       * Implement cancel back-propagation for Perl versions earlier than
       5.24. Currently this does not work due to some as-yet-unknown effects

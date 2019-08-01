@@ -155,6 +155,8 @@ struct Sv {
     static void __at_perl_destroy ();
 
 protected:
+    friend void swap (Sv&, Sv&);
+
     inline bool is_undef() const { return (SvTYPE(sv) <= SVt_PVMG && !SvOK(sv)); }
     inline bool is_scalar_unsafe() const { return (SvTYPE(sv) <= SVt_PVMG || SvTYPE(sv) == SVt_PVGV); }
     SV* sv;
@@ -167,6 +169,8 @@ template <class T, typename = enable_if_rawsv_t<T>> inline bool operator== (cons
 template <class T, typename = enable_if_rawsv_t<T>> inline bool operator!= (const Sv& lh, T* rh) { return lh.get() != (SV*)rh; }
 template <class T, typename = enable_if_rawsv_t<T>> inline bool operator== (T* lh, const Sv& rh) { return rh.get() == (SV*)lh; }
 template <class T, typename = enable_if_rawsv_t<T>> inline bool operator!= (T* lh, const Sv& rh) { return rh.get() != (SV*)lh; }
+
+inline void swap (Sv& lh, Sv& rh) { std::swap(lh.sv, rh.sv); }
 
 std::ostream& operator<< (std::ostream& os, const Sv& sv);
 

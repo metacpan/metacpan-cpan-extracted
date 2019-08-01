@@ -1,0 +1,121 @@
+{
+   "abstract" : "standard interface for author tests to find files to check",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XT-Files",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Tiny" : "1",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "Module::Load" : "0",
+            "Role::Tiny" : "0",
+            "Role::Tiny::With" : "0",
+            "Scalar::Util" : "0",
+            "Test::Builder" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "File::stat" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Test::XTFiles" : {
+         "file" : "lib/Test/XTFiles.pm",
+         "version" : "0.001"
+      },
+      "XT::Files" : {
+         "file" : "lib/XT/Files.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::File" : {
+         "file" : "lib/XT/Files/File.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::Plugin" : {
+         "file" : "lib/XT/Files/Plugin.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::Plugin::Default" : {
+         "file" : "lib/XT/Files/Plugin/Default.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::Plugin::Dirs" : {
+         "file" : "lib/XT/Files/Plugin/Dirs.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::Plugin::Excludes" : {
+         "file" : "lib/XT/Files/Plugin/Excludes.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::Plugin::Files" : {
+         "file" : "lib/XT/Files/Plugin/Files.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::Plugin::lib" : {
+         "file" : "lib/XT/Files/Plugin/lib.pm",
+         "version" : "0.001"
+      },
+      "XT::Files::Role::Logger" : {
+         "file" : "lib/XT/Files/Role/Logger.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skirmess/XT-Files/issues"
+      },
+      "homepage" : "https://github.com/skirmess/XT-Files",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skirmess/XT-Files.git",
+         "web" : "https://github.com/skirmess/XT-Files"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

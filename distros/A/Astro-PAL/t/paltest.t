@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 65;
+use Test::More tests => 133;
 use Test::Number::Delta;
 
 BEGIN {
@@ -197,4 +197,146 @@ print "# Refraction\n";
 
   delta_within( $aoprms[13], 7.602374979243502, 1e-8, "palAoppat");
 
+}
+
+{ # t_altaz
+  my ($az, $azd, $azdd, $el, $eld, $eldd, $pa, $pad, $padd) = palAltaz( 0.7, -0.7, -0.65 );
+  delta_within($az, 4.400560746660174, 1e-12, "palAltaz: az");
+  delta_within($azd, -0.2015438937145421, 1e-13, "palAltaz: azd");
+  delta_within($azdd, -0.4381266949668748, 1e-13, "palAltaz: azdd");
+  delta_within($el, 1.026646506651396, 1e-12, "palAltaz: el");
+  delta_within($eld, -0.7576920683826450, 1e-13, "palAltaz: eld");
+  delta_within($eldd, 0.04922465406857453, 1e-14, "palAltaz: eldd");
+  delta_within($pa, 1.707639969653937, 1e-12, "palAltaz: pa");
+  delta_within($pad, 0.4717832355365627, 1e-13, "palAltaz: pad");
+  delta_within($padd, -0.2957914128185515, 1e-13, "palAltaz: padd");
+}
+
+{ # t_fitxy
+  my $xye = [
+    -23.4, -12.1,   32.0,  -15.3,
+     10.9,  23.7,   -3.0,   16.1,
+     45.0,  32.5,    8.6,  -17.0,
+     15.3,  10.0,  121.7,   -3.8,
+  ];
+
+  my $xym = [
+    -23.41,  12.12,  32.03,  15.34,
+     10.93, -23.72,  -3.01, -16.10,
+     44.90, -32.46,   8.55,  17.02,
+     15.31, -10.07, 120.92,   3.81,
+  ];
+
+  # Fit a 4-coeff linear model to relate two sets of (x,y) coordinates.
+
+  my ($j, $coeffs) = palFitxy(4, $xye, $xym);
+
+  delta_within($coeffs->[0], -7.938263381515947e-3, 1e-12, "palFitxy: 4/0");
+  delta_within($coeffs->[1], 1.004640925187200, 1e-12, "palFitxy: 4/1");
+  delta_within($coeffs->[2], 3.976948048238268e-4, 1e-12, "palFitxy: 4/2");
+  delta_within($coeffs->[3], -2.501031681585021e-2, 1e-12, "palFitxy: 4/3");
+  delta_within($coeffs->[4], 3.976948048238268e-4, 1e-12, "palFitxy: 4/4");
+  delta_within($coeffs->[5], -1.004640925187200, 1e-12, "palFitxy: 4/5");
+  is($j, 0, "palFitxy: 4/j");
+
+  # Same but 6-coeff.
+
+  ($j, $coeffs) = palFitxy(6, $xye, $xym);
+
+  delta_within($coeffs->[0], -2.617232551841476e-2, 1e-12, "palFitxy: 6/0");
+  delta_within($coeffs->[1], 1.005634905041421, 1e-12, "palFitxy: 6/1");
+  delta_within($coeffs->[2], 2.133045023329208e-3, 1e-12, "palFitxy: 6/2");
+  delta_within($coeffs->[3], 3.846993364417779909e-3, 1e-12, "palFitxy: 6/3");
+  delta_within($coeffs->[4], 1.301671386431460e-4, 1e-12, "palFitxy: 6/4");
+  delta_within($coeffs->[5], -0.9994827065693964, 1e-12, "palFitxy: 6/5");
+  is($j, 0, "palFitxy: 6/j");
+
+  # Compute predicted coordinates and residuals.
+
+  my ($xyp, $xrms, $yrms, $rrms) = palPxy($xye, $xym, $coeffs);
+
+  delta_within($xyp->[0], -23.542232946855340, 1e-12, "palPxy: x0");
+  delta_within($xyp->[1], -12.11293062297230597, 1e-12, "palPxy: y0");
+  delta_within($xyp->[2], 32.217034593616180, 1e-12, "palPxy: x1");
+  delta_within($xyp->[3], -15.324048471959370, 1e-12, "palPxy: y1");
+  delta_within($xyp->[4], 10.914821358630950, 1e-12, "palPxy: x2");
+  delta_within($xyp->[5], 23.712999520015880, 1e-12, "palPxy: y2");
+  delta_within($xyp->[6], -3.087475414568693, 1e-12, "palPxy: x3");
+  delta_within($xyp->[7], 16.09512676604438414, 1e-12, "palPxy: y3");
+  delta_within($xyp->[8], 45.05759626938414666, 1e-12, "palPxy: x4");
+  delta_within($xyp->[9], 32.45290015313210889, 1e-12, "palPxy: y4");
+  delta_within($xyp->[10], 8.608310538882801, 1e-12, "palPxy: x5");
+  delta_within($xyp->[11], -17.006235743411300, 1e-12, "palPxy: y5");
+  delta_within($xyp->[12], 15.348618307280820, 1e-12, "palPxy: x6");
+  delta_within($xyp->[13], 10.07063070741086835, 1e-12, "palPxy: y6");
+  delta_within($xyp->[14], 121.5833272936291482, 1e-12, "palPxy: x7");
+  delta_within($xyp->[15], -3.788442308260240, 1e-12, "palPxy: y7");
+  delta_within($xrms, 0.1087247110488075, 1e-13, "palPxy: xrms");
+  delta_within($yrms, 0.03224481175794666, 1e-13, "palPxy: yrms");
+  delta_within($rrms, 0.1134054261398109, 1e-13, "palPxy: rrms");
+
+  # Invert the model.
+
+  ($j, my $bkwds) = palInvf($coeffs);
+
+  delta_within($bkwds->[0], 0.02601750208015891, 1e-12, "palInvf: 0");
+  delta_within($bkwds->[1], 0.9943963945040283, 1e-12, "palInvf: 1");
+  delta_within($bkwds->[2], 0.002122190075497872, 1e-12, "palInvf: 2");
+  delta_within($bkwds->[3], 0.003852372795357474353, 1e-12, "palInvf: 3");
+  delta_within($bkwds->[4], 0.0001295047252932767, 1e-12, "palInvf: 4");
+  delta_within($bkwds->[5], -1.000517284779212, 1e-12, "palInvf: 5");
+  is($j, 0, "palInvf: j");
+
+  # Transform one x, y.
+
+  my ($x2, $y2) = palXy2xy(44.5, 32.5, $coeffs);
+
+  delta_within($x2, 44.793904912083030, 1e-11, "palXy2xy: x");
+  delta_within($y2, -32.473548532471330, 1e-11, "palXy2xy: y");
+
+  # Decompose the fit into scales etc.
+
+  my ($xz, $yz, $xs, $ys, $perp, $orient) = palDcmpf($coeffs);
+  delta_within($xz, -0.0260175020801628646, 1e-12, "palDcmpf: xz");
+  delta_within($yz, -0.003852372795357474353, 1e-12, "palDcmpf: yz");
+  delta_within($xs, -1.00563491346569, 1e-12, "palDcmpf: xs");
+  delta_within($ys, 0.999484982684761, 1e-12, "palDcmpf: ys");
+  delta_within($perp,-0.002004707996156263, 1e-12, "palDcmpf: p");
+  delta_within($orient, 3.14046086182333, 1e-12, "palDcmpf: o");
+}
+
+{ # t_ecleq
+  my ($dr, $dd) = palEcleq(1.234, -0.123, 43210.0);
+  delta_within($dr, 1.229910118208851, 1e-5, "palEcleq: dr");
+  delta_within($dd, 0.2638461400411088, 1e-5, "palEcleq: dd");
+}
+
+{ # t_pcd
+  my $disco = 178.585;
+  my $x = 0.0123;
+  my $y = -0.00987;
+
+  ($x, $y) = palPcd($disco, $x, $y);
+  delta_within($x, 0.01284630845735895, 1e-14, "palPcd: x");
+  delta_within($y, -0.01030837922553926, 1e-14, "palPcd: y");
+
+  ($x, $y) = palUnpcd($disco, $x, $y);
+  delta_within($x, 0.0123, 1e-14, "palUnpcd: x");
+  delta_within($y, -0.00987, 1e-14, "palUnpcd: y");
+
+  # Now negative disco round trip
+  $disco = -0.3333333;
+  $x = 0.0123;
+  $y = -0.00987;
+  ($x, $y) = palPcd($disco, $x, $y);
+  ($x, $y) = palUnpcd($disco, $x, $y);
+  delta_within($x, 0.0123, 1e-14, "palUnpcd: x");
+  delta_within($y, -0.00987, 1e-14, "palUnpcd: y");
+}
+
+{ # t_polmo
+  my ($elong, $phi, $daz) = palPolmo(0.7, -0.5, 1.0e-6, -2.0e-6);
+  delta_within($elong, 0.7000004837322044, 1.0e-12, "palPolmo: elong");
+  delta_within($phi, -0.4999979467222241, 1.0e-12, "palPolmo: phi");
+  delta_within($daz, 1.008982781275728e-6, 1.0e-12, "palPolmo: daz");
 }

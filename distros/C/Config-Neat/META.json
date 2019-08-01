@@ -4,13 +4,13 @@
       "Igor Afanasyev <igor.afanasyev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Neat",
    "prereqs" : {
@@ -34,27 +34,27 @@
    "provides" : {
       "Config::Neat" : {
          "file" : "lib/Config/Neat.pm",
-         "version" : "1.302"
+         "version" : "1.401"
       },
       "Config::Neat::Array" : {
          "file" : "lib/Config/Neat/Array.pm",
-         "version" : "1.302"
+         "version" : "1.401"
       },
       "Config::Neat::Inheritable" : {
          "file" : "lib/Config/Neat/Inheritable.pm",
-         "version" : "1.302"
+         "version" : "1.401"
       },
       "Config::Neat::Render" : {
          "file" : "lib/Config/Neat/Render.pm",
-         "version" : "1.302"
+         "version" : "1.401"
       },
       "Config::Neat::Schema" : {
          "file" : "lib/Config/Neat/Schema.pm",
-         "version" : "1.302"
+         "version" : "1.401"
       },
       "Config::Neat::Util" : {
          "file" : "lib/Config/Neat/Util.pm",
-         "version" : "1.302"
+         "version" : "1.401"
       }
    },
    "release_status" : "stable",
@@ -66,5 +66,6 @@
          "url" : "https://github.com/iafan/Config-Neat"
       }
    },
-   "version" : "1.302"
+   "version" : "1.401",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

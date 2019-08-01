@@ -1,5 +1,17 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.79   2019-07-29
+       - Clone 0.43 or higher
+
+1.78   2019-07-27
+       - force Clone 0.41 and seems 0.42 causes warnings
+       - newest address-formatting templates
+
+1.77   2019-07-26
+       - change logic used to create ordered_components list
+       - newest address-formatting templates
+       - OpenCage is now OpenCage GmbH
+
 1.76   2019-04-20
        - better cleanup in _sanity_cleanup to avoid component keys with no value
        - newest address-formatting templates

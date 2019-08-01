@@ -1,5 +1,10 @@
 Revision history for Perl module DNS::Unbound
 
+0.09 - Sat, 27 July 2019
+- Remove dependency on recent ExtUtils::MakeMaker version.
+- Split DNS::Unbound::AsyncQuery off to a separate file; add POD & test.
+- Beef up documentation.
+
 0.08 - Thu, 13 June 2019
 - Tweak verbiage (no code changes)
 

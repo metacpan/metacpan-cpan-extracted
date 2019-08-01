@@ -1,7 +1,7 @@
 package Data::CSel;
 
-our $DATE = '2016-11-23'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.121'; # VERSION
 
 use 5.020000;
 use strict;
@@ -559,7 +559,23 @@ sub _simpsel {
         } elsif ($type eq 'class_selector') {
 
             my $class = $f->{class};
-            @res = grep { $_->isa($class) } @res;
+
+            my @classes_to_match;
+            for (@{ $opts->{class_prefixes} // [] }) {
+                push @classes_to_match, $_ . (/::$/ ? "" : "::") . $class;
+            }
+            push @classes_to_match, $class;
+            my @filtered_res;
+          RES:
+            for my $res (@res) {
+                for (@classes_to_match) {
+                    if ($res->isa($_)) {
+                        push @filtered_res, $res;
+                        next RES;
+                    }
+                }
+            }
+            @res = @filtered_res;
 
         } elsif ($type eq 'id_selector') {
 
@@ -704,7 +720,7 @@ Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 =head1 VERSION
 
-This document describes version 0.11 of Data::CSel (from Perl distribution Data-CSel), released on 2016-11-23.
+This document describes version 0.121 of Data::CSel (from Perl distribution Data-CSel), released on 2019-07-26.
 
 =head1 SYNOPSIS
 
@@ -1278,7 +1294,11 @@ something like this CSel, as we deal with only Perl objects.
 
 =head1 FUNCTIONS
 
-=head2 csel([ \%opts , ] $expr, @tree_nodes) => list|selection_object
+=head2 csel
+
+Usage:
+
+ $list_or_selection_obj = csel([ \%opts , ] $expr, @tree_nodes)
 
 Select from tree node objects C<@tree_nodes> using CSel expression C<$expr>.
 Will return a list of mattching node objects (unless when C<wrap> option is
@@ -1352,7 +1372,11 @@ C<children> to set children nodes.
 
 =back
 
-=head2 parse_csel($expr) => hash|undef
+=head2 parse_csel
+
+Usage:
+
+ $hash = parse_csel($expr);
 
 Parse an expression. On success, will return a hash containing parsed
 information. On failure, will return undef.
@@ -1382,7 +1406,19 @@ feature.
 
 =head1 SEE ALSO
 
+=head2 Related to CSS selector
+
 CSS4 Selectors Specification, L<https://www.w3.org/TR/selectors4/>.
+
+These modules let you use CSS selector syntax (or its subset) to select nodes of
+an HTML document: L<Mojo::DOM> (or L<DOM::Tiny>), L<jQuery>, L<pQuery>,
+L<HTML::Selector::XPath> (or via L<Web::Query>). The last two modules can also
+handle XPath expression.
+
+CLI to select HTML elements using CSS selector syntax: L<html-css-sel> (from
+L<App::html::css::sel>).
+
+=head2 Similar query languages
 
 These modules let you use XPath (or XPath-like) syntax to select nodes of a data
 structure: L<Data::DPath>. Like CSS selectors, XPath is another query language
@@ -1394,14 +1430,42 @@ L<JSON::Path>. JSONPath is a query language to select nodes of a JSON document
 (data structure). JSONPath specification:
 L<http://goessner.net/articles/JsonPath>.
 
-These modules let you use CSS selector syntax (or its subset) to select nodes of
-an HTML document: L<Mojo::DOM> (or L<DOM::Tiny>), L<jQuery>, L<pQuery>,
-L<HTML::Selector::XPath> (or via L<Web::Query>). The last two modules can also
-handle XPath expression.
+=head2 Related modules
 
 L<Data::CSel::WrapStruct>
 
 L<CSel::Examples>
+
+=head2 Modules that use CSel
+
+=over
+
+=item * For data structure
+
+CLI to select JSON nodes using CSel: L<jsonsel> (from L<App::jsonsel>).
+
+CLI to select Perl data structure elements using CSel: L<ddsel> (from
+L<App::CSelUtils>).
+
+CLI to select YAML nodes using CSel: L<yamlsel> (from L<App::yamlsel>).
+
+=item * For HTML document
+
+L<htmlsel> (from L<App::htmlsel>).
+
+=item * For Org document
+
+L<orgsel> (from L<App::orgsel>).
+
+=item * For POD document
+
+CLI to select POD::Elemental nodes using CSel: L<podsel> (from L<App::podsel>).
+
+=item * For PPI (Perl source code tree representation) document
+
+CLI to select PPI nodes using CSel: L<ppisel> (from L<App::ppisel>).
+
+=back
 
 =head1 AUTHOR
 
@@ -1409,7 +1473,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,65 @@
+NAME
+    App::html::css::sel - Select HTML elements using CSS selector syntax
+
+VERSION
+    This document describes version 0.003 of App::html::css::sel (from Perl
+    distribution App-html-css-sel), released on 2019-07-26.
+
+SYNOPSIS
+FUNCTIONS
+  html_css_sel
+    Usage:
+
+     html_css_sel(%args) -> [status, msg, payload, meta]
+
+    Select HTML elements using CSS selector syntax.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   expr* => *str*
+
+    *   file => *str* (default: "-")
+
+    *   match_action => *str* (default: "print-as-string")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-html-css-sel>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-html-css-sel>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-html-css-sel>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    htmlsel (from App::htmlsel), to select HTML tree nodes using CSel
+    syntax.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -240,6 +240,16 @@ sub import {
 
 sub TO_JSON { shift->data }
 
+sub validate_fields {
+  my $self = shift;
+  if (ref $self->{data} eq 'HASH') {
+    for (grep { $self->can($_) } keys %{ $self->{data} }) {
+      $self->$_($self->{data}{$_});
+    }
+  }
+  return $self;
+}
+
 sub _cache {
   my $self = shift;
   my $cache = $self->{cache} ||= {};
@@ -448,6 +458,16 @@ Alias for L</data>.
 
 This method allow the document to get automatically serialized by
 L<Mojo::JSON>.
+
+=head2 validate_fields
+
+  $self = $self->validate_fields;
+
+This method can be used to validate the content of the fields of a document
+againt the types defined in the model. It can be called after a document has
+been loaded from MongoDB, e.g. via L<Mandel::Collection/single>. It can be
+useful if the data in MongoDB might have been altered by something else after
+it was stored there.
 
 =head1 SEE ALSO
 

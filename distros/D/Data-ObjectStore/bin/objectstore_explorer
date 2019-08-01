@@ -15,8 +15,22 @@ die "No object store found at $db_dir;" unless -d $db_dir;
 
 my $store = Data::ObjectStore->open_store( $db_dir );
 
+sub fetch {
+    my $id = shift;
+    my $val;
+    $val = $store->_fetch( $id, 'force' );
+    return $val;
+}
+
+sub version {
+    print "Data::ObjectStore version: $Data::ObjectStore::VERSION\n";
+    print "$db_dir objectstore version: ".$store->get_store_version."\n";
+    print "$db_dir recordstore version: ".$store->get_db_version."\n";
+}
+
 show( $store->load_root_container->[0] );
 
+version();
 print ">";
 
 while( my $in = <STDIN> ) {
@@ -51,7 +65,7 @@ sub interpret {
         print "Done\n";
     } #STOW
 
-    elsif( $cmd =~ /^\s*EXIT/i ) {
+    elsif( $cmd =~ /^\s*EXIT|QUIT/i ) {
         if( $store->_has_dirty ) {
             print "About to exit. There are things not saved. Proceed without saving (yes/N)? ";
             my $yn = <STDIN>;
@@ -65,10 +79,22 @@ sub interpret {
         }
     } #STOW
 
+    elsif( $cmd =~ /^\s*VERSION/ ) {
+        version();
+    }
+    
+    elsif( $cmd =~ /^\s*BLESS\s+(\d+)\s+(\S+)/ ) {
+        my( $id, $toclass ) = ( $1, $2 );
+        my $obj = fetch( $id );
+        $store->save( $obj, $toclass );
+        show( $id );
+        print "Updated class for reference '$id' to '$toclass'\n";
+    } #BLESS
+    
     elsif( $cmd =~ /^\s*DELETE\s+(\d+)\s+(\S+)/ ) {
         my( $from_id, $from_field ) = ( $1, $2 );
 
-        my $obj = $store->_fetch( $from_id );
+        my $obj = fetch( $from_id );
         my $r = ref( $obj );
         if( $r eq 'ARRAY' ) {
             unless( $from_field > 0 || $from_field eq '0' ) {
@@ -83,14 +109,15 @@ sub interpret {
             print "Removed field '$from_field' from hash at $from_id.\n";
         } else {
             delete $obj->[1]{$from_field};
-            $store->_dirty( $obj, $from_id );
+            $store->_dirty( $obj );
+            $store->_dirty( $from_id );
             print "Removed field '$from_field' from object at $from_id.\n";
         }
     } #DELETE
 
     elsif( $cmd =~ /^\s*ADD(LIST|OBJ|HASH|VAL|REF)\s+(\d+)\s+(\S+)(\s+(.*))?/ ) {
         my( $type, $to_id, $to_field, $value ) = ( $1, $2, $3, $5 );
-        my $to_obj = $store->_fetch( $to_id );
+        my $to_obj = fetch( $to_id );
         my $to_r = ref( $to_obj );
         if( $to_r eq 'ARRAY' ) {
             unless( $to_field > 0 || $to_field eq '0' ) {
@@ -130,7 +157,8 @@ sub interpret {
                 $to_obj->[1]{$to_field} = $value;
                 print "Added reference $value to object $to_id at field $to_field\n";
             }
-            $store->_dirty( $to_obj, $to_id );
+            $store->_dirty( $to_obj );
+            $store->_dirty( $to_id );
             return;
         }
 
@@ -142,8 +170,7 @@ sub interpret {
             if( $value ) {
                 eval("use $value");
                 if( $@ ) {
-                    print "Error instantiating object of $value : $@. Doing nothing\n";
-                    return;
+                    warn "Error instantiating object of $value. Treating as generic container\n";
                 }
             }
             $value = $store->create_container($value); #value is class here
@@ -164,7 +191,7 @@ sub interpret {
 
     elsif( $cmd =~ /^\s*MOVE\s+(\d+)\s+(\S+)\s+(\d+)\s+(\S+)/ ) {
         my( $from_id, $from_field, $to_id, $to_field ) = ( $1, $2, $3, $4 );
-        my $to_obj = $store->_fetch( $to_id );
+        my $to_obj = fetch( $to_id );
         my $to_r = ref( $to_obj );
 
         if( $to_r eq 'ARRAY' ) {
@@ -185,7 +212,7 @@ sub interpret {
             }
         }
 
-        my $from_obj = $store->_fetch( $from_id );
+        my $from_obj = fetch( $from_id );
         my $from_r = ref( $from_obj );
         my $from_val;
         if( $from_r eq 'ARRAY' ) {
@@ -203,7 +230,8 @@ sub interpret {
         else {
             $from_val = delete $from_obj->[1]{$from_field};
         }
-        $store->_dirty( $from_obj, $from_id );
+        $store->_dirty( $from_obj );
+        $store->_dirty( $from_id );
 
         if( $to_r eq 'ARRAY' ) {
             my $tied = tied @$to_obj;
@@ -218,7 +246,8 @@ sub interpret {
             $to_obj->[1]{$to_field} = $from_val;
             print "Moved '$from_val' from '$from_id' field '$from_field' to object '$to_id' field '$to_field'\n";
         }
-        $store->_dirty( $to_obj, $to_id );
+        $store->_dirty( $to_obj );
+        $store->_dirty( $to_id );
 
     } #MOVE
     else {
@@ -245,6 +274,8 @@ Other Commands :
         run the recycler
      SAVE
         save any changes to the store
+     QUIT
+        exit this program
      
 END
     }
@@ -252,7 +283,7 @@ END
 
 sub show {
     my $id = shift;
-    my $obj = $store->_fetch( $id );
+    my $obj = fetch( $id );
     unless( $obj ) {
         print "Nothing found for id $id\n";
         return;
@@ -307,7 +338,7 @@ while( my $in = <STDIN> ) {
     chomp $in;
 
     if( $in =~ /^(FULL\s+)?(\d+)$/ ) {
-        my $val = $store->_fetch( $2 );
+        my $val = fetch( $2 );
         if( length($val) < 1001 || $1 ) {
             print $val."\n";
         } else {

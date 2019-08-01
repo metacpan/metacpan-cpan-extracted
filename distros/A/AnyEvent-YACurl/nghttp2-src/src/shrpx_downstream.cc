@@ -26,7 +26,7 @@
 
 #include <cassert>
 
-#include "http-parser/http_parser.h"
+#include "url-parser/url_parser.h"
 
 #include "shrpx_upstream.h"
 #include "shrpx_client_handler.h"
@@ -571,6 +571,18 @@ void FieldStore::append_last_trailer_key(const char *data, size_t len) {
 void FieldStore::append_last_trailer_value(const char *data, size_t len) {
   shrpx::append_last_header_value(balloc_, trailer_key_prev_, buffer_size_,
                                   trailers_, data, len);
+}
+
+void FieldStore::erase_content_length_and_transfer_encoding() {
+  for (auto &kv : headers_) {
+    switch (kv.token) {
+    case http2::HD_CONTENT_LENGTH:
+    case http2::HD_TRANSFER_ENCODING:
+      kv.name = StringRef{};
+      kv.token = -1;
+      break;
+    }
+  }
 }
 
 void Downstream::set_request_start_time(

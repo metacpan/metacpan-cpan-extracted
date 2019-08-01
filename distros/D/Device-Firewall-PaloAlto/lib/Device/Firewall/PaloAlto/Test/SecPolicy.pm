@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Test::SecPolicy;
-$Device::Firewall::PaloAlto::Test::SecPolicy::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::Test::SecPolicy::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
@@ -63,7 +63,7 @@ Device::Firewall::PaloAlto::Test::SecPolicy - A Palo Alto rulebase test result.
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 

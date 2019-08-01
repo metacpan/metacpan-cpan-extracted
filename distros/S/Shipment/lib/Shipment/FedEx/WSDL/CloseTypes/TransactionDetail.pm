@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::TransactionDetail;
-$Shipment::FedEx::WSDL::CloseTypes::TransactionDetail::VERSION = '3.01';
+$Shipment::FedEx::WSDL::CloseTypes::TransactionDetail::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::CloseTypes::TransactionDetail
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,5 @@
-.hgignore
 Changes
 CMakeLists.txt
-CPP-panda-lib.pro
 lib.xs
 lib/CPP/panda/lib.pm
 lib/CPP/panda/lib.pod

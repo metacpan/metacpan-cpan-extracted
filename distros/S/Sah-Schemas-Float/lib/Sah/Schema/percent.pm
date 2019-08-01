@@ -1,7 +1,7 @@
 package Sah::Schema::percent;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = ['float', {
     summary => 'A float',
@@ -32,7 +32,7 @@ Sah::Schema::percent - A float
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::percent (from Perl distribution Sah-Schemas-Float), released on 2019-04-08.
+This document describes version 0.005 of Sah::Schema::percent (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
 
 =head1 DESCRIPTION
 

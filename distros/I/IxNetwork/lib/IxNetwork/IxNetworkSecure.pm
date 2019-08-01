@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 1997 - 2018 by IXIA Keysight
+# Copyright 1997 - 2019 by IXIA Keysight
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"),
@@ -76,7 +76,7 @@ sub _setDefaults {
     $self->{_transportType} = 'WebSocket';     
     $self->{_OK} = '::ixNet::OK';
     $self->{_ERROR} = '::ixNet::ERROR';
-    $self->{_version} = '8.50.1501.9';
+    $self->{_version} = '9.00.1915.16';
     $self->{_noApiKey} = '00000000000000000000000000000000';
     $self->{_connectionInfo} = {
         port => undef,
@@ -637,6 +637,7 @@ sub connect {
             $self->_cleanUpSession($self->{_connectionInfo}->{sessionUrl});
         }
         $self->_close();
+        $self->_deleteSession($self->{_connectionInfo}->{sessionUrl});
         my $failedConnectionPort;
         if (exists $connectArgs->{-port}) {
             $failedConnectionPort = $connectArgs->{-port};
@@ -696,9 +697,10 @@ sub disconnect {
 
     if ($self->_isConnected()) {
         $self->_close();
-        if ($self->{_connectionInfo}->{closeServerOnDisconnect}) {
-            $self->_cleanUpSession($self->{_connectionInfo}->{sessionUrl});
-        }
+        # bye bye $self->_cleanUpSession() forever
+        #if ($self->{_connectionInfo}->{closeServerOnDisconnect}) {
+        #    $self->_cleanUpSession($self->{_connectionInfo}->{sessionUrl});
+        #}
         $self->_setDefaults();
         return $self->{_OK};
     } else {
@@ -711,9 +713,8 @@ sub _cleanUpSession {
     
     eval {
         $self->_restSend('POST', $url.'/operations/stop');
-        $self->_waitForState('stopped', $url);    
+        $self->_waitForState('stopped', $url);
     };
-
     $self->_deleteSession($url);
 }
 

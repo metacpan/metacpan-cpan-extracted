@@ -42,6 +42,7 @@
             "Complete::Module" : "0.09",
             "Config" : "0",
             "Cwd" : "0",
+            "Data::Sah::Coerce::perl::array::str_or_array_expand_perl_modname_wildcard" : "0",
             "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" : "0",
             "Data::Sah::Coerce::perl::str::str_normalize_perl_modname_or_prefix" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
@@ -68,7 +69,7 @@
             "Module::Path::More" : "0.32",
             "Module::XSOrPP" : "0.08",
             "PERLANCAR::AppUtil::PerlStripper" : "0.03",
-            "PERLANCAR::Module::List" : "0",
+            "PERLANCAR::Module::List" : "0.004002",
             "Perinci::CmdLine::Any" : "0.13",
             "Perinci::CmdLine::Lite" : "1.820",
             "Perinci::Sub::Util" : "0.46",
@@ -76,9 +77,11 @@
             "Perl::Stripper" : "0",
             "Sah::Schema::perl::modname" : "0",
             "Sah::Schema::perl::modname_or_prefix" : "0",
+            "Sah::Schema::perl::modnames" : "0",
             "Sah::Schema::true" : "0",
             "SourceCode::LineCounter::Perl" : "0",
             "String::ShellQuote" : "0",
+            "String::Wildcard::Bash" : "0.040",
             "experimental" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -106,7 +109,7 @@
          "web" : "https://github.com/perlancar/perl-App-PMUtils"
       }
    },
-   "version" : "0.724",
+   "version" : "0.726",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
@@ -216,7 +219,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.596"
+            "version" : "0.597"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -467,12 +470,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Author::PERLANCAR/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Rinci::Validate",
-            "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.24"
+            "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
+            "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
+            "version" : "0.250"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

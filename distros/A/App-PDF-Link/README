@@ -41,14 +41,11 @@ or
 
     pdflink --man
 
-You can also look for information at:
+PDFlink development is hosted on GitHub, repository
+https://github.com/sciurius/pdflink.
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-PDF-Link
-
-    Search CPAN
-        http://search.cpan.org/dist/App-PDF-Link
-
+Please report bugs and feature requests to the GitHub issue tracker,
+https://github.com/sciurius/pdflink/issues.
 
 COPYRIGHT AND LICENCE
 

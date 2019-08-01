@@ -41,7 +41,7 @@ namespace xs {
 
 using vv_fn   = function<void()>;
 using vi_fn   = function<void(int)>;
-using iid_fn  = function<int(int, double)>;
+using iid_fn  = function<int(int, panda::string_view)>;
 
 TEST_CASE("function->sub", "[function]") {
     int ecnt = 0;
@@ -72,21 +72,21 @@ TEST_CASE("function->sub", "[function]") {
     }
     SECTION("int(int, double)") {
         ecnt = 1;
-        iid_fn fn = [&](int i, double d) {
+        iid_fn fn = [&](int i, panda::string_view d) {
             CHECK(i == 42);
-            CHECK(d == 3.14);
+            CHECK(d == "hello");
             cnt++;
             return 255;
         };
         Sub sub = xs::out(fn);
-        Scalar ret = sub.call(Simple(42), Simple(3.14));
+        Scalar ret = sub.call(Simple(42), Simple("hello"));
         CHECK(Simple(ret) == 255);
     }
     SECTION("int(int, double) custom") {
         ecnt = 1;
-        iid_fn fn = [&](int i, double d) {
+        iid_fn fn = [&](int i, panda::string_view d) {
             CHECK(i == 842);
-            CHECK(d == 3.14);
+            CHECK(d == "hi");
             cnt++;
             return 255;
         };
@@ -94,7 +94,7 @@ TEST_CASE("function->sub", "[function]") {
             [](int r) { return Simple(r - 200); },
             [](const Sv& sv) { return (int)Simple(sv) + 800; }
         );
-        Scalar ret = sub.call(Simple(42), Simple(3.14));
+        Scalar ret = sub.call(Simple(42), Simple("hi"));
         CHECK(Simple(ret) == 55);
     }
     SECTION("function->sub->function") {

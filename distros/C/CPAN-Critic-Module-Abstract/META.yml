@@ -1,5 +1,5 @@
 ---
-abstract: 'Critic CPAN module abstract'
+abstract: '(DEPRECATED) Critic CPAN module abstract'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Critic-Module-Abstract
   homepage: https://metacpan.org/release/CPAN-Critic-Module-Abstract
   repository: git://github.com/perlancar/perl-CPAN-Critic-Module-Abstract.git
-version: '0.091'
+version: '0.092'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

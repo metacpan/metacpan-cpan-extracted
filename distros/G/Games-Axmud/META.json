@@ -56,9 +56,9 @@
             "HTTP::Tiny" : "0",
             "IO::Socket::INET" : "0",
             "IO::Socket::INET6" : "0",
-            "IO::Socket::SSL" : "0",
             "IPC::Run" : "0",
             "JSON" : "0",
+            "Math::Round" : "0",
             "Math::Trig" : "0",
             "Module::Load" : "0",
             "Net::OpenSSH" : "0",
@@ -87,6 +87,6 @@
          "web" : "https://github.com/axcore/axmud"
       }
    },
-   "version" : "v1.2.0",
+   "version" : "v1.2.041",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

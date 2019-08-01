@@ -6,29 +6,24 @@
 #  DESCRIPTION: Test of connection to Nominet EPP servers
 #               and other basic features of the object.
 #
-#        FILES:  ---
-#         BUGS:  ---
 #        NOTES:  Must have set $NOMTAG and $NOMPASS env vars first
 #       AUTHOR:  Pete Houston (cpan@openstrike.co.uk)
 #      COMPANY:  Openstrike
-#      VERSION:  $Id: connect.t,v 1.7 2015/11/04 16:19:14 pete Exp $
 #      CREATED:  04/02/13 11:54:43
-#     REVISION:  $Revision: 1.7 $
 #===============================================================================
 
 use strict;
 use warnings;
 
-use Test::More tests => 32;
+use Test::More tests => 38;
 use Test::Warn;
 
-use lib './lib';
 
 BEGIN { use_ok ('Net::EPP::Registry::Nominet') }
 
 my $epp;
 my %newargs = (
-	test    => 1,
+	ote     => 1,
 	login   => 0,
 	user    => $ENV{NOMTAG},
 	pass    => $ENV{NOMPASS},
@@ -42,18 +37,33 @@ if (defined $Net::EPP::Protocol::THRESHOLD) {
 $epp = Net::EPP::Registry::Nominet->new (%newargs);
 
 SKIP: {
-	skip "No access to testbed from this IP address", 3 unless defined $epp;
+	skip "No access to testbed from this IP address", 9 unless defined $epp;
 
 	ok ($epp->{def_years} == 2, 'def_years validation');
 
 	$epp = new_ok ('Net::EPP::Registry::Nominet', [
-		test  => 1,
+		ote   => 1,
 		login => 0,
 		debug => $ENV{DEBUG_TEST} || 0 ]
 	);
 
 	is ($epp->login ('nosuchuser', 'nosuchpass'), undef,
 		'Login with duff user');
+	my $res;
+	warning_is {$res = $epp->login ()} 
+		{carped => 'No username (tagname) supplied'},
+		'Carped msg for no username';
+	is ($epp->get_error, 'No username (tagname) supplied',
+		'Error msg for no username');
+	is ($res, undef,
+		'Login with no args trapped');
+	warning_is {$res = $epp->login ('nosuchuser')} 
+		{carped => 'No password supplied'},
+		'Carped msg for no password';
+	is ($res, undef,
+		'Login with no password trapped');
+	is ($epp->get_error, 'No password supplied',
+		'Error msg for no password');
 }
 
 SKIP: {
@@ -86,7 +96,7 @@ SKIP: {
 		'Expected warnings are thrown';
 	ok ((not defined $epp), 'Reconnect with duff SSL cert verification');
 	SKIP: {
-		skip "Server cert may not be valid now", 1 if time > 1538348400;
+		skip "Server cert may not be valid now", 1 if time > 1610712000;
 		$newargs{ca_file}  = 't/ca.crt';
 		$epp = Net::EPP::Registry::Nominet->new (%newargs);
 		ok (defined $epp, 'Reconnect with good SSL cert verification');
@@ -96,7 +106,7 @@ SKIP: {
 	$newargs{ciphers}  = 'duff';
 	warnings_exist { $epp = Net::EPP::Registry::Nominet->new (%newargs); }
 		[qr/^No greeting returned: cannot continue/,
-		qr/^Connection to testbed-epp\.nominet\.org\.uk:700 failed/],
+		qr/^Connection to ote-epp\.nominet\.org\.uk:700 failed/],
 		'Expected warnings are thrown';
 	ok ((not defined $epp), 'Reconnect with duff cipher list');
 

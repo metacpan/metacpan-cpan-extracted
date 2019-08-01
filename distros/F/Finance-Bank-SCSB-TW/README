@@ -1,0 +1,63 @@
+NAME
+
+    Finance::Bank::SCSB::TW - Check Taiawn SCSB bank info
+
+SYNOPSIS
+
+        use Finance::Bank::SCSB::TW;
+    
+        my $rate = Finance::Bank::SCSB::TW::currency_exchange_rate
+    
+        print YAML::Dump($rate);
+
+DESCRIPTION
+
+    This module provides a rudimentary interface to the online SCSB banking
+    system at http://www.scsb.com.tw/.
+
+    You will need either Crypt::SSLeay or IO::Socket::SSL installed for
+    HTTPS support to work with LWP.
+
+FUNCTIONS
+
+    currency_exchange_rate
+
+      Retrieve the table of foriegn currency exchange rate. All rates are
+      exchanged with NTD. It returns an arrayref of hash with each one
+      looks like this:
+
+          {
+              zh_currency_name => "ç¾éç¾é",
+              en_currency_name => "USD CASH",
+              buy_at           => 33.06,
+              sell_at          => 33.56
+          }
+
+      The returned reference is also an object of
+      Finance::Bank::SCSB::TW::CurrencyExchangeRateCollection, see the
+      documents there for the reference of instance methods.
+
+    check_balance($id, $username, $password)
+
+      Retrieve your NTD balance. id is the 10-digit Taiwan ID. username and
+      password is whatever you defined at the bank.
+
+WARNING
+
+    This is code for online banking, and that means your money, and that
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the
+    source of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to
+    me, but is provided under NO GUARANTEE, explicit or implied.
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

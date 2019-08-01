@@ -10,13 +10,13 @@ Time::Format - Easy-to-use date/time formatting.
 
 =head1 VERSION
 
-This is version 1.14 of Time::Format, July 22, 2019.
+This is version 1.15 of Time::Format, July 26, 2019.
 
 =cut
 
 use strict;
 package Time::Format;
-$Time::Format::VERSION  = '1.14';
+$Time::Format::VERSION  = '1.15';
 
 # This module claims to be compatible with the following versions
 # of Time::Format_XS.
@@ -27,6 +27,10 @@ sub _croak
     require Carp;
     goto &Carp::croak;
 }
+
+# Store the file offset of the __DATA__ region.
+my $data_pos = tell DATA;
+close DATA;                     # so we don't hold a lock on this file.
 
 # Here we go through a bunch of tests to decide whether we can use the
 # XS module, or if we need to load and compile the perl-only
@@ -68,22 +72,25 @@ if ($load_perlonly)
 {
     # Time::Format_XS not installed, or version mismatch, or NOXS was set.
     # The perl routines will need to be loaded.
-    # But defer this until someone actually calls time_format().
+    # But let's defer this until someone actually calls time_format().
     *time_format = sub
     {
-        goto &time_format_perlonly  if defined &time_format_perlonly;
+        if (not defined &time_format_perlonly)
+        {
+            open DATA, '<', __FILE__
+                or die "Can't access code in " . __FILE__ . ": $!\n";;
 
-        local $^W = 0;    # disable warning about subroutines redefined
-        local $/ = undef;
-        my $top = tell DATA;
-        my $d = <DATA>;
+            flock DATA, 1;      # LOCK_SH
+            seek  DATA, $data_pos, 0;
+            local $^W = 0;        # disable warning about subroutines redefined
+            local $/ = undef;     # slurp
+            my $code = <DATA>;
+            flock DATA, 8;      # LOCK_UN
+            close DATA;
 
-        # Why rewind?  Because if the program forks, a second process may need to read DATA.
-        # See CPAN RT bug 121367 (and maybe 74880 too).
-        seek DATA, $top, 0;
-
-        eval $d;
-        die if $@;
+            eval $code;
+            die if $@;
+        }
         goto &time_format_perlonly;
     };
     undef $Time::Format_XS::VERSION;    # Indicate that XS version is not available.
@@ -1189,9 +1196,9 @@ endeavor to improve the software.
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQTSmjxiQX/QfjsCVJLChJhzmpBWqgUCXTYSngAKCRDChJhzmpBW
-qsFsAJ9KgMFSmNmfX0g9DtHvJJjmAz9jygCgkUYdpA4g/pgCo0ejISRR+2qpTwk=
-=Ppwj
+iF0EARECAB0WIQTSmjxiQX/QfjsCVJLChJhzmpBWqgUCXTtSTQAKCRDChJhzmpBW
+qqmjAKCO5fIeALvd5cOw6C+o+4nqamDxagCePM3JdKVIEYuSz9VOaTWiJGVbo54=
+=drPW
 -----END PGP SIGNATURE-----
 
 =end gpg

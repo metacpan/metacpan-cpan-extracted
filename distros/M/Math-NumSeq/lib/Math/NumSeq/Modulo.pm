@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -40,16 +40,22 @@ sub description {
   }
 }
 use constant i_start => 0;
+
 use constant characteristic_smaller => 1;
+use constant characteristic_increasing => 0;
 sub characteristic_integer {
   my ($self) = @_;
-  return (int($self->{'modulus'}) == $self->{'modulus'});
+  return _is_integer($self->{'modulus'});
 }
 sub characteristic_modulus {
   my ($self) = @_;
   return $self->{'modulus'};
 }
-use constant characteristic_increasing => 0;
+sub _is_integer {
+  my ($n) = @_;
+  return ($n == int($n));
+}
+
 use constant parameter_info_array =>
   [ { name        => 'modulus',
       type        => 'integer',
@@ -83,8 +89,8 @@ sub values_max {
                    'A010880',  # modulus=11
                    'A010881',  # modulus=12
                    undef,      # 13
-                   undef,      # 14
-                   undef,      # 15
+                   'A070696',  # modulus=14
+                   'A167463',  # modulus=15
                    'A130909',  # modulus=16
 
                    # OEIS-Catalogue array end
@@ -176,7 +182,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

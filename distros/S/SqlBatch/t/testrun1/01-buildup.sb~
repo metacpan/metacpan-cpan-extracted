@@ -1,0 +1,17 @@
+--SQL-- -id=sql1
+create table t (a int,b varchar)
+--END--
+--INSERT-- -id=fill_table_t -table=t -id=insert1
+'a';'b'
+'1';'2'
+'3';'4'
+--END--
+    # Next section runs a delete when the "usertest"-tag is not defined
+    --DELETE-- -table=t --id=delete1 -tags=!usertest
+    'a';'b'
+    '1';'2'
+    --END--
+    # Next section runs in when "setup"-tag is defined and NOT "production" tag
+    --SQL-- -id=sql2 -tags=setup,-!production
+    create table x (a int)
+    --END--

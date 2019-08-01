@@ -1,5 +1,14 @@
 Revision history for HTTP-Daemon
 
+6.05      2019-07-26 20:41:05Z
+  - Added the .perltidyrc from the libwww-perl distribution
+  - Tidied the test suite with perltidy
+  - Tidied Daemon.pm
+  - Turned on EOL and tab tests
+  - Removed obvious indirect object syntax in test suite
+  - Added IPv6 support. (GH#24) Thanks, @ppisar and @intrigeri
+  - Added IO::Socket::IP as a prerequisite rather than IO::Socket::INET
+
 6.04      2019-04-02 13:09:45Z
   - Remove circular dependency on LWP::RobotUA introduced in 6.02 (GH#29)
     (Olaf Alders)

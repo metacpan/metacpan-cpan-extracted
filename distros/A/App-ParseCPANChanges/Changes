@@ -1,13 +1,16 @@
-Revision history for App-ParseCPANChanges
+0.070   2019-07-03  Released-By: PERLANCAR; Urgency: medium
 
-0.06    2016-01-18 (PERLANCAR)
+	- Add option --class to customize parser class.
+
+
+0.06    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.05    2015-09-03 (PERLANCAR)
+0.05    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -16,7 +19,7 @@ Revision history for App-ParseCPANChanges
 	  requirement.
 
 
-0.04     2014-07-22 (SHARYANTO)
+0.04     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -24,17 +27,17 @@ Revision history for App-ParseCPANChanges
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.03    2013-11-01 (SHARYANTO)
+0.03    2013-11-01  Released-By: SHARYANTO
 
         - No functional changes. Mention some other modules and the rationale
           for the script.
 
 
-0.02    2013-08-06 (SHARYANTO)
+0.02    2013-08-06  Released-By: SHARYANTO
 
         - No functional changes. Add missing dep [CT].
 
 
-0.01    2013-08-05 (SHARYANTO)
+0.01    2013-08-05  Released-By: SHARYANTO
 
         - First version.

@@ -1,4 +1,4 @@
-# Copyright 2013, 2014 Kevin Ryde
+# Copyright 2013, 2014, 2016 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -25,7 +25,7 @@ use strict;
 use Math::PlanePath::Base::Digits 'digit_split_lowtohigh';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;

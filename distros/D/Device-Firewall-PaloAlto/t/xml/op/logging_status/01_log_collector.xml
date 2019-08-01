@@ -1,0 +1,22 @@
+<response status="success"><result>-----------------------------------------------------------------------------------------------------------------------------
+      Type      Last Log Created        Last Log Fwded       Last Seq Num Fwded  Last Seq Num Acked         Total Logs Fwded
+-----------------------------------------------------------------------------------------------------------------------------
+> CMS 0
+	Not Sending to CMS 0
+> CMS 1
+	Not Sending to CMS 1
+
+>Log Collector 
+'Log Collection log forwarding agent' is active and connected to 172.28.128.102
+
+    config   2019/07/04 12:10:17   2019/07/04 12:10:18                  1301548             1301548                       59
+    system   2019/07/18 14:54:48   2019/07/18 14:55:07                   588238              588238                    36415
+    threat   2019/07/18 14:55:43   2019/07/18 14:55:47                436757175           436757175                 22747283
+   traffic   2019/07/18 14:55:43   2019/07/18 14:55:47                561720752           561720564                 33105406
+  hipmatch         Not Available         Not Available                        0                   0                        0
+gtp-tunnel         Not Available         Not Available                        0                   0                        0
+    userid   2019/07/18 14:55:43   2019/07/18 14:55:47                  6965298             6965298                   380228
+      auth         Not Available         Not Available                        0                   0                        0
+      sctp         Not Available         Not Available                        0                   0                        0
+
+</result></response>

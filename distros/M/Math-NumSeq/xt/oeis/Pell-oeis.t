@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014 Kevin Ryde
+# Copyright 2014, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,9 +19,9 @@
 
 use 5.004;
 use strict;
-
+use Math::BigInt;
 use Test;
-plan tests => 15;
+plan tests => 4;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -44,7 +44,7 @@ MyOEIS::compare_values
      my $seq = Math::NumSeq::Pell->new;
      my @got;
      for (my $i = 0; @got < $count; $i++) {
-       push @got, Math::NumSeq::_to_bigint($seq->ith($i)) * $seq->ith(2*$i) / 2;
+       push @got, Math::BigInt->new($seq->ith($i)) * $seq->ith(2*$i) / 2;
      }
      return \@got;
    });

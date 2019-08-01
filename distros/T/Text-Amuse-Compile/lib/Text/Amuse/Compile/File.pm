@@ -26,6 +26,7 @@ use Text::Amuse;
 use Text::Amuse::Functions qw/muse_fast_scan_header
                               muse_format_line/;
 
+use Text::Amuse::Compile::Templates;
 use Text::Amuse::Compile::TemplateOptions;
 use Text::Amuse::Compile::MuseHeader;
 use Types::Standard qw/Str Bool Object Maybe CodeRef HashRef InstanceOf/;
@@ -58,7 +59,9 @@ If it's a virtual file which doesn't exit on the disk (a merged one)
 
 =item suffix
 
-=item templates
+=item ttdir
+
+The directory with the custom templates.
 
 =item fileobj
 
@@ -131,7 +134,16 @@ Boolean (default to false). Activates the conditional article output.
 has luatex => (is => 'ro', isa => Bool, default => sub { 0 });
 has name => (is => 'ro', isa => Str, required => 1);
 has suffix => (is => 'ro', isa => Str, required => 1);
-has templates => (is => 'ro', isa => Object, required => 1);
+
+has ttdir => (is => 'ro',   isa => Maybe[Str]);
+has templates => (is => 'lazy', isa => Object);
+
+sub _build_templates {
+    my $self = shift;
+    return Text::Amuse::Compile::Templates->new(ttdir => $self->ttdir,
+                                                format_id => $self->options->{format_id});
+}
+
 has virtual => (is => 'ro', isa => Bool, default => sub { 0 });
 has standalone => (is => 'ro', isa => Bool, default => sub { 0 });
 has tt => (is => 'ro', isa => Object, default => sub { Template::Tiny->new });

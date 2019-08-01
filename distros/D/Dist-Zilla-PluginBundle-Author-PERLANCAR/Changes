@@ -1,56 +1,62 @@
-0.596   2019-04-17 (PERLANCAR)
+0.597   2019-07-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update: plugin Rinci::Validate is now renamed to
+	  Rinci::EmbedValidator.
+
+
+0.596   2019-04-17  Released-By: PERLANCAR
 
 	- Derp, fix syntax.
 
 
-0.595   2019-04-17 (PERLANCAR)
+0.595   2019-04-17  Released-By: PERLANCAR
 
 	- Replace PERLANCAR::OurPkgVersion with OurPkgVersion 0.15 which
 	  has now overwrite=1 config.
 
 
-0.594   2019-01-06 (PERLANCAR)
+0.594   2019-01-06  Released-By: PERLANCAR
 
 	- Also blacklist my retired modules.
 
 
-0.593   2018-06-26 (PERLANCAR)
+0.593   2018-06-26  Released-By: PERLANCAR
 
 	- Add plugin: CheckSelfDependency.
 
 
-0.592   2018-01-24 (PERLANCAR)
+0.592   2018-01-24  Released-By: PERLANCAR
 
 	- Add prereq to Perl::Critic::PolicyBundle::PERLANCAR for
 	  convenience.
 
 
-0.591   2018-01-10 (PERLANCAR)
+0.591   2018-01-10  Released-By: PERLANCAR
 
 	- Switch from using DZP:Acme::CPANLists::Blacklist to
 	  DZP:Acme::CPANModules::Blacklist.
 
 
-0.590   2017-08-01 (PERLANCAR)
+0.590   2017-08-01  Released-By: PERLANCAR
 
 	- Add plugin: DZP:Test::Perl::Critic.
 
 
-0.58    2017-07-08 (PERLANCAR)
+0.58    2017-07-08  Released-By: PERLANCAR
 
 	- Add some documentation.
 
 	- Add [StaticInstall].
 
 
-0.57    2017-07-07 (PERLANCAR)
+0.57    2017-07-07  Released-By: PERLANCAR
 
         - Add script/ as an exec dir using DZP:ExecDir.
 
         - [dist] Enable static install.
 
 
-0.56    2017-07-07 (PERLANCAR)
+0.56    2017-07-07  Released-By: PERLANCAR
 
         - Remove GenShellCompletion because it is incompatible with
           DZP:StaticInstall. Instead of running shcompgen in Makefile let's
@@ -60,156 +66,156 @@
           DZP:StaticInstall.
 
 
-0.55    2017-02-09 (PERLANCAR)
+0.55    2017-02-09  Released-By: PERLANCAR
 
 	- Add plugin: CopyrightYearFromGit.
 
 
-0.54    2016-12-28 (PERLANCAR)
+0.54    2016-12-28  Released-By: PERLANCAR
 
 	- Add plugin: PERLANCAR::BeforeBuild to e.g. make sure that
           CPAN::Meta::Prereqs is recent enough (>= 2.150006).
 
 
-0.53    2016-09-29 (PERLANCAR)
+0.53    2016-09-29  Released-By: PERLANCAR
 
 	- Add plugin: Prereqs::CheckCircular.
 
 
-0.52    2016-07-13 (PERLANCAR)
+0.52    2016-07-13  Released-By: PERLANCAR
 
 	- Replace UploadToCPAN with UploadToCPAN::WWWPAUSESimple.
 
 
-0.51    2016-06-30 (PERLANCAR)
+0.51    2016-06-30  Released-By: PERLANCAR
 
 	- Prune Devel::NYTProf-generated files.
 
 
-0.50    2016-04-13 (PERLANCAR)
+0.50    2016-04-13  Released-By: PERLANCAR
 
 	- Add plugin: IfBuilt.
 
 
-0.49    2016-04-07 (PERLANCAR)
+0.49    2016-04-07  Released-By: PERLANCAR
 
 	- [dist] Pull these modules for convenience: Test::Pod,
 	  Test::Pod::Coverage, Pod::Coverage::TrustPod.
 
 
-0.48    2016-03-16 (PERLANCAR)
+0.48    2016-03-16  Released-By: PERLANCAR
 
 	- Remove plugin: PERLANCAR::CheckDepDists because it slows down
 	  building.
 
 
-0.47    2016-02-20 (PERLANCAR)
+0.47    2016-02-20  Released-By: PERLANCAR
 
 	- Update blacklist name.
 
 
-0.46    2016-01-19 (PERLANCAR)
+0.46    2016-01-19  Released-By: PERLANCAR
 
 	- Add plugin: Prereqs::EnsureVersion.
 
 
-0.45    2015-12-01 (PERLANCAR)
+0.45    2015-12-01  Released-By: PERLANCAR
 
 	- Remove DZB:Author::PERLANCAR::NoRinci (no longer needed).
 
 
-0.44    2015-12-01 (PERLANCAR)
+0.44    2015-12-01  Released-By: PERLANCAR
 
 	- Add plugin: Rinci::AddToDb.
 
 
-0.43    2015-10-22 (PERLANCAR)
+0.43    2015-10-22  Released-By: PERLANCAR
 
 	- Add plugin: Acme::CPANLists::Blacklist with my configuration.
 
 
-0.42    2015-09-11 (PERLANCAR)
+0.42    2015-09-11  Released-By: PERLANCAR
 
 	- Add plugin: PERLANCAR::EnsurePrereqToSpec.
 
 
-0.41    2015-07-22 (PERLANCAR)
+0.41    2015-07-22  Released-By: PERLANCAR
 
 	- Add DZB:Author::Perlancar::NoRinci.
 
 
-0.40    2015-07-10 (PERLANCAR)
+0.40    2015-07-10  Released-By: PERLANCAR
 
 	- Add plugin: Authority.
 
 
-0.39    2015-07-01 (PERLANCAR)
+0.39    2015-07-01  Released-By: PERLANCAR
 
 	- Add plugin: OurDist.
 
 
-0.38    2015-05-16 (PERLANCAR)
+0.38    2015-05-16  Released-By: PERLANCAR
 
 	- Add plugin: PERLANCAR::CheckDepDists.
 
 
-0.37    2015-04-22 (PERLANCAR)
+0.37    2015-04-22  Released-By: PERLANCAR
 
 	- Add plugin: EnsureSQLSchemaVersionedTest.
 
 
-0.36    2015-04-21 (PERLANCAR)
+0.36    2015-04-21  Released-By: PERLANCAR
 
         - Remove plugin: PERLANCAR::GenTodoMd.
 
 
-0.35    2015-03-13 (PERLANCAR)
+0.35    2015-03-13  Released-By: PERLANCAR
 
 	- Increase minimum version for
 	  Dist::Zilla::Plugin::Rinci::AddPrereqs=0.02.
 
 
-0.34    2015-03-08 (PERLANCAR)
+0.34    2015-03-08  Released-By: PERLANCAR
 
 	- Add plugin: Rinci::AddPrereqs.
 
 
-0.33    2015-01-03 (PERLANCAR)
+0.33    2015-01-03  Released-By: PERLANCAR
 
 	- Add plugin: PERLANCAR::GenTodoMd.
 
 
-0.32    2014-12-14 (PERLANCAR)
+0.32    2014-12-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Derp, typo.
 
 
-0.31    2014-12-14 (PERLANCAR)
+0.31    2014-12-14  Released-By: PERLANCAR
 
 	- Add plugins: PodnameFromFilename, Rinci::AbstractFromName.
 
 
-0.30    2014-12-13 (PERLANCAR)
+0.30    2014-12-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [Bugfix] [dzil] Forgot to update deps.
 
 
-0.29    2014-12-13 (PERLANCAR)
+0.29    2014-12-13  Released-By: PERLANCAR
 
 	- Replace plugin Rinci::InstallCompletion with GenShellCompletion.
 
 
-0.28    2014-11-08 (PERLANCAR)
+0.28    2014-11-08  Released-By: PERLANCAR
 
 	- Add plugin: Rinci::InstallCompletion (as well as
 	  App::BashCompletionProg).
 
 
-0.27     2014-08-16 (PERLANCAR)
+0.27     2014-08-16  Released-By: PERLANCAR
 
          - Rename dist.
 
@@ -219,31 +225,31 @@
          - Add plugin: SetScriptShebang.
 
 
-0.25     2014-04-16 (SHARYANTO)
+0.25     2014-04-16  Released-By: SHARYANTO
 
          - Add plugin: OurDate.
 
 
-0.24     2014-04-09 (SHARYANTO)
+0.24     2014-04-09  Released-By: SHARYANTO
 
          - Remove the Run hooks (to install latest plugins & archive release)
            and move them to my release-perl-dist script, to make it easier for
            other people to build & release.
 
 
-0.23     2014-04-05 (SHARYANTO)
+0.23     2014-04-05  Released-By: SHARYANTO
 
          - Add PruneFiles to prune backup files (currently only /~$/). Editor
            (emacs) temporary files (#foo#) is not removed deliberately to fail
            the build process if they still exist.
 
 
-0.22     2014-04-01 (SHARYANTO)
+0.22     2014-04-01  Released-By: SHARYANTO
 
          - Replace OurPkgVersion plugin with SHARYANTO::OurPkgVersion.
 
 
-0.21     2014-01-21 (SHARYANTO)
+0.21     2014-01-21  Released-By: SHARYANTO
 
          - Fix run command (second '%s' is not filled by Run).
 
@@ -252,44 +258,44 @@
            bundle) uses OrePAN to inject the tarball to various DarkPANs.
 
 
-0.20     2014-01-09 (SHARYANTO)
+0.20     2014-01-09  Released-By: SHARYANTO
 
          - Do not install release when INSTALL=0.
 
 
-0.19     2013-12-25 (SHARYANTO)
+0.19     2013-12-25  Released-By: SHARYANTO
 
          - Fix logic bug.
 
 
-0.18     2013-12-25 (SHARYANTO)
+0.18     2013-12-25  Released-By: SHARYANTO
 
          - Allow skipping updating plugin bundle by setting OFFLINE=1.
 
 
-0.17     2013-11-13 (SHARYANTO)
+0.17     2013-11-13  Released-By: SHARYANTO
 
          - Remove MetaConfig::PodWeaver, pod weaver plugins config will be in
            next release of PW.
 
 
-0.16     2013-11-12 (SHARYANTO)
+0.16     2013-11-12  Released-By: SHARYANTO
 
          - Replace LogBuild with the more proper MetaConfig &
            MetaConfig::PodWeaver.
 
 
-0.15     2013-11-12 (SHARYANTO)
+0.15     2013-11-12  Released-By: SHARYANTO
 
          - non-CPAN dists should still produce META.{json,yml}.
 
 
-0.14     2013-11-12 (SHARYANTO)
+0.14     2013-11-12  Released-By: SHARYANTO
 
          - Add plugin: LogBuild.
 
 
-0.13     2013-11-08 (SHARYANTO)
+0.13     2013-11-08  Released-By: SHARYANTO
 
          - Add a BeforeBuild run to (re)install
            Dist::Zilla::PluginBundle::Author::SHARYANTO and
@@ -297,52 +303,52 @@
            have the latest plugins.
 
 
-0.12     2013-11-05 (SHARYANTO)
+0.12     2013-11-05  Released-By: SHARYANTO
 
          - Add plugins: Author::SHARYANTO::MetaResources & CheckMetaResources.
 
 
-0.11     2013-10-22 (SHARYANTO)
+0.11     2013-10-22  Released-By: SHARYANTO
 
          - Rename ::Private to ::NonCPAN.
 
 
-0.10     2013-10-19 (SHARYANTO)
+0.10     2013-10-19  Released-By: SHARYANTO
 
          - Rename dist from Dist-Zilla-PluginBundle-SHARYANTO to
            Dist-Zilla-PluginBundle-Author-SHARYANTO.
 
 
-0.09     2013-09-21 (SHARYANTO)
+0.09     2013-09-21  Released-By: SHARYANTO
 
          - Work around problem of hanging (sometimes) on Windows [GH #1].
            Thanks, chorny.
 
 
-0.08     2013-09-09 (SHARYANTO)
+0.08     2013-09-09  Released-By: SHARYANTO
 
          - No functional changes. Rebuild with MakeMaker instead of
            Module::Build because the latter is deprecated from core since 5.19.
 
 
-0.07     2013-09-09 (SHARYANTO)
+0.07     2013-09-09  Released-By: SHARYANTO
 
          - Switch (back) from ModuleBuild to MakeMaker. Don't remember why I
            switched to ModuleBuild in the first place, but now Module::Build
            adds deprecate notice for Perl 5.18+.
 
 
-0.06     2013-01-31 (SHARYANTO)
+0.06     2013-01-31  Released-By: SHARYANTO
 
          - Skip creating META.{yml,json} for private dists.
 
 
-0.05     2012-11-06 (SHARYANTO)
+0.05     2012-11-06  Released-By: SHARYANTO
 
          - Add plugin: DZP::Rinci::Validate
 
 
-0.04     2012-10-31 (SHARYANTO)
+0.04     2012-10-31  Released-By: SHARYANTO
 
          - Add plugin: DZP::Test::Rinci
 
@@ -350,16 +356,16 @@
            this).
 
 
-0.03     2012-08-08 (SHARYANTO)
+0.03     2012-08-08  Released-By: SHARYANTO
 
          - Add req: DZP::Extras
 
 
-0.02     2012-07-11 (SHARYANTO)
+0.02     2012-07-11  Released-By: SHARYANTO
 
          - Add bundle: SHARYANTO::Private, SHARYANTO::Task::Private.
 
 
-0.01     2012-04-04 (SHARYANTO)
+0.01     2012-04-04  Released-By: SHARYANTO
 
          - First release.

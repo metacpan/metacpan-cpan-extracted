@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::ssh;
 # ABSTRACT: Copies files to your server using scp
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use parent 'App::Nopaste::Service';
 use File::Temp;
@@ -77,9 +77,9 @@ App::Nopaste::Service::ssh - Copies files to your server using scp
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
-=for stopwords dir
+=for stopwords dir Kevin Falcone Thomas Sibley
 
 =head1 ENVIRONMENT VARIABLES
 

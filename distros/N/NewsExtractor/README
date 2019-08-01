@@ -1,0 +1,31 @@
+NAME
+
+    NewsExtractor -- download and extract news articles from Internet.
+
+SYNOPSIS
+
+        my ($error, $article) = NewsExtractor->new( url => $url )->download->parse;
+        die $error if $error;
+    
+        # $article is an instance of NewsExtractor::Article
+        say "Headline: " . $article->headline;
+        say "When: " . ($article->dateline // "(unknown)");
+        say "By: " . ($article->journalist // "(unknown)");
+        say "\n" . $article->content_text;
+
+SEE Also
+
+    NewsExtractor::Article
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+LICENSE
+
+    To the extent possible under law, Kang-min Liu has waived all copyright
+    and related or neighboring rights to NewsExtractor. This work is
+    published from: Taiwan.
+
+    https://creativecommons.org/publicdomain/zero/1.0/
+

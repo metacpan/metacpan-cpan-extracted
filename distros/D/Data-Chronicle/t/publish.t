@@ -37,6 +37,8 @@ package t::InMemoryCache {
         my ($self, $key, $subref) = @_;
         delete $self->cache->{"subscribe::$key"};
     }
+
+    sub ping { return "PONG"; }
 };
 
 my $data = {sample => 'data'};

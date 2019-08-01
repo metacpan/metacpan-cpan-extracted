@@ -1,12 +1,12 @@
 {
    "abstract" : "Utility synchronization of the mirror distribution-sites",
    "author" : [
-      "Serz Minus (Lepenkov Sergey) http://www.serzik.com <minus@mail333.com>"
+      "Serz Minus (Sergey Lepenkov) <abalama@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "open_source"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -40,7 +40,7 @@
             "File::Spec" : "3",
             "HTTP::Message" : "6.06",
             "LWP" : "6.08",
-            "URI" : "1.64",
+            "URI" : "1.7",
             "YAML::Tiny" : "1",
             "perl" : "5.012001"
          }
@@ -50,11 +50,11 @@
    "resources" : {
       "homepage" : "http://app-distsync.sourceforge.net",
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
+         "https://dev.perl.org/licenses"
       ],
       "repository" : {
          "url" : "https://svn.code.sf.net/p/app-distsync/code/trunk"
       }
    },
-   "version" : "1.05"
+   "version" : "1.06"
 }

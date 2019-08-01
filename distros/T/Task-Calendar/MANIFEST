@@ -6,8 +6,8 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
-t/manifest.t
-t/pod.t
-t/changes.t
+xt/manifest.t
+xt/pod.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

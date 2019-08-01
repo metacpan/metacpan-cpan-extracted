@@ -33,7 +33,7 @@
         if (! $self) {return undef};
 
         $self->{defaultUserCmdList} = ['wempire', 'wildempire'];
-        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{userCmdList} = \@{$self->{defaultUserCmdList}};
         $self->{descrip} = '(wilderness plugin) Sets EmpireMUD wilderness mode',
 
         # Bless the object into existence

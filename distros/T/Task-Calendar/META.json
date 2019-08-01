@@ -32,13 +32,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Calendar::Bahai" : "0.52",
-            "Calendar::Gregorian" : "0.21",
-            "Calendar::Hebrew" : "0.11",
-            "Calendar::Hijri" : "0.39",
-            "Calendar::Julian" : "0.12",
-            "Calendar::Persian" : "0.41",
-            "Calendar::Saka" : "1.40",
+            "Calendar::Bahai" : "0.53",
+            "Calendar::Gregorian" : "0.22",
+            "Calendar::Hebrew" : "0.12",
+            "Calendar::Hijri" : "0.40",
+            "Calendar::Julian" : "0.13",
+            "Calendar::Persian" : "0.42",
+            "Calendar::Saka" : "1.41",
             "perl" : "5.006"
          }
       }
@@ -51,6 +51,6 @@
          "web" : "https://github.com/manwar/Task-Calendar"
       }
    },
-   "version" : "0.41",
+   "version" : "0.43",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

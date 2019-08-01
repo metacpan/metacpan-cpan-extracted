@@ -7,7 +7,7 @@ my $builder = Module::Build->new(
     module_name       => 'IxNetwork',
 	dist_name         => 'IxNetwork',
     dist_author       => 'diana.galan@keysight.com',
-    dist_version      => '8.50',
+    dist_version      => '9.00',
 	dist_abstract     => 'IxNetwork API Perl Bindings',
 	license           => 'perl',
     requires          => {'perl' => '5.18.0'},

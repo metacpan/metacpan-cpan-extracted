@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   JSON: '0'
-version: '0.62'
+version: '0.63'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

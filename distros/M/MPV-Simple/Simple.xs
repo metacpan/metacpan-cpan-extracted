@@ -7,6 +7,21 @@
 
 #include "ppport.h"
 
+/* Global Data */
+
+#define MY_CXT_KEY "MPV::Simple::_guts" XS_VERSION
+
+typedef struct {
+    /* Put Global Data in here */
+    int reader;
+    int writer;		/* you can access this elsewhere as MY_CXT.pipes */
+} my_cxt_t;
+
+START_MY_CXT
+
+#include "const-c.inc"
+
+
 #include <mpv/client.h>
 
 // For debugging of MPV::Simple::Pipe
@@ -15,35 +30,45 @@
 typedef mpv_handle MPV__Simple;
 typedef mpv_event * MPVEvent;
 
-static int pipes[2];
-static pthread_mutex_t pipe_lock;
+//static int pipes[2];
 
 
 // callback schreibt in die Pipe ein einzelnes Byte hinein
-void callback()
+void callback(void *writer)
 {
-    //pthread_mutex_lock(&pipe_lock);
-    if (pipes[0] != -1)
-        write( pipes[1], &(char){0}, 1);
-    //pthread_mutex_unlock(&pipe_lock);
-    
+    //if (MY_CXT.reader != -1)
+        write( (int) writer, &(char){0}, 1);
 }
 
 
 MODULE = MPV::Simple		PACKAGE = MPV::Simple		
 
+INCLUDE: const-xs.inc
+
+BOOT:
+{
+    MY_CXT_INIT;
+    /* If any of the fields in the my_cxt_t struct need
+       to be initialised, do it here.
+     */
+     MY_CXT.reader = -1;
+     MY_CXT.writer = -1;
+}
+
 MPV__Simple *
 new( const char *class )
     PREINIT:
+    	dMY_CXT;
         MPV__Simple * handle;
     CODE:
-        //pthread_mutex_init(&pipe_lock, NULL);
-        if ( pipe(pipes) < 0) {
+     	int pipes[2];
+     	if ( pipe(pipes) < 0) {
             printf("Pipe creation failed\n");
             perror ("pipe");
             exit(EXIT_FAILURE);
-        }
-        
+        }   
+        MY_CXT.reader = pipes[0];
+        MY_CXT.writer = pipes[1];
         // Hier geht das Programm ab und zu baden. Keine Ahnung warum??
         handle = mpv_create();
         
@@ -118,10 +143,12 @@ initialize(MPV__Simple* ctx)
 
 void
 terminate_destroy(MPV__Simple* ctx)
+    PREINIT:
+    	dMY_CXT;
     CODE:
     {
-        close(pipes[0]);
-        close(pipes[1]);
+        close(MY_CXT.reader);
+        close(MY_CXT.writer);
         mpv_terminate_destroy(ctx);
         
     }
@@ -220,9 +247,11 @@ wakeup(MPV__Simple* ctx)
     
 int
 has_events(MPV__Simple* ctx)
+    PREINIT:
+    	dMY_CXT;
     CODE:
     int ret;
-    int pipefd = pipes[0];
+    int pipefd = MY_CXT.reader;
     if (pipefd < 0)
         ret = -1;
     else {
@@ -250,8 +279,11 @@ has_events(MPV__Simple* ctx)
             
 void
 setup_event_notification(MPV__Simple* ctx)
+    PREINIT:
+    	dMY_CXT;
     CODE:
     void (*callback_ptr)(void*);
     callback_ptr = callback;
-    mpv_set_wakeup_callback(ctx,callback_ptr,NULL);
+    void *d = (void*) MY_CXT.writer;
+    mpv_set_wakeup_callback(ctx,callback_ptr,d);
     

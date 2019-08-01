@@ -151,6 +151,40 @@ afterwards, e.g.
     die $error;   # or whatever
  });
 
+=head3 Priming the Cache
+
+It is also possible to prime the cache with data. For example if you fetch a user by ID,
+you could also prime a username-based cache:
+
+ $user_by_id->load(1)->then(fun ($user) {
+    $user_by_name->prime($user->name, $user);
+    ...
+ });
+
+If your backend query includes additional data, you could cache that too:
+
+ for my $tag (@{$user->tags}) {
+    $tag_loader->prime($tag->id, $tag->name);
+ }
+
+If you update a value in the backend, you can update the cache to save queries later:
+
+ $user = $user->update(favourite_color => 'red');
+ $user_cache->clear($user->id)->prime($user->id, $user);
+
+=head2 Using outside of GraphQL
+
+L<DataLoader> assumes the use of L<Mojolicious>, specifically its promise implementation
+L<Mojo::Promise>. The L<Mojo::Reactor::EV> backend is recommended (and is automatically
+used provided you have L<EV> installed) for optimal batching, although other backends will
+also work.
+
+With the EV backend, DataLoader will work fine with any L<AnyEvent>-based code. See the
+unit tests of this module for examples.
+
+It would be possible to write a version of DataLoader that depends only on AnyEvent/EV
+and does not depend on Mojolicious. Let me know if there is interest.
+
 =head1 METHODS
 
 =over
@@ -168,7 +202,7 @@ use Scalar::Util qw(blessed);
 
 use DataLoader::Error;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =item new ( batch_load_function, %options )
 
@@ -194,10 +228,12 @@ each key.
 
 If set, limit the maximum number of items to pass to the batch load function at once.
 
+If unset (undef or missing), there will be no limit.
+
 =item cache (true)
 
 Set to false to disable caching, which will create a new Promise and new key in the
-batch load function for every load of the same key. (This means the batch loda function
+batch load function for every load of the same key. (This means the batch loader function
 may be called with duplicate keys).
 
 =item cache_key_func (identity function)
@@ -272,6 +308,8 @@ Loads a key, returning a L<Mojo::Promise> for the value represented by that key.
 
 =cut
 
+# False-positive on Perl::Critic < 1.119 due to @_ size tests
+## no critic (RequireArgUnpacking)
 sub load {
     my ($self, $key) = @_;
 

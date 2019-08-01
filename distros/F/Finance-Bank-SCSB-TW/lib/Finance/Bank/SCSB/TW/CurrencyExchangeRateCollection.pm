@@ -57,12 +57,10 @@ to me, but is provided under B<NO GUARANTEE>, explicit or implied.
 
 Kang-min Liu E<lt>gugod@gugod.orgE<gt>
 
-Based on B<Finance::Bank::LloydTSB> by Simon Cozens C<simon@cpan.org>,
-and B<Finance::Bank::Fubon::TW> by Autrijus Tang C<autrijus@autrijus.org>
+Based on B<Finance::Bank::LloydTSB> by Simon Cozens
+and B<Finance::Bank::Fubon::TW> by Audrey Tang.
 
 =head1 COPYRIGHT
-
-Copyright 2003,2004,2005,2006,2007,2008,2009 by Kang-min Liu E<lt>gugod@gugod.orgE<gt>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

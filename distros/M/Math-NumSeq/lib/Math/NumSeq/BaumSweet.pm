@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,7 +26,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION','@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -99,8 +99,8 @@ The Baum-Sweet sequence
     1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, ...
     starting i=0
 
-where each value is 1 if the index i contains no odd-length run of 0-bits,
-or 0 if it does.
+where each value is 1 if the index i written in binary contains no
+odd-length run of 0-bits, or 0 if it does.
 
 =head1 FUNCTIONS
 
@@ -141,7 +141,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

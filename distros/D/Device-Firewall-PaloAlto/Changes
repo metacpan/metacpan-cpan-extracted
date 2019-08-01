@@ -1,3 +1,9 @@
+0.1.9 - * Added 'logging_status' operational method.
+        * Added 'fib_lookup' test method.
+        * Documentation updates.
+        * Error reporting fixes.
+        * sec_policy() test now accepts string protocols
+
 0.1.8 - * 
 
 0.1.7 - * Fixed issue with one-liners not croaking errors

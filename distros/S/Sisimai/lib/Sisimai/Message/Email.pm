@@ -248,7 +248,8 @@ sub takeapart {
     # @return        [Hash]         Structured message headers
     my $class = shift;
     my $heads = shift || return {};
-      $$heads =~ s/^[>]+[ ]//mg;  # Remove '>' indent symbol of forwarded message
+      $$heads =~ s/^[>]+[ ]//mg;    # Remove '>' indent symbol of forwarded message
+      $$heads =~ s/=[ ]+=/=\n =/mg; # Replace ' ' with "\n" at unfolded values
 
     my $previousfn = '';
     my $asciiarmor = {};    # Header names which has MIME encoded value
@@ -343,18 +344,6 @@ sub parse {
     $mailheader->{'subject'}      //= '';
     $mailheader->{'content-type'} //= '';
 
-    if( ref $hookmethod eq 'CODE' ) {
-        # Call hook method
-        my $p = { 
-            'datasrc' => 'email',
-            'headers' => $mailheader, 
-            'message' => $$bodystring,
-            'bounces' => undef,
-        };
-        eval { $havecaught = $hookmethod->($p) };
-        warn sprintf(" ***warning: Something is wrong in hook method:%s", $@) if $@;
-    }
-
     # Decode BASE64 Encoded message body
     my $mesgformat = lc($mailheader->{'content-type'} || '');
     my $ctencoding = lc($mailheader->{'content-transfer-encoding'} || '');
@@ -393,6 +382,19 @@ sub parse {
     } elsif( Sisimai::MIME->is_mimeencoded(\$mailheader->{'subject'}) ) {
         # Decode MIME-Encoded "Subject:" header
         $mailheader->{'subject'} = Sisimai::MIME->mimedecode([split(/[ ]/, $mailheader->{'subject'})]);
+    }
+    $$bodystring =~ tr/\r//d;
+
+    if( ref $hookmethod eq 'CODE' ) {
+        # Call hook method
+        my $p = { 
+            'datasrc' => 'email',
+            'headers' => $mailheader, 
+            'message' => $$bodystring,
+            'bounces' => undef,
+        };
+        eval { $havecaught = $hookmethod->($p) };
+        warn sprintf(" ***warning: Something is wrong in hook method:%s", $@) if $@;
     }
     $$bodystring .= $EndOfEmail;
 

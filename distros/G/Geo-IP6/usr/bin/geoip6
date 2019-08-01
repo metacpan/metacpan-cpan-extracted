@@ -1,0 +1,334 @@
+#!/usr/bin/perl
+
+use Geo::IP6;
+use Socket qw(inet_pton inet_ntop AF_INET AF_INET6);
+use LMDB_File qw(:flags :cursor_op);
+use Cwd;
+
+
+sub usage {
+print <<STOP;
+
+geoip6 [options] 2001:1488:0:3::2         	# returns country code CZ (2001:1488:0:3::2 = nic.cz ipv6) 
+geoip6 217.31.205.50				# returns country code CZ (217.31.205.50 = nic.cz ipv4)
+						# options: -exact (ipv6 slow but exact lookup)
+						# options: -debug (enable debug)
+						# options: -memcache (load ipv6 data into ram)
+						# options: -software77 (use software77 ip database)
+						# options: -maxmind (use maxmind ip database; default) 
+
+* Hint: ipv6 network prefixes are sorted by network count for performance reasons, which may result in incorrect lookups.
+* Currently (2019-07-01) there is only one minor overlap (2001:1c00::/22,ZZ vs 2001:1c00::/23,NL)
+* If you want to avoid this condition use "-exact" for ipv6 addresses. There is no "-exact" for ipv4 which is not affected.
+
+geoip6 update_maxmind				# update using maxmind GeoLite2 Country (ipv4 and ipv6 databases)
+
+geoip6 update_db6_software77 			# update ipv6 networks from http://software77.net/faq.html#automated	 
+						# needs /usr/bin/curl | /usr/bin/wget, /usr/bin/gunzip, /usr/bin/unzip
+
+geoip6 update_db4_software77			# update ipv4 networks (same as above)
+
+geoip6 verify_db6				# show software77 ipv6 overlaps (ipv4 is not affected); see "geoip6 [-exact]"
+
+geoip6 version					# show version number
+
+* geoip6 uses the IpToCountry database from http://software77.net/geo-ip/ which is donationware
+* See license http://software77.net/geo-ip/?license and FAQ http://software77.net/faq.html
+
+* geoip6 uses GeoLite2 Country data created by MaxMind, available from https://www.maxmind.com/
+* See https://dev.maxmind.com/geoip/geoip2/geolite2/ and https://creativecommons.org/licenses/by-sa/4.0/
+
+STOP
+	exit 1;
+}
+
+my $opt = {};
+while (@ARGV) {
+	my $e = shift(@ARGV);
+	if($e eq '-exact'){ $opt->{'exact'} = 1; next }
+	if($e eq '-debug'){ $opt->{'debug'} = 1; next }
+	if($e eq '-memcache'){ $opt->{'memcache'} = 1; next }
+	if($e eq '-software77'){ $opt->{'db'} = 'software77'; next }
+	if($e eq '-maxmind'){ $opt->{'db'} = 'maxmind'; next }
+	if($e =~ /^[a-f0-9:]{3,39}$/){ $cmd = 'lookup'; $opt->{'ip6'} = $e; next; }
+	if($e =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){ $cmd = 'lookup'; $opt->{'ip4'} = $e; next; }
+	$cmd = $e;
+}
+
+
+if($cmd eq 'update_maxmind'){
+
+	my $cdir = getcwd;
+
+	my @tmp = split(/\//, $Geo::IP6::ip4db_file_maxmind);
+	my $ip4db_filename = pop(@tmp);
+	my $ip4db_directory = join('/', @tmp);
+	die "unknown $ip4db_directory, internal error\n" if !$ip4db_directory;
+	system("/bin/mkdir -p \"$ip4db_directory\"");
+	if(!-e "/usr/bin/unzip"){ die "need /usr/bin/unzip\n"; }
+	unlink("$ip4db_directory/GeoLite2*.csv");
+	unlink("$ip4db_directory/GeoLite2.zip");
+	if(-e "/usr/bin/wget"){ system("/usr/bin/wget \"$Geo::IP6::ip4db_url_maxmind\" -O \"$ip4db_directory/GeoLite2.zip\""); }
+	elsif(-e "/usr/bin/curl"){ system("/usr/bin/curl \"$Geo::IP6::ip4db_url_maxmind\" -o \"$ip4db_directory/GeoLite2.zip\""); }
+	else { die "need /usr/bin/wget or /usr/bin/curl\n";} 
+	chdir($ip4db_directory) || die "Cannot change to directory $ip4db_directory: $!\n";
+	system("/bin/rm -rf $ip4db_directory/GeoLite2-Country-CSV_*");
+	system("/usr/bin/unzip -o $ip4db_directory/GeoLite2.zip");
+	system("/bin/mv -fv $ip4db_directory/GeoLite2-Country-CSV_*/* $ip4db_directory/");
+	system("/bin/rm -rfv $ip4db_directory/GeoLite2-Country-CSV_*");
+	chdir($cdir);
+
+	my $s = {};
+	my %db;
+	my %geo;
+
+	unlink("$Geo::IP6::ip4db_file_maxmind.tmp") if -e "$Geo::IP6::ip4db_file_maxmind.tmp";
+
+	my $env = LMDB::Env->new("$Geo::IP6::ip4db_file_maxmind.tmp", { mapsize => 32 * 1024 * 1024, maxdbs => 1, maxreaders => 128, mode => 0644, flags => MDB_NOSUBDIR });
+	my $txn = $env->BeginTxn();
+	my $db = $txn->OpenDB({ dbname => undef, flags => MDB_INTEGERKEY});
+
+	open(CC, "$ip4db_directory/GeoLite2-Country-Locations-en.csv") || die "Cannot open $ip4db_directory/GeoLite2-Country-Locations-en.csv\n";
+	while(<CC>){
+		chomp;
+		next if $_ !~ /^\d/;
+		my($geoname_id,$locale_code,$continent_code,$continent_name,$country_iso_code,$country_name,$is_in_european_union) = split(/,/, $_);
+		$geo{$geoname_id} = $country_iso_code;
+	}
+	close(CC);
+
+	open(CC, "$ip4db_directory/GeoLite2-Country-Blocks-IPv4.csv") || die "Cannot open $ip4db_directory/GeoLite2-Country-Blocks-IPv4.csv\n";
+	while(<CC>){
+		chomp;
+		next if $_ !~ /^\d/;
+		#network,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider
+		#1.0.0.0/24,2077456,2077456,,0,0
+
+		my($network,$geoname_id,$registered_country_geoname_id,$represented_country_geoname_id,$is_anonymous_proxy,$is_satellite_provider) = split(/,/, $_);
+		my($net, $cidr) = split(/\//, $network);
+
+		my $net_bits = unpack('B32', inet_pton(AF_INET, $net));
+		my $len = 32 - $cidr;
+		my $bitmask_start = '1' x $cidr . '0' x $len;
+		my $iprange_start = unpack('N', pack('B32', $net_bits & $bitmask_start));
+		my $iprange_start_ipv4 = join '.', unpack 'C4', pack 'N', $iprange_start;
+		my $iprange_stop = unpack('N', pack('B32', substr($net_bits, 0, $cidr) . '1' x $len));
+		my $iprange_stop_ipv4 = join '.', unpack 'C4', pack 'N', $iprange_stop;
+
+		my $bitmask_stop = substr($net_bits, 0, $cidr) . '1' x $len; 
+	
+		my $cc = uc($geo{$represented_country_geoname_id}) || uc($geo{$registered_country_geoname_id}) || uc($geo{$geoname_id});
+
+		# print "$iprange_start;$iprange_stop;$cc ($iprange_start_ipv4 - $iprange_stop_ipv4 / $geo{$represented_country_geoname_id} -> $geo{$registered_country_geoname_id} -> $geo{$geoname_id}) [$net/$cidr net_bits:$net_bits len:$len bitmask_start:$bitmask_start bitmask_stop:$bitmask_stop]\n"; 
+		$db->put($iprange_start, "$iprange_stop;$cc");
+	}
+	close(CC);
+
+	$txn->commit;
+
+	rename "$Geo::IP6::ip4db_file_maxmind.tmp", "$Geo::IP6::ip4db_file_maxmind";
+	rename "$Geo::IP6::ip4db_file_maxmind.tmp-lock", "$Geo::IP6::ip4db_file_maxmind-lock";
+	chmod 0666, "$Geo::IP6::ip4db_file_maxmind-lock";				# all users need write permission for locking
+
+	print "\nDatabase $Geo::IP6::ip4db_file_maxmind created\n\n"; 
+
+
+
+
+
+	##### process ipv6 (csv included in zip archive)
+
+	@tmp = ();
+	@tmp = split(/\//, $Geo::IP6::ip6db_file_maxmind);
+	my $ip6db_filename = pop(@tmp);
+	my $ip6db_directory = join('/', @tmp);
+
+	$s = {};
+	%db = ();
+
+	unlink("$Geo::IP6::ip6db_file_maxmind.tmp") if -e "$Geo::IP6::ip6db_file_maxmind.tmp";
+	tie %db, 'LMDB_File', "$Geo::IP6::ip6db_file_maxmind.tmp", { mapsize => $Geo::IP6::ip6db_size, mode => 0644, flags => MDB_NOSUBDIR };
+
+	open(CC, "$ip6db_directory/GeoLite2-Country-Blocks-IPv6.csv") || die "Cannot open \"$ip6db_directory/GeoLite2-Country-Blocks-IPv6.csv\"\n";
+	while(<CC>){
+		next if /^\s+|^#|^network/o;
+		chomp;
+		# network,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider
+		# 2000:db8::/32,6252001,,,0,0
+		# 2001:200::/32,1861060,1861060,,0,0
+		my ($v6net, $geoname_id, $registered_country_geoname_id, $represented_country_geoname_id, $is_anonymous_proxy, $is_satellite_provider) = split(/,/, $_);
+		my ($net, $cidr) = split(/\//, $v6net, 2);
+		$s->{$cidr}++;
+		my $cc = uc($geo{$represented_country_geoname_id}) || uc($geo{$registered_country_geoname_id}) || uc($geo{$geoname_id});
+		$db{$cidr . '/' . $net} = $cc;
+	}
+	close(CC);
+
+
+	print "\n\nEntry count for /CIDR:\n----------------------\n";	
+
+	# this is faster cidr order; use cc_exact in Geo::IP6 module to avoid overlaps 
+	my $cidrs;
+	foreach my $cidr (sort { $s->{$b} <=> $s->{$a} } keys %$s) {
+		$cidrs .= $cidr . ',';
+		print "$s->{$cidr} -> $cidr\n";
+	}
+	chop($cidrs);
+
+	$db{'CIDRS'} = $cidrs;
+
+	untie %db;
+
+	rename "$Geo::IP6::ip6db_file_maxmind.tmp", "$Geo::IP6::ip6db_file_maxmind";
+	rename "$Geo::IP6::ip6db_file_maxmind.tmp-lock", "$Geo::IP6::ip6db_file_maxmind-lock";
+	chmod 0666, "$Geo::IP6::ip6db_file_maxmind-lock";				# all users need write permission for locking
+
+	print "\nDatabase $Geo::IP6::ip6db_file_maxmind created with CIDR order $cidrs\n\n"; 
+
+
+} elsif($cmd eq 'update_db4_software77'){
+
+	my @tmp = split(/\//, $Geo::IP6::ip4db_file_software77);
+	my $ip4db_filename = pop(@tmp);
+	my $ip4db_directory = join('/', @tmp);
+	system("/bin/mkdir -p \"$ip4db_directory\"");
+	if(!-e "/usr/bin/gunzip"){ die "need /usr/bin/gunzip\n"; }
+	rename "$ip4db_directory/geoip4.csv", "$ip4db_directory/geoip4.csv.old" if -e "$ip4db_directory/geoip4.csv";
+	unlink "$ip4db_directory/geoip4.csv.gz" if -e "$ip4db_directory/geoip4.csv.gz";
+	if(-e "/usr/bin/wget"){ system("/usr/bin/wget \"$Geo::IP6::ip4db_url_software77\" -O \"$ip4db_directory/geoip4.csv.gz\""); }
+	if(-e "/usr/bin/curl"){ system("/usr/bin/curl \"$Geo::IP6::ip4db_url_software77\" -o \"$ip4db_directory/geoip4.csv.gz\""); }
+	else { die "need /usr/bin/wget or /usr/bin/curl\n";} 
+	system("/usr/bin/gunzip -d \"$ip4db_directory/geoip4.csv.gz\"");
+
+	my $s = {};
+	my %db;
+
+	unlink("$Geo::IP6::ip4db_file_software77.tmp") if -e "$Geo::IP6::ip4db_file_software77.tmp";
+
+	my $env = LMDB::Env->new("$Geo::IP6::ip4db_file_software77.tmp", { mapsize => 32 * 1024 * 1024, maxdbs => 1, maxreaders => 128, mode => 0644, flags => MDB_NOSUBDIR });
+	my $txn = $env->BeginTxn();
+	my $db = $txn->OpenDB({ dbname => undef, flags => MDB_INTEGERKEY});
+
+	open(CC, "$ip4db_directory/geoip4.csv") || die "zonk\n";
+	while(<CC>){
+		next if /^#|^\s/;
+		chomp;
+		# "16777216","16777471","apnic","1313020800","AU","AUS","Australia"
+		my ($from, $to, $nx1, $nx2, $cc, $nx3, $nx4) = split(/,/, $_);
+
+		$from =~ s/[^\d]//og;
+		$to =~ s/[^\d]//og;
+		$cc = uc($cc);
+		$cc =~ s/[^A-Z]//og;
+
+		$db->put($from, "$to;$cc");
+	}
+	close(CC);
+
+	$txn->commit;
+
+	rename "$Geo::IP6::ip4db_file_software77.tmp", "$Geo::IP6::ip4db_file_software77";
+	rename "$Geo::IP6::ip4db_file_software77.tmp-lock", "$Geo::IP6::ip4db_file_software77-lock";
+	chmod 0666, "$Geo::IP6::ip4db_file_software77-lock";				# all users need write permission for locking
+
+	print "\nDatabase $Geo::IP6::ip4db_file_software77 created\n\n"; 
+
+
+} elsif($cmd eq 'update_db6_maxmind'){
+	print "there is no update_db6_maxmind option, use update_maxmind (combines ipv4 and ipv6)\n";
+	exit 1;
+} elsif($cmd eq 'update_db6_software77'){
+	my @tmp = split(/\//, $Geo::IP6::ip6db_file_software77);
+	my $ip6db_filename = pop(@tmp);
+	my $ip6db_directory = join('/', @tmp);
+	system("/bin/mkdir -p \"$ip6db_directory\"");
+	if(!-e "/usr/bin/gunzip"){ die "need /usr/bin/gunzip\n"; }
+	rename "$ip6db_directory/geoip6.csv", "$ip6db_directory/geoip6.csv.old" if -e "$ip6db_directory/geoip6.csv";
+	unlink "$ip6db_directory/geoip6.csv.gz" if -e "$ip6db_directory/geoip6.csv.gz";
+	if(-e "/usr/bin/wget"){ system("/usr/bin/wget \"$Geo::IP6::ip6db_url_software77\" -O \"$ip6db_directory/geoip6.csv.gz\""); }
+	if(-e "/usr/bin/curl"){ system("/usr/bin/curl \"$Geo::IP6::ip6db_url_software77\" -o \"$ip6db_directory/geoip6.csv.gz\""); }
+	else { die "need /usr/bin/wget or /usr/bin/curl\n";} 
+	system("/usr/bin/gunzip -d \"$ip6db_directory/geoip6.csv.gz\"");
+
+	my $s = {};
+	my %db;
+
+	unlink("$Geo::IP6::ip6db_file_software77.tmp") if -e "$Geo::IP6::ip6db_file_software77.tmp";
+	tie %db, 'LMDB_File', "$Geo::IP6::ip6db_file_software77.tmp", { mapsize => $Geo::IP6::ip6db_size, mode => 0644, flags => MDB_NOSUBDIR };
+
+	open(CC, "$ip6db_directory/geoip6.csv") || die "Cannot open \"$ip6db_directory/geoip6.csv\"\n";
+	while(<CC>){
+		next if /^\s+|^#/o;
+		chomp;
+		my ($v6net, $country) = split(/,/, $_);
+		my ($net, $cidr) = split(/\//, $v6net, 2);
+		$s->{$cidr}++;
+		$db{$cidr . '/' . $net} = $country;
+	}
+	close(CC);
+
+
+	print "\n\nEntry count for /CIDR:\n----------------------\n";	
+
+	# this is faster cidr order; use cc_exact in Geo::IP6 module to avoid overlaps 
+	my $cidrs;
+	foreach my $cidr (sort { $s->{$b} <=> $s->{$a} } keys %$s) {
+		$cidrs .= $cidr . ',';
+		print "$s->{$cidr} -> $cidr\n";
+	}
+	chop($cidrs);
+
+	$db{'CIDRS'} = $cidrs;
+
+	untie %db;
+
+	rename "$Geo::IP6::ip6db_file_software77.tmp", "$Geo::IP6::ip6db_file_software77";
+	rename "$Geo::IP6::ip6db_file_software77.tmp-lock", "$Geo::IP6::ip6db_file_software77-lock";
+	chmod 0666, "$Geo::IP6::ip6db_file_software77-lock";				# all users need write permission for locking
+
+	print "\nDatabase $Geo::IP6::ip6db_file_software77 created with CIDR order $cidrs\n\n"; 
+
+} elsif($cmd eq 'verify_db6') {
+
+	my $geo = Geo::IP6->new();
+
+	my %db;
+	tie %db, 'LMDB_File', "$Geo::IP6::ip6db_file_software77", { mapsize => $Geo::IP6::ip6db_size, flags => MDB_NOSUBDIR|MDB_RDONLY };
+	
+	my $count = 0;
+	my $start = time;
+
+	my @nets = keys %db;
+
+	foreach my $e (@nets) {
+		$e =~ s/^.*?\///o;		# remove netmask
+		next if $e =~ /[^a-f0-9:]/io;	# only process ipv6 addresses, not e.g. CIDRS key
+		my $c1 = $geo->cc($e); 
+		my $c2 = $geo->cc_exact($e); 
+
+		if($c1 ne $c2){
+			my $nets = join(', ', @{$geo->net2cidr($e)} );
+			print "overlap: $e -> $c1 (default) / $c2 (optimized) / $nets\n"; }
+		++$count;
+	}
+
+	my $dur = time - $start;
+
+	untie %db;
+
+	print "Verified $Geo::IP6::ip6db_file_software77 with $count network entries in $dur secs\n";
+
+} elsif($cmd eq 'lookup'){
+	my $geo = Geo::IP6->new(db => $opt->{db}, memcache => $opt->{memcache}, debug => $opt->{debug});
+	if($opt->{'ip4'}){
+		print $geo->cc($opt->{ip4}) . "\n";
+	} elsif($opt->{'ip6'}){
+		print $geo->cc($opt->{ip6}) . "\n" if !$opt->{exact};
+		print $geo->cc_exact($opt->{ip6}) . "\n" if $opt->{exact};
+	} else { Carp::croak "cmd:lookup not ipv4/ipv6 found\n"; }	
+} elsif($cmd eq 'version'){
+	print $Geo::IP6::VERSION . "\n";
+} else {
+	usage();
+}
+

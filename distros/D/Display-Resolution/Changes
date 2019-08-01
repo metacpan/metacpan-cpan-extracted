@@ -1,22 +1,28 @@
-0.004   2018-04-26 (PERLANCAR)
+0.005   2019-07-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add: NTSC VCD, PAL VCD, SECAM VCD, NTSC SCVD, PAL SVCD, SECAM
+	  SVCD, KVCDx3 480p, KVCDx3 576p, KVCDx3A 480p, KVCDxA 576p.
+
+
+0.004   2018-04-26  Released-By: PERLANCAR
 
 	- Add names: UHD-1, True 4K, UHD-2, True 8K, Cinema 8K, DCI 8K,
 	  8640p, Cinema 16K, DCI 16K, True 16K.
 
 
-0.003   2018-04-26 (PERLANCAR)
+0.003   2018-04-26  Released-By: PERLANCAR
 
 	- Add new names: 2160p, 4320p, 4K UHD-1, 8K UHD-2, CGA1, CGA2, DVGA,
 	  EGA, HGC, HSXGA, HUXGA, HXGA, MCGA, MDA, QSXGA+, QUXGA, UW10K, UW4K,
 	  UW5K, WHSXGA, WHUXGA, WHXGA, WQSXGA, WQUXGA, qSVGA.
 
 
-0.002   2016-10-07 (PERLANCAR)
+0.002   2016-10-07  Released-By: PERLANCAR
 
         - Some Rinci metadata tweaks: CLI hints (completion for 'name', shortcut
           -a for --all), result schema (for nicer POD).
 
 
-0.001   2016-10-07 (PERLANCAR)
+0.001   2016-10-07  Released-By: PERLANCAR
 
         - First release.

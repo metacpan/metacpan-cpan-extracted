@@ -7,11 +7,11 @@ LICENSE
 lib/Calendar/Persian.pm
 t/00-load.t
 t/calendar-persian.t
-t/manifest.t
-t/pod.t
 t/persian.xml
 t/fake-persian.xml
-t/meta-json.t
-t/meta-yml.t
+xt/manifest.t
+xt/pod.t
+xt/meta-json.t
+xt/meta-yml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

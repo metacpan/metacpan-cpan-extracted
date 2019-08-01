@@ -67,7 +67,7 @@ L<https://github.com/iafan/Config-Neat>
 
 package Config::Neat::Inheritable;
 
-our $VERSION = '1.302';
+our $VERSION = '1.401';
 
 use strict;
 
@@ -189,6 +189,7 @@ sub expand_data {
             my $intermediate = new_ixhash;
 
             foreach my $from (@a) {
+                my $orig_from = $from;
                 my ($filename, $selector) = split('#', $from, 2);
                 # allow .#selector style to indicate the current file, since #selector
                 # without the leading symbol will be treated as a comment line
@@ -203,7 +204,12 @@ sub expand_data {
 
                 # make sure we don't have any infinite loops
                 map {
-                    die "Infinite loop detected at `\@inherit $from`" if $from eq $_;
+                    if ($from eq $_) {
+                        my $err =
+                            "Infinite loop detected in $self->{fullpath} at `\@inherit $orig_from`\n".
+                            "\@include stack:\n", join("\n", @{$self->{include_stack}}), "\n\n";
+                        die $err;
+                    }
                 } @{$self->{include_stack}};
 
                 push @{$self->{include_stack}}, $from;

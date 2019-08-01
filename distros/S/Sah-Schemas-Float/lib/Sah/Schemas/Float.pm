@@ -1,7 +1,7 @@
 package Sah::Schemas::Float;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for various floating types
@@ -18,7 +18,7 @@ Sah::Schemas::Float - Sah schemas for various floating types
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::Float (from Perl distribution Sah-Schemas-Float), released on 2019-04-08.
+This document describes version 0.005 of Sah::Schemas::Float (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
 
 =head1 SAH SCHEMAS
 

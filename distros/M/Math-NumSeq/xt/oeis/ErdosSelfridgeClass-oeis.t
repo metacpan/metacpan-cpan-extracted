@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -28,9 +28,6 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::NumSeq::ErdosSelfridgeClass;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 sub numeq_array {
@@ -128,6 +125,15 @@ foreach my $elem ([ 'A005113', '+' ],
 {
   my $anum = 'A101253';
   my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
+  my $bvalues_count = scalar(@$bvalues);
+  my $limit = 100000;
+  if ($bvalues->[-1] > $limit) {
+    while (@$bvalues && $bvalues->[-1] > $limit) {
+      pop @$bvalues;
+    }
+  }
+  MyTestHelpers::diag ("$anum has $bvalues_count values, shorten to ", scalar(@$bvalues));
+
   my @got;
   if ($bvalues) {
     MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");

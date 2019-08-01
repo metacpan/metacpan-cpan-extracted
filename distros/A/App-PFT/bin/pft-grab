@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014-2016 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -23,9 +23,9 @@
 
 pft grab - Grab a file as attachment or picture
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
-pft grab [options] <file> [<file> ...]
+B<pft grab> [I<options>] I<file> [I<file> ...]
 
 =head1 DESCRIPTION
 
@@ -34,29 +34,18 @@ place under C<ROOT/content>.
 
 The command will assume by default that the file is an I<attachment>, that
 is a binary file to be stored under C<ROOT/content/attachments>. This
-behavior can be overridden by specifying the C<--picture> option: as
+behavior can be overridden by means of the B<--picture> option: as
 result the C<ROOT/content/pics> directory will be used instead as
 destination.
 
-This command outputs the I<Markdown> code for linking, which can be pasted
-in your text entry. The output will be consistent with the
-attachment/picture choice: if C<--picture> is specified, the Markdown
-notation for including a picture will be used, otherwise the output will
-be the syntax for links:
+This command outputs the I<Markdown> code for linking the grabbed content
+item in a PFT page.  The output can be inserted in the PFT entry.
+The output will be consistent with the attachment/picture choice: if
+B<--picture> is specified, the Markdown notation for including a picture
+will be used, otherwise the syntax for links will be used.  See L<EXAMPLE>.
 
-    $ pft grab /tmp/tux.png
-    [tux.png]: :attach:tux.png
-
-    $ pft grab /tmp/tux.png --picture
-    ![tux.png](:pic:tux.png)
-
-The C<pft grab> command work also with URLs:
-
-    pft grab --picture http://example.com/picture.png
-    ![picture.png](:pic:picture.png)
-
-If you are using the vim editor, probably you want to call this command
-from within it as follows:
+Users of the I<ViM> editor may find useful to invoke this command from
+within the editor as follows:
 
     :read ! pft grab [options] file [file...]
 
@@ -64,47 +53,64 @@ from within it as follows:
 
 =over
 
-=item --today | -t
+=item B<--today> | B<-t>
 
 Store the file inside a content directory named after the current day. This
 is meant to avoid name conflict with previously stored attachments or
-pictures having the same name.
+pictures having the same name (see L<EXAMPLE>).
 
-    $ pft grab /tmp/tux.png --picture --today
-    ![tux.png](:pic:2016-04-20/tux.png)
-
-=item --picture | -p
+=item B<--picture> | B<-p>
 
 Store the files into the C<I<ROOT>/content/pics> directory and output the
 Markdown code required to show it as a picture.
 
-Note that no check is performed on the file content.
+Note that no check is performed on the file format to verify it is actually
+a picture.
 
-=item --rename=<name> | -r <name>
+=item B<--rename>=I<name> | B<-r> I<name>
 
-Rename the file. The supplied name must explicitly set file extensions, if
-any is needed. This however will not imply a format change.
+Rename the file. The alternate file name supplied with this option must
+explicitly set the extension, if an extension is desired.  Supplying the
+wrong extension will not imply a format change.
 
 This option is not allowed if multiple files are grabbed with the same
 command.
 
-=item --year=<Y> | -y <Y>
+=item B<--year>=I<Y> | B<-y> I<Y>
 
-When using C<--today>, overload year. Implies C<--today>.
+When using B<--today>, overload year with I<Y>. Implies B<--today>.
 
-=item --month=<M> | -m <M>
+=item B<--month>=I<M> | B<-m> I<M>
 
-When using C<--today>, overload month. Implies C<--today>.
+When using B<--today>, overload month with I<M>. Implies B<--today>.
 
-=item --day=<D> | -d <D>
+=item B<--day>=I<D> | B<-d> <D>
 
-When using C<--today>, overload day. Implies C<--today>.
+When using B<--today>, overload day with I<D>. Implies B<--today>.
 
-=item --help | -h
+=item B<--help> | B<-h>
 
 Show this help.
 
 =back
+
+=head1 EXAMPLE
+
+ $ pft grab /tmp/tux.png
+ [tux.png]: :attach:tux.png
+
+ $ pft grab /tmp/tux.png --picture
+ ![tux.png](:pic:tux.png)
+
+ $ pft grab /tmp/tux.png --picture --today
+ ![tux.png](:pic:2016-04-20/tux.png)
+
+ $ pft grab --picture http://example.com/picture.png
+ ![picture.png](:pic:picture.png)
+
+=head1 SEE ALSO
+
+L<pft-make(1)>
 
 =cut
 

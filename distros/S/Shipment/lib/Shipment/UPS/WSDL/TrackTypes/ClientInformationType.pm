@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ClientInformationType;
-$Shipment::UPS::WSDL::TrackTypes::ClientInformationType::VERSION = '3.01';
+$Shipment::UPS::WSDL::TrackTypes::ClientInformationType::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ Class::Std::initialize();
 
 package Shipment::UPS::WSDL::TrackTypes::ClientInformationType::_Property;
 $Shipment::UPS::WSDL::TrackTypes::ClientInformationType::_Property::VERSION =
-  '3.01';
+  '3.02';
 use strict;
 use warnings;
 {
@@ -64,7 +64,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::TrackTypes::ClientInformationType::_Property::XmlAttr;
     $Shipment::UPS::WSDL::TrackTypes::ClientInformationType::_Property::XmlAttr::VERSION
-      = '3.01';
+      = '3.02';
     use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
     {    # BLOCK to scope variables
@@ -103,7 +103,7 @@ Shipment::UPS::WSDL::TrackTypes::ClientInformationType
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.035'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '1.037'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,6 +40,7 @@ my %builtin_file_skip_list_sub = (
     'Shipment-2.02.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2016-06-29
     'Shipment-2.03.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2016-09-06
     'Shipment-3.01.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2018-02-08
+    'Shipment-3.02.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2019-07-23
     'App-IndonesianBankingUtils-0.07.tar.gz' => 'segfaults at phase 3/3',      # 2016-08-18
 );
 
@@ -311,7 +312,7 @@ our %mods_or_dists_args = (
 
 our %script_args = (
     script => {
-        schema => 'str*',
+        schema => 'filename::unix*',
         req => 1,
         pos => 0,
         completion => \&_complete_script,
@@ -320,7 +321,7 @@ our %script_args = (
 
 our %scripts_args = (
     scripts => {
-        schema => ['array*', of=>'str*', min_len=>1],
+        schema => ['array*', of=>'filename::unix*', min_len=>1],
         'x.name.is_plural' => 1,
         req => 1,
         pos => 0,
@@ -390,6 +391,15 @@ our %rel_args = (
         req => 1,
         pos => 0,
         completion => \&_complete_rel,
+    },
+);
+
+our %dist_or_rel_args = (
+    dist_or_release => {
+        schema => 'str*', # XXX [any, of=>[perl::relname, perl::distname]]
+        req => 1,
+        pos => 0,
+        completion => \&_complete_dist, # XXX dist/release
     },
 );
 
@@ -2632,14 +2642,14 @@ sub _complete_cpanid {
     }
 
     my $sth = $dbh->prepare(
-        "SELECT cpanid FROM author WHERE cpanid LIKE ? ORDER BY cpanid");
+        "SELECT cpanid,fullname FROM author WHERE cpanid LIKE ? ORDER BY cpanid");
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($cpanid) = $sth->fetchrow_array) {
-        push @res, $cpanid;
+    while (my ($cpanid, $fullname) = $sth->fetchrow_array) {
+        push @res, {word=>$cpanid, summary=>$fullname};
     }
 
     \@res;
@@ -2769,7 +2779,7 @@ $SPEC{authors} = {
                 my $res = $cmdline->parse_argv($r);
                 return undef unless $res->[0] == 200;
 
-                # provide completion for modules if query_type is exact-name
+                # provide completion for modules if query_type is exact-cpanid
                 my $qt = $res->[2]{query_type} // '';
                 return _complete_cpanid(%args) if $qt eq 'exact-cpanid';
 
@@ -2777,13 +2787,18 @@ $SPEC{authors} = {
             };
         } \%query_multi_args )},
         query_type => {
-            schema => ['str*', in=>[qw/any cpanid exact-cpanid fullname email exact-email/]],
+            schema => ['str*', in=>[qw/any cpanid exact-cpanid fullname regexp-fullname email exact-email/]],
             default => 'any',
             cmdline_aliases => {
                 x => {
                     summary => 'Shortcut --query-type exact-cpanid',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'exact-cpanid' },
+                },
+                r => {
+                    summary => 'Shortcut --query-type regexp-fullname',
+                    is_flag => 1,
+                    code => sub { $_[0]{query_type} = 'regexp-fullname' },
                 },
                 n => {
                     summary => 'Shortcut --query-type cpanid',
@@ -2845,6 +2860,9 @@ sub authors {
                 my $q = uc($q0 =~ /%/ ? $q0 : '%'.$q0.'%');
                 push @q_where, "(fullname LIKE ?)";
                 push @bind, $q;
+            } elsif ($qt eq 'regexp-fullname') {
+                push @q_where, "(fullname REGEXP ?)";
+                push @bind, $q0;
             } elsif ($qt eq 'email') {
                 my $q = uc($q0 =~ /%/ ? $q0 : '%'.$q0.'%');
                 push @q_where, "(email LIKE ?)";
@@ -2902,13 +2920,18 @@ $SPEC{modules} = {
             };
         } \%query_multi_args )},
         query_type => {
-            schema => ['str*', in=>[qw/any name exact-name abstract/]],
+            schema => ['str*', in=>[qw/any name exact-name regexp-name abstract/]],
             default => 'any',
             cmdline_aliases => {
                 x => {
                     summary => 'Shortcut --query-type exact-name',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'exact-name' },
+                },
+                r => {
+                    summary => 'Shortcut --query-type regexp-name',
+                    is_flag => 1,
+                    code => sub { $_[0]{query_type} = 'regexp-name' },
                 },
                 n => {
                     summary => 'Shortcut --query-type name',
@@ -2982,6 +3005,9 @@ sub modules {
                 push @bind, $q;
             } elsif ($qt eq 'exact-name') {
                 push @q_where, "(module.name=?)";
+                push @bind, $q0;
+            } elsif ($qt eq 'regexp-name') {
+                push @q_where, "(module.name REGEXP ?)";
                 push @bind, $q0;
             } elsif ($qt eq 'abstract') {
                 my $q = $q0 =~ /%/ ? $q0 : '%'.$q0.'%';
@@ -3078,13 +3104,18 @@ $SPEC{dists} = {
             };
         } \%query_multi_args )},
         query_type => {
-            schema => ['str*', in=>[qw/any name exact-name abstract/]],
+            schema => ['str*', in=>[qw/any name exact-name regexp-name abstract/]],
             default => 'any',
             cmdline_aliases => {
                 x => {
                     summary => 'Shortcut for --query-type exact-name',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'exact-name' },
+                },
+                r => {
+                    summary => 'Shortcut for --query-type regexp-name',
+                    is_flag => 1,
+                    code => sub { $_[0]{query_type} = 'regexp-name' },
                 },
                 n => {
                     summary => 'Shortcut for --query-type name',
@@ -3201,6 +3232,9 @@ sub dists {
             } elsif ($qt eq 'exact-name') {
                 push @q_where, "(d.name=?)";
                 push @bind, $q0;
+            } elsif ($qt eq 'regexp-name') {
+                push @q_where, "(d.name REGEXP ?)";
+                push @bind, $q0;
             } elsif ($qt eq 'abstract') {
                 my $q = $q0 =~ /%/ ? $q0 : '%'.$q0.'%';
                 push @q_where, "(abstract LIKE ?)";
@@ -3312,13 +3346,18 @@ $SPEC{'releases'} = {
             };
         } \%query_multi_args )},
         query_type => {
-            schema => ['str*', in=>[qw/any name exact-name/]],
+            schema => ['str*', in=>[qw/any name exact-name regexp-name/]],
             default => 'any',
             cmdline_aliases => {
                 x => {
                     summary => 'Shortcut for --query-type exact-name',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'exact-name' },
+                },
+                r => {
+                    summary => 'Shortcut for --query-type regexp-name',
+                    is_flag => 1,
+                    code => sub { $_[0]{query_type} = 'regexp-name' },
                 },
                 n => {
                     summary => 'Shortcut for --query-type name',
@@ -3372,6 +3411,9 @@ sub releases {
                 push @bind, $q;
             } elsif ($qt eq 'exact-name') {
                 push @q_where, "(f1.name=?)";
+                push @bind, $q0;
+            } elsif ($qt eq 'regexp-name') {
+                push @q_where, "(f1.name REGEXP ?)";
                 push @bind, $q0;
             }
         }
@@ -3959,8 +4001,25 @@ $SPEC{namespaces} = {
         %common_args,
         %query_multi_args,
         query_type => {
-            schema => ['str*', in=>[qw/any name exact-name/]],
+            schema => ['str*', in=>[qw/any name exact-name regexp-name/]],
             default => 'any',
+            cmdline_aliases => {
+                x => {
+                    summary => 'Shortcut --query-type exact-name',
+                    is_flag => 1,
+                    code => sub { $_[0]{query_type} = 'exact-name' },
+                },
+                r => {
+                    summary => 'Shortcut --query-type regexp-name',
+                    is_flag => 1,
+                    code => sub { $_[0]{query_type} = 'regexp-name' },
+                },
+                n => {
+                    summary => 'Shortcut --query-type name',
+                    is_flag => 1,
+                    code => sub { $_[0]{query_type} = 'name' },
+                },
+            },
         },
         from_level => {
             schema => ['int*', min=>0],
@@ -4001,6 +4060,9 @@ sub namespaces {
                 push @bind, $q;
             } elsif ($qt eq 'exact-name') {
                 push @q_where, "(name=?)";
+                push @bind, $q0;
+            } elsif ($qt eq 'regexp-name') {
+                push @q_where, "(name REGEXP ?)";
                 push @bind, $q0;
             }
         }
@@ -4062,7 +4124,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.035 of App::lcpan (from Perl distribution App-lcpan), released on 2019-06-26.
+This document describes version 1.037 of App::lcpan (from Perl distribution App-lcpan), released on 2019-07-23.
 
 =head1 SYNOPSIS
 
@@ -4241,7 +4303,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 
@@ -4439,7 +4501,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 
@@ -4607,7 +4669,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.28.2")
 
 Set base Perl version for determining core modules.
 

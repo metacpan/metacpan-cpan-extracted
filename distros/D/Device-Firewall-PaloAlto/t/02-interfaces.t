@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 use Device::Firewall::PaloAlto::API;
 use Device::Firewall::PaloAlto::Op::Interfaces;
 
@@ -22,6 +22,10 @@ isa_ok( $interface, 'Device::Firewall::PaloAlto::Op::Interface' );
 is( $interface->name, 'ethernet1/1', 'Interface Name' );
 is( $interface->state, 'up', 'Interface State' );
 is( $interface->vsys, '1', 'Interface VSys' );
+is( $interface->zone, 'UNTRUST', 'Zone' );
+
+$interface = $interfaces->interface('loopback');
+ok( !$interface->zone, 'No zone returned empty string' );
 
 $interfaces = pseudo_api_call(
     './t/xml/op/interfaces/no_interfaces.xml', 

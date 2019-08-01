@@ -1,0 +1,16 @@
+--SQL-- -id=sql1 -tags=setup1
+create table t1 (a int,b varchar)
+--END--
+--INSERT-- -id=fill_table_t1 -table=t1 -tags=setup1 -quote="
+a;b
+"1";"hello"
+"2";"world"
+--END--
+--SQL-- -id=sql2 -tags=setup1
+create table t2 (a int,b int)
+--END--
+--INSERT-- -id=fill_table_t2 -table=t2 -tags=setup1 -quote='
+'a';'b'
+'1';'2'
+'3';'4'
+--END--

@@ -1,7 +1,7 @@
 package App::ScanPrereqs;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-31'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,14 +12,25 @@ our %SPEC;
 
 $SPEC{scan_prereqs} = {
     v => 1.1,
-    summary => 'Scan source code for prerequisites',
+    summary => 'Scan files/directories for prerequisites',
     description => <<'_',
 
-This is an alternative CLI to <pm:scan_prereqs>. This CLI offers alternate
-backends: aside from <pm:Perl::PrereqScanner> you can also use
-<pm:Perl::PrereqScanner::Lite> and <pm:Perl::PrereqScanner::NotQuiteLite>. Some
-other features: output in various formats (text table, JSON), filter only core
-or non-core prerequisites.
+This is an alternative CLI to <pm:scan_prereqs>, with the following features:
+
+* merged output
+
+scan_prereqs by default reports prereqs per source file, which may or may not be
+what you want. This CLI outputs a single list of prerequisites found from all
+input.
+
+Aside from that, you can use `--json` to get a JSON output.
+
+* option to pick backend
+
+Aside from <pm:Perl::PrereqScanner> you can also use
+<pm:Perl::PrereqScanner::Lite> and <pm:Perl::PrereqScanner::NotQuiteLite>.
+
+* filter only core or non-core prerequisites.
 
 _
     args => {
@@ -28,9 +39,8 @@ _
             'x.name.singular' => 'file',
             schema => ['array*', of=>'pathname*'],
             default => ['.'],
-            req => 1,
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
         },
         scanner => {
             schema => ['str*', in=>['regular','lite','nqlite']],
@@ -190,7 +200,7 @@ sub scan_prereqs {
 }
 
 1;
-# ABSTRACT: Scan source code for prerequisites
+# ABSTRACT: Scan files/directories for prerequisites
 
 __END__
 
@@ -200,11 +210,11 @@ __END__
 
 =head1 NAME
 
-App::ScanPrereqs - Scan source code for prerequisites
+App::ScanPrereqs - Scan files/directories for prerequisites
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ScanPrereqs (from Perl distribution App-ScanPrereqs), released on 2017-07-03.
+This document describes version 0.005 of App::ScanPrereqs (from Perl distribution App-ScanPrereqs), released on 2019-07-31.
 
 =head1 SYNOPSIS
 
@@ -217,9 +227,9 @@ This document describes version 0.003 of App::ScanPrereqs (from Perl distributio
 
 Usage:
 
- scan_prereqs(%args) -> [status, msg, result, meta]
+ scan_prereqs(%args) -> [status, msg, payload, meta]
 
-Scan source code for prerequisites.
+Scan files/directories for prerequisites.
 
 Examples:
 
@@ -231,11 +241,34 @@ Examples:
 
 =back
 
-This is an alternative CLI to L<scan_prereqs>. This CLI offers alternate
-backends: aside from L<Perl::PrereqScanner> you can also use
-L<Perl::PrereqScanner::Lite> and L<Perl::PrereqScanner::NotQuiteLite>. Some
-other features: output in various formats (text table, JSON), filter only core
-or non-core prerequisites.
+This is an alternative CLI to L<scan_prereqs>, with the following features:
+
+=over
+
+=item * merged output
+
+=back
+
+scan_prereqs by default reports prereqs per source file, which may or may not be
+what you want. This CLI outputs a single list of prerequisites found from all
+input.
+
+Aside from that, you can use C<--json> to get a JSON output.
+
+=over
+
+=item * option to pick backend
+
+=back
+
+Aside from L<Perl::PrereqScanner> you can also use
+L<Perl::PrereqScanner::Lite> and L<Perl::PrereqScanner::NotQuiteLite>.
+
+=over
+
+=item * filter only core or non-core prerequisites.
+
+=back
 
 This function is not exported.
 
@@ -243,7 +276,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<files>* => I<array[pathname]> (default: ["."])
+=item * B<files> => I<array[pathname]> (default: ["."])
 
 =item * B<perlver> => I<str>
 
@@ -283,7 +316,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -311,7 +344,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

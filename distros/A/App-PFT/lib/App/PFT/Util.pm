@@ -1,4 +1,4 @@
-# Copyright 2014 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package App::PFT::Util v1.3.0;
+package App::PFT::Util v1.4.1;
 
 use strict;
 use warnings;

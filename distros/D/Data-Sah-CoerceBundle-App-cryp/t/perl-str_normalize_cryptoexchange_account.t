@@ -18,11 +18,11 @@ subtest "basics" => sub {
 
     is_deeply($c->({}), [undef, undef, {}], "hashref uncoerced");
     is_deeply($c->("foo"), [1, "Unknown cryptoexchange code/name/safename: foo", undef], "unknown exchange -> fail");
-    is_deeply($c->("gdax/a b"), [1, "Invalid account syntax (a b), please only use letters/numbers/underscores/dashes", undef], "invalid account syntax -> fail");
-    is_deeply($c->("gdax/".("a" x 65)), [1, "Account name too long (".("a" x 65)."), please do not exceed 64 characters", undef], "invalid account syntax -> fail");
+    is_deeply($c->("bitfinex/a b"), [1, "Invalid account syntax (a b), please only use letters/numbers/underscores/dashes", undef], "invalid account syntax -> fail");
+    is_deeply($c->("bitfinex/".("a" x 65)), [1, "Account name too long (".("a" x 65)."), please do not exceed 64 characters", undef], "invalid account syntax -> fail");
 
-    is_deeply($c->("GDAX"), [1, undef, "gdax/default"]);
-    is_deeply($c->("gdax/1"), [1, undef, "gdax/1"]);
+    is_deeply($c->("Bitfinex"), [1, undef, "bitfinex/default"]);
+    is_deeply($c->("bitfinex/1"), [1, undef, "bitfinex/1"]);
     is_deeply($c->("bx/2"), [1, undef, "bx-thailand/2"]);
     is_deeply($c->("BX thailand/Three"), [1, undef, "bx-thailand/Three"]);
 

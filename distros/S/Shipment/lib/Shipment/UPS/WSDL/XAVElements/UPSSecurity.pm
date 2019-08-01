@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::XAVElements::UPSSecurity;
-$Shipment::UPS::WSDL::XAVElements::UPSSecurity::VERSION = '3.01';
+$Shipment::UPS::WSDL::XAVElements::UPSSecurity::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::XAVElements::UPSSecurity::_ServiceAccessToken;
     $Shipment::UPS::WSDL::XAVElements::UPSSecurity::_ServiceAccessToken::VERSION
-      = '3.01';
+      = '3.02';
     use strict;
     use warnings;
     {
@@ -110,7 +110,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::XAVElements::UPSSecurity::_UsernameToken;
     $Shipment::UPS::WSDL::XAVElements::UPSSecurity::_UsernameToken::VERSION =
-      '3.01';
+      '3.02';
     use strict;
     use warnings;
     {
@@ -175,7 +175,7 @@ Shipment::UPS::WSDL::XAVElements::UPSSecurity
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -29,87 +29,44 @@ use MyOEIS;
 
 use Math::NumSeq::SqrtDigits;
 
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
-
-
-sub numeq_array {
-  my ($a1, $a2) = @_;
-  if (! ref $a1 || ! ref $a2) {
-    return 0;
-  }
-  my $i = 0;
-  while ($i < @$a1 && $i < @$a2) {
-    if ($a1->[$i] ne $a2->[$i]) {
-      return 0;
-    }
-    $i++;
-  }
-  return (@$a1 == @$a2);
-}
-
 
 #------------------------------------------------------------------------------
 # A020807 - sqrt(1/50) in decimal
 # sqrt(1/50) = sqrt(50)/50
 #            = 2*sqrt(50)/100
 #            = sqrt(200)/100
-{
-  my $anum = 'A020807';
 
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
-
-    my $seq = Math::NumSeq::SqrtDigits->new (sqrt => 200);
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      push @got, $value;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- sqrt(2)-1 1-bit positions");
-}
+MyOEIS::compare_values
+  (anum => 'A020807',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::SqrtDigits->new (sqrt => 200);
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       push @got, $value;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
-# A092855 - 1-bit positions in sqrt(2)-1 in binary
+# A092855 - 1-bit positions of sqrt(2)-1 in binary
 
-{
-  my $anum = 'A092855';
-
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
-
-    my $seq = Math::NumSeq::SqrtDigits->new (radix => 2, sqrt => 2);
-    $seq->next; # skipping 1.xxx leading 1
-
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      if ($value) {
-        push @got, $i-1; # -1 to count from 1 as 0.x... digit
-      }
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- sqrt(2)-1 1-bit positions");
-}
+MyOEIS::compare_values
+  (anum => 'A092855',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::SqrtDigits->new (radix => 2, sqrt => 2);
+     $seq->next; # skipping 1.xxx leading 1
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($value) {
+         push @got, $i-1;  # -1 to count from 1 as 0.x... digit
+       }
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------

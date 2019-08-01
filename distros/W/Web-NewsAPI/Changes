@@ -1,5 +1,11 @@
 Revision history for Perl extension Web-NewsAPI
 
+0.002 2019-07-25T21:05:56Z
+
+    - Changing the scalar-context return value of the `everything` and `top_headlines` methods into a new Web::NewsAPI::ArticleSet object. (Thanks to Matt S Trout for the suggestion.)
+    
+    - Miscellaneous other improvements to the interface and documentation.
+
 0.001 2019-07-19T17:44:45Z
 
     - original version

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-29'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-24'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=man
@@ -56,7 +56,9 @@ GetOptionsWithCompletion(
         my %args  = @_;
         my $type      = $args{type};
         my $word      = $args{word};
-        if ($type eq 'arg') {
+        if ($word eq '') {
+            return {message=>"Gathering list of all modules and manpages will take at least a few seconds. Please type something first."};
+        } elsif ($type eq 'arg') {
             log_trace("[manwrap-pm] Completing arg");
             return $comp_man_or_mod->(%args);
         } elsif ($type eq 'optval') {
@@ -156,7 +158,7 @@ manwrap-pm - Wrapper and completer for man (extra Perl stuffs)
 
 =head1 VERSION
 
-This document describes version 0.004 of manwrap-pm (from Perl distribution App-manwrap-pm), released on 2017-07-29.
+This document describes version 0.005 of manwrap-pm (from Perl distribution App-manwrap-pm), released on 2019-07-24.
 
 =head1 SYNOPSIS
 
@@ -250,7 +252,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

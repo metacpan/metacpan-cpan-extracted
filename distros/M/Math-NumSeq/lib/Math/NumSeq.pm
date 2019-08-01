@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -60,7 +60,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -230,11 +230,8 @@ sub _is_infinite {
 
 # or maybe check for new enough for uv->mpz fix
 use constant::defer _bigint => sub {
-  # Crib note: don't change the back-end if already loaded
-  unless (Math::BigInt->can('new')) {
-    require Math::BigInt;
-    eval { Math::BigInt->import (try => 'GMP') };
-  }
+  # no selection of back-end here, leave that to an application
+  require Math::BigInt;
   return 'Math::BigInt';
 };
 
@@ -269,8 +266,8 @@ predicate test.
 The idea is to generate things like squares or primes in a generic way.
 Some sequences, like squares, are so easy there's no need for a class except
 for the genericness.  Other sequences are trickier and an iterator is a good
-way to go through values.  The iterating tries to be progressive, so not
-calculating too far ahead yet doing reasonable size chunks for efficiency.
+way to go through values.  The iterators generally try to be progressive, so
+not calculating too far ahead, yet doing reasonable chunks for efficiency.
 
 Sequence values have an integer index "i" starting either from i=0 or i=1 or
 whatever best suits the sequence.  The values can be anything, positive,
@@ -287,6 +284,10 @@ number types.  So for instance C<pred()> might be applied to test a big
 value, or C<ith()> on a bigint to preserve precision from some rapidly
 growing sequence.  Infinities and NaNs give some kind of NaN or infinite
 return (some unspecified kind as yet).
+
+Some sequences automatically promote to C<Math::BigInt>, usually when values
+grows so fast that precision would soon be lost.  An application can
+pre-load C<Math::BigInt> to select a back-end or other global options.
 
 =head1 FUNCTIONS
 
@@ -486,7 +487,7 @@ two separate C<ith()> calls.
 
 =item C<$bool = $seq-E<gt>pred($value)>
 
-Return true if C<$value> occurs in the sequence.  For example for the
+Return true if C<$value> occurs in the sequence.  For example, for the
 squares this returns true if C<$value> is a square or false if not.
 
 =item C<$i = $seq-E<gt>value_to_i($value)>
@@ -678,7 +679,7 @@ http://user42.tuxfamily.org/math-numseq/index.html
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -1,5 +1,5 @@
 package Test::DirectoryLayout;
-$Test::DirectoryLayout::VERSION = '0.002';
+$Test::DirectoryLayout::VERSION = '0.003';
 
 #ABSTRACT: Test directory layout for standard compliance
 
@@ -78,7 +78,7 @@ Test::DirectoryLayout - Test directory layout for standard compliance
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

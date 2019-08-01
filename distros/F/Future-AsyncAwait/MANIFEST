@@ -8,6 +8,7 @@ hax/cx_pusheval.c.inc
 hax/docatch.c.inc
 hax/pad_block_start.c.inc
 hax/pad_leavemy.c.inc
+hax/parse_subsignature.c.inc
 hax/README
 hax/save_clearpadrange.c.inc
 hax/scalarseq.c.inc
@@ -44,6 +45,7 @@ t/41end.t
 t/42unresolved.t
 t/43failure.t
 t/44sub-attrs.t
+t/45sub-signatures.t
 t/80await+try.t
 t/81memory-growth.t
 t/82devel-mat-dumper-helper.t

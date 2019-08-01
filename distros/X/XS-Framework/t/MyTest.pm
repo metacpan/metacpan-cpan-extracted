@@ -19,7 +19,7 @@ sub import {
     }
     
     my $caller = caller();
-    foreach my $sym_name (qw/Config is cmp_deeply ok done_testing skip isnt Dumper noclass subtest bag dies_ok new_ok isa_ok pass dies_ok is_deeply/) {
+    foreach my $sym_name (qw/Config is cmp_deeply ok done_testing skip isnt Dumper noclass subtest bag dies_ok new_ok isa_ok pass dies_ok is_deeply ignore/) {
         no strict 'refs';
         *{"${caller}::$sym_name"} = *$sym_name;
     }

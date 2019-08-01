@@ -1,0 +1,5 @@
+--DELETE-- -table=t --id=delete1 -tags=teardown
+'a'
+'1'
+--END--
+# Next section runs in when "setup"-tag is defined and NOT "production" tag

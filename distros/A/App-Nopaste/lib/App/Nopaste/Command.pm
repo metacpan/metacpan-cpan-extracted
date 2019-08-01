@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Command;
 # ABSTRACT: command-line utility for L<App::Nopaste>
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use Getopt::Long::Descriptive ();
 
@@ -115,7 +115,10 @@ sub run {
 
     if ($self->copy) {
         use_module('Clipboard')->import;
-        Clipboard->copy($url);
+        eval {
+            Clipboard->copy_to_all_selections($url);
+            1;
+        } or Clipboard->copy($url);
     }
 
     if ($self->open_url) {
@@ -159,7 +162,7 @@ App::Nopaste::Command - command-line utility for L<App::Nopaste>
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =head1 DESCRIPTION
 

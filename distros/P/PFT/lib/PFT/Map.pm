@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Map v1.3.0;
+package PFT::Map v1.4.1;
 
 =encoding utf8
 
@@ -423,7 +423,7 @@ sub _recent {
 
     wantarray ? do {
         my @out;
-        while (--$n && defined $cursor) {
+        while ($n-- && defined $cursor) {
             push @out, $cursor;
             $cursor = $cursor->prev;
         }

@@ -14,7 +14,7 @@ use Astro::Telescope;
 use DateTime;
 use DateTime::TimeZone;
 
-our $VERSION = '1.61';
+our $VERSION = '1.62';
 
 use base qw/ Astro::FITS::HdrTrans::JAC /;
 
@@ -35,6 +35,8 @@ my %UNIT_MAP =
     PROJECT              => 'PROJECT',
     SCAN_PATTERN         => 'SCAN_PAT',
     STANDARD             => 'STANDARD',
+    TAI_UTC_CORRECTION   => 'DTAI',
+    UT1_UTC_CORRECTION   => 'DUT1',
     WIND_BLIND           => 'WND_BLND',
     X_APERTURE           => 'INSTAP_X',
     Y_APERTURE           => 'INSTAP_Y',
@@ -326,6 +328,64 @@ sub from_DOME_OPEN {
 
   return map {$_ => $value} qw/DOORSTST DOORSTEN ROOFSTST ROOFSTEN/;
 }
+
+=item B<to_REMOTE>
+
+Convert between the JCMT's OPER_LOC header and a standardised 'REMOTE value'.
+
+REMOTE = 1
+LOCAL = 0
+
+If not defined or has a different value, return 'undef'
+=cut
+
+sub to_REMOTE {
+  my $self = shift;
+  my $FITS_headers = shift;
+  my $remote;
+  if (exists( $FITS_headers->{'REMOTE'})) {
+      $remote = $FITS_headers->{'REMOTE'};
+  } else {
+      $remote = ''
+  }
+  if (uc($remote) =~ /REMOTE/) {
+      $remote = 1;
+  } elsif (uc($remote) =~ /LOCAL/) {
+      $remote = 0;
+  } else {
+      $remote = undef;
+  }
+
+  return $remote;
+}
+
+
+=item B<from_REMOTE>
+
+Converts the REMOTE value back to the OPER_LOC header
+if REMOTE=1, oper_loc='REMOTE'
+if REMOTE=0, oper_loc='LOCAL'
+if REMOTE is anything else, return undef;
+
+=cut
+
+sub from_REMOTE {
+  my $self = shift;
+  my $generic_headers = shift;
+
+  my $value = undef;
+
+  if (exists $generic_headers->{'REMOTE'}) {
+    my $remote = $generic_headers->{'REMOTE'};
+    if (defined $remote) {
+      $value = $remote ? 'REMOTE' : 'LOCAL';
+    }
+  }
+
+  return (OPER_LOC => $value);
+}
+
+
 
 =back
 

@@ -1148,7 +1148,7 @@ int call_daemon() {
     return 0;
   }
 #  endif // HAVE_LIBSYSTEMD
-  return daemon(0, 0);
+  return util::daemonize(0, 0);
 #endif   // !__sgi
 }
 } // namespace
@@ -1559,6 +1559,7 @@ void fill_default_config(Config *config) {
   }
 
   loggingconf.syslog_facility = LOG_DAEMON;
+  loggingconf.severity = NOTICE;
 
   auto &connconf = config->conn;
   {
@@ -2896,6 +2897,8 @@ int process_options(Config *config,
 
     assert(include_set.empty());
   }
+
+  Log::set_severity_level(config->logging.severity);
 
   auto &loggingconf = config->logging;
 

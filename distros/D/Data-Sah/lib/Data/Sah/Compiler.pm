@@ -1,7 +1,7 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.897'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.899'; # VERSION
 
 use 5.010;
 use strict;
@@ -18,16 +18,6 @@ our %coercer_cache; # key=type, value=coercer coderef
 with 'Data::Sah::Compiler::TextResultRole';
 
 has main => (is => 'rw');
-
-# instance to Language::Expr instance
-has expr_compiler => (
-    is => 'rw',
-    lazy => 1,
-    default => sub {
-        require Language::Expr;
-        Language::Expr->new;
-    },
-);
 
 # BEGIN COPIED FROM String::LineNumber
 sub __linenum {
@@ -85,7 +75,7 @@ sub _die {
 # $cd->{outer_cd}{all_expr_vars} is already defined).
 sub _form_deps {
     #require Data::Graph::Util;
-    require Language::Expr::Interpreter::VarEnumer;
+    require Language::Expr::Interpreter::var_enumer;
 
     my ($self, $cd, $ctbl) = @_;
     my $main = $self->main;
@@ -446,7 +436,7 @@ sub _process_clause {
     }
 
     local $cd->{cl_value}   = $cv;
-    local $cd->{cl_term}    = $ie ? $self->expr($cv) : $self->literal($cv);
+    local $cd->{cl_term}    = $ie ? $self->expr($cd, $cv) : $self->literal($cv);
     local $cd->{cl_is_expr} = $ie;
     local $cd->{cl_op}      = $op;
     delete $cd->{uclset}{"$clause.is_expr"};
@@ -789,7 +779,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.897 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2019-07-19.
+This document describes version 0.899 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2019-07-25.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 

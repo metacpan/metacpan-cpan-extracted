@@ -37,10 +37,12 @@ static Sub clone_anon_xsub (CV* proto) {
     CvSTASH_set(cv, CvSTASH(proto));
     CvISXSUB_on(cv);
     CvXSUB(cv) = CvXSUB(proto);
-    #ifndef PERL_IMPLICIT_CONTEXT
-        CvHSCXT(cv) = &PL_stack_sp;
-    #else
-        PoisonPADLIST(cv);
+    #if PERL_VERSION >= 22
+        #ifndef PERL_IMPLICIT_CONTEXT
+            CvHSCXT(cv) = &PL_stack_sp;
+        #else
+            PoisonPADLIST(cv);
+        #endif
     #endif
     CvANON_on(cv);
     return Sub::noinc(cv);

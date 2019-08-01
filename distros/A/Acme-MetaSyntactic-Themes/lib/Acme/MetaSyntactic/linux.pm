@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::linux;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.033';
+our $VERSION = '1.034';
 
 our %Remote = (
     source  => 'http://distrowatch.com/',
@@ -45,6 +45,12 @@ Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-07-29 - v1.034
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.053.
 
 =item *
 
@@ -298,41 +304,40 @@ __DATA__
 ThreeCX
 FourMLinux
 Absolute
+AcademiX
 AIO
 Alpine
 ALT
 Android_x86
-Antergos
 antiX
-APODIO
 Arch
 ArchBang
 ArchLabs
 Archman
-Arco
+ArchStrike
+ArcoLinux
 Artix
 Arya
 Asianux
-AsteriskNOW
-Audiophile
 AUSTRUMI
 AV_Linux
 BackBox
 Baruwa
 batocera
+Bedrock
 BeeFree
 Berry
 Bicom
 BigLinux
 Bio_Linux
 BitKey
-Black_Lab
 BlackArch
 blackPanther
 BlankOn
 BlueOnyx
 Bluestar
 Bodhi
+BOSS
 BSDRP
 BunsenLabs
 CAELinux
@@ -347,6 +352,7 @@ Clonezilla
 ClonOS
 CloudReady
 Clu
+Condres
 Container
 CRUX
 Cucumber
@@ -362,6 +368,7 @@ Dragora
 DRBL
 DuZeru
 EasyNAS
+EasyOS
 Elastix
 elementary
 Elive
@@ -379,22 +386,21 @@ FreeBSD
 FreeNAS
 FreePBX
 Freespire
-Frugalware
 FuguIta
 Funtoo
 Gecko
+GeeXboX
 Gentoo
 GhostBSD
 GNUstep
-GoboLinux
 GParted
 Greenie
 Grml
 GuixSD
 Haiku
 Hamara
+Hanthana
 HardenedBSD
-heads
 Hyperbola
 IPFire
 Kali
@@ -405,10 +411,8 @@ KDE_neon
 KNOPPIX
 Kodachi
 KolibriOS
-Korora
 Kubuntu
 Kwort
-KXStudio
 Lakka
 Legacy
 LFS
@@ -423,20 +427,15 @@ Live_Raizo
 LliureX
 Lubuntu
 Lunar
-LuninuX
 LXLE
 Mageia
 MakuluLinux
 Manjaro
-Maui
 MAX
-Metamorphose
 MidnightBSD
 Minimal
 MiniNo
-MINIX
 Mint
-MirOS
 MorpheusArch
 MX_Linux
 Namib
@@ -448,6 +447,7 @@ NexentaStor
 Nitrux
 NixOS
 NomadBSD
+Nova
 NST
 NuTyX
 OB2D
@@ -456,8 +456,8 @@ OLPC
 Omarine
 Omoikane
 OpenBSD
-OpenELEC
 OpenIndiana
+openmamba
 OpenMandriva
 OpenMediaVault
 openSUSE
@@ -476,7 +476,6 @@ Parted_Magic
 PCLinuxOS
 Peach_OSI
 Pearl
-PelicanHPC
 Pentoo
 Peppermint
 pfSense
@@ -489,21 +488,18 @@ Plop
 Pop_OS
 Porteus
 Porteus_Kiosk
+Poseidon
 PrimTux
 Proxmox
 Puppy
 PureOS
 Q4OS
 Qubes
-Quirky
 RancherOS
 Raspbian
-RaspBSD
-RasPlex
 RDS
 ReactOS
 RebeccaBlackOS
-Rebellin
 Red_Hat
 Redcore
 Refracta
@@ -517,13 +513,13 @@ RSS
 Runtu
 Sabayon
 SalentOS
-Salix
-Scientific
 Secure_K
 Securepoint
 SELKS
+Septor
 Shark
 siduction
+Simplicity
 Slackel
 Slackware
 Slax
@@ -531,7 +527,6 @@ SliTaz
 SmartOS
 SME_Server
 Smoothwall
-SMS
 Solaris
 Solus
 SolydXK
@@ -546,9 +541,9 @@ Subgraph
 SuliX
 Super_Grub2
 SuperGamer
+SuperX
 SUSE
 SwagArch
-Swift
 SystemRescue
 T2
 Tails
@@ -557,8 +552,8 @@ TENS
 Thinstation
 Tiny_Core
 ToOpPy
-ToriOS
 Toutou
+Trident
 Trisquel
 TrueOS
 TurnKey
@@ -567,20 +562,17 @@ UBOS
 UBports
 Ubuntu
 Ubuntu_Budgie
+Ubuntu_DP
 Ubuntu_Kylin
 Ubuntu_MATE
 Ubuntu_Studio
-UHU_Linux
-Ulteo
 Ultimate
 Univention
 Untangle
 Uruk
-UTUTO
 Vector
 VenenuX
 Vine
-Vinux
 Void
 Volumio
 Voyager
@@ -590,7 +582,6 @@ Whonix
 Wifislax
 WM_Live
 XigmaNAS
-XStreamOS
 Xubuntu
 YunoHost
 Zentyal

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -30,7 +30,7 @@ use Math::NumSeq::BalancedBinary;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-my $test_count = (tests => 11)[1];
+my $test_count = (tests => 187)[1];
 plan tests => $test_count;
 
 
@@ -38,7 +38,7 @@ plan tests => $test_count;
 # VERSION
 
 {
-  my $want_version = 72;
+  my $want_version = 73;
   ok ($Math::NumSeq::BalancedBinary::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::BalancedBinary->VERSION,  $want_version,
@@ -69,6 +69,25 @@ plan tests => $test_count;
       '');
 }
 
+
+#------------------------------------------------------------------------------
+# pred() vs next()
+
+{
+  my $seq = Math::NumSeq::BalancedBinary->new;
+  ok (! $seq->pred(0), 1, "pred() not 0");
+  ok (! $seq->pred(1), 1);
+  ok ($seq->pred(2), 1);
+  my $prev = -1;
+  for (1 .. 10) {
+    my ($i,$value) = $seq->next;
+    foreach my $t ($prev+1 .. $value-1) {
+      ok (! $seq->pred($t), 1, "pred() not t=$t");
+    }
+    ok ($seq->pred($value), 1);
+    $prev = $value;
+  }
+}
 
 #------------------------------------------------------------------------------
 # value_to_i_ceil()

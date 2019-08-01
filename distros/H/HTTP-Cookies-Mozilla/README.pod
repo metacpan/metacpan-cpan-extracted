@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/HTTP-Cookies-Mozilla/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/HTTP-Cookies-Mozilla.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/HTTP::Cookies::Mozilla"><img src="https://img.shields.io/cpan/v/HTTP-Cookies-Mozilla.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/HTTP::Cookies::Mozilla"><img src="https://img.shields.io/cpan/v/HTTP-Cookies-Mozilla.svg" /></A>
 
 =head1 The HTTP::Cookies::Mozilla module
 
@@ -33,7 +33,7 @@ name instead of the file location:
 	% perldoc HTTP::Cookies::Mozilla
 
 You can read the documentation and inspect the meta data on
-L<MetaCPAN|https://www.metacpan.org/module/HTTP::Cookies::Mozilla>.
+L<MetaCPAN|https://metacpan.org/pod/HTTP::Cookies::Mozilla>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

@@ -2,8 +2,8 @@ NAME
     Complete::Bash - Completion routines for bash shell
 
 VERSION
-    This document describes version 0.325 of Complete::Bash (from Perl
-    distribution Complete-Bash), released on 2019-06-28.
+    This document describes version 0.328 of Complete::Bash (from Perl
+    distribution Complete-Bash), released on 2019-07-30.
 
 DESCRIPTION
     This module provides routines related to tab completion in bash shell.
@@ -364,6 +364,17 @@ FUNCTIONS
     Return value: (any)
 
 ENVIRONMENT
+  COMPLETE_BASH_FZF
+    Bool. Whether to pass large completion answer to fzf instead of directly
+    passing it to bash and letting bash page it with a simpler more-like
+    internal pager. By default, large is defined as having at least 100
+    items (same bash's "completion-query-items" setting). This can be
+    configured via "COMPLETE_BASH_FZF_ITEMS".
+
+  COMPLETE_BASH_FZF_ITEMS
+    Uint. Default 100. The minimum number of items to trigger passing
+    completion answer to fzf. See also: "COMPLETE_BASH_FZF".
+
   COMPLETE_BASH_MAX_COLUMNS
     Uint.
 
@@ -396,25 +407,6 @@ ENVIRONMENT
      --baz                        Summary about the baz option
      --foo                        Summary about the foo option
      --schapen                Summary about the schapen option
-
-    To help match the option and its corresponding summary visually, by
-    default a line of underscores is drawn for every 5 lines (configurable
-    via "COMPLETE_BASH_SUMMARY_LINE_EVERY".
-
-     --bar                        Summary about the bar option
-     --baz                        Summary about the baz option
-     --foo                        Summary about the foo option
-     --foobar   _______________Summary about the foobar option
-     --lam                        Summary about the lam option
-     --qux
-     --quux                                    Alias for --qux
-     --schapen  ______________Summary about the schapen option
-
-  COMPLETE_BASH_SUMMARY_LINE_EVERY
-    Uint. Default: 4.
-
-    Relevant only when "COMPLETE_BASH_SUMMARY_ALIGN" is set to "right" (see
-    its documentation for more detail).
 
   COMPLETE_BASH_TRACE
     Bool. If set to true, will produce more log statements to Log::ger.

@@ -1,5 +1,8 @@
 Revision history for Perl module X::Tiny
 
+0.19 Fri Jul 26 2019
+- Fix typo in POD.
+
 0.18 Tue Apr 23 2019
 - Switch implementation to use Module::Runtime rather than Module::Load.
 

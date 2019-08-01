@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-X-Tiny/issues
   repository: https://github.com/FGasper/p5-X-Tiny.git
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

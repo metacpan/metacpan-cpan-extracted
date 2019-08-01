@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_to_isbn10;
 
-our $DATE = '2018-09-12'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,8 +9,7 @@ use warnings;
 
 sub meta {
     +{
-        v => 3,
-        enable_by_default => 0,
+        v => 4,
         might_fail => 1,
         prio => 50,
     };
@@ -58,7 +57,7 @@ Data::Sah::Coerce::perl::str::str_to_isbn10 - Check and format ISBN 10 number fr
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Sah::Coerce::perl::str::str_to_isbn10 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-12.
+This document describes version 0.006 of Data::Sah::Coerce::perl::str::str_to_isbn10 (from Perl distribution Sah-Schemas-ISBN), released on 2019-07-25.
 
 =head1 DESCRIPTION
 
@@ -90,7 +89,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

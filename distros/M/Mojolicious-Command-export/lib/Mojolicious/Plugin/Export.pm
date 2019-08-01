@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Export;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 # ABSTRACT: Export a Mojolicious website to static files
 
 #pod =head1 SYNOPSIS
@@ -8,7 +8,7 @@ our $VERSION = '0.006';
 #pod     get '/' => 'index';
 #pod     get '/secret' => 'secret';
 #pod     plugin Export => {
-#pod         paths => [qw( / /secret )],
+#pod         pages => [qw( / /secret )],
 #pod     };
 #pod     app->start;
 #pod
@@ -24,8 +24,8 @@ our $VERSION = '0.006';
 #pod     # myapp.conf
 #pod     {
 #pod         export => {
-#pod             # Configure the default paths to export
-#pod             paths => [ '/', '/hidden' ],
+#pod             # Configure the default pages to export
+#pod             pages => [ '/', '/hidden' ],
 #pod             # The directory to export to
 #pod             to => '/var/www/html',
 #pod             # Rewrite URLs to include base directory
@@ -115,6 +115,9 @@ sub register {
     # Config file overrides plugin config
     my $config = $app->can( 'config' ) ? $app->config->{export} : {};
     for my $key ( keys %$config ) {
+        if ( !$self->can( $key ) ) {
+            die "Unrecognized export configuration: $key\n";
+        }
         $self->$key( $config->{ $key } // $plugin_conf->{ $key } );
     }
 
@@ -286,7 +289,7 @@ Mojolicious::Plugin::Export - Export a Mojolicious website to static files
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -294,7 +297,7 @@ version 0.006
     get '/' => 'index';
     get '/secret' => 'secret';
     plugin Export => {
-        paths => [qw( / /secret )],
+        pages => [qw( / /secret )],
     };
     app->start;
 
@@ -310,8 +313,8 @@ configuration using one of Mojolicious's configuration plugins.
     # myapp.conf
     {
         export => {
-            # Configure the default paths to export
-            paths => [ '/', '/hidden' ],
+            # Configure the default pages to export
+            pages => [ '/', '/hidden' ],
             # The directory to export to
             to => '/var/www/html',
             # Rewrite URLs to include base directory

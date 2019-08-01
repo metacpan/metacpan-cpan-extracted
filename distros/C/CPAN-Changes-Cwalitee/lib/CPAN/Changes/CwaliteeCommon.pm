@@ -1,7 +1,7 @@
 package CPAN::Changes::CwaliteeCommon;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Common routines/data for CPAN::Changes::Cwalitee
@@ -18,7 +18,7 @@ CPAN::Changes::CwaliteeCommon - Common routines/data for CPAN::Changes::Cwalitee
 
 =head1 VERSION
 
-This document describes version 0.004 of CPAN::Changes::CwaliteeCommon (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-08.
+This document describes version 0.007 of CPAN::Changes::CwaliteeCommon (from Perl distribution CPAN-Changes-Cwalitee), released on 2019-07-26.
 
 =head1 HOMEPAGE
 

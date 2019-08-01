@@ -1,5 +1,12 @@
 Revision history for Config-Neat
 
+1.401   July 29, 2019
+        - Fix tests on Windows
+
+1.4     July 24, 2019
+        - Allow rendering of keys with spaces
+        - Provide better error reporting on infinite @inherit loop errors
+
 1.302   May 25, 2017
         - Fix rendering of '0'
         - Properly render empty default values as ``

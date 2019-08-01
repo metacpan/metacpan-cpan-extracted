@@ -4,7 +4,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 # VERSION
 
-version v0.2.1
+version v0.3.1
 
 # SYNOPSIS
 
@@ -74,7 +74,7 @@ however, larger numbers will increase the size of ["pages\_in\_set"](#pages_in_s
 
 This is the number of pages per exponent. It defaults to `3`.
 
-## `max_pages_per_set`
+## `pages_per_set`
 
 This is the maximum number of pages in ["pages\_in\_set"](#pages_in_set). It defaults
 to
@@ -86,6 +86,12 @@ to
 which for the default values is 23.
 
 This should be an odd number.
+
+This was renamed from ["max\_pages\_per\_set"](#max_pages_per_set) in v0.3.0.
+
+## `max_pages_per_set`
+
+This is a deprecated alias for ["pages\_per\_set"](#pages_per_set).
 
 # METHODS
 
@@ -133,11 +139,33 @@ It is added for compatability with [Data::Pageset](https://metacpan.org/pod/Data
 
 # KNOWN ISSUES
 
-## Fake @ISA
+## Differences with Data::Page
 
-This module is based on a complete rewrite of [Data::Page](https://metacpan.org/pod/Data::Page) using
+This module is intended as a drop-in replacement for [Data::Page](https://metacpan.org/pod/Data::Page).
+However, it is based on a complete rewrite of [Data::Page](https://metacpan.org/pod/Data::Page) using
 [Moo](https://metacpan.org/pod/Moo), rather than extending it.  Because of that, it needs to fake
 `@ISA`.  This may break some applications.
+
+Otherwise, it has the following differences:
+
+- The attributes have type constraints.  Invalid data may throw a fatal
+error instead of being ignored.
+- Setting the ["current\_page"](#current_page) to a value outside the ["first\_page"](#first_page) or
+["last\_page"](#last_page) will return the first or last page, instead of that
+value.
+
+## Differences with Data::Pageset
+
+This module can behave like [Data::Pageset](https://metacpan.org/pod/Data::Pageset) in `slide` mode if the
+exponent is set to `1`:
+
+```perl
+my $pager = Data::Pageset::Exponential->new(
+  exponent_max       => 1,
+  pages_per_exponent => 10,
+  pages_per_set      => 10,
+);
+```
 
 # SEE ALSO
 

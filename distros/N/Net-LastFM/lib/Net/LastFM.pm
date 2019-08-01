@@ -1,5 +1,5 @@
 package Net::LastFM;
-$Net::LastFM::VERSION = '0.36';
+$Net::LastFM::VERSION = '0.37';
 use Moose;
 use MooseX::StrictConstructor;
 use Digest::MD5 qw(md5_hex);
@@ -25,7 +25,7 @@ has 'ua' => (
     required => 0,
     default  => sub {
         my $ua = LWP::UserAgent->new;
-        $ua->agent( 'Net::LastFM/' . $VERSION );
+        $ua->agent( 'Net::LastFM/' . $Net::LastFM::VERSION );
         $ua->env_proxy;
         return $ua;
     }

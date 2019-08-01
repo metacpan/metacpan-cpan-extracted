@@ -1,3 +1,9 @@
+0.004   2019-06-24 (PERLANCAR)
+
+	- Add x.completion rules (Perinci::Sub::XCompletion::*) for
+	  date::dow_num{,s} and date::month_num{,s}.
+
+
 0.003   2019-06-20 (PERLANCAR)
 
 	- [ux] Add schemas: date::dow_nums, date::month_nums.

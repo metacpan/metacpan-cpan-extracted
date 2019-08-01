@@ -53,6 +53,9 @@ my %HyphenMin = (
 	'fr' => [2,3],
 	'es' => [2,2],
 	'et' => [2,3],
+	'ka' => [1,2],
+	'lt' => [2,2],
+	'lv' => [2,2],
 );
 
 my $CannotHyph;
@@ -176,9 +179,9 @@ $hyphenPatterns = {
 $hyphenRegexPattern = join "|",keys %{$hyphenPatterns};
 $hyphenRegexPattern = qr/(.*)($hyphenRegexPattern){1}(.*)/o;
 
-$soglasnie = "bcdfghjklmnpqrstvwxzбвгджзйклмнпрстфхцчшщłćżźśńżçßґñšž";
-$glasnie = "aeiouyАОУЮИЫЕЭЯЁєіїўóąęéàèùâêîôûëïüÿæœäöõ";
-$znaki = "ъь";
+$soglasnie = "bcdfghjklmnpqrstvwxzбвгджзйклмнпрстфхцчшщłćżźśńżçßґñšžčģķļņბგდვზთკლმნპჟრსტჳფქღყშჩცძწჭხჴჯჰჶ";
+$glasnie = "aeiouyАОУЮИЫЕЭЯЁєіїўóąęéàèùâêîôûëïüÿæœäöõāēīūėįųაეჱიჲოუჷჵ";
+$znaki = "ъьყ";
 
 $RgxSoglasnie = qr/[$soglasnie]/oi;
 $RgxGlasnie = qr/[$glasnie]/oi;

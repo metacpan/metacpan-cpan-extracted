@@ -326,7 +326,7 @@ sv_clone (SV * ref, HV* hseen, int depth)
               mg_ptr = (char *) cache;
               Copy(mg->mg_ptr, mg_ptr, PERL_MAGIC_UTF8_CACHESIZE * 2, STRLEN);
             }
-          } else {
+          } else if ( mg->mg_ptr != NULL) {
             croak("Unsupported magic_ptr clone");
           }
 

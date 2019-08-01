@@ -125,10 +125,12 @@ TEST_CASE("Array", "[Sv]") {
 
     SECTION("[]const") { // unsafe getter
         const Array& o = arr;
-        REQUIRE(Simple(o[0]) == 777);
-        REQUIRE(Simple(o[1]) == "fuckit");
-        REQUIRE(!o[2]);
-        REQUIRE(!o[90]);
+        CHECK(Simple(o[0]) == 777);
+        CHECK(Simple(o[1]) == "fuckit");
+        if (PERL_VERSION >= 20) {
+            CHECK(!o[2]);
+            CHECK(!o[90]);
+        }
     }
 
     SECTION("fetch") { // safe getter
@@ -142,8 +144,10 @@ TEST_CASE("Array", "[Sv]") {
 
         o = arr;
         REQUIRE(Simple(o.fetch(0)) == 777);
-        REQUIRE(!o.fetch(2));
-        REQUIRE(!o.fetch(90));
+        if (PERL_VERSION >= 20) {
+            REQUIRE(!o.fetch(2));
+            REQUIRE(!o.fetch(90));
+        }
         REQUIRE(!o.fetch(900));
     }
 
@@ -158,8 +162,10 @@ TEST_CASE("Array", "[Sv]") {
 
         o = arr;
         REQUIRE(Simple(o.at(0)) == 777);
-        REQUIRE_THROWS(o.at(2));
-        REQUIRE_THROWS(o.at(90));
+        if (PERL_VERSION >= 20) {
+            REQUIRE_THROWS(o.at(2));
+            REQUIRE_THROWS(o.at(90));
+        }
         REQUIRE_THROWS(o.at(900));
     }
 
@@ -167,8 +173,10 @@ TEST_CASE("Array", "[Sv]") {
         Array o = arr;
         REQUIRE(Simple(o[0]) == 777);
         REQUIRE(Simple(o[1]) == "fuckit");
-        REQUIRE(!o[2]);
-        REQUIRE(!o[90]);
+        if (PERL_VERSION >= 20) {
+            REQUIRE(!o[2]);
+            REQUIRE(!o[90]);
+        }
     }
 
     SECTION("[]=") { // unsafe setter
@@ -264,9 +272,9 @@ TEST_CASE("Array", "[Sv]") {
         o.reserve(2);
         REQUIRE(!o.exists(0));
         o.resize(2);
-        REQUIRE(!o.exists(0));
+        if (PERL_VERSION >= 20) REQUIRE(!o.exists(0));
         o.store(1, vars.iv);
-        REQUIRE(!o.exists(0));
+        if (PERL_VERSION >= 20) REQUIRE(!o.exists(0));
         REQUIRE(o.exists(1));
         av_delete(o, 1, 0);
         REQUIRE(!o.exists(1));
@@ -280,7 +288,7 @@ TEST_CASE("Array", "[Sv]") {
         o.reserve(2);
         REQUIRE(!o.del(0));
         o.resize(2);
-        REQUIRE(!o.del(0));
+        if (PERL_VERSION >= 20) REQUIRE(!o.del(0));
 
         auto icnt = SvREFCNT(vars.iv);
         o[0] = vars.iv;

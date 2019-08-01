@@ -1,17 +1,21 @@
-Revision history for App-jsonsel
+0.004   2019-07-29  Released-By: PERLANCAR; Urgency: medium
 
-0.003   2016-09-01 (PERLANCAR)
+	- [incompatible change] Adjust to App::CSelUtils 0.082 (--actions
+	  renamed to --node-actions, add --select-action).
+
+
+0.003   2016-09-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention CSel::Examples.
 
 
-0.002   2016-09-01 (PERLANCAR)
+0.002   2016-09-01  Released-By: PERLANCAR
 
 	- [Bugfix] Don't skip root node if it's the only result.
 
 
-0.001   2016-08-27 (PERLANCAR)
+0.001   2016-08-27  Released-By: PERLANCAR
 
         - First release.

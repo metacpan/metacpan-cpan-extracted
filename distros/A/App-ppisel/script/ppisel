@@ -1,0 +1,364 @@
+#!perl
+
+our $DATE = '2019-07-29'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => '/App/ppisel/ppisel',
+)->run;
+
+# ABSTRACT: Select PPI::Element nodes using CSel syntax
+# PODNAME: ppisel
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ppisel - Select PPI::Element nodes using CSel syntax
+
+=head1 VERSION
+
+This document describes version 0.001 of ppisel (from Perl distribution App-ppisel), released on 2019-07-29.
+
+=head1 SYNOPSIS
+
+To print all 'print' statements:
+
+ % ppisel script.pl '.Statement:has(.Token::Word[content="print"])'
+
+To print the first comment:
+
+ % ppisel script.pl 'Comment:first'
+
+To dump PPI document tree (C<--root> select the root node, C<--dump> dumps the
+content):
+
+ % ppisel script.pl --root --dump
+
+=head1 DESCRIPTION
+
+This utility uses CSel to select against a tree of L<PPI::Element> nodes,
+constructed by L<PPI> from a Perl source code.
+
+About the tree: the root node is PPI::Document object, which is a subclass of
+PPI::Element. The other nodes are also subclasses of PPI::Element. This utility
+allows you to omit the C<PPI::Token::> or C<PPI::> prefix, so to select a word
+token can use:
+
+ .Token::Word
+
+or just:
+
+ .Word
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--count>
+
+Shortcut for --node-action count.
+
+See C<--node-action>.
+
+=item B<--dump>
+
+Shortcut for --node-action dump.
+
+See C<--node-action>.
+
+=item B<--expr>=I<s>
+
+=item B<--file>=I<filename>
+
+Default value:
+
+ "-"
+
+=item B<--node-action>=I<s@>
+
+Specify action(s) to perform on matching nodes.
+
+Default value:
+
+ ["print_as_string"]
+
+Each action can be one of the following:
+
+* `count` will print the number of matching nodes.
+
+* `print_method` will call on or more of the node object's methods and print the
+result. Example:
+
+    print_method:as_string
+
+* `dump` will show a indented text representation of the node and its
+descendants. Each line will print information about a single node: its class,
+followed by the value of one or more attributes. You can specify which
+attributes to use in a dot-separated syntax, e.g.:
+
+    dump:tag.id.class
+
+which will result in a node printed like this:
+
+    HTML::Element tag=p id=undef class=undef
+
+By default, if no attributes are specified, `id` is used. If the node class does
+not support the attribute, or if the value of the attribute is undef, then
+`undef` is shown.
+
+
+Can be specified multiple times.
+
+=item B<--node-actions-json>=I<s>
+
+Specify action(s) to perform on matching nodes (JSON-encoded).
+
+See C<--node-action>.
+
+=item B<--print>
+
+Shortcut for --node-action print_as_string.
+
+See C<--node-action>.
+
+=item B<--print-method>=I<s@>
+
+--print-method M is shortcut for --node-action print_method:M.
+
+See C<--node-action>.
+
+Can be specified multiple times.
+
+=item B<--root>
+
+Shortcut for --select-action=root.
+
+See C<--select-action>.
+
+=item B<--select-action>=I<s>
+
+Specify how we should select nodes.
+
+Default value:
+
+ "csel"
+
+Valid values:
+
+ ["csel","root"]
+
+The default is `csel`, which will select nodes from the tree using the CSel
+expression. Note that the root node itself is not included. For more details on
+CSel expression, refer to <pm:Data::CSel>.
+
+`root` will return a single node which is the root node.
+
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C ppisel ppisel
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete ppisel 'p/*/`ppisel`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/ppisel.conf>, F<~/ppisel.conf>, or F</etc/ppisel.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ expr (see --expr)
+ file (see --file)
+ format (see --format)
+ naked_res (see --naked-res)
+ node_actions (see --node-action)
+ select_action (see --select-action)
+
+=head1 ENVIRONMENT
+
+=head2 PPISEL_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/ppisel.conf>
+
+F<~/ppisel.conf>
+
+F</etc/ppisel.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ppisel>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ppisel>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ppisel>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Data::CSel>
+
+L<PPI>
+
+Other utilities that use CSel against various data: L<ddsel>, L<jsonsel>,
+L<orgsel>, L<podsel>, L<htmlsel>, L<yamlsel>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

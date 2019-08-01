@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 1997 - 2018 by IXIA Keysight
+# Copyright 1997 - 2019 by IXIA Keysight
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"),
@@ -26,6 +26,7 @@ use Socket;
 use File::stat;
 use File::Basename;
 use IO::Socket;
+use validate;
 
 package IxNetworkLegacy;
 
@@ -59,7 +60,7 @@ sub new
         _timeout => undef,
         _transportType => 'TclSocket',
         _OK => '::ixNet::OK',
-        _version => '8.50.1501.9'
+        _version => '9.00.1915.16'
     };
     bless $self, $class;
     return $self;
@@ -131,6 +132,9 @@ sub connect {
         '-serverUsername' => $serverusername,
         '-port' => '8009',
         '-closeServerOnDisconnect' => 'true',
+        '-applicationVersion' => undef,
+		'-persistentApplicationVersion' => undef,
+        '-forceVersion' => undef, 
         '-clientType' => 'perl',
         '-clientusername' => getlogin()
     );
@@ -463,13 +467,26 @@ sub _InitialConnect {
     while(1)
     {
         my $ret = eval {
-            my $protocol = getprotobyname('tcp');
-            socket($self->{_socket}, Socket::AF_INET, Socket::SOCK_STREAM, $protocol);
-
-            my $inetAddress = gethostbyname($address);
-            my $sockAddress = Socket::sockaddr_in($port, $inetAddress);
-            CORE::connect($self->{_socket}, $sockAddress);
-
+            if (validate::isIpv6($address) == 0) {
+                # connect to IPv4 address (or a host name).
+                my $protocol = getprotobyname('tcp');
+                socket($self->{_socket}, Socket::AF_INET, Socket::SOCK_STREAM, $protocol);
+                my $inetAddress = gethostbyname($address);
+                my $sockAddress = Socket::sockaddr_in($port, $inetAddress);
+                CORE::connect($self->{_socket}, $sockAddress);
+            } else {
+                if (!$checkDependencies::ipv6LoadError) {
+                    require LWP::Protocol::INET6;
+                    $self->{_socket} = LWP::Protocol::INET6->new(
+                        PeerAddr => $address,
+                        PeerPort => $port,
+                        Proto    => 'tcp',
+                    )
+                    or die("Unknown Ipv6 address $address\n");
+                } else {
+                    die("Unable to load perl IPv6 module\n");
+                }
+            }
             1;
         };
         if (!$ret and $@) {

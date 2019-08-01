@@ -18,3 +18,11 @@ Revision history for Perl extension Tk::HMListbox.
 	- Renamed internal packages to prevent potential conflicts with 
 	  Tk::MListbox.
 	- Cleaned up and updated docs along with the usual code cleanups.
+3.11  Not Released
+	- Fix minor focusing issue and make <Left-Tab> focus work properly.
+3.12  Wed Jul 31, 2019
+	- Added options:  -ipadx, -ipady, -tpadx, -tpady
+	  See updated docs.  These provide padding values for image/imagetext 
+	  and text fields respectively, primarily to assist in adjusting to 
+	  keep icon and text columns' vertical allignment synced.
+	  NOTE:  Requires Tk::HListbox v.2.3+ to use these new options.

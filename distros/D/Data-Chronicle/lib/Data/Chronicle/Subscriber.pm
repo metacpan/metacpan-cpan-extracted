@@ -14,7 +14,7 @@ Data::Chronicle::Subscriber - Provides callback subscriptions to an efficient da
 
 =cut
 
-our $VERSION = '0.19';    ## VERSION
+our $VERSION = '0.20';    ## VERSION
 
 =head1 DESCRIPTION
 

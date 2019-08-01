@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+use v5.18;
+
+use App::p5find qw<p5_doc_iterator>;
+
+use Getopt::Long 'GetOptions';
+
+my ($wanted_sub_name, @paths) = @ARGV;
+
+sub print_usage {
+    print <<USAGE;
+p5find-sub [switches] name [path1] [path2]...
+
+  -h    show help message
+USAGE
+}
+
+my %opts;
+GetOptions(
+    \%opts,
+    "h",
+);
+
+if ($opts{h}) {
+    print_usage();
+    exit(0);
+}
+
+@paths = ('.') unless @paths;
+
+my $iter = p5_doc_iterator(@paths);
+while (my $doc = $iter->()) {
+    my $o = $doc->find(
+        sub {
+            my $el = $_[1];
+            return (
+                $el->isa("PPI::Token::Word") && $el eq "sub" && (
+                    $el->parent->isa("PPI::Statement::Sub") ||
+                    $el->snext_sibling()->isa("PPI::Structure::Block")
+                )
+            );
+        }
+    ) or next;
+
+    my $file = $doc->filename;
+    for my $token (@$o) {
+        # $token is the word "sub"
+        my $el = $token->parent;
+        my $sub_name = $el->isa("PPI::Statement::Sub") ? $el->name : "(anonymous)";
+        if ($wanted_sub_name eq $sub_name) {
+            say join ":", $file, $token->line_number, $sub_name;
+        }
+    }
+}

@@ -15,7 +15,7 @@ Sah::Schemas::Color - Sah schemas related to color codes/names
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::Color (from Perl distribution Sah-Schemas-Color), released on 2018-09-26.
+This document describes version 0.003 of Sah::Schemas::Color (from Perl distribution Sah-Schemas-Color), released on 2019-07-25.
 
 =head1 HOMEPAGE
 
@@ -45,7 +45,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

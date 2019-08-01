@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014-2016 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -23,22 +23,25 @@
 
 pft init - Initialize a PFT Site
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
-pft init [<configuration options>]
+B<pft init> [I<options>]
 
 =head1 DESCRIPTION
 
-This command initializes a I<PFT site> in the current directory. It
-generates a configuration file named C<pft.yaml> and it creates the
-following filesystem structure documented in the main C<pft> manual page.
+This command initializes a PFT site in the current directory. It generates a
+configuration file named C<pft.yaml> and it creates the following filesystem
+structure (see L<pft(1)>).
 
-A sensible configuration skeleton is provided by default, and can be
-modified by editing the C<pft.yaml> configuration file.
+A generic configuration skeleton is provided by default, and can be modified
+by editing the C<pft.yaml> configuration file.  Each option explained in
+this manual page corresponds to an equally named setting in the C<pft.yaml>
+file.
 
 =cut
 # NOTE: Documentation continues with auto-generated options from PFT::Conf
-# at the end of this file (from `=head1 CONFIGURATION OPTIONS` on).
+# at the end of this file (from "=head1 OPTIONS" to the subsequent
+# "# END # AUTOGEN" comment).
 #
 # Generate again if needed with:
 #
@@ -130,82 +133,110 @@ foreach (glob encode(locale_fs => $glob)) {
 
 =over
 
-=item --publish-host
+=item B<--publish-host>=I<HOST>
 
-Remote host where to publish
+Remote host where to publish (see L<pft-pub(1)>).
+Defaults to C<example.org>.
 
-Defaults to C<example.org>
+=item B<--publish-method>=I<NAME>
 
-=item --publish-method
+Method used for publishing (see L<pft-pub(1)>).
+Defaults to C<rsync+ssh>.
 
-Method used for publishing
+=item B<--publish-path>=I<PATH>
 
-Defaults to C<rsync+ssh>
+Remote path on publishing host (see L<pft-pub(1)>).
+Defaults to C</home/$USER/public_html>, as by tradition.
 
-=item --publish-path
+=item B<--publish-port>=I<PORT>
 
-Directory on publishing host
+Port for connection on publishing host (see L<pft-pub(1)>).
+Defaults to C<22>.
 
-Defaults to C</home/dacav/public_html>
+=item B<--publish-user>=I<USER>
 
-=item --publish-port
+User login on publishing host (see L<pft-pub(1)>).
+Defaults to $USER (environment variable).
 
-Port for connection on publishing host
+=item B<--site-author>=I<USER>
 
-Defaults to C<22>
+Global Author, can be overriden by individual entries.
+Defaults to C<$USER> (environment variable).
 
-=item --publish-user
+=item B<--site-encoding>=I<ENC>
 
-User login on publishing host
+Charset of the generated web pages.
+Defaults to what is defined by L<locale(1)>.
 
-Defaults to C<dacav>
+=item B<--site-feed-description>=I<DESC>
 
-=item --site-author
+Description of the channel (C<E<lt>descriptionE<gt>> in the XML).
+Defaults to C<News from a PFT website>.
 
-Default author of entries
+=item B<--site-feed-length>=I<N>
 
-Defaults to C<dacav>
+Number of most recent blog entries to list in the RSS feed.
+Defaults to C<10>.
 
-=item --site-encoding
+=item B<--site-feed-path>=I<PATH>
 
-Charset of the generated web pages
+File name of the RSS XML to be published by L<pft-gen-rss(1)>.
+Defaults to C<feed.rss>.
 
-Defaults to C<UTF-8>
+=item B<--site-home>=I<PAGE_NAME>
 
-=item --site-home
+First page, where C<index.html> will redirect the browsers.
+Defaults to C<Welcome>.
 
-First page, where index.html redirects the browsers
+=item B<--site-template>=I<TEMPLATE>
 
-Defaults to C<Welcome>
+Global HTML template, can be overriden by individual entires.
+Defaults to C<default.html>.
 
-=item --site-template
+=item B<--site-theme>=I<THEME>
 
-Default template for compilation, can be overriden by single entries
+Global theme (e.g. C<light> or C<dark>) optionally honored by templates. Specific accepted values depend on the template implementation.
+Defaults to C<light>.
 
-Defaults to C<default.html>
+=item B<--site-title>=I<TITLE>
 
-=item --site-title
+Title of the website.
+Defaults to C<My PFT website>.
 
-Title of the website
+=item B<--site-url>=I<URL>
 
-Defaults to C<My PFT website>
+Base url for the website.
+Defaults to C<http://example.org>.
 
-=item --site-url
+=item B<--system-browser>=I<BROWSER>
 
-Base url for the website
+Browser to be invoked by B<pft-show(1)>. You may specify an executable, or a L<sh(1)> command where "%s" gets replaced with the file name (e.g. "firefox -profile x '%s'").
+Defaults to C<$BROWSER> (environment variable), or C<firefox> if not defined.
 
-Defaults to C<http://example.org>
+=item B<--system-editor>=I<EDITOR>
 
-=item --system-browser
-
-Browser to be invoked by C<pft show>. You may specify an executable, or a shell command where "%s" gets replaced with the file name
-
-Defaults to C<firefox %s>
-
-=item --system-editor
-
-Editor to be invoked by C<pft edit>. You may specify an executable, or a shell command where "%s" gets replaced with the file name
-
-Defaults to C<vim %s>
+Editor to be invoked by L<pft-edit(1)>. You may specify an executable, or a L<sh(1)> command where "%s" gets replaced with the file name (e.g. "vim +'set filetype=markdown spell' %s").
+Defaults to C<$EDITOR> (environment variable), or C<vi> if not defined.
 
 =back
+
+# END AUTOGEN
+
+=head1 ENVIRONMENT
+
+The following environment variables are honored as sensible defaults unless
+some different setting is supplied by command line arguments.
+
+=over
+
+=item C<$USER>
+
+=item C<$BROWSER>
+
+=item C<$EDITOR>
+
+=back
+
+=head1 SEE ALSO
+
+L<pft>, L<pft-pub(1)>

@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.76';
+$Geo::Address::Formatter::VERSION = '1.79';
 use strict;
 use warnings;
 use feature qw(say);
@@ -71,8 +71,15 @@ sub _read_configuration {
                 }
             }
         }
-        $self->{ordered_components} =
-            [ map { $_->{name} => ($_->{aliases} ? @{$_->{aliases}} : ()) } @c];
+        foreach my $rh_c (@c){
+            push(@{ $self->{ordered_components} }, $rh_c->{name});
+            if ( defined($rh_c->{aliases}) ){
+                foreach my $alias (@{$rh_c->{aliases}}){
+                    push(@{ $self->{ordered_components} }, $alias);
+                }
+            }
+        }
+        #say Dumper $self->{ordered_components};
     }
     catch {
         warn "error parsing component configuration: $_";
@@ -684,7 +691,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.76
+version 1.79
 
 =head1 SYNOPSIS
 
@@ -767,7 +774,7 @@ edf <edf@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Opencage Data Limited.
+This software is copyright (c) 2019 by Opencage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

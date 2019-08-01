@@ -2,7 +2,7 @@ package ShellQuote::Any;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub import {
     my $caller = caller;
@@ -82,7 +82,7 @@ ShellQuote::Any - escape strings for the shell on Linux, UNIX or MSWin32
 
     use ShellQuote::Any;
 
-    shell_quote('curl', 'http://example.com/?foo=123&bar=baz');
+    shell_quote(['curl', 'http://example.com/?foo=123&bar=baz']);
     # curl 'http://example.com/?foo=123&bar=baz'
 
 
@@ -95,7 +95,7 @@ ShellQuote::Any escapes strings for the shell on Linux, UNIX or MSWin32.
 
 =head2 shell_quote(\@cmd [, $os])
 
-If this method was called without C<$os>, then C<@cmd> escapes for current OS. C<$os> supports C<MSWin32> or C<Bourne>.
+If this method was called without C<$os>, then C<\@cmd> escapes for current OS. C<$os> supports C<MSWin32> or C<Bourne>.
 
 
 =head1 REPOSITORY

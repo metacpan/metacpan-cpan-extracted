@@ -1,3 +1,20 @@
+0.007   2019-07-26  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] Add a couple of examples.
+
+
+0.006   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add indicators: preamble_has_no_releases, has_releases.
+
+
+0.005   2019-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add indicator: no_duplicate_version.
+
+
 0.004   2019-07-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Activate indicator: english using Lingua::Identify::Any.

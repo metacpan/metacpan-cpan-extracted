@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -24,7 +24,7 @@ use File::Temp;
 use Math::NumSeq::Base::File;
 
 use vars '$VERSION';
-$VERSION = 72;
+$VERSION = 73;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;

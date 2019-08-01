@@ -124,4 +124,3 @@ The available events are the same:
 ## License
 
 MIT. See LICENSE.txt.
-

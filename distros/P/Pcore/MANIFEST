@@ -253,6 +253,8 @@ share/data/par.ico
 share/data/pub-suffix.dat
 share/data/src.yaml
 share/data/status.yaml
+share/dbh/api/pgsql/010-init.perl
+share/dbh/api/sqlite/010-init.perl
 share/dist-id.yaml
 share/dist-tmpl/cfg.ini
 share/dist-tmpl/docker/.dockerignore

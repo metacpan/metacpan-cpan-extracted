@@ -1,16 +1,6 @@
 package My::TestSigs;
 use Mojo::Base -role, -signatures;
 
-=head1 NAME
-
-TestSigs - PPI::Transform::Doxygen Test Input
-
-=head1 DESCRIPTION
-
-Test input for subroutine signatures and inline comments
-
-=cut
-
 has attr1 => 99;
 has attr2 => sub { 'blabla' };
 
@@ -86,3 +76,14 @@ method test3 inline
     return $self;
 }
 
+__DATA__
+
+=head1 NAME
+
+TestSigs - PPI::Transform::Doxygen Test Input
+
+=head1 DESCRIPTION
+
+Test input for subroutine signatures and inline comments
+
+=cut

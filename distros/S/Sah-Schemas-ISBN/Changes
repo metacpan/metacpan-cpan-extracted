@@ -1,28 +1,33 @@
-0.005   2018-09-12 (PERLANCAR)
+0.006   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version of coerce rule module(s) 3->4.
+
+
+0.005   2018-09-12  Released-By: PERLANCAR
 
 	- Add missing test dependencies [CT].
 
 
-0.004   2018-09-08 (PERLANCAR)
+0.004   2018-09-08  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix repository URL.
 
 
-0.003   2018-08-23 (PERLANCAR)
+0.003   2018-08-23  Released-By: PERLANCAR
 
         - Add schema: isbn (which accepts ISBN 10 or ISBN 13).
 
         - [test] Add some tests.
 
 
-0.002   2018-08-23 (PERLANCAR)
+0.002   2018-08-23  Released-By: PERLANCAR
 
 	- Coerce rule str_to_isbn10 can now convert from ISBN 13, much like
 	  str_to_isbn13 rule which can convert from ISBN 10.
 
 
-0.001   2018-08-23 (PERLANCAR)
+0.001   2018-08-23  Released-By: PERLANCAR
 
         - First release.

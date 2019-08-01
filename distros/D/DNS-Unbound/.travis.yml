@@ -40,6 +40,7 @@ matrix:
         homebrew:
           packages:
             - unbound
+          update: true
       before_install:
         - "curl -L http://cpanmin.us | perl - --self-upgrade"
         - export PATH=$PATH:$HOME/perl5/bin

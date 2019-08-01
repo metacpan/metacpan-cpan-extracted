@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,9 +19,9 @@
 
 use 5.004;
 use strict;
-
+use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 2;
+plan tests => 16;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -100,15 +100,16 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A070976 - steps starting 3^n
+# A070976 - steps starting from 3^n
 
 MyOEIS::compare_values
   (anum => 'A070976',
+   max_count => 50,
    func => sub {
      my ($count) = @_;
      my $seq = Math::NumSeq::CollatzSteps->new;
      my @got;
-     my $i = Math::NumSeq::_to_bigint(1);
+     my $i = Math::BigInt->new(1);
      while (@got < $count) {
        push @got, $seq->ith($i);
        $i *= 3;
@@ -117,7 +118,7 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A070974 - steps starting n!
+# A070974 - steps starting from n!
 
 MyOEIS::compare_values
   (anum => 'A070974',
@@ -136,15 +137,16 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A179118 - steps starting 2^n + 1
+# A179118 - steps starting from 2^n + 1
 
 MyOEIS::compare_values
   (anum => 'A179118',
+   max_count => 50,
    func => sub {
      my ($count) = @_;
      my $seq = Math::NumSeq::CollatzSteps->new;
      my @got;
-     my $i = Math::NumSeq::_to_bigint(1);
+     my $i = Math::BigInt->new(1);
      while (@got < $count) {
        $i *= 2;
        push @got, $seq->ith($i+1);
@@ -157,11 +159,12 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A193688',
+   max_count => 50,
    func => sub {
      my ($count) = @_;
      my $seq = Math::NumSeq::CollatzSteps->new;
      my @got;
-     my $i = Math::NumSeq::_to_bigint(1);
+     my $i = Math::BigInt->new(1);
      while (@got < $count) {
        push @got, $seq->ith($i);
        $i = 2*$i + 1;

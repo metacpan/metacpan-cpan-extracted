@@ -2,8 +2,8 @@ NAME
     Perinci::Sub::Wrapper - A multi-purpose subroutine wrapping framework
 
 VERSION
-    This document describes version 0.850 of Perinci::Sub::Wrapper (from
-    Perl distribution Perinci-Sub-Wrapper), released on 2019-04-15.
+    This document describes version 0.851 of Perinci::Sub::Wrapper (from
+    Perl distribution Perinci-Sub-Wrapper), released on 2019-07-04.
 
 SYNOPSIS
     For dynamic usage:

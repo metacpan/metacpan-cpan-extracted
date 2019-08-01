@@ -1,0 +1,60 @@
+{
+   "abstract" : "Mechanize Mojo a little",
+   "author" : [
+      "Roy Storey <kiwiroy@users.noreply.github.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Transaction-HTTP-Role-Mechanize",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "2.00",
+            "Mojolicious" : "8.10",
+            "Role::Tiny" : "2.000001",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.80"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/issues"
+      },
+      "homepage" : "https://github.com/kiwiroy/mojo-transaction-http-role-mechanize",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kiwiroy/mojo-transaction-http-role-mechanize.git",
+         "web" : "https://github.com/kiwiroy/mojo-transaction-http-role-mechanize"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

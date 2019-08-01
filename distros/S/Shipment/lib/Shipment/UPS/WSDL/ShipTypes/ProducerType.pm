@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ProducerType;
-$Shipment::UPS::WSDL::ShipTypes::ProducerType::VERSION = '3.01';
+$Shipment::UPS::WSDL::ShipTypes::ProducerType::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ Shipment::UPS::WSDL::ShipTypes::ProducerType
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

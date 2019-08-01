@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.724'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.726'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,7 +31,7 @@ pmpath - Get path to locally installed Perl module
 
 =head1 VERSION
 
-This document describes version 0.724 of pmpath (from Perl distribution App-PMUtils), released on 2019-06-20.
+This document describes version 0.726 of pmpath (from Perl distribution App-PMUtils), released on 2019-07-25.
 
 =head1 SYNOPSIS
 
@@ -81,13 +81,7 @@ shell:
 and it won't change directory if the module doesn't exist.
 
 
-=item B<--module-json>=I<s>
-
-See C<--module>.
-
-=item B<--module>=I<s@>*
-
-Can be specified multiple times.
+=item B<--module>=I<s>*
 
 =item B<--pm>=I<s>
 
@@ -119,7 +113,7 @@ Default value:
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

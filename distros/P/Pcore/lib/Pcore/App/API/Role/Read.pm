@@ -1,6 +1,7 @@
 package Pcore::App::API::Role::Read;
 
 use Pcore -const, -role, -sql, -res;
+use Pcore::Lib::Scalar qw[is_ref];
 
 const our $DEFAULT_PAGE_SIZE => 100;
 
@@ -11,15 +12,12 @@ sub _read ( $self, $req, $args, $total_sql, $main_sql, $where, $page_size = $DEF
 
     # get by id
     if ( exists $args->{id} ) {
-        $data = $dbh->selectrow( [ $main_sql, $where // () ] );
+        $data = $dbh->selectrow( is_ref $main_sql ? $main_sql : [ $main_sql, $where // () ] );
     }
 
     # get all matched rows
     else {
-        $args->{start} = 0          if !defined $args->{start} || $args->{start} < 0;
-        $args->{limit} = $page_size if !$args->{limit}         || $args->{limit} > $page_size;
-
-        my $total = $dbh->selectrow( [ $total_sql, $where // () ] );
+        my $total = $dbh->selectrow( is_ref $total_sql ? $total_sql : [ $total_sql, $where // () ] );
 
         # total query error
         if ( !$total ) {
@@ -35,7 +33,10 @@ sub _read ( $self, $req, $args, $total_sql, $main_sql, $where, $page_size = $DEF
 
         # has results
         else {
-            $data = $dbh->selectall( [ $main_sql, $where // (), ORDER_BY $args->{sort}, LIMIT $args->{limit}, OFFSET $args->{start} ] );
+            $args->{start} = 0          if !defined $args->{start} || $args->{start} < 0;
+            $args->{limit} = $page_size if !$args->{limit}         || $args->{limit} > $page_size;
+
+            $data = $dbh->selectall( is_ref $main_sql ? $main_sql : [ $main_sql, $where // (), ORDER_BY $args->{sort}, LIMIT $args->{limit}, OFFSET $args->{start} ] );
 
             if ($data) {
                 $data->{total}   = $total->{data}->{total};
@@ -56,9 +57,9 @@ sub _read ( $self, $req, $args, $total_sql, $main_sql, $where, $page_size = $DEF
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 7                    | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 8                    | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 7                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_read' declared but not used        |
+## |    3 | 8                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_read' declared but not used        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

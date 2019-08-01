@@ -1,131 +1,23 @@
-commit 4a9d2005547dc02661ee74fc839df73052443242 (HEAD, tag: v1.38.0, origin/master, origin/HEAD, master)
+commit 7ffc239b5fe03325e6cec872941bebdbc586d850 (HEAD, tag: v1.39.1, origin/v1.39.x, origin/HEAD, v1.39.x)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-18
+AuthorDate: 2019-06-11
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-18
+CommitDate: 2019-06-11
 
-    Update manual pages
+    Bump up version number to 1.39.1
 
-commit acf6a9229d80cc1442c16e7982d2b07d03e4aba8
+commit bc886a0e0d15ee33611dc32eae9b987df65b8936
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-18
+AuthorDate: 2019-06-11
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-18
+CommitDate: 2019-06-11
 
-    Bump up version number to 1.38.0, LT revision to 31:3:17
+    Fix FPE with default backend
 
-commit 4ff4582132dbe1ce6f04db275c1828e63da29e73
+commit a3a14a9cde3c1aa5e82b69d796ee394dfdb84962
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-18
+AuthorDate: 2019-06-11
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-18
+CommitDate: 2019-06-11
 
-    Update AUTHORS
-
-commit 42dce01ec10847a98f49c0e25f39b54bbe56f43b
-Merge: 5a30fafd a35059e3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-16
-
-    Merge branch 'nghttpx-fix-backend-selection-on-retry'
-
-commit a35059e3f128ed7e0de9c7c808d816693f3455f8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-16
-
-    nghttpx: Fix bug that altered authority and path affect backend selection
-    
-    Fix bug that altered authority and path by per-pattern mruby script
-    affect backend selection on retry.
-
-commit 5a30fafddac5970eacf300f4cbc77ecb4fc86f6f
-Merge: dce91ad3 2cff8b43
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-16
-
-    Merge branch 'nghttpx-fix-chunked-request-stall'
-
-commit dce91ad37c59c56634db57e3aa484ab606622634
-Merge: ce962c3f be96654d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-16
-
-    Merge branch 'nghttpx-dont-log-authorization'
-
-commit 2cff8b43cff24ffaa79e92f2b6fdc55715155ee7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-15
-
-    nghttpx: Fix bug that chunked request stalls
-
-commit be96654d569d6e8e88c1b4c38830c2b6dec9d32f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-15
-
-    nghttpx: Don't log authorization request header field value with -LINFO
-
-commit ce962c3fdf29206e35f71a217ae2c31814903a53
-Merge: d978f351 f931504e
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-15
-
-    Merge branch 'update-http-parser'
-
-commit f931504e1cdff30d54a62b6a718d9fdc0ccd4447
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-15
-
-    Update http-parser to v2.9.1
-    
-    http-parser c5c45636b85e7598223adede6ba2d8cb8fe03ebe
-
-commit d978f351dad7c930e2c601f902b8430ea9a7b584
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-04-11
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-04-11
-
-    Fix bug that on_header callback is still called after stream is closed
-
-commit ec519f22dcad42a06b968e24a8ee8f651464016a
-Merge: e8b213e3 2c157059
-Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2019-03-13
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2019-03-13
-
-    Merge pull request #1270 from baitisj/master
-    
-    Fix for compilation against modern LibreSSL
-
-commit e8b213e3672c4119705f664bb0ecf0b0b9ed873c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2019-03-08
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2019-03-08
-
-    Bump up version number to 1.38.0-DEV
-
-commit 2c1570595e365a18c85fd1b12c8f56516742b664
-Author:     Jeff 'Raid' Baitis <jeff@baitis.net>
-AuthorDate: 2018-12-02
-Commit:     Jeff 'Raid' Baitis <jeff@baitis.net>
-CommitDate: 2018-12-02
-
-    Fix for compilation against modern LibreSSL
+    Fix log-level is not set with cmd-line or configuration file

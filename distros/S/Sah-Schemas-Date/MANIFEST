@@ -9,6 +9,10 @@ README
 dist.ini
 lib/Data/Sah/Coerce/perl/int/str_convert_en_dow_name_to_num.pm
 lib/Data/Sah/Coerce/perl/int/str_convert_en_month_name_to_num.pm
+lib/Perinci/Sub/XCompletion/date_dow_num.pm
+lib/Perinci/Sub/XCompletion/date_dow_nums.pm
+lib/Perinci/Sub/XCompletion/date_month_num.pm
+lib/Perinci/Sub/XCompletion/date_month_nums.pm
 lib/Sah/Schema/date/day.pm
 lib/Sah/Schema/date/dow_name/en.pm
 lib/Sah/Schema/date/dow_num.pm
@@ -40,4 +44,5 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/coerce-perl-str_convert_en_dow_name_to_num.t
 t/coerce-perl-str_convert_en_month_name_to_num.t
+t/release-rinci.t
 weaver.ini

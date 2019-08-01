@@ -2,8 +2,8 @@ NAME
     App::PMUtils - Command-line utilities related to Perl modules
 
 VERSION
-    This document describes version 0.724 of App::PMUtils (from Perl
-    distribution App-PMUtils), released on 2019-06-20.
+    This document describes version 0.726 of App::PMUtils (from Perl
+    distribution App-PMUtils), released on 2019-07-25.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -88,7 +88,7 @@ FUNCTIONS
 
         Absolutify each path.
 
-    *   module* => *array[perl::modname]*
+    *   module* => *perl::modnames*
 
     *   pm => *int* (default: 1)
 
@@ -137,7 +137,7 @@ FUNCTIONS
 
         and it won't change directory if the module doesn't exist.
 
-    *   module* => *array[perl::modname]*
+    *   module* => *perl::modnames*
 
     *   pm => *int* (default: 1)
 

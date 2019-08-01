@@ -17,6 +17,7 @@
 # Packaged along with Axmud, and renamed, so that MS Windows users can use it, and so that CPAN
 #   doesn't complain about unauthorised packages
 # List of changes (besides cosmetic ones):
+#   - Added 'use warnings' as the lack of it causes Kwalitee errors
 #   - Commented out $VERSION as it causes Kwalitee errors
 #   - Added a hack to ->new_from_treeview to prevent Gtk auto-selecting the first row in the simple
 #       list (sometimes, but not all the time)
@@ -32,6 +33,7 @@
 package Games::Axmud::Obj::SimpleList;
 
 use strict;
+use warnings;
 use Carp;
 use Gtk3;
 

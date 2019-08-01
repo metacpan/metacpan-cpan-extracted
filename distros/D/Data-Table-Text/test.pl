@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
 # Test Data::Table::Text
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016

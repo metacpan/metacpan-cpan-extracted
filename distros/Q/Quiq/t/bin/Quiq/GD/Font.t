@@ -184,7 +184,7 @@ sub test_charWidth_ttf : Test(1) {
 
     my $fnt = $self->get('ttFont');
     # Verschiedene Ergebnisse möglich, je nach Font oder libgd-Version
-    $self->in($fnt->charWidth,[20,23,26]);
+    $self->in($fnt->charWidth,[20,21,23,26]);
 }
 
 sub test_charWidth_gd : Test(5) {

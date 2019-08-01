@@ -536,6 +536,7 @@ EXTRA_DIST = \
 	$(CPAN_FILES)
 
 CLEANFILES = $(bin_SCRIPTS) $(pm_DATA) $(pmstow_DATA)
+DISTCLEANFILES = Makefile.in configure Build MYMETA.*
 MAINTAINERCLEANFILES = $(dist_man_MANS) $(HTML) $(PDF) ChangeLog
 
 # this is more explicit and reliable than the config file trick
@@ -1265,6 +1266,7 @@ distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f doc/$(am__dirstamp)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"

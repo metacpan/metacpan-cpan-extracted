@@ -29,23 +29,6 @@ namespace detail {
     template <typename T> inline void _setnum (SV* sv, T val, panda::enable_if_signed_integral_t<T>*   = nullptr) { sv_setiv(sv, val); }
     template <typename T> inline void _setnum (SV* sv, T val, panda::enable_if_unsigned_integral_t<T>* = nullptr) { sv_setuv(sv, val); }
     template <typename T> inline void _setnum (SV* sv, T val, panda::enable_if_floatp_t<T>*            = nullptr) { sv_setnv(sv, val); }
-
-    #if IVSIZE < 8 // use NV(double) as storage for 64bit integer on 32-bit perls (much more range available)
-        template <> inline SV* _newnum<int64_t>  (int64_t  val) { return newSVnv(val); }
-        template <> inline SV* _newnum<uint64_t> (uint64_t val) { return newSVnv(val); }
-
-        template <> inline int64_t  _getrawnum<int64_t>  (const SV* sv) { return SvNVX(sv); }
-        template <> inline uint64_t _getrawnum<uint64_t> (const SV* sv) { return SvNVX(sv); }
-
-        template <> inline int64_t  _getnum<int64_t>  (SV* sv) { return SvNV_nomg(sv); }
-        template <> inline uint64_t _getnum<uint64_t> (SV* sv) { return SvNV_nomg(sv); }
-
-        template <> inline void _setrawnum<int64_t>  (SV* sv, int64_t  val) { SvNV_set(sv, val); }
-        template <> inline void _setrawnum<uint64_t> (SV* sv, uint64_t val) { SvNV_set(sv, val); }
-
-        template <> inline void _setnum<int64_t>  (SV* sv, int64_t  val) { sv_setnv(sv, val); }
-        template <> inline void _setnum<uint64_t> (SV* sv, uint64_t val) { sv_setnv(sv, val); }
-    #endif
 }
 
 struct Simple : Scalar {

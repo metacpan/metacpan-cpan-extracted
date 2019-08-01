@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::GeoNames
 
+1.13 2019-07-23T19:36:01Z
+	* support the children? query (@alesn)
+	* a bit more info when the response has the wrong mime type (@nigelhorne)
+
 1.12 - 2017-04-16
 	* Update the docs for GitHub Issues:
 	+ call things methods (https://github.com/briandfoy/geo-geonames/issues/13)

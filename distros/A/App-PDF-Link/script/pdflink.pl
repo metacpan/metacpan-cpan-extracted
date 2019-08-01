@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Sep 15 11:43:40 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Nov  8 19:46:23 2017
-# Update Count    : 257
+# Last Modified On: Wed Feb  6 08:20:29 2019
+# Update Count    : 258
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,7 +20,7 @@ use lib "$FindBin::Bin/../CPAN";
 use lib "$FindBin::Bin/../lib";
 
 # App::Packager is only used when running packaged.
-use App::Packager;
+use App::Packager qw( :name App::PDF::Link );
 
 use App::PDF::Link;
 

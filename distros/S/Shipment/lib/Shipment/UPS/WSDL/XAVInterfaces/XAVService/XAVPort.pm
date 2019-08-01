@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort;
-$Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort::VERSION = '3.01';
+$Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort::VERSION = '3.02';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -114,7 +114,7 @@ Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 

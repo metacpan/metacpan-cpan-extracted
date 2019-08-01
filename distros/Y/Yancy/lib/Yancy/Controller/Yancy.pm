@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.036';
+our $VERSION = '1.038';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -159,6 +159,7 @@ our $VERSION = '1.036';
 
 use Mojo::Base 'Mojolicious::Controller';
 use Yancy::Util qw( derp );
+use POSIX qw( ceil );
 
 #pod =method list
 #pod
@@ -336,7 +337,7 @@ sub list {
             $c->stash(
                 ( format => $format )x!!$format,
                 %$items,
-                total_pages => int( $items->{total} / $limit ) + 1,
+                total_pages => ceil( $items->{total} / $limit ),
             );
         },
     );
@@ -830,7 +831,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.036
+version 1.038
 
 =head1 SYNOPSIS
 

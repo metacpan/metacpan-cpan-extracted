@@ -1,12 +1,12 @@
 package Device::Firewall::PaloAlto::Errors;
-$Device::Firewall::PaloAlto::Errors::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::Errors::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(ERROR);
+our @EXPORT_OK = qw(ERROR fatal_error);
 
 use Class::Error;
 use Carp;
@@ -16,7 +16,7 @@ use Carp;
 # ABSTRACT: Parent class for errors.
 
 
-
+# FIXME: uppercase subs are reserved. This needs to be removed and replaced with 'fatal_error' below.
 sub ERROR {
     my ($errstring, $errno) = @_;
 
@@ -28,6 +28,17 @@ sub ERROR {
     return Class::Error->new($errstring, $errno);
 }
 
+
+sub fatal_error {
+    my ($errstring, $errno) = @_;
+
+    $errno //= 0;
+
+    # Are we in a one liner? If so, we croak out straight away
+    croak $errstring if in_one_liner();
+
+    return Class::Error->new($errstring, $errno, '');
+}
 
 sub in_one_liner {
     my $level = 0;
@@ -52,7 +63,7 @@ Device::Firewall::PaloAlto::Errors - Parent class for errors.
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 

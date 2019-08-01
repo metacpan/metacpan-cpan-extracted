@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::float::str_share;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-07-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,8 +9,7 @@ use warnings;
 
 sub meta {
     +{
-        v => 3,
-        enable_by_default => 0,
+        v => 4,
         might_fail => 1,
         prio => 50,
     };
@@ -53,7 +52,7 @@ Data::Sah::Coerce::perl::float::str_share - Coerce float from share string
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Coerce::perl::float::str_share (from Perl distribution Sah-Schemas-Float), released on 2019-04-08.
+This document describes version 0.005 of Data::Sah::Coerce::perl::float::str_share (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
 
 =head1 DESCRIPTION
 

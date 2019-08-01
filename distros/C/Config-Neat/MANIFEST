@@ -1,4 +1,5 @@
 bin/dump-nconf
+Build
 Build.PL
 Changes
 lib/Config/Neat.pm
@@ -7,10 +8,7 @@ lib/Config/Neat/Inheritable.pm
 lib/Config/Neat/Render.pm
 lib/Config/Neat/Schema.pm
 lib/Config/Neat/Util.pm
-Makefile.PL
-MANIFEST
-META.json
-META.yml
+MANIFEST			This list of files
 README
 t/data/inherit/inc/01.nconf
 t/data/inherit/inc/02.nconf
@@ -128,5 +126,6 @@ t/inherit.t
 t/parse.t
 t/render.t
 t/schema.t
-~dist.sh
-~distclean.sh
+Makefile.PL
+META.yml
+META.json

@@ -1,49 +1,82 @@
 ==================================================
-Changes from 2017-06-06 00:00:00 +0000 to present.
+Changes from 2018-07-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2018-06-06 19:41:00 +0000
+version 0.004 at 2019-07-23 20:56:08 +0000
 ------------------------------------------
 
-  Change: 2f08de315779cfbfc567c2847fdf7b2a96d2691d
+  Change: 20338cc2682eea30528621687c1dc0ac0c526585
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-06-06 21:39:23 +0000
+  Date : 2019-07-23 22:55:54 +0000
 
-    Use newest Device::BusPirate for macOS support 
+    v0.004 
 
-  Change: f4eb6027b59200386d3f639d9a15fa105ff8b7f5
+  Change: 355c36ddb0c70d46eb91345b956d57fa26869799
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-06-04 01:02:47 +0000
+  Date : 2019-07-23 22:51:41 +0000
 
-    Use Time::HiRes instead of select to pacify perlcritic
+    Revert "SPI: disable open drain on output pins"
 
-    Perl::Critic::Policy::BuiltinFunctions::ProhibitSleepViaSelect:
+    Such a parameter was necessary before 9892b871
+    ("Device::Chip::Adapter::BusPirate instead of Device::BusPirate"),
+    but not any longer..
 
-    "Conway discourages the use of select() for performing non-integer
-    sleeps. Although documented in perlfunc, it's something that
-    generally requires the reader to read perldoc -f select to figure out
-    what it should be doing. Instead, Conway recommends that you use the
-    Time::HiRes module when you want to sleep." 
+    Thus revert commit 71d88336999a64965e6e39dba87ddd4c21fc0306. 
 
-  Change: 06ac494335361c649e9b5dfa901068863cea9581
+------------------------------------------
+version 0.003 at 2019-07-23 20:37:50 +0000
+------------------------------------------
+
+  Change: 16886a762b3f5df29c73beabaa42ca57adaae9c5
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-06-04 01:02:46 +0000
+  Date : 2019-07-23 22:37:50 +0000
 
-    Generate top-level README.pod from command-line tool 
+    v0.003 
 
-  Change: 39842ed99e7bfd592eec8f39d0b83d32a7477524
+  Change: 00eaa54ab310db811bd9bf6f897b7c655fdf6efd
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-06-04 01:02:46 +0000
+  Date : 2019-07-23 22:36:34 +0000
 
-    Add test image to be uploaded by default 
+    BusPirate: fix typo in parameter name 
 
-  Change: 836d2312c1ac5612b2c054886b037c3b838c15b9
+------------------------------------------
+version 0.002 at 2019-07-23 20:27:24 +0000
+------------------------------------------
+
+  Change: 71d88336999a64965e6e39dba87ddd4c21fc0306
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-06-04 01:02:45 +0000
+  Date : 2019-07-23 22:27:24 +0000
 
-    Initial commit 
+    SPI: disable open drain on output pins
 
-================
-End of releases.
-================
+    It has only worked incidentally so far it seems and in fact it
+    doesn't any longer.. It now works correctly though. :-) 
+
+  Change: 3b54c768839a737af724928084102b4a0a9d0349
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-07-23 22:24:53 +0000
+
+    Documentation: document my cable pinout 
+
+  Change: 994273c4a9072052954207ada77df385ca35163e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-07-23 22:24:33 +0000
+
+    README: update example console output 
+
+  Change: 03722d9d509d7459d846f9d2987b93d73dae0655
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-06-07 00:11:45 +0000
+
+    Show progress bar while uploading header as well 
+
+  Change: 9892b8718a1556514de0d50f6d2d6b13ad02a7f1
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-06-06 23:44:49 +0000
+
+    Use Device::Chip::Adapter::BusPirate instead of Device::BusPirate 
+
+===============================================
+Plus 1 release after 2018-07-23 00:00:00 +0000.
+===============================================

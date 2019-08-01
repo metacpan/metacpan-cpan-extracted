@@ -1,5 +1,4 @@
-# gmake file for MS Windows + CitrusPerl
-# Based on 64-bit gmake and CitrusPerl 5.24 with wxWidgets 3.0.
+# gmake file for MS Windows + StrawberryPerl
 
 SCRIPT := ../../script
 

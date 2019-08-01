@@ -1,0 +1,193 @@
+NAME
+    Geo::IP6 - get country code for an ipv6 or ipv4 address
+
+VERSION
+    Version 1.0
+
+INSTALLATION
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SYNOPSIS
+            use Geo::IP6;
+
+            my $geo = Geo::IP6->new();                      # default currently uses maxmind GeoLite2
+            my $geo = Geo::IP->new(db => 'software77');     # use software77 db 
+
+            say $geo->cc("217.31.205.50");                  # returns country code CZ 
+            say $geo->cc("2001:1488:0:3::2");               # returns country code CZ
+
+    Hint: ipv6 network prefixes are sorted by network count internally for
+    performance reasons, which may result in incorrect lookups. Currently
+    (2019-07-01) there is only one minor overlap (2001:1c00::/22,ZZ vs
+    2001:1c00::/23,NL) in software77 and none in GeoLite2 ipv6db. If you
+    want to avoid this condition use "$geo->cc_exact()" for ipv6 addresses.
+    There is no cc_exact for ipv4 which is not affected.
+
+            say $geo->cc("2001:1c00::1");                   # returns country code ZZ
+            say $geo->cc_exact("2001:1c00::1");             # returns country code NL
+
+DESCRIPTION
+    This module provides functions to get the country code for ipv6 and ipv4
+    addresses using IPV6 CIDR and IPV4 RANGE files in csv format provided by
+    http://software77.net/faq.html#automated and
+    https://dev.maxmind.com/geoip/geoip2/geolite2/
+
+    It depends on LMDB_FILE for internal storage and should run on 32bit and
+    64bit sytems as the databases are quite small (around 6MB each). LMDB is
+    not platform independent and may not be portable. You can use the geoip6
+    cmdline tool to recreate all databases.
+
+    Initial setup: If there are no
+    geoip4-maxmind.lmdb/geoip4-software77.lmdb and geoip6-*.lmdb files in
+    /usr/share/geoip6/ create them with the geoip6 cmdline tool:
+
+            geoip6 update_maxmind
+
+            geoip6 update_db4_software77
+            geoip6 update_db6_software77
+
+EXPORT
+    This module does not export any functions
+
+SUBROUTINES/METHODS
+  cc
+    Lookup country code for ipv6 or ipv4 address
+
+            my $cc =  $geo->cc("2001:1488:0:3::2");   # result: CZ
+            my $cc =  $geo->cc("217.31.205.50");      # result: CZ
+
+  cc_exact
+    Lookup exact country code for ipv6. See SYNOPSIS for overlap
+    information.
+
+            my $cc =  $geo->cc_exact("2001:1c00::1");       # result: NL
+
+  new
+            my $geo = Geo::IP6->new();
+ 
+            my $geo = Geo::IP6->new(db => 'maxmind', memcache => 0, debug => 0, ip4db_file => undef, ip6db_file => undef);
+
+    db  If not set, "maxmind" is currently used. You can choose "maxmind"
+        (GeoIP2Lite) or "software77" ipv4/6 databases.
+
+    memcache
+        It is possible to load the ipv6 data into memory (probably not
+        needed as LMDB is very fast). Ipv4 dataset is using ip-ranges
+        (integers) instead of netmasks (CIDR). There is no memcache option.
+
+    debug
+        Print debug output for ipv4 addresses (mainly convert ipv4 to
+        integers back and forth to show network ranges)
+
+                [user@host ~]$ geoip6 217.31.205.50
+                ip4:217.31.205.50 = 3642740018,  dbkey:3642740736 = 217.31.208.0, dbkey_last:3642744831 = 217.31.223.255, cc:DE
+                ip4:217.31.205.50 = 3642740018,  dbkey:3642736640 = 217.31.192.0, dbkey_last:3642740735 = 217.31.207.255, cc:CZ
+                CZ
+
+                [user@host ~]# geoip6 -debug 2001:1488:0:3::2
+                Loaded database /usr/share/geoip6/geoip4-maxmind.lmdb
+                Loaded database /usr/share/geoip6/geoip6-maxmind.lmdb
+                search 32/2001:1488::
+                search 48/2001:1488::
+                search 29/2001:1488::
+                CZ
+
+    ip4db_file
+        Manually set path to ip4 database file, e.g.
+        /usr/share/geoip6/geoip4-maxmind.lmdb
+
+    ip6db_file
+        Manually set path to ip6 database file, e.g.
+        /usr/share/geoip6/geoip6-software77.lmdb
+
+geoip6 cmdline tool
+    This module includes the geoip6 program that can be used to get the
+    country code of ipv6 and ipv4 addresses on the command line.
+
+            [user@host ~] geoip6
+
+            geoip6 [options] 2001:1488:0:3::2               # returns country code CZ (2001:1488:0:3::2 = nic.cz ipv6) 
+            geoip6 217.31.205.50                            # returns country code CZ (217.31.205.50 = nic.cz ipv4)
+                                                            # options: -exact (slow but exact lookup for ipv4)
+                                                            # options: -debug (enable debug)
+                                                            # options: -memcache (load ipv6 data into ram)
+                                                            # options: -software77 (use software77 ip database)
+                                                            # options: -maxmind (use maxmind ip database; default) 
+
+            * Hint: ipv6 network prefixes are sorted by network count for performance reasons, which may result in incorrect lookups.
+            * Currently (2019-07-01) there is only one minor overlap (2001:1c00::/22,ZZ vs 2001:1c00::/23,NL)
+            * If you want to avoid this condition use "-exact" for ipv6 addresses. There is no "-exact" for ipv4 which is not affected.
+
+            geoip6 update_maxmind                           # update using maxmind GeoLite2 Country (ipv4 and ipv6 databases)
+
+            geoip6 update_db6_software77                    # update ipv6 networks from http://software77.net/faq.html#automated     
+                                                            # needs /usr/bin/curl | /usr/bin/wget, /usr/bin/gunzip, /usr/bin/unzip
+
+            geoip6 update_db4_software77                    # update ipv4 networks (same as above)
+
+            geoip6 verify_db6                               # show software77 ipv6 overlaps (ipv4 is not affected); see "geoip6 [-exact]"
+
+            geoip6 version                                  # show version number
+
+            * geoip6 uses the IpToCountry database from http://software77.net/geo-ip/ which is donationware
+            * See license http://software77.net/geo-ip/?license and FAQ http://software77.net/faq.html
+
+            * geoip6 uses GeoLite2 Country data created by MaxMind, available from https://www.maxmind.com/
+            * See https://dev.maxmind.com/geoip/geoip2/geolite2/ and https://creativecommons.org/licenses/by-sa/4.0/
+
+AUTHOR
+    GCORE, "<cpan at gcore.de>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-geo-ip6 at
+    rt.cpan.org", or through the web interface at
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-IP6>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Geo::IP6
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-IP6>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Geo-IP6>
+
+    *   CPAN Ratings
+
+        <https://cpanratings.perl.org/d/Geo-IP6>
+
+    *   Search CPAN
+
+        <https://metacpan.org/release/Geo-IP6>
+
+ACKNOWLEDGEMENTS
+    The IpToCountry databases are provided by http://software77.net/geo-ip/
+    and are donationware. Software77.net is asking for donations to cope
+    with hosting costs, see
+
+    <http://software77.net/geo-ip/?license> and
+    <http://software77.net/faq.html>
+
+    GeoLite2 data is created by MaxMind, see <https://www.maxmind.com> and
+    <https://dev.maxmind.com/geoip/geoip2/geolite2/>
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2019 by GCore GmbH. <https://gcore.de/>
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

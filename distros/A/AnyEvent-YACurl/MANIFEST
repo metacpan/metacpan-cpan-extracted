@@ -6,6 +6,7 @@ YACurl.xs
 constants.inc
 curlopt-long.inc
 curlopt-off-t.inc
+curlopt-slist.inc
 curlopt-str.inc
 lib/AnyEvent/YACurl.pm
 ppport.h
@@ -32,6 +33,7 @@ curl-src/tests/server/util.c
 curl-src/tests/server/Makefile.in
 curl-src/tests/server/tftp.h
 curl-src/tests/server/rtspd.c
+curl-src/tests/server/disabled.c
 curl-src/tests/server/socksd.c
 curl-src/tests/certs/EdelCurlRoot-ca.key
 curl-src/tests/certs/EdelCurlRoot-ca.cnf
@@ -96,6 +98,7 @@ curl-src/tests/certs/Server-localhost-sv.csr
 curl-src/tests/certs/Server-localhost-sv.crt
 curl-src/tests/certs/Server-localhost0h-sv.csr
 curl-src/tests/certs/Server-localhost.nn-sv.pub.der
+curl-src/tests/manpage-syntax.pl
 curl-src/tests/CMakeLists.txt
 curl-src/tests/valgrind.supp
 curl-src/tests/README
@@ -224,6 +227,7 @@ curl-src/tests/data/test1551
 curl-src/tests/data/test2027
 curl-src/tests/data/test104
 curl-src/tests/data/test1151
+curl-src/tests/data/test1593
 curl-src/tests/data/test177
 curl-src/tests/data/test907
 curl-src/tests/data/test129
@@ -281,6 +285,7 @@ curl-src/tests/data/test853
 curl-src/tests/data/test2060
 curl-src/tests/data/test1222
 curl-src/tests/data/test901
+curl-src/tests/data/test1563
 curl-src/tests/data/test11
 curl-src/tests/data/test1218
 curl-src/tests/data/test1035
@@ -342,6 +347,7 @@ curl-src/tests/data/test1041
 curl-src/tests/data/test1022
 curl-src/tests/data/test109
 curl-src/tests/data/test1326
+curl-src/tests/data/test1165
 curl-src/tests/data/test279
 curl-src/tests/data/test625
 curl-src/tests/data/test1152
@@ -923,6 +929,7 @@ curl-src/tests/data/test1093
 curl-src/tests/data/test1591
 curl-src/tests/data/test281
 curl-src/tests/data/test41
+curl-src/tests/data/test1173
 curl-src/tests/data/test1442
 curl-src/tests/data/test867
 curl-src/tests/data/test938
@@ -964,6 +971,7 @@ curl-src/tests/data/test1098
 curl-src/tests/data/test884
 curl-src/tests/data/test817
 curl-src/tests/data/test935
+curl-src/tests/data/test334
 curl-src/tests/data/test1443
 curl-src/tests/data/test1060
 curl-src/tests/data/test911
@@ -1208,6 +1216,7 @@ curl-src/tests/data/test2017
 curl-src/tests/data/test1108
 curl-src/tests/data/test161
 curl-src/tests/data/test1063
+curl-src/tests/data/test1523
 curl-src/tests/data/test537
 curl-src/tests/data/test1200
 curl-src/tests/data/test110
@@ -1502,6 +1511,7 @@ curl-src/tests/libtest/lib519.c
 curl-src/tests/libtest/lib507.c
 curl-src/tests/libtest/lib526.c
 curl-src/tests/libtest/lib590.c
+curl-src/tests/libtest/lib1523.c
 curl-src/tests/libtest/lib503.c
 curl-src/tests/libtest/lib556.c
 curl-src/tests/libtest/lib1508.c
@@ -1545,6 +1555,7 @@ curl-src/tests/libtest/lib583.c
 curl-src/tests/libtest/lib1553.c
 curl-src/tests/libtest/lib533.c
 curl-src/tests/libtest/lib544.c
+curl-src/tests/libtest/lib1593.c
 curl-src/tests/libtest/lib654.c
 curl-src/tests/libtest/lib567.c
 curl-src/tests/libtest/lib1528.c
@@ -1558,6 +1569,7 @@ curl-src/tests/libtest/lib510.c
 curl-src/tests/rtspserver.pl
 curl-src/tests/http2-server.pl
 curl-src/tests/stunnel.pem
+curl-src/tests/disable-scan.pl
 curl-src/tests/nroff-scan.pl
 curl-src/tests/runtests.pl
 curl-src/tests/Makefile.in
@@ -2738,6 +2750,7 @@ curl-src/lib/vtls/openssl.c
 curl-src/lib/vtls/schannel.c
 curl-src/lib/vtls/gtls.h
 curl-src/lib/vtls/sectransp.h
+curl-src/lib/vtls/wolfssl.h
 curl-src/lib/vtls/vtls.h
 curl-src/lib/vtls/polarssl_threadlock.c
 curl-src/lib/vtls/sectransp.c
@@ -2747,15 +2760,14 @@ curl-src/lib/vtls/polarssl_threadlock.h
 curl-src/lib/vtls/mbedtls.c
 curl-src/lib/vtls/mbedtls.h
 curl-src/lib/vtls/schannel.h
-curl-src/lib/vtls/cyassl.h
 curl-src/lib/vtls/polarssl.c
 curl-src/lib/vtls/nssg.h
 curl-src/lib/vtls/nss.c
 curl-src/lib/vtls/openssl.h
 curl-src/lib/vtls/polarssl.h
 curl-src/lib/vtls/gskit.c
-curl-src/lib/vtls/cyassl.c
 curl-src/lib/vtls/mesalink.c
+curl-src/lib/vtls/wolfssl.c
 curl-src/lib/vtls/mesalink.h
 curl-src/lib/vtls/schannel_verify.c
 curl-src/lib/vtls/gtls.c
@@ -3557,10 +3569,14 @@ nghttp2-src/script/README.rst
 nghttp2-src/script/Makefile.am
 nghttp2-src/script/fetch-ocsp-response
 nghttp2-src/script/Makefile.in
+nghttp2-src/third-party/url-parser/url_parser.h
+nghttp2-src/third-party/url-parser/url_parser.c
 nghttp2-src/third-party/CMakeLists.txt
-nghttp2-src/third-party/http-parser/http_parser.c
-nghttp2-src/third-party/http-parser/http_parser.h
 nghttp2-src/third-party/Makefile.am
+nghttp2-src/third-party/llhttp/include/llhttp.h
+nghttp2-src/third-party/llhttp/src/llhttp.c
+nghttp2-src/third-party/llhttp/src/http.c
+nghttp2-src/third-party/llhttp/src/api.c
 nghttp2-src/third-party/neverbleed/neverbleed.h
 nghttp2-src/third-party/neverbleed/neverbleed.c
 nghttp2-src/third-party/Makefile.in

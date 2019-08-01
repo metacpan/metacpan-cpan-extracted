@@ -1,7 +1,7 @@
 package App::manwrap::pm;
 
-our $DATE = '2017-07-29'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-07-24'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: man + Perl stuffs
@@ -18,7 +18,7 @@ App::manwrap::pm - man + Perl stuffs
 
 =head1 VERSION
 
-This document describes version 0.004 of App::manwrap::pm (from Perl distribution App-manwrap-pm), released on 2017-07-29.
+This document describes version 0.005 of App::manwrap::pm (from Perl distribution App-manwrap-pm), released on 2019-07-24.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

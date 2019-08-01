@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014-2016 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -23,66 +23,43 @@
 
 pft make - Build the PFT website
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
-pft make [options]
+B<pft make>
 
 =head1 DESCRIPTION
 
-This command builds all content within your C<ROOT/content> directory into
+This command builds all content within the C<ROOT/content> directory into
 HTML form.
 
 The content will be first organized into an internal graph representation,
-so that each entry knows which other entries refer to it. Each node of the
-graph is then mapped on a HTML template, and and saved in the
-C<ROOT/build> directory. During this process unresolved links are notified
-to the user via standard error.
+so that each entry knows which other entries refer to it.  Each node of the
+graph is then mapped on a HTML template, and and saved in the C<ROOT/build>
+directory.  During this process unresolved links are notified to the user
+via standard error.
 
 =head2 Templates and expansions
 
 HTML templates must be stored in the C<ROOT/templates> directory.
 
-The template engine in use is C<Template::Alloy>. In a nutshell, it allows
+The template engine in use is C<Template::Alloy>.  In a nutshell, it allows
 to expand simple code blocks within a HTML (or text) skeleton, as for
 example in:
 
     <title>[% site.title %]</title>
 
-Loops and conditionals are also supported. The library is well documented,
-so you may consult the relevant references for learning the supported
-mini-language.
+Loops and conditionals are also supported.  See the C<Template::Alloy> user
+manual for learning the supported mini-language.
 
-You may take advantage of the default templates which are installed by
-default during the initialization process (C<pft init>):
-
-=over
-
-=item C<default.html>
-
-is a simple but reasonable template suitable for any page;
-
-=item C<dump_page.html>
-
-is a test template which gets expanded with all the available variables
-for each page. This constitutes a useful test, and a reference for
-available keys if you want to build your own template.
-
-=back
-
-More default installed templates may be added in future.
-
-If you are writing a template, keep in mind they are expected to be
-encoded as by locale.
-
-You are also encouraged to share your own templates: any help is
-appreciated! Please encode your shared templates as utf-8.
+A bunch of pre-defined, templates are installed by default during the
+initialization process (see L<pft-init(1)>).
 
 =head2 The output website
 
-The output encoding depends on a configuration key in C<pft.yaml> (see the
-manual of C<pft init>). The template is supposed to define the encoding in
-a proper way, that is by making use of the C<[% site.encoding %]> key in
-the HTML header:
+The output encoding depends on a configuration key in C<pft.yaml> (see
+L<pft-init(1)>). The template is expected to define the encoding in a proper
+way, that is by making use of the C<[% site.encoding %]> key in the HTML
+header:
 
     <head>
     <meta http-equiv="content-type"
@@ -90,24 +67,56 @@ the HTML header:
     ...
     </head>
 
-The result of a build is a group of I<relocatable> HTML pages: pages are
-referring each other via relative links. This means that the generated
-site will work fine even if moved or copied remotely on another system.
+The result of a build is a collection of HTML pages.  Since C<a href> links
+are relative, the generated site will work fine even if moved or copied
+remotely on another system (see L<pft-pub(1)>).
 
-Besides the generated site, the C<ROOT/build> directory will also contain
-links to everything under the C<ROOT/inject>. This meets the common
-requirement of placing additional files in the root directory of online
-websites (typical case being the C<.htaccess> file of Apache).
+=head2 Injected data
+
+The B<pft make> command will populate the C<ROOT/build> directory.
+
+Additional static data to inject in the resulting website can be placed in
+the C<ROOT/inject> directory.  This meets the common requirement of placing
+additional files in the root directory of online websites (typical case
+being the C<.htaccess> file of Apache).
+
+The L<pft-make(1)> command will first attempt to hard-link the injected files,
+from C<ROOT/inject> to C<ROOT/build>.  If this fails (e.g. because
+hard-links are not supported by the filesystem) soft-links are attempted.
+If nothing else succeeds, B<pft make> will make a copy of each injected
+file.
 
 =head1 OPTIONS
 
 =over
 
-=item --help
+=item B<--help>
 
-Show this guide
+Show this guide.
 
 =back
+
+=head1 EXIT STATUS
+
+=over
+
+=item
+
+1 in case of option parsing failure.
+
+=item
+
+2 if it was impossible to construct the filesystem tree.
+
+=item
+
+3 in case of corrupt configuration.
+
+=back
+
+=head1 SEE ALSO
+
+L<pft(1)>, L<pft-gen-rss(1)>, L<pft-init(1)>
 
 =cut
 

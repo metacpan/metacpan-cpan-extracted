@@ -1,0 +1,74 @@
+{
+   "abstract" : "toolkit for implementing voting methods.",
+   "author" : [
+      "John Karr <brainbuz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Vote-Count",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Data::Printer" : "0",
+            "Exporter" : "0",
+            "Exporter::Easy" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Path::Tiny" : "0.108",
+            "Storable" : "3.15",
+            "Time::Piece" : "0",
+            "YAML::XS" : "0",
+            "feature" : "0",
+            "namespace::autoclean" : "0",
+            "parent" : "0",
+            "perl" : "5.022",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "JSON::MaybeXS" : "0",
+            "Test2::Bundle::More" : "0",
+            "Test2::Harness" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test2::V0" : "0",
+            "Test::Exception" : "0",
+            "perl" : "5.022"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brainbuz/Vote-Count/issues"
+      },
+      "homepage" : "https://github.com/brainbuz/Vote-Count",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brainbuz/Vote-Count.git",
+         "web" : "https://github.com/brainbuz/Vote-Count"
+      }
+   },
+   "version" : "0.013",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+}
+

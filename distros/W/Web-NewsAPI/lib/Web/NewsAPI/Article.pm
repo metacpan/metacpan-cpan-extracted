@@ -76,10 +76,12 @@ Web::NewsAPI::Artcle - Object class representing a News API article
  );
 
  say "Here are some top American-news headlines about science...";
- my @articles = $newsapi->top_headlines(
+ my $result = $newsapi->top_headlines(
     category => 'science', country => 'us',
  );
- for my $article ( @articles ) {
+ # $result is now a Web::NewsAPI::Result object.
+ # We can call its 'articles' method to get a list of article objects:
+ for my $article ( $result->articles ) {
     say $article->title;
     say $article->description;
     print "\n";
@@ -89,8 +91,8 @@ Web::NewsAPI::Artcle - Object class representing a News API article
 
 Objects of this class represent a News API news article. Generally, you
 won't create these objects yourself; you'll get them as a result of
-calling L<methods on a Web::NewsAPI object|Web::NewsAPI/"Object
-methods">.
+calling methods on a L<Web::NewsAPI> object or a L<Web::NewsAPI::Result>
+object.
 
 =head1 METHODS
 
@@ -100,39 +102,47 @@ These are all read-only attributes, based on information provided by
 News API. (They use camelCase because they just copy the attribute names
 from News API itself.)
 
-=over
+=head3 source
 
-=item source
+ my $source = $article->source;
+ say "The source of this article was " . $source->name;
 
 A L<Web::NewsAPI::Source> object.
 
-=item author
+=head3 author
+
+ my $author = $article->author;
+ say "$author wrote this article.";
 
 A string.
 
-=item title
+=head3 title
+
+ my $title = $article->title;
 
 A string.
 
-=item description
+=head3 description
 
-A string.
+ my $description = $article->description;
 
-=item url
+=head3 url
+
+ my $url = $article->url;
 
 A L<URI> object. (Possibly undefined.)
 
-=item urlToImage
+=head3 urlToImage
+
+ my $image_url = $article->urlToImage;
 
 A L<URI> object. (Possibly undefined.)
 
-=item publishedAt
+=head3 publishedAt
+
+ my $publication_datetime = $article->publishedAt;
 
 A L<DateTime> object.
-
-
-
-=back
 
 =head1 AUTHOR
 

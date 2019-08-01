@@ -20035,7 +20035,8 @@
 
                 # Convert the zoom factor from a percentage to a number that can be stored in
                 #   GA::Obj::Regionmap->magnification (e.g. convert 133.33% to 1.33)
-                $newMag = sprintf('%.2f', ($zoom / 100));
+#                $newMag = sprintf('%.2f', ($zoom / 100));
+                $newMag = Math::Round::nearest(0.01, ($zoom / 100));
 
             } else {
 

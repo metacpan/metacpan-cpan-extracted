@@ -138,10 +138,10 @@ if (!$is_windows)
 else
 {
 	push @opts,
-		'ZMQ_HAVE_WINDOWS',
+		'ZMQ_HAVE_WINDOWS';
 }
 
-if (!$is_solaris || $Config{osvers} eq '2.10')
+if (!$is_solaris || (int ((split ('.', $Config{osvers}))[1]) > 10))
 {
 	# Solaris 10 doesn't have strnlen
 	push @opts,
@@ -225,7 +225,7 @@ my @cc_objs = map { substr ($_, 0, -2) . 'o' } (@cc_srcs);
 my @cpp_srcs = (glob ('deps/libzmq/src/*.cpp'));
 my @cpp_objs = map { substr ($_, 0, -3) . 'o' } (@cpp_srcs);
 
-my @c_srcs = (glob ('deps/libzmq/src/*.c'), glob ('deps/libzmqraw/*.c'));
+my @c_srcs = (glob ('deps/libzmq/src/*.c'), glob ('deps/libzmqraw/*.c'), glob ('deps/libzmq/external/sha1/*.c'));
 if ($is_windows)
 {
 	push @c_srcs, glob ('deps/libzmq/external/wepoll/*.c');
@@ -255,6 +255,14 @@ sub MY::c_o {
 .cpp\$(OBJ_EXT):
 	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.cpp $std_switch $out_switch\$@
 };
+
+	if ($is_gcc) {
+		# disable parallel builds
+		$line .= qq{
+
+.NOTPARALLEL:
+};
+	}
 	return $line;
 }
 
@@ -297,7 +305,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.35",
+  "VERSION" => "0.36",
   "test" => {
     "TESTS" => "t/*.t"
   }

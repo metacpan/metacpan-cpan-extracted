@@ -6,6 +6,7 @@ lib/IxNetwork/IxNetworkLegacy.pm
 lib/IxNetwork/IxNetworkSecure.pm
 lib/IxNetwork/checkDependencies.pm
 lib/IxNetwork/cpanfile
+lib/IxNetwork/dependencies/validate.pm
 LICENSE
 MANIFEST
 README.rst

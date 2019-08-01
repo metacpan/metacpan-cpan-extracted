@@ -6,11 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 31 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/int/str_convert_en_dow_name_to_num.pm',
     'Data/Sah/Coerce/perl/int/str_convert_en_month_name_to_num.pm',
+    'Perinci/Sub/XCompletion/date_dow_num.pm',
+    'Perinci/Sub/XCompletion/date_dow_nums.pm',
+    'Perinci/Sub/XCompletion/date_month_num.pm',
+    'Perinci/Sub/XCompletion/date_month_nums.pm',
     'Sah/Schema/date/day.pm',
     'Sah/Schema/date/dow_name/en.pm',
     'Sah/Schema/date/dow_num.pm',

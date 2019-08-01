@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog::TH;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.897'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.899'; # VERSION
 
 use 5.010;
 use strict;
@@ -139,6 +139,44 @@ sub gen_any_or_all_of {
     $c->add_ccl($cd, $jccl);
 }
 
+sub clause_if {
+    my ($self, $cd) = @_;
+    my $c  = $self->compiler;
+    my $cv = $cd->{cl_value};
+
+    my ($cond, $then, $else) = @$cv;
+
+    unless (!ref($cond) && ref($then) eq 'ARRAY' && !$else) {
+        $c->_die($cd, "Sorry, for 'if' clause, I currently can only handle COND=str (expr), THEN=array (schema), and no ELSE");
+    }
+
+    # COND
+    my $comp_cond = $c->expr($cd, $cond);
+
+    # THEN
+    my $comp_then;
+    {
+        local $cd->{ccls} = [];
+        local $cd->{spath} = [@{ $cd->{spath} }, 'if'];
+        my $sch  = $then;
+        my %iargs = %{$cd->{args}};
+        $iargs{outer_cd}             = $cd;
+        $iargs{schema}               = $sch;
+        $iargs{schema_is_normalized} = 0;
+        $iargs{indent_level}++;
+        my $icd  = $c->compile(%iargs);
+        my @code = (
+            $icd->{result},
+        );
+        $comp_then = join("", @code);
+    }
+
+    $c->add_ccl(
+        $cd,
+        $c->expr_ternary($comp_cond, $comp_then, $c->true, {err_msg=>''}),
+    );
+}
+
 1;
 # ABSTRACT: Base class for programming-language emiting compiler's type handlers
 
@@ -154,7 +192,7 @@ Data::Sah::Compiler::Prog::TH - Base class for programming-language emiting comp
 
 =head1 VERSION
 
-This document describes version 0.897 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2019-07-19.
+This document describes version 0.899 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2019-07-25.
 
 =for Pod::Coverage ^(compiler|clause_.+|handle_.+|gen_.+|set_tmp_data_term|restore_data_term)$
 

@@ -7,6 +7,7 @@ README.pod
 cpanfile
 lib/Web/NewsAPI.pm
 lib/Web/NewsAPI/Article.pm
+lib/Web/NewsAPI/Result.pm
 lib/Web/NewsAPI/Source.pm
 lib/Web/NewsAPI/Types.pm
 minil.toml

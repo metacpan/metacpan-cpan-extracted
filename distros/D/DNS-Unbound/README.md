@@ -63,7 +63,7 @@ To decode some common record types, see ["CONVENIENCE FUNCTIONS"](#convenience-f
 
 Also **NOTE:** libunbound doesn’t seem to offer effective controls for
 timing out a synchronous query.
-If timeouts are relevant for you, you probably want
+If timeouts are relevant for you, you probably need
 to use `resolve_async()` instead.
 
 ## $query = _OBJ_->resolve\_async( $NAME, $TYPE \[, $CLASS \] );
@@ -71,11 +71,10 @@ to use `resolve_async()` instead.
 Like `resolve()` but starts an asynchronous query rather than a
 synchronous one.
 
-This returns an instance of `DNS::Unbound::AsyncQuery`, which
-subclasses [Promise::ES6](https://metacpan.org/pod/Promise::ES6). You may `cancel()` this promise object.
-The promise resolves with either the same hash reference as
-`resolve()` returns, or it rejects with a [DNS::Unbound::X](https://metacpan.org/pod/DNS::Unbound::X) instance
-that describes the failure.
+This returns an instance of [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS::Unbound::AsyncQuery).
+
+[See below](#methods-for-dealing-with-asynchronous-queries) for
+the methods you’ll need to use in tandem with this one.
 
 ## _OBJ_->enable\_threads()
 
@@ -92,6 +91,12 @@ This option is not well-tested. If in doubt, just skip it.
 
 Sets a configuration option. Returns _OBJ_.
 
+Note that this is basically just a passthrough to the underlying
+`ub_ctx_set_option()` function and is thus subject to the same limitations
+as that function; for example, you can’t set `verbosity` after the
+configuration has been “finalized”. (So use `debuglevel()` for that
+instead.)
+
 ## $value = _OBJ_->get\_option( $NAME )
 
 Gets a configuration option’s value.
@@ -101,7 +106,7 @@ Gets a configuration option’s value.
 Sets the debug level (an integer). Returns _OBJ_.
 
 As of libunbound v1.9.2, this is just a way to set the `verbosity`
-option after configuration is finalized.
+option regardless of whether the configuration is finalized.
 
 ## _OBJ_->debugout( $FD\_OR\_FH )
 
@@ -116,7 +121,7 @@ Gives the libunbound version string.
 
 # METHODS FOR DEALING WITH ASYNCHRONOUS QUERIES
 
-The following methods correspond to their equivalents in libunbound:
+The following methods correspond to their equivalents in libunbound.
 
 ## _OBJ_->poll()
 
@@ -137,7 +142,7 @@ The following methods correspond to their equivalents in libunbound:
 # CONVENIENCE FUNCTIONS
 
 Note that [Socket](https://metacpan.org/pod/Socket) provides the `inet_ntoa()` and `inet_ntop()`
-functions for decoding `A` and `AAAA` records.
+functions for decoding the values of `A` and `AAAA` records.
 
 The following may be called either as object methods or as static
 functions (but not as class methods):
@@ -146,8 +151,9 @@ functions (but not as class methods):
 
 Decodes a DNS name. Useful for, e.g., `NS` query results.
 
-Note that this will normally include a trailing `.` because of the
-trailing NUL byte in an encoded DNS name.
+Note that this function’s return will normally include a trailing `.`
+because of the trailing NUL byte in an encoded DNS name. This is normal
+and expected.
 
 ## $strings\_ar = decode\_character\_strings($encoded)
 

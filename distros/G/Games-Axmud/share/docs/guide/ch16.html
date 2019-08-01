@@ -9,13 +9,13 @@
 <p><a href="ch15.html">Previous</a> <a href="index.html">Index</a> <a href="ch17.html">Next</a></p>
 <hr>
 <h1>16 Axmud for visually-impaired users</h1>
-<p>Axmud can be run with settings optimised for users with a visual impairment. These settings don't require JAWS, NVDA or any other screenreader, but they do require a text-to-speech engine of some kind.</p>
+<p>Axmud can be run with settings optimised for users with a visual impairment.</p>
+<p>The rest of this Section assumes that you're using optimised settings. These settings don't require JAWS, NVDA or any other screenreader, but they do require a text-to-speech engine of some kind.</p>
 <p>On Microsoft Windows, the Axmud installer includes a copy of the eSpeak engine. No further configuration is required. Simply run the installer, find Axmud in your system's Start menu, and open the menu item that's marked for visually-impaired users.</p>
 <p>Most modern Linux systems have the eSpeak engine installed 'out-of-the-box'. If not, you should install it yourself before starting Axmud.</p>
 <h2>16.1 Compatible speech engines</h2>
 <p>Axmud supports other speech engines, too. (Not all of them are free.)</p>
 <p>On Microsoft Windows, Axmud also supports espeak-ng and Swift (which is a part of Cepstral). On Linux, Axmud supports espeak-ng, Flite, Festival and Swift.</p>
-<p>The rest of this Section assumes that you're using optimised settings.</p>
 <h2>16.2 Connecting to a world</h2>
 <p>When you start Axmud, a series of dialogue windows will appear, asking you to select a world, a character and a password.</p>
 <p>The first dialogue window asks you to select a world.  Axmud comes with numerous pre-configured worlds, so you can either choose one of those, or you can create a new world.</p>
@@ -97,6 +97,9 @@
 <p>The text-to-speech configuration called <strong>receive</strong> is used for text received from the world, but there are a number of other configurations ready for your use.</p>
 <p>The <strong>system</strong> configuration changes the sound of the speech used to read system messages. You might change this configuration's word speed by typing <strong>;config system speed 200</strong>.</p>
 <p>The <strong>error</strong> configuration is used to read system error messages. The <strong>command</strong> configuration is used to read out commands sent to the world.  The <strong>dialogue</strong> configuration is used to read out text from dialogue windows.</p>
+<h3>16.5.4 Updating all configurations</h3>
+<p>There's an easy way to change the speech engine used by all configurations. This is really useful if, for example, you find that eSpeak is not working on your system, and you want to use espeak-ng instead.</p>
+<p>Just type <strong>;config all engine esng</strong>. This will change all the configurations that you're allowed to modify. (By the way, you can only use the word <strong>all</strong> in this situation.)</p>
 <h2>16.6 Configuring text-to-speech for tasks</h2>
 <p>Axmud comes with a number of built-in tasks, some of which have text-to-speech capabilities.  The configuration called <strong>attack</strong>, <strong>chat</strong>, <strong>divert</strong>, <strong>locator</strong>, <strong>status</strong> and <strong>watch</strong> change the sound of the voice used by each of those tasks.</p>
 <p>Tasks often have their own task windows. When using optimised settings, these windows don't open (but the tasks are still running in the background).</p>

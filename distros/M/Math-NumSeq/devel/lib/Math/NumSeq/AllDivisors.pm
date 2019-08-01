@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -18,6 +18,7 @@
 
 # http://www.polprimos.com/imagenespub/poldiv3v.jpg
 #
+# NOT RIGHT
 
 
 package Math::NumSeq::AllDivisors;
@@ -27,7 +28,7 @@ use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 use Math::Factor::XS 0.39 'factors';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -83,14 +84,16 @@ sub values_min {
 }
 
 #------------------------------------------------------------------------------
+# A027746 excluding 1, but n=1 reckoned having divisor 1
 # A027749 excluding 1
+# A027750 including 1
 # A027751 excluding n including 1, being proper divisors
 
 # A161901 with sqrt(n) repeated if an integer
 # A161906 list divisors <= sqrt(n)
 # A161908 list divisors >= sqrt(n)
 
-my %oeis_anum = ('all,ascending'  => 'A027750',
+my %oeis_anum = ('all,ascending'  => 'A027746',
                  'all,descending' => 'A056538',
                  # 'composites,ascending' => '',
 
@@ -254,7 +257,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2018 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

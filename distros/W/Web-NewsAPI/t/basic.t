@@ -16,46 +16,55 @@ my $newsapi = Web::NewsAPI->new(
     ua      => $ua,
 );
 
+# Try to make a query with insufficient parameters, and let News API complain.
 eval {
-    my @headlines = $newsapi->top_headlines;
+    my $headlines_set = $newsapi->top_headlines->articles;
 };
 like( $@, qr/400/, 'Got expected error from a bad API call' );
 
 {
 my @headlines = $newsapi->top_headlines( 'q' => 'foo' );
 is ( @headlines, 2, 'Got expected number of top headlines' );
+}
+
+{
+my $headlines_set = $newsapi->top_headlines( 'q' => 'foo' );
+my @headlines = $headlines_set->articles;
+is ( @headlines, 2, 'Got expected number of top headlines' );
 is ( ref $headlines[0], 'Web::NewsAPI::Article', 'Results are article objects' );
 is ($headlines[0]->author,
     'Christine Wang',
     'Article objects populated with data OK',
 );
-is ($newsapi->total_results, 38, 'Total results is correct');
+is ($headlines_set->total_results, 38, 'Total results is correct');
 }
 
 {
-my @headlines = $newsapi->everything(
+my $headlines_set = $newsapi->everything(
     from => DateTime->new( year=> 2010, month=> 6, time_zone=>'UTC' ),
 );
+my @headlines = $headlines_set->articles;
 is ( @headlines, 2, 'Got expected number of search results' );
 is ( ref $headlines[0], 'Web::NewsAPI::Article', 'Results are article objects' );
 is ($headlines[0]->author,
     'Jolie Kerr',
     'Article objects populated with data OK'
 );
-is ($newsapi->total_results, 426, 'Total results is correct');
+is ($headlines_set->total_results, 426, 'Total results is correct');
 }
 
 {
-my @headlines = $newsapi->everything(
+my $headlines_set = $newsapi->everything(
     domains=>['example.com','another.example.com'],
 );
+my @headlines = $headlines_set->articles;
 is ( @headlines, 2, 'Got expected number of search results' );
 is ( ref $headlines[0], 'Web::NewsAPI::Article', 'Results are article objects' );
 is ($headlines[0]->author,
     'Jolie Kerr',
     'Article objects populated with data OK'
 );
-is ($newsapi->total_results, 426, 'Total results is correct');
+is ($headlines_set->total_results, 426, 'Total results is correct');
 }
 
 {

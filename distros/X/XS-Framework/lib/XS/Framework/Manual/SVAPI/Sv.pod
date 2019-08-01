@@ -382,6 +382,10 @@ section, for example:
 
 All methods, which work with magic are NULL-unsafe.
 
+=head2 void swap (Sv& lh, Sv& rh)
+
+Swaps underlying SV* between C<lh> and C<rh>
+
 =head1 SEE ALSO
 
 L<XS::Framework>

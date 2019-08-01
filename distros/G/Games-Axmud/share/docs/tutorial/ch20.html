@@ -11,19 +11,19 @@
 <h1>20 - Miscellaneous features (2)</h1>
 <h4>Table of Contents</h4>
 <ul>
-<li><a href="#x.1">x.1 Movement commands</a></li>
-<li><a href="#x.2">x.2 Interpolated commands</a></li>
-<li><a href="#x.3">x.3 Multi, speed, bypass and perl commands</a></li>
-<li><a href="#x.4">x.4 Sound</a></li>
-<li><a href="#x.5">x.5 Displaying help</a></li>
-<li><a href="#x.6">x.6 Automatic logins</a></li>
-<li><a href="#x.7">x.7 Client, script and task functions</a></li>
-<li><a href="#x.8">x.8 Mathematical functions</a></li>
-<li><a href="#x.9">x.9 That's all, folks!</a></li>
+<li><a href="#x.1">20.1 Movement commands</a></li>
+<li><a href="#x.2">20.2 Interpolated commands</a></li>
+<li><a href="#x.3">20.3 Multi, speed, bypass and perl commands</a></li>
+<li><a href="#x.4">20.4 Sound</a></li>
+<li><a href="#x.5">20.5 Displaying help</a></li>
+<li><a href="#x.6">20.6 Automatic logins</a></li>
+<li><a href="#x.7">20.7 Client, script and task functions</a></li>
+<li><a href="#x.8">20.8 Mathematical functions</a></li>
+<li><a href="#x.9">20.9 That's all, folks!</a></li>
 </ul>
 <hr>
 <p>We're almost finished. Don't give up now!</p>
-<h2><a name="x.1">x.1 Movement commands</a></h2>
+<h2><a name="20.1">20.1 Movement commands</a></h2>
 <p>Commands can be typed in Axmud's main window. A <em>world command</em> like <strong>north</strong> is sent directly to the world.</p>
 <pre><code>    SEND "north"
 </code></pre>
@@ -41,7 +41,7 @@
     RELAY command$, substring$
 </code></pre>
 <p>The <em>substring</em> should be any part of the main string which you want obscured when it's displayed in the main window.</p>
-<h2><a name="x.2">x.2 Interpolated commands</a></h2>
+<h2><a name="20.2">20.2 Interpolated commands</a></h2>
 <p>It would be useful if you could write an Axbasic script that works at several different worlds.</p>
 <p>For example, if one world expects you to <strong>kill orc</strong> but the other expects you to <strong>attack orc</strong>, we <em>could</em> write some code like this:</p>
 <pre><code>    PEEK world$ = "world.current.name"
@@ -75,7 +75,7 @@
 <pre><code>    say text to victim
 </code></pre>
 <p>...in which case, the world would receive <strong>say hello to gandalf</strong> instead.</p>
-<h2><a name="x.3">x.3 Multi, speed, bypass and perl commands</a></h2>
+<h2><a name="20.3">20.3 Multi, speed, bypass and perl commands</a></h2>
 <p>A <em>multi comand</em> is executed in every session. For example, you might type:</p>
 <pre><code>    :shout I'm going for lunch
 </code></pre>
@@ -109,7 +109,7 @@
 <p>The Axbasic equivalent is:</p>
 <pre><code>    PERL " /$a = 5; $b = 2; $a * $b; "
 </code></pre>
-<h2><a name="x.4">x.4 Sound</a></h2>
+<h2><a name="20.4">20.4 Sound</a></h2>
 <p>Assuming that Axmud sound is turned on, you can play a sound effect.</p>
 <pre><code>    PLAY "alarm"
 </code></pre>
@@ -125,7 +125,7 @@
 <pre><code>    SPEAK "Hello, world!", "flite"
 </code></pre>
 <p>If you don't specify a configuration, Axbasic uses its own configuration, called <strong>script</strong>.</p>
-<h2><a name="x.5">x.5 Displaying help</a></h2>
+<h2><a name="20.5">20.5 Displaying help</a></h2>
 <p>All of Axbasic's keywords and functions are fully documented. You can display the help files in the main window by using a HELP statement.</p>
 <p>The following two lines are identical:</p>
 <pre><code>    HELP "print"
@@ -142,7 +142,7 @@
 <pre><code>    HELP "chr$"
     HELP "chr"
 </code></pre>
-<h2><a name="x.6">x.6 Automatic logins</a></h2>
+<h2><a name="20.6">20.6 Automatic logins</a></h2>
 <p>Logging in to a MUD is sometimes as simple as typing a username and password, but sometimes it's a lot more complicated.</p>
 <p>Axmud can handle simple logins for itself, but otherwise you'll have to write some kind of script to handle everything - a Perl plugin, a mission, or an Axbasic script.</p>
 <p>Here's an example of a trivial login script. It must always contain a LOGIN statement, which tells Axmud that the login process is complete.</p>
@@ -160,7 +160,7 @@
     END
 </code></pre>
 <p>Once you've composed your script, you should edit the current world profile and tell it to use that script. (Type <strong>;editworld</strong> and use the <strong>Settings</strong> tab.)</p>
-<h2><a name="x.7">x.7 Client, script and task functions</a></h2>
+<h2><a name="20.7">20.7 Client, script and task functions</a></h2>
 <p><strong>Clientname$ ()</strong>, <strong>Clientversion$ ()</strong> and <strong>Clientdate$ ()</strong> return information about the current installation of Axmud. Their return values look something like this:</p>
 <pre><code>    Axmud
     1.1.405
@@ -183,7 +183,7 @@
 </code></pre>
 <p>The argument can be a task label (e.g. <strong>"status"</strong> or <strong>"stat"</strong>) or the name used internally by Axmud (e.g. <strong>"status_task"</strong>). Most tasks, including the Status task, can only have one copy running at a time. If there <em>are</em> multiple copies running, the unique name of the task that was created first is returned.</p>
 <p><strong>Counttask ()</strong> takes the same kind of arguments as <strong>Findtask$ ()</strong> - a task label or a task's internal name. It returns the number of copies of the task that are running right now. (The number might be 0.)</p>
-<h2><a name="x.8">x.8 Mathematical functions</a></h2>
+<h2><a name="20.8">20.8 Mathematical functions</a></h2>
 <p>Axbasic provides a number of functions for trigonometry. (We can't think of any reason why you would need them, but nevertheless, they're available.)</p>
 <p>For example, to get the cosine of an angle, you can use the <strong>Cos ()</strong> function.</p>
 <pre><code>    PRINT Cos (1)
@@ -212,7 +212,7 @@
 <pre><code>    PRINT Min (1, 10)
     PRINT Min (10, 1)
 </code></pre>
-<h2><a name="x.9">x.9 That's all, folks!</a></h2>
+<h2><a name="20.9">20.9 That's all, folks!</a></h2>
 <p>That's the end of the tutorial! Don't forget that you can get help at the <a href="https://axmud.sourceforge.io/forum/index.php">Axmud forum</a>, if you need it!</p>
 <hr>
 <p><a href="ch19.html">Previous</a> <a href="index.html">Index</a> <a href="ch21.html">Next</a></p>

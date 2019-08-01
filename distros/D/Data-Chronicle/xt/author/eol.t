@@ -19,7 +19,8 @@ my @files = (
     't/chronicle.t',
     't/publish.t',
     't/rc/.perlcriticrc',
-    't/rc/.perltidyrc'
+    't/rc/.perltidyrc',
+    't/redis.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

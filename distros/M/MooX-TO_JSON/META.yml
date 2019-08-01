@@ -1,0 +1,26 @@
+---
+abstract: 'Generate a TO_JSON method from attributes.'
+author:
+  - 'John Napiorkowski <jjn1056@gmail.com>'
+build_requires:
+  JSON::MaybeXS: '1.004000'
+  Moo: '2.003004'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-TO_JSON
+requires:
+  Class::Method::Modifiers: '2.12'
+resources:
+  bugtracker: https://github.com/jjn1056/MooX-TO_JSON/issues
+  homepage: https://github.com/jjn1056/MooX-TO_JSON
+  repository: https://github.com/jjn1056/MooX-TO_JSON.git
+version: '0.001'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

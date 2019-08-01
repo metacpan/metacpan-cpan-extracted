@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort;
-$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '3.01';
+$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '3.02';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -164,7 +164,7 @@ Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 

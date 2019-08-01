@@ -1,23 +1,40 @@
-Revision history for App-CSelUtils
+0.082   2019-07-29  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
-0.07    2016-09-01 (PERLANCAR)
+	- [refactor][imcompatible change] Extract common subroutine: foosel(),
+	  add --select-action, rename --actions to --node-actions, tweak dump
+	  output. Rename package varibles.
+
+
+0.081   2019-07-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add action dump.
+
+
+0.080   2019-07-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention podsel, ppisel.
+
+
+0.07    2016-09-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention CSel::Examples.
 
 
-0.06    2016-09-01 (PERLANCAR)
+0.06    2016-09-01  Released-By: PERLANCAR
 
 	- [Bugfix] ddsel: Don't skip root node if it's the only result.
 
 
-0.05    2016-08-27 (PERLANCAR)
+0.05    2016-08-27  Released-By: PERLANCAR
 
 	- Add utility: ddsel.
 
 
-0.04    2016-08-27 (PERLANCAR)
+0.04    2016-08-27  Released-By: PERLANCAR
 
         - Provide common options and actions to accommodate jsonsel & yamlsel.
 
@@ -26,16 +43,16 @@ Revision history for App-CSelUtils
         - [doc] Mention htmlsel, orgsel, jsonsel, yamlsel.
 
 
-0.03    2016-05-28 (PERLANCAR)
+0.03    2016-05-28  Released-By: PERLANCAR
 
 	- Add stuffs for orgsel & htmlsel.
 
 
-0.02    2016-03-20 (PERLANCAR)
+0.02    2016-03-20  Released-By: PERLANCAR
 
          - Updates.
 
 
-0.01    2016-03-13 (PERLANCAR)
+0.01    2016-03-13  Released-By: PERLANCAR
 
          - First release.

@@ -45,7 +45,7 @@
    "provides" : {
       "Calendar::Saka" : {
          "file" : "lib/Calendar/Saka.pm",
-         "version" : "1.40"
+         "version" : "1.41"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Saka"
       }
    },
-   "version" : "1.40",
+   "version" : "1.41",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

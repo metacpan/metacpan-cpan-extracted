@@ -1,0 +1,24 @@
+NAME
+
+    App::p5find - A collection of programs for locating certain constructs
+    in Perl5 code.
+
+DESCRIPTION
+
+    This distribution provides a collection of programs that search through
+    Perl5 code structure for certain patterns. Such as: string literals
+    with interpolations, bareword tokens, vairable in method names.
+
+    While those code patterns may be discoverable with sufficient amount of
+    ack/grep-fu, this projects aims to reduce the amount of false recalls
+    to the point that it becomes usefull for tasks such as hunting for
+    anti-patterns.
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+LICENSE
+
+    MIT
+

@@ -34,7 +34,7 @@ use base qw/ Astro::FITS::HdrTrans::FITS /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.61";
+$VERSION = "1.62";
 
 # in each class we have three sets of data.
 #   - constant mappings
@@ -52,6 +52,7 @@ my %CONST_MAP = (
 my %UNIT_MAP = (
                 MSBID              => 'MSBID',
                 MSB_TRANSACTION_ID => 'MSBTID',
+                SHIFT_TYPE         => "OPER_SFT",
                );
 
 # Create the translation methods.

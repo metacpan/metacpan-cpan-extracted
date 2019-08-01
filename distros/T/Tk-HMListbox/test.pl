@@ -36,6 +36,7 @@ my %red = qw(-bg red -fg white);
 my %green = qw(-bg green -fg white);
 my %white = qw(-fg black);
 
+my @hlb23ops = ($Tk::HListbox::VERSION >= 2.3) ? ('-font', 'Helvetica -11 bold', '-ipady', 1, '-tpady', 1) : ();
 my $ml = $mw->Scrolled('HMListbox',
     -scrollbars => 'osoe',
     -background => 'white', 
@@ -47,6 +48,7 @@ my $ml = $mw->Scrolled('HMListbox',
     -sortable => 1,
     -bd=>2,
     -relief=>'sunken',
+    @hlb23ops,
     -columns=>[
          [qw/-itemtype imagetext -text ~D -textwidth 3/, %green],
          [qw/-text ~Mode -textwidth 10/, %red],

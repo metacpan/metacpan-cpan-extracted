@@ -10,11 +10,11 @@ MikroTik::API - Client to MikroTik RouterOS API
 
 =head1 VERSION
 
-Version 1.0.5
+Version 1.1.0
 
 =cut
 
-our $VERSION = '1.0.5';
+our $VERSION = '1.1.0';
 
 
 =head1 SYNOPSIS
@@ -104,6 +104,7 @@ sub connect {
                 PeerPort => $self->get_port(),
                 Proto => 'tcp',
                 SSL_cipher_list => 'HIGH',
+                SSL_verify_mode => $self->get_ssl_verify(),
                 Timeout => $self->get_timeout(),
             ) or die "failed connect or ssl handshake ($!: ". IO::Socket::SSL::errstr() .')'
         );
@@ -150,29 +151,37 @@ sub login {
         $self->connect();
     }
 
+    # RouterOS post v6.43 has new authentication method, thus pushing login/pass in the very first request.
     my @command = ('/login');
+    push( @command, '=name=' . $self->get_username() );
+    push( @command, '=password=' . $self->get_password() );
     my ( $retval, @results ) = $self->talk( \@command );
+    die 'disconnected while logging in' if !defined $retval;
     if ( $retval > 1 ) {
         die 'error during establishing login: ' . $results[0]{'message'};
     }
-    my $challenge = pack("H*",$results[0]{'ret'});
-    my $md5 = Digest::MD5->new();
-    $md5->add( chr(0) );
-    $md5->add( $self->get_password() );
-    $md5->add( $challenge );
 
-    @command = ('/login');
-    push( @command, '=name=' . $self->get_username() );
-    push( @command, '=response=00' . $md5->hexdigest() );
-    ( $retval, @results ) = $self->talk( \@command );
+    # if we got "=ret=" in response - then assuming this is old style AUTH
+    if ( exists $results[0]{'ret'} ) {
+        my $challenge = pack("H*",$results[0]{'ret'});
+        my $md5 = Digest::MD5->new();
+        $md5->add( chr(0) );
+        $md5->add( $self->get_password() );
+        $md5->add( $challenge );
+
+        @command = ('/login');
+        push( @command, '=name=' . $self->get_username() );
+        push( @command, '=response=00' . $md5->hexdigest() );
+        ( $retval, @results ) = $self->talk( \@command );
+    }
     die 'disconnected while logging in' if !defined $retval;
     if ( $retval > 1 ) {
-        die $results[0]{'message'};
+            die 'error during establishing login: ' . $results[0]{'message'};
     }
+
     if ( $self->get_debug() > 0 ) {
         print 'Logged in to '. $self->get_host() .' as '. $self->get_username() ."\n";
     }
-
     return $self;
 }
 
@@ -190,8 +199,25 @@ sub logout {
 
 =head2 $api->cmd( $command, \%attributes )
 
+    # Set with no key required
+    # /system identity set name=MyNewMikroTik
     my $returnvalue = $api->cmd( '/system/identity/set', { 'name' => 'MyNewMikroTik' } );
     print "Name set\n" if ($returnvalue < 2);
+
+    # Set keyed on the name "local"
+    # /interface bridge set local fast-forward=no
+    my $returnvalue = $api->cmd( '/interface/bridge/set', { '.id' => 'local', 'fast-forward' => 'no' } );
+    print "Bridge fast-forward turned off\n" if ($returnvalue < 2);
+
+    # Set keyed on internal key
+    # /interface bridge set *cc fast-forward=no
+    my $returnvalue = $api->cmd( '/interface/bridge/set', { '.id' => '*cc', 'fast-forward' => 'no' } );
+    print "Bridge fast-forward turned off\n" if ($returnvalue < 2);
+
+    # Reset a value
+    # /routing bgp peer set testpeer !keepalive-time
+    my $returnvalue = $api->cmd( '/routing/bgp/peer/set', { '.id' => 'testpeer', 'keepalive-time' => undef } );
+    print "Reset keepalive-time on testpeer\n" if ($returnvalue < 2);
 
 =cut
 
@@ -200,40 +226,67 @@ sub cmd {
     my @command = ($cmd);
 
     foreach my $attr ( keys %{$attrs_href} ) {
-        push( @command, '='. $attr .'='. $attrs_href->{$attr} );
+        if (defined($attrs_href->{$attr})) {
+            push( @command, '='. $attr .'='. $attrs_href->{$attr} );
+        } else {
+            push( @command, '=!'. $attr );
+        }
     }
     my ( $retval, @results ) = $self->talk( \@command );
-    die 'disconnected' if !defined $retval;
-    if ($retval > 1) {
-        die $results[0]{'message'};
-    }
     return ( $retval, @results );
 }
 
 =head2 $api->query( $command, \%attributes, \%conditions )
 
+    # Get all interfaces of type ether
     my ( $ret_interface_print, @interfaces ) = $api->query('/interface/print', { '.proplist' => '.id,name' }, { type => 'ether' } );
     foreach my $interface ( @interfaces ) {
         print "$interface->{name}\n";
     }
 
+    # get all default routes that don't have the dynamic attribute
+    my ( $ret_route_print, @routes ) = $api->query('/ip/route', { '.proplist' => '.id,dst-address' }, { 'dst-address' => '0.0.0.0/0', 'dynamic'=>undef } );
+    foreach my $route ( @routes ) {
+        print "$route->{'dst-address'}\n";
+    }
+
+    # get all default routes that don't have the dynamic attribute (alternate using array ref)
+    my ( $ret_route_print, @routes ) = $api->query('/ip/route', { '.proplist' => '.id,dst-address' }, [ 'dst-address=0.0.0.0/0', '-dynamic' ] );
+    foreach my $route ( @routes ) {
+        print "$route->{'dst-address'}\n";
+    }
+
+    # get all default routes along with those with the dynamic attribute (note 'or' operator as last arg)
+    my ( $ret_route_print, @routes ) = $api->query('/ip/route', { '.proplist' => '.id,dst-address' }, [ 'dst-address=0.0.0.0/0', 'dynamic', '#|' ] );
+    foreach my $route ( @routes ) {
+        print "$route->{'dst-address'}\n";
+    }
+
 =cut
 
 sub query {
-    my ( $self, $cmd, $attrs_href, $queries_href ) = @_;
+    my ( $self, $cmd, $attrs_href, $queries_ref ) = @_;
 
     my @command = ($cmd);
     foreach my $attr ( keys %{$attrs_href} ) {
-        push( @command, '='. $attr .'='. $attrs_href->{$attr} );
+        push( @command, '='. $attr .'='. (defined($attrs_href->{$attr}) ? $attrs_href->{$attr} : ''));
     }
-    foreach my $query (keys %{$queries_href} ) {
-        push( @command, '?'. $query .'='. $queries_href->{$query} );
+    if (defined($queries_ref)) {
+        if (ref($queries_ref) eq 'HASH') {
+            foreach my $query (keys %{$queries_ref} ) {
+                if (defined($queries_ref->{$query})) {
+                    push( @command, '?'. $query .'='. $queries_ref->{$query} );
+                } else {
+                    push( @command, '?-'. $query);
+                }
+            }
+        } elsif (ref($queries_ref) eq 'ARRAY') {
+            foreach my $query (@{$queries_ref} ) {
+                push( @command, '?'. $query);
+            }
+        }
     }
     my ( $retval, @results ) = $self->talk( \@command );
-    die 'disconnected' if !defined $retval;
-    if ($retval > 1) {
-        die $results[0]{'message'};
-    }
     return ( $retval, @results );
 }
 
@@ -299,7 +352,22 @@ has 'password' => ( is => 'rw', reader => 'get_password', writer => 'set_passwor
 
 =cut
 
-has 'use_ssl' => ( is => 'rw', reader => 'get_use_ssl', writer => 'set_use_ssl', isa => 'Bool' );
+has 'use_ssl'    => ( is => 'rw', reader => 'get_use_ssl', writer => 'set_use_ssl', isa => 'Bool' );
+
+=head2 $api->get_ssl_verify(), $api->set_ssl_verify( $zero_or_one )
+
+=cut
+
+has 'ssl_verify' => ( is => 'rw', reader => 'get_ssl_verify', writer => 'set_ssl_verify', isa => 'Int', default => 1 );
+
+=head2 $api->get_new_auth_method(), $api->set_new_auth_method( $zero_or_one )
+
+DEPRECATED: does not have any effect any longer. Login looks up wether new method is possible and falls back to old method. This parameter will be removed in future.
+Auth method changed in RouterOS v6.43+ (https://wiki.mikrotik.com/wiki/Manual:API#Initial_login) and reduces login by one call but sends password in plaintext.
+
+=cut
+
+has 'new_auth_method' => ( is => 'rw', reader => 'get_new_auth_method', writer => 'set_new_auth_method', isa => 'Bool', default => 0 );
 
 =head2 $api->get_autoconnect(), $api->set_autoconnect( $zero_or_one )
 
@@ -365,6 +433,10 @@ can be useful for advanced users, but too complex for daily use
 
 =cut
 
+# Send a sentence (command) and then read sentences back until we
+# get a '!done' sentence
+# returns 1 on success or 2 on trap, 3 on fatal
+#       along with an array of hashref for the results
 sub talk {
     my ( $self, $sentence_aref ) = @_;
 
@@ -381,7 +453,7 @@ sub talk {
                 $self->login();
             }
             else {
-                die 'could not talk to MikroTik';
+                return( 3, {message => 'could not talk to MikroTik'});
             }
         }
     }
@@ -390,16 +462,31 @@ sub talk {
     my ( @reply, @attrs );
     my $retval;
 
-    while ( ( $retval, @reply ) = $self->_read_sentence() ) {
-	last if !defined $retval;
-        my %dataset;
+    # Keep reading sentences until we get one that begins with '!done'
+    # Put each sentence into a hashref
+    while ( @reply = $self->_read_sentence()) {
+        if ($reply[0] eq '!done') {
+            $retval //= 1; # Set this if it has not already been set
+        } elsif ($reply[0] eq '!re') {
+            $retval = 1;
+        } elsif ($reply[0] eq '!trap') {
+            $retval = 2;
+        } elsif ($reply[0] eq '!fatal') {
+            $retval = 3;
+        }
+       my %dataset;
         foreach my $line ( @reply ) {
+            # Only consider words of the form "=var=value"
             if ( my ($key, $value) = ( $line =~ /^=([^=]+)=(.*)/s ) ) {
                 $dataset{$key} = $value;
             }
         }
         push( @attrs, \%dataset ) if (keys %dataset);
-        if ( $retval > 0 ) { last; }
+        last if ($reply[0] eq '!done');
+    }
+    if (!@reply) {
+        # network error
+        return( 3, {message => 'disconnected'});
     }
     return ( $retval, @attrs );
 }
@@ -415,12 +502,20 @@ sub raw_talk {
     my ( @reply, @response );
     my $retval;
 
-    while ( ( $retval, @reply ) = $self->_read_sentence() ) {
-	last if !defined $retval;
+    while ( @reply = $self->_read_sentence() ) {
+        if ($reply[0] eq '!done') {
+            $retval //= 0;
+        } elsif ($reply[0] eq '!re') {
+            $retval = 1;
+        } elsif ($reply[0] eq '!trap') {
+            $retval = 2;
+        } elsif ($reply[0] eq '!fatal') {
+            $retval = 3;
+        }
         foreach my $line ( @reply ) {
             push ( @response, $line );
         }
-        if ( $retval > 0 ) { last; }
+        last if ($reply[0] eq '!done');
     }
     return ( $retval, @response );
 }
@@ -492,33 +587,30 @@ sub _write_len {
     }
 }
 
+# Read words until we get a word with zero length. All sentences
+# begin with a word that begins with '!'
+# Returns an array of words
 sub _read_sentence {
     my ( $self ) = @_;
 
     my ( @reply );
-    my $retval;
 
-    while ( my $word = $self->_read_word() ) {
-        if ($word =~ /!done/) {
-            $retval = 1;
-        }
-        elsif ($word =~ /!trap/) {
-            $retval = 2;
-        }
-        elsif ($word =~ /!fatal/) {
-            $retval = 3;
-        }
-	else {
-	    $retval //= 0;
-	}
+    my $word = $self->_read_word();
+    return if (!$word);
+
+    die "Protocol error (sentence word does being with \"!\"\n" if ($word !~ /^!/);
+
+    do {
         push( @reply, $word );
         if ( $self->get_debug() > 2 ) {
             print "<<< $word\n"
         }
-    }
-    return ( $retval, @reply );
+    } while ( $word = $self->_read_word() );
+    return (@reply );
 }
 
+# Read a word from the Mikrotik
+# Return the word read (maybe zero length string), or undef on EOF or error
 sub _read_word {
     my ( $self ) = @_;
 
@@ -533,15 +625,16 @@ sub _read_word {
         while ( $length_received < $len ) {
             my $line = '';
             $self->get_socket()->read( $line, $len );
-	    last if !defined($line) || $line eq ''; # EOF
+            last if !defined($line) || $line eq ''; # EOF
             $ret_line .= $line; # append to $ret_line, in case we didn't get the whole word and are going round again
             $length_received += length $line;
         }
-	return if length($ret_line) != $len; # EOF or a protocol error
+        return if length($ret_line) != $len; # EOF or a protocol error
     }
     return $ret_line;
 }
 
+# Read the length of the next word
 sub _read_len {
     my ( $self ) = @_;
 
@@ -552,6 +645,9 @@ sub _read_len {
     my $len = $self->_read_byte();
 
     if ( ($len & 0x80) == 0x00 ) {
+        if ( $self->get_debug() > 4 ) {
+            print "read_len got $len\n";
+        }
         return $len
     }
     elsif ( ($len & 0xC0) == 0x80 ) {
@@ -610,11 +706,11 @@ Object-Orientated Rebuild of prior contributions, based on:
 
 =item *
 
-inital release from cheesegrits in MikroTik forum: http://forum.mikrotik.com/viewtopic.php?p=108530#p108530
+initial release from cheesegrits in MikroTik forum: http://forum.mikrotik.com/viewtopic.php?p=108530#p108530
 
 =item *
 
-added timeoutparameter and fixes by elcamlost: https://github.com/elcamlost/mikrotik-perl-api/commit/10e5da1fd0ccb4a249ed3047c1d22c97251f666e
+added C<timeout parameter> and fixes by elcamlost: https://github.com/elcamlost/mikrotik-perl-api/commit/10e5da1fd0ccb4a249ed3047c1d22c97251f666e
 
 =item *
 
@@ -642,7 +738,7 @@ Moose is more common than Moo or similar
 
 =head1 AUTHOR
 
-Martin Gojowsky, C<< <martin at gojowsky.de> >>
+Martin Gojowsky, C<martin at gojowsky.de>
 
 =head1 BUGS
 
@@ -658,19 +754,15 @@ automatically be notified of progress on your bug as I make changes.
 
 Quite high compile time because of using Moose. Use of a persistent running framework recommended.
 
-= item *
+=item *
 
 Login to RouterOS v6.43rc* not possible because of a changed auth method using plaintext passwords
 
 =back
 
-=head1 TODOS
+=head1 TODO
 
 =over 4
-
-=item *
-
-Merge auth mathod patch for RouterOS v6.43rc* and later. Requires some more work to prevent accidentally sent plaintext passwords: https://github.com/martin8883/MikroTik-API/pull/4
 
 =item *
 
@@ -683,7 +775,6 @@ Add a parameter talk_timeout as an alternative for probe_before_talk that enable
 You can find documentation for this module with the perldoc command.
 
     perldoc MikroTik::API
-
 
 You can also look for information at:
 

@@ -22,7 +22,7 @@ no_index:
 provides:
   Calendar::Saka:
     file: lib/Calendar/Saka.pm
-    version: '1.40'
+    version: '1.41'
 requires:
   Calendar::Plugin::Renderer: '0.15'
   Date::Saka::Simple: '0.23'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Calendar-Saka.git
-version: '1.40'
+version: '1.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

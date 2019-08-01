@@ -1,19 +1,30 @@
-Revision history for String-Wildcard-Bash
+0.040   2019-07-25  Released-By: PERLANCAR; Urgency: medium
 
-0.03    2015-09-10 (PERLANCAR)
+        - [new] Add convert_wildcard_to_re().
+
+	- [internal] Rename named captures, also capture literals to make things
+          like convert_wildcard_to_re() easier to implement.
+
+	- [bugfix] Handle escaped comma in bash brace.
+
+	- Capture ** in bash_joker to allow different behavior from * in
+	  the future.
+
+
+0.03    2015-09-10  Released-By: PERLANCAR
 
 	- Add function: convert_wildcard_to_sql.
 
 	- Make regex exportable ($RE_WILDCARD_BASH).
 
 
-0.02    2015-01-03 (PERLANCAR)
+0.02    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.01    2014-07-26 (SHARYANTO)
+0.01    2014-07-26  Released-By: SHARYANTO
 
         - First release.

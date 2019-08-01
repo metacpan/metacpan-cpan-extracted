@@ -1,6 +1,7 @@
 package Mail::SimpleList::Alias;
 
 use strict;
+use warnings;
 
 use Mail::Action::Address;
 use Mail::Address;
@@ -11,7 +12,7 @@ use Class::Roles
     does => 'address_described';
 
 use vars qw( $VERSION );
-$VERSION = '0.94';
+$VERSION = '0.95';
 
 sub new
 {
@@ -219,5 +220,6 @@ L<Mail::Action::Address>, the parent class.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016, chromatic.  All rights reserved.  This module is
-distributed under the same terms as Perl itself.  How nice.
+Copyright (c) 2003 - 2016 chromatic. All rights reserved. This module is
+distributed under the same terms as Perl 5.30, in the hope that it is useful
+but under no warranty.

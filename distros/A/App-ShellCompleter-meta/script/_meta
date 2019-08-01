@@ -1,0 +1,115 @@
+#!perl
+
+our $DATE = '2019-07-05'; # DATE
+our $VERSION = '0.004'; # VERSION
+
+# FRAGMENT id=shcompgen-hint completer=1 for=meta
+
+use strict;
+use warnings;
+
+use Shell::Completer;
+
+declare_completer(
+    options => {
+        'help' => undef,
+        'whitespace|ws' => undef,
+        'version' => undef,
+        'themes' => undef,
+        'remote' => undef,
+        'check' => undef,
+        'category=s' => sub {
+            require Complete::Acme::MetaSyntactic;
+
+            my %args = @_;
+            my $word = $args{word};
+
+            my $theme = $args{words}[0];
+            Complete::Acme::MetaSyntactic::complete_meta_category(
+                word => $word, theme => $theme);
+        },
+        'sources' => undef,
+        '<>' => sub {
+            require Complete::Acme::MetaSyntactic;
+
+            my %args = @_;
+            my $word = $args{word};
+
+            if ($args{type} eq 'arg') {
+                if ($args{argpos} == 0) {
+                    return Complete::Acme::MetaSyntactic::complete_meta_theme_and_category(
+                        word => $word);
+                } elsif ($args{argpos} == 1) {
+                    require Complete::Number;
+                    return Complete::Number::complete_int(
+                        word => $word,
+                        min => 1,
+                    );
+                }
+                undef;
+            }
+            undef;
+        },
+    },
+);
+
+# ABSTRACT: Shell completer for meta (Acme::MetaSyntactic CLI)
+# PODNAME: _meta
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+_meta - Shell completer for meta (Acme::MetaSyntactic CLI)
+
+=head1 VERSION
+
+This document describes version 0.004 of _meta (from Perl distribution App-ShellCompleter-meta), released on 2019-07-05.
+
+=head1 SYNOPSIS
+
+To install, install this module and then in your bash (and/or bash startup
+file):
+
+ complete -C _meta meta
+
+or, you can use L<shcompgen> to do that for you automatically.
+
+Now L<meta> has bash completion:
+
+ % meta -<tab>                 ;# complete list of options
+ % meta <tab>                  ;# complete theme
+ % meta christmas --cat <tab>  ;# complete category
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ShellCompleter-meta>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ShellCompleter-meta>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-meta>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

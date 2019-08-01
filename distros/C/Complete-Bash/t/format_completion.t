@@ -56,5 +56,10 @@ subtest "path_sep ::" => sub {
        "a::\nb::\n");
 };
 
+subtest "message" => sub {
+    like(format_completion({message=>"foo"}),
+         qr/\Afoo *\n \n\z/);
+};
+
 DONE_TESTING:
 done_testing;

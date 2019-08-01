@@ -6,21 +6,21 @@
 
 ####Table of Contents
 
-* [x.1 Movement commands](#x.1)
-* [x.2 Interpolated commands](#x.2)
-* [x.3 Multi, speed, bypass and perl commands](#x.3)
-* [x.4 Sound](#x.4)
-* [x.5 Displaying help](#x.5)
-* [x.6 Automatic logins](#x.6)
-* [x.7 Client, script and task functions](#x.7)
-* [x.8 Mathematical functions](#x.8)
-* [x.9 That's all, folks!](#x.9)
+* [20.1 Movement commands](#x.1)
+* [20.2 Interpolated commands](#x.2)
+* [20.3 Multi, speed, bypass and perl commands](#x.3)
+* [20.4 Sound](#x.4)
+* [20.5 Displaying help](#x.5)
+* [20.6 Automatic logins](#x.6)
+* [20.7 Client, script and task functions](#x.7)
+* [20.8 Mathematical functions](#x.8)
+* [20.9 That's all, folks!](#x.9)
 
 ---
 
 We're almost finished. Don't give up now!
 
-##<a name="x.1">x.1 Movement commands</a>
+##<a name="20.1">20.1 Movement commands</a>
 
 Commands can be typed in Axmud's main window. A *world command* like **north** is sent directly to the world.
 
@@ -45,7 +45,7 @@ RELAY has an optional second argument.
 
 The *substring* should be any part of the main string which you want obscured when it's displayed in the main window.
 
-##<a name="x.2">x.2 Interpolated commands</a>
+##<a name="20.2">20.2 Interpolated commands</a>
 
 It would be useful if you could write an Axbasic script that works at several different worlds.
 
@@ -94,7 +94,7 @@ To greet a character, your Axbasic script would therefore use a line like this:
 
 ...in which case, the world would receive **say hello to gandalf** instead.
 
-##<a name="x.3">x.3 Multi, speed, bypass and perl commands</a>
+##<a name="20.3">20.3 Multi, speed, bypass and perl commands</a>
 
 A *multi comand* is executed in every session. For example, you might type:
 
@@ -140,7 +140,7 @@ The Axbasic equivalent is:
 
         PERL " /$a = 5; $b = 2; $a * $b; "
 
-##<a name="x.4">x.4 Sound</a>
+##<a name="20.4">20.4 Sound</a>
 
 Assuming that Axmud sound is turned on, you can play a sound effect.
 
@@ -163,7 +163,7 @@ SPEAK takes an optional second argument, which is the text-to-speech configurati
 
 If you don't specify a configuration, Axbasic uses its own configuration, called **script**.
 
-##<a name="x.5">x.5 Displaying help</a>
+##<a name="20.5">20.5 Displaying help</a>
 
 All of Axbasic's keywords and functions are fully documented. You can display the help files in the main window by using a HELP statement.
 
@@ -185,7 +185,7 @@ It's not necessary to include the $ character, so both of the following lines wi
         HELP "chr$"
         HELP "chr"
 
-##<a name="x.6">x.6 Automatic logins</a>
+##<a name="20.6">20.6 Automatic logins</a>
 
 Logging in to a MUD is sometimes as simple as typing a username and password, but sometimes it's a lot more complicated.
 
@@ -208,7 +208,7 @@ Here's an example of a trivial login script. It must always contain a LOGIN stat
 
 Once you've composed your script, you should edit the current world profile and tell it to use that script. (Type **;editworld** and use the **Settings** tab.)
 
-##<a name="x.7">x.7 Client, script and task functions</a>
+##<a name="20.7">20.7 Client, script and task functions</a>
 
 **Clientname$ ()**, **Clientversion$ ()** and **Clientdate$ ()** return information about the current installation of Axmud. Their return values look something like this:
 
@@ -242,7 +242,7 @@ The argument can be a task label (e.g. **"status"** or **"stat"**) or the name u
 
 **Counttask ()** takes the same kind of arguments as **Findtask$ ()** - a task label or a task's internal name. It returns the number of copies of the task that are running right now. (The number might be 0.)
 
-##<a name="x.8">x.8 Mathematical functions</a>
+##<a name="20.8">20.8 Mathematical functions</a>
 
 Axbasic provides a number of functions for trigonometry. (We can't think of any reason why you would need them, but nevertheless, they're available.)
 
@@ -282,7 +282,7 @@ In this particular case, the order of the arguments doesn't matter. Both of thes
         PRINT Min (1, 10)
         PRINT Min (10, 1)
 
-##<a name="x.9">x.9 That's all, folks!</a>
+##<a name="20.9">20.9 That's all, folks!</a>
 
 That's the end of the tutorial! Don't forget that you can get help at the [Axmud forum](https://axmud.sourceforge.io/forum/index.php), if you need it!
 

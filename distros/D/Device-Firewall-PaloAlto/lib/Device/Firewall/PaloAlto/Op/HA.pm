@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::HA;
-$Device::Firewall::PaloAlto::Op::HA::VERSION = '0.1.8';
+$Device::Firewall::PaloAlto::Op::HA::VERSION = '0.1.9';
 use strict;
 use warnings;
 use 5.010;
@@ -99,7 +99,7 @@ Device::Firewall::PaloAlto::Op::HA - Palo Alto high availability information.
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.9
 
 =head1 SYNOPSIS
 

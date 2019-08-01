@@ -1,9 +1,15 @@
-0.245   2018-03-27 (PERLANCAR)
+0.246   2019-07-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Didn't use Term::Size::chars() correctly resulting in
+	  undefined width.
+
+
+0.245   2018-03-27  Released-By: PERLANCAR
 
 	- [ux] Redisplay progress bar after printing log message.
 
 
-0.244   2018-03-26 (PERLANCAR)
+0.244   2018-03-26  Released-By: PERLANCAR
 
         - Add option: freq.
 
@@ -14,13 +20,13 @@
         - [optimize] Calculate color in template once, not in every update().
 
 
-0.243   2018-03-21 (PERLANCAR)
+0.243   2018-03-21  Released-By: PERLANCAR
 
 	- [Bugfix] Check -t against the actual handle used, not hardcoded
 	  STDOUT or STDERR.
 
 
-0.242   2018-03-21 (PERLANCAR)
+0.242   2018-03-21  Released-By: PERLANCAR
 
 	- [Incompatible change] [ux] Default output to STDERR instead of
 	  STDOUT, like logging.
@@ -31,14 +37,14 @@
 	- [opt] No need to add extra color reset.
 
 
-0.241   2018-03-17 (PERLANCAR)
+0.241   2018-03-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [dist] Forgot to add entry to Changes.
 
 
-0.240   2018-03-17 (PERLANCAR)
+0.240   2018-03-17  Released-By: PERLANCAR
 
 	- Implement template.
 
@@ -46,7 +52,7 @@
           finish().
 
 
-0.23    2017-06-21 (PERLANCAR)
+0.23    2017-06-21  Released-By: PERLANCAR
 
         - Support patching Log::ger::Output::Screen in addition to
           Log::Any::Adapter::Screen.
@@ -54,32 +60,32 @@
         - Update documentation about COLOR being observed by Color::ANSI::Util.
 
 
-0.22    2016-03-11 (PERLANCAR)
+0.22    2016-03-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to Text::ANSI::Util 0.22 (::NonWideUtil removed).
 
 
-0.21    2015-08-29 (PERLANCAR)
+0.21    2015-08-29  Released-By: PERLANCAR
 
 	- Typo.
 
 
-0.20    2015-08-29 (PERLANCAR)
+0.20    2015-08-29  Released-By: PERLANCAR
 
 	- [Bugfix] fix dependencies, add option wide=>1 to explicitly
 	  enable wide character support and load the correct module
 	  [RT#106719].
 
 
-0.19    2015-06-19 (PERLANCAR)
+0.19    2015-06-19  Released-By: PERLANCAR
 
 	- Patch Log::Any::Adapter::Screen instead of ::ScreenColoredLevel,
 	  because that's what the new Perinci::CmdLine is using.
 
 
-0.18    2015-01-28 (PERLANCAR)
+0.18    2015-01-28  Released-By: PERLANCAR
 
 	- [Bugfix] Fixes so that show_delay is reset again after log is
 	  printed.
@@ -87,19 +93,19 @@
 	- [doc] Complete incomplete sentence.
 
 
-0.17    2015-01-28 (PERLANCAR)
+0.17    2015-01-28  Released-By: PERLANCAR
 
 	- Put patch for working together with
 	  Log::Any::Adapter::ScreenColoredLevel here, moved from
 	  Perinci::CmdLine(::Lite).
 
 
-0.16    2015-01-23 (PERLANCAR)
+0.16    2015-01-23  Released-By: PERLANCAR
 
 	- Support eliding message with String::Elide::Parts.
 
 
-0.15    2015-01-22 (PERLANCAR)
+0.15    2015-01-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -107,85 +113,85 @@
 	  options.
 
 
-0.14    2015-01-22 (PERLANCAR)
+0.14    2015-01-22  Released-By: PERLANCAR
 
 	- Add option: show_delay (and method: keep_delay_showing).
 
 
-0.13    2015-01-03 (PERLANCAR)
+0.13    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.12    2014-10-14 (PERLANCAR)
+0.12    2014-10-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Include screenshot.
 
 
-0.11    2014-10-14 (PERLANCAR)
+0.11    2014-10-14  Released-By: PERLANCAR
 
         - Add option: fh, to allow output other than to STDOUT (thanks Przemek
           Wesołek).
 
 
-0.10    2014-07-04 (SHARYANTO)
+0.10    2014-07-04  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Avoid division by zero.
 
 
-0.09    2014-02-26 (SHARYANTO)
+0.09    2014-02-26  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Fix cleanup (\b doesn't erase).
 
 
-0.08    2014-02-26 (SHARYANTO)
+0.08    2014-02-26  Released-By: SHARYANTO
 
         - Add cleanup() to allow, e.g. Perinci::CmdLine, to clean the at the end
           of application run.
 
 
-0.07    2013-09-11 (SHARYANTO)
+0.07    2013-09-11  Released-By: SHARYANTO
 
         - No functional changes. Require Win32::Console::ANSI on Windows.
 
 
-0.06    2013-09-11 (SHARYANTO)
+0.06    2013-09-11  Released-By: SHARYANTO
 
         - Provide defaults and allow install on Windows.
 
 
-0.05    2013-09-03 (SHARYANTO)
+0.05    2013-09-03  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Missed some adjustment for Progress::Any 0.10.
 
 
-0.04    2013-09-03 (SHARYANTO)
+0.04    2013-09-03  Released-By: SHARYANTO
 
         - No functional changes. Update to Progress::Any 0.10.
 
 
-0.03    2013-07-18 (SHARYANTO)
+0.03    2013-07-18  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Fix RGB color.
 
 
-0.02    2013-05-18 (SHARYANTO)
+0.02    2013-05-18  Released-By: SHARYANTO
 
         - Bugfix: didn't display when target is undefined.
 
 
-0.01    2013-05-18 (SHARYANTO)
+0.01    2013-05-18  Released-By: SHARYANTO
 
         - First, early release.

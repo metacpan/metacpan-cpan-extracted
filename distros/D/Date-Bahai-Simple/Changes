@@ -1,5 +1,8 @@
 Revision history for Date::Bahai::Simple
 
+0.26  Sat Jul 27 11:00:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.25  Tue May 28 14:30:00 2019
       - Updated dependency on Date::Utils v0.26.
 

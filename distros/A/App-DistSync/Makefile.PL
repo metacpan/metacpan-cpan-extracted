@@ -15,7 +15,7 @@ my $prereq_pm = {
         'File::Path'            => 2.00,
         'File::Spec'            => 3.00,
         'LWP'                   => 6.08,
-        'URI'                   => 1.64,
+        'URI'                   => 1.70,
         'YAML::Tiny'            => 1.00,
     };
 
@@ -31,14 +31,15 @@ WriteMakefile(
     'BUILD_REQUIRES'    => $build_requires,
     'PREREQ_PM'         => $prereq_pm,
     'EXE_FILES'         => $exefiles,
-    'AUTHOR'            => 'Serz Minus (Lepenkov Sergey) http://www.serzik.com <minus@mail333.com>',
-    'LICENSE'           => 'gpl',
+    'AUTHOR'            => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
+    'LICENSE'           => 'perl',
     'META_MERGE'        => {
         resources => {
             homepage        => 'http://app-distsync.sourceforge.net',
             repository      => 'https://svn.code.sf.net/p/app-distsync/code/trunk',
-            license         => 'http://opensource.org/licenses/gpl-license.php',
+            license         => 'https://dev.perl.org/licenses',
         },
     },
 );
+
 1;

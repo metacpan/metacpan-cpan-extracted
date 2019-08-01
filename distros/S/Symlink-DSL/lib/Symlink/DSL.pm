@@ -1,5 +1,5 @@
 package Symlink::DSL;
-$Symlink::DSL::VERSION = '0.2.1';
+$Symlink::DSL::VERSION = '0.2.2';
 use strict;
 use warnings;
 use autodie;
@@ -100,7 +100,7 @@ sub handle_line
             die
 "unacceptable character $1 in line <$l> in @{[$self->manifest]} !";
         }
-        if ( $str =~ m%((?:\.\.)|(?:/\./)|(?:/.\z)|(?:\A-)|(?:/-))% )
+        if ( $str =~ m%((?:\.\.)|(?:/\./)|(?:/\.\z)|(?:\A-)|(?:/-))% )
         {
             die
 "unacceptable sequence $1 in line <$l> in @{[$self->manifest]} !";
@@ -176,7 +176,7 @@ __END__
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 

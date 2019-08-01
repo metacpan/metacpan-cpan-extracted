@@ -41,10 +41,18 @@ my %META = (
   },
 );
 
+my $xt = $ENV{EXTENDED_TESTING};
 my %MM_ARGS = (
   PREREQ_PM => {
-    ($] >= 5.010 ? () : ('MRO::Compat' => 0)),
+    ("$]" >= 5.010 ? () : ('MRO::Compat' => 0)),
   },
+  ($xt ? (
+    TEST_REQUIRES => {
+      %{ $META{prereqs}{runtime}{recommends} },
+      %{ $META{prereqs}{develop}{recommends} },
+    },
+    test => { TESTS => 't/*.t xt/*.t' },
+  ):()),
 );
 
 ## BOILERPLATE ###############################################################

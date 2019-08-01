@@ -1,5 +1,6 @@
 .gitignore
 Changes
+lib/Archive/7zip.pm
 lib/Archive/SevenZip.pm
 lib/Archive/SevenZip/API/ArchiveTar.pm
 lib/Archive/SevenZip/API/ArchiveZip.pm
@@ -12,6 +13,9 @@ META.json
 META.yml
 README
 README.mkdn
+sysdeps.yml
+t/01-constructor.t
+t/01-identity-7z.t
 t/01-identity.t
 t/02-add-scalar.t
 t/02_main.t

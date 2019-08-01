@@ -1,5 +1,10 @@
 Revision history for Perl extension Minilla
 
+v3.1.5 2019-07-25T14:14:10Z
+    - Older Test::Pause::Permissions may have bugs. we need to depend on the latest version (#258)
+    - Add perl 5.28, 5.30 to travis.yml (akiym #267)
+    - Fix the usage of `git submodule foreach` for git 2.22.0 (bluefeet #268, #269)
+
 v3.1.4 2018-12-30T05:46:15Z
     - Support travis-ci.com badge (#253)
 
@@ -88,7 +93,7 @@ v3.0.2 2016-06-03T23:07:05Z
     Date:   Thu Apr 21 15:26:11 2016 +0200
 
         added requirements from cpan_meta information
-        
+
         so that the generate Build.PL file has the correct information for Module::Build
 
     commit 8924842129238ba3fbc29e68cbecb49807cea1bd
@@ -96,7 +101,7 @@ v3.0.2 2016-06-03T23:07:05Z
     Date:   Tue Mar 22 20:33:19 2016 +0900
 
         Delete system() function call
-        
+
         Delete system() function call.
         Some operating system don't have 'cat' cmd.
 
@@ -105,7 +110,7 @@ v3.0.2 2016-06-03T23:07:05Z
     Date:   Tue Mar 22 12:17:43 2016 +0900
 
         Always use 'git.config'
-        
+
         Both 'git.config' and environment variables are set, then
         environment variables are used, this causes test failure.
 

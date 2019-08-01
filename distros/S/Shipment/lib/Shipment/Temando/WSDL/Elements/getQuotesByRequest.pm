@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getQuotesByRequest;
-$Shipment::Temando::WSDL::Elements::getQuotesByRequest::VERSION = '3.01';
+$Shipment::Temando::WSDL::Elements::getQuotesByRequest::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -87,7 +87,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::getQuotesByRequest::_anythings;
     $Shipment::Temando::WSDL::Elements::getQuotesByRequest::_anythings::VERSION
-      = '3.01';
+      = '3.02';
     use strict;
     use warnings;
     {
@@ -143,7 +143,7 @@ Shipment::Temando::WSDL::Elements::getQuotesByRequest
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

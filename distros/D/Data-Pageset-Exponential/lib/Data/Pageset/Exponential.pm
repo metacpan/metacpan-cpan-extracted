@@ -9,13 +9,20 @@ use Moo;
 use List::Util 1.33 qw/ all min /;
 use PerlX::Maybe;
 use POSIX qw/ ceil floor /;
+use MooX::Aliases;
 use MooX::TypeTiny;
 use Types::Common::Numeric qw/ PositiveOrZeroInt PositiveInt /;
-use Types::Standard qw/ is_Int Int ArrayRef /;
+use Types::Standard qw/ is_Int Int ArrayRef is_HashRef /;
+
+
+use asa 'Data::Page';
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.1';
+# RECOMMEND PREREQ: Type::Tiny::XS
+# RECOMMEND PREREQ: Ref::Util::XS
+
+our $VERSION = 'v0.3.1';
 
 
 has total_entries => (
@@ -69,9 +76,10 @@ has pages_per_exponent => (
 );
 
 
-has max_pages_per_set => (
+has pages_per_set => (
     is      => 'lazy',
     isa     => PositiveInt,
+    alias   => 'max_pages_per_set',
     builder => sub {
         my ($self) = @_;
         use integer;
@@ -116,7 +124,6 @@ has series => (
         return [@prevs, @series];
     },
 );
-
 
 around current_page => sub {
     my $next = shift;
@@ -290,6 +297,10 @@ sub change_entries_per_page {
 sub BUILDARGS {
     my ( $class, @args ) = @_;
 
+    if (@args == 1 && is_HashRef(@args)) {
+        return $args[0];
+    }
+
     if ( @args && ( @args <= 3 ) && all { is_Int($_) } @args ) {
 
         return {
@@ -301,15 +312,6 @@ sub BUILDARGS {
     }
 
     return {@args};
-}
-
-
-sub isa {
-    my ($self, $class) = @_;
-
-    state $classes = { map { $_ => 1 } qw/ Data::Page / };
-
-    return $classes->{$class} || $self->UNIVERSAL::isa($class);
 }
 
 
@@ -327,7 +329,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -393,7 +395,7 @@ however, larger numbers will increase the size of L</pages_in_set>.
 
 This is the number of pages per exponent. It defaults to C<3>.
 
-=head2 C<max_pages_per_set>
+=head2 C<pages_per_set>
 
 This is the maximum number of pages in L</pages_in_set>. It defaults
 to
@@ -404,7 +406,11 @@ which for the default values is 23.
 
 This should be an odd number.
 
-=for Pod::Coverage series
+This was renamed from L</max_pages_per_set> in v0.3.0.
+
+=head2 C<max_pages_per_set>
+
+This is a deprecated alias for L</pages_per_set>.
 
 =head1 METHODS
 
@@ -432,10 +438,6 @@ Returns the number of the previous page.
 
 Returns the number of the next page.
 
-=for Pod::Coverage splice
-
-=for Pod::Coverage skipped
-
 =head2 C<pages_in_set>
 
 Returns an array reference of pages in the page set.
@@ -454,19 +456,54 @@ exponent.
 
 It is added for compatability with L<Data::Pageset>.
 
+=for Pod::Coverage isa
+
+=for Pod::Coverage series
+
+=for Pod::Coverage splice
+
+=for Pod::Coverage skipped
+
 =for Pod::Coverage change_entries_per_page
 
 =for Pod::Coverage BUILDARGS
 
-=for Pod::Coverage isa
-
 =head1 KNOWN ISSUES
 
-=head2 Fake @ISA
+=head2 Differences with Data::Page
 
-This module is based on a complete rewrite of L<Data::Page> using
+This module is intended as a drop-in replacement for L<Data::Page>.
+However, it is based on a complete rewrite of L<Data::Page> using
 L<Moo>, rather than extending it.  Because of that, it needs to fake
 C<@ISA>.  This may break some applications.
+
+Otherwise, it has the following differences:
+
+=over
+
+=item *
+
+The attributes have type constraints.  Invalid data may throw a fatal
+error instead of being ignored.
+
+=item *
+
+Setting the L</current_page> to a value outside the L</first_page> or
+L</last_page> will return the first or last page, instead of that
+value.
+
+=back
+
+=head2 Differences with Data::Pageset
+
+This module can behave like L<Data::Pageset> in C<slide> mode if the
+exponent is set to C<1>:
+
+  my $pager = Data::Pageset::Exponential->new(
+    exponent_max       => 1,
+    pages_per_exponent => 10,
+    pages_per_set      => 10,
+  );
 
 =head1 SEE ALSO
 

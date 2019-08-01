@@ -11,7 +11,7 @@ use Pcore::App::API::Auth;
 
 our $EXPORT = {
     ROOT_USER       => [qw[$ROOT_USER_NAME $ROOT_USER_ID]],
-    PERMISSIONS     => [qw[$PERMISSION_ANY_AUTHENTICATED_USER]],
+    PERMISSIONS     => [qw[$PERMISSIONS_ANY_AUTHENTICATED_USER]],
     TOKEN_TYPE      => [qw[$TOKEN_TYPE_PASSWORD $TOKEN_TYPE_TOKEN $TOKEN_TYPE_SESSION $TOKEN_TYPE_EMAIL_CONFIRM $TOKEN_TYPE_PASSWORD_RECOVERY]],
     INVALIDATE_TYPE => [qw[$INVALIDATE_USER $INVALIDATE_TOKEN $INVALIDATE_ALL]],
     PRIVATE_TOKEN   => [qw[$PRIVATE_TOKEN_ID $PRIVATE_TOKEN_HASH $PRIVATE_TOKEN_TYPE]],
@@ -29,7 +29,7 @@ has _auth_cache_cleanup_timer => ( init_arg             => undef );    # Instanc
 const our $ROOT_USER_NAME => 'root';
 const our $ROOT_USER_ID   => 1;
 
-const our $PERMISSION_ANY_AUTHENTICATED_USER => '*';
+const our $PERMISSIONS_ANY_AUTHENTICATED_USER => '*';
 
 const our $TOKEN_TYPE_PASSWORD          => 1;
 const our $TOKEN_TYPE_TOKEN             => 2;

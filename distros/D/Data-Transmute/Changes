@@ -1,12 +1,27 @@
-Revision history for Data-Transmute
+0.030   2019-07-24  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
-0.02    2015-05-05 (PERLANCAR)
+	[INCOMPATIBLE CHANGE]
+
+        - Merge transmute_array() and transmute_hash() into a single function
+          transmute_data().
+
+        - Rename rules: {create,rename,delete}_key ->
+          {create,rename,delete}_hash_key.
+
+        [NEW FEATURES]
+
+        - Provide reverse_rules() to produce the reverse of rules.
+
+        - New rules: transmute_array_elems, transmute_hash_values.
+
+
+0.02    2015-05-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix example in Synopsis.
 
 
-0.01     2015-05-05 (PERLANCAR)
+0.01     2015-05-05  Released-By: PERLANCAR
 
          - First release.

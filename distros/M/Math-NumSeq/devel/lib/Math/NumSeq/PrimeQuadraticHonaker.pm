@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 72;
+$VERSION = 73;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -35,8 +35,6 @@ use constant characteristic_increasing => 2;
 # http://oeis.org/A048988  # only the primes ones
 # use constant oeis_anum => undef;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 sub ith {
   my ($self, $i) = @_;

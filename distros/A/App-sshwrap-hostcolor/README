@@ -3,8 +3,8 @@ NAME
     background you use for each host
 
 VERSION
-    This document describes version 0.008 of App::sshwrap::hostcolor (from
-    Perl distribution App-sshwrap-hostcolor), released on 2019-03-12.
+    This document describes version 0.009 of App::sshwrap::hostcolor (from
+    Perl distribution App-sshwrap-hostcolor), released on 2019-07-26.
 
 SYNOPSIS
     See the included script sshwrap-hostcolor.

@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::wales_towns;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -10,7 +10,8 @@ our %Remote = (
     extract => sub {
         my $list = shift;
         $list =~ s{\A.*<span class="mw-headline" id="A">A</span>}{}s;
-        $list =~ s{<span class="mw-headline" id="Notes">Notes</span>.*}{}s;
+        $list =~ s{<span [^>]*>Notes</span>.*}{}s;
+        $list =~ s{<span [^>]*>See also</span>.*}{}s;
         return map { s/_+/_/g; s/^_|_$//g; $_ }
             map { Acme::MetaSyntactic::RemoteList::tr_nonword($_) }
             $list =~ m{<a href="/wiki/[^"]*" title="[^"]*"[^>]*>([^<]+)</a>}g;
@@ -40,6 +41,12 @@ Abigail, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-07-29 - v1.012
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.053.
 
 =item *
 
@@ -134,7 +141,6 @@ Aberaeron
 Aberavon
 Aberbargoed
 Abercarn
-Abercwmboi
 Aberdare
 Abergavenny
 Abergele
@@ -154,9 +160,9 @@ Beaumaris
 Bedwas
 Benllech
 Bethesda
-Blackwood
 Blaenau_Ffestiniog
 Blaenavon
+Blackwood
 Blaina
 Brecon
 Bridgend
@@ -175,7 +181,6 @@ Cardigan
 Carmarthen
 Chepstow
 Chirk
-Cilgerran
 Colwyn_Bay
 Connah_s_Quay
 Conwy
@@ -198,7 +203,7 @@ Glynneath
 Goodwick
 Gorseinon
 Gresford
-Hakin
+Gowerton
 Harlech
 Haverfordwest
 Hay_on_Wye
@@ -209,12 +214,12 @@ Knighton
 Lampeter
 Laugharne
 Llanberis
-Llanddulas
 Llandeilo
 Llandovery
 Llandrindod_Wells
 Llandudno
 Llandudno_Junction
+Llanddulas
 Llandysul
 Llanelli
 Llanfair_Caereinion
@@ -230,15 +235,15 @@ Llanwrtyd_Wells
 Llanybydder
 Loughor
 Machynlleth
-Maesglas
 Maesteg
 Menai_Bridge
 Merthyr_Tydfil
 Milford_Haven
-Miskin
 Mold
 Monmouth
 Montgomery
+Maesglas
+Miskin
 Narberth
 Neath
 Nefyn
@@ -250,7 +255,6 @@ New_Quay
 Newtown
 Neyland
 Old_Colwyn
-Old_Radnor
 Overton_on_Dee
 Pembroke
 Pembroke_Dock
@@ -263,10 +267,10 @@ Pontarddulais
 Pontyclun
 Pontypool
 Pontypridd
+Port_Talbot
 Porth
 Porthcawl
 Porthmadog
-Port_Talbot
 Prestatyn
 Presteigne
 Pwllheli
@@ -277,11 +281,11 @@ Rhyl
 Rhymney
 Risca
 Ruthin
-Saltney
-Senghenydd
-Shotton
 St_Asaph
 St_Clears
+Senghenydd
+Saltney
+Shotton
 Swansea
 Talgarth
 Templeton
@@ -290,12 +294,11 @@ Tonypandy
 Tredegar
 Tregaron
 Treharris
-Treorchy
 Tywyn
 Usk
 Welshpool
 Whitland
 Wrexham
-Ynysddu
 Ystradgynlais
 Ystrad_Mynach
+Ynysddu

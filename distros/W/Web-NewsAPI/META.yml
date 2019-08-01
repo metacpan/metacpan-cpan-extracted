@@ -27,9 +27,11 @@ no_index:
 provides:
   Web::NewsAPI:
     file: lib/Web/NewsAPI.pm
-    version: '0.001'
+    version: '0.002'
   Web::NewsAPI::Article:
     file: lib/Web/NewsAPI/Article.pm
+  Web::NewsAPI::Result:
+    file: lib/Web/NewsAPI/Result.pm
   Web::NewsAPI::Source:
     file: lib/Web/NewsAPI/Source.pm
   Web::NewsAPI::Types:
@@ -51,7 +53,7 @@ resources:
   bugtracker: https://github.com/jmacdotorg/newsapi-perl/issues
   homepage: https://github.com/jmacdotorg/newsapi-perl
   repository: git://github.com/jmacdotorg/newsapi-perl.git
-version: '0.001'
+version: '0.002'
 x_authority: cpan:JMAC
 x_contributors:
   - 'Jason McIntosh <jmac@jmac.org>'

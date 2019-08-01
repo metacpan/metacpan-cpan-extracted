@@ -29,6 +29,8 @@ my %WriteMakefileArgs = (
     "File::Slurper" => 0,
     "File::chdir" => 0,
     "JSON" => 0,
+    "Language::Expr" => "0.29",
+    "Language::Expr::Interpreter::var_enumer" => 0,
     "Lingua::EN::Numbers::Ordinate" => "1.02",
     "Log::ger" => "0.027",
     "Mo" => 0,
@@ -62,7 +64,7 @@ my %WriteMakefileArgs = (
     "lib::filter" => "0.03",
     "overload" => 0
   },
-  "VERSION" => "0.897",
+  "VERSION" => "0.899",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -85,6 +87,8 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON" => 0,
+  "Language::Expr" => "0.29",
+  "Language::Expr::Interpreter::var_enumer" => 0,
   "Lingua::EN::Numbers::Ordinate" => "1.02",
   "List::Util" => "1.45",
   "Log::ger" => "0.027",

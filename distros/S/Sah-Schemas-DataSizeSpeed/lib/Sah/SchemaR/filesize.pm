@@ -1,7 +1,7 @@
 package Sah::SchemaR::filesize;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $rschema = ["float",[{description=>"\nFloat, in bytes.\n\nCan be coerced from string that contains units, e.g.:\n\n    2KB   -> 2048      (kilobyte, 1024-based)\n    2mb   -> 2097152   (megabyte, 1024-based)\n    1.5K  -> 1536      (kilobyte, 1024-based)\n    1.6ki -> 1600      (kibibyte, 1000-based)\n\n",min=>0,summary=>"File size","x.perl.coerce_rules"=>["str_suffix_filesize"]}],["float"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::filesize - File size
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-01-16.
+This document describes version 0.002 of Sah::SchemaR::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-07-25.
 
 =head1 DESCRIPTION
 

@@ -3,10 +3,11 @@ MODE: INLINE
 
 template <typename T>
 using function = panda::function<T>;
+using panda::string_view;
 
 using vv_fn  = function<void()>;
 using vi_fn  = function<void(int)>;
-using iid_fn = function<int(int, double)>;
+using iis_fn = function<int(int, string_view)>;
 
 MODULE = MyTest::Typemap                PACKAGE = MyTest::Function
 PROTOTYPES: DISABLE
@@ -24,13 +25,13 @@ void s2f_vi_custom (Sub sub, int val) {
     fn(val);
 }
 
-int s2f_iid (Sv sub, int i, double d) {
-    auto fn = xs::sub2function<iid_fn>(sub);
+int s2f_iis (Sv sub, int i, string_view d) {
+    auto fn = xs::sub2function<iis_fn>(sub);
     RETVAL = fn(i, d);
 }
 
-int s2f_iid_custom (Sub sub, int i, double d) {
-    auto fn = xs::sub2function<int(int, double)>(
+int s2f_iis_custom (Sub sub, int i, string_view d) {
+    auto fn = xs::sub2function<int(int, string_view)>(
         sub,
         [=](const Sv& sv) { return SvIV(sv) + 10; },
         [](int val)       { return Simple(val + 100); }
@@ -71,10 +72,10 @@ uint64_t bench_vi (Sub sub, int cnt) {
     }
 }
 
-uint64_t bench_iid (Sub sub, int cnt) {
+uint64_t bench_iis (Sub sub, int cnt) {
     RETVAL = 0;
     for (int i = 0; i < cnt; ++i) {
-        RETVAL += (uint64_t)sub2function<iid_fn>(sub).func.get();
+        RETVAL += (uint64_t)sub2function<iis_fn>(sub).func.get();
     }
 }
 
@@ -94,9 +95,9 @@ uint64_t bench_viR (int cnt) {
     }
 }
 
-uint64_t bench_iidR (int cnt) {
+uint64_t bench_iisR (int cnt) {
     RETVAL = 0;
-    iid_fn fn = [](int a, double d) -> int { return a + d; };
+    iis_fn fn = [](int a, string_view d) -> int { return a + d.length(); };
     for (int i = 0; i < cnt; ++i) {
         RETVAL += (uint64_t)function2sub(fn).get();
     }

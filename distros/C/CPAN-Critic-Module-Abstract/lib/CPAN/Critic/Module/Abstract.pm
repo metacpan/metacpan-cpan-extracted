@@ -1,7 +1,7 @@
 package CPAN::Critic::Module::Abstract;
 
 our $DATE = '2019-07-03'; # DATE
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 use 5.010;
 use strict;
@@ -311,7 +311,7 @@ sub critique_cpan_module_abstract {
 }
 
 1;
-# ABSTRACT: Critic CPAN module abstract
+# ABSTRACT: (DEPRECATED) Critic CPAN module abstract
 
 __END__
 
@@ -321,11 +321,11 @@ __END__
 
 =head1 NAME
 
-CPAN::Critic::Module::Abstract - Critic CPAN module abstract
+CPAN::Critic::Module::Abstract - (DEPRECATED) Critic CPAN module abstract
 
 =head1 VERSION
 
-This document describes version 0.091 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2019-07-03.
+This document describes version 0.092 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2019-07-03.
 
 =head1 SYNOPSIS
 

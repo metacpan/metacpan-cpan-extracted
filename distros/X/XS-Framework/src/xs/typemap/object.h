@@ -154,27 +154,32 @@ private:
         return NULL;
     }
 
-    // prevent S_curse from calling dtor
-    static inline void _ignore_dtor (SV* sv) {
-        auto stash = SvSTASH(sv);
-        auto meta = HvMROMETA(stash);
-        if (meta->destroy == typemap::object::fake_dtor) return;
-        auto stmg = _zombie_get_stash_magic(stash);
-        if (!stmg) stmg = Sv(stash).payload_attach(Sv::Payload(), xs::Sv::PayloadMarker<ZombieMarker>::get());
-        stmg->mg_obj = (SV*)meta->destroy;
-        stmg->mg_ptr = (char*)(uint64_t)meta->destroy_gen;
-        meta->destroy = typemap::object::fake_dtor;
-        meta->destroy_gen = PL_sub_generation; // make cache valid
-    }
+    #if PERL_VERSION >= 24
+        // prevent S_curse from calling dtor
+        static inline void _ignore_dtor (SV* sv) {
+            auto stash = SvSTASH(sv);
+            auto meta = HvMROMETA(stash);
+            if (meta->destroy == typemap::object::fake_dtor) return;
+            auto stmg = _zombie_get_stash_magic(stash);
+            if (!stmg) stmg = Sv(stash).payload_attach(Sv::Payload(), xs::Sv::PayloadMarker<ZombieMarker>::get());
+            stmg->mg_obj = (SV*)meta->destroy;
+            stmg->mg_ptr = (char*)(uint64_t)meta->destroy_gen;
+            meta->destroy = typemap::object::fake_dtor;
+            meta->destroy_gen = PL_sub_generation; // make cache valid
+        }
 
-    static inline void _restore_dtor (SV* sv) {
-        auto stash = SvSTASH(sv);
-        auto meta = HvMROMETA(stash);
-        if (meta->destroy != typemap::object::fake_dtor) return;
-        auto stmg = _zombie_get_stash_magic(stash);
-        meta->destroy = (CV*)stmg->mg_obj; // restore dtor
-        meta->destroy_gen = (uint64_t)stmg->mg_ptr;
-    }
+        static inline void _restore_dtor (SV* sv) {
+            auto stash = SvSTASH(sv);
+            auto meta = HvMROMETA(stash);
+            if (meta->destroy != typemap::object::fake_dtor) return;
+            auto stmg = _zombie_get_stash_magic(stash);
+            meta->destroy = (CV*)stmg->mg_obj; // restore dtor
+            meta->destroy_gen = (uint64_t)stmg->mg_ptr;
+        }
+    #else
+        static inline void _ignore_dtor  (SV*) {}
+        static inline void _restore_dtor (SV*) {}
+    #endif
 
     static inline void _to_zombie (const TYPEMAP& var, SV* sv, MAGIC*, const Backref* br) {
         br->zombie = true;

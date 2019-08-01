@@ -7,14 +7,14 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
   IPC::Run: '0'
-  PFT: v1.2.1
+  PFT: v1.4.1
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -41,11 +41,11 @@ requires:
   Getopt::Long: '0'
   HTML::Escape: '0'
   LWP::Simple: '0'
-  PFT: v1.2.1
+  PFT: v1.4.1
   Pod::Find: '0'
   Pod::Usage: '0'
   Template::Alloy: '0'
   URI: '0'
   perl: '5.006'
-version: v1.3.0
+version: v1.4.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

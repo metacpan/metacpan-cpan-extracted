@@ -4,13 +4,13 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-NumSeq",
    "no_index" : {
@@ -90,6 +90,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "72",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 73,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

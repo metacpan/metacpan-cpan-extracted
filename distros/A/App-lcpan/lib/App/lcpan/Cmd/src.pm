@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::src;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.035'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '1.037'; # VERSION
 
 use 5.010;
 use strict;
@@ -50,7 +50,7 @@ App::lcpan::Cmd::src - Show source of module/.pod/script
 
 =head1 VERSION
 
-This document describes version 1.035 of App::lcpan::Cmd::src (from Perl distribution App-lcpan), released on 2019-06-26.
+This document describes version 1.037 of App::lcpan::Cmd::src (from Perl distribution App-lcpan), released on 2019-07-23.
 
 =head1 FUNCTIONS
 

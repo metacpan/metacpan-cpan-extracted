@@ -333,8 +333,6 @@ $data
 CODE
     die $@ if $@;
 
-    die q[Config must return value] unless $res;
-
     return $res;
 }
 
@@ -1038,10 +1036,10 @@ sub from_uri_query_utf8 : prototype($) ($uri) {
 ## |      | 159                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 357, 410             | * Postfix control "for" used                                                                                   |
-## |      | 618                  | * Postfix control "while" used                                                                                 |
+## |      | 355, 408             | * Postfix control "for" used                                                                                   |
+## |      | 616                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 953                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 951                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

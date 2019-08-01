@@ -22,7 +22,7 @@ no_index:
 provides:
   Calendar::Persian:
     file: lib/Calendar/Persian.pm
-    version: '0.41'
+    version: '0.42'
 requires:
   Calendar::Plugin::Renderer: '0.15'
   Date::Persian::Simple: '0.22'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Calendar-Persian.git
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

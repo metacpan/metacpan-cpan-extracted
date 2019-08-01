@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::TrackElements::TrackRequest;
-$Shipment::UPS::WSDL::TrackElements::TrackRequest::VERSION = '3.01';
+$Shipment::UPS::WSDL::TrackElements::TrackRequest::VERSION = '3.02';
 use strict;
 use warnings;
 
@@ -94,7 +94,7 @@ Shipment::UPS::WSDL::TrackElements::TrackRequest
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 DESCRIPTION
 

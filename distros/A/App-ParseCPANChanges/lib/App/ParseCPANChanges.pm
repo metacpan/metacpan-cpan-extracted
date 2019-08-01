@@ -1,7 +1,7 @@
 package App::ParseCPANChanges;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2019-07-03'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,18 +14,25 @@ $SPEC{parse_cpan_changes} = {
     summary => 'Parse CPAN Changes file',
     args => {
 	file => {
-	    schema => 'str*',
+	    schema => 'filename*',
 	    summary => 'If not specified, will look for file called '.
 		'Changes/ChangeLog in current directory',
 	    pos => 0,
 	},
+        class => {
+            schema => 'perl::modname*',
+            default => 'CPAN::Changes',
+        },
     },
 };
 sub parse_cpan_changes {
-    require CPAN::Changes;
     require Data::Structure::Util;
 
     my %args = @_;
+
+    my $class = $args{class} // 'CPAN::Changes';
+    (my $class_pm = "$class.pm") =~ s!::!/!g;
+    require $class_pm;
 
     my $file = $args{file};
     if (!$file) {
@@ -37,7 +44,7 @@ sub parse_cpan_changes {
                 "(or run in directory where Changes file exists)"]
         unless $file;
 
-    my $ch = CPAN::Changes->load($file);
+    my $ch = $class->load($file);
     [200, "OK", Data::Structure::Util::unbless($ch)];
 }
 
@@ -56,7 +63,7 @@ App::ParseCPANChanges - Parse CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.06 of App::ParseCPANChanges (from Perl distribution App-ParseCPANChanges), released on 2016-01-18.
+This document describes version 0.070 of App::ParseCPANChanges (from Perl distribution App-ParseCPANChanges), released on 2019-07-03.
 
 =head1 DESCRIPTION
 
@@ -66,17 +73,23 @@ L<CPAN::Changes>. See L<parse-cpan-changes> for more details.
 =head1 FUNCTIONS
 
 
-=head2 parse_cpan_changes(%args) -> [status, msg, result, meta]
+=head2 parse_cpan_changes
+
+Usage:
+
+ parse_cpan_changes(%args) -> [status, msg, payload, meta]
 
 Parse CPAN Changes file.
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<file> => I<str>
+=item * B<class> => I<perl::modname> (default: "CPAN::Changes")
+
+=item * B<file> => I<filename>
 
 If not specified, will look for file called Changes/ChangeLog in current directory.
 
@@ -87,7 +100,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -99,7 +112,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ParseC
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-ParseCPANChanges>.
+Source repository is at L<https://github.com/perlancar/perl-App-ParseCPANChanges>.
 
 =head1 BUGS
 
@@ -128,7 +141,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

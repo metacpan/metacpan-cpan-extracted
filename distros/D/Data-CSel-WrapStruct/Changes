@@ -1,10 +1,23 @@
-Revision history for Data-CSel-WrapStruct
+0.004   2019-07-29  Released-By: PERLANCAR; Urgency: medium
 
-0.002   2016-09-01 (PERLANCAR)
+	- Handle JSON::PP::Boolean object by turning it into 1/0.
 
-	- Hash: add methods has_key(), pair_value().
+	- Hash: Rename pair_value() to the much shorter and more easily
+	  remembered key().
 
 
-0.001    2016-08-26 (PERLANCAR)
+0.003   2016-09-10 (PERLANCAR)  Released-By: unreleased
+
+        - [Incompatible change] Rename Hash method pair_value() to the shorter
+          and more easily remembered key().
+
+
+0.002   2016-09-01  Released-By: PERLANCAR
+
+	- Hash: add methods has_key(), pair_value(). UPDATE: pair_value() was
+          renamed to in 0.003.
+
+
+0.001    2016-08-26  Released-By: PERLANCAR
 
          - First release.

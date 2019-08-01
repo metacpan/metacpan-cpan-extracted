@@ -16,10 +16,11 @@
 * [12.8 Interface notifications](#12.8)
 * [12.9 Retrieving notifications](#12.9)
 * [12.10 Advanced notifications](#12.10)
-* [12.11 Skipping notifications](#12.11)
-* [12.12 DELIFACE](#12.12)
-* [12.13 Starting a new script with SETTRIG](#12.13)
-* [12.14 Future plans](#12.14)
+* [12.11 Retrieving substrings](#12.11)
+* [12.12 Skipping notifications](#12.12)
+* [12.13 DELIFACE](#12.13)
+* [12.14 Starting a new script with SETTRIG](#12.14)
+* [12.15 Future plans](#12.15)
 
 ---
 
@@ -215,7 +216,7 @@ Here is the complete script. Once per main loop, the earliest remaining notifica
         WHILE 1
 
             ! Retrieve the first notification...
-            IF Ifacecount () > 1 THEN
+            IF Ifacecount () > 0 THEN
                 IF Ifacename$ () = treasure_trigger$ THEN
                     CALL GetStuff
                 END IF
@@ -263,11 +264,44 @@ Axmud gives each active trigger a unique number. This probably isn't very useful
 
 The **Ifacetype ()** function returns the type of interface that fired, in other words the string **"trigger"**.
 
+##<a name="12.11">12.11 Retrieving substrings</a>
+
 Triggers test a pattern against a line of text. The **Ifacestrings ()** function returns the number of matching substrings. (See the regular expression tutorial in the [Axmud Guide](../guide/index.html) if you don't know what that means.)
 
 The contents of those substrings can be retrieved using the **Ifaceshift$ ()** and **Ifacepop$ ()** functions. Both of those functions *remove* the matching substring from the notification, so you can use them several times until there are no more substrings left. **Ifaceshift$ ()** removes the first matching substring, and **Ifacepop$ ()** removes the last matching substring.
 
-##<a name="12.11">12.11 Skipping notifications</a>
+Another way to retrieve the substrings is with the **Ifaceselect$ ()**. Get the first substring with **Ifaceselect$ (1)**, the second with **Ifaceselect$ (2)** and so on. Unlike **Ifaceshift$ ()** and **Ifacepop$ ()**, nothing is removed. If the specified substring doesn't exist, the function returns an empty string. 
+
+A special case is when you use alternatives with substrings. For example, you might create a trigger than matches any of the following lines:
+
+        The warrior hits you with axe
+        The warrior hits you with handaxe
+        The warrior hits you with poleaxe
+
+...but not this line:
+
+        The warrior hits you with surtaxes
+
+In that case, you might use the following regular expression:
+
+        The warrior hits you with (hand|pole)?axe
+
+Additionally, you might want to capture the type of weapon used, and for that, you would add substrings:
+
+        The warrior hits you with ((hand)|(pole))?axe
+
+When the regular expression matches a line containing "handaxe" or "poleaxe", Perl produces a list of substrings containing two items, one of them an *undefined* value:
+
+        ( "hand", undefined )
+        ( undefined, "pole" )
+
+The **Ifaceselect ()** function returns an empty string in place of the *undefined* value, but it might also return an empty string if the line contained just **"axe"** and not **"handaxe"** or **"poleaxe"**.
+
+You can use the **Ifacedefined ()** function if you specifically want to test for undefined values. Test the first substring with **Ifacedefined (1)**, the second with **Ifacedefined (2)** and so on.
+
+The function returns 1 if the specified substring exists, and is defined. If the specified substring exists but is not defined, it returns -1. If the specified substring doesn't exist, it returns 0.
+
+##<a name="12.12">12.12 Skipping notifications</a>
 
 By default, these functions work on the *earliest* notification received. Usually, you'll retrieve the information you want, and then discard the notification, ready for the next one.
 
@@ -288,7 +322,7 @@ If only one notification remains, then SKIPIFACE will have no effect. If there a
 
 The **Ifacepos ()** function returns the number of the current notification. By default, it returns 1, representing the earliest remaining notification. If you've used SKIPIFACE once, it would return 2, representing the second notification on the list. (If no notifications have been received, or if they have all been discarded, it returns 0.)
 
-##<a name="12.12">12.12 DELIFACE</a>
+##<a name="12.13">12.13 DELIFACE</a>
 
 An *active interface* is one that's currently available. We've discussed how triggers, aliases and so on can be tied to a particular character profile. Those interfaces are only active when you're playing the right character.
 
@@ -304,7 +338,7 @@ If you want to be clever, you can delete the trigger that generated the current 
 
           DELIFACE Ifacename$ ()
 
-##<a name="12.13">12.13 Starting a new script with SETTRIG</a>
+##<a name="12.14">12.14 Starting a new script with SETTRIG</a>
 
 SETTRIG creates a trigger. When the trigger fires, the Axbasic script receives a notification, which can be retrieved when the script is ready.
 
@@ -314,7 +348,7 @@ However, SETTRIG has a second purpose: it can be used to run a different Axbasic
 
 The new script is not run as a task. The original Axbasic script does not receive an interface notification.
 
-##<a name="12.14">12.14 Future plans</a>
+##<a name="12.15">12.15 Future plans</a>
 
 At the time of writing, there are no SETALIAS, SETMACRO, SETTIMER or SETHOOK statements.
 

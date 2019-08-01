@@ -6,22 +6,23 @@ MANIFEST			This list of files
 README
 README.md
 bash_completion.d/pft
-bin/pft
+bin/pft-gen-rss
+bin/pft-show
+bin/pft-ls
+bin/pft-pub
 bin/pft-clean
-bin/pft-edit
 bin/pft-grab
 bin/pft-init
-bin/pft-ls
+bin/pft
 bin/pft-make
-bin/pft-pub
-bin/pft-show
+bin/pft-edit
 lib/App/PFT.pm
 lib/App/PFT/Util.pm
-share/templates/default.html
 share/templates/dump_page.html
-share/templates/minimal.html
+share/templates/default.html
 share/templates/terminal.html
-t/base_site.t
+share/templates/minimal.html
 t/editing_cases.t
+t/base_site.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

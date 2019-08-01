@@ -4,7 +4,7 @@
       "diana.galan@keysight.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4205",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
    "provides" : {
       "IxNetwork" : {
          "file" : "lib/IxNetwork/IxNetwork.pm",
-         "version" : "8.50"
+         "version" : "9.00"
       },
       "IxNetworkLegacy" : {
          "file" : "lib/IxNetwork/IxNetworkLegacy.pm"
@@ -38,6 +38,9 @@
       },
       "checkDependencies" : {
          "file" : "lib/IxNetwork/checkDependencies.pm"
+      },
+      "validate" : {
+         "file" : "lib/IxNetwork/dependencies/validate.pm"
       }
    },
    "release_status" : "stable",
@@ -46,6 +49,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "8.50",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "9.00"
 }

@@ -485,7 +485,7 @@ public:
     void shrink_to_fit () {
         switch (_state) {
             case State::INTERNAL:
-                if (_length < MAX_SSO_CHARS) {
+                if (_length <= MAX_SSO_CHARS) {
                     auto old_buf  = _buf;
                     auto old_dtor = _dtor;
                     _detach_str(_length);
@@ -497,7 +497,7 @@ public:
                 }
                 break;
             case State::EXTERNAL:
-                if (_length < MAX_SSO_CHARS) {
+                if (_length <= MAX_SSO_CHARS) {
                     auto old_buf  = _ebuf;
                     auto old_dtor = _dtor;
                     _detach_str(_length);

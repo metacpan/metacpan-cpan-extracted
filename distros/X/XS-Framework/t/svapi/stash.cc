@@ -291,10 +291,12 @@ TEST_CASE("Stash", "[Sv]") {
         REQUIRE(my.fetch("test").sub() == get_cv("M1::test", 0));
     }
 
-    SECTION("sub promote") {
-        Hash(my).store("test", get_sv("M1::anon", 0));
-        REQUIRE(my.fetch("test"));
-        REQUIRE(my.fetch("test").sub() == get_cv("M1::test", 0));
+    if (PERL_VERSION >= 22) { // in older perls only globs and refs to primitives allowed in symbol tables
+        SECTION("sub promote") {
+            Hash(my).store("test", get_sv("M1::anon", 0));
+            REQUIRE(my.fetch("test"));
+            REQUIRE(my.fetch("test").sub() == get_cv("M1::test", 0));
+        }
     }
 
     SECTION("scalar") {
@@ -537,16 +539,19 @@ TEST_CASE("Stash", "[Sv]") {
             Simple v2 = s.call();
             REQUIRE(v2 == v.get());
         }
-        SECTION("array") {
-            Array v({ Simple(1), Simple(2), Simple(3) });
-            st.add_const_sub("MYCONST", v);
-            REQUIRE(v.use_count() == 2);
-            auto res = st["MYCONST"].sub().call<List>();
-            REQUIRE(res.size() == v.size());
-            REQUIRE(res != v);
-            REQUIRE(res[0] == v[0]);
-            REQUIRE(res[1] == v[1]);
-            REQUIRE(res[2] == v[2]);
+
+        if (PERL_VERSION >= 20) { // in older perls values can only be scalars
+            SECTION("array") {
+                Array v({ Simple(1), Simple(2), Simple(3) });
+                st.add_const_sub("MYCONST", v);
+                REQUIRE(v.use_count() == 2);
+                auto res = st["MYCONST"].sub().call<List>();
+                REQUIRE(res.size() == v.size());
+                REQUIRE(res != v);
+                REQUIRE(res[0] == v[0]);
+                REQUIRE(res[1] == v[1]);
+                REQUIRE(res[2] == v[2]);
+            }
         }
 
         st.erase("MYCONST");

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014-2016 - Giovanni Simoni
+# Copyright 2014-2019 - Giovanni Simoni
 #
 # This file is part of PFT.
 #
@@ -23,13 +23,13 @@
 
 pft clean - Clean the build directory
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
-pft clean [-v]
+B<pft> B<clean> [B<-v>]
 
 =head1 DESCRIPTION
 
-Removes the C<ROOT/build> directory
+Syntactic sugar for a plain removal of the C<ROOT/build> directory
 
 =head1 OPTIONS
 
@@ -37,7 +37,11 @@ Removes the C<ROOT/build> directory
 
 =item --verbose | -v
 
+Be verbose.
+
 =item --help | -h
+
+Show this help text.
 
 =back
 

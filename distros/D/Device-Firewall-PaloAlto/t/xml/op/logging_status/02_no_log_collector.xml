@@ -1,0 +1,11 @@
+<response status="success"><result>-----------------------------------------------------------------------------------------------------------------------------
+      Type      Last Log Created        Last Log Fwded       Last Seq Num Fwded  Last Seq Num Acked         Total Logs Fwded
+-----------------------------------------------------------------------------------------------------------------------------
+> CMS 0
+	Not Sending to CMS 0
+> CMS 1
+	Not Sending to CMS 1
+
+>Log Collector 
+	Not Sending to Log Collector
+</result></response>

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '1.035'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '1.037'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.035 of lcpan (from Perl distribution App-lcpan), released on 2019-06-26.
+This document describes version 1.037 of lcpan (from Perl distribution App-lcpan), released on 2019-07-23.
 
 =head1 SYNOPSIS
 
@@ -799,7 +799,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -1002,7 +1002,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -1038,11 +1038,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--author-arg>=I<s>*
+
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
-
-=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1086,7 +1086,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -1226,7 +1226,7 @@ Default value:
 
 Valid values:
 
- ["any","cpanid","exact-cpanid","fullname","email","exact-email"]
+ ["any","cpanid","exact-cpanid","fullname","regexp-fullname","email","exact-email"]
 
 =item B<--query>=I<s@>
 
@@ -1237,6 +1237,12 @@ Can be specified multiple times.
 =item B<-n>
 
 Shortcut --query-type cpanid.
+
+See C<--query-type>.
+
+=item B<-r>
+
+Shortcut --query-type regexp-fullname.
 
 See C<--query-type>.
 
@@ -1463,7 +1469,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -1537,7 +1543,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.28.2"
 
 =item B<--phase>=I<s>
 
@@ -1667,7 +1673,7 @@ Default value:
 
 Valid values:
 
- ["any","name","exact-name","abstract"]
+ ["any","name","exact-name","regexp-name","abstract"]
 
 =item B<--query>=I<s@>
 
@@ -1696,6 +1702,12 @@ Can be specified multiple times.
 =item B<-n>
 
 Shortcut for --query-type name.
+
+See C<--query-type>.
+
+=item B<-r>
+
+Shortcut for --query-type regexp-name.
 
 See C<--query-type>.
 
@@ -2353,7 +2365,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.28.2"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2369,7 +2381,7 @@ Default value:
 
 Valid values:
 
- ["any","name","exact-name","abstract"]
+ ["any","name","exact-name","regexp-name","abstract"]
 
 =item B<--query>=I<s@>
 
@@ -2396,6 +2408,12 @@ Can be specified multiple times.
 =item B<-n>
 
 Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-r>
+
+Shortcut --query-type regexp-name.
 
 See C<--query-type>.
 
@@ -2509,7 +2527,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.28.2"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2525,7 +2543,7 @@ Default value:
 
 Valid values:
 
- ["any","name","exact-name","abstract"]
+ ["any","name","exact-name","regexp-name","abstract"]
 
 =item B<--query>=I<s@>
 
@@ -2552,6 +2570,12 @@ Can be specified multiple times.
 =item B<-n>
 
 Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-r>
+
+Shortcut --query-type regexp-name.
 
 See C<--query-type>.
 
@@ -2591,7 +2615,7 @@ Default value:
 
 Valid values:
 
- ["any","name","exact-name"]
+ ["any","name","exact-name","regexp-name"]
 
 =item B<--query>=I<s@>
 
@@ -2610,6 +2634,24 @@ Valid values:
  ["name","-name","num_modules","-num_modules"]
 
 =item B<--to-level>=I<s>
+
+=item B<-n>
+
+Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-r>
+
+Shortcut --query-type regexp-name.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut --query-type exact-name.
+
+See C<--query-type>.
 
 =back
 
@@ -2775,7 +2817,7 @@ Default value:
 
 Valid values:
 
- ["any","name","exact-name"]
+ ["any","name","exact-name","regexp-name"]
 
 =item B<--query>=I<s@>
 
@@ -2798,6 +2840,12 @@ Can be specified multiple times.
 =item B<-n>
 
 Shortcut for --query-type name.
+
+See C<--query-type>.
+
+=item B<-r>
+
+Shortcut for --query-type regexp-name.
 
 See C<--query-type>.
 
@@ -2851,7 +2899,7 @@ Default value:
 
 Valid values:
 
- ["any","name","exact-name"]
+ ["any","name","exact-name","regexp-name"]
 
 =item B<--query>=I<s@>
 
@@ -2874,6 +2922,12 @@ Can be specified multiple times.
 =item B<-n>
 
 Shortcut for --query-type name.
+
+See C<--query-type>.
+
+=item B<-r>
+
+Shortcut for --query-type regexp-name.
 
 See C<--query-type>.
 
@@ -3372,7 +3426,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author)
+ author (see --author-arg)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)

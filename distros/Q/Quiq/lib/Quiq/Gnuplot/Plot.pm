@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '1.151';
+our $VERSION = '1.152';
 
 use Quiq::Gnuplot::Graph;
 use Quiq::Gnuplot::Arrow;
@@ -243,7 +243,7 @@ sub graphsWithData {
 
 =head1 VERSION
 
-1.151
+1.152
 
 =head1 AUTHOR
 

@@ -25,6 +25,7 @@ WriteMakefile(
 		   },
 
  PREREQ_PM      => {
+		    'App::Packager' => 1.430,
 		    'PDF::API2'    => 2.029,
 		    'Text::CSV_XS' => 0,
 		   },

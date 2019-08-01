@@ -123,7 +123,6 @@ sub _call {
     my %headers = ('Keep-Alive' => 1);
 
     if ($self->auth_token) {
-        $headers{Cookie}        = $self->mmauthtoken($self->auth_token);
         $headers{Authorization} = $self->bearer($self->auth_token);
     }
 

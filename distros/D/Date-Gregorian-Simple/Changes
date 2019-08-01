@@ -1,5 +1,8 @@
 Revision history for Date::Gregorian::Simple
 
+0.15  Mon Jul 29 17:30:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.14  Thu May 30 14:20:00 2019
       - Updated dependency on Date::Utils v0.26.
 

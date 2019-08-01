@@ -1,0 +1,276 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/ruler/ruler
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-07-30'; # DATE
+our $DIST = 'App-ruler'; # DIST
+our $VERSION = '0.060'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Lite;
+
+my $cmdline = Perinci::CmdLine::Lite->new(
+    url => "/App/ruler/ruler",
+    program_name => "ruler",
+    skip_format => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Print horizontal ruler on the terminal
+# PODNAME: ruler
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ruler - Print horizontal ruler on the terminal
+
+=head1 VERSION
+
+This document describes version 0.060 of ruler (from Perl distribution App-ruler), released on 2019-07-30.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % ruler [options]
+
+Examples:
+
+Default ruler (dash + number every 10 characters):
+
+ % ruler
+ .........|10.......|20.......|30.......|40.......|50.......|60.......|70.......|80.......|90.......|100......|110......|120......|130......|140......|150......|160......|170......|180......|19
+
+White ruler with red marks and numbers:
+
+ % ruler --background-color 'black on_white' --major-tick-color 'red on_white' --minor-tick-character '' --number-color 'bold red on_white'
+ [30;47m---------[0m[31;47m|[0m[1;31;47m10[0m[30;47m-------[0m[31;47m|[0m[1;31;47m20[0m[30;47m-------[0m[31;47m|[0m[1;31;47m30[0m[30;47m-------[0m[31;47m|[0m[1;31;47m40[0m[30;47m-------[0m[31;47m|[0m[1;31;47m50[0m[30;47m-------[0m[31;47m|[0m[1;31;47m60[0m[30;47m-------[0m[31;47m|[0m[1;31;47m70[0m[30;47m-------[0m[31;47m|[0m[1;31;47m80[0m[30;47m-------[0m[31;47m|[0m[1;31;47m90[0m[30;47m-------[0m[31;47m|[0m[1;31;47m100[0m[30;47m------[0m[31;47m|[0m[1;31;47m110[0m[30;47m------[0m[31;47m|[0m[1;31;47m120[0m[30;47m------[0m[31;47m|[0m[1;31;47m130[0m[30;47m------[0m[31;47m|[0m[1;31;47m140[0m[30;47m------[0m[31;47m|[0m[1;31;47m150[0m[30;47m------[0m[31;47m|[0m[1;31;47m160[0m[30;47m------[0m[31;47m|[0m[1;31;47m170[0m[30;47m------[0m[31;47m|[0m[1;31;47m180[0m[30;47m------[0m[31;47m|[0m[1;31;47m19[0m
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--background-color>=I<s>
+
+=item B<--background-pattern>=I<s>, B<--bg>
+
+Default value:
+
+ "-"
+
+=item B<--length>=I<s>, B<-l>
+
+=item B<--major-tick-character>=I<s>, B<-M>
+
+Default value:
+
+ "|"
+
+=item B<--major-tick-color>=I<s>
+
+=item B<--major-tick-every>=I<s>, B<-N>
+
+Default value:
+
+ 10
+
+=item B<--minor-tick-character>=I<s>, B<-m>
+
+Default value:
+
+ "."
+
+=item B<--minor-tick-color>=I<s>
+
+=item B<--minor-tick-every>=I<s>, B<-n>
+
+Default value:
+
+ 1
+
+=item B<--number-color>=I<s>
+
+=item B<--number-every>=I<s>
+
+Default value:
+
+ 10
+
+=item B<--number-format>=I<s>, B<-f>
+
+Default value:
+
+ "%d"
+
+=item B<--number-start>=I<s>
+
+Default value:
+
+ 10
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C ruler ruler
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete ruler 'p/*/`ruler`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/ruler.conf>, F<~/ruler.conf>, or F</etc/ruler.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ background_color (see --background-color)
+ background_pattern (see --background-pattern)
+ length (see --length)
+ major_tick_character (see --major-tick-character)
+ major_tick_color (see --major-tick-color)
+ major_tick_every (see --major-tick-every)
+ minor_tick_character (see --minor-tick-character)
+ minor_tick_color (see --minor-tick-color)
+ minor_tick_every (see --minor-tick-every)
+ number_color (see --number-color)
+ number_every (see --number-every)
+ number_format (see --number-format)
+ number_start (see --number-start)
+
+=head1 ENVIRONMENT
+
+=head2 RULER_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/ruler.conf>
+
+F<~/ruler.conf>
+
+F</etc/ruler.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ruler>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ruler>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ruler>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

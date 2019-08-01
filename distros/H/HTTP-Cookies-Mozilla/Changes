@@ -1,5 +1,11 @@
 Revision history for Perl module HTTP::Cookies::Mozilla
 
+2.036 2019-07-23T03:27:30Z
+	* Rename a test file so it doesn't confuse Windows with extra dots
+
+2.035 2019-07-23T03:17:25Z
+	* Add a program that converts HTTP::Cookies to Mojo::UserAgent::CookieJar
+
 2.034 2018-06-24T13:57:31Z
 	* Clarify that it's the Artistic License 2.0
 

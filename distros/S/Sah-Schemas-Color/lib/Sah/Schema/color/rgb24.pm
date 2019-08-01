@@ -1,7 +1,7 @@
 package Sah::Schema::color::rgb24;
 
-our $DATE = '2018-09-26'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-25'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [str => {
     summary => 'RGB 24-digit color, a hexdigit e.g. ffcc00', # XXX also allow other forms
@@ -25,7 +25,7 @@ Sah::Schema::color::rgb24 - RGB 24-digit color, a hexdigit e.g. ffcc00
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2018-09-26.
+This document describes version 0.003 of Sah::Schema::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2019-07-25.
 
 =head1 DESCRIPTION
 
@@ -63,7 +63,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

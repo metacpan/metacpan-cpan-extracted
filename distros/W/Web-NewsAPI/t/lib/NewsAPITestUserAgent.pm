@@ -10,7 +10,7 @@ sub new {
 
     # /top-headlines, but no parameters specified.
     $ua->map_response(
-        qr{top-headlines$}, HTTP::Response->new(
+        qr{top-headlines\?page(Size)?=\d+&page(Size)?=\d+$}, HTTP::Response->new(
             400,
             'parametersMissing',
             [
@@ -35,7 +35,7 @@ sub new {
 
     # /everything, good request, with properly formatted 'from' param
     $ua->map_response(
-        qr{everything\?from=2010.*T.*Z$}, HTTP::Response->new(
+        qr{everything\?from=2010.*T.*Z}, HTTP::Response->new(
             200,
             'OK',
             [

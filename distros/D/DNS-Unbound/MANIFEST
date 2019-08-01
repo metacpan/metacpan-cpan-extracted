@@ -5,13 +5,15 @@ LICENSE
 MANIFEST
 Makefile.PL
 README.md
+Unbound.xs
 lib/DNS/Unbound.pm
-lib/DNS/Unbound.xs
+lib/DNS/Unbound/AsyncQuery.pm
 lib/DNS/Unbound/X.pm
 lib/DNS/Unbound/X/BadDebugFD.pm
 lib/DNS/Unbound/X/Base.pm
 lib/DNS/Unbound/X/ResolveError.pm
 t/async.t
+t/asyncquery.t
 t/convenience.t
 t/debuglevel.t
 t/debugout_badfd.t

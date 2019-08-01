@@ -1,11 +1,11 @@
 package Data::CSel::WrapStruct::Scalar;
 
-our $DATE = '2016-09-01'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 sub new {
     my ($class, $data_ref, $parent) = @_;
-    bless [$data_ref, $parent];
+    bless [$data_ref, $parent], $class;
 }
 
 sub value {
@@ -35,7 +35,7 @@ Data::CSel::WrapStruct::Scalar - Wrap a scalar
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::CSel::WrapStruct::Scalar (from Perl distribution Data-CSel-WrapStruct), released on 2016-09-01.
+This document describes version 0.004 of Data::CSel::WrapStruct::Scalar (from Perl distribution Data-CSel-WrapStruct), released on 2019-07-29.
 
 =for Pod::Coverage .*
 
@@ -61,7 +61,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

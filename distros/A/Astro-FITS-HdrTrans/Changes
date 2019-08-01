@@ -1,5 +1,11 @@
 Revision history for Astro::FITS::HdrTrans
 
+1.62 2019-07-30
+
+    - Use Astro::PAL instead of Astro::SLA.
+    - Add translation class for RxH3.
+    - Add translation of DTAI, DUT1, OPER_LOC and OPER_SFT.
+
 1.61 2018-02-09
 
     - Add support for the INBEAM header for SCUBA-2 (replacing

@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah::Coerce" => "0.025",
+    "Data::Sah::Coerce" => "0.032",
     "Data::Sah::CoerceJS" => "0.011",
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Nodejs::Util" => "0.007",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Coerce" => "0.025",
+  "Data::Sah::Coerce" => "0.032",
   "Data::Sah::CoerceJS" => "0.011",
   "File::Spec" => 0,
   "IO::Handle" => 0,

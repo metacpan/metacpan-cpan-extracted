@@ -55,9 +55,9 @@ subtest 'subclassing with xsbackref class preserves original perl object' => sub
     undef $r;
     cmp_deeply(dcnt(), [0,0], "no dtors");
     undef $u;
-    cmp_deeply(dcnt(), [0,0], "no dtors");
+    cmp_deeply(dcnt(), [0,ignv(0)], "no dtors");
     is($s->unit->id, 311, "id ok");
-    cmp_deeply(dcnt(), [0,0], "no dtors");
+    cmp_deeply(dcnt(), [0,ignv(0)], "no dtors");
     $s->unit(undef);
     cmp_deeply(dcnt(), [1,1], "perl dtor, c dtor");
     
@@ -85,7 +85,7 @@ subtest 'perl data can be used after PERL -> C -> PERL' => sub {
     is($r->id, 311, "id ok");
     is($r->special, 777, "custom method");
     undef $u; undef $r;
-    cmp_deeply(dcnt(), [0,0], "no dtors");
+    cmp_deeply(dcnt(), [0,ignv(0)], "no dtors");
     $s->unit(undef);
     cmp_deeply(dcnt(), [1,1], "perl dtor, c dtor");
 };
@@ -123,3 +123,10 @@ subtest 'global destruction' => sub {
 };
 
 done_testing();
+
+# ignore value if perl version < 5.24
+# that's because on older perls we can't supress perl DESTROY() call in sv resurrection
+sub ignv {
+    return $_[0] if $^V >= '5.24';
+    return ignore(); 
+}

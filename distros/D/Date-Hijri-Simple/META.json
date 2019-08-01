@@ -45,7 +45,7 @@
    "provides" : {
       "Date::Hijri::Simple" : {
          "file" : "lib/Date/Hijri/Simple.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Date-Hijri-Simple"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }
